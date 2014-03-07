@@ -1,0 +1,26 @@
+#CMake
+CMakeFiles/
+*/CMakeFiles/*
+*.dir/
+CMakeCache.txt
+cmake_install.cmake
+#Visual Studio 10
+*.vcxproj*
+*.sdf
+*.sln
+*.suo
+*.opensdf
+Win32/
+ipch/
+bin/
+lib/
+#Qt
+*.pro.user
+moc_*.*
+*.qm
+#Resources
+resources
+!src/*/resources
+doc/html
+*_log.txt
+start.bat
