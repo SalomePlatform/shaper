@@ -1,0 +1,64 @@
+ <!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>pictures/new.png</file>
+     <file>pictures/open.png</file>
+     <file>pictures/save.png</file>
+     <file>pictures/close.png</file>
+     <file>pictures/copy.png</file>
+     <file>pictures/cut.png</file>
+     <file>pictures/paste.png</file>
+     <file>pictures/redo.png</file>
+     <file>pictures/undo.png</file>
+     <!--For test purposes-->
+     <file>pictures/box.png</file>
+     <file>pictures/cylinder.png</file>
+     <file>pictures/disk.png</file>
+     <file>pictures/torus.png</file>
+     <file>pictures/ViewPort.png</file>
+     
+     <file>pictures/occ_view_ambient.png</file>
+     <file>pictures/occ_view_anticlockwise.png</file>
+     <file>pictures/occ_view_back.png</file>
+     <file>pictures/occ_view_bottom.png</file>
+     <file>pictures/occ_view_camera_dump.png</file>
+     <file>pictures/occ_view_clipping.png</file>
+     <file>pictures/occ_view_clipping_pressed.png</file>
+     <file>pictures/occ_view_clockwise.png</file>
+     <file>pictures/occ_view_clone.png</file>
+     <file>pictures/occ_view_fitall.png</file>
+     <file>pictures/occ_view_fitarea.png</file>
+     <file>pictures/occ_view_front.png</file>
+     <file>pictures/occ_view_glpan.png</file>
+     <file>pictures/occ_view_graduated_axes.png</file>
+     <file>pictures/occ_view_left.png</file>
+     <file>pictures/occ_view_maximized.png</file>
+     <file>pictures/occ_view_minimized.png</file>
+     <file>pictures/occ_view_pan.png</file>
+     <file>pictures/occ_view_preselection.png</file>
+     <file>pictures/occ_view_presets.png</file>
+     <file>pictures/occ_view_reset.png</file>
+     <file>pictures/occ_view_return_3d_view.png</file>
+     <file>pictures/occ_view_right.png</file>
+     <file>pictures/occ_view_rotate.png</file>
+     <file>pictures/occ_view_rotation_point.png</file>
+     <file>pictures/occ_view_scaling.png</file>
+     <file>pictures/occ_view_selection.png</file>
+     <file>pictures/occ_view_shoot.png</file>
+     <file>pictures/occ_view_style_switch.png</file>
+     <file>pictures/occ_view_top.png</file>
+     <file>pictures/occ_view_triedre.png</file>
+     <file>pictures/occ_view_zoom.png</file>
+     <file>pictures/occ_view_zooming_style_switch.png</file>
+     
+     <file>pictures/wnd_close.png</file>
+     <file>pictures/wnd_minimize.png</file>
+     <file>pictures/wnd_maximize.png</file>
+     
+     <file>pictures/params_folder.png</file>
+     <file>pictures/constr_folder.png</file>
+     <file>pictures/part_ico.png</file>
+     <file>pictures/properties.png</file>
+     <file>pictures/features.png</file>
+     
+ </qresource>
+ </RCC>
