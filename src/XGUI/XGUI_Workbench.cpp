@@ -20,12 +20,14 @@ protected:
 
 void CommandsArea::resizeEvent(QResizeEvent* theEvent)
 {
+    int x = widget()->x();
     QScrollArea::resizeEvent(theEvent);
     QRect aRect = widget()->childrenRect();
     QSize aNewSize = theEvent->size();
     if (aRect.width() > aNewSize.width())
         aNewSize.setWidth(aRect.width() * 2);
     widget()->resize(aNewSize);
+    widget()->move(x, 0);
 }
 
 
@@ -62,7 +64,6 @@ XGUI_Workbench::XGUI_Workbench(QWidget *theParent) :
 
     myRightButton = new QPushButton(">", this);
     myRightButton->setMaximumWidth(14);
-    //myRightButton->setEnabled(false);
     myRightButton->setVisible(false);
     connect(myRightButton,SIGNAL(clicked()), this, SLOT(onRightScroll()));
     aMainLayout->addWidget(myRightButton);
@@ -111,8 +112,6 @@ void XGUI_Workbench::resizeEvent(QResizeEvent* theEvent)
 	if (aW < aS.width())
 		myChildWidget->resize(aS.width(), myChildWidget->height());
 
-    //myLeftButton->setEnabled(isExceedsLeft());
-    //myRightButton->setEnabled(isExceedsRight());
     myLeftButton->setVisible(isExceedsLeft());
     myRightButton->setVisible(isExceedsRight());
 }
@@ -125,8 +124,6 @@ void XGUI_Workbench::onLeftScroll()
     myChildWidget->move( myChildWidget->pos().x() + SCROLL_STEP, 0 );
     myLeftButton->setVisible(isExceedsLeft());
     myRightButton->setVisible(isExceedsRight());
-    //myLeftButton->setEnabled(isExceedsLeft());
-    //myRightButton->setEnabled(isExceedsRight());
 }
 
 
@@ -135,8 +132,6 @@ void XGUI_Workbench::onRightScroll()
     if (!isExceedsRight())
 		return;
     myChildWidget->move( myChildWidget->pos().x() - SCROLL_STEP, 0 );
-    //myLeftButton->setEnabled(isExceedsLeft());
-    //myRightButton->setEnabled(isExceedsRight());
     myLeftButton->setVisible(isExceedsLeft());
     myRightButton->setVisible(isExceedsRight());
 }

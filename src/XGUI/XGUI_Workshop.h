@@ -2,6 +2,8 @@
 #ifndef XGUI_WORKSHOP_H
 #define XGUI_WORKSHOP_H
 
+#include "XGUI_Interfaces.h"
+
 #include <QObject>
 #include <QMap>
 #include <QIcon>
@@ -11,7 +13,7 @@ class XGUI_MainWindow;
 class XGUI_Command;
 class XGUI_Module;
 
-class XGUI_Workshop: public QObject
+class XGUI_Workshop: public QObject, IWorkshop
 {
 	Q_OBJECT
 public:
@@ -38,6 +40,14 @@ public:
 
     XGUI_MainWindow* mainWindow() const { return myMainWindow; }
 
+    virtual int addWorkbench(const QString& theName);
+    virtual int addGroup(int thePageId);
+    virtual int addFeature(int thePageId, int theGroupId, 
+                           const QString& theTitle, const QString& theTip, 
+                           const QIcon& theIcon, 
+                           const QKeySequence& theKeys = QKeySequence());
+
+
 public slots:
     void onNew();
     void onOpen();
@@ -48,13 +58,9 @@ public slots:
 private:
     void initMenu();
 
-    XGUI_Module* loadModule(const QString& theModule);
-    void loadModules();
+    IModule* loadModule(const QString& theModule);
+    bool activateModule();
 
-    void buildModuleMenu(const QString& theXML);
-
-    int addWorkbench(const QString& theName);
-    int addPageGroup(int thePageId);
     void addCommand(XCommandId theCommandId, int thePageId, int theGroupId, XGUI_Command* theCommand);
     XGUI_Command* createMenuCommand(int thePageId, int theGroupId, XCommandId theCmdId, 
                                     const QString& theTitle, const QString& theTip, 

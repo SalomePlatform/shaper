@@ -23,7 +23,9 @@ public:
 private:
     //!! For test purposes only
     QWidget* getSubWindow();
+
     void fillObjectBrowser();
+    void addPropertyPanel();
 
 
     XGUI_MainMenu* myMenuBar;

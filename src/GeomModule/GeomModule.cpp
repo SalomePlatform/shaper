@@ -6,22 +6,15 @@
 #include <QTextStream>
 
 /*!Create and return new instance of XGUI_Module*/
-extern "C" GM_EXPORT XGUI_Module* createModule()
+extern "C" GM_EXPORT IModule* createModule(IWorkshop* theWshop)
 {
-  return new GeomModule();
+  return new GeomModule(theWshop);
 }
 
 
-GeomModule::GeomModule()
+GeomModule::GeomModule(IWorkshop* theWshop)
 {
-    QString aDir = qApp->applicationDirPath();
-    QString aXMLFile = aDir + QDir::separator() + "main_menu.xml";
-
-    QFile aFile(aXMLFile);
-    if (aFile.open((QIODevice::ReadOnly | QIODevice::Text))) {
-        QTextStream aTextStream(&aFile);
-        myMenuXML = aTextStream.readAll();
-    }
+    myWorkshop = theWshop;
 }
 
 
@@ -29,7 +22,15 @@ GeomModule::~GeomModule()
 {
 }
 
-QString GeomModule::moduleDescription() const
+
+void GeomModule::createFeatures()
 {
-    return myMenuXML;
+    int aPageId = myWorkshop->addWorkbench("Primitives");
+    int aGroupId = myWorkshop->addGroup(aPageId);
+    int aCommand = myWorkshop->addFeature(aPageId, aGroupId, "Box", "Create Box", QIcon(":icons/box.png"), QKeySequence());
+    aCommand = myWorkshop->addFeature(aPageId, aGroupId, "Cylinder", "Create Cylinder", QIcon(":icons/cylinder.png"), QKeySequence());
+    aCommand = myWorkshop->addFeature(aPageId, aGroupId, "Disk", "Create Disk", QIcon(":icons/disk.png"), QKeySequence());
+    aCommand = myWorkshop->addFeature(aPageId, aGroupId, "Torus", "Create Torus", QIcon(":icons/torus.png"), QKeySequence());
+
+    aPageId = myWorkshop->addWorkbench("Operations");
 }

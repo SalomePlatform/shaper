@@ -3,7 +3,7 @@
 
 
 #if defined WIN32
-#  if defined GM_EXPORTS || defined gm_EXPORTS
+#  if defined GeomModule_EXPORTS
 #    define GM_EXPORT __declspec( dllexport )
 #  else
 #    define GM_EXPORT __declspec( dllimport )
