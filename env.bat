@@ -1,21 +1,21 @@
 @echo off
 
 @REM Load local settings from file localenv.bat that should be located in the root directory
-if "%INSTALL_DIR%" == "" (
-  set INSTALL_DIR=%~dp0..
+if "%ROOT_DIR%" == "" (
+  set ROOT_DIR=%~dp0..
 )
-if exist "%INSTALL_DIR%\localenv.bat" (
-  echo Setting local environment from %INSTALL_DIR%\localenv.bat
-  call "%INSTALL_DIR%\localenv.bat"
+if exist "%ROOT_DIR%\localenv.bat" (
+  echo Setting local environment from %ROOT_DIR%\localenv.bat
+  call "%ROOT_DIR%\localenv.bat"
 ) else (
-  echo Warning: file %INSTALL_DIR%\localenv.bat does not exist; using default environment
+  echo Warning: file %ROOT_DIR%\localenv.bat does not exist; using default environment
 )
 
 rem --------------- Configuration -------------- 
 
 rem --------------- Products path --------------
 if "%PRODUCTSDIR%" == "" (
-  set PRODUCTSDIR=%INSTALL_DIR%\PRODUCTS
+  set PRODUCTSDIR=%ROOT_DIR%\PRODUCTS
 )
 
 rem --------------- cmake 2.8.7 --------------
@@ -29,6 +29,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @SET CAS_ROOT_DIR=%PRODUCTSDIR%\OCCT-6.7.0
 @SET CASROOT=%CAS_ROOT_DIR%
 @REM -------------------------
+
 @REM -------------------------
 @REM CASCADE
 @SET PATH=%CASROOT%;%CASROOT%\win32\bind;%PATH%
