@@ -17,6 +17,7 @@
 #include <QFormLayout>
 #include <QDoubleSpinBox>
 #include <QPushButton>
+#include <QScrollArea>
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent) :
     QMainWindow(parent), myObjectBrowser(0)
@@ -36,12 +37,12 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent) :
 
     aDoc = new QDockWidget(this);
     aDoc->setFeatures(QDockWidget::AllDockWidgetFeatures | QDockWidget::DockWidgetVerticalTitleBar);
-    aDoc->setMinimumHeight(20);
+    aDoc->setMinimumHeight(0);
     aDoc->setWindowTitle("Console");
     QTextEdit* aTextEdt = new QTextEdit(aDoc);
     aTextEdt->setText(">>>");
-    aTextEdt->setMinimumHeight(20);
     aDoc->setWidget(aTextEdt);
+    aTextEdt->setMinimumHeight(0);
     addDockWidget(Qt::BottomDockWidgetArea, aDoc);
 
     QMdiArea* aMdiArea = new QMdiArea(this);
@@ -57,7 +58,6 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent) :
 QWidget* XGUI_MainWindow::getSubWindow()
 {
     QMdiSubWindow* aSub = new QMdiSubWindow(this);
-    aSub->setGeometry(0,0, 600, 400);
     QLabel* aLbl = new QLabel(aSub);
     aLbl->setFrameStyle(QFrame::Sunken);
     aLbl->setFrameShape(QFrame::Panel);

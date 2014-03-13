@@ -43,7 +43,6 @@ XGUI_Workbench::XGUI_Workbench(QWidget *theParent) :
 
     myLeftButton = new QPushButton("<", this);
     myLeftButton->setMaximumWidth(14);
-    //myLeftButton->setEnabled(false);
     myLeftButton->setVisible(false);
     connect(myLeftButton,SIGNAL(clicked()), this, SLOT(onLeftScroll()));
     aMainLayout->addWidget(myLeftButton);
@@ -70,7 +69,7 @@ XGUI_Workbench::XGUI_Workbench(QWidget *theParent) :
 
 }
 
-int XGUI_Workbench::addGroup()
+IMenuGroup* XGUI_Workbench::addGroup()
 {
     if (!myLayout->isEmpty()) {
         int aNb = myLayout->count();
@@ -82,7 +81,7 @@ int XGUI_Workbench::addGroup()
     addSeparator();
     myLayout->addStretch();
     myGroups.append(aGroup);
-    return myGroups.size() - 1;
+    return aGroup;
 }
 
 void XGUI_Workbench::addSeparator()
@@ -92,13 +91,6 @@ void XGUI_Workbench::addSeparator()
     aLine->setFrameShadow(QFrame::Sunken);
     myLayout->addWidget(aLine);
 }
-
-void XGUI_Workbench::addCommand(int theGroupId, XGUI_Command* theCommand)
-{
-    XGUI_MenuGroupPanel* aGroup = myGroups.at(theGroupId);
-    aGroup->addCommand(theCommand);
-}
-
 
 void XGUI_Workbench::resizeEvent(QResizeEvent* theEvent)
 {

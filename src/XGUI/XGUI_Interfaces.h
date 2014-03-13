@@ -6,17 +6,40 @@
 #include <QIcon>
 #include <QKeySequence>
 
+
+class IFeatureMenu
+{
+public:
+    virtual bool enabled() const = 0;
+    virtual void enable() = 0;
+    virtual void disable() = 0;
+    virtual QString getId() const = 0;
+    virtual void connectTo(const QObject* theResiver, const char* theSlot) = 0;
+};
+
+
+class IMenuGroup
+{
+public:
+    virtual IFeatureMenu* addFeature(const QString& theId, 
+                                     const QString& theTitle, 
+                                     const QString& theTip, 
+                                     const QIcon& theIcon, 
+                                     const QKeySequence& theKeys = QKeySequence()) = 0;
+};
+
+
+class IWorkbench
+{
+public:
+    virtual IMenuGroup* addGroup() = 0;
+};
+
+
 class IWorkshop
 {
 public:
-    virtual int addWorkbench(const QString& theName) = 0;
-
-    virtual int addGroup(int thePageId) = 0;
-
-    virtual int addFeature(int thePageId, int theGroupId, 
-                           const QString& theTitle, const QString& theTip, 
-                           const QIcon& theIcon, 
-                           const QKeySequence& theKeys = QKeySequence()) = 0;
+    virtual IWorkbench* addWorkbench(const QString& theName) = 0;
 };
 
 

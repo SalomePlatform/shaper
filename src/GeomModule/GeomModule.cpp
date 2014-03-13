@@ -25,12 +25,27 @@ GeomModule::~GeomModule()
 
 void GeomModule::createFeatures()
 {
-    int aPageId = myWorkshop->addWorkbench("Primitives");
-    int aGroupId = myWorkshop->addGroup(aPageId);
-    int aCommand = myWorkshop->addFeature(aPageId, aGroupId, "Box", "Create Box", QIcon(":icons/box.png"), QKeySequence());
-    aCommand = myWorkshop->addFeature(aPageId, aGroupId, "Cylinder", "Create Cylinder", QIcon(":icons/cylinder.png"), QKeySequence());
-    aCommand = myWorkshop->addFeature(aPageId, aGroupId, "Disk", "Create Disk", QIcon(":icons/disk.png"), QKeySequence());
-    aCommand = myWorkshop->addFeature(aPageId, aGroupId, "Torus", "Create Torus", QIcon(":icons/torus.png"), QKeySequence());
+    IWorkbench* aPage = myWorkshop->addWorkbench("Primitives");
+    IMenuGroup* aGroup = aPage->addGroup();
 
-    aPageId = myWorkshop->addWorkbench("Operations");
+    IFeatureMenu* aCommand = aGroup->addFeature("new_part", "Part", "Creates a new part", QIcon(":pictures/part_ico.png"));
+    aCommand = aGroup->addFeature("new_point", "Point", "Create a new point", QIcon(":icons/point.png"));
+    aCommand = aGroup->addFeature("new_axis", "Axis", "Create a new axis", QIcon(":icons/axis.png"), QKeySequence());
+    aCommand = aGroup->addFeature("new_plane", "Plane", "Create a new plane", QIcon(":icons/plane.png"), QKeySequence());
+
+    //aGroup = aPage->addGroup();
+    aCommand = aGroup->addFeature("duplicate", "Duplicate", "Duplicate selected object", QIcon(":icons/duplicate.png"));
+    aCommand = aGroup->addFeature("remove", "Remove", "Remove selected object", QIcon(":icons/remove.png"));
+
+    aPage = myWorkshop->addWorkbench("Features");
+    aGroup = aPage->addGroup();
+
+    aCommand = aGroup->addFeature("extrusion", "Extrusion", "Make extrusion", QIcon(":icons/extrusion.png"));
+    aCommand = aGroup->addFeature("cut", "Cut", "Make cut", QIcon(":icons/cut.png"));
+    aCommand = aGroup->addFeature("fusion", "Fusion", "Make fusion", QIcon(":icons/fusion.png"));
+    aCommand = aGroup->addFeature("revolution", "Revolution", "Make revolution", QIcon(":icons/revol.png"));
+    aCommand = aGroup->addFeature("common", "Common", "Make common", QIcon(":icons/common.png"));
+
+    //aGroup = aPage->addGroup();
+    aCommand = aGroup->addFeature("import", "Import", "Make import", QIcon(":icons/import.png"));
 }

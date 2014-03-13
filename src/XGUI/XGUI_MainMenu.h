@@ -1,6 +1,8 @@
 #ifndef XGUI_MainMenu_H
 #define XGUI_MainMenu_H
 
+#include "XGUI_Interfaces.h"
+
 #include <QObject>
 #include <QList>
 
@@ -19,11 +21,9 @@ public:
     XGUI_MainMenu(XGUI_MainWindow *parent);
     virtual ~XGUI_MainMenu();
 
-    int addWorkbench(QString theTitle);
+    IWorkbench* addWorkbench(QString theTitle);
 
-    int addGroup(int thePageId);
-
-    void addCommand(int thePageId, int theGroupId, XGUI_Command* theCommand);
+    IMenuGroup* addGroup(int thePageId);
 
 private:
     XGUI_MainWindow* myDesktop;

@@ -4,11 +4,9 @@
      <file>pictures/open.png</file>
      <file>pictures/save.png</file>
      <file>pictures/close.png</file>
-     <file>pictures/copy.png</file>
-     <file>pictures/cut.png</file>
-     <file>pictures/paste.png</file>
      <file>pictures/redo.png</file>
      <file>pictures/undo.png</file>
+     <file>pictures/rebuild.png</file>
      <!--For test purposes-->
 
      <file>pictures/ViewPort.png</file>
