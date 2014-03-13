@@ -4,16 +4,11 @@
      <file>pictures/open.png</file>
      <file>pictures/save.png</file>
      <file>pictures/close.png</file>
-     <file>pictures/copy.png</file>
-     <file>pictures/cut.png</file>
-     <file>pictures/paste.png</file>
      <file>pictures/redo.png</file>
      <file>pictures/undo.png</file>
+     <file>pictures/rebuild.png</file>
      <!--For test purposes-->
-     <file>pictures/box.png</file>
-     <file>pictures/cylinder.png</file>
-     <file>pictures/disk.png</file>
-     <file>pictures/torus.png</file>
+
      <file>pictures/ViewPort.png</file>
      
      <file>pictures/occ_view_ambient.png</file>
@@ -60,5 +55,15 @@
      <file>pictures/properties.png</file>
      <file>pictures/features.png</file>
      
+     <file>pictures/x_point.png</file>
+     <file>pictures/y_point.png</file>
+     <file>pictures/z_point.png</file>
+     <file>pictures/x_size.png</file>
+     <file>pictures/y_size.png</file>
+     <file>pictures/z_size.png</file>
+
+     <file>pictures/button_cancel.png</file>
+     <file>pictures/button_help.png</file>
+     <file>pictures/button_ok.png</file>
  </qresource>
  </RCC>

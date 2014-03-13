@@ -2,6 +2,8 @@
 #ifndef XGUI_Workbench_H
 #define XGUI_Workbench_H
 
+#include "XGUI_Interfaces.h"
+
 #include <QWidget>
 #include <QScrollArea>
 #include <QList>
@@ -13,15 +15,13 @@ class CommandsArea;
 class XGUI_Command;
 
 
-class XGUI_Workbench : public QWidget
+class XGUI_Workbench : public QWidget, public IWorkbench
 {
     Q_OBJECT
 public:
     XGUI_Workbench(QWidget* theParent);
 
-    int addGroup();
-
-    void addCommand(int theGroupId, XGUI_Command* theCommand);
+    virtual IMenuGroup* addGroup();
 
 private slots:
     void onLeftScroll();

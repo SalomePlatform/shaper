@@ -2,13 +2,13 @@
 
 #include <QPushButton>
 
-XGUI_Command::XGUI_Command(QObject * parent) :
-    QWidgetAction(parent)
+XGUI_Command::XGUI_Command(const QString& theId, QObject * parent) :
+    QWidgetAction(parent), myId(theId)
 {
 }
 
-XGUI_Command::XGUI_Command(const QIcon& icon, const QString& text, QObject* parent):
-    QWidgetAction(parent)
+XGUI_Command::XGUI_Command(const QString& theId, const QIcon& icon, const QString& text, QObject* parent):
+    QWidgetAction(parent), myId(theId)
 {
     setIcon(icon);
     setText(text);
@@ -39,4 +39,24 @@ QWidget* XGUI_Command::createWidget(QWidget* theParent)
         return aBtn;
     }
     return QWidgetAction::createWidget(theParent);
+}
+
+bool XGUI_Command::enabled() const
+{
+    return isEnabled();
+}
+
+void XGUI_Command::enable()
+{
+    setEnabled(true);
+}
+
+void XGUI_Command::disable()
+{
+    setEnabled(false);
+}
+
+void XGUI_Command::connectTo(const QObject* theResiver, const char* theSlot)
+{
+    connect(this, SIGNAL(triggered()), theResiver, theSlot);
 }

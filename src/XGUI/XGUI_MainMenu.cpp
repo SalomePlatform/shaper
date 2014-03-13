@@ -18,7 +18,7 @@ XGUI_MainMenu::~XGUI_MainMenu(void)
 {
 }
 
-int XGUI_MainMenu::addWorkbench(QString theTitle)
+IWorkbench* XGUI_MainMenu::addWorkbench(QString theTitle)
 {
     QDockWidget* aDoc = new QDockWidget(myDesktop);
     aDoc->setFeatures(QDockWidget::DockWidgetVerticalTitleBar);
@@ -37,19 +37,13 @@ int XGUI_MainMenu::addWorkbench(QString theTitle)
 
 
     myMenuTabs.append(aDoc);
-    return myMenuTabs.length() - 1;
+    return aPage;
 }
 
 
-int XGUI_MainMenu::addGroup(int thePageId)
+IMenuGroup* XGUI_MainMenu::addGroup(int thePageId)
 {
     XGUI_Workbench* aPage = dynamic_cast<XGUI_Workbench*>(myMenuTabs[thePageId]->widget());
     return aPage->addGroup();
-}
-
-void XGUI_MainMenu::addCommand(int thePageId, int theGroupId, XGUI_Command* theCommand)
-{
-    XGUI_Workbench* aPage = dynamic_cast<XGUI_Workbench*>(myMenuTabs[thePageId]->widget());
-    aPage->addCommand(theGroupId, theCommand);
 }
 

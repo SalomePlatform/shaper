@@ -20,7 +20,8 @@ XGUI_MenuGroupPanel::XGUI_MenuGroupPanel(QWidget *parent) :
 
 void XGUI_MenuGroupPanel::addCommand(XGUI_Command* theAction)
 {
-    addWidget(theAction->requestWidget(this));
+    myActions[theAction] = theAction->requestWidget(this);
+    addWidget(myActions[theAction]);
 }
 
 void XGUI_MenuGroupPanel::placeWidget(QWidget* theWgt)
@@ -36,14 +37,13 @@ void XGUI_MenuGroupPanel::placeWidget(QWidget* theWgt)
 void XGUI_MenuGroupPanel::addWidget(QWidget* theWgt)
 {
     placeWidget(theWgt);
-    myWidgets.append(theWgt);
 }
 
 
 void XGUI_MenuGroupPanel::resizeEvent(QResizeEvent* theEvent)
 {
     QWidget::resizeEvent(theEvent);
-    if (myWidgets.size() == 0)
+    if (myActions.size() == 0)
         return;
 
     int aH = theEvent->size().height();
@@ -52,10 +52,24 @@ void XGUI_MenuGroupPanel::resizeEvent(QResizeEvent* theEvent)
         return;
 
     myMaxRow = aMaxRow;
-    QListIterator<QWidget*> aIt(myWidgets);
+    QListIterator<QWidget*> aIt(myActions.values());
     myNewRow = 0;
     myNewCol = 0;
     while (aIt.hasNext()) {
        placeWidget(aIt.next());
     }
+}
+
+IFeatureMenu* XGUI_MenuGroupPanel::addFeature(const QString& theId, const QString& theTitle, 
+                                              const QString& theTip, 
+                                              const QIcon& theIcon, 
+                                              const QKeySequence& theKeys)
+{
+    XGUI_Command* aCommand = new XGUI_Command(theId, theIcon, theTitle, this);
+    aCommand->setToolTip(theTip);
+    if (!theKeys.isEmpty())
+        aCommand->setShortcut(theKeys);
+
+    addCommand(aCommand);
+    return aCommand;
 }

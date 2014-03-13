@@ -33,6 +33,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @REM -------------------------
 @REM CASCADE
 @SET PATH=%CASROOT%;%CASROOT%\win32\bind;%PATH%
+@SET LIB=%CASROOT%\win32\libd;%LIB%
 @set CSF_GraphicShr=%CASROOT%\win32\bind\TKOpenGl.dll
 @set CSF_MDTVFontDirectory=%CASROOT%\src\FontMFT
 @set CSF_LANGUAGE=us

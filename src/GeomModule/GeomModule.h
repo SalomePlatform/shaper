@@ -4,18 +4,20 @@
 
 #include "GeomModule_Defs.h"
 
-#include <XGUI_Module.h>
+#include <XGUI_Interfaces.h>
 
-class GM_EXPORT GeomModule : public XGUI_Module
+class GM_EXPORT GeomModule : public IModule
 {
 public:
-    GeomModule();
+    GeomModule(IWorkshop* theWshop);
     virtual ~GeomModule();
 
-    virtual QString moduleDescription() const;
+    virtual void createFeatures();
 
 private:
     QString myMenuXML;
+
+    IWorkshop* myWorkshop;
 };
 
 #endif

@@ -1,14 +1,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
-INCLUDE(Common)
-INCLUDE(FindQt5)
+SET(CMAKE_AUTOMOC ON)
 
 SET(PROJECT_HEADERS
 	XGUI_Command.h
+	XGUI_Interfaces.h
 	XGUI_MainMenu.h
 	XGUI_MainWindow.h
 	XGUI_MenuGroupPanel.h
-	XGUI_Module.h
 	XGUI_Tools.h
 	XGUI_Workbench.h
 	XGUI_Workshop.h

@@ -3,7 +3,6 @@
 #include "XGUI_MainMenu.h"
 #include "XGUI_Command.h"
 #include "XGUI_Tools.h"
-#include "XGUI_Module.h"
 
 #include <QApplication>
 #include <QFileDialog>
@@ -20,10 +19,6 @@ XGUI_Workshop::XGUI_Workshop() :
     QObject()
 {
     myMainWindow = new XGUI_MainWindow();
-
-    // Set Logo
-    //XGUI_MainMenu* aMenuBar = myMainWindow->menuBar();
-    //aMenuBar->setLogo(QPixmap(":pictures/OCCLogo.png"));
 }
 
 //******************************************************
@@ -35,115 +30,62 @@ XGUI_Workshop::~XGUI_Workshop(void)
 void XGUI_Workshop::startApplication()
 {
     initMenu();
-    //loadModules();
+    activateModule();
     myMainWindow->show();
 }
 
 //******************************************************
 void XGUI_Workshop::initMenu()
 {
-    int aPageId = addWorkbench(tr("HOME_MENU_TITLE"));
+    IWorkbench* aPage = addWorkbench(tr("HOME_MENU_TITLE"));
 
     // File commands group
-    int aGroupId = addPageGroup(aPageId);
+    IMenuGroup* aGroup = aPage->addGroup();
 
-    XGUI_Command* aCommand;
+    IFeatureMenu* aCommand;
 
-    aCommand = createMenuCommand(aPageId, aGroupId, NEW_CMD, tr("NEW_MENU"), tr("NEW_MENU_TIP"),
-                                 QIcon(":pictures/new.png"), QKeySequence::New);
-    connect(aCommand, SIGNAL(triggered()), this, SLOT(onNew()));
+    aCommand = aGroup->addFeature("NEW_CMD", tr("NEW_MENU"), tr("NEW_MENU_TIP"),
+                                  QIcon(":pictures/new.png"), QKeySequence::New);
+    aCommand->connectTo(this, SLOT(onNew()));
 
-    aCommand = createMenuCommand(aPageId, aGroupId, OPEN_CMD, tr("OPEN_MENU"), tr("OPEN_MENU_TIP"),
-                                 QIcon(":pictures/open.png"), QKeySequence::Open);
-    connect(aCommand, SIGNAL(triggered()), this, SLOT(onOpen()));
+    aCommand = aGroup->addFeature("OPEN_CMD", tr("OPEN_MENU"), tr("OPEN_MENU_TIP"),
+                                  QIcon(":pictures/open.png"), QKeySequence::Open);
+    aCommand->connectTo(this, SLOT(onOpen()));
 
-    aCommand = createMenuCommand(aPageId, aGroupId, SAVE_CMD, tr("SAVE_MENU"), tr("SAVE_MENU_TIP"),
-                                 QIcon(":pictures/save.png"), QKeySequence::Save);
-    connect(aCommand, SIGNAL(triggered()), this, SLOT(onSave()));
-    aCommand->setEnabled(false);
+    aCommand = aGroup->addFeature("SAVE_CMD", tr("SAVE_MENU"), tr("SAVE_MENU_TIP"),
+                                  QIcon(":pictures/save.png"), QKeySequence::Save);
+    aCommand->connectTo(this, SLOT(onSave()));
+    aCommand->disable();
 
-    aCommand = createMenuCommand(aPageId, aGroupId, SAVEAS_CMD, tr("SAVEAS_MENU"), tr("SAVEAS_MENU_TIP"),
-                                 QIcon(":pictures/save.png"));
-    connect(aCommand, SIGNAL(triggered()), this, SLOT(onSaveAs()));
-    aCommand->setEnabled(false);
 
-    aCommand = createMenuCommand(aPageId, aGroupId, EXIT_CMD, tr("EXIT_MENU"), tr("EXIT_MENU_TIP"),
-                                 QIcon(":pictures/close.png"), QKeySequence::Close);
-    connect(aCommand, SIGNAL(triggered()), this, SLOT(onExit()));
-
+    aCommand = aGroup->addFeature("SAVEAS_CMD", tr("SAVEAS_MENU"), tr("SAVEAS_MENU_TIP"),
+                                  QIcon(":pictures/save.png"));
+    aCommand->connectTo(this, SLOT(onSaveAs()));
+    aCommand->disable();
 
     // Edit commands group
-    aGroupId = addPageGroup(aPageId);
+    //aGroup = aPage->addGroup();
 
-    aCommand = createMenuCommand(aPageId, aGroupId, UNDO_CMD, tr("UNDO_MENU"), tr("UNDO_MENU_TIP"),
-                                 QIcon(":pictures/undo.png"), QKeySequence::Undo);
+    aCommand = aGroup->addFeature("UNDO_CMD", tr("UNDO_MENU"), tr("UNDO_MENU_TIP"),
+                                  QIcon(":pictures/undo.png"), QKeySequence::Undo);
 
-    aCommand = createMenuCommand(aPageId, aGroupId, REDO_CMD, tr("REDO_MENU"), tr("REDO_MENU_TIP"),
+    aCommand = aGroup->addFeature("REDO_CMD", tr("REDO_MENU"), tr("REDO_MENU_TIP"),
                                  QIcon(":pictures/redo.png"), QKeySequence::Redo);
 
-    aCommand = createMenuCommand(aPageId, aGroupId, CUT_CMD, tr("CUT_MENU"), tr("CUT_MENU_TIP"),
-                                 QIcon(":pictures/cut.png"), QKeySequence::Cut);
+    aCommand = aGroup->addFeature("REBUILD_CMD", tr("REBUILD_MENU"), tr("REBUILD_MENU_TIP"),
+                                 QIcon(":pictures/rebuild.png"));
 
-    aCommand = createMenuCommand(aPageId, aGroupId, COPY_CMD, tr("COPY_MENU"), tr("COPY_MENU_TIP"),
-                                 QIcon(":pictures/copy.png"), QKeySequence::Copy);
-
-    aCommand = createMenuCommand(aPageId, aGroupId, PASTE_CMD, tr("PASTE_MENU"), tr("PASTE_MENU_TIP"),
-                                 QIcon(":pictures/paste.png"), QKeySequence::Paste);
-
-    // Tests
-    aPageId = addWorkbench("Primitives");
-    aGroupId = addPageGroup(aPageId);
-    
-    aCommand = createMenuCommand(aPageId, aGroupId, LAST_CMD, "Box", "Create Box", QIcon(":pictures/box.png"));
-    aCommand = createMenuCommand(aPageId, aGroupId, LAST_CMD, "Cylinder", "Create Cylinder", QIcon(":pictures/cylinder.png"));
-    aCommand = createMenuCommand(aPageId, aGroupId, LAST_CMD, "Disk", "Create Disk", QIcon(":pictures/disk.png"));
-    aCommand = createMenuCommand(aPageId, aGroupId, LAST_CMD, "Torus", "Create Torus", QIcon(":pictures/torus.png"));
-
-    aPageId = addWorkbench("Operations");
+    aCommand = aGroup->addFeature("EXIT_CMD", tr("EXIT_MENU"), tr("EXIT_MENU_TIP"),
+                                  QIcon(":pictures/close.png"), QKeySequence::Close);
+    aCommand->connectTo(this, SLOT(onExit()));
 
 }
 
 //******************************************************
-XGUI_Command* XGUI_Workshop::createMenuCommand(int thePageId, int theGroupId, XCommandId theCmdId, 
-                                               const QString& theTitle, const QString& theTip, 
-                                               const QIcon& theIcon, const QKeySequence& theKeys)
-{
-    XGUI_Command* aCommand = new XGUI_Command(theIcon, theTitle, this);
-    aCommand->setToolTip(theTip);
-    if (!theKeys.isEmpty())
-        aCommand->setShortcut(theKeys);
-    addCommand(theCmdId, thePageId, theGroupId, aCommand);
-    return aCommand;
-}
-
-//******************************************************
-int XGUI_Workshop::addWorkbench(const QString& theName)
+IWorkbench* XGUI_Workshop::addWorkbench(const QString& theName)
 {
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
     return aMenuBar->addWorkbench(theName);
-}
-
-//******************************************************
-int XGUI_Workshop::addPageGroup(int thePageId)
-{
-    XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
-    return aMenuBar->addGroup(thePageId);
-}
-
-//******************************************************
-void XGUI_Workshop::addCommand(XCommandId theCommandId, int thePageId, int theGroupId, XGUI_Command* theCommand)
-{
-    XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
-    aMenuBar->addCommand(thePageId, theGroupId, theCommand);
-    myCommands[theCommandId] = theCommand;
-}
-
-//******************************************************
-XGUI_Command* XGUI_Workshop::command(XCommandId theId) const
-{
-    if (myCommands.contains(theId))
-        return myCommands[theId];
-    return 0;
 }
 
 //******************************************************
@@ -176,7 +118,7 @@ void XGUI_Workshop::onSaveAs()
 }
 
 //******************************************************
-XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
+IModule* XGUI_Workshop::loadModule(const QString& theModule)
 {
   QString libName = library( theModule );
   if ( libName.isEmpty() )
@@ -189,7 +131,8 @@ XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
   CREATE_FUNC crtInst = 0;
 
 #ifdef WIN32
-  HINSTANCE modLib = ::LoadLibrary( (LPTSTR) libName.utf16() ); 
+
+  HINSTANCE modLib = ::LoadLibrary( (LPTSTR) qPrintable(libName) ); 
   if ( !modLib )
   {
     LPVOID lpMsgBuf;
@@ -224,7 +167,7 @@ XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
   }
 #endif
 
-  XGUI_Module* aModule = crtInst ? crtInst() : 0;
+  IModule* aModule = crtInst ? crtInst(this) : 0;
 
   if ( !err.isEmpty() ) {
     if ( mainWindow() && mainWindow()->isVisible() )
@@ -236,20 +179,13 @@ XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
 }
 
 //******************************************************
-void XGUI_Workshop::loadModules()
+bool XGUI_Workshop::activateModule()
 {
     // Test of modules loading
-    QStringList aModules;
-    aModules << "GeomModule";
-
-    foreach(QString aName, aModules) {
-        XGUI_Module* aModule = loadModule(aName);
-        buildModuleMenu(aModule->moduleDescription());
-    }
+    IModule* aModule = loadModule("GeomModule");
+    if (!aModule)
+        return false;
+    aModule->createFeatures();
+    return true;
 }
 
-//******************************************************
-void XGUI_Workshop::buildModuleMenu(const QString& theXML)
-{
-
-}

@@ -2,8 +2,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 #Append Qt5's install prefix into CMAKE_MODULE_PATH
 SET(CMAKE_MODULE_PATH "$ENV{QTDIR}" ${CMAKE_MODULE_PATH})
 
-SET(CMAKE_AUTOMOC ON)
-
 # Widgets finds its own dependencies (QtGui and QtCore).
 FIND_PACKAGE(Qt5Widgets REQUIRED)
 FIND_PACKAGE(Qt5LinguistTools REQUIRED)

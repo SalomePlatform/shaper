@@ -20,12 +20,14 @@ protected:
 
 void CommandsArea::resizeEvent(QResizeEvent* theEvent)
 {
+    int x = widget()->x();
     QScrollArea::resizeEvent(theEvent);
     QRect aRect = widget()->childrenRect();
     QSize aNewSize = theEvent->size();
     if (aRect.width() > aNewSize.width())
         aNewSize.setWidth(aRect.width() * 2);
     widget()->resize(aNewSize);
+    widget()->move(x, 0);
 }
 
 
@@ -41,7 +43,6 @@ XGUI_Workbench::XGUI_Workbench(QWidget *theParent) :
 
     myLeftButton = new QPushButton("<", this);
     myLeftButton->setMaximumWidth(14);
-    //myLeftButton->setEnabled(false);
     myLeftButton->setVisible(false);
     connect(myLeftButton,SIGNAL(clicked()), this, SLOT(onLeftScroll()));
     aMainLayout->addWidget(myLeftButton);
@@ -62,14 +63,13 @@ XGUI_Workbench::XGUI_Workbench(QWidget *theParent) :
 
     myRightButton = new QPushButton(">", this);
     myRightButton->setMaximumWidth(14);
-    //myRightButton->setEnabled(false);
     myRightButton->setVisible(false);
     connect(myRightButton,SIGNAL(clicked()), this, SLOT(onRightScroll()));
     aMainLayout->addWidget(myRightButton);
 
 }
 
-int XGUI_Workbench::addGroup()
+IMenuGroup* XGUI_Workbench::addGroup()
 {
     if (!myLayout->isEmpty()) {
         int aNb = myLayout->count();
@@ -81,7 +81,7 @@ int XGUI_Workbench::addGroup()
     addSeparator();
     myLayout->addStretch();
     myGroups.append(aGroup);
-    return myGroups.size() - 1;
+    return aGroup;
 }
 
 void XGUI_Workbench::addSeparator()
@@ -91,13 +91,6 @@ void XGUI_Workbench::addSeparator()
     aLine->setFrameShadow(QFrame::Sunken);
     myLayout->addWidget(aLine);
 }
-
-void XGUI_Workbench::addCommand(int theGroupId, XGUI_Command* theCommand)
-{
-    XGUI_MenuGroupPanel* aGroup = myGroups.at(theGroupId);
-    aGroup->addCommand(theCommand);
-}
-
 
 void XGUI_Workbench::resizeEvent(QResizeEvent* theEvent)
 {
@@ -111,8 +104,6 @@ void XGUI_Workbench::resizeEvent(QResizeEvent* theEvent)
 	if (aW < aS.width())
 		myChildWidget->resize(aS.width(), myChildWidget->height());
 
-    //myLeftButton->setEnabled(isExceedsLeft());
-    //myRightButton->setEnabled(isExceedsRight());
     myLeftButton->setVisible(isExceedsLeft());
     myRightButton->setVisible(isExceedsRight());
 }
@@ -125,8 +116,6 @@ void XGUI_Workbench::onLeftScroll()
     myChildWidget->move( myChildWidget->pos().x() + SCROLL_STEP, 0 );
     myLeftButton->setVisible(isExceedsLeft());
     myRightButton->setVisible(isExceedsRight());
-    //myLeftButton->setEnabled(isExceedsLeft());
-    //myRightButton->setEnabled(isExceedsRight());
 }
 
 
@@ -135,8 +124,6 @@ void XGUI_Workbench::onRightScroll()
     if (!isExceedsRight())
 		return;
     myChildWidget->move( myChildWidget->pos().x() - SCROLL_STEP, 0 );
-    //myLeftButton->setEnabled(isExceedsLeft());
-    //myRightButton->setEnabled(isExceedsRight());
     myLeftButton->setVisible(isExceedsLeft());
     myRightButton->setVisible(isExceedsRight());
 }

@@ -1,0 +1,15 @@
+ <!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>icons/point.png</file>
+     <file>icons/plane.png</file>
+     <file>icons/axis.png</file>
+     <file>icons/duplicate.png</file>
+     <file>icons/remove.png</file>
+     <file>icons/extrusion.png</file>
+     <file>icons/cut.png</file>
+     <file>icons/fusion.png</file>
+     <file>icons/revol.png</file>
+     <file>icons/common.png</file>
+     <file>icons/import.png</file>
+ </qresource>
+ </RCC>

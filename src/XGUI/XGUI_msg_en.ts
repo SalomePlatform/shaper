@@ -90,6 +90,14 @@
         <source>PASTE_MENU_TIP</source>
         <translation>Paste copied object</translation>
     </message>
+    <message>
+        <source>REBUILD_MENU</source>
+        <translation>Rebuild</translation>
+    </message>
+    <message>
+        <source>REBUILD_MENU_TIP</source>
+        <translation>Rebuild data objects</translation>
+    </message>
 </context>
 <context>
     <name>XGUI_MainWindow</name>
