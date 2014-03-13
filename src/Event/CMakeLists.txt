@@ -1,0 +1,23 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+
+INCLUDE(Common)
+
+SET(PROJECT_HEADERS
+    Event.hxx
+    Event_Message.hxx
+    Event_Listener.hxx
+    Event_Loop.hxx
+)
+
+SET(PROJECT_SOURCES
+    Event_Message.cxx
+    Event_Listener.cxx
+    Event_Loop.cxx
+)
+
+ADD_DEFINITIONS(-DEVENT_EXPORTS)
+ADD_LIBRARY(Event SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+TARGET_LINK_LIBRARIES(Event ${PROJECT_LIBRARIES})
+
+INCLUDE_DIRECTORIES(
+)
