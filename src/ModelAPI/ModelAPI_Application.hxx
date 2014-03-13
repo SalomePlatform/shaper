@@ -6,7 +6,8 @@
 #ifndef ModelAPI_Application_HeaderFile
 #define ModelAPI_Application_HeaderFile
 
-#include <ModelAPI.hxx>
+#include "ModelAPI.hxx"
+class ModelAPI_Document;
 
 /**\class Model_Application
  * \ingroup DataModel
@@ -17,9 +18,8 @@
 class ModelAPI_Application
 {
 public: // useful methods inside of the module
-
   //! Retuns the application: one per process    
-  MODELAPI_EXPORT virtual static ModelAPI_Application GetApplication() = 0;
+  MODELAPI_EXPORT virtual ModelAPI_Application GetApplication() = 0;
 
   MODELAPI_EXPORT virtual ModelAPI_Document* GetMainDocument() = 0;
 };

@@ -14,19 +14,19 @@ if exist "%ROOT_DIR%\localenv.bat" (
 rem --------------- Configuration -------------- 
 
 rem --------------- Products path --------------
-if "%PRODUCTSDIR%" == "" (
-  set PRODUCTSDIR=%ROOT_DIR%\PRODUCTS
+if "%PDIR%" == "" (
+  set PDIR=%ROOT_DIR%\products
 )
 
 rem --------------- cmake 2.8.7 --------------
 if "%CMAKEDIR%" == "" (
-  set CMAKEDIR=%PRODUCTSDIR%\cmake-2.8.12.1
+  set CMAKEDIR=%PDIR%\cmake-2.8.12.1
 )
 set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM CASCADE
-@SET CAS_ROOT_DIR=%PRODUCTSDIR%\OCCT-6.7.0
+@SET CAS_ROOT_DIR=%PDIR%\OCCT-6.7.0
 @SET CASROOT=%CAS_ROOT_DIR%
 @REM -------------------------
 
@@ -55,35 +55,57 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM FREEIMAGE (Used by OCCT)
-@SET PATH=%PRODUCTSDIR%\freeimage-3.15.4\bin;%PATH%
+@SET PATH=%PDIR%\freeimage-3.15.4\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
 @REM FTGL (Used by OCCT)
-@SET PATH=%PRODUCTSDIR%\ftgl-2.1.3\bin;%PATH%
+@SET PATH=%PDIR%\ftgl-2.1.3\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
 @REM FREETYPE (Used by OCCT)
-@SET PATH=%PRODUCTSDIR%\freetype-2.4.11\bin;%PATH%
+@SET PATH=%PDIR%\freetype-2.4.11\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
 @REM GL2PS (Used by OCCT AND PARAVIEW)
-@SET PATH=%PRODUCTSDIR%\gl2ps-1.3.8\bin;%PATH%
+@SET PATH=%PDIR%\gl2ps-1.3.8\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
 @REM TBB (Used by OCCT)
-@SET PATH=%PRODUCTSDIR%\tbb\bin;%PATH%
+@SET PATH=%PDIR%\tbb\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
 @REM QT
 if "%QTDIR%" == "" (
-  @SET QTDIR=%PRODUCTSDIR%\Qt-5.2.0\5.2.0\msvc2010
+  @SET QTDIR=%PDIR%\Qt-5.2.0\5.2.0\msvc2010
 )
 @SET PATH=%QTDIR%\bin;%PATH%
+@REM -------------------------
+
+@REM -------------------------
+@REM PYTHON
+@SET PYTHONHOME=%PDIR%\python-2.7.3
+@SET PYTHON_LIB_DIR=%PYTHONHOME%\libs
+@SET PYTHON_INC_DIR=%PYTHONHOME%\include
+@SET PATH=%PYTHON_LIB_DIR%;%PATH%
+@SET PATH=%PYTHONHOME%;%PATH%
+@SET PYTHONPATH=%PYTHONHOME%\Lib;%PYTHONPATH%
+@SET PYTHONPATH=%PYTHONHOME%\DLLs;%PYTHONPATH%
+@SET PYTHON_VERSION=2.7
+@REM -------------------------
+
+@REM -------------------------
+@REM LIBXML2
+@SET PATH=%PDIR%\libxml2-2.9.0\lib;%PATH%
+@REM -------------------------
+
+@REM -------------------------
+@REM SWIG
+@SET PATH=%PDIR%\swig-2.0.9\bin;%PATH%
 @REM -------------------------
 
 rem -------- Visual Studio --------------------
