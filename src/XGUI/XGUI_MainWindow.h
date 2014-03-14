@@ -22,7 +22,7 @@ public:
 
 private:
     //!! For test purposes only
-    QWidget* getSubWindow();
+    //QWidget* getSubWindow();
 
     void fillObjectBrowser();
     void addPropertyPanel();

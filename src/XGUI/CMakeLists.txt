@@ -11,6 +11,7 @@ SET(PROJECT_HEADERS
 	XGUI_Tools.h
 	XGUI_Workbench.h
 	XGUI_Workshop.h
+    XGUI_ViewWindow.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -26,6 +27,7 @@ SET(PROJECT_SOURCES
 	XGUI_Tools.cpp
 	XGUI_Workbench.cpp
 	XGUI_Workshop.cpp
+    XGUI_ViewWindow.cpp
 )
 
 SET(PROJECT_RESOURCES 

@@ -1,15 +1,14 @@
 #include "XGUI_MainWindow.h"
 #include "XGUI_MainMenu.h"
+#include "XGUI_ViewWindow.h"
 
 #include <QMdiArea>
 #include <QTreeWidget>
 #include <QDockWidget>
 #include <QTextEdit>
-#include <QMdiSubWindow>
 #include <QLabel>
 #include <QToolBar>
 #include <QToolButton>
-#include <QAction>
 #include <QTreeWidgetItem>
 #include <QLayout>
 #include <QLineEdit>
@@ -18,11 +17,11 @@
 #include <QDoubleSpinBox>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QComboBox>
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent) :
     QMainWindow(parent), myObjectBrowser(0)
 {
-    //menuBar();
     myMenuBar = new XGUI_MainMenu(this);
 
     QDockWidget* aDoc = new QDockWidget(this);
@@ -48,56 +47,11 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent) :
     QMdiArea* aMdiArea = new QMdiArea(this);
     setCentralWidget(aMdiArea);
 
-    aMdiArea->addSubWindow(getSubWindow(), Qt::FramelessWindowHint);
+    aMdiArea->addSubWindow(new XGUI_ViewWindow(), Qt::FramelessWindowHint);
 
     fillObjectBrowser();
     addPropertyPanel();
 }
-
-
-QWidget* XGUI_MainWindow::getSubWindow()
-{
-    QMdiSubWindow* aSub = new QMdiSubWindow(this);
-    QLabel* aLbl = new QLabel(aSub);
-    aLbl->setFrameStyle(QFrame::Sunken);
-    aLbl->setFrameShape(QFrame::Panel);
-    aLbl->setPixmap(QPixmap(":pictures/ViewPort.png"));
-    aLbl->setScaledContents(true);
-    aSub->setWidget(aLbl);
-
-    QStringList aPictures;
-    aPictures<<":pictures/occ_view_camera_dump.png"<<":pictures/occ_view_style_switch.png";
-    aPictures<<":pictures/occ_view_triedre.png"<<":pictures/occ_view_fitall.png";
-    aPictures<<":pictures/occ_view_fitarea.png"<<":pictures/occ_view_zoom.png";
-    aPictures<<":pictures/occ_view_pan.png"<<":pictures/occ_view_glpan.png";
-    aPictures<<":pictures/occ_view_rotate.png"<<":pictures/occ_view_front.png";
-    aPictures<<":pictures/occ_view_back.png"<<":pictures/occ_view_left.png";
-    aPictures<<":pictures/occ_view_right.png"<<":pictures/occ_view_top.png";
-    aPictures<<":pictures/occ_view_bottom.png"<<":pictures/occ_view_clone.png";
-
-    QToolBar* aBar = new QToolBar(aSub);
-    aBar->setGeometry(0,0,500,30);
-
-    QAction* aBtn;
-    foreach(QString aName, aPictures) {
-        aBtn = new QAction(aBar);
-        aBtn->setIcon(QIcon(aName));
-        aBar->addAction(aBtn);
-    }
-    
-    aBar = new QToolBar(aSub);
-    aBar->setGeometry(615,0,100,25);
-    QStringList aWndIcons;
-    aWndIcons<<":pictures/wnd_minimize.png"<<":pictures/wnd_maximize.png"<<":pictures/wnd_close.png";
-    foreach(QString aName, aWndIcons) {
-        aBtn = new QAction(aBar);
-        aBtn->setIcon(QIcon(aName));
-        aBar->addAction(aBtn);
-    }
-
-    return aSub;
-}
-
 
 XGUI_MainWindow::~XGUI_MainWindow(void)
 {
@@ -165,26 +119,31 @@ void XGUI_MainWindow::fillObjectBrowser()
 void XGUI_MainWindow::addPropertyPanel()
 {
     QDockWidget* aPropPanel = new QDockWidget(this);
-    aPropPanel->setWindowTitle("Property panel");
+    aPropPanel->setWindowTitle("Point");
 
     QWidget* aContent = new QWidget(aPropPanel);
     QVBoxLayout* aMainLay = new QVBoxLayout(aContent);
     aMainLay->setContentsMargins(3,3,3,3);
     aPropPanel->setWidget(aContent);
 
-    QWidget* aNameWgt = new QWidget(aContent);
+    /*QWidget* aNameWgt = new QWidget(aContent);
     QHBoxLayout* aNameLay = new QHBoxLayout(aNameWgt);
     aNameLay->setContentsMargins(0,0,0,0);
     aMainLay->addWidget(aNameWgt);
 
     aNameLay->addWidget(new QLabel("Name", aNameWgt));
-    aNameLay->addWidget(new QLineEdit(aNameWgt));
+    aNameLay->addWidget(new QLineEdit(aNameWgt));*/
 
-    QGroupBox* aGrpBox1 = new QGroupBox("Point", aContent);
-    aGrpBox1->setFlat(true);
+    QComboBox* aCombo = new QComboBox(aContent);
+    aCombo->addItem("By coordinates");
+    aMainLay->addWidget(aCombo);
+
+    QWidget* aGrpBox1 = new QWidget(aContent);
+    //aGrpBox1->setFlat(true);
     QFormLayout* aFrmLay = new QFormLayout(aGrpBox1);
     aFrmLay->setContentsMargins(0, 6, 0, 0);
     aMainLay->addWidget(aGrpBox1);
+
 
     QLabel* aLbl = new QLabel(aGrpBox1);
     aLbl->setPixmap(QPixmap(":pictures/x_point.png"));
@@ -199,7 +158,7 @@ void XGUI_MainWindow::addPropertyPanel()
     aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
     
 
-    aGrpBox1 = new QGroupBox("Normal vector", aContent);
+/*    aGrpBox1 = new QGroupBox("Normal vector", aContent);
     aGrpBox1->setFlat(true);
     aFrmLay = new QFormLayout(aGrpBox1);
     aFrmLay->setContentsMargins(0, 6, 0, 0);
@@ -215,7 +174,7 @@ void XGUI_MainWindow::addPropertyPanel()
 
     aLbl = new QLabel(aGrpBox1);
     aLbl->setPixmap(QPixmap(":pictures/z_size.png"));
-    aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
+    aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));*/
     
     aMainLay->addStretch(1);
 
@@ -230,10 +189,10 @@ void XGUI_MainWindow::addPropertyPanel()
     aBtn->setFlat(true);
     aBtnLay->addWidget(aBtn);
     aBtnLay->addStretch(1);
-    aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
+    aBtn = new QPushButton(QIcon(":pictures/button_ok.png"), "", aFrm);
     aBtn->setFlat(true);
     aBtnLay->addWidget(aBtn);
-    aBtn = new QPushButton(QIcon(":pictures/button_ok.png"), "", aFrm);
+    aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
     aBtn->setFlat(true);
     aBtnLay->addWidget(aBtn);
 
