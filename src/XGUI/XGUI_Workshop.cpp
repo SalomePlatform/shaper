@@ -37,34 +37,17 @@ void XGUI_Workshop::startApplication()
 //******************************************************
 void XGUI_Workshop::initMenu()
 {
-    IWorkbench* aPage = addWorkbench(tr("HOME_MENU_TITLE"));
+    IWorkbench* aPage = addWorkbench(tr("GEN_MENU_TITLE"));
 
     // File commands group
     IMenuGroup* aGroup = aPage->addGroup();
 
     IFeatureMenu* aCommand;
 
-    aCommand = aGroup->addFeature("NEW_CMD", tr("NEW_MENU"), tr("NEW_MENU_TIP"),
-                                  QIcon(":pictures/new.png"), QKeySequence::New);
-    aCommand->connectTo(this, SLOT(onNew()));
-
-    aCommand = aGroup->addFeature("OPEN_CMD", tr("OPEN_MENU"), tr("OPEN_MENU_TIP"),
-                                  QIcon(":pictures/open.png"), QKeySequence::Open);
-    aCommand->connectTo(this, SLOT(onOpen()));
-
     aCommand = aGroup->addFeature("SAVE_CMD", tr("SAVE_MENU"), tr("SAVE_MENU_TIP"),
                                   QIcon(":pictures/save.png"), QKeySequence::Save);
     aCommand->connectTo(this, SLOT(onSave()));
-    aCommand->disable();
-
-
-    aCommand = aGroup->addFeature("SAVEAS_CMD", tr("SAVEAS_MENU"), tr("SAVEAS_MENU_TIP"),
-                                  QIcon(":pictures/save.png"));
-    aCommand->connectTo(this, SLOT(onSaveAs()));
-    aCommand->disable();
-
-    // Edit commands group
-    //aGroup = aPage->addGroup();
+    //aCommand->disable();
 
     aCommand = aGroup->addFeature("UNDO_CMD", tr("UNDO_MENU"), tr("UNDO_MENU_TIP"),
                                   QIcon(":pictures/undo.png"), QKeySequence::Undo);
@@ -74,6 +57,20 @@ void XGUI_Workshop::initMenu()
 
     aCommand = aGroup->addFeature("REBUILD_CMD", tr("REBUILD_MENU"), tr("REBUILD_MENU_TIP"),
                                  QIcon(":pictures/rebuild.png"));
+
+    aCommand = aGroup->addFeature("SAVEAS_CMD", tr("SAVEAS_MENU"), tr("SAVEAS_MENU_TIP"),
+                                  QIcon(":pictures/save.png"));
+    aCommand->connectTo(this, SLOT(onSaveAs()));
+    //aCommand->disable();
+
+    aCommand = aGroup->addFeature("OPEN_CMD", tr("OPEN_MENU"), tr("OPEN_MENU_TIP"),
+                                  QIcon(":pictures/open.png"), QKeySequence::Open);
+    aCommand->connectTo(this, SLOT(onOpen()));
+
+
+    aCommand = aGroup->addFeature("NEW_CMD", tr("NEW_MENU"), tr("NEW_MENU_TIP"),
+                                  QIcon(":pictures/new.png"), QKeySequence::New);
+    aCommand->connectTo(this, SLOT(onNew()));
 
     aCommand = aGroup->addFeature("EXIT_CMD", tr("EXIT_MENU"), tr("EXIT_MENU_TIP"),
                                   QIcon(":pictures/close.png"), QKeySequence::Close);

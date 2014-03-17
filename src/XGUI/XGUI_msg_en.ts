@@ -7,8 +7,8 @@
 <context>
     <name>XGUI_Workshop</name>
     <message>
-        <source>HOME_MENU_TITLE</source>
-        <translation>Home</translation>
+        <source>GEN_MENU_TITLE</source>
+        <translation>General</translation>
     </message>
     <message>
         <source>NEW_MENU</source>

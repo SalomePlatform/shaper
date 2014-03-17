@@ -25,7 +25,7 @@ GeomModule::~GeomModule()
 
 void GeomModule::createFeatures()
 {
-    IWorkbench* aPage = myWorkshop->addWorkbench("Primitives");
+    IWorkbench* aPage = myWorkshop->addWorkbench("Home");
     IMenuGroup* aGroup = aPage->addGroup();
 
     IFeatureMenu* aCommand = aGroup->addFeature("new_part", "Part", "Creates a new part", QIcon(":pictures/part_ico.png"));
@@ -41,11 +41,14 @@ void GeomModule::createFeatures()
     aGroup = aPage->addGroup();
 
     aCommand = aGroup->addFeature("extrusion", "Extrusion", "Make extrusion", QIcon(":icons/extrusion.png"));
+    aCommand = aGroup->addFeature("revolution", "Revolution", "Make revolution", QIcon(":icons/revol.png"));
     aCommand = aGroup->addFeature("cut", "Cut", "Make cut", QIcon(":icons/cut.png"));
     aCommand = aGroup->addFeature("fusion", "Fusion", "Make fusion", QIcon(":icons/fusion.png"));
-    aCommand = aGroup->addFeature("revolution", "Revolution", "Make revolution", QIcon(":icons/revol.png"));
     aCommand = aGroup->addFeature("common", "Common", "Make common", QIcon(":icons/common.png"));
 
     //aGroup = aPage->addGroup();
     aCommand = aGroup->addFeature("import", "Import", "Make import", QIcon(":icons/import.png"));
+
+    aPage = myWorkshop->addWorkbench("Sketch");
+    aPage = myWorkshop->addWorkbench("Properties");
 }
