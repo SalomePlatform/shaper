@@ -101,7 +101,11 @@ if "%QTDIR%" == "" (
 
 @REM -------------------------
 @REM LIBXML2
-@SET PATH=%PDIR%\libxml2-2.9.0\lib;%PATH%
+@SET LIBXML2_DIR=%PDIR%\libxml2-2.9.0
+@SET LIBXML2_INCLUDE_DIR=%LIBXML2_DIR%\include\libxml2
+@SET LIBXML2_LIB_DIR=%LIBXML2_DIR%\lib
+@SET LIBXML2_BIN_DIR=%LIBXML2_DIR%\bin
+@SET PATH=LIBXML2_BIN_DIR;LIBXML2_LIB_DIR;%PATH%
 @REM -------------------------
 
 @REM -------------------------

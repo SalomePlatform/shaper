@@ -1,0 +1,3 @@
+<plugins>
+  <plugin library="PartSetPlugin" configuration="plugin-PartSet.xml"/>
+</plugins>
