@@ -2,25 +2,23 @@
 #ifndef XGUI_MenuGroupPanel_H
 #define XGUI_MenuGroupPanel_H
 
-#include "XGUI_Interfaces.h"
-
 #include <QWidget>
 #include <QMap>
 
-class QGridLayout;
 class XGUI_Command;
+class QGridLayout;
 
-class XGUI_MenuGroupPanel : public QWidget, public IMenuGroup
+class XGUI_MenuGroupPanel : public QWidget
 {
     Q_OBJECT
 public:
     explicit XGUI_MenuGroupPanel(QWidget *parent = 0);
 
-    virtual IFeatureMenu* addFeature(const QString& theId, 
-                                     const QString& theTitle, 
-                                     const QString& theTip, 
-                                     const QIcon& theIcon, 
-                                     const QKeySequence& theKeys = QKeySequence());
+    XGUI_Command* addFeature(const QString& theId,
+                             const QString& theTitle,
+                             const QString& theTip,
+                             const QIcon& theIcon,
+                             const QKeySequence& theKeys = QKeySequence());
 
 protected:
     virtual void resizeEvent(QResizeEvent *theEvent);

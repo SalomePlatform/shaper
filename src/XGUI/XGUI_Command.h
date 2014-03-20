@@ -1,15 +1,13 @@
 #ifndef XGUI_Command_H
 #define XGUI_Command_H
 
-#include "XGUI_Interfaces.h"
-
 #include <QWidgetAction>
 
 #define MIN_BUTTON_HEIGHT 18
 #define MIN_BUTTON_WIDTH 40
 
 
-class XGUI_Command : public QWidgetAction, public IFeatureMenu
+class XGUI_Command : public QWidgetAction
 {
     Q_OBJECT
 public:

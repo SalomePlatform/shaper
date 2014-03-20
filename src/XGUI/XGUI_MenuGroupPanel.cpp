@@ -60,7 +60,7 @@ void XGUI_MenuGroupPanel::resizeEvent(QResizeEvent* theEvent)
     }
 }
 
-IFeatureMenu* XGUI_MenuGroupPanel::addFeature(const QString& theId, const QString& theTitle, 
+XGUI_Command* XGUI_MenuGroupPanel::addFeature(const QString& theId, const QString& theTitle, 
                                               const QString& theTip, 
                                               const QIcon& theIcon, 
                                               const QKeySequence& theKeys)

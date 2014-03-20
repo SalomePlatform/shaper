@@ -1,4 +1,4 @@
-#include "GeomModule.h"
+#include "PartSet_Module.h"
 
 #include <Config_XMLReader.h>
 
@@ -8,24 +8,24 @@
 #include <QTextStream>
 
 /*!Create and return new instance of XGUI_Module*/
-extern "C" GM_EXPORT IModule* createModule(IWorkshop* theWshop)
+extern "C" PARTSET_EXPORT XGUI_Module* createModule(XGUI_Workshop* theWshop)
 {
-  return new GeomModule(theWshop);
+  return new PartSet_Module(theWshop);
 }
 
 
-GeomModule::GeomModule(IWorkshop* theWshop)
+PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
 {
     myWorkshop = theWshop;
 }
 
 
-GeomModule::~GeomModule()
+PartSet_Module::~PartSet_Module()
 {
 }
 
 
-void GeomModule::createFeatures()
+void PartSet_Module::createFeatures()
 {
   Config_XMLReader* aReader =
           new Config_XMLReader("plugin-PartSet.xml");

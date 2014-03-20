@@ -2,27 +2,27 @@
 #ifndef XGUI_Workbench_H
 #define XGUI_Workbench_H
 
-#include "XGUI_Interfaces.h"
-
 #include <QWidget>
 #include <QScrollArea>
 #include <QList>
 
-class QHBoxLayout;
-class XGUI_MenuGroupPanel;
-class QPushButton;
-class CommandsArea;
 class XGUI_Command;
+class XGUI_MenuGroupPanel;
+class CommandsArea;
+
+class QHBoxLayout;
+class QPushButton;
 
 
-class XGUI_Workbench : public QWidget, public IWorkbench
+
+class XGUI_Workbench : public QWidget
 {
     Q_OBJECT
 public:
     XGUI_Workbench(QWidget* theParent);
 
-    virtual IMenuGroup* addGroup(const QString& theName = "");
-    virtual IMenuGroup* findGroup(const QString& theName);
+    XGUI_MenuGroupPanel* addGroup(const QString& theName = "");
+    XGUI_MenuGroupPanel* findGroup(const QString& theName);
 
 private slots:
     void onLeftScroll();

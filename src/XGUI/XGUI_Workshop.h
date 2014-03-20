@@ -2,8 +2,6 @@
 #ifndef XGUI_WORKSHOP_H
 #define XGUI_WORKSHOP_H
 
-#include "XGUI_Interfaces.h"
-
 #include <Event_Message.hxx>
 #include <Event_Listener.hxx>
 
@@ -15,10 +13,11 @@
 class XGUI_MainWindow;
 class XGUI_Command;
 class XGUI_Module;
+class XGUI_Workbench;
 
 class Config_FeatureMessage;
 
-class XGUI_Workshop: public QObject, public Event_Listener, public IWorkshop
+class XGUI_Workshop: public QObject, public Event_Listener
 {
 	Q_OBJECT
 public:
@@ -30,7 +29,7 @@ public:
 
     XGUI_MainWindow* mainWindow() const { return myMainWindow; }
 
-    virtual IWorkbench* addWorkbench(const QString& theName);
+    XGUI_Workbench* addWorkbench(const QString& theName);
 
     virtual void ProcessEvent(const Event_Message* theMessage);
 
@@ -48,7 +47,7 @@ protected:
 private:
     void initMenu();
 
-    IModule* loadModule(const QString& theModule);
+    XGUI_Module* loadModule(const QString& theModule);
     bool activateModule();
 
     XGUI_MainWindow* myMainWindow;

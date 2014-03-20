@@ -18,7 +18,7 @@ XGUI_MainMenu::~XGUI_MainMenu(void)
 {
 }
 
-IWorkbench* XGUI_MainMenu::addWorkbench(const QString& theTitle)
+XGUI_Workbench* XGUI_MainMenu::addWorkbench(const QString& theTitle)
 {
     QDockWidget* aDoc = new QDockWidget(myDesktop);
     QString workbenchObjName = theTitle + "_Workbench";
@@ -44,17 +44,17 @@ IWorkbench* XGUI_MainMenu::addWorkbench(const QString& theTitle)
 /*
  * Searches for already created workbench with given name.
  */
-IWorkbench* XGUI_MainMenu::findWorkbench(const QString& theObjName)
+XGUI_Workbench* XGUI_MainMenu::findWorkbench(const QString& theObjName)
 {
   QDockWidget* aDoc = myDesktop->findChild<QDockWidget*>(theObjName);
   if(aDoc) {
-    return dynamic_cast<IWorkbench*>(aDoc->widget());
+    return dynamic_cast<XGUI_Workbench*>(aDoc->widget());
   }
   return NULL;
 }
 
 
-IMenuGroup* XGUI_MainMenu::addGroup(int thePageId)
+XGUI_MenuGroupPanel* XGUI_MainMenu::addGroup(int thePageId)
 {
     XGUI_Workbench* aPage = dynamic_cast<XGUI_Workbench*>(myMenuTabs[thePageId]->widget());
     return aPage->addGroup();

@@ -73,7 +73,7 @@ XGUI_Workbench::XGUI_Workbench(QWidget *theParent) :
  * Creates a new group in the workbench with given name.
  * If no name provided it would be defined as {workbench_name}_Group_N.
  */
-IMenuGroup* XGUI_Workbench::addGroup(const QString& theName)
+XGUI_MenuGroupPanel* XGUI_Workbench::addGroup(const QString& theName)
 {
     QString aGroupName = theName;
     //Generate a group name.
@@ -99,7 +99,7 @@ IMenuGroup* XGUI_Workbench::addGroup(const QString& theName)
 /*
  * Searches for already created group with given name.
  */
-IMenuGroup* XGUI_Workbench::findGroup(const QString& theName)
+XGUI_MenuGroupPanel* XGUI_Workbench::findGroup(const QString& theName)
 {
   QString aGroupName = theName;
   XGUI_MenuGroupPanel* aPanel;

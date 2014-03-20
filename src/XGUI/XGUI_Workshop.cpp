@@ -1,8 +1,11 @@
-#include "XGUI_Workshop.h"
-#include "XGUI_MainWindow.h"
-#include "XGUI_MainMenu.h"
+#include "XGUI_Module.h"
 #include "XGUI_Command.h"
+#include "XGUI_MainMenu.h"
+#include "XGUI_MainWindow.h"
+#include "XGUI_MenuGroupPanel.h"
 #include "XGUI_Tools.h"
+#include "XGUI_Workbench.h"
+#include "XGUI_Workshop.h"
 
 #include <Config_Message.h>
 #include <Event_Loop.hxx>
@@ -13,10 +16,6 @@
 #ifdef _DEBUG
 #include <QDebug>
 #endif
-
-
-#include <cstdio>
-
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -50,12 +49,12 @@ void XGUI_Workshop::startApplication()
 //******************************************************
 void XGUI_Workshop::initMenu()
 {
-    IWorkbench* aPage = addWorkbench(tr("GEN_MENU_TITLE"));
+    XGUI_Workbench* aPage = addWorkbench(tr("GEN_MENU_TITLE"));
 
     // File commands group
-    IMenuGroup* aGroup = aPage->addGroup();
+    XGUI_MenuGroupPanel* aGroup = aPage->addGroup();
 
-    IFeatureMenu* aCommand;
+    XGUI_Command* aCommand;
 
     aCommand = aGroup->addFeature("SAVE_CMD", tr("SAVE_MENU"), tr("SAVE_MENU_TIP"),
                                   QIcon(":pictures/save.png"), QKeySequence::Save);
@@ -92,7 +91,7 @@ void XGUI_Workshop::initMenu()
 }
 
 //******************************************************
-IWorkbench* XGUI_Workshop::addWorkbench(const QString& theName)
+XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 {
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
     return aMenuBar->addWorkbench(theName);
@@ -109,15 +108,18 @@ void XGUI_Workshop::ProcessEvent(const Event_Message* theMessage)
   }
   #ifdef _DEBUG
   qDebug() << "XGUI_Workshop::ProcessEvent: "
-      << "Got message, but it's not a Config_FeatureMessage";
+           << "Catch message, but it can not be processed.";
   #endif
 
 }
 
+/*
+ *
+ */
 void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
 {
   XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
-  IWorkbench* aPage = aMenuBar->findWorkbench(tr( "GEN_MENU_TITLE" ) + "_Workbench");
+  XGUI_Workbench* aPage = aMenuBar->findWorkbench(tr( "GEN_MENU_TITLE" ) + "_Workbench");
   if(!aPage) {
     #ifdef _DEBUG
     qDebug() << "XGUI_Workshop::ProcessEvent: "
@@ -126,13 +128,12 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
     aPage = addWorkbench(tr( "GEN_MENU_TITLE" ));
   }
   QString aGroupName = QString::fromStdString(theMessage->m_group);
-  IMenuGroup* aGroup = aPage->findGroup(aGroupName);
+  QString aFeatureId = QString::fromStdString(theMessage->m_id);
+  XGUI_MenuGroupPanel* aGroup = aPage->findGroup(aGroupName);
   if(!aGroup) {
     aGroup = aPage->addGroup(aGroupName);
   }
-  IFeatureMenu* aCommand;
-  aCommand = aGroup->addFeature(
-    QString::fromStdString(theMessage->m_id),
+  XGUI_Command* aCommand = aGroup->addFeature(aFeatureId,
     QString::fromStdString(theMessage->m_text),
     QString::fromStdString(theMessage->m_tooltip),
     QIcon(theMessage->m_icon.c_str())
@@ -170,7 +171,7 @@ void XGUI_Workshop::onSaveAs()
 }
 
 //******************************************************
-IModule* XGUI_Workshop::loadModule(const QString& theModule)
+XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
 {
   QString libName = library( theModule );
   if ( libName.isEmpty() )
@@ -219,7 +220,7 @@ IModule* XGUI_Workshop::loadModule(const QString& theModule)
   }
 #endif
 
-  IModule* aModule = crtInst ? crtInst(this) : 0;
+  XGUI_Module* aModule = crtInst ? crtInst(this) : 0;
 
   if ( !err.isEmpty() ) {
     if ( mainWindow() && mainWindow()->isVisible() )
@@ -234,7 +235,7 @@ IModule* XGUI_Workshop::loadModule(const QString& theModule)
 bool XGUI_Workshop::activateModule()
 {
     // Test of modules loading
-    IModule* aModule = loadModule("GeomModule");
+    XGUI_Module* aModule = loadModule("PartSet");
     if (!aModule)
         return false;
     aModule->createFeatures();
