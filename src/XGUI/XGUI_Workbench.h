@@ -21,7 +21,8 @@ class XGUI_Workbench : public QWidget, public IWorkbench
 public:
     XGUI_Workbench(QWidget* theParent);
 
-    virtual IMenuGroup* addGroup();
+    virtual IMenuGroup* addGroup(const QString& theName = "");
+    virtual IMenuGroup* findGroup(const QString& theName);
 
 private slots:
     void onLeftScroll();

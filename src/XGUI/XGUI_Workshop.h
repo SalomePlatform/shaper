@@ -4,6 +4,9 @@
 
 #include "XGUI_Interfaces.h"
 
+#include <Event_Message.hxx>
+#include <Event_Listener.hxx>
+
 #include <QObject>
 #include <QMap>
 #include <QIcon>
@@ -13,7 +16,9 @@ class XGUI_MainWindow;
 class XGUI_Command;
 class XGUI_Module;
 
-class XGUI_Workshop: public QObject, public IWorkshop
+class Config_FeatureMessage;
+
+class XGUI_Workshop: public QObject, public Event_Listener, public IWorkshop
 {
 	Q_OBJECT
 public:
@@ -27,12 +32,18 @@ public:
 
     virtual IWorkbench* addWorkbench(const QString& theName);
 
+    virtual void ProcessEvent(const Event_Message* theMessage);
+
 public slots:
     void onNew();
     void onOpen();
     void onSave();
     void onSaveAs();
     void onExit();
+
+protected:
+    //Event-loop processing methods:
+    void addFeature(const Config_FeatureMessage*);
 
 private:
     void initMenu();

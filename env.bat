@@ -100,18 +100,27 @@ if "%QTDIR%" == "" (
 @REM -------------------------
 
 @REM -------------------------
+@REM ZLIB (for LIBXML2)
+@SET PATH=%PDIR%\zlib-1.2.5\dll;%PATH%
+@REM -------------------------
+
+@REM -------------------------
 @REM LIBXML2
 @SET LIBXML2_DIR=%PDIR%\libxml2-2.9.0
+@REM DO NOT rename following 3 variables, 
+@REM they are required by CMake "find(Libxml2)" procedure
 @SET LIBXML2_INCLUDE_DIR=%LIBXML2_DIR%\include\libxml2
 @SET LIBXML2_LIB_DIR=%LIBXML2_DIR%\lib
 @SET LIBXML2_BIN_DIR=%LIBXML2_DIR%\bin
-@SET PATH=LIBXML2_BIN_DIR;LIBXML2_LIB_DIR;%PATH%
+@SET PATH=%LIBXML2_BIN_DIR%;%LIBXML2_LIB_DIR%;%PATH%
 @REM -------------------------
 
 @REM -------------------------
 @REM SWIG
 @SET PATH=%PDIR%\swig-2.0.9\bin;%PATH%
 @REM -------------------------
+
+@SET PATH=D:\NewGEOM\build-eclipse\bin;%PATH%
 
 rem -------- Visual Studio --------------------
 rem Detect Visual Studio (either commercial or Express edition)

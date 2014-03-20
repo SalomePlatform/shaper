@@ -35,7 +35,7 @@ public:
   EVENT_EXPORT static Event_ID EventByName(const char* theName);
 
   //! Allows to send an event
-  EVENT_EXPORT void Send(Event_Message theMessage);
+  EVENT_EXPORT void Send(Event_Message& theMessage);
 
   //! Registers (or adds if such listener is already registered) a listener 
   //! that will be called on the event and from the defined sender

@@ -18,9 +18,11 @@ XGUI_MainMenu::~XGUI_MainMenu(void)
 {
 }
 
-IWorkbench* XGUI_MainMenu::addWorkbench(QString theTitle)
+IWorkbench* XGUI_MainMenu::addWorkbench(const QString& theTitle)
 {
     QDockWidget* aDoc = new QDockWidget(myDesktop);
+    QString workbenchObjName = theTitle + "_Workbench";
+    aDoc->setObjectName(workbenchObjName);
     aDoc->setFeatures(QDockWidget::DockWidgetVerticalTitleBar);
     aDoc->setAllowedAreas(Qt::TopDockWidgetArea);
     aDoc->setWindowTitle(theTitle);
@@ -35,9 +37,20 @@ IWorkbench* XGUI_MainMenu::addWorkbench(QString theTitle)
         myDesktop->tabifyDockWidget(myMenuTabs.last(), aDoc);
     }
 
-
     myMenuTabs.append(aDoc);
     return aPage;
+}
+
+/*
+ * Searches for already created workbench with given name.
+ */
+IWorkbench* XGUI_MainMenu::findWorkbench(const QString& theObjName)
+{
+  QDockWidget* aDoc = myDesktop->findChild<QDockWidget*>(theObjName);
+  if(aDoc) {
+    return dynamic_cast<IWorkbench*>(aDoc->widget());
+  }
+  return NULL;
 }
 
 

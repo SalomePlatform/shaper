@@ -21,7 +21,8 @@ public:
     XGUI_MainMenu(XGUI_MainWindow *parent);
     virtual ~XGUI_MainMenu();
 
-    IWorkbench* addWorkbench(QString theTitle);
+    IWorkbench* addWorkbench(const QString& theTitle);
+    IWorkbench* findWorkbench(const QString& theObjName);
 
     IMenuGroup* addGroup(int thePageId);
 

@@ -4,9 +4,18 @@
 #include "XGUI_Command.h"
 #include "XGUI_Tools.h"
 
+#include <Config_Message.h>
+#include <Event_Loop.hxx>
+
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
+#ifdef _DEBUG
+#include <QDebug>
+#endif
+
+
+#include <cstdio>
 
 #ifdef WIN32
 #include <windows.h>
@@ -30,6 +39,10 @@ XGUI_Workshop::~XGUI_Workshop(void)
 void XGUI_Workshop::startApplication()
 {
     initMenu();
+    //Initialize event listening
+    Event_Loop* aLoop =  Event_Loop::Loop();
+    Event_ID aFeatureId = aLoop->EventByName("Feature");
+    aLoop->RegisterListener(this, aFeatureId);
     activateModule();
     myMainWindow->show();
 }
@@ -83,6 +96,48 @@ IWorkbench* XGUI_Workshop::addWorkbench(const QString& theName)
 {
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
     return aMenuBar->addWorkbench(theName);
+}
+
+//******************************************************
+void XGUI_Workshop::ProcessEvent(const Event_Message* theMessage)
+{
+  const Config_FeatureMessage* aMsg =
+      dynamic_cast<const Config_FeatureMessage*>( theMessage );
+  if(aMsg) {
+    addFeature(aMsg);
+    return;
+  }
+  #ifdef _DEBUG
+  qDebug() << "XGUI_Workshop::ProcessEvent: "
+      << "Got message, but it's not a Config_FeatureMessage";
+  #endif
+
+}
+
+void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
+{
+  XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
+  IWorkbench* aPage = aMenuBar->findWorkbench(tr( "GEN_MENU_TITLE" ) + "_Workbench");
+  if(!aPage) {
+    #ifdef _DEBUG
+    qDebug() << "XGUI_Workshop::ProcessEvent: "
+             << "Creating a workbench " << tr( "GEN_MENU_TITLE" );
+    #endif
+    aPage = addWorkbench(tr( "GEN_MENU_TITLE" ));
+  }
+  QString aGroupName = QString::fromStdString(theMessage->m_group);
+  IMenuGroup* aGroup = aPage->findGroup(aGroupName);
+  if(!aGroup) {
+    aGroup = aPage->addGroup(aGroupName);
+  }
+  IFeatureMenu* aCommand;
+  aCommand = aGroup->addFeature(
+    QString::fromStdString(theMessage->m_id),
+    QString::fromStdString(theMessage->m_text),
+    QString::fromStdString(theMessage->m_tooltip),
+    QIcon(theMessage->m_icon.c_str())
+    //TODO(sbh): QKeySequence
+  );
 }
 
 //******************************************************

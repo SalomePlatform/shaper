@@ -69,20 +69,48 @@ XGUI_Workbench::XGUI_Workbench(QWidget *theParent) :
 
 }
 
-IMenuGroup* XGUI_Workbench::addGroup()
+/*
+ * Creates a new group in the workbench with given name.
+ * If no name provided it would be defined as {workbench_name}_Group_N.
+ */
+IMenuGroup* XGUI_Workbench::addGroup(const QString& theName)
 {
+    QString aGroupName = theName;
+    //Generate a group name.
+    if(theName.isEmpty()){
+      QString aGroupName = objectName();
+      aGroupName = aGroupName.replace("_Workbench", "_Group_%1");
+      aGroupName = aGroupName.arg(myGroups.count());
+    }
     if (!myLayout->isEmpty()) {
         int aNb = myLayout->count();
         QLayoutItem* aItem = myLayout->itemAt(aNb - 1);
         myLayout->removeItem(aItem);
     }
     XGUI_MenuGroupPanel* aGroup = new XGUI_MenuGroupPanel(myChildWidget);
+    aGroup->setObjectName(aGroupName);
     myLayout->addWidget(aGroup);
     addSeparator();
     myLayout->addStretch();
     myGroups.append(aGroup);
     return aGroup;
 }
+
+/*
+ * Searches for already created group with given name.
+ */
+IMenuGroup* XGUI_Workbench::findGroup(const QString& theName)
+{
+  QString aGroupName = theName;
+  XGUI_MenuGroupPanel* aPanel;
+  foreach(aPanel, myGroups) {
+    if(aPanel->objectName() == theName) {
+      return aPanel;
+    }
+  }
+  return NULL;
+}
+
 
 void XGUI_Workbench::addSeparator()
 {
@@ -91,6 +119,7 @@ void XGUI_Workbench::addSeparator()
     aLine->setFrameShadow(QFrame::Sunken);
     myLayout->addWidget(aLine);
 }
+
 
 void XGUI_Workbench::resizeEvent(QResizeEvent* theEvent)
 {

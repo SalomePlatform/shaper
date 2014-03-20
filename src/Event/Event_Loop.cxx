@@ -30,7 +30,7 @@ Event_ID Event_Loop::EventByName(const char* theName)
   return Event_ID(aResult);
 }
 
-void Event_Loop::Send(Event_Message theMessage)
+void Event_Loop::Send(Event_Message& theMessage)
 {
   // TO DO: make it in thread and wit husage of semaphores
 

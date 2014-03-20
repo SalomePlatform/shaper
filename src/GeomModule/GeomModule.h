@@ -6,6 +6,8 @@
 
 #include <XGUI_Interfaces.h>
 
+class Config_XMLReader;
+
 class GM_EXPORT GeomModule : public IModule
 {
 public:

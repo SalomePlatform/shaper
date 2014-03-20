@@ -17,7 +17,7 @@
  * used as an identifier (this is usefull for debugging of the events
  * with log files and in debugger).
  */
-EVENT_EXPORT class Event_ID {
+class EVENT_EXPORT Event_ID {
   char* myID; ///< pointer to the text-identifier of the event, unique pointer for all events of such type
 
   Event_ID(char* theID) {myID = theID;}
@@ -35,7 +35,7 @@ public:
  * \brief Message for communication between sender and listener of event.
  * Normally it is inherited by the higher-level 
  */
-EVENT_EXPORT class Event_Message {
+class EVENT_EXPORT Event_Message {
   Event_ID myID; ///< identifier of the event
   void* mySender; ///< the sender object
 
@@ -43,6 +43,7 @@ public:
 
   //! Creates the message
   Event_Message(const Event_ID theID, const void* theSender = 0);
+  virtual ~Event_Message() {}
 
   //! Returns identifier of the message
   const Event_ID& ID() const {return myID;}

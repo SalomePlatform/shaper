@@ -15,7 +15,7 @@ class Event_Message;
  * If some object wants to listen some events it must inherit
  * this class and register in the Loop.
  */
-EVENT_EXPORT class Event_Listener {
+class EVENT_EXPORT Event_Listener {
 
 public:
   //! This method is called by loop when the event is started to process.

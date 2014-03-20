@@ -32,7 +32,8 @@ public:
 class IWorkbench
 {
 public:
-    virtual IMenuGroup* addGroup() = 0;
+    virtual IMenuGroup* addGroup(const QString& theName = "") = 0;
+    virtual IMenuGroup* findGroup(const QString& theName) = 0;
 };
 
 
