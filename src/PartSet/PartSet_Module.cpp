@@ -1,6 +1,6 @@
 #include "PartSet_Module.h"
 
-#include <Config_XMLReader.h>
+#include <Config_ModuleReader.h>
 
 #include <QFile>
 #include <QDir>
@@ -24,10 +24,11 @@ PartSet_Module::~PartSet_Module()
 {
 }
 
-
 void PartSet_Module::createFeatures()
 {
-  Config_XMLReader* aReader =
-          new Config_XMLReader("plugin-PartSet.xml");
-  aReader->readAll();
+  Config_ModuleReader* aXMLReader = new Config_ModuleReader();
+  aXMLReader->getModuleName();
+  aXMLReader->setAutoImport(true);
+  aXMLReader->readAll();
+  delete aXMLReader;
 }

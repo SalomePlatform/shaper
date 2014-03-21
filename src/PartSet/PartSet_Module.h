@@ -6,7 +6,7 @@
 
 #include <XGUI_Module.h>
 
-class Config_XMLReader;
+class Config_FeatureReader;
 
 class PARTSET_EXPORT PartSet_Module : public XGUI_Module
 {

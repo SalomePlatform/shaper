@@ -12,27 +12,29 @@
 #include "Config_Message.h"
 
 #include <string>
-#include <map>
+
+//Forward declaration for xmlNodePtr.
+typedef struct _xmlNode xmlNode;
+typedef xmlNode *xmlNodePtr;
+struct _xmlNode;
 
 class CONFIG_EXPORT Config_XMLReader {
 public:
   Config_XMLReader(const std::string& theXmlFile);
   virtual ~Config_XMLReader();
 
-  std::string documentPath() const;
-  void setDocumentPath(std::string documentName);
-
   void readAll();
 
 protected:
-  //! Performs the real import of the given xml file, return false if file is not found
-  //! or generates an algo error if file content is bad
-  //! \param theFile name of the imported XML file
-  //! \returns true if file exists and not corrupted
-  bool import();
-  bool importWorkbench(void*);
-  void fillFeature(void *theRoot, Config_FeatureMessage& outFeatureMessage);
-  std::string getProperty(void *theRoot, const char* name);
+  virtual void processNode(xmlNodePtr aNode);
+  virtual bool processChildren(xmlNodePtr aNode);
+
+  xmlNodePtr findRoot();
+  void readRecursively(xmlNodePtr theParent);
+
+  xmlNodePtr node(void* theNode);
+  std::string getProperty(xmlNodePtr theNode, const char* property);
+  bool isNode(xmlNodePtr theNode, const char* name);
 
 private:
   std::string m_DocumentPath;

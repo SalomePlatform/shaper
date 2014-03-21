@@ -8,9 +8,9 @@
 #include <Config_XMLReader.h>
 
 #include <Event_Loop.hxx>
-
 #include <libxml\parser.h>
 #include <libxml\tree.h>
+
 #ifdef WIN32
 //For GetModuleFileNameW
 #include <windows.h>
@@ -20,36 +20,11 @@
 #include <iostream>
 #endif
 
-static bool IsNode(xmlNodePtr theNode, const char* theNodeName)
-{
-  return theNode->type == XML_ELEMENT_NODE
-      && !xmlStrcmp(theNode->name, (const xmlChar *) theNodeName);
-}
 
-const static char* FEATURE_ID = "id";
-const static char* FEATURE_TEXT = "text";
-const static char* FEATURE_TOOLTIP = "tooltip";
-const static char* FEATURE_ICON = "icon";
-const static char* FEATURE_KEYSEQUENCE = "keysequence";
-const static char* FEATURE_GROUP_NAME = "name";
-
-Config_XMLReader::Config_XMLReader(const std::string& theXmlFile)
-{
-  setDocumentPath(theXmlFile);
-}
-
-Config_XMLReader::~Config_XMLReader()
-{
-}
-
-std::string Config_XMLReader::documentPath() const
-{
-  return m_DocumentPath;
-}
-
-void Config_XMLReader::setDocumentPath(std::string documentPath)
+Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
 {
   std::string prefix;
+  //Get path to *.xml files (typically ./bin/../plugins/)
 #ifdef WIN32
   HMODULE hModule = GetModuleHandleW(NULL);
   WCHAR wchar_path[MAX_PATH];
@@ -66,20 +41,51 @@ void Config_XMLReader::setDocumentPath(std::string documentPath)
   //TODO(sbh): Find full path to binary on linux
   prefix = "../plugins/";
 #endif
-  m_DocumentPath = prefix + documentPath;
+
+  m_DocumentPath = prefix + theXmlFileName;
 }
 
-void Config_XMLReader::readAll()
+
+Config_XMLReader::~Config_XMLReader()
 {
-  import();
 }
 
 /*
- * TODO: make virtual as beforeImport
+ * Read all nodes (recursively if processChildren() is true
+ * for a node). For each read node the processNode will be
+ * called.
  */
-bool Config_XMLReader::import()
+void Config_XMLReader::readAll()
 {
-  bool result = false;
+  xmlNodePtr aRoot = findRoot();
+  readRecursively(aRoot);
+}
+
+/*
+ * Allows to customize reader's behavior for a node. Virtual.
+ * The default implementation does nothing. (In debug mode prints
+ * some info)
+ */
+void Config_XMLReader::processNode(xmlNodePtr aNode)
+{
+  #ifdef _DEBUG
+    std::cout << "Config_XMLReader::processNode: "
+              << aNode->name << " content: "
+              << aNode->content << std::endl;
+  #endif
+}
+
+/*
+ * Defines which nodes should be processed recursively. Virtual.
+ * The default implementation to read all nodes.
+ */
+bool Config_XMLReader::processChildren(xmlNodePtr aNode)
+{
+  return true;
+}
+
+xmlNodePtr Config_XMLReader::findRoot()
+{
   xmlDocPtr aDoc;
   aDoc = xmlParseFile(m_DocumentPath.c_str());
   if(aDoc == NULL) {
@@ -87,81 +93,62 @@ bool Config_XMLReader::import()
     std::cout << "Config_XMLReader::import: " << "Document " << m_DocumentPath
               << " is not parsed successfully." << std::endl;
     #endif
-    return result;
+    return NULL;
   }
   xmlNodePtr aRoot = xmlDocGetRootElement(aDoc);
+  #ifdef _DEBUG
   if(aRoot == NULL) {
-    #ifdef _DEBUG
     std::cout << "Config_XMLReader::import: " << "Error: empty document";
-    #endif
-    return result;
   }
-  xmlNodePtr aWbSec;
-  for(aWbSec = aRoot->xmlChildrenNode; aWbSec; aWbSec = aWbSec->next) { // searching for higher level element "workbench"
-    if(IsNode(aWbSec, "workbench")) {
-      result = importWorkbench(aWbSec);
-    } else {
-      #ifdef _DEBUG
-      std::cout << "Config_XMLReader::import: "
-                << "Found strange section, should be workbench" << std::endl;
-      #endif
-      continue;
-    }
-  }
-  return result;
+  #endif
+  return aRoot;
 }
 
 /*
- * TODO(sbh): make virtual as doImport
+ * Calls processNode() for each child (for some - recursively)
+ * of the given node.
+ * \sa ReadAll()
  */
-bool Config_XMLReader::importWorkbench(void* theRoot)
+void Config_XMLReader::readRecursively(xmlNodePtr theParent)
 {
-  xmlNodePtr aGroupNode = (static_cast<xmlNodePtr>(theRoot))->xmlChildrenNode;
-  Event_Loop* aEvLoop = Event_Loop::Loop();
-  if(!aEvLoop) {
-    #ifdef _DEBUG
-    std::cout << "Config_XMLReader::importWorkbench: "
-              << "No event loop registered" << std::endl;
-    #endif
-    return false;
-  }
-  for(; aGroupNode; aGroupNode = aGroupNode->next) { // searching for record
-    if(!IsNode(aGroupNode, "group"))
-      continue;
-    std::string aGroupName = getProperty(aGroupNode, FEATURE_GROUP_NAME);
-    if(aGroupName.empty())
-      continue;
-    xmlNodePtr aFtNode = aGroupNode->xmlChildrenNode;
-    for(; aFtNode; aFtNode = aFtNode->next) {
-      if(!IsNode(aFtNode, "feature"))
-        continue;
-      //Create feature...
-      Config_FeatureMessage aMessage(aEvLoop->EventByName("Feature"), this);
-      fillFeature(aFtNode, aMessage);
-      aMessage.m_group = aGroupName;
-      aEvLoop->Send(aMessage);
+  if(!theParent)
+    return;
+  xmlNodePtr aNode = theParent->xmlChildrenNode;
+  for(; aNode; aNode = aNode->next) {
+    processNode(aNode);
+    if(processChildren(aNode)) {
+      readRecursively(aNode);
     }
   }
-  return true;
 }
 
-void Config_XMLReader::fillFeature(void *theRoot,
-                                   Config_FeatureMessage& outFeatureMessage)
+/*
+ * void* -> xmlNodePtr
+ */
+xmlNodePtr Config_XMLReader::node(void* theNode)
 {
-  outFeatureMessage.m_id = getProperty(theRoot, FEATURE_ID);
-  outFeatureMessage.m_text = getProperty(theRoot, FEATURE_TEXT);
-  outFeatureMessage.m_tooltip = getProperty(theRoot, FEATURE_TOOLTIP);
-  outFeatureMessage.m_icon = getProperty(theRoot, FEATURE_ICON);
-  outFeatureMessage.m_keysequence = getProperty(theRoot, FEATURE_KEYSEQUENCE);
+  return static_cast<xmlNodePtr>(theNode);
 }
 
-std::string Config_XMLReader::getProperty(void *theRoot, const char* name)
+/*
+ * Returns named property for a given node as std::string.
+ */
+std::string Config_XMLReader::getProperty(xmlNodePtr theNode, const char* name)
 {
   std::string result = "";
-  xmlNodePtr aNode = (static_cast<xmlNodePtr>(theRoot));
-  char* aPropChars = (char*) xmlGetProp(aNode, BAD_CAST name);
+  char* aPropChars = (char*) xmlGetProp(theNode, BAD_CAST name);
   if(!aPropChars || aPropChars[0] == 0)
     return result;
   result = std::string(aPropChars);
   return result;
+}
+
+/*
+ * Returns true if theNode is XML node with a given name.
+ */
+bool Config_XMLReader::isNode(xmlNodePtr theNode, const char* theNodeName)
+{
+  const char* emptyLine = "";
+  return theNode->type == XML_ELEMENT_NODE
+      && !xmlStrcmp(theNode->name, (const xmlChar *) theNodeName);
 }

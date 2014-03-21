@@ -7,13 +7,17 @@ INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/src/Event)
 
 SET(PROJECT_HEADERS
   Config.h
-  Config_XMLReader.h
   Config_Message.h
+  Config_XMLReader.h
+  Config_ModuleReader.h
+  Config_FeatureReader.h
  )
  
 SET(PROJECT_SOURCES
-  Config_XMLReader.cpp
   Config_Message.cpp
+  Config_XMLReader.cpp
+  Config_ModuleReader.cpp
+  Config_FeatureReader.cpp
 )
 
 SET(XML_RESOURCES
@@ -26,9 +30,12 @@ SET(PROJECT_LIBRARIES
 	${LIBXML2_LIBRARIES}
 )
 
+SOURCE_GROUP ("Resource Files" FILES ${XML_RESOURCES})
+
 ADD_DEFINITIONS(-DCONFIG_EXPORTS)
-ADD_LIBRARY(Config SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+ADD_LIBRARY(Config SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES})
 
 TARGET_LINK_LIBRARIES(Config ${PROJECT_LIBRARIES})
 
+INSTALL(TARGETS Config DESTINATION bin)
 INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
