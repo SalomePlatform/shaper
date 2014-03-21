@@ -51,6 +51,7 @@ private:
     bool activateModule();
 
     XGUI_MainWindow* myMainWindow;
+    XGUI_Module* myPartSetModule;
 };
 
 #endif

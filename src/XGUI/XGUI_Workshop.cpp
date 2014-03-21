@@ -27,6 +27,7 @@ XGUI_Workshop::XGUI_Workshop() :
     QObject()
 {
     myMainWindow = new XGUI_MainWindow();
+    myPartSetModule = NULL;
 }
 
 //******************************************************
@@ -40,8 +41,10 @@ void XGUI_Workshop::startApplication()
     initMenu();
     //Initialize event listening
     Event_Loop* aLoop =  Event_Loop::Loop();
-    Event_ID aFeatureId = aLoop->EventByName("Feature");
+    Event_ID aFeatureId = aLoop->EventByName("menu_item");
     aLoop->RegisterListener(this, aFeatureId);
+    Event_ID aPartSetId = aLoop->EventByName("partset_module");
+    aLoop->RegisterListener(this, aPartSetId);
     activateModule();
     myMainWindow->show();
 }
@@ -52,7 +55,7 @@ void XGUI_Workshop::initMenu()
     XGUI_Workbench* aPage = addWorkbench(tr("GEN_MENU_TITLE"));
 
     // File commands group
-    XGUI_MenuGroupPanel* aGroup = aPage->addGroup();
+    XGUI_MenuGroupPanel* aGroup = aPage->addGroup("Default");
 
     XGUI_Command* aCommand;
 
@@ -100,10 +103,10 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 //******************************************************
 void XGUI_Workshop::ProcessEvent(const Event_Message* theMessage)
 {
-  const Config_FeatureMessage* aMsg =
+  const Config_FeatureMessage* aFeatureMsg =
       dynamic_cast<const Config_FeatureMessage*>( theMessage );
-  if(aMsg) {
-    addFeature(aMsg);
+  if(aFeatureMsg) {
+    addFeature(aFeatureMsg);
     return;
   }
   #ifdef _DEBUG
@@ -118,27 +121,35 @@ void XGUI_Workshop::ProcessEvent(const Event_Message* theMessage)
  */
 void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
 {
-  XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
-  XGUI_Workbench* aPage = aMenuBar->findWorkbench(tr( "GEN_MENU_TITLE" ) + "_Workbench");
-  if(!aPage) {
+  if(!theMessage) {
     #ifdef _DEBUG
-    qDebug() << "XGUI_Workshop::ProcessEvent: "
-             << "Creating a workbench " << tr( "GEN_MENU_TITLE" );
+    qDebug() << "XGUI_Workshop::addFeature: NULL message.";
     #endif
-    aPage = addWorkbench(tr( "GEN_MENU_TITLE" ));
+    return;
   }
-  QString aGroupName = QString::fromStdString(theMessage->m_group);
-  QString aFeatureId = QString::fromStdString(theMessage->m_id);
+  //Find or create Workbench
+  XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
+  QString aWchName = QString::fromStdString(theMessage->workbenchId());
+  XGUI_Workbench* aPage = aMenuBar->findWorkbench(aWchName);
+  if(!aPage) {
+    aPage = addWorkbench(aWchName);
+  }
+  //Find or create Group
+  QString aGroupName = QString::fromStdString(theMessage->groupId());
   XGUI_MenuGroupPanel* aGroup = aPage->findGroup(aGroupName);
   if(!aGroup) {
     aGroup = aPage->addGroup(aGroupName);
   }
-  XGUI_Command* aCommand = aGroup->addFeature(aFeatureId,
-    QString::fromStdString(theMessage->m_text),
-    QString::fromStdString(theMessage->m_tooltip),
-    QIcon(theMessage->m_icon.c_str())
+  //Create feature...
+  QString aFeatureId = QString::fromStdString(theMessage->id());
+  XGUI_Command* aCommand = aGroup->addFeature(
+    QString::fromStdString(theMessage->id()),
+    QString::fromStdString(theMessage->text()),
+    QString::fromStdString(theMessage->tooltip()),
+    QIcon(theMessage->icon().c_str())
     //TODO(sbh): QKeySequence
   );
+  myPartSetModule->featureCreated(aCommand);
 }
 
 //******************************************************
@@ -234,11 +245,10 @@ XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
 //******************************************************
 bool XGUI_Workshop::activateModule()
 {
-    // Test of modules loading
-    XGUI_Module* aModule = loadModule("PartSet");
-    if (!aModule)
-        return false;
-    aModule->createFeatures();
-    return true;
+  myPartSetModule = loadModule("PartSet");
+  if (!myPartSetModule)
+    return false;
+  myPartSetModule->createFeatures();
+  return true;
 }
 

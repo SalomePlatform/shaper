@@ -35,7 +35,7 @@ void Event_Loop::Send(Event_Message& theMessage)
   // TO DO: make it in thread and wit husage of semaphores
 
   map<char*, map<void*, list<Event_Listener*> > >::iterator aFindID = 
-    myListeners.find(theMessage.ID().EventText());
+    myListeners.find(theMessage.EventID().EventText());
   if (aFindID != myListeners.end()) {
     map<void*, list<Event_Listener*> >::iterator aFindSender = 
       aFindID->second.find(theMessage.Sender());

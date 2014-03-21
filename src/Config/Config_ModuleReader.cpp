@@ -15,6 +15,17 @@
 #include <iostream>
 #endif
 
+//Hardcoded xml entities
+// * Nodes
+const static char* NODE_PLUGIN = "plugin";
+const static char* NODE_PLUGINS = "plugins";
+
+// * Properties
+const static char* PLUGINS_MODULE = "module";
+const static char* PLUGIN_CONFIG = "configuration";
+const static char* PLUGIN_LIBRARY = "library";
+
+
 Config_ModuleReader::Config_ModuleReader()
     : Config_XMLReader("plugins.xml"),
       m_isAutoImport(false)
@@ -32,7 +43,7 @@ Config_ModuleReader::~Config_ModuleReader()
 std::string Config_ModuleReader::getModuleName()
 {
   xmlNodePtr aRoot = findRoot();
-  return getProperty(aRoot, "module");
+  return getProperty(aRoot, PLUGINS_MODULE);
 }
 
 /*
@@ -40,8 +51,8 @@ std::string Config_ModuleReader::getModuleName()
  */
 void Config_ModuleReader::processNode(xmlNodePtr theNode)
 {
-  if(isNode(theNode, "plugin")) {
-    std::string aPluginName = getProperty(theNode, "configuration");
+  if(isNode(theNode, NODE_PLUGIN, NULL)) {
+    std::string aPluginName = getProperty(theNode, PLUGIN_CONFIG);
     if(m_isAutoImport)
       importPlugin(aPluginName);
     m_pluginsList.push_back(aPluginName);
@@ -50,7 +61,7 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
 
 bool Config_ModuleReader::processChildren(xmlNodePtr theNode)
 {
-  return isNode(theNode, "plugins");
+  return isNode(theNode, NODE_PLUGINS, NULL);
 }
 
 void Config_ModuleReader::importPlugin(const std::string& thePluginName)

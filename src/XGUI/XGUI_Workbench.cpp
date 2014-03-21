@@ -70,25 +70,17 @@ XGUI_Workbench::XGUI_Workbench(QWidget *theParent) :
 }
 
 /*
- * Creates a new group in the workbench with given name.
- * If no name provided it would be defined as {workbench_name}_Group_N.
+ * Creates a new group in the workbench with given object name.
  */
-XGUI_MenuGroupPanel* XGUI_Workbench::addGroup(const QString& theName)
+XGUI_MenuGroupPanel* XGUI_Workbench::addGroup(const QString& theId)
 {
-    QString aGroupName = theName;
-    //Generate a group name.
-    if(theName.isEmpty()){
-      QString aGroupName = objectName();
-      aGroupName = aGroupName.replace("_Workbench", "_Group_%1");
-      aGroupName = aGroupName.arg(myGroups.count());
-    }
     if (!myLayout->isEmpty()) {
         int aNb = myLayout->count();
         QLayoutItem* aItem = myLayout->itemAt(aNb - 1);
         myLayout->removeItem(aItem);
     }
     XGUI_MenuGroupPanel* aGroup = new XGUI_MenuGroupPanel(myChildWidget);
-    aGroup->setObjectName(aGroupName);
+    aGroup->setObjectName(theId);
     myLayout->addWidget(aGroup);
     addSeparator();
     myLayout->addStretch();
@@ -99,12 +91,11 @@ XGUI_MenuGroupPanel* XGUI_Workbench::addGroup(const QString& theName)
 /*
  * Searches for already created group with given name.
  */
-XGUI_MenuGroupPanel* XGUI_Workbench::findGroup(const QString& theName)
+XGUI_MenuGroupPanel* XGUI_Workbench::findGroup(const QString& theId)
 {
-  QString aGroupName = theName;
   XGUI_MenuGroupPanel* aPanel;
   foreach(aPanel, myGroups) {
-    if(aPanel->objectName() == theName) {
+    if(aPanel->objectName() == theId) {
       return aPanel;
     }
   }

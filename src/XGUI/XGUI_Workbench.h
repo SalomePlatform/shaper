@@ -21,7 +21,7 @@ class XGUI_Workbench : public QWidget
 public:
     XGUI_Workbench(QWidget* theParent);
 
-    XGUI_MenuGroupPanel* addGroup(const QString& theName = "");
+    XGUI_MenuGroupPanel* addGroup(const QString& theId);
     XGUI_MenuGroupPanel* findGroup(const QString& theName);
 
 private slots:

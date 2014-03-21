@@ -23,10 +23,9 @@ public:
     XGUI_MainMenu(XGUI_MainWindow *parent);
     virtual ~XGUI_MainMenu();
 
-    XGUI_Workbench* addWorkbench(const QString& theTitle);
-    XGUI_Workbench* findWorkbench(const QString& theObjName);
-
-    XGUI_MenuGroupPanel* addGroup(int thePageId);
+    XGUI_Workbench* addWorkbench(const QString& theId,
+                                 const QString& theText = "");
+    XGUI_Workbench* findWorkbench(const QString& theId);
 
 private:
     XGUI_MainWindow* myDesktop;

@@ -146,9 +146,27 @@ std::string Config_XMLReader::getProperty(xmlNodePtr theNode, const char* name)
 /*
  * Returns true if theNode is XML node with a given name.
  */
-bool Config_XMLReader::isNode(xmlNodePtr theNode, const char* theNodeName)
+bool Config_XMLReader::isNode(xmlNodePtr theNode, const char* theNodeName, ...)
 {
-  const char* emptyLine = "";
-  return theNode->type == XML_ELEMENT_NODE
-      && !xmlStrcmp(theNode->name, (const xmlChar *) theNodeName);
+  bool result = false;
+  const xmlChar* aName = theNode->name;
+  if(!aName || theNode->type != XML_ELEMENT_NODE)
+    return false;
+
+  if(!xmlStrcmp(aName, (const xmlChar *) theNodeName))
+    return true;
+
+  va_list args; // define argument list variable
+  va_start (args, theNodeName); // init list; point to last defined argument
+  while(true) {
+    char *anArg = va_arg (args, char *); // get next argument
+    if(anArg == NULL)
+      break;
+    if(!xmlStrcmp(aName, (const xmlChar *) anArg)) {
+      va_end (args); // cleanup the system stack
+      return true;
+    }
+  }
+  va_end (args); // cleanup the system stack
+  return false;
 }

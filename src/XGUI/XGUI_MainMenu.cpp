@@ -18,26 +18,30 @@ XGUI_MainMenu::~XGUI_MainMenu(void)
 {
 }
 
-XGUI_Workbench* XGUI_MainMenu::addWorkbench(const QString& theTitle)
+XGUI_Workbench* XGUI_MainMenu::addWorkbench(const QString& theId,
+                                            const QString& theTitle)
 {
-    QDockWidget* aDoc = new QDockWidget(myDesktop);
-    QString workbenchObjName = theTitle + "_Workbench";
-    aDoc->setObjectName(workbenchObjName);
-    aDoc->setFeatures(QDockWidget::DockWidgetVerticalTitleBar);
-    aDoc->setAllowedAreas(Qt::TopDockWidgetArea);
-    aDoc->setWindowTitle(theTitle);
-    aDoc->setMinimumHeight(30);
-    aDoc->setContentsMargins(0, 0, 0, 0);
+    QDockWidget* aDock = new QDockWidget(myDesktop);
+    aDock->setFeatures(QDockWidget::DockWidgetVerticalTitleBar);
+    aDock->setAllowedAreas(Qt::TopDockWidgetArea);
+    QString aTitle = theTitle;
+    if(aTitle.isEmpty()){
+      aTitle = tr(theId.toLatin1().constData());
+    }
+    aDock->setWindowTitle(aTitle);
+    aDock->setMinimumHeight(30);
+    aDock->setContentsMargins(0, 0, 0, 0);
 
-    XGUI_Workbench* aPage = new XGUI_Workbench(aDoc);
-    aDoc->setWidget(aPage);
+    XGUI_Workbench* aPage = new XGUI_Workbench(aDock);
+    aPage->setObjectName(theId);
+    aDock->setWidget(aPage);
 
-    myDesktop->addDockWidget(Qt::TopDockWidgetArea, aDoc);
+    myDesktop->addDockWidget(Qt::TopDockWidgetArea, aDock);
     if (myMenuTabs.length() > 1) {
-        myDesktop->tabifyDockWidget(myMenuTabs.last(), aDoc);
+        myDesktop->tabifyDockWidget(myMenuTabs.last(), aDock);
     }
 
-    myMenuTabs.append(aDoc);
+    myMenuTabs.append(aDock);
     return aPage;
 }
 
@@ -46,17 +50,5 @@ XGUI_Workbench* XGUI_MainMenu::addWorkbench(const QString& theTitle)
  */
 XGUI_Workbench* XGUI_MainMenu::findWorkbench(const QString& theObjName)
 {
-  QDockWidget* aDoc = myDesktop->findChild<QDockWidget*>(theObjName);
-  if(aDoc) {
-    return dynamic_cast<XGUI_Workbench*>(aDoc->widget());
-  }
-  return NULL;
+  return myDesktop->findChild<XGUI_Workbench*>(theObjName);
 }
-
-
-XGUI_MenuGroupPanel* XGUI_MainMenu::addGroup(int thePageId)
-{
-    XGUI_Workbench* aPage = dynamic_cast<XGUI_Workbench*>(myMenuTabs[thePageId]->widget());
-    return aPage->addGroup();
-}
-

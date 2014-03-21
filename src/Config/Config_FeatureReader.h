@@ -16,12 +16,19 @@ public:
   Config_FeatureReader(const std::string& theXmlFile);
   virtual ~Config_FeatureReader();
 
+  std::string featureWidgetCfg(std::string theFeatureName);
+
 protected:
   void processNode(xmlNodePtr aNode);
   bool processChildren(xmlNodePtr aNode);
 
   void fillFeature(xmlNodePtr theRoot, Config_FeatureMessage& outFeatureMessage);
 
+  std::string m_lastWorkbench;
+  std::string m_lastGroup;
+
+  bool m_fetchWidgetCfg;
+  std::string m_widgetCfg;
 };
 
 #endif /* CONFIG_FEATUREREADER_H_ */

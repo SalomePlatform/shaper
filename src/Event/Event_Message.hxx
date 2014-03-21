@@ -36,7 +36,7 @@ public:
  * Normally it is inherited by the higher-level 
  */
 class EVENT_EXPORT Event_Message {
-  Event_ID myID; ///< identifier of the event
+  Event_ID myEventId; ///< identifier of the event
   void* mySender; ///< the sender object
 
 public:
@@ -46,7 +46,7 @@ public:
   virtual ~Event_Message() {}
 
   //! Returns identifier of the message
-  const Event_ID& ID() const {return myID;}
+  const Event_ID& EventID() const {return myEventId;}
 
   //! Returns sender of the message or NULL if it is anonymous message
   void* Sender() {return mySender;}
