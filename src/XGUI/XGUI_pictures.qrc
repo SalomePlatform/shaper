@@ -48,6 +48,8 @@
      <file>pictures/wnd_close.png</file>
      <file>pictures/wnd_minimize.png</file>
      <file>pictures/wnd_maximize.png</file>
+     <file>pictures/wnd_restore.png</file>
+     <file>pictures/wnd_grip.png</file>
      
      <file>pictures/params_folder.png</file>
      <file>pictures/constr_folder.png</file>

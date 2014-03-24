@@ -2,6 +2,7 @@
 #define XGUI_ViewWindow_H
 
 #include <QWidget>
+#include <QIcon>
 
 class QLabel;
 class QToolBar;
@@ -21,16 +22,31 @@ protected:
     virtual void enterEvent(QEvent* theEvent);
     virtual void leaveEvent(QEvent* theEvent);
 
+    virtual bool eventFilter(QObject *theObj, QEvent *theEvent);
+
 private slots:
     void onClose();
     void onMinimize();
+    void onMaximize();
 
 private:
 
     QLabel* myPicture;
     QLabel* myViewPort;
-    QToolBar* aViewBar;
-    QToolBar* aWindowBar;
+    QLabel* myGripWgt;
+    QToolBar* myViewBar;
+    QToolBar* myWindowBar;
+    QAction* myMinimizeBtn;
+    QAction* myMaximizeBtn;
+
+    QPixmap ViewPortPxm;
+    QIcon MinimizeIco;
+    QIcon MaximizeIco;
+    QIcon CloseIco;
+    QIcon RestoreIco;
+    
+    bool myMoving;
+    QPoint myMousePnt;
 };
 
 #endif

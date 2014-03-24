@@ -48,6 +48,7 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent) :
     setCentralWidget(aMdiArea);
 
     aMdiArea->addSubWindow(new XGUI_ViewWindow(), Qt::FramelessWindowHint);
+    aMdiArea->addSubWindow(new XGUI_ViewWindow(), Qt::FramelessWindowHint);
 
     fillObjectBrowser();
     addPropertyPanel();
