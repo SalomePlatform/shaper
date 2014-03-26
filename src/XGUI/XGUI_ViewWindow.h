@@ -1,17 +1,24 @@
 #ifndef XGUI_ViewWindow_H
 #define XGUI_ViewWindow_H
 
-#include <QWidget>
+#include <QFrame>
 #include <QIcon>
+
+#include <V3d_View.hxx>
+#include <V3d_Viewer.hxx>
 
 class QLabel;
 class QToolBar;
+class XGUI_ViewPort;
+class XGUI_Viewer;
 
-class XGUI_ViewWindow : public QWidget
+class XGUI_ViewWindow : public QFrame
 {
     Q_OBJECT
 public:
-    XGUI_ViewWindow();
+    XGUI_ViewWindow(XGUI_Viewer* theViewer, 
+                    V3d_TypeOfView theType);
+
     virtual ~XGUI_ViewWindow();
 
 protected:
@@ -30,16 +37,19 @@ private slots:
     void onMaximize();
 
 private:
+    enum WindowState { MinimizedState, MaximizedState, NormalState };
+
+
+    XGUI_Viewer* myViewer;
 
     QLabel* myPicture;
-    QLabel* myViewPort;
     QLabel* myGripWgt;
+    XGUI_ViewPort* myViewPort;
     QToolBar* myViewBar;
     QToolBar* myWindowBar;
     QAction* myMinimizeBtn;
     QAction* myMaximizeBtn;
 
-    QPixmap ViewPortPxm;
     QIcon MinimizeIco;
     QIcon MaximizeIco;
     QIcon CloseIco;
@@ -47,6 +57,8 @@ private:
     
     bool myMoving;
     QPoint myMousePnt;
+
+    WindowState myLastState;
 };
 
 #endif

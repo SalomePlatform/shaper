@@ -6,6 +6,7 @@
 #include "XGUI_Tools.h"
 #include "XGUI_Workbench.h"
 #include "XGUI_Workshop.h"
+#include "XGUI_Viewer.h"
 
 #include <Config_Message.h>
 #include <Event_Loop.hxx>
@@ -13,9 +14,13 @@
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QMdiSubWindow>
+
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
+
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -47,6 +52,8 @@ void XGUI_Workshop::startApplication()
     aLoop->RegisterListener(this, aPartSetId);
     activateModule();
     myMainWindow->show();
+    QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
+    aWnd->showMaximized();
 }
 
 //******************************************************

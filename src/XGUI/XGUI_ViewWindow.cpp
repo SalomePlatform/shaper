@@ -1,5 +1,6 @@
 #include "XGUI_ViewWindow.h"
-
+#include "XGUI_ViewPort.h"
+#include "XGUI_Viewer.h"
 
 #include <QLayout>
 #include <QLabel>
@@ -9,32 +10,36 @@
 #include <QApplication>
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QPainter>
 
 #define BORDER_SIZE 2
 
-XGUI_ViewWindow::XGUI_ViewWindow():
-QWidget(),
+
+
+XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, 
+                                 V3d_TypeOfView theType):
+QFrame(),
+    myViewer(theViewer),
     myMoving(false),
-    ViewPortPxm(":pictures/ViewPort.png"),
     MinimizeIco(":pictures/wnd_minimize.png"),
     MaximizeIco(":pictures/wnd_maximize.png"),
     CloseIco(":pictures/wnd_close.png"),
     RestoreIco(":pictures/wnd_restore.png")
 {
-
+    setFrameStyle(QFrame::Raised);
+    setFrameShape(QFrame::Panel);
+    setLineWidth(BORDER_SIZE);
     setMouseTracking(true);
+
     QVBoxLayout* aLay = new QVBoxLayout(this);
     aLay->setContentsMargins(BORDER_SIZE,BORDER_SIZE,BORDER_SIZE,BORDER_SIZE);
-    myViewPort = new QLabel(this);
+    myViewPort = new XGUI_ViewPort(this, myViewer->v3dViewer(), theType);
     aLay->addWidget(myViewPort);
-    myViewPort->setFrameStyle(QFrame::Raised);
-    myViewPort->setCursor(Qt::ArrowCursor);
-    myViewPort->setFrameShape(QFrame::Panel);
-    myViewPort->setPixmap(ViewPortPxm);
-    myViewPort->setScaledContents(true);
 
-    myPicture = new QLabel(this);
-    aLay->addWidget(myPicture);
+    myPicture = new QLabel();
+    myPicture->setFrameStyle(QFrame::Sunken);
+    myPicture->setFrameShape(QFrame::Panel);
+    //aLay->addWidget(myPicture);
     myPicture->setMouseTracking(true);
     myPicture->installEventFilter(this);
     myPicture->hide();
@@ -56,11 +61,14 @@ QWidget(),
 
     myGripWgt = new QLabel(this);
     myGripWgt->setPixmap(QPixmap(":pictures/wnd_grip.png"));
-    myGripWgt->setGeometry(BORDER_SIZE + 2, BORDER_SIZE + 4, 25, 25);
+    myGripWgt->setGeometry(BORDER_SIZE + 2, BORDER_SIZE + 2, 19, 32);
     myGripWgt->setMouseTracking(true);
     myGripWgt->installEventFilter(this);
+    myGripWgt->setAutoFillBackground(true);
 
     myViewBar = new QToolBar(this);
+    myViewBar->setAutoFillBackground(true);
+
     QAction* aBtn;
     for (int i = 0; i < aTitles.length(); i++) {
         aBtn = new QAction(QIcon(aPictures.at(i)), aTitles.at(i), myViewBar);
@@ -68,6 +76,7 @@ QWidget(),
     }
     
     myWindowBar = new QToolBar(this);
+    myWindowBar->setAutoFillBackground(true);
 
     myMinimizeBtn = new QAction(myWindowBar);
     myMinimizeBtn->setIcon(MinimizeIco);
@@ -101,8 +110,11 @@ void XGUI_ViewWindow::resizeEvent(QResizeEvent* theEvent)
     QSize aWndBarSize = myWindowBar->sizeHint();
     QSize myViewBarSize = myViewBar->sizeHint();
 
-    myWindowBar->move(aSize.width() - aWndBarSize.width() - BORDER_SIZE, BORDER_SIZE);
-    myViewBar->setGeometry(BORDER_SIZE + 16, BORDER_SIZE, aSize.width() - aWndBarSize.width(), myViewBarSize.height());
+    myWindowBar->move(aSize.width() - aWndBarSize.width() - BORDER_SIZE - 4, BORDER_SIZE);
+    int aViewBarWidth = aSize.width() - aWndBarSize.width() - myGripWgt->width() - 8;
+    if (aViewBarWidth > myViewBarSize.width())
+        aViewBarWidth = myViewBarSize.width();
+    myViewBar->setGeometry(BORDER_SIZE + 18, BORDER_SIZE, aViewBarWidth, myViewBarSize.height());
 }
 
 //****************************************************************
@@ -111,15 +123,28 @@ void XGUI_ViewWindow::changeEvent(QEvent* theEvent)
 
     if (theEvent->type() == QEvent::WindowStateChange) {
         if (isMinimized()) {
-            parentWidget()->setGeometry(parentWidget()->x(), parentWidget()->y(), 110, 80);
-            myViewPort->hide();
-            myViewBar->hide();
-            myGripWgt->hide();
-            myWindowBar->hide();
+            //parentWidget()->setGeometry(parentWidget()->x(), parentWidget()->y(), 100, 80);
+            //myViewPort->hide();
+            //myViewBar->hide();
+            //myGripWgt->hide();
+            //myWindowBar->hide();
+            //myMinimizeBtn->setIcon(RestoreIco);
+            //myMaximizeBtn->setIcon(MaximizeIco);
+
+            if (!myPicture->parentWidget()) {
+                QMdiSubWindow* aParent = static_cast<QMdiSubWindow*>(parentWidget());
+                QMdiArea* aMDIArea = aParent->mdiArea();
+                myPicture->setParent(aMDIArea);
+            }
+            myPicture->move(parentWidget()->x(), parentWidget()->y());
             myPicture->show();
         } else {
-            myViewPort->show();
+            //myViewPort->show();
             myPicture->hide();
+            if (isMaximized()) {
+                myMinimizeBtn->setIcon(MinimizeIco);
+                myMaximizeBtn->setIcon(RestoreIco);
+            }
         }
     } else
         QWidget::changeEvent(theEvent);
@@ -155,17 +180,22 @@ void XGUI_ViewWindow::leaveEvent(QEvent* theEvent)
 //****************************************************************
 void XGUI_ViewWindow::onMinimize()
 {
-    QPixmap aPMap = grab();
-    myPicture->setPixmap(aPMap.scaled(110, 80));
+    //QPixmap aPMap = myViewPort->grab();
+    QPixmap aPMap = QPixmap::fromImage(myViewPort->dumpView());
+    int aW = width();
+    int aH = height();
+    double aR = aW / 100.;
+    myPicture->setPixmap(aPMap.scaled(100,  int(aH / aR)));
 
-    if (isMinimized()) {
-        myMinimizeBtn->setIcon(MinimizeIco);
-        showNormal();
-    } else {
-        myMinimizeBtn->setIcon(RestoreIco);
-        showMinimized();
-    }
-    myMaximizeBtn->setIcon(MaximizeIco);
+    myLastState = isMaximized()? MaximizedState : NormalState;
+    //if (isMinimized()) {
+        //myMinimizeBtn->setIcon(MinimizeIco);
+        //showNormal();
+    //} else {
+        //myMinimizeBtn->setIcon(RestoreIco);
+    showMinimized();
+    //}
+    //myMaximizeBtn->setIcon(MaximizeIco);
 }
 
 //****************************************************************
@@ -187,6 +217,7 @@ void XGUI_ViewWindow::onMaximize()
 bool XGUI_ViewWindow::eventFilter(QObject *theObj, QEvent *theEvent)
 {
     if ((theObj == myGripWgt) || (theObj == myPicture)) {
+        QWidget* aWgt = (theObj == myPicture)? myPicture : static_cast<QWidget*>(parentWidget());
         switch (theEvent->type()) {
         case QEvent::MouseButtonPress: 
             {
@@ -217,15 +248,23 @@ bool XGUI_ViewWindow::eventFilter(QObject *theObj, QEvent *theEvent)
                     QPoint aPnt = aEvent->globalPos();
                     QPoint aMDIPnt = aMDIArea->mapFromGlobal(aPnt);
                     if (aMDIArea->rect().contains(aMDIPnt)) {
-                        int aX = aParent->x() + (aPnt.x() - myMousePnt.x());
-                        int aY = aParent->y() + (aPnt.y() - myMousePnt.y());
-                        aParent->move(aX, aY);
+                        int aX = aWgt->x() + (aPnt.x() - myMousePnt.x());
+                        int aY = aWgt->y() + (aPnt.y() - myMousePnt.y());
+                        aWgt->move(aX, aY);
                         myMousePnt = aPnt;
                     }
                     return true;
                 }
             }
         }
+        if ((theObj == myPicture) && (theEvent->type() == QEvent::MouseButtonDblClick)) {
+            myMoving = false;
+            if (myLastState == MaximizedState)
+                showMaximized();
+            else
+                showNormal();
+            return true;
+        }
     }
-    return QWidget::eventFilter(theObj, theEvent);
+    return QFrame::eventFilter(theObj, theEvent);
 }

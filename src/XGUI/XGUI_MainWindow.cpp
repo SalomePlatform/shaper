@@ -1,6 +1,7 @@
 #include "XGUI_MainWindow.h"
 #include "XGUI_MainMenu.h"
 #include "XGUI_ViewWindow.h"
+#include "XGUI_Viewer.h"
 
 #include <QMdiArea>
 #include <QTreeWidget>
@@ -47,8 +48,9 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent) :
     QMdiArea* aMdiArea = new QMdiArea(this);
     setCentralWidget(aMdiArea);
 
-    aMdiArea->addSubWindow(new XGUI_ViewWindow(), Qt::FramelessWindowHint);
-    aMdiArea->addSubWindow(new XGUI_ViewWindow(), Qt::FramelessWindowHint);
+    myViewer = new XGUI_Viewer(this);
+    //aMdiArea->addSubWindow(new XGUI_ViewWindow(), Qt::FramelessWindowHint);
+    //aMdiArea->addSubWindow(new XGUI_ViewWindow(), Qt::FramelessWindowHint);
 
     fillObjectBrowser();
     addPropertyPanel();
@@ -57,6 +59,13 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent) :
 XGUI_MainWindow::~XGUI_MainWindow(void)
 {
 }
+
+//******************************************************
+QMdiArea* XGUI_MainWindow::mdiArea() const
+{
+    return static_cast<QMdiArea*>(centralWidget());
+}
+
 
 //******************************************************
 void XGUI_MainWindow::showObjectBrowser()
