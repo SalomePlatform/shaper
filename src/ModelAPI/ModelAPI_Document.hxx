@@ -49,11 +49,14 @@ public:
   //! Returns True if there are available Undos
   MODELAPI_EXPORT virtual bool CanUndo() = 0;
   //! Undoes last operation
-  MODELAPI_EXPORT virtual void Undo();
+  MODELAPI_EXPORT virtual void Undo() = 0;
   //! Returns True if there are available Redos
   MODELAPI_EXPORT virtual bool CanRedo() = 0;
   //! Redoes last operation
   MODELAPI_EXPORT virtual  void Redo() = 0;
+
+  /// Only for SWIG wrapping it is here
+  MODELAPI_EXPORT ModelAPI_Document() {};
 };
 
 #endif

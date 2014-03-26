@@ -111,8 +111,7 @@ xmlNodePtr Config_XMLReader::findRoot()
  */
 void Config_XMLReader::readRecursively(xmlNodePtr theParent)
 {
-  static Event_ID aFeatureEvent = Event_Loop::EventByName("Feature");
-
+<<<<<<< Updated upstream
   if(!theParent)
     return;
   xmlNodePtr aNode = theParent->xmlChildrenNode;
@@ -120,7 +119,34 @@ void Config_XMLReader::readRecursively(xmlNodePtr theParent)
     processNode(aNode);
     if(processChildren(aNode)) {
       readRecursively(aNode);
+=======
+  static Event_ID aFeatureEvent = Event_Loop::EventByName("Feature");
+
+  xmlNodePtr aGroupNode = (static_cast<xmlNodePtr>(theRoot))->xmlChildrenNode;
+  Event_Loop* aEvLoop = Event_Loop::Loop();
+  if(!aEvLoop) {
+    #ifdef _DEBUG
+    std::cout << "Config_XMLReader::importWorkbench: "
+              << "No event loop registered" << std::endl;
+    #endif
+    return false;
+  }
+  for(; aGroupNode; aGroupNode = aGroupNode->next) { // searching for record
+    if(!IsNode(aGroupNode, "group"))
+      continue;
+    std::string aGroupName = getProperty(aGroupNode, FEATURE_GROUP_NAME);
+    if(aGroupName.empty())
+      continue;
+    xmlNodePtr aFtNode = aGroupNode->xmlChildrenNode;
+    for(; aFtNode; aFtNode = aFtNode->next) {
+      if(!IsNode(aFtNode, "feature"))
+        continue;
+      //Create feature...
       Config_FeatureMessage aMessage(aFeatureEvent, this);
+      fillFeature(aFtNode, aMessage);
+      aMessage.m_group = aGroupName;
+      aEvLoop->Send(aMessage);
+>>>>>>> Stashed changes
     }
   }
 }

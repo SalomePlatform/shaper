@@ -8,5 +8,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 IF(WIN32)
-  ADD_DEFINITIONS(-DWIN32 -D_WINDOWS)
+  ## Specific definitions: EHsc to avoid exceptions-linkage unresolved symbols
+  ADD_DEFINITIONS(-DWIN32 -D_WINDOWS /EHsc)
 ENDIF(WIN32)

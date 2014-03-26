@@ -4,7 +4,6 @@
 // Copyright:   CEA 2011
 
 #include <Model_Document.hxx>
-#include <Model_Application.hxx>
 
 #include <TDataStd_Integer.hxx>
 
@@ -23,6 +22,7 @@ using namespace std;
 bool Model_Document::Load(const char* theFileName)
 {
   bool myIsError = Standard_False;
+  /*
   TCollection_ExtendedString aPath ((const Standard_CString)theFileName);
   PCDM_ReaderStatus aStatus = (PCDM_ReaderStatus) -1;
   try
@@ -56,11 +56,14 @@ bool Model_Document::Load(const char* theFileName)
     }
   }
   SetUndoLimit(UNDO_LIMIT);
+  */
   return !myIsError;
 }
 
 bool Model_Document::Save(const char* theFileName)
 {
+  bool myIsError = true;
+  /*
   TCollection_ExtendedString aPath ((const Standard_CString)theFileName);
   PCDM_StoreStatus aStatus;
   try {
@@ -72,7 +75,7 @@ bool Model_Document::Save(const char* theFileName)
     cout<<"OCAFApp_Engine:save Error: "<<aFail->GetMessageString()<<endl;
     return false;
   }
-  bool myIsError = aStatus != PCDM_SS_OK;
+  myIsError = aStatus != PCDM_SS_OK;
   if (myIsError)
   {
     switch (aStatus)
@@ -91,6 +94,7 @@ bool Model_Document::Save(const char* theFileName)
   }
   myTransactionsAfterSave = 0;
   Standard::Purge(); // Release free memory
+  */
   return !myIsError;
 }
 

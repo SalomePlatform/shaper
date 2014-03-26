@@ -120,6 +120,12 @@ if "%QTDIR%" == "" (
 @SET PATH=%PDIR%\swig-2.0.9\bin;%PATH%
 @REM -------------------------
 
+@REM -------------------------
+@REM BOOST
+@SET BOOST_ROOT_DIR=%PDIR%\boost-1.52.0
+@SET PATH=%BOOST_ROOT_DIR%\lib;%PATH%
+@REM -------------------------
+
 @SET PATH=D:\NewGEOM\build-eclipse\bin;%PATH%
 
 rem -------- Visual Studio --------------------
