@@ -3,14 +3,16 @@
 
 #include <QFrame>
 #include <QIcon>
+#include <QToolBar>
+#include <QLabel>
 
 #include <V3d_View.hxx>
 #include <V3d_Viewer.hxx>
 
-class QLabel;
-class QToolBar;
 class XGUI_ViewPort;
 class XGUI_Viewer;
+class ViewerToolbar;
+class ViewerLabel;
 
 class XGUI_ViewWindow : public QFrame
 {
@@ -43,10 +45,10 @@ private:
     XGUI_Viewer* myViewer;
 
     QLabel* myPicture;
-    QLabel* myGripWgt;
+    ViewerLabel* myGripWgt;
     XGUI_ViewPort* myViewPort;
-    QToolBar* myViewBar;
-    QToolBar* myWindowBar;
+    ViewerToolbar* myViewBar;
+    ViewerToolbar* myWindowBar;
     QAction* myMinimizeBtn;
     QAction* myMaximizeBtn;
 
@@ -59,6 +61,36 @@ private:
     QPoint myMousePnt;
 
     WindowState myLastState;
+
+    //QGraphicsScene* myScene;
+};
+
+class ViewerToolbar : public QToolBar
+{
+    Q_OBJECT
+public:
+    ViewerToolbar(QWidget* theParent, XGUI_ViewPort* thePort) :
+    QToolBar(theParent), myVPort(thePort) {}
+
+protected:
+    virtual void paintEvent( QPaintEvent* theEvent);
+
+private:
+    XGUI_ViewPort* myVPort;
+};
+
+class ViewerLabel : public QLabel
+{
+    Q_OBJECT
+public:
+    ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort) :
+    QLabel(theParent), myVPort(thePort) {}
+
+protected:
+    virtual void paintEvent( QPaintEvent* theEvent);
+
+private:
+    XGUI_ViewPort* myVPort;
 };
 
 #endif

@@ -102,6 +102,10 @@
 <context>
     <name>XGUI_MainWindow</name>
     <message>
+        <source>WINDOW_TITLE</source>
+        <translation>New GEOM</translation>
+    </message>
+    <message>
         <source>OBJECT_BROWSER_TITLE</source>
         <translation>Object Browser</translation>
     </message>

@@ -23,6 +23,7 @@
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent) :
     QMainWindow(parent), myObjectBrowser(0)
 {
+    setWindowTitle(tr("WINDOW_TITLE"));
     myMenuBar = new XGUI_MainMenu(this);
 
     QDockWidget* aDoc = new QDockWidget(this);

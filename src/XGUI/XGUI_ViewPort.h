@@ -19,7 +19,7 @@ public:
 
     virtual QPaintEngine* paintEngine() const { return 0; }
 
-    QImage dumpView();
+    QImage dumpView(QRect theRect = QRect(), bool toUpdate = true);
 
     Handle(V3d_View) getView() const { return activeView(); }
 

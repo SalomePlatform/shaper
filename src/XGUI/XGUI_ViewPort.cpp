@@ -365,17 +365,22 @@ void XGUI_ViewPort::resizeEvent( QResizeEvent* )
 }
 
 //***********************************************
-QImage XGUI_ViewPort::dumpView()
+QImage XGUI_ViewPort::dumpView(QRect theRect, bool toUpdate)
 {
     Handle(V3d_View) view = getView();
     if ( view.IsNull() )
         return QImage();
   
-    int aWidth = width();
-    int aHeight = height();
+    int aWidth;
+    int aHeight; 
+    if (theRect.isNull()) {
+        aWidth = width();
+        aHeight = height();
+    } else {
+        aWidth = theRect.width();
+        aHeight = theRect.height();
+    }
     //QApplication::syncX();
-    view->Redraw(); // In order to reactivate GL context
-    //view->Update();
 
     OpenGLUtils_FrameBuffer aFrameBuffer;
     if( aFrameBuffer.init( aWidth, aHeight ) )
@@ -387,13 +392,20 @@ QImage XGUI_ViewPort::dumpView()
         aFrameBuffer.bind();
 
         // draw scene
-        view->Redraw();
-
+        if (toUpdate) {
+            if (theRect.isNull())
+                view->Redraw();
+            else
+                view->Redraw(theRect.x(), theRect.y(), theRect.width(), theRect.height());
+        }
         aFrameBuffer.unbind();
         glPopAttrib();
 
         aFrameBuffer.bind();
-        glReadPixels( 0, 0, aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE, anImage.bits() );
+        if (theRect.isNull())
+            glReadPixels( 0, 0, aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE, anImage.bits() );
+        else 
+            glReadPixels( theRect.x(), theRect.y(), aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE, anImage.bits() );
         aFrameBuffer.unbind();
 
         anImage = anImage.rgbSwapped();
@@ -401,14 +413,19 @@ QImage XGUI_ViewPort::dumpView()
         return anImage;
     }
     // if frame buffers are unsupported, use old functionality
-    //view->Redraw();
-
     unsigned char* data = new unsigned char[ aWidth*aHeight*4 ];
 
-    QPoint p = mapFromParent(geometry().topLeft());
-
-    glReadPixels( p.x(), p.y(), aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE,
-                data);
+    QPoint p;
+    if (theRect.isNull()) {
+        if (toUpdate)
+            view->Redraw();
+        p = mapFromParent(geometry().topLeft());
+    } else {
+        if (toUpdate)
+            view->Redraw(theRect.x(), theRect.y(), theRect.width(), theRect.height());
+        p = theRect.topLeft();
+    }
+    glReadPixels( p.x(), p.y(), aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
     QImage anImage( data, aWidth, aHeight, QImage::Format_ARGB32 );
     anImage = anImage.mirrored();
