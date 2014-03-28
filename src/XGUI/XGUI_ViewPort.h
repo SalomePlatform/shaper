@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <V3d_Viewer.hxx>
 #include <V3d_View.hxx>
+#include <gp_Pnt.hxx>
 
 class XGUI_ViewWindow;
 
@@ -23,11 +24,26 @@ public:
 
     Handle(V3d_View) getView() const { return activeView(); }
 
+    void startRotation( int x, int y, int theRotationPointType, const gp_Pnt& theSelectedPoint );
+    void rotate( int, int, int, const gp_Pnt& );
+    void endRotation();
+
+    // TRANSFORMATIONS
+    void pan( int dx, int dy );
+    void setCenter( int x, int y );
+    void fitRect( const QRect& rect );
+    void startZoomAtPoint( int x, int y );
+    void zoom( int x0, int y0, int x, int y );
+
+    void setAdvancedZoomingEnabled( const bool theState ) { myIsAdvancedZoomingEnabled = theState; }
+    bool isAdvancedZoomingEnabled() const { return myIsAdvancedZoomingEnabled; }
+
 signals:
   //void                  vpChangeBackground( const Qtx::BackgroundData& );
-    void                  vpClosed();
-    void                  vpMapped();
-
+    void vpClosed();
+    void vpMapped();
+    void vpTransformed( );
+    void vpUpdated();
 
 protected:
     virtual void          paintEvent( QPaintEvent* );
@@ -51,6 +67,9 @@ private:
     Handle(Aspect_Window) myWindow;
   
     bool myPaintersRedrawing;
+    bool myIsAdvancedZoomingEnabled;
+  
+    double myScale;
 };
 
 

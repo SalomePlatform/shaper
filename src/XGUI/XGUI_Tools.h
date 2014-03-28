@@ -3,6 +3,7 @@
 #define XGUI_Tools_H
 
 #include <QString>
+#include <QRect>
 
 /*!
   \brief Convert the given parameter to the platform-specific library name.
@@ -47,7 +48,7 @@ QString file( const QString& path, bool withExt = true );
   \param path file path
   \param full if true complete extension (all extensions, dot separated)
          is returned, otherwise (default) only last extension is returned
-  \return extension part of the file path
+  \return extension part of the file path 
 */
 QString extension( const QString& path, bool full = false );
 
@@ -59,5 +60,12 @@ QString extension( const QString& path, bool full = false );
   \return modified path (with slash added to the end)
 */
 QString addSlash( const QString& path );
+
+/*! 
+    Creates a rect with TopLeft = ( min(x1,x2), min(y1,y2) )
+    and BottomRight = ( TopLeft + (x2-x1)(y2-y1) )    
+*/      
+QRect makeRect( const int x1, const int y1, const int x2, const int y2 ); 
+
 
 #endif

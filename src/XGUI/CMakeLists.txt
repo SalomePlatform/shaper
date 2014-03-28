@@ -16,6 +16,8 @@ SET(PROJECT_HEADERS
     XGUI_ViewWindow.h
     XGUI_ViewPort.h
     XGUI_Viewer.h
+	XGUI_RubberBand.h
+	XGUI_Constants.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -34,6 +36,7 @@ SET(PROJECT_SOURCES
     XGUI_ViewWindow.cpp
     XGUI_ViewPort.cpp
     XGUI_Viewer.cpp
+	XGUI_RubberBand.cpp
 )
 
 SET(PROJECT_RESOURCES 

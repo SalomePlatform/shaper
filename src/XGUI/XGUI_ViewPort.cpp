@@ -12,6 +12,7 @@
 #include "XGUI_ViewPort.h"
 #include "XGUI_ViewWindow.h"
 #include "XGUI_Viewer.h"
+#include "XGUI_Constants.h"
 
 #include <QGuiApplication>
 #include <QPaintEvent>
@@ -28,6 +29,14 @@
 #endif
 
 #include <GL/gl.h>
+
+
+static double rx = 0.;
+static double ry = 0.;
+static int sx = 0;
+static int sy = 0;
+static Standard_Boolean zRotation = Standard_False;
+
 
 
 /*!
@@ -240,7 +249,9 @@ XGUI_ViewPort::XGUI_ViewPort(XGUI_ViewWindow* theParent,
                              const Handle(V3d_Viewer)& theViewer, 
                              V3d_TypeOfView theType) :
 QWidget(theParent), 
-    myPaintersRedrawing(false)
+    myPaintersRedrawing(false),
+    myScale( 1.0 ),
+    myIsAdvancedZoomingEnabled( false )
 {
     setMouseTracking( true );
     setBackgroundRole( QPalette::NoRole ); 
@@ -258,6 +269,8 @@ QWidget(theParent),
         myPerspView = new V3d_PerspectiveView( theViewer );
         myActiveView = myPerspView;
     }
+    myActiveView->SetSurfaceDetail(V3d_TEX_ALL);
+
   //setBackground( Qtx::BackgroundData( Qt::black ) ); // set default background
 }
 
@@ -342,6 +355,7 @@ void XGUI_ViewPort::paintEvent( QPaintEvent* theEvent)
         //if ( !myPaintersRedrawing ) {
             //activeView()->Redraw();
             activeView()->Redraw( rc.x(), rc.y(), rc.width(), rc.height() );
+            emit vpUpdated();
         //}
     }
     //if ( myPaintersRedrawing ) {
@@ -431,4 +445,152 @@ QImage XGUI_ViewPort::dumpView(QRect theRect, bool toUpdate)
     anImage = anImage.mirrored();
     anImage = anImage.rgbSwapped();
     return anImage;
+}
+
+
+/*!
+  Inits 'rotation' transformation.
+*/
+void XGUI_ViewPort::startRotation( int x, int y,
+                                   int theRotationPointType,
+                                   const gp_Pnt& theSelectedPoint )
+{
+  if ( !activeView().IsNull() ) {
+    switch ( theRotationPointType ) {
+    case XGUI::GRAVITY:
+      activeView()->StartRotation( x, y, 0.45 );
+      break;
+    case XGUI::SELECTED:
+      sx = x; sy = y;
+
+      double X,Y;
+      activeView()->Size(X,Y);
+      rx = Standard_Real(activeView()->Convert(X));
+      ry = Standard_Real(activeView()->Convert(Y));
+
+      activeView()->Rotate( 0., 0., 0.,
+                            theSelectedPoint.X(),theSelectedPoint.Y(), theSelectedPoint.Z(),
+                            Standard_True );
+
+      Quantity_Ratio zRotationThreshold;
+      zRotation = Standard_False;
+      zRotationThreshold = 0.45;
+      if( zRotationThreshold > 0. ) {
+        Standard_Real dx = Abs(sx - rx/2.);
+        Standard_Real dy = Abs(sy - ry/2.);
+        Standard_Real dd = zRotationThreshold * (rx + ry)/2.;
+        if( dx > dd || dy > dd ) zRotation = Standard_True;
+      }
+      break;
+    default:
+      break;
+    }
+    activeView()->DepthFitAll();
+  }
+}
+
+/*!
+  Rotates the viewport. 
+*/
+void XGUI_ViewPort::rotate( int x, int y,
+                            int theRotationPointType,
+                            const gp_Pnt& theSelectedPoint )
+{
+  if ( !activeView().IsNull() ) {
+    switch ( theRotationPointType ) {
+    case XGUI::GRAVITY:
+      activeView()->Rotation( x, y );
+      break;
+    case XGUI::SELECTED:
+      double dx, dy, dz;
+      if( zRotation ) {
+        dz = atan2(Standard_Real(x)-rx/2., ry/2.-Standard_Real(y)) -
+          atan2(sx-rx/2.,ry/2.-sy);
+        dx = dy = 0.;
+      }
+      else {
+        dx = (Standard_Real(x) - sx) * M_PI/rx;
+        dy = (sy - Standard_Real(y)) * M_PI/ry;
+        dz = 0.;
+      }
+
+      activeView()->Rotate( dx, dy, dz,
+                            theSelectedPoint.X(),theSelectedPoint.Y(), theSelectedPoint.Z(),
+                            Standard_False );
+      break;
+    default:
+      break;
+    }
+    emit vpTransformed( );
+  }
+  //  setZSize( getZSize() );
+}
+
+/*!
+  Resets the viewport after 'rotation'. 
+*/
+void XGUI_ViewPort::endRotation()
+{
+  if ( !activeView().IsNull() ) {
+    activeView()->ZFitAll(1.);
+    activeView()->SetZSize(0.);
+    activeView()->Update();
+    emit vpTransformed( );
+  }
+}
+
+/*!
+  Inits 'zoom' transformation.
+*/
+void XGUI_ViewPort::startZoomAtPoint( int x, int y )
+{
+    if ( !activeView().IsNull()/* && isAdvancedZoomingEnabled() */)
+        activeView()->StartZoomAtPoint( x, y );
+}
+
+/*!
+  Centers the viewport. 
+*/
+void XGUI_ViewPort::setCenter( int x, int y )
+{
+  if ( !activeView().IsNull() ) {
+    activeView()->Place( x, y, myScale );
+    emit vpTransformed( );
+  }
+}
+
+/*!
+  Called at 'pan' transformation. 
+ */
+void XGUI_ViewPort::pan( int dx, int dy )
+{
+  if ( !activeView().IsNull() ) {
+    activeView()->Pan( dx, dy, 1.0 );
+    emit vpTransformed( );
+  }
+}
+
+/*!
+  Called at 'window fit' transformation.
+*/
+void XGUI_ViewPort::fitRect( const QRect& rect )
+{
+  if ( !activeView().IsNull() ) {
+    activeView()->WindowFit( rect.left(), rect.top(), rect.right(), rect.bottom() );
+    emit vpTransformed( );
+  }
+}
+
+/*!
+  Called at 'zoom' transformation.
+*/
+void XGUI_ViewPort::zoom( int x0, int y0, int x, int y )
+{
+  if ( !activeView().IsNull() ) {
+    if ( isAdvancedZoomingEnabled() )
+      activeView()->ZoomAtPoint( x0, y0, x, y );
+    else
+      activeView()->Zoom( x0 + y0, 0, x + y, 0 );
+    emit vpTransformed( );
+  }
 }

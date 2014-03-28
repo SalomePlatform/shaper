@@ -75,3 +75,9 @@ QString addSlash( const QString& path )
   res += QDir::separator();
   return res;
 }
+
+//******************************************************************
+QRect makeRect( const int x1, const int y1, const int x2, const int y2 )
+{  
+  return QRect( qMin( x1, x2 ), qMin( y1, y2 ), qAbs( x2 - x1 ), qAbs( y2 - y1 ) );
+}
