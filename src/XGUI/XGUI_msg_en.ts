@@ -117,4 +117,43 @@
         <translation>Menu</translation>
     </message>
 </context>
+<context>
+    <name>XGUI_Viewer</name>
+    <message>
+        <source>GT_HORIZONTALGRADIENT</source>
+        <translation>Horizontal gradient</translation>
+    </message>
+    <message>
+        <source>GT_VERTICALGRADIENT</source>
+        <translation>Vertical gradient</translation>
+    </message>
+    <message>
+        <source>GT_FIRSTDIAGONALGRADIENT</source>
+        <translation>First diagonal gradient</translation>
+    </message>
+    <message>
+        <source>GT_SECONDDIAGONALGRADIENT</source>
+        <translation>Second diagonal gradient</translation>
+    </message>
+    <message>
+        <source>GT_FIRSTCORNERGRADIENT</source>
+        <translation>First corner gradient</translation>
+    </message>
+    <message>
+        <source>GT_SECONDCORNERGRADIENT</source>
+        <translation>Second corner gradient</translation>
+    </message>
+    <message>
+        <source>GT_THIRDCORNERGRADIENT</source>
+        <translation>Third corner gradient</translation>
+    </message>
+    <message>
+        <source>GT_FORTHCORNERGRADIENT</source>
+        <translation>Fourth corner gradient</translation>
+    </message>
+    <message>
+        <source>BG_IMAGE_FILES</source>
+        <translation>Image files (*.bmp *.gif *.pix *.xwd *.rgb *.rs)</translation>
+    </message>
+</context>
 </TS>

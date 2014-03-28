@@ -18,6 +18,8 @@ class XGUI_Viewer : public QObject
 {
     Q_OBJECT
 public:
+    static QString backgroundData( QStringList&, QIntList&, QIntList& );
+    
     XGUI_Viewer(XGUI_MainWindow* theParent, bool DisplayTrihedron = true);
     ~XGUI_Viewer();
 

@@ -2,6 +2,7 @@
 #define XGUI_ViewWindow_H
 
 #include "XGUI_Constants.h"
+#include "XGUI_ViewBackground.h"
 
 #include <QFrame>
 #include <QIcon>
@@ -39,6 +40,9 @@ public:
 
     void setTransformEnabled( const OperationType, const bool );
     bool transformEnabled( const OperationType ) const;
+
+    XGUI_ViewBackground background() const;
+    void setBackground( const XGUI_ViewBackground& theBackground );
 
 signals:
     void vpTransformationStarted(XGUI_ViewWindow::OperationType type);

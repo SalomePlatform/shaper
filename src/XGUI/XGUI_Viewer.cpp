@@ -58,6 +58,29 @@ Handle(V3d_Viewer) CreateViewer( const Standard_ExtString name,
 }
 
 
+// VSR: Uncomment below line to allow texture background support in OCC viewer
+#define OCC_ENABLE_TEXTURED_BACKGROUND
+
+/*!
+  Get data for supported background modes: gradient types, identifiers and supported image formats
+*/
+QString XGUI_Viewer::backgroundData( QStringList& gradList, QIntList& idList, QIntList& txtList )
+{
+  gradList << tr("GT_HORIZONTALGRADIENT")    << tr("GT_VERTICALGRADIENT")       <<
+              tr("GT_FIRSTDIAGONALGRADIENT") << tr("GT_SECONDDIAGONALGRADIENT") <<
+              tr("GT_FIRSTCORNERGRADIENT")   << tr("GT_SECONDCORNERGRADIENT")   <<
+              tr("GT_THIRDCORNERGRADIENT")   << tr("GT_FORTHCORNERGRADIENT");
+  idList   << XGUI::HorizontalGradient << XGUI::VerticalGradient  <<
+              XGUI::Diagonal1Gradient  << XGUI::Diagonal2Gradient <<
+              XGUI::Corner1Gradient    << XGUI::Corner2Gradient   <<
+              XGUI::Corner3Gradient    << XGUI::Corner4Gradient;
+#ifdef OCC_ENABLE_TEXTURED_BACKGROUND
+  txtList  << XGUI::CenterTexture << XGUI::TileTexture << XGUI::StretchTexture;
+#endif
+  return tr("BG_IMAGE_FILES");
+}
+
+
 
 XGUI_Viewer::XGUI_Viewer(XGUI_MainWindow* theParent, bool DisplayTrihedron) :
 QObject(theParent), 
@@ -102,7 +125,6 @@ QObject(theParent),
     // init CasCade viewers
     myV3dViewer = CreateViewer(TCollection_ExtendedString("Viewer3d").ToExtString(),
         					   "", "", 1000.0, V3d_XposYnegZpos, Standard_True, Standard_True );
-    //myV3dViewer->Init(); // to avoid creation of the useless perspective view (see OCCT issue 0024267)
     myV3dViewer->SetDefaultLights();
 
     // init selector
@@ -118,7 +140,6 @@ QObject(theParent),
         myTrihedron->SetInfiniteState( Standard_True );
     
         Quantity_Color Col(193/255., 205/255., 193/255., Quantity_TOC_RGB);
-        //myTrihedron->SetColor( Col );
         myTrihedron->SetArrowColor( Col.Name() );
         myTrihedron->SetSize(myTrihedronSize);
         Handle(AIS_Drawer) drawer = myTrihedron->Attributes();
@@ -136,6 +157,8 @@ QObject(theParent),
 
 XGUI_Viewer::~XGUI_Viewer(void)
 {
+    myAISContext.Nullify();
+    myV3dViewer.Nullify();
 }
 
 
@@ -152,6 +175,8 @@ QMdiSubWindow* XGUI_Viewer::createView(V3d_TypeOfView theType)
     //// connect signal from viewport
     connect(view->viewPort(), SIGNAL(vpClosed()), this, SLOT(onViewClosed()));
     connect(view->viewPort(), SIGNAL(vpMapped()), this, SLOT(onViewMapped()));
+
+    view->setBackground(XGUI_ViewBackground(XGUI::VerticalGradient, Qt::green, Qt::blue));
 
     QMdiArea* aMDI = myMainWindow->mdiArea();
     QMdiSubWindow* aWnd = aMDI->addSubWindow(view, Qt::FramelessWindowHint);

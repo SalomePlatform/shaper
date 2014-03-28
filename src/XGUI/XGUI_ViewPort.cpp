@@ -17,6 +17,7 @@
 #include <QGuiApplication>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QFileInfo>
 
 #include <V3d_OrthographicView.hxx>
 #include <V3d_PerspectiveView.hxx>
@@ -330,6 +331,115 @@ bool XGUI_ViewPort::mapped( const Handle(V3d_View)& theView) const
 //***********************************************
 void XGUI_ViewPort::updateBackground()
 {
+    if ( activeView().IsNull() ) return;
+    if ( !myBackground.isValid() ) return;
+
+    // VSR: Important note on below code.
+    // In OCCT (in version 6.5.2), things about the background drawing
+    // are not straightforward and not clearly understandable:
+    // - Horizontal gradient is drawn vertically (!), well ok, from top side to bottom one.
+    // - Vertical gradient is drawn horizontally (!), from right side to left one (!!!).
+    // - First and second diagonal gradients are confused.
+    // - Image texture, once set, can not be removed (!).
+    // - Texture image fill mode Aspect_FM_NONE is not taken into account (and means the same
+    //   as Aspect_FM_CENTERED).
+    // - The only way to cancel gradient background (and get back to single colored) is to
+    //   set gradient background style to Aspect_GFM_NONE while passing two colors is also needed
+    //   (see V3d_View::SetBgGradientColors() function).
+    // - Also, it is impossible to draw texture image above the gradiented background (only above
+    //   single-colored).
+    // In OCCT 6.5.3 all above mentioned problems are fixed; so, above comment should be removed as soon
+    // as SALOME is migrated to OCCT 6.5.3. The same concerns #ifdef statements in the below code
+    switch ( myBackground.mode() ) {
+    case XGUI::ColorBackground:
+        {
+            QColor c = myBackground.color();
+            if ( c.isValid() ) {
+                // Unset texture should be done here
+                // ...
+                Quantity_Color qCol( c.red()/255., c.green()/255., c.blue()/255., Quantity_TOC_RGB );
+                activeView()->SetBgGradientStyle( Aspect_GFM_NONE ); // cancel gradient background
+                activeView()->SetBgImageStyle( Aspect_FM_NONE );     // cancel texture background
+                // then change background color
+                activeView()->SetBackgroundColor( qCol );
+                // update viewer
+                activeView()->Update();
+            }
+            break;
+        }
+    case XGUI::SimpleGradientBackground:
+        {
+            QColor c1, c2;
+            int type = myBackground.gradient( c1, c2 );
+            if ( c1.isValid() && type >= XGUI::HorizontalGradient && type <= XGUI::LastGradient ) {
+                // Unset texture should be done here
+                // ...
+                // Get colors and set-up gradiented background
+                if ( !c2.isValid() ) c2 = c1;
+                Quantity_Color qCol1( c1.red()/255., c1.green()/255., c1.blue()/255., Quantity_TOC_RGB );
+                Quantity_Color qCol2( c2.red()/255., c2.green()/255., c2.blue()/255., Quantity_TOC_RGB );
+                activeView()->SetBgImageStyle( Aspect_FM_NONE );    // cancel texture background
+	            switch ( type ) {
+	            case XGUI::HorizontalGradient:
+	                activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_HOR, Standard_True );
+	                break;
+	            case XGUI::VerticalGradient:
+	                activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_VER, Standard_True );
+	                break;
+	            case XGUI::Diagonal1Gradient:
+	                activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_DIAG1, Standard_True );
+	                break;
+	            case XGUI::Diagonal2Gradient:
+	                activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_DIAG2, Standard_True );
+	                break;
+	            case XGUI::Corner1Gradient:
+	                activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_CORNER1, Standard_True );
+	                break;
+	            case XGUI::Corner2Gradient:
+	                activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_CORNER2, Standard_True );
+	                break;
+	            case XGUI::Corner3Gradient:
+	                activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_CORNER3, Standard_True );
+	                break;
+	            case XGUI::Corner4Gradient:
+	                activeView()->SetBgGradientColors( qCol1, qCol2, Aspect_GFM_CORNER4, Standard_True );
+	                break;
+	            default:
+	                break;
+	            }
+            }
+            break;
+        }
+    case XGUI::CustomGradientBackground:
+        // NOT IMPLEMENTED YET
+        break;
+    default:
+        break;
+    }
+    // VSR: In OCCT before v6.5.3 below code can't be used because of very ugly bug - it has been impossible to
+    // clear the background texture image as soon as it was once set to the viewer.
+    if ( myBackground.isTextureShown() ) {
+        QString fileName;
+        int textureMode = myBackground.texture( fileName );
+        QFileInfo fi( fileName );
+        if ( !fileName.isEmpty() && fi.exists() ) {
+            // set texture image: file name and fill mode
+            switch ( textureMode ) {
+            case XGUI::CenterTexture:
+	            activeView()->SetBackgroundImage( fi.absoluteFilePath().toLatin1().constData(), Aspect_FM_CENTERED );
+	            break;
+            case XGUI::TileTexture:
+	            activeView()->SetBackgroundImage( fi.absoluteFilePath().toLatin1().constData(), Aspect_FM_TILED );
+	            break;
+            case XGUI::StretchTexture:
+	            activeView()->SetBackgroundImage( fi.absoluteFilePath().toLatin1().constData(), Aspect_FM_STRETCH );
+	            break;
+            default:
+	            break;
+            }
+            activeView()->Update();
+        }
+    }
 }
 
 //***********************************************
@@ -593,4 +703,16 @@ void XGUI_ViewPort::zoom( int x0, int y0, int x, int y )
       activeView()->Zoom( x0 + y0, 0, x + y, 0 );
     emit vpTransformed( );
   }
+}
+
+/*!
+  Sets the background data
+*/
+void XGUI_ViewPort::setBackground( const XGUI_ViewBackground& bgData )
+{
+    if ( bgData.isValid() ) {
+        myBackground = bgData;
+        updateBackground();
+        emit vpChangeBackground( myBackground );
+    }
 }

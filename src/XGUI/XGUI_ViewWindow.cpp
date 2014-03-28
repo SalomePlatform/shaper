@@ -890,3 +890,13 @@ void XGUI_ViewWindow::resetState()
     setTransformInProcess( false );
     setTransformRequested( NOTHING );
 }
+
+XGUI_ViewBackground XGUI_ViewWindow::background() const
+{
+  return myViewPort ? myViewPort->background() : XGUI_ViewBackground();
+}
+   
+void XGUI_ViewWindow::setBackground( const XGUI_ViewBackground& theBackground )
+{
+  if ( myViewPort ) myViewPort->setBackground( theBackground );
+}
