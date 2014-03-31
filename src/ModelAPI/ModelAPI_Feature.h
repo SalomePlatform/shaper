@@ -22,6 +22,7 @@ public:
   /// Returns the kind of a feature (like "Point")
   virtual std::string GetKind() = 0;
 
+protected:
   /// Use plugin manager for features creation: this method is 
   /// defined here only for SWIG-wrapping
   ModelAPI_Feature()

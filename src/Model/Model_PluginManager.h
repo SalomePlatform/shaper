@@ -20,13 +20,21 @@
 class Model_PluginManager : public ModelAPI_PluginManager, public Event_Listener
 {
   bool myPluginsInfoLoaded; ///< it true if plugins information is loaded
-  std::map<std::string, std::string> myPlugins; ///< map of feature IDs to plugin name
+  /// map of feature IDs to plugin name and object
+  std::map<std::string, std::string> myPlugins;
+  std::map<std::string, ModelAPI_Plugin*> myPluginObjs; ///< instances of the already plugins
+  std::string myCurrentPluginName; ///< name of the plugin that must be loaded currently
 public:
   /// Creates the feature object using plugins functionality
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> CreateFeature(std::string theFeatureID);
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
+
+  /// Registers the plugin that creates features.
+  /// It is obligatory for each plugin to call this function on loading to be found by 
+  /// the plugin manager on call of the feature)
+  virtual void registerPlugin(ModelAPI_Plugin* thePlugin);
 
   /// Processes the configuration file reading
-  MODEL_EXPORT virtual void ProcessEvent(const Event_Message* theMessage);
+  MODEL_EXPORT virtual void processEvent(const Event_Message* theMessage);
 
   /// Is called only once, on startup of the application
   Model_PluginManager();

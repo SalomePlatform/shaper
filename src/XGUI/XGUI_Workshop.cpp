@@ -43,11 +43,11 @@ void XGUI_Workshop::startApplication()
 {
   initMenu();
   //Initialize event listening
-  Event_Loop* aLoop = Event_Loop::Loop();
-  Event_ID aFeatureId = aLoop->EventByName("menu_item");
-  aLoop->RegisterListener(this, aFeatureId);
-  Event_ID aPartSetId = aLoop->EventByName("partset_module");
-  aLoop->RegisterListener(this, aPartSetId);
+  Event_Loop* aLoop = Event_Loop::loop();
+  Event_ID aFeatureId = aLoop->eventByName("RegisterFeature");
+  aLoop->registerListener(this, aFeatureId);
+  Event_ID aPartSetId = aLoop->eventByName("partset_module");
+  aLoop->registerListener(this, aPartSetId);
   activateModule();
   myMainWindow->show();
   QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
@@ -105,7 +105,7 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 }
 
 //******************************************************
-void XGUI_Workshop::ProcessEvent(const Event_Message* theMessage)
+void XGUI_Workshop::processEvent(const Event_Message* theMessage)
 {
   const Config_FeatureMessage* aFeatureMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
   if (aFeatureMsg) {

@@ -33,7 +33,7 @@ public:
 
   XGUI_Workbench* addWorkbench(const QString& theName);
 
-  virtual void ProcessEvent(const Event_Message* theMessage);
+  virtual void processEvent(const Event_Message* theMessage);
 
 public slots:
   void onNew();

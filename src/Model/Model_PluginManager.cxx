@@ -4,33 +4,29 @@
 
 #include <Model_PluginManager.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Plugin.h>
 #include <Model_Feature.h>
 #include <Event_Loop.h>
 #include <Config_FeatureMessage.h>
 #include <Config_ModuleReader.h>
 
-#include <OSD_SharedLibrary.hxx>
-
 using namespace std;
 
 static Model_PluginManager* myImpl = new Model_PluginManager();
 
-boost::shared_ptr<ModelAPI_Feature> Model_PluginManager::CreateFeature(string theFeatureID)
+boost::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theFeatureID)
 {
-  if (this != myImpl) return myImpl->CreateFeature(theFeatureID);
+  if (this != myImpl) return myImpl->createFeature(theFeatureID);
 
   LoadPluginsInfo();
   if (myPlugins.find(theFeatureID) != myPlugins.end()) {
-    string aLibName = myPlugins[theFeatureID];
-#ifdef WIN32
-    aLibName += ".dll";
-#else
-    aLibName += ".so";
-#endif
-    Standard_CString aLibNameCStr = aLibName.c_str();
-    OSD_SharedLibrary aLib(aLibNameCStr);
-    if (aLib.DlOpen(OSD_RTLD_NOW)) {
-      OSD_Function aFunc = aLib.DlSymb("CreateFeature");
+    if (myPluginObjs.find(myPlugins[theFeatureID]) == myPluginObjs.end()) {
+      // load plugin library if not yet done
+      myCurrentPluginName = myPlugins[theFeatureID];
+      loadLibrary(myCurrentPluginName);
+    }
+    if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
+      return myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
     }
   }
 
@@ -40,22 +36,22 @@ boost::shared_ptr<ModelAPI_Feature> Model_PluginManager::CreateFeature(string th
 Model_PluginManager::Model_PluginManager()
 {
   myPluginsInfoLoaded = false;
-  static Event_ID aFeatureEvent = Event_Loop::EventByName("Feature");
+  static Event_ID aFeatureEvent = Event_Loop::eventByName("RegisterFeature");
 
   ModelAPI_PluginManager::SetPluginManager(boost::shared_ptr<ModelAPI_PluginManager>(this));
   // register the configuration reading listener
-  Event_Loop* aLoop = Event_Loop::Loop();
-  aLoop->RegisterListener(myImpl, aFeatureEvent);
+  Event_Loop* aLoop = Event_Loop::loop();
+  aLoop->registerListener(this, aFeatureEvent);
 }
 
-void Model_PluginManager::ProcessEvent(const Event_Message* theMessage)
+void Model_PluginManager::processEvent(const Event_Message* theMessage)
 {
   const Config_FeatureMessage* aMsg =
-    dynamic_cast<const Config_FeatureMessage*>( theMessage );
+    dynamic_cast<const Config_FeatureMessage*>(theMessage);
   if (aMsg) {
     // proccess the plugin info, load plugin
     if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
-      myPlugins[aMsg->id()] = "PartSetPlugin"; // TO DO: plugin name must be also imported from XMLs
+      myPlugins[aMsg->id()] = aMsg->pluginLibrary(); // TO DO: plugin name must be also imported from XMLs
     }
   }
   // plugins information was started to load, so, it will be loaded
@@ -71,4 +67,9 @@ void Model_PluginManager::LoadPluginsInfo()
   Config_ModuleReader aXMLReader;
   aXMLReader.setAutoImport(true);
   aXMLReader.readAll();
+}
+
+void Model_PluginManager::registerPlugin(ModelAPI_Plugin* thePlugin)
+{
+  myPluginObjs[myCurrentPluginName] = thePlugin;
 }

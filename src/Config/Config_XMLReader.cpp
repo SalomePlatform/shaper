@@ -11,10 +11,12 @@
 #include <libxml\parser.h>
 #include <libxml\tree.h>
 
+/*
 #ifdef WIN32
 //For GetModuleFileNameW
 #include <windows.h>
 #endif
+*/
 
 #ifdef _DEBUG
 #include <iostream>
@@ -23,6 +25,8 @@
 Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
 {
   std::string prefix;
+  /* the problem: application may be launched using python execuable, to use environment variable
+                  (at least for the current moment)
   //Get path to *.xml files (typically ./bin/../plugins/)
 #ifdef WIN32
   HMODULE hModule = GetModuleHandleW(NULL);
@@ -40,6 +44,11 @@ Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
   //TODO(sbh): Find full path to binary on linux
   prefix = "../plugins/";
 #endif
+  */
+  char* anEnv = getenv("NEW_GEOM_CONFIG_FILE");
+  if (anEnv) {
+    prefix = std::string(anEnv) + "/";
+  }
 
   myDocumentPath = prefix + theXmlFileName;
 }
@@ -109,8 +118,6 @@ xmlNodePtr Config_XMLReader::findRoot()
  */
 void Config_XMLReader::readRecursively(xmlNodePtr theParent)
 {
-  static Event_ID aFeatureEvent = Event_Loop::EventByName("Feature");
-
   if (!theParent)
     return;
   xmlNodePtr aNode = theParent->xmlChildrenNode;
@@ -118,7 +125,6 @@ void Config_XMLReader::readRecursively(xmlNodePtr theParent)
     processNode(aNode);
     if (processChildren(aNode)) {
       readRecursively(aNode);
-      Config_FeatureMessage aMessage(aFeatureEvent, this);
     }
   }
 }

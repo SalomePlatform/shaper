@@ -11,6 +11,7 @@ SET(PROJECT_HEADERS
     ModelAPI.h
     ModelAPI_Interface.h
     ModelAPI_PluginManager.h
+    ModelAPI_Plugin.h
     ModelAPI_Feature.h
     ModelAPI_Document.h
 )

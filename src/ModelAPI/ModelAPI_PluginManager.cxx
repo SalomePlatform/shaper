@@ -7,6 +7,8 @@
 #include <ModelAPI_Document.h>
 // to avoid unresolved ModelAPI_Feature()
 #include <ModelAPI_Feature.h>
+// to avoid unresolved ModelAPI_Plugin()
+#include <ModelAPI_Plugin.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -16,8 +18,6 @@
 
 using namespace std;
 
-/// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
-void loadLibrary(const string theLibName);
 /// Converts library name to the operation system file name
 string library(const string& theLibName);
 
@@ -34,7 +34,7 @@ void ModelAPI_PluginManager::SetPluginManager(
   MY_MANAGER = theManager;
 }
 
-boost::shared_ptr<ModelAPI_PluginManager> ModelAPI_PluginManager::Get()
+boost::shared_ptr<ModelAPI_PluginManager> ModelAPI_PluginManager::get()
 {
   if (!MY_MANAGER) { // import Model library that implements this interface of ModelAPI
     loadLibrary("Model");
@@ -62,7 +62,7 @@ string library(const string& theLibName)
   return aLibName;
 }
 
-void loadLibrary(const string theLibName)
+void ModelAPI_PluginManager::loadLibrary(const string theLibName)
 {
   string aFileName = library(theLibName);
   if ( aFileName.empty() )

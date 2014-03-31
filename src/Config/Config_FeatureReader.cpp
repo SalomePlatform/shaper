@@ -39,7 +39,7 @@ Config_FeatureReader::Config_FeatureReader(const std::string& theXmlFile)
   myLibraryName = "";
 
 #ifdef _DEBUG
-  if (!Event_Loop::Loop()) {
+  if (!Event_Loop::loop()) {
     std::cout << "Config_FeatureReader::importWorkbench: "
         << "No event loop registered" << std::endl;
   }
@@ -53,7 +53,7 @@ Config_FeatureReader::Config_FeatureReader(const std::string& theXmlFile,
       myFetchWidgetCfg(false)
 {
 #ifdef _DEBUG
-  if (!Event_Loop::Loop()) {
+  if (!Event_Loop::loop()) {
     std::cout << "Config_FeatureReader::importWorkbench: "
         << "No event loop registered" << std::endl;
   }
@@ -74,16 +74,17 @@ std::string Config_FeatureReader::featureWidgetCfg(std::string theFeatureName)
 
 void Config_FeatureReader::processNode(xmlNodePtr theNode)
 {
+  static Event_ID aMenuItemEvent = Event_Loop::eventByName("RegisterFeature");
   if (isNode(theNode, NODE_FEATURE, NULL)) {
     if (myFetchWidgetCfg) {
       xmlBufferPtr buffer = xmlBufferCreate();
       int size = xmlNodeDump(buffer, theNode->doc, theNode, 0, 1);
       myWidgetCfg = std::string((char*) buffer->content);
     } else {
-      Event_Loop* aEvLoop = Event_Loop::Loop();
-      Config_FeatureMessage aMessage(aEvLoop->EventByName("menu_item"), this);
+      Event_Loop* aEvLoop = Event_Loop::loop();
+      Config_FeatureMessage aMessage(aMenuItemEvent, this);
       fillFeature(theNode, aMessage);
-      aEvLoop->Send(aMessage);
+      aEvLoop->send(aMessage);
     }
   }
   //The m_last* variables always defined before fillFeature() call. XML is a tree.

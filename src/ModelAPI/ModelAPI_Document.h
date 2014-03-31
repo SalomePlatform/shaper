@@ -55,6 +55,7 @@ public:
   //! Redoes last operation
   MODELAPI_EXPORT virtual void Redo() = 0;
 
+protected:
   /// Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document()
   {

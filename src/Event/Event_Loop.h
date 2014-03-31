@@ -29,17 +29,17 @@ class Event_Loop {
   Event_Loop() {};
 public:
   ///! Returns the main object of the loop, one per application.
-  EVENT_EXPORT static Event_Loop* Loop();
+  EVENT_EXPORT static Event_Loop* loop();
   //! Returns the unique event by the given name. Call this method only on initialization of object
   //! to speedup the events processing without parsing of the string.
-  EVENT_EXPORT static Event_ID EventByName(const char* theName);
+  EVENT_EXPORT static Event_ID eventByName(const char* theName);
 
   //! Allows to send an event
-  EVENT_EXPORT void Send(Event_Message& theMessage);
+  EVENT_EXPORT void send(Event_Message& theMessage);
 
   //! Registers (or adds if such listener is already registered) a listener 
   //! that will be called on the event and from the defined sender
-  EVENT_EXPORT void RegisterListener(Event_Listener* theListener, const Event_ID theID, 
+  EVENT_EXPORT void registerListener(Event_Listener* theListener, const Event_ID theID, 
     void* theSender = 0);
 };
 

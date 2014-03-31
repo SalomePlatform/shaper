@@ -5,11 +5,12 @@ INCLUDE(FindBoost)
 
 SET(PROJECT_HEADERS
     PartSetPlugin.h
+    PartSetPlugin_Plugin.h
     PartSetPlugin_NewPart.h
 )
 
 SET(PROJECT_SOURCES
-    PartSetPlugin.cxx
+    PartSetPlugin_Plugin.cxx
     PartSetPlugin_NewPart.cxx
 )
 
