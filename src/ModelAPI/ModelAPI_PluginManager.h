@@ -5,7 +5,7 @@
 #ifndef ModelAPI_PluginManager_HeaderFile
 #define ModelAPI_PluginManager_HeaderFile
 
-#include "ModelAPI.hxx"
+#include "ModelAPI.h"
 #include <string>
 #include <boost/shared_ptr.hpp>
 

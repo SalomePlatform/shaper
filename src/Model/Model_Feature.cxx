@@ -2,7 +2,7 @@
 // Created:     21 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#include <Model_Feature.hxx>
+#include <Model_Feature.h>
 
 using namespace std;
 

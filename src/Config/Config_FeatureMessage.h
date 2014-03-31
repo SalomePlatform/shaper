@@ -3,7 +3,7 @@
 
 #include "Config.h"
 
-#include <Event_Message.hxx>
+#include <Event_Message.h>
 #include <string>
 
 /*
@@ -49,4 +49,4 @@ public:
   void setPluginLibrary(const std::string& thePluginLibrary);
 };
 
-#endif // CONFIG_MESSAGE_H
+#endif // CONFIG_MESSAGE_H

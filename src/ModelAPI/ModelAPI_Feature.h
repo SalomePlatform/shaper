@@ -5,7 +5,7 @@
 #ifndef ModelAPI_Feature_HeaderFile
 #define ModelAPI_Feature_HeaderFile
 
-#include "ModelAPI.hxx"
+#include "ModelAPI.h"
 #include <string>
 
 class ModelAPI_Feature;
