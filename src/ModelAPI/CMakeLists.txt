@@ -8,11 +8,11 @@ INCLUDE(FindBoost)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(PROJECT_HEADERS
-    ModelAPI.hxx
-    ModelAPI_Interface.hxx
-    ModelAPI_PluginManager.hxx
-    ModelAPI_Feature.hxx
-    ModelAPI_Document.hxx
+    ModelAPI.h
+    ModelAPI_Interface.h
+    ModelAPI_PluginManager.h
+    ModelAPI_Feature.h
+    ModelAPI_Document.h
 )
 
 SET(PROJECT_SOURCES

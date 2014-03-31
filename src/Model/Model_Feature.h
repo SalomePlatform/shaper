@@ -5,8 +5,8 @@
 #ifndef Model_Feature_HeaderFile
 #define Model_Feature_HeaderFile
 
-#include "Model.hxx"
-#include <ModelAPI_Feature.hxx>
+#include "Model.h"
+#include <ModelAPI_Feature.h>
 
 /**\class Model_Feature
  * \ingroup DataModel

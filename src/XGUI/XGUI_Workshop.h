@@ -1,8 +1,8 @@
 #ifndef XGUI_WORKSHOP_H
 #define XGUI_WORKSHOP_H
 
-#include <Event_Message.hxx>
-#include <Event_Listener.hxx>
+#include <Event_Message.h>
+#include <Event_Listener.h>
 
 #include <QObject>
 #include <QMap>

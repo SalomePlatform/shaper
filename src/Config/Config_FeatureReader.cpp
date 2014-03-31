@@ -7,7 +7,7 @@
 
 #include <Config_FeatureReader.h>
 
-#include <Event_Loop.hxx>
+#include <Event_Loop.h>
 
 #include <libxml\parser.h>
 #include <libxml\tree.h>

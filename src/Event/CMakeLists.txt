@@ -3,10 +3,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 INCLUDE(Common)
 
 SET(PROJECT_HEADERS
-    Event.hxx
-    Event_Message.hxx
-    Event_Listener.hxx
-    Event_Loop.hxx
+    Event.h
+    Event_Message.h
+    Event_Listener.h
+    Event_Loop.h
 )
 
 SET(PROJECT_SOURCES

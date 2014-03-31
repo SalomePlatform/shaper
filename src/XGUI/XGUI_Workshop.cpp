@@ -9,7 +9,7 @@
 #include "XGUI_Viewer.h"
 
 #include <Config_FeatureMessage.h>
-#include <Event_Loop.hxx>
+#include <Event_Loop.h>
 
 #include <QApplication>
 #include <QFileDialog>

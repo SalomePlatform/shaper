@@ -3,7 +3,7 @@
 #include <Config_ModuleReader.h>
 #include <Config_FeatureReader.h>
 
-#include <Event_Loop.hxx>
+#include <Event_Loop.h>
 
 #include <QFile>
 #include <QDir>

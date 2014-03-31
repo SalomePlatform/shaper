@@ -3,7 +3,7 @@
 // Author:      Mikhail PONIKAROV
 // Copyright:   CEA 2011
 
-#include <Model_Document.hxx>
+#include <Model_Document.h>
 
 #include <TDataStd_Integer.hxx>
 

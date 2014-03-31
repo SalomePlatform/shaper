@@ -5,10 +5,10 @@ INCLUDE(FindCAS)
 INCLUDE(FindBoost)
 
 SET(PROJECT_HEADERS
-    Model.hxx
-    Model_Document.hxx
-    Model_PluginManager.hxx
-    Model_Feature.hxx
+    Model.h
+    Model_Document.h
+    Model_PluginManager.h
+    Model_Feature.h
 )
 
 SET(PROJECT_SOURCES

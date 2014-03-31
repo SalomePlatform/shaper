@@ -5,8 +5,8 @@
 #ifndef Event_Loop_HeaderFile
 #define Event_Loop_HeaderFile
 
-#include <Event_Message.hxx>
-#include <Event_Listener.hxx>
+#include <Event_Message.h>
+#include <Event_Listener.h>
 
 #include <map>
 #include <list>
@@ -21,15 +21,12 @@
  * Performing of events is processed in separated thread, so, sender takes 
  * control back immideately.
  */
-class Event_Loop
-{
-  std::map<char*, std::map<void*, std::list<Event_Listener*> > > myListeners; ///< map from event ID to sender pointer to listeners that must be called for this
+class Event_Loop {
+  std::map<char*, std::map<void*, std::list<Event_Listener*> > >
+    myListeners; ///< map from event ID to sender pointer to listeners that must be called for this
 
   //! The empty constructor, will be called at startup of the application, only once
-  Event_Loop()
-  {
-  }
-  ;
+  Event_Loop() {};
 public:
   ///! Returns the main object of the loop, one per application.
   EVENT_EXPORT static Event_Loop* Loop();
@@ -42,8 +39,8 @@ public:
 
   //! Registers (or adds if such listener is already registered) a listener 
   //! that will be called on the event and from the defined sender
-  EVENT_EXPORT void RegisterListener(Event_Listener* theListener, const Event_ID theID,
-                                     void* theSender = 0);
+  EVENT_EXPORT void RegisterListener(Event_Listener* theListener, const Event_ID theID, 
+    void* theSender = 0);
 };
 
 #endif

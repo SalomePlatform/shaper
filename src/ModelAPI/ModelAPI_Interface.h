@@ -5,7 +5,7 @@
 #ifndef ModelAPI_Interface_HeaderFile
 #define ModelAPI_Interface_HeaderFile
 
-#include <ModelAPI.hxx>
+#include <ModelAPI.h>
 
 /**\class ModelAPI_Interface
  * \ingroup DataModel

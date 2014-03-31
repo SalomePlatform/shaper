@@ -3,7 +3,7 @@
 
 #include "Config.h"
 
-#include <Event_Message.hxx>
+#include <Event_Message.h>
 #include <string>
 
 class CONFIG_EXPORT Config_FeatureMessage: public Event_Message
@@ -42,4 +42,4 @@ public:
   void setWorkbenchId(const std::string& workbenchId);
 };
 
-#endif // CONFIG_MESSAGE_H
+#endif // CONFIG_MESSAGE_H

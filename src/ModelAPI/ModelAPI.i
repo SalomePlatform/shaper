@@ -1,10 +1,10 @@
 /* ModelAPI.i */
 %module ModelAPI
 %{
-  #include "ModelAPI.hxx"
-  #include "ModelAPI_Document.hxx"
-  #include "ModelAPI_PluginManager.hxx"
-  #include "ModelAPI_Feature.hxx"
+  #include "ModelAPI.h"
+  #include "ModelAPI_Document.h"
+  #include "ModelAPI_PluginManager.h"
+  #include "ModelAPI_Feature.h"
 %}
 
 // to avoid error on this
@@ -20,6 +20,6 @@
 %shared_ptr(ModelAPI_Feature)
 
 // all supported interfaces
-%include "ModelAPI_Document.hxx"
-%include "ModelAPI_PluginManager.hxx"
-%include "ModelAPI_Feature.hxx"
+%include "ModelAPI_Document.h"
+%include "ModelAPI_PluginManager.h"
+%include "ModelAPI_Feature.h"
