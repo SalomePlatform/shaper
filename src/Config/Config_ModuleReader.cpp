@@ -26,7 +26,7 @@ const static char* PLUGIN_CONFIG = "configuration";
 const static char* PLUGIN_LIBRARY = "library";
 
 Config_ModuleReader::Config_ModuleReader()
-    : Config_XMLReader("plugins.xml"), m_isAutoImport(false)
+    : Config_XMLReader("plugins.xml"), myIsAutoImport(false)
 {
 }
 
@@ -50,10 +50,11 @@ std::string Config_ModuleReader::getModuleName()
 void Config_ModuleReader::processNode(xmlNodePtr theNode)
 {
   if (isNode(theNode, NODE_PLUGIN, NULL)) {
-    std::string aPluginName = getProperty(theNode, PLUGIN_CONFIG);
-    if (m_isAutoImport)
-      importPlugin(aPluginName);
-    m_pluginsList.push_back(aPluginName);
+    std::string aPluginConf = getProperty(theNode, PLUGIN_CONFIG);
+    std::string aPluginLibrary = getProperty(theNode, PLUGIN_LIBRARY);
+    if (myIsAutoImport)
+      importPlugin(aPluginConf, aPluginLibrary);
+    myPluginsMap[aPluginLibrary] = aPluginConf;
   }
 }
 
@@ -62,18 +63,24 @@ bool Config_ModuleReader::processChildren(xmlNodePtr theNode)
   return isNode(theNode, NODE_PLUGINS, NULL);
 }
 
-void Config_ModuleReader::importPlugin(const std::string& thePluginName)
+void Config_ModuleReader::importPlugin(const std::string& thePluginName,
+                                       const std::string& thePluginLibrary)
 {
-  Config_FeatureReader aReader(thePluginName);
-  aReader.readAll();
+  Config_FeatureReader* aReader;
+  if(thePluginLibrary.empty()) {
+    aReader = new Config_FeatureReader(thePluginName);
+  } else {
+    aReader = new Config_FeatureReader(thePluginName, thePluginLibrary);
+  }
+  aReader->readAll();
 }
 
-void Config_ModuleReader::setAutoImport(bool enabled)
+void Config_ModuleReader::setAutoImport(bool theEnabled)
 {
-  m_isAutoImport = enabled;
+  myIsAutoImport = theEnabled;
 }
 
-const std::list<std::string>& Config_ModuleReader::pluginsList() const
+const std::map<std::string, std::string>& Config_ModuleReader::plugins() const
 {
-  return m_pluginsList;
+  return myPluginsMap;
 }

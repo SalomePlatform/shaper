@@ -85,3 +85,13 @@ void Config_FeatureMessage::setTooltip(const std::string& tooltip)
 {
   myTooltip = tooltip;
 }
+
+const std::string& Config_FeatureMessage::pluginLibrary() const
+{
+  return myPluginLibrary;
+}
+
+void Config_FeatureMessage::setPluginLibrary(const std::string& myPluginLibrary)
+{
+  this->myPluginLibrary = myPluginLibrary;
+}

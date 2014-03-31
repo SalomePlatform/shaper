@@ -6,17 +6,22 @@
 #include <Event_Message.hxx>
 #include <string>
 
+/*
+ * Class to pass a feature entry extracted from xml file.
+ * Example of the feature entry:
+ * <feature id="new_part" text="Part" tooltip="Creates a new part" icon=":pictures/part_ico.png"/>
+ */
 class CONFIG_EXPORT Config_FeatureMessage: public Event_Message
 {
+  std::string myId;  //Feature unique id
+  std::string myText; //Represents action's text
+  std::string myTooltip;  //Represents action's tooltip
+  std::string myIcon; //Represents action's icon
+  std::string myKeysequence;  //Represents action's key sequence
 
-  std::string myId;
-  std::string myText;
-  std::string myTooltip;
-  std::string myIcon;
-  std::string myKeysequence;
-
-  std::string myGroupId;
-  std::string myWorkbenchId;
+  std::string myGroupId;  //Id of feature's group
+  std::string myWorkbenchId;  //Id of feature's workbench
+  std::string myPluginLibrary;  //Name of feature's library
 
 public:
   //const Event_ID theID, const void* theSender = 0
@@ -31,6 +36,7 @@ public:
 
   const std::string& groupId() const;
   const std::string& workbenchId() const;
+  const std::string& pluginLibrary() const;
 
   void setIcon(const std::string& icon);
   void setId(const std::string& id);
@@ -40,6 +46,7 @@ public:
 
   void setGroupId(const std::string& groupId);
   void setWorkbenchId(const std::string& workbenchId);
+  void setPluginLibrary(const std::string& thePluginLibrary);
 };
 
 #endif // CONFIG_MESSAGE_H

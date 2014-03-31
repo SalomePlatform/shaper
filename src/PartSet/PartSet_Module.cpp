@@ -45,9 +45,9 @@ void PartSet_Module::onCommandTriggered()
 {
   Config_ModuleReader aModuleReader = Config_ModuleReader();
   aModuleReader.readAll();
-  std::string aPluginName = aModuleReader.pluginsList().front();
-  Config_FeatureReader* aReader = new Config_FeatureReader(aPluginName);
-  XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
-  std::string aXMLWidgetCfg = aReader->featureWidgetCfg(aCmd->getId().toStdString());
-  delete aReader;
+//  std::string aPluginName = aModuleReader.plugins().front();
+//  Config_FeatureReader* aReader = new Config_FeatureReader(aPluginName);
+//  XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
+//  std::string aXMLWidgetCfg = aReader->featureWidgetCfg(aCmd->getId().toStdString());
+//  delete aReader;
 }

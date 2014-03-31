@@ -45,7 +45,7 @@ protected:
   bool isNode(xmlNodePtr theNode, const char* name, ...);
 
 private:
-  std::string m_DocumentPath;
+  std::string myDocumentPath;
 };
 
 #endif /* CONFIG_XMLREADER_H_ */

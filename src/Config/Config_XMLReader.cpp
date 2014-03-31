@@ -41,7 +41,7 @@ Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
   prefix = "../plugins/";
 #endif
 
-  m_DocumentPath = prefix + theXmlFileName;
+  myDocumentPath = prefix + theXmlFileName;
 }
 
 Config_XMLReader::~Config_XMLReader()
@@ -85,10 +85,10 @@ bool Config_XMLReader::processChildren(xmlNodePtr aNode)
 xmlNodePtr Config_XMLReader::findRoot()
 {
   xmlDocPtr aDoc;
-  aDoc = xmlParseFile(m_DocumentPath.c_str());
+  aDoc = xmlParseFile(myDocumentPath.c_str());
   if (aDoc == NULL) {
 #ifdef _DEBUG
-    std::cout << "Config_XMLReader::import: " << "Document " << m_DocumentPath
+    std::cout << "Config_XMLReader::import: " << "Document " << myDocumentPath
     << " is not parsed successfully." << std::endl;
 #endif
     return NULL;

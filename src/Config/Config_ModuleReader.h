@@ -10,7 +10,7 @@
 
 #include <Config_XMLReader.h>
 
-#include <list>
+#include <map>
 
 class CONFIG_EXPORT Config_ModuleReader: public Config_XMLReader
 {
@@ -20,7 +20,7 @@ public:
   virtual ~Config_ModuleReader();
 
   void setAutoImport(bool enabled);
-  const std::list<std::string>& pluginsList() const;
+  const std::map<std::string, std::string>& plugins() const;
 
   std::string getModuleName();
 
@@ -28,11 +28,13 @@ protected:
   void processNode(xmlNodePtr aNode);
   bool processChildren(xmlNodePtr aNode);
 
-  void importPlugin(const std::string& thePluginName);
+  void importPlugin(const std::string& thePluginName,
+                    const std::string& thePluginLibrary = "");
 
 private:
-  bool m_isAutoImport;
-  std::list<std::string> m_pluginsList;
+  bool myIsAutoImport;
+  std::map<std::string, std::string> myPluginsMap;
+
 
 };
 
