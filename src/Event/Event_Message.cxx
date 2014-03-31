@@ -4,7 +4,7 @@
 
 #include <Event_Message.hxx>
 
-Event_Message::Event_Message(const Event_ID theID, const void* theSender) :
-myEventId(theID), mySender((void*)theSender)
+Event_Message::Event_Message(const Event_ID theID, const void* theSender)
+    : myEventId(theID), mySender((void*) theSender)
 {
 }

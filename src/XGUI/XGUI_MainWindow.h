@@ -8,36 +8,44 @@ class XGUI_Viewer;
 class QTreeWidget;
 class QMdiArea;
 
-class XGUI_MainWindow : public QMainWindow
+class XGUI_MainWindow: public QMainWindow
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
-    XGUI_MainWindow(QWidget* parent = 0);
-    virtual ~XGUI_MainWindow();
+  XGUI_MainWindow(QWidget* parent = 0);
+  virtual ~XGUI_MainWindow();
 
-    XGUI_MainMenu* menuObject() const { return myMenuBar; }
-   
-    QTreeWidget* objectBrowser() const { return myObjectBrowser; }
-    void showObjectBrowser();
-    void hideObjectBrowser();
+  XGUI_MainMenu* menuObject() const
+  {
+    return myMenuBar;
+  }
 
-    QMdiArea* mdiArea() const;
+  QTreeWidget* objectBrowser() const
+  {
+    return myObjectBrowser;
+  }
+  void showObjectBrowser();
+  void hideObjectBrowser();
 
-    XGUI_Viewer* viewer() const { return myViewer; }
+  QMdiArea* mdiArea() const;
+
+  XGUI_Viewer* viewer() const
+  {
+    return myViewer;
+  }
 
 private:
-    //!! For test purposes only
-    //QWidget* getSubWindow();
+  //!! For test purposes only
+  //QWidget* getSubWindow();
 
-    void fillObjectBrowser();
-    void addPropertyPanel();
+  void fillObjectBrowser();
+  void addPropertyPanel();
 
+  XGUI_MainMenu* myMenuBar;
+  QTreeWidget* myObjectBrowser;
 
-    XGUI_MainMenu* myMenuBar;
-    QTreeWidget* myObjectBrowser;
-
-    XGUI_Viewer* myViewer;
+  XGUI_Viewer* myViewer;
 };
 
 #endif

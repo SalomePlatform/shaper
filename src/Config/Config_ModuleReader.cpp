@@ -25,10 +25,8 @@ const static char* PLUGINS_MODULE = "module";
 const static char* PLUGIN_CONFIG = "configuration";
 const static char* PLUGIN_LIBRARY = "library";
 
-
 Config_ModuleReader::Config_ModuleReader()
-    : Config_XMLReader("plugins.xml"),
-      m_isAutoImport(false)
+    : Config_XMLReader("plugins.xml"), m_isAutoImport(false)
 {
 }
 
@@ -51,9 +49,9 @@ std::string Config_ModuleReader::getModuleName()
  */
 void Config_ModuleReader::processNode(xmlNodePtr theNode)
 {
-  if(isNode(theNode, NODE_PLUGIN, NULL)) {
+  if (isNode(theNode, NODE_PLUGIN, NULL)) {
     std::string aPluginName = getProperty(theNode, PLUGIN_CONFIG);
-    if(m_isAutoImport)
+    if (m_isAutoImport)
       importPlugin(aPluginName);
     m_pluginsList.push_back(aPluginName);
   }

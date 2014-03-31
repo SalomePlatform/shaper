@@ -19,8 +19,8 @@ typedef struct _xmlNode xmlNode;
 typedef xmlNode *xmlNodePtr;
 struct _xmlNode;
 
-
-class CONFIG_EXPORT Config_XMLReader {
+class CONFIG_EXPORT Config_XMLReader
+{
 public:
   Config_XMLReader(const std::string& theXmlFile);
   virtual ~Config_XMLReader();

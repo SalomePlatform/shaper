@@ -6,7 +6,7 @@
 #include <Event_Message.hxx>
 #include <string>
 
-class CONFIG_EXPORT Config_FeatureMessage : public Event_Message
+class CONFIG_EXPORT Config_FeatureMessage: public Event_Message
 {
 
   std::string myId;
@@ -42,4 +42,4 @@ public:
   void setWorkbenchId(const std::string& workbenchId);
 };
 
-#endif // CONFIG_MESSAGE_H
+#endif // CONFIG_MESSAGE_H

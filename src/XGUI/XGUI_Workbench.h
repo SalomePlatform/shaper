@@ -1,4 +1,3 @@
-
 #ifndef XGUI_Workbench_H
 #define XGUI_Workbench_H
 
@@ -13,37 +12,34 @@ class CommandsArea;
 class QHBoxLayout;
 class QPushButton;
 
-
-
-class XGUI_Workbench : public QWidget
+class XGUI_Workbench: public QWidget
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    XGUI_Workbench(QWidget* theParent);
+  XGUI_Workbench(QWidget* theParent);
 
-    XGUI_MenuGroupPanel* addGroup(const QString& theId);
-    XGUI_MenuGroupPanel* findGroup(const QString& theName);
+  XGUI_MenuGroupPanel* addGroup(const QString& theId);
+  XGUI_MenuGroupPanel* findGroup(const QString& theName);
 
 private slots:
-    void onLeftScroll();
-    void onRightScroll();
+  void onLeftScroll();
+  void onRightScroll();
 
 protected:
-    virtual void resizeEvent(QResizeEvent * theEvent);
+  virtual void resizeEvent(QResizeEvent * theEvent);
 
 private:
-    void addSeparator();
-    bool isExceedsLeft();
-    bool isExceedsRight();
+  void addSeparator();
+  bool isExceedsLeft();
+  bool isExceedsRight();
 
+  QWidget* myChildWidget;
+  QHBoxLayout* myLayout;
+  QList<XGUI_MenuGroupPanel*> myGroups;
 
-    QWidget* myChildWidget;
-    QHBoxLayout* myLayout;
-    QList<XGUI_MenuGroupPanel*> myGroups;
-
-    CommandsArea* myCommandsArea;
-    QPushButton* myRightButton;
-    QPushButton* myLeftButton;
+  CommandsArea* myCommandsArea;
+  QPushButton* myRightButton;
+  QPushButton* myLeftButton;
 };
 
 #endif;

@@ -24,7 +24,9 @@ public:
 
   /// Use plugin manager for features creation: this method is 
   /// defined here only for SWIG-wrapping
-  ModelAPI_Feature() {}
+  ModelAPI_Feature()
+  {
+  }
 };
 
 #endif

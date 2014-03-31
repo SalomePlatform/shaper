@@ -21,11 +21,12 @@ class Handle_Model_Document;
  * to provide access to all stored data.
  */
 
-class Model_Document : public TDocStd_Document, public ModelAPI_Document
+class Model_Document: public TDocStd_Document, public ModelAPI_Document
 {
 public:
 
-  DEFINE_STANDARD_RTTI(Model_Document);
+  DEFINE_STANDARD_RTTI(Model_Document)
+  ;
 
   //! Creates new document by the format string of a storage
   Model_Document(const TCollection_ExtendedString& theStorageFormat);

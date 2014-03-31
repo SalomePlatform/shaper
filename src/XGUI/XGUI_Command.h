@@ -6,27 +6,29 @@
 #define MIN_BUTTON_HEIGHT 18
 #define MIN_BUTTON_WIDTH 40
 
-
-class XGUI_Command : public QWidgetAction
+class XGUI_Command: public QWidgetAction
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    XGUI_Command(const QString& theId, QObject * parent);
-    XGUI_Command(const QString& theId, const QIcon& icon, const QString& text, QObject* parent);
-    ~XGUI_Command();
+  XGUI_Command(const QString& theId, QObject * parent);
+  XGUI_Command(const QString& theId, const QIcon& icon, const QString& text, QObject* parent);
+  ~XGUI_Command();
 
-    virtual bool enabled() const;
-    virtual void enable();
-    virtual void disable();
-    virtual QString getId() const { return myId; }
+  virtual bool enabled() const;
+  virtual void enable();
+  virtual void disable();
+  virtual QString getId() const
+  {
+    return myId;
+  }
 
-    virtual void connectTo(const QObject* theResiver, const char* theSlot);
+  virtual void connectTo(const QObject* theResiver, const char* theSlot);
 
 protected:
-    virtual QWidget* createWidget(QWidget* theParent);
+  virtual QWidget* createWidget(QWidget* theParent);
 
 private:
-    QString myId;
+  QString myId;
 };
 
 #endif

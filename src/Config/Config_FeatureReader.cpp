@@ -32,17 +32,15 @@ const static char* FEATURE_TOOLTIP = "tooltip";
 const static char* FEATURE_ICON = "icon";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
 
-
 Config_FeatureReader::Config_FeatureReader(const std::string& theXmlFile)
-    : Config_XMLReader(theXmlFile),
-      m_fetchWidgetCfg(false)
+    : Config_XMLReader(theXmlFile), m_fetchWidgetCfg(false)
 {
-  #ifdef _DEBUG
+#ifdef _DEBUG
   if(!Event_Loop::Loop()) {
     std::cout << "Config_FeatureReader::importWorkbench: "
-        << "No event loop registered" << std::endl;
+    << "No event loop registered" << std::endl;
   }
-  #endif
+#endif
 }
 
 Config_FeatureReader::~Config_FeatureReader()
@@ -59,11 +57,11 @@ std::string Config_FeatureReader::featureWidgetCfg(std::string theFeatureName)
 
 void Config_FeatureReader::processNode(xmlNodePtr theNode)
 {
-  if(isNode(theNode, NODE_FEATURE, NULL)) {
-    if(m_fetchWidgetCfg) {
+  if (isNode(theNode, NODE_FEATURE, NULL)) {
+    if (m_fetchWidgetCfg) {
       xmlBufferPtr buffer = xmlBufferCreate();
       int size = xmlNodeDump(buffer, theNode->doc, theNode, 0, 1);
-      m_widgetCfg = std::string((char*)buffer->content);
+      m_widgetCfg = std::string((char*) buffer->content);
     } else {
       Event_Loop* aEvLoop = Event_Loop::Loop();
       Config_FeatureMessage aMessage(aEvLoop->EventByName("menu_item"), this);
@@ -72,10 +70,10 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
     }
   }
   //The m_last* variables always defined before fillFeature() call. XML is a tree.
-  if(isNode(theNode, NODE_GROUP, NULL)) {
+  if (isNode(theNode, NODE_GROUP, NULL)) {
     m_lastGroup = getProperty(theNode, _ID);
   }
-  if(isNode(theNode, NODE_WORKBENCH, NULL)) {
+  if (isNode(theNode, NODE_WORKBENCH, NULL)) {
     m_lastWorkbench = getProperty(theNode, _ID);
   }
 }
@@ -85,8 +83,7 @@ bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
   return isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL);
 }
 
-void Config_FeatureReader::fillFeature(xmlNodePtr theRoot,
-                                       Config_FeatureMessage& outFtMessage)
+void Config_FeatureReader::fillFeature(xmlNodePtr theRoot, Config_FeatureMessage& outFtMessage)
 {
   outFtMessage.setId(getProperty(theRoot, _ID));
   outFtMessage.setText(getProperty(theRoot, FEATURE_TEXT));

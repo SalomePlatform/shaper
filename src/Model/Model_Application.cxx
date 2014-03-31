@@ -5,8 +5,8 @@
 #include <Model_Application.hxx>
 #include <Model_Document.hxx>
 
-IMPLEMENT_STANDARD_HANDLE(Model_Application,TDocStd_Application)
-IMPLEMENT_STANDARD_RTTIEXT(Model_Application,TDocStd_Application)
+IMPLEMENT_STANDARD_HANDLE(Model_Application, TDocStd_Application)
+IMPLEMENT_STANDARD_RTTIEXT(Model_Application, TDocStd_Application)
 
 static Handle_Model_Application TheApplication = new Model_Application;
 
@@ -14,7 +14,7 @@ static Handle_Model_Application TheApplication = new Model_Application;
 //function : getApplication
 //purpose  : 
 //=======================================================================
-Handle_Model_Application Model_Application::GetApplication() 
+Handle_Model_Application Model_Application::GetApplication()
 {
   return TheApplication;
 }
@@ -36,7 +36,7 @@ ModelAPI_Document* Model_Application::GetMainDocument()
 //function : OCAFApp_Application
 //purpose  : 
 //=======================================================================
-Model_Application::Model_Application ()
+Model_Application::Model_Application()
 {
   // store handle to the application to avoid nullification
   static Handle(Model_Application) TheKeepHandle;
@@ -47,9 +47,9 @@ Model_Application::Model_Application ()
 //function : Formats
 //purpose  : 
 //=======================================================================
-void Model_Application::Formats(TColStd_SequenceOfExtendedString& theFormats) 
+void Model_Application::Formats(TColStd_SequenceOfExtendedString& theFormats)
 {
-  theFormats.Append(TCollection_ExtendedString ("BinOcaf")); // standard binary schema
+  theFormats.Append(TCollection_ExtendedString("BinOcaf")); // standard binary schema
 }
 
 //=======================================================================

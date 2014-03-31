@@ -28,9 +28,8 @@ Model_PluginManager::Model_PluginManager()
 
 void Model_PluginManager::ProcessEvent(const Event_Message* theMessage)
 {
-  const Config_FeatureMessage* aMsg =
-    dynamic_cast<const Config_FeatureMessage*>( theMessage );
-  if(aMsg) {
+  const Config_FeatureMessage* aMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
+  if (aMsg) {
     // proccess the plugin info, load plugin
   }
 }

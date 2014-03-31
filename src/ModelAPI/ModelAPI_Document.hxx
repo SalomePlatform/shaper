@@ -53,10 +53,13 @@ public:
   //! Returns True if there are available Redos
   MODELAPI_EXPORT virtual bool CanRedo() = 0;
   //! Redoes last operation
-  MODELAPI_EXPORT virtual  void Redo() = 0;
+  MODELAPI_EXPORT virtual void Redo() = 0;
 
   /// Only for SWIG wrapping it is here
-  MODELAPI_EXPORT ModelAPI_Document() {};
+  MODELAPI_EXPORT ModelAPI_Document()
+  {
+  }
+  ;
 };
 
 #endif

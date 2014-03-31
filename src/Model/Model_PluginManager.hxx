@@ -16,7 +16,7 @@
  * the feature functionality request.
  */
 
-class MODEL_EXPORT Model_PluginManager : public ModelAPI_PluginManager, public Event_Listener
+class MODEL_EXPORT Model_PluginManager: public ModelAPI_PluginManager, public Event_Listener
 {
 public:
   /// Creates the feature object using plugins functionality

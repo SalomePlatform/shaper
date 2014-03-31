@@ -3,8 +3,7 @@
  */
 #include "Config_FeatureMessage.h"
 
-Config_FeatureMessage::Config_FeatureMessage(const Event_ID theId,
-                                             const void* theParent)
+Config_FeatureMessage::Config_FeatureMessage(const Event_ID theId, const void* theParent)
     : Event_Message(theId, theParent)
 {
   myId = "";
