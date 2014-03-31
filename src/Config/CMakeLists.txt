@@ -7,14 +7,14 @@ INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/src/Event)
 
 SET(PROJECT_HEADERS
   Config.h
-  Config_Message.h
+  Config_FeatureMessage.h
   Config_XMLReader.h
   Config_ModuleReader.h
   Config_FeatureReader.h
  )
  
 SET(PROJECT_SOURCES
-  Config_Message.cpp
+  Config_FeatureMessage.cpp
   Config_XMLReader.cpp
   Config_ModuleReader.cpp
   Config_FeatureReader.cpp

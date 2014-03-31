@@ -6,7 +6,7 @@
 #include <ModelAPI_Feature.hxx>
 #include <Model_Feature.hxx>
 #include <Event_Loop.hxx>
-#include <Config_Message.h>
+#include <Config_FeatureMessage.h>
 
 using namespace std;
 

@@ -9,7 +9,7 @@
 #define CONFIG_XMLREADER_H_
 
 #include "Config.h"
-#include "Config_Message.h"
+#include "Config_FeatureMessage.h"
 
 #include <string>
 #include <cstdarg>
