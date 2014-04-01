@@ -6,12 +6,14 @@ INCLUDE(FindBoost)
 
 SET(PROJECT_HEADERS
     Model.h
+    Model_Application.h
     Model_Document.h
     Model_PluginManager.h
     Model_Feature.h
 )
 
 SET(PROJECT_SOURCES
+    Model_Application.cxx
     Model_Document.cxx
     Model_PluginManager.cxx
     Model_Feature.cxx

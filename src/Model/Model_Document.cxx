@@ -1,21 +1,20 @@
 // File:        Model_Document.cxx
-// Created:     28 Dec 2011
+// Created:     28 Feb 2014
 // Author:      Mikhail PONIKAROV
-// Copyright:   CEA 2011
 
 #include <Model_Document.h>
+#include <Model_Feature.h>
 
 #include <TDataStd_Integer.hxx>
 
 IMPLEMENT_STANDARD_HANDLE(Model_Document, MMgt_TShared)
 IMPLEMENT_STANDARD_RTTIEXT(Model_Document, MMgt_TShared)
 
-static const int UNDO_LIMIT = 10; // number of possible undo operations in the module
+static const int UNDO_LIMIT = 10; // number of possible undo operations
 
 static const int TAG_GENERAL = 1; // general properties tag
 static const int TAG_OBJECTS = 2; // tag of the objects sub-tree (Root for Model_ObjectsMgr)
 static const int TAG_HISTORY = 3; // tag of the history sub-tree (Root for Model_History)
-static const int TAG_ISOTOPES = 4; // tag of the isotopes sub-tree (Root for MaterialMC_Isotope)
 
 using namespace std;
 
@@ -149,6 +148,18 @@ void Model_Document::Redo()
 {
   TDocStd_Document::Redo();
   myTransactionsAfterSave++;
+}
+
+void Model_Document::AddObject(
+  boost::shared_ptr<ModelAPI_Feature> theFeature, const int theGroupID)
+{
+  boost::shared_ptr<Model_Feature> aModelFeature = 
+    boost::dynamic_pointer_cast<Model_Feature>(theFeature);
+  if (aModelFeature) {
+    TDF_Label aGroupLab = Main().FindChild(TAG_OBJECTS).FindChild(theGroupID + 1);
+    TDF_Label anObjLab = aGroupLab.NewChild();
+    aModelFeature->setLabel(anObjLab);
+  }
 }
 
 Model_Document::Model_Document(const TCollection_ExtendedString& theStorageFormat)

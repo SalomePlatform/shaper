@@ -6,6 +6,8 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Plugin.h>
 #include <Model_Feature.h>
+#include <Model_Document.h>
+#include <Model_Application.h>
 #include <Event_Loop.h>
 #include <Config_FeatureMessage.h>
 #include <Config_ModuleReader.h>
@@ -26,12 +28,20 @@ boost::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string th
       loadLibrary(myCurrentPluginName);
     }
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
-      return myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
+      boost::shared_ptr<ModelAPI_Feature> aCreated = 
+        myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
     }
   }
 
   return boost::shared_ptr<ModelAPI_Feature>(); // return nothing
 }
+
+boost::shared_ptr<ModelAPI_Document> Model_PluginManager::rootDocument()
+{
+  return boost::shared_ptr<ModelAPI_Document>(
+    Model_Application::getApplication()->getDocument("root"));
+}
+
 
 Model_PluginManager::Model_PluginManager()
 {
@@ -51,7 +61,7 @@ void Model_PluginManager::processEvent(const Event_Message* theMessage)
   if (aMsg) {
     // proccess the plugin info, load plugin
     if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
-      myPlugins[aMsg->id()] = aMsg->pluginLibrary(); // TO DO: plugin name must be also imported from XMLs
+      myPlugins[aMsg->id()] = aMsg->pluginLibrary();
     }
   }
   // plugins information was started to load, so, it will be loaded

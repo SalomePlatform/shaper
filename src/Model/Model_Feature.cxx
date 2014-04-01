@@ -10,7 +10,7 @@ Model_Feature::Model_Feature()
 {
 }
 
-string Model_Feature::GetKind()
+void Model_Feature::setLabel(TDF_Label& theLab)
 {
-  return "Point";
+  myLab = theLab;
 }

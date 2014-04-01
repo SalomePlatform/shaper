@@ -11,6 +11,7 @@
 
 class ModelAPI_Feature;
 class ModelAPI_Plugin;
+class ModelAPI_Document;
 
 /**\class ModelAPI_PluginManager
  * \ingroup DataModel
@@ -32,6 +33,9 @@ public:
   /// It is obligatory for each plugin to call this function on loading to be found by 
   /// the plugin manager on call of the feature)
   virtual void registerPlugin(ModelAPI_Plugin* thePlugin) = 0;
+
+  /// Returns the root document of the application (that may contains sub-documents)
+  virtual boost::shared_ptr<ModelAPI_Document> rootDocument() = 0;
 
   /// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
   static void ModelAPI_PluginManager::loadLibrary(const std::string theLibName);

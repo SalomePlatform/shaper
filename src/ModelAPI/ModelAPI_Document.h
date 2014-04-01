@@ -1,12 +1,14 @@
-// File:        Model_Document.hxx
-// Created:     28 Dec 2011
+// File:        ModelAPI_Document.cxx
+// Created:     28 Feb 2014
 // Author:      Mikhail PONIKAROV
-// Copyright:   CEA 2011
 
 #ifndef ModelAPI_Document_HeaderFile
 #define ModelAPI_Document_HeaderFile
 
 #include <ModelAPI.h>
+#include <boost/shared_ptr.hpp>
+
+class ModelAPI_Feature;
 
 /**\class Model_Document
  * \ingroup DataModel
@@ -54,6 +56,12 @@ public:
   MODELAPI_EXPORT virtual bool CanRedo() = 0;
   //! Redoes last operation
   MODELAPI_EXPORT virtual void Redo() = 0;
+
+  //! Adds to the document the new object of the given group id
+  //! \param theFeature a feature object that will be connected to the document in this method
+  //! \param theGroupID identifier of the groups of objects (must be greater than zero)
+  MODELAPI_EXPORT virtual void AddObject(boost::shared_ptr<ModelAPI_Feature> theFeature,
+    const int theGroupID) = 0;
 
 protected:
   /// Only for SWIG wrapping it is here

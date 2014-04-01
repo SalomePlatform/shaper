@@ -10,6 +10,8 @@
 #include <Event_Listener.h>
 #include <map>
 
+class Model_Document;
+
 /**\class Model_PluginManager
  * \ingroup DataModel
  * \brief Object that knows (from the initial XML file) which
@@ -27,6 +29,9 @@ class Model_PluginManager : public ModelAPI_PluginManager, public Event_Listener
 public:
   /// Creates the feature object using plugins functionality
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
+
+  /// Returns the root document of the application (that may contains sub-documents)
+  virtual boost::shared_ptr<ModelAPI_Document> rootDocument();
 
   /// Registers the plugin that creates features.
   /// It is obligatory for each plugin to call this function on loading to be found by 

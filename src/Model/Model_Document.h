@@ -1,7 +1,6 @@
-// File:        Model_Document.hxx
-// Created:     28 Dec 2011
+// File:        Model_Document.cxx
+// Created:     28 Feb 2014
 // Author:      Mikhail PONIKAROV
-// Copyright:   CEA 2011
 
 #ifndef Model_Document_HeaderFile
 #define Model_Document_HeaderFile
@@ -25,8 +24,7 @@ class Model_Document: public TDocStd_Document, public ModelAPI_Document
 {
 public:
 
-  DEFINE_STANDARD_RTTI(Model_Document)
-  ;
+  DEFINE_STANDARD_RTTI(Model_Document);
 
   //! Creates new document by the format string of a storage
   Model_Document(const TCollection_ExtendedString& theStorageFormat);
@@ -66,6 +64,12 @@ public:
   MODEL_EXPORT bool CanRedo();
   //! Redoes last operation
   MODEL_EXPORT void Redo();
+
+  //! Adds to the document the new object of the given group id
+  //! \param theFeature a feature object that will be connected to the document in this method
+  //! \param theGroupID identifier of the groups of objects (must be greater than zero)
+  MODEL_EXPORT virtual void AddObject(boost::shared_ptr<ModelAPI_Feature> theFeature,
+    const int theGroupID);
 
 protected:
 
