@@ -716,3 +716,17 @@ void XGUI_ViewPort::setBackground( const XGUI_ViewBackground& bgData )
         emit vpChangeBackground( myBackground );
     }
 }
+
+void XGUI_ViewPort::fitAll(bool theKeepScale, bool theWithZ, bool theUpd)
+{
+  if ( activeView().IsNull() )
+    return;
+
+  if ( theKeepScale )
+    myScale = activeView()->Scale();
+
+  Standard_Real aMargin = 0.01;
+  activeView()->FitAll( aMargin, theWithZ, theUpd );
+  activeView()->SetZSize(0.);
+  emit vpTransformed( );
+}

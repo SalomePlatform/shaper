@@ -13,11 +13,13 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
-#include <QTime>
+//#include <QTime>
+#include <QFileDialog>
 
 #include <TopoDS_Shape.hxx>
 #include <BRep_Tool.hxx>
 #include <TopoDS.hxx>
+#include <Visual3d_View.hxx>
 
 #define BORDER_SIZE 2
 
@@ -183,7 +185,8 @@ QFrame(),
     my2dMode(XGUI::No2dMode),
     myCurrPointType(XGUI::GRAVITY),
     myPrevPointType(XGUI::GRAVITY),
-    myRotationPointSelection(false)
+    myRotationPointSelection(false),
+    myClosable(false)
 {
     mySelectedPoint = gp_Pnt(0.,0.,0.);
     setFrameStyle(QFrame::Raised);
@@ -197,27 +200,13 @@ QFrame(),
     myViewPort->installEventFilter(this);
     aLay->addWidget(myViewPort);
 
-    myPicture = new QLabel();
+    myPicture = new QLabel(this);
     myPicture->setFrameStyle(QFrame::Sunken);
     myPicture->setFrameShape(QFrame::Panel);
     myPicture->setMouseTracking(true);
     myPicture->installEventFilter(this);
+    aLay->addWidget(myPicture);
     myPicture->hide();
-
-    QStringList aPictures;
-    aPictures<<":pictures/occ_view_camera_dump.png"<<":pictures/occ_view_style_switch.png";
-    aPictures<<":pictures/occ_view_triedre.png"<<":pictures/occ_view_fitall.png";
-    aPictures<<":pictures/occ_view_fitarea.png"<<":pictures/occ_view_zoom.png";
-    aPictures<<":pictures/occ_view_pan.png"<<":pictures/occ_view_glpan.png";
-    aPictures<<":pictures/occ_view_rotate.png"<<":pictures/occ_view_front.png";
-    aPictures<<":pictures/occ_view_back.png"<<":pictures/occ_view_left.png";
-    aPictures<<":pictures/occ_view_right.png"<<":pictures/occ_view_top.png";
-    aPictures<<":pictures/occ_view_bottom.png"<<":pictures/occ_view_clone.png";
-
-    QStringList aTitles;
-    aTitles << "Dump view" << "Mouse style switch" << "Show trihedron" << "Fit all";
-    aTitles << "Fit area" << "Zoom" << "Panning" << "Global panning" << "Rotate";
-    aTitles << "Front" << "Back" << "Left" << "Right" << "Top" << "Bottom" << "Clone view";
 
     myGripWgt = new ViewerLabel(this, myViewPort);
     myGripWgt->setPixmap(QPixmap(":pictures/wnd_grip.png"));
@@ -227,16 +216,73 @@ QFrame(),
     connect(myViewPort, SIGNAL(vpTransformed()), myGripWgt, SLOT(update()));
     connect(myViewPort, SIGNAL(vpUpdated()), myGripWgt, SLOT(update()));
 
+    // Create Viewer management buttons
     myViewBar = new ViewerToolbar(this, myViewPort);
 
     QAction* aBtn;
-    for (int i = 0; i < aTitles.length(); i++) {
-        aBtn = new QAction(QIcon(aPictures.at(i)), aTitles.at(i), myViewBar);
-        myViewBar->addAction(aBtn);
-    }
+
+    // Dump view
+    aBtn = new QAction(QIcon(":pictures/occ_view_camera_dump.png"), tr("DUMP_VIEW"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(dumpView()));
+    myViewBar->addAction(aBtn);
+    // Fit all
+    aBtn = new QAction(QIcon(":pictures/occ_view_fitall.png"), tr("FIT_ALL"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(fitAll()));
+    myViewBar->addAction(aBtn);
+    // Fit area
+    aBtn = new QAction(QIcon(":pictures/occ_view_fitarea.png"), tr("FIT_AREA"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(activateWindowFit()));
+    myViewBar->addAction(aBtn);
+    // Zoom
+    aBtn = new QAction(QIcon(":pictures/occ_view_zoom.png"), tr("ZOOM_VIEW"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(activateZoom()));
+    myViewBar->addAction(aBtn);
+    // Pan
+    aBtn = new QAction(QIcon(":pictures/occ_view_pan.png"), tr("PAN_VIEW"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(activatePanning()));
+    myViewBar->addAction(aBtn);
+    // Global Panning
+    aBtn = new QAction(QIcon(":pictures/occ_view_glpan.png"), tr("GLOB_PAN_VIEW"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(activateGlobalPanning()));
+    myViewBar->addAction(aBtn);
+    // Rotation
+    aBtn = new QAction(QIcon(":pictures/occ_view_rotate.png"), tr("ROTATE_VIEW"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(activateRotation()));
+    myViewBar->addAction(aBtn);
+    // Front view
+    aBtn = new QAction(QIcon(":pictures/occ_view_front.png"), tr("FRONT_VIEW"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(frontView()));
+    myViewBar->addAction(aBtn);
+    // Back view
+    aBtn = new QAction(QIcon(":pictures/occ_view_back.png"), tr("BACK_VIEW"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(backView()));
+    myViewBar->addAction(aBtn);
+    // Top view
+    aBtn = new QAction(QIcon(":pictures/occ_view_top.png"), tr("TOP_VIEW"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(topView()));
+    myViewBar->addAction(aBtn);
+    // Bottom view
+    aBtn = new QAction(QIcon(":pictures/occ_view_bottom.png"), tr("BOTTOM_VIEW"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(bottomView()));
+    myViewBar->addAction(aBtn);
+    // Left view
+    aBtn = new QAction(QIcon(":pictures/occ_view_left.png"), tr("LEFT_VIEW"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(leftView()));
+    myViewBar->addAction(aBtn);
+    // Right view
+    aBtn = new QAction(QIcon(":pictures/occ_view_right.png"), tr("RIGHT_VIEW"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(rightView()));
+    myViewBar->addAction(aBtn);
+    // Clone view
+    aBtn = new QAction(QIcon(":pictures/occ_view_clone.png"), tr("CLONE_VIEW"), myViewBar);
+    connect(aBtn, SIGNAL(triggered()), SLOT(cloneView()));
+    myViewBar->addAction(aBtn);
+
+    //Support copy of background on updating of viewer
     connect(myViewPort, SIGNAL(vpTransformed()), myViewBar, SLOT(update()));
     connect(myViewPort, SIGNAL(vpUpdated()), myViewBar, SLOT(update()));
 
+    // Create Window management buttons
     myWindowBar = new ViewerToolbar(this, myViewPort);
     connect(myViewPort, SIGNAL(vpTransformed()), myWindowBar, SLOT(update()));
     connect(myViewPort, SIGNAL(vpUpdated()), myWindowBar, SLOT(update()));
@@ -286,15 +332,14 @@ void XGUI_ViewWindow::changeEvent(QEvent* theEvent)
 
     if (theEvent->type() == QEvent::WindowStateChange) {
         if (isMinimized()) {
-            if (!myPicture->parentWidget()) {
-                QMdiSubWindow* aParent = static_cast<QMdiSubWindow*>(parentWidget());
-                QMdiArea* aMDIArea = aParent->mdiArea();
-                myPicture->setParent(aMDIArea);
-            }
-            myPicture->move(parentWidget()->x(), parentWidget()->y());
+            myViewBar->hide();
+            myGripWgt->hide(); 
+            myWindowBar->hide();
+            myViewPort->hide();
             myPicture->show();
         } else {
             myPicture->hide();
+            myViewPort->show();
             if (isMaximized()) {
                 myMinimizeBtn->setIcon(MinimizeIco);
                 myMaximizeBtn->setIcon(RestoreIco);
@@ -304,12 +349,17 @@ void XGUI_ViewWindow::changeEvent(QEvent* theEvent)
         QWidget::changeEvent(theEvent);
 }
 
+
 //****************************************************************
 void XGUI_ViewWindow::onClose()
 {
-    if (parentWidget())
-        parentWidget()->close();
-
+    if (parentWidget()) {
+        emit tryClosing(this);
+        if (closable()) {
+            emit closed(static_cast<QMdiSubWindow*>(parentWidget()));
+            parentWidget()->close();
+        }
+    }
 }
 
 //****************************************************************
@@ -317,10 +367,10 @@ void XGUI_ViewWindow::enterEvent(QEvent* theEvent)
 {
     if (!isMinimized()) {
         myViewBar->show();
+        myWindowBar->show();
         if (!isMaximized())
             myGripWgt->show(); 
     }
-    myWindowBar->show();
 }
 
 //****************************************************************
@@ -338,10 +388,13 @@ void XGUI_ViewWindow::onMinimize()
     int aW = width();
     int aH = height();
     double aR = aW / 100.;
-    myPicture->setPixmap(aPMap.scaled(100,  int(aH / aR)));
+    int aNewH = int(aH / aR);
+    myPicture->setPixmap(aPMap.scaled(100,  aNewH));
     
     myLastState = isMaximized()? MaximizedState : NormalState;
     showMinimized();
+    parentWidget()->setGeometry(parentWidget()->x(), parentWidget()->y(),
+                                100, aNewH);
 }
 
 //****************************************************************
@@ -362,7 +415,6 @@ void XGUI_ViewWindow::onMaximize()
 //****************************************************************
 bool XGUI_ViewWindow::processWindowControls(QObject *theObj, QEvent *theEvent)
 {
-    QWidget* aWgt = (theObj == myPicture)? myPicture : static_cast<QWidget*>(parentWidget());
     switch (theEvent->type()) {
     case QEvent::MouseButtonPress: 
         {
@@ -393,9 +445,9 @@ bool XGUI_ViewWindow::processWindowControls(QObject *theObj, QEvent *theEvent)
                 QPoint aPnt = aEvent->globalPos();
                 QPoint aMDIPnt = aMDIArea->mapFromGlobal(aPnt);
                 if (aMDIArea->rect().contains(aMDIPnt)) {
-                    int aX = aWgt->x() + (aPnt.x() - myMousePnt.x());
-                    int aY = aWgt->y() + (aPnt.y() - myMousePnt.y());
-                    aWgt->move(aX, aY);
+                    int aX = aParent->x() + (aPnt.x() - myMousePnt.x());
+                    int aY = aParent->y() + (aPnt.y() - myMousePnt.y());
+                    aParent->move(aX, aY);
                     myMousePnt = aPnt;
                 }
                 return true;
@@ -433,6 +485,18 @@ bool XGUI_ViewWindow::processViewPort(QEvent *theEvent)
 
     case QEvent::MouseButtonDblClick:
         emit mouseDoubleClicked(this, (QMouseEvent*)theEvent);
+        return true;
+    case QEvent::Wheel:
+        {
+            QWheelEvent* aEvent = (QWheelEvent*) theEvent;
+            myViewPort->startZoomAtPoint( aEvent->x(), aEvent->y() );
+            double aDelta = (double)( aEvent->delta() ) / ( 15 * 8 );
+            int x  = aEvent->x();
+            int y  = aEvent->y();
+            int x1 = (int)( aEvent->x() + width()*aDelta/100 );
+            int y1 = (int)( aEvent->y() + height()*aDelta/100 );
+            myViewPort->zoom( x, y, x1, y1 );
+        }
         return true;
     }
     return false;
@@ -850,6 +914,26 @@ void XGUI_ViewWindow::activatePanning()
 }
 
 /*!
+  \brief Start global panning operation
+
+  Sets the corresponding cursor for the widget.
+*/
+void XGUI_ViewWindow::activateGlobalPanning()
+{
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) {
+    QPixmap globalPanPixmap (imageCrossCursor);
+    QCursor glPanCursor (globalPanPixmap);
+    myCurScale = aView3d->Scale();
+    aView3d->FitAll(0.01, false);
+    myCursor = cursor();                // save old cursor
+    myViewPort->fitAll(); // fits view before selecting a new scene center
+    if( setTransformRequested( PANGLOBAL ) )
+      myViewPort->setCursor( glPanCursor );
+  }
+}
+
+/*!
   \brief Start rotation operation
 
   Sets the corresponding cursor for the widget.
@@ -899,4 +983,140 @@ XGUI_ViewBackground XGUI_ViewWindow::background() const
 void XGUI_ViewWindow::setBackground( const XGUI_ViewBackground& theBackground )
 {
   if ( myViewPort ) myViewPort->setBackground( theBackground );
+}
+
+/*!
+   \brief Create one more window with same content.
+*/
+void XGUI_ViewWindow::cloneView()
+{
+  QMdiSubWindow* vw = myViewer->createView();
+  //vw->show();
+  emit viewCloned( vw );
+}
+
+void XGUI_ViewWindow::dumpView()
+{
+    QString aFilter(tr("OCC_IMAGE_FILES"));
+    QString aSelectedFilter;
+    QString aFileName = QFileDialog::getSaveFileName(this, "Save picture", QString(), aFilter, &aSelectedFilter);
+    if (!aFileName.isNull()) {
+        QApplication::setOverrideCursor( Qt::WaitCursor );
+        QImage aPicture = myViewPort->dumpView();
+
+        QString aFmt = extension(aFileName).toUpper();
+        if( aFmt.isEmpty() )
+            aFmt = QString( "BMP" ); // default format
+        else if( aFmt == "JPG" )
+            aFmt = "JPEG";
+          
+        Handle(Visual3d_View) a3dView = myViewPort->getView()->View();
+        if (aFmt == "PS")
+            a3dView->Export(strdup(qPrintable(aFileName)), Graphic3d_EF_PostScript);
+        else if (aFmt == "EPS")
+            a3dView->Export(strdup(qPrintable(aFileName)), Graphic3d_EF_EnhPostScript);
+        else
+            aPicture.save( aFileName, aFmt.toLatin1() );
+        QApplication::restoreOverrideCursor();
+    }
+}
+
+void XGUI_ViewWindow::fitAll()
+{
+    emit vpTransformationStarted( FITALLVIEW );
+    myViewPort->fitAll();
+    emit vpTransformationFinished( FITALLVIEW );
+}
+
+/*!
+  \brief Starts fit operation.
+
+  Sets the corresponding cursor for the widget.
+*/
+void XGUI_ViewWindow::activateWindowFit()
+{
+  if ( !transformRequested() && !myCursorIsHand )
+    myCursor = cursor();                /* save old cursor */
+
+  if ( myOperation != WINDOWFIT ) {
+    QCursor handCursor (Qt::PointingHandCursor);
+    if( setTransformRequested ( WINDOWFIT ) )
+    {
+      myViewPort->setCursor ( handCursor );
+      myCursorIsHand = true;
+    }
+  }
+}
+
+
+/*!
+  \brief Perform "front view" transformation.
+*/
+void XGUI_ViewWindow::frontView()
+{
+  emit vpTransformationStarted ( FRONTVIEW );
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Xpos);
+  myViewPort->fitAll();
+  emit vpTransformationFinished ( FRONTVIEW );
+}
+
+/*!
+  \brief Perform "back view" transformation.
+*/
+void XGUI_ViewWindow::backView()
+{
+  emit vpTransformationStarted ( BACKVIEW );
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Xneg);
+  myViewPort->fitAll();
+  emit vpTransformationFinished ( BACKVIEW );
+}
+
+/*!
+  \brief Perform "top view" transformation.
+*/
+void XGUI_ViewWindow::topView()
+{
+  emit vpTransformationStarted ( TOPVIEW );
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Zpos);
+  myViewPort->fitAll();
+  emit vpTransformationFinished ( TOPVIEW );
+}
+
+/*!
+  \brief Perform "bottom view" transformation.
+*/
+void XGUI_ViewWindow::bottomView()
+{
+  emit vpTransformationStarted ( BOTTOMVIEW );
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Zneg);
+  myViewPort->fitAll();
+  emit vpTransformationFinished ( BOTTOMVIEW );
+}
+
+/*!
+  \brief Perform "left view" transformation.
+*/
+void XGUI_ViewWindow::leftView()
+{
+  emit vpTransformationStarted ( LEFTVIEW );
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Yneg);
+  myViewPort->fitAll();
+  emit vpTransformationFinished ( LEFTVIEW );
+}
+
+/*!
+  \brief Perform "right view" transformation.
+*/
+void XGUI_ViewWindow::rightView()
+{
+  emit vpTransformationStarted ( RIGHTVIEW );
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Ypos);
+  myViewPort->fitAll();
+  emit vpTransformationFinished ( RIGHTVIEW );
 }
