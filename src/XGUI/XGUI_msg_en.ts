@@ -156,4 +156,71 @@
         <translation>Image files (*.bmp *.gif *.pix *.xwd *.rgb *.rs)</translation>
     </message>
 </context>
+<context>
+    <name>XGUI_ViewWindow</name>
+    <message>
+        <source>OCC_IMAGE_FILES</source>
+        <translation>Images Files (*.bmp *.png *.jpg *.jpeg *.eps *.ps)</translation>
+    </message>
+    <message>
+        <source>DUMP_VIEW</source>
+        <translation>Dump view</translation>
+    </message>
+    <message>
+        <source>FIT_ALL</source>
+        <translation>Fit all</translation>
+    </message>
+    <message>
+        <source>FIT_AREA</source>
+        <translation>Fit area</translation>
+    </message>
+    <message>
+        <source>CLONE_VIEW</source>
+        <translation>Clone view</translation>
+    </message>
+    <message>
+        <source>ZOOM_VIEW</source>
+        <translation>Zoom</translation>
+    </message>
+    <message>
+        <source>PAN_VIEW</source>
+        <translation>Panning</translation>
+    </message>
+    <message>
+        <source>GLOB_PAN_VIEW</source>
+        <translation>Global panning</translation>
+    </message>
+    <message>
+        <source>ROTATE_VIEW</source>
+        <translation>Rotate</translation>
+    </message>
+    <message>
+        <source>FRONT_VIEW</source>
+        <translation>Front</translation>
+    </message>
+    <message>
+        <source>BACK_VIEW</source>
+        <translation>Back</translation>
+    </message>
+    <message>
+        <source>TOP_VIEW</source>
+        <translation>Top</translation>
+    </message>
+    <message>
+        <source>BOTTOM_VIEW</source>
+        <translation>Bottom</translation>
+    </message>
+    <message>
+        <source>LEFT_VIEW</source>
+        <translation>Left</translation>
+    </message>
+    <message>
+        <source>RIGHT_VIEW</source>
+        <translation>Right</translation>
+    </message>
+    <message>
+        <source>RESET_VIEW</source>
+        <translation>Reset</translation>
+    </message>
+</context>
 </TS>

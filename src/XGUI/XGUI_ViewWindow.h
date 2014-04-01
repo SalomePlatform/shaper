@@ -18,6 +18,7 @@ class XGUI_Viewer;
 class ViewerToolbar;
 class ViewerLabel;
 class XGUI_RectRubberBand;
+class QMdiSubWindow;
 
 class XGUI_ViewWindow: public QFrame
 {
@@ -63,32 +64,51 @@ public:
   XGUI_ViewBackground background() const;
   void setBackground(const XGUI_ViewBackground& theBackground);
 
+  bool closable() const { return myClosable; }
+  void setClosable( const bool isClosable ) { myClosable = isClosable; }
+
 signals:
-  void vpTransformationStarted(XGUI_ViewWindow::OperationType type);
-  void vpTransformationFinished(XGUI_ViewWindow::OperationType type);
-  //void viewCloned( XGUI_ViewWindow* );
+    void vpTransformationStarted(XGUI_ViewWindow::OperationType type);
+    void vpTransformationFinished(XGUI_ViewWindow::OperationType type);
 
-  void Show(QShowEvent *);
-  void Hide(QHideEvent *);
-  void maximized(XGUI_ViewWindow*, bool);
-  void returnedTo3d();
+    void Show(QShowEvent *);
+    void Hide(QHideEvent *);
+    void maximized(XGUI_ViewWindow*, bool);
+    void returnedTo3d();
 
-  void tryClosing(XGUI_ViewWindow*);
-  void closing(XGUI_ViewWindow*);
-  void mousePressed(XGUI_ViewWindow*, QMouseEvent*);
-  void mouseReleased(XGUI_ViewWindow*, QMouseEvent*);
-  void mouseDoubleClicked(XGUI_ViewWindow*, QMouseEvent*);
-  void mouseMoving(XGUI_ViewWindow*, QMouseEvent*);
-  void wheeling(XGUI_ViewWindow*, QWheelEvent*);
-  void keyPressed(XGUI_ViewWindow*, QKeyEvent*);
-  void keyReleased(XGUI_ViewWindow*, QKeyEvent*);
-  void contextMenuRequested(QContextMenuEvent *e);
-  void viewModified(XGUI_ViewWindow*);
+    void tryClosing(XGUI_ViewWindow*);
+    void closed( QMdiSubWindow* );
+    void mousePressed(XGUI_ViewWindow*, QMouseEvent*);
+    void mouseReleased(XGUI_ViewWindow*, QMouseEvent*);
+    void mouseDoubleClicked(XGUI_ViewWindow*, QMouseEvent*);
+    void mouseMoving(XGUI_ViewWindow*, QMouseEvent*);
+    void keyPressed(XGUI_ViewWindow*, QKeyEvent*);
+    void keyReleased(XGUI_ViewWindow*, QKeyEvent*);
+    void contextMenuRequested(QContextMenuEvent *e);
+
+    void viewModified(XGUI_ViewWindow*);
+    void viewCloned( QMdiSubWindow* theView );
 
 public slots:
   void activateZoom();
   void activateRotation();
   void activatePanning();
+  void activateWindowFit();
+  void activateGlobalPanning();
+
+  void cloneView();
+  void dumpView();
+  void fitAll();
+
+  void frontView();
+  void backView();
+  void topView();
+  void bottomView();
+  void leftView();
+  void rightView();
+
+  void reset();
+
 
 protected:
   virtual void resizeEvent(QResizeEvent* theEvent);
@@ -104,6 +124,9 @@ private slots:
   void onClose();
   void onMinimize();
   void onMaximize();
+
+  void updateToolBar();
+  //void repaintToolBar();
 
 private:
   enum WindowState
@@ -174,6 +197,7 @@ private:
   bool myCursorIsHand;
   bool myIsKeyFree;
   bool myEventStarted;       // set when transformation is in process 
+  bool myClosable;
 
   QCursor myCursor;
 
@@ -200,6 +224,8 @@ public:
   {
   }
 
+  void repaintBackground();
+
 protected:
   virtual void paintEvent(QPaintEvent* theEvent);
 
@@ -216,6 +242,8 @@ public:
       : QLabel(theParent), myVPort(thePort)
   {
   }
+
+  void repaintBackground();
 
 protected:
   virtual void paintEvent(QPaintEvent* theEvent);

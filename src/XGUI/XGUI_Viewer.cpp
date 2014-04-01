@@ -75,9 +75,15 @@ QString XGUI_Viewer::backgroundData(QStringList& gradList, QIntList& idList, QIn
 }
 
 XGUI_Viewer::XGUI_Viewer(XGUI_MainWindow* theParent, bool DisplayTrihedron)
-    : QObject(theParent), myMainWindow(theParent), myPreselectionEnabled(true), mySelectionEnabled(
-        true), myMultiSelectionEnabled(true), myIsRelative(true), myInteractionStyle(
-        XGUI::STANDARD), myTrihedronSize(100)
+    : QObject(theParent), 
+    myMainWindow(theParent), 
+    myPreselectionEnabled(true), 
+    mySelectionEnabled(true), 
+    myMultiSelectionEnabled(true), 
+    myIsRelative(true), 
+    myInteractionStyle(XGUI::STANDARD), 
+    myTrihedronSize(100),
+    myActiveView(0)
 {
   if (!isInitialized) {
     isInitialized = true;
@@ -158,13 +164,16 @@ QMdiSubWindow* XGUI_Viewer::createView(V3d_TypeOfView theType)
   // set default background for view window
   //vw->setBackground( background(0) ); // 0 means MAIN_VIEW (other views are not yet created here)
   //// connect signal from viewport
-  connect(view->viewPort(), SIGNAL(vpClosed()), this, SLOT(onViewClosed()));
-  connect(view->viewPort(), SIGNAL(vpMapped()), this, SLOT(onViewMapped()));
+    //connect(view->viewPort(), SIGNAL(vpClosed()), this, SLOT(onViewClosed()));
+    //connect(view->viewPort(), SIGNAL(vpMapped()), this, SLOT(onViewMapped()));
+    if (myViews.size() == 0) 
+        setTrihedronShown(true);
 
   view->setBackground(XGUI_ViewBackground(XGUI::VerticalGradient, Qt::green, Qt::blue));
 
   QMdiArea* aMDI = myMainWindow->mdiArea();
   QMdiSubWindow* aWnd = aMDI->addSubWindow(view, Qt::FramelessWindowHint);
+    addView(aWnd);
   aWnd->setGeometry(0, 0, aMDI->width() / 2, aMDI->height() / 2);
   aWnd->show();
   return aWnd;
@@ -321,20 +330,86 @@ bool XGUI_Viewer::computeTrihedronSize(double& theNewSize, double& theSize)
   return fabs(theNewSize - theSize) > theSize * EPS || fabs(theNewSize - theSize) > theNewSize * EPS;
 }
 
-void XGUI_Viewer::onViewClosed()
+void XGUI_Viewer::onViewClosed(QMdiSubWindow* theView)
 {
-  Standard_Integer aViewsNb = 0;
-  for(myV3dViewer->InitActiveViews(); myV3dViewer->MoreActiveViews();
-      myV3dViewer->NextActiveViews())
-    ++aViewsNb;
-  if (aViewsNb < 2) {
-    //clean up presentations before last view is closed
-    myAISContext->RemoveAll(Standard_False);
-  }
+    if ( !theView )
+        return;
+
+    emit deleteView( static_cast<XGUI_ViewWindow*>(theView->widget()) );
+    removeView( theView );
+
+    // if this is last view
+    if (myViews.size() == 0) {
+        Standard_Integer aViewsNb = 0;
+        for ( myV3dViewer->InitActiveViews(); myV3dViewer->MoreActiveViews(); myV3dViewer->NextActiveViews())
+            ++aViewsNb;
+        if ( aViewsNb < 2 ) {
+            //clean up presentations before last view is closed
+            myAISContext->RemoveAll(Standard_False);
+        }
+    }
 }
 
-void XGUI_Viewer::onViewMapped()
+/*!Remove view window \a theView from view manager.
+ *And close the last view, if it has \a theView.
+*/
+void XGUI_Viewer::removeView( QMdiSubWindow* theView )
+{
+    XGUI_ViewWindow* aWindow = static_cast<XGUI_ViewWindow*>(theView->widget());
+
+    aWindow->disconnect( this );
+    myViews.removeAt( myViews.indexOf( theView ) );
+    if ( myActiveView == theView )
+        myActiveView = 0;
+    if ( myViews.size() == 0 )
+        emit lastViewClosed();
+}
+
+
+/*void XGUI_Viewer::onViewMapped()
 {
   setTrihedronShown(true);
+}*/
+
+
+void XGUI_Viewer::addView(QMdiSubWindow* theView)
+{
+    XGUI_ViewWindow* aWindow = dynamic_cast<XGUI_ViewWindow*>(theView->widget());
+
+    connect(aWindow, SIGNAL(closed(QMdiSubWindow*)),
+            this,    SLOT(onViewClosed(QMdiSubWindow*)));
+
+    connect(aWindow, SIGNAL(tryClosing(XGUI_ViewWindow*)),
+            this,    SIGNAL(tryCloseView(XGUI_ViewWindow*)));
+
+    connect(aWindow, SIGNAL(mousePressed(XGUI_ViewWindow*, QMouseEvent*)),
+            this,    SLOT(onMousePressed(XGUI_ViewWindow*, QMouseEvent*)));
+
+    connect(aWindow, SIGNAL(mouseReleased(XGUI_ViewWindow*, QMouseEvent*)),
+            this,    SIGNAL(mouseRelease(XGUI_ViewWindow*, QMouseEvent*)));
+
+    connect(aWindow, SIGNAL(mouseDoubleClicked(XGUI_ViewWindow*, QMouseEvent*)),
+            this,    SIGNAL(mouseDoubleClick(XGUI_ViewWindow*, QMouseEvent*)));
+
+    connect(aWindow, SIGNAL(mouseMoving(XGUI_ViewWindow*, QMouseEvent*)),
+            this,    SIGNAL(mouseMove(XGUI_ViewWindow*, QMouseEvent*)));
+
+    connect(aWindow, SIGNAL(keyPressed(XGUI_ViewWindow*, QKeyEvent*)),
+            this,    SIGNAL(keyPress(XGUI_ViewWindow*, QKeyEvent*)));
+
+    connect(aWindow, SIGNAL(keyReleased(XGUI_ViewWindow*, QKeyEvent*)),
+            this,    SIGNAL(keyRelease(XGUI_ViewWindow*, QKeyEvent*)));
+
+    connect(aWindow, SIGNAL(contextMenuRequested( QContextMenuEvent* )),
+            this,    SLOT  (onContextMenuRequested( QContextMenuEvent* )));
+
+    myViews.append(theView);
 }
 
+/*!
+    Emit activated for view \a view.
+*/
+void XGUI_Viewer::onWindowActivated(QMdiSubWindow* view)
+{
+    myActiveView = view;
+}

@@ -5,6 +5,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QList>
 
 #include <V3d_Viewer.hxx>
 #include <AIS_InteractiveContext.hxx>
@@ -12,6 +13,9 @@
 
 class XGUI_MainWindow;
 class QMdiSubWindow;
+class XGUI_ViewWindow;
+class QMouseEvent;
+class QKeyEvent;
 
 class XGUI_Viewer: public QObject
 {
@@ -70,9 +74,29 @@ public:
   static InteractionStyle2StatesMap myStateMap;
   static InteractionStyle2ButtonsMap myButtonMap;
 
+signals:
+    void lastViewClosed();
+    void tryCloseView(XGUI_ViewWindow* theWindow);
+    void deleteView(XGUI_ViewWindow* theWindow);
+    void viewCreated(XGUI_ViewWindow* theWindow);
+    void mousePress(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+    void mouseRelease(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+    void mouseDoubleClick(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+    void mouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+    void keyPress(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent);
+    void keyRelease(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent);
+    void activated(XGUI_ViewWindow* theWindow);
+
 private slots:
-  void onViewClosed();
-  void onViewMapped();
+    void onViewClosed(QMdiSubWindow*);
+    //void onViewMapped();
+    void onWindowActivated(QMdiSubWindow*);
+
+private:
+    void addView(QMdiSubWindow* theView);
+
+    /*! Removes the View from internal Views list.*/
+    void removeView(QMdiSubWindow* theView);
 
 private:
   XGUI_MainWindow* myMainWindow;
@@ -87,6 +111,10 @@ private:
   bool myIsRelative;
 
   double myTrihedronSize;
+  
+    QList<QMdiSubWindow*> myViews;
+
+    QMdiSubWindow* myActiveView;
 };
 
 #endif

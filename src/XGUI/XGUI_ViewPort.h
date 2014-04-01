@@ -40,6 +40,7 @@ public:
   void fitRect(const QRect& rect);
   void startZoomAtPoint(int x, int y);
   void zoom(int x0, int y0, int x, int y);
+    void fitAll(bool theKeepScale = false, bool theWithZ = true, bool theUpd = true);
 
   void setAdvancedZoomingEnabled(const bool theState)
   {
@@ -54,7 +55,10 @@ public:
   {
     return myBackground;
   }
+
   void setBackground(const XGUI_ViewBackground& bgData);
+
+  void syncronizeWith( const XGUI_ViewPort* ref );
 
 signals:
   void vpChangeBackground(const XGUI_ViewBackground&);
