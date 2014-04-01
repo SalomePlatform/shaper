@@ -30,7 +30,7 @@ public:
   //! Retuns the application: one per process    
   MODEL_EXPORT static Handle_Model_Application getApplication();
   //! Returns the main document (on first call creates it) by the string identifier
-  MODEL_EXPORT boost::shared_ptr<Model_Document> getDocument(std::string theDocID);
+  MODEL_EXPORT std::shared_ptr<Model_Document> getDocument(std::string theDocID);
 
 public:
   // Redefined OCAF methods
@@ -46,7 +46,7 @@ public:
 
 private:
   /// Map from string identifiers to created documents of an application
-  std::map<std::string, boost::shared_ptr<Model_Document> > myDocs;
+  std::map<std::string, std::shared_ptr<Model_Document> > myDocs;
 };
 
 #endif

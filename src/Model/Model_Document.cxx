@@ -7,9 +7,6 @@
 
 #include <TDataStd_Integer.hxx>
 
-IMPLEMENT_STANDARD_HANDLE(Model_Document, MMgt_TShared)
-IMPLEMENT_STANDARD_RTTIEXT(Model_Document, MMgt_TShared)
-
 static const int UNDO_LIMIT = 10; // number of possible undo operations
 
 static const int TAG_GENERAL = 1; // general properties tag
@@ -99,28 +96,28 @@ bool Model_Document::Save(const char* theFileName)
 
 void Model_Document::Close()
 {
-  TDocStd_Document::Close();
+  myDoc->Close();
 }
 
 void Model_Document::StartOperation()
 {
-  TDocStd_Document::NewCommand();
+  myDoc->NewCommand();
 }
 
 void Model_Document::FinishOperation()
 {
-  TDocStd_Document::CommitCommand();
+  myDoc->CommitCommand();
   myTransactionsAfterSave++;
 }
 
 void Model_Document::AbortOperation()
 {
-  TDocStd_Document::AbortCommand();
+  myDoc->AbortCommand();
 }
 
 bool Model_Document::IsOperation()
 {
-  return TDocStd_Document::HasOpenCommand() == Standard_True ;
+  return myDoc->HasOpenCommand() == Standard_True ;
 }
 
 bool Model_Document::IsModified()
@@ -130,42 +127,42 @@ bool Model_Document::IsModified()
 
 bool Model_Document::CanUndo()
 {
-  return TDocStd_Document::GetAvailableUndos() > 0;
+  return myDoc->GetAvailableUndos() > 0;
 }
 
 void Model_Document::Undo()
 {
-  TDocStd_Document::Undo();
+  myDoc->Undo();
   myTransactionsAfterSave--;
 }
 
 bool Model_Document::CanRedo()
 {
-  return TDocStd_Document::GetAvailableRedos() > 0;
+  return myDoc->GetAvailableRedos() > 0;
 }
 
 void Model_Document::Redo()
 {
-  TDocStd_Document::Redo();
+  myDoc->Redo();
   myTransactionsAfterSave++;
 }
 
 void Model_Document::AddObject(
-  boost::shared_ptr<ModelAPI_Feature> theFeature, const int theGroupID)
+  std::shared_ptr<ModelAPI_Feature> theFeature, const int theGroupID)
 {
-  boost::shared_ptr<Model_Feature> aModelFeature = 
-    boost::dynamic_pointer_cast<Model_Feature>(theFeature);
+  std::shared_ptr<Model_Feature> aModelFeature = 
+    std::dynamic_pointer_cast<Model_Feature>(theFeature);
   if (aModelFeature) {
-    TDF_Label aGroupLab = Main().FindChild(TAG_OBJECTS).FindChild(theGroupID + 1);
+    TDF_Label aGroupLab = myDoc->Main().FindChild(TAG_OBJECTS).FindChild(theGroupID + 1);
     TDF_Label anObjLab = aGroupLab.NewChild();
     aModelFeature->setLabel(anObjLab);
   }
 }
 
-Model_Document::Model_Document(const TCollection_ExtendedString& theStorageFormat)
-    : TDocStd_Document(theStorageFormat)
+Model_Document::Model_Document()
+    : myDoc(new TDocStd_Document("BinOcaf")) // binary OCAF format
 {
-  SetUndoLimit(UNDO_LIMIT);
+  myDoc->SetUndoLimit(UNDO_LIMIT);
   myTransactionsAfterSave = 0;
 }
 

@@ -23,12 +23,12 @@ Handle(Model_Application) Model_Application::getApplication()
 //function : getDocument
 //purpose  : 
 //=======================================================================
-boost::shared_ptr<Model_Document> Model_Application::getDocument(std::string theDocID)
+std::shared_ptr<Model_Document> Model_Application::getDocument(std::string theDocID)
 {
   if (myDocs.find(theDocID) != myDocs.end())
     return myDocs[theDocID];
 
-  boost::shared_ptr<Model_Document> aNew(new Model_Document("BinOcaf"));
+  std::shared_ptr<Model_Document> aNew(new Model_Document);
   myDocs[theDocID] = aNew;
   return aNew;
 }

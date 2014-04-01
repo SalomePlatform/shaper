@@ -15,9 +15,9 @@
 %include "std_string.i"
 
 // boost pointers
-%include <boost_shared_ptr.i>
-%shared_ptr(ModelAPI_PluginManager)
-%shared_ptr(ModelAPI_Feature)
+// %include <boost_shared_ptr.i>
+// %shared_ptr(ModelAPI_PluginManager)
+// %shared_ptr(ModelAPI_Feature)
 
 // all supported interfaces
 %include "ModelAPI_Document.h"

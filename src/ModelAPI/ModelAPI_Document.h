@@ -6,7 +6,7 @@
 #define ModelAPI_Document_HeaderFile
 
 #include <ModelAPI.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class ModelAPI_Feature;
 
@@ -60,7 +60,7 @@ public:
   //! Adds to the document the new object of the given group id
   //! \param theFeature a feature object that will be connected to the document in this method
   //! \param theGroupID identifier of the groups of objects (must be greater than zero)
-  MODELAPI_EXPORT virtual void AddObject(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  MODELAPI_EXPORT virtual void AddObject(std::shared_ptr<ModelAPI_Feature> theFeature,
     const int theGroupID) = 0;
 
 protected:

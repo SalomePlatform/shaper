@@ -20,14 +20,12 @@ class Handle_Model_Document;
  * to provide access to all stored data.
  */
 
-class Model_Document: public TDocStd_Document, public ModelAPI_Document
+class Model_Document: public ModelAPI_Document
 {
 public:
 
-  DEFINE_STANDARD_RTTI(Model_Document);
-
-  //! Creates new document by the format string of a storage
-  Model_Document(const TCollection_ExtendedString& theStorageFormat);
+  //! Creates new document with binary file format
+  Model_Document();
   //! Deletes all high-level data, managed this document
   ~Model_Document();
 
@@ -68,16 +66,14 @@ public:
   //! Adds to the document the new object of the given group id
   //! \param theFeature a feature object that will be connected to the document in this method
   //! \param theGroupID identifier of the groups of objects (must be greater than zero)
-  MODEL_EXPORT virtual void AddObject(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  MODEL_EXPORT virtual void AddObject(std::shared_ptr<ModelAPI_Feature> theFeature,
     const int theGroupID);
 
 protected:
 
 private:
+  Handle_TDocStd_Document myDoc; ///< OCAF document
   int myTransactionsAfterSave; ///< number of transactions after the last "save" call, used for "IsModified" method
 };
-
-// Define handle class 
-DEFINE_STANDARD_HANDLE(Model_Document, TDocStd_Document)
 
 #endif

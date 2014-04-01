@@ -28,10 +28,10 @@ class Model_PluginManager : public ModelAPI_PluginManager, public Event_Listener
   std::string myCurrentPluginName; ///< name of the plugin that must be loaded currently
 public:
   /// Creates the feature object using plugins functionality
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
 
   /// Returns the root document of the application (that may contains sub-documents)
-  virtual boost::shared_ptr<ModelAPI_Document> rootDocument();
+  virtual std::shared_ptr<ModelAPI_Document> rootDocument();
 
   /// Registers the plugin that creates features.
   /// It is obligatory for each plugin to call this function on loading to be found by 

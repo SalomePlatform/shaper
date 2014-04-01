@@ -17,11 +17,11 @@ PartSetPlugin_Plugin::PartSetPlugin_Plugin()
   ModelAPI_PluginManager::get()->registerPlugin(this);
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSetPlugin_Plugin::createFeature(string theFeatureID)
+std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Plugin::createFeature(string theFeatureID)
 {
-  boost::shared_ptr<ModelAPI_Feature> aCreated;
+  std::shared_ptr<ModelAPI_Feature> aCreated;
   if (theFeatureID == "new_part") {
-    aCreated = boost::shared_ptr<ModelAPI_Feature>(new PartSetPlugin_NewPart());
+    aCreated = std::shared_ptr<ModelAPI_Feature>(new PartSetPlugin_NewPart());
   }
   // add to a root document for the current moment
   if (aCreated)
