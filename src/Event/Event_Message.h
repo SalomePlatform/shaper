@@ -5,7 +5,7 @@
 #ifndef Event_Message_HeaderFile
 #define Event_Message_HeaderFile
 
-#include <Event.hxx>
+#include <Event.h>
 
 /**\class Event_ID
  * \ingroup EventLoop
@@ -25,7 +25,7 @@ class EVENT_EXPORT Event_ID {
   friend class Event_Loop;
 public:
   /// Returns the text-identifier of the event (for debugging reasons)
-  char* EventText() const {return myID;}
+  char* eventText() const {return myID;}
   /// Allows to compare identifiers
   bool operator==(const Event_ID& theID) const {return myID == theID.myID;}
 };
@@ -46,10 +46,10 @@ public:
   virtual ~Event_Message() {}
 
   //! Returns identifier of the message
-  const Event_ID& EventID() const {return myEventId;}
+  const Event_ID& eventID() const {return myEventId;}
 
   //! Returns sender of the message or NULL if it is anonymous message
-  void* Sender() {return mySender;}
+  void* sender() {return mySender;}
 };
 
 #endif

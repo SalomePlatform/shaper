@@ -14,22 +14,19 @@ class QLabel;
 class QAction;
 class QDockWidget;
 
-
-
-class XGUI_MainMenu : public QObject
+class XGUI_MainMenu: public QObject
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    XGUI_MainMenu(XGUI_MainWindow *parent);
-    virtual ~XGUI_MainMenu();
+  XGUI_MainMenu(XGUI_MainWindow *parent);
+  virtual ~XGUI_MainMenu();
 
-    XGUI_Workbench* addWorkbench(const QString& theId,
-                                 const QString& theText = "");
-    XGUI_Workbench* findWorkbench(const QString& theId);
+  XGUI_Workbench* addWorkbench(const QString& theId, const QString& theText = "");
+  XGUI_Workbench* findWorkbench(const QString& theId);
 
 private:
-    XGUI_MainWindow* myDesktop;
-    QList<QDockWidget*> myMenuTabs;
+  XGUI_MainWindow* myDesktop;
+  QList<QDockWidget*> myMenuTabs;
 };
 
 #endif

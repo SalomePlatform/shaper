@@ -3,7 +3,7 @@
 #include <Config_ModuleReader.h>
 #include <Config_FeatureReader.h>
 
-#include <Event_Loop.hxx>
+#include <Event_Loop.h>
 
 #include <QFile>
 #include <QDir>
@@ -16,12 +16,10 @@ extern "C" PARTSET_EXPORT XGUI_Module* createModule(XGUI_Workshop* theWshop)
   return new PartSet_Module(theWshop);
 }
 
-
 PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
 {
-    myWorkshop = theWshop;
+  myWorkshop = theWshop;
 }
-
 
 PartSet_Module::~PartSet_Module()
 {
@@ -38,7 +36,7 @@ void PartSet_Module::createFeatures()
 void PartSet_Module::featureCreated(XGUI_Command* theFeature)
 {
   QString aFtId = theFeature->getId();
-  if(aFtId == "new_point") {
+  if (aFtId == "new_point") {
     theFeature->connectTo(this, SLOT(onCommandTriggered()));
   }
 }
@@ -47,10 +45,9 @@ void PartSet_Module::onCommandTriggered()
 {
   Config_ModuleReader aModuleReader = Config_ModuleReader();
   aModuleReader.readAll();
-  std::string aPluginName = aModuleReader.pluginsList().front();
-  Config_FeatureReader* aReader = new Config_FeatureReader(aPluginName);
-  XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
-  std::string aXMLWidgetCfg =
-    aReader->featureWidgetCfg(aCmd->getId().toStdString());
-  delete aReader;
+//  std::string aPluginName = aModuleReader.plugins().front();
+//  Config_FeatureReader* aReader = new Config_FeatureReader(aPluginName);
+//  XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
+//  std::string aXMLWidgetCfg = aReader->featureWidgetCfg(aCmd->getId().toStdString());
+//  delete aReader;
 }

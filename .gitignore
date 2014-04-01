@@ -24,3 +24,4 @@ resources
 doc/html
 *_log.txt
 start.bat
+*.orig

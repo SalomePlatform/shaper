@@ -7,23 +7,26 @@
 
 #include <Config_XMLReader.h>
 
-#include <Event_Loop.hxx>
+#include <Event_Loop.h>
 #include <libxml\parser.h>
 #include <libxml\tree.h>
 
+/*
 #ifdef WIN32
 //For GetModuleFileNameW
 #include <windows.h>
 #endif
+*/
 
 #ifdef _DEBUG
 #include <iostream>
 #endif
 
-
 Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
 {
   std::string prefix;
+  /* the problem: application may be launched using python execuable, to use environment variable
+                  (at least for the current moment)
   //Get path to *.xml files (typically ./bin/../plugins/)
 #ifdef WIN32
   HMODULE hModule = GetModuleHandleW(NULL);
@@ -35,16 +38,20 @@ Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
   prefix = std::string(char_path);
   //chop "bin\XGUI.exe"
   unsigned found = prefix.rfind("bin");
-  if(found != std::string::npos)
+  if (found != std::string::npos)
     prefix.replace(found, prefix.length(), "plugins\\");
 #else
   //TODO(sbh): Find full path to binary on linux
   prefix = "../plugins/";
 #endif
+  */
+  char* anEnv = getenv("NEW_GEOM_CONFIG_FILE");
+  if (anEnv) {
+    prefix = std::string(anEnv) + "/";
+  }
 
-  m_DocumentPath = prefix + theXmlFileName;
+  myDocumentPath = prefix + theXmlFileName;
 }
-
 
 Config_XMLReader::~Config_XMLReader()
 {
@@ -68,11 +75,11 @@ void Config_XMLReader::readAll()
  */
 void Config_XMLReader::processNode(xmlNodePtr aNode)
 {
-  #ifdef _DEBUG
-    std::cout << "Config_XMLReader::processNode: "
-              << aNode->name << " content: "
-              << aNode->content << std::endl;
-  #endif
+#ifdef _DEBUG
+  std::cout << "Config_XMLReader::processNode: "
+  << aNode->name << " content: "
+  << aNode->content << std::endl;
+#endif
 }
 
 /*
@@ -87,20 +94,20 @@ bool Config_XMLReader::processChildren(xmlNodePtr aNode)
 xmlNodePtr Config_XMLReader::findRoot()
 {
   xmlDocPtr aDoc;
-  aDoc = xmlParseFile(m_DocumentPath.c_str());
-  if(aDoc == NULL) {
-    #ifdef _DEBUG
-    std::cout << "Config_XMLReader::import: " << "Document " << m_DocumentPath
-              << " is not parsed successfully." << std::endl;
-    #endif
+  aDoc = xmlParseFile(myDocumentPath.c_str());
+  if (aDoc == NULL) {
+#ifdef _DEBUG
+    std::cout << "Config_XMLReader::import: " << "Document " << myDocumentPath
+    << " is not parsed successfully." << std::endl;
+#endif
     return NULL;
   }
   xmlNodePtr aRoot = xmlDocGetRootElement(aDoc);
-  #ifdef _DEBUG
+#ifdef _DEBUG
   if(aRoot == NULL) {
     std::cout << "Config_XMLReader::import: " << "Error: empty document";
   }
-  #endif
+#endif
   return aRoot;
 }
 
@@ -111,16 +118,13 @@ xmlNodePtr Config_XMLReader::findRoot()
  */
 void Config_XMLReader::readRecursively(xmlNodePtr theParent)
 {
-  static Event_ID aFeatureEvent = Event_Loop::EventByName("Feature");
-
-  if(!theParent)
+  if (!theParent)
     return;
   xmlNodePtr aNode = theParent->xmlChildrenNode;
   for(; aNode; aNode = aNode->next) {
     processNode(aNode);
-    if(processChildren(aNode)) {
+    if (processChildren(aNode)) {
       readRecursively(aNode);
-      Config_FeatureMessage aMessage(aFeatureEvent, this);
     }
   }
 }
@@ -140,7 +144,7 @@ std::string Config_XMLReader::getProperty(xmlNodePtr theNode, const char* name)
 {
   std::string result = "";
   char* aPropChars = (char*) xmlGetProp(theNode, BAD_CAST name);
-  if(!aPropChars || aPropChars[0] == 0)
+  if (!aPropChars || aPropChars[0] == 0)
     return result;
   result = std::string(aPropChars);
   return result;
@@ -153,23 +157,23 @@ bool Config_XMLReader::isNode(xmlNodePtr theNode, const char* theNodeName, ...)
 {
   bool result = false;
   const xmlChar* aName = theNode->name;
-  if(!aName || theNode->type != XML_ELEMENT_NODE)
+  if (!aName || theNode->type != XML_ELEMENT_NODE)
     return false;
 
-  if(!xmlStrcmp(aName, (const xmlChar *) theNodeName))
+  if (!xmlStrcmp(aName, (const xmlChar *) theNodeName))
     return true;
 
   va_list args; // define argument list variable
-  va_start (args, theNodeName); // init list; point to last defined argument
+  va_start(args, theNodeName); // init list; point to last defined argument
   while(true) {
     char *anArg = va_arg (args, char *); // get next argument
-    if(anArg == NULL)
+    if (anArg == NULL)
       break;
-    if(!xmlStrcmp(aName, (const xmlChar *) anArg)) {
-      va_end (args); // cleanup the system stack
+    if (!xmlStrcmp(aName, (const xmlChar *) anArg)) {
+      va_end(args); // cleanup the system stack
       return true;
     }
   }
-  va_end (args); // cleanup the system stack
+  va_end(args); // cleanup the system stack
   return false;
 }

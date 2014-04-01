@@ -5,7 +5,7 @@
 #ifndef Event_Listener_HeaderFile
 #define Event_Listener_HeaderFile
 
-#include <Event.hxx>
+#include <Event.h>
 class Event_Message;
 
 /**\class Event_Listener
@@ -19,7 +19,7 @@ class EVENT_EXPORT Event_Listener {
 
 public:
   //! This method is called by loop when the event is started to process.
-  virtual void ProcessEvent(const Event_Message* theMessage) = 0;
+  virtual void processEvent(const Event_Message* theMessage) = 0;
 };
 
 #endif

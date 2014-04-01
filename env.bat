@@ -128,6 +128,9 @@ if "%QTDIR%" == "" (
 
 @SET PATH=D:\NewGEOM\build-eclipse\bin;%PATH%
 
+@SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
+@SET PATH=%ROOT_DIR%\install\plugins;%PATH%
+
 rem -------- Visual Studio --------------------
 rem Detect Visual Studio (either commercial or Express edition)
 if "%VS100COMNTOOLS%" == "" (

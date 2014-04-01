@@ -1,4 +1,3 @@
-
 #ifndef PartSet_Module_H
 #define PartSet_Module_H
 
@@ -9,22 +8,22 @@
 
 #include <QObject>
 
-class PARTSET_EXPORT PartSet_Module : public QObject, public XGUI_Module
+class PARTSET_EXPORT PartSet_Module: public QObject, public XGUI_Module
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    PartSet_Module(XGUI_Workshop* theWshop);
-    virtual ~PartSet_Module();
+  PartSet_Module(XGUI_Workshop* theWshop);
+  virtual ~PartSet_Module();
 
-    virtual void createFeatures();
-    virtual void featureCreated(XGUI_Command* theFeature);
+  virtual void createFeatures();
+  virtual void featureCreated(XGUI_Command* theFeature);
 
 public slots:
-    void onCommandTriggered();
+  void onCommandTriggered();
 
 private:
-    QString myMenuXML;
-    XGUI_Workshop* myWorkshop;
+  QString myMenuXML;
+  XGUI_Workshop* myWorkshop;
 };
 
 #endif

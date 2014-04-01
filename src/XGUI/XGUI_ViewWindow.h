@@ -20,61 +20,79 @@ class ViewerLabel;
 class XGUI_RectRubberBand;
 class QMdiSubWindow;
 
-class XGUI_ViewWindow : public QFrame
+class XGUI_ViewWindow: public QFrame
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    enum OperationType{ NOTHING, PANVIEW, ZOOMVIEW, ROTATE, 
-                        PANGLOBAL, WINDOWFIT, FITALLVIEW, RESETVIEW,
-                        FRONTVIEW, BACKVIEW, TOPVIEW, BOTTOMVIEW, LEFTVIEW, RIGHTVIEW,
-	        	        CLOCKWISEVIEW, ANTICLOCKWISEVIEW };
+  enum OperationType
+  {
+    NOTHING,
+    PANVIEW,
+    ZOOMVIEW,
+    ROTATE,
+    PANGLOBAL,
+    WINDOWFIT,
+    FITALLVIEW,
+    RESETVIEW,
+    FRONTVIEW,
+    BACKVIEW,
+    TOPVIEW,
+    BOTTOMVIEW,
+    LEFTVIEW,
+    RIGHTVIEW,
+    CLOCKWISEVIEW,
+    ANTICLOCKWISEVIEW
+  };
 
-    XGUI_ViewWindow(XGUI_Viewer* theViewer, 
-                    V3d_TypeOfView theType);
+  XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType);
 
-    virtual ~XGUI_ViewWindow();
+  virtual ~XGUI_ViewWindow();
 
-    XGUI_ViewPort* viewPort() const { return myViewPort; }
+  XGUI_ViewPort* viewPort() const
+  {
+    return myViewPort;
+  }
 
+  XGUI::InteractionStyle interactionStyle() const
+  {
+    return myInteractionStyle;
+  }
 
-    XGUI::InteractionStyle interactionStyle() const { return myInteractionStyle; } 
+  void setTransformEnabled(const OperationType, const bool);
+  bool transformEnabled(const OperationType) const;
 
-    void setTransformEnabled( const OperationType, const bool );
-    bool transformEnabled( const OperationType ) const;
-
-    XGUI_ViewBackground background() const;
-    void setBackground( const XGUI_ViewBackground& theBackground );
+  XGUI_ViewBackground background() const;
+  void setBackground(const XGUI_ViewBackground& theBackground);
 
     bool closable() const { return myClosable; }
     void setClosable( const bool isClosable ) { myClosable = isClosable; }
 
 signals:
-    void vpTransformationStarted(XGUI_ViewWindow::OperationType type);
-    void vpTransformationFinished(XGUI_ViewWindow::OperationType type);
+  void vpTransformationStarted(XGUI_ViewWindow::OperationType type);
+  void vpTransformationFinished(XGUI_ViewWindow::OperationType type);
 
-    void Show( QShowEvent * );
-    void Hide( QHideEvent * );
-    void maximized( XGUI_ViewWindow*, bool );
-    void returnedTo3d( );
+  void Show(QShowEvent *);
+  void Hide(QHideEvent *);
+  void maximized(XGUI_ViewWindow*, bool);
+  void returnedTo3d();
 
-
-    void tryClosing( XGUI_ViewWindow* );
+  void tryClosing(XGUI_ViewWindow*);
     void closed( QMdiSubWindow* );
-    void mousePressed( XGUI_ViewWindow*, QMouseEvent* );
-    void mouseReleased( XGUI_ViewWindow*, QMouseEvent* );
-    void mouseDoubleClicked( XGUI_ViewWindow*, QMouseEvent* );
-    void mouseMoving( XGUI_ViewWindow*, QMouseEvent* );
-    void keyPressed( XGUI_ViewWindow*, QKeyEvent* );
-    void keyReleased( XGUI_ViewWindow*, QKeyEvent* );
-    void contextMenuRequested( QContextMenuEvent *e );
+  void mousePressed(XGUI_ViewWindow*, QMouseEvent*);
+  void mouseReleased(XGUI_ViewWindow*, QMouseEvent*);
+  void mouseDoubleClicked(XGUI_ViewWindow*, QMouseEvent*);
+  void mouseMoving(XGUI_ViewWindow*, QMouseEvent*);
+  void keyPressed(XGUI_ViewWindow*, QKeyEvent*);
+  void keyReleased(XGUI_ViewWindow*, QKeyEvent*);
+  void contextMenuRequested(QContextMenuEvent *e);
 
-    void viewModified( XGUI_ViewWindow* );
+  void viewModified(XGUI_ViewWindow*);
     void viewCloned( QMdiSubWindow* theView );
 
 public slots:
-    void activateZoom();
-    void activateRotation();
-    void activatePanning();
+  void activateZoom();
+  void activateRotation();
+  void activatePanning();
     void activateWindowFit();
     void activateGlobalPanning();
 
@@ -90,126 +108,138 @@ public slots:
     void rightView();
 
 protected:
-    virtual void resizeEvent(QResizeEvent* theEvent);
+  virtual void resizeEvent(QResizeEvent* theEvent);
 
-    virtual void changeEvent(QEvent* theEvent);
+  virtual void changeEvent(QEvent* theEvent);
 
-    virtual void enterEvent(QEvent* theEvent);
-    virtual void leaveEvent(QEvent* theEvent);
+  virtual void enterEvent(QEvent* theEvent);
+  virtual void leaveEvent(QEvent* theEvent);
 
-    virtual bool eventFilter(QObject *theObj, QEvent *theEvent);
+  virtual bool eventFilter(QObject *theObj, QEvent *theEvent);
 
 private slots:
-    void onClose();
-    void onMinimize();
-    void onMaximize();
+  void onClose();
+  void onMinimize();
+  void onMaximize();
 
 private:
-    enum WindowState { MinimizedState, MaximizedState, NormalState };
+  enum WindowState
+  {
+    MinimizedState, MaximizedState, NormalState
+  };
 
-    bool processWindowControls(QObject *theObj, QEvent *theEvent);
-    bool processViewPort(QEvent *theEvent);
+  bool processWindowControls(QObject *theObj, QEvent *theEvent);
+  bool processViewPort(QEvent *theEvent);
 
-    void vpMousePressEvent(QMouseEvent* theEvent);
-    void vpMouseReleaseEvent(QMouseEvent* theEvent);
-    void vpMouseMoveEvent(QMouseEvent* theEvent);
+  void vpMousePressEvent(QMouseEvent* theEvent);
+  void vpMouseReleaseEvent(QMouseEvent* theEvent);
+  void vpMouseMoveEvent(QMouseEvent* theEvent);
 
-    OperationType getButtonState(QMouseEvent* theEvent, XGUI::InteractionStyle theInteractionStyle);
-  
-    void resetState();
-    void drawRect();
-    void endDrawRect();
+  OperationType getButtonState(QMouseEvent* theEvent, XGUI::InteractionStyle theInteractionStyle);
 
-    bool transformRequested() const;
-    bool setTransformRequested ( OperationType );
+  void resetState();
+  void drawRect();
+  void endDrawRect();
 
-    // Transformation is selected and already started
-    bool transformInProcess() const { return myEventStarted; }
-    void setTransformInProcess( bool bOn ) { myEventStarted = bOn; }
+  bool transformRequested() const;
+  bool setTransformRequested(OperationType);
+
+  // Transformation is selected and already started
+  bool transformInProcess() const
+  {
+    return myEventStarted;
+  }
+  void setTransformInProcess(bool bOn)
+  {
+    myEventStarted = bOn;
+  }
 
 private:
-    XGUI_Viewer* myViewer;
+  XGUI_Viewer* myViewer;
 
-    QLabel* myPicture;
-    ViewerLabel* myGripWgt;
-    XGUI_ViewPort* myViewPort;
-    ViewerToolbar* myViewBar;
-    ViewerToolbar* myWindowBar;
-    QAction* myMinimizeBtn;
-    QAction* myMaximizeBtn;
+  QLabel* myPicture;
+  ViewerLabel* myGripWgt;
+  XGUI_ViewPort* myViewPort;
+  ViewerToolbar* myViewBar;
+  ViewerToolbar* myWindowBar;
+  QAction* myMinimizeBtn;
+  QAction* myMaximizeBtn;
 
-    QIcon MinimizeIco;
-    QIcon MaximizeIco;
-    QIcon CloseIco;
-    QIcon RestoreIco;
-    
-    bool myMoving;
-    QPoint myMousePnt;
+  QIcon MinimizeIco;
+  QIcon MaximizeIco;
+  QIcon CloseIco;
+  QIcon RestoreIco;
 
-    WindowState myLastState;
+  bool myMoving;
+  QPoint myMousePnt;
 
-    int myStartX;
-    int myStartY;
-    int myCurrX;
-    int myCurrY;
+  WindowState myLastState;
 
-    XGUI::InteractionStyle myInteractionStyle;
-    OperationType          myOperation;
-    XGUI::Mode2dType       my2dMode;
+  int myStartX;
+  int myStartY;
+  int myCurrX;
+  int myCurrY;
 
-    int myCurSketch;
-    bool myDrawRect;           // set when a rect is used for selection or magnify 
-    bool myEnableDrawMode;
-    bool myRotationPointSelection;
-    bool myCursorIsHand;                 
-    bool myIsKeyFree;
-    bool myEventStarted;       // set when transformation is in process 
+  XGUI::InteractionStyle myInteractionStyle;
+  OperationType myOperation;
+  XGUI::Mode2dType my2dMode;
+
+  int myCurSketch;
+  bool myDrawRect;          // set when a rect is used for selection or magnify 
+  bool myEnableDrawMode;
+  bool myRotationPointSelection;
+  bool myCursorIsHand;
+  bool myIsKeyFree;
+  bool myEventStarted;       // set when transformation is in process 
     bool myClosable;
 
-    QCursor myCursor;
-  
-    XGUI::RotationPointType myCurrPointType;
-    XGUI::RotationPointType myPrevPointType;
+  QCursor myCursor;
 
-    gp_Pnt mySelectedPoint;
+  XGUI::RotationPointType myCurrPointType;
+  XGUI::RotationPointType myPrevPointType;
 
-    XGUI_RectRubberBand* myRectBand; //!< selection rectangle rubber band
+  gp_Pnt mySelectedPoint;
 
-    typedef QMap<OperationType, bool> MapOfTransformStatus;
-    MapOfTransformStatus myStatus;
+  XGUI_RectRubberBand* myRectBand; //!< selection rectangle rubber band
 
-    double myCurScale;
-};
+  typedef QMap<OperationType, bool> MapOfTransformStatus;
+  MapOfTransformStatus myStatus;
 
-
-//******************************************************
-class ViewerToolbar : public QToolBar
-{
-    Q_OBJECT
-public:
-    ViewerToolbar(QWidget* theParent, XGUI_ViewPort* thePort) :
-    QToolBar(theParent), myVPort(thePort) {}
-
-protected:
-    virtual void paintEvent( QPaintEvent* theEvent);
-
-private:
-    XGUI_ViewPort* myVPort;
+  double myCurScale;
 };
 
 //******************************************************
-class ViewerLabel : public QLabel
+class ViewerToolbar: public QToolBar
 {
-    Q_OBJECT
+Q_OBJECT
 public:
-    ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort) :
-    QLabel(theParent), myVPort(thePort) {}
+  ViewerToolbar(QWidget* theParent, XGUI_ViewPort* thePort)
+      : QToolBar(theParent), myVPort(thePort)
+  {
+  }
 
 protected:
-    virtual void paintEvent( QPaintEvent* theEvent);
+  virtual void paintEvent(QPaintEvent* theEvent);
 
 private:
-    XGUI_ViewPort* myVPort;
+  XGUI_ViewPort* myVPort;
+};
+
+//******************************************************
+class ViewerLabel: public QLabel
+{
+Q_OBJECT
+public:
+  ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort)
+      : QLabel(theParent), myVPort(thePort)
+  {
+  }
+
+protected:
+  virtual void paintEvent(QPaintEvent* theEvent);
+
+private:
+  XGUI_ViewPort* myVPort;
 };
 
 #endif

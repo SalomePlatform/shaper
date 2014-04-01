@@ -9,7 +9,7 @@
 #define CONFIG_XMLREADER_H_
 
 #include "Config.h"
-#include "Config_Message.h"
+#include "Config_FeatureMessage.h"
 
 #include <string>
 #include <cstdarg>
@@ -19,8 +19,8 @@ typedef struct _xmlNode xmlNode;
 typedef xmlNode *xmlNodePtr;
 struct _xmlNode;
 
-
-class CONFIG_EXPORT Config_XMLReader {
+class CONFIG_EXPORT Config_XMLReader
+{
 public:
   Config_XMLReader(const std::string& theXmlFile);
   virtual ~Config_XMLReader();
@@ -45,7 +45,7 @@ protected:
   bool isNode(xmlNodePtr theNode, const char* name, ...);
 
 private:
-  std::string m_DocumentPath;
+  std::string myDocumentPath;
 };
 
 #endif /* CONFIG_XMLREADER_H_ */

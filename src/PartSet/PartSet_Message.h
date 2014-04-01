@@ -12,7 +12,7 @@
 
 #include <QString>
 
-#include <Event_Message.hxx>
+#include <Event_Message.h>
 
 class PARTSET_EXPORT PartSet_Message: public Event_Message
 {

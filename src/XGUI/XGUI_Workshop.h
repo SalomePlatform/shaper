@@ -1,9 +1,8 @@
-
 #ifndef XGUI_WORKSHOP_H
 #define XGUI_WORKSHOP_H
 
-#include <Event_Message.hxx>
-#include <Event_Listener.hxx>
+#include <Event_Message.h>
+#include <Event_Listener.h>
 
 #include <QObject>
 #include <QMap>
@@ -19,39 +18,42 @@ class Config_FeatureMessage;
 
 class XGUI_Workshop: public QObject, public Event_Listener
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 
-	XGUI_Workshop();
-	virtual ~XGUI_Workshop();
+  XGUI_Workshop();
+  virtual ~XGUI_Workshop();
 
-    void startApplication();
+  void startApplication();
 
-    XGUI_MainWindow* mainWindow() const { return myMainWindow; }
+  XGUI_MainWindow* mainWindow() const
+  {
+    return myMainWindow;
+  }
 
-    XGUI_Workbench* addWorkbench(const QString& theName);
+  XGUI_Workbench* addWorkbench(const QString& theName);
 
-    virtual void ProcessEvent(const Event_Message* theMessage);
+  virtual void processEvent(const Event_Message* theMessage);
 
 public slots:
-    void onNew();
-    void onOpen();
-    void onSave();
-    void onSaveAs();
-    void onExit();
+  void onNew();
+  void onOpen();
+  void onSave();
+  void onSaveAs();
+  void onExit();
 
 protected:
-    //Event-loop processing methods:
-    void addFeature(const Config_FeatureMessage*);
+  //Event-loop processing methods:
+  void addFeature(const Config_FeatureMessage*);
 
 private:
-    void initMenu();
+  void initMenu();
 
-    XGUI_Module* loadModule(const QString& theModule);
-    bool activateModule();
+  XGUI_Module* loadModule(const QString& theModule);
+  bool activateModule();
 
-    XGUI_MainWindow* myMainWindow;
-    XGUI_Module* myPartSetModule;
+  XGUI_MainWindow* myMainWindow;
+  XGUI_Module* myPartSetModule;
 };
 
 #endif
