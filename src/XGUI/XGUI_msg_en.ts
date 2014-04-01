@@ -218,5 +218,9 @@
         <source>RIGHT_VIEW</source>
         <translation>Right</translation>
     </message>
+    <message>
+        <source>RESET_VIEW</source>
+        <translation>Reset</translation>
+    </message>
 </context>
 </TS>

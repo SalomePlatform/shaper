@@ -741,3 +741,41 @@ void XGUI_ViewPort::fitAll(bool theKeepScale, bool theWithZ, bool theUpd)
   activeView()->SetZSize(0.);
   emit vpTransformed( );
 }
+
+void XGUI_ViewPort::syncronizeWith( const XGUI_ViewPort* ref )
+{
+  Handle(V3d_View) refView = ref->getView();
+  Handle(V3d_View) tgtView = getView();
+
+  /*  The following params are copied:
+      - view type( ortho/persp )
+      - position of view point
+      - orientation of high point
+      - position of the eye
+      - projection vector
+      - view center ( 2D )
+      - view twist
+      - view scale
+  */
+
+  /* we'll update after setting all params */
+  tgtView->SetImmediateUpdate( Standard_False );
+
+  /* perspective */
+  if ( refView->Type() == V3d_PERSPECTIVE )
+    tgtView->SetFocale( refView->Focale() );
+
+  /* copy params */
+  Standard_Real x, y, z;
+  refView->At( x, y, z ); tgtView->SetAt( x, y, z );
+  refView->Up( x, y, z ); tgtView->SetUp( x, y, z );
+  refView->Eye( x, y, z ); tgtView->SetEye( x, y, z );
+  refView->Proj( x, y, z ); tgtView->SetProj( x, y, z );
+  refView->Center( x, y ); tgtView->SetCenter( x, y );
+  tgtView->SetScale( refView->Scale() );
+  tgtView->SetTwist( refView->Twist() );
+
+  /* update */
+  tgtView->Update();
+  tgtView->SetImmediateUpdate( Standard_True );
+}
