@@ -3,6 +3,9 @@
 #include "XGUI_ViewWindow.h"
 #include "XGUI_Viewer.h"
 
+#include <PyConsole_Console.h>
+#include <PyConsole_EnhInterp.h>
+
 #include <QMdiArea>
 #include <QTreeWidget>
 #include <QDockWidget>
@@ -21,7 +24,9 @@
 #include <QComboBox>
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
-    : QMainWindow(parent), myObjectBrowser(0)
+    : QMainWindow(parent), 
+    myObjectBrowser(0), 
+    myPythonConsole(0)
 {
   setWindowTitle(tr("WINDOW_TITLE"));
   myMenuBar = new XGUI_MainMenu(this);
@@ -36,25 +41,13 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
   addDockWidget(Qt::LeftDockWidgetArea, aDoc);
   //aDoc->hide();
 
-  aDoc = new QDockWidget(this);
-  aDoc->setFeatures(QDockWidget::AllDockWidgetFeatures | QDockWidget::DockWidgetVerticalTitleBar);
-  aDoc->setMinimumHeight(0);
-  aDoc->setWindowTitle("Console");
-  QTextEdit* aTextEdt = new QTextEdit(aDoc);
-  aTextEdt->setText(">>>");
-  aDoc->setWidget(aTextEdt);
-  aTextEdt->setMinimumHeight(0);
-  addDockWidget(Qt::BottomDockWidgetArea, aDoc);
-
   QMdiArea* aMdiArea = new QMdiArea(this);
   setCentralWidget(aMdiArea);
 
   myViewer = new XGUI_Viewer(this);
-  //aMdiArea->addSubWindow(new XGUI_ViewWindow(), Qt::FramelessWindowHint);
-  //aMdiArea->addSubWindow(new XGUI_ViewWindow(), Qt::FramelessWindowHint);
 
-  fillObjectBrowser();
-  addPropertyPanel();
+  //fillObjectBrowser();
+  //addPropertyPanel();
 }
 
 XGUI_MainWindow::~XGUI_MainWindow(void)
@@ -78,6 +71,40 @@ void XGUI_MainWindow::hideObjectBrowser()
 {
   myObjectBrowser->parentWidget()->hide();
 }
+
+//******************************************************
+void XGUI_MainWindow::showPythonConsole()
+{
+  if (!myPythonConsole) {
+
+    QDockWidget* aDoc = new QDockWidget(this);
+    aDoc->setFeatures(QDockWidget::AllDockWidgetFeatures | QDockWidget::DockWidgetVerticalTitleBar);
+    aDoc->setMinimumHeight(0);
+    aDoc->setWindowTitle("Console");
+    myPythonConsole = new PyConsole_EnhConsole( aDoc, new PyConsole_EnhInterp());
+    //myPythonConsole = new QTextEdit(aDoc);
+    //myPythonConsole->setGeometry(0,0,200, 50);
+    //myPythonConsole->setText(">>>");
+    aDoc->setWidget(myPythonConsole);
+    //myPythonConsole->setMinimumHeight(0);
+    addDockWidget(Qt::TopDockWidgetArea, aDoc);
+    tabifyDockWidget(myMenuBar->getLastDockWindow(), aDoc);
+  }
+  myPythonConsole->parentWidget()->show();
+}
+
+//******************************************************
+void XGUI_MainWindow::hidePythonConsole()
+{
+  if (myPythonConsole)
+    myPythonConsole->parentWidget()->hide();
+}
+
+
+
+//******************************************************
+
+// TEST FUNCTIONS
 
 //******************************************************
 void XGUI_MainWindow::fillObjectBrowser()

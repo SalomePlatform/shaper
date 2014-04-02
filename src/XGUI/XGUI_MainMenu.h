@@ -24,9 +24,14 @@ public:
   XGUI_Workbench* addWorkbench(const QString& theId, const QString& theText = "");
   XGUI_Workbench* findWorkbench(const QString& theId);
 
+  XGUI_Workbench* generalPage() const { return myGeneralPage; }
+
+  QDockWidget* getLastDockWindow() const { return myMenuTabs.last(); }
+
 private:
   XGUI_MainWindow* myDesktop;
   QList<QDockWidget*> myMenuTabs;
+  XGUI_Workbench* myGeneralPage;
 };
 
 #endif

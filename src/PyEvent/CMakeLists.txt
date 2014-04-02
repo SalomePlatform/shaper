@@ -1,0 +1,24 @@
+
+SET(PROJECT_HEADERS 
+	PyEvent.h 
+	PyEvent_Event.h 
+	PyEvent_EventFilter.h
+)
+
+SET(PROJECT_SOURCES 
+	PyEvent_Event.cxx 
+	PyEvent_EventFilter.cxx
+)
+
+#INCLUDE_DIRECTORIES(${Qt5Widgets_INCLUDES})
+
+ADD_DEFINITIONS(-DPYEVENT_EXPORTS)
+
+ADD_LIBRARY(PyEvent STATIC 
+	${PROJECT_SOURCES} 
+	${PROJECT_HEADERS} 
+)
+
+TARGET_LINK_LIBRARIES(PyEvent ${Qt5Widgets_LIBRARIES})
+
+#INSTALL(TARGETS PyEvent DESTINATION bin)

@@ -133,7 +133,7 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
     myCurrPointType(XGUI::GRAVITY), 
     myPrevPointType(XGUI::GRAVITY), 
     myRotationPointSelection(false),
-    myClosable(false)
+    myClosable(true)
 {
   mySelectedPoint = gp_Pnt(0., 0., 0.);
   setFrameStyle(QFrame::Raised);
@@ -1089,14 +1089,15 @@ void XGUI_ViewWindow::reset()
 
 void XGUI_ViewWindow::updateToolBar()
 {
-  myGripWgt->repaint();
-  myViewBar->repaint();
-  myWindowBar->repaint();
-  //QTimer::singleShot(300, this, SLOT(repaintToolBar()));
+  myGripWgt->update();
+  myViewBar->update();
+  myWindowBar->update();
+  //QTimer::singleShot(50, Qt::VeryCoarseTimer, this, SLOT(repaintToolBar()));
 }
 
 /*void XGUI_ViewWindow::repaintToolBar()
 {
+  QApplication::sync();
   myGripWgt->repaint();
   myViewBar->repaint();
   myWindowBar->repaint();

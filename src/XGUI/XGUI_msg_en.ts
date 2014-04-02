@@ -7,10 +7,6 @@
 <context>
     <name>XGUI_Workshop</name>
     <message>
-        <source>GEN_MENU_TITLE</source>
-        <translation>General</translation>
-    </message>
-    <message>
         <source>NEW_MENU</source>
         <translation>New</translation>
     </message>
@@ -115,6 +111,10 @@
     <message>
         <source>MENU_TITLE</source>
         <translation>Menu</translation>
+    </message>
+    <message>
+        <source>GEN_MENU_TITLE</source>
+        <translation>General</translation>
     </message>
 </context>
 <context>
