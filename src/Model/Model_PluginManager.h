@@ -18,11 +18,10 @@ class Model_Document;
  * plugin contains which feature, loads and stores reference to loaded plugins by
  * the feature functionality request.
  */
-
 class Model_PluginManager : public ModelAPI_PluginManager, public Event_Listener
 {
   bool myPluginsInfoLoaded; ///< it true if plugins information is loaded
-  /// map of feature IDs to plugin name and object
+  /// map of feature IDs to plugin name
   std::map<std::string, std::string> myPlugins;
   std::map<std::string, ModelAPI_Plugin*> myPluginObjs; ///< instances of the already plugins
   std::string myCurrentPluginName; ///< name of the plugin that must be loaded currently

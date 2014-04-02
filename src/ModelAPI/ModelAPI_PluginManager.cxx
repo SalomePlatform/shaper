@@ -7,8 +7,18 @@
 #include <ModelAPI_Document.h>
 // to avoid unresolved ModelAPI_Feature()
 #include <ModelAPI_Feature.h>
+// to avoid unresolved ModelAPI_Object()
+#include <ModelAPI_Object.h>
 // to avoid unresolved ModelAPI_Plugin()
 #include <ModelAPI_Plugin.h>
+// to avoid unresolved ModelAPI_Iterator()
+#include <ModelAPI_Iterator.h>
+// to avoid unresolved ModelAPI_Iterator()
+#include <ModelAPI_Iterator.h>
+// to avoid unresolved ModelAPI_Attribute()
+#include <ModelAPI_Attribute.h>
+// to avoid unresolved ModelAPI_AttributeDocRef()
+#include <ModelAPI_AttributeDocRef.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -62,6 +72,7 @@ string library(const string& theLibName)
   return aLibName;
 }
 
+// for debug purpose only (cerr), before the error management system is implemented
 #include <iostream>
 void ModelAPI_PluginManager::loadLibrary(const string theLibName)
 {

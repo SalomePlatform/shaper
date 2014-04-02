@@ -5,7 +5,7 @@
 #include <Model_PluginManager.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Plugin.h>
-#include <Model_Feature.h>
+#include <Model_Object.h>
 #include <Model_Document.h>
 #include <Model_Application.h>
 #include <Event_Loop.h>
@@ -30,6 +30,7 @@ std::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theF
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
       std::shared_ptr<ModelAPI_Feature> aCreated = 
         myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
+      return aCreated;
     }
   }
 

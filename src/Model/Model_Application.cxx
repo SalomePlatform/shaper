@@ -28,7 +28,7 @@ std::shared_ptr<Model_Document> Model_Application::getDocument(std::string theDo
   if (myDocs.find(theDocID) != myDocs.end())
     return myDocs[theDocID];
 
-  std::shared_ptr<Model_Document> aNew(new Model_Document);
+  std::shared_ptr<Model_Document> aNew(new Model_Document(theDocID));
   myDocs[theDocID] = aNew;
   return aNew;
 }

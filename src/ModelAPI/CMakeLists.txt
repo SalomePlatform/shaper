@@ -12,7 +12,11 @@ SET(PROJECT_HEADERS
     ModelAPI_PluginManager.h
     ModelAPI_Plugin.h
     ModelAPI_Feature.h
+    ModelAPI_Iterator.h
+    ModelAPI_Object.h
     ModelAPI_Document.h
+    ModelAPI_Attribute.h
+    ModelAPI_AttributeDocRef.h
 )
 
 SET(PROJECT_SOURCES
