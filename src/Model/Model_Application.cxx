@@ -2,8 +2,8 @@
 // Created:	Fri Sep 2 2011
 // Author:	Mikhail PONIKAROV
 
-#include <Model_Application.hxx>
-#include <Model_Document.hxx>
+#include <Model_Application.h>
+#include <Model_Document.h>
 
 IMPLEMENT_STANDARD_HANDLE(Model_Application, TDocStd_Application)
 IMPLEMENT_STANDARD_RTTIEXT(Model_Application, TDocStd_Application)
@@ -14,7 +14,7 @@ static Handle_Model_Application TheApplication = new Model_Application;
 //function : getApplication
 //purpose  : 
 //=======================================================================
-Handle_Model_Application Model_Application::GetApplication()
+Handle(Model_Application) Model_Application::getApplication()
 {
   return TheApplication;
 }
@@ -23,13 +23,14 @@ Handle_Model_Application Model_Application::GetApplication()
 //function : getDocument
 //purpose  : 
 //=======================================================================
-ModelAPI_Document* Model_Application::GetMainDocument()
+std::shared_ptr<Model_Document> Model_Application::getDocument(std::string theDocID)
 {
+  if (myDocs.find(theDocID) != myDocs.end())
+    return myDocs[theDocID];
 
-  if (myMainDoc.IsNull()) {
-    myMainDoc = new Model_Document("BinOcaf");
-  }
-  return *myMainDoc;
+  std::shared_ptr<Model_Document> aNew(new Model_Document(theDocID));
+  myDocs[theDocID] = aNew;
+  return aNew;
 }
 
 //=======================================================================

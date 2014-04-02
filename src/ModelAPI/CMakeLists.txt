@@ -2,7 +2,6 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 FIND_PACKAGE(SWIG REQUIRED)
 INCLUDE(${SWIG_USE_FILE})
-INCLUDE(FindBoost)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(PROJECT_HEADERS
@@ -11,7 +10,11 @@ SET(PROJECT_HEADERS
     ModelAPI_PluginManager.h
     ModelAPI_Plugin.h
     ModelAPI_Feature.h
+    ModelAPI_Iterator.h
+    ModelAPI_Object.h
     ModelAPI_Document.h
+    ModelAPI_Attribute.h
+    ModelAPI_AttributeDocRef.h
 )
 
 SET(PROJECT_SOURCES

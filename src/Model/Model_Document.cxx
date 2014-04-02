@@ -1,25 +1,26 @@
 // File:        Model_Document.cxx
-// Created:     28 Dec 2011
+// Created:     28 Feb 2014
 // Author:      Mikhail PONIKAROV
-// Copyright:   CEA 2011
 
 #include <Model_Document.h>
+#include <ModelAPI_Feature.h>
+#include <Model_Object.h>
+#include <Model_Application.h>
+#include <Model_PluginManager.h>
+#include <Model_Iterator.h>
 
 #include <TDataStd_Integer.hxx>
+#include <TDataStd_Comment.hxx>
 
-IMPLEMENT_STANDARD_HANDLE(Model_Document, MMgt_TShared)
-IMPLEMENT_STANDARD_RTTIEXT(Model_Document, MMgt_TShared)
-
-static const int UNDO_LIMIT = 10; // number of possible undo operations in the module
+static const int UNDO_LIMIT = 10; // number of possible undo operations
 
 static const int TAG_GENERAL = 1; // general properties tag
 static const int TAG_OBJECTS = 2; // tag of the objects sub-tree (Root for Model_ObjectsMgr)
 static const int TAG_HISTORY = 3; // tag of the history sub-tree (Root for Model_History)
-static const int TAG_ISOTOPES = 4; // tag of the isotopes sub-tree (Root for MaterialMC_Isotope)
 
 using namespace std;
 
-bool Model_Document::Load(const char* theFileName)
+bool Model_Document::load(const char* theFileName)
 {
   bool myIsError = Standard_False;
   /*
@@ -60,7 +61,7 @@ bool Model_Document::Load(const char* theFileName)
   return !myIsError;
 }
 
-bool Model_Document::Save(const char* theFileName)
+bool Model_Document::save(const char* theFileName)
 {
   bool myIsError = true;
   /*
@@ -98,66 +99,137 @@ bool Model_Document::Save(const char* theFileName)
   return !myIsError;
 }
 
-void Model_Document::Close()
+void Model_Document::close()
 {
-  TDocStd_Document::Close();
+  myDoc->Close();
 }
 
-void Model_Document::StartOperation()
+void Model_Document::startOperation()
 {
-  TDocStd_Document::NewCommand();
+  myDoc->NewCommand();
 }
 
-void Model_Document::FinishOperation()
+void Model_Document::finishOperation()
 {
-  TDocStd_Document::CommitCommand();
+  myDoc->CommitCommand();
   myTransactionsAfterSave++;
 }
 
-void Model_Document::AbortOperation()
+void Model_Document::abortOperation()
 {
-  TDocStd_Document::AbortCommand();
+  myDoc->AbortCommand();
 }
 
-bool Model_Document::IsOperation()
+bool Model_Document::isOperation()
 {
-  return TDocStd_Document::HasOpenCommand() == Standard_True ;
+  return myDoc->HasOpenCommand() == Standard_True ;
 }
 
-bool Model_Document::IsModified()
+bool Model_Document::isModified()
 {
   return myTransactionsAfterSave != 0;
 }
 
-bool Model_Document::CanUndo()
+bool Model_Document::canUndo()
 {
-  return TDocStd_Document::GetAvailableUndos() > 0;
+  return myDoc->GetAvailableUndos() > 0;
 }
 
-void Model_Document::Undo()
+void Model_Document::undo()
 {
-  TDocStd_Document::Undo();
+  myDoc->Undo();
   myTransactionsAfterSave--;
 }
 
-bool Model_Document::CanRedo()
+bool Model_Document::canRedo()
 {
-  return TDocStd_Document::GetAvailableRedos() > 0;
+  return myDoc->GetAvailableRedos() > 0;
 }
 
-void Model_Document::Redo()
+void Model_Document::redo()
 {
-  TDocStd_Document::Redo();
+  myDoc->Redo();
   myTransactionsAfterSave++;
 }
 
-Model_Document::Model_Document(const TCollection_ExtendedString& theStorageFormat)
-    : TDocStd_Document(theStorageFormat)
+void Model_Document::addFeature(
+  std::shared_ptr<ModelAPI_Feature> theFeature, const std::string theGroupID)
 {
-  SetUndoLimit(UNDO_LIMIT);
+  TDF_Label aGroupLab = groupLabel(theGroupID);
+  TDF_Label anObjLab = aGroupLab.NewChild();
+  std::shared_ptr<Model_Object> aData(new Model_Object);
+  aData->setLabel(anObjLab);
+  theFeature->setData(aData);
+  setUniqueName(theFeature, theGroupID);
+  theFeature->initAttributes();
+  TDataStd_Comment::Set(anObjLab, theFeature->getKind().c_str());
+}
+
+std::shared_ptr<ModelAPI_Feature> Model_Document::feature(TDF_Label& theLabel)
+{
+  Handle(TDataStd_Comment) aFeatureID;
+  if (theLabel.FindAttribute(TDataStd_Comment::GetID(), aFeatureID)) {
+    string anID(TCollection_AsciiString(aFeatureID->Get()).ToCString());
+    std::shared_ptr<ModelAPI_Feature> aResult = Model_PluginManager::get()->createFeature(anID);
+    std::shared_ptr<Model_Object> aData(new Model_Object);
+    aData->setLabel(theLabel);
+    aResult->setData(aData);
+    aResult->initAttributes();
+    return aResult;
+  }
+  return std::shared_ptr<ModelAPI_Feature>(); // not found
+}
+
+shared_ptr<ModelAPI_Document> Model_Document::subDocument(string theDocID)
+{
+  return Model_Application::getApplication()->getDocument(theDocID);
+}
+
+shared_ptr<ModelAPI_Iterator> Model_Document::featuresIterator(const string theGroup)
+{
+  shared_ptr<Model_Document> aThis(Model_Application::getApplication()->getDocument(myID));
+  return shared_ptr<ModelAPI_Iterator>(new Model_Iterator(aThis, groupLabel(theGroup)));
+}
+
+Model_Document::Model_Document(const std::string theID)
+    : myID(theID), myDoc(new TDocStd_Document("BinOcaf")) // binary OCAF format
+{
+  myDoc->SetUndoLimit(UNDO_LIMIT);
   myTransactionsAfterSave = 0;
 }
 
-Model_Document::~Model_Document()
+TDF_Label Model_Document::groupLabel(const string theGroup)
 {
+  if (myGroups.find(theGroup) == myGroups.end()) {
+    myGroups[theGroup] = myDoc->Main().FindChild(TAG_OBJECTS).NewChild();
+  }
+  return myGroups[theGroup];
+}
+
+void Model_Document::setUniqueName(
+  shared_ptr<ModelAPI_Feature> theFeature, const string theGroupID)
+{
+  // first count all objects of such kind to start with index = count + 1
+  int aNumObjects = 0;
+  shared_ptr<ModelAPI_Iterator> anIter = featuresIterator(theGroupID);
+  for(; anIter->More(); anIter->Next()) {
+    if (anIter->CurrentKind() == theFeature->getKind())
+      aNumObjects++;
+  }
+  // generate candidate name
+  stringstream aNameStream;
+  aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
+  string aName = aNameStream.str();
+  // check this is unique, if not, increase index by 1
+  for(anIter = featuresIterator(theGroupID); anIter->More();) {
+    if (anIter->CurrentName() == aName) {
+      aNumObjects++;
+      stringstream aNameStream;
+      aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
+      // reinitialize iterator to make sure a new name is unique
+      anIter = featuresIterator(theGroupID);
+    } else anIter->Next();
+  }
+
+  theFeature->data()->setName(aName);
 }
