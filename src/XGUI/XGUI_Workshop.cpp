@@ -7,9 +7,11 @@
 #include "XGUI_Workbench.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_Viewer.h"
+#include "XGUI_WidgetFactory.h"
 
-#include <Config_FeatureMessage.h>
 #include <Event_Loop.h>
+#include <Config_FeatureMessage.h>
+#include <Config_WidgetMessage.h>
 
 #include <QApplication>
 #include <QFileDialog>
@@ -44,9 +46,10 @@ void XGUI_Workshop::startApplication()
   initMenu();
   //Initialize event listening
   Event_Loop* aLoop = Event_Loop::loop();
-  Event_ID aFeatureId = aLoop->eventByName("RegisterFeature");
+  //TODO(sbh): Implement static method to extract event id [SEID]
+  Event_ID aFeatureId = aLoop->eventByName("FeatureEvent");
   aLoop->registerListener(this, aFeatureId);
-  Event_ID aPartSetId = aLoop->eventByName("partset_module");
+  Event_ID aPartSetId = aLoop->eventByName("PartSetModuleEvent");
   aLoop->registerListener(this, aPartSetId);
   activateModule();
   myMainWindow->show();
@@ -107,11 +110,18 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 //******************************************************
 void XGUI_Workshop::processEvent(const Event_Message* theMessage)
 {
-  const Config_FeatureMessage* aFeatureMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
+  const Config_FeatureMessage* aFeatureMsg =
+      dynamic_cast<const Config_FeatureMessage*>(theMessage);
   if (aFeatureMsg) {
     addFeature(aFeatureMsg);
     return;
   }
+  const Config_WidgetMessage* aPartSetMsg = dynamic_cast<const Config_WidgetMessage*>(theMessage);
+  if (aPartSetMsg) {
+    fillPropertyPanel(aPartSetMsg);
+    return;
+  }
+
 #ifdef _DEBUG
   qDebug() << "XGUI_Workshop::ProcessEvent: "
   << "Catch message, but it can not be processed.";
@@ -152,6 +162,23 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
                                               //TODO(sbh): QKeySequence
                                                   );
   myPartSetModule->featureCreated(aCommand);
+}
+
+/*
+ *
+ */
+void XGUI_Workshop::fillPropertyPanel(const Config_WidgetMessage* theMessage)
+{
+  QWidget* aPropWidget = myMainWindow->findChild<QWidget*>("PropertyPanelWidget");
+  if (!aPropWidget) {
+    #ifdef _DEBUG
+    qDebug() << "XGUI_Workshop::fillPropertyPanel: " << "Unable to find property panel";
+    #endif
+    return;
+  }
+  std::string aXml = theMessage->xmlRepresentation();
+  XGUI_WidgetFactory aFactory = XGUI_WidgetFactory(aXml);
+  aFactory.fillWidget(aPropWidget);
 }
 
 //******************************************************
@@ -252,4 +279,3 @@ bool XGUI_Workshop::activateModule()
   myPartSetModule->createFeatures();
   return true;
 }
-

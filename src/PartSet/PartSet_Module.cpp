@@ -1,14 +1,18 @@
-#include "PartSet_Module.h"
+#include <PartSet_Module.h>
+#include <Config_WidgetMessage.h>
 
 #include <Config_ModuleReader.h>
-#include <Config_FeatureReader.h>
-
+#include <Config_WidgetReader.h>
 #include <Event_Loop.h>
+#include <Event_Message.h>
 
-#include <QFile>
-#include <QDir>
-#include <QApplication>
-#include <QTextStream>
+#include <QObject>
+#include <QString>
+
+#ifdef _DEBUG
+#include <QDebug>
+#endif
+
 
 /*!Create and return new instance of XGUI_Module*/
 extern "C" PARTSET_EXPORT XGUI_Module* createModule(XGUI_Workshop* theWshop)
@@ -45,9 +49,17 @@ void PartSet_Module::onCommandTriggered()
 {
   Config_ModuleReader aModuleReader = Config_ModuleReader();
   aModuleReader.readAll();
-//  std::string aPluginName = aModuleReader.plugins().front();
-//  Config_FeatureReader* aReader = new Config_FeatureReader(aPluginName);
-//  XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
-//  std::string aXMLWidgetCfg = aReader->featureWidgetCfg(aCmd->getId().toStdString());
-//  delete aReader;
+  std::map<std::string, std::string> aPluginMap = aModuleReader.plugins();
+  std::string aPluginName = aPluginMap["PartSetPlugin"];
+  Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginName);
+  aWdgReader.readAll();
+  XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
+  std::string aCmdId = aCmd->getId().toStdString();
+  std::string aXMLWidgetCfg = aWdgReader.featureWidgetCfg(aCmdId);
+  //TODO(sbh): Implement static method to extract event id [SEID]
+  static Event_ID aModuleEvent = Event_Loop::eventByName("PartSetModuleEvent");
+  Config_WidgetMessage aMessage(aModuleEvent, this);
+  aMessage.setFeatureId(aCmdId);
+  aMessage.setXmlRepresentation(aXMLWidgetCfg);
+  Event_Loop::loop()->send(aMessage);
 }

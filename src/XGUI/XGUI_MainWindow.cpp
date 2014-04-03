@@ -129,27 +129,33 @@ void XGUI_MainWindow::fillObjectBrowser()
 void XGUI_MainWindow::addPropertyPanel()
 {
   QDockWidget* aPropPanel = new QDockWidget(this);
-  aPropPanel->setWindowTitle("Point");
+  aPropPanel->setWindowTitle("Property Panel");
 
   QWidget* aContent = new QWidget(aPropPanel);
   QVBoxLayout* aMainLay = new QVBoxLayout(aContent);
   aMainLay->setContentsMargins(3, 3, 3, 3);
   aPropPanel->setWidget(aContent);
 
-  /*QWidget* aNameWgt = new QWidget(aContent);
-   QHBoxLayout* aNameLay = new QHBoxLayout(aNameWgt);
-   aNameLay->setContentsMargins(0,0,0,0);
-   aMainLay->addWidget(aNameWgt);
+  QWidget* aCustomWidget = new QWidget(aContent);
+  aCustomWidget->setObjectName("PropertyPanelWidget");
+  aMainLay->addWidget(aCustomWidget);
 
-   aNameLay->addWidget(new QLabel("Name", aNameWgt));
-   aNameLay->addWidget(new QLineEdit(aNameWgt));*/
+  /*
+  QWidget* aNameWgt = new QWidget(aContent);
+  QHBoxLayout* aNameLay = new QHBoxLayout(aNameWgt);
+  aNameLay->setContentsMargins(0,0,0,0);
+  aMainLay->addWidget(aNameWgt);
 
+  aNameLay->addWidget(new QLabel("Name", aNameWgt));
+  aNameLay->addWidget(new QLineEdit(aNameWgt));
+  */
+
+/* Moved into PartSetModule by sbh
   QComboBox* aCombo = new QComboBox(aContent);
   aCombo->addItem("By coordinates");
   aMainLay->addWidget(aCombo);
 
   QWidget* aGrpBox1 = new QWidget(aContent);
-  //aGrpBox1->setFlat(true);
   QFormLayout* aFrmLay = new QFormLayout(aGrpBox1);
   aFrmLay->setContentsMargins(0, 6, 0, 0);
   aMainLay->addWidget(aGrpBox1);
@@ -165,24 +171,27 @@ void XGUI_MainWindow::addPropertyPanel()
   aLbl = new QLabel(aGrpBox1);
   aLbl->setPixmap(QPixmap(":pictures/z_point.png"));
   aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
+  */
 
-  /*    aGrpBox1 = new QGroupBox("Normal vector", aContent);
-   aGrpBox1->setFlat(true);
-   aFrmLay = new QFormLayout(aGrpBox1);
-   aFrmLay->setContentsMargins(0, 6, 0, 0);
-   aMainLay->addWidget(aGrpBox1);
+  /*
+  aGrpBox1 = new QGroupBox("Normal vector", aContent);
+  aGrpBox1->setFlat(true);
+  aFrmLay = new QFormLayout(aGrpBox1);
+  aFrmLay->setContentsMargins(0, 6, 0, 0);
+  aMainLay->addWidget(aGrpBox1);
 
-   aLbl = new QLabel(aGrpBox1);
-   aLbl->setPixmap(QPixmap(":pictures/x_size.png"));
-   aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
+  aLbl = new QLabel(aGrpBox1);
+  aLbl->setPixmap(QPixmap(":pictures/x_size.png"));
+  aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
 
-   aLbl = new QLabel(aGrpBox1);
-   aLbl->setPixmap(QPixmap(":pictures/y_size.png"));
-   aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
+  aLbl = new QLabel(aGrpBox1);
+  aLbl->setPixmap(QPixmap(":pictures/y_size.png"));
+  aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
 
-   aLbl = new QLabel(aGrpBox1);
-   aLbl->setPixmap(QPixmap(":pictures/z_size.png"));
-   aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));*/
+  aLbl = new QLabel(aGrpBox1);
+  aLbl->setPixmap(QPixmap(":pictures/z_size.png"));
+  aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
+  */
 
   aMainLay->addStretch(1);
 

@@ -6,12 +6,10 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Module.h
-	PartSet_Message.h
 )
 
 SET(PROJECT_SOURCES
 	PartSet_Module.cpp
-	PartSet_Message.cpp
 )
 
 SET(PROJECT_RESOURCES 
