@@ -55,7 +55,10 @@ public:
   {
     return myBackground;
   }
+
   void setBackground(const XGUI_ViewBackground& bgData);
+
+  void syncronizeWith( const XGUI_ViewPort* ref );
 
 signals:
   void vpChangeBackground(const XGUI_ViewBackground&);

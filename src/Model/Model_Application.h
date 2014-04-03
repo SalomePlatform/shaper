@@ -6,9 +6,9 @@
 #ifndef Model_Application_HeaderFile
 #define Model_Application_HeaderFile
 
-#include <Model_Document.hxx> 
-#include <ModelAPI_Application.hxx> 
+#include <Model_Document.h> 
 #include <TDocStd_Application.hxx>
+#include <map>
 
 // Define handle class 
 DEFINE_STANDARD_HANDLE(Model_Application, TDocStd_Application)
@@ -19,19 +19,18 @@ DEFINE_STANDARD_HANDLE(Model_Application, TDocStd_Application)
  * Application supports the formats and document management. It is uses OCAF-lke
  * architecture and just implements specific features of the module.
  */
-class Model_Application: public TDocStd_Application, public ModelAPI_Application
+class Model_Application: public TDocStd_Application
 {
 public:
   // useful methods inside of the module
 
   // CASCADE RTTI
-  DEFINE_STANDARD_RTTI(Model_Application)
-  ;
+  DEFINE_STANDARD_RTTI(Model_Application);
 
   //! Retuns the application: one per process    
-  MODEL_EXPORT static Handle_Model_Application GetApplication();
-  //! Returns the main document (on first call creates it)
-  MODEL_EXPORT ModelAPI_Document* GetMainDocument();
+  MODEL_EXPORT static Handle_Model_Application getApplication();
+  //! Returns the main document (on first call creates it) by the string identifier
+  MODEL_EXPORT std::shared_ptr<Model_Document> getDocument(std::string theDocID);
 
 public:
   // Redefined OCAF methods
@@ -46,8 +45,8 @@ public:
   Model_Application();
 
 private:
-
-  Handle_Model_Document myMainDoc; ///< main document of an application
+  /// Map from string identifiers to created documents of an application
+  std::map<std::string, std::shared_ptr<Model_Document> > myDocs;
 };
 
 #endif

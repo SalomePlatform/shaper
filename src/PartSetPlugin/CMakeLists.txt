@@ -1,17 +1,18 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
 
 INCLUDE(Common)
-INCLUDE(FindBoost)
 
 SET(PROJECT_HEADERS
     PartSetPlugin.h
     PartSetPlugin_Plugin.h
-    PartSetPlugin_NewPart.h
+    PartSetPlugin_Part.h
+    PartSetPlugin_Point.h
 )
 
 SET(PROJECT_SOURCES
     PartSetPlugin_Plugin.cxx
-    PartSetPlugin_NewPart.cxx
+    PartSetPlugin_Part.cxx
+    PartSetPlugin_Point.cxx
 )
 
 ADD_DEFINITIONS(-DPARTSETPLUGIN_EXPORTS ${BOOST_DEFINITIONS})

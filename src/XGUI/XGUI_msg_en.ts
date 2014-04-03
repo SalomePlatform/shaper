@@ -7,10 +7,6 @@
 <context>
     <name>XGUI_Workshop</name>
     <message>
-        <source>GEN_MENU_TITLE</source>
-        <translation>General</translation>
-    </message>
-    <message>
         <source>NEW_MENU</source>
         <translation>New</translation>
     </message>
@@ -116,6 +112,10 @@
         <source>MENU_TITLE</source>
         <translation>Menu</translation>
     </message>
+    <message>
+        <source>GEN_MENU_TITLE</source>
+        <translation>General</translation>
+    </message>
 </context>
 <context>
     <name>XGUI_Viewer</name>
@@ -217,6 +217,10 @@
     <message>
         <source>RIGHT_VIEW</source>
         <translation>Right</translation>
+    </message>
+    <message>
+        <source>RESET_VIEW</source>
+        <translation>Reset</translation>
     </message>
 </context>
 </TS>

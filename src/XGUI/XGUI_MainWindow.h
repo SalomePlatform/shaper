@@ -7,6 +7,7 @@ class XGUI_MainMenu;
 class XGUI_Viewer;
 class QTreeWidget;
 class QMdiArea;
+class PyConsole_EnhConsole;
 
 class XGUI_MainWindow: public QMainWindow
 {
@@ -25,6 +26,7 @@ public:
   {
     return myObjectBrowser;
   }
+
   void showObjectBrowser();
   void hideObjectBrowser();
 
@@ -35,10 +37,11 @@ public:
     return myViewer;
   }
 
+  void showPythonConsole();
+  void hidePythonConsole();
+
 private:
   //!! For test purposes only
-  //QWidget* getSubWindow();
-
   void fillObjectBrowser();
   void addPropertyPanel();
 
@@ -46,6 +49,8 @@ private:
   QTreeWidget* myObjectBrowser;
 
   XGUI_Viewer* myViewer;
+
+  PyConsole_EnhConsole* myPythonConsole;
 };
 
 #endif

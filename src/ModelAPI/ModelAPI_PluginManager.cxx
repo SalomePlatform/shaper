@@ -7,8 +7,17 @@
 #include <ModelAPI_Document.h>
 // to avoid unresolved ModelAPI_Feature()
 #include <ModelAPI_Feature.h>
+// to avoid unresolved ModelAPI_Object()
+#include <ModelAPI_Object.h>
 // to avoid unresolved ModelAPI_Plugin()
 #include <ModelAPI_Plugin.h>
+// to avoid unresolved ModelAPI_Iterator()
+#include <ModelAPI_Iterator.h>
+// to avoid unresolved ModelAPI_Iterator()
+#include <ModelAPI_Iterator.h>
+#include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeDocRef.h>
+#include <ModelAPI_AttributeDouble.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -22,19 +31,19 @@ using namespace std;
 string library(const string& theLibName);
 
 /// Manager that will be initialized from Model package, one per application
-boost::shared_ptr<ModelAPI_PluginManager> MY_MANAGER;
+std::shared_ptr<ModelAPI_PluginManager> MY_MANAGER;
 
 ModelAPI_PluginManager::ModelAPI_PluginManager()
 {
 }
 
 void ModelAPI_PluginManager::SetPluginManager(
-  boost::shared_ptr<ModelAPI_PluginManager> theManager)
+  std::shared_ptr<ModelAPI_PluginManager> theManager)
 {
   MY_MANAGER = theManager;
 }
 
-boost::shared_ptr<ModelAPI_PluginManager> ModelAPI_PluginManager::get()
+std::shared_ptr<ModelAPI_PluginManager> ModelAPI_PluginManager::get()
 {
   if (!MY_MANAGER) { // import Model library that implements this interface of ModelAPI
     loadLibrary("Model");
@@ -62,6 +71,8 @@ string library(const string& theLibName)
   return aLibName;
 }
 
+// for debug purpose only (cerr), before the error management system is implemented
+#include <iostream>
 void ModelAPI_PluginManager::loadLibrary(const string theLibName)
 {
   string aFileName = library(theLibName);

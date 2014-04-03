@@ -7,10 +7,11 @@
 
 #include "ModelAPI.h"
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class ModelAPI_Feature;
 class ModelAPI_Plugin;
+class ModelAPI_Document;
 
 /**\class ModelAPI_PluginManager
  * \ingroup DataModel
@@ -23,15 +24,24 @@ class MODELAPI_EXPORT ModelAPI_PluginManager
 {
 public:
   /// Creates the feature object using plugins functionality
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
 
   /// Returns the real implementation (the alone instance per application) of the plugin manager
-  static boost::shared_ptr<ModelAPI_PluginManager> get();
+  static std::shared_ptr<ModelAPI_PluginManager> get();
 
   /// Registers the plugin that creates features.
   /// It is obligatory for each plugin to call this function on loading to be found by 
   /// the plugin manager on call of the feature)
   virtual void registerPlugin(ModelAPI_Plugin* thePlugin) = 0;
+
+  /// Returns the root document of the application (that may contains sub-documents)
+  virtual std::shared_ptr<ModelAPI_Document> rootDocument() = 0;
+
+  /// Returns the current document that used for current work in the application
+  virtual std::shared_ptr<ModelAPI_Document> currentDocument() = 0;
+
+  /// Defines the current document that used for current work in the application
+  virtual void setCurrentDocument(std::shared_ptr<ModelAPI_Document> theDoc) = 0;
 
   /// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
   static void ModelAPI_PluginManager::loadLibrary(const std::string theLibName);
@@ -40,7 +50,7 @@ public:
   ModelAPI_PluginManager();
 
 protected:
-  static void SetPluginManager(boost::shared_ptr<ModelAPI_PluginManager> theManager);
+  static void SetPluginManager(std::shared_ptr<ModelAPI_PluginManager> theManager);
 };
 
 #endif

@@ -5,7 +5,9 @@
 #include <Model_PluginManager.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Plugin.h>
-#include <Model_Feature.h>
+#include <Model_Object.h>
+#include <Model_Document.h>
+#include <Model_Application.h>
 #include <Event_Loop.h>
 #include <Config_FeatureMessage.h>
 #include <Config_ModuleReader.h>
@@ -14,7 +16,7 @@ using namespace std;
 
 static Model_PluginManager* myImpl = new Model_PluginManager();
 
-boost::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theFeatureID)
+std::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theFeatureID)
 {
   if (this != myImpl) return myImpl->createFeature(theFeatureID);
 
@@ -26,11 +28,31 @@ boost::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string th
       loadLibrary(myCurrentPluginName);
     }
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
-      return myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
+      std::shared_ptr<ModelAPI_Feature> aCreated = 
+        myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
+      return aCreated;
     }
   }
 
-  return boost::shared_ptr<ModelAPI_Feature>(); // return nothing
+  return std::shared_ptr<ModelAPI_Feature>(); // return nothing
+}
+
+std::shared_ptr<ModelAPI_Document> Model_PluginManager::rootDocument()
+{
+  return std::shared_ptr<ModelAPI_Document>(
+    Model_Application::getApplication()->getDocument("root"));
+}
+
+shared_ptr<ModelAPI_Document> Model_PluginManager::currentDocument()
+{
+  if (!myCurrentDoc)
+    myCurrentDoc = rootDocument();
+  return myCurrentDoc;
+}
+
+void Model_PluginManager::setCurrentDocument(shared_ptr<ModelAPI_Document> theDoc)
+{
+  myCurrentDoc = theDoc;
 }
 
 Model_PluginManager::Model_PluginManager()
@@ -39,7 +61,7 @@ Model_PluginManager::Model_PluginManager()
   //TODO(sbh): Implement static method to extract event id [SEID]
   static Event_ID aFeatureEvent = Event_Loop::eventByName("FeatureEvent");
 
-  ModelAPI_PluginManager::SetPluginManager(boost::shared_ptr<ModelAPI_PluginManager>(this));
+  ModelAPI_PluginManager::SetPluginManager(std::shared_ptr<ModelAPI_PluginManager>(this));
   // register the configuration reading listener
   Event_Loop* aLoop = Event_Loop::loop();
   aLoop->registerListener(this, aFeatureEvent);
@@ -52,7 +74,7 @@ void Model_PluginManager::processEvent(const Event_Message* theMessage)
   if (aMsg) {
     // proccess the plugin info, load plugin
     if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
-      myPlugins[aMsg->id()] = aMsg->pluginLibrary(); // TO DO: plugin name must be also imported from XMLs
+      myPlugins[aMsg->id()] = aMsg->pluginLibrary();
     }
   }
   // plugins information was started to load, so, it will be loaded
