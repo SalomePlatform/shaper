@@ -126,7 +126,7 @@ private slots:
   void onMaximize();
 
   void updateToolBar();
-  //void repaintToolBar();
+//  void repaintToolBar();
 
 private:
   enum WindowState
@@ -222,6 +222,9 @@ public:
   ViewerToolbar(QWidget* theParent, XGUI_ViewPort* thePort)
       : QToolBar(theParent), myVPort(thePort)
   {
+    setBackgroundRole(QPalette::NoRole);
+    setAttribute(Qt::WA_NoSystemBackground);
+    setAttribute(Qt::WA_PaintOnScreen);
   }
 
   void repaintBackground();
@@ -241,6 +244,7 @@ public:
   ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort)
       : QLabel(theParent), myVPort(thePort)
   {
+    setAttribute(Qt::WA_NoSystemBackground);
   }
 
   void repaintBackground();

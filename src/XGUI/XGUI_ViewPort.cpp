@@ -272,8 +272,6 @@ XGUI_ViewPort::XGUI_ViewPort(XGUI_ViewWindow* theParent, const Handle(V3d_Viewer
     myActiveView = myPerspView;
   }
   myActiveView->SetSurfaceDetail(V3d_TEX_ALL);
-
-  //setBackground( Qtx::BackgroundData( Qt::black ) ); // set default background
 }
 
 //***********************************************

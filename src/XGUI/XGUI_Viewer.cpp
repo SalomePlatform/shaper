@@ -169,7 +169,8 @@ QMdiSubWindow* XGUI_Viewer::createView(V3d_TypeOfView theType)
     if (myViews.size() == 0) 
         setTrihedronShown(true);
 
-  view->setBackground(XGUI_ViewBackground(XGUI::VerticalGradient, Qt::green, Qt::blue));
+    view->setBackground(XGUI_ViewBackground(XGUI::VerticalGradient, Qt::white, QColor(Qt::blue).lighter()));
+  //view->setBackground(XGUI_ViewBackground(Qt::black));
 
   QMdiArea* aMDI = myMainWindow->mdiArea();
   QMdiSubWindow* aWnd = aMDI->addSubWindow(view, Qt::FramelessWindowHint);

@@ -52,12 +52,13 @@ void XGUI_Workshop::startApplication()
   myMainWindow->show();
   QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
   aWnd->showMaximized();
+  myMainWindow->showPythonConsole();
 }
 
 //******************************************************
 void XGUI_Workshop::initMenu()
 {
-  XGUI_Workbench* aPage = addWorkbench(tr("GEN_MENU_TITLE"));
+  XGUI_Workbench* aPage = myMainWindow->menuObject()->generalPage();
 
   // File commands group
   XGUI_MenuGroupPanel* aGroup = aPage->addGroup("Default");
