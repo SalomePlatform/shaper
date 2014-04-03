@@ -4,6 +4,7 @@
 
 #include <Model_Object.h>
 #include <Model_AttributeDocRef.h>
+#include <Model_AttributeDouble.h>
 #include <TDataStd_Name.hxx>
 
 using namespace std;
@@ -36,6 +37,9 @@ void Model_Object::addAttribute(string theID, string theAttrType)
   ModelAPI_Attribute* anAttr = 0;
   if (theAttrType == ModelAPI_AttributeDocRef::type())
     anAttr = new Model_AttributeDocRef(anAttrLab);
+  else if (theAttrType == ModelAPI_AttributeDouble::type())
+    anAttr = new Model_AttributeDouble(anAttrLab);
+
   if (anAttr)
     myAttrs[theID] = std::shared_ptr<ModelAPI_Attribute>(anAttr);
   else
@@ -51,6 +55,21 @@ shared_ptr<ModelAPI_AttributeDocRef> Model_Object::docRef(const string theID)
   }
   shared_ptr<ModelAPI_AttributeDocRef> aRes = 
     dynamic_pointer_cast<ModelAPI_AttributeDocRef>(aFound->second);
+  if (!aRes) {
+    // TODO: generate error on invalid attribute type request
+  }
+  return aRes;
+}
+
+shared_ptr<ModelAPI_AttributeDouble> Model_Object::real(const string theID)
+{
+  map<string, shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
+  if (aFound == myAttrs.end()) {
+    // TODO: generate error on unknown attribute request and/or add mechanism for customization
+    return std::shared_ptr<ModelAPI_AttributeDouble>();
+  }
+  shared_ptr<ModelAPI_AttributeDouble> aRes = 
+    dynamic_pointer_cast<ModelAPI_AttributeDouble>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
   }

@@ -37,6 +37,12 @@ public:
   /// Returns the root document of the application (that may contains sub-documents)
   virtual std::shared_ptr<ModelAPI_Document> rootDocument() = 0;
 
+  /// Returns the current document that used for current work in the application
+  virtual std::shared_ptr<ModelAPI_Document> currentDocument() = 0;
+
+  /// Defines the current document that used for current work in the application
+  virtual void setCurrentDocument(std::shared_ptr<ModelAPI_Document> theDoc) = 0;
+
   /// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
   static void ModelAPI_PluginManager::loadLibrary(const std::string theLibName);
 

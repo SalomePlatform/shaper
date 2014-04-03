@@ -9,7 +9,7 @@
 /*
  * Class to pass a feature entry extracted from xml file.
  * Example of the feature entry:
- * <feature id="new_part" text="Part" tooltip="Creates a new part" icon=":pictures/part_ico.png"/>
+ * <feature id="Part" text="New part" tooltip="Creates a new part" icon=":pictures/part_ico.png"/>
  */
 class CONFIG_EXPORT Config_FeatureMessage: public Event_Message
 {

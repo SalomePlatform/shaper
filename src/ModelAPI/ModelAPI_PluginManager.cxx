@@ -15,10 +15,9 @@
 #include <ModelAPI_Iterator.h>
 // to avoid unresolved ModelAPI_Iterator()
 #include <ModelAPI_Iterator.h>
-// to avoid unresolved ModelAPI_Attribute()
 #include <ModelAPI_Attribute.h>
-// to avoid unresolved ModelAPI_AttributeDocRef()
 #include <ModelAPI_AttributeDocRef.h>
+#include <ModelAPI_AttributeDouble.h>
 
 #ifdef WIN32
 #include <windows.h>

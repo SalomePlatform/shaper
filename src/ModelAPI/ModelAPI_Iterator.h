@@ -22,15 +22,18 @@ class MODELAPI_EXPORT ModelAPI_Iterator
 {
 public:
   /// Iterates to the next feature
-  virtual void Next() = 0;
+  virtual void next() = 0;
   /// Returns true if the current iteration is valid and next iteration is possible
-  virtual bool More() = 0;
+  virtual bool more() = 0;
   /// Returns the currently iterated feature
-  virtual std::shared_ptr<ModelAPI_Feature> Current() = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> current() = 0;
   /// Returns the kind of the current feature (faster than Current()->getKind())
-  virtual std::string CurrentKind() = 0;
+  virtual std::string currentKind() = 0;
   /// Returns the name of the current feature (faster than Current()->getName())
-  virtual std::string CurrentName() = 0;
+  virtual std::string currentName() = 0;
+  /// Don't changes the current position of iterator. Not fast: iterates the left items.
+  /// \returns number of left iterations
+  virtual int numIterationsLeft() = 0;
 
 protected:
   /// Use plugin manager for features creation: this method is 

@@ -10,6 +10,7 @@
 #include <memory>
 
 class ModelAPI_AttributeDocRef;
+class ModelAPI_AttributeDouble;
 
 /**\class ModelAPI_Object
  * \ingroup DataModel
@@ -29,6 +30,8 @@ public:
 
   /// Returns the attribute that references to another document
   virtual std::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string theID) = 0;
+  /// Returns the attribute that contains real value with double precision
+  virtual std::shared_ptr<ModelAPI_AttributeDouble> real(const std::string theID) = 0;
 
   /// Initializes object by the attributes: must be called just after the object is created
   /// for each attribute of the object

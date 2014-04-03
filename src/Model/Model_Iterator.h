@@ -24,15 +24,18 @@ class MODEL_EXPORT Model_Iterator : public ModelAPI_Iterator
   TDF_ChildIDIterator myIter; ///< iterator of the features-labels
 public:
   /// Iterates to the next feature
-  virtual void Next();
+  virtual void next();
   /// Returns true if the current iteration is valid and next iteration is possible
-  virtual bool More();
+  virtual bool more();
   /// Returns the currently iterated feature
-  virtual std::shared_ptr<ModelAPI_Feature> Current();
+  virtual std::shared_ptr<ModelAPI_Feature> current();
   /// Returns the kind of the current feature (faster than Current()->getKind())
-  virtual std::string CurrentKind();
+  virtual std::string currentKind();
   /// Returns the name of the current feature (faster than Current()->getName())
-  virtual std::string CurrentName();
+  virtual std::string currentName();
+  /// Don't changes the current position of iterator. Not fast: iterates the left items.
+  /// \returns number of left iterations
+  virtual int numIterationsLeft();
 
 protected:
   /// Initializes iterator

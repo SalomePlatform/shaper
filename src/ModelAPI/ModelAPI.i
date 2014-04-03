@@ -6,6 +6,9 @@
   #include "ModelAPI_PluginManager.h"
   #include "ModelAPI_Feature.h"
   #include "ModelAPI_Object.h"
+  #include "ModelAPI_Attribute.h"
+  #include "ModelAPI_AttributeDocRef.h"
+  #include "ModelAPI_AttributeDouble.h"
 %}
 
 // to avoid error on this
@@ -22,9 +25,15 @@
 %shared_ptr(ModelAPI_PluginManager)
 %shared_ptr(ModelAPI_Feature)
 %shared_ptr(ModelAPI_Object)
+%shared_ptr(ModelAPI_Attribute)
+%shared_ptr(ModelAPI_AttributeDocRef)
+%shared_ptr(ModelAPI_AttributeDouble)
 
 // all supported interfaces
 %include "ModelAPI_Document.h"
 %include "ModelAPI_PluginManager.h"
 %include "ModelAPI_Feature.h"
 %include "ModelAPI_Object.h"
+%include "ModelAPI_Attribute.h"
+%include "ModelAPI_AttributeDocRef.h"
+%include "ModelAPI_AttributeDouble.h"

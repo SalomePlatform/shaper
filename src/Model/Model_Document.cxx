@@ -212,8 +212,8 @@ void Model_Document::setUniqueName(
   // first count all objects of such kind to start with index = count + 1
   int aNumObjects = 0;
   shared_ptr<ModelAPI_Iterator> anIter = featuresIterator(theGroupID);
-  for(; anIter->More(); anIter->Next()) {
-    if (anIter->CurrentKind() == theFeature->getKind())
+  for(; anIter->more(); anIter->next()) {
+    if (anIter->currentKind() == theFeature->getKind())
       aNumObjects++;
   }
   // generate candidate name
@@ -221,14 +221,14 @@ void Model_Document::setUniqueName(
   aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
   string aName = aNameStream.str();
   // check this is unique, if not, increase index by 1
-  for(anIter = featuresIterator(theGroupID); anIter->More();) {
-    if (anIter->CurrentName() == aName) {
+  for(anIter = featuresIterator(theGroupID); anIter->more();) {
+    if (anIter->currentName() == aName) {
       aNumObjects++;
       stringstream aNameStream;
       aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
       // reinitialize iterator to make sure a new name is unique
       anIter = featuresIterator(theGroupID);
-    } else anIter->Next();
+    } else anIter->next();
   }
 
   theFeature->data()->setName(aName);

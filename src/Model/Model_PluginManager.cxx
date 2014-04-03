@@ -43,6 +43,17 @@ std::shared_ptr<ModelAPI_Document> Model_PluginManager::rootDocument()
     Model_Application::getApplication()->getDocument("root"));
 }
 
+shared_ptr<ModelAPI_Document> Model_PluginManager::currentDocument()
+{
+  if (!myCurrentDoc)
+    myCurrentDoc = rootDocument();
+  return myCurrentDoc;
+}
+
+void Model_PluginManager::setCurrentDocument(shared_ptr<ModelAPI_Document> theDoc)
+{
+  myCurrentDoc = theDoc;
+}
 
 Model_PluginManager::Model_PluginManager()
 {

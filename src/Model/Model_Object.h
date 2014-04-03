@@ -35,7 +35,9 @@ public:
   /// Defines the name of the feature visible by the user in the object browser
   virtual void setName(std::string theName);
   /// Returns the attribute that references to another document
-  std::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string theID);
+  virtual std::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string theID);
+  /// Returns the attribute that contains real value with double precision
+  virtual std::shared_ptr<ModelAPI_AttributeDouble> real(const std::string theID);
 
   /// Initializes object by the attributes: must be called just after the object is created
   /// for each attribute of the object

@@ -10,6 +10,7 @@ SET(PROJECT_HEADERS
     Model_PluginManager.h
     Model_Object.h
     Model_Iterator.h
+    Model_AttributeDouble.h
     Model_AttributeDocRef.h
 )
 
@@ -19,6 +20,7 @@ SET(PROJECT_SOURCES
     Model_PluginManager.cxx
     Model_Object.cxx
     Model_Iterator.cxx
+    Model_AttributeDouble.cxx
     Model_AttributeDocRef.cxx
 )
 

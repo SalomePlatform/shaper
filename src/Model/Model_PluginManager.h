@@ -25,17 +25,24 @@ class Model_PluginManager : public ModelAPI_PluginManager, public Event_Listener
   std::map<std::string, std::string> myPlugins;
   std::map<std::string, ModelAPI_Plugin*> myPluginObjs; ///< instances of the already plugins
   std::string myCurrentPluginName; ///< name of the plugin that must be loaded currently
+  std::shared_ptr<ModelAPI_Document> myCurrentDoc; ///< current working document
 public:
   /// Creates the feature object using plugins functionality
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
 
   /// Returns the root document of the application (that may contains sub-documents)
-  virtual std::shared_ptr<ModelAPI_Document> rootDocument();
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> rootDocument();
+
+  /// Returns the current document that used for current work in the application
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> currentDocument();
+
+  /// Defines the current document that used for current work in the application
+  MODEL_EXPORT virtual void setCurrentDocument(std::shared_ptr<ModelAPI_Document> theDoc);
 
   /// Registers the plugin that creates features.
   /// It is obligatory for each plugin to call this function on loading to be found by 
   /// the plugin manager on call of the feature)
-  virtual void registerPlugin(ModelAPI_Plugin* thePlugin);
+  MODEL_EXPORT virtual void registerPlugin(ModelAPI_Plugin* thePlugin);
 
   /// Processes the configuration file reading
   MODEL_EXPORT virtual void processEvent(const Event_Message* theMessage);
