@@ -58,7 +58,8 @@ void Model_PluginManager::setCurrentDocument(shared_ptr<ModelAPI_Document> theDo
 Model_PluginManager::Model_PluginManager()
 {
   myPluginsInfoLoaded = false;
-  static Event_ID aFeatureEvent = Event_Loop::eventByName("RegisterFeature");
+  //TODO(sbh): Implement static method to extract event id [SEID]
+  static Event_ID aFeatureEvent = Event_Loop::eventByName("FeatureEvent");
 
   ModelAPI_PluginManager::SetPluginManager(std::shared_ptr<ModelAPI_PluginManager>(this));
   // register the configuration reading listener

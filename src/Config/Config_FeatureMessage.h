@@ -1,9 +1,9 @@
 #ifndef CONFIG_MESSAGE_H
 #define CONFIG_MESSAGE_H
 
-#include "Config.h"
-
+#include <Config.h>
 #include <Event_Message.h>
+
 #include <string>
 
 /*
@@ -26,6 +26,9 @@ class CONFIG_EXPORT Config_FeatureMessage: public Event_Message
 public:
   //const Event_ID theID, const void* theSender = 0
   Config_FeatureMessage(const Event_ID theId, const void* theParent = 0);
+
+  //TODO(sbh): Implement static method to extract event id [SEID]
+  //static const char* eventId() { return ""; }
 
   //Auto-generated getters/setters
   const std::string& icon() const;

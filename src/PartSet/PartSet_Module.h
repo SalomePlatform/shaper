@@ -22,7 +22,6 @@ public slots:
   void onCommandTriggered();
 
 private:
-  QString myMenuXML;
   XGUI_Workshop* myWorkshop;
 };
 

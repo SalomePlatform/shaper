@@ -5,6 +5,7 @@
  *      Author: sbh
  */
 
+#include <Config_Keywords.h>
 #include <Config_ModuleReader.h>
 #include <Config_FeatureReader.h>
 
@@ -15,15 +16,7 @@
 #include <iostream>
 #endif
 
-//Hardcoded xml entities
-// * Nodes
-const static char* NODE_PLUGIN = "plugin";
-const static char* NODE_PLUGINS = "plugins";
 
-// * Properties
-const static char* PLUGINS_MODULE = "module";
-const static char* PLUGIN_CONFIG = "configuration";
-const static char* PLUGIN_LIBRARY = "library";
 
 Config_ModuleReader::Config_ModuleReader()
     : Config_XMLReader("plugins.xml"), myIsAutoImport(false)

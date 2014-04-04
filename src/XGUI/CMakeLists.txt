@@ -18,6 +18,7 @@ SET(PROJECT_HEADERS
 	XGUI_RubberBand.h
 	XGUI_Constants.h
 	XGUI_ViewBackground.h
+	XGUI_WidgetFactory.h
 	XGUI_DocumentDataModel.h
 	XGUI_DataModel.h
 	XGUI_ObjectsBrowser.h
@@ -41,6 +42,7 @@ SET(PROJECT_SOURCES
     XGUI_Viewer.cpp
 	XGUI_RubberBand.cpp
 	XGUI_ViewBackground.cpp
+	XGUI_WidgetFactory.cpp
 	XGUI_DocumentDataModel.cpp
 	XGUI_DataModel.cpp
 	XGUI_ObjectsBrowser.cpp

@@ -15,6 +15,7 @@ class XGUI_Module;
 class XGUI_Workbench;
 
 class Config_FeatureMessage;
+class Config_WidgetMessage;
 
 class XGUI_Workshop: public QObject, public Event_Listener
 {
@@ -45,6 +46,7 @@ public slots:
 protected:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
+  void fillPropertyPanel(const Config_WidgetMessage*);
 
 private:
   void initMenu();

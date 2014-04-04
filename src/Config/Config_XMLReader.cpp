@@ -23,28 +23,15 @@
 #endif
 
 Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
+    : myXmlDoc(NULL)
 {
-  std::string prefix;
-  /* the problem: application may be launched using python execuable, to use environment variable
-                  (at least for the current moment)
-  //Get path to *.xml files (typically ./bin/../plugins/)
-#ifdef WIN32
-  HMODULE hModule = GetModuleHandleW(NULL);
-  WCHAR wchar_path[MAX_PATH];
-  GetModuleFileNameW(hModule, wchar_path, MAX_PATH);
-  char char_path[MAX_PATH];
-  char DefChar = ' ';
-  WideCharToMultiByte(CP_ACP, 0, wchar_path, -1, char_path, MAX_PATH, &DefChar, NULL);
-  prefix = std::string(char_path);
-  //chop "bin\XGUI.exe"
-  unsigned found = prefix.rfind("bin");
-  if (found != std::string::npos)
-    prefix.replace(found, prefix.length(), "plugins\\");
-#else
-  //TODO(sbh): Find full path to binary on linux
-  prefix = "../plugins/";
-#endif
-  */
+  std::string prefix = "";
+  /*
+   * Get path to *.xml files (typically ./bin/../plugins/)
+
+   * the problem: application may be launched using python executable,
+   * to use environment variable (at least for the current moment)
+   */
   char* anEnv = getenv("NEW_GEOM_CONFIG_FILE");
   if (anEnv) {
     prefix = std::string(anEnv) + "/";
@@ -55,12 +42,13 @@ Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
 
 Config_XMLReader::~Config_XMLReader()
 {
+  xmlFreeDoc(myXmlDoc);
 }
 
 /*
- * Read all nodes (recursively if processChildren() is true
- * for a node). For each read node the processNode will be
- * called.
+ * Read all nodes in associated xml file,
+ * recursively if processChildren(xmlNode) is true for the xmlNode.
+ * For each read node the processNode will be called.
  */
 void Config_XMLReader::readAll()
 {
@@ -84,25 +72,28 @@ void Config_XMLReader::processNode(xmlNodePtr aNode)
 
 /*
  * Defines which nodes should be processed recursively. Virtual.
- * The default implementation to read all nodes.
+ * The default implementation is to read all nodes.
  */
 bool Config_XMLReader::processChildren(xmlNodePtr aNode)
 {
   return true;
 }
 
+/*
+ *
+ */
 xmlNodePtr Config_XMLReader::findRoot()
 {
-  xmlDocPtr aDoc;
-  aDoc = xmlParseFile(myDocumentPath.c_str());
-  if (aDoc == NULL) {
+  myXmlDoc = xmlParseFile(myDocumentPath.c_str());
+  if (myXmlDoc == NULL) {
 #ifdef _DEBUG
     std::cout << "Config_XMLReader::import: " << "Document " << myDocumentPath
     << " is not parsed successfully." << std::endl;
 #endif
     return NULL;
   }
-  xmlNodePtr aRoot = xmlDocGetRootElement(aDoc);
+
+  xmlNodePtr aRoot = xmlDocGetRootElement(myXmlDoc);
 #ifdef _DEBUG
   if(aRoot == NULL) {
     std::cout << "Config_XMLReader::import: " << "Error: empty document";
@@ -166,7 +157,7 @@ bool Config_XMLReader::isNode(xmlNodePtr theNode, const char* theNodeName, ...)
   va_list args; // define argument list variable
   va_start(args, theNodeName); // init list; point to last defined argument
   while(true) {
-    char *anArg = va_arg (args, char *); // get next argument
+    char *anArg = va_arg (args, char*); // get next argument
     if (anArg == NULL)
       break;
     if (!xmlStrcmp(aName, (const xmlChar *) anArg)) {

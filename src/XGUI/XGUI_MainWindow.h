@@ -41,9 +41,9 @@ public:
   void hidePythonConsole();
 
 private:
-  //!! For test purposes only
-  //void fillObjectBrowser();
-  void addPropertyPanel();
+  void createDockWidgets();
+  QDockWidget* createObjectBrowser();
+  QDockWidget* createPropertyPanel();
 
   XGUI_MainMenu* myMenuBar;
   XGUI_ObjectsBrowser* myObjectBrowser;

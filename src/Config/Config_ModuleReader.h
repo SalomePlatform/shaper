@@ -8,9 +8,12 @@
 #ifndef CONFIG_MODULEREADER_H_
 #define CONFIG_MODULEREADER_H_
 
+#include <Config.h>
 #include <Config_XMLReader.h>
 
 #include <map>
+#include <string>
+
 
 class CONFIG_EXPORT Config_ModuleReader: public Config_XMLReader
 {

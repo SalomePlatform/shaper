@@ -8,17 +8,28 @@
 #ifndef CONFIG_XMLREADER_H_
 #define CONFIG_XMLREADER_H_
 
-#include "Config.h"
-#include "Config_FeatureMessage.h"
+#include <Config.h>
 
-#include <string>
 #include <cstdarg>
+#include <string>
 
-//Forward declaration for xmlNodePtr.
+//>> Forward declaration of xmlNodePtr.
 typedef struct _xmlNode xmlNode;
 typedef xmlNode *xmlNodePtr;
 struct _xmlNode;
+//<<
 
+//>> Forward declaration of xmlDocPtr.
+typedef struct _xmlDoc xmlDoc;
+typedef xmlDoc *xmlDocPtr;
+struct _xmlDoc;
+//<<
+
+/*
+ * Base class for all libxml readers. Provides high-level API
+ * for all xml operations.
+ *
+ */
 class CONFIG_EXPORT Config_XMLReader
 {
 public:
@@ -44,8 +55,9 @@ protected:
    */
   bool isNode(xmlNodePtr theNode, const char* name, ...);
 
-private:
+protected:
   std::string myDocumentPath;
+  xmlDocPtr   myXmlDoc;
 };
 
 #endif /* CONFIG_XMLREADER_H_ */

@@ -11,6 +11,9 @@ SET(PROJECT_HEADERS
   Config_XMLReader.h
   Config_ModuleReader.h
   Config_FeatureReader.h
+  Config_WidgetAPI.h
+  Config_WidgetReader.h
+  Config_WidgetMessage.h
  )
  
 SET(PROJECT_SOURCES
@@ -18,6 +21,9 @@ SET(PROJECT_SOURCES
   Config_XMLReader.cpp
   Config_ModuleReader.cpp
   Config_FeatureReader.cpp
+  Config_WidgetAPI.cpp
+  Config_WidgetReader.cpp
+  Config_WidgetMessage.cpp
 )
 
 SET(XML_RESOURCES

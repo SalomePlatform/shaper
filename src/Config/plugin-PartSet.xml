@@ -9,9 +9,12 @@
   <workbench id="Construction">
     <group id="Basic">
       <feature id="Point" text="Point" tooltip="Create a new point" icon=":icons/point.png">
-        <value id="x" type="double" label="X:" min="0" max="" step="0.1" default="0"/>
-        <value id="y" type="double" label="Y:" min="0" max="" step="0.1" default="0"/>
-        <value id="z" type="double" label="Z:" min="0" max="" step="0.1" default="0"/>
+        <value id="x" type="double" label="X:" min="0" max="" step="0.1" default="0" 
+               icon=":pictures/x_point.png" tooltip="Set X"/>
+        <value id="y" type="double" label="Y:" min="0" max="" step="0.1" default="1" 
+               icon=":pictures/y_point.png" tooltip="Set Y"/>
+        <value id="z" type="double" label="Z:" min="0" max="10" step="0.1" default="2" 
+               icon=":pictures/z_point.png" tooltip="Set Z"/>
       </feature>
       <feature id="Axis" text="Axis" tooltip="Create a new axis" icon=":icons/axis.png" keysequence=""/>
       <feature id="Plane" text="Plane" tooltip="Create a new plane" icon=":icons/plane.png" keysequence=""/>
