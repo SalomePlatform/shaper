@@ -2,6 +2,7 @@
 #include "XGUI_MainMenu.h"
 #include "XGUI_ViewWindow.h"
 #include "XGUI_Viewer.h"
+#include "XGUI_ObjectsBrowser.h"
 
 #include <PyConsole_Console.h>
 #include <PyConsole_EnhInterp.h>
@@ -29,7 +30,7 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     myObjectBrowser(0), 
     myPythonConsole(0)
 {
-  setWindowTitle(tr("WINDOW_TITLE"));
+  setWindowTitle(tr("New Geom"));
   myMenuBar = new XGUI_MainMenu(this);
 
   QMdiArea* aMdiArea = new QMdiArea(this);
@@ -145,62 +146,11 @@ QDockWidget* XGUI_MainWindow::createObjectBrowser()
 {
   QDockWidget* aObjDock = new QDockWidget(this);
   aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-  aObjDock->setWindowTitle(tr("OBJECT_BROWSER_TITLE"));
-  myObjectBrowser = new QTreeWidget(aObjDock);
-  myObjectBrowser->setColumnCount(1);
-  myObjectBrowser->setHeaderHidden(true);
+  aObjDock->setWindowTitle(tr("Object browser"));
+  myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
+  //myObjectBrowser->setColumnCount(1);
+  //myObjectBrowser->setHeaderHidden(true);
   aObjDock->setWidget(myObjectBrowser);
 //  fillObjectBrowser();
   return aObjDock;
-}
-
-//******************************************************
-
-// TEST FUNCTIONS
-
-//******************************************************
-void XGUI_MainWindow::fillObjectBrowser()
-{
-  QStringList aNames;
-  aNames << "Parameters" << "Constructions";
-  aNames << "Part 1" << "Part 2" << "Part 3";
-  aNames << "Properties";
-
-  QStringList aIcons;
-  aIcons << ":pictures/params_folder.png";
-  aIcons << ":pictures/constr_folder.png";
-  aIcons << ":pictures/part_ico.png";
-  aIcons << ":pictures/part_ico.png";
-  aIcons << ":pictures/part_ico.png";
-  aIcons << ":pictures/properties.png";
-
-  QList<QTreeWidgetItem*> aItems;
-  foreach(QString aName, aNames)
-  {
-    QTreeWidgetItem* aItem = new QTreeWidgetItem(myObjectBrowser);
-    aItem->setText(0, aName);
-    aItems.append(aItem);
-  }
-  for(int i = 0; i < aItems.length(); i++) {
-    aItems[i]->setIcon(0, QIcon(aIcons[i]));
-  }
-  myObjectBrowser->addTopLevelItems(aItems);
-
-  for(int i = 2; i < 5; i++) {
-    QTreeWidgetItem* aItem = new QTreeWidgetItem(aItems[i]);
-    aItem->setText(0, "Parameters");
-    aItem->setIcon(0, QIcon(":pictures/params_folder.png"));
-
-    aItem = new QTreeWidgetItem(aItems[i]);
-    aItem->setText(0, "Construction");
-    aItem->setIcon(0, QIcon(":pictures/constr_folder.png"));
-
-    aItem = new QTreeWidgetItem(aItems[i]);
-    aItem->setText(0, "Bodies");
-    aItem->setIcon(0, QIcon(":pictures/part_ico.png"));
-
-    aItem = new QTreeWidgetItem(aItems[i]);
-    aItem->setText(0, "Features");
-    aItem->setIcon(0, QIcon(":pictures/features.png"));
-  }
 }

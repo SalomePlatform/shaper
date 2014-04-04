@@ -61,17 +61,17 @@ Handle(V3d_Viewer) CreateViewer(const Standard_ExtString name, const Standard_CS
  */
 QString XGUI_Viewer::backgroundData(QStringList& gradList, QIntList& idList, QIntList& txtList)
 {
-  gradList << tr("GT_HORIZONTALGRADIENT") << tr("GT_VERTICALGRADIENT")
-      << tr("GT_FIRSTDIAGONALGRADIENT") << tr("GT_SECONDDIAGONALGRADIENT")
-      << tr("GT_FIRSTCORNERGRADIENT") << tr("GT_SECONDCORNERGRADIENT")
-      << tr("GT_THIRDCORNERGRADIENT") << tr("GT_FORTHCORNERGRADIENT");
+  gradList << tr("Horizontal gradient") << tr("Vertical gradient")
+      << tr("First diagonal gradient") << tr("Second diagonal gradient")
+      << tr("First corner gradient") << tr("Second corner gradient")
+      << tr("Third corner gradient") << tr("Fourth corner gradient");
   idList << XGUI::HorizontalGradient << XGUI::VerticalGradient << XGUI::Diagonal1Gradient
       << XGUI::Diagonal2Gradient << XGUI::Corner1Gradient << XGUI::Corner2Gradient
       << XGUI::Corner3Gradient << XGUI::Corner4Gradient;
 #ifdef OCC_ENABLE_TEXTURED_BACKGROUND
   txtList << XGUI::CenterTexture << XGUI::TileTexture << XGUI::StretchTexture;
 #endif
-  return tr("BG_IMAGE_FILES");
+  return tr("Image files (*.bmp *.gif *.pix *.xwd *.rgb *.rs)");
 }
 
 XGUI_Viewer::XGUI_Viewer(XGUI_MainWindow* theParent, bool DisplayTrihedron)

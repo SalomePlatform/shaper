@@ -167,63 +167,63 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
   QAction* aBtn;
 
   // Dump view
-  aBtn = new QAction(QIcon(":pictures/occ_view_camera_dump.png"), tr("DUMP_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_camera_dump.png"), tr("Dump view"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(dumpView()));
   myViewBar->addAction(aBtn);
   // Fit all
-  aBtn = new QAction(QIcon(":pictures/occ_view_fitall.png"), tr("FIT_ALL"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_fitall.png"), tr("Fit all"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(fitAll()));
   myViewBar->addAction(aBtn);
   // Fit area
-  aBtn = new QAction(QIcon(":pictures/occ_view_fitarea.png"), tr("FIT_AREA"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_fitarea.png"), tr("Fit area"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(activateWindowFit()));
   myViewBar->addAction(aBtn);
   // Zoom
-  aBtn = new QAction(QIcon(":pictures/occ_view_zoom.png"), tr("ZOOM_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_zoom.png"), tr("Zoom"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(activateZoom()));
   myViewBar->addAction(aBtn);
   // Pan
-  aBtn = new QAction(QIcon(":pictures/occ_view_pan.png"), tr("PAN_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_pan.png"), tr("Panning"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(activatePanning()));
   myViewBar->addAction(aBtn);
   // Global Panning
-  aBtn = new QAction(QIcon(":pictures/occ_view_glpan.png"), tr("GLOB_PAN_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_glpan.png"), tr("Global panning"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(activateGlobalPanning()));
   myViewBar->addAction(aBtn);
   // Rotation
-  aBtn = new QAction(QIcon(":pictures/occ_view_rotate.png"), tr("ROTATE_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_rotate.png"), tr("Rotate"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(activateRotation()));
   myViewBar->addAction(aBtn);
   // Reset
-  aBtn = new QAction(QIcon(":pictures/occ_view_reset.png"), tr("RESET_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_reset.png"), tr("Reset"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(reset()));
   myViewBar->addAction(aBtn);
   // Front view
-  aBtn = new QAction(QIcon(":pictures/occ_view_front.png"), tr("FRONT_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_front.png"), tr("Front"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(frontView()));
   myViewBar->addAction(aBtn);
   // Back view
-  aBtn = new QAction(QIcon(":pictures/occ_view_back.png"), tr("BACK_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_back.png"), tr("Back"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(backView()));
   myViewBar->addAction(aBtn);
   // Top view
-  aBtn = new QAction(QIcon(":pictures/occ_view_top.png"), tr("TOP_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_top.png"), tr("Top"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(topView()));
   myViewBar->addAction(aBtn);
   // Bottom view
-  aBtn = new QAction(QIcon(":pictures/occ_view_bottom.png"), tr("BOTTOM_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_bottom.png"), tr("Bottom"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(bottomView()));
   myViewBar->addAction(aBtn);
   // Left view
-  aBtn = new QAction(QIcon(":pictures/occ_view_left.png"), tr("LEFT_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_left.png"), tr("Left"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(leftView()));
   myViewBar->addAction(aBtn);
   // Right view
-  aBtn = new QAction(QIcon(":pictures/occ_view_right.png"), tr("RIGHT_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_right.png"), tr("Right"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(rightView()));
   myViewBar->addAction(aBtn);
   // Clone view
-  aBtn = new QAction(QIcon(":pictures/occ_view_clone.png"), tr("CLONE_VIEW"), myViewBar);
+  aBtn = new QAction(QIcon(":pictures/occ_view_clone.png"), tr("Clone"), myViewBar);
   connect(aBtn, SIGNAL(triggered()), SLOT(cloneView()));
   myViewBar->addAction(aBtn);
 
@@ -946,7 +946,7 @@ void XGUI_ViewWindow::cloneView()
 
 void XGUI_ViewWindow::dumpView()
 {
-  QString aFilter(tr("OCC_IMAGE_FILES"));
+  QString aFilter(tr("Images Files (*.bmp *.png *.jpg *.jpeg *.eps *.ps)"));
   QString aSelectedFilter;
   QString aFileName = QFileDialog::getSaveFileName(this, "Save picture", QString(), aFilter, &aSelectedFilter);
   if (!aFileName.isNull()) {

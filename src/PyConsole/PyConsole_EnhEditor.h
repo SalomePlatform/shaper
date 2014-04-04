@@ -14,7 +14,8 @@ class PyConsole_EnhInterp;
 /**
  * Enhanced Python editor handling tab completion.
  */
-class PYCONSOLE_EXPORT PyConsole_EnhEditor: public PyConsole_Editor
+//PYCONSOLE_EXPORT
+class PyConsole_EnhEditor: public PyConsole_Editor
 {
   Q_OBJECT;
 

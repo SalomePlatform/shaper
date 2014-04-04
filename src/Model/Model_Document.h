@@ -78,6 +78,10 @@ public:
 
   MODEL_EXPORT virtual const std::string& id() const {return myID;}
 
+  //! Returns the feature in the group by the index (started from zero)
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> 
+    feature(const std::string& theGroupID, const int theIndex);
+
 protected:
 
   //! Returns (creates if needed) the group label

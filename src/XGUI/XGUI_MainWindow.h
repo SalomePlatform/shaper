@@ -5,7 +5,7 @@
 
 class XGUI_MainMenu;
 class XGUI_Viewer;
-class QTreeWidget;
+class XGUI_ObjectsBrowser;
 class QMdiArea;
 class PyConsole_EnhConsole;
 
@@ -22,7 +22,7 @@ public:
     return myMenuBar;
   }
 
-  QTreeWidget* objectBrowser() const
+  XGUI_ObjectsBrowser* objectBrowser() const
   {
     return myObjectBrowser;
   }
@@ -44,11 +44,9 @@ private:
   void createDockWidgets();
   QDockWidget* createObjectBrowser();
   QDockWidget* createPropertyPanel();
-  //!! For test purposes only
-  void fillObjectBrowser();
 
   XGUI_MainMenu* myMenuBar;
-  QTreeWidget* myObjectBrowser;
+  XGUI_ObjectsBrowser* myObjectBrowser;
 
   XGUI_Viewer* myViewer;
 

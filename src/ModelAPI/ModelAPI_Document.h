@@ -78,7 +78,12 @@ public:
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Iterator> featuresIterator(
     const std::string theGroup) = 0;
 
+  ///! Returns the id of hte document
   MODELAPI_EXPORT virtual const std::string& id() const = 0;
+
+  //! Returns the feature in the group by the index (started from zero)
+  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Feature> 
+    feature(const std::string& theGroupID, const int theIndex) = 0;
 
 protected:
   /// Only for SWIG wrapping it is here
