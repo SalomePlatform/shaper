@@ -177,7 +177,8 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::feature(TDF_Label& theLabel)
   Handle(TDataStd_Comment) aFeatureID;
   if (theLabel.FindAttribute(TDataStd_Comment::GetID(), aFeatureID)) {
     string anID(TCollection_AsciiString(aFeatureID->Get()).ToCString());
-    std::shared_ptr<ModelAPI_Feature> aResult = Model_PluginManager::get()->createFeature(anID);
+    std::shared_ptr<ModelAPI_Feature> aResult = 
+      Model_PluginManager::get()->createFeature(anID, false);
     std::shared_ptr<Model_Object> aData(new Model_Object);
     aData->setLabel(theLabel);
     aResult->setData(aData);

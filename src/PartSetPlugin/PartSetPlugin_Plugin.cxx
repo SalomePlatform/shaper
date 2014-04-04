@@ -15,7 +15,8 @@ PartSetPlugin_Plugin::PartSetPlugin_Plugin()
   ModelAPI_PluginManager::get()->registerPlugin(this);
 }
 
-std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Plugin::createFeature(string theFeatureID)
+std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Plugin::createFeature(
+  string theFeatureID, const bool theAddToDoc)
 {
   std::shared_ptr<ModelAPI_Feature> aCreated;
   bool isCurrent = true; // to create a feature in the current document
@@ -27,7 +28,7 @@ std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Plugin::createFeature(string the
   }
 
   // add to a root document for the current moment
-  if (aCreated) {
+  if (aCreated && theAddToDoc) {
     shared_ptr<ModelAPI_Document> aDoc = isCurrent ? 
       ModelAPI_PluginManager::get()->currentDocument() :
       ModelAPI_PluginManager::get()->rootDocument();
