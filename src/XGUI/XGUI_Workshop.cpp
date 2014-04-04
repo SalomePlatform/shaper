@@ -65,34 +65,34 @@ void XGUI_Workshop::initMenu()
 
   XGUI_Command* aCommand;
 
-  aCommand = aGroup->addFeature("SAVE_CMD", tr("SAVE_MENU"), tr("SAVE_MENU_TIP"),
+  aCommand = aGroup->addFeature("SAVE_CMD", tr("Save..."), tr("Save the document"),
                                 QIcon(":pictures/save.png"), QKeySequence::Save);
   aCommand->connectTo(this, SLOT(onSave()));
   //aCommand->disable();
 
-  aCommand = aGroup->addFeature("UNDO_CMD", tr("UNDO_MENU"), tr("UNDO_MENU_TIP"),
+  aCommand = aGroup->addFeature("UNDO_CMD", tr("Undo"), tr("Undo last command"),
                                 QIcon(":pictures/undo.png"), QKeySequence::Undo);
 
-  aCommand = aGroup->addFeature("REDO_CMD", tr("REDO_MENU"), tr("REDO_MENU_TIP"),
+  aCommand = aGroup->addFeature("REDO_CMD", tr("Redo"), tr("Redo last command"),
                                 QIcon(":pictures/redo.png"), QKeySequence::Redo);
 
-  aCommand = aGroup->addFeature("REBUILD_CMD", tr("REBUILD_MENU"), tr("REBUILD_MENU_TIP"),
+  aCommand = aGroup->addFeature("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
                                 QIcon(":pictures/rebuild.png"));
 
-  aCommand = aGroup->addFeature("SAVEAS_CMD", tr("SAVEAS_MENU"), tr("SAVEAS_MENU_TIP"),
+  aCommand = aGroup->addFeature("SAVEAS_CMD", tr("Save as..."), tr("Save the document into a file"),
                                 QIcon(":pictures/save.png"));
   aCommand->connectTo(this, SLOT(onSaveAs()));
   //aCommand->disable();
 
-  aCommand = aGroup->addFeature("OPEN_CMD", tr("OPEN_MENU"), tr("OPEN_MENU_TIP"),
+  aCommand = aGroup->addFeature("OPEN_CMD", tr("Open..."), tr("Open a new document"),
                                 QIcon(":pictures/open.png"), QKeySequence::Open);
   aCommand->connectTo(this, SLOT(onOpen()));
 
-  aCommand = aGroup->addFeature("NEW_CMD", tr("NEW_MENU"), tr("NEW_MENU_TIP"),
+  aCommand = aGroup->addFeature("NEW_CMD", tr("New"), tr("Create a new document"),
                                 QIcon(":pictures/new.png"), QKeySequence::New);
   aCommand->connectTo(this, SLOT(onNew()));
 
-  aCommand = aGroup->addFeature("EXIT_CMD", tr("EXIT_MENU"), tr("EXIT_MENU_TIP"),
+  aCommand = aGroup->addFeature("EXIT_CMD", tr("Exit"), tr("Exit application"),
                                 QIcon(":pictures/close.png"), QKeySequence::Close);
   aCommand->connectTo(this, SLOT(onExit()));
 

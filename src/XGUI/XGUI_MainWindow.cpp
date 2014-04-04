@@ -29,12 +29,12 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     myObjectBrowser(0), 
     myPythonConsole(0)
 {
-  setWindowTitle(tr("WINDOW_TITLE"));
+  setWindowTitle(tr("New Geom"));
   myMenuBar = new XGUI_MainMenu(this);
 
   QDockWidget* aDoc = new QDockWidget(this);
   aDoc->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-  aDoc->setWindowTitle(tr("OBJECT_BROWSER_TITLE"));
+  aDoc->setWindowTitle(tr("Object browser"));
 
   myObjectBrowser = new XGUI_ObjectsBrowser(aDoc);
   //myObjectBrowser->setColumnCount(1);

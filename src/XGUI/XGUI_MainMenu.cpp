@@ -11,7 +11,7 @@ XGUI_MainMenu::XGUI_MainMenu(XGUI_MainWindow *parent)
     : QObject(parent), myDesktop(parent)
 {
   parent->setTabPosition(Qt::TopDockWidgetArea, QTabWidget::North);
-  myGeneralPage = addWorkbench(tr("GEN_MENU_TITLE"));
+  myGeneralPage = addWorkbench(tr("General"));
 }
 
 XGUI_MainMenu::~XGUI_MainMenu(void)
