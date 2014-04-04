@@ -28,7 +28,8 @@ class Model_PluginManager : public ModelAPI_PluginManager, public Event_Listener
   std::shared_ptr<ModelAPI_Document> myCurrentDoc; ///< current working document
 public:
   /// Creates the feature object using plugins functionality
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> createFeature(
+    std::string theFeatureID, const bool theAddToDoc = true);
 
   /// Returns the root document of the application (that may contains sub-documents)
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> rootDocument();

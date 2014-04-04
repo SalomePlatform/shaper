@@ -24,4 +24,3 @@ Model_AttributeDouble::Model_AttributeDouble(TDF_Label& theLabel)
     myReal = TDataStd_Real::Set(theLabel, 0.);
   }
 }
-

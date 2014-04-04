@@ -16,7 +16,8 @@ using namespace std;
 
 static Model_PluginManager* myImpl = new Model_PluginManager();
 
-std::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theFeatureID)
+std::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(
+  string theFeatureID, const bool theAddToDoc)
 {
   if (this != myImpl) return myImpl->createFeature(theFeatureID);
 
@@ -29,7 +30,7 @@ std::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theF
     }
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
       std::shared_ptr<ModelAPI_Feature> aCreated = 
-        myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
+        myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID, theAddToDoc);
       return aCreated;
     }
   }
