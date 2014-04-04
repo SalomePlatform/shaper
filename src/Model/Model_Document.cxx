@@ -191,6 +191,14 @@ shared_ptr<ModelAPI_Iterator> Model_Document::featuresIterator(const string theG
   return shared_ptr<ModelAPI_Iterator>(new Model_Iterator(aThis, groupLabel(theGroup)));
 }
 
+shared_ptr<ModelAPI_Feature> Model_Document::feature(const string& theGroupID, const int theIndex)
+{
+  // TODO: optimize this method
+  shared_ptr<ModelAPI_Iterator>  anIter = featuresIterator(theGroupID);
+  for(int a = 0; a != theIndex; anIter->next()) a++;
+  return anIter->current();
+}
+
 Model_Document::Model_Document(const std::string theID)
     : myID(theID), myDoc(new TDocStd_Document("BinOcaf")) // binary OCAF format
 {
