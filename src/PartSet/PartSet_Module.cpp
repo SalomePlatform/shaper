@@ -40,9 +40,7 @@ void PartSet_Module::createFeatures()
 void PartSet_Module::featureCreated(XGUI_Command* theFeature)
 {
   QString aFtId = theFeature->getId();
-  if (aFtId == "new_point") {
-    theFeature->connectTo(this, SLOT(onCommandTriggered()));
-  }
+  theFeature->connectTo(this, SLOT(onCommandTriggered()));
 }
 
 void PartSet_Module::onCommandTriggered()

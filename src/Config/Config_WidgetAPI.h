@@ -34,7 +34,13 @@ public:
 
   void reset();
   bool nextWidget();
+
   std::string widgetType();
+
+  std::string widgetIcon();
+  std::string widgetLabel();
+  std::string widgetTooltip();
+
   std::string getProperty(const char* thePropName);
 
 protected:

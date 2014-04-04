@@ -177,6 +177,7 @@ void XGUI_Workshop::fillPropertyPanel(const Config_WidgetMessage* theMessage)
     #endif
     return;
   }
+  qDeleteAll(aPropWidget->children());
   std::string aXml = theMessage->xmlRepresentation();
   XGUI_WidgetFactory aFactory = XGUI_WidgetFactory(aXml);
   aFactory.fillWidget(aPropWidget);

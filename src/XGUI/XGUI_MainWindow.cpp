@@ -23,6 +23,7 @@
 #include <QScrollArea>
 #include <QComboBox>
 
+
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     : QMainWindow(parent), 
     myObjectBrowser(0), 
@@ -31,23 +32,12 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
   setWindowTitle(tr("WINDOW_TITLE"));
   myMenuBar = new XGUI_MainMenu(this);
 
-  QDockWidget* aDoc = new QDockWidget(this);
-  aDoc->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-  aDoc->setWindowTitle(tr("OBJECT_BROWSER_TITLE"));
-  myObjectBrowser = new QTreeWidget(aDoc);
-  myObjectBrowser->setColumnCount(1);
-  myObjectBrowser->setHeaderHidden(true);
-  aDoc->setWidget(myObjectBrowser);
-  addDockWidget(Qt::LeftDockWidgetArea, aDoc);
-  //aDoc->hide();
-
   QMdiArea* aMdiArea = new QMdiArea(this);
   setCentralWidget(aMdiArea);
 
   myViewer = new XGUI_Viewer(this);
 
-  //fillObjectBrowser();
-  //addPropertyPanel();
+  createDockWidgets();
 }
 
 XGUI_MainWindow::~XGUI_MainWindow(void)
@@ -100,7 +90,69 @@ void XGUI_MainWindow::hidePythonConsole()
     myPythonConsole->parentWidget()->hide();
 }
 
+/*
+ * Creates dock widgets, places them in corresponding area
+ * and tabifies if necessary.
+ */
+void XGUI_MainWindow::createDockWidgets()
+{
+  QDockWidget* aObjDock = createObjectBrowser();
+  addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
+  QDockWidget* aPropPanelDock = createPropertyPanel();
+  addDockWidget(Qt::LeftDockWidgetArea, aPropPanelDock);
 
+  tabifyDockWidget(aPropPanelDock, aObjDock);
+}
+
+
+QDockWidget* XGUI_MainWindow::createPropertyPanel()
+{
+  QDockWidget* aPropPanel = new QDockWidget(this);
+  aPropPanel->setWindowTitle(tr("Property Panel"));
+
+  QWidget* aContent = new QWidget(aPropPanel);
+  QVBoxLayout* aMainLay = new QVBoxLayout(aContent);
+  aMainLay->setContentsMargins(3, 3, 3, 3);
+  aPropPanel->setWidget(aContent);
+
+  QWidget* aCustomWidget = new QWidget(aContent);
+  aCustomWidget->setObjectName("PropertyPanelWidget");
+  aMainLay->addWidget(aCustomWidget);
+  aMainLay->addStretch(1);
+
+  QFrame* aFrm = new QFrame(aContent);
+  aFrm->setFrameStyle(QFrame::Sunken);
+  aFrm->setFrameShape(QFrame::Panel);
+  QHBoxLayout* aBtnLay = new QHBoxLayout(aFrm);
+  aBtnLay->setContentsMargins(0, 0, 0, 0);
+  aMainLay->addWidget(aFrm);
+
+  QPushButton* aBtn = new QPushButton(QIcon(":pictures/button_help.png"), "", aFrm);
+  aBtn->setFlat(true);
+  aBtnLay->addWidget(aBtn);
+  aBtnLay->addStretch(1);
+  aBtn = new QPushButton(QIcon(":pictures/button_ok.png"), "", aFrm);
+  aBtn->setFlat(true);
+  aBtnLay->addWidget(aBtn);
+  aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
+  aBtn->setFlat(true);
+  aBtnLay->addWidget(aBtn);
+
+  return aPropPanel;
+}
+
+QDockWidget* XGUI_MainWindow::createObjectBrowser()
+{
+  QDockWidget* aObjDock = new QDockWidget(this);
+  aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  aObjDock->setWindowTitle(tr("OBJECT_BROWSER_TITLE"));
+  myObjectBrowser = new QTreeWidget(aObjDock);
+  myObjectBrowser->setColumnCount(1);
+  myObjectBrowser->setHeaderHidden(true);
+  aObjDock->setWidget(myObjectBrowser);
+//  fillObjectBrowser();
+  return aObjDock;
+}
 
 //******************************************************
 
@@ -151,94 +203,4 @@ void XGUI_MainWindow::fillObjectBrowser()
     aItem->setText(0, "Features");
     aItem->setIcon(0, QIcon(":pictures/features.png"));
   }
-}
-
-void XGUI_MainWindow::addPropertyPanel()
-{
-  QDockWidget* aPropPanel = new QDockWidget(this);
-  aPropPanel->setWindowTitle("Property Panel");
-
-  QWidget* aContent = new QWidget(aPropPanel);
-  QVBoxLayout* aMainLay = new QVBoxLayout(aContent);
-  aMainLay->setContentsMargins(3, 3, 3, 3);
-  aPropPanel->setWidget(aContent);
-
-  QWidget* aCustomWidget = new QWidget(aContent);
-  aCustomWidget->setObjectName("PropertyPanelWidget");
-  aMainLay->addWidget(aCustomWidget);
-
-  /*
-  QWidget* aNameWgt = new QWidget(aContent);
-  QHBoxLayout* aNameLay = new QHBoxLayout(aNameWgt);
-  aNameLay->setContentsMargins(0,0,0,0);
-  aMainLay->addWidget(aNameWgt);
-
-  aNameLay->addWidget(new QLabel("Name", aNameWgt));
-  aNameLay->addWidget(new QLineEdit(aNameWgt));
-  */
-
-/* Moved into PartSetModule by sbh
-  QComboBox* aCombo = new QComboBox(aContent);
-  aCombo->addItem("By coordinates");
-  aMainLay->addWidget(aCombo);
-
-  QWidget* aGrpBox1 = new QWidget(aContent);
-  QFormLayout* aFrmLay = new QFormLayout(aGrpBox1);
-  aFrmLay->setContentsMargins(0, 6, 0, 0);
-  aMainLay->addWidget(aGrpBox1);
-
-  QLabel* aLbl = new QLabel(aGrpBox1);
-  aLbl->setPixmap(QPixmap(":pictures/x_point.png"));
-  aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
-
-  aLbl = new QLabel(aGrpBox1);
-  aLbl->setPixmap(QPixmap(":pictures/y_point.png"));
-  aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
-
-  aLbl = new QLabel(aGrpBox1);
-  aLbl->setPixmap(QPixmap(":pictures/z_point.png"));
-  aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
-  */
-
-  /*
-  aGrpBox1 = new QGroupBox("Normal vector", aContent);
-  aGrpBox1->setFlat(true);
-  aFrmLay = new QFormLayout(aGrpBox1);
-  aFrmLay->setContentsMargins(0, 6, 0, 0);
-  aMainLay->addWidget(aGrpBox1);
-
-  aLbl = new QLabel(aGrpBox1);
-  aLbl->setPixmap(QPixmap(":pictures/x_size.png"));
-  aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
-
-  aLbl = new QLabel(aGrpBox1);
-  aLbl->setPixmap(QPixmap(":pictures/y_size.png"));
-  aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
-
-  aLbl = new QLabel(aGrpBox1);
-  aLbl->setPixmap(QPixmap(":pictures/z_size.png"));
-  aFrmLay->addRow(aLbl, new QDoubleSpinBox(aGrpBox1));
-  */
-
-  aMainLay->addStretch(1);
-
-  QFrame* aFrm = new QFrame(aContent);
-  aFrm->setFrameStyle(QFrame::Sunken);
-  aFrm->setFrameShape(QFrame::Panel);
-  QHBoxLayout* aBtnLay = new QHBoxLayout(aFrm);
-  aBtnLay->setContentsMargins(0, 0, 0, 0);
-  aMainLay->addWidget(aFrm);
-
-  QPushButton* aBtn = new QPushButton(QIcon(":pictures/button_help.png"), "", aFrm);
-  aBtn->setFlat(true);
-  aBtnLay->addWidget(aBtn);
-  aBtnLay->addStretch(1);
-  aBtn = new QPushButton(QIcon(":pictures/button_ok.png"), "", aFrm);
-  aBtn->setFlat(true);
-  aBtnLay->addWidget(aBtn);
-  aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
-  aBtn->setFlat(true);
-  aBtnLay->addWidget(aBtn);
-
-  addDockWidget(Qt::RightDockWidgetArea, aPropPanel);
 }

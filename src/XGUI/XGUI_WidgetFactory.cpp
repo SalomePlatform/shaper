@@ -14,6 +14,7 @@
 #include <QSpinBox>
 #include <QMetaProperty>
 #include <QLabel>
+#include <QPixmap>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -36,6 +37,7 @@ void XGUI_WidgetFactory::fillWidget(QWidget* theParent)
   }
 
   QVBoxLayout* aWidgetLay = new QVBoxLayout(theParent);
+  aWidgetLay->setContentsMargins(0, 0, 0, 0);
   do {
     std::string aWdgType = myWidgetApi->widgetType();
     QWidget* aWidget = NULL;
@@ -50,7 +52,6 @@ void XGUI_WidgetFactory::fillWidget(QWidget* theParent)
       aWidgetLay->addWidget(aWidget);
     }
   } while(myWidgetApi->nextWidget());
-  aWidgetLay->addStretch(1);
   theParent->setLayout(aWidgetLay);
 }
 
@@ -58,8 +59,12 @@ QWidget* XGUI_WidgetFactory::valueWidget()
 {
   QWidget* result = new QWidget();
   QHBoxLayout* aControlLay = new QHBoxLayout(result);
-  QString aLabelVal = qs(myWidgetApi->getProperty("label"));
-  QLabel* aLabel = new QLabel(aLabelVal);
+  aControlLay->setContentsMargins(0, 0, 0, 0);
+  QString aLabelText = qs(myWidgetApi->widgetLabel());
+  QString aLabelIcon = qs(myWidgetApi->widgetIcon());
+  QLabel* aLabel = new QLabel(aLabelText);
+  aLabel->setPixmap(QPixmap(aLabelIcon));
+
   aControlLay->addWidget(aLabel);
   QDoubleSpinBox* aBox = new QDoubleSpinBox(result);
   bool isOk = false;
@@ -79,8 +84,10 @@ QWidget* XGUI_WidgetFactory::valueWidget()
   if (isOk) {
     aBox->setValue(aDefVal);
   }
+  QString aTTip = qs(myWidgetApi->widgetTooltip());
+  aBox->setToolTip(aTTip);
   aControlLay->addWidget(aBox);
-  aControlLay->addStretch();
+  aControlLay->setStretch(1, 1);
 
   result->setLayout(aControlLay);
   return result;

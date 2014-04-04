@@ -29,12 +29,13 @@ void Config_WidgetAPI::reset()
   if(aRoot) {
     myCurrentNode = aRoot->children;
   }
-
 }
 
 bool Config_WidgetAPI::nextWidget()
 {
-  myCurrentNode = myCurrentNode->next;
+  if(myCurrentNode) {
+    myCurrentNode = myCurrentNode->next;
+  }
   return myCurrentNode != NULL;
 }
 
@@ -55,6 +56,21 @@ std::string Config_WidgetAPI::getProperty(const char* thePropName)
     return result;
   result = std::string(aPropChars);
   return result;
+}
+
+std::string Config_WidgetAPI::widgetTooltip()
+{
+  return getProperty("tooltip");
+}
+
+std::string Config_WidgetAPI::widgetIcon()
+{
+  return getProperty("icon");
+}
+
+std::string Config_WidgetAPI::widgetLabel()
+{
+  return getProperty("label");
 }
 
 bool Config_WidgetAPI::isNode(xmlNodePtr theNode, const char* theNodeName, ...)
