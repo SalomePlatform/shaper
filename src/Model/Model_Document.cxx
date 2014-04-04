@@ -8,6 +8,7 @@
 #include <Model_Application.h>
 #include <Model_PluginManager.h>
 #include <Model_Iterator.h>
+#include <Event_Loop.h>
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
@@ -163,6 +164,12 @@ void Model_Document::addFeature(
   setUniqueName(theFeature, theGroupID);
   theFeature->initAttributes();
   TDataStd_Comment::Set(anObjLab, theFeature->getKind().c_str());
+
+  // event: model is updated
+  static Event_ID anEvent = Event_Loop::eventByName(EVENT_MODEL_UPDATED);
+  Event_Message anUpdateMsg(anEvent, this);
+  Event_Loop::loop()->send(anUpdateMsg);
+
 }
 
 std::shared_ptr<ModelAPI_Feature> Model_Document::feature(TDF_Label& theLabel)
