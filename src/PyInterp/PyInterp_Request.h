@@ -15,7 +15,8 @@ class PyInterp_Dispatcher;
 class PyInterp_ExecuteEvent;
 class PyConsole_Editor;
 
-class PYINTERP_EXPORT PyInterp_Request
+// PYINTERP_EXPORT
+class PyInterp_Request
 {
   friend class PyInterp_Dispatcher;
   friend class PyInterp_ExecuteEvent;
@@ -61,7 +62,8 @@ private:
   QObject*        myListener;
 };
 
-class PYINTERP_EXPORT PyInterp_LockRequest : public PyInterp_Request
+//PYINTERP_EXPORT
+class PyInterp_LockRequest : public PyInterp_Request
 {
 public:
 

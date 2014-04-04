@@ -18,6 +18,9 @@ SET(PROJECT_HEADERS
 	XGUI_RubberBand.h
 	XGUI_Constants.h
 	XGUI_ViewBackground.h
+	XGUI_DocumentDataModel.h
+	XGUI_DataModel.h
+	XGUI_ObjectsBrowser.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -38,6 +41,9 @@ SET(PROJECT_SOURCES
     XGUI_Viewer.cpp
 	XGUI_RubberBand.cpp
 	XGUI_ViewBackground.cpp
+	XGUI_DocumentDataModel.cpp
+	XGUI_DataModel.cpp
+	XGUI_ObjectsBrowser.cpp
 )
 
 SET(PROJECT_RESOURCES 
@@ -58,6 +64,7 @@ SET(PROJECT_LIBRARIES
 	PyConsole
 	PyInterp
 	PyEvent
+	ModelAPI
 )
 
 QT5_ADD_RESOURCES(PROJECT_COMPILED_RESOURCES ${PROJECT_RESOURCES})
@@ -72,6 +79,7 @@ INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/src/Event
 					 ${PROJECT_SOURCE_DIR}/src/Config
 					 ${PROJECT_SOURCE_DIR}/src/PyInterp
 					 ${PROJECT_SOURCE_DIR}/src/PyConsole
+					 ${PROJECT_SOURCE_DIR}/src/ModelAPI
 					 ${CAS_INCLUDE_DIRS})
 
 LINK_DIRECTORIES($ENV{PYTHON_LIB_DIR})
@@ -83,6 +91,8 @@ ADD_EXECUTABLE(XGUI WIN32
 	${TEXT_RESOURCES} 
 	${QM_RESOURCES}
 )
+
+ADD_DEPENDENCIES(XGUI ModelAPI)
 
 # The Qt5Widgets_LIBRARIES variable also includes QtGui and QtCore
 TARGET_LINK_LIBRARIES(XGUI ${PROJECT_LIBRARIES})

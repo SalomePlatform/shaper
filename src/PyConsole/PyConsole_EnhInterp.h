@@ -15,7 +15,8 @@
  * Enhanced Python interpreter used for auto-completion.
  * This extends PyConsole_Interp with an API wrapping the Python dir() command nicely.
  */
-class PYCONSOLE_EXPORT PyConsole_EnhInterp: public PyConsole_Interp
+//PYCONSOLE_EXPORT
+class PyConsole_EnhInterp: public PyConsole_Interp
 {
 public:
   PyConsole_EnhInterp()

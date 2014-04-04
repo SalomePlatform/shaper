@@ -2,6 +2,7 @@
 #include "XGUI_MainMenu.h"
 #include "XGUI_ViewWindow.h"
 #include "XGUI_Viewer.h"
+#include "XGUI_ObjectsBrowser.h"
 
 #include <PyConsole_Console.h>
 #include <PyConsole_EnhInterp.h>
@@ -34,9 +35,10 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
   QDockWidget* aDoc = new QDockWidget(this);
   aDoc->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   aDoc->setWindowTitle(tr("OBJECT_BROWSER_TITLE"));
-  myObjectBrowser = new QTreeWidget(aDoc);
-  myObjectBrowser->setColumnCount(1);
-  myObjectBrowser->setHeaderHidden(true);
+
+  myObjectBrowser = new XGUI_ObjectsBrowser(aDoc);
+  //myObjectBrowser->setColumnCount(1);
+  //myObjectBrowser->setHeaderHidden(true);
   aDoc->setWidget(myObjectBrowser);
   addDockWidget(Qt::LeftDockWidgetArea, aDoc);
   //aDoc->hide();
@@ -107,7 +109,7 @@ void XGUI_MainWindow::hidePythonConsole()
 // TEST FUNCTIONS
 
 //******************************************************
-void XGUI_MainWindow::fillObjectBrowser()
+/*void XGUI_MainWindow::fillObjectBrowser()
 {
   QStringList aNames;
   aNames << "Parameters" << "Constructions";
@@ -151,7 +153,7 @@ void XGUI_MainWindow::fillObjectBrowser()
     aItem->setText(0, "Features");
     aItem->setIcon(0, QIcon(":pictures/features.png"));
   }
-}
+}*/
 
 void XGUI_MainWindow::addPropertyPanel()
 {
