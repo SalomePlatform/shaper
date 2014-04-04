@@ -55,6 +55,7 @@ QVariant XGUI_DocumentDataModel::headerData(int section, Qt::Orientation orienta
 int XGUI_DocumentDataModel::rowCount(const QModelIndex &parent) const
 {
   std::shared_ptr<ModelAPI_Iterator> aIt = myDocument->featuresIterator(PARTS_GROUP);
+  int a = aIt->numIterationsLeft();
   return aIt->numIterationsLeft() + 2;
 }
 
@@ -96,7 +97,5 @@ bool XGUI_DocumentDataModel::hasChildren(const QModelIndex& theParent) const
     return myDocument->featuresIterator(PARAMETERS_GROUP)->more();
   if (theParent.internalId() == quintptr(&myConstructFolder))
     return myDocument->featuresIterator(CONSTRUCTIONS_GROUP)->more();
-  if (theParent.internalId() == 0)
-    return false;
   return false;
 }

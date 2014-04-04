@@ -8,6 +8,9 @@
 #include "XGUI_Workshop.h"
 #include "XGUI_Viewer.h"
 
+#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Feature.h>
+
 #include <Config_FeatureMessage.h>
 #include <Event_Loop.h>
 
@@ -53,6 +56,9 @@ void XGUI_Workshop::startApplication()
   QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
   aWnd->showMaximized();
   myMainWindow->showPythonConsole();
+
+  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  std::shared_ptr<ModelAPI_Feature> myRoot = aMgr->createFeature("Point");
 }
 
 //******************************************************
