@@ -34,6 +34,9 @@ public:
   /// Don't changes the current position of iterator. Not fast: iterates the left items.
   /// \returns number of left iterations
   virtual int numIterationsLeft() = 0;
+  /// Compares the current feature with the given one
+  /// \returns true if given feature equals to the current one
+  virtual bool is(std::shared_ptr<ModelAPI_Feature> theFeature) = 0;
 
 protected:
   /// Use plugin manager for features creation: this method is 

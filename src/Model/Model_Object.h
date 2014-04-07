@@ -19,15 +19,20 @@ class ModelAPI_Attribute;
  * to get/set attributes from the document and compute result of an operation.
  */
 
-class Model_Object: public ModelAPI_Object
+class MODEL_EXPORT Model_Object: public ModelAPI_Object
 {
   TDF_Label myLab; ///< label of the feature in the document
   /// All attributes of the object identified by the attribute ID
   std::map<std::string, std::shared_ptr<ModelAPI_Attribute> > myAttrs;
 
+  std::shared_ptr<ModelAPI_Document> myDoc; ///< document this feature belongs to
+
   Model_Object();
 
+  TDF_Label label() {return myLab;}
+
   friend class Model_Document;
+  friend class Model_Iterator;
 
 public:
   /// Returns the name of the feature visible by the user in the object browser
@@ -45,8 +50,14 @@ public:
   /// \param theAttrType type of the created attribute (received from the type method)
   virtual void addAttribute(std::string theID, std::string theAttrType);
 
+  /// Returns the document of this data
+  virtual std::shared_ptr<ModelAPI_Document> document() {return myDoc;}
+
   /// Puts feature to the document data sub-structure
   void setLabel(TDF_Label& theLab);
+
+  /// Sets the document of this data
+  virtual void setDocument(const std::shared_ptr<ModelAPI_Document>& theDoc) {myDoc = theDoc;}
 };
 
 #endif

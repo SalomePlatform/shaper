@@ -11,6 +11,7 @@
 
 class ModelAPI_AttributeDocRef;
 class ModelAPI_AttributeDouble;
+class ModelAPI_Document;
 
 /**\class ModelAPI_Object
  * \ingroup DataModel
@@ -38,6 +39,9 @@ public:
   /// \param theID identifier of the attribute that can be referenced by this ID later
   /// \param theAttrType type of the created attribute (received from the type method)
   virtual void addAttribute(std::string theID, std::string theAttrType) = 0;
+
+  /// Returns the document of this data
+  virtual std::shared_ptr<ModelAPI_Document> document() = 0;
 
 protected:
   /// Objects are created for features automatically

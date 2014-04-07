@@ -27,10 +27,6 @@ class Model_PluginManager : public ModelAPI_PluginManager, public Event_Listener
   std::string myCurrentPluginName; ///< name of the plugin that must be loaded currently
   std::shared_ptr<ModelAPI_Document> myCurrentDoc; ///< current working document
 public:
-  /// Creates the feature object using plugins functionality
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> createFeature(
-    std::string theFeatureID, const bool theAddToDoc = true);
-
   /// Returns the root document of the application (that may contains sub-documents)
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> rootDocument();
 
@@ -51,9 +47,12 @@ public:
   /// Is called only once, on startup of the application
   Model_PluginManager();
 
-private:
+protected:
   /// Loads (if not done yet) the information about the features and plugins
   void LoadPluginsInfo();
+
+  /// Creates the feature object using plugins functionality
+  virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
 };
 
 #endif
