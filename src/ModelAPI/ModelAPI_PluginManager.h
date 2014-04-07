@@ -23,10 +23,6 @@ class ModelAPI_Document;
 class MODELAPI_EXPORT ModelAPI_PluginManager
 {
 public:
-  /// Creates the feature object using plugins functionality
-  virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID,
-    const bool theAddToDoc = true) = 0;
-
   /// Returns the real implementation (the alone instance per application) of the plugin manager
   static std::shared_ptr<ModelAPI_PluginManager> get();
 
@@ -51,7 +47,12 @@ public:
   ModelAPI_PluginManager();
 
 protected:
+  /// Creates the feature object using plugins functionality
+  virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
+
   static void SetPluginManager(std::shared_ptr<ModelAPI_PluginManager> theManager);
+
+  friend class Model_Document;
 };
 
 #endif

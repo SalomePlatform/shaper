@@ -153,39 +153,62 @@ void Model_Document::redo()
   myTransactionsAfterSave++;
 }
 
-void Model_Document::addFeature(
-  std::shared_ptr<ModelAPI_Feature> theFeature, const std::string theGroupID)
+shared_ptr<ModelAPI_Feature> Model_Document::addFeature(string theID)
 {
-  TDF_Label aGroupLab = groupLabel(theGroupID);
+  shared_ptr<ModelAPI_Feature> aFeature = ModelAPI_PluginManager::get()->createFeature(theID);
+  if (aFeature) {
+    dynamic_pointer_cast<Model_Document>(aFeature->documentToAdd())->addFeature(aFeature);
+  } else {
+    // TODO: generate error that feature is not created
+  }
+  return aFeature;
+}
+
+void Model_Document::addFeature(const std::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  TDF_Label aGroupLab = groupLabel(theFeature->getGroup());
   TDF_Label anObjLab = aGroupLab.NewChild();
   std::shared_ptr<Model_Object> aData(new Model_Object);
   aData->setLabel(anObjLab);
+  aData->setDocument(Model_Application::getApplication()->getDocument(myID));
   theFeature->setData(aData);
-  setUniqueName(theFeature, theGroupID);
+  setUniqueName(theFeature);
   theFeature->initAttributes();
+  // keep the feature ID to restore document later correctly
   TDataStd_Comment::Set(anObjLab, theFeature->getKind().c_str());
 
   // event: model is updated
   static Event_ID anEvent = Event_Loop::eventByName(EVENT_MODEL_UPDATED);
   Event_Message anUpdateMsg(anEvent, this);
   Event_Loop::loop()->send(anUpdateMsg);
-
 }
 
-std::shared_ptr<ModelAPI_Feature> Model_Document::feature(TDF_Label& theLabel)
+shared_ptr<ModelAPI_Feature> Model_Document::feature(TDF_Label& theLabel)
 {
   Handle(TDataStd_Comment) aFeatureID;
   if (theLabel.FindAttribute(TDataStd_Comment::GetID(), aFeatureID)) {
     string anID(TCollection_AsciiString(aFeatureID->Get()).ToCString());
     std::shared_ptr<ModelAPI_Feature> aResult = 
-      Model_PluginManager::get()->createFeature(anID, false);
+      Model_PluginManager::get()->createFeature(anID);
     std::shared_ptr<Model_Object> aData(new Model_Object);
     aData->setLabel(theLabel);
+    aData->setDocument(Model_Application::getApplication()->getDocument(myID));
     aResult->setData(aData);
     aResult->initAttributes();
     return aResult;
   }
   return std::shared_ptr<ModelAPI_Feature>(); // not found
+}
+
+int Model_Document::featureIndex(shared_ptr<ModelAPI_Feature> theFeature)
+{
+  if (theFeature->data()->document().get() != this)
+    return theFeature->data()->document()->featureIndex(theFeature);
+  shared_ptr<ModelAPI_Iterator> anIter(featuresIterator(theFeature->getGroup()));
+  for(int anIndex = 0; anIter->more(); anIter->next(), anIndex++)
+    if (anIter->is(theFeature)) 
+      return anIndex;
+  return -1; // not found
 }
 
 shared_ptr<ModelAPI_Document> Model_Document::subDocument(string theDocID)
@@ -229,11 +252,11 @@ TDF_Label Model_Document::groupLabel(const string theGroup)
 }
 
 void Model_Document::setUniqueName(
-  shared_ptr<ModelAPI_Feature> theFeature, const string theGroupID)
+  shared_ptr<ModelAPI_Feature> theFeature)
 {
   // first count all objects of such kind to start with index = count + 1
   int aNumObjects = 0;
-  shared_ptr<ModelAPI_Iterator> anIter = featuresIterator(theGroupID);
+  shared_ptr<ModelAPI_Iterator> anIter = featuresIterator(theFeature->getGroup());
   for(; anIter->more(); anIter->next()) {
     if (anIter->currentKind() == theFeature->getKind())
       aNumObjects++;
@@ -243,13 +266,13 @@ void Model_Document::setUniqueName(
   aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
   string aName = aNameStream.str();
   // check this is unique, if not, increase index by 1
-  for(anIter = featuresIterator(theGroupID); anIter->more();) {
+  for(anIter = featuresIterator(theFeature->getGroup()); anIter->more();) {
     if (anIter->currentName() == aName) {
       aNumObjects++;
       stringstream aNameStream;
       aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
       // reinitialize iterator to make sure a new name is unique
-      anIter = featuresIterator(theGroupID);
+      anIter = featuresIterator(theFeature->getGroup());
     } else anIter->next();
   }
 

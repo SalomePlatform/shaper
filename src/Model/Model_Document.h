@@ -59,11 +59,9 @@ public:
   //! Redoes last operation
   MODEL_EXPORT void redo();
 
-  //! Adds to the document the new feature of the given group id
-  //! \param theFeature a feature object that will be connected to the document in this method
-  //! \param theGroupID identifier of the groups of objects (must be greater than zero)
-  MODEL_EXPORT virtual void addFeature(std::shared_ptr<ModelAPI_Feature> theFeature,
-    const std::string theGroupID);
+  //! Adds to the document the new feature of the given feature id
+  //! \param creates feature and puts it in the document
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
 
   //! Returns the existing feature by the label
   //! \param theLabel base label of the feature
@@ -85,6 +83,10 @@ public:
   ///! Returns the vector of groups already added to the document
   MODEL_EXPORT virtual const std::vector<std::string>& getGroups() const;
 
+  //! Returns the index of feature in the group (zero based)
+  //! \retruns -1 if not found
+  MODEL_EXPORT virtual int featureIndex(std::shared_ptr<ModelAPI_Feature> theFeature);
+
 protected:
 
   //! Returns (creates if needed) the group label
@@ -92,8 +94,10 @@ protected:
 
   //! Initializes feature with a unique name in this group (unique name is generated as 
   //! feature type + "_" + index
-  void setUniqueName(
-    std::shared_ptr<ModelAPI_Feature> theFeature, const std::string theGroupID);
+  void setUniqueName(std::shared_ptr<ModelAPI_Feature> theFeature);
+
+  //! Adds to the document the new feature
+  void addFeature(const std::shared_ptr<ModelAPI_Feature> theFeature);
 
   //! Creates new document with binary file format
   Model_Document(const std::string theID);

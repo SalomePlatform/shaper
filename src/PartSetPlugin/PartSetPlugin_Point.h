@@ -23,7 +23,12 @@ class PartSetPlugin_Point: public ModelAPI_Feature
 {
 public:
   /// Returns the kind of a feature
-  PARTSETPLUGIN_EXPORT virtual std::string getKind() {return "Point";}
+  PARTSETPLUGIN_EXPORT virtual const std::string& getKind() 
+  {static std::string MY_KIND = "Point"; return MY_KIND;}
+
+  /// Returns to which group in the document must be added feature
+  PARTSETPLUGIN_EXPORT virtual const std::string& getGroup() 
+  {static std::string MY_GROUP = "Construction"; return MY_GROUP;}
 
   /// Creates a new part document if needed
   PARTSETPLUGIN_EXPORT virtual void execute();

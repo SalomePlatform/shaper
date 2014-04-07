@@ -22,8 +22,7 @@ static const std::string CONSTRUCTIONS_GROUP = "Construction";
 static const std::string PARTS_GROUP = "Parts";
 
 /// Event ID that model is updated
-static const char* EVENT_MODEL_UPDATED = "ModelUpdated";
-
+static const char * EVENT_MODEL_UPDATED = "ModelUpdated";
 
 /**\class Model_Document
  * \ingroup DataModel
@@ -70,11 +69,9 @@ public:
   //! Redoes last operation
   MODELAPI_EXPORT virtual void redo() = 0;
 
-  //! Adds to the document the new feature of the given group id
-  //! \param theFeature a feature object that will be connected to the document in this method
-  //! \param theGroupID identifier of the groups of object
-  MODELAPI_EXPORT virtual void addFeature(std::shared_ptr<ModelAPI_Feature> theFeature,
-    const std::string theGroupID) = 0;
+  //! Adds to the document the new feature of the given feature id
+  //! \param creates feature and puts it in the document
+  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
 
   ///! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID) = 0;
@@ -90,15 +87,16 @@ public:
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Feature> 
     feature(const std::string& theGroupID, const int theIndex) = 0;
 
+  //! Returns the index of feature in the group (zero based)
+  MODELAPI_EXPORT virtual int featureIndex(std::shared_ptr<ModelAPI_Feature> theFeature) = 0;
+
   ///! Returns the vector of groups already added to the document
   MODELAPI_EXPORT virtual const std::vector<std::string>& getGroups() const = 0;
 
 protected:
   /// Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document()
-  {
-  }
-  ;
+  {}
 };
 
 #endif

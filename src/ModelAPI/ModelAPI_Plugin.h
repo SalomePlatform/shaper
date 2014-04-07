@@ -20,8 +20,7 @@ class MODELAPI_EXPORT ModelAPI_Plugin
 {
 public:
   /// Creates the feature object of this plugin by the feature string ID
-  virtual std::shared_ptr<ModelAPI_Feature> createFeature(
-    std::string theFeatureID, const bool theAddToDoc) = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
 
 protected:
   /// Is needed for python wrapping by swig
