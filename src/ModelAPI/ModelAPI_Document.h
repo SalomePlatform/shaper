@@ -8,6 +8,7 @@
 #include <ModelAPI.h>
 #include <string>
 #include <memory>
+#include <vector>
 
 class ModelAPI_Feature;
 class ModelAPI_Iterator;
@@ -88,6 +89,9 @@ public:
   //! Returns the feature in the group by the index (started from zero)
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Feature> 
     feature(const std::string& theGroupID, const int theIndex) = 0;
+
+  ///! Returns the vector of groups already added to the document
+  MODELAPI_EXPORT virtual const std::vector<std::string>& getGroups() const = 0;
 
 protected:
   /// Only for SWIG wrapping it is here
