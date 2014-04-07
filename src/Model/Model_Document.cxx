@@ -207,6 +207,11 @@ shared_ptr<ModelAPI_Feature> Model_Document::feature(const string& theGroupID, c
   return anIter->current();
 }
 
+const vector<string>& Model_Document::getGroups() const
+{
+  return myGroupsNames;
+}
+
 Model_Document::Model_Document(const std::string theID)
     : myID(theID), myDoc(new TDocStd_Document("BinOcaf")) // binary OCAF format
 {
@@ -218,6 +223,7 @@ TDF_Label Model_Document::groupLabel(const string theGroup)
 {
   if (myGroups.find(theGroup) == myGroups.end()) {
     myGroups[theGroup] = myDoc->Main().FindChild(TAG_OBJECTS).NewChild();
+    myGroupsNames.push_back(theGroup);
   }
   return myGroups[theGroup];
 }

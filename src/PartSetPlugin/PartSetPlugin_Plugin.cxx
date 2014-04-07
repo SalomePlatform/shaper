@@ -20,11 +20,14 @@ std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Plugin::createFeature(
 {
   std::shared_ptr<ModelAPI_Feature> aCreated;
   bool isCurrent = true; // to create a feature in the current document
+  std::string aGroup;
   if (theFeatureID == "Part") {
     aCreated = std::shared_ptr<ModelAPI_Feature>(new PartSetPlugin_Part);
     isCurrent = false; // allways create in the root document
+    aGroup = PARTS_GROUP;
   } else if (theFeatureID == "Point") {
     aCreated = std::shared_ptr<ModelAPI_Feature>(new PartSetPlugin_Point);
+    aGroup = CONSTRUCTIONS_GROUP;
   }
 
   // add to a root document for the current moment
@@ -32,7 +35,7 @@ std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Plugin::createFeature(
     shared_ptr<ModelAPI_Document> aDoc = isCurrent ? 
       ModelAPI_PluginManager::get()->currentDocument() :
       ModelAPI_PluginManager::get()->rootDocument();
-    aDoc->addFeature(aCreated, PARTS_GROUP);
+    aDoc->addFeature(aCreated, aGroup);
   }
   // feature of such kind is not found
   return aCreated;

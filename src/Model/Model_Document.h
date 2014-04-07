@@ -82,6 +82,9 @@ public:
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> 
     feature(const std::string& theGroupID, const int theIndex);
 
+  ///! Returns the vector of groups already added to the document
+  MODEL_EXPORT virtual const std::vector<std::string>& getGroups() const;
+
 protected:
 
   //! Returns (creates if needed) the group label
@@ -102,6 +105,7 @@ private:
   Handle_TDocStd_Document myDoc; ///< OCAF document
   int myTransactionsAfterSave; ///< number of transactions after the last "save" call, used for "IsModified" method
   std::map<std::string, TDF_Label> myGroups; ///< root labels of the features groups identified by names
+  std::vector<std::string> myGroupsNames; ///< names of added groups to the document
 };
 
 #endif
