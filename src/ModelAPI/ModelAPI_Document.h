@@ -21,9 +21,6 @@ static const std::string CONSTRUCTIONS_GROUP = "Construction";
 /// Group of parts
 static const std::string PARTS_GROUP = "Parts";
 
-/// Event ID that model is updated
-static const char * EVENT_MODEL_UPDATED = "ModelUpdated";
-
 /**\class Model_Document
  * \ingroup DataModel
  * \brief Document for internal data structure of any object storage. Corresponds to the SALOME study.

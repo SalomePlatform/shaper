@@ -7,6 +7,7 @@
 
 #include "ModelAPI.h"
 #include "ModelAPI_PluginManager.h"
+
 #include <string>
 #include <memory>
 
@@ -18,7 +19,6 @@ class ModelAPI_Document;
  * \brief Functionality of the model object: to update result,
  * to initialize attributes, etc.
  */
-
 class MODELAPI_EXPORT ModelAPI_Feature
 {
   std::shared_ptr<ModelAPI_Object> myData; ///< manager of the data model of a feature

@@ -178,9 +178,9 @@ void Model_Document::addFeature(const std::shared_ptr<ModelAPI_Feature> theFeatu
   TDataStd_Comment::Set(anObjLab, theFeature->getKind().c_str());
 
   // event: model is updated
-  static Event_ID anEvent = Event_Loop::eventByName(EVENT_MODEL_UPDATED);
-  Event_Message anUpdateMsg(anEvent, this);
-  Event_Loop::loop()->send(anUpdateMsg);
+  static Event_ID anEvent = Event_Loop::eventByName(EVENT_FEATURE_UPDATED);
+  ModelAPI_FeatureUpdatedMessage aMsg(theFeature);
+  Event_Loop::loop()->send(aMsg);
 }
 
 shared_ptr<ModelAPI_Feature> Model_Document::feature(TDF_Label& theLabel)
@@ -277,4 +277,21 @@ void Model_Document::setUniqueName(
   }
 
   theFeature->data()->setName(aName);
+}
+
+
+ModelAPI_FeatureUpdatedMessage::ModelAPI_FeatureUpdatedMessage(
+  shared_ptr<ModelAPI_Feature> theFeature)
+  : Event_Message(messageId(), 0), myFeature(theFeature)
+{}
+
+const Event_ID ModelAPI_FeatureUpdatedMessage::messageId()
+{
+  static Event_ID MY_ID = Event_Loop::eventByName("FeatureUpdated");
+  return MY_ID;
+}
+
+shared_ptr<ModelAPI_Feature> ModelAPI_FeatureUpdatedMessage::feature()
+{
+  return myFeature;
 }
