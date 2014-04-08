@@ -19,8 +19,10 @@ XGUI_MenuGroupPanel::XGUI_MenuGroupPanel(QWidget *parent)
 
 void XGUI_MenuGroupPanel::addCommand(XGUI_Command* theAction)
 {
-  myActions[theAction] = theAction->requestWidget(this);
-  addWidget(myActions[theAction]);
+  myActions.append(theAction);
+  QWidget* aWdg = theAction->requestWidget(this);
+  myActionWidget.append(aWdg);
+  addWidget(aWdg);
 }
 
 void XGUI_MenuGroupPanel::placeWidget(QWidget* theWgt)
@@ -50,11 +52,10 @@ void XGUI_MenuGroupPanel::resizeEvent(QResizeEvent* theEvent)
     return;
 
   myMaxRow = aMaxRow;
-  QListIterator<QWidget*> aIt(myActions.values());
   myNewRow = 0;
   myNewCol = 0;
-  while(aIt.hasNext()) {
-    placeWidget(aIt.next());
+  foreach(QWidget* eachWidget, myActionWidget) {
+    placeWidget(eachWidget);
   }
 }
 
