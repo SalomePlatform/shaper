@@ -1,4 +1,5 @@
 #include "XGUI_Module.h"
+#include "XGUI_Constants.h"
 #include "XGUI_Command.h"
 #include "XGUI_MainMenu.h"
 #include "XGUI_MainWindow.h"
@@ -8,9 +9,9 @@
 #include "XGUI_Workshop.h"
 #include "XGUI_Viewer.h"
 #include "XGUI_WidgetFactory.h"
-#include "ModuleBase_Operation.h"
 
 #include <Event_Loop.h>
+#include <ModuleBase_Operation.h>
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
 
@@ -19,6 +20,7 @@
 #include <QMessageBox>
 #include <QMdiSubWindow>
 #include <QPushButton>
+#include <QDockWidget>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -123,7 +125,14 @@ void XGUI_Workshop::processEvent(const Event_Message* theMessage)
   const Config_PointerMessage* aPartSetMsg =
       dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
-    fillPropertyPanel(aPartSetMsg);
+    ModuleBase_Operation* aOperation = (ModuleBase_Operation*)(aPartSetMsg->pointer());
+    setCurrentOperation(aOperation);
+    if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
+      myCurrentOperation->start();
+      myCurrentOperation->commit();
+    } else {
+      fillPropertyPanel(aOperation);
+    }
     return;
   }
 
@@ -172,29 +181,40 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
 /*
  *
  */
-void XGUI_Workshop::fillPropertyPanel(const Config_PointerMessage* theMessage)
+void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_Operation* anOperation = (ModuleBase_Operation*)(theMessage->pointer());
-  connectToPropertyPanel(anOperation);
-  QWidget* aPropWidget = myMainWindow->findChild<QWidget*>("property_panel_widget");
+  connectToPropertyPanel(theOperation);
+  QWidget* aPropWidget = myMainWindow->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
   qDeleteAll(aPropWidget->children());
-  anOperation->start();
-  XGUI_WidgetFactory aFactory = XGUI_WidgetFactory(anOperation);
+  theOperation->start();
+  XGUI_WidgetFactory aFactory = XGUI_WidgetFactory(theOperation);
   aFactory.fillWidget(aPropWidget);
 }
 
-void XGUI_Workshop::connectToPropertyPanel(ModuleBase_Operation* theOperation)
+void XGUI_Workshop::setCurrentOperation(ModuleBase_Operation* theOperation)
 {
-  if(myCurrentOperation) {
-    //FIXME: Ask user about aborting of current operation?
-    myCurrentOperation->abort();
+  //FIXME: Ask user about aborting of current operation?
+  if (myCurrentOperation) {
+    //TODO get isOperation from document
+    if (myCurrentOperation->isRunning())
+      myCurrentOperation->abort();
+
     myCurrentOperation->deleteLater();
   }
   myCurrentOperation = theOperation;
+}
 
-  QPushButton* aOkBtn = myMainWindow->findChild<QPushButton*>("property_panel_ok");
+/*
+ * Makes a signal/slot connections between Property Panel
+ * and given operation. The given operation becomes a
+ * current operation and previous operation if exists
+ */
+void XGUI_Workshop::connectToPropertyPanel(ModuleBase_Operation* theOperation)
+{
+  QDockWidget* aPanel = myMainWindow->findChild<QDockWidget*>(XGUI::PROP_PANEL);
+  QPushButton* aOkBtn = aPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
   connect(aOkBtn, SIGNAL(clicked()), theOperation, SLOT(commit()));
-  QPushButton* aCancelBtn = myMainWindow->findChild<QPushButton*>("property_panel_cancel");
+  QPushButton* aCancelBtn = aPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
   connect(aCancelBtn, SIGNAL(clicked()), theOperation, SLOT(abort()));
 
   connect(theOperation, SIGNAL(started()), myMainWindow, SLOT(showPropertyPanel()));

@@ -47,9 +47,9 @@ public slots:
 protected:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
-  void fillPropertyPanel(const Config_PointerMessage*);
-
+  void fillPropertyPanel(ModuleBase_Operation* theOperation);
   void connectToPropertyPanel(ModuleBase_Operation* theOperation);
+  void setCurrentOperation(ModuleBase_Operation* theOperation);
 
 private:
   void initMenu();

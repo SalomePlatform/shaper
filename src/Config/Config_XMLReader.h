@@ -54,6 +54,7 @@ protected:
    * TODO(sbh): find a way to simplify calling this method.
    */
   bool isNode(xmlNodePtr theNode, const char* name, ...);
+  bool hasChild(xmlNodePtr theNode);
 
 protected:
   std::string myDocumentPath;
