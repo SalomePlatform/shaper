@@ -13,6 +13,10 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_PluginManager.h>
 
+#ifdef _DEBUG
+#include <QDebug>
+#endif
+
 /*!
  \brief Constructor
  \param XGUI_Workshop - workshop for this operation
@@ -29,7 +33,6 @@ ModuleBase_Operation::ModuleBase_Operation(const QString& theId, QObject* parent
       myExecStatus(Rejected),
       myOperationId(theId)
 {
-  myFeature = ModelAPI_PluginManager::get()->createFeature(theId.toStdString());
 }
 
 /*!
@@ -251,6 +254,13 @@ void ModuleBase_Operation::commit()
  */
 void ModuleBase_Operation::storeReal(double theValue)
 {
+  if(!myFeature){
+    #ifdef _DEBUG
+    qDebug() << "ModuleBase_Operation::storeReal: " <<
+        "trying to store value without opening a transaction.";
+    #endif
+    return;
+  }
   QString anId = sender()->objectName();
   std::shared_ptr<ModelAPI_Object> aData = myFeature->data();
   std::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(anId.toStdString());
@@ -276,6 +286,7 @@ bool ModuleBase_Operation::isReadyToStart() const
  */
 void ModuleBase_Operation::startOperation()
 {
+  myFeature = ModelAPI_PluginManager::get()->createFeature(myOperationId.toStdString());
   //emit callSlot();
   //commit();
 }
