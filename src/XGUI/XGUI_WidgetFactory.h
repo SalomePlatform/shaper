@@ -9,26 +9,29 @@
 #define XGUI_WIDGETFACTORY_H_
 
 #include <QString>
-#include <string>
 
 class QWidget;
 class Config_WidgetAPI;
+class ModuleBase_Operation;
 
 class XGUI_WidgetFactory
 {
 public:
-  XGUI_WidgetFactory(const std::string&);
+  XGUI_WidgetFactory(ModuleBase_Operation*);
   virtual ~XGUI_WidgetFactory();
 
   void fillWidget(QWidget* theParent);
 
 protected:
-  QWidget* valueWidget();
+  QWidget* doubleSpinBoxWidget();
+
+  bool connectWidget(QWidget*, const QString&);
 
 private:
   QString qs(const std::string& theStdString) const;
 
   Config_WidgetAPI* myWidgetApi;
+  ModuleBase_Operation*   myOperation;
 };
 
 #endif /* XGUI_WIDGETFACTORY_H_ */

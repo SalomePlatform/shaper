@@ -23,12 +23,13 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QComboBox>
-
+#include <QAction>
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     : QMainWindow(parent), 
-    myObjectBrowser(0), 
-    myPythonConsole(0)
+    myObjectBrowser(NULL),
+    myPythonConsole(NULL),
+    myPropertyPanelDock(NULL)
 {
   setWindowTitle(tr("New Geom"));
   myMenuBar = new XGUI_MainMenu(this);
@@ -91,6 +92,21 @@ void XGUI_MainWindow::hidePythonConsole()
     myPythonConsole->parentWidget()->hide();
 }
 
+void XGUI_MainWindow::showPropertyPanel()
+{
+  QAction* aViewAct = myPropertyPanelDock->toggleViewAction();
+  aViewAct->setEnabled(true);
+  myPropertyPanelDock->show();
+  myPropertyPanelDock->raise();
+}
+
+void XGUI_MainWindow::hidePropertyPanel()
+{
+  QAction* aViewAct = myPropertyPanelDock->toggleViewAction();
+  aViewAct->setEnabled(false);
+  myPropertyPanelDock->hide();
+}
+
 /*
  * Creates dock widgets, places them in corresponding area
  * and tabifies if necessary.
@@ -99,10 +115,11 @@ void XGUI_MainWindow::createDockWidgets()
 {
   QDockWidget* aObjDock = createObjectBrowser();
   addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
-  QDockWidget* aPropPanelDock = createPropertyPanel();
-  addDockWidget(Qt::LeftDockWidgetArea, aPropPanelDock);
+  myPropertyPanelDock = createPropertyPanel();
+  addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanelDock);
+  hidePropertyPanel(); //<! Invisible by default
 
-  tabifyDockWidget(aPropPanelDock, aObjDock);
+  tabifyDockWidget(aObjDock, myPropertyPanelDock);
 }
 
 
@@ -117,7 +134,7 @@ QDockWidget* XGUI_MainWindow::createPropertyPanel()
   aPropPanel->setWidget(aContent);
 
   QWidget* aCustomWidget = new QWidget(aContent);
-  aCustomWidget->setObjectName("PropertyPanelWidget");
+  aCustomWidget->setObjectName("property_panel_widget");
   aMainLay->addWidget(aCustomWidget);
   aMainLay->addStretch(1);
 
@@ -133,9 +150,11 @@ QDockWidget* XGUI_MainWindow::createPropertyPanel()
   aBtnLay->addWidget(aBtn);
   aBtnLay->addStretch(1);
   aBtn = new QPushButton(QIcon(":pictures/button_ok.png"), "", aFrm);
+  aBtn->setObjectName("property_panel_ok");
   aBtn->setFlat(true);
   aBtnLay->addWidget(aBtn);
   aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
+  aBtn->setObjectName("property_panel_cancel");
   aBtn->setFlat(true);
   aBtnLay->addWidget(aBtn);
 

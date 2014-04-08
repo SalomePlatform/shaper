@@ -37,8 +37,11 @@ public:
     return myViewer;
   }
 
+public slots:
   void showPythonConsole();
   void hidePythonConsole();
+  void showPropertyPanel();
+  void hidePropertyPanel();
 
 private:
   void createDockWidgets();
@@ -47,6 +50,7 @@ private:
 
   XGUI_MainMenu* myMenuBar;
   XGUI_ObjectsBrowser* myObjectBrowser;
+  QDockWidget* myPropertyPanelDock;
 
   XGUI_Viewer* myViewer;
 

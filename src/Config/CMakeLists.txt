@@ -13,7 +13,7 @@ SET(PROJECT_HEADERS
   Config_FeatureReader.h
   Config_WidgetAPI.h
   Config_WidgetReader.h
-  Config_WidgetMessage.h
+  Config_PointerMessage.h
  )
  
 SET(PROJECT_SOURCES
@@ -23,7 +23,7 @@ SET(PROJECT_SOURCES
   Config_FeatureReader.cpp
   Config_WidgetAPI.cpp
   Config_WidgetReader.cpp
-  Config_WidgetMessage.cpp
+  Config_PointerMessage.cpp
 )
 
 SET(XML_RESOURCES

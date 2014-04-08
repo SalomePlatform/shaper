@@ -37,6 +37,7 @@ public:
 
   std::string widgetType();
 
+  std::string widgetId();
   std::string widgetIcon();
   std::string widgetLabel();
   std::string widgetTooltip();

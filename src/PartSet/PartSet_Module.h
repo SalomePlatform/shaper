@@ -19,7 +19,7 @@ public:
   virtual void featureCreated(XGUI_Command* theFeature);
 
 public slots:
-  void onCommandTriggered();
+  void onFeatureTriggered();
 
 private:
   XGUI_Workshop* myWorkshop;

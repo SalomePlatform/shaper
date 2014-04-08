@@ -58,6 +58,11 @@ std::string Config_WidgetAPI::getProperty(const char* thePropName)
   return result;
 }
 
+std::string Config_WidgetAPI::widgetId()
+{
+  return getProperty("id");
+}
+
 std::string Config_WidgetAPI::widgetTooltip()
 {
   return getProperty("tooltip");
