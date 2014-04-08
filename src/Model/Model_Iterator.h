@@ -37,6 +37,10 @@ public:
   /// \returns number of left iterations
   virtual int numIterationsLeft();
 
+  /// Compares the current feature with the given one
+  /// \returns true if given feature equals to the current one
+  virtual bool is(std::shared_ptr<ModelAPI_Feature> theFeature);
+
 protected:
   /// Initializes iterator
   /// \param theDoc document where the iteration is performed

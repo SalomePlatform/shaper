@@ -16,7 +16,7 @@ using namespace std;
 
 static Model_PluginManager* myImpl = new Model_PluginManager();
 
-std::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theFeatureID)
+shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theFeatureID)
 {
   if (this != myImpl) return myImpl->createFeature(theFeatureID);
 

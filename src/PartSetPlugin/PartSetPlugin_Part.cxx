@@ -28,3 +28,7 @@ void PartSetPlugin_Part::execute()
     aDocRef->setValue(aPartSetDoc->subDocument(data()->getName()));
   }
 }
+
+shared_ptr<ModelAPI_Document> PartSetPlugin_Part::documentToAdd() {
+  return ModelAPI_PluginManager::get()->rootDocument();
+}

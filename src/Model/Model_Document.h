@@ -7,6 +7,8 @@
 
 #include <Model.h>
 #include <ModelAPI_Document.h>
+#include <Event_Message.h>
+
 #include <TDocStd_Document.hxx>
 #include <map>
 
@@ -59,11 +61,9 @@ public:
   //! Redoes last operation
   MODEL_EXPORT void redo();
 
-  //! Adds to the document the new feature of the given group id
-  //! \param theFeature a feature object that will be connected to the document in this method
-  //! \param theGroupID identifier of the groups of objects (must be greater than zero)
-  MODEL_EXPORT virtual void addFeature(std::shared_ptr<ModelAPI_Feature> theFeature,
-    const std::string theGroupID);
+  //! Adds to the document the new feature of the given feature id
+  //! \param creates feature and puts it in the document
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
 
   //! Returns the existing feature by the label
   //! \param theLabel base label of the feature
@@ -82,6 +82,13 @@ public:
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> 
     feature(const std::string& theGroupID, const int theIndex);
 
+  ///! Returns the vector of groups already added to the document
+  MODEL_EXPORT virtual const std::vector<std::string>& getGroups() const;
+
+  //! Returns the index of feature in the group (zero based)
+  //! \retruns -1 if not found
+  MODEL_EXPORT virtual int featureIndex(std::shared_ptr<ModelAPI_Feature> theFeature);
+
 protected:
 
   //! Returns (creates if needed) the group label
@@ -89,8 +96,10 @@ protected:
 
   //! Initializes feature with a unique name in this group (unique name is generated as 
   //! feature type + "_" + index
-  void setUniqueName(
-    std::shared_ptr<ModelAPI_Feature> theFeature, const std::string theGroupID);
+  void setUniqueName(std::shared_ptr<ModelAPI_Feature> theFeature);
+
+  //! Adds to the document the new feature
+  void addFeature(const std::shared_ptr<ModelAPI_Feature> theFeature);
 
   //! Creates new document with binary file format
   Model_Document(const std::string theID);
@@ -102,6 +111,24 @@ private:
   Handle_TDocStd_Document myDoc; ///< OCAF document
   int myTransactionsAfterSave; ///< number of transactions after the last "save" call, used for "IsModified" method
   std::map<std::string, TDF_Label> myGroups; ///< root labels of the features groups identified by names
+  std::vector<std::string> myGroupsNames; ///< names of added groups to the document
+};
+
+/// Event ID that model is updated
+static const char * EVENT_FEATURE_UPDATED = "FeatureUpdated";
+
+/// Message that feature was changed (used for Object Browser update)
+class ModelAPI_FeatureUpdatedMessage : public Event_Message {
+  std::shared_ptr<ModelAPI_Feature> myFeature; ///< which feature is changed
+public:
+  /// sender is not important, all information is located in the feature
+  ModelAPI_FeatureUpdatedMessage(std::shared_ptr<ModelAPI_Feature> theFeature);
+
+  /// Returns the ID of this message
+  static const Event_ID messageId();
+
+  /// Returns the feature that has been updated
+  std::shared_ptr<ModelAPI_Feature> feature();
 };
 
 #endif

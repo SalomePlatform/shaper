@@ -42,7 +42,9 @@ class EVENT_EXPORT Event_Message {
 public:
 
   //! Creates the message
-  Event_Message(const Event_ID theID, const void* theSender = 0);
+  Event_Message(const Event_ID theID, const void* theSender = 0)
+    : myEventId(theID), mySender((void*) theSender) {}
+  //! do nothing in the destructor yet
   virtual ~Event_Message() {}
 
   //! Returns identifier of the message
