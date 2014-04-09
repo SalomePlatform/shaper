@@ -81,10 +81,12 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM QT
-if "%QTDIR%" == "" (
-  @SET QTDIR=%PDIR%\Qt-5.2.0\5.2.0\msvc2010
-)
+@SET QTDIR=%PDIR%\qt-4.8.4
+@ECHO -- Creating qt.conf... 
+@ECHO [Paths] > %QTDIR%/bin/qt.conf
+@ECHO Prefix = %QTDIR:\=/% >> %QTDIR%/bin/qt.conf
 @SET PATH=%QTDIR%\bin;%PATH%
+
 @REM -------------------------
 
 @REM -------------------------

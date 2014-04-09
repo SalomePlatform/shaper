@@ -14,7 +14,6 @@
 #include "XGUI_Viewer.h"
 #include "XGUI_Constants.h"
 
-#include <QGuiApplication>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QFileInfo>
