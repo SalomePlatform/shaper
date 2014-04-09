@@ -10,6 +10,11 @@
 #include "XGUI_Viewer.h"
 #include "XGUI_WidgetFactory.h"
 
+#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Feature.h>
+#include <ModelAPI_Object.h>
+#include <ModelAPI_AttributeDocRef.h>
+
 #include <Event_Loop.h>
 #include <ModuleBase_Operation.h>
 #include <Config_FeatureMessage.h>
@@ -61,6 +66,18 @@ void XGUI_Workshop::startApplication()
   QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
   aWnd->showMaximized();
   myMainWindow->showPythonConsole();
+
+  // Testing of document creation
+  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  std::shared_ptr<ModelAPI_Feature> aPoint1 = aMgr->rootDocument()->addFeature("Point");
+  std::shared_ptr<ModelAPI_Feature> aPart = aMgr->rootDocument()->addFeature("Part");
+  aPart->execute();
+  aMgr->setCurrentDocument(aPart->data()->docRef("PartDocument")->value());
+  std::shared_ptr<ModelAPI_Feature> aPoint2 = aMgr->rootDocument()->addFeature("Point");
+  aPoint2 = aMgr->rootDocument()->addFeature("Point");
+
+  aPart = aMgr->rootDocument()->addFeature("Part");
+  aPart->execute();
 }
 
 //******************************************************

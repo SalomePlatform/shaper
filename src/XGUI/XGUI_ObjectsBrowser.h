@@ -13,11 +13,11 @@ public:
   XGUI_ObjectsBrowser(QWidget* theParent);
   virtual ~XGUI_ObjectsBrowser();
 
-  XGUI_DocumentDataModel* dataModel() const { return myDocModel; }
+  QAbstractItemModel* dataModel() const { return myDocModel; }
 
 private:
 
-  XGUI_DocumentDataModel* myDocModel;
+  QAbstractItemModel* myDocModel;
 };
 
 #endif
