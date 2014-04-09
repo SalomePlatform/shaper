@@ -148,12 +148,12 @@ bool Config_XMLReader::isNode(xmlNodePtr theNode, const char* theNodeName, ...)
 {
   bool result = false;
   const xmlChar* aName = theNode->name;
-  if (!aName || theNode->type != XML_ELEMENT_NODE)
+  if (!aName || theNode->type != XML_ELEMENT_NODE) {
     return false;
-
-  if (!xmlStrcmp(aName, (const xmlChar *) theNodeName))
+  }
+  if (!xmlStrcmp(aName, (const xmlChar *) theNodeName)) {
     return true;
-
+  }
   va_list args; // define argument list variable
   va_start(args, theNodeName); // init list; point to last defined argument
   while(true) {
@@ -166,5 +166,23 @@ bool Config_XMLReader::isNode(xmlNodePtr theNode, const char* theNodeName, ...)
     }
   }
   va_end(args); // cleanup the system stack
+  return false;
+}
+
+/*
+ * Every xml node has child. Even if there is no explicit
+ * child nodes libxml gives the "Text node" as child.
+ *
+ * This method checks if real child nodes exist in the
+ * given node.
+ */
+bool Config_XMLReader::hasChild(xmlNodePtr theNode)
+{
+  xmlNodePtr aNode = theNode->children;
+  for(; aNode; aNode = aNode->next) {
+    if (aNode->type != XML_ELEMENT_NODE) {
+      return true;
+    }
+  }
   return false;
 }

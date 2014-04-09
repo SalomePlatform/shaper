@@ -24,31 +24,33 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
   switch (theRole) {
   case Qt::DisplayRole:
     // return a name
-    if (theIndex.model() == this) {
-      if (theIndex.internalId() == ParamsFolder)
-        return tr("Parameters");
-
-      if (theIndex.internalId() == ParamObject) {
+    switch (theIndex.internalId()) {
+    case ParamsFolder:
+      return tr("Parameters");
+    case ParamObject:
+      {
         std::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(PARAMETERS_GROUP, theIndex.row());
         return aFeature->data()->getName().c_str();
       } 
-      if (theIndex.internalId() == ConstructFolder)
+    case ConstructFolder:
         return tr("Constructions");
-
-      if (theIndex.internalId() == ConstructObject) {
+    case ConstructObject:
+      {
         std::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row());
         return aFeature->data()->getName().c_str();
       }
-    } 
+    }
     break;
 
   case Qt::DecorationRole:
     // return an Icon
-    if (theIndex.model() == this) {
-      if (theIndex.internalId() == ParamsFolder)
+    switch (theIndex.internalId()) {
+    case ParamsFolder:
         return QIcon(":pictures/params_folder.png");
-      else if (theIndex.internalId() == ConstructFolder)
+    case ConstructFolder:
         return QIcon(":pictures/constr_folder.png");
+    case ConstructObject:
+        return QIcon(":pictures/point_ico.png");
     }
     break;
 
@@ -119,20 +121,7 @@ QModelIndex XGUI_TopDataModel::parent(const QModelIndex& theIndex) const
 
 bool XGUI_TopDataModel::hasChildren(const QModelIndex& theParent) const
 {
-  if (!theParent.isValid())
-    return true;
-
-  int aId = (int)theParent.internalId();
-  switch (aId) {
-  case ParamsFolder:
-    return myDocument->featuresIterator(PARAMETERS_GROUP)->more();
-  case ConstructFolder:
-    return myDocument->featuresIterator(CONSTRUCTIONS_GROUP)->more();
-  case ParamObject:
-  case ConstructObject:
-    return false;
-  } 
-  return false;
+  return rowCount(theParent) > 0;
 }
 
 
@@ -154,23 +143,42 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
   switch (theRole) {
   case Qt::DisplayRole:
     // return a name
-    if (theIndex.internalId() == MyRoot) {
-      std::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(PARTS_GROUP, myId);
-      return aFeature->data()->getName().c_str();
-    }
-    if (theIndex.internalId() == ParamsFolder)
+    switch (theIndex.internalId()) {
+    case MyRoot:
+      {
+        std::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(PARTS_GROUP, myId);
+        return aFeature->data()->getName().c_str();
+      }
+    case ParamsFolder:
       return tr("Parameters");
-    if (theIndex.internalId() == ConstructFolder)
+    case ConstructFolder:
       return tr("Constructions");
+    case ParamObject:
+      {
+        std::shared_ptr<ModelAPI_Feature> aFeature = 
+          featureDocument()->feature(PARAMETERS_GROUP, theIndex.row());
+        return aFeature->data()->getName().c_str();
+      }
+    case ConstructObject:
+      {
+        std::shared_ptr<ModelAPI_Feature> aFeature = 
+          featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+        return aFeature->data()->getName().c_str();
+      }
+    }
     break;
   case Qt::DecorationRole:
     // return an Icon
-    if (theIndex.internalId() == MyRoot) 
+    switch (theIndex.internalId()) {
+    case MyRoot:
       return QIcon(":pictures/part_ico.png");
-    if (theIndex.internalId() == ParamsFolder)
+    case ParamsFolder:
       return QIcon(":pictures/params_folder.png");
-    if (theIndex.internalId() == ConstructFolder)
+    case ConstructFolder:
       return QIcon(":pictures/constr_folder.png");
+    case ConstructObject:
+        return QIcon(":pictures/point_ico.png");
+    }
    break;
   case Qt::ToolTipRole:
     // return Tooltip
@@ -191,8 +199,14 @@ int XGUI_PartDataModel::rowCount(const QModelIndex& parent) const
       return 1;
     else 
       return 0;
-  if (parent.internalId() == MyRoot)
-      return 2;
+  switch (parent.internalId()) {
+  case MyRoot:
+    return 2;
+  case ParamsFolder:
+    return featureDocument()->featuresIterator(PARAMETERS_GROUP)->numIterationsLeft();
+  case ConstructFolder:
+    return featureDocument()->featuresIterator(CONSTRUCTIONS_GROUP)->numIterationsLeft();
+  }
   return 0;
 }
 
@@ -242,20 +256,12 @@ QModelIndex XGUI_PartDataModel::parent(const QModelIndex& theIndex) const
 
 bool XGUI_PartDataModel::hasChildren(const QModelIndex& theParent) const
 {
-  if (!theParent.isValid())
-    return myDocument->feature(PARTS_GROUP, myId);
+  return rowCount(theParent) > 0;
+}
 
-  int aId = (int)theParent.internalId();
-  switch (aId) {
-  case MyRoot:
-    return true;
-  case ParamsFolder:
-    return false; // TODO
-  case ConstructFolder:
-    return false; // TODO
-  case ParamObject:
-  case ConstructObject:
-    return false;
-  }
-  return false;
+
+std::shared_ptr<ModelAPI_Document> XGUI_PartDataModel::featureDocument() const
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(PARTS_GROUP, myId);
+  return aFeature->data()->docRef("PartDocument")->value();
 }

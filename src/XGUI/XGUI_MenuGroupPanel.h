@@ -24,7 +24,9 @@ private:
   void placeWidget(QWidget* theWgt);
   void addCommand(XGUI_Command* theAction);
 
-  QMap<XGUI_Command*, QWidget*> myActions;
+  QList<XGUI_Command*> myActions;
+  QWidgetList          myActionWidget;
+
   QGridLayout* myLayout;
   int myNewRow;
   int myNewCol;

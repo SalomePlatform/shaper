@@ -1,4 +1,5 @@
 #include "XGUI_MainWindow.h"
+#include "XGUI_Constants.h"
 #include "XGUI_MainMenu.h"
 #include "XGUI_ViewWindow.h"
 #include "XGUI_Viewer.h"
@@ -23,12 +24,13 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QComboBox>
-
+#include <QAction>
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     : QMainWindow(parent), 
-    myObjectBrowser(0), 
-    myPythonConsole(0)
+    myObjectBrowser(NULL),
+    myPythonConsole(NULL),
+    myPropertyPanelDock(NULL)
 {
   setWindowTitle(tr("New Geom"));
   myMenuBar = new XGUI_MainMenu(this);
@@ -91,6 +93,23 @@ void XGUI_MainWindow::hidePythonConsole()
     myPythonConsole->parentWidget()->hide();
 }
 
+void XGUI_MainWindow::showPropertyPanel()
+{
+  QAction* aViewAct = myPropertyPanelDock->toggleViewAction();
+  //<! Restore ability to close panel from the window's menu
+  aViewAct->setEnabled(true);
+  myPropertyPanelDock->show();
+  myPropertyPanelDock->raise();
+}
+
+void XGUI_MainWindow::hidePropertyPanel()
+{
+  QAction* aViewAct = myPropertyPanelDock->toggleViewAction();
+  //<! Do not allow to show empty property panel
+  aViewAct->setEnabled(false);
+  myPropertyPanelDock->hide();
+}
+
 /*
  * Creates dock widgets, places them in corresponding area
  * and tabifies if necessary.
@@ -99,10 +118,11 @@ void XGUI_MainWindow::createDockWidgets()
 {
   QDockWidget* aObjDock = createObjectBrowser();
   addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
-  QDockWidget* aPropPanelDock = createPropertyPanel();
-  addDockWidget(Qt::LeftDockWidgetArea, aPropPanelDock);
+  myPropertyPanelDock = createPropertyPanel();
+  addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanelDock);
+  hidePropertyPanel(); //<! Invisible by default
 
-  tabifyDockWidget(aPropPanelDock, aObjDock);
+  tabifyDockWidget(aObjDock, myPropertyPanelDock);
 }
 
 
@@ -110,6 +130,7 @@ QDockWidget* XGUI_MainWindow::createPropertyPanel()
 {
   QDockWidget* aPropPanel = new QDockWidget(this);
   aPropPanel->setWindowTitle(tr("Property Panel"));
+  aPropPanel->setObjectName(XGUI::PROP_PANEL);
 
   QWidget* aContent = new QWidget(aPropPanel);
   QVBoxLayout* aMainLay = new QVBoxLayout(aContent);
@@ -117,7 +138,7 @@ QDockWidget* XGUI_MainWindow::createPropertyPanel()
   aPropPanel->setWidget(aContent);
 
   QWidget* aCustomWidget = new QWidget(aContent);
-  aCustomWidget->setObjectName("PropertyPanelWidget");
+  aCustomWidget->setObjectName(XGUI::PROP_PANEL_WDG);
   aMainLay->addWidget(aCustomWidget);
   aMainLay->addStretch(1);
 
@@ -133,9 +154,11 @@ QDockWidget* XGUI_MainWindow::createPropertyPanel()
   aBtnLay->addWidget(aBtn);
   aBtnLay->addStretch(1);
   aBtn = new QPushButton(QIcon(":pictures/button_ok.png"), "", aFrm);
+  aBtn->setObjectName(XGUI::PROP_PANEL_OK);
   aBtn->setFlat(true);
   aBtnLay->addWidget(aBtn);
   aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
+  aBtn->setObjectName(XGUI::PROP_PANEL_CANCEL);
   aBtn->setFlat(true);
   aBtnLay->addWidget(aBtn);
 

@@ -40,13 +40,16 @@ public:
 private:
 
   QModelIndex toSourceModel(const QModelIndex& theProxy) const;
-  QModelIndex fromSourceModel(const QModelIndex& theSource) const;
-
+  QModelIndex* findModelIndex(const QModelIndex& theIndex) const;
+  QModelIndex* getModelIndex(const QModelIndex& theIndex) const;
+  void clearModelIndexes();
 
   std::shared_ptr<ModelAPI_Document> myDocument;
 
   XGUI_TopDataModel* myModel;
   QList<XGUI_PartDataModel*> myPartModels;
+
+  QList<QModelIndex*> myIndexes;
 };
 
 #endif

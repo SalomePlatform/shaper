@@ -29,6 +29,7 @@ XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
 
 XGUI_DocumentDataModel::~XGUI_DocumentDataModel()
 {
+  clearModelIndexes();
 }
 
 
@@ -47,6 +48,7 @@ void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
     for (int i = 0; i < myPartModels.size(); i++)
       myPartModels.at(i)->setDocument(myDocument, i);
   }
+  clearModelIndexes();
   endResetModel();
 }
 
@@ -68,7 +70,8 @@ int XGUI_DocumentDataModel::rowCount(const QModelIndex& theParent) const
   if (!theParent.isValid()) 
     return myModel->rowCount(theParent) + myPartModels.size();
 
-  return 0;
+  QModelIndex aParent = toSourceModel(theParent);
+  return aParent.model()->rowCount(aParent);
 }
 
 int XGUI_DocumentDataModel::columnCount(const QModelIndex& theParent) const
@@ -85,7 +88,13 @@ QModelIndex XGUI_DocumentDataModel::index(int theRow, int theColumn, const QMode
       aIndex = myModel->index(theRow, theColumn, theParent);
     else
       aIndex = myPartModels.at(theRow - aOffs)->index(theRow - aOffs, theColumn, theParent);
-    aIndex = createIndex(theRow, theColumn, aIndex.internalId());
+
+    aIndex = createIndex(theRow, theColumn, (void*)getModelIndex(aIndex));
+  } else {
+    QModelIndex* aParent = (QModelIndex*)theParent.internalPointer();
+    aIndex = aParent->model()->index(theRow, theColumn, (*aParent));
+
+    aIndex = createIndex(theRow, theColumn, (void*)getModelIndex(aIndex));
   }
   return aIndex;
 }
@@ -93,7 +102,11 @@ QModelIndex XGUI_DocumentDataModel::index(int theRow, int theColumn, const QMode
 
 QModelIndex XGUI_DocumentDataModel::parent(const QModelIndex& theIndex) const
 {
-  return QModelIndex();
+  QModelIndex aParent = toSourceModel(theIndex);
+  aParent = aParent.model()->parent(aParent);
+  if (aParent.isValid())
+    return createIndex(aParent.row(), aParent.column(), (void*)getModelIndex(aParent));
+  return aParent;
 }
 
 
@@ -101,22 +114,43 @@ bool XGUI_DocumentDataModel::hasChildren(const QModelIndex& theParent) const
 {
   if (!theParent.isValid())
     return true;
-  return false;
+  return rowCount(theParent) > 0;
 }
 
 
 QModelIndex XGUI_DocumentDataModel::toSourceModel(const QModelIndex& theProxy) const
 {
-  int aRow = theProxy.row();
-  if (!theProxy.parent().isValid()) {
-    if (aRow < myModel->rowCount()) {
-      return myModel->index(aRow, 0);
-    } else {
-      int aOffs = aRow - myModel->rowCount();
-      return myPartModels.at(aOffs)->index(aOffs, 0);
-    }
-  } 
-  return QModelIndex();
+  QModelIndex* aIndexPtr = static_cast<QModelIndex*>(theProxy.internalPointer());
+  return (*aIndexPtr);
 }
 
 
+QModelIndex* XGUI_DocumentDataModel::findModelIndex(const QModelIndex& theIndex) const
+{
+  QList<QModelIndex*>::const_iterator aIt;
+  for (aIt = myIndexes.constBegin(); aIt != myIndexes.constEnd(); ++aIt) {
+    QModelIndex* aIndex = (*aIt);
+    if ((*aIndex) == theIndex)
+      return aIndex;
+  }
+  return 0;
+}
+
+QModelIndex* XGUI_DocumentDataModel::getModelIndex(const QModelIndex& theIndex) const
+{
+  QModelIndex* aIndexPtr = findModelIndex(theIndex);
+  if (!aIndexPtr) {
+    aIndexPtr = new QModelIndex(theIndex);
+    XGUI_DocumentDataModel* that = (XGUI_DocumentDataModel*) this;
+    that->myIndexes.append(aIndexPtr);
+  }
+  return aIndexPtr;
+}
+
+void XGUI_DocumentDataModel::clearModelIndexes()
+{
+  QList<QModelIndex*>::const_iterator aIt;
+  for (aIt = myIndexes.constBegin(); aIt != myIndexes.constEnd(); ++aIt) 
+    delete (*aIt);
+  myIndexes.clear();
+}

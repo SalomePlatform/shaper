@@ -14,7 +14,7 @@
 const static char* NODE_WORKBENCH = "workbench";
 const static char* NODE_GROUP = "group";
 const static char* NODE_FEATURE = "feature";
-const static char* NODE_WIDGET = "value";
+const static char* NODE_DOUBLE_WDG = "value";
 
 const static char* _ID = "id";
 //const static char* WORKBENCH_ID = "id";
@@ -24,6 +24,12 @@ const static char* FEATURE_TEXT = "text";
 const static char* FEATURE_TOOLTIP = "tooltip";
 const static char* FEATURE_ICON = "icon";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
+
+// doublevalue properties:
+const static char* DOUBLE_WDG_MIN = "min";
+const static char* DOUBLE_WDG_MAX = "max";
+const static char* DOUBLE_WDG_STEP = "step";
+const static char* DOUBLE_WDG_DFLT = "default";
 
 /*
  * Hardcoded xml entities of plugins.xml

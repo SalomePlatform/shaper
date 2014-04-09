@@ -1,6 +1,7 @@
 #include <PartSet_Module.h>
-#include <Config_WidgetMessage.h>
+#include <ModuleBase_Operation.h>
 
+#include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
 #include <Config_WidgetReader.h>
 #include <Event_Loop.h>
@@ -40,10 +41,10 @@ void PartSet_Module::createFeatures()
 void PartSet_Module::featureCreated(XGUI_Command* theFeature)
 {
   QString aFtId = theFeature->getId();
-  theFeature->connectTo(this, SLOT(onCommandTriggered()));
+  theFeature->connectTo(this, SLOT(onFeatureTriggered()));
 }
 
-void PartSet_Module::onCommandTriggered()
+void PartSet_Module::onFeatureTriggered()
 {
   Config_ModuleReader aModuleReader = Config_ModuleReader();
   aModuleReader.readAll();
@@ -52,12 +53,13 @@ void PartSet_Module::onCommandTriggered()
   Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginName);
   aWdgReader.readAll();
   XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
-  std::string aCmdId = aCmd->getId().toStdString();
-  std::string aXMLWidgetCfg = aWdgReader.featureWidgetCfg(aCmdId);
+  QString aCmdId = aCmd->getId();
+  std::string aXmlCfg = aWdgReader.featureWidgetCfg(aCmdId.toStdString());
   //TODO(sbh): Implement static method to extract event id [SEID]
   static Event_ID aModuleEvent = Event_Loop::eventByName("PartSetModuleEvent");
-  Config_WidgetMessage aMessage(aModuleEvent, this);
-  aMessage.setFeatureId(aCmdId);
-  aMessage.setXmlRepresentation(aXMLWidgetCfg);
+  Config_PointerMessage aMessage(aModuleEvent, this);
+  ModuleBase_Operation* aPartSetOp = new ModuleBase_Operation(aCmdId, this);
+  aPartSetOp->setXmlRepresentation(QString::fromStdString(aXmlCfg));
+  aMessage.setPointer(aPartSetOp);
   Event_Loop::loop()->send(aMessage);
 }

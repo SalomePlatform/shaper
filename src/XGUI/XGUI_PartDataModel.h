@@ -76,6 +76,9 @@ public:
   virtual bool hasChildren(const QModelIndex& theParent = QModelIndex()) const;
 
 private: 
+  std::shared_ptr<ModelAPI_Document> featureDocument() const;
+
+
   enum DataIds {
     MyRoot,
     ParamsFolder,

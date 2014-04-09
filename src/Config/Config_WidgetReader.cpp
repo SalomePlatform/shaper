@@ -36,10 +36,14 @@ std::string Config_WidgetReader::featureWidgetCfg(std::string theFeatureName)
 void Config_WidgetReader::processNode(xmlNodePtr theNode)
 {
   if (isNode(theNode, NODE_FEATURE, NULL)) {
-    xmlBufferPtr buffer = xmlBufferCreate();
-    int size = xmlNodeDump(buffer, theNode->doc, theNode, 0, 1);
+    std::string result = "";
     std::string aNodeName = getProperty(theNode, _ID);
-    myWidgetCache[aNodeName] = std::string((char*) buffer->content);
+    if (hasChild(theNode)) {
+      xmlBufferPtr buffer = xmlBufferCreate();
+      int size = xmlNodeDump(buffer, theNode->doc, theNode, 0, 1);
+      result = std::string((char*) buffer->content);
+    }
+    myWidgetCache[aNodeName] = result;
   }
 }
 
