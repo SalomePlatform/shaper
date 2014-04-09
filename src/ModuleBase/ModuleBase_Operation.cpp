@@ -12,6 +12,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Document.h>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -286,7 +287,8 @@ bool ModuleBase_Operation::isReadyToStart() const
  */
 void ModuleBase_Operation::startOperation()
 {
-  myFeature = ModelAPI_PluginManager::get()->createFeature(myOperationId.toStdString());
+  std::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_PluginManager::get()->rootDocument();
+  myFeature = aDoc->addFeature(myOperationId.toStdString());
   //emit callSlot();
   //commit();
 }
