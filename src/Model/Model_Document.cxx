@@ -226,8 +226,8 @@ shared_ptr<ModelAPI_Feature> Model_Document::feature(const string& theGroupID, c
 {
   // TODO: optimize this method
   shared_ptr<ModelAPI_Iterator>  anIter = featuresIterator(theGroupID);
-  for(int a = 0; a != theIndex; anIter->next()) a++;
-  return anIter->current();
+  for(int a = 0; a != theIndex && anIter->more(); anIter->next()) a++;
+  return anIter->more() ? anIter->current() : shared_ptr<ModelAPI_Feature>();
 }
 
 const vector<string>& Model_Document::getGroups() const

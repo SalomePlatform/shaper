@@ -20,7 +20,7 @@ SET(PROJECT_HEADERS
 	XGUI_ViewBackground.h
 	XGUI_WidgetFactory.h
 	XGUI_DocumentDataModel.h
-	XGUI_DataModel.h
+	XGUI_PartDataModel.h
 	XGUI_ObjectsBrowser.h
 )
 
@@ -44,7 +44,7 @@ SET(PROJECT_SOURCES
 	XGUI_ViewBackground.cpp
 	XGUI_WidgetFactory.cpp
 	XGUI_DocumentDataModel.cpp
-	XGUI_DataModel.cpp
+	XGUI_PartDataModel.cpp
 	XGUI_ObjectsBrowser.cpp
 )
 
@@ -63,6 +63,7 @@ SET(PROJECT_LIBRARIES
 	${Qt5Widgets_LIBRARIES}
 	${CAS_VIEWER}
 	${CAS_KERNEL}
+    ${CAS_OCAF}
 	PyConsole
 	PyInterp
 	PyEvent
@@ -83,6 +84,7 @@ INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/src/Event
 					 ${PROJECT_SOURCE_DIR}/src/PyInterp
 					 ${PROJECT_SOURCE_DIR}/src/PyConsole
 					 ${PROJECT_SOURCE_DIR}/src/ModelAPI
+					 ${PROJECT_SOURCE_DIR}/src/Model
 					 ${CAS_INCLUDE_DIRS})
 
 LINK_DIRECTORIES($ENV{PYTHON_LIB_DIR})
