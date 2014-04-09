@@ -14,6 +14,10 @@ class QLabel;
 class QAction;
 class QDockWidget;
 
+/**\class XGUI_MainMenu
+ * \ingroup GUI
+ * \brief Class for creation of main menu (set of workbenches)
+ */
 class XGUI_MainMenu: public QObject
 {
 Q_OBJECT
@@ -21,11 +25,16 @@ public:
   XGUI_MainMenu(XGUI_MainWindow *parent);
   virtual ~XGUI_MainMenu();
 
+  //! Creates and adds a new workbench (menu group) with the given name and returns it.
   XGUI_Workbench* addWorkbench(const QString& theId, const QString& theText = "");
+
+  //! Returns workbench (menu group) by the given name.
   XGUI_Workbench* findWorkbench(const QString& theId);
 
+  //! Returns General page (predefined workbench)
   XGUI_Workbench* generalPage() const { return myGeneralPage; }
 
+  //! Rerturns last created workbench in dock widget container
   QDockWidget* getLastDockWindow() const { return myMenuTabs.last(); }
 
 private:

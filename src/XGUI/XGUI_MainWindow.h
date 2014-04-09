@@ -9,6 +9,11 @@ class XGUI_ObjectsBrowser;
 class QMdiArea;
 class PyConsole_EnhConsole;
 
+/**\class XGUI_MainWindow
+ * \ingroup GUI
+ * \brief Main window of the application (Desktop).
+ * It contains: Object Browser, 3d Viewer, Python console, property panel, main menu
+ */
 class XGUI_MainWindow: public QMainWindow
 {
 Q_OBJECT
@@ -17,21 +22,22 @@ public:
   XGUI_MainWindow(QWidget* parent = 0);
   virtual ~XGUI_MainWindow();
 
+  //! Returns main menu object
   XGUI_MainMenu* menuObject() const
   {
     return myMenuBar;
   }
 
+  //! Returns Object browser
   XGUI_ObjectsBrowser* objectBrowser() const
   {
     return myObjectBrowser;
   }
 
-  void showObjectBrowser();
-  void hideObjectBrowser();
-
+  //! Returns MDI area
   QMdiArea* mdiArea() const;
 
+  //! Returns 3d viewer
   XGUI_Viewer* viewer() const
   {
     return myViewer;
@@ -42,6 +48,8 @@ public slots:
   void hidePythonConsole();
   void showPropertyPanel();
   void hidePropertyPanel();
+  void showObjectBrowser();
+  void hideObjectBrowser();
 
 private:
   void createDockWidgets();

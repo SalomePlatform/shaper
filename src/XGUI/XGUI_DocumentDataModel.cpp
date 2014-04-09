@@ -17,11 +17,14 @@
 XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
   : QAbstractItemModel(theParent)
 {
+  // Find Document object
   std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   myDocument = aMgr->currentDocument();
 
+  // Register in event loop
   Event_Loop::loop()->registerListener(this, Event_Loop::eventByName(EVENT_FEATURE_UPDATED));
 
+  // Create a top part of data tree model
   myModel = new XGUI_TopDataModel(this);
   myModel->setDocument(myDocument);
 }

@@ -7,6 +7,11 @@
 class ModelAPI_Feature;
 class ModelAPI_Document; 
 
+/**\class XGUI_TopDataModel
+ * \ingroup GUI
+ * \brief This is a data model for Object Browser (QTreeView).
+ * It represents only upper part of data tree (non-parts tree items)
+ */
 class XGUI_TopDataModel : public QAbstractItemModel
 {
   Q_OBJECT
@@ -14,6 +19,7 @@ public:
   XGUI_TopDataModel(QObject* theParent);
   virtual ~XGUI_TopDataModel();
  
+  //! Set a document object
   virtual void setDocument(const std::shared_ptr<ModelAPI_Document>& theDoc)
   {
     myDocument = theDoc;
@@ -35,6 +41,7 @@ public:
   virtual bool hasChildren(const QModelIndex& theParent = QModelIndex()) const;
 
 private:
+  //! Types of QModelIndexes
   enum DataIds {
     ParamsFolder,
     ParamObject,
@@ -42,11 +49,16 @@ private:
     ConstructObject
   };
 
+  //! Document object
   std::shared_ptr<ModelAPI_Document> myDocument;
 };
 
 
-
+/**\class XGUI_PartDataModel
+ * \ingroup GUI
+ * \brief This is a data model for Object Browser (QTreeView).
+ * It represents data tree only of a one part
+ */
 class XGUI_PartDataModel : public QAbstractItemModel
 {
   Q_OBJECT
@@ -54,6 +66,7 @@ public:
   XGUI_PartDataModel(QObject* theParent);
   virtual ~XGUI_PartDataModel();
 
+  //! Set a document object and Id of a part in the document
   virtual void setDocument(const std::shared_ptr<ModelAPI_Document>& theDoc, int theId)
   {
     myDocument = theDoc;
@@ -78,7 +91,7 @@ public:
 private: 
   std::shared_ptr<ModelAPI_Document> featureDocument() const;
 
-
+  //! Types of QModelIndexes
   enum DataIds {
     MyRoot,
     ParamsFolder,
@@ -87,7 +100,10 @@ private:
     ConstructObject
   };
 
+  //! Document object
   std::shared_ptr<ModelAPI_Document> myDocument;
+
+  //! Id of the current part object in the document
   int myId;
 };
 

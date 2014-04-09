@@ -18,6 +18,10 @@ class ModuleBase_Operation;
 class Config_FeatureMessage;
 class Config_PointerMessage;
 
+/**\class XGUI_Workshop
+ * \ingroup GUI
+ * \brief Class which defines a configuration of the application (Workshop) and launches it.
+ */
 class XGUI_Workshop: public QObject, public Event_Listener
 {
 Q_OBJECT
@@ -26,15 +30,19 @@ public:
   XGUI_Workshop();
   virtual ~XGUI_Workshop();
 
+  //! Starting of the application
   void startApplication();
 
+  //! Returns main window (Desktop) of the application
   XGUI_MainWindow* mainWindow() const
   {
     return myMainWindow;
   }
 
+  //! Creates and adds a new workbench (menu group) with the given name and returns it
   XGUI_Workbench* addWorkbench(const QString& theName);
 
+  //! Redefinition of Event_Listener method
   virtual void processEvent(const Event_Message* theMessage);
 
 public slots:

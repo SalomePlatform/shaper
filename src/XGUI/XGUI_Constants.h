@@ -3,6 +3,9 @@
 
 #include <QList>
 
+//! This file contains varioous constants used in the application
+
+
 typedef QList<int> QIntList;       //!< list of int values
 typedef QList<short> QShortList;     //!< list of short int values
 typedef QList<double> QDoubleList;    //!< list of double values
@@ -10,6 +13,7 @@ typedef QList<double> QDoubleList;    //!< list of double values
 namespace XGUI
 {
 
+//! Types of gradient type used in background of Viewer 3d
 enum GradientType
 {
   NoGradient = -1,
@@ -24,31 +28,38 @@ enum GradientType
   LastGradient = Corner4Gradient
 };
 
+//! Type of rotation point in viewer 3d
 enum RotationPointType
 {
   GRAVITY, SELECTED
 };
 
+//! Type of ribbon rect in Viewer 3d
 enum SketchingType
 {
   NoSketching, Rect, Polygon
 };
 
+
+//! View window operations accessible by hot keys
 enum HotOperation
 {
   PAN, ZOOM, ROTATE, FIT_AREA
 };
 
+//! Types of view window interactions
 enum InteractionStyle
 {
   STANDARD, KEY_FREE
 };
 
+//! Types of 2d mode in viewer 3d
 enum Mode2dType
 {
   No2dMode, XYPlane, XZPlane, YZPlane
 };
 
+//! Types of background in view window
 enum BackgroundMode
 {
   NoBackground,              // no (invalid) background data

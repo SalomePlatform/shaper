@@ -11,11 +11,17 @@ class ModelAPI_Document;
 class XGUI_PartDataModel;
 class XGUI_TopDataModel;
 
-
+/**\class XGUI_DocumentDataModel
+ * \ingroup GUI
+ * \brief This is a proxy data model for Object Browser (QTreeView).
+ * It contains several sub-models for generation of each sub-part of data tree.
+ */
 class XGUI_DocumentDataModel : public QAbstractItemModel, public Event_Listener
 {
   Q_OBJECT
 public:
+
+
   XGUI_DocumentDataModel(QObject* theParent);
   virtual ~XGUI_DocumentDataModel();
 
@@ -39,16 +45,28 @@ public:
 
 private:
 
+  //! Converts QModelIndex of this model to QModelIndex of a one of sub-models.
   QModelIndex toSourceModel(const QModelIndex& theProxy) const;
+
+  //! Finds a pointer on QModelIndex which is equal to the given one
   QModelIndex* findModelIndex(const QModelIndex& theIndex) const;
+
+  //! Returns pointer on QModelIndex which is equal to the given one.
   QModelIndex* getModelIndex(const QModelIndex& theIndex) const;
+
+  //! Deletes all saved pointers on QModelIndex objects.
   void clearModelIndexes();
 
+  //! Document
   std::shared_ptr<ModelAPI_Document> myDocument;
 
+  //! Data model of top part of data tree (not parts object)
   XGUI_TopDataModel* myModel;
+
+  //! Data models for Parts data tree representation (one data model per a one part)
   QList<XGUI_PartDataModel*> myPartModels;
 
+  //! List of saved QModelIndexes created by sub-models
   QList<QModelIndex*> myIndexes;
 };
 

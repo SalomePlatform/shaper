@@ -20,10 +20,18 @@ class ViewerLabel;
 class XGUI_RectRubberBand;
 class QMdiSubWindow;
 
+/*!
+  \class XGUI_ViewWindow
+  \ingroup GUI
+  \brief Implements a one view window of 3d viewer object.
+  It contains a view port object (drawing area) and toolbars for view camera and window management.
+  Also it managements events in view port
+*/
 class XGUI_ViewWindow: public QFrame
 {
 Q_OBJECT
 public:
+  //! Types of viewer operations
   enum OperationType
   {
     NOTHING,
@@ -48,65 +56,122 @@ public:
 
   virtual ~XGUI_ViewWindow();
 
+  //! Returns view port object
   XGUI_ViewPort* viewPort() const
   {
     return myViewPort;
   }
 
+  //! Retrurns current interaction style
   XGUI::InteractionStyle interactionStyle() const
   {
     return myInteractionStyle;
   }
 
+  //! Disable or enable given operation type
   void setTransformEnabled(const OperationType, const bool);
+
+  //! Returns true if the given operation type is enabled
   bool transformEnabled(const OperationType) const;
 
+  //! Returns View background object
   XGUI_ViewBackground background() const;
+
+  //! Sets View background object
   void setBackground(const XGUI_ViewBackground& theBackground);
 
+  //! Returns true if the current view window can be closed
   bool closable() const { return myClosable; }
+
+  //! Sets the current view window closable or not
   void setClosable( const bool isClosable ) { myClosable = isClosable; }
 
 signals:
-    void vpTransformationStarted(XGUI_ViewWindow::OperationType type);
-    void vpTransformationFinished(XGUI_ViewWindow::OperationType type);
+  //! Emited whien view transformation operation is started
+  void vpTransformationStarted(XGUI_ViewWindow::OperationType type);
 
-    void Show(QShowEvent *);
-    void Hide(QHideEvent *);
-    void maximized(XGUI_ViewWindow*, bool);
-    void returnedTo3d();
+  //! Emited whien view transformation operation is finished
+  void vpTransformationFinished(XGUI_ViewWindow::OperationType type);
 
-    void tryClosing(XGUI_ViewWindow*);
-    void closed( QMdiSubWindow* );
-    void mousePressed(XGUI_ViewWindow*, QMouseEvent*);
-    void mouseReleased(XGUI_ViewWindow*, QMouseEvent*);
-    void mouseDoubleClicked(XGUI_ViewWindow*, QMouseEvent*);
-    void mouseMoving(XGUI_ViewWindow*, QMouseEvent*);
-    void keyPressed(XGUI_ViewWindow*, QKeyEvent*);
-    void keyReleased(XGUI_ViewWindow*, QKeyEvent*);
-    void contextMenuRequested(QContextMenuEvent *e);
+  //void Show(QShowEvent *);
+  //void Hide(QHideEvent *);
+  //void maximized(XGUI_ViewWindow*, bool);
+  //void returnedTo3d();
 
-    void viewModified(XGUI_ViewWindow*);
-    void viewCloned( QMdiSubWindow* theView );
+  //! Emited before the window closing
+  void tryClosing(XGUI_ViewWindow*);
+
+  //! Emited when window is closing
+  void closed( QMdiSubWindow* );
+
+  //! Emited on mouse press in view port
+  void mousePressed(XGUI_ViewWindow*, QMouseEvent*);
+
+  //! Emited on mouse release in view port
+  void mouseReleased(XGUI_ViewWindow*, QMouseEvent*);
+
+  //! Emited on mouse double click in view port
+  void mouseDoubleClicked(XGUI_ViewWindow*, QMouseEvent*);
+
+  //! Emited on mouse moving in view port
+  void mouseMoving(XGUI_ViewWindow*, QMouseEvent*);
+ 
+  //! Emited on key press in view port
+  void keyPressed(XGUI_ViewWindow*, QKeyEvent*);
+ 
+  //! Emited on key release in view port
+  void keyReleased(XGUI_ViewWindow*, QKeyEvent*);
+ 
+  //! Emited on context menu request in view port
+  void contextMenuRequested(QContextMenuEvent *e);
+
+  //void viewModified(XGUI_ViewWindow*);
+  void viewCloned( QMdiSubWindow* theView );
 
 public slots:
+  //! Start zooming operation
   void activateZoom();
+
+  //! Start rotation operation
   void activateRotation();
+
+  //! Start panning operation
   void activatePanning();
+
+  //! Start window fit operation
   void activateWindowFit();
+
+  //! Start global panning operation
   void activateGlobalPanning();
 
+  //! Clone the view window preserving a view point of the current view
   void cloneView();
+
+  //! Dump the view window into external file (*.bmp *.png *.jpg *.jpeg *.eps *.ps)
   void dumpView();
+
+  //! Fit all command
   void fitAll();
 
+  //! Set front view
   void frontView();
+
+  //! Set back view
   void backView();
+
+  //! Set top view
   void topView();
+
+  //! Set bottom view
   void bottomView();
+
+  //! Set left view
   void leftView();
+
+  //! Set right view
   void rightView();
 
+  //! Reset point of view
   void reset();
 
 
@@ -215,6 +280,11 @@ private:
 };
 
 //******************************************************
+/*!
+  \class ViewerToolbar
+  \ingroup GUI
+  \brief Provides a toolbar widget with treansparent background over OCCT View window
+*/
 class ViewerToolbar: public QToolBar
 {
 Q_OBJECT
@@ -237,6 +307,11 @@ private:
 };
 
 //******************************************************
+/*!
+  \class ViewerToolbar
+  \ingroup GUI
+  \brief Provides a Label widget with treansparent background over OCCT View window
+*/
 class ViewerLabel: public QLabel
 {
 Q_OBJECT
