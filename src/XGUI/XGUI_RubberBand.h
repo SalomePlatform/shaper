@@ -3,6 +3,13 @@
 
 #include <QWidget>
 
+/*!
+  \class XGUI_AbstractRubberBand
+  \ingroup GUI
+  \brief Analog of class QRubberBand with possibility of creation non-rectangular contour for selection.
+  
+  Currently this class does not support Style functionality in full.
+*/
 class XGUI_AbstractRubberBand: public QWidget
 {
 Q_OBJECT
@@ -32,6 +39,13 @@ protected:
   bool myIsClosed;
 };
 
+/*!
+  \class XGUI_RectRubberBand
+  \ingroup GUI
+  \brief Analog of class QRubberBand with possibility of creation non-rectangular contour for selection.
+  
+  Redefinition for rectangular rubber band
+*/
 class XGUI_RectRubberBand: public XGUI_AbstractRubberBand
 {
 Q_OBJECT
