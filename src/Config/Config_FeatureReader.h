@@ -16,7 +16,7 @@
 
 class Config_FeatureMessage;
 
-class CONFIG_EXPORT Config_FeatureReader: public Config_XMLReader
+class Config_FeatureReader: public Config_XMLReader
 {
 public:
   Config_FeatureReader(const std::string& theXmlFile,

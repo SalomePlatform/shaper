@@ -5,7 +5,7 @@
 #include "Model_Iterator.h"
 #include "Model_Document.h"
 #include "ModelAPI_Feature.h"
-#include "Model_Object.h"
+#include "Model_Data.h"
 #include <TDataStd_Comment.hxx>
 #include <TDataStd_Name.hxx>
 
@@ -54,7 +54,7 @@ int Model_Iterator::numIterationsLeft()
 bool Model_Iterator::is(std::shared_ptr<ModelAPI_Feature> theFeature)
 {
   return (myIter.Value()->Label() == 
-    dynamic_pointer_cast<Model_Object>(theFeature->data())->label()) == Standard_True;
+    dynamic_pointer_cast<Model_Data>(theFeature->data())->label()) == Standard_True;
 
 }
 

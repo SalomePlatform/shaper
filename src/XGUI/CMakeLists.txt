@@ -67,7 +67,6 @@ SET(PROJECT_LIBRARIES
 	${QT_QTMAIN_LIBRARY}
 	${CAS_VIEWER}
 	${CAS_KERNEL}
-    ${CAS_OCAF}
 	PyConsole
 	PyInterp
 	PyEvent

@@ -15,17 +15,17 @@
 #include <string>
 
 
-class CONFIG_EXPORT Config_ModuleReader: public Config_XMLReader
+class Config_ModuleReader: public Config_XMLReader
 {
 
 public:
-  Config_ModuleReader();
-  virtual ~Config_ModuleReader();
+  CONFIG_EXPORT Config_ModuleReader();
+  CONFIG_EXPORT virtual ~Config_ModuleReader();
 
-  void setAutoImport(bool enabled);
-  const std::map<std::string, std::string>& plugins() const;
+  CONFIG_EXPORT void setAutoImport(bool enabled);
+  CONFIG_EXPORT const std::map<std::string, std::string>& plugins() const;
 
-  std::string getModuleName();
+  CONFIG_EXPORT std::string getModuleName();
 
 protected:
   void processNode(xmlNodePtr aNode);

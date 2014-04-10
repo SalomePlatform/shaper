@@ -15,13 +15,13 @@
 #include <string>
 
 
-class CONFIG_EXPORT Config_WidgetReader: public Config_XMLReader
+class Config_WidgetReader: public Config_XMLReader
 {
 public:
-  Config_WidgetReader(const std::string& theXmlFile);
-  virtual ~Config_WidgetReader();
+  CONFIG_EXPORT Config_WidgetReader(const std::string& theXmlFile);
+  CONFIG_EXPORT virtual ~Config_WidgetReader();
 
-  std::string featureWidgetCfg(std::string theFeatureName);
+  CONFIG_EXPORT std::string featureWidgetCfg(std::string theFeatureName);
 
 protected:
   void processNode(xmlNodePtr theNode);

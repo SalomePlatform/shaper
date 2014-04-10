@@ -11,7 +11,7 @@
  * Example of the feature entry:
  * <feature id="Part" text="New part" tooltip="Creates a new part" icon=":pictures/part_ico.png"/>
  */
-class CONFIG_EXPORT Config_FeatureMessage: public Event_Message
+class Config_FeatureMessage: public Event_Message
 {
   std::string myId;  //Feature unique id
   std::string myText; //Represents action's text
@@ -25,31 +25,31 @@ class CONFIG_EXPORT Config_FeatureMessage: public Event_Message
 
 public:
   //const Event_ID theID, const void* theSender = 0
-  Config_FeatureMessage(const Event_ID theId, const void* theParent = 0);
+  CONFIG_EXPORT Config_FeatureMessage(const Event_ID theId, const void* theParent = 0);
 
   //TODO(sbh): Implement static method to extract event id [SEID]
   //static const char* eventId() { return ""; }
 
   //Auto-generated getters/setters
-  const std::string& icon() const;
-  const std::string& id() const;
-  const std::string& keysequence() const;
-  const std::string& text() const;
-  const std::string& tooltip() const;
+  CONFIG_EXPORT const std::string& icon() const;
+  CONFIG_EXPORT const std::string& id() const;
+  CONFIG_EXPORT const std::string& keysequence() const;
+  CONFIG_EXPORT const std::string& text() const;
+  CONFIG_EXPORT const std::string& tooltip() const;
 
-  const std::string& groupId() const;
-  const std::string& workbenchId() const;
-  const std::string& pluginLibrary() const;
+  CONFIG_EXPORT const std::string& groupId() const;
+  CONFIG_EXPORT const std::string& workbenchId() const;
+  CONFIG_EXPORT const std::string& pluginLibrary() const;
 
-  void setIcon(const std::string& icon);
-  void setId(const std::string& id);
-  void setKeysequence(const std::string& keysequence);
-  void setText(const std::string& text);
-  void setTooltip(const std::string& tooltip);
+  CONFIG_EXPORT void setIcon(const std::string& icon);
+  CONFIG_EXPORT void setId(const std::string& id);
+  CONFIG_EXPORT void setKeysequence(const std::string& keysequence);
+  CONFIG_EXPORT void setText(const std::string& text);
+  CONFIG_EXPORT void setTooltip(const std::string& tooltip);
 
-  void setGroupId(const std::string& groupId);
-  void setWorkbenchId(const std::string& workbenchId);
-  void setPluginLibrary(const std::string& thePluginLibrary);
+  CONFIG_EXPORT void setGroupId(const std::string& groupId);
+  CONFIG_EXPORT void setWorkbenchId(const std::string& workbenchId);
+  CONFIG_EXPORT void setPluginLibrary(const std::string& thePluginLibrary);
 };
 
 #endif // CONFIG_MESSAGE_H

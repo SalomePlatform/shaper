@@ -1,9 +1,9 @@
-// File:        Model_Object.hxx
+// File:        Model_Data.hxx
 // Created:     21 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef Model_Object_HeaderFile
-#define Model_Object_HeaderFile
+#ifndef Model_Data_HeaderFile
+#define Model_Data_HeaderFile
 
 #include "Model.h"
 #include <ModelAPI_Object.h>
@@ -13,13 +13,13 @@
 
 class ModelAPI_Attribute;
 
-/**\class Model_Object
+/**\class Model_Data
  * \ingroup DataModel
  * \brief General object of the application that allows
  * to get/set attributes from the document and compute result of an operation.
  */
 
-class Model_Object: public ModelAPI_Object
+class Model_Data: public ModelAPI_Object
 {
   TDF_Label myLab; ///< label of the feature in the document
   /// All attributes of the object identified by the attribute ID
@@ -27,7 +27,7 @@ class Model_Object: public ModelAPI_Object
 
   std::shared_ptr<ModelAPI_Document> myDoc; ///< document this feature belongs to
 
-  Model_Object();
+  Model_Data();
 
   TDF_Label label() {return myLab;}
 
