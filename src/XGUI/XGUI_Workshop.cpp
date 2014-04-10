@@ -9,6 +9,7 @@
 #include "XGUI_Workshop.h"
 #include "XGUI_Viewer.h"
 #include "XGUI_WidgetFactory.h"
+#include "XGUI_SelectionMgr.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
@@ -43,6 +44,7 @@ XGUI_Workshop::XGUI_Workshop()
   myPartSetModule(NULL)
 {
   myMainWindow = new XGUI_MainWindow();
+  mySelector = new XGUI_SelectionMgr(this);
 }
 
 //******************************************************

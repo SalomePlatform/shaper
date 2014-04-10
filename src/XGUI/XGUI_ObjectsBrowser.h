@@ -2,6 +2,8 @@
 #ifndef XGUI_ObjectsBrowser_H
 #define XGUI_ObjectsBrowser_H
 
+#include "XGUI_Constants.h"
+
 #include <QTreeView>
 
 class XGUI_DocumentDataModel;
@@ -13,11 +15,21 @@ public:
   XGUI_ObjectsBrowser(QWidget* theParent);
   virtual ~XGUI_ObjectsBrowser();
 
-  QAbstractItemModel* dataModel() const { return myDocModel; }
+  XGUI_DocumentDataModel* dataModel() const { return myDocModel; }
+
+  QFeatureList selectedData() const { return mySelectedData; }
+
+signals:
+  void selectionChanged();
+
+
+private slots:
+  void onSelectionChanged(const QItemSelection& theSelected, const QItemSelection& theDeselected);
 
 private:
+  XGUI_DocumentDataModel* myDocModel;
 
-  QAbstractItemModel* myDocModel;
+  QFeatureList mySelectedData;
 };
 
 #endif

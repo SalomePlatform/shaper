@@ -22,6 +22,8 @@ SET(PROJECT_HEADERS
 	XGUI_DocumentDataModel.h
 	XGUI_PartDataModel.h
 	XGUI_ObjectsBrowser.h
+    XGUI_DataTreeModel.h
+    XGUI_SelectionMgr.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -46,6 +48,7 @@ SET(PROJECT_SOURCES
 	XGUI_DocumentDataModel.cpp
 	XGUI_PartDataModel.cpp
 	XGUI_ObjectsBrowser.cpp
+    XGUI_SelectionMgr.cpp
 )
 
 SET(PROJECT_RESOURCES 

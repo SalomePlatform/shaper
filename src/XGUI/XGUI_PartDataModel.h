@@ -2,28 +2,19 @@
 #ifndef XGUI_PartDataModel_H
 #define XGUI_PartDataModel_H
 
-#include <QAbstractItemModel>
-
-class ModelAPI_Feature;
-class ModelAPI_Document; 
+#include "XGUI_DataTreeModel.h"
 
 /**\class XGUI_TopDataModel
  * \ingroup GUI
  * \brief This is a data model for Object Browser (QTreeView).
  * It represents only upper part of data tree (non-parts tree items)
  */
-class XGUI_TopDataModel : public QAbstractItemModel
+class XGUI_TopDataModel : public XGUI_FeaturesModel
 {
   Q_OBJECT
 public:
-  XGUI_TopDataModel(QObject* theParent);
+  XGUI_TopDataModel(const std::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent);
   virtual ~XGUI_TopDataModel();
- 
-  //! Set a document object
-  virtual void setDocument(const std::shared_ptr<ModelAPI_Document>& theDoc)
-  {
-    myDocument = theDoc;
-  }
 
   // Reimplementation from QAbstractItemModel
   virtual QVariant data(const QModelIndex& theIndex, int theRole) const;
@@ -39,6 +30,10 @@ public:
   virtual QModelIndex parent(const QModelIndex& theIndex) const;
 
   virtual bool hasChildren(const QModelIndex& theParent = QModelIndex()) const;
+
+  //! Returns Feature object by the given Model index.
+  //! Returns 0 if the given index is not index of a feature
+  virtual FeaturePtr feature(const QModelIndex& theIndex) const;
 
 private:
   //! Types of QModelIndexes
@@ -49,8 +44,6 @@ private:
     ConstructObject
   };
 
-  //! Document object
-  std::shared_ptr<ModelAPI_Document> myDocument;
 };
 
 
@@ -59,19 +52,12 @@ private:
  * \brief This is a data model for Object Browser (QTreeView).
  * It represents data tree only of a one part
  */
-class XGUI_PartDataModel : public QAbstractItemModel
+class XGUI_PartDataModel : public XGUI_PartModel
 {
   Q_OBJECT
 public:
-  XGUI_PartDataModel(QObject* theParent);
+  XGUI_PartDataModel(const std::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent);
   virtual ~XGUI_PartDataModel();
-
-  //! Set a document object and Id of a part in the document
-  virtual void setDocument(const std::shared_ptr<ModelAPI_Document>& theDoc, int theId)
-  {
-    myDocument = theDoc;
-    myId = theId;
-  }
 
   // Reimplementation from QAbstractItemModel
   virtual QVariant data(const QModelIndex& theIndex, int theRole) const;
@@ -87,6 +73,10 @@ public:
   virtual QModelIndex parent(const QModelIndex& theIndex) const;
 
   virtual bool hasChildren(const QModelIndex& theParent = QModelIndex()) const;
+
+  //! Returns Feature object by the given Model index.
+  //! Returns 0 if the given index is not index of a feature
+  virtual FeaturePtr feature(const QModelIndex& theIndex) const;
 
 private: 
   std::shared_ptr<ModelAPI_Document> featureDocument() const;
@@ -100,11 +90,6 @@ private:
     ConstructObject
   };
 
-  //! Document object
-  std::shared_ptr<ModelAPI_Document> myDocument;
-
-  //! Id of the current part object in the document
-  int myId;
 };
 
 #endif

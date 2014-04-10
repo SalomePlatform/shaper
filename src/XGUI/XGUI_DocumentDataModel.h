@@ -2,13 +2,15 @@
 #ifndef XGUI_DocumentDataModel_H
 #define XGUI_DocumentDataModel_H
 
+#include "XGUI_Constants.h"
+
 #include <QAbstractItemModel>
 #include <Event_Listener.h>
 
 #include <QList>
 
 class ModelAPI_Document;
-class XGUI_PartDataModel;
+class XGUI_PartModel;
 class XGUI_TopDataModel;
 
 /**\class XGUI_DocumentDataModel
@@ -43,6 +45,10 @@ public:
 
   virtual bool hasChildren(const QModelIndex& theParent = QModelIndex()) const;
 
+  //! Returns Feature object by the given Model index.
+  //! Returns 0 if the given index is not index of a feature
+  FeaturePtr feature(const QModelIndex& theIndex) const;
+
 private:
 
   //! Converts QModelIndex of this model to QModelIndex of a one of sub-models.
@@ -64,7 +70,7 @@ private:
   XGUI_TopDataModel* myModel;
 
   //! Data models for Parts data tree representation (one data model per a one part)
-  QList<XGUI_PartDataModel*> myPartModels;
+  QList<XGUI_PartModel*> myPartModels;
 
   //! List of saved QModelIndexes created by sub-models
   QList<QModelIndex*> myIndexes;
