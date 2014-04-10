@@ -1,24 +1,24 @@
-// File:        Model_Object.hxx
+// File:        Model_Data.hxx
 // Created:     21 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#include <Model_Object.h>
+#include <Model_Data.h>
 #include <Model_AttributeDocRef.h>
 #include <Model_AttributeDouble.h>
 #include <TDataStd_Name.hxx>
 
 using namespace std;
 
-Model_Object::Model_Object()
+Model_Data::Model_Data()
 {
 }
 
-void Model_Object::setLabel(TDF_Label& theLab)
+void Model_Data::setLabel(TDF_Label& theLab)
 {
   myLab = theLab;
 }
 
-string Model_Object::getName()
+string Model_Data::getName()
 {
   Handle(TDataStd_Name) aName;
   if (myLab.FindAttribute(TDataStd_Name::GetID(), aName))
@@ -26,12 +26,12 @@ string Model_Object::getName()
   return ""; // not defined
 }
 
-void Model_Object::setName(string theName)
+void Model_Data::setName(string theName)
 {
   TDataStd_Name::Set(myLab, theName.c_str());
 }
 
-void Model_Object::addAttribute(string theID, string theAttrType)
+void Model_Data::addAttribute(string theID, string theAttrType)
 {
   TDF_Label anAttrLab = myLab.FindChild(myAttrs.size() + 1);
   ModelAPI_Attribute* anAttr = 0;
@@ -46,7 +46,7 @@ void Model_Object::addAttribute(string theID, string theAttrType)
     ; // TODO: generate error on unknown attribute request and/or add mechanism for customization
 }
 
-shared_ptr<ModelAPI_AttributeDocRef> Model_Object::docRef(const string theID)
+shared_ptr<ModelAPI_AttributeDocRef> Model_Data::docRef(const string theID)
 {
   map<string, shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
@@ -61,7 +61,7 @@ shared_ptr<ModelAPI_AttributeDocRef> Model_Object::docRef(const string theID)
   return aRes;
 }
 
-shared_ptr<ModelAPI_AttributeDouble> Model_Object::real(const string theID)
+shared_ptr<ModelAPI_AttributeDouble> Model_Data::real(const string theID)
 {
   map<string, shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
   if (aFound == myAttrs.end()) {

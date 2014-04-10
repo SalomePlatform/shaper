@@ -15,21 +15,21 @@
  * \brief Attribute that contains reference to another document.
  */
 
-class MODEL_EXPORT Model_AttributeDocRef : public ModelAPI_AttributeDocRef
+class Model_AttributeDocRef : public ModelAPI_AttributeDocRef
 {
   Handle_TDataStd_Comment myComment; ///< reference to document is identified as string-id
 public:
   /// Defines the document referenced from this attribute
-  virtual void setValue(std::shared_ptr<ModelAPI_Document> theDoc);
+  MODEL_EXPORT virtual void setValue(std::shared_ptr<ModelAPI_Document> theDoc);
 
   /// Returns document referenced from this attribute
-  virtual std::shared_ptr<ModelAPI_Document> value();
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> value();
 
 protected:
   /// Initializes attibutes
   Model_AttributeDocRef(TDF_Label& theLabel);
 
-  friend class Model_Object;
+  friend class Model_Data;
 };
 
 #endif

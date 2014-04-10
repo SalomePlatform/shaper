@@ -15,21 +15,21 @@
  * \brief Attribute that contains real value with double precision.
  */
 
-class MODEL_EXPORT Model_AttributeDouble : public ModelAPI_AttributeDouble
+class Model_AttributeDouble : public ModelAPI_AttributeDouble
 {
   Handle_TDataStd_Real myReal; ///< double is Real attribute
 public:
   /// Defines the double value
-  virtual void setValue(const double theValue);
+  MODEL_EXPORT virtual void setValue(const double theValue);
 
   /// Returns the double value
-  virtual double value();
+  MODEL_EXPORT virtual double value();
 
 protected:
   /// Initializes attibutes
   Model_AttributeDouble(TDF_Label& theLabel);
 
-  friend class Model_Object;
+  friend class Model_Data;
 };
 
 #endif

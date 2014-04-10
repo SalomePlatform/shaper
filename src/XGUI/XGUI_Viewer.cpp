@@ -324,7 +324,7 @@ bool XGUI_Viewer::computeTrihedronSize(double& theNewSize, double& theSize)
   if (aMaxSide < Precision::Confusion())
     return false;
 
-  static float EPS = 5.0E-3;
+  static float EPS = (float)5.0E-3;
   theSize = trihedron()->Size();
   //theNewSize = aMaxSide*aSizeInPercents / 100.0;
 

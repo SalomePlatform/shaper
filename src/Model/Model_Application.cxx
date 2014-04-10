@@ -25,14 +25,14 @@ Handle(Model_Application) Model_Application::getApplication()
 //function : getDocument
 //purpose  : 
 //=======================================================================
-std::shared_ptr<Model_Document> Model_Application::getDocument(string theDocID)
+const std::shared_ptr<Model_Document>& Model_Application::getDocument(string theDocID)
 {
   if (myDocs.find(theDocID) != myDocs.end())
     return myDocs[theDocID];
 
   std::shared_ptr<Model_Document> aNew(new Model_Document(theDocID));
   myDocs[theDocID] = aNew;
-  return aNew;
+  return myDocs[theDocID];
 }
 
 void Model_Application::deleteDocument(string theDocID)

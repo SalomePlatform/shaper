@@ -4,10 +4,11 @@
 
 #include <Model_Document.h>
 #include <ModelAPI_Feature.h>
-#include <Model_Object.h>
+#include <Model_Data.h>
 #include <Model_Application.h>
 #include <Model_PluginManager.h>
 #include <Model_Iterator.h>
+#include <Model_Events.h>
 #include <Event_Loop.h>
 
 #include <TDataStd_Integer.hxx>
@@ -17,7 +18,7 @@
 static const int UNDO_LIMIT = 10; // number of possible undo operations
 
 static const int TAG_GENERAL = 1; // general properties tag
-static const int TAG_OBJECTS = 2; // tag of the objects sub-tree (Root for Model_ObjectsMgr)
+static const int TAG_OBJECTS = 2; // tag of the objects sub-tree (Root for Model_DatasMgr)
 static const int TAG_HISTORY = 3; // tag of the history sub-tree (Root for Model_History)
 
 using namespace std;
@@ -219,7 +220,7 @@ void Model_Document::addFeature(const std::shared_ptr<ModelAPI_Feature> theFeatu
   const std::string& aGroup = theFeature->getGroup();
   TDF_Label aGroupLab = groupLabel(aGroup);
   TDF_Label anObjLab = aGroupLab.NewChild();
-  std::shared_ptr<Model_Object> aData(new Model_Object);
+  std::shared_ptr<Model_Data> aData(new Model_Data);
   aData->setLabel(anObjLab);
   aData->setDocument(Model_Application::getApplication()->getDocument(myID));
   theFeature->setData(aData);
@@ -231,9 +232,9 @@ void Model_Document::addFeature(const std::shared_ptr<ModelAPI_Feature> theFeatu
   TDataStd_Integer::Set(anObjLab, myFeatures[aGroup].size());
   myFeatures[aGroup].push_back(theFeature);
 
-  // event: model is updated
-  static Event_ID anEvent = Event_Loop::eventByName(EVENT_FEATURE_UPDATED);
-  ModelAPI_FeatureUpdatedMessage aMsg(theFeature);
+  // event: feature is added
+  static Event_ID anEvent = Event_Loop::eventByName(EVENT_FEATURE_CREATED);
+  ModelAPI_FeatureUpdatedMessage aMsg(theFeature, anEvent);
   Event_Loop::loop()->send(aMsg);
 }
 
@@ -255,7 +256,7 @@ int Model_Document::featureIndex(shared_ptr<ModelAPI_Feature> theFeature)
   if (theFeature->data()->document().get() != this) {
     return theFeature->data()->document()->featureIndex(theFeature);
   }
-  shared_ptr<Model_Object> aData = dynamic_pointer_cast<Model_Object>(theFeature->data());
+  shared_ptr<Model_Data> aData = dynamic_pointer_cast<Model_Data>(theFeature->data());
   Handle(TDataStd_Integer) aFeatureIndex;
   if (aData->label().FindAttribute(TDataStd_Integer::GetID(), aFeatureIndex)) {
     return aFeatureIndex->Get();
@@ -389,7 +390,7 @@ void Model_Document::synchronizeFeatures()
       static const int INFINITE_TAG = MAXINT; // no label means that it exists somwhere in infinite
       int aFeatureTag = INFINITE_TAG; 
       if (aFIter != aFeatures.end()) { // existing tag for feature
-        shared_ptr<Model_Object> aData = dynamic_pointer_cast<Model_Object>((*aFIter)->data());
+        shared_ptr<Model_Data> aData = dynamic_pointer_cast<Model_Data>((*aFIter)->data());
         aFeatureTag = aData->label().Tag();
       }
       int aDSTag = INFINITE_TAG; 
@@ -398,21 +399,25 @@ void Model_Document::synchronizeFeatures()
       }
       if (aDSTag > aFeatureTag) { // feature is removed
         aFIter = aFeatures.erase(aFIter);
+        // event: model is updated
+        ModelAPI_FeatureDeletedMessage aMsg(
+          Model_Application::getApplication()->getDocument(myID), aGroupName);
+        Event_Loop::loop()->send(aMsg);
       } else if (aDSTag < aFeatureTag) { // a new feature is inserted
         // create a feature
         shared_ptr<ModelAPI_Feature> aFeature = ModelAPI_PluginManager::get()->createFeature(
           TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(
           aFLabIter.Value())->Get()).ToCString());
 
-        std::shared_ptr<Model_Object> aData(new Model_Object);
+        std::shared_ptr<Model_Data> aData(new Model_Data);
         TDF_Label aLab = aFLabIter.Value()->Label();
         aData->setLabel(aLab);
         aData->setDocument(Model_Application::getApplication()->getDocument(myID));
         aFeature->setData(aData);
         aFeature->initAttributes();
         // event: model is updated
-        static Event_ID anEvent = Event_Loop::eventByName(EVENT_FEATURE_UPDATED);
-        ModelAPI_FeatureUpdatedMessage aMsg(aFeature);
+        static Event_ID anEvent = Event_Loop::eventByName(EVENT_FEATURE_CREATED);
+        ModelAPI_FeatureUpdatedMessage aMsg(aFeature, anEvent);
         Event_Loop::loop()->send(aMsg);
 
         if (aFIter == aFeatures.end()) {
@@ -430,20 +435,4 @@ void Model_Document::synchronizeFeatures()
       }
     }
   }
-}
-
-ModelAPI_FeatureUpdatedMessage::ModelAPI_FeatureUpdatedMessage(
-  shared_ptr<ModelAPI_Feature> theFeature)
-  : Event_Message(messageId(), 0), myFeature(theFeature)
-{}
-
-const Event_ID ModelAPI_FeatureUpdatedMessage::messageId()
-{
-  static Event_ID MY_ID = Event_Loop::eventByName("FeatureUpdated");
-  return MY_ID;
-}
-
-shared_ptr<ModelAPI_Feature> ModelAPI_FeatureUpdatedMessage::feature()
-{
-  return myFeature;
 }

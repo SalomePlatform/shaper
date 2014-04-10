@@ -30,13 +30,13 @@ struct _xmlDoc;
  * for all xml operations.
  *
  */
-class CONFIG_EXPORT Config_XMLReader
+class Config_XMLReader
 {
 public:
-  Config_XMLReader(const std::string& theXmlFile);
-  virtual ~Config_XMLReader();
+  CONFIG_EXPORT Config_XMLReader(const std::string& theXmlFile);
+  CONFIG_EXPORT virtual ~Config_XMLReader();
 
-  void readAll();
+  CONFIG_EXPORT void readAll();
 
 protected:
   virtual void processNode(xmlNodePtr aNode);

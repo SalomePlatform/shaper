@@ -16,7 +16,7 @@ class MODELAPI_EXPORT ModelAPI_AttributeDouble : public ModelAPI_Attribute
 {
 public:
   /// Defines the double value
-  virtual void setValue(double theValue) = 0;
+  virtual void setValue(const double theValue) = 0;
 
   /// Returns the double value
   virtual double value() = 0;

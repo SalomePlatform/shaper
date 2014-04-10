@@ -7,7 +7,6 @@
 
 #include <Model.h>
 #include <ModelAPI_Document.h>
-#include <Event_Message.h>
 
 #include <TDocStd_Document.hxx>
 #include <map>
@@ -124,23 +123,6 @@ private:
   std::set<std::string> mySubs; ///< set of identifiers of sub-documents of this document
   /// transaction indexes (related to myTransactionsAfterSave) which were empty in this doc
   std::map<int, bool> myIsEmptyTr;
-};
-
-/// Event ID that model is updated
-static const char * EVENT_FEATURE_UPDATED = "FeatureUpdated";
-
-/// Message that feature was changed (used for Object Browser update)
-class ModelAPI_FeatureUpdatedMessage : public Event_Message {
-  std::shared_ptr<ModelAPI_Feature> myFeature; ///< which feature is changed
-public:
-  /// sender is not important, all information is located in the feature
-  ModelAPI_FeatureUpdatedMessage(std::shared_ptr<ModelAPI_Feature> theFeature);
-
-  /// Returns the ID of this message
-  static const Event_ID messageId();
-
-  /// Returns the feature that has been updated
-  std::shared_ptr<ModelAPI_Feature> feature();
 };
 
 #endif

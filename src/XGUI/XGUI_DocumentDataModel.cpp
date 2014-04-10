@@ -6,7 +6,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Object.h>
-#include <Model_Document.h>
+#include <Model_Events.h>
 
 #include <Event_Loop.h>
 

@@ -30,7 +30,7 @@ public:
   //! Retuns the application: one per process    
   MODEL_EXPORT static Handle_Model_Application getApplication();
   //! Returns the main document (on first call creates it) by the string identifier
-  MODEL_EXPORT std::shared_ptr<Model_Document> getDocument(std::string theDocID);
+  MODEL_EXPORT const std::shared_ptr<Model_Document>& getDocument(std::string theDocID);
   //! Deletes the document from the application
   MODEL_EXPORT void deleteDocument(std::string theDocID);
 
