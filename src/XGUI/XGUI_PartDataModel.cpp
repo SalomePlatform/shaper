@@ -9,8 +9,8 @@
 
 #include <QIcon>
 
-XGUI_TopDataModel::XGUI_TopDataModel(QObject* theParent)
-  : QAbstractItemModel(theParent)
+XGUI_TopDataModel::XGUI_TopDataModel(const std::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent)
+  : XGUI_FeaturesModel(theDocument, theParent)
 {
 }
   
@@ -124,12 +124,26 @@ bool XGUI_TopDataModel::hasChildren(const QModelIndex& theParent) const
   return rowCount(theParent) > 0;
 }
 
+FeaturePtr XGUI_TopDataModel::feature(const QModelIndex& theIndex) const
+{
+  switch (theIndex.internalId()) {
+  case ParamsFolder:
+  case ConstructFolder:
+    return 0;
+  case ParamObject:
+    return myDocument->feature(PARAMETERS_GROUP, theIndex.row());
+  case ConstructObject:
+    return myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+  }
+  return 0;
+}
+
 
 //******************************************************************
 //******************************************************************
 //******************************************************************
-XGUI_PartDataModel::XGUI_PartDataModel(QObject* theParent)
-  : QAbstractItemModel(theParent)
+XGUI_PartDataModel::XGUI_PartDataModel(const std::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent)
+  : XGUI_PartModel(theDocument, theParent)
 {
 }
 
@@ -239,8 +253,7 @@ QModelIndex XGUI_PartDataModel::index(int theRow, int theColumn, const QModelInd
 
 QModelIndex XGUI_PartDataModel::parent(const QModelIndex& theIndex) const
 {
-  int aId = (int)theIndex.internalId();
-  switch (aId) {
+  switch (theIndex.internalId()) {
   case MyRoot:
     return QModelIndex();
   case ParamsFolder:
@@ -264,4 +277,20 @@ std::shared_ptr<ModelAPI_Document> XGUI_PartDataModel::featureDocument() const
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(PARTS_GROUP, myId);
   return aFeature->data()->docRef("PartDocument")->value();
+}
+
+FeaturePtr XGUI_PartDataModel::feature(const QModelIndex& theIndex) const
+{
+  switch (theIndex.internalId()) {
+  case MyRoot:
+    return myDocument->feature(PARTS_GROUP, myId);
+  case ParamsFolder:
+  case ConstructFolder:
+    return 0;
+  case ParamObject:
+    return featureDocument()->feature(PARAMETERS_GROUP, theIndex.row());
+  case ConstructObject:
+    return featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+  }
+  return 0;
 }

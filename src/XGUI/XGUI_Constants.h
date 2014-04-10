@@ -2,13 +2,18 @@
 #define XGUI_Constants_H
 
 #include <QList>
+#include <ModelAPI_Feature.h>
 
-//! This file contains varioous constants used in the application
+//! This file contains various constants used in the application
 
 
 typedef QList<int> QIntList;       //!< list of int values
 typedef QList<short> QShortList;     //!< list of short int values
 typedef QList<double> QDoubleList;    //!< list of double values
+
+//! Pointer on feature object
+typedef std::shared_ptr<ModelAPI_Feature> FeaturePtr;
+typedef QList<FeaturePtr> QFeatureList; //!< List of features
 
 namespace XGUI
 {

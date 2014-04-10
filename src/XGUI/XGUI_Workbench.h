@@ -27,6 +27,7 @@ private slots:
 
 protected:
   virtual void resizeEvent(QResizeEvent * theEvent);
+  virtual bool eventFilter(QObject *theObj, QEvent *theEvent);
 
 private:
   void addSeparator();

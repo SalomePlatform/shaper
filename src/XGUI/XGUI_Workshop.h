@@ -13,6 +13,7 @@ class XGUI_MainWindow;
 class XGUI_Command;
 class XGUI_Module;
 class XGUI_Workbench;
+class XGUI_SelectionMgr;
 class ModuleBase_Operation;
 
 class Config_FeatureMessage;
@@ -38,6 +39,9 @@ public:
   {
     return myMainWindow;
   }
+
+  //! Returns selection manager object
+  XGUI_SelectionMgr* selector() const { return mySelector; }
 
   //! Creates and adds a new workbench (menu group) with the given name and returns it
   XGUI_Workbench* addWorkbench(const QString& theName);
@@ -67,6 +71,8 @@ private:
 
   XGUI_MainWindow* myMainWindow;
   XGUI_Module* myPartSetModule;
+
+  XGUI_SelectionMgr* mySelector;
 
   ModuleBase_Operation* myCurrentOperation;
 };

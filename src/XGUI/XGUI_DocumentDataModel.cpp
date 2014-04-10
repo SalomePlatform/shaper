@@ -25,8 +25,7 @@ XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
   Event_Loop::loop()->registerListener(this, Event_Loop::eventByName(EVENT_FEATURE_UPDATED));
 
   // Create a top part of data tree model
-  myModel = new XGUI_TopDataModel(this);
-  myModel->setDocument(myDocument);
+  myModel = new XGUI_TopDataModel(myDocument, this);
 }
 
 
@@ -46,10 +45,10 @@ void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
       myPartModels.removeLast();
     }
     while (myPartModels.size() < aNbParts) {
-      myPartModels.append(new XGUI_PartDataModel(this));
+      myPartModels.append(new XGUI_PartDataModel(myDocument, this));
     }
     for (int i = 0; i < myPartModels.size(); i++)
-      myPartModels.at(i)->setDocument(myDocument, i);
+      myPartModels.at(i)->setPartId(i);
   }
   clearModelIndexes();
   endResetModel();
@@ -156,4 +155,11 @@ void XGUI_DocumentDataModel::clearModelIndexes()
   for (aIt = myIndexes.constBegin(); aIt != myIndexes.constEnd(); ++aIt) 
     delete (*aIt);
   myIndexes.clear();
+}
+
+FeaturePtr XGUI_DocumentDataModel::feature(const QModelIndex& theIndex) const
+{
+  QModelIndex aIndex = toSourceModel(theIndex);
+  const XGUI_FeaturesModel* aModel = dynamic_cast<const XGUI_FeaturesModel*>(aIndex.model());
+  return aModel->feature(aIndex);
 }
