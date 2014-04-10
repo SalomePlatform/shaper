@@ -12,6 +12,7 @@
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
+#include <TDF_ChildIDIterator.hxx>
 
 static const int UNDO_LIMIT = 10; // number of possible undo operations
 
@@ -102,55 +103,104 @@ bool Model_Document::save(const char* theFileName)
 
 void Model_Document::close()
 {
+  // close all subs
+  set<string>::iterator aSubIter = mySubs.begin();
+  for(; aSubIter != mySubs.end(); aSubIter++)
+    subDocument(*aSubIter)->close();
+  mySubs.clear();
+  // close this
   myDoc->Close();
+  Model_Application::getApplication()->deleteDocument(myID);
 }
 
 void Model_Document::startOperation()
 {
+  // new command for this
   myDoc->NewCommand();
+  // new command for all subs
+  set<string>::iterator aSubIter = mySubs.begin();
+  for(; aSubIter != mySubs.end(); aSubIter++)
+    subDocument(*aSubIter)->startOperation();
 }
 
 void Model_Document::finishOperation()
 {
-  myDoc->CommitCommand();
+  // returns false if delta is empty and no transaction was made
+  myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();
   myTransactionsAfterSave++;
+  // finish for all subs
+  set<string>::iterator aSubIter = mySubs.begin();
+  for(; aSubIter != mySubs.end(); aSubIter++)
+    subDocument(*aSubIter)->finishOperation();
 }
 
 void Model_Document::abortOperation()
 {
   myDoc->AbortCommand();
+  // abort for all subs
+  set<string>::iterator aSubIter = mySubs.begin();
+  for(; aSubIter != mySubs.end(); aSubIter++)
+    subDocument(*aSubIter)->abortOperation();
 }
 
 bool Model_Document::isOperation()
 {
+  // operation is opened for all documents: no need to check subs
   return myDoc->HasOpenCommand() == Standard_True ;
 }
 
 bool Model_Document::isModified()
 {
-  return myTransactionsAfterSave != 0;
+  // is modified if at least one operation was commited and not undoed
+  return myTransactionsAfterSave > 0;
 }
 
 bool Model_Document::canUndo()
 {
-  return myDoc->GetAvailableUndos() > 0;
+  if (myDoc->GetAvailableUndos() > 0)
+    return true;
+  // check other subs contains operation that can be undoed
+  set<string>::iterator aSubIter = mySubs.begin();
+  for(; aSubIter != mySubs.end(); aSubIter++)
+    if (subDocument(*aSubIter)->canUndo())
+      return true;
+  return false;
 }
 
 void Model_Document::undo()
 {
-  myDoc->Undo();
   myTransactionsAfterSave--;
+  if (!myIsEmptyTr[myTransactionsAfterSave])
+    myDoc->Undo();
+  synchronizeFeatures();
+  // undo for all subs
+  set<string>::iterator aSubIter = mySubs.begin();
+  for(; aSubIter != mySubs.end(); aSubIter++)
+    subDocument(*aSubIter)->undo();
 }
 
 bool Model_Document::canRedo()
 {
-  return myDoc->GetAvailableRedos() > 0;
+  if (myDoc->GetAvailableRedos() > 0)
+    return true;
+  // check other subs contains operation that can be redoed
+  set<string>::iterator aSubIter = mySubs.begin();
+  for(; aSubIter != mySubs.end(); aSubIter++)
+    if (subDocument(*aSubIter)->canRedo())
+      return true;
+  return false;
 }
 
 void Model_Document::redo()
 {
-  myDoc->Redo();
+  if (!myIsEmptyTr[myTransactionsAfterSave])
+    myDoc->Redo();
   myTransactionsAfterSave++;
+  synchronizeFeatures();
+  // redo for all subs
+  set<string>::iterator aSubIter = mySubs.begin();
+  for(; aSubIter != mySubs.end(); aSubIter++)
+    subDocument(*aSubIter)->redo();
 }
 
 shared_ptr<ModelAPI_Feature> Model_Document::addFeature(string theID)
@@ -166,7 +216,8 @@ shared_ptr<ModelAPI_Feature> Model_Document::addFeature(string theID)
 
 void Model_Document::addFeature(const std::shared_ptr<ModelAPI_Feature> theFeature)
 {
-  TDF_Label aGroupLab = groupLabel(theFeature->getGroup());
+  const std::string& aGroup = theFeature->getGroup();
+  TDF_Label aGroupLab = groupLabel(aGroup);
   TDF_Label anObjLab = aGroupLab.NewChild();
   std::shared_ptr<Model_Object> aData(new Model_Object);
   aData->setLabel(anObjLab);
@@ -176,6 +227,9 @@ void Model_Document::addFeature(const std::shared_ptr<ModelAPI_Feature> theFeatu
   theFeature->initAttributes();
   // keep the feature ID to restore document later correctly
   TDataStd_Comment::Set(anObjLab, theFeature->getKind().c_str());
+  // put index of the feature in the group in the tree
+  TDataStd_Integer::Set(anObjLab, myFeatures[aGroup].size());
+  myFeatures[aGroup].push_back(theFeature);
 
   // event: model is updated
   static Event_ID anEvent = Event_Loop::eventByName(EVENT_FEATURE_UPDATED);
@@ -185,40 +239,45 @@ void Model_Document::addFeature(const std::shared_ptr<ModelAPI_Feature> theFeatu
 
 shared_ptr<ModelAPI_Feature> Model_Document::feature(TDF_Label& theLabel)
 {
-  Handle(TDataStd_Comment) aFeatureID;
-  if (theLabel.FindAttribute(TDataStd_Comment::GetID(), aFeatureID)) {
-    string anID(TCollection_AsciiString(aFeatureID->Get()).ToCString());
-    std::shared_ptr<ModelAPI_Feature> aResult = 
-      Model_PluginManager::get()->createFeature(anID);
-    std::shared_ptr<Model_Object> aData(new Model_Object);
-    aData->setLabel(theLabel);
-    aData->setDocument(Model_Application::getApplication()->getDocument(myID));
-    aResult->setData(aData);
-    aResult->initAttributes();
-    return aResult;
+  Handle(TDataStd_Integer) aFeatureIndex;
+  if (theLabel.FindAttribute(TDataStd_Integer::GetID(), aFeatureIndex)) {
+    Handle(TDataStd_Comment) aGroupID;
+    if (theLabel.Father().FindAttribute(TDataStd_Comment::GetID(), aGroupID)) {
+      string aGroup = TCollection_AsciiString(aGroupID->Get()).ToCString();
+      return myFeatures[aGroup][aFeatureIndex->Get()];
+    }
   }
   return std::shared_ptr<ModelAPI_Feature>(); // not found
 }
 
 int Model_Document::featureIndex(shared_ptr<ModelAPI_Feature> theFeature)
 {
-  if (theFeature->data()->document().get() != this)
+  if (theFeature->data()->document().get() != this) {
     return theFeature->data()->document()->featureIndex(theFeature);
-  shared_ptr<ModelAPI_Iterator> anIter(featuresIterator(theFeature->getGroup()));
-  for(int anIndex = 0; anIter->more(); anIter->next(), anIndex++)
-    if (anIter->is(theFeature)) 
-      return anIndex;
+  }
+  shared_ptr<Model_Object> aData = dynamic_pointer_cast<Model_Object>(theFeature->data());
+  Handle(TDataStd_Integer) aFeatureIndex;
+  if (aData->label().FindAttribute(TDataStd_Integer::GetID(), aFeatureIndex)) {
+    return aFeatureIndex->Get();
+  }
   return -1; // not found
 }
 
 shared_ptr<ModelAPI_Document> Model_Document::subDocument(string theDocID)
 {
+  // just store sub-document identifier here to manage it later
+  if (mySubs.find(theDocID) == mySubs.end())
+    mySubs.insert(theDocID);
   return Model_Application::getApplication()->getDocument(theDocID);
 }
 
 shared_ptr<ModelAPI_Iterator> Model_Document::featuresIterator(const string theGroup)
 {
   shared_ptr<Model_Document> aThis(Model_Application::getApplication()->getDocument(myID));
+  // create an empty iterator for not existing group 
+  // (to avoidance of attributes management outside the transaction)
+  if (myGroups.find(theGroup) == myGroups.end())
+    return shared_ptr<ModelAPI_Iterator>(new Model_Iterator());
   return shared_ptr<ModelAPI_Iterator>(new Model_Iterator(aThis, groupLabel(theGroup)));
 }
 
@@ -240,6 +299,11 @@ Model_Document::Model_Document(const std::string theID)
 {
   myDoc->SetUndoLimit(UNDO_LIMIT);
   myTransactionsAfterSave = 0;
+  // to avoid creation of tag outside of the transaction (by iterator, for example)
+  /*
+  if (!myDoc->Main().FindChild(TAG_OBJECTS).IsAttribute(TDF_TagSource::GetID()))
+    TDataStd_Comment::Set(myDoc->Main().FindChild(TAG_OBJECTS).NewChild(), "");
+    */
 }
 
 TDF_Label Model_Document::groupLabel(const string theGroup)
@@ -247,6 +311,9 @@ TDF_Label Model_Document::groupLabel(const string theGroup)
   if (myGroups.find(theGroup) == myGroups.end()) {
     myGroups[theGroup] = myDoc->Main().FindChild(TAG_OBJECTS).NewChild();
     myGroupsNames.push_back(theGroup);
+    // set to the group label the group idntifier to restore on "open"
+    TDataStd_Comment::Set(myGroups[theGroup], theGroup.c_str());
+    myFeatures[theGroup] = vector<shared_ptr<ModelAPI_Feature> >();
   }
   return myGroups[theGroup];
 }
@@ -279,6 +346,91 @@ void Model_Document::setUniqueName(
   theFeature->data()->setName(aName);
 }
 
+void Model_Document::synchronizeFeatures()
+{
+  // iterate groups labels
+  TDF_ChildIDIterator aGroupsIter(myDoc->Main().FindChild(TAG_OBJECTS),
+    TDataStd_Comment::GetID(), Standard_False);
+  vector<string>::iterator aGroupNamesIter = myGroupsNames.begin();
+  for(; aGroupsIter.More() && aGroupNamesIter != myGroupsNames.end();
+        aGroupsIter.Next(), aGroupNamesIter++) {
+    string aGroupName = TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(
+      aGroupsIter.Value())->Get()).ToCString();
+    if (*aGroupNamesIter != aGroupName) 
+      break; // all since there is a change this must be recreated from scratch
+  }
+  // delete all groups left after the data model groups iteration
+  while(aGroupNamesIter != myGroupsNames.end()) {
+    myFeatures.erase(*aGroupNamesIter);
+    myGroups.erase(*aGroupNamesIter);
+    aGroupNamesIter = myGroupsNames.erase(aGroupNamesIter);
+  }
+  // create new groups basing on the following data model update
+  for(; aGroupsIter.More(); aGroupsIter.Next()) {
+    string aGroupName = TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(
+      aGroupsIter.Value())->Get()).ToCString();
+    myGroupsNames.push_back(aGroupName);
+    myGroups[aGroupName] = aGroupsIter.Value()->Label();
+    myFeatures[aGroupName] = vector<shared_ptr<ModelAPI_Feature> >();
+  }
+  // update features group by group
+  aGroupsIter.Initialize(myDoc->Main().FindChild(TAG_OBJECTS),
+    TDataStd_Comment::GetID(), Standard_False);
+  for(; aGroupsIter.More(); aGroupsIter.Next()) {
+    string aGroupName = TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(
+      aGroupsIter.Value())->Get()).ToCString();
+    // iterate features in internal container
+    vector<shared_ptr<ModelAPI_Feature> >& aFeatures = myFeatures[aGroupName];
+    vector<shared_ptr<ModelAPI_Feature> >::iterator aFIter = aFeatures.begin();
+    // and in parallel iterate labels of features
+    TDF_ChildIDIterator aFLabIter(
+      aGroupsIter.Value()->Label(), TDataStd_Comment::GetID(), Standard_False);
+    while(aFIter != aFeatures.end() || aFLabIter.More()) {
+      static const int INFINITE_TAG = MAXINT; // no label means that it exists somwhere in infinite
+      int aFeatureTag = INFINITE_TAG; 
+      if (aFIter != aFeatures.end()) { // existing tag for feature
+        shared_ptr<Model_Object> aData = dynamic_pointer_cast<Model_Object>((*aFIter)->data());
+        aFeatureTag = aData->label().Tag();
+      }
+      int aDSTag = INFINITE_TAG; 
+      if (aFLabIter.More()) { // next label in DS is existing
+        aDSTag = aFLabIter.Value()->Label().Tag();
+      }
+      if (aDSTag > aFeatureTag) { // feature is removed
+        aFIter = aFeatures.erase(aFIter);
+      } else if (aDSTag < aFeatureTag) { // a new feature is inserted
+        // create a feature
+        shared_ptr<ModelAPI_Feature> aFeature = ModelAPI_PluginManager::get()->createFeature(
+          TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(
+          aFLabIter.Value())->Get()).ToCString());
+
+        std::shared_ptr<Model_Object> aData(new Model_Object);
+        TDF_Label aLab = aFLabIter.Value()->Label();
+        aData->setLabel(aLab);
+        aData->setDocument(Model_Application::getApplication()->getDocument(myID));
+        aFeature->setData(aData);
+        aFeature->initAttributes();
+        // event: model is updated
+        static Event_ID anEvent = Event_Loop::eventByName(EVENT_FEATURE_UPDATED);
+        ModelAPI_FeatureUpdatedMessage aMsg(aFeature);
+        Event_Loop::loop()->send(aMsg);
+
+        if (aFIter == aFeatures.end()) {
+          aFeatures.push_back(aFeature);
+          aFIter = aFeatures.end();
+        } else {
+          aFIter++;
+          aFeatures.insert(aFIter, aFeature);
+        }
+        // feature for this label is added, so go to the next label
+        aFLabIter.Next();
+      } else { // nothing is changed, both iterators are incremented
+        aFIter++;
+        aFLabIter.Next();
+      }
+    }
+  }
+}
 
 ModelAPI_FeatureUpdatedMessage::ModelAPI_FeatureUpdatedMessage(
   shared_ptr<ModelAPI_Feature> theFeature)

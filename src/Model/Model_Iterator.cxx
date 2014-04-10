@@ -18,7 +18,7 @@ void Model_Iterator::next()
 
 bool Model_Iterator::more()
 {
-  return myIter.More();
+  return myIter.More() == Standard_True;
 }
 
 shared_ptr<ModelAPI_Feature> Model_Iterator::current()
@@ -53,11 +53,14 @@ int Model_Iterator::numIterationsLeft()
 
 bool Model_Iterator::is(std::shared_ptr<ModelAPI_Feature> theFeature)
 {
-  return myIter.Value()->Label() == 
-    dynamic_pointer_cast<Model_Object>(theFeature->data())->label();
+  return (myIter.Value()->Label() == 
+    dynamic_pointer_cast<Model_Object>(theFeature->data())->label()) == Standard_True;
 
 }
 
+Model_Iterator::Model_Iterator()
+{
+}
 
 Model_Iterator::Model_Iterator(std::shared_ptr<Model_Document> theDoc, TDF_Label theLab)
   : myDoc(theDoc), myIter(theLab, TDataStd_Comment::GetID(), Standard_False)

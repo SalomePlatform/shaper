@@ -18,30 +18,32 @@ class Model_Document;
  * (see method featuresIterator).
  */
 
-class MODEL_EXPORT Model_Iterator : public ModelAPI_Iterator
+class Model_Iterator : public ModelAPI_Iterator
 {
   std::shared_ptr<Model_Document> myDoc; ///< the document of iterated objects
   TDF_ChildIDIterator myIter; ///< iterator of the features-labels
 public:
   /// Iterates to the next feature
-  virtual void next();
+  MODEL_EXPORT virtual void next();
   /// Returns true if the current iteration is valid and next iteration is possible
-  virtual bool more();
+  MODEL_EXPORT virtual bool more();
   /// Returns the currently iterated feature
-  virtual std::shared_ptr<ModelAPI_Feature> current();
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> current();
   /// Returns the kind of the current feature (faster than Current()->getKind())
-  virtual std::string currentKind();
+  MODEL_EXPORT virtual std::string currentKind();
   /// Returns the name of the current feature (faster than Current()->getName())
-  virtual std::string currentName();
+  MODEL_EXPORT virtual std::string currentName();
   /// Don't changes the current position of iterator. Not fast: iterates the left items.
   /// \returns number of left iterations
-  virtual int numIterationsLeft();
+  MODEL_EXPORT virtual int numIterationsLeft();
 
   /// Compares the current feature with the given one
   /// \returns true if given feature equals to the current one
-  virtual bool is(std::shared_ptr<ModelAPI_Feature> theFeature);
+  MODEL_EXPORT virtual bool is(std::shared_ptr<ModelAPI_Feature> theFeature);
 
 protected:
+  /// Creates an empty iterator that alway returns More false
+  Model_Iterator();
   /// Initializes iterator
   /// \param theDoc document where the iteration is performed
   /// \param theLab label of the features group to iterate
