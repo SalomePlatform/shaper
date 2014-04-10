@@ -50,6 +50,7 @@ XGUI_Workbench::XGUI_Workbench(QWidget *theParent)
 
   myCommandsArea = new CommandsArea(this);
   aMainLayout->addWidget(myCommandsArea);
+  myCommandsArea->viewport()->installEventFilter(this);
 
   myChildWidget = new QWidget(myCommandsArea);
   myCommandsArea->setWidget(myChildWidget);
@@ -158,4 +159,15 @@ bool XGUI_Workbench::isExceedsRight()
   int aVPWidth = myCommandsArea->viewport()->rect().width();
   int aWgtWidth = myChildWidget->childrenRect().width();
   return ((aVPWidth - aPos.x()) < aWgtWidth);
+}
+
+bool XGUI_Workbench::eventFilter(QObject *theObj, QEvent *theEvent)
+{
+  if (theObj == myCommandsArea->viewport()) {
+    if (theEvent->type() == QEvent::Resize) {
+      myLeftButton->setVisible(isExceedsLeft());
+      myRightButton->setVisible(isExceedsRight());
+    }
+  }
+  return QWidget::eventFilter(theObj, theEvent);
 }

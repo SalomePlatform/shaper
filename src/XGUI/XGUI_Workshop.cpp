@@ -65,21 +65,18 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, aPartSetId);
   activateModule();
   myMainWindow->show();
-  QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
-  aWnd->showMaximized();
-  myMainWindow->showPythonConsole();
 
   // Testing of document creation
-  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  std::shared_ptr<ModelAPI_Feature> aPoint1 = aMgr->rootDocument()->addFeature("Point");
-  std::shared_ptr<ModelAPI_Feature> aPart = aMgr->rootDocument()->addFeature("Part");
-  aPart->execute();
-  aMgr->setCurrentDocument(aPart->data()->docRef("PartDocument")->value());
-  std::shared_ptr<ModelAPI_Feature> aPoint2 = aMgr->rootDocument()->addFeature("Point");
-  aPoint2 = aMgr->rootDocument()->addFeature("Point");
+  //std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  //std::shared_ptr<ModelAPI_Feature> aPoint1 = aMgr->rootDocument()->addFeature("Point");
+  //std::shared_ptr<ModelAPI_Feature> aPart = aMgr->rootDocument()->addFeature("Part");
+  //aPart->execute();
+  //aMgr->setCurrentDocument(aPart->data()->docRef("PartDocument")->value());
+  //std::shared_ptr<ModelAPI_Feature> aPoint2 = aMgr->rootDocument()->addFeature("Point");
+  //aPoint2 = aMgr->rootDocument()->addFeature("Point");
 
-  aPart = aMgr->rootDocument()->addFeature("Part");
-  aPart->execute();
+  //aPart = aMgr->rootDocument()->addFeature("Part");
+  //aPart->execute();
 }
 
 //******************************************************
@@ -249,7 +246,12 @@ void XGUI_Workshop::onExit()
 //******************************************************
 void XGUI_Workshop::onNew()
 {
+  QApplication::setOverrideCursor(Qt::WaitCursor);
   myMainWindow->showObjectBrowser();
+  myMainWindow->showPythonConsole();
+  QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
+  aWnd->showMaximized();
+  QApplication::restoreOverrideCursor();
 }
 
 //******************************************************

@@ -17,6 +17,11 @@ class XGUI_ViewWindow;
 class QMouseEvent;
 class QKeyEvent;
 
+/**\class XGUI_Viewer
+ * \ingroup GUI
+ * \brief Represents a 3d viewer. The viewer manages 3d scene and a set of view windows
+ * when each of view window is a one point of view on this scene.
+ */
 class XGUI_Viewer: public QObject
 {
 Q_OBJECT
@@ -26,38 +31,56 @@ public:
   XGUI_Viewer(XGUI_MainWindow* theParent, bool DisplayTrihedron = true);
   ~XGUI_Viewer();
 
+  //! Creates a new view window
   QMdiSubWindow* createView(V3d_TypeOfView theType = V3d_ORTHOGRAPHIC);
 
+  //! Return pointer on a main window - parent of the Viewer
   XGUI_MainWindow* mainWindow() const
   {
     return myMainWindow;
   }
 
+  //! Returns OCCT object which manages 3d scene
   Handle(V3d_Viewer) v3dViewer() const
   {
     return myV3dViewer;
   }
 
+  //! Returns OCCT object which manages displaying and selection in 3d scene
   Handle(AIS_InteractiveContext) AISContext() const
   {
     return myAISContext;
   }
 
+  //! Trihedron 3d object shown in the viewer
   Handle(AIS_Trihedron) trihedron() const
   {
     return myTrihedron;
   }
 
+  //! On/Off visibility of the trihedron object
   void toggleTrihedron();
+
+  //! Returns true if trihedron is visible
   bool isTrihedronVisible() const;
-  void setTrihedronShown(const bool on);
+
+  //! Returns true if trihedron is visible
+  void setTrihedronShown(bool on);
+
+  //! Returns trihedron size
   double trihedronSize() const;
+
+  //! Sets trihedron size
   void setTrihedronSize(const double sz, bool isRelative);
+
   bool trihedronRelative() const
   {
     return myIsRelative;
   }
+  //! Update trihedron
   void updateTrihedron();
+
+  //! Compute trihedron size dependent on 3d scene size
   bool computeTrihedronSize(double& theNewSize, double& theSize);
 
   static void setHotButton(XGUI::InteractionStyle theInteractionStyle, XGUI::HotOperation theOper,
@@ -75,28 +98,28 @@ public:
   static InteractionStyle2ButtonsMap myButtonMap;
 
 signals:
-    void lastViewClosed();
-    void tryCloseView(XGUI_ViewWindow* theWindow);
-    void deleteView(XGUI_ViewWindow* theWindow);
-    void viewCreated(XGUI_ViewWindow* theWindow);
-    void mousePress(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
-    void mouseRelease(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
-    void mouseDoubleClick(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
-    void mouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
-    void keyPress(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent);
-    void keyRelease(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent);
-    void activated(XGUI_ViewWindow* theWindow);
+  void lastViewClosed();
+  void tryCloseView(XGUI_ViewWindow* theWindow);
+  void deleteView(XGUI_ViewWindow* theWindow);
+  void viewCreated(XGUI_ViewWindow* theWindow);
+  void mousePress(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+  void mouseRelease(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+  void mouseDoubleClick(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+  void mouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+  void keyPress(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent);
+  void keyRelease(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent);
+  void activated(XGUI_ViewWindow* theWindow);
 
 private slots:
-    void onViewClosed(QMdiSubWindow*);
-    //void onViewMapped();
-    void onWindowActivated(QMdiSubWindow*);
+  void onViewClosed(QMdiSubWindow*);
+  //void onViewMapped();
+  void onWindowActivated(QMdiSubWindow*);
 
 private:
-    void addView(QMdiSubWindow* theView);
+  void addView(QMdiSubWindow* theView);
 
-    /*! Removes the View from internal Views list.*/
-    void removeView(QMdiSubWindow* theView);
+  /*! Removes the View from internal Views list.*/
+  void removeView(QMdiSubWindow* theView);
 
 private:
   XGUI_MainWindow* myMainWindow;

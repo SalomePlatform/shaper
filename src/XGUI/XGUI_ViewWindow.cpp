@@ -93,7 +93,7 @@ void ViewerToolbar::repaintBackground()
 void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 {
   repaintBackground();
-  QToolBar::paintEvent(theEvent);
+  //QToolBar::paintEvent(theEvent);
 }
 
 //**************************************************************************

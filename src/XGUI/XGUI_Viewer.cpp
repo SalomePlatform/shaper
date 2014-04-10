@@ -227,7 +227,7 @@ bool XGUI_Viewer::isTrihedronVisible() const
  \param on - new state
  */
 
-void XGUI_Viewer::setTrihedronShown(const bool on)
+void XGUI_Viewer::setTrihedronShown(bool on)
 {
   if (myTrihedron.IsNull())
     return;
