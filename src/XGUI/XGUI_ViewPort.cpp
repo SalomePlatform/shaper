@@ -249,10 +249,15 @@ void OpenGLUtils_FrameBuffer::unbind()
 //************************************************************************
 //************************************************************************
 //************************************************************************
-XGUI_ViewPort::XGUI_ViewPort(XGUI_ViewWindow* theParent, const Handle(V3d_Viewer)& theViewer,
+XGUI_ViewPort::XGUI_ViewPort(XGUI_ViewWindow* theParent,
+                             const Handle(V3d_Viewer)& theViewer,
                              V3d_TypeOfView theType)
-    : QWidget(theParent), myPaintersRedrawing(false), myScale(1.0), myIsAdvancedZoomingEnabled(
-        false)
+    : QWidget(theParent),
+      myPaintersRedrawing(false),
+      myScale(1.0),
+      myIsAdvancedZoomingEnabled(false),
+      myBgImgHeight(0),
+      myBgImgWidth(0)
 {
   setMouseTracking(true);
   setBackgroundRole(QPalette::NoRole);

@@ -133,7 +133,10 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
     myCurrPointType(XGUI::GRAVITY), 
     myPrevPointType(XGUI::GRAVITY), 
     myRotationPointSelection(false),
-    myClosable(true)
+    myClosable(true),
+    myStartX(0), myStartY(0), myCurrX(0), myCurrY(0), myCurScale(0.0), myCurSketch(0),
+    myDrawRect(false), myEnableDrawMode(false), myCursorIsHand(false), myEventStarted(false),
+    myLastState(NormalState), myOperation(NOTHING)
 {
   mySelectedPoint = gp_Pnt(0., 0., 0.);
   setFrameStyle(QFrame::Raised);

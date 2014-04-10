@@ -342,7 +342,7 @@ void PyConsole_EnhEditor::extractCommon(const std::vector<QString> & matches, QS
       if (charIdx >= matches[0].size())
         return;
       QChar ch = matches[0][charIdx];
-      for (int j = 1; j < matches.size(); j++)
+      for (size_t j = 1; j < matches.size(); j++)
         if (charIdx >= matches[j].size() || matches[j][charIdx] != ch)
           return;
       result += ch;

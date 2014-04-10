@@ -10,6 +10,8 @@ class XGUI_Module
 public:
   virtual void createFeatures() = 0;
   virtual void featureCreated(XGUI_Command*) = 0;
+
+  virtual ~XGUI_Module() {};
 };
 
 //! This function must return a new module instance.
