@@ -8,6 +8,8 @@
 IMPLEMENT_STANDARD_HANDLE(Model_Application, TDocStd_Application)
 IMPLEMENT_STANDARD_RTTIEXT(Model_Application, TDocStd_Application)
 
+using namespace std;
+
 static Handle_Model_Application TheApplication = new Model_Application;
 
 //=======================================================================
@@ -23,7 +25,7 @@ Handle(Model_Application) Model_Application::getApplication()
 //function : getDocument
 //purpose  : 
 //=======================================================================
-std::shared_ptr<Model_Document> Model_Application::getDocument(std::string theDocID)
+std::shared_ptr<Model_Document> Model_Application::getDocument(string theDocID)
 {
   if (myDocs.find(theDocID) != myDocs.end())
     return myDocs[theDocID];
@@ -31,6 +33,11 @@ std::shared_ptr<Model_Document> Model_Application::getDocument(std::string theDo
   std::shared_ptr<Model_Document> aNew(new Model_Document(theDocID));
   myDocs[theDocID] = aNew;
   return aNew;
+}
+
+void Model_Application::deleteDocument(string theDocID)
+{
+  myDocs.erase(theDocID);
 }
 
 //=======================================================================
