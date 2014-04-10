@@ -90,6 +90,9 @@ public:
   ///! Returns the vector of groups already added to the document
   MODELAPI_EXPORT virtual const std::vector<std::string>& getGroups() const = 0;
 
+  /// To virtually destroy the fields of successors
+  virtual ~ModelAPI_Document() {}
+
 protected:
   /// Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document()

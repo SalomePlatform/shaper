@@ -13,7 +13,7 @@
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
-#include <ModelAPI_Object.h>
+#include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
 
 #include <Event_Loop.h>

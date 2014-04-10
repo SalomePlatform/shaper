@@ -1,9 +1,9 @@
-// File:        ModelAPI_Object.hxx
+// File:        ModelAPI_Data.hxx
 // Created:     21 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ModelAPI_Object_HeaderFile
-#define ModelAPI_Object_HeaderFile
+#ifndef ModelAPI_Data_HeaderFile
+#define ModelAPI_Data_HeaderFile
 
 #include "ModelAPI.h"
 #include <string>
@@ -13,13 +13,13 @@ class ModelAPI_AttributeDocRef;
 class ModelAPI_AttributeDouble;
 class ModelAPI_Document;
 
-/**\class ModelAPI_Object
+/**\class ModelAPI_Data
  * \ingroup DataModel
  * \brief General object of the application that allows
  * to get/set attributes from the document and compute result of an operation.
  */
 
-class MODELAPI_EXPORT ModelAPI_Object
+class MODELAPI_EXPORT ModelAPI_Data
 {
 public:
 
@@ -43,9 +43,12 @@ public:
   /// Returns the document of this data
   virtual std::shared_ptr<ModelAPI_Document> document() = 0;
 
+  /// To virtually destroy the fields of successors
+  virtual ~ModelAPI_Data() {}
+
 protected:
   /// Objects are created for features automatically
-  ModelAPI_Object()
+  ModelAPI_Data()
   {}
 };
 

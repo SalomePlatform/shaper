@@ -20,10 +20,13 @@ public:
   /// Returns the type of this class of attributes, not static method
   virtual std::string attributeType() = 0;
 
+  /// To virtually destroy the fields of successors
+  virtual ~ModelAPI_Attribute() {}
+
 protected:
   /// Objects are created for features automatically
-  ModelAPI_Attribute()
-  {}
+  ModelAPI_Attribute(){}
+
 };
 
 #endif

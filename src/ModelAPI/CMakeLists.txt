@@ -6,12 +6,11 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(PROJECT_HEADERS
     ModelAPI.h
-    ModelAPI_Interface.h
     ModelAPI_PluginManager.h
     ModelAPI_Plugin.h
     ModelAPI_Feature.h
     ModelAPI_Iterator.h
-    ModelAPI_Object.h
+    ModelAPI_Data.h
     ModelAPI_Document.h
     ModelAPI_Attribute.h
     ModelAPI_AttributeDouble.h
