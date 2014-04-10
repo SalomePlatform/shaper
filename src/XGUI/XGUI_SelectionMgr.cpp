@@ -33,7 +33,9 @@ void XGUI_SelectionMgr::onSelectionChanged()
     FeaturePtr aFeature = mySelectedData.first();
 
     std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-    aMgr->setCurrentDocument(aFeature->data()->docRef("PartDocument")->value());
+    std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = aFeature->data()->docRef("PartDocument");
+    if (aDocRef)
+      aMgr->setCurrentDocument(aDocRef->value());
   }
 
   emit selectionChanged();

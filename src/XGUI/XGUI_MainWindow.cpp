@@ -121,7 +121,7 @@ void XGUI_MainWindow::createDockWidgets()
   myPropertyPanelDock = createPropertyPanel();
   addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanelDock);
   hidePropertyPanel(); //<! Invisible by default
-
+  hideObjectBrowser();
   tabifyDockWidget(aObjDock, myPropertyPanelDock);
 }
 
@@ -171,9 +171,6 @@ QDockWidget* XGUI_MainWindow::createObjectBrowser()
   aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   aObjDock->setWindowTitle(tr("Object browser"));
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
-  //myObjectBrowser->setColumnCount(1);
-  //myObjectBrowser->setHeaderHidden(true);
   aObjDock->setWidget(myObjectBrowser);
-//  fillObjectBrowser();
   return aObjDock;
 }
