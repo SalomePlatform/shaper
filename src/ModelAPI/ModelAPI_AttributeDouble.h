@@ -27,6 +27,9 @@ public:
   /// Returns the type of this class of attributes, not static method
   virtual std::string attributeType() {return type();}
 
+  /// To virtually destroy the fields of successors
+  virtual ~ModelAPI_AttributeDouble() {}
+
 protected:
   /// Objects are created for features automatically
   ModelAPI_AttributeDouble()

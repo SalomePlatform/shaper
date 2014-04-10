@@ -5,7 +5,7 @@
 #include "PartSetPlugin_Point.h"
 #include "ModelAPI_PluginManager.h"
 #include "ModelAPI_Document.h"
-#include "ModelAPI_Object.h"
+#include "ModelAPI_Data.h"
 #include "ModelAPI_AttributeDouble.h"
 
 using namespace std;

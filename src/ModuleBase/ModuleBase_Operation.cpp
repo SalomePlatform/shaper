@@ -10,7 +10,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
-#include <ModelAPI_Object.h>
+#include <ModelAPI_Data.h>
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
 
@@ -263,7 +263,7 @@ void ModuleBase_Operation::storeReal(double theValue)
     return;
   }
   QString anId = sender()->objectName();
-  std::shared_ptr<ModelAPI_Object> aData = myFeature->data();
+  std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   std::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(anId.toStdString());
   aReal->setValue(theValue);
 }

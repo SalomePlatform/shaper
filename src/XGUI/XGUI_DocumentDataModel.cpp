@@ -5,7 +5,7 @@
 #include <ModelAPI_Iterator.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
-#include <ModelAPI_Object.h>
+#include <ModelAPI_Data.h>
 #include <Model_Events.h>
 
 #include <Event_Loop.h>
@@ -22,6 +22,7 @@ XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
   myDocument = aMgr->currentDocument();
 
   // Register in event loop
+  Event_Loop::loop()->registerListener(this, Event_Loop::eventByName(EVENT_FEATURE_CREATED));
   Event_Loop::loop()->registerListener(this, Event_Loop::eventByName(EVENT_FEATURE_UPDATED));
 
   // Create a top part of data tree model

@@ -6,7 +6,7 @@
 #define Model_Data_HeaderFile
 
 #include "Model.h"
-#include <ModelAPI_Object.h>
+#include <ModelAPI_Data.h>
 #include <TDF_Label.hxx>
 
 #include <map>
@@ -19,7 +19,7 @@ class ModelAPI_Attribute;
  * to get/set attributes from the document and compute result of an operation.
  */
 
-class Model_Data: public ModelAPI_Object
+class Model_Data: public ModelAPI_Data
 {
   TDF_Label myLab; ///< label of the feature in the document
   /// All attributes of the object identified by the attribute ID

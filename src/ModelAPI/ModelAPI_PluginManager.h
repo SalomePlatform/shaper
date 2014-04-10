@@ -46,6 +46,9 @@ public:
   /// Is needed for python wrapping by swig, call Get to get an instance
   ModelAPI_PluginManager();
 
+  /// To virtually destroy the fields of successors
+  virtual ~ModelAPI_PluginManager() {}
+
 protected:
   /// Creates the feature object using plugins functionality
   virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;

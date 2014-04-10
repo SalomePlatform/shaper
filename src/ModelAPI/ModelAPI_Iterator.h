@@ -38,6 +38,9 @@ public:
   /// \returns true if given feature equals to the current one
   virtual bool is(std::shared_ptr<ModelAPI_Feature> theFeature) = 0;
 
+  /// To virtually destroy the fields of successors
+  virtual ~ModelAPI_Iterator() {}
+
 protected:
   /// Use plugin manager for features creation: this method is 
   /// defined here only for SWIG-wrapping
