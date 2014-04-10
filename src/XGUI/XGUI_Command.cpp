@@ -25,6 +25,7 @@ QWidget* XGUI_Command::createWidget(QWidget* theParent)
     QPushButton* aBtn = new QPushButton(theParent);
     aBtn->setIcon(icon());
     aBtn->setText(text());
+    aBtn->setStyleSheet("text-align: left");
     QKeySequence aKeys = shortcut();
     QString aToolTip = toolTip();
     if (!aKeys.isEmpty())
