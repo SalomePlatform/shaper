@@ -289,6 +289,7 @@ void ModuleBase_Operation::startOperation()
 {
   std::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_PluginManager::get()->rootDocument();
   myFeature = aDoc->addFeature(myOperationId.toStdString());
+  myFeature->execute();
   //emit callSlot();
   //commit();
 }
@@ -318,6 +319,7 @@ void ModuleBase_Operation::abortOperation()
  */
 void ModuleBase_Operation::commitOperation()
 {
+  myFeature->execute();
 }
 
 /*!

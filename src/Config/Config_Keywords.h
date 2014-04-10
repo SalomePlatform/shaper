@@ -14,7 +14,7 @@
 const static char* NODE_WORKBENCH = "workbench";
 const static char* NODE_GROUP = "group";
 const static char* NODE_FEATURE = "feature";
-const static char* NODE_DOUBLE_WDG = "value";
+const static char* NODE_DOUBLE_WDG = "doublevalue";
 
 const static char* _ID = "id";
 //const static char* WORKBENCH_ID = "id";
