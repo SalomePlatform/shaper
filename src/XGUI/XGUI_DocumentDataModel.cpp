@@ -86,9 +86,9 @@ void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
       if (aUpdMsg->group().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
         int aStart = myModel->rowCount(QModelIndex()) + myPartModels.size() - 1;
         beginRemoveRows(QModelIndex(), aStart, aStart);
+        endRemoveRows();
         delete myPartModels.last();
         myPartModels.removeLast();
-        endRemoveRows();
       } else { // Update top groups (other except parts
         QModelIndex aIndex = myModel->findGroup(aUpdMsg->group());
         int aStart = myModel->rowCount(aIndex);
