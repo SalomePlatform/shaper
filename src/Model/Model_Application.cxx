@@ -13,17 +13,11 @@ using namespace std;
 static Handle_Model_Application TheApplication = new Model_Application;
 
 //=======================================================================
-//function : getApplication
-//purpose  : 
-//=======================================================================
 Handle(Model_Application) Model_Application::getApplication()
 {
   return TheApplication;
 }
 
-//=======================================================================
-//function : getDocument
-//purpose  : 
 //=======================================================================
 const std::shared_ptr<Model_Document>& Model_Application::getDocument(string theDocID)
 {
@@ -41,8 +35,11 @@ void Model_Application::deleteDocument(string theDocID)
 }
 
 //=======================================================================
-//function : OCAFApp_Application
-//purpose  : 
+bool Model_Application::hasDocument(std::string theDocID)
+{
+  return myDocs.find(theDocID) != myDocs.end();
+}
+
 //=======================================================================
 Model_Application::Model_Application()
 {
@@ -52,17 +49,11 @@ Model_Application::Model_Application()
 }
 
 //=======================================================================
-//function : Formats
-//purpose  : 
-//=======================================================================
 void Model_Application::Formats(TColStd_SequenceOfExtendedString& theFormats)
 {
   theFormats.Append(TCollection_ExtendedString("BinOcaf")); // standard binary schema
 }
 
-//=======================================================================
-//function : ResourcesName
-//purpose  : 
 //=======================================================================
 Standard_CString Model_Application::ResourcesName()
 {

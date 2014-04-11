@@ -31,6 +31,8 @@ public:
   MODEL_EXPORT static Handle_Model_Application getApplication();
   //! Returns the main document (on first call creates it) by the string identifier
   MODEL_EXPORT const std::shared_ptr<Model_Document>& getDocument(std::string theDocID);
+  //! Returns true if document has been created
+  MODEL_EXPORT bool hasDocument(std::string theDocID);
   //! Deletes the document from the application
   MODEL_EXPORT void deleteDocument(std::string theDocID);
 
