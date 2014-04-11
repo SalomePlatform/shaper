@@ -35,7 +35,11 @@ public:
   //! Returns 0 if the given index is not index of a feature
   virtual FeaturePtr feature(const QModelIndex& theIndex) const;
 
+  //! Returns parent index of the given feature
   virtual QModelIndex findParent(const std::shared_ptr<ModelAPI_Feature>& theFeature) const;
+
+  //! Returns index corresponded to the group
+  virtual QModelIndex findGroup(const std::string& theGroup) const;
 
 private:
   //! Types of QModelIndexes
@@ -85,6 +89,9 @@ public:
 
   //! Returns parent index of the given feature
   virtual QModelIndex findParent(const std::shared_ptr<ModelAPI_Feature>& theFeature) const;
+
+  //! Returns index corresponded to the group
+  virtual QModelIndex findGroup(const std::string& theGroup) const;
 
 private: 
   std::shared_ptr<ModelAPI_Document> featureDocument() const;

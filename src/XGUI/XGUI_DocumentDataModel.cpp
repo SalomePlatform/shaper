@@ -83,12 +83,37 @@ void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
     std::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
 
     if (aDoc == myDocument) {  // If root objects
-      int aStart = myPartModels.count() - 2;
-      delete myPartModels.last();
-      myPartModels.removeLast();
-      beginRemoveRows(QModelIndex(), aStart, aStart);
-      endRemoveRows();
+      if (aUpdMsg->group().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
+        int aStart = myModel->rowCount(QModelIndex()) + myPartModels.size() - 1;
+        beginRemoveRows(QModelIndex(), aStart, aStart);
+        delete myPartModels.last();
+        myPartModels.removeLast();
+        endRemoveRows();
+      } else { // Update top groups (other except parts
+        QModelIndex aIndex = myModel->findGroup(aUpdMsg->group());
+        int aStart = myModel->rowCount(aIndex);
+        aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
+        beginRemoveRows(aIndex, aStart, aStart);
+        endRemoveRows();
+      }
+    } else {
+      XGUI_PartModel* aPartModel = 0;
+      QList<XGUI_PartModel*>::const_iterator aIt;
+      for (aIt = myPartModels.constBegin(); aIt != myPartModels.constEnd(); ++aIt) {
+        if ((*aIt)->hasDocument(aDoc)) {
+          aPartModel = (*aIt);
+          break;
+        }
+      }
+      if (aPartModel) {
+        QModelIndex aIndex = aPartModel->findGroup(aUpdMsg->group());
+        int aStart = aPartModel->rowCount(aIndex);
+        aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
+        beginRemoveRows(aIndex, aStart, aStart);
+        endRemoveRows();
+      }
     }
+
   // Reset whole tree **************************
   } else {  
     beginResetModel();

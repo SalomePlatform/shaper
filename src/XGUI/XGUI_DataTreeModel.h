@@ -25,6 +25,9 @@ public:
   //! Returns parent index of the given feature
   virtual QModelIndex findParent(const std::shared_ptr<ModelAPI_Feature>& theFeature) const = 0;
 
+  //! Returns index corresponded to the group
+  virtual QModelIndex findGroup(const std::string& theGroup) const = 0;
+
 protected:
   std::shared_ptr<ModelAPI_Document> myDocument;
 };

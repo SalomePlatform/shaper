@@ -152,6 +152,15 @@ QModelIndex XGUI_TopDataModel::findParent(const std::shared_ptr<ModelAPI_Feature
   return QModelIndex();
 }
 
+QModelIndex XGUI_TopDataModel::findGroup(const std::string& theGroup) const
+{
+  if (theGroup.compare(PARAMETERS_GROUP) == 0)
+    return createIndex(0, 0, (quintptr) ParamsFolder);
+  if (theGroup.compare(CONSTRUCTIONS_GROUP) == 0)
+    return createIndex(1, 0, (quintptr) ConstructFolder);
+  return QModelIndex();
+}
+
 
 //******************************************************************
 //******************************************************************
@@ -325,6 +334,15 @@ QModelIndex XGUI_PartDataModel::findParent(const std::shared_ptr<ModelAPI_Featur
   if (theFeature->getGroup().compare(PARAMETERS_GROUP) == 0)
     return createIndex(0, 0, (quintptr) ParamsFolder);
   if (theFeature->getGroup().compare(CONSTRUCTIONS_GROUP) == 0)
+    return createIndex(1, 0, (quintptr) ConstructFolder);
+  return QModelIndex();
+}
+
+QModelIndex XGUI_PartDataModel::findGroup(const std::string& theGroup) const
+{
+  if (theGroup.compare(PARAMETERS_GROUP) == 0)
+    return createIndex(0, 0, (quintptr) ParamsFolder);
+  if (theGroup.compare(CONSTRUCTIONS_GROUP) == 0)
     return createIndex(1, 0, (quintptr) ConstructFolder);
   return QModelIndex();
 }
