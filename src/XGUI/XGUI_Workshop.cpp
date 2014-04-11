@@ -314,7 +314,7 @@ XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
   err = QString( "Can not load library %1. %2" ).arg( libName ).arg( dlerror() );
   else
   {
-    crtInst = (CREATE_FUNC)dlsym( modLib, GET_MODULE_NAME );
+    crtInst = (CREATE_FUNC)dlsym( modLib, CREATE_MODULE );
     if ( !crtInst )
     err = QString( "Failed to find function %1. %2" ).arg( CREATE_MODULE ).arg( dlerror() );
   }

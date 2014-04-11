@@ -196,7 +196,9 @@ private slots:
 private:
   enum WindowState
   {
-    MinimizedState, MaximizedState, NormalState
+    MinimizedState,
+    MaximizedState,
+    WindowNormalState
   };
 
   bool processWindowControls(QObject *theObj, QEvent *theEvent);

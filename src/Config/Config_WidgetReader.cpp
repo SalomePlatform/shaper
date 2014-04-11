@@ -8,10 +8,10 @@
 #include <Config_WidgetReader.h>
 #include <Config_Keywords.h>
 
-#include <libxml\parser.h>
-#include <libxml\tree.h>
-#include <libxml\xpath.h>
-#include <libxml\xmlstring.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+#include <libxml/xpath.h>
+#include <libxml/xmlstring.h>
 
 #ifdef _DEBUG
 #include <iostream>

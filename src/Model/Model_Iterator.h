@@ -39,7 +39,7 @@ public:
 
   /// Compares the current feature with the given one
   /// \returns true if given feature equals to the current one
-  MODEL_EXPORT virtual bool is(std::shared_ptr<ModelAPI_Feature> theFeature);
+  MODEL_EXPORT virtual bool isEqual(std::shared_ptr<ModelAPI_Feature> theFeature);
 
 protected:
   /// Creates an empty iterator that alway returns More false

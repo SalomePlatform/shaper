@@ -11,9 +11,9 @@
 #include <Event_Message.h>
 #include <Event_Loop.h>
 
-#include <libxml\parser.h>
-#include <libxml\tree.h>
-#include <libxml\xmlstring.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+#include <libxml/xmlstring.h>
 
 #include <string>
 

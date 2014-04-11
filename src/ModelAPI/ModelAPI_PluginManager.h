@@ -41,7 +41,7 @@ public:
   virtual void setCurrentDocument(std::shared_ptr<ModelAPI_Document> theDoc) = 0;
 
   /// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
-  static void ModelAPI_PluginManager::loadLibrary(const std::string theLibName);
+  static void loadLibrary(const std::string theLibName);
 
   /// Is needed for python wrapping by swig, call Get to get an instance
   ModelAPI_PluginManager();

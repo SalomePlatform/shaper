@@ -8,6 +8,16 @@ INCLUDE(Common)
 INCLUDE(FindQt)
 INCLUDE(FindPython)
 
+IF(UNIX)
+    IF(CMAKE_COMPILER_IS_GNUCC)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+        MESSAGE(STATUS "Setting -std=c++0x flag for the gcc...")
+        MESSAGE(STATUS "Now gcc flags are: " ${CMAKE_CXX_FLAGS})
+        
+    ENDIF(CMAKE_COMPILER_IS_GNUCC)
+ENDIF(UNIX)
+
+
 ADD_SUBDIRECTORY (src/Config)
 ADD_SUBDIRECTORY (src/Event)
 ADD_SUBDIRECTORY (src/Model)

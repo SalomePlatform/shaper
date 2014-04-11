@@ -43,4 +43,4 @@ private:
   QPushButton* myLeftButton;
 };
 
-#endif;
+#endif

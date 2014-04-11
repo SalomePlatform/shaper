@@ -7,8 +7,8 @@
 
 #include <Config_WidgetAPI.h>
 
-#include <libxml\parser.h>
-#include <libxml\tree.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
 
 Config_WidgetAPI::Config_WidgetAPI(std::string theRawXml)

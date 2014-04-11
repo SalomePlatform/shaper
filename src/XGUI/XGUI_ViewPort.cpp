@@ -1,10 +1,4 @@
-#ifndef WIN32
-# ifndef GLX_GLXEXT_LEGACY
-#  define GLX_GLXEXT_LEGACY
-# endif
-# include <GL/glx.h>
-# include <dlfcn.h>
-#else
+#ifdef WIN32
 # include <windows.h>
 # include <wingdi.h>
 #endif
@@ -21,6 +15,7 @@
 #include <V3d_OrthographicView.hxx>
 #include <V3d_PerspectiveView.hxx>
 #include <Visual3d_View.hxx>
+#include <Graphic3d_GraphicDriver.hxx>
 
 #ifdef WIN32
 #include <WNT_Window.hxx>
@@ -29,6 +24,15 @@
 #endif
 
 #include <GL/gl.h>
+//qmetatype.h must be included before any header file that defines Bool
+//see /QtCore/qmetatype.h:53 for more info
+#ifndef WIN32
+# ifndef GLX_GLXEXT_LEGACY
+#  define GLX_GLXEXT_LEGACY
+# endif
+# include <GL/glx.h>
+# include <dlfcn.h>
+#endif
 
 static double rx = 0.;
 static double ry = 0.;
