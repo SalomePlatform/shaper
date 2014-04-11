@@ -20,7 +20,7 @@ if "%PDIR%" == "" (
 
 rem --------------- cmake 2.8.7 --------------
 if "%CMAKEDIR%" == "" (
-  set CMAKEDIR=%PDIR%\cmake-2.8.12.1
+  set CMAKEDIR=%PDIR%\cmake-2.8.10.2
 )
 set PATH=%CMAKEDIR%\bin;%PATH%
 
@@ -32,9 +32,9 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM CASCADE
-@SET PATH=%CASROOT%;%CASROOT%\win32\bind;%PATH%
-@SET LIB=%CASROOT%\win32\libd;%LIB%
-@set CSF_GraphicShr=%CASROOT%\win32\bind\TKOpenGl.dll
+@SET PATH=%CASROOT%;%CASROOT%\win32\bin%OCC_LIB_PREFIX%;%PATH%
+@SET LIB=%CASROOT%\win32\lib%OCC_LIB_PREFIX%;%LIB%
+@set CSF_GraphicShr=%CASROOT%\win32\bin%OCC_LIB_PREFIX%\TKOpenGl.dll
 @set CSF_MDTVFontDirectory=%CASROOT%\src\FontMFT
 @set CSF_LANGUAGE=us
 @set MMGT_CLEAR=1
