@@ -12,6 +12,7 @@
 
 
 #include <QIcon>
+#include <QString>
 
 
 XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
@@ -38,21 +39,32 @@ XGUI_DocumentDataModel::~XGUI_DocumentDataModel()
 
 void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
 {
-  beginResetModel();
-  int aNbParts = myDocument->featuresIterator(PARTS_GROUP)->numIterationsLeft();
-  if (myPartModels.size() != aNbParts) { // resize internal models
-    while (myPartModels.size() > aNbParts) {
-      delete myPartModels.last();
-      myPartModels.removeLast();
+  if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_CREATED) {
+    // Add a new part
+    int aStart = myModel->rowCount(QModelIndex()) + myPartModels.size();
+    beginInsertRows(QModelIndex(), aStart, aStart + 1);
+    XGUI_PartDataModel* aModel = new XGUI_PartDataModel(myDocument, this);
+    aModel->setPartId(myPartModels.count());
+    myPartModels.append(aModel);
+    endInsertRows();
+  } else {
+    // Reset whole tree
+    beginResetModel();
+    int aNbParts = myDocument->featuresIterator(PARTS_GROUP)->numIterationsLeft();
+    if (myPartModels.size() != aNbParts) { // resize internal models
+      while (myPartModels.size() > aNbParts) {
+        delete myPartModels.last();
+        myPartModels.removeLast();
+      }
+      while (myPartModels.size() < aNbParts) {
+        myPartModels.append(new XGUI_PartDataModel(myDocument, this));
+      }
+      for (int i = 0; i < myPartModels.size(); i++)
+        myPartModels.at(i)->setPartId(i);
     }
-    while (myPartModels.size() < aNbParts) {
-      myPartModels.append(new XGUI_PartDataModel(myDocument, this));
-    }
-    for (int i = 0; i < myPartModels.size(); i++)
-      myPartModels.at(i)->setPartId(i);
+    clearModelIndexes();
+    endResetModel();
   }
-  clearModelIndexes();
-  endResetModel();
 }
 
 QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) const
