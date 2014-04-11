@@ -224,9 +224,9 @@ void ModuleBase_Operation::abort()
   emit aborted();
 
   stopOperation();
-  emit stopped();
 
   document()->abortOperation();
+  emit stopped();
 }
 
 /*!
@@ -242,9 +242,9 @@ void ModuleBase_Operation::commit()
   emit committed();
 
   stopOperation();
-  emit stopped();
 
   document()->finishOperation();
+  emit stopped();
 }
 
 /*!

@@ -240,6 +240,7 @@ void XGUI_Workshop::connectToPropertyPanel(ModuleBase_Operation* theOperation)
 
   connect(theOperation, SIGNAL(started()), myMainWindow, SLOT(showPropertyPanel()));
   connect(theOperation, SIGNAL(stopped()), myMainWindow, SLOT(hidePropertyPanel()));
+  connect(theOperation, SIGNAL(stopped()), this, SLOT(updateCommandStatus()));
 }
 
 //******************************************************

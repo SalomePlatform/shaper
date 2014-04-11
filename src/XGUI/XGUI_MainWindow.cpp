@@ -147,15 +147,18 @@ QDockWidget* XGUI_MainWindow::createPropertyPanel()
 
   QPushButton* aBtn = new QPushButton(QIcon(":pictures/button_help.png"), "", aFrm);
   aBtn->setFlat(true);
+  //connect(aBtn, SIGNAL(clicked()), this, SIGNAL(propertyHelpPressed()));
   aBtnLay->addWidget(aBtn);
   aBtnLay->addStretch(1);
   aBtn = new QPushButton(QIcon(":pictures/button_ok.png"), "", aFrm);
   aBtn->setObjectName(XGUI::PROP_PANEL_OK);
   aBtn->setFlat(true);
+  //connect(aBtn, SIGNAL(clicked()), this, SIGNAL(propertyOkPressed()));
   aBtnLay->addWidget(aBtn);
   aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
   aBtn->setObjectName(XGUI::PROP_PANEL_CANCEL);
   aBtn->setFlat(true);
+  //connect(aBtn, SIGNAL(clicked()), this, SIGNAL(propertyClosePressed()));
   aBtnLay->addWidget(aBtn);
 
   return aPropPanel;
