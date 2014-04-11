@@ -18,8 +18,8 @@
 
 
 
-Config_ModuleReader::Config_ModuleReader()
-    : Config_XMLReader("plugins.xml"), myIsAutoImport(false)
+Config_ModuleReader::Config_ModuleReader(const char* theEventGenerated)
+    : Config_XMLReader("plugins.xml"), myIsAutoImport(false), myEventGenerated(theEventGenerated)
 {
 }
 
@@ -63,7 +63,7 @@ void Config_ModuleReader::importPlugin(const std::string& thePluginName,
   if(thePluginLibrary.empty()) {
     aReader = new Config_FeatureReader(thePluginName);
   } else {
-    aReader = new Config_FeatureReader(thePluginName, thePluginLibrary);
+    aReader = new Config_FeatureReader(thePluginName, thePluginLibrary, myEventGenerated);
   }
   aReader->readAll();
 }

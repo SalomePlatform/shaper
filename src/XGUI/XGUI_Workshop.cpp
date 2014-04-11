@@ -135,9 +135,10 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 //******************************************************
 void XGUI_Workshop::processEvent(const Event_Message* theMessage)
 {
-  const Config_FeatureMessage* aFeatureMsg =
-      dynamic_cast<const Config_FeatureMessage*>(theMessage);
-  if (aFeatureMsg) {
+  static Event_ID aFeatureId = Event_Loop::loop()->eventByName("FeatureEvent");
+  if (theMessage->eventID() == aFeatureId) {
+    const Config_FeatureMessage* aFeatureMsg =
+        dynamic_cast<const Config_FeatureMessage*>(theMessage);
     addFeature(aFeatureMsg);
     return;
   }

@@ -6,8 +6,9 @@
 #include <Event_Loop.h>
 
 ModelAPI_FeatureUpdatedMessage::ModelAPI_FeatureUpdatedMessage(
+  const std::shared_ptr<ModelAPI_Document>& theDoc,
   const std::shared_ptr<ModelAPI_Feature>& theFeature, const Event_ID& theEvent)
-  : Event_Message(theEvent, 0), myFeature(theFeature)
+  : Event_Message(theEvent, 0), myFeature(theFeature), myDoc(theDoc)
 {}
 
 ModelAPI_FeatureDeletedMessage::ModelAPI_FeatureDeletedMessage(

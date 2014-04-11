@@ -222,7 +222,8 @@ void Model_Document::addFeature(const std::shared_ptr<ModelAPI_Feature> theFeatu
   TDF_Label anObjLab = aGroupLab.NewChild();
   std::shared_ptr<Model_Data> aData(new Model_Data);
   aData->setLabel(anObjLab);
-  aData->setDocument(Model_Application::getApplication()->getDocument(myID));
+  shared_ptr<ModelAPI_Document> aThis = Model_Application::getApplication()->getDocument(myID);
+  aData->setDocument(aThis);
   theFeature->setData(aData);
   setUniqueName(theFeature);
   theFeature->initAttributes();
@@ -234,7 +235,7 @@ void Model_Document::addFeature(const std::shared_ptr<ModelAPI_Feature> theFeatu
 
   // event: feature is added
   static Event_ID anEvent = Event_Loop::eventByName(EVENT_FEATURE_CREATED);
-  ModelAPI_FeatureUpdatedMessage aMsg(theFeature, anEvent);
+  ModelAPI_FeatureUpdatedMessage aMsg(aThis, theFeature, anEvent);
   Event_Loop::loop()->send(aMsg);
 }
 
@@ -349,6 +350,7 @@ void Model_Document::setUniqueName(
 
 void Model_Document::synchronizeFeatures()
 {
+  shared_ptr<ModelAPI_Document> aThis = Model_Application::getApplication()->getDocument(myID);
   // iterate groups labels
   TDF_ChildIDIterator aGroupsIter(myDoc->Main().FindChild(TAG_OBJECTS),
     TDataStd_Comment::GetID(), Standard_False);
@@ -400,8 +402,7 @@ void Model_Document::synchronizeFeatures()
       if (aDSTag > aFeatureTag) { // feature is removed
         aFIter = aFeatures.erase(aFIter);
         // event: model is updated
-        ModelAPI_FeatureDeletedMessage aMsg(
-          Model_Application::getApplication()->getDocument(myID), aGroupName);
+        ModelAPI_FeatureDeletedMessage aMsg(aThis, aGroupName);
         Event_Loop::loop()->send(aMsg);
       } else if (aDSTag < aFeatureTag) { // a new feature is inserted
         // create a feature
@@ -417,7 +418,7 @@ void Model_Document::synchronizeFeatures()
         aFeature->initAttributes();
         // event: model is updated
         static Event_ID anEvent = Event_Loop::eventByName(EVENT_FEATURE_CREATED);
-        ModelAPI_FeatureUpdatedMessage aMsg(aFeature, anEvent);
+        ModelAPI_FeatureUpdatedMessage aMsg(aThis, aFeature, anEvent);
         Event_Loop::loop()->send(aMsg);
 
         if (aFIter == aFeatures.end()) {
