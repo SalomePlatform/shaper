@@ -32,9 +32,9 @@ public:
     const Event_ID& theEvent);
 
   /// Returns the feature that has been updated
-  std::shared_ptr<ModelAPI_Feature> feature() {return myFeature;}
+  std::shared_ptr<ModelAPI_Feature> feature() const {return myFeature;}
   /// Returns the document that has been updated
-  std::shared_ptr<ModelAPI_Document> document() {return myDoc;}
+  std::shared_ptr<ModelAPI_Document> document() const {return myDoc;}
 };
 
 /// Message that feature was deleted (used for Object Browser update)
@@ -50,10 +50,10 @@ public:
   static const Event_ID messageId();
 
   /// Returns the feature that has been updated
-  std::shared_ptr<ModelAPI_Document> document() {return myDoc;}
+  std::shared_ptr<ModelAPI_Document> document() const {return myDoc;}
 
   /// Returns the group where the feature was deleted
-  const std::string& group() {return myGroup;}
+  const std::string& group() const {return myGroup;}
 };
 
 #endif

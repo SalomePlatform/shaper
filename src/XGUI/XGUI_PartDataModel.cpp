@@ -30,14 +30,16 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
     case ParamObject:
       {
         std::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(PARAMETERS_GROUP, theIndex.row());
-        return aFeature->data()->getName().c_str();
+        if (aFeature)
+          return aFeature->data()->getName().c_str();
       } 
     case ConstructFolder:
         return tr("Constructions");
     case ConstructObject:
       {
         std::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row());
-        return aFeature->data()->getName().c_str();
+        if (aFeature)
+          return aFeature->data()->getName().c_str();
       }
     }
     break;
@@ -139,6 +141,18 @@ FeaturePtr XGUI_TopDataModel::feature(const QModelIndex& theIndex) const
 }
 
 
+QModelIndex XGUI_TopDataModel::findParent(const std::shared_ptr<ModelAPI_Feature>& theFeature) const
+{
+  QString aGroup(theFeature->getGroup().c_str());
+
+  if (theFeature->getGroup().compare(PARAMETERS_GROUP) == 0)
+    return createIndex(0, 0, (quintptr) ParamsFolder);
+  if (theFeature->getGroup().compare(CONSTRUCTIONS_GROUP) == 0)
+    return createIndex(1, 0, (quintptr) ConstructFolder);
+  return QModelIndex();
+}
+
+
 //******************************************************************
 //******************************************************************
 //******************************************************************
@@ -161,7 +175,8 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
     case MyRoot:
       {
         std::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(PARTS_GROUP, myId);
-        return aFeature->data()->getName().c_str();
+        if (aFeature)
+          return aFeature->data()->getName().c_str();
       }
     case ParamsFolder:
       return tr("Parameters");
@@ -171,13 +186,15 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
       {
         std::shared_ptr<ModelAPI_Feature> aFeature = 
           featureDocument()->feature(PARAMETERS_GROUP, theIndex.row());
-        return aFeature->data()->getName().c_str();
+        if (aFeature)
+          return aFeature->data()->getName().c_str();
       }
     case ConstructObject:
       {
         std::shared_ptr<ModelAPI_Feature> aFeature = 
           featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row());
-        return aFeature->data()->getName().c_str();
+        if (aFeature)
+          return aFeature->data()->getName().c_str();
       }
     }
     break;
@@ -293,4 +310,21 @@ FeaturePtr XGUI_PartDataModel::feature(const QModelIndex& theIndex) const
     return featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row());
   }
   return 0;
+}
+
+bool XGUI_PartDataModel::hasDocument(const std::shared_ptr<ModelAPI_Document>& theDoc) const
+{
+  return (featureDocument() == theDoc);
+}
+
+
+QModelIndex XGUI_PartDataModel::findParent(const std::shared_ptr<ModelAPI_Feature>& theFeature) const
+{
+  QString aGroup(theFeature->getGroup().c_str());
+
+  if (theFeature->getGroup().compare(PARAMETERS_GROUP) == 0)
+    return createIndex(0, 0, (quintptr) ParamsFolder);
+  if (theFeature->getGroup().compare(CONSTRUCTIONS_GROUP) == 0)
+    return createIndex(1, 0, (quintptr) ConstructFolder);
+  return QModelIndex();
 }

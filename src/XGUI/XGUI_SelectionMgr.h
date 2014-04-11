@@ -5,6 +5,7 @@
 #include <QObject>
 
 class XGUI_Workshop;
+class XGUI_ObjectsBrowser;
 
 /**\class XGUI_SelectionMgr
  * \ingroup GUI
@@ -21,6 +22,8 @@ public:
   //! Returns list of currently selected objects
   QFeatureList selectedData() const { return mySelectedData; }
 
+  void connectObjectBrowser(XGUI_ObjectsBrowser* theOB);
+
 signals:
   //! Emited when selection in a one of viewers was changed
   void selectionChanged();
@@ -30,6 +33,7 @@ public slots:
 
 private:
   XGUI_Workshop* myWorkshop;
+  XGUI_ObjectsBrowser* myObjectBrowser;
 
   //! List of selected features
   QFeatureList mySelectedData;

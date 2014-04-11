@@ -35,6 +35,8 @@ public:
   //! Returns 0 if the given index is not index of a feature
   virtual FeaturePtr feature(const QModelIndex& theIndex) const;
 
+  virtual QModelIndex findParent(const std::shared_ptr<ModelAPI_Feature>& theFeature) const;
+
 private:
   //! Types of QModelIndexes
   enum DataIds {
@@ -77,6 +79,12 @@ public:
   //! Returns Feature object by the given Model index.
   //! Returns 0 if the given index is not index of a feature
   virtual FeaturePtr feature(const QModelIndex& theIndex) const;
+
+  //! Returns true if the given document is a sub-document of this tree
+  virtual bool hasDocument(const std::shared_ptr<ModelAPI_Document>& theDoc) const;
+
+  //! Returns parent index of the given feature
+  virtual QModelIndex findParent(const std::shared_ptr<ModelAPI_Feature>& theFeature) const;
 
 private: 
   std::shared_ptr<ModelAPI_Document> featureDocument() const;

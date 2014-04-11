@@ -13,11 +13,13 @@
 XGUI_SelectionMgr::XGUI_SelectionMgr(XGUI_Workshop* theParent) :
   QObject(theParent), myWorkshop(theParent)
 {
-  XGUI_ObjectsBrowser* aObjBrowser = myWorkshop->mainWindow()->objectBrowser();
-
-  connect(aObjBrowser, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
 }
 
+void XGUI_SelectionMgr::connectObjectBrowser(XGUI_ObjectsBrowser* theOB)
+{
+  myObjectBrowser = theOB;
+  connect(myObjectBrowser, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+}
 
 XGUI_SelectionMgr::~XGUI_SelectionMgr()
 {

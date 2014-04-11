@@ -40,13 +40,47 @@ XGUI_DocumentDataModel::~XGUI_DocumentDataModel()
 void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
 {
   if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_CREATED) {
-    // Add a new part
-    int aStart = myModel->rowCount(QModelIndex()) + myPartModels.size();
-    beginInsertRows(QModelIndex(), aStart, aStart + 1);
-    XGUI_PartDataModel* aModel = new XGUI_PartDataModel(myDocument, this);
-    aModel->setPartId(myPartModels.count());
-    myPartModels.append(aModel);
-    endInsertRows();
+    const ModelAPI_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const ModelAPI_FeatureUpdatedMessage*>(theMessage);
+    std::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
+    std::shared_ptr<ModelAPI_Feature> aFeature = aUpdMsg->feature();
+
+    if (aDoc == myDocument) {
+      if (aFeature->getGroup().compare(PARTS_GROUP) == 0) {
+        // Add a new part
+        int aStart = myModel->rowCount(QModelIndex()) + myPartModels.size();
+        beginInsertRows(QModelIndex(), aStart, aStart + 1);
+        XGUI_PartDataModel* aModel = new XGUI_PartDataModel(myDocument, this);
+        aModel->setPartId(myPartModels.count());
+        myPartModels.append(aModel);
+        endInsertRows();
+      } else {
+        QModelIndex aIndex = myModel->findParent(aFeature);
+        int aStart = myModel->rowCount(aIndex);
+        aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
+        beginInsertRows(aIndex, aStart-1, aStart);
+        endInsertRows();
+        if (aStart == 1) // Update parent if this is a first child in order to update node decoration
+          emit dataChanged(aIndex, aIndex);
+      }
+    } else {
+      XGUI_PartModel* aPartModel = 0;
+      QList<XGUI_PartModel*>::const_iterator aIt;
+      for (aIt = myPartModels.constBegin(); aIt != myPartModels.constEnd(); ++aIt) {
+        if ((*aIt)->hasDocument(aDoc)) {
+          aPartModel = (*aIt);
+          break;
+        }
+      }
+      if (aPartModel) {
+        QModelIndex aIndex = aPartModel->findParent(aFeature);
+        int aStart = aPartModel->rowCount(aIndex);
+        aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
+        beginInsertRows(aIndex, aStart-1, aStart);
+        endInsertRows();
+        if (aStart == 1) // Update parent if this is a first child in order to update node decoration
+          emit dataChanged(aIndex, aIndex);
+      }
+    }
   } else {
     // Reset whole tree
     beginResetModel();

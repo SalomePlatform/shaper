@@ -252,8 +252,10 @@ void XGUI_Workshop::onExit()
 void XGUI_Workshop::onNew()
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  if (myMainWindow->objectBrowser() == 0)
+  if (myMainWindow->objectBrowser() == 0) {
     myMainWindow->createDockWidgets();
+    mySelector->connectObjectBrowser(myMainWindow->objectBrowser());
+  }
   myMainWindow->showObjectBrowser();
   myMainWindow->showPythonConsole();
   QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
