@@ -49,16 +49,16 @@ void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
     if (aDoc == myDocument) {  // If root objects
       if (aFeature->getGroup().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
         // Add a new part
-        int aStart = myModel->rowCount(QModelIndex()) + myPartModels.size();
+        int aStart = myModel->rowCount(QModelIndex()) + myPartModels.size() + 1;
         XGUI_PartDataModel* aModel = new XGUI_PartDataModel(myDocument, this);
         aModel->setPartId(myPartModels.count());
         myPartModels.append(aModel);
         insertRows(QModelIndex(), aStart, aStart);
       } else { // Update top groups (other except parts
         QModelIndex aIndex = myModel->findParent(aFeature);
-        int aStart = myModel->rowCount(aIndex);
+        int aStart = myModel->rowCount(aIndex) - 1;
         aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-        insertRows(aIndex, aStart-1, aStart);
+        insertRows(aIndex, aStart, aStart);
       }
     } else { // if sub-objects of first level nodes
       XGUI_PartModel* aPartModel = 0;
@@ -71,19 +71,19 @@ void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
       }
       if (aPartModel) {
         QModelIndex aIndex = aPartModel->findParent(aFeature);
-        int aStart = aPartModel->rowCount(aIndex);
+        int aStart = aPartModel->rowCount(aIndex) - 1;
         aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-        insertRows(aIndex, aStart-1, aStart);
+        insertRows(aIndex, aStart, aStart);
       }
     }
 
   // Deteted object event ***********************
-  } if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_DELETED) {
+  } else if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_DELETED) {
     const ModelAPI_FeatureDeletedMessage* aUpdMsg = dynamic_cast<const ModelAPI_FeatureDeletedMessage*>(theMessage);
     std::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
 
     if (aDoc == myDocument) {  // If root objects
-      int aStart = myPartModels.count() - 1;
+      int aStart = myPartModels.count() - 2;
       delete myPartModels.last();
       myPartModels.removeLast();
       beginRemoveRows(QModelIndex(), aStart, aStart);
@@ -223,6 +223,6 @@ void XGUI_DocumentDataModel::insertRows(const QModelIndex& theParent, int theSta
 {
   beginInsertRows(theParent, theStart, theEnd);
   endInsertRows();
-  if (theStart == 1) // Update parent if this is a first child in order to update node decoration
+  if (theStart == 0) // Update parent if this is a first child in order to update node decoration
     emit dataChanged(theParent, theParent);
 }
