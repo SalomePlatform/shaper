@@ -108,12 +108,12 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM LIBXML2
-@SET LIBXML2_DIR=%PDIR%\libxml2-2.9.0
+@SET LIBXML2_ROOT_DIR=%PDIR%\libxml2-2.9.0
 @REM DO NOT rename following 3 variables, 
 @REM they are required by CMake "find(Libxml2)" procedure
-@SET LIBXML2_INCLUDE_DIR=%LIBXML2_DIR%\include\libxml2
-@SET LIBXML2_LIB_DIR=%LIBXML2_DIR%\lib
-@SET LIBXML2_BIN_DIR=%LIBXML2_DIR%\bin
+@SET LIBXML2_INCLUDE_DIR=%LIBXML2_ROOT_DIR%\include\libxml2
+@SET LIBXML2_LIB_DIR=%LIBXML2_ROOT_DIR%\lib
+@SET LIBXML2_BIN_DIR=%LIBXML2_ROOT_DIR%\bin
 @SET PATH=%LIBXML2_BIN_DIR%;%LIBXML2_LIB_DIR%;%PATH%
 @REM -------------------------
 
