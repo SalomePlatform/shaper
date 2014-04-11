@@ -364,9 +364,13 @@ void Model_Document::synchronizeFeatures()
   }
   // delete all groups left after the data model groups iteration
   while(aGroupNamesIter != myGroupsNames.end()) {
-    myFeatures.erase(*aGroupNamesIter);
-    myGroups.erase(*aGroupNamesIter);
+    string aGroupName = *aGroupNamesIter;
+    myFeatures.erase(aGroupName);
+    myGroups.erase(aGroupName);
     aGroupNamesIter = myGroupsNames.erase(aGroupNamesIter);
+    // say that features were deleted from group
+    ModelAPI_FeatureDeletedMessage aMsg(aThis, aGroupName);
+    Event_Loop::loop()->send(aMsg);
   }
   // create new groups basing on the following data model update
   for(; aGroupsIter.More(); aGroupsIter.Next()) {
