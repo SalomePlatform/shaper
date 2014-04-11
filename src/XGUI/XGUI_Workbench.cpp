@@ -171,3 +171,23 @@ bool XGUI_Workbench::eventFilter(QObject *theObj, QEvent *theEvent)
   }
   return QWidget::eventFilter(theObj, theEvent);
 }
+
+XGUI_Command* XGUI_Workbench::feature(const QString& theId) const
+{
+  QList<XGUI_MenuGroupPanel*>::const_iterator aIt;
+  for (aIt = myGroups.constBegin(); aIt != myGroups.constEnd(); ++aIt) {
+    XGUI_Command* aCmd = (*aIt)->feature(theId);
+    if (aCmd)
+      return aCmd;
+  }
+  return 0;
+}
+
+QList<XGUI_Command*> XGUI_Workbench::features() const
+{
+  QList<XGUI_Command*> aList;
+  QList<XGUI_MenuGroupPanel*>::const_iterator aIt;
+  for (aIt = myGroups.constBegin(); aIt != myGroups.constEnd(); ++aIt) 
+    aList.append((*aIt)->features());
+  return aList;
+}

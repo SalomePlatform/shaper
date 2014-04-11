@@ -40,7 +40,7 @@ void PartSet_Module::createFeatures()
 
 void PartSet_Module::featureCreated(XGUI_Command* theFeature)
 {
-  QString aFtId = theFeature->getId();
+  QString aFtId = theFeature->id();
   theFeature->connectTo(this, SLOT(onFeatureTriggered()));
 }
 
@@ -53,7 +53,7 @@ void PartSet_Module::onFeatureTriggered()
   Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginName);
   aWdgReader.readAll();
   XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
-  QString aCmdId = aCmd->getId();
+  QString aCmdId = aCmd->id();
   std::string aXmlCfg = aWdgReader.featureWidgetCfg(aCmdId.toStdString());
   //TODO(sbh): Implement static method to extract event id [SEID]
   static Event_ID aModuleEvent = Event_Loop::eventByName("PartSetModuleEvent");

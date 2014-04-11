@@ -28,7 +28,7 @@ public:
   virtual void disable();
 
   //! Returns Id of the command
-  virtual QString getId() const
+  virtual QString id() const
   {
     return myId;
   }

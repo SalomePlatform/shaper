@@ -43,6 +43,9 @@ public:
     return myViewer;
   }
 
+  // Creates Dock widgets: Object broewser and Property panel
+  void createDockWidgets();
+
 public slots:
   void showPythonConsole();
   void hidePythonConsole();
@@ -52,7 +55,6 @@ public slots:
   void hideObjectBrowser();
 
 private:
-  void createDockWidgets();
   QDockWidget* createObjectBrowser();
   QDockWidget* createPropertyPanel();
 

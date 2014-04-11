@@ -28,9 +28,9 @@
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     : QMainWindow(parent), 
-    myObjectBrowser(NULL),
-    myPythonConsole(NULL),
-    myPropertyPanelDock(NULL)
+    myObjectBrowser(0),
+    myPythonConsole(0),
+    myPropertyPanelDock(0)
 {
   setWindowTitle(tr("New Geom"));
   myMenuBar = new XGUI_MainMenu(this);
@@ -40,7 +40,7 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
 
   myViewer = new XGUI_Viewer(this);
 
-  createDockWidgets();
+  //createDockWidgets();
 }
 
 XGUI_MainWindow::~XGUI_MainWindow(void)
@@ -75,11 +75,7 @@ void XGUI_MainWindow::showPythonConsole()
     aDoc->setMinimumHeight(0);
     aDoc->setWindowTitle("Console");
     myPythonConsole = new PyConsole_EnhConsole( aDoc, new PyConsole_EnhInterp());
-    //myPythonConsole = new QTextEdit(aDoc);
-    //myPythonConsole->setGeometry(0,0,200, 50);
-    //myPythonConsole->setText(">>>");
     aDoc->setWidget(myPythonConsole);
-    //myPythonConsole->setMinimumHeight(0);
     addDockWidget(Qt::TopDockWidgetArea, aDoc);
     tabifyDockWidget(myMenuBar->getLastDockWindow(), aDoc);
   }

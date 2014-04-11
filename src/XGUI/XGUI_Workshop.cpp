@@ -66,6 +66,7 @@ void XGUI_Workshop::startApplication()
   activateModule();
   myMainWindow->show();
 
+  updateCommandStatus();
   // Testing of document creation
   //std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   //std::shared_ptr<ModelAPI_Feature> aPoint1 = aMgr->rootDocument()->addFeature("Point");
@@ -96,9 +97,11 @@ void XGUI_Workshop::initMenu()
 
   aCommand = aGroup->addFeature("UNDO_CMD", tr("Undo"), tr("Undo last command"),
                                 QIcon(":pictures/undo.png"), QKeySequence::Undo);
+  aCommand->connectTo(this, SLOT(onUndo()));
 
   aCommand = aGroup->addFeature("REDO_CMD", tr("Redo"), tr("Redo last command"),
                                 QIcon(":pictures/redo.png"), QKeySequence::Redo);
+  aCommand->connectTo(this, SLOT(onRedo()));
 
   aCommand = aGroup->addFeature("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
                                 QIcon(":pictures/rebuild.png"));
@@ -146,6 +149,7 @@ void XGUI_Workshop::processEvent(const Event_Message* theMessage)
     if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
       myCurrentOperation->start();
       myCurrentOperation->commit();
+      updateCommandStatus();
     } else {
       fillPropertyPanel(aOperation);
     }
@@ -247,29 +251,54 @@ void XGUI_Workshop::onExit()
 void XGUI_Workshop::onNew()
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
+  if (myMainWindow->objectBrowser() == 0)
+    myMainWindow->createDockWidgets();
   myMainWindow->showObjectBrowser();
   myMainWindow->showPythonConsole();
   QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
   aWnd->showMaximized();
+  updateCommandStatus();
   QApplication::restoreOverrideCursor();
 }
 
 //******************************************************
 void XGUI_Workshop::onOpen()
 {
-  QString aFileName = QFileDialog::getOpenFileName(mainWindow());
+  //QString aFileName = QFileDialog::getOpenFileName(mainWindow());
+  updateCommandStatus();
 }
 
 //******************************************************
 void XGUI_Workshop::onSave()
 {
+  updateCommandStatus();
 }
 
 //******************************************************
 void XGUI_Workshop::onSaveAs()
 {
-  QString aFileName = QFileDialog::getSaveFileName(mainWindow());
+  //QString aFileName = QFileDialog::getSaveFileName(mainWindow());
+  updateCommandStatus();
 }
+
+//******************************************************
+void XGUI_Workshop::onUndo()
+{
+  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  aDoc->undo();
+  updateCommandStatus();
+}
+
+//******************************************************
+void XGUI_Workshop::onRedo()
+{
+  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  aDoc->redo();
+  updateCommandStatus();
+}
+
 
 //******************************************************
 XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
@@ -339,4 +368,39 @@ bool XGUI_Workshop::activateModule()
     return false;
   myPartSetModule->createFeatures();
   return true;
+}
+
+//******************************************************
+void XGUI_Workshop::updateCommandStatus()
+{
+  XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
+
+  QList<XGUI_Command*> aCommands = aMenuBar->features();
+  QList<XGUI_Command*>::const_iterator aIt;
+
+  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  if (aMgr->hasRootDocument()) {
+    XGUI_Command* aUndoCmd;
+    XGUI_Command* aRedoCmd;
+    for (aIt = aCommands.constBegin(); aIt != aCommands.constEnd(); ++aIt) {
+      if ((*aIt)->id() == "UNDO_CMD")
+        aUndoCmd = (*aIt);
+      else if ((*aIt)->id() == "REDO_CMD")
+        aRedoCmd = (*aIt);
+      else // Enable all commands
+        (*aIt)->enable();
+    }
+    std::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+    aUndoCmd->setEnabled(aDoc->canUndo());
+    aRedoCmd->setEnabled(aDoc->canRedo());
+  } else {
+    for (aIt = aCommands.constBegin(); aIt != aCommands.constEnd(); ++aIt) {
+      if ((*aIt)->id() == "NEW_CMD")
+        (*aIt)->enable();
+      else if ((*aIt)->id() == "EXIT_CMD")
+        (*aIt)->enable();
+      else 
+        (*aIt)->disable();
+    }
+  }
 }

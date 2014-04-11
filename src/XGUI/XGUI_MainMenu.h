@@ -13,6 +13,7 @@ class QTabWidget;
 class QLabel;
 class QAction;
 class QDockWidget;
+class QEvent;
 
 /**\class XGUI_MainMenu
  * \ingroup GUI
@@ -36,6 +37,15 @@ public:
 
   //! Rerturns last created workbench in dock widget container
   QDockWidget* getLastDockWindow() const { return myMenuTabs.last(); }
+
+  //! Returns already created command by its ID
+  XGUI_Command* feature(const QString& theId) const;
+
+  //! Returns list of created commands
+  QList<XGUI_Command*> features() const;
+
+protected:
+  virtual bool eventFilter(QObject *theWatched, QEvent *theEvent);
 
 private:
   XGUI_MainWindow* myDesktop;
