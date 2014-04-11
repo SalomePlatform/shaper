@@ -5,7 +5,7 @@ export ROOT_DIR=`cd "${ROOT_DIR}";pwd`
 
 SRC_DIR=${ROOT_DIR}/sources
 
-source ${SRC_DIR}/centos6_env.sh
+source ${SRC_DIR}/linux_env.sh
 mkdir -p ${ROOT_DIR}/build
 cd ${ROOT_DIR}/build
 

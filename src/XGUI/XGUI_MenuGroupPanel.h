@@ -21,6 +21,12 @@ public:
   XGUI_Command* addFeature(const QString& theId, const QString& theTitle, const QString& theTip,
                            const QIcon& theIcon, const QKeySequence& theKeys = QKeySequence());
 
+  //! Returns already created command by its ID
+  XGUI_Command* feature(const QString& theId) const;
+
+  //! Returns list of created commands
+  QList<XGUI_Command*> features() const { return myActions; }
+
 protected:
   virtual void resizeEvent(QResizeEvent *theEvent);
 

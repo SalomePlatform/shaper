@@ -34,6 +34,9 @@ public:
   /// Returns the root document of the application (that may contains sub-documents)
   virtual std::shared_ptr<ModelAPI_Document> rootDocument() = 0;
 
+  /// Return true if root document has been already created
+  virtual bool hasRootDocument() = 0;
+
   /// Returns the current document that used for current work in the application
   virtual std::shared_ptr<ModelAPI_Document> currentDocument() = 0;
 

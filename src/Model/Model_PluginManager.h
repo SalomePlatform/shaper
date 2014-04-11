@@ -30,6 +30,9 @@ public:
   /// Returns the root document of the application (that may contains sub-documents)
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> rootDocument();
 
+  /// Return true if root document has been already created
+  MODEL_EXPORT virtual bool hasRootDocument();
+
   /// Returns the current document that used for current work in the application
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> currentDocument();
 

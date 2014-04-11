@@ -21,6 +21,12 @@ public:
   XGUI_MenuGroupPanel* addGroup(const QString& theId);
   XGUI_MenuGroupPanel* findGroup(const QString& theName);
 
+  //! Returns already created command by its ID
+  XGUI_Command* feature(const QString& theId) const;
+
+  //! Returns list of created commands
+  QList<XGUI_Command*> features() const;
+
 private slots:
   void onLeftScroll();
   void onRightScroll();
@@ -28,6 +34,7 @@ private slots:
 protected:
   virtual void resizeEvent(QResizeEvent * theEvent);
   virtual bool eventFilter(QObject *theObj, QEvent *theEvent);
+
 
 private:
   void addSeparator();

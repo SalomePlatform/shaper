@@ -51,7 +51,7 @@ public:
   const Event_ID& eventID() const {return myEventId;}
 
   //! Returns sender of the message or NULL if it is anonymous message
-  void* sender() {return mySender;}
+  void* sender() const {return mySender;}
 };
 
 #endif

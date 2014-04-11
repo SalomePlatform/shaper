@@ -23,9 +23,11 @@
 
 
 Config_FeatureReader::Config_FeatureReader(const std::string& theXmlFile,
-                                           const std::string& theLibraryName)
+                                           const std::string& theLibraryName,
+                                           const char* theEventGenerated)
     : Config_XMLReader(theXmlFile),
-      myLibraryName(theLibraryName)
+      myLibraryName(theLibraryName),
+      myEventGenerated(theEventGenerated ? theEventGenerated : "FeatureEvent")
 {
 }
 
@@ -35,7 +37,7 @@ Config_FeatureReader::~Config_FeatureReader()
 
 void Config_FeatureReader::processNode(xmlNodePtr theNode)
 {
-  static Event_ID aMenuItemEvent = Event_Loop::eventByName("FeatureEvent");
+  Event_ID aMenuItemEvent = Event_Loop::eventByName(myEventGenerated);
   if (isNode(theNode, NODE_FEATURE, NULL)) {
     Event_Loop* aEvLoop = Event_Loop::loop();
     Config_FeatureMessage aMessage(aMenuItemEvent, this);

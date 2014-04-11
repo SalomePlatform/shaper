@@ -22,6 +22,12 @@ public:
   //! Returns 0 if the given index is not index of a feature
   virtual FeaturePtr feature(const QModelIndex& theIndex) const = 0;
 
+  //! Returns parent index of the given feature
+  virtual QModelIndex findParent(const std::shared_ptr<ModelAPI_Feature>& theFeature) const = 0;
+
+  //! Returns index corresponded to the group
+  virtual QModelIndex findGroup(const std::string& theGroup) const = 0;
+
 protected:
   std::shared_ptr<ModelAPI_Document> myDocument;
 };
@@ -37,7 +43,10 @@ public:
   XGUI_PartModel(const std::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent):
       XGUI_FeaturesModel(theDocument, theParent) {}
 
-      void setPartId(int theId) { myId = theId; }
+  void setPartId(int theId) { myId = theId; }
+
+  //! Returns true if the given document is a sub-document of this tree
+  virtual bool hasDocument(const std::shared_ptr<ModelAPI_Document>& theDoc) const = 0;
 
 protected:
   //! Id of the current part object in the document

@@ -52,7 +52,7 @@ public:
 private:
 
   //! Converts QModelIndex of this model to QModelIndex of a one of sub-models.
-  QModelIndex toSourceModel(const QModelIndex& theProxy) const;
+  QModelIndex toSourceModelIndex(const QModelIndex& theProxy) const;
 
   //! Finds a pointer on QModelIndex which is equal to the given one
   QModelIndex* findModelIndex(const QModelIndex& theIndex) const;
@@ -62,6 +62,9 @@ private:
 
   //! Deletes all saved pointers on QModelIndex objects.
   void clearModelIndexes();
+
+  //! Causes inserting of new nodes for given parent and indexes
+  void insertRows(const QModelIndex& theParent, int theStart, int theEnd);
 
   //! Document
   std::shared_ptr<ModelAPI_Document> myDocument;

@@ -224,9 +224,9 @@ void ModuleBase_Operation::abort()
   emit aborted();
 
   stopOperation();
-  emit stopped();
 
   document()->abortOperation();
+  emit stopped();
 }
 
 /*!
@@ -242,9 +242,9 @@ void ModuleBase_Operation::commit()
   emit committed();
 
   stopOperation();
-  emit stopped();
 
   document()->finishOperation();
+  emit stopped();
 }
 
 /*!
@@ -289,7 +289,8 @@ void ModuleBase_Operation::startOperation()
 {
   std::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_PluginManager::get()->rootDocument();
   myFeature = aDoc->addFeature(myOperationId.toStdString());
-  myFeature->execute();
+  if (myFeature) // TODO: generate an error if feature was not created
+    myFeature->execute();
   //emit callSlot();
   //commit();
 }
@@ -319,7 +320,7 @@ void ModuleBase_Operation::abortOperation()
  */
 void ModuleBase_Operation::commitOperation()
 {
-  myFeature->execute();
+  if (myFeature) myFeature->execute();
 }
 
 /*!

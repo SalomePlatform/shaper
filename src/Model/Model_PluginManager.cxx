@@ -43,6 +43,11 @@ std::shared_ptr<ModelAPI_Document> Model_PluginManager::rootDocument()
     Model_Application::getApplication()->getDocument("root"));
 }
 
+bool Model_PluginManager::hasRootDocument()
+{
+  return Model_Application::getApplication()->hasDocument("root");
+}
+
 shared_ptr<ModelAPI_Document> Model_PluginManager::currentDocument()
 {
   if (!myCurrentDoc)
@@ -59,7 +64,7 @@ Model_PluginManager::Model_PluginManager()
 {
   myPluginsInfoLoaded = false;
   //TODO(sbh): Implement static method to extract event id [SEID]
-  static Event_ID aFeatureEvent = Event_Loop::eventByName("FeatureEvent");
+  static Event_ID aFeatureEvent = Event_Loop::eventByName("FeatureRegisterEvent");
 
   ModelAPI_PluginManager::SetPluginManager(std::shared_ptr<ModelAPI_PluginManager>(this));
   // register the configuration reading listener
@@ -87,7 +92,7 @@ void Model_PluginManager::LoadPluginsInfo()
     return;
 
   // Read plugins information from XML files
-  Config_ModuleReader aXMLReader;
+  Config_ModuleReader aXMLReader("FeatureRegisterEvent");
   aXMLReader.setAutoImport(true);
   aXMLReader.readAll();
 }

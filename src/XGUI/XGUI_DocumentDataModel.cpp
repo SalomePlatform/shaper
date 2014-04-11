@@ -12,6 +12,7 @@
 
 
 #include <QIcon>
+#include <QString>
 
 
 XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
@@ -24,6 +25,7 @@ XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
   // Register in event loop
   Event_Loop::loop()->registerListener(this, Event_Loop::eventByName(EVENT_FEATURE_CREATED));
   Event_Loop::loop()->registerListener(this, Event_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Event_Loop::loop()->registerListener(this, Event_Loop::eventByName(EVENT_FEATURE_DELETED));
 
   // Create a top part of data tree model
   myModel = new XGUI_TopDataModel(myDocument, this);
@@ -38,28 +40,105 @@ XGUI_DocumentDataModel::~XGUI_DocumentDataModel()
 
 void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
 {
-  beginResetModel();
-  int aNbParts = myDocument->featuresIterator(PARTS_GROUP)->numIterationsLeft();
-  if (myPartModels.size() != aNbParts) { // resize internal models
-    while (myPartModels.size() > aNbParts) {
-      delete myPartModels.last();
-      myPartModels.removeLast();
+  // Created object event *******************
+  if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_CREATED) {
+    const ModelAPI_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const ModelAPI_FeatureUpdatedMessage*>(theMessage);
+    std::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
+    std::shared_ptr<ModelAPI_Feature> aFeature = aUpdMsg->feature();
+
+    if (aDoc == myDocument) {  // If root objects
+      if (aFeature->getGroup().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
+        // Add a new part
+        int aStart = myModel->rowCount(QModelIndex()) + myPartModels.size() + 1;
+        XGUI_PartDataModel* aModel = new XGUI_PartDataModel(myDocument, this);
+        aModel->setPartId(myPartModels.count());
+        myPartModels.append(aModel);
+        insertRows(QModelIndex(), aStart, aStart);
+      } else { // Update top groups (other except parts
+        QModelIndex aIndex = myModel->findParent(aFeature);
+        int aStart = myModel->rowCount(aIndex) - 1;
+        aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
+        insertRows(aIndex, aStart, aStart);
+      }
+    } else { // if sub-objects of first level nodes
+      XGUI_PartModel* aPartModel = 0;
+      QList<XGUI_PartModel*>::const_iterator aIt;
+      for (aIt = myPartModels.constBegin(); aIt != myPartModels.constEnd(); ++aIt) {
+        if ((*aIt)->hasDocument(aDoc)) {
+          aPartModel = (*aIt);
+          break;
+        }
+      }
+      if (aPartModel) {
+        QModelIndex aIndex = aPartModel->findParent(aFeature);
+        int aStart = aPartModel->rowCount(aIndex) - 1;
+        aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
+        insertRows(aIndex, aStart, aStart);
+      }
     }
-    while (myPartModels.size() < aNbParts) {
-      myPartModels.append(new XGUI_PartDataModel(myDocument, this));
+
+  // Deteted object event ***********************
+  } else if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_DELETED) {
+    const ModelAPI_FeatureDeletedMessage* aUpdMsg = dynamic_cast<const ModelAPI_FeatureDeletedMessage*>(theMessage);
+    std::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
+
+    if (aDoc == myDocument) {  // If root objects
+      if (aUpdMsg->group().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
+        int aStart = myModel->rowCount(QModelIndex()) + myPartModels.size() - 1;
+        beginRemoveRows(QModelIndex(), aStart, aStart);
+        endRemoveRows();
+        delete myPartModels.last();
+        myPartModels.removeLast();
+      } else { // Update top groups (other except parts
+        QModelIndex aIndex = myModel->findGroup(aUpdMsg->group());
+        int aStart = myModel->rowCount(aIndex);
+        aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
+        beginRemoveRows(aIndex, aStart, aStart);
+        endRemoveRows();
+      }
+    } else {
+      XGUI_PartModel* aPartModel = 0;
+      QList<XGUI_PartModel*>::const_iterator aIt;
+      for (aIt = myPartModels.constBegin(); aIt != myPartModels.constEnd(); ++aIt) {
+        if ((*aIt)->hasDocument(aDoc)) {
+          aPartModel = (*aIt);
+          break;
+        }
+      }
+      if (aPartModel) {
+        QModelIndex aIndex = aPartModel->findGroup(aUpdMsg->group());
+        int aStart = aPartModel->rowCount(aIndex);
+        aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
+        beginRemoveRows(aIndex, aStart, aStart);
+        endRemoveRows();
+      }
     }
-    for (int i = 0; i < myPartModels.size(); i++)
-      myPartModels.at(i)->setPartId(i);
+
+  // Reset whole tree **************************
+  } else {  
+    beginResetModel();
+    int aNbParts = myDocument->featuresIterator(PARTS_GROUP)->numIterationsLeft();
+    if (myPartModels.size() != aNbParts) { // resize internal models
+      while (myPartModels.size() > aNbParts) {
+        delete myPartModels.last();
+        myPartModels.removeLast();
+      }
+      while (myPartModels.size() < aNbParts) {
+        myPartModels.append(new XGUI_PartDataModel(myDocument, this));
+      }
+      for (int i = 0; i < myPartModels.size(); i++)
+        myPartModels.at(i)->setPartId(i);
+    }
+    clearModelIndexes();
+    endResetModel();
   }
-  clearModelIndexes();
-  endResetModel();
 }
 
 QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) const
 {
   if (!theIndex.isValid())
     return QVariant();
-  return toSourceModel(theIndex).data(theRole);
+  return toSourceModelIndex(theIndex).data(theRole);
 }
 
 
@@ -73,7 +152,7 @@ int XGUI_DocumentDataModel::rowCount(const QModelIndex& theParent) const
   if (!theParent.isValid()) 
     return myModel->rowCount(theParent) + myPartModels.size();
 
-  QModelIndex aParent = toSourceModel(theParent);
+  QModelIndex aParent = toSourceModelIndex(theParent);
   return aParent.model()->rowCount(aParent);
 }
 
@@ -105,7 +184,7 @@ QModelIndex XGUI_DocumentDataModel::index(int theRow, int theColumn, const QMode
 
 QModelIndex XGUI_DocumentDataModel::parent(const QModelIndex& theIndex) const
 {
-  QModelIndex aParent = toSourceModel(theIndex);
+  QModelIndex aParent = toSourceModelIndex(theIndex);
   aParent = aParent.model()->parent(aParent);
   if (aParent.isValid())
     return createIndex(aParent.row(), aParent.column(), (void*)getModelIndex(aParent));
@@ -121,7 +200,7 @@ bool XGUI_DocumentDataModel::hasChildren(const QModelIndex& theParent) const
 }
 
 
-QModelIndex XGUI_DocumentDataModel::toSourceModel(const QModelIndex& theProxy) const
+QModelIndex XGUI_DocumentDataModel::toSourceModelIndex(const QModelIndex& theProxy) const
 {
   QModelIndex* aIndexPtr = static_cast<QModelIndex*>(theProxy.internalPointer());
   return (*aIndexPtr);
@@ -160,7 +239,15 @@ void XGUI_DocumentDataModel::clearModelIndexes()
 
 FeaturePtr XGUI_DocumentDataModel::feature(const QModelIndex& theIndex) const
 {
-  QModelIndex aIndex = toSourceModel(theIndex);
+  QModelIndex aIndex = toSourceModelIndex(theIndex);
   const XGUI_FeaturesModel* aModel = dynamic_cast<const XGUI_FeaturesModel*>(aIndex.model());
   return aModel->feature(aIndex);
+}
+
+void XGUI_DocumentDataModel::insertRows(const QModelIndex& theParent, int theStart, int theEnd)
+{
+  beginInsertRows(theParent, theStart, theEnd);
+  endInsertRows();
+  if (theStart == 0) // Update parent if this is a first child in order to update node decoration
+    emit dataChanged(theParent, theParent);
 }

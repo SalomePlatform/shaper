@@ -50,11 +50,15 @@ public:
   virtual void processEvent(const Event_Message* theMessage);
 
 public slots:
+  void updateCommandStatus();
+
   void onNew();
   void onOpen();
   void onSave();
   void onSaveAs();
   void onExit();
+  void onUndo();
+  void onRedo();
 
 protected:
   //Event-loop processing methods:

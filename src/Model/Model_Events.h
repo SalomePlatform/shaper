@@ -22,14 +22,19 @@ static const char * EVENT_FEATURE_DELETED = "FeatureDeleted";
 
 /// Message that feature was changed (used for Object Browser update)
 class ModelAPI_FeatureUpdatedMessage : public Event_Message {
+  std::shared_ptr<ModelAPI_Document> myDoc; ///< document owner of the feature
   std::shared_ptr<ModelAPI_Feature> myFeature; ///< which feature is changed
 public:
   /// sender is not important, all information is located in the feature
-  ModelAPI_FeatureUpdatedMessage(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  ModelAPI_FeatureUpdatedMessage(
+    const std::shared_ptr<ModelAPI_Document>& theDoc,
+    const std::shared_ptr<ModelAPI_Feature>& theFeature,
     const Event_ID& theEvent);
 
   /// Returns the feature that has been updated
-  std::shared_ptr<ModelAPI_Feature> feature() {return myFeature;}
+  std::shared_ptr<ModelAPI_Feature> feature() const {return myFeature;}
+  /// Returns the document that has been updated
+  std::shared_ptr<ModelAPI_Document> document() const {return myDoc;}
 };
 
 /// Message that feature was deleted (used for Object Browser update)
@@ -45,10 +50,10 @@ public:
   static const Event_ID messageId();
 
   /// Returns the feature that has been updated
-  std::shared_ptr<ModelAPI_Document> document() {return myDoc;}
+  std::shared_ptr<ModelAPI_Document> document() const {return myDoc;}
 
   /// Returns the group where the feature was deleted
-  const std::string& group() {return myGroup;}
+  const std::string& group() const {return myGroup;}
 };
 
 #endif
