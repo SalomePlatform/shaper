@@ -128,8 +128,6 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @SET PATH=%BOOST_ROOT_DIR%\lib;%PATH%
 @REM -------------------------
 
-@SET PATH=D:\NewGEOM\build-eclipse\bin;%PATH%
-
 @SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
 @SET PATH=%ROOT_DIR%\install\plugins;%PATH%
 
