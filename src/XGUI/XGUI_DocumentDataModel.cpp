@@ -253,7 +253,7 @@ FeaturePtr XGUI_DocumentDataModel::feature(const QModelIndex& theIndex) const
 {
   QModelIndex aIndex = toSourceModelIndex(theIndex);
   if (!hasSubModel(aIndex.model())) 
-    return 0;
+    return FeaturePtr();
 
   const XGUI_FeaturesModel* aModel = dynamic_cast<const XGUI_FeaturesModel*>(aIndex.model());
   return aModel->feature(aIndex);
