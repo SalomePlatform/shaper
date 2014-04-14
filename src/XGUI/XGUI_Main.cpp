@@ -1,6 +1,7 @@
 #include "XGUI_Workshop.h"
 #include <QApplication>
 #include <QTranslator>
+#include <QDebug>
 
 #ifndef WIN32
 
@@ -13,7 +14,7 @@
   \return Pointer to X display.
   \sa getVisual()
 */
-void* getDisplay()
+Display* getDisplay()
 {
   static Display* pDisplay = NULL;
   if ( !pDisplay )
@@ -61,6 +62,7 @@ Qt::HANDLE getVisual()
     qCritical( "Could not find matching glx visual" );
     return res;
   }
+
 
   qDebug() << "Picked visual 0x" << hex << XVisualIDFromVisual( visualInfo->visual );
   res = (Qt::HANDLE)( visualInfo->visual );
