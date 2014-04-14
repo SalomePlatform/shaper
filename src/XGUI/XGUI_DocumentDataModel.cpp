@@ -149,9 +149,10 @@ QVariant XGUI_DocumentDataModel::headerData(int theSection, Qt::Orientation theO
 
 int XGUI_DocumentDataModel::rowCount(const QModelIndex& theParent) const
 {
-  if (!theParent.isValid()) 
+  if (!theParent.isValid()) {
+    int aVal = myModel->rowCount(theParent) + myPartModels.size();
     return myModel->rowCount(theParent) + myPartModels.size();
-
+  }
   QModelIndex aParent = toSourceModelIndex(theParent);
   return aParent.model()->rowCount(aParent);
 }
@@ -168,9 +169,15 @@ QModelIndex XGUI_DocumentDataModel::index(int theRow, int theColumn, const QMode
     int aOffs = myModel->rowCount();
     if (theRow < aOffs) 
       aIndex = myModel->index(theRow, theColumn, theParent);
-    else
-      aIndex = myPartModels.at(theRow - aOffs)->index(theRow - aOffs, theColumn, theParent);
-
+    else  {
+      if (myPartModels.size() > 0) {
+        int aPos = theRow - aOffs;
+        if (aPos >= myPartModels.size())
+          aPos = 0;
+        aIndex = myPartModels.at(aPos)->index(aPos, theColumn, theParent);
+      } else 
+        return aIndex;
+    }
     aIndex = createIndex(theRow, theColumn, (void*)getModelIndex(aIndex));
   } else {
     QModelIndex* aParent = (QModelIndex*)theParent.internalPointer();
@@ -185,6 +192,7 @@ QModelIndex XGUI_DocumentDataModel::index(int theRow, int theColumn, const QMode
 QModelIndex XGUI_DocumentDataModel::parent(const QModelIndex& theIndex) const
 {
   QModelIndex aParent = toSourceModelIndex(theIndex);
+  const QAbstractItemModel* a = aParent.model();
   aParent = aParent.model()->parent(aParent);
   if (aParent.isValid())
     return createIndex(aParent.row(), aParent.column(), (void*)getModelIndex(aParent));

@@ -10,6 +10,7 @@
 #include "XGUI_Viewer.h"
 #include "XGUI_WidgetFactory.h"
 #include "XGUI_SelectionMgr.h"
+#include "XGUI_ObjectsBrowser.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
@@ -288,6 +289,7 @@ void XGUI_Workshop::onSaveAs()
 //******************************************************
 void XGUI_Workshop::onUndo()
 {
+  myMainWindow->objectBrowser()->setCurrentIndex(QModelIndex());
   std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
   aDoc->undo();
@@ -297,6 +299,7 @@ void XGUI_Workshop::onUndo()
 //******************************************************
 void XGUI_Workshop::onRedo()
 {
+  myMainWindow->objectBrowser()->setCurrentIndex(QModelIndex());
   std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
   aDoc->redo();
