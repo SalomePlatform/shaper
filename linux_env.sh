@@ -89,5 +89,5 @@ export LIB=${LD_LIBRARY_PATH}
 
 export INST_DIR=${ROOT_DIR}/install
 export PATH=${INST_DIR}/bin:${INST_DIR}/plugins:${PATH}
-export LD_LIBRARY_PATH=${INST_DIR}/bin:${INST_DIR}/swig:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=${INST_DIR}/bin:${INST_DIR}/swig:${INST_DIR}/plugins:${PATH}${LD_LIBRARY_PATH}
 export NEW_GEOM_CONFIG_FILE=${INST_DIR}/plugins
