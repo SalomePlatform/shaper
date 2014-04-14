@@ -1,0 +1,31 @@
+NewGEOM version 0.1 (end of development phase 1 result).
+
+
+Compilation on LINUX:
+=====================
+
+  cd <sources_directory>
+  source linux_env.sh 
+  cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=${ROOT_DIR}/install ${ROOT_DIR}/sources
+  make
+  make install
+
+It will create a "build" and "install" folders. Environment is ready to launch an application:
+
+  XGUI
+
+Or without environment call:
+
+  linux_run.sh 
+
+
+Compilation on Windows:
+=======================
+  cd <sources_directory>
+  buildNewGEOM_rel.bat
+
+It will launch the Visual Studio 2010. In it build for: "ALL_BUILD" and then "INSTALL" projects.
+Launch:
+
+  winRun.bat
+  

@@ -87,6 +87,7 @@ export CASROOT=${CAS_ROOT_DIR}
 ##
 export LIB=${LD_LIBRARY_PATH}
 
+#------ NewGEOM ------
 export INST_DIR=${ROOT_DIR}/install
 export PATH=${INST_DIR}/bin:${INST_DIR}/plugins:${PATH}
 export LD_LIBRARY_PATH=${INST_DIR}/bin:${INST_DIR}/swig:${INST_DIR}/plugins:${PATH}${LD_LIBRARY_PATH}
