@@ -66,6 +66,12 @@ private:
   //! Causes inserting of new nodes for given parent and indexes
   void insertRows(const QModelIndex& theParent, int theStart, int theEnd);
 
+  //! Removes sub-model on removing a part object. Also it removes QModelIndex-es which refer to this model
+  void removeSubModel(int theModelId);
+
+  //! 
+  bool hasSubModel(const QAbstractItemModel* theModel) const;
+
   //! Document
   std::shared_ptr<ModelAPI_Document> myDocument;
 
