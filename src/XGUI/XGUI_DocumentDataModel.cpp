@@ -86,9 +86,8 @@ void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
       if (aUpdMsg->group().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
         int aStart = myModel->rowCount(QModelIndex()) + myPartModels.size() - 1;
         beginRemoveRows(QModelIndex(), aStart, aStart);
+        removeSubModel(myPartModels.size() - 1);
         endRemoveRows();
-        delete myPartModels.last();
-        myPartModels.removeLast();
       } else { // Update top groups (other except parts
         QModelIndex aIndex = myModel->findGroup(aUpdMsg->group());
         int aStart = myModel->rowCount(aIndex);
@@ -154,6 +153,9 @@ int XGUI_DocumentDataModel::rowCount(const QModelIndex& theParent) const
     return myModel->rowCount(theParent) + myPartModels.size();
   }
   QModelIndex aParent = toSourceModelIndex(theParent);
+  if (!hasSubModel(aParent.model())) 
+    return 0;
+
   return aParent.model()->rowCount(aParent);
 }
 
@@ -192,7 +194,9 @@ QModelIndex XGUI_DocumentDataModel::index(int theRow, int theColumn, const QMode
 QModelIndex XGUI_DocumentDataModel::parent(const QModelIndex& theIndex) const
 {
   QModelIndex aParent = toSourceModelIndex(theIndex);
-  const QAbstractItemModel* a = aParent.model();
+  if (!hasSubModel(aParent.model())) 
+    return QModelIndex();
+
   aParent = aParent.model()->parent(aParent);
   if (aParent.isValid())
     return createIndex(aParent.row(), aParent.column(), (void*)getModelIndex(aParent));
@@ -248,6 +252,9 @@ void XGUI_DocumentDataModel::clearModelIndexes()
 FeaturePtr XGUI_DocumentDataModel::feature(const QModelIndex& theIndex) const
 {
   QModelIndex aIndex = toSourceModelIndex(theIndex);
+  if (!hasSubModel(aIndex.model())) 
+    return 0;
+
   const XGUI_FeaturesModel* aModel = dynamic_cast<const XGUI_FeaturesModel*>(aIndex.model());
   return aModel->feature(aIndex);
 }
@@ -258,4 +265,34 @@ void XGUI_DocumentDataModel::insertRows(const QModelIndex& theParent, int theSta
   endInsertRows();
   if (theStart == 0) // Update parent if this is a first child in order to update node decoration
     emit dataChanged(theParent, theParent);
+}
+
+void XGUI_DocumentDataModel::removeSubModel(int theModelId)
+{
+  XGUI_PartModel* aModel = myPartModels.at(theModelId);
+  QIntList aToRemove;
+  for (int i = 0; i < myIndexes.size(); i++) {
+    if (myIndexes.at(i)->model() == aModel)
+      aToRemove.append(i);
+  }
+  int aId;
+  while(aToRemove.size() > 0) {
+    aId = aToRemove.last();
+    delete myIndexes.at(aId);
+    myIndexes.removeAt(aId);
+    aToRemove.removeLast();
+  }
+  delete aModel;
+  myPartModels.removeAt(theModelId);
+}
+
+bool XGUI_DocumentDataModel::hasSubModel(const QAbstractItemModel* theModel) const
+{
+  if (theModel == myModel)
+    return true;
+  QList<XGUI_PartModel*>::const_iterator aIt;
+  for (aIt = myPartModels.constBegin(); aIt != myPartModels.constEnd(); ++aIt) 
+    if ((*aIt) == theModel)
+      return true;
+  return false;
 }
