@@ -15,6 +15,8 @@
 #include <TDataStd_Comment.hxx>
 #include <TDF_ChildIDIterator.hxx>
 
+#include <climits>
+
 static const int UNDO_LIMIT = 10; // number of possible undo operations
 
 static const int TAG_GENERAL = 1; // general properties tag
@@ -393,7 +395,7 @@ void Model_Document::synchronizeFeatures()
     TDF_ChildIDIterator aFLabIter(
       aGroupsIter.Value()->Label(), TDataStd_Comment::GetID(), Standard_False);
     while(aFIter != aFeatures.end() || aFLabIter.More()) {
-      static const int INFINITE_TAG = MAXINT; // no label means that it exists somwhere in infinite
+      static const int INFINITE_TAG = INT_MAX; // no label means that it exists somwhere in infinite
       int aFeatureTag = INFINITE_TAG; 
       if (aFIter != aFeatures.end()) { // existing tag for feature
         shared_ptr<Model_Data> aData = dynamic_pointer_cast<Model_Data>((*aFIter)->data());

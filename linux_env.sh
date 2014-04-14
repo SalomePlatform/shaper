@@ -66,6 +66,7 @@ export CAS_ROOT_DIR=${INST_ROOT}/OCCT-6.7.0
 
 export PATH=${CAS_ROOT_DIR}:${CAS_ROOT_DIR}/bin:${PATH}
 export LD_LIBRARY_PATH=${CAS_ROOT_DIR}:${CAS_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
+export CSF_GraphicShr=${CAS_ROOT_DIR}/lib/libTKOpenGl.so
 # Variable for Foundation Classes : 
 export CSF_UnitsLexicon=${CAS_ROOT_DIR}/src/UnitsAPI/Lexi_Expr.dat 
 export CSF_UnitsDefinition=${CAS_ROOT_DIR}/src/UnitsAPI/Units.dat 
@@ -82,4 +83,5 @@ export CASROOT=${CAS_ROOT_DIR}
 ##
 export LIB=${LD_LIBRARY_PATH}
 
-
+export PATH=${INST_ROOT}/../install/bin:${PATH}
+export LD_LIBRARY_PATH=${INST_ROOT}/../install/bin:${INST_ROOT}/../install/swig:${LD_LIBRARY_PATH}

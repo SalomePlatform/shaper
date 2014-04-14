@@ -39,4 +39,4 @@ private:
   QFeatureList mySelectedData;
 };
 
-#endif;
+#endif

@@ -3,7 +3,9 @@
 // Author:	Mikhail PONIKAROV
 
 #include <Event_Loop.h>
+
 #include <string>
+#include <cstring>
 
 using namespace std;
 

@@ -58,7 +58,7 @@ string library(const string& theLibName)
 #ifndef WIN32
   static string aLibExt( ".so" );
   if (aLibName.size() < 3 || aLibName.substr(0, 3) !="lib")
-    aLibName = ".lib" + aLibName;
+    aLibName = "lib" + aLibName;
 #else
   static string aLibExt( ".dll" );
 #endif

@@ -9,8 +9,8 @@
 #include <Config_ModuleReader.h>
 #include <Config_FeatureReader.h>
 
-#include <libxml\parser.h>
-#include <libxml\tree.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
 #ifdef _DEBUG
 #include <iostream>

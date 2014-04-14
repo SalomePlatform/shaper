@@ -136,7 +136,7 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
     myClosable(true),
     myStartX(0), myStartY(0), myCurrX(0), myCurrY(0), myCurScale(0.0), myCurSketch(0),
     myDrawRect(false), myEnableDrawMode(false), myCursorIsHand(false), myEventStarted(false),
-    myLastState(NormalState), myOperation(NOTHING)
+    myLastState(WindowNormalState), myOperation(NOTHING)
 {
   mySelectedPoint = gp_Pnt(0., 0., 0.);
   setFrameStyle(QFrame::Raised);
@@ -345,7 +345,7 @@ void XGUI_ViewWindow::onMinimize()
     int aNewH = int(aH / aR);
     myPicture->setPixmap(aPMap.scaled(100,  aNewH));
 
-  myLastState = isMaximized() ? MaximizedState : NormalState;
+  myLastState = isMaximized() ? MaximizedState : WindowNormalState;
   showMinimized();
     parentWidget()->setGeometry(parentWidget()->x(), parentWidget()->y(),
                                 100, aNewH);
@@ -964,9 +964,9 @@ void XGUI_ViewWindow::dumpView()
 
     Handle(Visual3d_View) a3dView = myViewPort->getView()->View();
     if (aFmt == "PS")
-      a3dView->Export(_strdup(qPrintable(aFileName)), Graphic3d_EF_PostScript);
+      a3dView->Export(strdup(qPrintable(aFileName)), Graphic3d_EF_PostScript);
     else if (aFmt == "EPS")
-      a3dView->Export(_strdup(qPrintable(aFileName)), Graphic3d_EF_EnhPostScript);
+      a3dView->Export(strdup(qPrintable(aFileName)), Graphic3d_EF_EnhPostScript);
     else
       aPicture.save( aFileName, aFmt.toLatin1() );
     QApplication::restoreOverrideCursor();

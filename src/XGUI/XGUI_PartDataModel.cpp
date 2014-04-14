@@ -92,16 +92,16 @@ QModelIndex XGUI_TopDataModel::index(int theRow, int theColumn, const QModelInde
   if (!theParent.isValid()) {
     switch (theRow) {
     case 0:
-      return createIndex(theRow, theColumn, (quintptr) ParamsFolder);
+      return createIndex(theRow, theColumn, (qint32) ParamsFolder);
     case 1:
-      return createIndex(theRow, theColumn, (quintptr) ConstructFolder);
+      return createIndex(theRow, theColumn, (qint32) ConstructFolder);
     }
   } else {
     if (theParent.internalId() == ParamsFolder)
-      return createIndex(theRow, theColumn, (quintptr) ParamObject);
+      return createIndex(theRow, theColumn, (qint32) ParamObject);
 
     if (theParent.internalId() == ConstructFolder)
-      return createIndex(theRow, theColumn, (quintptr) ConstructObject);
+      return createIndex(theRow, theColumn, (qint32) ConstructObject);
   }
   return QModelIndex();
 }
@@ -114,9 +114,9 @@ QModelIndex XGUI_TopDataModel::parent(const QModelIndex& theIndex) const
   case ConstructFolder:
     return QModelIndex();
   case ParamObject:
-    return createIndex(0, 0, (quintptr) ParamsFolder);
+    return createIndex(0, 0, (qint32) ParamsFolder);
   case ConstructObject:
-    return createIndex(1, 0, (quintptr) ConstructFolder);
+    return createIndex(1, 0, (qint32) ConstructFolder);
   }
   return QModelIndex();
 }
@@ -131,13 +131,13 @@ FeaturePtr XGUI_TopDataModel::feature(const QModelIndex& theIndex) const
   switch (theIndex.internalId()) {
   case ParamsFolder:
   case ConstructFolder:
-    return 0;
+    return FeaturePtr();
   case ParamObject:
     return myDocument->feature(PARAMETERS_GROUP, theIndex.row());
   case ConstructObject:
     return myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row());
   }
-  return 0;
+  return FeaturePtr();
 }
 
 
@@ -258,21 +258,21 @@ int XGUI_PartDataModel::columnCount(const QModelIndex &parent) const
 QModelIndex XGUI_PartDataModel::index(int theRow, int theColumn, const QModelIndex &theParent) const
 {
   if (!theParent.isValid())
-    return createIndex(theRow, 0, (quintptr) MyRoot);
+    return createIndex(theRow, 0, (qint32) MyRoot);
 
   int aId = (int)theParent.internalId();
   switch (aId) {
   case MyRoot:
     switch (theRow) {
     case 0:
-      return createIndex(0, 0, (quintptr) ParamsFolder);
+      return createIndex(0, 0, (qint32) ParamsFolder);
     case 1:
-      return createIndex(1, 0, (quintptr) ConstructFolder);
+      return createIndex(1, 0, (qint32) ConstructFolder);
     }
   case ParamsFolder:
-    return createIndex(theRow, 0, (quintptr) ParamObject);
+    return createIndex(theRow, 0, (qint32) ParamObject);
   case ConstructFolder:
-    return createIndex(theRow, 0, (quintptr) ConstructObject);
+    return createIndex(theRow, 0, (qint32) ConstructObject);
   }
   return QModelIndex();
 }
@@ -284,11 +284,11 @@ QModelIndex XGUI_PartDataModel::parent(const QModelIndex& theIndex) const
     return QModelIndex();
   case ParamsFolder:
   case ConstructFolder:
-    return createIndex(0, 0, (quintptr) MyRoot);
+    return createIndex(0, 0, (qint32) MyRoot);
   case ParamObject:
-    return createIndex(0, 0, (quintptr) ParamsFolder);
+    return createIndex(0, 0, (qint32) ParamsFolder);
   case ConstructObject:
-    return createIndex(1, 0, (quintptr) ConstructFolder);
+    return createIndex(1, 0, (qint32) ConstructFolder);
   }
   return QModelIndex();
 }
@@ -312,13 +312,13 @@ FeaturePtr XGUI_PartDataModel::feature(const QModelIndex& theIndex) const
     return myDocument->feature(PARTS_GROUP, myId);
   case ParamsFolder:
   case ConstructFolder:
-    return 0;
+    return FeaturePtr();
   case ParamObject:
     return featureDocument()->feature(PARAMETERS_GROUP, theIndex.row());
   case ConstructObject:
     return featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row());
   }
-  return 0;
+  return FeaturePtr();
 }
 
 bool XGUI_PartDataModel::hasDocument(const std::shared_ptr<ModelAPI_Document>& theDoc) const

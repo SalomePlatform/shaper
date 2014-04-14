@@ -51,7 +51,7 @@ int Model_Iterator::numIterationsLeft()
   return aResult;
 }
 
-bool Model_Iterator::is(std::shared_ptr<ModelAPI_Feature> theFeature)
+bool Model_Iterator::isEqual(std::shared_ptr<ModelAPI_Feature> theFeature)
 {
   return (myIter.Value()->Label() == 
     dynamic_pointer_cast<Model_Data>(theFeature->data())->label()) == Standard_True;

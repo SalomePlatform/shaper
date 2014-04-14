@@ -8,8 +8,8 @@
 #include <Config_XMLReader.h>
 
 #include <Event_Loop.h>
-#include <libxml\parser.h>
-#include <libxml\tree.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
 /*
 #ifdef WIN32
