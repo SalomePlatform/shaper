@@ -1,6 +1,7 @@
 #ifndef XGUI_ViewWindow_H
 #define XGUI_ViewWindow_H
 
+#include "XGUI.h"
 #include "XGUI_Constants.h"
 #include "XGUI_ViewBackground.h"
 
@@ -27,7 +28,7 @@ class QMdiSubWindow;
   It contains a view port object (drawing area) and toolbars for view camera and window management.
   Also it managements events in view port
 */
-class XGUI_ViewWindow: public QFrame
+class XGUI_EXPORT XGUI_ViewWindow: public QFrame
 {
 Q_OBJECT
 public:

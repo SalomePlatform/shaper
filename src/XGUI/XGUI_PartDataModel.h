@@ -2,6 +2,7 @@
 #ifndef XGUI_PartDataModel_H
 #define XGUI_PartDataModel_H
 
+#include "XGUI.h"
 #include "XGUI_DataTreeModel.h"
 
 /**\class XGUI_TopDataModel
@@ -9,7 +10,7 @@
  * \brief This is a data model for Object Browser (QTreeView).
  * It represents only upper part of data tree (non-parts tree items)
  */
-class XGUI_TopDataModel : public XGUI_FeaturesModel
+class XGUI_EXPORT XGUI_TopDataModel : public XGUI_FeaturesModel
 {
   Q_OBJECT
 public:

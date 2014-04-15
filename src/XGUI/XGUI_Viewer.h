@@ -1,6 +1,7 @@
 #ifndef XGUI_Viewer_H
 #define XGUI_Viewer_H
 
+#include "XGUI.h"
 #include "XGUI_Constants.h"
 
 #include <QObject>
@@ -22,7 +23,7 @@ class QKeyEvent;
  * \brief Represents a 3d viewer. The viewer manages 3d scene and a set of view windows
  * when each of view window is a one point of view on this scene.
  */
-class XGUI_Viewer: public QObject
+class XGUI_EXPORT XGUI_Viewer: public QObject
 {
 Q_OBJECT
 public:

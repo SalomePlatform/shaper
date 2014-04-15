@@ -1,6 +1,7 @@
 #ifndef XGUI_SelectionMgr_H
 #define XGUI_SelectionMgr_H
 
+#include "XGUI.h"
 #include "XGUI_Constants.h"
 #include <QObject>
 
@@ -12,7 +13,7 @@ class XGUI_ObjectsBrowser;
  * \brief Selection manager. Provides selection event on selection in 
  * Object Browser and Viewer
  */
-class XGUI_SelectionMgr : public QObject
+class XGUI_EXPORT XGUI_SelectionMgr : public QObject
 {
   Q_OBJECT
 public:

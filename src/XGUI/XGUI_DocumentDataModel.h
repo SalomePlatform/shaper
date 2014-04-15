@@ -2,6 +2,7 @@
 #ifndef XGUI_DocumentDataModel_H
 #define XGUI_DocumentDataModel_H
 
+#include "XGUI.h"
 #include "XGUI_Constants.h"
 
 #include <QAbstractItemModel>
@@ -18,7 +19,7 @@ class XGUI_TopDataModel;
  * \brief This is a proxy data model for Object Browser (QTreeView).
  * It contains several sub-models for generation of each sub-part of data tree.
  */
-class XGUI_DocumentDataModel : public QAbstractItemModel, public Event_Listener
+class XGUI_EXPORT XGUI_DocumentDataModel : public QAbstractItemModel, public Event_Listener
 {
   Q_OBJECT
 public:

@@ -1,6 +1,7 @@
 #ifndef XGUI_MAINWINDOW_H
 #define XGUI_MAINWINDOW_H
 
+#include "XGUI.h"
 #include <QMainWindow>
 
 class XGUI_MainMenu;
@@ -14,7 +15,7 @@ class PyConsole_EnhConsole;
  * \brief Main window of the application (Desktop).
  * It contains: Object Browser, 3d Viewer, Python console, property panel, main menu
  */
-class XGUI_MainWindow: public QMainWindow
+class XGUI_EXPORT XGUI_MainWindow: public QMainWindow
 {
 Q_OBJECT
 

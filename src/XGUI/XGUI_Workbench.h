@@ -1,6 +1,7 @@
 #ifndef XGUI_Workbench_H
 #define XGUI_Workbench_H
 
+#include "XGUI.h"
 #include <QWidget>
 #include <QScrollArea>
 #include <QList>
@@ -12,7 +13,7 @@ class CommandsArea;
 class QHBoxLayout;
 class QPushButton;
 
-class XGUI_Workbench: public QWidget
+class XGUI_EXPORT XGUI_Workbench: public QWidget
 {
 Q_OBJECT
 public:

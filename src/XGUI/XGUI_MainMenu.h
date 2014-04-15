@@ -1,6 +1,7 @@
 #ifndef XGUI_MainMenu_H
 #define XGUI_MainMenu_H
 
+#include "XGUI.h"
 #include <QObject>
 #include <QList>
 
@@ -19,7 +20,7 @@ class QEvent;
  * \ingroup GUI
  * \brief Class for creation of main menu (set of workbenches)
  */
-class XGUI_MainMenu: public QObject
+class XGUI_EXPORT XGUI_MainMenu: public QObject
 {
 Q_OBJECT
 public:

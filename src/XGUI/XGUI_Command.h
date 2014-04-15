@@ -1,6 +1,7 @@
 #ifndef XGUI_Command_H
 #define XGUI_Command_H
 
+#include "XGUI.h"
 #include <QWidgetAction>
 
 #define MIN_BUTTON_HEIGHT 18
@@ -10,7 +11,7 @@
  * \ingroup GUI
  * \brief Represents a command item in the application menu (Workbench)
  */
-class XGUI_Command: public QWidgetAction
+class XGUI_EXPORT XGUI_Command: public QWidgetAction
 {
 Q_OBJECT
 public:

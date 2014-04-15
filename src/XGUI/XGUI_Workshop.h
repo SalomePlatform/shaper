@@ -1,7 +1,7 @@
 #ifndef XGUI_WORKSHOP_H
 #define XGUI_WORKSHOP_H
 
-#include <Event_Message.h>
+#include "XGUI.h"
 #include <Event_Listener.h>
 
 #include <QObject>
@@ -23,7 +23,7 @@ class Config_PointerMessage;
  * \ingroup GUI
  * \brief Class which defines a configuration of the application (Workshop) and launches it.
  */
-class XGUI_Workshop: public QObject, public Event_Listener
+class XGUI_EXPORT XGUI_Workshop: public QObject, public Event_Listener
 {
 Q_OBJECT
 public:

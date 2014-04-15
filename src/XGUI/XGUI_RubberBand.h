@@ -1,6 +1,7 @@
 #ifndef XGUI_RubberBand_H
 #define XGUI_RubberBand_H
 
+#include "XGUI.h"
 #include <QWidget>
 
 /*!
@@ -10,7 +11,7 @@
   
   Currently this class does not support Style functionality in full.
 */
-class XGUI_AbstractRubberBand: public QWidget
+class XGUI_EXPORT XGUI_AbstractRubberBand: public QWidget
 {
 Q_OBJECT
 protected:

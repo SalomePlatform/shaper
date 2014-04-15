@@ -8,13 +8,14 @@
 #ifndef XGUI_WIDGETFACTORY_H_
 #define XGUI_WIDGETFACTORY_H_
 
+#include "XGUI.h"
 #include <QString>
 
 class QWidget;
 class Config_WidgetAPI;
 class ModuleBase_Operation;
 
-class XGUI_WidgetFactory
+class XGUI_EXPORT XGUI_WidgetFactory
 {
 public:
   XGUI_WidgetFactory(ModuleBase_Operation*);

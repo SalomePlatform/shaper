@@ -1,6 +1,7 @@
 #ifndef XGUI_MenuGroupPanel_H
 #define XGUI_MenuGroupPanel_H
 
+#include "XGUI.h"
 #include <QWidget>
 #include <QMap>
 
@@ -11,7 +12,7 @@ class QGridLayout;
  * \ingroup GUI
  * \brief Represents a one group in a page of main menu (workbench)
  */
-class XGUI_MenuGroupPanel: public QWidget
+class XGUI_EXPORT XGUI_MenuGroupPanel: public QWidget
 {
 Q_OBJECT
 public:

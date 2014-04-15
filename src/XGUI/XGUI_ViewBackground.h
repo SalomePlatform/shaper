@@ -1,6 +1,7 @@
 #ifndef XGUI_ViewBackground_H
 #define XGUI_ViewBackground_H
 
+#include "XGUI.h"
 #include "XGUI_Constants.h"
 
 #include <QColor>
@@ -44,7 +45,7 @@ typedef QList<QColor> QColorList;     //!< list of colors
  bg.setTextureShown( true );                            // draw texture on the solid color background
  \endcode
  */
-class XGUI_ViewBackground
+class XGUI_EXPORT XGUI_ViewBackground
 {
 public:
   XGUI_ViewBackground();

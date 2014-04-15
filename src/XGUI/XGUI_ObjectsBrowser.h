@@ -2,6 +2,7 @@
 #ifndef XGUI_ObjectsBrowser_H
 #define XGUI_ObjectsBrowser_H
 
+#include "XGUI.h"
 #include "XGUI_Constants.h"
 
 #include <QTreeView>
@@ -12,7 +13,7 @@ class XGUI_DocumentDataModel;
  * \ingroup GUI
  * \brief Object browser window object. Represents data tree of current data structure
  */
- class XGUI_ObjectsBrowser : public QTreeView
+ class XGUI_EXPORT XGUI_ObjectsBrowser : public QTreeView
 {
   Q_OBJECT
 public:

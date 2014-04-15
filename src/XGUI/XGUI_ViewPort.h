@@ -1,6 +1,7 @@
 #ifndef XGUI_ViewPort_H
 #define XGUI_ViewPort_H
 
+#include "XGUI.h"
 #include "XGUI_ViewBackground.h"
 
 #include <QWidget>
@@ -10,7 +11,7 @@
 
 class XGUI_ViewWindow;
 
-class XGUI_ViewPort: public QWidget
+class XGUI_EXPORT XGUI_ViewPort: public QWidget
 {
 Q_OBJECT
 public:

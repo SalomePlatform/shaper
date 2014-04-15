@@ -1,18 +1,18 @@
 
-
 #ifndef XGUI_DataTreeModel_H
 #define XGUI_DataTreeModel_H
 
+#include "XGUI.h"
+#include "XGUI_Constants.h"
+
 #include <ModelAPI_Document.h>
 #include <QAbstractItemModel>
-
-#include "XGUI_Constants.h"
 
 /**\class XGUI_FeaturesModel
  * \ingroup GUI
  * \brief Abstaract class of model object which operates with features data.
  */
-class XGUI_FeaturesModel : public QAbstractItemModel
+class XGUI_EXPORT XGUI_FeaturesModel : public QAbstractItemModel
 {
 public:
   XGUI_FeaturesModel(const std::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent):
