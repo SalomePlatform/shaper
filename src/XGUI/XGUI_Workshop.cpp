@@ -68,6 +68,7 @@ void XGUI_Workshop::startApplication()
   myMainWindow->show();
 
   updateCommandStatus();
+  onNew();
   // Testing of document creation
   //std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   //std::shared_ptr<ModelAPI_Feature> aPoint1 = aMgr->rootDocument()->addFeature("Point");
@@ -116,9 +117,9 @@ void XGUI_Workshop::initMenu()
                                 QIcon(":pictures/open.png"), QKeySequence::Open);
   aCommand->connectTo(this, SLOT(onOpen()));
 
-  aCommand = aGroup->addFeature("NEW_CMD", tr("New"), tr("Create a new document"),
-                                QIcon(":pictures/new.png"), QKeySequence::New);
-  aCommand->connectTo(this, SLOT(onNew()));
+  //aCommand = aGroup->addFeature("NEW_CMD", tr("New"), tr("Create a new document"),
+  //                              QIcon(":pictures/new.png"), QKeySequence::New);
+  //aCommand->connectTo(this, SLOT(onNew()));
 
   aCommand = aGroup->addFeature("EXIT_CMD", tr("Exit"), tr("Exit application"),
                                 QIcon(":pictures/close.png"), QKeySequence::Close);
