@@ -174,14 +174,17 @@ public slots:
   //! Reset point of view
   void reset();
 
+  void windowActivated();
+
+  void windowDeactivated();
 
 protected:
   virtual void resizeEvent(QResizeEvent* theEvent);
 
   virtual void changeEvent(QEvent* theEvent);
 
-  virtual void enterEvent(QEvent* theEvent);
-  virtual void leaveEvent(QEvent* theEvent);
+  //virtual void enterEvent(QEvent* theEvent);
+  //virtual void leaveEvent(QEvent* theEvent);
 
   virtual bool eventFilter(QObject *theObj, QEvent *theEvent);
 
@@ -298,8 +301,6 @@ public:
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_PaintOnScreen);
   }
-
-  void repaintBackground();
 
 protected:
   virtual void paintEvent(QPaintEvent* theEvent);

@@ -145,6 +145,10 @@ XGUI_Viewer::XGUI_Viewer(XGUI_MainWindow* theParent, bool DisplayTrihedron)
   }
   // set zooming style to standard
   //myZoomingStyle = 0;
+
+  QMdiArea* aMDI = myMainWindow->mdiArea();
+  connect(aMDI, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(onWindowActivated(QMdiSubWindow*)));
+
 }
 
 XGUI_Viewer::~XGUI_Viewer(void)
@@ -412,5 +416,12 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
 */
 void XGUI_Viewer::onWindowActivated(QMdiSubWindow* view)
 {
+  if (view && (view != myActiveView)) {
     myActiveView = view;
+    ((XGUI_ViewWindow*)myActiveView->widget())->windowActivated();
+    QList<QMdiSubWindow*>::iterator aIt;
+    for (aIt = myViews.begin(); aIt != myViews.end(); ++aIt)
+      if ((*aIt) != myActiveView)
+        ((XGUI_ViewWindow*)(*aIt)->widget())->windowDeactivated();
+  }
 }

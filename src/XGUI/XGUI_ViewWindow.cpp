@@ -15,6 +15,7 @@
 #include <QPainter>
 #include <QTimer>
 #include <QFileDialog>
+#include <QStyleOptionToolBar>
 
 #include <TopoDS_Shape.hxx>
 #include <BRep_Tool.hxx>
@@ -77,9 +78,11 @@ const char* imageCrossCursor[] = { "32 32 3 1", ". c None", "a c #000000", "# c 
     "................................", "................................",
     "................................", "................................" };
 
-//**************************************************************************
-void ViewerToolbar::repaintBackground()
+
+void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 {
+  // Paint background
+  QPainter aPainter(this);
   QRect aRect = rect();
   QRect aVPRect = myVPort->rect();
   QPoint aGlobPnt = mapToGlobal(aRect.topLeft());
@@ -87,13 +90,16 @@ void ViewerToolbar::repaintBackground()
 
   QRect aImgRect(QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(), 
                        aRect.width(), aRect.height()));
-  QPainter(this).drawImage(aRect, myVPort->dumpView(aImgRect, false));
-}
+  aPainter.drawImage(aRect, myVPort->dumpView(aImgRect, false));
 
-void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
-{
-  repaintBackground();
-  //QToolBar::paintEvent(theEvent);
+  // Paint foreground
+  QStyle *style = this->style();
+  QStyleOptionToolBar aOpt;
+  initStyleOption(&aOpt);
+
+  aOpt.rect = style->subElementRect(QStyle::SE_ToolBarHandle, &aOpt, this);
+  if (aOpt.rect.isValid())
+    style->drawPrimitive(QStyle::PE_IndicatorToolBarHandle, &aOpt, &aPainter, this);
 }
 
 //**************************************************************************
@@ -248,9 +254,9 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
   myWindowBar->addAction(aBtn);
   connect(aBtn, SIGNAL(triggered()), SLOT(onClose()));
 
-  myViewBar->hide();
-  myWindowBar->hide();
-  myGripWgt->hide();
+  //myViewBar->hide();
+  //myWindowBar->hide();
+  //myGripWgt->hide();
 
   //Support copy of background on updating of viewer
   connect(myViewPort, SIGNAL(vpTransformed()), this, SLOT(updateToolBar()));
@@ -286,21 +292,40 @@ void XGUI_ViewWindow::changeEvent(QEvent* theEvent)
 
   if (theEvent->type() == QEvent::WindowStateChange) {
     if (isMinimized()) {
-            myViewBar->hide();
-            myGripWgt->hide(); 
-            myWindowBar->hide();
-            myViewPort->hide();
+      myViewBar->hide();
+      myGripWgt->hide(); 
+      myWindowBar->hide();
+      myViewPort->hide();
       myPicture->show();
     } else {
       myPicture->hide();
-            myViewPort->show();
+      myViewPort->show();
       if (isMaximized()) {
         myMinimizeBtn->setIcon(MinimizeIco);
         myMaximizeBtn->setIcon(RestoreIco);
       }
+      myViewBar->setVisible(isActiveWindow());
+      myWindowBar->setVisible(isActiveWindow());
+      myGripWgt->setVisible(isActiveWindow() && (!isMaximized())); 
     }
   } else
     QWidget::changeEvent(theEvent);
+}
+
+
+
+void XGUI_ViewWindow::windowActivated()
+{
+  myViewBar->show();
+  myWindowBar->show();
+  myGripWgt->setVisible(!(isMaximized() || isMinimized())); 
+}
+
+void XGUI_ViewWindow::windowDeactivated()
+{
+  myViewBar->hide();
+  myWindowBar->hide();
+  myGripWgt->hide(); 
 }
 
 
@@ -317,7 +342,7 @@ void XGUI_ViewWindow::onClose()
 }
 
 //****************************************************************
-void XGUI_ViewWindow::enterEvent(QEvent* theEvent)
+/*void XGUI_ViewWindow::enterEvent(QEvent* theEvent)
 {
   if (!isMinimized()) {
     myViewBar->show();
@@ -333,7 +358,7 @@ void XGUI_ViewWindow::leaveEvent(QEvent* theEvent)
   myViewBar->hide();
   myGripWgt->hide();
   myWindowBar->hide();
-}
+}*/
 
 //****************************************************************
 void XGUI_ViewWindow::onMinimize()

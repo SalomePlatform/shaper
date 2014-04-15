@@ -135,9 +135,9 @@ private:
 
   double myTrihedronSize;
   
-    QList<QMdiSubWindow*> myViews;
+  QList<QMdiSubWindow*> myViews;
 
-    QMdiSubWindow* myActiveView;
+  QMdiSubWindow* myActiveView;
 };
 
 #endif
