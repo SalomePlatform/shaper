@@ -3,7 +3,7 @@
 # Find absolute path to ROOT_DIR
 export ROOT_DIR=$(pwd)/..
 export ROOT_DIR=`cd "${ROOT_DIR}";pwd`
-export PDIR=${ROOT_DIR}/products
+export PDIR=/dn48/newgeom/common/products
 
 #------ Python ------
 export PYTHON_ROOT_DIR=${PDIR}/Python-2.7.3
