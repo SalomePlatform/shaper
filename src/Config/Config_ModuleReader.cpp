@@ -6,6 +6,7 @@
  */
 
 #include <Config_Keywords.h>
+#include <Config_Common.h>
 #include <Config_ModuleReader.h>
 #include <Config_FeatureReader.h>
 

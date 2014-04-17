@@ -211,7 +211,7 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   qDeleteAll(aPropWidget->children());
   theOperation->start();
   XGUI_WidgetFactory aFactory = XGUI_WidgetFactory(theOperation);
-  aFactory.fillWidget(aPropWidget);
+  aFactory.createWidget(aPropWidget);
 }
 
 void XGUI_Workshop::setCurrentOperation(ModuleBase_Operation* theOperation)

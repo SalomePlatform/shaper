@@ -12,4 +12,4 @@ popd
 
 call %SRC_DIR%\msvc10_env.bat
 
-start %ROOT_DIR%\install\bin\XGUI.exe 
+start %ROOT_DIR%\install\bin\GeomApp.exe 

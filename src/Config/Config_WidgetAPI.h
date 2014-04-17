@@ -32,10 +32,13 @@ public:
   Config_WidgetAPI(std::string theRawXml);
   virtual ~Config_WidgetAPI();
 
-  void reset();
-  bool nextWidget();
+  bool toNextWidget();
+  bool toChildWidget();
+  bool toParentWidget();
 
   std::string widgetType();
+  bool isContainerWidget();
+  bool isPagedWidget();
 
   std::string widgetId();
   std::string widgetIcon();
@@ -43,9 +46,6 @@ public:
   std::string widgetTooltip();
 
   std::string getProperty(const char* thePropName);
-
-protected:
-  bool isNode(xmlNodePtr theNode, const char* name, ...);
 
 private:
   xmlDocPtr myDoc;

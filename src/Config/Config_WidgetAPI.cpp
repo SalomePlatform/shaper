@@ -6,6 +6,8 @@
  */
 
 #include <Config_WidgetAPI.h>
+#include <Config_Keywords.h>
+#include <Config_Common.h>
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
@@ -14,7 +16,7 @@
 Config_WidgetAPI::Config_WidgetAPI(std::string theRawXml)
 {
   myDoc = xmlParseDoc(BAD_CAST theRawXml.c_str());
-  myCurrentNode = NULL;
+  myCurrentNode = xmlDocGetRootElement(myDoc);
 }
 
 
@@ -23,18 +25,38 @@ Config_WidgetAPI::~Config_WidgetAPI()
   xmlFreeDoc(myDoc);
 }
 
-void Config_WidgetAPI::reset()
+bool Config_WidgetAPI::toNextWidget()
 {
-  xmlNodePtr aRoot = xmlDocGetRootElement(myDoc);
-  if(aRoot) {
-    myCurrentNode = aRoot->children;
+  //Skip all non-element node, stop if next node is null
+  xmlNodePtr aNextNode = myCurrentNode;
+  do {
+    aNextNode = aNextNode->next;
+  } while(aNextNode && !isElementNode(aNextNode));
+
+  if(!aNextNode) {
+    toParentWidget();
+    return false;
   }
+  myCurrentNode = aNextNode;
+  return true;
 }
 
-bool Config_WidgetAPI::nextWidget()
+bool Config_WidgetAPI::toChildWidget()
+{
+  if(myCurrentNode && hasChild(myCurrentNode)) {
+    myCurrentNode = myCurrentNode->children;
+    while(!isElementNode(myCurrentNode)) {
+      myCurrentNode = myCurrentNode->next;
+    } 
+    return true;
+  }
+  return false;
+}
+
+bool Config_WidgetAPI::toParentWidget()
 {
   if(myCurrentNode) {
-    myCurrentNode = myCurrentNode->next;
+    myCurrentNode = myCurrentNode->parent;
   }
   return myCurrentNode != NULL;
 }
@@ -46,6 +68,18 @@ std::string Config_WidgetAPI::widgetType()
     result = std::string((char *) myCurrentNode->name);
   }
   return result;
+}
+
+bool Config_WidgetAPI::isContainerWidget()
+{
+  return isNode(myCurrentNode, WDG_GROUP, WDG_CHECK_GROUP,
+                               NULL);
+}
+
+bool Config_WidgetAPI::isPagedWidget()
+{
+  return isNode(myCurrentNode, WDG_TOOLBOX, WDG_SWITCH,
+                               NULL);
 }
 
 std::string Config_WidgetAPI::getProperty(const char* thePropName)
@@ -76,29 +110,4 @@ std::string Config_WidgetAPI::widgetIcon()
 std::string Config_WidgetAPI::widgetLabel()
 {
   return getProperty("label");
-}
-
-bool Config_WidgetAPI::isNode(xmlNodePtr theNode, const char* theNodeName, ...)
-{
-  bool result = false;
-  const xmlChar* aName = theNode->name;
-  if (!aName || theNode->type != XML_ELEMENT_NODE)
-    return false;
-
-  if (!xmlStrcmp(aName, (const xmlChar *) theNodeName))
-    return true;
-
-  va_list args; // define argument list variable
-  va_start(args, theNodeName); // init list; point to last defined argument
-  while(true) {
-    char *anArg = va_arg (args, char*); // get next argument
-    if (anArg == NULL)
-      break;
-    if (!xmlStrcmp(aName, (const xmlChar *) anArg)) {
-      va_end(args); // cleanup the system stack
-      return true;
-    }
-  }
-  va_end(args); // cleanup the system stack
-  return false;
 }

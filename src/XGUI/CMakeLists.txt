@@ -23,6 +23,7 @@ SET(PROJECT_HEADERS
 	XGUI_ObjectsBrowser.h
     XGUI_DataTreeModel.h
     XGUI_SelectionMgr.h
+    XGUI_SwitchWidget.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -47,6 +48,7 @@ SET(PROJECT_SOURCES
 	XGUI_PartDataModel.cpp
 	XGUI_ObjectsBrowser.cpp
     XGUI_SelectionMgr.cpp
+    XGUI_SwitchWidget.cpp
 )
 
 SET(PROJECT_RESOURCES 
