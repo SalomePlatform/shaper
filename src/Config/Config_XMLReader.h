@@ -47,14 +47,6 @@ protected:
 
   xmlNodePtr node(void* theNode);
   std::string getProperty(xmlNodePtr theNode, const char* property);
-  /*
-   * Please note that this function should be called with NULL last argument. 
-   * In example: isNode(aNode, "type1", ["type2", ...], NULL);
-   * ", NULL" is required to use unlimited number of arguments.
-   * TODO(sbh): find a way to simplify calling this method.
-   */
-  bool isNode(xmlNodePtr theNode, const char* name, ...);
-  bool hasChild(xmlNodePtr theNode);
 
 protected:
   std::string myDocumentPath;

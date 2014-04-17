@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
   Config_WidgetAPI.h
   Config_WidgetReader.h
   Config_PointerMessage.h
+  Config_Common.h
  )
  
 SET(PROJECT_SOURCES

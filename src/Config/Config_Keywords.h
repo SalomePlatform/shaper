@@ -14,7 +14,16 @@
 const static char* NODE_WORKBENCH = "workbench";
 const static char* NODE_GROUP = "group";
 const static char* NODE_FEATURE = "feature";
-const static char* NODE_DOUBLE_WDG = "doublevalue";
+//Widgets
+const static char* WDG_DOUBLEVALUE = "doublevalue";
+//Widget containers
+const static char* WDG_GROUP = "groupbox";
+const static char* WDG_CHECK_GROUP = "check_groupbox";
+const static char* WDG_TOOLBOX = "toolbox";
+const static char* WDG_TOOLBOX_BOX = "box";
+const static char* WDG_SWITCH = "switch";
+const static char* WDG_SWITCH_CASE = "case";
+
 
 const static char* _ID = "id";
 //const static char* WORKBENCH_ID = "id";
@@ -30,6 +39,10 @@ const static char* DOUBLE_WDG_MIN = "min";
 const static char* DOUBLE_WDG_MAX = "max";
 const static char* DOUBLE_WDG_STEP = "step";
 const static char* DOUBLE_WDG_DFLT = "default";
+
+//toolbox/switch properties
+const static char* CONTAINER_PAGE_NAME = "title";
+
 
 /*
  * Hardcoded xml entities of plugins.xml

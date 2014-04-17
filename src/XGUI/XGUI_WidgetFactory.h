@@ -21,18 +21,22 @@ public:
   XGUI_WidgetFactory(ModuleBase_Operation*);
   virtual ~XGUI_WidgetFactory();
 
-  void fillWidget(QWidget* theParent);
+  void createWidget(QWidget* theParent);
 
 protected:
-  QWidget* doubleSpinBoxWidget();
-
+  //Widgets
+  QWidget* doubleSpinBoxControl();
+  QWidget* createWidgetByType(const std::string& theType, QWidget* theParent = NULL);
+  QWidget* createContainer(const std::string& theType, QWidget* theParent = NULL);
   bool connectWidget(QWidget*, const QString&);
 
-private:
   QString qs(const std::string& theStdString) const;
 
+private:
   Config_WidgetAPI* myWidgetApi;
   ModuleBase_Operation*   myOperation;
+
+
 };
 
 #endif /* XGUI_WIDGETFACTORY_H_ */

@@ -7,6 +7,7 @@
 
 #include <Config_WidgetReader.h>
 #include <Config_Keywords.h>
+#include <Config_Common.h>
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
