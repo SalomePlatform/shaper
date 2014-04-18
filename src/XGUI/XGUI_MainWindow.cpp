@@ -139,11 +139,6 @@ QDockWidget* XGUI_MainWindow::createPropertyPanel()
   aMainLay->setContentsMargins(3, 3, 3, 3);
   aPropPanel->setWidget(aContent);
 
-  QWidget* aCustomWidget = new QWidget(aContent);
-  aCustomWidget->setObjectName(XGUI::PROP_PANEL_WDG);
-  aMainLay->addWidget(aCustomWidget);
-  aMainLay->addStretch(1);
-
   QFrame* aFrm = new QFrame(aContent);
   aFrm->setFrameStyle(QFrame::Sunken);
   aFrm->setFrameShape(QFrame::Panel);
@@ -166,6 +161,11 @@ QDockWidget* XGUI_MainWindow::createPropertyPanel()
   aBtn->setFlat(true);
   //connect(aBtn, SIGNAL(clicked()), this, SIGNAL(propertyClosePressed()));
   aBtnLay->addWidget(aBtn);
+
+  QWidget* aCustomWidget = new QWidget(aContent);
+  aCustomWidget->setObjectName(XGUI::PROP_PANEL_WDG);
+  aMainLay->addWidget(aCustomWidget);
+  aMainLay->addStretch(1);
 
   return aPropPanel;
 }
