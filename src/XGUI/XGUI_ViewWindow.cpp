@@ -81,8 +81,8 @@ const char* imageCrossCursor[] = { "32 32 3 1", ". c None", "a c #000000", "# c 
 
 void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 {
-  QApplication::syncX();
-  printf("### ViewerToolbar::paintEvent\n");
+  //QApplication::syncX();
+  //printf("### ViewerToolbar::paintEvent\n");
   //QToolBar::paintEvent(theEvent);
   // Paint background
   QPainter aPainter(this);
@@ -396,7 +396,7 @@ void XGUI_ViewWindow::onMinimize()
   int aNewH = int(aH / aR);
   myPicture->setPixmap(aPMap.scaled(100,  aNewH));
 
-  myLastState = isMaximized() ? MaximizedState : WindowNormalState;
+  myLastState = (isMaximized() || parentWidget()->isMaximized()) ? MaximizedState : WindowNormalState;
   //parentWidget()->showMinimized();
   showMinimized();
   parentWidget()->setGeometry(parentWidget()->x(), parentWidget()->y(), 100, aNewH);
@@ -405,10 +405,11 @@ void XGUI_ViewWindow::onMinimize()
 //****************************************************************
 void XGUI_ViewWindow::onMaximize()
 {
-  if (isMaximized()) {
+  if (isMaximized() || parentWidget()->isMaximized()) {
     myMaximizeBtn->setIcon(MaximizeIco);
     myGripWgt->show();
     showNormal();
+    parentWidget()->showNormal();
   } else {
     myMaximizeBtn->setIcon(RestoreIco);
     myGripWgt->hide();
