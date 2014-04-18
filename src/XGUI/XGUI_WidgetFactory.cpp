@@ -26,6 +26,9 @@
 #include <QDebug>
 #endif
 
+#include <cfloat>
+#include <climits>
+
 XGUI_WidgetFactory::XGUI_WidgetFactory(ModuleBase_Operation* theOperation)
     : myOperation(theOperation)
 {
@@ -132,11 +135,15 @@ QWidget* XGUI_WidgetFactory::doubleSpinBoxControl()
   double aMinVal = qs(aProp).toDouble(&isOk);
   if (isOk) {
     aBox->setMinimum(aMinVal);
+  } else {
+    aBox->setMinimum(-DBL_MAX);
   }
   aProp = myWidgetApi->getProperty(DOUBLE_WDG_MAX);
   double aMaxVal = qs(aProp).toDouble(&isOk);
   if (isOk) {
     aBox->setMaximum(aMaxVal);
+  } else {
+    aBox->setMaximum(DBL_MAX);
   }
   aProp = myWidgetApi->getProperty(DOUBLE_WDG_STEP);
   double aStepVal = qs(aProp).toDouble(&isOk);
