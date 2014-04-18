@@ -15,6 +15,7 @@ class XGUI_Module;
 class XGUI_Workbench;
 class XGUI_SelectionMgr;
 class ModuleBase_Operation;
+class ModuleBase_PropPanelOperation;
 
 class Config_FeatureMessage;
 class Config_PointerMessage;
@@ -63,7 +64,7 @@ public slots:
 protected:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
-  void fillPropertyPanel(ModuleBase_Operation* theOperation);
+  void fillPropertyPanel(ModuleBase_PropPanelOperation* theOperation);
   void connectToPropertyPanel(ModuleBase_Operation* theOperation);
   void setCurrentOperation(ModuleBase_Operation* theOperation);
 

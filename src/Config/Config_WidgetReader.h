@@ -21,7 +21,8 @@ public:
   CONFIG_EXPORT Config_WidgetReader(const std::string& theXmlFile);
   CONFIG_EXPORT virtual ~Config_WidgetReader();
 
-  CONFIG_EXPORT std::string featureWidgetCfg(std::string theFeatureName);
+  CONFIG_EXPORT std::string featureWidgetCfg(const std::string& theFeatureName);
+  CONFIG_EXPORT std::string featureDescription(const std::string& theFeatureName);
 
 protected:
   void processNode(xmlNodePtr theNode);
@@ -29,6 +30,7 @@ protected:
 
 private:
   std::map<std::string, std::string> myWidgetCache;
+  std::map<std::string, std::string> myDescriptionCache;
 
 };
 

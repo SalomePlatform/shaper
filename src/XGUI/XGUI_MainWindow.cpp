@@ -121,11 +121,17 @@ void XGUI_MainWindow::createDockWidgets()
   tabifyDockWidget(aObjDock, myPropertyPanelDock);
 }
 
+void XGUI_MainWindow::setPropertyPannelTitle(const QString& theTitle)
+{
+  myPropertyPanelDock->setWindowTitle(theTitle);
+}
+
 
 QDockWidget* XGUI_MainWindow::createPropertyPanel()
 {
   QDockWidget* aPropPanel = new QDockWidget(this);
   aPropPanel->setWindowTitle(tr("Property Panel"));
+  QAction* aViewAct = aPropPanel->toggleViewAction();
   aPropPanel->setObjectName(XGUI::PROP_PANEL);
 
   QWidget* aContent = new QWidget(aPropPanel);

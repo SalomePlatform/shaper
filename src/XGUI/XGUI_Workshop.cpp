@@ -18,7 +18,7 @@
 #include <ModelAPI_AttributeDocRef.h>
 
 #include <Event_Loop.h>
-#include <ModuleBase_Operation.h>
+#include <ModuleBase_PropPanelOperation.h>
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
 
@@ -147,7 +147,8 @@ void XGUI_Workshop::processEvent(const Event_Message* theMessage)
   const Config_PointerMessage* aPartSetMsg =
       dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
-    ModuleBase_Operation* aOperation = (ModuleBase_Operation*)(aPartSetMsg->pointer());
+    ModuleBase_PropPanelOperation* aOperation =
+        (ModuleBase_PropPanelOperation*)(aPartSetMsg->pointer());
     setCurrentOperation(aOperation);
     if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
       myCurrentOperation->start();
@@ -204,7 +205,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
 /*
  *
  */
-void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
+void XGUI_Workshop::fillPropertyPanel(ModuleBase_PropPanelOperation* theOperation)
 {
   connectToPropertyPanel(theOperation);
   QWidget* aPropWidget = myMainWindow->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
@@ -212,6 +213,7 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   theOperation->start();
   XGUI_WidgetFactory aFactory = XGUI_WidgetFactory(theOperation);
   aFactory.createWidget(aPropWidget);
+  myMainWindow->setPropertyPannelTitle(theOperation->description());
 }
 
 void XGUI_Workshop::setCurrentOperation(ModuleBase_Operation* theOperation)

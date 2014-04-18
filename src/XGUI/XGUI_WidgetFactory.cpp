@@ -9,7 +9,7 @@
 
 #include <XGUI_SwitchWidget.h>
 
-#include <ModuleBase_Operation.h>
+#include <ModuleBase_PropPanelOperation.h>
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
 
@@ -29,7 +29,7 @@
 #include <cfloat>
 #include <climits>
 
-XGUI_WidgetFactory::XGUI_WidgetFactory(ModuleBase_Operation* theOperation)
+XGUI_WidgetFactory::XGUI_WidgetFactory(ModuleBase_PropPanelOperation* theOperation)
     : myOperation(theOperation)
 {
   QString aXml = myOperation->xmlRepresentation();

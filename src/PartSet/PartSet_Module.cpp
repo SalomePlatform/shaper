@@ -1,5 +1,5 @@
 #include <PartSet_Module.h>
-#include <ModuleBase_Operation.h>
+#include <ModuleBase_PropPanelOperation.h>
 
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
@@ -55,11 +55,13 @@ void PartSet_Module::onFeatureTriggered()
   XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
   QString aCmdId = aCmd->id();
   std::string aXmlCfg = aWdgReader.featureWidgetCfg(aCmdId.toStdString());
+  std::string aDescription = aWdgReader.featureDescription(aCmdId.toStdString());
   //TODO(sbh): Implement static method to extract event id [SEID]
   static Event_ID aModuleEvent = Event_Loop::eventByName("PartSetModuleEvent");
   Config_PointerMessage aMessage(aModuleEvent, this);
-  ModuleBase_Operation* aPartSetOp = new ModuleBase_Operation(aCmdId, this);
+  ModuleBase_PropPanelOperation* aPartSetOp = new ModuleBase_PropPanelOperation(aCmdId, this);
   aPartSetOp->setXmlRepresentation(QString::fromStdString(aXmlCfg));
+  aPartSetOp->setDescription(QString::fromStdString(aDescription));
   aMessage.setPointer(aPartSetOp);
   Event_Loop::loop()->send(aMessage);
 }

@@ -4,10 +4,12 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
     ModuleBase.h
 	ModuleBase_Operation.h
+	ModuleBase_PropPanelOperation.h
 )
 
 SET(PROJECT_SOURCES
 	ModuleBase_Operation.cpp
+	ModuleBase_PropPanelOperation.cpp
 )
 
 SET(PROJECT_LIBRARIES

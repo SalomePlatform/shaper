@@ -29,9 +29,14 @@ Config_WidgetReader::~Config_WidgetReader()
 {
 }
 
-std::string Config_WidgetReader::featureWidgetCfg(std::string theFeatureName)
+std::string Config_WidgetReader::featureWidgetCfg(const std::string& theFeatureName)
 {
   return myWidgetCache[theFeatureName];
+}
+
+std::string Config_WidgetReader::featureDescription(const std::string& theFeatureName)
+{
+  return myDescriptionCache[theFeatureName];
 }
 
 void Config_WidgetReader::processNode(xmlNodePtr theNode)
@@ -45,6 +50,7 @@ void Config_WidgetReader::processNode(xmlNodePtr theNode)
       result = std::string((char*) buffer->content);
     }
     myWidgetCache[aNodeName] = result;
+    myDescriptionCache[aNodeName] = getProperty(theNode, FEATURE_TEXT);
   }
 }
 

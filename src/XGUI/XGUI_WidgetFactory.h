@@ -13,12 +13,12 @@
 
 class QWidget;
 class Config_WidgetAPI;
-class ModuleBase_Operation;
+class ModuleBase_PropPanelOperation;
 
 class XGUI_EXPORT XGUI_WidgetFactory
 {
 public:
-  XGUI_WidgetFactory(ModuleBase_Operation*);
+  XGUI_WidgetFactory(ModuleBase_PropPanelOperation*);
   virtual ~XGUI_WidgetFactory();
 
   void createWidget(QWidget* theParent);
@@ -34,7 +34,7 @@ protected:
 
 private:
   Config_WidgetAPI* myWidgetApi;
-  ModuleBase_Operation*   myOperation;
+  ModuleBase_PropPanelOperation*   myOperation;
 
 
 };

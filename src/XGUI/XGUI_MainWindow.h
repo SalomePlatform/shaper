@@ -46,6 +46,7 @@ public:
 
   // Creates Dock widgets: Object broewser and Property panel
   void createDockWidgets();
+  void setPropertyPannelTitle(const QString& theTitle);
 
 public slots:
   void showPythonConsole();
