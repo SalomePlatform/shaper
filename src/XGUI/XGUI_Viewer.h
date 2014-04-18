@@ -111,10 +111,12 @@ signals:
   void keyRelease(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent);
   void activated(XGUI_ViewWindow* theWindow);
 
+public slots:
+  void onWindowMinimized(QMdiSubWindow*);
+  void onWindowActivated(QMdiSubWindow*);
+
 private slots:
   void onViewClosed(QMdiSubWindow*);
-  //void onViewMapped();
-  void onWindowActivated(QMdiSubWindow*);
 
 private:
   void addView(QMdiSubWindow* theView);

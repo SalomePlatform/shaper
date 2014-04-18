@@ -5,6 +5,7 @@
 
 #include <QMdiArea>
 #include <QMdiSubWindow>
+#include <QApplication>
 
 #include <V3d_View.hxx>
 
@@ -414,14 +415,34 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
 /*!
     Emit activated for view \a view.
 */
+static int AA = 0;
 void XGUI_Viewer::onWindowActivated(QMdiSubWindow* view)
 {
+  qDebug("### windowActivated %i\n", AA++);
   if (view && (view != myActiveView)) {
     myActiveView = view;
     ((XGUI_ViewWindow*)myActiveView->widget())->windowActivated();
     QList<QMdiSubWindow*>::iterator aIt;
-    for (aIt = myViews.begin(); aIt != myViews.end(); ++aIt)
-      if ((*aIt) != myActiveView)
+    for (aIt = myViews.begin(); aIt != myViews.end(); ++aIt) {
+      if ((*aIt) != myActiveView) {
         ((XGUI_ViewWindow*)(*aIt)->widget())->windowDeactivated();
+      }
+    }
+  }
+}
+
+
+void XGUI_Viewer::onWindowMinimized(QMdiSubWindow* theWnd)
+{
+  if (myActiveView == theWnd) {
+    myActiveView = 0;
+    QList<QMdiSubWindow*>::iterator aIt;
+    for (aIt = myViews.begin(); aIt != myViews.end(); ++aIt) {
+      if (!(*aIt)->widget()->isMinimized()) {
+        (*aIt)->raise();
+        onWindowActivated(*aIt);
+        break;
+      }
+    }
   }
 }

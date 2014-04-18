@@ -16,13 +16,10 @@ class Handle_Model_Document;
 
 /**\class Model_Document
  * \ingroup DataModel
- * \brief Document for internal data structure of any object storage. Corresponds to the SALOME study.
- * Document contains all data of te SALOME Study specific to this module
- * that must be written into the HDF file.
+ * \brief Document for internal data structure of any object storage.
+ * Document contains all data that must be stored/retrived in the file.
  * Also it provides acces to this data: open/save, transactions management etc.
- * to provide access to all stored data.
  */
-
 class Model_Document: public ModelAPI_Document
 {
 public:

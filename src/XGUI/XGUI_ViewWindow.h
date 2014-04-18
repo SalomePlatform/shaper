@@ -87,6 +87,12 @@ public:
   //! Sets the current view window closable or not
   void setClosable( const bool isClosable ) { myClosable = isClosable; }
 
+  //! Enable/Disable drawing of ribbon line
+  void enableDrawMode(bool toEnable) { myEnableDrawMode = toEnable; }
+
+  //! Returns true if ribbon line drawing enabled
+  bool isDrawModeEnabled() const { return myEnableDrawMode; }
+
 signals:
   //! Emited whien view transformation operation is started
   void vpTransformationStarted(XGUI_ViewWindow::OperationType type);
@@ -180,12 +186,7 @@ public slots:
   void windowDeactivated();
 
 protected:
-  virtual void resizeEvent(QResizeEvent* theEvent);
-
   virtual void changeEvent(QEvent* theEvent);
-
-  //virtual void enterEvent(QEvent* theEvent);
-  //virtual void leaveEvent(QEvent* theEvent);
 
   virtual bool eventFilter(QObject *theObj, QEvent *theEvent);
 
@@ -302,6 +303,7 @@ public:
     setBackgroundRole(QPalette::NoRole);
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_PaintOnScreen);
+    setAutoFillBackground(false);
   }
 
 protected:
@@ -327,6 +329,7 @@ public:
     setBackgroundRole(QPalette::NoRole);
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_PaintOnScreen);
+    setAutoFillBackground(false);
   }
 
   void repaintBackground();
