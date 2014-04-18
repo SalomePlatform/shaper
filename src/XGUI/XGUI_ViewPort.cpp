@@ -179,7 +179,7 @@ bool OpenGLUtils_FrameBuffer::init(const GLsizei& xSize, const GLsizei& ySize)
 {
   char* ext = (char*) glGetString(GL_EXTENSIONS);
   if (!IsEXTInitialized || strstr(ext, "GL_EXT_framebuffer_object") == NULL) {
-    qDebug( "Initializing OpenGL FrameBuffer extension failed");
+    //qDebug( "Initializing OpenGL FrameBuffer extension failed");
     return false;
   }
 
@@ -271,6 +271,7 @@ XGUI_ViewPort::XGUI_ViewPort(XGUI_ViewWindow* theParent,
   setFocusPolicy(Qt::StrongFocus);
   setAttribute(Qt::WA_PaintOnScreen);
   setAttribute(Qt::WA_NoSystemBackground);
+  setAutoFillBackground(false);
 
   if (theType == V3d_ORTHOGRAPHIC) {
     myOrthoView = new V3d_OrthographicView(theViewer);
