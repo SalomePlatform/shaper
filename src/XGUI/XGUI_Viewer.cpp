@@ -388,7 +388,7 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
             this,    SIGNAL(tryCloseView(XGUI_ViewWindow*)));
 
     connect(aWindow, SIGNAL(mousePressed(XGUI_ViewWindow*, QMouseEvent*)),
-            this,    SLOT(onMousePressed(XGUI_ViewWindow*, QMouseEvent*)));
+            this,    SIGNAL(mousePress(XGUI_ViewWindow*, QMouseEvent*)));
 
     connect(aWindow, SIGNAL(mouseReleased(XGUI_ViewWindow*, QMouseEvent*)),
             this,    SIGNAL(mouseRelease(XGUI_ViewWindow*, QMouseEvent*)));
@@ -405,8 +405,8 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
     connect(aWindow, SIGNAL(keyReleased(XGUI_ViewWindow*, QKeyEvent*)),
             this,    SIGNAL(keyRelease(XGUI_ViewWindow*, QKeyEvent*)));
 
-    connect(aWindow, SIGNAL(contextMenuRequested( QContextMenuEvent* )),
-            this,    SLOT  (onContextMenuRequested( QContextMenuEvent* )));
+//    connect(aWindow, SIGNAL(contextMenuRequested( QContextMenuEvent* )),
+//            this,    SLOT  (onContextMenuRequested( QContextMenuEvent* )));
 
     myViews.append(theView);
 }

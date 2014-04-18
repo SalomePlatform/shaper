@@ -11,6 +11,7 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QFileInfo>
+#include <QApplication>
 
 #include <V3d_OrthographicView.hxx>
 #include <V3d_PerspectiveView.hxx>
@@ -295,8 +296,8 @@ bool XGUI_ViewPort::mapView(const Handle(V3d_View)& theView)
 
   if (!mapped(theView)) {
     theView->SetWindow(myWindow);
-    if (theView != activeView())
-      theView->View()->Deactivate();
+    //if (theView != activeView())
+      //theView->View()->Deactivate();
   }
 
   /* create static trihedron (16551: EDF PAL 501) */
@@ -480,7 +481,7 @@ void XGUI_ViewPort::paintEvent(QPaintEvent* theEvent)
   mapView( activeView() );
 #endif
   if (!myWindow.IsNull()) {
-    //QGuiApplication::sync();
+    QApplication::syncX();
     QRect rc = theEvent->rect();
     //if ( !myPaintersRedrawing ) {
     //activeView()->Redraw();
@@ -496,16 +497,17 @@ void XGUI_ViewPort::paintEvent(QPaintEvent* theEvent)
 }
 
 //***********************************************
-void XGUI_ViewPort::resizeEvent(QResizeEvent*)
+void XGUI_ViewPort::resizeEvent(QResizeEvent* theEvent)
 {
 #ifdef WIN32
   /* Win32 : map before first show to avoid flicker */
   if (!mapped(activeView()))
     mapView(activeView());
 #endif
-  //QGuiApplication::sync();
-  if (!activeView().IsNull())
+  QApplication::syncX();
+  if (!activeView().IsNull()) {
     activeView()->MustBeResized();
+  }
 }
 
 //***********************************************
@@ -524,7 +526,7 @@ QImage XGUI_ViewPort::dumpView(QRect theRect, bool toUpdate)
     aWidth = theRect.width();
     aHeight = theRect.height();
   }
-  //QApplication::syncX();
+  QApplication::syncX();
 
   OpenGLUtils_FrameBuffer aFrameBuffer;
   if (aFrameBuffer.init(aWidth, aHeight)) {

@@ -7,4 +7,4 @@ SRC_DIR=${ROOT_DIR}/sources
 
 source ${SRC_DIR}/linux_env.sh
 
-${ROOT_DIR}/install/bin/XGUI
+${ROOT_DIR}/install/bin/GeomApp

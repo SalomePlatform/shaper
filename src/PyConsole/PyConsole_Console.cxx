@@ -290,10 +290,10 @@ void PyConsole_Console::createActions()
   connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( selectAll() ) );
   myActions.insert( SelectAllId, a );
   
-  a = new QAction( tr( "EDIT_DUMPCOMMANDS_CMD" ), this );
-  a->setStatusTip( tr( "EDIT_DUMPCOMMANDS_CMD" ) );
-  connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( dump() ) );
-  myActions.insert( DumpCommandsId, a );
+//  a = new QAction( tr( "EDIT_DUMPCOMMANDS_CMD" ), this );
+//  a->setStatusTip( tr( "EDIT_DUMPCOMMANDS_CMD" ) );
+//  connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( dump() ) );
+//  myActions.insert( DumpCommandsId, a );
 }
 
 /*!
