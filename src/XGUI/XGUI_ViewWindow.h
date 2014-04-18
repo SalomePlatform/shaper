@@ -269,6 +269,7 @@ private:
   bool myIsKeyFree;
   bool myEventStarted;       // set when transformation is in process 
   bool myClosable;
+  bool myIsActive;
 
   QCursor myCursor;
 
@@ -323,7 +324,9 @@ public:
   ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort)
       : QLabel(theParent), myVPort(thePort)
   {
+    setBackgroundRole(QPalette::NoRole);
     setAttribute(Qt::WA_NoSystemBackground);
+    setAttribute(Qt::WA_PaintOnScreen);
   }
 
   void repaintBackground();

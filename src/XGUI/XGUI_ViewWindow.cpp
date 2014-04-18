@@ -81,6 +81,9 @@ const char* imageCrossCursor[] = { "32 32 3 1", ". c None", "a c #000000", "# c 
 
 void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 {
+  QApplication::syncX();
+  printf("### ViewerToolbar::paintEvent\n");
+  //QToolBar::paintEvent(theEvent);
   // Paint background
   QPainter aPainter(this);
   QRect aRect = rect();
@@ -88,7 +91,7 @@ void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
   QPoint aGlobPnt = mapToGlobal(aRect.topLeft());
   QPoint aPnt = myVPort->mapFromGlobal(aGlobPnt);
 
-  QRect aImgRect(QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(), 
+  QRect aImgRect(QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(),
                        aRect.width(), aRect.height()));
   aPainter.drawImage(aRect, myVPort->dumpView(aImgRect, false));
 
@@ -142,6 +145,7 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
     myClosable(true),
     myStartX(0), myStartY(0), myCurrX(0), myCurrY(0), myCurScale(0.0), myCurSketch(0),
     myDrawRect(false), myEnableDrawMode(false), myCursorIsHand(false), myEventStarted(false),
+    myIsActive(false),
     myLastState(WindowNormalState), myOperation(NOTHING)
 {
   mySelectedPoint = gp_Pnt(0., 0., 0.);
@@ -278,8 +282,8 @@ void XGUI_ViewWindow::resizeEvent(QResizeEvent* theEvent)
   QSize aWndBarSize = myWindowBar->sizeHint();
   QSize myViewBarSize = myViewBar->sizeHint();
 
-  myWindowBar->move(aSize.width() - aWndBarSize.width() - BORDER_SIZE - 4,
-  BORDER_SIZE + 2);
+  myWindowBar->setGeometry(aSize.width() - aWndBarSize.width() - BORDER_SIZE - 4, BORDER_SIZE + 2,
+      aWndBarSize.width(), aWndBarSize.height());
   int aViewBarWidth = aSize.width() - aWndBarSize.width() - myGripWgt->width() - 8;
   if (aViewBarWidth > myViewBarSize.width())
     aViewBarWidth = myViewBarSize.width();
@@ -291,7 +295,7 @@ void XGUI_ViewWindow::changeEvent(QEvent* theEvent)
 {
 
   if (theEvent->type() == QEvent::WindowStateChange) {
-    if (isMinimized()) {
+    if (parentWidget()->isMinimized()) {
       myViewBar->hide();
       myGripWgt->hide(); 
       myWindowBar->hide();
@@ -300,13 +304,13 @@ void XGUI_ViewWindow::changeEvent(QEvent* theEvent)
     } else {
       myPicture->hide();
       myViewPort->show();
-      if (isMaximized()) {
+      if (parentWidget()->isMaximized()) {
         myMinimizeBtn->setIcon(MinimizeIco);
         myMaximizeBtn->setIcon(RestoreIco);
       }
-      myViewBar->setVisible(isActiveWindow());
-      myWindowBar->setVisible(isActiveWindow());
-      myGripWgt->setVisible(isActiveWindow() && (!isMaximized())); 
+      myViewBar->setVisible(myIsActive);
+      myWindowBar->setVisible(myIsActive);
+      myGripWgt->setVisible(myIsActive && (!parentWidget()->isMaximized()));
     }
   } else
     QWidget::changeEvent(theEvent);
@@ -314,15 +318,19 @@ void XGUI_ViewWindow::changeEvent(QEvent* theEvent)
 
 
 
+//****************************************************************
 void XGUI_ViewWindow::windowActivated()
 {
+  myIsActive = true;
   myViewBar->show();
   myWindowBar->show();
-  myGripWgt->setVisible(!(isMaximized() || isMinimized())); 
+  myGripWgt->setVisible(!(parentWidget()->isMaximized() || parentWidget()->isMinimized()));
 }
 
+//****************************************************************
 void XGUI_ViewWindow::windowDeactivated()
 {
+  myIsActive = false;
   myViewBar->hide();
   myWindowBar->hide();
   myGripWgt->hide(); 
@@ -370,23 +378,22 @@ void XGUI_ViewWindow::onMinimize()
     int aNewH = int(aH / aR);
     myPicture->setPixmap(aPMap.scaled(100,  aNewH));
 
-  myLastState = isMaximized() ? MaximizedState : WindowNormalState;
-  showMinimized();
-    parentWidget()->setGeometry(parentWidget()->x(), parentWidget()->y(),
-                                100, aNewH);
+  myLastState = parentWidget()->isMaximized() ? MaximizedState : WindowNormalState;
+  parentWidget()->showMinimized();
+  parentWidget()->setGeometry(parentWidget()->x(), parentWidget()->y(), 100, aNewH);
 }
 
 //****************************************************************
 void XGUI_ViewWindow::onMaximize()
 {
-  if (isMaximized()) {
+  if (parentWidget()->isMaximized()) {
     myMaximizeBtn->setIcon(MaximizeIco);
     myGripWgt->show();
-    showNormal();
+    parentWidget()->showNormal();
   } else {
     myMaximizeBtn->setIcon(RestoreIco);
     myGripWgt->hide();
-    showMaximized();
+    parentWidget()->showMaximized();
   }
   myMinimizeBtn->setIcon(MinimizeIco);
 }
