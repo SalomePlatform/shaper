@@ -295,22 +295,26 @@ void XGUI_ViewWindow::changeEvent(QEvent* theEvent)
 {
 
   if (theEvent->type() == QEvent::WindowStateChange) {
-    if (parentWidget()->isMinimized()) {
-      myViewBar->hide();
-      myGripWgt->hide(); 
-      myWindowBar->hide();
-      myViewPort->hide();
-      myPicture->show();
+    if (isMinimized()) {
+      if (myPicture->isHidden()) {
+        myViewBar->hide();
+        myGripWgt->hide(); 
+        myWindowBar->hide();
+        myViewPort->hide();
+        myPicture->show();
+      }
     } else {
-      myPicture->hide();
-      myViewPort->show();
-      if (parentWidget()->isMaximized()) {
+      if (myPicture->isVisible()) {
+        myPicture->hide();
+        myViewPort->show();
+      }
+      if (isMaximized()) {
         myMinimizeBtn->setIcon(MinimizeIco);
         myMaximizeBtn->setIcon(RestoreIco);
       }
       myViewBar->setVisible(myIsActive);
       myWindowBar->setVisible(myIsActive);
-      myGripWgt->setVisible(myIsActive && (!parentWidget()->isMaximized()));
+      myGripWgt->setVisible(myIsActive && (!isMaximized()));
     }
   } else
     QWidget::changeEvent(theEvent);
@@ -322,18 +326,32 @@ void XGUI_ViewWindow::changeEvent(QEvent* theEvent)
 void XGUI_ViewWindow::windowActivated()
 {
   myIsActive = true;
-  myViewBar->show();
-  myWindowBar->show();
-  myGripWgt->setVisible(!(parentWidget()->isMaximized() || parentWidget()->isMinimized()));
+  if (!isMinimized()) {
+    myViewBar->show();
+    myWindowBar->show();
+    myGripWgt->setVisible(!(isMaximized() || isMinimized()));
+    if (isMaximized()) {
+      myMaximizeBtn->setIcon(RestoreIco);
+    } else {
+      myMaximizeBtn->setIcon(MaximizeIco);
+    }
+  }
 }
 
 //****************************************************************
 void XGUI_ViewWindow::windowDeactivated()
 {
   myIsActive = false;
-  myViewBar->hide();
-  myWindowBar->hide();
-  myGripWgt->hide(); 
+  if (!isMinimized()) {
+    myViewBar->hide();
+    myWindowBar->hide();
+    myGripWgt->hide(); 
+    if (isMaximized()) {
+      myMaximizeBtn->setIcon(RestoreIco);
+    } else {
+      myMaximizeBtn->setIcon(MaximizeIco);
+    }
+  }
 }
 
 
@@ -375,25 +393,26 @@ void XGUI_ViewWindow::onMinimize()
   int aW = width();
   int aH = height();
   double aR = aW / 100.;
-    int aNewH = int(aH / aR);
-    myPicture->setPixmap(aPMap.scaled(100,  aNewH));
+  int aNewH = int(aH / aR);
+  myPicture->setPixmap(aPMap.scaled(100,  aNewH));
 
-  myLastState = parentWidget()->isMaximized() ? MaximizedState : WindowNormalState;
-  parentWidget()->showMinimized();
+  myLastState = isMaximized() ? MaximizedState : WindowNormalState;
+  //parentWidget()->showMinimized();
+  showMinimized();
   parentWidget()->setGeometry(parentWidget()->x(), parentWidget()->y(), 100, aNewH);
 }
 
 //****************************************************************
 void XGUI_ViewWindow::onMaximize()
 {
-  if (parentWidget()->isMaximized()) {
+  if (isMaximized()) {
     myMaximizeBtn->setIcon(MaximizeIco);
     myGripWgt->show();
-    parentWidget()->showNormal();
+    showNormal();
   } else {
     myMaximizeBtn->setIcon(RestoreIco);
     myGripWgt->hide();
-    parentWidget()->showMaximized();
+    showMaximized();
   }
   myMinimizeBtn->setIcon(MinimizeIco);
 }
