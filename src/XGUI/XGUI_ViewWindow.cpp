@@ -79,9 +79,9 @@ const char* imageCrossCursor[] = { "32 32 3 1", ". c None", "a c #000000", "# c 
     "................................", "................................" };
 
 
+static int aAA = 0;
 void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 {
-  //qDebug("### ViewerToolbar::paintEvent  %i\n", AA++);
   // Paint background
   QPainter aPainter(this);
   QRect aRect = rect();
