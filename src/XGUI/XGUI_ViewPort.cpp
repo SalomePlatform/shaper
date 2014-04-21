@@ -303,6 +303,7 @@ void XGUI_ViewPort::resizeEvent(QResizeEvent* theEvent)
   if (!activeView().IsNull()) {
     activeView()->MustBeResized();
   }
+  emit resized();
 }
 
 //***********************************************

@@ -79,7 +79,16 @@ const char* imageCrossCursor[] = { "32 32 3 1", ". c None", "a c #000000", "# c 
     "................................", "................................" };
 
 
-static int aAA = 0;
+ViewerToolbar::ViewerToolbar(QWidget* theParent, XGUI_ViewPort* thePort)
+  : QToolBar(theParent), myVPort(thePort), myResize(false)
+{
+  setBackgroundRole(QPalette::NoRole);
+  setAttribute(Qt::WA_NoSystemBackground);
+  //setAttribute(Qt::WA_PaintOnScreen);
+  setAutoFillBackground(false);
+  connect(myVPort, SIGNAL(resized()), this, SLOT(onViewPortResized()));
+}
+
 void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 {
   // Paint background
@@ -91,7 +100,10 @@ void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 
   QRect aImgRect(QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(),
                        aRect.width(), aRect.height()));
-  aPainter.drawImage(aRect, myVPort->dumpView(aImgRect, false));
+  QImage aImg = myVPort->dumpView(aImgRect, myResize);
+  if (!aImg.isNull())
+    aPainter.drawImage(aRect, aImg);
+  myResize = false;
 
   // Paint foreground
   QStyle *style = this->style();
@@ -104,7 +116,17 @@ void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 }
 
 //**************************************************************************
-void ViewerLabel::repaintBackground()
+ViewerLabel::ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort)
+  : QLabel(theParent), myVPort(thePort), myResize(false)
+{
+  setBackgroundRole(QPalette::NoRole);
+  setAttribute(Qt::WA_NoSystemBackground);
+  //setAttribute(Qt::WA_PaintOnScreen);
+  setAutoFillBackground(false);
+  connect(myVPort, SIGNAL(resized()), this, SLOT(onViewPortResized()));
+}
+
+void ViewerLabel::paintEvent(QPaintEvent* theEvent)
 {
   QRect aRect = rect();
   QRect aVPRect = myVPort->rect();
@@ -113,12 +135,9 @@ void ViewerLabel::repaintBackground()
 
   QRect aImgRect(QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(), 
                  aRect.width(), aRect.height()));
-  QPainter(this).drawImage(aRect, myVPort->dumpView(aImgRect, false));
-}
-
-void ViewerLabel::paintEvent(QPaintEvent* theEvent)
-{
-  repaintBackground();
+  QImage aImg = myVPort->dumpView(aImgRect, myResize);
+  if (!aImg.isNull())
+    QPainter(this).drawImage(aRect, aImg);
   QLabel::paintEvent(theEvent);
 }
 

@@ -299,20 +299,19 @@ class ViewerToolbar: public QToolBar
 {
 Q_OBJECT
 public:
-  ViewerToolbar(QWidget* theParent, XGUI_ViewPort* thePort)
-      : QToolBar(theParent), myVPort(thePort)
-  {
-    setBackgroundRole(QPalette::NoRole);
-    setAttribute(Qt::WA_NoSystemBackground);
-    //setAttribute(Qt::WA_PaintOnScreen);
-    setAutoFillBackground(false);
-  }
+  ViewerToolbar(QWidget* theParent, XGUI_ViewPort* thePort);
+
+protected slots:
+  void onViewPortResized() { myResize = true; }
 
 protected:
   virtual void paintEvent(QPaintEvent* theEvent);
 
+
+
 private:
   XGUI_ViewPort* myVPort;
+  bool myResize;
 };
 
 //******************************************************
@@ -325,22 +324,17 @@ class ViewerLabel: public QLabel
 {
 Q_OBJECT
 public:
-  ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort)
-      : QLabel(theParent), myVPort(thePort)
-  {
-    setBackgroundRole(QPalette::NoRole);
-    setAttribute(Qt::WA_NoSystemBackground);
-    //setAttribute(Qt::WA_PaintOnScreen);
-    setAutoFillBackground(false);
-  }
+  ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort);
 
-  void repaintBackground();
+protected slots:
+  void onViewPortResized() { myResize = true; }
 
 protected:
   virtual void paintEvent(QPaintEvent* theEvent);
 
 private:
   XGUI_ViewPort* myVPort;
+  bool myResize;
 };
 
 #endif

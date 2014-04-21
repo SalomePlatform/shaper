@@ -67,6 +67,7 @@ signals:
   void vpMapped();
   void vpTransformed();
   void vpUpdated();
+  void resized();
 
 protected:
   virtual void paintEvent(QPaintEvent*);
