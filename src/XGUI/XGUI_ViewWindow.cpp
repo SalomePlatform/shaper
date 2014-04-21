@@ -259,7 +259,6 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
   myWindowBar = new ViewerToolbar(this, myViewPort);
   myWindowBar->setCursor(Qt::PointingHandCursor);
   aToolLay->addWidget(myWindowBar);
-  myWindowBar->setFixedWidth(100);
 
   myMinimizeBtn = new QAction(myWindowBar);
   myMinimizeBtn->setIcon(MinimizeIco);
@@ -287,6 +286,14 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
 //****************************************************************
 XGUI_ViewWindow::~XGUI_ViewWindow()
 {
+}
+
+
+//****************************************************************
+void XGUI_ViewWindow::showEvent(QShowEvent* theEvent)
+{
+  QFrame::showEvent(theEvent);
+  myWindowBar->setFixedSize(myWindowBar->sizeHint());
 }
 
 //****************************************************************

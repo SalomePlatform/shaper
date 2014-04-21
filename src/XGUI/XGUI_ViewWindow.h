@@ -190,6 +190,8 @@ protected:
 
   virtual bool eventFilter(QObject *theObj, QEvent *theEvent);
 
+  virtual void showEvent(QShowEvent* theEvent);
+
 private slots:
   void onClose();
   void onMinimize();
@@ -302,7 +304,7 @@ public:
   {
     setBackgroundRole(QPalette::NoRole);
     setAttribute(Qt::WA_NoSystemBackground);
-    setAttribute(Qt::WA_PaintOnScreen);
+    //setAttribute(Qt::WA_PaintOnScreen);
     setAutoFillBackground(false);
   }
 
@@ -328,7 +330,7 @@ public:
   {
     setBackgroundRole(QPalette::NoRole);
     setAttribute(Qt::WA_NoSystemBackground);
-    setAttribute(Qt::WA_PaintOnScreen);
+    //setAttribute(Qt::WA_PaintOnScreen);
     setAutoFillBackground(false);
   }
 

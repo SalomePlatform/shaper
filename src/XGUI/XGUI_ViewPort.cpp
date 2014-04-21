@@ -178,6 +178,8 @@ OpenGLUtils_FrameBuffer::~OpenGLUtils_FrameBuffer()
 bool OpenGLUtils_FrameBuffer::init(const GLsizei& xSize, const GLsizei& ySize)
 {
   char* ext = (char*) glGetString(GL_EXTENSIONS);
+  if (!ext)
+    return false;
   if (!IsEXTInitialized || strstr(ext, "GL_EXT_framebuffer_object") == NULL) {
     //qDebug( "Initializing OpenGL FrameBuffer extension failed");
     return false;

@@ -415,10 +415,8 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
 /*!
     Emit activated for view \a view.
 */
-static int AA = 0;
 void XGUI_Viewer::onWindowActivated(QMdiSubWindow* view)
 {
-  qDebug("### windowActivated %i\n", AA++);
   if (view && (view != myActiveView)) {
     myActiveView = view;
     ((XGUI_ViewWindow*)myActiveView->widget())->windowActivated();
