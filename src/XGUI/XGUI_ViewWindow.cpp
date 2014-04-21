@@ -82,15 +82,12 @@ const char* imageCrossCursor[] = { "32 32 3 1", ". c None", "a c #000000", "# c 
 ViewerToolbar::ViewerToolbar(QWidget* theParent, XGUI_ViewPort* thePort)
   : QToolBar(theParent), myVPort(thePort), myResize(false)
 {
-  setBackgroundRole(QPalette::NoRole);
-  setAttribute(Qt::WA_NoSystemBackground);
-  //setAttribute(Qt::WA_PaintOnScreen);
-  setAutoFillBackground(false);
   connect(myVPort, SIGNAL(resized()), this, SLOT(onViewPortResized()));
 }
 
 void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 {
+  //QToolBar::paintEvent(theEvent);
   // Paint background
   QPainter aPainter(this);
   QRect aRect = rect();
@@ -119,10 +116,6 @@ void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 ViewerLabel::ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort)
   : QLabel(theParent), myVPort(thePort), myResize(false)
 {
-  setBackgroundRole(QPalette::NoRole);
-  setAttribute(Qt::WA_NoSystemBackground);
-  //setAttribute(Qt::WA_PaintOnScreen);
-  setAutoFillBackground(false);
   connect(myVPort, SIGNAL(resized()), this, SLOT(onViewPortResized()));
 }
 
@@ -194,7 +187,7 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
   QHBoxLayout* aToolLay = new QHBoxLayout();
   aToolLay->setMargin(0);
   aToolLay->setSpacing(0);
-  aVPLay->setContentsMargins(0,0,0,0);
+  aToolLay->setContentsMargins(0,0,0,0);
   aVPLay->addLayout(aToolLay);
   aVPLay->addStretch(); 
 
@@ -428,6 +421,9 @@ void XGUI_ViewWindow::onMaximize()
   }
   parentWidget()->activateWindow();
   myMinimizeBtn->setIcon(MinimizeIco);
+  
+  //  In order to avoid frosen background in toolbars when it shown as a second view
+  QTimer::singleShot(50, parentWidget(), SLOT(setFocus()));
 }
 
 //****************************************************************
@@ -477,8 +473,11 @@ bool XGUI_ViewWindow::processWindowControls(QObject *theObj, QEvent *theEvent)
       } else {
         showNormal();
       }
-      raise();
       myViewer->onWindowActivated((QMdiSubWindow*)parentWidget());
+
+      //  In order to avoid frosen background in toolbars when it shown as a second view
+      QTimer::singleShot(20, parentWidget(), SLOT(setFocus()));
+
       return true;
     }
   }
@@ -1011,7 +1010,11 @@ void XGUI_ViewWindow::cloneView()
   QMdiSubWindow* vw = myViewer->createView();
   XGUI_ViewWindow* aNewWnd = static_cast<XGUI_ViewWindow*>(vw->widget());
   aNewWnd->viewPort()->syncronizeWith(myViewPort);
+
   emit viewCloned( vw );
+
+  //  In order to avoid frosen background in toolbars when it shown as a second view
+  QTimer::singleShot(20, vw, SLOT(setFocus()));
 }
 
 void XGUI_ViewWindow::dumpView()
