@@ -352,7 +352,8 @@ void XGUI_ViewWindow::windowActivated()
     }
     myViewBar->show();
     myWindowBar->show();
-    myGripWgt->setVisible(!(isMaximized() || isMinimized()));
+    myGripWgt->setVisible(!(isMaximized() || isMinimized() ||
+        parentWidget()->isMaximized() || parentWidget()->isMinimized()));
   } else 
     myIsActive = false;
 }
