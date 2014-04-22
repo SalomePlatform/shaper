@@ -19,8 +19,6 @@ shared_ptr<ModelAPI_Feature> PartSetPlugin_Plugin::createFeature(string theFeatu
 {
   if (theFeatureID == "Part") {
     return shared_ptr<ModelAPI_Feature>(new PartSetPlugin_Part);
-  } else if (theFeatureID == "Point") {
-    return shared_ptr<ModelAPI_Feature>(new PartSetPlugin_Point);
   }
   // feature of such kind is not found
   return shared_ptr<ModelAPI_Feature>();

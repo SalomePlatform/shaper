@@ -1,8 +1,8 @@
-// File:        PartSetPlugin_Point.cxx
+// File:        ConstructionPlugin_Point.cxx
 // Created:     27 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#include "PartSetPlugin_Point.h"
+#include "ConstructionPlugin_Point.h"
 #include "ModelAPI_PluginManager.h"
 #include "ModelAPI_Document.h"
 #include "ModelAPI_Data.h"
@@ -10,11 +10,11 @@
 
 using namespace std;
 
-PartSetPlugin_Point::PartSetPlugin_Point()
+ConstructionPlugin_Point::ConstructionPlugin_Point()
 {
 }
 
-void PartSetPlugin_Point::initAttributes()
+void ConstructionPlugin_Point::initAttributes()
 {
   data()->addAttribute(POINT_ATTR_X, ModelAPI_AttributeDouble::type());
   data()->addAttribute(POINT_ATTR_Y, ModelAPI_AttributeDouble::type());
@@ -23,7 +23,7 @@ void PartSetPlugin_Point::initAttributes()
 
 // this is for debug only
 #include <iostream>
-void PartSetPlugin_Point::execute() 
+void ConstructionPlugin_Point::execute() 
 {
   // TODO: create a real shape for the point using OCC layer
   cout<<"X="<<data()->real(POINT_ATTR_X)->value()<<" Y="<<data()->real(POINT_ATTR_Y)->value()
