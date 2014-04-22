@@ -1,13 +1,19 @@
 INCLUDE(Common)
+INCLUDE(FindCAS)
+
 SET(CMAKE_AUTOMOC ON)
 
 SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Module.h
+	PartSet_OperationSketchBase.h
+        PartSet_OperationSketch.h
 )
 
 SET(PROJECT_SOURCES
 	PartSet_Module.cpp
+	PartSet_OperationSketchBase.cpp
+	PartSet_OperationSketch.cpp
 )
 
 SET(PROJECT_RESOURCES 
@@ -22,6 +28,7 @@ SET(PROJECT_LIBRARIES
     ModuleBase
     Config
     ${QT_LIBRARIES}
+    ${CAS_KERNEL}
 )
 
 SET(PROJECT_AUTOMOC 
@@ -38,9 +45,12 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI
                     ${CMAKE_SOURCE_DIR}/src/Config
                     ${CMAKE_SOURCE_DIR}/src/Event
                     ${CMAKE_SOURCE_DIR}/src/ModuleBase
+                    ${CMAKE_SOURCE_DIR}/src/ModelAPI
+                    ${CMAKE_SOURCE_DIR}/src/SketchPlugin
+                    ${CAS_INCLUDE_DIRS}
 )
 
-ADD_DEFINITIONS(-DPARTSET_EXPORTS)
+ADD_DEFINITIONS(-DPARTSET_EXPORTS ${CAS_DEFINITIONS})
 ADD_LIBRARY(PartSet SHARED 
 	${PROJECT_SOURCES} 
 	${PROJECT_HEADERS} 
@@ -50,7 +60,7 @@ ADD_LIBRARY(PartSet SHARED
 )
 
 # The Qt5Widgets_LIBRARIES variable also includes QtGui and QtCore
-TARGET_LINK_LIBRARIES(PartSet ${PROJECT_LIBRARIES})
+TARGET_LINK_LIBRARIES(PartSet ${PROJECT_LIBRARIES} XGUI ModelAPI SketchPlugin)
 
 ADD_DEPENDENCIES(PartSet ModuleBase)
 

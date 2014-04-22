@@ -1,0 +1,31 @@
+INCLUDE(Common)
+INCLUDE(FindCAS)
+
+SET(PROJECT_HEADERS
+    SketchPlugin.h
+    SketchPlugin_Feature.h
+    SketchPlugin_Plugin.h
+    SketchPlugin_Sketch.h
+)
+
+SET(PROJECT_SOURCES
+    SketchPlugin_Feature.cpp
+    SketchPlugin_Plugin.cpp
+    SketchPlugin_Sketch.cpp
+)
+
+SET(PROJECT_LIBRARIES
+    ${CAS_KERNEL}
+    ${CAS_MODELER}
+)
+
+ADD_DEFINITIONS(-DSKETCHPLUGIN_EXPORTS ${BOOST_DEFINITIONS} ${CAS_DEFINITIONS})
+ADD_LIBRARY(SketchPlugin SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+TARGET_LINK_LIBRARIES(SketchPlugin ${PROJECT_LIBRARIES} ModelAPI)
+
+INCLUDE_DIRECTORIES(
+  ${CAS_INCLUDE_DIRS}
+  ../ModelAPI
+)
+
+INSTALL(TARGETS SketchPlugin DESTINATION plugins)

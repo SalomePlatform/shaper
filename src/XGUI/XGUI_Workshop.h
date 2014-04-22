@@ -14,6 +14,7 @@ class XGUI_Command;
 class XGUI_Module;
 class XGUI_Workbench;
 class XGUI_SelectionMgr;
+class XGUI_Displayer;
 class ModuleBase_Operation;
 class ModuleBase_PropPanelOperation;
 
@@ -44,8 +45,14 @@ public:
   //! Returns selection manager object
   XGUI_SelectionMgr* selector() const { return mySelector; }
 
+  //! Returns displayer
+  XGUI_Displayer* displayer() const { return myDisplayer; }
+
   //! Creates and adds a new workbench (menu group) with the given name and returns it
   XGUI_Workbench* addWorkbench(const QString& theName);
+
+  //! Returns the current operation or NULL
+  ModuleBase_Operation* currentOperation() { return myCurrentOperation; }
 
   //! Redefinition of Event_Listener method
   virtual void processEvent(const Event_Message* theMessage);
@@ -78,6 +85,7 @@ private:
   XGUI_Module* myPartSetModule;
 
   XGUI_SelectionMgr* mySelector;
+  XGUI_Displayer* myDisplayer;
 
   ModuleBase_Operation* myCurrentOperation;
 };

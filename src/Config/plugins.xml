@@ -1,3 +1,4 @@
 <plugins module="PartSet">
   <plugin library="PartSetPlugin" configuration="plugin-PartSet.xml"/>
+  <plugin library="SketchPlugin" configuration="plugin-Sketch.xml"/>
 </plugins>

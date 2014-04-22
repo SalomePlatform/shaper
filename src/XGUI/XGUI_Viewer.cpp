@@ -18,6 +18,9 @@
 #include <Prs3d_LineAspect.hxx>
 #include <V3d_View.hxx>
 #include <Visual3d_View.hxx>
+#include <AIS_ListOfInteractive.hxx>
+
+#include <QMouseEvent>
 
 #ifdef WIN32
 #include <WNT_Window.hxx>
@@ -389,7 +392,7 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
             this,    SIGNAL(tryCloseView(XGUI_ViewWindow*)));
 
     connect(aWindow, SIGNAL(mousePressed(XGUI_ViewWindow*, QMouseEvent*)),
-            this,    SIGNAL(mousePress(XGUI_ViewWindow*, QMouseEvent*)));
+            this,    SLOT(onMousePressed(XGUI_ViewWindow*, QMouseEvent*)));
 
     connect(aWindow, SIGNAL(mouseReleased(XGUI_ViewWindow*, QMouseEvent*)),
             this,    SIGNAL(mouseRelease(XGUI_ViewWindow*, QMouseEvent*)));
@@ -408,6 +411,12 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
 
 //    connect(aWindow, SIGNAL(contextMenuRequested( QContextMenuEvent* )),
 //            this,    SLOT  (onContextMenuRequested( QContextMenuEvent* )));
+
+    connect(aWindow, SIGNAL(mouseMoving(XGUI_ViewWindow*, QMouseEvent*)),
+            this, SLOT(onMouseMove(XGUI_ViewWindow*, QMouseEvent*)));
+
+    connect(aWindow, SIGNAL(mouseReleased(XGUI_ViewWindow*, QMouseEvent*)),
+            this, SLOT(onMouseReleased(XGUI_ViewWindow*, QMouseEvent*)));
 
     myViews.append(theView);
 }
@@ -443,4 +452,26 @@ void XGUI_Viewer::onWindowMinimized(QMdiSubWindow* theWnd)
       }
     }
   }
+}
+
+/*!
+  SLOT: called on mouse move, processes hilighting
+*/
+void XGUI_Viewer::onMouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
+{
+  XGUI_ViewPort* aViewPort = theWindow->viewPort();
+  Handle(V3d_View) aView3d = aViewPort->getView();
+
+  if ( !aView3d.IsNull() )
+    myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView3d);
+}
+
+/*!
+  SLOT: called on mouse button release, finishes selection
+*/
+void XGUI_Viewer::onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
+{
+  myAISContext->Select();
+
+  emit selectionChanged();
 }

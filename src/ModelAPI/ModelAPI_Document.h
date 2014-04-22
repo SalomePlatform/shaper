@@ -20,6 +20,8 @@ static const std::string PARAMETERS_GROUP = "Parameters";
 static const std::string CONSTRUCTIONS_GROUP = "Construction";
 /// Group of parts
 static const std::string PARTS_GROUP = "Parts";
+/// Group of sketches
+static const std::string SKETCHS_GROUP = "Sketchs";
 
 /**\class Model_Document
  * \ingroup DataModel
