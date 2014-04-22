@@ -17,8 +17,7 @@ class PyEvent_Event;
   This event filter can be installed by any application that intends to use PyEvent_Event mechanism asynchronously.
   This class replaced SalomeApp_EventFilter.
 */
-//PYEVENT_EXPORT
-class PyEvent_EventFilter: public QObject 
+class PYEVENT_EXPORT PyEvent_EventFilter: public QObject 
 {
 public:
   static void Init();

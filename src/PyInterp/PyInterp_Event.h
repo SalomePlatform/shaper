@@ -27,8 +27,8 @@ protected:
  * Events thrown by the interpreter having executed a command and indicating
  * the return status.
  */
-//PYINTERP_EXPORT
-class PyInterp_Event : public QEvent
+//
+class PYINTERP_EXPORT PyInterp_Event : public QEvent
 {
   PyInterp_Event();
   PyInterp_Event( const PyInterp_Event& );
