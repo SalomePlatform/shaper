@@ -34,15 +34,11 @@ void SketchPlugin_Sketch::initAttributes()
 
 void SketchPlugin_Sketch::execute() 
 {
-  shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->docRef(PART_ATTR_DOC_REF);
+  /*shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->docRef(PART_ATTR_DOC_REF);
   if (!aDocRef->value()) { // create a document if not yet created
     shared_ptr<ModelAPI_Document> aPartSetDoc = ModelAPI_PluginManager::get()->rootDocument();
     aDocRef->setValue(aPartSetDoc->subDocument(data()->getName()));
-  }
-}
-
-shared_ptr<ModelAPI_Document> SketchPlugin_Sketch::documentToAdd() {
-  return ModelAPI_PluginManager::get()->rootDocument();
+  }*/
 }
 
 const TopoDS_Shape& SketchPlugin_Sketch::preview()

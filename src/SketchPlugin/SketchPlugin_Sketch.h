@@ -26,15 +26,13 @@ public:
 
   /// Returns to which group in the document must be added feature
  SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
-  {static std::string MY_GROUP = "Sketchs"; return MY_GROUP;}
+  {static std::string MY_GROUP = "Construction"; return MY_GROUP;}
 
   /// Creates a new part document if needed
  SKETCHPLUGIN_EXPORT virtual void execute();
 
   /// Request for initialization of data model of the feature: adding all attributes
  SKETCHPLUGIN_EXPORT virtual void initAttributes();
-
- SKETCHPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Document> documentToAdd();
 
   /// Returns the sketch preview
   SKETCHPLUGIN_EXPORT virtual const TopoDS_Shape& preview();
