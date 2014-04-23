@@ -60,7 +60,7 @@ ADD_LIBRARY(PartSet SHARED
 )
 
 # The Qt5Widgets_LIBRARIES variable also includes QtGui and QtCore
-TARGET_LINK_LIBRARIES(PartSet ${PROJECT_LIBRARIES} XGUI ModelAPI SketchPlugin)
+TARGET_LINK_LIBRARIES(PartSet ${PROJECT_LIBRARIES} XGUI ModelAPI)
 
 ADD_DEPENDENCIES(PartSet ModuleBase)
 
