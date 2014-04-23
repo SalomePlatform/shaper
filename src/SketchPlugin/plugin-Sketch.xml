@@ -3,16 +3,5 @@
     <group id="Basic">
       <feature id="Sketch" text="New sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png"/>
     </group>
-    <group id="Operations">
-      <feature id="Point" text="New point" tooltip="Create a new point" icon=":icons/point.png">
-        <doublevalue id="x" label="X:" min="0" max="" step="0.1" default="0"
-               icon=":pictures/x_point.png" tooltip="Set X"/>
-        <doublevalue id="y" label="Y:" min="0" max="" step="0.1" default="1"
-               icon=":pictures/y_point.png" tooltip="Set Y"/>
-        <doublevalue id="z" label="Z:" min="0" max="10" step="0.1" default="2"
-               icon=":pictures/z_point.png" tooltip="Set Z"/>
-      </feature>
-      <feature id="Line" text="New line" tooltip="Create a new line" icon=":icons/line.png"/>
-    </group>
   </workbench>
 </plugin>
