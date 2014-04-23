@@ -26,7 +26,6 @@ SET(PROJECT_SOURCES
 )
 
 SET(XML_RESOURCES
-  plugin-PartSet.xml
   plugins.xml
 )
 

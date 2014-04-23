@@ -22,6 +22,7 @@ public:
 
 public slots:
   void onFeatureTriggered();
+  void onVisualizePreview();
 
 private:
   XGUI_Workshop* myWorkshop;

@@ -14,8 +14,7 @@
 class QObject;
 class PyInterp_Watcher;
 
-//PYINTERP_EXPORT
-class PyInterp_Dispatcher : protected QThread
+class PYINTERP_EXPORT PyInterp_Dispatcher : protected QThread
 {
   PyInterp_Dispatcher(); // private constructor
 

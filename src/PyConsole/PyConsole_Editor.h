@@ -10,8 +10,7 @@ class PyConsole_Interp;
 class PyInterp_Request;
 class QEventLoop;
 
-//PYCONSOLE_EXPORT
-class PyConsole_Editor : public QTextEdit
+class PYCONSOLE_EXPORT PyConsole_Editor : public QTextEdit
 {
   Q_OBJECT;
 

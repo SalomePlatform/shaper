@@ -9,8 +9,7 @@
 //! SALOME custom event type
 #define PyEvent_EVENT QEvent::Type( QEvent::User + 10000 )
 
-// PYEVENT_EXPORT
-class PyEvent_CustomEvent : public QEvent
+class PYEVENT_EXPORT PyEvent_CustomEvent : public QEvent
 {
 public:
   PyEvent_CustomEvent( int type );
@@ -25,8 +24,7 @@ private:
 
 class QSemaphore;
 
-//PYEVENT_EXPORT
-class PyEvent_Event
+class PYEVENT_EXPORT PyEvent_Event
 {
 public:
   PyEvent_Event();

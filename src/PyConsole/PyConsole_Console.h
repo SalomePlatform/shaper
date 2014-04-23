@@ -13,8 +13,7 @@ class PyConsole_Editor;
 class PyConsole_EnhInterp;
 class QMenu;
 
-//PYCONSOLE_EXPORT
-class PyConsole_Console : public QWidget//, public SUIT_PopupClient
+class PYCONSOLE_EXPORT PyConsole_Console : public QWidget//, public SUIT_PopupClient
 {
   Q_OBJECT
 
@@ -77,8 +76,8 @@ protected:
  * Similar to PyConsole_Console except that an enhanced interpreter and enhanced editor
  * are encapsulated.
  */
-//PYCONSOLE_EXPORT
-class PyConsole_EnhConsole: public PyConsole_Console
+//
+class PYCONSOLE_EXPORT PyConsole_EnhConsole: public PyConsole_Console
 {
   Q_OBJECT
 

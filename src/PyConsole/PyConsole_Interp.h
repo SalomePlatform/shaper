@@ -6,8 +6,7 @@
 
 #include <PyInterp_Interp.h>   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
 
-//PYCONSOLE_EXPORT
-class PyConsole_Interp : public PyInterp_Interp
+class PYCONSOLE_EXPORT PyConsole_Interp : public PyInterp_Interp
 {
 public:
   PyConsole_Interp();

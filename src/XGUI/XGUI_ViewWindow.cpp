@@ -79,9 +79,15 @@ const char* imageCrossCursor[] = { "32 32 3 1", ". c None", "a c #000000", "# c 
     "................................", "................................" };
 
 
+ViewerToolbar::ViewerToolbar(QWidget* theParent, XGUI_ViewPort* thePort)
+  : QToolBar(theParent), myVPort(thePort), myResize(false)
+{
+  connect(myVPort, SIGNAL(resized()), this, SLOT(onViewPortResized()));
+}
+
 void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 {
-  //qDebug("### ViewerToolbar::paintEvent  %i\n", AA++);
+  //QToolBar::paintEvent(theEvent);
   // Paint background
   QPainter aPainter(this);
   QRect aRect = rect();
@@ -91,7 +97,10 @@ void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 
   QRect aImgRect(QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(),
                        aRect.width(), aRect.height()));
-  aPainter.drawImage(aRect, myVPort->dumpView(aImgRect, false));
+  QImage aImg = myVPort->dumpView(aImgRect, myResize);
+  if (!aImg.isNull())
+    aPainter.drawImage(aRect, aImg);
+  myResize = false;
 
   // Paint foreground
   QStyle *style = this->style();
@@ -104,7 +113,13 @@ void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 }
 
 //**************************************************************************
-void ViewerLabel::repaintBackground()
+ViewerLabel::ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort)
+  : QLabel(theParent), myVPort(thePort), myResize(false)
+{
+  connect(myVPort, SIGNAL(resized()), this, SLOT(onViewPortResized()));
+}
+
+void ViewerLabel::paintEvent(QPaintEvent* theEvent)
 {
   QRect aRect = rect();
   QRect aVPRect = myVPort->rect();
@@ -113,12 +128,9 @@ void ViewerLabel::repaintBackground()
 
   QRect aImgRect(QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(), 
                  aRect.width(), aRect.height()));
-  QPainter(this).drawImage(aRect, myVPort->dumpView(aImgRect, false));
-}
-
-void ViewerLabel::paintEvent(QPaintEvent* theEvent)
-{
-  repaintBackground();
+  QImage aImg = myVPort->dumpView(aImgRect, myResize);
+  if (!aImg.isNull())
+    QPainter(this).drawImage(aRect, aImg);
   QLabel::paintEvent(theEvent);
 }
 
@@ -175,7 +187,7 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
   QHBoxLayout* aToolLay = new QHBoxLayout();
   aToolLay->setMargin(0);
   aToolLay->setSpacing(0);
-  aVPLay->setContentsMargins(0,0,0,0);
+  aToolLay->setContentsMargins(0,0,0,0);
   aVPLay->addLayout(aToolLay);
   aVPLay->addStretch(); 
 
@@ -259,7 +271,6 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
   myWindowBar = new ViewerToolbar(this, myViewPort);
   myWindowBar->setCursor(Qt::PointingHandCursor);
   aToolLay->addWidget(myWindowBar);
-  myWindowBar->setFixedWidth(100);
 
   myMinimizeBtn = new QAction(myWindowBar);
   myMinimizeBtn->setIcon(MinimizeIco);
@@ -287,6 +298,14 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
 //****************************************************************
 XGUI_ViewWindow::~XGUI_ViewWindow()
 {
+}
+
+
+//****************************************************************
+void XGUI_ViewWindow::showEvent(QShowEvent* theEvent)
+{
+  QFrame::showEvent(theEvent);
+  myWindowBar->setFixedSize(myWindowBar->sizeHint());
 }
 
 //****************************************************************
@@ -333,7 +352,8 @@ void XGUI_ViewWindow::windowActivated()
     }
     myViewBar->show();
     myWindowBar->show();
-    myGripWgt->setVisible(!(isMaximized() || isMinimized()));
+    myGripWgt->setVisible(!(isMaximized() || isMinimized() ||
+        parentWidget()->isMaximized() || parentWidget()->isMinimized()));
   } else 
     myIsActive = false;
 }
@@ -402,6 +422,9 @@ void XGUI_ViewWindow::onMaximize()
   }
   parentWidget()->activateWindow();
   myMinimizeBtn->setIcon(MinimizeIco);
+  
+  //  In order to avoid frosen background in toolbars when it shown as a second view
+  QTimer::singleShot(50, parentWidget(), SLOT(setFocus()));
 }
 
 //****************************************************************
@@ -451,8 +474,11 @@ bool XGUI_ViewWindow::processWindowControls(QObject *theObj, QEvent *theEvent)
       } else {
         showNormal();
       }
-      raise();
       myViewer->onWindowActivated((QMdiSubWindow*)parentWidget());
+
+      //  In order to avoid frosen background in toolbars when it shown as a second view
+      QTimer::singleShot(20, parentWidget(), SLOT(setFocus()));
+
       return true;
     }
   }
@@ -985,7 +1011,11 @@ void XGUI_ViewWindow::cloneView()
   QMdiSubWindow* vw = myViewer->createView();
   XGUI_ViewWindow* aNewWnd = static_cast<XGUI_ViewWindow*>(vw->widget());
   aNewWnd->viewPort()->syncronizeWith(myViewPort);
+
   emit viewCloned( vw );
+
+  //  In order to avoid frosen background in toolbars when it shown as a second view
+  QTimer::singleShot(20, vw, SLOT(setFocus()));
 }
 
 void XGUI_ViewWindow::dumpView()

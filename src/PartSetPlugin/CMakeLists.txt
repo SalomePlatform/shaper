@@ -4,13 +4,11 @@ SET(PROJECT_HEADERS
     PartSetPlugin.h
     PartSetPlugin_Plugin.h
     PartSetPlugin_Part.h
-    PartSetPlugin_Point.h
 )
 
 SET(PROJECT_SOURCES
-    PartSetPlugin_Plugin.cxx
-    PartSetPlugin_Part.cxx
-    PartSetPlugin_Point.cxx
+    PartSetPlugin_Plugin.cpp
+    PartSetPlugin_Part.cpp
 )
 
 ADD_DEFINITIONS(-DPARTSETPLUGIN_EXPORTS ${BOOST_DEFINITIONS})
@@ -21,4 +19,9 @@ INCLUDE_DIRECTORIES(
   ../ModelAPI
 )
 
+SET(XML_RESOURCES
+  plugin-PartSet.xml
+)
+
 INSTALL(TARGETS PartSetPlugin DESTINATION plugins)
+INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)

@@ -54,6 +54,11 @@ QString ModuleBase_Operation::operationId() const
   return myOperationId;
 }
 
+std::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::feature() const
+{
+  return myFeature;
+}
+
 /*!
  * \brief Gets state of operation
  * \return Value from OperationState enumeration

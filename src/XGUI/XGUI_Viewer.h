@@ -110,6 +110,7 @@ signals:
   void keyPress(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent);
   void keyRelease(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent);
   void activated(XGUI_ViewWindow* theWindow);
+  void selectionChanged();
 
 public slots:
   void onWindowMinimized(QMdiSubWindow*);
@@ -117,6 +118,8 @@ public slots:
 
 private slots:
   void onViewClosed(QMdiSubWindow*);
+  void onMouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+  void onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
 
 private:
   void addView(QMdiSubWindow* theView);

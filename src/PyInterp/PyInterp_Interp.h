@@ -7,8 +7,7 @@
 #include <list>
 #include <string>
 
-//PYINTERP_EXPORT
-class PyLockWrapper
+class PYINTERP_EXPORT PyLockWrapper
 {
   PyThreadState* myThreadState;
   PyThreadState* mySaveThreadState;
@@ -20,8 +19,7 @@ public:
 
 typedef void PyOutChanged(void* data,char * c);
 
-//PYINTERP_EXPORT
-class PyInterp_Interp
+class PYINTERP_EXPORT PyInterp_Interp
 {
 public:
   static int _argc;
@@ -64,8 +62,7 @@ protected:
   virtual bool initContext() = 0;  
 };
 
-//PYINTERP_EXPORT
-class PyObjWrapper
+class PYINTERP_EXPORT PyObjWrapper
 {
   PyObject* myObject;
 public:

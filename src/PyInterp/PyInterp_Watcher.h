@@ -9,8 +9,7 @@
 #include <QObject>
 
 // Private class that keeps track of destructions of request listeners
-//PYINTERP_EXPORT
-class PyInterp_Watcher : public QObject
+class PYINTERP_EXPORT PyInterp_Watcher : public QObject
 {                                           
   Q_OBJECT
 

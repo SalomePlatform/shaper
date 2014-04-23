@@ -46,7 +46,7 @@ public:
   enum OperationState
   {
     Waiting,  //!< Operation is not used (it is not run or suspended)
-    Running,  //!< Operation is started
+    Running  //!< Operation is started
   };
 
   /*!
@@ -75,6 +75,8 @@ public:
 
   // Operation processing.
   virtual QString operationId() const;
+
+  std::shared_ptr<ModelAPI_Feature> feature() const;
 
   OperationState state() const;
   bool isRunning() const;
