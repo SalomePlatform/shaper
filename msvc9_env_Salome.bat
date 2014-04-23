@@ -69,3 +69,6 @@ IF "%ARCH%" == "Win64" (
     echo Refer to the set_env.bat script.
   )
 )
+
+@SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
+@SET PATH=%ROOT_DIR%\install\plugins;%PATH%
