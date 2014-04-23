@@ -18,6 +18,8 @@ Q_OBJECT
 public:
   PartSet_OperationSketch(const QString& theId, QObject* theParent);
   virtual ~PartSet_OperationSketch();
+
+  virtual bool isPerformedImmediately() const;
 };
 
 #endif

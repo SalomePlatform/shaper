@@ -24,6 +24,8 @@ public:
 
   void Display(std::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape);
 
+  void Erase(std::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape);
+
 protected:
   XGUI_Viewer* myViewer; ///< the viewer
 };

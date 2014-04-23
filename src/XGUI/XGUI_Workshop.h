@@ -15,6 +15,7 @@ class XGUI_Module;
 class XGUI_Workbench;
 class XGUI_SelectionMgr;
 class XGUI_Displayer;
+class XGUI_OperationMgr;
 class ModuleBase_Operation;
 class ModuleBase_PropPanelOperation;
 
@@ -48,11 +49,11 @@ public:
   //! Returns displayer
   XGUI_Displayer* displayer() const { return myDisplayer; }
 
+  //! ! Returns operation manager.
+  XGUI_OperationMgr* operationMgr() const { return myOperationMgr; }
+
   //! Creates and adds a new workbench (menu group) with the given name and returns it
   XGUI_Workbench* addWorkbench(const QString& theName);
-
-  //! Returns the current operation or NULL
-  ModuleBase_Operation* currentOperation() { return myCurrentOperation; }
 
   //! Redefinition of Event_Listener method
   virtual void processEvent(const Event_Message* theMessage);
@@ -71,9 +72,11 @@ public slots:
 protected:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
-  void fillPropertyPanel(ModuleBase_PropPanelOperation* theOperation);
   void connectToPropertyPanel(ModuleBase_Operation* theOperation);
-  void setCurrentOperation(ModuleBase_Operation* theOperation);
+
+protected slots:
+  void onBeforeOperationStart();
+  void onAfterOperationStart();
 
 private:
   void initMenu();
@@ -87,7 +90,7 @@ private:
   XGUI_SelectionMgr* mySelector;
   XGUI_Displayer* myDisplayer;
 
-  ModuleBase_Operation* myCurrentOperation;
+  XGUI_OperationMgr* myOperationMgr;
 };
 
 #endif

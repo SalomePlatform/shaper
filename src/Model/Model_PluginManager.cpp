@@ -22,9 +22,9 @@ shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theFeatur
 
   LoadPluginsInfo();
   if (myPlugins.find(theFeatureID) != myPlugins.end()) {
-    if (myPluginObjs.find(myPlugins[theFeatureID]) == myPluginObjs.end()) {
+    myCurrentPluginName = myPlugins[theFeatureID];
+    if (myPluginObjs.find(myCurrentPluginName) == myPluginObjs.end()) {
       // load plugin library if not yet done
-      myCurrentPluginName = myPlugins[theFeatureID];
       loadLibrary(myCurrentPluginName);
     }
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {

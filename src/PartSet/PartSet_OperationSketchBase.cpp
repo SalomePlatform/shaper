@@ -42,5 +42,15 @@ void PartSet_OperationSketchBase::startOperation()
 {
   ModuleBase_PropPanelOperation::startOperation();
 
-  emit visualizePreview();
+  emit visualizePreview(true);
+}
+
+/*!
+ * Perform the operation stop and emit signal about visualization stop of the operation preview
+ */
+void PartSet_OperationSketchBase::stopOperation()
+{
+  ModuleBase_PropPanelOperation::stopOperation();
+
+  emit visualizePreview(false);
 }

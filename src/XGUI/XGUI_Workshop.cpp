@@ -12,6 +12,7 @@
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_Displayer.h"
+#include "XGUI_OperationMgr.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
@@ -43,12 +44,14 @@
 
 XGUI_Workshop::XGUI_Workshop()
   : QObject(), 
-  myCurrentOperation(NULL),
   myPartSetModule(NULL)
 {
   myMainWindow = new XGUI_MainWindow();
   mySelector = new XGUI_SelectionMgr(this);
   myDisplayer = new XGUI_Displayer(myMainWindow->viewer());
+  myOperationMgr = new XGUI_OperationMgr(this);
+  connect(myOperationMgr, SIGNAL(beforeOperationStart()), this, SLOT(onBeforeOperationStart()));
+  connect(myOperationMgr, SIGNAL(afterOperationStart()),  this, SLOT(onAfterOperationStart()));
 }
 
 //******************************************************
@@ -150,15 +153,36 @@ void XGUI_Workshop::processEvent(const Event_Message* theMessage)
   const Config_PointerMessage* aPartSetMsg =
       dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
-    ModuleBase_PropPanelOperation* aOperation =
+    ModuleBase_PropPanelOperation* anOperation =
         (ModuleBase_PropPanelOperation*)(aPartSetMsg->pointer());
-    setCurrentOperation(aOperation);
-    if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
-      myCurrentOperation->start();
-      myCurrentOperation->commit();
-      updateCommandStatus();
-    } else {
-      fillPropertyPanel(aOperation);
+
+    if (myOperationMgr->startOperation(anOperation))
+    {
+      if (anOperation->isPerformedImmediately())
+      {
+        myOperationMgr->commitCurrentOperation();
+        updateCommandStatus();
+      }
+      /*if(anOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
+        //connectToPropertyPanel(anOperation);
+
+        anOperation->start();
+
+        if (anOperation->isPerformedImmediately()) {
+          anOperation->commit();
+          updateCommandStatus();
+        }
+      } else {
+        connectToPropertyPanel(anOperation);
+        QWidget* aPropWidget = myMainWindow->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
+        qDeleteAll(aPropWidget->children());
+
+        anOperation->start();
+        
+        XGUI_WidgetFactory aFactory = XGUI_WidgetFactory(anOperation);
+        aFactory.createWidget(aPropWidget);
+        myMainWindow->setPropertyPannelTitle(anOperation->description());
+      }*/
     }
     return;
   }
@@ -168,6 +192,34 @@ void XGUI_Workshop::processEvent(const Event_Message* theMessage)
   << "Catch message, but it can not be processed.";
 #endif
 
+}
+
+void XGUI_Workshop::onBeforeOperationStart()
+{
+  ModuleBase_PropPanelOperation* aOperation =
+        (ModuleBase_PropPanelOperation*)(myOperationMgr->currentOperation());
+
+  if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
+    //myPartSetModule->connectToPropertyPanel(aOperation);
+  } else {
+    connectToPropertyPanel(aOperation);
+    QWidget* aPropWidget = myMainWindow->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
+    qDeleteAll(aPropWidget->children());
+  }
+}
+
+void XGUI_Workshop::onAfterOperationStart()
+{
+  ModuleBase_PropPanelOperation* aOperation =
+        (ModuleBase_PropPanelOperation*)(myOperationMgr->currentOperation());
+
+  if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
+  } else {
+    XGUI_WidgetFactory aFactory = XGUI_WidgetFactory(aOperation);
+    QWidget* aPropWidget = myMainWindow->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
+    aFactory.createWidget(aPropWidget);
+    myMainWindow->setPropertyPannelTitle(aOperation->description());
+  }
 }
 
 /*
@@ -208,7 +260,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
 /*
  *
  */
-void XGUI_Workshop::fillPropertyPanel(ModuleBase_PropPanelOperation* theOperation)
+/*void XGUI_Workshop::fillPropertyPanel(ModuleBase_PropPanelOperation* theOperation)
 {
   connectToPropertyPanel(theOperation);
   QWidget* aPropWidget = myMainWindow->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
@@ -217,20 +269,7 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_PropPanelOperation* theOperatio
   XGUI_WidgetFactory aFactory = XGUI_WidgetFactory(theOperation);
   aFactory.createWidget(aPropWidget);
   myMainWindow->setPropertyPannelTitle(theOperation->description());
-}
-
-void XGUI_Workshop::setCurrentOperation(ModuleBase_Operation* theOperation)
-{
-  //FIXME: Ask user about aborting of current operation?
-  if (myCurrentOperation) {
-    //TODO get isOperation from document
-    if (myCurrentOperation->isRunning())
-      myCurrentOperation->abort();
-
-    myCurrentOperation->deleteLater();
-  }
-  myCurrentOperation = theOperation;
-}
+}*/
 
 /*
  * Makes a signal/slot connections between Property Panel

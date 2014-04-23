@@ -76,6 +76,8 @@ public:
   // Operation processing.
   virtual QString operationId() const;
 
+  virtual bool isPerformedImmediately() const;
+
   std::shared_ptr<ModelAPI_Feature> feature() const;
 
   OperationState state() const;

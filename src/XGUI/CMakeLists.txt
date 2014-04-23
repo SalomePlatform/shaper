@@ -9,6 +9,7 @@ SET(PROJECT_HEADERS
 	XGUI_MainMenu.h
 	XGUI_MainWindow.h
 	XGUI_MenuGroupPanel.h
+	XGUI_Module.h
 	XGUI_Tools.h
 	XGUI_Workbench.h
 	XGUI_Workshop.h
@@ -22,6 +23,7 @@ SET(PROJECT_HEADERS
 	XGUI_DocumentDataModel.h
 	XGUI_PartDataModel.h
 	XGUI_ObjectsBrowser.h
+	XGUI_OperationMgr.h
     XGUI_DataTreeModel.h
     XGUI_SelectionMgr.h
     XGUI_SwitchWidget.h
@@ -49,6 +51,7 @@ SET(PROJECT_SOURCES
 	XGUI_DocumentDataModel.cpp
 	XGUI_PartDataModel.cpp
 	XGUI_ObjectsBrowser.cpp
+	XGUI_OperationMgr.cpp
     XGUI_SelectionMgr.cpp
     XGUI_SwitchWidget.cpp
 )

@@ -5,6 +5,9 @@
 
 #include <XGUI_MainWindow.h>
 #include <XGUI_Displayer.h>
+#include <XGUI_Viewer.h>
+#include <XGUI_Workshop.h>
+#include <XGUI_OperationMgr.h>
 
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
@@ -29,6 +32,9 @@ extern "C" PARTSET_EXPORT XGUI_Module* createModule(XGUI_Workshop* theWshop)
 PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
 {
   myWorkshop = theWshop;
+  XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
+
+  connect(anOperationMgr, SIGNAL(beforeOperationStart()), this, SLOT(onBeforeOperationStart()));
 }
 
 PartSet_Module::~PartSet_Module()
@@ -70,19 +76,19 @@ void PartSet_Module::onFeatureTriggered()
   else
     aPartSetOp = new ModuleBase_PropPanelOperation(aCmdId, this);
 
-  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(aPartSetOp);
-  if (aPreviewOp)
-    connect(aPreviewOp, SIGNAL(visualizePreview()), this, SLOT(onVisualizePreview()));
-
   aPartSetOp->setXmlRepresentation(QString::fromStdString(aXmlCfg));
   aPartSetOp->setDescription(QString::fromStdString(aDescription));
   aMessage.setPointer(aPartSetOp);
   Event_Loop::loop()->send(aMessage);
 }
 
-void PartSet_Module::onVisualizePreview()
+/**
+ * Slot that is called by the operation requiring of preview display or erase
+ * \param isDisplay the display or erase state
+*/
+void PartSet_Module::onVisualizePreview(bool isDisplay)
 {
-  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   if (!anOperation)
     return;
 
@@ -90,5 +96,35 @@ void PartSet_Module::onVisualizePreview()
   if (!aPreviewOp)
     return;
 
-  myWorkshop->displayer()->Display(anOperation->feature(), aPreviewOp->preview());
+  if (isDisplay)
+    myWorkshop->displayer()->Display(anOperation->feature(), aPreviewOp->preview());
+  else
+    myWorkshop->displayer()->Erase(anOperation->feature(), aPreviewOp->preview());
+}
+
+void PartSet_Module::onBeforeOperationStart()
+{
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aPreviewOp) {
+    connect(anOperation, SIGNAL(stopped()), this, SLOT(onOperationStopped()));
+    connect(aPreviewOp, SIGNAL(visualizePreview(bool)), this, SLOT(onVisualizePreview(bool)));
+    connect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
+            aPreviewOp, SLOT(onViewSelectionChanged()));
+  }
+}
+
+void PartSet_Module::onOperationStopped()
+{
+  ModuleBase_PropPanelOperation* anOperation = dynamic_cast<ModuleBase_PropPanelOperation*>(sender());
+  if (!anOperation)
+    return;
+
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aPreviewOp) {
+    disconnect(aPreviewOp, SIGNAL(visualizePreview(bool)), this, SLOT(onVisualizePreview(bool)));
+    disconnect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
+               aPreviewOp, SLOT(onViewSelectionChanged()));
+  }
 }

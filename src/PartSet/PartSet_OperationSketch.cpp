@@ -20,3 +20,12 @@ PartSet_OperationSketch::PartSet_OperationSketch(const QString& theId,
 PartSet_OperationSketch::~PartSet_OperationSketch()
 {
 }
+
+/**
+ * The sketch can not be created immediately, firstly a plane should be set
+ * \return false value
+ */
+bool PartSet_OperationSketch::isPerformedImmediately() const
+{
+  return false;
+}
