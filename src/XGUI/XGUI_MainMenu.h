@@ -4,6 +4,7 @@
 #include "XGUI.h"
 #include <QObject>
 #include <QList>
+#include <QMap>
 
 class XGUI_Command;
 class XGUI_MainWindow;
@@ -15,6 +16,7 @@ class QLabel;
 class QAction;
 class QDockWidget;
 class QEvent;
+
 
 /**\class XGUI_MainMenu
  * \ingroup GUI
@@ -45,13 +47,20 @@ public:
   //! Returns list of created commands
   QList<XGUI_Command*> features() const;
 
-protected:
+public slots:
+  void onFeatureChecked(bool);
+
+  void saveCommandsState();
+  void restoreCommandState();
+
   virtual bool eventFilter(QObject *theWatched, QEvent *theEvent);
 
 private:
   XGUI_MainWindow* myDesktop;
   QList<QDockWidget*> myMenuTabs;
   XGUI_Workbench* myGeneralPage;
+
+  QMap<XGUI_Command*, bool> myCommandState;
 };
 
 #endif

@@ -23,6 +23,8 @@ class Config_FeatureMessage: public Event_Message
   std::string myWorkbenchId;  //Id of feature's workbench
   std::string myPluginLibrary;  //Name of feature's library
 
+  bool myUseInput; //Action is being checked until user commit the operation
+
 public:
   //const Event_ID theID, const void* theSender = 0
   CONFIG_EXPORT Config_FeatureMessage(const Event_ID theId, const void* theParent = 0);
@@ -50,6 +52,8 @@ public:
   CONFIG_EXPORT void setGroupId(const std::string& groupId);
   CONFIG_EXPORT void setWorkbenchId(const std::string& workbenchId);
   CONFIG_EXPORT void setPluginLibrary(const std::string& thePluginLibrary);
+  CONFIG_EXPORT bool isUseInput() const;
+  CONFIG_EXPORT void setUseInput(bool isUseInput);
 };
 
 #endif // CONFIG_MESSAGE_H

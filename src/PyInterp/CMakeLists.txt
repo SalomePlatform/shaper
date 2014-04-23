@@ -17,10 +17,10 @@ SET(PROJECT_AUTOMOC
 
 # sources / static
 SET(PROJECT_SOURCES
-  PyInterp_Dispatcher.cxx
-  PyInterp_Event.cxx
-  PyInterp_Interp.cxx
-  PyInterp_Request.cxx
+  PyInterp_Dispatcher.cpp
+  PyInterp_Event.cpp
+  PyInterp_Interp.cpp
+  PyInterp_Request.cpp
 )
 
 SET(PROJECT_LIBRARIES

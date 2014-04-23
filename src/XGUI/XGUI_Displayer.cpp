@@ -45,3 +45,15 @@ void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
 
   aContext->UpdateCurrentViewer();
 }
+
+/*!
+ * Erase the feature and a shape.
+ * \param theFeature a feature instance
+ * \param theFeature a shape
+ */
+void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                           const TopoDS_Shape& theShape)
+{
+  Handle(AIS_InteractiveContext) aContext = myViewer->AISContext();
+  aContext->EraseAll();
+}

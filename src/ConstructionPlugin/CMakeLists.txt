@@ -7,8 +7,8 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
-    ConstructionPlugin_Plugin.cxx
-    ConstructionPlugin_Point.cxx
+    ConstructionPlugin_Plugin.cpp
+    ConstructionPlugin_Point.cpp
 )
 
 ADD_DEFINITIONS(-DCONSTRUCTIONPLUGIN_EXPORTS ${BOOST_DEFINITIONS})

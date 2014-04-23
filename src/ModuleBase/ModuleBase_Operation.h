@@ -91,10 +91,6 @@ public:
 
   int execStatus() const;
 
-  // Widget processing.
-  const QString& xmlRepresentation() const;
-  void setXmlRepresentation(const QString& xmlRepr);
-
 signals:
   void started();
   void aborted();
@@ -107,6 +103,10 @@ public slots:
   void start();
   void abort();
   void commit();
+
+  //true = do nothing, false = abort()
+  //Provided for S/S compatibility with QAction's toggle(bool)
+  void setRunning(bool);
 
   // Data model operations.
   void storeReal(double);
@@ -131,7 +131,6 @@ private:
 
   //!< Next fields could be extracted into a subclass;
   QString myOperationId;
-  QString myXmlRepr;
   boost::shared_ptr<ModelAPI_Feature> myFeature;
 };
 

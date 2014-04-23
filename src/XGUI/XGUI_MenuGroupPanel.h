@@ -20,7 +20,8 @@ public:
 
   //! Adding a new feature (Command) in the group
   XGUI_Command* addFeature(const QString& theId, const QString& theTitle, const QString& theTip,
-                           const QIcon& theIcon, const QKeySequence& theKeys = QKeySequence());
+                           const QIcon& theIcon, const QKeySequence& theKeys = QKeySequence(),
+                           bool isCheckable = false);
 
   //! Returns already created command by its ID
   XGUI_Command* feature(const QString& theId) const;

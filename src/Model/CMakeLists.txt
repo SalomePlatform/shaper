@@ -14,14 +14,14 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
-    Model_Application.cxx
-    Model_Document.cxx
-    Model_PluginManager.cxx
-    Model_Data.cxx
-    Model_Iterator.cxx
-    Model_AttributeDouble.cxx
-    Model_AttributeDocRef.cxx
-    Model_Events.cxx
+    Model_Application.cpp
+    Model_Document.cpp
+    Model_PluginManager.cpp
+    Model_Data.cpp
+    Model_Iterator.cpp
+    Model_AttributeDouble.cpp
+    Model_AttributeDocRef.cpp
+    Model_Events.cpp
 )
 
 ADD_DEFINITIONS(-DMODEL_EXPORTS ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS})

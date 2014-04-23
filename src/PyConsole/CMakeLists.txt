@@ -25,13 +25,13 @@ SET(TEXT_RESOURCES
 )
 # sources / static
 SET(PROJECT_SOURCES
-  PyConsole_Console.cxx
-  PyConsole_Editor.cxx
-  PyConsole_EnhEditor.cxx
-  PyConsole_EnhInterp.cxx
-  PyConsole_Event.cxx
-  PyConsole_Interp.cxx
-  PyConsole_Request.cxx
+  PyConsole_Console.cpp
+  PyConsole_Editor.cpp
+  PyConsole_EnhEditor.cpp
+  PyConsole_EnhInterp.cpp
+  PyConsole_Event.cpp
+  PyConsole_Interp.cpp
+  PyConsole_Request.cpp
 )
 
 SET(PROJECT_LIBRARIES

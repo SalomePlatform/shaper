@@ -11,6 +11,8 @@
 class PARTSET_EXPORT PartSet_Module: public QObject, public XGUI_Module
 {
 Q_OBJECT
+  std::string modulePlugin();
+
 public:
   PartSet_Module(XGUI_Workshop* theWshop);
   virtual ~PartSet_Module();
@@ -20,7 +22,9 @@ public:
 
 public slots:
   void onFeatureTriggered();
-  void onVisualizePreview();
+  void onBeforeOperationStart();
+  void onOperationStopped();
+  void onVisualizePreview(bool isDisplay);
 
 private:
   XGUI_Workshop* myWorkshop;

@@ -24,10 +24,15 @@ public:
   const TopoDS_Shape& preview() const;
 
 signals:
-  void visualizePreview();
+  /**
+   * The signal about preview visualization.
+   * \param isDisplay a state whether the preview should be displayed or erased
+   */
+  void visualizePreview(bool isDisplay);
 
 protected:
   virtual void startOperation();
+  virtual void stopOperation();
 };
 
 #endif

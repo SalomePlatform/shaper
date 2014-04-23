@@ -7,8 +7,8 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
-    PartSetPlugin_Plugin.cxx
-    PartSetPlugin_Part.cxx
+    PartSetPlugin_Plugin.cpp
+    PartSetPlugin_Part.cpp
 )
 
 ADD_DEFINITIONS(-DPARTSETPLUGIN_EXPORTS ${BOOST_DEFINITIONS})

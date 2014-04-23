@@ -7,7 +7,7 @@ SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Module.h
 	PartSet_OperationSketchBase.h
-        PartSet_OperationSketch.h
+    PartSet_OperationSketch.h
 )
 
 SET(PROJECT_SOURCES
@@ -27,6 +27,7 @@ SET(TEXT_RESOURCES
 SET(PROJECT_LIBRARIES
     ModuleBase
     Config
+    GeomAPI
     ${QT_LIBRARIES}
     ${CAS_KERNEL}
 )
@@ -47,6 +48,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI
                     ${CMAKE_SOURCE_DIR}/src/ModuleBase
                     ${CMAKE_SOURCE_DIR}/src/ModelAPI
                     ${CMAKE_SOURCE_DIR}/src/SketchPlugin
+                    ${CMAKE_SOURCE_DIR}/src/GeomAPI
                     ${CAS_INCLUDE_DIRS}
 )
 

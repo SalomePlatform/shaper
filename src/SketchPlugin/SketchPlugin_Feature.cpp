@@ -3,7 +3,7 @@
 /**
  * Returns the sketch preview
  */
-const TopoDS_Shape& SketchPlugin_Feature::preview()
+const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Feature::preview()
 {
   return myPreview;
 }
@@ -12,7 +12,7 @@ const TopoDS_Shape& SketchPlugin_Feature::preview()
  * Set the shape to the internal preview field
  * \param theShape a preview shape
  */
-void SketchPlugin_Feature::setPreview(const TopoDS_Shape& theShape)
+void SketchPlugin_Feature::setPreview(const boost::shared_ptr<GeomAPI_Shape>& theShape)
 {
   myPreview = theShape;
 }

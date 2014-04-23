@@ -32,7 +32,7 @@ PartSet_OperationSketchBase::~PartSet_OperationSketchBase()
 const TopoDS_Shape& PartSet_OperationSketchBase::preview() const
 {
   boost::shared_ptr<SketchPlugin_Feature> aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(feature());
-  return aFeature->preview();
+  return *(static_cast<TopoDS_Shape*>(aFeature->preview()->implementation()));
 }
 
 /*!
@@ -42,5 +42,15 @@ void PartSet_OperationSketchBase::startOperation()
 {
   ModuleBase_PropPanelOperation::startOperation();
 
-  emit visualizePreview();
+  emit visualizePreview(true);
+}
+
+/*!
+ * Perform the operation stop and emit signal about visualization stop of the operation preview
+ */
+void PartSet_OperationSketchBase::stopOperation()
+{
+  ModuleBase_PropPanelOperation::stopOperation();
+
+  emit visualizePreview(false);
 }

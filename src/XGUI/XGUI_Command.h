@@ -15,8 +15,8 @@ class XGUI_EXPORT XGUI_Command: public QWidgetAction
 {
 Q_OBJECT
 public:
-  XGUI_Command(const QString& theId, QObject * parent);
-  XGUI_Command(const QString& theId, const QIcon& icon, const QString& text, QObject* parent);
+  XGUI_Command(const QString& theId, QObject * parent, bool isCheckable = false);
+  XGUI_Command(const QString& theId, const QIcon& icon, const QString& text, QObject* parent, bool isCheckable = false);
   ~XGUI_Command();
 
   //! Returns true if the command is enabled
@@ -34,6 +34,9 @@ public:
     return myId;
   }
 
+  const QStringList& unblockableCommands() const;
+  void setUnblockableCommands(const QStringList& myUnblockableCommands);
+
   //! Connect the command to a slot
   virtual void connectTo(const QObject* theResiver, const char* theSlot);
 
@@ -43,6 +46,9 @@ protected:
 
 private:
   QString myId;
+  bool myCheckable;
+  //! List of Ids of commands which WILL NOT be blocked when the command is on.
+  QStringList myUnblockableCommands;
 };
 
 #endif

@@ -95,3 +95,13 @@ void Config_FeatureMessage::setPluginLibrary(const std::string& myPluginLibrary)
 {
   this->myPluginLibrary = myPluginLibrary;
 }
+
+bool Config_FeatureMessage::isUseInput() const
+{
+  return myUseInput;
+}
+
+void Config_FeatureMessage::setUseInput(bool isUseInput)
+{
+  myUseInput = isUseInput;
+}

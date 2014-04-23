@@ -16,7 +16,7 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
-    ModelAPI_PluginManager.cxx
+    ModelAPI_PluginManager.cpp
 )
 
 ADD_DEFINITIONS(-DMODELAPI_EXPORTS)

@@ -177,28 +177,6 @@ int ModuleBase_Operation::execStatus() const
 }
 
 /*!
- *  \brief Returns XML representation of the operation's widget.
- *  \return XML QString
- *
- *  Returns XML representation of the operation's widget.
- */
-const QString& ModuleBase_Operation::xmlRepresentation() const
-{
-  return myXmlRepr;
-}
-
-/*!
- *  \brief Sets XML representation of the operation's widget.
- *  \param xmlRepr - XML QString
- *
- *  Sets XML representation of the operation's widget.
- */
-void ModuleBase_Operation::setXmlRepresentation(const QString& xmlRepr)
-{
-  myXmlRepr = xmlRepr;
-}
-
-/*!
  * \brief Starts operation
  *
  * Public slot. Verifies whether operation can be started and starts operation.
@@ -250,6 +228,19 @@ void ModuleBase_Operation::commit()
 
   document()->finishOperation();
   emit stopped();
+}
+
+/*
+ * \brief Alias for start/abort slots
+ *
+ * Public slot. Aborts operation if false, else does nothing.
+ * Provided for S/S compatibility with QAction's toggle(bool)
+ */
+void ModuleBase_Operation::setRunning(bool on)
+{
+  if (!on) {
+    abort();
+  }
 }
 
 /*!

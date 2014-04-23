@@ -8,9 +8,9 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
-    Event_Message.cxx
-    Event_Listener.cxx
-    Event_Loop.cxx
+    Event_Message.cpp
+    Event_Listener.cpp
+    Event_Loop.cpp
 )
 
 ADD_DEFINITIONS(-DEVENT_EXPORTS)
