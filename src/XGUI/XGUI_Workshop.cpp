@@ -202,7 +202,7 @@ void XGUI_Workshop::onBeforeOperationStart()
   if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
     //myPartSetModule->connectToPropertyPanel(aOperation);
   } else {
-    connectToPropertyPanel(aOperation);
+    connectWithOperation(aOperation);
     QWidget* aPropWidget = myMainWindow->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
     qDeleteAll(aPropWidget->children());
   }

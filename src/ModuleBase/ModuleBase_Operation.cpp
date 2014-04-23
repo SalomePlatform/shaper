@@ -54,16 +54,6 @@ QString ModuleBase_Operation::operationId() const
   return myOperationId;
 }
 
-/*!
- * \brief Replied whether the operation should be commited after the start, or the operation itself
- *  do that. The default realization provides the check by the operation having the xml prepresentation 
- *  @return the boolean value
- */
-bool ModuleBase_Operation::isPerformedImmediately() const
-{
-  return xmlRepresentation().isEmpty();
-}
-
 std::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::feature() const
 {
   return myFeature;
