@@ -7,6 +7,7 @@
 #include <QResizeEvent>
 
 #include <math.h>
+#include <iostream>
 
 XGUI_MenuGroupPanel::XGUI_MenuGroupPanel(QWidget *parent)
     : QWidget(parent), myNewRow(0), myNewCol(0), myMaxRow(1)
@@ -61,9 +62,9 @@ void XGUI_MenuGroupPanel::resizeEvent(QResizeEvent* theEvent)
 
 XGUI_Command* XGUI_MenuGroupPanel::addFeature(const QString& theId, const QString& theTitle,
                                               const QString& theTip, const QIcon& theIcon,
-                                              const QKeySequence& theKeys)
+                                              const QKeySequence& theKeys, bool isCheckable)
 {
-  XGUI_Command* aCommand = new XGUI_Command(theId, theIcon, theTitle, this);
+  XGUI_Command* aCommand = new XGUI_Command(theId, theIcon, theTitle, this, isCheckable);
   aCommand->setToolTip(theTip);
   if (!theKeys.isEmpty())
     aCommand->setShortcut(theKeys);

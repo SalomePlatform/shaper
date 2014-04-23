@@ -72,7 +72,7 @@ public slots:
 protected:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
-  void connectToPropertyPanel(ModuleBase_Operation* theOperation);
+  void connectWithOperation(ModuleBase_Operation* theOperation);
 
 protected slots:
   void onBeforeOperationStart();

@@ -1,6 +1,7 @@
-#include "XGUI_MainMenu.h"
-#include "XGUI_Workbench.h"
-#include "XGUI_MainWindow.h"
+#include <XGUI_MainMenu.h>
+#include <XGUI_Workbench.h>
+#include <XGUI_MainWindow.h>
+#include <XGUI_Command.h>
 
 #include <QLayout>
 #include <QTabWidget>
@@ -88,4 +89,50 @@ QList<XGUI_Command*> XGUI_MainMenu::features() const
     aList.append(aWbn->features());
   }
   return aList;
+}
+
+void XGUI_MainMenu::onFeatureChecked(bool isChecked)
+{
+  if (!isChecked) {
+    restoreCommandState();
+    return;
+  }
+
+  saveCommandsState();
+  QStringList aSkippedIds;
+  XGUI_Command* aToggledFeature = dynamic_cast<XGUI_Command*>(sender());
+  aSkippedIds.append(aToggledFeature->unblockableCommands());
+//  aSkippedIds.append(aToggledFeature->id());
+  XGUI_Workbench* aGeneralWB = findWorkbench(tr("General"));
+  foreach(XGUI_Command* eachFeature, aGeneralWB->features()) {
+    aSkippedIds.append(eachFeature->id());
+  }
+  QList<XGUI_Command*> allFeatures = features();
+  foreach(XGUI_Command* eachFeature, allFeatures) {
+    QString aFeatureId = eachFeature->id();
+    if (aSkippedIds.removeAll(aFeatureId) > 0) {
+      continue;
+    }
+    eachFeature->setEnabled(false);
+  }
+}
+
+void XGUI_MainMenu::saveCommandsState()
+{
+  myCommandState.clear();
+  QList<XGUI_Command*> allFeatures = features();
+  XGUI_Command* eachFeature = NULL;
+  foreach(eachFeature, allFeatures) {
+    myCommandState.insert(eachFeature, eachFeature->enabled());
+  }
+}
+
+void XGUI_MainMenu::restoreCommandState()
+{
+  QList<XGUI_Command*> allFeatures = features();
+  XGUI_Command* eachFeature = NULL;
+  foreach(eachFeature, allFeatures) {
+    eachFeature->setChecked(false);
+    eachFeature->setEnabled(myCommandState[eachFeature]);
+  }
 }
