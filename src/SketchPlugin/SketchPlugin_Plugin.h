@@ -13,7 +13,7 @@ class SKETCHPLUGIN_EXPORT SketchPlugin_Plugin: public ModelAPI_Plugin
 {
 public:
   /// Creates the feature object of this plugin by the feature string ID
-  virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
+  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
 
 public:
   /// Is needed for python wrapping by swig

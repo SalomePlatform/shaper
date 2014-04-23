@@ -12,7 +12,7 @@ typedef QList<short> QShortList;     //!< list of short int values
 typedef QList<double> QDoubleList;    //!< list of double values
 
 //! Pointer on feature object
-typedef std::shared_ptr<ModelAPI_Feature> FeaturePtr;
+typedef boost::shared_ptr<ModelAPI_Feature> FeaturePtr;
 typedef QList<FeaturePtr> QFeatureList; //!< List of features
 
 namespace XGUI

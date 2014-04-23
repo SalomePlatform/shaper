@@ -26,7 +26,7 @@ XGUI_Displayer::~XGUI_Displayer()
  * Display the feature
  * \param theFeature a feature instance
  */
-void XGUI_Displayer::Display(std::shared_ptr<ModelAPI_Feature> theFeature)
+void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
 }
 
@@ -35,7 +35,7 @@ void XGUI_Displayer::Display(std::shared_ptr<ModelAPI_Feature> theFeature)
  * \param theFeature a feature instance
  * \param theFeature a shape
  */
-void XGUI_Displayer::Display(std::shared_ptr<ModelAPI_Feature> theFeature,
+void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
                              const TopoDS_Shape& theShape)
 {
   Handle(AIS_InteractiveContext) aContext = myViewer->AISContext();

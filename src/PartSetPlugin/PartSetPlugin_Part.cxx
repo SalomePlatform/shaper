@@ -22,13 +22,13 @@ void PartSetPlugin_Part::initAttributes()
 
 void PartSetPlugin_Part::execute() 
 {
-  shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->docRef(PART_ATTR_DOC_REF);
+  boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->docRef(PART_ATTR_DOC_REF);
   if (!aDocRef->value()) { // create a document if not yet created
-    shared_ptr<ModelAPI_Document> aPartSetDoc = ModelAPI_PluginManager::get()->rootDocument();
+    boost::shared_ptr<ModelAPI_Document> aPartSetDoc = ModelAPI_PluginManager::get()->rootDocument();
     aDocRef->setValue(aPartSetDoc->subDocument(data()->getName()));
   }
 }
 
-shared_ptr<ModelAPI_Document> PartSetPlugin_Part::documentToAdd() {
+boost::shared_ptr<ModelAPI_Document> PartSetPlugin_Part::documentToAdd() {
   return ModelAPI_PluginManager::get()->rootDocument();
 }

@@ -25,19 +25,19 @@ class Model_PluginManager : public ModelAPI_PluginManager, public Event_Listener
   std::map<std::string, std::string> myPlugins;
   std::map<std::string, ModelAPI_Plugin*> myPluginObjs; ///< instances of the already plugins
   std::string myCurrentPluginName; ///< name of the plugin that must be loaded currently
-  std::shared_ptr<ModelAPI_Document> myCurrentDoc; ///< current working document
+  boost::shared_ptr<ModelAPI_Document> myCurrentDoc; ///< current working document
 public:
   /// Returns the root document of the application (that may contains sub-documents)
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> rootDocument();
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> rootDocument();
 
   /// Return true if root document has been already created
   MODEL_EXPORT virtual bool hasRootDocument();
 
   /// Returns the current document that used for current work in the application
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> currentDocument();
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> currentDocument();
 
   /// Defines the current document that used for current work in the application
-  MODEL_EXPORT virtual void setCurrentDocument(std::shared_ptr<ModelAPI_Document> theDoc);
+  MODEL_EXPORT virtual void setCurrentDocument(boost::shared_ptr<ModelAPI_Document> theDoc);
 
   /// Registers the plugin that creates features.
   /// It is obligatory for each plugin to call this function on loading to be found by 
@@ -55,7 +55,7 @@ protected:
   void LoadPluginsInfo();
 
   /// Creates the feature object using plugins functionality
-  virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
+  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
 };
 
 #endif

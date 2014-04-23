@@ -4,6 +4,7 @@
 #include "XGUI.h"
 
 #include <QString>
+#include <boost/shared_ptr.hpp>
 
 #include <TopoDS_Shape.hxx>
 
@@ -20,9 +21,9 @@ public:
   XGUI_Displayer(XGUI_Viewer* theViewer);
   virtual ~XGUI_Displayer();
 
-  void Display(std::shared_ptr<ModelAPI_Feature> theFeature);
+  void Display(boost::shared_ptr<ModelAPI_Feature> theFeature);
 
-  void Display(std::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape);
+  void Display(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape);
 
 protected:
   XGUI_Viewer* myViewer; ///< the viewer

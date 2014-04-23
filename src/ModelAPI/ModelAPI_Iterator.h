@@ -7,7 +7,7 @@
 
 #include "ModelAPI.h"
 #include <string>
-#include <memory>
+#include <boost/shared_ptr.hpp>
 
 class ModelAPI_Feature;
 class ModelAPI_Document;
@@ -26,7 +26,7 @@ public:
   /// Returns true if the current iteration is valid and next iteration is possible
   virtual bool more() = 0;
   /// Returns the currently iterated feature
-  virtual std::shared_ptr<ModelAPI_Feature> current() = 0;
+  virtual boost::shared_ptr<ModelAPI_Feature> current() = 0;
   /// Returns the kind of the current feature (faster than Current()->getKind())
   virtual std::string currentKind() = 0;
   /// Returns the name of the current feature (faster than Current()->getName())
@@ -36,7 +36,7 @@ public:
   virtual int numIterationsLeft() = 0;
   /// Compares the current feature with the given one
   /// \returns true if given feature equals to the current one
-  virtual bool isEqual(std::shared_ptr<ModelAPI_Feature> theFeature) = 0;
+  virtual bool isEqual(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
 
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Iterator() {}

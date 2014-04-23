@@ -74,7 +74,7 @@ private:
   bool hasSubModel(const QAbstractItemModel* theModel) const;
 
   //! Document
-  std::shared_ptr<ModelAPI_Document> myDocument;
+  boost::shared_ptr<ModelAPI_Document> myDocument;
 
   //! Data model of top part of data tree (not parts object)
   XGUI_TopDataModel* myModel;

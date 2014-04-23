@@ -16,7 +16,7 @@ using namespace std;
 
 static Model_PluginManager* myImpl = new Model_PluginManager();
 
-shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theFeatureID)
+boost::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theFeatureID)
 {
   if (this != myImpl) return myImpl->createFeature(theFeatureID);
 
@@ -28,18 +28,18 @@ shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theFeatur
       loadLibrary(myCurrentPluginName);
     }
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
-      std::shared_ptr<ModelAPI_Feature> aCreated = 
+      boost::shared_ptr<ModelAPI_Feature> aCreated = 
         myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
       return aCreated;
     }
   }
 
-  return std::shared_ptr<ModelAPI_Feature>(); // return nothing
+  return boost::shared_ptr<ModelAPI_Feature>(); // return nothing
 }
 
-std::shared_ptr<ModelAPI_Document> Model_PluginManager::rootDocument()
+boost::shared_ptr<ModelAPI_Document> Model_PluginManager::rootDocument()
 {
-  return std::shared_ptr<ModelAPI_Document>(
+  return boost::shared_ptr<ModelAPI_Document>(
     Model_Application::getApplication()->getDocument("root"));
 }
 
@@ -48,14 +48,14 @@ bool Model_PluginManager::hasRootDocument()
   return Model_Application::getApplication()->hasDocument("root");
 }
 
-shared_ptr<ModelAPI_Document> Model_PluginManager::currentDocument()
+boost::shared_ptr<ModelAPI_Document> Model_PluginManager::currentDocument()
 {
   if (!myCurrentDoc)
     myCurrentDoc = rootDocument();
   return myCurrentDoc;
 }
 
-void Model_PluginManager::setCurrentDocument(shared_ptr<ModelAPI_Document> theDoc)
+void Model_PluginManager::setCurrentDocument(boost::shared_ptr<ModelAPI_Document> theDoc)
 {
   myCurrentDoc = theDoc;
 }
@@ -66,7 +66,7 @@ Model_PluginManager::Model_PluginManager()
   //TODO(sbh): Implement static method to extract event id [SEID]
   static Event_ID aFeatureEvent = Event_Loop::eventByName("FeatureRegisterEvent");
 
-  ModelAPI_PluginManager::SetPluginManager(std::shared_ptr<ModelAPI_PluginManager>(this));
+  ModelAPI_PluginManager::SetPluginManager(boost::shared_ptr<ModelAPI_PluginManager>(this));
   // register the configuration reading listener
   Event_Loop* aLoop = Event_Loop::loop();
   aLoop->registerListener(this, aFeatureEvent);

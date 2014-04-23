@@ -32,7 +32,7 @@ public:
   /// Request for initialization of data model of the feature: adding all attributes
   PARTSETPLUGIN_EXPORT virtual void initAttributes();
 
-  PARTSETPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Document> documentToAdd();
+  PARTSETPLUGIN_EXPORT virtual boost::shared_ptr<ModelAPI_Document> documentToAdd();
 
   /// Use plugin manager for features creation
   PartSetPlugin_Part();

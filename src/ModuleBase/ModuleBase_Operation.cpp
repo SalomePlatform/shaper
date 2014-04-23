@@ -54,7 +54,7 @@ QString ModuleBase_Operation::operationId() const
   return myOperationId;
 }
 
-std::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::feature() const
+boost::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::feature() const
 {
   return myFeature;
 }
@@ -112,7 +112,7 @@ bool ModuleBase_Operation::isGranted() const
 /*
  * Returns pointer to the root document.
  */
-std::shared_ptr<ModelAPI_Document> ModuleBase_Operation::document() const
+boost::shared_ptr<ModelAPI_Document> ModuleBase_Operation::document() const
 {
   return ModelAPI_PluginManager::get()->rootDocument();
 }
@@ -268,8 +268,8 @@ void ModuleBase_Operation::storeReal(double theValue)
     return;
   }
   QString anId = sender()->objectName();
-  std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  std::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(anId.toStdString());
+  boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
+  boost::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(anId.toStdString());
   aReal->setValue(theValue);
 }
 
@@ -292,7 +292,7 @@ bool ModuleBase_Operation::isReadyToStart() const
  */
 void ModuleBase_Operation::startOperation()
 {
-  std::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_PluginManager::get()->rootDocument();
+  boost::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_PluginManager::get()->rootDocument();
   myFeature = aDoc->addFeature(myOperationId.toStdString());
   if (myFeature) // TODO: generate an error if feature was not created
     myFeature->execute();

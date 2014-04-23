@@ -19,7 +19,7 @@ XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
   : QAbstractItemModel(theParent)
 {
   // Find Document object
-  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   myDocument = aMgr->currentDocument();
 
   // Register in event loop
@@ -43,8 +43,8 @@ void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
   // Created object event *******************
   if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_CREATED) {
     const ModelAPI_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const ModelAPI_FeatureUpdatedMessage*>(theMessage);
-    std::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
-    std::shared_ptr<ModelAPI_Feature> aFeature = aUpdMsg->feature();
+    boost::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
+    boost::shared_ptr<ModelAPI_Feature> aFeature = aUpdMsg->feature();
 
     if (aDoc == myDocument) {  // If root objects
       if (aFeature->getGroup().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
@@ -80,7 +80,7 @@ void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
   // Deteted object event ***********************
   } else if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_DELETED) {
     const ModelAPI_FeatureDeletedMessage* aUpdMsg = dynamic_cast<const ModelAPI_FeatureDeletedMessage*>(theMessage);
-    std::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
+    boost::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
 
     if (aDoc == myDocument) {  // If root objects
       if (aUpdMsg->group().compare(PARTS_GROUP) == 0) { // Updsate only Parts group

@@ -1,0 +1,41 @@
+SET(CMAKE_AUTOMOC ON)
+
+SET(PROJECT_HEADERS
+	SalomeModule.h
+	SalomeModule_Module.h
+)
+
+SET(PROJECT_AUTOMOC 
+    ${CMAKE_CURRENT_BINARY_DIR}/XGUI_automoc.cpp
+)
+
+SET(PROJECT_SOURCES
+	SalomeModule_Module.cpp
+)
+
+
+SET(PROJECT_LIBRARIES
+    Event
+    Config
+	${QT_LIBRARIES}
+	XGUI
+)
+
+ADD_DEFINITIONS( -DSalomeModule_EXPORTS ${CAS_DEFINITIONS} )
+
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/XGUI
+					${SALOME_GUI_INCLUDE}
+                    ${CAS_INCLUDE_DIRS}
+)
+
+ADD_LIBRARY(SalomeModule SHARED 
+	${PROJECT_SOURCES} 
+	${PROJECT_HEADERS} 
+)
+
+ADD_DEPENDENCIES(SalomeModule XGUI)
+
+# The Qt5Widgets_LIBRARIES variable also includes QtGui and QtCore
+TARGET_LINK_LIBRARIES(SalomeModule ${PROJECT_LIBRARIES})
+
+INSTALL(TARGETS SalomeModule DESTINATION bin)

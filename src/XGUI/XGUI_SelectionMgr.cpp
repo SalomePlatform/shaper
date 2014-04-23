@@ -34,8 +34,8 @@ void XGUI_SelectionMgr::onSelectionChanged()
   if (mySelectedData.size() > 0) {
     FeaturePtr aFeature = mySelectedData.first();
 
-    std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-    std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = aFeature->data()->docRef("PartDocument");
+    boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+    boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = aFeature->data()->docRef("PartDocument");
     if (aDocRef)
       aMgr->setCurrentDocument(aDocRef->value());
   }

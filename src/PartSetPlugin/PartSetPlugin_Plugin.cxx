@@ -14,11 +14,11 @@ PartSetPlugin_Plugin::PartSetPlugin_Plugin()
   ModelAPI_PluginManager::get()->registerPlugin(this);
 }
 
-shared_ptr<ModelAPI_Feature> PartSetPlugin_Plugin::createFeature(string theFeatureID)
+boost::shared_ptr<ModelAPI_Feature> PartSetPlugin_Plugin::createFeature(string theFeatureID)
 {
   if (theFeatureID == "Part") {
-    return shared_ptr<ModelAPI_Feature>(new PartSetPlugin_Part);
+    return boost::shared_ptr<ModelAPI_Feature>(new PartSetPlugin_Part);
   }
   // feature of such kind is not found
-  return shared_ptr<ModelAPI_Feature>();
+  return boost::shared_ptr<ModelAPI_Feature>();
 }

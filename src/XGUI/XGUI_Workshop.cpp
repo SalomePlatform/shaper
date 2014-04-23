@@ -73,12 +73,12 @@ void XGUI_Workshop::startApplication()
   updateCommandStatus();
   onNew();
   // Testing of document creation
-  //std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  //std::shared_ptr<ModelAPI_Feature> aPoint1 = aMgr->rootDocument()->addFeature("Point");
-  //std::shared_ptr<ModelAPI_Feature> aPart = aMgr->rootDocument()->addFeature("Part");
+  //boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  //boost::shared_ptr<ModelAPI_Feature> aPoint1 = aMgr->rootDocument()->addFeature("Point");
+  //boost::shared_ptr<ModelAPI_Feature> aPart = aMgr->rootDocument()->addFeature("Part");
   //aPart->execute();
   //aMgr->setCurrentDocument(aPart->data()->docRef("PartDocument")->value());
-  //std::shared_ptr<ModelAPI_Feature> aPoint2 = aMgr->rootDocument()->addFeature("Point");
+  //boost::shared_ptr<ModelAPI_Feature> aPoint2 = aMgr->rootDocument()->addFeature("Point");
   //aPoint2 = aMgr->rootDocument()->addFeature("Point");
 
   //aPart = aMgr->rootDocument()->addFeature("Part");
@@ -296,8 +296,8 @@ void XGUI_Workshop::onSaveAs()
 void XGUI_Workshop::onUndo()
 {
   myMainWindow->objectBrowser()->setCurrentIndex(QModelIndex());
-  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
   aDoc->undo();
   updateCommandStatus();
 }
@@ -306,8 +306,8 @@ void XGUI_Workshop::onUndo()
 void XGUI_Workshop::onRedo()
 {
   myMainWindow->objectBrowser()->setCurrentIndex(QModelIndex());
-  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
   aDoc->redo();
   updateCommandStatus();
 }
@@ -391,7 +391,7 @@ void XGUI_Workshop::updateCommandStatus()
   QList<XGUI_Command*> aCommands = aMenuBar->features();
   QList<XGUI_Command*>::const_iterator aIt;
 
-  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   if (aMgr->hasRootDocument()) {
     XGUI_Command* aUndoCmd;
     XGUI_Command* aRedoCmd;
@@ -403,7 +403,7 @@ void XGUI_Workshop::updateCommandStatus()
       else // Enable all commands
         (*aIt)->enable();
     }
-    std::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+    boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
     aUndoCmd->setEnabled(aDoc->canUndo());
     aRedoCmd->setEnabled(aDoc->canRedo());
   } else {

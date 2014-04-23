@@ -7,18 +7,18 @@
 
 using namespace std;
 
-void Model_AttributeDocRef::setValue(std::shared_ptr<ModelAPI_Document> theDoc)
+void Model_AttributeDocRef::setValue(boost::shared_ptr<ModelAPI_Document> theDoc)
 {
   myComment->Set(TCollection_ExtendedString(theDoc->id().c_str()));
 }
 
-std::shared_ptr<ModelAPI_Document> Model_AttributeDocRef::value()
+boost::shared_ptr<ModelAPI_Document> Model_AttributeDocRef::value()
 {
   if (myComment->Get().Length())
     return Model_Application::getApplication()->getDocument(
       TCollection_AsciiString(myComment->Get()).ToCString());
   // not initialized
-  return std::shared_ptr<ModelAPI_Document>();
+  return boost::shared_ptr<ModelAPI_Document>();
 }
 
 Model_AttributeDocRef::Model_AttributeDocRef(TDF_Label& theLabel)
