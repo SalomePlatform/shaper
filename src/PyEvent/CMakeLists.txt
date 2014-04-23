@@ -6,8 +6,8 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES 
-	PyEvent_Event.cxx 
-	PyEvent_EventFilter.cxx
+	PyEvent_Event.cpp
+	PyEvent_EventFilter.cpp
 )
 
 #INCLUDE_DIRECTORIES(${Qt5Widgets_INCLUDES})
