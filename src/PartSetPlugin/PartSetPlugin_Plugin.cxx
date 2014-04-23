@@ -1,6 +1,5 @@
 #include "PartSetPlugin_Plugin.h"
 #include "PartSetPlugin_Part.h"
-#include "PartSetPlugin_Point.h"
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
 
