@@ -8,7 +8,7 @@
 #include "SketchPlugin.h"
 #include <ModelAPI_Feature.h>
 
-#include "TopoDS_Shape.hxx"
+#include <GeomAPI_Shape.h>
 
 /**\class SketchPlugin_Feature
  * \ingroup DataModel
@@ -17,13 +17,13 @@
 class SketchPlugin_Feature: public ModelAPI_Feature
 {
 public:
- SKETCHPLUGIN_EXPORT virtual const TopoDS_Shape& preview() = 0;
+ SKETCHPLUGIN_EXPORT virtual const std::shared_ptr<GeomAPI_Shape>& preview() = 0;
 
 protected:
-  void setPreview(const TopoDS_Shape& theShape); ///< the preview shape
+  void setPreview(const std::shared_ptr<GeomAPI_Shape>& theShape); ///< the preview shape
 
 private:
-  TopoDS_Shape myPreview; ///< the preview shape
+  std::shared_ptr<GeomAPI_Shape> myPreview; ///< the preview shape
 };
 
 #endif

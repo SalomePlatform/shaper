@@ -1,0 +1,28 @@
+// File:        GeomAPI_Dir.cpp
+// Created:     23 Apr 2014
+// Author:      Mikhail PONIKAROV
+
+#include<GeomAPI_Dir.h>
+
+#include<gp_Dir.hxx>
+
+#define MY_DIR static_cast<gp_Pnt*>(myImpl)
+
+GeomAPI_Dir::GeomAPI_Dir(const double theX, const double theY, const double theZ)
+  : GeomAPI_Interface(new gp_Dir(theX, theY, theZ))
+{}
+
+double GeomAPI_Dir::x() const
+{
+  return MY_DIR->X();
+}
+
+double GeomAPI_Dir::y() const
+{
+  return MY_DIR->Y();
+}
+
+double GeomAPI_Dir::z() const
+{
+  return MY_DIR->Z();
+}

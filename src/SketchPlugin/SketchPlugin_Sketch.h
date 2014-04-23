@@ -8,8 +8,6 @@
 #include "SketchPlugin.h"
 #include <SketchPlugin_Feature.h>
 
-#include <TopoDS_Shape.hxx>
-
 /// part reference attribute
 const std::string PART_ATTR_DOC_REF = "SketchDocument";
 
@@ -35,7 +33,7 @@ public:
  SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
   /// Returns the sketch preview
-  SKETCHPLUGIN_EXPORT virtual const TopoDS_Shape& preview();
+  SKETCHPLUGIN_EXPORT virtual const std::shared_ptr<GeomAPI_Shape>& preview();
 
   /// Use plugin manager for features creation
   SketchPlugin_Sketch();
