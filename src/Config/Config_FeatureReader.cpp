@@ -43,6 +43,8 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
     Event_Loop* aEvLoop = Event_Loop::loop();
     Config_FeatureMessage aMessage(aMenuItemEvent, this);
     fillFeature(theNode, aMessage);
+    //If a feature has xml definition for it's widget:
+    aMessage.setUseInput(hasChild(theNode));
     aEvLoop->send(aMessage);
   }
   //The m_last* variables always defined before fillFeature() call. XML is a tree.

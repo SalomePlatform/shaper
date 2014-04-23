@@ -65,7 +65,7 @@ protected:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
   void fillPropertyPanel(ModuleBase_PropPanelOperation* theOperation);
-  void connectToPropertyPanel(ModuleBase_Operation* theOperation);
+  void connectWithOperation(ModuleBase_Operation* theOperation);
   void setCurrentOperation(ModuleBase_Operation* theOperation);
 
 private:

@@ -32,36 +32,45 @@ PartSet_Module::~PartSet_Module()
 
 void PartSet_Module::createFeatures()
 {
-  Config_ModuleReader* aXMLReader = new Config_ModuleReader();
-  aXMLReader->setAutoImport(true);
-  aXMLReader->readAll();
-  delete aXMLReader;
+  Config_ModuleReader aXMLReader = Config_ModuleReader();
+  aXMLReader.setAutoImport(true);
+  aXMLReader.readAll();
 }
 
 void PartSet_Module::featureCreated(XGUI_Command* theFeature)
 {
-  QString aFtId = theFeature->id();
   theFeature->connectTo(this, SLOT(onFeatureTriggered()));
 }
 
-void PartSet_Module::onFeatureTriggered()
+std::string PartSet_Module::modulePlugin()
 {
   Config_ModuleReader aModuleReader = Config_ModuleReader();
   aModuleReader.readAll();
-  std::map<std::string, std::string> aPluginMap = aModuleReader.plugins();
+  std::map < std::string, std::string > aPluginMap = aModuleReader.plugins();
   std::string aPluginName = aPluginMap["PartSetPlugin"];
+  return aPluginName;
+}
+
+/*
+ *
+ */
+void PartSet_Module::onFeatureTriggered()
+{
+  std::string aPluginName = modulePlugin();
   Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginName);
   aWdgReader.readAll();
   XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
   QString aCmdId = aCmd->id();
   std::string aXmlCfg = aWdgReader.featureWidgetCfg(aCmdId.toStdString());
   std::string aDescription = aWdgReader.featureDescription(aCmdId.toStdString());
-  //TODO(sbh): Implement static method to extract event id [SEID]
-  static Event_ID aModuleEvent = Event_Loop::eventByName("PartSetModuleEvent");
-  Config_PointerMessage aMessage(aModuleEvent, this);
+
   ModuleBase_PropPanelOperation* aPartSetOp = new ModuleBase_PropPanelOperation(aCmdId, this);
   aPartSetOp->setXmlRepresentation(QString::fromStdString(aXmlCfg));
   aPartSetOp->setDescription(QString::fromStdString(aDescription));
+
+  //TODO(sbh): Implement static method to extract event id [SEID]
+  static Event_ID aModuleEvent = Event_Loop::eventByName("PartSetModuleEvent");
+  Config_PointerMessage aMessage(aModuleEvent, this);
   aMessage.setPointer(aPartSetOp);
   Event_Loop::loop()->send(aMessage);
 }

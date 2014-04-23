@@ -106,6 +106,10 @@ public slots:
   void abort();
   void commit();
 
+  //true = do nothing, false = abort()
+  //Provided for S/S compatibility with QAction's toggle(bool)
+  void setRunning(bool);
+
   // Data model operations.
   void storeReal(double);
 

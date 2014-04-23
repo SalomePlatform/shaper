@@ -191,14 +191,16 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
   if (!aGroup) {
     aGroup = aPage->addGroup(aGroupName);
   }
+  bool isUsePropPanel = theMessage->isUseInput();
   //Create feature...
-  QString aFeatureId = QString::fromStdString(theMessage->id());
   XGUI_Command* aCommand = aGroup->addFeature(QString::fromStdString(theMessage->id()),
                                               QString::fromStdString(theMessage->text()),
                                               QString::fromStdString(theMessage->tooltip()),
-                                              QIcon(theMessage->icon().c_str())
-                                              //TODO(sbh): QKeySequence
-                                                  );
+                                              QIcon(theMessage->icon().c_str()),
+                                              QKeySequence(), isUsePropPanel);
+  
+  connect(aCommand,                   SIGNAL(toggled(bool)),
+          myMainWindow->menuObject(), SLOT(onFeatureChecked(bool)));
   myPartSetModule->featureCreated(aCommand);
 }
 
@@ -207,7 +209,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
  */
 void XGUI_Workshop::fillPropertyPanel(ModuleBase_PropPanelOperation* theOperation)
 {
-  connectToPropertyPanel(theOperation);
+  connectWithOperation(theOperation);
   QWidget* aPropWidget = myMainWindow->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
   qDeleteAll(aPropWidget->children());
   theOperation->start();
@@ -234,7 +236,7 @@ void XGUI_Workshop::setCurrentOperation(ModuleBase_Operation* theOperation)
  * and given operation. The given operation becomes a
  * current operation and previous operation if exists
  */
-void XGUI_Workshop::connectToPropertyPanel(ModuleBase_Operation* theOperation)
+void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
 {
   QDockWidget* aPanel = myMainWindow->findChild<QDockWidget*>(XGUI::PROP_PANEL);
   QPushButton* aOkBtn = aPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
@@ -245,6 +247,14 @@ void XGUI_Workshop::connectToPropertyPanel(ModuleBase_Operation* theOperation)
   connect(theOperation, SIGNAL(started()), myMainWindow, SLOT(showPropertyPanel()));
   connect(theOperation, SIGNAL(stopped()), myMainWindow, SLOT(hidePropertyPanel()));
   connect(theOperation, SIGNAL(stopped()), this, SLOT(updateCommandStatus()));
+
+  XGUI_MainMenu* aMenu = myMainWindow->menuObject();
+  connect(theOperation, SIGNAL(stopped()), aMenu, SLOT(restoreCommandState()));
+
+  XGUI_Command* aCommand = aMenu->feature(theOperation->operationId());
+  //Abort operation on uncheck the command
+  connect(aCommand, SIGNAL(toggled(bool)), theOperation, SLOT(setRunning(bool)));
+
 }
 
 //******************************************************
@@ -308,7 +318,6 @@ void XGUI_Workshop::onRedo()
   aDoc->redo();
   updateCommandStatus();
 }
-
 
 //******************************************************
 XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)

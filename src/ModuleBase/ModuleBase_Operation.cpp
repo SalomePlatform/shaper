@@ -247,6 +247,19 @@ void ModuleBase_Operation::commit()
   emit stopped();
 }
 
+/*
+ * \brief Alias for start/abort slots
+ *
+ * Public slot. Aborts operation if false, else does nothing.
+ * Provided for S/S compatibility with QAction's toggle(bool)
+ */
+void ModuleBase_Operation::setRunning(bool on)
+{
+  if (!on) {
+    abort();
+  }
+}
+
 /*!
  * \brief Stores a real value in model.
  * \param theValue - to store
