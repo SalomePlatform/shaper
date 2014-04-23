@@ -91,10 +91,6 @@ public:
 
   int execStatus() const;
 
-  // Widget processing.
-  const QString& xmlRepresentation() const;
-  void setXmlRepresentation(const QString& xmlRepr);
-
 signals:
   void started();
   void aborted();
@@ -135,7 +131,6 @@ private:
 
   //!< Next fields could be extracted into a subclass;
   QString myOperationId;
-  QString myXmlRepr;
   std::shared_ptr<ModelAPI_Feature> myFeature;
 };
 

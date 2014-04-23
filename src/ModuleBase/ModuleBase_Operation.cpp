@@ -177,28 +177,6 @@ int ModuleBase_Operation::execStatus() const
 }
 
 /*!
- *  \brief Returns XML representation of the operation's widget.
- *  \return XML QString
- *
- *  Returns XML representation of the operation's widget.
- */
-const QString& ModuleBase_Operation::xmlRepresentation() const
-{
-  return myXmlRepr;
-}
-
-/*!
- *  \brief Sets XML representation of the operation's widget.
- *  \param xmlRepr - XML QString
- *
- *  Sets XML representation of the operation's widget.
- */
-void ModuleBase_Operation::setXmlRepresentation(const QString& xmlRepr)
-{
-  myXmlRepr = xmlRepr;
-}
-
-/*!
  * \brief Starts operation
  *
  * Public slot. Verifies whether operation can be started and starts operation.
