@@ -1,5 +1,10 @@
 #include <PartSet_Module.h>
-#include <ModuleBase_PropPanelOperation.h>
+#include <PartSet_OperationSketch.h>
+
+#include <ModuleBase_Operation.h>
+
+#include <XGUI_MainWindow.h>
+#include <XGUI_Displayer.h>
 
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
@@ -59,9 +64,31 @@ void PartSet_Module::onFeatureTriggered()
   //TODO(sbh): Implement static method to extract event id [SEID]
   static Event_ID aModuleEvent = Event_Loop::eventByName("PartSetModuleEvent");
   Config_PointerMessage aMessage(aModuleEvent, this);
-  ModuleBase_PropPanelOperation* aPartSetOp = new ModuleBase_PropPanelOperation(aCmdId, this);
+  ModuleBase_PropPanelOperation* aPartSetOp;
+  if (aCmdId == "Sketch" )
+    aPartSetOp = new PartSet_OperationSketch(aCmdId, this);
+  else
+    aPartSetOp = new ModuleBase_PropPanelOperation(aCmdId, this);
+
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(aPartSetOp);
+  if (aPreviewOp)
+    connect(aPreviewOp, SIGNAL(visualizePreview()), this, SLOT(onVisualizePreview()));
+
   aPartSetOp->setXmlRepresentation(QString::fromStdString(aXmlCfg));
   aPartSetOp->setDescription(QString::fromStdString(aDescription));
   aMessage.setPointer(aPartSetOp);
   Event_Loop::loop()->send(aMessage);
+}
+
+void PartSet_Module::onVisualizePreview()
+{
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  if (!anOperation)
+    return;
+
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (!aPreviewOp)
+    return;
+
+  myWorkshop->displayer()->Display(anOperation->feature(), aPreviewOp->preview());
 }

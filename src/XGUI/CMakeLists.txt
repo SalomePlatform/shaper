@@ -5,6 +5,7 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	XGUI.h
 	XGUI_Command.h
+	XGUI_Displayer.h
 	XGUI_MainMenu.h
 	XGUI_MainWindow.h
 	XGUI_MenuGroupPanel.h
@@ -32,6 +33,7 @@ SET(PROJECT_AUTOMOC
 
 SET(PROJECT_SOURCES
 	XGUI_Command.cpp
+	XGUI_Displayer.cpp
 	XGUI_MainMenu.cpp
 	XGUI_MainWindow.cpp
 	XGUI_MenuGroupPanel.cpp

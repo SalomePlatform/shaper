@@ -11,6 +11,7 @@
 #include "XGUI_WidgetFactory.h"
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_ObjectsBrowser.h"
+#include "XGUI_Displayer.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
@@ -19,6 +20,7 @@
 
 #include <Event_Loop.h>
 #include <ModuleBase_PropPanelOperation.h>
+#include <ModuleBase_Operation.h>
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
 
@@ -46,6 +48,7 @@ XGUI_Workshop::XGUI_Workshop()
 {
   myMainWindow = new XGUI_MainWindow();
   mySelector = new XGUI_SelectionMgr(this);
+  myDisplayer = new XGUI_Displayer(myMainWindow->viewer());
 }
 
 //******************************************************
