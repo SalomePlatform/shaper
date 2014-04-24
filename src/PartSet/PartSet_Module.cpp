@@ -119,9 +119,9 @@ void PartSet_Module::onViewSelectionChanged()
   if (aPreviewOp) {
     XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
     if (aViewer) {
-      AIS_ListOfInteractive aList;
-      aViewer->getSelectedObjects(aList);
-      aPreviewOp->setSelectedObjects(aList);
+      NCollection_List<TopoDS_Shape> aList;
+      aViewer->getSelectedShapes(aList);
+      aPreviewOp->setSelectedShapes(aList);
     }
   }
 }
@@ -142,6 +142,6 @@ void PartSet_Module::visualizePreview(bool isDisplay)
   }
   else {
     myWorkshop->displayer()->GlobalSelection(false);
-    myWorkshop->displayer()->Erase(anOperation->feature(), aPreviewOp->preview());
+    myWorkshop->displayer()->Erase(anOperation->feature());
   }
 }

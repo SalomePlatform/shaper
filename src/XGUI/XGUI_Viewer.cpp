@@ -238,6 +238,17 @@ void XGUI_Viewer::getSelectedObjects(AIS_ListOfInteractive& theList)
     theList.Append(myAISContext->SelectedInteractive());
 }
 
+void XGUI_Viewer::getSelectedShapes(NCollection_List<TopoDS_Shape>& theList)
+{
+  Handle(AIS_InteractiveContext) ic = AISContext();
+
+  for (ic->InitSelected(); ic->MoreSelected(); ic->NextSelected()) {
+    TopoDS_Shape aShape = ic->SelectedShape();
+    if (!aShape.IsNull())
+      theList.Append(aShape);
+  }
+}
+
 void XGUI_Viewer::setObjectsSelected(const AIS_ListOfInteractive& theList)
 {
   AIS_ListIteratorOfListOfInteractive aIt;

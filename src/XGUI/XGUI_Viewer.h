@@ -11,6 +11,8 @@
 #include <V3d_Viewer.hxx>
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Trihedron.hxx>
+#include <NCollection_List.hxx>
+#include <TopoDS_Shape.hxx>
 
 class XGUI_MainWindow;
 class QMdiSubWindow;
@@ -68,6 +70,10 @@ public:
   /// Return objects selected in 3D viewer
   /// \param theList - list to be filled with selected objects
   void  getSelectedObjects(AIS_ListOfInteractive& theList);
+
+  /// Return shapes selected in 3D viewer
+  /// \param theList - list to be filled with selected shapes
+  void getSelectedShapes(NCollection_List<TopoDS_Shape>& theList);
 
   /// Selects objects in 3D viewer. Other selected objects are left as selected
   /// \param theList - list objects to be selected

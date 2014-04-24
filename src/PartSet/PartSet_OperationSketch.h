@@ -33,8 +33,8 @@ public:
   virtual int getSelectionMode() const;
 
   /// Gives the current selected objects to be processed by the operation
-  /// \param theList a list of interactive selected objects
-  virtual void setSelectedObjects(const AIS_ListOfInteractive& theList);
+  /// \param theList a list of interactive selected shapes
+  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList);
 };
 
 #endif
