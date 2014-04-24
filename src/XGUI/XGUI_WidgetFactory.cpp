@@ -82,11 +82,26 @@ void XGUI_WidgetFactory::createWidget(QWidget* theParent)
   theParent->setLayout(aWidgetLay);
 }
 
+QWidget* XGUI_WidgetFactory::labelControl(QWidget* theParent)
+{
+  QWidget* result = new QWidget(theParent);
+  QVBoxLayout* aLabelLay = new QVBoxLayout(result);
+  QLabel* aLabel = new QLabel(result);
+  aLabel->setText(qs(myWidgetApi->getProperty(INFO_WDG_TEXT)));
+  aLabel->setToolTip(qs(myWidgetApi->getProperty(INFO_WDG_TOOLTIP)));
+  aLabelLay->addWidget(aLabel);
+  aLabelLay->addStretch(1);
+  result->setLayout(aLabelLay);
+  return result;
+}
+
 QWidget* XGUI_WidgetFactory::createWidgetByType(const std::string& theType, QWidget* theParent)
 {
   QWidget* result = NULL;
   if (theType == WDG_DOUBLEVALUE) {
     result = doubleSpinBoxControl();
+  } else if (theType == WDG_INFO) {
+    result = labelControl(theParent);
   } else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
   }

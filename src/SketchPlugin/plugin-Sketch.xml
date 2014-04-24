@@ -1,7 +1,10 @@
 <plugin>
   <workbench id="Sketch">
     <group id="Basic">
-      <feature id="Sketch" text="New sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png"/>
+      <feature id="Sketch" text="New sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
+        <label text="Natasha, please provide a text for the label" tooltip="Natasha, please provide a text for the tooltip"/> 
+      <!--icon=":pictures/x_point.png"-->
+      </feature>
     </group>
   </workbench>
 </plugin>
