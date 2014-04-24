@@ -14,6 +14,8 @@
 const static char* NODE_WORKBENCH = "workbench";
 const static char* NODE_GROUP = "group";
 const static char* NODE_FEATURE = "feature";
+const static char* NODE_SOURCE = "source";
+
 //Widgets
 const static char* WDG_DOUBLEVALUE = "doublevalue";
 //Widget containers
@@ -24,7 +26,6 @@ const static char* WDG_TOOLBOX_BOX = "box";
 const static char* WDG_SWITCH = "switch";
 const static char* WDG_SWITCH_CASE = "case";
 
-
 const static char* _ID = "id";
 //const static char* WORKBENCH_ID = "id";
 //const static char* GROUP_ID = "id";
@@ -33,6 +34,8 @@ const static char* FEATURE_TEXT = "text";
 const static char* FEATURE_TOOLTIP = "tooltip";
 const static char* FEATURE_ICON = "icon";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
+const static char* SOURCE_FILE = "path";
+
 
 // doublevalue properties:
 const static char* DOUBLE_WDG_MIN = "min";

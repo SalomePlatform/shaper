@@ -20,12 +20,18 @@
 
 
 Config_ModuleReader::Config_ModuleReader(const char* theEventGenerated)
-    : Config_XMLReader("plugins.xml"), myIsAutoImport(false), myEventGenerated(theEventGenerated)
+    : Config_XMLReader("plugins.xml"),
+      myEventGenerated(theEventGenerated)
 {
 }
 
 Config_ModuleReader::~Config_ModuleReader()
 {
+}
+
+const std::map<std::string, std::string>& Config_ModuleReader::featuresInFiles() const
+{
+  return myFeaturesInFiles;
 }
 
 /*
@@ -46,9 +52,11 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
   if (isNode(theNode, NODE_PLUGIN, NULL)) {
     std::string aPluginConf = getProperty(theNode, PLUGIN_CONFIG);
     std::string aPluginLibrary = getProperty(theNode, PLUGIN_LIBRARY);
-    if (myIsAutoImport)
-      importPlugin(aPluginConf, aPluginLibrary);
-    myPluginsMap[aPluginLibrary] = aPluginConf;
+    std::list<std::string> aFeatures = importPlugin(aPluginConf, aPluginLibrary);
+    std::list<std::string>::iterator it = aFeatures.begin();
+    for( ; it != aFeatures.end(); it++ ) {
+      myFeaturesInFiles[*it] = aPluginConf;
+    }
   }
 }
 
@@ -57,24 +65,14 @@ bool Config_ModuleReader::processChildren(xmlNodePtr theNode)
   return isNode(theNode, NODE_PLUGINS, NULL);
 }
 
-void Config_ModuleReader::importPlugin(const std::string& thePluginName,
-                                       const std::string& thePluginLibrary)
+std::list<std::string>
+Config_ModuleReader::importPlugin(const std::string& thePluginFile,
+                                  const std::string& thePluginLibrary)
 {
-  Config_FeatureReader* aReader;
-  if(thePluginLibrary.empty()) {
-    aReader = new Config_FeatureReader(thePluginName);
-  } else {
-    aReader = new Config_FeatureReader(thePluginName, thePluginLibrary, myEventGenerated);
-  }
-  aReader->readAll();
+  Config_FeatureReader aReader = Config_FeatureReader(thePluginFile,
+                                                      thePluginLibrary,
+                                                      myEventGenerated);
+  aReader.readAll();
+  return aReader.features();
 }
 
-void Config_ModuleReader::setAutoImport(bool theEnabled)
-{
-  myIsAutoImport = theEnabled;
-}
-
-const std::map<std::string, std::string>& Config_ModuleReader::plugins() const
-{
-  return myPluginsMap;
-}

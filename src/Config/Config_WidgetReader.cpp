@@ -39,22 +39,39 @@ std::string Config_WidgetReader::featureDescription(const std::string& theFeatur
   return myDescriptionCache[theFeatureName];
 }
 
+
 void Config_WidgetReader::processNode(xmlNodePtr theNode)
 {
   if (isNode(theNode, NODE_FEATURE, NULL)) {
-    std::string result = "";
     std::string aNodeName = getProperty(theNode, _ID);
-    if (hasChild(theNode)) {
-      xmlBufferPtr buffer = xmlBufferCreate();
-      int size = xmlNodeDump(buffer, theNode->doc, theNode, 0, 1);
-      result = std::string((char*) buffer->content);
-    }
-    myWidgetCache[aNodeName] = result;
+    myWidgetCache[aNodeName] = dumpNode(theNode);;
     myDescriptionCache[aNodeName] = getProperty(theNode, FEATURE_TEXT);
   }
+  //Process SOURCE nodes.
+  Config_XMLReader::processNode(theNode);
 }
 
 bool Config_WidgetReader::processChildren(xmlNodePtr theNode)
 {
   return isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL);
+}
+
+std::string Config_WidgetReader::dumpNode(xmlNodePtr theNode)
+{
+  std::string result = "";
+  if (!hasChild(theNode)) {
+    return result;
+  }
+  xmlNodePtr aChildrenNode = xmlFirstElementChild(theNode);
+  xmlBufferPtr buffer = xmlBufferCreate();
+  if (isNode(aChildrenNode, NODE_SOURCE, NULL)) {
+    Config_XMLReader aSourceReader = 
+      Config_XMLReader(getProperty(aChildrenNode, SOURCE_FILE));
+    xmlNodePtr aSourceRoot = aSourceReader.findRoot();
+    int size = xmlNodeDump(buffer, aSourceRoot->doc, aSourceRoot, 0, 1);
+  } else {
+    int size = xmlNodeDump(buffer, theNode->doc, theNode, 0, 1);
+  }
+  result = std::string((char*) (buffer->content));
+  return result;
 }

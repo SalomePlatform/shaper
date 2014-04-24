@@ -6,12 +6,14 @@
 #include <XGUI_Module.h>
 #include <XGUI_Command.h>
 
+#include <QMap>
 #include <QObject>
+
+#include <string>
 
 class PARTSET_EXPORT PartSet_Module: public QObject, public XGUI_Module
 {
 Q_OBJECT
-  std::string modulePlugin();
 
 public:
   PartSet_Module(XGUI_Workshop* theWshop);
@@ -19,6 +21,7 @@ public:
 
   virtual void createFeatures();
   virtual void featureCreated(XGUI_Command* theFeature);
+  std::string featureFile(const std::string&);
 
 public slots:
   void onFeatureTriggered();
@@ -28,6 +31,9 @@ public slots:
   /// SLOT, that is called after the operation is stopped. Disconnect the sketch feature
   /// from the viewer selection and show the sketch preview.
   void onOperationStopped(ModuleBase_Operation* theOperation);
+  /// SLOT, that is called by the selection in the viewer is changed.
+  /// The selection is sent to the current operation if it listen the selection.
+  void onViewSelectionChanged();
 
 private:
   /// Displays or erase the current operation preview, if it has it.
@@ -36,6 +42,8 @@ private:
 
 private:
   XGUI_Workshop* myWorkshop;
+
+  std::map<std::string, std::string> myFeaturesInFiles;
 };
 
 #endif

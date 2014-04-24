@@ -12,6 +12,8 @@
 #include <ModuleBase_PropPanelOperation.h>
 #include <QObject>
 
+class AIS_ListOfInteractive;
+
 /*!
   \class PartSet_OperationSketchBase
   * \brief The base operation for the sketch features.
@@ -33,7 +35,11 @@ public:
 
   /// Returns the operation local selection mode
   /// \return the selection mode
-  virtual int getSelectionMode() const;
+  virtual int getSelectionMode() const = 0;
+
+  /// Gives the current selected objects to be processed by the operation
+  /// \param a list of interactive selected objects
+  virtual void setSelectedObjects(const AIS_ListOfInteractive& aList) = 0;
 };
 
 #endif

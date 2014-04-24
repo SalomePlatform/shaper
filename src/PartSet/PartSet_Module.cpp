@@ -15,6 +15,8 @@
 #include <Events_Loop.h>
 #include <Events_Message.h>
 
+#include <AIS_ListOfInteractive.hxx>
+
 #include <QObject>
 #include <QString>
 
@@ -37,6 +39,8 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
   connect(anOperationMgr, SIGNAL(operationStarted()), this, SLOT(onOperationStarted()));
   connect(anOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
+  connect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
+          this, SLOT(onViewSelectionChanged()));
 }
 
 PartSet_Module::~PartSet_Module()
@@ -46,8 +50,8 @@ PartSet_Module::~PartSet_Module()
 void PartSet_Module::createFeatures()
 {
   Config_ModuleReader aXMLReader = Config_ModuleReader();
-  aXMLReader.setAutoImport(true);
   aXMLReader.readAll();
+  myFeaturesInFiles = aXMLReader.featuresInFiles();
 }
 
 void PartSet_Module::featureCreated(XGUI_Command* theFeature)
@@ -55,13 +59,9 @@ void PartSet_Module::featureCreated(XGUI_Command* theFeature)
   theFeature->connectTo(this, SLOT(onFeatureTriggered()));
 }
 
-std::string PartSet_Module::modulePlugin()
+std::string PartSet_Module::featureFile(const std::string& theFeatureId)
 {
-  Config_ModuleReader aModuleReader = Config_ModuleReader();
-  aModuleReader.readAll();
-  std::map < std::string, std::string > aPluginMap = aModuleReader.plugins();
-  std::string aPluginName = aPluginMap["PartSetPlugin"];
-  return aPluginName;
+  return myFeaturesInFiles[theFeatureId];
 }
 
 /*
@@ -69,13 +69,14 @@ std::string PartSet_Module::modulePlugin()
  */
 void PartSet_Module::onFeatureTriggered()
 {
-  std::string aPluginName = modulePlugin();
-  Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginName);
-  aWdgReader.readAll();
   XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
   QString aCmdId = aCmd->id();
-  std::string aXmlCfg = aWdgReader.featureWidgetCfg(aCmdId.toStdString());
-  std::string aDescription = aWdgReader.featureDescription(aCmdId.toStdString());
+  std::string aStdCmdId = aCmdId.toStdString();
+  std::string aPluginFileName = featureFile(aStdCmdId);
+  Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginFileName);
+  aWdgReader.readAll();
+  std::string aXmlCfg = aWdgReader.featureWidgetCfg(aStdCmdId);
+  std::string aDescription = aWdgReader.featureDescription(aStdCmdId);
   ModuleBase_PropPanelOperation* aPartSetOp;
   if (aCmdId == "Sketch" ) {
     aPartSetOp = new PartSet_OperationSketch(aCmdId, this);
@@ -97,11 +98,8 @@ void PartSet_Module::onOperationStarted()
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
 
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp) {
-    connect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
-            aPreviewOp, SLOT(onViewSelectionChanged()));
+  if (aPreviewOp)
     visualizePreview(true);
-  }
 }
 
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
@@ -109,12 +107,22 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   ModuleBase_PropPanelOperation* anOperation = dynamic_cast<ModuleBase_PropPanelOperation*>(theOperation);
   if (!anOperation)
     return;
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aPreviewOp)
+    visualizePreview(false);
+}
 
+void PartSet_Module::onViewSelectionChanged()
+{
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    disconnect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
-               aPreviewOp, SLOT(onViewSelectionChanged()));
-    visualizePreview(false);
+    XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+    if (aViewer) {
+      AIS_ListOfInteractive aList;
+      aViewer->getSelectedObjects(aList);
+      aPreviewOp->setSelectedObjects(aList);
+    }
   }
 }
 

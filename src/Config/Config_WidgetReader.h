@@ -27,6 +27,7 @@ public:
 protected:
   void processNode(xmlNodePtr theNode);
   bool processChildren(xmlNodePtr theNode);
+  std::string dumpNode(xmlNodePtr theNode);
 
 private:
   std::map<std::string, std::string> myWidgetCache;
