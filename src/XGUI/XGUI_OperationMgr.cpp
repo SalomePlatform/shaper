@@ -4,46 +4,31 @@
 
 #include <QMessageBox>
 
-/*!
- \brief Constructor
- */
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent)
 : QObject(theParent)
 {
 }
 
-/*!
- \brief Destructor
- */
 XGUI_OperationMgr::~XGUI_OperationMgr()
 {
 }
 
-/*!
- \brief Returns the current operation or NULL
- * \return the current operation
- */
 ModuleBase_Operation* XGUI_OperationMgr::currentOperation() const
 {
   return myOperations.count() > 0 ? myOperations.last() : 0;
 }
 
-/*!
- \brief Sets the current operation or NULL
- * \return the current operation
- */
 bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
 {
   if (!canStartOperation(theOperation))
     return false;
 
   myOperations.append(theOperation);
-  emit beforeOperationStart();
 
   connect(theOperation, SIGNAL(stopped()), this, SLOT(onOperationStopped()));
-  theOperation->start();
+  connect(theOperation, SIGNAL(started()), this, SIGNAL(operationStarted()));
 
-  emit afterOperationStart();
+  theOperation->start();
   return true;
 }
 
@@ -80,7 +65,10 @@ void XGUI_OperationMgr::onOperationStopped()
   if (!aSenderOperation || !anOperation || aSenderOperation != anOperation )
     return;
 
+  emit operationStopped(anOperation);
+
   myOperations.removeAll(anOperation);
+  anOperation->deleteLater();
 
   // get last operation which can be resumed
   ModuleBase_Operation* aResultOp = 0;

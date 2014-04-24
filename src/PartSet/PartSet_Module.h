@@ -22,8 +22,8 @@ public:
 
 public slots:
   void onFeatureTriggered();
-  void onBeforeOperationStart();
-  void onOperationStopped();
+  void onOperationStarted();
+  void onOperationStopped(ModuleBase_Operation* theOperation);
   void onVisualizePreview(bool isDisplay);
 
 private:

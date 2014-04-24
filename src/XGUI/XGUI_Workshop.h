@@ -75,8 +75,8 @@ protected:
   void connectWithOperation(ModuleBase_Operation* theOperation);
 
 protected slots:
-  void onBeforeOperationStart();
-  void onAfterOperationStart();
+  void onOperationStarted();
+  void onOperationStopped(ModuleBase_Operation* theOperation);
 
 private:
   void initMenu();
@@ -90,7 +90,7 @@ private:
   XGUI_SelectionMgr* mySelector;
   XGUI_Displayer* myDisplayer;
 
-  XGUI_OperationMgr* myOperationMgr;
+  XGUI_OperationMgr* myOperationMgr; ///< manager to manipulate through the operations
 };
 
 #endif
