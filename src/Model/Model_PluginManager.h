@@ -7,7 +7,7 @@
 
 #include "Model.h"
 #include <ModelAPI_PluginManager.h>
-#include <Event_Listener.h>
+#include <Events_Listener.h>
 #include <map>
 
 class Model_Document;
@@ -18,7 +18,7 @@ class Model_Document;
  * plugin contains which feature, loads and stores reference to loaded plugins by
  * the feature functionality request.
  */
-class Model_PluginManager : public ModelAPI_PluginManager, public Event_Listener
+class Model_PluginManager : public ModelAPI_PluginManager, public Events_Listener
 {
   bool myPluginsInfoLoaded; ///< it true if plugins information is loaded
   /// map of feature IDs to plugin name
@@ -45,7 +45,7 @@ public:
   MODEL_EXPORT virtual void registerPlugin(ModelAPI_Plugin* thePlugin);
 
   /// Processes the configuration file reading
-  MODEL_EXPORT virtual void processEvent(const Event_Message* theMessage);
+  MODEL_EXPORT virtual void processEvent(const Events_Message* theMessage);
 
   /// Is called only once, on startup of the application
   Model_PluginManager();

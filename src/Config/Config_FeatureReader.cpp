@@ -9,8 +9,8 @@
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
 #include <Config_FeatureReader.h>
-#include <Event_Message.h>
-#include <Event_Loop.h>
+#include <Events_Message.h>
+#include <Events_Loop.h>
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
@@ -38,9 +38,9 @@ Config_FeatureReader::~Config_FeatureReader()
 
 void Config_FeatureReader::processNode(xmlNodePtr theNode)
 {
-  Event_ID aMenuItemEvent = Event_Loop::eventByName(myEventGenerated);
+  Events_ID aMenuItemEvent = Events_Loop::eventByName(myEventGenerated);
   if (isNode(theNode, NODE_FEATURE, NULL)) {
-    Event_Loop* aEvLoop = Event_Loop::loop();
+    Events_Loop* aEvLoop = Events_Loop::loop();
     Config_FeatureMessage aMessage(aMenuItemEvent, this);
     fillFeature(theNode, aMessage);
     //If a feature has xml definition for it's widget:

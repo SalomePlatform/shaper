@@ -19,7 +19,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
 
-#include <Event_Loop.h>
+#include <Events_Loop.h>
 #include <ModuleBase_PropPanelOperation.h>
 #include <ModuleBase_Operation.h>
 #include <Config_FeatureMessage.h>
@@ -65,11 +65,11 @@ void XGUI_Workshop::startApplication()
 {
   initMenu();
   //Initialize event listening
-  Event_Loop* aLoop = Event_Loop::loop();
+  Events_Loop* aLoop = Events_Loop::loop();
   //TODO(sbh): Implement static method to extract event id [SEID]
-  Event_ID aFeatureId = aLoop->eventByName("FeatureEvent");
+  Events_ID aFeatureId = aLoop->eventByName("FeatureEvent");
   aLoop->registerListener(this, aFeatureId);
-  Event_ID aPartSetId = aLoop->eventByName("PartSetModuleEvent");
+  Events_ID aPartSetId = aLoop->eventByName("PartSetModuleEvent");
   aLoop->registerListener(this, aPartSetId);
   activateModule();
   myMainWindow->show();
@@ -142,9 +142,9 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 }
 
 //******************************************************
-void XGUI_Workshop::processEvent(const Event_Message* theMessage)
+void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 {
-  static Event_ID aFeatureId = Event_Loop::loop()->eventByName("FeatureEvent");
+  static Events_ID aFeatureId = Events_Loop::loop()->eventByName("FeatureEvent");
   if (theMessage->eventID() == aFeatureId) {
     const Config_FeatureMessage* aFeatureMsg =
         dynamic_cast<const Config_FeatureMessage*>(theMessage);

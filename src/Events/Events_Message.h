@@ -1,14 +1,14 @@
-// File:	Event_Message.hxx
+// File:	Events_Message.hxx
 // Created:	Thu Mar 13 2014
 // Author:	Mikhail PONIKAROV
 
-#ifndef Event_Message_HeaderFile
-#define Event_Message_HeaderFile
+#ifndef Events_Message_HeaderFile
+#define Events_Message_HeaderFile
 
-#include <Event.h>
+#include <Events.h>
 
-/**\class Event_ID
- * \ingroup EventLoop
+/**\class Events_ID
+ * \ingroup EventsLoop
  * \brief Identifier of the event kind.
  *
  * Each event ID is created in main Envent_Loop class
@@ -17,38 +17,38 @@
  * used as an identifier (this is usefull for debugging of the events
  * with log files and in debugger).
  */
-class EVENT_EXPORT Event_ID {
+class EVENTS_EXPORT Events_ID {
   char* myID; ///< pointer to the text-identifier of the event, unique pointer for all events of such type
 
-  Event_ID(char* theID) {myID = theID;}
+  Events_ID(char* theID) {myID = theID;}
 
-  friend class Event_Loop;
+  friend class Events_Loop;
 public:
   /// Returns the text-identifier of the event (for debugging reasons)
   char* eventText() const {return myID;}
   /// Allows to compare identifiers
-  bool operator==(const Event_ID& theID) const {return myID == theID.myID;}
+  bool operator==(const Events_ID& theID) const {return myID == theID.myID;}
 };
 
-/**\class Event_Message
- * \ingroup EventLoop
+/**\class Events_Message
+ * \ingroup EventsLoop
  * \brief Message for communication between sender and listener of event.
  * Normally it is inherited by the higher-level 
  */
-class EVENT_EXPORT Event_Message {
-  Event_ID myEventId; ///< identifier of the event
+class EVENTS_EXPORT Events_Message {
+  Events_ID myEventsId; ///< identifier of the event
   void* mySender; ///< the sender object
 
 public:
 
   //! Creates the message
-  Event_Message(const Event_ID theID, const void* theSender = 0)
-    : myEventId(theID), mySender((void*) theSender) {}
+  Events_Message(const Events_ID theID, const void* theSender = 0)
+    : myEventsId(theID), mySender((void*) theSender) {}
   //! do nothing in the destructor yet
-  virtual ~Event_Message() {}
+  virtual ~Events_Message() {}
 
   //! Returns identifier of the message
-  const Event_ID& eventID() const {return myEventId;}
+  const Events_ID& eventID() const {return myEventsId;}
 
   //! Returns sender of the message or NULL if it is anonymous message
   void* sender() const {return mySender;}

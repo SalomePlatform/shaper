@@ -1,5 +1,5 @@
-// File:	Event_Message.cxx
+// File:	Events_Message.cxx
 // Created:	Thu Mar 13 2014
 // Author:	Mikhail PONIKAROV
 
-#include <Event_Message.h>
+#include <Events_Message.h>

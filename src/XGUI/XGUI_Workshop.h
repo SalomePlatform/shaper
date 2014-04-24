@@ -2,7 +2,7 @@
 #define XGUI_WORKSHOP_H
 
 #include "XGUI.h"
-#include <Event_Listener.h>
+#include <Events_Listener.h>
 
 #include <QObject>
 #include <QMap>
@@ -26,7 +26,7 @@ class Config_PointerMessage;
  * \ingroup GUI
  * \brief Class which defines a configuration of the application (Workshop) and launches it.
  */
-class XGUI_EXPORT XGUI_Workshop: public QObject, public Event_Listener
+class XGUI_EXPORT XGUI_Workshop: public QObject, public Events_Listener
 {
 Q_OBJECT
 public:
@@ -55,8 +55,8 @@ public:
   //! Creates and adds a new workbench (menu group) with the given name and returns it
   XGUI_Workbench* addWorkbench(const QString& theName);
 
-  //! Redefinition of Event_Listener method
-  virtual void processEvent(const Event_Message* theMessage);
+  //! Redefinition of Events_Listener method
+  virtual void processEvent(const Events_Message* theMessage);
 
 public slots:
   void updateCommandStatus();

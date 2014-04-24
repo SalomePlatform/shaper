@@ -2,7 +2,7 @@
 #define CONFIG_MESSAGE_H
 
 #include <Config.h>
-#include <Event_Message.h>
+#include <Events_Message.h>
 
 #include <string>
 
@@ -11,7 +11,7 @@
  * Example of the feature entry:
  * <feature id="Part" text="New part" tooltip="Creates a new part" icon=":pictures/part_ico.png"/>
  */
-class Config_FeatureMessage: public Event_Message
+class Config_FeatureMessage: public Events_Message
 {
   std::string myId;  //Feature unique id
   std::string myText; //Represents action's text
@@ -26,8 +26,8 @@ class Config_FeatureMessage: public Event_Message
   bool myUseInput; //Action is being checked until user commit the operation
 
 public:
-  //const Event_ID theID, const void* theSender = 0
-  CONFIG_EXPORT Config_FeatureMessage(const Event_ID theId, const void* theParent = 0);
+  //const Events_ID theID, const void* theSender = 0
+  CONFIG_EXPORT Config_FeatureMessage(const Events_ID theId, const void* theParent = 0);
 
   //TODO(sbh): Implement static method to extract event id [SEID]
   //static const char* eventId() { return ""; }

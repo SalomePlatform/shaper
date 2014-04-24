@@ -9,7 +9,7 @@
 #include <Model_PluginManager.h>
 #include <Model_Iterator.h>
 #include <Model_Events.h>
-#include <Event_Loop.h>
+#include <Events_Loop.h>
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
@@ -236,9 +236,9 @@ void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFea
   myFeatures[aGroup].push_back(theFeature);
 
   // event: feature is added
-  static Event_ID anEvent = Event_Loop::eventByName(EVENT_FEATURE_CREATED);
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);
   ModelAPI_FeatureUpdatedMessage aMsg(aThis, theFeature, anEvent);
-  Event_Loop::loop()->send(aMsg);
+  Events_Loop::loop()->send(aMsg);
 }
 
 boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(TDF_Label& theLabel)
@@ -371,7 +371,7 @@ void Model_Document::synchronizeFeatures()
     aGroupNamesIter = myGroupsNames.erase(aGroupNamesIter);
     // say that features were deleted from group
     ModelAPI_FeatureDeletedMessage aMsg(aThis, aGroupName);
-    Event_Loop::loop()->send(aMsg);
+    Events_Loop::loop()->send(aMsg);
   }
   // create new groups basing on the following data model update
   for(; aGroupsIter.More(); aGroupsIter.Next()) {
@@ -408,7 +408,7 @@ void Model_Document::synchronizeFeatures()
         aFIter = aFeatures.erase(aFIter);
         // event: model is updated
         ModelAPI_FeatureDeletedMessage aMsg(aThis, aGroupName);
-        Event_Loop::loop()->send(aMsg);
+        Events_Loop::loop()->send(aMsg);
       } else if (aDSTag < aFeatureTag) { // a new feature is inserted
         // create a feature
         boost::shared_ptr<ModelAPI_Feature> aFeature = ModelAPI_PluginManager::get()->createFeature(
@@ -422,9 +422,9 @@ void Model_Document::synchronizeFeatures()
         aFeature->setData(aData);
         aFeature->initAttributes();
         // event: model is updated
-        static Event_ID anEvent = Event_Loop::eventByName(EVENT_FEATURE_CREATED);
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);
         ModelAPI_FeatureUpdatedMessage aMsg(aThis, aFeature, anEvent);
-        Event_Loop::loop()->send(aMsg);
+        Events_Loop::loop()->send(aMsg);
 
         if (aFIter == aFeatures.end()) {
           aFeatures.push_back(aFeature);

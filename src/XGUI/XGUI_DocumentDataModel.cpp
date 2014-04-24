@@ -8,7 +8,7 @@
 #include <ModelAPI_Data.h>
 #include <Model_Events.h>
 
-#include <Event_Loop.h>
+#include <Events_Loop.h>
 
 
 #include <QIcon>
@@ -23,9 +23,9 @@ XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
   myDocument = aMgr->currentDocument();
 
   // Register in event loop
-  Event_Loop::loop()->registerListener(this, Event_Loop::eventByName(EVENT_FEATURE_CREATED));
-  Event_Loop::loop()->registerListener(this, Event_Loop::eventByName(EVENT_FEATURE_UPDATED));
-  Event_Loop::loop()->registerListener(this, Event_Loop::eventByName(EVENT_FEATURE_DELETED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
 
   // Create a top part of data tree model
   myModel = new XGUI_TopDataModel(myDocument, this);
@@ -38,7 +38,7 @@ XGUI_DocumentDataModel::~XGUI_DocumentDataModel()
 }
 
 
-void XGUI_DocumentDataModel::processEvent(const Event_Message* theMessage)
+void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
 {
   // Created object event *******************
   if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_CREATED) {
