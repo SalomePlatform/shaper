@@ -17,7 +17,7 @@ public:
   XGUI_TopDataModel(const boost::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent);
   virtual ~XGUI_TopDataModel();
 
-  // Reimplementation from QAbstractItemModel
+  // Reimpl from QAbstractItemModel
   virtual QVariant data(const QModelIndex& theIndex, int theRole) const;
   virtual QVariant headerData(int section, Qt::Orientation orientation,
                               int role = Qt::DisplayRole) const;
@@ -66,7 +66,7 @@ public:
   XGUI_PartDataModel(const boost::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent);
   virtual ~XGUI_PartDataModel();
 
-  // Reimplementation from QAbstractItemModel
+  // Reimpl from QAbstractItemModel
   virtual QVariant data(const QModelIndex& theIndex, int theRole) const;
   virtual QVariant headerData(int section, Qt::Orientation orientation,
                               int role = Qt::DisplayRole) const;

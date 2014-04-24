@@ -1,49 +1,38 @@
+// File:        XGUI_OperationMgr.h
+// Created:     20 Apr 2014
+// Author:      Natalia ERMOLAEVA
+
 #include "XGUI_OperationMgr.h"
 
 #include "ModuleBase_Operation.h"
 
 #include <QMessageBox>
 
-/*!
- \brief Constructor
- */
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent)
 : QObject(theParent)
 {
 }
 
-/*!
- \brief Destructor
- */
 XGUI_OperationMgr::~XGUI_OperationMgr()
 {
 }
 
-/*!
- \brief Returns the current operation or NULL
- * \return the current operation
- */
 ModuleBase_Operation* XGUI_OperationMgr::currentOperation() const
 {
   return myOperations.count() > 0 ? myOperations.last() : 0;
 }
 
-/*!
- \brief Sets the current operation or NULL
- * \return the current operation
- */
 bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
 {
   if (!canStartOperation(theOperation))
     return false;
 
   myOperations.append(theOperation);
-  emit beforeOperationStart();
 
   connect(theOperation, SIGNAL(stopped()), this, SLOT(onOperationStopped()));
-  theOperation->start();
+  connect(theOperation, SIGNAL(started()), this, SIGNAL(operationStarted()));
 
-  emit afterOperationStart();
+  theOperation->start();
   return true;
 }
 
@@ -64,15 +53,6 @@ bool XGUI_OperationMgr::canStartOperation(ModuleBase_Operation* theOperation)
   return aCanStart;
 }
 
-void XGUI_OperationMgr::commitCurrentOperation()
-{
-  ModuleBase_Operation* anOperation = currentOperation();
-  if (!anOperation)
-    return;
-
-  anOperation->commit();
-}
-
 void XGUI_OperationMgr::onOperationStopped()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
@@ -80,7 +60,10 @@ void XGUI_OperationMgr::onOperationStopped()
   if (!aSenderOperation || !anOperation || aSenderOperation != anOperation )
     return;
 
+  emit operationStopped(anOperation);
+
   myOperations.removeAll(anOperation);
+  anOperation->deleteLater();
 
   // get last operation which can be resumed
   ModuleBase_Operation* aResultOp = 0;

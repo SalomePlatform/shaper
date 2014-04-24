@@ -11,13 +11,13 @@ boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::square(
   boost::shared_ptr<GeomAPI_Pnt> theCenter, boost::shared_ptr<GeomAPI_Dir> theNormal,
   const double theSize)
 {
-  gp_Pnt* aCenter = static_cast<gp_Pnt*>(theCenter->implementation());
-  gp_Dir* aDir = static_cast<gp_Dir*>(theNormal->implementation());
-  gp_Pln aPlane(*aCenter, *aDir);
+  const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
+  const gp_Dir& aDir = theNormal->impl<gp_Dir>();
+  gp_Pln aPlane(aCenter, aDir);
   // half of the size in each direction from the center
   BRepBuilderAPI_MakeFace aFaceBuilder(aPlane, 
     -theSize / 2., theSize / 2., -theSize / 2., theSize / 2.);
   boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
-  aRes->setImplementation(new TopoDS_Shape(aFaceBuilder.Face()));
+  aRes->setImpl(new TopoDS_Shape(aFaceBuilder.Face()));
   return aRes;
 }

@@ -20,12 +20,7 @@ GeomAPI_Interface::~GeomAPI_Interface()
     delete myImpl;
 }
 
-void* GeomAPI_Interface::implementation()
-{
-  return myImpl;
-}
-
-void GeomAPI_Interface::setImplementation(void* theImpl)
+void GeomAPI_Interface::setImpl(void* theImpl)
 {
   if (myImpl)
     delete myImpl;

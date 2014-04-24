@@ -9,6 +9,7 @@ SET(PROJECT_HEADERS
     GeomAPI_Interface.h
     GeomAPI_Pnt.h
     GeomAPI_Dir.h
+    GeomAPI_Pln.h
     GeomAPI_Shape.h
 )
 
@@ -16,6 +17,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Interface.cpp
     GeomAPI_Pnt.cpp
     GeomAPI_Dir.cpp
+    GeomAPI_Pln.cpp
     GeomAPI_Shape.cpp
 )
 
