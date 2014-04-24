@@ -6,14 +6,16 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	NewGeom.h
 	NewGeom_Module.h
+	NewGeom_DataModel.h
 )
 
 SET(PROJECT_AUTOMOC 
-    ${CMAKE_CURRENT_BINARY_DIR}/XGUI_automoc.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/NewGeom_automoc.cpp
 )
 
 SET(PROJECT_SOURCES
 	NewGeom_Module.cpp
+	NewGeom_DataModel.cpp
 )
 
 SET(PROJECT_RESOURCES
