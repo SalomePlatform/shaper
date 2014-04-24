@@ -60,6 +60,8 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
   if (isNode(theNode, NODE_WORKBENCH, NULL)) {
     myLastWorkbench = getProperty(theNode, _ID);
   }
+  //Process SOURCE nodes.
+  Config_XMLReader::processNode(theNode);
 }
 
 bool Config_FeatureReader::processChildren(xmlNodePtr theNode)

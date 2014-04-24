@@ -38,11 +38,13 @@ public:
 
   CONFIG_EXPORT void readAll();
 
+public:
+  CONFIG_EXPORT xmlNodePtr findRoot();
+
 protected:
   virtual void processNode(xmlNodePtr aNode);
   virtual bool processChildren(xmlNodePtr aNode);
 
-  xmlNodePtr findRoot();
   void readRecursively(xmlNodePtr theParent);
 
   xmlNodePtr node(void* theNode);
