@@ -6,10 +6,12 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
 SET(PROJECT_HEADERS
     GeomAlgoAPI.h
+    GeomAlgoAPI_CompoundBuilder.h
     GeomAlgoAPI_FaceBuilder.h
 )
 
 SET(PROJECT_SOURCES
+    GeomAlgoAPI_CompoundBuilder.cpp
     GeomAlgoAPI_FaceBuilder.cpp
 )
 

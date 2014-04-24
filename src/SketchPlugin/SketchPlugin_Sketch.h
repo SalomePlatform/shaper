@@ -8,6 +8,8 @@
 #include "SketchPlugin.h"
 #include <SketchPlugin_Feature.h>
 
+#include <list>
+
 /// part reference attribute
 const std::string PART_ATTR_DOC_REF = "SketchDocument";
 
@@ -37,6 +39,15 @@ public:
 
   /// Use plugin manager for features creation
   SketchPlugin_Sketch();
+protected:
+  /// Creates a plane and append it to the list
+  /// \param theX the X normal value
+  /// \param theY the Y normal value
+  /// \param theZ the Z normal value
+  /// \param theShapes the list of result shapes
+  void addPlane(double theX, double theY, double theZ,
+                std::list<boost::shared_ptr<GeomAPI_Shape> >& theShapes) const;
+
 };
 
 #endif
