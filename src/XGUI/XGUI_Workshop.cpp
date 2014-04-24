@@ -158,10 +158,8 @@ void XGUI_Workshop::processEvent(const Event_Message* theMessage)
         (ModuleBase_PropPanelOperation*)(aPartSetMsg->pointer());
 
     if (myOperationMgr->startOperation(anOperation)) {
-      if (anOperation->isPerformedImmediately()) {
-        myOperationMgr->commitCurrentOperation();
-        updateCommandStatus();
-      }
+      if (anOperation->isPerformedImmediately())
+        anOperation->commit();
     }
     return;
   }
@@ -173,6 +171,7 @@ void XGUI_Workshop::processEvent(const Event_Message* theMessage)
 
 }
 
+//******************************************************
 void XGUI_Workshop::onOperationStarted()
 {
   ModuleBase_PropPanelOperation* aOperation =
@@ -192,9 +191,7 @@ void XGUI_Workshop::onOperationStarted()
   }
 }
 
-/**
- *
- */
+//******************************************************
 void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 {
   myMainWindow->hidePropertyPanel();

@@ -75,7 +75,12 @@ protected:
   void connectWithOperation(ModuleBase_Operation* theOperation);
 
 protected slots:
+  /// SLOT, that is called after the operation is started. Update workshop state according to
+  /// the started operation, e.g. visualizes the property panel and connect to it.
   void onOperationStarted();
+  /// SLOT, that is called after the operation is stopped. Update workshop state, e.g.
+  /// hides the property panel and udpate the command status.
+  /// \param theOpertion a stopped operation
   void onOperationStopped(ModuleBase_Operation* theOperation);
 
 private:

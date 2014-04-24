@@ -1,3 +1,7 @@
+// File:        XGUI_OperationMgr.h
+// Created:     20 Apr 2014
+// Author:      Natalia ERMOLAEVA
+
 #include "XGUI_OperationMgr.h"
 
 #include "ModuleBase_Operation.h"
@@ -47,15 +51,6 @@ bool XGUI_OperationMgr::canStartOperation(ModuleBase_Operation* theOperation)
       aCanStart = false;
   }
   return aCanStart;
-}
-
-void XGUI_OperationMgr::commitCurrentOperation()
-{
-  ModuleBase_Operation* anOperation = currentOperation();
-  if (!anOperation)
-    return;
-
-  anOperation->commit();
 }
 
 void XGUI_OperationMgr::onOperationStopped()

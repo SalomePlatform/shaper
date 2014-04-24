@@ -1,3 +1,7 @@
+// File:        XGUI_OperationMgr.h
+// Created:     20 Apr 2014
+// Author:      Natalia ERMOLAEVA
+
 #ifndef XGUI_OperationMgr_H
 #define XGUI_OperationMgr_H
 
@@ -34,16 +38,22 @@ public:
   /// \return the current operation
   bool startOperation(ModuleBase_Operation* theOperation);
 
-  void commitCurrentOperation();
-
 signals:
+  /// Signal about an operation is started. It is emitted after the start() of operation is done.
   void operationStarted();
+  /// Signal about an operation is stopped. It is emitted after the stop() of operation is done.
+  /// \param theOperation a stopped operation
   void operationStopped(ModuleBase_Operation* theOperation);
 
 protected:
+  /// Returns whether the operation can be started. Check if there is already started operation and
+  /// the granted parameter of the launched operation
+  /// \param theOperation an operation to check
   bool canStartOperation(ModuleBase_Operation* theOperation);
 
 protected slots:
+  /// Slot that is called by an operation stop. Removes the stopped operation form the stack.
+  /// If there is a suspended operation, restart it.
   void onOperationStopped();
 
 private:
