@@ -23,7 +23,7 @@ public:
   GeomAPI_Pln(const boost::shared_ptr<GeomAPI_Pnt>& thePoint,
               const boost::shared_ptr<GeomAPI_Dir>& theNormal);
 
-  /// Creation of plane by coefficients A * X + B * Y + C * Z + D = 0.0 
+  /// Creation of plane by coefficients (Ax+By+Cz+D=0)
   GeomAPI_Pln(const double theA, const double theB, const double theC, const double theD);
 
   /// Returns a point of this plane
@@ -31,6 +31,9 @@ public:
 
   /// Returns a plane normal
   boost::shared_ptr<GeomAPI_Dir> direction();
+
+  /// Returns the plane coefficients (Ax+By+Cz+D=0)
+  void coefficients(double& theA, double& theB, double& theC, double& theD);
 };
 
 #endif
