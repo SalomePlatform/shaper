@@ -12,7 +12,7 @@
 #include <Config_XMLReader.h>
 
 #include <string>
-
+#include <list>
 
 class Config_FeatureMessage;
 
@@ -20,9 +20,11 @@ class Config_FeatureReader: public Config_XMLReader
 {
 public:
   Config_FeatureReader(const std::string& theXmlFile,
-                       const std::string& theLibraryName = "",
+                       const std::string& theLibraryName,
                        const char* theEventGenerated = 0);
   virtual ~Config_FeatureReader();
+
+  std::list<std::string> features() const;
 
 protected:
   void processNode(xmlNodePtr aNode);
@@ -34,6 +36,8 @@ private:
   std::string myLastWorkbench;
   std::string myLastGroup;
   std::string myLibraryName;
+
+  std::list<std::string> myFeatures;
   /// event generated on feature data sending, by default it is "FeatureEvent"
   const char* myEventGenerated;
 };

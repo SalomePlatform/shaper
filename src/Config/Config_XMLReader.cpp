@@ -6,6 +6,8 @@
  */
 
 #include <Config_XMLReader.h>
+#include <Config_Keywords.h>
+#include <Config_Common.h>
 
 #include <Events_Loop.h>
 #include <libxml/parser.h>
@@ -61,13 +63,16 @@ void Config_XMLReader::readAll()
  * The default impl does nothing. (In debug mode prints
  * some info)
  */
-void Config_XMLReader::processNode(xmlNodePtr aNode)
+void Config_XMLReader::processNode(xmlNodePtr theNode)
 {
-#ifdef _DEBUG
-  std::cout << "Config_XMLReader::processNode: "
-  << aNode->name << " content: "
-  << aNode->content << std::endl;
-#endif
+  if (isNode(theNode, NODE_SOURCE, NULL)) {
+    std::string aSourceFile = getProperty(theNode, SOURCE_FILE);
+    Config_XMLReader aSourceReader = Config_XMLReader(aSourceFile);
+    readRecursively(aSourceReader.findRoot());
+    #ifdef _DEBUG
+    std::cout << "Config_XMLReader::sourced node: " << aSourceFile << std::endl;
+    #endif
+  }
 }
 
 /*
@@ -92,7 +97,6 @@ xmlNodePtr Config_XMLReader::findRoot()
 #endif
     return NULL;
   }
-
   xmlNodePtr aRoot = xmlDocGetRootElement(myXmlDoc);
 #ifdef _DEBUG
   if(aRoot == NULL) {

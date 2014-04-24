@@ -4,6 +4,7 @@
 
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
+#include <ModelAPI_AttributeDouble.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
@@ -18,7 +19,10 @@ SketchPlugin_Sketch::SketchPlugin_Sketch()
 
 void SketchPlugin_Sketch::initAttributes()
 {
-  //data()->addAttribute(PART_ATTR_DOC_REF, ModelAPI_AttributeDocRef::type());
+  data()->addAttribute(SKETCH_ATTR_PLANE_A, ModelAPI_AttributeDouble::type());
+  data()->addAttribute(SKETCH_ATTR_PLANE_B, ModelAPI_AttributeDouble::type());
+  data()->addAttribute(SKETCH_ATTR_PLANE_C, ModelAPI_AttributeDouble::type());
+  data()->addAttribute(SKETCH_ATTR_PLANE_D, ModelAPI_AttributeDouble::type());
 }
 
 void SketchPlugin_Sketch::execute() 

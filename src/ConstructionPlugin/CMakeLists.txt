@@ -21,6 +21,7 @@ INCLUDE_DIRECTORIES(
 
 SET(XML_RESOURCES
   plugin-Construction.xml
+  point_widget.xml
 )
 
 INSTALL(TARGETS ConstructionPlugin DESTINATION plugins)

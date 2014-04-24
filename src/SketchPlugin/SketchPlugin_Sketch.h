@@ -7,11 +7,16 @@
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Feature.h>
-
 #include <list>
 
-/// part reference attribute
-const std::string PART_ATTR_DOC_REF = "SketchDocument";
+/// Coefficient A of the sketch plane (Ax+By+Cz+D=0)
+const std::string SKETCH_ATTR_PLANE_A("PlaneA");
+/// Coefficient B of the sketch plane
+const std::string SKETCH_ATTR_PLANE_B("PlaneB");
+/// Coefficient C of the sketch plane
+const std::string SKETCH_ATTR_PLANE_C("PlaneC");
+/// Coefficient D of the sketch plane
+const std::string SKETCH_ATTR_PLANE_D("PlaneD");
 
 /**\class SketchPlugin_Sketch
  * \ingroup DataModel
@@ -47,7 +52,6 @@ protected:
   /// \param theShapes the list of result shapes
   void addPlane(double theX, double theY, double theZ,
                 std::list<boost::shared_ptr<GeomAPI_Shape> >& theShapes) const;
-
 };
 
 #endif
