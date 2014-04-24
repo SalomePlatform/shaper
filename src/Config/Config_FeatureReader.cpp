@@ -36,6 +36,11 @@ Config_FeatureReader::~Config_FeatureReader()
 {
 }
 
+std::list<std::string> Config_FeatureReader::features() const
+{
+  return myFeatures;
+}
+
 void Config_FeatureReader::processNode(xmlNodePtr theNode)
 {
   Event_ID aMenuItemEvent = Event_Loop::eventByName(myEventGenerated);
@@ -43,6 +48,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
     Event_Loop* aEvLoop = Event_Loop::loop();
     Config_FeatureMessage aMessage(aMenuItemEvent, this);
     fillFeature(theNode, aMessage);
+    myFeatures.push_back(getProperty(theNode, _ID));
     //If a feature has xml definition for it's widget:
     aMessage.setUseInput(hasChild(theNode));
     aEvLoop->send(aMessage);

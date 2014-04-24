@@ -93,7 +93,6 @@ void Model_PluginManager::LoadPluginsInfo()
 
   // Read plugins information from XML files
   Config_ModuleReader aXMLReader("FeatureRegisterEvent");
-  aXMLReader.setAutoImport(true);
   aXMLReader.readAll();
 }
 

@@ -12,6 +12,7 @@
 #include <Config_XMLReader.h>
 
 #include <map>
+#include <list>
 #include <string>
 
 
@@ -22,8 +23,7 @@ public:
   CONFIG_EXPORT Config_ModuleReader(const char* theEventGenerated = 0);
   CONFIG_EXPORT virtual ~Config_ModuleReader();
 
-  CONFIG_EXPORT void setAutoImport(bool enabled);
-  CONFIG_EXPORT const std::map<std::string, std::string>& plugins() const;
+  CONFIG_EXPORT const std::map<std::string, std::string>& featuresInFiles() const;
 
   CONFIG_EXPORT std::string getModuleName();
 
@@ -31,12 +31,11 @@ protected:
   void processNode(xmlNodePtr aNode);
   bool processChildren(xmlNodePtr aNode);
 
-  void importPlugin(const std::string& thePluginName,
-                    const std::string& thePluginLibrary = "");
+  std::list<std::string> importPlugin(const std::string& thePluginFile,
+                                      const std::string& thePluginLibrary);
 
 private:
-  bool myIsAutoImport;
-  std::map<std::string, std::string> myPluginsMap;
+  std::map<std::string, std::string> myFeaturesInFiles;
   const char* myEventGenerated;
 
 };
