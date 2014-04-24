@@ -31,8 +31,9 @@ PartSet_OperationSketchBase::~PartSet_OperationSketchBase()
  */
 const TopoDS_Shape& PartSet_OperationSketchBase::preview() const
 {
-  boost::shared_ptr<SketchPlugin_Feature> aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(feature());
-  return *(static_cast<TopoDS_Shape*>(aFeature->preview()->implementation()));
+  boost::shared_ptr<SketchPlugin_Feature> aFeature = 
+    boost::dynamic_pointer_cast<SketchPlugin_Feature>(feature());
+  return aFeature->preview()->impl<TopoDS_Shape>();
 }
 
 /*!

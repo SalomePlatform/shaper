@@ -15,23 +15,24 @@
 class GEOMAPI_EXPORT GeomAPI_Interface
 {
 protected:
-  void* myImpl; ///< pointer to the internal implementation object
+  void* myImpl; ///< pointer to the internal impl object
 
 public:
   /// None - constructor
   GeomAPI_Interface();
 
-  /// Constructor by the implementation pointer (used for internal needs)
+  /// Constructor by the impl pointer (used for internal needs)
   GeomAPI_Interface(void* theImpl);
   
   /// Destructor
   virtual ~GeomAPI_Interface();
 
-  /// Returns the pointer to the implementation
-  void* implementation();
-  /// Updates the implementation (deletes the old one)
-  void setImplementation(void* theImpl);
+  /// Returns the pointer to the impl
+  template<class T> inline T* implPtr() {return dynamic_cast<T*>(myImpl);}
+  /// Returns the reference object of the impl
+  template<class T> inline const T& impl() {return *(static_cast<T*>(myImpl));}
+  /// Updates the impl (deletes the old one)
+  void setImpl(void* theImpl);
 };
 
 #endif
-

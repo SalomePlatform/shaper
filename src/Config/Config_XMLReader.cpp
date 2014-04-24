@@ -58,7 +58,7 @@ void Config_XMLReader::readAll()
 
 /*
  * Allows to customize reader's behavior for a node. Virtual.
- * The default implementation does nothing. (In debug mode prints
+ * The default impl does nothing. (In debug mode prints
  * some info)
  */
 void Config_XMLReader::processNode(xmlNodePtr aNode)
@@ -72,7 +72,7 @@ void Config_XMLReader::processNode(xmlNodePtr aNode)
 
 /*
  * Defines which nodes should be processed recursively. Virtual.
- * The default implementation is to read all nodes.
+ * The default impl is to read all nodes.
  */
 bool Config_XMLReader::processChildren(xmlNodePtr aNode)
 {
