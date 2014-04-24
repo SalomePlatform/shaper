@@ -63,7 +63,8 @@ void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Sh
   aData->real(SKETCH_ATTR_PLANE_C)->setValue(aC);
   aData->real(SKETCH_ATTR_PLANE_D)->setValue(aD);
 
-  //emit viewPlaneChanged();
+  boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+  emit viewerProjectionChange(aDir->x(), aDir->y(), aDir->z());
 
   commit();
 }

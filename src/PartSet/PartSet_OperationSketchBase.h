@@ -39,6 +39,9 @@ public:
   /// Gives the current selected objects to be processed by the operation
   /// \param a list of interactive selected objects
   virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList) = 0;
+
+signals:
+  void viewerProjectionChange(double theX, double theY, double theZ);
 };
 
 #endif

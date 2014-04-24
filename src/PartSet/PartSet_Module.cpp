@@ -98,8 +98,11 @@ void PartSet_Module::onOperationStarted()
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
 
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp)
+  if (aPreviewOp) {
     visualizePreview(true);
+    connect(aPreviewOp, SIGNAL(viewerProjectionChange(double, double, double)),
+            this, SLOT(onViewerProjectionChange(double, double, double)));
+  }
 }
 
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
@@ -123,6 +126,14 @@ void PartSet_Module::onViewSelectionChanged()
       aViewer->getSelectedShapes(aList);
       aPreviewOp->setSelectedShapes(aList);
     }
+  }
+}
+
+void PartSet_Module::onViewerProjectionChange(double theX, double theY, double theZ)
+{
+  XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+  if (aViewer) {
+    aViewer->setViewProjection(theX, theY, theZ);
   }
 }
 

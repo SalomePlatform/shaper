@@ -119,6 +119,12 @@ public:
   static void getHotButton(XGUI::InteractionStyle theInteractionStyle, XGUI::HotOperation theOper,
                            Qt::KeyboardModifiers& theState, Qt::MouseButtons& theButton);
 
+  //! Sets the view projection
+  /// \param theX the X projection value
+  /// \param theY the Y projection value
+  /// \param theZ the Z projection value
+  void setViewProjection(double theX, double theY, double theZ);
+
   typedef QMap<XGUI::HotOperation, Qt::KeyboardModifiers> StatesMap;
   typedef QMap<XGUI::HotOperation, Qt::MouseButtons> ButtonsMap;
 

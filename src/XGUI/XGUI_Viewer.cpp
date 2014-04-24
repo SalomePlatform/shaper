@@ -283,6 +283,17 @@ void XGUI_Viewer::getHotButton(XGUI::InteractionStyle theInteractionStyle,
   theButton = myButtonMap[theInteractionStyle][theOper];
 }
 
+void XGUI_Viewer::setViewProjection(double theX, double theY, double theZ)
+{
+  XGUI_ViewWindow* aWindow = dynamic_cast<XGUI_ViewWindow*>(myActiveView->widget());
+  if (aWindow) {
+    Handle(V3d_View) aView3d = aWindow->viewPort()->getView();
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj(theX, theY, theZ);
+    aWindow->viewPort()->fitAll();
+  }
+}
+
 /*!
  Changes visibility of trihedron to opposite
  */
