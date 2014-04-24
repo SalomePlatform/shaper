@@ -3,23 +3,23 @@
 // Author:      Mikhail PONIKAROV
 
 #include <Model_Events.h>
-#include <Event_Loop.h>
+#include <Events_Loop.h>
 
 ModelAPI_FeatureUpdatedMessage::ModelAPI_FeatureUpdatedMessage(
-  const std::shared_ptr<ModelAPI_Document>& theDoc,
-  const std::shared_ptr<ModelAPI_Feature>& theFeature, const Event_ID& theEvent)
-  : Event_Message(theEvent, 0), myFeature(theFeature), myDoc(theDoc)
+  const boost::shared_ptr<ModelAPI_Document>& theDoc,
+  const boost::shared_ptr<ModelAPI_Feature>& theFeature, const Events_ID& theEvent)
+  : Events_Message(theEvent, 0), myFeature(theFeature), myDoc(theDoc)
 {}
 
 ModelAPI_FeatureDeletedMessage::ModelAPI_FeatureDeletedMessage(
-  const std::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theGroup)
-  : Event_Message(messageId(), 0), myDoc(theDoc), myGroup(theGroup)
+  const boost::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theGroup)
+  : Events_Message(messageId(), 0), myDoc(theDoc), myGroup(theGroup)
 
 {
 }
 
-const Event_ID ModelAPI_FeatureDeletedMessage::messageId()
+const Events_ID ModelAPI_FeatureDeletedMessage::messageId()
 {
-  static Event_ID MY_ID = Event_Loop::eventByName(EVENT_FEATURE_DELETED);
+  static Events_ID MY_ID = Events_Loop::eventByName(EVENT_FEATURE_DELETED);
   return MY_ID;
 }

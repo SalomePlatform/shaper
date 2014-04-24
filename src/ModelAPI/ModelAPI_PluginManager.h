@@ -7,7 +7,7 @@
 
 #include "ModelAPI.h"
 #include <string>
-#include <memory>
+#include <boost/shared_ptr.hpp>
 
 class ModelAPI_Feature;
 class ModelAPI_Plugin;
@@ -24,7 +24,7 @@ class MODELAPI_EXPORT ModelAPI_PluginManager
 {
 public:
   /// Returns the real implementation (the alone instance per application) of the plugin manager
-  static std::shared_ptr<ModelAPI_PluginManager> get();
+  static boost::shared_ptr<ModelAPI_PluginManager> get();
 
   /// Registers the plugin that creates features.
   /// It is obligatory for each plugin to call this function on loading to be found by 
@@ -32,16 +32,16 @@ public:
   virtual void registerPlugin(ModelAPI_Plugin* thePlugin) = 0;
 
   /// Returns the root document of the application (that may contains sub-documents)
-  virtual std::shared_ptr<ModelAPI_Document> rootDocument() = 0;
+  virtual boost::shared_ptr<ModelAPI_Document> rootDocument() = 0;
 
   /// Return true if root document has been already created
   virtual bool hasRootDocument() = 0;
 
   /// Returns the current document that used for current work in the application
-  virtual std::shared_ptr<ModelAPI_Document> currentDocument() = 0;
+  virtual boost::shared_ptr<ModelAPI_Document> currentDocument() = 0;
 
   /// Defines the current document that used for current work in the application
-  virtual void setCurrentDocument(std::shared_ptr<ModelAPI_Document> theDoc) = 0;
+  virtual void setCurrentDocument(boost::shared_ptr<ModelAPI_Document> theDoc) = 0;
 
   /// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
   static void loadLibrary(const std::string theLibName);
@@ -54,9 +54,9 @@ public:
 
 protected:
   /// Creates the feature object using plugins functionality
-  virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
+  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
 
-  static void SetPluginManager(std::shared_ptr<ModelAPI_PluginManager> theManager);
+  static void SetPluginManager(boost::shared_ptr<ModelAPI_PluginManager> theManager);
 
   friend class Model_Document;
 };

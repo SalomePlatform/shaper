@@ -18,6 +18,8 @@ class XGUI_ViewWindow;
 class QMouseEvent;
 class QKeyEvent;
 
+class AIS_ListOfInteractive;
+
 /**\class XGUI_Viewer
  * \ingroup GUI
  * \brief Represents a 3d viewer. The viewer manages 3d scene and a set of view windows
@@ -52,6 +54,16 @@ public:
   {
     return myAISContext;
   }
+
+  //! Activate local selection
+  //! \param theAIS the list of objects
+  //! \param theMode the selection mode
+  //! \param isUpdateViewer the state wether the viewer should be updated immediatelly
+  void setLocalSelection(const AIS_ListOfInteractive& theAISObjects, const int theMode,
+                         const bool isUpdateViewer);
+  //! Deactivate local selection
+  //! \param isUpdateViewer the state wether the viewer should be updated immediatelly
+  void setGlobalSelection(const bool isUpdateViewer);
 
   //! Trihedron 3d object shown in the viewer
   Handle(AIS_Trihedron) trihedron() const

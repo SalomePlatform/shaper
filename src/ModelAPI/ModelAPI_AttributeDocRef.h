@@ -17,10 +17,10 @@ class MODELAPI_EXPORT ModelAPI_AttributeDocRef : public ModelAPI_Attribute
 {
 public:
   /// Defines the document referenced from this attribute
-  virtual void setValue(std::shared_ptr<ModelAPI_Document> theDoc) = 0;
+  virtual void setValue(boost::shared_ptr<ModelAPI_Document> theDoc) = 0;
 
   /// Returns document referenced from this attribute
-  virtual std::shared_ptr<ModelAPI_Document> value() = 0;
+  virtual boost::shared_ptr<ModelAPI_Document> value() = 0;
 
   /// Returns the type of this class of attributes
   static std::string type() {return "DocRef";}

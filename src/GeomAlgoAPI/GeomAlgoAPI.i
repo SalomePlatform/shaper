@@ -12,7 +12,8 @@
 // standard definitions
 %include "typemaps.i"
 %include "std_string.i"
-%include <std_shared_ptr.i>
+//%include <std_shared_ptr.i>
+%include <boost_shared_ptr.i>
 
 // all supported interfaces
 %include "GeomAlgoAPI_FaceBuilder.h"

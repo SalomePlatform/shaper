@@ -54,7 +54,7 @@ QString ModuleBase_Operation::operationId() const
   return myOperationId;
 }
 
-std::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::feature() const
+boost::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::feature() const
 {
   return myFeature;
 }
@@ -100,7 +100,7 @@ bool ModuleBase_Operation::isValid(ModuleBase_Operation*) const
  * \return Returns TRUE if current operation must not be checked for ActiveOperation->IsValid( this )
  *
  * This method must be redefined in derived operation if operation of derived class
- * must be always can start above any launched one. Default implementation returns FALSE,
+ * must be always can start above any launched one. Default impl returns FALSE,
  * so it is being checked for IsValid, but some operations may overload IsGranted()
  * In this case they will always start, no matter what operation is running.
  */
@@ -112,7 +112,7 @@ bool ModuleBase_Operation::isGranted() const
 /*
  * Returns pointer to the root document.
  */
-std::shared_ptr<ModelAPI_Document> ModuleBase_Operation::document() const
+boost::shared_ptr<ModelAPI_Document> ModuleBase_Operation::document() const
 {
   return ModelAPI_PluginManager::get()->rootDocument();
 }
@@ -259,8 +259,8 @@ void ModuleBase_Operation::storeReal(double theValue)
     return;
   }
   QString anId = sender()->objectName();
-  std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  std::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(anId.toStdString());
+  boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
+  boost::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(anId.toStdString());
   aReal->setValue(theValue);
 }
 
@@ -268,7 +268,7 @@ void ModuleBase_Operation::storeReal(double theValue)
  * \brief Verifies whether operator is ready to start.
  * \return TRUE if operation is ready to start
  *
- * Default implementation returns TRUE. Redefine this method to add own verifications
+ * Default impl returns TRUE. Redefine this method to add own verifications
  */
 bool ModuleBase_Operation::isReadyToStart() const
 {
@@ -279,11 +279,11 @@ bool ModuleBase_Operation::isReadyToStart() const
  * \brief Virtual method called when operation is started
  *
  * Virtual method called when operation started (see start() method for more description)
- * Default implementation calls corresponding slot and commits immediately.
+ * Default impl calls corresponding slot and commits immediately.
  */
 void ModuleBase_Operation::startOperation()
 {
-  std::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_PluginManager::get()->rootDocument();
+  boost::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_PluginManager::get()->rootDocument();
   myFeature = aDoc->addFeature(myOperationId.toStdString());
   if (myFeature) // TODO: generate an error if feature was not created
     myFeature->execute();

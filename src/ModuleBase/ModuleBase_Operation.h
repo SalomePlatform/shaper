@@ -14,7 +14,7 @@
 #include <QObject>
 #include <QString>
 
-#include <memory>
+#include <boost/shared_ptr.hpp>
 
 class SUIT_Study;
 class XGUI_Workshop;
@@ -76,7 +76,7 @@ public:
   // Operation processing.
   virtual QString operationId() const;
 
-  std::shared_ptr<ModelAPI_Feature> feature() const;
+  boost::shared_ptr<ModelAPI_Feature> feature() const;
 
   OperationState state() const;
   bool isRunning() const;
@@ -122,7 +122,7 @@ protected:
   void setExecStatus(const int);
   void setState(const OperationState);
 
-  std::shared_ptr<ModelAPI_Document> document() const;
+  boost::shared_ptr<ModelAPI_Document> document() const;
 
 private:
   int myFlags;               //!< Operation flags
@@ -131,7 +131,7 @@ private:
 
   //!< Next fields could be extracted into a subclass;
   QString myOperationId;
-  std::shared_ptr<ModelAPI_Feature> myFeature;
+  boost::shared_ptr<ModelAPI_Feature> myFeature;
 };
 
 #endif

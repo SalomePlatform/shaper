@@ -25,7 +25,17 @@ public:
 
 public slots:
   void onFeatureTriggered();
-  void onVisualizePreview();
+  /// SLOT, that is called after the operation is started. Perform some specific for module
+  /// actions, e.g. connect the sketch feature to the viewer selection and show the sketch preview.
+  void onOperationStarted();
+  /// SLOT, that is called after the operation is stopped. Disconnect the sketch feature
+  /// from the viewer selection and show the sketch preview.
+  void onOperationStopped(ModuleBase_Operation* theOperation);
+
+private:
+  /// Displays or erase the current operation preview, if it has it.
+  /// \param isDisplay the state whether the presentation should be displayed or erased
+  void visualizePreview(bool isDisplay);
 
 private:
   XGUI_Workshop* myWorkshop;

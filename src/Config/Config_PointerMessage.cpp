@@ -7,8 +7,8 @@
 
 #include <Config_PointerMessage.h>
 
-Config_PointerMessage::Config_PointerMessage(const Event_ID theId, const void* theParent)
-    : Event_Message(theId, theParent), myPointer(0)
+Config_PointerMessage::Config_PointerMessage(const Events_ID theId, const void* theParent)
+    : Events_Message(theId, theParent), myPointer(0)
 {
 
 }

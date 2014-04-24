@@ -18,10 +18,10 @@
 // standard definitions
 %include "typemaps.i"
 %include "std_string.i"
-%include <std_shared_ptr.i>
+//%include <std_shared_ptr.i>
 
 // boost pointers
-// %include <boost_shared_ptr.i>
+%include <boost_shared_ptr.i>
 %shared_ptr(ModelAPI_Document)
 %shared_ptr(ModelAPI_PluginManager)
 %shared_ptr(ModelAPI_Feature)

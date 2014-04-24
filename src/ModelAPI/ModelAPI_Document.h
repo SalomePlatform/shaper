@@ -7,7 +7,7 @@
 
 #include <ModelAPI.h>
 #include <string>
-#include <memory>
+#include <boost/shared_ptr.hpp>
 #include <vector>
 
 class ModelAPI_Feature;
@@ -68,24 +68,24 @@ public:
 
   //! Adds to the document the new feature of the given feature id
   //! \param creates feature and puts it in the document
-  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
+  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
 
   ///! Adds a new sub-document by the identifier, or returns existing one if it is already exist
-  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID) = 0;
+  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID) = 0;
 
   ///! Creates an iterator of the features by the specific groups
-  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Iterator> featuresIterator(
+  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Iterator> featuresIterator(
     const std::string theGroup) = 0;
 
   ///! Returns the id of hte document
   MODELAPI_EXPORT virtual const std::string& id() const = 0;
 
   //! Returns the feature in the group by the index (started from zero)
-  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Feature> 
+  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
     feature(const std::string& theGroupID, const int theIndex) = 0;
 
   //! Returns the index of feature in the group (zero based)
-  MODELAPI_EXPORT virtual int featureIndex(std::shared_ptr<ModelAPI_Feature> theFeature) = 0;
+  MODELAPI_EXPORT virtual int featureIndex(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
 
   ///! Returns the vector of groups already added to the document
   MODELAPI_EXPORT virtual const std::vector<std::string>& getGroups() const = 0;

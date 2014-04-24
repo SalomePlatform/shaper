@@ -22,4 +22,4 @@ typedef XGUI_Module* (*CREATE_FUNC)(XGUI_Workshop*);
 
 #define CREATE_MODULE "createModule"
 
-#endif //XGUI_Module
+#endif //XGUI_Module

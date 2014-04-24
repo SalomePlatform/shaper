@@ -7,7 +7,7 @@
 
 #include "ModelAPI.h"
 #include <string>
-#include <memory>
+#include <boost/shared_ptr.hpp>
 
 class ModelAPI_AttributeDocRef;
 class ModelAPI_AttributeDouble;
@@ -30,9 +30,9 @@ public:
   virtual void setName(std::string theName) = 0;
 
   /// Returns the attribute that references to another document
-  virtual std::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string theID) = 0;
+  virtual boost::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string theID) = 0;
   /// Returns the attribute that contains real value with double precision
-  virtual std::shared_ptr<ModelAPI_AttributeDouble> real(const std::string theID) = 0;
+  virtual boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string theID) = 0;
 
   /// Initializes object by the attributes: must be called just after the object is created
   /// for each attribute of the object
@@ -41,7 +41,7 @@ public:
   virtual void addAttribute(std::string theID, std::string theAttrType) = 0;
 
   /// Returns the document of this data
-  virtual std::shared_ptr<ModelAPI_Document> document() = 0;
+  virtual boost::shared_ptr<ModelAPI_Document> document() = 0;
 
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Data() {}

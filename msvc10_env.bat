@@ -121,7 +121,6 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @SET PATH=%PDIR%\swig-2.0.9\bin;%PATH%
 @REM -------------------------
 
-@REM -------------------------
 @REM BOOST
 @SET BOOST_ROOT_DIR=%PDIR%\boost-1.52.0
 @SET PATH=%BOOST_ROOT_DIR%\lib;%PATH%
@@ -129,6 +128,13 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
 @SET PATH=%ROOT_DIR%\install\plugins;%PATH%
+
+@REM -------------------------
+if "%GUI_ROOT_DIR%" == "" (
+  @SET GUI_ROOT_DIR=%ROOT_DIR%\SALOME\GUI\DEBUG\GUI_INSTALL
+)
+@REM -------------------------
+
 
 rem -------- Visual Studio --------------------
 rem Detect Visual Studio (either commercial or Express edition)

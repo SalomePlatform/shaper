@@ -31,19 +31,19 @@ using namespace std;
 string library(const string& theLibName);
 
 /// Manager that will be initialized from Model package, one per application
-std::shared_ptr<ModelAPI_PluginManager> MY_MANAGER;
+boost::shared_ptr<ModelAPI_PluginManager> MY_MANAGER;
 
 ModelAPI_PluginManager::ModelAPI_PluginManager()
 {
 }
 
 void ModelAPI_PluginManager::SetPluginManager(
-  std::shared_ptr<ModelAPI_PluginManager> theManager)
+  boost::shared_ptr<ModelAPI_PluginManager> theManager)
 {
   MY_MANAGER = theManager;
 }
 
-std::shared_ptr<ModelAPI_PluginManager> ModelAPI_PluginManager::get()
+boost::shared_ptr<ModelAPI_PluginManager> ModelAPI_PluginManager::get()
 {
   if (!MY_MANAGER) { // import Model library that implements this interface of ModelAPI
     loadLibrary("Model");

@@ -19,12 +19,12 @@ Handle(Model_Application) Model_Application::getApplication()
 }
 
 //=======================================================================
-const std::shared_ptr<Model_Document>& Model_Application::getDocument(string theDocID)
+const boost::shared_ptr<Model_Document>& Model_Application::getDocument(string theDocID)
 {
   if (myDocs.find(theDocID) != myDocs.end())
     return myDocs[theDocID];
 
-  std::shared_ptr<Model_Document> aNew(new Model_Document(theDocID));
+  boost::shared_ptr<Model_Document> aNew(new Model_Document(theDocID));
   myDocs[theDocID] = aNew;
   return myDocs[theDocID];
 }

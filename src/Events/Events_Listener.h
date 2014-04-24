@@ -1,25 +1,25 @@
-// File:	Event_Listener.hxx
+// File:	Events_Listener.hxx
 // Created:	Thu Mar 13 2014
 // Author:	Mikhail PONIKAROV
 
-#ifndef Event_Listener_HeaderFile
-#define Event_Listener_HeaderFile
+#ifndef Events_Listener_HeaderFile
+#define Events_Listener_HeaderFile
 
-#include <Event.h>
-class Event_Message;
+#include <Events.h>
+class Events_Message;
 
-/**\class Event_Listener
- * \ingroup EventLoop
+/**\class Events_Listener
+ * \ingroup EventsLoop
  * \brief Base interface for any event listener.
  *
  * If some object wants to listen some events it must inherit
  * this class and register in the Loop.
  */
-class EVENT_EXPORT Event_Listener {
+class EVENTS_EXPORT Events_Listener {
 
 public:
   //! This method is called by loop when the event is started to process.
-  virtual void processEvent(const Event_Message* theMessage) = 0;
+  virtual void processEvent(const Events_Message* theMessage) = 0;
 };
 
 #endif

@@ -61,23 +61,23 @@ public:
 
   //! Adds to the document the new feature of the given feature id
   //! \param creates feature and puts it in the document
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
 
   //! Returns the existing feature by the label
   //! \param theLabel base label of the feature
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> feature(TDF_Label& theLabel);
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> feature(TDF_Label& theLabel);
 
   //! Adds a new sub-document by the identifier, or returns existing one if it is already exist
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
 
   //! Creates an iterator of the features by the specific groups
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Iterator> featuresIterator(
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Iterator> featuresIterator(
     const std::string theGroup);
 
   MODEL_EXPORT virtual const std::string& id() const {return myID;}
 
   //! Returns the feature in the group by the index (started from zero)
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> 
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
     feature(const std::string& theGroupID, const int theIndex);
 
   ///! Returns the vector of groups already added to the document
@@ -85,7 +85,7 @@ public:
 
   //! Returns the index of feature in the group (zero based)
   //! \retruns -1 if not found
-  MODEL_EXPORT virtual int featureIndex(std::shared_ptr<ModelAPI_Feature> theFeature);
+  MODEL_EXPORT virtual int featureIndex(boost::shared_ptr<ModelAPI_Feature> theFeature);
 
 protected:
 
@@ -94,10 +94,10 @@ protected:
 
   //! Initializes feature with a unique name in this group (unique name is generated as 
   //! feature type + "_" + index
-  void setUniqueName(std::shared_ptr<ModelAPI_Feature> theFeature);
+  void setUniqueName(boost::shared_ptr<ModelAPI_Feature> theFeature);
 
   //! Adds to the document the new feature
-  void addFeature(const std::shared_ptr<ModelAPI_Feature> theFeature);
+  void addFeature(const boost::shared_ptr<ModelAPI_Feature> theFeature);
 
   //! Synchronizes myGroups, myGroupsNames, myFeatures and mySubs list with the updated document
   void synchronizeFeatures();
@@ -116,7 +116,7 @@ private:
   std::map<std::string, TDF_Label> myGroups;
   std::vector<std::string> myGroupsNames; ///< names of added groups to the document
   /// Features managed by this document: by group name
-  std::map<std::string, std::vector<std::shared_ptr<ModelAPI_Feature> > > myFeatures;
+  std::map<std::string, std::vector<boost::shared_ptr<ModelAPI_Feature> > > myFeatures;
   std::set<std::string> mySubs; ///< set of identifiers of sub-documents of this document
   /// transaction indexes (related to myTransactionsAfterSave) which were empty in this doc
   std::map<int, bool> myIsEmptyTr;

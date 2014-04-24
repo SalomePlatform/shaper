@@ -44,7 +44,7 @@ SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES} ${PROJECT_RESOURCES})
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI 
                     ${CMAKE_SOURCE_DIR}/src/Config
-                    ${CMAKE_SOURCE_DIR}/src/Event
+                    ${CMAKE_SOURCE_DIR}/src/Events
                     ${CMAKE_SOURCE_DIR}/src/ModuleBase
                     ${CMAKE_SOURCE_DIR}/src/ModelAPI
                     ${CMAKE_SOURCE_DIR}/src/SketchPlugin

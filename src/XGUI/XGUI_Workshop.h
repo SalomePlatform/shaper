@@ -2,7 +2,7 @@
 #define XGUI_WORKSHOP_H
 
 #include "XGUI.h"
-#include <Event_Listener.h>
+#include <Events_Listener.h>
 
 #include <QObject>
 #include <QMap>
@@ -15,6 +15,7 @@ class XGUI_Module;
 class XGUI_Workbench;
 class XGUI_SelectionMgr;
 class XGUI_Displayer;
+class XGUI_OperationMgr;
 class ModuleBase_Operation;
 class ModuleBase_PropPanelOperation;
 
@@ -25,7 +26,7 @@ class Config_PointerMessage;
  * \ingroup GUI
  * \brief Class which defines a configuration of the application (Workshop) and launches it.
  */
-class XGUI_EXPORT XGUI_Workshop: public QObject, public Event_Listener
+class XGUI_EXPORT XGUI_Workshop: public QObject, public Events_Listener
 {
 Q_OBJECT
 public:
@@ -48,14 +49,14 @@ public:
   //! Returns displayer
   XGUI_Displayer* displayer() const { return myDisplayer; }
 
+  //! ! Returns operation manager.
+  XGUI_OperationMgr* operationMgr() const { return myOperationMgr; }
+
   //! Creates and adds a new workbench (menu group) with the given name and returns it
   XGUI_Workbench* addWorkbench(const QString& theName);
 
-  //! Returns the current operation or NULL
-  ModuleBase_Operation* currentOperation() { return myCurrentOperation; }
-
-  //! Redefinition of Event_Listener method
-  virtual void processEvent(const Event_Message* theMessage);
+  //! Redefinition of Events_Listener method
+  virtual void processEvent(const Events_Message* theMessage);
 
 public slots:
   void updateCommandStatus();
@@ -71,9 +72,16 @@ public slots:
 protected:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
-  void fillPropertyPanel(ModuleBase_PropPanelOperation* theOperation);
   void connectWithOperation(ModuleBase_Operation* theOperation);
-  void setCurrentOperation(ModuleBase_Operation* theOperation);
+
+protected slots:
+  /// SLOT, that is called after the operation is started. Update workshop state according to
+  /// the started operation, e.g. visualizes the property panel and connect to it.
+  void onOperationStarted();
+  /// SLOT, that is called after the operation is stopped. Update workshop state, e.g.
+  /// hides the property panel and udpate the command status.
+  /// \param theOpertion a stopped operation
+  void onOperationStopped(ModuleBase_Operation* theOperation);
 
 private:
   void initMenu();
@@ -87,7 +95,7 @@ private:
   XGUI_SelectionMgr* mySelector;
   XGUI_Displayer* myDisplayer;
 
-  ModuleBase_Operation* myCurrentOperation;
+  XGUI_OperationMgr* myOperationMgr; ///< manager to manipulate through the operations
 };
 
 #endif

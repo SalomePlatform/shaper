@@ -21,7 +21,7 @@ bool Model_Iterator::more()
   return myIter.More() == Standard_True;
 }
 
-shared_ptr<ModelAPI_Feature> Model_Iterator::current()
+boost::shared_ptr<ModelAPI_Feature> Model_Iterator::current()
 {
   TDF_Label aLab = myIter.Value()->Label();
   return myDoc->feature(aLab);
@@ -51,10 +51,10 @@ int Model_Iterator::numIterationsLeft()
   return aResult;
 }
 
-bool Model_Iterator::isEqual(std::shared_ptr<ModelAPI_Feature> theFeature)
+bool Model_Iterator::isEqual(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
   return (myIter.Value()->Label() == 
-    dynamic_pointer_cast<Model_Data>(theFeature->data())->label()) == Standard_True;
+    boost::dynamic_pointer_cast<Model_Data>(theFeature->data())->label()) == Standard_True;
 
 }
 
@@ -62,6 +62,6 @@ Model_Iterator::Model_Iterator()
 {
 }
 
-Model_Iterator::Model_Iterator(std::shared_ptr<Model_Document> theDoc, TDF_Label theLab)
+Model_Iterator::Model_Iterator(boost::shared_ptr<Model_Document> theDoc, TDF_Label theLab)
   : myDoc(theDoc), myIter(theLab, TDataStd_Comment::GetID(), Standard_False)
 {}

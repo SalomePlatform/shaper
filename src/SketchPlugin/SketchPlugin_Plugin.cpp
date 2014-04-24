@@ -14,14 +14,14 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   ModelAPI_PluginManager::get()->registerPlugin(this);
 }
 
-shared_ptr<ModelAPI_Feature> SketchPlugin_Plugin::createFeature(string theFeatureID)
+boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Plugin::createFeature(string theFeatureID)
 {
   if (theFeatureID == "Sketch") {
-    return shared_ptr<ModelAPI_Feature>(new SketchPlugin_Sketch);
+    return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_Sketch);
   }
   /*else if (theFeatureID == "Point") {
     return shared_ptr<ModelAPI_Feature>(new SketchPlugin_Point);
   }*/
   // feature of such kind is not found
-  return shared_ptr<ModelAPI_Feature>();
+  return boost::shared_ptr<ModelAPI_Feature>();
 }

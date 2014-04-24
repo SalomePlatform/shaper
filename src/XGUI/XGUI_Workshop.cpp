@@ -12,13 +12,14 @@
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_Displayer.h"
+#include "XGUI_OperationMgr.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
 
-#include <Event_Loop.h>
+#include <Events_Loop.h>
 #include <ModuleBase_PropPanelOperation.h>
 #include <ModuleBase_Operation.h>
 #include <Config_FeatureMessage.h>
@@ -43,12 +44,15 @@
 
 XGUI_Workshop::XGUI_Workshop()
   : QObject(), 
-  myCurrentOperation(NULL),
   myPartSetModule(NULL)
 {
   myMainWindow = new XGUI_MainWindow();
   mySelector = new XGUI_SelectionMgr(this);
   myDisplayer = new XGUI_Displayer(myMainWindow->viewer());
+  myOperationMgr = new XGUI_OperationMgr(this);
+  connect(myOperationMgr, SIGNAL(operationStarted()),  this, SLOT(onOperationStarted()));
+  connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
+          this, SLOT(onOperationStopped(ModuleBase_Operation*)));
 }
 
 //******************************************************
@@ -61,11 +65,11 @@ void XGUI_Workshop::startApplication()
 {
   initMenu();
   //Initialize event listening
-  Event_Loop* aLoop = Event_Loop::loop();
+  Events_Loop* aLoop = Events_Loop::loop();
   //TODO(sbh): Implement static method to extract event id [SEID]
-  Event_ID aFeatureId = aLoop->eventByName("FeatureEvent");
+  Events_ID aFeatureId = aLoop->eventByName("FeatureEvent");
   aLoop->registerListener(this, aFeatureId);
-  Event_ID aPartSetId = aLoop->eventByName("PartSetModuleEvent");
+  Events_ID aPartSetId = aLoop->eventByName("PartSetModuleEvent");
   aLoop->registerListener(this, aPartSetId);
   activateModule();
   myMainWindow->show();
@@ -73,12 +77,12 @@ void XGUI_Workshop::startApplication()
   updateCommandStatus();
   onNew();
   // Testing of document creation
-  //std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  //std::shared_ptr<ModelAPI_Feature> aPoint1 = aMgr->rootDocument()->addFeature("Point");
-  //std::shared_ptr<ModelAPI_Feature> aPart = aMgr->rootDocument()->addFeature("Part");
+  //boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  //boost::shared_ptr<ModelAPI_Feature> aPoint1 = aMgr->rootDocument()->addFeature("Point");
+  //boost::shared_ptr<ModelAPI_Feature> aPart = aMgr->rootDocument()->addFeature("Part");
   //aPart->execute();
   //aMgr->setCurrentDocument(aPart->data()->docRef("PartDocument")->value());
-  //std::shared_ptr<ModelAPI_Feature> aPoint2 = aMgr->rootDocument()->addFeature("Point");
+  //boost::shared_ptr<ModelAPI_Feature> aPoint2 = aMgr->rootDocument()->addFeature("Point");
   //aPoint2 = aMgr->rootDocument()->addFeature("Point");
 
   //aPart = aMgr->rootDocument()->addFeature("Part");
@@ -138,9 +142,9 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 }
 
 //******************************************************
-void XGUI_Workshop::processEvent(const Event_Message* theMessage)
+void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 {
-  static Event_ID aFeatureId = Event_Loop::loop()->eventByName("FeatureEvent");
+  static Events_ID aFeatureId = Events_Loop::loop()->eventByName("FeatureEvent");
   if (theMessage->eventID() == aFeatureId) {
     const Config_FeatureMessage* aFeatureMsg =
         dynamic_cast<const Config_FeatureMessage*>(theMessage);
@@ -150,15 +154,14 @@ void XGUI_Workshop::processEvent(const Event_Message* theMessage)
   const Config_PointerMessage* aPartSetMsg =
       dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
-    ModuleBase_PropPanelOperation* aOperation =
+    ModuleBase_PropPanelOperation* anOperation =
         (ModuleBase_PropPanelOperation*)(aPartSetMsg->pointer());
-    setCurrentOperation(aOperation);
-    if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
-      myCurrentOperation->start();
-      myCurrentOperation->commit();
-      updateCommandStatus();
-    } else {
-      fillPropertyPanel(aOperation);
+
+    if (myOperationMgr->startOperation(anOperation)) {
+      if (anOperation->isPerformedImmediately()) {
+        anOperation->commit();
+        updateCommandStatus();
+      }
     }
     return;
   }
@@ -168,6 +171,36 @@ void XGUI_Workshop::processEvent(const Event_Message* theMessage)
   << "Catch message, but it can not be processed.";
 #endif
 
+}
+
+//******************************************************
+void XGUI_Workshop::onOperationStarted()
+{
+  ModuleBase_PropPanelOperation* aOperation =
+        (ModuleBase_PropPanelOperation*)(myOperationMgr->currentOperation());
+
+  if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
+  } else {
+    connectWithOperation(aOperation);
+    QWidget* aPropWidget = myMainWindow->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
+    qDeleteAll(aPropWidget->children());
+
+    myMainWindow->showPropertyPanel();
+
+    XGUI_WidgetFactory aFactory = XGUI_WidgetFactory(aOperation);
+    aFactory.createWidget(aPropWidget);
+    myMainWindow->setPropertyPannelTitle(aOperation->description());
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
+{
+  myMainWindow->hidePropertyPanel();
+  updateCommandStatus();
+
+  XGUI_MainMenu* aMenu = myMainWindow->menuObject();
+  aMenu->restoreCommandState();
 }
 
 /*
@@ -208,33 +241,6 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
 }
 
 /*
- *
- */
-void XGUI_Workshop::fillPropertyPanel(ModuleBase_PropPanelOperation* theOperation)
-{
-  connectWithOperation(theOperation);
-  QWidget* aPropWidget = myMainWindow->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
-  qDeleteAll(aPropWidget->children());
-  theOperation->start();
-  XGUI_WidgetFactory aFactory = XGUI_WidgetFactory(theOperation);
-  aFactory.createWidget(aPropWidget);
-  myMainWindow->setPropertyPannelTitle(theOperation->description());
-}
-
-void XGUI_Workshop::setCurrentOperation(ModuleBase_Operation* theOperation)
-{
-  //FIXME: Ask user about aborting of current operation?
-  if (myCurrentOperation) {
-    //TODO get isOperation from document
-    if (myCurrentOperation->isRunning())
-      myCurrentOperation->abort();
-
-    myCurrentOperation->deleteLater();
-  }
-  myCurrentOperation = theOperation;
-}
-
-/*
  * Makes a signal/slot connections between Property Panel
  * and given operation. The given operation becomes a
  * current operation and previous operation if exists
@@ -247,13 +253,7 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
   QPushButton* aCancelBtn = aPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
   connect(aCancelBtn, SIGNAL(clicked()), theOperation, SLOT(abort()));
 
-  connect(theOperation, SIGNAL(started()), myMainWindow, SLOT(showPropertyPanel()));
-  connect(theOperation, SIGNAL(stopped()), myMainWindow, SLOT(hidePropertyPanel()));
-  connect(theOperation, SIGNAL(stopped()), this, SLOT(updateCommandStatus()));
-
   XGUI_MainMenu* aMenu = myMainWindow->menuObject();
-  connect(theOperation, SIGNAL(stopped()), aMenu, SLOT(restoreCommandState()));
-
   XGUI_Command* aCommand = aMenu->feature(theOperation->operationId());
   //Abort operation on uncheck the command
   connect(aCommand, SIGNAL(toggled(bool)), theOperation, SLOT(setRunning(bool)));
@@ -306,8 +306,8 @@ void XGUI_Workshop::onSaveAs()
 void XGUI_Workshop::onUndo()
 {
   myMainWindow->objectBrowser()->setCurrentIndex(QModelIndex());
-  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
   aDoc->undo();
   updateCommandStatus();
 }
@@ -316,8 +316,8 @@ void XGUI_Workshop::onUndo()
 void XGUI_Workshop::onRedo()
 {
   myMainWindow->objectBrowser()->setCurrentIndex(QModelIndex());
-  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
   aDoc->redo();
   updateCommandStatus();
 }
@@ -400,7 +400,7 @@ void XGUI_Workshop::updateCommandStatus()
   QList<XGUI_Command*> aCommands = aMenuBar->features();
   QList<XGUI_Command*>::const_iterator aIt;
 
-  std::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   if (aMgr->hasRootDocument()) {
     XGUI_Command* aUndoCmd;
     XGUI_Command* aRedoCmd;
@@ -412,7 +412,7 @@ void XGUI_Workshop::updateCommandStatus()
       else // Enable all commands
         (*aIt)->enable();
     }
-    std::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+    boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
     aUndoCmd->setEnabled(aDoc->canUndo());
     aRedoCmd->setEnabled(aDoc->canRedo());
   } else {
