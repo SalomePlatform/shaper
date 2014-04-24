@@ -9,15 +9,15 @@
 #define PARTSET_MESSAGE_H_
 
 #include <Config.h>
-#include <Event_Message.h>
+#include <Events_Message.h>
 
 /*
  * A general class to pass pointers over the event loop.
  */
-class CONFIG_EXPORT Config_PointerMessage: public Event_Message
+class CONFIG_EXPORT Config_PointerMessage: public Events_Message
 {
 public:
-  Config_PointerMessage(const Event_ID theId, const void* theParent = 0);
+  Config_PointerMessage(const Events_ID theId, const void* theParent = 0);
   virtual ~Config_PointerMessage();
 
   void* pointer() const;

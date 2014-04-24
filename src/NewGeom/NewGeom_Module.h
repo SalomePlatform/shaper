@@ -1,16 +1,17 @@
 
 
-#ifndef SalomeModule_Module_H
-#define SalomeModule_Module_H
+#ifndef NewGeom_Module_H
+#define NewGeom_Module_H
 
+#include "NewGeom.h"
 #include <LightApp_Module.h>
 
-class SalomeModule_Module: public LightApp_Module
+class NewGeom_EXPORT NewGeom_Module: public LightApp_Module
 {
   Q_OBJECT
 public:
-  SalomeModule_Module();
-  virtual ~SalomeModule_Module();
+  NewGeom_Module();
+  virtual ~NewGeom_Module();
 
   virtual void initialize( CAM_Application* theApp);
   virtual void windows( QMap<int, int>& theWndMap) const;

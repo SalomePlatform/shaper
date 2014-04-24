@@ -57,6 +57,7 @@ call "%PDIR%\env_compile.bat"
 @SET PATH=%PDIR%\ftgl-2.1.3\bin;%PATH%
 @SET PATH=%PDIR%\freetype-2.4.11\bin;%PATH%
 @SET PATH=%PDIR%\gl2ps-1.3.8\bin;%PATH%
+@SET PATH=%PDIR%\qwt-5.2.1\lib;%PATH%
 @REM -------------------------
 
 IF "%ARCH%" == "Win64" (
@@ -71,4 +72,6 @@ IF "%ARCH%" == "Win64" (
 )
 
 @SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
-@SET PATH=%ROOT_DIR%\install\plugins;%PATH%
+@SET PATH=%ROOT_DIR%\install\bin;%ROOT_DIR%\install\plugins;%PATH%
+
+@SET LightAppConfig=%ROOT_DIR%\install\share\salome\resources\newgeom;%GUI_ROOT_DIR%\share\salome\resources\gui

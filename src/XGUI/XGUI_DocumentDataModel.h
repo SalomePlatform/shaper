@@ -6,7 +6,7 @@
 #include "XGUI_Constants.h"
 
 #include <QAbstractItemModel>
-#include <Event_Listener.h>
+#include <Events_Listener.h>
 
 #include <QList>
 
@@ -19,7 +19,7 @@ class XGUI_TopDataModel;
  * \brief This is a proxy data model for Object Browser (QTreeView).
  * It contains several sub-models for generation of each sub-part of data tree.
  */
-class XGUI_EXPORT XGUI_DocumentDataModel : public QAbstractItemModel, public Event_Listener
+class XGUI_EXPORT XGUI_DocumentDataModel : public QAbstractItemModel, public Events_Listener
 {
   Q_OBJECT
 public:
@@ -29,7 +29,7 @@ public:
   virtual ~XGUI_DocumentDataModel();
 
   // Event Listener method
-  virtual void processEvent(const Event_Message* theMessage);
+  virtual void processEvent(const Events_Message* theMessage);
 
 
   virtual QVariant data(const QModelIndex& theIndex, int theRole) const;

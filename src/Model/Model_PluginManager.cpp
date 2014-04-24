@@ -8,7 +8,7 @@
 #include <Model_Data.h>
 #include <Model_Document.h>
 #include <Model_Application.h>
-#include <Event_Loop.h>
+#include <Events_Loop.h>
 #include <Config_FeatureMessage.h>
 #include <Config_ModuleReader.h>
 
@@ -64,15 +64,15 @@ Model_PluginManager::Model_PluginManager()
 {
   myPluginsInfoLoaded = false;
   //TODO(sbh): Implement static method to extract event id [SEID]
-  static Event_ID aFeatureEvent = Event_Loop::eventByName("FeatureRegisterEvent");
+  static Events_ID aFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
 
   ModelAPI_PluginManager::SetPluginManager(boost::shared_ptr<ModelAPI_PluginManager>(this));
   // register the configuration reading listener
-  Event_Loop* aLoop = Event_Loop::loop();
+  Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, aFeatureEvent);
 }
 
-void Model_PluginManager::processEvent(const Event_Message* theMessage)
+void Model_PluginManager::processEvent(const Events_Message* theMessage)
 {
   const Config_FeatureMessage* aMsg =
     dynamic_cast<const Config_FeatureMessage*>(theMessage);

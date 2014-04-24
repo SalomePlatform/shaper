@@ -12,8 +12,8 @@
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
 #include <Config_WidgetReader.h>
-#include <Event_Loop.h>
-#include <Event_Message.h>
+#include <Events_Loop.h>
+#include <Events_Message.h>
 
 #include <QObject>
 #include <QString>
@@ -84,10 +84,10 @@ void PartSet_Module::onFeatureTriggered()
   aPartSetOp->setDescription(QString::fromStdString(aDescription));
 
   //TODO(sbh): Implement static method to extract event id [SEID]
-  static Event_ID aModuleEvent = Event_Loop::eventByName("PartSetModuleEvent");
+  static Events_ID aModuleEvent = Events_Loop::eventByName("PartSetModuleEvent");
   Config_PointerMessage aMessage(aModuleEvent, this);
   aMessage.setPointer(aPartSetOp);
-  Event_Loop::loop()->send(aMessage);
+  Events_Loop::loop()->send(aMessage);
 }
 
 /**
