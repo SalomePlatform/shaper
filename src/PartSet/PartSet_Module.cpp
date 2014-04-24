@@ -128,8 +128,12 @@ void PartSet_Module::visualizePreview(bool isDisplay)
   if (!aPreviewOp)
     return;
 
-  if (isDisplay)
-    myWorkshop->displayer()->Display(anOperation->feature(), aPreviewOp->preview());
-  else
+  if (isDisplay) {
+    myWorkshop->displayer()->LocalSelection(anOperation->feature(), aPreviewOp->preview(),
+                                            aPreviewOp->getSelectionMode());
+  }
+  else {
+    myWorkshop->displayer()->GlobalSelection(false);
     myWorkshop->displayer()->Erase(anOperation->feature(), aPreviewOp->preview());
+  }
 }

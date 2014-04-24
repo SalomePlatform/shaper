@@ -30,6 +30,10 @@ public:
 
   /// Returns the feature preview shape
   const TopoDS_Shape& preview() const;
+
+  /// Returns the operation local selection mode
+  /// \return the selection mode
+  virtual int getSelectionMode() const;
 };
 
 #endif

@@ -27,6 +27,10 @@ public:
 
   /// The sketch can not be created immediately, firstly a plane should be set
   virtual bool isPerformedImmediately() const;
+
+  /// Returns the operation local selection mode
+  /// \return the selection mode
+  virtual int getSelectionMode() const;
 };
 
 #endif

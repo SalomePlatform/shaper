@@ -30,17 +30,34 @@ public:
 
   /// Display the feature. Obtain the visualized object from the feature.
   /// \param theFeature a feature instance
-  void Display(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  void Display(boost::shared_ptr<ModelAPI_Feature> theFeature, const bool isUpdateViewer = true);
 
   /// Display the feature and a shape. This shape would be associated to the given feature
   /// \param theFeature a feature instance
-  /// \param theFeature a shape
-  void Display(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape);
+  /// \param theShape a shape
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  void Display(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape,
+               const bool isUpdateViewer = true);
+  
+  /// Display the shape and activate selection of sub-shapes
+  /// \param theFeature a feature instance
+  /// \param theShape a shape
+  /// \param theMode a local selection mode
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  void LocalSelection(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape,
+                      const int theMode, const bool isUpdateViewer = true);
 
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance
   /// \param theFeature a shape
-  void Erase(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape);
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  void Erase(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape,
+             const bool isUpdateViewer = true);
+
+  /// Deactivates selection of sub-shapes
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  void GlobalSelection(const bool isUpdateViewer = true);
 
 protected:
   XGUI_Viewer* myViewer; ///< the viewer where the objects should be visualized
