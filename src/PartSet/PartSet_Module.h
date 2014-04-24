@@ -24,7 +24,9 @@ public slots:
   void onFeatureTriggered();
   void onOperationStarted();
   void onOperationStopped(ModuleBase_Operation* theOperation);
-  void onVisualizePreview(bool isDisplay);
+
+private:
+  void visualizePreview(bool isDisplay);
 
 private:
   XGUI_Workshop* myWorkshop;

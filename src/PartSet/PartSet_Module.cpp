@@ -96,7 +96,7 @@ void PartSet_Module::onFeatureTriggered()
  * Slot that is called by the operation requiring of preview display or erase
  * \param isDisplay the display or erase state
 */
-void PartSet_Module::onVisualizePreview(bool isDisplay)
+void PartSet_Module::visualizePreview(bool isDisplay)
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   if (!anOperation)
@@ -118,9 +118,9 @@ void PartSet_Module::onOperationStarted()
 
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    connect(aPreviewOp, SIGNAL(visualizePreview(bool)), this, SLOT(onVisualizePreview(bool)));
     connect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
             aPreviewOp, SLOT(onViewSelectionChanged()));
+    visualizePreview(true);
   }
 }
 
@@ -132,8 +132,8 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    disconnect(aPreviewOp, SIGNAL(visualizePreview(bool)), this, SLOT(onVisualizePreview(bool)));
     disconnect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
                aPreviewOp, SLOT(onViewSelectionChanged()));
+    visualizePreview(false);
   }
 }

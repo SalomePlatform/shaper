@@ -26,14 +26,11 @@ void SketchPlugin_Sketch::execute()
 
 const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Sketch::preview()
 {
-  if (!SketchPlugin_Feature::preview())
-  {
+  boost::shared_ptr<GeomAPI_Pnt> anOrigin(new GeomAPI_Pnt(0, 0, 0));
+  boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(1, 0, 0));
+  boost::shared_ptr<GeomAPI_Shape> aFace = 
+    GeomAlgoAPI_FaceBuilder::square(anOrigin, aNormal, PLANE_SIZE);
+  setPreview(aFace);
 
-    boost::shared_ptr<GeomAPI_Pnt> anOrigin(new GeomAPI_Pnt(0, 0, 0));
-    boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(1, 0, 0));
-    boost::shared_ptr<GeomAPI_Shape> aFace = 
-      GeomAlgoAPI_FaceBuilder::square(anOrigin, aNormal, PLANE_SIZE);
-    setPreview(aFace);
-  }
-  return SketchPlugin_Feature::preview();
+  return getPreview();
 }
