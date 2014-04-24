@@ -1,4 +1,4 @@
-// File:        XGUI_Displayer.cxx
+// File:        XGUI_Displayer.cpp
 // Created:     20 Apr 2014
 // Author:      Natalia ERMOLAEVA
 

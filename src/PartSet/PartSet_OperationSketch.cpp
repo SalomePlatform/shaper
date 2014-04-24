@@ -1,3 +1,7 @@
+// File:        PartSet_OperationSketch.h
+// Created:     20 Apr 2014
+// Author:      Natalia ERMOLAEVA
+
 #include <PartSet_OperationSketch.h>
 
 #include <SketchPlugin_Feature.h>
@@ -14,17 +18,10 @@ PartSet_OperationSketch::PartSet_OperationSketch(const QString& theId,
 {
 }
 
-/*!
- * \brief Destructor
- */
 PartSet_OperationSketch::~PartSet_OperationSketch()
 {
 }
 
-/**
- * The sketch can not be created immediately, firstly a plane should be set
- * \return false value
- */
 bool PartSet_OperationSketch::isPerformedImmediately() const
 {
   return false;
