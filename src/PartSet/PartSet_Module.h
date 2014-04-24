@@ -28,6 +28,9 @@ public slots:
   /// SLOT, that is called after the operation is stopped. Disconnect the sketch feature
   /// from the viewer selection and show the sketch preview.
   void onOperationStopped(ModuleBase_Operation* theOperation);
+  /// SLOT, that is called by the selection in the viewer is changed.
+  /// The selection is sent to the current operation if it listen the selection.
+  void onViewSelectionChanged();
 
 private:
   /// Displays or erase the current operation preview, if it has it.

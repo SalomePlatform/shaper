@@ -231,6 +231,21 @@ void XGUI_Viewer::setGlobalSelection(const bool isUpdateViewer)
   }
 }
 
+void XGUI_Viewer::getSelectedObjects(AIS_ListOfInteractive& theList)
+{
+  theList.Clear();
+  for (myAISContext->InitSelected(); myAISContext->MoreSelected(); myAISContext->NextSelected())
+    theList.Append(myAISContext->SelectedInteractive());
+}
+
+void XGUI_Viewer::setObjectsSelected(const AIS_ListOfInteractive& theList)
+{
+  AIS_ListIteratorOfListOfInteractive aIt;
+  for (aIt.Initialize(theList); aIt.More(); aIt.Next())
+    myAISContext->AddOrRemoveSelected(aIt.Value(), false);
+  myAISContext->UpdateCurrentViewer();
+}
+
 /*! Sets hot button
  *\param theOper - hot operation
  *\param theState - adding state to state map operations.

@@ -15,6 +15,8 @@
 #include <Events_Loop.h>
 #include <Events_Message.h>
 
+#include <AIS_ListOfInteractive.hxx>
+
 #include <QObject>
 #include <QString>
 
@@ -37,6 +39,8 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
   connect(anOperationMgr, SIGNAL(operationStarted()), this, SLOT(onOperationStarted()));
   connect(anOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
+  connect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
+          this, SLOT(onViewSelectionChanged()));
 }
 
 PartSet_Module::~PartSet_Module()
@@ -97,11 +101,8 @@ void PartSet_Module::onOperationStarted()
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
 
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp) {
-    connect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
-            aPreviewOp, SLOT(onViewSelectionChanged()));
+  if (aPreviewOp)
     visualizePreview(true);
-  }
 }
 
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
@@ -109,12 +110,22 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   ModuleBase_PropPanelOperation* anOperation = dynamic_cast<ModuleBase_PropPanelOperation*>(theOperation);
   if (!anOperation)
     return;
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aPreviewOp)
+    visualizePreview(false);
+}
 
+void PartSet_Module::onViewSelectionChanged()
+{
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    disconnect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
-               aPreviewOp, SLOT(onViewSelectionChanged()));
-    visualizePreview(false);
+    XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+    if (aViewer) {
+      AIS_ListOfInteractive aList;
+      aViewer->getSelectedObjects(aList);
+      aPreviewOp->setSelectedObjects(aList);
+    }
   }
 }
 
