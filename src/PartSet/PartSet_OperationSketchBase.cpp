@@ -28,8 +28,3 @@ const TopoDS_Shape& PartSet_OperationSketchBase::preview() const
     boost::dynamic_pointer_cast<SketchPlugin_Feature>(feature());
   return aFeature->preview()->impl<TopoDS_Shape>();
 }
-
-int PartSet_OperationSketchBase::getSelectionMode() const
-{
-  return 0;
-}

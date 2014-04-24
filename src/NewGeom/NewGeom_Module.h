@@ -21,6 +21,10 @@ public slots:
   bool activateModule( SUIT_Study* theStudy);
   bool deactivateModule( SUIT_Study* theStudy);
 
+protected:
+  CAM_DataModel* createDataModel();
+
+
 private:
 
 };

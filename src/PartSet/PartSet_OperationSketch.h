@@ -31,6 +31,10 @@ public:
   /// Returns the operation local selection mode
   /// \return the selection mode
   virtual int getSelectionMode() const;
+
+  /// Gives the current selected objects to be processed by the operation
+  /// \param theList a list of interactive selected shapes
+  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList);
 };
 
 #endif

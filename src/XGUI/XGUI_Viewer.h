@@ -11,6 +11,8 @@
 #include <V3d_Viewer.hxx>
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Trihedron.hxx>
+#include <NCollection_List.hxx>
+#include <TopoDS_Shape.hxx>
 
 class XGUI_MainWindow;
 class QMdiSubWindow;
@@ -64,6 +66,22 @@ public:
   //! Deactivate local selection
   //! \param isUpdateViewer the state wether the viewer should be updated immediatelly
   void setGlobalSelection(const bool isUpdateViewer);
+
+  /// Return objects selected in 3D viewer
+  /// \param theList - list to be filled with selected objects
+  void  getSelectedObjects(AIS_ListOfInteractive& theList);
+
+  /// Return shapes selected in 3D viewer
+  /// \param theList - list to be filled with selected shapes
+  void getSelectedShapes(NCollection_List<TopoDS_Shape>& theList);
+
+  /// Selects objects in 3D viewer. Other selected objects are left as selected
+  /// \param theList - list objects to be selected
+  void  setObjectsSelected(const AIS_ListOfInteractive& theList);
+
+  /// Select the object in 3D viewer.
+  /// \param theIO - list objects to be selected
+  void setSelected(const Handle(AIS_InteractiveObject)& theIO) { myAISContext->SetSelected(theIO); }
 
   //! Trihedron 3d object shown in the viewer
   Handle(AIS_Trihedron) trihedron() const

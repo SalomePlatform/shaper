@@ -8,6 +8,7 @@
 #include "PartSet.h"
 
 #include <TopoDS_Shape.hxx>
+#include <NCollection_List.hxx>
 
 #include <ModuleBase_PropPanelOperation.h>
 #include <QObject>
@@ -33,7 +34,11 @@ public:
 
   /// Returns the operation local selection mode
   /// \return the selection mode
-  virtual int getSelectionMode() const;
+  virtual int getSelectionMode() const = 0;
+
+  /// Gives the current selected objects to be processed by the operation
+  /// \param a list of interactive selected objects
+  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList) = 0;
 };
 
 #endif

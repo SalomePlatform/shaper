@@ -11,9 +11,14 @@
 #include <boost/shared_ptr.hpp>
 
 #include <TopoDS_Shape.hxx>
+#include <AIS_InteractiveObject.hxx>
+
+#include <map>
+#include <vector>
 
 class XGUI_Viewer;
 class ModelAPI_Feature;
+
 
 /**\class XGUI_Displayer
  * \ingroup GUI
@@ -50,10 +55,8 @@ public:
 
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance
-  /// \param theFeature a shape
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void Erase(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape,
-             const bool isUpdateViewer = true);
+  void Erase(boost::shared_ptr<ModelAPI_Feature> theFeature, const bool isUpdateViewer = true);
 
   /// Deactivates selection of sub-shapes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -61,6 +64,7 @@ public:
 
 protected:
   XGUI_Viewer* myViewer; ///< the viewer where the objects should be visualized
+  std::map<boost::shared_ptr<ModelAPI_Feature>, std::vector<Handle(AIS_InteractiveObject)> > myFeature2AISObjectMap;
 };
 
 #endif

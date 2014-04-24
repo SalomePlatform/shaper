@@ -34,3 +34,8 @@ boost::shared_ptr<GeomAPI_Dir> GeomAPI_Pln::direction()
   const gp_Dir& aDir = impl<gp_Pln>().Axis().Direction();
   return boost::shared_ptr<GeomAPI_Dir>(new GeomAPI_Dir(aDir.X(), aDir.Y(), aDir.Z()));
 }
+
+void GeomAPI_Pln::coefficients(double& theA, double& theB, double& theC, double& theD)
+{
+  impl<gp_Pln>().Coefficients(theA, theB, theC, theD);
+}

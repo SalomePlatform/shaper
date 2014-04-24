@@ -4,7 +4,13 @@
 
 #include <PartSet_OperationSketch.h>
 
-#include <SketchPlugin_Feature.h>
+#include <SketchPlugin_Sketch.h>
+#include <ModelAPI_Data.h>
+#include <ModelAPI_AttributeDouble.h>
+#include <GeomAlgoAPI_FaceBuilder.h>
+
+#include <AIS_Shape.hxx>
+#include <AIS_ListOfInteractive.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -30,4 +36,34 @@ bool PartSet_OperationSketch::isPerformedImmediately() const
 int PartSet_OperationSketch::getSelectionMode() const
 {
   return TopAbs_FACE;
+}
+
+void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList)
+{
+  if (theList.IsEmpty())
+    return;
+
+  // get selected shape
+  const TopoDS_Shape& aShape = theList.First();
+  boost::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
+  aGShape->setImpl(new TopoDS_Shape(aShape));
+
+  // get plane parameters
+  boost::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
+
+  // set plane parameters to feature
+  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+  double anA, aB, aC, aD;
+  aPlane->coefficients(anA, aB, aC, aD);
+
+  boost::shared_ptr<ModelAPI_AttributeDouble> anAttr;
+
+  aData->real(SKETCH_ATTR_PLANE_A)->setValue(anA);
+  aData->real(SKETCH_ATTR_PLANE_B)->setValue(aB);
+  aData->real(SKETCH_ATTR_PLANE_C)->setValue(aC);
+  aData->real(SKETCH_ATTR_PLANE_D)->setValue(aD);
+
+  //emit viewPlaneChanged();
+
+  commit();
 }
