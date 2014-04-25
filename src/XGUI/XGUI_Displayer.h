@@ -12,6 +12,7 @@
 
 #include <TopoDS_Shape.hxx>
 #include <AIS_InteractiveObject.hxx>
+#include <AIS_InteractiveContext.hxx>
 
 #include <map>
 #include <vector>
@@ -29,9 +30,13 @@ class XGUI_EXPORT XGUI_Displayer
 public:
   /// Constructor
   /// \param theViewer the viewer
-  XGUI_Displayer(XGUI_Viewer* theViewer);
+  XGUI_Displayer(const Handle(AIS_InteractiveContext)& theAIS);
   /// Destructor
   virtual ~XGUI_Displayer();
+
+  /// Set AIS_InteractiveContext object in case if it was changed
+  /// or can not be initialized in constructor
+  void setAISContext(const Handle(AIS_InteractiveContext)& theAIS);
 
   /// Display the feature. Obtain the visualized object from the feature.
   /// \param theFeature a feature instance
@@ -62,8 +67,22 @@ public:
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void GlobalSelection(const bool isUpdateViewer = true);
 
+  /// Activate local selection
+  /// \param theAIS the list of objects
+  /// \param theMode the selection mode
+  /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
+  void setLocalSelection(const AIS_ListOfInteractive& theAISObjects, const int theMode,
+                         const bool isUpdateViewer);
+  /// Deactivate local selection
+  /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
+  void setGlobalSelection(const bool isUpdateViewer);
+
+  /// Returns currently installed AIS_InteractiveContext
+  Handle(AIS_InteractiveContext) AISContext() const { return myAISContext; }
+
 protected:
-  XGUI_Viewer* myViewer; ///< the viewer where the objects should be visualized
+  ///< the viewer where the objects should be visualized
+  Handle(AIS_InteractiveContext) myAISContext;
   std::map<boost::shared_ptr<ModelAPI_Feature>, std::vector<Handle(AIS_InteractiveObject)> > myFeature2AISObjectMap;
 };
 

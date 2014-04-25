@@ -190,46 +190,6 @@ QMdiSubWindow* XGUI_Viewer::createView(V3d_TypeOfView theType)
   return aWnd;
 }
 
-void XGUI_Viewer::setLocalSelection(const AIS_ListOfInteractive& theAISObjects, const int theMode,
-                                    const bool isUpdateViewer)
-{
-  Handle(AIS_InteractiveContext) ic = AISContext();
-
-  // Open local context if there is no one
-  bool allObjects = false; // calculate by AIS shape
-  if (!ic->HasOpenedContext()) {
-    ic->ClearCurrents(false);
-    ic->OpenLocalContext(allObjects, true, true);
-  }
-
-  // Activate selection of objects from prs
-  AIS_ListIteratorOfListOfInteractive aIter(theAISObjects);
-  for (; aIter.More(); aIter.Next()) {
-    Handle(AIS_InteractiveObject) anAIS = aIter.Value();
-    if (!anAIS.IsNull()) {
-      if (anAIS->IsKind(STANDARD_TYPE(AIS_Shape))) {
-        ic->Load(anAIS, -1, false);
-        ic->Activate(anAIS, AIS_Shape::SelectionMode((TopAbs_ShapeEnum)theMode));
-      }
-      else if (anAIS->DynamicType() != STANDARD_TYPE(AIS_Trihedron)) {
-        ic->Load(anAIS, -1, false);
-        ic->Activate(anAIS, theMode);
-      }
-    }
-  }
-  if (isUpdateViewer)
-    ic->UpdateCurrentViewer();
-}
-
-void XGUI_Viewer::setGlobalSelection(const bool isUpdateViewer)
-{
-  Handle(AIS_InteractiveContext) ic = AISContext();
-  if (!ic.IsNull()) {
-    ic->CloseAllContexts(false);
-    if (isUpdateViewer)
-      ic->UpdateCurrentViewer();
-  }
-}
 
 void XGUI_Viewer::getSelectedObjects(AIS_ListOfInteractive& theList)
 {

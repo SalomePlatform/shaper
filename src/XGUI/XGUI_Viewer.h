@@ -57,16 +57,6 @@ public:
     return myAISContext;
   }
 
-  //! Activate local selection
-  //! \param theAIS the list of objects
-  //! \param theMode the selection mode
-  //! \param isUpdateViewer the state wether the viewer should be updated immediatelly
-  void setLocalSelection(const AIS_ListOfInteractive& theAISObjects, const int theMode,
-                         const bool isUpdateViewer);
-  //! Deactivate local selection
-  //! \param isUpdateViewer the state wether the viewer should be updated immediatelly
-  void setGlobalSelection(const bool isUpdateViewer);
-
   /// Return objects selected in 3D viewer
   /// \param theList - list to be filled with selected objects
   void  getSelectedObjects(AIS_ListOfInteractive& theList);
@@ -166,7 +156,9 @@ private:
 private:
   XGUI_MainWindow* myMainWindow;
 
-  Handle(V3d_Viewer) myV3dViewer;Handle(AIS_Trihedron) myTrihedron;Handle(AIS_InteractiveContext) myAISContext;
+  Handle(V3d_Viewer) myV3dViewer;
+  Handle(AIS_Trihedron) myTrihedron;
+  Handle(AIS_InteractiveContext) myAISContext;
 
   XGUI::InteractionStyle myInteractionStyle;
 

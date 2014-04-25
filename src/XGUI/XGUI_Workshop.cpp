@@ -49,11 +49,16 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myPartSetModule(NULL),
   mySalomeConnector(theConnector),
   myPropertyPanelDock(0),
-  myObjectBrowser(0)
+  myObjectBrowser(0),
+  myDisplayer(0)
 {
   myMainWindow = mySalomeConnector? 0 : new XGUI_MainWindow();
+
+  // In SALOME viewer is accessible only when module is initialized
+  // and in SALOME mode myDisplayer object has to be created later
+  // So, displayer will be created on demand.
+
   mySelector = new XGUI_SelectionMgr(this);
-  myDisplayer = myMainWindow? new XGUI_Displayer(myMainWindow->viewer()) : 0;
   myOperationMgr = new XGUI_OperationMgr(this);
   connect(myOperationMgr, SIGNAL(operationStarted()),  this, SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
@@ -589,4 +594,18 @@ void XGUI_Workshop::onFeatureTriggered()
     if (!aId.isNull())
       myPartSetModule->launchOperation(aId);
   }
+}
+
+//******************************************************
+XGUI_Displayer* XGUI_Workshop::displayer() const
+{
+  // In SALOME viewer is accessible only when module is initialized
+  // and in SALOME mode myDisplayer object has to be created later (on demand)
+  if (!myDisplayer) {
+    XGUI_Workshop* that = (XGUI_Workshop*)this;
+    that->myDisplayer = isSalomeMode() ?
+      new XGUI_Displayer(salomeConnector()->AISContext()):
+      new XGUI_Displayer(myMainWindow->viewer()->AISContext());
+  }
+  return myDisplayer;
 }

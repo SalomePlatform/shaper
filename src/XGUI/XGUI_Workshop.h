@@ -52,7 +52,7 @@ public:
   XGUI_SelectionMgr* selector() const { return mySelector; }
 
   //! Returns displayer
-  XGUI_Displayer* displayer() const { return myDisplayer; }
+  XGUI_Displayer* displayer() const;
 
   //! ! Returns operation manager.
   XGUI_OperationMgr* operationMgr() const { return myOperationMgr; }

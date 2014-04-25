@@ -7,7 +7,10 @@
 
 #include <LightApp_Application.h>
 #include <OCCViewer_ViewModel.h>
+
 #include <SUIT_Desktop.h>
+#include <SUIT_ViewManager.h>
+
 #include <QtxActionMenuMgr.h>
 
 
@@ -158,4 +161,16 @@ QAction* NewGeom_Module::command(const QString& theId) const
     return action(aId);
   }
   return 0;
+}
+
+//******************************************************
+Handle(AIS_InteractiveContext) NewGeom_Module::AISContext() const
+{
+  Handle(AIS_InteractiveContext) aContext;
+  SUIT_ViewManager* aMgr = application()->viewManager(OCCViewer_Viewer::Type());
+  if (aMgr) {
+    OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(aMgr->getViewModel());
+    aContext = aViewer->getAISContext();
+  }
+  return aContext;
 }

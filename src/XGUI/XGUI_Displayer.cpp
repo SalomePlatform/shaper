@@ -13,9 +13,9 @@
 
 #include <AIS_Shape.hxx>
 
-XGUI_Displayer::XGUI_Displayer(XGUI_Viewer* theViewer)
-: myViewer(theViewer)
+XGUI_Displayer::XGUI_Displayer(const Handle(AIS_InteractiveContext)& theAIS)
 {
+  myAISContext = theAIS;
 }
 
 XGUI_Displayer::~XGUI_Displayer()
@@ -30,7 +30,7 @@ void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
 void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
                              const TopoDS_Shape& theShape, const bool isUpdateViewer)
 {
-  Handle(AIS_InteractiveContext) aContext = myViewer->AISContext();
+  Handle(AIS_InteractiveContext) aContext = AISContext();
 
   Handle(AIS_Shape) anAIS = new AIS_Shape(theShape);
   std::vector<Handle(AIS_InteractiveObject)> aDispAIS;
@@ -55,7 +55,7 @@ void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
   std::vector<Handle(AIS_InteractiveObject)> aDispAIS = myFeature2AISObjectMap[theFeature];
   std::vector<Handle(AIS_InteractiveObject)>::const_iterator anIt = aDispAIS.begin(),
                                                              aLast = aDispAIS.end();
-  Handle(AIS_InteractiveContext) aContext = myViewer->AISContext();
+  Handle(AIS_InteractiveContext) aContext = AISContext();
   for (; anIt != aLast; anIt++) {
     Handle(AIS_InteractiveObject) anAIS = *anIt;
     Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
@@ -72,7 +72,7 @@ void XGUI_Displayer::LocalSelection(boost::shared_ptr<ModelAPI_Feature> theFeatu
                                     const TopoDS_Shape& theShape,
                                     const int theMode, const bool isUpdateViewer)
 {
-  Handle(AIS_InteractiveContext) aContext = myViewer->AISContext();
+  Handle(AIS_InteractiveContext) aContext = AISContext();
 
   Handle(AIS_Shape) anAIS = new AIS_Shape(theShape);
   std::vector<Handle(AIS_InteractiveObject)> aDispAIS;
@@ -85,11 +85,51 @@ void XGUI_Displayer::LocalSelection(boost::shared_ptr<ModelAPI_Feature> theFeatu
 
   AIS_ListOfInteractive anAISList;
   anAISList.Append(anAIS);
-  myViewer->setLocalSelection(anAISList, theMode, true);
+  setLocalSelection(anAISList, theMode, true);
 }
 
 void XGUI_Displayer::GlobalSelection(const bool isUpdateViewer)
 {
-  myViewer->setGlobalSelection(true);
+  setGlobalSelection(true);
 }
 
+void XGUI_Displayer::setLocalSelection(const AIS_ListOfInteractive& theAISObjects, const int theMode,
+                                    const bool isUpdateViewer)
+{
+  Handle(AIS_InteractiveContext) ic = AISContext();
+
+  // Open local context if there is no one
+  bool allObjects = false; // calculate by AIS shape
+  if (!ic->HasOpenedContext()) {
+    ic->ClearCurrents(false);
+    ic->OpenLocalContext(allObjects, true, true);
+  }
+
+  // Activate selection of objects from prs
+  AIS_ListIteratorOfListOfInteractive aIter(theAISObjects);
+  for (; aIter.More(); aIter.Next()) {
+    Handle(AIS_InteractiveObject) anAIS = aIter.Value();
+    if (!anAIS.IsNull()) {
+      if (anAIS->IsKind(STANDARD_TYPE(AIS_Shape))) {
+        ic->Load(anAIS, -1, false);
+        ic->Activate(anAIS, AIS_Shape::SelectionMode((TopAbs_ShapeEnum)theMode));
+      }
+      else if (anAIS->DynamicType() != STANDARD_TYPE(AIS_Trihedron)) {
+        ic->Load(anAIS, -1, false);
+        ic->Activate(anAIS, theMode);
+      }
+    }
+  }
+  if (isUpdateViewer)
+    ic->UpdateCurrentViewer();
+}
+
+void XGUI_Displayer::setGlobalSelection(const bool isUpdateViewer)
+{
+  Handle(AIS_InteractiveContext) ic = AISContext();
+  if (!ic.IsNull()) {
+    ic->CloseAllContexts(false);
+    if (isUpdateViewer)
+      ic->UpdateCurrentViewer();
+  }
+}

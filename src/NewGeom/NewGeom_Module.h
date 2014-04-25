@@ -12,6 +12,10 @@
 
 class XGUI_Workshop;
 
+/** 
+* An implementation of SALOME connector class for implementation of
+* XGUI functionality as a module of SALOME
+*/
 class NewGeom_EXPORT NewGeom_Module: public LightApp_Module, public XGUI_SalomeConnector
 {
   Q_OBJECT
@@ -50,6 +54,9 @@ public:
   virtual QString commandId(const QAction* theCmd) const;
 
   virtual QAction* command(const QString& theId) const;
+
+  //! Returns AIS_InteractiveContext from current OCCViewer
+  virtual Handle(AIS_InteractiveContext) AISContext() const;
 
 public slots:
   bool activateModule( SUIT_Study* theStudy);

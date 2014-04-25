@@ -28,6 +28,8 @@ SET(PROJECT_LIBRARIES
     Config
 	XGUI
 	${QT_LIBRARIES}
+	${suit}
+	${std}
 	${LightApp}
 	${CAM}
 	${OCCViewer}
