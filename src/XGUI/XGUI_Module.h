@@ -2,6 +2,7 @@
 #define XGUI_Module_H
 
 #include <XGUI_Workshop.h>
+#include <QString>
 
 class XGUI_Command;
 
@@ -10,6 +11,7 @@ class XGUI_Module
 public:
   virtual void createFeatures() = 0;
   virtual void featureCreated(XGUI_Command*) = 0;
+  virtual void launchOperation(const QString& theCmdId) = 0;
 
   virtual ~XGUI_Module() {};
 };

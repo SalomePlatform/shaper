@@ -25,6 +25,7 @@ SET(PROJECT_HEADERS
 	XGUI_OperationMgr.h
     XGUI_DataTreeModel.h
     XGUI_SelectionMgr.h
+    XGUI_SalomeConnector.h
 )
 
 SET(PROJECT_AUTOMOC 

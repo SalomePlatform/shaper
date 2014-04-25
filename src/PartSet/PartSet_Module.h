@@ -23,6 +23,8 @@ public:
   virtual void featureCreated(XGUI_Command* theFeature);
   std::string featureFile(const std::string&);
 
+  virtual void launchOperation(const QString& theCmdId);
+
 public slots:
   void onFeatureTriggered();
   /// SLOT, that is called after the operation is started. Perform some specific for module

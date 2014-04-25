@@ -13,6 +13,7 @@
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_OperationMgr.h"
+#include "XGUI_SalomeConnector.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
@@ -31,6 +32,7 @@
 #include <QMdiSubWindow>
 #include <QPushButton>
 #include <QDockWidget>
+#include <QLayout>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -42,13 +44,16 @@
 #include <dlfcn.h>
 #endif
 
-XGUI_Workshop::XGUI_Workshop()
+XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   : QObject(), 
-  myPartSetModule(NULL)
+  myPartSetModule(NULL),
+  mySalomeConnector(theConnector),
+  myPropertyPanelDock(0),
+  myObjectBrowser(0)
 {
-  myMainWindow = new XGUI_MainWindow();
+  myMainWindow = mySalomeConnector? 0 : new XGUI_MainWindow();
   mySelector = new XGUI_SelectionMgr(this);
-  myDisplayer = new XGUI_Displayer(myMainWindow->viewer());
+  myDisplayer = myMainWindow? new XGUI_Displayer(myMainWindow->viewer()) : 0;
   myOperationMgr = new XGUI_OperationMgr(this);
   connect(myOperationMgr, SIGNAL(operationStarted()),  this, SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
@@ -72,9 +77,10 @@ void XGUI_Workshop::startApplication()
   Events_ID aPartSetId = aLoop->eventByName("PartSetModuleEvent");
   aLoop->registerListener(this, aPartSetId);
   activateModule();
-  myMainWindow->show();
-
-  updateCommandStatus();
+  if (myMainWindow) {
+    myMainWindow->show();
+    updateCommandStatus();
+  }
   onNew();
   // Testing of document creation
   //boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
@@ -92,6 +98,21 @@ void XGUI_Workshop::startApplication()
 //******************************************************
 void XGUI_Workshop::initMenu()
 {
+  if (isSalomeMode()) {
+    // Create only Undo, Redo commands
+    salomeConnector()->addEditCommand("UNDO_CMD", 
+                                      tr("Undo"), tr("Undo last command"),
+                                      QIcon(":pictures/undo.png"), 
+                                      false, this, SLOT(onUndo()),
+                                      QKeySequence::Undo);
+    salomeConnector()->addEditCommand("REDO_CMD", 
+                                      tr("Redo"), tr("Redo last command"),
+                                      QIcon(":pictures/redo.png"), 
+                                      false, this, SLOT(onRedo()),
+                                      QKeySequence::Redo);
+    salomeConnector()->addEditMenuSeparator();
+    return;
+  }
   XGUI_Workbench* aPage = myMainWindow->menuObject()->generalPage();
 
   // File commands group
@@ -179,17 +200,16 @@ void XGUI_Workshop::onOperationStarted()
   ModuleBase_PropPanelOperation* aOperation =
         (ModuleBase_PropPanelOperation*)(myOperationMgr->currentOperation());
 
-  if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
-  } else {
+  if(!aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
     connectWithOperation(aOperation);
-    QWidget* aPropWidget = myMainWindow->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
+    QWidget* aPropWidget = myPropertyPanelDock->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
     qDeleteAll(aPropWidget->children());
 
-    myMainWindow->showPropertyPanel();
+    showPropertyPanel();
 
     ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aOperation);
     aFactory.createWidget(aPropWidget);
-    myMainWindow->setPropertyPannelTitle(aOperation->description());
+    setPropertyPannelTitle(aOperation->description());
   }
 }
 
@@ -202,11 +222,13 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
     updateCommandStatus();
   } else {
-    myMainWindow->hidePropertyPanel();
+    hidePropertyPanel();
     updateCommandStatus();
 
+  if (myMainWindow) {
     XGUI_MainMenu* aMenu = myMainWindow->menuObject();
     aMenu->restoreCommandState();
+  }
   }
 }
 
@@ -222,29 +244,39 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
     return;
   }
   //Find or create Workbench
-  XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
   QString aWchName = QString::fromStdString(theMessage->workbenchId());
-  XGUI_Workbench* aPage = aMenuBar->findWorkbench(aWchName);
-  if (!aPage) {
-    aPage = addWorkbench(aWchName);
+  if (isSalomeMode()) {
+    salomeConnector()->addFeature(aWchName,
+                                  QString::fromStdString(theMessage->id()),
+                                  QString::fromStdString(theMessage->text()),
+                                  QString::fromStdString(theMessage->tooltip()),
+                                  QIcon(theMessage->icon().c_str()),
+                                  false, this, 
+                                  SLOT(onFeatureTriggered()), QKeySequence());
+  } else {
+    XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
+    XGUI_Workbench* aPage = aMenuBar->findWorkbench(aWchName);
+    if (!aPage) {
+      aPage = addWorkbench(aWchName);
+    }
+    //Find or create Group
+    QString aGroupName = QString::fromStdString(theMessage->groupId());
+    XGUI_MenuGroupPanel* aGroup = aPage->findGroup(aGroupName);
+    if (!aGroup) {
+      aGroup = aPage->addGroup(aGroupName);
+    }
+    bool isUsePropPanel = theMessage->isUseInput();
+    //Create feature...
+    XGUI_Command* aCommand = aGroup->addFeature(QString::fromStdString(theMessage->id()),
+                                                QString::fromStdString(theMessage->text()),
+                                                QString::fromStdString(theMessage->tooltip()),
+                                                QIcon(theMessage->icon().c_str()),
+                                                QKeySequence(), isUsePropPanel);
+    
+    connect(aCommand,                   SIGNAL(toggled(bool)),
+            myMainWindow->menuObject(), SLOT(onFeatureChecked(bool)));
+    myPartSetModule->featureCreated(aCommand);
   }
-  //Find or create Group
-  QString aGroupName = QString::fromStdString(theMessage->groupId());
-  XGUI_MenuGroupPanel* aGroup = aPage->findGroup(aGroupName);
-  if (!aGroup) {
-    aGroup = aPage->addGroup(aGroupName);
-  }
-  bool isUsePropPanel = theMessage->isUseInput();
-  //Create feature...
-  XGUI_Command* aCommand = aGroup->addFeature(QString::fromStdString(theMessage->id()),
-                                              QString::fromStdString(theMessage->text()),
-                                              QString::fromStdString(theMessage->tooltip()),
-                                              QIcon(theMessage->icon().c_str()),
-                                              QKeySequence(), isUsePropPanel);
-  
-  connect(aCommand,                   SIGNAL(toggled(bool)),
-          myMainWindow->menuObject(), SLOT(onFeatureChecked(bool)));
-  myPartSetModule->featureCreated(aCommand);
 }
 
 /*
@@ -254,17 +286,20 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
  */
 void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
 {
-  QDockWidget* aPanel = myMainWindow->findChild<QDockWidget*>(XGUI::PROP_PANEL);
-  QPushButton* aOkBtn = aPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
+  QPushButton* aOkBtn = myPropertyPanelDock->findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
   connect(aOkBtn, SIGNAL(clicked()), theOperation, SLOT(commit()));
-  QPushButton* aCancelBtn = aPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
+  QPushButton* aCancelBtn = myPropertyPanelDock->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
   connect(aCancelBtn, SIGNAL(clicked()), theOperation, SLOT(abort()));
 
-  XGUI_MainMenu* aMenu = myMainWindow->menuObject();
-  XGUI_Command* aCommand = aMenu->feature(theOperation->operationId());
+  QAction* aCommand = 0;
+  if (isSalomeMode()) {
+    aCommand = salomeConnector()->command(theOperation->operationId());
+  } else {
+    XGUI_MainMenu* aMenu = myMainWindow->menuObject();
+    aCommand = aMenu->feature(theOperation->operationId());
+  }
   //Abort operation on uncheck the command
   connect(aCommand, SIGNAL(toggled(bool)), theOperation, SLOT(setRunning(bool)));
-
 }
 
 //******************************************************
@@ -277,15 +312,17 @@ void XGUI_Workshop::onExit()
 void XGUI_Workshop::onNew()
 {
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  if (myMainWindow->objectBrowser() == 0) {
-    myMainWindow->createDockWidgets();
-    mySelector->connectObjectBrowser(myMainWindow->objectBrowser());
+  if (objectBrowser() == 0) {
+    createDockWidgets();
+    mySelector->connectObjectBrowser(objectBrowser());
   }
-  myMainWindow->showObjectBrowser();
-  myMainWindow->showPythonConsole();
-  QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
-  aWnd->showMaximized();
-  updateCommandStatus();
+  showObjectBrowser();
+  if (!isSalomeMode()) {
+    myMainWindow->showPythonConsole();
+    QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
+    aWnd->showMaximized();
+    updateCommandStatus();
+  }
   QApplication::restoreOverrideCursor();
 }
 
@@ -312,7 +349,7 @@ void XGUI_Workshop::onSaveAs()
 //******************************************************
 void XGUI_Workshop::onUndo()
 {
-  myMainWindow->objectBrowser()->setCurrentIndex(QModelIndex());
+  objectBrowser()->setCurrentIndex(QModelIndex());
   boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
   aDoc->undo();
@@ -322,7 +359,7 @@ void XGUI_Workshop::onUndo()
 //******************************************************
 void XGUI_Workshop::onRedo()
 {
-  myMainWindow->objectBrowser()->setCurrentIndex(QModelIndex());
+  objectBrowser()->setCurrentIndex(QModelIndex());
   boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
   aDoc->redo();
@@ -402,6 +439,8 @@ bool XGUI_Workshop::activateModule()
 //******************************************************
 void XGUI_Workshop::updateCommandStatus()
 {
+  if (isSalomeMode()) // TODO: update commands in SALOME
+    return;
   XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
 
   QList<XGUI_Command*> aCommands = aMenuBar->features();
@@ -431,5 +470,123 @@ void XGUI_Workshop::updateCommandStatus()
       else 
         (*aIt)->disable();
     }
+  }
+}
+
+//******************************************************
+QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
+{
+  QDockWidget* aObjDock = new QDockWidget(theParent);
+  aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  aObjDock->setWindowTitle(tr("Object browser"));
+  myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
+  aObjDock->setWidget(myObjectBrowser);
+  return aObjDock;
+}
+
+//******************************************************
+QDockWidget* XGUI_Workshop::createPropertyPanel(QWidget* theParent)
+{
+  QDockWidget* aPropPanel = new QDockWidget(theParent);
+  aPropPanel->setWindowTitle(tr("Property Panel"));
+  QAction* aViewAct = aPropPanel->toggleViewAction();
+  aPropPanel->setObjectName(XGUI::PROP_PANEL);
+
+  QWidget* aContent = new QWidget(aPropPanel);
+  QVBoxLayout* aMainLay = new QVBoxLayout(aContent);
+  aMainLay->setContentsMargins(3, 3, 3, 3);
+  aPropPanel->setWidget(aContent);
+
+  QFrame* aFrm = new QFrame(aContent);
+  aFrm->setFrameStyle(QFrame::Sunken);
+  aFrm->setFrameShape(QFrame::Panel);
+  QHBoxLayout* aBtnLay = new QHBoxLayout(aFrm);
+  aBtnLay->setContentsMargins(0, 0, 0, 0);
+  aMainLay->addWidget(aFrm);
+
+  QPushButton* aBtn = new QPushButton(QIcon(":pictures/button_help.png"), "", aFrm);
+  aBtn->setFlat(true);
+  aBtnLay->addWidget(aBtn);
+  aBtnLay->addStretch(1);
+  aBtn = new QPushButton(QIcon(":pictures/button_ok.png"), "", aFrm);
+  aBtn->setObjectName(XGUI::PROP_PANEL_OK);
+  aBtn->setFlat(true);
+  aBtnLay->addWidget(aBtn);
+  aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
+  aBtn->setObjectName(XGUI::PROP_PANEL_CANCEL);
+  aBtn->setFlat(true);
+  aBtnLay->addWidget(aBtn);
+
+  QWidget* aCustomWidget = new QWidget(aContent);
+  aCustomWidget->setObjectName(XGUI::PROP_PANEL_WDG);
+  aMainLay->addWidget(aCustomWidget);
+  aMainLay->addStretch(1);
+
+  return aPropPanel;
+}
+
+//******************************************************
+void XGUI_Workshop::setPropertyPannelTitle(const QString& theTitle)
+{
+  myPropertyPanelDock->setWindowTitle(theTitle);
+}
+
+//******************************************************
+/*
+ * Creates dock widgets, places them in corresponding area
+ * and tabifies if necessary.
+ */
+void XGUI_Workshop::createDockWidgets()
+{
+  QMainWindow* aDesktop = isSalomeMode()? salomeConnector()->desktop() :
+                                          myMainWindow;
+  QDockWidget* aObjDock = createObjectBrowser(aDesktop);
+  aDesktop->addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
+  myPropertyPanelDock = createPropertyPanel(aDesktop);
+  aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanelDock);
+  hidePropertyPanel(); //<! Invisible by default
+  hideObjectBrowser();
+  aDesktop->tabifyDockWidget(aObjDock, myPropertyPanelDock);
+}
+
+//******************************************************
+void XGUI_Workshop::showPropertyPanel()
+{
+  QAction* aViewAct = myPropertyPanelDock->toggleViewAction();
+  //<! Restore ability to close panel from the window's menu
+  aViewAct->setEnabled(true);
+  myPropertyPanelDock->show();
+  myPropertyPanelDock->raise();
+}
+
+//******************************************************
+void XGUI_Workshop::hidePropertyPanel()
+{
+  QAction* aViewAct = myPropertyPanelDock->toggleViewAction();
+  //<! Do not allow to show empty property panel
+  aViewAct->setEnabled(false);
+  myPropertyPanelDock->hide();
+}
+
+//******************************************************
+void XGUI_Workshop::showObjectBrowser()
+{
+  myObjectBrowser->parentWidget()->show();
+}
+
+//******************************************************
+void XGUI_Workshop::hideObjectBrowser()
+{
+  myObjectBrowser->parentWidget()->hide();
+}
+
+//******************************************************
+void XGUI_Workshop::onFeatureTriggered()
+{
+  QAction* aCmd = dynamic_cast<QAction*>(sender());
+  if (aCmd) {
+    QString aId = salomeConnector()->commandId(aCmd);
+    if (!aId.isNull())
+      myPartSetModule->launchOperation(aId);
   }
 }

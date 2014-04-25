@@ -6,7 +6,6 @@
 
 class XGUI_MainMenu;
 class XGUI_Viewer;
-class XGUI_ObjectsBrowser;
 class QMdiArea;
 class PyConsole_EnhConsole;
 
@@ -29,12 +28,6 @@ public:
     return myMenuBar;
   }
 
-  //! Returns Object browser
-  XGUI_ObjectsBrowser* objectBrowser() const
-  {
-    return myObjectBrowser;
-  }
-
   //! Returns MDI area
   QMdiArea* mdiArea() const;
 
@@ -44,25 +37,12 @@ public:
     return myViewer;
   }
 
-  // Creates Dock widgets: Object broewser and Property panel
-  void createDockWidgets();
-  void setPropertyPannelTitle(const QString& theTitle);
-
 public slots:
   void showPythonConsole();
   void hidePythonConsole();
-  void showPropertyPanel();
-  void hidePropertyPanel();
-  void showObjectBrowser();
-  void hideObjectBrowser();
 
 private:
-  QDockWidget* createObjectBrowser();
-  QDockWidget* createPropertyPanel();
-
   XGUI_MainMenu* myMenuBar;
-  XGUI_ObjectsBrowser* myObjectBrowser;
-  QDockWidget* myPropertyPanelDock;
 
   XGUI_Viewer* myViewer;
 
