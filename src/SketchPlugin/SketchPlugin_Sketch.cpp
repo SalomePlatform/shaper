@@ -46,14 +46,9 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Sketch::preview()
   return getPreview();
 }
 
-void SketchPlugin_Sketch::setActive(boost::shared_ptr<SketchPlugin_Sketch> theSketch)
+const void SketchPlugin_Sketch::addSub(const boost::shared_ptr<ModelAPI_Feature>& theFeature)
 {
-  MY_ACITVE_SKETCH = theSketch;
-}
-
-boost::shared_ptr<SketchPlugin_Sketch> SketchPlugin_Sketch::active()
-{
-  return MY_ACITVE_SKETCH;
+  boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature)->setSketch(this);
 }
 
 void SketchPlugin_Sketch::addPlane(double theX, double theY, double theZ,

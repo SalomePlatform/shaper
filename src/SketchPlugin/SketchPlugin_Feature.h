@@ -24,6 +24,11 @@ public:
   /// \return the built preview
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview() = 0;
 
+  /// Adds sub-feature of the higher level feature (sub-element of the sketch)
+  /// \param theFeature sub-feature
+  SKETCHPLUGIN_EXPORT virtual const void addSub(
+    const boost::shared_ptr<ModelAPI_Feature>& theFeature) = 0;
+
 protected:
   /// Set the shape to the internal preview field
   /// \param theShape a preview shape
@@ -31,9 +36,16 @@ protected:
   /// Return the shape from the internal preview field
   /// \return theShape a preview shape
   const boost::shared_ptr<GeomAPI_Shape>& getPreview() const;
+  /// Sets the higher-level feature for the sub-feature (sketch for line)
+  void setSketch(SketchPlugin_Sketch* theSketch) {mySketch = theSketch;}
+  /// Returns the sketch of this feature
+  SketchPlugin_Sketch* sketch() {return mySketch;}
+
+  friend class SketchPlugin_Sketch;
 
 private:
   boost::shared_ptr<GeomAPI_Shape> myPreview; ///< the preview shape
+  SketchPlugin_Sketch* mySketch; /// sketch that contains this feature
 };
 
 #endif

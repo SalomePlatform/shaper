@@ -24,6 +24,7 @@ public:
   double y() const;
   /// returns Z coordinate
   double z() const;
+
 };
 
 #endif

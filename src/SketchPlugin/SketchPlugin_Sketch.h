@@ -43,13 +43,10 @@ public:
   /// Returns the sketch preview
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
-  /// Sets the sketch as active. All features and features previews 
-  /// will be connected to this sketch.
-  SKETCHPLUGIN_EXPORT static void setActive(boost::shared_ptr<SketchPlugin_Sketch> theSketch);
-
-  /// Returns the currently active sketch. All features and features previews 
-  /// will be connected to this sketch.
-  SKETCHPLUGIN_EXPORT static boost::shared_ptr<SketchPlugin_Sketch> active();
+  /// Adds sub-feature of the higher level feature (sub-element of the sketch)
+  /// \param theFeature sub-feature
+  SKETCHPLUGIN_EXPORT virtual const void addSub(
+    const boost::shared_ptr<ModelAPI_Feature>& theFeature);
 
   /// Converts a 2D sketch space point into point in 3D space
   SKETCHPLUGIN_EXPORT boost::shared_ptr<GeomAPI_Pnt> to3D(

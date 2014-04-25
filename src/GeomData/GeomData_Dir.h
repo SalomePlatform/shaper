@@ -9,6 +9,9 @@
 #include "GeomDataAPI_Dir.h"
 #include <TDataStd_RealArray.hxx>
 #include <TDF_Label.hxx>
+#include <boost/shared_ptr.hpp>
+
+class GeomAPI_Dir;
 
 /**\class GeomData_Dir
  * \ingroup DataModel
@@ -27,6 +30,8 @@ public:
   GEOMDATA_EXPORT virtual double y() const;
   /// Returns the Z double value
   GEOMDATA_EXPORT virtual double z() const;
+  /// Returns the direction of this attribute
+  GEOMDATA_EXPORT boost::shared_ptr<GeomAPI_Dir> dir();
 
 protected:
   /// Initializes attributes

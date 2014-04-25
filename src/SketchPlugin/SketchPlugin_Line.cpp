@@ -30,7 +30,7 @@ void SketchPlugin_Line::execute()
 
 const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Line::preview()
 {
-  boost::shared_ptr<SketchPlugin_Sketch> aSketch = SketchPlugin_Sketch::active();
+  SketchPlugin_Sketch* aSketch = sketch();
   // compute a start point in 3D view
   boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(LINE_ATTR_START));

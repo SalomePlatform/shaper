@@ -3,6 +3,8 @@
 // Author:      Mikhail PONIKAROV
 
 #include "GeomData_Dir.h"
+#include "GeomAPI_Dir.h"
+#include <gp_Dir.hxx>
 
 using namespace std;
 
@@ -26,6 +28,12 @@ double GeomData_Dir::y() const
 double GeomData_Dir::z() const
 {
   return myCoords->Value(2);
+}
+
+boost::shared_ptr<GeomAPI_Dir> GeomData_Dir::dir()
+{
+  return boost::shared_ptr<GeomAPI_Dir>(new GeomAPI_Dir(
+    myCoords->Value(0), myCoords->Value(1), myCoords->Value(2)));
 }
 
 GeomData_Dir::GeomData_Dir(TDF_Label& theLabel)
