@@ -8,7 +8,7 @@
 #include "XGUI_Workbench.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_Viewer.h"
-#include "XGUI_WidgetFactory.h"
+#include "ModuleBase_WidgetFactory.h"
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_Displayer.h"
@@ -187,7 +187,7 @@ void XGUI_Workshop::onOperationStarted()
 
     myMainWindow->showPropertyPanel();
 
-    XGUI_WidgetFactory aFactory = XGUI_WidgetFactory(aOperation);
+    ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aOperation);
     aFactory.createWidget(aPropWidget);
     myMainWindow->setPropertyPannelTitle(aOperation->description());
   }

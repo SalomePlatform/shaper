@@ -27,6 +27,9 @@ const static char* WDG_TOOLBOX_BOX = "box";
 const static char* WDG_SWITCH = "switch";
 const static char* WDG_SWITCH_CASE = "case";
 
+//Specific widget containers
+const static char* WDG_POINT_SELECTOR = "point_selector";
+
 const static char* _ID = "id";
 //const static char* WORKBENCH_ID = "id";
 //const static char* GROUP_ID = "id";

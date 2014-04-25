@@ -1,5 +1,6 @@
 #include "SketchPlugin_Plugin.h"
 #include "SketchPlugin_Sketch.h"
+#include "SketchPlugin_Line.h"
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
 
@@ -19,9 +20,9 @@ boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Plugin::createFeature(string th
   if (theFeatureID == "Sketch") {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_Sketch);
   }
-  /*else if (theFeatureID == "Point") {
-    return shared_ptr<ModelAPI_Feature>(new SketchPlugin_Point);
-  }*/
+  else if (theFeatureID == "SketchLine") {
+    return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_Line);
+  }
   // feature of such kind is not found
   return boost::shared_ptr<ModelAPI_Feature>();
 }

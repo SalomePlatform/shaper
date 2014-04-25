@@ -7,12 +7,16 @@
 
 #include "ModuleBase_Operation.h"
 
+#include "ModuleBase_WidgetCustom.h"
+
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
+
+#include <GeomDataAPI_Point2D.h>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -262,6 +266,27 @@ void ModuleBase_Operation::storeReal(double theValue)
   boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   boost::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(anId.toStdString());
   aReal->setValue(theValue);
+}
+
+/*!
+ * \brief Stores a real value in model.
+ * \param theValue - to store
+ *
+ * Public slot. Passes theValue into the model.
+ */
+void ModuleBase_Operation::storeCustomValue()
+{
+  if(!myFeature){
+    #ifdef _DEBUG
+    qDebug() << "ModuleBase_Operation::storeCustom: " <<
+        "trying to store value without opening a transaction.";
+    #endif
+    return;
+  }
+
+  ModuleBase_WidgetCustom* aCustom = dynamic_cast<ModuleBase_WidgetCustom*>(sender());
+  if (aCustom)
+    aCustom->store(myFeature);
 }
 
 /*!

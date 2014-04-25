@@ -1,5 +1,6 @@
 #include <PartSet_Module.h>
 #include <PartSet_OperationSketch.h>
+#include <PartSet_OperationSketchLine.h>
 
 #include <ModuleBase_Operation.h>
 
@@ -80,7 +81,15 @@ void PartSet_Module::onFeatureTriggered()
   ModuleBase_PropPanelOperation* aPartSetOp;
   if (aCmdId == "Sketch" ) {
     aPartSetOp = new PartSet_OperationSketch(aCmdId, this);
-  } else {
+  }
+  else if(aCmdId == "SketchLine") {
+    ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+    boost::shared_ptr<ModelAPI_Feature> aSketchFeature;
+    if (anOperation)
+      aSketchFeature = anOperation->feature();
+    aPartSetOp = new PartSet_OperationSketchLine(aCmdId, this, aSketchFeature);
+  }
+  else {
     aPartSetOp = new ModuleBase_PropPanelOperation(aCmdId, this);
   }
   aPartSetOp->setXmlRepresentation(QString::fromStdString(aXmlCfg));

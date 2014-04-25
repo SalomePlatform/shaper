@@ -1,20 +1,22 @@
 /*
- * XGUI_WidgetFactory.cpp
+ * ModuleBase_WidgetFactory.cpp
  *
  *  Created on: Apr 3, 2014
  *      Author: sbh
  */
 
-#include <XGUI_WidgetFactory.h>
+#include <ModuleBase_WidgetFactory.h>
 
-#include <XGUI_SwitchWidget.h>
+#include <ModuleBase_WidgetSwitch.h>
 
 #include <ModuleBase_PropPanelOperation.h>
+#include <ModuleBase_WidgetPoint2D.h>
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
 
 #include <QWidget>
 #include <QHBoxLayout>
+#include <QGridLayout>
 #include <QSpinBox>
 #include <QMetaProperty>
 #include <QLabel>
@@ -29,18 +31,18 @@
 #include <cfloat>
 #include <climits>
 
-XGUI_WidgetFactory::XGUI_WidgetFactory(ModuleBase_PropPanelOperation* theOperation)
+ModuleBase_WidgetFactory::ModuleBase_WidgetFactory(ModuleBase_PropPanelOperation* theOperation)
     : myOperation(theOperation)
 {
   QString aXml = myOperation->xmlRepresentation();
   myWidgetApi = new Config_WidgetAPI(aXml.toStdString());
 }
 
-XGUI_WidgetFactory::~XGUI_WidgetFactory()
+ModuleBase_WidgetFactory::~ModuleBase_WidgetFactory()
 {
 }
 
-void XGUI_WidgetFactory::createWidget(QWidget* theParent)
+void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
 {
   if (!myWidgetApi->toChildWidget())
     return;
@@ -70,7 +72,7 @@ void XGUI_WidgetFactory::createWidget(QWidget* theParent)
         QWidget* aPage = new QWidget(aWidget);
         createWidget(aPage);
         if (aWdgType == WDG_SWITCH) {
-          XGUI_SwitchWidget* aSwitch = qobject_cast<XGUI_SwitchWidget*>(aWidget);
+          ModuleBase_WidgetSwitch* aSwitch = qobject_cast<ModuleBase_WidgetSwitch*>(aWidget);
           aSwitch->addPage(aPage, aPageName);
         } else if (aWdgType == WDG_TOOLBOX){
           QToolBox* aToolbox = qobject_cast<QToolBox*>(aWidget);
@@ -82,7 +84,7 @@ void XGUI_WidgetFactory::createWidget(QWidget* theParent)
   theParent->setLayout(aWidgetLay);
 }
 
-QWidget* XGUI_WidgetFactory::labelControl(QWidget* theParent)
+QWidget* ModuleBase_WidgetFactory::labelControl(QWidget* theParent)
 {
   QWidget* result = new QWidget(theParent);
   QVBoxLayout* aLabelLay = new QVBoxLayout(result);
@@ -95,23 +97,27 @@ QWidget* XGUI_WidgetFactory::labelControl(QWidget* theParent)
   return result;
 }
 
-QWidget* XGUI_WidgetFactory::createWidgetByType(const std::string& theType, QWidget* theParent)
+QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType, QWidget* theParent)
 {
   QWidget* result = NULL;
   if (theType == WDG_DOUBLEVALUE) {
     result = doubleSpinBoxControl();
   } else if (theType == WDG_INFO) {
     result = labelControl(theParent);
-  } else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
+  }
+  else if (theType == WDG_POINT_SELECTOR) {
+    result = pointSelectorControl(theParent);
+  }
+  else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
   }
 #ifdef _DEBUG
-  else { qDebug() << "XGUI_WidgetFactory::fillWidget: find bad widget type"; }
+  else { qDebug() << "ModuleBase_WidgetFactory::fillWidget: find bad widget type"; }
 #endif
   return result;
 }
 
-QWidget* XGUI_WidgetFactory::createContainer(const std::string& theType, QWidget* theParent)
+QWidget* ModuleBase_WidgetFactory::createContainer(const std::string& theType, QWidget* theParent)
 {
   QWidget* result = NULL;
   if (theType == WDG_GROUP || theType == WDG_CHECK_GROUP) {
@@ -121,17 +127,17 @@ QWidget* XGUI_WidgetFactory::createContainer(const std::string& theType, QWidget
   } else if (theType == WDG_TOOLBOX) {
     result = new QToolBox(theParent);
   } else if (theType == WDG_SWITCH) {
-    result = new XGUI_SwitchWidget(theParent);
+    result = new ModuleBase_WidgetSwitch(theParent);
   } else if (theType == WDG_TOOLBOX_BOX || theType == WDG_SWITCH_CASE) {
     result = NULL;
   }
 #ifdef _DEBUG
-  else { qDebug() << "XGUI_WidgetFactory::fillWidget: find bad container type"; }
+  else { qDebug() << "ModuleBase_WidgetFactory::fillWidget: find bad container type"; }
 #endif
   return result;
 }
 
-QWidget* XGUI_WidgetFactory::doubleSpinBoxControl()
+QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl()
 {
   QWidget* result = new QWidget();
   QHBoxLayout* aControlLay = new QHBoxLayout(result);
@@ -179,17 +185,30 @@ QWidget* XGUI_WidgetFactory::doubleSpinBoxControl()
   return result;
 }
 
-bool XGUI_WidgetFactory::connectWidget(QWidget* theWidget,  const QString& theType)
+QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
+{
+  ModuleBase_WidgetPoint2D* aWidget = new ModuleBase_WidgetPoint2D(theParent,
+                       qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME)), myWidgetApi->widgetId());
+  connectWidget(aWidget, WDG_POINT_SELECTOR);
+  return aWidget->getControl();
+}
+
+bool ModuleBase_WidgetFactory::connectWidget(QObject* theWidget,  const QString& theType)
 {
   bool result = false;
   if (theType == WDG_DOUBLEVALUE) {
     result = QObject::connect(theWidget, SIGNAL(valueChanged(double)), 
                               myOperation, SLOT(storeReal(double)));
   }
+  if (theType == WDG_POINT_SELECTOR) {
+    ModuleBase_WidgetCustom* aCustom = dynamic_cast<ModuleBase_WidgetCustom*>(theWidget);
+    result = QObject::connect(aCustom, SIGNAL(valuesChanged()), 
+                              myOperation, SLOT(storeCustomValue()));
+  }
   return result;
 }
 
-QString XGUI_WidgetFactory::qs(const std::string& theStdString) const
+QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const
 {
   return QString::fromStdString(theStdString);
 }

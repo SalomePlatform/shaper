@@ -38,6 +38,11 @@ public:
   /// Returns the sketch preview
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
+  /// Adds sub-feature of the higher level feature (sub-element of the sketch)
+  /// \param theFeature sub-feature
+  SKETCHPLUGIN_EXPORT virtual const void addSub(
+    const boost::shared_ptr<ModelAPI_Feature>& theFeature) {};
+
   /// Use plugin manager for features creation
   SketchPlugin_Line();
 };

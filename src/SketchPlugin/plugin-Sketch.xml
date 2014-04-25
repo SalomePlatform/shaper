@@ -2,8 +2,12 @@
   <workbench id="Sketch">
     <group id="Basic">
       <feature id="Sketch" text="New sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
-        <label text="Natasha, please provide a text for the label" tooltip="Natasha, please provide a text for the tooltip"/> 
+        <label text="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch"/> 
       <!--icon=":pictures/x_point.png"-->
+      </feature>
+      <feature id="SketchLine" text="Line" tooltip="Create a new line" icon=":icons/line.png">
+        <point_selector id="StartPoint" title="Start point" tooltip="Start point of the line"/>
+        <point_selector id="EndPoint" title="End point" tooltip="End point of the line"/>
       </feature>
     </group>
   </workbench>
