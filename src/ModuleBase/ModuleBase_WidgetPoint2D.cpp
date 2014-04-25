@@ -15,6 +15,9 @@
 #include <QDoubleSpinBox>
 #include <QLabel>
 
+#include <cfloat>
+#include <climits>
+
 ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent, QString theTitle,
                                                    const std::string& theFeatureAttributeID)
 : ModuleBase_WidgetCustom(theParent), myFeatureAttributeID(theFeatureAttributeID)
