@@ -13,6 +13,8 @@
 #include <ModuleBase_PropPanelOperation.h>
 #include <QObject>
 
+class GeomAPI_Shape;
+
 /*!
   \class PartSet_OperationSketchBase
   * \brief The base operation for the sketch features.
@@ -30,7 +32,7 @@ public:
   virtual ~PartSet_OperationSketchBase();
 
   /// Returns the feature preview shape
-  const TopoDS_Shape& preview() const;
+  boost::shared_ptr<GeomAPI_Shape> preview() const;
 
   /// Returns the operation local selection mode
   /// \return the selection mode

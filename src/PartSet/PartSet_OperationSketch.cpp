@@ -30,11 +30,6 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 {
 }
 
-bool PartSet_OperationSketch::isPerformedImmediately() const
-{
-  return false;
-}
-
 int PartSet_OperationSketch::getSelectionMode() const
 {
   return TopAbs_FACE;

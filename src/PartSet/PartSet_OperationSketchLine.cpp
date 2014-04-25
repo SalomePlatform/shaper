@@ -23,9 +23,9 @@ PartSet_OperationSketchLine::~PartSet_OperationSketchLine()
 {
 }
 
-bool PartSet_OperationSketchLine::isPerformedImmediately() const
+bool PartSet_OperationSketchLine::isGranted() const
 {
-  return false;
+  return true;
 }
 
 int PartSet_OperationSketchLine::getSelectionMode() const

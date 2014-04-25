@@ -27,8 +27,9 @@ public:
   /// Destructor
   virtual ~PartSet_OperationSketchLine();
 
-  /// The sketch can not be created immediately, firstly a plane should be set
-  virtual bool isPerformedImmediately() const;
+   /// Returns that this operator can be started above already running one.
+   /// The runned operation should be the sketch feature modified operation
+  virtual bool isGranted() const;
 
   /// Returns the operation local selection mode
   /// \return the selection mode

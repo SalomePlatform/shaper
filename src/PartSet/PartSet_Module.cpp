@@ -16,6 +16,8 @@
 #include <Events_Loop.h>
 #include <Events_Message.h>
 
+#include <GeomAPI_Shape.h>
+
 #include <AIS_ListOfInteractive.hxx>
 
 #include <QObject>
@@ -162,8 +164,10 @@ void PartSet_Module::visualizePreview(bool isDisplay)
     return;
 
   if (isDisplay) {
-    myWorkshop->displayer()->LocalSelection(anOperation->feature(), aPreviewOp->preview(),
-                                            aPreviewOp->getSelectionMode());
+    boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview();
+    if (aPreview)
+      myWorkshop->displayer()->LocalSelection(anOperation->feature(),
+                                   aPreview->impl<TopoDS_Shape>(), aPreviewOp->getSelectionMode());
   }
   else {
     myWorkshop->displayer()->GlobalSelection(false);

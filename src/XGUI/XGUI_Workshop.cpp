@@ -179,7 +179,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
         (ModuleBase_PropPanelOperation*)(aPartSetMsg->pointer());
 
     if (myOperationMgr->startOperation(anOperation)) {
-      if (anOperation->isPerformedImmediately()) {
+      if (anOperation->xmlRepresentation().isEmpty()) {
         anOperation->commit();
         updateCommandStatus();
       }

@@ -22,9 +22,9 @@ PartSet_OperationSketchBase::~PartSet_OperationSketchBase()
 {
 }
 
-const TopoDS_Shape& PartSet_OperationSketchBase::preview() const
+boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview() const
 {
   boost::shared_ptr<SketchPlugin_Feature> aFeature = 
     boost::dynamic_pointer_cast<SketchPlugin_Feature>(feature());
-  return aFeature->preview()->impl<TopoDS_Shape>();
+  return aFeature->preview();
 }
