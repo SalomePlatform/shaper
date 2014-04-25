@@ -7,21 +7,31 @@
 
 #include "ModelAPI.h"
 #include <string>
+#include <boost/shared_ptr.hpp>
+
+class ModelAPI_Feature;
 
 /**\class ModelAPI_Attribute
  * \ingroup DataModel
  * \brief Generic attribute of the Object.
  */
-class MODELAPI_EXPORT ModelAPI_Attribute
+class ModelAPI_Attribute
 {
+  ///< needed here to emit signal that feature changed on change of the attribute
+  boost::shared_ptr<ModelAPI_Feature> myFeature;
 public:
   
   /// Returns the type of this class of attributes, not static method
-  virtual std::string attributeType() = 0;
+  MODELAPI_EXPORT virtual std::string attributeType() = 0;
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_Attribute() {}
+  MODELAPI_EXPORT virtual ~ModelAPI_Attribute() {}
 
+  MODELAPI_EXPORT void setFeature(const boost::shared_ptr<ModelAPI_Feature>& theFeature)
+    {myFeature = theFeature;}
+
+  MODELAPI_EXPORT const boost::shared_ptr<ModelAPI_Feature>& feature()
+  {return myFeature;}
 protected:
   /// Objects are created for features automatically
   ModelAPI_Attribute(){}

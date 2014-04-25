@@ -223,10 +223,11 @@ void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFea
   TDF_Label aGroupLab = groupLabel(aGroup);
   TDF_Label anObjLab = aGroupLab.NewChild();
   boost::shared_ptr<Model_Data> aData(new Model_Data);
+  aData->setFeature(theFeature);
   aData->setLabel(anObjLab);
   boost::shared_ptr<ModelAPI_Document> aThis = Model_Application::getApplication()->getDocument(myID);
-  aData->setDocument(aThis);
   theFeature->setData(aData);
+  theFeature->setDoc(aThis);
   setUniqueName(theFeature);
   theFeature->initAttributes();
   // keep the feature ID to restore document later correctly
@@ -237,7 +238,7 @@ void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFea
 
   // event: feature is added
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);
-  ModelAPI_FeatureUpdatedMessage aMsg(aThis, theFeature, anEvent);
+  Model_FeatureUpdatedMessage aMsg(theFeature, anEvent);
   Events_Loop::loop()->send(aMsg);
 }
 
@@ -256,8 +257,8 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(TDF_Label& theLabel)
 
 int Model_Document::featureIndex(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
-  if (theFeature->data()->document().get() != this) {
-    return theFeature->data()->document()->featureIndex(theFeature);
+  if (theFeature->document().get() != this) {
+    return theFeature->document()->featureIndex(theFeature);
   }
   boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
   Handle(TDataStd_Integer) aFeatureIndex;
@@ -370,7 +371,7 @@ void Model_Document::synchronizeFeatures()
     myGroups.erase(aGroupName);
     aGroupNamesIter = myGroupsNames.erase(aGroupNamesIter);
     // say that features were deleted from group
-    ModelAPI_FeatureDeletedMessage aMsg(aThis, aGroupName);
+    Model_FeatureDeletedMessage aMsg(aThis, aGroupName);
     Events_Loop::loop()->send(aMsg);
   }
   // create new groups basing on the following data model update
@@ -407,7 +408,7 @@ void Model_Document::synchronizeFeatures()
       if (aDSTag > aFeatureTag) { // feature is removed
         aFIter = aFeatures.erase(aFIter);
         // event: model is updated
-        ModelAPI_FeatureDeletedMessage aMsg(aThis, aGroupName);
+        Model_FeatureDeletedMessage aMsg(aThis, aGroupName);
         Events_Loop::loop()->send(aMsg);
       } else if (aDSTag < aFeatureTag) { // a new feature is inserted
         // create a feature
@@ -418,12 +419,13 @@ void Model_Document::synchronizeFeatures()
         boost::shared_ptr<Model_Data> aData(new Model_Data);
         TDF_Label aLab = aFLabIter.Value()->Label();
         aData->setLabel(aLab);
-        aData->setDocument(Model_Application::getApplication()->getDocument(myID));
+        aData->setFeature(aFeature);
+        aFeature->setDoc(aThis);
         aFeature->setData(aData);
         aFeature->initAttributes();
         // event: model is updated
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);
-        ModelAPI_FeatureUpdatedMessage aMsg(aThis, aFeature, anEvent);
+        Model_FeatureUpdatedMessage aMsg(aFeature, anEvent);
         Events_Loop::loop()->send(aMsg);
 
         if (aFIter == aFeatures.end()) {

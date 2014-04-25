@@ -49,8 +49,10 @@ void Model_Data::addAttribute(string theID, string theAttrType)
   else if (theAttrType == GeomData_Point2D::type())
     anAttr = new GeomData_Point2D(anAttrLab);
 
-  if (anAttr)
+  if (anAttr) {
     myAttrs[theID] = boost::shared_ptr<ModelAPI_Attribute>(anAttr);
+    anAttr->setFeature(myFeature);
+  }
   else
     ; // TODO: generate error on unknown attribute request and/or add mechanism for customization
 }

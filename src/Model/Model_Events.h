@@ -21,29 +21,26 @@ static const char * EVENT_FEATURE_UPDATED = "FeatureUpdated";
 static const char * EVENT_FEATURE_DELETED = "FeatureDeleted";
 
 /// Message that feature was changed (used for Object Browser update)
-class ModelAPI_FeatureUpdatedMessage : public Events_Message {
-  boost::shared_ptr<ModelAPI_Document> myDoc; ///< document owner of the feature
+class Model_FeatureUpdatedMessage : public Events_Message {
   boost::shared_ptr<ModelAPI_Feature> myFeature; ///< which feature is changed
 public:
   /// sender is not important, all information is located in the feature
-  ModelAPI_FeatureUpdatedMessage(
-    const boost::shared_ptr<ModelAPI_Document>& theDoc,
+  Model_FeatureUpdatedMessage(
     const boost::shared_ptr<ModelAPI_Feature>& theFeature,
-    const Events_ID& theEvent);
+    const Events_ID& theEvent) : Events_Message(theEvent, 0), myFeature(theFeature)
+  {}
 
   /// Returns the feature that has been updated
   boost::shared_ptr<ModelAPI_Feature> feature() const {return myFeature;}
-  /// Returns the document that has been updated
-  boost::shared_ptr<ModelAPI_Document> document() const {return myDoc;}
 };
 
 /// Message that feature was deleted (used for Object Browser update)
-class ModelAPI_FeatureDeletedMessage : public Events_Message {
+class Model_FeatureDeletedMessage : public Events_Message {
   boost::shared_ptr<ModelAPI_Document> myDoc; ///< document owner of the feature
   std::string myGroup; ///< group identifier that contained the deleted feature
 public:
   /// creates a message by initialization of fields
-  ModelAPI_FeatureDeletedMessage(const boost::shared_ptr<ModelAPI_Document>& theDoc,
+  Model_FeatureDeletedMessage(const boost::shared_ptr<ModelAPI_Document>& theDoc,
     const std::string& theGroup);
 
   /// Returns the ID of this message (EVENT_FEATURE_DELETED)

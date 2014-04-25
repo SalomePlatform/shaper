@@ -22,6 +22,7 @@ class ModelAPI_Document;
 class ModelAPI_Feature
 {
   boost::shared_ptr<ModelAPI_Data> myData; ///< manager of the data model of a feature
+  boost::shared_ptr<ModelAPI_Document> myDoc; ///< document this feature belongs to
 
 public:
   /// Returns the kind of a feature (like "Point")
@@ -44,6 +45,10 @@ public:
   MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Document> documentToAdd()
   {return ModelAPI_PluginManager::get()->currentDocument();}
 
+  /// Returns document this feature belongs to
+  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Document> document()
+  {return myDoc;}
+
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Feature() {}
 
@@ -55,6 +60,9 @@ protected:
 
   /// Sets the data manager of an object (document does)
   MODELAPI_EXPORT void setData(boost::shared_ptr<ModelAPI_Data> theData) {myData = theData;}
+  /// Sets the data manager of an object (document does)
+  MODELAPI_EXPORT void setDoc(boost::shared_ptr<ModelAPI_Document> theDoc) {myDoc = theDoc;}
+
   friend class Model_Document;
 };
 

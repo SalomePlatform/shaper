@@ -3,12 +3,19 @@
 // Author:      Mikhail PONIKAROV
 
 #include "Model_AttributeDouble.h"
+#include "Model_Events.h"
+#include <Events_Loop.h>
 
 using namespace std;
 
 void Model_AttributeDouble::setValue(const double theValue)
 {
-  myReal->Set(theValue);
+  if (myReal->Get() != theValue) {
+    myReal->Set(theValue);
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
+    Model_FeatureUpdatedMessage aMsg(feature(), anEvent);
+    Events_Loop::loop()->send(aMsg);
+  }
 }
 
 double Model_AttributeDouble::value()

@@ -12,6 +12,7 @@
 #include <map>
 
 class ModelAPI_Attribute;
+class ModelAPI_Feature;
 
 /**\class Model_Data
  * \ingroup DataModel
@@ -25,7 +26,8 @@ class Model_Data: public ModelAPI_Data
   /// All attributes of the object identified by the attribute ID
   std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> > myAttrs;
 
-  boost::shared_ptr<ModelAPI_Document> myDoc; ///< document this feature belongs to
+  /// needed here to emit signal that feature changed on change of the attribute
+  boost::shared_ptr<ModelAPI_Feature> myFeature;
 
   Model_Data();
 
@@ -53,14 +55,12 @@ public:
   /// \param theAttrType type of the created attribute (received from the type method)
   MODEL_EXPORT virtual void addAttribute(std::string theID, std::string theAttrType);
 
-  /// Returns the document of this data
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> document() {return myDoc;}
-
   /// Puts feature to the document data sub-structure
   MODEL_EXPORT void setLabel(TDF_Label& theLab);
 
-  /// Sets the document of this data
-  MODEL_EXPORT virtual void setDocument(const boost::shared_ptr<ModelAPI_Document>& theDoc) {myDoc = theDoc;}
+  /// Sets the feature of this data
+  MODEL_EXPORT virtual void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
+    {myFeature = theFeature;}
 };
 
 #endif

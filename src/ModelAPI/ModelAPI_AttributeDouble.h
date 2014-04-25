@@ -12,27 +12,27 @@
  * \brief Attribute that contains real value with double precision.
  */
 
-class MODELAPI_EXPORT ModelAPI_AttributeDouble : public ModelAPI_Attribute
+class ModelAPI_AttributeDouble : public ModelAPI_Attribute
 {
 public:
   /// Defines the double value
-  virtual void setValue(const double theValue) = 0;
+  MODELAPI_EXPORT virtual void setValue(const double theValue) = 0;
 
   /// Returns the double value
-  virtual double value() = 0;
+  MODELAPI_EXPORT virtual double value() = 0;
 
   /// Returns the type of this class of attributes
-  static std::string type() {return "Double";}
+  MODELAPI_EXPORT static std::string type() {return "Double";}
 
   /// Returns the type of this class of attributes, not static method
-  virtual std::string attributeType() {return type();}
+  MODELAPI_EXPORT virtual std::string attributeType() {return type();}
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_AttributeDouble() {}
+  MODELAPI_EXPORT virtual ~ModelAPI_AttributeDouble() {}
 
 protected:
   /// Objects are created for features automatically
-  ModelAPI_AttributeDouble()
+  MODELAPI_EXPORT ModelAPI_AttributeDouble()
   {}
 };
 

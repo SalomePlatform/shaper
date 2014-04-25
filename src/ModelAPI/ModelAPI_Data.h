@@ -45,9 +45,6 @@ public:
   /// \param theAttrType type of the created attribute (received from the type method)
   virtual void addAttribute(std::string theID, std::string theAttrType) = 0;
 
-  /// Returns the document of this data
-  virtual boost::shared_ptr<ModelAPI_Document> document() = 0;
-
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Data() {}
 

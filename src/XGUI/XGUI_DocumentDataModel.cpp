@@ -42,9 +42,9 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
 {
   // Created object event *******************
   if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_CREATED) {
-    const ModelAPI_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const ModelAPI_FeatureUpdatedMessage*>(theMessage);
-    boost::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
+    const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
     boost::shared_ptr<ModelAPI_Feature> aFeature = aUpdMsg->feature();
+    boost::shared_ptr<ModelAPI_Document> aDoc = aFeature->document();
 
     if (aDoc == myDocument) {  // If root objects
       if (aFeature->getGroup().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
@@ -79,7 +79,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
 
   // Deteted object event ***********************
   } else if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_DELETED) {
-    const ModelAPI_FeatureDeletedMessage* aUpdMsg = dynamic_cast<const ModelAPI_FeatureDeletedMessage*>(theMessage);
+    const Model_FeatureDeletedMessage* aUpdMsg = dynamic_cast<const Model_FeatureDeletedMessage*>(theMessage);
     boost::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
 
     if (aDoc == myDocument) {  // If root objects
