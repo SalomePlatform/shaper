@@ -87,7 +87,7 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
   if (theCmdId == "Sketch" ) {
     aPartSetOp = new PartSet_OperationSketch(theCmdId, this);
   }
-  else if(aCmdId == "SketchLine") {
+  else if(theCmdId == "SketchLine") {
     ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
     boost::shared_ptr<ModelAPI_Feature> aSketchFeature;
     if (anOperation)
