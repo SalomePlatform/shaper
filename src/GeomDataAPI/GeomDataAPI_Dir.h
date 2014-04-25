@@ -27,7 +27,7 @@ public:
   virtual double z() const = 0;
 
   /// Returns the type of this class of attributes
-  static inline std::string type() {return std::string("Point");}
+  static inline std::string type() {return std::string("Dir");}
 
   /// Returns the type of this class of attributes, not static method
   virtual std::string attributeType() {return type();}
