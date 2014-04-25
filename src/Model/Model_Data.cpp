@@ -7,6 +7,7 @@
 #include <Model_AttributeDouble.h>
 #include <GeomData_Point.h>
 #include <GeomData_Point2D.h>
+#include <GeomData_Dir.h>
 #include <TDataStd_Name.hxx>
 
 using namespace std;
@@ -43,6 +44,8 @@ void Model_Data::addAttribute(string theID, string theAttrType)
     anAttr = new Model_AttributeDouble(anAttrLab);
   else if (theAttrType == GeomData_Point::type())
     anAttr = new GeomData_Point(anAttrLab);
+  else if (theAttrType == GeomData_Dir::type())
+    anAttr = new GeomData_Dir(anAttrLab);
   else if (theAttrType == GeomData_Point2D::type())
     anAttr = new GeomData_Point2D(anAttrLab);
 

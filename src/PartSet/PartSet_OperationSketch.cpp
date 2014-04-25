@@ -30,11 +30,6 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 {
 }
 
-bool PartSet_OperationSketch::isPerformedImmediately() const
-{
-  return false;
-}
-
 int PartSet_OperationSketch::getSelectionMode() const
 {
   return TopAbs_FACE;
@@ -82,5 +77,6 @@ void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Sh
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
   emit viewerProjectionChange(aDir->x(), aDir->y(), aDir->z());
 
-  commit();
+  //commit();
+  //SketchPlugin_Sketch::setActive(myFeature);
 }

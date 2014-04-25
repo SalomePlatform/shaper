@@ -1,25 +1,25 @@
 /*
- * XGUI_SwitchWidget.h
+ * ModuleBase_WidgetSwitch.h
  *
  *  Created on: Apr 16, 2014
  *      Author: sbh
  */
 
-#ifndef XGUI_SWITCHWIDGET_H_
-#define XGUI_SWITCHWIDGET_H_
+#ifndef ModuleBase_WidgetSwitch_H_
+#define ModuleBase_WidgetSwitch_H_
 
-#include <XGUI.h>
+#include <ModuleBase.h>
 #include <QFrame>
 
 class QComboBox;
 class QVBoxLayout;
 
-class XGUI_EXPORT XGUI_SwitchWidget: public QFrame
+class MODULEBASE_EXPORT ModuleBase_WidgetSwitch: public QFrame
 {
   Q_OBJECT
 public:
-  XGUI_SwitchWidget(QWidget* parent = NULL);
-  virtual ~XGUI_SwitchWidget();
+  ModuleBase_WidgetSwitch(QWidget* parent = NULL);
+  virtual ~ModuleBase_WidgetSwitch();
 
   int addPage(QWidget * theWidget, const QString & theName);
   int count() const;
@@ -50,4 +50,4 @@ private:
   QWidgetList myCases;
 };
 
-#endif /* XGUI_SWITCHWIDGET_H_ */
+#endif /* ModuleBase_WidgetSwitch_H_ */

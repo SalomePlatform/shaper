@@ -19,14 +19,12 @@ SET(PROJECT_HEADERS
 	XGUI_RubberBand.h
 	XGUI_Constants.h
 	XGUI_ViewBackground.h
-	XGUI_WidgetFactory.h
 	XGUI_DocumentDataModel.h
 	XGUI_PartDataModel.h
 	XGUI_ObjectsBrowser.h
 	XGUI_OperationMgr.h
     XGUI_DataTreeModel.h
     XGUI_SelectionMgr.h
-    XGUI_SwitchWidget.h
     XGUI_SalomeConnector.h
 )
 
@@ -48,13 +46,11 @@ SET(PROJECT_SOURCES
     XGUI_Viewer.cpp
 	XGUI_RubberBand.cpp
 	XGUI_ViewBackground.cpp
-	XGUI_WidgetFactory.cpp
 	XGUI_DocumentDataModel.cpp
 	XGUI_PartDataModel.cpp
 	XGUI_ObjectsBrowser.cpp
 	XGUI_OperationMgr.cpp
     XGUI_SelectionMgr.cpp
-    XGUI_SwitchWidget.cpp
 )
 
 SET(PROJECT_RESOURCES 

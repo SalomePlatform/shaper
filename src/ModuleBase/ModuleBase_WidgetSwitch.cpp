@@ -1,17 +1,17 @@
 /*
- * XGUI_SwitchWidget.cpp
+ * ModuleBase_WidgetSwitch.cpp
  *
  *  Created on: Apr 16, 2014
  *      Author: sbh
  */
 
-#include <XGUI_SwitchWidget.h>
+#include <ModuleBase_WidgetSwitch.h>
 
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QSpacerItem>
 
-XGUI_SwitchWidget::XGUI_SwitchWidget(QWidget* parent)
+ModuleBase_WidgetSwitch::ModuleBase_WidgetSwitch(QWidget* parent)
 : QFrame(parent)
 {
   myMainLay = new QVBoxLayout(this);
@@ -27,37 +27,37 @@ XGUI_SwitchWidget::XGUI_SwitchWidget(QWidget* parent)
 
 }
 
-XGUI_SwitchWidget::~XGUI_SwitchWidget()
+ModuleBase_WidgetSwitch::~ModuleBase_WidgetSwitch()
 {
 }
 
-int XGUI_SwitchWidget::addPage(QWidget* theWidget, const QString& theName)
+int ModuleBase_WidgetSwitch::addPage(QWidget* theWidget, const QString& theName)
 {
   return insertPage(count(), theWidget, theName);
 }
 
-int XGUI_SwitchWidget::count() const
+int ModuleBase_WidgetSwitch::count() const
 {
   return myCombo->count();
 }
 
-int XGUI_SwitchWidget::currentIndex() const
+int ModuleBase_WidgetSwitch::currentIndex() const
 {
   return myCombo->currentIndex();
 }
 
-QWidget* XGUI_SwitchWidget::currentWidget() const
+QWidget* ModuleBase_WidgetSwitch::currentWidget() const
 {
   int idx = currentIndex();
   return myCases[idx];
 }
 
-int XGUI_SwitchWidget::indexOf(QWidget* theWidget) const
+int ModuleBase_WidgetSwitch::indexOf(QWidget* theWidget) const
 {
   return myCases.indexOf(theWidget);
 }
 
-int XGUI_SwitchWidget::insertPage(int theIndex, QWidget* theWidget, const QString& theName)
+int ModuleBase_WidgetSwitch::insertPage(int theIndex, QWidget* theWidget, const QString& theName)
 {
   int index = theIndex < count() ? theIndex : count();
   if(count() == 0)
@@ -69,22 +69,22 @@ int XGUI_SwitchWidget::insertPage(int theIndex, QWidget* theWidget, const QStrin
   return index;
 }
 
-bool XGUI_SwitchWidget::isPageEnabled(int index) const
+bool ModuleBase_WidgetSwitch::isPageEnabled(int index) const
 {
   return myCases[index]->isEnabled();
 }
 
-QString XGUI_SwitchWidget::pageText(int index) const
+QString ModuleBase_WidgetSwitch::pageText(int index) const
 {
   return myCombo->itemText(index);
 }
 
-QString XGUI_SwitchWidget::pageToolTip(int index) const
+QString ModuleBase_WidgetSwitch::pageToolTip(int index) const
 {
   return myCases[index]->toolTip();
 }
 
-void XGUI_SwitchWidget::removePage(int index)
+void ModuleBase_WidgetSwitch::removePage(int index)
 {
   myCombo->removeItem(index);
   myCases.removeAt(index);
@@ -93,28 +93,28 @@ void XGUI_SwitchWidget::removePage(int index)
   }
 }
 
-void XGUI_SwitchWidget::setPageEnabled(int index, bool enabled)
+void ModuleBase_WidgetSwitch::setPageEnabled(int index, bool enabled)
 {
   myCases[index]->setEnabled(enabled);
 }
 
-void XGUI_SwitchWidget::setPageName(int index, const QString& theName)
+void ModuleBase_WidgetSwitch::setPageName(int index, const QString& theName)
 {
   myCombo->setItemText(index, theName);
 }
 
-void XGUI_SwitchWidget::setPageToolTip(int index, const QString& toolTip)
+void ModuleBase_WidgetSwitch::setPageToolTip(int index, const QString& toolTip)
 {
   myCases[index]->setToolTip(toolTip);
 }
 
-void XGUI_SwitchWidget::setCurrentIndex(int index)
+void ModuleBase_WidgetSwitch::setCurrentIndex(int index)
 {
   myCombo->setCurrentIndex(index);
   refresh();
 }
 
-void XGUI_SwitchWidget::refresh()
+void ModuleBase_WidgetSwitch::refresh()
 {
   foreach(QWidget* eachWidget, myCases) {
     eachWidget->setVisible(false);

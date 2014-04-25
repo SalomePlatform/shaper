@@ -1,25 +1,26 @@
 /*
- * XGUI_WidgetFactory.h
+ * ModuleBase_WidgetFactory.h
  *
  *  Created on: Apr 3, 2014
  *      Author: sbh
  */
 
-#ifndef XGUI_WIDGETFACTORY_H_
-#define XGUI_WIDGETFACTORY_H_
+#ifndef ModuleBase_WidgetFactory_H_
+#define ModuleBase_WidgetFactory_H_
 
-#include "XGUI.h"
+#include <ModuleBase.h>
 #include <QString>
 
+class QObject;
 class QWidget;
 class Config_WidgetAPI;
 class ModuleBase_PropPanelOperation;
 
-class XGUI_EXPORT XGUI_WidgetFactory
+class MODULEBASE_EXPORT ModuleBase_WidgetFactory
 {
 public:
-  XGUI_WidgetFactory(ModuleBase_PropPanelOperation*);
-  virtual ~XGUI_WidgetFactory();
+  ModuleBase_WidgetFactory(ModuleBase_PropPanelOperation*);
+  virtual ~ModuleBase_WidgetFactory();
 
   void createWidget(QWidget* theParent);
 
@@ -28,9 +29,10 @@ protected:
   QWidget* createWidgetByType(const std::string& theType, QWidget* theParent = NULL);
   QWidget* labelControl(QWidget* theParent);
   QWidget* doubleSpinBoxControl();
+  QWidget* pointSelectorControl(QWidget* theParent);
   QWidget* createContainer(const std::string& theType, QWidget* theParent = NULL);
 
-  bool connectWidget(QWidget*, const QString&);
+  bool connectWidget(QObject*, const QString&);
   QString qs(const std::string& theStdString) const;
 
 private:
@@ -40,4 +42,4 @@ private:
 
 };
 
-#endif /* XGUI_WIDGETFACTORY_H_ */
+#endif /* ModuleBase_WidgetFactory_H_ */

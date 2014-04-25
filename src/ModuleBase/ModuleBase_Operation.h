@@ -111,6 +111,9 @@ public slots:
   // Data model operations.
   void storeReal(double);
 
+  // Data model operations.
+  void storeCustomValue();
+
 protected:
   virtual bool isReadyToStart() const;
 

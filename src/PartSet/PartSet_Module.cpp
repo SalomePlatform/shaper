@@ -1,5 +1,6 @@
 #include <PartSet_Module.h>
 #include <PartSet_OperationSketch.h>
+#include <PartSet_OperationSketchLine.h>
 
 #include <ModuleBase_Operation.h>
 
@@ -14,6 +15,8 @@
 #include <Config_WidgetReader.h>
 #include <Events_Loop.h>
 #include <Events_Message.h>
+
+#include <GeomAPI_Shape.h>
 
 #include <AIS_ListOfInteractive.hxx>
 
@@ -85,7 +88,15 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
   ModuleBase_PropPanelOperation* aPartSetOp;
   if (theCmdId == "Sketch" ) {
     aPartSetOp = new PartSet_OperationSketch(theCmdId, this);
-  } else {
+  }
+  else if(theCmdId == "SketchLine") {
+    ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+    boost::shared_ptr<ModelAPI_Feature> aSketchFeature;
+    if (anOperation)
+      aSketchFeature = anOperation->feature();
+    aPartSetOp = new PartSet_OperationSketchLine(theCmdId, this, aSketchFeature);
+  }
+  else {
     aPartSetOp = new ModuleBase_PropPanelOperation(theCmdId, this);
   }
   aPartSetOp->setXmlRepresentation(QString::fromStdString(aXmlCfg));
@@ -153,8 +164,10 @@ void PartSet_Module::visualizePreview(bool isDisplay)
     return;
 
   if (isDisplay) {
-    myWorkshop->displayer()->LocalSelection(anOperation->feature(), aPreviewOp->preview(),
-                                            aPreviewOp->getSelectionMode());
+    boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview();
+    if (aPreview)
+      myWorkshop->displayer()->LocalSelection(anOperation->feature(),
+                                   aPreview->impl<TopoDS_Shape>(), aPreviewOp->getSelectionMode());
   }
   else {
     myWorkshop->displayer()->GlobalSelection(false);

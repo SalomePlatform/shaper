@@ -30,15 +30,6 @@ public:
   virtual ~ModuleBase_PropPanelOperation();
 
   /*!
-   * \brief Replied whether the operation should be commited after the start, or the operation itself
-   *  do that. The default realization provides the check by the operation having the xml prepresentation 
-   *  @return the boolean value
-   */
-  virtual bool isPerformedImmediately() const
-  {
-    return xmlRepresentation().isEmpty();
-  }
-  /*!
    *  \brief Returns XML representation of the operation's widget.
    *  \return XML QString
    *

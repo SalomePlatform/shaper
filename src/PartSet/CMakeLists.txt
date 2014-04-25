@@ -7,13 +7,15 @@ SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Module.h
 	PartSet_OperationSketchBase.h
-    PartSet_OperationSketch.h
+	PartSet_OperationSketch.h
+	PartSet_OperationSketchLine.h
 )
 
 SET(PROJECT_SOURCES
 	PartSet_Module.cpp
 	PartSet_OperationSketchBase.cpp
 	PartSet_OperationSketch.cpp
+	PartSet_OperationSketchLine.cpp
 )
 
 SET(PROJECT_RESOURCES 

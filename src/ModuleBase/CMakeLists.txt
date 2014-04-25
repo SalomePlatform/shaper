@@ -5,14 +5,22 @@ SET(PROJECT_HEADERS
     ModuleBase.h
 	ModuleBase_Operation.h
 	ModuleBase_PropPanelOperation.h
+	ModuleBase_WidgetCustom.h
+	ModuleBase_WidgetFactory.h
+	ModuleBase_WidgetPoint2D.h
+	ModuleBase_WidgetSwitch.h
 )
 
 SET(PROJECT_SOURCES
 	ModuleBase_Operation.cpp
 	ModuleBase_PropPanelOperation.cpp
+	ModuleBase_WidgetFactory.cpp
+	ModuleBase_WidgetPoint2D.cpp
+	ModuleBase_WidgetSwitch.cpp
 )
 
 SET(PROJECT_LIBRARIES
+    Config
     ModelAPI
     ${QT_LIBRARIES}
 )
@@ -27,7 +35,11 @@ SET(PROJECT_AUTOMOC
 SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC} ${PROJECT_COMPILED_RESOURCES} ${QM_RESOURCES})
 #SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES} ${PROJECT_RESOURCES})
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/ModelAPI)
+INCLUDE_DIRECTORIES(
+    ${PROJECT_SOURCE_DIR}/src/Config
+    ${CMAKE_SOURCE_DIR}/src/ModelAPI
+    ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
+)
 
 ADD_DEFINITIONS(-DMODULEBASE_EXPORTS)
 ADD_LIBRARY(ModuleBase SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
