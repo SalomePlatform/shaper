@@ -12,7 +12,6 @@
  * \ingroup DataModel
  * \brief Generic attribute of the Object.
  */
-
 class MODELAPI_EXPORT ModelAPI_Attribute
 {
 public:

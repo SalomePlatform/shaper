@@ -5,6 +5,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 SET(PROJECT_HEADERS
     GeomDataAPI.h
     GeomDataAPI_Point.h
+    GeomDataAPI_Dir.h
+    GeomDataAPI_Point2D.h
 )
 
 SET(CMAKE_SWIG_FLAGS "")

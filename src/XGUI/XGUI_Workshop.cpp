@@ -216,12 +216,19 @@ void XGUI_Workshop::onOperationStarted()
 //******************************************************
 void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 {
-  hidePropertyPanel();
-  updateCommandStatus();
+  ModuleBase_PropPanelOperation* aOperation =
+        (ModuleBase_PropPanelOperation*)(myOperationMgr->currentOperation());
+
+  if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
+    updateCommandStatus();
+  } else {
+    hidePropertyPanel();
+    updateCommandStatus();
 
   if (myMainWindow) {
     XGUI_MainMenu* aMenu = myMainWindow->menuObject();
     aMenu->restoreCommandState();
+  }
   }
 }
 

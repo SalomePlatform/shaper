@@ -11,6 +11,8 @@
 #include <V3d_Viewer.hxx>
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Trihedron.hxx>
+#include <NCollection_List.hxx>
+#include <TopoDS_Shape.hxx>
 
 class XGUI_MainWindow;
 class QMdiSubWindow;
@@ -69,6 +71,10 @@ public:
   /// \param theList - list to be filled with selected objects
   void  getSelectedObjects(AIS_ListOfInteractive& theList);
 
+  /// Return shapes selected in 3D viewer
+  /// \param theList - list to be filled with selected shapes
+  void getSelectedShapes(NCollection_List<TopoDS_Shape>& theList);
+
   /// Selects objects in 3D viewer. Other selected objects are left as selected
   /// \param theList - list objects to be selected
   void  setObjectsSelected(const AIS_ListOfInteractive& theList);
@@ -112,6 +118,12 @@ public:
                            Qt::KeyboardModifiers theState, Qt::MouseButtons theButton);
   static void getHotButton(XGUI::InteractionStyle theInteractionStyle, XGUI::HotOperation theOper,
                            Qt::KeyboardModifiers& theState, Qt::MouseButtons& theButton);
+
+  //! Sets the view projection
+  /// \param theX the X projection value
+  /// \param theY the Y projection value
+  /// \param theZ the Z projection value
+  void setViewProjection(double theX, double theY, double theZ);
 
   typedef QMap<XGUI::HotOperation, Qt::KeyboardModifiers> StatesMap;
   typedef QMap<XGUI::HotOperation, Qt::MouseButtons> ButtonsMap;

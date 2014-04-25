@@ -19,6 +19,7 @@ const static char* NODE_SOURCE = "source";
 //Widgets
 const static char* WDG_DOUBLEVALUE = "doublevalue";
 //Widget containers
+const static char* WDG_INFO = "label";
 const static char* WDG_GROUP = "groupbox";
 const static char* WDG_CHECK_GROUP = "check_groupbox";
 const static char* WDG_TOOLBOX = "toolbox";
@@ -38,6 +39,8 @@ const static char* SOURCE_FILE = "path";
 
 
 // doublevalue properties:
+const static char* INFO_WDG_TEXT = FEATURE_TEXT;
+const static char* INFO_WDG_TOOLTIP = FEATURE_TOOLTIP;
 const static char* DOUBLE_WDG_MIN = "min";
 const static char* DOUBLE_WDG_MAX = "max";
 const static char* DOUBLE_WDG_STEP = "step";

@@ -7,16 +7,17 @@
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Feature.h>
+#include <GeomAPI_Pnt.h>
 #include <list>
 
-/// Coefficient A of the sketch plane (Ax+By+Cz+D=0)
-const std::string SKETCH_ATTR_PLANE_A("PlaneA");
-/// Coefficient B of the sketch plane
-const std::string SKETCH_ATTR_PLANE_B("PlaneB");
-/// Coefficient C of the sketch plane
-const std::string SKETCH_ATTR_PLANE_C("PlaneC");
-/// Coefficient D of the sketch plane
-const std::string SKETCH_ATTR_PLANE_D("PlaneD");
+/// Origin point of the sketcher in 3D space
+const std::string SKETCH_ATTR_ORIGIN("Origin");
+/// Vector X inside of the sketch plane
+const std::string SKETCH_ATTR_DIRX("DirX");
+/// Vector Y inside of the sketch plane
+const std::string SKETCH_ATTR_DIRY("DirY");
+/// Vector Z, normal to the sketch plane
+const std::string SKETCH_ATTR_NORM("Norm");
 
 /**\class SketchPlugin_Sketch
  * \ingroup DataModel
@@ -41,6 +42,15 @@ public:
 
   /// Returns the sketch preview
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
+
+  /// Adds sub-feature of the higher level feature (sub-element of the sketch)
+  /// \param theFeature sub-feature
+  SKETCHPLUGIN_EXPORT virtual const void addSub(
+    const boost::shared_ptr<ModelAPI_Feature>& theFeature);
+
+  /// Converts a 2D sketch space point into point in 3D space
+  SKETCHPLUGIN_EXPORT boost::shared_ptr<GeomAPI_Pnt> to3D(
+    const double theX, const double theY);
 
   /// Use plugin manager for features creation
   SketchPlugin_Sketch();

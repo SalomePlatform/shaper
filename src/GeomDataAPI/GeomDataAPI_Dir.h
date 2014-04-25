@@ -1,19 +1,19 @@
-// File:        GeomDataAPI_Point.h
+// File:        GeomDataAPI_Dir.h
 // Created:     24 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomDataAPI_Point_HeaderFile
-#define GeomDataAPI_Point_HeaderFile
+#ifndef GeomDataAPI_Dir_HeaderFile
+#define GeomDataAPI_Dir_HeaderFile
 
 #include "GeomDataAPI.h"
 #include <ModelAPI_Attribute.h>
 
-/**\class GeomDataAPI_Point
+/**\class GeomDataAPI_Dir
  * \ingroup DataModel
- * \brief Attribute that contains 3D point coordinates. 
+ * \brief Attribute that contains 3D direction coordinates. 
  */
 
-class GeomDataAPI_Point : public ModelAPI_Attribute
+class GeomDataAPI_Dir : public ModelAPI_Attribute
 {
 public:
   /// Defines the double value
@@ -34,7 +34,7 @@ public:
 
 protected:
   /// Objects are created for features automatically
-  GeomDataAPI_Point()
+  GeomDataAPI_Dir()
   {}
 };
 

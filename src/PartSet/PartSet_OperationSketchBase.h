@@ -8,11 +8,10 @@
 #include "PartSet.h"
 
 #include <TopoDS_Shape.hxx>
+#include <NCollection_List.hxx>
 
 #include <ModuleBase_PropPanelOperation.h>
 #include <QObject>
-
-class AIS_ListOfInteractive;
 
 /*!
   \class PartSet_OperationSketchBase
@@ -39,7 +38,10 @@ public:
 
   /// Gives the current selected objects to be processed by the operation
   /// \param a list of interactive selected objects
-  virtual void setSelectedObjects(const AIS_ListOfInteractive& aList) = 0;
+  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList) = 0;
+
+signals:
+  void viewerProjectionChange(double theX, double theY, double theZ);
 };
 
 #endif

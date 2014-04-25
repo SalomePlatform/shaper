@@ -36,6 +36,11 @@ public slots:
   /// SLOT, that is called by the selection in the viewer is changed.
   /// The selection is sent to the current operation if it listen the selection.
   void onViewSelectionChanged();
+  /// SLOT, to apply to the current viewer the operation
+  /// \param theX the X projection value
+  /// \param theY the Y projection value
+  /// \param theZ the Z projection value
+  void onViewerProjectionChange(double theX, double theY, double theZ);
 
 private:
   /// Displays or erase the current operation preview, if it has it.

@@ -1,21 +1,23 @@
-// File:        GeomData_Point.h
+// File:        GeomData_Dir.h
 // Created:     24 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomData_Point_HeaderFile
-#define GeomData_Point_HeaderFile
+#ifndef GeomData_Dir_HeaderFile
+#define GeomData_Dir_HeaderFile
 
 #include "GeomData.h"
-#include "GeomDataAPI_Point.h"
+#include "GeomDataAPI_Dir.h"
 #include <TDataStd_RealArray.hxx>
 #include <TDF_Label.hxx>
+#include <boost/shared_ptr.hpp>
 
-/**\class GeomData_Point
+class GeomAPI_Dir;
+
+/**\class GeomData_Dir
  * \ingroup DataModel
- * \brief Attribute that contains 3D point.
+ * \brief Attribute that contains direction.
  */
-
-class GeomData_Point : public GeomDataAPI_Point
+class GeomData_Dir : public GeomDataAPI_Dir
 {
   Handle_TDataStd_RealArray myCoords; ///< X, Y and Z doubles as real array attribute [0; 2]
 public:
@@ -28,10 +30,12 @@ public:
   GEOMDATA_EXPORT virtual double y() const;
   /// Returns the Z double value
   GEOMDATA_EXPORT virtual double z() const;
+  /// Returns the direction of this attribute
+  GEOMDATA_EXPORT boost::shared_ptr<GeomAPI_Dir> dir();
 
 protected:
   /// Initializes attributes
-  GEOMDATA_EXPORT GeomData_Point(TDF_Label& theLabel);
+  GEOMDATA_EXPORT GeomData_Dir(TDF_Label& theLabel);
 
   friend class Model_Data;
 };

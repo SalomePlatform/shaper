@@ -7,8 +7,9 @@
 
 #include "SketchPlugin.h"
 #include <ModelAPI_Feature.h>
-
 #include <GeomAPI_Shape.h>
+
+class SketchPlugin_Sketch;
 
 /**\class SketchPlugin_Feature
  * \ingroup DataModel
@@ -19,8 +20,14 @@ class SketchPlugin_Feature: public ModelAPI_Feature
 {
 public:
   /// Returns the sketch preview
+  /// \param theSketch the owner of this feature
   /// \return the built preview
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview() = 0;
+
+  /// Adds sub-feature of the higher level feature (sub-element of the sketch)
+  /// \param theFeature sub-feature
+  SKETCHPLUGIN_EXPORT virtual const void addSub(
+    const boost::shared_ptr<ModelAPI_Feature>& theFeature) = 0;
 
 protected:
   /// Set the shape to the internal preview field
@@ -29,9 +36,16 @@ protected:
   /// Return the shape from the internal preview field
   /// \return theShape a preview shape
   const boost::shared_ptr<GeomAPI_Shape>& getPreview() const;
+  /// Sets the higher-level feature for the sub-feature (sketch for line)
+  void setSketch(SketchPlugin_Sketch* theSketch) {mySketch = theSketch;}
+  /// Returns the sketch of this feature
+  SketchPlugin_Sketch* sketch() {return mySketch;}
+
+  friend class SketchPlugin_Sketch;
 
 private:
   boost::shared_ptr<GeomAPI_Shape> myPreview; ///< the preview shape
+  SketchPlugin_Sketch* mySketch; /// sketch that contains this feature
 };
 
 #endif

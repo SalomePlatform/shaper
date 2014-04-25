@@ -238,6 +238,17 @@ void XGUI_Viewer::getSelectedObjects(AIS_ListOfInteractive& theList)
     theList.Append(myAISContext->SelectedInteractive());
 }
 
+void XGUI_Viewer::getSelectedShapes(NCollection_List<TopoDS_Shape>& theList)
+{
+  Handle(AIS_InteractiveContext) ic = AISContext();
+
+  for (ic->InitSelected(); ic->MoreSelected(); ic->NextSelected()) {
+    TopoDS_Shape aShape = ic->SelectedShape();
+    if (!aShape.IsNull())
+      theList.Append(aShape);
+  }
+}
+
 void XGUI_Viewer::setObjectsSelected(const AIS_ListOfInteractive& theList)
 {
   AIS_ListIteratorOfListOfInteractive aIt;
@@ -270,6 +281,17 @@ void XGUI_Viewer::getHotButton(XGUI::InteractionStyle theInteractionStyle,
 {
   theState = myStateMap[theInteractionStyle][theOper];
   theButton = myButtonMap[theInteractionStyle][theOper];
+}
+
+void XGUI_Viewer::setViewProjection(double theX, double theY, double theZ)
+{
+  XGUI_ViewWindow* aWindow = dynamic_cast<XGUI_ViewWindow*>(myActiveView->widget());
+  if (aWindow) {
+    Handle(V3d_View) aView3d = aWindow->viewPort()->getView();
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj(theX, theY, theZ);
+    aWindow->viewPort()->fitAll();
+  }
 }
 
 /*!

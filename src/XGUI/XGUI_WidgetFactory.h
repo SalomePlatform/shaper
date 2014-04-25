@@ -25,11 +25,12 @@ public:
 
 protected:
   //Widgets
-  QWidget* doubleSpinBoxControl();
   QWidget* createWidgetByType(const std::string& theType, QWidget* theParent = NULL);
+  QWidget* labelControl(QWidget* theParent);
+  QWidget* doubleSpinBoxControl();
   QWidget* createContainer(const std::string& theType, QWidget* theParent = NULL);
-  bool connectWidget(QWidget*, const QString&);
 
+  bool connectWidget(QWidget*, const QString&);
   QString qs(const std::string& theStdString) const;
 
 private:
