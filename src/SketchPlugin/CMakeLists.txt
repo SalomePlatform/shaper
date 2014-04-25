@@ -5,12 +5,14 @@ SET(PROJECT_HEADERS
     SketchPlugin_Feature.h
     SketchPlugin_Plugin.h
     SketchPlugin_Sketch.h
+    SketchPlugin_Line.h
 )
 
 SET(PROJECT_SOURCES
     SketchPlugin_Feature.cpp
     SketchPlugin_Plugin.cpp
     SketchPlugin_Sketch.cpp
+    SketchPlugin_Line.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -26,6 +28,7 @@ INCLUDE_DIRECTORIES(
   ../ModelAPI
   ../GeomAPI
   ../GeomAlgoAPI
+  ../GeomDataAPI
 )
 
 SET(XML_RESOURCES

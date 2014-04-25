@@ -43,6 +43,9 @@ public:
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string theID);
   /// Returns the attribute that contains real value with double precision
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string theID);
+  /// Returns the generic attribute by identifier
+  /// \param theID identifier of the attribute
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string theID);
 
   /// Initializes object by the attributes: must be called just after the object is created
   /// for each attribute of the object

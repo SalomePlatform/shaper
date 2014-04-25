@@ -4,11 +4,15 @@
 
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
-#include <ModelAPI_AttributeDouble.h>
+#include <GeomDataAPI_Dir.h>
+#include <GeomDataAPI_Point.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
 using namespace std;
+
+/// the active sketch
+boost::shared_ptr<SketchPlugin_Sketch> MY_ACITVE_SKETCH;
 
 // face of the square-face displayed for selection of general plane
 const double PLANE_SIZE = 200;
@@ -19,10 +23,10 @@ SketchPlugin_Sketch::SketchPlugin_Sketch()
 
 void SketchPlugin_Sketch::initAttributes()
 {
-  data()->addAttribute(SKETCH_ATTR_PLANE_A, ModelAPI_AttributeDouble::type());
-  data()->addAttribute(SKETCH_ATTR_PLANE_B, ModelAPI_AttributeDouble::type());
-  data()->addAttribute(SKETCH_ATTR_PLANE_C, ModelAPI_AttributeDouble::type());
-  data()->addAttribute(SKETCH_ATTR_PLANE_D, ModelAPI_AttributeDouble::type());
+  data()->addAttribute(SKETCH_ATTR_ORIGIN, GeomDataAPI_Point::type());
+  data()->addAttribute(SKETCH_ATTR_DIRX, GeomDataAPI_Dir::type());
+  data()->addAttribute(SKETCH_ATTR_DIRY, GeomDataAPI_Dir::type());
+  data()->addAttribute(SKETCH_ATTR_NORM, GeomDataAPI_Dir::type());
 }
 
 void SketchPlugin_Sketch::execute() 
@@ -42,6 +46,16 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Sketch::preview()
   return getPreview();
 }
 
+void SketchPlugin_Sketch::setActive(boost::shared_ptr<SketchPlugin_Sketch> theSketch)
+{
+  MY_ACITVE_SKETCH = theSketch;
+}
+
+boost::shared_ptr<SketchPlugin_Sketch> SketchPlugin_Sketch::active()
+{
+  return MY_ACITVE_SKETCH;
+}
+
 void SketchPlugin_Sketch::addPlane(double theX, double theY, double theZ,
                                    std::list<boost::shared_ptr<GeomAPI_Shape> >& theShapes) const
 {
@@ -50,4 +64,19 @@ void SketchPlugin_Sketch::addPlane(double theX, double theY, double theZ,
   boost::shared_ptr<GeomAPI_Shape> aFace = 
     GeomAlgoAPI_FaceBuilder::square(anOrigin, aNormal, PLANE_SIZE);
   theShapes.push_back(aFace);
+}
+
+boost::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, const double theY)
+{
+  boost::shared_ptr<GeomDataAPI_Point> aC = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(SKETCH_ATTR_ORIGIN));
+  boost::shared_ptr<GeomDataAPI_Dir> aX = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_DIRX));
+  boost::shared_ptr<GeomDataAPI_Dir> aY = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_DIRY));
+
+  return boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(
+    aC->x() + aX->x() * theX + aY->x() * theY, 
+    aC->y() + aX->y() * theX + aY->y() * theY,
+    aC->z() + aX->z() * theX + aY->z() * theY));
 }

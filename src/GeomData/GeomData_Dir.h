@@ -1,21 +1,20 @@
-// File:        GeomData_Point.h
+// File:        GeomData_Dir.h
 // Created:     24 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomData_Point_HeaderFile
-#define GeomData_Point_HeaderFile
+#ifndef GeomData_Dir_HeaderFile
+#define GeomData_Dir_HeaderFile
 
 #include "GeomData.h"
-#include "GeomDataAPI_Point.h"
+#include "GeomDataAPI_Dir.h"
 #include <TDataStd_RealArray.hxx>
 #include <TDF_Label.hxx>
 
-/**\class GeomData_Point
+/**\class GeomData_Dir
  * \ingroup DataModel
- * \brief Attribute that contains 3D point.
+ * \brief Attribute that contains direction.
  */
-
-class GeomData_Point : public GeomDataAPI_Point
+class GeomData_Dir : public GeomDataAPI_Dir
 {
   Handle_TDataStd_RealArray myCoords; ///< X, Y and Z doubles as real array attribute [0; 2]
 public:
@@ -31,7 +30,7 @@ public:
 
 protected:
   /// Initializes attributes
-  GEOMDATA_EXPORT GeomData_Point(TDF_Label& theLabel);
+  GEOMDATA_EXPORT GeomData_Dir(TDF_Label& theLabel);
 
   friend class Model_Data;
 };

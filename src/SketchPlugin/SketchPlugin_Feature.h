@@ -7,8 +7,9 @@
 
 #include "SketchPlugin.h"
 #include <ModelAPI_Feature.h>
-
 #include <GeomAPI_Shape.h>
+
+class SketchPlugin_Sketch;
 
 /**\class SketchPlugin_Feature
  * \ingroup DataModel
@@ -19,6 +20,7 @@ class SketchPlugin_Feature: public ModelAPI_Feature
 {
 public:
   /// Returns the sketch preview
+  /// \param theSketch the owner of this feature
   /// \return the built preview
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview() = 0;
 
