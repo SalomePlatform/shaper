@@ -16,11 +16,16 @@ class XGUI_Workbench;
 class XGUI_SelectionMgr;
 class XGUI_Displayer;
 class XGUI_OperationMgr;
+class XGUI_SalomeConnector;
+class XGUI_ObjectsBrowser;
 class ModuleBase_Operation;
 class ModuleBase_PropPanelOperation;
 
 class Config_FeatureMessage;
 class Config_PointerMessage;
+
+class QWidget;
+class QDockWidget;
 
 /**\class XGUI_Workshop
  * \ingroup GUI
@@ -31,7 +36,7 @@ class XGUI_EXPORT XGUI_Workshop: public QObject, public Events_Listener
 Q_OBJECT
 public:
 
-  XGUI_Workshop();
+  XGUI_Workshop(XGUI_SalomeConnector* theConnector = 0);
   virtual ~XGUI_Workshop();
 
   //! Starting of the application
@@ -58,6 +63,14 @@ public:
   //! Redefinition of Events_Listener method
   virtual void processEvent(const Events_Message* theMessage);
 
+  XGUI_SalomeConnector* salomeConnector() const { return mySalomeConnector; }
+
+  //! Returns true if the application works as SALOME module
+  bool isSalomeMode() const { return mySalomeConnector != 0; }
+
+  //! Returns Object browser
+  XGUI_ObjectsBrowser* objectBrowser() const { return myObjectBrowser; }
+
 public slots:
   void updateCommandStatus();
 
@@ -68,6 +81,13 @@ public slots:
   void onExit();
   void onUndo();
   void onRedo();
+
+  void showPropertyPanel();
+  void hidePropertyPanel();
+  void showObjectBrowser();
+  void hideObjectBrowser();
+
+  void onFeatureTriggered();
 
 protected:
   //Event-loop processing methods:
@@ -89,13 +109,26 @@ private:
   XGUI_Module* loadModule(const QString& theModule);
   bool activateModule();
 
+  QDockWidget* createObjectBrowser(QWidget* theParent);
+  QDockWidget* createPropertyPanel(QWidget* theParent);
+
+  // Creates Dock widgets: Object browser and Property panel
+  void createDockWidgets();
+  void setPropertyPannelTitle(const QString& theTitle);
+
+
   XGUI_MainWindow* myMainWindow;
   XGUI_Module* myPartSetModule;
+
+  XGUI_ObjectsBrowser* myObjectBrowser;
+  QDockWidget* myPropertyPanelDock;
 
   XGUI_SelectionMgr* mySelector;
   XGUI_Displayer* myDisplayer;
 
   XGUI_OperationMgr* myOperationMgr; ///< manager to manipulate through the operations
+
+  XGUI_SalomeConnector* mySalomeConnector;
 };
 
 #endif

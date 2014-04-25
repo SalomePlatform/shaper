@@ -27,7 +27,7 @@ XGUI_SelectionMgr::~XGUI_SelectionMgr()
 
 void XGUI_SelectionMgr::onSelectionChanged()
 {
-  XGUI_ObjectsBrowser* aObjBrowser = myWorkshop->mainWindow()->objectBrowser();
+  XGUI_ObjectsBrowser* aObjBrowser = myWorkshop->objectBrowser();
   mySelectedData = aObjBrowser->selectedData();
   
   // Set current document

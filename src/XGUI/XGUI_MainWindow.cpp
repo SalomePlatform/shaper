@@ -28,9 +28,7 @@
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     : QMainWindow(parent), 
-    myObjectBrowser(0),
-    myPythonConsole(0),
-    myPropertyPanelDock(0)
+    myPythonConsole(0)
 {
   setWindowTitle(tr("New Geom"));
   myMenuBar = new XGUI_MainMenu(this);
@@ -39,8 +37,6 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
   setCentralWidget(aMdiArea);
 
   myViewer = new XGUI_Viewer(this);
-
-  //createDockWidgets();
 }
 
 XGUI_MainWindow::~XGUI_MainWindow(void)
@@ -51,18 +47,6 @@ XGUI_MainWindow::~XGUI_MainWindow(void)
 QMdiArea* XGUI_MainWindow::mdiArea() const
 {
   return static_cast<QMdiArea*>(centralWidget());
-}
-
-//******************************************************
-void XGUI_MainWindow::showObjectBrowser()
-{
-  myObjectBrowser->parentWidget()->show();
-}
-
-//******************************************************
-void XGUI_MainWindow::hideObjectBrowser()
-{
-  myObjectBrowser->parentWidget()->hide();
 }
 
 //******************************************************
@@ -89,93 +73,4 @@ void XGUI_MainWindow::hidePythonConsole()
     myPythonConsole->parentWidget()->hide();
 }
 
-void XGUI_MainWindow::showPropertyPanel()
-{
-  QAction* aViewAct = myPropertyPanelDock->toggleViewAction();
-  //<! Restore ability to close panel from the window's menu
-  aViewAct->setEnabled(true);
-  myPropertyPanelDock->show();
-  myPropertyPanelDock->raise();
-}
 
-void XGUI_MainWindow::hidePropertyPanel()
-{
-  QAction* aViewAct = myPropertyPanelDock->toggleViewAction();
-  //<! Do not allow to show empty property panel
-  aViewAct->setEnabled(false);
-  myPropertyPanelDock->hide();
-}
-
-/*
- * Creates dock widgets, places them in corresponding area
- * and tabifies if necessary.
- */
-void XGUI_MainWindow::createDockWidgets()
-{
-  QDockWidget* aObjDock = createObjectBrowser();
-  addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
-  myPropertyPanelDock = createPropertyPanel();
-  addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanelDock);
-  hidePropertyPanel(); //<! Invisible by default
-  hideObjectBrowser();
-  tabifyDockWidget(aObjDock, myPropertyPanelDock);
-}
-
-void XGUI_MainWindow::setPropertyPannelTitle(const QString& theTitle)
-{
-  myPropertyPanelDock->setWindowTitle(theTitle);
-}
-
-
-QDockWidget* XGUI_MainWindow::createPropertyPanel()
-{
-  QDockWidget* aPropPanel = new QDockWidget(this);
-  aPropPanel->setWindowTitle(tr("Property Panel"));
-  QAction* aViewAct = aPropPanel->toggleViewAction();
-  aPropPanel->setObjectName(XGUI::PROP_PANEL);
-
-  QWidget* aContent = new QWidget(aPropPanel);
-  QVBoxLayout* aMainLay = new QVBoxLayout(aContent);
-  aMainLay->setContentsMargins(3, 3, 3, 3);
-  aPropPanel->setWidget(aContent);
-
-  QFrame* aFrm = new QFrame(aContent);
-  aFrm->setFrameStyle(QFrame::Sunken);
-  aFrm->setFrameShape(QFrame::Panel);
-  QHBoxLayout* aBtnLay = new QHBoxLayout(aFrm);
-  aBtnLay->setContentsMargins(0, 0, 0, 0);
-  aMainLay->addWidget(aFrm);
-
-  QPushButton* aBtn = new QPushButton(QIcon(":pictures/button_help.png"), "", aFrm);
-  aBtn->setFlat(true);
-  //connect(aBtn, SIGNAL(clicked()), this, SIGNAL(propertyHelpPressed()));
-  aBtnLay->addWidget(aBtn);
-  aBtnLay->addStretch(1);
-  aBtn = new QPushButton(QIcon(":pictures/button_ok.png"), "", aFrm);
-  aBtn->setObjectName(XGUI::PROP_PANEL_OK);
-  aBtn->setFlat(true);
-  //connect(aBtn, SIGNAL(clicked()), this, SIGNAL(propertyOkPressed()));
-  aBtnLay->addWidget(aBtn);
-  aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
-  aBtn->setObjectName(XGUI::PROP_PANEL_CANCEL);
-  aBtn->setFlat(true);
-  //connect(aBtn, SIGNAL(clicked()), this, SIGNAL(propertyClosePressed()));
-  aBtnLay->addWidget(aBtn);
-
-  QWidget* aCustomWidget = new QWidget(aContent);
-  aCustomWidget->setObjectName(XGUI::PROP_PANEL_WDG);
-  aMainLay->addWidget(aCustomWidget);
-  aMainLay->addStretch(1);
-
-  return aPropPanel;
-}
-
-QDockWidget* XGUI_MainWindow::createObjectBrowser()
-{
-  QDockWidget* aObjDock = new QDockWidget(this);
-  aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-  aObjDock->setWindowTitle(tr("Object browser"));
-  myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
-  aObjDock->setWidget(myObjectBrowser);
-  return aObjDock;
-}

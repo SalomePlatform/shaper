@@ -39,8 +39,9 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
   connect(anOperationMgr, SIGNAL(operationStarted()), this, SLOT(onOperationStarted()));
   connect(anOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
-  connect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
-          this, SLOT(onViewSelectionChanged()));
+  if (!myWorkshop->isSalomeMode())
+    connect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
+            this, SLOT(onViewSelectionChanged()));
 }
 
 PartSet_Module::~PartSet_Module()
@@ -70,18 +71,22 @@ std::string PartSet_Module::featureFile(const std::string& theFeatureId)
 void PartSet_Module::onFeatureTriggered()
 {
   XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
-  QString aCmdId = aCmd->id();
-  std::string aStdCmdId = aCmdId.toStdString();
+  launchOperation(aCmd->id());
+}
+  
+void PartSet_Module::launchOperation(const QString& theCmdId)
+{
+  std::string aStdCmdId = theCmdId.toStdString();
   std::string aPluginFileName = featureFile(aStdCmdId);
   Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginFileName);
   aWdgReader.readAll();
   std::string aXmlCfg = aWdgReader.featureWidgetCfg(aStdCmdId);
   std::string aDescription = aWdgReader.featureDescription(aStdCmdId);
   ModuleBase_PropPanelOperation* aPartSetOp;
-  if (aCmdId == "Sketch" ) {
-    aPartSetOp = new PartSet_OperationSketch(aCmdId, this);
+  if (theCmdId == "Sketch" ) {
+    aPartSetOp = new PartSet_OperationSketch(theCmdId, this);
   } else {
-    aPartSetOp = new ModuleBase_PropPanelOperation(aCmdId, this);
+    aPartSetOp = new ModuleBase_PropPanelOperation(theCmdId, this);
   }
   aPartSetOp->setXmlRepresentation(QString::fromStdString(aXmlCfg));
   aPartSetOp->setDescription(QString::fromStdString(aDescription));
