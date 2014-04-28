@@ -63,6 +63,11 @@ void PartSet_Module::featureCreated(XGUI_Command* theFeature)
   theFeature->connectTo(this, SLOT(onFeatureTriggered()));
 }
 
+QStringList PartSet_Module::nestedFeatures(QString)
+{
+  return QStringList();
+}
+
 std::string PartSet_Module::featureFile(const std::string& theFeatureId)
 {
   return myFeaturesInFiles[theFeatureId];
@@ -74,6 +79,9 @@ std::string PartSet_Module::featureFile(const std::string& theFeatureId)
 void PartSet_Module::onFeatureTriggered()
 {
   XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
+  //Do nothing on uncheck
+  if(aCmd->isCheckable() && !aCmd->isChecked())
+    return;
   launchOperation(aCmd->id());
 }
   

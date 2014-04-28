@@ -18,6 +18,7 @@ class XGUI_Displayer;
 class XGUI_OperationMgr;
 class XGUI_SalomeConnector;
 class XGUI_ObjectsBrowser;
+class XGUI_ActionsMgr;
 class ModuleBase_Operation;
 class ModuleBase_PropPanelOperation;
 
@@ -127,6 +128,8 @@ private:
   XGUI_Displayer* myDisplayer;
 
   XGUI_OperationMgr* myOperationMgr; ///< manager to manipulate through the operations
+  XGUI_ActionsMgr* myActionsMgr;
+
 
   XGUI_SalomeConnector* mySalomeConnector;
 };

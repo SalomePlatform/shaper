@@ -26,6 +26,7 @@ SET(PROJECT_HEADERS
     XGUI_DataTreeModel.h
     XGUI_SelectionMgr.h
     XGUI_SalomeConnector.h
+    XGUI_ActionsMgr.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -51,6 +52,7 @@ SET(PROJECT_SOURCES
 	XGUI_ObjectsBrowser.cpp
 	XGUI_OperationMgr.cpp
     XGUI_SelectionMgr.cpp
+    XGUI_ActionsMgr.cpp
 )
 
 SET(PROJECT_RESOURCES 

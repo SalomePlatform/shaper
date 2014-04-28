@@ -21,6 +21,7 @@ public:
 
   virtual void createFeatures();
   virtual void featureCreated(XGUI_Command* theFeature);
+  virtual QStringList nestedFeatures(QString theFeature);
   std::string featureFile(const std::string&);
 
   virtual void launchOperation(const QString& theCmdId);

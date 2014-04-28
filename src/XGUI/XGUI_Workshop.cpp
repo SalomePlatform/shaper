@@ -14,6 +14,7 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_SalomeConnector.h"
+#include "XGUI_ActionsMgr.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
@@ -60,6 +61,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
   mySelector = new XGUI_SelectionMgr(this);
   myOperationMgr = new XGUI_OperationMgr(this);
+  myActionsMgr = new XGUI_ActionsMgr(this);
   connect(myOperationMgr, SIGNAL(operationStarted()),  this, SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
@@ -230,10 +232,9 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
     hidePropertyPanel();
     updateCommandStatus();
 
-  if (myMainWindow) {
-    XGUI_MainMenu* aMenu = myMainWindow->menuObject();
-    aMenu->restoreCommandState();
-  }
+    if (myMainWindow) {
+      myActionsMgr->restoreCommandState();
+    }
   }
 }
 
@@ -277,9 +278,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
                                                 QString::fromStdString(theMessage->tooltip()),
                                                 QIcon(theMessage->icon().c_str()),
                                                 QKeySequence(), isUsePropPanel);
-    
-    connect(aCommand,                   SIGNAL(toggled(bool)),
-            myMainWindow->menuObject(), SLOT(onFeatureChecked(bool)));
+    myActionsMgr->addCommand(aCommand);
     myPartSetModule->featureCreated(aCommand);
   }
 }
@@ -304,7 +303,7 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
     aCommand = aMenu->feature(theOperation->operationId());
   }
   //Abort operation on uncheck the command
-  connect(aCommand, SIGNAL(toggled(bool)), theOperation, SLOT(setRunning(bool)));
+  connect(aCommand, SIGNAL(triggered(bool)), theOperation, SLOT(setRunning(bool)));
 }
 
 //******************************************************

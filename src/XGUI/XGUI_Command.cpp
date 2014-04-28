@@ -63,7 +63,7 @@ void XGUI_Command::disable()
 
 void XGUI_Command::connectTo(const QObject* theResiver, const char* theSlot)
 {
-    connect(this, SIGNAL(triggered()), theResiver, theSlot);
+    connect(this, SIGNAL(triggered(bool)), theResiver, theSlot);
 }
 
 const QStringList& XGUI_Command::unblockableCommands() const
