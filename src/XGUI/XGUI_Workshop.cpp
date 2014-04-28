@@ -59,6 +59,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   // So, displayer will be created on demand.
 
   mySelector = new XGUI_SelectionMgr(this);
+  connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(changeCurrentDocument()));
   myOperationMgr = new XGUI_OperationMgr(this);
   connect(myOperationMgr, SIGNAL(operationStarted()),  this, SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
@@ -319,7 +320,7 @@ void XGUI_Workshop::onNew()
   QApplication::setOverrideCursor(Qt::WaitCursor);
   if (objectBrowser() == 0) {
     createDockWidgets();
-    mySelector->connectObjectBrowser(objectBrowser());
+    mySelector->connectViewers();
   }
   showObjectBrowser();
   if (!isSalomeMode()) {
@@ -608,4 +609,26 @@ XGUI_Displayer* XGUI_Workshop::displayer() const
       new XGUI_Displayer(myMainWindow->viewer()->AISContext());
   }
   return myDisplayer;
+}
+
+//******************************************************
+void XGUI_Workshop::changeCurrentDocument()
+{
+  QFeatureList aFeatures = objectBrowser()->selectedFeatures();
+  
+  // Set current document
+  if (aFeatures.size() > 0) {
+    FeaturePtr aFeature = aFeatures.first();
+
+    boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+    boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = aFeature->data()->docRef("PartDocument");
+    if (aDocRef)
+      aMgr->setCurrentDocument(aDocRef->value());
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::salomeViewerSelectionChanged()
+{
+  emit salomeViewerSelection();
 }

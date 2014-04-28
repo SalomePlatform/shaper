@@ -4,6 +4,11 @@
 #include "XGUI.h"
 #include "XGUI_Constants.h"
 #include <QObject>
+#include <QModelIndexList>
+
+#include <AIS_ListOfInteractive.hxx>
+#include <NCollection_List.hxx>
+#include <TopoDS_Shape.hxx>
 
 class XGUI_Workshop;
 class XGUI_ObjectsBrowser;
@@ -20,24 +25,32 @@ public:
   XGUI_SelectionMgr(XGUI_Workshop* theParent);
   virtual ~XGUI_SelectionMgr();
 
-  //! Returns list of currently selected objects
-  QFeatureList selectedData() const { return mySelectedData; }
+  //! Returns list of currently selected data objects
+  QFeatureList selectedFeatures() const; 
+  
+  //! Returns list of currently selected QModelIndexes
+  QModelIndexList selectedIndexes() const;
 
-  void connectObjectBrowser(XGUI_ObjectsBrowser* theOB);
+  //! Returns list of currently selected AIS objects
+  void selectedAISObjects(AIS_ListOfInteractive& theList) const;
+
+  //! Returns list of currently selected shapes
+  void selectedShapes(NCollection_List<TopoDS_Shape>& theList) const;
+
+  //! Connects the manager to all viewers accessible by Workshop
+  void connectViewers();
 
 signals:
   //! Emited when selection in a one of viewers was changed
   void selectionChanged();
 
-public slots:
-  void onSelectionChanged();
+private slots:
+  void onObjectBrowserSelection();
+  void onViewerSelection();
 
 private:
-  XGUI_Workshop* myWorkshop;
-  XGUI_ObjectsBrowser* myObjectBrowser;
 
-  //! List of selected features
-  QFeatureList mySelectedData;
+  XGUI_Workshop* myWorkshop;
 };
 
 #endif

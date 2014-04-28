@@ -24,7 +24,7 @@ public:
   XGUI_DocumentDataModel* dataModel() const { return myDocModel; }
 
   //! Returns list of currently selected features
-  QFeatureList selectedData() const { return mySelectedData; }
+  QFeatureList selectedFeatures() const { return mySelectedData; }
 
 signals:
   //! Emited when selection is changed

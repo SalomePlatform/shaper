@@ -1166,13 +1166,5 @@ void XGUI_ViewWindow::updateToolBar()
   myGripWgt->update();
   myViewBar->update();
   myWindowBar->update();
-  //QTimer::singleShot(50, Qt::VeryCoarseTimer, this, SLOT(repaintToolBar()));
 }
 
-/*void XGUI_ViewWindow::repaintToolBar()
-{
-  QApplication::sync();
-  myGripWgt->repaint();
-  myViewBar->repaint();
-  myWindowBar->repaint();
-}*/

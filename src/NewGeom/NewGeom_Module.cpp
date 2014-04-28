@@ -6,13 +6,15 @@
 #include <XGUI_Workshop.h>
 
 #include <LightApp_Application.h>
+#include <LightApp_SelectionMgr.h>
+#include <LightApp_OCCSelector.h>
 #include <OCCViewer_ViewModel.h>
+#include <SUIT_Selector.h>
 
 #include <SUIT_Desktop.h>
 #include <SUIT_ViewManager.h>
 
 #include <QtxActionMenuMgr.h>
-
 
 extern "C" {
   NewGeom_EXPORT CAM_Module* createModule() {
@@ -64,6 +66,11 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
   if (isDone) {
     setMenuShown( true );
     setToolShown( true );
+
+    SUIT_ViewManager* aMgr = application()->viewManager(OCCViewer_Viewer::Type());
+    if (aMgr) {
+      OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(aMgr->getViewModel());
+    }
   }
   return isDone;
 }
@@ -173,4 +180,11 @@ Handle(AIS_InteractiveContext) NewGeom_Module::AISContext() const
     aContext = aViewer->getAISContext();
   }
   return aContext;
+}
+
+//******************************************************
+void NewGeom_Module::selectionChanged()
+{
+  LightApp_Module::selectionChanged();
+  //myWorkshop->salomeViewerSelectionChanged();
 }

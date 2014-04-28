@@ -9,6 +9,7 @@
 #include <XGUI_Viewer.h>
 #include <XGUI_Workshop.h>
 #include <XGUI_OperationMgr.h>
+#include <XGUI_SelectionMgr.h>
 
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
@@ -42,8 +43,7 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
   connect(anOperationMgr, SIGNAL(operationStarted()), this, SLOT(onOperationStarted()));
   connect(anOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
-  if (!myWorkshop->isSalomeMode())
-    connect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
+  connect(myWorkshop->selector(), SIGNAL(selectionChanged()),
             this, SLOT(onViewSelectionChanged()));
 }
 
@@ -136,10 +136,10 @@ void PartSet_Module::onViewSelectionChanged()
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-    if (aViewer) {
+    XGUI_SelectionMgr* aSelector = myWorkshop->selector();
+    if (aSelector) {
       NCollection_List<TopoDS_Shape> aList;
-      aViewer->getSelectedShapes(aList);
+      aSelector->selectedShapes(aList);
       aPreviewOp->setSelectedShapes(aList);
     }
   }
