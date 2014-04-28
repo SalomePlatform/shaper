@@ -94,6 +94,7 @@ protected:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
   void connectWithOperation(ModuleBase_Operation* theOperation);
+  void saveDocument(QString theName);
 
 protected slots:
   /// SLOT, that is called after the operation is started. Update workshop state according to
@@ -117,20 +118,15 @@ private:
   void createDockWidgets();
   void setPropertyPannelTitle(const QString& theTitle);
 
-
+  QString myCurrentFile;
   XGUI_MainWindow* myMainWindow;
   XGUI_Module* myPartSetModule;
-
   XGUI_ObjectsBrowser* myObjectBrowser;
   QDockWidget* myPropertyPanelDock;
-
   XGUI_SelectionMgr* mySelector;
   XGUI_Displayer* myDisplayer;
-
   XGUI_OperationMgr* myOperationMgr; ///< manager to manipulate through the operations
   XGUI_ActionsMgr* myActionsMgr;
-
-
   XGUI_SalomeConnector* mySalomeConnector;
 };
 

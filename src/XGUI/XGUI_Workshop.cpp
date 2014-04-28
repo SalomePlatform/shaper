@@ -46,7 +46,8 @@
 #endif
 
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
-  : QObject(), 
+  : QObject(),
+  myCurrentFile(QString()),
   myPartSetModule(NULL),
   mySalomeConnector(theConnector),
   myPropertyPanelDock(0),
@@ -306,9 +307,34 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
   connect(aCommand, SIGNAL(triggered(bool)), theOperation, SLOT(setRunning(bool)));
 }
 
+/*
+ * Saves document with given name.
+ */
+void XGUI_Workshop::saveDocument(QString theName)
+{
+  QApplication::restoreOverrideCursor();
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  aDoc->save(theName.toLatin1().constData());
+  QApplication::restoreOverrideCursor();
+}
+
 //******************************************************
 void XGUI_Workshop::onExit()
 {
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  if(aDoc->isModified()) {
+    int anAnswer = QMessageBox::question(
+        myMainWindow, tr("Save current file"),
+        tr("The document is modified, save before exit?"),
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
+    if(anAnswer == QMessageBox::Save) {
+      onSave();
+    } else if (anAnswer == QMessageBox::Cancel) {
+      return;
+    }
+  }
   qApp->exit();
 }
 
@@ -333,21 +359,66 @@ void XGUI_Workshop::onNew()
 //******************************************************
 void XGUI_Workshop::onOpen()
 {
-  //QString aFileName = QFileDialog::getOpenFileName(mainWindow());
+  //save current file before close if modified
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  if(aDoc->isModified()) {
+    //TODO(sbh): re-launch the app?
+    int anAnswer = QMessageBox::question(
+        myMainWindow, tr("Save current file"),
+        tr("The document is modified, save before opening another?"),
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
+    if(anAnswer == QMessageBox::Save) {
+      onSave();
+    } else if (anAnswer == QMessageBox::Cancel) {
+      return;
+    }
+    aDoc->close();
+    myCurrentFile = "";
+  }
+
+  //show file dialog, check if readable and open
+  myCurrentFile = QFileDialog::getOpenFileName(mainWindow());
+  if(myCurrentFile.isEmpty())
+    return;
+  QFileInfo aFileInfo(myCurrentFile);
+  if(!aFileInfo.exists() || !aFileInfo.isReadable()) {
+    QMessageBox::critical(myMainWindow, tr("Warning"), tr("Unable to open the file."));
+    myCurrentFile = "";
+    return;
+  }
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  aDoc->load(myCurrentFile.toLatin1().constData());
+  QApplication::restoreOverrideCursor();
   updateCommandStatus();
 }
 
 //******************************************************
 void XGUI_Workshop::onSave()
 {
+  if(myCurrentFile.isEmpty()) {
+    onSaveAs();
+    return;
+  }
+  saveDocument(myCurrentFile);
   updateCommandStatus();
 }
 
 //******************************************************
 void XGUI_Workshop::onSaveAs()
 {
-  //QString aFileName = QFileDialog::getSaveFileName(mainWindow());
-  updateCommandStatus();
+  QString aTemp = myCurrentFile;
+  myCurrentFile = QFileDialog::getSaveFileName(mainWindow());
+  if(myCurrentFile.isEmpty()) {
+    myCurrentFile = aTemp;
+    return;
+  }
+  QFileInfo aFileInfo(myCurrentFile);
+  if(aFileInfo.exists() && !aFileInfo.isWritable()) {
+    QMessageBox::critical(myMainWindow, tr("Warning"), tr("Unable to save the file."));
+    return;
+  }
+  onSave();
 }
 
 //******************************************************
