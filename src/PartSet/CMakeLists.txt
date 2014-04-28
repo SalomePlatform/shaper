@@ -5,17 +5,21 @@ SET(CMAKE_AUTOMOC ON)
 
 SET(PROJECT_HEADERS
 	PartSet.h
+	PartSet_Listener.h
 	PartSet_Module.h
 	PartSet_OperationSketchBase.h
 	PartSet_OperationSketch.h
 	PartSet_OperationSketchLine.h
+	PartSet_Tools.h
 )
 
 SET(PROJECT_SOURCES
+	PartSet_Listener.cpp
 	PartSet_Module.cpp
 	PartSet_OperationSketchBase.cpp
 	PartSet_OperationSketch.cpp
 	PartSet_OperationSketchLine.cpp
+	PartSet_Tools.cpp
 )
 
 SET(PROJECT_RESOURCES 
@@ -47,6 +51,7 @@ SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES} ${PROJECT_RESOURCES})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI 
                     ${CMAKE_SOURCE_DIR}/src/Config
                     ${CMAKE_SOURCE_DIR}/src/Events
+                    ${CMAKE_SOURCE_DIR}/src/Model
                     ${CMAKE_SOURCE_DIR}/src/ModuleBase
                     ${CMAKE_SOURCE_DIR}/src/ModelAPI
                     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI

@@ -16,8 +16,6 @@
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
 
-#include <GeomDataAPI_Point2D.h>
-
 #ifdef _DEBUG
 #include <QDebug>
 #endif
