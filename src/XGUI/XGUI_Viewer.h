@@ -14,6 +14,8 @@
 #include <NCollection_List.hxx>
 #include <TopoDS_Shape.hxx>
 
+#include <QPoint>
+
 class XGUI_MainWindow;
 class QMdiSubWindow;
 class XGUI_ViewWindow;
@@ -56,6 +58,9 @@ public:
   {
     return myAISContext;
   }
+
+  //! Returns an active view window or NULL
+  XGUI_ViewWindow* activeViewWindow() const;
 
   /// Return objects selected in 3D viewer
   /// \param theList - list to be filled with selected objects
@@ -137,6 +142,8 @@ signals:
   void keyRelease(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent);
   void activated(XGUI_ViewWindow* theWindow);
   void selectionChanged();
+  void mouseReleased(QPoint thePoint);
+  void mouseMoved(QPoint thePoint);
 
 public slots:
   void onWindowMinimized(QMdiSubWindow*);

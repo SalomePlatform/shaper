@@ -1,6 +1,8 @@
 #include <PartSet_Module.h>
 #include <PartSet_OperationSketch.h>
 #include <PartSet_OperationSketchLine.h>
+#include <PartSet_Listener.h>
+#include <PartSet_Tools.h>
 
 #include <ModuleBase_Operation.h>
 
@@ -9,6 +11,8 @@
 #include <XGUI_Viewer.h>
 #include <XGUI_Workshop.h>
 #include <XGUI_OperationMgr.h>
+#include <XGUI_ViewWindow.h>
+#include <XGUI_ViewPort.h>
 
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
@@ -37,14 +41,19 @@ extern "C" PARTSET_EXPORT XGUI_Module* createModule(XGUI_Workshop* theWshop)
 PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
 {
   myWorkshop = theWshop;
+  myListener = new PartSet_Listener(this);
+
   XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
 
   connect(anOperationMgr, SIGNAL(operationStarted()), this, SLOT(onOperationStarted()));
   connect(anOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
-  if (!myWorkshop->isSalomeMode())
-    connect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
-            this, SLOT(onViewSelectionChanged()));
+  if (!myWorkshop->isSalomeMode()) {
+    connect(myWorkshop->mainWindow()->viewer(), SIGNAL(mouseReleased(QPoint)),
+            this, SLOT(onMouseReleased(QPoint)));
+    connect(myWorkshop->mainWindow()->viewer(), SIGNAL(mouseMoved(QPoint)),
+            this, SLOT(onMouseMoved(QPoint)));
+  }
 }
 
 PartSet_Module::~PartSet_Module()
@@ -139,7 +148,7 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
     visualizePreview(false);
 }
 
-void PartSet_Module::onViewSelectionChanged()
+void PartSet_Module::onMouseReleased(QPoint thePoint)
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
@@ -148,7 +157,33 @@ void PartSet_Module::onViewSelectionChanged()
     if (aViewer) {
       NCollection_List<TopoDS_Shape> aList;
       aViewer->getSelectedShapes(aList);
-      aPreviewOp->setSelectedShapes(aList);
+      XGUI_ViewWindow* aWindow = aViewer->activeViewWindow();
+      if (aWindow) {
+        Handle(V3d_View) aView3d = aWindow->viewPort()->getView();
+        if ( !aView3d.IsNull() ) {
+          gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(thePoint, aView3d);
+          aPreviewOp->setSelectedShapes(aList, aPoint);
+        }
+      }
+    }
+  }
+}
+
+void PartSet_Module::onMouseMoved(QPoint thePoint)
+{
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aPreviewOp) {
+    XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+    if (aViewer) {
+      XGUI_ViewWindow* aWindow = aViewer->activeViewWindow();
+      if (aWindow) {
+        Handle(V3d_View) aView3d = aWindow->viewPort()->getView();
+        if ( !aView3d.IsNull() ) {
+          gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(thePoint, aView3d);
+          aPreviewOp->setMouseMovePoint(aPoint);
+        }
+      }
     }
   }
 }
@@ -171,14 +206,16 @@ void PartSet_Module::visualizePreview(bool isDisplay)
   if (!aPreviewOp)
     return;
 
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   if (isDisplay) {
     boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview();
-    if (aPreview)
-      myWorkshop->displayer()->LocalSelection(anOperation->feature(),
+    if (aPreview) {
+      aDisplayer->LocalSelection(anOperation->feature(),
                                    aPreview->impl<TopoDS_Shape>(), aPreviewOp->getSelectionMode());
+    }
   }
   else {
-    myWorkshop->displayer()->GlobalSelection(false);
-    myWorkshop->displayer()->Erase(anOperation->feature());
+    aDisplayer->GlobalSelection(false);
+    aDisplayer->Erase(anOperation->feature());
   }
 }

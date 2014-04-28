@@ -35,7 +35,8 @@ int PartSet_OperationSketch::getSelectionMode() const
   return TopAbs_FACE;
 }
 
-void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList)
+void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList,
+                                                const gp_Pnt& theSelectedPoint)
 {
   if (theList.IsEmpty())
     return;

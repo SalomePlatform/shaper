@@ -190,6 +190,10 @@ QMdiSubWindow* XGUI_Viewer::createView(V3d_TypeOfView theType)
   return aWnd;
 }
 
+XGUI_ViewWindow* XGUI_Viewer::activeViewWindow() const
+{
+  return dynamic_cast<XGUI_ViewWindow*>(myActiveView->widget());
+}
 
 void XGUI_Viewer::getSelectedObjects(AIS_ListOfInteractive& theList)
 {
@@ -502,8 +506,10 @@ void XGUI_Viewer::onMouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
   XGUI_ViewPort* aViewPort = theWindow->viewPort();
   Handle(V3d_View) aView3d = aViewPort->getView();
 
-  if ( !aView3d.IsNull() )
+  if ( !aView3d.IsNull() ) {
     myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView3d);
+    mouseMoved(theEvent->pos());
+  }
 }
 
 /*!
@@ -513,5 +519,5 @@ void XGUI_Viewer::onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEv
 {
   myAISContext->Select();
 
-  emit selectionChanged();
+  emit mouseReleased(theEvent->pos());
 }
