@@ -49,6 +49,7 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
 //**************************************************************
 void XGUI_SelectionMgr::onViewerSelection()
 {
+  // TODO: Highliht selected objects in Object Browser
   emit selectionChanged();
 }
 
