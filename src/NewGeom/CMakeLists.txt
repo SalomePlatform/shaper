@@ -7,6 +7,7 @@ SET(PROJECT_HEADERS
 	NewGeom.h
 	NewGeom_Module.h
 	NewGeom_DataModel.h
+	NewGeom_OCCSelector.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -16,6 +17,7 @@ SET(PROJECT_AUTOMOC
 SET(PROJECT_SOURCES
 	NewGeom_Module.cpp
 	NewGeom_DataModel.cpp
+	NewGeom_OCCSelector.cpp
 )
 
 SET(PROJECT_RESOURCES

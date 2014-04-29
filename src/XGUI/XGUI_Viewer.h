@@ -74,6 +74,13 @@ public:
   /// \param theList - list objects to be selected
   void  setObjectsSelected(const AIS_ListOfInteractive& theList);
 
+  /// Returns true if selection in the viewer is enabled
+  bool isSelectionEnabled() const { return mySelectionEnabled; }
+
+  /// Enable or disable selectioon in the viewer
+  // \param toEnable - true or false (enable or disable selection)
+  void setSelectionEnabled(bool toEnable) { mySelectionEnabled = toEnable; }
+
   /// Select the object in 3D viewer.
   /// \param theIO - list objects to be selected
   void setSelected(const Handle(AIS_InteractiveObject)& theIO) { myAISContext->SetSelected(theIO); }
@@ -142,8 +149,8 @@ signals:
   void keyRelease(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent);
   void activated(XGUI_ViewWindow* theWindow);
   void selectionChanged();
-  void mouseReleased(QPoint thePoint);
-  void mouseMoved(QPoint thePoint);
+  //void mouseReleased(QPoint thePoint);
+  //void mouseMoved(QPoint thePoint);
 
 public slots:
   void onWindowMinimized(QMdiSubWindow*);
@@ -153,6 +160,7 @@ private slots:
   void onViewClosed(QMdiSubWindow*);
   void onMouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
   void onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+  void onMousePressed(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
 
 private:
   void addView(QMdiSubWindow* theView);
@@ -179,6 +187,9 @@ private:
   QList<QMdiSubWindow*> myViews;
 
   QMdiSubWindow* myActiveView;
+
+  /// Points used for selection management
+  QPoint myStartPnt, myEndPnt, myCurPnt;
 };
 
 #endif

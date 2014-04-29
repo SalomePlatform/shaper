@@ -455,7 +455,6 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
 
 //    connect(aWindow, SIGNAL(contextMenuRequested( QContextMenuEvent* )),
 //            this,    SLOT  (onContextMenuRequested( QContextMenuEvent* )));
-
     connect(aWindow, SIGNAL(mouseMoving(XGUI_ViewWindow*, QMouseEvent*)),
             this, SLOT(onMouseMove(XGUI_ViewWindow*, QMouseEvent*)));
 
@@ -499,16 +498,25 @@ void XGUI_Viewer::onWindowMinimized(QMdiSubWindow* theWnd)
 }
 
 /*!
+  SLOT: called on mouse button press, stores current mouse position as start point for transformations
+*/
+void XGUI_Viewer::onMousePressed(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
+{
+  myStartPnt.setX(theEvent->x()); myStartPnt.setY(theEvent->y());
+  emit mousePress(theWindow, theEvent);
+}
+
+/*!
   SLOT: called on mouse move, processes hilighting
 */
 void XGUI_Viewer::onMouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
 {
-  XGUI_ViewPort* aViewPort = theWindow->viewPort();
-  Handle(V3d_View) aView3d = aViewPort->getView();
+  if (!mySelectionEnabled) return;
 
+  myCurPnt.setX(theEvent->x()); myCurPnt.setY(theEvent->y());
+  Handle(V3d_View) aView3d = theWindow->viewPort()->getView();
   if ( !aView3d.IsNull() ) {
     myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView3d);
-    mouseMoved(theEvent->pos());
   }
 }
 
@@ -517,7 +525,41 @@ void XGUI_Viewer::onMouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
 */
 void XGUI_Viewer::onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
 {
-  myAISContext->Select();
+  if (!mySelectionEnabled) return;
+  if (theEvent->button() != Qt::LeftButton) return;
 
-  emit mouseReleased(theEvent->pos());
+  myEndPnt.setX(theEvent->x()); myEndPnt.setY(theEvent->y());
+  bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+  
+  //if (!aHasShift) 
+  //  emit deselection();
+
+  if (myStartPnt == myEndPnt) {
+    if (aHasShift && myMultiSelectionEnabled)
+      myAISContext->ShiftSelect();
+    else
+      myAISContext->Select();
+  } else {
+    if (aHasShift && myMultiSelectionEnabled)
+      myAISContext->ShiftSelect(myStartPnt.x(), myStartPnt.y(),
+                                myEndPnt.x(), myEndPnt.y(),
+                                theWindow->viewPort()->getView(), false );
+    else
+      myAISContext->Select(myStartPnt.x(), myStartPnt.y(),
+                           myEndPnt.x(), myEndPnt.y(),
+                           theWindow->viewPort()->getView(), false );
+
+    int Nb = myAISContext->NbSelected();
+    if( Nb>1 && !myMultiSelectionEnabled ) {
+      myAISContext->InitSelected();
+      Handle( SelectMgr_EntityOwner ) anOwner = myAISContext->SelectedOwner();
+      if( !anOwner.IsNull() ) {
+        myAISContext->ClearSelected( Standard_False );
+        myAISContext->AddOrRemoveSelected( anOwner, Standard_False );
+      }
+    }
+
+    myAISContext->UpdateCurrentViewer();
+  }
+  emit selectionChanged();
 }
