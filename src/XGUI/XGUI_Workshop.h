@@ -19,6 +19,7 @@ class XGUI_OperationMgr;
 class XGUI_SalomeConnector;
 class XGUI_ObjectsBrowser;
 class XGUI_ActionsMgr;
+class XGUI_ErrorDialog;
 class ModuleBase_Operation;
 class ModuleBase_PropPanelOperation;
 
@@ -90,6 +91,9 @@ public slots:
 
   void onFeatureTriggered();
 
+signals:
+  void errorOccurred(const QString&);
+
 protected:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
@@ -128,6 +132,7 @@ private:
   XGUI_OperationMgr* myOperationMgr; ///< manager to manipulate through the operations
   XGUI_ActionsMgr* myActionsMgr;
   XGUI_SalomeConnector* mySalomeConnector;
+  XGUI_ErrorDialog* myErrorDlg;
 };
 
 #endif

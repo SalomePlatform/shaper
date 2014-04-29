@@ -15,6 +15,7 @@
 #include "XGUI_OperationMgr.h"
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_ActionsMgr.h"
+#include "XGUI_ErrorDialog.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
@@ -22,6 +23,7 @@
 #include <ModelAPI_AttributeDocRef.h>
 
 #include <Events_Loop.h>
+#include <Events_Error.h>
 #include <ModuleBase_PropPanelOperation.h>
 #include <ModuleBase_Operation.h>
 #include <Config_FeatureMessage.h>
@@ -63,9 +65,12 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   mySelector = new XGUI_SelectionMgr(this);
   myOperationMgr = new XGUI_OperationMgr(this);
   myActionsMgr = new XGUI_ActionsMgr(this);
+  myErrorDlg = new XGUI_ErrorDialog(myMainWindow);
+
   connect(myOperationMgr, SIGNAL(operationStarted()),  this, SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
+  connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
 }
 
 //******************************************************
@@ -79,6 +84,7 @@ void XGUI_Workshop::startApplication()
   initMenu();
   //Initialize event listening
   Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->registerListener(this, Events_Error::errorID()); //!< Listening application errors.
   //TODO(sbh): Implement static method to extract event id [SEID]
   Events_ID aFeatureId = aLoop->eventByName("FeatureEvent");
   aLoop->registerListener(this, aFeatureId);
@@ -175,13 +181,11 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 {
   static Events_ID aFeatureId = Events_Loop::loop()->eventByName("FeatureEvent");
   if (theMessage->eventID() == aFeatureId) {
-    const Config_FeatureMessage* aFeatureMsg =
-        dynamic_cast<const Config_FeatureMessage*>(theMessage);
+    const Config_FeatureMessage* aFeatureMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
     addFeature(aFeatureMsg);
     return;
   }
-  const Config_PointerMessage* aPartSetMsg =
-      dynamic_cast<const Config_PointerMessage*>(theMessage);
+  const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
     ModuleBase_PropPanelOperation* anOperation =
         (ModuleBase_PropPanelOperation*)(aPartSetMsg->pointer());
@@ -193,6 +197,13 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
       }
     }
     return;
+  }
+  const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
+  if (anAppError) {
+      emit errorOccurred(QString::fromLatin1(anAppError->description()));
+      myErrorDlg->show();
+      myErrorDlg->raise();
+      myErrorDlg->activateWindow();
   }
 
 #ifdef _DEBUG

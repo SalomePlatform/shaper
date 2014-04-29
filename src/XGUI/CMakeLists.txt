@@ -27,6 +27,7 @@ SET(PROJECT_HEADERS
     XGUI_SelectionMgr.h
     XGUI_SalomeConnector.h
     XGUI_ActionsMgr.h
+    XGUI_ErrorDialog.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -53,6 +54,7 @@ SET(PROJECT_SOURCES
 	XGUI_OperationMgr.cpp
     XGUI_SelectionMgr.cpp
     XGUI_ActionsMgr.cpp
+    XGUI_ErrorDialog.cpp
 )
 
 SET(PROJECT_RESOURCES 
