@@ -5,12 +5,14 @@ SET(PROJECT_HEADERS
     Events_Message.h
     Events_Listener.h
     Events_Loop.h
+    Events_Error.h
 )
 
 SET(PROJECT_SOURCES
     Events_Message.cpp
     Events_Listener.cpp
     Events_Loop.cpp
+    Events_Error.cpp
 )
 
 ADD_DEFINITIONS(-DEVENTS_EXPORTS)

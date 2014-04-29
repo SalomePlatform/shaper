@@ -15,6 +15,7 @@
 #include "XGUI_OperationMgr.h"
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_ActionsMgr.h"
+#include "XGUI_ErrorDialog.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
@@ -22,6 +23,7 @@
 #include <ModelAPI_AttributeDocRef.h>
 
 #include <Events_Loop.h>
+#include <Events_Error.h>
 #include <ModuleBase_PropPanelOperation.h>
 #include <ModuleBase_Operation.h>
 #include <Config_FeatureMessage.h>
@@ -46,7 +48,8 @@
 #endif
 
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
-  : QObject(), 
+  : QObject(),
+  myCurrentFile(QString()),
   myPartSetModule(NULL),
   mySalomeConnector(theConnector),
   myPropertyPanelDock(0),
@@ -63,9 +66,12 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(changeCurrentDocument()));
   myOperationMgr = new XGUI_OperationMgr(this);
   myActionsMgr = new XGUI_ActionsMgr(this);
+  myErrorDlg = new XGUI_ErrorDialog(myMainWindow);
+
   connect(myOperationMgr, SIGNAL(operationStarted()),  this, SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
+  connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
 }
 
 //******************************************************
@@ -79,6 +85,7 @@ void XGUI_Workshop::startApplication()
   initMenu();
   //Initialize event listening
   Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->registerListener(this, Events_Error::errorID()); //!< Listening application errors.
   //TODO(sbh): Implement static method to extract event id [SEID]
   Events_ID aFeatureId = aLoop->eventByName("FeatureEvent");
   aLoop->registerListener(this, aFeatureId);
@@ -175,13 +182,11 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 {
   static Events_ID aFeatureId = Events_Loop::loop()->eventByName("FeatureEvent");
   if (theMessage->eventID() == aFeatureId) {
-    const Config_FeatureMessage* aFeatureMsg =
-        dynamic_cast<const Config_FeatureMessage*>(theMessage);
+    const Config_FeatureMessage* aFeatureMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
     addFeature(aFeatureMsg);
     return;
   }
-  const Config_PointerMessage* aPartSetMsg =
-      dynamic_cast<const Config_PointerMessage*>(theMessage);
+  const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
     ModuleBase_PropPanelOperation* anOperation =
         (ModuleBase_PropPanelOperation*)(aPartSetMsg->pointer());
@@ -193,6 +198,13 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
       }
     }
     return;
+  }
+  const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
+  if (anAppError) {
+      emit errorOccurred(QString::fromLatin1(anAppError->description()));
+      myErrorDlg->show();
+      myErrorDlg->raise();
+      myErrorDlg->activateWindow();
   }
 
 #ifdef _DEBUG
@@ -307,9 +319,34 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
   connect(aCommand, SIGNAL(triggered(bool)), theOperation, SLOT(setRunning(bool)));
 }
 
+/*
+ * Saves document with given name.
+ */
+void XGUI_Workshop::saveDocument(QString theName)
+{
+  QApplication::restoreOverrideCursor();
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  aDoc->save(theName.toLatin1().constData());
+  QApplication::restoreOverrideCursor();
+}
+
 //******************************************************
 void XGUI_Workshop::onExit()
 {
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  if(aDoc->isModified()) {
+    int anAnswer = QMessageBox::question(
+        myMainWindow, tr("Save current file"),
+        tr("The document is modified, save before exit?"),
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
+    if(anAnswer == QMessageBox::Save) {
+      onSave();
+    } else if (anAnswer == QMessageBox::Cancel) {
+      return;
+    }
+  }
   qApp->exit();
 }
 
@@ -334,21 +371,66 @@ void XGUI_Workshop::onNew()
 //******************************************************
 void XGUI_Workshop::onOpen()
 {
-  //QString aFileName = QFileDialog::getOpenFileName(mainWindow());
+  //save current file before close if modified
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  if(aDoc->isModified()) {
+    //TODO(sbh): re-launch the app?
+    int anAnswer = QMessageBox::question(
+        myMainWindow, tr("Save current file"),
+        tr("The document is modified, save before opening another?"),
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
+    if(anAnswer == QMessageBox::Save) {
+      onSave();
+    } else if (anAnswer == QMessageBox::Cancel) {
+      return;
+    }
+    aDoc->close();
+    myCurrentFile = "";
+  }
+
+  //show file dialog, check if readable and open
+  myCurrentFile = QFileDialog::getOpenFileName(mainWindow());
+  if(myCurrentFile.isEmpty())
+    return;
+  QFileInfo aFileInfo(myCurrentFile);
+  if(!aFileInfo.exists() || !aFileInfo.isReadable()) {
+    QMessageBox::critical(myMainWindow, tr("Warning"), tr("Unable to open the file."));
+    myCurrentFile = "";
+    return;
+  }
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  aDoc->load(myCurrentFile.toLatin1().constData());
+  QApplication::restoreOverrideCursor();
   updateCommandStatus();
 }
 
 //******************************************************
 void XGUI_Workshop::onSave()
 {
+  if(myCurrentFile.isEmpty()) {
+    onSaveAs();
+    return;
+  }
+  saveDocument(myCurrentFile);
   updateCommandStatus();
 }
 
 //******************************************************
 void XGUI_Workshop::onSaveAs()
 {
-  //QString aFileName = QFileDialog::getSaveFileName(mainWindow());
-  updateCommandStatus();
+  QString aTemp = myCurrentFile;
+  myCurrentFile = QFileDialog::getSaveFileName(mainWindow());
+  if(myCurrentFile.isEmpty()) {
+    myCurrentFile = aTemp;
+    return;
+  }
+  QFileInfo aFileInfo(myCurrentFile);
+  if(aFileInfo.exists() && !aFileInfo.isWritable()) {
+    QMessageBox::critical(myMainWindow, tr("Warning"), tr("Unable to save the file."));
+    return;
+  }
+  onSave();
 }
 
 //******************************************************

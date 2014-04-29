@@ -20,6 +20,7 @@
 #include <Config_WidgetReader.h>
 #include <Events_Loop.h>
 #include <Events_Message.h>
+#include <Events_Error.h>
 
 #include <GeomAPI_Shape.h>
 
