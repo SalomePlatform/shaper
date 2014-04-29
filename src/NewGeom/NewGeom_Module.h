@@ -10,8 +10,9 @@
 
 #include <QStringList>
 
-class XGUI_Workshop;
-
+class XGUI_Workshop; 
+class NewGeom_OCCSelector;
+class OCCViewer_Viewer;
 /** 
 * An implementation of SALOME connector class for implementation of
 * XGUI functionality as a module of SALOME
@@ -61,17 +62,24 @@ public:
   virtual Handle(AIS_InteractiveContext) AISContext() const;
 
 public slots:
-  bool activateModule( SUIT_Study* theStudy);
-  bool deactivateModule( SUIT_Study* theStudy);
+  virtual bool activateModule( SUIT_Study* theStudy);
+  virtual bool deactivateModule( SUIT_Study* theStudy);
+
+protected slots:
+  virtual void onViewManagerAdded( SUIT_ViewManager* theMgr );
 
 protected:
   CAM_DataModel* createDataModel();
 
 
 private:
+  NewGeom_OCCSelector* createSelector(SUIT_ViewManager* theMgr);
+
   QStringList myActionsList;
 
   XGUI_Workshop* myWorkshop;
+
+  NewGeom_OCCSelector* mySelector;
 };
 
 #endif
