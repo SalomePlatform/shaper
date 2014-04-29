@@ -2,6 +2,7 @@
 
 #include "NewGeom_Module.h"
 #include "NewGeom_DataModel.h"
+#include "NewGeom_OCCSelector.h"
 
 #include <XGUI_Workshop.h>
 
@@ -20,7 +21,7 @@ extern "C" {
   NewGeom_EXPORT CAM_Module* createModule() {
     return new NewGeom_Module();
   }
-  
+    
   NewGeom_EXPORT char* getModuleVersion() {
     return "0.0";
   }
@@ -29,7 +30,7 @@ extern "C" {
 
 //******************************************************
 NewGeom_Module::NewGeom_Module()
-: LightApp_Module( "NewGeom" )
+: LightApp_Module( "NewGeom" ), mySelector(0)
 {
   myWorkshop = new XGUI_Workshop(this);
 }
@@ -67,12 +68,41 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
     setMenuShown( true );
     setToolShown( true );
 
-    SUIT_ViewManager* aMgr = application()->viewManager(OCCViewer_Viewer::Type());
-    if (aMgr) {
-      OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(aMgr->getViewModel());
+    if (!mySelector) {
+      ViewManagerList OCCViewManagers;
+      application()->viewManagers(OCCViewer_Viewer::Type(), OCCViewManagers);
+      if (OCCViewManagers.size() > 0) {
+        mySelector = createSelector(OCCViewManagers.first());
+      }
     }
   }
   return isDone;
+}
+
+//******************************************************
+void NewGeom_Module::onViewManagerAdded( SUIT_ViewManager* theMgr )
+{
+  if ((!mySelector)) {
+    mySelector = createSelector(theMgr);
+  }
+}
+
+//******************************************************
+NewGeom_OCCSelector* NewGeom_Module::createSelector(SUIT_ViewManager* theMgr)
+{
+  if (theMgr->getType() == OCCViewer_Viewer::Type()) {
+    OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(theMgr->getViewModel());
+    NewGeom_OCCSelector* aSelector = new NewGeom_OCCSelector(aViewer, 
+                                                             getApp()->selectionMgr());
+    LightApp_SelectionMgr* aMgr = getApp()->selectionMgr();
+    QList<SUIT_Selector*> aList;
+    aMgr->selectors(aList);
+    foreach(SUIT_Selector* aSel, aList) {
+      aSel->setEnabled(aSel == aSelector);
+    }
+    return aSelector;
+  }
+  return 0;
 }
 
 //******************************************************
@@ -174,9 +204,8 @@ QAction* NewGeom_Module::command(const QString& theId) const
 Handle(AIS_InteractiveContext) NewGeom_Module::AISContext() const
 {
   Handle(AIS_InteractiveContext) aContext;
-  SUIT_ViewManager* aMgr = application()->viewManager(OCCViewer_Viewer::Type());
-  if (aMgr) {
-    OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(aMgr->getViewModel());
+  OCCViewer_Viewer* aViewer = mySelector->viewer();
+  if (aViewer) {
     aContext = aViewer->getAISContext();
   }
   return aContext;
@@ -186,5 +215,5 @@ Handle(AIS_InteractiveContext) NewGeom_Module::AISContext() const
 void NewGeom_Module::selectionChanged()
 {
   LightApp_Module::selectionChanged();
-  //myWorkshop->salomeViewerSelectionChanged();
+  myWorkshop->salomeViewerSelectionChanged();
 }

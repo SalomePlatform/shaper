@@ -149,8 +149,6 @@ signals:
   void keyRelease(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent);
   void activated(XGUI_ViewWindow* theWindow);
   void selectionChanged();
-  //void mouseReleased(QPoint thePoint);
-  //void mouseMoved(QPoint thePoint);
 
 public slots:
   void onWindowMinimized(QMdiSubWindow*);
