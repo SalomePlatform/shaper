@@ -91,6 +91,7 @@ void XGUI_ActionsMgr::restoreCommandState()
 void XGUI_ActionsMgr::setNestedActionsEnabled(bool isEnabled)
 {
   foreach(QString eachKey, myNestedActions) {
-    myActions[eachKey]->setEnabled(isEnabled);
+    if (myActions.contains(eachKey))
+      myActions[eachKey]->setEnabled(isEnabled);
   }
 }
