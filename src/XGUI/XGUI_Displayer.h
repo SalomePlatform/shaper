@@ -38,6 +38,10 @@ public:
   /// or can not be initialized in constructor
   void setAISContext(const Handle(AIS_InteractiveContext)& theAIS);
 
+  /// Returns the feature visibility state.
+  /// \param theFeature a feature instance
+  bool IsVisible(boost::shared_ptr<ModelAPI_Feature> theFeature);
+
   /// Display the feature. Obtain the visualized object from the feature.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly

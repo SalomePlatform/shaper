@@ -11,6 +11,8 @@
 
 #include <string>
 
+class PartSet_Listener;
+
 class PARTSET_EXPORT PartSet_Module: public QObject, public XGUI_Module
 {
 Q_OBJECT
@@ -21,9 +23,14 @@ public:
 
   virtual void createFeatures();
   virtual void featureCreated(XGUI_Command* theFeature);
+  virtual QStringList nestedFeatures(QString theFeature);
   std::string featureFile(const std::string&);
 
   virtual void launchOperation(const QString& theCmdId);
+
+  /// Displays or erase the current operation preview, if it has it.
+  /// \param isDisplay the state whether the presentation should be displayed or erased
+  void visualizePreview(bool isDisplay);
 
 public slots:
   void onFeatureTriggered();
@@ -35,7 +42,12 @@ public slots:
   void onOperationStopped(ModuleBase_Operation* theOperation);
   /// SLOT, that is called by the selection in the viewer is changed.
   /// The selection is sent to the current operation if it listen the selection.
-  void onViewSelectionChanged();
+  void onMouseReleased(QPoint thePoint);
+  /// SLOT, that is called by the selection in the viewer is changed.
+  /// The selection is sent to the current operation if it listen the selection.
+  /// \thePoint the mouse point
+  void onMouseMoved(QPoint thePoint);
+
   /// SLOT, to apply to the current viewer the operation
   /// \param theX the X projection value
   /// \param theY the Y projection value
@@ -43,12 +55,8 @@ public slots:
   void onViewerProjectionChange(double theX, double theY, double theZ);
 
 private:
-  /// Displays or erase the current operation preview, if it has it.
-  /// \param isDisplay the state whether the presentation should be displayed or erased
-  void visualizePreview(bool isDisplay);
-
-private:
   XGUI_Workshop* myWorkshop;
+  PartSet_Listener* myListener;
 
   std::map<std::string, std::string> myFeaturesInFiles;
 };

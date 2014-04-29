@@ -22,6 +22,11 @@ XGUI_Displayer::~XGUI_Displayer()
 {
 }
 
+bool XGUI_Displayer::IsVisible(boost::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  return myFeature2AISObjectMap.find(theFeature) != myFeature2AISObjectMap.end();
+}
+
 void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
                              const bool isUpdateViewer)
 {
@@ -73,6 +78,10 @@ void XGUI_Displayer::LocalSelection(boost::shared_ptr<ModelAPI_Feature> theFeatu
                                     const int theMode, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
+  
+  if (IsVisible(theFeature)) {
+    Erase(theFeature, false);
+  }
 
   Handle(AIS_Shape) anAIS = new AIS_Shape(theShape);
   std::vector<Handle(AIS_InteractiveObject)> aDispAIS;

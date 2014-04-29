@@ -8,6 +8,7 @@
 #include "PartSet.h"
 
 #include <TopoDS_Shape.hxx>
+#include <gp_Pnt.hxx>
 #include <NCollection_List.hxx>
 
 #include <ModuleBase_PropPanelOperation.h>
@@ -39,8 +40,13 @@ public:
   virtual int getSelectionMode() const = 0;
 
   /// Gives the current selected objects to be processed by the operation
-  /// \param a list of interactive selected objects
-  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList) = 0;
+  /// \param theList a list of interactive selected shapes
+  /// \param theSelectedPoint a 3D selected point
+  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList,
+                                 const gp_Pnt& thePoint) = 0;
+  /// Gives the current mouse point in the viewer
+  /// \param thePoint a point clidked in the viewer
+  virtual void setMouseMovePoint(const gp_Pnt& thePoint) {};
 
 signals:
   void viewerProjectionChange(double theX, double theY, double theZ);

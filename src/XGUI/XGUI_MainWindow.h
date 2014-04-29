@@ -6,6 +6,7 @@
 
 class XGUI_MainMenu;
 class XGUI_Viewer;
+class XGUI_ActionsMgr;
 class QMdiArea;
 class PyConsole_EnhConsole;
 
@@ -43,7 +44,6 @@ public slots:
 
 private:
   XGUI_MainMenu* myMenuBar;
-
   XGUI_Viewer* myViewer;
 
   PyConsole_EnhConsole* myPythonConsole;

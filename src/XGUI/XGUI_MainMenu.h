@@ -47,12 +47,6 @@ public:
   //! Returns list of created commands
   QList<XGUI_Command*> features() const;
 
-public slots:
-  void onFeatureChecked(bool);
-
-  void saveCommandsState();
-  void restoreCommandState();
-
   virtual bool eventFilter(QObject *theWatched, QEvent *theEvent);
 
 private:

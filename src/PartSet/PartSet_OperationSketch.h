@@ -31,7 +31,9 @@ public:
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theList a list of interactive selected shapes
-  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList);
+  /// \param theSelectedPoint a point clidked in the viewer
+  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList,
+                                 const gp_Pnt& theSelectedPoint);
 };
 
 #endif
