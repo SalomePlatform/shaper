@@ -12,6 +12,7 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_OperationMgr.h>
 #include <XGUI_ViewWindow.h>
+#include <XGUI_SelectionMgr.h>
 #include <XGUI_ViewPort.h>
 
 #include <Config_PointerMessage.h>
@@ -154,11 +155,11 @@ void PartSet_Module::onMouseReleased(QPoint thePoint)
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-    if (aViewer) {
+    XGUI_SelectionMgr* aSelector = myWorkshop->selector();
+    if (aSelector) {
       NCollection_List<TopoDS_Shape> aList;
-      aViewer->getSelectedShapes(aList);
-      XGUI_ViewWindow* aWindow = aViewer->activeViewWindow();
+      aSelector->selectedShapes(aList);
+      XGUI_ViewWindow* aWindow = myWorkshop->mainWindow()->viewer()->activeViewWindow();
       if (aWindow) {
         Handle(V3d_View) aView3d = aWindow->viewPort()->getView();
         if ( !aView3d.IsNull() ) {

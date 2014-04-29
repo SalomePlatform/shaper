@@ -73,6 +73,11 @@ public:
   //! Returns Object browser
   XGUI_ObjectsBrowser* objectBrowser() const { return myObjectBrowser; }
 
+  void salomeViewerSelectionChanged();
+
+signals:
+  void salomeViewerSelection();
+
 public slots:
   void updateCommandStatus();
 
@@ -90,6 +95,7 @@ public slots:
   void hideObjectBrowser();
 
   void onFeatureTriggered();
+  void changeCurrentDocument();
 
 signals:
   void errorOccurred(const QString&);

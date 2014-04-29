@@ -23,9 +23,11 @@ public:
   NewGeom_Module();
   virtual ~NewGeom_Module();
 
+  //----- LightAPP_Module interface ---------------
   virtual void initialize( CAM_Application* theApp);
   virtual void windows( QMap<int, int>& theWndMap) const;
   virtual void viewManagers( QStringList& theList) const;
+  virtual void selectionChanged();
 
   //--- XGUI connector interface -----
   virtual void addFeature(const QString& theWBName,
