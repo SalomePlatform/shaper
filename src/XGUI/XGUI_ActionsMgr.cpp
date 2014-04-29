@@ -29,22 +29,22 @@ void XGUI_ActionsMgr::setActionsDisabled(bool isDisabled)
 {
   //Re-enable actions (just restore their state)
   if (!isDisabled) {
+    myNestedActions.clear();
     restoreCommandState();
     return;
   }
   //Disable all actions, but caller and unblockable (defined in a xml)
   saveCommandsState();
-  QStringList aSkippedIds;
   XGUI_Command* aToggledFeature = dynamic_cast<XGUI_Command*>(sender());
-  aSkippedIds.append(aToggledFeature->unblockableCommands());
-  aSkippedIds.append(aToggledFeature->id());
+  QString aSkippedId = aToggledFeature->id();
   QStringList anActionIdsList = myActions.keys();
   foreach(QString eachKey, anActionIdsList) {
-    if (aSkippedIds.removeAll(eachKey) > 0) {
+    if (eachKey == aSkippedId) {
       continue;
     }
     myActions[eachKey]->setEnabled(false);
   }
+  myNestedActions = aToggledFeature->unblockableCommands();
 }
 
 void XGUI_ActionsMgr::saveCommandsState()
@@ -63,5 +63,12 @@ void XGUI_ActionsMgr::restoreCommandState()
   foreach(QString eachKey, anActionIdsList) {
     myActions[eachKey]->setEnabled(myActionsState[eachKey]);
     myActions[eachKey]->setChecked(false);
+  }
+}
+
+void XGUI_ActionsMgr::setNestedActionsEnabled(bool isEnabled)
+{
+  foreach(QString eachKey, myNestedActions) {
+    myActions[eachKey]->setEnabled(isEnabled);
   }
 }

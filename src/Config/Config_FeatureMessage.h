@@ -24,13 +24,11 @@ class Config_FeatureMessage: public Events_Message
   std::string myPluginLibrary;  //Name of feature's library
 
   bool myUseInput; //Action is being checked until user commit the operation
+  std::string myNestedFeatures;
 
 public:
   //const Events_ID theID, const void* theSender = 0
   CONFIG_EXPORT Config_FeatureMessage(const Events_ID theId, const void* theParent = 0);
-
-  //TODO(sbh): Implement static method to extract event id [SEID]
-  //static const char* eventId() { return ""; }
 
   //Auto-generated getters/setters
   CONFIG_EXPORT const std::string& icon() const;
@@ -42,17 +40,18 @@ public:
   CONFIG_EXPORT const std::string& groupId() const;
   CONFIG_EXPORT const std::string& workbenchId() const;
   CONFIG_EXPORT const std::string& pluginLibrary() const;
+  CONFIG_EXPORT const std::string& nestedFeatures() const;
+  CONFIG_EXPORT bool isUseInput() const;
 
   CONFIG_EXPORT void setIcon(const std::string& icon);
   CONFIG_EXPORT void setId(const std::string& id);
   CONFIG_EXPORT void setKeysequence(const std::string& keysequence);
   CONFIG_EXPORT void setText(const std::string& text);
   CONFIG_EXPORT void setTooltip(const std::string& tooltip);
-
   CONFIG_EXPORT void setGroupId(const std::string& groupId);
   CONFIG_EXPORT void setWorkbenchId(const std::string& workbenchId);
   CONFIG_EXPORT void setPluginLibrary(const std::string& thePluginLibrary);
-  CONFIG_EXPORT bool isUseInput() const;
+  CONFIG_EXPORT void setNestedFeatures(const std::string& theNestedFeatures);
   CONFIG_EXPORT void setUseInput(bool isUseInput);
 };
 

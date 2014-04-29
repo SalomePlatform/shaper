@@ -20,14 +20,18 @@ public:
   XGUI_ActionsMgr(QObject* theParent);
   virtual ~XGUI_ActionsMgr();
 
+
   void addCommand(XGUI_Command* theCmd);
-  void restoreCommandState();
   void saveCommandsState();
+  void restoreCommandState();
+
+  void setNestedActionsEnabled(bool);
 
 public slots:
   void setActionsDisabled(bool isEnabled);
 
 private:
+  QStringList myNestedActions;
   QMap<QString, QAction*> myActions;
   QMap<QString, bool> myActionsState;
 };

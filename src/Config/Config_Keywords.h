@@ -38,6 +38,7 @@ const static char* FEATURE_TEXT = "text";
 const static char* FEATURE_TOOLTIP = "tooltip";
 const static char* FEATURE_ICON = "icon";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
+const static char* FEATURE_NESTED = "nested";
 const static char* SOURCE_FILE = "path";
 
 

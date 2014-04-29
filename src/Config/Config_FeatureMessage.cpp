@@ -105,3 +105,13 @@ void Config_FeatureMessage::setUseInput(bool isUseInput)
 {
   myUseInput = isUseInput;
 }
+
+const std::string& Config_FeatureMessage::nestedFeatures() const
+{
+  return myNestedFeatures;
+}
+
+void Config_FeatureMessage::setNestedFeatures(const std::string& theNestedFeatures)
+{
+  myNestedFeatures = theNestedFeatures;
+}

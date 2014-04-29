@@ -291,6 +291,8 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
                                                 QString::fromStdString(theMessage->tooltip()),
                                                 QIcon(theMessage->icon().c_str()),
                                                 QKeySequence(), isUsePropPanel);
+    QString aNestedFeatures = QString::fromStdString(theMessage->nestedFeatures());
+    aCommand->setUnblockableCommands(aNestedFeatures.split(" "));
     myActionsMgr->addCommand(aCommand);
     myPartSetModule->featureCreated(aCommand);
   }

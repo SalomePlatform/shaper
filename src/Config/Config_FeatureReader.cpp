@@ -79,4 +79,5 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theRoot, Config_FeatureMessage
   outFtMessage.setGroupId(myLastGroup);
   outFtMessage.setWorkbenchId(myLastWorkbench);
   outFtMessage.setPluginLibrary(myLibraryName);
+  outFtMessage.setNestedFeatures(getProperty(theRoot, FEATURE_NESTED));
 }
