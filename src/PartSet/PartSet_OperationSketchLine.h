@@ -36,13 +36,11 @@ public:
   virtual int getSelectionMode() const;
 
   /// Gives the current selected objects to be processed by the operation
-  /// \param theList a list of interactive selected shapes
-  /// \param theSelectedPoint a point clidked in the viewer
-  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList,
-                                 const gp_Pnt& thePoint);
+  /// \param thePoint a point clicked in the viewer
+  virtual void mouseReleased(const gp_Pnt& thePoint);
   /// Gives the current mouse point in the viewer
-  /// \param thePoint a point clidked in the viewer
-  virtual void setMouseMovePoint(const gp_Pnt& thePoint);
+  /// \param thePoint a point clicked in the viewer
+  virtual void mouseMoved(const gp_Pnt& thePoint);
 
 protected:
   /// \brief Virtual method called when operation is started

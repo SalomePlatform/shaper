@@ -35,8 +35,7 @@ int PartSet_OperationSketch::getSelectionMode() const
   return TopAbs_FACE;
 }
 
-void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList,
-                                                const gp_Pnt& theSelectedPoint)
+void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList)
 {
   if (theList.IsEmpty())
     return;
@@ -76,7 +75,7 @@ void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Sh
   aDirY->setValue(aC, anA, aB);
 
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
-  emit viewerProjectionChange(aDir->x(), aDir->y(), aDir->z());
+  emit planeSelected(aDir->x(), aDir->y(), aDir->z());
 
   //commit();
   //SketchPlugin_Sketch::setActive(myFeature);

@@ -41,15 +41,15 @@ public:
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theList a list of interactive selected shapes
-  /// \param theSelectedPoint a 3D selected point
-  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList,
-                                 const gp_Pnt& thePoint) = 0;
-  /// Gives the current mouse point in the viewer
-  /// \param thePoint a point clidked in the viewer
-  virtual void setMouseMovePoint(const gp_Pnt& thePoint) {};
+  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList) {};
 
-signals:
-  void viewerProjectionChange(double theX, double theY, double theZ);
+  /// Processes the mouse release in the point
+  /// \param thePoint a point clicked in the viewer
+  virtual void mouseReleased(const gp_Pnt& thePoint) {};
+
+  /// Processes the mouse move in the point
+  /// \param thePoint a 3D point clicked in the viewer
+  virtual void mouseMoved(const gp_Pnt& thePoint) {};
 };
 
 #endif

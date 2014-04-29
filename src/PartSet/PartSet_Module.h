@@ -11,6 +11,8 @@
 
 #include <string>
 
+class XGUI_ViewWindow;
+class QMouseEvent;
 class PartSet_Listener;
 
 class PARTSET_EXPORT PartSet_Module: public QObject, public XGUI_Module
@@ -40,19 +42,26 @@ public slots:
   /// SLOT, that is called after the operation is stopped. Disconnect the sketch feature
   /// from the viewer selection and show the sketch preview.
   void onOperationStopped(ModuleBase_Operation* theOperation);
+
   /// SLOT, that is called by the selection in the viewer is changed.
-  /// The selection is sent to the current operation if it listen the selection.
-  void onMouseReleased(QPoint thePoint);
+  /// The selection is sent to the current operation if it listens selection.
+  void onSelectionChanged();
+  /// SLOT, that is called by mouse click in the viewer.
+  /// The mouse released point is sent to the current operation to be processed.
+  /// \param theWindow the window where the signal appears
+  /// \param theEvent the mouse event
+  void onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
   /// SLOT, that is called by the selection in the viewer is changed.
-  /// The selection is sent to the current operation if it listen the selection.
-  /// \thePoint the mouse point
-  void onMouseMoved(QPoint thePoint);
+  /// The mouse moved point is sent to the current operation to be processed.
+  /// \param theWindow the window where the signal appears
+  /// \param theEvent the mouse event
+  void onMouseMoved(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
 
   /// SLOT, to apply to the current viewer the operation
   /// \param theX the X projection value
   /// \param theY the Y projection value
   /// \param theZ the Z projection value
-  void onViewerProjectionChange(double theX, double theY, double theZ);
+  void onPlaneSelected(double theX, double theY, double theZ);
 
 private:
   XGUI_Workshop* myWorkshop;
