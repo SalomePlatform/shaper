@@ -49,7 +49,7 @@ void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint)
     break;
     case SM_SecondPoint: {
       setLinePoint(thePoint, LINE_ATTR_END);
-      commit();
+      myPointSelectionMode = SM_None;
     }
     break;
     case SM_None: {
@@ -83,7 +83,6 @@ void PartSet_OperationSketchLine::startOperation()
 void PartSet_OperationSketchLine::stopOperation()
 {
   PartSet_OperationSketchBase::stopOperation();
-
   myPointSelectionMode = SM_None;
 }
 

@@ -154,8 +154,8 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   if (!anOperation)
     return;
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp)
-    visualizePreview(false);
+  //if (aPreviewOp)
+  //  visualizePreview(false);
 }
 
 void PartSet_Module::onSelectionChanged()
@@ -218,6 +218,18 @@ void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
   if (aViewer) {
     aViewer->setViewProjection(theX, theY, theZ);
   }
+
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+  if (anOperation) {
+    PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+    if (aPreviewOp) {
+      aPreviewOp->setEditMode(true);
+      // the preview should be shown in another local context
+      visualizePreview(false);
+      visualizePreview(true);
+    }
+  }
+
   myWorkshop->actionsMgr()->setNestedActionsEnabled(true);
 }
 

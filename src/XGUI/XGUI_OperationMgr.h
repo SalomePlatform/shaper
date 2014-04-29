@@ -34,8 +34,9 @@ public:
   /// Returns the current operation or NULL
   /// \return the current operation
   ModuleBase_Operation* currentOperation() const;
-  /// Sets the current operation or NULL
-  /// \return the current operation
+  /// Start the operation and append it to the stack of operations
+  /// \param theOperation the started operation
+  /// \return the state whether the current operation is started
   bool startOperation(ModuleBase_Operation* theOperation);
 
 signals:
@@ -46,6 +47,12 @@ signals:
   void operationStopped(ModuleBase_Operation* theOperation);
 
 protected:
+  /// Sets the current operation or NULL
+  /// \param theOperation the started operation
+  /// \param isCheckBeforeStart the flag whether to check whether the operation can be started
+  /// \return the state whether the operation is resumed
+  void resumeOperation(ModuleBase_Operation* theOperation);
+
   /// Returns whether the operation can be started. Check if there is already started operation and
   /// the granted parameter of the launched operation
   /// \param theOperation an operation to check
