@@ -32,8 +32,14 @@ public:
   /// Gives the current selected objects to be processed by the operation
   /// \param theList a list of interactive selected shapes
   /// \param theSelectedPoint a point clidked in the viewer
-  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList,
-                                 const gp_Pnt& theSelectedPoint);
+  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList);
+
+signals:
+  /// signal about the sketch plane is selected
+  /// \param theX the value in the X direction of the plane
+  /// \param theX the value in the Y direction value of the plane
+  /// \param theX the value in the Z direction of the plane
+  void planeSelected(double theX, double theY, double theZ);
 };
 
 #endif

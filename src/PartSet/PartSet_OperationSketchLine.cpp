@@ -38,12 +38,8 @@ int PartSet_OperationSketchLine::getSelectionMode() const
   return 0;//TopAbs_FACE;
 }
 
-void PartSet_OperationSketchLine::setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList,
-                                                    const gp_Pnt& thePoint)
+void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint)
 {
-  if (theList.IsEmpty())
-    return;
-
   switch (myPointSelectionMode)
   {
     case SM_FirstPoint: {
@@ -65,7 +61,7 @@ void PartSet_OperationSketchLine::setSelectedShapes(const NCollection_List<TopoD
   }
 }
 
-void PartSet_OperationSketchLine::setMouseMovePoint(const gp_Pnt& thePoint)
+void PartSet_OperationSketchLine::mouseMoved(const gp_Pnt& thePoint)
 {
   if (myPointSelectionMode == SM_SecondPoint)
     setLinePoint(thePoint, LINE_ATTR_END);

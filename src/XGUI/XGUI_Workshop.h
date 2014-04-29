@@ -59,6 +59,9 @@ public:
   //! ! Returns operation manager.
   XGUI_OperationMgr* operationMgr() const { return myOperationMgr; }
 
+  //! ! Returns an actions manager
+  XGUI_ActionsMgr* actionsMgr() const { return myActionsMgr; };
+
   //! Creates and adds a new workbench (menu group) with the given name and returns it
   XGUI_Workbench* addWorkbench(const QString& theName);
 

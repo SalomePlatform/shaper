@@ -5,6 +5,8 @@
 #ifndef XGUI_ACTIONSMGR_H_
 #define XGUI_ACTIONSMGR_H_
 
+#include "XGUI.h"
+
 #include <QObject>
 #include <QMap>
 #include <QStringList>
@@ -13,7 +15,7 @@ class XGUI_Command;
 class XGUI_Workshop;
 class QAction;
 
-class XGUI_ActionsMgr: public QObject
+class XGUI_EXPORT XGUI_ActionsMgr: public QObject
 {
   Q_OBJECT
 
