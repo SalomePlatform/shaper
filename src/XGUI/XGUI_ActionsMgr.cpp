@@ -2,21 +2,31 @@
  * XGUI_ActionsMgr.cpp
  */
 
-#include <XGUI_ActionsMgr.h>
-#include <XGUI_Command.h>
+#include "XGUI_ActionsMgr.h"
+#include "XGUI_Command.h"
+#include "XGUI_Workshop.h"
+#include "XGUI_SalomeConnector.h"
+
 #include <QAction>
 
 
-XGUI_ActionsMgr::XGUI_ActionsMgr(QObject* theParent)
- : QObject(theParent)
+XGUI_ActionsMgr::XGUI_ActionsMgr(XGUI_Workshop* theParent)
+ : QObject(theParent), myWorkshop(theParent)
 {
-
+  
 }
 
 XGUI_ActionsMgr::~XGUI_ActionsMgr()
 {
 }
 
+
+void XGUI_ActionsMgr::addCommand(QString theId, QAction* theCmd)
+{
+  myActions.insert(theId,theCmd);
+  myActionsState.insert(theId, theCmd->isEnabled());
+  connect(theCmd, SIGNAL(triggered(bool)), this, SLOT(setActionsDisabled(bool)));
+}
 
 void XGUI_ActionsMgr::addCommand(XGUI_Command* theCmd)
 {
@@ -35,8 +45,15 @@ void XGUI_ActionsMgr::setActionsDisabled(bool isDisabled)
   }
   //Disable all actions, but caller and unblockable (defined in a xml)
   saveCommandsState();
-  XGUI_Command* aToggledFeature = dynamic_cast<XGUI_Command*>(sender());
-  QString aSkippedId = aToggledFeature->id();
+
+  QString aSkippedId;
+  if (myWorkshop->isSalomeMode()) {
+    QAction* aToggledFeature = dynamic_cast<QAction*>(sender());
+    aSkippedId = myWorkshop->salomeConnector()->commandId(aToggledFeature);
+  } else {
+    XGUI_Command* aToggledFeature = dynamic_cast<XGUI_Command*>(sender());
+    aSkippedId = aToggledFeature->id();
+  }
   QStringList anActionIdsList = myActions.keys();
   foreach(QString eachKey, anActionIdsList) {
     if (eachKey == aSkippedId) {
@@ -44,7 +61,12 @@ void XGUI_ActionsMgr::setActionsDisabled(bool isDisabled)
     }
     myActions[eachKey]->setEnabled(false);
   }
-  myNestedActions = aToggledFeature->unblockableCommands();
+  if (myWorkshop->isSalomeMode()) {
+    myNestedActions = myWorkshop->salomeConnector()->nestedActions(aSkippedId);
+  } else {
+    XGUI_Command* aToggledFeature = dynamic_cast<XGUI_Command*>(sender());
+    myNestedActions = aToggledFeature->unblockableCommands();
+  }
 }
 
 void XGUI_ActionsMgr::saveCommandsState()
@@ -69,6 +91,7 @@ void XGUI_ActionsMgr::restoreCommandState()
 void XGUI_ActionsMgr::setNestedActionsEnabled(bool isEnabled)
 {
   foreach(QString eachKey, myNestedActions) {
-    myActions[eachKey]->setEnabled(isEnabled);
+    if (myActions.contains(eachKey))
+      myActions[eachKey]->setEnabled(isEnabled);
   }
 }
