@@ -9,6 +9,7 @@
 #include <XGUI_SalomeConnector.h>
 
 #include <QStringList>
+#include <QMap>
 
 class XGUI_Workshop; 
 class NewGeom_OCCSelector;
@@ -58,6 +59,14 @@ public:
 
   virtual QAction* command(const QString& theId) const;
 
+  //! Set nested actions dependent on command Id
+  //! \param theId - the command ID
+  //! \param theActions - the list of nested actions
+  virtual void setNestedActions(const QString& theId, const QStringList& theActions);
+
+  //! Returns list of nested actions according to the given command ID
+  virtual QStringList nestedActions(const QString& theId) const;
+
   //! Returns AIS_InteractiveContext from current OCCViewer
   virtual Handle(AIS_InteractiveContext) AISContext() const;
 
@@ -80,6 +89,8 @@ private:
   XGUI_Workshop* myWorkshop;
 
   NewGeom_OCCSelector* mySelector;
+
+  QMap<QString, QStringList> myNestedActions;
 };
 
 #endif

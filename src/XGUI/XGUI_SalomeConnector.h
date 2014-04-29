@@ -5,6 +5,7 @@
 
 #include <AIS_InteractiveContext.hxx>
 #include <QString>
+#include <QStringList>
 
 class QMainWindow;
 
@@ -65,6 +66,14 @@ public:
   //! Returns QAction instance by command string Id
   virtual QAction* command(const QString& theId) const = 0;
 
+  //! Set nested actions dependent on command Id
+  //! \param theId - the command ID
+  //! \param theActions - the list of nested actions
+  virtual void setNestedActions(const QString& theId, const QStringList& theActions) = 0;
+
+  //! Returns list of nested actions according to the given command ID
+  virtual QStringList nestedActions(const QString& theId) const = 0;
+  
   //! Returns AIS_InteractiveContext from current OCCViewer
   virtual Handle(AIS_InteractiveContext) AISContext() const = 0;
 };

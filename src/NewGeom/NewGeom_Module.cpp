@@ -201,6 +201,20 @@ QAction* NewGeom_Module::command(const QString& theId) const
 }
 
 //******************************************************
+void NewGeom_Module::setNestedActions(const QString& theId, const QStringList& theActions)
+{
+  myNestedActions[theId] = theActions;
+}
+
+//******************************************************
+QStringList NewGeom_Module::nestedActions(const QString& theId) const
+{
+  if (myNestedActions.contains(theId))
+    return myNestedActions[theId];
+  return QStringList();
+}
+
+//******************************************************
 Handle(AIS_InteractiveContext) NewGeom_Module::AISContext() const
 {
   Handle(AIS_InteractiveContext) aContext;

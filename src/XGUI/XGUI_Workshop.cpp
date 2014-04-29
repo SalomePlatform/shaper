@@ -244,10 +244,7 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   } else {
     hidePropertyPanel();
     updateCommandStatus();
-
-    if (myMainWindow) {
-      myActionsMgr->restoreCommandState();
-    }
+    myActionsMgr->restoreCommandState();
   }
 }
 
@@ -264,15 +261,22 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
   }
   //Find or create Workbench
   QString aWchName = QString::fromStdString(theMessage->workbenchId());
+  QString aNestedFeatures = QString::fromStdString(theMessage->nestedFeatures());
+  bool isUsePropPanel = theMessage->isUseInput();
   if (isSalomeMode()) {
+    QString aId = QString::fromStdString(theMessage->id());
     salomeConnector()->addFeature(aWchName,
                                   QString::fromStdString(theMessage->id()),
-                                  QString::fromStdString(theMessage->text()),
+                                  aId,
                                   QString::fromStdString(theMessage->tooltip()),
                                   QIcon(theMessage->icon().c_str()),
-                                  false, this, 
+                                  isUsePropPanel, this, 
                                   SLOT(onFeatureTriggered()), QKeySequence());
+    myActionsMgr->addCommand(aId, salomeConnector()->command(aId));
+    salomeConnector()->setNestedActions(aId, aNestedFeatures.split(" "));
+
   } else {
+
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
     XGUI_Workbench* aPage = aMenuBar->findWorkbench(aWchName);
     if (!aPage) {
@@ -284,14 +288,12 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
     if (!aGroup) {
       aGroup = aPage->addGroup(aGroupName);
     }
-    bool isUsePropPanel = theMessage->isUseInput();
     //Create feature...
     XGUI_Command* aCommand = aGroup->addFeature(QString::fromStdString(theMessage->id()),
                                                 QString::fromStdString(theMessage->text()),
                                                 QString::fromStdString(theMessage->tooltip()),
                                                 QIcon(theMessage->icon().c_str()),
                                                 QKeySequence(), isUsePropPanel);
-    QString aNestedFeatures = QString::fromStdString(theMessage->nestedFeatures());
     aCommand->setUnblockableCommands(aNestedFeatures.split(" "));
     myActionsMgr->addCommand(aCommand);
     myPartSetModule->featureCreated(aCommand);
