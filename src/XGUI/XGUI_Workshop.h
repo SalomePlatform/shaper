@@ -65,6 +65,9 @@ public:
   //! ! Returns an actions manager
   XGUI_ActionsMgr* actionsMgr() const { return myActionsMgr; };
 
+  //! Returns property panel widget
+  QDockWidget* propertyPanel() const { return myPropertyPanelDock; }
+
   //! Creates and adds a new workbench (menu group) with the given name and returns it
   XGUI_Workbench* addWorkbench(const QString& theName);
 

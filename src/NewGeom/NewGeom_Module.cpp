@@ -10,12 +10,14 @@
 #include <LightApp_SelectionMgr.h>
 #include <LightApp_OCCSelector.h>
 #include <OCCViewer_ViewModel.h>
-#include <SUIT_Selector.h>
 
+#include <SUIT_Selector.h>
 #include <SUIT_Desktop.h>
 #include <SUIT_ViewManager.h>
 
 #include <QtxActionMenuMgr.h>
+
+#include <QDockWidget>
 
 extern "C" {
   NewGeom_EXPORT CAM_Module* createModule() {
@@ -68,6 +70,7 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
   if (isDone) {
     setMenuShown( true );
     setToolShown( true );
+    myWorkshop->propertyPanel()->hide();
 
     if (!mySelector) {
       ViewManagerList OCCViewManagers;
