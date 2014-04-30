@@ -4,6 +4,7 @@
 #define NewGeom_Module_H
 
 #include "NewGeom.h"
+#include "NewGeom_SalomeViewer.h"
 
 #include <LightApp_Module.h>
 #include <XGUI_SalomeConnector.h>
@@ -14,6 +15,7 @@
 class XGUI_Workshop; 
 class NewGeom_OCCSelector;
 class OCCViewer_Viewer;
+
 /** 
 * An implementation of SALOME connector class for implementation of
 * XGUI functionality as a module of SALOME
@@ -67,8 +69,8 @@ public:
   //! Returns list of nested actions according to the given command ID
   virtual QStringList nestedActions(const QString& theId) const;
 
-  //! Returns AIS_InteractiveContext from current OCCViewer
-  virtual Handle(AIS_InteractiveContext) AISContext() const;
+  //! Returns interface to Salome viewer
+  virtual XGUI_SalomeViewer* viewer() const { return myProxyViewer; }
 
 public slots:
   virtual bool activateModule( SUIT_Study* theStudy);
@@ -89,6 +91,8 @@ private:
   XGUI_Workshop* myWorkshop;
 
   NewGeom_OCCSelector* mySelector;
+
+  NewGeom_SalomeViewer* myProxyViewer;
 
   QMap<QString, QStringList> myNestedActions;
 };

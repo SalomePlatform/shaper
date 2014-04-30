@@ -3,11 +3,11 @@
 
 #include "XGUI.h"
 
-#include <AIS_InteractiveContext.hxx>
 #include <QString>
 #include <QStringList>
 
 class QMainWindow;
+class XGUI_SalomeViewer;
 
 /**
 * An interface which provides a connection of XGUI functionality 
@@ -73,9 +73,9 @@ public:
 
   //! Returns list of nested actions according to the given command ID
   virtual QStringList nestedActions(const QString& theId) const = 0;
-  
-  //! Returns AIS_InteractiveContext from current OCCViewer
-  virtual Handle(AIS_InteractiveContext) AISContext() const = 0;
+
+  //! Returns interface to Salome viewer
+  virtual XGUI_SalomeViewer* viewer() const = 0;
 };
 
 #endif

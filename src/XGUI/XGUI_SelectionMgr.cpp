@@ -4,6 +4,7 @@
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_Viewer.h"
 #include "XGUI_SalomeConnector.h"
+#include "XGUI_SalomeViewer.h"
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_PluginManager.h>
@@ -69,7 +70,7 @@ QModelIndexList XGUI_SelectionMgr::selectedIndexes() const
 void XGUI_SelectionMgr::selectedAISObjects(AIS_ListOfInteractive& theList) const
 {
   if (myWorkshop->isSalomeMode()) {
-    Handle(AIS_InteractiveContext) aContext = myWorkshop->salomeConnector()->AISContext();
+    Handle(AIS_InteractiveContext) aContext = myWorkshop->salomeViewer()->AISContext();
     theList.Clear();
     for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
       theList.Append(aContext->SelectedInteractive());
@@ -84,7 +85,7 @@ void XGUI_SelectionMgr::selectedShapes(NCollection_List<TopoDS_Shape>& theList) 
 {
   if (myWorkshop->isSalomeMode()) {
     theList.Clear();
-    Handle(AIS_InteractiveContext) aContext = myWorkshop->salomeConnector()->AISContext();
+    Handle(AIS_InteractiveContext) aContext = myWorkshop->salomeViewer()->AISContext();
     for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
       TopoDS_Shape aShape = aContext->SelectedShape();
       if (!aShape.IsNull())

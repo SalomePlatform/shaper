@@ -28,6 +28,7 @@ SET(PROJECT_HEADERS
     XGUI_SalomeConnector.h
     XGUI_ActionsMgr.h
     XGUI_ErrorDialog.h
+    XGUI_SalomeViewer.h
 )
 
 SET(PROJECT_AUTOMOC 

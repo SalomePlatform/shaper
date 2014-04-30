@@ -20,6 +20,8 @@ class XGUI_SalomeConnector;
 class XGUI_ObjectsBrowser;
 class XGUI_ActionsMgr;
 class XGUI_ErrorDialog;
+class XGUI_SalomeViewer;
+
 class ModuleBase_Operation;
 class ModuleBase_PropPanelOperation;
 
@@ -68,7 +70,11 @@ public:
   //! Redefinition of Events_Listener method
   virtual void processEvent(const Events_Message* theMessage);
 
+  //! Returns an object which provides interface to Salome Module (LightApp_Module)
   XGUI_SalomeConnector* salomeConnector() const { return mySalomeConnector; }
+
+  //! Provides an object which provides interface to Salome Viewer
+  XGUI_SalomeViewer* salomeViewer() const;
 
   //! Returns true if the application works as SALOME module
   bool isSalomeMode() const { return mySalomeConnector != 0; }

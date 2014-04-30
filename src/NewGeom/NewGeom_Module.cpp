@@ -33,6 +33,7 @@ NewGeom_Module::NewGeom_Module()
 : LightApp_Module( "NewGeom" ), mySelector(0)
 {
   myWorkshop = new XGUI_Workshop(this);
+  myProxyViewer = new NewGeom_SalomeViewer(this);
 }
 
 //******************************************************
@@ -100,6 +101,7 @@ NewGeom_OCCSelector* NewGeom_Module::createSelector(SUIT_ViewManager* theMgr)
     foreach(SUIT_Selector* aSel, aList) {
       aSel->setEnabled(aSel == aSelector);
     }
+    myProxyViewer->setSelector(aSelector);
     return aSelector;
   }
   return 0;
@@ -212,17 +214,6 @@ QStringList NewGeom_Module::nestedActions(const QString& theId) const
   if (myNestedActions.contains(theId))
     return myNestedActions[theId];
   return QStringList();
-}
-
-//******************************************************
-Handle(AIS_InteractiveContext) NewGeom_Module::AISContext() const
-{
-  Handle(AIS_InteractiveContext) aContext;
-  OCCViewer_Viewer* aViewer = mySelector->viewer();
-  if (aViewer) {
-    aContext = aViewer->getAISContext();
-  }
-  return aContext;
 }
 
 //******************************************************

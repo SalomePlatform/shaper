@@ -14,6 +14,7 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_SalomeConnector.h"
+#include "XGUI_SalomeViewer.h"
 #include "XGUI_ActionsMgr.h"
 #include "XGUI_ErrorDialog.h"
 
@@ -690,7 +691,7 @@ XGUI_Displayer* XGUI_Workshop::displayer() const
   if (!myDisplayer) {
     XGUI_Workshop* that = (XGUI_Workshop*)this;
     that->myDisplayer = isSalomeMode() ?
-      new XGUI_Displayer(salomeConnector()->AISContext()):
+      new XGUI_Displayer(salomeViewer()->AISContext()):
       new XGUI_Displayer(myMainWindow->viewer()->AISContext());
   }
   return myDisplayer;
@@ -716,4 +717,11 @@ void XGUI_Workshop::changeCurrentDocument()
 void XGUI_Workshop::salomeViewerSelectionChanged()
 {
   emit salomeViewerSelection();
+}
+
+
+//**************************************************************
+XGUI_SalomeViewer* XGUI_Workshop::salomeViewer() const 
+{ 
+  return mySalomeConnector->viewer(); 
 }
