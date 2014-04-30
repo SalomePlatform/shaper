@@ -73,9 +73,9 @@ void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
     aContext->UpdateCurrentViewer();
 }
 
-void XGUI_Displayer::LocalSelection(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                                    const TopoDS_Shape& theShape,
-                                    const int theMode, const bool isUpdateViewer)
+void XGUI_Displayer::DisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                           const TopoDS_Shape& theShape,
+                                           const int theMode, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   
@@ -94,16 +94,16 @@ void XGUI_Displayer::LocalSelection(boost::shared_ptr<ModelAPI_Feature> theFeatu
 
   AIS_ListOfInteractive anAISList;
   anAISList.Append(anAIS);
-  setLocalSelection(anAISList, theMode, true);
+  activateInLocalContext(anAISList, theMode, true);
 }
 
-void XGUI_Displayer::GlobalSelection(const bool isUpdateViewer)
+void XGUI_Displayer::CloseLocalContexts(const bool isUpdateViewer)
 {
-  setGlobalSelection(true);
+  closeAllContexts(true);
 }
 
-void XGUI_Displayer::setLocalSelection(const AIS_ListOfInteractive& theAISObjects, const int theMode,
-                                    const bool isUpdateViewer)
+void XGUI_Displayer::activateInLocalContext(const AIS_ListOfInteractive& theAISObjects, const int theMode,
+                                            const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) ic = AISContext();
 
@@ -133,7 +133,7 @@ void XGUI_Displayer::setLocalSelection(const AIS_ListOfInteractive& theAISObject
     ic->UpdateCurrentViewer();
 }
 
-void XGUI_Displayer::setGlobalSelection(const bool isUpdateViewer)
+void XGUI_Displayer::closeAllContexts(const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) ic = AISContext();
   if (!ic.IsNull()) {
