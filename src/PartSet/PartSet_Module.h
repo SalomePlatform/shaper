@@ -11,9 +11,13 @@
 
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 class XGUI_ViewWindow;
 class QMouseEvent;
+class QKeyEvent;
 class PartSet_Listener;
+class ModelAPI_Feature;
 
 class PARTSET_EXPORT PartSet_Module: public QObject, public XGUI_Module
 {
@@ -31,8 +35,9 @@ public:
   virtual void launchOperation(const QString& theCmdId);
 
   /// Displays or erase the current operation preview, if it has it.
+  /// \param theF
   /// \param isDisplay the state whether the presentation should be displayed or erased
-  void visualizePreview(bool isDisplay);
+  void visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFeature, bool isDisplay);
 
 public slots:
   void onFeatureTriggered();
@@ -57,11 +62,20 @@ public slots:
   /// \param theEvent the mouse event
   void onMouseMoved(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
 
+  /// SLOT, that is called by the key in the viewer is clicked.
+  /// \param theWindow the window where the signal appears
+  /// \param theEvent the mouse event
+  void onKeyRelease(XGUI_ViewWindow*, QKeyEvent*);
+
   /// SLOT, to apply to the current viewer the operation
   /// \param theX the X projection value
   /// \param theY the Y projection value
   /// \param theZ the Z projection value
   void onPlaneSelected(double theX, double theY, double theZ);
+
+  /// SLOT, to visualize the feature in another local context mode
+  /// \param theFeature the feature to be put in another local context mode
+  void onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature);
 
 private:
   XGUI_Workshop* myWorkshop;

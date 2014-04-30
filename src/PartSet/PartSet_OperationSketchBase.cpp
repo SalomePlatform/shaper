@@ -23,9 +23,10 @@ PartSet_OperationSketchBase::~PartSet_OperationSketchBase()
 {
 }
 
-boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview() const
+boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview(
+                                      boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
   boost::shared_ptr<SketchPlugin_Feature> aFeature = 
-    boost::dynamic_pointer_cast<SketchPlugin_Feature>(feature());
+                              boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
   return aFeature->preview();
 }

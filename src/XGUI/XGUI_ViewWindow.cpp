@@ -530,6 +530,10 @@ bool XGUI_ViewWindow::eventFilter(QObject *theObj, QEvent *theEvent)
     if (processViewPort(theEvent)) {
       return true;
     }
+    if (theEvent->type() == QEvent::KeyRelease) {
+      emit keyReleased(this, (QKeyEvent*) theEvent);
+      return true;
+    }
   }
   return QFrame::eventFilter(theObj, theEvent);
 }
