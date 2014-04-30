@@ -101,6 +101,7 @@ signals:
 
 public slots:
   void start();
+  void resume();
   void abort();
   void commit();
 

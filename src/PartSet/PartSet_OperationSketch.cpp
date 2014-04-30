@@ -32,12 +32,18 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 
 int PartSet_OperationSketch::getSelectionMode() const
 {
-  return TopAbs_FACE;
+  int aMode = TopAbs_FACE;
+  if (isEditMode())
+    aMode = TopAbs_VERTEX;
+  return aMode;
 }
 
 void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList)
 {
   if (theList.IsEmpty())
+    return;
+
+  if (isEditMode())
     return;
 
   // get selected shape

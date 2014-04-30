@@ -50,6 +50,13 @@ public:
   /// Processes the mouse move in the point
   /// \param thePoint a 3D point clicked in the viewer
   virtual void mouseMoved(const gp_Pnt& thePoint) {};
+
+  /// temporary code to provide edition mode
+  void setEditMode(const bool isEditMode) { myIsEditMode = isEditMode; };
+protected:
+  bool isEditMode() const { return myIsEditMode; }
+private:
+  bool myIsEditMode;
 };
 
 #endif

@@ -59,6 +59,12 @@ protected:
   /// \param theAttribute the start or end attribute of the line
   void setLinePoint(const gp_Pnt& thePoint, const std::string& theAttribute);
 
+  /// \brief Converts the 3D point to the projected coodinates on the sketch plane.
+  /// \param thePoint the 3D point in the viewer
+  /// \param theX the X coordinate
+  /// \param theY the Y coordinate
+  void convertTo2D(const gp_Pnt& thePoint, double& theX, double& theY);
+
 protected:
   ///< Structure to lists the possible types of point selection modes
   enum PointSelectionMode {SM_FirstPoint, SM_SecondPoint, SM_None};

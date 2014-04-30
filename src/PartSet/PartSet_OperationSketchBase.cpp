@@ -16,6 +16,7 @@ PartSet_OperationSketchBase::PartSet_OperationSketchBase(const QString& theId,
 	                                                     QObject* theParent)
 : ModuleBase_PropPanelOperation(theId, theParent)
 {
+  setEditMode(false);
 }
 
 PartSet_OperationSketchBase::~PartSet_OperationSketchBase()

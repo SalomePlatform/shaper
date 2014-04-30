@@ -36,6 +36,14 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
   return true;
 }
 
+void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
+{
+  connect(theOperation, SIGNAL(stopped()), this, SLOT(onOperationStopped()));
+  connect(theOperation, SIGNAL(started()), this, SIGNAL(operationStarted()));
+
+  theOperation->resume();
+}
+
 bool XGUI_OperationMgr::canStartOperation(ModuleBase_Operation* theOperation)
 {
   bool aCanStart = true;
@@ -78,5 +86,5 @@ void XGUI_OperationMgr::onOperationStopped()
     }
   }
   if (aResultOp)
-    startOperation(aResultOp);
+    resumeOperation(aResultOp);
 }

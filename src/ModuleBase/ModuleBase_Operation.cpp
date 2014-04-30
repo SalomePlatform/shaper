@@ -197,6 +197,19 @@ void ModuleBase_Operation::start()
 }
 
 /*!
+ * \brief Resumes operation
+ *
+ * Public slot. Verifies whether operation can be started and starts operation.
+ * This slot is not virtual and cannot be redefined. Redefine startOperation method
+ * to change behavior of operation. There is no point in using this method. It would
+ * be better to inherit own operator from base one and redefine startOperation method
+ * instead.
+ */
+void ModuleBase_Operation::resume()
+{
+}
+
+/*!
  * \brief Aborts operation
  *
  * Public slot. Aborts operation. This slot is not virtual and cannot be redefined.

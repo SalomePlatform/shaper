@@ -154,8 +154,8 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   if (!anOperation)
     return;
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp)
-    visualizePreview(false);
+  //if (aPreviewOp)
+  //  visualizePreview(false);
 }
 
 void PartSet_Module::onSelectionChanged()
@@ -218,6 +218,16 @@ void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
   if (aViewer) {
     aViewer->setViewProjection(theX, theY, theZ);
   }
+
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+  if (anOperation) {
+    PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+    if (aPreviewOp) {
+      aPreviewOp->setEditMode(true);
+      visualizePreview(false);
+    }
+  }
+
   myWorkshop->actionsMgr()->setNestedActionsEnabled(true);
 }
 
@@ -235,12 +245,12 @@ void PartSet_Module::visualizePreview(bool isDisplay)
   if (isDisplay) {
     boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview();
     if (aPreview) {
-      aDisplayer->LocalSelection(anOperation->feature(),
-                                   aPreview->impl<TopoDS_Shape>(), aPreviewOp->getSelectionMode());
+      aDisplayer->DisplayInLocalContext(anOperation->feature(), aPreview->impl<TopoDS_Shape>(),
+                                        aPreviewOp->getSelectionMode());
     }
   }
   else {
-    aDisplayer->GlobalSelection(false);
+    aDisplayer->CloseLocalContexts(false);
     aDisplayer->Erase(anOperation->feature());
   }
 }

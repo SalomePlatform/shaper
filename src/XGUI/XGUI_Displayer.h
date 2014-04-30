@@ -59,8 +59,9 @@ public:
   /// \param theShape a shape
   /// \param theMode a local selection mode
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void LocalSelection(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape,
-                      const int theMode, const bool isUpdateViewer = true);
+  void DisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                             const TopoDS_Shape& theShape,
+                             const int theMode, const bool isUpdateViewer = true);
 
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance
@@ -69,17 +70,18 @@ public:
 
   /// Deactivates selection of sub-shapes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void GlobalSelection(const bool isUpdateViewer = true);
+  void CloseLocalContexts(const bool isUpdateViewer = true);
 
+protected:
   /// Activate local selection
   /// \param theAIS the list of objects
   /// \param theMode the selection mode
   /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
-  void setLocalSelection(const AIS_ListOfInteractive& theAISObjects, const int theMode,
-                         const bool isUpdateViewer);
+  void activateInLocalContext(const AIS_ListOfInteractive& theAISObjects, const int theMode,
+                              const bool isUpdateViewer);
   /// Deactivate local selection
   /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
-  void setGlobalSelection(const bool isUpdateViewer);
+  void closeAllContexts(const bool isUpdateViewer);
 
   /// Returns currently installed AIS_InteractiveContext
   Handle(AIS_InteractiveContext) AISContext() const { return myAISContext; }
