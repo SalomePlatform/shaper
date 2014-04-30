@@ -33,11 +33,13 @@ public:
   virtual ~PartSet_OperationSketchBase();
 
   /// Returns the feature preview shape
-  boost::shared_ptr<GeomAPI_Shape> preview() const;
+  /// \param theFeature the feature object to obtain the preview
+  boost::shared_ptr<GeomAPI_Shape> preview(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
   /// Returns the operation local selection mode
+  /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual int getSelectionMode() const = 0;
+  virtual int getSelectionMode(boost::shared_ptr<ModelAPI_Feature> theFeature) const = 0;
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theList a list of interactive selected shapes
@@ -51,6 +53,12 @@ public:
   /// \param thePoint a 3D point clicked in the viewer
   virtual void mouseMoved(const gp_Pnt& thePoint) {};
 
+signals:
+  /// Signal about the feature construing is finished
+  /// \param theFeature the result feature
+  void featureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature);
+
+public:
   /// temporary code to provide edition mode
   void setEditMode(const bool isEditMode) { myIsEditMode = isEditMode; };
 protected:

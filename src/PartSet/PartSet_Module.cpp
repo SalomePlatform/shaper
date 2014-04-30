@@ -138,7 +138,10 @@ void PartSet_Module::onOperationStarted()
 
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    visualizePreview(true);
+    visualizePreview(aPreviewOp->feature(), true);
+
+    connect(aPreviewOp, SIGNAL(featureConstructed(boost::shared_ptr<ModelAPI_Feature>)),
+            this, SLOT(onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature>)));
 
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {
@@ -224,14 +227,19 @@ void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
     PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
     if (aPreviewOp) {
       aPreviewOp->setEditMode(true);
-      visualizePreview(false);
+      visualizePreview(aPreviewOp->feature(), false);
     }
   }
 
   myWorkshop->actionsMgr()->setNestedActionsEnabled(true);
 }
 
-void PartSet_Module::visualizePreview(bool isDisplay)
+void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  visualizePreview(theFeature, true);
+}
+
+void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFeature, bool isDisplay)
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   if (!anOperation)
@@ -243,10 +251,10 @@ void PartSet_Module::visualizePreview(bool isDisplay)
 
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   if (isDisplay) {
-    boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview();
+    boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview(theFeature);
     if (aPreview) {
-      aDisplayer->DisplayInLocalContext(anOperation->feature(), aPreview->impl<TopoDS_Shape>(),
-                                        aPreviewOp->getSelectionMode());
+      aDisplayer->DisplayInLocalContext(theFeature, aPreview->impl<TopoDS_Shape>(),
+                                        aPreviewOp->getSelectionMode(theFeature));
     }
   }
   else {

@@ -32,6 +32,8 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
 {
   if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_UPDATED)
   {
-    myModule->visualizePreview(true);
+    const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+    boost::shared_ptr<ModelAPI_Feature> aFeature = aUpdMsg->feature();
+    myModule->visualizePreview(aFeature, true);
   }
 }

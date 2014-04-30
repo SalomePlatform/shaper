@@ -30,7 +30,7 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 {
 }
 
-int PartSet_OperationSketch::getSelectionMode() const
+int PartSet_OperationSketch::getSelectionMode(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
   int aMode = TopAbs_FACE;
   if (isEditMode())

@@ -26,8 +26,9 @@ public:
   virtual ~PartSet_OperationSketch();
 
   /// Returns the operation local selection mode
+  /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual int getSelectionMode() const;
+  virtual int getSelectionMode(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theList a list of interactive selected shapes
