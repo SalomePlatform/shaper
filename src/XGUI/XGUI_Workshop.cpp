@@ -17,6 +17,7 @@
 #include "XGUI_SalomeViewer.h"
 #include "XGUI_ActionsMgr.h"
 #include "XGUI_ErrorDialog.h"
+#include "XGUI_ViewerProxy.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
@@ -59,15 +60,16 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 {
   myMainWindow = mySalomeConnector? 0 : new XGUI_MainWindow();
 
-  // In SALOME viewer is accessible only when module is initialized
-  // and in SALOME mode myDisplayer object has to be created later
-  // So, displayer will be created on demand.
+  myDisplayer = new XGUI_Displayer(this);
 
   mySelector = new XGUI_SelectionMgr(this);
   connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(changeCurrentDocument()));
+
   myOperationMgr = new XGUI_OperationMgr(this);
   myActionsMgr = new XGUI_ActionsMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(myMainWindow);
+
+  myViewerProxy = new XGUI_ViewerProxy(this);
 
   connect(myOperationMgr, SIGNAL(operationStarted()),  this, SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
@@ -363,6 +365,7 @@ void XGUI_Workshop::onNew()
     createDockWidgets();
     mySelector->connectViewers();
   }
+  myViewerProxy->connectToViewer();
   showObjectBrowser();
   if (!isSalomeMode()) {
     myMainWindow->showPythonConsole();
@@ -681,20 +684,6 @@ void XGUI_Workshop::onFeatureTriggered()
     if (!aId.isNull())
       myPartSetModule->launchOperation(aId);
   }
-}
-
-//******************************************************
-XGUI_Displayer* XGUI_Workshop::displayer() const
-{
-  // In SALOME viewer is accessible only when module is initialized
-  // and in SALOME mode myDisplayer object has to be created later (on demand)
-  if (!myDisplayer) {
-    XGUI_Workshop* that = (XGUI_Workshop*)this;
-    that->myDisplayer = isSalomeMode() ?
-      new XGUI_Displayer(salomeViewer()->AISContext()):
-      new XGUI_Displayer(myMainWindow->viewer()->AISContext());
-  }
-  return myDisplayer;
 }
 
 //******************************************************

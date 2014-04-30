@@ -4,6 +4,8 @@
 
 #include "XGUI_Displayer.h"
 #include "XGUI_Viewer.h"
+#include "XGUI_Workshop.h"
+#include "XGUI_ViewerProxy.h"
 
 #include <ModelAPI_Document.h>
 
@@ -13,9 +15,9 @@
 
 #include <AIS_Shape.hxx>
 
-XGUI_Displayer::XGUI_Displayer(const Handle(AIS_InteractiveContext)& theAIS)
+XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
 {
-  myAISContext = theAIS;
+  myWorkshop = theWorkshop;
 }
 
 XGUI_Displayer::~XGUI_Displayer()
@@ -141,4 +143,9 @@ void XGUI_Displayer::closeAllContexts(const bool isUpdateViewer)
     if (isUpdateViewer)
       ic->UpdateCurrentViewer();
   }
+}
+
+Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const 
+{ 
+  return myWorkshop->viewer()->AISContext(); 
 }

@@ -23,7 +23,7 @@ public:
   virtual Handle(AIS_InteractiveContext) AISContext() const;
 
   //! Retrurns V3d_Vioewer from current viewer
-  virtual Handle(V3d_Viewer) V3dViewer() const;
+  virtual Handle(V3d_Viewer) v3dViewer() const;
 
   //! Returns Vsd_View object from currently active view window
   virtual Handle(V3d_View) activeView() const;

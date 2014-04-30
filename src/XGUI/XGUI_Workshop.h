@@ -21,6 +21,7 @@ class XGUI_ObjectsBrowser;
 class XGUI_ActionsMgr;
 class XGUI_ErrorDialog;
 class XGUI_SalomeViewer;
+class XGUI_ViewerProxy;
 
 class ModuleBase_Operation;
 class ModuleBase_PropPanelOperation;
@@ -56,7 +57,7 @@ public:
   XGUI_SelectionMgr* selector() const { return mySelector; }
 
   //! Returns displayer
-  XGUI_Displayer* displayer() const;
+  XGUI_Displayer* displayer() const { return myDisplayer; }
 
   //! ! Returns operation manager.
   XGUI_OperationMgr* operationMgr() const { return myOperationMgr; }
@@ -83,6 +84,8 @@ public:
   XGUI_ObjectsBrowser* objectBrowser() const { return myObjectBrowser; }
 
   void salomeViewerSelectionChanged();
+
+  XGUI_ViewerProxy* viewer() const { return myViewerProxy; }
 
 signals:
   void salomeViewerSelection();
@@ -148,6 +151,7 @@ private:
   XGUI_ActionsMgr* myActionsMgr;
   XGUI_SalomeConnector* mySalomeConnector;
   XGUI_ErrorDialog* myErrorDlg;
+  XGUI_ViewerProxy* myViewerProxy;
 };
 
 #endif

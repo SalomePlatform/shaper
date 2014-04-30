@@ -18,7 +18,7 @@ Handle(AIS_InteractiveContext) NewGeom_SalomeViewer::AISContext() const
   return mySelector->viewer()->getAISContext();
 }
 
-Handle(V3d_Viewer) NewGeom_SalomeViewer::V3dViewer() const
+Handle(V3d_Viewer) NewGeom_SalomeViewer::v3dViewer() const
 {
   return mySelector->viewer()->getViewer3d();
 }

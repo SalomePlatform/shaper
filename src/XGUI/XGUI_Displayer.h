@@ -19,7 +19,7 @@
 
 class XGUI_Viewer;
 class ModelAPI_Feature;
-
+class XGUI_Workshop;
 
 /**\class XGUI_Displayer
  * \ingroup GUI
@@ -30,7 +30,7 @@ class XGUI_EXPORT XGUI_Displayer
 public:
   /// Constructor
   /// \param theViewer the viewer
-  XGUI_Displayer(const Handle(AIS_InteractiveContext)& theAIS);
+  XGUI_Displayer(XGUI_Workshop* theWorkshop);
   /// Destructor
   virtual ~XGUI_Displayer();
 
@@ -84,11 +84,10 @@ protected:
   void closeAllContexts(const bool isUpdateViewer);
 
   /// Returns currently installed AIS_InteractiveContext
-  Handle(AIS_InteractiveContext) AISContext() const { return myAISContext; }
+  Handle(AIS_InteractiveContext) AISContext() const;
 
 protected:
-  ///< the viewer where the objects should be visualized
-  Handle(AIS_InteractiveContext) myAISContext;
+  XGUI_Workshop* myWorkshop;
   std::map<boost::shared_ptr<ModelAPI_Feature>, std::vector<Handle(AIS_InteractiveObject)> > myFeature2AISObjectMap;
 };
 
