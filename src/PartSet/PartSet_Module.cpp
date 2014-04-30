@@ -11,10 +11,10 @@
 #include <XGUI_Viewer.h>
 #include <XGUI_Workshop.h>
 #include <XGUI_OperationMgr.h>
-#include <XGUI_ViewWindow.h>
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_ViewPort.h>
 #include <XGUI_ActionsMgr.h>
+#include <XGUI_ViewerProxy.h>
 
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
@@ -52,16 +52,15 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
   connect(anOperationMgr, SIGNAL(operationStarted()), this, SLOT(onOperationStarted()));
   connect(anOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
-  if (!myWorkshop->isSalomeMode()) {
-    XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-    connect(aViewer, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-    connect(aViewer, SIGNAL(mouseRelease(XGUI_ViewWindow*, QMouseEvent*)),
-            this, SLOT(onMouseReleased(XGUI_ViewWindow*, QMouseEvent*)));
-    connect(aViewer, SIGNAL(mouseMove(XGUI_ViewWindow*, QMouseEvent*)),
-            this, SLOT(onMouseMoved(XGUI_ViewWindow*, QMouseEvent*)));
-    connect(aViewer, SIGNAL(keyRelease(XGUI_ViewWindow*, QKeyEvent*)),
-            this, SLOT(onKeyRelease(XGUI_ViewWindow*, QKeyEvent*)));
-  }
+
+  connect(myWorkshop->selector(), SIGNAL(selectionChanged()), 
+          this, SLOT(onSelectionChanged()));
+  connect(myWorkshop->viewer(), SIGNAL(mouseRelease(QMouseEvent*)),
+          this, SLOT(onMouseReleased(QMouseEvent*)));
+  connect(myWorkshop->viewer(), SIGNAL(mouseMove(QMouseEvent*)),
+          this, SLOT(onMouseMoved(QMouseEvent*)));
+  connect(myWorkshop->viewer(), SIGNAL(keyRelease(QKeyEvent*)),
+          this, SLOT(onKeyRelease(QKeyEvent*)));
 }
 
 PartSet_Module::~PartSet_Module()
@@ -177,7 +176,7 @@ void PartSet_Module::onSelectionChanged()
   }
 }
 
-void PartSet_Module::onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
+void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
 {
   QPoint aPoint = theEvent->pos();
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
@@ -185,39 +184,30 @@ void PartSet_Module::onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* th
   if (aPreviewOp) {
     XGUI_SelectionMgr* aSelector = myWorkshop->selector();
     if (aSelector) {
-      XGUI_ViewWindow* aWindow = myWorkshop->mainWindow()->viewer()->activeViewWindow();
-      if (aWindow) {
-        Handle(V3d_View) aView3d = aWindow->viewPort()->getView();
-        if ( !aView3d.IsNull() ) {
-          gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(aPoint, aView3d);
-          aPreviewOp->mouseReleased(aPnt);
-        }
+      Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
+      if ( !aView3d.IsNull() ) {
+        gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(aPoint, aView3d);
+        aPreviewOp->mouseReleased(aPnt);
       }
     }
   }
 }
 
-void PartSet_Module::onMouseMoved(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
+void PartSet_Module::onMouseMoved(QMouseEvent* theEvent)
 {
   QPoint aPoint = theEvent->pos();
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-    if (aViewer) {
-      XGUI_ViewWindow* aWindow = aViewer->activeViewWindow();
-      if (aWindow) {
-        Handle(V3d_View) aView3d = aWindow->viewPort()->getView();
-        if ( !aView3d.IsNull() ) {
-          gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(aPoint, aView3d);
-          aPreviewOp->mouseMoved(aPnt);
-        }
-      }
+    Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
+    if ( !aView3d.IsNull() ) {
+      gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(aPoint, aView3d);
+      aPreviewOp->mouseMoved(aPnt);
     }
   }
 }
 
-void PartSet_Module::onKeyRelease(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent)
+void PartSet_Module::onKeyRelease(QKeyEvent* theEvent)
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
@@ -228,10 +218,7 @@ void PartSet_Module::onKeyRelease(XGUI_ViewWindow* theWindow, QKeyEvent* theEven
 
 void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
 {
-  XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-  if (aViewer) {
-    aViewer->setViewProjection(theX, theY, theZ);
-  }
+  myWorkshop->viewer()->setViewProjection(theX, theY, theZ);
 
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   if (anOperation) {

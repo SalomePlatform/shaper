@@ -41,6 +41,17 @@ Handle(V3d_View) XGUI_ViewerProxy::activeView() const
   }
 }
  
+void XGUI_ViewerProxy::setViewProjection(double theX, double theY, double theZ)
+{
+  Handle(V3d_View) aView3d = activeView();
+  if ( !aView3d.IsNull() ) {
+    aView3d->SetProj(theX, theY, theZ);
+    aView3d->FitAll( 0.01, true, true );
+    aView3d->SetZSize(0.);
+  }
+}
+
+
 void XGUI_ViewerProxy::connectToViewer()
 {
   if (myWorkshop->isSalomeMode()) {
@@ -57,18 +68,23 @@ void XGUI_ViewerProxy::connectToViewer()
     connect(aViewer, SIGNAL(activated()),
             this, SIGNAL(activated()));
 
-    connect(aViewer, SIGNAL(mousePress(QMouseEvent* theEvent)),
-            this, SIGNAL(mousePress(QMouseEvent* theEvent)));
-    connect(aViewer, SIGNAL(mouseRelease(QMouseEvent* theEvent)),
-            this, SIGNAL(mouseRelease(QMouseEvent* theEvent)));
-    connect(aViewer, SIGNAL(mouseDoubleClick(QMouseEvent* theEvent)),
-            this, SIGNAL(mouseDoubleClick(QMouseEvent* theEvent)));
-    connect(aViewer, SIGNAL(mouseMove(QMouseEvent* theEvent)),
-            this, SIGNAL(mouseMove(QMouseEvent* theEvent)));
-    connect(aViewer, SIGNAL(keyPress(QKeyEvent* theEvent)),
-            this, SIGNAL(keyPress(QKeyEvent* theEvent)));
-    connect(aViewer, SIGNAL(keyRelease(QKeyEvent* theEvent)),
-            this, SIGNAL(keyRelease(QKeyEvent* theEvent)));
+    connect(aViewer, SIGNAL(mousePress(QMouseEvent*)),
+            this, SIGNAL(mousePress(QMouseEvent*)));
+
+    connect(aViewer, SIGNAL(mouseRelease(QMouseEvent*)),
+            this, SIGNAL(mouseRelease(QMouseEvent*)));
+    
+    connect(aViewer, SIGNAL(mouseDoubleClick(QMouseEvent*)),
+            this, SIGNAL(mouseDoubleClick(QMouseEvent*)));
+    
+    connect(aViewer, SIGNAL(mouseMove(QMouseEvent*)),
+            this, SIGNAL(mouseMove(QMouseEvent*)));
+    
+    connect(aViewer, SIGNAL(keyPress(QKeyEvent*)),
+            this, SIGNAL(keyPress(QKeyEvent*)));
+    
+    connect(aViewer, SIGNAL(keyRelease(QKeyEvent*)),
+            this, SIGNAL(keyRelease(QKeyEvent*)));
   } else {
     XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
 

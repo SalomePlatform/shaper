@@ -13,7 +13,7 @@ class XGUI_ViewWindow;
 * It is reccomennded to use this class in operation for accessing to viewer 
 * functionality instead of direct access to a viewer
 */
-class XGUI_ViewerProxy: public XGUI_SalomeViewer
+class XGUI_EXPORT XGUI_ViewerProxy: public XGUI_SalomeViewer
 {
   Q_OBJECT
 public:
@@ -28,6 +28,13 @@ public:
   //! Returns Vsd_View object from currently active view window
   virtual Handle(V3d_View) activeView() const;
 
+  //! Sets the view projection
+  /// \param theX the X projection value
+  /// \param theY the Y projection value
+  /// \param theZ the Z projection value
+  void setViewProjection(double theX, double theY, double theZ);
+
+  /// Connects to a viewer according to current environment
   void connectToViewer();
 
 private slots:

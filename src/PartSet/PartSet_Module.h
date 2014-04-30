@@ -13,7 +13,6 @@
 
 #include <boost/shared_ptr.hpp>
 
-class XGUI_ViewWindow;
 class QMouseEvent;
 class QKeyEvent;
 class PartSet_Listener;
@@ -53,19 +52,16 @@ public slots:
   void onSelectionChanged();
   /// SLOT, that is called by mouse click in the viewer.
   /// The mouse released point is sent to the current operation to be processed.
-  /// \param theWindow the window where the signal appears
   /// \param theEvent the mouse event
-  void onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+  void onMouseReleased(QMouseEvent* theEvent);
   /// SLOT, that is called by the selection in the viewer is changed.
   /// The mouse moved point is sent to the current operation to be processed.
-  /// \param theWindow the window where the signal appears
   /// \param theEvent the mouse event
-  void onMouseMoved(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+  void onMouseMoved(QMouseEvent* theEvent);
 
   /// SLOT, that is called by the key in the viewer is clicked.
-  /// \param theWindow the window where the signal appears
   /// \param theEvent the mouse event
-  void onKeyRelease(XGUI_ViewWindow*, QKeyEvent*);
+  void onKeyRelease(QKeyEvent*);
 
   /// SLOT, to apply to the current viewer the operation
   /// \param theX the X projection value
