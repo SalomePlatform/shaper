@@ -15,6 +15,7 @@
 
 class XGUI_ViewWindow;
 class QMouseEvent;
+class QKeyEvent;
 class PartSet_Listener;
 class ModelAPI_Feature;
 
@@ -60,6 +61,11 @@ public slots:
   /// \param theWindow the window where the signal appears
   /// \param theEvent the mouse event
   void onMouseMoved(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+
+  /// SLOT, that is called by the key in the viewer is clicked.
+  /// \param theWindow the window where the signal appears
+  /// \param theEvent the mouse event
+  void onKeyRelease(XGUI_ViewWindow*, QKeyEvent*);
 
   /// SLOT, to apply to the current viewer the operation
   /// \param theX the X projection value

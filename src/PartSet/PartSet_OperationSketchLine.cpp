@@ -96,6 +96,20 @@ void PartSet_OperationSketchLine::mouseMoved(const gp_Pnt& thePoint)
   }
 }
 
+void PartSet_OperationSketchLine::keyReleased(const int theKey)
+{
+  switch (theKey) {
+    case Qt::Key_Escape:
+      abort();
+      break;
+    case Qt::Key_Enter:
+      //myPointSelectionMode = myPointSelectionMode;
+      break;
+    default:
+      break;
+  }
+}
+
 void PartSet_OperationSketchLine::startOperation()
 {
   PartSet_OperationSketchBase::startOperation();

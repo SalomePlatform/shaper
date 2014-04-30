@@ -59,6 +59,8 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
             this, SLOT(onMouseReleased(XGUI_ViewWindow*, QMouseEvent*)));
     connect(aViewer, SIGNAL(mouseMove(XGUI_ViewWindow*, QMouseEvent*)),
             this, SLOT(onMouseMoved(XGUI_ViewWindow*, QMouseEvent*)));
+    connect(aViewer, SIGNAL(keyRelease(XGUI_ViewWindow*, QKeyEvent*)),
+            this, SLOT(onKeyRelease(XGUI_ViewWindow*, QKeyEvent*)));
   }
 }
 
@@ -212,6 +214,15 @@ void PartSet_Module::onMouseMoved(XGUI_ViewWindow* theWindow, QMouseEvent* theEv
         }
       }
     }
+  }
+}
+
+void PartSet_Module::onKeyRelease(XGUI_ViewWindow* theWindow, QKeyEvent* theEvent)
+{
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aPreviewOp) {
+    aPreviewOp->keyReleased(theEvent->key());
   }
 }
 

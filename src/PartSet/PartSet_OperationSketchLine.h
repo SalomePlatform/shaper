@@ -42,6 +42,9 @@ public:
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   virtual void mouseMoved(const gp_Pnt& thePoint);
+  /// Processes the key pressed in the view
+  /// \param theKey a key value
+  virtual void keyReleased(const int theKey);
 
 signals:
   /// signal about the sketch plane is selected
