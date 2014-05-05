@@ -61,7 +61,7 @@ XGUI_PropertyPanel::~XGUI_PropertyPanel()
 {
 }
 
-void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_IModelWidget*>& theWidgets)
+void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets)
 {
   myWidgets = theWidgets;
 }
@@ -71,9 +71,9 @@ QWidget* XGUI_PropertyPanel::contentWidget()
   return myCustomWidget;
 }
 
-void XGUI_PropertyPanel::updateContentWidget()
+void XGUI_PropertyPanel::updateContentWidget(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
-  foreach(ModuleBase_IModelWidget* eachWidget, myWidgets) {
-    eachWidget->restoreValue();
+  foreach(ModuleBase_ModelWidget* eachWidget, myWidgets) {
+    eachWidget->restoreValue(theFeature);
   }
 }

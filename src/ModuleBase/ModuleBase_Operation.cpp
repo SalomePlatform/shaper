@@ -8,7 +8,7 @@
 #include "ModuleBase_Operation.h"
 
 #include "ModuleBase_OperationDescription.h"
-#include "ModuleBase_WidgetCustom.h"
+#include "ModuleBase_ModelWidget.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Document.h>
@@ -60,9 +60,9 @@ void ModuleBase_Operation::storeCustomValue()
     return;
   }
 
-  ModuleBase_WidgetCustom* aCustom = dynamic_cast<ModuleBase_WidgetCustom*>(sender());
+  ModuleBase_ModelWidget* aCustom = dynamic_cast<ModuleBase_ModelWidget*>(sender());
   if (aCustom)
-    aCustom->store(myFeature);
+    aCustom->storeValue(myFeature);
 }
 
 void ModuleBase_Operation::startOperation()

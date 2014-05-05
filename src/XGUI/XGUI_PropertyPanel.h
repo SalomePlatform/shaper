@@ -8,7 +8,7 @@
 #ifndef XGUI_PROPERTYPANEL_H_
 #define XGUI_PROPERTYPANEL_H_
 
-#include <ModuleBase_IModelWidget.h>
+#include <ModuleBase_ModelWidget.h>
 
 #include <QDockWidget>
 #include <QList>
@@ -21,15 +21,15 @@ public:
   virtual ~XGUI_PropertyPanel();
 
   QWidget* contentWidget();
-  void setModelWidgets(const QList<ModuleBase_IModelWidget*>& theWidgets);
+  void setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets);
 
 public slots:
-  void updateContentWidget();
+  void updateContentWidget(boost::shared_ptr<ModelAPI_Feature> theFeature);
 
 private:
   QWidget* myCustomWidget;
 
-  QList<ModuleBase_IModelWidget*> myWidgets;
+  QList<ModuleBase_ModelWidget*> myWidgets;
 };
 
 #endif /* XGUI_PROPERTYPANEL_H_ */

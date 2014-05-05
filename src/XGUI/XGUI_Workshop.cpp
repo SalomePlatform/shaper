@@ -177,17 +177,27 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 //******************************************************
 void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 {
+  //A message to start feature creation received.
   static Events_ID aFeatureLoadedId = Events_Loop::loop()->eventByName(EVENT_FEATURE_LOADED);
   if (theMessage->eventID() == aFeatureLoadedId) {
     const Config_FeatureMessage* aFeatureMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
     addFeature(aFeatureMsg);
     return;
   }
+  //Update property panel on corresponding message. If there is no current operation (no
+  //property panel), or received message has different feature to the current - do nothing.
   static Events_ID aFeatureUpdatedId = Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED);
-  if (theMessage->eventID() == aFeatureUpdatedId)
+  if (theMessage->eventID() == aFeatureUpdatedId && myOperationMgr->hasOperation())
   {
-    myPropertyPanel->updateContentWidget();
+    const Model_FeatureUpdatedMessage* anUpdateMsg =
+        dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+    boost::shared_ptr<ModelAPI_Feature> aNewFeature = anUpdateMsg->feature();
+    boost::shared_ptr<ModelAPI_Feature> aCurrentFeature = myOperationMgr->currentOperation()->feature();
+    if(aNewFeature == aCurrentFeature) {
+      myPropertyPanel->updateContentWidget(aCurrentFeature);
+    }
   }
+  //An operation passed by message. Start it, process and commit.
   const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
     ModuleBase_Operation* anOperation =
@@ -201,6 +211,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     }
     return;
   }
+  //Show error dialog if error message received.
   const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
   if (anAppError) {
     emit errorOccurred(QString::fromLatin1(anAppError->description()));
@@ -222,8 +233,10 @@ void XGUI_Workshop::onOperationStarted()
     showPropertyPanel();
 
     ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aOperation);
-    aFactory.createWidget(myPropertyPanel->contentWidget());
-    myPropertyPanel->setModelWidgets(aFactory.getWrappedWidgets());
+    QWidget* aContent = myPropertyPanel->contentWidget();
+    qDeleteAll(aContent->children());
+    aFactory.createWidget(aContent);
+    myPropertyPanel->setModelWidgets(aFactory.getModelWidgets());
     myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
   }
 }

@@ -20,7 +20,7 @@
 
 ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent, QString theTitle,
                                                    const std::string& theFeatureAttributeID)
-: ModuleBase_WidgetCustom(theParent), myFeatureAttributeID(theFeatureAttributeID)
+: ModuleBase_ModelWidget(theParent), myFeatureAttributeID(theFeatureAttributeID)
 {
   myGroupBox = new QGroupBox(theTitle, theParent);
   QGridLayout* aGroupLay = new QGridLayout(myGroupBox);
@@ -60,13 +60,27 @@ ModuleBase_WidgetPoint2D::~ModuleBase_WidgetPoint2D()
 {
 }
 
-void ModuleBase_WidgetPoint2D::store(boost::shared_ptr<ModelAPI_Feature> theFeature)
+bool ModuleBase_WidgetPoint2D::storeValue(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myFeatureAttributeID));
 
   aPoint->setValue(myXSpin->value(), myYSpin->value());
+  return true;
+}
+
+bool ModuleBase_WidgetPoint2D::restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myFeatureAttributeID));
+
+  bool isBlocked = this->blockSignals(true);
+  myXSpin->setValue(aPoint->x());
+  myYSpin->setValue(aPoint->y());
+  this->blockSignals(isBlocked);
+  return true;
 }
 
 QWidget* ModuleBase_WidgetPoint2D::getControl() const

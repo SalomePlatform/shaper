@@ -6,7 +6,7 @@
 #define ModuleBase_WidgetPoint2D_H
 
 #include <ModuleBase.h>
-#include "ModuleBase_WidgetCustom.h"
+#include "ModuleBase_ModelWidget.h"
 
 #include <QObject>
 
@@ -19,7 +19,7 @@ class QDoubleSpinBox;
  * \ingroup GUI
  * \brief Custom widget. An abstract class to be redefined to fill with some GUI controls
  */
-class MODULEBASE_EXPORT ModuleBase_WidgetPoint2D : public ModuleBase_WidgetCustom
+class MODULEBASE_EXPORT ModuleBase_WidgetPoint2D : public ModuleBase_ModelWidget
 {
   Q_OBJECT
 public:
@@ -34,7 +34,9 @@ public:
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed
-  virtual void store(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  virtual bool storeValue(boost::shared_ptr<ModelAPI_Feature> theFeature);
+
+  virtual bool restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature);
 
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget

@@ -22,6 +22,11 @@ ModuleBase_Operation* XGUI_OperationMgr::currentOperation() const
   return myOperations.count() > 0 ? myOperations.last() : 0;
 }
 
+bool XGUI_OperationMgr::hasOperation() const
+{
+  return (myOperations.count() > 0) && (myOperations.last() != NULL);
+}
+
 bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
 {
   if (!canStartOperation(theOperation))
