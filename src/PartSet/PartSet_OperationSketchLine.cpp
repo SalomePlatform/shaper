@@ -88,7 +88,7 @@ void PartSet_OperationSketchLine::mouseMoved(const gp_Pnt& thePoint)
       setLinePoint(aPrevFeature, LINE_ATTR_END, LINE_ATTR_START);
       myPointSelectionMode = SM_SecondPoint;
 
-      emit featureConstructed(aPrevFeature);
+      emit featureConstructed(aPrevFeature, FM_Deactivation);
     }
     break;
     default:
@@ -99,27 +99,28 @@ void PartSet_OperationSketchLine::mouseMoved(const gp_Pnt& thePoint)
 void PartSet_OperationSketchLine::keyReleased(const int theKey)
 {
   switch (theKey) {
-    case Qt::Key_Escape:
+    case Qt::Key_Escape: {
+      if (myPointSelectionMode != SM_None)
+        emit featureConstructed(feature(), FM_Abort);
       abort();
-      break;
-    case Qt::Key_Enter:
-      //myPointSelectionMode = myPointSelectionMode;
-      break;
+    }
+    break;
+    case Qt::Key_Return: {
+      if (myPointSelectionMode != SM_None) {
+        emit featureConstructed(feature(), FM_Abort);
+        myPointSelectionMode = SM_FirstPoint;
+        document()->abortOperation();
+      }
+    }
+    break;
     default:
-      break;
+    break;
   }
 }
 
 void PartSet_OperationSketchLine::startOperation()
 {
   PartSet_OperationSketchBase::startOperation();
-
-  if (mySketch) {
-    boost::shared_ptr<SketchPlugin_Feature> aFeature = 
-                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(mySketch);
-
-    aFeature->addSub(feature());
-  }
   myPointSelectionMode = SM_FirstPoint;
 }
 
@@ -127,6 +128,18 @@ void PartSet_OperationSketchLine::stopOperation()
 {
   PartSet_OperationSketchBase::stopOperation();
   myPointSelectionMode = SM_None;
+}
+
+void PartSet_OperationSketchLine::createFeature()
+{
+  PartSet_OperationSketchBase::createFeature();
+  if (mySketch) {
+    boost::shared_ptr<SketchPlugin_Feature> aFeature = 
+                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(mySketch);
+
+    aFeature->addSub(feature());
+  }
+  //emit featureConstructed(aPrevFeature, FM_Activation);
 }
 
 void PartSet_OperationSketchLine::setLinePoint(const gp_Pnt& thePoint,

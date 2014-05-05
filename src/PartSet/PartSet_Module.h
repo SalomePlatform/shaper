@@ -71,7 +71,9 @@ public slots:
 
   /// SLOT, to visualize the feature in another local context mode
   /// \param theFeature the feature to be put in another local context mode
-  void onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  /// \param theMode the mode appeared on the feature
+  void onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                            int theMode);
 
 private:
   XGUI_Workshop* myWorkshop;

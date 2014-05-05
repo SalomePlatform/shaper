@@ -65,6 +65,10 @@ protected:
   /// After the parent operation body perform, reset selection point mode of the operation
   virtual void stopOperation();
 
+  /// Creates a new feature and save it in the operation internal field.
+  /// In addition to the default realization it set a sketch feature to the created feature
+  virtual void createFeature();
+
 protected:
   /// \brief Save the point to the line.
   /// \param thePoint the 3D point in the viewer

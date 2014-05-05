@@ -26,6 +26,9 @@ class PARTSET_EXPORT PartSet_OperationSketchBase : public ModuleBase_Operation
 {
   Q_OBJECT
 public:
+  enum FeatureActionMode { FM_Activation, FM_Deactivation, FM_Abort };
+
+public:
   /// Constructor
   /// \param theId an feature index
   /// \param theParent the object parent
@@ -61,7 +64,9 @@ public:
 signals:
   /// Signal about the feature construing is finished
   /// \param theFeature the result feature
-  void featureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  /// \param theMode the mode of the feature modification
+  void featureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                          int theMode);
 
 public:
   /// temporary code to provide edition mode
