@@ -70,14 +70,15 @@ void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
       continue;
       aContext->Erase(anAISShape);
   }
+  myFeature2AISObjectMap.erase(theFeature);
 
   if (isUpdateViewer)
     aContext->UpdateCurrentViewer();
 }
 
-void XGUI_Displayer::DisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                                           const TopoDS_Shape& theShape,
-                                           const int theMode, const bool isUpdateViewer)
+void XGUI_Displayer::RedisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                             const TopoDS_Shape& theShape,
+                                             const std::list<int>& theModes, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   
@@ -92,47 +93,32 @@ void XGUI_Displayer::DisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature> t
   }
   aDispAIS.push_back(anAIS);
   myFeature2AISObjectMap[theFeature] = aDispAIS;
-  aContext->Display(anAIS, Standard_False);
 
-  AIS_ListOfInteractive anAISList;
-  anAISList.Append(anAIS);
-  activateInLocalContext(anAISList, theMode, true);
+  Handle(AIS_InteractiveContext) ic = AISContext();
+
+  // Open local context if there is no one
+  if (!ic->HasOpenedContext()) {
+    ic->ClearCurrents(false);
+    ic->OpenLocalContext(false/*use displayed objects*/, /*true*/false/*use displayed objects*/,
+                         true/*allow shape decomposition*/);
+  }
+  // Activate selection of objects from prs
+  if (!anAIS.IsNull()) {
+    if (anAIS->IsKind(STANDARD_TYPE(AIS_Shape))) {
+      ic->Display(anAIS, false);
+      ic->Load(anAIS, -1, true/*allow decomposition*/);
+      std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
+      for (; anIt != aLast; anIt++) 
+        ic->Activate(anAIS, AIS_Shape::SelectionMode((TopAbs_ShapeEnum)*anIt));
+    }
+  }
+  if (isUpdateViewer)
+    ic->UpdateCurrentViewer();
 }
 
 void XGUI_Displayer::CloseLocalContexts(const bool isUpdateViewer)
 {
   closeAllContexts(true);
-}
-
-void XGUI_Displayer::activateInLocalContext(const AIS_ListOfInteractive& theAISObjects, const int theMode,
-                                            const bool isUpdateViewer)
-{
-  Handle(AIS_InteractiveContext) ic = AISContext();
-
-  // Open local context if there is no one
-  bool allObjects = false; // calculate by AIS shape
-  if (!ic->HasOpenedContext()) {
-    ic->ClearCurrents(false);
-    ic->OpenLocalContext(allObjects, true, true);
-  }
-
-  // Activate selection of objects from prs
-  AIS_ListIteratorOfListOfInteractive aIter(theAISObjects);
-  for (; aIter.More(); aIter.Next()) {
-    Handle(AIS_InteractiveObject) anAIS = aIter.Value();
-    if (!anAIS.IsNull()) {
-      if (anAIS->IsKind(STANDARD_TYPE(AIS_Shape))) {
-        ic->Load(anAIS, -1, false);
-        ic->Activate(anAIS, AIS_Shape::SelectionMode((TopAbs_ShapeEnum)theMode));
-      }
-      else if (anAIS->DynamicType() != STANDARD_TYPE(AIS_Trihedron)) {
-        ic->Load(anAIS, -1, false);
-        ic->Activate(anAIS, theMode);
-      }
-    }
-  }
-  if (isUpdateViewer)
-    ic->UpdateCurrentViewer();
 }
 
 void XGUI_Displayer::closeAllContexts(const bool isUpdateViewer)

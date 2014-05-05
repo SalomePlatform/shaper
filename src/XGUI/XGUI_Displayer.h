@@ -16,6 +16,7 @@
 
 #include <map>
 #include <vector>
+#include <list>
 
 class XGUI_Viewer;
 class ModelAPI_Feature;
@@ -59,9 +60,9 @@ public:
   /// \param theShape a shape
   /// \param theMode a local selection mode
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void DisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  void RedisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
                              const TopoDS_Shape& theShape,
-                             const int theMode, const bool isUpdateViewer = true);
+                             const std::list<int>& theMode, const bool isUpdateViewer = true);
 
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance
@@ -73,12 +74,6 @@ public:
   void CloseLocalContexts(const bool isUpdateViewer = true);
 
 protected:
-  /// Activate local selection
-  /// \param theAIS the list of objects
-  /// \param theMode the selection mode
-  /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
-  void activateInLocalContext(const AIS_ListOfInteractive& theAISObjects, const int theMode,
-                              const bool isUpdateViewer);
   /// Deactivate local selection
   /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
   void closeAllContexts(const bool isUpdateViewer);

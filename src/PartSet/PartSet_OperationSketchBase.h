@@ -26,6 +26,9 @@ class PARTSET_EXPORT PartSet_OperationSketchBase : public ModuleBase_Operation
 {
   Q_OBJECT
 public:
+  enum FeatureActionMode { FM_Activation, FM_Deactivation, FM_Abort };
+
+public:
   /// Constructor
   /// \param theId an feature index
   /// \param theParent the object parent
@@ -40,7 +43,7 @@ public:
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual int getSelectionMode(boost::shared_ptr<ModelAPI_Feature> theFeature) const = 0;
+  virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const = 0;
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theList a list of interactive selected shapes
@@ -61,7 +64,9 @@ public:
 signals:
   /// Signal about the feature construing is finished
   /// \param theFeature the result feature
-  void featureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  /// \param theMode the mode of the feature modification
+  void featureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                          int theMode);
 
 public:
   /// temporary code to provide edition mode
