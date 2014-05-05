@@ -30,12 +30,12 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 {
 }
 
-int PartSet_OperationSketch::getSelectionMode(boost::shared_ptr<ModelAPI_Feature> theFeature) const
+std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
-  int aMode = TopAbs_FACE;
-  if (isEditMode())
-    aMode = TopAbs_VERTEX;
-  return aMode;
+  std::list<int> aModes;
+  if (!isEditMode())
+    aModes.push_back(TopAbs_FACE);
+  return aModes;
 }
 
 void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList)

@@ -70,6 +70,9 @@ protected:
   /// Virtual method called when operation committed (see commit() method for more description)
   virtual void commitOperation();
 
+  /// Creates a new feature and save it in the operation internal field
+  virtual void createFeature();
+
 private:
   boost::shared_ptr<ModelAPI_Feature> myFeature; /// the operation feature to be handled
 };

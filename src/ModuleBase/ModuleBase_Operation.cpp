@@ -14,7 +14,6 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
-#include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
 
 #ifdef _DEBUG
@@ -67,10 +66,7 @@ void ModuleBase_Operation::storeCustomValue()
 
 void ModuleBase_Operation::startOperation()
 {
-  boost::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_PluginManager::get()->rootDocument();
-  myFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
-  if (myFeature) // TODO: generate an error if feature was not created
-    myFeature->execute();
+  createFeature();
   //emit callSlot();
   //commit();
 }
@@ -86,4 +82,12 @@ void ModuleBase_Operation::abortOperation()
 void ModuleBase_Operation::commitOperation()
 {
   if (myFeature) myFeature->execute();
+}
+
+void ModuleBase_Operation::createFeature()
+{
+  boost::shared_ptr<ModelAPI_Document> aDoc = document();
+  myFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
+  if (myFeature) // TODO: generate an error if feature was not created
+    myFeature->execute();
 }

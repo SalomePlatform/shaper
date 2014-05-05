@@ -34,7 +34,7 @@ public:
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual int getSelectionMode(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
+  virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
   /// Gives the current selected objects to be processed by the operation
   /// \param thePoint a point clicked in the viewer
@@ -64,6 +64,10 @@ protected:
   /// Virtual method called when operation stopped - committed or aborted.
   /// After the parent operation body perform, reset selection point mode of the operation
   virtual void stopOperation();
+
+  /// Creates a new feature and save it in the operation internal field.
+  /// In addition to the default realization it set a sketch feature to the created feature
+  virtual void createFeature();
 
 protected:
   /// \brief Save the point to the line.

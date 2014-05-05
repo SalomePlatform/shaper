@@ -143,8 +143,8 @@ void PartSet_Module::onOperationStarted()
   if (aPreviewOp) {
     visualizePreview(aPreviewOp->feature(), true);
 
-    connect(aPreviewOp, SIGNAL(featureConstructed(boost::shared_ptr<ModelAPI_Feature>)),
-            this, SLOT(onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature>)));
+    connect(aPreviewOp, SIGNAL(featureConstructed(boost::shared_ptr<ModelAPI_Feature>, int)),
+            this, SLOT(onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature>, int)));
 
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {
@@ -233,9 +233,11 @@ void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
   myWorkshop->actionsMgr()->setNestedActionsEnabled(true);
 }
 
-void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                          int theMode)
 {
-  visualizePreview(theFeature, true);
+  bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Abort;
+  visualizePreview(theFeature, isDisplay);
 }
 
 void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFeature, bool isDisplay)
@@ -252,12 +254,12 @@ void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFea
   if (isDisplay) {
     boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview(theFeature);
     if (aPreview) {
-      aDisplayer->DisplayInLocalContext(theFeature, aPreview->impl<TopoDS_Shape>(),
-                                        aPreviewOp->getSelectionMode(theFeature));
+      aDisplayer->RedisplayInLocalContext(theFeature, aPreview->impl<TopoDS_Shape>(),
+                                          aPreviewOp->getSelectionModes(theFeature));
     }
   }
   else {
-    aDisplayer->CloseLocalContexts(false);
+    //aDisplayer->CloseLocalContexts(false);
     aDisplayer->Erase(anOperation->feature());
   }
 }
