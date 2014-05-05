@@ -204,6 +204,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
         (ModuleBase_Operation*)(aPartSetMsg->pointer());
 
     if (myOperationMgr->startOperation(anOperation)) {
+      myPropertyPanel->updateContentWidget(anOperation->feature());
       if (anOperation->getDescription()->xmlRepresentation().isEmpty()) {
         anOperation->commit();
         updateCommandStatus();

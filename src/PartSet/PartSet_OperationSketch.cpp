@@ -38,18 +38,22 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<Mode
   return aModes;
 }
 
-void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList)
+void PartSet_OperationSketch::setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                          const TopoDS_Shape& theShape)
 {
-  if (theList.IsEmpty())
-    return;
+  if (!isEditMode()) {
+    setSketchPlane(theShape);
+    setEditMode(true);
+  }
+  else if (theFeature)
+    emit launchOperation("EditLine", theFeature);
+}
 
-  if (isEditMode())
-    return;
-
+void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
+{
   // get selected shape
-  const TopoDS_Shape& aShape = theList.First();
   boost::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
-  aGShape->setImpl(new TopoDS_Shape(aShape));
+  aGShape->setImpl(new TopoDS_Shape(theShape));
 
   // get plane parameters
   boost::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
@@ -79,10 +83,7 @@ void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Sh
   boost::shared_ptr<GeomDataAPI_Dir> aDirY = 
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRY));
   aDirY->setValue(aC, anA, aB);
-
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
   emit planeSelected(aDir->x(), aDir->y(), aDir->z());
-
-  //commit();
-  //SketchPlugin_Sketch::setActive(myFeature);
 }
+

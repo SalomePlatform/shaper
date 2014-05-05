@@ -7,6 +7,7 @@ SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Listener.h
 	PartSet_Module.h
+	PartSet_OperationEditLine.h
 	PartSet_OperationSketchBase.h
 	PartSet_OperationSketch.h
 	PartSet_OperationSketchLine.h
@@ -16,6 +17,7 @@ SET(PROJECT_HEADERS
 SET(PROJECT_SOURCES
 	PartSet_Listener.cpp
 	PartSet_Module.cpp
+	PartSet_OperationEditLine.cpp
 	PartSet_OperationSketchBase.cpp
 	PartSet_OperationSketch.cpp
 	PartSet_OperationSketchLine.cpp

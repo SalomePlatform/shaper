@@ -45,9 +45,15 @@ public:
   /// \return the selection mode
   virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const = 0;
 
+  /// Initializes some fields accorging to the feature
+  /// \param theFeature the feature
+  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature) {}
+
   /// Gives the current selected objects to be processed by the operation
-  /// \param theList a list of interactive selected shapes
-  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList) {};
+  /// \param theFeature the selected feature
+  /// \param theShape the selected shape
+  virtual void setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                           const TopoDS_Shape& theShape) {};
 
   /// Processes the mouse release in the point
   /// \param thePoint a point clicked in the viewer
@@ -67,6 +73,10 @@ signals:
   /// \param theMode the mode of the feature modification
   void featureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
                           int theMode);
+  /// signal about the request to launch operation
+  /// theName the operation name
+  /// theFeature the operation argument
+  void launchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature);
 
 public:
   /// temporary code to provide edition mode

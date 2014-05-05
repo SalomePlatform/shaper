@@ -1,6 +1,7 @@
 #include <PartSet_Module.h>
 #include <PartSet_OperationSketch.h>
 #include <PartSet_OperationSketchLine.h>
+#include <PartSet_OperationEditLine.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <PartSet_Listener.h>
@@ -105,34 +106,8 @@ void PartSet_Module::onFeatureTriggered()
   
 void PartSet_Module::launchOperation(const QString& theCmdId)
 {
-  std::string aStdCmdId = theCmdId.toStdString();
-  std::string aPluginFileName = featureFile(aStdCmdId);
-  Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginFileName);
-  aWdgReader.readAll();
-  std::string aXmlCfg = aWdgReader.featureWidgetCfg(aStdCmdId);
-  std::string aDescription = aWdgReader.featureDescription(aStdCmdId);
-  ModuleBase_Operation* aPartSetOp;
-  if (theCmdId == "Sketch" ) {
-    aPartSetOp = new PartSet_OperationSketch(theCmdId, this);
-  }
-  else if(theCmdId == "SketchLine") {
-    ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
-    boost::shared_ptr<ModelAPI_Feature> aSketchFeature;
-    if (anOperation)
-      aSketchFeature = anOperation->feature();
-    aPartSetOp = new PartSet_OperationSketchLine(theCmdId, this, aSketchFeature);
-  }
-  else {
-    aPartSetOp = new ModuleBase_Operation(theCmdId, this);
-  }
-  aPartSetOp->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
-  aPartSetOp->getDescription()->setDescription(QString::fromStdString(aDescription));
-
-  //TODO(sbh): Implement static method to extract event id [SEID]
-  static Events_ID aModuleEvent = Events_Loop::eventByName("PartSetModuleEvent");
-  Config_PointerMessage aMessage(aModuleEvent, this);
-  aMessage.setPointer(aPartSetOp);
-  Events_Loop::loop()->send(aMessage);
+  ModuleBase_Operation* anOperation = createOperation(theCmdId);
+  sendOperation(anOperation);
 }
 
 void PartSet_Module::onOperationStarted()
@@ -150,6 +125,9 @@ void PartSet_Module::onOperationStarted()
     if (aSketchOp) {
       connect(aSketchOp, SIGNAL(planeSelected(double, double, double)),
               this, SLOT(onPlaneSelected(double, double, double)));
+      connect(aSketchOp, SIGNAL(launchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)),
+              this, SLOT(onLaunchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)));
+
     }
   }
 }
@@ -172,7 +150,14 @@ void PartSet_Module::onSelectionChanged()
     if (aSelector) {
       NCollection_List<TopoDS_Shape> aList;
       aSelector->selectedShapes(aList);
-      aPreviewOp->setSelectedShapes(aList);
+
+      XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+      boost::shared_ptr<ModelAPI_Feature> aFeature;
+      if (!aList.IsEmpty()) {
+        const TopoDS_Shape& aShape = aList.First();
+        aFeature = aDisplayer->GetFeature(aShape);
+        aPreviewOp->setSelected(aFeature, aShape);
+      }
     }
   }
 }
@@ -225,7 +210,6 @@ void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
   if (anOperation) {
     PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
     if (aPreviewOp) {
-      aPreviewOp->setEditMode(true);
       visualizePreview(aPreviewOp->feature(), false);
     }
   }
@@ -233,11 +217,64 @@ void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
   myWorkshop->actionsMgr()->setNestedActionsEnabled(true);
 }
 
+void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  ModuleBase_Operation* anOperation = createOperation(theName.c_str());
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aPreviewOp)
+  {
+    aPreviewOp->init(theFeature);
+  }
+  sendOperation(anOperation);
+}
+
 void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                           int theMode)
 {
   bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Abort;
   visualizePreview(theFeature, isDisplay);
+}
+
+ModuleBase_Operation* PartSet_Module::createOperation(const QString& theCmdId)
+{
+  std::string aStdCmdId = theCmdId.toStdString();
+  if (aStdCmdId == "EditLine")
+    aStdCmdId = "SketchLine";
+  std::string aPluginFileName = featureFile(aStdCmdId);
+  Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginFileName);
+  aWdgReader.readAll();
+  std::string aXmlCfg = aWdgReader.featureWidgetCfg(aStdCmdId);
+  std::string aDescription = aWdgReader.featureDescription(aStdCmdId);
+  ModuleBase_Operation* anOperation;
+  if (theCmdId == "Sketch" ) {
+    anOperation = new PartSet_OperationSketch(theCmdId, this);
+  }
+  else if(theCmdId == "SketchLine" || theCmdId == "EditLine") {
+    ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
+    boost::shared_ptr<ModelAPI_Feature> aSketchFeature;
+    if (aCurOperation)
+      aSketchFeature = aCurOperation->feature();
+    if (theCmdId == "SketchLine")
+      anOperation = new PartSet_OperationSketchLine(theCmdId, this, aSketchFeature);
+    else
+      anOperation = new PartSet_OperationEditLine(theCmdId, this, aSketchFeature);
+  }
+  else {
+    anOperation = new ModuleBase_Operation(theCmdId, this);
+  }
+  anOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
+  anOperation->getDescription()->setDescription(QString::fromStdString(aDescription));
+
+  return anOperation;
+}
+
+void PartSet_Module::sendOperation(ModuleBase_Operation* theOperation)
+{
+  //TODO(sbh): Implement static method to extract event id [SEID]
+  static Events_ID aModuleEvent = Events_Loop::eventByName("PartSetModuleEvent");
+  Config_PointerMessage aMessage(aModuleEvent, this);
+  aMessage.setPointer(theOperation);
+  Events_Loop::loop()->send(aMessage);
 }
 
 void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFeature, bool isDisplay)

@@ -31,9 +31,10 @@ public:
   virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
   /// Gives the current selected objects to be processed by the operation
-  /// \param theList a list of interactive selected shapes
-  /// \param theSelectedPoint a point clidked in the viewer
-  virtual void setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList);
+  /// \param theFeature the selected feature
+  /// \param theShape the selected shape
+  virtual void setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                           const TopoDS_Shape& theShape);
 
 signals:
   /// signal about the sketch plane is selected
@@ -41,6 +42,11 @@ signals:
   /// \param theX the value in the Y direction value of the plane
   /// \param theX the value in the Z direction of the plane
   void planeSelected(double theX, double theY, double theZ);
+
+protected:
+  /// Set the plane to the current sketch
+  /// \param theShape the shape
+  void setSketchPlane(const TopoDS_Shape& theShape);
 };
 
 #endif
