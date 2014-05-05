@@ -5,6 +5,7 @@
 #include "NewGeom_OCCSelector.h"
 
 #include <XGUI_Workshop.h>
+#include <XGUI_PropertyPanel.h>
 
 #include <LightApp_Application.h>
 #include <LightApp_SelectionMgr.h>
