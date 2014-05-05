@@ -9,7 +9,7 @@
 #define ModuleBase_WidgetFactory_H_
 
 #include <ModuleBase.h>
-#include <ModuleBase_IModelWidget.h>
+#include <ModuleBase_ModelWidget.h>
 
 #include <QString>
 #include <QList>
@@ -27,9 +27,9 @@ public:
 
   void createWidget(QWidget* theParent);
 
-  QList<ModuleBase_IModelWidget*> getWrappedWidgets() const
+  QList<ModuleBase_ModelWidget*> getModelWidgets() const
   {
-    return myWidgets;
+    return myModelWidgets;
   }
 
 protected:
@@ -47,7 +47,7 @@ private:
   Config_WidgetAPI* myWidgetApi;
   ModuleBase_Operation*   myOperation;
 
-  QList<ModuleBase_IModelWidget*> myWidgets;
+  QList<ModuleBase_ModelWidget*> myModelWidgets;
 };
 
 #endif /* ModuleBase_WidgetFactory_H_ */

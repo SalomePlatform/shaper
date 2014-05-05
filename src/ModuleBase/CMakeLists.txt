@@ -7,11 +7,10 @@ SET(PROJECT_HEADERS
 	ModuleBase_Operation.h
 	ModuleBase_OperationDescription.h	
 	ModuleBase_PropPanelOperation.h
-	ModuleBase_WidgetCustom.h
+	ModuleBase_ModelWidget.h
 	ModuleBase_WidgetFactory.h
 	ModuleBase_WidgetPoint2D.h
 	ModuleBase_WidgetSwitch.h
-	ModuleBase_IModelWidget.h
 	ModuleBase_MetaWidget.h
 )
 

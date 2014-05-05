@@ -34,6 +34,8 @@ public:
   /// Returns the current operation or NULL
   /// \return the current operation
   ModuleBase_Operation* currentOperation() const;
+  /// Returns true is operation manager has at least one non-null operation.
+  bool hasOperation() const;
   /// Start the operation and append it to the stack of operations
   /// \param theOperation the started operation
   /// \return the state whether the current operation is started

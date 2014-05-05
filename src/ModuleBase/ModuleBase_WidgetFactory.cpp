@@ -185,17 +185,16 @@ QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl()
   aControlLay->setStretch(1, 1);
   result->setLayout(aControlLay);
   connectWidget(aBox, WDG_DOUBLEVALUE);
-  ModuleBase_MetaWidget* aWrappedWdg =
-      new ModuleBase_MetaWidget(anObjName, aBox, myOperation->feature());
-  myWidgets.append(aWrappedWdg);
   return result;
 }
 
 QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
 {
   ModuleBase_WidgetPoint2D* aWidget = new ModuleBase_WidgetPoint2D(theParent,
-                       qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME)), myWidgetApi->widgetId());
+                       qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME)),
+                       myWidgetApi->widgetId());
   connectWidget(aWidget, WDG_POINT_SELECTOR);
+  myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
 
@@ -207,8 +206,7 @@ bool ModuleBase_WidgetFactory::connectWidget(QObject* theWidget,  const QString&
                               myOperation, SLOT(storeReal(double)));
   }
   if (theType == WDG_POINT_SELECTOR) {
-    ModuleBase_WidgetCustom* aCustom = dynamic_cast<ModuleBase_WidgetCustom*>(theWidget);
-    result = QObject::connect(aCustom, SIGNAL(valuesChanged()), 
+    result = QObject::connect(theWidget, SIGNAL(valuesChanged()),
                               myOperation, SLOT(storeCustomValue()));
   }
   return result;
