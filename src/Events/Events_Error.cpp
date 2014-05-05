@@ -35,7 +35,7 @@ void Events_Error::send(char* theDescription, const void* theSender)
   Events_Loop::loop()->send(anError);
 }
 
-static void send(std::string theDescription, const void* theSender = 0)
+void Events_Error::send(std::string theDescription, const void* theSender)
 {
   Events_Error::send(theDescription.c_str(), theSender);
 }
