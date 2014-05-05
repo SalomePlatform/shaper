@@ -16,6 +16,7 @@
 
 #include <map>
 #include <vector>
+#include <list>
 
 class XGUI_Viewer;
 class ModelAPI_Feature;
@@ -61,7 +62,7 @@ public:
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void RedisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
                              const TopoDS_Shape& theShape,
-                             const int theMode, const bool isUpdateViewer = true);
+                             const std::list<int>& theMode, const bool isUpdateViewer = true);
 
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance

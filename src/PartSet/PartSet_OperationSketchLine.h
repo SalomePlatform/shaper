@@ -34,7 +34,7 @@ public:
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual int getSelectionMode(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
+  virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
   /// Gives the current selected objects to be processed by the operation
   /// \param thePoint a point clicked in the viewer

@@ -78,7 +78,7 @@ void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
 
 void XGUI_Displayer::RedisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                              const TopoDS_Shape& theShape,
-                                             const int theMode, const bool isUpdateViewer)
+                                             const std::list<int>& theModes, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   
@@ -105,12 +105,11 @@ void XGUI_Displayer::RedisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature>
   // Activate selection of objects from prs
   if (!anAIS.IsNull()) {
     if (anAIS->IsKind(STANDARD_TYPE(AIS_Shape))) {
-      ic->Display(anAIS, 0/*display mode*/, AIS_Shape::SelectionMode((TopAbs_ShapeEnum)theMode),
-                  false/*update viewer*/, true/*allow decomposition*/);
-      /*if (theMode == TopAbs_VERTEX) {
-        ic->ActivateStandardMode(TopAbs_EDGE);
-        ic->ActivateStandardMode(TopAbs_VERTEX);
-      }*/
+      ic->Display(anAIS, false);
+      ic->Load(anAIS, -1, true/*allow decomposition*/);
+      std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
+      for (; anIt != aLast; anIt++) 
+        ic->Activate(anAIS, AIS_Shape::SelectionMode((TopAbs_ShapeEnum)*anIt));
     }
   }
   if (isUpdateViewer)

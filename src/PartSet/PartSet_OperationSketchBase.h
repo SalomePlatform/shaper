@@ -43,7 +43,7 @@ public:
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual int getSelectionMode(boost::shared_ptr<ModelAPI_Feature> theFeature) const = 0;
+  virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const = 0;
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theList a list of interactive selected shapes

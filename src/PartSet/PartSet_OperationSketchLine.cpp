@@ -37,12 +37,12 @@ bool PartSet_OperationSketchLine::isGranted() const
   return true;
 }
 
-int PartSet_OperationSketchLine::getSelectionMode(boost::shared_ptr<ModelAPI_Feature> theFeature) const
+std::list<int> PartSet_OperationSketchLine::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
-  int aMode = 0;
+  std::list<int> aModes;
   if (theFeature != feature())
-    aMode = TopAbs_VERTEX;
-  return aMode;
+    aModes.push_back(TopAbs_VERTEX);
+  return aModes;
 }
 
 void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint)
@@ -111,6 +111,8 @@ void PartSet_OperationSketchLine::keyReleased(const int theKey)
         myPointSelectionMode = SM_FirstPoint;
         document()->abortOperation();
       }
+      else
+        myPointSelectionMode = SM_FirstPoint;
     }
     break;
     default:

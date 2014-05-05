@@ -255,7 +255,7 @@ void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFea
     boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview(theFeature);
     if (aPreview) {
       aDisplayer->RedisplayInLocalContext(theFeature, aPreview->impl<TopoDS_Shape>(),
-                                          aPreviewOp->getSelectionMode(theFeature));
+                                          aPreviewOp->getSelectionModes(theFeature));
     }
   }
   else {
