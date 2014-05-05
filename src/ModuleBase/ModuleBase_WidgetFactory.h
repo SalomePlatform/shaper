@@ -14,12 +14,12 @@
 class QObject;
 class QWidget;
 class Config_WidgetAPI;
-class ModuleBase_PropPanelOperation;
+class ModuleBase_Operation;
 
 class MODULEBASE_EXPORT ModuleBase_WidgetFactory
 {
 public:
-  ModuleBase_WidgetFactory(ModuleBase_PropPanelOperation*);
+  ModuleBase_WidgetFactory(ModuleBase_Operation*);
   virtual ~ModuleBase_WidgetFactory();
 
   void createWidget(QWidget* theParent);
@@ -37,7 +37,7 @@ protected:
 
 private:
   Config_WidgetAPI* myWidgetApi;
-  ModuleBase_PropPanelOperation*   myOperation;
+  ModuleBase_Operation*   myOperation;
 
 
 };

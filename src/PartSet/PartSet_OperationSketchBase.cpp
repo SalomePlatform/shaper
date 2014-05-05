@@ -14,7 +14,7 @@ using namespace std;
 
 PartSet_OperationSketchBase::PartSet_OperationSketchBase(const QString& theId,
 	                                                     QObject* theParent)
-: ModuleBase_PropPanelOperation(theId, theParent)
+: ModuleBase_Operation(theId, theParent)
 {
   setEditMode(false);
 }

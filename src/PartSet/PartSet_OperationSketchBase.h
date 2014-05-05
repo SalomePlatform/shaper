@@ -11,7 +11,8 @@
 #include <gp_Pnt.hxx>
 #include <NCollection_List.hxx>
 
-#include <ModuleBase_PropPanelOperation.h>
+#include <ModuleBase_Operation.h>
+#include <ModuleBase_Operation.h>
 #include <QObject>
 
 class GeomAPI_Shape;
@@ -21,7 +22,7 @@ class GeomAPI_Shape;
   * \brief The base operation for the sketch features.
   *  Base class for all sketch operations. It provides an access to the feature preview
 */
-class PARTSET_EXPORT PartSet_OperationSketchBase : public ModuleBase_PropPanelOperation
+class PARTSET_EXPORT PartSet_OperationSketchBase : public ModuleBase_Operation
 {
   Q_OBJECT
 public:

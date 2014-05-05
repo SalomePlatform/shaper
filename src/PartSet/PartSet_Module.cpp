@@ -1,6 +1,8 @@
 #include <PartSet_Module.h>
 #include <PartSet_OperationSketch.h>
 #include <PartSet_OperationSketchLine.h>
+#include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationDescription.h>
 #include <PartSet_Listener.h>
 #include <PartSet_Tools.h>
 
@@ -109,7 +111,7 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
   aWdgReader.readAll();
   std::string aXmlCfg = aWdgReader.featureWidgetCfg(aStdCmdId);
   std::string aDescription = aWdgReader.featureDescription(aStdCmdId);
-  ModuleBase_PropPanelOperation* aPartSetOp;
+  ModuleBase_Operation* aPartSetOp;
   if (theCmdId == "Sketch" ) {
     aPartSetOp = new PartSet_OperationSketch(theCmdId, this);
   }
@@ -121,10 +123,10 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
     aPartSetOp = new PartSet_OperationSketchLine(theCmdId, this, aSketchFeature);
   }
   else {
-    aPartSetOp = new ModuleBase_PropPanelOperation(theCmdId, this);
+    aPartSetOp = new ModuleBase_Operation(theCmdId, this);
   }
-  aPartSetOp->setXmlRepresentation(QString::fromStdString(aXmlCfg));
-  aPartSetOp->setDescription(QString::fromStdString(aDescription));
+  aPartSetOp->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
+  aPartSetOp->getDescription()->setDescription(QString::fromStdString(aDescription));
 
   //TODO(sbh): Implement static method to extract event id [SEID]
   static Events_ID aModuleEvent = Events_Loop::eventByName("PartSetModuleEvent");
@@ -154,10 +156,9 @@ void PartSet_Module::onOperationStarted()
 
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_PropPanelOperation* anOperation = dynamic_cast<ModuleBase_PropPanelOperation*>(theOperation);
-  if (!anOperation)
+  if (!theOperation)
     return;
-  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
   //if (aPreviewOp)
   //  visualizePreview(false);
 }

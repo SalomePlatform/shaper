@@ -26,8 +26,9 @@
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
-#include <ModuleBase_PropPanelOperation.h>
 #include <ModuleBase_Operation.h>
+#include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationDescription.h>
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
 
@@ -191,11 +192,11 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   }
   const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
-    ModuleBase_PropPanelOperation* anOperation =
-        (ModuleBase_PropPanelOperation*)(aPartSetMsg->pointer());
+    ModuleBase_Operation* anOperation =
+        (ModuleBase_Operation*)(aPartSetMsg->pointer());
 
     if (myOperationMgr->startOperation(anOperation)) {
-      if (anOperation->xmlRepresentation().isEmpty()) {
+      if (anOperation->getDescription()->xmlRepresentation().isEmpty()) {
         anOperation->commit();
         updateCommandStatus();
       }
@@ -220,10 +221,9 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 //******************************************************
 void XGUI_Workshop::onOperationStarted()
 {
-  ModuleBase_PropPanelOperation* aOperation =
-        (ModuleBase_PropPanelOperation*)(myOperationMgr->currentOperation());
+  ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
 
-  if(!aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
+  if(!aOperation->getDescription()->xmlRepresentation().isEmpty()) { //!< No need for property panel
     connectWithOperation(aOperation);
     QWidget* aPropWidget = myPropertyPanelDock->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
     qDeleteAll(aPropWidget->children());
@@ -232,17 +232,16 @@ void XGUI_Workshop::onOperationStarted()
 
     ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aOperation);
     aFactory.createWidget(aPropWidget);
-    setPropertyPannelTitle(aOperation->description());
+    setPropertyPannelTitle(aOperation->getDescription()->description());
   }
 }
 
 //******************************************************
 void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_PropPanelOperation* aOperation =
-        (ModuleBase_PropPanelOperation*)(myOperationMgr->currentOperation());
+  ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
 
-  if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
+  if(aOperation->getDescription()->xmlRepresentation().isEmpty()) { //!< No need for property panel
     updateCommandStatus();
   } else {
     hidePropertyPanel();
@@ -317,10 +316,10 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
 
   QAction* aCommand = 0;
   if (isSalomeMode()) {
-    aCommand = salomeConnector()->command(theOperation->operationId());
+    aCommand = salomeConnector()->command(theOperation->getDescription()->operationId());
   } else {
     XGUI_MainMenu* aMenu = myMainWindow->menuObject();
-    aCommand = aMenu->feature(theOperation->operationId());
+    aCommand = aMenu->feature(theOperation->getDescription()->operationId());
   }
   //Abort operation on uncheck the command
   connect(aCommand, SIGNAL(triggered(bool)), theOperation, SLOT(setRunning(bool)));

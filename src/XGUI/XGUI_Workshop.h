@@ -24,7 +24,6 @@ class XGUI_SalomeViewer;
 class XGUI_ViewerProxy;
 
 class ModuleBase_Operation;
-class ModuleBase_PropPanelOperation;
 
 class Config_FeatureMessage;
 class Config_PointerMessage;
