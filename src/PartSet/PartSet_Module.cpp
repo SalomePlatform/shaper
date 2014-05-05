@@ -120,14 +120,13 @@ void PartSet_Module::onOperationStarted()
 
     connect(aPreviewOp, SIGNAL(featureConstructed(boost::shared_ptr<ModelAPI_Feature>, int)),
             this, SLOT(onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature>, int)));
+    connect(aPreviewOp, SIGNAL(launchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)),
+            this, SLOT(onLaunchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)));
 
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {
       connect(aSketchOp, SIGNAL(planeSelected(double, double, double)),
               this, SLOT(onPlaneSelected(double, double, double)));
-      connect(aSketchOp, SIGNAL(launchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)),
-              this, SLOT(onLaunchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)));
-
     }
   }
 }
