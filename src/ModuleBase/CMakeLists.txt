@@ -11,6 +11,8 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetFactory.h
 	ModuleBase_WidgetPoint2D.h
 	ModuleBase_WidgetSwitch.h
+	ModuleBase_IModelWidget.h
+	ModuleBase_MetaWidget.h
 )
 
 SET(PROJECT_SOURCES
@@ -21,6 +23,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetFactory.cpp
 	ModuleBase_WidgetPoint2D.cpp
 	ModuleBase_WidgetSwitch.cpp
+	ModuleBase_MetaWidget.cpp
 )
 
 SET(PROJECT_LIBRARIES

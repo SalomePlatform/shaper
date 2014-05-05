@@ -22,6 +22,7 @@ class XGUI_ActionsMgr;
 class XGUI_ErrorDialog;
 class XGUI_SalomeViewer;
 class XGUI_ViewerProxy;
+class XGUI_PropertyPanel;
 
 class ModuleBase_Operation;
 
@@ -65,7 +66,7 @@ public:
   XGUI_ActionsMgr* actionsMgr() const { return myActionsMgr; };
 
   //! Returns property panel widget
-  QDockWidget* propertyPanel() const { return myPropertyPanelDock; }
+  XGUI_PropertyPanel* propertyPanel() const { return myPropertyPanel; }
 
   //! Creates and adds a new workbench (menu group) with the given name and returns it
   XGUI_Workbench* addWorkbench(const QString& theName);
@@ -140,13 +141,12 @@ private:
 
   // Creates Dock widgets: Object browser and Property panel
   void createDockWidgets();
-  void setPropertyPannelTitle(const QString& theTitle);
 
   QString myCurrentFile;
   XGUI_MainWindow* myMainWindow;
   XGUI_Module* myPartSetModule;
   XGUI_ObjectsBrowser* myObjectBrowser;
-  QDockWidget* myPropertyPanelDock;
+  XGUI_PropertyPanel* myPropertyPanel;
   XGUI_SelectionMgr* mySelector;
   XGUI_Displayer* myDisplayer;
   XGUI_OperationMgr* myOperationMgr; ///< manager to manipulate through the operations

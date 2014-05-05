@@ -38,7 +38,7 @@ private:
   std::string myLibraryName;
 
   std::list<std::string> myFeatures;
-  /// event generated on feature data sending, by default it is "FeatureEvent"
+  /// event generated on feature data sending, by default it is EVENT_FEATURE_LOADED
   const char* myEventGenerated;
 };
 

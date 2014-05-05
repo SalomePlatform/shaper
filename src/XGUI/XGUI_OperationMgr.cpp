@@ -53,10 +53,11 @@ bool XGUI_OperationMgr::canStartOperation(ModuleBase_Operation* theOperation)
     int anAnswer = QMessageBox::question(0, tr("Operation launch"),
                                 tr("Previous operation is not finished and will be aborted"),
                                 QMessageBox::Ok, QMessageBox::Cancel);
-    if (anAnswer == QMessageBox::Ok)
+    if (anAnswer == QMessageBox::Ok) {
       aCurrentOp->abort();
-    else
+    } else {
       aCanStart = false;
+    }
   }
   return aCanStart;
 }

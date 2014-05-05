@@ -84,7 +84,6 @@ enum TextureMode
 const static char* PROP_PANEL = "property_panel_dock";
 const static char* PROP_PANEL_OK = "property_panel_ok";
 const static char* PROP_PANEL_CANCEL = "property_panel_cancel";
-const static char* PROP_PANEL_WDG = "property_panel_widget";
 
 };
 

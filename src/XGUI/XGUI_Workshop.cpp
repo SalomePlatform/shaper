@@ -18,7 +18,9 @@
 #include "XGUI_ActionsMgr.h"
 #include "XGUI_ErrorDialog.h"
 #include "XGUI_ViewerProxy.h"
+#include "XGUI_PropertyPanel.h"
 
+#include <Model_Events.h>
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
@@ -55,7 +57,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myCurrentFile(QString()),
   myPartSetModule(NULL),
   mySalomeConnector(theConnector),
-  myPropertyPanelDock(0),
+  myPropertyPanel(0),
   myObjectBrowser(0),
   myDisplayer(0)
 {
@@ -91,27 +93,18 @@ void XGUI_Workshop::startApplication()
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Error::errorID()); //!< Listening application errors.
   //TODO(sbh): Implement static method to extract event id [SEID]
-  Events_ID aFeatureId = aLoop->eventByName("FeatureEvent");
+  Events_ID aFeatureId = aLoop->eventByName(EVENT_FEATURE_LOADED);
   aLoop->registerListener(this, aFeatureId);
   Events_ID aPartSetId = aLoop->eventByName("PartSetModuleEvent");
   aLoop->registerListener(this, aPartSetId);
+  Events_ID aFeatureUpdatedId = aLoop->eventByName(EVENT_FEATURE_UPDATED);
+  aLoop->registerListener(this, aFeatureUpdatedId);
   activateModule();
   if (myMainWindow) {
     myMainWindow->show();
     updateCommandStatus();
   }
   onNew();
-  // Testing of document creation
-  //boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  //boost::shared_ptr<ModelAPI_Feature> aPoint1 = aMgr->rootDocument()->addFeature("Point");
-  //boost::shared_ptr<ModelAPI_Feature> aPart = aMgr->rootDocument()->addFeature("Part");
-  //aPart->execute();
-  //aMgr->setCurrentDocument(aPart->data()->docRef("PartDocument")->value());
-  //boost::shared_ptr<ModelAPI_Feature> aPoint2 = aMgr->rootDocument()->addFeature("Point");
-  //aPoint2 = aMgr->rootDocument()->addFeature("Point");
-
-  //aPart = aMgr->rootDocument()->addFeature("Part");
-  //aPart->execute();
 }
 
 //******************************************************
@@ -184,11 +177,16 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 //******************************************************
 void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 {
-  static Events_ID aFeatureId = Events_Loop::loop()->eventByName("FeatureEvent");
-  if (theMessage->eventID() == aFeatureId) {
+  static Events_ID aFeatureLoadedId = Events_Loop::loop()->eventByName(EVENT_FEATURE_LOADED);
+  if (theMessage->eventID() == aFeatureLoadedId) {
     const Config_FeatureMessage* aFeatureMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
     addFeature(aFeatureMsg);
     return;
+  }
+  static Events_ID aFeatureUpdatedId = Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED);
+  if (theMessage->eventID() == aFeatureUpdatedId)
+  {
+    myPropertyPanel->updateContentWidget();
   }
   const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
@@ -205,16 +203,11 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   }
   const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
   if (anAppError) {
-      emit errorOccurred(QString::fromLatin1(anAppError->description()));
-      myErrorDlg->show();
-      myErrorDlg->raise();
-      myErrorDlg->activateWindow();
+    emit errorOccurred(QString::fromLatin1(anAppError->description()));
+    myErrorDlg->show();
+    myErrorDlg->raise();
+    myErrorDlg->activateWindow();
   }
-
-#ifdef _DEBUG
-  qDebug() << "XGUI_Workshop::ProcessEvent: "
-  << "Catch message, but it can not be processed.";
-#endif
 
 }
 
@@ -225,14 +218,13 @@ void XGUI_Workshop::onOperationStarted()
 
   if(!aOperation->getDescription()->xmlRepresentation().isEmpty()) { //!< No need for property panel
     connectWithOperation(aOperation);
-    QWidget* aPropWidget = myPropertyPanelDock->findChild<QWidget*>(XGUI::PROP_PANEL_WDG);
-    qDeleteAll(aPropWidget->children());
 
     showPropertyPanel();
 
     ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aOperation);
-    aFactory.createWidget(aPropWidget);
-    setPropertyPannelTitle(aOperation->getDescription()->description());
+    aFactory.createWidget(myPropertyPanel->contentWidget());
+    myPropertyPanel->setModelWidgets(aFactory.getWrappedWidgets());
+    myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
   }
 }
 
@@ -309,9 +301,9 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
  */
 void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
 {
-  QPushButton* aOkBtn = myPropertyPanelDock->findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
+  QPushButton* aOkBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
   connect(aOkBtn, SIGNAL(clicked()), theOperation, SLOT(commit()));
-  QPushButton* aCancelBtn = myPropertyPanelDock->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
+  QPushButton* aCancelBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
   connect(aCancelBtn, SIGNAL(clicked()), theOperation, SLOT(abort()));
 
   QAction* aCommand = 0;
@@ -579,53 +571,6 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
 }
 
 //******************************************************
-QDockWidget* XGUI_Workshop::createPropertyPanel(QWidget* theParent)
-{
-  QDockWidget* aPropPanel = new QDockWidget(theParent);
-  aPropPanel->setWindowTitle(tr("Property Panel"));
-  QAction* aViewAct = aPropPanel->toggleViewAction();
-  aPropPanel->setObjectName(XGUI::PROP_PANEL);
-
-  QWidget* aContent = new QWidget(aPropPanel);
-  QVBoxLayout* aMainLay = new QVBoxLayout(aContent);
-  aMainLay->setContentsMargins(3, 3, 3, 3);
-  aPropPanel->setWidget(aContent);
-
-  QFrame* aFrm = new QFrame(aContent);
-  aFrm->setFrameStyle(QFrame::Sunken);
-  aFrm->setFrameShape(QFrame::Panel);
-  QHBoxLayout* aBtnLay = new QHBoxLayout(aFrm);
-  aBtnLay->setContentsMargins(0, 0, 0, 0);
-  aMainLay->addWidget(aFrm);
-
-  QPushButton* aBtn = new QPushButton(QIcon(":pictures/button_help.png"), "", aFrm);
-  aBtn->setFlat(true);
-  aBtnLay->addWidget(aBtn);
-  aBtnLay->addStretch(1);
-  aBtn = new QPushButton(QIcon(":pictures/button_ok.png"), "", aFrm);
-  aBtn->setObjectName(XGUI::PROP_PANEL_OK);
-  aBtn->setFlat(true);
-  aBtnLay->addWidget(aBtn);
-  aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
-  aBtn->setObjectName(XGUI::PROP_PANEL_CANCEL);
-  aBtn->setFlat(true);
-  aBtnLay->addWidget(aBtn);
-
-  QWidget* aCustomWidget = new QWidget(aContent);
-  aCustomWidget->setObjectName(XGUI::PROP_PANEL_WDG);
-  aMainLay->addWidget(aCustomWidget);
-  aMainLay->addStretch(1);
-
-  return aPropPanel;
-}
-
-//******************************************************
-void XGUI_Workshop::setPropertyPannelTitle(const QString& theTitle)
-{
-  myPropertyPanelDock->setWindowTitle(theTitle);
-}
-
-//******************************************************
 /*
  * Creates dock widgets, places them in corresponding area
  * and tabifies if necessary.
@@ -636,30 +581,30 @@ void XGUI_Workshop::createDockWidgets()
                                           myMainWindow;
   QDockWidget* aObjDock = createObjectBrowser(aDesktop);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
-  myPropertyPanelDock = createPropertyPanel(aDesktop);
-  aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanelDock);
+  myPropertyPanel = new XGUI_PropertyPanel(aDesktop);
+  aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanel);
   hidePropertyPanel(); //<! Invisible by default
   hideObjectBrowser();
-  aDesktop->tabifyDockWidget(aObjDock, myPropertyPanelDock);
+  aDesktop->tabifyDockWidget(aObjDock, myPropertyPanel);
 }
 
 //******************************************************
 void XGUI_Workshop::showPropertyPanel()
 {
-  QAction* aViewAct = myPropertyPanelDock->toggleViewAction();
+  QAction* aViewAct = myPropertyPanel->toggleViewAction();
   //<! Restore ability to close panel from the window's menu
   aViewAct->setEnabled(true);
-  myPropertyPanelDock->show();
-  myPropertyPanelDock->raise();
+  myPropertyPanel->show();
+  myPropertyPanel->raise();
 }
 
 //******************************************************
 void XGUI_Workshop::hidePropertyPanel()
 {
-  QAction* aViewAct = myPropertyPanelDock->toggleViewAction();
+  QAction* aViewAct = myPropertyPanel->toggleViewAction();
   //<! Do not allow to show empty property panel
   aViewAct->setEnabled(false);
-  myPropertyPanelDock->hide();
+  myPropertyPanel->hide();
 }
 
 //******************************************************
