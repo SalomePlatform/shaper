@@ -3,7 +3,9 @@ SET(CMAKE_AUTOMOC ON)
 
 SET(PROJECT_HEADERS
     ModuleBase.h
+	ModuleBase_IOperation.h
 	ModuleBase_Operation.h
+	ModuleBase_OperationDescription.h	
 	ModuleBase_PropPanelOperation.h
 	ModuleBase_WidgetCustom.h
 	ModuleBase_WidgetFactory.h
@@ -14,7 +16,9 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
+	ModuleBase_IOperation.cpp
 	ModuleBase_Operation.cpp
+	ModuleBase_OperationDescription.cpp
 	ModuleBase_PropPanelOperation.cpp
 	ModuleBase_WidgetFactory.cpp
 	ModuleBase_WidgetPoint2D.cpp

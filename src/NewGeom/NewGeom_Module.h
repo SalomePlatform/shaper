@@ -4,13 +4,17 @@
 #define NewGeom_Module_H
 
 #include "NewGeom.h"
+#include "NewGeom_SalomeViewer.h"
 
 #include <LightApp_Module.h>
 #include <XGUI_SalomeConnector.h>
 
 #include <QStringList>
+#include <QMap>
 
-class XGUI_Workshop;
+class XGUI_Workshop; 
+class NewGeom_OCCSelector;
+class OCCViewer_Viewer;
 
 /** 
 * An implementation of SALOME connector class for implementation of
@@ -57,21 +61,40 @@ public:
 
   virtual QAction* command(const QString& theId) const;
 
-  //! Returns AIS_InteractiveContext from current OCCViewer
-  virtual Handle(AIS_InteractiveContext) AISContext() const;
+  //! Set nested actions dependent on command Id
+  //! \param theId - the command ID
+  //! \param theActions - the list of nested actions
+  virtual void setNestedActions(const QString& theId, const QStringList& theActions);
+
+  //! Returns list of nested actions according to the given command ID
+  virtual QStringList nestedActions(const QString& theId) const;
+
+  //! Returns interface to Salome viewer
+  virtual XGUI_SalomeViewer* viewer() const { return myProxyViewer; }
 
 public slots:
-  bool activateModule( SUIT_Study* theStudy);
-  bool deactivateModule( SUIT_Study* theStudy);
+  virtual bool activateModule( SUIT_Study* theStudy);
+  virtual bool deactivateModule( SUIT_Study* theStudy);
+
+protected slots:
+  virtual void onViewManagerAdded( SUIT_ViewManager* theMgr );
 
 protected:
   CAM_DataModel* createDataModel();
 
 
 private:
+  NewGeom_OCCSelector* createSelector(SUIT_ViewManager* theMgr);
+
   QStringList myActionsList;
 
   XGUI_Workshop* myWorkshop;
+
+  NewGeom_OCCSelector* mySelector;
+
+  NewGeom_SalomeViewer* myProxyViewer;
+
+  QMap<QString, QStringList> myNestedActions;
 };
 
 #endif

@@ -20,9 +20,11 @@ class XGUI_SalomeConnector;
 class XGUI_ObjectsBrowser;
 class XGUI_ActionsMgr;
 class XGUI_ErrorDialog;
+class XGUI_SalomeViewer;
+class XGUI_ViewerProxy;
 class XGUI_PropertyPanel;
+
 class ModuleBase_Operation;
-class ModuleBase_PropPanelOperation;
 
 class Config_FeatureMessage;
 class Config_PointerMessage;
@@ -55,10 +57,16 @@ public:
   XGUI_SelectionMgr* selector() const { return mySelector; }
 
   //! Returns displayer
-  XGUI_Displayer* displayer() const;
+  XGUI_Displayer* displayer() const { return myDisplayer; }
 
   //! ! Returns operation manager.
   XGUI_OperationMgr* operationMgr() const { return myOperationMgr; }
+
+  //! ! Returns an actions manager
+  XGUI_ActionsMgr* actionsMgr() const { return myActionsMgr; };
+
+  //! Returns property panel widget
+  XGUI_PropertyPanel* propertyPanel() const { return myPropertyPanel; }
 
   //! Creates and adds a new workbench (menu group) with the given name and returns it
   XGUI_Workbench* addWorkbench(const QString& theName);
@@ -66,7 +74,11 @@ public:
   //! Redefinition of Events_Listener method
   virtual void processEvent(const Events_Message* theMessage);
 
+  //! Returns an object which provides interface to Salome Module (LightApp_Module)
   XGUI_SalomeConnector* salomeConnector() const { return mySalomeConnector; }
+
+  //! Provides an object which provides interface to Salome Viewer
+  XGUI_SalomeViewer* salomeViewer() const;
 
   //! Returns true if the application works as SALOME module
   bool isSalomeMode() const { return mySalomeConnector != 0; }
@@ -75,6 +87,8 @@ public:
   XGUI_ObjectsBrowser* objectBrowser() const { return myObjectBrowser; }
 
   void salomeViewerSelectionChanged();
+
+  XGUI_ViewerProxy* viewer() const { return myViewerProxy; }
 
 signals:
   void salomeViewerSelection();
@@ -139,6 +153,7 @@ private:
   XGUI_ActionsMgr* myActionsMgr;
   XGUI_SalomeConnector* mySalomeConnector;
   XGUI_ErrorDialog* myErrorDlg;
+  XGUI_ViewerProxy* myViewerProxy;
 };
 
 #endif

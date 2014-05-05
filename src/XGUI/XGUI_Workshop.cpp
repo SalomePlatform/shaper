@@ -14,8 +14,10 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_SalomeConnector.h"
+#include "XGUI_SalomeViewer.h"
 #include "XGUI_ActionsMgr.h"
 #include "XGUI_ErrorDialog.h"
+#include "XGUI_ViewerProxy.h"
 #include "XGUI_PropertyPanel.h"
 
 #include <Model_Events.h>
@@ -26,8 +28,9 @@
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
-#include <ModuleBase_PropPanelOperation.h>
 #include <ModuleBase_Operation.h>
+#include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationDescription.h>
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
 
@@ -60,15 +63,16 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 {
   myMainWindow = mySalomeConnector? 0 : new XGUI_MainWindow();
 
-  // In SALOME viewer is accessible only when module is initialized
-  // and in SALOME mode myDisplayer object has to be created later
-  // So, displayer will be created on demand.
+  myDisplayer = new XGUI_Displayer(this);
 
   mySelector = new XGUI_SelectionMgr(this);
   connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(changeCurrentDocument()));
+
   myOperationMgr = new XGUI_OperationMgr(this);
   myActionsMgr = new XGUI_ActionsMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(myMainWindow);
+
+  myViewerProxy = new XGUI_ViewerProxy(this);
 
   connect(myOperationMgr, SIGNAL(operationStarted()),  this, SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
@@ -186,11 +190,11 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   }
   const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
-    ModuleBase_PropPanelOperation* anOperation =
-        (ModuleBase_PropPanelOperation*)(aPartSetMsg->pointer());
+    ModuleBase_Operation* anOperation =
+        (ModuleBase_Operation*)(aPartSetMsg->pointer());
 
     if (myOperationMgr->startOperation(anOperation)) {
-      if (anOperation->xmlRepresentation().isEmpty()) {
+      if (anOperation->getDescription()->xmlRepresentation().isEmpty()) {
         anOperation->commit();
         updateCommandStatus();
       }
@@ -210,10 +214,9 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 //******************************************************
 void XGUI_Workshop::onOperationStarted()
 {
-  ModuleBase_PropPanelOperation* aOperation =
-        (ModuleBase_PropPanelOperation*)(myOperationMgr->currentOperation());
+  ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
 
-  if(!aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
+  if(!aOperation->getDescription()->xmlRepresentation().isEmpty()) { //!< No need for property panel
     connectWithOperation(aOperation);
 
     showPropertyPanel();
@@ -221,25 +224,21 @@ void XGUI_Workshop::onOperationStarted()
     ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aOperation);
     aFactory.createWidget(myPropertyPanel->contentWidget());
     myPropertyPanel->setModelWidgets(aFactory.getWrappedWidgets());
-    myPropertyPanel->setWindowTitle(aOperation->description());
+    myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
   }
 }
 
 //******************************************************
 void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_PropPanelOperation* aOperation =
-        (ModuleBase_PropPanelOperation*)(myOperationMgr->currentOperation());
+  ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
 
-  if(aOperation->xmlRepresentation().isEmpty()) { //!< No need for property panel
+  if(aOperation->getDescription()->xmlRepresentation().isEmpty()) { //!< No need for property panel
     updateCommandStatus();
   } else {
     hidePropertyPanel();
     updateCommandStatus();
-
-    if (myMainWindow) {
-      myActionsMgr->restoreCommandState();
-    }
+    myActionsMgr->restoreCommandState();
   }
 }
 
@@ -256,15 +255,22 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
   }
   //Find or create Workbench
   QString aWchName = QString::fromStdString(theMessage->workbenchId());
+  QString aNestedFeatures = QString::fromStdString(theMessage->nestedFeatures());
+  bool isUsePropPanel = theMessage->isUseInput();
   if (isSalomeMode()) {
+    QString aId = QString::fromStdString(theMessage->id());
     salomeConnector()->addFeature(aWchName,
                                   QString::fromStdString(theMessage->id()),
-                                  QString::fromStdString(theMessage->text()),
+                                  aId,
                                   QString::fromStdString(theMessage->tooltip()),
                                   QIcon(theMessage->icon().c_str()),
-                                  false, this, 
+                                  isUsePropPanel, this, 
                                   SLOT(onFeatureTriggered()), QKeySequence());
+    myActionsMgr->addCommand(aId, salomeConnector()->command(aId));
+    salomeConnector()->setNestedActions(aId, aNestedFeatures.split(" "));
+
   } else {
+
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
     XGUI_Workbench* aPage = aMenuBar->findWorkbench(aWchName);
     if (!aPage) {
@@ -276,14 +282,12 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
     if (!aGroup) {
       aGroup = aPage->addGroup(aGroupName);
     }
-    bool isUsePropPanel = theMessage->isUseInput();
     //Create feature...
     XGUI_Command* aCommand = aGroup->addFeature(QString::fromStdString(theMessage->id()),
                                                 QString::fromStdString(theMessage->text()),
                                                 QString::fromStdString(theMessage->tooltip()),
                                                 QIcon(theMessage->icon().c_str()),
                                                 QKeySequence(), isUsePropPanel);
-    QString aNestedFeatures = QString::fromStdString(theMessage->nestedFeatures());
     aCommand->setUnblockableCommands(aNestedFeatures.split(" "));
     myActionsMgr->addCommand(aCommand);
     myPartSetModule->featureCreated(aCommand);
@@ -304,10 +308,10 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
 
   QAction* aCommand = 0;
   if (isSalomeMode()) {
-    aCommand = salomeConnector()->command(theOperation->operationId());
+    aCommand = salomeConnector()->command(theOperation->getDescription()->operationId());
   } else {
     XGUI_MainMenu* aMenu = myMainWindow->menuObject();
-    aCommand = aMenu->feature(theOperation->operationId());
+    aCommand = aMenu->feature(theOperation->getDescription()->operationId());
   }
   //Abort operation on uncheck the command
   connect(aCommand, SIGNAL(triggered(bool)), theOperation, SLOT(setRunning(bool)));
@@ -352,6 +356,7 @@ void XGUI_Workshop::onNew()
     createDockWidgets();
     mySelector->connectViewers();
   }
+  myViewerProxy->connectToViewer();
   showObjectBrowser();
   if (!isSalomeMode()) {
     myMainWindow->showPythonConsole();
@@ -626,20 +631,6 @@ void XGUI_Workshop::onFeatureTriggered()
 }
 
 //******************************************************
-XGUI_Displayer* XGUI_Workshop::displayer() const
-{
-  // In SALOME viewer is accessible only when module is initialized
-  // and in SALOME mode myDisplayer object has to be created later (on demand)
-  if (!myDisplayer) {
-    XGUI_Workshop* that = (XGUI_Workshop*)this;
-    that->myDisplayer = isSalomeMode() ?
-      new XGUI_Displayer(salomeConnector()->AISContext()):
-      new XGUI_Displayer(myMainWindow->viewer()->AISContext());
-  }
-  return myDisplayer;
-}
-
-//******************************************************
 void XGUI_Workshop::changeCurrentDocument()
 {
   QFeatureList aFeatures = objectBrowser()->selectedFeatures();
@@ -659,4 +650,11 @@ void XGUI_Workshop::changeCurrentDocument()
 void XGUI_Workshop::salomeViewerSelectionChanged()
 {
   emit salomeViewerSelection();
+}
+
+
+//**************************************************************
+XGUI_SalomeViewer* XGUI_Workshop::salomeViewer() const 
+{ 
+  return mySalomeConnector->viewer(); 
 }

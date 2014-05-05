@@ -1,6 +1,8 @@
 #include <PartSet_Module.h>
 #include <PartSet_OperationSketch.h>
 #include <PartSet_OperationSketchLine.h>
+#include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationDescription.h>
 #include <PartSet_Listener.h>
 #include <PartSet_Tools.h>
 
@@ -11,9 +13,10 @@
 #include <XGUI_Viewer.h>
 #include <XGUI_Workshop.h>
 #include <XGUI_OperationMgr.h>
-#include <XGUI_ViewWindow.h>
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_ViewPort.h>
+#include <XGUI_ActionsMgr.h>
+#include <XGUI_ViewerProxy.h>
 
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
@@ -27,6 +30,7 @@
 #include <AIS_ListOfInteractive.hxx>
 
 #include <QObject>
+#include <QMouseEvent>
 #include <QString>
 
 #ifdef _DEBUG
@@ -50,12 +54,15 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
   connect(anOperationMgr, SIGNAL(operationStarted()), this, SLOT(onOperationStarted()));
   connect(anOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
-  if (!myWorkshop->isSalomeMode()) {
-    connect(myWorkshop->mainWindow()->viewer(), SIGNAL(mouseReleased(QPoint)),
-            this, SLOT(onMouseReleased(QPoint)));
-    connect(myWorkshop->mainWindow()->viewer(), SIGNAL(mouseMoved(QPoint)),
-            this, SLOT(onMouseMoved(QPoint)));
-  }
+
+  connect(myWorkshop->selector(), SIGNAL(selectionChanged()), 
+          this, SLOT(onSelectionChanged()));
+  connect(myWorkshop->viewer(), SIGNAL(mouseRelease(QMouseEvent*)),
+          this, SLOT(onMouseReleased(QMouseEvent*)));
+  connect(myWorkshop->viewer(), SIGNAL(mouseMove(QMouseEvent*)),
+          this, SLOT(onMouseMoved(QMouseEvent*)));
+  connect(myWorkshop->viewer(), SIGNAL(keyRelease(QKeyEvent*)),
+          this, SLOT(onKeyRelease(QKeyEvent*)));
 }
 
 PartSet_Module::~PartSet_Module()
@@ -104,7 +111,7 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
   aWdgReader.readAll();
   std::string aXmlCfg = aWdgReader.featureWidgetCfg(aStdCmdId);
   std::string aDescription = aWdgReader.featureDescription(aStdCmdId);
-  ModuleBase_PropPanelOperation* aPartSetOp;
+  ModuleBase_Operation* aPartSetOp;
   if (theCmdId == "Sketch" ) {
     aPartSetOp = new PartSet_OperationSketch(theCmdId, this);
   }
@@ -116,10 +123,10 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
     aPartSetOp = new PartSet_OperationSketchLine(theCmdId, this, aSketchFeature);
   }
   else {
-    aPartSetOp = new ModuleBase_PropPanelOperation(theCmdId, this);
+    aPartSetOp = new ModuleBase_Operation(theCmdId, this);
   }
-  aPartSetOp->setXmlRepresentation(QString::fromStdString(aXmlCfg));
-  aPartSetOp->setDescription(QString::fromStdString(aDescription));
+  aPartSetOp->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
+  aPartSetOp->getDescription()->setDescription(QString::fromStdString(aDescription));
 
   //TODO(sbh): Implement static method to extract event id [SEID]
   static Events_ID aModuleEvent = Events_Loop::eventByName("PartSetModuleEvent");
@@ -134,23 +141,29 @@ void PartSet_Module::onOperationStarted()
 
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    visualizePreview(true);
-    connect(aPreviewOp, SIGNAL(viewerProjectionChange(double, double, double)),
-            this, SLOT(onViewerProjectionChange(double, double, double)));
+    visualizePreview(aPreviewOp->feature(), true);
+
+    connect(aPreviewOp, SIGNAL(featureConstructed(boost::shared_ptr<ModelAPI_Feature>)),
+            this, SLOT(onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature>)));
+
+    PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
+    if (aSketchOp) {
+      connect(aSketchOp, SIGNAL(planeSelected(double, double, double)),
+              this, SLOT(onPlaneSelected(double, double, double)));
+    }
   }
 }
 
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_PropPanelOperation* anOperation = dynamic_cast<ModuleBase_PropPanelOperation*>(theOperation);
-  if (!anOperation)
+  if (!theOperation)
     return;
-  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp)
-    visualizePreview(false);
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
+  //if (aPreviewOp)
+  //  visualizePreview(false);
 }
 
-void PartSet_Module::onMouseReleased(QPoint thePoint)
+void PartSet_Module::onSelectionChanged()
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
@@ -159,46 +172,73 @@ void PartSet_Module::onMouseReleased(QPoint thePoint)
     if (aSelector) {
       NCollection_List<TopoDS_Shape> aList;
       aSelector->selectedShapes(aList);
-      XGUI_ViewWindow* aWindow = myWorkshop->mainWindow()->viewer()->activeViewWindow();
-      if (aWindow) {
-        Handle(V3d_View) aView3d = aWindow->viewPort()->getView();
-        if ( !aView3d.IsNull() ) {
-          gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(thePoint, aView3d);
-          aPreviewOp->setSelectedShapes(aList, aPoint);
-        }
+      aPreviewOp->setSelectedShapes(aList);
+    }
+  }
+}
+
+void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
+{
+  QPoint aPoint = theEvent->pos();
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aPreviewOp) {
+    XGUI_SelectionMgr* aSelector = myWorkshop->selector();
+    if (aSelector) {
+      Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
+      if ( !aView3d.IsNull() ) {
+        gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(aPoint, aView3d);
+        aPreviewOp->mouseReleased(aPnt);
       }
     }
   }
 }
 
-void PartSet_Module::onMouseMoved(QPoint thePoint)
+void PartSet_Module::onMouseMoved(QMouseEvent* theEvent)
+{
+  QPoint aPoint = theEvent->pos();
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aPreviewOp) {
+    Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
+    if ( !aView3d.IsNull() ) {
+      gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(aPoint, aView3d);
+      aPreviewOp->mouseMoved(aPnt);
+    }
+  }
+}
+
+void PartSet_Module::onKeyRelease(QKeyEvent* theEvent)
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-    if (aViewer) {
-      XGUI_ViewWindow* aWindow = aViewer->activeViewWindow();
-      if (aWindow) {
-        Handle(V3d_View) aView3d = aWindow->viewPort()->getView();
-        if ( !aView3d.IsNull() ) {
-          gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(thePoint, aView3d);
-          aPreviewOp->setMouseMovePoint(aPoint);
-        }
-      }
+    aPreviewOp->keyReleased(theEvent->key());
+  }
+}
+
+void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
+{
+  myWorkshop->viewer()->setViewProjection(theX, theY, theZ);
+
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+  if (anOperation) {
+    PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+    if (aPreviewOp) {
+      aPreviewOp->setEditMode(true);
+      visualizePreview(aPreviewOp->feature(), false);
     }
   }
+
+  myWorkshop->actionsMgr()->setNestedActionsEnabled(true);
 }
 
-void PartSet_Module::onViewerProjectionChange(double theX, double theY, double theZ)
+void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
-  XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-  if (aViewer) {
-    aViewer->setViewProjection(theX, theY, theZ);
-  }
+  visualizePreview(theFeature, true);
 }
 
-void PartSet_Module::visualizePreview(bool isDisplay)
+void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFeature, bool isDisplay)
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   if (!anOperation)
@@ -210,14 +250,14 @@ void PartSet_Module::visualizePreview(bool isDisplay)
 
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   if (isDisplay) {
-    boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview();
+    boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview(theFeature);
     if (aPreview) {
-      aDisplayer->LocalSelection(anOperation->feature(),
-                                   aPreview->impl<TopoDS_Shape>(), aPreviewOp->getSelectionMode());
+      aDisplayer->DisplayInLocalContext(theFeature, aPreview->impl<TopoDS_Shape>(),
+                                        aPreviewOp->getSelectionMode(theFeature));
     }
   }
   else {
-    aDisplayer->GlobalSelection(false);
+    aDisplayer->CloseLocalContexts(false);
     aDisplayer->Erase(anOperation->feature());
   }
 }

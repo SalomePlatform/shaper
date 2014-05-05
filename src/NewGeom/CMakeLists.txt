@@ -8,6 +8,7 @@ SET(PROJECT_HEADERS
 	NewGeom_Module.h
 	NewGeom_DataModel.h
 	NewGeom_OCCSelector.h
+	NewGeom_SalomeViewer.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -18,6 +19,7 @@ SET(PROJECT_SOURCES
 	NewGeom_Module.cpp
 	NewGeom_DataModel.cpp
 	NewGeom_OCCSelector.cpp
+	NewGeom_SalomeViewer.cpp
 )
 
 SET(PROJECT_RESOURCES

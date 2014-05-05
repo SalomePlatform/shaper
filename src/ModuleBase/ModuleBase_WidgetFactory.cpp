@@ -6,7 +6,10 @@
  */
 
 #include <ModuleBase_WidgetFactory.h>
+
 #include <ModuleBase_MetaWidget.h>
+#include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_PropPanelOperation.h>
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetSwitch.h>
@@ -31,10 +34,10 @@
 #include <cfloat>
 #include <climits>
 
-ModuleBase_WidgetFactory::ModuleBase_WidgetFactory(ModuleBase_PropPanelOperation* theOperation)
-    : myOperation(theOperation)
+ModuleBase_WidgetFactory::ModuleBase_WidgetFactory(ModuleBase_Operation* theOperation)
+ : myOperation(theOperation)
 {
-  QString aXml = myOperation->xmlRepresentation();
+  QString aXml = myOperation->getDescription()->xmlRepresentation();
   myWidgetApi = new Config_WidgetAPI(aXml.toStdString());
 }
 

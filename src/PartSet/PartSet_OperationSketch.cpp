@@ -30,15 +30,20 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 {
 }
 
-int PartSet_OperationSketch::getSelectionMode() const
+int PartSet_OperationSketch::getSelectionMode(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
-  return TopAbs_FACE;
+  int aMode = TopAbs_FACE;
+  if (isEditMode())
+    aMode = TopAbs_VERTEX;
+  return aMode;
 }
 
-void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList,
-                                                const gp_Pnt& theSelectedPoint)
+void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Shape>& theList)
 {
   if (theList.IsEmpty())
+    return;
+
+  if (isEditMode())
     return;
 
   // get selected shape
@@ -76,7 +81,7 @@ void PartSet_OperationSketch::setSelectedShapes(const NCollection_List<TopoDS_Sh
   aDirY->setValue(aC, anA, aB);
 
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
-  emit viewerProjectionChange(aDir->x(), aDir->y(), aDir->z());
+  emit planeSelected(aDir->x(), aDir->y(), aDir->z());
 
   //commit();
   //SketchPlugin_Sketch::setActive(myFeature);
