@@ -6,6 +6,7 @@
 #define ModuleBase_WidgetCustom_H
 
 #include <ModuleBase.h>
+#include <ModuleBase_IModelWidget.h>
 
 #include <QObject>
 

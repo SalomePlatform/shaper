@@ -6,6 +6,9 @@
 
 #include <string>
 
+/// Event ID that feature is loaded (comes with Config_FeatureMessage)
+static const char * EVENT_FEATURE_LOADED = "FeatureLoaded";
+
 /*
  * Class to pass a feature entry extracted from xml file.
  * Example of the feature entry:

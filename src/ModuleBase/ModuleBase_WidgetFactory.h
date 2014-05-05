@@ -9,7 +9,10 @@
 #define ModuleBase_WidgetFactory_H_
 
 #include <ModuleBase.h>
+#include <ModuleBase_IModelWidget.h>
+
 #include <QString>
+#include <QList>
 
 class QObject;
 class QWidget;
@@ -23,6 +26,11 @@ public:
   virtual ~ModuleBase_WidgetFactory();
 
   void createWidget(QWidget* theParent);
+
+  QList<ModuleBase_IModelWidget*> getWrappedWidgets() const
+  {
+    return myWidgets;
+  }
 
 protected:
   //Widgets
@@ -39,7 +47,7 @@ private:
   Config_WidgetAPI* myWidgetApi;
   ModuleBase_PropPanelOperation*   myOperation;
 
-
+  QList<ModuleBase_IModelWidget*> myWidgets;
 };
 
 #endif /* ModuleBase_WidgetFactory_H_ */

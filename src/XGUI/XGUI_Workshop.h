@@ -20,6 +20,7 @@ class XGUI_SalomeConnector;
 class XGUI_ObjectsBrowser;
 class XGUI_ActionsMgr;
 class XGUI_ErrorDialog;
+class XGUI_PropertyPanel;
 class ModuleBase_Operation;
 class ModuleBase_PropPanelOperation;
 
@@ -126,13 +127,12 @@ private:
 
   // Creates Dock widgets: Object browser and Property panel
   void createDockWidgets();
-  void setPropertyPannelTitle(const QString& theTitle);
 
   QString myCurrentFile;
   XGUI_MainWindow* myMainWindow;
   XGUI_Module* myPartSetModule;
   XGUI_ObjectsBrowser* myObjectBrowser;
-  QDockWidget* myPropertyPanelDock;
+  XGUI_PropertyPanel* myPropertyPanel;
   XGUI_SelectionMgr* mySelector;
   XGUI_Displayer* myDisplayer;
   XGUI_OperationMgr* myOperationMgr; ///< manager to manipulate through the operations

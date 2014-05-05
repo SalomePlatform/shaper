@@ -28,7 +28,7 @@ Config_FeatureReader::Config_FeatureReader(const std::string& theXmlFile,
                                            const char* theEventGenerated)
     : Config_XMLReader(theXmlFile),
       myLibraryName(theLibraryName),
-      myEventGenerated(theEventGenerated ? theEventGenerated : "FeatureEvent")
+      myEventGenerated(theEventGenerated ? theEventGenerated : EVENT_FEATURE_LOADED)
 {
 }
 

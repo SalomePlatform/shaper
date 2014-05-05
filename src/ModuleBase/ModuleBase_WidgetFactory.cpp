@@ -6,11 +6,11 @@
  */
 
 #include <ModuleBase_WidgetFactory.h>
-
-#include <ModuleBase_WidgetSwitch.h>
-
+#include <ModuleBase_MetaWidget.h>
 #include <ModuleBase_PropPanelOperation.h>
 #include <ModuleBase_WidgetPoint2D.h>
+#include <ModuleBase_WidgetSwitch.h>
+
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
 
@@ -182,6 +182,9 @@ QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl()
   aControlLay->setStretch(1, 1);
   result->setLayout(aControlLay);
   connectWidget(aBox, WDG_DOUBLEVALUE);
+  ModuleBase_MetaWidget* aWrappedWdg =
+      new ModuleBase_MetaWidget(anObjName, aBox, myOperation->feature());
+  myWidgets.append(aWrappedWdg);
   return result;
 }
 
