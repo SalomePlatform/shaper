@@ -12,6 +12,8 @@
 
 #include <SketchPlugin_Line.h>
 
+#include <V3d_View.hxx>
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -49,14 +51,15 @@ void PartSet_OperationEditLine::init(boost::shared_ptr<ModelAPI_Feature> theFeat
   setFeature(theFeature);
 }
 
-void PartSet_OperationEditLine::mousePressed(const gp_Pnt& thePoint, QMouseEvent* theEvent)
+void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
   if (!(theEvent->buttons() &  Qt::LeftButton))
     return;
-  myCurPressed = thePoint;
+  gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
+  myCurPressed = aPoint;
 }
 
-void PartSet_OperationEditLine::mouseMoved(const gp_Pnt& thePoint, QMouseEvent* theEvent)
+void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
   if (!(theEvent->buttons() &  Qt::LeftButton))
     return;
@@ -65,14 +68,15 @@ void PartSet_OperationEditLine::mouseMoved(const gp_Pnt& thePoint, QMouseEvent* 
   PartSet_Tools::ConvertTo2D(myCurPressed, mySketch, aCurX, aCurY);
 
   double aX, anY;
-  PartSet_Tools::ConvertTo2D(thePoint, mySketch, aX, anY);
+  gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
+  PartSet_Tools::ConvertTo2D(aPoint, mySketch, aX, anY);
 
   double aDeltaX = aX - aCurX;
   double aDeltaY = anY - aCurY;
 
   moveLinePoint(aDeltaX, aDeltaY, LINE_ATTR_START);
   moveLinePoint(aDeltaX, aDeltaY, LINE_ATTR_END);
-  myCurPressed = thePoint;
+  myCurPressed = aPoint;
 }
 
 void PartSet_OperationEditLine::setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,

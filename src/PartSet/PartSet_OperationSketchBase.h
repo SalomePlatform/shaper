@@ -15,8 +15,8 @@
 #include <ModuleBase_Operation.h>
 #include <QObject>
 
+class Handle_V3d_View;
 class QMouseEvent;
-
 class GeomAPI_Shape;
 
 /*!
@@ -60,17 +60,17 @@ public:
   /// Processes the mouse pressed in the point
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mousePressed(const gp_Pnt& thePoint, QMouseEvent* theEvent) {};
+  virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView);
 
   /// Processes the mouse release in the point
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mouseReleased(const gp_Pnt& thePoint, QMouseEvent* theEvent) {};
+  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView);
 
   /// Processes the mouse move in the point
   /// \param thePoint a 3D point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mouseMoved(const gp_Pnt& thePoint, QMouseEvent* theEvent) {};
+  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
 
   /// Processes the key pressed in the view
   /// \param theKey a key value

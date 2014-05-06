@@ -6,6 +6,8 @@
 
 #include <SketchPlugin_Feature.h>
 
+#include <V3d_View.hxx>
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -35,4 +37,15 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchBase::createFeature()
   boost::shared_ptr<ModelAPI_Feature> aFeature = ModuleBase_Operation::createFeature();
   emit featureConstructed(aFeature, FM_Activation);
   return aFeature;
+}
+
+
+void PartSet_OperationSketchBase::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView)
+{
+}
+void PartSet_OperationSketchBase::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView)
+{
+}
+void PartSet_OperationSketchBase::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
+{
 }

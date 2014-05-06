@@ -13,9 +13,13 @@
 
 #include <SketchPlugin_Line.h>
 
+#include <V3d_View.hxx>
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
+
+#include <QMouseEvent>
 
 using namespace std;
 
@@ -50,17 +54,18 @@ void PartSet_OperationSketchLine::init(boost::shared_ptr<ModelAPI_Feature> theFe
   myInitPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
 }
 
-void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint, QMouseEvent* /*theEvent*/)
+void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
+  gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
   switch (myPointSelectionMode)
   {
     case SM_FirstPoint: {
-      setLinePoint(thePoint, LINE_ATTR_START);
+      setLinePoint(aPoint, LINE_ATTR_START);
       myPointSelectionMode = SM_SecondPoint;
     }
     break;
     case SM_SecondPoint: {
-      setLinePoint(thePoint, LINE_ATTR_END);
+      setLinePoint(aPoint, LINE_ATTR_END);
       commit();
       emit featureConstructed(feature(), FM_Deactivation);
       emit launchOperation(PartSet_OperationSketchLine::Type(), feature());
@@ -71,13 +76,16 @@ void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint, QMouseEv
   }
 }
 
-void PartSet_OperationSketchLine::mouseMoved(const gp_Pnt& thePoint, QMouseEvent* /*theEvent*/)
+void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
   switch (myPointSelectionMode)
   {
     case SM_SecondPoint:
-      setLinePoint(thePoint, LINE_ATTR_END);
-      break;
+    {
+      gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
+      setLinePoint(aPoint, LINE_ATTR_END);
+    }
+    break;
     default:
       break;
   }

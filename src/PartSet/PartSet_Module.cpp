@@ -5,7 +5,6 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <PartSet_Listener.h>
-#include <PartSet_Tools.h>
 
 #include <ModuleBase_Operation.h>
 
@@ -150,9 +149,7 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(theEvent->pos(),
-                                                     myWorkshop->viewer()->activeView());
-    aPreviewOp->mousePressed(aPnt, theEvent);
+    aPreviewOp->mousePressed(theEvent, myWorkshop->viewer()->activeView());
   }
 }
 
@@ -162,9 +159,7 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(theEvent->pos(),
-                                                     myWorkshop->viewer()->activeView());
-    aPreviewOp->mouseReleased(aPnt, theEvent);
+    aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView());
   }
 }
 
@@ -174,9 +169,7 @@ void PartSet_Module::onMouseMoved(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(theEvent->pos(),
-                                                     myWorkshop->viewer()->activeView());
-    aPreviewOp->mouseMoved(aPnt, theEvent);
+    aPreviewOp->mouseMoved(theEvent, myWorkshop->viewer()->activeView());
   }
 }
 
