@@ -112,6 +112,8 @@ void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
     style->drawPrimitive(QStyle::PE_IndicatorToolBarHandle, &aOpt, &aPainter, this);
 }
 
+
+
 //**************************************************************************
 ViewerLabel::ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort)
   : QLabel(theParent), myVPort(thePort), myResize(false)
@@ -131,6 +133,7 @@ void ViewerLabel::paintEvent(QPaintEvent* theEvent)
   QImage aImg = myVPort->dumpView(aImgRect, myResize);
   if (!aImg.isNull())
     QPainter(this).drawImage(aRect, aImg);
+  myResize = false;
   QLabel::paintEvent(theEvent);
 }
 
