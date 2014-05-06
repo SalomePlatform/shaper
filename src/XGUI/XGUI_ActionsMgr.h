@@ -34,6 +34,7 @@ public:
   void saveCommandsState();
   void restoreCommandState();
 
+  void updateAction(const QString&);
   void setNestedActionsEnabled(bool);
 
 public slots:

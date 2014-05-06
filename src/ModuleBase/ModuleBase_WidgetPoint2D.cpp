@@ -66,7 +66,9 @@ bool ModuleBase_WidgetPoint2D::storeValue(boost::shared_ptr<ModelAPI_Feature> th
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myFeatureAttributeID));
 
+  bool isBlocked = this->blockSignals(true);
   aPoint->setValue(myXSpin->value(), myYSpin->value());
+  this->blockSignals(isBlocked);
   return true;
 }
 

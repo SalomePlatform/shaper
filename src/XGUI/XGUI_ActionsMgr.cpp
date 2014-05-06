@@ -88,6 +88,14 @@ void XGUI_ActionsMgr::restoreCommandState()
   }
 }
 
+void XGUI_ActionsMgr::updateAction(const QString& theId)
+{
+  if(myActions.contains(theId)){
+    myActions[theId]->setEnabled(myActionsState[theId]);
+    myActions[theId]->setChecked(false);
+  }
+}
+
 void XGUI_ActionsMgr::setNestedActionsEnabled(bool isEnabled)
 {
   foreach(QString eachKey, myNestedActions) {
