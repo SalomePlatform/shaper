@@ -37,5 +37,5 @@ void Events_Error::send(char* theDescription, const void* theSender)
 
 void Events_Error::send(std::string theDescription, const void* theSender)
 {
-  Events_Error::send(theDescription.c_str(), theSender);
+  Events_Error::send((char*)theDescription.c_str(), theSender);
 }

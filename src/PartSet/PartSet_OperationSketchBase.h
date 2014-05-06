@@ -15,6 +15,8 @@
 #include <ModuleBase_Operation.h>
 #include <QObject>
 
+class QMouseEvent;
+
 class GeomAPI_Shape;
 
 /*!
@@ -55,13 +57,20 @@ public:
   virtual void setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
                            const TopoDS_Shape& theShape) {};
 
+  /// Processes the mouse pressed in the point
+  /// \param thePoint a point clicked in the viewer
+  /// \param theEvent the mouse event
+  virtual void mousePressed(const gp_Pnt& thePoint, QMouseEvent* theEvent) {};
+
   /// Processes the mouse release in the point
   /// \param thePoint a point clicked in the viewer
-  virtual void mouseReleased(const gp_Pnt& thePoint) {};
+  /// \param theEvent the mouse event
+  virtual void mouseReleased(const gp_Pnt& thePoint, QMouseEvent* theEvent) {};
 
   /// Processes the mouse move in the point
   /// \param thePoint a 3D point clicked in the viewer
-  virtual void mouseMoved(const gp_Pnt& thePoint) {};
+  /// \param theEvent the mouse event
+  virtual void mouseMoved(const gp_Pnt& thePoint, QMouseEvent* theEvent) {};
 
   /// Processes the key pressed in the view
   /// \param theKey a key value
@@ -78,13 +87,12 @@ signals:
   /// theFeature the operation argument
   void launchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature);
 
-public:
-  /// temporary code to provide edition mode
-  void setEditMode(const bool isEditMode) { myIsEditMode = isEditMode; };
 protected:
-  bool isEditMode() const { return myIsEditMode; }
-private:
-  bool myIsEditMode;
+  /// Creates an operation new feature
+  /// In addition to the default realization it appends the created line feature to
+  /// the sketch feature
+  /// \returns the created feature
+  virtual boost::shared_ptr<ModelAPI_Feature> createFeature();
 };
 
 #endif

@@ -26,6 +26,10 @@ public:
   PartSet_Module(XGUI_Workshop* theWshop);
   virtual ~PartSet_Module();
 
+  /// Returns the module workshop
+  /// \returns a workshop instance
+  XGUI_Workshop* workshop() const;
+
   virtual void createFeatures();
   virtual void featureCreated(XGUI_Command* theFeature);
   virtual QStringList nestedFeatures(QString theFeature);
@@ -42,9 +46,6 @@ public:
 
 public slots:
   void onFeatureTriggered();
-  /// SLOT, that is called after the operation is started. Perform some specific for module
-  /// actions, e.g. connect the sketch feature to the viewer selection and show the sketch preview.
-  void onOperationStarted();
   /// SLOT, that is called after the operation is stopped. Disconnect the sketch feature
   /// from the viewer selection and show the sketch preview.
   void onOperationStopped(ModuleBase_Operation* theOperation);
@@ -52,11 +53,15 @@ public slots:
   /// SLOT, that is called by the selection in the viewer is changed.
   /// The selection is sent to the current operation if it listens selection.
   void onSelectionChanged();
-  /// SLOT, that is called by mouse click in the viewer.
+  /// SLOT, that is called by mouse press in the viewer.
+  /// The mouse released point is sent to the current operation to be processed.
+  /// \param theEvent the mouse event
+  void onMousePressed(QMouseEvent* theEvent);
+  /// SLOT, that is called by mouse release in the viewer.
   /// The mouse released point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
   void onMouseReleased(QMouseEvent* theEvent);
-  /// SLOT, that is called by the selection in the viewer is changed.
+  /// SLOT, that is called by mouse move in the viewer.
   /// The mouse moved point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
   void onMouseMoved(QMouseEvent* theEvent);
@@ -81,7 +86,7 @@ public slots:
 protected:
   /// Creates a new operation
   /// \param theCmdId the operation name
-  ModuleBase_Operation* createOperation(const QString& theCmdId);
+  ModuleBase_Operation* createOperation(const std::string& theCmdId);
 
   /// Sends the operation
   /// \param theOperation the operation

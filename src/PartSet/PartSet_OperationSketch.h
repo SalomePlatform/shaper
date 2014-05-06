@@ -18,6 +18,10 @@ class PARTSET_EXPORT PartSet_OperationSketch : public PartSet_OperationSketchBas
 {
   Q_OBJECT
 public:
+  /// Returns the operation type key
+  static std::string Type() { return "Sketch"; }
+
+public:
   /// Constructor
   /// \param theId the feature identifier
   /// \param theParent the operation parent
@@ -47,6 +51,9 @@ protected:
   /// Set the plane to the current sketch
   /// \param theShape the shape
   void setSketchPlane(const TopoDS_Shape& theShape);
+
+private:
+  bool myIsEditMode; /// the edit mode of this operation
 };
 
 #endif

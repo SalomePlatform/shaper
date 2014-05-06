@@ -4,6 +4,8 @@
 
 #include <PartSet_OperationSketch.h>
 
+#include <PartSet_OperationEditLine.h>
+
 #include <SketchPlugin_Sketch.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -22,7 +24,7 @@ using namespace std;
 
 PartSet_OperationSketch::PartSet_OperationSketch(const QString& theId,
 	                                             QObject* theParent)
-: PartSet_OperationSketchBase(theId, theParent)
+: PartSet_OperationSketchBase(theId, theParent), myIsEditMode(false)
 {
 }
 
@@ -33,20 +35,27 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
   std::list<int> aModes;
-  if (!isEditMode())
+  if (!myIsEditMode)
     aModes.push_back(TopAbs_FACE);
+  else {
+    aModes.push_back(TopAbs_VERTEX);
+    aModes.push_back(TopAbs_EDGE);
+  }
   return aModes;
 }
 
 void PartSet_OperationSketch::setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                           const TopoDS_Shape& theShape)
 {
-  if (!isEditMode()) {
+  if (theShape.IsNull())
+    return;
+
+  if (!myIsEditMode) {
     setSketchPlane(theShape);
-    setEditMode(true);
+    myIsEditMode = true;
   }
   else if (theFeature)
-    emit launchOperation("EditLine", theFeature);
+    emit launchOperation(PartSet_OperationEditLine::Type(), theFeature);
 }
 
 void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)

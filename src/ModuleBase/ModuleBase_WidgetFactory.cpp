@@ -10,7 +10,6 @@
 #include <ModuleBase_MetaWidget.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
-#include <ModuleBase_PropPanelOperation.h>
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetSwitch.h>
 

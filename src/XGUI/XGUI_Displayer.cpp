@@ -40,15 +40,9 @@ void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
   Handle(AIS_Shape) anAIS = new AIS_Shape(theShape);
-  std::vector<Handle(AIS_InteractiveObject)> aDispAIS;
-  if (myFeature2AISObjectMap.find(theFeature) != myFeature2AISObjectMap.end()) {
-    aDispAIS = myFeature2AISObjectMap[theFeature];
-  }
-  aDispAIS.push_back(anAIS);
-  myFeature2AISObjectMap[theFeature] = aDispAIS;
+  myFeature2AISObjectMap[theFeature] = anAIS;
 
   aContext->Display(anAIS, Standard_False);
-
   if (isUpdateViewer)
     aContext->UpdateCurrentViewer();
 }
@@ -61,19 +55,12 @@ boost::shared_ptr<ModelAPI_Feature> XGUI_Displayer::GetFeature(const TopoDS_Shap
                                   aFLast = myFeature2AISObjectMap.end();
   for (; aFIt != aFLast && !aFeature; aFIt++)
   {
-    std::vector<Handle(AIS_InteractiveObject)> aDispAIS = (*aFIt).second;
-    std::vector<Handle(AIS_InteractiveObject)>::const_iterator anIt = aDispAIS.begin(),
-                                                                aLast = aDispAIS.end();
-    Handle(AIS_InteractiveContext) aContext = AISContext();
-    for (; anIt != aLast && !aFeature; anIt++) {
-      Handle(AIS_InteractiveObject) anAIS = *anIt;
-      Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
-      if (!anAISShape.IsNull() && anAISShape->Shape() == theShape) {
-        aFeature = (*aFIt).first;
-      }
+    Handle(AIS_InteractiveObject) anAIS = (*aFIt).second;
+    Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
+    if (!anAISShape.IsNull() && anAISShape->Shape() == theShape) {
+      aFeature = (*aFIt).first;
     }
   }
-
   return aFeature;
 }
 
@@ -83,16 +70,12 @@ void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
   if (myFeature2AISObjectMap.find(theFeature) == myFeature2AISObjectMap.end())
     return;
 
-  std::vector<Handle(AIS_InteractiveObject)> aDispAIS = myFeature2AISObjectMap[theFeature];
-  std::vector<Handle(AIS_InteractiveObject)>::const_iterator anIt = aDispAIS.begin(),
-                                                             aLast = aDispAIS.end();
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  for (; anIt != aLast; anIt++) {
-    Handle(AIS_InteractiveObject) anAIS = *anIt;
-    Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
-    if (anAISShape.IsNull())
-      continue;
-      aContext->Erase(anAISShape);
+  Handle(AIS_InteractiveObject) anAIS = myFeature2AISObjectMap[theFeature];
+  Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
+  if (!anAISShape.IsNull())
+  {
+    aContext->Erase(anAISShape);
   }
   myFeature2AISObjectMap.erase(theFeature);
 
@@ -105,39 +88,38 @@ void XGUI_Displayer::RedisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature>
                                              const std::list<int>& theModes, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  
-  if (IsVisible(theFeature)) {
-    Erase(theFeature, false);
-  }
-
-  Handle(AIS_Shape) anAIS = new AIS_Shape(theShape);
-  std::vector<Handle(AIS_InteractiveObject)> aDispAIS;
-  if (myFeature2AISObjectMap.find(theFeature) != myFeature2AISObjectMap.end()) {
-    aDispAIS = myFeature2AISObjectMap[theFeature];
-  }
-  aDispAIS.push_back(anAIS);
-  myFeature2AISObjectMap[theFeature] = aDispAIS;
-
-  Handle(AIS_InteractiveContext) ic = AISContext();
-
   // Open local context if there is no one
-  if (!ic->HasOpenedContext()) {
-    ic->ClearCurrents(false);
-    ic->OpenLocalContext(false/*use displayed objects*/, /*true*/false/*use displayed objects*/,
+  if (!aContext->HasOpenedContext()) {
+    aContext->ClearCurrents(false);
+    aContext->OpenLocalContext(false/*use displayed objects*/, /*true*/false/*use displayed objects*/,
                          true/*allow shape decomposition*/);
+  }
+  // display or redisplay presentation
+  Handle(AIS_Shape) anAIS;
+  if (IsVisible(theFeature)) {
+    anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[theFeature]);
+    if (!anAIS.IsNull()) {
+      anAIS->Set(theShape);
+      anAIS->Redisplay();
+    }
+  }
+  else {
+    anAIS = new AIS_Shape(theShape);
+    myFeature2AISObjectMap[theFeature] = anAIS;
+    aContext->Display(anAIS, false);
   }
   // Activate selection of objects from prs
   if (!anAIS.IsNull()) {
-    if (anAIS->IsKind(STANDARD_TYPE(AIS_Shape))) {
-      ic->Display(anAIS, false);
-      ic->Load(anAIS, -1, true/*allow decomposition*/);
-      std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
-      for (; anIt != aLast; anIt++) 
-        ic->Activate(anAIS, AIS_Shape::SelectionMode((TopAbs_ShapeEnum)*anIt));
+    aContext->Load(anAIS, -1, true/*allow decomposition*/);
+    std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
+    for (; anIt != aLast; anIt++)
+    {
+      aContext->Activate(anAIS, AIS_Shape::SelectionMode((TopAbs_ShapeEnum)*anIt));
     }
   }
+
   if (isUpdateViewer)
-    ic->UpdateCurrentViewer();
+    aContext->UpdateCurrentViewer();
 }
 
 void XGUI_Displayer::CloseLocalContexts(const bool isUpdateViewer)

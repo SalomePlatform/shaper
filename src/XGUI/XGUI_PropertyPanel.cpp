@@ -8,8 +8,6 @@
 #include <XGUI_Constants.h>
 #include <XGUI_PropertyPanel.h>
 
-#include <ModuleBase_PropPanelOperation.h>
-
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QFrame>
@@ -76,4 +74,6 @@ void XGUI_PropertyPanel::updateContentWidget(boost::shared_ptr<ModelAPI_Feature>
   foreach(ModuleBase_ModelWidget* eachWidget, myWidgets) {
     eachWidget->restoreValue(theFeature);
   }
+  // the repaint is used here to immediatelly react in GUI to the values change.
+  repaint();
 }
