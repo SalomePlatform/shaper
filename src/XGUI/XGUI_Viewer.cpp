@@ -173,14 +173,15 @@ QMdiSubWindow* XGUI_Viewer::createView(V3d_TypeOfView theType)
   //initView( vw );
   // set default background for view window
   //vw->setBackground( background(0) ); // 0 means MAIN_VIEW (other views are not yet created here)
-  //// connect signal from viewport
-    //connect(view->viewPort(), SIGNAL(vpClosed()), this, SLOT(onViewClosed()));
+  // connect signal from viewport
+  //connect(view->viewPort(), SIGNAL(vpClosed()), this, SLOT(onViewClosed()));
     //connect(view->viewPort(), SIGNAL(vpMapped()), this, SLOT(onViewMapped()));
-    if (myViews.size() == 0) 
-        setTrihedronShown(true);
+  if (myViews.size() == 0) 
+    setTrihedronShown(true);
 
-    view->setBackground(XGUI_ViewBackground(XGUI::VerticalGradient, Qt::white, QColor(Qt::blue).lighter()));
+  view->setBackground(XGUI_ViewBackground(XGUI::VerticalGradient, Qt::white, QColor(Qt::blue).lighter()));
   //view->setBackground(XGUI_ViewBackground(Qt::black));
+  view->updateEnabledDrawMode();
 
   QMdiArea* aMDI = myMainWindow->mdiArea();
   QMdiSubWindow* aWnd = aMDI->addSubWindow(view, Qt::FramelessWindowHint);
@@ -374,22 +375,22 @@ bool XGUI_Viewer::computeTrihedronSize(double& theNewSize, double& theSize)
 
 void XGUI_Viewer::onViewClosed(QMdiSubWindow* theView)
 {
-    if ( !theView )
-        return;
+  if ( !theView )
+    return;
 
-    emit deleteView( static_cast<XGUI_ViewWindow*>(theView->widget()) );
-    removeView( theView );
+  emit deleteView( static_cast<XGUI_ViewWindow*>(theView->widget()) );
+  removeView( theView );
 
-    // if this is last view
-    if (myViews.size() == 0) {
-        Standard_Integer aViewsNb = 0;
-        for ( myV3dViewer->InitActiveViews(); myV3dViewer->MoreActiveViews(); myV3dViewer->NextActiveViews())
-            ++aViewsNb;
-        if ( aViewsNb < 2 ) {
-            //clean up presentations before last view is closed
-            myAISContext->RemoveAll(Standard_False);
-        }
+  // if this is last view
+  if (myViews.size() == 0) {
+    Standard_Integer aViewsNb = 0;
+    for ( myV3dViewer->InitActiveViews(); myV3dViewer->MoreActiveViews(); myV3dViewer->NextActiveViews())
+      ++aViewsNb;
+    if ( aViewsNb < 2 ) {
+      //clean up presentations before last view is closed
+      myAISContext->RemoveAll(Standard_False);
     }
+  }
 }
 
 /*!Remove view window \a theView from view manager.
@@ -551,4 +552,27 @@ void XGUI_Viewer::onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEv
     myAISContext->UpdateCurrentViewer();
   }
   emit selectionChanged();
+}
+
+//******************************************************
+void XGUI_Viewer::setMultiSelectionEnabled(bool toEnable) 
+{ 
+  myMultiSelectionEnabled = toEnable; 
+  updateViewsDrawMode();
+}
+
+//******************************************************
+void XGUI_Viewer::setSelectionEnabled(bool toEnable) 
+{ 
+  mySelectionEnabled = toEnable; 
+  updateViewsDrawMode();
+}
+
+//******************************************************
+void XGUI_Viewer::updateViewsDrawMode() const
+{
+  foreach(QMdiSubWindow* aWnd, myViews){
+    XGUI_ViewWindow* aView = static_cast<XGUI_ViewWindow*>(aWnd->widget());
+    aView->updateEnabledDrawMode();
+  }
 }

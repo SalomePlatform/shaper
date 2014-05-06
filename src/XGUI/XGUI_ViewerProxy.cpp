@@ -143,3 +143,43 @@ void XGUI_ViewerProxy::onKeyRelease(XGUI_ViewWindow*, QKeyEvent* theEvent)
 {
   emit keyRelease(theEvent);
 }
+
+//***************************************
+void XGUI_ViewerProxy::enableSelection(bool isEnabled)
+{
+  if (myWorkshop->isSalomeMode()) {
+    myWorkshop->salomeConnector()->viewer()->enableSelection(isEnabled);
+  } else {
+    myWorkshop->mainWindow()->viewer()->setSelectionEnabled(isEnabled);
+  }
+}
+
+//***************************************
+bool XGUI_ViewerProxy::isSelectionEnabled() const
+{
+  if (myWorkshop->isSalomeMode()) {
+    return myWorkshop->salomeConnector()->viewer()->isSelectionEnabled();
+  } else {
+    return myWorkshop->mainWindow()->viewer()->isSelectionEnabled();
+  }
+}
+
+//***************************************
+void XGUI_ViewerProxy::enableMultiselection(bool isEnable)
+{
+  if (myWorkshop->isSalomeMode()) {
+    myWorkshop->salomeConnector()->viewer()->enableMultiselection(isEnable);
+  } else {
+    myWorkshop->mainWindow()->viewer()->setMultiSelectionEnabled(isEnable);
+  }
+}
+
+//***************************************
+bool XGUI_ViewerProxy::isMultiSelectionEnabled() const
+{
+  if (myWorkshop->isSalomeMode()) {
+    return myWorkshop->salomeConnector()->viewer()->isMultiSelectionEnabled();
+  } else {
+    return myWorkshop->mainWindow()->viewer()->isMultiSelectionEnabled();
+  }
+}

@@ -12,17 +12,19 @@ NewGeom_SalomeViewer::NewGeom_SalomeViewer(QObject* theParent)
 {
 }
 
-
+//**********************************************
 Handle(AIS_InteractiveContext) NewGeom_SalomeViewer::AISContext() const
 {
   return mySelector->viewer()->getAISContext();
 }
 
+//**********************************************
 Handle(V3d_Viewer) NewGeom_SalomeViewer::v3dViewer() const
 {
   return mySelector->viewer()->getViewer3d();
 }
 
+//**********************************************
 Handle(V3d_View) NewGeom_SalomeViewer::activeView() const
 {
   OCCViewer_Viewer* aViewer = mySelector->viewer();
@@ -31,6 +33,7 @@ Handle(V3d_View) NewGeom_SalomeViewer::activeView() const
   return aWnd->getViewPort()->getView();
 }
 
+//**********************************************
 void NewGeom_SalomeViewer::setSelector(NewGeom_OCCSelector* theSel)
 {
   if (mySelector) {
@@ -69,33 +72,62 @@ void NewGeom_SalomeViewer::setSelector(NewGeom_OCCSelector* theSel)
           this, SLOT(onKeyRelease(SUIT_ViewWindow*, QKeyEvent*)));
 }
 
-
+//**********************************************
 void NewGeom_SalomeViewer::onMousePress(SUIT_ViewWindow*, QMouseEvent* theEvent)
 {
   emit mousePress(theEvent);
 }
 
+//**********************************************
 void NewGeom_SalomeViewer::onMouseRelease(SUIT_ViewWindow*, QMouseEvent* theEvent)
 {
   emit mouseRelease(theEvent);
 }
 
+//**********************************************
 void NewGeom_SalomeViewer::onMouseDoubleClick(SUIT_ViewWindow*, QMouseEvent* theEvent)
 {
   emit mouseDoubleClick(theEvent);
 }
 
+//**********************************************
 void NewGeom_SalomeViewer::onMouseMove(SUIT_ViewWindow*, QMouseEvent* theEvent)
 {
   emit mouseMove(theEvent);
 }
 
+//**********************************************
 void NewGeom_SalomeViewer::onKeyPress(SUIT_ViewWindow*, QKeyEvent* theEvent)
 {
   emit keyPress(theEvent);
 }
 
+//**********************************************
 void NewGeom_SalomeViewer::onKeyRelease(SUIT_ViewWindow*, QKeyEvent* theEvent)
 {
   emit keyRelease(theEvent);
+}
+
+//**********************************************
+void NewGeom_SalomeViewer::enableSelection(bool isEnabled)
+{
+  mySelector->viewer()->enableSelection(isEnabled);
+}
+
+//**********************************************
+bool NewGeom_SalomeViewer::isSelectionEnabled() const
+{
+  return mySelector->viewer()->isSelectionEnabled();
+}
+
+//**********************************************
+void NewGeom_SalomeViewer::enableMultiselection(bool isEnable)
+{
+  mySelector->viewer()->enableMultiselection(isEnable);
+}
+
+//**********************************************
+bool NewGeom_SalomeViewer::isMultiSelectionEnabled() const
+{
+  return mySelector->viewer()->isMultiSelectionEnabled();
 }

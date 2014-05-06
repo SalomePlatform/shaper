@@ -28,6 +28,18 @@ public:
   //! Returns Vsd_View object from currently active view window
   virtual Handle(V3d_View) activeView() const;
 
+  //! Enable or disable selection in the viewer
+  virtual void enableSelection(bool isEnabled);
+
+  //! Returns true if selection is enabled
+  virtual bool isSelectionEnabled() const;
+
+  //! Enable or disable multiselection in the viewer
+  virtual void enableMultiselection(bool isEnable);
+
+  //! Returns true if multiselection is enabled
+  virtual bool isMultiSelectionEnabled() const;
+
   void setSelector(NewGeom_OCCSelector* theSel);
 
   NewGeom_OCCSelector* selector() const { return mySelector; }
