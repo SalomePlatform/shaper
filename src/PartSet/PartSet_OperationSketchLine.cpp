@@ -40,8 +40,10 @@ bool PartSet_OperationSketchLine::isGranted() const
 std::list<int> PartSet_OperationSketchLine::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
   std::list<int> aModes;
-  if (theFeature != feature())
+  if (theFeature != feature()) {
     aModes.push_back(TopAbs_VERTEX);
+    aModes.push_back(TopAbs_EDGE);
+  }
   return aModes;
 }
 
@@ -134,14 +136,14 @@ void PartSet_OperationSketchLine::stopOperation()
 
 boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature()
 {
-  boost::shared_ptr<ModelAPI_Feature> aNewFeature = PartSet_OperationSketchBase::createFeature();
+  boost::shared_ptr<ModelAPI_Feature> aNewFeature = ModuleBase_Operation::createFeature();
   if (mySketch) {
     boost::shared_ptr<SketchPlugin_Feature> aFeature = 
                            boost::dynamic_pointer_cast<SketchPlugin_Feature>(mySketch);
 
     aFeature->addSub(aNewFeature);
   }
-  //emit featureConstructed(aNewFeature, FM_Activation);
+  emit featureConstructed(aNewFeature, FM_Activation);
   return aNewFeature;
 }
 

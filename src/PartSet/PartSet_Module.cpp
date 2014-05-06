@@ -52,7 +52,6 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
 
   XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
 
-  connect(anOperationMgr, SIGNAL(operationStarted()), this, SLOT(onOperationStarted()));
   connect(anOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
 
@@ -68,6 +67,11 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
 
 PartSet_Module::~PartSet_Module()
 {
+}
+
+XGUI_Workshop* PartSet_Module::workshop() const
+{
+  return myWorkshop;
 }
 
 void PartSet_Module::createFeatures()
@@ -110,34 +114,11 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
   sendOperation(anOperation);
 }
 
-void PartSet_Module::onOperationStarted()
-{
-  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
-
-  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp) {
-    visualizePreview(aPreviewOp->feature(), true);
-
-    connect(aPreviewOp, SIGNAL(featureConstructed(boost::shared_ptr<ModelAPI_Feature>, int)),
-            this, SLOT(onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature>, int)));
-    connect(aPreviewOp, SIGNAL(launchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)),
-            this, SLOT(onLaunchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)));
-
-    PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
-    if (aSketchOp) {
-      connect(aSketchOp, SIGNAL(planeSelected(double, double, double)),
-              this, SLOT(onPlaneSelected(double, double, double)));
-    }
-  }
-}
-
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 {
   if (!theOperation)
     return;
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
-  //if (aPreviewOp)
-  //  visualizePreview(false);
 }
 
 void PartSet_Module::onSelectionChanged()
@@ -264,6 +245,21 @@ ModuleBase_Operation* PartSet_Module::createOperation(const QString& theCmdId)
   anOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
   anOperation->getDescription()->setDescription(QString::fromStdString(aDescription));
 
+  // connect
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aPreviewOp) {
+    connect(aPreviewOp, SIGNAL(featureConstructed(boost::shared_ptr<ModelAPI_Feature>, int)),
+            this, SLOT(onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature>, int)));
+    connect(aPreviewOp, SIGNAL(launchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)),
+            this, SLOT(onLaunchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)));
+
+    PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
+    if (aSketchOp) {
+      connect(aSketchOp, SIGNAL(planeSelected(double, double, double)),
+              this, SLOT(onPlaneSelected(double, double, double)));
+    }
+  }
+
   return anOperation;
 }
 
@@ -289,10 +285,9 @@ void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFea
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   if (isDisplay) {
     boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview(theFeature);
-    if (aPreview) {
-      aDisplayer->RedisplayInLocalContext(theFeature, aPreview->impl<TopoDS_Shape>(),
-                                          aPreviewOp->getSelectionModes(theFeature));
-    }
+    aDisplayer->RedisplayInLocalContext(theFeature,
+                                        aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
+                                        aPreviewOp->getSelectionModes(theFeature));
   }
   else {
     //aDisplayer->CloseLocalContexts(false);

@@ -78,13 +78,12 @@ signals:
   /// theFeature the operation argument
   void launchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature);
 
-public:
-  /// temporary code to provide edition mode
-  void setEditMode(const bool isEditMode) { myIsEditMode = isEditMode; };
 protected:
-  bool isEditMode() const { return myIsEditMode; }
-private:
-  bool myIsEditMode;
+  /// Creates an operation new feature
+  /// In addition to the default realization it appends the created line feature to
+  /// the sketch feature
+  /// \returns the created feature
+  virtual boost::shared_ptr<ModelAPI_Feature> createFeature();
 };
 
 #endif

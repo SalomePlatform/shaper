@@ -26,6 +26,10 @@ public:
   PartSet_Module(XGUI_Workshop* theWshop);
   virtual ~PartSet_Module();
 
+  /// Returns the module workshop
+  /// \returns a workshop instance
+  XGUI_Workshop* workshop() const;
+
   virtual void createFeatures();
   virtual void featureCreated(XGUI_Command* theFeature);
   virtual QStringList nestedFeatures(QString theFeature);
@@ -42,9 +46,6 @@ public:
 
 public slots:
   void onFeatureTriggered();
-  /// SLOT, that is called after the operation is started. Perform some specific for module
-  /// actions, e.g. connect the sketch feature to the viewer selection and show the sketch preview.
-  void onOperationStarted();
   /// SLOT, that is called after the operation is stopped. Disconnect the sketch feature
   /// from the viewer selection and show the sketch preview.
   void onOperationStopped(ModuleBase_Operation* theOperation);

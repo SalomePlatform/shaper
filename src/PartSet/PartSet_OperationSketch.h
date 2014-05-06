@@ -47,6 +47,9 @@ protected:
   /// Set the plane to the current sketch
   /// \param theShape the shape
   void setSketchPlane(const TopoDS_Shape& theShape);
+
+private:
+  bool myIsEditMode; /// the edit mode of this operation
 };
 
 #endif

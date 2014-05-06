@@ -22,7 +22,7 @@ using namespace std;
 
 PartSet_OperationSketch::PartSet_OperationSketch(const QString& theId,
 	                                             QObject* theParent)
-: PartSet_OperationSketchBase(theId, theParent)
+: PartSet_OperationSketchBase(theId, theParent), myIsEditMode(false)
 {
 }
 
@@ -33,7 +33,7 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
   std::list<int> aModes;
-  if (!isEditMode())
+  if (!myIsEditMode)
     aModes.push_back(TopAbs_FACE);
   return aModes;
 }
@@ -41,9 +41,9 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<Mode
 void PartSet_OperationSketch::setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                           const TopoDS_Shape& theShape)
 {
-  if (!isEditMode()) {
+  if (!myIsEditMode) {
     setSketchPlane(theShape);
-    setEditMode(true);
+    myIsEditMode = true;
   }
   else if (theFeature)
     emit launchOperation("EditLine", theFeature);

@@ -88,7 +88,7 @@ protected:
 protected:
   XGUI_Workshop* myWorkshop;
 
-  typedef std::map<boost::shared_ptr<ModelAPI_Feature>, std::vector<Handle(AIS_InteractiveObject)> > FeatureToAISMap;
+  typedef std::map<boost::shared_ptr<ModelAPI_Feature>, Handle(AIS_InteractiveObject) > FeatureToAISMap;
   FeatureToAISMap myFeature2AISObjectMap;
 };
 
