@@ -53,11 +53,15 @@ public slots:
   /// SLOT, that is called by the selection in the viewer is changed.
   /// The selection is sent to the current operation if it listens selection.
   void onSelectionChanged();
-  /// SLOT, that is called by mouse click in the viewer.
+  /// SLOT, that is called by mouse press in the viewer.
+  /// The mouse released point is sent to the current operation to be processed.
+  /// \param theEvent the mouse event
+  void onMousePressed(QMouseEvent* theEvent);
+  /// SLOT, that is called by mouse release in the viewer.
   /// The mouse released point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
   void onMouseReleased(QMouseEvent* theEvent);
-  /// SLOT, that is called by the selection in the viewer is changed.
+  /// SLOT, that is called by mouse move in the viewer.
   /// The mouse moved point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
   void onMouseMoved(QMouseEvent* theEvent);
@@ -82,7 +86,7 @@ public slots:
 protected:
   /// Creates a new operation
   /// \param theCmdId the operation name
-  ModuleBase_Operation* createOperation(const QString& theCmdId);
+  ModuleBase_Operation* createOperation(const std::string& theCmdId);
 
   /// Sends the operation
   /// \param theOperation the operation

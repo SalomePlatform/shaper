@@ -8,8 +8,6 @@
 #include <XGUI_Constants.h>
 #include <XGUI_PropertyPanel.h>
 
-#include <ModuleBase_PropPanelOperation.h>
-
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QFrame>

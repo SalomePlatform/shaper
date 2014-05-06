@@ -57,6 +57,8 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
 
   connect(myWorkshop->selector(), SIGNAL(selectionChanged()), 
           this, SLOT(onSelectionChanged()));
+  connect(myWorkshop->viewer(), SIGNAL(mousePress(QMouseEvent*)),
+          this, SLOT(onMousePressed(QMouseEvent*)));
   connect(myWorkshop->viewer(), SIGNAL(mouseRelease(QMouseEvent*)),
           this, SLOT(onMouseReleased(QMouseEvent*)));
   connect(myWorkshop->viewer(), SIGNAL(mouseMove(QMouseEvent*)),
@@ -110,7 +112,7 @@ void PartSet_Module::onFeatureTriggered()
   
 void PartSet_Module::launchOperation(const QString& theCmdId)
 {
-  ModuleBase_Operation* anOperation = createOperation(theCmdId);
+  ModuleBase_Operation* anOperation = createOperation(theCmdId.toStdString());
   sendOperation(anOperation);
 }
 
@@ -142,34 +144,39 @@ void PartSet_Module::onSelectionChanged()
   }
 }
 
+void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
+{
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
+                                       myWorkshop->operationMgr()->currentOperation());
+  if (aPreviewOp)
+  {
+    gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(theEvent->pos(),
+                                                     myWorkshop->viewer()->activeView());
+    aPreviewOp->mousePressed(aPnt, theEvent);
+  }
+}
+
 void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
 {
-  QPoint aPoint = theEvent->pos();
-  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
-  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp) {
-    XGUI_SelectionMgr* aSelector = myWorkshop->selector();
-    if (aSelector) {
-      Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
-      if ( !aView3d.IsNull() ) {
-        gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(aPoint, aView3d);
-        aPreviewOp->mouseReleased(aPnt);
-      }
-    }
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
+                                       myWorkshop->operationMgr()->currentOperation());
+  if (aPreviewOp)
+  {
+    gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(theEvent->pos(),
+                                                     myWorkshop->viewer()->activeView());
+    aPreviewOp->mouseReleased(aPnt, theEvent);
   }
 }
 
 void PartSet_Module::onMouseMoved(QMouseEvent* theEvent)
 {
-  QPoint aPoint = theEvent->pos();
-  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
-  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp) {
-    Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
-    if ( !aView3d.IsNull() ) {
-      gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(aPoint, aView3d);
-      aPreviewOp->mouseMoved(aPnt);
-    }
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
+                                       myWorkshop->operationMgr()->currentOperation());
+  if (aPreviewOp)
+  {
+    gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(theEvent->pos(),
+                                                     myWorkshop->viewer()->activeView());
+    aPreviewOp->mouseMoved(aPnt, theEvent);
   }
 }
 
@@ -215,37 +222,41 @@ void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> th
   visualizePreview(theFeature, isDisplay);
 }
 
-ModuleBase_Operation* PartSet_Module::createOperation(const QString& theCmdId)
+ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdId)
 {
-  std::string aStdCmdId = theCmdId.toStdString();
-  if (aStdCmdId == "EditLine")
-    aStdCmdId = "SketchLine";
+  // get operation xml description
+  std::string aStdCmdId = theCmdId;
+  if (aStdCmdId == PartSet_OperationEditLine::Type())
+    aStdCmdId = PartSet_OperationSketchLine::Type();
   std::string aPluginFileName = featureFile(aStdCmdId);
   Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginFileName);
   aWdgReader.readAll();
   std::string aXmlCfg = aWdgReader.featureWidgetCfg(aStdCmdId);
   std::string aDescription = aWdgReader.featureDescription(aStdCmdId);
+
+  // create the operation
   ModuleBase_Operation* anOperation;
-  if (theCmdId == "Sketch" ) {
-    anOperation = new PartSet_OperationSketch(theCmdId, this);
+  if (theCmdId == PartSet_OperationSketch::Type()) {
+    anOperation = new PartSet_OperationSketch(theCmdId.c_str(), this);
   }
-  else if(theCmdId == "SketchLine" || theCmdId == "EditLine") {
+  else if(theCmdId == PartSet_OperationSketchLine::Type() ||
+          theCmdId == PartSet_OperationEditLine::Type()) {
     ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
     boost::shared_ptr<ModelAPI_Feature> aSketchFeature;
     if (aCurOperation)
       aSketchFeature = aCurOperation->feature();
-    if (theCmdId == "SketchLine")
-      anOperation = new PartSet_OperationSketchLine(theCmdId, this, aSketchFeature);
+    if (theCmdId == PartSet_OperationSketchLine::Type())
+      anOperation = new PartSet_OperationSketchLine(theCmdId.c_str(), this, aSketchFeature);
     else
-      anOperation = new PartSet_OperationEditLine(theCmdId, this, aSketchFeature);
+      anOperation = new PartSet_OperationEditLine(theCmdId.c_str(), this, aSketchFeature);
   }
   else {
-    anOperation = new ModuleBase_Operation(theCmdId, this);
+    anOperation = new ModuleBase_Operation(theCmdId.c_str(), this);
   }
   anOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
   anOperation->getDescription()->setDescription(QString::fromStdString(aDescription));
 
-  // connect
+  // connect the operation
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
     connect(aPreviewOp, SIGNAL(featureConstructed(boost::shared_ptr<ModelAPI_Feature>, int)),
@@ -259,7 +270,6 @@ ModuleBase_Operation* PartSet_Module::createOperation(const QString& theCmdId)
               this, SLOT(onPlaneSelected(double, double, double)));
     }
   }
-
   return anOperation;
 }
 

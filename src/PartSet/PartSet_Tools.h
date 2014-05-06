@@ -11,7 +11,10 @@
 
 #include <QPoint>
 
+#include <boost/shared_ptr.hpp>
+
 class Handle_V3d_View;
+class ModelAPI_Feature;
 
 /*!
  \class PartSet_Tools
@@ -25,6 +28,13 @@ public:
   /// \param theView a 3D view
   static gp_Pnt ConvertClickToPoint(QPoint thePoint, Handle_V3d_View theView);
 
+  /// \brief Converts the 3D point to the projected coodinates on the sketch plane.
+  /// \param thePoint the 3D point in the viewer
+  /// \param theSketch the sketch feature
+  /// \param theX the X coordinate
+  /// \param theY the Y coordinate
+  static void ConvertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelAPI_Feature> theSketch,
+                          double& theX, double& theY);
 };
 
 #endif

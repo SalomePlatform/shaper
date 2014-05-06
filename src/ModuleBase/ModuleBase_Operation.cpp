@@ -1,8 +1,8 @@
 /*
  * ModuleBase_Operation.cpp
  *
- *  Created on: May 5, 2014
- *      Author: nds
+ *  Created on: Apr 2, 2014
+ *      Author: sbh
  */
 
 #include "ModuleBase_Operation.h"

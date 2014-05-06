@@ -10,6 +10,8 @@
 #include <PartSet_OperationSketchBase.h>
 #include <QObject>
 
+class QMouseEvent;
+
 /*!
  \class PartSet_OperationSketchLine
  * \brief The operation for the sketch feature creation
@@ -17,6 +19,11 @@
 class PARTSET_EXPORT PartSet_OperationSketchLine : public PartSet_OperationSketchBase
 {
   Q_OBJECT
+
+public:
+  /// Returns the operation type key
+  static std::string Type() { return "SketchLine"; }
+
 public:
   /// Constructor
   /// \param theId the feature identifier
@@ -38,21 +45,15 @@ public:
 
   /// Gives the current selected objects to be processed by the operation
   /// \param thePoint a point clicked in the viewer
-  virtual void mouseReleased(const gp_Pnt& thePoint);
+  /// \param theEvent the mouse event
+  virtual void mouseReleased(const gp_Pnt& thePoint, QMouseEvent* theEvent);
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
-  virtual void mouseMoved(const gp_Pnt& thePoint);
+  /// \param theEvent the mouse event
+  virtual void mouseMoved(const gp_Pnt& thePoint, QMouseEvent* theEvent);
   /// Processes the key pressed in the view
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);
-
-signals:
-  /// signal about the sketch plane is selected
-  /// \param theX the value in the X direction of the plane
-  /// \param theX the value in the Y direction value of the plane
-  /// \param theX the value in the Z direction of the plane
-  void localContextChanged(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                           int theMode);
 
 protected:
   /// \brief Virtual method called when operation is started
@@ -84,11 +85,6 @@ protected:
   void setLinePoint(boost::shared_ptr<ModelAPI_Feature> theSourceFeature,
                                                const std::string& theSourceAttribute,
                                                const std::string& theAttribute);
-  /// \brief Converts the 3D point to the projected coodinates on the sketch plane.
-  /// \param thePoint the 3D point in the viewer
-  /// \param theX the X coordinate
-  /// \param theY the Y coordinate
-  void convertTo2D(const gp_Pnt& thePoint, double& theX, double& theY);
 
 protected:
   ///< Structure to lists the possible types of point selection modes

@@ -4,6 +4,8 @@
 
 #include <PartSet_OperationSketch.h>
 
+#include <PartSet_OperationEditLine.h>
+
 #include <SketchPlugin_Sketch.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -49,7 +51,7 @@ void PartSet_OperationSketch::setSelected(boost::shared_ptr<ModelAPI_Feature> th
     myIsEditMode = true;
   }
   else if (theFeature)
-    emit launchOperation("EditLine", theFeature);
+    emit launchOperation(PartSet_OperationEditLine::Type(), theFeature);
 }
 
 void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)

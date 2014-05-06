@@ -4,14 +4,13 @@
 
 #include <PartSet_OperationSketchLine.h>
 
+#include <PartSet_Tools.h>
+
 #include <SketchPlugin_Feature.h>
 #include <GeomDataAPI_Point2D.h>
-#include <GeomDataAPI_Point.h>
-#include <GeomDataAPI_Dir.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 
-#include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Line.h>
 
 #ifdef _DEBUG
@@ -47,7 +46,7 @@ std::list<int> PartSet_OperationSketchLine::getSelectionModes(boost::shared_ptr<
   return aModes;
 }
 
-void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint)
+void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint, QMouseEvent* /*theEvent*/)
 {
   switch (myPointSelectionMode)
   {
@@ -62,7 +61,6 @@ void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint)
     }
     break;
     case SM_None: {
-
     }
     break;
     default:
@@ -70,7 +68,7 @@ void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint)
   }
 }
 
-void PartSet_OperationSketchLine::mouseMoved(const gp_Pnt& thePoint)
+void PartSet_OperationSketchLine::mouseMoved(const gp_Pnt& thePoint, QMouseEvent* /*theEvent*/)
 {
   switch (myPointSelectionMode)
   {
@@ -154,9 +152,8 @@ void PartSet_OperationSketchLine::setLinePoint(const gp_Pnt& thePoint,
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
 
-  double aX = 0;
-  double anY = 0;
-  convertTo2D(thePoint, aX, anY);
+  double aX, anY;
+  PartSet_Tools::ConvertTo2D(thePoint, mySketch, aX, anY);
   aPoint->setValue(aX, anY);
 }
 
@@ -173,25 +170,4 @@ void PartSet_OperationSketchLine::setLinePoint(boost::shared_ptr<ModelAPI_Featur
   aData = feature()->data();
   aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
   aPoint->setValue(aX, anY);
-}
-
-void PartSet_OperationSketchLine::convertTo2D(const gp_Pnt& thePoint, double& theX, double& theY)
-{
-  if (!mySketch)
-    return;
-
-  boost::shared_ptr<ModelAPI_AttributeDouble> anAttr;
-  boost::shared_ptr<ModelAPI_Data> aData = mySketch->data();
-
-  boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SKETCH_ATTR_ORIGIN));
-
-  boost::shared_ptr<GeomDataAPI_Dir> aX = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRX));
-  boost::shared_ptr<GeomDataAPI_Dir> anY = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRY));
-
-  gp_Pnt aVec(thePoint.X() - anOrigin->x(), thePoint.Y() - anOrigin->y(), thePoint.Z() - anOrigin->z());
-  theX = aVec.X() * aX->x() + aVec.Y() * aX->y() + aVec.Z() * aX->z();
-  theY = aVec.X() * anY->x() + aVec.Y() * anY->y() + aVec.Z() * anY->z();
 }

@@ -1,8 +1,8 @@
 /*
  * ModuleBase_OperationDescription.h
  *
- *  Created on: May 5, 2014
- *      Author: nds
+ *  Created on: Apr 2, 2014
+ *      Author: sbh
  */
 
 #ifndef MODULEBASE_OPERATIONDESCRIPTION_H
