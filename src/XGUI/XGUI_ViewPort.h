@@ -17,7 +17,7 @@ Q_OBJECT
 public:
   XGUI_ViewPort(XGUI_ViewWindow* theParent, const Handle(V3d_Viewer)& theViewer,
                 V3d_TypeOfView theType = V3d_ORTHOGRAPHIC);
-  ~XGUI_ViewPort();
+  virtual ~XGUI_ViewPort();
 
   virtual QPaintEngine* paintEngine() const
   {
