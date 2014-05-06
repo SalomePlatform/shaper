@@ -8,12 +8,14 @@
 #ifndef XGUI_PROPERTYPANEL_H_
 #define XGUI_PROPERTYPANEL_H_
 
+#include "XGUI.h"
+
 #include <ModuleBase_ModelWidget.h>
 
 #include <QDockWidget>
 #include <QList>
 
-class XGUI_PropertyPanel: public QDockWidget
+class XGUI_EXPORT XGUI_PropertyPanel: public QDockWidget
 {
   Q_OBJECT
 public:
