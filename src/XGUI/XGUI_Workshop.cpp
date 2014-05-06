@@ -246,11 +246,14 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 {
   ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
 
-  if(aOperation->getDescription()->xmlRepresentation().isEmpty()) { //!< No need for property panel
-    updateCommandStatus();
-  } else {
-    hidePropertyPanel();
-    updateCommandStatus();
+  //!< No need for property panel
+  updateCommandStatus();
+  hidePropertyPanel();
+  if(myOperationMgr->operationsCount() > 1) {
+    myActionsMgr->updateAction(theOperation->getDescription()->operationId());
+    return;
+  }
+  if(!aOperation->getDescription()->xmlRepresentation().isEmpty()) { 
     myActionsMgr->restoreCommandState();
   }
 }
