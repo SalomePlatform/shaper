@@ -133,11 +133,11 @@ void PartSet_Module::onSelectionChanged()
 
       XGUI_Displayer* aDisplayer = myWorkshop->displayer();
       boost::shared_ptr<ModelAPI_Feature> aFeature;
+      // only first selected shape is processed
       if (!aList.IsEmpty()) {
-        const TopoDS_Shape& aShape = aList.First();
-        aFeature = aDisplayer->GetFeature(aShape);
-        aPreviewOp->setSelected(aFeature, aShape);
+        aFeature = aDisplayer->GetFeature(aList.First());
       }
+      aPreviewOp->setSelected(aFeature, !aList.IsEmpty() ? aList.First() : TopoDS_Shape());
     }
   }
 }

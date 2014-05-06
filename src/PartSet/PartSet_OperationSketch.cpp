@@ -41,6 +41,9 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<Mode
 void PartSet_OperationSketch::setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                           const TopoDS_Shape& theShape)
 {
+  if (theShape.IsNull())
+    return;
+
   if (!myIsEditMode) {
     setSketchPlane(theShape);
     myIsEditMode = true;
