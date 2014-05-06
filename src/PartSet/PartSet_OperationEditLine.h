@@ -1,9 +1,9 @@
-// File:        PartSet_OperationSketchLine.h
-// Created:     20 Apr 2014
+// File:        PartSet_OperationEditLine.h
+// Created:     05 May 2014
 // Author:      Natalia ERMOLAEVA
 
-#ifndef PartSet_OperationSketchLine_H
-#define PartSet_OperationSketchLine_H
+#ifndef PartSet_OperationEditLine_H
+#define PartSet_OperationEditLine_H
 
 #include "PartSet.h"
 
@@ -11,10 +11,10 @@
 #include <QObject>
 
 /*!
- \class PartSet_OperationSketchLine
+ \class PartSet_OperationEditLine
  * \brief The operation for the sketch feature creation
 */
-class PARTSET_EXPORT PartSet_OperationSketchLine : public PartSet_OperationSketchBase
+class PARTSET_EXPORT PartSet_OperationEditLine : public PartSet_OperationSketchBase
 {
   Q_OBJECT
 public:
@@ -22,10 +22,10 @@ public:
   /// \param theId the feature identifier
   /// \param theParent the operation parent
   /// \param theFeature the parent feature
-  PartSet_OperationSketchLine(const QString& theId, QObject* theParent,
-                              boost::shared_ptr<ModelAPI_Feature> theSketchFeature);
+  PartSet_OperationEditLine(const QString& theId, QObject* theParent,
+                            boost::shared_ptr<ModelAPI_Feature> theFeature);
   /// Destructor
-  virtual ~PartSet_OperationSketchLine();
+  virtual ~PartSet_OperationEditLine();
 
    /// Returns that this operator can be started above already running one.
    /// The runned operation should be the sketch feature modified operation
@@ -36,6 +36,10 @@ public:
   /// \return the selection mode
   virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
+  /// Initializes some fields accorging to the feature
+  /// \param theFeature the feature
+  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature);
+
   /// Gives the current selected objects to be processed by the operation
   /// \param thePoint a point clicked in the viewer
   virtual void mouseReleased(const gp_Pnt& thePoint);
@@ -45,6 +49,12 @@ public:
   /// Processes the key pressed in the view
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);
+
+  /// Gives the current selected objects to be processed by the operation
+  /// \param theFeature the selected feature
+  /// \param theShape the selected shape
+  virtual void setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                           const TopoDS_Shape& theShape);
 
 signals:
   /// signal about the sketch plane is selected
@@ -66,8 +76,7 @@ protected:
   virtual void stopOperation();
 
   /// Creates an operation new feature
-  /// In addition to the default realization it appends the created line feature to
-  /// the sketch feature
+  /// Returns NULL feature. This is an operation of edition, not creation.
   /// \returns the created feature
   virtual boost::shared_ptr<ModelAPI_Feature> createFeature();
 
@@ -96,7 +105,7 @@ protected:
 
 private:
   boost::shared_ptr<ModelAPI_Feature> mySketch; ///< the sketch feature
-  PointSelectionMode myPointSelectionMode; ///< point selection mode
+  //PointSelectionMode myPointSelectionMode; ///< point selection mode
 };
 
 #endif

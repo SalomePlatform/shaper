@@ -55,6 +55,10 @@ public:
   void Display(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape,
                const bool isUpdateViewer = true);
   
+  /// Returns the feature, that was displayed with this shape
+  /// \param theShape a shape
+  boost::shared_ptr<ModelAPI_Feature> GetFeature( const TopoDS_Shape& theShape );
+
   /// Display the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
   /// \param theShape a shape
@@ -83,7 +87,9 @@ protected:
 
 protected:
   XGUI_Workshop* myWorkshop;
-  std::map<boost::shared_ptr<ModelAPI_Feature>, std::vector<Handle(AIS_InteractiveObject)> > myFeature2AISObjectMap;
+
+  typedef std::map<boost::shared_ptr<ModelAPI_Feature>, std::vector<Handle(AIS_InteractiveObject)> > FeatureToAISMap;
+  FeatureToAISMap myFeature2AISObjectMap;
 };
 
 #endif

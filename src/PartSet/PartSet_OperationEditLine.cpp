@@ -1,8 +1,8 @@
-// File:        PartSet_OperationSketchLine.h
-// Created:     20 Apr 2014
+// File:        PartSet_OperationEditLine.h
+// Created:     05 May 2014
 // Author:      Natalia ERMOLAEVA
 
-#include <PartSet_OperationSketchLine.h>
+#include <PartSet_OperationEditLine.h>
 
 #include <SketchPlugin_Feature.h>
 #include <GeomDataAPI_Point2D.h>
@@ -20,34 +20,38 @@
 
 using namespace std;
 
-PartSet_OperationSketchLine::PartSet_OperationSketchLine(const QString& theId,
+PartSet_OperationEditLine::PartSet_OperationEditLine(const QString& theId,
 	                                          QObject* theParent,
                                               boost::shared_ptr<ModelAPI_Feature> theFeature)
-: PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature),
-  myPointSelectionMode(SM_FirstPoint)
+: PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature)
 {
 }
 
-PartSet_OperationSketchLine::~PartSet_OperationSketchLine()
+PartSet_OperationEditLine::~PartSet_OperationEditLine()
 {
 }
 
-bool PartSet_OperationSketchLine::isGranted() const
+bool PartSet_OperationEditLine::isGranted() const
 {
   return true;
 }
 
-std::list<int> PartSet_OperationSketchLine::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
+std::list<int> PartSet_OperationEditLine::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
   std::list<int> aModes;
-  if (theFeature != feature())
-    aModes.push_back(TopAbs_VERTEX);
+  //if (theFeature != feature())
+  //  aModes.push_back(TopAbs_VERTEX);
   return aModes;
 }
 
-void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint)
+void PartSet_OperationEditLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
-  switch (myPointSelectionMode)
+  setFeature(theFeature);
+}
+
+void PartSet_OperationEditLine::mouseReleased(const gp_Pnt& thePoint)
+{
+  /*switch (myPointSelectionMode)
   {
     case SM_FirstPoint: {
       setLinePoint(thePoint, LINE_ATTR_START);
@@ -66,11 +70,12 @@ void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint)
     default:
       break;
   }
+*/
 }
 
-void PartSet_OperationSketchLine::mouseMoved(const gp_Pnt& thePoint)
+void PartSet_OperationEditLine::mouseMoved(const gp_Pnt& thePoint)
 {
-  switch (myPointSelectionMode)
+/*  switch (myPointSelectionMode)
   {
     case SM_SecondPoint:
       setLinePoint(thePoint, LINE_ATTR_END);
@@ -94,11 +99,12 @@ void PartSet_OperationSketchLine::mouseMoved(const gp_Pnt& thePoint)
     default:
       break;
   }
+*/
 }
 
-void PartSet_OperationSketchLine::keyReleased(const int theKey)
+void PartSet_OperationEditLine::keyReleased(const int theKey)
 {
-  switch (theKey) {
+/*  switch (theKey) {
     case Qt::Key_Escape: {
       if (myPointSelectionMode != SM_None)
         emit featureConstructed(feature(), FM_Abort);
@@ -118,34 +124,39 @@ void PartSet_OperationSketchLine::keyReleased(const int theKey)
     default:
     break;
   }
+  */
 }
 
-void PartSet_OperationSketchLine::startOperation()
+void PartSet_OperationEditLine::setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                            const TopoDS_Shape& theShape)
 {
-  PartSet_OperationSketchBase::startOperation();
-  myPointSelectionMode = SM_FirstPoint;
+  if (theFeature == feature())
+    return;
+
+  commit();
+
+  if (theFeature)
+    emit launchOperation("EditLine", theFeature);
 }
 
-void PartSet_OperationSketchLine::stopOperation()
+void PartSet_OperationEditLine::startOperation()
+{
+  //PartSet_OperationSketchBase::startOperation();
+  //myPointSelectionMode = SM_FirstPoint;
+}
+
+void PartSet_OperationEditLine::stopOperation()
 {
   PartSet_OperationSketchBase::stopOperation();
-  myPointSelectionMode = SM_None;
+  //myPointSelectionMode = SM_None;
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature()
+boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::createFeature()
 {
-  boost::shared_ptr<ModelAPI_Feature> aNewFeature = PartSet_OperationSketchBase::createFeature();
-  if (mySketch) {
-    boost::shared_ptr<SketchPlugin_Feature> aFeature = 
-                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(mySketch);
-
-    aFeature->addSub(aNewFeature);
-  }
-  //emit featureConstructed(aNewFeature, FM_Activation);
-  return aNewFeature;
+  return boost::shared_ptr<ModelAPI_Feature>();
 }
 
-void PartSet_OperationSketchLine::setLinePoint(const gp_Pnt& thePoint,
+void PartSet_OperationEditLine::setLinePoint(const gp_Pnt& thePoint,
                                                const std::string& theAttribute)
 {
   boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
@@ -158,7 +169,7 @@ void PartSet_OperationSketchLine::setLinePoint(const gp_Pnt& thePoint,
   aPoint->setValue(aX, anY);
 }
 
-void PartSet_OperationSketchLine::setLinePoint(boost::shared_ptr<ModelAPI_Feature> theSourceFeature,
+void PartSet_OperationEditLine::setLinePoint(boost::shared_ptr<ModelAPI_Feature> theSourceFeature,
                                                const std::string& theSourceAttribute,
                                                const std::string& theAttribute)
 {
@@ -173,7 +184,7 @@ void PartSet_OperationSketchLine::setLinePoint(boost::shared_ptr<ModelAPI_Featur
   aPoint->setValue(aX, anY);
 }
 
-void PartSet_OperationSketchLine::convertTo2D(const gp_Pnt& thePoint, double& theX, double& theY)
+void PartSet_OperationEditLine::convertTo2D(const gp_Pnt& thePoint, double& theX, double& theY)
 {
   if (!mySketch)
     return;

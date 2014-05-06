@@ -66,7 +66,7 @@ void ModuleBase_Operation::storeCustomValue()
 
 void ModuleBase_Operation::startOperation()
 {
-  createFeature();
+  setFeature(createFeature());
   //emit callSlot();
   //commit();
 }
@@ -84,10 +84,17 @@ void ModuleBase_Operation::commitOperation()
   if (myFeature) myFeature->execute();
 }
 
-void ModuleBase_Operation::createFeature()
+boost::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::createFeature()
 {
   boost::shared_ptr<ModelAPI_Document> aDoc = document();
-  myFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
-  if (myFeature) // TODO: generate an error if feature was not created
-    myFeature->execute();
+  boost::shared_ptr<ModelAPI_Feature> aFeature = aDoc->addFeature(
+                                           getDescription()->operationId().toStdString());
+  if (aFeature) // TODO: generate an error if feature was not created
+    aFeature->execute();
+  return aFeature;
+}
+
+void ModuleBase_Operation::setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  myFeature = theFeature;
 }

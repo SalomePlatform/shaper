@@ -53,6 +53,30 @@ void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
     aContext->UpdateCurrentViewer();
 }
 
+boost::shared_ptr<ModelAPI_Feature> XGUI_Displayer::GetFeature(const TopoDS_Shape& theShape)
+{
+  boost::shared_ptr<ModelAPI_Feature> aFeature;
+
+  FeatureToAISMap::const_iterator aFIt = myFeature2AISObjectMap.begin(),
+                                  aFLast = myFeature2AISObjectMap.end();
+  for (; aFIt != aFLast && !aFeature; aFIt++)
+  {
+    std::vector<Handle(AIS_InteractiveObject)> aDispAIS = (*aFIt).second;
+    std::vector<Handle(AIS_InteractiveObject)>::const_iterator anIt = aDispAIS.begin(),
+                                                                aLast = aDispAIS.end();
+    Handle(AIS_InteractiveContext) aContext = AISContext();
+    for (; anIt != aLast && !aFeature; anIt++) {
+      Handle(AIS_InteractiveObject) anAIS = *anIt;
+      Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
+      if (!anAISShape.IsNull() && anAISShape->Shape() == theShape) {
+        aFeature = (*aFIt).first;
+      }
+    }
+  }
+
+  return aFeature;
+}
+
 void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
                            const bool isUpdateViewer)
 {

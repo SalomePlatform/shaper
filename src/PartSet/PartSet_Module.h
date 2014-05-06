@@ -31,6 +31,8 @@ public:
   virtual QStringList nestedFeatures(QString theFeature);
   std::string featureFile(const std::string&);
 
+  /// Creates an operation and send it to loop
+  /// \param theCmdId the operation name
   virtual void launchOperation(const QString& theCmdId);
 
   /// Displays or erase the current operation preview, if it has it.
@@ -69,11 +71,21 @@ public slots:
   /// \param theZ the Z projection value
   void onPlaneSelected(double theX, double theY, double theZ);
 
+  void onLaunchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature);
+
   /// SLOT, to visualize the feature in another local context mode
   /// \param theFeature the feature to be put in another local context mode
   /// \param theMode the mode appeared on the feature
   void onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
                             int theMode);
+protected:
+  /// Creates a new operation
+  /// \param theCmdId the operation name
+  ModuleBase_Operation* createOperation(const QString& theCmdId);
+
+  /// Sends the operation
+  /// \param theOperation the operation
+  void sendOperation(ModuleBase_Operation* theOperation);
 
 private:
   XGUI_Workshop* myWorkshop;
