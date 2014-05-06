@@ -37,6 +37,10 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<Mode
   std::list<int> aModes;
   if (!myIsEditMode)
     aModes.push_back(TopAbs_FACE);
+  else {
+    aModes.push_back(TopAbs_VERTEX);
+    aModes.push_back(TopAbs_EDGE);
+  }
   return aModes;
 }
 

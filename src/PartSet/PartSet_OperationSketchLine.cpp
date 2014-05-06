@@ -38,12 +38,16 @@ bool PartSet_OperationSketchLine::isGranted() const
 
 std::list<int> PartSet_OperationSketchLine::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
-  std::list<int> aModes;
-  if (theFeature != feature()) {
-    aModes.push_back(TopAbs_VERTEX);
-    aModes.push_back(TopAbs_EDGE);
-  }
-  return aModes;
+  return std::list<int>();
+}
+
+void PartSet_OperationSketchLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  if (!theFeature)
+    return;
+  // use the last point of the previous feature as the first of the new one
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  myInitPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
 }
 
 void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint, QMouseEvent* /*theEvent*/)
@@ -57,10 +61,9 @@ void PartSet_OperationSketchLine::mouseReleased(const gp_Pnt& thePoint, QMouseEv
     break;
     case SM_SecondPoint: {
       setLinePoint(thePoint, LINE_ATTR_END);
-      myPointSelectionMode = SM_None;
-    }
-    break;
-    case SM_None: {
+      commit();
+      emit featureConstructed(feature(), FM_Deactivation);
+      emit launchOperation(PartSet_OperationSketchLine::Type(), feature());
     }
     break;
     default:
@@ -75,22 +78,6 @@ void PartSet_OperationSketchLine::mouseMoved(const gp_Pnt& thePoint, QMouseEvent
     case SM_SecondPoint:
       setLinePoint(thePoint, LINE_ATTR_END);
       break;
-    case SM_None: {
-      boost::shared_ptr<ModelAPI_Feature> aPrevFeature = feature();
-      // stop the last operation
-      commitOperation();
-      document()->finishOperation();
-      //emit changeSelectionMode(aPrevFeature, TopAbs_VERTEX);
-      // start a new operation
-      document()->startOperation();
-      startOperation();
-      // use the last point of the previous feature as the first of the new one
-      setLinePoint(aPrevFeature, LINE_ATTR_END, LINE_ATTR_START);
-      myPointSelectionMode = SM_SecondPoint;
-
-      emit featureConstructed(aPrevFeature, FM_Deactivation);
-    }
-    break;
     default:
       break;
   }
@@ -100,19 +87,12 @@ void PartSet_OperationSketchLine::keyReleased(const int theKey)
 {
   switch (theKey) {
     case Qt::Key_Escape: {
-      if (myPointSelectionMode != SM_None)
-        emit featureConstructed(feature(), FM_Abort);
       abort();
     }
     break;
     case Qt::Key_Return: {
-      if (myPointSelectionMode != SM_None) {
-        emit featureConstructed(feature(), FM_Abort);
-        myPointSelectionMode = SM_FirstPoint;
-        document()->abortOperation();
-      }
-      else
-        myPointSelectionMode = SM_FirstPoint;
+      abort();
+      emit launchOperation(PartSet_OperationSketchLine::Type(), boost::shared_ptr<ModelAPI_Feature>());
     }
     break;
     default:
@@ -123,13 +103,13 @@ void PartSet_OperationSketchLine::keyReleased(const int theKey)
 void PartSet_OperationSketchLine::startOperation()
 {
   PartSet_OperationSketchBase::startOperation();
-  myPointSelectionMode = SM_FirstPoint;
+  myPointSelectionMode = !myInitPoint ? SM_FirstPoint : SM_SecondPoint;
 }
 
-void PartSet_OperationSketchLine::stopOperation()
+void PartSet_OperationSketchLine::abortOperation()
 {
-  PartSet_OperationSketchBase::stopOperation();
-  myPointSelectionMode = SM_None;
+  emit featureConstructed(feature(), FM_Abort);
+  PartSet_OperationSketchBase::abortOperation();
 }
 
 boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature()
@@ -141,6 +121,13 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature()
 
     aFeature->addSub(aNewFeature);
   }
+  if (myInitPoint) {
+    boost::shared_ptr<ModelAPI_Data> aData = aNewFeature->data();
+    boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
+                                                                (aData->attribute(LINE_ATTR_START));
+    aPoint->setValue(myInitPoint->x(), myInitPoint->y());
+  }
+
   emit featureConstructed(aNewFeature, FM_Activation);
   return aNewFeature;
 }
@@ -154,20 +141,5 @@ void PartSet_OperationSketchLine::setLinePoint(const gp_Pnt& thePoint,
 
   double aX, anY;
   PartSet_Tools::ConvertTo2D(thePoint, mySketch, aX, anY);
-  aPoint->setValue(aX, anY);
-}
-
-void PartSet_OperationSketchLine::setLinePoint(boost::shared_ptr<ModelAPI_Feature> theSourceFeature,
-                                               const std::string& theSourceAttribute,
-                                               const std::string& theAttribute)
-{
-  boost::shared_ptr<ModelAPI_Data> aData = theSourceFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theSourceAttribute));
-  double aX = aPoint->x();
-  double anY = aPoint->y();
-
-  aData = feature()->data();
-  aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
   aPoint->setValue(aX, anY);
 }

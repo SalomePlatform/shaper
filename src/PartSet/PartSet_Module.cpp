@@ -212,6 +212,7 @@ void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<Mo
   {
     aPreviewOp->init(theFeature);
   }
+  myWorkshop->actionsMgr()->setActionChecked(anOperation->getDescription()->operationId(), true);
   sendOperation(anOperation);
 }
 

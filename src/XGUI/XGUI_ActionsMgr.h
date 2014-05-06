@@ -34,6 +34,11 @@ public:
   void saveCommandsState();
   void restoreCommandState();
 
+  /// Set the action is checked
+  /// \param theId - string ID of the command
+  /// \praram theChecked - the new checked state
+  void setActionChecked(const QString& theId, const bool theChecked);
+
   void updateAction(const QString&);
   void setNestedActionsEnabled(bool);
 

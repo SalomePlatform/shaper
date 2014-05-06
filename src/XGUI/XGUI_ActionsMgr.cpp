@@ -88,6 +88,13 @@ void XGUI_ActionsMgr::restoreCommandState()
   }
 }
 
+void XGUI_ActionsMgr::setActionChecked(const QString& theId, const bool theChecked)
+{
+  if(myActions.contains(theId)) {
+    myActions[theId]->setChecked(theChecked);
+  }
+}
+
 void XGUI_ActionsMgr::updateAction(const QString& theId)
 {
   if(myActions.contains(theId)){
