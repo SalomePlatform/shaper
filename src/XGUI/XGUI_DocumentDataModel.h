@@ -70,8 +70,14 @@ private:
   //! Removes sub-model on removing a part object. Also it removes QModelIndex-es which refer to this model
   void removeSubModel(int theModelId);
 
-  //! 
-  bool hasSubModel(const QAbstractItemModel* theModel) const;
+  //! Returns true if the given model is a one of sub-models (of both types)
+  bool isSubModel(const QAbstractItemModel* theModel) const;
+
+  //! Returns true if the given model is a one of sub-models of Part type
+  bool isPartSubModel(const QAbstractItemModel* theModel) const;
+
+  QModelIndex partFolderNode() const;
+
 
   //! Document
   boost::shared_ptr<ModelAPI_Document> myDocument;
