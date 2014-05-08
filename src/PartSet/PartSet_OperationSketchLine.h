@@ -80,7 +80,7 @@ protected:
   /// \brief Save the point to the line.
   /// \param thePoint the 3D point in the viewer
   /// \param theAttribute the start or end attribute of the line
-  void setLinePoint(const gp_Pnt& thePoint, const std::string& theAttribute);
+  void setLinePoint(const gp_Pnt& thePoint, Handle(V3d_View) theView, const std::string& theAttribute);
 
 protected:
   ///< Structure to lists the possible types of point selection modes

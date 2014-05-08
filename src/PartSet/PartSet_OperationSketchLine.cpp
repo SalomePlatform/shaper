@@ -60,12 +60,12 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
   switch (myPointSelectionMode)
   {
     case SM_FirstPoint: {
-      setLinePoint(aPoint, LINE_ATTR_START);
+      setLinePoint(aPoint, theView, LINE_ATTR_START);
       myPointSelectionMode = SM_SecondPoint;
     }
     break;
     case SM_SecondPoint: {
-      setLinePoint(aPoint, LINE_ATTR_END);
+      setLinePoint(aPoint, theView, LINE_ATTR_END);
       commit();
       emit featureConstructed(feature(), FM_Deactivation);
       emit launchOperation(PartSet_OperationSketchLine::Type(), feature());
@@ -83,7 +83,7 @@ void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_V
     case SM_SecondPoint:
     {
       gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
-      setLinePoint(aPoint, LINE_ATTR_END);
+      setLinePoint(aPoint, theView, LINE_ATTR_END);
     }
     break;
     default:
@@ -141,6 +141,7 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature()
 }
 
 void PartSet_OperationSketchLine::setLinePoint(const gp_Pnt& thePoint,
+                                               Handle(V3d_View) theView,
                                                const std::string& theAttribute)
 {
   boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
@@ -148,6 +149,6 @@ void PartSet_OperationSketchLine::setLinePoint(const gp_Pnt& thePoint,
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
 
   double aX, anY;
-  PartSet_Tools::ConvertTo2D(thePoint, mySketch, aX, anY);
+  PartSet_Tools::ConvertTo2D(thePoint, mySketch, theView, aX, anY);
   aPoint->setValue(aX, anY);
 }

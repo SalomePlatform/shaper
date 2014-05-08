@@ -65,11 +65,11 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
     return;
 
   double aCurX, aCurY;
-  PartSet_Tools::ConvertTo2D(myCurPressed, mySketch, aCurX, aCurY);
+  PartSet_Tools::ConvertTo2D(myCurPressed, mySketch, theView, aCurX, aCurY);
 
   double aX, anY;
   gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
-  PartSet_Tools::ConvertTo2D(aPoint, mySketch, aX, anY);
+  PartSet_Tools::ConvertTo2D(aPoint, mySketch, theView, aX, anY);
 
   double aDeltaX = aX - aCurX;
   double aDeltaY = anY - aCurY;

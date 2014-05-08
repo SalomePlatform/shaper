@@ -4,12 +4,12 @@
 <context>
     <name>XGUI_DocumentDataModel</name>
     <message>
-        <location filename="XGUI_DocumentDataModel.cpp" line="152"/>
+        <location filename="XGUI_DocumentDataModel.cpp" line="151"/>
         <source>Parts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_DocumentDataModel.cpp" line="156"/>
+        <location filename="XGUI_DocumentDataModel.cpp" line="155"/>
         <source>Parts folder</source>
         <translation type="unfinished"></translation>
     </message>
@@ -54,17 +54,17 @@
 <context>
     <name>XGUI_PartDataModel</name>
     <message>
-        <location filename="XGUI_PartDataModel.cpp" line="191"/>
+        <location filename="XGUI_PartDataModel.cpp" line="190"/>
         <source>Parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_PartDataModel.cpp" line="193"/>
+        <location filename="XGUI_PartDataModel.cpp" line="192"/>
         <source>Constructions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_PartDataModel.cpp" line="195"/>
+        <location filename="XGUI_PartDataModel.cpp" line="194"/>
         <source>Bodies</source>
         <translation type="unfinished"></translation>
     </message>
@@ -80,12 +80,12 @@
 <context>
     <name>XGUI_TopDataModel</name>
     <message>
-        <location filename="XGUI_PartDataModel.cpp" line="29"/>
+        <location filename="XGUI_PartDataModel.cpp" line="28"/>
         <source>Parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="XGUI_PartDataModel.cpp" line="37"/>
+        <location filename="XGUI_PartDataModel.cpp" line="36"/>
         <source>Constructions</source>
         <translation type="unfinished"></translation>
     </message>

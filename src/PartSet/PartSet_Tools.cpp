@@ -25,27 +25,27 @@ gp_Pnt PartSet_Tools::ConvertClickToPoint(QPoint thePoint, Handle(V3d_View) theV
     return gp_Pnt();
 
   V3d_Coordinate XEye, YEye, ZEye, XAt, YAt, ZAt;
-  theView->Eye( XEye, YEye, ZEye );
+  theView->Eye(XEye, YEye, ZEye);
 
-  theView->At( XAt, YAt, ZAt );
-  gp_Pnt EyePoint( XEye, YEye, ZEye );
-  gp_Pnt AtPoint( XAt, YAt, ZAt );
+  theView->At(XAt, YAt, ZAt);
+  gp_Pnt EyePoint(XEye, YEye, ZEye);
+  gp_Pnt AtPoint(XAt, YAt, ZAt);
 
-  gp_Vec EyeVector( EyePoint, AtPoint );
-  gp_Dir EyeDir( EyeVector );
+  gp_Vec EyeVector(EyePoint, AtPoint);
+  gp_Dir EyeDir(EyeVector);
 
-  gp_Pln PlaneOfTheView = gp_Pln( AtPoint, EyeDir );
+  gp_Pln PlaneOfTheView = gp_Pln(AtPoint, EyeDir);
   Standard_Real X, Y, Z;
-  theView->Convert( thePoint.x(), thePoint.y(), X, Y, Z );
-  gp_Pnt ConvertedPoint( X, Y, Z );
+  theView->Convert(thePoint.x(), thePoint.y(), X, Y, Z);
+  gp_Pnt ConvertedPoint(X, Y, Z);
 
-  gp_Pnt2d ConvertedPointOnPlane = ProjLib::Project( PlaneOfTheView, ConvertedPoint );
-  gp_Pnt ResultPoint = ElSLib::Value( ConvertedPointOnPlane.X(), ConvertedPointOnPlane.Y(), PlaneOfTheView );
+  gp_Pnt2d ConvertedPointOnPlane = ProjLib::Project(PlaneOfTheView, ConvertedPoint);
+  gp_Pnt ResultPoint = ElSLib::Value(ConvertedPointOnPlane.X(), ConvertedPointOnPlane.Y(), PlaneOfTheView);
   return ResultPoint;
 }
 
 void PartSet_Tools::ConvertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelAPI_Feature> theSketch,
-                                double& theX, double& theY)
+                                Handle(V3d_View) theView, double& theX, double& theY)
 {
   if (!theSketch)
     return;
@@ -61,7 +61,31 @@ void PartSet_Tools::ConvertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelA
   boost::shared_ptr<GeomDataAPI_Dir> anY = 
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRY));
 
-  gp_Pnt aVec(thePoint.X() - anOrigin->x(), thePoint.Y() - anOrigin->y(), thePoint.Z() - anOrigin->z());
+  gp_Pnt anOriginPnt(anOrigin->x(), anOrigin->y(), anOrigin->z());
+  gp_Vec aVec(anOriginPnt, thePoint);
+
+  if (!theView.IsNull())
+  {
+    V3d_Coordinate XEye, YEye, ZEye, XAt, YAt, ZAt;
+    theView->Eye(XEye, YEye, ZEye);
+
+    theView->At(XAt, YAt, ZAt);
+    gp_Pnt EyePoint(XEye, YEye, ZEye);
+    gp_Pnt AtPoint(XAt, YAt, ZAt);
+
+    gp_Vec anEyeVec(EyePoint, AtPoint);
+    anEyeVec.Normalize();
+
+    boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
+                  boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_NORM));
+    gp_Vec aNormalVec(aNormal->x(), aNormal->y(), aNormal->z());
+
+    double aDen = anEyeVec*aNormalVec;
+    double aLVec = aDen != 0 ? aVec*aNormalVec/aDen : aVec*aNormalVec;
+
+    gp_Vec aDeltaVec = anEyeVec*aLVec;
+    aVec = aVec - aDeltaVec;
+  }
   theX = aVec.X() * aX->x() + aVec.Y() * aX->y() + aVec.Z() * aX->z();
   theY = aVec.X() * anY->x() + aVec.Y() * anY->y() + aVec.Z() * anY->z();
 }

@@ -34,7 +34,7 @@ public:
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
   static void ConvertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelAPI_Feature> theSketch,
-                          double& theX, double& theY);
+                          Handle(V3d_View) theView, double& theX, double& theY);
 };
 
 #endif
