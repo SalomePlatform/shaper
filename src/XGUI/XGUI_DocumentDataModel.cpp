@@ -52,12 +52,12 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
         XGUI_PartDataModel* aModel = new XGUI_PartDataModel(myDocument, this);
         aModel->setPartId(myPartModels.count());
         myPartModels.append(aModel);
-        insertRows(partFolderNode(), aStart, aStart);
+        insertRow(aStart, partFolderNode());
       } else { // Update top groups (other except parts
         QModelIndex aIndex = myModel->findParent(aFeature);
         int aStart = myModel->rowCount(aIndex) - 1;
         aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-        insertRows(aIndex, aStart, aStart);
+        insertRow(aStart, aIndex);
       }
     } else { // if sub-objects of first level nodes
       XGUI_PartModel* aPartModel = 0;
@@ -72,7 +72,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
         QModelIndex aIndex = aPartModel->findParent(aFeature);
         int aStart = aPartModel->rowCount(aIndex) - 1;
         aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-        insertRows(aIndex, aStart, aStart);
+        insertRow(aStart, aIndex);
       }
     }
 
@@ -84,15 +84,13 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
     if (aDoc == myDocument) {  // If root objects
       if (aUpdMsg->group().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
         int aStart = myPartModels.size();
-        beginRemoveRows(partFolderNode(), aStart, aStart);
         removeSubModel(myPartModels.size() - 1);
-        endRemoveRows();
+        removeRow(aStart - 1, partFolderNode());
       } else { // Update top groups (other except parts
         QModelIndex aIndex = myModel->findGroup(aUpdMsg->group());
         int aStart = myModel->rowCount(aIndex);
         aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-        beginRemoveRows(aIndex, aStart, aStart);
-        endRemoveRows();
+        removeRow(aStart - 1, aIndex);
       }
     } else {
       XGUI_PartModel* aPartModel = 0;
@@ -107,8 +105,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
         QModelIndex aIndex = aPartModel->findGroup(aUpdMsg->group());
         int aStart = aPartModel->rowCount(aIndex);
         aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-        beginRemoveRows(aIndex, aStart, aStart);
-        endRemoveRows();
+        removeRow(aStart - 1, aIndex);
       }
     }
 
@@ -145,7 +142,8 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
 {
   if (!theIndex.isValid())
     return QVariant();
-  if (theIndex.internalId() == 0){
+  switch (theIndex.internalId()) {
+  case PartsFolder:
     switch (theRole) {
     case Qt::DisplayRole:
       return tr("Parts") + QString(" (%1)").arg(rowCount(theIndex));
@@ -156,9 +154,37 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
     default:
       return QVariant();
     }
+    break;
+  case HistoryNode:
+    {
+      int aOffset = historyOffset();
+      FeaturePtr aFeature = myDocument->feature(FEATURES_GROUP, theIndex.row() - aOffset);
+      switch (theRole) {
+      case Qt::DisplayRole:
+        if (aFeature)
+          return aFeature->data()->getName().c_str();
+        else 
+          return QVariant();
+      case Qt::DecorationRole:
+        {
+          std::string aType = aFeature->getKind();
+          if (aType.compare("Point") == 0)
+            return QIcon(":pictures/point_ico.png");
+          if (aType.compare("Part") == 0)
+            return QIcon(":pictures/part_ico.png");
+          if (aType.compare("Sketch") == 0)
+            return QIcon(":icons/sketch.png");
+        }
+      case Qt::ToolTipRole:
+        return tr("Feature object");
+      default:
+        return QVariant();
+      }
+    }
+    break;
   }
   QModelIndex aParent = theIndex.parent();
-  if (aParent.isValid() && (aParent.internalId() == 0)) {
+  if (aParent.isValid() && (aParent.internalId() == PartsFolder)) {
     return myPartModels.at(theIndex.row())->data(QModelIndex(), theRole);
   }
   return toSourceModelIndex(theIndex).data(theRole);
@@ -173,11 +199,17 @@ QVariant XGUI_DocumentDataModel::headerData(int theSection, Qt::Orientation theO
 int XGUI_DocumentDataModel::rowCount(const QModelIndex& theParent) const
 {
   if (!theParent.isValid()) {
-    int aVal = myModel->rowCount(theParent) + myPartModels.size();
-    return myModel->rowCount(theParent) + 1;//myPartModels.size();
+    // Size of external models
+    int aVal = historyOffset();
+    // Plus history size
+    aVal += myDocument->size(FEATURES_GROUP);
+    return aVal;
   }
-  if (theParent.internalId() == 0) {
+  if (theParent.internalId() == PartsFolder) {
     return myPartModels.size();
+  }
+  if (theParent.internalId() == HistoryNode) {
+    return 0;
   }
   QModelIndex aParent = toSourceModelIndex(theParent);
   if (!isSubModel(aParent.model())) 
@@ -200,11 +232,13 @@ QModelIndex XGUI_DocumentDataModel::index(int theRow, int theColumn, const QMode
       aIndex = myModel->index(theRow, theColumn, theParent);
       aIndex = createIndex(theRow, theColumn, (void*)getModelIndex(aIndex));
     } else {
-      // Create Parts node
-      aIndex = partFolderNode();
+      if (theRow == aOffs)  // Create Parts node
+        aIndex = partFolderNode();
+      else // create history node
+        aIndex = createIndex(theRow, theColumn, HistoryNode);
     }
   } else {
-    if (theParent.internalId() == 0) {
+    if (theParent.internalId() == PartsFolder) {
       aIndex = myPartModels.at(theRow)->index(0, theColumn, QModelIndex());
     } else {
       QModelIndex* aParent = (QModelIndex*)theParent.internalPointer();
@@ -218,7 +252,7 @@ QModelIndex XGUI_DocumentDataModel::index(int theRow, int theColumn, const QMode
 
 QModelIndex XGUI_DocumentDataModel::parent(const QModelIndex& theIndex) const
 {
-  if (theIndex.internalId() == 0)
+  if ((theIndex.internalId() == PartsFolder) || (theIndex.internalId() == HistoryNode))
     return QModelIndex();
 
   QModelIndex aIndex = toSourceModelIndex(theIndex);
@@ -286,7 +320,7 @@ void XGUI_DocumentDataModel::clearModelIndexes()
 
 FeaturePtr XGUI_DocumentDataModel::feature(const QModelIndex& theIndex) const
 {
-  if (theIndex.internalId() == 0)
+  if (theIndex.internalId() == PartsFolder)
     return FeaturePtr();
 
   QModelIndex aIndex = toSourceModelIndex(theIndex);
@@ -297,13 +331,27 @@ FeaturePtr XGUI_DocumentDataModel::feature(const QModelIndex& theIndex) const
   return aModel->feature(aIndex);
 }
 
-void XGUI_DocumentDataModel::insertRows(const QModelIndex& theParent, int theStart, int theEnd)
+bool XGUI_DocumentDataModel::insertRows(int theRow, int theCount, const QModelIndex& theParent)
 {
-  beginInsertRows(theParent, theStart, theEnd);
+  beginInsertRows(theParent, theRow, theRow + theCount - 1);
+  //endInsertRows();
+
+  // Update history
+  QModelIndex aRoot;
+  int aRow = rowCount(aRoot);
+  beginInsertRows(aRoot, aRow, aRow);
   endInsertRows();
-  if (theStart == 0) // Update parent if this is a first child in order to update node decoration
-    emit dataChanged(theParent, theParent);
+
+  return true;
 }
+
+bool XGUI_DocumentDataModel::removeRows(int theRow, int theCount, const QModelIndex& theParent)
+{
+  beginRemoveRows(theParent, theRow, theRow + theCount - 1);
+  endRemoveRows();
+  return true;
+}
+
 
 void XGUI_DocumentDataModel::removeSubModel(int theModelId)
 {
@@ -339,5 +387,11 @@ bool XGUI_DocumentDataModel::isPartSubModel(const QAbstractItemModel* theModel) 
 QModelIndex XGUI_DocumentDataModel::partFolderNode() const
 {
   int aPos = myModel->rowCount(QModelIndex());
-  return createIndex(aPos, columnCount() - 1, 0);
+  return createIndex(aPos, columnCount() - 1, PartsFolder);
+}
+
+int XGUI_DocumentDataModel::historyOffset() const
+{
+  // Nb of rows of top model + Parts folder
+  return myModel->rowCount(QModelIndex()) + 1;
 }

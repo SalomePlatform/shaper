@@ -46,11 +46,18 @@ public:
 
   virtual bool hasChildren(const QModelIndex& theParent = QModelIndex()) const;
 
+  bool insertRows(int theRow, int theCount, const QModelIndex& theParent = QModelIndex());
+
+  bool removeRows(int theRow, int theCount, const QModelIndex& theParent = QModelIndex());
+
   //! Returns Feature object by the given Model index.
   //! Returns 0 if the given index is not index of a feature
   FeaturePtr feature(const QModelIndex& theIndex) const;
 
 private:
+
+  enum {PartsFolder, HistoryNode};
+
 
   //! Converts QModelIndex of this model to QModelIndex of a one of sub-models.
   QModelIndex toSourceModelIndex(const QModelIndex& theProxy) const;
@@ -64,9 +71,6 @@ private:
   //! Deletes all saved pointers on QModelIndex objects.
   void clearModelIndexes();
 
-  //! Causes inserting of new nodes for given parent and indexes
-  void insertRows(const QModelIndex& theParent, int theStart, int theEnd);
-
   //! Removes sub-model on removing a part object. Also it removes QModelIndex-es which refer to this model
   void removeSubModel(int theModelId);
 
@@ -76,7 +80,10 @@ private:
   //! Returns true if the given model is a one of sub-models of Part type
   bool isPartSubModel(const QAbstractItemModel* theModel) const;
 
+  //! Returns Parts Folder node
   QModelIndex partFolderNode() const;
+
+  int historyOffset() const;
 
 
   //! Document

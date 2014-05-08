@@ -270,23 +270,23 @@ int PyConsole_Console::menuActions() const
 */
 void PyConsole_Console::createActions()
 {
-  QAction* a = new QAction( tr( "EDIT_COPY_CMD" ), this );
-  a->setStatusTip( tr( "EDIT_COPY_CMD" ) );
+  QAction* a = new QAction( tr( "&Copy" ), this );
+  a->setStatusTip( tr( "Copy" ) );
   connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( copy() ) );
   myActions.insert( CopyId, a );
 
-  a = new QAction( tr( "EDIT_PASTE_CMD" ), this );
-  a->setStatusTip( tr( "EDIT_PASTE_CMD" ) );
+  a = new QAction( tr( "&Paste" ), this );
+  a->setStatusTip( tr( "Paste" ) );
   connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( paste() ) );
   myActions.insert( PasteId, a );
 
-  a = new QAction( tr( "EDIT_CLEAR_CMD" ), this );
-  a->setStatusTip( tr( "EDIT_CLEAR_CMD" ) );
+  a = new QAction( tr( "Clea&r" ), this );
+  a->setStatusTip( tr( "Clear" ) );
   connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( clear() ) );
   myActions.insert( ClearId, a );
 
-  a = new QAction( tr( "EDIT_SELECTALL_CMD" ), this );
-  a->setStatusTip( tr( "EDIT_SELECTALL_CMD" ) );
+  a = new QAction( tr( "Select &All" ), this );
+  a->setStatusTip( tr( "Select all" ) );
   connect( a, SIGNAL( triggered( bool ) ), myEditor, SLOT( selectAll() ) );
   myActions.insert( SelectAllId, a );
   

@@ -19,10 +19,9 @@ SET(PROJECT_AUTOMOC
 
 # resource files / to be processed by lrelease
 SET(TEXT_RESOURCES
-  resources/PyConsole_msg_en.ts
-  resources/PyConsole_msg_fr.ts
-  resources/PyConsole_msg_ja.ts
+  PyConsole_msg_fr.ts
 )
+
 # sources / static
 SET(PROJECT_SOURCES
   PyConsole_Console.cpp
@@ -40,7 +39,12 @@ SET(PROJECT_LIBRARIES
 	${PYTHON_LIBRARIES}
 )
 
-QT4_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
+#QT4_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
+QT4_CREATE_TRANSLATION(QM_RESOURCES 
+					   ${PROJECT_SOURCES}
+					   ${TEXT_RESOURCES}
+					   OPTIONS -extensions cpp -no-recursive
+					   )
 
 SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC} ${QM_RESOURCES})
 
@@ -61,5 +65,6 @@ ADD_LIBRARY(PyConsole SHARED
 TARGET_LINK_LIBRARIES(PyConsole ${PROJECT_LIBRARIES})
 
 INSTALL(TARGETS PyConsole DESTINATION bin)
+INSTALL(FILES ${QM_RESOURCES} DESTINATION bin)
 
 

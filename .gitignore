@@ -18,6 +18,7 @@ lib/
 *.pro.user
 moc_*.*
 *.qm
+*.ts
 #Resources
 resources
 !src/*/resources
