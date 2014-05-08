@@ -64,8 +64,12 @@ public:
 protected:
   /// \brief Virtual method called when operation is started
   /// Virtual method called when operation started (see start() method for more description)
-  /// After the parent operation body perform, set sketch feature to the created line feature
+  /// Switch off the multi selection state
   virtual void startOperation();
+
+  /// Virtual method called when operation stopped - committed or aborted.
+  /// Restore the multi selection state
+  virtual void stopOperation();
 
   /// Creates an operation new feature
   /// Returns NULL feature. This is an operation of edition, not creation.

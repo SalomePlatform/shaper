@@ -120,6 +120,8 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   if (!theOperation)
     return;
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
+  if (aPreviewOp) {
+  }
 }
 
 void PartSet_Module::onSelectionChanged()
@@ -209,6 +211,12 @@ void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<Mo
   sendOperation(anOperation);
 }
 
+void PartSet_Module::onMultiSelectionEnabled(bool theEnabled)
+{
+  XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
+  aViewer->enableMultiselection(theEnabled);
+}
+
 void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                           int theMode)
 {
@@ -257,6 +265,8 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
             this, SLOT(onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature>, int)));
     connect(aPreviewOp, SIGNAL(launchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)),
             this, SLOT(onLaunchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)));
+    connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)),
+            this, SLOT(onMultiSelectionEnabled(bool)));
 
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {
@@ -264,6 +274,7 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
               this, SLOT(onPlaneSelected(double, double, double)));
     }
   }
+
   return anOperation;
 }
 

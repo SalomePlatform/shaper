@@ -46,8 +46,8 @@ public:
 
 public slots:
   void onFeatureTriggered();
-  /// SLOT, that is called after the operation is stopped. Disconnect the sketch feature
-  /// from the viewer selection and show the sketch preview.
+  /// SLOT, that is called after the operation is stopped. Switched off the modfications performed
+  /// by the operation start
   void onOperationStopped(ModuleBase_Operation* theOperation);
 
   /// SLOT, that is called by the selection in the viewer is changed.
@@ -77,6 +77,10 @@ public slots:
   void onPlaneSelected(double theX, double theY, double theZ);
 
   void onLaunchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature);
+
+  /// SLOT, to switch on/off the multi selection in the viewer
+  /// \param theEnabled the enabled state
+  void onMultiSelectionEnabled(bool theEnabled);
 
   /// SLOT, to visualize the feature in another local context mode
   /// \param theFeature the feature to be put in another local context mode

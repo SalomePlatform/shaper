@@ -94,6 +94,12 @@ void PartSet_OperationEditLine::setSelected(boost::shared_ptr<ModelAPI_Feature> 
 void PartSet_OperationEditLine::startOperation()
 {
   // do nothing in order to do not create a new feature
+  emit multiSelectionEnabled(false);
+}
+
+void PartSet_OperationEditLine::stopOperation()
+{
+  emit multiSelectionEnabled(true);
 }
 
 boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::createFeature()

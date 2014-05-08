@@ -86,6 +86,9 @@ signals:
   /// theName the operation name
   /// theFeature the operation argument
   void launchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature);
+  /// signal to enable/disable multi selection in the viewer
+  /// \param theEnabled the boolean state
+  void multiSelectionEnabled(bool theEnabled);
 
 protected:
   /// Creates an operation new feature
