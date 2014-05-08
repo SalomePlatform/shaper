@@ -29,6 +29,18 @@ public:
   //! Returns Vsd_View object from currently active view window
   virtual Handle(V3d_View) activeView() const = 0;
 
+  //! Enable or disable selection in the viewer
+  virtual void enableSelection(bool isEnabled) = 0;
+
+  //! Returns true if selection is enabled
+  virtual bool isSelectionEnabled() const = 0;
+
+  //! Enable or disable multiselection in the viewer
+  virtual void enableMultiselection(bool isEnable) = 0;
+
+  //! Returns true if multiselection is enabled
+  virtual bool isMultiSelectionEnabled() const = 0;
+
 signals:
   void lastViewClosed();
   void tryCloseView();

@@ -28,6 +28,8 @@ public:
   GEOMDATA_EXPORT virtual double y() const;
   /// Returns the Z double value
   GEOMDATA_EXPORT virtual double z() const;
+  /// Returns the 3D point
+  GEOMDATA_EXPORT virtual boost::shared_ptr<GeomAPI_Pnt> pnt();
 
 protected:
   /// Initializes attributes

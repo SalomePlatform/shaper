@@ -11,13 +11,11 @@
 #include <ModelAPI_Data.h>
 // to avoid unresolved ModelAPI_Plugin()
 #include <ModelAPI_Plugin.h>
-// to avoid unresolved ModelAPI_Iterator()
-#include <ModelAPI_Iterator.h>
-// to avoid unresolved ModelAPI_Iterator()
-#include <ModelAPI_Iterator.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_AttributeRefAttr.h>
 
 #ifdef WIN32
 #include <windows.h>

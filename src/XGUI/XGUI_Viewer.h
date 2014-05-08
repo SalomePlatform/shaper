@@ -79,7 +79,14 @@ public:
 
   /// Enable or disable selectioon in the viewer
   // \param toEnable - true or false (enable or disable selection)
-  void setSelectionEnabled(bool toEnable) { mySelectionEnabled = toEnable; }
+  void setSelectionEnabled(bool toEnable);
+
+  /// Returns true if multi-selection in the viewer is enabled
+  bool isMultiSelectionEnabled() const { return myMultiSelectionEnabled; }
+
+  /// Enable or disable selectioon in the viewer
+  // \param toEnable - true or false (enable or disable selection)
+  void setMultiSelectionEnabled(bool toEnable);
 
   /// Select the object in 3D viewer.
   /// \param theIO - list objects to be selected
@@ -159,6 +166,8 @@ private:
 
   /*! Removes the View from internal Views list.*/
   void removeView(QMdiSubWindow* theView);
+
+  void updateViewsDrawMode() const;
 
 private:
   XGUI_MainWindow* myMainWindow;

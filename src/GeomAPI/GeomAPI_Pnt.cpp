@@ -3,6 +3,7 @@
 // Author:      Mikhail PONIKAROV
 
 #include<GeomAPI_Pnt.h>
+#include<GeomAPI_XYZ.h>
 
 #include<gp_Pnt.hxx>
 
@@ -10,6 +11,10 @@
 
 GeomAPI_Pnt::GeomAPI_Pnt(const double theX, const double theY, const double theZ)
   : GeomAPI_Interface(new gp_Pnt(theX, theY, theZ))
+{}
+
+GeomAPI_Pnt::GeomAPI_Pnt(const boost::shared_ptr<GeomAPI_XYZ>& theCoords)
+  : GeomAPI_Interface(new gp_Pnt(theCoords->x(), theCoords->y(), theCoords->z()))
 {}
 
 double GeomAPI_Pnt::x() const
@@ -40,4 +45,9 @@ void GeomAPI_Pnt::setY(const double theY)
 void GeomAPI_Pnt::setZ(const double theZ)
 {
   return MY_PNT->SetZ(theZ);
+}
+
+const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_Pnt::xyz() 
+{
+  return boost::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(MY_PNT->X(), MY_PNT->Y(), MY_PNT->Z()));
 }

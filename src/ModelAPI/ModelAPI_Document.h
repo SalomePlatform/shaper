@@ -11,7 +11,6 @@
 #include <vector>
 
 class ModelAPI_Feature;
-class ModelAPI_Iterator;
 
 /// Common groups identifiers
 /// Group of parameters
@@ -20,8 +19,8 @@ static const std::string PARAMETERS_GROUP = "Parameters";
 static const std::string CONSTRUCTIONS_GROUP = "Construction";
 /// Group of parts
 static const std::string PARTS_GROUP = "Parts";
-/// Group of sketches
-static const std::string SKETCHS_GROUP = "Sketchs";
+/// All created fetaures of the document (a history)
+static const std::string FEATURES_GROUP = "Features";
 
 /**\class Model_Document
  * \ingroup DataModel
@@ -73,16 +72,15 @@ public:
   ///! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID) = 0;
 
-  ///! Creates an iterator of the features by the specific groups
-  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Iterator> featuresIterator(
-    const std::string theGroup) = 0;
-
   ///! Returns the id of hte document
   MODELAPI_EXPORT virtual const std::string& id() const = 0;
 
   //! Returns the feature in the group by the index (started from zero)
   MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
     feature(const std::string& theGroupID, const int theIndex) = 0;
+
+  //! Returns the number of features in the group
+  MODELAPI_EXPORT virtual int size(const std::string& theGroupID) = 0;
 
   //! Returns the index of feature in the group (zero based)
   MODELAPI_EXPORT virtual int featureIndex(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;

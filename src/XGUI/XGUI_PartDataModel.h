@@ -103,7 +103,9 @@ private:
     ParamsFolder,
     ParamObject,
     ConstructFolder,
-    ConstructObject
+    ConstructObject,
+    BodiesFolder,
+    BodieswObject
   };
 
 };

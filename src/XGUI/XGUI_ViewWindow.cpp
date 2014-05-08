@@ -157,7 +157,7 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
     myRotationPointSelection(false),
     myClosable(true),
     myStartX(0), myStartY(0), myCurrX(0), myCurrY(0), myCurScale(0.0), myCurSketch(0),
-    myDrawRect(false), myEnableDrawMode(true), myCursorIsHand(false), myEventStarted(false),
+    myDrawRect(false), myEnableDrawMode(false), myCursorIsHand(false), myEventStarted(false),
     myIsActive(false),
     myLastState(WindowNormalState), myOperation(NOTHING)
 {
@@ -1175,3 +1175,11 @@ void XGUI_ViewWindow::updateToolBar()
   myWindowBar->update();
 }
 
+/*!
+  \brief Update state of enable draw mode state.
+*/
+void XGUI_ViewWindow::updateEnabledDrawMode()
+{
+  myEnableDrawMode = myViewer->isSelectionEnabled() && 
+                     myViewer->isMultiSelectionEnabled();
+}

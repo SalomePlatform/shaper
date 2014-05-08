@@ -93,6 +93,9 @@ public:
   //! Returns true if ribbon line drawing enabled
   bool isDrawModeEnabled() const { return myEnableDrawMode; }
 
+  //! Updates drawing mode in the view window
+  void updateEnabledDrawMode();
+
 signals:
   //! Emited whien view transformation operation is started
   void vpTransformationStarted(XGUI_ViewWindow::OperationType type);

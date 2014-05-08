@@ -2,9 +2,10 @@
 // Created:     23 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#include<GeomAPI_Dir.h>
+#include <GeomAPI_Dir.h>
+#include <GeomAPI_XYZ.h>
 
-#include<gp_Dir.hxx>
+#include <gp_Dir.hxx>
 
 #define MY_DIR static_cast<gp_Pnt*>(myImpl)
 
@@ -25,4 +26,9 @@ double GeomAPI_Dir::y() const
 double GeomAPI_Dir::z() const
 {
   return MY_DIR->Z();
+}
+
+const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_Dir::xyz() 
+{
+  return boost::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(MY_DIR->X(), MY_DIR->Y(), MY_DIR->Z()));
 }

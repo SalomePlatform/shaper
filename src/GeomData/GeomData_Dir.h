@@ -31,7 +31,7 @@ public:
   /// Returns the Z double value
   GEOMDATA_EXPORT virtual double z() const;
   /// Returns the direction of this attribute
-  GEOMDATA_EXPORT boost::shared_ptr<GeomAPI_Dir> dir();
+  GEOMDATA_EXPORT virtual boost::shared_ptr<GeomAPI_Dir> dir();
 
 protected:
   /// Initializes attributes

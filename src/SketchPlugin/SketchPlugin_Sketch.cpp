@@ -4,6 +4,7 @@
 
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
+#include <GeomAPI_XYZ.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
@@ -70,8 +71,8 @@ boost::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, cons
   boost::shared_ptr<GeomDataAPI_Dir> aY = 
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_DIRY));
 
-  return boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(
-    aC->x() + aX->x() * theX + aY->x() * theY, 
-    aC->y() + aX->y() * theX + aY->y() * theY,
-    aC->z() + aX->z() * theX + aY->z() * theY));
+  boost::shared_ptr<GeomAPI_XYZ> aSum = aC->pnt()->xyz()->added(
+    aX->dir()->xyz()->multiplied(theX))->added(aY->dir()->xyz()->multiplied(theY));
+
+  return boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
 }

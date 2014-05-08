@@ -31,10 +31,12 @@ class Model_Data: public ModelAPI_Data
 
   Model_Data();
 
+  /// Returns label of this feature
   TDF_Label label() {return myLab;}
 
   friend class Model_Document;
-  friend class Model_Iterator;
+  friend class Model_AttributeReference;
+  friend class Model_AttributeRefAttr;
 
 public:
   /// Returns the name of the feature visible by the user in the object browser
@@ -45,9 +47,18 @@ public:
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string theID);
   /// Returns the attribute that contains real value with double precision
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string theID);
+  /// Returns the attribute that contains reference to a feature
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeReference> 
+    reference(const std::string theID);
+  /// Returns the attribute that contains reference to an attribute of a feature
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeRefAttr>
+    refattr(const std::string theID);
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string theID);
+  /// Identifier by the id (not fast, iteration by map)
+  /// \param theAttr attribute already created in this data
+  MODEL_EXPORT virtual const std::string& id(const boost::shared_ptr<ModelAPI_Attribute> theAttr);
 
   /// Initializes object by the attributes: must be called just after the object is created
   /// for each attribute of the object

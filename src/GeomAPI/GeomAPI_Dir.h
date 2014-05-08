@@ -6,6 +6,9 @@
 #define GeomAPI_Dir_HeaderFile
 
 #include <GeomAPI_Interface.h>
+#include <boost/shared_ptr.hpp>
+
+class GeomAPI_XYZ;
 
 /**\class GeomAPI_Dir
  * \ingroup DataModel
@@ -25,6 +28,8 @@ public:
   /// returns Z coordinate
   double z() const;
 
+  /// returns coordinates of the direction
+  const boost::shared_ptr<GeomAPI_XYZ> xyz();
 };
 
 #endif

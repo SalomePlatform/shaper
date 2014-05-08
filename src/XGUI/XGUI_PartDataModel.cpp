@@ -1,7 +1,6 @@
 #include "XGUI_PartDataModel.h"
 
 #include <ModelAPI_PluginManager.h>
-#include <ModelAPI_Iterator.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
@@ -26,7 +25,7 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
     // return a name
     switch (theIndex.internalId()) {
     case ParamsFolder:
-      return tr("Parameters");
+      return tr("Parameters") + QString(" (%1)").arg(rowCount(theIndex));
     case ParamObject:
       {
         boost::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(PARAMETERS_GROUP, theIndex.row());
@@ -34,7 +33,7 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
           return aFeature->data()->getName().c_str();
       } 
     case ConstructFolder:
-        return tr("Constructions");
+        return tr("Constructions") + QString(" (%1)").arg(rowCount(theIndex));
     case ConstructObject:
       {
         boost::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row());
@@ -74,10 +73,10 @@ int XGUI_TopDataModel::rowCount(const QModelIndex& theParent) const
     return 2;
 
   if (theParent.internalId() == ParamsFolder)
-    return myDocument->featuresIterator(PARAMETERS_GROUP)->numIterationsLeft();
+    return myDocument->size(PARAMETERS_GROUP);
 
   if (theParent.internalId() == ConstructFolder)
-    return myDocument->featuresIterator(CONSTRUCTIONS_GROUP)->numIterationsLeft();
+    return myDocument->size(CONSTRUCTIONS_GROUP);
 
   return 0;
 }
@@ -188,9 +187,11 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
           return aFeature->data()->getName().c_str();
       }
     case ParamsFolder:
-      return tr("Parameters");
+      return tr("Parameters") + QString(" (%1)").arg(rowCount(theIndex));
     case ConstructFolder:
-      return tr("Constructions");
+      return tr("Constructions") + QString(" (%1)").arg(rowCount(theIndex));
+    case BodiesFolder:
+      return tr("Bodies") + QString(" (%1)").arg(rowCount(theIndex));
     case ParamObject:
       {
         boost::shared_ptr<ModelAPI_Feature> aFeature = 
@@ -215,6 +216,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
     case ParamsFolder:
       return QIcon(":pictures/params_folder.png");
     case ConstructFolder:
+    case BodiesFolder:
       return QIcon(":pictures/constr_folder.png");
     case ConstructObject:
         return QIcon(":pictures/point_ico.png");
@@ -241,11 +243,13 @@ int XGUI_PartDataModel::rowCount(const QModelIndex& parent) const
       return 0;
   switch (parent.internalId()) {
   case MyRoot:
-    return 2;
+    return 3;
   case ParamsFolder:
-    return featureDocument()->featuresIterator(PARAMETERS_GROUP)->numIterationsLeft();
+    return featureDocument()->size(PARAMETERS_GROUP);
   case ConstructFolder:
-    return featureDocument()->featuresIterator(CONSTRUCTIONS_GROUP)->numIterationsLeft();
+    return featureDocument()->size(CONSTRUCTIONS_GROUP);
+  case BodiesFolder:
+    return 0;
   }
   return 0;
 }
@@ -268,11 +272,15 @@ QModelIndex XGUI_PartDataModel::index(int theRow, int theColumn, const QModelInd
       return createIndex(0, 0, (qint32) ParamsFolder);
     case 1:
       return createIndex(1, 0, (qint32) ConstructFolder);
+    case 2:
+      return createIndex(1, 0, (qint32) BodiesFolder);
     }
   case ParamsFolder:
     return createIndex(theRow, 0, (qint32) ParamObject);
   case ConstructFolder:
     return createIndex(theRow, 0, (qint32) ConstructObject);
+  case BodiesFolder:
+    return createIndex(theRow, 0, (qint32) BodieswObject);
   }
   return QModelIndex();
 }
@@ -284,6 +292,7 @@ QModelIndex XGUI_PartDataModel::parent(const QModelIndex& theIndex) const
     return QModelIndex();
   case ParamsFolder:
   case ConstructFolder:
+  case BodiesFolder:
     return createIndex(0, 0, (qint32) MyRoot);
   case ParamObject:
     return createIndex(0, 0, (qint32) ParamsFolder);

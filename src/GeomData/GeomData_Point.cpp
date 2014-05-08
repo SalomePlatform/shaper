@@ -5,6 +5,7 @@
 #include "GeomData_Point.h"
 #include "Model_Events.h"
 #include <Events_Loop.h>
+#include <GeomAPI_Pnt.h>
 
 using namespace std;
 
@@ -33,6 +34,13 @@ double GeomData_Point::y() const
 double GeomData_Point::z() const
 {
   return myCoords->Value(2);
+}
+
+boost::shared_ptr<GeomAPI_Pnt> GeomData_Point::pnt()
+{
+  boost::shared_ptr<GeomAPI_Pnt> aResult(new GeomAPI_Pnt(
+    myCoords->Value(0), myCoords->Value(1), myCoords->Value(2)));
+  return aResult;
 }
 
 GeomData_Point::GeomData_Point(TDF_Label& theLabel)
