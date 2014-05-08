@@ -27,9 +27,11 @@ public:
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Attribute() {}
 
+  /// Sets the owner of this attribute
   MODELAPI_EXPORT void setFeature(const boost::shared_ptr<ModelAPI_Feature>& theFeature)
     {myFeature = theFeature;}
 
+  /// Returns the owner of this attribute
   MODELAPI_EXPORT const boost::shared_ptr<ModelAPI_Feature>& feature()
   {return myFeature;}
 protected:

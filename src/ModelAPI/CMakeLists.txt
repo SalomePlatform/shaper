@@ -7,7 +7,6 @@ SET(PROJECT_HEADERS
     ModelAPI_PluginManager.h
     ModelAPI_Plugin.h
     ModelAPI_Feature.h
-    ModelAPI_Iterator.h
     ModelAPI_Data.h
     ModelAPI_Document.h
     ModelAPI_Attribute.h

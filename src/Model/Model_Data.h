@@ -34,7 +34,6 @@ class Model_Data: public ModelAPI_Data
   TDF_Label label() {return myLab;}
 
   friend class Model_Document;
-  friend class Model_Iterator;
 
 public:
   /// Returns the name of the feature visible by the user in the object browser

@@ -8,6 +8,8 @@
 #include "GeomDataAPI.h"
 #include <ModelAPI_Attribute.h>
 
+class GeomAPI_Dir;
+
 /**\class GeomDataAPI_Dir
  * \ingroup DataModel
  * \brief Attribute that contains 3D direction coordinates. 
@@ -25,6 +27,8 @@ public:
   virtual double y() const = 0;
   /// Returns the Z double value
   virtual double z() const = 0;
+  /// Returns the direction of this attribute
+  virtual boost::shared_ptr<GeomAPI_Dir> dir() = 0;
 
   /// Returns the type of this class of attributes
   static inline std::string type() {return std::string("Dir");}

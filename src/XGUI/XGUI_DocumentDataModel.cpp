@@ -2,7 +2,6 @@
 #include "XGUI_PartDataModel.h"
 
 #include <ModelAPI_PluginManager.h>
-#include <ModelAPI_Iterator.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
@@ -125,7 +124,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
   // Reset whole tree **************************
   } else {  
     beginResetModel();
-    int aNbParts = myDocument->featuresIterator(PARTS_GROUP)->numIterationsLeft();
+    int aNbParts = myDocument->size(PARTS_GROUP);
     if (myPartModels.size() != aNbParts) { // resize internal models
       while (myPartModels.size() > aNbParts) {
         delete myPartModels.last();

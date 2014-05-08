@@ -1,7 +1,6 @@
 #include "XGUI_PartDataModel.h"
 
 #include <ModelAPI_PluginManager.h>
-#include <ModelAPI_Iterator.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
@@ -74,10 +73,10 @@ int XGUI_TopDataModel::rowCount(const QModelIndex& theParent) const
     return 2;
 
   if (theParent.internalId() == ParamsFolder)
-    return myDocument->featuresIterator(PARAMETERS_GROUP)->numIterationsLeft();
+    return myDocument->size(PARAMETERS_GROUP);
 
   if (theParent.internalId() == ConstructFolder)
-    return myDocument->featuresIterator(CONSTRUCTIONS_GROUP)->numIterationsLeft();
+    return myDocument->size(CONSTRUCTIONS_GROUP);
 
   return 0;
 }
@@ -246,9 +245,9 @@ int XGUI_PartDataModel::rowCount(const QModelIndex& parent) const
   case MyRoot:
     return 3;
   case ParamsFolder:
-    return featureDocument()->featuresIterator(PARAMETERS_GROUP)->numIterationsLeft();
+    return featureDocument()->size(PARAMETERS_GROUP);
   case ConstructFolder:
-    return featureDocument()->featuresIterator(CONSTRUCTIONS_GROUP)->numIterationsLeft();
+    return featureDocument()->size(CONSTRUCTIONS_GROUP);
   case BodiesFolder:
     return 0;
   }

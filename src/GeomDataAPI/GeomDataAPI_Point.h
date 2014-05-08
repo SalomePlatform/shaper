@@ -8,6 +8,8 @@
 #include "GeomDataAPI.h"
 #include <ModelAPI_Attribute.h>
 
+class GeomAPI_Pnt;
+
 /**\class GeomDataAPI_Point
  * \ingroup DataModel
  * \brief Attribute that contains 3D point coordinates. 
@@ -25,6 +27,8 @@ public:
   virtual double y() const = 0;
   /// Returns the Z double value
   virtual double z() const = 0;
+  /// Returns the 3D point
+  virtual boost::shared_ptr<GeomAPI_Pnt> pnt() = 0;
 
   /// Returns the type of this class of attributes
   static inline std::string type() {return std::string("Point");}

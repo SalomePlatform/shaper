@@ -7,21 +7,22 @@
 #include <Model_Data.h>
 #include <Model_Application.h>
 #include <Model_PluginManager.h>
-#include <Model_Iterator.h>
 #include <Model_Events.h>
 #include <Events_Loop.h>
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
 #include <TDF_ChildIDIterator.hxx>
+#include <TDataStd_ReferenceArray.hxx>
+#include <TDataStd_HLabelArray1.hxx>
 
 #include <climits>
 
 static const int UNDO_LIMIT = 10; // number of possible undo operations
 
 static const int TAG_GENERAL = 1; // general properties tag
-static const int TAG_OBJECTS = 2; // tag of the objects sub-tree (Root for Model_DatasMgr)
-static const int TAG_HISTORY = 3; // tag of the history sub-tree (Root for Model_History)
+static const int TAG_OBJECTS = 2; // tag of the objects sub-tree (features)
+static const int TAG_HISTORY = 3; // tag of the history sub-tree (python dump)
 
 using namespace std;
 
@@ -208,7 +209,8 @@ void Model_Document::redo()
 
 boost::shared_ptr<ModelAPI_Feature> Model_Document::addFeature(string theID)
 {
-  boost::shared_ptr<ModelAPI_Feature> aFeature = ModelAPI_PluginManager::get()->createFeature(theID);
+  boost::shared_ptr<ModelAPI_Feature> aFeature = 
+    ModelAPI_PluginManager::get()->createFeature(theID);
   if (aFeature) {
     boost::dynamic_pointer_cast<Model_Document>(aFeature->documentToAdd())->addFeature(aFeature);
   } else {
@@ -225,7 +227,8 @@ void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFea
   boost::shared_ptr<Model_Data> aData(new Model_Data);
   aData->setFeature(theFeature);
   aData->setLabel(anObjLab);
-  boost::shared_ptr<ModelAPI_Document> aThis = Model_Application::getApplication()->getDocument(myID);
+  boost::shared_ptr<ModelAPI_Document> aThis = 
+    Model_Application::getApplication()->getDocument(myID);
   theFeature->setData(aData);
   theFeature->setDoc(aThis);
   setUniqueName(theFeature);
@@ -235,6 +238,20 @@ void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFea
   // put index of the feature in the group in the tree
   TDataStd_Integer::Set(anObjLab, myFeatures[aGroup].size());
   myFeatures[aGroup].push_back(theFeature);
+  // store feature in the history of features array
+  Handle(TDataStd_ReferenceArray) aRefs;
+  if (!groupLabel(FEATURES_GROUP).FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
+    aRefs = TDataStd_ReferenceArray::Set(groupLabel(FEATURES_GROUP), 0, 0);
+    aRefs->SetValue(0, anObjLab);
+  } else { // extend array by one more element
+    Handle(TDataStd_HLabelArray1) aNewArray = 
+      new TDataStd_HLabelArray1(aRefs->Lower(), aRefs->Upper() + 1);
+    for(int a = aRefs->Lower(); a < aRefs->Upper(); a++) {
+      aNewArray->SetValue(a, aRefs->Value(a));
+    }
+    aNewArray->SetValue(aRefs->Upper() + 1, anObjLab);
+    aRefs->SetInternalArray(aNewArray);
+  }
 
   // event: feature is added
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);
@@ -260,7 +277,8 @@ int Model_Document::featureIndex(boost::shared_ptr<ModelAPI_Feature> theFeature)
   if (theFeature->document().get() != this) {
     return theFeature->document()->featureIndex(theFeature);
   }
-  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
+  boost::shared_ptr<Model_Data> aData =
+    boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
   Handle(TDataStd_Integer) aFeatureIndex;
   if (aData->label().FindAttribute(TDataStd_Integer::GetID(), aFeatureIndex)) {
     return aFeatureIndex->Get();
@@ -276,22 +294,42 @@ boost::shared_ptr<ModelAPI_Document> Model_Document::subDocument(string theDocID
   return Model_Application::getApplication()->getDocument(theDocID);
 }
 
-boost::shared_ptr<ModelAPI_Iterator> Model_Document::featuresIterator(const string theGroup)
+boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
+  const string& theGroupID, const int theIndex)
 {
-  boost::shared_ptr<Model_Document> aThis(Model_Application::getApplication()->getDocument(myID));
-  // create an empty iterator for not existing group 
-  // (to avoidance of attributes management outside the transaction)
-  if (myGroups.find(theGroup) == myGroups.end())
-    return boost::shared_ptr<ModelAPI_Iterator>(new Model_Iterator());
-  return boost::shared_ptr<ModelAPI_Iterator>(new Model_Iterator(aThis, groupLabel(theGroup)));
+  if (theGroupID == FEATURES_GROUP) { // history is just a references array
+    Handle(TDataStd_ReferenceArray) aRefs;
+    if (groupLabel(FEATURES_GROUP).FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
+      if (aRefs->Lower() <= theIndex && aRefs->Upper() >= theIndex) {
+        TDF_Label aFeatureLab = aRefs->Value(theIndex);
+        return feature(aFeatureLab);
+      }
+    }
+  } else { // one of the group
+    map<string, vector<boost::shared_ptr<ModelAPI_Feature> > >::iterator aGroup = 
+      myFeatures.find(theGroupID);
+    if (aGroup != myFeatures.end() && (int)(aGroup->second.size()) > theIndex) {
+      return aGroup->second[theIndex];
+    }
+  }
+  // not found
+  return boost::shared_ptr<ModelAPI_Feature>();
 }
 
-boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(const string& theGroupID, const int theIndex)
+int Model_Document::size(const string& theGroupID) 
 {
-  // TODO: optimize this method
-  boost::shared_ptr<ModelAPI_Iterator>  anIter = featuresIterator(theGroupID);
-  for(int a = 0; a != theIndex && anIter->more(); anIter->next()) a++;
-  return anIter->more() ? anIter->current() : boost::shared_ptr<ModelAPI_Feature>();
+  if (theGroupID == FEATURES_GROUP) { // history is just a references array
+    Handle(TDataStd_ReferenceArray) aRefs;
+    if (groupLabel(FEATURES_GROUP).FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs))
+      return aRefs->Length();
+  } else { // one of the group
+    map<string, vector<boost::shared_ptr<ModelAPI_Feature> > >::iterator aGroup = 
+      myFeatures.find(theGroupID);
+    if (aGroup != myFeatures.end())
+      return aGroup->second.size();
+  }
+  // group is not found
+  return 0;
 }
 
 const vector<string>& Model_Document::getGroups() const
@@ -304,11 +342,6 @@ Model_Document::Model_Document(const std::string theID)
 {
   myDoc->SetUndoLimit(UNDO_LIMIT);
   myTransactionsAfterSave = 0;
-  // to avoid creation of tag outside of the transaction (by iterator, for example)
-  /*
-  if (!myDoc->Main().FindChild(TAG_OBJECTS).IsAttribute(TDF_TagSource::GetID()))
-    TDataStd_Comment::Set(myDoc->Main().FindChild(TAG_OBJECTS).NewChild(), "");
-    */
 }
 
 TDF_Label Model_Document::groupLabel(const string theGroup)
@@ -326,10 +359,10 @@ TDF_Label Model_Document::groupLabel(const string theGroup)
 void Model_Document::setUniqueName(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
   // first count all objects of such kind to start with index = count + 1
-  int aNumObjects = 0;
-  boost::shared_ptr<ModelAPI_Iterator> anIter = featuresIterator(theFeature->getGroup());
-  for(; anIter->more(); anIter->next()) {
-    if (anIter->currentKind() == theFeature->getKind())
+  int a, aNumObjects = 0;
+  int aSize = size(theFeature->getGroup());
+  for(a = 0; a < aSize; a++) {
+    if (feature(theFeature->getGroup(), a)->getKind() == theFeature->getKind())
       aNumObjects++;
   }
   // generate candidate name
@@ -337,14 +370,14 @@ void Model_Document::setUniqueName(boost::shared_ptr<ModelAPI_Feature> theFeatur
   aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
   string aName = aNameStream.str();
   // check this is unique, if not, increase index by 1
-  for(anIter = featuresIterator(theFeature->getGroup()); anIter->more();) {
-    if (anIter->currentName() == aName) {
+  for(a = 0; a < aSize;) {
+    if (feature(theFeature->getGroup(), a)->data()->getName() == aName) {
       aNumObjects++;
       stringstream aNameStream;
       aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
       // reinitialize iterator to make sure a new name is unique
-      anIter = featuresIterator(theFeature->getGroup());
-    } else anIter->next();
+      a = 0;
+    } else a++;
   }
 
   theFeature->data()->setName(aName);

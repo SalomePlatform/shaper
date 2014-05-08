@@ -70,15 +70,15 @@ public:
   //! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
 
-  //! Creates an iterator of the features by the specific groups
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Iterator> featuresIterator(
-    const std::string theGroup);
-
+  ///! Returns the id of hte document
   MODEL_EXPORT virtual const std::string& id() const {return myID;}
 
   //! Returns the feature in the group by the index (started from zero)
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
     feature(const std::string& theGroupID, const int theIndex);
+
+  //! Returns the number of features in the group
+  MODEL_EXPORT virtual int size(const std::string& theGroupID);
 
   ///! Returns the vector of groups already added to the document
   MODEL_EXPORT virtual const std::vector<std::string>& getGroups() const;

@@ -7,7 +7,6 @@ SET(PROJECT_HEADERS
     Model_Document.h
     Model_PluginManager.h
     Model_Data.h
-    Model_Iterator.h
     Model_AttributeDouble.h
     Model_AttributeDocRef.h
     Model_Events.h
@@ -18,7 +17,6 @@ SET(PROJECT_SOURCES
     Model_Document.cpp
     Model_PluginManager.cpp
     Model_Data.cpp
-    Model_Iterator.cpp
     Model_AttributeDouble.cpp
     Model_AttributeDocRef.cpp
     Model_Events.cpp
