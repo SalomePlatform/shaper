@@ -51,11 +51,11 @@ public:
   /// Gives the current selected objects to be processed by the operation
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mouseReleased(const gp_Pnt& thePoint, QMouseEvent* theEvent);
+  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView);
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mouseMoved(const gp_Pnt& thePoint, QMouseEvent* theEvent);
+  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
   /// Processes the key pressed in the view
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);
@@ -80,7 +80,7 @@ protected:
   /// \brief Save the point to the line.
   /// \param thePoint the 3D point in the viewer
   /// \param theAttribute the start or end attribute of the line
-  void setLinePoint(const gp_Pnt& thePoint, const std::string& theAttribute);
+  void setLinePoint(const gp_Pnt& thePoint, Handle(V3d_View) theView, const std::string& theAttribute);
 
 protected:
   ///< Structure to lists the possible types of point selection modes

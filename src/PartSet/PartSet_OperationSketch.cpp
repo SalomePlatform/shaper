@@ -60,6 +60,9 @@ void PartSet_OperationSketch::setSelected(boost::shared_ptr<ModelAPI_Feature> th
 
 void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
 {
+  if (theShape.IsNull())
+    return;
+
   // get selected shape
   boost::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
   aGShape->setImpl(new TopoDS_Shape(theShape));

@@ -49,11 +49,11 @@ public:
   /// Processes the mouse pressed in the point
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mousePressed(const gp_Pnt& thePoint, QMouseEvent* theEvent);
+  virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView);
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mouseMoved(const gp_Pnt& thePoint, QMouseEvent* theEvent);
+  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theFeature the selected feature
@@ -64,8 +64,12 @@ public:
 protected:
   /// \brief Virtual method called when operation is started
   /// Virtual method called when operation started (see start() method for more description)
-  /// After the parent operation body perform, set sketch feature to the created line feature
+  /// Switch off the multi selection state
   virtual void startOperation();
+
+  /// Virtual method called when operation stopped - committed or aborted.
+  /// Restore the multi selection state
+  virtual void stopOperation();
 
   /// Creates an operation new feature
   /// Returns NULL feature. This is an operation of edition, not creation.

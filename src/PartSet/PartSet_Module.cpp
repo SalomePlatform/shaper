@@ -5,7 +5,6 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <PartSet_Listener.h>
-#include <PartSet_Tools.h>
 
 #include <ModuleBase_Operation.h>
 
@@ -121,6 +120,8 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   if (!theOperation)
     return;
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
+  if (aPreviewOp) {
+  }
 }
 
 void PartSet_Module::onSelectionChanged()
@@ -150,9 +151,7 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(theEvent->pos(),
-                                                     myWorkshop->viewer()->activeView());
-    aPreviewOp->mousePressed(aPnt, theEvent);
+    aPreviewOp->mousePressed(theEvent, myWorkshop->viewer()->activeView());
   }
 }
 
@@ -162,9 +161,7 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(theEvent->pos(),
-                                                     myWorkshop->viewer()->activeView());
-    aPreviewOp->mouseReleased(aPnt, theEvent);
+    aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView());
   }
 }
 
@@ -174,9 +171,7 @@ void PartSet_Module::onMouseMoved(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    gp_Pnt aPnt = PartSet_Tools::ConvertClickToPoint(theEvent->pos(),
-                                                     myWorkshop->viewer()->activeView());
-    aPreviewOp->mouseMoved(aPnt, theEvent);
+    aPreviewOp->mouseMoved(theEvent, myWorkshop->viewer()->activeView());
   }
 }
 
@@ -214,6 +209,12 @@ void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<Mo
   }
   myWorkshop->actionsMgr()->setActionChecked(anOperation->getDescription()->operationId(), true);
   sendOperation(anOperation);
+}
+
+void PartSet_Module::onMultiSelectionEnabled(bool theEnabled)
+{
+  XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
+  aViewer->enableMultiselection(theEnabled);
 }
 
 void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
@@ -264,6 +265,8 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
             this, SLOT(onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature>, int)));
     connect(aPreviewOp, SIGNAL(launchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)),
             this, SLOT(onLaunchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)));
+    connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)),
+            this, SLOT(onMultiSelectionEnabled(bool)));
 
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {
@@ -271,6 +274,7 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
               this, SLOT(onPlaneSelected(double, double, double)));
     }
   }
+
   return anOperation;
 }
 
