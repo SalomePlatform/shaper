@@ -9,6 +9,8 @@
   #include "ModelAPI_Attribute.h"
   #include "ModelAPI_AttributeDocRef.h"
   #include "ModelAPI_AttributeDouble.h"
+  #include "ModelAPI_AttributeReference.h"
+  #include "ModelAPI_AttributeRefAttr.h"
 %}
 
 // to avoid error on this
@@ -28,6 +30,8 @@
 %shared_ptr(ModelAPI_Attribute)
 %shared_ptr(ModelAPI_AttributeDocRef)
 %shared_ptr(ModelAPI_AttributeDouble)
+%shared_ptr(ModelAPI_AttributeReference)
+%shared_ptr(ModelAPI_AttributeRefAttr)
 
 // all supported interfaces
 %include "ModelAPI_Document.h"
@@ -37,3 +41,5 @@
 %include "ModelAPI_Attribute.h"
 %include "ModelAPI_AttributeDocRef.h"
 %include "ModelAPI_AttributeDouble.h"
+%include "ModelAPI_AttributeReference.h"
+%include "ModelAPI_AttributeRefAttr.h"

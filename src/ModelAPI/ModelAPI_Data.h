@@ -11,6 +11,8 @@
 
 class ModelAPI_AttributeDocRef;
 class ModelAPI_AttributeDouble;
+class ModelAPI_AttributeReference;
+class ModelAPI_AttributeRefAttr;
 class ModelAPI_Document;
 class ModelAPI_Attribute;
 
@@ -34,10 +36,17 @@ public:
   virtual boost::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string theID) = 0;
   /// Returns the attribute that contains real value with double precision
   virtual boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string theID) = 0;
+  /// Returns the attribute that contains reference to a feature
+  virtual boost::shared_ptr<ModelAPI_AttributeReference> reference(const std::string theID) = 0;
+  /// Returns the attribute that contains reference to an attribute of a feature
+  virtual boost::shared_ptr<ModelAPI_AttributeRefAttr> refattr(const std::string theID) = 0;
 
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
   virtual boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string theID) = 0;
+  /// Identifier by the id (not fast, iteration by map)
+  /// \param theAttr attribute already created in this data
+  virtual const std::string& id(const boost::shared_ptr<ModelAPI_Attribute> theAttr) = 0;
 
   /// Initializes object by the attributes: must be called just after the object is created
   /// for each attribute of the object

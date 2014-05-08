@@ -9,6 +9,8 @@ SET(PROJECT_HEADERS
     Model_Data.h
     Model_AttributeDouble.h
     Model_AttributeDocRef.h
+    Model_AttributeReference.h
+    Model_AttributeRefAttr.h
     Model_Events.h
 )
 
@@ -19,6 +21,8 @@ SET(PROJECT_SOURCES
     Model_Data.cpp
     Model_AttributeDouble.cpp
     Model_AttributeDocRef.cpp
+    Model_AttributeReference.cpp
+    Model_AttributeRefAttr.cpp
     Model_Events.cpp
 )
 
