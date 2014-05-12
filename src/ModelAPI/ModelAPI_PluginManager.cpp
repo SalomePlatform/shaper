@@ -16,6 +16,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeRefList.h>
 
 #ifdef WIN32
 #include <windows.h>

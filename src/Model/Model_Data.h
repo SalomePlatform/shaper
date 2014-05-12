@@ -37,6 +37,7 @@ class Model_Data: public ModelAPI_Data
   friend class Model_Document;
   friend class Model_AttributeReference;
   friend class Model_AttributeRefAttr;
+  friend class Model_AttributeRefList;
 
 public:
   /// Returns the name of the feature visible by the user in the object browser
@@ -53,6 +54,9 @@ public:
   /// Returns the attribute that contains reference to an attribute of a feature
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeRefAttr>
     refattr(const std::string theID);
+  /// Returns the attribute that contains list of references to features
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeRefList> 
+    reflist(const std::string theID);
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string theID);

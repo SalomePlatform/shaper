@@ -7,6 +7,7 @@
 #include <Model_AttributeDouble.h>
 #include <Model_AttributeReference.h>
 #include <Model_AttributeRefAttr.h>
+#include <Model_AttributeRefList.h>
 #include <GeomData_Point.h>
 #include <GeomData_Point2D.h>
 #include <GeomData_Dir.h>
@@ -48,6 +49,8 @@ void Model_Data::addAttribute(string theID, string theAttrType)
     anAttr = new Model_AttributeReference(anAttrLab);
   else if (theAttrType == ModelAPI_AttributeRefAttr::type())
     anAttr = new Model_AttributeRefAttr(anAttrLab);
+  else if (theAttrType == ModelAPI_AttributeRefList::type())
+    anAttr = new Model_AttributeRefList(anAttrLab);
   else if (theAttrType == GeomData_Point::type())
     anAttr = new GeomData_Point(anAttrLab);
   else if (theAttrType == GeomData_Dir::type())
@@ -117,6 +120,21 @@ boost::shared_ptr<ModelAPI_AttributeRefAttr> Model_Data::refattr(const string th
   }
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRes = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aFound->second);
+  if (!aRes) {
+    // TODO: generate error on invalid attribute type request
+  }
+  return aRes;
+}
+
+boost::shared_ptr<ModelAPI_AttributeRefList> Model_Data::reflist(const string theID)
+{
+  map<string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
+  if (aFound == myAttrs.end()) {
+    // TODO: generate error on unknown attribute request and/or add mechanism for customization
+    return boost::shared_ptr<ModelAPI_AttributeRefList>();
+  }
+  boost::shared_ptr<ModelAPI_AttributeRefList> aRes = 
+    boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
   }

@@ -29,6 +29,9 @@ public:
   SKETCHPLUGIN_EXPORT virtual const void addSub(
     const boost::shared_ptr<ModelAPI_Feature>& theFeature) = 0;
 
+  /// Returns true if this feature must be displayed in the history (top level of Part tree)
+  SKETCHPLUGIN_EXPORT virtual bool isInHistory() {return false;}
+
 protected:
   /// Set the shape to the internal preview field
   /// \param theShape a preview shape

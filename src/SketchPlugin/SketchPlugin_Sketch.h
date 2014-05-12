@@ -18,6 +18,8 @@ const std::string SKETCH_ATTR_DIRX("DirX");
 const std::string SKETCH_ATTR_DIRY("DirY");
 /// Vector Z, normal to the sketch plane
 const std::string SKETCH_ATTR_NORM("Norm");
+/// All features of this sketch (list of references)
+const std::string SKETCH_ATTR_FEATURES("Features");
 
 /**\class SketchPlugin_Sketch
  * \ingroup DataModel
@@ -51,6 +53,9 @@ public:
   /// Converts a 2D sketch space point into point in 3D space
   SKETCHPLUGIN_EXPORT boost::shared_ptr<GeomAPI_Pnt> to3D(
     const double theX, const double theY);
+
+  /// Returns true if this feature must be displayed in the history (top level of Part tree)
+  SKETCHPLUGIN_EXPORT virtual bool isInHistory() {return true;}
 
   /// Use plugin manager for features creation
   SketchPlugin_Sketch();

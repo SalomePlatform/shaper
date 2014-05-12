@@ -4,6 +4,7 @@
 
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
+#include <ModelAPI_AttributeRefList.h>
 #include <GeomAPI_XYZ.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
@@ -28,6 +29,7 @@ void SketchPlugin_Sketch::initAttributes()
   data()->addAttribute(SKETCH_ATTR_DIRX, GeomDataAPI_Dir::type());
   data()->addAttribute(SKETCH_ATTR_DIRY, GeomDataAPI_Dir::type());
   data()->addAttribute(SKETCH_ATTR_NORM, GeomDataAPI_Dir::type());
+  data()->addAttribute(SKETCH_ATTR_FEATURES, ModelAPI_AttributeRefList::type());
 }
 
 void SketchPlugin_Sketch::execute() 
@@ -50,6 +52,7 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Sketch::preview()
 const void SketchPlugin_Sketch::addSub(const boost::shared_ptr<ModelAPI_Feature>& theFeature)
 {
   boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature)->setSketch(this);
+  data()->reflist(SKETCH_ATTR_FEATURES)->append(theFeature);
 }
 
 void SketchPlugin_Sketch::addPlane(double theX, double theY, double theZ,
