@@ -5,6 +5,8 @@
 #include <PartSet_OperationEditLine.h>
 #include <PartSet_Tools.h>
 
+#include <XGUI_ViewerPrs.h>
+
 #include <SketchPlugin_Feature.h>
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_Data.h>
@@ -79,16 +81,19 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
   myCurPressed = aPoint;
 }
 
-void PartSet_OperationEditLine::setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                                            const TopoDS_Shape& theShape)
+void PartSet_OperationEditLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
+                                              const std::list<XGUI_ViewerPrs>& theSelected)
 {
-  if (theFeature == feature())
+  boost::shared_ptr<ModelAPI_Feature> aFeature;
+  if (!theSelected.empty())
+    aFeature = theSelected.front().feature();
+  
+  if (aFeature == feature())
     return;
-
+  
   commit();
-
-  if (theFeature)
-    emit launchOperation(PartSet_OperationEditLine::Type(), theFeature);
+  if (aFeature)
+    emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
 }
 
 void PartSet_OperationEditLine::startOperation()

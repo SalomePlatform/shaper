@@ -13,8 +13,11 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
 
+#include <XGUI_ViewerPrs.h>
+
 #include <AIS_Shape.hxx>
 #include <AIS_ListOfInteractive.hxx>
+#include <V3d_View.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -44,18 +47,24 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<Mode
   return aModes;
 }
 
-void PartSet_OperationSketch::setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                                          const TopoDS_Shape& theShape)
+void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
+                                            const std::list<XGUI_ViewerPrs>& theSelected)
 {
-  if (theShape.IsNull())
+  if (theSelected.empty())
     return;
+  XGUI_ViewerPrs aPrs = theSelected.front();
 
   if (!myIsEditMode) {
-    setSketchPlane(theShape);
-    myIsEditMode = true;
+    const TopoDS_Shape& aShape = aPrs.shape();
+    if (!aShape.IsNull()) {
+      setSketchPlane(aShape);
+      myIsEditMode = true;
+    }
   }
-  else if (theFeature)
-    emit launchOperation(PartSet_OperationEditLine::Type(), theFeature);
+  else {
+    if (aPrs.feature())
+      emit launchOperation(PartSet_OperationEditLine::Type(), aPrs.feature());
+  }
 }
 
 void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)

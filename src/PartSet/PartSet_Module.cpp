@@ -54,8 +54,6 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
   connect(anOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
 
-  connect(myWorkshop->selector(), SIGNAL(selectionChanged()), 
-          this, SLOT(onSelectionChanged()));
   connect(myWorkshop->viewer(), SIGNAL(mousePress(QMouseEvent*)),
           this, SLOT(onMousePressed(QMouseEvent*)));
   connect(myWorkshop->viewer(), SIGNAL(mouseRelease(QMouseEvent*)),
@@ -124,27 +122,6 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   }
 }
 
-void PartSet_Module::onSelectionChanged()
-{
-  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
-  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp) {
-    XGUI_SelectionMgr* aSelector = myWorkshop->selector();
-    if (aSelector) {
-      NCollection_List<TopoDS_Shape> aList;
-      aSelector->selectedShapes(aList);
-
-      XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-      boost::shared_ptr<ModelAPI_Feature> aFeature;
-      // only first selected shape is processed
-      if (!aList.IsEmpty()) {
-        aFeature = aDisplayer->GetFeature(aList.First());
-      }
-      aPreviewOp->setSelected(aFeature, !aList.IsEmpty() ? aList.First() : TopoDS_Shape());
-    }
-  }
-}
-
 void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
 {
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
@@ -161,7 +138,15 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView());
+    XGUI_SelectionMgr* aSelector = myWorkshop->selector();
+    std::list<XGUI_ViewerPrs> aPresentations;
+    if (aSelector) {
+      NCollection_List<TopoDS_Shape> aList;
+      aSelector->selectedShapes(aList);
+
+      aPresentations = myWorkshop->displayer()->GetViewerPrs(aList);
+    }
+    aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aPresentations);
   }
 }
 

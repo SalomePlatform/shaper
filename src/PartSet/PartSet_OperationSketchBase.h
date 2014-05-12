@@ -18,6 +18,7 @@
 class Handle_V3d_View;
 class QMouseEvent;
 class GeomAPI_Shape;
+class XGUI_ViewerPrs;
 
 /*!
   \class PartSet_OperationSketchBase
@@ -51,12 +52,6 @@ public:
   /// \param theFeature the feature
   virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature) {}
 
-  /// Gives the current selected objects to be processed by the operation
-  /// \param theFeature the selected feature
-  /// \param theShape the selected shape
-  virtual void setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                           const TopoDS_Shape& theShape) {};
-
   /// Processes the mouse pressed in the point
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
@@ -65,7 +60,9 @@ public:
   /// Processes the mouse release in the point
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView);
+  /// \param theSelected the list of selected presentations
+  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
+                             const std::list<XGUI_ViewerPrs>& theSelected);
 
   /// Processes the mouse move in the point
   /// \param thePoint a 3D point clicked in the viewer

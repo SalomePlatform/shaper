@@ -30,6 +30,7 @@ SET(PROJECT_HEADERS
     XGUI_ErrorDialog.h
     XGUI_SalomeViewer.h
     XGUI_ViewerProxy.h
+    XGUI_ViewerPrs.h
     XGUI_PropertyPanel.h
 )
 
@@ -59,6 +60,7 @@ SET(PROJECT_SOURCES
     XGUI_ActionsMgr.cpp
     XGUI_ErrorDialog.cpp
     XGUI_ViewerProxy.cpp
+    XGUI_ViewerPrs.cpp
     XGUI_PropertyPanel.cpp
 )
 

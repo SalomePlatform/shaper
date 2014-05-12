@@ -13,6 +13,9 @@
 #include <TopoDS_Shape.hxx>
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_InteractiveContext.hxx>
+#include <NCollection_List.hxx>
+
+#include <XGUI_ViewerPrs.h>
 
 #include <map>
 #include <vector>
@@ -57,7 +60,12 @@ public:
   
   /// Returns the feature, that was displayed with this shape
   /// \param theShape a shape
-  boost::shared_ptr<ModelAPI_Feature> GetFeature( const TopoDS_Shape& theShape );
+  boost::shared_ptr<ModelAPI_Feature> GetFeature(const TopoDS_Shape& theShape);
+
+  /// Returns a list of viewer presentations
+  /// \param theShapes list of shapes to find corresponded features
+  /// \return list of presentations
+  std::list<XGUI_ViewerPrs> GetViewerPrs(const NCollection_List<TopoDS_Shape>& theShapes);
 
   /// Display the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance

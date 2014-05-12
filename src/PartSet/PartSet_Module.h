@@ -50,9 +50,6 @@ public slots:
   /// by the operation start
   void onOperationStopped(ModuleBase_Operation* theOperation);
 
-  /// SLOT, that is called by the selection in the viewer is changed.
-  /// The selection is sent to the current operation if it listens selection.
-  void onSelectionChanged();
   /// SLOT, that is called by mouse press in the viewer.
   /// The mouse released point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
