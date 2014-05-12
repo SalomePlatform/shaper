@@ -5,14 +5,9 @@
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
-////#include <GeomAPI_Pnt.h>
-////#include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomDataAPI_Point2D.h>
 
 using namespace std;
-
-////// face of the square-face displayed for selection of general plane
-////const double PLANE_SIZE = 200;
 
 SketchPlugin_Point::SketchPlugin_Point()
 {
