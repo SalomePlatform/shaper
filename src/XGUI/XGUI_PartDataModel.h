@@ -105,7 +105,8 @@ private:
     ConstructFolder,
     ConstructObject,
     BodiesFolder,
-    BodieswObject
+    BodieswObject,
+    HistoryObject
   };
 
 };

@@ -1,5 +1,6 @@
 #include "XGUI_DocumentDataModel.h"
 #include "XGUI_PartDataModel.h"
+#include "XGUI_Workshop.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
@@ -9,6 +10,7 @@
 
 #include <Events_Loop.h>
 
+#include <Config_FeatureMessage.h>
 
 #include <QIcon>
 #include <QString>
@@ -40,7 +42,7 @@ XGUI_DocumentDataModel::~XGUI_DocumentDataModel()
 void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
 {
   // Created object event *******************
-  if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_CREATED) {
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED)) {
     const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
     boost::shared_ptr<ModelAPI_Feature> aFeature = aUpdMsg->feature();
     boost::shared_ptr<ModelAPI_Document> aDoc = aFeature->document();
@@ -77,7 +79,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
     }
 
   // Deleted object event ***********************
-  } else if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_DELETED) {
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED)) {
     const Model_FeatureDeletedMessage* aUpdMsg = dynamic_cast<const Model_FeatureDeletedMessage*>(theMessage);
     boost::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
 
@@ -110,11 +112,12 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
     }
 
   // Deleted object event ***********************
-  } else if (QString(theMessage->eventID().eventText()) == EVENT_FEATURE_UPDATED) {
-    const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    boost::shared_ptr<ModelAPI_Feature> aFeature = aUpdMsg->feature();
-    boost::shared_ptr<ModelAPI_Document> aDoc = aFeature->document();
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED)) {
+    //const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+    //boost::shared_ptr<ModelAPI_Feature> aFeature = aUpdMsg->feature();
+    //boost::shared_ptr<ModelAPI_Document> aDoc = aFeature->document();
     
+    // TODO: Identify the necessary index by the modified feature
     QModelIndex aIndex;
     emit dataChanged(aIndex, aIndex);
 
@@ -168,15 +171,7 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
         else 
           return QVariant();
       case Qt::DecorationRole:
-        {
-          std::string aType = aFeature->getKind();
-          if (aType.compare("Point") == 0)
-            return QIcon(":pictures/point_ico.png");
-          if (aType.compare("Part") == 0)
-            return QIcon(":pictures/part_ico.png");
-          if (aType.compare("Sketch") == 0)
-            return QIcon(":icons/sketch.png");
-        }
+        return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
       case Qt::ToolTipRole:
         return tr("Feature object");
       default:

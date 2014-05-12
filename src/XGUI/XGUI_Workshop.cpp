@@ -52,6 +52,17 @@
 #include <dlfcn.h>
 #endif
 
+
+QMap<QString, QString> XGUI_Workshop::myIcons;
+
+QString XGUI_Workshop::featureIcon(const std::string& theId)
+{
+  QString aId(theId.c_str());
+  if (myIcons.contains(aId))
+    return myIcons[aId];
+  return QString();
+}
+
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   : QObject(),
   myCurrentFile(QString()),
@@ -270,6 +281,9 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
 #endif
     return;
   }
+  // Remember features icons
+  myIcons[QString(theMessage->id().c_str())] = QString(theMessage->icon().c_str());
+
   //Find or create Workbench
   QString aWchName = QString::fromStdString(theMessage->workbenchId());
   QString aNestedFeatures = QString::fromStdString(theMessage->nestedFeatures());

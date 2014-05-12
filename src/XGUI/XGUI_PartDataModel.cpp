@@ -1,4 +1,5 @@
 #include "XGUI_PartDataModel.h"
+#include "XGUI_Workshop.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
@@ -47,11 +48,15 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
     // return an Icon
     switch (theIndex.internalId()) {
     case ParamsFolder:
-        return QIcon(":pictures/params_folder.png");
+      return QIcon(":pictures/params_folder.png");
     case ConstructFolder:
-        return QIcon(":pictures/constr_folder.png");
+      return QIcon(":pictures/constr_folder.png");
     case ConstructObject:
-        return QIcon(":pictures/point_ico.png");
+      {
+        FeaturePtr aFeature = myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+        if (aFeature)
+          return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
+      }
     }
     break;
 
@@ -206,6 +211,13 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
         if (aFeature)
           return aFeature->data()->getName().c_str();
       }
+    case HistoryObject:
+      {
+        boost::shared_ptr<ModelAPI_Feature> aFeature = 
+          featureDocument()->feature(FEATURES_GROUP, theIndex.row() - 3);
+        if (aFeature)
+          return aFeature->data()->getName().c_str();
+      }
     }
     break;
   case Qt::DecorationRole:
@@ -219,7 +231,18 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
     case BodiesFolder:
       return QIcon(":pictures/constr_folder.png");
     case ConstructObject:
-        return QIcon(":pictures/point_ico.png");
+      {
+        FeaturePtr aFeature = featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+        if (aFeature)
+          return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
+      }
+    case HistoryObject:
+      {
+        boost::shared_ptr<ModelAPI_Feature> aFeature = 
+          featureDocument()->feature(FEATURES_GROUP, theIndex.row() - 3);
+        if (aFeature)
+          return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
+      }
     }
    break;
   case Qt::ToolTipRole:
@@ -243,7 +266,7 @@ int XGUI_PartDataModel::rowCount(const QModelIndex& parent) const
       return 0;
   switch (parent.internalId()) {
   case MyRoot:
-    return 3;
+    return 3 + featureDocument()->size(FEATURES_GROUP);
   case ParamsFolder:
     return featureDocument()->size(PARAMETERS_GROUP);
   case ConstructFolder:
@@ -273,7 +296,9 @@ QModelIndex XGUI_PartDataModel::index(int theRow, int theColumn, const QModelInd
     case 1:
       return createIndex(1, 0, (qint32) ConstructFolder);
     case 2:
-      return createIndex(1, 0, (qint32) BodiesFolder);
+      return createIndex(2, 0, (qint32) BodiesFolder);
+    default:
+      return createIndex(theRow, theColumn, (qint32) HistoryObject);
     }
   case ParamsFolder:
     return createIndex(theRow, 0, (qint32) ParamObject);
@@ -293,6 +318,7 @@ QModelIndex XGUI_PartDataModel::parent(const QModelIndex& theIndex) const
   case ParamsFolder:
   case ConstructFolder:
   case BodiesFolder:
+  case HistoryObject:
     return createIndex(0, 0, (qint32) MyRoot);
   case ParamObject:
     return createIndex(0, 0, (qint32) ParamsFolder);
@@ -318,7 +344,10 @@ FeaturePtr XGUI_PartDataModel::feature(const QModelIndex& theIndex) const
 {
   switch (theIndex.internalId()) {
   case MyRoot:
-    return myDocument->feature(PARTS_GROUP, myId);
+    if (theIndex.row() < 3)
+      return myDocument->feature(PARTS_GROUP, myId);
+    else 
+      return featureDocument()->feature(FEATURES_GROUP, theIndex.row() - 3);
   case ParamsFolder:
   case ConstructFolder:
     return FeaturePtr();

@@ -97,6 +97,7 @@ private:
 
   //! List of saved QModelIndexes created by sub-models
   QList<QModelIndex*> myIndexes;
+
 };
 
 #endif

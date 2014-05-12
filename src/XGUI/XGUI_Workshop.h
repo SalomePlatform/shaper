@@ -90,6 +90,10 @@ public:
 
   XGUI_ViewerProxy* viewer() const { return myViewerProxy; }
 
+  //! Returns icon name according to feature Id
+  static QString featureIcon(const std::string& theId);
+
+
 signals:
   void salomeViewerSelection();
 
@@ -154,6 +158,9 @@ private:
   XGUI_SalomeConnector* mySalomeConnector;
   XGUI_ErrorDialog* myErrorDlg;
   XGUI_ViewerProxy* myViewerProxy;
+
+  static QMap<QString, QString> myIcons;
+
 };
 
 #endif
