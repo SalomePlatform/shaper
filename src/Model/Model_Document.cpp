@@ -246,7 +246,7 @@ void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFea
   } else { // extend array by one more element
     Handle(TDataStd_HLabelArray1) aNewArray = 
       new TDataStd_HLabelArray1(aRefs->Lower(), aRefs->Upper() + 1);
-    for(int a = aRefs->Lower(); a < aRefs->Upper(); a++) {
+    for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) {
       aNewArray->SetValue(a, aRefs->Value(a));
     }
     aNewArray->SetValue(aRefs->Upper() + 1, anObjLab);
