@@ -159,6 +159,8 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
     {
       int aOffset = historyOffset();
       FeaturePtr aFeature = myDocument->feature(FEATURES_GROUP, theIndex.row() - aOffset);
+      if (!aFeature)
+        return QVariant();
       switch (theRole) {
       case Qt::DisplayRole:
         if (aFeature)
