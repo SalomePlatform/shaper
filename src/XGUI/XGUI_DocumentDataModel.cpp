@@ -322,7 +322,10 @@ FeaturePtr XGUI_DocumentDataModel::feature(const QModelIndex& theIndex) const
 {
   if (theIndex.internalId() == PartsFolder)
     return FeaturePtr();
-
+  if (theIndex.internalId() == HistoryNode) {
+      int aOffset = historyOffset();
+      return myDocument->feature(FEATURES_GROUP, theIndex.row() - aOffset);
+  }
   QModelIndex aIndex = toSourceModelIndex(theIndex);
   if (!isSubModel(aIndex.model())) 
     return FeaturePtr();
