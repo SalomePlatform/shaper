@@ -239,18 +239,20 @@ void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFea
   TDataStd_Integer::Set(anObjLab, myFeatures[aGroup].size());
   myFeatures[aGroup].push_back(theFeature);
   // store feature in the history of features array
-  Handle(TDataStd_ReferenceArray) aRefs;
-  if (!groupLabel(FEATURES_GROUP).FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
-    aRefs = TDataStd_ReferenceArray::Set(groupLabel(FEATURES_GROUP), 0, 0);
-    aRefs->SetValue(0, anObjLab);
-  } else { // extend array by one more element
-    Handle(TDataStd_HLabelArray1) aNewArray = 
-      new TDataStd_HLabelArray1(aRefs->Lower(), aRefs->Upper() + 1);
-    for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) {
-      aNewArray->SetValue(a, aRefs->Value(a));
+  if (theFeature->isInHistory()) {
+    Handle(TDataStd_ReferenceArray) aRefs;
+    if (!groupLabel(FEATURES_GROUP).FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
+      aRefs = TDataStd_ReferenceArray::Set(groupLabel(FEATURES_GROUP), 0, 0);
+      aRefs->SetValue(0, anObjLab);
+    } else { // extend array by one more element
+      Handle(TDataStd_HLabelArray1) aNewArray = 
+        new TDataStd_HLabelArray1(aRefs->Lower(), aRefs->Upper() + 1);
+      for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) {
+        aNewArray->SetValue(a, aRefs->Value(a));
+      }
+      aNewArray->SetValue(aRefs->Upper() + 1, anObjLab);
+      aRefs->SetInternalArray(aNewArray);
     }
-    aNewArray->SetValue(aRefs->Upper() + 1, anObjLab);
-    aRefs->SetInternalArray(aNewArray);
   }
 
   // event: feature is added

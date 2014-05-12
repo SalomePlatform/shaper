@@ -64,6 +64,25 @@ boost::shared_ptr<ModelAPI_Feature> XGUI_Displayer::GetFeature(const TopoDS_Shap
   return aFeature;
 }
 
+std::list<XGUI_ViewerPrs> XGUI_Displayer::GetViewerPrs
+                                                (const NCollection_List<TopoDS_Shape>& theShapes)
+{
+  std::list<XGUI_ViewerPrs> aPresentations;
+  if (theShapes.IsEmpty())
+    return aPresentations;
+
+  NCollection_List<TopoDS_Shape>::Iterator anIt(theShapes);
+  for (; anIt.More(); anIt.Next()) {
+    const TopoDS_Shape& aShape = anIt.Value();
+    if (aShape.IsNull())
+      continue;
+    boost::shared_ptr<ModelAPI_Feature> aFeature = GetFeature(aShape);
+    aPresentations.push_back(XGUI_ViewerPrs(aFeature, aShape));
+  }
+
+  return aPresentations;
+}
+
 void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
                            const bool isUpdateViewer)
 {

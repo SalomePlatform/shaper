@@ -13,6 +13,7 @@ class ModelAPI_AttributeDocRef;
 class ModelAPI_AttributeDouble;
 class ModelAPI_AttributeReference;
 class ModelAPI_AttributeRefAttr;
+class ModelAPI_AttributeRefList;
 class ModelAPI_Document;
 class ModelAPI_Attribute;
 
@@ -40,6 +41,8 @@ public:
   virtual boost::shared_ptr<ModelAPI_AttributeReference> reference(const std::string theID) = 0;
   /// Returns the attribute that contains reference to an attribute of a feature
   virtual boost::shared_ptr<ModelAPI_AttributeRefAttr> refattr(const std::string theID) = 0;
+  /// Returns the attribute that contains list of references to features
+  virtual boost::shared_ptr<ModelAPI_AttributeRefList> reflist(const std::string theID) = 0;
 
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute

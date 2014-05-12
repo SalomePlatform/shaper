@@ -34,11 +34,12 @@ public:
   /// \return the selection mode
   virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
-  /// Gives the current selected objects to be processed by the operation
-  /// \param theFeature the selected feature
-  /// \param theShape the selected shape
-  virtual void setSelected(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                           const TopoDS_Shape& theShape);
+  /// Processes the mouse release in the point
+  /// \param thePoint a point clicked in the viewer
+  /// \param theEvent the mouse event
+  /// \param theSelected the list of selected presentations
+  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
+                             const std::list<XGUI_ViewerPrs>& theSelected);
 
 signals:
   /// signal about the sketch plane is selected

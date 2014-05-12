@@ -37,6 +37,9 @@ public:
   /// Computes or recomputes the result
   MODELAPI_EXPORT virtual void execute() = 0;
 
+  /// Returns true if this feature must be displayed in the history (top level of Part tree)
+  MODELAPI_EXPORT virtual bool isInHistory() {return true;}
+
   /// Returns the data manager of this feature
   MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Data> data() {return myData;}
 

@@ -54,7 +54,8 @@ void PartSet_OperationSketchLine::init(boost::shared_ptr<ModelAPI_Feature> theFe
   myInitPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
 }
 
-void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView)
+void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
+                                                const std::list<XGUI_ViewerPrs>& theSelected)
 {
   gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
   switch (myPointSelectionMode)
