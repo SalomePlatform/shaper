@@ -72,6 +72,10 @@ protected:
   /// Before the feature is aborted, it should be hidden from the viewer
   virtual void abortOperation();
 
+  /// Virtual method called when operation stopped - committed or aborted.
+  /// Restore the multi selection state
+  virtual void stopOperation();
+
   /// Creates an operation new feature
   /// In addition to the default realization it appends the created line feature to
   /// the sketch feature
@@ -79,6 +83,18 @@ protected:
   virtual boost::shared_ptr<ModelAPI_Feature> createFeature();
 
 protected:
+  /// \brief Get the line point 2d coordinates.
+  /// \param theFeature the line feature
+  /// \param theAttribute the start or end attribute of the line
+  /// \param theX the horizontal coordinate
+  /// \param theY the vertical coordinate
+  void getLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature, const std::string& theAttribute,
+                    double& theX, double& theY);
+  /// \brief Save the point to the line.
+  /// \param theX the horizontal coordinate
+  /// \param theY the vertical coordinate
+  /// \param theAttribute the start or end attribute of the line
+  void setLinePoint(double theX, double theY, const std::string& theAttribute);
   /// \brief Save the point to the line.
   /// \param thePoint the 3D point in the viewer
   /// \param theAttribute the start or end attribute of the line
