@@ -40,11 +40,15 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
   aMdiArea->addAction(aAction);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(cascadeWindows()));
 
+  aAction = new QAction(aMdiArea);
+  aAction->setSeparator(true);
+  aMdiArea->addAction(aAction);
+
   myViewer = new XGUI_Viewer(this);
   connect(myViewer, SIGNAL(viewCreated(XGUI_ViewWindow*)), 
           this, SLOT(onViewCreated(XGUI_ViewWindow*)));
   connect(myViewer, SIGNAL(deleteView(XGUI_ViewWindow*)), 
-          this, SLOT(onViewCreated(XGUI_ViewWindow*)));
+          this, SLOT(onDeleteView(XGUI_ViewWindow*)));
 }
 
 XGUI_MainWindow::~XGUI_MainWindow(void)
@@ -129,13 +133,8 @@ void XGUI_MainWindow::onViewCreated(XGUI_ViewWindow* theWindow)
 {
   QWidget* aSubWindow = theWindow->parentWidget();
   QWidget* aMDIWidget = centralWidget();
-  QAction* aAction;
-  if (aMDIWidget->actions().size() == 3) {
-    aAction = new QAction(aMDIWidget);
-    aAction->setSeparator(true);
-    aMDIWidget->addAction(aAction);
-  }
-  aAction = new QAction(aSubWindow->windowTitle(), aMDIWidget);
+
+  QAction* aAction = new QAction(aSubWindow->windowTitle(), aMDIWidget);
   aAction->setCheckable(true);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(activateView()));
   aMDIWidget->addAction(aAction);
