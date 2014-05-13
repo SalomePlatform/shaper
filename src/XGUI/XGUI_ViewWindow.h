@@ -195,6 +195,8 @@ protected:
 
   virtual void showEvent(QShowEvent* theEvent);
 
+  virtual void contextMenuEvent(QContextMenuEvent* theEvent);
+
 private slots:
   void onClose();
   void onMinimize();

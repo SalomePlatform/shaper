@@ -295,7 +295,6 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
   connect(myViewPort, SIGNAL(vpUpdated()), this, SLOT(updateToolBar()));
   connect(this, SIGNAL(vpTransformationFinished(XGUI_ViewWindow::OperationType)), 
           this, SLOT(updateToolBar()));
-
 }
 
 //****************************************************************
@@ -678,6 +677,13 @@ void XGUI_ViewWindow::vpMousePressEvent(QMouseEvent* theEvent)
 }
 
 //****************************************************************
+void XGUI_ViewWindow::contextMenuEvent(QContextMenuEvent* theEvent)
+{
+  QFrame::contextMenuEvent(theEvent);
+  emit contextMenuRequested(theEvent);
+}
+
+//****************************************************************
 void XGUI_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
 {
   switch(myOperation) {
@@ -693,10 +699,6 @@ void XGUI_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
      }
      */
     emit mouseReleased(this, theEvent);
-    if (theEvent->button() == Qt::RightButton && prevState == -1) {
-      QContextMenuEvent aEvent(QContextMenuEvent::Mouse, theEvent->pos(), theEvent->globalPos());
-      emit contextMenuRequested(&aEvent);
-    }
   }
     break;
   case ROTATE:
