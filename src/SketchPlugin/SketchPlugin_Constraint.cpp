@@ -28,8 +28,8 @@ void SketchPlugin_Constraint::addConstrainedObject(
 {
   if (!data()->attribute(theAttrID).get())
     data()->addAttribute(theAttrID, theReference->type());
-  boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-    data()->attribute(theAttrID))->setValue(theReference->value());
+  //boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+  //  data()->attribute(theAttrID))->setValue(theReference->value());
 }
 
 void SketchPlugin_Constraint::getSketchParameters(

@@ -67,8 +67,8 @@ void SketchPlugin_ConstraintDistance::setAttributes(
   // Assign reference to the first point
   myAttrList.push_back(CONSTRAINT_ATTR_POINT_A);
   data()->addAttribute(CONSTRAINT_ATTR_POINT_A, ModelAPI_AttributeRefAttr::type());
-  boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-    data()->attribute(CONSTRAINT_ATTR_POINT_A))->setValue(thePoint);
+  //boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+  //  data()->attribute(CONSTRAINT_ATTR_POINT_A))->setValue(thePoint);
 
   // Assign reference to the entity
   std::string aCurAttr;
@@ -95,14 +95,14 @@ void SketchPlugin_ConstraintDistance::setAttributes(
   // Assign reference to the first point
   myAttrList.push_back(CONSTRAINT_ATTR_POINT_A);
   data()->addAttribute(CONSTRAINT_ATTR_POINT_A, ModelAPI_AttributeRefAttr::type());
-  boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-    data()->attribute(CONSTRAINT_ATTR_POINT_A))->setValue(thePointA);
+  //boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+  //  data()->attribute(CONSTRAINT_ATTR_POINT_A))->setValue(thePointA);
 
   // Assign reference to the second point
   myAttrList.push_back(CONSTRAINT_ATTR_POINT_B);
   data()->addAttribute(CONSTRAINT_ATTR_POINT_B, ModelAPI_AttributeRefAttr::type());
-  boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-    data()->attribute(CONSTRAINT_ATTR_POINT_B))->setValue(thePointB);
+  //boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+  //  data()->attribute(CONSTRAINT_ATTR_POINT_B))->setValue(thePointB);
 }
 
 void SketchPlugin_ConstraintDistance::setAttributes(

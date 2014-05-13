@@ -20,13 +20,23 @@
 class Model_AttributeRefAttr : public ModelAPI_AttributeRefAttr
 {
   Handle_TDF_Reference myRef; ///< reference to the feature label
-  Handle_TDataStd_Comment myID; ///< ID of the referenced attirbute
+   ///< ID of the referenced attirbute (empty if this is a reference to a feature)
+  Handle_TDataStd_Comment myID;
 public:
-  /// Defines the attribute referenced from this attribute
-  MODEL_EXPORT virtual void setValue(boost::shared_ptr<ModelAPI_Attribute> theAttr);
+  /// Returns true if this attribute references to a feature (not to the attribute)
+  MODEL_EXPORT virtual bool isFeature();
+
+  /// Defines the reference to the attribute
+  MODEL_EXPORT virtual void setAttr(boost::shared_ptr<ModelAPI_Attribute> theAttr);
 
   /// Returns attribute referenced from this attribute
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> value();
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attr();
+
+  /// Defines the reference to the feature
+  MODEL_EXPORT virtual void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
+
+  /// Returns feature referenced from this attribute
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> feature();
 
 protected:
   /// Objects are created for features automatically
