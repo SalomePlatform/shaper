@@ -90,7 +90,7 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
           PartSet_Tools::ConvertTo2D(aPoint, mySketch, theView, X1, Y1);
 
           double aX, anY;
-          PartSet_Tools::IntersectLines(X0, X1, X2, X3, Y0, Y1, Y2, Y3, aX, anY);
+          PartSet_Tools::IntersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, aX, anY);
 
           setLinePoint(aX, anY, LINE_ATTR_END);
           commit();
