@@ -54,7 +54,7 @@ public:
   { /* do nothing */ }
 
   /// \brief Use plugin manager for features creation
-  SketchPlugin_ConstraintDistance();
+  SKETCHPLUGIN_EXPORT SketchPlugin_ConstraintDistance();
 
   /** \brief Initializes the attributes of the constraint
    *

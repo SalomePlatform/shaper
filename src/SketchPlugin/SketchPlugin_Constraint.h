@@ -49,6 +49,11 @@ public:
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
   {static std::string MY_GROUP = "Sketch"; return MY_GROUP;}
 
+  /// Returns the sketch preview
+  /// \param theSketch the owner of this feature
+  /// \return the built preview
+  SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
+
   /** \brief Adds sub-feature of the higher level feature (sub-element of the sketch)
    *  \param theFeature sub-feature
    */
@@ -56,16 +61,26 @@ public:
     const boost::shared_ptr<ModelAPI_Feature>& theFeature) {}
 
   /** \brief Adds an object of the constraint. The object added by the reference.
-   *  \param theReference reference to the feature, which will be constrained
+   *  \param[in] theAttrID    identifier of the attribute
+   *  \param[in] theReference reference to the feature, which will be constrained
    */
   SKETCHPLUGIN_EXPORT virtual void addConstrainedObject(
+    const std::string&                                    theAttrID,
     const boost::shared_ptr<ModelAPI_AttributeReference>& theReference);
 
   /** \brief Adds an object of the constraint. The object added by the reference to its attribute.
-   *  \param theReference reference to the attribute feature, which will be constrained
+   *  \param[in] theAttrID    identifier of the attribute
+   *  \param[in] theReference reference to the attribute feature, which will be constrained
    */
   SKETCHPLUGIN_EXPORT virtual void addConstrainedObject(
+    const std::string&                                  theAttrID,
     const boost::shared_ptr<ModelAPI_AttributeRefAttr>& theReference);
+
+  /** \brief Prepares list of attributes of current sketch workplane
+   *  \param[out] theParams list of attributes
+   */
+  SKETCHPLUGIN_EXPORT void getSketchParameters(
+    std::list< boost::shared_ptr<ModelAPI_Attribute> >& theParams);
 
   /// \brief Use plugin manager for features creation
   SketchPlugin_Constraint() {}
