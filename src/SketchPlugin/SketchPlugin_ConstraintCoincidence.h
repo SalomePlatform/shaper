@@ -1,27 +1,27 @@
-// File:    SketchPlugin_ConstraintPointsCoincident.h
+// File:    SketchPlugin_ConstraintCoincidence.h
 // Created: 08 May 2014
 // Author:  Artem ZHIDKOV
 
-#ifndef SketchPlugin_ConstraintPointsCoincident_HeaderFile
-#define SketchPlugin_ConstraintPointsCoincident_HeaderFile
+#ifndef SketchPlugin_ConstraintCoincidence_HeaderFile
+#define SketchPlugin_ConstraintCoincidence_HeaderFile
 
 #include "SketchPlugin.h"
 #include "SketchPlugin_Constraint.h"
 #include <list>
 
 
-/** \class SketchPlugin_ConstraintPointsCoincident
+/** \class SketchPlugin_ConstraintCoincidence
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint which defines equvalence of two points
  *
  *  These constraint has two attributes: CONSTRAINT_ATTR_POINT_A and CONSTRAINT_ATTR_POINT_B
  */
-class SketchPlugin_ConstraintPointsCoincident: public SketchPlugin_Constraint
+class SketchPlugin_ConstraintCoincidence: public SketchPlugin_Constraint
 {
 public:
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "SketchConstraintPointsCoincident"; return MY_KIND;}
+  {static std::string MY_KIND = "SketchConstraintCoincidence"; return MY_KIND;}
 
   /// \brief Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
@@ -37,7 +37,7 @@ public:
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
   /// \brief Use plugin manager for features creation
-  SketchPlugin_ConstraintPointsCoincident();
+  SketchPlugin_ConstraintCoincidence();
 };
 
 #endif

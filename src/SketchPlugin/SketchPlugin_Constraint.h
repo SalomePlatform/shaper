@@ -18,20 +18,25 @@
  *    The "entityA" and "entityB" represents any other object (and a point too).
  *    And the "valA" represents a real value.
  *
- *    The attributes below are named corresponding to the SolveSpace, 
- *    some of them may be unused. The list of used attributes is defined 
- *    inside the certain constraint.
+ *    The attributes below are named independent of the SolveSpace.
+ *    Some of them may be unused. 
+ *
+ *    Also the list of possible attributes is provided to simplify assignment.
  */
 /// The value parameter for the constraint
-const std::string CONSTRAINT_ATTR_VALUE("ConstraintValueA");
-/// First point for the constraint
-const std::string CONSTRAINT_ATTR_POINT_A("ConstraintPointA");
-/// Second point for the constraint
-const std::string CONSTRAINT_ATTR_POINT_B("ConstraintPointB");
+const std::string CONSTRAINT_ATTR_VALUE("ConstraintValue");
 /// First entity for the constraint
 const std::string CONSTRAINT_ATTR_ENTITY_A("ConstraintEntityA");
 /// Second entity for the constraint
 const std::string CONSTRAINT_ATTR_ENTITY_B("ConstraintEntityB");
+/// Third entity for the constraint
+const std::string CONSTRAINT_ATTR_ENTITY_C("ConstraintEntityC");
+/// Fourth entity for the constraint
+const std::string CONSTRAINT_ATTR_ENTITY_D("ConstraintEntityD");
+/// List of constraint attributes
+const std::string CONSTRAINT_ATTRIBUTES[4] = 
+                      {CONSTRAINT_ATTR_ENTITY_A, CONSTRAINT_ATTR_ENTITY_B, 
+                       CONSTRAINT_ATTR_ENTITY_C, CONSTRAINT_ATTR_ENTITY_D};
 
 
 /** \class SketchPlugin_Constraint
