@@ -9,18 +9,27 @@
 
 /**\class ModelAPI_AttributeRefAttr
  * \ingroup DataModel
- * \brief Attribute that contains reference to an attribute of a feature 
- * (located in the same document).
+ * \brief Attribute that contains reference to an attribute of a feature or reference to 
+ * a feature (switchable)
  */
 
 class ModelAPI_AttributeRefAttr : public ModelAPI_Attribute
 {
 public:
-  /// Defines the attribute referenced from this attribute
-  MODELAPI_EXPORT virtual void setValue(boost::shared_ptr<ModelAPI_Attribute> theAttr) = 0;
+  /// Returns true if this attribute references to a feature (not to the attribute)
+  MODELAPI_EXPORT virtual bool isFeature() = 0;
+
+  /// Defines the reference to the attribute
+  MODELAPI_EXPORT virtual void setAttr(boost::shared_ptr<ModelAPI_Attribute> theAttr) = 0;
 
   /// Returns attribute referenced from this attribute
-  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> value() = 0;
+  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attr() = 0;
+
+  /// Defines the reference to the feature
+  MODELAPI_EXPORT virtual void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
+
+  /// Returns feature referenced from this attribute
+  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> feature() = 0;
 
   /// Returns the type of this class of attributes
   MODELAPI_EXPORT static std::string type() {return "RefAttr";}

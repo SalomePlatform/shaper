@@ -16,7 +16,7 @@ void GeomData_Point::setValue(const double theX, const double theY, const double
     myCoords->SetValue(1, theY);
     myCoords->SetValue(2, theZ);
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-    Model_FeatureUpdatedMessage aMsg(feature(), anEvent);
+    Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
     Events_Loop::loop()->send(aMsg);
   }
 }

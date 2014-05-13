@@ -4,20 +4,29 @@
 
 #include <PartSet_Tools.h>
 
+#include <ModelAPI_Data.h>
+#include <ModelAPI_AttributeDouble.h>
+
+#include <GeomDataAPI_Point.h>
+#include <GeomDataAPI_Dir.h>
+
+#include <GeomAPI_Dir.h>
+#include <GeomAPI_XYZ.h>
+
+#include <SketchPlugin_Sketch.h>
+
 #include <V3d_View.hxx>
 #include <gp_Pln.hxx>
 #include <ProjLib.hxx>
 #include <ElSLib.hxx>
-
-#include <ModelAPI_Data.h>
-#include <ModelAPI_AttributeDouble.h>
-#include <GeomDataAPI_Point.h>
-#include <GeomDataAPI_Dir.h>
-#include <SketchPlugin_Sketch.h>
+#include <Geom_Line.hxx>
+#include <GeomAPI_ProjectPointOnCurve.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
 #endif
+
+const double PRECISION_TOLERANCE = 0.000001;
 
 gp_Pnt PartSet_Tools::ConvertClickToPoint(QPoint thePoint, Handle(V3d_View) theView)
 {
@@ -80,12 +89,53 @@ void PartSet_Tools::ConvertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelA
                   boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_NORM));
     gp_Vec aNormalVec(aNormal->x(), aNormal->y(), aNormal->z());
 
-    double aDen = anEyeVec*aNormalVec;
-    double aLVec = aDen != 0 ? aVec*aNormalVec/aDen : aVec*aNormalVec;
+    double aDen = anEyeVec * aNormalVec;
+    double aLVec = aDen != 0 ? aVec * aNormalVec / aDen : DBL_MAX;
 
     gp_Vec aDeltaVec = anEyeVec*aLVec;
     aVec = aVec - aDeltaVec;
   }
   theX = aVec.X() * aX->x() + aVec.Y() * aX->y() + aVec.Z() * aX->z();
   theY = aVec.X() * anY->x() + aVec.Y() * anY->y() + aVec.Z() * anY->z();
+}
+
+void PartSet_Tools::IntersectLines(double theX0, double theY0, double theX1, double theY1,
+                                   double theX2, double theY2, double theX3, double theY3,
+                                   double& theX, double& theY)
+{
+  double aV1 = theX1 - theX0, aV2 = theY1 - theY0;
+  double aW1 = theX3 - theX2, aW2 = theY3 - theY2;
+
+  double aT2 = 0;
+  if (aV1  != 0 && aV2 != 0)
+    aT2 = (( theY2 - theY0 )/aV2 - ( theX2 - theX0 )/aV1) / ( aW1/aV1 - aW2/aV2 );
+  else
+    aT2 = DBL_MAX;
+
+  theX  = theX2 + aT2*aW1;
+  theY = theY2 + aT2*aW2;
+
+  // the coordinates of two lines are on the common line
+  //It is not possible to use Precision::Confusion(), because it is e-0.8, but V is sometimes e-6
+  Standard_Real aPrec = PRECISION_TOLERANCE;
+  if (fabs(theX - theX0) < aPrec && fabs(theY - theY0) < aPrec) {
+    ProjectPointOnLine(theX2, theY2, theX3, theY3, theX1, theY1, theX, theY);    
+  }
+}
+
+void PartSet_Tools::ProjectPointOnLine(double theX1, double theY1, double theX2, double theY2,
+                                       double thePointX, double thePointY, double& theX, double& theY)
+{
+  theX = theY = 0;
+
+  Handle(Geom_Line) aLine = new Geom_Line(gp_Pnt(theX1, theY1, 0),
+                                     gp_Dir(gp_Vec(gp_Pnt(theX1, theY1, 0), gp_Pnt(theX2, theY2, 0))));
+  GeomAPI_ProjectPointOnCurve aProj(gp_Pnt(thePointX, thePointY, 0), aLine);
+
+  Standard_Integer aNbPoint = aProj.NbPoints();
+  if (aNbPoint > 0) {
+    gp_Pnt aPoint = aProj.Point(1);
+    theX = aPoint.X();
+    theY = aPoint.Y();
+  }
 }

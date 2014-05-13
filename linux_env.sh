@@ -68,6 +68,10 @@ export LIBXML2_INCLUDE_DIR=${LIBXML2_ROOT_DIR}/include/libxml2
 export LIBXML2_LIB_DIR=${LIBXML2_ROOT_DIR}/lib
 export LIBXML2_BIN_DIR=${LIBXML2_ROOT_DIR}/bin
 ##
+#------ SolveSpace ------
+export SOLVESPACE_ROOT_DIR=${PDIR}/solvespace-2.0
+export LD_LIBRARY_PATH=${SOLVESPACE_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
+##
 #------ OCCT ------
 export CAS_ROOT_DIR=${PDIR}/OCCT-6.7.0
 
