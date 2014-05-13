@@ -13,6 +13,7 @@
 #include <QAction>
 #include <QDockWidget>
 #include <QApplication>
+#include <QTimer>
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     : QMainWindow(parent), 
@@ -171,15 +172,18 @@ void XGUI_MainWindow::activateView()
   QMdiArea* aMdiArea = static_cast<QMdiArea*>(centralWidget());
 
   QList<QMdiSubWindow*> aWndList = aMdiArea->subWindowList();
+  QMdiSubWindow* aTargetView = 0;
   foreach(QMdiSubWindow* aWnd, aWndList) {
     if (aWnd->windowTitle() == aWndTitle) {
       aWnd->raise();
       aWnd->activateWindow();
-      aWnd->setFocus();
+      aTargetView = aWnd;
       break;
     }
   }
   QApplication::processEvents();
+  if (aTargetView)
+    QTimer::singleShot(20, aTargetView, SLOT(setFocus()));
 }
 
 void XGUI_MainWindow::onViewActivated(QMdiSubWindow* theSubWnd)
