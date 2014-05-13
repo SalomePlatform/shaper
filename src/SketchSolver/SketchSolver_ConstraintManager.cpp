@@ -7,7 +7,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
 #include <SketchPlugin_Constraint.h>
-#include <SketchPlugin_ConstraintPointsCoincident.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_Line.h>
 
 
@@ -106,17 +106,18 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addConstraint
   if (aDistAttr.get())
     aDistance = aDistAttr->value();
 
+  /// \todo Specify the entities
   Slvs_hEntity aPtA, aPtB, aEntityA, aEntityB; // parameters of the constraint
-  boost::shared_ptr<ModelAPI_Attribute> aEntAttr = theConstraint->data()->attribute(CONSTRAINT_ATTR_POINT_A);
+  boost::shared_ptr<ModelAPI_Attribute> aEntAttr = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_A);
   aPtA = addEntity(aEntAttr);
   if (aPtA == 0) return false;
-  aEntAttr = theConstraint->data()->attribute(CONSTRAINT_ATTR_POINT_B);
+  aEntAttr = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_B);
   aPtB = addEntity(aEntAttr);
   if (aPtB == 0) return false;
-  aEntAttr = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_A);
+  aEntAttr = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_C);
   aEntityA = addEntity(aEntAttr);
   if (aEntityA == 0) return false;
-  aEntAttr = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_B);
+  aEntAttr = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_D);
   aEntityB = addEntity(aEntAttr);
   if (aEntityB == 0) return false;
 
