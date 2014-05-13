@@ -4,12 +4,19 @@
 
 #include "SketchSolver_ConstraintManager.h"
 
+#include <Events_Loop.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
+#include <Model_Events.h>
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Sketch.h>
 
+SketchSolver_ConstraintManager* SketchSolver_ConstraintManager::_self = 0;
+
+/// Global constaint manager object
+SketchSolver_ConstraintManager* myManager = SketchSolver_ConstraintManager::Instance();
 
 /// This value is used to give unique index to the groups
 static Slvs_hGroup myGroupIndexer = 0;
@@ -17,15 +24,99 @@ static Slvs_hGroup myGroupIndexer = 0;
 // ========================================================
 // ========= SketchSolver_ConstraintManager ===============
 // ========================================================
+SketchSolver_ConstraintManager* SketchSolver_ConstraintManager::Instance()
+{
+  if (!_self)
+    _self = new SketchSolver_ConstraintManager();
+  return _self;
+}
+
 SketchSolver_ConstraintManager::SketchSolver_ConstraintManager()
 {
   myGroups.clear();
+
+  // Register in event loop
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
 }
 
 SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
 {
   myGroups.clear();
 }
+
+void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessage)
+{
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED))
+  {
+    const Model_FeatureUpdatedMessage* aCreateMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+
+    // Only sketches and constraints can be added by Create event
+    boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
+      boost::dynamic_pointer_cast<SketchPlugin_Sketch>(aCreateMsg->feature());
+    if (aSketch)
+    {
+      addWorkplane(aSketch);
+      return ;
+    }
+    boost::shared_ptr<SketchPlugin_Constraint> aConstraint = 
+      boost::dynamic_pointer_cast<SketchPlugin_Constraint>(aCreateMsg->feature());
+    if (aConstraint)
+    {
+      addConstraint(aConstraint);
+      return ;
+    }
+  }
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED))
+  {
+    const Model_FeatureDeletedMessage* aDeleteMsg = dynamic_cast<const Model_FeatureDeletedMessage*>(theMessage);
+    /// \todo Implement deleting objects on event
+  }
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED))
+  {
+    const Model_FeatureUpdatedMessage* aUpdateMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+
+    boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
+      boost::dynamic_pointer_cast<SketchPlugin_Sketch>(aUpdateMsg->feature());
+    if (aSketch)
+    {
+      updateWorkplane(aSketch);
+      return ;
+    }
+
+    boost::shared_ptr<SketchPlugin_Constraint> aConstraint = 
+      boost::dynamic_pointer_cast<SketchPlugin_Constraint>(aUpdateMsg->feature());
+    if (aConstraint)
+    {
+      updateConstraint(aConstraint);
+      return ;
+    }
+
+    boost::shared_ptr<SketchPlugin_Feature> aFeature = 
+      boost::dynamic_pointer_cast<SketchPlugin_Feature>(aUpdateMsg->feature());
+    if (aFeature)
+      updateEntity(aFeature);
+  }
+}
+
+
+bool SketchSolver_ConstraintManager::addWorkplane(boost::shared_ptr<SketchPlugin_Sketch> theSketch)
+{
+  // Check the specified workplane is already used
+  std::vector<SketchSolver_ConstraintGroup>::const_iterator aGroupIter;
+  for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
+    if (aGroupIter->isBaseWorkplane(theSketch))
+      return true;
+  // Create new group for workplane
+  SketchSolver_ConstraintGroup aNewGroup(theSketch);
+  // Verify that the group is created successfully
+  if (!aNewGroup.isBaseWorkplane(theSketch))
+    return false;
+  myGroups.push_back(aNewGroup);
+  return true;
+}
+
 
 void SketchSolver_ConstraintManager::findGroups(
               boost::shared_ptr<SketchPlugin_Constraint> theConstraint, 
@@ -42,7 +133,8 @@ void SketchSolver_ConstraintManager::findGroups(
 // =========  SketchSolver_ConstraintGroup  ===============
 // ========================================================
 
-SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::SketchSolver_ConstraintGroup()
+SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::
+  SketchSolver_ConstraintGroup(boost::shared_ptr<SketchPlugin_Sketch> theWorkplane)
   : myID(++myGroupIndexer),
     myParamMaxID(0),
     myEntityMaxID(0),
@@ -53,14 +145,15 @@ SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::SketchSolver_Const
   myEntities.clear();
   myConstraints.clear();
 
-  // The workplane will be initialized on first constraint, so its handle is NULL meanwhile
-  myWorkplane.h = 0;
-
   // Nullify all elements of the set of equations
   myConstrSet.param = 0;
   myConstrSet.entity = 0;
   myConstrSet.constraint = 0;
   myConstrSet.failed = 0;
+
+  // Initialize workplane
+  mySketch = theWorkplane;
+  addWorkplane(theWorkplane);
 }
 
 SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::~SketchSolver_ConstraintGroup()
@@ -78,6 +171,12 @@ SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::~SketchSolver_Cons
     delete [] myConstrSet.constraint;
   if (myConstrSet.failed)
     delete [] myConstrSet.failed;
+}
+
+bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::isBaseWorkplane(
+                boost::shared_ptr<SketchPlugin_Sketch> theWorkplane) const
+{
+  return theWorkplane == mySketch;
 }
 
 bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::isInteract(
@@ -143,7 +242,7 @@ Slvs_hEntity SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addEn
 }
 
 bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addWorkplane(
-                std::list< boost::shared_ptr<ModelAPI_Attribute> >& theParams)
+                boost::shared_ptr<SketchPlugin_Sketch> theParams)
 {
   /// \todo Should be implemented
   return false;
