@@ -88,6 +88,10 @@ protected:
   void createConstraint(boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
                         boost::shared_ptr<GeomDataAPI_Point2D> thePoint2);
 
+  /// Creates constrains of the current 
+  /// \param theX the horizontal coordnate of the point
+  /// \param theY the vertical coordnate of the point
+  void setConstraints(double theX, double theY);
 protected:
   /// \brief Get the line point 2d coordinates.
   /// \param theFeature the line feature
@@ -96,6 +100,13 @@ protected:
   /// \param theY the vertical coordinate
   void getLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature, const std::string& theAttribute,
                     double& theX, double& theY);
+  /// Find a point in the line with given coordinates
+  /// \param theFeature the line feature
+  /// \param theX the horizontal point coordinate
+  /// \param theY the vertical point coordinate
+  boost::shared_ptr<GeomDataAPI_Point2D> findLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                                       double theX, double theY);
+
   /// \brief Save the point to the line.
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate

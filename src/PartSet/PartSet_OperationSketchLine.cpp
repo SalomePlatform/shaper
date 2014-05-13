@@ -7,10 +7,13 @@
 #include <PartSet_Tools.h>
 
 #include <SketchPlugin_Feature.h>
+#include <SketchPlugin_Sketch.h>
+
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeRefList.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -53,7 +56,13 @@ bool PartSet_OperationSketchLine::isGranted() const
 
 std::list<int> PartSet_OperationSketchLine::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
-  return std::list<int>();
+  std::list<int> aModes;
+  if (theFeature != feature())
+  {
+    aModes.push_back(TopAbs_VERTEX);
+    aModes.push_back(TopAbs_EDGE);
+  }
+  return aModes;
 }
 
 void PartSet_OperationSketchLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature)
@@ -84,6 +93,8 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
         if (!aVertex.IsNull()) {
           aPoint = BRep_Tool::Pnt(aVertex);
           PartSet_Tools::ConvertTo2D(aPoint, mySketch, theView, aX, anY);
+
+          setConstraints(aX, anY);
         }
       }
       else if (aShape.ShapeType() == TopAbs_EDGE) // the line is selected
@@ -197,7 +208,7 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature()
                                                                 (aData->attribute(LINE_ATTR_START));
     aPoint->setValue(myInitPoint->x(), myInitPoint->y());
 
-    //createConstraint(myInitPoint, aPoint);
+    createConstraint(myInitPoint, aPoint);
   }
 
   emit featureConstructed(aNewFeature, FM_Activation);
@@ -224,6 +235,37 @@ void PartSet_OperationSketchLine::createConstraint(boost::shared_ptr<GeomDataAPI
     aFeature->execute();
 }
 
+void PartSet_OperationSketchLine::setConstraints(double theX, double theY)
+{
+  std::string aPointArg;
+  switch (myPointSelectionMode)
+  {
+    case SM_FirstPoint:
+      aPointArg = LINE_ATTR_START;
+      break;
+    case SM_SecondPoint:
+      aPointArg = LINE_ATTR_END;
+      break;
+  }
+
+  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
+                                                              (aData->attribute(aPointArg));
+  aData = mySketch->data();
+  boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SKETCH_ATTR_FEATURES));
+
+  std::list<boost::shared_ptr<ModelAPI_Feature> > aFeatures = aRefList->list();
+  std::list<boost::shared_ptr<ModelAPI_Feature> >::const_iterator anIt = aFeatures.begin(),
+                                                                  aLast = aFeatures.end();
+  for (; anIt != aLast; anIt++) {
+    boost::shared_ptr<ModelAPI_Feature> aFeature = *anIt;
+    boost::shared_ptr<GeomDataAPI_Point2D> aFPoint = findLinePoint(aFeature, theX, theY);
+    if (aFPoint)
+      createConstraint(aFPoint, aPoint);
+  }
+}
+
 void PartSet_OperationSketchLine::getLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                                const std::string& theAttribute,
                                                double& theX, double& theY)
@@ -235,6 +277,27 @@ void PartSet_OperationSketchLine::getLinePoint(boost::shared_ptr<ModelAPI_Featur
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
   theX = aPoint->x();
   theY = aPoint->y();
+}
+
+boost::shared_ptr<GeomDataAPI_Point2D> PartSet_OperationSketchLine::findLinePoint(
+                                               boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                               double theX, double theY)
+{
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
+  if (!theFeature)
+    return aPoint2D;
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
+  if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
+    aPoint2D = aPoint;
+  else {
+    aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
+    if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
+      aPoint2D = aPoint;
+  }
+  return aPoint2D;
 }
 
 void PartSet_OperationSketchLine::setLinePoint(double theX, double theY,
