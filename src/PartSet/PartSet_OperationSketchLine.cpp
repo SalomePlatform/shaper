@@ -65,53 +65,59 @@ void PartSet_OperationSketchLine::init(boost::shared_ptr<ModelAPI_Feature> theFe
 void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
                                                 const std::list<XGUI_ViewerPrs>& theSelected)
 {
-  gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
+  double aX, anY;
 
-  if (!theSelected.empty()) {
+  gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
+  if (theSelected.empty()) {
+    PartSet_Tools::ConvertTo2D(aPoint, mySketch, theView, aX, anY);
+  }
+  else {
     XGUI_ViewerPrs aPrs = theSelected.front();
     const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull()) {
+    if (!aShape.IsNull()) // the point is selected
+    {
       if (aShape.ShapeType() == TopAbs_VERTEX) {
         const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
-        if (!aVertex.IsNull())
+        if (!aVertex.IsNull()) {
           aPoint = BRep_Tool::Pnt(aVertex);
+          PartSet_Tools::ConvertTo2D(aPoint, mySketch, theView, aX, anY);
+        }
       }
-      else if (aShape.ShapeType() == TopAbs_EDGE) {
+      else if (aShape.ShapeType() == TopAbs_EDGE) // the line is selected
+      {
         boost::shared_ptr<ModelAPI_Feature> aFeature = aPrs.feature();
-        if (!aFeature)
-          return;
-        double X0, X1, X2, X3;
-        double Y0, Y1, Y2, Y3;
-        getLinePoint(aFeature, LINE_ATTR_START, X2, Y2);
-        getLinePoint(aFeature, LINE_ATTR_END, X3, Y3);
-
-        if (myPointSelectionMode == SM_SecondPoint) {
-          getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
+        if (aFeature) {
+          double X0, X1, X2, X3;
+          double Y0, Y1, Y2, Y3;
+          getLinePoint(aFeature, LINE_ATTR_START, X2, Y2);
+          getLinePoint(aFeature, LINE_ATTR_END, X3, Y3);
           PartSet_Tools::ConvertTo2D(aPoint, mySketch, theView, X1, Y1);
 
-          double aX, anY;
-          PartSet_Tools::IntersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, aX, anY);
-
-          setLinePoint(aX, anY, LINE_ATTR_END);
-          commit();
-          emit featureConstructed(feature(), FM_Deactivation);
-          emit launchOperation(PartSet_OperationSketchLine::Type(), feature());
-          return;
+          switch (myPointSelectionMode) {
+            case SM_FirstPoint:
+              PartSet_Tools::ProjectPointOnLine(X2, Y2, X3, Y3, X1, Y1, aX, anY);
+            break;
+            case SM_SecondPoint: {
+              getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
+              PartSet_Tools::IntersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, aX, anY);
+            }
+            break;
+            default:
+            break;
+          }
         }
-
       }
     }
   }
-
   switch (myPointSelectionMode)
   {
     case SM_FirstPoint: {
-      setLinePoint(aPoint, theView, LINE_ATTR_START);
+      setLinePoint(aX, anY, LINE_ATTR_START);
       myPointSelectionMode = SM_SecondPoint;
     }
     break;
     case SM_SecondPoint: {
-      setLinePoint(aPoint, theView, LINE_ATTR_END);
+      setLinePoint(aX, anY, LINE_ATTR_END);
       commit();
       emit featureConstructed(feature(), FM_Deactivation);
       emit launchOperation(PartSet_OperationSketchLine::Type(), feature());
