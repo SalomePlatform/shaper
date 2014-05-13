@@ -4,18 +4,23 @@
 
 #include <PartSet_Tools.h>
 
+#include <ModelAPI_Data.h>
+#include <ModelAPI_AttributeDouble.h>
+
+#include <GeomDataAPI_Point.h>
+#include <GeomDataAPI_Dir.h>
+
+#include <GeomAPI_Dir.h>
+#include <GeomAPI_XYZ.h>
+
+#include <SketchPlugin_Sketch.h>
+
 #include <V3d_View.hxx>
 #include <gp_Pln.hxx>
 #include <ProjLib.hxx>
 #include <ElSLib.hxx>
-
-#include <ModelAPI_Data.h>
-#include <ModelAPI_AttributeDouble.h>
-#include <GeomDataAPI_Point.h>
-#include <GeomDataAPI_Dir.h>
-#include <GeomAPI_Dir.h>
-#include <GeomAPI_XYZ.h>
-#include <SketchPlugin_Sketch.h>
+#include <Geom_Line.hxx>
+#include <GeomAPI_ProjectPointOnCurve.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -94,8 +99,8 @@ void PartSet_Tools::ConvertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelA
   theY = aVec.X() * anY->x() + aVec.Y() * anY->y() + aVec.Z() * anY->z();
 }
 
-void PartSet_Tools::IntersectLines(double theX0, double theX1, double theX2, double theX3,
-                                   double theY0, double theY1, double theY2, double theY3,
+void PartSet_Tools::IntersectLines(double theX0, double theY0, double theX1, double theY1,
+                                   double theX2, double theY2, double theX3, double theY3,
                                    double& theX, double& theY)
 {
   double aV1 = theX1 - theX0, aV2 = theY1 - theY0;
@@ -114,28 +119,23 @@ void PartSet_Tools::IntersectLines(double theX0, double theX1, double theX2, dou
   //It is not possible to use Precision::Confusion(), because it is e-0.8, but V is sometimes e-6
   Standard_Real aPrec = PRECISION_TOLERANCE;
   if (fabs(theX - theX0) < aPrec && fabs(theY - theY0) < aPrec) {
-    ProjectPointOnLine(theX2, theX3, theY2, theY3, theX1, theY1, theX, theY);    
+    ProjectPointOnLine(theX2, theY2, theX3, theY3, theX1, theY1, theX, theY);    
   }
 }
 
-void PartSet_Tools::ProjectPointOnLine(double theX1, double theX2, double theY1, double theY2,
+void PartSet_Tools::ProjectPointOnLine(double theX1, double theY1, double theX2, double theY2,
                                        double thePointX, double thePointY, double& theX, double& theY)
 {
-  //GEOM_Line aLine(gp_Pnt(theX1, theY1), gp_Dir(gp_Vec(gp_Pnt(theX1, theY1), gp_Pnt(theX2, theY2))));
-  //GeomAPI_ProjectPointOnCurve aProj(gp_Pnt(thePointX, thePointY));
-  /*  
+  theX = theY = 0;
+
+  Handle(Geom_Line) aLine = new Geom_Line(gp_Pnt(theX1, theY1, 0),
+                                     gp_Dir(gp_Vec(gp_Pnt(theX1, theY1, 0), gp_Pnt(theX2, theY2, 0))));
+  GeomAPI_ProjectPointOnCurve aProj(gp_Pnt(thePointX, thePointY, 0), aLine);
+
   Standard_Integer aNbPoint = aProj.NbPoints();
   if (aNbPoint > 0) {
-    for (Standard_Integer j = 1; j <= aNbPoint && !isFound; j++) {
-      gp_Pnt aNewPoint = aProj.Point( j );
-      theParameter = aProj.Parameter( j );
-
-      int aX, anY;
-      CurveCreator_Utils::ConvertPointToClick( aNewPoint, theView, aX, anY );
-
-      isFound = isEqualPixels( aX, anY, theX, theY, SCENE_PIXEL_PROJECTION_TOLERANCE, theDelta );
-    }
+    gp_Pnt aPoint = aProj.Point(1);
+    theX = aPoint.X();
+    theY = aPoint.Y();
   }
-  return isFound;
-  */
 }
