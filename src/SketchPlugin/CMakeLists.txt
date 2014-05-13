@@ -17,7 +17,6 @@ SET(PROJECT_SOURCES
     SketchPlugin_Sketch.cpp
     SketchPlugin_Line.cpp
     SketchPlugin_Point.cpp
-    SketchPlugin_Constraint.cpp
     SketchPlugin_ConstraintPointsCoincident.cpp
 )
 
