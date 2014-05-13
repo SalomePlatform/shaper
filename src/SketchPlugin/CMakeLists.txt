@@ -8,7 +8,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_Line.h
     SketchPlugin_Point.h
     SketchPlugin_Constraint.h
-    SketchPlugin_ConstraintDistance.h
+    SketchPlugin_ConstraintPointsCoincident.h
 )
 
 SET(PROJECT_SOURCES
@@ -18,7 +18,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_Line.cpp
     SketchPlugin_Point.cpp
     SketchPlugin_Constraint.cpp
-    SketchPlugin_ConstraintDistance.cpp
+    SketchPlugin_ConstraintPointsCoincident.cpp
 )
 
 SET(PROJECT_LIBRARIES

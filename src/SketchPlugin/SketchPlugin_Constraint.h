@@ -37,6 +37,7 @@ const std::string CONSTRAINT_ATTR_ENTITY_B("ConstraintEntityB");
 /** \class SketchPlugin_Constraint
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint between other features.
+ *         Base class for all constraints.
  */
 class SketchPlugin_Constraint: public SketchPlugin_Feature
 {
@@ -49,47 +50,14 @@ public:
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
   {static std::string MY_GROUP = "Sketch"; return MY_GROUP;}
 
-  /// Returns the sketch preview
-  /// \param theSketch the owner of this feature
-  /// \return the built preview
-  SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
-
   /** \brief Adds sub-feature of the higher level feature (sub-element of the sketch)
    *  \param theFeature sub-feature
    */
   SKETCHPLUGIN_EXPORT virtual const void addSub(
     const boost::shared_ptr<ModelAPI_Feature>& theFeature) {}
 
-  /** \brief Adds an object of the constraint. The object added by the reference.
-   *  \param[in] theAttrID    identifier of the attribute
-   *  \param[in] theReference reference to the feature, which will be constrained
-   */
-  SKETCHPLUGIN_EXPORT virtual void addConstrainedObject(
-    const std::string&                                    theAttrID,
-    const boost::shared_ptr<ModelAPI_AttributeReference>& theReference);
-
-  /** \brief Adds an object of the constraint. The object added by the reference to its attribute.
-   *  \param[in] theAttrID    identifier of the attribute
-   *  \param[in] theReference reference to the attribute feature, which will be constrained
-   */
-  SKETCHPLUGIN_EXPORT virtual void addConstrainedObject(
-    const std::string&                                  theAttrID,
-    const boost::shared_ptr<ModelAPI_AttributeRefAttr>& theReference);
-
-  /** \brief Prepares list of attributes of current sketch workplane
-   *  \param[out] theParams list of attributes
-   */
-  SKETCHPLUGIN_EXPORT void getSketchParameters(
-    std::list< boost::shared_ptr<ModelAPI_Attribute> >& theParams);
-
   /// \brief Use plugin manager for features creation
   SketchPlugin_Constraint() {}
-
-protected:
-  /** \brief Returns the list of attributes for the certain type of constraint.
-   *  \return names of attributes
-   */
-  virtual const std::list<std::string>& getAttributesList() const = 0;
 };
 
 #endif

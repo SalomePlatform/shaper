@@ -7,7 +7,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
 #include <SketchPlugin_Constraint.h>
-#include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintPointsCoincident.h>
 #include <SketchPlugin_Line.h>
 
 
@@ -92,11 +92,11 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addConstraint
 {
   if (myWorkplane.h == 0)
   {
-    // Create workplane when first constraint is added
-    std::list< boost::shared_ptr<ModelAPI_Attribute> > aWPAttr;
-    theConstraint->getSketchParameters(aWPAttr);
-    if (!addWorkplane(aWPAttr))
-      return false;
+//    // Create workplane when first constraint is added
+//    std::list< boost::shared_ptr<ModelAPI_Attribute> > aWPAttr;
+//    theConstraint->getSketchParameters(aWPAttr);
+//    if (!addWorkplane(aWPAttr))
+//      return false;
   }
 
   // Create constraint parameters
@@ -151,42 +151,42 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addWorkplane(
 int SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::getConstraintType(
                 const boost::shared_ptr<SketchPlugin_Constraint>& theConstraint) const
 {
-  if (theConstraint->getKind() == SketchPlugin_ConstraintDistance().getKind())
-  {
-    boost::shared_ptr<ModelAPI_Attribute> aPtA  = theConstraint->data()->attribute(CONSTRAINT_ATTR_POINT_A);
-    boost::shared_ptr<ModelAPI_Attribute> aPtB  = theConstraint->data()->attribute(CONSTRAINT_ATTR_POINT_B);
-    boost::shared_ptr<ModelAPI_Attribute> aEntA = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_A);
-    boost::shared_ptr<ModelAPI_Attribute> aEntB = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_B);
-    boost::shared_ptr<ModelAPI_AttributeDouble> aDistance = 
-      boost::shared_dynamic_cast<ModelAPI_AttributeDouble>(theConstraint->data()->attribute(CONSTRAINT_ATTR_VALUE));
-    if (aPtA.get()) // ptA is an attribute of the constraint
-    {
-//      if (aEntA.get()) // entityA is an attribute of the constraint
+//  if (theConstraint->getKind() == SketchPlugin_ConstraintDistance().getKind())
+//  {
+//    boost::shared_ptr<ModelAPI_Attribute> aPtA  = theConstraint->data()->attribute(CONSTRAINT_ATTR_POINT_A);
+//    boost::shared_ptr<ModelAPI_Attribute> aPtB  = theConstraint->data()->attribute(CONSTRAINT_ATTR_POINT_B);
+//    boost::shared_ptr<ModelAPI_Attribute> aEntA = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_A);
+//    boost::shared_ptr<ModelAPI_Attribute> aEntB = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_B);
+//    boost::shared_ptr<ModelAPI_AttributeDouble> aDistance = 
+//      boost::shared_dynamic_cast<ModelAPI_AttributeDouble>(theConstraint->data()->attribute(CONSTRAINT_ATTR_VALUE));
+//    if (aPtA.get()) // ptA is an attribute of the constraint
+//    {
+////      if (aEntA.get()) // entityA is an attribute of the constraint
+////      {
+////        if (aEntA->feature()->getKind() == SketchPlugin_Line().getKind()) // entityA is a line
+////        {
+////          if (aEntB.get() && aEntB->feature()->getKind() == SketchPlugin_Line().getKind()) // entityB is a line too
+////            return SLVS_C_ANGLE;
+////          else if (aPtB.get()) // ptB is also an attribute of the constraint
+////            return SLVS_C_PROJ_PT_DISTANCE;
+////          else
+////            return SLVS_C_PT_LINE_DISTANCE;
+////        }
+////        /// \todo Implement other point-entity distances
+////      }
+////      else 
+//      if (aPtB.get()) // ptB is an attribute of the constrtaint => point-point distance
 //      {
-//        if (aEntA->feature()->getKind() == SketchPlugin_Line().getKind()) // entityA is a line
-//        {
-//          if (aEntB.get() && aEntB->feature()->getKind() == SketchPlugin_Line().getKind()) // entityB is a line too
-//            return SLVS_C_ANGLE;
-//          else if (aPtB.get()) // ptB is also an attribute of the constraint
-//            return SLVS_C_PROJ_PT_DISTANCE;
-//          else
-//            return SLVS_C_PT_LINE_DISTANCE;
-//        }
-//        /// \todo Implement other point-entity distances
+//        if (aDistance->value() == 0.0)
+//          return SLVS_C_POINTS_COINCIDENT;
+//        else 
+//          return SLVS_C_PT_PT_DISTANCE;
 //      }
-//      else 
-      if (aPtB.get()) // ptB is an attribute of the constrtaint => point-point distance
-      {
-        if (aDistance->value() == 0.0)
-          return SLVS_C_POINTS_COINCIDENT;
-        else 
-          return SLVS_C_PT_PT_DISTANCE;
-      }
-    }
-    else if (aEntA.get() && !aEntB.get() && !aPtB.get())
-      return SLVS_C_DIAMETER;
-    return SLVS_C_UNKNOWN;
-  }
+//    }
+//    else if (aEntA.get() && !aEntB.get() && !aPtB.get())
+//      return SLVS_C_DIAMETER;
+//    return SLVS_C_UNKNOWN;
+//  }
   /// \todo Implement other kind of constrtaints
 
   return SLVS_C_UNKNOWN;
