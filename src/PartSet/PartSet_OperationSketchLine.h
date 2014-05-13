@@ -82,6 +82,12 @@ protected:
   /// \returns the created feature
   virtual boost::shared_ptr<ModelAPI_Feature> createFeature();
 
+  /// Creates a constraint on two points
+  /// \param thePoint1 the first point
+  /// \param thePoint1 the second point
+  void createConstraint(boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
+                        boost::shared_ptr<GeomDataAPI_Point2D> thePoint2);
+
 protected:
   /// \brief Get the line point 2d coordinates.
   /// \param theFeature the line feature

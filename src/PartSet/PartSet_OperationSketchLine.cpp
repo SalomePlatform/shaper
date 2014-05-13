@@ -10,6 +10,9 @@
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_AttributeRefAttr.h>
+
+#include <SketchPlugin_Constraint.h>
 
 #include <Geom_Line.hxx>
 #include <gp_Lin.hxx>
@@ -193,10 +196,32 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature()
     boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                                                 (aData->attribute(LINE_ATTR_START));
     aPoint->setValue(myInitPoint->x(), myInitPoint->y());
+
+    //createConstraint(myInitPoint, aPoint);
   }
 
   emit featureConstructed(aNewFeature, FM_Activation);
   return aNewFeature;
+}
+
+void PartSet_OperationSketchLine::createConstraint(boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
+                                                   boost::shared_ptr<GeomDataAPI_Point2D> thePoint2)
+{
+  boost::shared_ptr<ModelAPI_Document> aDoc = document();
+  boost::shared_ptr<ModelAPI_Feature> aFeature = aDoc->addFeature("SketchConstraintCoincidence");
+
+  boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
+
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef1 =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
+  aRef1->setAttr(thePoint1);
+
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef2 =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_B));
+  aRef2->setAttr(thePoint2);
+
+  if (aFeature) // TODO: generate an error if feature was not created
+    aFeature->execute();
 }
 
 void PartSet_OperationSketchLine::getLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,

@@ -10,7 +10,7 @@
         <point_selector id="StartPoint" title="Start point" tooltip="Start point of the line"/>
         <point_selector id="EndPoint" title="End point" tooltip="End point of the line"/>
       </feature>
-      <feature id="SketchConstraintPointsCoincident" text="Points coincidence" tooltip="Create constraint for the coincidence of two points" icon="" />
+      <feature id="SketchConstraintCoincidence" text="Points coincidence" tooltip="Create constraint for the coincidence of two points" icon="" />
     </group>
   </workbench>
 </plugin>
