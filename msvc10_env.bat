@@ -126,6 +126,11 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @SET PATH=%BOOST_ROOT_DIR%\lib;%PATH%
 @REM -------------------------
 
+@REM -------------------------
+@SET SOLVESPACE_ROOT_DIR=%PDIR%\solvespace-2.0
+@SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
+@REM -------------------------
+
 @SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
 @SET PATH=%ROOT_DIR%\install\plugins;%PATH%
 
