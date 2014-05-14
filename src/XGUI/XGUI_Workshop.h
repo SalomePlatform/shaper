@@ -2,6 +2,7 @@
 #define XGUI_WORKSHOP_H
 
 #include "XGUI.h"
+#include "XGUI_Constants.h"
 #include <Events_Listener.h>
 
 #include <QObject>
@@ -114,7 +115,7 @@ public slots:
   void hideObjectBrowser();
 
   void onFeatureTriggered();
-  void changeCurrentDocument();
+  void changeCurrentDocument(FeaturePtr thePart);
 
 signals:
   void errorOccurred(const QString&);

@@ -384,3 +384,8 @@ QModelIndex XGUI_PartDataModel::findGroup(const std::string& theGroup) const
     return createIndex(1, 0, (qint32) ConstructFolder);
   return QModelIndex();
 }
+
+FeaturePtr XGUI_PartDataModel::part() const
+{
+  return myDocument->feature(PARTS_GROUP, myId);
+}

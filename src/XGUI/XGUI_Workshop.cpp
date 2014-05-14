@@ -77,7 +77,6 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myDisplayer = new XGUI_Displayer(this);
 
   mySelector = new XGUI_SelectionMgr(this);
-  connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(changeCurrentDocument()));
 
   myOperationMgr = new XGUI_OperationMgr(this);
   myActionsMgr = new XGUI_ActionsMgr(this);
@@ -597,6 +596,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   aObjDock->setWindowTitle(tr("Object browser"));
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
+  connect(myObjectBrowser, SIGNAL(activePartChanged(FeaturePtr)), this, SLOT(changeCurrentDocument(FeaturePtr)));
   aObjDock->setWidget(myObjectBrowser);
   return aObjDock;
 }
@@ -662,18 +662,15 @@ void XGUI_Workshop::onFeatureTriggered()
 }
 
 //******************************************************
-void XGUI_Workshop::changeCurrentDocument()
+void XGUI_Workshop::changeCurrentDocument(FeaturePtr thePart)
 {
-  QFeatureList aFeatures = objectBrowser()->selectedFeatures();
-  
-  // Set current document
-  if (aFeatures.size() > 0) {
-    FeaturePtr aFeature = aFeatures.first();
-
-    boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-    boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = aFeature->data()->docRef("PartDocument");
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  if (thePart) {
+    boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = thePart->data()->docRef("PartDocument");
     if (aDocRef)
       aMgr->setCurrentDocument(aDocRef->value());
+  } else {
+    aMgr->setCurrentDocument(aMgr->rootDocument());
   }
 }
 

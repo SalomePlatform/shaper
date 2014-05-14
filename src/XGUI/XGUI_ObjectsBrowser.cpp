@@ -32,3 +32,15 @@ void XGUI_ObjectsBrowser::onSelectionChanged(const QItemSelection& theSelected,
   }
   emit selectionChanged();
 }
+
+void XGUI_ObjectsBrowser::mouseDoubleClickEvent(QMouseEvent* theEvent)
+{
+  QModelIndex aIndex = currentIndex();
+  bool isChanged = myDocModel->activatedIndex(aIndex);
+  QTreeView::mouseDoubleClickEvent(theEvent);
+  if (isChanged) {
+    setExpanded(aIndex.parent(), true);
+    setExpanded(aIndex, myDocModel->hasChildren(aIndex));
+    emit activePartChanged(myDocModel->activePart());
+  }
+}

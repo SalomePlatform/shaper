@@ -48,6 +48,9 @@ public:
   //! Returns true if the given document is a sub-document of this tree
   virtual bool hasDocument(const boost::shared_ptr<ModelAPI_Document>& theDoc) const = 0;
 
+  //! Return a Part object
+  virtual FeaturePtr part() const = 0;
+
 protected:
   //! Id of the current part object in the document
   int myId;
