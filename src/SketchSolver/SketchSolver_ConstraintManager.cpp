@@ -5,6 +5,9 @@
 #include "SketchSolver_ConstraintManager.h"
 
 #include <Events_Loop.h>
+#include <GeomDataAPI_Dir.h>
+#include <GeomDataAPI_Point.h>
+#include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
 #include <Model_Events.h>
@@ -152,7 +155,7 @@ SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::
   myConstrSet.failed = 0;
 
   // Initialize workplane
-  mySketch = theWorkplane;
+  myWorkplane.h = 0;
   addWorkplane(theWorkplane);
 }
 
@@ -237,15 +240,93 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addConstraint
 Slvs_hEntity SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addEntity(
                 boost::shared_ptr<ModelAPI_Attribute> theEntity)
 {
-  /// \todo Should be implemented
+  // Look over supported types of entities
+
+  // Point in 3D
+  boost::shared_ptr<GeomDataAPI_Point> aPoint = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(theEntity);
+  if (aPoint)
+  {
+    Slvs_hParam aX = addParameter(aPoint->x());
+    Slvs_hParam aY = addParameter(aPoint->y());
+    Slvs_hParam aZ = addParameter(aPoint->z());
+    Slvs_Entity aPtEntity = Slvs_MakePoint3d(++myEntityMaxID, myID, aX, aY, aZ);
+    myEntities.push_back(aPtEntity);
+    return aPtEntity.h;
+  }
+
+  // Point in 2D
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEntity);
+  if (aPoint2D)
+  {
+    // The 2D points are created on workplane. So, if there is no workplane yet, then error
+    if (myWorkplane.h == 0)
+      return 0;
+    Slvs_hParam aU = addParameter(aPoint2D->x());
+    Slvs_hParam aV = addParameter(aPoint2D->y());
+    Slvs_Entity aPt2DEntity = Slvs_MakePoint2d(++myEntityMaxID, myID, myWorkplane.h, aU, aV);
+    myEntities.push_back(aPt2DEntity);
+    return aPt2DEntity.h;
+  }
+
+  /// \todo Other types of entities
+  
+  // Unsupported or wrong entity type
   return 0;
 }
 
-bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addWorkplane(
-                boost::shared_ptr<SketchPlugin_Sketch> theParams)
+Slvs_hEntity SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addNormal(
+                boost::shared_ptr<ModelAPI_Attribute> theDirX, 
+                boost::shared_ptr<ModelAPI_Attribute> theDirY)
 {
-  /// \todo Should be implemented
-  return false;
+  boost::shared_ptr<GeomDataAPI_Dir> aDirX = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theDirX);
+  boost::shared_ptr<GeomDataAPI_Dir> aDirY = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theDirY);
+  if (!aDirX || !aDirY)
+    return 0;
+
+  // quaternion parameters of normal vector
+  double qw, qx, qy, qz;
+  Slvs_MakeQuaternion(aDirX->x(), aDirX->y(), aDirX->z(), 
+                      aDirY->x(), aDirY->y(), aDirY->z(), 
+                      &qw, &qx, &qy, &qz);
+
+  // Create a normal
+  Slvs_Entity aNormal = Slvs_MakeNormal3d(++myEntityMaxID, myID, 
+                      addParameter(qw), addParameter(qx), addParameter(qy), addParameter(qz));
+  myEntities.push_back(aNormal);
+  return aNormal.h;
+}
+
+
+bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addWorkplane(
+                boost::shared_ptr<SketchPlugin_Sketch> theSketch)
+{
+  if (myWorkplane.h)
+    return false; // the workplane already exists
+
+  // Get parameters of workplane
+  boost::shared_ptr<ModelAPI_Attribute> aDirX    = theSketch->data()->attribute(SKETCH_ATTR_DIRX);
+  boost::shared_ptr<ModelAPI_Attribute> aDirY    = theSketch->data()->attribute(SKETCH_ATTR_DIRY);
+  boost::shared_ptr<ModelAPI_Attribute> anOrigin = theSketch->data()->attribute(SKETCH_ATTR_ORIGIN);
+  // Transform them into SolveSpace format
+  Slvs_hEntity aNormalWP = addNormal(aDirX, aDirY);
+  if (!aNormalWP) return false;
+  Slvs_hEntity anOriginWP = addEntity(anOrigin);
+  if (!anOriginWP) return false;
+  // Create workplane
+  myWorkplane = Slvs_MakeWorkplane(++myEntityMaxID, myID, anOriginWP, aNormalWP);
+  mySketch = theSketch;
+  // Workplane should be added to the list of entities
+  myEntities.push_back(myWorkplane);
+  return true;
+}
+
+Slvs_hParam SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addParameter(double theParam)
+{
+  Slvs_Param aParam = Slvs_MakeParam(++myParamMaxID, myID, theParam);
+  myParams.push_back(aParam);
+  return aParam.h;
 }
 
 int SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::getConstraintType(

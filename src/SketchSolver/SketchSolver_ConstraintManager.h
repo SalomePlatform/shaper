@@ -154,10 +154,29 @@ public:
 
 protected:
   /** \brief Adds an entity into the group
+   *
+   *  The parameters of entity will be parsed and added to the list of SolveSpace parameters.
+   *  Parameters of certain entity will be placed sequentially in the list.
+   *
    *  \param[in] theEntity the object of constraint
    *  \return identifier of created entity or 0 if entity was not added
    */
   Slvs_hEntity addEntity(boost::shared_ptr<ModelAPI_Attribute> theEntity);
+
+  /** \brief Adds a normal into the group
+   *
+   *  Normal is a special entity in SolveSpace, which defines a direction in 3D and 
+   *  a rotation about this direction. So, SolveSpace represents normals as unit quaternions.
+   *
+   *  To define a normal there should be specified two coordinate axis 
+   *  on the plane transversed to created normal.
+   *
+   *  \param[in] theDirX first coordinate axis of the plane
+   *  \param[in] theDirY second coordinate axis of the plane
+   *  \return identifier of created normal
+   */
+  Slvs_hEntity addNormal(boost::shared_ptr<ModelAPI_Attribute> theDirX, 
+                         boost::shared_ptr<ModelAPI_Attribute> theDirY);
 
   /** \brief Adds a parameter into the group
    *  \param[in] theParam parameter to be added
