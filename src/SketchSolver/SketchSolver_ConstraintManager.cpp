@@ -25,6 +25,26 @@ SketchSolver_ConstraintManager* myManager = SketchSolver_ConstraintManager::Inst
 /// This value is used to give unique index to the groups
 static Slvs_hGroup myGroupIndexer = 0;
 
+/** \brief Makes transformation from ModelAPI_Attribute to the list of parameters' values
+ *  \remark Convertion of normal in 3D needs two attributes (coordinate axis of transversal plane)
+ *  \param[in,out] theParams        list of converted values which appended to incoming list
+ *  \param[in]     theAttr          attribute to be converted
+ *  \param[in]     theNormExtraAttr additional attribute for conversion of a normal
+ */
+static void ConvertAttributeToParamList(
+        std::vector<double>&                  theParams, 
+        boost::shared_ptr<ModelAPI_Attribute> theAttr, 
+        boost::shared_ptr<ModelAPI_Attribute> theNormExtraAttr = boost::shared_ptr<ModelAPI_Attribute>());
+
+/** \brief Search the entity/parameter with specified ID in the list of elements
+ *  \param[in] theEntityID unique ID of the element
+ *  \param[in] theEntities list of elements
+ *  \return position of the found element or -1 if the element is not found
+ */
+template <typename T>
+static int Search(const uint32_t& theEntityID, const std::vector<T>& theEntities);
+
+
 // ========================================================
 // ========= SketchSolver_ConstraintManager ===============
 // ========================================================
@@ -85,7 +105,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       boost::dynamic_pointer_cast<SketchPlugin_Sketch>(aUpdateMsg->feature());
     if (aSketch)
     {
-//      updateWorkplane(aSketch);
+      updateWorkplane(aSketch);
       return ;
     }
 
@@ -121,6 +141,25 @@ bool SketchSolver_ConstraintManager::addWorkplane(boost::shared_ptr<SketchPlugin
   return true;
 }
 
+bool SketchSolver_ConstraintManager::updateWorkplane(boost::shared_ptr<SketchPlugin_Sketch> theSketch)
+{
+  bool aResult = true; // changed when a workplane wrongly updated
+  bool isUpdated = false;
+  // Try to update specified workplane in all groups
+  std::vector<SketchSolver_ConstraintGroup>::iterator aGroupIter;
+  for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
+    if (aGroupIter->isBaseWorkplane(theSketch))
+    {
+      isUpdated = true;
+      if (!aGroupIter->updateWorkplane(theSketch))
+        aResult = false;
+    }
+  // If the workplane is not updates, so this is a new workplane
+  if (!isUpdated)
+    return addWorkplane(theSketch);
+  return aResult;
+}
+
 bool SketchSolver_ConstraintManager::addConstraint(
               boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
 {
@@ -131,9 +170,12 @@ bool SketchSolver_ConstraintManager::addConstraint(
   // Process the groups list
   if (aGroups.size() == 0)
   { // There are no groups applicable for this constraint => create new one
-    SketchSolver_ConstraintGroup aGroup(findWorkplaneForConstraint(theConstraint));
+    boost::shared_ptr<SketchPlugin_Sketch> aWP = findWorkplaneForConstraint(theConstraint);
+    if (!aWP) return false;
+    SketchSolver_ConstraintGroup aGroup(aWP);
     aGroup.addConstraint(theConstraint);
     myGroups.push_back(aGroup);
+    return true;
   }
   else if (aGroups.size() == 1)
   { // Only one group => add constraint into it
@@ -323,20 +365,16 @@ Slvs_hEntity SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addNo
                 boost::shared_ptr<ModelAPI_Attribute> theDirX, 
                 boost::shared_ptr<ModelAPI_Attribute> theDirY)
 {
-  boost::shared_ptr<GeomDataAPI_Dir> aDirX = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theDirX);
-  boost::shared_ptr<GeomDataAPI_Dir> aDirY = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theDirY);
-  if (!aDirX || !aDirY)
-    return 0;
-
-  // quaternion parameters of normal vector
-  double qw, qx, qy, qz;
-  Slvs_MakeQuaternion(aDirX->x(), aDirX->y(), aDirX->z(), 
-                      aDirY->x(), aDirY->y(), aDirY->z(), 
-                      &qw, &qx, &qy, &qz);
-
+  // Convert axes to the coordinates of normal
+  std::vector<double> aNormCoord;
+  ConvertAttributeToParamList(aNormCoord, theDirX, theDirY);
+  
   // Create a normal
+  Slvs_hParam aNormParams[4];
+  for (int i = 0; i < 4; i++)
+    aNormParams[i] = addParameter(aNormCoord[i]);
   Slvs_Entity aNormal = Slvs_MakeNormal3d(++myEntityMaxID, myID, 
-                      addParameter(qw), addParameter(qx), addParameter(qy), addParameter(qz));
+                aNormParams[0], aNormParams[1], aNormParams[2], aNormParams[3]);
   myEntities.push_back(aNormal);
   return aNormal.h;
 }
@@ -364,6 +402,53 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addWorkplane(
   myEntities.push_back(myWorkplane);
   return true;
 }
+
+bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateWorkplane(
+                boost::shared_ptr<SketchPlugin_Sketch> theSketch)
+{
+  // Renew Sketch pointer
+  mySketch = theSketch;
+
+  // Get parameters of workplane
+  boost::shared_ptr<ModelAPI_Attribute> aDirX  = theSketch->data()->attribute(SKETCH_ATTR_DIRX);
+  boost::shared_ptr<ModelAPI_Attribute> aDirY  = theSketch->data()->attribute(SKETCH_ATTR_DIRY);
+  boost::shared_ptr<ModelAPI_Attribute> anOrig = theSketch->data()->attribute(SKETCH_ATTR_ORIGIN);
+  // Transform them to lists of coordinates
+  std::vector<double> aNormal;
+  ConvertAttributeToParamList(aNormal, aDirX, aDirY);
+  std::vector<double> anOrigin;
+  ConvertAttributeToParamList(anOrigin, anOrig);
+
+  // Search the normal and the origin in the parameters list and update their values.
+  // Remark: entities are sorted in the vector, so the most probable position 
+  //         of the entity is equal to identifier the entity
+  
+  // search normal
+  int aEntPos = Search(myWorkplane.normal, myEntities);
+  if (aEntPos < 0) return false;
+  // search first parameter of normal
+  int aParamPos = Search(myEntities[aEntPos].param[0], myParams);
+  if (aParamPos < 0) return false;
+  std::vector<Slvs_Param>::iterator aParamIter = myParams.begin() + aParamPos;
+  // change normal parameters
+  std::vector<double>::iterator anIter;
+  for (anIter = aNormal.begin(); anIter != aNormal.end(); anIter++, aParamIter++)
+    aParamIter->val = *anIter;
+
+  // search origin
+  aEntPos = Search(myWorkplane.point[0], myEntities);
+  if (aEntPos < 0) return false;
+  // search first parameter of origin
+  aParamPos = Search(myEntities[aEntPos].param[0], myParams);
+  if (aParamPos < 0) return false;
+  aParamIter = myParams.begin() + aParamPos;
+  // change origin's parameters
+  for (anIter = anOrigin.begin(); anIter != anOrigin.end(); anIter++, aParamIter++)
+    aParamIter->val = *anIter;
+
+  return true;
+}
+
 
 Slvs_hParam SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addParameter(double theParam)
 {
@@ -420,3 +505,70 @@ int SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::getConstraintT
 
   return SLVS_C_UNKNOWN;
 }
+
+
+
+// ========================================================
+// =========      Auxiliary functions       ===============
+// ========================================================
+
+void ConvertAttributeToParamList(
+                std::vector<double>&                  theParams, 
+                boost::shared_ptr<ModelAPI_Attribute> theAttr, 
+                boost::shared_ptr<ModelAPI_Attribute> theNormExtraAttr)
+{
+  // Point in 3D
+  boost::shared_ptr<GeomDataAPI_Point> aPoint = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(theAttr);
+  if (aPoint)
+  {
+    theParams.push_back(aPoint->x());
+    theParams.push_back(aPoint->y());
+    theParams.push_back(aPoint->z());
+    return ;
+  }
+
+  // Point in 2D
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttr);
+  if (aPoint2D)
+  {
+    theParams.push_back(aPoint2D->x());
+    theParams.push_back(aPoint2D->y());
+    return ;
+  }
+
+  // Normal in 3D
+  boost::shared_ptr<GeomDataAPI_Dir> aDirX = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theAttr);
+  boost::shared_ptr<GeomDataAPI_Dir> aDirY = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theNormExtraAttr);
+  if (aDirX && aDirY)
+  {
+    // quaternion parameters of normal vector
+    double qw, qx, qy, qz;
+    Slvs_MakeQuaternion(aDirX->x(), aDirX->y(), aDirX->z(), 
+                        aDirY->x(), aDirY->y(), aDirY->z(), 
+                        &qw, &qx, &qy, &qz);
+    theParams.push_back(qw);
+    theParams.push_back(qx);
+    theParams.push_back(qy);
+    theParams.push_back(qz);
+  }
+
+  /// \todo Other types of entities
+}
+
+template <typename T>
+int Search(const uint32_t& theEntityID, const std::vector<T>& theEntities)
+{
+  std::vector<T>::const_iterator aEntIter = theEntities.begin() + theEntityID - 1;
+  while (aEntIter != theEntities.end() && aEntIter->h > theEntityID)
+    aEntIter--;
+  while (aEntIter != theEntities.end() && aEntIter->h < theEntityID)
+    aEntIter++;
+  if (aEntIter == theEntities.end())
+    return -1;
+  return aEntIter - theEntities.begin();
+}
+

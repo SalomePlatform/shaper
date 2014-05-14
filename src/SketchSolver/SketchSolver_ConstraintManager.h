@@ -162,6 +162,12 @@ public:
   boost::shared_ptr<SketchPlugin_Sketch> getWorkplane() const
   { return mySketch; }
 
+  /** \brief Update parameters of workplane. Should be called when Update event is coming
+   *  \param[in] theWorkplane workplane to be updated
+   *  \return \c true if workplane updated successfully
+   */
+  bool updateWorkplane(boost::shared_ptr<SketchPlugin_Sketch> theWorkplane);
+
 protected:
   /** \brief Adds an entity into the group
    *
