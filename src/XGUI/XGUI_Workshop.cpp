@@ -31,6 +31,7 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
+#include <Config_Common.h>
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
 
@@ -486,7 +487,8 @@ void XGUI_Workshop::onRedo()
 //******************************************************
 XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
 {
-  QString libName = library(theModule);
+  QString libName =
+      QString::fromStdString(library(theModule.toStdString()));
   if (libName.isEmpty()) {
     qWarning(
     qPrintable( tr( "Information about module \"%1\" doesn't exist." ).arg( theModule ) ));
