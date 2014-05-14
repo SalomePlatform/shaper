@@ -679,8 +679,10 @@ void XGUI_ViewWindow::vpMousePressEvent(QMouseEvent* theEvent)
 //****************************************************************
 void XGUI_ViewWindow::contextMenuEvent(QContextMenuEvent* theEvent)
 {
-  QFrame::contextMenuEvent(theEvent);
-  emit contextMenuRequested(theEvent);
+  if (theEvent->modifiers() == Qt::NoModifier) {
+    QFrame::contextMenuEvent(theEvent);
+    emit contextMenuRequested(theEvent);
+  }
 }
 
 //****************************************************************
