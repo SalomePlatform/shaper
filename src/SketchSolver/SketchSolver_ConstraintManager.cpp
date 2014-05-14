@@ -9,6 +9,7 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Data.h>
 #include <Model_Events.h>
 #include <SketchPlugin_Constraint.h>
@@ -84,7 +85,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       boost::dynamic_pointer_cast<SketchPlugin_Sketch>(aUpdateMsg->feature());
     if (aSketch)
     {
-      updateWorkplane(aSketch);
+//      updateWorkplane(aSketch);
       return ;
     }
 
@@ -92,14 +93,14 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       boost::dynamic_pointer_cast<SketchPlugin_Constraint>(aUpdateMsg->feature());
     if (aConstraint)
     {
-      updateConstraint(aConstraint);
+//      updateConstraint(aConstraint);
       return ;
     }
 
     boost::shared_ptr<SketchPlugin_Feature> aFeature = 
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(aUpdateMsg->feature());
-    if (aFeature)
-      updateEntity(aFeature);
+//    if (aFeature)
+//      updateEntity(aFeature);
   }
 }
 
@@ -120,6 +121,37 @@ bool SketchSolver_ConstraintManager::addWorkplane(boost::shared_ptr<SketchPlugin
   return true;
 }
 
+bool SketchSolver_ConstraintManager::addConstraint(
+              boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
+{
+  // Search the groups which this constraint touchs
+  std::vector<Slvs_hGroup> aGroups;
+  findGroups(theConstraint, aGroups);
+
+  // Process the groups list
+  if (aGroups.size() == 0)
+  { // There are no groups applicable for this constraint => create new one
+    SketchSolver_ConstraintGroup aGroup(findWorkplaneForConstraint(theConstraint));
+    aGroup.addConstraint(theConstraint);
+    myGroups.push_back(aGroup);
+  }
+  else if (aGroups.size() == 1)
+  { // Only one group => add constraint into it
+    Slvs_hGroup aGroupId = *(aGroups.begin());
+    std::vector<SketchSolver_ConstraintGroup>::iterator aGroupIter;
+    for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
+      if (aGroupIter->getId() == aGroupId)
+        return aGroupIter->addConstraint(theConstraint);
+  }
+  else if (aGroups.size() > 1)
+  { // Several groups applicable for this constraint => need to merge them
+    /// \todo Implement merging of groups
+  }
+
+  // Something goes wrong
+  return false;
+}
+
 
 void SketchSolver_ConstraintManager::findGroups(
               boost::shared_ptr<SketchPlugin_Constraint> theConstraint, 
@@ -130,6 +162,26 @@ void SketchSolver_ConstraintManager::findGroups(
     if (aGroupIter->isInteract(theConstraint))
       theGroupIDs.push_back(aGroupIter->getId());
 }
+
+boost::shared_ptr<SketchPlugin_Sketch> SketchSolver_ConstraintManager::findWorkplaneForConstraint(
+              boost::shared_ptr<SketchPlugin_Constraint> theConstraint) const
+{
+  std::vector<SketchSolver_ConstraintGroup>::const_iterator aGroupIter;
+  for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
+  {
+    boost::shared_ptr<SketchPlugin_Sketch> aWP = aGroupIter->getWorkplane();
+    boost::shared_ptr<ModelAPI_AttributeRefList> aWPFeatures = 
+      boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aWP->data()->attribute(SKETCH_ATTR_FEATURES));
+    std::list< boost::shared_ptr<ModelAPI_Feature> > aFeaturesList = aWPFeatures->list();
+    std::list< boost::shared_ptr<ModelAPI_Feature> >::const_iterator anIter;
+    for (anIter = aFeaturesList.begin(); anIter != aFeaturesList.end(); anIter++)
+      if (*anIter == theConstraint)
+        return aWP; // workplane is found
+  }
+
+  return boost::shared_ptr<SketchPlugin_Sketch>();
+}
+
 
 
 // ========================================================
@@ -192,45 +244,36 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::isInteract(
 bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addConstraint(
                 boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
 {
+  // There is no workplane yet, something wrong
   if (myWorkplane.h == 0)
-  {
-//    // Create workplane when first constraint is added
-//    std::list< boost::shared_ptr<ModelAPI_Attribute> > aWPAttr;
-//    theConstraint->getSketchParameters(aWPAttr);
-//    if (!addWorkplane(aWPAttr))
-//      return false;
-  }
+    return false;
+
+  // Get constraint type and verify the constraint parameters are correct
+  int aConstrType = getConstraintType(theConstraint);
+  if (aConstrType == SLVS_C_UNKNOWN)
+    return false;
 
   // Create constraint parameters
   double aDistance = 0.0; // scalar value of the constraint
   boost::shared_ptr<ModelAPI_AttributeDouble> aDistAttr =
     boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theConstraint->data()->attribute(CONSTRAINT_ATTR_VALUE));
-  if (aDistAttr.get())
+  if (aDistAttr)
     aDistance = aDistAttr->value();
 
-  /// \todo Specify the entities
-  Slvs_hEntity aPtA, aPtB, aEntityA, aEntityB; // parameters of the constraint
-  boost::shared_ptr<ModelAPI_Attribute> aEntAttr = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_A);
-  aPtA = addEntity(aEntAttr);
-  if (aPtA == 0) return false;
-  aEntAttr = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_B);
-  aPtB = addEntity(aEntAttr);
-  if (aPtB == 0) return false;
-  aEntAttr = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_C);
-  aEntityA = addEntity(aEntAttr);
-  if (aEntityA == 0) return false;
-  aEntAttr = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_D);
-  aEntityB = addEntity(aEntAttr);
-  if (aEntityB == 0) return false;
-
-  // Constraint type
-  int aConstrType = getConstraintType(theConstraint);
-  if (aConstrType == 0) return false;
+  Slvs_hEntity aConstrEnt[CONSTRAINT_ATTR_SIZE]; // parameters of the constraint
+  for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
+  {
+    boost::shared_ptr<ModelAPI_AttributeRefAttr> aConstrAttr = 
+      boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
+      );
+    aConstrEnt[indAttr] = addEntity(aConstrAttr->attr());
+  }
 
   // Create SolveSpace constraint structure
   Slvs_Constraint aConstraint = 
     Slvs_MakeConstraint(++myConstrMaxID, myID, aConstrType, myWorkplane.h, 
-                        aDistance, aPtA, aPtB, aEntityA, aEntityB);
+                        aDistance, aConstrEnt[0], aConstrEnt[1], aConstrEnt[2], aConstrEnt[3]);
   myConstraints.push_back(aConstraint);
   myConstraintMap[theConstraint] = *(myConstraints.rbegin());
 
@@ -332,42 +375,47 @@ Slvs_hParam SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addPar
 int SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::getConstraintType(
                 const boost::shared_ptr<SketchPlugin_Constraint>& theConstraint) const
 {
-//  if (theConstraint->getKind() == SketchPlugin_ConstraintDistance().getKind())
-//  {
-//    boost::shared_ptr<ModelAPI_Attribute> aPtA  = theConstraint->data()->attribute(CONSTRAINT_ATTR_POINT_A);
-//    boost::shared_ptr<ModelAPI_Attribute> aPtB  = theConstraint->data()->attribute(CONSTRAINT_ATTR_POINT_B);
-//    boost::shared_ptr<ModelAPI_Attribute> aEntA = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_A);
-//    boost::shared_ptr<ModelAPI_Attribute> aEntB = theConstraint->data()->attribute(CONSTRAINT_ATTR_ENTITY_B);
-//    boost::shared_ptr<ModelAPI_AttributeDouble> aDistance = 
-//      boost::shared_dynamic_cast<ModelAPI_AttributeDouble>(theConstraint->data()->attribute(CONSTRAINT_ATTR_VALUE));
-//    if (aPtA.get()) // ptA is an attribute of the constraint
-//    {
-////      if (aEntA.get()) // entityA is an attribute of the constraint
-////      {
-////        if (aEntA->feature()->getKind() == SketchPlugin_Line().getKind()) // entityA is a line
-////        {
-////          if (aEntB.get() && aEntB->feature()->getKind() == SketchPlugin_Line().getKind()) // entityB is a line too
-////            return SLVS_C_ANGLE;
-////          else if (aPtB.get()) // ptB is also an attribute of the constraint
-////            return SLVS_C_PROJ_PT_DISTANCE;
-////          else
-////            return SLVS_C_PT_LINE_DISTANCE;
-////        }
-////        /// \todo Implement other point-entity distances
-////      }
-////      else 
-//      if (aPtB.get()) // ptB is an attribute of the constrtaint => point-point distance
-//      {
-//        if (aDistance->value() == 0.0)
-//          return SLVS_C_POINTS_COINCIDENT;
-//        else 
-//          return SLVS_C_PT_PT_DISTANCE;
-//      }
-//    }
-//    else if (aEntA.get() && !aEntB.get() && !aPtB.get())
-//      return SLVS_C_DIAMETER;
-//    return SLVS_C_UNKNOWN;
-//  }
+  // Constraint for coincidence of two points
+  boost::shared_ptr<SketchPlugin_ConstraintCoincidence> aPtEquiv = 
+    boost::dynamic_pointer_cast<SketchPlugin_ConstraintCoincidence>(theConstraint);
+  if (aPtEquiv)
+  {
+    // Verify the constraint has only two attributes and they are points
+    int aPt2d = 0; // bit-mapped field, each bit indicates whether the attribute is 2D point 
+    int aPt3d = 0; // bit-mapped field, the same information for 3D points
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
+    {
+      boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
+        );
+      // Verify the attribute is a 2D point
+      boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D = 
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
+      if (aPoint2D)
+      {
+        aPt2d |= (1 << indAttr);
+        continue;
+      }
+      // Verify the attribute is a 3D point
+      boost::shared_ptr<GeomDataAPI_Point> aPoint3D = 
+        boost::dynamic_pointer_cast<GeomDataAPI_Point>(anAttr->attr());
+      if (aPoint3D)
+      {
+        aPt3d |= (1 << indAttr);
+        continue;
+      }
+      // Attribute neither 2D nor 3D point is not supported by this type of constraint
+      return SLVS_C_UNKNOWN;
+    }
+    // The constrained points should be in first and second positions,
+    // so the expected value of aPt2d or aPt3d is 3
+    if ((aPt2d == 3 && aPt3d == 0) || (aPt2d == 0 && aPt3d == 3))
+      return SLVS_C_POINTS_COINCIDENT;
+    // Constraint parameters are wrong
+    return SLVS_C_UNKNOWN;
+  }
+
   /// \todo Implement other kind of constrtaints
 
   return SLVS_C_UNKNOWN;

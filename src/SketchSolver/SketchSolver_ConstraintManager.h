@@ -105,6 +105,13 @@ private:
   void findGroups(boost::shared_ptr<SketchPlugin_Constraint> theConstraint, 
                   std::vector<Slvs_hGroup>&                  theGroupIDs) const;
 
+  /** \brief Searches in the list of groups the workplane which constains specified constraint
+   *  \param[in] theConstraint constraint to be found
+   *  \return workplane contains the constraint
+   */
+  boost::shared_ptr<SketchPlugin_Sketch> findWorkplaneForConstraint(
+                  boost::shared_ptr<SketchPlugin_Constraint> theConstraint) const;
+
 private:
   static SketchSolver_ConstraintManager*    _self;    ///< Self pointer to implement singleton functionality
   std::vector<SketchSolver_ConstraintGroup> myGroups; ///< Groups of constraints
@@ -152,6 +159,9 @@ public:
    */
   bool isBaseWorkplane(boost::shared_ptr<SketchPlugin_Sketch> theWorkplane) const;
 
+  boost::shared_ptr<SketchPlugin_Sketch> getWorkplane() const
+  { return mySketch; }
+
 protected:
   /** \brief Adds an entity into the group
    *
@@ -185,8 +195,9 @@ protected:
   Slvs_hParam addParameter(double theParam);
 
   /** \brief Compute constraint type according to SolveSpace identifiers
+   *         and verify that constraint parameters are correct
    *  \param[in] theConstraint constraint which type should be determined
-   *  \return identifier of constraint type
+   *  \return identifier of constraint type or SLVS_C_UNKNOWN if the type is wrong
    */
   int getConstraintType(const boost::shared_ptr<SketchPlugin_Constraint>& theConstraint) const;
 

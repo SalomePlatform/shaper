@@ -34,7 +34,8 @@ const std::string CONSTRAINT_ATTR_ENTITY_C("ConstraintEntityC");
 /// Fourth entity for the constraint
 const std::string CONSTRAINT_ATTR_ENTITY_D("ConstraintEntityD");
 /// List of constraint attributes
-const std::string CONSTRAINT_ATTRIBUTES[4] = 
+const unsigned int CONSTRAINT_ATTR_SIZE = 4;
+const std::string CONSTRAINT_ATTRIBUTES[CONSTRAINT_ATTR_SIZE] = 
                       {CONSTRAINT_ATTR_ENTITY_A, CONSTRAINT_ATTR_ENTITY_B, 
                        CONSTRAINT_ATTR_ENTITY_C, CONSTRAINT_ATTR_ENTITY_D};
 
