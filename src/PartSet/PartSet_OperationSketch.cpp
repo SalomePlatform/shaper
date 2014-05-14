@@ -5,8 +5,10 @@
 #include <PartSet_OperationSketch.h>
 
 #include <PartSet_OperationEditLine.h>
+#include <PartSet_Tools.h>
 
 #include <SketchPlugin_Sketch.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
@@ -22,6 +24,8 @@
 #ifdef _DEBUG
 #include <QDebug>
 #endif
+
+#include <QMouseEvent>
 
 using namespace std;
 
@@ -52,19 +56,27 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
 {
   if (theSelected.empty())
     return;
-  XGUI_ViewerPrs aPrs = theSelected.front();
 
   if (!myIsEditMode) {
+    XGUI_ViewerPrs aPrs = theSelected.front();
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull()) {
       setSketchPlane(aShape);
       myIsEditMode = true;
     }
   }
-  else {
-    if (aPrs.feature())
-      emit launchOperation(PartSet_OperationEditLine::Type(), aPrs.feature());
-  }
+}
+
+void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView,
+                                         const std::list<XGUI_ViewerPrs>& theSelected)
+{
+  if (!myIsEditMode || !(theEvent->buttons() &  Qt::LeftButton) || theSelected.empty())
+    return;
+
+  boost::shared_ptr<ModelAPI_Feature> aFeature = PartSet_Tools::NearestFeature(theEvent->pos(),
+                                                              theView, feature(), theSelected);
+  if (aFeature)
+    emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
 }
 
 void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
@@ -107,4 +119,3 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
   emit planeSelected(aDir->x(), aDir->y(), aDir->z());
 }
-
