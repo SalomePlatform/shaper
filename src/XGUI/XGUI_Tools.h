@@ -6,19 +6,6 @@
 #include <QRect>
 
 /*!
- \brief Convert the given parameter to the platform-specific library name.
-
- The function appends platform-specific prefix (lib) and suffix (.dll/.so)
- to the library file name.
- For example, if \a str = "mylib", "libmylib.so" is returned for Linux and
- mylib.dll for Windows.
-
- \param str short library name
- \return full library name
- */
-QString XGUI_EXPORT library(const QString& str);
-
-/*!
  \brief Return directory part of the file path.
 
  If the file path does not include directory part (the file is in the

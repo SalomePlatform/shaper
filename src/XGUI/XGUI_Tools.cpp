@@ -3,37 +3,6 @@
 #include <QDir>
 
 //******************************************************************
-QString library(const QString& str)
-{
-  QString path = dir(str, false);
-  QString name = file(str, false);
-  QString ext = extension(str);
-
-#ifndef WIN32
-  if ( !name.startsWith( "lib" ) )
-  name = QString( "lib" ) + name;
-#endif
-
-#ifdef WIN32
-  QString libExt("dll");
-#else
-  QString libExt( "so" );
-#endif
-
-  if (ext.toLower() != QString("so") && ext.toLower() != QString("dll")) {
-    if (!name.isEmpty() && !ext.isEmpty())
-      name += QString(".");
-    name += ext;
-  }
-
-  ext = libExt;
-
-  QString fileName = addSlash(path) + name + QString(".") + ext;
-
-  return fileName;
-}
-
-//******************************************************************
 QString dir(const QString& path, bool isAbs)
 {
   QDir aDir = QFileInfo(path).dir();

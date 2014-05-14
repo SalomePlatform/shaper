@@ -25,7 +25,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string th
     myCurrentPluginName = myPlugins[theFeatureID];
     if (myPluginObjs.find(myCurrentPluginName) == myPluginObjs.end()) {
       // load plugin library if not yet done
-      loadLibrary(myCurrentPluginName);
+      Config_ModuleReader::loadLibrary(myCurrentPluginName);
     }
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
       boost::shared_ptr<ModelAPI_Feature> aCreated = 
