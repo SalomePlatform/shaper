@@ -48,5 +48,9 @@
      <file>pictures/button_cancel.png</file>
      <file>pictures/button_help.png</file>
      <file>pictures/button_ok.png</file>
+   
+     <file>pictures/cascade_views.png</file>
+     <file>pictures/tile_views.png</file>
+     <file>pictures/new_view.png</file>
  </qresource>
  </RCC>

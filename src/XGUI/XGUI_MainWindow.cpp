@@ -9,22 +9,11 @@
 #include <PyConsole_EnhInterp.h>
 
 #include <QMdiArea>
-#include <QTreeWidget>
-#include <QDockWidget>
-#include <QTextEdit>
-#include <QLabel>
-#include <QToolBar>
-#include <QToolButton>
-#include <QTreeWidgetItem>
-#include <QLayout>
-#include <QLineEdit>
-#include <QGroupBox>
-#include <QFormLayout>
-#include <QDoubleSpinBox>
-#include <QPushButton>
-#include <QScrollArea>
-#include <QComboBox>
+#include <QMdiSubWindow>
 #include <QAction>
+#include <QDockWidget>
+#include <QApplication>
+#include <QTimer>
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     : QMainWindow(parent), 
@@ -34,9 +23,33 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
   myMenuBar = new XGUI_MainMenu(this);
 
   QMdiArea* aMdiArea = new QMdiArea(this);
+  aMdiArea->setContextMenuPolicy(Qt::ActionsContextMenu);
   setCentralWidget(aMdiArea);
+  connect(aMdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), 
+          this, SLOT(onViewActivated(QMdiSubWindow*)));
+
+  // Create actions of MDI area
+  QAction* aAction = new QAction(QIcon(":pictures/new_view.png"), tr("Create Window"), aMdiArea);
+  aMdiArea->addAction(aAction);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(createSubWindow()));
+  
+  aAction = new QAction(QIcon(":pictures/tile_views.png"), tr("Tile"), aMdiArea);
+  aMdiArea->addAction(aAction);
+  connect(aAction, SIGNAL(triggered(bool)), aMdiArea, SLOT(tileSubWindows()));
+  
+  aAction = new QAction(QIcon(":pictures/cascade_views.png"), tr("Cascade"), aMdiArea);
+  aMdiArea->addAction(aAction);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(cascadeWindows()));
+
+  aAction = new QAction(aMdiArea);
+  aAction->setSeparator(true);
+  aMdiArea->addAction(aAction);
 
   myViewer = new XGUI_Viewer(this);
+  connect(myViewer, SIGNAL(viewCreated(XGUI_ViewWindow*)), 
+          this, SLOT(onViewCreated(XGUI_ViewWindow*)));
+  connect(myViewer, SIGNAL(deleteView(XGUI_ViewWindow*)), 
+          this, SLOT(onDeleteView(XGUI_ViewWindow*)));
 }
 
 XGUI_MainWindow::~XGUI_MainWindow(void)
@@ -73,4 +86,115 @@ void XGUI_MainWindow::hidePythonConsole()
     myPythonConsole->parentWidget()->hide();
 }
 
+//******************************************************
+void XGUI_MainWindow::createSubWindow()
+{
+  viewer()->createView();
+}
 
+//******************************************************
+void XGUI_MainWindow::cascadeWindows()
+{
+  QMdiArea* aMdiArea = static_cast<QMdiArea*>(centralWidget());
+  QList<QMdiSubWindow*> aWindows = aMdiArea->subWindowList();
+  
+  QSize aSize = aMdiArea->size();
+  QRect aRect = aMdiArea->geometry();
+  const int aOffset = 30;
+  int i = 0, j = 0;
+  int x, y;
+  int w = aSize.width() / 2;
+  int h = aSize.height() / 2;
+  QMdiSubWindow* aLastWnd;
+  foreach(QMdiSubWindow* aWnd, aWindows) {
+    aWnd->showNormal();
+    aWnd->raise();
+    x = aOffset * i;
+    if ((x + w) > aSize.width()) {
+      x = 0;
+      i = 0;
+    }
+    y = aOffset * j;
+    if ((y + h) > aSize.height()) {
+      y = 0;
+      j = 0;
+    }
+    aWnd->setGeometry(QStyle::visualRect(aWnd->layoutDirection(), aRect, 
+      QRect(x, y, w, h)));
+    i++;
+    j++;
+    viewer()->onWindowActivated(aWnd);
+    aLastWnd = aWnd;
+    QApplication::processEvents();
+  }
+  aLastWnd->setFocus();
+}
+
+void XGUI_MainWindow::onViewCreated(XGUI_ViewWindow* theWindow)
+{
+  QWidget* aSubWindow = theWindow->parentWidget();
+  QWidget* aMDIWidget = centralWidget();
+
+  QAction* aAction = new QAction(aSubWindow->windowTitle(), aMDIWidget);
+  aAction->setCheckable(true);
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(activateView()));
+  aMDIWidget->addAction(aAction);
+
+  QList<QAction*> aActions = aMDIWidget->actions();
+  foreach(QAction* aAct, aActions) {
+    if (aAct->isCheckable())
+      aAct->setChecked(false);
+  }
+  aAction->setChecked(true);
+}
+
+void XGUI_MainWindow::onDeleteView(XGUI_ViewWindow* theWindow)
+{
+  QWidget* aSubWindow = theWindow->parentWidget();
+  QString aTitle = aSubWindow->windowTitle();
+  QWidget* aMDIWidget = centralWidget();
+  QList<QAction*> aActions = aMDIWidget->actions();
+
+  QAction* aDelAct = 0;
+  foreach(QAction* aAct, aActions) {
+    if (aAct->text() == aTitle) {
+      aDelAct = aAct;
+      break;
+    }
+  }
+  aMDIWidget->removeAction(aDelAct);
+}
+
+void XGUI_MainWindow::activateView()
+{
+  QAction* aAction = static_cast<QAction*>(sender());
+  QString aWndTitle = aAction->text();
+  QMdiArea* aMdiArea = static_cast<QMdiArea*>(centralWidget());
+
+  QList<QMdiSubWindow*> aWndList = aMdiArea->subWindowList();
+  QMdiSubWindow* aTargetView = 0;
+  foreach(QMdiSubWindow* aWnd, aWndList) {
+    if (aWnd->windowTitle() == aWndTitle) {
+      aWnd->raise();
+      aWnd->activateWindow();
+      aTargetView = aWnd;
+      break;
+    }
+  }
+  QApplication::processEvents();
+  if (aTargetView)
+    QTimer::singleShot(20, aTargetView, SLOT(setFocus()));
+}
+
+void XGUI_MainWindow::onViewActivated(QMdiSubWindow* theSubWnd)
+{
+  if (!theSubWnd)
+    return;
+  QMdiArea* aMdiArea = static_cast<QMdiArea*>(centralWidget());
+  QString aWndTitle = theSubWnd->windowTitle();
+  QList<QAction*> aActionList = aMdiArea->actions();
+  foreach(QAction* aAct, aActionList) {
+    if (aAct->isCheckable())
+      aAct->setChecked(aAct->text() == aWndTitle);
+  }
+}

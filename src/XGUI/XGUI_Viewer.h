@@ -191,6 +191,9 @@ private:
 
   /// Points used for selection management
   QPoint myStartPnt, myEndPnt, myCurPnt;
+
+  // A counter of created windows
+  int myWndIdCount;
 };
 
 #endif
