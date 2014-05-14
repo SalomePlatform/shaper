@@ -34,6 +34,7 @@
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
+#include <Config_ModuleReader.h>
 
 #include <QApplication>
 #include <QFileDialog>
@@ -283,7 +284,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
     return;
   }
   // Remember features icons
-  myIcons[QString(theMessage->id().c_str())] = QString(theMessage->icon().c_str());
+  myIcons[QString::fromStdString(theMessage->id())] = QString::fromStdString(theMessage->icon());
 
   //Find or create Workbench
   QString aWchName = QString::fromStdString(theMessage->workbenchId());
@@ -499,7 +500,6 @@ XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
   CREATE_FUNC crtInst = 0;
 
 #ifdef WIN32
-
   HINSTANCE modLib = ::LoadLibrary((LPTSTR) qPrintable(libName));
   if (!modLib) {
     LPVOID lpMsgBuf;
@@ -524,23 +524,24 @@ XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
   }
 #else
   void* modLib = dlopen( libName.toLatin1(), RTLD_LAZY );
-  if ( !modLib )
-  err = QString( "Can not load library %1. %2" ).arg( libName ).arg( dlerror() );
-  else
-  {
+  if ( !modLib ) {
+    err = QString( "Can not load library %1. %2" ).arg( libName ).arg( dlerror() );
+  } else {
     crtInst = (CREATE_FUNC)dlsym( modLib, CREATE_MODULE );
-    if ( !crtInst )
-    err = QString( "Failed to find function %1. %2" ).arg( CREATE_MODULE ).arg( dlerror() );
+    if ( !crtInst ) {
+      err = QString( "Failed to find function %1. %2" ).arg( CREATE_MODULE ).arg( dlerror() );
+    }
   }
 #endif
 
   XGUI_Module* aModule = crtInst ? crtInst(this) : 0;
 
   if (!err.isEmpty()) {
-    if (mainWindow() && mainWindow()->isVisible())
+    if (mainWindow()) {
       QMessageBox::warning(mainWindow(), tr("Error"), err);
-    else
+    } else {
       qWarning( qPrintable( err ));
+    }
   }
   return aModule;
 }
@@ -548,7 +549,9 @@ XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
 //******************************************************
 bool XGUI_Workshop::activateModule()
 {
-  myPartSetModule = loadModule("PartSet");
+  Config_ModuleReader aModuleReader;
+  QString moduleName = QString::fromStdString(aModuleReader.getModuleName());
+  myPartSetModule = loadModule(moduleName);
   if (!myPartSetModule)
     return false;
   myPartSetModule->createFeatures();
