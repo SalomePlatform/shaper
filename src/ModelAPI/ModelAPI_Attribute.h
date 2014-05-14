@@ -32,7 +32,7 @@ public:
     {myFeature = theFeature;}
 
   /// Returns the owner of this attribute
-  MODELAPI_EXPORT const boost::shared_ptr<ModelAPI_Feature>& feature()
+  MODELAPI_EXPORT const boost::shared_ptr<ModelAPI_Feature>& owner()
   {return myFeature;}
 protected:
   /// Objects are created for features automatically

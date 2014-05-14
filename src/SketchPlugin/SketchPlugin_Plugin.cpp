@@ -1,6 +1,7 @@
 #include "SketchPlugin_Plugin.h"
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_Line.h"
+#include "SketchPlugin_ConstraintCoincidence.h"
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
 
@@ -22,6 +23,9 @@ boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Plugin::createFeature(string th
   }
   else if (theFeatureID == "SketchLine") {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_Line);
+  }
+  else if (theFeatureID == "SketchConstraintCoincidence") {
+    return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintCoincidence);
   }
   // feature of such kind is not found
   return boost::shared_ptr<ModelAPI_Feature>();

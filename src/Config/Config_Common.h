@@ -5,8 +5,13 @@
  *      Author: sbh
  */
 
-#include <libxml/parser.h>
-#include <libxml/tree.h>
+#ifndef Config_Common_H_
+#define Config_Common_H_
+
+#include "Config.h"
+
+#include <string>
+#include <stdarg.h>
 
 //>> Forward declaration of xmlNodePtr.
 typedef struct _xmlNode xmlNode;
@@ -23,10 +28,7 @@ struct _xmlDoc;
 /*
  * Returns true if theNode is XML ELEMENT node (not a "text" node ie).
  */
-static bool isElementNode(xmlNodePtr theNode)
-{
-  return theNode->type == XML_ELEMENT_NODE;
-}
+CONFIG_EXPORT bool isElementNode(xmlNodePtr theNode);
 
 /*
  * Returns true if theNode is XML node with a given name.
@@ -36,31 +38,7 @@ static bool isElementNode(xmlNodePtr theNode)
  * ", NULL" is required to use unlimited number of arguments.
  * TODO(sbh): find a way to simplify calling this method.
  */
-static bool isNode(xmlNodePtr theNode, const char* theNodeName, ...)
-{
-  bool result = false;
-  const xmlChar* aName = theNode->name;
-  if (!aName || !isElementNode(theNode)) {
-    return false;
-  }
-  if (!xmlStrcmp(aName, (const xmlChar *) theNodeName)) {
-    return true;
-  }
-  va_list args; // define argument list variable
-  va_start(args, theNodeName); // init list; point to last defined argument
-  while(true) {
-    char *anArg = va_arg (args, char*); // get next argument
-    if (anArg == NULL)
-      break;
-    if (!xmlStrcmp(aName, (const xmlChar *) anArg)) {
-      va_end(args); // cleanup the system stack
-      return true;
-    }
-  }
-  va_end(args); // cleanup the system stack
-  return false;
-}
-
+CONFIG_EXPORT bool isNode(xmlNodePtr theNode, const char* theNodeName, ...);
 
 /*
  * Every xml node has child. Even if there is no explicit
@@ -69,13 +47,19 @@ static bool isNode(xmlNodePtr theNode, const char* theNodeName, ...)
  * This method checks if real child nodes exist in the
  * given node.
  */
-static bool hasChild(xmlNodePtr theNode)
-{
-  xmlNodePtr aNode = theNode->children;
-  for(; aNode; aNode = aNode->next) {
-    if (isElementNode(theNode)) {
-      return true;
-    }
-  }
-  return false;
-}
+CONFIG_EXPORT bool hasChild(xmlNodePtr theNode);
+
+/*!
+ \brief Convert the given parameter to the platform-specific library name.
+
+ The function appends platform-specific prefix (lib) and suffix (.dll/.so)
+ to the library file name.
+ For example, if \a str = "mylib", "libmylib.so" is returned for Linux and
+ mylib.dll for Windows.
+
+ \param str short library name
+ \return full library name
+ */
+CONFIG_EXPORT std::string library(const std::string& theLibName);
+
+#endif

@@ -58,27 +58,39 @@ void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_V
   if (!(theEvent->buttons() &  Qt::LeftButton))
     return;
   gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
-  myCurPressed = aPoint;
+  myCurPoint.setPoint(aPoint);
 }
 
-void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
+void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView,
+                                           const std::list<XGUI_ViewerPrs>& theSelected)
 {
   if (!(theEvent->buttons() &  Qt::LeftButton))
     return;
-
-  double aCurX, aCurY;
-  PartSet_Tools::ConvertTo2D(myCurPressed, mySketch, theView, aCurX, aCurY);
-
-  double aX, anY;
   gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
-  PartSet_Tools::ConvertTo2D(aPoint, mySketch, theView, aX, anY);
 
-  double aDeltaX = aX - aCurX;
-  double aDeltaY = anY - aCurY;
+  if (myCurPoint.myIsInitialized) {
+    double aCurX, aCurY;
+    PartSet_Tools::ConvertTo2D(myCurPoint.myPoint, mySketch, theView, aCurX, aCurY);
 
-  moveLinePoint(aDeltaX, aDeltaY, LINE_ATTR_START);
-  moveLinePoint(aDeltaX, aDeltaY, LINE_ATTR_END);
-  myCurPressed = aPoint;
+    double aX, anY;
+    PartSet_Tools::ConvertTo2D(aPoint, mySketch, theView, aX, anY);
+
+    double aDeltaX = aX - aCurX;
+    double aDeltaY = anY - aCurY;
+
+    moveLinePoint(feature(), aDeltaX, aDeltaY, LINE_ATTR_START);
+    moveLinePoint(feature(), aDeltaX, aDeltaY, LINE_ATTR_END);
+
+    /*std::list<XGUI_ViewerPrs>::const_iterator anIt = theSelected.begin(), aLast = theSelected.end();
+    for (; anIt != aLast; anIt++) {
+      boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).feature();
+      if (!aFeature)
+        continue;
+      moveLinePoint(aFeature, aDeltaX, aDeltaY, LINE_ATTR_START);
+      moveLinePoint(aFeature, aDeltaX, aDeltaY, LINE_ATTR_END);
+    }*/
+  }
+  myCurPoint.setPoint(aPoint);
 }
 
 void PartSet_OperationEditLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
@@ -99,12 +111,13 @@ void PartSet_OperationEditLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_
 void PartSet_OperationEditLine::startOperation()
 {
   // do nothing in order to do not create a new feature
-  emit multiSelectionEnabled(false);
+  emit selectionEnabled(false);
+  myCurPoint.clear();
 }
 
 void PartSet_OperationEditLine::stopOperation()
 {
-  emit multiSelectionEnabled(true);
+  emit selectionEnabled(true);
 }
 
 boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::createFeature()
@@ -113,10 +126,14 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::createFeature()
   return boost::shared_ptr<ModelAPI_Feature>();
 }
 
-void  PartSet_OperationEditLine::moveLinePoint(double theDeltaX, double theDeltaY,
+void  PartSet_OperationEditLine::moveLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                               double theDeltaX, double theDeltaY,
                                                const std::string& theAttribute)
 {
-  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+  if (!theFeature)
+    return;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
 

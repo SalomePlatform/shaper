@@ -16,7 +16,7 @@ void Model_AttributeDocRef::setValue(boost::shared_ptr<ModelAPI_Document> theDoc
     myComment->Set(TCollection_ExtendedString(theDoc->id().c_str()));
 
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-    Model_FeatureUpdatedMessage aMsg(feature(), anEvent);
+    Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
     Events_Loop::loop()->send(aMsg);
   }
 }

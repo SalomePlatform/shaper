@@ -19,6 +19,33 @@ class QMouseEvent;
 class PARTSET_EXPORT PartSet_OperationEditLine : public PartSet_OperationSketchBase
 {
   Q_OBJECT
+  /// Struct to define gp point, with the state is the point is initialized
+  struct Point
+  {
+    /// Constructor
+    Point() {}
+    /// Constructor
+    /// \param thePoint the point
+    Point(gp_Pnt thePoint)
+    {
+      setPoint(thePoint);
+    }
+    ~Point() {}
+
+    /// clear the initialized flag.
+    void clear() { myIsInitialized = false; }
+    /// set the point and switch on the initialized flag
+    /// \param thePoint the point
+    void setPoint(const gp_Pnt& thePoint)
+    {
+      myIsInitialized = true;
+      myPoint = thePoint;
+    }
+
+    bool myIsInitialized; /// the state whether the point is set
+    gp_Pnt myPoint; /// the point
+  };
+
 public:
   /// Returns the operation type key
   static std::string Type() { return "EditLine"; }
@@ -53,13 +80,15 @@ public:
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
+  /// \param theSelected the list of selected presentations
+  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView,
+                          const std::list<XGUI_ViewerPrs>& theSelected);
   /// Gives the current selected objects to be processed by the operation
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
   /// \param theSelected the list of selected presentations
  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                             const std::list<XGUI_ViewerPrs>& theSelected);
+                            const std::list<XGUI_ViewerPrs>& theSelected);
 protected:
   /// \brief Virtual method called when operation is started
   /// Virtual method called when operation started (see start() method for more description)
@@ -77,14 +106,17 @@ protected:
 
 protected:
   /// \brief Save the point to the line.
+  /// \param theFeature the source feature
   /// \param theDeltaX the delta for X coordinate is moved
   /// \param theDeltaY the delta for Y coordinate is moved
   /// \param theAttribute the start or end attribute of the line
-  void  moveLinePoint(double theDeltaX, double theDeltaY,
+  void  moveLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                      double theDeltaX, double theDeltaY,
                       const std::string& theAttribute);
 
 private:
   boost::shared_ptr<ModelAPI_Feature> mySketch; ///< the sketch feature
+  Point myCurPoint; ///< the current 3D point clicked or moved
   gp_Pnt myCurPressed; ///< the current 3D point clicked or moved
 };
 

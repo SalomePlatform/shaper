@@ -43,9 +43,6 @@ public:
   /// Defines the current document that used for current work in the application
   virtual void setCurrentDocument(boost::shared_ptr<ModelAPI_Document> theDoc) = 0;
 
-  /// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
-  static void loadLibrary(const std::string theLibName);
-
   /// Is needed for python wrapping by swig, call Get to get an instance
   ModelAPI_PluginManager();
 

@@ -13,8 +13,11 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include <list>
+
 class Handle_V3d_View;
 class ModelAPI_Feature;
+class XGUI_ViewerPrs;
 
 /*!
  \class PartSet_Tools
@@ -61,6 +64,22 @@ public:
   /// \param theY2 the vertical coordinate of the second line point
   static void ProjectPointOnLine(double theX1, double theY1, double theX2, double theY2,
                                  double thePointX, double thePointY, double& theX, double& theY);
+
+  /// Returns a feature that is under the mouse point
+  /// \param thePoint a screen point
+  /// \param theView a 3D view
+  /// \param theSketch the sketch feature
+  /// \param theFeatures the list of selected presentations
+  static boost::shared_ptr<ModelAPI_Feature> NearestFeature(QPoint thePoint, Handle_V3d_View theView,
+                                                     boost::shared_ptr<ModelAPI_Feature> theSketch,
+                                                     const std::list<XGUI_ViewerPrs>& theFeatures);
+private:
+  /// Return the distance between the feature and the point
+  /// \param theFeature feature object
+  /// \param theX the horizontal coordinate of the point
+  /// \param theX the vertical coordinate of the point
+  static double DistanceToPoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                double theX, double theY);
 };
 
 #endif

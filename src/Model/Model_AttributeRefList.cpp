@@ -19,7 +19,7 @@ void Model_AttributeRefList::append(boost::shared_ptr<ModelAPI_Feature> theFeatu
   myRef->Append(aData->label());
 
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-  Model_FeatureUpdatedMessage aMsg(feature(), anEvent);
+  Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
   Events_Loop::loop()->send(aMsg);
 }
 
@@ -40,7 +40,7 @@ list<boost::shared_ptr<ModelAPI_Feature> > Model_AttributeRefList::list()
 {
   std::list< boost::shared_ptr<ModelAPI_Feature> > aResult;
   boost::shared_ptr<Model_Document> aDoc = 
-    boost::dynamic_pointer_cast<Model_Document>(feature()->document());
+    boost::dynamic_pointer_cast<Model_Document>(owner()->document());
   if (aDoc) {
     const TDF_LabelList& aList = myRef->List();
     for(TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {

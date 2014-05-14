@@ -7,7 +7,9 @@
 class XGUI_MainMenu;
 class XGUI_Viewer;
 class XGUI_ActionsMgr;
+class XGUI_ViewWindow;
 class QMdiArea;
+class QMdiSubWindow;
 class PyConsole_EnhConsole;
 
 /**\class XGUI_MainWindow
@@ -41,6 +43,15 @@ public:
 public slots:
   void showPythonConsole();
   void hidePythonConsole();
+
+  void createSubWindow();
+  
+private slots:
+  void cascadeWindows();
+  void onViewCreated(XGUI_ViewWindow* theWindow);
+  void onDeleteView(XGUI_ViewWindow* theWindow);
+  void activateView();
+  void onViewActivated(QMdiSubWindow* theSubWnd);
 
 private:
   XGUI_MainMenu* myMenuBar;

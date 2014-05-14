@@ -19,9 +19,9 @@ bool Model_AttributeRefAttr::isFeature()
 void Model_AttributeRefAttr::setAttr(boost::shared_ptr<ModelAPI_Attribute> theAttr)
 {
   boost::shared_ptr<Model_Data> aData = 
-    boost::dynamic_pointer_cast<Model_Data>(theAttr->feature()->data());
+    boost::dynamic_pointer_cast<Model_Data>(theAttr->owner()->data());
   string anID = aData->id(theAttr);
-  if (feature() == theAttr->feature() && myID->Get().IsEqual(anID.c_str()))
+  if (feature() == theAttr->owner() && myID->Get().IsEqual(anID.c_str()))
     return; // nothing is changed
 
   myRef->Set(aData->label());
@@ -53,7 +53,7 @@ void Model_AttributeRefAttr::setFeature(boost::shared_ptr<ModelAPI_Feature> theF
     myID->Set(""); // feature is identified by the empty ID
 
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-    Model_FeatureUpdatedMessage aMsg(feature(), anEvent);
+    Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
     Events_Loop::loop()->send(aMsg);
   }
 }
@@ -62,7 +62,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_AttributeRefAttr::feature()
 {
   if (myRef->Get() != myRef->Label()) { // initialized
     boost::shared_ptr<Model_Document> aDoc = 
-      boost::dynamic_pointer_cast<Model_Document>(feature()->document());
+      boost::dynamic_pointer_cast<Model_Document>(owner()->document());
     if (aDoc) {
       TDF_Label aRefLab = myRef->Get();
       TDF_Label aFeatureLab = aRefLab.Father();

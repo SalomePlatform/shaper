@@ -89,7 +89,8 @@ XGUI_Viewer::XGUI_Viewer(XGUI_MainWindow* theParent, bool DisplayTrihedron)
     myIsRelative(true), 
     myInteractionStyle(XGUI::STANDARD), 
     myTrihedronSize(100),
-    myActiveView(0)
+    myActiveView(0),
+    myWndIdCount(0)
 {
   if (!isInitialized) {
     isInitialized = true;
@@ -185,9 +186,11 @@ QMdiSubWindow* XGUI_Viewer::createView(V3d_TypeOfView theType)
 
   QMdiArea* aMDI = myMainWindow->mdiArea();
   QMdiSubWindow* aWnd = aMDI->addSubWindow(view, Qt::FramelessWindowHint);
-    addView(aWnd);
+  addView(aWnd);
   aWnd->setGeometry(0, 0, aMDI->width() / 2, aMDI->height() / 2);
   aWnd->show();
+  aWnd->setWindowTitle(QString("Viewer #%1").arg(++myWndIdCount));
+  emit viewCreated(view);
   return aWnd;
 }
 
@@ -440,8 +443,11 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
     connect(aWindow, SIGNAL(keyReleased(XGUI_ViewWindow*, QKeyEvent*)),
             this,    SIGNAL(keyRelease(XGUI_ViewWindow*, QKeyEvent*)));
 
-//    connect(aWindow, SIGNAL(contextMenuRequested( QContextMenuEvent* )),
-//            this,    SLOT  (onContextMenuRequested( QContextMenuEvent* )));
+    //connect(aWindow, SIGNAL(contextMenuRequested( QContextMenuEvent* )),
+    //        this,    SLOT  (onContextMenuRequested( QContextMenuEvent* )));
+    //connect(aWindow, SIGNAL( contextMenuRequested(QContextMenuEvent*) ), 
+    //        this, SIGNAL( contextMenuRequested(QContextMenuEvent*) ) );
+
     connect(aWindow, SIGNAL(mouseMoving(XGUI_ViewWindow*, QMouseEvent*)),
             this, SLOT(onMouseMove(XGUI_ViewWindow*, QMouseEvent*)));
 
@@ -457,6 +463,7 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
 void XGUI_Viewer::onWindowActivated(QMdiSubWindow* view)
 {
   if (view && (view != myActiveView) && (!view->isMinimized())) {
+    qDebug("onWindowActivated");
     myActiveView = view;
     ((XGUI_ViewWindow*)myActiveView->widget())->windowActivated();
     QList<QMdiSubWindow*>::iterator aIt;
@@ -512,8 +519,10 @@ void XGUI_Viewer::onMouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
 */
 void XGUI_Viewer::onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
 {
-  if (!mySelectionEnabled) return;
-  if (theEvent->button() != Qt::LeftButton) return;
+  if (!mySelectionEnabled || theEvent->button() != Qt::LeftButton) {
+    emit mouseRelease(theWindow, theEvent);
+    return;
+  }
 
   myEndPnt.setX(theEvent->x()); myEndPnt.setY(theEvent->y());
   bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
