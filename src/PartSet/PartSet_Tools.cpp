@@ -9,11 +9,15 @@
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
+#include <GeomDataAPI_Point2D.h>
 
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
 
 #include <SketchPlugin_Sketch.h>
+#include <SketchPlugin_Line.h>
+
+#include <XGUI_ViewerPrs.h>
 
 #include <V3d_View.hxx>
 #include <gp_Pln.hxx>
@@ -138,4 +142,54 @@ void PartSet_Tools::ProjectPointOnLine(double theX1, double theY1, double theX2,
     theX = aPoint.X();
     theY = aPoint.Y();
   }
+}
+
+boost::shared_ptr<ModelAPI_Feature> PartSet_Tools::NearestFeature(QPoint thePoint,
+                                                   Handle_V3d_View theView,
+                                                   boost::shared_ptr<ModelAPI_Feature> theSketch,
+                                                   const std::list<XGUI_ViewerPrs>& theFeatures)
+{
+  double aX, anY;
+  gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(thePoint, theView);
+  PartSet_Tools::ConvertTo2D(aPoint, theSketch, theView, aX, anY);
+
+  boost::shared_ptr<ModelAPI_Feature> aFeature;
+  std::list<XGUI_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
+
+  boost::shared_ptr<ModelAPI_Feature> aDeltaFeature;   
+  double aMinDelta = -1;
+  XGUI_ViewerPrs aPrs;
+  for (; anIt != aLast; anIt++) {
+    aPrs = *anIt;
+    if (!aPrs.feature())
+      continue;
+    double aDelta = DistanceToPoint(aPrs.feature(), aX, anY);
+    if (aMinDelta < 0 || aMinDelta > aDelta) {
+      aMinDelta = aDelta;
+      aDeltaFeature = aPrs.feature();
+    }
+  }
+  return aDeltaFeature;
+}
+
+double PartSet_Tools::DistanceToPoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                      double theX, double theY)
+{
+  double aDelta = 0;
+  if (theFeature->getKind() != "SketchLine")
+    return aDelta;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
+
+  double aX, anY;
+  PartSet_Tools::ProjectPointOnLine(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y(), theX, theY, aX, anY);
+
+  aDelta = gp_Pnt(theX, theY, 0).Distance(gp_Pnt(aX, anY, 0));
+
+  return aDelta;
 }

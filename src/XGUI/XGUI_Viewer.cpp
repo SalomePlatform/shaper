@@ -519,8 +519,10 @@ void XGUI_Viewer::onMouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
 */
 void XGUI_Viewer::onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
 {
-  if (!mySelectionEnabled) return;
-  if (theEvent->button() != Qt::LeftButton) return;
+  if (!mySelectionEnabled || theEvent->button() != Qt::LeftButton) {
+    emit mouseRelease(theWindow, theEvent);
+    return;
+  }
 
   myEndPnt.setX(theEvent->x()); myEndPnt.setY(theEvent->y());
   bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);

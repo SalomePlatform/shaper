@@ -40,6 +40,12 @@ public:
   /// \param theSelected the list of selected presentations
   virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
                              const std::list<XGUI_ViewerPrs>& theSelected);
+  /// Gives the current mouse point in the viewer
+  /// \param thePoint a point clicked in the viewer
+  /// \param theEvent the mouse event
+  /// \param theSelected the list of selected presentations
+  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView,
+                          const std::list<XGUI_ViewerPrs>& theSelected);
 
 signals:
   /// signal about the sketch plane is selected

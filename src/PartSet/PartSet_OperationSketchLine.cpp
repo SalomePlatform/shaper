@@ -79,9 +79,11 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
 {
   double aX, anY;
 
+  bool isFoundPoint = false;
   gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
   if (theSelected.empty()) {
     PartSet_Tools::ConvertTo2D(aPoint, mySketch, theView, aX, anY);
+    isFoundPoint = true;
   }
   else {
     XGUI_ViewerPrs aPrs = theSelected.front();
@@ -93,6 +95,7 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
         if (!aVertex.IsNull()) {
           aPoint = BRep_Tool::Pnt(aVertex);
           PartSet_Tools::ConvertTo2D(aPoint, mySketch, theView, aX, anY);
+          isFoundPoint = true;
 
           setConstraints(aX, anY);
         }
@@ -119,10 +122,14 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
             default:
             break;
           }
+          isFoundPoint = true;
         }
       }
     }
   }
+  //if (!isFoundPoint)
+  //  return;
+
   switch (myPointSelectionMode)
   {
     case SM_FirstPoint: {
@@ -142,7 +149,8 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
   }
 }
 
-void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
+void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView,
+                                             const std::list<XGUI_ViewerPrs>& /*theSelected*/)
 {
   switch (myPointSelectionMode)
   {
