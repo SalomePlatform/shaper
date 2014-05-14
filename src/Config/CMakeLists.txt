@@ -23,6 +23,7 @@ SET(PROJECT_SOURCES
   Config_WidgetAPI.cpp
   Config_WidgetReader.cpp
   Config_PointerMessage.cpp
+  Config_Common.cpp
 )
 
 SET(XML_RESOURCES

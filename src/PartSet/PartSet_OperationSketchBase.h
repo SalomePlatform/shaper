@@ -67,7 +67,9 @@ public:
   /// Processes the mouse move in the point
   /// \param thePoint a 3D point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
+  /// \param theSelected the list of selected presentations
+  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView,
+                          const std::list<XGUI_ViewerPrs>& theSelected);
 
   /// Processes the key pressed in the view
   /// \param theKey a key value
@@ -86,6 +88,10 @@ signals:
   /// signal to enable/disable multi selection in the viewer
   /// \param theEnabled the boolean state
   void multiSelectionEnabled(bool theEnabled);
+
+  /// signal to enable/disable usual selection in the viewer
+  /// \param theEnabled the boolean state
+  void selectionEnabled(bool theEnabled);
 
 protected:
   /// Creates an operation new feature

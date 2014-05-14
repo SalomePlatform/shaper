@@ -143,7 +143,6 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
     if (aSelector) {
       NCollection_List<TopoDS_Shape> aList;
       aSelector->selectedShapes(aList);
-
       aPresentations = myWorkshop->displayer()->GetViewerPrs(aList);
     }
     aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aPresentations);
@@ -156,7 +155,14 @@ void PartSet_Module::onMouseMoved(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    aPreviewOp->mouseMoved(theEvent, myWorkshop->viewer()->activeView());
+    XGUI_SelectionMgr* aSelector = myWorkshop->selector();
+    std::list<XGUI_ViewerPrs> aPresentations;
+    if (aSelector) {
+      NCollection_List<TopoDS_Shape> aList;
+      aSelector->selectedShapes(aList);
+      aPresentations = myWorkshop->displayer()->GetViewerPrs(aList);
+    }
+    aPreviewOp->mouseMoved(theEvent, myWorkshop->viewer()->activeView(), aPresentations);
   }
 }
 
@@ -200,6 +206,12 @@ void PartSet_Module::onMultiSelectionEnabled(bool theEnabled)
 {
   XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
   aViewer->enableMultiselection(theEnabled);
+}
+
+void PartSet_Module::onSelectionEnabled(bool theEnabled)
+{
+  XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
+  aViewer->enableSelection(theEnabled);
 }
 
 void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
@@ -252,6 +264,8 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
             this, SLOT(onLaunchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)));
     connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)),
             this, SLOT(onMultiSelectionEnabled(bool)));
+    connect(aPreviewOp, SIGNAL(selectionEnabled(bool)),
+            this, SLOT(onSelectionEnabled(bool)));
 
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {

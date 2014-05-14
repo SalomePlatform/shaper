@@ -47,6 +47,7 @@ void PartSet_OperationSketchBase::mouseReleased(QMouseEvent* theEvent, Handle_V3
                                                 const std::list<XGUI_ViewerPrs>& theSelected)
 {
 }
-void PartSet_OperationSketchBase::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
+void PartSet_OperationSketchBase::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView,
+                                             const std::list<XGUI_ViewerPrs>& theSelected)
 {
 }

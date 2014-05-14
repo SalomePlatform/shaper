@@ -27,12 +27,16 @@ public:
 
   CONFIG_EXPORT std::string getModuleName();
 
+  /// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
+  CONFIG_EXPORT static void loadLibrary(const std::string theLibName);
+
 protected:
   void processNode(xmlNodePtr aNode);
   bool processChildren(xmlNodePtr aNode);
 
-  std::list<std::string> importPlugin(const std::string& thePluginFile,
-                                      const std::string& thePluginLibrary);
+  std::list<std::string> importPlugin(const std::string& thePluginLibrary,
+                                      const std::string& thePluginFile);
+
 
 private:
   std::map<std::string, std::string> myFeaturesInFiles;
