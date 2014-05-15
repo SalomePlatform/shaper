@@ -141,6 +141,26 @@ void XGUI_Displayer::RedisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature>
     aContext->UpdateCurrentViewer();
 }
 
+void XGUI_Displayer::EraseAll(const bool isUpdateViewer)
+{
+  Handle(AIS_InteractiveContext) ic = AISContext();
+
+  AIS_ListOfInteractive aList;
+  ic->DisplayedObjects(aList);
+  AIS_ListIteratorOfListOfInteractive anIter(aList);
+  for (; anIter.More(); anIter.Next()) {
+    if ((anIter.Value()->DynamicType() == STANDARD_TYPE(AIS_Trihedron)))
+      continue;
+
+    // erase an object
+    Handle(AIS_InteractiveObject) anIO = anIter.Value();
+    ic->Erase(anIO, false);
+  }
+  myFeature2AISObjectMap.clear();
+  if (isUpdateViewer)
+    ic->UpdateCurrentViewer();
+}
+
 void XGUI_Displayer::CloseLocalContexts(const bool isUpdateViewer)
 {
   closeAllContexts(true);
@@ -154,6 +174,13 @@ void XGUI_Displayer::closeAllContexts(const bool isUpdateViewer)
     if (isUpdateViewer)
       ic->UpdateCurrentViewer();
   }
+}
+
+void XGUI_Displayer::UpdateViewer()
+{
+  Handle(AIS_InteractiveContext) ic = AISContext();
+  if (!ic.IsNull())
+    ic->UpdateCurrentViewer();
 }
 
 Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const 

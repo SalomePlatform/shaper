@@ -424,7 +424,7 @@ void XGUI_Workshop::onOpen()
   }
 
   //show file dialog, check if readable and open
-  myCurrentFile = QFileDialog::getOpenFileName(mainWindow());
+  myCurrentFile = QFileDialog::getExistingDirectory(mainWindow());
   if(myCurrentFile.isEmpty())
     return;
   QFileInfo aFileInfo(myCurrentFile);
@@ -473,6 +473,8 @@ void XGUI_Workshop::onUndo()
   objectBrowser()->setCurrentIndex(QModelIndex());
   boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  if (!operationMgr()->abortOperation())
+    return;
   aDoc->undo();
   updateCommandStatus();
 }

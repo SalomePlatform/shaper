@@ -15,12 +15,16 @@ SET(PROJECT_SOURCES
 SET(PROJECT_LIBRARIES
     ${SLVS_LIBRARIES}
     SketchPlugin
+    Events
 )
 
 INCLUDE_DIRECTORIES(
-    ../SketchPlugin
-    ../ModelAPI
-    ../GeomAPI
+    ${PROJECT_SOURCE_DIR}/src/SketchPlugin
+    ${PROJECT_SOURCE_DIR}/src/ModelAPI
+    ${PROJECT_SOURCE_DIR}/src/Model
+    ${PROJECT_SOURCE_DIR}/src/GeomAPI
+    ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
+    ${PROJECT_SOURCE_DIR}/src/Events
 )
 
 ADD_DEFINITIONS(-DSKETCHSOLVER_EXPORTS ${BOOST_DEFINITIONS})

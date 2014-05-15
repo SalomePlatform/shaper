@@ -15,6 +15,8 @@
 #include <ModuleBase_Operation.h>
 #include <QObject>
 
+#include <map>
+
 class Handle_V3d_View;
 class QMouseEvent;
 class GeomAPI_Shape;
@@ -42,6 +44,10 @@ public:
   /// Returns the feature preview shape
   /// \param theFeature the feature object to obtain the preview
   boost::shared_ptr<GeomAPI_Shape> preview(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
+
+  /// Returns the map of the operation previews including the nested feature previews
+  /// \return the map of feature to the feature preview
+  virtual std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> > preview() const;
 
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode

@@ -26,6 +26,12 @@ const boost::shared_ptr<Model_Document>& Model_Application::getDocument(string t
 
   boost::shared_ptr<Model_Document> aNew(new Model_Document(theDocID));
   myDocs[theDocID] = aNew;
+  // load it if it must be loaded by demand
+  if (myLoadedByDemand.find(theDocID) != myLoadedByDemand.end() && !myPath.empty()) {
+    aNew->load(myPath.c_str());
+    myLoadedByDemand.erase(theDocID); // done, don't do it anymore
+  }
+
   return myDocs[theDocID];
 }
 
@@ -38,6 +44,18 @@ void Model_Application::deleteDocument(string theDocID)
 bool Model_Application::hasDocument(std::string theDocID)
 {
   return myDocs.find(theDocID) != myDocs.end();
+}
+
+//=======================================================================
+void Model_Application::setLoadPath(std::string thePath)
+{
+  myPath = thePath;
+}
+
+//=======================================================================
+void Model_Application::setLoadByDemand(std::string theID)
+{
+  myLoadedByDemand.insert(theID);
 }
 
 //=======================================================================

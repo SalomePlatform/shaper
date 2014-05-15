@@ -47,6 +47,10 @@ public:
   virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView,
                           const std::list<XGUI_ViewerPrs>& theSelected);
 
+  /// Returns the map of the operation previews including the nested feature previews
+  /// \return the map of feature to the feature preview
+  virtual std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
+                                                                           preview() const;
 signals:
   /// signal about the sketch plane is selected
   /// \param theX the value in the X direction of the plane

@@ -28,7 +28,7 @@ void Model_AttributeRefAttr::setAttr(boost::shared_ptr<ModelAPI_Attribute> theAt
   myID->Set(aData->id(theAttr).c_str());
 
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-  Model_FeatureUpdatedMessage aMsg(feature(), anEvent);
+  Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
   Events_Loop::loop()->send(aMsg);
 }
 

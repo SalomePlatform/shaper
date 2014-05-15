@@ -46,6 +46,16 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
   return true;
 }
 
+bool XGUI_OperationMgr::abortOperation()
+{
+  ModuleBase_Operation* aCurrentOp = currentOperation();
+  if (!aCurrentOp || !canStopOperation())
+    return false; 
+
+  aCurrentOp->abort();
+  return true;
+}
+
 void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
 {
   connect(theOperation, SIGNAL(stopped()), this, SLOT(onOperationStopped()));
@@ -60,16 +70,21 @@ bool XGUI_OperationMgr::canStartOperation(ModuleBase_Operation* theOperation)
   ModuleBase_Operation* aCurrentOp = currentOperation();
   if (aCurrentOp && !theOperation->isGranted())
   {
-    int anAnswer = QMessageBox::question(0, tr("Operation launch"),
-                                tr("Previous operation is not finished and will be aborted"),
-                                QMessageBox::Ok, QMessageBox::Cancel);
-    if (anAnswer == QMessageBox::Ok) {
+    if (canStopOperation()) {
       aCurrentOp->abort();
     } else {
       aCanStart = false;
     }
   }
   return aCanStart;
+}
+
+bool XGUI_OperationMgr::canStopOperation()
+{
+  int anAnswer = QMessageBox::question(0, tr("Operation launch"),
+                              tr("Previous operation is not finished and will be aborted"),
+                              QMessageBox::Ok, QMessageBox::Cancel);
+  return anAnswer == QMessageBox::Ok;
 }
 
 void XGUI_OperationMgr::onOperationStopped()

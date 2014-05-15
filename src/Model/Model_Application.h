@@ -36,6 +36,11 @@ public:
   //! Deletes the document from the application
   MODEL_EXPORT void deleteDocument(std::string theDocID);
 
+  //! Set path for the loaded by demand documents
+  void setLoadPath(std::string thePath);
+  //! Defines that specified document must be loaded by demand
+  void setLoadByDemand(std::string theID);
+
 public:
   // Redefined OCAF methods
   //! Return name of resource (i.e. "Standard")
@@ -51,6 +56,10 @@ public:
 private:
   /// Map from string identifiers to created documents of an application
   std::map<std::string, boost::shared_ptr<Model_Document> > myDocs;
+  /// Path for the loaded by demand documents
+  std::string myPath;
+  /// Path for the loaded by demand documents
+  std::set<std::string> myLoadedByDemand;
 };
 
 #endif

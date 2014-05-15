@@ -11,6 +11,8 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeRefList.h>
+
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
@@ -77,6 +79,29 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View)
                                                               theView, feature(), theSelected);
   if (aFeature)
     emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+}
+
+std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
+                                                        PartSet_OperationSketch::preview() const
+{
+  std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> > aPreviewMap;
+
+  boost::shared_ptr<SketchPlugin_Feature> aFeature;
+
+  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+  boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SKETCH_ATTR_FEATURES));
+
+  std::list<boost::shared_ptr<ModelAPI_Feature> > aFeatures = aRefList->list();
+  std::list<boost::shared_ptr<ModelAPI_Feature> >::const_iterator anIt = aFeatures.begin(),
+                                                                  aLast = aFeatures.end();
+  for (; anIt != aLast; anIt++) {
+    aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
+    boost::shared_ptr<GeomAPI_Shape> aPreview = aFeature->preview();
+    if (aPreview)
+      aPreviewMap[aFeature] = aPreview;
+  }
+  return aPreviewMap;
 }
 
 void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
