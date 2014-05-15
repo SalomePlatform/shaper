@@ -43,6 +43,10 @@ public:
   /// \return the state whether the current operation is started
   bool startOperation(ModuleBase_Operation* theOperation);
 
+  /// Abort the operation and append it to the stack of operations
+  /// \return the state whether the current operation is aborted
+  bool abortOperation();
+
 signals:
   /// Signal about an operation is started. It is emitted after the start() of operation is done.
   void operationStarted();
@@ -61,6 +65,9 @@ protected:
   /// the granted parameter of the launched operation
   /// \param theOperation an operation to check
   bool canStartOperation(ModuleBase_Operation* theOperation);
+
+  /// Returns whether the operation can be stopped.
+  bool canStopOperation();
 
 protected slots:
   /// Slot that is called by an operation stop. Removes the stopped operation form the stack.

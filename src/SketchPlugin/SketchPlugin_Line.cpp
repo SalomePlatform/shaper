@@ -16,6 +16,7 @@ const double PLANE_SIZE = 200;
 
 SketchPlugin_Line::SketchPlugin_Line()
 {
+  setSketch(0);
 }
 
 void SketchPlugin_Line::initAttributes()
@@ -31,17 +32,18 @@ void SketchPlugin_Line::execute()
 const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Line::preview()
 {
   SketchPlugin_Sketch* aSketch = sketch();
-  // compute a start point in 3D view
-  boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(LINE_ATTR_START));
-  boost::shared_ptr<GeomAPI_Pnt> aStart(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
-  // compute an end point in 3D view
-  boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(LINE_ATTR_END));
-  boost::shared_ptr<GeomAPI_Pnt> anEnd(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
-  // make linear edge
-  boost::shared_ptr<GeomAPI_Shape> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
-  setPreview(anEdge);
-
+  if (aSketch) {
+    // compute a start point in 3D view
+    boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
+      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(LINE_ATTR_START));
+    boost::shared_ptr<GeomAPI_Pnt> aStart(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
+    // compute an end point in 3D view
+    boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
+      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(LINE_ATTR_END));
+    boost::shared_ptr<GeomAPI_Pnt> anEnd(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
+    // make linear edge
+    boost::shared_ptr<GeomAPI_Shape> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
+    setPreview(anEdge);
+  }
   return getPreview();
 }

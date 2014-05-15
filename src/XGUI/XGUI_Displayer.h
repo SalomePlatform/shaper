@@ -81,9 +81,16 @@ public:
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void Erase(boost::shared_ptr<ModelAPI_Feature> theFeature, const bool isUpdateViewer = true);
 
+  /// Erase all presentations
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  void EraseAll(const bool isUpdateViewer = true);
+
   /// Deactivates selection of sub-shapes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void CloseLocalContexts(const bool isUpdateViewer = true);
+
+  /// Updates the viewer
+  void UpdateViewer();
 
 protected:
   /// Deactivate local selection
