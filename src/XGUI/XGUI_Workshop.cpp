@@ -421,7 +421,7 @@ void XGUI_Workshop::onOpen()
   }
 
   //show file dialog, check if readable and open
-  myCurrentFile = QFileDialog::getOpenFileName(mainWindow());
+  myCurrentFile = QFileDialog::getExistingDirectory(mainWindow());
   if(myCurrentFile.isEmpty())
     return;
   QFileInfo aFileInfo(myCurrentFile);

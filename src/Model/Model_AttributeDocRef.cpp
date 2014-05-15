@@ -36,5 +36,11 @@ Model_AttributeDocRef::Model_AttributeDocRef(TDF_Label& theLabel)
   if (!theLabel.FindAttribute(TDataStd_Comment::GetID(), myComment)) {
     // create attribute: not initialized by value yet, just empty string
     myComment = TDataStd_Comment::Set(theLabel, "");
+  } else { // document was already referenced: try to set it as loaded by demand
+    Handle(Model_Application) anApp = Model_Application::getApplication();
+    string anID(TCollection_AsciiString(myComment->Get()).ToCString());
+    if (!anApp->hasDocument(anID)) {
+      anApp->setLoadByDemand(anID);
+    }
   }
 }
