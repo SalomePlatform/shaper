@@ -120,6 +120,8 @@ private:
   std::set<std::string> mySubs; ///< set of identifiers of sub-documents of this document
   /// transaction indexes (related to myTransactionsAfterSave) which were empty in this doc
   std::map<int, bool> myIsEmptyTr;
+  /// true if the current operation is nested
+  bool myIsNested;
 };
 
 #endif

@@ -168,6 +168,10 @@ void Model_Document::close()
 
 void Model_Document::startOperation()
 {
+  // check is it nested or not
+  if (myDoc->HasOpenCommand()) {
+    myIsNested = true;
+  }
   // new command for this
   myDoc->NewCommand();
   // new command for all subs
@@ -181,6 +185,7 @@ void Model_Document::finishOperation()
   // returns false if delta is empty and no transaction was made
   myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();
   myTransactionsAfterSave++;
+  myIsNested = false;
   // finish for all subs
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
@@ -393,6 +398,8 @@ Model_Document::Model_Document(const std::string theID)
 {
   myDoc->SetUndoLimit(UNDO_LIMIT);
   myTransactionsAfterSave = 0;
+  myIsNested = false;
+  myDoc->SetNestedTransactionMode();
   // to have something in the document and avoid empty doc open/save problem
   TDataStd_Integer::Set(myDoc->Main().Father(), 0);
 }
