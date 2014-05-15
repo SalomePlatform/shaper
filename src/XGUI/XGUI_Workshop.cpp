@@ -19,6 +19,7 @@
 #include "XGUI_ErrorDialog.h"
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_PropertyPanel.h"
+#include "XGUI_ContextMenuMgr.h"
 
 #include <Model_Events.h>
 #include <ModelAPI_PluginManager.h>
@@ -83,6 +84,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myOperationMgr = new XGUI_OperationMgr(this);
   myActionsMgr = new XGUI_ActionsMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(myMainWindow);
+  myContextMenuMgr = new XGUI_ContextMenuMgr(this);
 
   myViewerProxy = new XGUI_ViewerProxy(this);
 
@@ -177,6 +179,7 @@ void XGUI_Workshop::initMenu()
                                 QIcon(":pictures/close.png"), QKeySequence::Close);
   aCommand->connectTo(this, SLOT(onExit()));
 
+  myContextMenuMgr->createActions();
 }
 
 //******************************************************
@@ -571,25 +574,25 @@ void XGUI_Workshop::updateCommandStatus()
   if (aMgr->hasRootDocument()) {
     XGUI_Command* aUndoCmd;
     XGUI_Command* aRedoCmd;
-    for (aIt = aCommands.constBegin(); aIt != aCommands.constEnd(); ++aIt) {
-      if ((*aIt)->id() == "UNDO_CMD")
-        aUndoCmd = (*aIt);
-      else if ((*aIt)->id() == "REDO_CMD")
-        aRedoCmd = (*aIt);
+    foreach(XGUI_Command* aCmd, aCommands) {
+      if (aCmd->id() == "UNDO_CMD")
+        aUndoCmd = aCmd;
+      else if (aCmd->id() == "REDO_CMD")
+        aRedoCmd = aCmd;
       else // Enable all commands
-        (*aIt)->enable();
+        aCmd->enable();
     }
     boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
     aUndoCmd->setEnabled(aDoc->canUndo());
     aRedoCmd->setEnabled(aDoc->canRedo());
   } else {
-    for (aIt = aCommands.constBegin(); aIt != aCommands.constEnd(); ++aIt) {
-      if ((*aIt)->id() == "NEW_CMD")
-        (*aIt)->enable();
-      else if ((*aIt)->id() == "EXIT_CMD")
-        (*aIt)->enable();
+    foreach(XGUI_Command* aCmd, aCommands) {
+      if (aCmd->id() == "NEW_CMD")
+        aCmd->enable();
+      else if (aCmd->id() == "EXIT_CMD")
+        aCmd->enable();
       else 
-        (*aIt)->disable();
+        aCmd->disable();
     }
   }
 }
@@ -603,6 +606,8 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
   connect(myObjectBrowser, SIGNAL(activePartChanged(FeaturePtr)), this, SLOT(changeCurrentDocument(FeaturePtr)));
   aObjDock->setWidget(myObjectBrowser);
+
+  myContextMenuMgr->connectObjectBrowser();
   return aObjDock;
 }
 

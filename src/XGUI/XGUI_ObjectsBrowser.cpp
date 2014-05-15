@@ -44,3 +44,8 @@ void XGUI_ObjectsBrowser::mouseDoubleClickEvent(QMouseEvent* theEvent)
     emit activePartChanged(myDocModel->activePart());
   }
 }
+
+void XGUI_ObjectsBrowser::contextMenuEvent(QContextMenuEvent* theEvent)
+{
+  emit contextMenuRequested(theEvent);
+}

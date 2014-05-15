@@ -36,6 +36,9 @@ public:
 
   /// Use plugin manager for features creation
   PartSetPlugin_Part();
+
+  /// Returns true if this feature must be displayed in the history (top level of Part tree)
+  PARTSETPLUGIN_EXPORT virtual bool isInHistory() {return false;}
 };
 
 #endif

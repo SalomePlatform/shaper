@@ -7,6 +7,8 @@
 #include <QObject>
 #include <QMap>
 #include <QList>
+#include <QPoint>
+#include <QAction>
 
 #include <V3d_Viewer.hxx>
 #include <AIS_InteractiveContext.hxx>
@@ -14,7 +16,6 @@
 #include <NCollection_List.hxx>
 #include <TopoDS_Shape.hxx>
 
-#include <QPoint>
 
 class XGUI_MainWindow;
 class QMdiSubWindow;
@@ -123,6 +124,10 @@ public:
   //! Compute trihedron size dependent on 3d scene size
   bool computeTrihedronSize(double& theNewSize, double& theSize);
 
+  //! Add action to the viewer
+  void addAction(QAction* theAction) { myActions.append(theAction); }
+
+
   static void setHotButton(XGUI::InteractionStyle theInteractionStyle, XGUI::HotOperation theOper,
                            Qt::KeyboardModifiers theState, Qt::MouseButtons theButton);
   static void getHotButton(XGUI::InteractionStyle theInteractionStyle, XGUI::HotOperation theOper,
@@ -160,6 +165,7 @@ private slots:
   void onMouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
   void onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
   void onMousePressed(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
+  void onContextMenuRequested(QContextMenuEvent* theEvent);
 
 private:
   void addView(QMdiSubWindow* theView);
@@ -192,8 +198,11 @@ private:
   /// Points used for selection management
   QPoint myStartPnt, myEndPnt, myCurPnt;
 
-  // A counter of created windows
+  /// A counter of created windows
   int myWndIdCount;
+
+  /// List of Viewer actions
+  QList<QAction*> myActions;
 };
 
 #endif
