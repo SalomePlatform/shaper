@@ -50,6 +50,10 @@ public:
   /// Identifier by the id (not fast, iteration by map)
   /// \param theAttr attribute already created in this data
   virtual const std::string& id(const boost::shared_ptr<ModelAPI_Attribute> theAttr) = 0;
+  /// Returns true if data belongs to same features
+  virtual bool isEqual(const boost::shared_ptr<ModelAPI_Data> theData) = 0;
+  /// Returns true if it is correctly connected t othe data model
+  virtual bool isValid() = 0;
 
   /// Initializes object by the attributes: must be called just after the object is created
   /// for each attribute of the object

@@ -170,7 +170,7 @@ void Model_Document::startOperation()
 {
   // check is it nested or not
   if (myDoc->HasOpenCommand()) {
-    myIsNested = true;
+    myNestedStart = myTransactionsAfterSave;
   }
   // new command for this
   myDoc->NewCommand();
@@ -182,10 +182,11 @@ void Model_Document::startOperation()
 
 void Model_Document::finishOperation()
 {
+  if (myNestedStart > myTransactionsAfterSave) // this nested transaction is owervritten
+    myNestedStart = 0;
   // returns false if delta is empty and no transaction was made
   myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();
   myTransactionsAfterSave++;
-  myIsNested = false;
   // finish for all subs
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
@@ -215,7 +216,7 @@ bool Model_Document::isModified()
 
 bool Model_Document::canUndo()
 {
-  if (myDoc->GetAvailableUndos() > 0)
+  if (myDoc->GetAvailableUndos() > 0 && myNestedStart != myTransactionsAfterSave)
     return true;
   // check other subs contains operation that can be undoed
   set<string>::iterator aSubIter = mySubs.begin();
@@ -283,8 +284,8 @@ void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFea
   aData->setLabel(anObjLab);
   boost::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
-  theFeature->setData(aData);
   theFeature->setDoc(aThis);
+  theFeature->setData(aData);
   setUniqueName(theFeature);
   theFeature->initAttributes();
   // keep the feature ID to restore document later correctly
@@ -398,7 +399,7 @@ Model_Document::Model_Document(const std::string theID)
 {
   myDoc->SetUndoLimit(UNDO_LIMIT);
   myTransactionsAfterSave = 0;
-  myIsNested = false;
+  myNestedStart = 0;
   myDoc->SetNestedTransactionMode();
   // to have something in the document and avoid empty doc open/save problem
   TDataStd_Integer::Set(myDoc->Main().Father(), 0);
@@ -509,6 +510,13 @@ void Model_Document::synchronizeFeatures()
           TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(
           aFLabIter.Value())->Get()).ToCString());
 
+        if (aFIter == aFeatures.end()) { // must be before "setData" to redo the sketch line correctly
+          aFeatures.push_back(aFeature);
+          aFIter = aFeatures.end();
+        } else {
+          aFIter++;
+          aFeatures.insert(aFIter, aFeature);
+        }
         boost::shared_ptr<Model_Data> aData(new Model_Data);
         TDF_Label aLab = aFLabIter.Value()->Label();
         aData->setLabel(aLab);
@@ -517,13 +525,6 @@ void Model_Document::synchronizeFeatures()
         aFeature->setData(aData);
         aFeature->initAttributes();
 
-        if (aFIter == aFeatures.end()) {
-          aFeatures.push_back(aFeature);
-          aFIter = aFeatures.end();
-        } else {
-          aFIter++;
-          aFeatures.insert(aFIter, aFeature);
-        }
         // event: model is updated
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);
         Model_FeatureUpdatedMessage aMsg(aFeature, anEvent);
