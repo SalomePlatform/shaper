@@ -473,8 +473,9 @@ void XGUI_Workshop::onUndo()
   objectBrowser()->setCurrentIndex(QModelIndex());
   boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
-  if (!operationMgr()->abortOperation())
-    return;
+  //if (!operationMgr()->abortOperation())
+  //  return;
+  operationMgr()->abortOperation();
   aDoc->undo();
   updateCommandStatus();
 }

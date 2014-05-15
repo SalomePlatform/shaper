@@ -159,3 +159,16 @@ const string& Model_Data::id(const boost::shared_ptr<ModelAPI_Attribute> theAttr
   static string anEmpty;
   return anEmpty;
 }
+
+bool Model_Data::isEqual(const boost::shared_ptr<ModelAPI_Data> theData)
+{
+  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theData);
+  if (aData)
+    return myLab.IsEqual(aData->myLab) == Standard_True;
+  return false;
+}
+
+bool Model_Data::isValid()
+{
+  return !myLab.IsNull() && myLab.HasAttribute();
+}

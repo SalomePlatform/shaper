@@ -112,6 +112,8 @@ private:
   Handle_TDocStd_Document myDoc; ///< OCAF document
   /// number of transactions after the last "save" call, used for "IsModified" method
   int myTransactionsAfterSave;
+  /// number of myTransactionsAfterSave for the nested transaction start
+  int myNestedStart;
   /// root labels of the features groups identified by names
   std::map<std::string, TDF_Label> myGroups;
   std::vector<std::string> myGroupsNames; ///< names of added groups to the document
@@ -120,8 +122,6 @@ private:
   std::set<std::string> mySubs; ///< set of identifiers of sub-documents of this document
   /// transaction indexes (related to myTransactionsAfterSave) which were empty in this doc
   std::map<int, bool> myIsEmptyTr;
-  /// true if the current operation is nested
-  bool myIsNested;
 };
 
 #endif
