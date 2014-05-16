@@ -89,11 +89,11 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       changeConstraint(aConstraint);
 
       // Solve the set of constraints
-      ResolveConstraints();
+      resolveConstraints();
       return ;
     }
 
-    /// \todo Implement feature update handling
+    // Sketch plugin features only can be updated
     boost::shared_ptr<SketchPlugin_Feature> aFeature = 
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(aUpdateMsg->feature());
     if (aFeature)
@@ -101,13 +101,28 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       updateEntity(aFeature);
 
       // Solve the set of constraints
-      ResolveConstraints();
+      resolveConstraints();
     }
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED))
   {
     const Model_FeatureDeletedMessage* aDeleteMsg = dynamic_cast<const Model_FeatureDeletedMessage*>(theMessage);
-    /// \todo Implement deleting objects on event
+
+    if (aDeleteMsg->group().compare("Sketch") == 0)
+    {
+      std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter = myGroups.begin();
+      while (aGroupIter != myGroups.end())
+      {
+        if ((*aGroupIter)->updateGroup())
+        { // the group should be removed
+          delete *aGroupIter;
+          int aShift = aGroupIter - myGroups.begin();
+          myGroups.erase(aGroupIter);
+          aGroupIter = myGroups.begin() + aShift;
+        }
+        else aGroupIter++;
+      }
+    }
   }
 }
 
@@ -242,11 +257,11 @@ boost::shared_ptr<SketchPlugin_Sketch> SketchSolver_ConstraintManager::findWorkp
   return boost::shared_ptr<SketchPlugin_Sketch>();
 }
 
-void SketchSolver_ConstraintManager::ResolveConstraints()
+void SketchSolver_ConstraintManager::resolveConstraints()
 {
   std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter; 
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
-    (*aGroupIter)->ResolveConstraints();
+    (*aGroupIter)->resolveConstraints();
 }
 
 
@@ -588,7 +603,7 @@ int SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::getConstraintT
   return SLVS_C_UNKNOWN;
 }
 
-void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::ResolveConstraints()
+void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::resolveConstraints()
 {
   if (!myNeedToSolve)
     return;
@@ -615,6 +630,92 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::ResolveConstr
   myNeedToSolve = false;
 }
 
+bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateGroup()
+{
+  // Check for valid sketch
+  if (!mySketch->data()->isValid())
+    return true;
+
+  // Fast check for constraint validity. If all constraints are valid, no need to update the group
+  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::reverse_iterator
+    aConstrIter = myConstraintMap.rbegin();
+  bool isAllValid = true;
+  for ( ; isAllValid && aConstrIter != myConstraintMap.rend(); aConstrIter++)
+    if (!aConstrIter->first->data()->isValid())
+      isAllValid = false;
+  if (isAllValid)
+    return false;
+
+  // Remove invalid constraints.
+  // There only constraint will be deleted (parameters and entities) will be removed below
+  std::list< boost::shared_ptr<SketchPlugin_Constraint> > aConstrToDelete;
+  std::map<Slvs_hEntity, bool> anEntToDelete; // entities will be removed if no valid constraints use them
+  for (aConstrIter = myConstraintMap.rbegin(); aConstrIter != myConstraintMap.rend(); aConstrIter++)
+  {
+    bool isValid = aConstrIter->first->data()->isValid();
+
+    int aConstrPos = Search(aConstrIter->second, myConstraints);
+    if (aConstrPos < (int)myConstraints.size())
+    {
+      Slvs_hEntity aConstrEnt[] = {
+        myConstraints[aConstrPos].ptA,     myConstraints[aConstrPos].ptB, 
+        myConstraints[aConstrPos].entityA, myConstraints[aConstrPos].entityB};
+      for (int i = 0; i < 4; i++)
+        if (aConstrEnt[i] != SLVS_E_UNKNOWN)
+        {
+          if (anEntToDelete.find(aConstrEnt[i]) == anEntToDelete.end())
+            anEntToDelete[aConstrEnt[i]] = !isValid;
+          else if (isValid) // constraint is valid => no need to remove its entities
+            anEntToDelete[aConstrEnt[i]] = false;
+        }
+      if (!isValid)
+      {
+        myConstraints.erase(myConstraints.begin() + aConstrPos);
+        if (aConstrIter->second == myConstrMaxID) // When the constraint with highest ID is removed, decrease indexer
+          myConstrMaxID--;
+        aConstrToDelete.push_front(aConstrIter->first);
+      }
+    }
+  }
+  std::list< boost::shared_ptr<SketchPlugin_Constraint> >::iterator aDelIter;
+  for (aDelIter = aConstrToDelete.begin(); aDelIter != aConstrToDelete.end(); aDelIter++)
+    myConstraintMap.erase(*aDelIter);
+
+  // Remove invalid and unused entities
+  std::map<Slvs_hEntity, bool>::reverse_iterator aEDelIter;
+  for (aEDelIter = anEntToDelete.rbegin(); aEDelIter != anEntToDelete.rend(); aEDelIter++)
+    if (aEDelIter->second)
+    {
+      int anEntPos = Search(aEDelIter->first, myEntities);
+      std::vector<Slvs_Entity>::iterator aEntIter = myEntities.begin() + anEntPos;
+      // Number of parameters for the entity
+      int aNbParams = 0;
+      while (aEntIter->param[aNbParams]) aNbParams++;
+      if (aNbParams == 0) continue;
+      // Decrease parameter indexer if there are deleted parameter with higher IDs
+      if (aEntIter->param[aNbParams-1] == myParamMaxID)
+        myParamMaxID -= aNbParams;
+      // Remove parameters of the entity
+      int aParamPos = Search(aEntIter->param[0], myParams);
+      myParams.erase(myParams.begin() + aParamPos, 
+                     myParams.begin() + aParamPos + aNbParams);
+
+      // Remove entity
+      if (aEDelIter->first == myEntityMaxID)
+        myEntityMaxID--;
+      myEntities.erase(myEntities.begin() + anEntPos);
+      // Remove such entity from myEntityMap
+      std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator
+        anEntMapIter = myEntityMap.begin();
+      for ( ; anEntMapIter != myEntityMap.end(); anEntMapIter++)
+        if (anEntMapIter->second == aEDelIter->first)
+          break;
+      if (anEntMapIter != myEntityMap.end())
+        myEntityMap.erase(anEntMapIter);
+    }
+
+  return false;
+}
 
 void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateAttribute(
                 boost::shared_ptr<ModelAPI_Attribute> theAttribute, 
@@ -719,12 +820,13 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::removeTempora
 template <typename T>
 int Search(const uint32_t& theEntityID, const std::vector<T>& theEntities)
 {
-  std::vector<T>::const_iterator aEntIter = theEntities.begin() + theEntityID - 1;
-  while (aEntIter != theEntities.end() && aEntIter->h > theEntityID)
-    aEntIter--;
-  while (aEntIter != theEntities.end() && aEntIter->h < theEntityID)
-    aEntIter++;
-  if (aEntIter == theEntities.end())
-    return -1;
-  return aEntIter - theEntities.begin();
+  int aResIndex = theEntityID <= theEntities.size() ? theEntityID - 1 : 0;
+  int aVecSize = theEntities.size();
+  while (aResIndex >= 0 && theEntities[aResIndex].h > theEntityID)
+    aResIndex--;
+  while (aResIndex < aVecSize && theEntities[aResIndex].h < theEntityID)
+    aResIndex++;
+  if (aResIndex == -1)
+    aResIndex = aVecSize;
+  return aResIndex;
 }

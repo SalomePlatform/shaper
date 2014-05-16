@@ -84,7 +84,7 @@ protected:
 
   /** \brief Goes through the list of groups and solve the constraints
    */
-  void ResolveConstraints();
+  void resolveConstraints();
 
 private:
   class SketchSolver_ConstraintGroup;
@@ -132,12 +132,6 @@ public:
    */
   bool changeConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
-  /** \brief Removes a constraint into the group
-   *  \param[in] theConstraint constraint to be removed
-   *  \return \c true if the constraint removed successfully
-   */
-  bool removeConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
-
   /** \brief Verifies the constraint uses the objects from this group
    *  \param[in] theConstraint constraint for verification of interaction
    *  \return \c true if the constrained objects are used in current group
@@ -163,9 +157,14 @@ public:
    */
   void updateEntityIfPossible(boost::shared_ptr<ModelAPI_Attribute> theEntity);
 
+  /** \brief Searches invalid features and constraints in the group and avoids them
+   *  \return \c true if the group's sketch is invalid and the group should be removed
+   */
+  bool updateGroup();
+
   /** \brief Start solution procedure if necessary and update attributes of features
    */
-  void ResolveConstraints();
+  void resolveConstraints();
 
 protected:
   /** \brief Adds or updates an entity in the group
