@@ -280,6 +280,10 @@ SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::~SketchSolver_Cons
   myEntities.clear();
   myConstraints.clear();
   myConstraintMap.clear();
+
+  // If the group with maximal identifier is deleted, decrease the indexer
+  if (myID == myGroupIndexer)
+    myGroupIndexer--;
 }
 
 bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::isBaseWorkplane(
@@ -329,7 +333,7 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::changeConstra
   if (aDistAttr)
   {
     aDistance = aDistAttr->value();
-    if (aConstrMapIter != myConstraintMap.end() && aConstrIter->valA != aDistance)
+    if (aConstrMapIter != myConstraintMap.end() && fabs(aConstrIter->valA - aDistance) > tolerance)
     {
       myNeedToSolve = true;
       aConstrIter->valA = aDistance;
@@ -515,10 +519,12 @@ Slvs_hParam SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::change
 {
   if (thePrmIter != myParams.end())
   { // Parameter should be updated
-    if (thePrmIter->val != theParam)
-      myNeedToSolve = true; // parameter is changed, need to resolve constraints
     int aParamPos = thePrmIter - myParams.begin();
-    myParams[aParamPos].val = theParam;
+    if (fabs(thePrmIter->val - theParam) > tolerance)
+    {
+      myNeedToSolve = true; // parameter is changed, need to resolve constraints
+      myParams[aParamPos].val = theParam;
+    }
     thePrmIter++;
     return myParams[aParamPos].h;
   }
@@ -605,6 +611,7 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::ResolveConstr
   }
   /// \todo Implement error handling
 
+  removeTemporaryConstraints();
   myNeedToSolve = false;
 }
 
@@ -647,7 +654,60 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateEntityI
                 boost::shared_ptr<ModelAPI_Attribute> theEntity)
 {
   if (myEntityMap.find(theEntity) != myEntityMap.end())
+  {
+    // If the attribute is a point and it is changed (the group needs to rebuild), 
+    // probably user has dragged this point into this position, 
+    // so it is necessary to add constraint which will quarantee the point will not change
+
+    // Store myNeedToSolve flag to verify the entity is really changed
+    bool aNeedToSolveCopy = myNeedToSolve;
+    myNeedToSolve = false;
+
     changeEntity(theEntity);
+
+    if (myNeedToSolve) // the entity is changed
+    {
+      // Verify the entity is a point and add temporary constraint of permanency
+      boost::shared_ptr<GeomDataAPI_Point> aPoint = 
+        boost::dynamic_pointer_cast<GeomDataAPI_Point>(theEntity);
+      boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D = 
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEntity);
+      if (aPoint || aPoint2D)
+        addTemporaryConstraintWhereDragged(theEntity);
+    }
+
+    // Restore flag of changes
+    myNeedToSolve = myNeedToSolve || aNeedToSolveCopy;
+  }
+}
+
+void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addTemporaryConstraintWhereDragged(
+                boost::shared_ptr<ModelAPI_Attribute> theEntity)
+{
+  // Find identifier of the entity
+  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator
+    anEntIter = myEntityMap.find(theEntity);
+
+  // Create WHERE_DRAGGED constraint
+  Slvs_Constraint aWDConstr = Slvs_MakeConstraint(++myConstrMaxID, myID, SLVS_C_WHERE_DRAGGED, 
+                                                  myWorkplane.h, 0.0, anEntIter->second, 0, 0, 0);
+  myConstraints.push_back(aWDConstr);
+  myTempConstraints.push_back(aWDConstr.h);
+}
+
+void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::removeTemporaryConstraints()
+{
+  std::list<Slvs_hConstraint>::reverse_iterator aTmpConstrIter;
+  for (aTmpConstrIter = myTempConstraints.rbegin(); aTmpConstrIter != myTempConstraints.rend(); aTmpConstrIter++)
+  {
+    int aConstrPos = Search(*aTmpConstrIter, myConstraints);
+    myConstraints.erase(myConstraints.begin() + aConstrPos);
+
+    // If the removing constraint has higher index, decrease the indexer
+    if (*aTmpConstrIter == myConstrMaxID)
+      myConstrMaxID--;
+  }
+  myTempConstraints.clear();
 }
 
 

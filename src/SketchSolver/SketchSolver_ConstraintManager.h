@@ -14,6 +14,7 @@
 #include <string.h>
 #include <slvs.h>
 
+#include <list>
 #include <map>
 #include <vector>
 
@@ -216,6 +217,15 @@ protected:
    */
   void updateAttribute(boost::shared_ptr<ModelAPI_Attribute> theAttribute, const Slvs_hEntity& theEntityID);
 
+  /** \brief Adds a constraint for a point which should not be changed during computations
+   *  \param[in] theEntity the base for the constraint
+   */
+  void addTemporaryConstraintWhereDragged(boost::shared_ptr<ModelAPI_Attribute> theEntity);
+
+  /** \brief Remove all temporary constraint after computation finished
+   */
+  void removeTemporaryConstraints();
+
 private:
   /** \brief Creates a workplane from the sketch parameters
    *  \param[in] theSketch parameters of workplane are the attributes of this sketch
@@ -240,9 +250,10 @@ private:
   // SketchPlugin entities
   boost::shared_ptr<SketchPlugin_Sketch> mySketch; ///< Equivalent to workplane
   std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint> 
-                               myConstraintMap;    ///< The map between SketchPlugin and SolveSpace constraints
+                                myConstraintMap;   ///< The map between SketchPlugin and SolveSpace constraints
+  std::list<Slvs_hConstraint> myTempConstraints;   ///< The list of identifiers of temporary constraints
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>
-                               myEntityMap;        ///< The map between parameters of constraints and their equivalent SolveSpace entities
+                                myEntityMap;       ///< The map between parameters of constraints and their equivalent SolveSpace entities
 };
 
 #endif
