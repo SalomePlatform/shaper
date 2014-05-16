@@ -6,6 +6,7 @@
 #include "XGUI_Viewer.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_ViewerProxy.h"
+#include "XGUI_Tools.h"
 
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>
@@ -15,6 +16,8 @@
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 
 #include <AIS_Shape.hxx>
+
+#include <set>
 
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
 {
@@ -35,7 +38,7 @@ void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
 {
 }
 
-void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
+/*void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
                              const TopoDS_Shape& theShape, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -46,39 +49,32 @@ void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
   aContext->Display(anAIS, Standard_False);
   if (isUpdateViewer)
     aContext->UpdateCurrentViewer();
-}
+}*/
 
-boost::shared_ptr<ModelAPI_Feature> XGUI_Displayer::GetFeature(const TopoDS_Shape& theShape)
+
+std::list<XGUI_ViewerPrs> XGUI_Displayer::GetViewerPrs()
 {
-  boost::shared_ptr<ModelAPI_Feature> aFeature;
+  std::set<boost::shared_ptr<ModelAPI_Feature> > aPrsFeatures;
+  std::list<XGUI_ViewerPrs> aPresentations;
 
-  FeatureToAISMap::const_iterator aFIt = myFeature2AISObjectMap.begin(),
-                                  aFLast = myFeature2AISObjectMap.end();
-  for (; aFIt != aFLast && !aFeature; aFIt++)
-  {
-    Handle(AIS_InteractiveObject) anAIS = (*aFIt).second;
-    Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
-    if (!anAISShape.IsNull() && anAISShape->Shape() == theShape) {
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
+    Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
+    TopoDS_Shape aShape = aContext->SelectedShape();
+
+    boost::shared_ptr<ModelAPI_Feature> aFeature;
+    FeatureToAISMap::const_iterator aFIt = myFeature2AISObjectMap.begin(),
+                                    aFLast = myFeature2AISObjectMap.end();
+    for (; aFIt != aFLast && !aFeature; aFIt++) {
+      Handle(AIS_InteractiveObject) anAIS = (*aFIt).second;
+      if (anAIS != anIO)
+        continue;
       aFeature = (*aFIt).first;
     }
-  }
-  return aFeature;
-}
-
-std::list<XGUI_ViewerPrs> XGUI_Displayer::GetViewerPrs
-                                                (const NCollection_List<TopoDS_Shape>& theShapes)
-{
-  std::list<XGUI_ViewerPrs> aPresentations;
-  if (theShapes.IsEmpty())
-    return aPresentations;
-
-  NCollection_List<TopoDS_Shape>::Iterator anIt(theShapes);
-  for (; anIt.More(); anIt.Next()) {
-    const TopoDS_Shape& aShape = anIt.Value();
-    if (aShape.IsNull())
+    if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
       continue;
-    boost::shared_ptr<ModelAPI_Feature> aFeature = GetFeature(aShape);
     aPresentations.push_back(XGUI_ViewerPrs(aFeature, aShape));
+    aPrsFeatures.insert(aFeature);
   }
 
   return aPresentations;
@@ -119,8 +115,18 @@ void XGUI_Displayer::RedisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature>
   if (IsVisible(theFeature)) {
     anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[theFeature]);
     if (!anAIS.IsNull()) {
+      // if the AIS object is displayed in the opened local context in some mode, additional
+      // AIS sub objects are created there. They should be rebuild for correct selecting.
+      // It is possible to correct it by closing local context before the shape set and opening
+      // after. Another workaround to thrown down the selection and reselecting the AIS.
+      // If there was a problem here, try the first solution with close/open local context.
       anAIS->Set(theShape);
       anAIS->Redisplay();
+      if (aContext->IsSelected(anAIS)) {
+        aContext->AddOrRemoveSelected(anAIS, false);
+        aContext->AddOrRemoveSelected(anAIS, false);
+        //aContext->SetSelected(anAIS, false);
+      }
     }
   }
   else {

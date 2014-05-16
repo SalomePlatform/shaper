@@ -53,6 +53,12 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<Mode
   return aModes;
 }
 
+void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
+                                           const std::list<XGUI_ViewerPrs>& theSelected)
+{
+  myFeatures = theSelected;
+}
+
 void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
                                             const std::list<XGUI_ViewerPrs>& theSelected)
 {
@@ -67,18 +73,27 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
       myIsEditMode = true;
     }
   }
+  else {
+    if (theSelected.size() == 1) {
+      boost::shared_ptr<ModelAPI_Feature> aFeature = theSelected.front().feature();
+      if (aFeature)
+        emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+    }
+  }
+  myFeatures.clear();
 }
 
-void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                         const std::list<XGUI_ViewerPrs>& theSelected)
+void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
-  if (!myIsEditMode || !(theEvent->buttons() &  Qt::LeftButton) || theSelected.empty())
+  if (!myIsEditMode || !(theEvent->buttons() &  Qt::LeftButton) || myFeatures.empty())
     return;
 
-  boost::shared_ptr<ModelAPI_Feature> aFeature = PartSet_Tools::NearestFeature(theEvent->pos(),
-                                                              theView, feature(), theSelected);
-  if (aFeature)
-    emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+  if (myFeatures.size() != 1) {
+    boost::shared_ptr<ModelAPI_Feature> aFeature = PartSet_Tools::NearestFeature(theEvent->pos(),
+                                                                theView, feature(), myFeatures);
+    if (aFeature)
+      emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+  }
 }
 
 std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >

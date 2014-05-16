@@ -83,10 +83,6 @@ public slots:
   /// \param theEnabled the enabled state
   void onMultiSelectionEnabled(bool theEnabled);
 
-  /// SLOT, to switch on/off the selection in the viewer
-  /// \param theEnabled the enabled state
-  void onSelectionEnabled(bool theEnabled);
-
   /// SLOT, to visualize the feature in another local context mode
   /// \param theFeature the feature to be put in another local context mode
   /// \param theMode the mode appeared on the feature

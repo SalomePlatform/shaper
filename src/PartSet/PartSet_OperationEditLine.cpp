@@ -48,9 +48,11 @@ std::list<int> PartSet_OperationEditLine::getSelectionModes(boost::shared_ptr<Mo
   return aModes;
 }
 
-void PartSet_OperationEditLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void PartSet_OperationEditLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                     const std::list<XGUI_ViewerPrs>& thePresentations)
 {
   setFeature(theFeature);
+  myFeatures = thePresentations;
 }
 
 void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView)
@@ -61,11 +63,11 @@ void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_V
   myCurPoint.setPoint(aPoint);
 }
 
-void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                           const std::list<XGUI_ViewerPrs>& theSelected)
+void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
   if (!(theEvent->buttons() &  Qt::LeftButton))
     return;
+
   gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
 
   if (myCurPoint.myIsInitialized) {
@@ -81,14 +83,14 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
     moveLinePoint(feature(), aDeltaX, aDeltaY, LINE_ATTR_START);
     moveLinePoint(feature(), aDeltaX, aDeltaY, LINE_ATTR_END);
 
-    /*std::list<XGUI_ViewerPrs>::const_iterator anIt = theSelected.begin(), aLast = theSelected.end();
+    std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
     for (; anIt != aLast; anIt++) {
       boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).feature();
-      if (!aFeature)
+      if (!aFeature || aFeature == feature())
         continue;
       moveLinePoint(aFeature, aDeltaX, aDeltaY, LINE_ATTR_START);
       moveLinePoint(aFeature, aDeltaX, aDeltaY, LINE_ATTR_END);
-    }*/
+    }
   }
   myCurPoint.setPoint(aPoint);
 }
@@ -96,28 +98,41 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
 void PartSet_OperationEditLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
                                               const std::list<XGUI_ViewerPrs>& theSelected)
 {
-  boost::shared_ptr<ModelAPI_Feature> aFeature;
-  if (!theSelected.empty())
-    aFeature = theSelected.front().feature();
+  std::list<XGUI_ViewerPrs> aFeatures = myFeatures;
+  if (myFeatures.size() == 1) {
+    boost::shared_ptr<ModelAPI_Feature> aFeature;
+    if (!theSelected.empty())
+      aFeature = theSelected.front().feature();
+
+    if (aFeature == feature())
+      return;
   
-  if (aFeature == feature())
-    return;
-  
-  commit();
-  if (aFeature)
-    emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+   commit();
+   if (aFeature)
+     emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+  }
+  else {
+    commit();
+    std::list<XGUI_ViewerPrs>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
+    for (; anIt != aLast; anIt++) {
+      boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).feature();
+      if (aFeature)
+        emit featureConstructed(aFeature, FM_Deactivation);
+    }
+  }
 }
 
 void PartSet_OperationEditLine::startOperation()
 {
   // do nothing in order to do not create a new feature
-  emit selectionEnabled(false);
+  emit multiSelectionEnabled(false);
   myCurPoint.clear();
 }
 
 void PartSet_OperationEditLine::stopOperation()
 {
-  emit selectionEnabled(true);
+  emit multiSelectionEnabled(true);
+  myFeatures.clear();
 }
 
 boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::createFeature()
@@ -130,7 +145,7 @@ void  PartSet_OperationEditLine::moveLinePoint(boost::shared_ptr<ModelAPI_Featur
                                                double theDeltaX, double theDeltaY,
                                                const std::string& theAttribute)
 {
-  if (!theFeature)
+  if (!theFeature || theFeature->getKind() != "SketchLine")
     return;
 
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();

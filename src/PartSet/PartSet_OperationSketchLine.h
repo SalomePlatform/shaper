@@ -46,7 +46,9 @@ public:
 
   /// Initializes some fields accorging to the feature
   /// \param theFeature the feature
-  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  /// \param thePresentations the list of additional presentations
+  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                    const std::list<XGUI_ViewerPrs>& thePresentations);
 
   /// Gives the current selected objects to be processed by the operation
   /// \param thePoint a point clicked in the viewer
@@ -57,9 +59,7 @@ public:
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  /// \param theSelected the list of selected presentations
-  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView,
-                          const std::list<XGUI_ViewerPrs>& theSelected);
+  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
   /// Processes the key pressed in the view
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);
