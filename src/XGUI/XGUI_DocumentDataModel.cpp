@@ -431,7 +431,15 @@ bool XGUI_DocumentDataModel::activatedIndex(const QModelIndex& theIndex)
     // if this is root node (Part item index)
     if (!aIndex->parent().isValid()) {
       if (myActivePart) myActivePart->setItemsColor(PASSIVE_COLOR);
-      myActivePart = (myActivePart == aModel)? 0 : (XGUI_PartModel*)aModel;
+
+      if (myActivePart == aModel) {
+        myActivePart = 0;
+        myActivePartIndex = QModelIndex();
+      } else {
+        myActivePart = (XGUI_PartModel*)aModel;
+        myActivePartIndex = theIndex;
+      }
+
       if (myActivePart) {
         myActivePart->setItemsColor(ACTIVE_COLOR);
         myModel->setItemsColor(PASSIVE_COLOR);
@@ -448,4 +456,12 @@ FeaturePtr XGUI_DocumentDataModel::activePart() const
   if (myActivePart) 
     return myActivePart->part();
   return FeaturePtr();
+}
+
+void XGUI_DocumentDataModel::deactivatePart() 
+{ 
+  if (myActivePart) 
+    myActivePart->setItemsColor(PASSIVE_COLOR);
+  myActivePart = 0;
+  myModel->setItemsColor(ACTIVE_COLOR);
 }

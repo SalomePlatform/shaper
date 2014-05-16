@@ -139,6 +139,8 @@ protected slots:
   /// \param theOpertion a stopped operation
   void onOperationStopped(ModuleBase_Operation* theOperation);
 
+  void onContextMenuCommand(const QString& theId, bool isChecked);
+
 private:
   void initMenu();
 
@@ -150,6 +152,9 @@ private:
 
   // Creates Dock widgets: Object browser and Property panel
   void createDockWidgets();
+
+  //! Activates or deactivates currently selected part
+  void activatePart(bool toActivate);
 
   QString myCurrentFile;
   XGUI_MainWindow* myMainWindow;

@@ -22,6 +22,12 @@ void XGUI_ContextMenuMgr::createActions()
 {
   QAction* aAction = new QAction(QIcon(":pictures/edit.png"), tr("Edit..."), this);
   addAction("EDIT_CMD", aAction);
+
+  aAction = new QAction(QIcon(":pictures/activate.png"), tr("Activate"), this);
+  addAction("ACTIVATE_PART_CMD", aAction);
+
+  aAction = new QAction(QIcon(":pictures/assembly.png"), tr("Deactivate"), this);
+  addAction("DEACTIVATE_PART_CMD", aAction);
 }
 
 void XGUI_ContextMenuMgr::addAction(const QString& theId, QAction* theAction)
@@ -73,11 +79,14 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
   QFeatureList aFeatures = aSelMgr->selectedFeatures();
   if (aFeatures.size() == 1) {
     FeaturePtr aFeature = aFeatures.first();
-    if (aFeature->getKind() != "Part") {
-      QMenu* aMenu = new QMenu();
+    QMenu* aMenu = new QMenu();
+    if (aFeature->getKind() == "Part") {
+      //TODO: Check that feature is active
+      aMenu->addAction(action("ACTIVATE_PART_CMD"));
+    } else {
       aMenu->addAction(action("EDIT_CMD"));
-      return aMenu;
     }
+    return aMenu;
   }
   return 0;
 }
