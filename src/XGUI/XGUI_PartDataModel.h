@@ -94,6 +94,9 @@ public:
   //! Returns index corresponded to the group
   virtual QModelIndex findGroup(const std::string& theGroup) const;
 
+  //! Return a Part object
+  virtual FeaturePtr part() const;
+
 private: 
   boost::shared_ptr<ModelAPI_Document> featureDocument() const;
 

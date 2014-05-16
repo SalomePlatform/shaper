@@ -308,3 +308,36 @@ void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFea
     aDisplayer->Erase(anOperation->feature());
   }
 }
+
+void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
+{
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+  if (!anOperation)
+    return;
+
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (!aPreviewOp)
+    return;
+
+  boost::shared_ptr<ModelAPI_Feature> aFeature = aPreviewOp->feature();
+  if (!aFeature || aFeature->getKind() != theCmdId)
+    return;
+
+  std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
+                                                                     aList = aPreviewOp->preview();
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  std::list<int> aModes = aPreviewOp->getSelectionModes(aPreviewOp->feature());
+
+  std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >::const_iterator
+                                                         anIt = aList.begin(), aLast = aList.end();
+  aDisplayer->EraseAll(false);
+  for (; anIt != aLast; anIt++) {
+    boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).first;
+    boost::shared_ptr<GeomAPI_Shape> aPreview = (*anIt).second;
+    aDisplayer->RedisplayInLocalContext(aFeature,
+                                        aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
+                                        aModes, false);
+  }
+  aDisplayer->UpdateViewer();
+}
+

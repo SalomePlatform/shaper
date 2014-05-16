@@ -54,13 +54,19 @@ public:
   //! Returns 0 if the given index is not index of a feature
   FeaturePtr feature(const QModelIndex& theIndex) const;
 
+  //! Activates a part data model if the index is a Part node index. 
+  //! Returns true if active part changed.
+  bool activatedIndex(const QModelIndex& theIndex);
+
+  FeaturePtr activePart() const;
+
 private:
 
   enum {PartsFolder, HistoryNode};
 
 
   //! Converts QModelIndex of this model to QModelIndex of a one of sub-models.
-  QModelIndex toSourceModelIndex(const QModelIndex& theProxy) const;
+  QModelIndex* toSourceModelIndex(const QModelIndex& theProxy) const;
 
   //! Finds a pointer on QModelIndex which is equal to the given one
   QModelIndex* findModelIndex(const QModelIndex& theIndex) const;
@@ -94,6 +100,9 @@ private:
 
   //! Data models for Parts data tree representation (one data model per a one part)
   QList<XGUI_PartModel*> myPartModels;
+
+  //! Active part in part editing mode
+  XGUI_PartModel* myActivePart;
 
   //! List of saved QModelIndexes created by sub-models
   QList<QModelIndex*> myIndexes;

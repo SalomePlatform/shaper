@@ -32,3 +32,18 @@ void XGUI_ObjectsBrowser::onSelectionChanged(const QItemSelection& theSelected,
   }
   emit selectionChanged();
 }
+
+void XGUI_ObjectsBrowser::mouseDoubleClickEvent(QMouseEvent* theEvent)
+{
+  QModelIndex aIndex = currentIndex();
+  bool isChanged = myDocModel->activatedIndex(aIndex);
+  QTreeView::mouseDoubleClickEvent(theEvent);
+  if (isChanged) {
+    emit activePartChanged(myDocModel->activePart());
+  }
+}
+
+void XGUI_ObjectsBrowser::contextMenuEvent(QContextMenuEvent* theEvent)
+{
+  emit contextMenuRequested(theEvent);
+}

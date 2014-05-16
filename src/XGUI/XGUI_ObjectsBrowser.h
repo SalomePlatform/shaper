@@ -29,7 +29,14 @@ public:
 signals:
   //! Emited when selection is changed
   void selectionChanged();
+  void activePartChanged(FeaturePtr thePart); 
+ 
+  //! Emited on context menu request
+  void contextMenuRequested(QContextMenuEvent* theEvent);
 
+protected:
+  virtual void mouseDoubleClickEvent(QMouseEvent* theEvent);
+  virtual void contextMenuEvent(QContextMenuEvent* theEvent);
 
 private slots:
   //! Called when selection in Data Tree is changed
@@ -41,6 +48,8 @@ private:
 
   //! List of currently selected data
   QFeatureList mySelectedData;
+
+  //QModelIndex myActivePartIndex;
 };
 
 #endif

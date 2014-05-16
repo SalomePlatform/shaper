@@ -44,6 +44,10 @@ public:
   /// \param isDisplay the state whether the presentation should be displayed or erased
   void visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFeature, bool isDisplay);
 
+  /// Updates current operation preview, if it has it.
+  /// \param theCmdId the operation name
+  void updateCurrentPreview(const std::string& theCmdId);
+
 public slots:
   void onFeatureTriggered();
   /// SLOT, that is called after the operation is stopped. Switched off the modfications performed

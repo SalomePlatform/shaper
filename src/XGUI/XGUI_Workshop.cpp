@@ -19,6 +19,7 @@
 #include "XGUI_ErrorDialog.h"
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_PropertyPanel.h"
+#include "XGUI_ContextMenuMgr.h"
 
 #include <Model_Events.h>
 #include <ModelAPI_PluginManager.h>
@@ -79,11 +80,11 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myDisplayer = new XGUI_Displayer(this);
 
   mySelector = new XGUI_SelectionMgr(this);
-  connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(changeCurrentDocument()));
 
   myOperationMgr = new XGUI_OperationMgr(this);
   myActionsMgr = new XGUI_ActionsMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(myMainWindow);
+  myContextMenuMgr = new XGUI_ContextMenuMgr(this);
 
   myViewerProxy = new XGUI_ViewerProxy(this);
 
@@ -178,6 +179,7 @@ void XGUI_Workshop::initMenu()
                                 QIcon(":pictures/close.png"), QKeySequence::Close);
   aCommand->connectTo(this, SLOT(onExit()));
 
+  myContextMenuMgr->createActions();
 }
 
 //******************************************************
@@ -422,7 +424,7 @@ void XGUI_Workshop::onOpen()
   }
 
   //show file dialog, check if readable and open
-  myCurrentFile = QFileDialog::getOpenFileName(mainWindow());
+  myCurrentFile = QFileDialog::getExistingDirectory(mainWindow());
   if(myCurrentFile.isEmpty())
     return;
   QFileInfo aFileInfo(myCurrentFile);
@@ -471,6 +473,9 @@ void XGUI_Workshop::onUndo()
   objectBrowser()->setCurrentIndex(QModelIndex());
   boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  //if (!operationMgr()->abortOperation())
+  //  return;
+  operationMgr()->abortOperation();
   aDoc->undo();
   updateCommandStatus();
 }
@@ -572,25 +577,25 @@ void XGUI_Workshop::updateCommandStatus()
   if (aMgr->hasRootDocument()) {
     XGUI_Command* aUndoCmd;
     XGUI_Command* aRedoCmd;
-    for (aIt = aCommands.constBegin(); aIt != aCommands.constEnd(); ++aIt) {
-      if ((*aIt)->id() == "UNDO_CMD")
-        aUndoCmd = (*aIt);
-      else if ((*aIt)->id() == "REDO_CMD")
-        aRedoCmd = (*aIt);
+    foreach(XGUI_Command* aCmd, aCommands) {
+      if (aCmd->id() == "UNDO_CMD")
+        aUndoCmd = aCmd;
+      else if (aCmd->id() == "REDO_CMD")
+        aRedoCmd = aCmd;
       else // Enable all commands
-        (*aIt)->enable();
+        aCmd->enable();
     }
     boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
     aUndoCmd->setEnabled(aDoc->canUndo());
     aRedoCmd->setEnabled(aDoc->canRedo());
   } else {
-    for (aIt = aCommands.constBegin(); aIt != aCommands.constEnd(); ++aIt) {
-      if ((*aIt)->id() == "NEW_CMD")
-        (*aIt)->enable();
-      else if ((*aIt)->id() == "EXIT_CMD")
-        (*aIt)->enable();
+    foreach(XGUI_Command* aCmd, aCommands) {
+      if (aCmd->id() == "NEW_CMD")
+        aCmd->enable();
+      else if (aCmd->id() == "EXIT_CMD")
+        aCmd->enable();
       else 
-        (*aIt)->disable();
+        aCmd->disable();
     }
   }
 }
@@ -602,7 +607,10 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   aObjDock->setWindowTitle(tr("Object browser"));
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
+  connect(myObjectBrowser, SIGNAL(activePartChanged(FeaturePtr)), this, SLOT(changeCurrentDocument(FeaturePtr)));
   aObjDock->setWidget(myObjectBrowser);
+
+  myContextMenuMgr->connectObjectBrowser();
   return aObjDock;
 }
 
@@ -667,18 +675,15 @@ void XGUI_Workshop::onFeatureTriggered()
 }
 
 //******************************************************
-void XGUI_Workshop::changeCurrentDocument()
+void XGUI_Workshop::changeCurrentDocument(FeaturePtr thePart)
 {
-  QFeatureList aFeatures = objectBrowser()->selectedFeatures();
-  
-  // Set current document
-  if (aFeatures.size() > 0) {
-    FeaturePtr aFeature = aFeatures.first();
-
-    boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-    boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = aFeature->data()->docRef("PartDocument");
+  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  if (thePart) {
+    boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = thePart->data()->docRef("PartDocument");
     if (aDocRef)
       aMgr->setCurrentDocument(aDocRef->value());
+  } else {
+    aMgr->setCurrentDocument(aMgr->rootDocument());
   }
 }
 

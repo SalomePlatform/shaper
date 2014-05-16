@@ -32,6 +32,7 @@ SET(PROJECT_HEADERS
     XGUI_ViewerProxy.h
     XGUI_ViewerPrs.h
     XGUI_PropertyPanel.h
+    XGUI_ContextMenuMgr.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -62,6 +63,7 @@ SET(PROJECT_SOURCES
     XGUI_ViewerProxy.cpp
     XGUI_ViewerPrs.cpp
     XGUI_PropertyPanel.cpp
+    XGUI_ContextMenuMgr.cpp
 )
 
 SET(PROJECT_RESOURCES 

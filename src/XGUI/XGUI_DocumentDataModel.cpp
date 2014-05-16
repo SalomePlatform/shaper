@@ -14,10 +14,14 @@
 
 #include <QIcon>
 #include <QString>
+#include <QBrush>
 
+
+#define ACTIVE_COLOR QColor(0,72,140)
+#define PASSIVE_COLOR Qt::black
 
 XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
-  : QAbstractItemModel(theParent)
+  : QAbstractItemModel(theParent), myActivePart(0)
 {
   // Find Document object
   boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
@@ -30,6 +34,7 @@ XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
 
   // Create a top part of data tree model
   myModel = new XGUI_TopDataModel(myDocument, this);
+  myModel->setItemsColor(ACTIVE_COLOR);
 }
 
 
@@ -154,6 +159,11 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
       return QIcon(":pictures/constr_folder.png");
     case Qt::ToolTipRole:
       return tr("Parts folder");
+    case Qt::ForegroundRole:
+      if (myActivePart)
+        return QBrush(PASSIVE_COLOR);
+      else
+        return QBrush(ACTIVE_COLOR);
     default:
       return QVariant();
     }
@@ -174,6 +184,11 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
         return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
       case Qt::ToolTipRole:
         return tr("Feature object");
+      case Qt::ForegroundRole:
+        if (myActivePart)
+          return QBrush(PASSIVE_COLOR);
+        else
+          return QBrush(ACTIVE_COLOR);
       default:
         return QVariant();
       }
@@ -184,7 +199,7 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
   if (aParent.isValid() && (aParent.internalId() == PartsFolder)) {
     return myPartModels.at(theIndex.row())->data(QModelIndex(), theRole);
   }
-  return toSourceModelIndex(theIndex).data(theRole);
+  return toSourceModelIndex(theIndex)->data(theRole);
 }
 
 
@@ -208,11 +223,16 @@ int XGUI_DocumentDataModel::rowCount(const QModelIndex& theParent) const
   if (theParent.internalId() == HistoryNode) {
     return 0;
   }
-  QModelIndex aParent = toSourceModelIndex(theParent);
-  if (!isSubModel(aParent.model())) 
+  QModelIndex* aParent = toSourceModelIndex(theParent);
+  const QAbstractItemModel* aModel = aParent->model();
+  if (!isSubModel(aModel)) 
     return 0;
 
-  return aParent.model()->rowCount(aParent);
+  /*if (isPartSubModel(aModel)) {
+    if (aModel != myActivePart)
+      return 0;
+  }*/
+  return aModel->rowCount(*aParent);
 }
 
 int XGUI_DocumentDataModel::columnCount(const QModelIndex& theParent) const
@@ -252,21 +272,21 @@ QModelIndex XGUI_DocumentDataModel::parent(const QModelIndex& theIndex) const
   if ((theIndex.internalId() == PartsFolder) || (theIndex.internalId() == HistoryNode))
     return QModelIndex();
 
-  QModelIndex aIndex = toSourceModelIndex(theIndex);
-  const QAbstractItemModel* aModel = aIndex.model();
+  QModelIndex* aIndex = toSourceModelIndex(theIndex);
+  const QAbstractItemModel* aModel = aIndex->model();
   if (!isSubModel(aModel)) 
     return QModelIndex();
 
   if (isPartSubModel(aModel)) {
-    if (!aModel->parent(aIndex).isValid()) {
+    if (!aModel->parent(*aIndex).isValid()) {
       return partFolderNode();
     }
   }
 
-  aIndex = aModel->parent(aIndex);
-  if (aIndex.isValid())
-    return createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-  return aIndex;
+  QModelIndex aIndex1 = aModel->parent(*aIndex);
+  if (aIndex1.isValid())
+    return createIndex(aIndex1.row(), aIndex1.column(), (void*)getModelIndex(aIndex1));
+  return aIndex1;
 }
 
 
@@ -278,10 +298,10 @@ bool XGUI_DocumentDataModel::hasChildren(const QModelIndex& theParent) const
 }
 
 
-QModelIndex XGUI_DocumentDataModel::toSourceModelIndex(const QModelIndex& theProxy) const
+QModelIndex* XGUI_DocumentDataModel::toSourceModelIndex(const QModelIndex& theProxy) const
 {
   QModelIndex* aIndexPtr = static_cast<QModelIndex*>(theProxy.internalPointer());
-  return (*aIndexPtr);
+  return aIndexPtr;
 }
 
 
@@ -323,12 +343,12 @@ FeaturePtr XGUI_DocumentDataModel::feature(const QModelIndex& theIndex) const
       int aOffset = historyOffset();
       return myDocument->feature(FEATURES_GROUP, theIndex.row() - aOffset);
   }
-  QModelIndex aIndex = toSourceModelIndex(theIndex);
-  if (!isSubModel(aIndex.model())) 
+  QModelIndex* aIndex = toSourceModelIndex(theIndex);
+  if (!isSubModel(aIndex->model())) 
     return FeaturePtr();
 
-  const XGUI_FeaturesModel* aModel = dynamic_cast<const XGUI_FeaturesModel*>(aIndex.model());
-  return aModel->feature(aIndex);
+  const XGUI_FeaturesModel* aModel = dynamic_cast<const XGUI_FeaturesModel*>(aIndex->model());
+  return aModel->feature(*aIndex);
 }
 
 bool XGUI_DocumentDataModel::insertRows(int theRow, int theCount, const QModelIndex& theParent)
@@ -394,4 +414,38 @@ int XGUI_DocumentDataModel::historyOffset() const
 {
   // Nb of rows of top model + Parts folder
   return myModel->rowCount(QModelIndex()) + 1;
+}
+
+bool XGUI_DocumentDataModel::activatedIndex(const QModelIndex& theIndex)
+{
+  if ((theIndex.internalId() == PartsFolder) || (theIndex.internalId() == HistoryNode))
+    return false;
+
+  QModelIndex* aIndex = toSourceModelIndex(theIndex);
+  if (!aIndex)
+    return false;
+
+  const QAbstractItemModel* aModel = aIndex->model();
+
+  if (isPartSubModel(aModel)) {
+    // if this is root node (Part item index)
+    if (!aIndex->parent().isValid()) {
+      if (myActivePart) myActivePart->setItemsColor(PASSIVE_COLOR);
+      myActivePart = (myActivePart == aModel)? 0 : (XGUI_PartModel*)aModel;
+      if (myActivePart) {
+        myActivePart->setItemsColor(ACTIVE_COLOR);
+        myModel->setItemsColor(PASSIVE_COLOR);
+      } else 
+         myModel->setItemsColor(ACTIVE_COLOR);
+     return true;
+    }
+  }
+  return false;
+}
+
+FeaturePtr XGUI_DocumentDataModel::activePart() const
+{
+  if (myActivePart) 
+    return myActivePart->part();
+  return FeaturePtr();
 }

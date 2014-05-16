@@ -680,7 +680,8 @@ void XGUI_ViewWindow::vpMousePressEvent(QMouseEvent* theEvent)
 void XGUI_ViewWindow::contextMenuEvent(QContextMenuEvent* theEvent)
 {
   if (theEvent->modifiers() == Qt::NoModifier) {
-    QFrame::contextMenuEvent(theEvent);
+    // Temporary: has to be removed when viewer popup will be defined
+    //QFrame::contextMenuEvent(theEvent);
     emit contextMenuRequested(theEvent);
   }
 }

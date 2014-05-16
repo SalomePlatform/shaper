@@ -2,6 +2,7 @@
 #define XGUI_WORKSHOP_H
 
 #include "XGUI.h"
+#include "XGUI_Constants.h"
 #include <Events_Listener.h>
 
 #include <QObject>
@@ -23,6 +24,7 @@ class XGUI_ErrorDialog;
 class XGUI_SalomeViewer;
 class XGUI_ViewerProxy;
 class XGUI_PropertyPanel;
+class XGUI_ContextMenuMgr;
 
 class ModuleBase_Operation;
 
@@ -67,6 +69,9 @@ public:
 
   //! Returns property panel widget
   XGUI_PropertyPanel* propertyPanel() const { return myPropertyPanel; }
+
+  //! Returns context menu manager object
+  XGUI_ContextMenuMgr* contextMenuMgr() const { return myContextMenuMgr; }
 
   //! Creates and adds a new workbench (menu group) with the given name and returns it
   XGUI_Workbench* addWorkbench(const QString& theName);
@@ -114,7 +119,7 @@ public slots:
   void hideObjectBrowser();
 
   void onFeatureTriggered();
-  void changeCurrentDocument();
+  void changeCurrentDocument(FeaturePtr thePart);
 
 signals:
   void errorOccurred(const QString&);
@@ -158,6 +163,7 @@ private:
   XGUI_SalomeConnector* mySalomeConnector;
   XGUI_ErrorDialog* myErrorDlg;
   XGUI_ViewerProxy* myViewerProxy;
+  XGUI_ContextMenuMgr* myContextMenuMgr;
 
   static QMap<QString, QString> myIcons;
 

@@ -9,6 +9,7 @@
 #include <Model_PluginManager.h>
 #include <Model_Events.h>
 #include <Events_Loop.h>
+#include <Events_Error.h>
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
@@ -18,6 +19,12 @@
 
 #include <climits>
 
+#ifdef WIN32
+# define _separator_ '\\'
+#else
+# define _separator_ '/'
+#endif
+
 static const int UNDO_LIMIT = 10; // number of possible undo operations
 
 static const int TAG_GENERAL = 1; // general properties tag
@@ -26,83 +33,125 @@ static const int TAG_HISTORY = 3; // tag of the history sub-tree (python dump)
 
 using namespace std;
 
+/// Returns the file name of this document by the nameof directory and identifuer of a document
+static TCollection_ExtendedString DocFileName(const char* theFileName, const string& theID)
+{
+  TCollection_ExtendedString aPath ((const Standard_CString)theFileName);
+  aPath += _separator_;
+  aPath += theID.c_str();
+  aPath += ".cbf"; // standard binary file extension
+  return aPath;
+}
+
 bool Model_Document::load(const char* theFileName)
 {
-  bool myIsError = Standard_False;
-  /*
-   TCollection_ExtendedString aPath ((const Standard_CString)theFileName);
-   PCDM_ReaderStatus aStatus = (PCDM_ReaderStatus) -1;
-   try
-   {
-   Handle(TDocStd_Document) aDoc = this;
-   aStatus = Model_Application::GetApplication()->Open(aPath, aDoc);
-   }
-   catch (Standard_Failure)
-   {}
-   myIsError = aStatus != PCDM_RS_OK;
-   if (myIsError)
-   {
-   switch (aStatus)
-   {
-   case PCDM_RS_UnknownDocument: cout<<"OCAFApp_Appl_RUnknownDocument"<<endl; break;
-   case PCDM_RS_AlreadyRetrieved: cout<<"OCAFApp_Appl_RAlreadyRetrieved"<<endl; break;
-   case PCDM_RS_AlreadyRetrievedAndModified: cout<<"OCAFApp_Appl_RAlreadyRetrievedAndModified"<<endl; break;
-   case PCDM_RS_NoDriver: cout<<"OCAFApp_Appl_RNoDriver"<<endl; break;
-   case PCDM_RS_UnknownFileDriver: cout<<"OCAFApp_Appl_RNoDriver"<<endl; break;
-   case PCDM_RS_OpenError: cout<<"OCAFApp_Appl_ROpenError"<<endl; break;
-   case PCDM_RS_NoVersion: cout<<"OCAFApp_Appl_RNoVersion"<<endl; break;
-   case PCDM_RS_NoModel: cout<<"OCAFApp_Appl_RNoModel"<<endl; break;
-   case PCDM_RS_NoDocument: cout<<"OCAFApp_Appl_RNoDocument"<<endl; break;
-   case PCDM_RS_FormatFailure: cout<<"OCAFApp_Appl_RFormatFailure"<<endl; break;
-   case PCDM_RS_TypeNotFoundInSchema: cout<<"OCAFApp_Appl_RTypeNotFound"<<endl; break;
-   case PCDM_RS_UnrecognizedFileFormat: cout<<"OCAFApp_Appl_RBadFileFormat"<<endl; break;
-   case PCDM_RS_MakeFailure: cout<<"OCAFApp_Appl_RMakeFailure"<<endl; break;
-   case PCDM_RS_PermissionDenied: cout<<"OCAFApp_Appl_RPermissionDenied"<<endl; break;
-   case PCDM_RS_DriverFailure: cout<<"OCAFApp_Appl_RDriverFailure"<<endl; break;
-   default: cout<<"OCAFApp_Appl_RUnknownFail"<<endl; break;
-   }
-   }
-   SetUndoLimit(UNDO_LIMIT);
-   */
-  return !myIsError;
+  Handle(Model_Application) anApp = Model_Application::getApplication();
+  if (this == Model_PluginManager::get()->rootDocument().get()) {
+    anApp->setLoadPath(theFileName);
+  }
+  TCollection_ExtendedString aPath (DocFileName(theFileName, myID));
+  PCDM_ReaderStatus aStatus = (PCDM_ReaderStatus) -1;
+  try
+  {
+    aStatus = anApp->Open(aPath, myDoc);
+  }
+  catch (Standard_Failure)
+  {
+    Handle(Standard_Failure) aFail = Standard_Failure::Caught();
+    Events_Error::send(string("Exception in opening of document: ") + aFail->GetMessageString());
+    return false;
+  }
+  bool isError = aStatus != PCDM_RS_OK;
+  if (isError)
+  {
+    switch (aStatus)
+    {
+    case PCDM_RS_UnknownDocument: 
+      Events_Error::send(string("Can not open document: PCDM_RS_UnknownDocument")); break;
+    case PCDM_RS_AlreadyRetrieved: 
+      Events_Error::send(string("Can not open document: PCDM_RS_AlreadyRetrieved")); break;
+    case PCDM_RS_AlreadyRetrievedAndModified:
+      Events_Error::send(string("Can not open document: PCDM_RS_AlreadyRetrievedAndModified")); break;
+    case PCDM_RS_NoDriver:
+      Events_Error::send(string("Can not open document: PCDM_RS_NoDriver")); break;
+    case PCDM_RS_UnknownFileDriver:
+      Events_Error::send(string("Can not open document: PCDM_RS_UnknownFileDriver")); break;
+    case PCDM_RS_OpenError:
+      Events_Error::send(string("Can not open document: PCDM_RS_OpenError")); break;
+    case PCDM_RS_NoVersion:
+      Events_Error::send(string("Can not open document: PCDM_RS_NoVersion")); break;
+    case PCDM_RS_NoModel:
+      Events_Error::send(string("Can not open document: PCDM_RS_NoModel")); break;
+    case PCDM_RS_NoDocument:
+      Events_Error::send(string("Can not open document: PCDM_RS_NoDocument")); break;
+    case PCDM_RS_FormatFailure:
+      Events_Error::send(string("Can not open document: PCDM_RS_FormatFailure")); break;
+    case PCDM_RS_TypeNotFoundInSchema:
+      Events_Error::send(string("Can not open document: PCDM_RS_TypeNotFoundInSchema")); break;
+    case PCDM_RS_UnrecognizedFileFormat:
+      Events_Error::send(string("Can not open document: PCDM_RS_UnrecognizedFileFormat")); break;
+    case PCDM_RS_MakeFailure:
+      Events_Error::send(string("Can not open document: PCDM_RS_MakeFailure")); break;
+    case PCDM_RS_PermissionDenied:
+      Events_Error::send(string("Can not open document: PCDM_RS_PermissionDenied")); break;
+    case PCDM_RS_DriverFailure:
+      Events_Error::send(string("Can not open document: PCDM_RS_DriverFailure")); break;
+    default:
+      Events_Error::send(string("Can not open document: unknown error")); break;
+    }
+  }
+  if (!isError) {
+    myDoc->SetUndoLimit(UNDO_LIMIT);
+    synchronizeFeatures();
+  }
+  return !isError;
 }
 
 bool Model_Document::save(const char* theFileName)
 {
-  bool myIsError = true;
-  /*
-   TCollection_ExtendedString aPath ((const Standard_CString)theFileName);
-   PCDM_StoreStatus aStatus;
-   try {
-   Handle(TDocStd_Document) aDoc = this;
-   aStatus = Model_Application::GetApplication()->SaveAs (aDoc, aPath);
-   }
-   catch (Standard_Failure) {
-   Handle(Standard_Failure) aFail = Standard_Failure::Caught();
-   cout<<"OCAFApp_Engine:save Error: "<<aFail->GetMessageString()<<endl;
-   return false;
-   }
-   myIsError = aStatus != PCDM_SS_OK;
-   if (myIsError)
-   {
-   switch (aStatus)
-   {
-   case PCDM_SS_DriverFailure:
-   cout<<"OCAFApp_Appl_SDriverFailure"<<endl;
-   break;
-   case PCDM_SS_WriteFailure:
-   cout<<"OCAFApp_Appl_SWriteFailure"<<endl;
-   break;
-   case PCDM_SS_Failure:
-   default:
-   cout<<"OCAFApp_Appl_SUnknownFailure"<<endl;
-   break;
-   }
-   }
-   myTransactionsAfterSave = 0;
-   Standard::Purge(); // Release free memory
-   */
-  return !myIsError;
+  // create a directory in the root document if it is not yet exist
+  if (this == Model_PluginManager::get()->rootDocument().get()) {
+#ifdef WIN32
+    CreateDirectory(theFileName, NULL);
+#else
+    mkdir(theFileName, 0x1ff); 
+#endif
+  }
+  // filename in the dir is id of document inside of the given directory
+  TCollection_ExtendedString aPath(DocFileName(theFileName, myID));
+  PCDM_StoreStatus aStatus;
+  try {
+    aStatus = Model_Application::getApplication()->SaveAs(myDoc, aPath);
+  }
+  catch (Standard_Failure) {
+    Handle(Standard_Failure) aFail = Standard_Failure::Caught();
+    Events_Error::send(string("Exception in saving of document: ") + aFail->GetMessageString());
+    return false;
+  }
+  bool isDone = aStatus == PCDM_SS_OK || aStatus == PCDM_SS_No_Obj;
+  if (!isDone)
+  {
+    switch (aStatus)
+    {
+    case PCDM_SS_DriverFailure:
+      Events_Error::send(string("Can not save document: PCDM_SS_DriverFailure"));
+      break;
+    case PCDM_SS_WriteFailure:
+      Events_Error::send(string("Can not save document: PCDM_SS_WriteFailure"));
+      break;
+    case PCDM_SS_Failure:
+    default:
+      Events_Error::send(string("Can not save document: PCDM_SS_Failure"));
+      break;
+    }
+  }
+  myTransactionsAfterSave = 0;
+  if (isDone) { // save also sub-documents if any
+    set<string>::iterator aSubIter = mySubs.begin();
+    for(; aSubIter != mySubs.end() && isDone; aSubIter++)
+      isDone = subDocument(*aSubIter)->save(theFileName);
+  }
+  return isDone;
 }
 
 void Model_Document::close()
@@ -119,6 +168,10 @@ void Model_Document::close()
 
 void Model_Document::startOperation()
 {
+  // check is it nested or not
+  if (myDoc->HasOpenCommand()) {
+    myNestedStart = myTransactionsAfterSave;
+  }
   // new command for this
   myDoc->NewCommand();
   // new command for all subs
@@ -129,6 +182,8 @@ void Model_Document::startOperation()
 
 void Model_Document::finishOperation()
 {
+  if (myNestedStart > myTransactionsAfterSave) // this nested transaction is owervritten
+    myNestedStart = 0;
   // returns false if delta is empty and no transaction was made
   myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();
   myTransactionsAfterSave++;
@@ -161,7 +216,7 @@ bool Model_Document::isModified()
 
 bool Model_Document::canUndo()
 {
-  if (myDoc->GetAvailableUndos() > 0)
+  if (myDoc->GetAvailableUndos() > 0 && myNestedStart != myTransactionsAfterSave)
     return true;
   // check other subs contains operation that can be undoed
   set<string>::iterator aSubIter = mySubs.begin();
@@ -229,8 +284,8 @@ void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFea
   aData->setLabel(anObjLab);
   boost::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
-  theFeature->setData(aData);
   theFeature->setDoc(aThis);
+  theFeature->setData(aData);
   setUniqueName(theFeature);
   theFeature->initAttributes();
   // keep the feature ID to restore document later correctly
@@ -344,6 +399,10 @@ Model_Document::Model_Document(const std::string theID)
 {
   myDoc->SetUndoLimit(UNDO_LIMIT);
   myTransactionsAfterSave = 0;
+  myNestedStart = 0;
+  myDoc->SetNestedTransactionMode();
+  // to have something in the document and avoid empty doc open/save problem
+  TDataStd_Integer::Set(myDoc->Main().Father(), 0);
 }
 
 TDF_Label Model_Document::groupLabel(const string theGroup)
@@ -451,6 +510,13 @@ void Model_Document::synchronizeFeatures()
           TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(
           aFLabIter.Value())->Get()).ToCString());
 
+        if (aFIter == aFeatures.end()) { // must be before "setData" to redo the sketch line correctly
+          aFeatures.push_back(aFeature);
+          aFIter = aFeatures.end();
+        } else {
+          aFIter++;
+          aFeatures.insert(aFIter, aFeature);
+        }
         boost::shared_ptr<Model_Data> aData(new Model_Data);
         TDF_Label aLab = aFLabIter.Value()->Label();
         aData->setLabel(aLab);
@@ -458,18 +524,12 @@ void Model_Document::synchronizeFeatures()
         aFeature->setDoc(aThis);
         aFeature->setData(aData);
         aFeature->initAttributes();
+
         // event: model is updated
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);
         Model_FeatureUpdatedMessage aMsg(aFeature, anEvent);
         Events_Loop::loop()->send(aMsg);
 
-        if (aFIter == aFeatures.end()) {
-          aFeatures.push_back(aFeature);
-          aFIter = aFeatures.end();
-        } else {
-          aFIter++;
-          aFeatures.insert(aFIter, aFeature);
-        }
         // feature for this label is added, so go to the next label
         aFLabIter.Next();
       } else { // nothing is changed, both iterators are incremented

@@ -7,6 +7,7 @@
 
 #include <ModelAPI_Document.h>
 #include <QAbstractItemModel>
+#include <QColor>
 
 /**\class XGUI_FeaturesModel
  * \ingroup GUI
@@ -16,7 +17,7 @@ class XGUI_EXPORT XGUI_FeaturesModel : public QAbstractItemModel
 {
 public:
   XGUI_FeaturesModel(const boost::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent):
-      QAbstractItemModel(theParent), myDocument(theDocument) {}
+      QAbstractItemModel(theParent), myDocument(theDocument), myItemsColor(Qt::black) {}
 
   //! Returns Feature object by the given Model index.
   //! Returns 0 if the given index is not index of a feature
@@ -28,8 +29,13 @@ public:
   //! Returns index corresponded to the group
   virtual QModelIndex findGroup(const std::string& theGroup) const = 0;
 
+  void setItemsColor(const QColor& theColor) { myItemsColor = theColor; }
+
+  QColor itemsColor() const { return myItemsColor; }
+
 protected:
   boost::shared_ptr<ModelAPI_Document> myDocument;
+  QColor myItemsColor;
 };
 
 
@@ -47,6 +53,9 @@ public:
 
   //! Returns true if the given document is a sub-document of this tree
   virtual bool hasDocument(const boost::shared_ptr<ModelAPI_Document>& theDoc) const = 0;
+
+  //! Return a Part object
+  virtual FeaturePtr part() const = 0;
 
 protected:
   //! Id of the current part object in the document

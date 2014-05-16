@@ -8,6 +8,7 @@
 #include <ModelAPI_AttributeDocRef.h>
 
 #include <QIcon>
+#include <QBrush>
 
 XGUI_TopDataModel::XGUI_TopDataModel(const boost::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent)
   : XGUI_FeaturesModel(theDocument, theParent)
@@ -62,6 +63,9 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
 
   case Qt::ToolTipRole:
     // return Tooltip
+    break;
+  case Qt::ForegroundRole:
+    return QBrush(myItemsColor);
     break;
   }
   return QVariant();
@@ -248,6 +252,9 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
   case Qt::ToolTipRole:
     // return Tooltip
     break;
+  case Qt::ForegroundRole:
+    return QBrush(myItemsColor);
+    break;
   }
   return QVariant();
 }
@@ -383,4 +390,9 @@ QModelIndex XGUI_PartDataModel::findGroup(const std::string& theGroup) const
   if (theGroup.compare(CONSTRUCTIONS_GROUP) == 0)
     return createIndex(1, 0, (qint32) ConstructFolder);
   return QModelIndex();
+}
+
+FeaturePtr XGUI_PartDataModel::part() const
+{
+  return myDocument->feature(PARTS_GROUP, myId);
 }
