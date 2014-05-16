@@ -330,7 +330,6 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
 
   std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >::const_iterator
                                                          anIt = aList.begin(), aLast = aList.end();
-  aDisplayer->EraseAll(false);
   for (; anIt != aLast; anIt++) {
     boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).first;
     boost::shared_ptr<GeomAPI_Shape> aPreview = (*anIt).second;

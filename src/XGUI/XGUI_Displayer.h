@@ -85,6 +85,10 @@ public:
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void EraseAll(const bool isUpdateViewer = true);
 
+  /// Erase AIS interactive objects, which has an empty feature in the internal map
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  void EraseDeletedFeatures(const bool isUpdateViewer = true);
+
   /// Deactivates selection of sub-shapes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void CloseLocalContexts(const bool isUpdateViewer = true);
