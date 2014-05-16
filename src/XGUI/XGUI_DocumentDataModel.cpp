@@ -92,12 +92,12 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
       if (aUpdMsg->group().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
         int aStart = myPartModels.size();
         removeSubModel(myPartModels.size() - 1);
-        removeRow(aStart - 1, partFolderNode());
+        removeRow(aStart, partFolderNode());
       } else { // Update top groups (other except parts
         QModelIndex aIndex = myModel->findGroup(aUpdMsg->group());
         int aStart = myModel->rowCount(aIndex);
         aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-        removeRow(aStart - 1, aIndex);
+        removeRow(aStart, aIndex);
       }
     } else {
       XGUI_PartModel* aPartModel = 0;
@@ -112,7 +112,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
         QModelIndex aIndex = aPartModel->findGroup(aUpdMsg->group());
         int aStart = aPartModel->rowCount(aIndex);
         aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-        removeRow(aStart - 1, aIndex);
+        removeRow(aStart, aIndex);
       }
     }
 

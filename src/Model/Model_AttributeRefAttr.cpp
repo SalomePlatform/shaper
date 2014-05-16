@@ -80,5 +80,7 @@ Model_AttributeRefAttr::Model_AttributeRefAttr(TDF_Label& theLabel)
     // create attribute: not initialized by value yet
     myID = TDataStd_Comment::Set(theLabel, "");
     myRef = TDF_Reference::Set(theLabel, theLabel); // not initialized: reference to itself
+  } else {
+    theLabel.FindAttribute(TDF_Reference::GetID(), myRef);
   }
 }
