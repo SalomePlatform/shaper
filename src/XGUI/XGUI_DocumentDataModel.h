@@ -60,6 +60,11 @@ public:
 
   FeaturePtr activePart() const;
 
+  QModelIndex activePartIndex() const { return myActivePartIndex; }
+
+  //! Deactivates a Part
+  void deactivatePart();
+
 private:
 
   enum {PartsFolder, HistoryNode};
@@ -103,6 +108,8 @@ private:
 
   //! Active part in part editing mode
   XGUI_PartModel* myActivePart;
+
+  QModelIndex myActivePartIndex;
 
   //! List of saved QModelIndexes created by sub-models
   QList<QModelIndex*> myIndexes;

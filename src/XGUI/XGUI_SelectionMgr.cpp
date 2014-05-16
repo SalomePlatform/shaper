@@ -63,7 +63,7 @@ QFeatureList XGUI_SelectionMgr::selectedFeatures() const
 //**************************************************************
 QModelIndexList XGUI_SelectionMgr::selectedIndexes() const 
 { 
-  return myWorkshop->objectBrowser()->selectionModel()->selectedIndexes();
+  return myWorkshop->objectBrowser()->selectedIndexes();
 }
 
 //**************************************************************

@@ -52,5 +52,7 @@
      <file>pictures/tile_views.png</file>
      <file>pictures/new_view.png</file>
      <file>pictures/edit.png</file>
+     <file>pictures/assembly.png</file>
+     <file>pictures/activate.png</file>
  </qresource>
  </RCC>

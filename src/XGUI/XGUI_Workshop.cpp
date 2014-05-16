@@ -85,6 +85,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myActionsMgr = new XGUI_ActionsMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(myMainWindow);
   myContextMenuMgr = new XGUI_ContextMenuMgr(this);
+  connect(myContextMenuMgr, SIGNAL(actionTriggered(const QString&, bool)), 
+          this, SLOT(onContextMenuCommand(const QString&, bool)));
 
   myViewerProxy = new XGUI_ViewerProxy(this);
 
@@ -470,7 +472,7 @@ void XGUI_Workshop::onSaveAs()
 //******************************************************
 void XGUI_Workshop::onUndo()
 {
-  objectBrowser()->setCurrentIndex(QModelIndex());
+  objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
   if (aDoc->isOperation())
@@ -482,7 +484,7 @@ void XGUI_Workshop::onUndo()
 //******************************************************
 void XGUI_Workshop::onRedo()
 {
-  objectBrowser()->setCurrentIndex(QModelIndex());
+  objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
   boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
   aDoc->redo();
@@ -698,3 +700,29 @@ XGUI_SalomeViewer* XGUI_Workshop::salomeViewer() const
 { 
   return mySalomeConnector->viewer(); 
 }
+
+//**************************************************************
+void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
+{
+  if (theId == "ACTIVATE_PART_CMD")
+    activatePart(true);
+  else if (theId == "DEACTIVATE_PART_CMD") 
+    activatePart(false);
+
+}
+
+//**************************************************************
+void XGUI_Workshop::activatePart(bool toActivate)
+{
+  if (toActivate) {
+    QFeatureList aFeatures = mySelector->selectedFeatures();
+    if (aFeatures.size() > 0) {
+      changeCurrentDocument(aFeatures.first());
+      myObjectBrowser->activateCurrentPart(true);
+    }
+  } else {
+    changeCurrentDocument(FeaturePtr());
+    myObjectBrowser->activateCurrentPart(false);
+  }
+}
+
