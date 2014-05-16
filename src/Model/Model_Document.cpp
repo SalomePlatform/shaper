@@ -324,7 +324,8 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(TDF_Label& theLabel)
     Handle(TDataStd_Comment) aGroupID;
     if (theLabel.Father().FindAttribute(TDataStd_Comment::GetID(), aGroupID)) {
       string aGroup = TCollection_AsciiString(aGroupID->Get()).ToCString();
-      return myFeatures[aGroup][aFeatureIndex->Get()];
+      if (myFeatures[aGroup].size() > aFeatureIndex->Get())
+        return myFeatures[aGroup][aFeatureIndex->Get()];
     }
   }
   return boost::shared_ptr<ModelAPI_Feature>(); // not found
