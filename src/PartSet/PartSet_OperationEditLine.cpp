@@ -145,7 +145,7 @@ void  PartSet_OperationEditLine::moveLinePoint(boost::shared_ptr<ModelAPI_Featur
                                                double theDeltaX, double theDeltaY,
                                                const std::string& theAttribute)
 {
-  if (!theFeature)
+  if (!theFeature || theFeature->getKind() != "SketchLine")
     return;
 
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();

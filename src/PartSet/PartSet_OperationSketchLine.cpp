@@ -68,7 +68,7 @@ std::list<int> PartSet_OperationSketchLine::getSelectionModes(boost::shared_ptr<
 void PartSet_OperationSketchLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                        const std::list<XGUI_ViewerPrs>& /*thePresentations*/)
 {
-  if (!theFeature)
+  if (!theFeature || theFeature->getKind() != "SketchLine")
     return;
   // use the last point of the previous feature as the first of the new one
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
@@ -284,7 +284,7 @@ void PartSet_OperationSketchLine::getLinePoint(boost::shared_ptr<ModelAPI_Featur
                                                const std::string& theAttribute,
                                                double& theX, double& theY)
 {
-  if (!theFeature)
+  if (!theFeature || theFeature->getKind() != "SketchLine")
     return;
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
@@ -298,10 +298,10 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_OperationSketchLine::findLinePoin
                                                double theX, double theY)
 {
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
-  if (!theFeature)
+  if (!theFeature || theFeature->getKind() != "SketchLine")
     return aPoint2D;
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-
+  
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
   if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
