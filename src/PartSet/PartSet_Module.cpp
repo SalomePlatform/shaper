@@ -128,7 +128,8 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    aPreviewOp->mousePressed(theEvent, myWorkshop->viewer()->activeView());
+    std::list<XGUI_ViewerPrs> aPresentations = myWorkshop->displayer()->GetViewerPrs();
+    aPreviewOp->mousePressed(theEvent, myWorkshop->viewer()->activeView(), aPresentations);
   }
 }
 
@@ -148,10 +149,7 @@ void PartSet_Module::onMouseMoved(QMouseEvent* theEvent)
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
-  {
-    std::list<XGUI_ViewerPrs> aPresentations = myWorkshop->displayer()->GetViewerPrs();
-    aPreviewOp->mouseMoved(theEvent, myWorkshop->viewer()->activeView(), aPresentations);
-  }
+    aPreviewOp->mouseMoved(theEvent, myWorkshop->viewer()->activeView());
 }
 
 void PartSet_Module::onKeyRelease(QKeyEvent* theEvent)

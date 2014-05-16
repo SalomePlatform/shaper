@@ -63,7 +63,9 @@ public:
   /// Processes the mouse pressed in the point
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView);
+  /// \param theSelected the list of selected presentations
+  virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
+                            const std::list<XGUI_ViewerPrs>& theSelected);
 
   /// Processes the mouse release in the point
   /// \param thePoint a point clicked in the viewer
@@ -75,9 +77,7 @@ public:
   /// Processes the mouse move in the point
   /// \param thePoint a 3D point clicked in the viewer
   /// \param theEvent the mouse event
-  /// \param theSelected the list of selected presentations
-  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView,
-                          const std::list<XGUI_ViewerPrs>& theSelected);
+  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
 
   /// Processes the key pressed in the view
   /// \param theKey a key value
@@ -89,6 +89,9 @@ signals:
   /// \param theMode the mode of the feature modification
   void featureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
                           int theMode);
+  /// Signal about the features should be selected
+  /// \param theSelected the list of selected presentations
+  void featureSelected(const std::list<XGUI_ViewerPrs>& theSelected);
   /// signal about the request to launch operation
   /// theName the operation name
   /// theFeature the operation argument
@@ -96,6 +99,10 @@ signals:
   /// signal to enable/disable multi selection in the viewer
   /// \param theEnabled the boolean state
   void multiSelectionEnabled(bool theEnabled);
+
+  /// signal to enable/disable usual selection in the viewer
+  /// \param theEnabled the boolean state
+  void selectionEnabled(bool theEnabled);
 
 protected:
   /// Creates an operation new feature

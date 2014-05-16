@@ -82,9 +82,7 @@ public:
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  /// \param theSelected the list of selected presentations
-  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView,
-                          const std::list<XGUI_ViewerPrs>& theSelected);
+  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
   /// Gives the current selected objects to be processed by the operation
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event

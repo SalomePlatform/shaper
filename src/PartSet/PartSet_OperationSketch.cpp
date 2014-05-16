@@ -53,6 +53,12 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<Mode
   return aModes;
 }
 
+void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
+                                           const std::list<XGUI_ViewerPrs>& theSelected)
+{
+  myFeatures = theSelected;
+}
+
 void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
                                             const std::list<XGUI_ViewerPrs>& theSelected)
 {
@@ -74,17 +80,17 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
         emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
     }
   }
+  myFeatures.clear();
 }
 
-void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                         const std::list<XGUI_ViewerPrs>& theSelected)
+void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
-  if (!myIsEditMode || !(theEvent->buttons() &  Qt::LeftButton) || theSelected.empty())
+  if (!myIsEditMode || !(theEvent->buttons() &  Qt::LeftButton) || myFeatures.empty())
     return;
 
-  if (theSelected.size() != 1) {
+  if (myFeatures.size() != 1) {
     boost::shared_ptr<ModelAPI_Feature> aFeature = PartSet_Tools::NearestFeature(theEvent->pos(),
-                                                                theView, feature(), theSelected);
+                                                                theView, feature(), myFeatures);
     if (aFeature)
       emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
   }

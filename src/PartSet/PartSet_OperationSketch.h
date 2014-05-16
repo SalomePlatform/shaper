@@ -34,6 +34,12 @@ public:
   /// \return the selection mode
   virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
+  /// Processes the mouse pressed in the point
+  /// \param thePoint a point clicked in the viewer
+  /// \param theEvent the mouse event
+  /// \param theSelected the list of selected presentations
+  virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
+                            const std::list<XGUI_ViewerPrs>& theSelected);
   /// Processes the mouse release in the point
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
@@ -43,9 +49,7 @@ public:
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  /// \param theSelected the list of selected presentations
-  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView,
-                          const std::list<XGUI_ViewerPrs>& theSelected);
+  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
 
   /// Returns the map of the operation previews including the nested feature previews
   /// \return the map of feature to the feature preview
@@ -65,6 +69,7 @@ protected:
 
 private:
   bool myIsEditMode; /// the edit mode of this operation
+  std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
 };
 
 #endif

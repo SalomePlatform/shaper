@@ -150,8 +150,7 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
   }
 }
 
-void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                             const std::list<XGUI_ViewerPrs>& /*theSelected*/)
+void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
   switch (myPointSelectionMode)
   {

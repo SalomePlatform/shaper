@@ -63,8 +63,7 @@ void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_V
   myCurPoint.setPoint(aPoint);
 }
 
-void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                           const std::list<XGUI_ViewerPrs>& theSelected)
+void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
   if (!(theEvent->buttons() &  Qt::LeftButton))
     return;
