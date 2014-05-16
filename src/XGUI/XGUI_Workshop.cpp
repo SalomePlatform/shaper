@@ -336,11 +336,6 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
  */
 void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
 {
-  QPushButton* aOkBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
-  connect(aOkBtn, SIGNAL(clicked()), theOperation, SLOT(commit()));
-  QPushButton* aCancelBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
-  connect(aCancelBtn, SIGNAL(clicked()), theOperation, SLOT(abort()));
-
   QAction* aCommand = 0;
   if (isSalomeMode()) {
     aCommand = salomeConnector()->command(theOperation->getDescription()->operationId());
@@ -629,6 +624,11 @@ void XGUI_Workshop::createDockWidgets()
   hidePropertyPanel(); //<! Invisible by default
   hideObjectBrowser();
   aDesktop->tabifyDockWidget(aObjDock, myPropertyPanel);
+
+  QPushButton* aOkBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
+  connect(aOkBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onCommitOperation()));
+  QPushButton* aCancelBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
+  connect(aCancelBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onAbortOperation()));
 }
 
 //******************************************************

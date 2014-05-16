@@ -70,6 +70,11 @@ protected:
   bool canStopOperation();
 
 protected slots:
+  /// Slot that commits the current operation.
+  void onCommitOperation();
+  /// Slot that aborts the current operation.
+  void onAbortOperation();
+
   /// Slot that is called by an operation stop. Removes the stopped operation form the stack.
   /// If there is a suspended operation, restart it.
   void onOperationStopped();

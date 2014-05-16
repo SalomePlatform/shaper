@@ -87,6 +87,20 @@ bool XGUI_OperationMgr::canStopOperation()
   return anAnswer == QMessageBox::Ok;
 }
 
+void XGUI_OperationMgr::onCommitOperation()
+{
+  ModuleBase_Operation* anOperation = currentOperation();
+  if (anOperation)
+    anOperation->commit();
+}
+
+void XGUI_OperationMgr::onAbortOperation()
+{
+  ModuleBase_Operation* anOperation = currentOperation();
+  if (anOperation)
+    anOperation->abort();
+}
+
 void XGUI_OperationMgr::onOperationStopped()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
