@@ -6,14 +6,11 @@
 #define SketchSolver_ConstraintManager_Headerfile
 
 #include "SketchSolver.h"
+#include <SketchSolver_Solver.h>
 
 #include <Events_Listener.h>
 #include <SketchPlugin_Constraint.h>
 
-// Need to be defined before including SolveSpace to avoid additional dependances on Windows platform
-#if defined(WIN32) && !defined(HAVE_C99_INTEGER_TYPES)
-typedef unsigned int UINT32;
-#endif
 #include <string.h>
 #include <slvs.h>
 
@@ -23,6 +20,8 @@ typedef unsigned int UINT32;
 
 // Unknown constraint (for error reporting)
 #define SLVS_C_UNKNOWN 0
+// Unknown entity
+#define SLVS_E_UNKNOWN 0
 
 /** \class   SketchSolver_ConstraintManager
  *  \ingroup DataModel
@@ -79,9 +78,12 @@ protected:
 
   /** \brief Updates entity which is neither workplane nor constraint
    *  \param[in] theFeature entity to be updated
-   *  \return \c true if the entity updated successfully
    */
-  bool updateEntity(boost::shared_ptr<SketchPlugin_Feature> theFeature);
+  void updateEntity(boost::shared_ptr<SketchPlugin_Feature> theFeature);
+
+  /** \brief Goes through the list of groups and solve the constraints
+   */
+  void ResolveConstraints();
 
 private:
   class SketchSolver_ConstraintGroup;
@@ -102,7 +104,7 @@ private:
 
 private:
   static SketchSolver_ConstraintManager*    _self;    ///< Self pointer to implement singleton functionality
-  std::vector<SketchSolver_ConstraintGroup> myGroups; ///< Groups of constraints
+  std::vector<SketchSolver_ConstraintGroup*> myGroups; ///< Groups of constraints
 };
 
 
@@ -155,6 +157,15 @@ public:
    */
   bool updateWorkplane();
 
+  /** \brief If the entity is in this group it will updated
+   *  \param[in] theEntity attribute, which values should update SolveSpace entity
+   */
+  void updateEntityIfPossible(boost::shared_ptr<ModelAPI_Attribute> theEntity);
+
+  /** \brief Start solution procedure if necessary and update attributes of features
+   */
+  void ResolveConstraints();
+
 protected:
   /** \brief Adds or updates an entity in the group
    *
@@ -199,6 +210,12 @@ protected:
    */
   int getConstraintType(const boost::shared_ptr<SketchPlugin_Constraint>& theConstraint) const;
 
+  /** \brief Change values of attribute by parameters received from SolveSpace solver
+   *  \param[in,out] theAttribute pointer to the attribute to be changed
+   *  \param[in]     theEntityID  identifier of SolveSpace entity, which contains updated data
+   */
+  void updateAttribute(boost::shared_ptr<ModelAPI_Attribute> theAttribute, const Slvs_hEntity& theEntityID);
+
 private:
   /** \brief Creates a workplane from the sketch parameters
    *  \param[in] theSketch parameters of workplane are the attributes of this sketch
@@ -216,12 +233,13 @@ private:
   Slvs_hEntity                 myEntityMaxID;   ///< Actual maximal ID of entities (not equal to myEntities size)
   std::vector<Slvs_Constraint> myConstraints;   ///< List of constraints in SolveSpace format
   Slvs_hConstraint             myConstrMaxID;   ///< Actual maximal ID of constraints (not equal to myConstraints size)
-  Slvs_System                  myConstrSet;     ///< SolveSpace's set of equations obtained by constraints
   bool                         myNeedToSolve;   ///< Indicator that something changed in the group and constraint system need to be rebuilt
+
+  SketchSolver_Solver          myConstrSolver;  ///< Solver for set of equations obtained by constraints
 
   // SketchPlugin entities
   boost::shared_ptr<SketchPlugin_Sketch> mySketch; ///< Equivalent to workplane
-  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_Constraint> 
+  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint> 
                                myConstraintMap;    ///< The map between SketchPlugin and SolveSpace constraints
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>
                                myEntityMap;        ///< The map between parameters of constraints and their equivalent SolveSpace entities
