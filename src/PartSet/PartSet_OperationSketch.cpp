@@ -67,6 +67,13 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
       myIsEditMode = true;
     }
   }
+  else {
+    if (theSelected.size() == 1) {
+      boost::shared_ptr<ModelAPI_Feature> aFeature = theSelected.front().feature();
+      if (aFeature)
+        emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+    }
+  }
 }
 
 void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView,
@@ -75,10 +82,12 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View)
   if (!myIsEditMode || !(theEvent->buttons() &  Qt::LeftButton) || theSelected.empty())
     return;
 
-  boost::shared_ptr<ModelAPI_Feature> aFeature = PartSet_Tools::NearestFeature(theEvent->pos(),
-                                                              theView, feature(), theSelected);
-  if (aFeature)
-    emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+  if (theSelected.size() != 1) {
+    boost::shared_ptr<ModelAPI_Feature> aFeature = PartSet_Tools::NearestFeature(theEvent->pos(),
+                                                                theView, feature(), theSelected);
+    if (aFeature)
+      emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+  }
 }
 
 std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >

@@ -65,7 +65,8 @@ std::list<int> PartSet_OperationSketchLine::getSelectionModes(boost::shared_ptr<
   return aModes;
 }
 
-void PartSet_OperationSketchLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void PartSet_OperationSketchLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                       const std::list<XGUI_ViewerPrs>& /*thePresentations*/)
 {
   if (!theFeature)
     return;

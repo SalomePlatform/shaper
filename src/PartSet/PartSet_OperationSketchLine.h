@@ -46,7 +46,9 @@ public:
 
   /// Initializes some fields accorging to the feature
   /// \param theFeature the feature
-  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  /// \param thePresentations the list of additional presentations
+  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                    const std::list<XGUI_ViewerPrs>& thePresentations);
 
   /// Gives the current selected objects to be processed by the operation
   /// \param thePoint a point clicked in the viewer

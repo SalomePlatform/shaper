@@ -1,6 +1,12 @@
 #include "XGUI_Tools.h"
 
+#include <TopoDS_Shape.hxx>
+#include <ModelAPI_Feature.h>
+
 #include <QDir>
+
+#include <iostream>
+#include <sstream>
 
 //******************************************************************
 QString dir(const QString& path, bool isAbs)
@@ -46,3 +52,13 @@ QRect makeRect(const int x1, const int y1, const int x2, const int y2)
 {
   return QRect(qMin(x1, x2), qMin(y1, y2), qAbs(x2 - x1), qAbs(y2 - y1));
 }
+
+//******************************************************************
+std::string featureInfo(boost::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  std::ostringstream aStream; 
+  if (theFeature)
+    aStream << theFeature.get();
+  return QString(aStream.str().c_str()).toStdString();
+}
+

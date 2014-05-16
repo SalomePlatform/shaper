@@ -55,17 +55,12 @@ public:
   /// \param theFeature a feature instance
   /// \param theShape a shape
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void Display(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape,
-               const bool isUpdateViewer = true);
+  //void Display(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape,
+  //             const bool isUpdateViewer = true);
   
-  /// Returns the feature, that was displayed with this shape
-  /// \param theShape a shape
-  boost::shared_ptr<ModelAPI_Feature> GetFeature(const TopoDS_Shape& theShape);
-
   /// Returns a list of viewer presentations
-  /// \param theShapes list of shapes to find corresponded features
   /// \return list of presentations
-  std::list<XGUI_ViewerPrs> GetViewerPrs(const NCollection_List<TopoDS_Shape>& theShapes);
+  std::list<XGUI_ViewerPrs> GetViewerPrs();
 
   /// Display the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance

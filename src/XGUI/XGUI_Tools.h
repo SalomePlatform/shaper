@@ -5,6 +5,10 @@
 #include <QString>
 #include <QRect>
 
+#include <boost/shared_ptr.hpp>
+
+class TopoDS_Shape;
+class ModelAPI_Feature;
 /*!
  \brief Return directory part of the file path.
 
@@ -52,4 +56,9 @@ QString XGUI_EXPORT addSlash(const QString& path);
  */
 QRect XGUI_EXPORT makeRect(const int x1, const int y1, const int x2, const int y2);
 
+/*!
+ Returns the string presentation of the given feature
+ \param theFeature a feature
+*/
+std::string XGUI_EXPORT featureInfo(boost::shared_ptr<ModelAPI_Feature> theFeature);
 #endif

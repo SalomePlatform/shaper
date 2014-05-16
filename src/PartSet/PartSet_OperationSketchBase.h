@@ -56,7 +56,9 @@ public:
 
   /// Initializes some fields accorging to the feature
   /// \param theFeature the feature
-  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature) {}
+  /// \param thePresentations the list of additional presentations
+  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                    const std::list<XGUI_ViewerPrs>& thePresentations) {}
 
   /// Processes the mouse pressed in the point
   /// \param thePoint a point clicked in the viewer
@@ -94,10 +96,6 @@ signals:
   /// signal to enable/disable multi selection in the viewer
   /// \param theEnabled the boolean state
   void multiSelectionEnabled(bool theEnabled);
-
-  /// signal to enable/disable usual selection in the viewer
-  /// \param theEnabled the boolean state
-  void selectionEnabled(bool theEnabled);
 
 protected:
   /// Creates an operation new feature

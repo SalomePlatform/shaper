@@ -71,7 +71,9 @@ public:
 
   /// Initializes some fields accorging to the feature
   /// \param theFeature the feature
-  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  /// \param thePresentations the list of additional presentations
+  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                    const std::list<XGUI_ViewerPrs>& thePresentations);
 
   /// Processes the mouse pressed in the point
   /// \param thePoint a point clicked in the viewer
@@ -116,6 +118,7 @@ protected:
 
 private:
   boost::shared_ptr<ModelAPI_Feature> mySketch; ///< the sketch feature
+  std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
   Point myCurPoint; ///< the current 3D point clicked or moved
   gp_Pnt myCurPressed; ///< the current 3D point clicked or moved
 };
