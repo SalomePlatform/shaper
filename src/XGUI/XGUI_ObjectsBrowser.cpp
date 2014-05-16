@@ -39,8 +39,11 @@ void XGUI_ObjectsBrowser::mouseDoubleClickEvent(QMouseEvent* theEvent)
   bool isChanged = myDocModel->activatedIndex(aIndex);
   QTreeView::mouseDoubleClickEvent(theEvent);
   if (isChanged) {
-    setExpanded(aIndex.parent(), true);
-    setExpanded(aIndex, myDocModel->hasChildren(aIndex));
     emit activePartChanged(myDocModel->activePart());
   }
+}
+
+void XGUI_ObjectsBrowser::contextMenuEvent(QContextMenuEvent* theEvent)
+{
+  emit contextMenuRequested(theEvent);
 }

@@ -14,7 +14,11 @@
 
 #include <QIcon>
 #include <QString>
+#include <QBrush>
 
+
+#define ACTIVE_COLOR QColor(0,72,140)
+#define PASSIVE_COLOR Qt::black
 
 XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
   : QAbstractItemModel(theParent), myActivePart(0)
@@ -30,6 +34,7 @@ XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
 
   // Create a top part of data tree model
   myModel = new XGUI_TopDataModel(myDocument, this);
+  myModel->setItemsColor(ACTIVE_COLOR);
 }
 
 
@@ -154,6 +159,11 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
       return QIcon(":pictures/constr_folder.png");
     case Qt::ToolTipRole:
       return tr("Parts folder");
+    case Qt::ForegroundRole:
+      if (myActivePart)
+        return QBrush(PASSIVE_COLOR);
+      else
+        return QBrush(ACTIVE_COLOR);
     default:
       return QVariant();
     }
@@ -174,6 +184,11 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
         return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
       case Qt::ToolTipRole:
         return tr("Feature object");
+      case Qt::ForegroundRole:
+        if (myActivePart)
+          return QBrush(PASSIVE_COLOR);
+        else
+          return QBrush(ACTIVE_COLOR);
       default:
         return QVariant();
       }
@@ -213,10 +228,10 @@ int XGUI_DocumentDataModel::rowCount(const QModelIndex& theParent) const
   if (!isSubModel(aModel)) 
     return 0;
 
-  if (isPartSubModel(aModel)) {
+  /*if (isPartSubModel(aModel)) {
     if (aModel != myActivePart)
       return 0;
-  }
+  }*/
   return aModel->rowCount(*aParent);
 }
 
@@ -415,10 +430,14 @@ bool XGUI_DocumentDataModel::activatedIndex(const QModelIndex& theIndex)
   if (isPartSubModel(aModel)) {
     // if this is root node (Part item index)
     if (!aIndex->parent().isValid()) {
-      beginResetModel();
+      if (myActivePart) myActivePart->setItemsColor(PASSIVE_COLOR);
       myActivePart = (myActivePart == aModel)? 0 : (XGUI_PartModel*)aModel;
-      endResetModel();
-      return true;
+      if (myActivePart) {
+        myActivePart->setItemsColor(ACTIVE_COLOR);
+        myModel->setItemsColor(PASSIVE_COLOR);
+      } else 
+         myModel->setItemsColor(ACTIVE_COLOR);
+     return true;
     }
   }
   return false;

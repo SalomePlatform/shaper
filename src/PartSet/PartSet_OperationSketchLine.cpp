@@ -229,6 +229,12 @@ void PartSet_OperationSketchLine::createConstraint(boost::shared_ptr<GeomDataAPI
   boost::shared_ptr<ModelAPI_Document> aDoc = document();
   boost::shared_ptr<ModelAPI_Feature> aFeature = aDoc->addFeature("SketchConstraintCoincidence");
 
+  if (mySketch) {
+    boost::shared_ptr<SketchPlugin_Feature> aSketch = 
+                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(mySketch);
+    aSketch->addSub(aFeature);
+  }
+
   boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
 
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef1 =

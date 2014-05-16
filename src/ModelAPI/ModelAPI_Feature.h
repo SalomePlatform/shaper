@@ -62,7 +62,8 @@ protected:
   {}
 
   /// Sets the data manager of an object (document does)
-  MODELAPI_EXPORT void setData(boost::shared_ptr<ModelAPI_Data> theData) {myData = theData;}
+  MODELAPI_EXPORT virtual void setData(boost::shared_ptr<ModelAPI_Data> theData) 
+  {myData = theData;}
   /// Sets the data manager of an object (document does)
   MODELAPI_EXPORT void setDoc(boost::shared_ptr<ModelAPI_Document> theDoc) {myDoc = theDoc;}
 
