@@ -17,7 +17,6 @@ const double PLANE_SIZE = 200;
 SketchPlugin_Line::SketchPlugin_Line()
   : SketchPlugin_Feature()
 {
-  setSketch(0);
 }
 
 void SketchPlugin_Line::initAttributes()

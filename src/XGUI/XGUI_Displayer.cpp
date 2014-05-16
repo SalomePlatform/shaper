@@ -161,6 +161,34 @@ void XGUI_Displayer::EraseAll(const bool isUpdateViewer)
     ic->UpdateCurrentViewer();
 }
 
+void XGUI_Displayer::EraseDeletedFeatures(const bool isUpdateViewer)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+
+  FeatureToAISMap::const_iterator aFIt = myFeature2AISObjectMap.begin(),
+                                  aFLast = myFeature2AISObjectMap.end();
+  std::list<boost::shared_ptr<ModelAPI_Feature>> aRemoved;
+  for (; aFIt != aFLast; aFIt++)
+  {
+    boost::shared_ptr<ModelAPI_Feature> aFeature = (*aFIt).first;
+    if (!aFeature) {
+      Handle(AIS_InteractiveObject) anAIS = (*aFIt).second;
+      if (!anAIS.IsNull()) {
+        aContext->Erase(anAIS, false);
+        aRemoved.push_back(aFeature);
+      }
+    }
+  }
+  std::list<boost::shared_ptr<ModelAPI_Feature>>::const_iterator anIt = aRemoved.begin(),
+                                                                 aLast = aRemoved.end();
+  for (; anIt != aLast; anIt++) {
+    myFeature2AISObjectMap.erase(myFeature2AISObjectMap.find(*anIt));
+  }
+
+  if (isUpdateViewer)
+    aContext->UpdateCurrentViewer();
+}
+
 void XGUI_Displayer::CloseLocalContexts(const bool isUpdateViewer)
 {
   closeAllContexts(true);
