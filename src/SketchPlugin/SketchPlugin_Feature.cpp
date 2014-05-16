@@ -18,13 +18,15 @@ void SketchPlugin_Feature::setData(boost::shared_ptr<ModelAPI_Data> theData)
   for(int a = 0; a < aSketches && !mySketch; a++) {
     boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
       boost::dynamic_pointer_cast<SketchPlugin_Sketch>(document()->feature("Construction", a));
-    std::list<boost::shared_ptr<ModelAPI_Feature> > aList = 
-      aSketch->data()->reflist(SKETCH_ATTR_FEATURES)->list();
-    std::list<boost::shared_ptr<ModelAPI_Feature> >::iterator aSub = aList.begin();
-    for(; aSub != aList.end(); aSub++) {
-      if ((*aSub)->data()->isEqual(theData)) {
-        mySketch = aSketch.get();
-        break;
+    if (aSketch) {
+      std::list<boost::shared_ptr<ModelAPI_Feature> > aList = 
+        aSketch->data()->reflist(SKETCH_ATTR_FEATURES)->list();
+      std::list<boost::shared_ptr<ModelAPI_Feature> >::iterator aSub = aList.begin();
+      for(; aSub != aList.end(); aSub++) {
+        if ((*aSub)->data()->isEqual(theData)) {
+          mySketch = aSketch.get();
+          break;
+        }
       }
     }
   }

@@ -196,6 +196,7 @@ void Model_Document::finishOperation()
 void Model_Document::abortOperation()
 {
   myDoc->AbortCommand();
+  synchronizeFeatures();
   // abort for all subs
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
