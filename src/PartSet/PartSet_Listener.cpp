@@ -50,7 +50,7 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
 
     std::string aGroup = aDelMsg->group();
     if (aDelMsg->group().compare("Sketch") == 0) { // Update only Sketch group
-      //myModule->workshop()->displayer()->EraseDeletedFeatures();
+      myModule->workshop()->displayer()->EraseDeletedFeatures();
       myModule->updateCurrentPreview(aGroup);
     }
   }

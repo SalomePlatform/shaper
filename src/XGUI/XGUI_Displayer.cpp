@@ -8,6 +8,7 @@
 #include "XGUI_ViewerProxy.h"
 
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Data.h>
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_ListOfInteractive.hxx>
@@ -171,7 +172,7 @@ void XGUI_Displayer::EraseDeletedFeatures(const bool isUpdateViewer)
   for (; aFIt != aFLast; aFIt++)
   {
     boost::shared_ptr<ModelAPI_Feature> aFeature = (*aFIt).first;
-    if (!aFeature) {
+    if (!aFeature || !aFeature->data()->isValid()) {
       Handle(AIS_InteractiveObject) anAIS = (*aFIt).second;
       if (!anAIS.IsNull()) {
         aContext->Erase(anAIS, false);
