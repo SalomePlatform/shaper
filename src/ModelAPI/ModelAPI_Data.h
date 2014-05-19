@@ -70,4 +70,7 @@ protected:
   {}
 };
 
+typedef boost::shared_ptr<ModelAPI_Data> DataPtr;
+
+
 #endif

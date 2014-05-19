@@ -70,4 +70,8 @@ protected:
   friend class Model_Document;
 };
 
+//! Pointer on feature object
+typedef boost::shared_ptr<ModelAPI_Feature> FeaturePtr;
+
+
 #endif

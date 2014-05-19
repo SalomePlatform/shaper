@@ -6,6 +6,8 @@
 #include "XGUI_Constants.h"
 
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Feature.h>
+
 #include <QAbstractItemModel>
 #include <QColor>
 
@@ -16,7 +18,7 @@
 class XGUI_EXPORT XGUI_FeaturesModel : public QAbstractItemModel
 {
 public:
-  XGUI_FeaturesModel(const boost::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent):
+  XGUI_FeaturesModel(const DocumentPtr& theDocument, QObject* theParent):
       QAbstractItemModel(theParent), myDocument(theDocument), myItemsColor(Qt::black) {}
 
   //! Returns Feature object by the given Model index.
@@ -24,7 +26,7 @@ public:
   virtual FeaturePtr feature(const QModelIndex& theIndex) const = 0;
 
   //! Returns parent index of the given feature
-  virtual QModelIndex findParent(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const = 0;
+  virtual QModelIndex findParent(const FeaturePtr& theFeature) const = 0;
 
   //! Returns index corresponded to the group
   virtual QModelIndex findGroup(const std::string& theGroup) const = 0;
@@ -46,13 +48,13 @@ protected:
 class XGUI_PartModel : public XGUI_FeaturesModel
 {
 public:
-  XGUI_PartModel(const boost::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent):
+  XGUI_PartModel(const DocumentPtr& theDocument, QObject* theParent):
       XGUI_FeaturesModel(theDocument, theParent) {}
 
   void setPartId(int theId) { myId = theId; }
 
   //! Returns true if the given document is a sub-document of this tree
-  virtual bool hasDocument(const boost::shared_ptr<ModelAPI_Document>& theDoc) const = 0;
+  virtual bool hasDocument(const DocumentPtr& theDoc) const = 0;
 
   //! Return a Part object
   virtual FeaturePtr part() const = 0;

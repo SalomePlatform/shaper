@@ -91,4 +91,9 @@ protected:
   {}
 };
 
+
+//! Pointer on document object
+typedef boost::shared_ptr<ModelAPI_Document> DocumentPtr;
+
+
 #endif

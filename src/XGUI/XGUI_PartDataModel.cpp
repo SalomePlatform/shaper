@@ -6,11 +6,12 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
+#include <ModelAPI_Object.h>
 
 #include <QIcon>
 #include <QBrush>
 
-XGUI_TopDataModel::XGUI_TopDataModel(const boost::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent)
+XGUI_TopDataModel::XGUI_TopDataModel(const DocumentPtr& theDocument, QObject* theParent)
   : XGUI_FeaturesModel(theDocument, theParent)
 {
 }
@@ -30,7 +31,7 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
       return tr("Parameters") + QString(" (%1)").arg(rowCount(theIndex));
     case ParamObject:
       {
-        boost::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(PARAMETERS_GROUP, theIndex.row());
+        FeaturePtr aFeature = myDocument->feature(PARAMETERS_GROUP, theIndex.row());
         if (aFeature)
           return aFeature->data()->getName().c_str();
       } 
@@ -38,7 +39,7 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
         return tr("Constructions") + QString(" (%1)").arg(rowCount(theIndex));
     case ConstructObject:
       {
-        boost::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+        FeaturePtr aFeature = myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row());
         if (aFeature)
           return aFeature->data()->getName().c_str();
       }
@@ -149,7 +150,7 @@ FeaturePtr XGUI_TopDataModel::feature(const QModelIndex& theIndex) const
 }
 
 
-QModelIndex XGUI_TopDataModel::findParent(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const
+QModelIndex XGUI_TopDataModel::findParent(const FeaturePtr& theFeature) const
 {
   QString aGroup(theFeature->getGroup().c_str());
 
@@ -173,7 +174,7 @@ QModelIndex XGUI_TopDataModel::findGroup(const std::string& theGroup) const
 //******************************************************************
 //******************************************************************
 //******************************************************************
-XGUI_PartDataModel::XGUI_PartDataModel(const boost::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent)
+XGUI_PartDataModel::XGUI_PartDataModel(const DocumentPtr& theDocument, QObject* theParent)
   : XGUI_PartModel(theDocument, theParent)
 {
 }
@@ -191,7 +192,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
     switch (theIndex.internalId()) {
     case MyRoot:
       {
-        boost::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(PARTS_GROUP, myId);
+        FeaturePtr aFeature = myDocument->feature(PARTS_GROUP, myId);
         if (aFeature)
           return aFeature->data()->getName().c_str();
       }
@@ -203,22 +204,19 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
       return tr("Bodies") + QString(" (%1)").arg(rowCount(theIndex));
     case ParamObject:
       {
-        boost::shared_ptr<ModelAPI_Feature> aFeature = 
-          featureDocument()->feature(PARAMETERS_GROUP, theIndex.row());
+        FeaturePtr aFeature = featureDocument()->feature(PARAMETERS_GROUP, theIndex.row());
         if (aFeature)
           return aFeature->data()->getName().c_str();
       }
     case ConstructObject:
       {
-        boost::shared_ptr<ModelAPI_Feature> aFeature = 
-          featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+        FeaturePtr aFeature = featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row());
         if (aFeature)
           return aFeature->data()->getName().c_str();
       }
     case HistoryObject:
       {
-        boost::shared_ptr<ModelAPI_Feature> aFeature = 
-          featureDocument()->feature(FEATURES_GROUP, theIndex.row() - 3);
+        FeaturePtr aFeature = featureDocument()->feature(FEATURES_GROUP, theIndex.row() - 3);
         if (aFeature)
           return aFeature->data()->getName().c_str();
       }
@@ -242,8 +240,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
       }
     case HistoryObject:
       {
-        boost::shared_ptr<ModelAPI_Feature> aFeature = 
-          featureDocument()->feature(FEATURES_GROUP, theIndex.row() - 3);
+        FeaturePtr aFeature = featureDocument()->feature(FEATURES_GROUP, theIndex.row() - 3);
         if (aFeature)
           return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
       }
@@ -341,12 +338,15 @@ bool XGUI_PartDataModel::hasChildren(const QModelIndex& theParent) const
 }
 
 
-boost::shared_ptr<ModelAPI_Document> XGUI_PartDataModel::featureDocument() const
+DocumentPtr XGUI_PartDataModel::featureDocument() const
 {
-  boost::shared_ptr<ModelAPI_Feature> aFeature = myDocument->feature(PARTS_GROUP, myId);
+  FeaturePtr aFeature = myDocument->feature(PARTS_GROUP, myId);
+  ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
+  if (aObject)
+    return aObject->featureRef()->data()->docRef("PartDocument")->value();
   return aFeature->data()->docRef("PartDocument")->value();
 }
-
+ 
 FeaturePtr XGUI_PartDataModel::feature(const QModelIndex& theIndex) const
 {
   switch (theIndex.internalId()) {
@@ -366,13 +366,13 @@ FeaturePtr XGUI_PartDataModel::feature(const QModelIndex& theIndex) const
   return FeaturePtr();
 }
 
-bool XGUI_PartDataModel::hasDocument(const boost::shared_ptr<ModelAPI_Document>& theDoc) const
+bool XGUI_PartDataModel::hasDocument(const DocumentPtr& theDoc) const
 {
   return (featureDocument() == theDoc);
 }
 
 
-QModelIndex XGUI_PartDataModel::findParent(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const
+QModelIndex XGUI_PartDataModel::findParent(const FeaturePtr& theFeature) const
 {
   QString aGroup(theFeature->getGroup().c_str());
 
