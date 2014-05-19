@@ -383,7 +383,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
 int Model_Document::size(const string& theGroupID) 
 {
   Handle(TDataStd_ReferenceArray) aRefs;
-  if (groupLabel(FEATURES_GROUP).FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs))
+  if (groupLabel(theGroupID).FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs))
     return aRefs->Length();
   // group is not found
   return 0;
