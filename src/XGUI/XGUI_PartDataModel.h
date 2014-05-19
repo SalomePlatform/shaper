@@ -14,7 +14,7 @@ class XGUI_EXPORT XGUI_TopDataModel : public XGUI_FeaturesModel
 {
   Q_OBJECT
 public:
-  XGUI_TopDataModel(const boost::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent);
+  XGUI_TopDataModel(const DocumentPtr& theDocument, QObject* theParent);
   virtual ~XGUI_TopDataModel();
 
   // Reimpl from QAbstractItemModel
@@ -37,7 +37,7 @@ public:
   virtual FeaturePtr feature(const QModelIndex& theIndex) const;
 
   //! Returns parent index of the given feature
-  virtual QModelIndex findParent(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const;
+  virtual QModelIndex findParent(const FeaturePtr& theFeature) const;
 
   //! Returns index corresponded to the group
   virtual QModelIndex findGroup(const std::string& theGroup) const;
@@ -63,7 +63,7 @@ class XGUI_PartDataModel : public XGUI_PartModel
 {
   Q_OBJECT
 public:
-  XGUI_PartDataModel(const boost::shared_ptr<ModelAPI_Document>& theDocument, QObject* theParent);
+  XGUI_PartDataModel(const DocumentPtr& theDocument, QObject* theParent);
   virtual ~XGUI_PartDataModel();
 
   // Reimpl from QAbstractItemModel
@@ -86,10 +86,10 @@ public:
   virtual FeaturePtr feature(const QModelIndex& theIndex) const;
 
   //! Returns true if the given document is a sub-document of this tree
-  virtual bool hasDocument(const boost::shared_ptr<ModelAPI_Document>& theDoc) const;
+  virtual bool hasDocument(const DocumentPtr& theDoc) const;
 
   //! Returns parent index of the given feature
-  virtual QModelIndex findParent(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const;
+  virtual QModelIndex findParent(const FeaturePtr& theFeature) const;
 
   //! Returns index corresponded to the group
   virtual QModelIndex findGroup(const std::string& theGroup) const;
@@ -98,7 +98,7 @@ public:
   virtual FeaturePtr part() const;
 
 private: 
-  boost::shared_ptr<ModelAPI_Document> featureDocument() const;
+  DocumentPtr featureDocument() const;
 
   //! Types of QModelIndexes
   enum DataIds {

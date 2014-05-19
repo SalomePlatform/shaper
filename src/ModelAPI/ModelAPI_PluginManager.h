@@ -58,4 +58,7 @@ protected:
   friend class Model_Document;
 };
 
+typedef boost::shared_ptr<ModelAPI_PluginManager> PluginManagerPtr;
+
+
 #endif

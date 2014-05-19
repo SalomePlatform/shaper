@@ -7,6 +7,8 @@
 
 #include "ModelAPI_Feature.h"
 
+#include <boost/shared_ptr.hpp>
+
 /**\class ModelAPI_Object
  * \ingroup DataModel
  * \brief Represents the result of some feature in the object browser
@@ -29,5 +31,8 @@ public:
   /// Defines the name of the object
   MODELAPI_EXPORT virtual void setName(std::string theName) = 0;
 };
+
+
+typedef boost::shared_ptr<ModelAPI_Object> ObjectPtr;
 
 #endif
