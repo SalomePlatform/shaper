@@ -58,10 +58,7 @@ std::list<int> PartSet_OperationSketchLine::getSelectionModes(boost::shared_ptr<
 {
   std::list<int> aModes;
   if (theFeature != feature())
-  {
-    aModes.push_back(TopAbs_VERTEX);
-    aModes.push_back(TopAbs_EDGE);
-  }
+    aModes = PartSet_OperationSketchBase::getSelectionModes(theFeature);
   return aModes;
 }
 

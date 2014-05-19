@@ -17,6 +17,7 @@ class QMouseEvent;
 class QKeyEvent;
 class PartSet_Listener;
 class ModelAPI_Feature;
+class XGUI_ViewerPrs;
 
 class PARTSET_EXPORT PartSet_Module: public QObject, public XGUI_Module
 {
@@ -40,9 +41,17 @@ public:
   virtual void launchOperation(const QString& theCmdId);
 
   /// Displays or erase the current operation preview, if it has it.
-  /// \param theF
+  /// \param theFeature the feature instance to be displayed
   /// \param isDisplay the state whether the presentation should be displayed or erased
-  void visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFeature, bool isDisplay);
+  /// \param isUpdateViewer the flag whether the viewer should be updated
+  void visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFeature, bool isDisplay,
+                        const bool isUpdateViewer = true);
+
+  /// Activates the feature in the displayer
+  /// \param theFeature the feature instance to be displayed
+  /// \param isUpdateViewer the flag whether the viewer should be updated
+  void activateFeature(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                       const bool isUpdateViewer);
 
   /// Updates current operation preview, if it has it.
   /// \param theCmdId the operation name
@@ -82,6 +91,11 @@ public slots:
   /// SLOT, to switch on/off the multi selection in the viewer
   /// \param theEnabled the enabled state
   void onMultiSelectionEnabled(bool theEnabled);
+
+  /// SLOT, to stop or start selection for the features
+  /// \param theFeatures a list of features to be disabled
+  /// \param theToStop the boolean state whether it it stopped or non stopped
+  void onStopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop);
 
   /// SLOT, to visualize the feature in another local context mode
   /// \param theFeature the feature to be put in another local context mode

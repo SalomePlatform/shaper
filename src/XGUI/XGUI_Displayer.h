@@ -67,9 +67,21 @@ public:
   /// \param theShape a shape
   /// \param theMode a local selection mode
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void RedisplayInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                             const TopoDS_Shape& theShape,
-                             const std::list<int>& theMode, const bool isUpdateViewer = true);
+  void Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                             const TopoDS_Shape& theShape, const bool isUpdateViewer = true);
+
+  /// Display the shape and activate selection of sub-shapes
+  /// \param theFeature a feature instance
+  /// \param theShape a shape
+  /// \param theMode a list of local selection modes
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  void ActivateInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                              const std::list<int>& theModes, const bool isUpdateViewer = true);
+
+  /// Stop the current selection and color the given features to the selection color
+  /// \param theFeatures a list of features to be disabled
+  /// \param theToStop the boolean state whether it it stopped or non stopped
+  void StopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop);
 
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance
@@ -105,5 +117,6 @@ protected:
   typedef std::map<boost::shared_ptr<ModelAPI_Feature>, Handle(AIS_InteractiveObject) > FeatureToAISMap;
   FeatureToAISMap myFeature2AISObjectMap;
 };
+
 
 #endif

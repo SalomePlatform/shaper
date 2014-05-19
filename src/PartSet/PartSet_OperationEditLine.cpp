@@ -43,9 +43,9 @@ bool PartSet_OperationEditLine::isGranted() const
 std::list<int> PartSet_OperationEditLine::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
   std::list<int> aModes;
-  aModes.push_back(TopAbs_VERTEX);
-  aModes.push_back(TopAbs_EDGE);
+  aModes.push_back(-1);
   return aModes;
+  //return PartSet_OperationSketchBase::getSelectionModes(theFeature);
 }
 
 void PartSet_OperationEditLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
@@ -126,12 +126,14 @@ void PartSet_OperationEditLine::startOperation()
 {
   // do nothing in order to do not create a new feature
   emit multiSelectionEnabled(false);
+  emit stopSelection(myFeatures, true);
   myCurPoint.clear();
 }
 
 void PartSet_OperationEditLine::stopOperation()
 {
   emit multiSelectionEnabled(true);
+  emit stopSelection(myFeatures, false);
   myFeatures.clear();
 }
 
