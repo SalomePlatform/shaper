@@ -26,6 +26,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
+#include <ModelAPI_Object.h>
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
@@ -208,8 +209,8 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   {
     const Model_FeatureUpdatedMessage* anUpdateMsg =
         dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    boost::shared_ptr<ModelAPI_Feature> aNewFeature = anUpdateMsg->feature();
-    boost::shared_ptr<ModelAPI_Feature> aCurrentFeature = myOperationMgr->currentOperation()->feature();
+    FeaturePtr aNewFeature = anUpdateMsg->feature();
+    FeaturePtr aCurrentFeature = myOperationMgr->currentOperation()->feature();
     if(aNewFeature == aCurrentFeature) {
       myPropertyPanel->updateContentWidget(aCurrentFeature);
     }
@@ -355,8 +356,8 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
 void XGUI_Workshop::saveDocument(QString theName)
 {
   QApplication::restoreOverrideCursor();
-  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  DocumentPtr aDoc = aMgr->rootDocument();
   aDoc->save(theName.toLatin1().constData());
   QApplication::restoreOverrideCursor();
 }
@@ -364,8 +365,8 @@ void XGUI_Workshop::saveDocument(QString theName)
 //******************************************************
 void XGUI_Workshop::onExit()
 {
-  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  DocumentPtr aDoc = aMgr->rootDocument();
   if(aDoc->isModified()) {
     int anAnswer = QMessageBox::question(
         myMainWindow, tr("Save current file"),
@@ -403,8 +404,8 @@ void XGUI_Workshop::onNew()
 void XGUI_Workshop::onOpen()
 {
   //save current file before close if modified
-  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  DocumentPtr aDoc = aMgr->rootDocument();
   if(aDoc->isModified()) {
     //TODO(sbh): re-launch the app?
     int anAnswer = QMessageBox::question(
@@ -468,8 +469,8 @@ void XGUI_Workshop::onSaveAs()
 void XGUI_Workshop::onUndo()
 {
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
-  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  DocumentPtr aDoc = aMgr->rootDocument();
   if (aDoc->isOperation())
     operationMgr()->abortOperation();
   aDoc->undo();
@@ -480,8 +481,8 @@ void XGUI_Workshop::onUndo()
 void XGUI_Workshop::onRedo()
 {
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
-  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
-  boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  DocumentPtr aDoc = aMgr->rootDocument();
   aDoc->redo();
   updateCommandStatus();
 }
@@ -569,7 +570,7 @@ void XGUI_Workshop::updateCommandStatus()
   QList<XGUI_Command*> aCommands = aMenuBar->features();
   QList<XGUI_Command*>::const_iterator aIt;
 
-  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   if (aMgr->hasRootDocument()) {
     XGUI_Command* aUndoCmd;
     XGUI_Command* aRedoCmd;
@@ -581,7 +582,7 @@ void XGUI_Workshop::updateCommandStatus()
       else // Enable all commands
         aCmd->enable();
     }
-    boost::shared_ptr<ModelAPI_Document> aDoc = aMgr->rootDocument();
+    DocumentPtr aDoc = aMgr->rootDocument();
     aUndoCmd->setEnabled(aDoc->canUndo());
     aRedoCmd->setEnabled(aDoc->canRedo());
   } else {
@@ -678,7 +679,7 @@ void XGUI_Workshop::onFeatureTriggered()
 //******************************************************
 void XGUI_Workshop::changeCurrentDocument(FeaturePtr thePart)
 {
-  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   if (thePart) {
     boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = thePart->data()->docRef("PartDocument");
     if (aDocRef)

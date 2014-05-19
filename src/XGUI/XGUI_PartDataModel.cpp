@@ -11,6 +11,16 @@
 #include <QIcon>
 #include <QBrush>
 
+
+FeaturePtr featureObj(const FeaturePtr& theFeature)
+{
+  ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
+  if (aObject)
+    return aObject->featureRef();
+  return theFeature;
+}
+
+
 XGUI_TopDataModel::XGUI_TopDataModel(const DocumentPtr& theDocument, QObject* theParent)
   : XGUI_FeaturesModel(theDocument, theParent)
 {
@@ -31,7 +41,7 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
       return tr("Parameters") + QString(" (%1)").arg(rowCount(theIndex));
     case ParamObject:
       {
-        FeaturePtr aFeature = myDocument->feature(PARAMETERS_GROUP, theIndex.row());
+        FeaturePtr aFeature = featureObj(myDocument->feature(PARAMETERS_GROUP, theIndex.row()));
         if (aFeature)
           return aFeature->data()->getName().c_str();
       } 
@@ -39,7 +49,7 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
         return tr("Constructions") + QString(" (%1)").arg(rowCount(theIndex));
     case ConstructObject:
       {
-        FeaturePtr aFeature = myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+        FeaturePtr aFeature = featureObj(myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row()));
         if (aFeature)
           return aFeature->data()->getName().c_str();
       }
@@ -55,7 +65,7 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
       return QIcon(":pictures/constr_folder.png");
     case ConstructObject:
       {
-        FeaturePtr aFeature = myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+        FeaturePtr aFeature = featureObj(myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row()));
         if (aFeature)
           return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
       }
@@ -142,9 +152,9 @@ FeaturePtr XGUI_TopDataModel::feature(const QModelIndex& theIndex) const
   case ConstructFolder:
     return FeaturePtr();
   case ParamObject:
-    return myDocument->feature(PARAMETERS_GROUP, theIndex.row());
+    return featureObj(myDocument->feature(PARAMETERS_GROUP, theIndex.row()));
   case ConstructObject:
-    return myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+    return featureObj(myDocument->feature(CONSTRUCTIONS_GROUP, theIndex.row()));
   }
   return FeaturePtr();
 }
@@ -192,7 +202,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
     switch (theIndex.internalId()) {
     case MyRoot:
       {
-        FeaturePtr aFeature = myDocument->feature(PARTS_GROUP, myId);
+        FeaturePtr aFeature = featureObj(myDocument->feature(PARTS_GROUP, myId));
         if (aFeature)
           return aFeature->data()->getName().c_str();
       }
@@ -204,19 +214,19 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
       return tr("Bodies") + QString(" (%1)").arg(rowCount(theIndex));
     case ParamObject:
       {
-        FeaturePtr aFeature = featureDocument()->feature(PARAMETERS_GROUP, theIndex.row());
+        FeaturePtr aFeature = featureObj(featureDocument()->feature(PARAMETERS_GROUP, theIndex.row()));
         if (aFeature)
           return aFeature->data()->getName().c_str();
       }
     case ConstructObject:
       {
-        FeaturePtr aFeature = featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+        FeaturePtr aFeature = featureObj(featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row()));
         if (aFeature)
           return aFeature->data()->getName().c_str();
       }
     case HistoryObject:
       {
-        FeaturePtr aFeature = featureDocument()->feature(FEATURES_GROUP, theIndex.row() - 3);
+        FeaturePtr aFeature = featureObj(featureDocument()->feature(FEATURES_GROUP, theIndex.row() - 3));
         if (aFeature)
           return aFeature->data()->getName().c_str();
       }
@@ -234,7 +244,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
       return QIcon(":pictures/constr_folder.png");
     case ConstructObject:
       {
-        FeaturePtr aFeature = featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+        FeaturePtr aFeature = featureObj(featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row()));
         if (aFeature)
           return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
       }
@@ -340,10 +350,7 @@ bool XGUI_PartDataModel::hasChildren(const QModelIndex& theParent) const
 
 DocumentPtr XGUI_PartDataModel::featureDocument() const
 {
-  FeaturePtr aFeature = myDocument->feature(PARTS_GROUP, myId);
-  ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
-  if (aObject)
-    return aObject->featureRef()->data()->docRef("PartDocument")->value();
+  FeaturePtr aFeature = featureObj(myDocument->feature(PARTS_GROUP, myId));
   return aFeature->data()->docRef("PartDocument")->value();
 }
  
@@ -351,17 +358,17 @@ FeaturePtr XGUI_PartDataModel::feature(const QModelIndex& theIndex) const
 {
   switch (theIndex.internalId()) {
   case MyRoot:
-    if (theIndex.row() < 3)
-      return myDocument->feature(PARTS_GROUP, myId);
-    else 
+    if (theIndex.row() < 3) {
+      return featureObj(myDocument->feature(PARTS_GROUP, myId));
+    } else 
       return featureDocument()->feature(FEATURES_GROUP, theIndex.row() - 3);
   case ParamsFolder:
   case ConstructFolder:
     return FeaturePtr();
   case ParamObject:
-    return featureDocument()->feature(PARAMETERS_GROUP, theIndex.row());
+    return featureObj(featureDocument()->feature(PARAMETERS_GROUP, theIndex.row()));
   case ConstructObject:
-    return featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row());
+    return featureObj(featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row()));
   }
   return FeaturePtr();
 }
@@ -394,5 +401,5 @@ QModelIndex XGUI_PartDataModel::findGroup(const std::string& theGroup) const
 
 FeaturePtr XGUI_PartDataModel::part() const
 {
-  return myDocument->feature(PARTS_GROUP, myId);
+  return featureObj(myDocument->feature(PARTS_GROUP, myId));
 }
