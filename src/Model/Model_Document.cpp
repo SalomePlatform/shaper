@@ -316,16 +316,16 @@ void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFea
   // store feature in the history of features array
   if (theFeature->isInHistory()) {
     AddToRefArray(aFeaturesLab, aFeatureLab);
-    // add featue to the group
-    const std::string& aGroup = theFeature->getGroup();
-    TDF_Label aGroupLab = groupLabel(aGroup);
-    AddToRefArray(aGroupLab, aFeatureLab);
-    // new name of this feature object by default equal to name of feature
-    TDF_Label anObjLab = aGroupLab.NewChild();
-    TCollection_ExtendedString aName(theFeature->data()->getName().c_str());
-    TDataStd_Name::Set(anObjLab, aName);
-    AddToRefArray(aGroupLab.FindChild(1), anObjLab); // reference to names is on the first sub
   }
+  // add featue to the group
+  const std::string& aGroup = theFeature->getGroup();
+  TDF_Label aGroupLab = groupLabel(aGroup);
+  AddToRefArray(aGroupLab, aFeatureLab);
+  // new name of this feature object by default equal to name of feature
+  TDF_Label anObjLab = aGroupLab.NewChild();
+  TCollection_ExtendedString aName(theFeature->data()->getName().c_str());
+  TDataStd_Name::Set(anObjLab, aName);
+  AddToRefArray(aGroupLab.FindChild(1), anObjLab); // reference to names is on the first sub
 
   // event: feature is added
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);
