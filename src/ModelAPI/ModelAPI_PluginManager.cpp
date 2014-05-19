@@ -7,6 +7,7 @@
 #include <ModelAPI_Document.h>
 // to avoid unresolved ModelAPI_Feature()
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Object.h>
 // to avoid unresolved ModelAPI_Data()
 #include <ModelAPI_Data.h>
 // to avoid unresolved ModelAPI_Plugin()

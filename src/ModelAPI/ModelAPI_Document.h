@@ -82,12 +82,6 @@ public:
   //! Returns the number of features in the group
   MODELAPI_EXPORT virtual int size(const std::string& theGroupID) = 0;
 
-  //! Returns the index of feature in the group (zero based)
-  MODELAPI_EXPORT virtual int featureIndex(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
-
-  ///! Returns the vector of groups already added to the document
-  MODELAPI_EXPORT virtual const std::vector<std::string>& getGroups() const = 0;
-
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Document() {}
 
@@ -96,5 +90,10 @@ protected:
   MODELAPI_EXPORT ModelAPI_Document()
   {}
 };
+
+
+//! Pointer on document object
+typedef boost::shared_ptr<ModelAPI_Document> DocumentPtr;
+
 
 #endif

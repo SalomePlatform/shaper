@@ -80,13 +80,6 @@ public:
   //! Returns the number of features in the group
   MODEL_EXPORT virtual int size(const std::string& theGroupID);
 
-  ///! Returns the vector of groups already added to the document
-  MODEL_EXPORT virtual const std::vector<std::string>& getGroups() const;
-
-  //! Returns the index of feature in the group (zero based)
-  //! \retruns -1 if not found
-  MODEL_EXPORT virtual int featureIndex(boost::shared_ptr<ModelAPI_Feature> theFeature);
-
 protected:
 
   //! Returns (creates if needed) the group label
@@ -99,7 +92,11 @@ protected:
   //! Adds to the document the new feature
   void addFeature(const boost::shared_ptr<ModelAPI_Feature> theFeature);
 
-  //! Synchronizes myGroups, myGroupsNames, myFeatures and mySubs list with the updated document
+  //! Returns the object by the feature
+  boost::shared_ptr<ModelAPI_Feature> objectByFeature(
+    const boost::shared_ptr<ModelAPI_Feature> theFeature);
+
+  //! Synchronizes myFeatures list with the updated document
   void synchronizeFeatures();
 
   //! Creates new document with binary file format
@@ -114,12 +111,11 @@ private:
   int myTransactionsAfterSave;
   /// number of myTransactionsAfterSave for the nested transaction start
   int myNestedStart;
-  /// root labels of the features groups identified by names
-  std::map<std::string, TDF_Label> myGroups;
-  std::vector<std::string> myGroupsNames; ///< names of added groups to the document
-  /// Features managed by this document: by group name
-  std::map<std::string, std::vector<boost::shared_ptr<ModelAPI_Feature> > > myFeatures;
-  std::set<std::string> mySubs; ///< set of identifiers of sub-documents of this document
+  /// All features managed by this document (not only in history of OB)
+  std::vector<boost::shared_ptr<ModelAPI_Feature> > myFeatures;
+
+  ///< set of identifiers of sub-documents of this document
+  std::set<std::string> mySubs;
   /// transaction indexes (related to myTransactionsAfterSave) which were empty in this doc
   std::map<int, bool> myIsEmptyTr;
 };
