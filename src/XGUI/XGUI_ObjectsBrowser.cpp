@@ -81,21 +81,27 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   aLayout->setContentsMargins(0, 0, 0, 0);
   aLayout->setSpacing(0);
 
-  QWidget* aLabelWgt = new QWidget(this);
+  QFrame* aLabelWgt = new QFrame(this);
+  aLabelWgt->setAutoFillBackground(true);
+  QPalette aPalet = aLabelWgt->palette();
+  aPalet.setColor(QPalette::Window, Qt::white);
+  aLabelWgt->setPalette(aPalet);
+
   aLayout->addWidget(aLabelWgt);
   QHBoxLayout* aLabelLay = new QHBoxLayout(aLabelWgt);
-  aLabelLay->setContentsMargins(3, 3, 3, 3);
+  aLabelLay->setContentsMargins(0, 0, 0, 0);
+  aLabelLay->setSpacing(0);
 
   QLabel* aLbl = new QLabel(aLabelWgt);
   aLbl->setPixmap(QPixmap(":pictures/assembly.png"));
+  aLbl->setMargin(2);
+
+  aLbl->setAutoFillBackground(true);
+
   aLabelLay->addWidget(aLbl);
 
-  myActiveDocLbl = new QLabel("", aLabelWgt);
-  myActiveDocLbl->setAlignment(Qt::AlignHCenter);
-
-  QFont aFnt = myActiveDocLbl->font();
-  aFnt.setBold(true);
-  myActiveDocLbl->setFont(aFnt);
+  myActiveDocLbl = new QLabel(tr("Part set"), aLabelWgt);
+  myActiveDocLbl->setMargin(2);
 
   myActiveDocLbl->installEventFilter(this);
 
@@ -106,6 +112,9 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   aLayout->addWidget(myTreeView);
 
   myDocModel = myTreeView->dataModel();
+
+  aLabelWgt->setFrameShape(myTreeView->frameShape());
+  aLabelWgt->setFrameShadow(myTreeView->frameShadow());
 
   connect(myTreeView, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
   connect(myTreeView, SIGNAL(activePartChanged(FeaturePtr)), this, SLOT(onActivePartChanged(FeaturePtr)));
@@ -126,11 +135,11 @@ void XGUI_ObjectsBrowser::onActivePartChanged(FeaturePtr thePart)
 {
   QPalette aPalet = myActiveDocLbl->palette();
   if (thePart) {
-    myActiveDocLbl->setText(tr("Activate Part set"));
+    //myActiveDocLbl->setText(tr("Activate Part set"));
     aPalet.setColor(QPalette::Foreground, Qt::black);
     myActiveDocLbl->setCursor(Qt::PointingHandCursor);
   }  else {
-    myActiveDocLbl->setText(tr("Part set is active"));
+    //myActiveDocLbl->setText(tr("Part set is active"));
     aPalet.setColor(QPalette::Foreground, QColor(0, 72, 140));
     myActiveDocLbl->unsetCursor();
   }
