@@ -208,7 +208,8 @@ void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> th
   bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Abort;
   visualizePreview(theFeature, isDisplay, false);
 
-  if (theMode == FM_Activation || theMode == FM_Deactivation)
+  if (theMode == PartSet_OperationSketchBase::FM_Activation ||
+      theMode == PartSet_OperationSketchBase::FM_Deactivation)
     activateFeature(theFeature, true);
 }
 
