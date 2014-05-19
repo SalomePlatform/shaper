@@ -4,6 +4,9 @@
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_SelectionMgr.h"
 
+#include <ModelAPI_Data.h>
+#include <ModelAPI_AttributeDocRef.h>
+
 #include <QAction>
 #include <QContextMenuEvent>
 #include <QMenu>
@@ -81,8 +84,12 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     FeaturePtr aFeature = aFeatures.first();
     QMenu* aMenu = new QMenu();
     if (aFeature->getKind() == "Part") {
-      //TODO: Check that feature is active
-      aMenu->addAction(action("ACTIVATE_PART_CMD"));
+      boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+      boost::shared_ptr<ModelAPI_Document> aFeaDoc = aFeature->data()->docRef("PartDocument")->value();
+      if (aMgr->currentDocument() == aFeaDoc)
+        aMenu->addAction(action("DEACTIVATE_PART_CMD"));
+      else 
+        aMenu->addAction(action("ACTIVATE_PART_CMD"));
     } else {
       aMenu->addAction(action("EDIT_CMD"));
     }
