@@ -102,6 +102,7 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
 
   myActiveDocLbl = new QLabel(tr("Part set"), aLabelWgt);
   myActiveDocLbl->setMargin(2);
+  myActiveDocLbl->setContextMenuPolicy(Qt::CustomContextMenu);
 
   myActiveDocLbl->installEventFilter(this);
 
@@ -119,8 +120,11 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   connect(myTreeView, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
   connect(myTreeView, SIGNAL(activePartChanged(FeaturePtr)), this, SLOT(onActivePartChanged(FeaturePtr)));
   connect(myTreeView, SIGNAL(activePartChanged(FeaturePtr)), this, SIGNAL(activePartChanged(FeaturePtr)));
+
+  connect(myActiveDocLbl, SIGNAL(customContextMenuRequested(const QPoint&)), 
+          this, SLOT(onLabelContextMenuRequested(const QPoint&)));
   connect(myTreeView, SIGNAL(contextMenuRequested(QContextMenuEvent*)), 
-          this, SIGNAL(contextMenuRequested(QContextMenuEvent*)));
+          this, SLOT(onContextMenuRequested(QContextMenuEvent*)));
   
   onActivePartChanged(FeaturePtr());
 }
@@ -137,11 +141,11 @@ void XGUI_ObjectsBrowser::onActivePartChanged(FeaturePtr thePart)
   if (thePart) {
     //myActiveDocLbl->setText(tr("Activate Part set"));
     aPalet.setColor(QPalette::Foreground, Qt::black);
-    myActiveDocLbl->setCursor(Qt::PointingHandCursor);
+    //myActiveDocLbl->setCursor(Qt::PointingHandCursor);
   }  else {
     //myActiveDocLbl->setText(tr("Part set is active"));
     aPalet.setColor(QPalette::Foreground, QColor(0, 72, 140));
-    myActiveDocLbl->unsetCursor();
+    //myActiveDocLbl->unsetCursor();
   }
   myActiveDocLbl->setPalette(aPalet);
 }
@@ -170,9 +174,13 @@ void XGUI_ObjectsBrowser::activateCurrentPart(bool toActivate)
       myTreeView->setExpanded(myDocModel->activePartIndex(), false);
     }
     bool isChanged = myDocModel->activatedIndex(aIndex);
-    if ((isChanged) && (myDocModel->activePartIndex().isValid())) {
-      myTreeView->setExpanded(aIndex, true);
-      onActivePartChanged(myDocModel->feature(aIndex));
+    if (isChanged) {
+      if (myDocModel->activePartIndex().isValid()) {
+        myTreeView->setExpanded(aIndex, true);
+        onActivePartChanged(myDocModel->feature(aIndex));
+      } else {
+        onActivePartChanged(FeaturePtr());
+      }
     }
   } else {
     QModelIndex aIndex = myDocModel->activePartIndex();
@@ -182,4 +190,20 @@ void XGUI_ObjectsBrowser::activateCurrentPart(bool toActivate)
       onActivePartChanged(FeaturePtr());
     }
   }
+}
+
+void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent) 
+{
+  myFeaturesList = myTreeView->selectedFeatures();
+  emit contextMenuRequested(theEvent);
+}
+
+void XGUI_ObjectsBrowser::onLabelContextMenuRequested(const QPoint& thePnt)
+{
+  myFeaturesList.clear();
+  //Empty feature pointer means that selected root document
+  myFeaturesList.append(FeaturePtr()); 
+
+  QContextMenuEvent aEvent( QContextMenuEvent::Mouse, thePnt, myActiveDocLbl->mapToGlobal(thePnt) );
+  emit contextMenuRequested(&aEvent);
 }

@@ -61,7 +61,7 @@ public:
   XGUI_DocumentDataModel* dataModel() const { return myDocModel; }
 
   //! Returns list of currently selected features
-  QFeatureList selectedFeatures() const { return myTreeView->selectedFeatures(); }
+  QFeatureList selectedFeatures() const { return myFeaturesList; }
 
   //! Returns currently selected indexes
   QModelIndexList selectedIndexes() const { return myTreeView->selectionModel()->selectedIndexes(); }
@@ -87,6 +87,8 @@ protected:
 
 private slots:
   void onActivePartChanged(FeaturePtr thePart);
+  void onContextMenuRequested(QContextMenuEvent* theEvent);
+  void onLabelContextMenuRequested(const QPoint& thePnt);
 
 private:
   //! Internal model
@@ -94,6 +96,8 @@ private:
 
   QLabel* myActiveDocLbl;
   XGUI_DataTree* myTreeView;
+
+  QFeatureList myFeaturesList;
 };
 
 #endif
