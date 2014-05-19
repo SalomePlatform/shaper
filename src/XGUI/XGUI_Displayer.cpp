@@ -120,6 +120,7 @@ void XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
       // If there was a problem here, try the first solution with close/open local context.
       anAIS->Set(theShape);
       anAIS->Redisplay();
+
       /*if (aContext->IsSelected(anAIS)) {
         aContext->AddOrRemoveSelected(anAIS, false);
         aContext->AddOrRemoveSelected(anAIS, false);
@@ -147,8 +148,6 @@ void XGUI_Displayer::ActivateInLocalContext(boost::shared_ptr<ModelAPI_Feature> 
   Handle(AIS_Shape) anAIS;
   if (IsVisible(theFeature))
     anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[theFeature]);
-  //if (!anAIS.IsNull())
-  //  return;
 
   // Activate selection of objects from prs
   if (!anAIS.IsNull()) {
@@ -156,30 +155,19 @@ void XGUI_Displayer::ActivateInLocalContext(boost::shared_ptr<ModelAPI_Feature> 
     aContext->Deactivate(anAIS);
 
     std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
-    QString aDebugStr = QString(featureInfo(theFeature).c_str()) + QString("; modes: ");
     for (; anIt != aLast; anIt++)
     {
       aContext->Activate(anAIS, AIS_Shape::SelectionMode((TopAbs_ShapeEnum)*anIt));
-	  aDebugStr += QString("%1").arg(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)*anIt)) + QString(", ");
 	}
-    /*if (theModes.empty()) {
-      aContext->Deactivate(anAIS);
-      aContext->Activate(anAIS, -1);
-	  aContext->ClearSelected();
-	  aDebugStr += " deactivated";
-	  QColor aColor(Qt::white);
-	  anAIS->SetColor(Quantity_Color(aColor.red()/255., aColor.green()/255., aColor.blue()/255., Quantity_TOC_RGB));
-	}*/
-	qDebug(aDebugStr.toStdString().c_str());
   }
 
   if (isUpdateViewer)
     aContext->UpdateCurrentViewer();
 }
 
-void XGUI_Displayer::StopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop)
+void XGUI_Displayer::StopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop,
+                                   const bool isUpdateViewer)
 {
-  return;
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
   Handle(AIS_Shape) anAIS;
@@ -193,19 +181,43 @@ void XGUI_Displayer::StopSelection(const std::list<XGUI_ViewerPrs>& theFeatures,
       continue;
 
     if (isStop) {
-      aContext->Deactivate(anAIS);
-      aContext->Activate(anAIS, -1);
       aContext->ClearSelected();
+      aContext->Deactivate(anAIS);
       
-      //aDebugStr += " deactivated";
       QColor aColor(Qt::white);
       anAIS->SetColor(Quantity_Color(aColor.red()/255., aColor.green()/255., aColor.blue()/255., Quantity_TOC_RGB));
+      anAIS->Redisplay();
     }
     else {
-      //QColor aColor(Qt::red);
-      //anAIS->SetColor(Quantity_Color(aColor.red()/255., aColor.green()/255., aColor.blue()/255., Quantity_TOC_RGB));
+      QColor aColor(Qt::red);
+      anAIS->SetColor(Quantity_Color(aColor.red()/255., aColor.green()/255., aColor.blue()/255., Quantity_TOC_RGB));
+      anAIS->Redisplay();
     }
   }
+  if (isUpdateViewer)
+    aContext->UpdateCurrentViewer();
+}
+
+void XGUI_Displayer::SetSelected(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isUpdateViewer)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+
+  std::list<XGUI_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
+  boost::shared_ptr<ModelAPI_Feature> aFeature;
+
+  Handle(AIS_Shape) anAIS;
+  aContext->ClearSelected();
+
+  for (; anIt != aLast; anIt++) {
+    aFeature = (*anIt).feature();
+    if (IsVisible(aFeature))
+      anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[aFeature]);
+    if (anAIS.IsNull())
+      continue;
+    aContext->AddOrRemoveSelected(anAIS, false);
+  }
+  if (isUpdateViewer)
+    aContext->UpdateCurrentViewer();
 }
 
 void XGUI_Displayer::EraseAll(const bool isUpdateViewer)

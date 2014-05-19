@@ -198,8 +198,16 @@ void PartSet_Module::onMultiSelectionEnabled(bool theEnabled)
 void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop)
 {
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  aDisplayer->StopSelection(theFeatures, isStop);
-  
+  aDisplayer->StopSelection(theFeatures, isStop, false);
+  if (!isStop) {
+    std::list<XGUI_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
+    boost::shared_ptr<ModelAPI_Feature> aFeature;
+    for (; anIt != aLast; anIt++) {
+      activateFeature((*anIt).feature(), false);
+    }
+  }
+  aDisplayer->SetSelected(theFeatures, false);
+  aDisplayer->UpdateViewer();
 }
 
 void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
