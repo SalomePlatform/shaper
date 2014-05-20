@@ -15,6 +15,10 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 
+#include <Model_Events.h>
+
+#include <Events_Loop.h>
+
 #include <SketchPlugin_Line.h>
 
 #include <V3d_View.hxx>
@@ -97,6 +101,8 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
       moveLinePoint(aFeature, aDeltaX, aDeltaY, LINE_ATTR_END);
     }
   }
+  sendFeatures();
+
   myCurPoint.setPoint(aPoint);
 }
 
@@ -149,7 +155,7 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::createFeature()
   return boost::shared_ptr<ModelAPI_Feature>();
 }
 
-void  PartSet_OperationEditLine::moveLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+void PartSet_OperationEditLine::moveLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                                double theDeltaX, double theDeltaY,
                                                const std::string& theAttribute)
 {
@@ -162,3 +168,20 @@ void  PartSet_OperationEditLine::moveLinePoint(boost::shared_ptr<ModelAPI_Featur
 
   aPoint->setValue(aPoint->x() + theDeltaX, aPoint->y() + theDeltaY);
 }
+
+void PartSet_OperationEditLine::sendFeatures()
+{
+  std::list<boost::shared_ptr<ModelAPI_Feature> > aFeatures;
+  std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
+  for (; anIt != aLast; anIt++) {
+    boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).feature();
+    if (!aFeature || aFeature == feature())
+      continue;
+  }
+
+  static Events_ID aModuleEvent = Events_Loop::eventByName("PartSetEditEvent");
+  Model_FeaturesMovedMessage aMessage;
+  aMessage.setFeatures(aFeatures);
+  Events_Loop::loop()->send(aMessage);
+}
+
