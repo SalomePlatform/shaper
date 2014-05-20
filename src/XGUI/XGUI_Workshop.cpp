@@ -69,7 +69,7 @@ QString XGUI_Workshop::featureIcon(const std::string& theId)
 
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   : QObject(),
-  myCurrentFile(QString()),
+  myCurrentDir(QString()),
   myPartSetModule(NULL),
   mySalomeConnector(theConnector),
   myPropertyPanel(0),
@@ -418,21 +418,21 @@ void XGUI_Workshop::onOpen()
       return;
     }
     aDoc->close();
-    myCurrentFile = "";
+    myCurrentDir = "";
   }
 
   //show file dialog, check if readable and open
-  myCurrentFile = QFileDialog::getExistingDirectory(mainWindow());
-  if(myCurrentFile.isEmpty())
+  myCurrentDir = QFileDialog::getExistingDirectory(mainWindow());
+  if(myCurrentDir.isEmpty())
     return;
-  QFileInfo aFileInfo(myCurrentFile);
+  QFileInfo aFileInfo(myCurrentDir);
   if(!aFileInfo.exists() || !aFileInfo.isReadable()) {
     QMessageBox::critical(myMainWindow, tr("Warning"), tr("Unable to open the file."));
-    myCurrentFile = "";
+    myCurrentDir = "";
     return;
   }
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  aDoc->load(myCurrentFile.toLatin1().constData());
+  aDoc->load(myCurrentDir.toLatin1().constData());
   QApplication::restoreOverrideCursor();
   updateCommandStatus();
 }
@@ -440,28 +440,38 @@ void XGUI_Workshop::onOpen()
 //******************************************************
 void XGUI_Workshop::onSave()
 {
-  if(myCurrentFile.isEmpty()) {
+  if(myCurrentDir.isEmpty()) {
     onSaveAs();
     return;
   }
-  saveDocument(myCurrentFile);
+  saveDocument(myCurrentDir);
   updateCommandStatus();
 }
 
 //******************************************************
 void XGUI_Workshop::onSaveAs()
 {
-  QString aTemp = myCurrentFile;
-  myCurrentFile = QFileDialog::getSaveFileName(mainWindow());
-  if(myCurrentFile.isEmpty()) {
-    myCurrentFile = aTemp;
+  QFileDialog dialog(mainWindow());
+  dialog.setWindowTitle(tr("Select directory to save files..."));
+  dialog.setFileMode(QFileDialog::Directory);
+  dialog.setFilter(tr("Folders (*)"));
+  dialog.setOptions(QFileDialog::HideNameFilterDetails | QFileDialog::ShowDirsOnly);
+  dialog.setViewMode(QFileDialog::Detail);
+
+  if(!dialog.exec()) {
     return;
   }
-  QFileInfo aFileInfo(myCurrentFile);
-  if(aFileInfo.exists() && !aFileInfo.isWritable()) {
-    QMessageBox::critical(myMainWindow, tr("Warning"), tr("Unable to save the file."));
-    return;
+  QString aTempDir = dialog.selectedFiles().first();
+  QDir aDir(aTempDir);
+  if(aDir.exists() && !aDir.entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).isEmpty()) {
+    int answer = QMessageBox::question(myMainWindow,
+                                       QString(),
+                                       tr("The folder already contains some files, save anyway?"),
+                                       QMessageBox::Save|QMessageBox::Cancel);
+    if(answer == QMessageBox::Cancel)
+      return;
   }
+  myCurrentDir = aTempDir;
   onSave();
 }
 

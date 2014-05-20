@@ -156,7 +156,7 @@ private:
   //! Activates or deactivates currently selected part
   void activatePart(bool toActivate);
 
-  QString myCurrentFile;
+  QString myCurrentDir;
   XGUI_MainWindow* myMainWindow;
   XGUI_Module* myPartSetModule;
   XGUI_ObjectsBrowser* myObjectBrowser;
