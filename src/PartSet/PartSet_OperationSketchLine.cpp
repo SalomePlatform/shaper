@@ -175,16 +175,13 @@ void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_V
 void PartSet_OperationSketchLine::keyReleased(const int theKey)
 {
   switch (theKey) {
-    case Qt::Key_Escape: {
-      abort();
-    }
-    break;
     case Qt::Key_Return: {
       abort();
       emit launchOperation(PartSet_OperationSketchLine::Type(), boost::shared_ptr<ModelAPI_Feature>());
     }
     break;
     default:
+      PartSet_OperationSketchBase::keyReleased(theKey); 
     break;
   }
 }
