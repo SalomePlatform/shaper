@@ -9,7 +9,7 @@
 #include <QTreeView>
 
 class XGUI_DocumentDataModel;
-class QLabel;
+class QLineEdit;
 
 
 class XGUI_DataTree: public QTreeView
@@ -31,6 +31,9 @@ signals:
  
   //! Emited on context menu request
   void contextMenuRequested(QContextMenuEvent* theEvent);
+
+protected slots:
+  virtual void commitData(QWidget* theEditor);
 
 protected:
   virtual void mouseDoubleClickEvent(QMouseEvent* theEvent);
@@ -90,11 +93,16 @@ private slots:
   void onContextMenuRequested(QContextMenuEvent* theEvent);
   void onLabelContextMenuRequested(const QPoint& thePnt);
 
+  //! Called on Edit command request
+  void onEditItem();
+
 private:
+  void closeDocNameEditing(bool toSave);
+
   //! Internal model
   XGUI_DocumentDataModel* myDocModel;
 
-  QLabel* myActiveDocLbl;
+  QLineEdit* myActiveDocLbl;
   XGUI_DataTree* myTreeView;
 
   QFeatureList myFeaturesList;

@@ -103,6 +103,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
       }
     }
   }
+  aActions.append(myWorkshop->objectBrowser()->actions());
   if (aActions.size() > 0) {
     QMenu* aMenu = new QMenu();
     aMenu->addActions(aActions);

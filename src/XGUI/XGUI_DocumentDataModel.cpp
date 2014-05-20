@@ -465,3 +465,12 @@ void XGUI_DocumentDataModel::deactivatePart()
   myActivePart = 0;
   myModel->setItemsColor(ACTIVE_COLOR);
 }
+
+Qt::ItemFlags XGUI_DocumentDataModel::flags(const QModelIndex& theIndex) const
+{
+  Qt::ItemFlags aFlags = QAbstractItemModel::flags(theIndex);
+  if (feature(theIndex)) {
+    aFlags |= Qt::ItemIsEditable;
+  }
+  return aFlags;
+}

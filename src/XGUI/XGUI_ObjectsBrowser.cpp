@@ -2,12 +2,16 @@
 #include "XGUI_DocumentDataModel.h"
 
 #include <ModelAPI_Data.h>
+#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Document.h>
 
 #include <QLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPixmap>
 #include <QEvent>
 #include <QMouseEvent>
+#include <QAction>
 
 
 
@@ -71,6 +75,16 @@ void XGUI_DataTree::contextMenuEvent(QContextMenuEvent* theEvent)
   emit contextMenuRequested(theEvent);
 }
 
+void XGUI_DataTree::commitData(QWidget* theEditor)
+{
+  QLineEdit* aEditor = dynamic_cast<QLineEdit*>(theEditor);
+  if (aEditor) {
+    QString aRes = aEditor->text();
+    FeaturePtr aFeature = mySelectedData.first();
+    aFeature->data()->setName(qPrintable(aRes));
+  }
+}
+
 //********************************************************************
 //********************************************************************
 //********************************************************************
@@ -100,8 +114,14 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
 
   aLabelLay->addWidget(aLbl);
 
-  myActiveDocLbl = new QLabel(tr("Part set"), aLabelWgt);
-  myActiveDocLbl->setMargin(2);
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  DocumentPtr aDoc = aMgr->rootDocument();
+  // TODO: Find a name of the root document
+
+  myActiveDocLbl = new QLineEdit(tr("Part set"), aLabelWgt);
+  myActiveDocLbl->setReadOnly(true);
+  myActiveDocLbl->setFrame(false);
+  //myActiveDocLbl->setMargin(2);
   myActiveDocLbl->setContextMenuPolicy(Qt::CustomContextMenu);
 
   myActiveDocLbl->installEventFilter(this);
@@ -127,44 +147,85 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
           this, SLOT(onContextMenuRequested(QContextMenuEvent*)));
   
   onActivePartChanged(FeaturePtr());
+
+  // Create internal actions
+  QAction* aAction = new QAction(tr("Rename"), this);
+  aAction->setData("RENAME_CMD");
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onEditItem()));
+  addAction(aAction);
 }
 
-
+//***************************************************
 XGUI_ObjectsBrowser::~XGUI_ObjectsBrowser()
 {
 }
 
-
+//***************************************************
 void XGUI_ObjectsBrowser::onActivePartChanged(FeaturePtr thePart)
 {
   QPalette aPalet = myActiveDocLbl->palette();
   if (thePart) {
-    //myActiveDocLbl->setText(tr("Activate Part set"));
-    aPalet.setColor(QPalette::Foreground, Qt::black);
-    //myActiveDocLbl->setCursor(Qt::PointingHandCursor);
+    aPalet.setColor(QPalette::Text, Qt::black);
   }  else {
-    //myActiveDocLbl->setText(tr("Part set is active"));
-    aPalet.setColor(QPalette::Foreground, QColor(0, 72, 140));
-    //myActiveDocLbl->unsetCursor();
+    aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
   }
   myActiveDocLbl->setPalette(aPalet);
 }
 
+//***************************************************
 bool XGUI_ObjectsBrowser::eventFilter(QObject* obj, QEvent* theEvent)
 {
   if (obj == myActiveDocLbl) {
-    if (theEvent->type() == QEvent::MouseButtonDblClick) {
-      if (myDocModel->activePartIndex().isValid()) {
-        myTreeView->setExpanded(myDocModel->activePartIndex(), false);
+    if (myActiveDocLbl->isReadOnly()) {
+      if (theEvent->type() == QEvent::MouseButtonDblClick) {
+        if (myDocModel->activePartIndex().isValid()) {
+          myTreeView->setExpanded(myDocModel->activePartIndex(), false);
+        }
+        myDocModel->deactivatePart();
+        onActivePartChanged(FeaturePtr());
+        emit activePartChanged(FeaturePtr());
       }
-      myDocModel->deactivatePart();
-      onActivePartChanged(FeaturePtr());
-      emit activePartChanged(FeaturePtr());
+    } else {
+      // End of editing by mouse click
+      if (theEvent->type() == QEvent::MouseButtonRelease) {
+        QMouseEvent* aEvent = (QMouseEvent*) theEvent;
+        QPoint aPnt = mapFromGlobal(aEvent->globalPos());
+        if (childAt(aPnt) != myActiveDocLbl) {
+          closeDocNameEditing(false);
+        }
+      } else if (theEvent->type() == QEvent::KeyRelease) {
+        QKeyEvent* aEvent = (QKeyEvent*) theEvent;
+        switch (aEvent->key()) {
+        case Qt::Key_Return: // Accept current input
+          closeDocNameEditing(true);
+          break;
+        case Qt::Key_Escape: // Cancel the input
+          closeDocNameEditing(false);
+          break;
+        } 
+      }
     }
   }
   return QWidget::eventFilter(obj, theEvent);
 }
 
+//***************************************************
+void XGUI_ObjectsBrowser::closeDocNameEditing(bool toSave)
+{
+  myActiveDocLbl->deselect();
+  myActiveDocLbl->clearFocus();
+  myActiveDocLbl->releaseMouse();
+  myActiveDocLbl->setReadOnly(true);
+  if (toSave) {
+    // TODO: Save the name of root document
+    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+    DocumentPtr aDoc = aMgr->rootDocument();
+  } else {
+    myActiveDocLbl->setText(myActiveDocLbl->property("OldText").toString());
+  }
+}
+
+//***************************************************
 void XGUI_ObjectsBrowser::activateCurrentPart(bool toActivate)
 {
   if (toActivate) {
@@ -192,18 +253,55 @@ void XGUI_ObjectsBrowser::activateCurrentPart(bool toActivate)
   }
 }
 
+//***************************************************
 void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent) 
 {
   myFeaturesList = myTreeView->selectedFeatures();
+  bool toEnable = myFeaturesList.size() > 0;
+  foreach(QAction* aCmd, actions()) {
+    aCmd->setEnabled(toEnable);
+  }
   emit contextMenuRequested(theEvent);
 }
 
+//***************************************************
 void XGUI_ObjectsBrowser::onLabelContextMenuRequested(const QPoint& thePnt)
 {
   myFeaturesList.clear();
   //Empty feature pointer means that selected root document
   myFeaturesList.append(FeaturePtr()); 
 
+  foreach(QAction* aCmd, actions()) {
+    aCmd->setEnabled(true);
+  }
   QContextMenuEvent aEvent( QContextMenuEvent::Mouse, thePnt, myActiveDocLbl->mapToGlobal(thePnt) );
   emit contextMenuRequested(&aEvent);
+}
+
+//***************************************************
+void XGUI_ObjectsBrowser::onEditItem()
+{
+  if (myFeaturesList.size() > 0) {
+    FeaturePtr aFeature = myFeaturesList.first();
+    if (aFeature) { // Selection happens in TreeView
+      // Find index which corresponds the feature
+      QModelIndex aIndex;
+      foreach(QModelIndex aIdx, selectedIndexes()) {
+        if (dataModel()->feature(aIdx) == aFeature) {
+          aIndex = aIdx;
+          break;
+        }
+      }
+      if (aIndex.isValid()) {
+        myTreeView->setCurrentIndex(aIndex);
+        myTreeView->edit(aIndex);
+      }
+    } else { //Selection happens in Upper label
+      myActiveDocLbl->setReadOnly(false);
+      myActiveDocLbl->setFocus();
+      myActiveDocLbl->selectAll();
+      myActiveDocLbl->grabMouse();
+      myActiveDocLbl->setProperty("OldText", myActiveDocLbl->text());
+    }
+  }
 }
