@@ -51,6 +51,11 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<Mode
   return aModes;
 }
 
+boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketch::sketch() const
+{
+  return feature();
+}
+
 void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
                                            const std::list<XGUI_ViewerPrs>& theSelected)
 {

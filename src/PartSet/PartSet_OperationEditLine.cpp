@@ -4,6 +4,9 @@
 
 #include <PartSet_OperationEditLine.h>
 #include <PartSet_Tools.h>
+#include <PartSet_OperationSketch.h>
+
+#include <ModuleBase_OperationDescription.h>
 
 #include <XGUI_ViewerPrs.h>
 
@@ -35,9 +38,9 @@ PartSet_OperationEditLine::~PartSet_OperationEditLine()
 {
 }
 
-bool PartSet_OperationEditLine::isGranted() const
+bool PartSet_OperationEditLine::isGranted(ModuleBase_IOperation* theOperation) const
 {
-  return true;
+  return theOperation->getDescription()->operationId().toStdString() == PartSet_OperationSketch::Type();
 }
 
 std::list<int> PartSet_OperationEditLine::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
@@ -50,6 +53,11 @@ void PartSet_OperationEditLine::init(boost::shared_ptr<ModelAPI_Feature> theFeat
 {
   setFeature(theFeature);
   myFeatures = thePresentations;
+}
+
+boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::sketch() const
+{
+  return mySketch;
 }
 
 void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView)
@@ -69,10 +77,10 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
 
   if (myCurPoint.myIsInitialized) {
     double aCurX, aCurY;
-    PartSet_Tools::ConvertTo2D(myCurPoint.myPoint, mySketch, theView, aCurX, aCurY);
+    PartSet_Tools::ConvertTo2D(myCurPoint.myPoint, sketch(), theView, aCurX, aCurY);
 
     double aX, anY;
-    PartSet_Tools::ConvertTo2D(aPoint, mySketch, theView, aX, anY);
+    PartSet_Tools::ConvertTo2D(aPoint, sketch(), theView, aX, anY);
 
     double aDeltaX = aX - aCurX;
     double aDeltaY = anY - aCurY;

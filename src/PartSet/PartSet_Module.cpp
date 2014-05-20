@@ -247,13 +247,14 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   else if(theCmdId == PartSet_OperationSketchLine::Type() ||
           theCmdId == PartSet_OperationEditLine::Type()) {
     ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
-    boost::shared_ptr<ModelAPI_Feature> aSketchFeature;
-    if (aCurOperation)
-      aSketchFeature = aCurOperation->feature();
+    boost::shared_ptr<ModelAPI_Feature> aSketch;
+    PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
+    if (aPrevOp)
+      aSketch = aPrevOp->sketch();
     if (theCmdId == PartSet_OperationSketchLine::Type())
-      anOperation = new PartSet_OperationSketchLine(theCmdId.c_str(), this, aSketchFeature);
+      anOperation = new PartSet_OperationSketchLine(theCmdId.c_str(), this, aSketch);
     else
-      anOperation = new PartSet_OperationEditLine(theCmdId.c_str(), this, aSketchFeature);
+      anOperation = new PartSet_OperationEditLine(theCmdId.c_str(), this, aSketch);
   }
   else {
     anOperation = new ModuleBase_Operation(theCmdId.c_str(), this);

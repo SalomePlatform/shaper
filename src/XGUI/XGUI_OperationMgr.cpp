@@ -68,7 +68,7 @@ bool XGUI_OperationMgr::canStartOperation(ModuleBase_Operation* theOperation)
 {
   bool aCanStart = true;
   ModuleBase_Operation* aCurrentOp = currentOperation();
-  if (aCurrentOp && !theOperation->isGranted())
+  if (aCurrentOp && !theOperation->isGranted(aCurrentOp))
   {
     if (canStopOperation()) {
       aCurrentOp->abort();

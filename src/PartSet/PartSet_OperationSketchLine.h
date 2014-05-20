@@ -37,7 +37,8 @@ public:
 
    /// Returns that this operator can be started above already running one.
    /// The runned operation should be the sketch feature modified operation
-  virtual bool isGranted() const;
+  /// \param theOperation the previous running operation
+  virtual bool isGranted(ModuleBase_IOperation* theOperation) const;
 
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
@@ -49,6 +50,10 @@ public:
   /// \param thePresentations the list of additional presentations
   virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
                     const std::list<XGUI_ViewerPrs>& thePresentations);
+
+  /// Returns the operation sketch feature
+  /// \returns the sketch instance
+  virtual boost::shared_ptr<ModelAPI_Feature> sketch() const;
 
   /// Gives the current selected objects to be processed by the operation
   /// \param thePoint a point clicked in the viewer

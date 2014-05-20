@@ -34,6 +34,10 @@ public:
   /// \return the selection mode
   virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
+  /// Returns the operation sketch feature
+  /// \returns the sketch instance
+  virtual boost::shared_ptr<ModelAPI_Feature> sketch() const;
+
   /// Processes the mouse pressed in the point
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event

@@ -60,6 +60,10 @@ public:
   virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
                     const std::list<XGUI_ViewerPrs>& thePresentations) {}
 
+  /// Returns the operation sketch feature
+  /// \returns the sketch instance
+  virtual boost::shared_ptr<ModelAPI_Feature> sketch() const = 0;
+
   /// Processes the mouse pressed in the point
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event

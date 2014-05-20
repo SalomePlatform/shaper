@@ -31,7 +31,7 @@ ModuleBase_OperationDescription* ModuleBase_IOperation::getDescription() const
   return myDescription;
 }
 
-bool ModuleBase_IOperation::isGranted() const
+bool ModuleBase_IOperation::isGranted(ModuleBase_IOperation* /*theOperation*/) const
 {
   return false;
 }
