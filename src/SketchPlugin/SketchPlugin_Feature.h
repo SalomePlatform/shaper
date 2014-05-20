@@ -42,11 +42,9 @@ protected:
   /// Sets the higher-level feature for the sub-feature (sketch for line)
   void setSketch(SketchPlugin_Sketch* theSketch) {mySketch = theSketch;}
   /// Returns the sketch of this feature
-  SketchPlugin_Sketch* sketch() {return mySketch;}
+  SketchPlugin_Sketch* sketch();
   /// initializes mySketch
   SketchPlugin_Feature();
-  /// Sets the data manager of an object and here initializes mySketch field
-  SKETCHPLUGIN_EXPORT virtual void setData(boost::shared_ptr<ModelAPI_Data> theData);
 
   friend class SketchPlugin_Sketch;
 
