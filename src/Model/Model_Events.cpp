@@ -17,3 +17,26 @@ const Events_ID Model_FeatureDeletedMessage::messageId()
   static Events_ID MY_ID = Events_Loop::eventByName(EVENT_FEATURE_DELETED);
   return MY_ID;
 }
+
+Model_FeaturesMovedMessage::Model_FeaturesMovedMessage()
+: Events_Message(messageId(), 0)
+{
+}
+
+const Events_ID Model_FeaturesMovedMessage::messageId()
+{
+  static Events_ID MY_ID = Events_Loop::eventByName(EVENT_FEATURES_MOVED);
+  return MY_ID;
+}
+
+void Model_FeaturesMovedMessage::setFeatures(
+                                const std::list<boost::shared_ptr<ModelAPI_Feature> >& theFeatures)
+{
+  myFeatures = theFeatures;  
+}
+
+const std::list<boost::shared_ptr<ModelAPI_Feature> >& Model_FeaturesMovedMessage::features() const
+{
+  return myFeatures;
+}
+
