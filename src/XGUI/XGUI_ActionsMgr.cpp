@@ -21,18 +21,12 @@ XGUI_ActionsMgr::~XGUI_ActionsMgr()
 }
 
 
-void XGUI_ActionsMgr::addCommand(QString theId, QAction* theCmd)
+void XGUI_ActionsMgr::addCommand(QAction* theCmd)
 {
-  myActions.insert(theId,theCmd);
-  myActionsState.insert(theId, theCmd->isEnabled());
+  QString aId = theCmd->data().toString();
+  myActions.insert(aId, theCmd);
+  myActionsState.insert(aId, theCmd->isEnabled());
   connect(theCmd, SIGNAL(triggered(bool)), this, SLOT(setActionsDisabled(bool)));
-}
-
-void XGUI_ActionsMgr::addCommand(XGUI_Command* theCmd)
-{
-  myActions.insert(theCmd->id(),theCmd);
-  myActionsState.insert(theCmd->id(), theCmd->enabled());
-  theCmd->connectTo(this, SLOT(setActionsDisabled(bool)));
 }
 
 void XGUI_ActionsMgr::setActionsDisabled(bool isDisabled)
@@ -47,13 +41,9 @@ void XGUI_ActionsMgr::setActionsDisabled(bool isDisabled)
   saveCommandsState();
 
   QString aSkippedId;
-  if (myWorkshop->isSalomeMode()) {
-    QAction* aToggledFeature = dynamic_cast<QAction*>(sender());
-    aSkippedId = myWorkshop->salomeConnector()->commandId(aToggledFeature);
-  } else {
-    XGUI_Command* aToggledFeature = dynamic_cast<XGUI_Command*>(sender());
-    aSkippedId = aToggledFeature->id();
-  }
+  QAction* aToggledFeature = dynamic_cast<QAction*>(sender());
+  aSkippedId = aToggledFeature->data().toString();
+
   QStringList anActionIdsList = myActions.keys();
   foreach(QString eachKey, anActionIdsList) {
     if (eachKey == aSkippedId) {

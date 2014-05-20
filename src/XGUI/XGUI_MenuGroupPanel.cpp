@@ -76,9 +76,9 @@ XGUI_Command* XGUI_MenuGroupPanel::addFeature(const QString& theId, const QStrin
 
 XGUI_Command* XGUI_MenuGroupPanel::feature(const QString& theId) const
 {
-  QList<XGUI_Command*>::const_iterator aIt;
-  for (aIt = myActions.constBegin(); aIt != myActions.constEnd(); ++aIt)
-    if ((*aIt)->id() == theId)
-      return (*aIt);
+  foreach (XGUI_Command* aCmd, myActions) {
+    if (aCmd->data().toString() == theId)
+      return aCmd;
+  }
   return 0;
 }

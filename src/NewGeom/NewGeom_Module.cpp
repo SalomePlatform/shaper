@@ -19,6 +19,7 @@
 #include <QtxActionMenuMgr.h>
 
 #include <QDockWidget>
+#include <QAction>
 
 extern "C" {
   NewGeom_EXPORT CAM_Module* createModule() {
@@ -126,15 +127,13 @@ CAM_DataModel* NewGeom_Module::createDataModel()
 }
 
 //******************************************************
-void NewGeom_Module::addFeature(const QString& theWBName,
-                                const QString& theId, 
-                                const QString& theTitle, 
-                                const QString& theTip,
-                                const QIcon& theIcon, 
-                                bool isCheckable,
-                                QObject* theReciever,
-                                const char* theMember,
-                                const QKeySequence& theKeys)
+QAction* NewGeom_Module::addFeature(const QString& theWBName,
+                                    const QString& theId, 
+                                    const QString& theTitle, 
+                                    const QString& theTip,
+                                    const QIcon& theIcon, 
+                                    const QKeySequence& theKeys,
+                                    bool isCheckable)
 {
   int aMenu = createMenu(theWBName, -1, -1, 50);
   int aTool = createTool(theWBName);
@@ -145,21 +144,21 @@ void NewGeom_Module::addFeature(const QString& theWBName,
   int aKeys = 0;
   for (int i = 0; i < theKeys.count(); i++) 
     aKeys += theKeys[i];
-  createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk, 
-               isCheckable, theReciever, theMember);
+  QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk, 
+                                  isCheckable);
+  aAction->setData(theId);
   int aItemId = createMenu( aId,  aMenu, -1, 10 );
   int aToolId = createTool( aId, aTool );
+  return aAction;
 }
 
 //******************************************************
-void NewGeom_Module::addEditCommand(const QString& theId,
-                                    const QString& theTitle,
-                                    const QString& theTip,
-                                    const QIcon& theIcon, 
-                                    bool isCheckable,
-                                    QObject* theReciever,
-                                    const char* theMember,
-                                    const QKeySequence& theKeys)
+QAction* NewGeom_Module::addEditCommand(const QString& theId,
+                                        const QString& theTitle,
+                                        const QString& theTip,
+                                        const QIcon& theIcon, 
+                                        const QKeySequence& theKeys,
+                                        bool isCheckable)
 {
   int aMenu = createMenu(tr( "MEN_DESK_EDIT" ), -1, -1);
 
@@ -169,9 +168,11 @@ void NewGeom_Module::addEditCommand(const QString& theId,
   int aKeys = 0;
   for (int i = 0; i < theKeys.count(); i++) 
     aKeys += theKeys[i];
-  createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk, 
-               isCheckable, theReciever, theMember);
+  QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk, 
+                                  isCheckable);
+  aAction->setData(theId);
   createMenu( aId, aMenu, 10 );
+  return aAction;
 }
 
 //******************************************************
@@ -179,6 +180,21 @@ void NewGeom_Module::addEditMenuSeparator()
 {
   int aMenu = createMenu(tr( "MEN_DESK_EDIT" ), -1, -1);
   createMenu( separator(), aMenu, -1, 10 );
+}
+
+//******************************************************
+QList<QAction*> NewGeom_Module::commandList() const
+{
+  QList<QAction*> aActions;
+  for (int i = 0; i < myActionsList.size(); i++)
+    aActions.append(action(i));
+  return aActions;
+}
+
+//******************************************************
+QStringList NewGeom_Module::commandIdList() const
+{
+  return myActionsList;
 }
 
 //******************************************************
