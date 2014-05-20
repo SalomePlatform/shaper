@@ -127,6 +127,8 @@ void XGUI_Workshop::startApplication()
 //******************************************************
 void XGUI_Workshop::initMenu()
 {
+  myContextMenuMgr->createActions();
+
   if (isSalomeMode()) {
     // Create only Undo, Redo commands
     QAction* aAction = salomeConnector()->addEditCommand("UNDO_CMD", 
@@ -181,8 +183,6 @@ void XGUI_Workshop::initMenu()
   aCommand = aGroup->addFeature("EXIT_CMD", tr("Exit"), tr("Exit application"),
                                 QIcon(":pictures/close.png"), QKeySequence::Close);
   aCommand->connectTo(this, SLOT(onExit()));
-
-  myContextMenuMgr->createActions();
 }
 
 //******************************************************
