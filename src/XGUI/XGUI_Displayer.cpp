@@ -247,7 +247,7 @@ void XGUI_Displayer::EraseDeletedFeatures(const bool isUpdateViewer)
   for (; aFIt != aFLast; aFIt++)
   {
     boost::shared_ptr<ModelAPI_Feature> aFeature = (*aFIt).first;
-    if (!aFeature || !aFeature->data()->isValid()) {
+    if (!aFeature || !aFeature->data() || !aFeature->data()->isValid()) {
       Handle(AIS_InteractiveObject) anAIS = (*aFIt).second;
       if (!anAIS.IsNull()) {
         aContext->Erase(anAIS, false);
