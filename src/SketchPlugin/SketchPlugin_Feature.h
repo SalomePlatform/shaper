@@ -46,7 +46,8 @@ protected:
   /// initializes mySketch
   SketchPlugin_Feature();
   /// Sets the data manager of an object and here initializes mySketch field
-  SKETCHPLUGIN_EXPORT virtual void setData(boost::shared_ptr<ModelAPI_Data> theData);
+  SKETCHPLUGIN_EXPORT virtual void setData(boost::shared_ptr<ModelAPI_Data> theData)
+  {}
 
   friend class SketchPlugin_Sketch;
 

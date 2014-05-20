@@ -20,6 +20,9 @@
 #include <TDataStd_Name.hxx>
 
 #include <climits>
+#ifndef WIN32
+#include <sys/stat.h>
+#endif
 
 #ifdef WIN32
 # define _separator_ '\\'
@@ -325,7 +328,8 @@ void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFea
   TDF_Label anObjLab = aGroupLab.NewChild();
   TCollection_ExtendedString aName(theFeature->data()->getName().c_str());
   TDataStd_Name::Set(anObjLab, aName);
-  AddToRefArray(aGroupLab.FindChild(1), anObjLab); // reference to names is on the first sub
+  TDF_Label aGrLabChild = aGroupLab.FindChild(1);
+  AddToRefArray(aGrLabChild, anObjLab); // reference to names is on the first sub
 
   // event: feature is added
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);

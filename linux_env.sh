@@ -27,8 +27,8 @@ export PATH=${QT4_ROOT_DIR}/bin:${PATH}
 export LD_LIBRARY_PATH=${QT4_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
 ##
 #------ boost ------
-#export BOOST_ROOT_DIR=${PDIR}/boost-1.52.0
-#export LD_LIBRARY_PATH ${BOOST_ROOT_DIR}/lib
+export BOOST_ROOT_DIR=${PDIR}/boost-1.52.0
+export LD_LIBRARY_PATH ${BOOST_ROOT_DIR}/lib
 ##
 #------ swig ------
 export SWIG_ROOT_DIR=${PDIR}/swig-2.0.8
