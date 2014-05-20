@@ -74,8 +74,11 @@ public:
   MODEL_EXPORT virtual const std::string& id() const {return myID;}
 
   //! Returns the feature in the group by the index (started from zero)
+  //! \param theGroupID group that contains a feature
+  //! \param theIndex zero-based index of feature in the group
+  //! \param isOperation if it is true, returns feature (not Object)
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
-    feature(const std::string& theGroupID, const int theIndex);
+    feature(const std::string& theGroupID, const int theIndex, const bool isOperation = false);
 
   //! Returns the number of features in the group
   MODEL_EXPORT virtual int size(const std::string& theGroupID);

@@ -359,7 +359,7 @@ boost::shared_ptr<ModelAPI_Document> Model_Document::subDocument(string theDocID
 }
 
 boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
-  const string& theGroupID, const int theIndex)
+  const string& theGroupID, const int theIndex, const bool isOperation)
 {
   TDF_Label aGroupLab = groupLabel(theGroupID);
   Handle(TDataStd_ReferenceArray) aRefs;
@@ -368,7 +368,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
       TDF_Label aFeatureLab = aRefs->Value(theIndex);
       boost::shared_ptr<ModelAPI_Feature> aFeature = feature(aFeatureLab);
 
-      if (theGroupID == FEATURES_GROUP) { // just returns the feature from the history
+      if (theGroupID == FEATURES_GROUP || isOperation) { // just returns the feature from the history
         return aFeature;
       } else { // create a new object from the group to return it
         Handle(TDataStd_Name) aName; // name of the object
@@ -422,28 +422,36 @@ TDF_Label Model_Document::groupLabel(const string theGroup)
 
 void Model_Document::setUniqueName(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
-  // first count all objects of such kind to start with index = count + 1
-  int a, aNumObjects = 0;
-  int aSize = size(FEATURES_GROUP);
-  for(a = 0; a < aSize; a++) {
-    if (feature(FEATURES_GROUP, a)->getKind() == theFeature->getKind())
-      aNumObjects++;
+  string aName; // result
+  // iterate all features but also iterate group of this feature if object is not in history
+  list<string> aGroups;
+  aGroups.push_back(FEATURES_GROUP);
+  if (!theFeature->isInHistory()) {
+    aGroups.push_back(theFeature->getGroup());
   }
-  // generate candidate name
-  stringstream aNameStream;
-  aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
-  string aName = aNameStream.str();
-  // check this is unique, if not, increase index by 1
-  for(a = 0; a < aSize;) {
-    if (feature(FEATURES_GROUP, a)->data()->getName() == aName) {
-      aNumObjects++;
-      stringstream aNameStream;
-      aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
-      // reinitialize iterator to make sure a new name is unique
-      a = 0;
-    } else a++;
+  for(list<string>::iterator aGIter = aGroups.begin(); aGIter != aGroups.end(); aGIter++) {
+    // first count all objects of such kind to start with index = count + 1
+    int a, aNumObjects = 0;
+    int aSize = size(*aGIter);
+    for(a = 0; a < aSize; a++) {
+      if (feature(*aGIter, a)->getKind() == theFeature->getKind())
+        aNumObjects++;
+    }
+    // generate candidate name
+    stringstream aNameStream;
+    aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
+    aName = aNameStream.str();
+    // check this is unique, if not, increase index by 1
+    for(a = 0; a < aSize;) {
+      if (feature(*aGIter, a, true)->data()->getName() == aName) {
+        aNumObjects++;
+        stringstream aNameStream;
+        aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
+        // reinitialize iterator to make sure a new name is unique
+        a = 0;
+      } else a++;
+    }
   }
-
   theFeature->data()->setName(aName);
 }
 

@@ -16,7 +16,7 @@ class QMouseEvent;
  \class PartSet_OperationEditLine
  * \brief The operation for the sketch feature creation
 */
-class PARTSET_EXPORT PartSet_OperationEditLine : public PartSet_OperationSketchBase
+class PARTSET_EXPORT PartSet_OperationEditLine : public PartSet_OperationSketchBase                                                 
 {
   Q_OBJECT
   /// Struct to define gp point, with the state is the point is initialized
@@ -118,6 +118,8 @@ protected:
   void  moveLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
                       double theDeltaX, double theDeltaY,
                       const std::string& theAttribute);
+  /// Sends the features
+  void sendFeatures();
 
 private:
   boost::shared_ptr<ModelAPI_Feature> mySketch; ///< the sketch feature

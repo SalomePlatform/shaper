@@ -72,3 +72,15 @@ void PartSet_OperationSketchBase::mouseReleased(QMouseEvent* theEvent, Handle_V3
 void PartSet_OperationSketchBase::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
 }
+
+void PartSet_OperationSketchBase::keyReleased(const int theKey)
+{
+  switch (theKey) {
+    case Qt::Key_Escape: {
+      abort();
+    }
+    break;
+    default:
+    break;
+  }
+}

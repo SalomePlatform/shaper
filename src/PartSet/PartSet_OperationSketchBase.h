@@ -85,7 +85,7 @@ public:
 
   /// Processes the key pressed in the view
   /// \param theKey a key value
-  virtual void keyReleased(const int theKey) {};
+  virtual void keyReleased(const int theKey);
 
 signals:
   /// Signal about the feature construing is finished

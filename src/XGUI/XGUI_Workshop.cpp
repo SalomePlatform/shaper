@@ -92,6 +92,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myViewerProxy = new XGUI_ViewerProxy(this);
 
   connect(myOperationMgr, SIGNAL(operationStarted()),  this, SLOT(onOperationStarted()));
+  connect(myOperationMgr, SIGNAL(operationResumed()),  this, SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
   connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
@@ -127,6 +128,8 @@ void XGUI_Workshop::startApplication()
 //******************************************************
 void XGUI_Workshop::initMenu()
 {
+  myContextMenuMgr->createActions();
+
   if (isSalomeMode()) {
     // Create only Undo, Redo commands
     QAction* aAction = salomeConnector()->addEditCommand("UNDO_CMD", 
@@ -181,8 +184,6 @@ void XGUI_Workshop::initMenu()
   aCommand = aGroup->addFeature("EXIT_CMD", tr("Exit"), tr("Exit application"),
                                 QIcon(":pictures/close.png"), QKeySequence::Close);
   aCommand->connectTo(this, SLOT(onExit()));
-
-  myContextMenuMgr->createActions();
 }
 
 //******************************************************

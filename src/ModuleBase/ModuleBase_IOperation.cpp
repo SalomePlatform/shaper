@@ -51,6 +51,7 @@ void ModuleBase_IOperation::start()
 
 void ModuleBase_IOperation::resume()
 {
+  emit resumed();
 }
 
 void ModuleBase_IOperation::abort()

@@ -53,6 +53,8 @@ signals:
   /// Signal about an operation is stopped. It is emitted after the stop() of operation is done.
   /// \param theOperation a stopped operation
   void operationStopped(ModuleBase_Operation* theOperation);
+  /// Signal about an operation is resumed. It is emitted after the resume() of operation is done.
+  void operationResumed();
 
 protected:
   /// Sets the current operation or NULL
