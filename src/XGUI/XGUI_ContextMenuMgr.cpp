@@ -78,7 +78,7 @@ void XGUI_ContextMenuMgr::onContextMenuRequest(QContextMenuEvent* theEvent)
 
 QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
 {
-  QMenu* aMenu = new QMenu();
+  QList<QAction*> aActions;
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   QFeatureList aFeatures = aSelMgr->selectedFeatures();
   if (aFeatures.size() == 1) {
@@ -89,23 +89,25 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
       if (aFeature->getKind() == "Part") {
         boost::shared_ptr<ModelAPI_Document> aFeaDoc = aFeature->data()->docRef("PartDocument")->value();
         if (aMgr->currentDocument() == aFeaDoc)
-          aMenu->addAction(action("DEACTIVATE_PART_CMD"));
+          aActions.append(action("DEACTIVATE_PART_CMD"));
         else 
-          aMenu->addAction(action("ACTIVATE_PART_CMD"));
+          aActions.append(action("ACTIVATE_PART_CMD"));
       } else {
-        aMenu->addAction(action("EDIT_CMD"));
+        aActions.append(action("EDIT_CMD"));
       }
 
     // Process Root object (document)
     } else { // If feature is 0 the it means that selected root object (document)
       if (aMgr->currentDocument() != aMgr->rootDocument()) {
-        aMenu->addAction(action("ACTIVATE_PART_CMD"));
+        aActions.append(action("ACTIVATE_PART_CMD"));
       }
     }
   }
-  if (aMenu->actions().size() > 0)
+  if (aActions.size() > 0) {
+    QMenu* aMenu = new QMenu();
+    aMenu->addActions(aActions);
     return aMenu;
-  delete aMenu;
+  }
   return 0;
 }
 
