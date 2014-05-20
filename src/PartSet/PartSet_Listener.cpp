@@ -40,8 +40,12 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
     const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
     boost::shared_ptr<ModelAPI_Feature> aFeature = aUpdMsg->feature();
     if (myModule->workshop()->displayer()->IsVisible(aFeature) ||
-        aType == EVENT_FEATURE_CREATED)
-      myModule->visualizePreview(aFeature, true);
+        aType == EVENT_FEATURE_CREATED) {
+      myModule->visualizePreview(aFeature, true, false);
+      if (aType == EVENT_FEATURE_CREATED)
+        myModule->activateFeature(aFeature, true);
+      myModule->workshop()->displayer()->UpdateViewer();
+    }
   }
   if (aType == EVENT_FEATURE_DELETED)
   {

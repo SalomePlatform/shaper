@@ -4,6 +4,9 @@
 
 #include <PartSet_OperationEditLine.h>
 #include <PartSet_Tools.h>
+#include <PartSet_OperationSketch.h>
+
+#include <ModuleBase_OperationDescription.h>
 
 #include <XGUI_ViewerPrs.h>
 
@@ -35,17 +38,14 @@ PartSet_OperationEditLine::~PartSet_OperationEditLine()
 {
 }
 
-bool PartSet_OperationEditLine::isGranted() const
+bool PartSet_OperationEditLine::isGranted(ModuleBase_IOperation* theOperation) const
 {
-  return true;
+  return theOperation->getDescription()->operationId().toStdString() == PartSet_OperationSketch::Type();
 }
 
 std::list<int> PartSet_OperationEditLine::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
-  std::list<int> aModes;
-  aModes.push_back(TopAbs_VERTEX);
-  aModes.push_back(TopAbs_EDGE);
-  return aModes;
+  return PartSet_OperationSketchBase::getSelectionModes(theFeature);
 }
 
 void PartSet_OperationEditLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
@@ -53,6 +53,11 @@ void PartSet_OperationEditLine::init(boost::shared_ptr<ModelAPI_Feature> theFeat
 {
   setFeature(theFeature);
   myFeatures = thePresentations;
+}
+
+boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::sketch() const
+{
+  return mySketch;
 }
 
 void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView)
@@ -72,10 +77,10 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
 
   if (myCurPoint.myIsInitialized) {
     double aCurX, aCurY;
-    PartSet_Tools::ConvertTo2D(myCurPoint.myPoint, mySketch, theView, aCurX, aCurY);
+    PartSet_Tools::ConvertTo2D(myCurPoint.myPoint, sketch(), theView, aCurX, aCurY);
 
     double aX, anY;
-    PartSet_Tools::ConvertTo2D(aPoint, mySketch, theView, aX, anY);
+    PartSet_Tools::ConvertTo2D(aPoint, sketch(), theView, aX, anY);
 
     double aDeltaX = aX - aCurX;
     double aDeltaY = anY - aCurY;
@@ -100,16 +105,12 @@ void PartSet_OperationEditLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_
 {
   std::list<XGUI_ViewerPrs> aFeatures = myFeatures;
   if (myFeatures.size() == 1) {
-    boost::shared_ptr<ModelAPI_Feature> aFeature;
-    if (!theSelected.empty())
-      aFeature = theSelected.front().feature();
-
-    if (aFeature == feature())
+    if (theSelected.empty())
       return;
-  
-   commit();
-   if (aFeature)
-     emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+
+    boost::shared_ptr<ModelAPI_Feature> aFeature = theSelected.front().feature();
+    commit();
+    emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
   }
   else {
     commit();
@@ -126,12 +127,19 @@ void PartSet_OperationEditLine::startOperation()
 {
   // do nothing in order to do not create a new feature
   emit multiSelectionEnabled(false);
+  emit setSelection(std::list<XGUI_ViewerPrs>());
+  emit stopSelection(myFeatures, true);
   myCurPoint.clear();
 }
 
 void PartSet_OperationEditLine::stopOperation()
 {
   emit multiSelectionEnabled(true);
+  bool isSelectFeatures = myFeatures.size() > 1;
+  emit stopSelection(myFeatures, false);
+  if (isSelectFeatures)
+    emit setSelection(myFeatures);
+
   myFeatures.clear();
 }
 

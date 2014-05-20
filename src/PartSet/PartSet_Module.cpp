@@ -195,11 +195,36 @@ void PartSet_Module::onMultiSelectionEnabled(bool theEnabled)
   aViewer->enableMultiselection(theEnabled);
 }
 
+void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop)
+{
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  if (!isStop) {
+    std::list<XGUI_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
+    boost::shared_ptr<ModelAPI_Feature> aFeature;
+    for (; anIt != aLast; anIt++) {
+      activateFeature((*anIt).feature(), false);
+    }
+  }
+  aDisplayer->StopSelection(theFeatures, isStop, false);
+  aDisplayer->UpdateViewer();
+}
+
+void PartSet_Module::onSetSelection(const std::list<XGUI_ViewerPrs>& theFeatures)
+{
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  aDisplayer->SetSelected(theFeatures, false);
+  aDisplayer->UpdateViewer();
+}
+
 void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                           int theMode)
 {
   bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Abort;
-  visualizePreview(theFeature, isDisplay);
+  visualizePreview(theFeature, isDisplay, false);
+
+  if (theMode == PartSet_OperationSketchBase::FM_Activation ||
+      theMode == PartSet_OperationSketchBase::FM_Deactivation)
+    activateFeature(theFeature, true);
 }
 
 ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdId)
@@ -222,13 +247,14 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   else if(theCmdId == PartSet_OperationSketchLine::Type() ||
           theCmdId == PartSet_OperationEditLine::Type()) {
     ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
-    boost::shared_ptr<ModelAPI_Feature> aSketchFeature;
-    if (aCurOperation)
-      aSketchFeature = aCurOperation->feature();
+    boost::shared_ptr<ModelAPI_Feature> aSketch;
+    PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
+    if (aPrevOp)
+      aSketch = aPrevOp->sketch();
     if (theCmdId == PartSet_OperationSketchLine::Type())
-      anOperation = new PartSet_OperationSketchLine(theCmdId.c_str(), this, aSketchFeature);
+      anOperation = new PartSet_OperationSketchLine(theCmdId.c_str(), this, aSketch);
     else
-      anOperation = new PartSet_OperationEditLine(theCmdId.c_str(), this, aSketchFeature);
+      anOperation = new PartSet_OperationEditLine(theCmdId.c_str(), this, aSketch);
   }
   else {
     anOperation = new ModuleBase_Operation(theCmdId.c_str(), this);
@@ -245,6 +271,13 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
             this, SLOT(onLaunchOperation(std::string, boost::shared_ptr<ModelAPI_Feature>)));
     connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)),
             this, SLOT(onMultiSelectionEnabled(bool)));
+
+    connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)),
+            this, SLOT(onMultiSelectionEnabled(bool)));
+    connect(aPreviewOp, SIGNAL(stopSelection(const std::list<XGUI_ViewerPrs>&, const bool)),
+            this, SLOT(onStopSelection(const std::list<XGUI_ViewerPrs>&, const bool)));
+    connect(aPreviewOp, SIGNAL(setSelection(const std::list<XGUI_ViewerPrs>&)),
+            this, SLOT(onSetSelection(const std::list<XGUI_ViewerPrs>&)));
 
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {
@@ -265,7 +298,8 @@ void PartSet_Module::sendOperation(ModuleBase_Operation* theOperation)
   Events_Loop::loop()->send(aMessage);
 }
 
-void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFeature, bool isDisplay)
+void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFeature, bool isDisplay,
+                                      const bool isUpdateViewer)
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   if (!anOperation)
@@ -278,13 +312,25 @@ void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFea
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   if (isDisplay) {
     boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview(theFeature);
-    aDisplayer->RedisplayInLocalContext(theFeature,
-                                        aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
-                                        aPreviewOp->getSelectionModes(theFeature));
+    aDisplayer->Redisplay(theFeature,
+                          aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), false);
   }
-  else {
-    //aDisplayer->CloseLocalContexts(false);
-    aDisplayer->Erase(anOperation->feature());
+  else
+    aDisplayer->Erase(anOperation->feature(), false);
+
+  if (isUpdateViewer)
+    aDisplayer->UpdateViewer();
+}
+
+void PartSet_Module::activateFeature(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                     const bool isUpdateViewer)
+{
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aPreviewOp) {
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    aDisplayer->ActivateInLocalContext(theFeature, aPreviewOp->getSelectionModes(theFeature),
+                                       isUpdateViewer);
   }
 }
 
@@ -312,9 +358,9 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
   for (; anIt != aLast; anIt++) {
     boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).first;
     boost::shared_ptr<GeomAPI_Shape> aPreview = (*anIt).second;
-    aDisplayer->RedisplayInLocalContext(aFeature,
-                                        aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
-                                        aModes, false);
+    aDisplayer->Redisplay(aFeature,
+                          aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), false);
+    aDisplayer->ActivateInLocalContext(aFeature, aModes, false);
   }
   aDisplayer->UpdateViewer();
 }
