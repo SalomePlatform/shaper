@@ -181,9 +181,6 @@ void XGUI_Displayer::StopSelection(const std::list<XGUI_ViewerPrs>& theFeatures,
       continue;
 
     if (isStop) {
-      aContext->ClearSelected();
-      aContext->Deactivate(anAIS);
-      
       QColor aColor(Qt::white);
       anAIS->SetColor(Quantity_Color(aColor.red()/255., aColor.green()/255., aColor.blue()/255., Quantity_TOC_RGB));
       anAIS->Redisplay();

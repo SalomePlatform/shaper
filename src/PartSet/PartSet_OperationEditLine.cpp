@@ -42,10 +42,7 @@ bool PartSet_OperationEditLine::isGranted() const
 
 std::list<int> PartSet_OperationEditLine::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
-  std::list<int> aModes;
-  aModes.push_back(-1);
-  return aModes;
-  //return PartSet_OperationSketchBase::getSelectionModes(theFeature);
+  return PartSet_OperationSketchBase::getSelectionModes(theFeature);
 }
 
 void PartSet_OperationEditLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
@@ -100,16 +97,12 @@ void PartSet_OperationEditLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_
 {
   std::list<XGUI_ViewerPrs> aFeatures = myFeatures;
   if (myFeatures.size() == 1) {
-    boost::shared_ptr<ModelAPI_Feature> aFeature;
-    if (!theSelected.empty())
-      aFeature = theSelected.front().feature();
-
-    if (aFeature == feature())
+    if (theSelected.empty())
       return;
-  
-   commit();
-   if (aFeature)
-     emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+
+    boost::shared_ptr<ModelAPI_Feature> aFeature = theSelected.front().feature();
+    commit();
+    emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
   }
   else {
     commit();
@@ -126,14 +119,15 @@ void PartSet_OperationEditLine::startOperation()
 {
   // do nothing in order to do not create a new feature
   emit multiSelectionEnabled(false);
-  emit stopSelection(myFeatures, true);
+  emit stopSelection(myFeatures, true, false);
   myCurPoint.clear();
 }
 
 void PartSet_OperationEditLine::stopOperation()
 {
   emit multiSelectionEnabled(true);
-  emit stopSelection(myFeatures, false);
+  bool isSelectFeatures = myFeatures.size() > 1;
+  emit stopSelection(myFeatures, false, isSelectFeatures);
   myFeatures.clear();
 }
 

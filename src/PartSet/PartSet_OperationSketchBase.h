@@ -103,7 +103,9 @@ signals:
   /// signal to enable/disable selection in the viewer
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
-  void stopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool theToStop);
+  /// \param isToSelect the boolean state whether the features should be selected
+  void stopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool theToStop,
+                     const bool isToSelect);
 
   /// signal to enable/disable usual selection in the viewer
   /// \param theEnabled the boolean state

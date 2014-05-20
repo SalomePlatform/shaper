@@ -195,7 +195,8 @@ void PartSet_Module::onMultiSelectionEnabled(bool theEnabled)
   aViewer->enableMultiselection(theEnabled);
 }
 
-void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop)
+void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop,
+                                     const bool isToSelect)
 {
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   aDisplayer->StopSelection(theFeatures, isStop, false);
@@ -206,7 +207,8 @@ void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeature
       activateFeature((*anIt).feature(), false);
     }
   }
-  aDisplayer->SetSelected(theFeatures, false);
+  if (isToSelect)
+    aDisplayer->SetSelected(theFeatures, false);
   aDisplayer->UpdateViewer();
 }
 
@@ -267,8 +269,8 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
 
     connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)),
             this, SLOT(onMultiSelectionEnabled(bool)));
-    connect(aPreviewOp, SIGNAL(stopSelection(const std::list<XGUI_ViewerPrs>&, const bool)),
-            this, SLOT(onStopSelection(const std::list<XGUI_ViewerPrs>&, const bool)));
+    connect(aPreviewOp, SIGNAL(stopSelection(const std::list<XGUI_ViewerPrs>&, const bool, const bool)),
+            this, SLOT(onStopSelection(const std::list<XGUI_ViewerPrs>&, const bool, const bool)));
 
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {
