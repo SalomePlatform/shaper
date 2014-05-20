@@ -140,12 +140,13 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
   switch (myPointSelectionMode)
   {
     case SM_FirstPoint: {
-      setLinePoint(aX, anY, LINE_ATTR_START);
+      setLinePoint(feature(), aX, anY, LINE_ATTR_START);
+      setLinePoint(feature(), aX, anY, LINE_ATTR_END);
       myPointSelectionMode = SM_SecondPoint;
     }
     break;
     case SM_SecondPoint: {
-      setLinePoint(aX, anY, LINE_ATTR_END);
+      setLinePoint(feature(), aX, anY, LINE_ATTR_END);
       commit();
       emit featureConstructed(feature(), FM_Deactivation);
       emit launchOperation(PartSet_OperationSketchLine::Type(), feature());
@@ -217,11 +218,12 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature()
     aFeature->addSub(aNewFeature);
   }
   if (myInitPoint) {
+    setLinePoint(aNewFeature, myInitPoint->x(), myInitPoint->y(), LINE_ATTR_START);
+    setLinePoint(aNewFeature, myInitPoint->x(), myInitPoint->y(), LINE_ATTR_END);
+
     boost::shared_ptr<ModelAPI_Data> aData = aNewFeature->data();
     boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                                                 (aData->attribute(LINE_ATTR_START));
-    aPoint->setValue(myInitPoint->x(), myInitPoint->y());
-
     createConstraint(myInitPoint, aPoint);
   }
 
@@ -320,10 +322,13 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_OperationSketchLine::findLinePoin
   return aPoint2D;
 }
 
-void PartSet_OperationSketchLine::setLinePoint(double theX, double theY,
+void PartSet_OperationSketchLine::setLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                               double theX, double theY,
                                                const std::string& theAttribute)
 {
-  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+  if (!theFeature)
+    return;
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
   aPoint->setValue(theX, theY);

@@ -115,10 +115,12 @@ protected:
                                                        double theX, double theY);
 
   /// \brief Save the point to the line.
+  /// \param theFeature the line feature
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
   /// \param theAttribute the start or end attribute of the line
-  void setLinePoint(double theX, double theY, const std::string& theAttribute);
+  void setLinePoint(boost::shared_ptr<ModelAPI_Feature>, double theX, double theY,
+                    const std::string& theAttribute);
   /// \brief Save the point to the line.
   /// \param thePoint the 3D point in the viewer
   /// \param theAttribute the start or end attribute of the line
