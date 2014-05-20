@@ -41,6 +41,7 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
 
   connect(theOperation, SIGNAL(stopped()), this, SLOT(onOperationStopped()));
   connect(theOperation, SIGNAL(started()), this, SIGNAL(operationStarted()));
+  connect(theOperation, SIGNAL(resumed()), this, SIGNAL(operationResumed()));
 
   theOperation->start();
   return true;
@@ -58,9 +59,6 @@ bool XGUI_OperationMgr::abortOperation()
 
 void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
 {
-  connect(theOperation, SIGNAL(stopped()), this, SLOT(onOperationStopped()));
-  connect(theOperation, SIGNAL(started()), this, SIGNAL(operationStarted()));
-
   theOperation->resume();
 }
 

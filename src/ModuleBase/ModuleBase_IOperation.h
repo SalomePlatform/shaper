@@ -69,6 +69,7 @@ signals:
   void aborted(); /// the operation is aborted
   void committed(); /// the operation is committed
   void stopped(); /// the operation is aborted or committed
+  void resumed(); /// the operation is resumed
 
 public slots:
   /// Starts operation
