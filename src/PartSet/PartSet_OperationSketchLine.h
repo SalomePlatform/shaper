@@ -37,7 +37,8 @@ public:
 
    /// Returns that this operator can be started above already running one.
    /// The runned operation should be the sketch feature modified operation
-  virtual bool isGranted() const;
+  /// \param theOperation the previous running operation
+  virtual bool isGranted(ModuleBase_IOperation* theOperation) const;
 
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
@@ -49,6 +50,10 @@ public:
   /// \param thePresentations the list of additional presentations
   virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
                     const std::list<XGUI_ViewerPrs>& thePresentations);
+
+  /// Returns the operation sketch feature
+  /// \returns the sketch instance
+  virtual boost::shared_ptr<ModelAPI_Feature> sketch() const;
 
   /// Gives the current selected objects to be processed by the operation
   /// \param thePoint a point clicked in the viewer
@@ -110,10 +115,12 @@ protected:
                                                        double theX, double theY);
 
   /// \brief Save the point to the line.
+  /// \param theFeature the line feature
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
   /// \param theAttribute the start or end attribute of the line
-  void setLinePoint(double theX, double theY, const std::string& theAttribute);
+  void setLinePoint(boost::shared_ptr<ModelAPI_Feature>, double theX, double theY,
+                    const std::string& theAttribute);
   /// \brief Save the point to the line.
   /// \param thePoint the 3D point in the viewer
   /// \param theAttribute the start or end attribute of the line

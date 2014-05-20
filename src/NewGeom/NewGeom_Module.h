@@ -34,24 +34,20 @@ public:
   virtual void selectionChanged();
 
   //--- XGUI connector interface -----
-  virtual void addFeature(const QString& theWBName,
-                          const QString& theId, 
-                          const QString& theTitle, 
-                          const QString& theTip,
-                          const QIcon& theIcon, 
-                          bool isCheckable = false,
-                          QObject* reciever = 0,
-                          const char* member = 0,
-                          const QKeySequence& theKeys = QKeySequence());
-
-  virtual void addEditCommand(const QString& theId,
-                              const QString& theTitle,
+  virtual QAction* addFeature(const QString& theWBName,
+                              const QString& theId, 
+                              const QString& theTitle, 
                               const QString& theTip,
                               const QIcon& theIcon, 
-                              bool isCheckable,
-                              QObject* reciever,
-                              const char* member,
-                              const QKeySequence& theKeys);
+                              const QKeySequence& theKeys = QKeySequence(),
+                              bool isCheckable = false);
+
+  virtual QAction* addEditCommand(const QString& theId,
+                                  const QString& theTitle,
+                                  const QString& theTip,
+                                  const QIcon& theIcon, 
+                                  const QKeySequence& theKeys,
+                                  bool isCheckable);
 
   virtual void addEditMenuSeparator();
 
@@ -71,6 +67,12 @@ public:
 
   //! Returns interface to Salome viewer
   virtual XGUI_SalomeViewer* viewer() const { return myProxyViewer; }
+
+  //! Returns list of defined actions (just by NewGeom module)
+  virtual QList<QAction*> commandList() const;
+
+  //! Returns list of Ids of defined actions (just by NewGeom module)
+  virtual QStringList commandIdList() const;
 
 public slots:
   virtual bool activateModule( SUIT_Study* theStudy);

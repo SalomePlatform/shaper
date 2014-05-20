@@ -58,7 +58,7 @@ std::string featureInfo(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
   std::ostringstream aStream; 
   if (theFeature)
-    aStream << theFeature.get();
+    aStream << theFeature.get() << " " << theFeature->getKind();
   return QString(aStream.str().c_str()).toStdString();
 }
 

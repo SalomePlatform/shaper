@@ -46,11 +46,14 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<Mode
   std::list<int> aModes;
   if (!myIsEditMode)
     aModes.push_back(TopAbs_FACE);
-  else {
-    aModes.push_back(TopAbs_VERTEX);
-    aModes.push_back(TopAbs_EDGE);
-  }
+  else
+    aModes = PartSet_OperationSketchBase::getSelectionModes(theFeature);
   return aModes;
+}
+
+boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketch::sketch() const
+{
+  return feature();
 }
 
 void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,

@@ -60,6 +60,10 @@ public:
   virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
                     const std::list<XGUI_ViewerPrs>& thePresentations) {}
 
+  /// Returns the operation sketch feature
+  /// \returns the sketch instance
+  virtual boost::shared_ptr<ModelAPI_Feature> sketch() const = 0;
+
   /// Processes the mouse pressed in the point
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
@@ -99,6 +103,14 @@ signals:
   /// signal to enable/disable multi selection in the viewer
   /// \param theEnabled the boolean state
   void multiSelectionEnabled(bool theEnabled);
+
+  /// signal to enable/disable selection in the viewer
+  /// \param theFeatures a list of features to be disabled
+  /// \param theToStop the boolean state whether it it stopped or non stopped
+  void stopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool theToStop);
+  /// signal to set selection in the viewer
+  /// \param theFeatures a list of features to be disabled
+  void setSelection(const std::list<XGUI_ViewerPrs>& theFeatures);
 
   /// signal to enable/disable usual selection in the viewer
   /// \param theEnabled the boolean state

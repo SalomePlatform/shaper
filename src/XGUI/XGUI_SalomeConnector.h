@@ -23,18 +23,15 @@ public:
   //! \param theTip - a tooltip string (help)
   //! \param theIcon - icon
   //! \param isCheckable - is checkable or not
-  //! \param reciever - QObject which will react on the command call
-  //! \param member - a method of receiver which will be called on the command
   //! \param theKeys - hot keys
-  virtual void addFeature(const QString& theWBName,
-                          const QString& theId, 
-                          const QString& theTitle, 
-                          const QString& theTip,
-                          const QIcon& theIcon, 
-                          bool isCheckable,
-                          QObject* reciever,
-                          const char* member,
-                          const QKeySequence& theKeys) = 0;
+  //! returns created action
+  virtual QAction* addFeature(const QString& theWBName,
+                              const QString& theId, 
+                              const QString& theTitle, 
+                              const QString& theTip,
+                              const QIcon& theIcon, 
+                              const QKeySequence& theKeys,
+                              bool isCheckable) = 0;
 
   //! Creates a command in Edit menu of SALOME desktop
   //! \param theId - an id of the feature
@@ -42,17 +39,14 @@ public:
   //! \param theTip - a tooltip string (help)
   //! \param theIcon - icon
   //! \param isCheckable - is checkable or not
-  //! \param reciever - QObject which will react on the command call
-  //! \param member - a method of receiver which will be called on the command
   //! \param theKeys - hot keys
-  virtual void addEditCommand(const QString& theId,
-                              const QString& theTitle,
-                              const QString& theTip,
-                              const QIcon& theIcon, 
-                              bool isCheckable,
-                              QObject* reciever,
-                              const char* member,
-                              const QKeySequence& theKeys) = 0;
+  //! returns created action
+  virtual QAction* addEditCommand(const QString& theId,
+                                  const QString& theTitle,
+                                  const QString& theTip,
+                                  const QIcon& theIcon, 
+                                  const QKeySequence& theKeys,
+                                  bool isCheckable) = 0;
 
   //! Insert separator into Edit menu of SALOME desktop
   virtual void addEditMenuSeparator() = 0;
@@ -65,6 +59,12 @@ public:
 
   //! Returns QAction instance by command string Id
   virtual QAction* command(const QString& theId) const = 0;
+
+  //! Returns list of defined actions (just by NewGeom module)
+  virtual QList<QAction*> commandList() const = 0;
+
+  //! Returns list of Ids of defined actions (just by NewGeom module)
+  virtual QStringList commandIdList() const = 0;
 
   //! Set nested actions dependent on command Id
   //! \param theId - the command ID

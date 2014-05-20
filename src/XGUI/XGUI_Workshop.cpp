@@ -129,16 +129,16 @@ void XGUI_Workshop::initMenu()
 {
   if (isSalomeMode()) {
     // Create only Undo, Redo commands
-    salomeConnector()->addEditCommand("UNDO_CMD", 
+    QAction* aAction = salomeConnector()->addEditCommand("UNDO_CMD", 
                                       tr("Undo"), tr("Undo last command"),
                                       QIcon(":pictures/undo.png"), 
-                                      false, this, SLOT(onUndo()),
-                                      QKeySequence::Undo);
-    salomeConnector()->addEditCommand("REDO_CMD", 
+                                      QKeySequence::Undo, false);
+    connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onUndo()));
+    aAction = salomeConnector()->addEditCommand("REDO_CMD", 
                                       tr("Redo"), tr("Redo last command"),
                                       QIcon(":pictures/redo.png"), 
-                                      false, this, SLOT(onRedo()),
-                                      QKeySequence::Redo);
+                                      QKeySequence::Redo, false);
+    connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRedo()));
     salomeConnector()->addEditMenuSeparator();
     return;
   }
@@ -297,16 +297,15 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
   bool isUsePropPanel = theMessage->isUseInput();
   if (isSalomeMode()) {
     QString aId = QString::fromStdString(theMessage->id());
-    salomeConnector()->addFeature(aWchName,
-                                  QString::fromStdString(theMessage->id()),
-                                  aId,
-                                  QString::fromStdString(theMessage->tooltip()),
-                                  QIcon(theMessage->icon().c_str()),
-                                  isUsePropPanel, this, 
-                                  SLOT(onFeatureTriggered()), QKeySequence());
-    myActionsMgr->addCommand(aId, salomeConnector()->command(aId));
+    QAction* aAction = salomeConnector()->addFeature(aWchName,
+                              aId,
+                              QString::fromStdString(theMessage->text()),
+                              QString::fromStdString(theMessage->tooltip()),
+                              QIcon(theMessage->icon().c_str()),
+                              QKeySequence(), isUsePropPanel);
+    myActionsMgr->addCommand(aAction);
     salomeConnector()->setNestedActions(aId, aNestedFeatures.split(" "));
-
+    myPartSetModule->featureCreated(aAction);
   } else {
 
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
@@ -563,36 +562,39 @@ bool XGUI_Workshop::activateModule()
 //******************************************************
 void XGUI_Workshop::updateCommandStatus()
 {
-  if (isSalomeMode()) // TODO: update commands in SALOME
-    return;
-  XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
-
-  QList<XGUI_Command*> aCommands = aMenuBar->features();
-  QList<XGUI_Command*>::const_iterator aIt;
-
+  QList<QAction*> aCommands;
+  if (isSalomeMode()) { // update commands in SALOME mode
+    aCommands = salomeConnector()->commandList();
+  } else {
+    XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
+    foreach (XGUI_Command* aCmd, aMenuBar->features())
+      aCommands.append(aCmd);
+  }
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   if (aMgr->hasRootDocument()) {
-    XGUI_Command* aUndoCmd;
-    XGUI_Command* aRedoCmd;
-    foreach(XGUI_Command* aCmd, aCommands) {
-      if (aCmd->id() == "UNDO_CMD")
+    QAction* aUndoCmd;
+    QAction* aRedoCmd;
+    foreach(QAction* aCmd, aCommands) {
+      QString aId = aCmd->data().toString();
+      if (aId == "UNDO_CMD")
         aUndoCmd = aCmd;
-      else if (aCmd->id() == "REDO_CMD")
+      else if (aId == "REDO_CMD")
         aRedoCmd = aCmd;
       else // Enable all commands
-        aCmd->enable();
+        aCmd->setEnabled(true);
     }
     DocumentPtr aDoc = aMgr->rootDocument();
     aUndoCmd->setEnabled(aDoc->canUndo());
     aRedoCmd->setEnabled(aDoc->canRedo());
   } else {
-    foreach(XGUI_Command* aCmd, aCommands) {
-      if (aCmd->id() == "NEW_CMD")
-        aCmd->enable();
-      else if (aCmd->id() == "EXIT_CMD")
-        aCmd->enable();
+    foreach(QAction* aCmd, aCommands) {
+      QString aId = aCmd->data().toString();
+      if (aId == "NEW_CMD")
+        aCmd->setEnabled(true);
+      else if (aId == "EXIT_CMD")
+        aCmd->setEnabled(true);
       else 
-        aCmd->disable();
+        aCmd->setEnabled(false);
     }
   }
 }

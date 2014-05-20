@@ -61,7 +61,8 @@ public:
   /// must be always can start above any launched one. Default impl returns FALSE,
   /// so it is being checked for IsValid, but some operations may overload IsGranted()
   /// In this case they will always start, no matter what operation is running.
-  virtual bool isGranted() const;
+  /// \param theOperation the previous running operation
+  virtual bool isGranted(ModuleBase_IOperation* theOperation) const;
 
 signals:
   void started(); /// the operation is started

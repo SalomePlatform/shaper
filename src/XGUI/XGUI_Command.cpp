@@ -3,16 +3,18 @@
 #include <QPushButton>
 
 XGUI_Command::XGUI_Command(const QString& theId, QObject * parent, bool isCheckable)
-    : QWidgetAction(parent), myId(theId), myCheckable(isCheckable)
+    : QWidgetAction(parent), myCheckable(isCheckable)
 {
+  setData(theId);
 }
 
 XGUI_Command::XGUI_Command(const QString& theId, const QIcon& icon, const QString& text,
                            QObject* parent, bool isCheckable)
-    : QWidgetAction(parent), myId(theId), myCheckable(isCheckable)
+    : QWidgetAction(parent), myCheckable(isCheckable)
 {
   setIcon(icon);
   setText(text);
+  setData(theId);
 }
 
 XGUI_Command::~XGUI_Command()
@@ -44,21 +46,6 @@ QWidget* XGUI_Command::createWidget(QWidget* theParent)
     return aButton;
   }
   return QWidgetAction::createWidget(theParent);
-}
-
-bool XGUI_Command::enabled() const
-{
-  return isEnabled();
-}
-
-void XGUI_Command::enable()
-{
-  setEnabled(true);
-}
-
-void XGUI_Command::disable()
-{
-  setEnabled(false);
 }
 
 void XGUI_Command::connectTo(const QObject* theResiver, const char* theSlot)

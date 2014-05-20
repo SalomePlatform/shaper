@@ -45,6 +45,13 @@ std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
   return std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >();
 }
 
+std::list<int> PartSet_OperationSketchBase::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
+{
+  std::list<int> aModes;
+  aModes.push_back(TopAbs_VERTEX);
+  aModes.push_back(TopAbs_EDGE);
+  return aModes;
+}
 boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchBase::createFeature()
 {
   boost::shared_ptr<ModelAPI_Feature> aFeature = ModuleBase_Operation::createFeature();
