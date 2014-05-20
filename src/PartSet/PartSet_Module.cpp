@@ -195,11 +195,9 @@ void PartSet_Module::onMultiSelectionEnabled(bool theEnabled)
   aViewer->enableMultiselection(theEnabled);
 }
 
-void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop,
-                                     const bool isToSelect)
+void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop)
 {
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  aDisplayer->StopSelection(theFeatures, isStop, false);
   if (!isStop) {
     std::list<XGUI_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
     boost::shared_ptr<ModelAPI_Feature> aFeature;
@@ -207,8 +205,14 @@ void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeature
       activateFeature((*anIt).feature(), false);
     }
   }
-  if (isToSelect)
-    aDisplayer->SetSelected(theFeatures, false);
+  aDisplayer->StopSelection(theFeatures, isStop, false);
+  aDisplayer->UpdateViewer();
+}
+
+void PartSet_Module::onSetSelection(const std::list<XGUI_ViewerPrs>& theFeatures)
+{
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  aDisplayer->SetSelected(theFeatures, false);
   aDisplayer->UpdateViewer();
 }
 
@@ -269,8 +273,10 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
 
     connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)),
             this, SLOT(onMultiSelectionEnabled(bool)));
-    connect(aPreviewOp, SIGNAL(stopSelection(const std::list<XGUI_ViewerPrs>&, const bool, const bool)),
-            this, SLOT(onStopSelection(const std::list<XGUI_ViewerPrs>&, const bool, const bool)));
+    connect(aPreviewOp, SIGNAL(stopSelection(const std::list<XGUI_ViewerPrs>&, const bool)),
+            this, SLOT(onStopSelection(const std::list<XGUI_ViewerPrs>&, const bool)));
+    connect(aPreviewOp, SIGNAL(setSelection(const std::list<XGUI_ViewerPrs>&)),
+            this, SLOT(onSetSelection(const std::list<XGUI_ViewerPrs>&)));
 
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {

@@ -119,7 +119,8 @@ void PartSet_OperationEditLine::startOperation()
 {
   // do nothing in order to do not create a new feature
   emit multiSelectionEnabled(false);
-  emit stopSelection(myFeatures, true, false);
+  emit setSelection(std::list<XGUI_ViewerPrs>());
+  emit stopSelection(myFeatures, true);
   myCurPoint.clear();
 }
 
@@ -127,7 +128,10 @@ void PartSet_OperationEditLine::stopOperation()
 {
   emit multiSelectionEnabled(true);
   bool isSelectFeatures = myFeatures.size() > 1;
-  emit stopSelection(myFeatures, false, isSelectFeatures);
+  emit stopSelection(myFeatures, false);
+  if (isSelectFeatures)
+    emit setSelection(myFeatures);
+
   myFeatures.clear();
 }
 
