@@ -31,7 +31,7 @@ public:
   XGUI_Workshop* workshop() const;
 
   virtual void createFeatures();
-  virtual void featureCreated(XGUI_Command* theFeature);
+  virtual void featureCreated(QAction* theFeature);
   virtual QStringList nestedFeatures(QString theFeature);
   std::string featureFile(const std::string&);
 

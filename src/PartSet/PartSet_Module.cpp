@@ -80,9 +80,9 @@ void PartSet_Module::createFeatures()
   myFeaturesInFiles = aXMLReader.featuresInFiles();
 }
 
-void PartSet_Module::featureCreated(XGUI_Command* theFeature)
+void PartSet_Module::featureCreated(QAction* theFeature)
 {
-  theFeature->connectTo(this, SLOT(onFeatureTriggered()));
+  connect(theFeature, SIGNAL(triggered(bool)), this, SLOT(onFeatureTriggered()));
 }
 
 QStringList PartSet_Module::nestedFeatures(QString)
@@ -100,11 +100,11 @@ std::string PartSet_Module::featureFile(const std::string& theFeatureId)
  */
 void PartSet_Module::onFeatureTriggered()
 {
-  XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(sender());
+  QAction* aCmd = dynamic_cast<QAction*>(sender());
   //Do nothing on uncheck
   if(aCmd->isCheckable() && !aCmd->isChecked())
     return;
-  launchOperation(aCmd->id());
+  launchOperation(aCmd->data().toString());
 }
   
 void PartSet_Module::launchOperation(const QString& theCmdId)

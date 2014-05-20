@@ -24,12 +24,7 @@ public:
   virtual ~XGUI_ActionsMgr();
 
 
-  void addCommand(XGUI_Command* theCmd);
-
-  /// Register a command in SALOME mode
-  /// \param theId - string ID of the command
-  /// \param theCmd - command object
-  void addCommand(QString theId, QAction* theCmd);
+  void addCommand(QAction* theCmd);
 
   void saveCommandsState();
   void restoreCommandState();

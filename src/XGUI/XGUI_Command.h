@@ -19,20 +19,11 @@ public:
   XGUI_Command(const QString& theId, const QIcon& icon, const QString& text, QObject* parent, bool isCheckable = false);
   ~XGUI_Command();
 
-  //! Returns true if the command is enabled
-  virtual bool enabled() const;
-
-  //! Set the command enabled
-  virtual void enable();
-
-  //! Set the command disabled
-  virtual void disable();
-
-  //! Returns Id of the command
-  virtual QString id() const
+  //VSV: Don't use this method for compatibility with SALOME. Use the construction below
+  /*virtual QString id() const
   {
-    return myId;
-  }
+    return data().toString();
+  }*/
 
   const QStringList& unblockableCommands() const;
   void setUnblockableCommands(const QStringList& myUnblockableCommands);
@@ -45,7 +36,6 @@ protected:
   virtual QWidget* createWidget(QWidget* theParent);
 
 private:
-  QString myId;
   bool myCheckable;
   //! List of Ids of commands which WILL NOT be blocked when the command is on.
   QStringList myUnblockableCommands;
