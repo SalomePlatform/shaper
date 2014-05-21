@@ -4,11 +4,15 @@ SET(PROJECT_HEADERS
     PartSetPlugin.h
     PartSetPlugin_Plugin.h
     PartSetPlugin_Part.h
+    PartSetPlugin_Duplicate.h
+    PartSetPlugin_Remove.h
 )
 
 SET(PROJECT_SOURCES
     PartSetPlugin_Plugin.cpp
     PartSetPlugin_Part.cpp
+    PartSetPlugin_Duplicate.cpp
+    PartSetPlugin_Remove.cpp
 )
 
 ADD_DEFINITIONS(-DPARTSETPLUGIN_EXPORTS ${BOOST_DEFINITIONS})
