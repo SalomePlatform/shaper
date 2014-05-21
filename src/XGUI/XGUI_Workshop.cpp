@@ -525,7 +525,7 @@ XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
     }
   }
 #else
-  void* modLib = dlopen( libName.toLatin1(), RTLD_LAZY );
+  void* modLib = dlopen( libName.toLatin1(), RTLD_LAZY | RTLD_GLOBAL );
   if ( !modLib ) {
     err = QString( "Can not load library %1. %2" ).arg( libName ).arg( dlerror() );
   } else {
