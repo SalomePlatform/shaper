@@ -50,6 +50,8 @@ public:
 
   bool removeRows(int theRow, int theCount, const QModelIndex& theParent = QModelIndex());
 
+  Qt::ItemFlags flags(const QModelIndex& theIndex) const;
+
   //! Returns Feature object by the given Model index.
   //! Returns 0 if the given index is not index of a feature
   FeaturePtr feature(const QModelIndex& theIndex) const;
