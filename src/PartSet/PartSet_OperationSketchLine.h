@@ -128,7 +128,7 @@ protected:
 
 protected:
   ///< Structure to lists the possible types of point selection modes
-  enum PointSelectionMode {SM_FirstPoint, SM_SecondPoint};
+  enum PointSelectionMode {SM_FirstPoint, SM_SecondPoint, SM_DonePoint};
 
 private:
   boost::shared_ptr<ModelAPI_Feature> mySketch; ///< the sketch feature
