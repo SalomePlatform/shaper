@@ -63,7 +63,7 @@ bool Model_PluginManager::hasRootDocument()
 
 boost::shared_ptr<ModelAPI_Document> Model_PluginManager::currentDocument()
 {
-  if (!myCurrentDoc)
+  if (!myCurrentDoc || !Model_Application::getApplication()->hasDocument(myCurrentDoc->id()))
     myCurrentDoc = rootDocument();
   return myCurrentDoc;
 }
