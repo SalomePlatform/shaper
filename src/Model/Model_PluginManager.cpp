@@ -9,8 +9,15 @@
 #include <Model_Document.h>
 #include <Model_Application.h>
 #include <Events_Loop.h>
+#include <Events_Error.h>
 #include <Config_FeatureMessage.h>
 #include <Config_ModuleReader.h>
+
+#include <TDF_CopyTool.hxx>
+#include <TDF_DataSet.hxx>
+#include <TDF_RelocationTable.hxx>
+#include <TDF_ClosureTool.hxx>
+
 
 using namespace std;
 
@@ -30,7 +37,13 @@ boost::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string th
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
       boost::shared_ptr<ModelAPI_Feature> aCreated = 
         myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
+      if (!aCreated) {
+        Events_Error::send(string("Can not initialize feature '") + theFeatureID +
+          "' in plugin '" + myCurrentPluginName + "'");
+      }
       return aCreated;
+    } else {
+      Events_Error::send(string("Can not load plugin '") + myCurrentPluginName + "'");
     }
   }
 
@@ -58,6 +71,27 @@ boost::shared_ptr<ModelAPI_Document> Model_PluginManager::currentDocument()
 void Model_PluginManager::setCurrentDocument(boost::shared_ptr<ModelAPI_Document> theDoc)
 {
   myCurrentDoc = theDoc;
+}
+
+boost::shared_ptr<ModelAPI_Document> Model_PluginManager::copy(
+  boost::shared_ptr<ModelAPI_Document> theSource, std::string theID) 
+{
+  // create a new document
+  boost::shared_ptr<Model_Document> aNew = boost::dynamic_pointer_cast<Model_Document>(
+    Model_Application::getApplication()->getDocument(theID));
+  // make a copy of all labels
+  TDF_Label aSourceRoot = 
+    boost::dynamic_pointer_cast<Model_Document>(theSource)->document()->Main().Father();
+  TDF_Label aTargetRoot = aNew->document()->Main().Father();
+  Handle(TDF_DataSet) aDS = new TDF_DataSet;
+  aDS->AddLabel(aSourceRoot);
+  TDF_ClosureTool::Closure(aDS);
+  Handle(TDF_RelocationTable) aRT = new TDF_RelocationTable;
+  aRT->SetRelocation(aSourceRoot, aTargetRoot);
+  TDF_CopyTool::Copy(aDS, aRT);
+
+  aNew->synchronizeFeatures();
+  return aNew;
 }
 
 Model_PluginManager::Model_PluginManager()

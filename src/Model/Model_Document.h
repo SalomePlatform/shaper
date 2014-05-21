@@ -63,6 +63,9 @@ public:
   //! \param creates feature and puts it in the document
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
 
+  //! Removes the feature from the document
+  MODEL_EXPORT virtual void removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
+
   //! Returns the existing feature by the label
   //! \param theLabel base label of the feature
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> feature(TDF_Label& theLabel);
@@ -105,7 +108,10 @@ protected:
   //! Creates new document with binary file format
   Model_Document(const std::string theID);
 
+  Handle_TDocStd_Document document() {return myDoc;}
+
   friend class Model_Application;
+  friend class Model_PluginManager;
 
 private:
   std::string myID; ///< identifier of the document in the application

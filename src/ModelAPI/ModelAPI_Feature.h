@@ -40,6 +40,10 @@ public:
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
   MODELAPI_EXPORT virtual bool isInHistory() {return true;}
 
+  /// Returns true if this feature must not be created: this is just an action
+  /// that is not stored in the features history (like delete part).
+  MODELAPI_EXPORT virtual bool isAction() {return false;}
+
   /// Returns the data manager of this feature
   MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Data> data() {return myData;}
 
