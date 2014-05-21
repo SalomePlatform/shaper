@@ -84,9 +84,6 @@ std::list<std::string> Config_ModuleReader::importPlugin(const std::string& theP
 
 void Config_ModuleReader::loadLibrary(const std::string theLibName)
 {
-#ifdef _DEBUG
-  std::cout << "Config_ModuleReader::loading library... "  << theLibName.c_str() << std::endl;
-#endif
   std::string aFileName = library(theLibName);
   if (aFileName.empty())
     return;

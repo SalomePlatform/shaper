@@ -200,7 +200,9 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   static Events_ID aFeatureLoadedId = Events_Loop::loop()->eventByName(EVENT_FEATURE_LOADED);
   if (theMessage->eventID() == aFeatureLoadedId) {
     const Config_FeatureMessage* aFeatureMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
-    addFeature(aFeatureMsg);
+    if(!aFeatureMsg->isInternal()) {
+      addFeature(aFeatureMsg);
+    }
     return;
   }
   //Update property panel on corresponding message. If there is no current operation (no

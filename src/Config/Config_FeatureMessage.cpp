@@ -14,6 +14,11 @@ Config_FeatureMessage::Config_FeatureMessage(const Events_ID theId, const void* 
 
   myGroupId = "";
   myWorkbenchId = "";
+  myPluginLibrary = "";
+
+  myInternal = false;
+  myUseInput = false;
+  myNestedFeatures = "";
 }
 
 const std::string& Config_FeatureMessage::icon() const
@@ -101,9 +106,19 @@ bool Config_FeatureMessage::isUseInput() const
   return myUseInput;
 }
 
+bool Config_FeatureMessage::isInternal() const
+{
+  return myInternal;
+}
+
 void Config_FeatureMessage::setUseInput(bool isUseInput)
 {
   myUseInput = isUseInput;
+}
+
+void Config_FeatureMessage::setInternal(bool isInternal)
+{
+  myInternal = isInternal;
 }
 
 const std::string& Config_FeatureMessage::nestedFeatures() const
