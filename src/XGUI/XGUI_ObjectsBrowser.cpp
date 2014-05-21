@@ -20,6 +20,7 @@ XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
 {
   setHeaderHidden(true);
   setModel(new XGUI_DocumentDataModel(this));
+  setEditTriggers(QAbstractItemView::NoEditTriggers);
 
   connect(selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
           this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
@@ -191,7 +192,7 @@ bool XGUI_ObjectsBrowser::eventFilter(QObject* obj, QEvent* theEvent)
         QMouseEvent* aEvent = (QMouseEvent*) theEvent;
         QPoint aPnt = mapFromGlobal(aEvent->globalPos());
         if (childAt(aPnt) != myActiveDocLbl) {
-          closeDocNameEditing(false);
+          closeDocNameEditing(true);
         }
       } else if (theEvent->type() == QEvent::KeyRelease) {
         QKeyEvent* aEvent = (QKeyEvent*) theEvent;
@@ -226,10 +227,10 @@ void XGUI_ObjectsBrowser::closeDocNameEditing(bool toSave)
 }
 
 //***************************************************
-void XGUI_ObjectsBrowser::activateCurrentPart(bool toActivate)
+void XGUI_ObjectsBrowser::activatePart(const FeaturePtr& thePart)
 {
-  if (toActivate) {
-    QModelIndex aIndex = myTreeView->currentIndex();
+  if (thePart) {
+    QModelIndex aIndex = myDocModel->partIndex(thePart);
 
     if ((myDocModel->activePartIndex() != aIndex) && myDocModel->activePartIndex().isValid()) {
       myTreeView->setExpanded(myDocModel->activePartIndex(), false);
@@ -237,6 +238,7 @@ void XGUI_ObjectsBrowser::activateCurrentPart(bool toActivate)
     bool isChanged = myDocModel->activatedIndex(aIndex);
     if (isChanged) {
       if (myDocModel->activePartIndex().isValid()) {
+        myTreeView->setExpanded(aIndex.parent(), true);
         myTreeView->setExpanded(aIndex, true);
         onActivePartChanged(myDocModel->feature(aIndex));
       } else {

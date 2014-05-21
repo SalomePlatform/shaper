@@ -124,6 +124,13 @@ public slots:
 signals:
   void errorOccurred(const QString&);
 
+public slots:
+  //! Activates or deactivates a part
+  //! If PartPtr is Null pointer then PartSet will be activated
+  void activatePart(FeaturePtr theFeature);
+
+  void activateLastPart();
+
 protected:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
@@ -152,9 +159,6 @@ private:
 
   // Creates Dock widgets: Object browser and Property panel
   void createDockWidgets();
-
-  //! Activates or deactivates currently selected part
-  void activatePart(bool toActivate);
 
   QString myCurrentFile;
   XGUI_MainWindow* myMainWindow;

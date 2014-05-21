@@ -162,13 +162,7 @@ FeaturePtr XGUI_TopDataModel::feature(const QModelIndex& theIndex) const
 
 QModelIndex XGUI_TopDataModel::findParent(const FeaturePtr& theFeature) const
 {
-  QString aGroup(theFeature->getGroup().c_str());
-
-  if (theFeature->getGroup().compare(PARAMETERS_GROUP) == 0)
-    return createIndex(0, 0, (qint32) ParamsFolder);
-  if (theFeature->getGroup().compare(CONSTRUCTIONS_GROUP) == 0)
-    return createIndex(1, 0, (qint32) ConstructFolder);
-  return QModelIndex();
+  return findGroup(theFeature->getGroup().c_str());
 }
 
 QModelIndex XGUI_TopDataModel::findGroup(const std::string& theGroup) const
@@ -179,6 +173,30 @@ QModelIndex XGUI_TopDataModel::findGroup(const std::string& theGroup) const
     return createIndex(1, 0, (qint32) ConstructFolder);
   return QModelIndex();
 }
+
+QModelIndex XGUI_TopDataModel::featureIndex(const FeaturePtr& theFeature) const
+{
+  QModelIndex aIndex;
+  if (theFeature) {
+    std::string aGroup = theFeature->getGroup();
+    int aNb = myDocument->size(aGroup);
+    int aRow = -1;
+    for (int i = 0; i < aNb; i++) {
+      if (myDocument->feature(aGroup, i, true) == theFeature) {
+        aRow = i;
+        break;
+      }
+    }
+    if (aRow != -1) {
+      if (aGroup.compare(PARAMETERS_GROUP) == 0)
+        return createIndex(aRow, 0, (qint32) ParamObject);
+      if (aGroup.compare(CONSTRUCTIONS_GROUP) == 0)
+        return createIndex(aRow, 0, (qint32) ConstructObject);
+    }
+  }
+  return aIndex;
+}
+
 
 
 //******************************************************************
@@ -319,7 +337,7 @@ QModelIndex XGUI_PartDataModel::index(int theRow, int theColumn, const QModelInd
   case ConstructFolder:
     return createIndex(theRow, 0, (qint32) ConstructObject);
   case BodiesFolder:
-    return createIndex(theRow, 0, (qint32) BodieswObject);
+    return createIndex(theRow, 0, (qint32) BodiesObject);
   }
   return QModelIndex();
 }
@@ -364,11 +382,14 @@ FeaturePtr XGUI_PartDataModel::feature(const QModelIndex& theIndex) const
       return featureDocument()->feature(FEATURES_GROUP, theIndex.row() - 3, true);
   case ParamsFolder:
   case ConstructFolder:
+  case BodiesFolder:
     return FeaturePtr();
   case ParamObject:
     return featureDocument()->feature(PARAMETERS_GROUP, theIndex.row(), true);
   case ConstructObject:
     return featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row(), true);
+  //case BodiesObject:
+  //  return featureDocument()->feature(CONSTRUCTIONS_GROUP, theIndex.row(), true);
   }
   return FeaturePtr();
 }
@@ -381,13 +402,7 @@ bool XGUI_PartDataModel::hasDocument(const DocumentPtr& theDoc) const
 
 QModelIndex XGUI_PartDataModel::findParent(const FeaturePtr& theFeature) const
 {
-  QString aGroup(theFeature->getGroup().c_str());
-
-  if (theFeature->getGroup().compare(PARAMETERS_GROUP) == 0)
-    return createIndex(0, 0, (qint32) ParamsFolder);
-  if (theFeature->getGroup().compare(CONSTRUCTIONS_GROUP) == 0)
-    return createIndex(1, 0, (qint32) ConstructFolder);
-  return QModelIndex();
+  return findGroup(theFeature->getGroup().c_str());
 }
 
 QModelIndex XGUI_PartDataModel::findGroup(const std::string& theGroup) const
@@ -402,4 +417,30 @@ QModelIndex XGUI_PartDataModel::findGroup(const std::string& theGroup) const
 FeaturePtr XGUI_PartDataModel::part() const
 {
   return myDocument->feature(PARTS_GROUP, myId, true);
+}
+
+QModelIndex XGUI_PartDataModel::featureIndex(const FeaturePtr& theFeature) const
+{
+  QModelIndex aIndex;
+  if (theFeature) {
+    if (part() == theFeature) 
+      return aIndex;
+
+    std::string aGroup = theFeature->getGroup();
+    int aNb = myDocument->size(aGroup);
+    int aRow = -1;
+    for (int i = 0; i < aNb; i++) {
+      if (myDocument->feature(aGroup, i, true) == theFeature) {
+        aRow = i;
+        break;
+      }
+    }
+    if (aRow != -1) {
+      if (aGroup.compare(PARAMETERS_GROUP) == 0)
+        return createIndex(aRow, 0, (qint32) ParamObject);
+      if (aGroup.compare(CONSTRUCTIONS_GROUP) == 0)
+        return createIndex(aRow, 0, (qint32) ConstructObject);
+    }
+  }
+  return aIndex;
 }

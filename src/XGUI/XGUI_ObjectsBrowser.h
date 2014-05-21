@@ -73,7 +73,7 @@ public:
   XGUI_DataTree* treeView() const { return myTreeView; }
 
   //! Activates currently selected part. Signal activePartChanged will not be sent
-  void activateCurrentPart(bool toActivate);
+  void activatePart(const FeaturePtr& thePart);
 
 signals:
   //! Emited when selection is changed

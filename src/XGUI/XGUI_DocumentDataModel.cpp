@@ -24,7 +24,7 @@ XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
   : QAbstractItemModel(theParent), myActivePart(0)
 {
   // Find Document object
-  boost::shared_ptr<ModelAPI_PluginManager> aMgr = ModelAPI_PluginManager::get();
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   myDocument = aMgr->currentDocument();
 
   // Register in event loop
@@ -49,8 +49,8 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
   // Created object event *******************
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED)) {
     const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    boost::shared_ptr<ModelAPI_Feature> aFeature = aUpdMsg->feature();
-    boost::shared_ptr<ModelAPI_Document> aDoc = aFeature->document();
+    FeaturePtr aFeature = aUpdMsg->feature();
+    DocumentPtr aDoc = aFeature->document();
 
     if (aDoc == myDocument) {  // If root objects
       if (aFeature->getGroup().compare(PARTS_GROUP) == 0) { // Update only Parts group
@@ -86,7 +86,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
   // Deleted object event ***********************
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED)) {
     const Model_FeatureDeletedMessage* aUpdMsg = dynamic_cast<const Model_FeatureDeletedMessage*>(theMessage);
-    boost::shared_ptr<ModelAPI_Document> aDoc = aUpdMsg->document();
+    DocumentPtr aDoc = aUpdMsg->document();
 
     if (aDoc == myDocument) {  // If root objects
       if (aUpdMsg->group().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
@@ -119,8 +119,8 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
   // Deleted object event ***********************
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED)) {
     //const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    //boost::shared_ptr<ModelAPI_Feature> aFeature = aUpdMsg->feature();
-    //boost::shared_ptr<ModelAPI_Document> aDoc = aFeature->document();
+    //FeaturePtr aFeature = aUpdMsg->feature();
+    //DocumentPtr aDoc = aFeature->document();
     
     // TODO: Identify the necessary index by the modified feature
     QModelIndex aIndex;
@@ -465,7 +465,7 @@ void XGUI_DocumentDataModel::deactivatePart()
   myActivePart = 0;
   myModel->setItemsColor(ACTIVE_COLOR);
 }
-
+ 
 Qt::ItemFlags XGUI_DocumentDataModel::flags(const QModelIndex& theIndex) const
 {
   Qt::ItemFlags aFlags = QAbstractItemModel::flags(theIndex);
@@ -473,4 +473,21 @@ Qt::ItemFlags XGUI_DocumentDataModel::flags(const QModelIndex& theIndex) const
     aFlags |= Qt::ItemIsEditable;
   }
   return aFlags;
+}
+
+QModelIndex XGUI_DocumentDataModel::partIndex(const FeaturePtr& theFeature) const 
+{
+  int aRow = -1;
+  XGUI_PartModel* aModel = 0;
+  foreach (XGUI_PartModel* aPartModel, myPartModels) {
+    aRow++;
+    if (aPartModel->part() == theFeature) {
+      aModel = aPartModel;
+      break;
+    }
+  }
+  if (aModel) {
+    return createIndex(aRow, 0, (void*)getModelIndex(aModel->index(0, 0, QModelIndex())));
+  }
+  return QModelIndex();
 }
