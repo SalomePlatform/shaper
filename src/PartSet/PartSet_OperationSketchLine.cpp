@@ -213,7 +213,7 @@ void PartSet_OperationSketchLine::startOperation()
 
 void PartSet_OperationSketchLine::abortOperation()
 {
-  emit featureConstructed(feature(), FM_Abort);
+  emit featureConstructed(feature(), FM_Hide);
   PartSet_OperationSketchBase::abortOperation();
 }
 

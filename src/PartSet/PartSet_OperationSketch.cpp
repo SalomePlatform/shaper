@@ -100,7 +100,7 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View)
 }
 
 std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
-                                                        PartSet_OperationSketch::preview() const
+                                                        PartSet_OperationSketch::subPreview() const
 {
   std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> > aPreviewMap;
 
@@ -120,6 +120,13 @@ std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
       aPreviewMap[aFeature] = aPreview;
   }
   return aPreviewMap;
+}
+
+void PartSet_OperationSketch::stopOperation()
+{
+  PartSet_OperationSketchBase::stopOperation();
+  emit featureConstructed(feature(), FM_Hide);
+  emit closeLocalContext();
 }
 
 void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
@@ -160,5 +167,7 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRY));
   aDirY->setValue(aC, anA, aB);
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+  emit featureConstructed(feature(), FM_Hide);
+  emit closeLocalContext();
   emit planeSelected(aDir->x(), aDir->y(), aDir->z());
 }
