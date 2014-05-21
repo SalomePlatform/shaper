@@ -40,7 +40,7 @@ boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview(
 }
 
 std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
-                                                     PartSet_OperationSketchBase::preview() const
+                                                     PartSet_OperationSketchBase::subPreview() const
 {
   return std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >();
 }

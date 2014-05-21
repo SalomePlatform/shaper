@@ -58,7 +58,12 @@ public:
   /// Returns the map of the operation previews including the nested feature previews
   /// \return the map of feature to the feature preview
   virtual std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
-                                                                           preview() const;
+                                                                           subPreview() const;
+
+  /// Virtual method called when operation stopped - committed or aborted.
+  /// Emits a signal to hide the preview of the operation
+  virtual void stopOperation();
+
 signals:
   /// signal about the sketch plane is selected
   /// \param theX the value in the X direction of the plane

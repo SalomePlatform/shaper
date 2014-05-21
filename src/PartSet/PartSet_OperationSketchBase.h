@@ -31,7 +31,7 @@ class PARTSET_EXPORT PartSet_OperationSketchBase : public ModuleBase_Operation
 {
   Q_OBJECT
 public:
-  enum FeatureActionMode { FM_Activation, FM_Deactivation, FM_Abort };
+  enum FeatureActionMode { FM_Activation, FM_Deactivation, FM_Hide };
 
 public:
   /// Constructor
@@ -47,7 +47,7 @@ public:
 
   /// Returns the map of the operation previews including the nested feature previews
   /// \return the map of feature to the feature preview
-  virtual std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> > preview() const;
+  virtual std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> > subPreview() const;
 
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
@@ -112,9 +112,8 @@ signals:
   /// \param theFeatures a list of features to be disabled
   void setSelection(const std::list<XGUI_ViewerPrs>& theFeatures);
 
-  /// signal to enable/disable usual selection in the viewer
-  /// \param theEnabled the boolean state
-  void selectionEnabled(bool theEnabled);
+  /// signal to close the operation local context if it is opened
+  void closeLocalContext();
 
 protected:
   /// Creates an operation new feature
