@@ -7,6 +7,7 @@
 #include <PartSet_OperationSketch.h>
 
 #include <ModuleBase_OperationDescription.h>
+#include <Model_Events.h>
 
 #include <XGUI_ViewerPrs.h>
 
@@ -171,17 +172,18 @@ void PartSet_OperationEditLine::moveLinePoint(boost::shared_ptr<ModelAPI_Feature
 
 void PartSet_OperationEditLine::sendFeatures()
 {
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_MOVED);
+
   std::list<boost::shared_ptr<ModelAPI_Feature> > aFeatures;
   std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
   for (; anIt != aLast; anIt++) {
     boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).feature();
     if (!aFeature || aFeature == feature())
       continue;
-  }
 
-  static Events_ID aModuleEvent = Events_Loop::eventByName("PartSetEditEvent");
-  Model_FeaturesMovedMessage aMessage;
-  aMessage.setFeatures(aFeatures);
-  Events_Loop::loop()->send(aMessage);
+    Model_FeatureUpdatedMessage aMessage(aFeature, anEvent);
+    Events_Loop::loop()->send(aMessage);
+  }
+  Events_Loop::loop()->flush(anEvent);
 }
 

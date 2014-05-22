@@ -61,7 +61,7 @@ SketchSolver_ConstraintManager::SketchSolver_ConstraintManager()
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURES_MOVED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_MOVED));
 }
 
 SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
@@ -118,7 +118,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       }
     }
   }
-  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURES_MOVED))
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_MOVED))
   {
     // Solve the set of constraints
     resolveConstraints();

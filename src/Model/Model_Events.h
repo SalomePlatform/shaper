@@ -22,7 +22,7 @@ static const char * EVENT_FEATURE_UPDATED = "FeatureUpdated";
 /// Event ID that data of feature is deleted (comes with Model_FeatureDeletedMessage)
 static const char * EVENT_FEATURE_DELETED = "FeatureDeleted";
 /// Event ID that data of feature is updated (comes with Model_FeaturesMovedMessage)
-static const char * EVENT_FEATURES_MOVED = "FeaturesMoved";
+static const char * EVENT_FEATURE_MOVED = "FeaturesMoved";
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class Model_FeatureUpdatedMessage : public Events_MessageGroup {
