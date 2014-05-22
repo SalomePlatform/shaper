@@ -4,6 +4,8 @@
 
 #include "Model_Object.h"
 #include <TCollection_AsciiString.hxx>
+#include "Model_Events.h"
+#include <Events_Loop.h>
 
 boost::shared_ptr<ModelAPI_Feature> Model_Object::featureRef()
 {
@@ -17,7 +19,12 @@ std::string Model_Object::getName()
 
 void Model_Object::setName(std::string theName)
 {
-  myName->Set(theName.c_str());
+  if (myName->Get() != theName.c_str()) {
+    myName->Set(theName.c_str());
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
+    Model_FeatureUpdatedMessage aMsg(boost::shared_ptr<ModelAPI_Object>(this), anEvent);
+    Events_Loop::loop()->send(aMsg, false);
+  }
 }
 
 Model_Object::Model_Object(boost::shared_ptr<ModelAPI_Feature> theRef,

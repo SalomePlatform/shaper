@@ -98,6 +98,7 @@ boost::shared_ptr<ModelAPI_Document> Model_PluginManager::copy(
 Model_PluginManager::Model_PluginManager()
 {
   myPluginsInfoLoaded = false;
+  myCheckTransactions = true;
   ModelAPI_PluginManager::SetPluginManager(boost::shared_ptr<ModelAPI_PluginManager>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
@@ -123,7 +124,7 @@ void Model_PluginManager::processEvent(const Events_Message* theMessage)
     // plugins information was started to load, so, it will be loaded
     myPluginsInfoLoaded = true;
   } else { // create/update/delete
-    if (!rootDocument()->isOperation())
+    if (myCheckTransactions && !rootDocument()->isOperation())
       Events_Error::send("Modification of data structure outside of the transaction");
   }
 }
