@@ -81,7 +81,8 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
     const Model_FeatureUpdatedMessage* anUpdateMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
     std::set< boost::shared_ptr<ModelAPI_Feature> > aFeatures = anUpdateMsg->features();
 
-    if (!(theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURES_MOVED)))
+    bool isModifiedEvt = theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURES_MOVED);
+    if (!isModifiedEvt)
     {
       std::set< boost::shared_ptr<ModelAPI_Feature> >::iterator aFeatIter;
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++)
@@ -111,7 +112,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
     }
 
     // Solve the set of constraints
-    resolveConstraints();
+    resolveConstraints(isModifiedEvt);
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED))
   {
@@ -277,14 +278,15 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
   return boost::shared_ptr<SketchPlugin_Feature>();
 }
 
-void SketchSolver_ConstraintManager::resolveConstraints()
+void SketchSolver_ConstraintManager::resolveConstraints(const bool needEvent)
 {
   std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
     (*aGroupIter)->resolveConstraints();
 
   // Features may be updated => send events
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  if (needEvent)
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
 }
 
 
