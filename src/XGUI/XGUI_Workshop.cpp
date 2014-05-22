@@ -92,10 +92,11 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
   myViewerProxy = new XGUI_ViewerProxy(this);
 
-  connect(myOperationMgr, SIGNAL(operationStarted()),  this, SLOT(onOperationStarted()));
-  connect(myOperationMgr, SIGNAL(operationResumed()),  this, SLOT(onOperationStarted()));
-  connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
-          this, SLOT(onOperationStopped(ModuleBase_Operation*)));
+  connect(myOperationMgr, SIGNAL(operationStarted()), SLOT(onOperationStarted()));
+  connect(myOperationMgr, SIGNAL(operationResumed()), SLOT(onOperationStarted()));
+  connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)), SLOT(onOperationStopped(ModuleBase_Operation*)));
+  connect(myOperationMgr, SIGNAL(operationStarted()), myActionsMgr, SLOT(update()));
+  connect(myOperationMgr, SIGNAL(operationStopped()), myActionsMgr, SLOT(update()));
   connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
 }
 
@@ -188,6 +189,12 @@ void XGUI_Workshop::initMenu()
   aCommand = aGroup->addFeature("EXIT_CMD", tr("Exit"), tr("Exit application"),
                                 QIcon(":pictures/close.png"), QKeySequence::Close);
   aCommand->connectTo(this, SLOT(onExit()));
+  //FIXME: SBH's test action. Can be used for some GUI tests.
+  //#ifdef _DEBUG
+  //  aCommand = aGroup->addFeature("TEST_CMD", "Test!", "Private debug button",
+  //                                QIcon(":pictures/close.png"));
+  //  aCommand->connectTo(myActionsMgr, SLOT(update()));
+  //#endif
 }
 
 //******************************************************
@@ -288,18 +295,9 @@ void XGUI_Workshop::onOperationStarted()
 //******************************************************
 void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-
   //!< No need for property panel
   updateCommandStatus();
   hidePropertyPanel();
-  if(myOperationMgr->operationsCount() > 1) {
-    myActionsMgr->updateAction(theOperation->getDescription()->operationId());
-    return;
-  }
-  if(!aOperation->getDescription()->xmlRepresentation().isEmpty()) { 
-    myActionsMgr->restoreCommandState();
-  }
 }
 
 /*
@@ -350,7 +348,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
                                                 QString::fromStdString(theMessage->tooltip()),
                                                 QIcon(theMessage->icon().c_str()),
                                                 QKeySequence(), isUsePropPanel);
-    aCommand->setUnblockableCommands(aNestedFeatures.split(" "));
+    aCommand->setNestedCommands(aNestedFeatures.split(" ", QString::SkipEmptyParts));
     myActionsMgr->addCommand(aCommand);
     myPartSetModule->featureCreated(aCommand);
   }
@@ -591,6 +589,7 @@ bool XGUI_Workshop::activateModule()
   if (!myPartSetModule)
     return false;
   myPartSetModule->createFeatures();
+  myActionsMgr->update();
   return true;
 }
 
@@ -632,6 +631,7 @@ void XGUI_Workshop::updateCommandStatus()
         aCmd->setEnabled(false);
     }
   }
+  myActionsMgr->update();
 }
 
 //******************************************************

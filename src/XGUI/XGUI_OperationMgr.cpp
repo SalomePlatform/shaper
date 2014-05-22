@@ -57,6 +57,15 @@ bool XGUI_OperationMgr::abortOperation()
   return true;
 }
 
+QStringList XGUI_OperationMgr::operationList()
+{
+  QStringList result;
+  foreach(ModuleBase_Operation* eachOperation, myOperations) {
+    result << eachOperation->id();
+  }
+  return result;
+}
+
 void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
 {
   theOperation->resume();
@@ -106,10 +115,10 @@ void XGUI_OperationMgr::onOperationStopped()
   if (!aSenderOperation || !anOperation || aSenderOperation != anOperation )
     return;
 
-  emit operationStopped(anOperation);
-
   myOperations.removeAll(anOperation);
   anOperation->deleteLater();
+
+  emit operationStopped(anOperation);
 
   // get last operation which can be resumed
   ModuleBase_Operation* aResultOp = 0;

@@ -29,9 +29,19 @@ ModuleBase_Operation::~ModuleBase_Operation()
 {
 }
 
+QString ModuleBase_Operation::id() const
+{
+  return getDescription()->operationId();
+}
+
 boost::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::feature() const
 {
   return myFeature;
+}
+
+bool ModuleBase_Operation::isNestedOperationsEnabled()
+{
+  return true;
 }
 
 void ModuleBase_Operation::storeReal(double theValue)

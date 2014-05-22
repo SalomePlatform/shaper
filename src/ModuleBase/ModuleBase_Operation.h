@@ -48,9 +48,13 @@ public:
   /// Destructor
   virtual ~ModuleBase_Operation();
 
+  // Returns operations Id from it's description
+  QString id() const;
   /// Returns the operation feature
   /// \return the feature
   boost::shared_ptr<ModelAPI_Feature> feature() const;
+
+  virtual bool isNestedOperationsEnabled();
 
   // Data model methods.
   /// Stores a real value in model.

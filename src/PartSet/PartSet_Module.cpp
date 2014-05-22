@@ -164,7 +164,7 @@ void PartSet_Module::onKeyRelease(QKeyEvent* theEvent)
 void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
 {
   myWorkshop->viewer()->setViewProjection(theX, theY, theZ);
-  myWorkshop->actionsMgr()->setNestedActionsEnabled(true);
+  myWorkshop->actionsMgr()->update();
 }
 
 void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature)
@@ -176,7 +176,7 @@ void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<Mo
     std::list<XGUI_ViewerPrs> aPresentations = myWorkshop->displayer()->GetViewerPrs();
     aPreviewOp->init(theFeature, aPresentations);
   }
-  myWorkshop->actionsMgr()->setActionChecked(anOperation->getDescription()->operationId(), true);
+  myWorkshop->actionsMgr()->updateCheckState();
   sendOperation(anOperation);
 }
 
