@@ -67,7 +67,8 @@ std::list<int> PartSet_OperationSketchLine::getSelectionModes(boost::shared_ptr<
 }
 
 void PartSet_OperationSketchLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                                       const std::list<XGUI_ViewerPrs>& /*thePresentations*/)
+                                       const std::list<XGUI_ViewerPrs>& /*theSelected*/,
+                                       const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
   if (!theFeature || theFeature->getKind() != "SketchLine")
     return;
@@ -82,7 +83,8 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::sketch() const
 }
 
 void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                                const std::list<XGUI_ViewerPrs>& theSelected)
+                                                const std::list<XGUI_ViewerPrs>& theSelected,
+                                                const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
   double aX, anY;
 
@@ -198,8 +200,16 @@ void PartSet_OperationSketchLine::keyReleased(const int theKey)
       emit launchOperation(PartSet_OperationSketchLine::Type(), boost::shared_ptr<ModelAPI_Feature>());
     }
     break;
+    case Qt::Key_Escape: {
+      if (myPointSelectionMode == SM_DonePoint)
+      {
+        commit();
+        emit featureConstructed(feature(), FM_Deactivation);
+      }
+      else
+        abort();
+    }
     default:
-      PartSet_OperationSketchBase::keyReleased(theKey); 
     break;
   }
 }

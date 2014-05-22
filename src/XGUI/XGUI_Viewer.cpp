@@ -506,9 +506,9 @@ void XGUI_Viewer::onMousePressed(XGUI_ViewWindow* theWindow, QMouseEvent* theEve
 */
 void XGUI_Viewer::onMouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
 {
+  myCurPnt.setX(theEvent->x()); myCurPnt.setY(theEvent->y());
   if (!mySelectionEnabled) return;
 
-  myCurPnt.setX(theEvent->x()); myCurPnt.setY(theEvent->y());
   Handle(V3d_View) aView3d = theWindow->viewPort()->getView();
   if ( !aView3d.IsNull() ) {
     myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView3d);

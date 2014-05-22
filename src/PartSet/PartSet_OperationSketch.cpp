@@ -57,19 +57,11 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketch::sketch() const
 }
 
 void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                           const std::list<XGUI_ViewerPrs>& theSelected)
+                                           const std::list<XGUI_ViewerPrs>& /*theSelected*/,
+                                           const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
-  myFeatures = theSelected;
-}
-
-void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                            const std::list<XGUI_ViewerPrs>& theSelected)
-{
-  if (theSelected.empty())
-    return;
-
   if (!myIsEditMode) {
-    XGUI_ViewerPrs aPrs = theSelected.front();
+    XGUI_ViewerPrs aPrs = theHighlighted.front();
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull()) {
       setSketchPlane(aShape);
@@ -77,13 +69,14 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
     }
   }
   else {
-    if (theSelected.size() == 1) {
-      boost::shared_ptr<ModelAPI_Feature> aFeature = theSelected.front().feature();
+    if (theHighlighted.size() == 1) {
+      boost::shared_ptr<ModelAPI_Feature> aFeature = theHighlighted.front().feature();
       if (aFeature)
         emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
     }
+    else
+      myFeatures = theHighlighted;
   }
-  myFeatures.clear();
 }
 
 void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)

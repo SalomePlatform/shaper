@@ -12,6 +12,7 @@
 #include <ModelAPI_Data.h>
 
 #include <AIS_InteractiveContext.hxx>
+#include <AIS_LocalContext.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 
@@ -52,7 +53,7 @@ void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
 }*/
 
 
-std::list<XGUI_ViewerPrs> XGUI_Displayer::GetViewerPrs()
+std::list<XGUI_ViewerPrs> XGUI_Displayer::GetSelected()
 {
   std::set<boost::shared_ptr<ModelAPI_Feature> > aPrsFeatures;
   std::list<XGUI_ViewerPrs> aPresentations;
@@ -62,15 +63,26 @@ std::list<XGUI_ViewerPrs> XGUI_Displayer::GetViewerPrs()
     Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
     TopoDS_Shape aShape = aContext->SelectedShape();
 
-    boost::shared_ptr<ModelAPI_Feature> aFeature;
-    FeatureToAISMap::const_iterator aFIt = myFeature2AISObjectMap.begin(),
-                                    aFLast = myFeature2AISObjectMap.end();
-    for (; aFIt != aFLast && !aFeature; aFIt++) {
-      Handle(AIS_InteractiveObject) anAIS = (*aFIt).second;
-      if (anAIS != anIO)
-        continue;
-      aFeature = (*aFIt).first;
-    }
+    boost::shared_ptr<ModelAPI_Feature> aFeature = GetFeature(anIO);
+    if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
+      continue;
+    aPresentations.push_back(XGUI_ViewerPrs(aFeature, aShape));
+    aPrsFeatures.insert(aFeature);
+  }
+  return aPresentations;
+}
+
+std::list<XGUI_ViewerPrs> XGUI_Displayer::GetHighlighted()
+{
+  std::set<boost::shared_ptr<ModelAPI_Feature> > aPrsFeatures;
+  std::list<XGUI_ViewerPrs> aPresentations;
+
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
+    Handle(AIS_InteractiveObject) anIO = aContext->DetectedInteractive();
+    TopoDS_Shape aShape = aContext->DetectedShape();
+
+    boost::shared_ptr<ModelAPI_Feature> aFeature = GetFeature(anIO);
     if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
       continue;
     aPresentations.push_back(XGUI_ViewerPrs(aFeature, aShape));
@@ -203,7 +215,12 @@ void XGUI_Displayer::SetSelected(const std::list<XGUI_ViewerPrs>& theFeatures, c
   boost::shared_ptr<ModelAPI_Feature> aFeature;
 
   Handle(AIS_Shape) anAIS;
-  aContext->ClearSelected();
+  // we need to unhighligth objects manually in the current local context
+  // in couple with the selection clear (TODO)
+  Handle(AIS_LocalContext) aLocalContext = aContext->LocalContext();
+  if (!aLocalContext.IsNull())
+    aLocalContext->UnhilightLastDetected(myWorkshop->viewer()->activeView());
+  aContext->ClearSelected(false);
 
   for (; anIt != aLast; anIt++) {
     aFeature = (*anIt).feature();
@@ -213,6 +230,7 @@ void XGUI_Displayer::SetSelected(const std::list<XGUI_ViewerPrs>& theFeatures, c
       continue;
     aContext->AddOrRemoveSelected(anAIS, false);
   }
+ 
   if (isUpdateViewer)
     aContext->UpdateCurrentViewer();
 }
@@ -267,10 +285,24 @@ void XGUI_Displayer::EraseDeletedFeatures(const bool isUpdateViewer)
 
 void XGUI_Displayer::CloseLocalContexts(const bool isUpdateViewer)
 {
-  closeAllContexts(true);
+  CloseAllContexts(true);
 }
 
-void XGUI_Displayer::closeAllContexts(const bool isUpdateViewer)
+boost::shared_ptr<ModelAPI_Feature> XGUI_Displayer::GetFeature(Handle(AIS_InteractiveObject) theIO)
+{
+  boost::shared_ptr<ModelAPI_Feature> aFeature;
+  FeatureToAISMap::const_iterator aFIt = myFeature2AISObjectMap.begin(),
+                                  aFLast = myFeature2AISObjectMap.end();
+  for (; aFIt != aFLast && !aFeature; aFIt++) {
+    Handle(AIS_InteractiveObject) anAIS = (*aFIt).second;
+    if (anAIS != theIO)
+      continue;
+    aFeature = (*aFIt).first;
+  }
+  return aFeature;
+}
+
+void XGUI_Displayer::CloseAllContexts(const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) ic = AISContext();
   if (!ic.IsNull()) {
