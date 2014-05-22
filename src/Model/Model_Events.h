@@ -38,9 +38,19 @@ public:
   std::set<boost::shared_ptr<ModelAPI_Feature> > features() const {return myFeatures;}
 
   //! Creates a new empty group (to store it in the loop before flush)
-  virtual Events_MessageGroup* newEmpty();
+  virtual Events_MessageGroup* newEmpty() {
+    boost::shared_ptr<ModelAPI_Feature> anEmptyFeature;
+    return new Model_FeatureUpdatedMessage(anEmptyFeature, eventID());
+  }
+
   //! Allows to join the given message with the current one
-  virtual void Join(Events_MessageGroup& theJoined);
+  virtual void Join(Events_MessageGroup& theJoined) {
+    Model_FeatureUpdatedMessage* aJoined = dynamic_cast<Model_FeatureUpdatedMessage*>(&theJoined);
+    std::set<boost::shared_ptr<ModelAPI_Feature> >::iterator aFIter = aJoined->myFeatures.begin();
+    for(; aFIter != aJoined->myFeatures.end(); aFIter++) {
+      myFeatures.insert(*aFIter);
+    }
+  }
 };
 
 /// Message that feature was deleted (used for Object Browser update)

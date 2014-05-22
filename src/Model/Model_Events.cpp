@@ -5,21 +5,6 @@
 #include <Model_Events.h>
 #include <Events_Loop.h>
 
-// UPDATED methods
-Events_MessageGroup* Model_FeatureUpdatedMessage::newEmpty() {
-  boost::shared_ptr<ModelAPI_Feature> anEmptyFeature;
-  return new Model_FeatureUpdatedMessage(anEmptyFeature, eventID());
-}
-
-void Model_FeatureUpdatedMessage::Join(Events_MessageGroup& theJoined)
-{
-  Model_FeatureUpdatedMessage* aJoined = dynamic_cast<Model_FeatureUpdatedMessage*>(&theJoined);
-  std::set<boost::shared_ptr<ModelAPI_Feature> >::iterator aFIter = aJoined->myFeatures.begin();
-  for(; aFIter != aJoined->myFeatures.end(); aFIter++) {
-    myFeatures.insert(*aFIter);
-  }
-}
-
 // DELETED methods
 Events_MessageGroup* Model_FeatureDeletedMessage::newEmpty() {
   return new Model_FeatureDeletedMessage(myDoc, "");
