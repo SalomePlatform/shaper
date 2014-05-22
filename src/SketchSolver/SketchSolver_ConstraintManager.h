@@ -84,9 +84,8 @@ protected:
   void updateEntity(boost::shared_ptr<SketchPlugin_Feature> theFeature);
 
   /** \brief Goes through the list of groups and solve the constraints
-   *  \param[in] needEvent shows that some features are probably updated and Update event should be thrown
    */
-  void resolveConstraints(const bool needEvent);
+  void resolveConstraints();
 
 private:
   class SketchSolver_ConstraintGroup;
