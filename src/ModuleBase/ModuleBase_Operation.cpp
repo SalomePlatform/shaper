@@ -15,6 +15,9 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
+#include <Model_Events.h>
+
+#include <Events_Loop.h>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -47,6 +50,7 @@ void ModuleBase_Operation::storeReal(double theValue)
   boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   boost::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(anId.toStdString());
   aReal->setValue(theValue);
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
 }
 
 void ModuleBase_Operation::storeCustomValue()
@@ -84,13 +88,26 @@ void ModuleBase_Operation::commitOperation()
   if (myFeature) myFeature->execute();
 }
 
-boost::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::createFeature()
+void ModuleBase_Operation::flushUpdated()
+{
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+}
+
+void ModuleBase_Operation::flushCreated()
+{
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+}
+
+boost::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::createFeature(const bool theFlushMessage)
 {
   boost::shared_ptr<ModelAPI_Document> aDoc = document();
   boost::shared_ptr<ModelAPI_Feature> aFeature = aDoc->addFeature(
                                            getDescription()->operationId().toStdString());
   if (aFeature) // TODO: generate an error if feature was not created
     aFeature->execute();
+
+  if (theFlushMessage)
+    flushCreated();
   return aFeature;
 }
 

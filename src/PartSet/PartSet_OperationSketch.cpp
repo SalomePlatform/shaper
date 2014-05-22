@@ -160,6 +160,9 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRY));
   aDirY->setValue(aC, anA, aB);
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+
+  flushUpdated();
+
   emit featureConstructed(feature(), FM_Hide);
   emit closeLocalContext();
   emit planeSelected(aDir->x(), aDir->y(), aDir->z());

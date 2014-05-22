@@ -12,6 +12,8 @@
 #include <GeomData_Point2D.h>
 #include <GeomData_Dir.h>
 #include <TDataStd_Name.hxx>
+#include "Model_Events.h"
+#include <Events_Loop.h>
 
 using namespace std;
 
@@ -35,6 +37,9 @@ string Model_Data::getName()
 void Model_Data::setName(string theName)
 {
   TDataStd_Name::Set(myLab, theName.c_str());
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
+  Model_FeatureUpdatedMessage aMsg(myFeature, anEvent);
+  Events_Loop::loop()->send(aMsg, false);
 }
 
 void Model_Data::addAttribute(string theID, string theAttrType)

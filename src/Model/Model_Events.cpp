@@ -5,11 +5,18 @@
 #include <Model_Events.h>
 #include <Events_Loop.h>
 
+// DELETED methods
+Events_MessageGroup* Model_FeatureDeletedMessage::newEmpty() {
+  return new Model_FeatureDeletedMessage(myDoc, "");
+}
+
 Model_FeatureDeletedMessage::Model_FeatureDeletedMessage(
   const boost::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theGroup)
-  : Events_Message(messageId(), 0), myDoc(theDoc), myGroup(theGroup)
+  : Events_MessageGroup(messageId(), 0), myDoc(theDoc)
 
 {
+  if (!theGroup.empty())
+    myGroups.insert(theGroup);
 }
 
 const Events_ID Model_FeatureDeletedMessage::messageId()
@@ -18,25 +25,11 @@ const Events_ID Model_FeatureDeletedMessage::messageId()
   return MY_ID;
 }
 
-Model_FeaturesMovedMessage::Model_FeaturesMovedMessage()
-: Events_Message(messageId(), 0)
+void Model_FeatureDeletedMessage::Join(Events_MessageGroup& theJoined)
 {
+  Model_FeatureDeletedMessage* aJoined = dynamic_cast<Model_FeatureDeletedMessage*>(&theJoined);
+  std::set<std::string>::iterator aGIter = aJoined->myGroups.begin();
+  for(; aGIter != aJoined->myGroups.end(); aGIter++) {
+    myGroups.insert(*aGIter);
+  }
 }
-
-const Events_ID Model_FeaturesMovedMessage::messageId()
-{
-  static Events_ID MY_ID = Events_Loop::eventByName(EVENT_FEATURES_MOVED);
-  return MY_ID;
-}
-
-void Model_FeaturesMovedMessage::setFeatures(
-                                const std::list<boost::shared_ptr<ModelAPI_Feature> >& theFeatures)
-{
-  myFeatures = theFeatures;  
-}
-
-const std::list<boost::shared_ptr<ModelAPI_Feature> >& Model_FeaturesMovedMessage::features() const
-{
-  return myFeatures;
-}
-

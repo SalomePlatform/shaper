@@ -54,9 +54,9 @@ std::list<int> PartSet_OperationSketchBase::getSelectionModes(boost::shared_ptr<
   aModes.push_back(TopAbs_EDGE);
   return aModes;
 }
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchBase::createFeature()
+boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchBase::createFeature(const bool theFlushMessage)
 {
-  boost::shared_ptr<ModelAPI_Feature> aFeature = ModuleBase_Operation::createFeature();
+  boost::shared_ptr<ModelAPI_Feature> aFeature = ModuleBase_Operation::createFeature(theFlushMessage);
   if (aFeature)
     emit featureConstructed(aFeature, FM_Activation);
   return aFeature;

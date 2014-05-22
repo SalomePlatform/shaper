@@ -114,8 +114,9 @@ protected:
 
   /// Creates an operation new feature
   /// Returns NULL feature. This is an operation of edition, not creation.
+  /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature();
+  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
 
 protected:
   /// Emits a signal about the selection blocking. Emits a signal to change the selection.

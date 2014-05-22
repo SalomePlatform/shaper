@@ -144,11 +144,15 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
     case SM_FirstPoint: {
       setLinePoint(feature(), aX, anY, LINE_ATTR_START);
       setLinePoint(feature(), aX, anY, LINE_ATTR_END);
+      flushUpdated();
+
       myPointSelectionMode = SM_SecondPoint;
     }
     break;
     case SM_SecondPoint: {
       setLinePoint(feature(), aX, anY, LINE_ATTR_END);
+      flushUpdated();
+
       myPointSelectionMode = SM_DonePoint;
     }
     break;
@@ -167,12 +171,14 @@ void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_V
       PartSet_Tools::ConvertTo2D(aPoint, sketch(), theView, aX, anY);
       setLinePoint(feature(), aX, anY, LINE_ATTR_START);
       setLinePoint(feature(), aX, anY, LINE_ATTR_END);
+      flushUpdated();
     }
     break;
     case SM_SecondPoint:
     {
       gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
       setLinePoint(aPoint, theView, LINE_ATTR_END);
+      flushUpdated();
     }
     break;
     case SM_DonePoint:
@@ -233,9 +239,9 @@ void PartSet_OperationSketchLine::stopOperation()
   emit multiSelectionEnabled(true);
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature()
+boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature(const bool theFlushMessage)
 {
-  boost::shared_ptr<ModelAPI_Feature> aNewFeature = ModuleBase_Operation::createFeature();
+  boost::shared_ptr<ModelAPI_Feature> aNewFeature = ModuleBase_Operation::createFeature(false);
   if (sketch()) {
     boost::shared_ptr<SketchPlugin_Feature> aFeature = 
                            boost::dynamic_pointer_cast<SketchPlugin_Feature>(sketch());
@@ -253,6 +259,8 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature()
   }
 
   emit featureConstructed(aNewFeature, FM_Activation);
+  if (theFlushMessage)
+    flushCreated();
   return aNewFeature;
 }
 

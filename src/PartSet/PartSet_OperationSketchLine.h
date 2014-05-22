@@ -89,8 +89,9 @@ protected:
   /// Creates an operation new feature
   /// In addition to the default realization it appends the created line feature to
   /// the sketch feature
+  /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature();
+  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
 
   /// Creates a constraint on two points
   /// \param thePoint1 the first point
