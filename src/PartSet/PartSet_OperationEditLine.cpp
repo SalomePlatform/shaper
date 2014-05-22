@@ -179,7 +179,7 @@ void PartSet_OperationEditLine::sendFeatures()
   std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
   for (; anIt != aLast; anIt++) {
     boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).feature();
-    if (!aFeature || aFeature == feature())
+    if (!aFeature)
       continue;
 
     Model_FeatureUpdatedMessage aMessage(aFeature, anEvent);

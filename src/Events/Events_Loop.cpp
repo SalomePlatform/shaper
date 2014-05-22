@@ -103,8 +103,8 @@ void Events_Loop::flush(const Events_ID& theID)
     myGroups.find(theID.eventText());
   if (aMyGroup != myGroups.end()) { // really sends
     Events_MessageGroup* aGroup = aMyGroup->second;
-    send(*aGroup, false);
     myGroups.erase(aMyGroup);
+    send(*aGroup, false);
     delete aGroup;
   }
 }

@@ -112,7 +112,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
     }
 
     // Solve the set of constraints
-    resolveConstraints(isModifiedEvt);
+    resolveConstraints();
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED))
   {
@@ -278,15 +278,14 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
   return boost::shared_ptr<SketchPlugin_Feature>();
 }
 
-void SketchSolver_ConstraintManager::resolveConstraints(const bool needEvent)
+void SketchSolver_ConstraintManager::resolveConstraints()
 {
   std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
     (*aGroupIter)->resolveConstraints();
 
   // Features may be updated => send events
-  if (needEvent)
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
 }
 
 
