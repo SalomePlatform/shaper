@@ -41,7 +41,8 @@ public:
   EVENTS_EXPORT static Events_ID eventByName(const char* theName);
 
   //! Allows to send an event
-  EVENTS_EXPORT void send(Events_Message& theMessage);
+  //! \param isGroup is true for grouping messages if possible
+  EVENTS_EXPORT void send(Events_Message& theMessage, bool isGroup = true);
 
   //! Registers (or adds if such listener is already registered) a listener 
   //! that will be called on the event and from the defined sender

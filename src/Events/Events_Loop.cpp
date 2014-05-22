@@ -33,19 +33,21 @@ Events_ID Events_Loop::eventByName(const char* theName)
   return Events_ID(aResult);
 }
 
-void Events_Loop::send(Events_Message& theMessage)
+void Events_Loop::send(Events_Message& theMessage, bool isGroup)
 {
   // if it is grouped message, just accumulate it
-  Events_MessageGroup* aGroup = dynamic_cast<Events_MessageGroup*>(&theMessage);
-  if (aGroup) {
-    std::map<char*, Events_MessageGroup*>::iterator aMyGroup = 
-      myGroups.find(aGroup->eventID().eventText());
-    if (aMyGroup == myGroups.end()) { // create a new group of messages for accumulation
-      myGroups[aGroup->eventID().eventText()] = aGroup->newEmpty();
-      aMyGroup = myGroups.find(aGroup->eventID().eventText());
+  if (isGroup) {
+    Events_MessageGroup* aGroup = dynamic_cast<Events_MessageGroup*>(&theMessage);
+    if (aGroup) {
+      std::map<char*, Events_MessageGroup*>::iterator aMyGroup = 
+        myGroups.find(aGroup->eventID().eventText());
+      if (aMyGroup == myGroups.end()) { // create a new group of messages for accumulation
+        myGroups[aGroup->eventID().eventText()] = aGroup->newEmpty();
+        aMyGroup = myGroups.find(aGroup->eventID().eventText());
+      }
+      aMyGroup->second->Join(*aGroup);
+      return;
     }
-    aMyGroup->second->Join(*aGroup);
-    return;
   }
 
   // TO DO: make it in thread and with usage of semaphores
@@ -101,7 +103,7 @@ void Events_Loop::flush(const Events_ID& theID)
     myGroups.find(theID.eventText());
   if (aMyGroup != myGroups.end()) { // really sends
     Events_MessageGroup* aGroup = aMyGroup->second;
-    send(*aGroup);
+    send(*aGroup, false);
     myGroups.erase(aMyGroup);
     delete aGroup;
   }

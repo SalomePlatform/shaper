@@ -8,6 +8,7 @@
 #include <Model_Data.h>
 #include <Model_Document.h>
 #include <Model_Application.h>
+#include <Model_Events.h>
 #include <Events_Loop.h>
 #include <Events_Error.h>
 #include <Config_FeatureMessage.h>
@@ -97,27 +98,34 @@ boost::shared_ptr<ModelAPI_Document> Model_PluginManager::copy(
 Model_PluginManager::Model_PluginManager()
 {
   myPluginsInfoLoaded = false;
-  //TODO(sbh): Implement static method to extract event id [SEID]
-  static Events_ID aFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
-
   ModelAPI_PluginManager::SetPluginManager(boost::shared_ptr<ModelAPI_PluginManager>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
-  aLoop->registerListener(this, aFeatureEvent);
+  static Events_ID FeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
+  aLoop->registerListener(this, FeatureEvent);
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
 }
 
 void Model_PluginManager::processEvent(const Events_Message* theMessage)
 {
-  const Config_FeatureMessage* aMsg =
-    dynamic_cast<const Config_FeatureMessage*>(theMessage);
-  if (aMsg) {
-    // proccess the plugin info, load plugin
-    if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
-      myPlugins[aMsg->id()] = aMsg->pluginLibrary();
+  static Events_ID FeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
+  if (theMessage->eventID() == FeatureEvent) {
+    const Config_FeatureMessage* aMsg =
+      dynamic_cast<const Config_FeatureMessage*>(theMessage);
+    if (aMsg) {
+      // proccess the plugin info, load plugin
+      if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
+        myPlugins[aMsg->id()] = aMsg->pluginLibrary();
+      }
     }
+    // plugins information was started to load, so, it will be loaded
+    myPluginsInfoLoaded = true;
+  } else { // create/update/delete
+    if (!rootDocument()->isOperation())
+      Events_Error::send("Modification of data structure outside of the transaction");
   }
-  // plugins information was started to load, so, it will be loaded
-  myPluginsInfoLoaded = true;
 }
 
 void Model_PluginManager::LoadPluginsInfo()
