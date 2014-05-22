@@ -36,6 +36,8 @@ boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview(
     if (anObj) 
       aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(anObj->featureRef());
   }
+  if (!aFeature)
+    return boost::shared_ptr<GeomAPI_Shape>();
   return aFeature->preview();
 }
 
