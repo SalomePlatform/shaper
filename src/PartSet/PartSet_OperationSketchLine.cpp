@@ -147,9 +147,7 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
     break;
     case SM_SecondPoint: {
       setLinePoint(feature(), aX, anY, LINE_ATTR_END);
-      commit();
-      emit featureConstructed(feature(), FM_Deactivation);
-      emit launchOperation(PartSet_OperationSketchLine::Type(), feature());
+      myPointSelectionMode = SM_DonePoint;
     }
     break;
     default:
@@ -161,12 +159,26 @@ void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_V
 {
   switch (myPointSelectionMode)
   {
+    case SM_FirstPoint: {
+      double aX, anY;
+      gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
+      PartSet_Tools::ConvertTo2D(aPoint, sketch(), theView, aX, anY);
+      setLinePoint(feature(), aX, anY, LINE_ATTR_START);
+      setLinePoint(feature(), aX, anY, LINE_ATTR_END);
+    }
+    break;
     case SM_SecondPoint:
     {
       gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
       setLinePoint(aPoint, theView, LINE_ATTR_END);
     }
     break;
+    case SM_DonePoint:
+    {
+      commit();
+      emit featureConstructed(feature(), FM_Deactivation);
+      emit launchOperation(PartSet_OperationSketchLine::Type(), feature());
+    }
     default:
       break;
   }
@@ -176,7 +188,13 @@ void PartSet_OperationSketchLine::keyReleased(const int theKey)
 {
   switch (theKey) {
     case Qt::Key_Return: {
-      abort();
+      if (myPointSelectionMode == SM_DonePoint)
+      {
+        commit();
+        emit featureConstructed(feature(), FM_Deactivation);
+      }
+      else
+        abort();
       emit launchOperation(PartSet_OperationSketchLine::Type(), boost::shared_ptr<ModelAPI_Feature>());
     }
     break;
@@ -195,7 +213,7 @@ void PartSet_OperationSketchLine::startOperation()
 
 void PartSet_OperationSketchLine::abortOperation()
 {
-  emit featureConstructed(feature(), FM_Abort);
+  emit featureConstructed(feature(), FM_Hide);
   PartSet_OperationSketchBase::abortOperation();
 }
 

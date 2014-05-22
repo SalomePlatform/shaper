@@ -47,6 +47,10 @@ public:
   /// Processes the configuration file reading
   MODEL_EXPORT virtual void processEvent(const Events_Message* theMessage);
 
+  /// Copies the document to the new one wit hthe given id
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> copy(
+    boost::shared_ptr<ModelAPI_Document> theSource, std::string theID);
+
   /// Is called only once, on startup of the application
   Model_PluginManager();
 

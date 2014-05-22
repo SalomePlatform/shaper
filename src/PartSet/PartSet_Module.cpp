@@ -164,15 +164,6 @@ void PartSet_Module::onKeyRelease(QKeyEvent* theEvent)
 void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
 {
   myWorkshop->viewer()->setViewProjection(theX, theY, theZ);
-
-  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
-  if (anOperation) {
-    PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-    if (aPreviewOp) {
-      visualizePreview(aPreviewOp->feature(), false);
-    }
-  }
-
   myWorkshop->actionsMgr()->setNestedActionsEnabled(true);
 }
 
@@ -216,11 +207,36 @@ void PartSet_Module::onSetSelection(const std::list<XGUI_ViewerPrs>& theFeatures
   aDisplayer->UpdateViewer();
 }
 
+void PartSet_Module::onCloseLocalContext()
+{
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  aDisplayer->CloseLocalContexts();
+}
+
 void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                           int theMode)
 {
-  bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Abort;
+  bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Hide;
   visualizePreview(theFeature, isDisplay, false);
+  if (!isDisplay) {
+    ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
+    boost::shared_ptr<ModelAPI_Feature> aSketch;
+    PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
+    if (aPrevOp) {
+      std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
+                                                                         aList = aPrevOp->subPreview();
+      XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+      std::list<int> aModes = aPrevOp->getSelectionModes(aPrevOp->feature());
+
+      std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >::const_iterator
+                                                             anIt = aList.begin(), aLast = aList.end();
+      for (; anIt != aLast; anIt++) {
+        boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).first;
+        visualizePreview(aFeature, false, false);
+      }
+      aDisplayer->UpdateViewer();
+    }
+  }
 
   if (theMode == PartSet_OperationSketchBase::FM_Activation ||
       theMode == PartSet_OperationSketchBase::FM_Deactivation)
@@ -279,6 +295,9 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
     connect(aPreviewOp, SIGNAL(setSelection(const std::list<XGUI_ViewerPrs>&)),
             this, SLOT(onSetSelection(const std::list<XGUI_ViewerPrs>&)));
 
+     connect(aPreviewOp, SIGNAL(closeLocalContext()),
+             this, SLOT(onCloseLocalContext()));
+
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {
       connect(aSketchOp, SIGNAL(planeSelected(double, double, double)),
@@ -316,7 +335,7 @@ void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFea
                           aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), false);
   }
   else
-    aDisplayer->Erase(anOperation->feature(), false);
+    aDisplayer->Erase(theFeature, false);
 
   if (isUpdateViewer)
     aDisplayer->UpdateViewer();
@@ -349,7 +368,7 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
     return;
 
   std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
-                                                                     aList = aPreviewOp->preview();
+                                                                     aList = aPreviewOp->subPreview();
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   std::list<int> aModes = aPreviewOp->getSelectionModes(aPreviewOp->feature());
 

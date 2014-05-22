@@ -36,6 +36,10 @@ public:
   //! Returns 0 if the given index is not index of a feature
   virtual FeaturePtr feature(const QModelIndex& theIndex) const;
 
+  //! Returns QModelIndex which corresponds to the given feature
+  //! If the feature is not found then index is not valid
+  virtual QModelIndex featureIndex(const FeaturePtr& theFeature) const;
+
   //! Returns parent index of the given feature
   virtual QModelIndex findParent(const FeaturePtr& theFeature) const;
 
@@ -85,6 +89,10 @@ public:
   //! Returns 0 if the given index is not index of a feature
   virtual FeaturePtr feature(const QModelIndex& theIndex) const;
 
+  //! Returns QModelIndex which corresponds to the given feature
+  //! If the feature is not found then index is not valid
+  virtual QModelIndex featureIndex(const FeaturePtr& theFeature) const;
+
   //! Returns true if the given document is a sub-document of this tree
   virtual bool hasDocument(const DocumentPtr& theDoc) const;
 
@@ -108,7 +116,7 @@ private:
     ConstructFolder,
     ConstructObject,
     BodiesFolder,
-    BodieswObject,
+    BodiesObject,
     HistoryObject
   };
 

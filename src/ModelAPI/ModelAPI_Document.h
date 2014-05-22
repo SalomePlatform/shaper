@@ -69,8 +69,12 @@ public:
   //! \param creates feature and puts it in the document
   MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
 
+  //! Removes the feature from the document
+  MODELAPI_EXPORT virtual void removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
+
   ///! Adds a new sub-document by the identifier, or returns existing one if it is already exist
-  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID) = 0;
+  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Document> 
+    subDocument(std::string theDocID) = 0;
 
   ///! Returns the id of hte document
   MODELAPI_EXPORT virtual const std::string& id() const = 0;
