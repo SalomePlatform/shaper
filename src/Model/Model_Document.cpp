@@ -179,7 +179,7 @@ void Model_Document::startOperation()
     myNestedStart = myTransactionsAfterSave;
   }
   // new command for this
-  myDoc->NewCommand();
+  myDoc->OpenCommand();
   // new command for all subs
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
