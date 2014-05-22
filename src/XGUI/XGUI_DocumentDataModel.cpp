@@ -90,8 +90,8 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
 
     if (aDoc == myDocument) {  // If root objects
       if (aUpdMsg->group().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
-        int aStart = myPartModels.size();
-        removeSubModel(myPartModels.size() - 1);
+        int aStart = myPartModels.size() - 1;
+        removeSubModel(aStart);
         removeRow(aStart, partFolderNode());
       } else { // Update top groups (other except parts
         QModelIndex aIndex = myModel->findGroup(aUpdMsg->group());

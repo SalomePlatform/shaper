@@ -98,7 +98,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
       } else {
         aActions.append(action("EDIT_CMD"));
       }
-       aActions.append(action("DELETE_CMD"));
+      aActions.append(action("DELETE_CMD"));
 
     // Process Root object (document)
     } else { // If feature is 0 the it means that selected root object (document)

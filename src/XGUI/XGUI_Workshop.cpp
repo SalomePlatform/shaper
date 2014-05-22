@@ -318,8 +318,8 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
   QString aWchName = QString::fromStdString(theMessage->workbenchId());
   QString aNestedFeatures = QString::fromStdString(theMessage->nestedFeatures());
   bool isUsePropPanel = theMessage->isUseInput();
+  QString aId = QString::fromStdString(theMessage->id());
   if (isSalomeMode()) {
-    QString aId = QString::fromStdString(theMessage->id());
     QAction* aAction = salomeConnector()->addFeature(aWchName,
                               aId,
                               QString::fromStdString(theMessage->text()),
@@ -343,7 +343,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
       aGroup = aPage->addGroup(aGroupName);
     }
     //Create feature...
-    XGUI_Command* aCommand = aGroup->addFeature(QString::fromStdString(theMessage->id()),
+    XGUI_Command* aCommand = aGroup->addFeature(aId,
                                                 QString::fromStdString(theMessage->text()),
                                                 QString::fromStdString(theMessage->tooltip()),
                                                 QIcon(theMessage->icon().c_str()),
@@ -763,9 +763,18 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
                                                           tr("Seleted features will be deleted. Continue?"), 
                                                           QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
   if (aRes == QMessageBox::Yes) {
+    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+    aMgr->rootDocument()->startOperation();
     foreach (FeaturePtr aFeature, theList) {
-      DocumentPtr aDoc = aFeature->data()->docRef("PartDocument")->value();
-      aDoc->removeFeature(aFeature);
+      if (aFeature->getKind() == "Part") {
+        DocumentPtr aDoc = aFeature->data()->docRef("PartDocument")->value();
+        if (aDoc == aMgr->currentDocument()) {
+          aDoc->close();
+        }
+      } //else
+        //aDoc = aFeature->document();
+      aMgr->rootDocument()->removeFeature(aFeature);
     }
+    aMgr->rootDocument()->finishOperation();
   }
 }
