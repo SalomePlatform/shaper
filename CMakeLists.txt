@@ -17,6 +17,7 @@ IF(UNIX)
         MESSAGE(STATUS "Setting -std=c++0x flag for the gcc...")
         MESSAGE(STATUS "Now gcc flags are: " ${CMAKE_CXX_FLAGS})
         
+	SET(CMAKE_SHARED_LINKER_FLAGS "${SMAKE_SHARED_LINKER_FLAGS} -Wl,-E")
     ENDIF(CMAKE_COMPILER_IS_GNUCC)
 ENDIF(UNIX)
 

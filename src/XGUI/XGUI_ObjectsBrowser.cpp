@@ -150,7 +150,7 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   onActivePartChanged(FeaturePtr());
 
   // Create internal actions
-  QAction* aAction = new QAction(tr("Rename"), this);
+  QAction* aAction = new QAction(QIcon(":pictures/rename_edit.png"), tr("Rename"), this);
   aAction->setData("RENAME_CMD");
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onEditItem()));
   addAction(aAction);

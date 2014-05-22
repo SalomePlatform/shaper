@@ -98,9 +98,15 @@ public:
   //! Returns icon name according to feature Id
   static QString featureIcon(const std::string& theId);
 
+  //! Activates or deactivates a part
+  //! If PartPtr is Null pointer then PartSet will be activated
+  void activatePart(FeaturePtr theFeature);
+
+  void deleteFeatures(QFeatureList theList);
 
 signals:
   void salomeViewerSelection();
+  void errorOccurred(const QString&);
 
 public slots:
   void updateCommandStatus();
@@ -120,14 +126,6 @@ public slots:
 
   void onFeatureTriggered();
   void changeCurrentDocument(FeaturePtr thePart);
-
-signals:
-  void errorOccurred(const QString&);
-
-public slots:
-  //! Activates or deactivates a part
-  //! If PartPtr is Null pointer then PartSet will be activated
-  void activatePart(FeaturePtr theFeature);
 
   void activateLastPart();
 
@@ -160,7 +158,6 @@ private:
   // Creates Dock widgets: Object browser and Property panel
   void createDockWidgets();
 
-  QString myCurrentFile;
   XGUI_MainWindow* myMainWindow;
   XGUI_Module* myPartSetModule;
   XGUI_ObjectsBrowser* myObjectBrowser;
@@ -174,6 +171,7 @@ private:
   XGUI_ViewerProxy* myViewerProxy;
   XGUI_ContextMenuMgr* myContextMenuMgr;
 
+  QString myCurrentDir;
   static QMap<QString, QString> myIcons;
 
 };

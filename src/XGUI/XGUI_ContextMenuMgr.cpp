@@ -31,6 +31,9 @@ void XGUI_ContextMenuMgr::createActions()
 
   aAction = new QAction(QIcon(":pictures/assembly.png"), tr("Deactivate"), this);
   addAction("DEACTIVATE_PART_CMD", aAction);
+
+  aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
+  addAction("DELETE_CMD", aAction);
 }
 
 void XGUI_ContextMenuMgr::addAction(const QString& theId, QAction* theAction)
@@ -95,6 +98,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
       } else {
         aActions.append(action("EDIT_CMD"));
       }
+      aActions.append(action("DELETE_CMD"));
 
     // Process Root object (document)
     } else { // If feature is 0 the it means that selected root object (document)

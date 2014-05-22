@@ -10,6 +10,8 @@
 // Need to be defined before including SolveSpace to avoid additional dependances on Windows platform
 #if defined(WIN32) && !defined(HAVE_C99_INTEGER_TYPES)
 typedef unsigned int UINT32;
+#else
+#include <stdint.h>
 #endif
 #include <string.h>
 #include <slvs.h>
