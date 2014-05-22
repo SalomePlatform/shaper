@@ -54,5 +54,6 @@
      <file>pictures/edit.png</file>
      <file>pictures/assembly.png</file>
      <file>pictures/activate.png</file>
+     <file>pictures/delete.png</file>
  </qresource>
  </RCC>

@@ -119,6 +119,7 @@ void XGUI_Workshop::startApplication()
   Events_ID aFeatureUpdatedId = aLoop->eventByName(EVENT_FEATURE_UPDATED);
   aLoop->registerListener(this, aFeatureUpdatedId);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
 
   activateModule();
   if (myMainWindow) {
@@ -211,10 +212,17 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
     FeaturePtr aFeature = aUpdMsg->feature();
     if (aFeature->getKind() == "Part") {
-      //The created part will be created in Object Browser later and we have to activate that
-      // only when it created everywere
+      //The created part will be created in Object Browser later and we have to activate it
+      // only when it is created everywere
       QTimer::singleShot(50, this, SLOT(activateLastPart()));
     }
+  }
+
+  // Process deletion of a part
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED)) {
+    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+    if (aMgr->currentDocument() == aMgr->rootDocument())
+      activatePart(FeaturePtr()); // Activate PartSet
   }
 
   //Update property panel on corresponding message. If there is no current operation (no
@@ -727,7 +735,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     activatePart(aFeatures.first());
   else if (theId == "DEACTIVATE_PART_CMD") 
     activatePart(FeaturePtr());
-
+  else if (theId == "DELETE_CMD")
+    deleteFeatures(aFeatures);
 }
 
 //**************************************************************
@@ -744,4 +753,19 @@ void XGUI_Workshop::activateLastPart()
   DocumentPtr aDoc = aMgr->rootDocument();
   FeaturePtr aLastPart = aDoc->feature(PARTS_GROUP, aDoc->size(PARTS_GROUP) - 1, true);
   activatePart(aLastPart);
+}
+
+//**************************************************************
+void XGUI_Workshop::deleteFeatures(QFeatureList theList)
+{
+  QMainWindow* aDesktop = isSalomeMode()? salomeConnector()->desktop() : myMainWindow;
+  QMessageBox::StandardButton aRes = QMessageBox::warning(aDesktop, tr("Delete features"), 
+                                                          tr("Seleted features will be deleted. Continue?"), 
+                                                          QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
+  if (aRes == QMessageBox::Yes) {
+    foreach (FeaturePtr aFeature, theList) {
+      DocumentPtr aDoc = aFeature->data()->docRef("PartDocument")->value();
+      aDoc->removeFeature(aFeature);
+    }
+  }
 }
