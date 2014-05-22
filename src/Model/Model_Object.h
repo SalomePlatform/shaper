@@ -36,6 +36,17 @@ public:
   /// Returns to which group in the document must be added feature
   MODEL_EXPORT virtual const std::string& getGroup() {return myRef->getGroup();}
 
+  /// Returns document this feature belongs to
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> document()
+  {return myRef->document();}
+
+  /// Returns true if feature refers to the same model data instance
+  MODEL_EXPORT virtual bool isSame(const boost::shared_ptr<ModelAPI_Feature>& theFeature)
+  {
+    boost::shared_ptr<Model_Object> anObj = boost::dynamic_pointer_cast<Model_Object>(theFeature);
+    return anObj && myRef == anObj->myRef;
+  }
+
   /// It is just a reference: don't init attributes
   MODEL_EXPORT virtual void initAttributes() {}
 
@@ -47,7 +58,7 @@ private:
   /// Constructor fully defines this object
   Model_Object(boost::shared_ptr<ModelAPI_Feature> theRef, Handle_TDataStd_Name theName);
 
-  friend class Model_Document;
+  friend class Model_Document;  
 };
 
 #endif
