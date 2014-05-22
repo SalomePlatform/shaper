@@ -13,9 +13,6 @@
 
 using namespace std;
 
-/// the active sketch
-boost::shared_ptr<SketchPlugin_Sketch> MY_ACITVE_SKETCH;
-
 // face of the square-face displayed for selection of general plane
 const double PLANE_SIZE = 200;
 

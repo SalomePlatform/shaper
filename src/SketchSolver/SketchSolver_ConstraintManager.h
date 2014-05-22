@@ -26,7 +26,7 @@
 
 /** \class   SketchSolver_ConstraintManager
  *  \ingroup DataModel
- *  \brief   Listens the changes of SketchPlugin features and transforms the Constraint 
+ *  \brief   Listens the changes of SketchPlugin features and transforms the Constraint
  *           feature into the format understandable by SolveSpace library.
  *
  *  Constraints created for SolveSpace library are divided into the groups.
@@ -66,11 +66,12 @@ protected:
 
   /** \brief Adds or updates a workplane in the manager
    *  \param[in] theSketch the feature to create or update workplane
-   *  \return \c true if the workplane cahnged successfully
+   *  \return \c true if the workplane changed successfully
+   *  \remark Type of theSketch is not verified inside
    */
-  bool changeWorkplane(boost::shared_ptr<SketchPlugin_Sketch> theSketch);
+  bool changeWorkplane(boost::shared_ptr<SketchPlugin_Feature> theSketch);
 
-  /** \brief Removes a workplane from the manager. 
+  /** \brief Removes a workplane from the manager.
    *         All groups based on such workplane will be removed too.
    *  \param[in] theSketch the feature to be removed
    *  \return \c true if the workplane removed successfully
@@ -93,14 +94,14 @@ private:
    *  \param[in]  theConstraint constraint to be found
    *  \param[out] theGroups     list of group indexes interacted with constraint
    */
-  void findGroups(boost::shared_ptr<SketchPlugin_Constraint> theConstraint, 
+  void findGroups(boost::shared_ptr<SketchPlugin_Constraint> theConstraint,
                   std::vector<Slvs_hGroup>&                  theGroupIDs) const;
 
   /** \brief Searches in the list of groups the workplane which constains specified constraint
    *  \param[in] theConstraint constraint to be found
-   *  \return workplane contains the constraint
+   *  \return workplane containing the constraint
    */
-  boost::shared_ptr<SketchPlugin_Sketch> findWorkplaneForConstraint(
+  boost::shared_ptr<SketchPlugin_Feature> findWorkplaneForConstraint(
                   boost::shared_ptr<SketchPlugin_Constraint> theConstraint) const;
 
 private:
@@ -116,9 +117,11 @@ private:
 class SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup
 {
 public:
-  /** \brief New group based on specified workplane
+  /** \brief New group based on specified workplane.
+   *         Throws an exception if theWorkplane is not an object of SketchPlugin_Sketch type
+   *  \remark Type of theSketch is not verified inside
    */
-  SketchSolver_ConstraintGroup(boost::shared_ptr<SketchPlugin_Sketch> theWorkplane);
+  SketchSolver_ConstraintGroup(boost::shared_ptr<SketchPlugin_Feature> theWorkplane);
 
   ~SketchSolver_ConstraintGroup();
 
@@ -138,13 +141,13 @@ public:
    */
   bool isInteract(boost::shared_ptr<SketchPlugin_Constraint> theConstraint) const;
 
-  /** \brief Verifies the specified workplane is the same as a base workplane for this group
-   *  \param[in] theWorkplane workplane to be compared
+  /** \brief Verifies the specified feature is equal to the base workplane for this group
+   *  \param[in] theWorkplane the feature to be compared with base workplane
    *  \return \c true if workplanes are the same
    */
-  bool isBaseWorkplane(boost::shared_ptr<SketchPlugin_Sketch> theWorkplane) const;
+  bool isBaseWorkplane(boost::shared_ptr<SketchPlugin_Feature> theWorkplane) const;
 
-  boost::shared_ptr<SketchPlugin_Sketch> getWorkplane() const
+  boost::shared_ptr<SketchPlugin_Feature> getWorkplane() const
   { return mySketch; }
 
   /** \brief Update parameters of workplane. Should be called when Update event is coming.
@@ -179,10 +182,10 @@ protected:
 
   /** \brief Adds or updates a normal in the group
    *
-   *  Normal is a special entity in SolveSpace, which defines a direction in 3D and 
+   *  Normal is a special entity in SolveSpace, which defines a direction in 3D and
    *  a rotation about this direction. So, SolveSpace represents normals as unit quaternions.
    *
-   *  To define a normal there should be specified two coordinate axis 
+   *  To define a normal there should be specified two coordinate axis
    *  on the plane transversed to created normal.
    *
    *  \param[in] theDirX first coordinate axis of the plane
@@ -190,17 +193,17 @@ protected:
    *  \param[in] theNorm attribute for the normal (used to identify newly created entity)
    *  \return identifier of created or updated normal
    */
-  Slvs_hEntity changeNormal(boost::shared_ptr<ModelAPI_Attribute> theDirX, 
-                            boost::shared_ptr<ModelAPI_Attribute> theDirY, 
+  Slvs_hEntity changeNormal(boost::shared_ptr<ModelAPI_Attribute> theDirX,
+                            boost::shared_ptr<ModelAPI_Attribute> theDirY,
                             boost::shared_ptr<ModelAPI_Attribute> theNorm);
 
   /** \brief Adds or updates a parameter in the group
    *  \param[in] theParam   the value of parameter
-   *  \param[in] thePrmIter the cell in the list of parameters which should be changed 
+   *  \param[in] thePrmIter the cell in the list of parameters which should be changed
    *                        (the iterator will be increased if it does not reach the end of the list)
    *  \return identifier of changed parameter; when the parameter cannot be created, returned ID is 0
    */
-  Slvs_hParam changeParameter(const double& theParam, 
+  Slvs_hParam changeParameter(const double& theParam,
                               std::vector<Slvs_Param>::const_iterator& thePrmIter);
 
   /** \brief Compute constraint type according to SolveSpace identifiers
@@ -230,7 +233,7 @@ private:
    *  \param[in] theSketch parameters of workplane are the attributes of this sketch
    *  \return \c true if success, \c false if workplane parameters are not consistent
    */
-  bool addWorkplane(boost::shared_ptr<SketchPlugin_Sketch> theSketch);
+  bool addWorkplane(boost::shared_ptr<SketchPlugin_Feature> theSketch);
 
 private:
   // SolveSpace entities
@@ -247,12 +250,12 @@ private:
   SketchSolver_Solver          myConstrSolver;  ///< Solver for set of equations obtained by constraints
 
   // SketchPlugin entities
-  boost::shared_ptr<SketchPlugin_Sketch> mySketch; ///< Equivalent to workplane
-  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint> 
-                                myConstraintMap;   ///< The map between SketchPlugin and SolveSpace constraints
-  std::list<Slvs_hConstraint> myTempConstraints;   ///< The list of identifiers of temporary constraints
+  boost::shared_ptr<SketchPlugin_Feature> mySketch; ///< Equivalent to workplane
+  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>
+                                myConstraintMap;    ///< The map between SketchPlugin and SolveSpace constraints
+  std::list<Slvs_hConstraint> myTempConstraints;    ///< The list of identifiers of temporary constraints
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>
-                                myEntityMap;       ///< The map between parameters of constraints and their equivalent SolveSpace entities
+                                myEntityMap;        ///< The map between parameters of constraints and their equivalent SolveSpace entities
 };
 
 #endif
