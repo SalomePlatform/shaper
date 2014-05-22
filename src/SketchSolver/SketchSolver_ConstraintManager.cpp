@@ -97,9 +97,6 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       if (aFeature)
         updateEntity(aFeature);
     }
-
-    // Solve the set of constraints
-    resolveConstraints();
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED))
   {
@@ -120,6 +117,11 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
         else aGroupIter++;
       }
     }
+  }
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURES_MOVED))
+  {
+    // Solve the set of constraints
+    resolveConstraints();
   }
 }
 
