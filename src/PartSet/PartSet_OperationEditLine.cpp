@@ -102,6 +102,7 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
       moveLinePoint(aFeature, aDeltaX, aDeltaY, LINE_ATTR_END);
     }
   }
+  flushUpdated();
   sendFeatures();
 
   myCurPoint.setPoint(aPoint);

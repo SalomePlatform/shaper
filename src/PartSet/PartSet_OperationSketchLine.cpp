@@ -10,9 +10,6 @@
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
 
-#include <Events_Loop.h>
-#include <Model_Events.h>
-
 #include <GeomDataAPI_Point2D.h>
 
 #include <ModuleBase_OperationDescription.h>
@@ -145,14 +142,14 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
     case SM_FirstPoint: {
       setLinePoint(feature(), aX, anY, LINE_ATTR_START);
       setLinePoint(feature(), aX, anY, LINE_ATTR_END);
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+      flushUpdated();
 
       myPointSelectionMode = SM_SecondPoint;
     }
     break;
     case SM_SecondPoint: {
       setLinePoint(feature(), aX, anY, LINE_ATTR_END);
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+      flushUpdated();
 
       myPointSelectionMode = SM_DonePoint;
     }
@@ -172,14 +169,14 @@ void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_V
       PartSet_Tools::ConvertTo2D(aPoint, sketch(), theView, aX, anY);
       setLinePoint(feature(), aX, anY, LINE_ATTR_START);
       setLinePoint(feature(), aX, anY, LINE_ATTR_END);
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+      flushUpdated();
     }
     break;
     case SM_SecondPoint:
     {
       gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
       setLinePoint(aPoint, theView, LINE_ATTR_END);
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+      flushUpdated();
     }
     break;
     case SM_DonePoint:
@@ -253,7 +250,7 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature(c
 
   emit featureConstructed(aNewFeature, FM_Activation);
   if (theFlushMessage)
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+    flushCreated();
   return aNewFeature;
 }
 

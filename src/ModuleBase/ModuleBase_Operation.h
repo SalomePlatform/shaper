@@ -70,6 +70,11 @@ protected:
   /// Virtual method called when operation committed (see commit() method for more description)
   virtual void commitOperation();
 
+  /// Send update message by loop
+  void flushUpdated();
+  /// Send created message by loop
+  void flushCreated();
+
   /// Creates an operation new feature
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature

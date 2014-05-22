@@ -87,6 +87,16 @@ void ModuleBase_Operation::commitOperation()
   if (myFeature) myFeature->execute();
 }
 
+void ModuleBase_Operation::flushUpdated()
+{
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+}
+
+void ModuleBase_Operation::flushCreated()
+{
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+}
+
 boost::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::createFeature(const bool theFlushMessage)
 {
   boost::shared_ptr<ModelAPI_Document> aDoc = document();
@@ -96,7 +106,7 @@ boost::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::createFeature(const bo
     aFeature->execute();
 
   if (theFlushMessage)
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+    flushCreated();
   return aFeature;
 }
 
