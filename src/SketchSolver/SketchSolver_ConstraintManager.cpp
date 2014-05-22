@@ -22,8 +22,6 @@
 #include <math.h>
 #include <assert.h>
 
-#include <set>
-
 /// Tolerance for value of parameters
 const double tolerance = 1.e-10;
 
@@ -160,7 +158,7 @@ bool SketchSolver_ConstraintManager::changeConstraint(
               boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
 {
   // Search the groups which this constraint touchs
-  std::vector<Slvs_hGroup> aGroups;
+  std::set<Slvs_hGroup> aGroups;
   findGroups(theConstraint, aGroups);
 
   // Process the groups list
@@ -187,7 +185,39 @@ bool SketchSolver_ConstraintManager::changeConstraint(
   }
   else if (aGroups.size() > 1)
   { // Several groups applicable for this constraint => need to merge them
-    /// \todo Implement merging of groups
+    std::set<Slvs_hGroup>::const_iterator aGroupsIter = aGroups.begin();
+
+    // Search first group
+    std::vector<SketchSolver_ConstraintGroup*>::iterator aFirstGroupIter;
+    for (aFirstGroupIter = myGroups.begin(); aFirstGroupIter != myGroups.end(); aFirstGroupIter++)
+      if ((*aFirstGroupIter)->getId() == *aGroupsIter)
+        break;
+    if (aFirstGroupIter == myGroups.end())
+      return false;
+
+    // Append other groups to the first one
+    std::vector<SketchSolver_ConstraintGroup*>::iterator anOtherGroupIter = aFirstGroupIter + 1;
+    for (aGroupsIter++; aGroupsIter != aGroups.end(); aGroupsIter++)
+    {
+      for ( ; anOtherGroupIter != myGroups.end(); anOtherGroupIter++)
+        if ((*anOtherGroupIter)->getId() == *aGroupsIter)
+          break;
+      if (anOtherGroupIter == myGroups.end())
+      { // Group disappears
+        anOtherGroupIter = aFirstGroupIter + 1;
+        continue;
+      }
+
+      (*aFirstGroupIter)->mergeGroups(**anOtherGroupIter);
+      int aShiftFirst = aFirstGroupIter - myGroups.begin();
+      int aShiftOther = anOtherGroupIter - myGroups.begin();
+      delete *anOtherGroupIter;
+      myGroups.erase(anOtherGroupIter);
+      aFirstGroupIter  = myGroups.begin() + aShiftFirst;
+      anOtherGroupIter = myGroups.begin() + aShiftOther;
+    }
+
+    return (*aFirstGroupIter)->changeConstraint(theConstraint);
   }
 
   // Something goes wrong
@@ -227,14 +257,14 @@ void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin
 
 void SketchSolver_ConstraintManager::findGroups(
               boost::shared_ptr<SketchPlugin_Constraint> theConstraint,
-              std::vector<Slvs_hGroup>&                  theGroupIDs) const
+              std::set<Slvs_hGroup>&                     theGroupIDs) const
 {
   boost::shared_ptr<SketchPlugin_Feature> aWP = findWorkplaneForConstraint(theConstraint);
 
   std::vector<SketchSolver_ConstraintGroup*>::const_iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
     if (aWP == (*aGroupIter)->getWorkplane() && (*aGroupIter)->isInteract(theConstraint))
-      theGroupIDs.push_back((*aGroupIter)->getId());
+      theGroupIDs.insert((*aGroupIter)->getId());
 }
 
 boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWorkplaneForConstraint(
@@ -646,6 +676,88 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::resolveConstr
 
   removeTemporaryConstraints();
   myNeedToSolve = false;
+}
+
+void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::mergeGroups(
+                const SketchSolver_ConstraintGroup& theGroup)
+{
+  // NOTE: The possibility, that some elements are placed into both groups, is around 0, 
+  // so the objects should be copied with changing the indexes
+
+  // Maps between old and new indexes of SolveSpace elements:
+  std::map<Slvs_hParam, Slvs_hParam>           aParamMap;
+  std::map<Slvs_hEntity, Slvs_hEntity>         anEntityMap;
+  std::map<Slvs_hConstraint, Slvs_hConstraint> aConstrMap;
+
+  // Go through copying constraints
+  std::vector<Slvs_Constraint>::const_iterator aConstrIter = theGroup.myConstraints.begin();
+  for ( ; aConstrIter != theGroup.myConstraints.end(); aConstrIter++)
+  {
+    Slvs_Constraint aConstraintCopy = *aConstrIter;
+    // Go through constraint entities
+    Slvs_hEntity* anEntities[CONSTRAINT_ATTR_SIZE] = {
+      &(aConstraintCopy.ptA), &(aConstraintCopy.ptB), 
+      &(aConstraintCopy.entityA), &(aConstraintCopy.entityB)
+    };
+    for (int indEnt = 0; indEnt < CONSTRAINT_ATTR_SIZE; indEnt++)
+    {
+      if (*(anEntities[indEnt]) == 0)
+        continue;
+      if (anEntityMap.find(*(anEntities[indEnt])) != anEntityMap.end())
+      { // entity is already copied
+        *(anEntities[indEnt]) = anEntityMap[*(anEntities[indEnt])];
+        continue;
+      }
+
+      // Copy entity
+      Slvs_Entity anEntityCopy = theGroup.myEntities[Search(*(anEntities[indEnt]), theGroup.myEntities)];
+      // Go through entity parameters
+      const int aNbEntParams = 4; // maximal number of entity parameters
+      for (int indPrm = 0; indPrm < aNbEntParams; indPrm++)
+      {
+        if (anEntityCopy.param[indPrm] == 0)
+          continue;
+        if (aParamMap.find(anEntityCopy.param[indPrm]) != aParamMap.end())
+        {
+          anEntityCopy.param[indPrm] = aParamMap[anEntityCopy.param[indPrm]];
+          continue;
+        }
+
+        Slvs_Param aParamCopy = theGroup.myParams[Search(anEntityCopy.param[indPrm], theGroup.myParams)];
+        aParamMap[aParamCopy.h] = ++myParamMaxID;
+        aParamCopy.h = myParamMaxID;
+        myParams.push_back(aParamCopy);
+      }
+
+      anEntityMap[anEntityCopy.h] = ++myEntityMaxID;
+      anEntityCopy.h = myEntityMaxID;
+      myEntities.push_back(anEntityCopy);
+      *(anEntities[indEnt]) = anEntityCopy.h;
+    }
+
+    aConstraintCopy.h = ++myConstrMaxID;
+    myConstraints.push_back(aConstraintCopy);
+    aConstrMap[aConstrIter->h] = aConstraintCopy.h;
+  }
+
+  // Append maps of SketchPlugin to SolveSpace parameters
+  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::const_iterator
+    aSPConstrMapIter = theGroup.myConstraintMap.begin();
+  for ( ; aSPConstrMapIter!= theGroup.myConstraintMap.end(); aSPConstrMapIter++)
+    myConstraintMap[aSPConstrMapIter->first] = aConstrMap.find(aSPConstrMapIter->second)->second;
+
+  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator
+    aSPEntMapIter = theGroup.myEntityMap.begin();
+  for ( ; aSPEntMapIter != theGroup.myEntityMap.end(); aSPEntMapIter++)
+    myEntityMap[aSPEntMapIter->first] = anEntityMap.find(aSPEntMapIter->second)->second;
+
+  // Add temporary constraints
+  std::list<Slvs_hConstraint>::const_iterator aTempConstrIter = theGroup.myTempConstraints.begin();
+  for ( ; aTempConstrIter != theGroup.myTempConstraints.end(); aTempConstrIter++)
+    myTempConstraints.push_back(aConstrMap.find(*aTempConstrIter)->second);
+  myTempConstraints.sort();
+
+  myNeedToSolve = myNeedToSolve || theGroup.myNeedToSolve;
 }
 
 bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateGroup()
