@@ -12,6 +12,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Data.h>
 #include <Model_Events.h>
+
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_Line.h>
@@ -20,6 +21,8 @@
 
 #include <math.h>
 #include <assert.h>
+
+#include <set>
 
 /// Tolerance for value of parameters
 const double tolerance = 1.e-10;
@@ -237,10 +240,16 @@ void SketchSolver_ConstraintManager::findGroups(
 boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWorkplaneForConstraint(
               boost::shared_ptr<SketchPlugin_Constraint> theConstraint) const
 {
+  // Already verified workplanes
+  std::set< boost::shared_ptr<SketchPlugin_Feature> > aVerified;
+
   std::vector<SketchSolver_ConstraintGroup*>::const_iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
   {
     boost::shared_ptr<SketchPlugin_Feature> aWP = (*aGroupIter)->getWorkplane();
+    if (aVerified.find(aWP) != aVerified.end())
+      continue;
+
     boost::shared_ptr<ModelAPI_AttributeRefList> aWPFeatures =
       boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aWP->data()->attribute(SKETCH_ATTR_FEATURES));
     std::list< boost::shared_ptr<ModelAPI_Feature> > aFeaturesList = aWPFeatures->list();
@@ -248,6 +257,7 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
     for (anIter = aFeaturesList.begin(); anIter != aFeaturesList.end(); anIter++)
       if (*anIter == theConstraint)
         return aWP; // workplane is found
+    aVerified.insert(aWP);
   }
 
   return boost::shared_ptr<SketchPlugin_Feature>();
@@ -310,7 +320,19 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::isInteract(
   if (myWorkplane.h != SLVS_E_UNKNOWN && myConstraints.empty())
     return true;
 
-  /// \todo Should be implemented
+  // Go through constraint entities and verify if some of them already in the group
+  for (int i = 0; i < CONSTRAINT_ATTR_SIZE; i++)
+  {
+    boost::shared_ptr<ModelAPI_AttributeRefAttr> aCAttrRef =
+      boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+        theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[i])
+      );
+    if (!aCAttrRef) continue;
+    if (myEntityMap.find(aCAttrRef->attr()) != myEntityMap.end())
+      return true;
+  }
+
+  // Entities did not found
   return false;
 }
 
