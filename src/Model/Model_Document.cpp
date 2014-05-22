@@ -593,4 +593,11 @@ void Model_Document::synchronizeFeatures()
       aFLabIter.Next();
     }
   }
+  // after all updates, sends a message that groups of features were created or updated
+  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
+    setCheckTransactions(false);
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_DELETED));
+  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
+    setCheckTransactions(true);
 }

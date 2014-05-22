@@ -106,8 +106,9 @@ protected:
 
   /// Creates an operation new feature
   /// Returns NULL feature. This is an operation of edition, not creation.
+  /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature();
+  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
 
 protected:
   /// \brief Save the point to the line.

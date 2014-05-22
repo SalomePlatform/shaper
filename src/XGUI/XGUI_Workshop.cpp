@@ -212,8 +212,18 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   // Process creation of Part
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED)) {
     const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    FeaturePtr aFeature = aUpdMsg->feature();
-    if (aFeature->getKind() == "Part") {
+    std::set<FeaturePtr> aFeatures = aUpdMsg->features();
+
+    std::set<FeaturePtr>::const_iterator aIt;
+    bool aHasPart = false;
+    for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
+      FeaturePtr aFeature = (*aIt);
+      if (aFeature->getKind() == "Part") {
+        aHasPart = true;
+        break;
+      }
+    }
+    if (aHasPart) {
       //The created part will be created in Object Browser later and we have to activate it
       // only when it is created everywere
       QTimer::singleShot(50, this, SLOT(activateLastPart()));
@@ -234,10 +244,16 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   {
     const Model_FeatureUpdatedMessage* anUpdateMsg =
         dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    FeaturePtr aNewFeature = anUpdateMsg->feature();
+    std::set<FeaturePtr> aFeatures = anUpdateMsg->features();
+
     FeaturePtr aCurrentFeature = myOperationMgr->currentOperation()->feature();
-    if(aNewFeature == aCurrentFeature) {
-      myPropertyPanel->updateContentWidget(aCurrentFeature);
+    std::set<FeaturePtr>::const_iterator aIt;
+    for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
+      FeaturePtr aNewFeature = (*aIt);
+      if(aNewFeature == aCurrentFeature) {
+        myPropertyPanel->updateContentWidget(aCurrentFeature);
+        break;
+      } 
     }
   }
   //An operation passed by message. Start it, process and commit.
