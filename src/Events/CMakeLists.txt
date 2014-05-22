@@ -3,6 +3,7 @@ INCLUDE(Common)
 SET(PROJECT_HEADERS
     Events.h
     Events_Message.h
+    Events_MessageGroup.h 
     Events_Listener.h
     Events_Loop.h
     Events_Error.h

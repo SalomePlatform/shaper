@@ -3,6 +3,7 @@
 // Author:	Mikhail PONIKAROV
 
 #include <Events_Loop.h>
+#include <Events_MessageGroup.h>
 
 #include <string>
 #include <cstring>
@@ -34,7 +35,20 @@ Events_ID Events_Loop::eventByName(const char* theName)
 
 void Events_Loop::send(Events_Message& theMessage)
 {
-  // TO DO: make it in thread and wit husage of semaphores
+  // if it is grouped message, just accumulate it
+  Events_MessageGroup* aGroup = dynamic_cast<Events_MessageGroup*>(&theMessage);
+  if (aGroup) {
+    std::map<char*, Events_MessageGroup*>::iterator aMyGroup = 
+      myGroups.find(aGroup->eventID().eventText());
+    if (aMyGroup == myGroups.end()) { // create a new group of messages for accumulation
+      myGroups[aGroup->eventID().eventText()] = aGroup->newEmpty();
+      aMyGroup = myGroups.find(aGroup->eventID().eventText());
+    }
+    aMyGroup->second->Join(*aGroup);
+    return;
+  }
+
+  // TO DO: make it in thread and with usage of semaphores
 
   map<char*, map<void*, list<Events_Listener*> > >::iterator aFindID = myListeners.find(
       theMessage.eventID().eventText());
@@ -79,4 +93,16 @@ void Events_Loop::registerListener(Events_Listener* theListener, const Events_ID
       return; // avoid duplicates
 
   aListeners.push_back(theListener);
+}
+
+void Events_Loop::flush(const Events_ID& theID)
+{
+  std::map<char*, Events_MessageGroup*>::iterator aMyGroup = 
+    myGroups.find(theID.eventText());
+  if (aMyGroup != myGroups.end()) { // really sends
+    Events_MessageGroup* aGroup = aMyGroup->second;
+    send(*aGroup);
+    myGroups.erase(aMyGroup);
+    delete aGroup;
+  }
 }

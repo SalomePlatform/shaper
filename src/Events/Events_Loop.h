@@ -11,6 +11,8 @@
 #include <map>
 #include <list>
 
+class Events_MessageGroup;
+
 /**\class Events_Lopp
  * \ingroup EventsLoop
  * \brief Base class that manages the receiving and sending of all
@@ -22,8 +24,12 @@
  * control back immideately.
  */
 class Events_Loop {
+  /// map from event ID to sender pointer to listeners that must be called for this
   std::map<char*, std::map<void*, std::list<Events_Listener*> > >
-    myListeners; ///< map from event ID to sender pointer to listeners that must be called for this
+    myListeners;
+
+  /// map from event ID to groupped messages (accumulated on flush)
+  std::map<char*, Events_MessageGroup*> myGroups;
 
   //! The empty constructor, will be called at startup of the application, only once
   Events_Loop() {};
@@ -41,6 +47,9 @@ public:
   //! that will be called on the event and from the defined sender
   EVENTS_EXPORT void registerListener(Events_Listener* theListener, const Events_ID theID, 
     void* theSender = 0);
+
+  //! Initializes sending of a group-message by the given ID
+  EVENTS_EXPORT void flush(const Events_ID& theID);
 };
 
 #endif
