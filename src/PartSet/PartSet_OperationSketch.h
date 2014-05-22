@@ -39,17 +39,13 @@ public:
   virtual boost::shared_ptr<ModelAPI_Feature> sketch() const;
 
   /// Processes the mouse pressed in the point
-  /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
+  /// \param theView a viewer to have the viewer the eye position
   /// \param theSelected the list of selected presentations
+  /// \param theHighlighted the list of highlighted presentations
   virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<XGUI_ViewerPrs>& theSelected);
-  /// Processes the mouse release in the point
-  /// \param thePoint a point clicked in the viewer
-  /// \param theEvent the mouse event
-  /// \param theSelected the list of selected presentations
-  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                             const std::list<XGUI_ViewerPrs>& theSelected);
+                            const std::list<XGUI_ViewerPrs>& theSelected,
+                            const std::list<XGUI_ViewerPrs>& theHighlighted);
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event

@@ -4,6 +4,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Object.h>
 
 #include <QLayout>
 #include <QLabel>
@@ -82,7 +83,12 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
   if (aEditor) {
     QString aRes = aEditor->text();
     FeaturePtr aFeature = mySelectedData.first();
-    aFeature->data()->setName(qPrintable(aRes));
+    aFeature->document()->startOperation();
+    if (aFeature->data())
+      aFeature->data()->setName(qPrintable(aRes));
+    else
+      boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature)->setName(qPrintable(aRes));
+    aFeature->document()->finishOperation();
   }
 }
 
@@ -289,7 +295,8 @@ void XGUI_ObjectsBrowser::onEditItem()
       // Find index which corresponds the feature
       QModelIndex aIndex;
       foreach(QModelIndex aIdx, selectedIndexes()) {
-        if (dataModel()->feature(aIdx) == aFeature) {
+        FeaturePtr aFea = dataModel()->feature(aIdx);
+        if (dataModel()->feature(aIdx)->isSame(aFeature)) {
           aIndex = aIdx;
           break;
         }

@@ -6,6 +6,7 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
+#include <ModelAPI_Object.h>
 
 #include <QAction>
 #include <QContextMenuEvent>
@@ -90,7 +91,8 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     //Process Feature
     if (aFeature) {
       if (aFeature->getKind() == "Part") {
-        boost::shared_ptr<ModelAPI_Document> aFeaDoc = aFeature->data()->docRef("PartDocument")->value();
+        ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
+        DocumentPtr aFeaDoc = aObject->featureRef()->data()->docRef("PartDocument")->value();
         if (aMgr->currentDocument() == aFeaDoc)
           aActions.append(action("DEACTIVATE_PART_CMD"));
         else 

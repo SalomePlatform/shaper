@@ -128,8 +128,11 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    std::list<XGUI_ViewerPrs> aPresentations = myWorkshop->displayer()->GetViewerPrs();
-    aPreviewOp->mousePressed(theEvent, myWorkshop->viewer()->activeView(), aPresentations);
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->GetSelected();
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->GetHighlighted();
+
+    aPreviewOp->mousePressed(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
   }
 }
 
@@ -139,8 +142,11 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    std::list<XGUI_ViewerPrs> aPresentations = myWorkshop->displayer()->GetViewerPrs();
-    aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aPresentations);
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->GetSelected();
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->GetHighlighted();
+
+    aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
   }
 }
 
@@ -173,8 +179,10 @@ void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<Mo
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp)
   {
-    std::list<XGUI_ViewerPrs> aPresentations = myWorkshop->displayer()->GetViewerPrs();
-    aPreviewOp->init(theFeature, aPresentations);
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->GetSelected();
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->GetHighlighted();
+    aPreviewOp->init(theFeature, aSelected, aHighlighted);
   }
   myWorkshop->actionsMgr()->updateCheckState();
   sendOperation(anOperation);
@@ -197,6 +205,10 @@ void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeature
     }
   }
   aDisplayer->StopSelection(theFeatures, isStop, false);
+
+  XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
+  aViewer->enableSelection(!isStop);
+
   aDisplayer->UpdateViewer();
 }
 

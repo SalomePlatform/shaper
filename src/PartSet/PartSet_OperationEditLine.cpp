@@ -7,6 +7,7 @@
 #include <PartSet_OperationSketch.h>
 
 #include <ModuleBase_OperationDescription.h>
+#include <Model_Events.h>
 
 #include <XGUI_ViewerPrs.h>
 
@@ -53,10 +54,28 @@ std::list<int> PartSet_OperationEditLine::getSelectionModes(boost::shared_ptr<Mo
 }
 
 void PartSet_OperationEditLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                                     const std::list<XGUI_ViewerPrs>& thePresentations)
+                                     const std::list<XGUI_ViewerPrs>& theSelected,
+                                     const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
   setFeature(theFeature);
-  myFeatures = thePresentations;
+
+  if (!theHighlighted.empty()) {
+    // if there is highlighted object, we check whether it is in the list of selected objects
+    // in that case this object is a handle of the moved lines. If there no such object in the selection,
+    // the hightlighted object should moved and the selection is skipped. The skipped selection will be
+    // deselected in the viewer by blockSelection signal in the startOperation method.
+    bool isSelected = false;
+    std::list<XGUI_ViewerPrs>::const_iterator anIt = theSelected.begin(), aLast = theSelected.end();
+    for (; anIt != aLast && !isSelected; anIt++) {
+      isSelected = (*anIt).feature() == feature();
+    }
+    if (!isSelected)
+      myFeatures = theHighlighted;
+    else
+      myFeatures = theSelected;
+  }
+  else
+    myFeatures = theSelected;
 }
 
 boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::sketch() const
@@ -64,12 +83,27 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::sketch() const
   return mySketch;
 }
 
-void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView)
+void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView,
+                                             const std::list<XGUI_ViewerPrs>& /*theSelected*/,
+                                             const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
-  if (!(theEvent->buttons() &  Qt::LeftButton))
-    return;
-  gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
-  myCurPoint.setPoint(aPoint);
+  if (myFeatures.size() == 1)
+  {
+    boost::shared_ptr<ModelAPI_Feature> aFeature;
+    if (!theHighlighted.empty())
+      aFeature = theHighlighted.front().feature();
+
+    if (aFeature && aFeature == feature()) { // continue the feature edit
+      blockSelection(true);
+    }
+    else {
+      commit();
+      emit featureConstructed(feature(), FM_Deactivation);
+      if (aFeature) {
+        emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+      }
+    }
+  }
 }
 
 void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
@@ -101,22 +135,19 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
       moveLinePoint(aFeature, aDeltaX, aDeltaY, LINE_ATTR_END);
     }
   }
+  flushUpdated();
   sendFeatures();
 
   myCurPoint.setPoint(aPoint);
 }
 
 void PartSet_OperationEditLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                              const std::list<XGUI_ViewerPrs>& theSelected)
+                                              const std::list<XGUI_ViewerPrs>& /*theSelected*/,
+                                              const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
   std::list<XGUI_ViewerPrs> aFeatures = myFeatures;
   if (myFeatures.size() == 1) {
-    if (theSelected.empty())
-      return;
-
-    boost::shared_ptr<ModelAPI_Feature> aFeature = theSelected.front().feature();
-    commit();
-    emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+    blockSelection(false);
   }
   else {
     commit();
@@ -133,23 +164,35 @@ void PartSet_OperationEditLine::startOperation()
 {
   // do nothing in order to do not create a new feature
   emit multiSelectionEnabled(false);
-  emit setSelection(std::list<XGUI_ViewerPrs>());
-  emit stopSelection(myFeatures, true);
+
+  blockSelection(true);
+
   myCurPoint.clear();
 }
 
 void PartSet_OperationEditLine::stopOperation()
 {
   emit multiSelectionEnabled(true);
-  bool isSelectFeatures = myFeatures.size() > 1;
-  emit stopSelection(myFeatures, false);
-  if (isSelectFeatures)
-    emit setSelection(myFeatures);
+
+  blockSelection(false, myFeatures.size() > 1);
 
   myFeatures.clear();
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::createFeature()
+void PartSet_OperationEditLine::blockSelection(bool isBlocked, const bool isRestoreSelection)
+{
+  if (isBlocked) {
+    emit setSelection(std::list<XGUI_ViewerPrs>());
+    emit stopSelection(myFeatures, true);
+  }
+  else {
+    emit stopSelection(myFeatures, false);
+    if (isRestoreSelection)
+      emit setSelection(myFeatures);
+  }
+}
+
+boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::createFeature(const bool /*theFlushMessage*/)
 {
   // do nothing in order to do not create a new feature
   return boost::shared_ptr<ModelAPI_Feature>();
@@ -171,17 +214,18 @@ void PartSet_OperationEditLine::moveLinePoint(boost::shared_ptr<ModelAPI_Feature
 
 void PartSet_OperationEditLine::sendFeatures()
 {
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_MOVED);
+
   std::list<boost::shared_ptr<ModelAPI_Feature> > aFeatures;
   std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
   for (; anIt != aLast; anIt++) {
     boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).feature();
-    if (!aFeature || aFeature == feature())
+    if (!aFeature)
       continue;
-  }
 
-  static Events_ID aModuleEvent = Events_Loop::eventByName("PartSetEditEvent");
-  Model_FeaturesMovedMessage aMessage;
-  aMessage.setFeatures(aFeatures);
-  Events_Loop::loop()->send(aMessage);
+    Model_FeatureUpdatedMessage aMessage(aFeature, anEvent);
+    Events_Loop::loop()->send(aMessage);
+  }
+  Events_Loop::loop()->flush(anEvent);
 }
 
