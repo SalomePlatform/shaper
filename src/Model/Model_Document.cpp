@@ -20,6 +20,9 @@
 #include <TDataStd_Name.hxx>
 
 #include <climits>
+#ifndef WIN32
+#include <sys/stat.h>
+#endif
 
 #ifdef WIN32
 # define _separator_ '\\'
@@ -164,7 +167,8 @@ void Model_Document::close()
     subDocument(*aSubIter)->close();
   mySubs.clear();
   // close this
-  myDoc->Close();
+  if (myDoc->CanClose() == CDM_CCS_OK)
+    myDoc->Close();
   Model_Application::getApplication()->deleteDocument(myID);
 }
 
@@ -296,6 +300,8 @@ static void AddToRefArray(TDF_Label& theArrayLab, TDF_Label& theReferenced) {
 
 void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
+  if (theFeature->isAction()) return; // do not add action to the data model
+
   boost::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
   TDF_Label aFeaturesLab = groupLabel(FEATURES_GROUP);
@@ -325,11 +331,69 @@ void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFea
   TDF_Label anObjLab = aGroupLab.NewChild();
   TCollection_ExtendedString aName(theFeature->data()->getName().c_str());
   TDataStd_Name::Set(anObjLab, aName);
-  AddToRefArray(aGroupLab.FindChild(1), anObjLab); // reference to names is on the first sub
+  TDF_Label aGrLabChild = aGroupLab.FindChild(1);
+  AddToRefArray(aGrLabChild, anObjLab); // reference to names is on the first sub
 
   // event: feature is added
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);
   Model_FeatureUpdatedMessage aMsg(theFeature, anEvent);
+  Events_Loop::loop()->send(aMsg);
+}
+
+/// Appenad to the array of references a new referenced label.
+/// If theIndex is not -1, removes element at thisindex, not theReferenced.
+/// \returns the index of removed element
+static int RemoveFromRefArray(
+  TDF_Label theArrayLab, TDF_Label theReferenced, const int theIndex = -1) {
+  int aResult = -1; // no returned
+  Handle(TDataStd_ReferenceArray) aRefs;
+  if (theArrayLab.FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
+    if (aRefs->Length() == 1) { // just erase an array
+      if ((theIndex == -1 && aRefs->Value(0) == theReferenced) || theIndex == 0)
+        theArrayLab.ForgetAttribute(TDataStd_ReferenceArray::GetID());
+      aResult = 0;
+    } else { // reduce the array
+      Handle(TDataStd_HLabelArray1) aNewArray = 
+        new TDataStd_HLabelArray1(aRefs->Lower(), aRefs->Upper() - 1);
+      int aCount = aRefs->Lower();
+      for(int a = aCount; a <= aRefs->Upper(); a++, aCount++) {
+        if ((theIndex == -1 && aRefs->Value(a) == theReferenced) || theIndex == a) {
+          aCount--;
+          aResult = a;
+        } else {
+          aNewArray->SetValue(aCount, aRefs->Value(a));
+        }
+      }
+    aRefs->SetInternalArray(aNewArray);
+    }
+  }
+  return aResult;
+}
+
+void Model_Document::removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  boost::shared_ptr<Model_Data> aData = boost::static_pointer_cast<Model_Data>(theFeature->data());
+  TDF_Label aFeatureLabel = aData->label();
+  // remove the object
+  TDF_Label aGroupLabel = groupLabel(theFeature->getGroup());
+  int aRemovedIndex = RemoveFromRefArray(aGroupLabel, aFeatureLabel);
+  RemoveFromRefArray(aGroupLabel.FindChild(1), TDF_Label(), aRemovedIndex);
+  // remove feature from the myFeatures list
+  std::vector<boost::shared_ptr<ModelAPI_Feature> >::iterator aFIter = myFeatures.begin();
+  while(aFIter != myFeatures.end()) {
+    if (*aFIter == theFeature) {
+      aFIter = myFeatures.erase(aFIter);
+    } else {
+      aFIter++;
+    }
+  }
+  // erase all attributes under the label of feature
+  aFeatureLabel.ForgetAllAttributes();
+  // remove it from the references array
+  RemoveFromRefArray(groupLabel(FEATURES_GROUP), aData->label());
+
+  // event: feature is added
+  Model_FeatureDeletedMessage aMsg(theFeature->document(), theFeature->getGroup());
   Events_Loop::loop()->send(aMsg);
 }
 
@@ -443,6 +507,7 @@ void Model_Document::setUniqueName(boost::shared_ptr<ModelAPI_Feature> theFeatur
         aNumObjects++;
         stringstream aNameStream;
         aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
+        aName = aNameStream.str();
         // reinitialize iterator to make sure a new name is unique
         a = 0;
       } else a++;

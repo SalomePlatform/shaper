@@ -101,6 +101,9 @@ public slots:
   /// \param theFeatures a list of features to be selected
   void onSetSelection(const std::list<XGUI_ViewerPrs>& theFeatures);
 
+  /// SLOT, to close the viewer local context
+  void onCloseLocalContext();
+
   /// SLOT, to visualize the feature in another local context mode
   /// \param theFeature the feature to be put in another local context mode
   /// \param theMode the mode appeared on the feature

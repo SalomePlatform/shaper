@@ -1,5 +1,7 @@
 #include "PartSetPlugin_Plugin.h"
 #include "PartSetPlugin_Part.h"
+#include "PartSetPlugin_Duplicate.h"
+#include "PartSetPlugin_Remove.h"
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
 
@@ -19,6 +21,12 @@ boost::shared_ptr<ModelAPI_Feature> PartSetPlugin_Plugin::createFeature(string t
   if (theFeatureID == "Part") {
     return boost::shared_ptr<ModelAPI_Feature>(new PartSetPlugin_Part);
   }
-  // feature of such kind is not found
+  if (theFeatureID == "duplicate") {
+    return boost::shared_ptr<ModelAPI_Feature>(new PartSetPlugin_Duplicate);
+  }
+  if (theFeatureID == "remove") {
+    return boost::shared_ptr<ModelAPI_Feature>(new PartSetPlugin_Remove);
+  }
+    // feature of such kind is not found
   return boost::shared_ptr<ModelAPI_Feature>();
 }

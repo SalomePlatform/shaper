@@ -25,6 +25,10 @@ public:
   //! Returns 0 if the given index is not index of a feature
   virtual FeaturePtr feature(const QModelIndex& theIndex) const = 0;
 
+  //! Returns QModelIndex which corresponds to the given feature
+  //! If the feature is not found then index is not valid
+  virtual QModelIndex featureIndex(const FeaturePtr& theFeature) const = 0;
+
   //! Returns parent index of the given feature
   virtual QModelIndex findParent(const FeaturePtr& theFeature) const = 0;
 

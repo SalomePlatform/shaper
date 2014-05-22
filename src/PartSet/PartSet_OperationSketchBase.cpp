@@ -36,11 +36,13 @@ boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview(
     if (anObj) 
       aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(anObj->featureRef());
   }
+  if (!aFeature)
+    return boost::shared_ptr<GeomAPI_Shape>();
   return aFeature->preview();
 }
 
 std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
-                                                     PartSet_OperationSketchBase::preview() const
+                                                     PartSet_OperationSketchBase::subPreview() const
 {
   return std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >();
 }
@@ -55,7 +57,8 @@ std::list<int> PartSet_OperationSketchBase::getSelectionModes(boost::shared_ptr<
 boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchBase::createFeature()
 {
   boost::shared_ptr<ModelAPI_Feature> aFeature = ModuleBase_Operation::createFeature();
-  emit featureConstructed(aFeature, FM_Activation);
+  if (aFeature)
+    emit featureConstructed(aFeature, FM_Activation);
   return aFeature;
 }
 

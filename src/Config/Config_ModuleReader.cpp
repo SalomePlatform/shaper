@@ -96,7 +96,7 @@ void Config_ModuleReader::loadLibrary(const std::string theLibName)
     Events_Error::send(errorMsg);
   }
 #else
-  void* aModLib = dlopen( aFileName.c_str(), RTLD_LAZY );
+  void* aModLib = dlopen( aFileName.c_str(), RTLD_LAZY | RTLD_GLOBAL );
   if ( !aModLib ) {
     std::cerr << "Failed to load " << aFileName.c_str() << std::endl;
   }

@@ -43,6 +43,10 @@ public:
   /// Defines the current document that used for current work in the application
   virtual void setCurrentDocument(boost::shared_ptr<ModelAPI_Document> theDoc) = 0;
 
+  /// Copies the document to the new one wit hthe given id
+  virtual boost::shared_ptr<ModelAPI_Document> copy(
+    boost::shared_ptr<ModelAPI_Document> theSource, std::string theID) = 0;
+
   /// Is needed for python wrapping by swig, call Get to get an instance
   ModelAPI_PluginManager();
 

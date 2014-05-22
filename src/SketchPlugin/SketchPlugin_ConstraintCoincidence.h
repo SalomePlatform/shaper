@@ -12,7 +12,7 @@
 
 /** \class SketchPlugin_ConstraintCoincidence
  *  \ingroup DataModel
- *  \brief Feature for creation of a new constraint which defines equvalence of two points
+ *  \brief Feature for creation of a new constraint which defines equivalence of two points
  *
  *  These constraint has two attributes: CONSTRAINT_ATTR_POINT_A and CONSTRAINT_ATTR_POINT_B
  */
