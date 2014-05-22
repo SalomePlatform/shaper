@@ -71,8 +71,9 @@ protected:
   virtual void commitOperation();
 
   /// Creates an operation new feature
+  /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature();
+  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
 
   /// Returns the operation feature
   /// \return the feature

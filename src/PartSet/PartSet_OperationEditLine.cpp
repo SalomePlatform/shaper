@@ -150,7 +150,7 @@ void PartSet_OperationEditLine::stopOperation()
   myFeatures.clear();
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::createFeature()
+boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::createFeature(const bool /*theFlushMessage*/)
 {
   // do nothing in order to do not create a new feature
   return boost::shared_ptr<ModelAPI_Feature>();
