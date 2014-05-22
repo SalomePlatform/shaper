@@ -50,6 +50,7 @@ void ModuleBase_Operation::storeReal(double theValue)
   boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   boost::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(anId.toStdString());
   aReal->setValue(theValue);
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
 }
 
 void ModuleBase_Operation::storeCustomValue()
