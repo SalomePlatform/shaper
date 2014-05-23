@@ -196,6 +196,11 @@ void Model_Document::startOperation()
 
 void Model_Document::finishOperation()
 {
+  // just to be sure that everybody knows that changes were performed
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_DELETED));
+
   if (myNestedNum != -1) // this nested transaction is owervritten
     myNestedNum++;
   if (!myDoc->HasOpenCommand()) {
@@ -376,8 +381,9 @@ static int RemoveFromRefArray(
   Handle(TDataStd_ReferenceArray) aRefs;
   if (theArrayLab.FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
     if (aRefs->Length() == 1) { // just erase an array
-      if ((theIndex == -1 && aRefs->Value(0) == theReferenced) || theIndex == 0)
+      if ((theIndex == -1 && aRefs->Value(0) == theReferenced) || theIndex == 0) {
         theArrayLab.ForgetAttribute(TDataStd_ReferenceArray::GetID());
+      }
       aResult = 0;
     } else { // reduce the array
       Handle(TDataStd_HLabelArray1) aNewArray = 
@@ -391,7 +397,7 @@ static int RemoveFromRefArray(
           aNewArray->SetValue(aCount, aRefs->Value(a));
         }
       }
-    aRefs->SetInternalArray(aNewArray);
+      aRefs->SetInternalArray(aNewArray);
     }
   }
   return aResult;
