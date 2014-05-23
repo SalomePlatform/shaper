@@ -60,6 +60,12 @@ public:
   /// Emits a signal to hide the preview of the operation
   virtual void stopOperation();
 
+  /// Returns whether the nested operations are enabled.
+  /// The state can depend on the operation current state.
+  /// It returns true after the sketch plane is choosen.
+  /// \return enabled state
+  virtual bool isNestedOperationsEnabled() const;
+
 signals:
   /// signal about the sketch plane is selected
   /// \param theX the value in the X direction of the plane
@@ -68,12 +74,15 @@ signals:
   void planeSelected(double theX, double theY, double theZ);
 
 protected:
+  /// Returns whether the sketch plane is set
+  /// \return the boolean value whether the sketch is set
+  bool hasSketchPlane() const;
+
   /// Set the plane to the current sketch
   /// \param theShape the shape
   void setSketchPlane(const TopoDS_Shape& theShape);
 
 private:
-  bool myIsEditMode; /// the edit mode of this operation
   std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
 };
 

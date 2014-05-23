@@ -42,7 +42,7 @@ boost::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::feature() const
   return myFeature;
 }
 
-bool ModuleBase_Operation::isNestedOperationsEnabled()
+bool ModuleBase_Operation::isNestedOperationsEnabled() const
 {
   return true;
 }

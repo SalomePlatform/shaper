@@ -54,7 +54,10 @@ public:
   /// \return the feature
   boost::shared_ptr<ModelAPI_Feature> feature() const;
 
-  virtual bool isNestedOperationsEnabled();
+  /// Returns whether the nested operations are enabled.
+  /// The state can depend on the operation current state.
+  /// \return enabled state
+  virtual bool isNestedOperationsEnabled() const;
 
   // Data model methods.
   /// Stores a real value in model.
