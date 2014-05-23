@@ -3,7 +3,7 @@
     <group id="Operations">
       <feature id="Part" title="New part" tooltip="Creates a new part" icon=":pictures/part_ico.png"/>
       <feature id="duplicate" title="Duplicate" tooltip="Duplicate selected object" icon=":icons/duplicate.png"/>
-      <feature id="remove" title="Remove"  tooltip="Remove selected object" icon=":icons/remove.png"/>
+      <feature id="remove" title="Remove part"  tooltip="Remove active part" icon=":icons/remove.png"/>
     </group>
   </workbench>
 </plugin>
