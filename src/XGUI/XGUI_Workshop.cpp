@@ -662,6 +662,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   QDockWidget* aObjDock = new QDockWidget(theParent);
   aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   aObjDock->setWindowTitle(tr("Object browser"));
+  aObjDock->setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
   connect(myObjectBrowser, SIGNAL(activePartChanged(FeaturePtr)), this, SLOT(changeCurrentDocument(FeaturePtr)));
   aObjDock->setWidget(myObjectBrowser);
@@ -740,9 +741,15 @@ void XGUI_Workshop::changeCurrentDocument(FeaturePtr thePart)
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   if (thePart) {
-    boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = thePart->data()->docRef("PartDocument");
-    if (aDocRef)
-      aMgr->setCurrentDocument(aDocRef->value());
+    DocumentPtr aFeaDoc;
+    if (thePart->data()) {
+      aFeaDoc = thePart->data()->docRef("PartDocument")->value();
+    } else {
+      ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(thePart);
+      aFeaDoc = aObject->featureRef()->data()->docRef("PartDocument")->value();
+    }
+    if (aFeaDoc)
+      aMgr->setCurrentDocument(aFeaDoc);
   } else {
     aMgr->setCurrentDocument(aMgr->rootDocument());
   }
@@ -801,13 +808,24 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
     aMgr->rootDocument()->startOperation();
     foreach (FeaturePtr aFeature, theList) {
       if (aFeature->getKind() == "Part") {
-        DocumentPtr aDoc = aFeature->data()->docRef("PartDocument")->value();
+        DocumentPtr aDoc;
+        if (aFeature->data()) {
+          aDoc = aFeature->data()->docRef("PartDocument")->value();
+        } else {
+          ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
+          aDoc = aObject->featureRef()->data()->docRef("PartDocument")->value();
+          aFeature = aObject->featureRef();
+        }
         if (aDoc == aMgr->currentDocument()) {
           aDoc->close();
         }
-      } //else
-        //aDoc = aFeature->document();
-      aMgr->rootDocument()->removeFeature(aFeature);
+      } else {
+        if (!aFeature->data()) {
+          ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
+          aFeature = aObject->featureRef();
+        }
+      }
+      aFeature->document()->removeFeature(aFeature);
     }
     aMgr->rootDocument()->finishOperation();
   }

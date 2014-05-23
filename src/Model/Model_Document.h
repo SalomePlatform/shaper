@@ -118,8 +118,8 @@ private:
   Handle_TDocStd_Document myDoc; ///< OCAF document
   /// number of transactions after the last "save" call, used for "IsModified" method
   int myTransactionsAfterSave;
-  /// number of myTransactionsAfterSave for the nested transaction start
-  int myNestedStart;
+  /// number of nested transactions performed (or -1 if not nested)
+  int myNestedNum;
   /// All features managed by this document (not only in history of OB)
   std::vector<boost::shared_ptr<ModelAPI_Feature> > myFeatures;
 
