@@ -232,7 +232,7 @@ void Model_Document::abortOperation()
   if (myNestedNum == 0)
     myNestedNum = -1;
   myDoc->AbortCommand();
-  synchronizeFeatures();
+  synchronizeFeatures(true);
   // abort for all subs
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
@@ -269,7 +269,7 @@ void Model_Document::undo()
   if (myNestedNum > 0) myNestedNum--;
   if (!myIsEmptyTr[myTransactionsAfterSave])
     myDoc->Undo();
-  synchronizeFeatures();
+  synchronizeFeatures(true);
   // undo for all subs
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
@@ -294,7 +294,7 @@ void Model_Document::redo()
   if (!myIsEmptyTr[myTransactionsAfterSave])
     myDoc->Redo();
   myTransactionsAfterSave++;
-  synchronizeFeatures();
+  synchronizeFeatures(true);
   // redo for all subs
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
@@ -566,7 +566,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::objectByFeature(
   return boost::shared_ptr<ModelAPI_Feature>(); // not found
 }
 
-void Model_Document::synchronizeFeatures()
+void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
 {
   boost::shared_ptr<ModelAPI_Document> aThis = Model_Application::getApplication()->getDocument(myID);
   // update features
@@ -628,6 +628,11 @@ void Model_Document::synchronizeFeatures()
       // feature for this label is added, so go to the next label
       aFLabIter.Next();
     } else { // nothing is changed, both iterators are incremented
+      if (theMarkUpdated) {
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
+        Model_FeatureUpdatedMessage aMsg(*aFIter, anEvent);
+        Events_Loop::loop()->send(aMsg);
+      }
       aFIter++;
       aFLabIter.Next();
     }
@@ -636,6 +641,8 @@ void Model_Document::synchronizeFeatures()
   boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
     setCheckTransactions(false);
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+  if (theMarkUpdated)
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_DELETED));
   boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
     setCheckTransactions(true);
