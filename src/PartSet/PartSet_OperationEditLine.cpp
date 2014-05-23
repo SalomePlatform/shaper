@@ -35,7 +35,7 @@ using namespace std;
 PartSet_OperationEditLine::PartSet_OperationEditLine(const QString& theId,
 	                                          QObject* theParent,
                                               boost::shared_ptr<ModelAPI_Feature> theFeature)
-: PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature)
+: PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature), myIsBlockedSelection(false)
 {
 }
 
@@ -94,12 +94,20 @@ void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_V
       aFeature = theHighlighted.front().feature();
 
     if (aFeature && aFeature == feature()) { // continue the feature edit
-      blockSelection(true);
     }
     else {
+      XGUI_ViewerPrs aFeaturePrs = myFeatures.front();
       commit();
       emit featureConstructed(feature(), FM_Deactivation);
-      if (aFeature) {
+
+      bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+      if(aHasShift && !theHighlighted.empty()) {
+        std::list<XGUI_ViewerPrs> aSelected;
+        aSelected.push_back(aFeaturePrs);
+        aSelected.push_back(theHighlighted.front());
+        emit setSelection(aSelected);
+      }
+      else if (aFeature) {
         emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
       }
     }
@@ -113,6 +121,7 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
 
   gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
 
+  blockSelection(true);
   if (myCurPoint.myIsInitialized) {
     double aCurX, aCurY;
     PartSet_Tools::ConvertTo2D(myCurPoint.myPoint, sketch(), theView, aCurX, aCurY);
@@ -165,7 +174,8 @@ void PartSet_OperationEditLine::startOperation()
   // do nothing in order to do not create a new feature
   emit multiSelectionEnabled(false);
 
-  blockSelection(true);
+  if (myFeatures.size() > 1)
+    blockSelection(true);
 
   myCurPoint.clear();
 }
@@ -181,6 +191,10 @@ void PartSet_OperationEditLine::stopOperation()
 
 void PartSet_OperationEditLine::blockSelection(bool isBlocked, const bool isRestoreSelection)
 {
+  if (myIsBlockedSelection == isBlocked)
+    return;
+
+  myIsBlockedSelection = isBlocked;
   if (isBlocked) {
     emit setSelection(std::list<XGUI_ViewerPrs>());
     emit stopSelection(myFeatures, true);

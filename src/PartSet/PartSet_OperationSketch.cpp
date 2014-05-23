@@ -63,7 +63,7 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketch::sketch() const
 }
 
 void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                           const std::list<XGUI_ViewerPrs>& /*theSelected*/,
+                                           const std::list<XGUI_ViewerPrs>& theSelected,
                                            const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
   if (!hasSketchPlane()) {
@@ -75,6 +75,12 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
     }
   }
   else {
+    // if shift button is pressed and there are some already selected objects, the operation should
+    // not be started. We just want to combine some selected objects.
+    bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+    if (aHasShift && theSelected.size() > 0)
+      return;
+
     if (theHighlighted.size() == 1) {
       boost::shared_ptr<ModelAPI_Feature> aFeature = theHighlighted.front().feature();
       if (aFeature)
