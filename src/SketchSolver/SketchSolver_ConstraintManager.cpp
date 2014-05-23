@@ -95,7 +95,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
             boost::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
           if (aSketch)
             changeWorkplane(aSketch);
-          return ;
+          continue;
         }
         boost::shared_ptr<SketchPlugin_Constraint> aConstraint =
           boost::dynamic_pointer_cast<SketchPlugin_Constraint>(*aFeatIter);
