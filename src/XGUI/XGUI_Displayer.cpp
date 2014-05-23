@@ -20,6 +20,8 @@
 
 #include <set>
 
+const int MOUSE_SENSITIVITY_IN_PIXEL = 10; ///< defines the local context mouse selection sensitivity
+
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
 {
   myWorkshop = theWorkshop;
@@ -119,6 +121,9 @@ void XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
   if (!aContext->HasOpenedContext()) {
     aContext->ClearCurrents(false);
     aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
+    // set mouse sensitivity
+    aContext->SetSensitivityMode(StdSelect_SM_WINDOW);
+    aContext->SetPixelTolerance(MOUSE_SENSITIVITY_IN_PIXEL);
   }
   // display or redisplay presentation
   Handle(AIS_Shape) anAIS;
