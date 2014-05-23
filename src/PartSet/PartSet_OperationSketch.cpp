@@ -106,6 +106,8 @@ std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
                                                                   aLast = aFeatures.end();
   for (; anIt != aLast; anIt++) {
     aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
+    if (!aFeature)
+      continue;
     boost::shared_ptr<GeomAPI_Shape> aPreview = aFeature->preview();
     if (aPreview)
       aPreviewMap[aFeature] = aPreview;
