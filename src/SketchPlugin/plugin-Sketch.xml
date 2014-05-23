@@ -11,6 +11,7 @@
         <point_selector id="EndPoint" title="End point" tooltip="End point of the line"/>
       </feature>
       <feature id="SketchConstraintCoincidence" title="Points coincidence" tooltip="Create constraint for the coincidence of two points" internal="1"/>
+      <feature id="SketchConstraintDistance" title="Distance between objects" tooltip="Create constraint for the distance from a point to an object" internal="1"/>
     </group>
   </workbench>
 </plugin>
