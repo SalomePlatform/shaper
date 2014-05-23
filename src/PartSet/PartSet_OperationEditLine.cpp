@@ -206,6 +206,8 @@ void PartSet_OperationEditLine::moveLinePoint(boost::shared_ptr<ModelAPI_Feature
     return;
 
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  if (!aData->isValid())
+    return;
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
 
