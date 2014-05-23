@@ -83,12 +83,13 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
   if (aEditor) {
     QString aRes = aEditor->text();
     FeaturePtr aFeature = mySelectedData.first();
-    aFeature->document()->startOperation();
+    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+    aMgr->rootDocument()->startOperation();
     if (aFeature->data())
       aFeature->data()->setName(qPrintable(aRes));
     else
       boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature)->setName(qPrintable(aRes));
-    aFeature->document()->finishOperation();
+    aMgr->rootDocument()->finishOperation();
   }
 }
 
