@@ -113,8 +113,8 @@ public slots:
 
   void onNew();
   void onOpen();
-  void onSave();
-  void onSaveAs();
+  bool onSave();
+  bool onSaveAs();
   void onExit();
   void onUndo();
   void onRedo();

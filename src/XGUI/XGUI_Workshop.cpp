@@ -95,6 +95,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   connect(myOperationMgr, SIGNAL(operationStarted()), SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationResumed()), SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)), SLOT(onOperationStopped(ModuleBase_Operation*)));
+  connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
   connect(myOperationMgr, SIGNAL(operationStarted()), myActionsMgr, SLOT(update()));
   connect(myOperationMgr, SIGNAL(operationStopped()), myActionsMgr, SLOT(update()));
   connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
@@ -411,7 +412,10 @@ void XGUI_Workshop::onExit()
         tr("The document is modified, save before exit?"),
         QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
     if(anAnswer == QMessageBox::Save) {
-      onSave();
+      bool saved = onSave();
+      if(!saved) {
+        return;
+      }
     } else if (anAnswer == QMessageBox::Cancel) {
       return;
     }
@@ -476,18 +480,18 @@ void XGUI_Workshop::onOpen()
 }
 
 //******************************************************
-void XGUI_Workshop::onSave()
+bool XGUI_Workshop::onSave()
 {
   if(myCurrentDir.isEmpty()) {
-    onSaveAs();
-    return;
+    return onSaveAs();
   }
   saveDocument(myCurrentDir);
   updateCommandStatus();
+  return true;
 }
 
 //******************************************************
-void XGUI_Workshop::onSaveAs()
+bool XGUI_Workshop::onSaveAs()
 {
   QFileDialog dialog(mainWindow());
   dialog.setWindowTitle(tr("Select directory to save files..."));
@@ -497,7 +501,7 @@ void XGUI_Workshop::onSaveAs()
   dialog.setViewMode(QFileDialog::Detail);
 
   if(!dialog.exec()) {
-    return;
+    return false;
   }
   QString aTempDir = dialog.selectedFiles().first();
   QDir aDir(aTempDir);
@@ -506,11 +510,12 @@ void XGUI_Workshop::onSaveAs()
                                        QString(),
                                        tr("The folder already contains some files, save anyway?"),
                                        QMessageBox::Save|QMessageBox::Cancel);
-    if(answer == QMessageBox::Cancel)
-      return;
+    if(answer == QMessageBox::Cancel) {
+      return false;
+    }
   }
   myCurrentDir = aTempDir;
-  onSave();
+  return onSave();
 }
 
 //******************************************************
