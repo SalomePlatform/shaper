@@ -307,6 +307,7 @@ void XGUI_Workshop::onOperationStarted()
     myPropertyPanel->setModelWidgets(aFactory.getModelWidgets());
     myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
   }
+  updateCommandStatus();
 }
 
 //******************************************************

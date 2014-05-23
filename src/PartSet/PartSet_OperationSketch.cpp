@@ -52,7 +52,8 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<Mode
 }
 
 void PartSet_OperationSketch::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                                   const std::list<XGUI_ViewerPrs>& thePresentations)
+                                   const std::list<XGUI_ViewerPrs>& /*theSelected*/,
+                                   const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
   setFeature(theFeature);
 }
@@ -141,20 +142,21 @@ bool PartSet_OperationSketch::isNestedOperationsEnabled() const
   return hasSketchPlane();
 }
 
+void PartSet_OperationSketch::startOperation()
+{
+  if (!feature())
+    setFeature(createFeature());
+}
+
 bool PartSet_OperationSketch::hasSketchPlane() const
 {
   bool aHasPlane = false;
 
   if (feature()) {
-    // set plane parameters to feature
     boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
-
     boost::shared_ptr<ModelAPI_AttributeDouble> anAttr;
-    // temporary solution for main planes only
     boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
       boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_NORM));
-    double aX = aNormal->x(), anY = aNormal->y(), aZ = aNormal->z();
-
     aHasPlane = aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
   }
   return aHasPlane;

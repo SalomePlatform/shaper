@@ -67,6 +67,10 @@ protected:
   /// \param theShapes the list of result shapes
   void addPlane(double theX, double theY, double theZ,
                 std::list<boost::shared_ptr<GeomAPI_Shape> >& theShapes) const;
+
+  /// Checks whether the plane is set in the sketch.
+  /// \returns the boolean state
+  bool isPlaneSet();
 };
 
 #endif
