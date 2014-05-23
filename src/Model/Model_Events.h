@@ -59,11 +59,11 @@ class Model_FeatureDeletedMessage : public Events_MessageGroup {
   std::set<std::string> myGroups; ///< group identifiers that contained the deleted feature
 public:
   /// creates a message by initialization of fields
-  Model_FeatureDeletedMessage(const boost::shared_ptr<ModelAPI_Document>& theDoc,
-    const std::string& theGroup);
+//  Model_FeatureDeletedMessage(const boost::shared_ptr<ModelAPI_Document>& theDoc,
+//    const std::string& theGroup);
 
   /// Returns the ID of this message (EVENT_FEATURE_DELETED)
-  static const Events_ID messageId();
+//  static const Events_ID messageId();
 
   /// Returns the feature that has been updated
   boost::shared_ptr<ModelAPI_Document> document() const {return myDoc;}
@@ -72,10 +72,38 @@ public:
   const std::set<std::string >& groups() const {return myGroups;}
 
   //! Creates a new empty group (to store it in the loop before flush)
-  virtual Events_MessageGroup* newEmpty();
+//  virtual Events_MessageGroup* newEmpty();
 
   //! Allows to join the given message with the current one
-  virtual void Join(Events_MessageGroup& theJoined);
+//  virtual void Join(Events_MessageGroup& theJoined);
+
+  Events_MessageGroup* newEmpty() {
+    return new Model_FeatureDeletedMessage(myDoc, "");
+  }
+
+  Model_FeatureDeletedMessage(
+    const boost::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theGroup)
+    : Events_MessageGroup(messageId(), 0), myDoc(theDoc)
+
+  {
+    if (!theGroup.empty())
+      myGroups.insert(theGroup);
+  }
+
+  const Events_ID messageId()
+  {
+    static Events_ID MY_ID = Events_Loop::eventByName(EVENT_FEATURE_DELETED);
+    return MY_ID;
+  }
+
+  void Join(Events_MessageGroup& theJoined)
+  {
+    Model_FeatureDeletedMessage* aJoined = dynamic_cast<Model_FeatureDeletedMessage*>(&theJoined);
+    std::set<std::string>::iterator aGIter = aJoined->myGroups.begin();
+    for(; aGIter != aJoined->myGroups.end(); aGIter++) {
+      myGroups.insert(*aGIter);
+    }
+  }
 };
 
 #endif
