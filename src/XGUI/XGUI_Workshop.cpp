@@ -825,7 +825,7 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
           aFeature = aObject->featureRef();
         }
       }
-      aMgr->rootDocument()->removeFeature(aFeature);
+      aFeature->document()->removeFeature(aFeature);
     }
     aMgr->rootDocument()->finishOperation();
   }

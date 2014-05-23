@@ -117,7 +117,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
         }
         if (aPartModel) {
           QModelIndex aIndex = aPartModel->findGroup(aGroup);
-          int aStart = aPartModel->rowCount(aIndex) - 1;
+          int aStart = aPartModel->rowCount(aIndex);
           aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
           removeRow(aStart, aIndex);
         }
