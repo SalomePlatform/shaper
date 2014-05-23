@@ -49,9 +49,6 @@ void ModelAPI_PluginManager::SetPluginManager(
 boost::shared_ptr<ModelAPI_PluginManager> ModelAPI_PluginManager::get()
 {
   if (!MY_MANAGER) { // import Model library that implements this interface of ModelAPI
-    #ifdef _DEBUG
-    std::cout << "ModelAPI_PluginManager::get: " << "Model library has not been loaded from xml." << std::endl;
-    #endif
     Config_ModuleReader::loadLibrary("Model");
   }
   return MY_MANAGER;

@@ -6,6 +6,9 @@
 
 #include <Config_Keywords.h>
 
+#include <Events_Loop.h>
+#include <Model_Events.h>
+
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <GeomDataAPI_Point2D.h>
@@ -68,6 +71,8 @@ bool ModuleBase_WidgetPoint2D::storeValue(boost::shared_ptr<ModelAPI_Feature> th
 
   bool isBlocked = this->blockSignals(true);
   aPoint->setValue(myXSpin->value(), myYSpin->value());
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+
   this->blockSignals(isBlocked);
   return true;
 }

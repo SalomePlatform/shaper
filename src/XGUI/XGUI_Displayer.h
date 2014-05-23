@@ -58,9 +58,15 @@ public:
   //void Display(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape,
   //             const bool isUpdateViewer = true);
   
-  /// Returns a list of viewer presentations
+  /// Returns a list of viewer selected presentations
+  /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  std::list<XGUI_ViewerPrs> GetViewerPrs();
+  std::list<XGUI_ViewerPrs> GetSelected(const int theShapeTypeToSkip = -1);
+
+  /// Returns a list of viewer highlited presentations
+  /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
+  /// \return list of presentations
+  std::list<XGUI_ViewerPrs> GetHighlighted(const int theShapeTypeToSkip = -1);
 
   /// Display the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
@@ -111,9 +117,13 @@ public:
   void UpdateViewer();
 
 protected:
+  /// Searches the feature by interactive object
+  /// \param theIO an interactive object
+  /// \return feature the feature or NULL if it not visualized
+  boost::shared_ptr<ModelAPI_Feature> GetFeature(Handle(AIS_InteractiveObject) theIO);
   /// Deactivate local selection
   /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
-  void closeAllContexts(const bool isUpdateViewer);
+  void CloseAllContexts(const bool isUpdateViewer);
 
   /// Returns currently installed AIS_InteractiveContext
   Handle(AIS_InteractiveContext) AISContext() const;

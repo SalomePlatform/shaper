@@ -49,73 +49,80 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
   // Created object event *******************
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED)) {
     const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    FeaturePtr aFeature = aUpdMsg->feature();
-    DocumentPtr aDoc = aFeature->document();
+    std::set<FeaturePtr> aFeatures = aUpdMsg->features();
 
-    if (aDoc == myDocument) {  // If root objects
-      if (aFeature->getGroup().compare(PARTS_GROUP) == 0) { // Update only Parts group
-        // Add a new part
-        int aStart = myPartModels.size() + 1;
-        XGUI_PartDataModel* aModel = new XGUI_PartDataModel(myDocument, this);
-        aModel->setPartId(myPartModels.count());
-        myPartModels.append(aModel);
-        insertRow(aStart, partFolderNode());
-      } else { // Update top groups (other except parts
-        QModelIndex aIndex = myModel->findParent(aFeature);
-        int aStart = myModel->rowCount(aIndex) - 1;
-        aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-        insertRow(aStart, aIndex);
-      }
-    } else { // if sub-objects of first level nodes
-      XGUI_PartModel* aPartModel = 0;
-      QList<XGUI_PartModel*>::const_iterator aIt;
-      for (aIt = myPartModels.constBegin(); aIt != myPartModels.constEnd(); ++aIt) {
-        if ((*aIt)->hasDocument(aDoc)) {
-          aPartModel = (*aIt);
-          break;
+    std::set<FeaturePtr>::const_iterator aIt;
+    for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
+      FeaturePtr aFeature = (*aIt);
+      DocumentPtr aDoc = aFeature->document();
+      if (aDoc == myDocument) {  // If root objects
+        if (aFeature->getGroup().compare(PARTS_GROUP) == 0) { // Update only Parts group
+          // Add a new part
+          int aStart = myPartModels.size() + 1;
+          XGUI_PartDataModel* aModel = new XGUI_PartDataModel(myDocument, this);
+          aModel->setPartId(myPartModels.count());
+          myPartModels.append(aModel);
+          insertRow(aStart, partFolderNode());
+        } else { // Update top groups (other except parts
+          QModelIndex aIndex = myModel->findParent(aFeature);
+          int aStart = myModel->rowCount(aIndex) - 1;
+          aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
+          insertRow(aStart, aIndex);
+        }
+      } else { // if sub-objects of first level nodes
+        XGUI_PartModel* aPartModel = 0;
+        QList<XGUI_PartModel*>::const_iterator aIt;
+        for (aIt = myPartModels.constBegin(); aIt != myPartModels.constEnd(); ++aIt) {
+          if ((*aIt)->hasDocument(aDoc)) {
+            aPartModel = (*aIt);
+            break;
+          }
+        }
+        if (aPartModel) {
+          QModelIndex aIndex = aPartModel->findParent(aFeature);
+          int aStart = aPartModel->rowCount(aIndex) - 1;
+          aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
+          insertRow(aStart, aIndex);
         }
       }
-      if (aPartModel) {
-        QModelIndex aIndex = aPartModel->findParent(aFeature);
-        int aStart = aPartModel->rowCount(aIndex) - 1;
-        aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-        insertRow(aStart, aIndex);
-      }
     }
-
   // Deleted object event ***********************
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED)) {
     const Model_FeatureDeletedMessage* aUpdMsg = dynamic_cast<const Model_FeatureDeletedMessage*>(theMessage);
     DocumentPtr aDoc = aUpdMsg->document();
+    std::set<std::string> aGroups = aUpdMsg->groups();
 
-    if (aDoc == myDocument) {  // If root objects
-      if (aUpdMsg->group().compare(PARTS_GROUP) == 0) { // Updsate only Parts group
-        int aStart = myPartModels.size();
-        removeSubModel(myPartModels.size() - 1);
-        removeRow(aStart, partFolderNode());
-      } else { // Update top groups (other except parts
-        QModelIndex aIndex = myModel->findGroup(aUpdMsg->group());
-        int aStart = myModel->rowCount(aIndex);
-        aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-        removeRow(aStart, aIndex);
-      }
-    } else {
-      XGUI_PartModel* aPartModel = 0;
-      QList<XGUI_PartModel*>::const_iterator aIt;
-      for (aIt = myPartModels.constBegin(); aIt != myPartModels.constEnd(); ++aIt) {
-        if ((*aIt)->hasDocument(aDoc)) {
-          aPartModel = (*aIt);
-          break;
+    std::set<std::string>::const_iterator aIt;
+    for (aIt = aGroups.begin(); aIt != aGroups.end(); ++aIt) {
+      std::string aGroup = (*aIt);
+      if (aDoc == myDocument) {  // If root objects
+        if (aGroup.compare(PARTS_GROUP) == 0) { // Updsate only Parts group
+          int aStart = myPartModels.size() - 1;
+          removeSubModel(aStart);
+          removeRow(aStart, partFolderNode());
+        } else { // Update top groups (other except parts
+          QModelIndex aIndex = myModel->findGroup(aGroup);
+          int aStart = myModel->rowCount(aIndex);
+          aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
+          removeRow(aStart, aIndex);
+        }
+      } else {
+        XGUI_PartModel* aPartModel = 0;
+        QList<XGUI_PartModel*>::const_iterator aIt;
+        for (aIt = myPartModels.constBegin(); aIt != myPartModels.constEnd(); ++aIt) {
+          if ((*aIt)->hasDocument(aDoc)) {
+            aPartModel = (*aIt);
+            break;
+          }
+        }
+        if (aPartModel) {
+          QModelIndex aIndex = aPartModel->findGroup(aGroup);
+          int aStart = aPartModel->rowCount(aIndex);
+          aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
+          removeRow(aStart, aIndex);
         }
       }
-      if (aPartModel) {
-        QModelIndex aIndex = aPartModel->findGroup(aUpdMsg->group());
-        int aStart = aPartModel->rowCount(aIndex);
-        aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
-        removeRow(aStart, aIndex);
-      }
     }
-
   // Deleted object event ***********************
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED)) {
     //const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);

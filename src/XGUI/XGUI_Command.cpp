@@ -38,6 +38,7 @@ QWidget* XGUI_Command::createWidget(QWidget* theParent)
     aButton->addAction(this);
     connect(aButton, SIGNAL(clicked()), this, SLOT(trigger()));
     connect(this, SIGNAL(toggled(bool)), aButton, SLOT(setChecked(bool)));
+    connect(this, SIGNAL(toggled(bool)), aButton, SLOT(setChecked(bool)));
     aButton->setFlat(true);
     aButton->setCheckable(myCheckable);
     this->setCheckable(myCheckable);
@@ -53,12 +54,12 @@ void XGUI_Command::connectTo(const QObject* theResiver, const char* theSlot)
     connect(this, SIGNAL(triggered(bool)), theResiver, theSlot);
 }
 
-const QStringList& XGUI_Command::unblockableCommands() const
+const QStringList& XGUI_Command::nestedCommands() const
 {
-  return myUnblockableCommands;
+  return myNestedCommands;
 }
 
-void XGUI_Command::setUnblockableCommands(const QStringList& myUnblockableCommands)
+void XGUI_Command::setNestedCommands(const QStringList& myUnblockableCommands)
 {
-  this->myUnblockableCommands = myUnblockableCommands;
+  this->myNestedCommands = myUnblockableCommands;
 }

@@ -27,6 +27,7 @@ class Config_FeatureMessage: public Events_Message
   std::string myPluginLibrary;  //Name of feature's library
 
   bool myUseInput; //Action is being checked until user commit the operation
+  bool myInternal; //Internal feature without GUI representation
   std::string myNestedFeatures;
 
 public:
@@ -45,6 +46,7 @@ public:
   CONFIG_EXPORT const std::string& pluginLibrary() const;
   CONFIG_EXPORT const std::string& nestedFeatures() const;
   CONFIG_EXPORT bool isUseInput() const;
+  CONFIG_EXPORT bool isInternal() const;
 
   CONFIG_EXPORT void setIcon(const std::string& icon);
   CONFIG_EXPORT void setId(const std::string& id);
@@ -56,6 +58,7 @@ public:
   CONFIG_EXPORT void setPluginLibrary(const std::string& thePluginLibrary);
   CONFIG_EXPORT void setNestedFeatures(const std::string& theNestedFeatures);
   CONFIG_EXPORT void setUseInput(bool isUseInput);
+  CONFIG_EXPORT void setInternal(bool isInternal);
 };
 
 #endif // CONFIG_MESSAGE_H

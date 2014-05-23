@@ -56,6 +56,10 @@ public:
   MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Document> document()
   {return myDoc;}
 
+  /// Returns true if feature refers to the same model data instance
+  MODELAPI_EXPORT virtual bool isSame(const boost::shared_ptr<ModelAPI_Feature>& theFeature)
+  {return true;}
+
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Feature() {}
 

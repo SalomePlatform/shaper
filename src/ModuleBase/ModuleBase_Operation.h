@@ -48,9 +48,16 @@ public:
   /// Destructor
   virtual ~ModuleBase_Operation();
 
+  // Returns operations Id from it's description
+  QString id() const;
   /// Returns the operation feature
   /// \return the feature
   boost::shared_ptr<ModelAPI_Feature> feature() const;
+
+  /// Returns whether the nested operations are enabled.
+  /// The state can depend on the operation current state.
+  /// \return enabled state
+  virtual bool isNestedOperationsEnabled() const;
 
   // Data model methods.
   /// Stores a real value in model.
@@ -70,9 +77,15 @@ protected:
   /// Virtual method called when operation committed (see commit() method for more description)
   virtual void commitOperation();
 
+  /// Send update message by loop
+  void flushUpdated();
+  /// Send created message by loop
+  void flushCreated();
+
   /// Creates an operation new feature
+  /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature();
+  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
 
   /// Returns the operation feature
   /// \return the feature

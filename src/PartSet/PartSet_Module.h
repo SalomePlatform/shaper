@@ -62,7 +62,8 @@ public slots:
   /// SLOT, that is called after the operation is stopped. Switched off the modfications performed
   /// by the operation start
   void onOperationStopped(ModuleBase_Operation* theOperation);
-
+  /// SLOT, that is called afetr the popup menu action clicked.
+  void onContextMenuCommand(const QString& theId, bool isChecked);
   /// SLOT, that is called by mouse press in the viewer.
   /// The mouse released point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
@@ -117,6 +118,10 @@ protected:
   /// Sends the operation
   /// \param theOperation the operation
   void sendOperation(ModuleBase_Operation* theOperation);
+
+protected:
+  //! Edits the feature
+  void editFeature(FeaturePtr theFeature);
 
 private:
   XGUI_Workshop* myWorkshop;

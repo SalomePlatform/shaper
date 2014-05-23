@@ -46,21 +46,24 @@ public:
   virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
   /// Initializes some fields accorging to the feature
-  /// \param theFeature the feature
-  /// \param thePresentations the list of additional presentations
+  /// \param theSelected the list of selected presentations
+  /// \param theHighlighted the list of highlighted presentations
   virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                    const std::list<XGUI_ViewerPrs>& thePresentations);
+                    const std::list<XGUI_ViewerPrs>& theSelected,
+                    const std::list<XGUI_ViewerPrs>& theHighlighted);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
   virtual boost::shared_ptr<ModelAPI_Feature> sketch() const;
 
   /// Gives the current selected objects to be processed by the operation
-  /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
+  /// \param theView a viewer to have the viewer the eye position
   /// \param theSelected the list of selected presentations
+  /// \param theHighlighted the list of highlighted presentations
  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                             const std::list<XGUI_ViewerPrs>& theSelected);
+                            const std::list<XGUI_ViewerPrs>& theSelected,
+                            const std::list<XGUI_ViewerPrs>& theHighlighted);
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
@@ -86,8 +89,9 @@ protected:
   /// Creates an operation new feature
   /// In addition to the default realization it appends the created line feature to
   /// the sketch feature
+  /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature();
+  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
 
   /// Creates a constraint on two points
   /// \param thePoint1 the first point

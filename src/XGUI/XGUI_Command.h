@@ -25,8 +25,8 @@ public:
     return data().toString();
   }*/
 
-  const QStringList& unblockableCommands() const;
-  void setUnblockableCommands(const QStringList& myUnblockableCommands);
+  const QStringList& nestedCommands() const;
+  void setNestedCommands(const QStringList& myUnblockableCommands);
 
   //! Connect the command to a slot
   virtual void connectTo(const QObject* theResiver, const char* theSlot);
@@ -38,7 +38,7 @@ protected:
 private:
   bool myCheckable;
   //! List of Ids of commands which WILL NOT be blocked when the command is on.
-  QStringList myUnblockableCommands;
+  QStringList myNestedCommands;
 };
 
 #endif

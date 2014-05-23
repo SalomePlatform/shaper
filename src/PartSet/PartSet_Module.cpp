@@ -122,14 +122,25 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   }
 }
 
+void PartSet_Module::onContextMenuCommand(const QString& theId, bool isChecked)
+{
+  QFeatureList aFeatures = myWorkshop->selector()->selectedFeatures();
+  if (theId == "EDIT_CMD" && (aFeatures.size() > 0)) {
+    editFeature(aFeatures.first());
+  }
+}
+
 void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
 {
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    std::list<XGUI_ViewerPrs> aPresentations = myWorkshop->displayer()->GetViewerPrs();
-    aPreviewOp->mousePressed(theEvent, myWorkshop->viewer()->activeView(), aPresentations);
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->GetSelected();
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->GetHighlighted();
+
+    aPreviewOp->mousePressed(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
   }
 }
 
@@ -139,8 +150,11 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    std::list<XGUI_ViewerPrs> aPresentations = myWorkshop->displayer()->GetViewerPrs();
-    aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aPresentations);
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->GetSelected();
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->GetHighlighted();
+
+    aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
   }
 }
 
@@ -164,7 +178,7 @@ void PartSet_Module::onKeyRelease(QKeyEvent* theEvent)
 void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
 {
   myWorkshop->viewer()->setViewProjection(theX, theY, theZ);
-  myWorkshop->actionsMgr()->setNestedActionsEnabled(true);
+  myWorkshop->actionsMgr()->update();
 }
 
 void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature)
@@ -173,10 +187,13 @@ void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<Mo
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp)
   {
-    std::list<XGUI_ViewerPrs> aPresentations = myWorkshop->displayer()->GetViewerPrs();
-    aPreviewOp->init(theFeature, aPresentations);
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+      // refill the features list with avoiding of the features, obtained only by vertex shape (TODO)
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->GetSelected(TopAbs_VERTEX);
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->GetHighlighted(TopAbs_VERTEX);
+    aPreviewOp->init(theFeature, aSelected, aHighlighted);
   }
-  myWorkshop->actionsMgr()->setActionChecked(anOperation->getDescription()->operationId(), true);
+  myWorkshop->actionsMgr()->updateCheckState();
   sendOperation(anOperation);
 }
 
@@ -197,6 +214,10 @@ void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeature
     }
   }
   aDisplayer->StopSelection(theFeatures, isStop, false);
+
+  XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
+  aViewer->enableSelection(!isStop);
+
   aDisplayer->UpdateViewer();
 }
 
@@ -384,3 +405,13 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
   aDisplayer->UpdateViewer();
 }
 
+void PartSet_Module::editFeature(FeaturePtr theFeature)
+{
+  /*if (!theFeature)
+    return;
+
+  if (theFeature->getKind() == "Sketch") {
+    onLaunchOperation(theFeature->getKind(), theFeature);
+    visualizePreview(theFeature, true);
+  }*/
+}

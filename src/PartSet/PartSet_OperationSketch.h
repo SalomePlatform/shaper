@@ -34,22 +34,24 @@ public:
   /// \return the selection mode
   virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
+  /// Initializes some fields accorging to the feature
+  /// \param theFeature the feature
+  /// \param thePresentations the list of additional presentations
+  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                    const std::list<XGUI_ViewerPrs>& thePresentations);
+
   /// Returns the operation sketch feature
   /// \returns the sketch instance
   virtual boost::shared_ptr<ModelAPI_Feature> sketch() const;
 
   /// Processes the mouse pressed in the point
-  /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
+  /// \param theView a viewer to have the viewer the eye position
   /// \param theSelected the list of selected presentations
+  /// \param theHighlighted the list of highlighted presentations
   virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<XGUI_ViewerPrs>& theSelected);
-  /// Processes the mouse release in the point
-  /// \param thePoint a point clicked in the viewer
-  /// \param theEvent the mouse event
-  /// \param theSelected the list of selected presentations
-  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                             const std::list<XGUI_ViewerPrs>& theSelected);
+                            const std::list<XGUI_ViewerPrs>& theSelected,
+                            const std::list<XGUI_ViewerPrs>& theHighlighted);
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
@@ -64,6 +66,12 @@ public:
   /// Emits a signal to hide the preview of the operation
   virtual void stopOperation();
 
+  /// Returns whether the nested operations are enabled.
+  /// The state can depend on the operation current state.
+  /// It returns true after the sketch plane is choosen.
+  /// \return enabled state
+  virtual bool isNestedOperationsEnabled() const;
+
 signals:
   /// signal about the sketch plane is selected
   /// \param theX the value in the X direction of the plane
@@ -72,12 +80,15 @@ signals:
   void planeSelected(double theX, double theY, double theZ);
 
 protected:
+  /// Returns whether the sketch plane is set
+  /// \return the boolean value whether the sketch is set
+  bool hasSketchPlane() const;
+
   /// Set the plane to the current sketch
   /// \param theShape the shape
   void setSketchPlane(const TopoDS_Shape& theShape);
 
 private:
-  bool myIsEditMode; /// the edit mode of this operation
   std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
 };
 

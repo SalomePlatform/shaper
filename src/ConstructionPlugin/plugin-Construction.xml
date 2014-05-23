@@ -1,11 +1,11 @@
 <plugin>
   <workbench id="Construction">
     <group id="Basic">
-      <feature id="Point" text="Point" tooltip="Create a new point" icon=":icons/point.png">
+      <feature id="Point" title="Point" tooltip="Create a new point" icon=":icons/point.png">
         <source path="point_widget.xml"/>
       </feature>
-      <feature id="Axis" text="Axis" tooltip="Create a new axis" icon=":icons/axis.png" keysequence=""/>
-      <feature id="Plane" text="Plane" tooltip="Create a new plane" icon=":icons/plane.png" keysequence=""/>
+      <feature id="Axis" title="Axis" tooltip="Create a new axis" icon=":icons/axis.png" keysequence="" internal="true"/>
+      <feature id="Plane" title="Plane" tooltip="Create a new plane" icon=":icons/plane.png" keysequence="" internal="true"/>
     </group>
   </workbench>  
 </plugin>

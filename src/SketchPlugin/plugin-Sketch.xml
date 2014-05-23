@@ -1,16 +1,16 @@
 <plugin>
   <workbench id="Sketch">
     <group id="Basic">
-      <feature id="Sketch" nested="SketchLine" text="New sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
-        <label text="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch"/> 
+      <feature id="Sketch" nested="SketchLine" title="New sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
+        <label title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch"/> 
       <!--icon=":pictures/x_point.png"-->
       </feature>
-      <feature id="SketchPoint" text="Point" tooltip="Create a new point" icon=":icons/point.png" />
-      <feature id="SketchLine" text="Line" tooltip="Create a new line" icon=":icons/line.png">
+      <feature id="SketchPoint" title="Point" tooltip="Create a new point" icon=":icons/point.png" internal="1"/>
+      <feature id="SketchLine" title="Line" tooltip="Create a new line" icon=":icons/line.png">
         <point_selector id="StartPoint" title="Start point" tooltip="Start point of the line"/>
         <point_selector id="EndPoint" title="End point" tooltip="End point of the line"/>
       </feature>
-      <feature id="SketchConstraintCoincidence" text="Points coincidence" tooltip="Create constraint for the coincidence of two points" icon="" />
+      <feature id="SketchConstraintCoincidence" title="Points coincidence" tooltip="Create constraint for the coincidence of two points" internal="1"/>
     </group>
   </workbench>
 </plugin>

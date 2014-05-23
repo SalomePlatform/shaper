@@ -33,7 +33,7 @@ using namespace std;
 
 PartSet_OperationSketch::PartSet_OperationSketch(const QString& theId,
 	                                             QObject* theParent)
-: PartSet_OperationSketchBase(theId, theParent), myIsEditMode(false)
+: PartSet_OperationSketchBase(theId, theParent)
 {
 }
 
@@ -44,11 +44,17 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
   std::list<int> aModes;
-  if (!myIsEditMode)
+  if (!hasSketchPlane())
     aModes.push_back(TopAbs_FACE);
   else
     aModes = PartSet_OperationSketchBase::getSelectionModes(theFeature);
   return aModes;
+}
+
+void PartSet_OperationSketch::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                   const std::list<XGUI_ViewerPrs>& thePresentations)
+{
+  setFeature(theFeature);
 }
 
 boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketch::sketch() const
@@ -57,38 +63,37 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketch::sketch() const
 }
 
 void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                           const std::list<XGUI_ViewerPrs>& theSelected)
+                                           const std::list<XGUI_ViewerPrs>& theSelected,
+                                           const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
-  myFeatures = theSelected;
-}
-
-void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                            const std::list<XGUI_ViewerPrs>& theSelected)
-{
-  if (theSelected.empty())
-    return;
-
-  if (!myIsEditMode) {
-    XGUI_ViewerPrs aPrs = theSelected.front();
-    const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull()) {
-      setSketchPlane(aShape);
-      myIsEditMode = true;
+  if (!hasSketchPlane()) {
+    if (!theHighlighted.empty()) {
+      XGUI_ViewerPrs aPrs = theHighlighted.front();
+      const TopoDS_Shape& aShape = aPrs.shape();
+      if (!aShape.IsNull())
+        setSketchPlane(aShape);
     }
   }
   else {
-    if (theSelected.size() == 1) {
-      boost::shared_ptr<ModelAPI_Feature> aFeature = theSelected.front().feature();
+    // if shift button is pressed and there are some already selected objects, the operation should
+    // not be started. We just want to combine some selected objects.
+    bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+    if (aHasShift && theSelected.size() > 0)
+      return;
+
+    if (theHighlighted.size() == 1) {
+      boost::shared_ptr<ModelAPI_Feature> aFeature = theHighlighted.front().feature();
       if (aFeature)
         emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
     }
+    else
+      myFeatures = theHighlighted;
   }
-  myFeatures.clear();
 }
 
 void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
-  if (!myIsEditMode || !(theEvent->buttons() &  Qt::LeftButton) || myFeatures.empty())
+  if (!hasSketchPlane() || !(theEvent->buttons() &  Qt::LeftButton) || myFeatures.empty())
     return;
 
   if (myFeatures.size() != 1) {
@@ -107,6 +112,8 @@ std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
   boost::shared_ptr<SketchPlugin_Feature> aFeature;
 
   boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+  if (!aData->isValid())
+    return aPreviewMap;
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SKETCH_ATTR_FEATURES));
 
@@ -129,6 +136,30 @@ void PartSet_OperationSketch::stopOperation()
   emit closeLocalContext();
 }
 
+bool PartSet_OperationSketch::isNestedOperationsEnabled() const
+{
+  return hasSketchPlane();
+}
+
+bool PartSet_OperationSketch::hasSketchPlane() const
+{
+  bool aHasPlane = false;
+
+  if (feature()) {
+    // set plane parameters to feature
+    boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+
+    boost::shared_ptr<ModelAPI_AttributeDouble> anAttr;
+    // temporary solution for main planes only
+    boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
+      boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_NORM));
+    double aX = aNormal->x(), anY = aNormal->y(), aZ = aNormal->z();
+
+    aHasPlane = aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
+  }
+  return aHasPlane;
+}
+
 void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
 {
   if (theShape.IsNull())
@@ -147,12 +178,6 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
   aPlane->coefficients(anA, aB, aC, aD);
 
   boost::shared_ptr<ModelAPI_AttributeDouble> anAttr;
-  /*
-  aData->real(SKETCH_ATTR_PLANE_A)->setValue(anA);
-  aData->real(SKETCH_ATTR_PLANE_B)->setValue(aB);
-  aData->real(SKETCH_ATTR_PLANE_C)->setValue(aC);
-  aData->real(SKETCH_ATTR_PLANE_D)->setValue(aD);
-  */
   // temporary solution for main planes only
   boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
     boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SKETCH_ATTR_ORIGIN));
@@ -167,6 +192,9 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRY));
   aDirY->setValue(aC, anA, aB);
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+
+  flushUpdated();
+
   emit featureConstructed(feature(), FM_Hide);
   emit closeLocalContext();
   emit planeSelected(aDir->x(), aDir->y(), aDir->z());

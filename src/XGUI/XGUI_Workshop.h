@@ -113,8 +113,8 @@ public slots:
 
   void onNew();
   void onOpen();
-  void onSave();
-  void onSaveAs();
+  bool onSave();
+  bool onSaveAs();
   void onExit();
   void onUndo();
   void onRedo();
@@ -158,7 +158,6 @@ private:
   // Creates Dock widgets: Object browser and Property panel
   void createDockWidgets();
 
-  QString myCurrentFile;
   XGUI_MainWindow* myMainWindow;
   XGUI_Module* myPartSetModule;
   XGUI_ObjectsBrowser* myObjectBrowser;
@@ -172,6 +171,7 @@ private:
   XGUI_ViewerProxy* myViewerProxy;
   XGUI_ContextMenuMgr* myContextMenuMgr;
 
+  QString myCurrentDir;
   static QMap<QString, QString> myIcons;
 
 };

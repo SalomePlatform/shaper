@@ -11,6 +11,7 @@
 
 #include <QList>
 #include <QObject>
+#include <QStringList>
 
 /**\class XGUI_OperationMgr
  * \ingroup GUI
@@ -46,6 +47,8 @@ public:
   /// Abort the operation and append it to the stack of operations
   /// \return the state whether the current operation is aborted
   bool abortOperation();
+  ///Returns list of all operations IDs
+  QStringList operationList();
 
 signals:
   /// Signal about an operation is started. It is emitted after the start() of operation is done.

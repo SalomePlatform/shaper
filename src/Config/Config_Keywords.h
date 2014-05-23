@@ -34,11 +34,12 @@ const static char* _ID = "id";
 //const static char* WORKBENCH_ID = "id";
 //const static char* GROUP_ID = "id";
 //const static char* FEATURE_ID = "id";
-const static char* FEATURE_TEXT = "text";
+const static char* FEATURE_TEXT = "title";
 const static char* FEATURE_TOOLTIP = "tooltip";
 const static char* FEATURE_ICON = "icon";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
 const static char* FEATURE_NESTED = "nested";
+const static char* FEATURE_INTERNAL = "internal";
 const static char* SOURCE_FILE = "path";
 
 

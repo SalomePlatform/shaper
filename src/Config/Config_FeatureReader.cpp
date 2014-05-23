@@ -17,6 +17,7 @@
 #include <libxml/xmlstring.h>
 
 #include <string>
+#include <algorithm>
 
 #ifdef _DEBUG
 #include <iostream>
@@ -72,12 +73,28 @@ bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
 void Config_FeatureReader::fillFeature(xmlNodePtr theRoot, Config_FeatureMessage& outFtMessage)
 {
   outFtMessage.setId(getProperty(theRoot, _ID));
+  outFtMessage.setPluginLibrary(myLibraryName);
+  outFtMessage.setNestedFeatures(getProperty(theRoot, FEATURE_NESTED));
+  bool isFtInternal = isInternalFeature(theRoot);
+  outFtMessage.setInternal(isFtInternal);
+  if(isFtInternal) {
+    //Internal feature has no visual representation.
+    return;
+  }
   outFtMessage.setText(getProperty(theRoot, FEATURE_TEXT));
   outFtMessage.setTooltip(getProperty(theRoot, FEATURE_TOOLTIP));
   outFtMessage.setIcon(getProperty(theRoot, FEATURE_ICON));
   outFtMessage.setKeysequence(getProperty(theRoot, FEATURE_KEYSEQUENCE));
   outFtMessage.setGroupId(myLastGroup);
   outFtMessage.setWorkbenchId(myLastWorkbench);
-  outFtMessage.setPluginLibrary(myLibraryName);
-  outFtMessage.setNestedFeatures(getProperty(theRoot, FEATURE_NESTED));
+}
+
+bool Config_FeatureReader::isInternalFeature(xmlNodePtr theRoot)
+{
+  std::string prop = getProperty(theRoot, FEATURE_INTERNAL);
+  std::transform(prop.begin(), prop.end(), prop.begin(), ::tolower);
+  if(prop.empty() || prop == "false" || prop == "0") {
+    return false;
+  }
+  return true;
 }

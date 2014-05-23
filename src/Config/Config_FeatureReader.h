@@ -31,6 +31,7 @@ protected:
   bool processChildren(xmlNodePtr aNode);
 
   void fillFeature(xmlNodePtr theRoot, Config_FeatureMessage& outFeatureMessage);
+  bool isInternalFeature(xmlNodePtr theRoot);
 
 private:
   std::string myLastWorkbench;
