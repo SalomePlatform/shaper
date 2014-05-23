@@ -180,8 +180,9 @@ void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<Mo
   if (aPreviewOp)
   {
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->GetSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->GetHighlighted();
+      // refill the features list with avoiding of the features, obtained only by vertex shape (TODO)
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->GetSelected(TopAbs_VERTEX);
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->GetHighlighted(TopAbs_VERTEX);
     aPreviewOp->init(theFeature, aSelected, aHighlighted);
   }
   myWorkshop->actionsMgr()->updateCheckState();
