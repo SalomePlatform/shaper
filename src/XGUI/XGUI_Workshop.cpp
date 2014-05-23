@@ -814,12 +814,17 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
         } else {
           ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
           aDoc = aObject->featureRef()->data()->docRef("PartDocument")->value();
+          aFeature = aObject->featureRef();
         }
         if (aDoc == aMgr->currentDocument()) {
           aDoc->close();
         }
-      } //else
-        //aDoc = aFeature->document();
+      } else {
+        if (!aFeature->data()) {
+          ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
+          aFeature = aObject->featureRef();
+        }
+      }
       aMgr->rootDocument()->removeFeature(aFeature);
     }
     aMgr->rootDocument()->finishOperation();
