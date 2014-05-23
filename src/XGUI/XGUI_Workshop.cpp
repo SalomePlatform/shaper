@@ -97,7 +97,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)), SLOT(onOperationStopped(ModuleBase_Operation*)));
   connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
   connect(myOperationMgr, SIGNAL(operationStarted()), myActionsMgr, SLOT(update()));
-  connect(myOperationMgr, SIGNAL(operationStopped()), myActionsMgr, SLOT(update()));
+  connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)), myActionsMgr, SLOT(update()));
   connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
 }
 
