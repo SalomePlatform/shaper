@@ -24,6 +24,7 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   this->setWindowTitle(tr("Property Panel"));
   QAction* aViewAct = this->toggleViewAction();
   this->setObjectName(XGUI::PROP_PANEL);
+  setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
   QWidget* aContent = new QWidget(this);
   QVBoxLayout* aMainLay = new QVBoxLayout(aContent);

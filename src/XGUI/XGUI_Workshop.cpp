@@ -662,6 +662,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   QDockWidget* aObjDock = new QDockWidget(theParent);
   aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   aObjDock->setWindowTitle(tr("Object browser"));
+  aObjDock->setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
   connect(myObjectBrowser, SIGNAL(activePartChanged(FeaturePtr)), this, SLOT(changeCurrentDocument(FeaturePtr)));
   aObjDock->setWidget(myObjectBrowser);
