@@ -59,12 +59,14 @@ public:
   //             const bool isUpdateViewer = true);
   
   /// Returns a list of viewer selected presentations
+  /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  std::list<XGUI_ViewerPrs> GetSelected();
+  std::list<XGUI_ViewerPrs> GetSelected(const int theShapeTypeToSkip = -1);
 
   /// Returns a list of viewer highlited presentations
+  /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  std::list<XGUI_ViewerPrs> GetHighlighted();
+  std::list<XGUI_ViewerPrs> GetHighlighted(const int theShapeTypeToSkip = -1);
 
   /// Display the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance

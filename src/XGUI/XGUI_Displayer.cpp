@@ -55,7 +55,7 @@ void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
 }*/
 
 
-std::list<XGUI_ViewerPrs> XGUI_Displayer::GetSelected()
+std::list<XGUI_ViewerPrs> XGUI_Displayer::GetSelected(const int theShapeTypeToSkip)
 {
   std::set<boost::shared_ptr<ModelAPI_Feature> > aPrsFeatures;
   std::list<XGUI_ViewerPrs> aPresentations;
@@ -64,6 +64,8 @@ std::list<XGUI_ViewerPrs> XGUI_Displayer::GetSelected()
   for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
     Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
     TopoDS_Shape aShape = aContext->SelectedShape();
+    if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
+      continue;
 
     boost::shared_ptr<ModelAPI_Feature> aFeature = GetFeature(anIO);
     if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
@@ -74,7 +76,7 @@ std::list<XGUI_ViewerPrs> XGUI_Displayer::GetSelected()
   return aPresentations;
 }
 
-std::list<XGUI_ViewerPrs> XGUI_Displayer::GetHighlighted()
+std::list<XGUI_ViewerPrs> XGUI_Displayer::GetHighlighted(const int theShapeTypeToSkip)
 {
   std::set<boost::shared_ptr<ModelAPI_Feature> > aPrsFeatures;
   std::list<XGUI_ViewerPrs> aPresentations;
@@ -83,6 +85,8 @@ std::list<XGUI_ViewerPrs> XGUI_Displayer::GetHighlighted()
   for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
     Handle(AIS_InteractiveObject) anIO = aContext->DetectedInteractive();
     TopoDS_Shape aShape = aContext->DetectedShape();
+    if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
+      continue;
 
     boost::shared_ptr<ModelAPI_Feature> aFeature = GetFeature(anIO);
     if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
@@ -122,8 +126,8 @@ void XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
     aContext->ClearCurrents(false);
     aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
     // set mouse sensitivity
-    aContext->SetSensitivityMode(StdSelect_SM_WINDOW);
-    aContext->SetPixelTolerance(MOUSE_SENSITIVITY_IN_PIXEL);
+    //aContext->SetSensitivityMode(StdSelect_SM_WINDOW);
+    //aContext->SetPixelTolerance(MOUSE_SENSITIVITY_IN_PIXEL);
   }
   // display or redisplay presentation
   Handle(AIS_Shape) anAIS;

@@ -95,7 +95,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
             boost::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
           if (aSketch)
             changeWorkplane(aSketch);
-          return ;
+          continue;
         }
         boost::shared_ptr<SketchPlugin_Constraint> aConstraint =
           boost::dynamic_pointer_cast<SketchPlugin_Constraint>(*aFeatIter);
@@ -311,7 +311,11 @@ SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::
 
   // Initialize workplane
   myWorkplane.h = SLVS_E_UNKNOWN;
+#ifndef NDEBUG
   assert(addWorkplane(theWorkplane));
+#else
+  addWorkplane(theWorkplane);
+#endif
 }
 
 SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::~SketchSolver_ConstraintGroup()
