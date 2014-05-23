@@ -299,6 +299,7 @@ void XGUI_Workshop::onOperationStarted()
     myPropertyPanel->setModelWidgets(aFactory.getModelWidgets());
     myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
   }
+  updateCommandStatus();
 }
 
 //******************************************************
@@ -529,6 +530,8 @@ void XGUI_Workshop::onRedo()
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   DocumentPtr aDoc = aMgr->rootDocument();
+  if (aDoc->isOperation())
+    operationMgr()->abortOperation();
   aDoc->redo();
   updateCommandStatus();
 }
