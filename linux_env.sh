@@ -86,7 +86,10 @@ export CSF_SHMessage=${CAS_ROOT_DIR}/src/SHMessage
 export CSF_XSMessage=${CAS_ROOT_DIR}/src/XSMessage 
 # Variable for Font : 
 export CSF_MDTVFontDirectory=${CAS_ROOT_DIR}/src/FontMFT 
-export CSF_MDTVTexturesDirectory=${CAS_ROOT_DIR}/src/Textures 
+export CSF_MDTVTexturesDirectory=${CAS_ROOT_DIR}/src/Textures
+# Defaults
+export CSF_PluginDefaults=${CAS_ROOT_DIR}/src/StdResource 
+export CSF_StandardDefaults=${CAS_ROOT_DIR}/src/StdResource
 # Activation of OCCT Kernel multithreading :
 export MMGT_REENTRANT=1
 # this variable only needed for DRAWEXE
