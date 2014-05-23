@@ -507,7 +507,8 @@ bool XGUI_Workshop::onSaveAs()
   QDir aDir(aTempDir);
   if(aDir.exists() && !aDir.entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).isEmpty()) {
     int answer = QMessageBox::question(myMainWindow,
-                                       QString(),
+                                       //: Title of the dialog which asks user if he wants to save study in existing non-empty folder
+                                       tr("Save"),
                                        tr("The folder already contains some files, save anyway?"),
                                        QMessageBox::Save|QMessageBox::Cancel);
     if(answer == QMessageBox::Cancel) {
