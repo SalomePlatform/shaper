@@ -311,7 +311,11 @@ SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::
 
   // Initialize workplane
   myWorkplane.h = SLVS_E_UNKNOWN;
+#ifndef NDEBUG
   assert(addWorkplane(theWorkplane));
+#else
+  addWorkplane(theWorkplane);
+#endif
 }
 
 SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::~SketchSolver_ConstraintGroup()
