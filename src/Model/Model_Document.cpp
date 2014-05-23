@@ -161,6 +161,11 @@ bool Model_Document::save(const char* theFileName)
 
 void Model_Document::close()
 {
+  boost::shared_ptr<ModelAPI_PluginManager> aPM = Model_PluginManager::get();
+  if (this != aPM->rootDocument().get() && 
+      this == aPM->currentDocument().get()) {
+    aPM->setCurrentDocument(aPM->rootDocument());
+  }
   // close all subs
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
@@ -174,12 +179,15 @@ void Model_Document::close()
 
 void Model_Document::startOperation()
 {
-  // check is it nested or not
-  if (myDoc->HasOpenCommand()) {
-    myNestedStart = myTransactionsAfterSave;
+  if (myDoc->HasOpenCommand()) { // start of nested command
+    if (myNestedNum == -1) {
+      myNestedNum = 0;
+      myDoc->InitDeltaCompaction();
+    }
+    myDoc->NewCommand();
+  } else { // start of simple command
+    myDoc->NewCommand();
   }
-  // new command for this
-  myDoc->OpenCommand();
   // new command for all subs
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
@@ -188,11 +196,26 @@ void Model_Document::startOperation()
 
 void Model_Document::finishOperation()
 {
-  if (myNestedStart > myTransactionsAfterSave) // this nested transaction is owervritten
-    myNestedStart = 0;
-  // returns false if delta is empty and no transaction was made
-  myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();
-  myTransactionsAfterSave++;
+  if (myNestedNum != -1) // this nested transaction is owervritten
+    myNestedNum++;
+  if (!myDoc->HasOpenCommand()) {
+    if (myNestedNum != -1) {
+      myNestedNum -= 2; // one is just incremented before, one is left (and not empty!)
+      while(myNestedNum != -1) {
+        myIsEmptyTr.erase(myTransactionsAfterSave);
+        myTransactionsAfterSave--;
+        myNestedNum--;
+      }
+      myIsEmptyTr[myTransactionsAfterSave] = false;
+      myTransactionsAfterSave++;
+      myDoc->PerformDeltaCompaction();
+    }
+  } else {
+    // returns false if delta is empty and no transaction was made
+    myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand() && (myNestedNum == -1);
+    myTransactionsAfterSave++;
+  }
+
   // finish for all subs
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
@@ -201,6 +224,8 @@ void Model_Document::finishOperation()
 
 void Model_Document::abortOperation()
 {
+  if (myNestedNum == 0)
+    myNestedNum = -1;
   myDoc->AbortCommand();
   synchronizeFeatures();
   // abort for all subs
@@ -212,7 +237,7 @@ void Model_Document::abortOperation()
 bool Model_Document::isOperation()
 {
   // operation is opened for all documents: no need to check subs
-  return myDoc->HasOpenCommand() == Standard_True ;
+  return myDoc->HasOpenCommand() == Standard_True;
 }
 
 bool Model_Document::isModified()
@@ -223,7 +248,7 @@ bool Model_Document::isModified()
 
 bool Model_Document::canUndo()
 {
-  if (myDoc->GetAvailableUndos() > 0 && myNestedStart != myTransactionsAfterSave)
+  if (myDoc->GetAvailableUndos() > 0 && myNestedNum != 0 && myTransactionsAfterSave != 0 /* for omitting the first useless transaction */)
     return true;
   // check other subs contains operation that can be undoed
   set<string>::iterator aSubIter = mySubs.begin();
@@ -236,6 +261,7 @@ bool Model_Document::canUndo()
 void Model_Document::undo()
 {
   myTransactionsAfterSave--;
+  if (myNestedNum > 0) myNestedNum--;
   if (!myIsEmptyTr[myTransactionsAfterSave])
     myDoc->Undo();
   synchronizeFeatures();
@@ -259,6 +285,7 @@ bool Model_Document::canRedo()
 
 void Model_Document::redo()
 {
+  if (myNestedNum != -1) myNestedNum++;
   if (!myIsEmptyTr[myTransactionsAfterSave])
     myDoc->Redo();
   myTransactionsAfterSave++;
@@ -458,10 +485,13 @@ Model_Document::Model_Document(const std::string theID)
 {
   myDoc->SetUndoLimit(UNDO_LIMIT);
   myTransactionsAfterSave = 0;
-  myNestedStart = 0;
-  myDoc->SetNestedTransactionMode();
+  myNestedNum = -1;
+  //myDoc->SetNestedTransactionMode();
   // to have something in the document and avoid empty doc open/save problem
+  // in transaction for nesting correct working
+  myDoc->NewCommand();
   TDataStd_Integer::Set(myDoc->Main().Father(), 0);
+  myDoc->CommitCommand();
 }
 
 TDF_Label Model_Document::groupLabel(const string theGroup)
