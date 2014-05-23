@@ -7,6 +7,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <Model_Events.h>
+#include <ModelAPI_Object.h>
 
 #include <Events_Loop.h>
 
@@ -58,7 +59,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
       if (aDoc == myDocument) {  // If root objects
         if (aFeature->getGroup().compare(PARTS_GROUP) == 0) { // Update only Parts group
           // Add a new part
-          int aStart = myPartModels.size() + 1;
+          int aStart = myPartModels.size();
           XGUI_PartDataModel* aModel = new XGUI_PartDataModel(myDocument, this);
           aModel->setPartId(myPartModels.count());
           myPartModels.append(aModel);
@@ -100,6 +101,11 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
           int aStart = myPartModels.size() - 1;
           removeSubModel(aStart);
           removeRow(aStart, partFolderNode());
+          if (myActivePart && (!isPartSubModel(myActivePart))) {
+            myActivePart = 0;
+            myActivePartIndex = QModelIndex();
+            myModel->setItemsColor(ACTIVE_COLOR);
+          }
         } else { // Update top groups (other except parts
           QModelIndex aIndex = myModel->findGroup(aGroup);
           int aStart = myModel->rowCount(aIndex);
@@ -470,6 +476,7 @@ void XGUI_DocumentDataModel::deactivatePart()
   if (myActivePart) 
     myActivePart->setItemsColor(PASSIVE_COLOR);
   myActivePart = 0;
+  myActivePartIndex = QModelIndex();
   myModel->setItemsColor(ACTIVE_COLOR);
 }
  
@@ -484,11 +491,16 @@ Qt::ItemFlags XGUI_DocumentDataModel::flags(const QModelIndex& theIndex) const
 
 QModelIndex XGUI_DocumentDataModel::partIndex(const FeaturePtr& theFeature) const 
 {
+  FeaturePtr aFeature = theFeature;
+  if (!aFeature->data()) {
+    ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
+    aFeature = aObject->featureRef();
+  }
   int aRow = -1;
   XGUI_PartModel* aModel = 0;
   foreach (XGUI_PartModel* aPartModel, myPartModels) {
     aRow++;
-    if (aPartModel->part() == theFeature) {
+    if (aPartModel->part() == aFeature) {
       aModel = aPartModel;
       break;
     }

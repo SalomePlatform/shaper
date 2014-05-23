@@ -585,11 +585,14 @@ void Model_Document::synchronizeFeatures()
       aDSTag = aFLabIter.Value()->Label().Tag();
     }
     if (aDSTag > aFeatureTag) { // feature is removed
-      Model_FeatureDeletedMessage aMsg1(aThis, FEATURES_GROUP);
-      Model_FeatureDeletedMessage aMsg2(aThis, (*aFIter)->getGroup());
+      FeaturePtr aFeature = *aFIter;
       aFIter = myFeatures.erase(aFIter);
       // event: model is updated
-      Events_Loop::loop()->send(aMsg1);
+      if (aFeature->isInHistory()) {
+        Model_FeatureDeletedMessage aMsg1(aThis, FEATURES_GROUP);
+        Events_Loop::loop()->send(aMsg1);
+      }
+      Model_FeatureDeletedMessage aMsg2(aThis, aFeature->getGroup());
       Events_Loop::loop()->send(aMsg2);
     } else if (aDSTag < aFeatureTag) { // a new feature is inserted
       // create a feature

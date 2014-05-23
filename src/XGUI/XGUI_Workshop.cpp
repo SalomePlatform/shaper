@@ -121,7 +121,6 @@ void XGUI_Workshop::startApplication()
   Events_ID aFeatureUpdatedId = aLoop->eventByName(EVENT_FEATURE_UPDATED);
   aLoop->registerListener(this, aFeatureUpdatedId);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
 
   activateModule();
   if (myMainWindow) {
@@ -236,13 +235,6 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
       // only when it is created everywere
       QTimer::singleShot(50, this, SLOT(activateLastPart()));
     }
-  }
-
-  // Process deletion of a part
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED)) {
-    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-    if (aMgr->currentDocument() == aMgr->rootDocument())
-      activatePart(FeaturePtr()); // Activate PartSet
   }
 
   //Update property panel on corresponding message. If there is no current operation (no
