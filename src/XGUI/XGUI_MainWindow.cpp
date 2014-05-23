@@ -14,6 +14,7 @@
 #include <QDockWidget>
 #include <QApplication>
 #include <QTimer>
+#include <QCloseEvent>
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     : QMainWindow(parent), 
@@ -197,4 +198,10 @@ void XGUI_MainWindow::onViewActivated(QMdiSubWindow* theSubWnd)
     if (aAct->isCheckable())
       aAct->setChecked(aAct->text() == aWndTitle);
   }
+}
+
+void XGUI_MainWindow::closeEvent(QCloseEvent * event)
+{
+  emit exitKeySequence();
+  event->ignore();
 }

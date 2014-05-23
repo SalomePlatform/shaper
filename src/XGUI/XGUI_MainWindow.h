@@ -11,6 +11,7 @@ class XGUI_ViewWindow;
 class QMdiArea;
 class QMdiSubWindow;
 class PyConsole_EnhConsole;
+class QCloseEvent;
 
 /**\class XGUI_MainWindow
  * \ingroup GUI
@@ -52,6 +53,12 @@ private slots:
   void onDeleteView(XGUI_ViewWindow* theWindow);
   void activateView();
   void onViewActivated(QMdiSubWindow* theSubWnd);
+
+signals:
+  void exitKeySequence();
+
+protected:
+  void closeEvent(QCloseEvent* event);
 
 private:
   XGUI_MainMenu* myMenuBar;
