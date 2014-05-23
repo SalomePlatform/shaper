@@ -530,6 +530,8 @@ void XGUI_Workshop::onRedo()
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   DocumentPtr aDoc = aMgr->rootDocument();
+  if (aDoc->isOperation())
+    operationMgr()->abortOperation();
   aDoc->redo();
   updateCommandStatus();
 }
