@@ -34,6 +34,12 @@ public:
   /// \return the selection mode
   virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
+  /// Initializes some fields accorging to the feature
+  /// \param theFeature the feature
+  /// \param thePresentations the list of additional presentations
+  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                    const std::list<XGUI_ViewerPrs>& thePresentations);
+
   /// Returns the operation sketch feature
   /// \returns the sketch instance
   virtual boost::shared_ptr<ModelAPI_Feature> sketch() const;

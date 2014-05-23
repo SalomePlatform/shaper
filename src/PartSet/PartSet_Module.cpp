@@ -122,6 +122,14 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   }
 }
 
+void PartSet_Module::onContextMenuCommand(const QString& theId, bool isChecked)
+{
+  QFeatureList aFeatures = myWorkshop->selector()->selectedFeatures();
+  if (theId == "EDIT_CMD" && (aFeatures.size() > 0)) {
+    editFeature(aFeatures.first());
+  }
+}
+
 void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
 {
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
@@ -397,3 +405,13 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
   aDisplayer->UpdateViewer();
 }
 
+void PartSet_Module::editFeature(FeaturePtr theFeature)
+{
+  /*if (!theFeature)
+    return;
+
+  if (theFeature->getKind() == "Sketch") {
+    onLaunchOperation(theFeature->getKind(), theFeature);
+    visualizePreview(theFeature, true);
+  }*/
+}
