@@ -704,6 +704,10 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::resolveConstr
 void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::mergeGroups(
                 const SketchSolver_ConstraintGroup& theGroup)
 {
+  // If specified group is empty, no need to merge
+  if (theGroup.myConstraintMap.size() == 0)
+    return ;
+
   // NOTE: The possibility, that some elements are placed into both groups, is around 0, 
   // so the objects should be copied with changing the indexes
 
@@ -767,7 +771,11 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::mergeGroups(
   std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::const_iterator
     aSPConstrMapIter = theGroup.myConstraintMap.begin();
   for ( ; aSPConstrMapIter!= theGroup.myConstraintMap.end(); aSPConstrMapIter++)
-    myConstraintMap[aSPConstrMapIter->first] = aConstrMap.find(aSPConstrMapIter->second)->second;
+  {
+    std::map<Slvs_hConstraint, Slvs_hConstraint>::iterator aFind = aConstrMap.find(aSPConstrMapIter->second);
+    if (aFind != aConstrMap.end())
+      myConstraintMap[aSPConstrMapIter->first] = aFind->second;
+  }
 
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator
     aSPEntMapIter = theGroup.myEntityMap.begin();
@@ -780,7 +788,11 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::mergeGroups(
   // Add temporary constraints
   std::list<Slvs_hConstraint>::const_iterator aTempConstrIter = theGroup.myTempConstraints.begin();
   for ( ; aTempConstrIter != theGroup.myTempConstraints.end(); aTempConstrIter++)
-    myTempConstraints.push_back(aConstrMap.find(*aTempConstrIter)->second);
+  {
+    std::map<Slvs_hConstraint, Slvs_hConstraint>::iterator aFind = aConstrMap.find(*aTempConstrIter);
+    if (aFind != aConstrMap.end())
+      myTempConstraints.push_back(aFind->second);
+  }
   myTempConstraints.sort();
 
   myNeedToSolve = myNeedToSolve || theGroup.myNeedToSolve;
