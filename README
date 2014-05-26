@@ -1,4 +1,4 @@
-NewGEOM version 0.1 (end of development phase 1 result).
+NewGEOM version 0.2 (end of development phase 2 result).
 
 
 Compilation on LINUX:
@@ -9,6 +9,15 @@ Compilation on LINUX:
   cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=${ROOT_DIR}/install ${ROOT_DIR}/sources
   make
   make install
+
+or simply (only for not-SALOME prerequisites):
+
+  make.sh
+
+Note that it is possible to use SALOME installed environment for compilation. 
+For this just import it (PDIR variable will be set automatically) or update 
+salome_env.sh first "export" and import this script.
+
 
 It will create a "build" and "install" folders. Environment is ready to launch an application:
 
@@ -28,4 +37,12 @@ It will launch the Visual Studio 2010. In it build for: "ALL_BUILD" and then "IN
 Launch:
 
   winRun.bat
-  
+
+For compilation on Windows basing on SALOME products already installed please use:
+
+msvc9_env_Salome.bat
+
+SALOME_ROOT_DIR is needed to be correctly set or located in "SALOME" folder of
+parent to NewGEOM folder. For the current moment SALOME 7.3.0 compiled on
+Visual Studio 2008 compiler is supported.
+
