@@ -110,6 +110,9 @@ protected:
 
   Handle_TDocStd_Document document() {return myDoc;}
 
+  //! performas compactification of all nested operations into one
+  void compactNested();
+
   friend class Model_Application;
   friend class Model_PluginManager;
 

@@ -184,6 +184,8 @@ void Model_Document::startOperation()
       myNestedNum = 0;
       myDoc->InitDeltaCompaction();
     }
+    myIsEmptyTr[myTransactionsAfterSave] = false;
+    myTransactionsAfterSave++;
     myDoc->NewCommand();
   } else { // start of simple command
     myDoc->NewCommand();
@@ -192,6 +194,17 @@ void Model_Document::startOperation()
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
     subDocument(*aSubIter)->startOperation();
+}
+
+void Model_Document::compactNested() {
+  while(myNestedNum != -1) {
+    myTransactionsAfterSave--;
+    myIsEmptyTr.erase(myTransactionsAfterSave);
+    myNestedNum--;
+  }
+  myIsEmptyTr[myTransactionsAfterSave] = false;
+  myTransactionsAfterSave++;
+  myDoc->PerformDeltaCompaction();
 }
 
 void Model_Document::finishOperation()
@@ -205,15 +218,8 @@ void Model_Document::finishOperation()
     myNestedNum++;
   if (!myDoc->HasOpenCommand()) {
     if (myNestedNum != -1) {
-      myNestedNum -= 2; // one is just incremented before, one is left (and not empty!)
-      while(myNestedNum != -1) {
-        myIsEmptyTr.erase(myTransactionsAfterSave);
-        myTransactionsAfterSave--;
-        myNestedNum--;
-      }
-      myIsEmptyTr[myTransactionsAfterSave] = false;
-      myTransactionsAfterSave++;
-      myDoc->PerformDeltaCompaction();
+      myNestedNum--;
+      compactNested();
     }
   } else {
     // returns false if delta is empty and no transaction was made
@@ -229,13 +235,23 @@ void Model_Document::finishOperation()
 
 void Model_Document::abortOperation()
 {
-  if (myNestedNum == 0)
-    myNestedNum = -1;
-  myDoc->AbortCommand();
+  if (myNestedNum > 0 && !myDoc->HasOpenCommand()) { // abort all what was done in nested
+    // first compact all nested
+    compactNested();
+    // for nested it is undo and clear redos
+    myDoc->Undo();
+    myDoc->ClearRedos();
+    myTransactionsAfterSave--;
+    myIsEmptyTr.erase(myTransactionsAfterSave);
+  } else {
+    if (myNestedNum == 0) // abort only high-level
+      myNestedNum = -1;
+    myDoc->AbortCommand();
+  }
   synchronizeFeatures(true);
   // abort for all subs
   set<string>::iterator aSubIter = mySubs.begin();
-  for(; aSubIter != mySubs.end(); aSubIter++)
+    for(; aSubIter != mySubs.end(); aSubIter++)
     subDocument(*aSubIter)->abortOperation();
 }
 
