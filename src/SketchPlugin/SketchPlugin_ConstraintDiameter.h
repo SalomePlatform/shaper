@@ -1,28 +1,27 @@
-// File:    SketchPlugin_ConstraintCoincidence.h
-// Created: 08 May 2014
+// File:    SketchPlugin_ConstraintDiameter.h
+// Created: 26 May 2014
 // Author:  Artem ZHIDKOV
 
-#ifndef SketchPlugin_ConstraintCoincidence_HeaderFile
-#define SketchPlugin_ConstraintCoincidence_HeaderFile
+#ifndef SketchPlugin_ConstraintDiameter_HeaderFile
+#define SketchPlugin_ConstraintDiameter_HeaderFile
 
 #include "SketchPlugin.h"
 #include "SketchPlugin_Constraint.h"
-#include <list>
 
 
-/** \class SketchPlugin_ConstraintCoincidence
+/** \class SketchPlugin_ConstraintDiameter
  *  \ingroup DataModel
- *  \brief Feature for creation of a new constraint which defines equivalence of two points
+ *  \brief Feature for creation of a new constraint which defines a diameter of a circle
  *
  *  These constraint has two attributes:
- *  CONSTRAINT_ATTR_ENTITY_A and CONSTRAINT_ATTR_ENTITY_B
+ *  CONSTRAINT_ATTR_VALUE (diameter), CONSTRAINT_ATTR_ENTITY_A (a circle)
  */
-class SketchPlugin_ConstraintCoincidence: public SketchPlugin_Constraint
+class SketchPlugin_ConstraintDiameter: public SketchPlugin_Constraint
 {
 public:
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "SketchConstraintCoincidence"; return MY_KIND;}
+  {static std::string MY_KIND = "SketchConstraintDiameter"; return MY_KIND;}
 
   /// \brief Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
@@ -38,7 +37,7 @@ public:
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
   /// \brief Use plugin manager for features creation
-  SketchPlugin_ConstraintCoincidence();
+  SketchPlugin_ConstraintDiameter();
 };
 
 #endif

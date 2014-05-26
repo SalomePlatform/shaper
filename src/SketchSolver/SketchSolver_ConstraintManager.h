@@ -17,6 +17,7 @@
 #include <list>
 #include <map>
 #include <vector>
+#include <set>
 
 
 // Unknown constraint (for error reporting)
@@ -95,7 +96,7 @@ private:
    *  \param[out] theGroups     list of group indexes interacted with constraint
    */
   void findGroups(boost::shared_ptr<SketchPlugin_Constraint> theConstraint,
-                  std::vector<Slvs_hGroup>&                  theGroupIDs) const;
+                  std::set<Slvs_hGroup>&                     theGroupIDs) const;
 
   /** \brief Searches in the list of groups the workplane which constains specified constraint
    *  \param[in] theConstraint constraint to be found
@@ -164,6 +165,11 @@ public:
    *  \return \c true if the group's sketch is invalid and the group should be removed
    */
   bool updateGroup();
+
+  /** \brief Add specified group to this one
+   *  \param[in] theGroup group of constraint to be added
+   */
+  void mergeGroups(const SketchSolver_ConstraintGroup& theGroup);
 
   /** \brief Start solution procedure if necessary and update attributes of features
    */
