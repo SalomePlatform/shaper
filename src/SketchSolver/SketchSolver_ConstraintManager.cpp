@@ -771,8 +771,11 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::mergeGroups(
 
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator
     aSPEntMapIter = theGroup.myEntityMap.begin();
-  for ( ; aSPEntMapIter != theGroup.myEntityMap.end(); aSPEntMapIter++)
-    myEntityMap[aSPEntMapIter->first] = anEntityMap.find(aSPEntMapIter->second)->second;
+  for ( ; aSPEntMapIter != theGroup.myEntityMap.end(); aSPEntMapIter++) {
+    std::map<Slvs_hEntity, Slvs_hEntity>::iterator aFind = anEntityMap.find(aSPEntMapIter->second);
+    if (aFind != anEntityMap.end())
+      myEntityMap[aSPEntMapIter->first] = aFind->second;
+  }
 
   // Add temporary constraints
   std::list<Slvs_hConstraint>::const_iterator aTempConstrIter = theGroup.myTempConstraints.begin();

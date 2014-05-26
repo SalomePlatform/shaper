@@ -577,7 +577,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::objectByFeature(
   for(int a = 0; a < size(theFeature->getGroup()); a++) {
     boost::shared_ptr<Model_Object> anObj = 
       boost::dynamic_pointer_cast<Model_Object>(feature(theFeature->getGroup(), a));
-    if (anObj) {
+    if (anObj && anObj->featureRef() == theFeature) {
       return anObj;
     }
   }
