@@ -127,8 +127,12 @@ public:
   ~SketchSolver_ConstraintGroup();
 
   /// \brief Returns group's unique identifier
-  const Slvs_hGroup& getId() const
+  inline const Slvs_hGroup& getId() const
   {return myID;}
+
+  /// \brief Returns true if the group has no constraints yet
+  inline bool isEmpty() const
+  {return myConstraints.empty();}
 
   /** \brief Adds or updates a constraint in the group
    *  \param[in] theConstraint constraint to be changed
@@ -214,10 +218,12 @@ protected:
 
   /** \brief Compute constraint type according to SolveSpace identifiers
    *         and verify that constraint parameters are correct
-   *  \param[in] theConstraint constraint which type should be determined
+   *  \param[in]  theConstraint constraint which type should be determined
+   *  \param[out] theAttrNames  names of attributes in order required by SolveSpace (unused attributes have empty names)
    *  \return identifier of constraint type or SLVS_C_UNKNOWN if the type is wrong
    */
-  int getConstraintType(const boost::shared_ptr<SketchPlugin_Constraint>& theConstraint) const;
+  int getConstraintType(const boost::shared_ptr<SketchPlugin_Constraint>& theConstraint, 
+                        std::vector<std::string>& theAttrNames) const;
 
   /** \brief Change values of attribute by parameters received from SolveSpace solver
    *  \param[in,out] theAttribute pointer to the attribute to be changed

@@ -318,10 +318,20 @@ void SketchSolver_ConstraintManager::findGroups(
 {
   boost::shared_ptr<SketchPlugin_Feature> aWP = findWorkplaneForConstraint(theConstraint);
 
+  SketchSolver_ConstraintGroup* anEmptyGroup = 0; // appropriate empty group for specified constraint
   std::vector<SketchSolver_ConstraintGroup*>::const_iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
     if (aWP == (*aGroupIter)->getWorkplane() && (*aGroupIter)->isInteract(theConstraint))
-      theGroupIDs.insert((*aGroupIter)->getId());
+    {
+      if (!(*aGroupIter)->isEmpty())
+        theGroupIDs.insert((*aGroupIter)->getId());
+      else if (!anEmptyGroup)
+        anEmptyGroup = *aGroupIter;
+    }
+
+  // When only empty group is found, use it
+  if (anEmptyGroup && theGroupIDs.empty())
+    theGroupIDs.insert(anEmptyGroup->getId());
 }
 
 // ============================================================================
@@ -473,7 +483,8 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::changeConstra
   }
 
   // Get constraint type and verify the constraint parameters are correct
-  int aConstrType = getConstraintType(theConstraint);
+  std::vector<std::string> aConstraintAttributes;
+  int aConstrType = getConstraintType(theConstraint, aConstraintAttributes);
   if (aConstrType == SLVS_C_UNKNOWN ||
      (aConstrMapIter != myConstraintMap.end() && aConstrIter->type != aConstrType))
     return false;
@@ -498,7 +509,7 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::changeConstra
     aConstrEnt[indAttr] = SLVS_E_UNKNOWN;
     boost::shared_ptr<ModelAPI_AttributeRefAttr> aConstrAttr =
       boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
+        theConstraint->data()->attribute(aConstraintAttributes[indAttr])
       );
     if (!aConstrAttr) continue;
     aConstrEnt[indAttr] = changeEntity(aConstrAttr->attr());
@@ -635,7 +646,7 @@ Slvs_hEntity SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::chang
       myEntityMap[theEntity] = aCircleEntity.h;
       return aCircleEntity.h;
     }
-    //Arc
+    // Arc
     else if (aFeatureKind.compare("SketchArc") == 0)
     {
       Slvs_hEntity aCenter = changeEntity(aFeature->data()->attribute(ARC_ATTR_CENTER));
@@ -671,6 +682,11 @@ Slvs_hEntity SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::chang
   return SLVS_E_UNKNOWN;
 }
 
+// ============================================================================
+//  Function: changeNormal
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  create/update the normal of workplane
+// ============================================================================
 Slvs_hEntity SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::changeNormal(
                 boost::shared_ptr<ModelAPI_Attribute> theDirX,
                 boost::shared_ptr<ModelAPI_Attribute> theDirY,
@@ -695,7 +711,7 @@ Slvs_hEntity SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::chang
   // Try to find existent normal
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator
     aEntIter = myEntityMap.find(theNorm);
-  std::vector<Slvs_Param>::const_iterator aParamIter; // looks at first parameter of already existent entity or at the end of vector otherwise
+  std::vector<Slvs_Param>::const_iterator aParamIter; // looks to the first parameter of already existent entity or to the end of vector otherwise
   if (aEntIter == myEntityMap.end()) // no such entity => should be created
     aParamIter = myParams.end();
   else
@@ -722,6 +738,11 @@ Slvs_hEntity SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::chang
 }
 
 
+// ============================================================================
+//  Function: addWorkplane
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  create workplane for the group
+// ============================================================================
 bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addWorkplane(
                 boost::shared_ptr<SketchPlugin_Feature> theSketch)
 {
@@ -733,6 +754,11 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addWorkplane(
   return true;
 }
 
+// ============================================================================
+//  Function: updateWorkplane
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  update parameters of workplane
+// ============================================================================
 bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateWorkplane()
 {
   // Get parameters of workplane
@@ -756,7 +782,11 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateWorkpla
   return true;
 }
 
-
+// ============================================================================
+//  Function: changeParameter
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  create/update value of parameter
+// ============================================================================
 Slvs_hParam SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::changeParameter(
                 const double&                            theParam,
                 std::vector<Slvs_Param>::const_iterator& thePrmIter)
@@ -782,13 +812,24 @@ Slvs_hParam SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::change
   return aParam.h;
 }
 
+// ============================================================================
+//  Function: getConstraintType
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  calculate the type of constraint using its parameters
+// ============================================================================
 int SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::getConstraintType(
-                const boost::shared_ptr<SketchPlugin_Constraint>& theConstraint) const
+                const boost::shared_ptr<SketchPlugin_Constraint>& theConstraint,
+                std::vector<std::string>&                         theAttrNames) const
 {
+  // Assign empty names of attributes
+  for (int i = 0; i < CONSTRAINT_ATTR_SIZE; i++)
+    theAttrNames.push_back(std::string());
+
   const std::string& aConstraintKind = theConstraint->getKind();
   // Constraint for coincidence of two points
   if (aConstraintKind.compare("SketchConstraintCoincidence") == 0)
   {
+    int anAttrPos = 0;
     // Verify the constraint has only two attributes and they are points
     int aPt2d = 0; // bit-mapped field, each bit indicates whether the attribute is 2D point
     int aPt3d = 0; // bit-mapped field, the same information for 3D points
@@ -805,6 +846,7 @@ int SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::getConstraintT
       if (aPoint2D)
       {
         aPt2d |= (1 << indAttr);
+        theAttrNames[anAttrPos++] = CONSTRAINT_ATTRIBUTES[indAttr];
         continue;
       }
       // Verify the attribute is a 3D point
@@ -813,6 +855,7 @@ int SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::getConstraintT
       if (aPoint3D)
       {
         aPt3d |= (1 << indAttr);
+        theAttrNames[anAttrPos++] = CONSTRAINT_ATTRIBUTES[indAttr];
         continue;
       }
       // Attribute neither 2D nor 3D point is not supported by this type of constraint
@@ -826,11 +869,121 @@ int SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::getConstraintT
     return SLVS_C_UNKNOWN;
   }
 
+  // Constraint for distance between point and another entity
+  if (aConstraintKind.compare("SketchConstraintDistance") == 0)
+  {
+    int aResult = SLVS_C_UNKNOWN; // possible constraint type
+    int aNbPoints = 0;
+    int aNbEntities = 0;
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
+    {
+      boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
+        );
+      if (!anAttr) continue;
+      if (anAttr->isFeature())
+      { // verify posiible entities
+        const std::string& aKind = anAttr->feature()->getKind();
+        if (aKind.compare("SketchPoint") == 0)
+        {
+          theAttrNames[aNbPoints++] = CONSTRAINT_ATTRIBUTES[indAttr];
+          continue;
+        }
+        else if(aKind.compare("SketchLine") == 0)
+        {
+          // entities are placed starting from CONSTRAINT_ATTR_ENTITY_C attribute
+          theAttrNames[2 + aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
+          aResult = SLVS_C_PT_LINE_DISTANCE;
+          continue;
+        }
+      }
+      else
+      { // verify points
+        // Verify the attribute is a 2D point
+        boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
+          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
+        if (aPoint2D)
+        {
+          theAttrNames[aNbPoints++] = CONSTRAINT_ATTRIBUTES[indAttr];
+          continue;
+        }
+        // Verify the attribute is a 3D point
+        boost::shared_ptr<GeomDataAPI_Point> aPoint3D =
+          boost::dynamic_pointer_cast<GeomDataAPI_Point>(anAttr->attr());
+        if (aPoint3D)
+        {
+          theAttrNames[aNbPoints++] = CONSTRAINT_ATTRIBUTES[indAttr];
+          continue;
+        }
+      }
+    }
+    // Verify the correctness of constraint arguments
+    if (aNbPoints == 2 && aNbEntities ==0)
+      aResult = SLVS_C_PT_PT_DISTANCE;
+    else if (aNbPoints == 1 && aNbEntities == 1)
+      aResult = SLVS_C_UNKNOWN;
+    return aResult;
+  }
+
+  // Constraint for two parallel/perpendicular lines
+  bool isParallel = (aConstraintKind.compare("SketchConstraintParallel") == 0);
+  bool isPerpendicular = (aConstraintKind.compare("SketchConstraintPerpendicular") == 0);
+  if (isParallel || isPerpendicular)
+  {
+    int aNbEntities = 2; // lines in SolveSpace constraints should started from CONSTRAINT_ATTR_ENTITY_C attribute
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
+    {
+      boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
+        );
+      if (!anAttr || !anAttr->isFeature()) continue;
+      const std::string& aKind = anAttr->feature()->getKind();
+      if (aKind.compare("SketchLine") == 0)
+      {
+        theAttrNames[aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
+        continue;
+      }
+    }
+    if (aNbEntities == 4)
+      return isParallel ? SLVS_C_PARALLEL : SLVS_C_PERPENDICULAR;
+    return SLVS_C_UNKNOWN;
+  }
+
+  // Constraint for diameter of a circle
+  if (aConstraintKind.compare("SketchConstraintDiameter") == 0)
+  {
+    int aNbEntities = 2; // lines in SolveSpace constraints should started from CONSTRAINT_ATTR_ENTITY_C attribute
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
+    {
+      boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
+        );
+      if (!anAttr || !anAttr->isFeature()) continue;
+      const std::string& aKind = anAttr->feature()->getKind();
+      if (aKind.compare("SketchCircle") == 0)
+      {
+        theAttrNames[aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
+        continue;
+      }
+    }
+    if (aNbEntities == 3)
+      return SLVS_C_DIAMETER;
+    return SLVS_C_UNKNOWN;
+  }
+
   /// \todo Implement other kind of constrtaints
 
   return SLVS_C_UNKNOWN;
 }
 
+// ============================================================================
+//  Function: resolveConstraints
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  solve the set of constraints for the current group
+// ============================================================================
 void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::resolveConstraints()
 {
   if (!myNeedToSolve)
@@ -858,11 +1011,16 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::resolveConstr
   myNeedToSolve = false;
 }
 
+// ============================================================================
+//  Function: mergeGroups
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  append specified group to the current group
+// ============================================================================
 void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::mergeGroups(
                 const SketchSolver_ConstraintGroup& theGroup)
 {
   // If specified group is empty, no need to merge
-  if (theGroup.myConstraintMap.size() == 0)
+  if (theGroup.myConstraintMap.empty())
     return ;
 
   // NOTE: The possibility, that some elements are placed into both groups, is around 0, 
@@ -880,7 +1038,7 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::mergeGroups(
     Slvs_Constraint aConstraintCopy = *aConstrIter;
     // Go through constraint entities
     Slvs_hEntity* anEntities[CONSTRAINT_ATTR_SIZE] = {
-      &(aConstraintCopy.ptA), &(aConstraintCopy.ptB), 
+      &(aConstraintCopy.ptA),     &(aConstraintCopy.ptB), 
       &(aConstraintCopy.entityA), &(aConstraintCopy.entityB)
     };
     for (int indEnt = 0; indEnt < CONSTRAINT_ATTR_SIZE; indEnt++)
@@ -955,6 +1113,11 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::mergeGroups(
   myNeedToSolve = myNeedToSolve || theGroup.myNeedToSolve;
 }
 
+// ============================================================================
+//  Function: updateGroup
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  search removed entities and constraints
+// ============================================================================
 bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateGroup()
 {
   // Check for valid sketch
@@ -1042,6 +1205,11 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateGroup()
   return false;
 }
 
+// ============================================================================
+//  Function: updateAttribute
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  update features of sketch after resolving constraints
+// ============================================================================
 void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateAttribute(
                 boost::shared_ptr<ModelAPI_Attribute> theAttribute,
                 const Slvs_hEntity&                   theEntityID)
@@ -1073,9 +1241,23 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateAttribu
     return ;
   }
 
+  // Scalar value
+  boost::shared_ptr<ModelAPI_AttributeDouble> aScalar = 
+    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
+  if (aScalar)
+  {
+    aScalar->setValue(myParams[aFirstParamPos].val);
+    return ;
+  }
+
   /// \todo Support other types of entities
 }
 
+// ============================================================================
+//  Function: updateEntityIfPossible
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  search the entity in this group and update it
+// ============================================================================
 void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateEntityIfPossible(
                 boost::shared_ptr<ModelAPI_Attribute> theEntity)
 {
@@ -1107,6 +1289,12 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::updateEntityI
   }
 }
 
+// ============================================================================
+//  Function: addTemporaryConstraintWhereDragged
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  add transient constraint SLVS_C_WHERE_DRAGGED for the entity, 
+//            which was moved by user
+// ============================================================================
 void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addTemporaryConstraintWhereDragged(
                 boost::shared_ptr<ModelAPI_Attribute> theEntity)
 {
@@ -1114,13 +1302,19 @@ void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::addTemporaryC
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator
     anEntIter = myEntityMap.find(theEntity);
 
-  // Create WHERE_DRAGGED constraint
+  // Create SLVS_C_WHERE_DRAGGED constraint
   Slvs_Constraint aWDConstr = Slvs_MakeConstraint(++myConstrMaxID, myID, SLVS_C_WHERE_DRAGGED,
                                                   myWorkplane.h, 0.0, anEntIter->second, 0, 0, 0);
   myConstraints.push_back(aWDConstr);
   myTempConstraints.push_back(aWDConstr.h);
 }
 
+// ============================================================================
+//  Function: removeTemporaryConstraints
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  remove all transient SLVS_C_WHERE_DRAGGED constraints after
+//            resolving the set of constraints
+// ============================================================================
 void SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::removeTemporaryConstraints()
 {
   std::list<Slvs_hConstraint>::reverse_iterator aTmpConstrIter;
