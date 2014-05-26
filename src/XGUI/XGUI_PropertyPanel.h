@@ -15,6 +15,8 @@
 #include <QDockWidget>
 #include <QList>
 
+class QKeyEvent;
+
 class XGUI_EXPORT XGUI_PropertyPanel: public QDockWidget
 {
   Q_OBJECT
@@ -25,8 +27,19 @@ public:
   QWidget* contentWidget();
   void setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets);
 
+  virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
+
 public slots:
   void updateContentWidget(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  /// slot to set the focus to the widget visualized an attribute with the given name
+  /// \param theAttributteName
+  void onFocusActivated(const std::string& theAttributeName);
+
+signals:
+  /// The signal about key release on the control, that corresponds to the attribute
+  /// \param theAttributeName a name of the attribute
+  /// \param theEvent key release event
+  void keyReleased(const std::string& theAttributeName, QKeyEvent* theEvent);
 
 private:
   QWidget* myCustomWidget;

@@ -59,6 +59,8 @@ public:
 
 public slots:
   void onFeatureTriggered();
+  /// SLOT, that is called after the operation is started. Connect on the focus activated signal
+  void onOperationStarted();
   /// SLOT, that is called after the operation is stopped. Switched off the modfications performed
   /// by the operation start
   void onOperationStopped(ModuleBase_Operation* theOperation);
@@ -79,7 +81,7 @@ public slots:
 
   /// SLOT, that is called by the key in the viewer is clicked.
   /// \param theEvent the mouse event
-  void onKeyRelease(QKeyEvent*);
+  void onKeyRelease(QKeyEvent* theEvent);
 
   /// SLOT, to apply to the current viewer the operation
   /// \param theX the X projection value

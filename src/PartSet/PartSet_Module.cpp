@@ -18,6 +18,7 @@
 #include <XGUI_ActionsMgr.h>
 #include <XGUI_ViewerProxy.h>
 #include <XGUI_ContextMenuMgr.h>
+#include <XGUI_PropertyPanel.h>
 
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
@@ -51,6 +52,9 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
   myListener = new PartSet_Listener(this);
 
   XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
+
+  connect(anOperationMgr, SIGNAL(operationStarted()),
+          this, SLOT(onOperationStarted()));
 
   connect(anOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           this, SLOT(onOperationStopped(ModuleBase_Operation*)));
@@ -118,12 +122,26 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
   sendOperation(anOperation);
 }
 
+void PartSet_Module::onOperationStarted()
+{
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
+                                       myWorkshop->operationMgr()->currentOperation());
+  if (aPreviewOp) {
+    XGUI_PropertyPanel* aPropPanel = myWorkshop->propertyPanel();
+    connect(aPreviewOp, SIGNAL(focusActivated(const std::string&)),
+            aPropPanel, SLOT(onFocusActivated(const std::string&)));
+  }
+}
+
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 {
   if (!theOperation)
     return;
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
   if (aPreviewOp) {
+    XGUI_PropertyPanel* aPropPanel = myWorkshop->propertyPanel();
+    disconnect(aPreviewOp, SIGNAL(focusActivated(const std::string&)),
+               aPropPanel, SLOT(onFocusActivated(const std::string&)));
   }
 }
 

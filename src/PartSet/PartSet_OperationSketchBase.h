@@ -92,7 +92,17 @@ public:
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);
 
+  virtual void keyReleased(std::string theName, QKeyEvent* theEvent);
+
 signals:
+  /// signal about the request to launch operation
+  /// theName the operation name
+  /// theFeature the operation argument
+  void launchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature);
+  /// signal about the focus activated
+  /// theName the attribute name
+  void focusActivated(const std::string& theAttibuteName);
+
   /// Signal about the feature construing is finished
   /// \param theFeature the result feature
   /// \param theMode the mode of the feature modification
@@ -101,10 +111,6 @@ signals:
   /// Signal about the features should be selected
   /// \param theSelected the list of selected presentations
   void featureSelected(const std::list<XGUI_ViewerPrs>& theSelected);
-  /// signal about the request to launch operation
-  /// theName the operation name
-  /// theFeature the operation argument
-  void launchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature);
   /// signal to enable/disable multi selection in the viewer
   /// \param theEnabled the boolean state
   void multiSelectionEnabled(bool theEnabled);
