@@ -12,6 +12,7 @@
 #include <boost/shared_ptr.hpp>
 
 class ModelAPI_Feature;
+class QKeyEvent;
 
 /**\class ModuleBase_ModelWidget
  * \brief An abstract custom widget class. This class realization is assumed to create some controls.
@@ -37,10 +38,21 @@ public:
 
   virtual bool restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
 
+  /// Set focus to the current widget if it corresponds to the given attribute
+  /// \param theAttribute name
+  virtual bool focusTo(const std::string& theAttributeName) = 0;
+
+  /// Returns list of widget controls
+  /// \return a control list
+  virtual QList<QWidget*> getControls() const = 0;
 
 signals:
   /// The signal about widget values changed
   void valuesChanged();
+  /// The signal about key release on the control, that corresponds to the attribute
+  /// \param theAttributeName a name of the attribute
+  /// \param theEvent key release event
+  void keyReleased(const std::string& theAttributeName, QKeyEvent* theEvent);
 };
 
 #endif

@@ -25,6 +25,7 @@
 #include <gp_Lin.hxx>
 
 #include <XGUI_ViewerPrs.h>
+#include <XGUI_Constants.h>
 
 #include <SketchPlugin_Line.h>
 
@@ -146,15 +147,15 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
       setLinePoint(feature(), aX, anY, LINE_ATTR_END);
       flushUpdated();
 
-      myPointSelectionMode = SM_SecondPoint;
+      setPointSelectionMode(SM_SecondPoint);
     }
     break;
     case SM_SecondPoint: {
       setLinePoint(feature(), aX, anY, LINE_ATTR_END);
       flushUpdated();
 
-      myPointSelectionMode = SM_DonePoint;
-    }
+      setPointSelectionMode(SM_DonePoint);
+   }
     break;
     default:
       break;
@@ -172,6 +173,7 @@ void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_V
       setLinePoint(feature(), aX, anY, LINE_ATTR_START);
       setLinePoint(feature(), aX, anY, LINE_ATTR_END);
       flushUpdated();
+      emit focusActivated(LINE_ATTR_START);
     }
     break;
     case SM_SecondPoint:
@@ -179,6 +181,7 @@ void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_V
       gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
       setLinePoint(aPoint, theView, LINE_ATTR_END);
       flushUpdated();
+      emit focusActivated(LINE_ATTR_END);
     }
     break;
     case SM_DonePoint:
@@ -192,6 +195,20 @@ void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_V
   }
 }
 
+void PartSet_OperationSketchLine::keyReleased(std::string theName, QKeyEvent* theEvent)
+{
+  int aKeyType = theEvent->key();
+  if (!theName.empty() && aKeyType == Qt::Key_Return) {
+    if (theName == LINE_ATTR_START) {
+      setPointSelectionMode(SM_SecondPoint, false);
+    }
+    else if (theName == LINE_ATTR_END) {
+      setPointSelectionMode(SM_DonePoint, false);
+    }
+  }
+  keyReleased(theEvent->key());
+}
+
 void PartSet_OperationSketchLine::keyReleased(const int theKey)
 {
   switch (theKey) {
@@ -200,10 +217,11 @@ void PartSet_OperationSketchLine::keyReleased(const int theKey)
       {
         commit();
         emit featureConstructed(feature(), FM_Deactivation);
+        emit launchOperation(PartSet_OperationSketchLine::Type(), boost::shared_ptr<ModelAPI_Feature>());
       }
-      else
-        abort();
-      emit launchOperation(PartSet_OperationSketchLine::Type(), boost::shared_ptr<ModelAPI_Feature>());
+      //else
+      //  abort();
+      //emit launchOperation(PartSet_OperationSketchLine::Type(), boost::shared_ptr<ModelAPI_Feature>());
     }
     break;
     case Qt::Key_Escape: {
@@ -223,7 +241,8 @@ void PartSet_OperationSketchLine::keyReleased(const int theKey)
 void PartSet_OperationSketchLine::startOperation()
 {
   PartSet_OperationSketchBase::startOperation();
-  myPointSelectionMode = !myInitPoint ? SM_FirstPoint : SM_SecondPoint;
+  setPointSelectionMode(!myInitPoint ? SM_FirstPoint : SM_SecondPoint);
+
   emit multiSelectionEnabled(false);
 }
 
@@ -377,4 +396,27 @@ void PartSet_OperationSketchLine::setLinePoint(const gp_Pnt& thePoint,
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
   aPoint->setValue(aX, anY);
+}
+
+void PartSet_OperationSketchLine::setPointSelectionMode(const PointSelectionMode& theMode,
+                                                        const bool isToEmitSignal)
+{
+  myPointSelectionMode = theMode;
+  if (isToEmitSignal) {
+    std::string aName;
+    switch (theMode) {
+      case SM_FirstPoint:
+        aName = LINE_ATTR_START;
+        break;
+      case SM_SecondPoint:
+        aName = LINE_ATTR_END;
+        break;
+      case SM_DonePoint:
+        aName = XGUI::PROP_PANEL_OK;
+        break;
+      default:
+        break;
+    }
+    emit focusActivated(aName);
+  }
 }

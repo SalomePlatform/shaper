@@ -12,6 +12,7 @@
 
 class GeomDataAPI_Point2D;
 class QMouseEvent;
+class QKeyEvent;
 
 /*!
  \class PartSet_OperationSketchLine
@@ -71,6 +72,8 @@ public:
   /// Processes the key pressed in the view
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);
+
+  virtual void keyReleased(std::string theName, QKeyEvent* theEvent);
 
 protected:
   /// \brief Virtual method called when operation is started
@@ -133,6 +136,11 @@ protected:
 protected:
   ///< Structure to lists the possible types of point selection modes
   enum PointSelectionMode {SM_FirstPoint, SM_SecondPoint, SM_DonePoint};
+
+  ///< Set the point selection mode. Emit signal about focus change if necessary.
+  /// \param theMode a new selection mode
+  /// \param isToEmitSignal the neccessity to emit signal
+  void setPointSelectionMode(const PointSelectionMode& theMode, const bool isToEmitSignal = true);
 
 private:
   boost::shared_ptr<ModelAPI_Feature> mySketch; ///< the sketch feature

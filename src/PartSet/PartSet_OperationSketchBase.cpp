@@ -9,6 +9,8 @@
 
 #include <V3d_View.hxx>
 
+#include <QKeyEvent>
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -87,4 +89,9 @@ void PartSet_OperationSketchBase::keyReleased(const int theKey)
     default:
     break;
   }
+}
+
+void PartSet_OperationSketchBase::keyReleased(std::string theName, QKeyEvent* theEvent)
+{
+  keyReleased(theEvent->key());
 }

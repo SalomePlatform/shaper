@@ -38,9 +38,19 @@ public:
 
   virtual bool restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature);
 
+  /// Set focus to the current widget if it corresponds to the given attribute
+  /// \param theAttribute name
+  virtual bool focusTo(const std::string& theAttributeName);
+
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
   QWidget* getControl() const;
+
+  /// Returns list of widget controls
+  /// \return a control list
+  virtual QList<QWidget*> getControls() const;
+
+  virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
 private:
   std::string myFeatureAttributeID; ///< the identifier of the feature attribute
