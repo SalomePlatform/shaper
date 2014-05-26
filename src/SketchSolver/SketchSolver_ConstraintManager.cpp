@@ -15,6 +15,9 @@
 
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+
+#include <SketchPlugin_Arc.h>
+#include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Sketch.h>
@@ -70,6 +73,11 @@ SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
   myGroups.clear();
 }
 
+// ============================================================================
+//  Function: processEvent
+//  Class:    SketchSolver_PluginManager
+//  Purpose:  listen the event loop and process the message
+// ============================================================================
 void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessage)
 {
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED) ||
@@ -142,6 +150,11 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
   }
 }
 
+// ============================================================================
+//  Function: changeWorkplane
+//  Class:    SketchSolver_PluginManager
+//  Purpose:  update workplane by given parameters of the sketch
+// ============================================================================
 bool SketchSolver_ConstraintManager::changeWorkplane(boost::shared_ptr<SketchPlugin_Feature> theSketch)
 {
   bool aResult = true; // changed when a workplane wrongly updated
@@ -170,10 +183,15 @@ bool SketchSolver_ConstraintManager::changeWorkplane(boost::shared_ptr<SketchPlu
   return aResult;
 }
 
+// ============================================================================
+//  Function: changeConstraint
+//  Class:    SketchSolver_PluginManager
+//  Purpose:  create/update the constraint and place it into appropriate group
+// ============================================================================
 bool SketchSolver_ConstraintManager::changeConstraint(
               boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
 {
-  // Search the groups which this constraint touchs
+  // Search the groups which this constraint touches
   std::set<Slvs_hGroup> aGroups;
   findGroups(theConstraint, aGroups);
 
@@ -240,6 +258,11 @@ bool SketchSolver_ConstraintManager::changeConstraint(
   return false;
 }
 
+// ============================================================================
+//  Function: updateEntity
+//  Class:    SketchSolver_PluginManager
+//  Purpose:  update any element on the sketch, which is used by constraints
+// ============================================================================
 void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin_Feature> theFeature)
 {
   // Create list of attributes depending on type of the feature
@@ -253,6 +276,19 @@ void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin
   {
     anAttrList.push_back(LINE_ATTR_START);
     anAttrList.push_back(LINE_ATTR_END);
+  }
+  // Circle
+  else if (aFeatureKind.compare("SketchCircle") == 0)
+  {
+    anAttrList.push_back(CIRCLE_ATTR_CENTER);
+    anAttrList.push_back(CIRCLE_ATTR_RADIUS);
+  }
+  // Arc
+  else if (aFeatureKind.compare("SketchArc") == 0)
+  {
+    anAttrList.push_back(ARC_ATTR_CENTER);
+    anAttrList.push_back(ARC_ATTR_START);
+    anAttrList.push_back(ARC_ATTR_END);
   }
   /// \todo Other types of features should be implemented
 
@@ -271,6 +307,11 @@ void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin
 }
 
 
+// ============================================================================
+//  Function: findGroups
+//  Class:    SketchSolver_PluginManager
+//  Purpose:  search groups of entities interacting with given constraint
+// ============================================================================
 void SketchSolver_ConstraintManager::findGroups(
               boost::shared_ptr<SketchPlugin_Constraint> theConstraint,
               std::set<Slvs_hGroup>&                     theGroupIDs) const
@@ -283,6 +324,11 @@ void SketchSolver_ConstraintManager::findGroups(
       theGroupIDs.insert((*aGroupIter)->getId());
 }
 
+// ============================================================================
+//  Function: findWorkplaneForConstraint
+//  Class:    SketchSolver_PluginManager
+//  Purpose:  search workplane containing given constraint
+// ============================================================================
 boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWorkplaneForConstraint(
               boost::shared_ptr<SketchPlugin_Constraint> theConstraint) const
 {
@@ -309,6 +355,11 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
   return boost::shared_ptr<SketchPlugin_Feature>();
 }
 
+// ============================================================================
+//  Function: resolveConstraints
+//  Class:    SketchSolver_PluginManager
+//  Purpose:  change entities according to available constraints
+// ============================================================================
 void SketchSolver_ConstraintManager::resolveConstraints()
 {
   std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter;
@@ -360,12 +411,22 @@ SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::~SketchSolver_Cons
     myGroupIndexer--;
 }
 
+// ============================================================================
+//  Function: isBaseWorkplane
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  verify the group is based on the given workplane
+// ============================================================================
 bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::isBaseWorkplane(
                 boost::shared_ptr<SketchPlugin_Feature> theWorkplane) const
 {
   return theWorkplane == mySketch;
 }
 
+// ============================================================================
+//  Function: isInteract
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  verify are there any entities in the group used by given constraint
+// ============================================================================
 bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::isInteract(
                 boost::shared_ptr<SketchPlugin_Constraint> theConstraint) const
 {
@@ -389,6 +450,11 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::isInteract(
   return false;
 }
 
+// ============================================================================
+//  Function: changeConstraint
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  create/update the constraint in the group
+// ============================================================================
 bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::changeConstraint(
                 boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
 {
@@ -450,6 +516,11 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::changeConstra
   return true;
 }
 
+// ============================================================================
+//  Function: changeEntity
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  create/update the element affected by any constraint
+// ============================================================================
 Slvs_hEntity SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::changeEntity(
                 boost::shared_ptr<ModelAPI_Attribute> theEntity)
 {
@@ -487,14 +558,15 @@ Slvs_hEntity SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::chang
     return aPtEntity.h;
   }
 
+  // All entities except 3D points are created on workplane. So, if there is no workplane yet, then error
+  if (myWorkplane.h == SLVS_E_UNKNOWN)
+    return SLVS_E_UNKNOWN;
+
   // Point in 2D
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEntity);
   if (aPoint2D)
   {
-    // The 2D points are created on workplane. So, if there is no workplane yet, then error
-    if (myWorkplane.h == SLVS_E_UNKNOWN)
-      return SLVS_E_UNKNOWN;
     Slvs_hParam aU = changeParameter(aPoint2D->x(), aParamIter);
     Slvs_hParam aV = changeParameter(aPoint2D->y(), aParamIter);
 
@@ -506,6 +578,91 @@ Slvs_hEntity SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::chang
     myEntities.push_back(aPt2DEntity);
     myEntityMap[theEntity] = aPt2DEntity.h;
     return aPt2DEntity.h;
+  }
+
+  // Scalar value (used for the distance entities)
+  boost::shared_ptr<ModelAPI_AttributeDouble> aScalar = 
+    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theEntity);
+  if (aScalar)
+  {
+    Slvs_hParam aValue = changeParameter(aScalar->value(), aParamIter);
+
+    if (aEntIter != myEntityMap.end()) // the entity already exists
+      return aEntIter->second;
+
+    // New entity
+    Slvs_Entity aDistance = Slvs_MakeDistance(++myEntityMaxID, myID, myWorkplane.h, aValue);
+    myEntities.push_back(aDistance);
+    myEntityMap[theEntity] = aDistance.h;
+    return aDistance.h;
+  }
+
+  // SketchPlugin features
+  boost::shared_ptr<SketchPlugin_Feature> aFeature =
+    boost::dynamic_pointer_cast<SketchPlugin_Feature>(theEntity);
+  if (aFeature)
+  { // Verify the feature by its kind
+    const std::string& aFeatureKind = aFeature->getKind();
+
+    // Line
+    if (aFeatureKind.compare("SketchLine") == 0)
+    {
+      Slvs_hEntity aStart = changeEntity(aFeature->data()->attribute(LINE_ATTR_START));
+      Slvs_hEntity aEnd   = changeEntity(aFeature->data()->attribute(LINE_ATTR_END));
+
+      if (aEntIter != myEntityMap.end()) // the entity already exists
+        return aEntIter->second;
+
+      // New entity
+      Slvs_Entity aLineEntity = Slvs_MakeLineSegment(++myEntityMaxID, myID, myWorkplane.h, aStart, aEnd);
+      myEntities.push_back(aLineEntity);
+      myEntityMap[theEntity] = aLineEntity.h;
+      return aLineEntity.h;
+    }
+    // Circle
+    else if (aFeatureKind.compare("SketchCircle") == 0)
+    {
+      Slvs_hEntity aCenter = changeEntity(aFeature->data()->attribute(CIRCLE_ATTR_CENTER));
+      Slvs_hEntity aRadius = changeEntity(aFeature->data()->attribute(CIRCLE_ATTR_RADIUS));
+
+      if (aEntIter != myEntityMap.end()) // the entity already exists
+        return aEntIter->second;
+
+      // New entity
+      Slvs_Entity aCircleEntity = 
+        Slvs_MakeCircle(++myEntityMaxID, myID, myWorkplane.h, aCenter, myWorkplane.normal, aRadius);
+      myEntities.push_back(aCircleEntity);
+      myEntityMap[theEntity] = aCircleEntity.h;
+      return aCircleEntity.h;
+    }
+    //Arc
+    else if (aFeatureKind.compare("SketchArc") == 0)
+    {
+      Slvs_hEntity aCenter = changeEntity(aFeature->data()->attribute(ARC_ATTR_CENTER));
+      Slvs_hEntity aStart  = changeEntity(aFeature->data()->attribute(ARC_ATTR_START));
+      Slvs_hEntity aEnd    = changeEntity(aFeature->data()->attribute(ARC_ATTR_END));
+
+      if (aEntIter != myEntityMap.end()) // the entity already exists
+        return aEntIter->second;
+
+      Slvs_Entity anArcEntity = Slvs_MakeArcOfCircle(++myEntityMaxID, myID, 
+                                  myWorkplane.h, myWorkplane.normal, aCenter, aStart, aEnd);
+      myEntities.push_back(anArcEntity);
+      myEntityMap[theEntity] = anArcEntity.h;
+      return anArcEntity.h;
+    }
+    // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
+    else if (aFeatureKind.compare("SketchPoint") == 0)
+    {
+      Slvs_hEntity aPoint = changeEntity(aFeature->data()->attribute(POINT_ATTR_COORD));
+
+      if (aEntIter != myEntityMap.end()) // the entity already exists
+        return aEntIter->second;
+
+      // Both the sketch point and its attribute (coordinates) link to the same SolveSpace point identifier
+      myEntityMap[theEntity] = aPoint;
+      return aPoint;
+    }
   }
 
   /// \todo Other types of entities
