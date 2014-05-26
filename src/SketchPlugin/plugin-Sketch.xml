@@ -10,7 +10,19 @@
         <point_selector id="StartPoint" title="Start point" tooltip="Start point of the line"/>
         <point_selector id="EndPoint" title="End point" tooltip="End point of the line"/>
       </feature>
+      <feature id="SketchCircle" title="Circle" tooltip="Create a new circle" icon="" internal="1">
+        <point_selector id="CircleCenter" title="Center" tooltip="Center of the circle"/>
+      </feature>
+      <feature id="SketchArc" title="Arc" tooltip="Create a new arc of a circle" icon="" internal="1">
+        <point_selector id="ArcCenter" title="Center" tooltip="Center of the arc"/>
+        <point_selector id="ArcStartPoint" title="Start point" tooltip="Start point of the arc"/>
+        <point_selector id="ArcEndPoint" title="End point" tooltip="End point of the arc"/>
+      </feature>
       <feature id="SketchConstraintCoincidence" title="Points coincidence" tooltip="Create constraint for the coincidence of two points" internal="1"/>
+      <feature id="SketchConstraintDistance" title="Distance between objects" tooltip="Create constraint for the distance from a point to an object" internal="1"/>
+      <feature id="SketchConstraintDiameter" title="Diameter of a circle" tooltip="Create constraint for the given diameter of a circle" internal="1"/>
+      <feature id="SketchConstraintParallel" title="Parallelism of a lines" tooltip="Create constraint defining two parallel lines" internal="1"/>
+      <feature id="SketchConstraintPerpendicular" title="Orthgonality of a lines" tooltip="Create constraint defining two perpendicular lines" internal="1"/>
     </group>
   </workbench>
 </plugin>
