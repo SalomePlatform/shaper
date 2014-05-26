@@ -172,9 +172,11 @@ void Model_Document::close()
     subDocument(*aSubIter)->close();
   mySubs.clear();
   // close this
+  /* do not close because it can be undoed
   if (myDoc->CanClose() == CDM_CCS_OK)
     myDoc->Close();
   Model_Application::getApplication()->deleteDocument(myID);
+  */
 }
 
 void Model_Document::startOperation()
