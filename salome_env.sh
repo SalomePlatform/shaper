@@ -1,12 +1,16 @@
 #!/bin/sh
 
 if [ "${INST_ROOT}" = "" ] ; then
-    source /dn47/SALOME/PRODUCTS/7x/opt/CentOS.6.3.64/7.3.0/env_products.sh
-    source /dn47/SALOME/stable/V7_3_0/start.sh
+    source /dn48/newgeom/common/SALOME/env_products.sh
 else
     source ${INST_ROOT}/env_products.sh
 fi
 
+
+#------ SolveSpace ------
+export SOLVESPACE_ROOT_DIR=/dn48/newgeom/common/products/solvespace-2.0
+export LD_LIBRARY_PATH=${SOLVESPACE_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
+##
 
 export ROOT_DIR=$(pwd)/..
 export ROOT_DIR=`cd "${ROOT_DIR}";pwd`
@@ -17,6 +21,7 @@ export LIB=${LD_LIBRARY_PATH}
 export PATH=${CASROOT}:${PATH}
 export PYTHON_INC_DIR=${PYTHON_INCLUDE}
 export PYTHON_LIB_DIR=${PYTHON_ROOT_DIR}/lib
+
 
 #------ NewGEOM ------
 export INST_DIR=${ROOT_DIR}/install
