@@ -20,11 +20,6 @@
 #include <set>
 
 
-// Unknown constraint (for error reporting)
-#define SLVS_C_UNKNOWN 0
-// Unknown entity
-#define SLVS_E_UNKNOWN 0
-
 /** \class   SketchSolver_ConstraintManager
  *  \ingroup DataModel
  *  \brief   Listens the changes of SketchPlugin features and transforms the Constraint
@@ -215,15 +210,6 @@ protected:
    */
   Slvs_hParam changeParameter(const double& theParam,
                               std::vector<Slvs_Param>::const_iterator& thePrmIter);
-
-  /** \brief Compute constraint type according to SolveSpace identifiers
-   *         and verify that constraint parameters are correct
-   *  \param[in]  theConstraint constraint which type should be determined
-   *  \param[out] theAttrNames  names of attributes in order required by SolveSpace (unused attributes have empty names)
-   *  \return identifier of constraint type or SLVS_C_UNKNOWN if the type is wrong
-   */
-  int getConstraintType(const boost::shared_ptr<SketchPlugin_Constraint>& theConstraint, 
-                        std::vector<std::string>& theAttrNames) const;
 
   /** \brief Change values of attribute by parameters received from SolveSpace solver
    *  \param[in,out] theAttribute pointer to the attribute to be changed

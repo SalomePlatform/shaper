@@ -21,6 +21,11 @@ typedef unsigned int UINT32;
 
 #define SLVS_RESULT_EMPTY_SET -1
 
+// Unknown constraint (for error reporting)
+#define SLVS_C_UNKNOWN 0
+// Unknown entity
+#define SLVS_E_UNKNOWN 0
+
 
 class SketchSolver_Solver
 {

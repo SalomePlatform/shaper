@@ -4,6 +4,8 @@
 
 #include "SketchSolver_ConstraintManager.h"
 
+#include <SketchSolver_Constraint.h>
+
 #include <Events_Loop.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
@@ -483,11 +485,12 @@ bool SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::changeConstra
   }
 
   // Get constraint type and verify the constraint parameters are correct
-  std::vector<std::string> aConstraintAttributes;
-  int aConstrType = getConstraintType(theConstraint, aConstraintAttributes);
+  SketchSolver_Constraint aConstraint(theConstraint);
+  int aConstrType = aConstraint.getType();
   if (aConstrType == SLVS_C_UNKNOWN ||
      (aConstrMapIter != myConstraintMap.end() && aConstrIter->type != aConstrType))
     return false;
+  const std::vector<std::string>& aConstraintAttributes = aConstraint.getAttributes();
 
   // Create constraint parameters
   double aDistance = 0.0; // scalar value of the constraint
@@ -810,173 +813,6 @@ Slvs_hParam SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::change
   // The list of parameters is changed, move iterator to the end of the list to avoid problems
   thePrmIter = myParams.end();
   return aParam.h;
-}
-
-// ============================================================================
-//  Function: getConstraintType
-//  Class:    SketchSolver_ConstraintGroup
-//  Purpose:  calculate the type of constraint using its parameters
-// ============================================================================
-int SketchSolver_ConstraintManager::SketchSolver_ConstraintGroup::getConstraintType(
-                const boost::shared_ptr<SketchPlugin_Constraint>& theConstraint,
-                std::vector<std::string>&                         theAttrNames) const
-{
-  // Assign empty names of attributes
-  for (int i = 0; i < CONSTRAINT_ATTR_SIZE; i++)
-    theAttrNames.push_back(std::string());
-
-  const std::string& aConstraintKind = theConstraint->getKind();
-  // Constraint for coincidence of two points
-  if (aConstraintKind.compare("SketchConstraintCoincidence") == 0)
-  {
-    int anAttrPos = 0;
-    // Verify the constraint has only two attributes and they are points
-    int aPt2d = 0; // bit-mapped field, each bit indicates whether the attribute is 2D point
-    int aPt3d = 0; // bit-mapped field, the same information for 3D points
-    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
-    {
-      boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-          theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
-        );
-      if (!anAttr) continue;
-      // Verify the attribute is a 2D point
-      boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
-      if (aPoint2D)
-      {
-        aPt2d |= (1 << indAttr);
-        theAttrNames[anAttrPos++] = CONSTRAINT_ATTRIBUTES[indAttr];
-        continue;
-      }
-      // Verify the attribute is a 3D point
-      boost::shared_ptr<GeomDataAPI_Point> aPoint3D =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point>(anAttr->attr());
-      if (aPoint3D)
-      {
-        aPt3d |= (1 << indAttr);
-        theAttrNames[anAttrPos++] = CONSTRAINT_ATTRIBUTES[indAttr];
-        continue;
-      }
-      // Attribute neither 2D nor 3D point is not supported by this type of constraint
-      return SLVS_C_UNKNOWN;
-    }
-    // The constrained points should be in first and second positions,
-    // so the expected value of aPt2d or aPt3d is 3
-    if ((aPt2d == 3 && aPt3d == 0) || (aPt2d == 0 && aPt3d == 3))
-      return SLVS_C_POINTS_COINCIDENT;
-    // Constraint parameters are wrong
-    return SLVS_C_UNKNOWN;
-  }
-
-  // Constraint for distance between point and another entity
-  if (aConstraintKind.compare("SketchConstraintDistance") == 0)
-  {
-    int aResult = SLVS_C_UNKNOWN; // possible constraint type
-    int aNbPoints = 0;
-    int aNbEntities = 0;
-    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
-    {
-      boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-          theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
-        );
-      if (!anAttr) continue;
-      if (anAttr->isFeature())
-      { // verify posiible entities
-        const std::string& aKind = anAttr->feature()->getKind();
-        if (aKind.compare("SketchPoint") == 0)
-        {
-          theAttrNames[aNbPoints++] = CONSTRAINT_ATTRIBUTES[indAttr];
-          continue;
-        }
-        else if(aKind.compare("SketchLine") == 0)
-        {
-          // entities are placed starting from CONSTRAINT_ATTR_ENTITY_C attribute
-          theAttrNames[2 + aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
-          aResult = SLVS_C_PT_LINE_DISTANCE;
-          continue;
-        }
-      }
-      else
-      { // verify points
-        // Verify the attribute is a 2D point
-        boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
-          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
-        if (aPoint2D)
-        {
-          theAttrNames[aNbPoints++] = CONSTRAINT_ATTRIBUTES[indAttr];
-          continue;
-        }
-        // Verify the attribute is a 3D point
-        boost::shared_ptr<GeomDataAPI_Point> aPoint3D =
-          boost::dynamic_pointer_cast<GeomDataAPI_Point>(anAttr->attr());
-        if (aPoint3D)
-        {
-          theAttrNames[aNbPoints++] = CONSTRAINT_ATTRIBUTES[indAttr];
-          continue;
-        }
-      }
-    }
-    // Verify the correctness of constraint arguments
-    if (aNbPoints == 2 && aNbEntities ==0)
-      aResult = SLVS_C_PT_PT_DISTANCE;
-    else if (aNbPoints == 1 && aNbEntities == 1)
-      aResult = SLVS_C_UNKNOWN;
-    return aResult;
-  }
-
-  // Constraint for two parallel/perpendicular lines
-  bool isParallel = (aConstraintKind.compare("SketchConstraintParallel") == 0);
-  bool isPerpendicular = (aConstraintKind.compare("SketchConstraintPerpendicular") == 0);
-  if (isParallel || isPerpendicular)
-  {
-    int aNbEntities = 2; // lines in SolveSpace constraints should started from CONSTRAINT_ATTR_ENTITY_C attribute
-    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
-    {
-      boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-          theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
-        );
-      if (!anAttr || !anAttr->isFeature()) continue;
-      const std::string& aKind = anAttr->feature()->getKind();
-      if (aKind.compare("SketchLine") == 0)
-      {
-        theAttrNames[aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
-        continue;
-      }
-    }
-    if (aNbEntities == 4)
-      return isParallel ? SLVS_C_PARALLEL : SLVS_C_PERPENDICULAR;
-    return SLVS_C_UNKNOWN;
-  }
-
-  // Constraint for diameter of a circle
-  if (aConstraintKind.compare("SketchConstraintDiameter") == 0)
-  {
-    int aNbEntities = 2; // lines in SolveSpace constraints should started from CONSTRAINT_ATTR_ENTITY_C attribute
-    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
-    {
-      boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-          theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
-        );
-      if (!anAttr || !anAttr->isFeature()) continue;
-      const std::string& aKind = anAttr->feature()->getKind();
-      if (aKind.compare("SketchCircle") == 0)
-      {
-        theAttrNames[aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
-        continue;
-      }
-    }
-    if (aNbEntities == 3)
-      return SLVS_C_DIAMETER;
-    return SLVS_C_UNKNOWN;
-  }
-
-  /// \todo Implement other kind of constrtaints
-
-  return SLVS_C_UNKNOWN;
 }
 
 // ============================================================================
