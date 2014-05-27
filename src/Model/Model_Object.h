@@ -7,6 +7,7 @@
 
 #include <Model.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Document.h>
 
 #include <TDataStd_Name.hxx>
 
@@ -34,7 +35,7 @@ public:
   MODEL_EXPORT virtual const std::string& getKind() {return myRef->getKind();}
 
   /// Returns to which group in the document must be added feature
-  MODEL_EXPORT virtual const std::string& getGroup() {return myRef->getGroup();}
+  MODEL_EXPORT virtual const std::string& getGroup() {return FEATURES_GROUP;}
 
   /// Returns document this feature belongs to
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> document()

@@ -7,10 +7,14 @@
 #include "ModuleBase_Operation.h"
 
 #include <QMessageBox>
+#include <QApplication>
+#include <QKeyEvent>
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent)
 : QObject(theParent)
 {
+  // listen to Escape signal to stop the current operation
+  qApp->installEventFilter(this);
 }
 
 XGUI_OperationMgr::~XGUI_OperationMgr()
@@ -64,6 +68,20 @@ QStringList XGUI_OperationMgr::operationList()
     result << eachOperation->id();
   }
   return result;
+}
+
+bool XGUI_OperationMgr::eventFilter(QObject *theObject, QEvent *theEvent)
+{
+  if (theEvent->type() == QEvent::KeyRelease) {
+    QKeyEvent* aKeyEvent = (QKeyEvent*)theEvent;
+    if (aKeyEvent && aKeyEvent->key() == Qt::Key_Escape) {
+      // TODO: this is Escape button processing when the property panel has empty content,
+      // but the operation should be stopped by the Enter has been clicked
+      onKeyReleased("", aKeyEvent);
+      return true;
+    }
+  }
+  return QObject::eventFilter(theObject, theEvent);
 }
 
 void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
@@ -134,4 +152,11 @@ void XGUI_OperationMgr::onOperationStopped()
   }
   if (aResultOp)
     resumeOperation(aResultOp);
+}
+
+void XGUI_OperationMgr::onKeyReleased(const std::string& theName, QKeyEvent* theEvent)
+{
+  ModuleBase_Operation* anOperation = currentOperation();
+  if (anOperation)
+    anOperation->keyReleased(theName, theEvent);
 }

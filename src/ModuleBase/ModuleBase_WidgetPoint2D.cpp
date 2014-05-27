@@ -11,12 +11,15 @@
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Object.h>
 #include <GeomDataAPI_Point2D.h>
 
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QDoubleSpinBox>
 #include <QLabel>
+#include <QEvent>
+#include <QKeyEvent>
 
 #include <cfloat>
 #include <climits>
@@ -57,6 +60,8 @@ ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent, QString t
 
     connect(myYSpin, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
   }
+  myXSpin->installEventFilter(this);
+  myYSpin->installEventFilter(this);
 }
 
 ModuleBase_WidgetPoint2D::~ModuleBase_WidgetPoint2D()
@@ -66,6 +71,10 @@ ModuleBase_WidgetPoint2D::~ModuleBase_WidgetPoint2D()
 bool ModuleBase_WidgetPoint2D::storeValue(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  if (!aData) {
+     ObjectPtr anObj = boost::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
+     if (anObj) aData = anObj->featureRef()->data();
+  }
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myFeatureAttributeID));
 
@@ -80,6 +89,10 @@ bool ModuleBase_WidgetPoint2D::storeValue(boost::shared_ptr<ModelAPI_Feature> th
 bool ModuleBase_WidgetPoint2D::restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  if (!aData) {
+     ObjectPtr anObj = boost::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
+     if (anObj) aData = anObj->featureRef()->data();
+  }
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myFeatureAttributeID));
 
@@ -90,7 +103,39 @@ bool ModuleBase_WidgetPoint2D::restoreValue(boost::shared_ptr<ModelAPI_Feature> 
   return true;
 }
 
+bool ModuleBase_WidgetPoint2D::focusTo(const std::string& theAttributeName)
+{
+  if (theAttributeName != myFeatureAttributeID)
+    return false;
+
+  if (!myXSpin->hasFocus() && !myYSpin->hasFocus()) {
+    myXSpin->setFocus();
+  }
+
+  return true;
+}
+
 QWidget* ModuleBase_WidgetPoint2D::getControl() const
 {
   return myGroupBox;
+}
+
+QList<QWidget*> ModuleBase_WidgetPoint2D::getControls() const
+{
+  QList<QWidget*> aControls;
+  aControls.push_back(myXSpin);
+  aControls.push_back(myYSpin);
+
+  return aControls;
+}
+
+bool ModuleBase_WidgetPoint2D::eventFilter(QObject *theObject, QEvent *theEvent)
+{
+  if (theObject == myXSpin || theObject == myYSpin) {
+    if (theEvent->type() == QEvent::KeyRelease) {
+      emit keyReleased(myFeatureAttributeID, (QKeyEvent*) theEvent);
+      return true;
+    }
+  }
+  return ModuleBase_ModelWidget::eventFilter(theObject, theEvent);
 }

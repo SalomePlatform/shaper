@@ -36,10 +36,21 @@ string Model_Data::getName()
 
 void Model_Data::setName(string theName)
 {
-  TDataStd_Name::Set(myLab, theName.c_str());
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-  Model_FeatureUpdatedMessage aMsg(myFeature, anEvent);
-  Events_Loop::loop()->send(aMsg, false);
+  bool isModified = false;
+  Handle(TDataStd_Name) aName;
+  if (!myLab.FindAttribute(TDataStd_Name::GetID(), aName)) {
+    TDataStd_Name::Set(myLab, theName.c_str());
+    isModified = true;
+  } else {
+    isModified = !aName->Get().IsEqual(theName.c_str());
+    if (isModified)
+      aName->Set(theName.c_str());
+  }
+  if (isModified) {
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
+    Model_FeatureUpdatedMessage aMsg(myFeature, anEvent);
+    Events_Loop::loop()->send(aMsg, false);
+  }
 }
 
 void Model_Data::addAttribute(string theID, string theAttrType)

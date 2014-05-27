@@ -27,6 +27,14 @@ public:
   //! Interface for loading widget's data from the data model
   MODULEBASE_EXPORT virtual bool restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature);
 
+  /// Set focus to the current widget if it corresponds to the given attribute
+  /// \param theAttribute name
+  MODULEBASE_EXPORT virtual bool focusTo(const std::string& theAttributeName);
+
+  /// Returns list of widget controls
+  /// \return a control list
+  virtual QList<QWidget*> getControls() const;
+
 private:
   QWidget* myWrappedWidget;
 };

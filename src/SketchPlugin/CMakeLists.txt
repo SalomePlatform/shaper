@@ -7,8 +7,14 @@ SET(PROJECT_HEADERS
     SketchPlugin_Sketch.h
     SketchPlugin_Line.h
     SketchPlugin_Point.h
+    SketchPlugin_Circle.h
+    SketchPlugin_Arc.h
     SketchPlugin_Constraint.h
     SketchPlugin_ConstraintCoincidence.h
+    SketchPlugin_ConstraintDistance.h
+    SketchPlugin_ConstraintDiameter.h
+    SketchPlugin_ConstraintParallel.h
+    SketchPlugin_ConstraintPerpendicular.h
 )
 
 SET(PROJECT_SOURCES
@@ -17,7 +23,13 @@ SET(PROJECT_SOURCES
     SketchPlugin_Sketch.cpp
     SketchPlugin_Line.cpp
     SketchPlugin_Point.cpp
+    SketchPlugin_Circle.cpp
+    SketchPlugin_Arc.cpp
     SketchPlugin_ConstraintCoincidence.cpp
+    SketchPlugin_ConstraintDistance.cpp
+    SketchPlugin_ConstraintDiameter.cpp
+    SketchPlugin_ConstraintParallel.cpp
+    SketchPlugin_ConstraintPerpendicular.cpp
 )
 
 SET(PROJECT_LIBRARIES

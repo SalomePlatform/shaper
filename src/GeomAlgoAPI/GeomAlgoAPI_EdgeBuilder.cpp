@@ -18,6 +18,8 @@ boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_EdgeBuilder::line(
 
   if (aStart.IsEqual(anEnd, Precision::Confusion()))
     return boost::shared_ptr<GeomAPI_Shape>();
+  if (Abs(aStart.SquareDistance(anEnd)) > 1.e+100)
+    return boost::shared_ptr<GeomAPI_Shape>();
   BRepBuilderAPI_MakeEdge anEdgeBuilder(aStart, anEnd);
   boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
   TopoDS_Edge anEdge = anEdgeBuilder.Edge();

@@ -103,12 +103,15 @@ protected:
     const boost::shared_ptr<ModelAPI_Feature> theFeature);
 
   //! Synchronizes myFeatures list with the updated document
-  void synchronizeFeatures();
+  void synchronizeFeatures(const bool theMarkUpdated = false);
 
   //! Creates new document with binary file format
   Model_Document(const std::string theID);
 
   Handle_TDocStd_Document document() {return myDoc;}
+
+  //! performas compactification of all nested operations into one
+  void compactNested();
 
   friend class Model_Application;
   friend class Model_PluginManager;

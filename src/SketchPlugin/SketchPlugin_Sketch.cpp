@@ -35,14 +35,18 @@ void SketchPlugin_Sketch::execute()
 
 const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Sketch::preview()
 {
-  std::list<boost::shared_ptr<GeomAPI_Shape> > aFaces;
+  if (isPlaneSet()) {
+    setPreview(boost::shared_ptr<GeomAPI_Shape>());
+  }
+  else {
+    std::list<boost::shared_ptr<GeomAPI_Shape> > aFaces;
 
-  addPlane(1, 0, 0, aFaces); // YZ plane
-  addPlane(0, 1, 0, aFaces); // XZ plane
-  addPlane(0, 0, 1, aFaces); // XY plane
-  boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aFaces);
-  setPreview(aCompound);
-
+    addPlane(1, 0, 0, aFaces); // YZ plane
+    addPlane(0, 1, 0, aFaces); // XZ plane
+    addPlane(0, 0, 1, aFaces); // XY plane
+    boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aFaces);
+    setPreview(aCompound);
+  }
   return getPreview();
 }
 
@@ -75,4 +79,12 @@ boost::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, cons
     aX->dir()->xyz()->multiplied(theX))->added(aY->dir()->xyz()->multiplied(theY));
 
   return boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
+}
+
+bool SketchPlugin_Sketch::isPlaneSet()
+{
+  boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_NORM));
+
+  return aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
 }

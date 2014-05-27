@@ -20,6 +20,8 @@
 class ModelAPI_Feature;
 class ModelAPI_Document;
 
+class QKeyEvent;
+
 /*!
  \class ModuleBase_Operation
  * \brief Base class for all operations
@@ -65,6 +67,8 @@ public:
   void storeReal(double theValue);
   /// Stores a custom value in model.
   void storeCustomValue();
+
+  virtual void keyReleased(std::string theName, QKeyEvent* theEvent) {};
 
 protected:
   /// Virtual method called when operation started (see start() method for more description)

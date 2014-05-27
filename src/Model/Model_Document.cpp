@@ -172,9 +172,11 @@ void Model_Document::close()
     subDocument(*aSubIter)->close();
   mySubs.clear();
   // close this
+  /* do not close because it can be undoed
   if (myDoc->CanClose() == CDM_CCS_OK)
     myDoc->Close();
   Model_Application::getApplication()->deleteDocument(myID);
+  */
 }
 
 void Model_Document::startOperation()
@@ -184,6 +186,8 @@ void Model_Document::startOperation()
       myNestedNum = 0;
       myDoc->InitDeltaCompaction();
     }
+    myIsEmptyTr[myTransactionsAfterSave] = false;
+    myTransactionsAfterSave++;
     myDoc->NewCommand();
   } else { // start of simple command
     myDoc->NewCommand();
@@ -192,6 +196,17 @@ void Model_Document::startOperation()
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
     subDocument(*aSubIter)->startOperation();
+}
+
+void Model_Document::compactNested() {
+  while(myNestedNum != -1) {
+    myTransactionsAfterSave--;
+    myIsEmptyTr.erase(myTransactionsAfterSave);
+    myNestedNum--;
+  }
+  myIsEmptyTr[myTransactionsAfterSave] = false;
+  myTransactionsAfterSave++;
+  myDoc->PerformDeltaCompaction();
 }
 
 void Model_Document::finishOperation()
@@ -205,15 +220,8 @@ void Model_Document::finishOperation()
     myNestedNum++;
   if (!myDoc->HasOpenCommand()) {
     if (myNestedNum != -1) {
-      myNestedNum -= 2; // one is just incremented before, one is left (and not empty!)
-      while(myNestedNum != -1) {
-        myIsEmptyTr.erase(myTransactionsAfterSave);
-        myTransactionsAfterSave--;
-        myNestedNum--;
-      }
-      myIsEmptyTr[myTransactionsAfterSave] = false;
-      myTransactionsAfterSave++;
-      myDoc->PerformDeltaCompaction();
+      myNestedNum--;
+      compactNested();
     }
   } else {
     // returns false if delta is empty and no transaction was made
@@ -229,13 +237,23 @@ void Model_Document::finishOperation()
 
 void Model_Document::abortOperation()
 {
-  if (myNestedNum == 0)
-    myNestedNum = -1;
-  myDoc->AbortCommand();
-  synchronizeFeatures();
+  if (myNestedNum > 0 && !myDoc->HasOpenCommand()) { // abort all what was done in nested
+    // first compact all nested
+    compactNested();
+    // for nested it is undo and clear redos
+    myDoc->Undo();
+    myDoc->ClearRedos();
+    myTransactionsAfterSave--;
+    myIsEmptyTr.erase(myTransactionsAfterSave);
+  } else {
+    if (myNestedNum == 0) // abort only high-level
+      myNestedNum = -1;
+    myDoc->AbortCommand();
+  }
+  synchronizeFeatures(true);
   // abort for all subs
   set<string>::iterator aSubIter = mySubs.begin();
-  for(; aSubIter != mySubs.end(); aSubIter++)
+    for(; aSubIter != mySubs.end(); aSubIter++)
     subDocument(*aSubIter)->abortOperation();
 }
 
@@ -269,7 +287,7 @@ void Model_Document::undo()
   if (myNestedNum > 0) myNestedNum--;
   if (!myIsEmptyTr[myTransactionsAfterSave])
     myDoc->Undo();
-  synchronizeFeatures();
+  synchronizeFeatures(true);
   // undo for all subs
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
@@ -294,7 +312,7 @@ void Model_Document::redo()
   if (!myIsEmptyTr[myTransactionsAfterSave])
     myDoc->Redo();
   myTransactionsAfterSave++;
-  synchronizeFeatures();
+  synchronizeFeatures(true);
   // redo for all subs
   set<string>::iterator aSubIter = mySubs.begin();
   for(; aSubIter != mySubs.end(); aSubIter++)
@@ -559,14 +577,14 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::objectByFeature(
   for(int a = 0; a < size(theFeature->getGroup()); a++) {
     boost::shared_ptr<Model_Object> anObj = 
       boost::dynamic_pointer_cast<Model_Object>(feature(theFeature->getGroup(), a));
-    if (anObj) {
+    if (anObj && anObj->featureRef() == theFeature) {
       return anObj;
     }
   }
   return boost::shared_ptr<ModelAPI_Feature>(); // not found
 }
 
-void Model_Document::synchronizeFeatures()
+void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
 {
   boost::shared_ptr<ModelAPI_Document> aThis = Model_Application::getApplication()->getDocument(myID);
   // update features
@@ -585,11 +603,14 @@ void Model_Document::synchronizeFeatures()
       aDSTag = aFLabIter.Value()->Label().Tag();
     }
     if (aDSTag > aFeatureTag) { // feature is removed
-      Model_FeatureDeletedMessage aMsg1(aThis, FEATURES_GROUP);
-      Model_FeatureDeletedMessage aMsg2(aThis, (*aFIter)->getGroup());
+      FeaturePtr aFeature = *aFIter;
       aFIter = myFeatures.erase(aFIter);
       // event: model is updated
-      Events_Loop::loop()->send(aMsg1);
+      if (aFeature->isInHistory()) {
+        Model_FeatureDeletedMessage aMsg1(aThis, FEATURES_GROUP);
+        Events_Loop::loop()->send(aMsg1);
+      }
+      Model_FeatureDeletedMessage aMsg2(aThis, aFeature->getGroup());
       Events_Loop::loop()->send(aMsg2);
     } else if (aDSTag < aFeatureTag) { // a new feature is inserted
       // create a feature
@@ -625,6 +646,11 @@ void Model_Document::synchronizeFeatures()
       // feature for this label is added, so go to the next label
       aFLabIter.Next();
     } else { // nothing is changed, both iterators are incremented
+      if (theMarkUpdated) {
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
+        Model_FeatureUpdatedMessage aMsg(*aFIter, anEvent);
+        Events_Loop::loop()->send(aMsg);
+      }
       aFIter++;
       aFLabIter.Next();
     }
@@ -633,6 +659,8 @@ void Model_Document::synchronizeFeatures()
   boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
     setCheckTransactions(false);
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+  if (theMarkUpdated)
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_DELETED));
   boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
     setCheckTransactions(true);

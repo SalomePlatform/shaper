@@ -38,3 +38,17 @@ bool ModuleBase_MetaWidget::restoreValue(boost::shared_ptr<ModelAPI_Feature> the
   #endif
   return true;
 }
+
+bool ModuleBase_MetaWidget::focusTo(const std::string& theAttributeName)
+{
+  #ifdef _DEBUG
+  std::cout << "ModuleBase_MetaWidget::focusTo"
+            << myWrappedWidget->metaObject()->className() << std::endl;
+  #endif
+  return true;
+}
+
+QList<QWidget*> ModuleBase_MetaWidget::getControls() const
+{
+  return QList<QWidget*>();
+}

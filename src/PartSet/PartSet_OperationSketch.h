@@ -35,10 +35,11 @@ public:
   virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
   /// Initializes some fields accorging to the feature
-  /// \param theFeature the feature
-  /// \param thePresentations the list of additional presentations
+  /// \param theSelected the list of selected presentations
+  /// \param theHighlighted the list of highlighted presentations
   virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                    const std::list<XGUI_ViewerPrs>& thePresentations);
+                    const std::list<XGUI_ViewerPrs>& theSelected,
+                    const std::list<XGUI_ViewerPrs>& theHighlighted);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
@@ -80,6 +81,10 @@ signals:
   void planeSelected(double theX, double theY, double theZ);
 
 protected:
+  /// Virtual method called when operation started (see start() method for more description)
+  /// Default impl calls corresponding slot and commits immediately.
+  virtual void startOperation();
+
   /// Returns whether the sketch plane is set
   /// \return the boolean value whether the sketch is set
   bool hasSketchPlane() const;

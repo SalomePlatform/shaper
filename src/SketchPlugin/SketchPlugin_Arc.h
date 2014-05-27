@@ -1,32 +1,33 @@
-// File:        SketchPlugin_Line.h
-// Created:     24 Apr 2014
-// Author:      Mikhail PONIKAROV
+// File:        SketchPlugin_Arc.h
+// Created:     26 May 2014
+// Author:      Artem ZHIDKOV
 
-#ifndef SketchPlugin_Line_HeaderFile
-#define SketchPlugin_Line_HeaderFile
+#ifndef SketchPlugin_Arc_HeaderFile
+#define SketchPlugin_Arc_HeaderFile
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Feature.h>
-#include <list>
 
-/// Start 2D point of the line
-const std::string LINE_ATTR_START("StartPoint");
-/// End 2D point of the line
-const std::string LINE_ATTR_END("EndPoint");
+/// Central 2D point of the circle which contains the arc
+const std::string ARC_ATTR_CENTER("ArcCenter");
+/// Start 2D point of the arc
+const std::string ARC_ATTR_START("ArcStartPoint");
+/// End 2D point of the arc
+const std::string ARC_ATTR_END("ArcEndPoint");
 
-/**\class SketchPlugin_Line
+/**\class SketchPlugin_Arc
  * \ingroup DataModel
- * \brief Feature for creation of the new part in PartSet.
+ * \brief Feature for creation of the new arc of circle in PartSet.
  */
-class SketchPlugin_Line: public SketchPlugin_Feature
+class SketchPlugin_Arc: public SketchPlugin_Feature
 {
 public:
   /// Returns the kind of a feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "SketchLine"; return MY_KIND;}
+  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
+  {static std::string MY_KIND = "SketchArc"; return MY_KIND;}
 
   /// Returns to which group in the document must be added feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
+  SKETCHPLUGIN_EXPORT virtual const std::string& getGroup()
   {static std::string MY_GROUP = "Sketch"; return MY_GROUP;}
 
   /// Creates a new part document if needed
@@ -44,7 +45,7 @@ public:
     const boost::shared_ptr<ModelAPI_Feature>& theFeature) {};
 
   /// Use plugin manager for features creation
-  SketchPlugin_Line();
+  SketchPlugin_Arc();
 };
 
 #endif

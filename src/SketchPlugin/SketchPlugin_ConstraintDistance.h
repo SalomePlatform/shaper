@@ -1,28 +1,29 @@
-// File:    SketchPlugin_ConstraintCoincidence.h
-// Created: 08 May 2014
+// File:    SketchPlugin_ConstraintDistance.h
+// Created: 23 May 2014
 // Author:  Artem ZHIDKOV
 
-#ifndef SketchPlugin_ConstraintCoincidence_HeaderFile
-#define SketchPlugin_ConstraintCoincidence_HeaderFile
+#ifndef SketchPlugin_ConstraintDistance_HeaderFile
+#define SketchPlugin_ConstraintDistance_HeaderFile
 
 #include "SketchPlugin.h"
 #include "SketchPlugin_Constraint.h"
 #include <list>
 
 
-/** \class SketchPlugin_ConstraintCoincidence
+/** \class SketchPlugin_ConstraintDistance
  *  \ingroup DataModel
- *  \brief Feature for creation of a new constraint which defines equivalence of two points
+ *  \brief Feature for creation of a new constraint which defines a distance
+ *         between a point and another feature (point, line, plane or face)
  *
- *  These constraint has two attributes:
- *  CONSTRAINT_ATTR_ENTITY_A and CONSTRAINT_ATTR_ENTITY_B
+ *  These constraint has three attributes:
+ *  CONSTRAINT_ATTR_VALUE, CONSTRAINT_ATTR_ENTITY_A and CONSTRAINT_ATTR_ENTITY_B
  */
-class SketchPlugin_ConstraintCoincidence: public SketchPlugin_Constraint
+class SketchPlugin_ConstraintDistance: public SketchPlugin_Constraint
 {
 public:
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "SketchConstraintCoincidence"; return MY_KIND;}
+  {static std::string MY_KIND = "SketchConstraintDistance"; return MY_KIND;}
 
   /// \brief Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
@@ -38,7 +39,7 @@ public:
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
   /// \brief Use plugin manager for features creation
-  SketchPlugin_ConstraintCoincidence();
+  SketchPlugin_ConstraintDistance();
 };
 
 #endif

@@ -97,7 +97,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)), SLOT(onOperationStopped(ModuleBase_Operation*)));
   connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
   connect(myOperationMgr, SIGNAL(operationStarted()), myActionsMgr, SLOT(update()));
-  connect(myOperationMgr, SIGNAL(operationStopped()), myActionsMgr, SLOT(update()));
+  connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)), myActionsMgr, SLOT(update()));
   connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
 }
 
@@ -121,7 +121,6 @@ void XGUI_Workshop::startApplication()
   Events_ID aFeatureUpdatedId = aLoop->eventByName(EVENT_FEATURE_UPDATED);
   aLoop->registerListener(this, aFeatureUpdatedId);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
 
   activateModule();
   if (myMainWindow) {
@@ -238,13 +237,6 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     }
   }
 
-  // Process deletion of a part
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED)) {
-    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-    if (aMgr->currentDocument() == aMgr->rootDocument())
-      activatePart(FeaturePtr()); // Activate PartSet
-  }
-
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
   static Events_ID aFeatureUpdatedId = Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED);
@@ -307,6 +299,7 @@ void XGUI_Workshop::onOperationStarted()
     myPropertyPanel->setModelWidgets(aFactory.getModelWidgets());
     myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
   }
+  updateCommandStatus();
 }
 
 //******************************************************
@@ -537,6 +530,8 @@ void XGUI_Workshop::onRedo()
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   DocumentPtr aDoc = aMgr->rootDocument();
+  if (aDoc->isOperation())
+    operationMgr()->abortOperation();
   aDoc->redo();
   updateCommandStatus();
 }
@@ -692,6 +687,9 @@ void XGUI_Workshop::createDockWidgets()
   connect(aOkBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onCommitOperation()));
   QPushButton* aCancelBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
   connect(aCancelBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onAbortOperation()));
+
+  connect(myPropertyPanel, SIGNAL(keyReleased(const std::string&, QKeyEvent*)),
+          myOperationMgr, SLOT(onKeyReleased(const std::string&, QKeyEvent*)));
 }
 
 //******************************************************
@@ -825,7 +823,7 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
           aFeature = aObject->featureRef();
         }
       }
-      aMgr->rootDocument()->removeFeature(aFeature);
+      aFeature->document()->removeFeature(aFeature);
     }
     aMgr->rootDocument()->finishOperation();
   }
