@@ -75,6 +75,14 @@ public:
 
   virtual void keyReleased(std::string theName, QKeyEvent* theEvent);
 
+  /// \brief Save the point to the line.
+  /// \param theFeature the line feature
+  /// \param theX the horizontal coordinate
+  /// \param theY the vertical coordinate
+  /// \param theAttribute the start or end attribute of the line
+  static void setLinePoint(boost::shared_ptr<ModelAPI_Feature>, double theX, double theY,
+                           const std::string& theAttribute);
+
 protected:
   /// \brief Virtual method called when operation is started
   /// Virtual method called when operation started (see start() method for more description)
@@ -106,6 +114,7 @@ protected:
   /// \param theX the horizontal coordnate of the point
   /// \param theY the vertical coordnate of the point
   void setConstraints(double theX, double theY);
+
 protected:
   /// \brief Get the line point 2d coordinates.
   /// \param theFeature the line feature
@@ -121,13 +130,6 @@ protected:
   boost::shared_ptr<GeomDataAPI_Point2D> findLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                                        double theX, double theY);
 
-  /// \brief Save the point to the line.
-  /// \param theFeature the line feature
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  /// \param theAttribute the start or end attribute of the line
-  void setLinePoint(boost::shared_ptr<ModelAPI_Feature>, double theX, double theY,
-                    const std::string& theAttribute);
   /// \brief Save the point to the line.
   /// \param thePoint the 3D point in the viewer
   /// \param theAttribute the start or end attribute of the line
