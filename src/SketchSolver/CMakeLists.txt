@@ -4,11 +4,15 @@ INCLUDE(FindSolveSpace)
 SET(PROJECT_HEADERS
     SketchSolver.h
     SketchSolver_Solver.h
+    SketchSolver_Constraint.h
+    SketchSolver_ConstraintGroup.h
     SketchSolver_ConstraintManager.h
 )
 
 SET(PROJECT_SOURCES
     SketchSolver_Solver.cpp
+    SketchSolver_Constraint.cpp
+    SketchSolver_ConstraintGroup.cpp
     SketchSolver_ConstraintManager.cpp
 )
 
