@@ -17,6 +17,8 @@ popd
 
 
 call %SALOME_ROOT_DIR%\env_launch.bat
+rem Unfortunately in "env_launch.bat" only KERNEL is added as a module, so add GUI manually
+call %SALOME_ROOT_DIR%\set_one_module_env.bat GUI
 
 @SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
 @SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
