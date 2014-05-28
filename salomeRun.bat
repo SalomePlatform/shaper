@@ -10,7 +10,19 @@ popd
 @SET SRC_DIR=%ROOT_DIR%\sources
 @SET OCC_LIB_PREFIX=d
 
-call %SRC_DIR%\msvc9_env_Salome.bat
+@SET SALOME_ROOT_DIR=%ROOT_DIR%\SALOME-7.3.0-WIN32
+@SET SOLVESPACE_ROOT_DIR=%ROOT_DIR%\products\solvespace-2.0
+@SET NEWGEOM_ROOT_DIR=%ROOT_DIR%\install
+@SET PATH=%SALOME_ROOT_DIR%;%PATH%
+
+
+call %SALOME_ROOT_DIR%\env_launch.bat
+
+@SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
+@SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
+@SET PATH=%PATH%;%NEWGEOM_ROOT_DIR%\bin;%NEWGEOM_ROOT_DIR%\plugins
+
+@SET LightAppConfig=%ROOT_DIR%\install\share\salome\resources\newgeom;%SALOME_ROOT_DIR%\MODULES\GUI\share\salome\resources\gui
 
 
 SuitApp.exe LightApp -style salome --modules=NewGeom --uselicense --noexcepthandling
