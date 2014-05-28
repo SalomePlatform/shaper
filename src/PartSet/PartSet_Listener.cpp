@@ -47,7 +47,8 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
       if (myModule->workshop()->displayer()->IsVisible(aFeature) ||
           aType == EVENT_FEATURE_CREATED) {
         myModule->visualizePreview(aFeature, true, false);
-        myModule->activateFeature(aFeature, true);
+        if (aType == EVENT_FEATURE_CREATED)
+          myModule->activateFeature(aFeature, true);
       }
     }
     myModule->workshop()->displayer()->UpdateViewer();

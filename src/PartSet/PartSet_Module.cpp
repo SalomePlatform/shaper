@@ -5,6 +5,7 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <PartSet_Listener.h>
+#include <PartSet_TestOCC.h>
 
 #include <ModuleBase_Operation.h>
 
@@ -38,7 +39,6 @@
 #ifdef _DEBUG
 #include <QDebug>
 #endif
-
 
 /*!Create and return new instance of XGUI_Module*/
 extern "C" PARTSET_EXPORT XGUI_Module* createModule(XGUI_Workshop* theWshop)
@@ -109,6 +109,12 @@ std::string PartSet_Module::featureFile(const std::string& theFeatureId)
  */
 void PartSet_Module::onFeatureTriggered()
 {
+  //PartSet_TestOCC::testSelection_OCC(myWorkshop->viewer()->AISContext(),
+  //                                   myWorkshop->viewer()->activeView());
+
+  //PartSet_TestOCC::testErase_OCC(myWorkshop->viewer()->AISContext(),
+  //                               myWorkshop->viewer()->activeView());
+
   QAction* aCmd = dynamic_cast<QAction*>(sender());
   //Do nothing on uncheck
   if(aCmd->isCheckable() && !aCmd->isChecked())
@@ -202,6 +208,8 @@ void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
 {
   myWorkshop->viewer()->setViewProjection(theX, theY, theZ);
   myWorkshop->actionsMgr()->update();
+
+  //PartSet_TestOCC::testSelection(myWorkshop);
 }
 
 void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature)

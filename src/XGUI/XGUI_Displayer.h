@@ -116,11 +116,16 @@ public:
   /// Updates the viewer
   void UpdateViewer();
 
+  /// Searches the interactive object by feature
+  /// \param feature the feature or NULL if it not visualized
+  /// \return theIO an interactive object
+   Handle(AIS_InteractiveObject) GetAISObject(boost::shared_ptr<ModelAPI_Feature>) const;
+
 protected:
   /// Searches the feature by interactive object
   /// \param theIO an interactive object
   /// \return feature the feature or NULL if it not visualized
-  boost::shared_ptr<ModelAPI_Feature> GetFeature(Handle(AIS_InteractiveObject) theIO);
+  boost::shared_ptr<ModelAPI_Feature> GetFeature(Handle(AIS_InteractiveObject) theIO) const;
   /// Deactivate local selection
   /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
   void CloseAllContexts(const bool isUpdateViewer);
