@@ -278,6 +278,8 @@ void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin
     std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter;
     for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
     {
+      if ((*aGroupIter)->isEmpty()) 
+        continue;
       boost::shared_ptr<ModelAPI_Attribute> anAttribute =
         boost::dynamic_pointer_cast<ModelAPI_Attribute>(theFeature->data()->attribute(*anAttrIter));
       (*aGroupIter)->updateEntityIfPossible(anAttribute);

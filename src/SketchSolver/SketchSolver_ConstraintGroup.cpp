@@ -566,84 +566,17 @@ void SketchSolver_ConstraintGroup::mergeGroups(
   if (theGroup.myConstraintMap.empty())
     return ;
 
-  // NOTE: The possibility, that some elements are placed into both groups, is around 0, 
-  // so the objects should be copied with changing the indexes
-
-  // Maps between old and new indexes of SolveSpace elements:
-  std::map<Slvs_hParam, Slvs_hParam>           aParamMap;
-  std::map<Slvs_hEntity, Slvs_hEntity>         anEntityMap;
+  // Map between old and new indexes of SolveSpace constraints
   std::map<Slvs_hConstraint, Slvs_hConstraint> aConstrMap;
 
-  // Go through copying constraints
-  std::vector<Slvs_Constraint>::const_iterator aConstrIter = theGroup.myConstraints.begin();
-  for ( ; aConstrIter != theGroup.myConstraints.end(); aConstrIter++)
-  {
-    Slvs_Constraint aConstraintCopy = *aConstrIter;
-    // Go through constraint entities
-    Slvs_hEntity* anEntities[CONSTRAINT_ATTR_SIZE] = {
-      &(aConstraintCopy.ptA),     &(aConstraintCopy.ptB), 
-      &(aConstraintCopy.entityA), &(aConstraintCopy.entityB)
-    };
-    for (int indEnt = 0; indEnt < CONSTRAINT_ATTR_SIZE; indEnt++)
-    {
-      if (*(anEntities[indEnt]) == 0)
-        continue;
-      if (anEntityMap.find(*(anEntities[indEnt])) != anEntityMap.end())
-      { // entity is already copied
-        *(anEntities[indEnt]) = anEntityMap[*(anEntities[indEnt])];
-        continue;
-      }
-
-      // Copy entity
-      Slvs_Entity anEntityCopy = theGroup.myEntities[Search(*(anEntities[indEnt]), theGroup.myEntities)];
-      // Go through entity parameters
-      const int aNbEntParams = 4; // maximal number of entity parameters
-      for (int indPrm = 0; indPrm < aNbEntParams; indPrm++)
-      {
-        if (anEntityCopy.param[indPrm] == 0)
-          continue;
-        if (aParamMap.find(anEntityCopy.param[indPrm]) != aParamMap.end())
-        {
-          anEntityCopy.param[indPrm] = aParamMap[anEntityCopy.param[indPrm]];
-          continue;
-        }
-
-        Slvs_Param aParamCopy = theGroup.myParams[Search(anEntityCopy.param[indPrm], theGroup.myParams)];
-        aParamMap[aParamCopy.h] = ++myParamMaxID;
-        aParamCopy.h = myParamMaxID;
-        myParams.push_back(aParamCopy);
-      }
-
-      anEntityMap[anEntityCopy.h] = ++myEntityMaxID;
-      anEntityCopy.h = myEntityMaxID;
-      myEntities.push_back(anEntityCopy);
-      *(anEntities[indEnt]) = anEntityCopy.h;
-    }
-
-    aConstraintCopy.h = ++myConstrMaxID;
-    myConstraints.push_back(aConstraintCopy);
-    aConstrMap[aConstrIter->h] = aConstraintCopy.h;
-  }
-
-  // Append maps of SketchPlugin to SolveSpace parameters
+  // Add all constraints from theGroup to the current group
   std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::const_iterator
-    aSPConstrMapIter = theGroup.myConstraintMap.begin();
-  for ( ; aSPConstrMapIter!= theGroup.myConstraintMap.end(); aSPConstrMapIter++)
-  {
-    std::map<Slvs_hConstraint, Slvs_hConstraint>::iterator aFind = aConstrMap.find(aSPConstrMapIter->second);
-    if (aFind != aConstrMap.end())
-      myConstraintMap[aSPConstrMapIter->first] = aFind->second;
-  }
+    aConstrIter = theGroup.myConstraintMap.begin();
+  for ( ; aConstrIter != theGroup.myConstraintMap.end(); aConstrIter++)
+    if (changeConstraint(aConstrIter->first))
+      aConstrMap[aConstrIter->second] = myConstrMaxID; // the constraint was added => store its ID
 
-  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator
-    aSPEntMapIter = theGroup.myEntityMap.begin();
-  for ( ; aSPEntMapIter != theGroup.myEntityMap.end(); aSPEntMapIter++) {
-    std::map<Slvs_hEntity, Slvs_hEntity>::iterator aFind = anEntityMap.find(aSPEntMapIter->second);
-    if (aFind != anEntityMap.end())
-      myEntityMap[aSPEntMapIter->first] = aFind->second;
-  }
-
-  // Add temporary constraints
+  // Add temporary constraints from theGroup
   std::list<Slvs_hConstraint>::const_iterator aTempConstrIter = theGroup.myTempConstraints.begin();
   for ( ; aTempConstrIter != theGroup.myTempConstraints.end(); aTempConstrIter++)
   {
@@ -651,7 +584,6 @@ void SketchSolver_ConstraintGroup::mergeGroups(
     if (aFind != aConstrMap.end())
       myTempConstraints.push_back(aFind->second);
   }
-  myTempConstraints.sort();
 
   if (myTempPointWhereDragged.empty())
     myTempPointWhereDragged = theGroup.myTempPointWhereDragged;
@@ -666,12 +598,6 @@ void SketchSolver_ConstraintGroup::mergeGroups(
         break;
       }
   }
-
-  // Merge the lists of coincidence points. As the groups were separated, there was 
-  // no coincidence constraint, so each two points from different groups don't coincide
-  myCoincidentPoints.insert(myCoincidentPoints.end(),
-                            theGroup.myCoincidentPoints.begin(),
-                            theGroup.myCoincidentPoints.end());
 
   myNeedToSolve = myNeedToSolve || theGroup.myNeedToSolve;
 }
