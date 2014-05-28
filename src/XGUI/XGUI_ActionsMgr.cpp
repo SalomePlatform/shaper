@@ -6,6 +6,7 @@
 #include "XGUI_Command.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_OperationMgr.h"
+#include "XGUI_SalomeConnector.h"
 
 #include <ModuleBase_Operation.h>
 
@@ -37,6 +38,9 @@ void XGUI_ActionsMgr::addCommand(QAction* theCmd)
   XGUI_Command* aXCmd = dynamic_cast<XGUI_Command*>(theCmd);
   if (aXCmd) {
     myNestedActions[aId] = aXCmd->nestedCommands();
+  } else {
+    XGUI_Workshop* aWorkshop = static_cast<XGUI_Workshop*>(parent());
+    myNestedActions[aId] = aWorkshop->salomeConnector()->nestedActions(aId);
   }
 }
 
