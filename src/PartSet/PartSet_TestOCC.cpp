@@ -43,8 +43,8 @@ void PartSet_TestOCC::testSelection(XGUI_Workshop* theWorkshop)
   }
 }
 
-void PartSet_TestOCC::testSelection_OCC(Handle_AIS_InteractiveContext theContext,
-                                        Handle_V3d_View theView)
+void PartSet_TestOCC::local_selection_change_shape(Handle_AIS_InteractiveContext theContext,
+                                                   Handle_V3d_View theView)
 {
   // 1. Create shape
   gp_Pnt aPnt1(100, 100, 0);
@@ -94,7 +94,7 @@ void PartSet_TestOCC::testSelection_OCC(Handle_AIS_InteractiveContext theContext
     std::cout << "Error: The point of the first line should not be selected." << std::endl;
 }
 
-void PartSet_TestOCC::testErase_OCC(Handle_AIS_InteractiveContext theContext,
+void PartSet_TestOCC::local_selection_erase(Handle_AIS_InteractiveContext theContext,
                                     Handle_V3d_View theView)
 {
   // 1. Create shape

@@ -109,12 +109,11 @@ std::string PartSet_Module::featureFile(const std::string& theFeatureId)
  */
 void PartSet_Module::onFeatureTriggered()
 {
-  //PartSet_TestOCC::testSelection_OCC(myWorkshop->viewer()->AISContext(),
+  //PartSet_TestOCC::local_selection_change_shape(myWorkshop->viewer()->AISContext(),
   //                                   myWorkshop->viewer()->activeView());
 
-  //PartSet_TestOCC::testErase_OCC(myWorkshop->viewer()->AISContext(),
-  //                               myWorkshop->viewer()->activeView());
-
+  //PartSet_TestOCC::local_selection_erase(myWorkshop->viewer()->AISContext(),
+  //                                       myWorkshop->viewer()->activeView());
   QAction* aCmd = dynamic_cast<QAction*>(sender());
   //Do nothing on uncheck
   if(aCmd->isCheckable() && !aCmd->isChecked())

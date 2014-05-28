@@ -28,15 +28,15 @@ public:
   /// BUG: The result contains the selection from the first presentation
   /// \param theContext a viewer interactive context
   /// \param theContext a view
-  static void testSelection_OCC(Handle_AIS_InteractiveContext theContext,
-                                Handle_V3d_View theView);
+  static void local_selection_change_shape(Handle_AIS_InteractiveContext theContext,
+                                           Handle_V3d_View theView);
 
   /// Creates row OCC presentation, activate in the local context, select it, erase the presentation
   /// BUG: The selected shape are in the viewer even after erase
   /// \param theContext a viewer interactive context
   /// \param theContext a view
-  static void testErase_OCC(Handle_AIS_InteractiveContext theContext,
-                            Handle_V3d_View theView);
+  static void local_selection_erase(Handle_AIS_InteractiveContext theContext,
+                                    Handle_V3d_View theView);
 
 private:
 
