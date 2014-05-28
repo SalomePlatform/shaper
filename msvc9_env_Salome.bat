@@ -18,8 +18,13 @@ if "%SALOME_ROOT_DIR%" == "" (
   set SALOME_ROOT_DIR=%ROOT_DIR%\SALOME
 )
 
-call "%SALOME_ROOT_DIR%\WORK\set_env.bat"
+if "%SOLVESPACE_ROOT_DIR%" == "" (
+  @SET SOLVESPACE_ROOT_DIR=%ROOT_DIR%\products\solvespace-2.0
+)
+
+call %SALOME_ROOT_DIR%\WORK\set_env.bat %1
 call "%PDIR%\env_compile.bat"
+
 
 @REM -------------------------
 @REM Python
@@ -58,7 +63,10 @@ call "%PDIR%\env_compile.bat"
 @SET PATH=%PDIR%\freetype-2.4.11\bin;%PATH%
 @SET PATH=%PDIR%\gl2ps-1.3.8\bin;%PATH%
 @SET PATH=%PDIR%\qwt-5.2.1\lib;%PATH%
+@SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
 @REM -------------------------
+
+
 
 IF "%ARCH%" == "Win64" (
   call "%VS90COMNTOOLS%..\..\VC\vcvarsall.bat" x64
@@ -72,6 +80,6 @@ IF "%ARCH%" == "Win64" (
 )
 
 @SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
-@SET PATH=%ROOT_DIR%\install\bin;%ROOT_DIR%\install\plugins;%PATH%
+@SET PATH=%PATH%;%ROOT_DIR%\install\bin;%ROOT_DIR%\install\plugins
 
 @SET LightAppConfig=%ROOT_DIR%\install\share\salome\resources\newgeom;%GUI_ROOT_DIR%\share\salome\resources\gui

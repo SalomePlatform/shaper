@@ -336,8 +336,8 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
                               QString::fromStdString(theMessage->tooltip()),
                               QIcon(theMessage->icon().c_str()),
                               QKeySequence(), isUsePropPanel);
-    myActionsMgr->addCommand(aAction);
     salomeConnector()->setNestedActions(aId, aNestedFeatures.split(" "));
+    myActionsMgr->addCommand(aAction);
     myPartSetModule->featureCreated(aAction);
   } else {
 

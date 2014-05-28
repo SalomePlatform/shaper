@@ -51,7 +51,7 @@ void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
 
   aContext->Display(anAIS, Standard_False);
   if (isUpdateViewer)
-    aContext->UpdateCurrentViewer();
+    UpdateViewer();
 }*/
 
 
@@ -114,7 +114,7 @@ void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
   myFeature2AISObjectMap.erase(theFeature);
 
   if (isUpdateViewer)
-    aContext->UpdateCurrentViewer();
+    UpdateViewer();
 }
 
 void XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
@@ -140,13 +140,8 @@ void XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
       // after. Another workaround to thrown down the selection and reselecting the AIS.
       // If there was a problem here, try the first solution with close/open local context.
       anAIS->Set(theShape);
-      anAIS->Redisplay();
-
-      /*if (aContext->IsSelected(anAIS)) {
-        aContext->AddOrRemoveSelected(anAIS, false);
-        aContext->AddOrRemoveSelected(anAIS, false);
-        //aContext->SetSelected(anAIS, false);
-      }*/
+      anAIS->Redisplay(Standard_True);
+      aContext->RecomputeSelectionOnly(anAIS);
     }
   }
   else {
@@ -154,6 +149,8 @@ void XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
     myFeature2AISObjectMap[theFeature] = anAIS;
     aContext->Display(anAIS, false);
   }
+  if (isUpdateViewer)
+    UpdateViewer();
 }
 
 void XGUI_Displayer::ActivateInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
@@ -183,7 +180,7 @@ void XGUI_Displayer::ActivateInLocalContext(boost::shared_ptr<ModelAPI_Feature> 
   }
 
   if (isUpdateViewer)
-    aContext->UpdateCurrentViewer();
+    UpdateViewer();
 }
 
 void XGUI_Displayer::StopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop,
@@ -213,7 +210,7 @@ void XGUI_Displayer::StopSelection(const std::list<XGUI_ViewerPrs>& theFeatures,
     }
   }
   if (isUpdateViewer)
-    aContext->UpdateCurrentViewer();
+    UpdateViewer();
 }
 
 void XGUI_Displayer::SetSelected(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isUpdateViewer)
@@ -241,7 +238,7 @@ void XGUI_Displayer::SetSelected(const std::list<XGUI_ViewerPrs>& theFeatures, c
   }
  
   if (isUpdateViewer)
-    aContext->UpdateCurrentViewer();
+    UpdateViewer();
 }
 
 void XGUI_Displayer::EraseAll(const bool isUpdateViewer)
@@ -261,7 +258,7 @@ void XGUI_Displayer::EraseAll(const bool isUpdateViewer)
   }
   myFeature2AISObjectMap.clear();
   if (isUpdateViewer)
-    ic->UpdateCurrentViewer();
+    UpdateViewer();
 }
 
 void XGUI_Displayer::EraseDeletedFeatures(const bool isUpdateViewer)
@@ -289,7 +286,7 @@ void XGUI_Displayer::EraseDeletedFeatures(const bool isUpdateViewer)
   }
 
   if (isUpdateViewer)
-    aContext->UpdateCurrentViewer();
+    UpdateViewer();
 }
 
 void XGUI_Displayer::CloseLocalContexts(const bool isUpdateViewer)
@@ -297,7 +294,16 @@ void XGUI_Displayer::CloseLocalContexts(const bool isUpdateViewer)
   CloseAllContexts(true);
 }
 
-boost::shared_ptr<ModelAPI_Feature> XGUI_Displayer::GetFeature(Handle(AIS_InteractiveObject) theIO)
+Handle(AIS_InteractiveObject) XGUI_Displayer::GetAISObject(
+                                              boost::shared_ptr<ModelAPI_Feature> theFeature) const
+{
+  Handle(AIS_InteractiveObject) anIO;
+  if (myFeature2AISObjectMap.find(theFeature) != myFeature2AISObjectMap.end())
+    anIO = (myFeature2AISObjectMap.find(theFeature))->second;
+  return anIO;
+}
+
+boost::shared_ptr<ModelAPI_Feature> XGUI_Displayer::GetFeature(Handle(AIS_InteractiveObject) theIO) const
 {
   boost::shared_ptr<ModelAPI_Feature> aFeature;
   FeatureToAISMap::const_iterator aFIt = myFeature2AISObjectMap.begin(),
@@ -317,7 +323,7 @@ void XGUI_Displayer::CloseAllContexts(const bool isUpdateViewer)
   if (!ic.IsNull()) {
     ic->CloseAllContexts(false);
     if (isUpdateViewer)
-      ic->UpdateCurrentViewer();
+      UpdateViewer();
   }
 }
 
