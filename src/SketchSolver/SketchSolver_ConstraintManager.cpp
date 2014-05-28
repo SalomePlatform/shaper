@@ -114,17 +114,25 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
     if (aFGrIter != aFeatureGroups.end())
     {
       std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter = myGroups.begin();
+      std::vector<SketchSolver_ConstraintGroup*> aSeparatedGroups;
       while (aGroupIter != myGroups.end())
       {
-        if ((*aGroupIter)->updateGroup())
+        if (!(*aGroupIter)->isWorkplaneValid())
         { // the group should be removed
           delete *aGroupIter;
           int aShift = aGroupIter - myGroups.begin();
           myGroups.erase(aGroupIter);
           aGroupIter = myGroups.begin() + aShift;
+          continue;
         }
-        else aGroupIter++;
+        if ((*aGroupIter)->updateGroup())
+        { // some constraints were removed, try to split the group
+          (*aGroupIter)->splitGroup(aSeparatedGroups);
+        }
+        aGroupIter++;
       }
+      if (aSeparatedGroups.size() > 0)
+        myGroups.insert(myGroups.end(), aSeparatedGroups.begin(), aSeparatedGroups.end());
     }
   }
 }

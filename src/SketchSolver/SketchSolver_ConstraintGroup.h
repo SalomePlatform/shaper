@@ -9,6 +9,7 @@
 #include <SketchSolver_Solver.h>
 
 #include <SketchPlugin_Constraint.h>
+#include <ModelAPI_Data.h>
 
 #include <list>
 #include <map>
@@ -38,6 +39,10 @@ public:
   /// \brief Returns true if the group has no constraints yet
   inline bool isEmpty() const
   {return myConstraints.empty();}
+
+  /// \brief Check for valid sketch data
+  inline bool isWorkplaneValid() const
+  {return mySketch->data()->isValid();}
 
   /** \brief Adds or updates a constraint in the group
    *  \param[in] theConstraint constraint to be changed
@@ -71,7 +76,7 @@ public:
   void updateEntityIfPossible(boost::shared_ptr<ModelAPI_Attribute> theEntity);
 
   /** \brief Searches invalid features and constraints in the group and avoids them
-   *  \return \c true if the group's sketch is invalid and the group should be removed
+   *  \return \c true if the group several constraints were removed
    */
   bool updateGroup();
 
@@ -79,6 +84,11 @@ public:
    *  \param[in] theGroup group of constraint to be added
    */
   void mergeGroups(const SketchSolver_ConstraintGroup& theGroup);
+
+  /** \brief Cut from the group several subgroups, which are not connected to the current one by any constraint
+   *  \param[out] theCuts enlarge this list by newly created groups
+   */
+  void splitGroup(std::vector<SketchSolver_ConstraintGroup*>& theCuts);
 
   /** \brief Start solution procedure if necessary and update attributes of features
    */
@@ -120,6 +130,11 @@ protected:
    */
   Slvs_hParam changeParameter(const double& theParam,
                               std::vector<Slvs_Param>::const_iterator& thePrmIter);
+
+  /** \brief Removes constraints from the group
+   *  \param[in] theConstraint constraint to be removed
+   */
+  void removeConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
   /** \brief Change values of attribute by parameters received from SolveSpace solver
    *  \param[in,out] theAttribute pointer to the attribute to be changed

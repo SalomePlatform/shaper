@@ -12,7 +12,6 @@
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefList.h>
-#include <ModelAPI_Data.h>
 #include <Model_Events.h>
 
 #include <SketchPlugin_Constraint.h>
@@ -603,111 +602,117 @@ void SketchSolver_ConstraintGroup::mergeGroups(
 }
 
 // ============================================================================
+//  Function: splitGroup
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  divide the group into several subgroups
+// ============================================================================
+void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_ConstraintGroup*>& theCuts)
+{
+  // Divide constraints and entities into several groups
+  std::vector< std::set<Slvs_hEntity> >     aGroupsEntities;
+  std::vector< std::set<Slvs_hConstraint> > aGroupsConstr;
+  int aMaxNbEntities = 0; // index of the group with maximal nuber of elements (this group will be left in the current)
+  std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
+  for ( ; aConstrIter != myConstraints.end(); aConstrIter++)
+  {
+    Slvs_hEntity aConstrEnt[] = {
+      aConstrIter->ptA,     aConstrIter->ptB,
+      aConstrIter->entityA, aConstrIter->entityB};
+    // Go through the groupped entities and find even one of entities of current constraint
+    std::vector< std::set<Slvs_hEntity> >::iterator aGrEntIter;
+    for (aGrEntIter = aGroupsEntities.begin(); aGrEntIter != aGroupsEntities.end(); aGrEntIter++)
+    {
+      bool isFound = false;
+      for (int i = 0; i < 4 && !isFound; i++)
+        if (aConstrEnt[i] != 0)
+          isFound = (aGrEntIter->find(aConstrEnt[i]) != aGrEntIter->end());
+      if (isFound)
+      {
+        for (int i = 0; i < 4; i++)
+          if (aConstrEnt[i] != 0)
+            aGrEntIter->insert(aConstrEnt[i]);
+        aGroupsConstr[aGrEntIter - aGroupsEntities.begin()].insert(aConstrIter->h);
+        if (aGrEntIter->size() > aGroupsEntities[aMaxNbEntities].size())
+          aMaxNbEntities = aGrEntIter - aGroupsEntities.begin();
+        break;
+      }
+    }
+    // Add new group is no one is found
+    if (aGrEntIter == aGroupsEntities.end())
+    {
+      std::set<Slvs_hEntity> aNewGrEnt;
+      for (int i = 0; i < 4; i++)
+        if (aConstrEnt[i] != 0)
+          aNewGrEnt.insert(aConstrEnt[i]);
+      std::set<Slvs_hConstraint> aNewGrConstr;
+      aNewGrConstr.insert(aConstrIter->h);
+
+      aGroupsEntities.push_back(aNewGrEnt);
+      aGroupsConstr.push_back(aNewGrConstr);
+      if (aNewGrEnt.size() > aGroupsEntities[aMaxNbEntities].size())
+        aMaxNbEntities = aGroupsEntities.size() - 1;
+    }
+  }
+
+  if (aGroupsEntities.size() <= 1)
+    return ;
+
+  // Remove the group with maximum elements as it will be left in the current group
+  aGroupsEntities.erase(aGroupsEntities.begin() + aMaxNbEntities);
+  aGroupsConstr.erase(aGroupsConstr.begin() + aMaxNbEntities);
+
+  // Add new groups of constraints and divide current group
+  std::vector<SketchSolver_ConstraintGroup*> aNewGroups;
+  for (int i = aGroupsEntities.size(); i > 0; i--)
+  {
+    SketchSolver_ConstraintGroup* aG = new SketchSolver_ConstraintGroup(mySketch);
+    aNewGroups.push_back(aG);
+  }
+  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::const_iterator
+    aConstrMapIter = myConstraintMap.begin();
+  int aConstrMapPos = 0; // position of iterator in the map (used to restore iterator after removing constraint)
+  while (aConstrMapIter != myConstraintMap.end())
+  {
+    std::vector< std::set<Slvs_hConstraint> >::const_iterator aGIter = aGroupsConstr.begin();
+    std::vector<SketchSolver_ConstraintGroup*>::iterator aGroup = aNewGroups.begin();
+    for ( ; aGIter != aGroupsConstr.end(); aGIter++, aGroup++)
+      if (aGIter->find(aConstrMapIter->second) != aGIter->end())
+      {
+        (*aGroup)->changeConstraint(aConstrMapIter->first);
+        removeConstraint(aConstrMapIter->first);
+        // restore iterator
+        aConstrMapIter = myConstraintMap.begin();
+        for (int i = 0; i < aConstrMapPos; i++)
+          aConstrMapIter++;
+        break;
+      }
+    if (aGIter == aGroupsConstr.end())
+    {
+      aConstrMapIter++;
+      aConstrMapPos++;
+    }
+  }
+
+  theCuts.insert(theCuts.end(), aNewGroups.begin(), aNewGroups.end());
+}
+
+// ============================================================================
 //  Function: updateGroup
 //  Class:    SketchSolver_ConstraintGroup
 //  Purpose:  search removed entities and constraints
 // ============================================================================
 bool SketchSolver_ConstraintGroup::updateGroup()
 {
-  // Check for valid sketch
-  if (!mySketch->data()->isValid())
-    return true;
-
-  // Fast check for constraint validity. If all constraints are valid, no need to update the group
   std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::reverse_iterator
     aConstrIter = myConstraintMap.rbegin();
   bool isAllValid = true;
   for ( ; isAllValid && aConstrIter != myConstraintMap.rend(); aConstrIter++)
     if (!aConstrIter->first->data()->isValid())
+    {
+      removeConstraint(aConstrIter->first);
       isAllValid = false;
-  if (isAllValid)
-    return false;
-
-  // Remove invalid constraints.
-  // There only constraint will be deleted (parameters and entities) will be removed below
-  std::list< boost::shared_ptr<SketchPlugin_Constraint> > aConstrToDelete;
-  std::map<Slvs_hEntity, bool> anEntToDelete; // entities will be removed if no valid constraints use them
-  std::map<Slvs_hEntity, bool> aCoincPtToDelete; // list of entities (points) used in coincidence constaints which will be removed;
-  for (aConstrIter = myConstraintMap.rbegin(); aConstrIter != myConstraintMap.rend(); aConstrIter++)
-  {
-    bool isValid = aConstrIter->first->data()->isValid();
-
-    int aConstrPos = Search(aConstrIter->second, myConstraints);
-    if (aConstrPos < (int)myConstraints.size())
-    {
-      Slvs_hEntity aConstrEnt[] = {
-        myConstraints[aConstrPos].ptA,     myConstraints[aConstrPos].ptB,
-        myConstraints[aConstrPos].entityA, myConstraints[aConstrPos].entityB};
-      for (int i = 0; i < 4; i++)
-        if (aConstrEnt[i] != SLVS_E_UNKNOWN)
-        {
-          if (anEntToDelete.find(aConstrEnt[i]) == anEntToDelete.end())
-          {
-            anEntToDelete[aConstrEnt[i]] = !isValid;
-            aCoincPtToDelete[aConstrEnt[i]] = !isValid && (myConstraints[aConstrPos].type == SLVS_C_POINTS_COINCIDENT);
-          }
-          else if (isValid) // constraint is valid => no need to remove its entities
-          {
-            anEntToDelete[aConstrEnt[i]] = false;
-            aCoincPtToDelete[aConstrEnt[i]] = false;
-          }
-        }
-      if (!isValid)
-      {
-        myConstraints.erase(myConstraints.begin() + aConstrPos);
-        if (aConstrIter->second == myConstrMaxID) // When the constraint with highest ID is removed, decrease indexer
-          myConstrMaxID--;
-        aConstrToDelete.push_front(aConstrIter->first);
-      }
     }
-  }
-  std::list< boost::shared_ptr<SketchPlugin_Constraint> >::iterator aDelIter;
-  for (aDelIter = aConstrToDelete.begin(); aDelIter != aConstrToDelete.end(); aDelIter++)
-    myConstraintMap.erase(*aDelIter);
-
-  // Remove invalid and unused entities
-  std::map<Slvs_hEntity, bool>::reverse_iterator aEDelIter;
-  std::map<Slvs_hEntity, bool>::reverse_iterator aPtDelIter = aCoincPtToDelete.rbegin();
-  for (aEDelIter = anEntToDelete.rbegin(); aEDelIter != anEntToDelete.rend(); aEDelIter++, aPtDelIter++)
-  {
-    if (aEDelIter->second) // remove entity
-    {
-      int anEntPos = Search(aEDelIter->first, myEntities);
-      std::vector<Slvs_Entity>::iterator aEntIter = myEntities.begin() + anEntPos;
-      // Number of parameters for the entity
-      int aNbParams = 0;
-      while (aEntIter->param[aNbParams]) aNbParams++;
-      if (aNbParams == 0) continue;
-      // Decrease parameter indexer if there are deleted parameter with higher IDs
-      if (aEntIter->param[aNbParams-1] == myParamMaxID)
-        myParamMaxID -= aNbParams;
-      // Remove parameters of the entity
-      int aParamPos = Search(aEntIter->param[0], myParams);
-      myParams.erase(myParams.begin() + aParamPos,
-                     myParams.begin() + aParamPos + aNbParams);
-
-      // Remove entity
-      if (aEDelIter->first == myEntityMaxID)
-        myEntityMaxID--;
-      myEntities.erase(myEntities.begin() + anEntPos);
-      // Remove such entity from myEntityMap
-      std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator
-        anEntMapIter = myEntityMap.begin();
-      for ( ; anEntMapIter != myEntityMap.end(); anEntMapIter++)
-        if (anEntMapIter->second == aEDelIter->first)
-          break;
-      if (anEntMapIter != myEntityMap.end())
-        myEntityMap.erase(anEntMapIter);
-    }
-    if (aPtDelIter->second) // remove link for this entity from list of coincident points
-    {
-      std::vector< std::set<Slvs_hEntity> >::iterator aCoPtIter = myCoincidentPoints.begin();
-      for ( ; aCoPtIter != myCoincidentPoints.end(); aCoPtIter++)
-        aCoPtIter->erase(aPtDelIter->first);
-    }
-  }
-
-  return false;
+  return !isAllValid;
 }
 
 // ============================================================================
@@ -877,6 +882,86 @@ void SketchSolver_ConstraintGroup::removeTemporaryConstraints()
 
   // Clear basic dragged point
   myTempPointWhereDragged.clear();
+}
+
+// ============================================================================
+//  Function: removeConstraint
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  remove constraint and all unused entities
+// ============================================================================
+void SketchSolver_ConstraintGroup::removeConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
+{
+  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::iterator
+    anIterToRemove = myConstraintMap.find(theConstraint);
+  if (anIterToRemove == myConstraintMap.end())
+     return ;
+
+  Slvs_hConstraint aCnstrToRemove = anIterToRemove->second;
+  // Remove constraint from the map
+  myConstraintMap.erase(anIterToRemove);
+
+  // Find unused entities
+  int aConstrPos = Search(aCnstrToRemove, myConstraints);
+  std::set<Slvs_hEntity> anEntToRemove;
+  Slvs_hEntity aCnstEnt[] = {myConstraints[aConstrPos].ptA,     myConstraints[aConstrPos].ptB, 
+                             myConstraints[aConstrPos].entityA, myConstraints[aConstrPos].entityB};
+  for (int i = 0; i < 4; i++)
+    if (aCnstEnt[i] != 0)
+      anEntToRemove.insert(aCnstEnt[i]);
+  myConstraints.erase(myConstraints.begin() + aConstrPos);
+  if (aCnstrToRemove == myConstrMaxID)
+    myConstrMaxID--;
+  std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
+  for ( ; aConstrIter != myConstraints.end(); aConstrIter++)
+  {
+    Slvs_hEntity aEnts[] = {aConstrIter->ptA,     aConstrIter->ptB, 
+                            aConstrIter->entityA, aConstrIter->entityB};
+    for (int i = 0; i < 4; i++)
+      if (aEnts[i] != 0 && anEntToRemove.find(aEnts[i]) != anEntToRemove.end())
+        anEntToRemove.erase(aEnts[i]);
+  }
+
+  if (anEntToRemove.empty())
+    return ;
+
+  // Remove unused entities
+  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator
+    anEntMapIter = myEntityMap.begin();
+  while (anEntMapIter != myEntityMap.end())
+  {
+    if (anEntToRemove.find(anEntMapIter->second) != anEntToRemove.end())
+    {
+      std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator
+        aRemovedIter = anEntMapIter;
+      anEntMapIter++;
+      myEntityMap.erase(aRemovedIter);
+    }
+    else anEntMapIter++;
+  }
+  std::set<Slvs_hEntity>::const_reverse_iterator aRemIter = anEntToRemove.rbegin();
+  for ( ; aRemIter != anEntToRemove.rend(); aRemIter++)
+  {
+    unsigned int anEntPos = Search(*aRemIter, myEntities);
+    if (anEntPos >= myEntities.size())
+      continue;
+    unsigned int aParamPos = Search(myEntities[anEntPos].param[0], myParams);
+    if (aParamPos >= myParams.size())
+      continue;
+    int aNbParams = 0;
+    while (myEntities[anEntPos].param[aNbParams] != 0) 
+      aNbParams++;
+    if (myEntities[anEntPos].param[aNbParams-1] == myParamMaxID)
+      myParamMaxID -= aNbParams;
+    myParams.erase(myParams.begin() + aParamPos, myParams.begin() + aParamPos + aNbParams);
+    if (*aRemIter == myEntityMaxID)
+      myEntityMaxID--;
+    myEntities.erase(myEntities.begin() + anEntPos);
+
+    // Remove entity's ID from the lists of conincident points
+    std::vector< std::set<Slvs_hEntity> >::iterator aCoPtIter = myCoincidentPoints.begin();
+    for ( ; aCoPtIter != myCoincidentPoints.end(); aCoPtIter++)
+      aCoPtIter->erase(*aRemIter);
+  }
 }
 
 
