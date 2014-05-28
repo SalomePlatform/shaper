@@ -58,6 +58,10 @@ SketchSolver_ConstraintGroup::
   myParams.clear();
   myEntities.clear();
   myConstraints.clear();
+  
+  myTempConstraints.clear();
+  myTempPointWhereDragged.clear();
+  myTempPointWDrgdID = 0;
 
   // Initialize workplane
   myWorkplane.h = SLVS_E_UNKNOWN;
@@ -74,6 +78,8 @@ SketchSolver_ConstraintGroup::~SketchSolver_ConstraintGroup()
   myEntities.clear();
   myConstraints.clear();
   myConstraintMap.clear();
+  myTempConstraints.clear();
+  myTempPointWhereDragged.clear();
 
   // If the group with maximal identifier is deleted, decrease the indexer
   if (myID == myGroupIndexer)
@@ -177,6 +183,48 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
 
   if (aConstrMapIter == myConstraintMap.end())
   {
+    // Several points may be coincident, it is not necessary to store all constraints between them.
+    // Try to find sequence of coincident points which connects the points of new constraint
+    if (aConstrType == SLVS_C_POINTS_COINCIDENT)
+    {
+      std::vector< std::set<Slvs_hEntity> >::iterator aCoPtIter = myCoincidentPoints.begin();
+      std::vector< std::set<Slvs_hEntity> >::iterator aFirstFound = myCoincidentPoints.end();
+      for ( ; aCoPtIter != myCoincidentPoints.end(); aCoPtIter++)
+      {
+        bool isFound[2] = { // indicate which point ID was already in coincidence constraint
+          aCoPtIter->find(aConstrEnt[0]) != aCoPtIter->end(),
+          aCoPtIter->find(aConstrEnt[1]) != aCoPtIter->end(),
+        };
+        if (isFound[0] && isFound[1]) // points are already connected by coincidence constraints => no need to additional one
+          return false;
+        if ((isFound[0] && !isFound[1]) || (!isFound[0] && isFound[1]))
+        {
+          if (aFirstFound != myCoincidentPoints.end())
+          { // there are two groups of coincident points connected by created constraint => merge them
+            int aFirstFoundShift = aFirstFound - myCoincidentPoints.begin();
+            int aCurrentShift = aCoPtIter - myCoincidentPoints.begin();
+            aFirstFound->insert(aCoPtIter->begin(), aCoPtIter->end());
+            myCoincidentPoints.erase(aCoPtIter);
+            aFirstFound = myCoincidentPoints.begin() + aFirstFoundShift;
+            aCoPtIter = myCoincidentPoints.begin() + aCurrentShift;
+          }
+          else
+          {
+            aCoPtIter->insert(aConstrEnt[isFound[0] ? 1 : 0]);
+            aFirstFound = aCoPtIter;
+          }
+        }
+      }
+      // No points were found, need to create new set
+      if (aFirstFound == myCoincidentPoints.end())
+      {
+        std::set<Slvs_hEntity> aNewSet;
+        aNewSet.insert(aConstrEnt[0]);
+        aNewSet.insert(aConstrEnt[1]);
+        myCoincidentPoints.push_back(aNewSet);
+      }
+    }
+
     // Create SolveSpace constraint structure
     Slvs_Constraint aConstraint =
       Slvs_MakeConstraint(++myConstrMaxID, myID, aConstrType, myWorkplane.h,
@@ -486,8 +534,10 @@ void SketchSolver_ConstraintGroup::resolveConstraints()
   myConstrSolver.setParameters(myParams);
   myConstrSolver.setEntities(myEntities);
   myConstrSolver.setConstraints(myConstraints);
+  myConstrSolver.setDraggedParameters(myTempPointWhereDragged);
 
-  if (myConstrSolver.solve() == SLVS_RESULT_OKAY)
+  int aResult = myConstrSolver.solve();
+  if (aResult == SLVS_RESULT_OKAY)
   { // solution succeeded, store results into correspondent attributes
     // Obtain result into the same list of parameters
     if (!myConstrSolver.getResult(myParams))
@@ -603,6 +653,26 @@ void SketchSolver_ConstraintGroup::mergeGroups(
   }
   myTempConstraints.sort();
 
+  if (myTempPointWhereDragged.empty())
+    myTempPointWhereDragged = theGroup.myTempPointWhereDragged;
+  else if (!theGroup.myTempPointWhereDragged.empty())
+  { // Need to create additional transient constraint
+    std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator
+      aFeatureIter = theGroup.myEntityMap.begin();
+    for (; aFeatureIter != theGroup.myEntityMap.end(); aFeatureIter++)
+      if (aFeatureIter->second == myTempPointWDrgdID)
+      {
+        addTemporaryConstraintWhereDragged(aFeatureIter->first);
+        break;
+      }
+  }
+
+  // Merge the lists of coincidence points. As the groups were separated, there was 
+  // no coincidence constraint, so each two points from different groups don't coincide
+  myCoincidentPoints.insert(myCoincidentPoints.end(),
+                            theGroup.myCoincidentPoints.begin(),
+                            theGroup.myCoincidentPoints.end());
+
   myNeedToSolve = myNeedToSolve || theGroup.myNeedToSolve;
 }
 
@@ -631,6 +701,7 @@ bool SketchSolver_ConstraintGroup::updateGroup()
   // There only constraint will be deleted (parameters and entities) will be removed below
   std::list< boost::shared_ptr<SketchPlugin_Constraint> > aConstrToDelete;
   std::map<Slvs_hEntity, bool> anEntToDelete; // entities will be removed if no valid constraints use them
+  std::map<Slvs_hEntity, bool> aCoincPtToDelete; // list of entities (points) used in coincidence constaints which will be removed;
   for (aConstrIter = myConstraintMap.rbegin(); aConstrIter != myConstraintMap.rend(); aConstrIter++)
   {
     bool isValid = aConstrIter->first->data()->isValid();
@@ -645,9 +716,15 @@ bool SketchSolver_ConstraintGroup::updateGroup()
         if (aConstrEnt[i] != SLVS_E_UNKNOWN)
         {
           if (anEntToDelete.find(aConstrEnt[i]) == anEntToDelete.end())
+          {
             anEntToDelete[aConstrEnt[i]] = !isValid;
+            aCoincPtToDelete[aConstrEnt[i]] = !isValid && (myConstraints[aConstrPos].type == SLVS_C_POINTS_COINCIDENT);
+          }
           else if (isValid) // constraint is valid => no need to remove its entities
+          {
             anEntToDelete[aConstrEnt[i]] = false;
+            aCoincPtToDelete[aConstrEnt[i]] = false;
+          }
         }
       if (!isValid)
       {
@@ -664,8 +741,10 @@ bool SketchSolver_ConstraintGroup::updateGroup()
 
   // Remove invalid and unused entities
   std::map<Slvs_hEntity, bool>::reverse_iterator aEDelIter;
-  for (aEDelIter = anEntToDelete.rbegin(); aEDelIter != anEntToDelete.rend(); aEDelIter++)
-    if (aEDelIter->second)
+  std::map<Slvs_hEntity, bool>::reverse_iterator aPtDelIter = aCoincPtToDelete.rbegin();
+  for (aEDelIter = anEntToDelete.rbegin(); aEDelIter != anEntToDelete.rend(); aEDelIter++, aPtDelIter++)
+  {
+    if (aEDelIter->second) // remove entity
     {
       int anEntPos = Search(aEDelIter->first, myEntities);
       std::vector<Slvs_Entity>::iterator aEntIter = myEntities.begin() + anEntPos;
@@ -694,6 +773,13 @@ bool SketchSolver_ConstraintGroup::updateGroup()
       if (anEntMapIter != myEntityMap.end())
         myEntityMap.erase(anEntMapIter);
     }
+    if (aPtDelIter->second) // remove link for this entity from list of coincident points
+    {
+      std::vector< std::set<Slvs_hEntity> >::iterator aCoPtIter = myCoincidentPoints.begin();
+      for ( ; aCoPtIter != myCoincidentPoints.end(); aCoPtIter++)
+        aCoPtIter->erase(aPtDelIter->first);
+    }
+  }
 
   return false;
 }
@@ -794,8 +880,47 @@ void SketchSolver_ConstraintGroup::addTemporaryConstraintWhereDragged(
   // Find identifier of the entity
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator
     anEntIter = myEntityMap.find(theEntity);
+  if (anEntIter == myEntityMap.end())
+    return ;
 
-  // Create SLVS_C_WHERE_DRAGGED constraint
+  // If this is a first dragged point, its parameters should be placed 
+  // into Slvs_System::dragged field to avoid system inconsistense
+  if (myTempPointWhereDragged.empty())
+  {
+    int anEntPos = Search(anEntIter->second, myEntities);
+    Slvs_hParam* aDraggedParam = myEntities[anEntPos].param;
+    for (int i = 0; i < 4; i++, aDraggedParam++)
+      if (*aDraggedParam != 0)
+        myTempPointWhereDragged.push_back(*aDraggedParam);
+    myTempPointWDrgdID = myEntities[anEntPos].h;
+    return ;
+  }
+
+  // Get identifiers of all dragged points
+  std::set<Slvs_hEntity> aDraggedPntID;
+  aDraggedPntID.insert(myTempPointWDrgdID);
+  std::list<Slvs_hConstraint>::iterator aTmpCoIter = myTempConstraints.begin();
+  for ( ; aTmpCoIter != myTempConstraints.end(); aTmpCoIter++)
+  {
+    unsigned int aConstrPos = Search(*aTmpCoIter, myConstraints);
+    if (aConstrPos < myConstraints.size())
+      aDraggedPntID.insert(myConstraints[aConstrPos].ptA);
+  }
+  // Find whether there is a point coincident with theEntity, which already has SLVS_C_WHERE_DRAGGED
+  std::vector< std::set<Slvs_hEntity> >::iterator aCoPtIter = myCoincidentPoints.begin();
+  for ( ; aCoPtIter != myCoincidentPoints.end(); aCoPtIter++)
+  {
+    if (aCoPtIter->find(anEntIter->second) == aCoPtIter->end())
+      continue; // the entity was not found in current set
+
+    // Find one of already created SLVS_C_WHERE_DRAGGED constraints in current set of coincident points
+    std::set<Slvs_hEntity>::const_iterator aDrgIter = aDraggedPntID.begin();
+    for ( ; aDrgIter != aDraggedPntID.end(); aDrgIter++)
+      if (aCoPtIter->find(*aDrgIter) != aCoPtIter->end())
+        return ; // the SLVS_C_WHERE_DRAGGED constraint already exists
+  }
+
+  // Create additional SLVS_C_WHERE_DRAGGED constraint if myTempPointWhereDragged field is not empty
   Slvs_Constraint aWDConstr = Slvs_MakeConstraint(++myConstrMaxID, myID, SLVS_C_WHERE_DRAGGED,
                                                   myWorkplane.h, 0.0, anEntIter->second, 0, 0, 0);
   myConstraints.push_back(aWDConstr);
@@ -813,7 +938,9 @@ void SketchSolver_ConstraintGroup::removeTemporaryConstraints()
   std::list<Slvs_hConstraint>::reverse_iterator aTmpConstrIter;
   for (aTmpConstrIter = myTempConstraints.rbegin(); aTmpConstrIter != myTempConstraints.rend(); aTmpConstrIter++)
   {
-    int aConstrPos = Search(*aTmpConstrIter, myConstraints);
+    unsigned int aConstrPos = Search(*aTmpConstrIter, myConstraints);
+    if (aConstrPos >= myConstraints.size())
+      continue;
     myConstraints.erase(myConstraints.begin() + aConstrPos);
 
     // If the removing constraint has higher index, decrease the indexer
@@ -821,6 +948,9 @@ void SketchSolver_ConstraintGroup::removeTemporaryConstraints()
       myConstrMaxID--;
   }
   myTempConstraints.clear();
+
+  // Clear basic dragged point
+  myTempPointWhereDragged.clear();
 }
 
 
