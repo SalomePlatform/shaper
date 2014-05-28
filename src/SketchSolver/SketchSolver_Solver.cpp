@@ -16,6 +16,11 @@ SketchSolver_Solver::SketchSolver_Solver()
   myEquationsSystem.failed = 0;
   myEquationsSystem.faileds = 0;
 
+  myEquationsSystem.dragged[0] = 0;
+  myEquationsSystem.dragged[1] = 0;
+  myEquationsSystem.dragged[2] = 0;
+  myEquationsSystem.dragged[3] = 0;
+
   // If the set of constraints is inconsistent,
   // the failed field will contain wrong constraints
   myEquationsSystem.calculateFaileds = 1;
@@ -49,6 +54,20 @@ void SketchSolver_Solver::setParameters(const std::vector<Slvs_Param>& theParame
     myEquationsSystem.param[i] = *aParamIter;
 }
 
+void SketchSolver_Solver::setDraggedParameters(const std::vector<Slvs_hParam>& theDragged)
+{
+  if (theDragged.size() == 0)
+  {
+    myEquationsSystem.dragged[0] = 0;
+    myEquationsSystem.dragged[1] = 0;
+    myEquationsSystem.dragged[2] = 0;
+    myEquationsSystem.dragged[3] = 0;
+    return;
+  }
+  for (unsigned int i = 0; i < theDragged.size(); i++)
+    myEquationsSystem.dragged[i] = theDragged[i];
+}
+
 void SketchSolver_Solver::setEntities(const std::vector<Slvs_Entity>& theEntities)
 {
   if (theEntities.size() != myEquationsSystem.entities) // number of entities was changed => reallocate the memory
@@ -73,6 +92,12 @@ void SketchSolver_Solver::setConstraints(const std::vector<Slvs_Constraint>& the
       delete [] myEquationsSystem.constraint;
     myEquationsSystem.constraints = theConstraints.size();
     myEquationsSystem.constraint = new Slvs_Constraint[theConstraints.size()];
+
+    // Assign the memory for the failed constraints
+    if (myEquationsSystem.failed)
+      delete [] myEquationsSystem.failed;
+    myEquationsSystem.failed = new Slvs_hConstraint[theConstraints.size()];
+    myEquationsSystem.faileds = 0;
   }
 
   // Copy data

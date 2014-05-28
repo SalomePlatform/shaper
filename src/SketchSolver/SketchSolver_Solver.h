@@ -21,6 +21,11 @@ typedef unsigned int UINT32;
 
 #define SLVS_RESULT_EMPTY_SET -1
 
+// Unknown constraint (for error reporting)
+#define SLVS_C_UNKNOWN 0
+// Unknown entity
+#define SLVS_E_UNKNOWN 0
+
 
 class SketchSolver_Solver
 {
@@ -47,6 +52,12 @@ public:
    *  \param[in] theConstraints vector of constraints
    */
   void setConstraints(const std::vector<Slvs_Constraint>& theConstraints);
+
+  /** \brief Store the parameters of the point which was moved by user.
+   *         The solver will watch this items to be constant
+   *  \param[in] theDragged list of parameters (not more than 4) which should not be changed during solving
+   */
+  void setDraggedParameters(const std::vector<Slvs_hParam>& theDragged);
 
   /** \brief Solve the set of equations
    *  \return identifier whether solution succeeded
