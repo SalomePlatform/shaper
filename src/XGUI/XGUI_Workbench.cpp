@@ -84,7 +84,9 @@ XGUI_MenuGroupPanel* XGUI_Workbench::addGroup(const QString& theId)
   XGUI_MenuGroupPanel* aGroup = new XGUI_MenuGroupPanel(myChildWidget);
   aGroup->setObjectName(theId);
   myLayout->addWidget(aGroup);
-  addSeparator();
+  if(theId != "Default") {
+    addSeparator();
+  }
   myLayout->addStretch();
   myGroups.append(aGroup);
   return aGroup;
