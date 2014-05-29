@@ -37,6 +37,14 @@ public:
   const boost::shared_ptr<GeomAPI_XYZ> added(const boost::shared_ptr<GeomAPI_XYZ>& theArg);
   /// result is coordinates multiplied by the argument
   const boost::shared_ptr<GeomAPI_XYZ> multiplied(const double theArg);
+
+  /// result is a scalar product of two triplets
+  double dot(const boost::shared_ptr<GeomAPI_XYZ>& theArg) const;
+  /// result is a cross product of two triplets
+  const boost::shared_ptr<GeomAPI_XYZ> cross(const boost::shared_ptr<GeomAPI_XYZ>& theArg) const;
+
+  /// Distance between two triplets
+  double distance(const boost::shared_ptr<GeomAPI_XYZ>& theOther) const;
 };
 
 #endif

@@ -20,6 +20,8 @@ class GEOMAPI_EXPORT GeomAPI_Dir: public GeomAPI_Interface
 public:
   /// Creation of direction by coordinates
   GeomAPI_Dir(const double theX, const double theY, const double theZ);
+  /// Creation of direction by coordinates
+  GeomAPI_Dir(const boost::shared_ptr<GeomAPI_XYZ>& theCoords);
 
   /// returns X coordinate
   double x() const;
