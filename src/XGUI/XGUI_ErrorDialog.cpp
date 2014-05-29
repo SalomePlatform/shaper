@@ -56,6 +56,11 @@ void XGUI_ErrorDialog::addError(const QString& theError)
 {
   myErrors.append(theError);
   refresh();
+  if(!isVisible()) {
+    show();
+    raise();
+    activateWindow();
+  }
 }
 
 void XGUI_ErrorDialog::removeError(const QString& theError)
@@ -63,4 +68,3 @@ void XGUI_ErrorDialog::removeError(const QString& theError)
   myErrors.removeAll(theError);
   refresh();
 }
-

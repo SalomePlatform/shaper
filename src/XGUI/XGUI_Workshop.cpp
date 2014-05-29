@@ -275,9 +275,6 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
   if (anAppError) {
     emit errorOccurred(QString::fromLatin1(anAppError->description()));
-    myErrorDlg->show();
-    myErrorDlg->raise();
-    myErrorDlg->activateWindow();
   }
 
 }
