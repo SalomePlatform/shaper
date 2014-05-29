@@ -175,10 +175,6 @@ private:
   std::vector<Slvs_hParam>     myTempPointWhereDragged; ///< Parameters of one of the points which is moved by user
   Slvs_hEntity                 myTempPointWDrgdID;      ///< Identifier of such point
   std::list<Slvs_hConstraint>  myTempConstraints;       ///< The list of identifiers of temporary constraints (SLVS_C_WHERE_DRAGGED) applied for all other points moved by user
-                                                        //   NOTE: First ID in the list corresponds to myTempPointWhereDragged parameters and does not added to myConstraints list
-
-  std::vector< std::set<Slvs_hEntity> >
-                               myCoincidentPoints; ///< Stores the lists of identifiers of coincident points (to avoid unnecessary coincidence constraints)
 
   // SketchPlugin entities
   boost::shared_ptr<SketchPlugin_Feature>
@@ -187,6 +183,13 @@ private:
                                myConstraintMap; ///< The map between SketchPlugin and SolveSpace constraints
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>
                                myEntityMap;     ///< The map between parameters of constraints and their equivalent SolveSpace entities
+
+  // Conincident items
+  std::vector< std::set<Slvs_hEntity> >
+                               myCoincidentPoints; ///< Stores the lists of identifiers of coincident points (to avoid unnecessary coincidence constraints)
+  std::set< boost::shared_ptr<SketchPlugin_Constraint> >
+                               myExtraCoincidence; ///< Additional coincidence constraints which are not necessary (coincidence between points already done
+                                                   ///< by other constraints) but created by GUI tools. Useful when some coincidence constraints were removed
 };
 
 #endif

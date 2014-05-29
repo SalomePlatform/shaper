@@ -97,7 +97,7 @@ void SketchSolver_Solver::setConstraints(const std::vector<Slvs_Constraint>& the
     if (myEquationsSystem.failed)
       delete [] myEquationsSystem.failed;
     myEquationsSystem.failed = new Slvs_hConstraint[theConstraints.size()];
-    myEquationsSystem.faileds = 0;
+    myEquationsSystem.faileds = theConstraints.size();
   }
 
   // Copy data

@@ -194,8 +194,11 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
           aCoPtIter->find(aConstrEnt[0]) != aCoPtIter->end(),
           aCoPtIter->find(aConstrEnt[1]) != aCoPtIter->end(),
         };
-        if (isFound[0] && isFound[1]) // points are already connected by coincidence constraints => no need to additional one
+        if (isFound[0] && isFound[1]) // points are already connected by coincidence constraints => no need additional one
+        {
+          myExtraCoincidence.insert(theConstraint); // the constraint is stored for further purposes
           return false;
+        }
         if ((isFound[0] && !isFound[1]) || (!isFound[0] && isFound[1]))
         {
           if (aFirstFound != myCoincidentPoints.end())
@@ -637,7 +640,7 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
         break;
       }
     }
-    // Add new group is no one is found
+    // Add new group if no one is found
     if (aGrEntIter == aGroupsEntities.end())
     {
       std::set<Slvs_hEntity> aNewGrEnt;
@@ -706,12 +709,35 @@ bool SketchSolver_ConstraintGroup::updateGroup()
   std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::reverse_iterator
     aConstrIter = myConstraintMap.rbegin();
   bool isAllValid = true;
-  for ( ; isAllValid && aConstrIter != myConstraintMap.rend(); aConstrIter++)
+  bool isCCRemoved = false; // indicates that at least one of coincidence constraints was removed
+  while (isAllValid && aConstrIter != myConstraintMap.rend())
+  {
     if (!aConstrIter->first->data()->isValid())
     {
-      removeConstraint(aConstrIter->first);
+      if (aConstrIter->first->getKind().compare("SketchConstraintCoincidence") == 0)
+        isCCRemoved = true;
+      std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::reverse_iterator
+        aCopyIter = aConstrIter++;
+      removeConstraint(aCopyIter->first);
       isAllValid = false;
     }
+    else aConstrIter++;
+  }
+
+  // Probably, need to update coincidence constraints
+  if (isCCRemoved && !myExtraCoincidence.empty())
+  {
+    // Make a copy, because the new list of unused constrtaints will be generated
+    std::set< boost::shared_ptr<SketchPlugin_Constraint> > anExtraCopy = myExtraCoincidence;
+    myExtraCoincidence.clear();
+
+    std::set< boost::shared_ptr<SketchPlugin_Constraint> >::iterator
+      aCIter = anExtraCopy.begin();
+    for ( ; aCIter != anExtraCopy.end(); aCIter++)
+      if ((*aCIter)->data()->isValid())
+        changeConstraint(*aCIter);
+  }
+
   return !isAllValid;
 }
 
@@ -962,6 +988,8 @@ void SketchSolver_ConstraintGroup::removeConstraint(boost::shared_ptr<SketchPlug
     for ( ; aCoPtIter != myCoincidentPoints.end(); aCoPtIter++)
       aCoPtIter->erase(*aRemIter);
   }
+  if (myCoincidentPoints.size() == 1 && myCoincidentPoints.front().empty())
+    myCoincidentPoints.clear();
 }
 
 
