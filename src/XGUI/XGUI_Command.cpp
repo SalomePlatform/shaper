@@ -1,6 +1,6 @@
 #include "XGUI_Command.h"
 
-#include <QPushButton>
+#include <QToolButton>
 
 XGUI_Command::XGUI_Command(const QString& theId, QObject * parent, bool isCheckable)
     : QWidgetAction(parent), myCheckable(isCheckable)
@@ -24,10 +24,16 @@ XGUI_Command::~XGUI_Command()
 QWidget* XGUI_Command::createWidget(QWidget* theParent)
 {
   if (theParent->inherits("XGUI_MenuGroupPanel")) {
-    QPushButton* aButton = new QPushButton(theParent);
+    QToolButton* aButton = new QToolButton(theParent);
     aButton->setIcon(icon());
     aButton->setText(text());
-    aButton->setStyleSheet("text-align: left");
+    aButton->setStyleSheet("QToolButton::menu-indicator { image: none; }");
+    aButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    aButton->setAutoRaise(true);
+    aButton->setArrowType(Qt::NoArrow);
+    aButton->setCheckable(myCheckable);
+    aButton->setMinimumSize(MIN_BUTTON_WIDTH, MIN_BUTTON_HEIGHT);
+    aButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
     QKeySequence aKeys = shortcut();
     QString aToolTip = toolTip();
     if (!aKeys.isEmpty())
@@ -39,10 +45,7 @@ QWidget* XGUI_Command::createWidget(QWidget* theParent)
     connect(aButton, SIGNAL(clicked()), this, SLOT(trigger()));
     connect(this, SIGNAL(toggled(bool)), aButton, SLOT(setChecked(bool)));
     connect(this, SIGNAL(toggled(bool)), aButton, SLOT(setChecked(bool)));
-    aButton->setFlat(true);
-    aButton->setCheckable(myCheckable);
     this->setCheckable(myCheckable);
-    aButton->setMinimumSize(MIN_BUTTON_WIDTH, MIN_BUTTON_HEIGHT);
 
     return aButton;
   }

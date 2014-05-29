@@ -4,8 +4,8 @@
 #include "XGUI.h"
 #include <QWidgetAction>
 
-#define MIN_BUTTON_HEIGHT 18
-#define MIN_BUTTON_WIDTH 40
+#define MIN_BUTTON_HEIGHT 25
+#define MIN_BUTTON_WIDTH 60
 
 /**\class XGUI_Command
  * \ingroup GUI

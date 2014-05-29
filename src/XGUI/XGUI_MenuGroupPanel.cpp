@@ -32,7 +32,8 @@ void XGUI_MenuGroupPanel::placeWidget(QWidget* theWgt)
     myNewRow = 0;
     myNewCol++;
   }
-  myLayout->addWidget(theWgt, myNewRow, myNewCol, Qt::AlignLeft);
+  myLayout->addWidget(theWgt, myNewRow, myNewCol);
+  myLayout->setRowStretch(myNewRow, 0);
   myNewRow++;
 }
 
@@ -58,6 +59,7 @@ void XGUI_MenuGroupPanel::resizeEvent(QResizeEvent* theEvent)
   foreach(QWidget* eachWidget, myActionWidget) {
     placeWidget(eachWidget);
   }
+  myLayout->setRowStretch(myMaxRow + 1,  1);
 }
 
 XGUI_Command* XGUI_MenuGroupPanel::addFeature(const QString& theId, const QString& theTitle,

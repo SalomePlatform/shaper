@@ -13,9 +13,12 @@ XGUI_MainMenu::XGUI_MainMenu(XGUI_MainWindow *parent)
     : QObject(parent), myDesktop(parent)
 {
   parent->setTabPosition(Qt::TopDockWidgetArea, QTabWidget::North);
+  myDesktop->setStyleSheet("QTabBar::tab {height: 24px;}");
   myGeneralPage = addWorkbench(tr("General"));
   myGeneralPage->parentWidget()->setMaximumWidth(200);
   myGeneralPage->installEventFilter(this);
+//  QString aStyle = myDesktop->styleSheet();
+//  aStyle += " QTabBar::tab {min-height: 24px;}";
 }
 
 XGUI_MainMenu::~XGUI_MainMenu(void)

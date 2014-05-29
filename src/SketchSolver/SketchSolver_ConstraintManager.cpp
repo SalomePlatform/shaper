@@ -114,17 +114,25 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
     if (aFGrIter != aFeatureGroups.end())
     {
       std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter = myGroups.begin();
+      std::vector<SketchSolver_ConstraintGroup*> aSeparatedGroups;
       while (aGroupIter != myGroups.end())
       {
-        if ((*aGroupIter)->updateGroup())
+        if (!(*aGroupIter)->isWorkplaneValid())
         { // the group should be removed
           delete *aGroupIter;
           int aShift = aGroupIter - myGroups.begin();
           myGroups.erase(aGroupIter);
           aGroupIter = myGroups.begin() + aShift;
+          continue;
         }
-        else aGroupIter++;
+        if ((*aGroupIter)->updateGroup())
+        { // some constraints were removed, try to split the group
+          (*aGroupIter)->splitGroup(aSeparatedGroups);
+        }
+        aGroupIter++;
       }
+      if (aSeparatedGroups.size() > 0)
+        myGroups.insert(myGroups.end(), aSeparatedGroups.begin(), aSeparatedGroups.end());
     }
   }
 }
@@ -278,6 +286,8 @@ void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin
     std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter;
     for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
     {
+      if ((*aGroupIter)->isEmpty()) 
+        continue;
       boost::shared_ptr<ModelAPI_Attribute> anAttribute =
         boost::dynamic_pointer_cast<ModelAPI_Attribute>(theFeature->data()->attribute(*anAttrIter));
       (*aGroupIter)->updateEntityIfPossible(anAttribute);
