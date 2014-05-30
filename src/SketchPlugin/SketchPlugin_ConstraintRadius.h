@@ -1,27 +1,28 @@
-// File:    SketchPlugin_ConstraintDiameter.h
+// File:    SketchPlugin_ConstraintRadius.h
 // Created: 26 May 2014
 // Author:  Artem ZHIDKOV
 
-#ifndef SketchPlugin_ConstraintDiameter_HeaderFile
-#define SketchPlugin_ConstraintDiameter_HeaderFile
+#ifndef SketchPlugin_ConstraintRadius_HeaderFile
+#define SketchPlugin_ConstraintRadius_HeaderFile
 
 #include "SketchPlugin.h"
 #include "SketchPlugin_Constraint.h"
 
 
-/** \class SketchPlugin_ConstraintDiameter
+/** \class SketchPlugin_ConstraintRadius
  *  \ingroup DataModel
- *  \brief Feature for creation of a new constraint which defines a diameter of a circle
+ *  \brief Feature for creation of a new constraint which defines 
+ *         a radius of a circle or an arc of circle
  *
  *  These constraint has two attributes:
- *  CONSTRAINT_ATTR_VALUE (diameter), CONSTRAINT_ATTR_ENTITY_A (a circle)
+ *  CONSTRAINT_ATTR_VALUE (radius), CONSTRAINT_ATTR_ENTITY_A (a circle)
  */
-class SketchPlugin_ConstraintDiameter: public SketchPlugin_Constraint
+class SketchPlugin_ConstraintRadius: public SketchPlugin_Constraint
 {
 public:
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "SketchConstraintDiameter"; return MY_KIND;}
+  {static std::string MY_KIND = "SketchConstraintRadius"; return MY_KIND;}
 
   /// \brief Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
@@ -37,7 +38,7 @@ public:
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
   /// \brief Use plugin manager for features creation
-  SketchPlugin_ConstraintDiameter();
+  SketchPlugin_ConstraintRadius();
 };
 
 #endif

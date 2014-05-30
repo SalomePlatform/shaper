@@ -6,9 +6,10 @@
 #include "SketchPlugin_Arc.h"
 #include "SketchPlugin_ConstraintCoincidence.h"
 #include "SketchPlugin_ConstraintDistance.h"
-#include "SketchPlugin_ConstraintDiameter.h"
+#include "SketchPlugin_ConstraintLength.h"
 #include "SketchPlugin_ConstraintParallel.h"
 #include "SketchPlugin_ConstraintPerpendicular.h"
+#include "SketchPlugin_ConstraintRadius.h"
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
 
@@ -43,14 +44,17 @@ boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Plugin::createFeature(string th
   else if (theFeatureID == "SketchConstraintDistance") {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintDistance);
   }
-  else if (theFeatureID == "SketchConstraintDiameter") {
-    return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintDiameter);
+  else if (theFeatureID == "SketchConstraintLength") {
+    return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintLength);
   }
   else if (theFeatureID == "SketchConstraintParallel") {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintParallel);
   }
   else if (theFeatureID == "SketchConstraintPerpendicular") {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintPerpendicular);
+  }
+  else if (theFeatureID == "SketchConstraintRadius") {
+    return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintRadius);
   }
   // feature of such kind is not found
   return boost::shared_ptr<ModelAPI_Feature>();
