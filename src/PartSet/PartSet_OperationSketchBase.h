@@ -94,6 +94,13 @@ public:
 
   virtual void keyReleased(std::string theName, QKeyEvent* theEvent);
 
+  /// Emits a signal about the operation start. This signal has an information about the feature.
+  /// If the provided feature is empty, the current operation feature is used.
+  /// \param theType a type of an operation started
+  /// theFeature the operation argument
+  void restartOperation(const std::string& theType,
+         boost::shared_ptr<ModelAPI_Feature> theFeature = boost::shared_ptr<ModelAPI_Feature>());
+
 signals:
   /// signal about the request to launch operation
   /// theName the operation name

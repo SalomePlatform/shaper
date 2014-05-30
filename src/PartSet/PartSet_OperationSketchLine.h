@@ -97,6 +97,9 @@ protected:
   /// Restore the multi selection state
   virtual void stopOperation();
 
+  /// Virtual method called after operation committed (see commit() method for more description)
+  virtual void afterCommitOperation();
+
   /// Creates an operation new feature
   /// In addition to the default realization it appends the created line feature to
   /// the sketch feature

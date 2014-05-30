@@ -74,6 +74,8 @@ void ModuleBase_IOperation::commit()
 
   document()->finishOperation();
   emit stopped();
+  
+  afterCommitOperation();
 }
 
 void ModuleBase_IOperation::setRunning(bool theState)

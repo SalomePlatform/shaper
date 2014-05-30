@@ -108,7 +108,7 @@ void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_V
         emit setSelection(aSelected);
       }
       else if (aFeature) {
-        emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+        restartOperation(PartSet_OperationEditLine::Type(), aFeature);
       }
     }
   }

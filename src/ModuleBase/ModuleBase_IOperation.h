@@ -118,6 +118,9 @@ protected:
   virtual void abortOperation() = 0;
   /// Virtual method called when operation committed (see commit() method for more description)
   virtual void commitOperation() = 0;
+  /// Virtual method called after operation committed (see commit() method for more description)
+  /// it is important that the method is called after the stop() signal is emitted
+  virtual void afterCommitOperation() = 0;
 
   /// Returns pointer to the root document.
   boost::shared_ptr<ModelAPI_Document> document() const;

@@ -95,3 +95,9 @@ void PartSet_OperationSketchBase::keyReleased(std::string theName, QKeyEvent* th
 {
   keyReleased(theEvent->key());
 }
+
+void PartSet_OperationSketchBase::restartOperation(const std::string& theType,
+                                                   boost::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  emit launchOperation(theType, theFeature);
+}
