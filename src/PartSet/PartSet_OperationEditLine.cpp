@@ -144,7 +144,6 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
       moveLinePoint(aFeature, aDeltaX, aDeltaY, LINE_ATTR_END);
     }
   }
-  flushUpdated();
   sendFeatures();
 
   myCurPoint.setPoint(aPoint);
@@ -243,5 +242,6 @@ void PartSet_OperationEditLine::sendFeatures()
     Events_Loop::loop()->send(aMessage);
   }
   Events_Loop::loop()->flush(anEvent);
+  flushUpdated();
 }
 
