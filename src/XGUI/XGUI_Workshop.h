@@ -102,7 +102,11 @@ public:
   //! If PartPtr is Null pointer then PartSet will be activated
   void activatePart(FeaturePtr theFeature);
 
+  //! Delete features
   void deleteFeatures(QFeatureList theList);
+
+  //! Show the given features in 3d Viewer
+  void showFeatures(QFeatureList theList, bool isVisible);
 
 signals:
   void salomeViewerSelection();
