@@ -159,6 +159,14 @@ private:
    */
   bool addWorkplane(boost::shared_ptr<SketchPlugin_Feature> theSketch);
 
+  /** \brief Add the entities of constraint for points coincidence into the appropriate list
+   *  \param[in] thePoint1 identifier of the first point
+   *  \param[in] thePoint2 identifier of the second point
+   *  \return \c true if the points are added successfully, and 
+   *          \c false if the constraint is the extra one (should not be created in SolveSpace)
+   */
+  bool addCoincidentPoints(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2);
+
 private:
   // SolveSpace entities
   Slvs_hGroup                  myID;            ///< the index of the group

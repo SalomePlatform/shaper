@@ -203,47 +203,11 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
   {
     // Several points may be coincident, it is not necessary to store all constraints between them.
     // Try to find sequence of coincident points which connects the points of new constraint
-    if (aConstrType == SLVS_C_POINTS_COINCIDENT)
+    if (aConstrType == SLVS_C_POINTS_COINCIDENT &&
+        !addCoincidentPoints(aConstrEnt[0], aConstrEnt[1]))
     {
-      std::vector< std::set<Slvs_hEntity> >::iterator aCoPtIter = myCoincidentPoints.begin();
-      std::vector< std::set<Slvs_hEntity> >::iterator aFirstFound = myCoincidentPoints.end();
-      for ( ; aCoPtIter != myCoincidentPoints.end(); aCoPtIter++)
-      {
-        bool isFound[2] = { // indicate which point ID was already in coincidence constraint
-          aCoPtIter->find(aConstrEnt[0]) != aCoPtIter->end(),
-          aCoPtIter->find(aConstrEnt[1]) != aCoPtIter->end(),
-        };
-        if (isFound[0] && isFound[1]) // points are already connected by coincidence constraints => no need additional one
-        {
-          myExtraCoincidence.insert(theConstraint); // the constraint is stored for further purposes
-          return false;
-        }
-        if ((isFound[0] && !isFound[1]) || (!isFound[0] && isFound[1]))
-        {
-          if (aFirstFound != myCoincidentPoints.end())
-          { // there are two groups of coincident points connected by created constraint => merge them
-            int aFirstFoundShift = aFirstFound - myCoincidentPoints.begin();
-            int aCurrentShift = aCoPtIter - myCoincidentPoints.begin();
-            aFirstFound->insert(aCoPtIter->begin(), aCoPtIter->end());
-            myCoincidentPoints.erase(aCoPtIter);
-            aFirstFound = myCoincidentPoints.begin() + aFirstFoundShift;
-            aCoPtIter = myCoincidentPoints.begin() + aCurrentShift;
-          }
-          else
-          {
-            aCoPtIter->insert(aConstrEnt[isFound[0] ? 1 : 0]);
-            aFirstFound = aCoPtIter;
-          }
-        }
-      }
-      // No points were found, need to create new set
-      if (aFirstFound == myCoincidentPoints.end())
-      {
-        std::set<Slvs_hEntity> aNewSet;
-        aNewSet.insert(aConstrEnt[0]);
-        aNewSet.insert(aConstrEnt[1]);
-        myCoincidentPoints.push_back(aNewSet);
-      }
+      myExtraCoincidence.insert(theConstraint); // the constraint is stored for further purposes
+      return false;
     }
 
     // Create SolveSpace constraint structure
@@ -1046,6 +1010,58 @@ void SketchSolver_ConstraintGroup::removeConstraint(boost::shared_ptr<SketchPlug
   if (myCoincidentPoints.size() == 1 && myCoincidentPoints.front().empty())
     myCoincidentPoints.clear();
 }
+
+
+// ============================================================================
+//  Function: addCoincidentPoints
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  add coincident point the appropriate list of such points
+// ============================================================================
+bool SketchSolver_ConstraintGroup::addCoincidentPoints(
+                const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2)
+{
+  std::vector< std::set<Slvs_hEntity> >::iterator aCoPtIter = myCoincidentPoints.begin();
+  std::vector< std::set<Slvs_hEntity> >::iterator aFirstFound = myCoincidentPoints.end();
+  while (aCoPtIter != myCoincidentPoints.end())
+  {
+    bool isFound[2] = { // indicate which point ID was already in coincidence constraint
+      aCoPtIter->find(thePoint1) != aCoPtIter->end(),
+      aCoPtIter->find(thePoint2) != aCoPtIter->end(),
+    };
+    if (isFound[0] && isFound[1]) // points are already connected by coincidence constraints => no need additional one
+      return false;
+    if ((isFound[0] && !isFound[1]) || (!isFound[0] && isFound[1]))
+    {
+      if (aFirstFound != myCoincidentPoints.end())
+      { // there are two groups of coincident points connected by created constraint => merge them
+        int aFirstFoundShift = aFirstFound - myCoincidentPoints.begin();
+        int aCurrentShift = aCoPtIter - myCoincidentPoints.begin();
+        aFirstFound->insert(aCoPtIter->begin(), aCoPtIter->end());
+        myCoincidentPoints.erase(aCoPtIter);
+        aFirstFound = myCoincidentPoints.begin() + aFirstFoundShift;
+        aCoPtIter = myCoincidentPoints.begin() + aCurrentShift;
+        continue;
+      }
+      else
+      {
+        aCoPtIter->insert(isFound[0] ? thePoint2 : thePoint1);
+        aFirstFound = aCoPtIter;
+      }
+    }
+    aCoPtIter++;
+  }
+  // No points were found, need to create new set
+  if (aFirstFound == myCoincidentPoints.end())
+  {
+    std::set<Slvs_hEntity> aNewSet;
+    aNewSet.insert(thePoint1);
+    aNewSet.insert(thePoint2);
+    myCoincidentPoints.push_back(aNewSet);
+  }
+
+  return true;
+}
+
 
 
 
