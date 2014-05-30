@@ -8,6 +8,7 @@
 #include <PartSet_TestOCC.h>
 
 #include <ModuleBase_Operation.h>
+#include <ModelAPI_Object.h>
 
 #include <XGUI_MainWindow.h>
 #include <XGUI_Displayer.h>
@@ -20,6 +21,7 @@
 #include <XGUI_ViewerProxy.h>
 #include <XGUI_ContextMenuMgr.h>
 #include <XGUI_PropertyPanel.h>
+#include <XGUI_Tools.h>
 
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
@@ -441,7 +443,15 @@ void PartSet_Module::editFeature(FeaturePtr theFeature)
     return;
 
   if (theFeature->getKind() == "Sketch") {
-    onLaunchOperation(theFeature->getKind(), theFeature);
-    updateCurrentPreview(theFeature->getKind());
+    FeaturePtr aFeature = theFeature;
+    if (XGUI_Tools::isModelObject(aFeature)) {
+      ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
+      aFeature = aObject->featureRef();
+    }
+
+    if (aFeature) {
+      onLaunchOperation(aFeature->getKind(), aFeature);
+      updateCurrentPreview(aFeature->getKind());
+    }
   }
 }

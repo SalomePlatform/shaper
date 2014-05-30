@@ -71,10 +71,6 @@ ModuleBase_WidgetPoint2D::~ModuleBase_WidgetPoint2D()
 bool ModuleBase_WidgetPoint2D::storeValue(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  if (!aData) {
-     ObjectPtr anObj = boost::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
-     if (anObj) aData = anObj->featureRef()->data();
-  }
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myFeatureAttributeID));
 
@@ -89,10 +85,6 @@ bool ModuleBase_WidgetPoint2D::storeValue(boost::shared_ptr<ModelAPI_Feature> th
 bool ModuleBase_WidgetPoint2D::restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  if (!aData) {
-     ObjectPtr anObj = boost::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
-     if (anObj) aData = anObj->featureRef()->data();
-  }
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myFeatureAttributeID));
 

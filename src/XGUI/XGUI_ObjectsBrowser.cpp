@@ -1,5 +1,6 @@
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_DocumentDataModel.h"
+#include "XGUI_Tools.h"
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_PluginManager.h>
@@ -85,7 +86,7 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
     FeaturePtr aFeature = mySelectedData.first();
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
     aMgr->rootDocument()->startOperation();
-    if (aFeature->data())
+    if (!XGUI_Tools::isModelObject(aFeature))
       aFeature->data()->setName(qPrintable(aRes));
     else
       boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature)->setName(qPrintable(aRes));
