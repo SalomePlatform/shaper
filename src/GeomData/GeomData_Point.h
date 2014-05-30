@@ -21,6 +21,8 @@ class GeomData_Point : public GeomDataAPI_Point
 public:
   /// Defines the double value
   GEOMDATA_EXPORT virtual void setValue(const double theX, const double theY, const double theZ);
+  /// Defines the point
+  GEOMDATA_EXPORT virtual void setValue(const boost::shared_ptr<GeomAPI_Pnt>& thePoint);
 
   /// Returns the X double value
   GEOMDATA_EXPORT virtual double x() const;

@@ -35,6 +35,8 @@ public:
 
   /// result is sum of coordinates of this and the given argument
   const boost::shared_ptr<GeomAPI_XYZ> added(const boost::shared_ptr<GeomAPI_XYZ>& theArg);
+  /// result is difference between coordinates of this and the given argument
+  const boost::shared_ptr<GeomAPI_XYZ> decreased(const boost::shared_ptr<GeomAPI_XYZ>& theArg);
   /// result is coordinates multiplied by the argument
   const boost::shared_ptr<GeomAPI_XYZ> multiplied(const double theArg);
 

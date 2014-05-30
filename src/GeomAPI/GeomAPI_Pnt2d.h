@@ -8,7 +8,7 @@
 #include <GeomAPI_Interface.h>
 #include <boost/shared_ptr.hpp>
 
-class GeomAPI_XYZ;
+class GeomAPI_XY;
 
 /**\class GeomAPI_Pnt2d
  * \ingroup DataModel
@@ -20,6 +20,8 @@ class GEOMAPI_EXPORT GeomAPI_Pnt2d: public GeomAPI_Interface
 public:
   /// Creation of point by coordinates
   GeomAPI_Pnt2d(const double theX, const double theY);
+  /// Creation of point by coordinates
+  GeomAPI_Pnt2d(const boost::shared_ptr<GeomAPI_XY>& theCoords);
 
   /// returns X coordinate
   double x() const;
@@ -30,6 +32,9 @@ public:
   void setX(const double theX);
   /// sets Y coordinate
   void setY(const double theY);
+
+  /// returns coordinates of the point
+  const boost::shared_ptr<GeomAPI_XY> xy();
 
   /// Distance between two points
   double distance(const boost::shared_ptr<GeomAPI_Pnt2d>& theOther) const;

@@ -21,6 +21,11 @@ void GeomData_Point::setValue(const double theX, const double theY, const double
   }
 }
 
+void GeomData_Point::setValue(const boost::shared_ptr<GeomAPI_Pnt>& thePoint)
+{
+  setValue(thePoint->x(), thePoint->y(), thePoint->z());
+}
+
 double GeomData_Point::x() const
 {
   return myCoords->Value(0);

@@ -50,6 +50,14 @@ const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::added(
   return aResult;
 }
 
+const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::decreased(
+  const boost::shared_ptr<GeomAPI_XYZ>& theArg)
+{
+  boost::shared_ptr<GeomAPI_XYZ> aResult(new GeomAPI_XYZ(MY_XYZ->X() - theArg->x(),
+    MY_XYZ->Y() - theArg->y(), MY_XYZ->Z() - theArg->z()));
+  return aResult;
+}
+
 const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::multiplied(const double theArg)
 {
   boost::shared_ptr<GeomAPI_XYZ> aResult(new GeomAPI_XYZ(MY_XYZ->X() * theArg,
