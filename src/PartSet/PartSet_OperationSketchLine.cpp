@@ -54,6 +54,11 @@ PartSet_OperationSketchLine::~PartSet_OperationSketchLine()
 {
 }
 
+bool PartSet_OperationSketchLine::canBeCommitted() const
+{
+  return myPointSelectionMode == SM_DonePoint;
+}
+
 bool PartSet_OperationSketchLine::isGranted(ModuleBase_IOperation* theOperation) const
 {
   return theOperation->getDescription()->operationId().toStdString() == PartSet_OperationSketch::Type();

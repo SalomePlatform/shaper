@@ -115,8 +115,12 @@ bool XGUI_OperationMgr::canStopOperation()
 void XGUI_OperationMgr::onCommitOperation()
 {
   ModuleBase_Operation* anOperation = currentOperation();
-  if (anOperation)
-    anOperation->commit();
+  if (anOperation) {
+    if (anOperation->canBeCommitted())
+      anOperation->commit();
+    else
+      anOperation->abort();
+  }
 }
 
 void XGUI_OperationMgr::onAbortOperation()

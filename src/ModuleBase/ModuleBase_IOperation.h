@@ -55,6 +55,10 @@ public:
   /// /returns the instance of the description class
   ModuleBase_OperationDescription* getDescription() const;
 
+  /// Verifies whether this operator can be commited.
+  /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
+  virtual bool canBeCommitted() const;
+
   /// Verifies whether this operator can be always started above any already running one
   /// \return Returns TRUE if current operation must not be checked for ActiveOperation->IsValid( this )
   /// This method must be redefined in derived operation if operation of derived class
