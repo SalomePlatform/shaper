@@ -1,5 +1,7 @@
 #include "ConstructionPlugin_Plugin.h"
 #include "ConstructionPlugin_Point.h"
+#include "ConstructionPlugin_Extrusion.h"
+
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
 
@@ -18,6 +20,8 @@ boost::shared_ptr<ModelAPI_Feature> ConstructionPlugin_Plugin::createFeature(str
 {
   if (theFeatureID == "Point") {
     return boost::shared_ptr<ModelAPI_Feature>(new ConstructionPlugin_Point);
+  } else if (theFeatureID == "Extrusion") {
+    return boost::shared_ptr<ModelAPI_Feature>(new ConstructionPlugin_Extrusion);
   }
   // feature of such kind is not found
   return boost::shared_ptr<ModelAPI_Feature>();

@@ -16,6 +16,7 @@ SET(PROJECT_HEADERS
     ModelAPI_AttributeReference.h
     ModelAPI_AttributeRefAttr.h
     ModelAPI_AttributeRefList.h
+    ModelAPI_AttributeBoolean.h
 )
 
 SET(PROJECT_SOURCES

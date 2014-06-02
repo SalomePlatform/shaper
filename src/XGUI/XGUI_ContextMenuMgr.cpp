@@ -3,6 +3,7 @@
 #include "XGUI_Workshop.h"
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_SelectionMgr.h"
+#include "XGUI_Displayer.h"
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
@@ -15,7 +16,6 @@
 XGUI_ContextMenuMgr::XGUI_ContextMenuMgr(XGUI_Workshop* theParent) :
 QObject(theParent), myWorkshop(theParent)
 {
-
 }
 
 XGUI_ContextMenuMgr::~XGUI_ContextMenuMgr()
@@ -35,6 +35,12 @@ void XGUI_ContextMenuMgr::createActions()
 
   aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
   addAction("DELETE_CMD", aAction);
+
+  aAction = new QAction(QIcon(":pictures/eye_pencil.png"), tr("Show"), this);
+  addAction("SHOW_CMD", aAction);
+
+  aAction = new QAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide"), this);
+  addAction("HIDE_CMD", aAction);
 }
 
 void XGUI_ContextMenuMgr::addAction(const QString& theId, QAction* theAction)
@@ -82,7 +88,7 @@ void XGUI_ContextMenuMgr::onContextMenuRequest(QContextMenuEvent* theEvent)
 
 QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
 {
-  QList<QAction*> aActions;
+  QMenu* aMenu = new QMenu();
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   QFeatureList aFeatures = aSelMgr->selectedFeatures();
   if (aFeatures.size() == 1) {
@@ -94,27 +100,33 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
         ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
         DocumentPtr aFeaDoc = aObject->featureRef()->data()->docRef("PartDocument")->value();
         if (aMgr->currentDocument() == aFeaDoc)
-          aActions.append(action("DEACTIVATE_PART_CMD"));
+          aMenu->addAction(action("DEACTIVATE_PART_CMD"));
         else 
-          aActions.append(action("ACTIVATE_PART_CMD"));
+          aMenu->addAction(action("ACTIVATE_PART_CMD"));
       } else {
-        aActions.append(action("EDIT_CMD"));
+        aMenu->addAction(action("EDIT_CMD"));
+
+        XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+        if (aDisplayer->IsVisible(aFeature))
+          aMenu->addAction(action("HIDE_CMD"));
+        else
+          aMenu->addAction(action("SHOW_CMD"));
       }
-      aActions.append(action("DELETE_CMD"));
+      aMenu->addAction(action("DELETE_CMD"));
+      aMenu->addSeparator();
 
     // Process Root object (document)
     } else { // If feature is 0 the it means that selected root object (document)
       if (aMgr->currentDocument() != aMgr->rootDocument()) {
-        aActions.append(action("ACTIVATE_PART_CMD"));
+        aMenu->addAction(action("ACTIVATE_PART_CMD"));
       }
     }
   }
-  aActions.append(myWorkshop->objectBrowser()->actions());
-  if (aActions.size() > 0) {
-    QMenu* aMenu = new QMenu();
-    aMenu->addActions(aActions);
+  aMenu->addActions(myWorkshop->objectBrowser()->actions());
+  if (aMenu->actions().size() > 0) {
     return aMenu;
   }
+  delete aMenu;
   return 0;
 }
 

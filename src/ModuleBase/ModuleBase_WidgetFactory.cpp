@@ -25,6 +25,9 @@
 #include <QPixmap>
 #include <QGroupBox>
 #include <QToolBox>
+#include <QLineEdit>
+#include <QToolButton>
+#include <QCheckBox>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -104,13 +107,20 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   QWidget* result = NULL;
   if (theType == WDG_DOUBLEVALUE) {
     result = doubleSpinBoxControl();
+
   } else if (theType == WDG_INFO) {
     result = labelControl(theParent);
-  }
-  else if (theType == WDG_POINT_SELECTOR) {
+
+  } else if (theType == WDG_SELECTOR) {
+    result = selectorControl(theParent);
+
+  } else if (theType == WDG_BOOLVALUE) {
+    result = booleanControl(theParent);
+
+  } else if (theType == WDG_POINT_SELECTOR) {
     result = pointSelectorControl(theParent);
-  }
-  else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
+
+  } else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
   }
 #ifdef _DEBUG
@@ -214,4 +224,45 @@ bool ModuleBase_WidgetFactory::connectWidget(QObject* theWidget,  const QString&
 QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const
 {
   return QString::fromStdString(theStdString);
+}
+
+
+QWidget* ModuleBase_WidgetFactory::selectorControl(QWidget* theParent)
+{
+  QWidget* aRes = new QWidget();
+  QHBoxLayout* aLayout = new QHBoxLayout(aRes);
+
+  aLayout->setContentsMargins(0, 0, 0, 0);
+  QString aLabelText = qs(myWidgetApi->widgetLabel());
+  QString aLabelIcon = qs(myWidgetApi->widgetIcon());
+  QLabel* aLabel = new QLabel(aLabelText, aRes);
+  aLabel->setPixmap(QPixmap(aLabelIcon));
+
+  aLayout->addWidget(aLabel);
+
+  QLineEdit* aTextLine = new QLineEdit(aRes);
+  aTextLine->setReadOnly(true);
+
+  aLayout->addWidget(aTextLine);
+
+  QToolButton* aActivateBtn = new QToolButton(aRes);
+  aActivateBtn->setIcon(QIcon(":icons/hand_point.png"));
+  aActivateBtn->setCheckable(true);
+
+  aLayout->addWidget(aActivateBtn);
+
+  return aRes;
+}
+
+
+QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
+{
+  QString aText = qs(myWidgetApi->widgetLabel());
+  QString aToolTip = qs(myWidgetApi->widgetTooltip());
+  QString aDefault = qs(myWidgetApi->getProperty("default"));
+
+  QCheckBox* aRes = new QCheckBox(aText, theParent);
+  aRes->setToolTip(aToolTip);
+  aRes->setChecked(aDefault == "true");
+  return aRes;
 }
