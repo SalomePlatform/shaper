@@ -36,3 +36,8 @@ const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_Dir::xyz()
 {
   return boost::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(MY_DIR->X(), MY_DIR->Y(), MY_DIR->Z()));
 }
+
+double GeomAPI_Dir::dot(const boost::shared_ptr<GeomAPI_Dir>& theArg) const
+{
+  return MY_DIR->Dot(theArg->impl<gp_Dir>());
+}

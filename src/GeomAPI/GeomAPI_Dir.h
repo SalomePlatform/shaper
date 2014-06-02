@@ -32,6 +32,9 @@ public:
 
   /// returns coordinates of the direction
   const boost::shared_ptr<GeomAPI_XYZ> xyz();
+
+  /// result is a scalar product of directions
+  double dot(const boost::shared_ptr<GeomAPI_Dir>& theArg) const;
 };
 
 #endif

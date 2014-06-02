@@ -7,6 +7,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 SET(PROJECT_HEADERS
     GeomAPI.h
     GeomAPI_Interface.h
+    GeomAPI_XY.h
     GeomAPI_XYZ.h
     GeomAPI_Pnt.h
     GeomAPI_Pnt2d.h
@@ -19,6 +20,7 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
     GeomAPI_Interface.cpp
+    GeomAPI_XY.cpp
     GeomAPI_XYZ.cpp
     GeomAPI_Pnt.cpp
     GeomAPI_Pnt2d.cpp
