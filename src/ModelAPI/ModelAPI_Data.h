@@ -16,6 +16,7 @@ class ModelAPI_AttributeRefAttr;
 class ModelAPI_AttributeRefList;
 class ModelAPI_Document;
 class ModelAPI_Attribute;
+class GeomAPI_Shape;
 
 /**\class ModelAPI_Data
  * \ingroup DataModel
@@ -54,6 +55,11 @@ public:
   virtual bool isEqual(const boost::shared_ptr<ModelAPI_Data> theData) = 0;
   /// Returns true if it is correctly connected t othe data model
   virtual bool isValid() = 0;
+
+  /// Stores the shape (called by the execution method).
+  virtual void store(const boost::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+  /// Returns the shape-result produced by this feature
+  virtual boost::shared_ptr<GeomAPI_Shape> shape() = 0;
 
   /// Initializes object by the attributes: must be called just after the object is created
   /// for each attribute of the object

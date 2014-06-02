@@ -9,12 +9,14 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_CompoundBuilder.h
     GeomAlgoAPI_FaceBuilder.h
     GeomAlgoAPI_EdgeBuilder.h
+    GeomAlgoAPI_PointBuilder.h
 )
 
 SET(PROJECT_SOURCES
     GeomAlgoAPI_CompoundBuilder.cpp
     GeomAlgoAPI_FaceBuilder.cpp
     GeomAlgoAPI_EdgeBuilder.cpp
+    GeomAlgoAPI_PointBuilder.cpp
 )
 
 ADD_DEFINITIONS(-DGEOMALGOAPI_EXPORTS ${CAS_DEFINITIONS})

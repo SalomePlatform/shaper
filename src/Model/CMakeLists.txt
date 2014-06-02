@@ -36,7 +36,9 @@ SET(PROJECT_LIBRARIES
     Events 
     Config 
     GeomData
+    GeomAPI
     ${CAS_OCAF}
+    ${CAS_TKCAF}
 )
 
 
@@ -51,6 +53,7 @@ INCLUDE_DIRECTORIES(
   ../Config
   ../GeomData
   ../GeomDataAPI
+  ../GeomAPI
   ${CAS_INCLUDE_DIRS}
 )
 

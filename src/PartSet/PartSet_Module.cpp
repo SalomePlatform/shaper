@@ -315,7 +315,7 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   std::string aDescription = aWdgReader.featureDescription(aStdCmdId);
 
   // create the operation
-  ModuleBase_Operation* anOperation;
+  ModuleBase_Operation* anOperation = 0;
   if (theCmdId == PartSet_OperationSketch::Type()) {
     anOperation = new PartSet_OperationSketch(theCmdId.c_str(), this);
   }
