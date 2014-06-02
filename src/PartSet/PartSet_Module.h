@@ -89,6 +89,9 @@ public slots:
   /// \param theZ the Z projection value
   void onPlaneSelected(double theX, double theY, double theZ);
 
+  /// SLOT, to fit all current viewer
+  void onFitAllView();
+
   void onLaunchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature);
 
   /// SLOT, to switch on/off the multi selection in the viewer

@@ -41,6 +41,9 @@ public:
   //! Returns true if multiselection is enabled
   virtual bool isMultiSelectionEnabled() const = 0;
 
+  //! Perfroms the fit all for the active view
+  virtual void fitAll() = 0;
+
 signals:
   void lastViewClosed();
   void tryCloseView();
