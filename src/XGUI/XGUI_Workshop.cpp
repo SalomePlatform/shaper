@@ -738,7 +738,6 @@ void XGUI_Workshop::changeCurrentDocument(FeaturePtr thePart)
   if (thePart) {
     DocumentPtr aFeaDoc;
     if (!XGUI_Tools::isModelObject(thePart)) {
-    //if (thePart->data()) {
       aFeaDoc = thePart->data()->docRef("PartDocument")->value();
     } else {
       ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(thePart);
@@ -806,7 +805,6 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
       if (aFeature->getKind() == "Part") {
         DocumentPtr aDoc;
         if (!XGUI_Tools::isModelObject(aFeature)) {
-        //if (aFeature->data()) {
           aDoc = aFeature->data()->docRef("PartDocument")->value();
         } else {
           ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
@@ -818,7 +816,6 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
         }
       } else {
         if (XGUI_Tools::isModelObject(aFeature)) {
-        //if (!aFeature->data()) {
           ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
           aFeature = aObject->featureRef();
         }
