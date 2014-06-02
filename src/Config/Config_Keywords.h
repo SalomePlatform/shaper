@@ -18,6 +18,7 @@ const static char* NODE_SOURCE = "source";
 
 //Widgets
 const static char* WDG_DOUBLEVALUE = "doublevalue";
+const static char* WDG_BOOLVALUE = "boolvalue";
 //Widget containers
 const static char* WDG_INFO = "label";
 const static char* WDG_GROUP = "groupbox";
@@ -26,6 +27,7 @@ const static char* WDG_TOOLBOX = "toolbox";
 const static char* WDG_TOOLBOX_BOX = "box";
 const static char* WDG_SWITCH = "switch";
 const static char* WDG_SWITCH_CASE = "case";
+const static char* WDG_SELECTOR = "selector";
 
 //Specific widget containers
 const static char* WDG_POINT_SELECTOR = "point_selector";

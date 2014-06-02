@@ -46,6 +46,9 @@ public:
   /// \param theZ the Z projection value
   void setViewProjection(double theX, double theY, double theZ);
 
+  //! Sets the view fitted all
+  void fitAll();
+
   /// Connects to a viewer according to current environment
   void connectToViewer();
 

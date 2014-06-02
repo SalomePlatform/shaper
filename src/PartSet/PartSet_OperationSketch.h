@@ -79,6 +79,8 @@ signals:
   /// \param theX the value in the Y direction value of the plane
   /// \param theX the value in the Z direction of the plane
   void planeSelected(double theX, double theY, double theZ);
+  // signal about the viewer fit all perform
+  void fitAllView();
 
 protected:
   /// Virtual method called when operation started (see start() method for more description)

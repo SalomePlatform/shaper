@@ -39,6 +39,8 @@ protected:
   QWidget* doubleSpinBoxControl();
   QWidget* pointSelectorControl(QWidget* theParent);
   QWidget* createContainer(const std::string& theType, QWidget* theParent = NULL);
+  QWidget* selectorControl(QWidget* theParent);
+  QWidget* booleanControl(QWidget* theParent);
 
   bool connectWidget(QObject*, const QString&);
   QString qs(const std::string& theStdString) const;

@@ -773,6 +773,10 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     activatePart(FeaturePtr());
   else if (theId == "DELETE_CMD")
     deleteFeatures(aFeatures);
+  else if (theId == "SHOW_CMD")
+    showFeatures(aFeatures, true);
+  else if (theId == "HIDE_CMD")
+    showFeatures(aFeatures, false);
 }
 
 //**************************************************************
@@ -824,4 +828,11 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
     }
     aMgr->rootDocument()->finishOperation();
   }
+}
+
+//**************************************************************
+void XGUI_Workshop::showFeatures(QFeatureList theList, bool isVisible)
+{
+//  foreach (FeaturePtr aFeature, theList) {
+//  }
 }
