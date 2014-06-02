@@ -56,3 +56,21 @@ const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::multiplied(const double theArg
     MY_XYZ->Y() * theArg, MY_XYZ->Z() * theArg));
   return aResult;
 }
+
+double GeomAPI_XYZ::dot(const boost::shared_ptr<GeomAPI_XYZ>& theArg) const
+{
+  return MY_XYZ->Dot(theArg->impl<gp_XYZ>());
+}
+
+const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::cross(const boost::shared_ptr<GeomAPI_XYZ>& theArg) const
+{
+  gp_XYZ aResult = MY_XYZ->Crossed(theArg->impl<gp_XYZ>());
+  return boost::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(aResult.X(), aResult.Y(), aResult.Z()));
+}
+
+double GeomAPI_XYZ::distance(const boost::shared_ptr<GeomAPI_XYZ>& theOther) const
+{
+  gp_XYZ aResult(theOther->x() - x(), theOther->y() - y(), theOther->z() - z());
+  return aResult.Modulus();
+}
+
