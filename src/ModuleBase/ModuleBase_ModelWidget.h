@@ -38,9 +38,12 @@ public:
 
   virtual bool restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
 
-  /// Set focus to the current widget if it corresponds to the given attribute
+  /// Returns whether the widget can accept focus, or if it corresponds to the given attribute
   /// \param theAttribute name
-  virtual bool focusTo(const std::string& theAttributeName) = 0;
+  virtual bool canFocusTo(const std::string& theAttributeName) = 0;
+
+  /// Set focus to the current widget if it corresponds to the given attribute
+  virtual void focusTo() = 0;
 
   /// Returns list of widget controls
   /// \return a control list

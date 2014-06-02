@@ -73,7 +73,6 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
   myWidgets = theWidgets;
 
   if (!theWidgets.empty()) {
-
     QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast = theWidgets.end();
     for (; anIt != aLast; anIt++) {
       connect(*anIt, SIGNAL(keyReleased(const std::string&, QKeyEvent*)),
@@ -92,6 +91,9 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
         setTabOrder(anOkBtn, aCancelBtn);
       }
     }
+    ModuleBase_ModelWidget* aWidget = theWidgets.first();
+    if (aWidget)
+      aWidget->focusTo();
   }
 }
 
@@ -138,8 +140,10 @@ void XGUI_PropertyPanel::onFocusActivated(const std::string& theAttributeName)
   }
   else {
     foreach(ModuleBase_ModelWidget* eachWidget, myWidgets) {
-      if (eachWidget->focusTo(theAttributeName))
+      if (eachWidget->canFocusTo(theAttributeName)) {
+        eachWidget->focusTo();
         break;
+      }
     }
   }
 }

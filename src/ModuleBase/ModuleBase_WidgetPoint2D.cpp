@@ -95,16 +95,15 @@ bool ModuleBase_WidgetPoint2D::restoreValue(boost::shared_ptr<ModelAPI_Feature> 
   return true;
 }
 
-bool ModuleBase_WidgetPoint2D::focusTo(const std::string& theAttributeName)
+bool ModuleBase_WidgetPoint2D::canFocusTo(const std::string& theAttributeName)
 {
-  if (theAttributeName != myFeatureAttributeID)
-    return false;
+  return theAttributeName == myFeatureAttributeID;
+}
 
-  if (!myXSpin->hasFocus() && !myYSpin->hasFocus()) {
+void ModuleBase_WidgetPoint2D::focusTo()
+{
+  if (!myXSpin->hasFocus() && !myYSpin->hasFocus())
     myXSpin->setFocus();
-  }
-
-  return true;
 }
 
 QWidget* ModuleBase_WidgetPoint2D::getControl() const
