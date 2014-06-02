@@ -627,6 +627,7 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
     Slvs_hEntity aConstrEnt[] = {
       aConstrIter->ptA,     aConstrIter->ptB,
       aConstrIter->entityA, aConstrIter->entityB};
+    std::vector<int> anIndexes;
     // Go through the groupped entities and find even one of entities of current constraint
     std::vector< std::set<Slvs_hEntity> >::iterator aGrEntIter;
     for (aGrEntIter = aGroupsEntities.begin(); aGrEntIter != aGroupsEntities.end(); aGrEntIter++)
@@ -636,18 +637,10 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
         if (aConstrEnt[i] != 0)
           isFound = (aGrEntIter->find(aConstrEnt[i]) != aGrEntIter->end());
       if (isFound)
-      {
-        for (int i = 0; i < 4; i++)
-          if (aConstrEnt[i] != 0)
-            aGrEntIter->insert(aConstrEnt[i]);
-        aGroupsConstr[aGrEntIter - aGroupsEntities.begin()].insert(aConstrIter->h);
-        if (aGrEntIter->size() > aGroupsEntities[aMaxNbEntities].size())
-          aMaxNbEntities = aGrEntIter - aGroupsEntities.begin();
-        break;
-      }
+        anIndexes.push_back(aGrEntIter - aGroupsEntities.begin());
     }
     // Add new group if no one is found
-    if (aGrEntIter == aGroupsEntities.end())
+    if (anIndexes.empty())
     {
       std::set<Slvs_hEntity> aNewGrEnt;
       for (int i = 0; i < 4; i++)
@@ -660,6 +653,36 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
       aGroupsConstr.push_back(aNewGrConstr);
       if (aNewGrEnt.size() > aGroupsEntities[aMaxNbEntities].size())
         aMaxNbEntities = aGroupsEntities.size() - 1;
+    }
+    else if (anIndexes.size() == 1)
+    { // Add entities indexes into the found group
+      for (int i = 0; i < 4; i++)
+        if (aConstrEnt[i] != 0)
+          aGrEntIter->insert(aConstrEnt[i]);
+      aGroupsConstr[aGrEntIter - aGroupsEntities.begin()].insert(aConstrIter->h);
+      if (aGrEntIter->size() > aGroupsEntities[aMaxNbEntities].size())
+        aMaxNbEntities = aGrEntIter - aGroupsEntities.begin();
+    }
+    else 
+    { // There are found several connected groups, merge them
+      std::vector< std::set<Slvs_hEntity> >::iterator aFirstGroup = 
+        aGroupsEntities.begin() + anIndexes.front();
+      std::vector< std::set<Slvs_hConstraint> >::iterator aFirstConstr = 
+        aGroupsConstr.begin() + anIndexes.front();
+      std::vector<int>::iterator anInd = anIndexes.begin();
+      for (++anInd; anInd != anIndexes.end(); anInd++)
+      {
+        aFirstGroup->insert(aGroupsEntities[*anInd].begin(), aGroupsEntities[*anInd].end());
+        aFirstConstr->insert(aGroupsConstr[*anInd].begin(), aGroupsConstr[*anInd].end());
+      }
+      if (aFirstGroup->size() > aGroupsEntities[aMaxNbEntities].size())
+        aMaxNbEntities = anIndexes.front();
+      // Remove merged groups
+      for (anInd = anIndexes.end() - 1; anInd != anIndexes.begin(); anInd--)
+      {
+        aGroupsEntities.erase(aGroupsEntities.begin() + (*anInd));
+        aGroupsConstr.erase(aGroupsConstr.begin() + (*anInd));
+      }
     }
   }
 
