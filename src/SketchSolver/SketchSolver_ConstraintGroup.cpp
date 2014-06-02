@@ -656,10 +656,11 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
     }
     else if (anIndexes.size() == 1)
     { // Add entities indexes into the found group
+      aGrEntIter = aGroupsEntities.begin() + anIndexes.front();
       for (int i = 0; i < 4; i++)
         if (aConstrEnt[i] != 0)
           aGrEntIter->insert(aConstrEnt[i]);
-      aGroupsConstr[aGrEntIter - aGroupsEntities.begin()].insert(aConstrIter->h);
+      aGroupsConstr[anIndexes.front()].insert(aConstrIter->h);
       if (aGrEntIter->size() > aGroupsEntities[aMaxNbEntities].size())
         aMaxNbEntities = aGrEntIter - aGroupsEntities.begin();
     }
