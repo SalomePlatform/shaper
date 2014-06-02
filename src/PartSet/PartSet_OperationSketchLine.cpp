@@ -209,7 +209,8 @@ void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_V
 void PartSet_OperationSketchLine::keyReleased(std::string theName, QKeyEvent* theEvent)
 {
   int aKeyType = theEvent->key();
-  if (!theName.empty() && aKeyType == Qt::Key_Return) {
+  // the second point should be activated by any modification in the property panel
+  if (!theName.empty() /*&& aKeyType == Qt::Key_Return*/) {
     if (theName == LINE_ATTR_START) {
       setPointSelectionMode(SM_SecondPoint, false);
     }
