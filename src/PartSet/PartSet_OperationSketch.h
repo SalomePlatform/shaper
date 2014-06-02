@@ -10,6 +10,8 @@
 #include <PartSet_OperationSketchBase.h>
 #include <QObject>
 
+class Handle_AIS_InteractiveObject;
+
 /*!
  \class PartSet_OperationSketch
  * \brief The operation for the sketch feature creation
@@ -72,6 +74,10 @@ public:
   /// It returns true after the sketch plane is choosen.
   /// \return enabled state
   virtual bool isNestedOperationsEnabled() const;
+
+  /// Corrects the presentation settings by the operation
+  /// thePresentation an operation presentation
+  void correctPresentation(Handle_AIS_InteractiveObject thePresentation);
 
 signals:
   /// signal about the sketch plane is selected

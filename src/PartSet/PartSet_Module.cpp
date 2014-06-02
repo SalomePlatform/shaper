@@ -391,8 +391,15 @@ void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFea
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   if (isDisplay) {
     boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview(theFeature);
-    aDisplayer->Redisplay(theFeature,
-                          aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), false);
+    bool isAISCreated = aDisplayer->Redisplay(theFeature, aPreview ?
+                                           aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), false);
+    if (isAISCreated) {
+      PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
+      if (aSketchOp) {
+        Handle(AIS_InteractiveObject) anAIS = aDisplayer->GetAISObject(theFeature);
+        aSketchOp->correctPresentation(anAIS);
+      }
+    }
   }
   else
     aDisplayer->Erase(theFeature, false);

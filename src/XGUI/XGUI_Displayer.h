@@ -73,7 +73,8 @@ public:
   /// \param theShape a shape
   /// \param theMode a local selection mode
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  /// \returns true if the presentation is created
+  bool Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
                              const TopoDS_Shape& theShape, const bool isUpdateViewer = true);
 
   /// Display the shape and activate selection of sub-shapes
@@ -117,9 +118,9 @@ public:
   void UpdateViewer();
 
   /// Searches the interactive object by feature
-  /// \param feature the feature or NULL if it not visualized
+  /// \param theFeature the feature or NULL if it not visualized
   /// \return theIO an interactive object
-   Handle(AIS_InteractiveObject) GetAISObject(boost::shared_ptr<ModelAPI_Feature>) const;
+  Handle(AIS_InteractiveObject) GetAISObject(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
 protected:
   /// Searches the feature by interactive object
