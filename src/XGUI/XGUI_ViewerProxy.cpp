@@ -51,6 +51,16 @@ void XGUI_ViewerProxy::setViewProjection(double theX, double theY, double theZ)
   }
 }
 
+void XGUI_ViewerProxy::fitAll()
+{
+  if (myWorkshop->isSalomeMode()) {
+    myWorkshop->salomeConnector()->viewer()->fitAll();
+  }
+  else {
+    XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+    aViewer->activeViewWindow()->viewPort()->fitAll();
+  }
+}
 
 void XGUI_ViewerProxy::connectToViewer()
 {

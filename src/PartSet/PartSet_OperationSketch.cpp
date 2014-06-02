@@ -144,8 +144,10 @@ bool PartSet_OperationSketch::isNestedOperationsEnabled() const
 
 void PartSet_OperationSketch::startOperation()
 {
-  if (!feature())
+  if (!feature()) {
     setFeature(createFeature());
+    emit fitAllView();
+  }
 }
 
 bool PartSet_OperationSketch::hasSketchPlane() const

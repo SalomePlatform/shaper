@@ -213,6 +213,11 @@ void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
   //PartSet_TestOCC::testSelection(myWorkshop);
 }
 
+void PartSet_Module::onFitAllView()
+{
+  myWorkshop->viewer()->fitAll();
+}
+
 void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
   ModuleBase_Operation* anOperation = createOperation(theName.c_str());
@@ -355,6 +360,8 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
     if (aSketchOp) {
       connect(aSketchOp, SIGNAL(planeSelected(double, double, double)),
               this, SLOT(onPlaneSelected(double, double, double)));
+      connect(aSketchOp, SIGNAL(fitAllView()),
+              this, SLOT(onFitAllView()));
     }
   }
 
