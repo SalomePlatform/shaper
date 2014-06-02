@@ -15,6 +15,7 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefList.h>
