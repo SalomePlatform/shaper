@@ -39,6 +39,9 @@ public:
 
   /// returns coordinates of the point
   const boost::shared_ptr<GeomAPI_XYZ> xyz();
+
+  /// Distance between two points
+  double distance(const boost::shared_ptr<GeomAPI_Pnt>& theOther) const;
 };
 
 #endif

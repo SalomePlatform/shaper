@@ -12,9 +12,10 @@ SET(PROJECT_HEADERS
     SketchPlugin_Constraint.h
     SketchPlugin_ConstraintCoincidence.h
     SketchPlugin_ConstraintDistance.h
-    SketchPlugin_ConstraintDiameter.h
+    SketchPlugin_ConstraintLength.h
     SketchPlugin_ConstraintParallel.h
     SketchPlugin_ConstraintPerpendicular.h
+    SketchPlugin_ConstraintRadius.h
 )
 
 SET(PROJECT_SOURCES
@@ -27,9 +28,10 @@ SET(PROJECT_SOURCES
     SketchPlugin_Arc.cpp
     SketchPlugin_ConstraintCoincidence.cpp
     SketchPlugin_ConstraintDistance.cpp
-    SketchPlugin_ConstraintDiameter.cpp
+    SketchPlugin_ConstraintLength.cpp
     SketchPlugin_ConstraintParallel.cpp
     SketchPlugin_ConstraintPerpendicular.cpp
+    SketchPlugin_ConstraintRadius.cpp
 )
 
 SET(PROJECT_LIBRARIES

@@ -20,6 +20,8 @@ class GeomDataAPI_Dir : public ModelAPI_Attribute
 public:
   /// Defines the double value
   virtual void setValue(const double theX, const double theY, const double theZ) = 0;
+  /// Defines the direction
+  virtual void setValue(const boost::shared_ptr<GeomAPI_Dir>& theDir) = 0;
 
   /// Returns the X double value
   virtual double x() const = 0;

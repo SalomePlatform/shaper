@@ -1,6 +1,7 @@
 #include "XGUI_DocumentDataModel.h"
 #include "XGUI_PartDataModel.h"
 #include "XGUI_Workshop.h"
+#include "XGUI_Tools.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
@@ -492,7 +493,7 @@ Qt::ItemFlags XGUI_DocumentDataModel::flags(const QModelIndex& theIndex) const
 QModelIndex XGUI_DocumentDataModel::partIndex(const FeaturePtr& theFeature) const 
 {
   FeaturePtr aFeature = theFeature;
-  if (!aFeature->data()) {
+  if (XGUI_Tools::isModelObject(aFeature)) {
     ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
     aFeature = aObject->featureRef();
   }

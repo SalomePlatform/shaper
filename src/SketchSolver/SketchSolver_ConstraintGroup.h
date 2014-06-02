@@ -104,6 +104,7 @@ protected:
    *  \return identifier of changed entity or 0 if entity could not be changed
    */
   Slvs_hEntity changeEntity(boost::shared_ptr<ModelAPI_Attribute> theEntity);
+  Slvs_hEntity changeEntity(boost::shared_ptr<ModelAPI_Feature>   theEntity);
 
   /** \brief Adds or updates a normal in the group
    *
@@ -158,6 +159,14 @@ private:
    */
   bool addWorkplane(boost::shared_ptr<SketchPlugin_Feature> theSketch);
 
+  /** \brief Add the entities of constraint for points coincidence into the appropriate list
+   *  \param[in] thePoint1 identifier of the first point
+   *  \param[in] thePoint2 identifier of the second point
+   *  \return \c true if the points are added successfully, and 
+   *          \c false if the constraint is the extra one (should not be created in SolveSpace)
+   */
+  bool addCoincidentPoints(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2);
+
 private:
   // SolveSpace entities
   Slvs_hGroup                  myID;            ///< the index of the group
@@ -182,7 +191,9 @@ private:
   std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>
                                myConstraintMap; ///< The map between SketchPlugin and SolveSpace constraints
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>
-                               myEntityMap;     ///< The map between parameters of constraints and their equivalent SolveSpace entities
+                               myEntityAttrMap;     ///< The map between "attribute" parameters of constraints and their equivalent SolveSpace entities
+  std::map<boost::shared_ptr<ModelAPI_Feature>, Slvs_hEntity>
+                               myEntityFeatMap;     ///< The map between "feature" parameters of constraints and their equivalent SolveSpace entities
 
   // Conincident items
   std::vector< std::set<Slvs_hEntity> >

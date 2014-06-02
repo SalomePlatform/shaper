@@ -138,6 +138,28 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
     return getType();
   }
 
+  // Constraint for the given length of a line
+  if (aConstraintKind.compare("SketchConstraintLength") == 0)
+  {
+    int aNbLines = 0;
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
+    {
+      boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+          theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
+        );
+      if (!anAttr) continue;
+      if (anAttr->isFeature() && anAttr->feature()->getKind().compare("SketchLine") == 0)
+      {
+        myAttributesList[aNbLines++] = CONSTRAINT_ATTRIBUTES[indAttr];
+        break;
+      }
+    }
+    if (aNbLines == 1)
+      myType = SLVS_C_PT_PT_DISTANCE;
+    return getType();
+  }
+
   // Constraint for two parallel/perpendicular lines
   bool isParallel = (aConstraintKind.compare("SketchConstraintParallel") == 0);
   bool isPerpendicular = (aConstraintKind.compare("SketchConstraintPerpendicular") == 0);
@@ -163,8 +185,8 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
     return getType();
   }
 
-  // Constraint for diameter of a circle
-  if (aConstraintKind.compare("SketchConstraintDiameter") == 0)
+  // Constraint for radius of a circle or an arc of circle
+  if (aConstraintKind.compare("SketchConstraintRadius") == 0)
   {
     int aNbEntities = 2; // lines in SolveSpace constraints should started from CONSTRAINT_ATTR_ENTITY_C attribute
     for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
@@ -175,7 +197,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
         );
       if (!anAttr || !anAttr->isFeature()) continue;
       const std::string& aKind = anAttr->feature()->getKind();
-      if (aKind.compare("SketchCircle") == 0)
+      if (aKind.compare("SketchCircle") == 0 || aKind.compare("SketchArc") == 0)
       {
         myAttributesList[aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
         continue;

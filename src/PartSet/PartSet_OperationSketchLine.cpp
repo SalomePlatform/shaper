@@ -54,6 +54,11 @@ PartSet_OperationSketchLine::~PartSet_OperationSketchLine()
 {
 }
 
+bool PartSet_OperationSketchLine::canBeCommitted() const
+{
+  return myPointSelectionMode == SM_DonePoint;
+}
+
 bool PartSet_OperationSketchLine::isGranted(ModuleBase_IOperation* theOperation) const
 {
   return theOperation->getDescription()->operationId().toStdString() == PartSet_OperationSketch::Type();
@@ -87,6 +92,15 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
                                                 const std::list<XGUI_ViewerPrs>& theSelected,
                                                 const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
+  if (myPointSelectionMode == SM_DonePoint)
+  {
+    // if the point creation is finished, the next mouse release should commit the modification
+    // the next release can happens by double click in the viewer
+    commit();
+    restartOperation(PartSet_OperationSketchLine::Type(), feature());
+    return;
+  }
+
   double aX, anY;
 
   bool isFoundPoint = false;
@@ -137,8 +151,6 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
       }
     }
   }
-  //if (!isFoundPoint)
-  //  return;
 
   switch (myPointSelectionMode)
   {
@@ -187,8 +199,7 @@ void PartSet_OperationSketchLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_V
     case SM_DonePoint:
     {
       commit();
-      emit featureConstructed(feature(), FM_Deactivation);
-      emit launchOperation(PartSet_OperationSketchLine::Type(), feature());
+      restartOperation(PartSet_OperationSketchLine::Type(), feature());
     }
     default:
       break;
@@ -216,8 +227,7 @@ void PartSet_OperationSketchLine::keyReleased(const int theKey)
       if (myPointSelectionMode == SM_DonePoint)
       {
         commit();
-        emit featureConstructed(feature(), FM_Deactivation);
-        emit launchOperation(PartSet_OperationSketchLine::Type(), boost::shared_ptr<ModelAPI_Feature>());
+        restartOperation(PartSet_OperationSketchLine::Type(), feature());
       }
       //else
       //  abort();
@@ -228,7 +238,6 @@ void PartSet_OperationSketchLine::keyReleased(const int theKey)
       if (myPointSelectionMode == SM_DonePoint)
       {
         commit();
-        emit featureConstructed(feature(), FM_Deactivation);
       }
       else
         abort();
@@ -256,6 +265,12 @@ void PartSet_OperationSketchLine::stopOperation()
 {
   PartSet_OperationSketchBase::stopOperation();
   emit multiSelectionEnabled(true);
+}
+
+void PartSet_OperationSketchLine::afterCommitOperation()
+{
+  PartSet_OperationSketchBase::afterCommitOperation();  
+  emit featureConstructed(feature(), FM_Deactivation);
 }
 
 boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature(const bool theFlushMessage)
@@ -320,7 +335,11 @@ void PartSet_OperationSketchLine::setConstraints(double theX, double theY)
     case SM_SecondPoint:
       aPointArg = LINE_ATTR_END;
       break;
+    default:
+      break;
   }
+
+  boost::shared_ptr<ModelAPI_Feature> aSkFeature = feature();
 
   boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>

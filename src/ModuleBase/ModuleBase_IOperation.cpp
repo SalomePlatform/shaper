@@ -31,6 +31,11 @@ ModuleBase_OperationDescription* ModuleBase_IOperation::getDescription() const
   return myDescription;
 }
 
+bool ModuleBase_IOperation::canBeCommitted() const
+{
+  return true;
+}
+
 bool ModuleBase_IOperation::isGranted(ModuleBase_IOperation* /*theOperation*/) const
 {
   return false;
@@ -74,6 +79,8 @@ void ModuleBase_IOperation::commit()
 
   document()->finishOperation();
   emit stopped();
+  
+  afterCommitOperation();
 }
 
 void ModuleBase_IOperation::setRunning(bool theState)

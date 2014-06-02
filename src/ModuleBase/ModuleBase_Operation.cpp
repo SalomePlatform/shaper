@@ -98,6 +98,10 @@ void ModuleBase_Operation::commitOperation()
   if (myFeature) myFeature->execute();
 }
 
+void ModuleBase_Operation::afterCommitOperation()
+{
+}
+
 void ModuleBase_Operation::flushUpdated()
 {
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));

@@ -36,7 +36,11 @@ public:
   /// Destructor
   virtual ~PartSet_OperationSketchLine();
 
-   /// Returns that this operator can be started above already running one.
+  /// Verifies whether this operator can be commited.
+  /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
+  virtual bool canBeCommitted() const;
+
+  /// Returns that this operator can be started above already running one.
    /// The runned operation should be the sketch feature modified operation
   /// \param theOperation the previous running operation
   virtual bool isGranted(ModuleBase_IOperation* theOperation) const;
@@ -96,6 +100,9 @@ protected:
   /// Virtual method called when operation stopped - committed or aborted.
   /// Restore the multi selection state
   virtual void stopOperation();
+
+  /// Virtual method called after operation committed (see commit() method for more description)
+  virtual void afterCommitOperation();
 
   /// Creates an operation new feature
   /// In addition to the default realization it appends the created line feature to

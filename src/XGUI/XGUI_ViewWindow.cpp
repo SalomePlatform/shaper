@@ -727,7 +727,7 @@ void XGUI_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
       myCurrX = theEvent->x();
       myCurrY = theEvent->y();
       drawRect();
-      QRect rect = makeRect(myStartX, myStartY, myCurrX, myCurrY);
+      QRect rect = XGUI_Tools::makeRect(myStartX, myStartY, myCurrX, myCurrY);
       if (!rect.isEmpty())
         myViewPort->fitRect(rect);
       endDrawRect();
@@ -859,7 +859,7 @@ void XGUI_ViewWindow::drawRect()
   }
 
   myRectBand->setUpdatesEnabled(false);
-  QRect aRect = makeRect(myStartX, myStartY, myCurrX, myCurrY);
+  QRect aRect = XGUI_Tools::makeRect(myStartX, myStartY, myCurrX, myCurrY);
   myRectBand->initGeometry(aRect);
 
   if (!myRectBand->isVisible())
@@ -1039,7 +1039,7 @@ void XGUI_ViewWindow::dumpView()
     QApplication::setOverrideCursor( Qt::WaitCursor );
     QImage aPicture = myViewPort->dumpView();
 
-    QString aFmt = extension(aFileName).toUpper();
+    QString aFmt = XGUI_Tools::extension(aFileName).toUpper();
     if( aFmt.isEmpty() )
       aFmt = QString( "BMP" ); // default format
     else if( aFmt == "JPG" )

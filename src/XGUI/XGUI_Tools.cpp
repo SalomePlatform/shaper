@@ -8,6 +8,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace XGUI_Tools
+{
 //******************************************************************
 QString dir(const QString& path, bool isAbs)
 {
@@ -54,6 +56,12 @@ QRect makeRect(const int x1, const int y1, const int x2, const int y2)
 }
 
 //******************************************************************
+bool isModelObject(boost::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  return theFeature && !theFeature->data();
+}
+
+//******************************************************************
 std::string featureInfo(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
   std::ostringstream aStream; 
@@ -62,3 +70,4 @@ std::string featureInfo(boost::shared_ptr<ModelAPI_Feature> theFeature)
   return QString(aStream.str().c_str()).toStdString();
 }
 
+}

@@ -23,6 +23,8 @@ class GeomData_Dir : public GeomDataAPI_Dir
 public:
   /// Defines the double value
   GEOMDATA_EXPORT virtual void setValue(const double theX, const double theY, const double theZ);
+  /// Defines the direction
+  GEOMDATA_EXPORT virtual void setValue(const boost::shared_ptr<GeomAPI_Dir>& theDir);
 
   /// Returns the X double value
   GEOMDATA_EXPORT virtual double x() const;

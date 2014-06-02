@@ -5,6 +5,7 @@
 #include "GeomData_Point2D.h"
 #include "Model_Events.h"
 #include <Events_Loop.h>
+#include <GeomAPI_Pnt2d.h>
 
 using namespace std;
 
@@ -19,6 +20,11 @@ void GeomData_Point2D::setValue(const double theX, const double theY)
   }
 }
 
+void GeomData_Point2D::setValue(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  setValue(thePoint->x(), thePoint->y());
+}
+
 double GeomData_Point2D::x() const
 {
   return myCoords->Value(0);
@@ -27,6 +33,13 @@ double GeomData_Point2D::x() const
 double GeomData_Point2D::y() const
 {
   return myCoords->Value(1);
+}
+
+boost::shared_ptr<GeomAPI_Pnt2d> GeomData_Point2D::pnt()
+{
+  boost::shared_ptr<GeomAPI_Pnt2d> aResult(
+    new GeomAPI_Pnt2d(myCoords->Value(0), myCoords->Value(1)));
+  return aResult;
 }
 
 GeomData_Point2D::GeomData_Point2D(TDF_Label& theLabel)

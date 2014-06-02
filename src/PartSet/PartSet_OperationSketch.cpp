@@ -85,7 +85,7 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
     if (theHighlighted.size() == 1) {
       boost::shared_ptr<ModelAPI_Feature> aFeature = theHighlighted.front().feature();
       if (aFeature)
-        emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+        restartOperation(PartSet_OperationEditLine::Type(), aFeature);
     }
     else
       myFeatures = theHighlighted;
@@ -101,7 +101,7 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View)
     boost::shared_ptr<ModelAPI_Feature> aFeature = PartSet_Tools::NearestFeature(theEvent->pos(),
                                                                 theView, feature(), myFeatures);
     if (aFeature)
-      emit launchOperation(PartSet_OperationEditLine::Type(), aFeature);
+      restartOperation(PartSet_OperationEditLine::Type(), aFeature);
   }
 }
 

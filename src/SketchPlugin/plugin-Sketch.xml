@@ -20,7 +20,8 @@
       </feature>
       <feature id="SketchConstraintCoincidence" title="Points coincidence" tooltip="Create constraint for the coincidence of two points" internal="1"/>
       <feature id="SketchConstraintDistance" title="Distance between objects" tooltip="Create constraint for the distance from a point to an object" internal="1"/>
-      <feature id="SketchConstraintDiameter" title="Diameter of a circle" tooltip="Create constraint for the given diameter of a circle" internal="1"/>
+      <feature id="SketchConstraintLength" title="Length of a line" tooltip="Create constraint for the given length of a line segment" internal="1"/>
+      <feature id="SketchConstraintRadius" title="Radius of a circle or an arc" tooltip="Create constraint for the given radius of a circle or an arc" internal="1"/>
       <feature id="SketchConstraintParallel" title="Parallelism of a lines" tooltip="Create constraint defining two parallel lines" internal="1"/>
       <feature id="SketchConstraintPerpendicular" title="Orthgonality of a lines" tooltip="Create constraint defining two perpendicular lines" internal="1"/>
     </group>
