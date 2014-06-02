@@ -2,6 +2,7 @@
 #include <PartSet_OperationSketch.h>
 #include <PartSet_OperationSketchLine.h>
 #include <PartSet_OperationEditLine.h>
+#include <PartSet_OperationConstraint.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <PartSet_Listener.h>
@@ -318,8 +319,7 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   if (theCmdId == PartSet_OperationSketch::Type()) {
     anOperation = new PartSet_OperationSketch(theCmdId.c_str(), this);
   }
-  else if(theCmdId == PartSet_OperationSketchLine::Type() ||
-          theCmdId == PartSet_OperationEditLine::Type()) {
+  else {
     ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
     boost::shared_ptr<ModelAPI_Feature> aSketch;
     PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
@@ -327,10 +327,13 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
       aSketch = aPrevOp->sketch();
     if (theCmdId == PartSet_OperationSketchLine::Type())
       anOperation = new PartSet_OperationSketchLine(theCmdId.c_str(), this, aSketch);
-    else
+    else if (theCmdId == PartSet_OperationEditLine::Type())
       anOperation = new PartSet_OperationEditLine(theCmdId.c_str(), this, aSketch);
+    else if (theCmdId == PartSet_OperationConstraint::Type())
+      anOperation = new PartSet_OperationConstraint(theCmdId.c_str(), this, aSketch);
   }
-  else {
+
+  if (!anOperation) {
     anOperation = new ModuleBase_Operation(theCmdId.c_str(), this);
   }
   anOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
