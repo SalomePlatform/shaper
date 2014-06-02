@@ -51,3 +51,8 @@ const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_Pnt::xyz()
 {
   return boost::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(MY_PNT->X(), MY_PNT->Y(), MY_PNT->Z()));
 }
+
+double GeomAPI_Pnt::distance(const boost::shared_ptr<GeomAPI_Pnt>& theOther) const
+{
+  return MY_PNT->Distance(theOther->impl<gp_Pnt>());
+}

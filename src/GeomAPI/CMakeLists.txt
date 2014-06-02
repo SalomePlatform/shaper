@@ -7,8 +7,12 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 SET(PROJECT_HEADERS
     GeomAPI.h
     GeomAPI_Interface.h
+    GeomAPI_XY.h
     GeomAPI_XYZ.h
     GeomAPI_Pnt.h
+    GeomAPI_Pnt2d.h
+    GeomAPI_Lin.h
+    GeomAPI_Lin2d.h
     GeomAPI_Dir.h
     GeomAPI_Pln.h
     GeomAPI_Shape.h
@@ -16,8 +20,12 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
     GeomAPI_Interface.cpp
+    GeomAPI_XY.cpp
     GeomAPI_XYZ.cpp
     GeomAPI_Pnt.cpp
+    GeomAPI_Pnt2d.cpp
+    GeomAPI_Lin.cpp
+    GeomAPI_Lin2d.cpp
     GeomAPI_Dir.cpp
     GeomAPI_Pln.cpp
     GeomAPI_Shape.cpp
@@ -35,7 +43,7 @@ INCLUDE_DIRECTORIES(
   ${CAS_INCLUDE_DIRS}
 )
 
-TARGET_LINK_LIBRARIES(GeomAPI ${PROJECT_LIBRARIES} ${CAS_KERNEL})
+TARGET_LINK_LIBRARIES(GeomAPI ${PROJECT_LIBRARIES} ${CAS_KERNEL} ${CAS_MODELER})
 
 SET(SWIG_SCRIPTS
   ${CMAKE_CURRENT_BINARY_DIR}/GeomAPI.py
