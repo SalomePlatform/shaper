@@ -141,7 +141,6 @@ private:
   boost::shared_ptr<ModelAPI_Feature> mySketch; ///< the sketch feature
   std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
   Point myCurPoint; ///< the current 3D point clicked or moved
-  gp_Pnt myCurPressed; ///< the current 3D point clicked or moved
   bool myIsBlockedSelection; ///< the state of the last state of selection blocked signal
 };
 

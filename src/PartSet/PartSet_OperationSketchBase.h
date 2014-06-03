@@ -52,7 +52,7 @@ public:
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const = 0;
+  virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
   /// Initializes some fields accorging to the feature
   /// \param theSelected the list of selected presentations

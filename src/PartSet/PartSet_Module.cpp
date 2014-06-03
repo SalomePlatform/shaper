@@ -2,6 +2,7 @@
 #include <PartSet_OperationSketch.h>
 #include <PartSet_OperationSketchLine.h>
 #include <PartSet_OperationEditLine.h>
+#include <PartSet_OperationConstraint.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <PartSet_Listener.h>
@@ -314,12 +315,11 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   std::string aDescription = aWdgReader.featureDescription(aStdCmdId);
 
   // create the operation
-  ModuleBase_Operation* anOperation;
+  ModuleBase_Operation* anOperation = 0;
   if (theCmdId == PartSet_OperationSketch::Type()) {
     anOperation = new PartSet_OperationSketch(theCmdId.c_str(), this);
   }
-  else if(theCmdId == PartSet_OperationSketchLine::Type() ||
-          theCmdId == PartSet_OperationEditLine::Type()) {
+  else {
     ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
     boost::shared_ptr<ModelAPI_Feature> aSketch;
     PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
@@ -327,10 +327,13 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
       aSketch = aPrevOp->sketch();
     if (theCmdId == PartSet_OperationSketchLine::Type())
       anOperation = new PartSet_OperationSketchLine(theCmdId.c_str(), this, aSketch);
-    else
+    else if (theCmdId == PartSet_OperationEditLine::Type())
       anOperation = new PartSet_OperationEditLine(theCmdId.c_str(), this, aSketch);
+    else if (theCmdId == PartSet_OperationConstraint::Type())
+      anOperation = new PartSet_OperationConstraint(theCmdId.c_str(), this, aSketch);
   }
-  else {
+
+  if (!anOperation) {
     anOperation = new ModuleBase_Operation(theCmdId.c_str(), this);
   }
   anOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
@@ -391,8 +394,15 @@ void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFea
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   if (isDisplay) {
     boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview(theFeature);
-    aDisplayer->Redisplay(theFeature,
-                          aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), false);
+    bool isAISCreated = aDisplayer->Redisplay(theFeature, aPreview ?
+                                           aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), false);
+    if (isAISCreated) {
+      PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
+      if (aSketchOp) {
+        Handle(AIS_InteractiveObject) anAIS = aDisplayer->GetAISObject(theFeature);
+        aSketchOp->correctPresentation(anAIS);
+      }
+    }
   }
   else
     aDisplayer->Erase(theFeature, false);

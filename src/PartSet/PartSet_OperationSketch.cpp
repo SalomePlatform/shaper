@@ -21,6 +21,7 @@
 
 #include <AIS_Shape.hxx>
 #include <AIS_ListOfInteractive.hxx>
+#include <AIS_InteractiveObject.hxx>
 #include <V3d_View.hxx>
 
 #ifdef _DEBUG
@@ -30,6 +31,9 @@
 #include <QMouseEvent>
 
 using namespace std;
+
+const Quantity_NameOfColor SKETCH_PLANE_COLOR = Quantity_NOC_CHOCOLATE; /// the plane edge color
+const int SKETCH_WIDTH = 4; /// the plane edge width
 
 PartSet_OperationSketch::PartSet_OperationSketch(const QString& theId,
 	                                             QObject* theParent)
@@ -140,6 +144,17 @@ void PartSet_OperationSketch::stopOperation()
 bool PartSet_OperationSketch::isNestedOperationsEnabled() const
 {
   return hasSketchPlane();
+}
+
+void PartSet_OperationSketch::correctPresentation(Handle(AIS_InteractiveObject) thePresentation)
+{
+  Handle(AIS_Shape) anAIS = Handle(AIS_Shape)::DownCast(thePresentation);
+  if (anAIS.IsNull())
+    return;
+
+  anAIS->SetColor(Quantity_Color(SKETCH_PLANE_COLOR));
+  anAIS->SetWidth(SKETCH_WIDTH);
+  anAIS->Redisplay();
 }
 
 void PartSet_OperationSketch::startOperation()

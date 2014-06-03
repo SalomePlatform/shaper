@@ -117,9 +117,10 @@ void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
     UpdateViewer();
 }
 
-void XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
+bool XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                const TopoDS_Shape& theShape, const bool isUpdateViewer)
 {
+  bool isCreated = false;
   Handle(AIS_InteractiveContext) aContext = AISContext();
   // Open local context if there is no one
   if (!aContext->HasOpenedContext()) {
@@ -148,9 +149,12 @@ void XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
     anAIS = new AIS_Shape(theShape);
     myFeature2AISObjectMap[theFeature] = anAIS;
     aContext->Display(anAIS, false);
+    isCreated = true;
   }
   if (isUpdateViewer)
     UpdateViewer();
+
+  return isCreated;
 }
 
 void XGUI_Displayer::ActivateInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
