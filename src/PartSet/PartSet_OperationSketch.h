@@ -55,6 +55,15 @@ public:
   virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
                             const std::list<XGUI_ViewerPrs>& theSelected,
                             const std::list<XGUI_ViewerPrs>& theHighlighted);
+  /// Processes the mouse release in the point
+  /// \param theEvent the mouse event
+  /// \param theView a viewer to have the viewer the eye position
+  /// \param theSelected the list of selected presentations
+  /// \param theHighlighted the list of highlighted presentations
+  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
+                             const std::list<XGUI_ViewerPrs>& theSelected,
+                             const std::list<XGUI_ViewerPrs>& theHighlighted);
+
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
@@ -74,10 +83,6 @@ public:
   /// It returns true after the sketch plane is choosen.
   /// \return enabled state
   virtual bool isNestedOperationsEnabled() const;
-
-  /// Corrects the presentation settings by the operation
-  /// thePresentation an operation presentation
-  void correctPresentation(Handle_AIS_InteractiveObject thePresentation);
 
 signals:
   /// signal about the sketch plane is selected

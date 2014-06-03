@@ -22,6 +22,8 @@
 #include <AIS_Shape.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_InteractiveObject.hxx>
+#include <AIS_DimensionOwner.hxx>
+#include <AIS_LengthDimension.hxx>
 #include <V3d_View.hxx>
 
 #ifdef _DEBUG
@@ -31,9 +33,6 @@
 #include <QMouseEvent>
 
 using namespace std;
-
-const Quantity_NameOfColor SKETCH_PLANE_COLOR = Quantity_NOC_CHOCOLATE; /// the plane edge color
-const int SKETCH_WIDTH = 4; /// the plane edge width
 
 PartSet_OperationSketch::PartSet_OperationSketch(const QString& theId,
 	                                             QObject* theParent)
@@ -52,6 +51,7 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<Mode
     aModes.push_back(TopAbs_FACE);
   else
     aModes = PartSet_OperationSketchBase::getSelectionModes(theFeature);
+
   return aModes;
 }
 
@@ -93,6 +93,39 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
     }
     else
       myFeatures = theHighlighted;
+  }
+}
+
+#include <QLineEdit>
+void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
+                                            const std::list<XGUI_ViewerPrs>& theSelected,
+                                            const std::list<XGUI_ViewerPrs>& theHighlighted)
+{
+  if (!hasSketchPlane()) {
+  }
+  else {
+    if (!theSelected.empty()) {
+      XGUI_ViewerPrs aPrs = theSelected.front();
+      if (!aPrs.owner().IsNull()) {
+        Handle(AIS_DimensionOwner) anOwner = Handle(AIS_DimensionOwner)::DownCast(aPrs.owner());
+        if (!anOwner.IsNull() && anOwner->SelectionMode() == AIS_DSM_Text) {
+          Handle(SelectMgr_SelectableObject) anObject = anOwner->Selectable();
+          double aValue = 0;
+          if (!anObject.IsNull()) {
+            Handle(AIS_LengthDimension) aLenDim = Handle(AIS_LengthDimension)::DownCast(anObject);
+            if (!aLenDim.IsNull())
+              aValue = aLenDim->GetValue();
+          }
+
+          QLineEdit* aLine = new QLineEdit();
+          QPoint aViewPos = theEvent->globalPos();
+          QPoint aLinePos(aViewPos.x(), aViewPos.y());
+          aLine->move(aLinePos);
+          aLine->setText(QString::number(aValue));
+          aLine->show();
+        }
+      }
+    }
   }
 }
 
@@ -144,17 +177,6 @@ void PartSet_OperationSketch::stopOperation()
 bool PartSet_OperationSketch::isNestedOperationsEnabled() const
 {
   return hasSketchPlane();
-}
-
-void PartSet_OperationSketch::correctPresentation(Handle(AIS_InteractiveObject) thePresentation)
-{
-  Handle(AIS_Shape) anAIS = Handle(AIS_Shape)::DownCast(thePresentation);
-  if (anAIS.IsNull())
-    return;
-
-  anAIS->SetColor(Quantity_Color(SKETCH_PLANE_COLOR));
-  anAIS->SetWidth(SKETCH_WIDTH);
-  anAIS->Redisplay();
 }
 
 void PartSet_OperationSketch::startOperation()

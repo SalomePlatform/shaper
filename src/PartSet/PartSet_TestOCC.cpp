@@ -10,6 +10,7 @@
 #include <XGUI_ViewerPrs.h>
 #include <XGUI_ViewerProxy.h>
 #include <PartSet_OperationSketchLine.h>
+#include <PartSet_Presentation.h>
 
 #include <ModelAPI_Feature.h>
 
@@ -146,7 +147,13 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
     boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchLine::preview(aFeature);
 
     XGUI_Displayer* aDisplayer = theWorkshop->displayer();
-    aDisplayer->Redisplay(aFeature, aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), false);
+
+    Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
+                           aFeature, aSketch,
+                           aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), NULL);
+    if (!anAIS.IsNull())
+      aDisplayer->Redisplay(aFeature, anAIS, -1, false);
+
     std::list<int> aModes;
     aModes.push_back(TopAbs_VERTEX);
     aModes.push_back(TopAbs_EDGE);
@@ -158,9 +165,13 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
       aDelta = aDelta - i*2;
       PartSet_OperationSketchLine::setLinePoint(aFeature, 100+aDelta, 200+aDelta, LINE_ATTR_START);
       PartSet_OperationSketchLine::setLinePoint(aFeature, 300+aDelta, 500+aDelta, LINE_ATTR_END);
-      boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchLine::preview(aFeature);
 
-      theWorkshop->displayer()->Redisplay(aFeature, aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), true);
+      boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchLine::preview(aFeature);
+      Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
+                             aFeature, aSketch,
+                             aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), NULL);
+      if (!anAIS.IsNull())
+        aDisplayer->Redisplay(aFeature, anAIS, -1, true);
 
       int aVal = 90;
       for (int j = 0; j < 10000000; j++)
@@ -174,7 +185,7 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
     myTestFeature = aFeature;
 
     std::list<XGUI_ViewerPrs> aPrs;
-    aPrs.push_back(XGUI_ViewerPrs(myTestFeature, TopoDS_Shape()));
+    aPrs.push_back(XGUI_ViewerPrs(myTestFeature, TopoDS_Shape(), NULL));
     aDisplayer->SetSelected(aPrs, true);
   }
 }
@@ -192,7 +203,14 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   PartSet_OperationSketchLine::setLinePoint(aFeature, 200/*aDelta*2*/, 200/*aDelta*2*/, LINE_ATTR_END);
   boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchLine::preview(aFeature);
 
-  theWorkshop->displayer()->Redisplay(aFeature, aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), true);
+  Handle(AIS_InteractiveObject) aPrevAIS;
+  boost::shared_ptr<ModelAPI_Feature> aSketch;//NULL
+  Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
+                          aFeature, aSketch,
+                          aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
+                          aPrevAIS);
+  if (!anAIS.IsNull())
+    theWorkshop->displayer()->Redisplay(aFeature, anAIS, -1, true);
   //std::list<int> aModes;
   //aModes.clear();
   //aModes.push_back(TopAbs_VERTEX);

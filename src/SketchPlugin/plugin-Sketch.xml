@@ -1,7 +1,7 @@
 <plugin>
   <workbench id="Sketch">
     <group id="Basic">
-      <feature id="Sketch" nested="SketchLine SketchConstraintDistance" title="Sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
+      <feature id="Sketch" nested="SketchLine SketchConstraintLength" title="Sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
         <label title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch"/> 
       <!--icon=":pictures/x_point.png"-->
       </feature>
@@ -19,8 +19,10 @@
         <point_selector id="ArcEndPoint" title="End point" tooltip="End point of the arc"/>
       </feature>
       <feature id="SketchConstraintCoincidence" title="Points coincidence" tooltip="Create constraint for the coincidence of two points" internal="1"/>
-      <feature id="SketchConstraintDistance" title="Distance between objects" tooltip="Create constraint for the distance from a point to an object"/>
-      <feature id="SketchConstraintLength" title="Length of a line" tooltip="Create constraint for the given length of a line segment" internal="1"/>
+      <feature id="SketchConstraintDistance" title="Distance between objects" tooltip="Create constraint for the distance from a point to an object" internal="1"/>
+      <feature id="SketchConstraintLength" title="Length of a line" tooltip="Create constraint for the given length of a line segment">
+        <label title="Select a line entity on which to calculate lenght" tooltip="Select a line entity on which to calculate lenght"/>
+      </feature>
       <feature id="SketchConstraintRadius" title="Radius of a circle or an arc" tooltip="Create constraint for the given radius of a circle or an arc" internal="1"/>
       <feature id="SketchConstraintParallel" title="Parallelism of a lines" tooltip="Create constraint defining two parallel lines" internal="1"/>
       <feature id="SketchConstraintPerpendicular" title="Orthgonality of a lines" tooltip="Create constraint defining two perpendicular lines" internal="1"/>

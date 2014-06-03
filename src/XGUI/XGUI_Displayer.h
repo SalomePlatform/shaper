@@ -70,12 +70,17 @@ public:
 
   /// Display the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
-  /// \param theShape a shape
-  /// \param theMode a local selection mode
+  /// \param theAIS an AIS object
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the presentation is created
   bool Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                             const TopoDS_Shape& theShape, const bool isUpdateViewer = true);
+                 Handle(AIS_InteractiveObject) theAIS,
+                 const int theSelectionMode, const bool isUpdateViewer = true);
+
+  /// Redisplay the shape and activate selection of sub-shapes
+  /// \param theFeature a feature instance
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  //void Redisplay(Handle(AIS_InteractiveObject) theAIS, const bool isUpdateViewer = true);
 
   /// Display the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance

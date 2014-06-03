@@ -39,6 +39,15 @@ public:
   static void ConvertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelAPI_Feature> theSketch,
                           Handle(V3d_View) theView, double& theX, double& theY);
 
+  /// \brief Converts the 2D projected coodinates on the sketch plane to the 3D point.
+  /// \param theX the X coordinate
+  /// \param theY the Y coordinate
+  /// \param theSketch the sketch feature
+  /// \param thePoint the 3D point in the viewer
+  static void ConvertTo3D(const double theX, const double theY,
+                          boost::shared_ptr<ModelAPI_Feature> theSketch,
+                          gp_Pnt& thePoint);
+
   /// Returns the point of intersection of the two lines, the first is (v0, v1), the second is (v2, v3),
   /// where vi - {xi,yi}. If the v0 is on the second line, the result is a projection of the v1 to this line
   /// \param theX0 the horizontal coordinate of 0 point

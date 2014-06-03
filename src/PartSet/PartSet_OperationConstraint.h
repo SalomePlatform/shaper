@@ -20,7 +20,7 @@ class PARTSET_EXPORT PartSet_OperationConstraint : public PartSet_OperationSketc
 
 public:
   /// Returns the operation type key
-  static std::string Type() { return "SketchConstraintDistance"; }
+  static std::string Type() { return "SketchConstraintLength"; }
 
 public:
   /// Constructor
@@ -84,6 +84,14 @@ protected:
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
   virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
+
+  /// Set the feature for the constraint
+  /// \param theFeature the line feature
+  void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
+
+  /// Set the value for the constraint
+  /// \param theValue the constraint value
+  void setValue(const double theValue);
 
 private:
   boost::shared_ptr<ModelAPI_Feature> mySketch; ///< the sketch feature

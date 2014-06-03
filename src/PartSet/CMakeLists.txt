@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
 	PartSet_OperationSketchBase.h
 	PartSet_OperationSketch.h
 	PartSet_OperationSketchLine.h
+	PartSet_Presentation.h
 	PartSet_TestOCC.h
 	PartSet_Tools.h
 )
@@ -24,6 +25,7 @@ SET(PROJECT_SOURCES
 	PartSet_OperationSketchBase.cpp
 	PartSet_OperationSketch.cpp
 	PartSet_OperationSketchLine.cpp
+	PartSet_Presentation.cpp
 	PartSet_TestOCC.cpp
 	PartSet_Tools.cpp
 )
