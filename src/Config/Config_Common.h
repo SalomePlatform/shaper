@@ -8,7 +8,7 @@
 #ifndef Config_Common_H_
 #define Config_Common_H_
 
-#include "Config.h"
+#include "Config_def.h"
 
 #include <string>
 #include <stdarg.h>

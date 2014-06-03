@@ -8,7 +8,7 @@
 #ifndef CONFIG_WIDGETAPI_H_
 #define CONFIG_WIDGETAPI_H_
 
-#include <Config.h>
+#include <Config_def.h>
 
 #include <cstdarg>
 #include <string>
@@ -36,16 +36,16 @@ public:
   bool toChildWidget();
   bool toParentWidget();
 
-  std::string widgetType();
-  bool isContainerWidget();
-  bool isPagedWidget();
+  std::string widgetType() const;
+  bool isContainerWidget() const;
+  bool isPagedWidget() const;
 
-  std::string widgetId();
-  std::string widgetIcon();
-  std::string widgetLabel();
-  std::string widgetTooltip();
+  std::string widgetId() const;
+  std::string widgetIcon() const;
+  std::string widgetLabel() const;
+  std::string widgetTooltip() const;
 
-  std::string getProperty(const char* thePropName);
+  std::string getProperty(const char* thePropName) const;
 
 private:
   xmlDocPtr myDoc;

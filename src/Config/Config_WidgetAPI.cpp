@@ -61,7 +61,7 @@ bool Config_WidgetAPI::toParentWidget()
   return myCurrentNode != NULL;
 }
 
-std::string Config_WidgetAPI::widgetType()
+std::string Config_WidgetAPI::widgetType() const
 {
   std::string result = "";
   if(myCurrentNode) {
@@ -70,19 +70,19 @@ std::string Config_WidgetAPI::widgetType()
   return result;
 }
 
-bool Config_WidgetAPI::isContainerWidget()
+bool Config_WidgetAPI::isContainerWidget() const
 {
   return isNode(myCurrentNode, WDG_GROUP, WDG_CHECK_GROUP,
                                NULL);
 }
 
-bool Config_WidgetAPI::isPagedWidget()
+bool Config_WidgetAPI::isPagedWidget() const
 {
   return isNode(myCurrentNode, WDG_TOOLBOX, WDG_SWITCH,
                                NULL);
 }
 
-std::string Config_WidgetAPI::getProperty(const char* thePropName)
+std::string Config_WidgetAPI::getProperty(const char* thePropName) const
 {
   std::string result = "";
   char* aPropChars = (char*) xmlGetProp(myCurrentNode, BAD_CAST thePropName);
@@ -92,22 +92,22 @@ std::string Config_WidgetAPI::getProperty(const char* thePropName)
   return result;
 }
 
-std::string Config_WidgetAPI::widgetId()
+std::string Config_WidgetAPI::widgetId() const
 {
   return getProperty("id");
 }
 
-std::string Config_WidgetAPI::widgetTooltip()
+std::string Config_WidgetAPI::widgetTooltip() const
 {
   return getProperty("tooltip");
 }
 
-std::string Config_WidgetAPI::widgetIcon()
+std::string Config_WidgetAPI::widgetIcon() const
 {
   return getProperty("icon");
 }
 
-std::string Config_WidgetAPI::widgetLabel()
+std::string Config_WidgetAPI::widgetLabel() const
 {
   return getProperty("label");
 }

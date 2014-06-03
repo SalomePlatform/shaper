@@ -146,7 +146,7 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   aLabelWgt->setFrameShape(myTreeView->frameShape());
   aLabelWgt->setFrameShadow(myTreeView->frameShadow());
 
-  connect(myTreeView, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
+  connect(myTreeView, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   connect(myTreeView, SIGNAL(activePartChanged(FeaturePtr)), this, SLOT(onActivePartChanged(FeaturePtr)));
   connect(myTreeView, SIGNAL(activePartChanged(FeaturePtr)), this, SIGNAL(activePartChanged(FeaturePtr)));
 
@@ -315,4 +315,11 @@ void XGUI_ObjectsBrowser::onEditItem()
       myActiveDocLbl->setProperty("OldText", myActiveDocLbl->text());
     }
   }
+}
+
+//***************************************************
+void XGUI_ObjectsBrowser::onSelectionChanged()
+{
+  myFeaturesList = myTreeView->selectedFeatures();
+  emit selectionChanged();
 }

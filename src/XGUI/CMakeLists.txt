@@ -1,4 +1,3 @@
-INCLUDE(FindCAS)
 
 SET(CMAKE_AUTOMOC ON)
 
@@ -33,6 +32,7 @@ SET(PROJECT_HEADERS
     XGUI_ViewerPrs.h
     XGUI_PropertyPanel.h
     XGUI_ContextMenuMgr.h
+    XGUI_ModuleConnector.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -64,6 +64,7 @@ SET(PROJECT_SOURCES
     XGUI_ViewerPrs.cpp
     XGUI_PropertyPanel.cpp
     XGUI_ContextMenuMgr.cpp
+    XGUI_ModuleConnector.cpp
 )
 
 SET(PROJECT_RESOURCES 
