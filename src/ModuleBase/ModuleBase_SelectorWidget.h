@@ -49,10 +49,26 @@ public:
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
+  void setActivationOnStart(bool toActivate) { myActivateOnStart = toActivate; }
+  bool activateOnStart() const { return myActivateOnStart; }
+
+  FeaturePtr selectedFeature() const { return mySelectedFeature; }
+
+public slots:
+
+  /// Activate or deactivate selection
+  void activateSelection(bool toActivate);
+
+protected:
+  bool eventFilter(QObject* theObj, QEvent* theEvent);
+
 private slots:
   void onSelectionChanged();
 
 private:
+  void enableOthersControls(bool toEnable);
+  void updateSelectionName();
+
   std::string myFeatureAttributeID;
 
   QWidget*     myContainer;
@@ -61,6 +77,10 @@ private:
   QToolButton* myActivateBtn;
 
   ModuleBase_IWorkshop* myWorkshop;
+
+  bool myActivateOnStart;
+
+  FeaturePtr mySelectedFeature;
 };
 
 #endif
