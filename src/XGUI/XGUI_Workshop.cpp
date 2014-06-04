@@ -809,7 +809,7 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
     aMgr->rootDocument()->startOperation();
     foreach (FeaturePtr aFeature, theList) {
-      if (aFeature->getKind() == PARTSET_PART_KIND) {
+      if (aFeature->getKind() == "Part") {
         DocumentPtr aDoc;
         if (!XGUI_Tools::isModelObject(aFeature)) {
           aDoc = aFeature->data()->docRef("PartDocument")->value();
