@@ -35,6 +35,8 @@ public:
 
   /// result is a scalar product of directions
   double dot(const boost::shared_ptr<GeomAPI_Dir>& theArg) const;
+  /// result is a cross product of two directions
+  const boost::shared_ptr<GeomAPI_XYZ> cross(const boost::shared_ptr<GeomAPI_Dir>& theArg) const;
 };
 
 #endif
