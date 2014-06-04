@@ -120,6 +120,7 @@ void ModuleBase_SelectorWidget::onSelectionChanged()
       return;
 
     // TODO: Check that the selection corresponds to selection type
+    // TODO: Use the feature kind definition like SKETCH_KIND instead of the direct text
     if (aFeature->getKind().compare("Sketch") != 0)
       return;
 
