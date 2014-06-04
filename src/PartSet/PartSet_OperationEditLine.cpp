@@ -119,15 +119,15 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
   if (!(theEvent->buttons() &  Qt::LeftButton))
     return;
 
-  gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
+  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
 
   blockSelection(true);
   if (myCurPoint.myIsInitialized) {
     double aCurX, aCurY;
-    PartSet_Tools::ConvertTo2D(myCurPoint.myPoint, sketch(), theView, aCurX, aCurY);
+    PartSet_Tools::convertTo2D(myCurPoint.myPoint, sketch(), theView, aCurX, aCurY);
 
     double aX, anY;
-    PartSet_Tools::ConvertTo2D(aPoint, sketch(), theView, aX, anY);
+    PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
 
     double aDeltaX = aX - aCurX;
     double aDeltaY = anY - aCurY;

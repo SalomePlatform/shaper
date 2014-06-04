@@ -91,10 +91,10 @@ void PartSet_OperationConstraint::mouseReleased(QMouseEvent* theEvent, Handle(V3
   double aX, anY;
 
   bool isFoundPoint = false;
-  gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
+  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
 */
   if (theSelected.empty()) {
-    //PartSet_Tools::ConvertTo2D(aPoint, sketch(), theView, aX, anY);
+    //PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
     //isFoundPoint = true;
   }
   else {
@@ -112,7 +112,7 @@ void PartSet_OperationConstraint::mouseReleased(QMouseEvent* theEvent, Handle(V3
         const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
         if (!aVertex.IsNull()) {
           aPoint = BRep_Tool::Pnt(aVertex);
-          PartSet_Tools::ConvertTo2D(aPoint, sketch(), theView, aX, anY);
+          PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
           isFoundPoint = true;
 
           setConstraints(aX, anY);
@@ -126,15 +126,15 @@ void PartSet_OperationConstraint::mouseReleased(QMouseEvent* theEvent, Handle(V3
           double Y0, Y1, Y2, Y3;
           getLinePoint(aFeature, LINE_ATTR_START, X2, Y2);
           getLinePoint(aFeature, LINE_ATTR_END, X3, Y3);
-          PartSet_Tools::ConvertTo2D(aPoint, sketch(), theView, X1, Y1);
+          PartSet_Tools::convertTo2D(aPoint, sketch(), theView, X1, Y1);
 
           switch (myPointSelectionMode) {
             case SM_FirstPoint:
-              PartSet_Tools::ProjectPointOnLine(X2, Y2, X3, Y3, X1, Y1, aX, anY);
+              PartSet_Tools::projectPointOnLine(X2, Y2, X3, Y3, X1, Y1, aX, anY);
             break;
             case SM_SecondPoint: {
               getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
-              PartSet_Tools::IntersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, aX, anY);
+              PartSet_Tools::intersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, aX, anY);
             }
             break;
             default:
@@ -174,8 +174,8 @@ void PartSet_OperationConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V3d_V
   {
     case SM_FirstPoint: {
       double aX, anY;
-      gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
-      PartSet_Tools::ConvertTo2D(aPoint, sketch(), theView, aX, anY);
+      gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
+      PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
       setLinePoint(feature(), aX, anY, LINE_ATTR_START);
       setLinePoint(feature(), aX, anY, LINE_ATTR_END);
       flushUpdated();
@@ -184,7 +184,7 @@ void PartSet_OperationConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V3d_V
     break;
     case SM_SecondPoint:
     {
-      gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
+      gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
       setLinePoint(aPoint, theView, LINE_ATTR_END);
       flushUpdated();
       emit focusActivated(LINE_ATTR_END);

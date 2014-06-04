@@ -107,7 +107,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
         aMenu->addAction(action("EDIT_CMD"));
 
         XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-        if (aDisplayer->IsVisible(aFeature))
+        if (aDisplayer->isVisible(aFeature))
           aMenu->addAction(action("HIDE_CMD"));
         else
           aMenu->addAction(action("SHOW_CMD"));

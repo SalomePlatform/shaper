@@ -44,14 +44,14 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
                                                                    aLast = aFeatures.end();
     for (; anIt != aLast; anIt++) {
       boost::shared_ptr<ModelAPI_Feature> aFeature = *anIt;
-      if (myModule->workshop()->displayer()->IsVisible(aFeature) ||
+      if (myModule->workshop()->displayer()->isVisible(aFeature) ||
           aType == EVENT_FEATURE_CREATED) {
         myModule->visualizePreview(aFeature, true, false);
         //if (aType == EVENT_FEATURE_CREATED)
           myModule->activateFeature(aFeature, true);
       }
     }
-    myModule->workshop()->displayer()->UpdateViewer();
+    myModule->workshop()->displayer()->updateViewer();
   }
   if (aType == EVENT_FEATURE_DELETED)
   {
@@ -63,7 +63,7 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
     for (; anIt != aLast; anIt++) {
       std::string aGroup = *anIt;
       if (aGroup.compare("Sketch") == 0) { // Update only Sketch group
-        myModule->workshop()->displayer()->EraseDeletedFeatures();
+        myModule->workshop()->displayer()->eraseDeletedFeatures();
         myModule->updateCurrentPreview(aGroup);
       }
     }

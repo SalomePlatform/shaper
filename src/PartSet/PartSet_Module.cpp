@@ -170,8 +170,8 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
   if (aPreviewOp)
   {
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->GetSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->GetHighlighted();
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
 
     aPreviewOp->mousePressed(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
   }
@@ -184,8 +184,8 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
   if (aPreviewOp)
   {
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->GetSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->GetHighlighted();
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
 
     aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
   }
@@ -229,8 +229,8 @@ void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<Mo
   {
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
       // refill the features list with avoiding of the features, obtained only by vertex shape (TODO)
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->GetSelected(TopAbs_VERTEX);
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->GetHighlighted(TopAbs_VERTEX);
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected(TopAbs_VERTEX);
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted(TopAbs_VERTEX);
     aPreviewOp->init(theFeature, aSelected, aHighlighted);
   } else {
     anOperation->setFeature(theFeature);
@@ -255,25 +255,25 @@ void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeature
       activateFeature((*anIt).feature(), false);
     }
   }
-  aDisplayer->StopSelection(theFeatures, isStop, false);
+  aDisplayer->stopSelection(theFeatures, isStop, false);
 
   XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
   aViewer->enableSelection(!isStop);
 
-  aDisplayer->UpdateViewer();
+  aDisplayer->updateViewer();
 }
 
 void PartSet_Module::onSetSelection(const std::list<XGUI_ViewerPrs>& theFeatures)
 {
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  aDisplayer->SetSelected(theFeatures, false);
-  aDisplayer->UpdateViewer();
+  aDisplayer->setSelected(theFeatures, false);
+  aDisplayer->updateViewer();
 }
 
 void PartSet_Module::onCloseLocalContext()
 {
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  aDisplayer->CloseLocalContexts();
+  aDisplayer->closeLocalContexts();
 }
 
 void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
@@ -297,7 +297,7 @@ void PartSet_Module::onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> th
         boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).first;
         visualizePreview(aFeature, false, false);
       }
-      aDisplayer->UpdateViewer();
+      aDisplayer->updateViewer();
     }
   }
 
@@ -401,19 +401,19 @@ void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFea
     Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
                            theFeature, aPreviewOp->sketch(),
                            aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
-                           aDisplayer->GetAISObject(theFeature));
+                           aDisplayer->getAISObject(theFeature));
 
     int aSelectionMode = -1;
     if (theFeature->getKind() == "SketchConstraintLength") {
       aSelectionMode = AIS_DSM_Text;
     }
-    aDisplayer->Redisplay(theFeature, anAIS, aSelectionMode, false);
+    aDisplayer->redisplay(theFeature, anAIS, aSelectionMode, false);
   }
   else
-    aDisplayer->Erase(theFeature, false);
+    aDisplayer->erase(theFeature, false);
 
   if (isUpdateViewer)
-    aDisplayer->UpdateViewer();
+    aDisplayer->updateViewer();
 }
 
 void PartSet_Module::activateFeature(boost::shared_ptr<ModelAPI_Feature> theFeature,
@@ -423,7 +423,7 @@ void PartSet_Module::activateFeature(boost::shared_ptr<ModelAPI_Feature> theFeat
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    aDisplayer->ActivateInLocalContext(theFeature, aPreviewOp->getSelectionModes(theFeature),
+    aDisplayer->activateInLocalContext(theFeature, aPreviewOp->getSelectionModes(theFeature),
                                        isUpdateViewer);
   }
 }
@@ -455,12 +455,12 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
     Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
                            aFeature, aPreviewOp->sketch(),
                            aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
-                           aDisplayer->GetAISObject(aFeature));
+                           aDisplayer->getAISObject(aFeature));
     if (!anAIS.IsNull())
-      aDisplayer->Redisplay(aFeature, anAIS, -1, false);
-    aDisplayer->ActivateInLocalContext(aFeature, aModes, false);
+      aDisplayer->redisplay(aFeature, anAIS, -1, false);
+    aDisplayer->activateInLocalContext(aFeature, aModes, false);
   }
-  aDisplayer->UpdateViewer();
+  aDisplayer->updateViewer();
 }
 
 void PartSet_Module::editFeature(FeaturePtr theFeature)

@@ -37,7 +37,7 @@ void PartSet_TestOCC::testSelection(XGUI_Workshop* theWorkshop)
                                theWorkshop->viewer()->activeView());
     PartSet_TestOCC::changeTestLine(theWorkshop);
   }
-  Handle(AIS_InteractiveObject) anIO = theWorkshop->displayer()->GetAISObject(myTestFeature);
+  Handle(AIS_InteractiveObject) anIO = theWorkshop->displayer()->getAISObject(myTestFeature);
   if (!anIO.IsNull()) {
     theWorkshop->viewer()->AISContext()->MoveTo(0, 0, theWorkshop->viewer()->activeView());
     theWorkshop->viewer()->AISContext()->Select(0, 0, 2500, 2500, theWorkshop->viewer()->activeView());
@@ -152,12 +152,12 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
                            aFeature, aSketch,
                            aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), NULL);
     if (!anAIS.IsNull())
-      aDisplayer->Redisplay(aFeature, anAIS, -1, false);
+      aDisplayer->redisplay(aFeature, anAIS, -1, false);
 
     std::list<int> aModes;
     aModes.push_back(TopAbs_VERTEX);
     aModes.push_back(TopAbs_EDGE);
-    aDisplayer->ActivateInLocalContext(aFeature, aModes, true);
+    aDisplayer->activateInLocalContext(aFeature, aModes, true);
 
     // change the line
     /*double aDelta = -200;
@@ -171,7 +171,7 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
                              aFeature, aSketch,
                              aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), NULL);
       if (!anAIS.IsNull())
-        aDisplayer->Redisplay(aFeature, anAIS, -1, true);
+        aDisplayer->redisplay(aFeature, anAIS, -1, true);
 
       int aVal = 90;
       for (int j = 0; j < 10000000; j++)
@@ -181,12 +181,12 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
     //aModes.clear();
     //aModes.push_back(TopAbs_VERTEX);
     //aModes.push_back(TopAbs_EDGE);
-    //aDisplayer->ActivateInLocalContext(aFeature, aModes, true);
+    //aDisplayer->activateInLocalContext(aFeature, aModes, true);
     myTestFeature = aFeature;
 
     std::list<XGUI_ViewerPrs> aPrs;
     aPrs.push_back(XGUI_ViewerPrs(myTestFeature, TopoDS_Shape(), NULL));
-    aDisplayer->SetSelected(aPrs, true);
+    aDisplayer->setSelected(aPrs, true);
   }
 }
 
@@ -210,18 +210,18 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
                           aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
                           aPrevAIS);
   if (!anAIS.IsNull())
-    theWorkshop->displayer()->Redisplay(aFeature, anAIS, -1, true);
+    theWorkshop->displayer()->redisplay(aFeature, anAIS, -1, true);
   //std::list<int> aModes;
   //aModes.clear();
   //aModes.push_back(TopAbs_VERTEX);
   //aModes.push_back(TopAbs_EDGE);
-  //aDisplayer->ActivateInLocalContext(aFeature, aModes, true);
+  //aDisplayer->activateInLocalContext(aFeature, aModes, true);
 
   /*std::list<XGUI_ViewerPrs> aPrs;
   aPrs.push_back(XGUI_ViewerPrs(myTestFeature, TopoDS_Shape()));
-  theWorkshop->displayer()->SetSelected(aPrs, true);*/
+  theWorkshop->displayer()->setSelected(aPrs, true);*/
 
-  theWorkshop->displayer()->UpdateViewer();
+  theWorkshop->displayer()->updateViewer();
 }
 
 void PartSet_TestOCC::moveMouse(Handle(AIS_InteractiveContext) theContext, Handle(V3d_View) theView)

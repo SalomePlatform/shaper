@@ -135,7 +135,7 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View)
     return;
 
   if (myFeatures.size() != 1) {
-    boost::shared_ptr<ModelAPI_Feature> aFeature = PartSet_Tools::NearestFeature(theEvent->pos(),
+    boost::shared_ptr<ModelAPI_Feature> aFeature = PartSet_Tools::nearestFeature(theEvent->pos(),
                                                                 theView, feature(), myFeatures);
     if (aFeature)
       restartOperation(PartSet_OperationEditLine::Type(), aFeature);

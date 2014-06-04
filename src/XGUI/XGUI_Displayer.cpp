@@ -32,15 +32,15 @@ XGUI_Displayer::~XGUI_Displayer()
 {
 }
 
-bool XGUI_Displayer::IsVisible(boost::shared_ptr<ModelAPI_Feature> theFeature)
+bool XGUI_Displayer::isVisible(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
   return myFeature2AISObjectMap.find(theFeature) != myFeature2AISObjectMap.end();
 }
 
-void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                             const bool isUpdateViewer)
-{
-}
+//void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
+//                             const bool isUpdateViewer)
+//{
+//}
 
 /*void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
                              const TopoDS_Shape& theShape, const bool isUpdateViewer)
@@ -52,11 +52,11 @@ void XGUI_Displayer::Display(boost::shared_ptr<ModelAPI_Feature> theFeature,
 
   aContext->Display(anAIS, Standard_False);
   if (isUpdateViewer)
-    UpdateViewer();
+    updateViewer();
 }*/
 
 
-std::list<XGUI_ViewerPrs> XGUI_Displayer::GetSelected(const int theShapeTypeToSkip)
+std::list<XGUI_ViewerPrs> XGUI_Displayer::getSelected(const int theShapeTypeToSkip)
 {
   std::set<boost::shared_ptr<ModelAPI_Feature> > aPrsFeatures;
   std::list<XGUI_ViewerPrs> aPresentations;
@@ -69,7 +69,7 @@ std::list<XGUI_ViewerPrs> XGUI_Displayer::GetSelected(const int theShapeTypeToSk
     if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
       continue;
 
-    boost::shared_ptr<ModelAPI_Feature> aFeature = GetFeature(anIO);
+    boost::shared_ptr<ModelAPI_Feature> aFeature = getFeature(anIO);
     if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
       continue;
     Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
@@ -79,7 +79,7 @@ std::list<XGUI_ViewerPrs> XGUI_Displayer::GetSelected(const int theShapeTypeToSk
   return aPresentations;
 }
 
-std::list<XGUI_ViewerPrs> XGUI_Displayer::GetHighlighted(const int theShapeTypeToSkip)
+std::list<XGUI_ViewerPrs> XGUI_Displayer::getHighlighted(const int theShapeTypeToSkip)
 {
   std::set<boost::shared_ptr<ModelAPI_Feature> > aPrsFeatures;
   std::list<XGUI_ViewerPrs> aPresentations;
@@ -91,7 +91,7 @@ std::list<XGUI_ViewerPrs> XGUI_Displayer::GetHighlighted(const int theShapeTypeT
     if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
       continue;
 
-    boost::shared_ptr<ModelAPI_Feature> aFeature = GetFeature(anIO);
+    boost::shared_ptr<ModelAPI_Feature> aFeature = getFeature(anIO);
     if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
       continue;
     aPresentations.push_back(XGUI_ViewerPrs(aFeature, aShape, NULL));
@@ -101,7 +101,7 @@ std::list<XGUI_ViewerPrs> XGUI_Displayer::GetHighlighted(const int theShapeTypeT
   return aPresentations;
 }
 
-void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
+void XGUI_Displayer::erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
                            const bool isUpdateViewer)
 {
   if (myFeature2AISObjectMap.find(theFeature) == myFeature2AISObjectMap.end())
@@ -117,10 +117,10 @@ void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
   myFeature2AISObjectMap.erase(theFeature);
 
   if (isUpdateViewer)
-    UpdateViewer();
+    updateViewer();
 }
 
-bool XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
+bool XGUI_Displayer::redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                Handle(AIS_InteractiveObject) theAIS,
                                const int theSelectionMode,
                                const bool isUpdateViewer)
@@ -136,7 +136,7 @@ bool XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
     //aContext->SetPixelTolerance(MOUSE_SENSITIVITY_IN_PIXEL);
   }
   // display or redisplay presentation
-  if (IsVisible(theFeature) && !myFeature2AISObjectMap[theFeature].IsNull()) {
+  if (isVisible(theFeature) && !myFeature2AISObjectMap[theFeature].IsNull()) {
       aContext->RecomputeSelectionOnly(theAIS);
   }
   else {
@@ -152,12 +152,12 @@ bool XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
     isCreated = true;
   }
   if (isUpdateViewer)
-    UpdateViewer();
+    updateViewer();
 
   return isCreated;
 }
 
-void XGUI_Displayer::ActivateInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
+void XGUI_Displayer::activateInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
                                          const std::list<int>& theModes, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -168,7 +168,7 @@ void XGUI_Displayer::ActivateInLocalContext(boost::shared_ptr<ModelAPI_Feature> 
   }
   // display or redisplay presentation
   Handle(AIS_Shape) anAIS;
-  if (IsVisible(theFeature))
+  if (isVisible(theFeature))
     anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[theFeature]);
 
   // Activate selection of objects from prs
@@ -184,10 +184,10 @@ void XGUI_Displayer::ActivateInLocalContext(boost::shared_ptr<ModelAPI_Feature> 
   }
 
   if (isUpdateViewer)
-    UpdateViewer();
+    updateViewer();
 }
 
-void XGUI_Displayer::StopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop,
+void XGUI_Displayer::stopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop,
                                    const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -197,7 +197,7 @@ void XGUI_Displayer::StopSelection(const std::list<XGUI_ViewerPrs>& theFeatures,
   boost::shared_ptr<ModelAPI_Feature> aFeature;
   for (; anIt != aLast; anIt++) {
     aFeature = (*anIt).feature();
-    if (IsVisible(aFeature))
+    if (isVisible(aFeature))
       anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[aFeature]);
     if (anAIS.IsNull())
       continue;
@@ -214,10 +214,10 @@ void XGUI_Displayer::StopSelection(const std::list<XGUI_ViewerPrs>& theFeatures,
     }
   }
   if (isUpdateViewer)
-    UpdateViewer();
+    updateViewer();
 }
 
-void XGUI_Displayer::SetSelected(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isUpdateViewer)
+void XGUI_Displayer::setSelected(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
@@ -234,7 +234,7 @@ void XGUI_Displayer::SetSelected(const std::list<XGUI_ViewerPrs>& theFeatures, c
 
   for (; anIt != aLast; anIt++) {
     aFeature = (*anIt).feature();
-    if (IsVisible(aFeature))
+    if (isVisible(aFeature))
       anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[aFeature]);
     if (anAIS.IsNull())
       continue;
@@ -242,10 +242,10 @@ void XGUI_Displayer::SetSelected(const std::list<XGUI_ViewerPrs>& theFeatures, c
   }
  
   if (isUpdateViewer)
-    UpdateViewer();
+    updateViewer();
 }
 
-void XGUI_Displayer::EraseAll(const bool isUpdateViewer)
+/*void XGUI_Displayer::EraseAll(const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) ic = AISContext();
 
@@ -262,10 +262,10 @@ void XGUI_Displayer::EraseAll(const bool isUpdateViewer)
   }
   myFeature2AISObjectMap.clear();
   if (isUpdateViewer)
-    UpdateViewer();
-}
+    updateViewer();
+}*/
 
-void XGUI_Displayer::EraseDeletedFeatures(const bool isUpdateViewer)
+void XGUI_Displayer::eraseDeletedFeatures(const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
@@ -290,15 +290,15 @@ void XGUI_Displayer::EraseDeletedFeatures(const bool isUpdateViewer)
   }
 
   if (isUpdateViewer)
-    UpdateViewer();
+    updateViewer();
 }
 
-void XGUI_Displayer::CloseLocalContexts(const bool isUpdateViewer)
+void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
 {
-  CloseAllContexts(true);
+  closeAllContexts(true);
 }
 
-Handle(AIS_InteractiveObject) XGUI_Displayer::GetAISObject(
+Handle(AIS_InteractiveObject) XGUI_Displayer::getAISObject(
                                               boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
   Handle(AIS_InteractiveObject) anIO;
@@ -307,7 +307,7 @@ Handle(AIS_InteractiveObject) XGUI_Displayer::GetAISObject(
   return anIO;
 }
 
-boost::shared_ptr<ModelAPI_Feature> XGUI_Displayer::GetFeature(Handle(AIS_InteractiveObject) theIO) const
+boost::shared_ptr<ModelAPI_Feature> XGUI_Displayer::getFeature(Handle(AIS_InteractiveObject) theIO) const
 {
   boost::shared_ptr<ModelAPI_Feature> aFeature;
   FeatureToAISMap::const_iterator aFIt = myFeature2AISObjectMap.begin(),
@@ -321,17 +321,17 @@ boost::shared_ptr<ModelAPI_Feature> XGUI_Displayer::GetFeature(Handle(AIS_Intera
   return aFeature;
 }
 
-void XGUI_Displayer::CloseAllContexts(const bool isUpdateViewer)
+void XGUI_Displayer::closeAllContexts(const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) ic = AISContext();
   if (!ic.IsNull()) {
     ic->CloseAllContexts(false);
     if (isUpdateViewer)
-      UpdateViewer();
+      updateViewer();
   }
 }
 
-void XGUI_Displayer::UpdateViewer()
+void XGUI_Displayer::updateViewer()
 {
   Handle(AIS_InteractiveContext) ic = AISContext();
   if (!ic.IsNull())

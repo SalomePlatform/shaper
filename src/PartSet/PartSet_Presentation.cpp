@@ -110,8 +110,8 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createSketchConstraintLength
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
 
   gp_Pnt aPoint1, aPoint2;
-  PartSet_Tools::ConvertTo3D(aPointStart->x(), aPointStart->y(), theSketch, aPoint1);
-  PartSet_Tools::ConvertTo3D(aPointEnd->x(), aPointEnd->y(), theSketch, aPoint2);
+  PartSet_Tools::convertTo3D(aPointStart->x(), aPointStart->y(), theSketch, aPoint1);
+  PartSet_Tools::convertTo3D(aPointEnd->x(), aPointEnd->y(), theSketch, aPoint2);
 
   //Build dimension here
   gp_Pnt aP1 = aPoint1;

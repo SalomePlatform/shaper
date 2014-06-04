@@ -44,12 +44,12 @@ public:
 
   /// Returns the feature visibility state.
   /// \param theFeature a feature instance
-  bool IsVisible(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  bool isVisible(boost::shared_ptr<ModelAPI_Feature> theFeature);
 
   /// Display the feature. Obtain the visualized object from the feature.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void Display(boost::shared_ptr<ModelAPI_Feature> theFeature, const bool isUpdateViewer = true);
+  //void Display(boost::shared_ptr<ModelAPI_Feature> theFeature, const bool isUpdateViewer = true);
 
   /// Display the feature and a shape. This shape would be associated to the given feature
   /// \param theFeature a feature instance
@@ -61,80 +61,80 @@ public:
   /// Returns a list of viewer selected presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  std::list<XGUI_ViewerPrs> GetSelected(const int theShapeTypeToSkip = -1);
+  std::list<XGUI_ViewerPrs> getSelected(const int theShapeTypeToSkip = -1);
 
   /// Returns a list of viewer highlited presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  std::list<XGUI_ViewerPrs> GetHighlighted(const int theShapeTypeToSkip = -1);
+  std::list<XGUI_ViewerPrs> getHighlighted(const int theShapeTypeToSkip = -1);
 
   /// Display the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
   /// \param theAIS an AIS object
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the presentation is created
-  bool Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  bool redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
                  Handle(AIS_InteractiveObject) theAIS,
                  const int theSelectionMode, const bool isUpdateViewer = true);
 
   /// Redisplay the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  //void Redisplay(Handle(AIS_InteractiveObject) theAIS, const bool isUpdateViewer = true);
+  //void redisplay(Handle(AIS_InteractiveObject) theAIS, const bool isUpdateViewer = true);
 
   /// Display the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
   /// \param theShape a shape
   /// \param theMode a list of local selection modes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void ActivateInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  void activateInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
                               const std::list<int>& theModes, const bool isUpdateViewer = true);
 
   /// Stop the current selection and color the given features to the selection color
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void StopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop,
+  void stopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop,
                      const bool isUpdateViewer);
 
   /// Set the features are selected
   /// \param theFeatures a list of features to be selected
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void SetSelected(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isUpdateViewer);
+  void setSelected(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isUpdateViewer);
 
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void Erase(boost::shared_ptr<ModelAPI_Feature> theFeature, const bool isUpdateViewer = true);
+  void erase(boost::shared_ptr<ModelAPI_Feature> theFeature, const bool isUpdateViewer = true);
 
   /// Erase all presentations
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void EraseAll(const bool isUpdateViewer = true);
+  //void EraseAll(const bool isUpdateViewer = true);
 
   /// Erase AIS interactive objects, which has an empty feature in the internal map
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void EraseDeletedFeatures(const bool isUpdateViewer = true);
+  void eraseDeletedFeatures(const bool isUpdateViewer = true);
 
   /// Deactivates selection of sub-shapes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void CloseLocalContexts(const bool isUpdateViewer = true);
+  void closeLocalContexts(const bool isUpdateViewer = true);
 
   /// Updates the viewer
-  void UpdateViewer();
+  void updateViewer();
 
   /// Searches the interactive object by feature
   /// \param theFeature the feature or NULL if it not visualized
   /// \return theIO an interactive object
-  Handle(AIS_InteractiveObject) GetAISObject(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
+  Handle(AIS_InteractiveObject) getAISObject(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
 protected:
   /// Searches the feature by interactive object
   /// \param theIO an interactive object
   /// \return feature the feature or NULL if it not visualized
-  boost::shared_ptr<ModelAPI_Feature> GetFeature(Handle(AIS_InteractiveObject) theIO) const;
+  boost::shared_ptr<ModelAPI_Feature> getFeature(Handle(AIS_InteractiveObject) theIO) const;
   /// Deactivate local selection
   /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
-  void CloseAllContexts(const bool isUpdateViewer);
+  void closeAllContexts(const bool isUpdateViewer);
 
   /// Returns currently installed AIS_InteractiveContext
   Handle(AIS_InteractiveContext) AISContext() const;
