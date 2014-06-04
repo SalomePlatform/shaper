@@ -9,6 +9,9 @@
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
 
+/// Arc feature kind
+const std::string SKETCH_ARC_KIND("SketchArc");
+
 /// Central 2D point of the circle which contains the arc
 const std::string ARC_ATTR_CENTER("ArcCenter");
 /// Start 2D point of the arc
@@ -25,7 +28,7 @@ class SketchPlugin_Arc: public SketchPlugin_Feature
 public:
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
-  {static std::string MY_KIND = "SketchArc"; return MY_KIND;}
+  {static std::string MY_KIND = SKETCH_ARC_KIND; return MY_KIND;}
 
   /// Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup()

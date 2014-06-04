@@ -38,22 +38,22 @@ boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Plugin::createFeature(string th
   else if (theFeatureID == SKETCH_CIRCLE_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_Circle);
   }
-  else if (theFeatureID == "SketchConstraintCoincidence") {
+  else if (theFeatureID == SKETCH_CONSTRAINT_COINCIDENCE_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintCoincidence);
   }
-  else if (theFeatureID == "SketchConstraintDistance") {
+  else if (theFeatureID == SKETCH_CONSTRAINT_DISTANCE_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintDistance);
   }
-  else if (theFeatureID == "SketchConstraintLength") {
+  else if (theFeatureID == SKETCH_CONSTRAINT_LENGTH_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintLength);
   }
-  else if (theFeatureID == "SketchConstraintParallel") {
+  else if (theFeatureID == SKETCH_CONSTRAINT_PARALLEL_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintParallel);
   }
-  else if (theFeatureID == "SketchConstraintPerpendicular") {
+  else if (theFeatureID == SKETCH_CONSTRAINT_PERPENDICULAR_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintPerpendicular);
   }
-  else if (theFeatureID == "SketchConstraintRadius") {
+  else if (theFeatureID == SKETCH_CONSTRAINT_RADIUS_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_ConstraintRadius);
   }
   // feature of such kind is not found

@@ -404,7 +404,7 @@ void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFea
                            aDisplayer->getAISObject(theFeature));
 
     int aSelectionMode = -1;
-    if (theFeature->getKind() == "SketchConstraintLength") {
+    if (theFeature->getKind() == SKETCH_CONSTRAINT_LENGTH_KIND) {
       aSelectionMode = AIS_DSM_Text;
     }
     aDisplayer->redisplay(theFeature, anAIS, aSelectionMode, false);

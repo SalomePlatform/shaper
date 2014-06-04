@@ -9,6 +9,7 @@
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
 
 #include <GeomDataAPI_Point2D.h>
 
@@ -303,7 +304,7 @@ void PartSet_OperationSketchLine::createConstraint(boost::shared_ptr<GeomDataAPI
                                                    boost::shared_ptr<GeomDataAPI_Point2D> thePoint2)
 {
   boost::shared_ptr<ModelAPI_Document> aDoc = document();
-  boost::shared_ptr<ModelAPI_Feature> aFeature = aDoc->addFeature("SketchConstraintCoincidence");
+  boost::shared_ptr<ModelAPI_Feature> aFeature = aDoc->addFeature(SKETCH_CONSTRAINT_COINCIDENCE_KIND);
 
   if (sketch()) {
     boost::shared_ptr<SketchPlugin_Feature> aSketch = 

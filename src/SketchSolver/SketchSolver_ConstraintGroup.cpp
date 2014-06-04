@@ -15,6 +15,8 @@
 #include <Model_Events.h>
 
 #include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
@@ -186,7 +188,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
     if (!aConstrAttr) continue;
 
     // For the length constraint the start and end points of the line should be added to the entities list instead of line
-    if (aConstrType == SLVS_C_PT_PT_DISTANCE && theConstraint->getKind().compare("SketchConstraintLength") == 0)
+    if (aConstrType == SLVS_C_PT_PT_DISTANCE && theConstraint->getKind().compare(SKETCH_CONSTRAINT_LENGTH_KIND) == 0)
     {
       boost::shared_ptr<ModelAPI_Data> aData = aConstrAttr->feature()->data();
       aConstrEnt[indAttr]   = changeEntity(aData->attribute(LINE_ATTR_START));
@@ -362,7 +364,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
       return aCircleEntity.h;
     }
     // Arc
-    else if (aFeatureKind.compare("SketchArc") == 0)
+    else if (aFeatureKind.compare(SKETCH_ARC_KIND) == 0)
     {
       Slvs_hEntity aCenter = changeEntity(aFeature->data()->attribute(ARC_ATTR_CENTER));
       Slvs_hEntity aStart  = changeEntity(aFeature->data()->attribute(ARC_ATTR_START));
@@ -744,7 +746,7 @@ bool SketchSolver_ConstraintGroup::updateGroup()
   {
     if (!aConstrIter->first->data()->isValid())
     {
-      if (aConstrIter->first->getKind().compare("SketchConstraintCoincidence") == 0)
+      if (aConstrIter->first->getKind().compare(SKETCH_CONSTRAINT_COINCIDENCE_KIND) == 0)
         isCCRemoved = true;
       std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::reverse_iterator
         aCopyIter = aConstrIter++;

@@ -9,6 +9,9 @@
 #include <SketchPlugin_Sketch.h>
 #include "SketchPlugin_Constraint.h"
 
+/// Radius constraint kind
+const std::string SKETCH_CONSTRAINT_RADIUS_KIND("SketchConstraintRadius");
+
 
 /** \class SketchPlugin_ConstraintRadius
  *  \ingroup DataModel
@@ -23,7 +26,7 @@ class SketchPlugin_ConstraintRadius: public SketchPlugin_Constraint
 public:
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "SketchConstraintRadius"; return MY_KIND;}
+  {static std::string MY_KIND = SKETCH_CONSTRAINT_RADIUS_KIND; return MY_KIND;}
 
   /// \brief Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 

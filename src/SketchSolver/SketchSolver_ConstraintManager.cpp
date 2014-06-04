@@ -271,7 +271,7 @@ void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin
     anAttrList.push_back(CIRCLE_ATTR_RADIUS);
   }
   // Arc
-  else if (aFeatureKind.compare("SketchArc") == 0)
+  else if (aFeatureKind.compare(SKETCH_ARC_KIND) == 0)
   {
     anAttrList.push_back(ARC_ATTR_CENTER);
     anAttrList.push_back(ARC_ATTR_START);

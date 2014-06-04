@@ -49,10 +49,6 @@ const std::string CONSTRAINT_ATTRIBUTES[CONSTRAINT_ATTR_SIZE] =
 class SketchPlugin_Constraint: public SketchPlugin_Feature
 {
 public:
-  /// \brief Returns the kind of a feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
-  {static std::string MY_KIND = "SketchConstraint"; return MY_KIND;}
-
   /// \brief Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup()
   {static std::string MY_GROUP = SKETCH_KIND; return MY_GROUP;}

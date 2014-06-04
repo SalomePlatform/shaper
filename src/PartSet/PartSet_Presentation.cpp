@@ -15,6 +15,7 @@
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_ConstraintLength.h>
 
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_LengthDimension.hxx>
@@ -34,7 +35,7 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createPresentation(
 {
   Handle(AIS_InteractiveObject) anAIS;
 
-  if (theFeature->getKind() == "SketchConstraintLength")
+  if (theFeature->getKind() == SKETCH_CONSTRAINT_LENGTH_KIND)
     anAIS = createSketchConstraintLength(theFeature, theSketch, thePrevPrs);
   else {
     anAIS = createFeature(theFeature, theShape, thePrevPrs);

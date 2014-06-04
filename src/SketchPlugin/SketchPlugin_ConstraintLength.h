@@ -10,6 +10,8 @@
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
+/// Length constraint kind
+const std::string SKETCH_CONSTRAINT_LENGTH_KIND("SketchConstraintLength");
 
 /** \class SketchPlugin_ConstraintLength
  *  \ingroup DataModel
@@ -23,7 +25,7 @@ class SketchPlugin_ConstraintLength: public SketchPlugin_Constraint
 public:
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "SketchConstraintLength"; return MY_KIND;}
+  {static std::string MY_KIND = SKETCH_CONSTRAINT_LENGTH_KIND; return MY_KIND;}
 
   /// \brief Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
