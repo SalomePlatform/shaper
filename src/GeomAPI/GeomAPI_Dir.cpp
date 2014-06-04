@@ -41,3 +41,10 @@ double GeomAPI_Dir::dot(const boost::shared_ptr<GeomAPI_Dir>& theArg) const
 {
   return MY_DIR->Dot(theArg->impl<gp_Dir>());
 }
+
+const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_Dir::cross(const boost::shared_ptr<GeomAPI_Dir>& theArg) const
+{
+  gp_XYZ aResult = MY_DIR->XYZ().Crossed(theArg->impl<gp_Dir>().XYZ());
+  return boost::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(aResult.X(), aResult.Y(), aResult.Z()));
+}
+
