@@ -7,6 +7,8 @@
 #include "ModelAPI_Document.h"
 #include "ModelAPI_Data.h"
 #include "ModelAPI_AttributeDouble.h"
+#include <GeomAlgoAPI_PointBuilder.h>
+#include <GeomAPI_Pnt.h>
 
 using namespace std;
 
@@ -21,11 +23,10 @@ void ConstructionPlugin_Point::initAttributes()
   data()->addAttribute(POINT_ATTR_Z, ModelAPI_AttributeDouble::type());
 }
 
-// this is for debug only
-#include <iostream>
 void ConstructionPlugin_Point::execute() 
 {
-  // TODO: create a real shape for the point using OCC layer
-  cout<<"X="<<data()->real(POINT_ATTR_X)->value()<<" Y="<<data()->real(POINT_ATTR_Y)->value()
-      <<" Z="<<data()->real(POINT_ATTR_Z)->value()<<endl;
+  boost::shared_ptr<GeomAPI_Pnt> aPnt(new GeomAPI_Pnt(
+    data()->real(POINT_ATTR_X)->value(), data()->real(POINT_ATTR_Y)->value(), data()->real(POINT_ATTR_Z)->value()));
+
+  data()->store(GeomAlgoAPI_PointBuilder::point(aPnt));
 }

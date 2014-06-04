@@ -188,3 +188,34 @@ bool Model_Data::isValid()
 {
   return !myLab.IsNull() && myLab.HasAttribute();
 }
+
+#include <TNaming_Builder.hxx>
+#include <TNaming_NamedShape.hxx>
+#include <TopoDS_Shape.hxx>
+#include <GeomAPI_Shape.h>
+
+void Model_Data::store(const boost::shared_ptr<GeomAPI_Shape>& theShape)
+{
+  // the simplest way is to keep this attribute here, on Data
+  // TODO: add naming structure in separated document for shape storage
+  TNaming_Builder aBuilder(myLab);
+  if (!theShape) return; // bad shape
+  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+  if (aShape.IsNull()) return; // null shape inside
+
+  aBuilder.Generated(aShape);
+}
+
+boost::shared_ptr<GeomAPI_Shape> Model_Data::shape()
+{
+  Handle(TNaming_NamedShape) aName;
+  if (myLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
+    TopoDS_Shape aShape = aName->Get();
+    if (!aShape.IsNull()) {
+      boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
+      aRes->setImpl(new TopoDS_Shape(aShape));
+      return aRes;
+    }
+  }
+  return boost::shared_ptr<GeomAPI_Shape>();
+}

@@ -4,6 +4,8 @@
   #include "memory"
   #include "GeomAlgoAPI.h"
   #include "GeomAlgoAPI_FaceBuilder.h"
+  #include "GeomAlgoAPI_EdgeBuilder.h"
+  #include "GeomAlgoAPI_PointBuilder.h"
 %}
 
 // to avoid error on this
@@ -17,3 +19,5 @@
 
 // all supported interfaces
 %include "GeomAlgoAPI_FaceBuilder.h"
+%include "GeomAlgoAPI_EdgeBuilder.h"
+%include "GeomAlgoAPI_PointBuilder.h"

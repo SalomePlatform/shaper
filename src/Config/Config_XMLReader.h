@@ -8,7 +8,7 @@
 #ifndef CONFIG_XMLREADER_H_
 #define CONFIG_XMLREADER_H_
 
-#include <Config.h>
+#include <Config_def.h>
 
 #include <cstdarg>
 #include <string>

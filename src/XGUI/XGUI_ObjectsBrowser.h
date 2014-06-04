@@ -96,6 +96,8 @@ private slots:
   //! Called on Edit command request
   void onEditItem();
 
+  void onSelectionChanged();
+
 private:
   void closeDocNameEditing(bool toSave);
 

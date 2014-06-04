@@ -1,5 +1,4 @@
 INCLUDE(Common)
-INCLUDE(FindCAS)
 
 SET(PROJECT_HEADERS
     GeomData.h

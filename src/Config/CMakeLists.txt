@@ -4,7 +4,7 @@ INCLUDE(XMLProcessing)
 INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/src/Events) 
 
 SET(PROJECT_HEADERS
-  Config.h
+  Config_def.h
   Config_FeatureMessage.h
   Config_XMLReader.h
   Config_ModuleReader.h

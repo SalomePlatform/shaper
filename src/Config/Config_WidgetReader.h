@@ -8,7 +8,7 @@
 #ifndef CONFIG_WIDGETREADER_H_
 #define CONFIG_WIDGETREADER_H_
 
-#include <Config.h>
+#include <Config_def.h>
 #include <Config_XMLReader.h>
 
 #include <map>

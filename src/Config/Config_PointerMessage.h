@@ -8,7 +8,7 @@
 #ifndef PARTSET_MESSAGE_H_
 #define PARTSET_MESSAGE_H_
 
-#include <Config.h>
+#include <Config_def.h>
 #include <Events_Message.h>
 
 /*

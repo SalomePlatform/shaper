@@ -1,7 +1,7 @@
 #ifndef CONFIG_MESSAGE_H
 #define CONFIG_MESSAGE_H
 
-#include <Config.h>
+#include <Config_def.h>
 #include <Events_Message.h>
 
 #include <string>

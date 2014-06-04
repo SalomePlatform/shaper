@@ -20,6 +20,7 @@
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_PropertyPanel.h"
 #include "XGUI_ContextMenuMgr.h"
+#include "XGUI_ModuleConnector.h"
 
 #include <Model_Events.h>
 #include <ModelAPI_PluginManager.h>
@@ -91,6 +92,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           this, SLOT(onContextMenuCommand(const QString&, bool)));
 
   myViewerProxy = new XGUI_ViewerProxy(this);
+  
+  myModuleConnector = new XGUI_ModuleConnector(this);
 
   connect(myOperationMgr, SIGNAL(operationStarted()), SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationResumed()), SLOT(onOperationStarted()));
@@ -289,7 +292,7 @@ void XGUI_Workshop::onOperationStarted()
 
     showPropertyPanel();
 
-    ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aOperation);
+    ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aOperation, myModuleConnector);
     QWidget* aContent = myPropertyPanel->contentWidget();
     qDeleteAll(aContent->children());
     aFactory.createWidget(aContent);
