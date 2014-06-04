@@ -15,6 +15,7 @@
 #include <AIS_LocalContext.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
+#include <AIS_DimensionSelectionMode.hxx>
 
 #include <AIS_Shape.hxx>
 
@@ -64,13 +65,15 @@ std::list<XGUI_ViewerPrs> XGUI_Displayer::GetSelected(const int theShapeTypeToSk
   for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
     Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
     TopoDS_Shape aShape = aContext->SelectedShape();
+
     if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
       continue;
 
     boost::shared_ptr<ModelAPI_Feature> aFeature = GetFeature(anIO);
     if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
       continue;
-    aPresentations.push_back(XGUI_ViewerPrs(aFeature, aShape));
+    Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
+    aPresentations.push_back(XGUI_ViewerPrs(aFeature, aShape, anOwner));
     aPrsFeatures.insert(aFeature);
   }
   return aPresentations;
@@ -91,7 +94,7 @@ std::list<XGUI_ViewerPrs> XGUI_Displayer::GetHighlighted(const int theShapeTypeT
     boost::shared_ptr<ModelAPI_Feature> aFeature = GetFeature(anIO);
     if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
       continue;
-    aPresentations.push_back(XGUI_ViewerPrs(aFeature, aShape));
+    aPresentations.push_back(XGUI_ViewerPrs(aFeature, aShape, NULL));
     aPrsFeatures.insert(aFeature);
   }
 
@@ -118,7 +121,9 @@ void XGUI_Displayer::Erase(boost::shared_ptr<ModelAPI_Feature> theFeature,
 }
 
 bool XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                               const TopoDS_Shape& theShape, const bool isUpdateViewer)
+                               Handle(AIS_InteractiveObject) theAIS,
+                               const int theSelectionMode,
+                               const bool isUpdateViewer)
 {
   bool isCreated = false;
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -131,24 +136,19 @@ bool XGUI_Displayer::Redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
     //aContext->SetPixelTolerance(MOUSE_SENSITIVITY_IN_PIXEL);
   }
   // display or redisplay presentation
-  Handle(AIS_Shape) anAIS;
-  if (IsVisible(theFeature)) {
-    anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[theFeature]);
-    if (!anAIS.IsNull()) {
-      // if the AIS object is displayed in the opened local context in some mode, additional
-      // AIS sub objects are created there. They should be rebuild for correct selecting.
-      // It is possible to correct it by closing local context before the shape set and opening
-      // after. Another workaround to thrown down the selection and reselecting the AIS.
-      // If there was a problem here, try the first solution with close/open local context.
-      anAIS->Set(theShape);
-      anAIS->Redisplay(Standard_True);
-      aContext->RecomputeSelectionOnly(anAIS);
-    }
+  if (IsVisible(theFeature) && !myFeature2AISObjectMap[theFeature].IsNull()) {
+      aContext->RecomputeSelectionOnly(theAIS);
   }
   else {
-    anAIS = new AIS_Shape(theShape);
-    myFeature2AISObjectMap[theFeature] = anAIS;
-    aContext->Display(anAIS, false);
+    myFeature2AISObjectMap[theFeature] = theAIS;
+    if (theSelectionMode < 0)
+    {
+      aContext->Display(theAIS, false);
+    }
+    else
+    {
+      aContext->Display(theAIS, 0, theSelectionMode, false);
+    }
     isCreated = true;
   }
   if (isUpdateViewer)

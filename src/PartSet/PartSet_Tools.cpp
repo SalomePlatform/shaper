@@ -103,6 +103,29 @@ void PartSet_Tools::ConvertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelA
   theY = aVec.X() * anY->x() + aVec.Y() * anY->y() + aVec.Z() * anY->z();
 }
 
+void PartSet_Tools::ConvertTo3D(const double theX, const double theY,
+                                boost::shared_ptr<ModelAPI_Feature> theSketch,
+                                gp_Pnt& thePoint)
+{
+  if (!theSketch)
+    return;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
+
+  boost::shared_ptr<GeomDataAPI_Point> aC = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SKETCH_ATTR_ORIGIN));
+  boost::shared_ptr<GeomDataAPI_Dir> aX = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRX));
+  boost::shared_ptr<GeomDataAPI_Dir> aY = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRY));
+
+  boost::shared_ptr<GeomAPI_XYZ> aSum = aC->pnt()->xyz()->added(
+    aX->dir()->xyz()->multiplied(theX))->added(aY->dir()->xyz()->multiplied(theY));
+
+  boost::shared_ptr<GeomAPI_Pnt> aPoint = boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
+  thePoint = gp_Pnt(aPoint->x(), aPoint->y(), aPoint->z());
+}
+
 void PartSet_Tools::IntersectLines(double theX0, double theY0, double theX1, double theY1,
                                    double theX2, double theY2, double theX3, double theY3,
                                    double& theX, double& theY)

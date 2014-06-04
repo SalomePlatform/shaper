@@ -7,6 +7,7 @@
 #include <ModuleBase_OperationDescription.h>
 #include <PartSet_Listener.h>
 #include <PartSet_TestOCC.h>
+#include <PartSet_Presentation.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModelAPI_Object.h>
@@ -34,6 +35,7 @@
 #include <GeomAPI_Shape.h>
 
 #include <AIS_ListOfInteractive.hxx>
+#include <AIS_DimensionSelectionMode.hxx>
 
 #include <QObject>
 #include <QMouseEvent>
@@ -396,15 +398,16 @@ void PartSet_Module::visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFea
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   if (isDisplay) {
     boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview(theFeature);
-    bool isAISCreated = aDisplayer->Redisplay(theFeature, aPreview ?
-                                           aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), false);
-    if (isAISCreated) {
-      PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
-      if (aSketchOp) {
-        Handle(AIS_InteractiveObject) anAIS = aDisplayer->GetAISObject(theFeature);
-        aSketchOp->correctPresentation(anAIS);
-      }
+    Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
+                           theFeature, aPreviewOp->sketch(),
+                           aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
+                           aDisplayer->GetAISObject(theFeature));
+
+    int aSelectionMode = -1;
+    if (theFeature->getKind() == "SketchConstraintLength") {
+      aSelectionMode = AIS_DSM_Text;
     }
+    aDisplayer->Redisplay(theFeature, anAIS, aSelectionMode, false);
   }
   else
     aDisplayer->Erase(theFeature, false);
@@ -449,8 +452,12 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
   for (; anIt != aLast; anIt++) {
     boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).first;
     boost::shared_ptr<GeomAPI_Shape> aPreview = (*anIt).second;
-    aDisplayer->Redisplay(aFeature,
-                          aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), false);
+    Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
+                           aFeature, aPreviewOp->sketch(),
+                           aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
+                           aDisplayer->GetAISObject(aFeature));
+    if (!anAIS.IsNull())
+      aDisplayer->Redisplay(aFeature, anAIS, -1, false);
     aDisplayer->ActivateInLocalContext(aFeature, aModes, false);
   }
   aDisplayer->UpdateViewer();

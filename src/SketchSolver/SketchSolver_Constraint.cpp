@@ -94,7 +94,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
           theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
         );
       if (!anAttr) continue;
-      if (anAttr->isFeature())
+      if (anAttr->isFeature() && anAttr->feature())
       { // verify posiible entities
         const std::string& aKind = anAttr->feature()->getKind();
         if (aKind.compare("SketchPoint") == 0)
@@ -149,7 +149,8 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
           theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
         );
       if (!anAttr) continue;
-      if (anAttr->isFeature() && anAttr->feature()->getKind().compare("SketchLine") == 0)
+      if (anAttr->isFeature() && anAttr->feature() &&
+          anAttr->feature()->getKind().compare("SketchLine") == 0)
       {
         myAttributesList[aNbLines++] = CONSTRAINT_ATTRIBUTES[indAttr];
         break;

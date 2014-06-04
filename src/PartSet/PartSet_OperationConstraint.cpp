@@ -18,6 +18,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_AttributeDouble.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -91,13 +92,20 @@ void PartSet_OperationConstraint::mouseReleased(QMouseEvent* theEvent, Handle(V3
 
   bool isFoundPoint = false;
   gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(theEvent->pos(), theView);
+*/
   if (theSelected.empty()) {
-    PartSet_Tools::ConvertTo2D(aPoint, sketch(), theView, aX, anY);
-    isFoundPoint = true;
+    //PartSet_Tools::ConvertTo2D(aPoint, sketch(), theView, aX, anY);
+    //isFoundPoint = true;
   }
   else {
     XGUI_ViewerPrs aPrs = theSelected.front();
-    const TopoDS_Shape& aShape = aPrs.shape();
+    boost::shared_ptr<ModelAPI_Feature> aFeature = aPrs.feature();
+
+    setFeature(aFeature);
+    setValue(120);
+    flushUpdated();
+
+    /*const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull()) // the point is selected
     {
       if (aShape.ShapeType() == TopAbs_VERTEX) {
@@ -135,10 +143,10 @@ void PartSet_OperationConstraint::mouseReleased(QMouseEvent* theEvent, Handle(V3
           isFoundPoint = true;
         }
       }
-    }
+    }*/
   }
 
-  switch (myPointSelectionMode)
+  /*switch (myPointSelectionMode)
   {
     case SM_FirstPoint: {
       setLinePoint(feature(), aX, anY, LINE_ATTR_START);
@@ -157,8 +165,7 @@ void PartSet_OperationConstraint::mouseReleased(QMouseEvent* theEvent, Handle(V3
     break;
     default:
       break;
-  }
-*/
+  }*/
 }
 
 void PartSet_OperationConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
@@ -242,4 +249,26 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationConstraint::createFeature(c
   if (theFlushMessage)
     flushCreated();
   return aNewFeature;
+}
+
+void PartSet_OperationConstraint::setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
+{
+  if (!theFeature || theFeature->getKind() != "SketchLine")
+    return;
+
+  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+          boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
+  anAttr->setFeature(theFeature);
+}
+
+void PartSet_OperationConstraint::setValue(const double theValue)
+{
+  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+
+  boost::shared_ptr<ModelAPI_AttributeDouble> anAttr = 
+          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_VALUE));
+  anAttr->setValue(theValue);
+
 }
