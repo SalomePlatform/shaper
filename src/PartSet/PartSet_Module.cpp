@@ -230,6 +230,8 @@ void PartSet_Module::onLaunchOperation(std::string theName, boost::shared_ptr<Mo
     std::list<XGUI_ViewerPrs> aSelected = aDisplayer->GetSelected(TopAbs_VERTEX);
     std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->GetHighlighted(TopAbs_VERTEX);
     aPreviewOp->init(theFeature, aSelected, aHighlighted);
+  } else {
+    anOperation->setFeature(theFeature);
   }
   sendOperation(anOperation);
   myWorkshop->actionsMgr()->updateCheckState();
@@ -459,7 +461,7 @@ void PartSet_Module::editFeature(FeaturePtr theFeature)
   if (!theFeature)
     return;
 
-  if (theFeature->getKind() == "Sketch") {
+//  if (theFeature->getKind() == "Sketch") {
     FeaturePtr aFeature = theFeature;
     if (XGUI_Tools::isModelObject(aFeature)) {
       ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
@@ -470,5 +472,5 @@ void PartSet_Module::editFeature(FeaturePtr theFeature)
       onLaunchOperation(aFeature->getKind(), aFeature);
       updateCurrentPreview(aFeature->getKind());
     }
-  }
+//  }
 }

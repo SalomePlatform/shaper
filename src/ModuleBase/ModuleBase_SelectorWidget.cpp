@@ -6,6 +6,9 @@
 #include "ModuleBase_SelectorWidget.h"
 #include "ModuleBase_IWorkshop.h"
 
+#include <Events_Loop.h>
+#include <Model_Events.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_AttributeReference.h>
@@ -72,8 +75,11 @@ bool ModuleBase_SelectorWidget::storeValue(FeaturePtr theFeature)
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(myFeatureAttributeID));
 
-  aRef->setFeature(mySelectedFeature);
+  bool isBlocked = this->blockSignals(true);
+  aRef->setValue(mySelectedFeature);
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
 
+  this->blockSignals(isBlocked);
   return true;
 }
 
@@ -84,8 +90,11 @@ bool ModuleBase_SelectorWidget::restoreValue(FeaturePtr theFeature)
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(myFeatureAttributeID));
 
+  bool isBlocked = this->blockSignals(true);
   mySelectedFeature = aRef->value();
   updateSelectionName(); 
+
+  this->blockSignals(isBlocked);
   return true;
 }
 
@@ -122,6 +131,9 @@ void ModuleBase_SelectorWidget::onSelectionChanged()
       return;
 
     // TODO: Check that the selection corresponds to selection type
+    if (aFeature->getKind().compare("Sketch") != 0)
+      return;
+
     mySelectedFeature = aFeature;
     if (mySelectedFeature) {
       updateSelectionName();

@@ -9,7 +9,7 @@
 #include <ModelAPI_Feature.h>
 
 /// attribute name of referenced face
-const std::string EXTRUSION_FACE = "extrusion_select_face";
+const std::string EXTRUSION_FACE = "extrusion_face";
 
 /// attribute name of extrusion size
 const std::string EXTRUSION_SIZE = "extrusion_size";

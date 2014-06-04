@@ -80,7 +80,8 @@ void ModuleBase_Operation::storeCustomValue()
 
 void ModuleBase_Operation::startOperation()
 {
-  setFeature(createFeature());
+  if (!myFeature)
+    setFeature(createFeature());
   //emit callSlot();
   //commit();
 }

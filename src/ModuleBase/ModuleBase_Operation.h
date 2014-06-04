@@ -70,6 +70,9 @@ public:
 
   virtual void keyReleased(std::string theName, QKeyEvent* theEvent) {};
 
+  /// Sets the operation feature
+  void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
+
 protected:
   /// Virtual method called when operation started (see start() method for more description)
   /// Default impl calls corresponding slot and commits immediately.
@@ -92,10 +95,6 @@ protected:
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
   virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
-
-  /// Returns the operation feature
-  /// \return the feature
-  void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
 
 private:
   boost::shared_ptr<ModelAPI_Feature> myFeature; /// the operation feature to be handled
