@@ -44,13 +44,13 @@ public:
   /// \param theFeature the feature instance to be displayed
   /// \param isDisplay the state whether the presentation should be displayed or erased
   /// \param isUpdateViewer the flag whether the viewer should be updated
-  void visualizePreview(boost::shared_ptr<ModelAPI_Feature> theFeature, bool isDisplay,
+  void visualizePreview(FeaturePtr theFeature, bool isDisplay,
                         const bool isUpdateViewer = true);
 
   /// Activates the feature in the displayer
   /// \param theFeature the feature instance to be displayed
   /// \param isUpdateViewer the flag whether the viewer should be updated
-  void activateFeature(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  void activateFeature(FeaturePtr theFeature,
                        const bool isUpdateViewer);
 
   /// Updates current operation preview, if it has it.
@@ -92,7 +92,7 @@ public slots:
   /// SLOT, to fit all current viewer
   void onFitAllView();
 
-  void onLaunchOperation(std::string theName, boost::shared_ptr<ModelAPI_Feature> theFeature);
+  void onLaunchOperation(std::string theName, FeaturePtr theFeature);
 
   /// SLOT, to switch on/off the multi selection in the viewer
   /// \param theEnabled the enabled state
@@ -113,7 +113,7 @@ public slots:
   /// SLOT, to visualize the feature in another local context mode
   /// \param theFeature the feature to be put in another local context mode
   /// \param theMode the mode appeared on the feature
-  void onFeatureConstructed(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  void onFeatureConstructed(FeaturePtr theFeature,
                             int theMode);
 protected:
   /// Creates a new operation

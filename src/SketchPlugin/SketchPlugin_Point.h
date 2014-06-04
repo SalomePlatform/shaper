@@ -43,7 +43,7 @@ public:
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
   SKETCHPLUGIN_EXPORT virtual const void addSub(
-    const boost::shared_ptr<ModelAPI_Feature>& theFeature) {};
+    const FeaturePtr& theFeature) {};
 
   /// Use plugin manager for features creation
   SketchPlugin_Point();

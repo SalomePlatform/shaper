@@ -319,9 +319,9 @@ void Model_Document::redo()
     subDocument(*aSubIter)->redo();
 }
 
-boost::shared_ptr<ModelAPI_Feature> Model_Document::addFeature(string theID)
+FeaturePtr Model_Document::addFeature(string theID)
 {
-  boost::shared_ptr<ModelAPI_Feature> aFeature = 
+  FeaturePtr aFeature = 
     ModelAPI_PluginManager::get()->createFeature(theID);
   if (aFeature) {
     boost::dynamic_pointer_cast<Model_Document>(aFeature->documentToAdd())->addFeature(aFeature);
@@ -348,7 +348,7 @@ static void AddToRefArray(TDF_Label& theArrayLab, TDF_Label& theReferenced) {
   }
 }
 
-void Model_Document::addFeature(const boost::shared_ptr<ModelAPI_Feature> theFeature)
+void Model_Document::addFeature(const FeaturePtr theFeature)
 {
   if (theFeature->isAction()) return; // do not add action to the data model
 
@@ -421,7 +421,7 @@ static int RemoveFromRefArray(
   return aResult;
 }
 
-void Model_Document::removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void Model_Document::removeFeature(FeaturePtr theFeature)
 {
   boost::shared_ptr<Model_Data> aData = boost::static_pointer_cast<Model_Data>(theFeature->data());
   TDF_Label aFeatureLabel = aData->label();
@@ -430,7 +430,7 @@ void Model_Document::removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeatur
   int aRemovedIndex = RemoveFromRefArray(aGroupLabel, aFeatureLabel);
   RemoveFromRefArray(aGroupLabel.FindChild(1), TDF_Label(), aRemovedIndex);
   // remove feature from the myFeatures list
-  std::vector<boost::shared_ptr<ModelAPI_Feature> >::iterator aFIter = myFeatures.begin();
+  std::vector<FeaturePtr >::iterator aFIter = myFeatures.begin();
   while(aFIter != myFeatures.end()) {
     if (*aFIter == theFeature) {
       aFIter = myFeatures.erase(aFIter);
@@ -448,17 +448,17 @@ void Model_Document::removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeatur
   Events_Loop::loop()->send(aMsg);
 }
 
-boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(TDF_Label& theLabel)
+FeaturePtr Model_Document::feature(TDF_Label& theLabel)
 {
   // iterate all features, may be optimized later by keeping labels-map
-  vector<boost::shared_ptr<ModelAPI_Feature> >::iterator aFIter = myFeatures.begin();
+  vector<FeaturePtr >::iterator aFIter = myFeatures.begin();
   for(; aFIter != myFeatures.end(); aFIter++) {
     boost::shared_ptr<Model_Data> aData = 
       boost::dynamic_pointer_cast<Model_Data>((*aFIter)->data());
     if (aData->label().IsEqual(theLabel))
       return *aFIter;
   }
-  return boost::shared_ptr<ModelAPI_Feature>(); // not found
+  return FeaturePtr(); // not found
 }
 
 boost::shared_ptr<ModelAPI_Document> Model_Document::subDocument(string theDocID)
@@ -469,7 +469,7 @@ boost::shared_ptr<ModelAPI_Document> Model_Document::subDocument(string theDocID
   return Model_Application::getApplication()->getDocument(theDocID);
 }
 
-boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
+FeaturePtr Model_Document::feature(
   const string& theGroupID, const int theIndex, const bool isOperation)
 {
   TDF_Label aGroupLab = groupLabel(theGroupID);
@@ -477,7 +477,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
   if (aGroupLab.FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
     if (aRefs->Lower() <= theIndex && aRefs->Upper() >= theIndex) {
       TDF_Label aFeatureLab = aRefs->Value(theIndex);
-      boost::shared_ptr<ModelAPI_Feature> aFeature = feature(aFeatureLab);
+      FeaturePtr aFeature = feature(aFeatureLab);
 
       if (theGroupID == FEATURES_GROUP || isOperation) { // just returns the feature from the history
         return aFeature;
@@ -492,7 +492,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
   }
 
   // not found
-  return boost::shared_ptr<ModelAPI_Feature>();
+  return FeaturePtr();
 }
 
 int Model_Document::size(const string& theGroupID) 
@@ -534,7 +534,7 @@ TDF_Label Model_Document::groupLabel(const string theGroup)
   return aNew;
 }
 
-void Model_Document::setUniqueName(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void Model_Document::setUniqueName(FeaturePtr theFeature)
 {
   string aName; // result
   // iterate all features but also iterate group of this feature if object is not in history
@@ -571,8 +571,8 @@ void Model_Document::setUniqueName(boost::shared_ptr<ModelAPI_Feature> theFeatur
 }
 
 //! Returns the object by the feature
-boost::shared_ptr<ModelAPI_Feature> Model_Document::objectByFeature(
-  const boost::shared_ptr<ModelAPI_Feature> theFeature)
+FeaturePtr Model_Document::objectByFeature(
+  const FeaturePtr theFeature)
 {
   for(int a = 0; a < size(theFeature->getGroup()); a++) {
     boost::shared_ptr<Model_Object> anObj = 
@@ -581,14 +581,14 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::objectByFeature(
       return anObj;
     }
   }
-  return boost::shared_ptr<ModelAPI_Feature>(); // not found
+  return FeaturePtr(); // not found
 }
 
 void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
 {
   boost::shared_ptr<ModelAPI_Document> aThis = Model_Application::getApplication()->getDocument(myID);
   // update features
-  vector<boost::shared_ptr<ModelAPI_Feature> >::iterator aFIter = myFeatures.begin();
+  vector<FeaturePtr >::iterator aFIter = myFeatures.begin();
   // and in parallel iterate labels of features
   TDF_ChildIDIterator aFLabIter(groupLabel(FEATURES_GROUP), TDataStd_Comment::GetID());
   while(aFIter != myFeatures.end() || aFLabIter.More()) {
@@ -614,7 +614,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       Events_Loop::loop()->send(aMsg2);
     } else if (aDSTag < aFeatureTag) { // a new feature is inserted
       // create a feature
-      boost::shared_ptr<ModelAPI_Feature> aFeature = ModelAPI_PluginManager::get()->createFeature(
+      FeaturePtr aFeature = ModelAPI_PluginManager::get()->createFeature(
         TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(
         aFLabIter.Value())->Get()).ToCString());
 
@@ -637,7 +637,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);
       Model_FeatureUpdatedMessage aMsg1(aFeature, anEvent);
       Events_Loop::loop()->send(aMsg1);
-      boost::shared_ptr<ModelAPI_Feature> anObj = objectByFeature(aFeature);
+      FeaturePtr anObj = objectByFeature(aFeature);
       if (anObj) {
         Model_FeatureUpdatedMessage aMsg2(anObj, anEvent);
         Events_Loop::loop()->send(aMsg2);

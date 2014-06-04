@@ -57,7 +57,7 @@ public:
    *  \param theFeature sub-feature
    */
   SKETCHPLUGIN_EXPORT virtual const void addSub(
-    const boost::shared_ptr<ModelAPI_Feature>& theFeature) {}
+    const FeaturePtr& theFeature) {}
 
 protected:
   /// \brief Use plugin manager for features creation

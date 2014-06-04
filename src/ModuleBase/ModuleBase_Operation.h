@@ -12,12 +12,13 @@
 #include <ModuleBase.h>
 #include <ModuleBase_IOperation.h>
 
+#include "ModelAPI_Feature.h"
+
 #include <QObject>
 #include <QString>
 
 #include <boost/shared_ptr.hpp>
 
-class ModelAPI_Feature;
 class ModelAPI_Document;
 
 class QKeyEvent;
@@ -54,7 +55,7 @@ public:
   QString id() const;
   /// Returns the operation feature
   /// \return the feature
-  boost::shared_ptr<ModelAPI_Feature> feature() const;
+  FeaturePtr feature() const;
 
   /// Returns whether the nested operations are enabled.
   /// The state can depend on the operation current state.
@@ -71,7 +72,7 @@ public:
   virtual void keyReleased(std::string theName, QKeyEvent* theEvent) {};
 
   /// Sets the operation feature
-  void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  void setFeature(FeaturePtr theFeature);
 
 protected:
   /// Virtual method called when operation started (see start() method for more description)
@@ -94,10 +95,10 @@ protected:
   /// Creates an operation new feature
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
+  virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
 private:
-  boost::shared_ptr<ModelAPI_Feature> myFeature; /// the operation feature to be handled
+  FeaturePtr myFeature; /// the operation feature to be handled
 };
 
 #endif

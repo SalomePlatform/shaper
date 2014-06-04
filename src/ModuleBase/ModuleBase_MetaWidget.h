@@ -23,9 +23,9 @@ public:
   MODULEBASE_EXPORT ModuleBase_MetaWidget(QWidget* theWrapped);
   virtual ~ModuleBase_MetaWidget();
   //! Interface for saving widget's data into the data model
-  MODULEBASE_EXPORT virtual bool storeValue(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  MODULEBASE_EXPORT virtual bool storeValue(FeaturePtr theFeature);
   //! Interface for loading widget's data from the data model
-  MODULEBASE_EXPORT virtual bool restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  MODULEBASE_EXPORT virtual bool restoreValue(FeaturePtr theFeature);
 
   /// Set focus to the current widget if it corresponds to the given attribute
   /// \param theAttribute name

@@ -35,7 +35,7 @@ public:
   /// \param theParent the operation parent
   /// \param theFeature the parent feature
   PartSet_OperationSketchLine(const QString& theId, QObject* theParent,
-                              boost::shared_ptr<ModelAPI_Feature> theSketchFeature);
+                              FeaturePtr theSketchFeature);
   /// Destructor
   virtual ~PartSet_OperationSketchLine();
 
@@ -51,18 +51,18 @@ public:
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
+  virtual std::list<int> getSelectionModes(FeaturePtr theFeature) const;
 
   /// Initializes some fields accorging to the feature
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  virtual void init(FeaturePtr theFeature,
                     const std::list<XGUI_ViewerPrs>& theSelected,
                     const std::list<XGUI_ViewerPrs>& theHighlighted);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
-  virtual boost::shared_ptr<ModelAPI_Feature> sketch() const;
+  virtual FeaturePtr sketch() const;
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theEvent the mouse event
@@ -87,7 +87,7 @@ public:
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
   /// \param theAttribute the start or end attribute of the line
-  static void setLinePoint(boost::shared_ptr<ModelAPI_Feature>, double theX, double theY,
+  static void setLinePoint(FeaturePtr, double theX, double theY,
                            const std::string& theAttribute);
 
 protected:
@@ -112,7 +112,7 @@ protected:
   /// the sketch feature
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
+  virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
   /// Creates a constraint on two points
   /// \param thePoint1 the first point
@@ -131,13 +131,13 @@ protected:
   /// \param theAttribute the start or end attribute of the line
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
-  void getLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature, const std::string& theAttribute,
+  void getLinePoint(FeaturePtr theFeature, const std::string& theAttribute,
                     double& theX, double& theY);
   /// Find a point in the line with given coordinates
   /// \param theFeature the line feature
   /// \param theX the horizontal point coordinate
   /// \param theY the vertical point coordinate
-  boost::shared_ptr<GeomDataAPI_Point2D> findLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  boost::shared_ptr<GeomDataAPI_Point2D> findLinePoint(FeaturePtr theFeature,
                                                        double theX, double theY);
 
   /// \brief Save the point to the line.
@@ -155,7 +155,7 @@ protected:
   void setPointSelectionMode(const PointSelectionMode& theMode, const bool isToEmitSignal = true);
 
 private:
-  boost::shared_ptr<ModelAPI_Feature> mySketch; ///< the sketch feature
+  FeaturePtr mySketch; ///< the sketch feature
   boost::shared_ptr<GeomDataAPI_Point2D> myInitPoint; ///< the first line point
   PointSelectionMode myPointSelectionMode; ///< point selection mode
 };

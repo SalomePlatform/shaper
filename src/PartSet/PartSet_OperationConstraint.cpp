@@ -45,7 +45,7 @@ using namespace std;
 
 PartSet_OperationConstraint::PartSet_OperationConstraint(const QString& theId,
 	                                          QObject* theParent,
-                                              boost::shared_ptr<ModelAPI_Feature> theFeature)
+                                              FeaturePtr theFeature)
 : PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature)
 {
 }
@@ -59,7 +59,7 @@ bool PartSet_OperationConstraint::isGranted(ModuleBase_IOperation* theOperation)
   return theOperation->getDescription()->operationId().toStdString() == PartSet_OperationSketch::Type();
 }
 
-void PartSet_OperationConstraint::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+void PartSet_OperationConstraint::init(FeaturePtr theFeature,
                                        const std::list<XGUI_ViewerPrs>& /*theSelected*/,
                                        const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
@@ -70,7 +70,7 @@ void PartSet_OperationConstraint::init(boost::shared_ptr<ModelAPI_Feature> theFe
   //myInitPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationConstraint::sketch() const
+FeaturePtr PartSet_OperationConstraint::sketch() const
 {
   return mySketch;
 }
@@ -99,7 +99,7 @@ void PartSet_OperationConstraint::mouseReleased(QMouseEvent* theEvent, Handle(V3
   }
   else {
     XGUI_ViewerPrs aPrs = theSelected.front();
-    boost::shared_ptr<ModelAPI_Feature> aFeature = aPrs.feature();
+    FeaturePtr aFeature = aPrs.feature();
 
     setFeature(aFeature);
     setValue(120);
@@ -120,7 +120,7 @@ void PartSet_OperationConstraint::mouseReleased(QMouseEvent* theEvent, Handle(V3
       }
       else if (aShape.ShapeType() == TopAbs_EDGE) // the line is selected
       {
-        boost::shared_ptr<ModelAPI_Feature> aFeature = aPrs.feature();
+        FeaturePtr aFeature = aPrs.feature();
         if (aFeature) {
           double X0, X1, X2, X3;
           double Y0, Y1, Y2, Y3;
@@ -226,9 +226,9 @@ void PartSet_OperationConstraint::afterCommitOperation()
   emit featureConstructed(feature(), FM_Deactivation);
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationConstraint::createFeature(const bool theFlushMessage)
+FeaturePtr PartSet_OperationConstraint::createFeature(const bool theFlushMessage)
 {
-  boost::shared_ptr<ModelAPI_Feature> aNewFeature = ModuleBase_Operation::createFeature(false);
+  FeaturePtr aNewFeature = ModuleBase_Operation::createFeature(false);
   if (sketch()) {
     boost::shared_ptr<SketchPlugin_Feature> aFeature = 
                            boost::dynamic_pointer_cast<SketchPlugin_Feature>(sketch());
@@ -251,7 +251,7 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationConstraint::createFeature(c
   return aNewFeature;
 }
 
-void PartSet_OperationConstraint::setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void PartSet_OperationConstraint::setFeature(FeaturePtr theFeature)
 {
   if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
     return;

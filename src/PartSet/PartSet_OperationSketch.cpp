@@ -45,7 +45,7 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 {
 }
 
-std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
+std::list<int> PartSet_OperationSketch::getSelectionModes(FeaturePtr theFeature) const
 {
   std::list<int> aModes;
   if (!hasSketchPlane())
@@ -56,14 +56,14 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<Mode
   return aModes;
 }
 
-void PartSet_OperationSketch::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+void PartSet_OperationSketch::init(FeaturePtr theFeature,
                                    const std::list<XGUI_ViewerPrs>& /*theSelected*/,
                                    const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
   setFeature(theFeature);
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketch::sketch() const
+FeaturePtr PartSet_OperationSketch::sketch() const
 {
   return feature();
 }
@@ -88,7 +88,7 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
       return;
 
     if (theHighlighted.size() == 1) {
-      boost::shared_ptr<ModelAPI_Feature> aFeature = theHighlighted.front().feature();
+      FeaturePtr aFeature = theHighlighted.front().feature();
       if (aFeature)
         restartOperation(PartSet_OperationEditLine::Type(), aFeature);
     }
@@ -136,17 +136,17 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View)
     return;
 
   if (myFeatures.size() != 1) {
-    boost::shared_ptr<ModelAPI_Feature> aFeature = PartSet_Tools::nearestFeature(theEvent->pos(),
+    FeaturePtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(),
                                                                 theView, feature(), myFeatures);
     if (aFeature)
       restartOperation(PartSet_OperationEditLine::Type(), aFeature);
   }
 }
 
-std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
+std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >
                                                         PartSet_OperationSketch::subPreview() const
 {
-  std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> > aPreviewMap;
+  std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> > aPreviewMap;
 
   boost::shared_ptr<SketchPlugin_Feature> aFeature;
 
@@ -156,8 +156,8 @@ std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SKETCH_ATTR_FEATURES));
 
-  std::list<boost::shared_ptr<ModelAPI_Feature> > aFeatures = aRefList->list();
-  std::list<boost::shared_ptr<ModelAPI_Feature> >::const_iterator anIt = aFeatures.begin(),
+  std::list<FeaturePtr > aFeatures = aRefList->list();
+  std::list<FeaturePtr >::const_iterator anIt = aFeatures.begin(),
                                                                   aLast = aFeatures.end();
   for (; anIt != aLast; anIt++) {
     aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);

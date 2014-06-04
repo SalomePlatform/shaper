@@ -31,7 +31,7 @@ public:
   /// \param theParent the operation parent
   /// \param theFeature the parent feature
   PartSet_OperationConstraint(const QString& theId, QObject* theParent,
-                              boost::shared_ptr<ModelAPI_Feature> theSketchFeature);
+                              FeaturePtr theSketchFeature);
   /// Destructor
   virtual ~PartSet_OperationConstraint();
 
@@ -43,13 +43,13 @@ public:
   /// Initializes some fields accorging to the feature
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  virtual void init(FeaturePtr theFeature,
                     const std::list<XGUI_ViewerPrs>& theSelected,
                     const std::list<XGUI_ViewerPrs>& theHighlighted);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
-  virtual boost::shared_ptr<ModelAPI_Feature> sketch() const;
+  virtual FeaturePtr sketch() const;
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theEvent the mouse event
@@ -86,18 +86,18 @@ protected:
   /// the sketch feature
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
+  virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
   /// Set the feature for the constraint
   /// \param theFeature the line feature
-  void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  void setFeature(FeaturePtr theFeature);
 
   /// Set the value for the constraint
   /// \param theValue the constraint value
   void setValue(const double theValue);
 
 private:
-  boost::shared_ptr<ModelAPI_Feature> mySketch; ///< the sketch feature
+  FeaturePtr mySketch; ///< the sketch feature
 };
 
 #endif

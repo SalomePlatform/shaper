@@ -33,10 +33,10 @@ public:
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attr();
 
   /// Defines the reference to the feature
-  MODEL_EXPORT virtual void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  MODEL_EXPORT virtual void setFeature(FeaturePtr theFeature);
 
   /// Returns feature referenced from this attribute
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> feature();
+  MODEL_EXPORT virtual FeaturePtr feature();
 
 protected:
   /// Objects are created for features automatically

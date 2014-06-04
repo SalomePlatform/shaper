@@ -10,7 +10,7 @@ XGUI_ViewerPrs::XGUI_ViewerPrs()
 {
 }
 
-XGUI_ViewerPrs::XGUI_ViewerPrs(boost::shared_ptr<ModelAPI_Feature> theFeature,
+XGUI_ViewerPrs::XGUI_ViewerPrs(FeaturePtr theFeature,
                                const TopoDS_Shape& theShape,
                                Handle(SelectMgr_EntityOwner) theOwner)
 : myFeature(theFeature), myShape(theShape), myOwner(theOwner)
@@ -21,12 +21,12 @@ XGUI_ViewerPrs::~XGUI_ViewerPrs()
 {
 }
 
-void XGUI_ViewerPrs::setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void XGUI_ViewerPrs::setFeature(FeaturePtr theFeature)
 {
   myFeature = theFeature;
 }
 
-boost::shared_ptr<ModelAPI_Feature> XGUI_ViewerPrs::feature() const
+FeaturePtr XGUI_ViewerPrs::feature() const
 {
   return myFeature;
 }

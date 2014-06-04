@@ -7,6 +7,8 @@
 
 #include "Model.h"
 #include "ModelAPI_AttributeRefList.h"
+#include "ModelAPI_Feature.h"
+
 #include <TDataStd_ReferenceList.hxx>
 
 /**\class Model_AttributeRefList
@@ -19,16 +21,16 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
   Handle_TDataStd_ReferenceList myRef; ///< references to the features labels
 public:
   /// Appends the feature to the end of a list
-  MODEL_EXPORT virtual void append(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  MODEL_EXPORT virtual void append(FeaturePtr theFeature);
 
   /// Erases the first meet of the feature in the list
-  MODEL_EXPORT virtual void remove(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  MODEL_EXPORT virtual void remove(FeaturePtr theFeature);
 
   /// Returns number of features in the list
   MODEL_EXPORT virtual int size();
 
   /// Returns the list of features
-  MODEL_EXPORT virtual std::list<boost::shared_ptr<ModelAPI_Feature> > list();
+  MODEL_EXPORT virtual std::list<FeaturePtr > list();
 
 protected:
   /// Objects are created for features automatically

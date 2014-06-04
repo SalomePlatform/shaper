@@ -30,7 +30,7 @@ public:
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
 public slots:
-  void updateContentWidget(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  void updateContentWidget(FeaturePtr theFeature);
   /// slot to set the focus to the widget visualized an attribute with the given name
   /// \param theAttributteName
   void onFocusActivated(const std::string& theAttributeName);

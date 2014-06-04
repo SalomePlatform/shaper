@@ -28,8 +28,8 @@ const Quantity_NameOfColor SKETCH_PLANE_COLOR = Quantity_NOC_CHOCOLATE; /// the 
 const int SKETCH_WIDTH = 4; /// the plane edge width
 
 Handle(AIS_InteractiveObject) PartSet_Presentation::createPresentation(
-                                         boost::shared_ptr<ModelAPI_Feature> theFeature,
-                                         boost::shared_ptr<ModelAPI_Feature> theSketch,
+                                         FeaturePtr theFeature,
+                                         FeaturePtr theSketch,
                                          const TopoDS_Shape& theShape,
                                          Handle_AIS_InteractiveObject thePrevPrs)
 {
@@ -52,7 +52,7 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createPresentation(
 }
 
 Handle(AIS_InteractiveObject) PartSet_Presentation::createFeature(
-                                              boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                              FeaturePtr theFeature,
                                               const TopoDS_Shape& theShape,
                                               Handle_AIS_InteractiveObject thePrevPrs)
 {
@@ -78,8 +78,8 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createFeature(
 }
 
 Handle(AIS_InteractiveObject) PartSet_Presentation::createSketchConstraintLength(
-                                         boost::shared_ptr<ModelAPI_Feature> theFeature,
-                                         boost::shared_ptr<ModelAPI_Feature> theSketch,
+                                         FeaturePtr theFeature,
+                                         FeaturePtr theSketch,
                                          Handle(AIS_InteractiveObject) thePrevPrs)
 {
   if (!theFeature || !theSketch)
@@ -97,7 +97,7 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createSketchConstraintLength
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
   if (!anAttr)
     return thePrevPrs;
-  boost::shared_ptr<ModelAPI_Feature> aFeature = anAttr->feature();
+  FeaturePtr aFeature = anAttr->feature();
   if (!aFeature || aFeature->getKind() != SKETCH_LINE_KIND)
     return thePrevPrs;
 

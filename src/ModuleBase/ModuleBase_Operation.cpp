@@ -37,7 +37,7 @@ QString ModuleBase_Operation::id() const
   return getDescription()->operationId();
 }
 
-boost::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::feature() const
+FeaturePtr ModuleBase_Operation::feature() const
 {
   return myFeature;
 }
@@ -113,10 +113,10 @@ void ModuleBase_Operation::flushCreated()
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_CREATED));
 }
 
-boost::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::createFeature(const bool theFlushMessage)
+FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
 {
   boost::shared_ptr<ModelAPI_Document> aDoc = document();
-  boost::shared_ptr<ModelAPI_Feature> aFeature = aDoc->addFeature(
+  FeaturePtr aFeature = aDoc->addFeature(
                                            getDescription()->operationId().toStdString());
   if (aFeature) // TODO: generate an error if feature was not created
     aFeature->execute();
@@ -126,7 +126,7 @@ boost::shared_ptr<ModelAPI_Feature> ModuleBase_Operation::createFeature(const bo
   return aFeature;
 }
 
-void ModuleBase_Operation::setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void ModuleBase_Operation::setFeature(FeaturePtr theFeature)
 {
   myFeature = theFeature;
 }

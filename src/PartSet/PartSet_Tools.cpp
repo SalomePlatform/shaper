@@ -57,7 +57,7 @@ gp_Pnt PartSet_Tools::convertClickToPoint(QPoint thePoint, Handle(V3d_View) theV
   return ResultPoint;
 }
 
-void PartSet_Tools::convertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelAPI_Feature> theSketch,
+void PartSet_Tools::convertTo2D(const gp_Pnt& thePoint, FeaturePtr theSketch,
                                 Handle(V3d_View) theView, double& theX, double& theY)
 {
   if (!theSketch)
@@ -104,7 +104,7 @@ void PartSet_Tools::convertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelA
 }
 
 void PartSet_Tools::convertTo3D(const double theX, const double theY,
-                                boost::shared_ptr<ModelAPI_Feature> theSketch,
+                                FeaturePtr theSketch,
                                 gp_Pnt& thePoint)
 {
   if (!theSketch)
@@ -167,19 +167,19 @@ void PartSet_Tools::projectPointOnLine(double theX1, double theY1, double theX2,
   }
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_Tools::nearestFeature(QPoint thePoint,
+FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint,
                                                    Handle_V3d_View theView,
-                                                   boost::shared_ptr<ModelAPI_Feature> theSketch,
+                                                   FeaturePtr theSketch,
                                                    const std::list<XGUI_ViewerPrs>& theFeatures)
 {
   double aX, anY;
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(thePoint, theView);
   PartSet_Tools::convertTo2D(aPoint, theSketch, theView, aX, anY);
 
-  boost::shared_ptr<ModelAPI_Feature> aFeature;
+  FeaturePtr aFeature;
   std::list<XGUI_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
 
-  boost::shared_ptr<ModelAPI_Feature> aDeltaFeature;   
+  FeaturePtr aDeltaFeature;   
   double aMinDelta = -1;
   XGUI_ViewerPrs aPrs;
   for (; anIt != aLast; anIt++) {
@@ -195,7 +195,7 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_Tools::nearestFeature(QPoint thePoin
   return aDeltaFeature;
 }
 
-double PartSet_Tools::distanceToPoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+double PartSet_Tools::distanceToPoint(FeaturePtr theFeature,
                                       double theX, double theY)
 {
   double aDelta = 0;

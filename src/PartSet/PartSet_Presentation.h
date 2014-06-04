@@ -9,9 +9,10 @@
 
 #include <TopoDS_Shape.hxx>
 
+#include <ModelAPI_Feature.h>
+
 #include <boost/shared_ptr.hpp>
 
-class ModelAPI_Feature;
 class Handle_AIS_InteractiveObject;
 
 /*!
@@ -25,19 +26,19 @@ public:
   /// \param theFeature a feature
   /// \return the presentation
   static Handle_AIS_InteractiveObject createPresentation(
-                                              boost::shared_ptr<ModelAPI_Feature> theFeature,
-                                              boost::shared_ptr<ModelAPI_Feature> theSketch,
+                                              FeaturePtr theFeature,
+                                              FeaturePtr theSketch,
                                               const TopoDS_Shape& theShape,
                                               Handle_AIS_InteractiveObject thePrevPrs);
 protected:
   static Handle_AIS_InteractiveObject createFeature(
-                                              boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                              FeaturePtr theFeature,
                                               const TopoDS_Shape& theShape,
                                               Handle_AIS_InteractiveObject thePrevPrs);
 
   static Handle_AIS_InteractiveObject createSketchConstraintLength(
-                                              boost::shared_ptr<ModelAPI_Feature> theFeature,
-                                              boost::shared_ptr<ModelAPI_Feature> theSketch,
+                                              FeaturePtr theFeature,
+                                              FeaturePtr theSketch,
                                               Handle_AIS_InteractiveObject thePrevPrs);
 };
 

@@ -7,12 +7,12 @@
 
 #include "Model.h"
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Feature.h>
 #include <TDF_Label.hxx>
 
 #include <map>
 
 class ModelAPI_Attribute;
-class ModelAPI_Feature;
 
 /**\class Model_Data
  * \ingroup DataModel
@@ -27,7 +27,7 @@ class Model_Data: public ModelAPI_Data
   std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> > myAttrs;
 
   /// needed here to emit signal that feature changed on change of the attribute
-  boost::shared_ptr<ModelAPI_Feature> myFeature;
+  FeaturePtr myFeature;
 
   Model_Data();
 
@@ -83,7 +83,7 @@ public:
   MODEL_EXPORT void setLabel(TDF_Label& theLab);
 
   /// Sets the feature of this data
-  MODEL_EXPORT virtual void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
+  MODEL_EXPORT virtual void setFeature(FeaturePtr theFeature)
     {myFeature = theFeature;}
 };
 

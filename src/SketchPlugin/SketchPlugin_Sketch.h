@@ -51,7 +51,7 @@ public:
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
   SKETCHPLUGIN_EXPORT virtual const void addSub(
-    const boost::shared_ptr<ModelAPI_Feature>& theFeature);
+    const FeaturePtr& theFeature);
 
   /// Converts a 2D sketch space point into point in 3D space
   SKETCHPLUGIN_EXPORT boost::shared_ptr<GeomAPI_Pnt> to3D(

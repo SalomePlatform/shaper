@@ -8,12 +8,13 @@
 
 #include "SketchPlugin.h"
 #include "ModelAPI_Plugin.h"
+#include "ModelAPI_Feature.h"
 
 class SKETCHPLUGIN_EXPORT SketchPlugin_Plugin: public ModelAPI_Plugin
 {
 public:
   /// Creates the feature object of this plugin by the feature string ID
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
+  virtual FeaturePtr createFeature(std::string theFeatureID);
 
 public:
   /// Is needed for python wrapping by swig

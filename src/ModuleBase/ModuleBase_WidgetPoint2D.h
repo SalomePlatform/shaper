@@ -34,9 +34,9 @@ public:
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed
-  virtual bool storeValue(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  virtual bool storeValue(FeaturePtr theFeature);
 
-  virtual bool restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  virtual bool restoreValue(FeaturePtr theFeature);
 
   /// Returns whether the widget can accept focus, or if it corresponds to the given attribute
   /// \param theAttribute name

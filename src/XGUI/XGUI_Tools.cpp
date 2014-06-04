@@ -56,13 +56,13 @@ QRect makeRect(const int x1, const int y1, const int x2, const int y2)
 }
 
 //******************************************************************
-bool isModelObject(boost::shared_ptr<ModelAPI_Feature> theFeature)
+bool isModelObject(FeaturePtr theFeature)
 {
   return theFeature && !theFeature->data();
 }
 
 //******************************************************************
-std::string featureInfo(boost::shared_ptr<ModelAPI_Feature> theFeature)
+std::string featureInfo(FeaturePtr theFeature)
 {
   std::ostringstream aStream; 
   if (theFeature)

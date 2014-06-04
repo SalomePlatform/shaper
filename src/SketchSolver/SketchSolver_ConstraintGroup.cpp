@@ -317,10 +317,10 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
 //  Purpose:  create/update the element defined by the feature affected by any constraint
 // ============================================================================
 Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
-                boost::shared_ptr<ModelAPI_Feature> theEntity)
+                FeaturePtr theEntity)
 {
   // If the entity is already in the group, try to find it
-  std::map<boost::shared_ptr<ModelAPI_Feature>, Slvs_hEntity>::const_iterator
+  std::map<FeaturePtr, Slvs_hEntity>::const_iterator
     aEntIter = myEntityFeatMap.find(theEntity);
   // defines that the entity already exists
   const bool isEntExists = (myEntityFeatMap.find(theEntity) != myEntityFeatMap.end());
@@ -996,13 +996,13 @@ void SketchSolver_ConstraintGroup::removeConstraint(boost::shared_ptr<SketchPlug
     }
     else anEntAttrIter++;
   }
-  std::map<boost::shared_ptr<ModelAPI_Feature>, Slvs_hEntity>::iterator
+  std::map<FeaturePtr, Slvs_hEntity>::iterator
     anEntFeatIter = myEntityFeatMap.begin();
   while (anEntFeatIter != myEntityFeatMap.end())
   {
     if (anEntToRemove.find(anEntFeatIter->second) != anEntToRemove.end())
     {
-      std::map<boost::shared_ptr<ModelAPI_Feature>, Slvs_hEntity>::iterator
+      std::map<FeaturePtr, Slvs_hEntity>::iterator
         aRemovedIter = anEntFeatIter;
       anEntFeatIter++;
       myEntityFeatMap.erase(aRemovedIter);

@@ -119,7 +119,7 @@ QWidget* XGUI_PropertyPanel::contentWidget()
   return myCustomWidget;
 }
 
-void XGUI_PropertyPanel::updateContentWidget(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
 {
   foreach(ModuleBase_ModelWidget* eachWidget, myWidgets) {
     eachWidget->restoreValue(theFeature);

@@ -64,12 +64,12 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_MOVED))
   {
     const Model_FeatureUpdatedMessage* anUpdateMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    std::set< boost::shared_ptr<ModelAPI_Feature> > aFeatures = anUpdateMsg->features();
+    std::set< FeaturePtr > aFeatures = anUpdateMsg->features();
 
     bool isModifiedEvt = theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_MOVED);
     if (!isModifiedEvt)
     {
-      std::set< boost::shared_ptr<ModelAPI_Feature> >::iterator aFeatIter;
+      std::set< FeaturePtr >::iterator aFeatIter;
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++)
       {
         // Only sketches and constraints can be added by Create event
@@ -343,8 +343,8 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
 
     boost::shared_ptr<ModelAPI_AttributeRefList> aWPFeatures =
       boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aWP->data()->attribute(SKETCH_ATTR_FEATURES));
-    std::list< boost::shared_ptr<ModelAPI_Feature> > aFeaturesList = aWPFeatures->list();
-    std::list< boost::shared_ptr<ModelAPI_Feature> >::const_iterator anIter;
+    std::list< FeaturePtr > aFeaturesList = aWPFeatures->list();
+    std::list< FeaturePtr >::const_iterator anIter;
     for (anIter = aFeaturesList.begin(); anIter != aFeaturesList.end(); anIter++)
       if (*anIter == theConstraint)
         return aWP; // workplane is found

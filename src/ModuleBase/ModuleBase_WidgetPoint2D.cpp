@@ -68,7 +68,7 @@ ModuleBase_WidgetPoint2D::~ModuleBase_WidgetPoint2D()
 {
 }
 
-bool ModuleBase_WidgetPoint2D::storeValue(boost::shared_ptr<ModelAPI_Feature> theFeature)
+bool ModuleBase_WidgetPoint2D::storeValue(FeaturePtr theFeature)
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
@@ -82,7 +82,7 @@ bool ModuleBase_WidgetPoint2D::storeValue(boost::shared_ptr<ModelAPI_Feature> th
   return true;
 }
 
-bool ModuleBase_WidgetPoint2D::restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature)
+bool ModuleBase_WidgetPoint2D::restoreValue(FeaturePtr theFeature)
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =

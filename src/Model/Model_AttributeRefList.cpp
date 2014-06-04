@@ -12,7 +12,7 @@
 
 using namespace std;
 
-void Model_AttributeRefList::append(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void Model_AttributeRefList::append(FeaturePtr theFeature)
 {
   boost::shared_ptr<Model_Data> aData = 
     boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
@@ -23,7 +23,7 @@ void Model_AttributeRefList::append(boost::shared_ptr<ModelAPI_Feature> theFeatu
   Events_Loop::loop()->send(aMsg);
 }
 
-void Model_AttributeRefList::remove(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void Model_AttributeRefList::remove(FeaturePtr theFeature)
 {
   boost::shared_ptr<Model_Data> aData = 
     boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
@@ -36,9 +36,9 @@ int Model_AttributeRefList::size()
   return myRef->Extent();
 }
 
-list<boost::shared_ptr<ModelAPI_Feature> > Model_AttributeRefList::list()
+list<FeaturePtr > Model_AttributeRefList::list()
 {
-  std::list< boost::shared_ptr<ModelAPI_Feature> > aResult;
+  std::list< FeaturePtr > aResult;
   boost::shared_ptr<Model_Document> aDoc = 
     boost::dynamic_pointer_cast<Model_Document>(owner()->document());
   if (aDoc) {

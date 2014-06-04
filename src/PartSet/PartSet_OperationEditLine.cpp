@@ -34,7 +34,7 @@ using namespace std;
 
 PartSet_OperationEditLine::PartSet_OperationEditLine(const QString& theId,
 	                                          QObject* theParent,
-                                              boost::shared_ptr<ModelAPI_Feature> theFeature)
+                                              FeaturePtr theFeature)
 : PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature), myIsBlockedSelection(false)
 {
 }
@@ -48,12 +48,12 @@ bool PartSet_OperationEditLine::isGranted(ModuleBase_IOperation* theOperation) c
   return theOperation->getDescription()->operationId().toStdString() == PartSet_OperationSketch::Type();
 }
 
-std::list<int> PartSet_OperationEditLine::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
+std::list<int> PartSet_OperationEditLine::getSelectionModes(FeaturePtr theFeature) const
 {
   return PartSet_OperationSketchBase::getSelectionModes(theFeature);
 }
 
-void PartSet_OperationEditLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+void PartSet_OperationEditLine::init(FeaturePtr theFeature,
                                      const std::list<XGUI_ViewerPrs>& theSelected,
                                      const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
@@ -78,7 +78,7 @@ void PartSet_OperationEditLine::init(boost::shared_ptr<ModelAPI_Feature> theFeat
     myFeatures = theSelected;
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::sketch() const
+FeaturePtr PartSet_OperationEditLine::sketch() const
 {
   return mySketch;
 }
@@ -89,7 +89,7 @@ void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_V
 {
   if (myFeatures.size() == 1)
   {
-    boost::shared_ptr<ModelAPI_Feature> aFeature;
+    FeaturePtr aFeature;
     if (!theHighlighted.empty())
       aFeature = theHighlighted.front().feature();
 
@@ -137,7 +137,7 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
 
     std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
     for (; anIt != aLast; anIt++) {
-      boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).feature();
+      FeaturePtr aFeature = (*anIt).feature();
       if (!aFeature || aFeature == feature())
         continue;
       moveLinePoint(aFeature, aDeltaX, aDeltaY, LINE_ATTR_START);
@@ -161,7 +161,7 @@ void PartSet_OperationEditLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_
     commit();
     std::list<XGUI_ViewerPrs>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
     for (; anIt != aLast; anIt++) {
-      boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).feature();
+      FeaturePtr aFeature = (*anIt).feature();
       if (aFeature)
         emit featureConstructed(aFeature, FM_Deactivation);
     }
@@ -205,13 +205,13 @@ void PartSet_OperationEditLine::blockSelection(bool isBlocked, const bool isRest
   }
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationEditLine::createFeature(const bool /*theFlushMessage*/)
+FeaturePtr PartSet_OperationEditLine::createFeature(const bool /*theFlushMessage*/)
 {
   // do nothing in order to do not create a new feature
-  return boost::shared_ptr<ModelAPI_Feature>();
+  return FeaturePtr();
 }
 
-void PartSet_OperationEditLine::moveLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+void PartSet_OperationEditLine::moveLinePoint(FeaturePtr theFeature,
                                                double theDeltaX, double theDeltaY,
                                                const std::string& theAttribute)
 {
@@ -231,10 +231,10 @@ void PartSet_OperationEditLine::sendFeatures()
 {
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_MOVED);
 
-  std::list<boost::shared_ptr<ModelAPI_Feature> > aFeatures;
+  std::list<FeaturePtr > aFeatures;
   std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
   for (; anIt != aLast; anIt++) {
-    boost::shared_ptr<ModelAPI_Feature> aFeature = (*anIt).feature();
+    FeaturePtr aFeature = (*anIt).feature();
     if (!aFeature)
       continue;
 

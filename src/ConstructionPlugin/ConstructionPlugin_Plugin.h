@@ -8,12 +8,13 @@
 
 #include "ConstructionPlugin.h"
 #include "ModelAPI_Plugin.h"
+#include "ModelAPI_Feature.h"
 
 class CONSTRUCTIONPLUGIN_EXPORT ConstructionPlugin_Plugin: public ModelAPI_Plugin
 {
 public:
   /// Creates the feature object of this plugin by the feature string ID
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
+  virtual FeaturePtr createFeature(std::string theFeatureID);
 
 public:
   /// Is needed for python wrapping by swig

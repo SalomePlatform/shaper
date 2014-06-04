@@ -7,7 +7,7 @@
 #include "Model_Events.h"
 #include <Events_Loop.h>
 
-boost::shared_ptr<ModelAPI_Feature> Model_Object::featureRef()
+FeaturePtr Model_Object::featureRef()
 {
   return myRef;
 }
@@ -29,7 +29,7 @@ void Model_Object::setName(std::string theName)
   }
 }
 
-Model_Object::Model_Object(boost::shared_ptr<ModelAPI_Feature> theRef,
+Model_Object::Model_Object(FeaturePtr theRef,
                            Handle_TDataStd_Name theName)
                            : myRef(theRef), myName(theName)
 {

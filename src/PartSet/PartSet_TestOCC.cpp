@@ -18,7 +18,7 @@
 #include <ModelAPI_Document.h>
 
 static double myTestDelta;
-static boost::shared_ptr<ModelAPI_Feature> myTestFeature;
+static FeaturePtr myTestFeature;
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Shape.hxx>
@@ -127,12 +127,12 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
 
   ModuleBase_Operation* anOperation = theWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-    boost::shared_ptr<ModelAPI_Feature> aSketch;
+    FeaturePtr aSketch;
 
   if (aPreviewOp) {
     // create a line
     boost::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_PluginManager::get()->rootDocument();
-    boost::shared_ptr<ModelAPI_Feature> aFeature = aDoc->addFeature(
+    FeaturePtr aFeature = aDoc->addFeature(
                                                    PartSet_OperationSketchLine::Type().c_str());
     if (aFeature) // TODO: generate an error if feature was not created
       aFeature->execute();
@@ -195,7 +195,7 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   // change the line
   if (!myTestFeature)
     return;
-  boost::shared_ptr<ModelAPI_Feature> aFeature = myTestFeature;
+  FeaturePtr aFeature = myTestFeature;
 
   myTestDelta = myTestDelta - 50;
   double aDelta = myTestDelta;
@@ -204,7 +204,7 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchLine::preview(aFeature);
 
   Handle(AIS_InteractiveObject) aPrevAIS;
-  boost::shared_ptr<ModelAPI_Feature> aSketch;//NULL
+  FeaturePtr aSketch;//NULL
   Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
                           aFeature, aSketch,
                           aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),

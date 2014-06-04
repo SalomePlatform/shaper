@@ -19,11 +19,11 @@
  */
 class Model_Object : public ModelAPI_Object
 {
-  boost::shared_ptr<ModelAPI_Feature> myRef; ///< the referenced feature
+  FeaturePtr myRef; ///< the referenced feature
   Handle_TDataStd_Name myName; ///< the name of this object that may be changed
 public:
   /// Reference to the feature-operation that produces this object
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> featureRef();
+  MODEL_EXPORT virtual FeaturePtr featureRef();
 
   /// Returns the name of this object (by default equal to the name of feature)
   MODEL_EXPORT virtual std::string getName();
@@ -42,7 +42,7 @@ public:
   {return myRef->document();}
 
   /// Returns true if feature refers to the same model data instance
-  MODEL_EXPORT virtual bool isSame(const boost::shared_ptr<ModelAPI_Feature>& theFeature)
+  MODEL_EXPORT virtual bool isSame(const FeaturePtr& theFeature)
   {
     boost::shared_ptr<Model_Object> anObj = boost::dynamic_pointer_cast<Model_Object>(theFeature);
     return anObj && myRef == anObj->myRef;
@@ -57,7 +57,7 @@ public:
 private:
 
   /// Constructor fully defines this object
-  Model_Object(boost::shared_ptr<ModelAPI_Feature> theRef, Handle_TDataStd_Name theName);
+  Model_Object(FeaturePtr theRef, Handle_TDataStd_Name theName);
 
   friend class Model_Document;  
 };

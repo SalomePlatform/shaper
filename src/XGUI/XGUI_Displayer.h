@@ -15,6 +15,8 @@
 #include <AIS_InteractiveContext.hxx>
 #include <NCollection_List.hxx>
 
+#include <ModelAPI_Feature.h>
+
 #include <XGUI_ViewerPrs.h>
 
 #include <map>
@@ -44,18 +46,18 @@ public:
 
   /// Returns the feature visibility state.
   /// \param theFeature a feature instance
-  bool isVisible(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  bool isVisible(FeaturePtr theFeature);
 
   /// Display the feature. Obtain the visualized object from the feature.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  //void Display(boost::shared_ptr<ModelAPI_Feature> theFeature, const bool isUpdateViewer = true);
+  //void Display(FeaturePtr theFeature, const bool isUpdateViewer = true);
 
   /// Display the feature and a shape. This shape would be associated to the given feature
   /// \param theFeature a feature instance
   /// \param theShape a shape
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  //void Display(boost::shared_ptr<ModelAPI_Feature> theFeature, const TopoDS_Shape& theShape,
+  //void Display(FeaturePtr theFeature, const TopoDS_Shape& theShape,
   //             const bool isUpdateViewer = true);
   
   /// Returns a list of viewer selected presentations
@@ -73,7 +75,7 @@ public:
   /// \param theAIS an AIS object
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the presentation is created
-  bool redisplay(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  bool redisplay(FeaturePtr theFeature,
                  Handle(AIS_InteractiveObject) theAIS,
                  const int theSelectionMode, const bool isUpdateViewer = true);
 
@@ -87,7 +89,7 @@ public:
   /// \param theShape a shape
   /// \param theMode a list of local selection modes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void activateInLocalContext(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  void activateInLocalContext(FeaturePtr theFeature,
                               const std::list<int>& theModes, const bool isUpdateViewer = true);
 
   /// Stop the current selection and color the given features to the selection color
@@ -105,7 +107,7 @@ public:
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void erase(boost::shared_ptr<ModelAPI_Feature> theFeature, const bool isUpdateViewer = true);
+  void erase(FeaturePtr theFeature, const bool isUpdateViewer = true);
 
   /// Erase all presentations
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -125,13 +127,13 @@ public:
   /// Searches the interactive object by feature
   /// \param theFeature the feature or NULL if it not visualized
   /// \return theIO an interactive object
-  Handle(AIS_InteractiveObject) getAISObject(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
+  Handle(AIS_InteractiveObject) getAISObject(FeaturePtr theFeature) const;
 
 protected:
   /// Searches the feature by interactive object
   /// \param theIO an interactive object
   /// \return feature the feature or NULL if it not visualized
-  boost::shared_ptr<ModelAPI_Feature> getFeature(Handle(AIS_InteractiveObject) theIO) const;
+  FeaturePtr getFeature(Handle(AIS_InteractiveObject) theIO) const;
   /// Deactivate local selection
   /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
   void closeAllContexts(const bool isUpdateViewer);
@@ -142,7 +144,7 @@ protected:
 protected:
   XGUI_Workshop* myWorkshop;
 
-  typedef std::map<boost::shared_ptr<ModelAPI_Feature>, Handle(AIS_InteractiveObject) > FeatureToAISMap;
+  typedef std::map<FeaturePtr, Handle(AIS_InteractiveObject) > FeatureToAISMap;
   FeatureToAISMap myFeature2AISObjectMap;
 };
 

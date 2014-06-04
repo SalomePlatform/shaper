@@ -104,7 +104,7 @@ protected:
    *  \return identifier of changed entity or 0 if entity could not be changed
    */
   Slvs_hEntity changeEntity(boost::shared_ptr<ModelAPI_Attribute> theEntity);
-  Slvs_hEntity changeEntity(boost::shared_ptr<ModelAPI_Feature>   theEntity);
+  Slvs_hEntity changeEntity(FeaturePtr   theEntity);
 
   /** \brief Adds or updates a normal in the group
    *
@@ -192,7 +192,7 @@ private:
                                myConstraintMap; ///< The map between SketchPlugin and SolveSpace constraints
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>
                                myEntityAttrMap;     ///< The map between "attribute" parameters of constraints and their equivalent SolveSpace entities
-  std::map<boost::shared_ptr<ModelAPI_Feature>, Slvs_hEntity>
+  std::map<FeaturePtr, Slvs_hEntity>
                                myEntityFeatMap;     ///< The map between "feature" parameters of constraints and their equivalent SolveSpace entities
 
   // Conincident items

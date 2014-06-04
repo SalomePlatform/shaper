@@ -37,18 +37,18 @@ public:
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
+  virtual std::list<int> getSelectionModes(FeaturePtr theFeature) const;
 
   /// Initializes some fields accorging to the feature
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  virtual void init(FeaturePtr theFeature,
                     const std::list<XGUI_ViewerPrs>& theSelected,
                     const std::list<XGUI_ViewerPrs>& theHighlighted);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
-  virtual boost::shared_ptr<ModelAPI_Feature> sketch() const;
+  virtual FeaturePtr sketch() const;
 
   /// Processes the mouse pressed in the point
   /// \param theEvent the mouse event
@@ -74,7 +74,7 @@ public:
 
   /// Returns the map of the operation previews including the nested feature previews
   /// \return the map of feature to the feature preview
-  virtual std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
+  virtual std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >
                                                                            subPreview() const;
 
   /// Virtual method called when operation stopped - committed or aborted.

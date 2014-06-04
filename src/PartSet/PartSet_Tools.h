@@ -11,12 +11,13 @@
 
 #include <QPoint>
 
+#include <ModelAPI_Feature.h>
+
 #include <boost/shared_ptr.hpp>
 
 #include <list>
 
 class Handle_V3d_View;
-class ModelAPI_Feature;
 class XGUI_ViewerPrs;
 
 /*!
@@ -36,7 +37,7 @@ public:
   /// \param theSketch the sketch feature
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
-  static void convertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelAPI_Feature> theSketch,
+  static void convertTo2D(const gp_Pnt& thePoint, FeaturePtr theSketch,
                           Handle(V3d_View) theView, double& theX, double& theY);
 
   /// \brief Converts the 2D projected coodinates on the sketch plane to the 3D point.
@@ -45,7 +46,7 @@ public:
   /// \param theSketch the sketch feature
   /// \param thePoint the 3D point in the viewer
   static void convertTo3D(const double theX, const double theY,
-                          boost::shared_ptr<ModelAPI_Feature> theSketch,
+                          FeaturePtr theSketch,
                           gp_Pnt& thePoint);
 
   /// Returns the point of intersection of the two lines, the first is (v0, v1), the second is (v2, v3),
@@ -79,15 +80,15 @@ public:
   /// \param theView a 3D view
   /// \param theSketch the sketch feature
   /// \param theFeatures the list of selected presentations
-  static boost::shared_ptr<ModelAPI_Feature> nearestFeature(QPoint thePoint, Handle_V3d_View theView,
-                                                     boost::shared_ptr<ModelAPI_Feature> theSketch,
+  static FeaturePtr nearestFeature(QPoint thePoint, Handle_V3d_View theView,
+                                                     FeaturePtr theSketch,
                                                      const std::list<XGUI_ViewerPrs>& theFeatures);
 private:
   /// Return the distance between the feature and the point
   /// \param theFeature feature object
   /// \param theX the horizontal coordinate of the point
   /// \param theX the vertical coordinate of the point
-  static double distanceToPoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  static double distanceToPoint(FeaturePtr theFeature,
                                 double theX, double theY);
 };
 

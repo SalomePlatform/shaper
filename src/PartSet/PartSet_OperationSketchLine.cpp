@@ -45,7 +45,7 @@ using namespace std;
 
 PartSet_OperationSketchLine::PartSet_OperationSketchLine(const QString& theId,
 	                                          QObject* theParent,
-                                              boost::shared_ptr<ModelAPI_Feature> theFeature)
+                                              FeaturePtr theFeature)
 : PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature),
   myPointSelectionMode(SM_FirstPoint)
 {
@@ -65,7 +65,7 @@ bool PartSet_OperationSketchLine::isGranted(ModuleBase_IOperation* theOperation)
   return theOperation->getDescription()->operationId().toStdString() == PartSet_OperationSketch::Type();
 }
 
-std::list<int> PartSet_OperationSketchLine::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
+std::list<int> PartSet_OperationSketchLine::getSelectionModes(FeaturePtr theFeature) const
 {
   std::list<int> aModes;
   if (theFeature != feature())
@@ -73,7 +73,7 @@ std::list<int> PartSet_OperationSketchLine::getSelectionModes(boost::shared_ptr<
   return aModes;
 }
 
-void PartSet_OperationSketchLine::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+void PartSet_OperationSketchLine::init(FeaturePtr theFeature,
                                        const std::list<XGUI_ViewerPrs>& /*theSelected*/,
                                        const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
@@ -84,7 +84,7 @@ void PartSet_OperationSketchLine::init(boost::shared_ptr<ModelAPI_Feature> theFe
   myInitPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::sketch() const
+FeaturePtr PartSet_OperationSketchLine::sketch() const
 {
   return mySketch;
 }
@@ -127,7 +127,7 @@ void PartSet_OperationSketchLine::mouseReleased(QMouseEvent* theEvent, Handle(V3
       }
       else if (aShape.ShapeType() == TopAbs_EDGE) // the line is selected
       {
-        boost::shared_ptr<ModelAPI_Feature> aFeature = aPrs.feature();
+        FeaturePtr aFeature = aPrs.feature();
         if (aFeature) {
           double X0, X1, X2, X3;
           double Y0, Y1, Y2, Y3;
@@ -233,7 +233,7 @@ void PartSet_OperationSketchLine::keyReleased(const int theKey)
       }
       //else
       //  abort();
-      //emit launchOperation(PartSet_OperationSketchLine::Type(), boost::shared_ptr<ModelAPI_Feature>());
+      //emit launchOperation(PartSet_OperationSketchLine::Type(), FeaturePtr());
     }
     break;
     case Qt::Key_Escape: {
@@ -275,9 +275,9 @@ void PartSet_OperationSketchLine::afterCommitOperation()
   emit featureConstructed(feature(), FM_Deactivation);
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchLine::createFeature(const bool theFlushMessage)
+FeaturePtr PartSet_OperationSketchLine::createFeature(const bool theFlushMessage)
 {
-  boost::shared_ptr<ModelAPI_Feature> aNewFeature = ModuleBase_Operation::createFeature(false);
+  FeaturePtr aNewFeature = ModuleBase_Operation::createFeature(false);
   if (sketch()) {
     boost::shared_ptr<SketchPlugin_Feature> aFeature = 
                            boost::dynamic_pointer_cast<SketchPlugin_Feature>(sketch());
@@ -304,7 +304,7 @@ void PartSet_OperationSketchLine::createConstraint(boost::shared_ptr<GeomDataAPI
                                                    boost::shared_ptr<GeomDataAPI_Point2D> thePoint2)
 {
   boost::shared_ptr<ModelAPI_Document> aDoc = document();
-  boost::shared_ptr<ModelAPI_Feature> aFeature = aDoc->addFeature(SKETCH_CONSTRAINT_COINCIDENCE_KIND);
+  FeaturePtr aFeature = aDoc->addFeature(SKETCH_CONSTRAINT_COINCIDENCE_KIND);
 
   if (sketch()) {
     boost::shared_ptr<SketchPlugin_Feature> aSketch = 
@@ -341,7 +341,7 @@ void PartSet_OperationSketchLine::setConstraints(double theX, double theY)
       break;
   }
 
-  boost::shared_ptr<ModelAPI_Feature> aSkFeature = feature();
+  FeaturePtr aSkFeature = feature();
 
   boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
@@ -350,18 +350,18 @@ void PartSet_OperationSketchLine::setConstraints(double theX, double theY)
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SKETCH_ATTR_FEATURES));
 
-  std::list<boost::shared_ptr<ModelAPI_Feature> > aFeatures = aRefList->list();
-  std::list<boost::shared_ptr<ModelAPI_Feature> >::const_iterator anIt = aFeatures.begin(),
+  std::list<FeaturePtr > aFeatures = aRefList->list();
+  std::list<FeaturePtr >::const_iterator anIt = aFeatures.begin(),
                                                                   aLast = aFeatures.end();
   for (; anIt != aLast; anIt++) {
-    boost::shared_ptr<ModelAPI_Feature> aFeature = *anIt;
+    FeaturePtr aFeature = *anIt;
     boost::shared_ptr<GeomDataAPI_Point2D> aFPoint = findLinePoint(aFeature, theX, theY);
     if (aFPoint)
       createConstraint(aFPoint, aPoint);
   }
 }
 
-void PartSet_OperationSketchLine::getLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+void PartSet_OperationSketchLine::getLinePoint(FeaturePtr theFeature,
                                                const std::string& theAttribute,
                                                double& theX, double& theY)
 {
@@ -375,7 +375,7 @@ void PartSet_OperationSketchLine::getLinePoint(boost::shared_ptr<ModelAPI_Featur
 }
 
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_OperationSketchLine::findLinePoint(
-                                               boost::shared_ptr<ModelAPI_Feature> theFeature,
+                                               FeaturePtr theFeature,
                                                double theX, double theY)
 {
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
@@ -395,7 +395,7 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_OperationSketchLine::findLinePoin
   return aPoint2D;
 }
 
-void PartSet_OperationSketchLine::setLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+void PartSet_OperationSketchLine::setLinePoint(FeaturePtr theFeature,
                                                double theX, double theY,
                                                const std::string& theAttribute)
 {

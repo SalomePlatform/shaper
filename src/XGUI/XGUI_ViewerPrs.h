@@ -11,7 +11,7 @@
 #include <TopoDS_Shape.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 
-class ModelAPI_Feature;
+#include <ModelAPI_Feature.h>
 
 /**\class XGUI_ViewerPrs
  * \ingroup GUI
@@ -26,7 +26,7 @@ public:
   /// \param theFeature a model feature
   /// \param theShape a viewer shape
   /// \param theOwner a selection owner
-  XGUI_ViewerPrs(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  XGUI_ViewerPrs(FeaturePtr theFeature,
                  const TopoDS_Shape& theShape,
                  Handle_SelectMgr_EntityOwner theOwner);
   /// Destructor
@@ -34,11 +34,11 @@ public:
 
   /// Sets the feature.
   /// \param theFeature a feature instance
-  void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  void setFeature(FeaturePtr theFeature);
 
   /// Returns the feature.
   /// \return a feature instance
-  boost::shared_ptr<ModelAPI_Feature> feature() const;
+  FeaturePtr feature() const;
 
   /// Returns the presentation owner
   /// \param the owner
@@ -57,7 +57,7 @@ public:
   const TopoDS_Shape& shape() const;
 
 private:
-  boost::shared_ptr<ModelAPI_Feature> myFeature; /// the feature
+  FeaturePtr myFeature; /// the feature
   Handle(SelectMgr_EntityOwner) myOwner; /// the selection owner
   TopoDS_Shape myShape; /// the shape
 };

@@ -16,13 +16,13 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
   ModelAPI_PluginManager::get()->registerPlugin(this);
 }
 
-boost::shared_ptr<ModelAPI_Feature> ConstructionPlugin_Plugin::createFeature(string theFeatureID)
+FeaturePtr ConstructionPlugin_Plugin::createFeature(string theFeatureID)
 {
   if (theFeatureID == "Point") {
-    return boost::shared_ptr<ModelAPI_Feature>(new ConstructionPlugin_Point);
+    return FeaturePtr(new ConstructionPlugin_Point);
   } else if (theFeatureID == "Extrusion") {
-    return boost::shared_ptr<ModelAPI_Feature>(new ConstructionPlugin_Extrusion);
+    return FeaturePtr(new ConstructionPlugin_Extrusion);
   }
   // feature of such kind is not found
-  return boost::shared_ptr<ModelAPI_Feature>();
+  return FeaturePtr();
 }

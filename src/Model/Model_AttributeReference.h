@@ -7,6 +7,7 @@
 
 #include "Model.h"
 #include "ModelAPI_AttributeReference.h"
+#include <ModelAPI_Feature.h>
 #include <TDF_Label.hxx>
 #include <TDF_Reference.hxx>
 
@@ -20,10 +21,10 @@ class Model_AttributeReference : public ModelAPI_AttributeReference
   Handle_TDF_Reference myRef; ///< references to the feature label
 public:
   /// Defines the feature referenced from this attribute
-  MODEL_EXPORT virtual void setValue(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  MODEL_EXPORT virtual void setValue(FeaturePtr theFeature);
 
   /// Returns feature referenced from this attribute
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> value();
+  MODEL_EXPORT virtual FeaturePtr value();
 
 protected:
   /// Objects are created for features automatically

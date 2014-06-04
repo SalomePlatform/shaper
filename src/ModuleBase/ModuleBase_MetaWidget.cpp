@@ -21,7 +21,7 @@ ModuleBase_MetaWidget::~ModuleBase_MetaWidget()
 
 }
 
-bool ModuleBase_MetaWidget::storeValue(boost::shared_ptr<ModelAPI_Feature> theFeature)
+bool ModuleBase_MetaWidget::storeValue(FeaturePtr theFeature)
 {
   #ifdef _DEBUG
   std::cout << "ModuleBase_MetaWidget::storeValue"
@@ -30,7 +30,7 @@ bool ModuleBase_MetaWidget::storeValue(boost::shared_ptr<ModelAPI_Feature> theFe
   return true;
 }
 
-bool ModuleBase_MetaWidget::restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature)
+bool ModuleBase_MetaWidget::restoreValue(FeaturePtr theFeature)
 {
   #ifdef _DEBUG
   std::cout << "ModuleBase_MetaWidget::restoreValue"
