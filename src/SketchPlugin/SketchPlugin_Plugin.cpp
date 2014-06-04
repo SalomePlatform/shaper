@@ -32,7 +32,7 @@ boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Plugin::createFeature(string th
   else if (theFeatureID == "SketchPoint") {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_Point);
   }
-  else if (theFeatureID == "SketchLine") {
+  else if (theFeatureID == SKETCH_LINE_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_Line);
   }
   else if (theFeatureID == "SketchCircle") {

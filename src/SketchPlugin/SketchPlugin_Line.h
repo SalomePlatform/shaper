@@ -10,6 +10,9 @@
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
+/// Line feature kind
+const std::string SKETCH_LINE_KIND("SketchLine");
+
 /// Start 2D point of the line
 const std::string LINE_ATTR_START("StartPoint");
 /// End 2D point of the line
@@ -24,7 +27,7 @@ class SketchPlugin_Line: public SketchPlugin_Feature
 public:
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "SketchLine"; return MY_KIND;}
+  {static std::string MY_KIND = SKETCH_LINE_KIND; return MY_KIND;}
 
   /// Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 

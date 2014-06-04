@@ -5,6 +5,8 @@
 #include "SketchSolver_Constraint.h"
 #include <SketchSolver_Solver.h>
 
+#include <SketchPlugin_Line.h>
+
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Data.h>
 
@@ -102,7 +104,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
           myAttributesList[aNbPoints++] = CONSTRAINT_ATTRIBUTES[indAttr];
           continue;
         }
-        else if(aKind.compare("SketchLine") == 0)
+        else if(aKind.compare(SKETCH_LINE_KIND) == 0)
         {
           // entities are placed starting from CONSTRAINT_ATTR_ENTITY_C attribute
           myAttributesList[2 + aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
@@ -150,7 +152,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
         );
       if (!anAttr) continue;
       if (anAttr->isFeature() && anAttr->feature() &&
-          anAttr->feature()->getKind().compare("SketchLine") == 0)
+          anAttr->feature()->getKind().compare(SKETCH_LINE_KIND) == 0)
       {
         myAttributesList[aNbLines++] = CONSTRAINT_ATTRIBUTES[indAttr];
         break;
@@ -175,7 +177,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
         );
       if (!anAttr || !anAttr->isFeature()) continue;
       const std::string& aKind = anAttr->feature()->getKind();
-      if (aKind.compare("SketchLine") == 0)
+      if (aKind.compare(SKETCH_LINE_KIND) == 0)
       {
         myAttributesList[aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
         continue;

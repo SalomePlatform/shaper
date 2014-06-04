@@ -8,6 +8,9 @@
 #include "PartSet.h"
 
 #include <PartSet_OperationSketchBase.h>
+
+#include <SketchPlugin_Line.h>
+
 #include <QObject>
 
 class GeomDataAPI_Point2D;
@@ -24,7 +27,7 @@ class PARTSET_EXPORT PartSet_OperationSketchLine : public PartSet_OperationSketc
 
 public:
   /// Returns the operation type key
-  static std::string Type() { return "SketchLine"; }
+  static std::string Type() { return SKETCH_LINE_KIND; }
 
 public:
   /// Constructor

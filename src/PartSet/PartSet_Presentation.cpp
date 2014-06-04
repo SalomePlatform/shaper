@@ -97,7 +97,7 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createSketchConstraintLength
   if (!anAttr)
     return thePrevPrs;
   boost::shared_ptr<ModelAPI_Feature> aFeature = anAttr->feature();
-  if (!aFeature || aFeature->getKind() != "SketchLine")
+  if (!aFeature || aFeature->getKind() != SKETCH_LINE_KIND)
     return thePrevPrs;
 
   aData = aFeature->data();

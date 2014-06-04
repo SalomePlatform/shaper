@@ -259,7 +259,7 @@ void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin
   if (aFeatureKind.compare("SketchPoint") == 0)
     anAttrList.push_back(POINT_ATTR_COORD);
   // Line
-  else if (aFeatureKind.compare("SketchLine") == 0)
+  else if (aFeatureKind.compare(SKETCH_LINE_KIND) == 0)
   {
     anAttrList.push_back(LINE_ATTR_START);
     anAttrList.push_back(LINE_ATTR_END);

@@ -199,7 +199,7 @@ double PartSet_Tools::distanceToPoint(boost::shared_ptr<ModelAPI_Feature> theFea
                                       double theX, double theY)
 {
   double aDelta = 0;
-  if (theFeature->getKind() != "SketchLine")
+  if (theFeature->getKind() != SKETCH_LINE_KIND)
     return aDelta;
 
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();

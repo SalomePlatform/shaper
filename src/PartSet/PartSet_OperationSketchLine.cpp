@@ -76,7 +76,7 @@ void PartSet_OperationSketchLine::init(boost::shared_ptr<ModelAPI_Feature> theFe
                                        const std::list<XGUI_ViewerPrs>& /*theSelected*/,
                                        const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
-  if (!theFeature || theFeature->getKind() != "SketchLine")
+  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
     return;
   // use the last point of the previous feature as the first of the new one
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
@@ -364,7 +364,7 @@ void PartSet_OperationSketchLine::getLinePoint(boost::shared_ptr<ModelAPI_Featur
                                                const std::string& theAttribute,
                                                double& theX, double& theY)
 {
-  if (!theFeature || theFeature->getKind() != "SketchLine")
+  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
     return;
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
@@ -378,7 +378,7 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_OperationSketchLine::findLinePoin
                                                double theX, double theY)
 {
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
-  if (!theFeature || theFeature->getKind() != "SketchLine")
+  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
     return aPoint2D;
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   

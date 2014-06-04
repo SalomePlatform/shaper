@@ -10,7 +10,7 @@
 #include <GeomAPI_Pnt.h>
 #include <list>
 
-/// All features of this sketch (list of references)
+/// Sketch feature kind
 const std::string SKETCH_KIND("Sketch");
 
 /// Origin point of the sketcher in 3D space

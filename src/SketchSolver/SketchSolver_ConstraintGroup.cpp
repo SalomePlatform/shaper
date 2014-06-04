@@ -331,7 +331,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
     const std::string& aFeatureKind = aFeature->getKind();
 
     // Line
-    if (aFeatureKind.compare("SketchLine") == 0)
+    if (aFeatureKind.compare(SKETCH_LINE_KIND) == 0)
     {
       Slvs_hEntity aStart = changeEntity(aFeature->data()->attribute(LINE_ATTR_START));
       Slvs_hEntity aEnd   = changeEntity(aFeature->data()->attribute(LINE_ATTR_END));

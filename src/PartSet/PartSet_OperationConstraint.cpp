@@ -63,7 +63,7 @@ void PartSet_OperationConstraint::init(boost::shared_ptr<ModelAPI_Feature> theFe
                                        const std::list<XGUI_ViewerPrs>& /*theSelected*/,
                                        const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
-  //if (!theFeature || theFeature->getKind() != "SketchLine")
+  //if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
   //  return;
   // use the last point of the previous feature as the first of the new one
   //boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
@@ -253,7 +253,7 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_OperationConstraint::createFeature(c
 
 void PartSet_OperationConstraint::setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
 {
-  if (!theFeature || theFeature->getKind() != "SketchLine")
+  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
     return;
 
   boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
