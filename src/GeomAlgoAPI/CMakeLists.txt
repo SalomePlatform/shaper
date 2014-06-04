@@ -9,12 +9,14 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_CompoundBuilder.h
     GeomAlgoAPI_FaceBuilder.h
     GeomAlgoAPI_EdgeBuilder.h
+    GeomAlgoAPI_SketchBuilder.h
 )
 
 SET(PROJECT_SOURCES
     GeomAlgoAPI_CompoundBuilder.cpp
     GeomAlgoAPI_FaceBuilder.cpp
     GeomAlgoAPI_EdgeBuilder.cpp
+    GeomAlgoAPI_SketchBuilder.cpp
 )
 
 ADD_DEFINITIONS(-DGEOMALGOAPI_EXPORTS ${CAS_DEFINITIONS})
@@ -30,7 +32,7 @@ INCLUDE_DIRECTORIES(
   ${CAS_INCLUDE_DIRS}
 )
 
-TARGET_LINK_LIBRARIES(GeomAlgoAPI ${PROJECT_LIBRARIES} GeomAPI ${CAS_KERNEL} ${CAS_MODELER})
+TARGET_LINK_LIBRARIES(GeomAlgoAPI ${PROJECT_LIBRARIES} GeomAPI ${CAS_TKBool} ${CAS_TKBO})
 
 SET(SWIG_SCRIPTS
   ${CMAKE_CURRENT_BINARY_DIR}/GeomAlgoAPI.py

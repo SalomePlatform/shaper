@@ -10,6 +10,7 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_SketchBuilder.h>
 
 using namespace std;
 
@@ -31,6 +32,38 @@ void SketchPlugin_Sketch::initAttributes()
 
 void SketchPlugin_Sketch::execute() 
 {
+  if (!data()->isValid())
+    return ;
+  boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
+    boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(SKETCH_ATTR_FEATURES));
+
+  boost::shared_ptr<GeomDataAPI_Dir> aDirX = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_DIRX));
+  boost::shared_ptr<GeomDataAPI_Dir> aDirY = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_DIRY));
+  boost::shared_ptr<GeomDataAPI_Dir> aNorm = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_NORM));
+
+  std::list<boost::shared_ptr<ModelAPI_Feature> > aFeatures = aRefList->list();
+  if (aFeatures.empty())
+    return ;
+
+  std::list<boost::shared_ptr<ModelAPI_Feature> >::const_iterator anIt = aFeatures.begin(),
+                                                                  aLast = aFeatures.end();
+
+  boost::shared_ptr<SketchPlugin_Feature> aFeature;
+  std::list< boost::shared_ptr<GeomAPI_Shape> > aFeaturesPreview;
+  for (; anIt != aLast; anIt++) {
+    aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
+    boost::shared_ptr<GeomAPI_Shape> aPreview = aFeature->preview();
+    if (aPreview)
+      aFeaturesPreview.push_back(aPreview);
+  }
+
+  std::list< boost::shared_ptr<GeomAPI_Shape> > aLoops;
+  std::list< boost::shared_ptr<GeomAPI_Shape> > aWires;
+  GeomAlgoAPI_SketchBuilder::createFaces(aDirX->dir(), aDirY->dir(), aNorm->dir(),
+                                         aFeaturesPreview, aLoops, aWires);
 }
 
 const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Sketch::preview()
