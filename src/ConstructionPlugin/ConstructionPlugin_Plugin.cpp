@@ -18,9 +18,9 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
 
 FeaturePtr ConstructionPlugin_Plugin::createFeature(string theFeatureID)
 {
-  if (theFeatureID == "Point") {
+  if (theFeatureID == CONSTRUCTION_POINT_KIND) {
     return FeaturePtr(new ConstructionPlugin_Point);
-  } else if (theFeatureID == "Extrusion") {
+  } else if (theFeatureID == CONSTRUCTION_EXTRUSION_KIND) {
     return FeaturePtr(new ConstructionPlugin_Extrusion);
   }
   // feature of such kind is not found

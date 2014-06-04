@@ -8,6 +8,9 @@
 #include "ConstructionPlugin.h"
 #include <ModelAPI_Feature.h>
 
+/// Point kind
+const std::string CONSTRUCTION_POINT_KIND("Point");
+
 /// attribute name for X coordinate
 const std::string POINT_ATTR_X = "x";
 /// attribute name for Y coordinate
@@ -24,7 +27,7 @@ class ConstructionPlugin_Point: public ModelAPI_Feature
 public:
   /// Returns the kind of a feature
   CONSTRUCTIONPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "Point"; return MY_KIND;}
+  {static std::string MY_KIND = CONSTRUCTION_POINT_KIND; return MY_KIND;}
 
   /// Returns to which group in the document must be added feature
   CONSTRUCTIONPLUGIN_EXPORT virtual const std::string& getGroup() 

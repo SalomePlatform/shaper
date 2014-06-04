@@ -16,7 +16,7 @@ void PartSetPlugin_Remove::execute()
   boost::shared_ptr<PartSetPlugin_Part> a;
   for(int a = aRoot->size(getGroup()) - 1; a >= 0; a--) {
     FeaturePtr aFeature = aRoot->feature(getGroup(), a, true);
-    if (aFeature->getKind() == "Part") {
+    if (aFeature->getKind() == PARTSET_PART_KIND) {
       boost::shared_ptr<PartSetPlugin_Part> aPart = 
         boost::static_pointer_cast<PartSetPlugin_Part>(aFeature);
       if (aPart->data()->docRef(PART_ATTR_DOC_REF)->value() == aPManager->currentDocument()) {

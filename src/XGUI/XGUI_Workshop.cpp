@@ -228,7 +228,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     bool aHasPart = false;
     for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
       FeaturePtr aFeature = (*aIt);
-      if (aFeature->getKind() == "Part") {
+      if (aFeature->getKind() == PARTSET_PART_KIND) {
         aHasPart = true;
         break;
       }
@@ -809,7 +809,7 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
     aMgr->rootDocument()->startOperation();
     foreach (FeaturePtr aFeature, theList) {
-      if (aFeature->getKind() == "Part") {
+      if (aFeature->getKind() == PARTSET_PART_KIND) {
         DocumentPtr aDoc;
         if (!XGUI_Tools::isModelObject(aFeature)) {
           aDoc = aFeature->data()->docRef("PartDocument")->value();
