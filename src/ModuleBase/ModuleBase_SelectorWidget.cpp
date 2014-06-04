@@ -21,6 +21,7 @@
 #include <QToolButton>
 #include <QString>
 #include <QEvent>
+#include <QDockWidget>
 
 
 ModuleBase_SelectorWidget::ModuleBase_SelectorWidget(QWidget* theParent, 
@@ -69,17 +70,17 @@ ModuleBase_SelectorWidget::~ModuleBase_SelectorWidget()
 }
 
 //********************************************************************
-bool ModuleBase_SelectorWidget::storeValue(FeaturePtr theFeature)
+bool ModuleBase_SelectorWidget::storeValue(FeaturePtr theFeature) const
 {
   DataPtr aData = theFeature->data();
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(myFeatureAttributeID));
 
-  bool isBlocked = this->blockSignals(true);
-  aRef->setValue(mySelectedFeature);
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
-
-  this->blockSignals(isBlocked);
+  FeaturePtr aFeature = aRef->value();
+  if (!(aFeature && aFeature->isSame(mySelectedFeature))) {
+    aRef->setValue(mySelectedFeature);
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  }
   return true;
 }
 
@@ -87,8 +88,7 @@ bool ModuleBase_SelectorWidget::storeValue(FeaturePtr theFeature)
 bool ModuleBase_SelectorWidget::restoreValue(FeaturePtr theFeature)
 {
   DataPtr aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(myFeatureAttributeID));
+  boost::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(myFeatureAttributeID);
 
   bool isBlocked = this->blockSignals(true);
   mySelectedFeature = aRef->value();
@@ -96,17 +96,6 @@ bool ModuleBase_SelectorWidget::restoreValue(FeaturePtr theFeature)
 
   this->blockSignals(isBlocked);
   return true;
-}
-
-//********************************************************************
-bool ModuleBase_SelectorWidget::canFocusTo(const std::string& theAttributeName)
-{
-  return false;
-}
-
-//********************************************************************
-void ModuleBase_SelectorWidget::focusTo()
-{
 }
 
 //********************************************************************
@@ -138,6 +127,7 @@ void ModuleBase_SelectorWidget::onSelectionChanged()
     if (mySelectedFeature) {
       updateSelectionName();
       activateSelection(false);
+      raisePanel();
     } else {
       myTextLine->setText("");
     }
@@ -173,7 +163,7 @@ bool ModuleBase_SelectorWidget::eventFilter(QObject* theObj, QEvent* theEvent)
 }
 
 //********************************************************************
-void ModuleBase_SelectorWidget::enableOthersControls(bool toEnable)
+void ModuleBase_SelectorWidget::enableOthersControls(bool toEnable) const
 {
   QWidget* aParent = myContainer->parentWidget();
   QList<QWidget*> aChldList = aParent->findChildren<QWidget*>();
@@ -195,4 +185,20 @@ void ModuleBase_SelectorWidget::activateSelection(bool toActivate)
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
 
   myActivateBtn->setDown(toActivate);
+}
+
+//********************************************************************
+void ModuleBase_SelectorWidget::raisePanel() const
+{
+  QWidget* aParent = myContainer->parentWidget();
+  QWidget* aLastPanel = 0;
+  while (!aParent->inherits("QDockWidget")) {
+    aLastPanel = aParent;
+    aParent = aParent->parentWidget();
+    if (!aParent) return;
+  }
+  if (aParent->inherits("QDockWidget")) {
+    QDockWidget* aTabWgt = (QDockWidget*) aParent;
+    aTabWgt->raise();
+  }
 }

@@ -72,7 +72,9 @@ public:
   virtual void keyReleased(std::string theName, QKeyEvent* theEvent) {};
 
   /// Sets the operation feature
-  void setFeature(FeaturePtr theFeature);
+  void setEditingFeature(FeaturePtr theFeature);
+
+  bool isEditOperation() const { return myIsEditing; }
 
 protected:
   /// Virtual method called when operation started (see start() method for more description)
@@ -97,8 +99,13 @@ protected:
   /// \returns the created feature
   virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
+  /// Sets the operation feature
+  void setFeature(FeaturePtr theFeature);
+
 private:
   FeaturePtr myFeature; /// the operation feature to be handled
+
+  bool myIsEditing;
 };
 
 #endif

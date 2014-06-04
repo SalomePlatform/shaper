@@ -24,7 +24,7 @@
 #endif
 
 ModuleBase_Operation::ModuleBase_Operation(const QString& theId, QObject* theParent)
-: ModuleBase_IOperation(theId, theParent)
+: ModuleBase_IOperation(theId, theParent), myIsEditing(false)
 {
 }
 
@@ -80,7 +80,7 @@ void ModuleBase_Operation::storeCustomValue()
 
 void ModuleBase_Operation::startOperation()
 {
-  if (!myFeature)
+  if (!myIsEditing)
     setFeature(createFeature());
   //emit callSlot();
   //commit();
@@ -129,4 +129,10 @@ FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
 void ModuleBase_Operation::setFeature(FeaturePtr theFeature)
 {
   myFeature = theFeature;
+}
+
+void ModuleBase_Operation::setEditingFeature(FeaturePtr theFeature)
+{
+  myFeature = theFeature;
+  myIsEditing = true;
 }

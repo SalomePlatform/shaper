@@ -57,6 +57,9 @@ public:
   /// Returns the attribute that contains list of references to features
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeRefList> 
     reflist(const std::string theID);
+  /// Returns the attribute that contains boolean value
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeBoolean> 
+    boolean(const std::string theID);
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string theID);
