@@ -16,6 +16,7 @@
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
+#include <GeomAPI_XYZ.h>
 
 #include <XGUI_ViewerPrs.h>
 
@@ -181,20 +182,31 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
   double anA, aB, aC, aD;
   aPlane->coefficients(anA, aB, aC, aD);
 
-  boost::shared_ptr<ModelAPI_AttributeDouble> anAttr;
-  // temporary solution for main planes only
+  // calculate attributes of the sketch
+  boost::shared_ptr<GeomAPI_Dir> aNormDir(new GeomAPI_Dir(anA, aB, aC));
+  boost::shared_ptr<GeomAPI_XYZ> aCoords = aNormDir->xyz();
+  boost::shared_ptr<GeomAPI_XYZ> aZero(new GeomAPI_XYZ(0, 0, 0));
+  aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
+  boost::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
+  // X axis is preferable to be dirX on the sketch
+  const double tol = 1e-7;
+  bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
+  boost::shared_ptr<GeomAPI_Dir> aTempDir(isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
+  boost::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
+  boost::shared_ptr<GeomAPI_Dir> aXDir(new GeomAPI_Dir(aYDir->cross(aNormDir)));
+
   boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
     boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SKETCH_ATTR_ORIGIN));
-  anOrigin->setValue(0, 0, 0);
+  anOrigin->setValue(anOrigPnt);
   boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_NORM));
-  aNormal->setValue(anA, aB, aC);
+  aNormal->setValue(aNormDir);
   boost::shared_ptr<GeomDataAPI_Dir> aDirX = 
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRX));
-  aDirX->setValue(aB, aC, anA);
+  aDirX->setValue(aXDir);
   boost::shared_ptr<GeomDataAPI_Dir> aDirY = 
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRY));
-  aDirY->setValue(aC, anA, aB);
+  aDirY->setValue(aYDir);
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
 
   flushUpdated();
