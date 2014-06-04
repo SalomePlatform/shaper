@@ -228,7 +228,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     bool aHasPart = false;
     for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
       FeaturePtr aFeature = (*aIt);
-      if (aFeature->getKind() == PARTSET_PART_KIND) {
+      if (aFeature->getKind() == "Part") {
         aHasPart = true;
         break;
       }

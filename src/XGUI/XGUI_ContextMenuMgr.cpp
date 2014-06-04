@@ -96,7 +96,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     FeaturePtr aFeature = aFeatures.first();
     //Process Feature
     if (aFeature) {
-      if (aFeature->getKind() == PARTSET_PART_KIND) {
+      if (aFeature->getKind() == "Part") {
         ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
         DocumentPtr aFeaDoc = aObject->featureRef()->data()->docRef("PartDocument")->value();
         if (aMgr->currentDocument() == aFeaDoc)
