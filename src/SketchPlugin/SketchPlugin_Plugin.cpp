@@ -26,7 +26,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
 
 boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Plugin::createFeature(string theFeatureID)
 {
-  if (theFeatureID == "Sketch") {
+  if (theFeatureID == SKETCH_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_Sketch);
   }
   else if (theFeatureID == "SketchPoint") {

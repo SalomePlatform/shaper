@@ -7,6 +7,7 @@
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Feature.h>
+#include <SketchPlugin_Sketch.h>
 
 /// 2D point - center of the circle
 const std::string CIRCLE_ATTR_CENTER("CircleCenter");
@@ -26,7 +27,7 @@ public:
 
   /// Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
-  {static std::string MY_GROUP = "Sketch"; return MY_GROUP;}
+  {static std::string MY_GROUP = SKETCH_KIND; return MY_GROUP;}
 
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();

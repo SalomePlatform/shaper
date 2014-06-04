@@ -11,6 +11,8 @@
 #include <Events_Loop.h>
 #include <Model_Events.h>
 
+#include <SketchPlugin_Sketch.h>
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -62,7 +64,7 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
     std::set<std::string>::const_iterator anIt = aGroups.begin(), aLast = aGroups.end();
     for (; anIt != aLast; anIt++) {
       std::string aGroup = *anIt;
-      if (aGroup.compare("Sketch") == 0) { // Update only Sketch group
+      if (aGroup.compare(SKETCH_KIND) == 0) { // Update only Sketch group
         myModule->workshop()->displayer()->eraseDeletedFeatures();
         myModule->updateCurrentPreview(aGroup);
       }

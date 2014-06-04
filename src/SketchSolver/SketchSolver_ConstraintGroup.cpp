@@ -461,7 +461,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeNormal(
 bool SketchSolver_ConstraintGroup::addWorkplane(
                 boost::shared_ptr<SketchPlugin_Feature> theSketch)
 {
-  if (myWorkplane.h || theSketch->getKind().compare("Sketch") != 0)
+  if (myWorkplane.h || theSketch->getKind().compare(SKETCH_KIND) != 0)
     return false; // the workplane already exists or the function parameter is not Sketch
 
   mySketch = theSketch;

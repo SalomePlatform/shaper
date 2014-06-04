@@ -74,7 +74,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       {
         // Only sketches and constraints can be added by Create event
         const std::string& aFeatureKind = (*aFeatIter)->getKind();
-        if (aFeatureKind.compare("Sketch") == 0)
+        if (aFeatureKind.compare(SKETCH_KIND) == 0)
         {
           boost::shared_ptr<SketchPlugin_Feature> aSketch =
             boost::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
@@ -105,10 +105,10 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
     const Model_FeatureDeletedMessage* aDeleteMsg = dynamic_cast<const Model_FeatureDeletedMessage*>(theMessage);
     const std::set<std::string>& aFeatureGroups = aDeleteMsg->groups();
 
-    // Find "Sketch" in groups. The constraint groups should be updated when an object removed from Sketch
+    // Find SKETCH_KIND in groups. The constraint groups should be updated when an object removed from Sketch
     std::set<std::string>::const_iterator aFGrIter;
     for (aFGrIter = aFeatureGroups.begin(); aFGrIter != aFeatureGroups.end(); aFGrIter++)
-      if (aFGrIter->compare("Sketch") == 0)
+      if (aFGrIter->compare(SKETCH_KIND) == 0)
         break;
     
     if (aFGrIter != aFeatureGroups.end())

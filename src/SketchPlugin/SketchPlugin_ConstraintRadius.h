@@ -6,6 +6,7 @@
 #define SketchPlugin_ConstraintRadius_HeaderFile
 
 #include "SketchPlugin.h"
+#include <SketchPlugin_Sketch.h>
 #include "SketchPlugin_Constraint.h"
 
 
@@ -26,7 +27,7 @@ public:
 
   /// \brief Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
-  {static std::string MY_GROUP = "Sketch"; return MY_GROUP;}
+  {static std::string MY_GROUP = SKETCH_KIND; return MY_GROUP;}
 
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();

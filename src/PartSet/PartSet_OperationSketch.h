@@ -8,6 +8,9 @@
 #include "PartSet.h"
 
 #include <PartSet_OperationSketchBase.h>
+
+#include <SketchPlugin_Sketch.h>
+
 #include <QObject>
 
 class Handle_AIS_InteractiveObject;
@@ -21,7 +24,7 @@ class PARTSET_EXPORT PartSet_OperationSketch : public PartSet_OperationSketchBas
   Q_OBJECT
 public:
   /// Returns the operation type key
-  static std::string Type() { return "Sketch"; }
+  static std::string Type() { return SKETCH_KIND; }
 
 public:
   /// Constructor

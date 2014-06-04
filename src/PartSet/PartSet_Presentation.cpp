@@ -38,7 +38,7 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createPresentation(
     anAIS = createSketchConstraintLength(theFeature, theSketch, thePrevPrs);
   else {
     anAIS = createFeature(theFeature, theShape, thePrevPrs);
-    if (theFeature->getKind() == "Sketch")
+    if (theFeature->getKind() == SKETCH_KIND)
     {
       Handle(AIS_Shape) aShapeAIS = Handle(AIS_Shape)::DownCast(anAIS);
       aShapeAIS->SetColor(Quantity_Color(SKETCH_PLANE_COLOR));
