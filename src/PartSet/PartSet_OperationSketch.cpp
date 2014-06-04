@@ -226,7 +226,7 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
   aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
   boost::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
   // X axis is preferable to be dirX on the sketch
-  const double tol = 1e-7;
+  const double tol = Precision::Confusion();
   bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
   boost::shared_ptr<GeomAPI_Dir> aTempDir(isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
   boost::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
