@@ -10,6 +10,9 @@
 #include "SketchPlugin_Feature.h"
 #include <list>
 
+/// Point feature kind
+const std::string SKETCH_POINT_KIND("SketchPoint");
+
 /// Coordinates of the point
 const std::string POINT_ATTR_COORD("PointCoordindates");
 
@@ -22,7 +25,7 @@ class SketchPlugin_Point: public SketchPlugin_Feature
 public:
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "SketchPoint"; return MY_KIND;}
+  {static std::string MY_KIND = SKETCH_POINT_KIND; return MY_KIND;}
 
   /// Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 

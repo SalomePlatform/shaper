@@ -6,6 +6,8 @@
 #include <SketchSolver_Solver.h>
 
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Point.h>
+#include <SketchPlugin_Circle.h>
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Data.h>
@@ -99,7 +101,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
       if (anAttr->isFeature() && anAttr->feature())
       { // verify posiible entities
         const std::string& aKind = anAttr->feature()->getKind();
-        if (aKind.compare("SketchPoint") == 0)
+        if (aKind.compare(SKETCH_POINT_KIND) == 0)
         {
           myAttributesList[aNbPoints++] = CONSTRAINT_ATTRIBUTES[indAttr];
           continue;
@@ -200,7 +202,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
         );
       if (!anAttr || !anAttr->isFeature()) continue;
       const std::string& aKind = anAttr->feature()->getKind();
-      if (aKind.compare("SketchCircle") == 0 || aKind.compare("SketchArc") == 0)
+      if (aKind.compare(SKETCH_CIRCLE_KIND) == 0 || aKind.compare("SketchArc") == 0)
       {
         myAttributesList[aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
         continue;

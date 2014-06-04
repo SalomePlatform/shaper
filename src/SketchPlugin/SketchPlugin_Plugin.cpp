@@ -29,13 +29,13 @@ boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Plugin::createFeature(string th
   if (theFeatureID == SKETCH_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_Sketch);
   }
-  else if (theFeatureID == "SketchPoint") {
+  else if (theFeatureID == SKETCH_POINT_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_Point);
   }
   else if (theFeatureID == SKETCH_LINE_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_Line);
   }
-  else if (theFeatureID == "SketchCircle") {
+  else if (theFeatureID == SKETCH_CIRCLE_KIND) {
     return boost::shared_ptr<ModelAPI_Feature>(new SketchPlugin_Circle);
   }
   else if (theFeatureID == "SketchConstraintCoincidence") {

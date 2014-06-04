@@ -9,6 +9,9 @@
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
 
+/// Circle feature kind
+const std::string SKETCH_CIRCLE_KIND("SketchCircle");
+
 /// 2D point - center of the circle
 const std::string CIRCLE_ATTR_CENTER("CircleCenter");
 /// Radius of the circle
@@ -23,7 +26,7 @@ class SketchPlugin_Circle: public SketchPlugin_Feature
 public:
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "SketchCircle"; return MY_KIND;}
+  {static std::string MY_KIND = SKETCH_CIRCLE_KIND; return MY_KIND;}
 
   /// Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 

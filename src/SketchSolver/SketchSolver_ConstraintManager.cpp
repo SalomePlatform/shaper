@@ -256,7 +256,7 @@ void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin
   std::vector<std::string> anAttrList;
   const std::string& aFeatureKind = theFeature->getKind();
   // Point
-  if (aFeatureKind.compare("SketchPoint") == 0)
+  if (aFeatureKind.compare(SKETCH_POINT_KIND) == 0)
     anAttrList.push_back(POINT_ATTR_COORD);
   // Line
   else if (aFeatureKind.compare(SKETCH_LINE_KIND) == 0)
@@ -265,7 +265,7 @@ void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin
     anAttrList.push_back(LINE_ATTR_END);
   }
   // Circle
-  else if (aFeatureKind.compare("SketchCircle") == 0)
+  else if (aFeatureKind.compare(SKETCH_CIRCLE_KIND) == 0)
   {
     anAttrList.push_back(CIRCLE_ATTR_CENTER);
     anAttrList.push_back(CIRCLE_ATTR_RADIUS);

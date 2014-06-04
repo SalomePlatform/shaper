@@ -346,7 +346,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
       return aLineEntity.h;
     }
     // Circle
-    else if (aFeatureKind.compare("SketchCircle") == 0)
+    else if (aFeatureKind.compare(SKETCH_CIRCLE_KIND) == 0)
     {
       Slvs_hEntity aCenter = changeEntity(aFeature->data()->attribute(CIRCLE_ATTR_CENTER));
       Slvs_hEntity aRadius = changeEntity(aFeature->data()->attribute(CIRCLE_ATTR_RADIUS));
@@ -378,7 +378,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
       return anArcEntity.h;
     }
     // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
-    else if (aFeatureKind.compare("SketchPoint") == 0)
+    else if (aFeatureKind.compare(SKETCH_POINT_KIND) == 0)
     {
       Slvs_hEntity aPoint = changeEntity(aFeature->data()->attribute(POINT_ATTR_COORD));
 
