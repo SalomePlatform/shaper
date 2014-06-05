@@ -1,6 +1,6 @@
 #include <PartSet_Module.h>
 #include <PartSet_OperationSketch.h>
-#include <PartSet_OperationSketchLine.h>
+#include <PartSet_OperationCreateFeature.h>
 #include <PartSet_OperationEditLine.h>
 #include <PartSet_OperationConstraint.h>
 #include <ModuleBase_Operation.h>
@@ -309,7 +309,7 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   // get operation xml description
   std::string aStdCmdId = theCmdId;
   if (aStdCmdId == PartSet_OperationEditLine::Type())
-    aStdCmdId = PartSet_OperationSketchLine::Type();
+    aStdCmdId = SKETCH_LINE_KIND;
   std::string aPluginFileName = featureFile(aStdCmdId);
   Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginFileName);
   aWdgReader.readAll();
@@ -327,8 +327,8 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
     PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
     if (aPrevOp)
       aSketch = aPrevOp->sketch();
-    if (theCmdId == PartSet_OperationSketchLine::Type())
-      anOperation = new PartSet_OperationSketchLine(theCmdId.c_str(), this, aSketch);
+    if (theCmdId == SKETCH_LINE_KIND)
+      anOperation = new PartSet_OperationCreateFeature(theCmdId.c_str(), this, aSketch);
     else if (theCmdId == PartSet_OperationEditLine::Type())
       anOperation = new PartSet_OperationEditLine(theCmdId.c_str(), this, aSketch);
     else if (theCmdId == PartSet_OperationConstraint::Type())
