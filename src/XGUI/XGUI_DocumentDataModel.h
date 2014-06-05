@@ -71,6 +71,8 @@ public:
   //! Deactivates a Part
   void deactivatePart();
 
+  void rebuildDataTree();
+
 private:
 
   enum {PartsFolder, HistoryNode};
@@ -102,9 +104,6 @@ private:
 
   int historyOffset() const;
 
-
-  //! Document
-  boost::shared_ptr<ModelAPI_Document> myDocument;
 
   //! Data model of top part of data tree (not parts object)
   XGUI_TopDataModel* myModel;

@@ -75,6 +75,8 @@ public:
   //! Activates currently selected part. Signal activePartChanged will not be sent
   void activatePart(const FeaturePtr& thePart);
 
+  void rebuildDataTree();
+
 signals:
   //! Emited when selection is changed
   void selectionChanged();

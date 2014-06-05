@@ -18,8 +18,8 @@
 class XGUI_EXPORT XGUI_FeaturesModel : public QAbstractItemModel
 {
 public:
-  XGUI_FeaturesModel(const DocumentPtr& theDocument, QObject* theParent):
-      QAbstractItemModel(theParent), myDocument(theDocument), myItemsColor(Qt::black) {}
+  XGUI_FeaturesModel(QObject* theParent):
+      QAbstractItemModel(theParent), myItemsColor(Qt::black) {}
 
   //! Returns Feature object by the given Model index.
   //! Returns 0 if the given index is not index of a feature
@@ -40,7 +40,6 @@ public:
   QColor itemsColor() const { return myItemsColor; }
 
 protected:
-  boost::shared_ptr<ModelAPI_Document> myDocument;
   QColor myItemsColor;
 };
 
@@ -52,8 +51,8 @@ protected:
 class XGUI_PartModel : public XGUI_FeaturesModel
 {
 public:
-  XGUI_PartModel(const DocumentPtr& theDocument, QObject* theParent):
-      XGUI_FeaturesModel(theDocument, theParent) {}
+  XGUI_PartModel(QObject* theParent):
+      XGUI_FeaturesModel(theParent) {}
 
   void setPartId(int theId) { myId = theId; }
 

@@ -323,3 +323,10 @@ void XGUI_ObjectsBrowser::onSelectionChanged()
   myFeaturesList = myTreeView->selectedFeatures();
   emit selectionChanged();
 }
+
+//***************************************************
+void XGUI_ObjectsBrowser::rebuildDataTree()
+{
+  myDocModel->rebuildDataTree();
+  update();
+}
