@@ -26,7 +26,6 @@
 #include <XGUI_Tools.h>
 
 #include <SketchPlugin_Line.h>
-#include <SketchPlugin_Point.h>
 
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
@@ -330,7 +329,7 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
     PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
     if (aPrevOp)
       aSketch = aPrevOp->sketch();
-    if (theCmdId == SKETCH_LINE_KIND || theCmdId == SKETCH_POINT_KIND)
+    if (PartSet_OperationCreateFeature::canProcessKind(theCmdId))
       anOperation = new PartSet_OperationCreateFeature(theCmdId.c_str(), this, aSketch);
     else if (theCmdId == PartSet_OperationEditLine::Type())
       anOperation = new PartSet_OperationEditLine(theCmdId.c_str(), this, aSketch);

@@ -15,5 +15,6 @@
      <file>icons/sketch.png</file>
      <file>icons/hand_point.png</file>
      <file>icons/dimension_v.png</file>
+     <file>icons/radius.png</file>
  </qresource>
  </RCC>
