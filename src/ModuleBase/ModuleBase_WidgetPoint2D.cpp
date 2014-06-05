@@ -68,17 +68,18 @@ ModuleBase_WidgetPoint2D::~ModuleBase_WidgetPoint2D()
 {
 }
 
-bool ModuleBase_WidgetPoint2D::storeValue(FeaturePtr theFeature)
+bool ModuleBase_WidgetPoint2D::storeValue(FeaturePtr theFeature) const
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myFeatureAttributeID));
 
-  bool isBlocked = this->blockSignals(true);
+  ModuleBase_WidgetPoint2D* that = (ModuleBase_WidgetPoint2D*) this;
+  bool isBlocked = that->blockSignals(true);
   aPoint->setValue(myXSpin->value(), myYSpin->value());
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  that->blockSignals(isBlocked);
 
-  this->blockSignals(isBlocked);
   return true;
 }
 

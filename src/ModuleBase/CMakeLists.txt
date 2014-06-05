@@ -13,6 +13,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_MetaWidget.h
     ModuleBase_SelectorWidget.h
     ModuleBase_IWorkshop.h
+    ModuleBase_Widgets.h
 )
 
 SET(PROJECT_SOURCES
@@ -24,6 +25,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetSwitch.cpp
 	ModuleBase_MetaWidget.cpp
     ModuleBase_SelectorWidget.cpp
+    ModuleBase_Widgets.cpp
 )
 
 SET(PROJECT_LIBRARIES

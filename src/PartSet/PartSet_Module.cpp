@@ -233,7 +233,7 @@ void PartSet_Module::onLaunchOperation(std::string theName, FeaturePtr theFeatur
     std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted(TopAbs_VERTEX);
     aPreviewOp->init(theFeature, aSelected, aHighlighted);
   } else {
-    anOperation->setFeature(theFeature);
+    anOperation->setEditingFeature(theFeature);
   }
   sendOperation(anOperation);
   myWorkshop->actionsMgr()->updateCheckState();

@@ -37,7 +37,7 @@ protected:
   //Widgets
   QWidget* createWidgetByType(const std::string& theType, QWidget* theParent = NULL);
   QWidget* labelControl(QWidget* theParent);
-  QWidget* doubleSpinBoxControl();
+  QWidget* doubleSpinBoxControl(QWidget* theParent);
   QWidget* pointSelectorControl(QWidget* theParent);
   QWidget* createContainer(const std::string& theType, QWidget* theParent = NULL);
   QWidget* selectorControl(QWidget* theParent);
