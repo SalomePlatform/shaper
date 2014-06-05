@@ -19,6 +19,7 @@
 
 class Handle_V3d_View;
 class XGUI_ViewerPrs;
+class GeomDataAPI_Point2D;
 
 /*!
  \class PartSet_Tools
@@ -45,8 +46,7 @@ public:
   /// \param theY the Y coordinate
   /// \param theSketch the sketch feature
   /// \param thePoint the 3D point in the viewer
-  static void convertTo3D(const double theX, const double theY,
-                          FeaturePtr theSketch,
+  static void convertTo3D(const double theX, const double theY, FeaturePtr theSketch,
                           gp_Pnt& thePoint);
 
   /// Returns the point of intersection of the two lines, the first is (v0, v1), the second is (v2, v3),
@@ -80,16 +80,46 @@ public:
   /// \param theView a 3D view
   /// \param theSketch the sketch feature
   /// \param theFeatures the list of selected presentations
-  static FeaturePtr nearestFeature(QPoint thePoint, Handle_V3d_View theView,
-                                                     FeaturePtr theSketch,
-                                                     const std::list<XGUI_ViewerPrs>& theFeatures);
+  static FeaturePtr nearestFeature(QPoint thePoint, Handle_V3d_View theView, FeaturePtr theSketch,
+                                   const std::list<XGUI_ViewerPrs>& theFeatures);
+
+  /// Returns pointer to the root document.
+  static boost::shared_ptr<ModelAPI_Document> document();
+
+  /// \brief Save the point to the feature. If the attribute is 2D geometry point, it is filled.
+  /// \param theFeature the feature
+  /// \param theX the horizontal coordinate
+  /// \param theY the vertical coordinate
+  /// \param theAttribute the feature attribute
+  static void setFeaturePoint(FeaturePtr, double theX, double theY, const std::string& theAttribute);
+
+    /// Creates a constraint on two points
+  /// \param thePoint1 the first point
+  /// \param thePoint1 the second point
+  static void createConstraint(FeaturePtr theSketch,
+                               boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
+                               boost::shared_ptr<GeomDataAPI_Point2D> thePoint2);
+
+  /// \brief Get the line point 2d coordinates.
+  /// \param theFeature the line feature
+  /// \param theAttribute the start or end attribute of the line
+  /// \param theX the horizontal coordinate
+  /// \param theY the vertical coordinate
+  static void getLinePoint(FeaturePtr theFeature, const std::string& theAttribute,
+                           double& theX, double& theY);
+  /// Find a point in the line with given coordinates
+  /// \param theFeature the line feature
+  /// \param theX the horizontal point coordinate
+  /// \param theY the vertical point coordinate
+  static boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
+                                                          double theY);
+
 private:
   /// Return the distance between the feature and the point
   /// \param theFeature feature object
   /// \param theX the horizontal coordinate of the point
   /// \param theX the vertical coordinate of the point
-  static double distanceToPoint(FeaturePtr theFeature,
-                                double theX, double theY);
+  static double distanceToPoint(FeaturePtr theFeature, double theX, double theY);
 };
 
 #endif

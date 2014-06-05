@@ -1,43 +1,43 @@
-// File:        PartSet_OperationSketchLine.h
+// File:        PartSet_OperationCreateFeature.h
 // Created:     20 Apr 2014
 // Author:      Natalia ERMOLAEVA
 
-#ifndef PartSet_OperationSketchLine_H
-#define PartSet_OperationSketchLine_H
+#ifndef PartSet_OperationCreateFeature_H
+#define PartSet_OperationCreateFeature_H
 
 #include "PartSet.h"
 
 #include <PartSet_OperationSketchBase.h>
+#include <PartSet_Constants.h>
 
 #include <SketchPlugin_Line.h>
 
 #include <QObject>
 
+class PartSet_FeaturePrs;
 class GeomDataAPI_Point2D;
 class QMouseEvent;
 class QKeyEvent;
 
 /*!
- \class PartSet_OperationSketchLine
+ \class PartSet_OperationCreateFeature
  * \brief The operation for the sketch feature creation
 */
-class PARTSET_EXPORT PartSet_OperationSketchLine : public PartSet_OperationSketchBase
+class PARTSET_EXPORT PartSet_OperationCreateFeature : public PartSet_OperationSketchBase
 {
   Q_OBJECT
 
 public:
-  /// Returns the operation type key
-  static std::string Type() { return SKETCH_LINE_KIND; }
 
 public:
   /// Constructor
   /// \param theId the feature identifier
   /// \param theParent the operation parent
-  /// \param theFeature the parent feature
-  PartSet_OperationSketchLine(const QString& theId, QObject* theParent,
-                              FeaturePtr theSketchFeature);
+  /// \param theSketch the parent feature
+  PartSet_OperationCreateFeature(const QString& theId, QObject* theParent,
+                                 FeaturePtr theSketch);
   /// Destructor
-  virtual ~PartSet_OperationSketchLine();
+  virtual ~PartSet_OperationCreateFeature();
 
   /// Verifies whether this operator can be commited.
   /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
@@ -82,14 +82,6 @@ public:
 
   virtual void keyReleased(std::string theName, QKeyEvent* theEvent);
 
-  /// \brief Save the point to the line.
-  /// \param theFeature the line feature
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  /// \param theAttribute the start or end attribute of the line
-  static void setLinePoint(FeaturePtr, double theX, double theY,
-                           const std::string& theAttribute);
-
 protected:
   /// \brief Virtual method called when operation is started
   /// Virtual method called when operation started (see start() method for more description)
@@ -114,50 +106,17 @@ protected:
   /// \returns the created feature
   virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
-  /// Creates a constraint on two points
-  /// \param thePoint1 the first point
-  /// \param thePoint1 the second point
-  void createConstraint(boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
-                        boost::shared_ptr<GeomDataAPI_Point2D> thePoint2);
-
-  /// Creates constrains of the current 
-  /// \param theX the horizontal coordnate of the point
-  /// \param theY the vertical coordnate of the point
-  void setConstraints(double theX, double theY);
-
 protected:
-  /// \brief Get the line point 2d coordinates.
-  /// \param theFeature the line feature
-  /// \param theAttribute the start or end attribute of the line
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  void getLinePoint(FeaturePtr theFeature, const std::string& theAttribute,
-                    double& theX, double& theY);
-  /// Find a point in the line with given coordinates
-  /// \param theFeature the line feature
-  /// \param theX the horizontal point coordinate
-  /// \param theY the vertical point coordinate
-  boost::shared_ptr<GeomDataAPI_Point2D> findLinePoint(FeaturePtr theFeature,
-                                                       double theX, double theY);
-
-  /// \brief Save the point to the line.
-  /// \param thePoint the 3D point in the viewer
-  /// \param theAttribute the start or end attribute of the line
-  void setLinePoint(const gp_Pnt& thePoint, Handle(V3d_View) theView, const std::string& theAttribute);
-
-protected:
-  ///< Structure to lists the possible types of point selection modes
-  enum PointSelectionMode {SM_FirstPoint, SM_SecondPoint, SM_DonePoint};
-
   ///< Set the point selection mode. Emit signal about focus change if necessary.
   /// \param theMode a new selection mode
   /// \param isToEmitSignal the neccessity to emit signal
-  void setPointSelectionMode(const PointSelectionMode& theMode, const bool isToEmitSignal = true);
+  void setPointSelectionMode(const PartSet_SelectionMode& theMode,
+                             const bool isToEmitSignal = true);
 
 private:
-  FeaturePtr mySketch; ///< the sketch feature
-  boost::shared_ptr<GeomDataAPI_Point2D> myInitPoint; ///< the first line point
-  PointSelectionMode myPointSelectionMode; ///< point selection mode
+  PartSet_FeaturePrs* myFeaturePrs; ///< the feature presentation
+  FeaturePtr myInitFeature; ///< the initial feature
+  PartSet_SelectionMode myPointSelectionMode; ///< point selection mode
 };
 
 #endif

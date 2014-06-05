@@ -6,6 +6,7 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_Document.h>
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
@@ -14,8 +15,11 @@
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
 
+#include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_Constraint.h>
 
 #include <XGUI_ViewerPrs.h>
 
@@ -215,4 +219,83 @@ double PartSet_Tools::distanceToPoint(FeaturePtr theFeature,
   aDelta = gp_Pnt(theX, theY, 0).Distance(gp_Pnt(aX, anY, 0));
 
   return aDelta;
+}
+
+boost::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
+{
+  return ModelAPI_PluginManager::get()->rootDocument();
+}
+
+void PartSet_Tools::setFeaturePoint(FeaturePtr theFeature, double theX, double theY,
+                                    const std::string& theAttribute)
+{
+  if (!theFeature)
+    return;
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
+  if (aPoint)
+    aPoint->setValue(theX, theY);
+}
+
+void PartSet_Tools::createConstraint(FeaturePtr theSketch,
+                                     boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
+                                     boost::shared_ptr<GeomDataAPI_Point2D> thePoint2)
+{
+  boost::shared_ptr<ModelAPI_Document> aDoc = document();
+  FeaturePtr aFeature = aDoc->addFeature(SKETCH_CONSTRAINT_COINCIDENCE_KIND);
+
+  if (theSketch) {
+    boost::shared_ptr<SketchPlugin_Feature> aSketch = 
+                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(theSketch);
+    aSketch->addSub(aFeature);
+  }
+
+  boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
+
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef1 =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
+  aRef1->setAttr(thePoint1);
+
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef2 =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_B));
+  aRef2->setAttr(thePoint2);
+
+  if (aFeature) // TODO: generate an error if feature was not created
+    aFeature->execute();
+}
+
+void PartSet_Tools::getLinePoint(FeaturePtr theFeature, const std::string& theAttribute,
+                                 double& theX, double& theY)
+{
+  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
+    return;
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
+  theX = aPoint->x();
+  theY = aPoint->y();
+}
+
+boost::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findPoint(FeaturePtr theFeature,
+                                                                double theX, double theY)
+{
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
+  if (!theFeature)
+    return aPoint2D;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  if (theFeature->getKind() == SKETCH_LINE_KIND)
+  {
+    boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
+    if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
+      aPoint2D = aPoint;
+    else {
+      aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
+      if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
+        aPoint2D = aPoint;
+    }
+  }
+  return aPoint2D;
 }
