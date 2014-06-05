@@ -1,17 +1,20 @@
 <plugin>
   <workbench id="Sketch">
     <group id="Basic">
-      <feature id="Sketch" nested="SketchLine SketchConstraintLength" title="Sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
+      <feature id="Sketch" nested="SketchPoint SketchLine SketchCircle SketchConstraintLength" title="Sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
         <label title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch"/> 
       <!--icon=":pictures/x_point.png"-->
       </feature>
-      <feature id="SketchPoint" title="Point" tooltip="Create a new point" icon=":icons/point.png" internal="1"/>
+      <feature id="SketchPoint" title="Point" tooltip="Create a new point" icon=":icons/point.png">
+        <point_selector id="PointCoordindates" title="Point" tooltip="Point"/>
+      </feature>
       <feature id="SketchLine" title="Line" tooltip="Create a new line" icon=":icons/line.png">
         <point_selector id="StartPoint" title="Start point" tooltip="Start point of the line"/>
         <point_selector id="EndPoint" title="End point" tooltip="End point of the line"/>
       </feature>
-      <feature id="SketchCircle" title="Circle" tooltip="Create a new circle" icon="" internal="1">
+      <feature id="SketchCircle" title="Circle" tooltip="Create a new circle" icon="">
         <point_selector id="CircleCenter" title="Center" tooltip="Center of the circle"/>
+        <doublevalue id="CircleRadius" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set Radius"/>
       </feature>
       <feature id="SketchArc" title="Arc" tooltip="Create a new arc of a circle" icon="" internal="1">
         <point_selector id="ArcCenter" title="Center" tooltip="Center of the arc"/>

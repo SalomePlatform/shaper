@@ -6,9 +6,14 @@
 
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketch.h>
+#include <PartSet_FeaturePointPrs.h>
 #include <PartSet_FeatureLinePrs.h>
+#include <PartSet_FeatureCirclePrs.h>
 
 #include <SketchPlugin_Feature.h>
+#include <SketchPlugin_Point.h>
+#include <SketchPlugin_Line.h>
+#include <SketchPlugin_Circle.h>
 
 #include <ModuleBase_OperationDescription.h>
 
@@ -29,17 +34,32 @@
 using namespace std;
 
 PartSet_OperationCreateFeature::PartSet_OperationCreateFeature(const QString& theId,
-	                                          QObject* theParent,
-                                              FeaturePtr theFeature)
+                                                               QObject* theParent,
+                                                               FeaturePtr theFeature)
 : PartSet_OperationSketchBase(theId, theParent),
   myPointSelectionMode(SM_FirstPoint)
 {
-  myFeaturePrs = new PartSet_FeatureLinePrs(theFeature);
+  std::string aKind = theId.toStdString();
+
+  if (aKind == SKETCH_POINT_KIND) {
+    myFeaturePrs = new PartSet_FeaturePointPrs(theFeature);
+  }
+  if (aKind == SKETCH_LINE_KIND) {
+    myFeaturePrs = new PartSet_FeatureLinePrs(theFeature);
+  }
+  else if (aKind == SKETCH_CIRCLE_KIND) {
+    myFeaturePrs = new PartSet_FeatureCirclePrs(theFeature);
+  }
 }
 
 PartSet_OperationCreateFeature::~PartSet_OperationCreateFeature()
 {
   delete myFeaturePrs;
+}
+
+bool PartSet_OperationCreateFeature::canProcessKind(const std::string& theId)
+{
+  return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND || theId == SKETCH_CIRCLE_KIND;
 }
 
 bool PartSet_OperationCreateFeature::canBeCommitted() const
