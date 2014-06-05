@@ -30,7 +30,7 @@ public:
   /// Saves the fiature as the presentation internal feature
   /// \param theFeature the presentation feature
   /// \param theSourceFeature the feature, which attributes are used to initialize the feature
-  virtual void init(FeaturePtr theFeature, FeaturePtr theSourceFeature);
+  void init(FeaturePtr theFeature, FeaturePtr theSourceFeature);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
@@ -41,7 +41,17 @@ public:
   /// \param theY the 2D point vertical coordinate
   /// \param theMode the selection mode
   /// \return the new selection mode
-  PartSet_SelectionMode setPoint(double theX, double theY, const PartSet_SelectionMode& theMode);
+  virtual PartSet_SelectionMode setPoint(double theX, double theY,
+                                         const PartSet_SelectionMode& theMode) = 0;
+
+  /// Returns the feature attribute name for the selection mode
+  /// \param theMode the current operation selection mode. The feature attribute depends on the mode
+  virtual std::string getAttribute(const PartSet_SelectionMode& theMode) const = 0;
+
+  /// Returns the next selection mode after the attribute
+  /// \param theAttribute the feature attribute name
+  /// \return next attribute selection mode
+  virtual PartSet_SelectionMode getNextMode(const std::string& theAttribute) const = 0;
 
   /// Creates constrains of the current 
   /// \param theX the horizontal coordnate of the point
@@ -49,50 +59,18 @@ public:
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode
   void setConstraints(double theX, double theY, const PartSet_SelectionMode& theMode);
 
-  /// Returns the feature attribute name for the selection mode
-  /// \param theMode the current operation selection mode. The feature attribute depends on the mode
-  std::string getAttribute(const PartSet_SelectionMode& theMode) const;
-
-  /// Returns the next selection mode after the attribute
-  /// \param theAttribute the feature attribute name
-  /// \return next attribute selection mode
-  PartSet_SelectionMode getNextMode(const std::string& theAttribute) const;
-
-  /// \brief Save the point to the line.
-  /// \param theFeature the line feature
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  /// \param theAttribute the start or end attribute of the line
-  static void setLinePoint(FeaturePtr, double theX, double theY,
-                           const std::string& theAttribute);
-
 protected:
-  /// Returns pointer to the root document.
-  boost::shared_ptr<ModelAPI_Document> document() const;
-
-    /// Returns the operation feature
+  /// Returns the operation feature
   /// \return the feature
   FeaturePtr feature() const;
 
-  /// Creates a constraint on two points
-  /// \param thePoint1 the first point
-  /// \param thePoint1 the second point
-  void createConstraint(boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
-                        boost::shared_ptr<GeomDataAPI_Point2D> thePoint2);
+  /// Initializes current feature by the given
+  /// \param theSourceFeature the feature, which attributes are used to initialize the current feature
+  virtual void initFeature(FeaturePtr theSourceFeature) = 0;
 
-  /// \brief Get the line point 2d coordinates.
-  /// \param theFeature the line feature
-  /// \param theAttribute the start or end attribute of the line
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  void getLinePoint(FeaturePtr theFeature, const std::string& theAttribute,
-                    double& theX, double& theY);
-  /// Find a point in the line with given coordinates
-  /// \param theFeature the line feature
-  /// \param theX the horizontal point coordinate
-  /// \param theY the vertical point coordinate
-  boost::shared_ptr<GeomDataAPI_Point2D> findLinePoint(FeaturePtr theFeature,
-                                                       double theX, double theY);
+  /// Returns the feature point in the selection mode position.
+  /// \param theMode the current operation selection mode. The feature attribute depends on the mode
+  virtual boost::shared_ptr<GeomDataAPI_Point2D> featurePoint(const PartSet_SelectionMode& theMode) = 0;
 
 private:
   FeaturePtr mySketch; ///< the sketch of the feature

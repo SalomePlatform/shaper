@@ -6,7 +6,7 @@
 
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketch.h>
-#include <PartSet_FeaturePrs.h>
+#include <PartSet_FeatureLinePrs.h>
 
 #include <SketchPlugin_Feature.h>
 
@@ -34,7 +34,7 @@ PartSet_OperationCreateFeature::PartSet_OperationCreateFeature(const QString& th
 : PartSet_OperationSketchBase(theId, theParent),
   myPointSelectionMode(SM_FirstPoint)
 {
-  myFeaturePrs = new PartSet_FeaturePrs(theFeature);
+  myFeaturePrs = new PartSet_FeatureLinePrs(theFeature);
 }
 
 PartSet_OperationCreateFeature::~PartSet_OperationCreateFeature()
@@ -110,14 +110,17 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
           myFeaturePrs->setConstraints(aX, anY, myPointSelectionMode);
         }
       }
-      /*else if (aShape.ShapeType() == TopAbs_EDGE) // the line is selected
+      else if (aShape.ShapeType() == TopAbs_EDGE) // the line is selected
       {
+        PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+        isFoundPoint = true;
+        /*
         FeaturePtr aFeature = aPrs.feature();
         if (aFeature) {
           double X0, X1, X2, X3;
           double Y0, Y1, Y2, Y3;
-          getLinePoint(aFeature, LINE_ATTR_START, X2, Y2);
-          getLinePoint(aFeature, LINE_ATTR_END, X3, Y3);
+          PartSet_Tools::getLinePoint(aFeature, LINE_ATTR_START, X2, Y2);
+          PartSet_Tools::getLinePoint(aFeature, LINE_ATTR_END, X3, Y3);
           PartSet_Tools::convertTo2D(aPoint, sketch(), theView, X1, Y1);
 
           switch (myPointSelectionMode) {
@@ -125,7 +128,7 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
               PartSet_Tools::projectPointOnLine(X2, Y2, X3, Y3, X1, Y1, aX, anY);
             break;
             case SM_SecondPoint: {
-              getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
+              PartSet_Tools::getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
               PartSet_Tools::intersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, aX, anY);
             }
             break;
@@ -134,7 +137,8 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
           }
           isFoundPoint = true;
         }
-      }*/
+        */
+      }
     }
   }
 
