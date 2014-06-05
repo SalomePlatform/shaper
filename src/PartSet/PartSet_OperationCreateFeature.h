@@ -10,8 +10,6 @@
 #include <PartSet_OperationSketchBase.h>
 #include <PartSet_Constants.h>
 
-#include <SketchPlugin_Line.h>
-
 #include <QObject>
 
 class PartSet_FeaturePrs;

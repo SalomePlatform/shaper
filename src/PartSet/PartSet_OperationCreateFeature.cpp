@@ -7,8 +7,10 @@
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketch.h>
 #include <PartSet_FeatureLinePrs.h>
+#include <PartSet_FeaturePointPrs.h>
 
 #include <SketchPlugin_Feature.h>
+#include <SketchPlugin_Line.h>
 
 #include <ModuleBase_OperationDescription.h>
 
@@ -29,12 +31,17 @@
 using namespace std;
 
 PartSet_OperationCreateFeature::PartSet_OperationCreateFeature(const QString& theId,
-	                                          QObject* theParent,
-                                              FeaturePtr theFeature)
+                                                               QObject* theParent,
+                                                               FeaturePtr theFeature)
 : PartSet_OperationSketchBase(theId, theParent),
   myPointSelectionMode(SM_FirstPoint)
 {
-  myFeaturePrs = new PartSet_FeatureLinePrs(theFeature);
+  if (theId.toStdString() == SKETCH_LINE_KIND) {
+    myFeaturePrs = new PartSet_FeatureLinePrs(theFeature);
+  }
+  else {
+    myFeaturePrs = new PartSet_FeaturePointPrs(theFeature);
+  }
 }
 
 PartSet_OperationCreateFeature::~PartSet_OperationCreateFeature()
