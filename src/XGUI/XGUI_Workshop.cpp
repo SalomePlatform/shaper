@@ -264,6 +264,8 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   //An operation passed by message. Start it, process and commit.
   const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
+    // Clear previous content
+    myPropertyPanel->cleanContent();
     ModuleBase_Operation* anOperation =
         (ModuleBase_Operation*)(aPartSetMsg->pointer());
 
