@@ -29,8 +29,8 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
   QWidget* aContent = new QWidget(this);
-  QVBoxLayout* aMainLay = new QVBoxLayout(aContent);
-  aMainLay->setContentsMargins(3, 3, 3, 3);
+  myMainLayout = new QVBoxLayout(aContent);
+  myMainLayout->setContentsMargins(3, 3, 3, 3);
   this->setWidget(aContent);
 
   QFrame* aFrm = new QFrame(aContent);
@@ -38,7 +38,7 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   aFrm->setFrameShape(QFrame::Panel);
   QHBoxLayout* aBtnLay = new QHBoxLayout(aFrm);
   aBtnLay->setContentsMargins(0, 0, 0, 0);
-  aMainLay->addWidget(aFrm);
+  myMainLayout->addWidget(aFrm);
 
   QPushButton* aBtn = new QPushButton(QIcon(":pictures/button_help.png"), "", aFrm);
   aBtn->setFlat(true);
@@ -58,14 +58,29 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   aBtnLay->addWidget(aBtn);
 
   myCustomWidget = new QWidget(aContent);
-  aMainLay->addWidget(myCustomWidget);
-  aMainLay->addStretch(1);
+  myMainLayout->addWidget(myCustomWidget);
+  myMainLayout->addStretch(1);
 
   aBtn->installEventFilter(this);
 }
 
 XGUI_PropertyPanel::~XGUI_PropertyPanel()
 {
+}
+
+void XGUI_PropertyPanel::cleanContent()
+{
+  myWidgets.clear();
+  
+  QLayoutItem* aItem = myMainLayout->takeAt(myMainLayout->count() - 1);
+  delete aItem;
+
+  myMainLayout->removeWidget(myCustomWidget);
+  delete myCustomWidget;
+
+  myCustomWidget = new QWidget(widget());
+  myMainLayout->addWidget(myCustomWidget);
+  myMainLayout->addStretch(1);
 }
 
 void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets)
