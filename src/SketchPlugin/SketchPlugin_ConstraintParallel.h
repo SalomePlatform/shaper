@@ -6,8 +6,11 @@
 #define SketchPlugin_ConstraintParallel_HeaderFile
 
 #include "SketchPlugin.h"
+#include <SketchPlugin_Sketch.h>
 #include "SketchPlugin_Constraint.h"
 
+/// Parallel constraint kind
+const std::string SKETCH_CONSTRAINT_PARALLEL_KIND("SketchConstraintParallel");
 
 /** \class SketchPlugin_ConstraintParallel
  *  \ingroup DataModel
@@ -21,11 +24,11 @@ class SketchPlugin_ConstraintParallel: public SketchPlugin_Constraint
 public:
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "SketchConstraintParallel"; return MY_KIND;}
+  {static std::string MY_KIND = SKETCH_CONSTRAINT_PARALLEL_KIND; return MY_KIND;}
 
   /// \brief Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
-  {static std::string MY_GROUP = "Sketch"; return MY_GROUP;}
+  {static std::string MY_GROUP = SKETCH_KIND; return MY_GROUP;}
 
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();

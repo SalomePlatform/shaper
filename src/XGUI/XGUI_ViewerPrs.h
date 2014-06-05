@@ -9,12 +9,13 @@
 
 #include <boost/shared_ptr.hpp>
 #include <TopoDS_Shape.hxx>
+#include <SelectMgr_EntityOwner.hxx>
 
-class ModelAPI_Feature;
+#include <ModelAPI_Feature.h>
 
 /**\class XGUI_ViewerPrs
  * \ingroup GUI
- * \brief Presentation. Provides container to have feature and the shape
+ * \brief Presentation. Provides container to have feature, shape and/or selection owner.
  */
 class XGUI_EXPORT XGUI_ViewerPrs
 {
@@ -22,29 +23,42 @@ public:
   /// Constructor
   XGUI_ViewerPrs();
   /// Constructor
-  XGUI_ViewerPrs(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                 const TopoDS_Shape& theShape);
+  /// \param theFeature a model feature
+  /// \param theShape a viewer shape
+  /// \param theOwner a selection owner
+  XGUI_ViewerPrs(FeaturePtr theFeature,
+                 const TopoDS_Shape& theShape,
+                 Handle_SelectMgr_EntityOwner theOwner);
   /// Destructor
   virtual ~XGUI_ViewerPrs();
 
   /// Sets the feature.
   /// \param theFeature a feature instance
-  void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  void setFeature(FeaturePtr theFeature);
+
+  /// Returns the feature.
+  /// \return a feature instance
+  FeaturePtr feature() const;
+
+  /// Returns the presentation owner
+  /// \param the owner
+  void setOwner(Handle_SelectMgr_EntityOwner theOwner);
+
+  /// Returns the presentation owner
+  /// \return an owner
+  Handle_SelectMgr_EntityOwner owner() const;
 
   /// Sets the shape
   /// \param theShape a shape instance
   void setShape(const TopoDS_Shape& theShape);
-
-  /// Returns the feature.
-  /// \return a feature instance
-  boost::shared_ptr<ModelAPI_Feature> feature() const;
 
   /// Returns the shape
   /// \return a shape instance
   const TopoDS_Shape& shape() const;
 
 private:
-  boost::shared_ptr<ModelAPI_Feature> myFeature; /// the feature
+  FeaturePtr myFeature; /// the feature
+  Handle(SelectMgr_EntityOwner) myOwner; /// the selection owner
   TopoDS_Shape myShape; /// the shape
 };
 

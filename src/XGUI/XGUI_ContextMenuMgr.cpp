@@ -5,6 +5,8 @@
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_Displayer.h"
 
+#include "PartSetPlugin_Part.h"
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Object.h>
@@ -96,7 +98,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     FeaturePtr aFeature = aFeatures.first();
     //Process Feature
     if (aFeature) {
-      if (aFeature->getKind() == "Part") {
+      if (aFeature->getKind() == PARTSET_PART_KIND) {
         ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
         DocumentPtr aFeaDoc = aObject->featureRef()->data()->docRef("PartDocument")->value();
         if (aMgr->currentDocument() == aFeaDoc)
@@ -107,7 +109,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
         aMenu->addAction(action("EDIT_CMD"));
 
         XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-        if (aDisplayer->IsVisible(aFeature))
+        if (aDisplayer->isVisible(aFeature))
           aMenu->addAction(action("HIDE_CMD"));
         else
           aMenu->addAction(action("SHOW_CMD"));

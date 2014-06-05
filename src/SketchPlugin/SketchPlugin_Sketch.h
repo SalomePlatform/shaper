@@ -10,6 +10,9 @@
 #include <GeomAPI_Pnt.h>
 #include <list>
 
+/// Sketch feature kind
+const std::string SKETCH_KIND("Sketch");
+
 /// Origin point of the sketcher in 3D space
 const std::string SKETCH_ATTR_ORIGIN("Origin");
 /// Vector X inside of the sketch plane
@@ -30,7 +33,7 @@ class SketchPlugin_Sketch: public SketchPlugin_Feature
 public:
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = "Sketch"; return MY_KIND;}
+  {static std::string MY_KIND = SKETCH_KIND; return MY_KIND;}
 
   /// Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
@@ -48,7 +51,7 @@ public:
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
   SKETCHPLUGIN_EXPORT virtual const void addSub(
-    const boost::shared_ptr<ModelAPI_Feature>& theFeature);
+    const FeaturePtr& theFeature);
 
   /// Converts a 2D sketch space point into point in 3D space
   SKETCHPLUGIN_EXPORT boost::shared_ptr<GeomAPI_Pnt> to3D(

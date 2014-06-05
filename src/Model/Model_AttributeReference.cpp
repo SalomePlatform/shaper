@@ -11,7 +11,7 @@
 
 using namespace std;
 
-void Model_AttributeReference::setValue(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void Model_AttributeReference::setValue(FeaturePtr theFeature)
 {
   if (value() != theFeature) {
     boost::shared_ptr<Model_Data> aData = 
@@ -19,7 +19,7 @@ void Model_AttributeReference::setValue(boost::shared_ptr<ModelAPI_Feature> theF
     if (myRef.IsNull()) {
       boost::shared_ptr<Model_Data> aMyData = 
         boost::dynamic_pointer_cast<Model_Data>(owner()->data());
-      TDF_Reference::Set(aMyData->label(), aData->label());
+      myRef = TDF_Reference::Set(aMyData->label(), aData->label());
     } else {
       myRef->Set(aData->label());
     }
@@ -30,7 +30,7 @@ void Model_AttributeReference::setValue(boost::shared_ptr<ModelAPI_Feature> theF
   }
 }
 
-boost::shared_ptr<ModelAPI_Feature> Model_AttributeReference::value()
+FeaturePtr Model_AttributeReference::value()
 {
   if (!myRef.IsNull()) {
     boost::shared_ptr<Model_Document> aDoc = 
@@ -41,7 +41,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_AttributeReference::value()
     }
   }
   // not initialized
-  return boost::shared_ptr<ModelAPI_Feature>();
+  return FeaturePtr();
 }
 
 Model_AttributeReference::Model_AttributeReference(TDF_Label& theLabel)

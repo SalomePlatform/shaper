@@ -29,9 +29,9 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
       boost::shared_ptr<SketchPlugin_Sketch> aSketch = boost::
         dynamic_pointer_cast<SketchPlugin_Sketch>(document()->feature("Construction", a, true));
       if (aSketch) {
-        std::list<boost::shared_ptr<ModelAPI_Feature> > aList = 
+        std::list<FeaturePtr > aList = 
           aSketch->data()->reflist(SKETCH_ATTR_FEATURES)->list();
-        std::list<boost::shared_ptr<ModelAPI_Feature> >::iterator aSub = aList.begin();
+        std::list<FeaturePtr >::iterator aSub = aList.begin();
         for(; aSub != aList.end(); aSub++) {
           if ((*aSub)->data()->isEqual(data())) {
             mySketch = aSketch.get();

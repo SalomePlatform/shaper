@@ -83,7 +83,7 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Sketch::preview()
   return getPreview();
 }
 
-const void SketchPlugin_Sketch::addSub(const boost::shared_ptr<ModelAPI_Feature>& theFeature)
+const void SketchPlugin_Sketch::addSub(const FeaturePtr& theFeature)
 {
   boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature)->setSketch(this);
   data()->reflist(SKETCH_ATTR_FEATURES)->append(theFeature);

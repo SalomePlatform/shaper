@@ -25,6 +25,7 @@ class XGUI_SalomeViewer;
 class XGUI_ViewerProxy;
 class XGUI_PropertyPanel;
 class XGUI_ContextMenuMgr;
+class XGUI_ModuleConnector;
 
 class ModuleBase_Operation;
 
@@ -174,6 +175,7 @@ private:
   XGUI_ErrorDialog* myErrorDlg;
   XGUI_ViewerProxy* myViewerProxy;
   XGUI_ContextMenuMgr* myContextMenuMgr;
+  XGUI_ModuleConnector* myModuleConnector;
 
   QString myCurrentDir;
   static QMap<QString, QString> myIcons;

@@ -27,7 +27,7 @@ PartSet_OperationSketchBase::~PartSet_OperationSketchBase()
 }
 
 boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview(
-                                      boost::shared_ptr<ModelAPI_Feature> theFeature)
+                                      FeaturePtr theFeature)
 {
   boost::shared_ptr<SketchPlugin_Feature> aFeature = 
                               boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
@@ -36,22 +36,22 @@ boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview(
   return aFeature->preview();
 }
 
-std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
+std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >
                                                      PartSet_OperationSketchBase::subPreview() const
 {
-  return std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >();
+  return std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >();
 }
 
-std::list<int> PartSet_OperationSketchBase::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
+std::list<int> PartSet_OperationSketchBase::getSelectionModes(FeaturePtr theFeature) const
 {
   std::list<int> aModes;
   aModes.push_back(TopAbs_VERTEX);
   aModes.push_back(TopAbs_EDGE);
   return aModes;
 }
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketchBase::createFeature(const bool theFlushMessage)
+FeaturePtr PartSet_OperationSketchBase::createFeature(const bool theFlushMessage)
 {
-  boost::shared_ptr<ModelAPI_Feature> aFeature = ModuleBase_Operation::createFeature(theFlushMessage);
+  FeaturePtr aFeature = ModuleBase_Operation::createFeature(theFlushMessage);
   if (aFeature)
     emit featureConstructed(aFeature, FM_Activation);
   return aFeature;
@@ -90,7 +90,7 @@ void PartSet_OperationSketchBase::keyReleased(std::string theName, QKeyEvent* th
 }
 
 void PartSet_OperationSketchBase::restartOperation(const std::string& theType,
-                                                   boost::shared_ptr<ModelAPI_Feature> theFeature)
+                                                   FeaturePtr theFeature)
 {
   emit launchOperation(theType, theFeature);
 }

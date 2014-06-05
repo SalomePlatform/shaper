@@ -10,6 +10,7 @@ INCLUDE(FindBoost)
 INCLUDE(FindPython)
 INCLUDE(FindSalome)
 INCLUDE(FindSolveSpace)
+INCLUDE(FindCAS)
 
 IF(UNIX)
     IF(CMAKE_COMPILER_IS_GNUCC)

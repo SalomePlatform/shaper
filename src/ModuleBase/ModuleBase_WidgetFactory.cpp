@@ -7,11 +7,12 @@
 
 #include <ModuleBase_WidgetFactory.h>
 
-#include <ModuleBase_MetaWidget.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetSwitch.h>
+#include <ModuleBase_SelectorWidget.h>
+#include <ModuleBase_Widgets.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -25,9 +26,6 @@
 #include <QPixmap>
 #include <QGroupBox>
 #include <QToolBox>
-#include <QLineEdit>
-#include <QToolButton>
-#include <QCheckBox>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -36,8 +34,8 @@
 #include <cfloat>
 #include <climits>
 
-ModuleBase_WidgetFactory::ModuleBase_WidgetFactory(ModuleBase_Operation* theOperation)
- : myOperation(theOperation)
+ModuleBase_WidgetFactory::ModuleBase_WidgetFactory(ModuleBase_Operation* theOperation, ModuleBase_IWorkshop* theWorkshop)
+ : myOperation(theOperation), myWorkshop(theWorkshop)
 {
   QString aXml = myOperation->getDescription()->xmlRepresentation();
   myWidgetApi = new Config_WidgetAPI(aXml.toStdString());
@@ -106,7 +104,7 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
 {
   QWidget* result = NULL;
   if (theType == WDG_DOUBLEVALUE) {
-    result = doubleSpinBoxControl();
+    result = doubleSpinBoxControl(theParent);
 
   } else if (theType == WDG_INFO) {
     result = labelControl(theParent);
@@ -149,52 +147,17 @@ QWidget* ModuleBase_WidgetFactory::createContainer(const std::string& theType, Q
   return result;
 }
 
-QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl()
+QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 {
-  QWidget* result = new QWidget();
-  QHBoxLayout* aControlLay = new QHBoxLayout(result);
-  aControlLay->setContentsMargins(0, 0, 0, 0);
-  QString aLabelText = qs(myWidgetApi->widgetLabel());
-  QString aLabelIcon = qs(myWidgetApi->widgetIcon());
-  QLabel* aLabel = new QLabel(aLabelText);
-  aLabel->setPixmap(QPixmap(aLabelIcon));
+  ModuleBase_DoubleValueWidget* aDblWgt = new ModuleBase_DoubleValueWidget(theParent, myWidgetApi);
+  QObject::connect(aDblWgt, SIGNAL(valuesChanged()),  myOperation, SLOT(storeCustomValue()));
 
-  aControlLay->addWidget(aLabel);
-  QDoubleSpinBox* aBox = new QDoubleSpinBox(result);
-  QString anObjName = QString::fromStdString(myWidgetApi->widgetId());
-  aBox->setObjectName(anObjName);
-  bool isOk = false;
-  std::string aProp = myWidgetApi->getProperty(DOUBLE_WDG_MIN);
-  double aMinVal = qs(aProp).toDouble(&isOk);
-  if (isOk) {
-    aBox->setMinimum(aMinVal);
-  } else {
-    aBox->setMinimum(-DBL_MAX);
-  }
-  aProp = myWidgetApi->getProperty(DOUBLE_WDG_MAX);
-  double aMaxVal = qs(aProp).toDouble(&isOk);
-  if (isOk) {
-    aBox->setMaximum(aMaxVal);
-  } else {
-    aBox->setMaximum(DBL_MAX);
-  }
-  aProp = myWidgetApi->getProperty(DOUBLE_WDG_STEP);
-  double aStepVal = qs(aProp).toDouble(&isOk);
-  if (isOk) {
-    aBox->setSingleStep(aStepVal);
-  }
-  aProp = myWidgetApi->getProperty(DOUBLE_WDG_DFLT);
-  double aDefVal = qs(aProp).toDouble(&isOk);
-  if (isOk) {
-    aBox->setValue(aDefVal);
-  }
-  QString aTTip = qs(myWidgetApi->widgetTooltip());
-  aBox->setToolTip(aTTip);
-  aControlLay->addWidget(aBox);
-  aControlLay->setStretch(1, 1);
-  result->setLayout(aControlLay);
-  connectWidget(aBox, WDG_DOUBLEVALUE);
-  return result;
+  myModelWidgets.append(aDblWgt);
+
+  // Init default values
+  if (!myOperation->isEditOperation())
+    aDblWgt->storeValue(myOperation->feature());
+  return aDblWgt->getControl();
 }
 
 QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
@@ -229,40 +192,24 @@ QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const
 
 QWidget* ModuleBase_WidgetFactory::selectorControl(QWidget* theParent)
 {
-  QWidget* aRes = new QWidget();
-  QHBoxLayout* aLayout = new QHBoxLayout(aRes);
+  ModuleBase_SelectorWidget* aSelector = new ModuleBase_SelectorWidget(theParent, myWorkshop, myWidgetApi);
+  
+  QObject::connect(aSelector, SIGNAL(valuesChanged()),  myOperation, SLOT(storeCustomValue()));
 
-  aLayout->setContentsMargins(0, 0, 0, 0);
-  QString aLabelText = qs(myWidgetApi->widgetLabel());
-  QString aLabelIcon = qs(myWidgetApi->widgetIcon());
-  QLabel* aLabel = new QLabel(aLabelText, aRes);
-  aLabel->setPixmap(QPixmap(aLabelIcon));
-
-  aLayout->addWidget(aLabel);
-
-  QLineEdit* aTextLine = new QLineEdit(aRes);
-  aTextLine->setReadOnly(true);
-
-  aLayout->addWidget(aTextLine);
-
-  QToolButton* aActivateBtn = new QToolButton(aRes);
-  aActivateBtn->setIcon(QIcon(":icons/hand_point.png"));
-  aActivateBtn->setCheckable(true);
-
-  aLayout->addWidget(aActivateBtn);
-
-  return aRes;
+  myModelWidgets.append(aSelector);
+  return aSelector->getControl();
 }
 
 
 QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
 {
-  QString aText = qs(myWidgetApi->widgetLabel());
-  QString aToolTip = qs(myWidgetApi->widgetTooltip());
-  QString aDefault = qs(myWidgetApi->getProperty("default"));
+  ModuleBase_BoolValueWidget* aBoolWgt = new ModuleBase_BoolValueWidget(theParent, myWidgetApi);
+  QObject::connect(aBoolWgt, SIGNAL(valuesChanged()),  myOperation, SLOT(storeCustomValue()));
 
-  QCheckBox* aRes = new QCheckBox(aText, theParent);
-  aRes->setToolTip(aToolTip);
-  aRes->setChecked(aDefault == "true");
-  return aRes;
+  myModelWidgets.append(aBoolWgt);
+
+  // Init default values
+  if (!myOperation->isEditOperation())
+    aBoolWgt->storeValue(myOperation->feature());
+  return aBoolWgt->getControl();
 }

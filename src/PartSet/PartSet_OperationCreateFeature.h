@@ -1,40 +1,43 @@
-// File:        PartSet_OperationSketchLine.h
+// File:        PartSet_OperationCreateFeature.h
 // Created:     20 Apr 2014
 // Author:      Natalia ERMOLAEVA
 
-#ifndef PartSet_OperationSketchLine_H
-#define PartSet_OperationSketchLine_H
+#ifndef PartSet_OperationCreateFeature_H
+#define PartSet_OperationCreateFeature_H
 
 #include "PartSet.h"
 
 #include <PartSet_OperationSketchBase.h>
+#include <PartSet_Constants.h>
+
+#include <SketchPlugin_Line.h>
+
 #include <QObject>
 
+class PartSet_FeaturePrs;
 class GeomDataAPI_Point2D;
 class QMouseEvent;
 class QKeyEvent;
 
 /*!
- \class PartSet_OperationSketchLine
+ \class PartSet_OperationCreateFeature
  * \brief The operation for the sketch feature creation
 */
-class PARTSET_EXPORT PartSet_OperationSketchLine : public PartSet_OperationSketchBase
+class PARTSET_EXPORT PartSet_OperationCreateFeature : public PartSet_OperationSketchBase
 {
   Q_OBJECT
 
 public:
-  /// Returns the operation type key
-  static std::string Type() { return "SketchLine"; }
 
 public:
   /// Constructor
   /// \param theId the feature identifier
   /// \param theParent the operation parent
-  /// \param theFeature the parent feature
-  PartSet_OperationSketchLine(const QString& theId, QObject* theParent,
-                              boost::shared_ptr<ModelAPI_Feature> theSketchFeature);
+  /// \param theSketch the parent feature
+  PartSet_OperationCreateFeature(const QString& theId, QObject* theParent,
+                                 FeaturePtr theSketch);
   /// Destructor
-  virtual ~PartSet_OperationSketchLine();
+  virtual ~PartSet_OperationCreateFeature();
 
   /// Verifies whether this operator can be commited.
   /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
@@ -48,18 +51,18 @@ public:
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
+  virtual std::list<int> getSelectionModes(FeaturePtr theFeature) const;
 
   /// Initializes some fields accorging to the feature
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  virtual void init(FeaturePtr theFeature,
                     const std::list<XGUI_ViewerPrs>& theSelected,
                     const std::list<XGUI_ViewerPrs>& theHighlighted);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
-  virtual boost::shared_ptr<ModelAPI_Feature> sketch() const;
+  virtual FeaturePtr sketch() const;
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theEvent the mouse event
@@ -78,14 +81,6 @@ public:
   virtual void keyReleased(const int theKey);
 
   virtual void keyReleased(std::string theName, QKeyEvent* theEvent);
-
-  /// \brief Save the point to the line.
-  /// \param theFeature the line feature
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  /// \param theAttribute the start or end attribute of the line
-  static void setLinePoint(boost::shared_ptr<ModelAPI_Feature>, double theX, double theY,
-                           const std::string& theAttribute);
 
 protected:
   /// \brief Virtual method called when operation is started
@@ -109,52 +104,19 @@ protected:
   /// the sketch feature
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
-
-  /// Creates a constraint on two points
-  /// \param thePoint1 the first point
-  /// \param thePoint1 the second point
-  void createConstraint(boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
-                        boost::shared_ptr<GeomDataAPI_Point2D> thePoint2);
-
-  /// Creates constrains of the current 
-  /// \param theX the horizontal coordnate of the point
-  /// \param theY the vertical coordnate of the point
-  void setConstraints(double theX, double theY);
+  virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
 protected:
-  /// \brief Get the line point 2d coordinates.
-  /// \param theFeature the line feature
-  /// \param theAttribute the start or end attribute of the line
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  void getLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature, const std::string& theAttribute,
-                    double& theX, double& theY);
-  /// Find a point in the line with given coordinates
-  /// \param theFeature the line feature
-  /// \param theX the horizontal point coordinate
-  /// \param theY the vertical point coordinate
-  boost::shared_ptr<GeomDataAPI_Point2D> findLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
-                                                       double theX, double theY);
-
-  /// \brief Save the point to the line.
-  /// \param thePoint the 3D point in the viewer
-  /// \param theAttribute the start or end attribute of the line
-  void setLinePoint(const gp_Pnt& thePoint, Handle(V3d_View) theView, const std::string& theAttribute);
-
-protected:
-  ///< Structure to lists the possible types of point selection modes
-  enum PointSelectionMode {SM_FirstPoint, SM_SecondPoint, SM_DonePoint};
-
   ///< Set the point selection mode. Emit signal about focus change if necessary.
   /// \param theMode a new selection mode
   /// \param isToEmitSignal the neccessity to emit signal
-  void setPointSelectionMode(const PointSelectionMode& theMode, const bool isToEmitSignal = true);
+  void setPointSelectionMode(const PartSet_SelectionMode& theMode,
+                             const bool isToEmitSignal = true);
 
 private:
-  boost::shared_ptr<ModelAPI_Feature> mySketch; ///< the sketch feature
-  boost::shared_ptr<GeomDataAPI_Point2D> myInitPoint; ///< the first line point
-  PointSelectionMode myPointSelectionMode; ///< point selection mode
+  PartSet_FeaturePrs* myFeaturePrs; ///< the feature presentation
+  FeaturePtr myInitFeature; ///< the initial feature
+  PartSet_SelectionMode myPointSelectionMode; ///< point selection mode
 };
 
 #endif

@@ -64,17 +64,17 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_MOVED))
   {
     const Model_FeatureUpdatedMessage* anUpdateMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    std::set< boost::shared_ptr<ModelAPI_Feature> > aFeatures = anUpdateMsg->features();
+    std::set< FeaturePtr > aFeatures = anUpdateMsg->features();
 
     bool isModifiedEvt = theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_MOVED);
     if (!isModifiedEvt)
     {
-      std::set< boost::shared_ptr<ModelAPI_Feature> >::iterator aFeatIter;
+      std::set< FeaturePtr >::iterator aFeatIter;
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++)
       {
         // Only sketches and constraints can be added by Create event
         const std::string& aFeatureKind = (*aFeatIter)->getKind();
-        if (aFeatureKind.compare("Sketch") == 0)
+        if (aFeatureKind.compare(SKETCH_KIND) == 0)
         {
           boost::shared_ptr<SketchPlugin_Feature> aSketch =
             boost::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
@@ -105,10 +105,10 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
     const Model_FeatureDeletedMessage* aDeleteMsg = dynamic_cast<const Model_FeatureDeletedMessage*>(theMessage);
     const std::set<std::string>& aFeatureGroups = aDeleteMsg->groups();
 
-    // Find "Sketch" in groups. The constraint groups should be updated when an object removed from Sketch
+    // Find SKETCH_KIND in groups. The constraint groups should be updated when an object removed from Sketch
     std::set<std::string>::const_iterator aFGrIter;
     for (aFGrIter = aFeatureGroups.begin(); aFGrIter != aFeatureGroups.end(); aFGrIter++)
-      if (aFGrIter->compare("Sketch") == 0)
+      if (aFGrIter->compare(SKETCH_KIND) == 0)
         break;
     
     if (aFGrIter != aFeatureGroups.end())
@@ -256,22 +256,22 @@ void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin
   std::vector<std::string> anAttrList;
   const std::string& aFeatureKind = theFeature->getKind();
   // Point
-  if (aFeatureKind.compare("SketchPoint") == 0)
+  if (aFeatureKind.compare(SKETCH_POINT_KIND) == 0)
     anAttrList.push_back(POINT_ATTR_COORD);
   // Line
-  else if (aFeatureKind.compare("SketchLine") == 0)
+  else if (aFeatureKind.compare(SKETCH_LINE_KIND) == 0)
   {
     anAttrList.push_back(LINE_ATTR_START);
     anAttrList.push_back(LINE_ATTR_END);
   }
   // Circle
-  else if (aFeatureKind.compare("SketchCircle") == 0)
+  else if (aFeatureKind.compare(SKETCH_CIRCLE_KIND) == 0)
   {
     anAttrList.push_back(CIRCLE_ATTR_CENTER);
     anAttrList.push_back(CIRCLE_ATTR_RADIUS);
   }
   // Arc
-  else if (aFeatureKind.compare("SketchArc") == 0)
+  else if (aFeatureKind.compare(SKETCH_ARC_KIND) == 0)
   {
     anAttrList.push_back(ARC_ATTR_CENTER);
     anAttrList.push_back(ARC_ATTR_START);
@@ -343,8 +343,8 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
 
     boost::shared_ptr<ModelAPI_AttributeRefList> aWPFeatures =
       boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aWP->data()->attribute(SKETCH_ATTR_FEATURES));
-    std::list< boost::shared_ptr<ModelAPI_Feature> > aFeaturesList = aWPFeatures->list();
-    std::list< boost::shared_ptr<ModelAPI_Feature> >::const_iterator anIter;
+    std::list< FeaturePtr > aFeaturesList = aWPFeatures->list();
+    std::list< FeaturePtr >::const_iterator anIter;
     for (anIter = aFeaturesList.begin(); anIter != aFeaturesList.end(); anIter++)
       if (*anIter == theConstraint)
         return aWP; // workplane is found

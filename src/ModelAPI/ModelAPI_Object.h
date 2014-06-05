@@ -23,7 +23,7 @@ public:
   MODELAPI_EXPORT virtual bool isInHistory() {return false;}
 
   /// Reference to the feature-operation that produces this object
-  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> featureRef() = 0;
+  MODELAPI_EXPORT virtual FeaturePtr featureRef() = 0;
 
   /// Returns the name of this object (by default equal to the name of feature)
   MODELAPI_EXPORT virtual std::string getName() = 0;

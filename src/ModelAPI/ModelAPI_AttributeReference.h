@@ -6,6 +6,7 @@
 #define ModelAPI_AttributeReference_HeaderFile
 
 #include "ModelAPI_Attribute.h"
+#include <ModelAPI_Feature.h>
 
 /**\class ModelAPI_AttributeReference
  * \ingroup DataModel
@@ -16,10 +17,10 @@ class ModelAPI_AttributeReference : public ModelAPI_Attribute
 {
 public:
   /// Defines the feature referenced from this attribute
-  MODELAPI_EXPORT virtual void setValue(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
+  MODELAPI_EXPORT virtual void setValue(FeaturePtr theFeature) = 0;
 
   /// Returns feature referenced from this attribute
-  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> value() = 0;
+  MODELAPI_EXPORT virtual FeaturePtr value() = 0;
 
   /// Returns the type of this class of attributes
   MODELAPI_EXPORT static std::string type() {return "Reference";}

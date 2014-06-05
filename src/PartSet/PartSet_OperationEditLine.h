@@ -56,7 +56,7 @@ public:
   /// \param theParent the operation parent
   /// \param theFeature the parent feature
   PartSet_OperationEditLine(const QString& theId, QObject* theParent,
-                            boost::shared_ptr<ModelAPI_Feature> theFeature);
+                            FeaturePtr theFeature);
   /// Destructor
   virtual ~PartSet_OperationEditLine();
 
@@ -68,19 +68,19 @@ public:
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual std::list<int> getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
+  virtual std::list<int> getSelectionModes(FeaturePtr theFeature) const;
 
   /// Initializes some fields accorging to the feature
   /// \param theFeature the feature
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  virtual void init(FeaturePtr theFeature,
                     const std::list<XGUI_ViewerPrs>& theSelected,
                     const std::list<XGUI_ViewerPrs>& theHighlighted);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
-  virtual boost::shared_ptr<ModelAPI_Feature> sketch() const;
+  virtual FeaturePtr sketch() const;
 
   /// Processes the mouse pressed in the point
   /// \param theEvent the mouse event
@@ -116,7 +116,7 @@ protected:
   /// Returns NULL feature. This is an operation of edition, not creation.
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(const bool theFlushMessage = true);
+  virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
 protected:
   /// Emits a signal about the selection blocking. Emits a signal to change the selection.
@@ -131,17 +131,16 @@ protected:
   /// \param theDeltaX the delta for X coordinate is moved
   /// \param theDeltaY the delta for Y coordinate is moved
   /// \param theAttribute the start or end attribute of the line
-  void  moveLinePoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  void  moveLinePoint(FeaturePtr theFeature,
                       double theDeltaX, double theDeltaY,
                       const std::string& theAttribute);
   /// Sends the features
   void sendFeatures();
 
 private:
-  boost::shared_ptr<ModelAPI_Feature> mySketch; ///< the sketch feature
+  FeaturePtr mySketch; ///< the sketch feature
   std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
   Point myCurPoint; ///< the current 3D point clicked or moved
-  gp_Pnt myCurPressed; ///< the current 3D point clicked or moved
   bool myIsBlockedSelection; ///< the state of the last state of selection blocked signal
 };
 

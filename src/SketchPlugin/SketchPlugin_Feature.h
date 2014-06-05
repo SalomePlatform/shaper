@@ -27,7 +27,7 @@ public:
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
   SKETCHPLUGIN_EXPORT virtual const void addSub(
-    const boost::shared_ptr<ModelAPI_Feature>& theFeature) = 0;
+    const FeaturePtr& theFeature) = 0;
 
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
   SKETCHPLUGIN_EXPORT virtual bool isInHistory() {return false;}

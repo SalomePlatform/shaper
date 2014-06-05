@@ -7,6 +7,7 @@
 
 #include "SketchPlugin.h"
 #include "SketchPlugin_Feature.h"
+#include <SketchPlugin_Sketch.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <list>
@@ -48,19 +49,15 @@ const std::string CONSTRAINT_ATTRIBUTES[CONSTRAINT_ATTR_SIZE] =
 class SketchPlugin_Constraint: public SketchPlugin_Feature
 {
 public:
-  /// \brief Returns the kind of a feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
-  {static std::string MY_KIND = "SketchConstraint"; return MY_KIND;}
-
   /// \brief Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup()
-  {static std::string MY_GROUP = "Sketch"; return MY_GROUP;}
+  {static std::string MY_GROUP = SKETCH_KIND; return MY_GROUP;}
 
   /** \brief Adds sub-feature of the higher level feature (sub-element of the sketch)
    *  \param theFeature sub-feature
    */
   SKETCHPLUGIN_EXPORT virtual const void addSub(
-    const boost::shared_ptr<ModelAPI_Feature>& theFeature) {}
+    const FeaturePtr& theFeature) {}
 
 protected:
   /// \brief Use plugin manager for features creation

@@ -11,6 +11,8 @@
 #include <Events_Loop.h>
 #include <Model_Events.h>
 
+#include <SketchPlugin_Sketch.h>
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -39,19 +41,18 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
   {
     const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>
                                                                                     (theMessage);
-    std::set<boost::shared_ptr<ModelAPI_Feature> > aFeatures = aUpdMsg->features();
-    std::set<boost::shared_ptr<ModelAPI_Feature> >::const_iterator anIt = aFeatures.begin(),
-                                                                   aLast = aFeatures.end();
+    std::set<FeaturePtr > aFeatures = aUpdMsg->features();
+    std::set<FeaturePtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
     for (; anIt != aLast; anIt++) {
-      boost::shared_ptr<ModelAPI_Feature> aFeature = *anIt;
-      if (myModule->workshop()->displayer()->IsVisible(aFeature) ||
+      FeaturePtr aFeature = *anIt;
+      if (myModule->workshop()->displayer()->isVisible(aFeature) ||
           aType == EVENT_FEATURE_CREATED) {
         myModule->visualizePreview(aFeature, true, false);
         //if (aType == EVENT_FEATURE_CREATED)
           myModule->activateFeature(aFeature, true);
       }
     }
-    myModule->workshop()->displayer()->UpdateViewer();
+    myModule->workshop()->displayer()->updateViewer();
   }
   if (aType == EVENT_FEATURE_DELETED)
   {
@@ -62,8 +63,8 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
     std::set<std::string>::const_iterator anIt = aGroups.begin(), aLast = aGroups.end();
     for (; anIt != aLast; anIt++) {
       std::string aGroup = *anIt;
-      if (aGroup.compare("Sketch") == 0) { // Update only Sketch group
-        myModule->workshop()->displayer()->EraseDeletedFeatures();
+      if (aGroup.compare(SKETCH_KIND) == 0) { // Update only Sketch group
+        myModule->workshop()->displayer()->eraseDeletedFeatures();
         myModule->updateCurrentPreview(aGroup);
       }
     }

@@ -5,6 +5,16 @@
 #include "SketchSolver_Constraint.h"
 #include <SketchSolver_Solver.h>
 
+#include <SketchPlugin_Line.h>
+#include <SketchPlugin_Point.h>
+#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Arc.h>
+#include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintParallel.h>
+#include <SketchPlugin_ConstraintPerpendicular.h>
+#include <SketchPlugin_ConstraintRadius.h>
+
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Data.h>
 
@@ -83,7 +93,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
   }
 
   // Constraint for distance between point and another entity
-  if (aConstraintKind.compare("SketchConstraintDistance") == 0)
+  if (aConstraintKind.compare(SKETCH_CONSTRAINT_DISTANCE_KIND) == 0)
   {
     int aNbPoints = 0;
     int aNbEntities = 0;
@@ -94,15 +104,15 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
           theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
         );
       if (!anAttr) continue;
-      if (anAttr->isFeature())
+      if (anAttr->isFeature() && anAttr->feature())
       { // verify posiible entities
         const std::string& aKind = anAttr->feature()->getKind();
-        if (aKind.compare("SketchPoint") == 0)
+        if (aKind.compare(SKETCH_POINT_KIND) == 0)
         {
           myAttributesList[aNbPoints++] = CONSTRAINT_ATTRIBUTES[indAttr];
           continue;
         }
-        else if(aKind.compare("SketchLine") == 0)
+        else if(aKind.compare(SKETCH_LINE_KIND) == 0)
         {
           // entities are placed starting from CONSTRAINT_ATTR_ENTITY_C attribute
           myAttributesList[2 + aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
@@ -139,7 +149,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
   }
 
   // Constraint for the given length of a line
-  if (aConstraintKind.compare("SketchConstraintLength") == 0)
+  if (aConstraintKind.compare(SKETCH_CONSTRAINT_LENGTH_KIND) == 0)
   {
     int aNbLines = 0;
     for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
@@ -149,7 +159,8 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
           theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
         );
       if (!anAttr) continue;
-      if (anAttr->isFeature() && anAttr->feature()->getKind().compare("SketchLine") == 0)
+      if (anAttr->isFeature() && anAttr->feature() &&
+          anAttr->feature()->getKind().compare(SKETCH_LINE_KIND) == 0)
       {
         myAttributesList[aNbLines++] = CONSTRAINT_ATTRIBUTES[indAttr];
         break;
@@ -161,8 +172,8 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
   }
 
   // Constraint for two parallel/perpendicular lines
-  bool isParallel = (aConstraintKind.compare("SketchConstraintParallel") == 0);
-  bool isPerpendicular = (aConstraintKind.compare("SketchConstraintPerpendicular") == 0);
+  bool isParallel = (aConstraintKind.compare(SKETCH_CONSTRAINT_PARALLEL_KIND) == 0);
+  bool isPerpendicular = (aConstraintKind.compare(SKETCH_CONSTRAINT_PERPENDICULAR_KIND) == 0);
   if (isParallel || isPerpendicular)
   {
     int aNbEntities = 2; // lines in SolveSpace constraints should started from CONSTRAINT_ATTR_ENTITY_C attribute
@@ -174,7 +185,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
         );
       if (!anAttr || !anAttr->isFeature()) continue;
       const std::string& aKind = anAttr->feature()->getKind();
-      if (aKind.compare("SketchLine") == 0)
+      if (aKind.compare(SKETCH_LINE_KIND) == 0)
       {
         myAttributesList[aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
         continue;
@@ -186,7 +197,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
   }
 
   // Constraint for radius of a circle or an arc of circle
-  if (aConstraintKind.compare("SketchConstraintRadius") == 0)
+  if (aConstraintKind.compare(SKETCH_CONSTRAINT_RADIUS_KIND) == 0)
   {
     int aNbEntities = 2; // lines in SolveSpace constraints should started from CONSTRAINT_ATTR_ENTITY_C attribute
     for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
@@ -197,7 +208,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
         );
       if (!anAttr || !anAttr->isFeature()) continue;
       const std::string& aKind = anAttr->feature()->getKind();
-      if (aKind.compare("SketchCircle") == 0 || aKind.compare("SketchArc") == 0)
+      if (aKind.compare(SKETCH_CIRCLE_KIND) == 0 || aKind.compare(SKETCH_ARC_KIND) == 0)
       {
         myAttributesList[aNbEntities++] = CONSTRAINT_ATTRIBUTES[indAttr];
         continue;

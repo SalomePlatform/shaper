@@ -20,6 +20,7 @@
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_PropertyPanel.h"
 #include "XGUI_ContextMenuMgr.h"
+#include "XGUI_ModuleConnector.h"
 
 #include <Model_Events.h>
 #include <ModelAPI_PluginManager.h>
@@ -27,6 +28,8 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Object.h>
+
+#include <PartSetPlugin_Part.h>
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
@@ -91,6 +94,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           this, SLOT(onContextMenuCommand(const QString&, bool)));
 
   myViewerProxy = new XGUI_ViewerProxy(this);
+  
+  myModuleConnector = new XGUI_ModuleConnector(this);
 
   connect(myOperationMgr, SIGNAL(operationStarted()), SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationResumed()), SLOT(onOperationStarted()));
@@ -225,7 +230,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     bool aHasPart = false;
     for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
       FeaturePtr aFeature = (*aIt);
-      if (aFeature->getKind() == "Part") {
+      if (aFeature->getKind() == PARTSET_PART_KIND) {
         aHasPart = true;
         break;
       }
@@ -289,7 +294,7 @@ void XGUI_Workshop::onOperationStarted()
 
     showPropertyPanel();
 
-    ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aOperation);
+    ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aOperation, myModuleConnector);
     QWidget* aContent = myPropertyPanel->contentWidget();
     qDeleteAll(aContent->children());
     aFactory.createWidget(aContent);
@@ -806,7 +811,7 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
     aMgr->rootDocument()->startOperation();
     foreach (FeaturePtr aFeature, theList) {
-      if (aFeature->getKind() == "Part") {
+      if (aFeature->getKind() == PARTSET_PART_KIND) {
         DocumentPtr aDoc;
         if (!XGUI_Tools::isModelObject(aFeature)) {
           aDoc = aFeature->data()->docRef("PartDocument")->value();

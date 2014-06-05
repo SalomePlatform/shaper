@@ -12,7 +12,8 @@
 #include <string>
 #include <set>
 
-class ModelAPI_Feature;
+#include "ModelAPI_Feature.h"
+
 class ModelAPI_Document;
 
 /// Event ID that feature is created (comes with Model_FeatureUpdatedMessage)
@@ -26,27 +27,27 @@ static const char * EVENT_FEATURE_MOVED = "FeaturesMoved";
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class Model_FeatureUpdatedMessage : public Events_MessageGroup {
-  std::set<boost::shared_ptr<ModelAPI_Feature> > myFeatures; ///< which feature is changed
+  std::set<FeaturePtr > myFeatures; ///< which feature is changed
 public:
   /// sender is not important, all information is located in the feature
   Model_FeatureUpdatedMessage(
-    const boost::shared_ptr<ModelAPI_Feature>& theFeature,
+    const FeaturePtr& theFeature,
     const Events_ID& theEvent) : Events_MessageGroup(theEvent, 0)
   {if (theFeature) myFeatures.insert(theFeature);}
 
   /// Returns the feature that has been updated
-  std::set<boost::shared_ptr<ModelAPI_Feature> > features() const {return myFeatures;}
+  std::set<FeaturePtr > features() const {return myFeatures;}
 
   //! Creates a new empty group (to store it in the loop before flush)
   virtual Events_MessageGroup* newEmpty() {
-    boost::shared_ptr<ModelAPI_Feature> anEmptyFeature;
+    FeaturePtr anEmptyFeature;
     return new Model_FeatureUpdatedMessage(anEmptyFeature, eventID());
   }
 
   //! Allows to join the given message with the current one
   virtual void Join(Events_MessageGroup& theJoined) {
     Model_FeatureUpdatedMessage* aJoined = dynamic_cast<Model_FeatureUpdatedMessage*>(&theJoined);
-    std::set<boost::shared_ptr<ModelAPI_Feature> >::iterator aFIter = aJoined->myFeatures.begin();
+    std::set<FeaturePtr >::iterator aFIter = aJoined->myFeatures.begin();
     for(; aFIter != aJoined->myFeatures.end(); aFIter++) {
       myFeatures.insert(*aFIter);
     }

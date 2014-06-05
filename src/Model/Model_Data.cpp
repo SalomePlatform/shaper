@@ -8,6 +8,7 @@
 #include <Model_AttributeReference.h>
 #include <Model_AttributeRefAttr.h>
 #include <Model_AttributeRefList.h>
+#include <Model_AttributeBoolean.h>
 #include <GeomData_Point.h>
 #include <GeomData_Point2D.h>
 #include <GeomData_Dir.h>
@@ -73,6 +74,8 @@ void Model_Data::addAttribute(string theID, string theAttrType)
     anAttr = new GeomData_Dir(anAttrLab);
   else if (theAttrType == GeomData_Point2D::type())
     anAttr = new GeomData_Point2D(anAttrLab);
+  else if (theAttrType == Model_AttributeBoolean::type())
+    anAttr = new Model_AttributeBoolean(anAttrLab);
 
   if (anAttr) {
     myAttrs[theID] = boost::shared_ptr<ModelAPI_Attribute>(anAttr);
@@ -106,6 +109,21 @@ boost::shared_ptr<ModelAPI_AttributeDouble> Model_Data::real(const string theID)
   }
   boost::shared_ptr<ModelAPI_AttributeDouble> aRes = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aFound->second);
+  if (!aRes) {
+    // TODO: generate error on invalid attribute type request
+  }
+  return aRes;
+}
+
+boost::shared_ptr<ModelAPI_AttributeBoolean> Model_Data::boolean(const std::string theID)
+{
+  map<string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
+  if (aFound == myAttrs.end()) {
+    // TODO: generate error on unknown attribute request and/or add mechanism for customization
+    return boost::shared_ptr<ModelAPI_AttributeBoolean>();
+  }
+  boost::shared_ptr<ModelAPI_AttributeBoolean> aRes = 
+    boost::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
   }
@@ -187,4 +205,35 @@ bool Model_Data::isEqual(const boost::shared_ptr<ModelAPI_Data> theData)
 bool Model_Data::isValid()
 {
   return !myLab.IsNull() && myLab.HasAttribute();
+}
+
+#include <TNaming_Builder.hxx>
+#include <TNaming_NamedShape.hxx>
+#include <TopoDS_Shape.hxx>
+#include <GeomAPI_Shape.h>
+
+void Model_Data::store(const boost::shared_ptr<GeomAPI_Shape>& theShape)
+{
+  // the simplest way is to keep this attribute here, on Data
+  // TODO: add naming structure in separated document for shape storage
+  TNaming_Builder aBuilder(myLab);
+  if (!theShape) return; // bad shape
+  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+  if (aShape.IsNull()) return; // null shape inside
+
+  aBuilder.Generated(aShape);
+}
+
+boost::shared_ptr<GeomAPI_Shape> Model_Data::shape()
+{
+  Handle(TNaming_NamedShape) aName;
+  if (myLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
+    TopoDS_Shape aShape = aName->Get();
+    if (!aShape.IsNull()) {
+      boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
+      aRes->setImpl(new TopoDS_Shape(aShape));
+      return aRes;
+    }
+  }
+  return boost::shared_ptr<GeomAPI_Shape>();
 }

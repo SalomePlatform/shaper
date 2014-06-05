@@ -7,6 +7,8 @@
 
 #include <ModuleBase.h>
 
+#include <ModelAPI_Feature.h>
+
 #include <QObject>
 
 #include <boost/shared_ptr.hpp>
@@ -34,16 +36,16 @@ public:
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed
-  virtual bool storeValue(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
+  virtual bool storeValue(FeaturePtr theFeature) const = 0;
 
-  virtual bool restoreValue(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
+  virtual bool restoreValue(FeaturePtr theFeature) = 0;
 
   /// Returns whether the widget can accept focus, or if it corresponds to the given attribute
   /// \param theAttribute name
-  virtual bool canFocusTo(const std::string& theAttributeName) = 0;
+  virtual bool canFocusTo(const std::string& theAttributeName) const { return false; }
 
   /// Set focus to the current widget if it corresponds to the given attribute
-  virtual void focusTo() = 0;
+  virtual void focusTo() {}
 
   /// Returns list of widget controls
   /// \return a control list

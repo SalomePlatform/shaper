@@ -7,6 +7,7 @@
 
 #include <Model.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Feature.h>
 
 #include <TDocStd_Document.hxx>
 #include <map>
@@ -61,14 +62,14 @@ public:
 
   //! Adds to the document the new feature of the given feature id
   //! \param creates feature and puts it in the document
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
+  MODEL_EXPORT virtual FeaturePtr addFeature(std::string theID);
 
   //! Removes the feature from the document
-  MODEL_EXPORT virtual void removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  MODEL_EXPORT virtual void removeFeature(FeaturePtr theFeature);
 
   //! Returns the existing feature by the label
   //! \param theLabel base label of the feature
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> feature(TDF_Label& theLabel);
+  MODEL_EXPORT virtual FeaturePtr feature(TDF_Label& theLabel);
 
   //! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
@@ -80,7 +81,7 @@ public:
   //! \param theGroupID group that contains a feature
   //! \param theIndex zero-based index of feature in the group
   //! \param isOperation if it is true, returns feature (not Object)
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
+  MODEL_EXPORT virtual FeaturePtr 
     feature(const std::string& theGroupID, const int theIndex, const bool isOperation = false);
 
   //! Returns the number of features in the group
@@ -93,14 +94,14 @@ protected:
 
   //! Initializes feature with a unique name in this group (unique name is generated as 
   //! feature type + "_" + index
-  void setUniqueName(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  void setUniqueName(FeaturePtr theFeature);
 
   //! Adds to the document the new feature
-  void addFeature(const boost::shared_ptr<ModelAPI_Feature> theFeature);
+  void addFeature(const FeaturePtr theFeature);
 
   //! Returns the object by the feature
-  boost::shared_ptr<ModelAPI_Feature> objectByFeature(
-    const boost::shared_ptr<ModelAPI_Feature> theFeature);
+  FeaturePtr objectByFeature(
+    const FeaturePtr theFeature);
 
   //! Synchronizes myFeatures list with the updated document
   void synchronizeFeatures(const bool theMarkUpdated = false);
@@ -124,7 +125,7 @@ private:
   /// number of nested transactions performed (or -1 if not nested)
   int myNestedNum;
   /// All features managed by this document (not only in history of OB)
-  std::vector<boost::shared_ptr<ModelAPI_Feature> > myFeatures;
+  std::vector<FeaturePtr > myFeatures;
 
   ///< set of identifiers of sub-documents of this document
   std::set<std::string> mySubs;

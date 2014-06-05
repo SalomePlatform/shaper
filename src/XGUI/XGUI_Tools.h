@@ -5,10 +5,11 @@
 #include <QString>
 #include <QRect>
 
+#include <ModelAPI_Feature.h>
+
 #include <boost/shared_ptr.hpp>
 
 class TopoDS_Shape;
-class ModelAPI_Feature;
 /*!
  \brief Return directory part of the file path.
 
@@ -64,13 +65,13 @@ namespace XGUI_Tools
    Returns true if the feature is a model object
    \param theFeature a feature
   */
-  bool XGUI_EXPORT isModelObject(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  bool XGUI_EXPORT isModelObject(FeaturePtr theFeature);
 
   /*!
    Returns the string presentation of the given feature
    \param theFeature a feature
   */
-  std::string XGUI_EXPORT featureInfo(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  std::string XGUI_EXPORT featureInfo(FeaturePtr theFeature);
 }
 
 #endif

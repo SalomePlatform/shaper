@@ -24,7 +24,7 @@ using namespace std;
 
 static Model_PluginManager* myImpl = new Model_PluginManager();
 
-boost::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string theFeatureID)
+FeaturePtr Model_PluginManager::createFeature(string theFeatureID)
 {
   if (this != myImpl) return myImpl->createFeature(theFeatureID);
 
@@ -36,7 +36,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string th
       Config_ModuleReader::loadLibrary(myCurrentPluginName);
     }
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
-      boost::shared_ptr<ModelAPI_Feature> aCreated = 
+      FeaturePtr aCreated = 
         myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
       if (!aCreated) {
         Events_Error::send(string("Can not initialize feature '") + theFeatureID +
@@ -48,7 +48,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_PluginManager::createFeature(string th
     }
   }
 
-  return boost::shared_ptr<ModelAPI_Feature>(); // return nothing
+  return FeaturePtr(); // return nothing
 }
 
 boost::shared_ptr<ModelAPI_Document> Model_PluginManager::rootDocument()

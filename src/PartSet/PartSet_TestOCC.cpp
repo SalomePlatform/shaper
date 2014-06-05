@@ -9,7 +9,9 @@
 #include <XGUI_Displayer.h>
 #include <XGUI_ViewerPrs.h>
 #include <XGUI_ViewerProxy.h>
-#include <PartSet_OperationSketchLine.h>
+#include <PartSet_FeaturePrs.h>
+#include <PartSet_Presentation.h>
+#include <PartSet_OperationSketchBase.h>
 
 #include <ModelAPI_Feature.h>
 
@@ -17,7 +19,7 @@
 #include <ModelAPI_Document.h>
 
 static double myTestDelta;
-static boost::shared_ptr<ModelAPI_Feature> myTestFeature;
+static FeaturePtr myTestFeature;
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Shape.hxx>
@@ -36,7 +38,7 @@ void PartSet_TestOCC::testSelection(XGUI_Workshop* theWorkshop)
                                theWorkshop->viewer()->activeView());
     PartSet_TestOCC::changeTestLine(theWorkshop);
   }
-  Handle(AIS_InteractiveObject) anIO = theWorkshop->displayer()->GetAISObject(myTestFeature);
+  Handle(AIS_InteractiveObject) anIO = theWorkshop->displayer()->getAISObject(myTestFeature);
   if (!anIO.IsNull()) {
     theWorkshop->viewer()->AISContext()->MoveTo(0, 0, theWorkshop->viewer()->activeView());
     theWorkshop->viewer()->AISContext()->Select(0, 0, 2500, 2500, theWorkshop->viewer()->activeView());
@@ -126,13 +128,12 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
 
   ModuleBase_Operation* anOperation = theWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-    boost::shared_ptr<ModelAPI_Feature> aSketch;
+    FeaturePtr aSketch;
 
   if (aPreviewOp) {
     // create a line
     boost::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_PluginManager::get()->rootDocument();
-    boost::shared_ptr<ModelAPI_Feature> aFeature = aDoc->addFeature(
-                                                   PartSet_OperationSketchLine::Type().c_str());
+    FeaturePtr aFeature = aDoc->addFeature(SKETCH_LINE_KIND);
     if (aFeature) // TODO: generate an error if feature was not created
       aFeature->execute();
 
@@ -140,27 +141,37 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
                         boost::dynamic_pointer_cast<SketchPlugin_Feature>(aPreviewOp->sketch());
     aSketch->addSub(aFeature);
 
-    PartSet_OperationSketchLine::setLinePoint(aFeature, 100, 100, LINE_ATTR_START);
-    PartSet_OperationSketchLine::setLinePoint(aFeature, 150, 300, LINE_ATTR_END);
+    PartSet_FeaturePrs::setLinePoint(aFeature, 100, 100, LINE_ATTR_START);
+    PartSet_FeaturePrs::setLinePoint(aFeature, 150, 300, LINE_ATTR_END);
 
-    boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchLine::preview(aFeature);
+    boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
 
     XGUI_Displayer* aDisplayer = theWorkshop->displayer();
-    aDisplayer->Redisplay(aFeature, aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), false);
+
+    Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
+                           aFeature, aSketch,
+                           aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), NULL);
+    if (!anAIS.IsNull())
+      aDisplayer->redisplay(aFeature, anAIS, -1, false);
+
     std::list<int> aModes;
     aModes.push_back(TopAbs_VERTEX);
     aModes.push_back(TopAbs_EDGE);
-    aDisplayer->ActivateInLocalContext(aFeature, aModes, true);
+    aDisplayer->activateInLocalContext(aFeature, aModes, true);
 
     // change the line
     /*double aDelta = -200;
     for (int i = 0; i < 20; i++) {
       aDelta = aDelta - i*2;
-      PartSet_OperationSketchLine::setLinePoint(aFeature, 100+aDelta, 200+aDelta, LINE_ATTR_START);
-      PartSet_OperationSketchLine::setLinePoint(aFeature, 300+aDelta, 500+aDelta, LINE_ATTR_END);
-      boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchLine::preview(aFeature);
+      PartSet_FeaturePrs::setLinePoint(aFeature, 100+aDelta, 200+aDelta, LINE_ATTR_START);
+      PartSet_FeaturePrs::setLinePoint(aFeature, 300+aDelta, 500+aDelta, LINE_ATTR_END);
 
-      theWorkshop->displayer()->Redisplay(aFeature, aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), true);
+      boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
+      Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
+                             aFeature, aSketch,
+                             aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), NULL);
+      if (!anAIS.IsNull())
+        aDisplayer->redisplay(aFeature, anAIS, -1, true);
 
       int aVal = 90;
       for (int j = 0; j < 10000000; j++)
@@ -170,12 +181,12 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
     //aModes.clear();
     //aModes.push_back(TopAbs_VERTEX);
     //aModes.push_back(TopAbs_EDGE);
-    //aDisplayer->ActivateInLocalContext(aFeature, aModes, true);
+    //aDisplayer->activateInLocalContext(aFeature, aModes, true);
     myTestFeature = aFeature;
 
     std::list<XGUI_ViewerPrs> aPrs;
-    aPrs.push_back(XGUI_ViewerPrs(myTestFeature, TopoDS_Shape()));
-    aDisplayer->SetSelected(aPrs, true);
+    aPrs.push_back(XGUI_ViewerPrs(myTestFeature, TopoDS_Shape(), NULL));
+    aDisplayer->setSelected(aPrs, true);
   }
 }
 
@@ -184,26 +195,33 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   // change the line
   if (!myTestFeature)
     return;
-  boost::shared_ptr<ModelAPI_Feature> aFeature = myTestFeature;
+  FeaturePtr aFeature = myTestFeature;
 
   myTestDelta = myTestDelta - 50;
   double aDelta = myTestDelta;
-  PartSet_OperationSketchLine::setLinePoint(aFeature, -100/*aDelta*/, -100/*aDelta*/, LINE_ATTR_START);
-  PartSet_OperationSketchLine::setLinePoint(aFeature, 200/*aDelta*2*/, 200/*aDelta*2*/, LINE_ATTR_END);
-  boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchLine::preview(aFeature);
+  PartSet_FeaturePrs::setLinePoint(aFeature, -100/*aDelta*/, -100/*aDelta*/, LINE_ATTR_START);
+  PartSet_FeaturePrs::setLinePoint(aFeature, 200/*aDelta*2*/, 200/*aDelta*2*/, LINE_ATTR_END);
+  boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
 
-  theWorkshop->displayer()->Redisplay(aFeature, aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), true);
+  Handle(AIS_InteractiveObject) aPrevAIS;
+  FeaturePtr aSketch;//NULL
+  Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
+                          aFeature, aSketch,
+                          aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
+                          aPrevAIS);
+  if (!anAIS.IsNull())
+    theWorkshop->displayer()->redisplay(aFeature, anAIS, -1, true);
   //std::list<int> aModes;
   //aModes.clear();
   //aModes.push_back(TopAbs_VERTEX);
   //aModes.push_back(TopAbs_EDGE);
-  //aDisplayer->ActivateInLocalContext(aFeature, aModes, true);
+  //aDisplayer->activateInLocalContext(aFeature, aModes, true);
 
   /*std::list<XGUI_ViewerPrs> aPrs;
   aPrs.push_back(XGUI_ViewerPrs(myTestFeature, TopoDS_Shape()));
-  theWorkshop->displayer()->SetSelected(aPrs, true);*/
+  theWorkshop->displayer()->setSelected(aPrs, true);*/
 
-  theWorkshop->displayer()->UpdateViewer();
+  theWorkshop->displayer()->updateViewer();
 }
 
 void PartSet_TestOCC::moveMouse(Handle(AIS_InteractiveContext) theContext, Handle(V3d_View) theView)

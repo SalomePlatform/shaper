@@ -32,7 +32,7 @@
 
 const double PRECISION_TOLERANCE = 0.000001;
 
-gp_Pnt PartSet_Tools::ConvertClickToPoint(QPoint thePoint, Handle(V3d_View) theView)
+gp_Pnt PartSet_Tools::convertClickToPoint(QPoint thePoint, Handle(V3d_View) theView)
 {
   if (theView.IsNull())
     return gp_Pnt();
@@ -57,7 +57,7 @@ gp_Pnt PartSet_Tools::ConvertClickToPoint(QPoint thePoint, Handle(V3d_View) theV
   return ResultPoint;
 }
 
-void PartSet_Tools::ConvertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelAPI_Feature> theSketch,
+void PartSet_Tools::convertTo2D(const gp_Pnt& thePoint, FeaturePtr theSketch,
                                 Handle(V3d_View) theView, double& theX, double& theY)
 {
   if (!theSketch)
@@ -103,7 +103,30 @@ void PartSet_Tools::ConvertTo2D(const gp_Pnt& thePoint, boost::shared_ptr<ModelA
   theY = aVec.X() * anY->x() + aVec.Y() * anY->y() + aVec.Z() * anY->z();
 }
 
-void PartSet_Tools::IntersectLines(double theX0, double theY0, double theX1, double theY1,
+void PartSet_Tools::convertTo3D(const double theX, const double theY,
+                                FeaturePtr theSketch,
+                                gp_Pnt& thePoint)
+{
+  if (!theSketch)
+    return;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
+
+  boost::shared_ptr<GeomDataAPI_Point> aC = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SKETCH_ATTR_ORIGIN));
+  boost::shared_ptr<GeomDataAPI_Dir> aX = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRX));
+  boost::shared_ptr<GeomDataAPI_Dir> aY = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRY));
+
+  boost::shared_ptr<GeomAPI_XYZ> aSum = aC->pnt()->xyz()->added(
+    aX->dir()->xyz()->multiplied(theX))->added(aY->dir()->xyz()->multiplied(theY));
+
+  boost::shared_ptr<GeomAPI_Pnt> aPoint = boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
+  thePoint = gp_Pnt(aPoint->x(), aPoint->y(), aPoint->z());
+}
+
+void PartSet_Tools::intersectLines(double theX0, double theY0, double theX1, double theY1,
                                    double theX2, double theY2, double theX3, double theY3,
                                    double& theX, double& theY)
 {
@@ -123,11 +146,11 @@ void PartSet_Tools::IntersectLines(double theX0, double theY0, double theX1, dou
   //It is not possible to use Precision::Confusion(), because it is e-0.8, but V is sometimes e-6
   Standard_Real aPrec = PRECISION_TOLERANCE;
   if (fabs(theX - theX0) < aPrec && fabs(theY - theY0) < aPrec) {
-    ProjectPointOnLine(theX2, theY2, theX3, theY3, theX1, theY1, theX, theY);    
+    projectPointOnLine(theX2, theY2, theX3, theY3, theX1, theY1, theX, theY);    
   }
 }
 
-void PartSet_Tools::ProjectPointOnLine(double theX1, double theY1, double theX2, double theY2,
+void PartSet_Tools::projectPointOnLine(double theX1, double theY1, double theX2, double theY2,
                                        double thePointX, double thePointY, double& theX, double& theY)
 {
   theX = theY = 0;
@@ -144,26 +167,26 @@ void PartSet_Tools::ProjectPointOnLine(double theX1, double theY1, double theX2,
   }
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_Tools::NearestFeature(QPoint thePoint,
+FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint,
                                                    Handle_V3d_View theView,
-                                                   boost::shared_ptr<ModelAPI_Feature> theSketch,
+                                                   FeaturePtr theSketch,
                                                    const std::list<XGUI_ViewerPrs>& theFeatures)
 {
   double aX, anY;
-  gp_Pnt aPoint = PartSet_Tools::ConvertClickToPoint(thePoint, theView);
-  PartSet_Tools::ConvertTo2D(aPoint, theSketch, theView, aX, anY);
+  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(thePoint, theView);
+  PartSet_Tools::convertTo2D(aPoint, theSketch, theView, aX, anY);
 
-  boost::shared_ptr<ModelAPI_Feature> aFeature;
+  FeaturePtr aFeature;
   std::list<XGUI_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
 
-  boost::shared_ptr<ModelAPI_Feature> aDeltaFeature;   
+  FeaturePtr aDeltaFeature;   
   double aMinDelta = -1;
   XGUI_ViewerPrs aPrs;
   for (; anIt != aLast; anIt++) {
     aPrs = *anIt;
     if (!aPrs.feature())
       continue;
-    double aDelta = DistanceToPoint(aPrs.feature(), aX, anY);
+    double aDelta = distanceToPoint(aPrs.feature(), aX, anY);
     if (aMinDelta < 0 || aMinDelta > aDelta) {
       aMinDelta = aDelta;
       aDeltaFeature = aPrs.feature();
@@ -172,11 +195,11 @@ boost::shared_ptr<ModelAPI_Feature> PartSet_Tools::NearestFeature(QPoint thePoin
   return aDeltaFeature;
 }
 
-double PartSet_Tools::DistanceToPoint(boost::shared_ptr<ModelAPI_Feature> theFeature,
+double PartSet_Tools::distanceToPoint(FeaturePtr theFeature,
                                       double theX, double theY)
 {
   double aDelta = 0;
-  if (theFeature->getKind() != "SketchLine")
+  if (theFeature->getKind() != SKETCH_LINE_KIND)
     return aDelta;
 
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
@@ -187,7 +210,7 @@ double PartSet_Tools::DistanceToPoint(boost::shared_ptr<ModelAPI_Feature> theFea
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
 
   double aX, anY;
-  PartSet_Tools::ProjectPointOnLine(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y(), theX, theY, aX, anY);
+  PartSet_Tools::projectPointOnLine(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y(), theX, theY, aX, anY);
 
   aDelta = gp_Pnt(theX, theY, 0).Distance(gp_Pnt(aX, anY, 0));
 

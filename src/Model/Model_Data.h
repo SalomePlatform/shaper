@@ -7,12 +7,12 @@
 
 #include "Model.h"
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Feature.h>
 #include <TDF_Label.hxx>
 
 #include <map>
 
 class ModelAPI_Attribute;
-class ModelAPI_Feature;
 
 /**\class Model_Data
  * \ingroup DataModel
@@ -27,7 +27,7 @@ class Model_Data: public ModelAPI_Data
   std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> > myAttrs;
 
   /// needed here to emit signal that feature changed on change of the attribute
-  boost::shared_ptr<ModelAPI_Feature> myFeature;
+  FeaturePtr myFeature;
 
   Model_Data();
 
@@ -57,6 +57,9 @@ public:
   /// Returns the attribute that contains list of references to features
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeRefList> 
     reflist(const std::string theID);
+  /// Returns the attribute that contains boolean value
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeBoolean> 
+    boolean(const std::string theID);
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string theID);
@@ -68,6 +71,11 @@ public:
   /// Returns true if it is correctly connected t othe data model
   MODEL_EXPORT virtual bool isValid();
 
+  /// Stores the shape (called by the execution method).
+  MODEL_EXPORT virtual void store(const boost::shared_ptr<GeomAPI_Shape>& theShape);
+  /// Returns the shape-result produced by this feature
+  MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape> shape();
+
   /// Initializes object by the attributes: must be called just after the object is created
   /// for each attribute of the object
   /// \param theID identifier of the attribute that can be referenced by this ID later
@@ -78,7 +86,7 @@ public:
   MODEL_EXPORT void setLabel(TDF_Label& theLab);
 
   /// Sets the feature of this data
-  MODEL_EXPORT virtual void setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
+  MODEL_EXPORT virtual void setFeature(FeaturePtr theFeature)
     {myFeature = theFeature;}
 };
 

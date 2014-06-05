@@ -7,6 +7,8 @@
 
 #include "Model.h"
 #include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Feature.h>
+
 #include <Events_Listener.h>
 #include <map>
 
@@ -62,7 +64,7 @@ protected:
   void LoadPluginsInfo();
 
   /// Creates the feature object using plugins functionality
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID);
+  virtual FeaturePtr createFeature(std::string theFeatureID);
 };
 
 #endif

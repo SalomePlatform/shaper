@@ -8,7 +8,7 @@
 #ifndef CONFIG_FEATUREREADER_H_
 #define CONFIG_FEATUREREADER_H_
 
-#include <Config.h>
+#include <Config_def.h>
 #include <Config_XMLReader.h>
 
 #include <string>

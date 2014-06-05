@@ -22,6 +22,9 @@
 
 #include <AIS_Shape.hxx>
 #include <AIS_ListOfInteractive.hxx>
+#include <AIS_InteractiveObject.hxx>
+#include <AIS_DimensionOwner.hxx>
+#include <AIS_LengthDimension.hxx>
 #include <V3d_View.hxx>
 
 #ifdef _DEBUG
@@ -42,24 +45,25 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 {
 }
 
-std::list<int> PartSet_OperationSketch::getSelectionModes(boost::shared_ptr<ModelAPI_Feature> theFeature) const
+std::list<int> PartSet_OperationSketch::getSelectionModes(FeaturePtr theFeature) const
 {
   std::list<int> aModes;
   if (!hasSketchPlane())
     aModes.push_back(TopAbs_FACE);
   else
     aModes = PartSet_OperationSketchBase::getSelectionModes(theFeature);
+
   return aModes;
 }
 
-void PartSet_OperationSketch::init(boost::shared_ptr<ModelAPI_Feature> theFeature,
+void PartSet_OperationSketch::init(FeaturePtr theFeature,
                                    const std::list<XGUI_ViewerPrs>& /*theSelected*/,
                                    const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
   setFeature(theFeature);
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSet_OperationSketch::sketch() const
+FeaturePtr PartSet_OperationSketch::sketch() const
 {
   return feature();
 }
@@ -84,12 +88,45 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
       return;
 
     if (theHighlighted.size() == 1) {
-      boost::shared_ptr<ModelAPI_Feature> aFeature = theHighlighted.front().feature();
+      FeaturePtr aFeature = theHighlighted.front().feature();
       if (aFeature)
         restartOperation(PartSet_OperationEditLine::Type(), aFeature);
     }
     else
       myFeatures = theHighlighted;
+  }
+}
+
+#include <QLineEdit>
+void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
+                                            const std::list<XGUI_ViewerPrs>& theSelected,
+                                            const std::list<XGUI_ViewerPrs>& theHighlighted)
+{
+  if (!hasSketchPlane()) {
+  }
+  else {
+    if (!theSelected.empty()) {
+      XGUI_ViewerPrs aPrs = theSelected.front();
+      if (!aPrs.owner().IsNull()) {
+        Handle(AIS_DimensionOwner) anOwner = Handle(AIS_DimensionOwner)::DownCast(aPrs.owner());
+        if (!anOwner.IsNull() && anOwner->SelectionMode() == AIS_DSM_Text) {
+          Handle(SelectMgr_SelectableObject) anObject = anOwner->Selectable();
+          double aValue = 0;
+          if (!anObject.IsNull()) {
+            Handle(AIS_LengthDimension) aLenDim = Handle(AIS_LengthDimension)::DownCast(anObject);
+            if (!aLenDim.IsNull())
+              aValue = aLenDim->GetValue();
+          }
+
+          QLineEdit* aLine = new QLineEdit();
+          QPoint aViewPos = theEvent->globalPos();
+          QPoint aLinePos(aViewPos.x(), aViewPos.y());
+          aLine->move(aLinePos);
+          aLine->setText(QString::number(aValue));
+          aLine->show();
+        }
+      }
+    }
   }
 }
 
@@ -99,17 +136,17 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View)
     return;
 
   if (myFeatures.size() != 1) {
-    boost::shared_ptr<ModelAPI_Feature> aFeature = PartSet_Tools::NearestFeature(theEvent->pos(),
+    FeaturePtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(),
                                                                 theView, feature(), myFeatures);
     if (aFeature)
       restartOperation(PartSet_OperationEditLine::Type(), aFeature);
   }
 }
 
-std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
+std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >
                                                         PartSet_OperationSketch::subPreview() const
 {
-  std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> > aPreviewMap;
+  std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> > aPreviewMap;
 
   boost::shared_ptr<SketchPlugin_Feature> aFeature;
 
@@ -119,8 +156,8 @@ std::map<boost::shared_ptr<ModelAPI_Feature>, boost::shared_ptr<GeomAPI_Shape> >
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SKETCH_ATTR_FEATURES));
 
-  std::list<boost::shared_ptr<ModelAPI_Feature> > aFeatures = aRefList->list();
-  std::list<boost::shared_ptr<ModelAPI_Feature> >::const_iterator anIt = aFeatures.begin(),
+  std::list<FeaturePtr > aFeatures = aRefList->list();
+  std::list<FeaturePtr >::const_iterator anIt = aFeatures.begin(),
                                                                   aLast = aFeatures.end();
   for (; anIt != aLast; anIt++) {
     aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
@@ -189,7 +226,7 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
   aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
   boost::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
   // X axis is preferable to be dirX on the sketch
-  const double tol = 1e-7;
+  const double tol = Precision::Confusion();
   bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
   boost::shared_ptr<GeomAPI_Dir> aTempDir(isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
   boost::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));

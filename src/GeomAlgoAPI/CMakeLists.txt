@@ -1,5 +1,4 @@
 FIND_PACKAGE(SWIG REQUIRED)
-INCLUDE(FindCAS)
 
 INCLUDE(${SWIG_USE_FILE})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
@@ -9,6 +8,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_CompoundBuilder.h
     GeomAlgoAPI_FaceBuilder.h
     GeomAlgoAPI_EdgeBuilder.h
+    GeomAlgoAPI_PointBuilder.h
     GeomAlgoAPI_SketchBuilder.h
 )
 
@@ -16,6 +16,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_CompoundBuilder.cpp
     GeomAlgoAPI_FaceBuilder.cpp
     GeomAlgoAPI_EdgeBuilder.cpp
+    GeomAlgoAPI_PointBuilder.cpp
     GeomAlgoAPI_SketchBuilder.cpp
 )
 

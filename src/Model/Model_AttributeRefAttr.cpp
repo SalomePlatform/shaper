@@ -34,7 +34,7 @@ void Model_AttributeRefAttr::setAttr(boost::shared_ptr<ModelAPI_Attribute> theAt
 
 boost::shared_ptr<ModelAPI_Attribute> Model_AttributeRefAttr::attr()
 {
-  boost::shared_ptr<ModelAPI_Feature> aFeature = feature();
+  FeaturePtr aFeature = feature();
   if (aFeature) {
     boost::shared_ptr<Model_Data> aData = 
       boost::dynamic_pointer_cast<Model_Data>(aFeature->data());
@@ -44,7 +44,7 @@ boost::shared_ptr<ModelAPI_Attribute> Model_AttributeRefAttr::attr()
   return boost::shared_ptr<ModelAPI_Attribute>();
 }
 
-void Model_AttributeRefAttr::setFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
+void Model_AttributeRefAttr::setFeature(FeaturePtr theFeature)
 {
   if (myID->Get().Length() != 0 || feature() != theFeature) {
     boost::shared_ptr<Model_Data> aData = 
@@ -58,7 +58,7 @@ void Model_AttributeRefAttr::setFeature(boost::shared_ptr<ModelAPI_Feature> theF
   }
 }
 
-boost::shared_ptr<ModelAPI_Feature> Model_AttributeRefAttr::feature()
+FeaturePtr Model_AttributeRefAttr::feature()
 {
   if (myRef->Get() != myRef->Label()) { // initialized
     boost::shared_ptr<Model_Document> aDoc = 
@@ -70,7 +70,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_AttributeRefAttr::feature()
     }
   }
   // not initialized
-  return boost::shared_ptr<ModelAPI_Feature>();
+  return FeaturePtr();
 }
 
 Model_AttributeRefAttr::Model_AttributeRefAttr(TDF_Label& theLabel)

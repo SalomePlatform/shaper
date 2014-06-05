@@ -8,8 +8,11 @@
 #include "ConstructionPlugin.h"
 #include <ModelAPI_Feature.h>
 
+/// Extrusion kind
+const std::string CONSTRUCTION_EXTRUSION_KIND("Extrusion");
+
 /// attribute name of referenced face
-const std::string EXTRUSION_FACE = "extrusion_select_face";
+const std::string EXTRUSION_FACE = "extrusion_face";
 
 /// attribute name of extrusion size
 const std::string EXTRUSION_SIZE = "extrusion_size";
@@ -23,7 +26,7 @@ class ConstructionPlugin_Extrusion: public ModelAPI_Feature
 public:
   /// Returns the kind of a feature
   CONSTRUCTIONPLUGIN_EXPORT virtual const std::string& getKind() 
-  { static std::string MY_KIND = "Extrusion"; return MY_KIND; }
+  { static std::string MY_KIND = CONSTRUCTION_EXTRUSION_KIND; return MY_KIND; }
 
   /// Returns to which group in the document must be added feature
   CONSTRUCTIONPLUGIN_EXPORT virtual const std::string& getGroup() 

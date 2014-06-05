@@ -10,8 +10,9 @@ using namespace std;
 
 void Model_AttributeBoolean::setValue(bool theValue)
 {
-  if (myBool->Get() != theValue) {
-    myBool->Set(theValue? 1 : 0);
+  Standard_Boolean aValue = theValue ? Standard_True : Standard_False;
+  if (myBool->Get() != aValue) {
+    myBool->Set(aValue);
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
     Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
     Events_Loop::loop()->send(aMsg);
@@ -20,7 +21,7 @@ void Model_AttributeBoolean::setValue(bool theValue)
 
 bool Model_AttributeBoolean::value()
 {
-  return (myBool->Get() == 1)? true : false;
+  return myBool->Get() == Standard_True;
 }
 
 Model_AttributeBoolean::Model_AttributeBoolean(TDF_Label& theLabel)

@@ -16,17 +16,17 @@ PartSetPlugin_Plugin::PartSetPlugin_Plugin()
   ModelAPI_PluginManager::get()->registerPlugin(this);
 }
 
-boost::shared_ptr<ModelAPI_Feature> PartSetPlugin_Plugin::createFeature(string theFeatureID)
+FeaturePtr PartSetPlugin_Plugin::createFeature(string theFeatureID)
 {
-  if (theFeatureID == "Part") {
-    return boost::shared_ptr<ModelAPI_Feature>(new PartSetPlugin_Part);
+  if (theFeatureID == PARTSET_PART_KIND) {
+    return FeaturePtr(new PartSetPlugin_Part);
   }
   if (theFeatureID == "duplicate") {
-    return boost::shared_ptr<ModelAPI_Feature>(new PartSetPlugin_Duplicate);
+    return FeaturePtr(new PartSetPlugin_Duplicate);
   }
   if (theFeatureID == "remove") {
-    return boost::shared_ptr<ModelAPI_Feature>(new PartSetPlugin_Remove);
+    return FeaturePtr(new PartSetPlugin_Remove);
   }
     // feature of such kind is not found
-  return boost::shared_ptr<ModelAPI_Feature>();
+  return FeaturePtr();
 }
