@@ -19,6 +19,7 @@
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Circle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_Constraint.h>
 
@@ -314,6 +315,13 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findPoint(FeaturePtr theFe
   {
     boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
           boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(POINT_ATTR_COORD));
+    if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
+      aPoint2D = aPoint;
+  }
+  else if (theFeature->getKind() == SKETCH_CIRCLE_KIND)
+  {
+    boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
     if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
       aPoint2D = aPoint;
   }
