@@ -163,9 +163,7 @@ QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 
 QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetPoint2D* aWidget = new ModuleBase_WidgetPoint2D(theParent,
-                       qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME)),
-                       myWidgetApi->widgetId());
+  ModuleBase_WidgetPoint2D* aWidget = new ModuleBase_WidgetPoint2D(theParent, myWidgetApi);
   connectWidget(aWidget, WDG_POINT_SELECTOR);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();

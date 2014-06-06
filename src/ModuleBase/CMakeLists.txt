@@ -20,6 +20,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_IOperation.cpp
 	ModuleBase_Operation.cpp
 	ModuleBase_OperationDescription.cpp
+	ModuleBase_ModelWidget.cpp
 	ModuleBase_WidgetBoolValue.cpp
 	ModuleBase_WidgetDoubleValue.cpp
 	ModuleBase_WidgetFactory.cpp
