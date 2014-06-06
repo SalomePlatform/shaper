@@ -330,3 +330,18 @@ void XGUI_ObjectsBrowser::rebuildDataTree()
   myDocModel->rebuildDataTree();
   update();
 }
+
+//***************************************************
+void XGUI_ObjectsBrowser::setFeaturesSelected(const QFeatureList& theFeatures)
+{
+  QList<QModelIndex> theIndexes;
+  QItemSelectionModel* aSelectModel = myTreeView->selectionModel();
+  aSelectModel->clear();
+
+  foreach(FeaturePtr aFeature, theFeatures) {
+    QModelIndex aIndex = myDocModel->featureIndex(aFeature);
+    if (aIndex.isValid()) {
+      aSelectModel->select(aIndex, QItemSelectionModel::Select);
+    }
+  }
+}

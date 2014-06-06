@@ -66,6 +66,8 @@ public:
   //! Returns list of currently selected features
   QFeatureList selectedFeatures() const { return myFeaturesList; }
 
+  void setFeaturesSelected(const QFeatureList& theFeatures);
+
   //! Returns currently selected indexes
   QModelIndexList selectedIndexes() const { return myTreeView->selectionModel()->selectedIndexes(); }
 

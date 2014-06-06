@@ -1,10 +1,11 @@
 #include "XGUI_SelectionMgr.h"
+
 #include "XGUI_Workshop.h"
 #include "XGUI_MainWindow.h"
 #include "XGUI_ObjectsBrowser.h"
-#include "XGUI_Viewer.h"
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_ViewerProxy.h"
+#include "XGUI_Displayer.h"
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_PluginManager.h>
@@ -29,20 +30,16 @@ void XGUI_SelectionMgr::connectViewers()
     this, SLOT(onObjectBrowserSelection()));
 
   //Connect to other viewers
-  if (myWorkshop->isSalomeMode()) {
-    connect(myWorkshop, SIGNAL(salomeViewerSelection()),
-      this, SLOT(onViewerSelection()));
-  } else {
-    connect(myWorkshop->mainWindow()->viewer(), SIGNAL(selectionChanged()),
-      this, SLOT(onViewerSelection()));
-  }
+  connect(myWorkshop->viewer(), SIGNAL(selectionChanged()),
+    this, SLOT(onViewerSelection()));
 }
 
 //**************************************************************
 void XGUI_SelectionMgr::onObjectBrowserSelection()
 {
-
-  // TODO: Highliht selected objects in Viewer 3d
+  QFeatureList aFeatures = selectedFeatures();
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  aDisplayer->setSelected(aFeatures);
 
   emit selectionChanged();
 }
@@ -50,7 +47,9 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
 //**************************************************************
 void XGUI_SelectionMgr::onViewerSelection()
 {
-  // TODO: Highliht selected objects in Object Browser
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  QFeatureList aFeatures = aDisplayer->selectedFeatures();
+  myWorkshop->objectBrowser()->setFeaturesSelected(aFeatures);
   emit selectionChanged();
 }
 
