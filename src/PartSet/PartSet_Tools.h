@@ -91,9 +91,16 @@ public:
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
   /// \param theAttribute the feature attribute
-  static void setFeaturePoint(FeaturePtr, double theX, double theY, const std::string& theAttribute);
+  static void setFeaturePoint(FeaturePtr theFeature, double theX, double theY,
+                              const std::string& theAttribute);
 
-    /// Creates a constraint on two points
+  /// \brief Save the double to the feature. If the attribute is double, it is filled.
+  /// \param theFeature the feature
+  /// \param theValue the horizontal coordinate
+  /// \param theAttribute the feature attribute
+  static void setFeatureValue(FeaturePtr theFeature, double theX, const std::string& theAttribute);
+
+  /// Creates a constraint on two points
   /// \param thePoint1 the first point
   /// \param thePoint1 the second point
   static void createConstraint(FeaturePtr theSketch,
