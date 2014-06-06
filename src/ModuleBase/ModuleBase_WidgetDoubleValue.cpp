@@ -17,6 +17,8 @@
 #include <QLayout>
 #include <QLabel>
 #include <QDoubleSpinBox>
+#include <QEvent>
+#include <QKeyEvent>
 
 
 ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent, const Config_WidgetAPI* theData)
@@ -72,6 +74,8 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent, c
   aControlLay->setStretch(1, 1);
 
   connect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
+
+  mySpinBox->installEventFilter(this);
 }
 
 ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
@@ -107,4 +111,15 @@ QList<QWidget*> ModuleBase_WidgetDoubleValue::getControls() const
   aList.append(myLabel);
   aList.append(mySpinBox);
   return aList;
+}
+
+bool ModuleBase_WidgetDoubleValue::eventFilter(QObject *theObject, QEvent *theEvent)
+{
+  if (theObject == mySpinBox) {
+    if (theEvent->type() == QEvent::KeyRelease) {
+      emit keyReleased(attributeID(), (QKeyEvent*) theEvent);
+      return true;
+    }
+  }
+  return ModuleBase_ModelWidget::eventFilter(theObject, theEvent);
 }
