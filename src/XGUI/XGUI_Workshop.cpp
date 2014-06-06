@@ -841,6 +841,14 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
 //**************************************************************
 void XGUI_Workshop::showFeatures(QFeatureList theList, bool isVisible)
 {
-//  foreach (FeaturePtr aFeature, theList) {
-//  }
+  if (isVisible) {
+    foreach (FeaturePtr aFeature, theList) {
+      myDisplayer->display(aFeature, false);
+    }
+  } else {
+    foreach (FeaturePtr aFeature, theList) {
+      myDisplayer->erase(aFeature, false);
+    }
+  }
+  myDisplayer->updateViewer();
 }

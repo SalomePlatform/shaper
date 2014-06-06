@@ -57,6 +57,7 @@ signals:
   void keyRelease(QKeyEvent* theEvent);
   void activated();
 
+  void selectionChanged();
 };
 
 #endif

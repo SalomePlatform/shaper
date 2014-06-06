@@ -10,6 +10,9 @@
 
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Object.h>
+
+#include <GeomAPI_Shape.h>
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_LocalContext.hxx>
@@ -34,26 +37,31 @@ XGUI_Displayer::~XGUI_Displayer()
 
 bool XGUI_Displayer::isVisible(FeaturePtr theFeature)
 {
-  return myFeature2AISObjectMap.find(theFeature) != myFeature2AISObjectMap.end();
+  FeaturePtr aFeature = XGUI_Tools::realFeature(theFeature);
+  return myFeature2AISObjectMap.find(aFeature) != myFeature2AISObjectMap.end();
 }
 
-//void XGUI_Displayer::Display(FeaturePtr theFeature,
-//                             const bool isUpdateViewer)
-//{
-//}
+void XGUI_Displayer::display(FeaturePtr theFeature, bool isUpdateViewer)
+{
+  FeaturePtr aFeature = XGUI_Tools::realFeature(theFeature);
+  boost::shared_ptr<GeomAPI_Shape> aShapePtr = aFeature->data()->shape();
 
-/*void XGUI_Displayer::Display(FeaturePtr theFeature,
-                             const TopoDS_Shape& theShape, const bool isUpdateViewer)
+  if (aShapePtr) {
+    TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+    display(aFeature, aShape, isUpdateViewer);
+  }
+}
+
+void XGUI_Displayer::display(FeaturePtr theFeature,
+                             const TopoDS_Shape& theShape, bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
   Handle(AIS_Shape) anAIS = new AIS_Shape(theShape);
   myFeature2AISObjectMap[theFeature] = anAIS;
 
-  aContext->Display(anAIS, Standard_False);
-  if (isUpdateViewer)
-    updateViewer();
-}*/
+  aContext->Display(anAIS, isUpdateViewer);
+}
 
 
 std::list<XGUI_ViewerPrs> XGUI_Displayer::getSelected(const int theShapeTypeToSkip)
@@ -78,6 +86,21 @@ std::list<XGUI_ViewerPrs> XGUI_Displayer::getSelected(const int theShapeTypeToSk
   }
   return aPresentations;
 }
+
+QFeatureList XGUI_Displayer::selectedFeatures() const
+{
+  QFeatureList aSelectedList;
+
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
+    Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
+    FeaturePtr aFeature = getFeature(anIO);
+    if (aFeature)
+      aSelectedList.append(aFeature);
+  }
+  return aSelectedList;
+}
+
 
 std::list<XGUI_ViewerPrs> XGUI_Displayer::getHighlighted(const int theShapeTypeToSkip)
 {
@@ -104,21 +127,21 @@ std::list<XGUI_ViewerPrs> XGUI_Displayer::getHighlighted(const int theShapeTypeT
 void XGUI_Displayer::erase(FeaturePtr theFeature,
                            const bool isUpdateViewer)
 {
-  if (myFeature2AISObjectMap.find(theFeature) == myFeature2AISObjectMap.end())
+  FeaturePtr aFeature = XGUI_Tools::realFeature(theFeature);
+
+  if (myFeature2AISObjectMap.find(aFeature) == myFeature2AISObjectMap.end())
     return;
 
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  Handle(AIS_InteractiveObject) anAIS = myFeature2AISObjectMap[theFeature];
+  Handle(AIS_InteractiveObject) anAIS = myFeature2AISObjectMap[aFeature];
   Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
   if (!anAISShape.IsNull())
   {
-    aContext->Erase(anAISShape);
+    aContext->Erase(anAISShape, isUpdateViewer);
   }
-  myFeature2AISObjectMap.erase(theFeature);
-
-  if (isUpdateViewer)
-    updateViewer();
+  myFeature2AISObjectMap.erase(aFeature);
 }
+
 
 bool XGUI_Displayer::redisplay(FeaturePtr theFeature,
                                Handle(AIS_InteractiveObject) theAIS,
@@ -244,6 +267,25 @@ void XGUI_Displayer::setSelected(const std::list<XGUI_ViewerPrs>& theFeatures, c
   if (isUpdateViewer)
     updateViewer();
 }
+
+
+void XGUI_Displayer::setSelected(const QFeatureList& theFeatures, const bool isUpdateViewer)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  aContext->ClearSelected();
+  foreach(FeaturePtr aFeature, theFeatures) {
+    FeaturePtr aRFeature = XGUI_Tools::realFeature(aFeature);
+    if (myFeature2AISObjectMap.find(aRFeature) == myFeature2AISObjectMap.end()) 
+      return;
+
+    Handle(AIS_InteractiveObject) anAIS = myFeature2AISObjectMap[aRFeature];
+    if (!anAIS.IsNull())
+      aContext->AddOrRemoveSelected(anAIS, false);
+  }
+  if (isUpdateViewer)
+    updateViewer();
+}
+
 
 /*void XGUI_Displayer::EraseAll(const bool isUpdateViewer)
 {

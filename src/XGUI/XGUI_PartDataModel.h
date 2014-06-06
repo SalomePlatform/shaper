@@ -106,6 +106,8 @@ public:
   virtual FeaturePtr part() const;
 
 private: 
+
+  //! Returns document of the current part
   DocumentPtr featureDocument() const;
 
   //! Types of QModelIndexes

@@ -445,11 +445,11 @@ QModelIndex XGUI_PartDataModel::featureIndex(const FeaturePtr& theFeature) const
       return aIndex;
 
     std::string aGroup = theFeature->getGroup();
-    DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
-    int aNb = aRootDoc->size(aGroup);
+    DocumentPtr aDoc = theFeature->document();
+    int aNb = aDoc->size(aGroup);
     int aRow = -1;
     for (int i = 0; i < aNb; i++) {
-      if (aRootDoc->feature(aGroup, i) == theFeature) {
+      if (aDoc->feature(aGroup, i) == theFeature) {
         aRow = i;
         break;
       }

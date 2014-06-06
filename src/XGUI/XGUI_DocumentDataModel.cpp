@@ -501,11 +501,8 @@ Qt::ItemFlags XGUI_DocumentDataModel::flags(const QModelIndex& theIndex) const
 
 QModelIndex XGUI_DocumentDataModel::partIndex(const FeaturePtr& theFeature) const 
 {
-  FeaturePtr aFeature = theFeature;
-  if (XGUI_Tools::isModelObject(aFeature)) {
-    ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
-    aFeature = aObject->featureRef();
-  }
+  FeaturePtr aFeature = XGUI_Tools::realFeature(theFeature);
+
   int aRow = -1;
   XGUI_PartModel* aModel = 0;
   foreach (XGUI_PartModel* aPartModel, myPartModels) {
@@ -519,4 +516,41 @@ QModelIndex XGUI_DocumentDataModel::partIndex(const FeaturePtr& theFeature) cons
     return createIndex(aRow, 0, (void*)getModelIndex(aModel->index(0, 0, QModelIndex())));
   }
   return QModelIndex();
+}
+
+QModelIndex XGUI_DocumentDataModel::featureIndex(const FeaturePtr theFeature) const
+{
+  // Check that this feature belongs to root document
+  DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+  DocumentPtr aDoc = theFeature->document();
+  if (aDoc == aRootDoc) {
+    // This feature belongs to histrory or top model
+    if (theFeature->isInHistory()) {
+      int aId;
+      for (aId = 0; aId < aRootDoc->size(FEATURES_GROUP); aId++) {
+        if (theFeature == aRootDoc->feature(FEATURES_GROUP, aId))
+          break;
+      }
+      return index(aId + historyOffset(), 0, QModelIndex());
+    } else {
+      QModelIndex aIndex = myModel->featureIndex(theFeature);
+      return aIndex.isValid()? 
+        createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex)) :
+        QModelIndex();
+    }
+  } else {
+    XGUI_PartModel* aPartModel = 0;
+    foreach(XGUI_PartModel* aModel, myPartModels) {
+      if (aModel->hasDocument(aDoc)) {
+        aPartModel = aModel;
+        break;
+      }
+    }
+    if (aPartModel) {
+      QModelIndex aIndex = aPartModel->featureIndex(theFeature);
+      return aIndex.isValid()? 
+        createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex)) :
+        QModelIndex();
+    }
+  }
 }
