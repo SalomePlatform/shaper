@@ -239,6 +239,18 @@ void PartSet_Tools::setFeaturePoint(FeaturePtr theFeature, double theX, double t
     aPoint->setValue(theX, theY);
 }
 
+void PartSet_Tools::setFeatureValue(FeaturePtr theFeature, double theValue,
+                                    const std::string& theAttribute)
+{
+  if (!theFeature)
+    return;
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<ModelAPI_AttributeDouble> anAttribute =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(theAttribute));
+  if (anAttribute)
+    anAttribute->setValue(theValue);
+}
+
 void PartSet_Tools::createConstraint(FeaturePtr theSketch,
                                      boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
                                      boost::shared_ptr<GeomDataAPI_Point2D> thePoint2)
@@ -305,5 +317,6 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findPoint(FeaturePtr theFe
     if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
       aPoint2D = aPoint;
   }
+
   return aPoint2D;
 }

@@ -45,10 +45,6 @@ public:
   virtual PartSet_SelectionMode getNextMode(const std::string& theAttribute) const;
 
 protected:
-  /// Initializes current feature by the given
-  /// \param theSourceFeature the feature, which attributes are used to initialize the current feature
-  virtual void initFeature(FeaturePtr theSourceFeature);
-
   /// Returns the feature point in the selection mode position.
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode
   virtual boost::shared_ptr<GeomDataAPI_Point2D> featurePoint(const PartSet_SelectionMode& theMode);

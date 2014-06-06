@@ -66,7 +66,7 @@ protected:
 
   /// Initializes current feature by the given
   /// \param theSourceFeature the feature, which attributes are used to initialize the current feature
-  virtual void initFeature(FeaturePtr theSourceFeature) = 0;
+  virtual void initFeature(FeaturePtr theSourceFeature) {};
 
   /// Returns the feature point in the selection mode position.
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode

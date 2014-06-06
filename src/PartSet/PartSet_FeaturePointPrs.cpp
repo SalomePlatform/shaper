@@ -25,10 +25,6 @@ PartSet_FeaturePointPrs::PartSet_FeaturePointPrs(FeaturePtr theSketch)
 {
 }
 
-void PartSet_FeaturePointPrs::initFeature(FeaturePtr theFeature)
-{
-}
-
 PartSet_SelectionMode PartSet_FeaturePointPrs::setPoint(double theX, double theY,
                                                        const PartSet_SelectionMode& theMode)
 {
