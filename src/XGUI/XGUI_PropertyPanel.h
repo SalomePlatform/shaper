@@ -16,6 +16,7 @@
 #include <QList>
 
 class QKeyEvent;
+class QVBoxLayout;
 
 class XGUI_EXPORT XGUI_PropertyPanel: public QDockWidget
 {
@@ -27,6 +28,9 @@ public:
   QWidget* contentWidget();
   void setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets);
 
+  void cleanContent();
+
+protected:
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
 public slots:
@@ -45,6 +49,8 @@ private:
   QWidget* myCustomWidget;
 
   QList<ModuleBase_ModelWidget*> myWidgets;
+
+  QVBoxLayout* myMainLayout;
 };
 
 #endif /* XGUI_PROPERTYPANEL_H_ */

@@ -124,8 +124,8 @@ void PartSet_OperationConstraint::mouseReleased(QMouseEvent* theEvent, Handle(V3
         if (aFeature) {
           double X0, X1, X2, X3;
           double Y0, Y1, Y2, Y3;
-          getLinePoint(aFeature, LINE_ATTR_START, X2, Y2);
-          getLinePoint(aFeature, LINE_ATTR_END, X3, Y3);
+          PartSet_Tools::getLinePoint(aFeature, LINE_ATTR_START, X2, Y2);
+          PartSet_Tools::getLinePoint(aFeature, LINE_ATTR_END, X3, Y3);
           PartSet_Tools::convertTo2D(aPoint, sketch(), theView, X1, Y1);
 
           switch (myPointSelectionMode) {
@@ -133,7 +133,7 @@ void PartSet_OperationConstraint::mouseReleased(QMouseEvent* theEvent, Handle(V3
               PartSet_Tools::projectPointOnLine(X2, Y2, X3, Y3, X1, Y1, aX, anY);
             break;
             case SM_SecondPoint: {
-              getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
+              PartSet_Tools::getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
               PartSet_Tools::intersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, aX, anY);
             }
             break;
@@ -242,7 +242,7 @@ FeaturePtr PartSet_OperationConstraint::createFeature(const bool theFlushMessage
     boost::shared_ptr<ModelAPI_Data> aData = aNewFeature->data();
     boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                                                 (aData->attribute(LINE_ATTR_START));
-    createConstraint(myInitPoint, aPoint);
+    PartSet_Tools::createConstraint(myInitPoint, aPoint);
   }*/
 
   emit featureConstructed(aNewFeature, FM_Activation);

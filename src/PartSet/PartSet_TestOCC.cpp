@@ -11,6 +11,7 @@
 #include <XGUI_ViewerProxy.h>
 #include <PartSet_FeaturePrs.h>
 #include <PartSet_Presentation.h>
+#include <PartSet_Tools.h>
 #include <PartSet_OperationSketchBase.h>
 
 #include <ModelAPI_Feature.h>
@@ -141,8 +142,8 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
                         boost::dynamic_pointer_cast<SketchPlugin_Feature>(aPreviewOp->sketch());
     aSketch->addSub(aFeature);
 
-    PartSet_FeaturePrs::setLinePoint(aFeature, 100, 100, LINE_ATTR_START);
-    PartSet_FeaturePrs::setLinePoint(aFeature, 150, 300, LINE_ATTR_END);
+    PartSet_Tools::setFeaturePoint(aFeature, 100, 100, LINE_ATTR_START);
+    PartSet_Tools::setFeaturePoint(aFeature, 150, 300, LINE_ATTR_END);
 
     boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
 
@@ -163,8 +164,8 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
     /*double aDelta = -200;
     for (int i = 0; i < 20; i++) {
       aDelta = aDelta - i*2;
-      PartSet_FeaturePrs::setLinePoint(aFeature, 100+aDelta, 200+aDelta, LINE_ATTR_START);
-      PartSet_FeaturePrs::setLinePoint(aFeature, 300+aDelta, 500+aDelta, LINE_ATTR_END);
+      PartSet_Tools::setFeaturePoint(aFeature, 100+aDelta, 200+aDelta, LINE_ATTR_START);
+      PartSet_Tools::setFeaturePoint(aFeature, 300+aDelta, 500+aDelta, LINE_ATTR_END);
 
       boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
       Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
@@ -199,8 +200,8 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
 
   myTestDelta = myTestDelta - 50;
   double aDelta = myTestDelta;
-  PartSet_FeaturePrs::setLinePoint(aFeature, -100/*aDelta*/, -100/*aDelta*/, LINE_ATTR_START);
-  PartSet_FeaturePrs::setLinePoint(aFeature, 200/*aDelta*2*/, 200/*aDelta*2*/, LINE_ATTR_END);
+  PartSet_Tools::setFeaturePoint(aFeature, -100/*aDelta*/, -100/*aDelta*/, LINE_ATTR_START);
+  PartSet_Tools::setFeaturePoint(aFeature, 200/*aDelta*2*/, 200/*aDelta*2*/, LINE_ATTR_END);
   boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
 
   Handle(AIS_InteractiveObject) aPrevAIS;

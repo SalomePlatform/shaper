@@ -56,6 +56,8 @@ public:
   //! Returns 0 if the given index is not index of a feature
   FeaturePtr feature(const QModelIndex& theIndex) const;
 
+  QModelIndex featureIndex(const FeaturePtr theFeature) const;
+
   //! Returns QModelIndex which corresponds to the given feature if this is a part
   //! If the feature is not found then index is not valid
   QModelIndex partIndex(const FeaturePtr& theFeature) const;
@@ -64,12 +66,16 @@ public:
   //! Returns true if active part changed.
   bool activatedIndex(const QModelIndex& theIndex);
 
+  //! Retrurns Feature which corresponds to active part
   FeaturePtr activePart() const;
 
+  //! Retrurns QModelIndex of active part
   QModelIndex activePartIndex() const { return myActivePartIndex; }
 
   //! Deactivates a Part
   void deactivatePart();
+
+  void rebuildDataTree();
 
 private:
 
@@ -102,9 +108,6 @@ private:
 
   int historyOffset() const;
 
-
-  //! Document
-  boost::shared_ptr<ModelAPI_Document> myDocument;
 
   //! Data model of top part of data tree (not parts object)
   XGUI_TopDataModel* myModel;

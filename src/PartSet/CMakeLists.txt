@@ -5,7 +5,10 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Constants.h
+	PartSet_FeatureCirclePrs.h
 	PartSet_FeaturePrs.h
+	PartSet_FeatureLinePrs.h
+	PartSet_FeaturePointPrs.h
 	PartSet_Listener.h
 	PartSet_Module.h
 	PartSet_OperationConstraint.h
@@ -20,6 +23,9 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
 	PartSet_FeaturePrs.cpp
+	PartSet_FeatureCirclePrs.cpp
+	PartSet_FeatureLinePrs.cpp
+	PartSet_FeaturePointPrs.cpp
 	PartSet_Listener.cpp
 	PartSet_Module.cpp
 	PartSet_OperationConstraint.cpp

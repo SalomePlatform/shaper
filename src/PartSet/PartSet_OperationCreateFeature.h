@@ -10,8 +10,6 @@
 #include <PartSet_OperationSketchBase.h>
 #include <PartSet_Constants.h>
 
-#include <SketchPlugin_Line.h>
-
 #include <QObject>
 
 class PartSet_FeaturePrs;
@@ -28,6 +26,10 @@ class PARTSET_EXPORT PartSet_OperationCreateFeature : public PartSet_OperationSk
   Q_OBJECT
 
 public:
+  /// Returns true if the feature with the given kind can be created by this operation
+  /// \param theId the feature kind
+  /// \return the boolean result
+  static bool canProcessKind(const std::string& theId);
 
 public:
   /// Constructor

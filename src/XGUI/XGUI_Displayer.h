@@ -6,6 +6,7 @@
 #define XGUI_Displayer_H
 
 #include "XGUI.h"
+#include "XGUI_Constants.h"
 
 #include <QString>
 #include <boost/shared_ptr.hpp>
@@ -51,19 +52,23 @@ public:
   /// Display the feature. Obtain the visualized object from the feature.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  //void Display(FeaturePtr theFeature, const bool isUpdateViewer = true);
+  void display(FeaturePtr theFeature, bool isUpdateViewer = true);
 
   /// Display the feature and a shape. This shape would be associated to the given feature
   /// \param theFeature a feature instance
   /// \param theShape a shape
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  //void Display(FeaturePtr theFeature, const TopoDS_Shape& theShape,
-  //             const bool isUpdateViewer = true);
+  void display(FeaturePtr theFeature, const TopoDS_Shape& theShape, bool isUpdateViewer = true);
   
   /// Returns a list of viewer selected presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
   std::list<XGUI_ViewerPrs> getSelected(const int theShapeTypeToSkip = -1);
+
+  /**
+  * Returns list of features currently selected in 3d viewer
+  */
+  QFeatureList selectedFeatures() const;
 
   /// Returns a list of viewer highlited presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
@@ -103,6 +108,13 @@ public:
   /// \param theFeatures a list of features to be selected
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void setSelected(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isUpdateViewer);
+
+  /**
+  * Add presentations which corresponds to the given features to current selection
+  * \param theFeatures a list of features to be selected
+  * isUpdateViewer the parameter whether the viewer should be update immediatelly
+  */
+  void setSelected(const QFeatureList& theFeatures, bool isUpdateViewer = true);
 
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance

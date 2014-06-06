@@ -25,10 +25,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetPoint2D : public ModuleBase_ModelWidget
 public:
   /// Constructor
   /// \theParent the parent object
-  /// \theTitle the group box title
-  /// \theFeatureAttributeID the identifier of the feature attribute
-  ModuleBase_WidgetPoint2D(QWidget* theParent, QString theTitle,
-                           const std::string& theFeatureAttributeID);
+  /// \theParent the parent object
+  /// \theData the widget configuation. The attribute of the model widget is obtained from
+  ModuleBase_WidgetPoint2D(QWidget* theParent, const Config_WidgetAPI* theData);
   /// Destructor
   virtual ~ModuleBase_WidgetPoint2D();
 
@@ -37,13 +36,6 @@ public:
   virtual bool storeValue(FeaturePtr theFeature) const;
 
   virtual bool restoreValue(FeaturePtr theFeature);
-
-  /// Returns whether the widget can accept focus, or if it corresponds to the given attribute
-  /// \param theAttribute name
-  virtual bool canFocusTo(const std::string& theAttributeName);
-
-  /// Set focus to the current widget if it corresponds to the given attribute
-  virtual void focusTo();
 
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
@@ -56,7 +48,6 @@ public:
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
 private:
-  std::string myFeatureAttributeID; ///< the identifier of the feature attribute
   QGroupBox* myGroupBox; ///< the parent group box for all intenal widgets
   QDoubleSpinBox* myXSpin; ///< the spin box for the X coordinate
   QDoubleSpinBox* myYSpin; ///< the spin box for the Y coordinate

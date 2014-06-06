@@ -464,7 +464,6 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
 void XGUI_Viewer::onWindowActivated(QMdiSubWindow* view)
 {
   if (view && (view != myActiveView) && (!view->isMinimized())) {
-    qDebug("onWindowActivated");
     myActiveView = view;
     ((XGUI_ViewWindow*)myActiveView->widget())->windowActivated();
     QList<QMdiSubWindow*>::iterator aIt;

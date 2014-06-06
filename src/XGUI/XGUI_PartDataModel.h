@@ -14,7 +14,7 @@ class XGUI_EXPORT XGUI_TopDataModel : public XGUI_FeaturesModel
 {
   Q_OBJECT
 public:
-  XGUI_TopDataModel(const DocumentPtr& theDocument, QObject* theParent);
+  XGUI_TopDataModel(QObject* theParent);
   virtual ~XGUI_TopDataModel();
 
   // Reimpl from QAbstractItemModel
@@ -67,7 +67,7 @@ class XGUI_PartDataModel : public XGUI_PartModel
 {
   Q_OBJECT
 public:
-  XGUI_PartDataModel(const DocumentPtr& theDocument, QObject* theParent);
+  XGUI_PartDataModel(QObject* theParent);
   virtual ~XGUI_PartDataModel();
 
   // Reimpl from QAbstractItemModel
@@ -106,6 +106,8 @@ public:
   virtual FeaturePtr part() const;
 
 private: 
+
+  //! Returns document of the current part
   DocumentPtr featureDocument() const;
 
   //! Types of QModelIndexes

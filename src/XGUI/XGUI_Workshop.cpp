@@ -264,6 +264,8 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   //An operation passed by message. Start it, process and commit.
   const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
+    // Clear previous content
+    myPropertyPanel->cleanContent();
     ModuleBase_Operation* anOperation =
         (ModuleBase_Operation*)(aPartSetMsg->pointer());
 
@@ -470,8 +472,9 @@ void XGUI_Workshop::onOpen()
   }
   QApplication::setOverrideCursor(Qt::WaitCursor);
   aDoc->load(myCurrentDir.toLatin1().constData());
-  QApplication::restoreOverrideCursor();
   updateCommandStatus();
+  myObjectBrowser->rebuildDataTree();
+  QApplication::restoreOverrideCursor();
 }
 
 //******************************************************
@@ -838,6 +841,14 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
 //**************************************************************
 void XGUI_Workshop::showFeatures(QFeatureList theList, bool isVisible)
 {
-//  foreach (FeaturePtr aFeature, theList) {
-//  }
+  if (isVisible) {
+    foreach (FeaturePtr aFeature, theList) {
+      myDisplayer->display(aFeature, false);
+    }
+  } else {
+    foreach (FeaturePtr aFeature, theList) {
+      myDisplayer->erase(aFeature, false);
+    }
+  }
+  myDisplayer->updateViewer();
 }

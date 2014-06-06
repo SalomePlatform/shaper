@@ -6,9 +6,14 @@
 
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketch.h>
-#include <PartSet_FeaturePrs.h>
+#include <PartSet_FeaturePointPrs.h>
+#include <PartSet_FeatureLinePrs.h>
+#include <PartSet_FeatureCirclePrs.h>
 
 #include <SketchPlugin_Feature.h>
+#include <SketchPlugin_Point.h>
+#include <SketchPlugin_Line.h>
+#include <SketchPlugin_Circle.h>
 
 #include <ModuleBase_OperationDescription.h>
 
@@ -29,17 +34,32 @@
 using namespace std;
 
 PartSet_OperationCreateFeature::PartSet_OperationCreateFeature(const QString& theId,
-	                                          QObject* theParent,
-                                              FeaturePtr theFeature)
+                                                               QObject* theParent,
+                                                               FeaturePtr theFeature)
 : PartSet_OperationSketchBase(theId, theParent),
   myPointSelectionMode(SM_FirstPoint)
 {
-  myFeaturePrs = new PartSet_FeaturePrs(theFeature);
+  std::string aKind = theId.toStdString();
+
+  if (aKind == SKETCH_POINT_KIND) {
+    myFeaturePrs = new PartSet_FeaturePointPrs(theFeature);
+  }
+  if (aKind == SKETCH_LINE_KIND) {
+    myFeaturePrs = new PartSet_FeatureLinePrs(theFeature);
+  }
+  else if (aKind == SKETCH_CIRCLE_KIND) {
+    myFeaturePrs = new PartSet_FeatureCirclePrs(theFeature);
+  }
 }
 
 PartSet_OperationCreateFeature::~PartSet_OperationCreateFeature()
 {
   delete myFeaturePrs;
+}
+
+bool PartSet_OperationCreateFeature::canProcessKind(const std::string& theId)
+{
+  return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND || theId == SKETCH_CIRCLE_KIND;
 }
 
 bool PartSet_OperationCreateFeature::canBeCommitted() const
@@ -110,14 +130,17 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
           myFeaturePrs->setConstraints(aX, anY, myPointSelectionMode);
         }
       }
-      /*else if (aShape.ShapeType() == TopAbs_EDGE) // the line is selected
+      else if (aShape.ShapeType() == TopAbs_EDGE) // the line is selected
       {
+        PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+        isFoundPoint = true;
+        /*
         FeaturePtr aFeature = aPrs.feature();
         if (aFeature) {
           double X0, X1, X2, X3;
           double Y0, Y1, Y2, Y3;
-          getLinePoint(aFeature, LINE_ATTR_START, X2, Y2);
-          getLinePoint(aFeature, LINE_ATTR_END, X3, Y3);
+          PartSet_Tools::getLinePoint(aFeature, LINE_ATTR_START, X2, Y2);
+          PartSet_Tools::getLinePoint(aFeature, LINE_ATTR_END, X3, Y3);
           PartSet_Tools::convertTo2D(aPoint, sketch(), theView, X1, Y1);
 
           switch (myPointSelectionMode) {
@@ -125,7 +148,7 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
               PartSet_Tools::projectPointOnLine(X2, Y2, X3, Y3, X1, Y1, aX, anY);
             break;
             case SM_SecondPoint: {
-              getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
+              PartSet_Tools::getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
               PartSet_Tools::intersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, aX, anY);
             }
             break;
@@ -134,7 +157,8 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
           }
           isFoundPoint = true;
         }
-      }*/
+        */
+      }
     }
   }
 

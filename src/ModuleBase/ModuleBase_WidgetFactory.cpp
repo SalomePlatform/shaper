@@ -12,7 +12,8 @@
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetSwitch.h>
 #include <ModuleBase_SelectorWidget.h>
-#include <ModuleBase_Widgets.h>
+#include <ModuleBase_WidgetDoubleValue.h>
+#include <ModuleBase_WidgetBoolValue.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -149,7 +150,7 @@ QWidget* ModuleBase_WidgetFactory::createContainer(const std::string& theType, Q
 
 QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 {
-  ModuleBase_DoubleValueWidget* aDblWgt = new ModuleBase_DoubleValueWidget(theParent, myWidgetApi);
+  ModuleBase_WidgetDoubleValue* aDblWgt = new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi);
   QObject::connect(aDblWgt, SIGNAL(valuesChanged()),  myOperation, SLOT(storeCustomValue()));
 
   myModelWidgets.append(aDblWgt);
@@ -162,9 +163,7 @@ QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 
 QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetPoint2D* aWidget = new ModuleBase_WidgetPoint2D(theParent,
-                       qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME)),
-                       myWidgetApi->widgetId());
+  ModuleBase_WidgetPoint2D* aWidget = new ModuleBase_WidgetPoint2D(theParent, myWidgetApi);
   connectWidget(aWidget, WDG_POINT_SELECTOR);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
@@ -203,7 +202,7 @@ QWidget* ModuleBase_WidgetFactory::selectorControl(QWidget* theParent)
 
 QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
 {
-  ModuleBase_BoolValueWidget* aBoolWgt = new ModuleBase_BoolValueWidget(theParent, myWidgetApi);
+  ModuleBase_WidgetBoolValue* aBoolWgt = new ModuleBase_WidgetBoolValue(theParent, myWidgetApi);
   QObject::connect(aBoolWgt, SIGNAL(valuesChanged()),  myOperation, SLOT(storeCustomValue()));
 
   myModelWidgets.append(aBoolWgt);

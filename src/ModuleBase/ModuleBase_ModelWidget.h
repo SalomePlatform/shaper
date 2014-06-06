@@ -13,6 +13,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+class Config_WidgetAPI;
 class ModelAPI_Feature;
 class QKeyEvent;
 
@@ -30,7 +31,8 @@ class MODULEBASE_EXPORT ModuleBase_ModelWidget : public QObject
 public:
   /// Constructor
   /// \theParent the parent object
-  ModuleBase_ModelWidget(QObject* theParent) :QObject(theParent) {};
+  /// \theData the widget configuation. The attribute of the model widget is obtained from
+  ModuleBase_ModelWidget(QObject* theParent, const Config_WidgetAPI* theData);
   /// Destructor
   virtual ~ModuleBase_ModelWidget() {};
 
@@ -42,10 +44,11 @@ public:
 
   /// Returns whether the widget can accept focus, or if it corresponds to the given attribute
   /// \param theAttribute name
-  virtual bool canFocusTo(const std::string& theAttributeName) const { return false; }
+  bool canFocusTo(const std::string& theAttributeName) const;
 
-  /// Set focus to the current widget if it corresponds to the given attribute
-  virtual void focusTo() {}
+  /// Set focus to the first control of the current widget. The focus policy of the control is checked.
+  /// If the widget has the NonFocus focus policy, it is skipped.
+  virtual void focusTo();
 
   /// Returns list of widget controls
   /// \return a control list
@@ -58,6 +61,14 @@ signals:
   /// \param theAttributeName a name of the attribute
   /// \param theEvent key release event
   void keyReleased(const std::string& theAttributeName, QKeyEvent* theEvent);
+
+protected:
+  /// Returns the attribute name
+  /// \returns the string value
+  std::string attributeID() const;
+
+private:
+  std::string myAttributeID; /// the attribute name of the model feature
 };
 
 #endif

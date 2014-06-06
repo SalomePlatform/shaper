@@ -1,7 +1,7 @@
 #include "XGUI_Tools.h"
 
 #include <TopoDS_Shape.hxx>
-#include <ModelAPI_Feature.h>
+#include <ModelAPI_Object.h>
 
 #include <QDir>
 
@@ -68,6 +68,17 @@ std::string featureInfo(FeaturePtr theFeature)
   if (theFeature)
     aStream << theFeature.get() << " " << theFeature->getKind();
   return QString(aStream.str().c_str()).toStdString();
+}
+
+//******************************************************************
+FeaturePtr realFeature(const FeaturePtr theFeature)
+{
+  if (theFeature->data()) {
+    return theFeature;
+  } else {
+    ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
+    return aObject->featureRef();
+  }
 }
 
 }
