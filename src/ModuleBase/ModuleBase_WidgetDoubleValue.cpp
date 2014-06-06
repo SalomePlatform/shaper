@@ -5,7 +5,6 @@
 #include <ModuleBase_WidgetDoubleValue.h>
 
 #include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_Data.h>
 
 #include <Config_Keywords.h>
@@ -18,11 +17,12 @@
 #include <QLayout>
 #include <QLabel>
 #include <QDoubleSpinBox>
-#include <QCheckBox>
+#include <QEvent>
+#include <QKeyEvent>
 
 
 ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent, const Config_WidgetAPI* theData)
-  : ModuleBase_ModelWidget(theParent)
+  : ModuleBase_ModelWidget(theParent, theData)
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aControlLay = new QHBoxLayout(myContainer);
@@ -34,9 +34,8 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent, c
   myLabel->setPixmap(QPixmap(aLabelIcon));
   aControlLay->addWidget(myLabel);
 
-  myAttributeID = theData->widgetId();
   mySpinBox = new QDoubleSpinBox(myContainer);
-  QString anObjName = QString::fromStdString(myAttributeID);
+  QString anObjName = QString::fromStdString(attributeID());
   mySpinBox->setObjectName(anObjName);
 
   bool isOk = false;
@@ -75,6 +74,8 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent, c
   aControlLay->setStretch(1, 1);
 
   connect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
+
+  mySpinBox->installEventFilter(this);
 }
 
 ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
@@ -84,7 +85,7 @@ ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 bool ModuleBase_WidgetDoubleValue::storeValue(FeaturePtr theFeature) const
 {
   DataPtr aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(myAttributeID);
+  boost::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(attributeID());
   if (aReal->value() != mySpinBox->value()) {
     aReal->setValue(mySpinBox->value());
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
@@ -95,7 +96,7 @@ bool ModuleBase_WidgetDoubleValue::storeValue(FeaturePtr theFeature) const
 bool ModuleBase_WidgetDoubleValue::restoreValue(FeaturePtr theFeature)
 {
   DataPtr aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeDouble> aRef = aData->real(myAttributeID);
+  boost::shared_ptr<ModelAPI_AttributeDouble> aRef = aData->real(attributeID());
 
   bool isBlocked = mySpinBox->blockSignals(true);
   mySpinBox->setValue(aRef->value());
@@ -110,4 +111,15 @@ QList<QWidget*> ModuleBase_WidgetDoubleValue::getControls() const
   aList.append(myLabel);
   aList.append(mySpinBox);
   return aList;
+}
+
+bool ModuleBase_WidgetDoubleValue::eventFilter(QObject *theObject, QEvent *theEvent)
+{
+  if (theObject == mySpinBox) {
+    if (theEvent->type() == QEvent::KeyRelease) {
+      emit keyReleased(attributeID(), (QKeyEvent*) theEvent);
+      return true;
+    }
+  }
+  return ModuleBase_ModelWidget::eventFilter(theObject, theEvent);
 }

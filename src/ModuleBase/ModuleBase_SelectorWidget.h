@@ -63,8 +63,6 @@ private:
   void updateSelectionName();
   void raisePanel() const;
 
-  std::string myFeatureAttributeID;
-
   QWidget*     myContainer;
   QLabel*      myLabel;
   QLineEdit*   myTextLine;

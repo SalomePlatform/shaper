@@ -4,7 +4,6 @@
 
 #include <ModuleBase_WidgetBoolValue.h>
 
-#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_Data.h>
 
@@ -16,14 +15,11 @@
 
 #include <QWidget>
 #include <QLayout>
-#include <QLabel>
-#include <QDoubleSpinBox>
 #include <QCheckBox>
 
 ModuleBase_WidgetBoolValue::ModuleBase_WidgetBoolValue(QWidget* theParent, const Config_WidgetAPI* theData)
-  : ModuleBase_ModelWidget(theParent)
+  : ModuleBase_ModelWidget(theParent, theData)
 {
-  myAttributeID = theData->widgetId();
   QString aText = QString::fromStdString(theData->widgetLabel());
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());
   QString aDefault = QString::fromStdString(theData->getProperty("default"));
@@ -47,7 +43,7 @@ QWidget* ModuleBase_WidgetBoolValue::getControl() const
 bool ModuleBase_WidgetBoolValue::storeValue(FeaturePtr theFeature) const
 {
   DataPtr aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeBoolean> aBool = aData->boolean(myAttributeID);
+  boost::shared_ptr<ModelAPI_AttributeBoolean> aBool = aData->boolean(attributeID());
 
   if (aBool->value() != myCheckBox->isChecked()) {
     aBool->setValue(myCheckBox->isChecked());
@@ -59,7 +55,7 @@ bool ModuleBase_WidgetBoolValue::storeValue(FeaturePtr theFeature) const
 bool ModuleBase_WidgetBoolValue::restoreValue(FeaturePtr theFeature)
 {
   DataPtr aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeBoolean> aRef = aData->boolean(myAttributeID);
+  boost::shared_ptr<ModelAPI_AttributeBoolean> aRef = aData->boolean(attributeID());
 
   bool isBlocked = myCheckBox->blockSignals(true);
   myCheckBox->setChecked(aRef->value());

@@ -5,6 +5,7 @@
 #include <ModuleBase_WidgetPoint2D.h>
 
 #include <Config_Keywords.h>
+#include <Config_WidgetAPI.h>
 
 #include <Events_Loop.h>
 #include <Model_Events.h>
@@ -24,11 +25,12 @@
 #include <cfloat>
 #include <climits>
 
-ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent, QString theTitle,
-                                                   const std::string& theFeatureAttributeID)
-: ModuleBase_ModelWidget(theParent), myFeatureAttributeID(theFeatureAttributeID)
+ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
+                                                   const Config_WidgetAPI* theData)
+: ModuleBase_ModelWidget(theParent, theData)
 {
-  myGroupBox = new QGroupBox(theTitle, theParent);
+  myGroupBox = new QGroupBox(QString::fromStdString(theData->getProperty(CONTAINER_PAGE_NAME)),
+                             theParent);
   QGridLayout* aGroupLay = new QGridLayout(myGroupBox);
   aGroupLay->setContentsMargins(0, 0, 0, 0);
   aGroupLay->setColumnStretch(1, 1);
@@ -72,7 +74,7 @@ bool ModuleBase_WidgetPoint2D::storeValue(FeaturePtr theFeature) const
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myFeatureAttributeID));
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(attributeID()));
 
   ModuleBase_WidgetPoint2D* that = (ModuleBase_WidgetPoint2D*) this;
   bool isBlocked = that->blockSignals(true);
@@ -87,24 +89,13 @@ bool ModuleBase_WidgetPoint2D::restoreValue(FeaturePtr theFeature)
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myFeatureAttributeID));
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(attributeID()));
 
   bool isBlocked = this->blockSignals(true);
   myXSpin->setValue(aPoint->x());
   myYSpin->setValue(aPoint->y());
   this->blockSignals(isBlocked);
   return true;
-}
-
-bool ModuleBase_WidgetPoint2D::canFocusTo(const std::string& theAttributeName)
-{
-  return theAttributeName == myFeatureAttributeID;
-}
-
-void ModuleBase_WidgetPoint2D::focusTo()
-{
-  if (!myXSpin->hasFocus() && !myYSpin->hasFocus())
-    myXSpin->setFocus();
 }
 
 QWidget* ModuleBase_WidgetPoint2D::getControl() const
@@ -125,7 +116,7 @@ bool ModuleBase_WidgetPoint2D::eventFilter(QObject *theObject, QEvent *theEvent)
 {
   if (theObject == myXSpin || theObject == myYSpin) {
     if (theEvent->type() == QEvent::KeyRelease) {
-      emit keyReleased(myFeatureAttributeID, (QKeyEvent*) theEvent);
+      emit keyReleased(attributeID(), (QKeyEvent*) theEvent);
       return true;
     }
   }

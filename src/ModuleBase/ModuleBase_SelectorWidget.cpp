@@ -27,10 +27,8 @@
 ModuleBase_SelectorWidget::ModuleBase_SelectorWidget(QWidget* theParent, 
                                                      ModuleBase_IWorkshop* theWorkshop, 
                                                      const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent), myWorkshop(theWorkshop), myActivateOnStart(false)
+: ModuleBase_ModelWidget(theParent, theData), myWorkshop(theWorkshop), myActivateOnStart(false)
 {
-  myFeatureAttributeID = theData->widgetId();
-
   myContainer = new QWidget(theParent);
   QHBoxLayout* aLayout = new QHBoxLayout(myContainer);
 
@@ -74,7 +72,7 @@ bool ModuleBase_SelectorWidget::storeValue(FeaturePtr theFeature) const
 {
   DataPtr aData = theFeature->data();
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(myFeatureAttributeID));
+    boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
 
   FeaturePtr aFeature = aRef->value();
   if (!(aFeature && aFeature->isSame(mySelectedFeature))) {
@@ -88,7 +86,7 @@ bool ModuleBase_SelectorWidget::storeValue(FeaturePtr theFeature) const
 bool ModuleBase_SelectorWidget::restoreValue(FeaturePtr theFeature)
 {
   DataPtr aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(myFeatureAttributeID);
+  boost::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(attributeID());
 
   bool isBlocked = this->blockSignals(true);
   mySelectedFeature = aRef->value();
