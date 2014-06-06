@@ -18,13 +18,13 @@
 #include <BRep_TVertex.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
+#include <BRepClass_FaceClassifier.hxx>
 #include <Geom_Curve.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_Wire.hxx>
-#include <TopOpeBRepTool_ShapeClassifier.hxx>
 
 #include <Precision.hxx>
 const double tolerance = Precision::Confusion();
@@ -298,37 +298,50 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
 void GeomAlgoAPI_SketchBuilder::fixIntersections(
           std::list< boost::shared_ptr<GeomAPI_Shape> >& theFaces)
 {
-////  TopOpeBRepTool_ShapeClassifier aClassifier;
-////  const int aSameDomain = 1;
-////
-////  std::list< boost::shared_ptr<GeomAPI_Shape> >::iterator anIter1 = theFaces.begin();
-////  std::list< boost::shared_ptr<GeomAPI_Shape> >::iterator anIter2;
-////  for ( ; anIter1 != theFaces.end(); anIter1++)
-////  {
-////    anIter2 = anIter1;
-////    for (++anIter2; anIter2 != theFaces.end(); anIter2++)
-////    {
-////      TopAbs_State aState = aClassifier.StateShapeShape(
-////        (*anIter1)->impl<TopoDS_Shape>(), (*anIter2)->impl<TopoDS_Shape>(), aSameDomain);
-////      if (aState == TopAbs_IN)
-////      { // second shape should be cut from the first
-////        BRepAlgoAPI_Cut aCut((*anIter1)->impl<TopoDS_Shape>(),
-////                             (*anIter2)->impl<TopoDS_Shape>());
-////        (*anIter1)->setImpl(new TopoDS_Shape(aCut.Shape()));
-////      }
-////      else if (aState != TopAbs_OUT)
-////      { // change the shapes order and repeat
-////        aState = aClassifier.StateShapeShape(
-////          (*anIter2)->impl<TopoDS_Shape>(), (*anIter1)->impl<TopoDS_Shape>(), aSameDomain);
-////        if (aState == TopAbs_IN)
-////        { // first shape should be cut from the second
-////          BRepAlgoAPI_Cut aCut((*anIter2)->impl<TopoDS_Shape>(),
-////                               (*anIter1)->impl<TopoDS_Shape>());
-////          (*anIter2)->setImpl(new TopoDS_Shape(aCut.Shape()));
-////        }
-////      }
-////    }
-////  }
+  BRepClass_FaceClassifier aClassifier;
+
+  std::list< boost::shared_ptr<GeomAPI_Shape> >::iterator anIter1 = theFaces.begin();
+  std::list< boost::shared_ptr<GeomAPI_Shape> >::iterator anIter2;
+  for ( ; anIter1 != theFaces.end(); anIter1++)
+  {
+    anIter2 = anIter1;
+    for (++anIter2; anIter2 != theFaces.end(); anIter2++)
+    {
+      const TopoDS_Face& aF1 = (*anIter1)->impl<TopoDS_Face>();
+      TopExp_Explorer aVert2((*anIter2)->impl<TopoDS_Shape>(), TopAbs_VERTEX);
+      for ( ; aVert2.More(); aVert2.Next())
+      {
+        Handle(BRep_TVertex) aV = Handle(BRep_TVertex)::DownCast(aVert2.Current().TShape());
+        aClassifier.Perform(aF1, aV->Pnt(), tolerance);
+        if (aClassifier.State() != TopAbs_IN)
+          break;
+      }
+      if (aVert2.More())
+      { // second shape is not inside first, change the shapes order and repeat comparision
+        const TopoDS_Face& aF2 = (*anIter2)->impl<TopoDS_Face>();
+        TopExp_Explorer aVert1((*anIter1)->impl<TopoDS_Shape>(), TopAbs_VERTEX);
+        for ( ; aVert1.More(); aVert1.Next())
+        {
+          Handle(BRep_TVertex) aV = Handle(BRep_TVertex)::DownCast(aVert1.Current().TShape());
+          aClassifier.Perform(aF2, aV->Pnt(), tolerance);
+          if (aClassifier.State() != TopAbs_IN)
+            break;
+        }
+        if (!aVert1.More())
+        { // first shape should be cut from the second
+          BRepAlgoAPI_Cut aCut((*anIter2)->impl<TopoDS_Shape>(),
+                               (*anIter1)->impl<TopoDS_Shape>());
+          (*anIter2)->setImpl(new TopoDS_Shape(aCut.Shape()));
+        }
+      }
+      else
+      { // second shape should be cut from the first
+        BRepAlgoAPI_Cut aCut((*anIter1)->impl<TopoDS_Shape>(),
+                             (*anIter2)->impl<TopoDS_Shape>());
+        (*anIter1)->setImpl(new TopoDS_Shape(aCut.Shape()));
+      }
+    }
+  }
 }
 
 

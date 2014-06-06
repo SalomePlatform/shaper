@@ -64,6 +64,10 @@ void SketchPlugin_Sketch::execute()
   std::list< boost::shared_ptr<GeomAPI_Shape> > aWires;
   GeomAlgoAPI_SketchBuilder::createFaces(aDirX->dir(), aDirY->dir(), aNorm->dir(),
                                          aFeaturesPreview, aLoops, aWires);
+
+  aLoops.insert(aLoops.end(), aWires.begin(), aWires.end());
+  boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aLoops);
+  data()->store(aCompound);
 }
 
 const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Sketch::preview()
