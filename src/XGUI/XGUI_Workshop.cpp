@@ -472,8 +472,9 @@ void XGUI_Workshop::onOpen()
   }
   QApplication::setOverrideCursor(Qt::WaitCursor);
   aDoc->load(myCurrentDir.toLatin1().constData());
-  QApplication::restoreOverrideCursor();
   updateCommandStatus();
+  myObjectBrowser->rebuildDataTree();
+  QApplication::restoreOverrideCursor();
 }
 
 //******************************************************

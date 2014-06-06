@@ -25,17 +25,13 @@
 XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
   : QAbstractItemModel(theParent), myActivePart(0)
 {
-  // Find Document object
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-  myDocument = aMgr->currentDocument();
-
   // Register in event loop
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
 
   // Create a top part of data tree model
-  myModel = new XGUI_TopDataModel(myDocument, this);
+  myModel = new XGUI_TopDataModel(this);
   myModel->setItemsColor(ACTIVE_COLOR);
 }
 
@@ -48,6 +44,8 @@ XGUI_DocumentDataModel::~XGUI_DocumentDataModel()
 
 void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
 {
+  DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+
   // Created object event *******************
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED)) {
     const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
@@ -57,11 +55,11 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
     for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
       FeaturePtr aFeature = (*aIt);
       DocumentPtr aDoc = aFeature->document();
-      if (aDoc == myDocument) {  // If root objects
+      if (aDoc == aRootDoc) {  // If root objects
         if (aFeature->getGroup().compare(PARTS_GROUP) == 0) { // Update only Parts group
           // Add a new part
           int aStart = myPartModels.size();
-          XGUI_PartDataModel* aModel = new XGUI_PartDataModel(myDocument, this);
+          XGUI_PartDataModel* aModel = new XGUI_PartDataModel(this);
           aModel->setPartId(myPartModels.count());
           myPartModels.append(aModel);
           insertRow(aStart, partFolderNode());
@@ -97,7 +95,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
     std::set<std::string>::const_iterator aIt;
     for (aIt = aGroups.begin(); aIt != aGroups.end(); ++aIt) {
       std::string aGroup = (*aIt);
-      if (aDoc == myDocument) {  // If root objects
+      if (aDoc == aRootDoc) {  // If root objects
         if (aGroup.compare(PARTS_GROUP) == 0) { // Updsate only Parts group
           int aStart = myPartModels.size() - 1;
           removeSubModel(aStart);
@@ -142,22 +140,30 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
 
   // Reset whole tree **************************
   } else {  
-    beginResetModel();
-    int aNbParts = myDocument->size(PARTS_GROUP);
-    if (myPartModels.size() != aNbParts) { // resize internal models
-      while (myPartModels.size() > aNbParts) {
-        delete myPartModels.last();
-        myPartModels.removeLast();
-      }
-      while (myPartModels.size() < aNbParts) {
-        myPartModels.append(new XGUI_PartDataModel(myDocument, this));
-      }
-      for (int i = 0; i < myPartModels.size(); i++)
-        myPartModels.at(i)->setPartId(i);
-    }
-    clearModelIndexes();
-    endResetModel();
+    rebuildDataTree();
   }
+}
+
+void XGUI_DocumentDataModel::rebuildDataTree()
+{
+  DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+
+  beginResetModel();
+  clearModelIndexes();
+
+  int aNbParts = aRootDoc->size(PARTS_GROUP);
+  if (myPartModels.size() != aNbParts) { // resize internal models
+    while (myPartModels.size() > aNbParts) {
+      delete myPartModels.last();
+      myPartModels.removeLast();
+    }
+    while (myPartModels.size() < aNbParts) {
+      myPartModels.append(new XGUI_PartDataModel(this));
+    }
+    for (int i = 0; i < myPartModels.size(); i++)
+      myPartModels.at(i)->setPartId(i);
+  }
+  endResetModel();
 }
 
 QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) const
@@ -185,7 +191,8 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
   case HistoryNode:
     {
       int aOffset = historyOffset();
-      FeaturePtr aFeature = myDocument->feature(FEATURES_GROUP, theIndex.row() - aOffset);
+      DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+      FeaturePtr aFeature = aRootDoc->feature(FEATURES_GROUP, theIndex.row() - aOffset);
       if (!aFeature)
         return QVariant();
       switch (theRole) {
@@ -225,10 +232,11 @@ QVariant XGUI_DocumentDataModel::headerData(int theSection, Qt::Orientation theO
 int XGUI_DocumentDataModel::rowCount(const QModelIndex& theParent) const
 {
   if (!theParent.isValid()) {
+    DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
     // Size of external models
     int aVal = historyOffset();
     // Plus history size
-    aVal += myDocument->size(FEATURES_GROUP);
+    aVal += aRootDoc->size(FEATURES_GROUP);
     return aVal;
   }
   if (theParent.internalId() == PartsFolder) {
@@ -354,8 +362,9 @@ FeaturePtr XGUI_DocumentDataModel::feature(const QModelIndex& theIndex) const
   if (theIndex.internalId() == PartsFolder)
     return FeaturePtr();
   if (theIndex.internalId() == HistoryNode) {
-      int aOffset = historyOffset();
-      return myDocument->feature(FEATURES_GROUP, theIndex.row() - aOffset);
+    DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+    int aOffset = historyOffset();
+    return aRootDoc->feature(FEATURES_GROUP, theIndex.row() - aOffset);
   }
   QModelIndex* aIndex = toSourceModelIndex(theIndex);
   if (!isSubModel(aIndex->model())) 
