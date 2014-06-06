@@ -2,30 +2,30 @@ INCLUDE(Common)
 SET(CMAKE_AUTOMOC ON)
 
 SET(PROJECT_HEADERS
-    ModuleBase.h
+	ModuleBase.h
 	ModuleBase_IOperation.h
 	ModuleBase_Operation.h
 	ModuleBase_OperationDescription.h	
 	ModuleBase_ModelWidget.h
+	ModuleBase_WidgetBoolValue.h
+	ModuleBase_WidgetDoubleValue.h
 	ModuleBase_WidgetFactory.h
 	ModuleBase_WidgetPoint2D.h
 	ModuleBase_WidgetSwitch.h
-	ModuleBase_MetaWidget.h
-    ModuleBase_SelectorWidget.h
-    ModuleBase_IWorkshop.h
-    ModuleBase_Widgets.h
+	ModuleBase_SelectorWidget.h
+	ModuleBase_IWorkshop.h
 )
 
 SET(PROJECT_SOURCES
 	ModuleBase_IOperation.cpp
 	ModuleBase_Operation.cpp
 	ModuleBase_OperationDescription.cpp
+	ModuleBase_WidgetBoolValue.cpp
+	ModuleBase_WidgetDoubleValue.cpp
 	ModuleBase_WidgetFactory.cpp
 	ModuleBase_WidgetPoint2D.cpp
 	ModuleBase_WidgetSwitch.cpp
-	ModuleBase_MetaWidget.cpp
-    ModuleBase_SelectorWidget.cpp
-    ModuleBase_Widgets.cpp
+	ModuleBase_SelectorWidget.cpp
 )
 
 SET(PROJECT_LIBRARIES

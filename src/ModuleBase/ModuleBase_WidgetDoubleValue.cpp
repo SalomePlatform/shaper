@@ -2,7 +2,7 @@
 // Created:     04 June 2014
 // Author:      Vitaly Smetannikov
 
-#include "ModuleBase_Widgets.h"
+#include <ModuleBase_WidgetDoubleValue.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeBoolean.h>
@@ -21,7 +21,7 @@
 #include <QCheckBox>
 
 
-ModuleBase_DoubleValueWidget::ModuleBase_DoubleValueWidget(QWidget* theParent, const Config_WidgetAPI* theData)
+ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent, const Config_WidgetAPI* theData)
   : ModuleBase_ModelWidget(theParent)
 {
   myContainer = new QWidget(theParent);
@@ -77,11 +77,11 @@ ModuleBase_DoubleValueWidget::ModuleBase_DoubleValueWidget(QWidget* theParent, c
   connect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
 }
 
-ModuleBase_DoubleValueWidget::~ModuleBase_DoubleValueWidget()
+ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 {
 }
 
-bool ModuleBase_DoubleValueWidget::storeValue(FeaturePtr theFeature) const
+bool ModuleBase_WidgetDoubleValue::storeValue(FeaturePtr theFeature) const
 {
   DataPtr aData = theFeature->data();
   boost::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(myAttributeID);
@@ -92,7 +92,7 @@ bool ModuleBase_DoubleValueWidget::storeValue(FeaturePtr theFeature) const
   return true;
 }
 
-bool ModuleBase_DoubleValueWidget::restoreValue(FeaturePtr theFeature)
+bool ModuleBase_WidgetDoubleValue::restoreValue(FeaturePtr theFeature)
 {
   DataPtr aData = theFeature->data();
   boost::shared_ptr<ModelAPI_AttributeDouble> aRef = aData->real(myAttributeID);
@@ -104,67 +104,10 @@ bool ModuleBase_DoubleValueWidget::restoreValue(FeaturePtr theFeature)
   return true;
 }
 
-QList<QWidget*> ModuleBase_DoubleValueWidget::getControls() const
+QList<QWidget*> ModuleBase_WidgetDoubleValue::getControls() const
 {
   QList<QWidget*> aList;
   aList.append(myLabel);
   aList.append(mySpinBox);
-  return aList;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////////
-ModuleBase_BoolValueWidget::ModuleBase_BoolValueWidget(QWidget* theParent, const Config_WidgetAPI* theData)
-  : ModuleBase_ModelWidget(theParent)
-{
-  myAttributeID = theData->widgetId();
-  QString aText = QString::fromStdString(theData->widgetLabel());
-  QString aToolTip = QString::fromStdString(theData->widgetTooltip());
-  QString aDefault = QString::fromStdString(theData->getProperty("default"));
-
-  myCheckBox = new QCheckBox(aText, theParent);
-  myCheckBox->setToolTip(aToolTip);
-  myCheckBox->setChecked(aDefault == "true");
-
-  connect(myCheckBox, SIGNAL(toggled(bool)), this, SIGNAL(valuesChanged()));
-}
-
-ModuleBase_BoolValueWidget::~ModuleBase_BoolValueWidget()
-{
-}
-
-QWidget* ModuleBase_BoolValueWidget::getControl() const 
-{ 
-  return myCheckBox; 
-}
-
-bool ModuleBase_BoolValueWidget::storeValue(FeaturePtr theFeature) const
-{
-  DataPtr aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeBoolean> aBool = aData->boolean(myAttributeID);
-
-  if (aBool->value() != myCheckBox->isChecked()) {
-    aBool->setValue(myCheckBox->isChecked());
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
-  }
-  return true;
-}
-
-bool ModuleBase_BoolValueWidget::restoreValue(FeaturePtr theFeature)
-{
-  DataPtr aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeBoolean> aRef = aData->boolean(myAttributeID);
-
-  bool isBlocked = myCheckBox->blockSignals(true);
-  myCheckBox->setChecked(aRef->value());
-  myCheckBox->blockSignals(isBlocked);
-
-  return true;
-}
-
-QList<QWidget*> ModuleBase_BoolValueWidget::getControls() const
-{
-  QList<QWidget*> aList;
-  aList.append(myCheckBox);
   return aList;
 }
