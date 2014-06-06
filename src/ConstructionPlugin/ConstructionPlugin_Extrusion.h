@@ -18,7 +18,7 @@ const std::string EXTRUSION_FACE = "extrusion_face";
 const std::string EXTRUSION_SIZE = "extrusion_size";
 
 /// attribute name of reverce direction
-const std::string EXTRUSION_REVERCE = "extrusion_reverse";
+const std::string EXTRUSION_REVERSE = "extrusion_reverse";
 
 
 class ConstructionPlugin_Extrusion: public ModelAPI_Feature
