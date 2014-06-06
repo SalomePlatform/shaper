@@ -9,11 +9,13 @@
 #include <PartSet_FeaturePointPrs.h>
 #include <PartSet_FeatureLinePrs.h>
 #include <PartSet_FeatureCirclePrs.h>
+#include <PartSet_FeatureArcPrs.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Arc.h>
 
 #include <ModuleBase_OperationDescription.h>
 
@@ -50,6 +52,9 @@ PartSet_OperationCreateFeature::PartSet_OperationCreateFeature(const QString& th
   else if (aKind == SKETCH_CIRCLE_KIND) {
     myFeaturePrs = new PartSet_FeatureCirclePrs(theFeature);
   }
+  else if (aKind == SKETCH_ARC_KIND) {
+    myFeaturePrs = new PartSet_FeatureArcPrs(theFeature);
+  }
 }
 
 PartSet_OperationCreateFeature::~PartSet_OperationCreateFeature()
@@ -59,7 +64,8 @@ PartSet_OperationCreateFeature::~PartSet_OperationCreateFeature()
 
 bool PartSet_OperationCreateFeature::canProcessKind(const std::string& theId)
 {
-  return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND || theId == SKETCH_CIRCLE_KIND;
+  return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND || theId == SKETCH_CIRCLE_KIND ||
+         theId == SKETCH_ARC_KIND;
 }
 
 bool PartSet_OperationCreateFeature::canBeCommitted() const

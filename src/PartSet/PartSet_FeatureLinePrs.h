@@ -14,7 +14,7 @@ class GeomDataAPI_Point2D;
 
 /*!
  \class PartSet_FeatureLinePrs
- * \brief The abstract class to define the specific feature manipulation. It is created for
+ * \brief The class to define the line feature manipulation. It is created for
  * the feature create operation to move out the feature properties set and use one operation
  * for any type of features.
 */
