@@ -444,10 +444,10 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
     connect(aWindow, SIGNAL(keyReleased(XGUI_ViewWindow*, QKeyEvent*)),
             this,    SIGNAL(keyRelease(XGUI_ViewWindow*, QKeyEvent*)));
 
-    connect(aWindow, SIGNAL(contextMenuRequested( QContextMenuEvent* )),
-            this,    SLOT  (onContextMenuRequested( QContextMenuEvent* )));
-    //connect(aWindow, SIGNAL( contextMenuRequested(QContextMenuEvent*) ), 
-    //        this, SIGNAL( contextMenuRequested(QContextMenuEvent*) ) );
+    //connect(aWindow, SIGNAL(contextMenuRequested( QContextMenuEvent* )),
+    //        this,    SLOT  (onContextMenuRequested( QContextMenuEvent* )));
+    connect(aWindow, SIGNAL( contextMenuRequested(QContextMenuEvent*) ), 
+            this, SIGNAL( contextMenuRequested(QContextMenuEvent*) ) );
 
     connect(aWindow, SIGNAL(mouseMoving(XGUI_ViewWindow*, QMouseEvent*)),
             this, SLOT(onMouseMove(XGUI_ViewWindow*, QMouseEvent*)));
@@ -590,29 +590,29 @@ void XGUI_Viewer::updateViewsDrawMode() const
 }
 
 //******************************************************
-void XGUI_Viewer::onContextMenuRequested(QContextMenuEvent* theEvent)
-{
-  XGUI_ViewWindow* aWnd = dynamic_cast<XGUI_ViewWindow*>(sender());
-  if (!aWnd) return;
-
-  QMenu aMenu;
-
-  // Include Viewer actions
-  if (myActions.size() > 0) {
-    aMenu.addActions(myActions);
-    aMenu.addSeparator();
-  }
-  if (aWnd->actions().size() > 0) {
-    aMenu.addActions(aWnd->actions());
-    aMenu.addSeparator();
-  }
-
-  QMdiArea* aMDI = myMainWindow->mdiArea();
-  if (aMenu.actions().size() > 0) {
-    QMenu* aSubMenu = aMenu.addMenu(tr("Windows"));
-    aSubMenu->addActions(aMDI->actions());
-  } else {
-    aMenu.addActions(aMDI->actions());
-  }
-  aMenu.exec(theEvent->globalPos());
-}
+//void XGUI_Viewer::onContextMenuRequested(QContextMenuEvent* theEvent)
+//{
+//  XGUI_ViewWindow* aWnd = dynamic_cast<XGUI_ViewWindow*>(sender());
+//  if (!aWnd) return;
+//
+//  QMenu aMenu;
+//
+//  // Include Viewer actions
+//  if (myActions.size() > 0) {
+//    aMenu.addActions(myActions);
+//    aMenu.addSeparator();
+//  }
+//  if (aWnd->actions().size() > 0) {
+//    aMenu.addActions(aWnd->actions());
+//    aMenu.addSeparator();
+//  }
+//
+//  QMdiArea* aMDI = myMainWindow->mdiArea();
+//  if (aMenu.actions().size() > 0) {
+//    QMenu* aSubMenu = aMenu.addMenu(tr("Windows"));
+//    aSubMenu->addActions(aMDI->actions());
+//  } else {
+//    aMenu.addActions(aMDI->actions());
+//  }
+//  aMenu.exec(theEvent->globalPos());
+//}

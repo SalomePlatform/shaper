@@ -433,6 +433,7 @@ void XGUI_Workshop::onNew()
   if (!isSalomeMode()) {
     myMainWindow->showPythonConsole();
     QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
+    myContextMenuMgr->connectViewer();
     aWnd->showMaximized();
     updateCommandStatus();
   }
@@ -832,8 +833,11 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
           aFeature = aObject->featureRef();
         }
       }
+      if (myDisplayer->isVisible(aFeature))
+        myDisplayer->erase(aFeature, false);
       aFeature->document()->removeFeature(aFeature);
     }
+    myDisplayer->updateViewer();
     aMgr->rootDocument()->finishOperation();
   }
 }

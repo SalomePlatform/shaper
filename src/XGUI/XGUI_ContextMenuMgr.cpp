@@ -4,6 +4,8 @@
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_Displayer.h"
+#include "XGUI_MainWindow.h"
+#include "XGUI_Viewer.h"
 
 #include "PartSetPlugin_Part.h"
 
@@ -14,6 +16,7 @@
 #include <QAction>
 #include <QContextMenuEvent>
 #include <QMenu>
+#include <QMdiArea>
 
 XGUI_ContextMenuMgr::XGUI_ContextMenuMgr(XGUI_Workshop* theParent) :
 QObject(theParent), myWorkshop(theParent)
@@ -81,8 +84,11 @@ void XGUI_ContextMenuMgr::onContextMenuRequest(QContextMenuEvent* theEvent)
   QMenu* aMenu = 0;
   if (sender() == myWorkshop->objectBrowser())
     aMenu = objectBrowserMenu();
-
-  if (aMenu) {
+  else if (sender() == myWorkshop->mainWindow()->viewer()) {
+    aMenu = viewerMenu();
+  }
+  
+  if (aMenu && (aMenu->actions().size() > 0)) {
     aMenu->exec(theEvent->globalPos());
     delete aMenu;
   }
@@ -132,8 +138,38 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
   return 0;
 }
 
+QMenu* XGUI_ContextMenuMgr::viewerMenu() const
+{
+  QMenu* aMenu = new QMenu();
+  XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
+  QFeatureList aFeatures = aSelMgr->selectedFeatures();
+  if (aFeatures.size() > 0) {
+    if (aFeatures.size() > 0)
+      aMenu->addAction(action("EDIT_CMD"));
+    aMenu->addAction(action("HIDE_CMD"));
+    aMenu->addAction(action("DELETE_CMD"));
+  }
+  QMdiArea* aMDI = myWorkshop->mainWindow()->mdiArea();
+  if (aMDI->actions().size() > 0) {
+    QMenu* aSubMenu = aMenu->addMenu(tr("Windows"));
+    aSubMenu->addActions(aMDI->actions());
+  }
+  if (aMenu->actions().size() > 0) {
+    return aMenu;
+  }
+  delete aMenu;
+  return 0;
+}
+
 void XGUI_ContextMenuMgr::connectObjectBrowser() const
 {
   connect(myWorkshop->objectBrowser(), SIGNAL(contextMenuRequested(QContextMenuEvent*)), 
+    this, SLOT(onContextMenuRequest(QContextMenuEvent*)));
+}
+
+void XGUI_ContextMenuMgr::connectViewer() const
+{
+  // TODO: Adapt to SALOME mode
+  connect(myWorkshop->mainWindow()->viewer(), SIGNAL(contextMenuRequested(QContextMenuEvent*)), 
     this, SLOT(onContextMenuRequest(QContextMenuEvent*)));
 }
