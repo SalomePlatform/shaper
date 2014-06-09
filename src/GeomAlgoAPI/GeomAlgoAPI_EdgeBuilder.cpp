@@ -45,3 +45,22 @@ boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_EdgeBuilder::lineCircle(
   aRes->setImpl(new TopoDS_Shape(anEdge));
   return aRes;
 }
+
+boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
+    boost::shared_ptr<GeomAPI_Pnt> theCenter,
+    boost::shared_ptr<GeomAPI_Pnt> theStartPoint,
+    boost::shared_ptr<GeomAPI_Pnt> theEndPoint,
+    boost::shared_ptr<GeomAPI_Dir> theNormal)
+{
+  const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
+  const gp_Dir& aDir = theNormal->impl<gp_Dir>();
+
+  double aRadius = theCenter->distance(theStartPoint);
+  gp_Circ aCircle(gp_Ax2(aCenter, aDir), aRadius);
+
+  BRepBuilderAPI_MakeEdge anEdgeBuilder(aCircle);
+  boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
+  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+  aRes->setImpl(new TopoDS_Shape(anEdge));
+  return aRes;
+}
