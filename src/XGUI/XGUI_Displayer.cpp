@@ -180,6 +180,21 @@ bool XGUI_Displayer::redisplay(FeaturePtr theFeature,
   return isCreated;
 }
 
+void XGUI_Displayer::redisplay(FeaturePtr theFeature, bool isUpdateViewer)
+{
+  FeaturePtr aFeature = XGUI_Tools::realFeature(theFeature);
+  if (!isVisible(aFeature))
+    return;
+
+  Handle(AIS_InteractiveObject) aAISObj = getAISObject(aFeature);
+  boost::shared_ptr<GeomAPI_Shape> aShapePtr = aFeature->data()->shape();
+
+  Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(aAISObj);
+  aAISShape->Set(aShapePtr->impl<TopoDS_Shape>());
+
+  AISContext()->Redisplay(aAISShape);
+}
+
 void XGUI_Displayer::activateInLocalContext(FeaturePtr theFeature,
                                          const std::list<int>& theModes, const bool isUpdateViewer)
 {

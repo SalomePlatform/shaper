@@ -84,6 +84,12 @@ public:
                  Handle(AIS_InteractiveObject) theAIS,
                  const int theSelectionMode, const bool isUpdateViewer = true);
 
+  /** Redisplay the shape if it was displayed
+  * \param theFeature a feature instance
+  * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  */
+  void redisplay(FeaturePtr theFeature, bool isUpdateViewer = true);
+
   /// Redisplay the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly

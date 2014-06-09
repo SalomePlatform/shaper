@@ -232,9 +232,12 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
       FeaturePtr aFeature = (*aIt);
       if (aFeature->getKind() == PARTSET_PART_KIND) {
         aHasPart = true;
-        break;
+        //break;
+      } else {
+        myDisplayer->display(aFeature, false);
       }
     }
+    myDisplayer->updateViewer();
     if (aHasPart) {
       //The created part will be created in Object Browser later and we have to activate it
       // only when it is created everywere
@@ -245,21 +248,31 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
   static Events_ID aFeatureUpdatedId = Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED);
-  if (theMessage->eventID() == aFeatureUpdatedId && myOperationMgr->hasOperation())
-  {
+  if (theMessage->eventID() == aFeatureUpdatedId) {
     const Model_FeatureUpdatedMessage* anUpdateMsg =
         dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    std::set<FeaturePtr> aFeatures = anUpdateMsg->features();
 
-    FeaturePtr aCurrentFeature = myOperationMgr->currentOperation()->feature();
+    std::set<FeaturePtr> aFeatures = anUpdateMsg->features();
+    if (myOperationMgr->hasOperation())
+    {
+      FeaturePtr aCurrentFeature = myOperationMgr->currentOperation()->feature();
+      std::set<FeaturePtr>::const_iterator aIt;
+      for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
+        FeaturePtr aNewFeature = (*aIt);
+        if(aNewFeature == aCurrentFeature) {
+          myPropertyPanel->updateContentWidget(aCurrentFeature);
+          break;
+        } 
+      }
+    }
+    // Redisplay feature if it is modified
     std::set<FeaturePtr>::const_iterator aIt;
     for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
-      FeaturePtr aNewFeature = (*aIt);
-      if(aNewFeature == aCurrentFeature) {
-        myPropertyPanel->updateContentWidget(aCurrentFeature);
-        break;
-      } 
+      FeaturePtr aFeature = (*aIt);
+      if (aFeature->getKind() != PARTSET_PART_KIND)
+        myDisplayer->redisplay(aFeature, false);
     }
+    myDisplayer->updateViewer();
   }
   //An operation passed by message. Start it, process and commit.
   const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
