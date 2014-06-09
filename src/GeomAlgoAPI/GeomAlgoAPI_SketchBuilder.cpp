@@ -7,6 +7,7 @@
 #include <set>
 
 #include <gp_Dir.hxx>
+#include <gp_Pln.hxx>
 
 #include <BOPAlgo_Builder.hxx>
 #include <BOPAlgo_Operation.hxx>
@@ -20,6 +21,7 @@
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepClass_FaceClassifier.hxx>
 #include <Geom_Curve.hxx>
+#include <Geom_Plane.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
@@ -48,6 +50,7 @@ static void findNextVertex(
 static void createFace(const TopoDS_Shape&                      theStartVertex,
                        const std::list<TopoDS_Shape>::iterator& theStartEdge,
                        const std::list<TopoDS_Shape>::iterator& theEndOfEdges,
+                       const gp_Pln&                            thePlane,
                              TopoDS_Face&                       theResFace);
 
 /// \bief Create planar wire
@@ -74,6 +77,7 @@ static void removeWasteEdges(
 
 
 void GeomAlgoAPI_SketchBuilder::createFaces(
+          const boost::shared_ptr<GeomAPI_Pnt>&                theOrigin,
           const boost::shared_ptr<GeomAPI_Dir>&                theDirX,
           const boost::shared_ptr<GeomAPI_Dir>&                theDirY,
           const boost::shared_ptr<GeomAPI_Dir>&                theNorm,
@@ -105,6 +109,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   gp_Dir aDirX = theDirX->impl<gp_Dir>();
   gp_Dir aDirY = theDirY->impl<gp_Dir>();
   gp_Dir aNorm = theNorm->impl<gp_Dir>();
+
+  gp_Pln aPlane(theOrigin->impl<gp_Pnt>(), aNorm);
 
   // Set of edges used in loops
   std::set<Handle(TopoDS_TShape)> anEdgesInLoops;
@@ -177,7 +183,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
       // When the orientation is correct or the edges looped through
       // the first element, create new face and remove unnecessary edges.
       TopoDS_Face aPatch;
-      createFace(*aVertIter, anEdgeIter, aProcEdges.end(), aPatch);
+      createFace(*aVertIter, anEdgeIter, aProcEdges.end(), aPlane, aPatch);
       if (!aPatch.IsNull())
       {
         boost::shared_ptr<GeomAPI_Shape> aFace(new GeomAPI_Shape);
@@ -420,6 +426,7 @@ static void addEdgeToWire(const TopoDS_Edge&  theEdge,
                                 TopoDS_Shape& theSpliceVertex,
                                 TopoDS_Wire&  theWire)
 {
+  TopoDS_Edge anEdge = theEdge;
   bool isCurVertChanged = false;
   TopoDS_Shape aCurVertChanged;
 
@@ -430,13 +437,7 @@ static void addEdgeToWire(const TopoDS_Edge&  theEdge,
     if (aVertex.TShape() == theSpliceVertex.TShape() && 
         aVertex.Orientation() != theEdge.Orientation())
     { // Current vertex is the last for the edge, so its orientation is wrong, need to revert the edge
-      const Handle(BRep_TEdge)& aTEdge = (const Handle(BRep_TEdge)&)theEdge.TShape();
-      Handle(BRep_Curve3D) aEdgeCurve = 
-        Handle(BRep_Curve3D)::DownCast(aTEdge->Curves().First());
-      Handle(Geom_Curve) aCurve = aEdgeCurve->Curve3D();
-      aCurve->Reverse();
-
-      theBuilder.UpdateEdge(theEdge, aCurve, aTEdge->Tolerance());
+      anEdge.Reverse();
       break;
     }
     if (aVertex.TShape() != theSpliceVertex.TShape())
@@ -447,12 +448,13 @@ static void addEdgeToWire(const TopoDS_Edge&  theEdge,
   }
   theSpliceVertex = isCurVertChanged ? aCurVertChanged : aVertExp.Current();
 
-  theBuilder.Add(theWire, theEdge);
+  theBuilder.Add(theWire, anEdge);
 }
 
 void createFace(const TopoDS_Shape&                      theStartVertex,
                 const std::list<TopoDS_Shape>::iterator& theStartEdge,
                 const std::list<TopoDS_Shape>::iterator& theEndOfEdges,
+                const gp_Pln&                            thePlane,
                       TopoDS_Face&                       theResFace)
 {
   TopoDS_Wire aResWire;
@@ -467,7 +469,7 @@ void createFace(const TopoDS_Shape&                      theStartVertex,
     addEdgeToWire(anEdge, aBuilder, aCurVertex, aResWire);
   }
 
-  BRepBuilderAPI_MakeFace aFaceBuilder(aResWire, Standard_True/*planar face*/);
+  BRepBuilderAPI_MakeFace aFaceBuilder(thePlane, aResWire);
   if (aFaceBuilder.Error() == BRepBuilderAPI_FaceDone)
     theResFace = aFaceBuilder.Face();
 }

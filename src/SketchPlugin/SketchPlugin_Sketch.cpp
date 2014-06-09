@@ -37,6 +37,8 @@ void SketchPlugin_Sketch::execute()
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
     boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(SKETCH_ATTR_FEATURES));
 
+  boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(SKETCH_ATTR_ORIGIN));
   boost::shared_ptr<GeomDataAPI_Dir> aDirX = 
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_DIRX));
   boost::shared_ptr<GeomDataAPI_Dir> aDirY = 
@@ -62,7 +64,7 @@ void SketchPlugin_Sketch::execute()
 
   std::list< boost::shared_ptr<GeomAPI_Shape> > aLoops;
   std::list< boost::shared_ptr<GeomAPI_Shape> > aWires;
-  GeomAlgoAPI_SketchBuilder::createFaces(aDirX->dir(), aDirY->dir(), aNorm->dir(),
+  GeomAlgoAPI_SketchBuilder::createFaces(anOrigin->pnt(), aDirX->dir(), aDirY->dir(), aNorm->dir(),
                                          aFeaturesPreview, aLoops, aWires);
 
   aLoops.insert(aLoops.end(), aWires.begin(), aWires.end());

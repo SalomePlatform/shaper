@@ -11,6 +11,7 @@
 #include <list>
 
 #include <GeomAPI_Dir.h>
+#include <GeomAPI_Pnt.h>
 #include <GeomAPI_Shape.h>
 
 /** \class GeomAlgoAPI_SketchBuilder
@@ -21,6 +22,7 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_SketchBuilder
 {
 public:
   /** \brief Creates list of faces and unclosed wires on basis of the features of the sketch
+   *  \param[in]  theOrigin      origin point of the sketch
    *  \param[in]  theDirX        x-direction of the sketch
    *  \param[in]  theDirY        y-direction of the sketch
    *  \param[in]  theNorm        normal of the sketch
@@ -32,7 +34,8 @@ public:
    *  It finds the vertex with minimal coordinates along X axis (theDirX) and then 
    *  goes through the edges passing the surrounding area on the left.
    */
-  static void createFaces(const boost::shared_ptr<GeomAPI_Dir>&                theDirX,
+  static void createFaces(const boost::shared_ptr<GeomAPI_Pnt>&                theOrigin,
+                          const boost::shared_ptr<GeomAPI_Dir>&                theDirX,
                           const boost::shared_ptr<GeomAPI_Dir>&                theDirY,
                           const boost::shared_ptr<GeomAPI_Dir>&                theNorm,
                           const std::list< boost::shared_ptr<GeomAPI_Shape> >& theFeatures,

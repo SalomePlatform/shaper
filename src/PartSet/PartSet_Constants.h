@@ -14,6 +14,7 @@ enum PartSet_SelectionMode
 {
   SM_FirstPoint,
   SM_SecondPoint,
+  SM_ThirdPoint,
   SM_DonePoint
 };
 

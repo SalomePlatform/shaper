@@ -19,6 +19,7 @@
 #include <ModelAPI_AttributeRefList.h>
 
 #include <Precision.hxx>
+#include <V3d_View.hxx>
 
 using namespace std;
 
@@ -94,6 +95,33 @@ PartSet_SelectionMode PartSet_FeatureLinePrs::getNextMode(const std::string& the
   else if (theAttribute == LINE_ATTR_END)
     aMode = SM_DonePoint;
   return aMode;
+}
+
+void PartSet_FeatureLinePrs::projectPointOnLine(FeaturePtr theFeature,
+                                                const PartSet_SelectionMode& theMode,
+                                                const gp_Pnt& thePoint, Handle(V3d_View) theView,
+                                                double& theX, double& theY)
+{
+  if (theFeature) {
+    double X0, X1, X2, X3;
+    double Y0, Y1, Y2, Y3;
+    PartSet_Tools::getLinePoint(theFeature, LINE_ATTR_START, X2, Y2);
+    PartSet_Tools::getLinePoint(theFeature, LINE_ATTR_END, X3, Y3);
+    PartSet_Tools::convertTo2D(thePoint, sketch(), theView, X1, Y1);
+
+    switch (theMode) {
+      case SM_FirstPoint:
+        PartSet_Tools::projectPointOnLine(X2, Y2, X3, Y3, X1, Y1, theX, theY);
+      break;
+      case SM_SecondPoint: {
+        PartSet_Tools::getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
+        PartSet_Tools::intersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, theX, theY);
+      }
+      break;
+      default:
+      break;
+    }
+  }
 }
 
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLinePrs::featurePoint
