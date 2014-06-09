@@ -444,21 +444,22 @@ QModelIndex XGUI_PartDataModel::featureIndex(const FeaturePtr& theFeature) const
     if (part() == theFeature) 
       return aIndex;
 
-    std::string aGroup = theFeature->getGroup();
+    //std::string aGroup = theFeature->getGroup();
     DocumentPtr aDoc = theFeature->document();
-    int aNb = aDoc->size(aGroup);
+    int aNb = aDoc->size(FEATURES_GROUP);
     int aRow = -1;
     for (int i = 0; i < aNb; i++) {
-      if (aDoc->feature(aGroup, i) == theFeature) {
+      if (aDoc->feature(FEATURES_GROUP, i) == theFeature) {
         aRow = i;
         break;
       }
     }
     if (aRow != -1) {
-      if (aGroup.compare(PARAMETERS_GROUP) == 0)
+      return createIndex(aRow + 3, 0, (qint32) HistoryObject);
+/*      if (aGroup.compare(PARAMETERS_GROUP) == 0)
         return createIndex(aRow, 0, (qint32) ParamObject);
       if (aGroup.compare(CONSTRUCTIONS_GROUP) == 0)
-        return createIndex(aRow, 0, (qint32) ConstructObject);
+        return createIndex(aRow, 0, (qint32) ConstructObject);*/
     }
   }
   return aIndex;

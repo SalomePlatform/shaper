@@ -156,6 +156,8 @@ signals:
   void activated(XGUI_ViewWindow* theWindow);
   void selectionChanged();
 
+  void contextMenuRequested(QContextMenuEvent*);
+
 public slots:
   void onWindowMinimized(QMdiSubWindow*);
   void onWindowActivated(QMdiSubWindow*);
@@ -165,7 +167,7 @@ private slots:
   void onMouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
   void onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
   void onMousePressed(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
-  void onContextMenuRequested(QContextMenuEvent* theEvent);
+  //void onContextMenuRequested(QContextMenuEvent* theEvent);
 
 private:
   void addView(QMdiSubWindow* theView);

@@ -31,6 +31,8 @@ public:
 
   void connectObjectBrowser() const;
 
+  void connectViewer() const;
+
 signals:
   void actionTriggered(const QString& theId, bool isChecked);
 
@@ -41,6 +43,7 @@ private slots:
 
 private:
   QMenu* objectBrowserMenu() const;
+  QMenu* viewerMenu() const;
 
   QMap<QString, QAction*> myActions;
 
