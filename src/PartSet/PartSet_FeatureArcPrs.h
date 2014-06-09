@@ -10,7 +10,10 @@
 #include "PartSet_FeaturePrs.h"
 #include "PartSet_Constants.h"
 
+#include <gp_Pnt.hxx>
+
 class GeomDataAPI_Point2D;
+class Handle_V3d_View;
 
 /*!
  \class PartSet_FeatureArcPrs
@@ -43,6 +46,9 @@ public:
   /// \param theAttribute the feature attribute name
   /// \return next attribute selection mode
   virtual PartSet_SelectionMode getNextMode(const std::string& theAttribute) const;
+
+  void projectPointOnArc(gp_Pnt& thePoint, Handle_V3d_View theView,
+                         double& theX, double& theY);
 
 protected:
   /// Returns the feature point in the selection mode position.
