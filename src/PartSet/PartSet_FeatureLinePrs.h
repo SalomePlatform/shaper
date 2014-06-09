@@ -10,11 +10,14 @@
 #include "PartSet_FeaturePrs.h"
 #include "PartSet_Constants.h"
 
+#include <gp_Pnt.hxx>
+
 class GeomDataAPI_Point2D;
+class Handle_V3d_View;
 
 /*!
  \class PartSet_FeatureLinePrs
- * \brief The abstract class to define the specific feature manipulation. It is created for
+ * \brief The class to define the line feature manipulation. It is created for
  * the feature create operation to move out the feature properties set and use one operation
  * for any type of features.
 */
@@ -43,6 +46,18 @@ public:
   /// \param theAttribute the feature attribute name
   /// \return next attribute selection mode
   virtual PartSet_SelectionMode getNextMode(const std::string& theAttribute) const;
+
+
+  /// Project the point on a feature
+  /// \param theFeature the feature to be projected on
+  /// \param theMode the selection mode
+  /// \param thePoint the clicked point
+  /// \param theView the viewer
+  /// \param theX the output horizontal coordinate
+  /// \param theY the output vertical coordinate
+  void projectPointOnLine(FeaturePtr theFeature, const PartSet_SelectionMode& theMode,
+                          const gp_Pnt& thePoint, Handle_V3d_View theView,
+                          double& theX, double& theY);
 
 protected:
   /// Initializes current feature by the given

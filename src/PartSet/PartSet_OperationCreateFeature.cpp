@@ -9,11 +9,13 @@
 #include <PartSet_FeaturePointPrs.h>
 #include <PartSet_FeatureLinePrs.h>
 #include <PartSet_FeatureCirclePrs.h>
+#include <PartSet_FeatureArcPrs.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Arc.h>
 
 #include <ModuleBase_OperationDescription.h>
 
@@ -50,6 +52,9 @@ PartSet_OperationCreateFeature::PartSet_OperationCreateFeature(const QString& th
   else if (aKind == SKETCH_CIRCLE_KIND) {
     myFeaturePrs = new PartSet_FeatureCirclePrs(theFeature);
   }
+  else if (aKind == SKETCH_ARC_KIND) {
+    myFeaturePrs = new PartSet_FeatureArcPrs(theFeature);
+  }
 }
 
 PartSet_OperationCreateFeature::~PartSet_OperationCreateFeature()
@@ -59,7 +64,8 @@ PartSet_OperationCreateFeature::~PartSet_OperationCreateFeature()
 
 bool PartSet_OperationCreateFeature::canProcessKind(const std::string& theId)
 {
-  return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND || theId == SKETCH_CIRCLE_KIND;
+  return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND || theId == SKETCH_CIRCLE_KIND ||
+         theId == SKETCH_ARC_KIND;
 }
 
 bool PartSet_OperationCreateFeature::canBeCommitted() const
@@ -109,11 +115,9 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
 
   double aX, anY;
 
-  bool isFoundPoint = false;
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
   if (theSelected.empty()) {
     PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-    isFoundPoint = true;
   }
   else {
     XGUI_ViewerPrs aPrs = theSelected.front();
@@ -125,7 +129,6 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
         if (!aVertex.IsNull()) {
           aPoint = BRep_Tool::Pnt(aVertex);
           PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-          isFoundPoint = true;
 
           myFeaturePrs->setConstraints(aX, anY, myPointSelectionMode);
         }
@@ -133,31 +136,14 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
       else if (aShape.ShapeType() == TopAbs_EDGE) // the line is selected
       {
         PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-        isFoundPoint = true;
-        /*
-        FeaturePtr aFeature = aPrs.feature();
-        if (aFeature) {
-          double X0, X1, X2, X3;
-          double Y0, Y1, Y2, Y3;
-          PartSet_Tools::getLinePoint(aFeature, LINE_ATTR_START, X2, Y2);
-          PartSet_Tools::getLinePoint(aFeature, LINE_ATTR_END, X3, Y3);
-          PartSet_Tools::convertTo2D(aPoint, sketch(), theView, X1, Y1);
-
-          switch (myPointSelectionMode) {
-            case SM_FirstPoint:
-              PartSet_Tools::projectPointOnLine(X2, Y2, X3, Y3, X1, Y1, aX, anY);
-            break;
-            case SM_SecondPoint: {
-              PartSet_Tools::getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
-              PartSet_Tools::intersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, aX, anY);
-            }
-            break;
-            default:
-            break;
+        // move to selected line
+        if (feature()->getKind() == SKETCH_LINE_KIND) {
+          PartSet_FeatureLinePrs* aLinePrs = dynamic_cast<PartSet_FeatureLinePrs*>(myFeaturePrs);
+          if (aLinePrs) {
+            FeaturePtr aFeature = aPrs.feature();
+            aLinePrs->projectPointOnLine(aFeature, myPointSelectionMode, aPoint, theView, aX, anY);
           }
-          isFoundPoint = true;
         }
-        */
       }
     }
   }
@@ -165,7 +151,8 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
   switch (myPointSelectionMode)
   {
     case SM_FirstPoint:
-    case SM_SecondPoint: {
+    case SM_SecondPoint:
+    case SM_ThirdPoint: {
       PartSet_SelectionMode aMode = myFeaturePrs->setPoint(aX, anY, myPointSelectionMode);
       flushUpdated();
       setPointSelectionMode(aMode);
@@ -182,6 +169,7 @@ void PartSet_OperationCreateFeature::mouseMoved(QMouseEvent* theEvent, Handle(V3
   {
     case SM_FirstPoint:
     case SM_SecondPoint:
+    case SM_ThirdPoint:
     {
       double aX, anY;
       gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);

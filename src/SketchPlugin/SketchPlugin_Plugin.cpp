@@ -38,6 +38,9 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
   else if (theFeatureID == SKETCH_CIRCLE_KIND) {
     return FeaturePtr(new SketchPlugin_Circle);
   }
+  else if (theFeatureID == SKETCH_ARC_KIND) {
+    return FeaturePtr(new SketchPlugin_Arc);
+  }
   else if (theFeatureID == SKETCH_CONSTRAINT_COINCIDENCE_KIND) {
     return FeaturePtr(new SketchPlugin_ConstraintCoincidence);
   }

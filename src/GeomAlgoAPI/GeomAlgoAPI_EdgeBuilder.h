@@ -27,6 +27,13 @@ public:
   static boost::shared_ptr<GeomAPI_Shape> lineCircle(
     boost::shared_ptr<GeomAPI_Pnt> theCenter,
     boost::shared_ptr<GeomAPI_Dir> theNormal, double theRadius);
+
+  /// Creates linear edge in a form of a circle arc by a three points
+  static boost::shared_ptr<GeomAPI_Shape> lineCircleArc(
+    boost::shared_ptr<GeomAPI_Pnt> theCenter,
+    boost::shared_ptr<GeomAPI_Pnt> theStartPoint,
+    boost::shared_ptr<GeomAPI_Pnt> theEndPoint,
+    boost::shared_ptr<GeomAPI_Dir> theNormal);
 };
 
 #endif
