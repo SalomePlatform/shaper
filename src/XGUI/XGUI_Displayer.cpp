@@ -186,13 +186,14 @@ void XGUI_Displayer::redisplay(FeaturePtr theFeature, bool isUpdateViewer)
   if (!isVisible(aFeature))
     return;
 
-  Handle(AIS_InteractiveObject) aAISObj = getAISObject(aFeature);
   boost::shared_ptr<GeomAPI_Shape> aShapePtr = aFeature->data()->shape();
+  if (aShapePtr) {
+    Handle(AIS_InteractiveObject) aAISObj = getAISObject(aFeature);
+    Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(aAISObj);
+    aAISShape->Set(aShapePtr->impl<TopoDS_Shape>());
 
-  Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(aAISObj);
-  aAISShape->Set(aShapePtr->impl<TopoDS_Shape>());
-
-  AISContext()->Redisplay(aAISShape);
+    AISContext()->Redisplay(aAISShape);
+  }
 }
 
 void XGUI_Displayer::activateInLocalContext(FeaturePtr theFeature,
