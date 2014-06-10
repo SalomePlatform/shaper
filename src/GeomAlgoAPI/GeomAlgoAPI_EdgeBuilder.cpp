@@ -58,7 +58,16 @@ boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
   double aRadius = theCenter->distance(theStartPoint);
   gp_Circ aCircle(gp_Ax2(aCenter, aDir), aRadius);
 
-  BRepBuilderAPI_MakeEdge anEdgeBuilder(aCircle);
+  const gp_Pnt& aStart = theStartPoint->impl<gp_Pnt>();
+  const gp_Pnt& anEnd = theEndPoint->impl<gp_Pnt>();
+
+  BRepBuilderAPI_MakeEdge anEdgeBuilder;
+  if (aStart.IsEqual(anEnd, Precision::Confusion()) ||
+      gp_Pnt(0, 0, 0).IsEqual(anEnd, Precision::Confusion()))
+    anEdgeBuilder = BRepBuilderAPI_MakeEdge(aCircle);
+  else
+    anEdgeBuilder = BRepBuilderAPI_MakeEdge(aCircle, aStart, anEnd);
+
   boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
   TopoDS_Edge anEdge = anEdgeBuilder.Edge();
   aRes->setImpl(new TopoDS_Shape(anEdge));

@@ -10,11 +10,15 @@
 #include <SketchPlugin_Arc.h>
 
 #include <GeomDataAPI_Point2D.h>
+#include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_Circ2d.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefList.h>
+
+#include <V3d_View.hxx>
 
 #include <Precision.hxx>
 
@@ -42,8 +46,8 @@ PartSet_SelectionMode PartSet_FeatureArcPrs::setPoint(double theX, double theY,
    }
    break;
    case SM_ThirdPoint: {
-      PartSet_Tools::setFeaturePoint(feature(), theX, theY, ARC_ATTR_END);
-      aMode = SM_DonePoint;
+     PartSet_Tools::setFeaturePoint(feature(), theX, theY, ARC_ATTR_END);
+     aMode = SM_DonePoint;
    }
     break;
     default:
@@ -83,6 +87,31 @@ PartSet_SelectionMode PartSet_FeatureArcPrs::getNextMode(const std::string& theA
   else if (theAttribute == ARC_ATTR_END)
     aMode = SM_DonePoint;
   return aMode;
+}
+
+void PartSet_FeatureArcPrs::projectPointOnArc(gp_Pnt& thePoint, Handle(V3d_View) theView,
+                                              double& theX, double& theY)
+{
+  FeaturePtr aSketch = sketch();
+  if (aSketch) {
+    double aX, anY;
+    PartSet_Tools::convertTo2D(thePoint, aSketch, theView, aX, anY);
+
+    // circle origin point and radius
+    boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+    boost::shared_ptr<GeomDataAPI_Point2D> aCenter = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
+                                                              (aData->attribute(ARC_ATTR_CENTER));
+    boost::shared_ptr<GeomDataAPI_Point2D> aStart = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
+                                                              (aData->attribute(ARC_ATTR_START));
+
+    boost::shared_ptr<GeomAPI_Circ2d> aCirc(new GeomAPI_Circ2d(aCenter->pnt(), aStart->pnt()));
+    boost::shared_ptr<GeomAPI_Pnt2d> aGeomPoint2d(new GeomAPI_Pnt2d(aX, anY));
+    boost::shared_ptr<GeomAPI_Pnt2d> aPnt2d = aCirc->project(aGeomPoint2d);
+    if (aPnt2d) {
+      theX = aPnt2d->x();
+      theY = aPnt2d->y();
+    }
+  }
 }
 
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureArcPrs::featurePoint

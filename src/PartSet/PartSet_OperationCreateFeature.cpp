@@ -153,6 +153,12 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
     case SM_FirstPoint:
     case SM_SecondPoint:
     case SM_ThirdPoint: {
+      if (feature()->getKind() == SKETCH_ARC_KIND) {
+        PartSet_FeatureArcPrs* anArcPrs = dynamic_cast<PartSet_FeatureArcPrs*>(myFeaturePrs);
+        if (anArcPrs) {
+          anArcPrs->projectPointOnArc(aPoint, theView, aX, anY);
+        }
+      }
       PartSet_SelectionMode aMode = myFeaturePrs->setPoint(aX, anY, myPointSelectionMode);
       flushUpdated();
       setPointSelectionMode(aMode);
@@ -174,6 +180,14 @@ void PartSet_OperationCreateFeature::mouseMoved(QMouseEvent* theEvent, Handle(V3
       double aX, anY;
       gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
       PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+      if (myPointSelectionMode == SM_ThirdPoint) {
+        if (feature()->getKind() == SKETCH_ARC_KIND) {
+          PartSet_FeatureArcPrs* anArcPrs = dynamic_cast<PartSet_FeatureArcPrs*>(myFeaturePrs);
+          if (anArcPrs) {
+            anArcPrs->projectPointOnArc(aPoint, theView, aX, anY);
+          }
+        }
+      }
       myFeaturePrs->setPoint(aX, anY, myPointSelectionMode);
 
       flushUpdated();
