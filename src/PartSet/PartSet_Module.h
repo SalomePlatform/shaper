@@ -118,7 +118,9 @@ public slots:
 protected:
   /// Creates a new operation
   /// \param theCmdId the operation name
-  ModuleBase_Operation* createOperation(const std::string& theCmdId);
+  /// \param theFeatureKind a kind of feature to get the feature xml description
+  ModuleBase_Operation* createOperation(const std::string& theCmdId,
+                                        const std::string& theFeatureKind = "");
 
   /// Sends the operation
   /// \param theOperation the operation

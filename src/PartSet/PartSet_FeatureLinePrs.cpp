@@ -28,6 +28,11 @@ PartSet_FeatureLinePrs::PartSet_FeatureLinePrs(FeaturePtr theSketch)
 {
 }
 
+std::string PartSet_FeatureLinePrs::getKind()
+{
+  return SKETCH_LINE_KIND;
+}
+
 void PartSet_FeatureLinePrs::initFeature(FeaturePtr theFeature)
 {
   if (feature() && theFeature)
@@ -105,8 +110,8 @@ void PartSet_FeatureLinePrs::projectPointOnLine(FeaturePtr theFeature,
   if (theFeature) {
     double X0, X1, X2, X3;
     double Y0, Y1, Y2, Y3;
-    PartSet_Tools::getLinePoint(theFeature, LINE_ATTR_START, X2, Y2);
-    PartSet_Tools::getLinePoint(theFeature, LINE_ATTR_END, X3, Y3);
+    getLinePoint(theFeature, LINE_ATTR_START, X2, Y2);
+    getLinePoint(theFeature, LINE_ATTR_END, X3, Y3);
     PartSet_Tools::convertTo2D(thePoint, sketch(), theView, X1, Y1);
 
     switch (theMode) {
@@ -114,7 +119,7 @@ void PartSet_FeatureLinePrs::projectPointOnLine(FeaturePtr theFeature,
         PartSet_Tools::projectPointOnLine(X2, Y2, X3, Y3, X1, Y1, theX, theY);
       break;
       case SM_SecondPoint: {
-        PartSet_Tools::getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
+        getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
         PartSet_Tools::intersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, theX, theY);
       }
       break;
@@ -122,6 +127,50 @@ void PartSet_FeatureLinePrs::projectPointOnLine(FeaturePtr theFeature,
       break;
     }
   }
+}
+
+double PartSet_FeatureLinePrs::distanceToPoint(FeaturePtr theFeature,
+                                      double theX, double theY)
+{
+  double aDelta = 0;
+  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
+    return aDelta;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
+
+  double aX, anY;
+  PartSet_Tools::projectPointOnLine(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y(), theX, theY, aX, anY);
+  aDelta = gp_Pnt(theX, theY, 0).Distance(gp_Pnt(aX, anY, 0));
+
+  return aDelta;
+}
+
+boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLinePrs::findPoint(FeaturePtr theFeature,
+                                                                         double theX, double theY)
+{
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
+  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
+    return aPoint2D;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  aPoint2D = PartSet_FeatureLinePrs::findPoint(theFeature, theX, theY);
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
+  if (fabs(aPoint->x() - theX) < Precision::Confusion() &&
+      fabs(aPoint->y() - theY) < Precision::Confusion())
+    aPoint2D = aPoint;
+  else {
+    aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
+    if (fabs(aPoint->x() - theX) < Precision::Confusion() &&
+        fabs(aPoint->y() - theY) < Precision::Confusion())
+      aPoint2D = aPoint;
+  }
+  return aPoint2D;
 }
 
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLinePrs::featurePoint
@@ -143,4 +192,16 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLinePrs::featurePoint
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                                               (aData->attribute(aPointArg));
   return aPoint;
+}
+
+void PartSet_FeatureLinePrs::getLinePoint(FeaturePtr theFeature, const std::string& theAttribute,
+                                          double& theX, double& theY)
+{
+  if (!theFeature || theFeature->getKind() != PartSet_FeatureLinePrs::getKind())
+    return;
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
+  theX = aPoint->x();
+  theY = aPoint->y();
 }

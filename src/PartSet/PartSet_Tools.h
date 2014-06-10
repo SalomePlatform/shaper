@@ -20,6 +20,7 @@
 class Handle_V3d_View;
 class XGUI_ViewerPrs;
 class GeomDataAPI_Point2D;
+class PartSet_FeaturePrs;
 
 /*!
  \class PartSet_Tools
@@ -75,6 +76,15 @@ public:
   static void projectPointOnLine(double theX1, double theY1, double theX2, double theY2,
                                  double thePointX, double thePointY, double& theX, double& theY);
 
+  /// Creates the feature presentation
+  /// \param theKind a feature kind
+  /// \param theSketch the sketch of the feature
+  /// \param theFeature the feature
+  static boost::shared_ptr<PartSet_FeaturePrs> createFeaturePrs(const std::string& theKind,
+                                                                FeaturePtr theSketch,
+                                                                FeaturePtr theFeature = FeaturePtr());
+
+
   /// Returns a feature that is under the mouse point
   /// \param thePoint a screen point
   /// \param theView a 3D view
@@ -107,13 +117,6 @@ public:
                                boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
                                boost::shared_ptr<GeomDataAPI_Point2D> thePoint2);
 
-  /// \brief Get the line point 2d coordinates.
-  /// \param theFeature the line feature
-  /// \param theAttribute the start or end attribute of the line
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  static void getLinePoint(FeaturePtr theFeature, const std::string& theAttribute,
-                           double& theX, double& theY);
   /// Find a point in the line with given coordinates
   /// \param theFeature the line feature
   /// \param theX the horizontal point coordinate

@@ -1,8 +1,8 @@
-// File:        PartSet_OperationEditLine.h
+// File:        PartSet_OperationEditFeature.h
 // Created:     05 May 2014
 // Author:      Natalia ERMOLAEVA
 
-#include <PartSet_OperationEditLine.h>
+#include <PartSet_OperationEditFeature.h>
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketch.h>
 
@@ -32,28 +32,28 @@
 
 using namespace std;
 
-PartSet_OperationEditLine::PartSet_OperationEditLine(const QString& theId,
+PartSet_OperationEditFeature::PartSet_OperationEditFeature(const QString& theId,
 	                                          QObject* theParent,
                                               FeaturePtr theFeature)
 : PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature), myIsBlockedSelection(false)
 {
 }
 
-PartSet_OperationEditLine::~PartSet_OperationEditLine()
+PartSet_OperationEditFeature::~PartSet_OperationEditFeature()
 {
 }
 
-bool PartSet_OperationEditLine::isGranted(ModuleBase_IOperation* theOperation) const
+bool PartSet_OperationEditFeature::isGranted(ModuleBase_IOperation* theOperation) const
 {
   return theOperation->getDescription()->operationId().toStdString() == PartSet_OperationSketch::Type();
 }
 
-std::list<int> PartSet_OperationEditLine::getSelectionModes(FeaturePtr theFeature) const
+std::list<int> PartSet_OperationEditFeature::getSelectionModes(FeaturePtr theFeature) const
 {
   return PartSet_OperationSketchBase::getSelectionModes(theFeature);
 }
 
-void PartSet_OperationEditLine::init(FeaturePtr theFeature,
+void PartSet_OperationEditFeature::init(FeaturePtr theFeature,
                                      const std::list<XGUI_ViewerPrs>& theSelected,
                                      const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
@@ -78,12 +78,12 @@ void PartSet_OperationEditLine::init(FeaturePtr theFeature,
     myFeatures = theSelected;
 }
 
-FeaturePtr PartSet_OperationEditLine::sketch() const
+FeaturePtr PartSet_OperationEditFeature::sketch() const
 {
   return mySketch;
 }
 
-void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView,
+void PartSet_OperationEditFeature::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView,
                                              const std::list<XGUI_ViewerPrs>& /*theSelected*/,
                                              const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
@@ -108,13 +108,13 @@ void PartSet_OperationEditLine::mousePressed(QMouseEvent* theEvent, Handle(V3d_V
         emit setSelection(aSelected);
       }
       else if (aFeature) {
-        restartOperation(PartSet_OperationEditLine::Type(), aFeature);
+        restartOperation(PartSet_OperationEditFeature::Type(), aFeature);
       }
     }
   }
 }
 
-void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
+void PartSet_OperationEditFeature::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
   if (!(theEvent->buttons() &  Qt::LeftButton))
     return;
@@ -149,7 +149,7 @@ void PartSet_OperationEditLine::mouseMoved(QMouseEvent* theEvent, Handle(V3d_Vie
   myCurPoint.setPoint(aPoint);
 }
 
-void PartSet_OperationEditLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
+void PartSet_OperationEditFeature::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
                                               const std::list<XGUI_ViewerPrs>& /*theSelected*/,
                                               const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
@@ -168,7 +168,7 @@ void PartSet_OperationEditLine::mouseReleased(QMouseEvent* theEvent, Handle(V3d_
   }
 }
 
-void PartSet_OperationEditLine::startOperation()
+void PartSet_OperationEditFeature::startOperation()
 {
   // do nothing in order to do not create a new feature
   emit multiSelectionEnabled(false);
@@ -179,7 +179,7 @@ void PartSet_OperationEditLine::startOperation()
   myCurPoint.clear();
 }
 
-void PartSet_OperationEditLine::stopOperation()
+void PartSet_OperationEditFeature::stopOperation()
 {
   emit multiSelectionEnabled(true);
 
@@ -188,7 +188,7 @@ void PartSet_OperationEditLine::stopOperation()
   myFeatures.clear();
 }
 
-void PartSet_OperationEditLine::blockSelection(bool isBlocked, const bool isRestoreSelection)
+void PartSet_OperationEditFeature::blockSelection(bool isBlocked, const bool isRestoreSelection)
 {
   if (myIsBlockedSelection == isBlocked)
     return;
@@ -205,13 +205,13 @@ void PartSet_OperationEditLine::blockSelection(bool isBlocked, const bool isRest
   }
 }
 
-FeaturePtr PartSet_OperationEditLine::createFeature(const bool /*theFlushMessage*/)
+FeaturePtr PartSet_OperationEditFeature::createFeature(const bool /*theFlushMessage*/)
 {
   // do nothing in order to do not create a new feature
   return FeaturePtr();
 }
 
-void PartSet_OperationEditLine::moveLinePoint(FeaturePtr theFeature,
+void PartSet_OperationEditFeature::moveLinePoint(FeaturePtr theFeature,
                                                double theDeltaX, double theDeltaY,
                                                const std::string& theAttribute)
 {
@@ -227,7 +227,7 @@ void PartSet_OperationEditLine::moveLinePoint(FeaturePtr theFeature,
   aPoint->setValue(aPoint->x() + theDeltaX, aPoint->y() + theDeltaY);
 }
 
-void PartSet_OperationEditLine::sendFeatures()
+void PartSet_OperationEditFeature::sendFeatures()
 {
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_MOVED);
 

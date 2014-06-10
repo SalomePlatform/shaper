@@ -26,6 +26,11 @@ PartSet_FeatureCirclePrs::PartSet_FeatureCirclePrs(FeaturePtr theSketch)
 {
 }
 
+std::string PartSet_FeatureCirclePrs::getKind()
+{
+  return SKETCH_CIRCLE_KIND;
+}
+
 PartSet_SelectionMode PartSet_FeatureCirclePrs::setPoint(double theX, double theY,
                                                          const PartSet_SelectionMode& theMode)
 {
@@ -80,6 +85,37 @@ PartSet_SelectionMode PartSet_FeatureCirclePrs::getNextMode(const std::string& t
   else if (theAttribute == CIRCLE_ATTR_RADIUS)
     aMode = SM_DonePoint;
   return aMode;
+}
+
+double PartSet_FeatureCirclePrs::distanceToPoint(FeaturePtr theFeature,
+                                                 double theX, double theY)
+{
+  double aDelta = 0;
+  if (!theFeature || theFeature->getKind() != getKind())
+    return aDelta;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
+
+  boost::shared_ptr<GeomAPI_Pnt2d> aPoint2d(new GeomAPI_Pnt2d(theX, theY));
+  return aPoint->pnt()->distance(aPoint2d);
+}
+
+boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureCirclePrs::findPoint(FeaturePtr theFeature,
+                                                                           double theX, double theY)
+{
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
+  if (!theFeature || theFeature->getKind() != getKind())
+    return aPoint2D;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
+  if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
+    aPoint2D = aPoint;
+
+  return aPoint2D;
 }
 
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureCirclePrs::featurePoint

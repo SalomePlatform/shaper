@@ -24,6 +24,10 @@ class Handle_V3d_View;
 class PARTSET_EXPORT PartSet_FeatureArcPrs : public PartSet_FeaturePrs
 {
 public:
+  /// Returns the feature type processed by this presentation
+  /// \return the feature kind
+  static std::string getKind();
+
   /// Constructor
   /// \param theSketch the sketch feature
   PartSet_FeatureArcPrs(FeaturePtr theSketch);
