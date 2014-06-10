@@ -225,7 +225,8 @@ void PartSet_Module::onFitAllView()
 
 void PartSet_Module::onLaunchOperation(std::string theName, FeaturePtr theFeature)
 {
-  ModuleBase_Operation* anOperation = createOperation(theName.c_str());
+  ModuleBase_Operation* anOperation = createOperation(theName.c_str(),
+                                                      theFeature ? theFeature->getKind() : "");
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp)
   {
@@ -306,18 +307,9 @@ void PartSet_Module::onFeatureConstructed(FeaturePtr theFeature, int theMode)
     activateFeature(theFeature, true);
 }
 
-ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdId)
+ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdId,
+                                                      const std::string& theFeatureKind)
 {
-  // get operation xml description
-  std::string aStdCmdId = theCmdId;
-  if (aStdCmdId == PartSet_OperationEditLine::Type())
-    aStdCmdId = SKETCH_LINE_KIND;
-  std::string aPluginFileName = featureFile(aStdCmdId);
-  Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginFileName);
-  aWdgReader.readAll();
-  std::string aXmlCfg = aWdgReader.featureWidgetCfg(aStdCmdId);
-  std::string aDescription = aWdgReader.featureDescription(aStdCmdId);
-
   // create the operation
   ModuleBase_Operation* anOperation = 0;
   if (theCmdId == PartSet_OperationSketch::Type()) {
@@ -340,6 +332,16 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   if (!anOperation) {
     anOperation = new ModuleBase_Operation(theCmdId.c_str(), this);
   }
+
+  // set operation xml description
+  std::string aFeatureKind = theFeatureKind.empty() ? theCmdId : theFeatureKind;
+
+  std::string aPluginFileName = featureFile(aFeatureKind);
+  Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginFileName);
+  aWdgReader.readAll();
+  std::string aXmlCfg = aWdgReader.featureWidgetCfg(aFeatureKind);
+  std::string aDescription = aWdgReader.featureDescription(aFeatureKind);
+
   anOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
   anOperation->getDescription()->setDescription(QString::fromStdString(aDescription));
 
