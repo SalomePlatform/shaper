@@ -40,6 +40,9 @@ public:
   //! Returns true if multiselection is enabled
   virtual bool isMultiSelectionEnabled() const;
 
+  //! Perfroms the fit all for the active view
+  virtual void fitAll();
+
   void setSelector(NewGeom_OCCSelector* theSel);
 
   NewGeom_OCCSelector* selector() const { return mySelector; }

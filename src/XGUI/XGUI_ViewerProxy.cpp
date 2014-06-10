@@ -97,6 +97,9 @@ void XGUI_ViewerProxy::connectToViewer()
             this, SIGNAL(keyRelease(QKeyEvent*)));
 
     connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
+    connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), 
+            this, SIGNAL(contextMenuRequested(QContextMenuEvent*)));
+
   } else {
     XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
 
@@ -125,6 +128,8 @@ void XGUI_ViewerProxy::connectToViewer()
             this, SLOT(onKeyRelease(XGUI_ViewWindow*, QKeyEvent*)));
 
     connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
+    connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), 
+            this, SIGNAL(contextMenuRequested(QContextMenuEvent*)));
   }
 }
 

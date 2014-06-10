@@ -74,6 +74,8 @@ public:
   //! Returns list of Ids of defined actions (just by NewGeom module)
   virtual QStringList commandIdList() const;
 
+  virtual void contextMenuPopup(const QString& theClient, QMenu* theMenu, QString& theTitle);
+
 public slots:
   virtual bool activateModule( SUIT_Study* theStudy);
   virtual bool deactivateModule( SUIT_Study* theStudy);

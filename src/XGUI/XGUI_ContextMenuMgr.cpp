@@ -5,7 +5,7 @@
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_MainWindow.h"
-#include "XGUI_Viewer.h"
+#include "XGUI_ViewerProxy.h"
 
 #include "PartSetPlugin_Part.h"
 
@@ -84,7 +84,7 @@ void XGUI_ContextMenuMgr::onContextMenuRequest(QContextMenuEvent* theEvent)
   QMenu* aMenu = 0;
   if (sender() == myWorkshop->objectBrowser())
     aMenu = objectBrowserMenu();
-  else if (sender() == myWorkshop->mainWindow()->viewer()) {
+  else if (sender() == myWorkshop->viewer()) {
     aMenu = viewerMenu();
   }
   
@@ -141,24 +141,41 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
 QMenu* XGUI_ContextMenuMgr::viewerMenu() const
 {
   QMenu* aMenu = new QMenu();
-  XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QFeatureList aFeatures = aSelMgr->selectedFeatures();
-  if (aFeatures.size() > 0) {
-    if (aFeatures.size() > 0)
-      aMenu->addAction(action("EDIT_CMD"));
-    aMenu->addAction(action("HIDE_CMD"));
-    aMenu->addAction(action("DELETE_CMD"));
-  }
-  QMdiArea* aMDI = myWorkshop->mainWindow()->mdiArea();
-  if (aMDI->actions().size() > 0) {
-    QMenu* aSubMenu = aMenu->addMenu(tr("Windows"));
-    aSubMenu->addActions(aMDI->actions());
-  }
+  addViewerItems(aMenu);
   if (aMenu->actions().size() > 0) {
     return aMenu;
   }
   delete aMenu;
   return 0;
+}
+
+void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
+{
+  XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
+  QFeatureList aFeatures = aSelMgr->selectedFeatures();
+  if (aFeatures.size() > 0) {
+    if (aFeatures.size() == 1)
+      theMenu->addAction(action("EDIT_CMD"));
+    bool isVisible = false;
+    foreach(FeaturePtr aFeature, aFeatures) {
+      if (myWorkshop->displayer()->isVisible(aFeature)) {
+        isVisible = true;
+        break;
+      }
+    }
+    if (isVisible)
+      theMenu->addAction(action("HIDE_CMD"));
+    else 
+      theMenu->addAction(action("SHOW_CMD"));
+    theMenu->addAction(action("DELETE_CMD"));
+  }
+  if (!myWorkshop->isSalomeMode()) {
+    QMdiArea* aMDI = myWorkshop->mainWindow()->mdiArea();
+    if (aMDI->actions().size() > 0) {
+      QMenu* aSubMenu = theMenu->addMenu(tr("Windows"));
+      aSubMenu->addActions(aMDI->actions());
+    }
+  }
 }
 
 void XGUI_ContextMenuMgr::connectObjectBrowser() const
@@ -169,7 +186,7 @@ void XGUI_ContextMenuMgr::connectObjectBrowser() const
 
 void XGUI_ContextMenuMgr::connectViewer() const
 {
-  // TODO: Adapt to SALOME mode
-  connect(myWorkshop->mainWindow()->viewer(), SIGNAL(contextMenuRequested(QContextMenuEvent*)), 
+  connect(myWorkshop->viewer(), SIGNAL(contextMenuRequested(QContextMenuEvent*)), 
     this, SLOT(onContextMenuRequest(QContextMenuEvent*)));
 }
+

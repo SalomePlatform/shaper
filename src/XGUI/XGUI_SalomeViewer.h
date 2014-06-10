@@ -9,6 +9,7 @@
 
 class QMouseEvent;
 class QKeyEvent;
+class QContextMenuEvent;
 
 /**
 * A Base object for definition of connector object to
@@ -58,6 +59,7 @@ signals:
   void activated();
 
   void selectionChanged();
+  void contextMenuRequested(QContextMenuEvent*);
 };
 
 #endif
