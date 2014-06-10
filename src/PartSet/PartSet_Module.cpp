@@ -1,7 +1,7 @@
 #include <PartSet_Module.h>
 #include <PartSet_OperationSketch.h>
 #include <PartSet_OperationCreateFeature.h>
-#include <PartSet_OperationEditLine.h>
+#include <PartSet_OperationEditFeature.h>
 #include <PartSet_OperationConstraint.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
@@ -323,8 +323,8 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
       aSketch = aPrevOp->sketch();
     if (PartSet_OperationCreateFeature::canProcessKind(theCmdId))
       anOperation = new PartSet_OperationCreateFeature(theCmdId.c_str(), this, aSketch);
-    else if (theCmdId == PartSet_OperationEditLine::Type())
-      anOperation = new PartSet_OperationEditLine(theCmdId.c_str(), this, aSketch);
+    else if (theCmdId == PartSet_OperationEditFeature::Type())
+      anOperation = new PartSet_OperationEditFeature(theCmdId.c_str(), this, aSketch);
     else if (theCmdId == PartSet_OperationConstraint::Type())
       anOperation = new PartSet_OperationConstraint(theCmdId.c_str(), this, aSketch);
   }

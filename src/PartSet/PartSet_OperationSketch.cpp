@@ -4,7 +4,7 @@
 
 #include <PartSet_OperationSketch.h>
 
-#include <PartSet_OperationEditLine.h>
+#include <PartSet_OperationEditFeature.h>
 #include <PartSet_Tools.h>
 
 #include <SketchPlugin_Sketch.h>
@@ -90,7 +90,7 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
     if (theHighlighted.size() == 1) {
       FeaturePtr aFeature = theHighlighted.front().feature();
       if (aFeature)
-        restartOperation(PartSet_OperationEditLine::Type(), aFeature);
+        restartOperation(PartSet_OperationEditFeature::Type(), aFeature);
     }
     else
       myFeatures = theHighlighted;
@@ -139,7 +139,7 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View)
     FeaturePtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(),
                                                                 theView, feature(), myFeatures);
     if (aFeature)
-      restartOperation(PartSet_OperationEditLine::Type(), aFeature);
+      restartOperation(PartSet_OperationEditFeature::Type(), aFeature);
   }
 }
 

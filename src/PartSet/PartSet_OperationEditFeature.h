@@ -1,9 +1,9 @@
-// File:        PartSet_OperationEditLine.h
+// File:        PartSet_OperationEditFeature.h
 // Created:     05 May 2014
 // Author:      Natalia ERMOLAEVA
 
-#ifndef PartSet_OperationEditLine_H
-#define PartSet_OperationEditLine_H
+#ifndef PartSet_OperationEditFeature_H
+#define PartSet_OperationEditFeature_H
 
 #include "PartSet.h"
 
@@ -13,10 +13,10 @@
 class QMouseEvent;
 
 /*!
- \class PartSet_OperationEditLine
+ \class PartSet_OperationEditFeature
  * \brief The operation for the sketch feature creation
 */
-class PARTSET_EXPORT PartSet_OperationEditLine : public PartSet_OperationSketchBase                                                 
+class PARTSET_EXPORT PartSet_OperationEditFeature : public PartSet_OperationSketchBase                                                 
 {
   Q_OBJECT
   /// Struct to define gp point, with the state is the point is initialized
@@ -55,10 +55,10 @@ public:
   /// \param theId the feature identifier
   /// \param theParent the operation parent
   /// \param theFeature the parent feature
-  PartSet_OperationEditLine(const QString& theId, QObject* theParent,
+  PartSet_OperationEditFeature(const QString& theId, QObject* theParent,
                             FeaturePtr theFeature);
   /// Destructor
-  virtual ~PartSet_OperationEditLine();
+  virtual ~PartSet_OperationEditFeature();
 
   /// Returns that this operator can be started above already running one.
   /// The runned operation should be the sketch feature modified operation
