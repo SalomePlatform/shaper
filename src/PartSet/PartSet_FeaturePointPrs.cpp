@@ -71,6 +71,17 @@ PartSet_SelectionMode PartSet_FeaturePointPrs::getNextMode(const std::string& th
   return aMode;
 }
 
+void PartSet_FeaturePointPrs::move(double theDeltaX, double theDeltaY)
+{
+  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+  if (!aData->isValid())
+    return;
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(POINT_ATTR_COORD));
+  aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
+}
+
 double PartSet_FeaturePointPrs::distanceToPoint(FeaturePtr theFeature,
                                                 double theX, double theY)
 {

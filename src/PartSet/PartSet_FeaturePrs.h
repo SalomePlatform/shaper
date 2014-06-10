@@ -53,6 +53,24 @@ public:
   /// \return next attribute selection mode
   virtual PartSet_SelectionMode getNextMode(const std::string& theAttribute) const = 0;
 
+  /// \brief Move the full feature.
+  /// \param theDeltaX the delta for X coordinate is moved
+  /// \param theDeltaY the delta for Y coordinate is moved
+  virtual void move(double theDeltaX, double theDeltaY) = 0;
+
+  /// Return the distance between the feature and the point
+  /// \param theFeature feature object
+  /// \param theX the horizontal coordinate of the point
+  /// \param theX the vertical coordinate of the point
+  virtual double distanceToPoint(FeaturePtr theFeature, double theX, double theY) = 0;
+
+  /// Find a point in the line with given coordinates
+  /// \param theFeature the line feature
+  /// \param theX the horizontal point coordinate
+  /// \param theY the vertical point coordinate
+  virtual boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
+                                                           double theY) = 0;
+
   /// Creates constrains of the current 
   /// \param theX the horizontal coordnate of the point
   /// \param theY the vertical coordnate of the point

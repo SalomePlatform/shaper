@@ -229,19 +229,24 @@ FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theVie
 double PartSet_Tools::distanceToPoint(FeaturePtr theFeature,
                                       double theX, double theY)
 {
+  boost::shared_ptr<PartSet_FeaturePrs> aFeaturePrs = PartSet_Tools::createFeaturePrs(
+                                           theFeature->getKind(), FeaturePtr(), theFeature);
   double aDelta = 0;
-  std::string aKind = theFeature->getKind();
-  if (aKind == PartSet_FeatureLinePrs::getKind()) {
-    aDelta = PartSet_FeatureLinePrs::distanceToPoint(theFeature, theX, theY);
-  }
-  else if (aKind == PartSet_FeaturePointPrs::getKind()) {
-    aDelta = PartSet_FeaturePointPrs::distanceToPoint(theFeature, theX, theY);
-  }
-  else if (aKind == PartSet_FeatureCirclePrs::getKind()) {
-    aDelta = PartSet_FeatureCirclePrs::distanceToPoint(theFeature, theX, theY);
-  }
+  if (aFeaturePrs)
+    aDelta = aFeaturePrs->distanceToPoint(theFeature, theX, theY);
 
   return aDelta;
+}
+
+void PartSet_Tools::moveFeature(FeaturePtr theFeature, double theDeltaX, double theDeltaY)
+{
+  if (!theFeature)
+    return;
+
+  boost::shared_ptr<PartSet_FeaturePrs> aFeaturePrs = PartSet_Tools::createFeaturePrs(
+                                           theFeature->getKind(), FeaturePtr(), theFeature);
+  if (aFeaturePrs)
+  aFeaturePrs->move(theDeltaX, theDeltaY);
 }
 
 boost::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
@@ -303,20 +308,12 @@ void PartSet_Tools::createConstraint(FeaturePtr theSketch,
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findPoint(FeaturePtr theFeature,
                                                                 double theX, double theY)
 {
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
-  if (!theFeature)
-    return aPoint2D;
+  boost::shared_ptr<PartSet_FeaturePrs> aFeaturePrs = PartSet_Tools::createFeaturePrs(
+                                           theFeature->getKind(), FeaturePtr(), theFeature);
 
-  std::string aKind = theFeature->getKind();
-  if (aKind == PartSet_FeatureLinePrs::getKind()) {
-    aPoint2D = PartSet_FeatureLinePrs::findPoint(theFeature, theX, theY);
-  }
-  else if (aKind == PartSet_FeaturePointPrs::getKind()) {
-    aPoint2D = PartSet_FeaturePointPrs::findPoint(theFeature, theX, theY);
-  }
-  else if (aKind == PartSet_FeatureCirclePrs::getKind()) {
-    aPoint2D = PartSet_FeatureCirclePrs::findPoint(theFeature, theX, theY);
-  }
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
+  if (aFeaturePrs)
+    aPoint2D = aFeaturePrs->findPoint(theFeature, theX, theY);
 
   return aPoint2D;
 }

@@ -132,16 +132,14 @@ void PartSet_OperationEditFeature::mouseMoved(QMouseEvent* theEvent, Handle(V3d_
     double aDeltaX = aX - aCurX;
     double aDeltaY = anY - aCurY;
 
-    moveLinePoint(feature(), aDeltaX, aDeltaY, LINE_ATTR_START);
-    moveLinePoint(feature(), aDeltaX, aDeltaY, LINE_ATTR_END);
+    PartSet_Tools::moveFeature(feature(), aDeltaX, aDeltaY);
 
     std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = (*anIt).feature();
       if (!aFeature || aFeature == feature())
         continue;
-      moveLinePoint(aFeature, aDeltaX, aDeltaY, LINE_ATTR_START);
-      moveLinePoint(aFeature, aDeltaX, aDeltaY, LINE_ATTR_END);
+      PartSet_Tools::moveFeature(aFeature, aDeltaX, aDeltaY);
     }
   }
   sendFeatures();
@@ -209,22 +207,6 @@ FeaturePtr PartSet_OperationEditFeature::createFeature(const bool /*theFlushMess
 {
   // do nothing in order to do not create a new feature
   return FeaturePtr();
-}
-
-void PartSet_OperationEditFeature::moveLinePoint(FeaturePtr theFeature,
-                                               double theDeltaX, double theDeltaY,
-                                               const std::string& theAttribute)
-{
-  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
-    return;
-
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  if (!aData->isValid())
-    return;
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
-
-  aPoint->setValue(aPoint->x() + theDeltaX, aPoint->y() + theDeltaY);
 }
 
 void PartSet_OperationEditFeature::sendFeatures()

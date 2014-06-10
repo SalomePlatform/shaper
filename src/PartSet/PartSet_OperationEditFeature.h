@@ -126,14 +126,6 @@ protected:
   /// \param isRestoreSelection the state whether the selected objects should be reselected
   void blockSelection(bool isBlocked, const bool isRestoreSelection = true);
 
-  /// \brief Save the point to the line.
-  /// \param theFeature the source feature
-  /// \param theDeltaX the delta for X coordinate is moved
-  /// \param theDeltaY the delta for Y coordinate is moved
-  /// \param theAttribute the start or end attribute of the line
-  void  moveLinePoint(FeaturePtr theFeature,
-                      double theDeltaX, double theDeltaY,
-                      const std::string& theAttribute);
   /// Sends the features
   void sendFeatures();
 
