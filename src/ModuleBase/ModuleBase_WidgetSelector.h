@@ -1,14 +1,18 @@
-// File:        ModuleBase_SelectorWidget.h
+// File:        ModuleBase_WidgetSelector.h
 // Created:     2 June 2014
 // Author:      Vitaly Smetannikov
 
-#ifndef ModuleBase_SelectorWidget_H
-#define ModuleBase_SelectorWidget_H
+#ifndef ModuleBase_WidgetSelector_H
+#define ModuleBase_WidgetSelector_H
 
 #include "ModuleBase.h"
 #include "ModuleBase_ModelWidget.h"
 
 #include <ModelAPI_Feature.h>
+
+#include <TopAbs_ShapeEnum.hxx>
+
+#include <QStringList>
 
 
 class Config_WidgetAPI;
@@ -18,15 +22,15 @@ class QLineEdit;
 class QToolButton;
 class ModuleBase_IWorkshop;
 
-class MODULEBASE_EXPORT ModuleBase_SelectorWidget: public ModuleBase_ModelWidget
+class MODULEBASE_EXPORT ModuleBase_WidgetSelector: public ModuleBase_ModelWidget
 {
   Q_OBJECT
 public:
-  ModuleBase_SelectorWidget(QWidget* theParent, 
+  ModuleBase_WidgetSelector(QWidget* theParent, 
                             ModuleBase_IWorkshop* theWorkshop, 
                             const Config_WidgetAPI* theData);
 
-  virtual ~ModuleBase_SelectorWidget();
+  virtual ~ModuleBase_WidgetSelector();
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed
@@ -62,6 +66,9 @@ private:
   void enableOthersControls(bool toEnable) const;
   void updateSelectionName();
   void raisePanel() const;
+  bool isAccepted(const FeaturePtr theFeature) const;
+
+  static TopAbs_ShapeEnum shapeType(const QString& theType);
 
   QWidget*     myContainer;
   QLabel*      myLabel;
@@ -73,6 +80,7 @@ private:
   bool myActivateOnStart;
 
   FeaturePtr mySelectedFeature;
+  QStringList myShapeTypes;
 };
 
 #endif

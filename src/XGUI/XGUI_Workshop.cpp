@@ -269,8 +269,12 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     std::set<FeaturePtr>::const_iterator aIt;
     for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
       FeaturePtr aFeature = (*aIt);
-      if (aFeature->getKind() != PARTSET_PART_KIND)
-        myDisplayer->redisplay(aFeature, false);
+      if (aFeature->getKind() != PARTSET_PART_KIND) {
+        if (myDisplayer->isVisible(aFeature))
+          myDisplayer->redisplay(aFeature, false);
+        else 
+          myDisplayer->display(aFeature, false);
+      }
     }
     myDisplayer->updateViewer();
   }

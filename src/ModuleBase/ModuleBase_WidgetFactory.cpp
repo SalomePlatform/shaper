@@ -11,7 +11,7 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetSwitch.h>
-#include <ModuleBase_SelectorWidget.h>
+#include <ModuleBase_WidgetSelector.h>
 #include <ModuleBase_WidgetDoubleValue.h>
 #include <ModuleBase_WidgetBoolValue.h>
 
@@ -191,7 +191,7 @@ QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const
 
 QWidget* ModuleBase_WidgetFactory::selectorControl(QWidget* theParent)
 {
-  ModuleBase_SelectorWidget* aSelector = new ModuleBase_SelectorWidget(theParent, myWorkshop, myWidgetApi);
+  ModuleBase_WidgetSelector* aSelector = new ModuleBase_WidgetSelector(theParent, myWorkshop, myWidgetApi);
   
   QObject::connect(aSelector, SIGNAL(valuesChanged()),  myOperation, SLOT(storeCustomValue()));
 
