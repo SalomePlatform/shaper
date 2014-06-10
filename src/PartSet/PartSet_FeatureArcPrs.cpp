@@ -29,6 +29,11 @@ PartSet_FeatureArcPrs::PartSet_FeatureArcPrs(FeaturePtr theSketch)
 {
 }
 
+std::string PartSet_FeatureArcPrs::getKind()
+{
+  return SKETCH_ARC_KIND;
+}
+
 PartSet_SelectionMode PartSet_FeatureArcPrs::setPoint(double theX, double theY,
                                                        const PartSet_SelectionMode& theMode)
 {

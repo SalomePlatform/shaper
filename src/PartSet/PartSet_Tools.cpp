@@ -23,6 +23,7 @@
 #include <PartSet_FeatureLinePrs.h>
 #include <PartSet_FeaturePointPrs.h>
 #include <PartSet_FeatureCirclePrs.h>
+#include <PartSet_FeatureArcPrs.h>
 
 #include <XGUI_ViewerPrs.h>
 
@@ -172,6 +173,30 @@ void PartSet_Tools::projectPointOnLine(double theX1, double theY1, double theX2,
     theX = aPoint.X();
     theY = aPoint.Y();
   }
+}
+
+boost::shared_ptr<PartSet_FeaturePrs> PartSet_Tools::createFeaturePrs(const std::string& theKind,
+                                                                      FeaturePtr theSketch,
+                                                                      FeaturePtr theFeature)
+{
+  PartSet_FeaturePrs* aFeaturePrs;
+
+  if (theKind == PartSet_FeaturePointPrs::getKind()) {
+    aFeaturePrs = new PartSet_FeaturePointPrs(theSketch);
+  }
+  else if (theKind == PartSet_FeatureLinePrs::getKind()) {
+    aFeaturePrs = new PartSet_FeatureLinePrs(theSketch);
+  }
+  else if (theKind == PartSet_FeatureCirclePrs::getKind()) {
+    aFeaturePrs = new PartSet_FeatureCirclePrs(theSketch);
+  }
+  else if (theKind == PartSet_FeatureArcPrs::getKind()) {
+    aFeaturePrs = new PartSet_FeatureArcPrs(theSketch);
+  }
+  if (theFeature)
+    aFeaturePrs->init(theFeature, FeaturePtr());
+
+  return boost::shared_ptr<PartSet_FeaturePrs>(aFeaturePrs);
 }
 
 FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,

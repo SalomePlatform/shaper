@@ -116,7 +116,7 @@ protected:
                              const bool isToEmitSignal = true);
 
 private:
-  PartSet_FeaturePrs* myFeaturePrs; ///< the feature presentation
+  boost::shared_ptr<PartSet_FeaturePrs> myFeaturePrs; ///< the feature presentation
   FeaturePtr myInitFeature; ///< the initial feature
   PartSet_SelectionMode myPointSelectionMode; ///< point selection mode
 };

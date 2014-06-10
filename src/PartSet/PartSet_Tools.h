@@ -20,6 +20,7 @@
 class Handle_V3d_View;
 class XGUI_ViewerPrs;
 class GeomDataAPI_Point2D;
+class PartSet_FeaturePrs;
 
 /*!
  \class PartSet_Tools
@@ -74,6 +75,15 @@ public:
   /// \param theY2 the vertical coordinate of the second line point
   static void projectPointOnLine(double theX1, double theY1, double theX2, double theY2,
                                  double thePointX, double thePointY, double& theX, double& theY);
+
+  /// Creates the feature presentation
+  /// \param theKind a feature kind
+  /// \param theSketch the sketch of the feature
+  /// \param theFeature the feature
+  static boost::shared_ptr<PartSet_FeaturePrs> createFeaturePrs(const std::string& theKind,
+                                                                FeaturePtr theSketch,
+                                                                FeaturePtr theFeature = FeaturePtr());
+
 
   /// Returns a feature that is under the mouse point
   /// \param thePoint a screen point

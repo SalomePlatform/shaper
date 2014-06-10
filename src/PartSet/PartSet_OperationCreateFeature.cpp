@@ -42,24 +42,11 @@ PartSet_OperationCreateFeature::PartSet_OperationCreateFeature(const QString& th
   myPointSelectionMode(SM_FirstPoint)
 {
   std::string aKind = theId.toStdString();
-
-  if (aKind == SKETCH_POINT_KIND) {
-    myFeaturePrs = new PartSet_FeaturePointPrs(theFeature);
-  }
-  if (aKind == SKETCH_LINE_KIND) {
-    myFeaturePrs = new PartSet_FeatureLinePrs(theFeature);
-  }
-  else if (aKind == SKETCH_CIRCLE_KIND) {
-    myFeaturePrs = new PartSet_FeatureCirclePrs(theFeature);
-  }
-  else if (aKind == SKETCH_ARC_KIND) {
-    myFeaturePrs = new PartSet_FeatureArcPrs(theFeature);
-  }
+  myFeaturePrs = PartSet_Tools::createFeaturePrs(aKind, theFeature);
 }
 
 PartSet_OperationCreateFeature::~PartSet_OperationCreateFeature()
 {
-  delete myFeaturePrs;
 }
 
 bool PartSet_OperationCreateFeature::canProcessKind(const std::string& theId)
@@ -138,7 +125,8 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
         PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
         // move to selected line
         if (feature()->getKind() == SKETCH_LINE_KIND) {
-          PartSet_FeatureLinePrs* aLinePrs = dynamic_cast<PartSet_FeatureLinePrs*>(myFeaturePrs);
+          boost::shared_ptr<PartSet_FeatureLinePrs> aLinePrs =
+                                 boost::dynamic_pointer_cast<PartSet_FeatureLinePrs>(myFeaturePrs);
           if (aLinePrs) {
             FeaturePtr aFeature = aPrs.feature();
             aLinePrs->projectPointOnLine(aFeature, myPointSelectionMode, aPoint, theView, aX, anY);
@@ -154,7 +142,8 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
     case SM_SecondPoint:
     case SM_ThirdPoint: {
       if (feature()->getKind() == SKETCH_ARC_KIND) {
-        PartSet_FeatureArcPrs* anArcPrs = dynamic_cast<PartSet_FeatureArcPrs*>(myFeaturePrs);
+        boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
+                                 boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
         if (anArcPrs) {
           anArcPrs->projectPointOnArc(aPoint, theView, aX, anY);
         }
@@ -182,7 +171,8 @@ void PartSet_OperationCreateFeature::mouseMoved(QMouseEvent* theEvent, Handle(V3
       PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
       if (myPointSelectionMode == SM_ThirdPoint) {
         if (feature()->getKind() == SKETCH_ARC_KIND) {
-          PartSet_FeatureArcPrs* anArcPrs = dynamic_cast<PartSet_FeatureArcPrs*>(myFeaturePrs);
+          boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
+                                 boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
           if (anArcPrs) {
             anArcPrs->projectPointOnArc(aPoint, theView, aX, anY);
           }
