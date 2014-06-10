@@ -1,9 +1,9 @@
-// File:        ModuleBase_SelectorWidget.h
+// File:        ModuleBase_WidgetSelector.h
 // Created:     2 June 2014
 // Author:      Vitaly Smetannikov
 
 
-#include "ModuleBase_SelectorWidget.h"
+#include "ModuleBase_WidgetSelector.h"
 #include "ModuleBase_IWorkshop.h"
 
 #include <Events_Loop.h>
@@ -13,6 +13,11 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_AttributeReference.h>
 #include <Config_WidgetAPI.h>
+
+#include <GeomAPI_Shape.h>
+
+#include <TopoDS_Shape.hxx>
+#include <TopExp_Explorer.hxx>
 
 #include <QWidget>
 #include <QLayout>
@@ -24,7 +29,28 @@
 #include <QDockWidget>
 
 
-ModuleBase_SelectorWidget::ModuleBase_SelectorWidget(QWidget* theParent, 
+typedef QMap<QString, TopAbs_ShapeEnum> ShapeTypes;
+static ShapeTypes MyShapeTypes;
+
+TopAbs_ShapeEnum ModuleBase_WidgetSelector::shapeType(const QString& theType)
+{
+  if (MyShapeTypes.count() == 0) {
+    MyShapeTypes["face"] = TopAbs_FACE;
+    MyShapeTypes["vertex"] = TopAbs_VERTEX;
+    MyShapeTypes["wire"] = TopAbs_WIRE;
+    MyShapeTypes["edge"] = TopAbs_EDGE;
+    MyShapeTypes["shell"] = TopAbs_SHELL;
+    MyShapeTypes["solid"] = TopAbs_SOLID;
+  }
+  if (MyShapeTypes.contains(theType)) 
+    return MyShapeTypes[theType];
+  throw std::invalid_argument("Shape type defined in XML is not implemented!");
+}
+
+
+
+
+ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent, 
                                                      ModuleBase_IWorkshop* theWorkshop, 
                                                      const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData), myWorkshop(theWorkshop), myActivateOnStart(false)
@@ -60,15 +86,18 @@ ModuleBase_SelectorWidget::ModuleBase_SelectorWidget(QWidget* theParent,
   if (!aActivateTxt.isNull()) {
     myActivateOnStart = (aActivateTxt == "true");
   }
+
+  std::string aTypes = theData->getProperty("shape_types");
+  myShapeTypes = QString(aTypes.c_str()).split(',');
 }
 
 //********************************************************************
-ModuleBase_SelectorWidget::~ModuleBase_SelectorWidget()
+ModuleBase_WidgetSelector::~ModuleBase_WidgetSelector()
 {
 }
 
 //********************************************************************
-bool ModuleBase_SelectorWidget::storeValue(FeaturePtr theFeature) const
+bool ModuleBase_WidgetSelector::storeValue(FeaturePtr theFeature) const
 {
   DataPtr aData = theFeature->data();
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
@@ -83,7 +112,7 @@ bool ModuleBase_SelectorWidget::storeValue(FeaturePtr theFeature) const
 }
 
 //********************************************************************
-bool ModuleBase_SelectorWidget::restoreValue(FeaturePtr theFeature)
+bool ModuleBase_WidgetSelector::restoreValue(FeaturePtr theFeature)
 {
   DataPtr aData = theFeature->data();
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(attributeID());
@@ -97,7 +126,7 @@ bool ModuleBase_SelectorWidget::restoreValue(FeaturePtr theFeature)
 }
 
 //********************************************************************
-QList<QWidget*> ModuleBase_SelectorWidget::getControls() const
+QList<QWidget*> ModuleBase_WidgetSelector::getControls() const
 {
   QList<QWidget*> aControls;
   aControls.append(myLabel);
@@ -107,7 +136,7 @@ QList<QWidget*> ModuleBase_SelectorWidget::getControls() const
 }
 
 //********************************************************************
-void ModuleBase_SelectorWidget::onSelectionChanged()
+void ModuleBase_WidgetSelector::onSelectionChanged()
 {
   QList<FeaturePtr> aFeatures = myWorkshop->selectedFeatures();
   if (aFeatures.size() > 0) {
@@ -117,10 +146,8 @@ void ModuleBase_SelectorWidget::onSelectionChanged()
     if (mySelectedFeature && aFeature && mySelectedFeature->isSame(aFeature))
       return;
 
-    // TODO: Check that the selection corresponds to selection type
-    // TODO: Use the feature kind definition like SKETCH_KIND instead of the direct text
-    if (aFeature->getKind().compare("Sketch") != 0)
-      return;
+    // Check that the selection corresponds to selection type
+    if (!isAccepted(aFeature)) return;
 
     mySelectedFeature = aFeature;
     if (mySelectedFeature) {
@@ -135,7 +162,31 @@ void ModuleBase_SelectorWidget::onSelectionChanged()
 }
 
 //********************************************************************
-void ModuleBase_SelectorWidget::updateSelectionName()
+bool ModuleBase_WidgetSelector::isAccepted(const FeaturePtr theFeature) const
+{
+  boost::shared_ptr<GeomAPI_Shape> aShapePtr = theFeature->data()->shape();
+  if (!aShapePtr) return false;
+  TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+  if (aShape.IsNull()) return false;
+
+  TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
+  if (aShapeType == TopAbs_COMPOUND) {
+    foreach (QString aType, myShapeTypes) {
+      TopExp_Explorer aEx(aShape, shapeType(aType));
+      if (aEx.More())
+        return true;
+    }
+  } else {
+    foreach (QString aType, myShapeTypes) {
+      if (shapeType(aType) == aShapeType)
+        return true;
+    }
+  }
+  return false;
+}
+
+//********************************************************************
+void ModuleBase_WidgetSelector::updateSelectionName()
 {
   if (mySelectedFeature) {
     std::string aName;
@@ -150,7 +201,7 @@ void ModuleBase_SelectorWidget::updateSelectionName()
 }
 
 //********************************************************************
-bool ModuleBase_SelectorWidget::eventFilter(QObject* theObj, QEvent* theEvent)
+bool ModuleBase_WidgetSelector::eventFilter(QObject* theObj, QEvent* theEvent)
 {
   if (theObj == myTextLine) {
     if (theEvent->type() == QEvent::Polish) {
@@ -162,7 +213,7 @@ bool ModuleBase_SelectorWidget::eventFilter(QObject* theObj, QEvent* theEvent)
 }
 
 //********************************************************************
-void ModuleBase_SelectorWidget::enableOthersControls(bool toEnable) const
+void ModuleBase_WidgetSelector::enableOthersControls(bool toEnable) const
 {
   QWidget* aParent = myContainer->parentWidget();
   QList<QWidget*> aChldList = aParent->findChildren<QWidget*>();
@@ -173,7 +224,7 @@ void ModuleBase_SelectorWidget::enableOthersControls(bool toEnable) const
 }
 
 //********************************************************************
-void ModuleBase_SelectorWidget::activateSelection(bool toActivate)
+void ModuleBase_WidgetSelector::activateSelection(bool toActivate)
 {
   enableOthersControls(!toActivate);
   myTextLine->setEnabled(toActivate);
@@ -187,7 +238,7 @@ void ModuleBase_SelectorWidget::activateSelection(bool toActivate)
 }
 
 //********************************************************************
-void ModuleBase_SelectorWidget::raisePanel() const
+void ModuleBase_WidgetSelector::raisePanel() const
 {
   QWidget* aParent = myContainer->parentWidget();
   QWidget* aLastPanel = 0;

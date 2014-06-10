@@ -12,7 +12,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetFactory.h
 	ModuleBase_WidgetPoint2D.h
 	ModuleBase_WidgetSwitch.h
-	ModuleBase_SelectorWidget.h
+	ModuleBase_WidgetSelector.h
 	ModuleBase_IWorkshop.h
 )
 
@@ -26,7 +26,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetFactory.cpp
 	ModuleBase_WidgetPoint2D.cpp
 	ModuleBase_WidgetSwitch.cpp
-	ModuleBase_SelectorWidget.cpp
+	ModuleBase_WidgetSelector.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -54,6 +54,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src/Model
     ${CMAKE_SOURCE_DIR}/src/ModelAPI
     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
+    ${CMAKE_SOURCE_DIR}/src/GeomAPI
 )
 
 ADD_DEFINITIONS(-DMODULEBASE_EXPORTS ${CAS_DEFINITIONS})
