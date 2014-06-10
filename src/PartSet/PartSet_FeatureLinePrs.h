@@ -24,6 +24,10 @@ class Handle_V3d_View;
 class PARTSET_EXPORT PartSet_FeatureLinePrs : public PartSet_FeaturePrs
 {
 public:
+  /// Returns the feature type processed by this presentation
+  /// \return the feature kind
+  static std::string getKind();
+
   /// Constructor
   /// \param theSketch the sketch feature
   PartSet_FeatureLinePrs(FeaturePtr theSketch);
@@ -59,6 +63,19 @@ public:
                           const gp_Pnt& thePoint, Handle_V3d_View theView,
                           double& theX, double& theY);
 
+  /// Return the distance between the feature and the point
+  /// \param theFeature feature object
+  /// \param theX the horizontal coordinate of the point
+  /// \param theX the vertical coordinate of the point
+  static double distanceToPoint(FeaturePtr theFeature, double theX, double theY);
+
+  /// Find a point in the line with given coordinates
+  /// \param theFeature the line feature
+  /// \param theX the horizontal point coordinate
+  /// \param theY the vertical point coordinate
+  static boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
+                                                          double theY);
+
 protected:
   /// Initializes current feature by the given
   /// \param theSourceFeature the feature, which attributes are used to initialize the current feature
@@ -67,6 +84,14 @@ protected:
   /// Returns the feature point in the selection mode position.
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode
   virtual boost::shared_ptr<GeomDataAPI_Point2D> featurePoint(const PartSet_SelectionMode& theMode);
+
+  /// \brief Get the line point 2d coordinates.
+  /// \param theFeature the line feature
+  /// \param theAttribute the start or end attribute of the line
+  /// \param theX the horizontal coordinate
+  /// \param theY the vertical coordinate
+  static void getLinePoint(FeaturePtr theFeature, const std::string& theAttribute,
+                           double& theX, double& theY);
 };
 
 #endif

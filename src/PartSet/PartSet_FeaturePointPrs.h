@@ -21,6 +21,10 @@ class GeomDataAPI_Point2D;
 class PARTSET_EXPORT PartSet_FeaturePointPrs : public PartSet_FeaturePrs
 {
 public:
+  /// Returns the feature type processed by this presentation
+  /// \return the feature kind
+  static std::string getKind();
+
   /// Constructor
   /// \param theSketch the sketch feature
   PartSet_FeaturePointPrs(FeaturePtr theSketch);
@@ -43,6 +47,19 @@ public:
   /// \param theAttribute the feature attribute name
   /// \return next attribute selection mode
   virtual PartSet_SelectionMode getNextMode(const std::string& theAttribute) const;
+
+  /// Return the distance between the feature and the point
+  /// \param theFeature feature object
+  /// \param theX the horizontal coordinate of the point
+  /// \param theX the vertical coordinate of the point
+  static double distanceToPoint(FeaturePtr theFeature, double theX, double theY);
+
+  /// Find a point in the line with given coordinates
+  /// \param theFeature the line feature
+  /// \param theX the horizontal point coordinate
+  /// \param theY the vertical point coordinate
+  static boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
+                                                          double theY);
 
 protected:
   /// Returns the feature point in the selection mode position.

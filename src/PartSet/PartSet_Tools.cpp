@@ -17,11 +17,12 @@
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
-#include <SketchPlugin_Point.h>
-#include <SketchPlugin_Line.h>
-#include <SketchPlugin_Circle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_Constraint.h>
+
+#include <PartSet_FeatureLinePrs.h>
+#include <PartSet_FeaturePointPrs.h>
+#include <PartSet_FeatureCirclePrs.h>
 
 #include <XGUI_ViewerPrs.h>
 
@@ -173,10 +174,9 @@ void PartSet_Tools::projectPointOnLine(double theX1, double theY1, double theX2,
   }
 }
 
-FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint,
-                                                   Handle_V3d_View theView,
-                                                   FeaturePtr theSketch,
-                                                   const std::list<XGUI_ViewerPrs>& theFeatures)
+FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
+                                         FeaturePtr theSketch,
+                                         const std::list<XGUI_ViewerPrs>& theFeatures)
 {
   double aX, anY;
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(thePoint, theView);
@@ -205,20 +205,16 @@ double PartSet_Tools::distanceToPoint(FeaturePtr theFeature,
                                       double theX, double theY)
 {
   double aDelta = 0;
-  if (theFeature->getKind() != SKETCH_LINE_KIND)
-    return aDelta;
-
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
-
-  double aX, anY;
-  PartSet_Tools::projectPointOnLine(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y(), theX, theY, aX, anY);
-
-  aDelta = gp_Pnt(theX, theY, 0).Distance(gp_Pnt(aX, anY, 0));
+  std::string aKind = theFeature->getKind();
+  if (aKind == PartSet_FeatureLinePrs::getKind()) {
+    aDelta = PartSet_FeatureLinePrs::distanceToPoint(theFeature, theX, theY);
+  }
+  else if (aKind == PartSet_FeaturePointPrs::getKind()) {
+    aDelta = PartSet_FeaturePointPrs::distanceToPoint(theFeature, theX, theY);
+  }
+  else if (aKind == PartSet_FeatureCirclePrs::getKind()) {
+    aDelta = PartSet_FeatureCirclePrs::distanceToPoint(theFeature, theX, theY);
+  }
 
   return aDelta;
 }
@@ -279,18 +275,6 @@ void PartSet_Tools::createConstraint(FeaturePtr theSketch,
     aFeature->execute();
 }
 
-void PartSet_Tools::getLinePoint(FeaturePtr theFeature, const std::string& theAttribute,
-                                 double& theX, double& theY)
-{
-  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
-    return;
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
-  theX = aPoint->x();
-  theY = aPoint->y();
-}
-
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findPoint(FeaturePtr theFeature,
                                                                 double theX, double theY)
 {
@@ -298,32 +282,15 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findPoint(FeaturePtr theFe
   if (!theFeature)
     return aPoint2D;
 
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  if (theFeature->getKind() == SKETCH_LINE_KIND)
-  {
-    boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
-    if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
-      aPoint2D = aPoint;
-    else {
-      aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
-      if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
-        aPoint2D = aPoint;
-    }
+  std::string aKind = theFeature->getKind();
+  if (aKind == PartSet_FeatureLinePrs::getKind()) {
+    aPoint2D = PartSet_FeatureLinePrs::findPoint(theFeature, theX, theY);
   }
-  else if (theFeature->getKind() == SKETCH_POINT_KIND)
-  {
-    boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(POINT_ATTR_COORD));
-    if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
-      aPoint2D = aPoint;
+  else if (aKind == PartSet_FeaturePointPrs::getKind()) {
+    aPoint2D = PartSet_FeaturePointPrs::findPoint(theFeature, theX, theY);
   }
-  else if (theFeature->getKind() == SKETCH_CIRCLE_KIND)
-  {
-    boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
-    if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
-      aPoint2D = aPoint;
+  else if (aKind == PartSet_FeatureCirclePrs::getKind()) {
+    aPoint2D = PartSet_FeatureCirclePrs::findPoint(theFeature, theX, theY);
   }
 
   return aPoint2D;

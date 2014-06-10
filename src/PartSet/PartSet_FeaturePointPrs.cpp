@@ -9,6 +9,7 @@
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Point.h>
 
+#include <GeomAPI_Pnt2d.h>
 #include <GeomDataAPI_Point2D.h>
 
 #include <ModelAPI_Data.h>
@@ -23,6 +24,11 @@ using namespace std;
 PartSet_FeaturePointPrs::PartSet_FeaturePointPrs(FeaturePtr theSketch)
 : PartSet_FeaturePrs(theSketch)
 {
+}
+
+std::string PartSet_FeaturePointPrs::getKind()
+{
+  return SKETCH_POINT_KIND;
 }
 
 PartSet_SelectionMode PartSet_FeaturePointPrs::setPoint(double theX, double theY,
@@ -63,6 +69,37 @@ PartSet_SelectionMode PartSet_FeaturePointPrs::getNextMode(const std::string& th
   if (theAttribute == POINT_ATTR_COORD)
     aMode = SM_DonePoint;
   return aMode;
+}
+
+double PartSet_FeaturePointPrs::distanceToPoint(FeaturePtr theFeature,
+                                                double theX, double theY)
+{
+  double aDelta = 0;
+  if (!theFeature || theFeature->getKind() != getKind())
+    return aDelta;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(POINT_ATTR_COORD));
+
+  boost::shared_ptr<GeomAPI_Pnt2d> aPoint2d(new GeomAPI_Pnt2d(theX, theY));
+  return aPoint->pnt()->distance(aPoint2d);
+}
+
+boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeaturePointPrs::findPoint(FeaturePtr theFeature,
+                                                                          double theX, double theY)
+{
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
+  if (!theFeature || theFeature->getKind() != getKind())
+    return aPoint2D;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(POINT_ATTR_COORD));
+  if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
+    aPoint2D = aPoint;
+
+  return aPoint2D;
 }
 
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeaturePointPrs::featurePoint
