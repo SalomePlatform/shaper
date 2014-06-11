@@ -155,9 +155,6 @@ QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 
   myModelWidgets.append(aDblWgt);
 
-  // Init default values
-  if (!myOperation->isEditOperation())
-    aDblWgt->storeValue(myOperation->feature());
   return aDblWgt->getControl();
 }
 
@@ -207,8 +204,5 @@ QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
 
   myModelWidgets.append(aBoolWgt);
 
-  // Init default values
-  if (!myOperation->isEditOperation())
-    aBoolWgt->storeValue(myOperation->feature());
   return aBoolWgt->getControl();
 }

@@ -317,6 +317,16 @@ void XGUI_Workshop::onOperationStarted()
     QWidget* aContent = myPropertyPanel->contentWidget();
     qDeleteAll(aContent->children());
     aFactory.createWidget(aContent);
+
+    // Init default values
+    if (!aOperation->isEditOperation()) {
+      QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
+      QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
+      for (; anIt != aLast; anIt++) {
+        (*anIt)->storeValue(aOperation->feature());
+      }
+    }
+
     myPropertyPanel->setModelWidgets(aFactory.getModelWidgets());
     myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
   }
