@@ -35,11 +35,11 @@
 #include <cfloat>
 #include <climits>
 
-ModuleBase_WidgetFactory::ModuleBase_WidgetFactory(ModuleBase_Operation* theOperation, ModuleBase_IWorkshop* theWorkshop)
- : myOperation(theOperation), myWorkshop(theWorkshop)
+ModuleBase_WidgetFactory::ModuleBase_WidgetFactory(const std::string& theXmlRepresentation,
+                                                   ModuleBase_IWorkshop* theWorkshop)
+ : myWorkshop(theWorkshop)
 {
-  QString aXml = myOperation->getDescription()->xmlRepresentation();
-  myWidgetApi = new Config_WidgetAPI(aXml.toStdString());
+  myWidgetApi = new Config_WidgetAPI(theXmlRepresentation);
 }
 
 ModuleBase_WidgetFactory::~ModuleBase_WidgetFactory()
@@ -151,8 +151,6 @@ QWidget* ModuleBase_WidgetFactory::createContainer(const std::string& theType, Q
 QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 {
   ModuleBase_WidgetDoubleValue* aDblWgt = new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi);
-  QObject::connect(aDblWgt, SIGNAL(valuesChanged()),  myOperation, SLOT(storeCustomValue()));
-
   myModelWidgets.append(aDblWgt);
 
   return aDblWgt->getControl();
@@ -161,8 +159,6 @@ QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
 {
   ModuleBase_WidgetPoint2D* aWidget = new ModuleBase_WidgetPoint2D(theParent, myWidgetApi);
-  QObject::connect(aWidget, SIGNAL(valuesChanged()),  myOperation, SLOT(storeCustomValue()));
-
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
@@ -176,9 +172,6 @@ QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const
 QWidget* ModuleBase_WidgetFactory::selectorControl(QWidget* theParent)
 {
   ModuleBase_WidgetSelector* aSelector = new ModuleBase_WidgetSelector(theParent, myWorkshop, myWidgetApi);
-  
-  QObject::connect(aSelector, SIGNAL(valuesChanged()),  myOperation, SLOT(storeCustomValue()));
-
   myModelWidgets.append(aSelector);
   return aSelector->getControl();
 }
@@ -187,8 +180,6 @@ QWidget* ModuleBase_WidgetFactory::selectorControl(QWidget* theParent)
 QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
 {
   ModuleBase_WidgetBoolValue* aBoolWgt = new ModuleBase_WidgetBoolValue(theParent, myWidgetApi);
-  QObject::connect(aBoolWgt, SIGNAL(valuesChanged()),  myOperation, SLOT(storeCustomValue()));
-
   myModelWidgets.append(aBoolWgt);
 
   return aBoolWgt->getControl();

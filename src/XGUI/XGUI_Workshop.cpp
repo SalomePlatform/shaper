@@ -313,17 +313,21 @@ void XGUI_Workshop::onOperationStarted()
 
     showPropertyPanel();
 
-    ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aOperation, myModuleConnector);
+    QString aXmlRepr = aOperation->getDescription()->xmlRepresentation();
+    ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(), myModuleConnector);
     QWidget* aContent = myPropertyPanel->contentWidget();
     qDeleteAll(aContent->children());
     aFactory.createWidget(aContent);
 
-    // Init default values
-    if (!aOperation->isEditOperation()) {
-      QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
-      QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
-      for (; anIt != aLast; anIt++) {
-        (*anIt)->storeValue(aOperation->feature());
+    QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
+    QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
+    ModuleBase_ModelWidget* aWidget;
+    for (; anIt != aLast; anIt++) {
+      aWidget = *anIt;
+      QObject::connect(aWidget, SIGNAL(valuesChanged()),  aOperation, SLOT(storeCustomValue()));
+      // Init default values
+      if (!aOperation->isEditOperation()) {
+        aWidget->storeValue(aOperation->feature());
       }
     }
 

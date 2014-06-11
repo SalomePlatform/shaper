@@ -17,13 +17,12 @@
 class QObject;
 class QWidget;
 class Config_WidgetAPI;
-class ModuleBase_Operation;
 class ModuleBase_IWorkshop;
 
 class MODULEBASE_EXPORT ModuleBase_WidgetFactory
 {
 public:
-  ModuleBase_WidgetFactory(ModuleBase_Operation* theOperation, ModuleBase_IWorkshop* theWorkshop);
+  ModuleBase_WidgetFactory(const std::string& theXmlRepresentation, ModuleBase_IWorkshop* theWorkshop);
   virtual ~ModuleBase_WidgetFactory();
 
   void createWidget(QWidget* theParent);
@@ -47,7 +46,6 @@ protected:
 
 private:
   Config_WidgetAPI* myWidgetApi;
-  ModuleBase_Operation*   myOperation;
   ModuleBase_IWorkshop*   myWorkshop;
 
   QList<ModuleBase_ModelWidget*> myModelWidgets;
