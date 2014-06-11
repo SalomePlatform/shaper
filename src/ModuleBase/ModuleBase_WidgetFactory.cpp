@@ -161,23 +161,10 @@ QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
 {
   ModuleBase_WidgetPoint2D* aWidget = new ModuleBase_WidgetPoint2D(theParent, myWidgetApi);
-  connectWidget(aWidget, WDG_POINT_SELECTOR);
+  QObject::connect(aWidget, SIGNAL(valuesChanged()),  myOperation, SLOT(storeCustomValue()));
+
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
-}
-
-bool ModuleBase_WidgetFactory::connectWidget(QObject* theWidget,  const QString& theType)
-{
-  bool result = false;
-  if (theType == WDG_DOUBLEVALUE) {
-    result = QObject::connect(theWidget, SIGNAL(valueChanged(double)), 
-                              myOperation, SLOT(storeReal(double)));
-  }
-  if (theType == WDG_POINT_SELECTOR) {
-    result = QObject::connect(theWidget, SIGNAL(valuesChanged()),
-                              myOperation, SLOT(storeCustomValue()));
-  }
-  return result;
 }
 
 QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const

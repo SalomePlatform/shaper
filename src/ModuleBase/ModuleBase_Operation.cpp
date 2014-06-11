@@ -47,22 +47,6 @@ bool ModuleBase_Operation::isNestedOperationsEnabled() const
   return true;
 }
 
-void ModuleBase_Operation::storeReal(double theValue)
-{
-  if(!myFeature){
-    #ifdef _DEBUG
-    qDebug() << "ModuleBase_Operation::storeReal: " <<
-        "trying to store value without opening a transaction.";
-    #endif
-    return;
-  }
-  QString anId = sender()->objectName();
-  boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(anId.toStdString());
-  aReal->setValue(theValue);
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
-}
-
 void ModuleBase_Operation::storeCustomValue()
 {
   if(!myFeature){

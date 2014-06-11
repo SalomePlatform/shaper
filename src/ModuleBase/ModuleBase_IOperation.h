@@ -106,9 +106,6 @@ public slots:
   void setRunning(bool theState);
 
   // Data model methods.
-  /// Stores a real value in model.
-  /// \param theValue - to store
-  virtual void storeReal(double theValue) = 0;
   /// Stores a custom value in model.
   virtual void storeCustomValue() = 0;
 

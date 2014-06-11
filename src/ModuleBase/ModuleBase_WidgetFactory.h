@@ -43,7 +43,6 @@ protected:
   QWidget* selectorControl(QWidget* theParent);
   QWidget* booleanControl(QWidget* theParent);
 
-  bool connectWidget(QObject*, const QString&);
   QString qs(const std::string& theStdString) const;
 
 private:

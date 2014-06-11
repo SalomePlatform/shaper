@@ -63,9 +63,6 @@ public:
   virtual bool isNestedOperationsEnabled() const;
 
   // Data model methods.
-  /// Stores a real value in model.
-  /// \param theValue - to store
-  void storeReal(double theValue);
   /// Stores a custom value in model.
   void storeCustomValue();
 
