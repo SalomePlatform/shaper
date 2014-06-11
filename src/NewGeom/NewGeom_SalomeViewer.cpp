@@ -4,8 +4,13 @@
 
 #include <OCCViewer_ViewWindow.h>
 #include <OCCViewer_ViewPort3d.h>
+#include <OCCViewer_ViewFrame.h>
 
 #include <SUIT_ViewManager.h>
+
+#include <QMouseEvent>
+#include <QContextMenuEvent>
+
 
 NewGeom_SalomeViewer::NewGeom_SalomeViewer(QObject* theParent)
 : XGUI_SalomeViewer(theParent), mySelector(0)
@@ -70,6 +75,9 @@ void NewGeom_SalomeViewer::setSelector(NewGeom_OCCSelector* theSel)
           this, SLOT(onKeyPress(SUIT_ViewWindow*, QKeyEvent*)));
   connect(aMgr, SIGNAL(keyRelease(SUIT_ViewWindow*, QKeyEvent*)),
           this, SLOT(onKeyRelease(SUIT_ViewWindow*, QKeyEvent*)));
+
+  connect(aViewer, SIGNAL(selectionChanged()),
+          this, SIGNAL(selectionChanged()));
 }
 
 //**********************************************
@@ -82,6 +90,11 @@ void NewGeom_SalomeViewer::onMousePress(SUIT_ViewWindow*, QMouseEvent* theEvent)
 void NewGeom_SalomeViewer::onMouseRelease(SUIT_ViewWindow*, QMouseEvent* theEvent)
 {
   emit mouseRelease(theEvent);
+  //if ((theEvent->button() == Qt::RightButton) && 
+  //  (theEvent->modifiers() == Qt::NoModifier)) {
+  //  QContextMenuEvent aEvent(QContextMenuEvent::Mouse, theEvent->pos(), theEvent->globalPos());
+  //  emit contextMenuRequested(&aEvent);
+  //}
 }
 
 //**********************************************
@@ -130,4 +143,14 @@ void NewGeom_SalomeViewer::enableMultiselection(bool isEnable)
 bool NewGeom_SalomeViewer::isMultiSelectionEnabled() const
 {
   return mySelector->viewer()->isMultiSelectionEnabled();
+}
+
+//**********************************************
+void NewGeom_SalomeViewer::fitAll()
+{
+  SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
+  OCCViewer_ViewFrame* aVFrame = dynamic_cast<OCCViewer_ViewFrame*>(aMgr->getActiveView());
+  if (aVFrame) {
+    aVFrame->onFitAll();
+  }
 }

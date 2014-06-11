@@ -57,5 +57,6 @@
      <file>pictures/delete.png</file>
      <file>pictures/rename_edit.png</file>
      <file>pictures/eye_pencil.png</file>
+     <file>pictures/eye_pencil_closed.png</file>
  </qresource>
  </RCC>

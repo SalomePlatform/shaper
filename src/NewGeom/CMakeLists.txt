@@ -35,6 +35,7 @@ SET(PROJECT_LIBRARIES
 	${LightApp}
 	${CAM}
 	${OCCViewer}
+	${qtx}
 )
 
 ADD_DEFINITIONS( -DNewGeom_EXPORTS ${CAS_DEFINITIONS} )

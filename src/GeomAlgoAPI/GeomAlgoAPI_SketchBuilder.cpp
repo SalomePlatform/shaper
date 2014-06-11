@@ -29,6 +29,12 @@
 #include <TopoDS_Wire.hxx>
 
 #include <Precision.hxx>
+
+#ifndef DBL_MAX
+#define DBL_MAX 1.7976931348623158e+308 
+#endif
+
+
 const double tolerance = Precision::Confusion();
 
 /// \brief Search first vertex - the vertex with lowest x coordinate, which is used in 2 edges at least

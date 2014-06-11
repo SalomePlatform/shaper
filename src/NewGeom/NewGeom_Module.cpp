@@ -6,6 +6,7 @@
 
 #include <XGUI_Workshop.h>
 #include <XGUI_PropertyPanel.h>
+#include <XGUI_ContextMenuMgr.h>
 
 #include <LightApp_Application.h>
 #include <LightApp_SelectionMgr.h>
@@ -16,6 +17,7 @@
 #include <SUIT_Desktop.h>
 #include <SUIT_ViewManager.h>
 
+#include <QtxPopupMgr.h>
 #include <QtxActionMenuMgr.h>
 
 #include <QDockWidget>
@@ -72,7 +74,6 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
   if (isDone) {
     setMenuShown( true );
     setToolShown( true );
-    myWorkshop->propertyPanel()->hide();
 
     if (!mySelector) {
       ViewManagerList OCCViewManagers;
@@ -81,8 +82,20 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
         mySelector = createSelector(OCCViewManagers.first());
       }
     }
+    myWorkshop->propertyPanel()->hide();
+    QtxPopupMgr* aMgr = popupMgr(); // Create popup manager
+    action(myEraseAll)->setEnabled(false);
   }
   return isDone;
+}
+
+//******************************************************
+bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
+{
+  setMenuShown( false );
+  setToolShown( false );
+  //myWorkshop->contextMenuMgr()->disconnectViewer();
+  return LightApp_Module::deactivateModule(theStudy);
 }
 
 //******************************************************
@@ -110,14 +123,6 @@ NewGeom_OCCSelector* NewGeom_Module::createSelector(SUIT_ViewManager* theMgr)
     return aSelector;
   }
   return 0;
-}
-
-//******************************************************
-bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
-{
-  setMenuShown( false );
-  setToolShown( false );
-  return LightApp_Module::deactivateModule(theStudy);
 }
 
 //******************************************************
@@ -241,4 +246,11 @@ void NewGeom_Module::selectionChanged()
 {
   LightApp_Module::selectionChanged();
   myWorkshop->salomeViewerSelectionChanged();
+}
+
+//******************************************************
+void NewGeom_Module::contextMenuPopup(const QString& theClient, QMenu* theMenu, QString& theTitle)
+{
+  myWorkshop->contextMenuMgr()->addViewerItems(theMenu);
+  LightApp_Module::contextMenuPopup(theClient, theMenu, theTitle);
 }

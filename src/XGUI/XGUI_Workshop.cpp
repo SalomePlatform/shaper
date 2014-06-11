@@ -450,10 +450,10 @@ void XGUI_Workshop::onNew()
   if (!isSalomeMode()) {
     myMainWindow->showPythonConsole();
     QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
-    myContextMenuMgr->connectViewer();
     aWnd->showMaximized();
     updateCommandStatus();
   }
+  myContextMenuMgr->connectViewer();
   QApplication::restoreOverrideCursor();
 }
 
