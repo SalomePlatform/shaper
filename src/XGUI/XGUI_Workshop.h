@@ -96,6 +96,10 @@ public:
 
   XGUI_ViewerProxy* viewer() const { return myViewerProxy; }
 
+  /// Returns the module connectory
+  /// \returns the instance of connector
+  XGUI_ModuleConnector* moduleConnector() const { return myModuleConnector; }
+
   //! Returns icon name according to feature Id
   static QString featureIcon(const std::string& theId);
 

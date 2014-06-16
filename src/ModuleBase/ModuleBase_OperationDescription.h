@@ -13,8 +13,11 @@
 
 #include <QObject>
 #include <QString>
+#include <QList>
 
 #include <memory>
+
+class ModuleBase_ModelWidget;
 
 /*!
  * \class ModuleBase_OperationDescription
@@ -35,11 +38,7 @@ public:
 
   /// Returns XML representation of the operation's widget.
   /// \return XML QString
-  const QString& xmlRepresentation() const;
-
-  /// Sets XML representation of the operation's widget.
-  /// \param xmlRepr - XML QString
-  void setXmlRepresentation(const QString& xmlRepr);
+  //const QString& xmlRepresentation() const;
 
   /// Returns a short description of operation (will be
   /// inserted in title of property panel)
@@ -49,11 +48,25 @@ public:
   /// inserted in title of property panel)
   void setDescription(const QString& theDescription);
 
+  /// Sets a list of model widgets, according to the operation feature xml definition
+  /// \param theWidgets a list of widgets
+  void setModelWidgets(const std::string& theXmlRepresentation,
+                       const QList<ModuleBase_ModelWidget*>& theWidgets);
+
+  /// Sets a list of model widgets, according to the operation feature xml definition
+  /// \param theWidgets a list of widgets
+  const QList<ModuleBase_ModelWidget*>& modelWidgets() const;
+
+  /// Returns true if there are no model widgets
+  /// \return the boolean value
+  bool hasXmlRepresentation() const;
+
 private:
   //!< Next fields could be extracted into a subclass;
   QString myOperationId; /// the operation identifier
-  QString myXmlRepr; /// the XML representation of the operation's widget
   QString myDescription; /// the short description of the opertaion
+  std::string myXmlRepresentation; /// the xml definition
+  QList<ModuleBase_ModelWidget*> myWidgets; /// the list of operation widgets
 };
 
 #endif //ModuleBase_OperationDescription_H

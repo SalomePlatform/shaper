@@ -7,6 +7,7 @@
 
 #include "ModuleBase_IOperation.h"
 #include "ModuleBase_OperationDescription.h"
+#include "ModuleBase_ModelWidget.h"
 
 #include <ModelAPI_Document.h>
 #include <ModelAPI_PluginManager.h>
@@ -39,6 +40,16 @@ bool ModuleBase_IOperation::canBeCommitted() const
 bool ModuleBase_IOperation::isGranted(ModuleBase_IOperation* /*theOperation*/) const
 {
   return false;
+}
+
+void ModuleBase_IOperation::setModelWidgets(const std::string& theXmlRepresentation,
+                                            QList<ModuleBase_ModelWidget*> theWidgets)
+{
+  QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast = theWidgets.end();
+  for (; anIt != aLast; anIt++) {
+    QObject::connect(*anIt, SIGNAL(valuesChanged()),  this, SLOT(storeCustomValue()));
+  }
+  getDescription()->setModelWidgets(theXmlRepresentation, theWidgets);
 }
 
 boost::shared_ptr<ModelAPI_Document> ModuleBase_IOperation::document() const

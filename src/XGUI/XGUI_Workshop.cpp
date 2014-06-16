@@ -281,14 +281,14 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   //An operation passed by message. Start it, process and commit.
   const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
-    // Clear previous content
-    myPropertyPanel->cleanContent();
+    // TODO: Clear previous content
+    //myPropertyPanel->cleanContent();
     ModuleBase_Operation* anOperation =
         (ModuleBase_Operation*)(aPartSetMsg->pointer());
 
     if (myOperationMgr->startOperation(anOperation)) {
       myPropertyPanel->updateContentWidget(anOperation->feature());
-      if (anOperation->getDescription()->xmlRepresentation().isEmpty()) {
+      if (!anOperation->getDescription()->hasXmlRepresentation()) {
         anOperation->commit();
         updateCommandStatus();
       }
@@ -308,30 +308,20 @@ void XGUI_Workshop::onOperationStarted()
 {
   ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
 
-  if(!aOperation->getDescription()->xmlRepresentation().isEmpty()) { //!< No need for property panel
+  if(aOperation->getDescription()->hasXmlRepresentation()) { //!< No need for property panel
     connectWithOperation(aOperation);
 
     showPropertyPanel();
-
+    // TODO: Clear previous content
+    /*
     QString aXmlRepr = aOperation->getDescription()->xmlRepresentation();
     ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(), myModuleConnector);
     QWidget* aContent = myPropertyPanel->contentWidget();
     qDeleteAll(aContent->children());
     aFactory.createWidget(aContent);
-
-    QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
-    QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
-    ModuleBase_ModelWidget* aWidget;
-    for (; anIt != aLast; anIt++) {
-      aWidget = *anIt;
-      QObject::connect(aWidget, SIGNAL(valuesChanged()),  aOperation, SLOT(storeCustomValue()));
-      // Init default values
-      if (!aOperation->isEditOperation()) {
-        aWidget->storeValue(aOperation->feature());
-      }
-    }
-
     myPropertyPanel->setModelWidgets(aFactory.getModelWidgets());
+    */
+    myPropertyPanel->setModelWidgets(aOperation->getDescription()->modelWidgets());
     myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
   }
   updateCommandStatus();
@@ -343,6 +333,7 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   //!< No need for property panel
   updateCommandStatus();
   hidePropertyPanel();
+  //myPropertyPanel->cleanContent();
 }
 
 /*

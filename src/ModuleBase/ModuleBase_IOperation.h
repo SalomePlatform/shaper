@@ -13,11 +13,13 @@
 
 #include <QObject>
 #include <QString>
+#include <QList>
 
 #include <boost/shared_ptr.hpp>
 
 class ModelAPI_Document;
 class ModuleBase_OperationDescription;
+class ModuleBase_ModelWidget;
 
 /*!
  \class ModuleBase_IOperation
@@ -67,6 +69,12 @@ public:
   /// In this case they will always start, no matter what operation is running.
   /// \param theOperation the previous running operation
   virtual bool isGranted(ModuleBase_IOperation* theOperation) const;
+
+  /// Sets a list of model widgets, according to the operation feature xml definition
+  /// \param theXmlRepresentation an xml feature definition
+  /// \param theWidgets a list of widgets
+  void setModelWidgets(const std::string& theXmlRepresentation,
+                       QList<ModuleBase_ModelWidget*> theWidgets);
 
 signals:
   void started(); /// the operation is started

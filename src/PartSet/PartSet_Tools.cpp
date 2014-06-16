@@ -179,24 +179,25 @@ boost::shared_ptr<PartSet_FeaturePrs> PartSet_Tools::createFeaturePrs(const std:
                                                                       FeaturePtr theSketch,
                                                                       FeaturePtr theFeature)
 {
-  PartSet_FeaturePrs* aFeaturePrs;
+  boost::shared_ptr<PartSet_FeaturePrs> aFeaturePrs;
 
   if (theKind == PartSet_FeaturePointPrs::getKind()) {
-    aFeaturePrs = new PartSet_FeaturePointPrs(theSketch);
+    aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeaturePointPrs(theSketch));
   }
   else if (theKind == PartSet_FeatureLinePrs::getKind()) {
-    aFeaturePrs = new PartSet_FeatureLinePrs(theSketch);
+    aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeatureLinePrs(theSketch));
   }
   else if (theKind == PartSet_FeatureCirclePrs::getKind()) {
-    aFeaturePrs = new PartSet_FeatureCirclePrs(theSketch);
+    aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeatureCirclePrs(theSketch));
   }
   else if (theKind == PartSet_FeatureArcPrs::getKind()) {
-    aFeaturePrs = new PartSet_FeatureArcPrs(theSketch);
+    aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeatureArcPrs(theSketch));
   }
-  if (theFeature)
+
+  if (theFeature && aFeaturePrs)
     aFeaturePrs->init(theFeature, FeaturePtr());
 
-  return boost::shared_ptr<PartSet_FeaturePrs>(aFeaturePrs);
+  return aFeaturePrs;
 }
 
 FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,

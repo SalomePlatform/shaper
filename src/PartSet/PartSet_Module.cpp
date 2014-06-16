@@ -5,6 +5,7 @@
 #include <PartSet_OperationConstraint.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
+#include <ModuleBase_WidgetFactory.h>
 #include <PartSet_Listener.h>
 #include <PartSet_TestOCC.h>
 #include <PartSet_Presentation.h>
@@ -23,6 +24,7 @@
 #include <XGUI_ViewerProxy.h>
 #include <XGUI_ContextMenuMgr.h>
 #include <XGUI_PropertyPanel.h>
+#include <XGUI_ModuleConnector.h>
 #include <XGUI_Tools.h>
 
 #include <SketchPlugin_Line.h>
@@ -231,7 +233,7 @@ void PartSet_Module::onLaunchOperation(std::string theName, FeaturePtr theFeatur
   if (aPreviewOp)
   {
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-      // refill the features list with avoiding of the features, obtained only by vertex shape (TODO)
+    // refill the features list with avoiding of the features, obtained only by vertex shape (TODO)
     std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected(TopAbs_VERTEX);
     std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted(TopAbs_VERTEX);
     aPreviewOp->init(theFeature, aSelected, aHighlighted);
@@ -333,7 +335,7 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
     anOperation = new ModuleBase_Operation(theCmdId.c_str(), this);
   }
 
-  // set operation xml description
+  // set operation description and list of widgets corresponding to the feature xml definition
   std::string aFeatureKind = theFeatureKind.empty() ? theCmdId : theFeatureKind;
 
   std::string aPluginFileName = featureFile(aFeatureKind);
@@ -342,8 +344,16 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   std::string aXmlCfg = aWdgReader.featureWidgetCfg(aFeatureKind);
   std::string aDescription = aWdgReader.featureDescription(aFeatureKind);
 
-  anOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
+  QString aXmlRepr = QString::fromStdString(aXmlCfg);
+  ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(),
+                                                               myWorkshop->moduleConnector());
+  QWidget* aContent = myWorkshop->propertyPanel()->contentWidget();
+  qDeleteAll(aContent->children());
+  aFactory.createWidget(aContent);
+
   anOperation->getDescription()->setDescription(QString::fromStdString(aDescription));
+
+  anOperation->setModelWidgets(aXmlRepr.toStdString(), aFactory.getModelWidgets());
 
   // connect the operation
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
