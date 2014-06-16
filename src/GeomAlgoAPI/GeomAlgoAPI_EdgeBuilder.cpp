@@ -69,7 +69,11 @@ boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
     anEdgeBuilder = BRepBuilderAPI_MakeEdge(aCircle, aStart, anEnd);
 
   boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
-  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
-  aRes->setImpl(new TopoDS_Shape(anEdge));
+  anEdgeBuilder.Build();
+
+  if (anEdgeBuilder.IsDone())
+    aRes->setImpl(new TopoDS_Shape(anEdgeBuilder.Edge()));
+  else
+    aRes = boost::shared_ptr<GeomAPI_Shape>();
   return aRes;
 }

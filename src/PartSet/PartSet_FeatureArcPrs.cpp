@@ -110,7 +110,7 @@ void PartSet_FeatureArcPrs::move(double theDeltaX, double theDeltaY)
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint3 =
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_END));
-  aPoint1->setValue(aPoint3->x() + theDeltaX, aPoint3->y() + theDeltaY);
+  aPoint3->setValue(aPoint3->x() + theDeltaX, aPoint3->y() + theDeltaY);
 }
 
 double PartSet_FeatureArcPrs::distanceToPoint(FeaturePtr theFeature,

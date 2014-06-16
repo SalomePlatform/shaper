@@ -61,7 +61,8 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Arc::preview()
 
       boost::shared_ptr<GeomAPI_Shape> aCircleShape = 
                  GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStartPoint, aEndPoint, aNormal);
-      aShapes.push_back(aCircleShape);
+      if (aCircleShape)
+        aShapes.push_back(aCircleShape);
     }
     boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
     setPreview(aCompound);
