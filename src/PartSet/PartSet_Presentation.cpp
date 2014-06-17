@@ -7,6 +7,7 @@
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_AttributeDouble.h>
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
@@ -101,6 +102,10 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createSketchConstraintLength
   if (!aFeature || aFeature->getKind() != SKETCH_LINE_KIND)
     return thePrevPrs;
 
+  boost::shared_ptr<ModelAPI_AttributeDouble> aFlyoutAttr = 
+          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
+  double aFlyout = aFlyoutAttr->value();
+
   aData = aFeature->data();
   if (!aData->isValid())
     return thePrevPrs;
@@ -134,7 +139,7 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createSketchConstraintLength
       aLenDim->SetDisplayUnits (aDimDlg->GetUnits ());
     }*/
     aLenDim->SetDimensionAspect (anAspect);
-    aLenDim->SetFlyout(12);
+    aLenDim->SetFlyout(aFlyout);
 
     anAIS = aLenDim;
   }

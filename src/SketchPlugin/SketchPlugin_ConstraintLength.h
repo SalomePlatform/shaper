@@ -18,7 +18,8 @@ const std::string SKETCH_CONSTRAINT_LENGTH_KIND("SketchConstraintLength");
  *  \brief Feature for creation of a new constraint which defines a length of a line segment
  *
  *  These constraint has two attributes:
- *  CONSTRAINT_ATTR_VALUE (length) and CONSTRAINT_ATTR_ENTITY_A (segment)
+ *  CONSTRAINT_ATTR_VALUE (length) and CONSTRAINT_ATTR_ENTITY_A (segment),
+ *  CONSTRAINT_ATTR_FLYOUT_VALUE (distance of a constraints handle)
  */
 class SketchPlugin_ConstraintLength: public SketchPlugin_Constraint
 {

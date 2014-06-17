@@ -50,32 +50,6 @@ public:
   static void convertTo3D(const double theX, const double theY, FeaturePtr theSketch,
                           gp_Pnt& thePoint);
 
-  /// Returns the point of intersection of the two lines, the first is (v0, v1), the second is (v2, v3),
-  /// where vi - {xi,yi}. If the v0 is on the second line, the result is a projection of the v1 to this line
-  /// \param theX0 the horizontal coordinate of 0 point
-  /// \param theY0 the vertical coordinate of 0 point
-  /// \param theX1 the horizontal coordinate of 1 point
-  /// \param theY1 the vertical coordinate of 1 point
-  /// \param theX2 the horizontal coordinate of 2 point
-  /// \param theY2 the vertical coordinate of 2 point
-  /// \param theX3 the horizontal coordinate of 3 point
-  /// \param theY3 the vertical coordinate of 3 point
-  /// \param theX the output horizontal coordinate of the intersection point
-  /// \param theY the outpup vertical coordinate of the intersection point
-  static void intersectLines(double theX0, double theY0, double theX1, double theY1,
-                             double theX2, double theY2, double theX3, double theY3,
-                             double& theX, double& theY);
-
-  /// Returns the coordinates of projection of the point to the line
-  /// \param thePointX the projected point horizontal coordinate
-  /// \param thePointY the projected point vertictal coordinate
-  /// \param theX1 the horizontal coordinate of the first line point
-  /// \param theY1 the vertical coordinate of the first line point
-  /// \param theX2 the horizontal coordinate of the second line point
-  /// \param theY2 the vertical coordinate of the second line point
-  static void projectPointOnLine(double theX1, double theY1, double theX2, double theY2,
-                                 double thePointX, double thePointY, double& theX, double& theY);
-
   /// Creates the feature presentation
   /// \param theKind a feature kind
   /// \param theSketch the sketch of the feature

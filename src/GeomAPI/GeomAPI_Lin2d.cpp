@@ -45,7 +45,7 @@ const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::intersect(
   IntAna2d_AnaIntersection anInter(*MY_LIN2D, theLine->impl<gp_Lin2d>());
   if (!anInter.IsDone() || anInter.IsEmpty())
     return boost::shared_ptr<GeomAPI_Pnt2d>();
-  const gp_Pnt2d& aResult = anInter.Point(0).Value();
+  const gp_Pnt2d& aResult = anInter.Point(1).Value();
   return boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aResult.X(), aResult.Y()));
 }
 
@@ -56,7 +56,7 @@ const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::project(const boost::share
   const gp_XY& aPnt = thePoint->impl<gp_Pnt2d>().XY();
   double aParam = aDir.Dot(aPnt - aLoc);
 
-  gp_XY aResult = aPnt + aDir * aParam;
+  gp_XY aResult = aLoc + aDir * aParam;
   return boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aResult.X(), aResult.Y()));
 }
 

@@ -25,6 +25,8 @@
 #include <PartSet_FeatureCirclePrs.h>
 #include <PartSet_FeatureArcPrs.h>
 
+#include <PartSet_FeatureLengthPrs.h>
+
 #include <XGUI_ViewerPrs.h>
 
 #include <V3d_View.hxx>
@@ -134,47 +136,6 @@ void PartSet_Tools::convertTo3D(const double theX, const double theY,
   thePoint = gp_Pnt(aPoint->x(), aPoint->y(), aPoint->z());
 }
 
-void PartSet_Tools::intersectLines(double theX0, double theY0, double theX1, double theY1,
-                                   double theX2, double theY2, double theX3, double theY3,
-                                   double& theX, double& theY)
-{
-  double aV1 = theX1 - theX0, aV2 = theY1 - theY0;
-  double aW1 = theX3 - theX2, aW2 = theY3 - theY2;
-
-  double aT2 = 0;
-  if (aV1  != 0 && aV2 != 0)
-    aT2 = (( theY2 - theY0 )/aV2 - ( theX2 - theX0 )/aV1) / ( aW1/aV1 - aW2/aV2 );
-  else
-    aT2 = DBL_MAX;
-
-  theX  = theX2 + aT2*aW1;
-  theY = theY2 + aT2*aW2;
-
-  // the coordinates of two lines are on the common line
-  //It is not possible to use Precision::Confusion(), because it is e-0.8, but V is sometimes e-6
-  Standard_Real aPrec = PRECISION_TOLERANCE;
-  if (fabs(theX - theX0) < aPrec && fabs(theY - theY0) < aPrec) {
-    projectPointOnLine(theX2, theY2, theX3, theY3, theX1, theY1, theX, theY);    
-  }
-}
-
-void PartSet_Tools::projectPointOnLine(double theX1, double theY1, double theX2, double theY2,
-                                       double thePointX, double thePointY, double& theX, double& theY)
-{
-  theX = theY = 0;
-
-  Handle(Geom_Line) aLine = new Geom_Line(gp_Pnt(theX1, theY1, 0),
-                                     gp_Dir(gp_Vec(gp_Pnt(theX1, theY1, 0), gp_Pnt(theX2, theY2, 0))));
-  GeomAPI_ProjectPointOnCurve aProj(gp_Pnt(thePointX, thePointY, 0), aLine);
-
-  Standard_Integer aNbPoint = aProj.NbPoints();
-  if (aNbPoint > 0) {
-    gp_Pnt aPoint = aProj.Point(1);
-    theX = aPoint.X();
-    theY = aPoint.Y();
-  }
-}
-
 boost::shared_ptr<PartSet_FeaturePrs> PartSet_Tools::createFeaturePrs(const std::string& theKind,
                                                                       FeaturePtr theSketch,
                                                                       FeaturePtr theFeature)
@@ -192,6 +153,9 @@ boost::shared_ptr<PartSet_FeaturePrs> PartSet_Tools::createFeaturePrs(const std:
   }
   else if (theKind == PartSet_FeatureArcPrs::getKind()) {
     aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeatureArcPrs(theSketch));
+  }
+  else if (theKind == PartSet_FeatureLengthPrs::getKind()) {
+    aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeatureLengthPrs(theSketch));
   }
 
   if (theFeature && aFeaturePrs)

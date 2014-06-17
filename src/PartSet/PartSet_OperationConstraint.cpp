@@ -79,23 +79,7 @@ void PartSet_OperationConstraint::mouseReleased(QMouseEvent* theEvent, Handle(V3
                                                 const std::list<XGUI_ViewerPrs>& theSelected,
                                                 const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
-  /*if (myPointSelectionMode == SM_DonePoint)
-  {
-    // if the point creation is finished, the next mouse release should commit the modification
-    // the next release can happens by double click in the viewer
-    commit();
-    restartOperation(PartSet_OperationConstraint::Type(), feature());
-    return;
-  }
-
-  double aX, anY;
-
-  bool isFoundPoint = false;
-  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
-*/
   if (theSelected.empty()) {
-    //PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-    //isFoundPoint = true;
   }
   else {
     XGUI_ViewerPrs aPrs = theSelected.front();
@@ -104,100 +88,11 @@ void PartSet_OperationConstraint::mouseReleased(QMouseEvent* theEvent, Handle(V3
     setFeature(aFeature);
     setValue(120);
     flushUpdated();
-
-    /*const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull()) // the point is selected
-    {
-      if (aShape.ShapeType() == TopAbs_VERTEX) {
-        const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
-        if (!aVertex.IsNull()) {
-          aPoint = BRep_Tool::Pnt(aVertex);
-          PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-          isFoundPoint = true;
-
-          setConstraints(aX, anY);
-        }
-      }
-      else if (aShape.ShapeType() == TopAbs_EDGE) // the line is selected
-      {
-        FeaturePtr aFeature = aPrs.feature();
-        if (aFeature) {
-          double X0, X1, X2, X3;
-          double Y0, Y1, Y2, Y3;
-          PartSet_Tools::getLinePoint(aFeature, LINE_ATTR_START, X2, Y2);
-          PartSet_Tools::getLinePoint(aFeature, LINE_ATTR_END, X3, Y3);
-          PartSet_Tools::convertTo2D(aPoint, sketch(), theView, X1, Y1);
-
-          switch (myPointSelectionMode) {
-            case SM_FirstPoint:
-              PartSet_Tools::projectPointOnLine(X2, Y2, X3, Y3, X1, Y1, aX, anY);
-            break;
-            case SM_SecondPoint: {
-              PartSet_Tools::getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
-              PartSet_Tools::intersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, aX, anY);
-            }
-            break;
-            default:
-            break;
-          }
-          isFoundPoint = true;
-        }
-      }
-    }*/
   }
-
-  /*switch (myPointSelectionMode)
-  {
-    case SM_FirstPoint: {
-      setLinePoint(feature(), aX, anY, LINE_ATTR_START);
-      setLinePoint(feature(), aX, anY, LINE_ATTR_END);
-      flushUpdated();
-
-      //setPointSelectionMode(SM_SecondPoint);
-    }
-    break;
-    case SM_SecondPoint: {
-      setLinePoint(feature(), aX, anY, LINE_ATTR_END);
-      flushUpdated();
-
-      //setPointSelectionMode(SM_DonePoint);
-   }
-    break;
-    default:
-      break;
-  }*/
 }
 
 void PartSet_OperationConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
-/*  switch (myPointSelectionMode)
-  {
-    case SM_FirstPoint: {
-      double aX, anY;
-      gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
-      PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-      setLinePoint(feature(), aX, anY, LINE_ATTR_START);
-      setLinePoint(feature(), aX, anY, LINE_ATTR_END);
-      flushUpdated();
-      emit focusActivated(LINE_ATTR_START);
-    }
-    break;
-    case SM_SecondPoint:
-    {
-      gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
-      setLinePoint(aPoint, theView, LINE_ATTR_END);
-      flushUpdated();
-      emit focusActivated(LINE_ATTR_END);
-    }
-    break;
-    case SM_DonePoint:
-    {
-      commit();
-      restartOperation(PartSet_OperationConstraint::Type(), feature());
-    }
-    default:
-      break;
-  }*/
 }
 
 void PartSet_OperationConstraint::startOperation()

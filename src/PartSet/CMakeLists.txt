@@ -8,11 +8,13 @@ SET(PROJECT_HEADERS
 	PartSet_FeatureArcPrs.h
 	PartSet_FeatureCirclePrs.h
 	PartSet_FeaturePrs.h
+	PartSet_FeatureLengthPrs.h
 	PartSet_FeatureLinePrs.h
 	PartSet_FeaturePointPrs.h
 	PartSet_Listener.h
 	PartSet_Module.h
 	PartSet_OperationConstraint.h
+	PartSet_OperationCreateConstraint.h
 	PartSet_OperationCreateFeature.h
 	PartSet_OperationEditFeature.h
 	PartSet_OperationSketchBase.h
@@ -26,11 +28,13 @@ SET(PROJECT_SOURCES
 	PartSet_FeaturePrs.cpp
 	PartSet_FeatureArcPrs.cpp
 	PartSet_FeatureCirclePrs.cpp
+	PartSet_FeatureLengthPrs.cpp
 	PartSet_FeatureLinePrs.cpp
 	PartSet_FeaturePointPrs.cpp
 	PartSet_Listener.cpp
 	PartSet_Module.cpp
 	PartSet_OperationConstraint.cpp
+	PartSet_OperationCreateConstraint.cpp
 	PartSet_OperationCreateFeature.cpp
 	PartSet_OperationEditFeature.cpp
 	PartSet_OperationSketchBase.cpp

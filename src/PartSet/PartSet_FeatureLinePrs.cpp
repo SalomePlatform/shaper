@@ -12,6 +12,8 @@
 #include <SketchPlugin_Constraint.h>
 
 #include <GeomDataAPI_Point2D.h>
+#include <GeomAPI_Lin2d.h>
+#include <GeomAPI_Pnt2d.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -122,20 +124,36 @@ void PartSet_FeatureLinePrs::projectPointOnLine(FeaturePtr theFeature,
                                                 const gp_Pnt& thePoint, Handle(V3d_View) theView,
                                                 double& theX, double& theY)
 {
-  if (theFeature) {
+  if (theFeature && theFeature->getKind() == getKind()) {
     double X0, X1, X2, X3;
     double Y0, Y1, Y2, Y3;
     getLinePoint(theFeature, LINE_ATTR_START, X2, Y2);
     getLinePoint(theFeature, LINE_ATTR_END, X3, Y3);
-    PartSet_Tools::convertTo2D(thePoint, sketch(), theView, X1, Y1);
 
+    PartSet_Tools::convertTo2D(thePoint, sketch(), theView, X1, Y1);
+    boost::shared_ptr<GeomAPI_Pnt2d> aPoint = boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(X1, Y1));
+    boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin = boost::shared_ptr<GeomAPI_Lin2d>
+                                                         (new GeomAPI_Lin2d(X2, Y2, X3, Y3));
     switch (theMode) {
-      case SM_FirstPoint:
-        PartSet_Tools::projectPointOnLine(X2, Y2, X3, Y3, X1, Y1, theX, theY);
+      case SM_FirstPoint: {
+        boost::shared_ptr<GeomAPI_Pnt2d> aResult = aFeatureLin->project(aPoint);
+        theX = aResult->x();
+        theY = aResult->y();
+      }
       break;
       case SM_SecondPoint: {
         getLinePoint(feature(), LINE_ATTR_START, X0, Y0);
-        PartSet_Tools::intersectLines(X0, Y0, X1, Y1, X2, Y2, X3, Y3, theX, theY);
+        boost::shared_ptr<GeomAPI_Lin2d> aCurrentLin = boost::shared_ptr<GeomAPI_Lin2d>
+                                                           (new GeomAPI_Lin2d(X0, Y0, X1, Y1));
+        boost::shared_ptr<GeomAPI_Pnt2d> aResult = aFeatureLin->intersect(aCurrentLin);
+        boost::shared_ptr<GeomAPI_Pnt2d> aPoint0 = boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(X0, Y0));
+        if (aResult->distance(aPoint0) < Precision::Confusion()) { // the start point is nearest to the line
+          // if the first point of a line belongs to the given line
+          // we need to project the second point on the same line
+          aResult = aFeatureLin->project(aPoint);
+        }
+        theX = aResult->x();
+        theY = aResult->y();
       }
       break;
       default:
@@ -157,9 +175,16 @@ double PartSet_FeatureLinePrs::distanceToPoint(FeaturePtr theFeature,
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
 
-  double aX, anY;
-  PartSet_Tools::projectPointOnLine(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y(), theX, theY, aX, anY);
-  aDelta = gp_Pnt(theX, theY, 0).Distance(gp_Pnt(aX, anY, 0));
+  GeomAPI_Lin2d aLin2d(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y());
+  boost::shared_ptr<GeomAPI_Pnt2d> aPoint = boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
+
+  if (false/*projection*/) { // TODO: if it has not been necessary, remove this block
+    boost::shared_ptr<GeomAPI_Pnt2d> aResult = aLin2d.project(aPoint);
+    aDelta = aResult->distance(aPoint);
+  }
+  else { // distance
+    aDelta = aLin2d.distance(aPoint);
+  }
 
   return aDelta;
 }
