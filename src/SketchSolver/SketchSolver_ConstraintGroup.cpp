@@ -162,7 +162,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
 
   // Create constraint parameters
   double aDistance = 0.0; // scalar value of the constraint
-  boost::shared_ptr<ModelAPI_AttributeDouble> aDistAttr =
+  AttributeDoublePtr aDistAttr =
     boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theConstraint->data()->attribute(CONSTRAINT_ATTR_VALUE));
   if (aDistAttr)
   {
@@ -288,7 +288,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
   }
 
   // Scalar value (used for the distance entities)
-  boost::shared_ptr<ModelAPI_AttributeDouble> aScalar = 
+  AttributeDoublePtr aScalar = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theEntity);
   if (aScalar)
   {
@@ -810,7 +810,7 @@ void SketchSolver_ConstraintGroup::updateAttribute(
   }
 
   // Scalar value
-  boost::shared_ptr<ModelAPI_AttributeDouble> aScalar = 
+  AttributeDoublePtr aScalar = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
   if (aScalar)
   {

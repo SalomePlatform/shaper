@@ -194,7 +194,7 @@ bool PartSet_OperationSketch::hasSketchPlane() const
 
   if (feature()) {
     boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
-    boost::shared_ptr<ModelAPI_AttributeDouble> anAttr;
+    AttributeDoublePtr anAttr;
     boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
       boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_NORM));
     aHasPlane = aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);

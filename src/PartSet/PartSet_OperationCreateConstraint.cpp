@@ -53,8 +53,8 @@ PartSet_OperationCreateConstraint::~PartSet_OperationCreateConstraint()
 
 bool PartSet_OperationCreateConstraint::canProcessKind(const std::string& theId)
 {
-  return /*theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND || theId == SKETCH_CIRCLE_KIND ||
-         theId == SKETCH_ARC_KIND || */theId == SKETCH_CONSTRAINT_LENGTH_KIND;
+  // changed
+  return theId == SKETCH_CONSTRAINT_LENGTH_KIND;
 }
 
 bool PartSet_OperationCreateConstraint::canBeCommitted() const
@@ -79,7 +79,8 @@ void PartSet_OperationCreateConstraint::init(FeaturePtr theFeature,
                                        const std::list<XGUI_ViewerPrs>& /*theSelected*/,
                                        const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
-  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
+  // changed
+  if (!theFeature/* || theFeature->getKind() != SKETCH_LINE_KIND*/)
     return;
   myInitFeature = theFeature;
 }
@@ -93,25 +94,45 @@ void PartSet_OperationCreateConstraint::mouseReleased(QMouseEvent* theEvent, Han
                                                 const std::list<XGUI_ViewerPrs>& theSelected,
                                                 const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
-  if (theSelected.empty()) {
+  switch (myPointSelectionMode)
+  {
+    case SM_FirstPoint: {
+      if (!theSelected.empty()) {
+        XGUI_ViewerPrs aPrs = theSelected.front();
+        FeaturePtr aFeature = aPrs.feature();
 
-  }
-  else {
-    XGUI_ViewerPrs aPrs = theSelected.front();
-    FeaturePtr aFeature = aPrs.feature();
+        myFeaturePrs->init(feature(), aFeature);
+        flushUpdated();
+        setPointSelectionMode(SM_SecondPoint);
+      }
+    }
+    break;
+    case SM_SecondPoint: {
+      double aX, anY;
+      gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
+      PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
 
-    myFeaturePrs->init(feature(), aFeature);
-    flushUpdated();
+      PartSet_SelectionMode aMode = myFeaturePrs->setPoint(aX, anY, myPointSelectionMode);
+      flushUpdated();
+      // show value edit dialog
+      //setPointSelectionMode(aMode);
+      commit();
+      restartOperation(feature()->getKind(), FeaturePtr());
+    }
+    break;
+    default:
+      break;
   }
 }
 
 void PartSet_OperationCreateConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
+  // changed
   switch (myPointSelectionMode)
   {
-    case SM_FirstPoint:
+    //case SM_FirstPoint:
     case SM_SecondPoint:
-    case SM_ThirdPoint:
+    //case SM_ThirdPoint:
     {
       double aX, anY;
       gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);

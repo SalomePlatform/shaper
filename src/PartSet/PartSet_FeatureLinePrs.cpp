@@ -125,15 +125,13 @@ void PartSet_FeatureLinePrs::projectPointOnLine(FeaturePtr theFeature,
                                                 double& theX, double& theY)
 {
   if (theFeature && theFeature->getKind() == getKind()) {
-    double X0, X1, X2, X3;
-    double Y0, Y1, Y2, Y3;
-    getLinePoint(theFeature, LINE_ATTR_START, X2, Y2);
-    getLinePoint(theFeature, LINE_ATTR_END, X3, Y3);
+    double X0, X1;
+    double Y0, Y1;
 
     PartSet_Tools::convertTo2D(thePoint, sketch(), theView, X1, Y1);
     boost::shared_ptr<GeomAPI_Pnt2d> aPoint = boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(X1, Y1));
-    boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin = boost::shared_ptr<GeomAPI_Lin2d>
-                                                         (new GeomAPI_Lin2d(X2, Y2, X3, Y3));
+    boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin = PartSet_FeatureLinePrs::createLin2d(theFeature);
+
     switch (theMode) {
       case SM_FirstPoint: {
         boost::shared_ptr<GeomAPI_Pnt2d> aResult = aFeatureLin->project(aPoint);
@@ -209,6 +207,21 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLinePrs::findPoint(Feature
       aPoint2D = aPoint;
   }
   return aPoint2D;
+}
+
+boost::shared_ptr<GeomAPI_Lin2d> PartSet_FeatureLinePrs::createLin2d(FeaturePtr theFeature)
+{
+  boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin;
+  if (!theFeature || theFeature->getKind() != PartSet_FeatureLinePrs::getKind())
+    return aFeatureLin;
+
+  double aStartX, aStartY, anEndX, anEndY;
+  getLinePoint(theFeature, LINE_ATTR_START, aStartX, aStartY);
+  getLinePoint(theFeature, LINE_ATTR_END, anEndX, anEndY);
+
+  aFeatureLin = boost::shared_ptr<GeomAPI_Lin2d>
+                                        (new GeomAPI_Lin2d(aStartX, aStartY, anEndX, anEndY));
+  return aFeatureLin;
 }
 
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLinePrs::featurePoint

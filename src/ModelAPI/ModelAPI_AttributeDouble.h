@@ -36,4 +36,7 @@ protected:
   {}
 };
 
+//! Pointer on double attribute
+typedef boost::shared_ptr<ModelAPI_AttributeDouble> AttributeDoublePtr;
+
 #endif

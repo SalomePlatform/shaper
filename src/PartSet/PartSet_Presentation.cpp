@@ -122,6 +122,11 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createSketchConstraintLength
   //Build dimension here
   gp_Pnt aP1 = aPoint1;
   gp_Pnt aP2 = aPoint2;
+  if (aFlyout < 0) {
+    aP1 = aPoint2;
+    aP2 = aPoint1;
+  }
+
 
   Handle(AIS_InteractiveObject) anAIS = thePrevPrs;
   if (anAIS.IsNull())
@@ -148,6 +153,8 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createSketchConstraintLength
     Handle(AIS_LengthDimension) aDimAIS = Handle(AIS_LengthDimension)::DownCast(anAIS);
     if (!aDimAIS.IsNull()) {
       aDimAIS->SetMeasuredGeometry(aPoint1, aPoint2, aPlane);
+      aDimAIS->SetFlyout(aFlyout);
+
       aDimAIS->Redisplay(Standard_True);
     }
   }

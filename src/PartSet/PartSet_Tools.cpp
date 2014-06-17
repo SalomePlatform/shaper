@@ -73,7 +73,7 @@ void PartSet_Tools::convertTo2D(const gp_Pnt& thePoint, FeaturePtr theSketch,
   if (!theSketch)
     return;
 
-  boost::shared_ptr<ModelAPI_AttributeDouble> anAttr;
+  AttributeDoublePtr anAttr;
   boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
 
   boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
@@ -237,7 +237,7 @@ void PartSet_Tools::setFeatureValue(FeaturePtr theFeature, double theValue,
   if (!theFeature)
     return;
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeDouble> anAttribute =
+  AttributeDoublePtr anAttribute =
         boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(theAttribute));
   if (anAttribute)
     anAttribute->setValue(theValue);

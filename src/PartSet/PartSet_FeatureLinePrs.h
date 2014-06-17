@@ -13,6 +13,7 @@
 #include <gp_Pnt.hxx>
 
 class GeomDataAPI_Point2D;
+class GeomAPI_Lin2d;
 class Handle_V3d_View;
 
 /*!
@@ -80,6 +81,17 @@ public:
   virtual boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
                                                            double theY);
 
+  /// Creates a lin 2d object on a base of the line feature
+  /// \param theFeature the line feature
+  static boost::shared_ptr<GeomAPI_Lin2d> createLin2d(FeaturePtr theFeature);
+  /// \brief Get the line point 2d coordinates.
+  /// \param theFeature the line feature
+  /// \param theAttribute the start or end attribute of the line
+  /// \param theX the horizontal coordinate
+  /// \param theY the vertical coordinate
+  static void getLinePoint(FeaturePtr theFeature, const std::string& theAttribute,
+                           double& theX, double& theY);
+
 protected:
   /// Initializes current feature by the given
   /// \param theSourceFeature the feature, which attributes are used to initialize the current feature
@@ -88,14 +100,6 @@ protected:
   /// Returns the feature point in the selection mode position.
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode
   virtual boost::shared_ptr<GeomDataAPI_Point2D> featurePoint(const PartSet_SelectionMode& theMode);
-
-  /// \brief Get the line point 2d coordinates.
-  /// \param theFeature the line feature
-  /// \param theAttribute the start or end attribute of the line
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  static void getLinePoint(FeaturePtr theFeature, const std::string& theAttribute,
-                           double& theX, double& theY);
 };
 
 #endif

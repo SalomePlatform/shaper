@@ -51,7 +51,7 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Circle::preview()
     if (aHasPlane) {
       boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
       // compute the circle radius
-      boost::shared_ptr<ModelAPI_AttributeDouble> aRadiusAttr = 
+      AttributeDoublePtr aRadiusAttr = 
         boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CIRCLE_ATTR_RADIUS));
       double aRadius = aRadiusAttr->value();
 

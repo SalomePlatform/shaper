@@ -5,6 +5,8 @@
 #include <PartSet_FeatureLengthPrs.h>
 #include <PartSet_Tools.h>
 
+#include <PartSet_FeatureLinePrs.h>
+
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Line.h>
@@ -12,11 +14,13 @@
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_Lin2d.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_AttributeDouble.h>
 
 #include <Precision.hxx>
 
@@ -44,15 +48,34 @@ PartSet_SelectionMode PartSet_FeatureLengthPrs::setPoint(double theX, double the
     }
     break;
     case SM_SecondPoint: {
-      /*boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
-      boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                                                                  (aData->attribute(CIRCLE_ATTR_CENTER));
-      boost::shared_ptr<GeomAPI_Pnt2d> aCoordPoint(new GeomAPI_Pnt2d(theX, theY));
-      double aRadius = aCoordPoint->distance(aPoint->pnt());
-      PartSet_Tools::setFeatureValue(feature(), aRadius, CIRCLE_ATTR_RADIUS);
+      boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+      boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+              boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
+      FeaturePtr aFeature;
+      if (anAttr) {
+        aFeature = anAttr->feature();
+        if (aFeature->getKind() != SKETCH_LINE_KIND) {
+          aFeature = FeaturePtr();
+        }
+      }
+      boost::shared_ptr<GeomAPI_Pnt2d> aPoint = boost::shared_ptr<GeomAPI_Pnt2d>
+                                                             (new GeomAPI_Pnt2d(theX, theY));
+      boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin = PartSet_FeatureLinePrs::createLin2d(aFeature);
+      boost::shared_ptr<GeomAPI_Pnt2d> aResult = aFeatureLin->project(aPoint);
+      double aDistance = aPoint->distance(aResult);
 
-      aMode = SM_DonePoint;*/
-   }
+      double aStartX, aStartY;
+      PartSet_FeatureLinePrs::getLinePoint(aFeature, LINE_ATTR_START, aStartX, aStartY);
+
+      if (aFeatureLin->crossed(aPoint) < 0)
+        aDistance = -aDistance;
+
+      AttributeDoublePtr aFlyoutAttr = 
+          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
+      aFlyoutAttr->setValue(aDistance);
+
+      aMode = SM_DonePoint;
+    }
     break;
     default:
       break;

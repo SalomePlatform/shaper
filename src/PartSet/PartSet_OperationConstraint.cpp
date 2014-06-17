@@ -162,7 +162,7 @@ void PartSet_OperationConstraint::setValue(const double theValue)
 {
   boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
 
-  boost::shared_ptr<ModelAPI_AttributeDouble> anAttr = 
+  AttributeDoublePtr anAttr = 
           boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_VALUE));
   anAttr->setValue(theValue);
 

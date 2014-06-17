@@ -89,7 +89,7 @@ ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 bool ModuleBase_WidgetDoubleValue::storeValue(FeaturePtr theFeature) const
 {
   DataPtr aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeDouble> aReal = aData->real(attributeID());
+  AttributeDoublePtr aReal = aData->real(attributeID());
   if (aReal->value() != mySpinBox->value()) {
     aReal->setValue(mySpinBox->value());
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
@@ -100,7 +100,7 @@ bool ModuleBase_WidgetDoubleValue::storeValue(FeaturePtr theFeature) const
 bool ModuleBase_WidgetDoubleValue::restoreValue(FeaturePtr theFeature)
 {
   DataPtr aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeDouble> aRef = aData->real(attributeID());
+  AttributeDoublePtr aRef = aData->real(attributeID());
 
   bool isBlocked = mySpinBox->blockSignals(true);
   mySpinBox->setValue(aRef->value());
