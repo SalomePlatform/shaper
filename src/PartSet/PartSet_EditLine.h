@@ -31,14 +31,22 @@ public:
   /// \param theValue a value for the editor
   void start(const QPoint& thePoint, double theValue);
 
-  /// Returns the editor value
-  /// \return the real value
-  double getValue() const;
+  /// Checks whether the editor is started
+  /// \returns true if the editor is activated
+  bool isStarted() const;
+
+  /// Stop the editor, in other words hide it
+  void stop();
 
 signals:
   /// Signals about the editing stop
   /// \param theValue the editor value
   void stopped(double theValue);
+
+protected:
+  /// Returns the editor value
+  /// \return the real value
+  double getValue() const;
 
 protected slots:
   /// Slot to check the editing stop

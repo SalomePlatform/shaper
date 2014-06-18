@@ -134,10 +134,9 @@ void XGUI_Displayer::erase(FeaturePtr theFeature,
 
   Handle(AIS_InteractiveContext) aContext = AISContext();
   Handle(AIS_InteractiveObject) anAIS = myFeature2AISObjectMap[aFeature];
-  Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
-  if (!anAISShape.IsNull())
+  if (!anAIS.IsNull())
   {
-    aContext->Erase(anAISShape, isUpdateViewer);
+    aContext->Erase(anAIS, isUpdateViewer);
   }
   myFeature2AISObjectMap.erase(aFeature);
 }

@@ -12,6 +12,7 @@
 
 #include <QObject>
 
+class PartSet_EditLine;
 class PartSet_FeaturePrs;
 class GeomDataAPI_Point2D;
 class QMouseEvent;
@@ -129,6 +130,7 @@ private:
   boost::shared_ptr<PartSet_FeaturePrs> myFeaturePrs; ///< the feature presentation
   FeaturePtr myInitFeature; ///< the initial feature
   PartSet_SelectionMode myPointSelectionMode; ///< point selection mode
+  PartSet_EditLine* myEditor; ///< the constraint value editor
 };
 
 #endif

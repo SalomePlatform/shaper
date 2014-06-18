@@ -46,6 +46,10 @@ PartSet_OperationCreateConstraint::PartSet_OperationCreateConstraint(const QStri
 {
   std::string aKind = theId.toStdString();
   myFeaturePrs = PartSet_Tools::createFeaturePrs(aKind, theFeature);
+
+  // changed
+  myEditor = new PartSet_EditLine(0);
+  connect(myEditor, SIGNAL(stopped(double)), this, SLOT(onEditStopped(double)));
 }
 
 PartSet_OperationCreateConstraint::~PartSet_OperationCreateConstraint()
@@ -191,6 +195,8 @@ void PartSet_OperationCreateConstraint::keyReleased(const int theKey)
     }
     break;
     case Qt::Key_Escape: {
+      if (myEditor->isStarted())
+        myEditor->stop();
       if (myPointSelectionMode == SM_DonePoint)
       {
         commit();
@@ -265,10 +271,7 @@ void PartSet_OperationCreateConstraint::showEditor(QMouseEvent* theEvent, double
 {
   // changed
   QPoint aPos = theEvent->globalPos();
-
-  PartSet_EditLine* anEditor = new PartSet_EditLine(0);
-  connect(anEditor, SIGNAL(stopped(double)), this, SLOT(onEditStopped(double)));
-  anEditor->start(aPos, theValue);
+  myEditor->start(aPos, theValue);
 }
 
 void PartSet_OperationCreateConstraint::onEditStopped(double theValue)

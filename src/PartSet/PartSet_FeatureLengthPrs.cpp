@@ -67,7 +67,7 @@ PartSet_SelectionMode PartSet_FeatureLengthPrs::setPoint(double theX, double the
       double aStartX, aStartY;
       PartSet_FeatureLinePrs::getLinePoint(aFeature, LINE_ATTR_START, aStartX, aStartY);
 
-      if (aFeatureLin->crossed(aPoint) < 0)
+      if (!aFeatureLin->isRight(aPoint))
         aDistance = -aDistance;
 
       AttributeDoublePtr aFlyoutAttr = 

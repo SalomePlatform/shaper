@@ -32,7 +32,7 @@ public:
   /// Project point on line
   const boost::shared_ptr<GeomAPI_Pnt2d> project(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) const;
   /// Computes the cross product of the line direction and a vector from the line start point to the point
-  double crossed(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) const;
+  bool isRight(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) const;
 };
 
 #endif

@@ -60,11 +60,11 @@ const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::project(const boost::share
   return boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aResult.X(), aResult.Y()));
 }
 
-double GeomAPI_Lin2d::crossed(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) const
+bool GeomAPI_Lin2d::isRight(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) const
 {
   const gp_XY& aDir = MY_LIN2D->Direction().XY();
   const gp_XY& aLoc = MY_LIN2D->Location().XY();
   const gp_XY& aPnt = thePoint->impl<gp_Pnt2d>().XY();
 
-  return aDir.Crossed(aPnt - aLoc);
+  return aDir.Crossed(aPnt - aLoc) > 0;
 }
