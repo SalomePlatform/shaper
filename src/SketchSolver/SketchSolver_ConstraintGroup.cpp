@@ -193,6 +193,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
       boost::shared_ptr<ModelAPI_Data> aData = aConstrAttr->feature()->data();
       aConstrEnt[indAttr]   = changeEntity(aData->attribute(LINE_ATTR_START));
       aConstrEnt[indAttr+1] = changeEntity(aData->attribute(LINE_ATTR_END));
+      myEntityFeatMap[aConstrAttr->feature()] = 0; // measured object is added into the map of objects to avoid problems with interaction betwee constraint and group
       break; // there should be no other entities
     }
     else if (aConstrAttr->isFeature())
