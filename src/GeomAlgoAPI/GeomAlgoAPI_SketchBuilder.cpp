@@ -22,6 +22,7 @@
 #include <BRepClass_FaceClassifier.hxx>
 #include <Geom_Curve.hxx>
 #include <Geom_Plane.hxx>
+#include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
@@ -30,6 +31,10 @@
 
 #include <Precision.hxx>
 const double tolerance = Precision::Confusion();
+// This value helps to find direction on the boundaries of curve.
+// It is not significant for lines, but is used for circles to avoid 
+// wrong directions of movement (when two edges are tangent on the certain vertex)
+const double shift     = acos(1.0 - 2.0 * tolerance);
 
 /// \brief Search first vertex - the vertex with lowest x coordinate, which is used in 2 edges at least
 static const TopoDS_Shape& findStartVertex(
@@ -85,26 +90,38 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
                 std::list< boost::shared_ptr<GeomAPI_Shape> >& theResultFaces,
                 std::list< boost::shared_ptr<GeomAPI_Shape> >& theResultWires)
 {
+  if (theFeatures.empty())
+    return ;
+
   // Create the list of edges with shared vertexes
   BOPAlgo_Builder aBuilder;
   BOPAlgo_PaveFiller aPF;
+  TopoDS_Shape aFeaturesCompound;
 
-  std::list< boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = theFeatures.begin();
-  for (; anIt != theFeatures.end(); anIt++)
-  {
-    boost::shared_ptr<GeomAPI_Shape> aPreview(*anIt);
-    aBuilder.AddArgument(aPreview->impl<TopoDS_Edge>());
+  if (theFeatures.size() == 1)
+  { // If there is only one feature, BOPAlgo_Builder will decline to work. Need to process it anyway
+    aFeaturesCompound = theFeatures.front()->impl<TopoDS_Shape>();
   }
-  aPF.SetArguments(aBuilder.Arguments());
-  aPF.Perform();
-  int aErr = aPF.ErrorStatus();
-  if (aErr) return ;
-  aBuilder.PerformWithFiller(aPF);
-  aErr = aBuilder.ErrorStatus();
-  if (aErr) return ;
+  else
+  {
+    std::list< boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = theFeatures.begin();
+    for (; anIt != theFeatures.end(); anIt++)
+    {
+      boost::shared_ptr<GeomAPI_Shape> aPreview(*anIt);
+      aBuilder.AddArgument(aPreview->impl<TopoDS_Edge>());
+    }
+    aPF.SetArguments(aBuilder.Arguments());
+    aPF.Perform();
+    int aErr = aPF.ErrorStatus();
+    if (aErr) return ;
+    aBuilder.PerformWithFiller(aPF);
+    aErr = aBuilder.ErrorStatus();
+    if (aErr) return ;
+    aFeaturesCompound = aBuilder.Shape();
+  }
 
   BOPCol_IndexedDataMapOfShapeListOfShape aMapVE; // map between vertexes and edges
-  BOPTools::MapShapesAndAncestors(aBuilder.Shape(), TopAbs_VERTEX, TopAbs_EDGE, aMapVE);
+  BOPTools::MapShapesAndAncestors(aFeaturesCompound, TopAbs_VERTEX, TopAbs_EDGE, aMapVE);
 
   gp_Dir aDirX = theDirX->impl<gp_Dir>();
   gp_Dir aDirY = theDirY->impl<gp_Dir>();
@@ -123,7 +140,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   aProcVertexes.push_back(aStartVertex);
 
   TopoDS_Shape aCurVertex = aStartVertex;
-  gp_Dir aCurDir = aDirY;
+  gp_Dir aCurDir = aDirY.Reversed();
   gp_Dir aCurNorm = aNorm.Reversed();
 
   // Go through the edges and find loops
@@ -152,20 +169,18 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
     // The loop was found
     if (aVertIter != aProcVertexes.end())
     {
+      // If the binding edge is a full circle, then the list may be empty before addition. Need to update edge iterator
+      if (aProcEdges.size() == 1)
+        anEdgeIter = aProcEdges.begin();
+
       if (aVertIter != aProcVertexes.begin())
       {
         // Check the orientation of the loop
-        Handle(BRep_TVertex) aVert = Handle(BRep_TVertex)::DownCast(aVertIter->TShape());
-        const gp_Pnt& aCurPnt = aVert->Pnt();
-        aVert = Handle(BRep_TVertex)::DownCast((++aVertIter)->TShape());
-        aVertIter--;
-        const gp_Pnt& aNextPnt = aVert->Pnt();
-        std::list<TopoDS_Shape>::reverse_iterator anItBeforeLast = aProcVertexes.rbegin();
-        aVert = Handle(BRep_TVertex)::DownCast((++anItBeforeLast)->TShape()); // get the vertex before last one, because the last duplicates the start of loop
-        const gp_Pnt& aPrevPnt = aVert->Pnt();
-        gp_Vec aCN(aCurPnt, aNextPnt);
-        gp_Vec aCP(aCurPnt, aPrevPnt);
-        if (aCN.DotCross(aCP, gp_Vec(aNorm)) < -tolerance)
+        gp_Dir aCN = getOuterEdgeDirection(*anEdgeIter, *aVertIter);
+        gp_Dir aCP = getOuterEdgeDirection(aProcEdges.back(), *aVertIter);
+        aCN.Reverse();
+        aCP.Reverse();
+        if (aCN.DotCross(aCP, aNorm) < -tolerance)
         {
           // The found loop has wrong orientation and may contain sub-loops.
           // Need to check it onle again with another initial direction.
@@ -218,7 +233,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
         aNextVertex = aProcVertexes.back();
         if (!aProcEdges.empty())
           aNextDir = getOuterEdgeDirection(aProcEdges.back(), aNextVertex);
-        else aNextDir = -aDirY;
+        else aNextDir = aDirY;
       }
     }
 
@@ -288,9 +303,9 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
       TopoDS_Shape aStartEdge;
       aStartVertex = findStartVertex(aMapVE, aDirX, aDirY);
       aProcVertexes.push_back(aStartVertex);
-      findNextVertex(aStartVertex, aMapVE, aDirY, aNorm.Reversed(), aNextVertex, aStartEdge, aNextDir);
-      aProcVertexes.push_back(aNextVertex);
-      aProcEdges.push_back(aStartEdge);
+      aNextVertex = aStartVertex;
+      aNextDir = aDirY.Reversed();
+      aCurNorm = aNorm.Reversed();
     }
 
     aCurVertex = aNextVertex;
@@ -357,8 +372,8 @@ const TopoDS_Shape& findStartVertex(
           const gp_Dir& theDirX, const gp_Dir& theDirY)
 {
   int aStartVertexInd = 1;
-  double aMinX = DBL_MAX;
-  double aMinY = DBL_MAX;
+  double aMaxX = -DBL_MAX;
+  double aMaxY = -DBL_MAX;
   int aNbVert = theMapVE.Extent();
   for (int i = 1; i <= aNbVert; i++)
   {
@@ -368,11 +383,11 @@ const TopoDS_Shape& findStartVertex(
 
     double aX = aVertPnt.XYZ().Dot(theDirX.XYZ());
     double aY = aVertPnt.XYZ().Dot(theDirY.XYZ());
-    if ((aX < aMinX || (fabs(aX - aMinX) < tolerance && aY < aMinY)) && 
+    if ((aX > aMaxX || (fabs(aX - aMaxX) < tolerance && aY > aMaxY)) && 
         theMapVE.FindFromIndex(i).Extent() > 1)
     {
-      aMinX = aX;
-      aMinY = aY;
+      aMaxX = aX;
+      aMaxY = aY;
       aStartVertexInd = i;
     }
   }
@@ -417,6 +432,16 @@ void findNextVertex(
           theNextDir = getOuterEdgeDirection(aEdIter.Value(), theNextVertex);
           break;
         }
+      if (!aVertExp.More())
+      { // This edge is a full circle
+        TopoDS_Vertex aV1, aV2;
+        TopExp::Vertices(*(const TopoDS_Edge*)(&theNextEdge), aV1, aV2);
+        if (aV1.Orientation() == theStartVertex.Orientation())
+          theNextVertex = aV2;
+        else
+          theNextVertex = aV1;
+        theNextDir = getOuterEdgeDirection(aEdIter.Value(), theNextVertex);
+      }
     }
   }
 }
@@ -541,11 +566,12 @@ gp_Dir getOuterEdgeDirection(const TopoDS_Shape& theEdge,
 
   gp_Pnt aPnt;
   gp_Vec aTang;
-  aCurve->D1(aFirst, aPnt, aTang);
+  aCurve->D1(aFirst + shift, aPnt, aTang);
+  aCurve->D0(aFirst, aPnt);
   if (aVertexPnt.IsEqual(aPnt, tolerance))
     return gp_Dir(aTang.Reversed());
 
-  aCurve->D1(aLast,  aPnt, aTang);
+  aCurve->D1(aLast - shift, aPnt, aTang);
   return gp_Dir(aTang);
 }
 
