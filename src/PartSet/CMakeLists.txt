@@ -5,6 +5,7 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Constants.h
+	PartSet_EditLine.h
 	PartSet_FeatureArcPrs.h
 	PartSet_FeatureCirclePrs.h
 	PartSet_FeaturePrs.h
@@ -25,6 +26,7 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
+	PartSet_EditLine.cpp
 	PartSet_FeaturePrs.cpp
 	PartSet_FeatureArcPrs.cpp
 	PartSet_FeatureCirclePrs.cpp

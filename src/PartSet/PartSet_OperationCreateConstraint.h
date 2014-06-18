@@ -115,6 +115,16 @@ protected:
   void setPointSelectionMode(const PartSet_SelectionMode& theMode,
                              const bool isToEmitSignal = true);
 
+  /// Show the value editor
+  /// \param theEvent to get the mouse cursor position
+  /// \param theValue an editor value
+  void showEditor(QMouseEvent* theEvent, double theValue);
+
+protected slots:
+  /// SLOT, that listens the value edited signal and set the new value to the feature
+  /// \param theValue the editor value
+  void onEditStopped(double theValue);
+
 private:
   boost::shared_ptr<PartSet_FeaturePrs> myFeaturePrs; ///< the feature presentation
   FeaturePtr myInitFeature; ///< the initial feature

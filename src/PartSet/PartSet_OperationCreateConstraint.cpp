@@ -10,6 +10,7 @@
 #include <PartSet_FeatureLinePrs.h>
 #include <PartSet_FeatureCirclePrs.h>
 #include <PartSet_FeatureArcPrs.h>
+#include <PartSet_EditLine.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Point.h>
@@ -113,11 +114,12 @@ void PartSet_OperationCreateConstraint::mouseReleased(QMouseEvent* theEvent, Han
       PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
 
       PartSet_SelectionMode aMode = myFeaturePrs->setPoint(aX, anY, myPointSelectionMode);
-      flushUpdated();
       // show value edit dialog
-      //setPointSelectionMode(aMode);
-      commit();
-      restartOperation(feature()->getKind(), FeaturePtr());
+      double aValue;
+      if (PartSet_Tools::featureValue(feature(), CONSTRAINT_ATTR_VALUE, aValue)) {
+        showEditor(theEvent, aValue);
+        setPointSelectionMode(SM_ThirdPoint/*aMode*/);
+      }
     }
     break;
     default:
@@ -247,7 +249,7 @@ FeaturePtr PartSet_OperationCreateConstraint::createFeature(const bool theFlushM
 }
 
 void PartSet_OperationCreateConstraint::setPointSelectionMode(const PartSet_SelectionMode& theMode,
-                                                           const bool isToEmitSignal)
+                                                              const bool isToEmitSignal)
 {
   myPointSelectionMode = theMode;
   if (isToEmitSignal) {
@@ -257,4 +259,23 @@ void PartSet_OperationCreateConstraint::setPointSelectionMode(const PartSet_Sele
     }
     emit focusActivated(aName);
   }
+}
+
+void PartSet_OperationCreateConstraint::showEditor(QMouseEvent* theEvent, double theValue)
+{
+  // changed
+  QPoint aPos = theEvent->globalPos();
+
+  PartSet_EditLine* anEditor = new PartSet_EditLine(0);
+  connect(anEditor, SIGNAL(stopped(double)), this, SLOT(onEditStopped(double)));
+  anEditor->start(aPos, theValue);
+}
+
+void PartSet_OperationCreateConstraint::onEditStopped(double theValue)
+{
+  PartSet_Tools::setFeatureValue(feature(), theValue, CONSTRAINT_ATTR_VALUE);
+
+  flushUpdated();
+  commit();
+  restartOperation(feature()->getKind(), FeaturePtr());
 }

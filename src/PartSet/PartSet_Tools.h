@@ -89,6 +89,14 @@ public:
   /// \param theAttribute the feature attribute
   static void setFeatureValue(FeaturePtr theFeature, double theX, const std::string& theAttribute);
 
+  /// \brief Returns the feature double value if it is.
+  /// \param theFeature the feature
+  /// \param theAttribute the feature attribute
+  /// \param theValue the horizontal coordinate
+  /// \returns the state whether the value is correct
+  static bool featureValue(FeaturePtr theFeature, const std::string& theAttribute,
+                           double& theValue);
+
   /// Creates a constraint on two points
   /// \param thePoint1 the first point
   /// \param thePoint1 the second point
