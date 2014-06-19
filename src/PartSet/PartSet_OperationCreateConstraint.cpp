@@ -106,9 +106,10 @@ void PartSet_OperationCreateConstraint::mouseReleased(QMouseEvent* theEvent, Han
         XGUI_ViewerPrs aPrs = theSelected.front();
         FeaturePtr aFeature = aPrs.feature();
 
-        myFeaturePrs->init(feature(), aFeature);
-        flushUpdated();
-        setPointSelectionMode(SM_SecondPoint);
+        if (myFeaturePrs->setFeature(aFeature, myPointSelectionMode)) {
+          flushUpdated();
+          setPointSelectionMode(SM_SecondPoint);
+        }
       }
     }
     break;
@@ -189,9 +190,15 @@ void PartSet_OperationCreateConstraint::keyReleased(const int theKey)
         // it start a new line creation at a free point
         restartOperation(feature()->getKind(), FeaturePtr()/*feature()*/);
       }
-      //else
-      //  abort();
-      //restartOperation(feature()->getKind(), FeaturePtr());
+      // changed
+      // the modification is really need until the focus of editor do not accept the focus
+      if (myPointSelectionMode == SM_ThirdPoint) {
+        if (myEditor->isStarted())
+          myEditor->stop();
+        commit();
+        // it start a new line creation at a free point
+        restartOperation(feature()->getKind(), FeaturePtr()/*feature()*/);
+      }
     }
     break;
     case Qt::Key_Escape: {
@@ -246,7 +253,9 @@ FeaturePtr PartSet_OperationCreateConstraint::createFeature(const bool theFlushM
 
     aFeature->addSub(aNewFeature);
   }
-  myFeaturePrs->init(aNewFeature, myInitFeature);
+  myFeaturePrs->init(aNewFeature);
+  if (myInitFeature)
+    myFeaturePrs->setFeature(myInitFeature, SM_FirstPoint);
 
   emit featureConstructed(aNewFeature, FM_Activation);
   if (theFlushMessage)

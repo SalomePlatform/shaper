@@ -9,8 +9,6 @@
 
 #include <PartSet_OperationSketchBase.h>
 
-#include <SketchPlugin_ConstraintLength.h>
-
 #include <QObject>
 
 /*!
@@ -23,7 +21,7 @@ class PARTSET_EXPORT PartSet_OperationConstraint : public PartSet_OperationSketc
 
 public:
   /// Returns the operation type key
-  static std::string Type() { return SKETCH_CONSTRAINT_LENGTH_KIND; }
+  static std::string Type();
 
 public:
   /// Constructor

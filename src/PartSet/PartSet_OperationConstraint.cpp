@@ -6,6 +6,7 @@
 
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketch.h>
+#include <SketchPlugin_ConstraintLength.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
@@ -52,6 +53,11 @@ PartSet_OperationConstraint::PartSet_OperationConstraint(const QString& theId,
 
 PartSet_OperationConstraint::~PartSet_OperationConstraint()
 {
+}
+
+std::string PartSet_OperationConstraint::Type()
+{
+  return SKETCH_CONSTRAINT_LENGTH_KIND;
 }
 
 bool PartSet_OperationConstraint::isGranted(ModuleBase_IOperation* theOperation) const

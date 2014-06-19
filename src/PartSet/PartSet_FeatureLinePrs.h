@@ -43,6 +43,12 @@ public:
   virtual PartSet_SelectionMode setPoint(double theX, double theY,
                                          const PartSet_SelectionMode& theMode);
 
+  /// Sets the feature to to a feature attribute depending on the selection mode
+  /// \param theFeature a feature instance
+  /// \param theMode the selection mode
+  /// \return whether the feature is set
+  virtual bool setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode);
+
   /// Returns the feature attribute name for the selection mode
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode
   virtual std::string getAttribute(const PartSet_SelectionMode& theMode) const;
@@ -93,10 +99,6 @@ public:
                            double& theX, double& theY);
 
 protected:
-  /// Initializes current feature by the given
-  /// \param theSourceFeature the feature, which attributes are used to initialize the current feature
-  virtual void initFeature(FeaturePtr theSourceFeature);
-
   /// Returns the feature point in the selection mode position.
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode
   virtual boost::shared_ptr<GeomDataAPI_Point2D> featurePoint(const PartSet_SelectionMode& theMode);

@@ -35,24 +35,6 @@ std::string PartSet_FeatureLinePrs::getKind()
   return SKETCH_LINE_KIND;
 }
 
-void PartSet_FeatureLinePrs::initFeature(FeaturePtr theFeature)
-{
-  if (feature() && theFeature)
-  {
-    // use the last point of the previous feature as the first of the new one
-    boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-    boost::shared_ptr<GeomDataAPI_Point2D> anInitPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                                                                  (aData->attribute(LINE_ATTR_END));
-    PartSet_Tools::setFeaturePoint(feature(), anInitPoint->x(), anInitPoint->y(), LINE_ATTR_START);
-    PartSet_Tools::setFeaturePoint(feature(), anInitPoint->x(), anInitPoint->y(), LINE_ATTR_END);
-
-    aData = feature()->data();
-    boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                                                                 (aData->attribute(LINE_ATTR_START));
-    PartSet_Tools::createConstraint(sketch(), anInitPoint, aPoint);
-  }
-}
-
 PartSet_SelectionMode PartSet_FeatureLinePrs::setPoint(double theX, double theY,
                                                        const PartSet_SelectionMode& theMode)
 {
@@ -74,6 +56,27 @@ PartSet_SelectionMode PartSet_FeatureLinePrs::setPoint(double theX, double theY,
       break;
   }
   return aMode;
+}
+
+bool PartSet_FeatureLinePrs::setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode)
+{
+  bool aResult = false;
+  if (feature() && theFeature && theMode == SM_FirstPoint)
+  {
+    // use the last point of the previous feature as the first of the new one
+    boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+    boost::shared_ptr<GeomDataAPI_Point2D> anInitPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
+                                                                  (aData->attribute(LINE_ATTR_END));
+    PartSet_Tools::setFeaturePoint(feature(), anInitPoint->x(), anInitPoint->y(), LINE_ATTR_START);
+    PartSet_Tools::setFeaturePoint(feature(), anInitPoint->x(), anInitPoint->y(), LINE_ATTR_END);
+
+    aData = feature()->data();
+    boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
+                                                                 (aData->attribute(LINE_ATTR_START));
+    PartSet_Tools::createConstraint(sketch(), anInitPoint, aPoint);
+    aResult = true;
+  }
+  return aResult;
 }
 
 std::string PartSet_FeatureLinePrs::getAttribute(const PartSet_SelectionMode& theMode) const

@@ -270,7 +270,8 @@ FeaturePtr PartSet_OperationCreateFeature::createFeature(const bool theFlushMess
 
     aFeature->addSub(aNewFeature);
   }
-  myFeaturePrs->init(aNewFeature, myInitFeature);
+  myFeaturePrs->init(aNewFeature);
+  myFeaturePrs->setFeature(myInitFeature, SM_FirstPoint);
 
   emit featureConstructed(aNewFeature, FM_Activation);
   if (theFlushMessage)

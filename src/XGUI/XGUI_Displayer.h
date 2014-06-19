@@ -81,8 +81,7 @@ public:
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the presentation is created
   bool redisplay(FeaturePtr theFeature,
-                 Handle(AIS_InteractiveObject) theAIS,
-                 const int theSelectionMode, const bool isUpdateViewer = true);
+                 Handle(AIS_InteractiveObject) theAIS, const bool isUpdateViewer = true);
 
   /** Redisplay the shape if it was displayed
   * \param theFeature a feature instance

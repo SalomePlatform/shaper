@@ -88,6 +88,15 @@ public:
   /// \param theView a viewer to have the viewer the eye position
   virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
 
+  /// Processes the mouse double click in the point
+  /// \param theEvent the mouse event
+  /// \param theView a viewer to have the viewer the eye position
+  /// \param theSelected the list of selected presentations
+  /// \param theHighlighted the list of highlighted presentations
+  virtual void mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
+                            const std::list<XGUI_ViewerPrs>& theSelected,
+                            const std::list<XGUI_ViewerPrs>& theHighlighted);
+
   /// Processes the key pressed in the view
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);

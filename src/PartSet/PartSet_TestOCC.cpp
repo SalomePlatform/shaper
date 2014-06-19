@@ -153,7 +153,7 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
                            aFeature, aSketch,
                            aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), NULL);
     if (!anAIS.IsNull())
-      aDisplayer->redisplay(aFeature, anAIS, -1, false);
+      aDisplayer->redisplay(aFeature, anAIS, false);
 
     std::list<int> aModes;
     aModes.push_back(TopAbs_VERTEX);
@@ -172,7 +172,7 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
                              aFeature, aSketch,
                              aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), NULL);
       if (!anAIS.IsNull())
-        aDisplayer->redisplay(aFeature, anAIS, -1, true);
+        aDisplayer->redisplay(aFeature, anAIS, true);
 
       int aVal = 90;
       for (int j = 0; j < 10000000; j++)
@@ -211,7 +211,7 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
                           aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
                           aPrevAIS);
   if (!anAIS.IsNull())
-    theWorkshop->displayer()->redisplay(aFeature, anAIS, -1, true);
+    theWorkshop->displayer()->redisplay(aFeature, anAIS, true);
   //std::list<int> aModes;
   //aModes.clear();
   //aModes.push_back(TopAbs_VERTEX);

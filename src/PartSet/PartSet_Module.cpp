@@ -40,7 +40,7 @@
 #include <GeomAPI_Shape.h>
 
 #include <AIS_ListOfInteractive.hxx>
-#include <AIS_DimensionSelectionMode.hxx>
+//#include <AIS_DimensionSelectionMode.hxx>
 
 #include <QObject>
 #include <QMouseEvent>
@@ -81,6 +81,9 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
           this, SLOT(onMouseMoved(QMouseEvent*)));
   connect(myWorkshop->viewer(), SIGNAL(keyRelease(QKeyEvent*)),
           this, SLOT(onKeyRelease(QKeyEvent*)));
+  connect(myWorkshop->viewer(), SIGNAL(mouseDoubleClick(QMouseEvent*)),
+          this, SLOT(onMouseDoubleClick(QMouseEvent*)));
+
 }
 
 PartSet_Module::~PartSet_Module()
@@ -210,6 +213,20 @@ void PartSet_Module::onKeyRelease(QKeyEvent* theEvent)
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
     aPreviewOp->keyReleased(theEvent->key());
+  }
+}
+
+void PartSet_Module::onMouseDoubleClick(QMouseEvent* theEvent)
+{
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
+                                       myWorkshop->operationMgr()->currentOperation());
+  if (aPreviewOp)
+  {
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+    aPreviewOp->mouseDoubleClick(theEvent, myWorkshop->viewer()->activeView(), aSelected,
+                                 aHighlighted);
   }
 }
 
@@ -418,11 +435,7 @@ void PartSet_Module::visualizePreview(FeaturePtr theFeature, bool isDisplay,
                            aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
                            aDisplayer->getAISObject(theFeature));
 
-    int aSelectionMode = -1;
-    if (theFeature->getKind() == SKETCH_CONSTRAINT_LENGTH_KIND) {
-      aSelectionMode = AIS_DSM_Text;
-    }
-    aDisplayer->redisplay(theFeature, anAIS, aSelectionMode, false);
+    aDisplayer->redisplay(theFeature, anAIS, false);
   }
   else
     aDisplayer->erase(theFeature, false);
@@ -470,7 +483,7 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
                            aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
                            aDisplayer->getAISObject(aFeature));
     if (!anAIS.IsNull())
-      aDisplayer->redisplay(aFeature, anAIS, -1, false);
+      aDisplayer->redisplay(aFeature, anAIS, false);
     aDisplayer->activateInLocalContext(aFeature, aModes, false);
   }
   aDisplayer->updateViewer();

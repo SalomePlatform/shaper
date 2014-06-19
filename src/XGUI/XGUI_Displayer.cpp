@@ -144,7 +144,6 @@ void XGUI_Displayer::erase(FeaturePtr theFeature,
 
 bool XGUI_Displayer::redisplay(FeaturePtr theFeature,
                                Handle(AIS_InteractiveObject) theAIS,
-                               const int theSelectionMode,
                                const bool isUpdateViewer)
 {
   bool isCreated = false;
@@ -163,14 +162,7 @@ bool XGUI_Displayer::redisplay(FeaturePtr theFeature,
   }
   else {
     myFeature2AISObjectMap[theFeature] = theAIS;
-    if (theSelectionMode < 0)
-    {
-      aContext->Display(theAIS, false);
-    }
-    else
-    {
-      aContext->Display(theAIS, 0, theSelectionMode, false);
-    }
+    aContext->Display(theAIS, false);
     isCreated = true;
   }
   if (isUpdateViewer)
@@ -205,9 +197,9 @@ void XGUI_Displayer::activateInLocalContext(FeaturePtr theFeature,
     aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
   }
   // display or redisplay presentation
-  Handle(AIS_Shape) anAIS;
+  Handle(AIS_InteractiveObject) anAIS;
   if (isVisible(theFeature))
-    anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[theFeature]);
+    anAIS = Handle(AIS_InteractiveObject)::DownCast(myFeature2AISObjectMap[theFeature]);
 
   // Activate selection of objects from prs
   if (!anAIS.IsNull()) {
@@ -217,7 +209,7 @@ void XGUI_Displayer::activateInLocalContext(FeaturePtr theFeature,
     std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
     for (; anIt != aLast; anIt++)
     {
-      aContext->Activate(anAIS, AIS_Shape::SelectionMode((TopAbs_ShapeEnum)*anIt));
+      aContext->Activate(anAIS, (*anIt));
 	}
   }
 

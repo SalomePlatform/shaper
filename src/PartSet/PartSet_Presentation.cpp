@@ -28,6 +28,9 @@
 const Quantity_NameOfColor SKETCH_PLANE_COLOR = Quantity_NOC_CHOCOLATE; /// the plane edge color
 const int SKETCH_WIDTH = 4; /// the plane edge width
 
+const int CONSTRAINT_TEXT_HEIGHT = 28; /// the text height of the constraint
+const int CONSTRAINT_TEXT_SELECTION_TOLERANCE = 20; /// the text selection tolerance
+
 Handle(AIS_InteractiveObject) PartSet_Presentation::createPresentation(
                                          FeaturePtr theFeature,
                                          FeaturePtr theSketch,
@@ -131,22 +134,23 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createSketchConstraintLength
   Handle(AIS_InteractiveObject) anAIS = thePrevPrs;
   if (anAIS.IsNull())
   {
-    Handle(AIS_LengthDimension) aLenDim = new AIS_LengthDimension (aP1, aP2, aPlane);
+    Handle(AIS_LengthDimension) aDimAIS = new AIS_LengthDimension (aP1, aP2, aPlane);
 
     Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
     anAspect->MakeArrows3d (Standard_False);
     anAspect->MakeText3d(false/*is text 3d*/);
-    anAspect->TextAspect()->SetHeight(28);
+    anAspect->TextAspect()->SetHeight(CONSTRAINT_TEXT_HEIGHT);
     anAspect->MakeTextShaded(false/*is test shaded*/);
-    aLenDim->DimensionAspect()->MakeUnitsDisplayed(false/*is units displayed*/);
+    aDimAIS->DimensionAspect()->MakeUnitsDisplayed(false/*is units displayed*/);
     /*if (isUnitsDisplayed)
     {
-      aLenDim->SetDisplayUnits (aDimDlg->GetUnits ());
+      aDimAIS->SetDisplayUnits (aDimDlg->GetUnits ());
     }*/
-    aLenDim->SetDimensionAspect (anAspect);
-    aLenDim->SetFlyout(aFlyout);
+    aDimAIS->SetDimensionAspect (anAspect);
+    aDimAIS->SetFlyout(aFlyout);
+    aDimAIS->SetSelToleranceForText2d(CONSTRAINT_TEXT_SELECTION_TOLERANCE);
 
-    anAIS = aLenDim;
+    anAIS = aDimAIS;
   }
   else {
     // update presentation

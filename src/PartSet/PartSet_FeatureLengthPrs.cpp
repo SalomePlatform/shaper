@@ -174,18 +174,19 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLengthPrs::featurePoint
   return boost::shared_ptr<GeomDataAPI_Point2D>();
 }
 
-void PartSet_FeatureLengthPrs::initFeature(FeaturePtr theSourceFeature)
+bool PartSet_FeatureLengthPrs::setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode)
 {
-  if (feature() && theSourceFeature && theSourceFeature->getKind() == SKETCH_LINE_KIND)
+  bool aResult = false;
+  if (feature() && theFeature && theFeature->getKind() == SKETCH_LINE_KIND && theMode == SM_FirstPoint)
   {
     // set length feature
     boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
     boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
-    aRef->setFeature(theSourceFeature);
+    aRef->setFeature(theFeature);
 
     // set length value
-    aData = theSourceFeature->data();
+    aData = theFeature->data();
     boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
           boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
     boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
@@ -193,5 +194,7 @@ void PartSet_FeatureLengthPrs::initFeature(FeaturePtr theSourceFeature)
 
     double aLenght = aPoint1->pnt()->distance(aPoint2->pnt());
     PartSet_Tools::setFeatureValue(feature(), aLenght, CONSTRAINT_ATTR_VALUE);
+    aResult = true;
   }
+  return aResult;
 }

@@ -28,12 +28,9 @@ PartSet_FeaturePrs::~PartSet_FeaturePrs()
 {
 }
 
-void PartSet_FeaturePrs::init(FeaturePtr theFeature, FeaturePtr theSourceFeature)
+void PartSet_FeaturePrs::init(FeaturePtr theFeature)
 {
   myFeature = theFeature;
-  if (theSourceFeature) {
-    initFeature(theSourceFeature);
-  }
 }
 
 FeaturePtr PartSet_FeaturePrs::sketch() const

@@ -83,6 +83,10 @@ public slots:
   /// \param theEvent the mouse event
   void onKeyRelease(QKeyEvent* theEvent);
 
+  /// SLOT, that is called by the mouse double click in the viewer.
+  /// \param theEvent the mouse event
+  void onMouseDoubleClick(QMouseEvent* theEvent);
+
   /// SLOT, to apply to the current viewer the operation
   /// \param theX the X projection value
   /// \param theY the Y projection value

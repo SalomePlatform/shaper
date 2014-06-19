@@ -7,6 +7,7 @@
 #include <SketchPlugin_Feature.h>
 
 #include <V3d_View.hxx>
+#include <AIS_Shape.hxx>
 
 #include <QKeyEvent>
 
@@ -42,11 +43,20 @@ std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >
   return std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >();
 }
 
+#include <AIS_DimensionSelectionMode.hxx>
+#include <SketchPlugin_ConstraintLength.h>
 std::list<int> PartSet_OperationSketchBase::getSelectionModes(FeaturePtr theFeature) const
 {
   std::list<int> aModes;
-  aModes.push_back(TopAbs_VERTEX);
-  aModes.push_back(TopAbs_EDGE);
+  if (theFeature->getKind() == SKETCH_CONSTRAINT_LENGTH_KIND) {
+      aModes.clear();
+      aModes.push_back(AIS_DSM_Text);
+      aModes.push_back(AIS_DSM_Line);
+  }
+  else {
+    aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)TopAbs_VERTEX));
+    aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)TopAbs_EDGE));
+  }
   return aModes;
 }
 FeaturePtr PartSet_OperationSketchBase::createFeature(const bool theFlushMessage)
@@ -69,6 +79,11 @@ void PartSet_OperationSketchBase::mouseReleased(QMouseEvent* theEvent, Handle_V3
 {
 }
 void PartSet_OperationSketchBase::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
+{
+}
+void PartSet_OperationSketchBase::mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
+                                                   const std::list<XGUI_ViewerPrs>& theSelected,
+                                                   const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
 }
 

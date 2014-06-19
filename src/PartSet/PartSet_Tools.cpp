@@ -159,7 +159,7 @@ boost::shared_ptr<PartSet_FeaturePrs> PartSet_Tools::createFeaturePrs(const std:
   }
 
   if (theFeature && aFeaturePrs)
-    aFeaturePrs->init(theFeature, FeaturePtr());
+    aFeaturePrs->init(theFeature);
 
   return aFeaturePrs;
 }

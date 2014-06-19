@@ -29,8 +29,7 @@ public:
   /// Initializes some fields of feature accorging to the source feature
   /// Saves the fiature as the presentation internal feature
   /// \param theFeature the presentation feature
-  /// \param theSourceFeature the feature, which attributes are used to initialize the feature
-  void init(FeaturePtr theFeature, FeaturePtr theSourceFeature);
+  void init(FeaturePtr theFeature);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
@@ -43,6 +42,12 @@ public:
   /// \return the new selection mode
   virtual PartSet_SelectionMode setPoint(double theX, double theY,
                                          const PartSet_SelectionMode& theMode) = 0;
+
+  /// Sets the feature to to a feature attribute depending on the selection mode
+  /// \param theFeature a feature instance
+  /// \param theMode the selection mode
+  /// \return whether the feature is set
+  virtual bool setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode) { return false; };
 
   /// Returns the feature attribute name for the selection mode
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode
@@ -81,10 +86,6 @@ protected:
   /// Returns the operation feature
   /// \return the feature
   FeaturePtr feature() const;
-
-  /// Initializes current feature by the given
-  /// \param theSourceFeature the feature, which attributes are used to initialize the current feature
-  virtual void initFeature(FeaturePtr theSourceFeature) {};
 
   /// Returns the feature point in the selection mode position.
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode
