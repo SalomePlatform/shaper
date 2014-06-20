@@ -361,7 +361,6 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
 // ============================================================================
 void SketchSolver_ConstraintManager::resolveConstraints()
 {
-  return; // myConstrSolver.solve() gives an exception
   std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
     (*aGroupIter)->resolveConstraints();
