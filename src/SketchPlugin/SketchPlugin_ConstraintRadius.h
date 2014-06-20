@@ -12,6 +12,9 @@
 /// Radius constraint kind
 const std::string SKETCH_CONSTRAINT_RADIUS_KIND("SketchConstraintRadius");
 
+/// Start 2D point of the line
+const std::string SKETCH_CONSTRAINT_ATTR_CIRCLE_POINT("CirclePoint");
+
 
 /** \class SketchPlugin_ConstraintRadius
  *  \ingroup DataModel

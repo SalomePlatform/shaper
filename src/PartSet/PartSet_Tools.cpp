@@ -26,6 +26,8 @@
 #include <PartSet_FeatureArcPrs.h>
 
 #include <PartSet_FeatureLengthPrs.h>
+#include <PartSet_FeatureRadiusPrs.h>
+#include <PartSet_FeatureDistancePrs.h>
 
 #include <XGUI_ViewerPrs.h>
 
@@ -157,6 +159,13 @@ boost::shared_ptr<PartSet_FeaturePrs> PartSet_Tools::createFeaturePrs(const std:
   else if (theKind == PartSet_FeatureLengthPrs::getKind()) {
     aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeatureLengthPrs(theSketch));
   }
+  else if (theKind == PartSet_FeatureRadiusPrs::getKind()) {
+    aFeaturePrs = boost::shared_ptr<PartSet_FeatureRadiusPrs>(new PartSet_FeatureRadiusPrs(theSketch));
+  }
+  else if (theKind == PartSet_FeatureDistancePrs::getKind()) {
+    aFeaturePrs = boost::shared_ptr<PartSet_FeatureDistancePrs>(new PartSet_FeatureDistancePrs(theSketch));
+  }
+
 
   if (theFeature && aFeaturePrs)
     aFeaturePrs->init(theFeature);

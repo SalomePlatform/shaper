@@ -15,6 +15,7 @@ SketchPlugin_ConstraintDistance::SketchPlugin_ConstraintDistance()
 void SketchPlugin_ConstraintDistance::initAttributes()
 {
   data()->addAttribute(CONSTRAINT_ATTR_VALUE,    ModelAPI_AttributeDouble::type());
+  data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE, ModelAPI_AttributeDouble::type());
   data()->addAttribute(CONSTRAINT_ATTR_ENTITY_A, ModelAPI_AttributeRefAttr::type());
   data()->addAttribute(CONSTRAINT_ATTR_ENTITY_B, ModelAPI_AttributeRefAttr::type());
 }

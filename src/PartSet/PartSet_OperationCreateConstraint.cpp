@@ -13,12 +13,17 @@
 #include <PartSet_EditLine.h>
 
 #include <SketchPlugin_Feature.h>
-#include <SketchPlugin_Point.h>
+/*#include <SketchPlugin_Point.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Arc.h>
+*/
 
-#include <SketchPlugin_ConstraintLength.h>
+#include <PartSet_FeatureLengthPrs.h>
+#include <PartSet_FeatureDistancePrs.h>
+#include <PartSet_FeatureRadiusPrs.h>
+
+#include <SketchPlugin_Constraint.h>
 
 #include <ModuleBase_OperationDescription.h>
 
@@ -59,7 +64,9 @@ PartSet_OperationCreateConstraint::~PartSet_OperationCreateConstraint()
 bool PartSet_OperationCreateConstraint::canProcessKind(const std::string& theId)
 {
   // changed
-  return theId == SKETCH_CONSTRAINT_LENGTH_KIND;
+  return theId == PartSet_FeatureLengthPrs::getKind() ||
+         theId == PartSet_FeatureDistancePrs::getKind() ||
+         theId == PartSet_FeatureRadiusPrs::getKind();
 }
 
 bool PartSet_OperationCreateConstraint::canBeCommitted() const

@@ -22,24 +22,29 @@ class Handle_AIS_InteractiveObject;
 class PARTSET_EXPORT PartSet_Presentation
 {
 public:
-  /// Creates AIS presentation for the given feature
+  /// Creates AIS presentation for the given feature. It deals with features and
+  /// constraints presentations
   /// \param theFeature a feature
-  /// \return the presentation
+  /// \param theSketch a feature sketch
+  /// \param theShape a shape of the feature
+  /// \param thePrevious a previous AIS object
+  /// \return a created/changed AIS object with the feature parameters
   static Handle_AIS_InteractiveObject createPresentation(
                                               FeaturePtr theFeature,
                                               FeaturePtr theSketch,
                                               const TopoDS_Shape& theShape,
-                                              Handle_AIS_InteractiveObject thePrevPrs);
+                                              Handle_AIS_InteractiveObject thePreviuos);
 protected:
-  static Handle_AIS_InteractiveObject createFeature(
+  /// Creates AIS presentation based on the given shape
+  /// \param theFeature a feature
+  /// \param theSketch a feature sketch
+  /// \param theShape a shape of the feature
+  /// \param thePrevious a previous AIS object
+  /// \return a created/changed AIS object with the feature parameters
+ static Handle_AIS_InteractiveObject createFeature(
                                               FeaturePtr theFeature,
                                               const TopoDS_Shape& theShape,
-                                              Handle_AIS_InteractiveObject thePrevPrs);
-
-  static Handle_AIS_InteractiveObject createSketchConstraintLength(
-                                              FeaturePtr theFeature,
-                                              FeaturePtr theSketch,
-                                              Handle_AIS_InteractiveObject thePrevPrs);
+                                              Handle_AIS_InteractiveObject thePreviuos);
 };
 
 #endif
