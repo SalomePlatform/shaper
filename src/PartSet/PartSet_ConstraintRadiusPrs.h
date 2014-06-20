@@ -1,9 +1,9 @@
-// File:        PartSet_FeatureRadiusPrs.h
+// File:        PartSet_ConstraintRadiusPrs.h
 // Created:     16 Jun 2014
 // Author:      Natalia ERMOLAEVA
 
-#ifndef PartSet_FeatureRadiusPrs_H
-#define PartSet_FeatureRadiusPrs_H
+#ifndef PartSet_ConstraintRadiusPrs_H
+#define PartSet_ConstraintRadiusPrs_H
 
 #include "PartSet.h"
 
@@ -11,14 +11,15 @@
 #include "PartSet_Constants.h"
 
 class GeomDataAPI_Point2D;
+class Handle_AIS_InteractiveObject;
 
 /*!
- \class PartSet_FeatureRadiusPrs
+ \class PartSet_ConstraintRadiusPrs
  * \brief The class to define the circle feature manipulation. It is created for
  * the feature create operation to move out the feature properties set and use one operation
  * for any type of features.
 */
-class PARTSET_EXPORT PartSet_FeatureRadiusPrs : public PartSet_FeaturePrs
+class PARTSET_EXPORT PartSet_ConstraintRadiusPrs : public PartSet_FeaturePrs
 {
 public:
   /// Returns the feature type processed by this presentation
@@ -27,9 +28,9 @@ public:
 
   /// Constructor
   /// \param theSketch the sketch feature
-  PartSet_FeatureRadiusPrs(FeaturePtr theSketch);
+  PartSet_ConstraintRadiusPrs(FeaturePtr theSketch);
   /// Destructor
-  virtual ~PartSet_FeatureRadiusPrs() {};
+  virtual ~PartSet_ConstraintRadiusPrs() {};
 
   /// Sets the feature to to a feature attribute depending on the selection mode
   /// \param theFeature a feature instance
@@ -44,6 +45,15 @@ public:
   /// \return the new selection mode
   virtual PartSet_SelectionMode setPoint(double theX, double theY,
                                          const PartSet_SelectionMode& theMode);
+
+  /// Creates an AIS presentation if the previous is null or update the given one
+  /// \param theFeature a feature
+  /// \param theSketch a feature sketch
+  /// \param thePrevious a previuos AIS presentation
+  /// \return a created/changed AIS object with the feature parameters
+  static Handle_AIS_InteractiveObject createPresentation(FeaturePtr theFeature,
+                                                         FeaturePtr theSketch,
+                                                         Handle_AIS_InteractiveObject thePreviuos);
 
   /// Returns the feature attribute name for the selection mode
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode

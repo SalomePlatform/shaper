@@ -1,9 +1,9 @@
-// File:        PartSet_FeatureLengthPrs.h
+// File:        PartSet_ConstraintDistancePrs.h
 // Created:     16 Jun 2014
 // Author:      Natalia ERMOLAEVA
 
-#ifndef PartSet_FeatureLengthPrs_H
-#define PartSet_FeatureLengthPrs_H
+#ifndef PartSet_ConstraintDistancePrs_H
+#define PartSet_ConstraintDistancePrs_H
 
 #include "PartSet.h"
 
@@ -14,12 +14,12 @@ class GeomDataAPI_Point2D;
 class Handle_AIS_InteractiveObject;
 
 /*!
- \class PartSet_FeatureLengthPrs
+ \class PartSet_ConstraintDistancePrs
  * \brief The class to define the circle feature manipulation. It is created for
  * the feature create operation to move out the feature properties set and use one operation
  * for any type of features.
 */
-class PARTSET_EXPORT PartSet_FeatureLengthPrs : public PartSet_FeaturePrs
+class PARTSET_EXPORT PartSet_ConstraintDistancePrs : public PartSet_FeaturePrs
 {
 public:
   /// Returns the feature type processed by this presentation
@@ -28,9 +28,9 @@ public:
 
   /// Constructor
   /// \param theSketch the sketch feature
-  PartSet_FeatureLengthPrs(FeaturePtr theSketch);
+  PartSet_ConstraintDistancePrs(FeaturePtr theSketch);
   /// Destructor
-  virtual ~PartSet_FeatureLengthPrs() {};
+  virtual ~PartSet_ConstraintDistancePrs() {};
 
   /// Sets the feature to to a feature attribute depending on the selection mode
   /// \param theFeature a feature instance

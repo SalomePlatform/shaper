@@ -25,9 +25,9 @@
 #include <PartSet_FeatureCirclePrs.h>
 #include <PartSet_FeatureArcPrs.h>
 
-#include <PartSet_FeatureLengthPrs.h>
-#include <PartSet_FeatureRadiusPrs.h>
-#include <PartSet_FeatureDistancePrs.h>
+#include <PartSet_ConstraintLengthPrs.h>
+#include <PartSet_ConstraintRadiusPrs.h>
+#include <PartSet_ConstraintDistancePrs.h>
 
 #include <XGUI_ViewerPrs.h>
 
@@ -156,14 +156,14 @@ boost::shared_ptr<PartSet_FeaturePrs> PartSet_Tools::createFeaturePrs(const std:
   else if (theKind == PartSet_FeatureArcPrs::getKind()) {
     aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeatureArcPrs(theSketch));
   }
-  else if (theKind == PartSet_FeatureLengthPrs::getKind()) {
-    aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeatureLengthPrs(theSketch));
+  else if (theKind == PartSet_ConstraintLengthPrs::getKind()) {
+    aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_ConstraintLengthPrs(theSketch));
   }
-  else if (theKind == PartSet_FeatureRadiusPrs::getKind()) {
-    aFeaturePrs = boost::shared_ptr<PartSet_FeatureRadiusPrs>(new PartSet_FeatureRadiusPrs(theSketch));
+  else if (theKind == PartSet_ConstraintRadiusPrs::getKind()) {
+    aFeaturePrs = boost::shared_ptr<PartSet_ConstraintRadiusPrs>(new PartSet_ConstraintRadiusPrs(theSketch));
   }
-  else if (theKind == PartSet_FeatureDistancePrs::getKind()) {
-    aFeaturePrs = boost::shared_ptr<PartSet_FeatureDistancePrs>(new PartSet_FeatureDistancePrs(theSketch));
+  else if (theKind == PartSet_ConstraintDistancePrs::getKind()) {
+    aFeaturePrs = boost::shared_ptr<PartSet_ConstraintDistancePrs>(new PartSet_ConstraintDistancePrs(theSketch));
   }
 
 

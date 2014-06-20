@@ -5,15 +5,15 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Constants.h
+	PartSet_ConstraintDistancePrs.h
+	PartSet_ConstraintLengthPrs.h
+	PartSet_ConstraintRadiusPrs.h
 	PartSet_EditLine.h
 	PartSet_FeatureArcPrs.h
 	PartSet_FeatureCirclePrs.h
-	PartSet_FeatureDistancePrs.h
 	PartSet_FeaturePrs.h
-	PartSet_FeatureLengthPrs.h
 	PartSet_FeatureLinePrs.h
 	PartSet_FeaturePointPrs.h
-	PartSet_FeatureRadiusPrs.h
 	PartSet_Listener.h
 	PartSet_Module.h
 	PartSet_OperationCreateConstraint.h
@@ -28,15 +28,15 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
+	PartSet_ConstraintDistancePrs.cpp
+	PartSet_ConstraintLengthPrs.cpp
+	PartSet_ConstraintRadiusPrs.cpp
 	PartSet_EditLine.cpp
 	PartSet_FeaturePrs.cpp
 	PartSet_FeatureArcPrs.cpp
 	PartSet_FeatureCirclePrs.cpp
-	PartSet_FeatureDistancePrs.cpp
-	PartSet_FeatureLengthPrs.cpp
 	PartSet_FeatureLinePrs.cpp
 	PartSet_FeaturePointPrs.cpp
-	PartSet_FeatureRadiusPrs.cpp
 	PartSet_Listener.cpp
 	PartSet_Module.cpp
 	PartSet_OperationCreateConstraint.cpp

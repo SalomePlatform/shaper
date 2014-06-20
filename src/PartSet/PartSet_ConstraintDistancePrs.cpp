@@ -2,25 +2,19 @@
 // Created:     16 Jun 2014
 // Author:      Natalia ERMOLAEVA
 
-#include <PartSet_FeatureLengthPrs.h>
+#include <PartSet_ConstraintDistancePrs.h>
 #include <PartSet_Tools.h>
-#include <PartSet_Constants.h>
 
 #include <PartSet_FeatureLinePrs.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Line.h>
-#include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintDistance.h>
 
-#include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
-#include <GeomDataAPI_Dir.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Lin2d.h>
-
-#include <AIS_InteractiveObject.hxx>
-#include <AIS_LengthDimension.hxx>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -28,23 +22,22 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeDouble.h>
 
-#include <gp_Pln.hxx>
-#include <gp_Pnt.hxx>
+#include <AIS_InteractiveObject.hxx>
 #include <Precision.hxx>
 
 using namespace std;
 
-PartSet_FeatureLengthPrs::PartSet_FeatureLengthPrs(FeaturePtr theSketch)
+PartSet_ConstraintDistancePrs::PartSet_ConstraintDistancePrs(FeaturePtr theSketch)
 : PartSet_FeaturePrs(theSketch)
 {
 }
 
-std::string PartSet_FeatureLengthPrs::getKind()
+std::string PartSet_ConstraintDistancePrs::getKind()
 {
-  return SKETCH_CONSTRAINT_LENGTH_KIND;
+  return SKETCH_CONSTRAINT_DISTANCE_KIND;
 }
 
-bool PartSet_FeatureLengthPrs::setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode)
+bool PartSet_ConstraintDistancePrs::setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode)
 {
   bool aResult = false;
   if (feature() && theFeature && theFeature->getKind() == SKETCH_LINE_KIND && theMode == SM_FirstPoint)
@@ -69,7 +62,7 @@ bool PartSet_FeatureLengthPrs::setFeature(FeaturePtr theFeature, const PartSet_S
   return aResult;
 }
 
-PartSet_SelectionMode PartSet_FeatureLengthPrs::setPoint(double theX, double theY,
+PartSet_SelectionMode PartSet_ConstraintDistancePrs::setPoint(double theX, double theY,
                                                          const PartSet_SelectionMode& theMode)
 {
   PartSet_SelectionMode aMode = theMode;
@@ -111,19 +104,20 @@ PartSet_SelectionMode PartSet_FeatureLengthPrs::setPoint(double theX, double the
   return aMode;
 }
 
-Handle(AIS_InteractiveObject) PartSet_FeatureLengthPrs::createPresentation(FeaturePtr theFeature,
+Handle(AIS_InteractiveObject) PartSet_ConstraintDistancePrs::createPresentation(FeaturePtr theFeature,
                                                        FeaturePtr theSketch,
                                                        Handle(AIS_InteractiveObject) thePreviuos)
 {
+  Handle(AIS_InteractiveObject) anAIS = thePreviuos;
   if (!theFeature || !theSketch)
-    return thePreviuos;
-
+    return anAIS;
+  /*
   boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
   boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
     boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SKETCH_ATTR_ORIGIN));
   boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_NORM));
-  gp_Pln aPlane(aNormal->x(), aNormal->y(), aNormal->z(), 0/*D*/);
+  gp_Pln aPlane(aNormal->x(), aNormal->y(), aNormal->z(), 0);
 
   aData = theFeature->data();
   boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
@@ -166,14 +160,14 @@ Handle(AIS_InteractiveObject) PartSet_FeatureLengthPrs::createPresentation(Featu
 
     Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
     anAspect->MakeArrows3d (Standard_False);
-    anAspect->MakeText3d(false/*is text 3d*/);
+    anAspect->MakeText3d(false);
     anAspect->TextAspect()->SetHeight(CONSTRAINT_TEXT_HEIGHT);
-    anAspect->MakeTextShaded(false/*is test shaded*/);
-    aDimAIS->DimensionAspect()->MakeUnitsDisplayed(false/*is units displayed*/);
-    /*if (isUnitsDisplayed)
-    {
-      aDimAIS->SetDisplayUnits (aDimDlg->GetUnits ());
-    }*/
+    anAspect->MakeTextShaded(false);
+    aDimAIS->DimensionAspect()->MakeUnitsDisplayed(false);
+    //if (isUnitsDisplayed)
+    //{
+    //  aDimAIS->SetDisplayUnits (aDimDlg->GetUnits ());
+    //}
     aDimAIS->SetDimensionAspect (anAspect);
     aDimAIS->SetFlyout(aFlyout);
     aDimAIS->SetSelToleranceForText2d(CONSTRAINT_TEXT_SELECTION_TOLERANCE);
@@ -190,37 +184,38 @@ Handle(AIS_InteractiveObject) PartSet_FeatureLengthPrs::createPresentation(Featu
       aDimAIS->Redisplay(Standard_True);
     }
   }
+*/
   return anAIS;
 }
 
-std::string PartSet_FeatureLengthPrs::getAttribute(const PartSet_SelectionMode& theMode) const
+std::string PartSet_ConstraintDistancePrs::getAttribute(const PartSet_SelectionMode& theMode) const
 {
   return "";
 }
 
-PartSet_SelectionMode PartSet_FeatureLengthPrs::getNextMode(const std::string& theAttribute) const
+PartSet_SelectionMode PartSet_ConstraintDistancePrs::getNextMode(const std::string& theAttribute) const
 {
   return SM_FirstPoint;
 }
 
-void PartSet_FeatureLengthPrs::move(double theDeltaX, double theDeltaY)
+void PartSet_ConstraintDistancePrs::move(double theDeltaX, double theDeltaY)
 {
 }
 
-double PartSet_FeatureLengthPrs::distanceToPoint(FeaturePtr theFeature,
+double PartSet_ConstraintDistancePrs::distanceToPoint(FeaturePtr theFeature,
                                                  double theX, double theY)
 {
   return 0;
 }
 
-boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLengthPrs::findPoint(FeaturePtr theFeature,
+boost::shared_ptr<GeomDataAPI_Point2D> PartSet_ConstraintDistancePrs::findPoint(FeaturePtr theFeature,
                                                                            double theX, double theY)
 {
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
   return aPoint2D;
 }
 
-boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLengthPrs::featurePoint
+boost::shared_ptr<GeomDataAPI_Point2D> PartSet_ConstraintDistancePrs::featurePoint
                                                      (const PartSet_SelectionMode& theMode)
 {
   return boost::shared_ptr<GeomDataAPI_Point2D>();

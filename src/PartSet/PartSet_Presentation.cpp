@@ -5,7 +5,9 @@
 #include <PartSet_Presentation.h>
 #include <PartSet_Tools.h>
 
-#include <PartSet_FeatureLengthPrs.h>
+#include <PartSet_ConstraintLengthPrs.h>
+#include <PartSet_ConstraintDistancePrs.h>
+#include <PartSet_ConstraintRadiusPrs.h>
 
 #include <ModelAPI_Feature.h>
 
@@ -28,8 +30,12 @@ Handle(AIS_InteractiveObject) PartSet_Presentation::createPresentation(
   Handle(AIS_InteractiveObject) anAIS;
 
   std::string aKind = theFeature->getKind();
-  if (aKind == PartSet_FeatureLengthPrs::getKind())
-    anAIS = PartSet_FeatureLengthPrs::createPresentation(theFeature, theSketch, thePreviuos);
+  if (aKind == PartSet_ConstraintLengthPrs::getKind())
+    anAIS = PartSet_ConstraintLengthPrs::createPresentation(theFeature, theSketch, thePreviuos);
+  else if (aKind == PartSet_ConstraintDistancePrs::getKind())
+    anAIS = PartSet_ConstraintDistancePrs::createPresentation(theFeature, theSketch, thePreviuos);
+  else if (aKind == PartSet_ConstraintRadiusPrs::getKind())
+    anAIS = PartSet_ConstraintRadiusPrs::createPresentation(theFeature, theSketch, thePreviuos);
   else {
     anAIS = createFeature(theFeature, theShape, thePreviuos);
     if (theFeature->getKind() == SKETCH_KIND)
