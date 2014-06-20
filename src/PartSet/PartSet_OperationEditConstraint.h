@@ -11,6 +11,7 @@
 #include <QObject>
 
 class PartSet_EditLine;
+class PartSet_FeaturePrs;
 class QMouseEvent;
 
 /*!
@@ -146,6 +147,7 @@ protected slots:
 
 private:
   PartSet_EditLine* myEditor; ///< the constraint value editor
+  boost::shared_ptr<PartSet_FeaturePrs> myFeaturePrs; ///< the feature presentation
   FeaturePtr mySketch; ///< the sketch feature
   //std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
   Point myCurPoint; ///< the current 3D point clicked or moved

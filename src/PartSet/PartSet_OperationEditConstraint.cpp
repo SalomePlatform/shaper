@@ -6,6 +6,7 @@
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketch.h>
 #include <PartSet_EditLine.h>
+#include <PartSet_FeaturePrs.h>
 #include <SketchPlugin_ConstraintLength.h>
 
 #include <ModuleBase_OperationDescription.h>
@@ -40,6 +41,9 @@ PartSet_OperationEditConstraint::PartSet_OperationEditConstraint(const QString& 
                                               FeaturePtr theFeature)
 : PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature), myIsBlockedSelection(false)
 {
+  std::string aKind = theId.toStdString();
+  myFeaturePrs = PartSet_Tools::createFeaturePrs(aKind, theFeature);
+
   // changed
   myEditor = new PartSet_EditLine(0);
   connect(myEditor, SIGNAL(stopped(double)), this, SLOT(onEditStopped(double)));
@@ -90,7 +94,7 @@ FeaturePtr PartSet_OperationEditConstraint::sketch() const
 }
 
 void PartSet_OperationEditConstraint::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                             const std::list<XGUI_ViewerPrs>& /*theSelected*/,
+                                             const std::list<XGUI_ViewerPrs>& theSelected,
                                              const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
   //if (myFeatures.size() == 1)
@@ -98,6 +102,8 @@ void PartSet_OperationEditConstraint::mousePressed(QMouseEvent* theEvent, Handle
     FeaturePtr aFeature;
     if (!theHighlighted.empty())
       aFeature = theHighlighted.front().feature();
+    if (!aFeature && !theSelected.empty()) // changed
+      aFeature = theSelected.front().feature();
 
     if (aFeature && aFeature == feature()) { // continue the feature edit
     }
@@ -135,10 +141,12 @@ void PartSet_OperationEditConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V
     double aX, anY;
     PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
 
-    double aDeltaX = aX - aCurX;
+    /*double aDeltaX = aX - aCurX;
     double aDeltaY = anY - aCurY;
 
-    PartSet_Tools::moveFeature(feature(), aDeltaX, aDeltaY);
+    PartSet_Tools::moveFeature(feature(), aDeltaX, aDeltaY);*/
+    myFeaturePrs->setPoint(aX, anY, SM_SecondPoint);
+
 
     /*std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
     for (; anIt != aLast; anIt++) {

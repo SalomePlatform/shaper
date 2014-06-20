@@ -42,11 +42,6 @@ PartSet_SelectionMode PartSet_FeatureLengthPrs::setPoint(double theX, double the
   PartSet_SelectionMode aMode = theMode;
   switch (theMode)
   {
-    case SM_FirstPoint: {
-      //PartSet_Tools::setFeaturePoint(feature(), theX, theY, CIRCLE_ATTR_CENTER);
-      //aMode = SM_SecondPoint;
-    }
-    break;
     case SM_SecondPoint: {
       boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
       boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
@@ -85,56 +80,21 @@ PartSet_SelectionMode PartSet_FeatureLengthPrs::setPoint(double theX, double the
 
 std::string PartSet_FeatureLengthPrs::getAttribute(const PartSet_SelectionMode& theMode) const
 {
-  std::string aAttribute;
-  switch (theMode)
-  {
-    case SM_FirstPoint:
-      //aAttribute = CIRCLE_ATTR_CENTER;
-    break;
-    case SM_SecondPoint:
-      //aAttribute = CIRCLE_ATTR_RADIUS;
-    break;
-    default:
-    break;
-  }
-  return aAttribute;
+  return "";
 }
 
 PartSet_SelectionMode PartSet_FeatureLengthPrs::getNextMode(const std::string& theAttribute) const
 {
-  PartSet_SelectionMode aMode = SM_SecondPoint;
-
-  /*if (theAttribute == CIRCLE_ATTR_CENTER)
-    aMode = SM_SecondPoint;
-  else if (theAttribute == CIRCLE_ATTR_RADIUS)
-    aMode = SM_DonePoint;*/
-  return aMode;
+  return SM_FirstPoint;
 }
 
 void PartSet_FeatureLengthPrs::move(double theDeltaX, double theDeltaY)
 {
-  /*boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
-  if (!aData->isValid())
-    return;
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
-  aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);*/
 }
 
 double PartSet_FeatureLengthPrs::distanceToPoint(FeaturePtr theFeature,
                                                  double theX, double theY)
 {
-  /*double aDelta = 0;
-  if (!theFeature || theFeature->getKind() != getKind())
-    return aDelta;
-
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
-
-  boost::shared_ptr<GeomAPI_Pnt2d> aPoint2d(new GeomAPI_Pnt2d(theX, theY));
-  return aPoint->pnt()->distance(aPoint2d);*/
   return 0;
 }
 
@@ -142,35 +102,12 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLengthPrs::findPoint(Featu
                                                                            double theX, double theY)
 {
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
-  /*if (!theFeature || theFeature->getKind() != getKind())
-    return aPoint2D;
-
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
-  if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
-    aPoint2D = aPoint;
-*/
   return aPoint2D;
 }
 
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLengthPrs::featurePoint
                                                      (const PartSet_SelectionMode& theMode)
 {
-  /*std::string aPointArg;
-  switch (theMode)
-  {
-    case SM_FirstPoint:
-      aPointArg = CIRCLE_ATTR_CENTER;
-      break;
-    default:
-      break;
-  }
-  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                                                              (aData->attribute(aPointArg));
-  return aPoint;
-  */
   return boost::shared_ptr<GeomDataAPI_Point2D>();
 }
 
