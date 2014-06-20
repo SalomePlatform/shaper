@@ -64,7 +64,7 @@ void PartSet_OperationEditConstraint::init(FeaturePtr theFeature,
                                      const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
   setFeature(theFeature);
-
+  /*
   if (!theHighlighted.empty()) {
     // if there is highlighted object, we check whether it is in the list of selected objects
     // in that case this object is a handle of the moved lines. If there no such object in the selection,
@@ -81,7 +81,7 @@ void PartSet_OperationEditConstraint::init(FeaturePtr theFeature,
       myFeatures = theSelected;
   }
   else
-    myFeatures = theSelected;
+    myFeatures = theSelected;*/
 }
 
 FeaturePtr PartSet_OperationEditConstraint::sketch() const
@@ -93,7 +93,7 @@ void PartSet_OperationEditConstraint::mousePressed(QMouseEvent* theEvent, Handle
                                              const std::list<XGUI_ViewerPrs>& /*theSelected*/,
                                              const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
-  if (myFeatures.size() == 1)
+  //if (myFeatures.size() == 1)
   {
     FeaturePtr aFeature;
     if (!theHighlighted.empty())
@@ -102,11 +102,11 @@ void PartSet_OperationEditConstraint::mousePressed(QMouseEvent* theEvent, Handle
     if (aFeature && aFeature == feature()) { // continue the feature edit
     }
     else {
-      XGUI_ViewerPrs aFeaturePrs = myFeatures.front();
+      //XGUI_ViewerPrs aFeaturePrs = myFeatures.front();
       commit();
       emit featureConstructed(feature(), FM_Deactivation);
 
-      bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+      /*bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
       if(aHasShift && !theHighlighted.empty()) {
         std::list<XGUI_ViewerPrs> aSelected;
         aSelected.push_back(aFeaturePrs);
@@ -115,7 +115,7 @@ void PartSet_OperationEditConstraint::mousePressed(QMouseEvent* theEvent, Handle
       }
       else if (aFeature) {
         restartOperation(PartSet_OperationEditConstraint::Type(), aFeature);
-      }
+      }*/
     }
   }
 }
@@ -140,13 +140,13 @@ void PartSet_OperationEditConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V
 
     PartSet_Tools::moveFeature(feature(), aDeltaX, aDeltaY);
 
-    std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
+    /*std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = (*anIt).feature();
       if (!aFeature || aFeature == feature())
         continue;
       PartSet_Tools::moveFeature(aFeature, aDeltaX, aDeltaY);
-    }
+    }*/
   }
   sendFeatures();
 
@@ -157,10 +157,10 @@ void PartSet_OperationEditConstraint::mouseReleased(QMouseEvent* theEvent, Handl
                                               const std::list<XGUI_ViewerPrs>& /*theSelected*/,
                                               const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
-  std::list<XGUI_ViewerPrs> aFeatures = myFeatures;
-  if (myFeatures.size() == 1) {
+  //std::list<XGUI_ViewerPrs> aFeatures = myFeatures;
+  //if (myFeatures.size() == 1) {
     blockSelection(false);
-  }
+  /*}
   else {
     commit();
     std::list<XGUI_ViewerPrs>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
@@ -169,7 +169,7 @@ void PartSet_OperationEditConstraint::mouseReleased(QMouseEvent* theEvent, Handl
       if (aFeature)
         emit featureConstructed(aFeature, FM_Deactivation);
     }
-  }
+  }*/
 }
 
 void PartSet_OperationEditConstraint::mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
@@ -192,8 +192,8 @@ void PartSet_OperationEditConstraint::startOperation()
   // do nothing in order to do not create a new feature
   emit multiSelectionEnabled(false);
 
-  if (myFeatures.size() > 1)
-    blockSelection(true);
+  //if (myFeatures.size() > 1)
+  //  blockSelection(true);
 
   myCurPoint.clear();
 }
@@ -202,9 +202,9 @@ void PartSet_OperationEditConstraint::stopOperation()
 {
   emit multiSelectionEnabled(true);
 
-  blockSelection(false, myFeatures.size() > 1);
+  //blockSelection(false, myFeatures.size() > 1);
 
-  myFeatures.clear();
+  //myFeatures.clear();
 }
 
 void PartSet_OperationEditConstraint::blockSelection(bool isBlocked, const bool isRestoreSelection)
@@ -215,12 +215,12 @@ void PartSet_OperationEditConstraint::blockSelection(bool isBlocked, const bool 
   myIsBlockedSelection = isBlocked;
   if (isBlocked) {
     emit setSelection(std::list<XGUI_ViewerPrs>());
-    emit stopSelection(myFeatures, true);
+    //emit stopSelection(myFeatures, true);
   }
   else {
-    emit stopSelection(myFeatures, false);
-    if (isRestoreSelection)
-      emit setSelection(myFeatures);
+    //emit stopSelection(myFeatures, false);
+    //if (isRestoreSelection)
+    //  emit setSelection(myFeatures);
   }
 }
 
@@ -234,10 +234,12 @@ void PartSet_OperationEditConstraint::sendFeatures()
 {
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_MOVED);
 
-  std::list<FeaturePtr > aFeatures;
-  std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
+  std::list<FeaturePtr> aFeatures;
+  aFeatures.push_back(feature());
+  std::list<FeaturePtr>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
+  //std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
   for (; anIt != aLast; anIt++) {
-    FeaturePtr aFeature = (*anIt).feature();
+    FeaturePtr aFeature = (*anIt);//.feature();
     if (!aFeature)
       continue;
 
@@ -254,5 +256,6 @@ void PartSet_OperationEditConstraint::onEditStopped(double theValue)
 
   flushUpdated();
   commit();
+  emit featureConstructed(feature(), FM_Deactivation);
   //restartOperation(feature()->getKind(), FeaturePtr());
 }

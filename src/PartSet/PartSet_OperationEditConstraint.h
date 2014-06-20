@@ -147,7 +147,7 @@ protected slots:
 private:
   PartSet_EditLine* myEditor; ///< the constraint value editor
   FeaturePtr mySketch; ///< the sketch feature
-  std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
+  //std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
   Point myCurPoint; ///< the current 3D point clicked or moved
   bool myIsBlockedSelection; ///< the state of the last state of selection blocked signal
 };
