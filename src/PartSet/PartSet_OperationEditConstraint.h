@@ -55,10 +55,11 @@ public:
 public:
   /// Constructor
   /// \param theId the feature identifier
+  /// \param theFeatureId the feature identifier
   /// \param theParent the operation parent
   /// \param theFeature the parent feature
-  PartSet_OperationEditConstraint(const QString& theId, QObject* theParent,
-                            FeaturePtr theFeature);
+  PartSet_OperationEditConstraint(const QString& theId, const std::string& theFeatureKind,
+                            QObject* theParent, FeaturePtr theFeature);
   /// Destructor
   virtual ~PartSet_OperationEditConstraint();
 
@@ -148,7 +149,6 @@ protected slots:
 private:
   PartSet_EditLine* myEditor; ///< the constraint value editor
   boost::shared_ptr<PartSet_FeaturePrs> myFeaturePrs; ///< the feature presentation
-  FeaturePtr mySketch; ///< the sketch feature
   //std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
   Point myCurPoint; ///< the current 3D point clicked or moved
   bool myIsBlockedSelection; ///< the state of the last state of selection blocked signal

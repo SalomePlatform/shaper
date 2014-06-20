@@ -37,12 +37,12 @@
 using namespace std;
 
 PartSet_OperationEditConstraint::PartSet_OperationEditConstraint(const QString& theId,
+                                              const std::string& theFeatureKind,
 	                                          QObject* theParent,
                                               FeaturePtr theFeature)
-: PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature), myIsBlockedSelection(false)
+: PartSet_OperationSketchBase(theId, theParent), myIsBlockedSelection(false)
 {
-  std::string aKind = theId.toStdString();
-  myFeaturePrs = PartSet_Tools::createFeaturePrs(aKind, theFeature);
+  myFeaturePrs = PartSet_Tools::createFeaturePrs(theFeatureKind, theFeature);
 
   // changed
   myEditor = new PartSet_EditLine(0);
@@ -68,6 +68,8 @@ void PartSet_OperationEditConstraint::init(FeaturePtr theFeature,
                                      const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
   setFeature(theFeature);
+  myFeaturePrs->init(theFeature);
+
   /*
   if (!theHighlighted.empty()) {
     // if there is highlighted object, we check whether it is in the list of selected objects
@@ -90,7 +92,7 @@ void PartSet_OperationEditConstraint::init(FeaturePtr theFeature,
 
 FeaturePtr PartSet_OperationEditConstraint::sketch() const
 {
-  return mySketch;
+  return myFeaturePrs->sketch();
 }
 
 void PartSet_OperationEditConstraint::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView,
