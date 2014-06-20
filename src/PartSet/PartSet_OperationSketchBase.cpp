@@ -5,9 +5,11 @@
 #include <PartSet_OperationSketchBase.h>
 
 #include <SketchPlugin_Feature.h>
+#include <SketchPlugin_ConstraintLength.h>
 
 #include <V3d_View.hxx>
 #include <AIS_Shape.hxx>
+#include <AIS_DimensionSelectionMode.hxx>
 
 #include <QKeyEvent>
 
@@ -43,8 +45,6 @@ std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >
   return std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >();
 }
 
-#include <AIS_DimensionSelectionMode.hxx>
-#include <SketchPlugin_ConstraintLength.h>
 std::list<int> PartSet_OperationSketchBase::getSelectionModes(FeaturePtr theFeature) const
 {
   std::list<int> aModes;

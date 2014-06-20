@@ -72,15 +72,6 @@ public:
   /// \param theEvent the mouse event
   virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
 
-  /// Processes the mouse double click in the point
-  /// \param theEvent the mouse event
-  /// \param theView a viewer to have the viewer the eye position
-  /// \param theSelected the list of selected presentations
-  /// \param theHighlighted the list of highlighted presentations
-  virtual void mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                const std::list<XGUI_ViewerPrs>& theSelected,
-                                const std::list<XGUI_ViewerPrs>& theHighlighted);
-
   /// Returns the map of the operation previews including the nested feature previews
   /// \return the map of feature to the feature preview
   virtual std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >
@@ -117,6 +108,10 @@ protected:
   /// Set the plane to the current sketch
   /// \param theShape the shape
   void setSketchPlane(const TopoDS_Shape& theShape);
+
+  /// Returns the operation type, which is feature or constraint edit opeation
+  /// \param theFeature a feature instance
+  std::string getOperationType(FeaturePtr theFeature);
 
 private:
   std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation

@@ -5,9 +5,11 @@
 #include <PartSet_OperationSketch.h>
 
 #include <PartSet_OperationEditFeature.h>
+#include <PartSet_OperationEditConstraint.h>
 #include <PartSet_Tools.h>
 
 #include <SketchPlugin_Sketch.h>
+#include <SketchPlugin_ConstraintLength.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -90,14 +92,14 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
     if (theHighlighted.size() == 1) {
       FeaturePtr aFeature = theHighlighted.front().feature();
       if (aFeature)
-        restartOperation(PartSet_OperationEditFeature::Type(), aFeature);
+        restartOperation(getOperationType(aFeature), aFeature);
     }
     else
       myFeatures = theHighlighted;
+
   }
 }
 
-#include <QLineEdit>
 void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
                                             const std::list<XGUI_ViewerPrs>& theSelected,
                                             const std::list<XGUI_ViewerPrs>& theHighlighted)
@@ -105,59 +107,10 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
   if (!hasSketchPlane()) {
   }
   else {
-    if (!theSelected.empty()) {
-      XGUI_ViewerPrs aPrs = theSelected.front();
-      if (!aPrs.owner().IsNull()) {
-        Handle(AIS_DimensionOwner) anOwner = Handle(AIS_DimensionOwner)::DownCast(aPrs.owner());
-        if (!anOwner.IsNull() && anOwner->SelectionMode() == AIS_DSM_Text) {
-          Handle(SelectMgr_SelectableObject) anObject = anOwner->Selectable();
-          double aValue = 0;
-          if (!anObject.IsNull()) {
-            Handle(AIS_LengthDimension) aLenDim = Handle(AIS_LengthDimension)::DownCast(anObject);
-            if (!aLenDim.IsNull())
-              aValue = aLenDim->GetValue();
-          }
-
-          QLineEdit* aLine = new QLineEdit();
-          QPoint aViewPos = theEvent->globalPos();
-          QPoint aLinePos(aViewPos.x(), aViewPos.y());
-          aLine->move(aLinePos);
-          aLine->setText(QString::number(aValue));
-          aLine->show();
-        }
-      }
-    }
-  }
-}
-
-#include <QLineEdit>
-void PartSet_OperationSketch::mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                               const std::list<XGUI_ViewerPrs>& theSelected,
-                                               const std::list<XGUI_ViewerPrs>& theHighlighted)
-{
-  return;
-  if (!hasSketchPlane())
-    return;
-  if (!theSelected.empty()) {
-    XGUI_ViewerPrs aPrs = theSelected.front();
-    if (!aPrs.owner().IsNull()) {
-      Handle(AIS_DimensionOwner) anOwner = Handle(AIS_DimensionOwner)::DownCast(aPrs.owner());
-      if (!anOwner.IsNull() && anOwner->SelectionMode() == AIS_DSM_Text) {
-        Handle(SelectMgr_SelectableObject) anObject = anOwner->Selectable();
-        double aValue = 0;
-        if (!anObject.IsNull()) {
-          Handle(AIS_LengthDimension) aLenDim = Handle(AIS_LengthDimension)::DownCast(anObject);
-          if (!aLenDim.IsNull())
-            aValue = aLenDim->GetValue();
-        }
-
-        QLineEdit* aLine = new QLineEdit();
-        QPoint aViewPos = theEvent->globalPos();
-        QPoint aLinePos(aViewPos.x(), aViewPos.y());
-        aLine->move(aLinePos);
-        aLine->setText(QString::number(aValue));
-        aLine->show();
-      }
+    if (theSelected.size() == 1) {
+      FeaturePtr aFeature = theSelected.front().feature();
+      if (aFeature)
+        restartOperation(getOperationType(aFeature), aFeature);
     }
   }
 }
@@ -171,7 +124,7 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View)
     FeaturePtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), theView, feature(),
                                                         myFeatures);
     if (aFeature)
-      restartOperation(PartSet_OperationEditFeature::Type(), aFeature);
+      restartOperation(getOperationType(aFeature), aFeature);
   }
 }
 
@@ -283,4 +236,14 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
   emit featureConstructed(feature(), FM_Hide);
   emit closeLocalContext();
   emit planeSelected(aDir->x(), aDir->y(), aDir->z());
+}
+
+std::string PartSet_OperationSketch::getOperationType(FeaturePtr theFeature)
+{
+  std::string aType = PartSet_OperationEditFeature::Type();
+
+  if (theFeature->getKind() == SKETCH_CONSTRAINT_LENGTH_KIND)
+    aType = PartSet_OperationEditConstraint::Type();
+
+  return aType;
 }

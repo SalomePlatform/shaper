@@ -17,6 +17,7 @@ SET(PROJECT_HEADERS
 	PartSet_OperationConstraint.h
 	PartSet_OperationCreateConstraint.h
 	PartSet_OperationCreateFeature.h
+	PartSet_OperationEditConstraint.h
 	PartSet_OperationEditFeature.h
 	PartSet_OperationSketchBase.h
 	PartSet_OperationSketch.h
@@ -38,6 +39,7 @@ SET(PROJECT_SOURCES
 	PartSet_OperationConstraint.cpp
 	PartSet_OperationCreateConstraint.cpp
 	PartSet_OperationCreateFeature.cpp
+	PartSet_OperationEditConstraint.cpp
 	PartSet_OperationEditFeature.cpp
 	PartSet_OperationSketchBase.cpp
 	PartSet_OperationSketch.cpp
