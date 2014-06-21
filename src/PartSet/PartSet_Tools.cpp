@@ -272,6 +272,25 @@ double PartSet_Tools::featureValue(FeaturePtr theFeature, const std::string& the
   return aValue;
 }
 
+FeaturePtr PartSet_Tools::feature(FeaturePtr theFeature, const std::string& theAttribute,
+                                  const std::string& theKind)
+{
+  FeaturePtr aFeature;
+  if (!theFeature)
+    return aFeature;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+          boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(theAttribute));
+  if (anAttr) {
+    aFeature = anAttr->feature();
+    if (!theKind.empty() && aFeature && aFeature->getKind() != theKind) {
+      aFeature = FeaturePtr();
+    }
+  }
+  return aFeature;
+}
+
 void PartSet_Tools::createConstraint(FeaturePtr theSketch,
                                      boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
                                      boost::shared_ptr<GeomDataAPI_Point2D> thePoint2)

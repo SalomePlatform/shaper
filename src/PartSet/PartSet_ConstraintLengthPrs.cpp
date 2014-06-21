@@ -94,9 +94,6 @@ PartSet_SelectionMode PartSet_ConstraintLengthPrs::setPoint(double theX, double 
       boost::shared_ptr<GeomAPI_Pnt2d> aResult = aFeatureLin->project(aPoint);
       double aDistance = aPoint->distance(aResult);
 
-      double aStartX, aStartY;
-      PartSet_FeatureLinePrs::getLinePoint(aFeature, LINE_ATTR_START, aStartX, aStartY);
-
       if (!aFeatureLin->isRight(aPoint))
         aDistance = -aDistance;
 

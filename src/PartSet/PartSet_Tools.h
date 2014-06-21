@@ -100,6 +100,15 @@ public:
   static double featureValue(FeaturePtr theFeature, const std::string& theAttribute,
                              bool& isValid);
 
+  /// Find a feature in the attribute of the given feature. If the kind is not empty,
+  /// the return feature should be this type. Otherwise it is null
+  /// \param theFeature a source feature
+  /// \param theAttribute a name of the requried attribute attribute
+  /// \param theKind an output feature kind
+  /// \return the feature
+  static FeaturePtr feature(FeaturePtr theFeature, const std::string& theAttribute,
+                             const std::string& theKind);
+
   /// Creates a constraint on two points
   /// \param thePoint1 the first point
   /// \param thePoint1 the second point
