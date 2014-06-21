@@ -51,8 +51,15 @@ public:
   /// \return next attribute selection mode
   virtual PartSet_SelectionMode getNextMode(const std::string& theAttribute) const;
 
-  void projectPointOnArc(gp_Pnt& thePoint, Handle_V3d_View theView,
-                         double& theX, double& theY);
+  /// Project the view point on the feature. The output coordinates belong to the feature
+  /// \param theFeature a feature
+  /// \param theSketch the sketch feature
+  /// \param thePoint a viewer point
+  /// \param theView the OCC view
+  /// \theX the output horizontal coordinate of a projected point
+  /// \theY the output vertical coordinate of a projected point
+  static void projectPointOnFeature(FeaturePtr theFeature, FeaturePtr theSketch, gp_Pnt& thePoint,
+                                    Handle_V3d_View theView, double& theX, double& theY);
 
   /// \brief Move the full feature.
   /// \param theDeltaX the delta for X coordinate is moved

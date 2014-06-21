@@ -11,6 +11,9 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomAPI_Pln.h>
+#include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_Pnt.h>
 
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
@@ -252,20 +255,21 @@ void PartSet_Tools::setFeatureValue(FeaturePtr theFeature, double theValue,
     anAttribute->setValue(theValue);
 }
 
-bool PartSet_Tools::featureValue(FeaturePtr theFeature, const std::string& theAttribute,
-                                 double& theValue)
+double PartSet_Tools::featureValue(FeaturePtr theFeature, const std::string& theAttribute,
+                                   bool& isValid)
 {
-  bool aResult = false;
-  if (!theFeature)
-    return aResult;
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  AttributeDoublePtr anAttribute =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(theAttribute));
-  if (anAttribute) {
-    theValue = anAttribute->value();
-    aResult = true;
+  isValid = false;
+  double aValue;
+  if (theFeature) {
+    boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+    AttributeDoublePtr anAttribute =
+          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(theAttribute));
+    if (anAttribute) {
+      aValue = anAttribute->value();
+      isValid = true;
+    }
   }
-  return aResult;
+  return aValue;
 }
 
 void PartSet_Tools::createConstraint(FeaturePtr theSketch,
@@ -306,4 +310,41 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findPoint(FeaturePtr theFe
     aPoint2D = aFeaturePrs->findPoint(theFeature, theX, theY);
 
   return aPoint2D;
+}
+
+boost::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(FeaturePtr theSketch)
+{
+  boost::shared_ptr<GeomAPI_Pln> aPlane;
+  double aA, aB, aC, aD;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
+  boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SKETCH_ATTR_ORIGIN));
+  boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_NORM));
+  aA = aNormal->x();
+  aB = aNormal->y();
+  aC = aNormal->z();
+  aD = 0;
+
+  aPlane = boost::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
+  return aPlane;
+}
+
+boost::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(
+                                                boost::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
+                                                FeaturePtr theSketch)
+{
+  boost::shared_ptr<GeomAPI_Pnt> aPoint;
+  if (!theSketch || !thePoint2D)
+    return aPoint;
+
+  boost::shared_ptr<GeomDataAPI_Point> aC = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(theSketch->data()->attribute(SKETCH_ATTR_ORIGIN));
+  boost::shared_ptr<GeomDataAPI_Dir> aX = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theSketch->data()->attribute(SKETCH_ATTR_DIRX));
+  boost::shared_ptr<GeomDataAPI_Dir> aY = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theSketch->data()->attribute(SKETCH_ATTR_DIRY));
+
+  return thePoint2D->to3D(aC->pnt(), aX->dir(), aY->dir());
 }

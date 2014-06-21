@@ -10,7 +10,10 @@
 #include "PartSet_FeaturePrs.h"
 #include "PartSet_Constants.h"
 
+#include <gp_Pnt.hxx>
+
 class GeomDataAPI_Point2D;
+class Handle_V3d_View;
 
 /*!
  \class PartSet_FeatureCirclePrs
@@ -65,6 +68,16 @@ public:
   /// \param theY the vertical point coordinate
   virtual boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
                                                            double theY);
+  /// Project the view point on the feature. The output coordinates belong to the feature
+  /// \param theFeature a feature
+  /// \param theSketch the sketch feature
+  /// \param thePoint a viewer point
+  /// \param theView the OCC view
+  /// \theX the output horizontal coordinate of a projected point
+  /// \theY the output vertical coordinate of a projected point
+  static void projectPointOnFeature(FeaturePtr theFeature, FeaturePtr theSketch, gp_Pnt& thePoint,
+                                    Handle_V3d_View theView, double& theX, double& theY);
+
 protected:
   /// Returns the feature point in the selection mode position.
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode

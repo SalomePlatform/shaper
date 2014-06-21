@@ -4,6 +4,7 @@
 
 #include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_Dir2d.h>
 
 #include <gp_Dir2d.hxx>
 #include <gp_Circ2d.hxx>
@@ -18,6 +19,13 @@
 #define MY_CIRC2D static_cast<gp_Circ2d*>(myImpl)
 
 static gp_Circ2d* newCirc2d(const double theCenterX, const double theCenterY,
+                            const gp_Dir2d theDir, const double theRadius)
+{
+  gp_Pnt2d aCenter(theCenterX, theCenterY);
+  return new gp_Circ2d(gp_Ax2d(aCenter, theDir), theRadius);
+}
+
+static gp_Circ2d* newCirc2d(const double theCenterX, const double theCenterY,
                             const double thePointX,   const double thePointY)
 {
   gp_Pnt2d aCenter(theCenterX, theCenterY);
@@ -29,15 +37,24 @@ static gp_Circ2d* newCirc2d(const double theCenterX, const double theCenterY,
       return NULL;
 
   gp_Dir2d aDir(theCenterX - thePointX, theCenterY - thePointY);
-  return new gp_Circ2d(gp_Ax2d(aCenter, aDir), aRadius);
+  
+  return newCirc2d(theCenterX, theCenterY, aDir, aRadius);
 }
-
 
 GeomAPI_Circ2d::GeomAPI_Circ2d(const boost::shared_ptr<GeomAPI_Pnt2d>& theCenter,
                                const boost::shared_ptr<GeomAPI_Pnt2d>& theCirclePoint)
   : GeomAPI_Interface(newCirc2d(theCenter->x(), theCenter->y(),
                                 theCirclePoint->x(),   theCirclePoint->y()))
 {}
+
+GeomAPI_Circ2d::GeomAPI_Circ2d(const boost::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+                               const boost::shared_ptr<GeomAPI_Dir2d>& theDir,
+                               double theRadius)
+ : GeomAPI_Interface(newCirc2d(theCenter->x(), theCenter->y(),
+                               theDir->impl<gp_Dir2d>(), theRadius))
+{
+
+}
 
 const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::project(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) const
 {

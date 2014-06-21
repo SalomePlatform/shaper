@@ -4,6 +4,9 @@
 
 #include<GeomAPI_Pnt2d.h>
 #include<GeomAPI_XY.h>
+#include<GeomAPI_XYZ.h>
+#include<GeomAPI_Pnt.h>
+#include<GeomAPI_Dir.h>
 
 #include<gp_Pnt2d.hxx>
 
@@ -35,6 +38,16 @@ void GeomAPI_Pnt2d::setX(const double theX)
 void GeomAPI_Pnt2d::setY(const double theY)
 {
   return MY_PNT2D->SetY(theY);
+}
+
+boost::shared_ptr<GeomAPI_Pnt> GeomAPI_Pnt2d::to3D(const boost::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                                                   const boost::shared_ptr<GeomAPI_Dir>& theDirX,
+                                                   const boost::shared_ptr<GeomAPI_Dir>& theDirY)
+{
+  boost::shared_ptr<GeomAPI_XYZ> aSum = theOrigin->xyz()->added(
+    theDirX->xyz()->multiplied(x()))->added(theDirY->xyz()->multiplied(y()));
+
+  return boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
 }
 
 const boost::shared_ptr<GeomAPI_XY> GeomAPI_Pnt2d::xy()

@@ -5,7 +5,8 @@
 #include <PartSet_ConstraintRadiusPrs.h>
 #include <PartSet_Tools.h>
 
-#include <PartSet_FeatureLinePrs.h>
+#include <PartSet_FeatureCirclePrs.h>
+#include <PartSet_FeatureArcPrs.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
@@ -14,9 +15,15 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_ConstraintRadius.h>
 
+#include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Dir.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Lin2d.h>
+#include <GeomAPI_Pln.h>
+#include <GeomAPI_Dir.h>
+
+#include <GeomAlgoAPI_EdgeBuilder.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -25,7 +32,10 @@
 #include <ModelAPI_AttributeDouble.h>
 
 #include <AIS_InteractiveObject.hxx>
+#include <AIS_RadiusDimension.hxx>
 #include <Precision.hxx>
+#include <gp_Circ.hxx>
+#include <V3d_View.hxx>
 
 using namespace std;
 
@@ -42,26 +52,31 @@ std::string PartSet_ConstraintRadiusPrs::getKind()
 bool PartSet_ConstraintRadiusPrs::setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode)
 {
   bool aResult = false;
-  if (feature() && theMode == SM_FirstPoint &&
-      (theFeature && theFeature->getKind() == SKETCH_CIRCLE_KIND ||
-       theFeature && theFeature->getKind() == SKETCH_ARC_KIND)) {
+  if (!feature() || theMode != SM_FirstPoint || !theFeature) {
+    return aResult;
+  }
+  std::string aKind = theFeature->getKind();
+  if (aKind == SKETCH_CIRCLE_KIND || aKind == SKETCH_ARC_KIND) {
     // set length feature
     boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
     boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
     aRef->setFeature(theFeature);
 
-    // set length value
-    /*aData = theFeature->data();
-    boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
-    boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
+    double aLength = 50;
+    bool isValid;
+    if (aKind == SKETCH_CIRCLE_KIND) {
+      aLength = PartSet_Tools::featureValue(theFeature, CIRCLE_ATTR_RADIUS, isValid);
+    }
+    else if (aKind == SKETCH_ARC_KIND) {
+      boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->data()->attribute(ARC_ATTR_CENTER));
+      boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->data()->attribute(ARC_ATTR_START));
+      aLength = aCenterAttr->pnt()->distance(aStartAttr->pnt());
+    }
 
-    double aLenght = aPoint1->pnt()->distance(aPoint2->pnt());
-    */
-    double aLenght = 50;
-    PartSet_Tools::setFeatureValue(feature(), aLenght, CONSTRAINT_ATTR_VALUE);
+    PartSet_Tools::setFeatureValue(feature(), aLength, CONSTRAINT_ATTR_VALUE);
     aResult = true;
   }
   return aResult;
@@ -75,31 +90,16 @@ PartSet_SelectionMode PartSet_ConstraintRadiusPrs::setPoint(double theX, double 
   {
     case SM_SecondPoint: {
       boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
-      /*boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
-              boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
-      FeaturePtr aFeature;
-      if (anAttr) {
-        aFeature = anAttr->feature();
-        if (aFeature->getKind() != SKETCH_LINE_KIND) {
-          aFeature = FeaturePtr();
-        }
-      }
+
       boost::shared_ptr<GeomAPI_Pnt2d> aPoint = boost::shared_ptr<GeomAPI_Pnt2d>
                                                              (new GeomAPI_Pnt2d(theX, theY));
-      boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin = PartSet_FeatureLinePrs::createLin2d(aFeature);
-      boost::shared_ptr<GeomAPI_Pnt2d> aResult = aFeatureLin->project(aPoint);
-      double aDistance = aPoint->distance(aResult);
 
-      double aStartX, aStartY;
-      PartSet_FeatureLinePrs::getLinePoint(aFeature, LINE_ATTR_START, aStartX, aStartY);
+      PartSet_Tools::setFeaturePoint(feature(), theX, theY, SKETCH_CONSTRAINT_ATTR_CIRCLE_POINT);
 
-      if (!aFeatureLin->isRight(aPoint))
-        aDistance = -aDistance;
-        */
-      double aDistance = 40;
-      AttributeDoublePtr aFlyoutAttr = 
-          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
-      aFlyoutAttr->setValue(aDistance);
+      //double aDistance = 40;
+      //AttributeDoublePtr aFlyoutAttr = 
+      //    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
+      //aFlyoutAttr->setValue(aDistance);
 
       aMode = SM_DonePoint;
     }
@@ -117,52 +117,61 @@ Handle(AIS_InteractiveObject) PartSet_ConstraintRadiusPrs::createPresentation(Fe
   Handle(AIS_InteractiveObject) anAIS = thePreviuos;
   if (!theFeature || !theSketch)
     return anAIS;
-  /*
-  boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
-  boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SKETCH_ATTR_ORIGIN));
-  boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_NORM));
-  gp_Pln aPlane(aNormal->x(), aNormal->y(), aNormal->z(), 0);
 
-  aData = theFeature->data();
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
   if (!anAttr)
-    return thePreviuos;
+    return anAIS;
   FeaturePtr aFeature = anAttr->feature();
-  if (!aFeature || aFeature->getKind() != SKETCH_LINE_KIND)
-    return thePreviuos;
+  if (!aFeature || aFeature->getKind() != SKETCH_CIRCLE_KIND)
+    return anAIS;
 
-  boost::shared_ptr<ModelAPI_AttributeDouble> aFlyoutAttr = 
-          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
-  double aFlyout = aFlyoutAttr->value();
 
-  aData = aFeature->data();
-  if (!aData->isValid())
-    return thePreviuos;
+  //boost::shared_ptr<ModelAPI_AttributeDouble> aFlyoutAttr = 
+  //        boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
+  //double aFlyout = aFlyoutAttr->value();
+  boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = 
+          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_VALUE));
+  double aValue = aValueAttr->value();
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aPointStart =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
-  boost::shared_ptr<GeomDataAPI_Point2D> aPointEnd =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
+  gp_Circ aCircle;
+  gp_Pnt anAnchorPoint;
+  double aRadius;
+  //boost::shared_ptr<GeomAPI_Shape> aShape;
+  if (aFeature->getKind() == SKETCH_CIRCLE_KIND) {
+    boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
+    // a circle
+    boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
+      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
+    boost::shared_ptr<GeomAPI_Pnt2d> aCenter2D = aCenterAttr->pnt();
+    
+    boost::shared_ptr<GeomAPI_Pnt> aCenter = PartSet_Tools::point3D(aCenter2D, theSketch);
 
-  gp_Pnt aPoint1, aPoint2;
-  PartSet_Tools::convertTo3D(aPointStart->x(), aPointStart->y(), theSketch, aPoint1);
-  PartSet_Tools::convertTo3D(aPointEnd->x(), aPointEnd->y(), theSketch, aPoint2);
+    boost::shared_ptr<GeomDataAPI_Dir> aNDir = 
+      boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theSketch->data()->attribute(SKETCH_ATTR_NORM));
+    boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
+    const gp_Dir& aDir = aNormal->impl<gp_Dir>();
+    bool isValid;
+    aRadius = PartSet_Tools::featureValue(aFeature, CIRCLE_ATTR_RADIUS, isValid);
+    aCircle = gp_Circ(gp_Ax2(aCenter->impl<gp_Pnt>(), aDir), aRadius);
 
-  //Build dimension here
-  gp_Pnt aP1 = aPoint1;
-  gp_Pnt aP2 = aPoint2;
-  if (aFlyout < 0) {
-    aP1 = aPoint2;
-    aP2 = aPoint1;
+    // an anchor point
+    boost::shared_ptr<GeomDataAPI_Point2D> aAnchorAttr = 
+      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->data()->attribute
+                                                         (SKETCH_CONSTRAINT_ATTR_CIRCLE_POINT));
+    boost::shared_ptr<GeomAPI_Pnt2d> anAnchor2D = aAnchorAttr->pnt();
+    boost::shared_ptr<GeomAPI_Pnt> anAnchor = PartSet_Tools::point3D(anAnchor2D, theSketch);
+    anAnchorPoint = anAnchor->impl<gp_Pnt>();
+
+    //aShape = GeomAlgoAPI_EdgeBuilder::line(aCenter, anAnchor);
+      //boost::shared_ptr<GeomAPI_Pnt> theStart, boost::shared_ptr<GeomAPI_Pnt> theEnd)
   }
-
-  Handle(AIS_InteractiveObject) anAIS = thePreviuos;
   if (anAIS.IsNull())
   {
-    Handle(AIS_LengthDimension) aDimAIS = new AIS_LengthDimension (aP1, aP2, aPlane);
+    Handle(AIS_RadiusDimension) aDimAIS = new AIS_RadiusDimension(aCircle, anAnchorPoint);
+    aDimAIS->SetCustomValue(aValue);
+    //Handle(AIS_RadiusDimension) aDimAIS = new AIS_RadiusDimension(aShape->impl<TopoDS_Shape>());
 
     Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
     anAspect->MakeArrows3d (Standard_False);
@@ -170,28 +179,58 @@ Handle(AIS_InteractiveObject) PartSet_ConstraintRadiusPrs::createPresentation(Fe
     anAspect->TextAspect()->SetHeight(CONSTRAINT_TEXT_HEIGHT);
     anAspect->MakeTextShaded(false);
     aDimAIS->DimensionAspect()->MakeUnitsDisplayed(false);
-    //if (isUnitsDisplayed)
-    //{
-    //  aDimAIS->SetDisplayUnits (aDimDlg->GetUnits ());
-    //}
     aDimAIS->SetDimensionAspect (anAspect);
-    aDimAIS->SetFlyout(aFlyout);
+    //aDimAIS->SetFlyout(aFlyout);
     aDimAIS->SetSelToleranceForText2d(CONSTRAINT_TEXT_SELECTION_TOLERANCE);
 
     anAIS = aDimAIS;
   }
   else {
     // update presentation
-    Handle(AIS_LengthDimension) aDimAIS = Handle(AIS_LengthDimension)::DownCast(anAIS);
+    Handle(AIS_RadiusDimension) aDimAIS = Handle(AIS_RadiusDimension)::DownCast(anAIS);
     if (!aDimAIS.IsNull()) {
-      aDimAIS->SetMeasuredGeometry(aPoint1, aPoint2, aPlane);
-      aDimAIS->SetFlyout(aFlyout);
+      gp_Pnt anAPoint(anAnchorPoint.X(),anAnchorPoint.Y(),anAnchorPoint.Z());
 
+      aDimAIS->SetMeasuredGeometry(aCircle, anAnchorPoint);
+      aDimAIS->SetCustomValue(aValue);
+      //aDimAIS->SetMeasuredGeometry(aShape->impl<TopoDS_Shape>());
+      //aDimAIS->SetFlyout(aFlyout);
       aDimAIS->Redisplay(Standard_True);
     }
   }
-*/
   return anAIS;
+}
+
+void PartSet_ConstraintRadiusPrs::projectPointOnFeature(FeaturePtr theFeature, FeaturePtr theSketch,
+                                                        gp_Pnt& thePoint, Handle(V3d_View) theView,
+                                                        double& theX, double& theY)
+{
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+          boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
+  if (!anAttr)
+    return;
+  FeaturePtr aFeature = anAttr->feature();
+  if (!aFeature)
+    return;
+
+  gp_Circ aCircle;
+  gp_Pnt anAnchorPoint;
+  if (aFeature->getKind() == SKETCH_CIRCLE_KIND) {
+    PartSet_FeatureCirclePrs::projectPointOnFeature(aFeature, theSketch, thePoint, theView, theX, theY);
+  }
+  else if (aFeature->getKind() == SKETCH_ARC_KIND) {
+    PartSet_FeatureArcPrs::projectPointOnFeature(aFeature, theSketch, thePoint, theView, theX, theY);
+  }
+  // TODO: a bug in AIS_RadiusDimension:
+  // The anchor point can't be myCirc.Location() - an exception is raised.
+  // But we need exactly this case...
+  // We want to show a radius dimension starting from the circle centre and 
+  // ending at the user-defined point.
+  // Also, if anchor point coincides with myP2, the radius dimension is not displayed at all.
+  double aDelta = 1/1000.0;
+  theX += aDelta;
+  theY += aDelta;
 }
 
 std::string PartSet_ConstraintRadiusPrs::getAttribute(const PartSet_SelectionMode& theMode) const

@@ -168,16 +168,17 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureArcPrs::findPoint(FeatureP
   return aPoint2D;
 }
 
-void PartSet_FeatureArcPrs::projectPointOnArc(gp_Pnt& thePoint, Handle(V3d_View) theView,
-                                              double& theX, double& theY)
+void PartSet_FeatureArcPrs::projectPointOnFeature(FeaturePtr theFeature, FeaturePtr theSketch,
+                                                  gp_Pnt& thePoint, Handle(V3d_View) theView,
+                                                  double& theX, double& theY)
 {
-  FeaturePtr aSketch = sketch();
+  FeaturePtr aSketch = theSketch;
   if (aSketch) {
     double aX, anY;
     PartSet_Tools::convertTo2D(thePoint, aSketch, theView, aX, anY);
 
     // circle origin point and radius
-    boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+    boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
     boost::shared_ptr<GeomDataAPI_Point2D> aCenter = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                                               (aData->attribute(ARC_ATTR_CENTER));
     boost::shared_ptr<GeomDataAPI_Point2D> aStart = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>

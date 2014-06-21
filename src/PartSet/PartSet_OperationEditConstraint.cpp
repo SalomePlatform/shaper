@@ -188,9 +188,9 @@ void PartSet_OperationEditConstraint::mouseDoubleClick(QMouseEvent* theEvent, Ha
 {
   // changed
   if (!theSelected.empty()) {
-
-    double aValue;
-    if(PartSet_Tools::featureValue(feature(), CONSTRAINT_ATTR_VALUE, aValue)) {
+    bool isValid;
+    double aValue = PartSet_Tools::featureValue(feature(), CONSTRAINT_ATTR_VALUE, isValid);
+    if (isValid) {
       QPoint aPos = theEvent->globalPos();
       myEditor->start(aPos, aValue);
     }

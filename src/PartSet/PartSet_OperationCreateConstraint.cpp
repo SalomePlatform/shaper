@@ -127,8 +127,9 @@ void PartSet_OperationCreateConstraint::mouseReleased(QMouseEvent* theEvent, Han
 
       PartSet_SelectionMode aMode = myFeaturePrs->setPoint(aX, anY, myPointSelectionMode);
       // show value edit dialog
-      double aValue;
-      if (PartSet_Tools::featureValue(feature(), CONSTRAINT_ATTR_VALUE, aValue)) {
+      bool isValid;
+      double aValue = PartSet_Tools::featureValue(feature(), CONSTRAINT_ATTR_VALUE, isValid);
+      if (isValid) {
         showEditor(theEvent, aValue);
         setPointSelectionMode(SM_ThirdPoint/*aMode*/);
       }
@@ -151,15 +152,13 @@ void PartSet_OperationCreateConstraint::mouseMoved(QMouseEvent* theEvent, Handle
       double aX, anY;
       gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
       PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-      /*if (myPointSelectionMode == SM_ThirdPoint) {
-        if (feature()->getKind() == SKETCH_ARC_KIND) {
-          boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
-                                 boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
-          if (anArcPrs) {
-            anArcPrs->projectPointOnArc(aPoint, theView, aX, anY);
-          }
+      if (feature()->getKind() == PartSet_ConstraintRadiusPrs::getKind()) {
+        boost::shared_ptr<PartSet_ConstraintRadiusPrs> anArcPrs =
+                                boost::dynamic_pointer_cast<PartSet_ConstraintRadiusPrs>(myFeaturePrs);
+        if (anArcPrs) {
+          anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
         }
-      }*/
+      }
       myFeaturePrs->setPoint(aX, anY, myPointSelectionMode);
 
       flushUpdated();

@@ -9,6 +9,8 @@
 #include <boost/shared_ptr.hpp>
 
 class GeomAPI_XY;
+class GeomAPI_Pnt;
+class GeomAPI_Dir;
 
 /**\class GeomAPI_Pnt2d
  * \ingroup DataModel
@@ -32,6 +34,11 @@ public:
   void setX(const double theX);
   /// sets Y coordinate
   void setY(const double theY);
+
+  /// Returns the 3D point
+  boost::shared_ptr<GeomAPI_Pnt> to3D(const boost::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                                      const boost::shared_ptr<GeomAPI_Dir>& theDirX,
+                                      const boost::shared_ptr<GeomAPI_Dir>& theDirY);
 
   /// returns coordinates of the point
   const boost::shared_ptr<GeomAPI_XY> xy();

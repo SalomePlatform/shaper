@@ -18,6 +18,7 @@
 #include <GeomDataAPI_Dir.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Lin2d.h>
+#include <GeomAPI_Pln.h>
 
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_LengthDimension.hxx>
@@ -119,14 +120,10 @@ Handle(AIS_InteractiveObject) PartSet_ConstraintLengthPrs::createPresentation(Fe
   if (!theFeature || !theSketch)
     return thePreviuos;
 
-  boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
-  boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SKETCH_ATTR_ORIGIN));
-  boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_NORM));
-  gp_Pln aPlane(aNormal->x(), aNormal->y(), aNormal->z(), 0/*D*/);
+  boost::shared_ptr<GeomAPI_Pln> aGPlane = PartSet_Tools::sketchPlane(theSketch);
+  gp_Pln aPlane = aGPlane->impl<gp_Pln>();
 
-  aData = theFeature->data();
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
   if (!anAttr)
@@ -138,6 +135,10 @@ Handle(AIS_InteractiveObject) PartSet_ConstraintLengthPrs::createPresentation(Fe
   boost::shared_ptr<ModelAPI_AttributeDouble> aFlyoutAttr = 
           boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
   double aFlyout = aFlyoutAttr->value();
+
+  boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = 
+          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_VALUE));
+  double aValue = aValueAttr->value();
 
   aData = aFeature->data();
   if (!aData->isValid())
@@ -164,6 +165,7 @@ Handle(AIS_InteractiveObject) PartSet_ConstraintLengthPrs::createPresentation(Fe
   if (anAIS.IsNull())
   {
     Handle(AIS_LengthDimension) aDimAIS = new AIS_LengthDimension (aP1, aP2, aPlane);
+    aDimAIS->SetCustomValue(aValue);
 
     Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
     anAspect->MakeArrows3d (Standard_False);
@@ -186,6 +188,7 @@ Handle(AIS_InteractiveObject) PartSet_ConstraintLengthPrs::createPresentation(Fe
     Handle(AIS_LengthDimension) aDimAIS = Handle(AIS_LengthDimension)::DownCast(anAIS);
     if (!aDimAIS.IsNull()) {
       aDimAIS->SetMeasuredGeometry(aPoint1, aPoint2, aPlane);
+      aDimAIS->SetCustomValue(aValue);
       aDimAIS->SetFlyout(aFlyout);
 
       aDimAIS->Redisplay(Standard_True);

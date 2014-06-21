@@ -145,7 +145,7 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
         boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
                                  boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
         if (anArcPrs) {
-          anArcPrs->projectPointOnArc(aPoint, theView, aX, anY);
+          anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
         }
       }
       PartSet_SelectionMode aMode = myFeaturePrs->setPoint(aX, anY, myPointSelectionMode);
@@ -174,7 +174,7 @@ void PartSet_OperationCreateFeature::mouseMoved(QMouseEvent* theEvent, Handle(V3
           boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
                                  boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
           if (anArcPrs) {
-            anArcPrs->projectPointOnArc(aPoint, theView, aX, anY);
+            anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
           }
         }
       }

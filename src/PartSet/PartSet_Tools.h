@@ -20,6 +20,9 @@
 class Handle_V3d_View;
 class XGUI_ViewerPrs;
 class GeomDataAPI_Point2D;
+class GeomAPI_Pln;
+class GeomAPI_Pnt2d;
+class GeomAPI_Pnt;
 class PartSet_FeaturePrs;
 
 /*!
@@ -92,10 +95,10 @@ public:
   /// \brief Returns the feature double value if it is.
   /// \param theFeature the feature
   /// \param theAttribute the feature attribute
-  /// \param theValue the horizontal coordinate
-  /// \returns the state whether the value is correct
-  static bool featureValue(FeaturePtr theFeature, const std::string& theAttribute,
-                           double& theValue);
+  /// \param isValid an output parameter whether the value is valid
+  /// \returns the feature value
+  static double featureValue(FeaturePtr theFeature, const std::string& theAttribute,
+                             bool& isValid);
 
   /// Creates a constraint on two points
   /// \param thePoint1 the first point
@@ -111,6 +114,17 @@ public:
   static boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
                                                           double theY);
 
+  /// Create a sketch plane instance
+  /// \param theSketch a sketch feature
+  /// \return API object of geom plane
+  static boost::shared_ptr<GeomAPI_Pln> sketchPlane(FeaturePtr theSketch);
+
+  /// Create a point 3D on a basis of point 2D and sketch feature
+  /// \param thePoint2D a point on a sketch
+  /// \param theSketch a sketch feature
+  /// \return API object of point 3D
+  static boost::shared_ptr<GeomAPI_Pnt> point3D(boost::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
+                                                FeaturePtr theSketch);
 private:
   /// Return the distance between the feature and the point
   /// \param theFeature feature object

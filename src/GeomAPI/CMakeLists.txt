@@ -14,6 +14,7 @@ SET(PROJECT_HEADERS
     GeomAPI_Lin.h
     GeomAPI_Lin2d.h
     GeomAPI_Dir.h
+    GeomAPI_Dir2d.h
     GeomAPI_Pln.h
     GeomAPI_Shape.h
 )
@@ -28,6 +29,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Lin.cpp
     GeomAPI_Lin2d.cpp
     GeomAPI_Dir.cpp
+    GeomAPI_Dir2d.cpp
     GeomAPI_Pln.cpp
     GeomAPI_Shape.cpp
 )
