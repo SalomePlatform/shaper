@@ -69,11 +69,7 @@ bool PartSet_ConstraintRadiusPrs::setFeature(FeaturePtr theFeature, const PartSe
       aLength = PartSet_Tools::featureValue(theFeature, CIRCLE_ATTR_RADIUS, isValid);
     }
     else if (aKind == SKETCH_ARC_KIND) {
-      boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->data()->attribute(ARC_ATTR_CENTER));
-      boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->data()->attribute(ARC_ATTR_START));
-      aLength = aCenterAttr->pnt()->distance(aStartAttr->pnt());
+      aLength = PartSet_FeatureArcPrs::radius(theFeature);
     }
 
     PartSet_Tools::setFeatureValue(feature(), aLength, CONSTRAINT_ATTR_VALUE);
@@ -124,9 +120,9 @@ Handle(AIS_InteractiveObject) PartSet_ConstraintRadiusPrs::createPresentation(Fe
   if (!anAttr)
     return anAIS;
   FeaturePtr aFeature = anAttr->feature();
-  if (!aFeature || aFeature->getKind() != SKETCH_CIRCLE_KIND)
+  std::string aKind = aFeature ? aFeature->getKind() : "";
+  if (aKind != SKETCH_CIRCLE_KIND && aKind != SKETCH_ARC_KIND)
     return anAIS;
-
 
   //boost::shared_ptr<ModelAPI_AttributeDouble> aFlyoutAttr = 
   //        boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
@@ -135,38 +131,42 @@ Handle(AIS_InteractiveObject) PartSet_ConstraintRadiusPrs::createPresentation(Fe
           boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_VALUE));
   double aValue = aValueAttr->value();
 
-  gp_Circ aCircle;
-  gp_Pnt anAnchorPoint;
-  double aRadius;
-  //boost::shared_ptr<GeomAPI_Shape> aShape;
-  if (aFeature->getKind() == SKETCH_CIRCLE_KIND) {
-    boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
-    // a circle
-    boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
-    boost::shared_ptr<GeomAPI_Pnt2d> aCenter2D = aCenterAttr->pnt();
-    
-    boost::shared_ptr<GeomAPI_Pnt> aCenter = PartSet_Tools::point3D(aCenter2D, theSketch);
+  // an anchor point
+  boost::shared_ptr<GeomDataAPI_Point2D> aAnchorAttr = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->data()->attribute
+                                                        (SKETCH_CONSTRAINT_ATTR_CIRCLE_POINT));
+  boost::shared_ptr<GeomAPI_Pnt2d> anAnchor2D = aAnchorAttr->pnt();
+  boost::shared_ptr<GeomAPI_Pnt> anAnchor = PartSet_Tools::point3D(anAnchor2D, theSketch);
+  gp_Pnt anAnchorPoint = anAnchor->impl<gp_Pnt>();
 
-    boost::shared_ptr<GeomDataAPI_Dir> aNDir = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theSketch->data()->attribute(SKETCH_ATTR_NORM));
-    boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
-    const gp_Dir& aDir = aNormal->impl<gp_Dir>();
+  std::string aCenterArgument;
+  double aRadius;
+  if (aKind == SKETCH_CIRCLE_KIND) {
+    aCenterArgument = CIRCLE_ATTR_CENTER;
     bool isValid;
     aRadius = PartSet_Tools::featureValue(aFeature, CIRCLE_ATTR_RADIUS, isValid);
-    aCircle = gp_Circ(gp_Ax2(aCenter->impl<gp_Pnt>(), aDir), aRadius);
-
-    // an anchor point
-    boost::shared_ptr<GeomDataAPI_Point2D> aAnchorAttr = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->data()->attribute
-                                                         (SKETCH_CONSTRAINT_ATTR_CIRCLE_POINT));
-    boost::shared_ptr<GeomAPI_Pnt2d> anAnchor2D = aAnchorAttr->pnt();
-    boost::shared_ptr<GeomAPI_Pnt> anAnchor = PartSet_Tools::point3D(anAnchor2D, theSketch);
-    anAnchorPoint = anAnchor->impl<gp_Pnt>();
-
-    //aShape = GeomAlgoAPI_EdgeBuilder::line(aCenter, anAnchor);
-      //boost::shared_ptr<GeomAPI_Pnt> theStart, boost::shared_ptr<GeomAPI_Pnt> theEnd)
   }
+  else if (aKind == SKETCH_ARC_KIND) {
+    aCenterArgument = ARC_ATTR_CENTER;
+    aRadius = PartSet_FeatureArcPrs::radius(aFeature);
+  }
+
+  // a circle
+  boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(aCenterArgument));
+  boost::shared_ptr<GeomAPI_Pnt2d> aCenter2D = aCenterAttr->pnt();
+  boost::shared_ptr<GeomAPI_Pnt> aCenter = PartSet_Tools::point3D(aCenter2D, theSketch);
+
+  boost::shared_ptr<GeomDataAPI_Dir> aNDir = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theSketch->data()->attribute(SKETCH_ATTR_NORM));
+  boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
+  const gp_Dir& aDir = aNormal->impl<gp_Dir>();
+
+  gp_Circ aCircle = gp_Circ(gp_Ax2(aCenter->impl<gp_Pnt>(), aDir), aRadius);
+  //boost::shared_ptr<GeomAPI_Shape> aShape;
+  //aShape = GeomAlgoAPI_EdgeBuilder::line(aCenter, anAnchor);
+    //boost::shared_ptr<GeomAPI_Pnt> theStart, boost::shared_ptr<GeomAPI_Pnt> theEnd)
+
   if (anAIS.IsNull())
   {
     Handle(AIS_RadiusDimension) aDimAIS = new AIS_RadiusDimension(aCircle, anAnchorPoint);

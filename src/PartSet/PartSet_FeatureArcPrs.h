@@ -79,6 +79,11 @@ public:
   virtual boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
                                                            double theY);
 
+  /// Computes the feature's radius
+  /// \param theFeature an arc feature
+  /// \return the double value
+  static double radius(FeaturePtr theFeature);
+
 protected:
   /// Returns the feature point in the selection mode position.
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode

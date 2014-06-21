@@ -217,3 +217,18 @@ boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureArcPrs::featurePoint
                                                               (aData->attribute(aPointArg));
   return aPoint;
 }
+
+double PartSet_FeatureArcPrs::radius(FeaturePtr theFeature)
+{
+  if (!theFeature)
+    return 0;
+
+  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_CENTER));
+  boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_START));
+  
+  return aCenterAttr->pnt()->distance(aStartAttr->pnt());
+}
