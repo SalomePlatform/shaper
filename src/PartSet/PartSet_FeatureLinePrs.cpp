@@ -58,9 +58,9 @@ PartSet_SelectionMode PartSet_FeatureLinePrs::setPoint(double theX, double theY,
   return aMode;
 }
 
-bool PartSet_FeatureLinePrs::setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode)
+PartSet_SelectionMode PartSet_FeatureLinePrs::setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode)
 {
-  bool aResult = false;
+  PartSet_SelectionMode aMode = theMode;
   if (feature() && theFeature && theMode == SM_FirstPoint)
   {
     // use the last point of the previous feature as the first of the new one
@@ -74,9 +74,9 @@ bool PartSet_FeatureLinePrs::setFeature(FeaturePtr theFeature, const PartSet_Sel
     boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                                                  (aData->attribute(LINE_ATTR_START));
     PartSet_Tools::createConstraint(sketch(), anInitPoint, aPoint);
-    aResult = true;
+    aMode = SM_SecondPoint;
   }
-  return aResult;
+  return aMode;
 }
 
 std::string PartSet_FeatureLinePrs::getAttribute(const PartSet_SelectionMode& theMode) const

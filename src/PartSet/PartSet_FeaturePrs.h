@@ -47,7 +47,8 @@ public:
   /// \param theFeature a feature instance
   /// \param theMode the selection mode
   /// \return whether the feature is set
-  virtual bool setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode) { return false; };
+  /// \return the new selection mode
+  virtual PartSet_SelectionMode setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode);
 
   /// Returns the feature attribute name for the selection mode
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode

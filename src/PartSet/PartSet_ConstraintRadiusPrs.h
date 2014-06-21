@@ -39,7 +39,7 @@ public:
   /// \param theFeature a feature instance
   /// \param theMode the selection mode
   /// \return whether the feature is set
-  virtual bool setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode);
+  virtual PartSet_SelectionMode setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode);
 
   /// Sets the point to the feature in an attribute depending on the selection mode
   /// \param theX the 2D point horizontal coordinate

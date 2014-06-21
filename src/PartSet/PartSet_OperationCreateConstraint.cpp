@@ -104,19 +104,21 @@ void PartSet_OperationCreateConstraint::mouseReleased(QMouseEvent* theEvent, Han
 {
   switch (myPointSelectionMode)
   {
-    case SM_FirstPoint: {
+    case SM_FirstPoint:
+    case SM_SecondPoint: {
       if (!theSelected.empty()) {
         XGUI_ViewerPrs aPrs = theSelected.front();
         FeaturePtr aFeature = aPrs.feature();
 
-        if (myFeaturePrs->setFeature(aFeature, myPointSelectionMode)) {
+        PartSet_SelectionMode aMode = myFeaturePrs->setFeature(aFeature, myPointSelectionMode);
+        if (aMode != myPointSelectionMode) {
           flushUpdated();
-          setPointSelectionMode(SM_SecondPoint);
+          setPointSelectionMode(aMode);
         }
       }
     }
     break;
-    case SM_SecondPoint: {
+    case SM_LastPoint: {
       double aX, anY;
       gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
       PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
@@ -127,7 +129,6 @@ void PartSet_OperationCreateConstraint::mouseReleased(QMouseEvent* theEvent, Han
       double aValue = PartSet_Tools::featureValue(feature(), CONSTRAINT_ATTR_VALUE, isValid);
       if (isValid) {
         showEditor(theEvent, aValue);
-        setPointSelectionMode(SM_ThirdPoint/*aMode*/);
       }
     }
     break;
@@ -142,8 +143,8 @@ void PartSet_OperationCreateConstraint::mouseMoved(QMouseEvent* theEvent, Handle
   switch (myPointSelectionMode)
   {
     //case SM_FirstPoint:
-    case SM_SecondPoint:
-    //case SM_ThirdPoint:
+    //case SM_SecondPoint:
+    case SM_LastPoint:
     {
       double aX, anY;
       gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
@@ -194,9 +195,8 @@ void PartSet_OperationCreateConstraint::keyReleased(const int theKey)
       }
       // changed
       // the modification is really need until the focus of editor do not accept the focus
-      if (myPointSelectionMode == SM_ThirdPoint) {
-        if (myEditor->isStarted())
-          myEditor->stop();
+      if (myPointSelectionMode == SM_LastPoint && myEditor->isStarted()) {
+        myEditor->stop();
         commit();
         // it start a new line creation at a free point
         restartOperation(feature()->getKind(), FeaturePtr()/*feature()*/);
@@ -223,7 +223,7 @@ void PartSet_OperationCreateConstraint::keyReleased(const int theKey)
 void PartSet_OperationCreateConstraint::startOperation()
 {
   PartSet_OperationSketchBase::startOperation();
-  setPointSelectionMode(!myInitFeature ? SM_FirstPoint : SM_SecondPoint);
+  //setPointSelectionMode(!myInitFeature ? SM_FirstPoint : SM_SecondPoint);
 
   emit multiSelectionEnabled(false);
 }
@@ -256,8 +256,10 @@ FeaturePtr PartSet_OperationCreateConstraint::createFeature(const bool theFlushM
     aFeature->addSub(aNewFeature);
   }
   myFeaturePrs->init(aNewFeature);
-  if (myInitFeature)
-    myFeaturePrs->setFeature(myInitFeature, SM_FirstPoint);
+  if (myInitFeature) {
+    PartSet_SelectionMode aMode = myFeaturePrs->setFeature(myInitFeature, SM_FirstPoint);
+    //setPointSelectionMode(aMode);
+  }
 
   emit featureConstructed(aNewFeature, FM_Activation);
   if (theFlushMessage)

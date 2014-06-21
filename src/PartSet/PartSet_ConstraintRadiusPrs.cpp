@@ -49,11 +49,11 @@ std::string PartSet_ConstraintRadiusPrs::getKind()
   return SKETCH_CONSTRAINT_RADIUS_KIND;
 }
 
-bool PartSet_ConstraintRadiusPrs::setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode)
+PartSet_SelectionMode PartSet_ConstraintRadiusPrs::setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode)
 {
-  bool aResult = false;
+  PartSet_SelectionMode aMode = theMode;
   if (!feature() || theMode != SM_FirstPoint || !theFeature) {
-    return aResult;
+    return aMode;
   }
   std::string aKind = theFeature->getKind();
   if (aKind == SKETCH_CIRCLE_KIND || aKind == SKETCH_ARC_KIND) {
@@ -73,9 +73,9 @@ bool PartSet_ConstraintRadiusPrs::setFeature(FeaturePtr theFeature, const PartSe
     }
 
     PartSet_Tools::setFeatureValue(feature(), aLength, CONSTRAINT_ATTR_VALUE);
-    aResult = true;
+    aMode = SM_LastPoint;
   }
-  return aResult;
+  return aMode;
 }
 
 PartSet_SelectionMode PartSet_ConstraintRadiusPrs::setPoint(double theX, double theY,
@@ -84,7 +84,7 @@ PartSet_SelectionMode PartSet_ConstraintRadiusPrs::setPoint(double theX, double 
   PartSet_SelectionMode aMode = theMode;
   switch (theMode)
   {
-    case SM_SecondPoint: {
+    case SM_LastPoint: {
       boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
 
       boost::shared_ptr<GeomAPI_Pnt2d> aPoint = boost::shared_ptr<GeomAPI_Pnt2d>
@@ -97,7 +97,7 @@ PartSet_SelectionMode PartSet_ConstraintRadiusPrs::setPoint(double theX, double 
       //    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
       //aFlyoutAttr->setValue(aDistance);
 
-      aMode = SM_DonePoint;
+      aMode = SM_LastPoint;
     }
     break;
     default:

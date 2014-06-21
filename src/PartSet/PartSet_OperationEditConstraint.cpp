@@ -156,7 +156,7 @@ void PartSet_OperationEditConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V
         anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
       }
     }
-    myFeaturePrs->setPoint(aX, anY, SM_SecondPoint);
+    myFeaturePrs->setPoint(aX, anY, SM_LastPoint);
 
 
     /*std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();

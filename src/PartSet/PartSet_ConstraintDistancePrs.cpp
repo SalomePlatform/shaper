@@ -37,9 +37,9 @@ std::string PartSet_ConstraintDistancePrs::getKind()
   return SKETCH_CONSTRAINT_DISTANCE_KIND;
 }
 
-bool PartSet_ConstraintDistancePrs::setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode)
+PartSet_SelectionMode PartSet_ConstraintDistancePrs::setFeature(FeaturePtr theFeature, const PartSet_SelectionMode& theMode)
 {
-  bool aResult = false;
+  PartSet_SelectionMode aMode = theMode;
   if (feature() && theFeature && theFeature->getKind() == SKETCH_LINE_KIND && theMode == SM_FirstPoint)
   {
     // set length feature
@@ -57,9 +57,9 @@ bool PartSet_ConstraintDistancePrs::setFeature(FeaturePtr theFeature, const Part
 
     double aLenght = aPoint1->pnt()->distance(aPoint2->pnt());
     PartSet_Tools::setFeatureValue(feature(), aLenght, CONSTRAINT_ATTR_VALUE);
-    aResult = true;
+    aMode = SM_SecondPoint;
   }
-  return aResult;
+  return aMode;
 }
 
 PartSet_SelectionMode PartSet_ConstraintDistancePrs::setPoint(double theX, double theY,
@@ -68,7 +68,7 @@ PartSet_SelectionMode PartSet_ConstraintDistancePrs::setPoint(double theX, doubl
   PartSet_SelectionMode aMode = theMode;
   switch (theMode)
   {
-    case SM_SecondPoint: {
+    case SM_LastPoint: {
       boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
       boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
               boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));

@@ -43,6 +43,12 @@ FeaturePtr PartSet_FeaturePrs::feature() const
   return myFeature;
 }
 
+PartSet_SelectionMode PartSet_FeaturePrs::setFeature(FeaturePtr theFeature,
+                                                     const PartSet_SelectionMode& theMode)
+{
+  return SM_FirstPoint;
+}
+
 void PartSet_FeaturePrs::setConstraints(double theX, double theY,
                                         const PartSet_SelectionMode& theMode)
 {
