@@ -3,10 +3,9 @@
 // Author:      Natalia ERMOLAEVA
 
 #include <PartSet_OperationSketchBase.h>
+#include <PartSet_Tools.h>
 
 #include <SketchPlugin_Feature.h>
-#include <SketchPlugin_ConstraintLength.h>
-
 #include <V3d_View.hxx>
 #include <AIS_Shape.hxx>
 #include <AIS_DimensionSelectionMode.hxx>
@@ -48,7 +47,7 @@ std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >
 std::list<int> PartSet_OperationSketchBase::getSelectionModes(FeaturePtr theFeature) const
 {
   std::list<int> aModes;
-  if (theFeature->getKind() == SKETCH_CONSTRAINT_LENGTH_KIND) {
+  if (PartSet_Tools::isConstraintFeature(theFeature->getKind())) {
       aModes.clear();
       aModes.push_back(AIS_DSM_Text);
       aModes.push_back(AIS_DSM_Line);

@@ -242,8 +242,8 @@ std::string PartSet_OperationSketch::getOperationType(FeaturePtr theFeature)
 {
   std::string aType = PartSet_OperationEditFeature::Type();
 
-  if (theFeature->getKind() == SKETCH_CONSTRAINT_LENGTH_KIND)
+  if (PartSet_Tools::isConstraintFeature(theFeature->getKind())) {
     aType = PartSet_OperationEditConstraint::Type();
-
+  }
   return aType;
 }

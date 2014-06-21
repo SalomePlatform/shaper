@@ -19,8 +19,6 @@
 #include <SketchPlugin_Arc.h>
 */
 
-#include <PartSet_ConstraintLengthPrs.h>
-#include <PartSet_ConstraintDistancePrs.h>
 #include <PartSet_ConstraintRadiusPrs.h>
 
 #include <SketchPlugin_Constraint.h>
@@ -64,9 +62,7 @@ PartSet_OperationCreateConstraint::~PartSet_OperationCreateConstraint()
 bool PartSet_OperationCreateConstraint::canProcessKind(const std::string& theId)
 {
   // changed
-  return theId == PartSet_ConstraintLengthPrs::getKind() ||
-         theId == PartSet_ConstraintDistancePrs::getKind() ||
-         theId == PartSet_ConstraintRadiusPrs::getKind();
+  return PartSet_Tools::isConstraintFeature(theId);
 }
 
 bool PartSet_OperationCreateConstraint::canBeCommitted() const

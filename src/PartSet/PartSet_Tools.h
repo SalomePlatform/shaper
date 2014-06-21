@@ -125,6 +125,11 @@ public:
   /// \return API object of point 3D
   static boost::shared_ptr<GeomAPI_Pnt> point3D(boost::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
                                                 FeaturePtr theSketch);
+  /// Check whether there is a constraint with the feature kind given
+  /// \param theKind a feature kind
+  /// \return the boolean value
+  static bool isConstraintFeature(const std::string& theKind);
+
 private:
   /// Return the distance between the feature and the point
   /// \param theFeature feature object

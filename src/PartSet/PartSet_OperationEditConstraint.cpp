@@ -7,7 +7,9 @@
 #include <PartSet_OperationSketch.h>
 #include <PartSet_EditLine.h>
 #include <PartSet_FeaturePrs.h>
-#include <SketchPlugin_ConstraintLength.h>
+#include <PartSet_ConstraintRadiusPrs.h>
+
+#include <SketchPlugin_Constraint.h>
 
 #include <ModuleBase_OperationDescription.h>
 #include <Model_Events.h>
@@ -147,6 +149,13 @@ void PartSet_OperationEditConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V
     double aDeltaY = anY - aCurY;
 
     PartSet_Tools::moveFeature(feature(), aDeltaX, aDeltaY);*/
+    if (feature()->getKind() == PartSet_ConstraintRadiusPrs::getKind()) {
+      boost::shared_ptr<PartSet_ConstraintRadiusPrs> anArcPrs =
+                              boost::dynamic_pointer_cast<PartSet_ConstraintRadiusPrs>(myFeaturePrs);
+      if (anArcPrs) {
+        anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
+      }
+    }
     myFeaturePrs->setPoint(aX, anY, SM_SecondPoint);
 
 

@@ -348,3 +348,10 @@ boost::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(
 
   return thePoint2D->to3D(aC->pnt(), aX->dir(), aY->dir());
 }
+
+bool PartSet_Tools::isConstraintFeature(const std::string& theKind)
+{
+  return theKind == PartSet_ConstraintLengthPrs::getKind() ||
+         theKind == PartSet_ConstraintDistancePrs::getKind() ||
+         theKind == PartSet_ConstraintRadiusPrs::getKind();
+}
