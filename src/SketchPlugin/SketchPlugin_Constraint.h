@@ -66,6 +66,10 @@ public:
   /// \param theDeltaY the delta for Y coordinate is moved
   SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY) {};
 
+  /// Return the distance between the feature and the point
+  /// \param thePoint the point
+  virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) { return 0; };
+
 protected:
   /// \brief Use plugin manager for features creation
   SketchPlugin_Constraint() {}

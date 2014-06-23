@@ -69,12 +69,6 @@ public:
                           const gp_Pnt& thePoint, Handle_V3d_View theView,
                           double& theX, double& theY);
 
-  /// Return the distance between the feature and the point
-  /// \param theFeature feature object
-  /// \param theX the horizontal coordinate of the point
-  /// \param theX the vertical coordinate of the point
-  virtual double distanceToPoint(FeaturePtr theFeature, double theX, double theY);
-
   /// Find a point in the line with given coordinates
   /// \param theFeature the line feature
   /// \param theX the horizontal point coordinate

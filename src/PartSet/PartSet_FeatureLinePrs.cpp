@@ -148,33 +148,6 @@ void PartSet_FeatureLinePrs::projectPointOnLine(FeaturePtr theFeature,
   }
 }
 
-double PartSet_FeatureLinePrs::distanceToPoint(FeaturePtr theFeature,
-                                      double theX, double theY)
-{
-  double aDelta = 0;
-  if (!theFeature || theFeature->getKind() != getKind())
-    return aDelta;
-
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
-
-  GeomAPI_Lin2d aLin2d(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y());
-  boost::shared_ptr<GeomAPI_Pnt2d> aPoint = boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
-
-  if (false/*projection*/) { // TODO: if it has not been necessary, remove this block
-    boost::shared_ptr<GeomAPI_Pnt2d> aResult = aLin2d.project(aPoint);
-    aDelta = aResult->distance(aPoint);
-  }
-  else { // distance
-    aDelta = aLin2d.distance(aPoint);
-  }
-
-  return aDelta;
-}
-
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLinePrs::findPoint(FeaturePtr theFeature,
                                                                          double theX, double theY)
 {

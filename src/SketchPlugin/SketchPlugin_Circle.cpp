@@ -6,6 +6,8 @@
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
 
+#include <GeomAPI_Pnt2d.h>
+
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
 
@@ -74,4 +76,13 @@ void SketchPlugin_Circle::move(double theDeltaX, double theDeltaY)
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
   aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
+}
+
+double SketchPlugin_Circle::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  boost::shared_ptr<ModelAPI_Data> aData = data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
+
+  return aPoint->pnt()->distance(thePoint);
 }

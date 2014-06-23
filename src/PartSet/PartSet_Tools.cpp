@@ -194,25 +194,18 @@ FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theVie
     aPrs = *anIt;
     if (!aPrs.feature())
       continue;
-    double aDelta = distanceToPoint(aPrs.feature(), aX, anY);
+    boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(aPrs.feature());
+    if (!aSketchFeature)
+      continue;
+    double aDelta = aSketchFeature->distanceToPoint(
+                               boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
     if (aMinDelta < 0 || aMinDelta > aDelta) {
       aMinDelta = aDelta;
       aDeltaFeature = aPrs.feature();
     }
   }
   return aDeltaFeature;
-}
-
-double PartSet_Tools::distanceToPoint(FeaturePtr theFeature,
-                                      double theX, double theY)
-{
-  boost::shared_ptr<PartSet_FeaturePrs> aFeaturePrs = PartSet_Tools::createFeaturePrs(
-                                           theFeature->getKind(), FeaturePtr(), theFeature);
-  double aDelta = 0;
-  if (aFeaturePrs)
-    aDelta = aFeaturePrs->distanceToPoint(theFeature, theX, theY);
-
-  return aDelta;
 }
 
 boost::shared_ptr<ModelAPI_Document> PartSet_Tools::document()

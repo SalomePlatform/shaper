@@ -132,13 +132,6 @@ public:
   /// \param theKind a feature kind
   /// \return the boolean value
   static bool isConstraintFeature(const std::string& theKind);
-
-private:
-  /// Return the distance between the feature and the point
-  /// \param theFeature feature object
-  /// \param theX the horizontal coordinate of the point
-  /// \param theX the vertical coordinate of the point
-  static double distanceToPoint(FeaturePtr theFeature, double theX, double theY);
 };
 
 #endif
