@@ -123,6 +123,6 @@ void ModuleBase_Operation::setFeature(FeaturePtr theFeature)
 
 void ModuleBase_Operation::setEditingFeature(FeaturePtr theFeature)
 {
-  myFeature = theFeature;
+  setFeature(theFeature);
   myIsEditing = true;
 }

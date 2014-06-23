@@ -57,7 +57,7 @@ void PartSet_OperationEditFeature::init(FeaturePtr theFeature,
                                      const std::list<XGUI_ViewerPrs>& theSelected,
                                      const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
-  setFeature(theFeature);
+  setEditingFeature(theFeature);
 
   if (!theHighlighted.empty()) {
     // if there is highlighted object, we check whether it is in the list of selected objects
@@ -171,7 +171,7 @@ void PartSet_OperationEditFeature::mouseReleased(QMouseEvent* theEvent, Handle(V
 
 void PartSet_OperationEditFeature::startOperation()
 {
-  // do nothing in order to do not create a new feature
+  PartSet_OperationSketchBase::startOperation();
   emit multiSelectionEnabled(false);
 
   if (myFeatures.size() > 1)

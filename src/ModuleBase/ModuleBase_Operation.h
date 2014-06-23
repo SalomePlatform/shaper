@@ -96,6 +96,7 @@ protected:
   /// \returns the created feature
   virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
+private:
   /// Sets the operation feature
   void setFeature(FeaturePtr theFeature);
 

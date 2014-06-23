@@ -69,7 +69,7 @@ void PartSet_OperationEditConstraint::init(FeaturePtr theFeature,
                                      const std::list<XGUI_ViewerPrs>& theSelected,
                                      const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
-  setFeature(theFeature);
+  setEditingFeature(theFeature);
   myFeaturePrs->init(theFeature);
 
   /*
@@ -196,7 +196,7 @@ void PartSet_OperationEditConstraint::mouseDoubleClick(QMouseEvent* theEvent, Ha
 
 void PartSet_OperationEditConstraint::startOperation()
 {
-  // do nothing in order to do not create a new feature
+  PartSet_OperationSketchBase::startOperation();
   emit multiSelectionEnabled(false);
 
   //if (myFeatures.size() > 1)
