@@ -42,10 +42,7 @@ PartSet_OperationFeatureCreate::PartSet_OperationFeatureCreate(const QString& th
                                                                QObject* theParent,
                                                                FeaturePtr theFeature)
 : PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature), myActiveWidget(0)
-  //myPointSelectionMode(SM_FirstPoint)
 {
-  //std::string aKind = theId.toStdString();
-  //myFeaturePrs = PartSet_Tools::createFeaturePrs(aKind, theFeature);
 }
 
 PartSet_OperationFeatureCreate::~PartSet_OperationFeatureCreate()
@@ -54,13 +51,13 @@ PartSet_OperationFeatureCreate::~PartSet_OperationFeatureCreate()
 
 bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
 {
-  return theId == SKETCH_LINE_KIND;/* || theId == SKETCH_POINT_KIND || theId == SKETCH_CIRCLE_KIND ||
-         theId == SKETCH_ARC_KIND;*/
+  return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND /*|| theId == SKETCH_CIRCLE_KIND ||
+         theId == SKETCH_ARC_KIND*/;
 }
 
 bool PartSet_OperationFeatureCreate::canBeCommitted() const
 {
-  return !myActiveWidget;//myPointSelectionMode == SM_DonePoint;
+  return !myActiveWidget;
 }
 
 bool PartSet_OperationFeatureCreate::isGranted(ModuleBase_IOperation* theOperation) const
@@ -94,7 +91,7 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
                                                 const std::list<XGUI_ViewerPrs>& theSelected,
                                                 const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
-  if (canBeCommitted()/*myPointSelectionMode == SM_DonePoint*/)
+  if (canBeCommitted())
   {
     // if the point creation is finished, the next mouse release should commit the modification
     // the next release can happens by double click in the viewer
@@ -138,72 +135,39 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
       }
     }
   }
-
+  /*if (feature()->getKind() == SKETCH_ARC_KIND) {
+    boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
+                              boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
+    if (anArcPrs) {
+      anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
+    }
+  }*/
   setWidgetPoint(aX, anY);
   flushUpdated();
   emit activateNextWidget(myActiveWidget);
-
-  /*switch (myPointSelectionMode)
-  {
-    case SM_FirstPoint:
-    case SM_SecondPoint:
-    case SM_ThirdPoint: {
-      if (feature()->getKind() == SKETCH_ARC_KIND) {
-        boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
-                                 boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
-        if (anArcPrs) {
-          anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
-        }
-      }
-      PartSet_SelectionMode aMode = myFeaturePrs->setPoint(aX, anY, myPointSelectionMode);
-      flushUpdated();
-      setPointSelectionMode(aMode);
-    }
-    break;
-    default:
-      break;
-  }*/
 }
 
 void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
-  if (canBeCommitted()/*myPointSelectionMode == SM_DonePoint*/) {
+  if (canBeCommitted()) {
     commit();
     restartOperation(feature()->getKind(), feature());
   }
   else {
-  /*switch (myPointSelectionMode)
-  {
-    case SM_FirstPoint:
-    case SM_SecondPoint:
-    case SM_ThirdPoint:
-    {*/
-      double aX, anY;
-      gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
-      PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-      /*if (myPointSelectionMode == SM_ThirdPoint) {
-        if (feature()->getKind() == SKETCH_ARC_KIND) {
-          boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
-                                 boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
-          if (anArcPrs) {
-            anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
-          }
+    double aX, anY;
+    gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
+    PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+    /*if (myPointSelectionMode == SM_ThirdPoint) {
+      if (feature()->getKind() == SKETCH_ARC_KIND) {
+        boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
+                                boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
+        if (anArcPrs) {
+          anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
         }
-      }*/
-      //myFeaturePrs->setPoint(aX, anY, myPointSelectionMode);
-      setWidgetPoint(aX, anY);
-      flushUpdated();
-      //emit focusActivated(myFeaturePrs->getAttribute(myPointSelectionMode));
-      //emit activateNextWidget(myActiveWidget);
-    /*}
-    break;
-    case SM_DonePoint:
-    {
-      commit();
-      restartOperation(feature()->getKind(), feature());
-    }
-    default:
-      break;*/
+      }
+    }*/
+    setWidgetPoint(aX, anY);
+    flushUpdated();
   }
 }
 
@@ -221,22 +185,30 @@ void PartSet_OperationFeatureCreate::keyReleased(std::string theName, QKeyEvent*
 void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
 {
   myActiveWidget = theWidget;
+
+  if (myInitFeature && myActiveWidget) {
+    // TODO: to be realized in the custom point selector. The last point values of the init feature
+    // should be to to the start point of a new feature
+    //myActiveWidget->init(myInitFeature);
+    myInitFeature = FeaturePtr();
+    emit activateNextWidget(myActiveWidget);
+  }
 }
 
 void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
 {
   switch (theKey) {
     case Qt::Key_Return: {
-      if (canBeCommitted()/*myPointSelectionMode == SM_DonePoint*/)
+      if (canBeCommitted())
       {
         commit();
         // it start a new line creation at a free point
-        restartOperation(feature()->getKind(), FeaturePtr()/*feature()*/);
+        restartOperation(feature()->getKind(), FeaturePtr());
       }
     }
     break;
     case Qt::Key_Escape: {
-      if (canBeCommitted()/*myPointSelectionMode == SM_DonePoint*/)
+      if (canBeCommitted())
       {
         commit();
       }
