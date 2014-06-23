@@ -62,6 +62,10 @@ void ModuleBase_Operation::storeCustomValue()
     aCustom->storeValue(myFeature);
 }
 
+void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
+{
+}
+
 void ModuleBase_Operation::startOperation()
 {
   if (!myIsEditing)

@@ -20,6 +20,7 @@
 #include <boost/shared_ptr.hpp>
 
 class ModelAPI_Document;
+class ModuleBase_ModelWidget;
 
 class QKeyEvent;
 
@@ -72,6 +73,16 @@ public:
   void setEditingFeature(FeaturePtr theFeature);
 
   bool isEditOperation() const { return myIsEditing; }
+
+public slots:
+  /// Slots which listen the mode widget activation
+  /// \param theWidget the model widget
+  virtual void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
+
+signals:
+  /// Signals about the activating of the next widget
+  /// \param theWidget the previous active widget
+  void activateNextWidget(ModuleBase_ModelWidget* theWidget);
 
 protected:
   /// Virtual method called when operation started (see start() method for more description)
