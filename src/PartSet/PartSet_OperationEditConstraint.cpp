@@ -145,10 +145,7 @@ void PartSet_OperationEditConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V
     double aX, anY;
     PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
 
-    /*double aDeltaX = aX - aCurX;
-    double aDeltaY = anY - aCurY;
 
-    PartSet_Tools::moveFeature(feature(), aDeltaX, aDeltaY);*/
     if (feature()->getKind() == PartSet_ConstraintRadiusPrs::getKind()) {
       boost::shared_ptr<PartSet_ConstraintRadiusPrs> anArcPrs =
                               boost::dynamic_pointer_cast<PartSet_ConstraintRadiusPrs>(myFeaturePrs);
@@ -157,15 +154,6 @@ void PartSet_OperationEditConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V
       }
     }
     myFeaturePrs->setPoint(aX, anY, SM_LastPoint);
-
-
-    /*std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
-    for (; anIt != aLast; anIt++) {
-      FeaturePtr aFeature = (*anIt).feature();
-      if (!aFeature || aFeature == feature())
-        continue;
-      PartSet_Tools::moveFeature(aFeature, aDeltaX, aDeltaY);
-    }*/
   }
   sendFeatures();
 

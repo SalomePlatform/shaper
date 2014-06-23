@@ -59,11 +59,6 @@ public:
   /// \return next attribute selection mode
   virtual PartSet_SelectionMode getNextMode(const std::string& theAttribute) const = 0;
 
-  /// \brief Move the full feature.
-  /// \param theDeltaX the delta for X coordinate is moved
-  /// \param theDeltaY the delta for Y coordinate is moved
-  virtual void move(double theDeltaX, double theDeltaY) = 0;
-
   /// Return the distance between the feature and the point
   /// \param theFeature feature object
   /// \param theX the horizontal coordinate of the point

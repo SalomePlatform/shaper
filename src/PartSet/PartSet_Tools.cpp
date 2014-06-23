@@ -215,17 +215,6 @@ double PartSet_Tools::distanceToPoint(FeaturePtr theFeature,
   return aDelta;
 }
 
-void PartSet_Tools::moveFeature(FeaturePtr theFeature, double theDeltaX, double theDeltaY)
-{
-  if (!theFeature)
-    return;
-
-  boost::shared_ptr<PartSet_FeaturePrs> aFeaturePrs = PartSet_Tools::createFeaturePrs(
-                                           theFeature->getKind(), FeaturePtr(), theFeature);
-  if (aFeaturePrs)
-  aFeaturePrs->move(theDeltaX, theDeltaY);
-}
-
 boost::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
 {
   return ModelAPI_PluginManager::get()->rootDocument();

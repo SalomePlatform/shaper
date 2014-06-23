@@ -61,11 +61,6 @@ public:
   static void projectPointOnFeature(FeaturePtr theFeature, FeaturePtr theSketch, gp_Pnt& thePoint,
                                     Handle_V3d_View theView, double& theX, double& theY);
 
-  /// \brief Move the full feature.
-  /// \param theDeltaX the delta for X coordinate is moved
-  /// \param theDeltaY the delta for Y coordinate is moved
-  virtual void move(double theDeltaX, double theDeltaY);
-
   /// Return the distance between the feature and the point
   /// \param theFeature feature object
   /// \param theX the horizontal coordinate of the point

@@ -32,6 +32,11 @@ public:
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
   SKETCHPLUGIN_EXPORT virtual bool isInHistory() {return false;}
 
+  /// Moves the feature
+  /// \param theDeltaX the delta for X coordinate is moved
+  /// \param theDeltaY the delta for Y coordinate is moved
+  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY) = 0;
+
 protected:
   /// Set the shape to the internal preview field
   /// \param theShape a preview shape

@@ -132,14 +132,17 @@ void PartSet_OperationEditFeature::mouseMoved(QMouseEvent* theEvent, Handle(V3d_
     double aDeltaX = aX - aCurX;
     double aDeltaY = anY - aCurY;
 
-    PartSet_Tools::moveFeature(feature(), aDeltaX, aDeltaY);
+    boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(feature());
+    aSketchFeature->move(aDeltaX, aDeltaY);
 
     std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = (*anIt).feature();
       if (!aFeature || aFeature == feature())
         continue;
-      PartSet_Tools::moveFeature(aFeature, aDeltaX, aDeltaY);
+      aSketchFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+      aSketchFeature->move(aDeltaX, aDeltaY);
     }
   }
   sendFeatures();

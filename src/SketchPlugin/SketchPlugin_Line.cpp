@@ -47,3 +47,18 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Line::preview()
   }
   return getPreview();
 }
+
+void SketchPlugin_Line::move(double theDeltaX, double theDeltaY)
+{
+  boost::shared_ptr<ModelAPI_Data> aData = data();
+  if (!aData->isValid())
+    return;
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
+  aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
+  aPoint2->setValue(aPoint2->x() + theDeltaX, aPoint2->y() + theDeltaY);
+}

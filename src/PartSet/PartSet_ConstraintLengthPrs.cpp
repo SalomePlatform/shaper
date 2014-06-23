@@ -204,10 +204,6 @@ PartSet_SelectionMode PartSet_ConstraintLengthPrs::getNextMode(const std::string
   return SM_FirstPoint;
 }
 
-void PartSet_ConstraintLengthPrs::move(double theDeltaX, double theDeltaY)
-{
-}
-
 double PartSet_ConstraintLengthPrs::distanceToPoint(FeaturePtr theFeature,
                                                  double theX, double theY)
 {

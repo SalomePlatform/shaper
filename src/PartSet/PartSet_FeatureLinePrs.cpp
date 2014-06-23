@@ -107,21 +107,6 @@ PartSet_SelectionMode PartSet_FeatureLinePrs::getNextMode(const std::string& the
   return aMode;
 }
 
-void PartSet_FeatureLinePrs::move(double theDeltaX, double theDeltaY)
-{
-  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
-  if (!aData->isValid())
-    return;
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
-  aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
-  aPoint2->setValue(aPoint2->x() + theDeltaX, aPoint2->y() + theDeltaY);
-}
-
 void PartSet_FeatureLinePrs::projectPointOnLine(FeaturePtr theFeature,
                                                 const PartSet_SelectionMode& theMode,
                                                 const gp_Pnt& thePoint, Handle(V3d_View) theView,

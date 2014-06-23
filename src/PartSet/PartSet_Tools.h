@@ -69,12 +69,6 @@ public:
   static FeaturePtr nearestFeature(QPoint thePoint, Handle_V3d_View theView, FeaturePtr theSketch,
                                    const std::list<XGUI_ViewerPrs>& theFeatures);
 
-  /// \brief Move the feature.
-  /// \param theFeature the source feature
-  /// \param theDeltaX the delta for X coordinate is moved
-  /// \param theDeltaY the delta for Y coordinate is moved
-  static void moveFeature(FeaturePtr theFeature, double theDeltaX, double theDeltaY);
-
   /// Returns pointer to the root document.
   static boost::shared_ptr<ModelAPI_Document> document();
 

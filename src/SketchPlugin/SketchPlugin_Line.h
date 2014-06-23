@@ -47,6 +47,11 @@ public:
   SKETCHPLUGIN_EXPORT virtual const void addSub(
     const FeaturePtr& theFeature) {};
 
+  /// Moves the feature
+  /// \param theDeltaX the delta for X coordinate is moved
+  /// \param theDeltaY the delta for Y coordinate is moved
+  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
+
   /// Use plugin manager for features creation
   SketchPlugin_Line();
 };
