@@ -104,11 +104,11 @@ FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
   if (aFeature) { // TODO: generate an error if feature was not created
     aFeature->execute();
     // Init default values
-    QList<ModuleBase_ModelWidget*> aWidgets = getDescription()->modelWidgets();
+    /*QList<ModuleBase_ModelWidget*> aWidgets = getDescription()->modelWidgets();
     QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
     for (; anIt != aLast; anIt++) {
       (*anIt)->storeValue(aFeature);
-    }
+    }*/
   }
 
   if (theFlushMessage)

@@ -32,7 +32,7 @@ void ModuleBase_OperationDescription::setDescription(const QString& theDescripti
   myDescription = theDescription;
 }
 
-void ModuleBase_OperationDescription::setModelWidgets(const std::string& theXmlRepresentation,
+/*void ModuleBase_OperationDescription::setModelWidgets(const std::string& theXmlRepresentation,
                                                       const QList<ModuleBase_ModelWidget*>& theWidgets)
 {
   myWidgets.clear();
@@ -40,14 +40,24 @@ void ModuleBase_OperationDescription::setModelWidgets(const std::string& theXmlR
   for (; anIt != aLast; anIt++)
     myWidgets.push_back(*anIt);
   myXmlRepresentation = theXmlRepresentation;
-}
+}*/
 
-const QList<ModuleBase_ModelWidget*>& ModuleBase_OperationDescription::modelWidgets() const
+/*const QList<ModuleBase_ModelWidget*>& ModuleBase_OperationDescription::modelWidgets() const
 {
   return myWidgets;
+}*/
+
+const QString& ModuleBase_OperationDescription::xmlRepresentation() const
+{
+  return myXmlRepresentation;
+}
+
+void ModuleBase_OperationDescription::setXmlRepresentation(const QString& theXMLRepresentation)
+{
+  myXmlRepresentation = theXMLRepresentation;
 }
 
 bool ModuleBase_OperationDescription::hasXmlRepresentation() const
 {
-  return !myWidgets.empty() || !myXmlRepresentation.empty();
+  return /*!myWidgets.empty() || */!myXmlRepresentation.isEmpty();
 }

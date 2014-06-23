@@ -17,7 +17,7 @@
 
 #include <memory>
 
-class ModuleBase_ModelWidget;
+//class ModuleBase_ModelWidget;
 
 /*!
  * \class ModuleBase_OperationDescription
@@ -50,12 +50,20 @@ public:
 
   /// Sets a list of model widgets, according to the operation feature xml definition
   /// \param theWidgets a list of widgets
-  void setModelWidgets(const std::string& theXmlRepresentation,
-                       const QList<ModuleBase_ModelWidget*>& theWidgets);
+  //void setModelWidgets(const std::string& theXmlRepresentation,
+  //                     const QList<ModuleBase_ModelWidget*>& theWidgets);
 
   /// Sets a list of model widgets, according to the operation feature xml definition
   /// \param theWidgets a list of widgets
-  const QList<ModuleBase_ModelWidget*>& modelWidgets() const;
+  //const QList<ModuleBase_ModelWidget*>& modelWidgets() const;
+
+   /// Returns XML representation of the operation's widget.
+   /// \return XML QString
+  const QString& xmlRepresentation() const;
+
+  /// Sets XML representation of the operation's widget.
+  /// \param theXMLRepresentation - XML QString
+  void setXmlRepresentation(const QString& theXMLRepresentation);
 
   /// Returns true if there are no model widgets
   /// \return the boolean value
@@ -65,8 +73,8 @@ private:
   //!< Next fields could be extracted into a subclass;
   QString myOperationId; /// the operation identifier
   QString myDescription; /// the short description of the opertaion
-  std::string myXmlRepresentation; /// the xml definition
-  QList<ModuleBase_ModelWidget*> myWidgets; /// the list of operation widgets
+  QString myXmlRepresentation; /// the xml definition
+  //QList<ModuleBase_ModelWidget*> myWidgets; /// the list of operation widgets
 };
 
 #endif //ModuleBase_OperationDescription_H

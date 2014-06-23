@@ -364,16 +364,17 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   std::string aXmlCfg = aWdgReader.featureWidgetCfg(aFeatureKind);
   std::string aDescription = aWdgReader.featureDescription(aFeatureKind);
 
-  QString aXmlRepr = QString::fromStdString(aXmlCfg);
-  ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(),
-                                                               myWorkshop->moduleConnector());
-  QWidget* aContent = myWorkshop->propertyPanel()->contentWidget();
-  qDeleteAll(aContent->children());
-  aFactory.createWidget(aContent);
+  //QString aXmlRepr = QString::fromStdString(aXmlCfg);
+  //ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(),
+  //                                                             myWorkshop->moduleConnector());
+  //QWidget* aContent = myWorkshop->propertyPanel()->contentWidget();
+  //qDeleteAll(aContent->children());
+  //aFactory.createWidget(aContent);
 
   anOperation->getDescription()->setDescription(QString::fromStdString(aDescription));
+  anOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
 
-  anOperation->setModelWidgets(aXmlRepr.toStdString(), aFactory.getModelWidgets());
+  //anOperation->setModelWidgets(aXmlRepr.toStdString(), aFactory.getModelWidgets());
 
   // connect the operation
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
