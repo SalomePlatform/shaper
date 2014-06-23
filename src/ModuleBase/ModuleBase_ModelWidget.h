@@ -58,6 +58,10 @@ public:
   /// \return a boolean value
   bool hasDefaultValue() const { return myHasDefaultValue; }
 
+  /// Returns the attribute name
+  /// \returns the string value
+  std::string attributeID() const;
+
 signals:
   /// The signal about widget values changed
   void valuesChanged();
@@ -67,16 +71,9 @@ signals:
   void keyReleased(const std::string& theAttributeName, QKeyEvent* theEvent);
 
 protected:
-  /// Returns the attribute name
-  /// \returns the string value
-  std::string attributeID() const;
-
-  /// Sets the has default value state to the widget
-  /// \param theHasDefaultValue the boolean value
-  void setHasDefaultValue(const bool& theHasDefaultValue);
+  bool myHasDefaultValue; /// the boolean state whether the control has a default value
 
 private:
-  bool myHasDefaultValue; /// the boolean state whether the control has a default value
   std::string myAttributeID; /// the attribute name of the model feature
 };
 

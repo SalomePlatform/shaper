@@ -117,7 +117,7 @@ void PartSet_OperationCreateFeature::mouseReleased(QMouseEvent* theEvent, Handle
           aPoint = BRep_Tool::Pnt(aVertex);
           PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
 
-          myFeaturePrs->setConstraints(aX, anY, myPointSelectionMode);
+          //myFeaturePrs->setConstraints(aX, anY, myPointSelectionMode);
         }
       }
       else if (aShape.ShapeType() == TopAbs_EDGE) // the line is selected

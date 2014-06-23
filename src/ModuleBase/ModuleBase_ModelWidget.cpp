@@ -36,8 +36,3 @@ std::string ModuleBase_ModelWidget::attributeID() const
 {
   return myAttributeID;
 }
-
-void ModuleBase_ModelWidget::setHasDefaultValue(const bool& theHasDefaultValue)
-{
-  myHasDefaultValue = theHasDefaultValue;
-}

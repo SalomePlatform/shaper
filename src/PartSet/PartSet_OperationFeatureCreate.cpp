@@ -117,7 +117,8 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
           aPoint = BRep_Tool::Pnt(aVertex);
           PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
 
-          //myFeaturePrs->setConstraints(aX, anY, myPointSelectionMode);
+          PartSet_Tools::setConstraints(sketch(), feature(), myActiveWidget->attributeID(),
+                                        aX, anY);
         }
       }
       else if (aShape.ShapeType() == TopAbs_EDGE) // the line is selected
@@ -190,6 +191,7 @@ void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* t
     // TODO: to be realized in the custom point selector. The last point values of the init feature
     // should be to to the start point of a new feature
     //myActiveWidget->init(myInitFeature);
+    //PartSet_FeatureLinePrs::setFeature(myInitFeature, SM_FirstPoint);
     myInitFeature = FeaturePtr();
     emit activateNextWidget(myActiveWidget);
   }
