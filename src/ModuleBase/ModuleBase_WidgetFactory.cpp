@@ -14,6 +14,7 @@
 #include <ModuleBase_WidgetSelector.h>
 #include <ModuleBase_WidgetDoubleValue.h>
 #include <ModuleBase_WidgetBoolValue.h>
+#include <ModuleBase_WidgetPoint2dDistance.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -119,6 +120,9 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   } else if (theType == WDG_POINT_SELECTOR) {
     result = pointSelectorControl(theParent);
 
+  } else if (theType == WDG_POINT2D_DISTANCE) {
+    result = point2dDistanceControl(theParent);
+
   } else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
   }
@@ -183,4 +187,13 @@ QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
   myModelWidgets.append(aBoolWgt);
 
   return aBoolWgt->getControl();
+}
+
+
+QWidget* ModuleBase_WidgetFactory::point2dDistanceControl(QWidget* theParent)
+{
+  ModuleBase_WidgetPoint2dDistance* aDistWgt = new ModuleBase_WidgetPoint2dDistance(theParent, myWidgetApi);
+  myModelWidgets.append(aDistWgt);
+
+  return aDistWgt->getControl();
 }

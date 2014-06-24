@@ -43,7 +43,7 @@ public:
   /// \param theEvent the processed event
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
-private:
+protected:
   QWidget*     myContainer;
   QLabel*      myLabel;
   QDoubleSpinBox* mySpinBox;
