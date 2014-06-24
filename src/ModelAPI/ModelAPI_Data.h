@@ -7,6 +7,7 @@
 
 #include "ModelAPI.h"
 #include <string>
+#include <list>
 #include <boost/shared_ptr.hpp>
 
 class ModelAPI_AttributeDocRef;
@@ -51,6 +52,10 @@ public:
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
   virtual boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string theID) = 0;
+  /// Returns all attributes ofthe feature of the given type
+  /// or all attributes if "theType" is empty
+  virtual std::list<boost::shared_ptr<ModelAPI_Attribute> >
+    attributes(const std::string theType) = 0;
   /// Identifier by the id (not fast, iteration by map)
   /// \param theAttr attribute already created in this data
   virtual const std::string& id(const boost::shared_ptr<ModelAPI_Attribute> theAttr) = 0;
@@ -69,6 +74,10 @@ public:
   /// \param theID identifier of the attribute that can be referenced by this ID later
   /// \param theAttrType type of the created attribute (received from the type method)
   virtual void addAttribute(std::string theID, std::string theAttrType) = 0;
+
+  /// Useful method for "set" methods of the attributes: sends an UPDATE event and
+  /// makes attribute initialized
+  virtual void sendAttributeUpdated(ModelAPI_Attribute* theAttr) = 0;
 
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Data() {}

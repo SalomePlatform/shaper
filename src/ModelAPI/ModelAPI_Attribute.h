@@ -19,6 +19,8 @@ class ModelAPI_Attribute
 {
   ///< needed here to emit signal that feature changed on change of the attribute
   boost::shared_ptr<ModelAPI_Feature> myFeature;
+protected: // accessible from the attributes
+  bool myIsInitialized;
 public:
   
   /// Returns the type of this class of attributes, not static method
@@ -34,9 +36,16 @@ public:
   /// Returns the owner of this attribute
   MODELAPI_EXPORT const boost::shared_ptr<ModelAPI_Feature>& owner()
   {return myFeature;}
+
+  /// Returns true if attribute was  initialized by some value
+  MODELAPI_EXPORT bool isInitialized() {return myIsInitialized;}
+
+  /// Makes attribute initialized
+  MODELAPI_EXPORT void setInitialized() {myIsInitialized = true;}
+
 protected:
   /// Objects are created for features automatically
-  ModelAPI_Attribute(){}
+  ModelAPI_Attribute() {myIsInitialized = false;}
 
 };
 

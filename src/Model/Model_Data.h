@@ -63,6 +63,11 @@ public:
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string theID);
+  /// Returns all attributes ofthe feature of the given type
+  /// or all attributes if "theType" is empty
+  MODEL_EXPORT virtual std::list<boost::shared_ptr<ModelAPI_Attribute> >
+    attributes(const std::string theType);
+
   /// Identifier by the id (not fast, iteration by map)
   /// \param theAttr attribute already created in this data
   MODEL_EXPORT virtual const std::string& id(const boost::shared_ptr<ModelAPI_Attribute> theAttr);
@@ -81,6 +86,10 @@ public:
   /// \param theID identifier of the attribute that can be referenced by this ID later
   /// \param theAttrType type of the created attribute (received from the type method)
   MODEL_EXPORT virtual void addAttribute(std::string theID, std::string theAttrType);
+
+  /// Useful method for "set" methods of the attributes: sends an UPDATE event and
+  /// makes attribute initialized
+  MODEL_EXPORT virtual void sendAttributeUpdated(ModelAPI_Attribute* theAttr);
 
   /// Puts feature to the document data sub-structure
   MODEL_EXPORT void setLabel(TDF_Label& theLab);

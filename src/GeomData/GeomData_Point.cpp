@@ -3,27 +3,27 @@
 // Author:      Mikhail PONIKAROV
 
 #include "GeomData_Point.h"
-#include "Model_Events.h"
-#include <Events_Loop.h>
 #include <GeomAPI_Pnt.h>
+#include <ModelAPI_Feature.h>
+#include <ModelAPI_Data.h>
 
 using namespace std;
 
 void GeomData_Point::setValue(const double theX, const double theY, const double theZ)
 {
-  if (myCoords->Value(0) != theX || myCoords->Value(1) != theY || myCoords->Value(2) != theZ) {
+  if (!myIsInitialized || myCoords->Value(0) != theX || myCoords->Value(1) != theY || 
+       myCoords->Value(2) != theZ) {
     myCoords->SetValue(0, theX);
     myCoords->SetValue(1, theY);
     myCoords->SetValue(2, theZ);
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-    Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
-    Events_Loop::loop()->send(aMsg);
+    owner()->data()->sendAttributeUpdated(this);
   }
 }
 
 void GeomData_Point::setValue(const boost::shared_ptr<GeomAPI_Pnt>& thePoint)
 {
   setValue(thePoint->x(), thePoint->y(), thePoint->z());
+  owner()->data()->sendAttributeUpdated(this);
 }
 
 double GeomData_Point::x() const
@@ -50,8 +50,8 @@ boost::shared_ptr<GeomAPI_Pnt> GeomData_Point::pnt()
 
 GeomData_Point::GeomData_Point(TDF_Label& theLabel)
 {
-  // check the attribute could be already presented in this doc (after load document)
-  if (!theLabel.FindAttribute(TDataStd_RealArray::GetID(), myCoords)) {
+  myIsInitialized = theLabel.FindAttribute(TDataStd_RealArray::GetID(), myCoords) == Standard_True;
+  if (!myIsInitialized) {
     // create attribute: not initialized by value yet, just zero
     myCoords = TDataStd_RealArray::Set(theLabel, 0, 2);
   }
