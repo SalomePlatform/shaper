@@ -97,9 +97,9 @@ PartSet_SelectionMode PartSet_ConstraintLengthPrs::setPoint(double theX, double 
       if (!aFeatureLin->isRight(aPoint))
         aDistance = -aDistance;
 
-      AttributeDoublePtr aFlyoutAttr = 
-          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
-      aFlyoutAttr->setValue(aDistance);
+      //AttributeDoublePtr aFlyoutAttr = 
+      //    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
+      //aFlyoutAttr->setValue(aDistance);
 
       aMode = SM_DonePoint;
     }

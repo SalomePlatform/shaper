@@ -27,13 +27,12 @@ void SketchPlugin_ConstraintRadius::initAttributes()
 {
   data()->addAttribute(CONSTRAINT_ATTR_VALUE,    ModelAPI_AttributeDouble::type());
   data()->addAttribute(CONSTRAINT_ATTR_ENTITY_A, ModelAPI_AttributeRefAttr::type());
-
-  data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE, ModelAPI_AttributeDouble::type());
-  data()->addAttribute(SKETCH_CONSTRAINT_ATTR_CIRCLE_POINT, GeomDataAPI_Point2D::type());
+  data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT, GeomDataAPI_Point2D::type());
 }
 
 void SketchPlugin_ConstraintRadius::execute()
 {
+
 }
 
 Handle(AIS_InteractiveObject) SketchPlugin_ConstraintRadius::getAISShape(
@@ -59,7 +58,7 @@ Handle(AIS_InteractiveObject) SketchPlugin_ConstraintRadius::getAISShape(
 
   // an anchor point
   boost::shared_ptr<GeomDataAPI_Point2D> aAnchorAttr = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SKETCH_CONSTRAINT_ATTR_CIRCLE_POINT));
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
   boost::shared_ptr<GeomAPI_Pnt2d> anAnchor2D = aAnchorAttr->pnt();
   boost::shared_ptr<GeomAPI_Pnt> anAnchor = sketch()->to3D(anAnchor2D->x(), anAnchor2D->y());
 

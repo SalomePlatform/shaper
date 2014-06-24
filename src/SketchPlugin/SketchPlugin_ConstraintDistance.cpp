@@ -77,9 +77,8 @@ Handle(AIS_InteractiveObject) SketchPlugin_ConstraintDistance::getAISShape(
   boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin = 
     boost::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPoint_A->x(), aPoint_A->y(),
                                                        aPoint_B->x(), aPoint_B->y()));
-  boost::shared_ptr<GeomAPI_Pnt2d> aResult = aFeatureLin->project(aFlyOutPnt);
-  double aDistance = aFlyOutPnt->distance(aResult);
-
+  boost::shared_ptr<GeomAPI_Pnt2d> aProjectedPoint = aFeatureLin->project(aFlyOutPnt);
+  double aDistance = aFlyOutPnt->distance(aProjectedPoint);
   if (!aFeatureLin->isRight(aFlyOutPnt))
     aDistance = -aDistance;
   double aFlyout = aDistance;
@@ -87,16 +86,11 @@ Handle(AIS_InteractiveObject) SketchPlugin_ConstraintDistance::getAISShape(
   //Build dimension here
   boost::shared_ptr<GeomAPI_Pnt> aPoint1 = sketch()->to3D(aPoint_A->x(), aPoint_A->y());
   boost::shared_ptr<GeomAPI_Pnt> aPoint2 = sketch()->to3D(aPoint_B->x(), aPoint_B->y());
-  if (aFlyout < 0)
-    aPoint1.swap(aPoint2);
 
   // value calculation
   boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_VALUE));
   double aValue = aValueAttr->value();
-  if (aValue == 0) { // TODO! the default value
-    aValue = aPoint1->distance(aPoint2);
-  }
 
   Handle(AIS_InteractiveObject) anAIS = thePrevious;
   if (anAIS.IsNull())

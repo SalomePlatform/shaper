@@ -31,15 +31,13 @@ ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
 
 ModuleBase_WidgetEditor::~ModuleBase_WidgetEditor()
 {
-  //delete myEditor;
 }
 
 bool ModuleBase_WidgetEditor::storeValue(FeaturePtr theFeature) const
 {
   DataPtr aData = theFeature->data();
   AttributeDoublePtr aReal = aData->real(attributeID());
-  bool isOk;
-  if (isOk && aReal->value() != myValue) {
+  if (aReal->value() != myValue) {
     aReal->setValue(myValue);
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
   }
@@ -74,6 +72,7 @@ void ModuleBase_WidgetEditor::focusTo()
   if (aRes == QDialog::Accepted)
     myValue = aEditor->text().toDouble();
 
+  emit valuesChanged();
   emit focusOutWidget(this);
 }
 

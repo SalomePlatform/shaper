@@ -32,8 +32,6 @@ const int CONSTRAINT_TEXT_SELECTION_TOLERANCE = 20; /// the text selection toler
 const std::string CONSTRAINT_ATTR_VALUE("ConstraintValue");
 /// The 2D value parameter for the constraint
 const std::string CONSTRAINT_ATTR_FLYOUT_VALUE_PNT("ConstraintFlyoutValuePnt");
-/// The value parameter for the constraint
-const std::string CONSTRAINT_ATTR_FLYOUT_VALUE("ConstraintFlyoutValue");
 /// First entity for the constraint
 const std::string CONSTRAINT_ATTR_ENTITY_A("ConstraintEntityA");
 /// Second entity for the constraint

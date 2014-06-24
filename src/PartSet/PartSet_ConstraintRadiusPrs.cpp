@@ -90,7 +90,7 @@ PartSet_SelectionMode PartSet_ConstraintRadiusPrs::setPoint(double theX, double 
       boost::shared_ptr<GeomAPI_Pnt2d> aPoint = boost::shared_ptr<GeomAPI_Pnt2d>
                                                              (new GeomAPI_Pnt2d(theX, theY));
 
-      PartSet_Tools::setFeaturePoint(feature(), theX, theY, SKETCH_CONSTRAINT_ATTR_CIRCLE_POINT);
+      //PartSet_Tools::setFeaturePoint(feature(), theX, theY, SKETCH_CONSTRAINT_ATTR_CIRCLE_POINT);
 
       //double aDistance = 40;
       //AttributeDoublePtr aFlyoutAttr = 

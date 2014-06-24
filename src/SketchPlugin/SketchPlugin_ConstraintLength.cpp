@@ -12,6 +12,9 @@
 
 #include <GeomDataAPI_Point2D.h>
 
+#include <GeomAPI_Lin2d.h>
+#include <GeomAPI_Pnt2d.h>
+
 #include <AIS_LengthDimension.hxx>
 #include <gp_Pnt.hxx>
 #include <gp_Pln.hxx>
@@ -23,13 +26,33 @@ SketchPlugin_ConstraintLength::SketchPlugin_ConstraintLength()
 void SketchPlugin_ConstraintLength::initAttributes()
 {
   data()->addAttribute(CONSTRAINT_ATTR_VALUE,    ModelAPI_AttributeDouble::type());
-  data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE, ModelAPI_AttributeDouble::type());
+  //data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE, ModelAPI_AttributeDouble::type());
   data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT, GeomDataAPI_Point2D::type());
   data()->addAttribute(CONSTRAINT_ATTR_ENTITY_A, ModelAPI_AttributeRefAttr::type());
 }
 
 void SketchPlugin_ConstraintLength::execute()
 {
+  if (data()->attribute(CONSTRAINT_ATTR_ENTITY_A)->isInitialized() &&
+      !data()->attribute(CONSTRAINT_ATTR_VALUE)->isInitialized()) {
+
+    boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
+      boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(data()->attribute(CONSTRAINT_ATTR_ENTITY_A));
+    FeaturePtr aFeature = aRef->feature();
+    if (aFeature) {
+      // set length value
+      boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(LINE_ATTR_START));
+      boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(LINE_ATTR_END));
+
+      double aLenght = aPoint1->pnt()->distance(aPoint2->pnt());
+
+      boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = 
+        boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CONSTRAINT_ATTR_VALUE));
+      aValueAttr->setValue(aLenght);
+    }
+  }
 }
 
 Handle(AIS_InteractiveObject) SketchPlugin_ConstraintLength::getAISShape(
@@ -48,10 +71,29 @@ Handle(AIS_InteractiveObject) SketchPlugin_ConstraintLength::getAISShape(
   if (!aFeature || aFeature->getKind() != SKETCH_LINE_KIND)
     return thePrevious;
 
-  boost::shared_ptr<ModelAPI_AttributeDouble> aFlyoutAttr = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
-  double aFlyout = aFlyoutAttr->value();
+  //boost::shared_ptr<ModelAPI_AttributeDouble> aFlyoutAttr = 
+  //  boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
+  //double aFlyout = aFlyoutAttr->value();
+  // fly out calculation
+  boost::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
+  boost::shared_ptr<GeomAPI_Pnt2d> aFlyOutPnt = aFlyOutAttr->pnt();
 
+  boost::shared_ptr<GeomDataAPI_Point2D> aStartPoint =
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(LINE_ATTR_START));
+  boost::shared_ptr<GeomDataAPI_Point2D> anEndPoint =
+     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(LINE_ATTR_END));
+
+  boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin = boost::shared_ptr<GeomAPI_Lin2d>
+                                             (new GeomAPI_Lin2d(aStartPoint->x(), aStartPoint->y(),
+                                                                anEndPoint->x(), anEndPoint->y()));
+  boost::shared_ptr<GeomAPI_Pnt2d> aProjectedPoint = aFeatureLin->project(aFlyOutPnt);
+  double aDistance = aFlyOutPnt->distance(aProjectedPoint);
+  if (!aFeatureLin->isRight(aFlyOutPnt))
+    aDistance = -aDistance;
+  double aFlyout = aDistance;
+
+  // value
   boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CONSTRAINT_ATTR_VALUE));
   double aValue = aValueAttr->value();
@@ -68,8 +110,6 @@ Handle(AIS_InteractiveObject) SketchPlugin_ConstraintLength::getAISShape(
   //Build dimension here
   boost::shared_ptr<GeomAPI_Pnt> aPoint1 = sketch()->to3D(aPointStart->x(), aPointStart->y());
   boost::shared_ptr<GeomAPI_Pnt> aPoint2 = sketch()->to3D(aPointEnd->x(),   aPointEnd->y());
-  if (aFlyout < 0)
-    aPoint1.swap(aPoint2);
 
   Handle(AIS_InteractiveObject) anAIS = thePrevious;
   if (anAIS.IsNull())
