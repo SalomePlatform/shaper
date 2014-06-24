@@ -1,7 +1,7 @@
 <plugin>
   <workbench id="Sketch">
     <group id="Basic">
-      <feature id="Sketch" nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance" title="Sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
+      <feature id="Sketch" nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular" title="Sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
         <label title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch"/> 
       <!--icon=":pictures/x_point.png"-->
       </feature>
@@ -26,17 +26,29 @@
         <label title="Select point and another feature (point or point on line) between which to calculate distance" tooltip="Select point and another feature (point or point on line) between which to calculate distance"/>
         <feature_selector id="ConstraintEntityA" keysequence="SketchPoint" internal="1"/>
         <feature_selector id="ConstraintEntityB" keysequence="SketchPoint" internal="1"/>
-        <point_selector id="ConstraintFlyoutValuePnt" title="Flyout point" tooltip="Flyout" internal="1"/>
-        <doublevalue_editor id="ConstraintValue" min="0" step="1.0" tooltip="Constraint value"/>
+        <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
+        <doublevalue_editor id="ConstraintValue"/>
       </feature>
       <feature id="SketchConstraintLength" title="Length of a line" tooltip="Create constraint for the given length of a line segment">
         <label title="Select a line entity on which to calculate lenght" tooltip="Select a line entity on which to calculate lenght"/>
+        <feature_selector id="ConstraintEntityA" keysequence="SketchLine" internal="1"/>
+        <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
+        <doublevalue_editor id="ConstraintValue"/>
       </feature>
       <feature id="SketchConstraintRadius" title="Radius of a circle or an arc" tooltip="Create constraint for the given radius of a circle or an arc">
         <label title="Select two points on a circle or an arc of circle on which to calculate radius" tooltip="Select two points on a circle or an arc of circle on which to calculate radius"/>
+        <feature_selector id="ConstraintEntityA" keysequence="SketchPoint" internal="1"/>
+        <point_selector id="CirclePoint" internal="1"/>
+        <doublevalue_editor id="ConstraintValue"/>
       </feature>
-      <feature id="SketchConstraintParallel" title="Parallelism of a lines" tooltip="Create constraint defining two parallel lines" internal="1"/>
-      <feature id="SketchConstraintPerpendicular" title="Orthgonality of a lines" tooltip="Create constraint defining two perpendicular lines" internal="1"/>
+      <feature id="SketchConstraintParallel" title="Parallelism of a lines" tooltip="Create constraint defining two parallel lines">
+        <feature_selector id="ConstraintEntityA" keysequence="SketchLine" internal="1"/>
+        <feature_selector id="ConstraintEntityB" keysequence="SketchLine" internal="1"/>
+      </feature>
+      <feature id="SketchConstraintPerpendicular" title="Orthgonality of a lines" tooltip="Create constraint defining two perpendicular lines">
+        <feature_selector id="ConstraintEntityA" keysequence="SketchLine" internal="1"/>
+        <feature_selector id="ConstraintEntityB" keysequence="SketchLine" internal="1"/>
+      </feature>
     </group>
   </workbench>
 </plugin>
