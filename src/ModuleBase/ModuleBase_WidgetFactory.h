@@ -43,6 +43,7 @@ protected:
   QWidget* createContainer(const std::string& theType, QWidget* theParent = NULL);
   QWidget* selectorControl(QWidget* theParent);
   QWidget* booleanControl(QWidget* theParent);
+  QWidget* point2dDistanceControl(QWidget* theParent);
 
   QString qs(const std::string& theStdString) const;
 

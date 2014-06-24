@@ -23,6 +23,7 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetFeature.h>
+#include <ModuleBase_WidgetPoint2dDistance.h>
 
 #include <XGUI_ViewerPrs.h>
 #include <XGUI_Constants.h>
@@ -54,7 +55,7 @@ PartSet_OperationFeatureCreate::~PartSet_OperationFeatureCreate()
 bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
 {
   return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND ||
-         theId == SKETCH_CONSTRAINT_DISTANCE_KIND/*|| theId == SKETCH_CIRCLE_KIND ||
+         theId == SKETCH_CONSTRAINT_DISTANCE_KIND || theId == SKETCH_CIRCLE_KIND /*||
          theId == SKETCH_ARC_KIND*/;
 }
 
@@ -301,12 +302,19 @@ bool PartSet_OperationFeatureCreate::isPointWidget() const
 
 bool PartSet_OperationFeatureCreate::setWidgetPoint(double theX, double theY)
 {
+  boost::shared_ptr<GeomAPI_Pnt2d> aPoint(new GeomAPI_Pnt2d(theX, theY));
   ModuleBase_WidgetPoint2D* aWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
-  if (!aWidget)
-    return false;
-
-  aWidget->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
-  return true;
+  if (aWidget) {
+    aWidget->setPoint(aPoint);
+    return true;
+  } else {
+    ModuleBase_WidgetPoint2dDistance* aWgt = dynamic_cast<ModuleBase_WidgetPoint2dDistance*>(myActiveWidget);
+    if (aWgt) {
+      aWgt->setPoint(feature(), aPoint);
+      return true;
+    }
+  }
+  return false;
 }
 
 bool PartSet_OperationFeatureCreate::setWidgetFeature(const FeaturePtr& theFeature)

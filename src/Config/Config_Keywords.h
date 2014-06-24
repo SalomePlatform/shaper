@@ -31,6 +31,8 @@ const static char* WDG_SELECTOR = "selector";
 
 //Specific widget containers
 const static char* WDG_POINT_SELECTOR = "point_selector";
+const static char* WDG_POINT2D_DISTANCE = "point2ddistance";
+
 const static char* WDG_FEATURE_SELECTOR = "feature_selector";
 const static char* WDG_DOUBLEVALUE_EDITOR = "doublevalue_editor";
 
