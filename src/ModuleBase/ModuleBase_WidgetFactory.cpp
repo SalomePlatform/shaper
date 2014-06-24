@@ -100,6 +100,7 @@ QWidget* ModuleBase_WidgetFactory::labelControl(QWidget* theParent)
   QWidget* result = new QWidget(theParent);
   QVBoxLayout* aLabelLay = new QVBoxLayout(result);
   QLabel* aLabel = new QLabel(result);
+  aLabel->setWordWrap(true);
   aLabel->setText(qs(myWidgetApi->getProperty(INFO_WDG_TEXT)));
   aLabel->setToolTip(qs(myWidgetApi->getProperty(INFO_WDG_TOOLTIP)));
   aLabelLay->addWidget(aLabel);

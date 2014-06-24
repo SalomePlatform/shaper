@@ -26,7 +26,6 @@ SketchPlugin_ConstraintLength::SketchPlugin_ConstraintLength()
 void SketchPlugin_ConstraintLength::initAttributes()
 {
   data()->addAttribute(CONSTRAINT_ATTR_VALUE,    ModelAPI_AttributeDouble::type());
-  //data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE, ModelAPI_AttributeDouble::type());
   data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT, GeomDataAPI_Point2D::type());
   data()->addAttribute(CONSTRAINT_ATTR_ENTITY_A, ModelAPI_AttributeRefAttr::type());
 }
@@ -71,9 +70,6 @@ Handle(AIS_InteractiveObject) SketchPlugin_ConstraintLength::getAISShape(
   if (!aFeature || aFeature->getKind() != SKETCH_LINE_KIND)
     return thePrevious;
 
-  //boost::shared_ptr<ModelAPI_AttributeDouble> aFlyoutAttr = 
-  //  boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
-  //double aFlyout = aFlyoutAttr->value();
   // fly out calculation
   boost::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = 
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));

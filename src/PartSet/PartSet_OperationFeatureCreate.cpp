@@ -59,8 +59,8 @@ PartSet_OperationFeatureCreate::~PartSet_OperationFeatureCreate()
 bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
 {
   return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND ||
-         theId == SKETCH_CIRCLE_KIND /*||
-         theId == SKETCH_ARC_KIND*/ ||
+         theId == SKETCH_CIRCLE_KIND ||
+         theId == SKETCH_ARC_KIND ||
          theId == SKETCH_CONSTRAINT_DISTANCE_KIND ||
          theId == SKETCH_CONSTRAINT_LENGTH_KIND ||
          theId == SKETCH_CONSTRAINT_RADIUS_KIND /*||
@@ -113,7 +113,7 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
     return;
   }
 
-  double aX, anY;
+  double aX = 0, anY = 0;
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
   if (theSelected.empty()) {

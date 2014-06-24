@@ -19,7 +19,7 @@ const std::string SKETCH_CONSTRAINT_LENGTH_KIND("SketchConstraintLength");
  *
  *  These constraint has two attributes:
  *  CONSTRAINT_ATTR_VALUE (length) and CONSTRAINT_ATTR_ENTITY_A (segment),
- *  CONSTRAINT_ATTR_FLYOUT_VALUE (distance of a constraints handle)
+ *  CONSTRAINT_ATTR_FLYOUT_VALUE_PNT (distance of a constraints handle)
  */
 class SketchPlugin_ConstraintLength: public SketchPlugin_Constraint
 {

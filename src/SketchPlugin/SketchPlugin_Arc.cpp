@@ -6,6 +6,7 @@
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
 
+#include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Pnt2d.h>
 
 #include <GeomDataAPI_Point2D.h>
@@ -14,6 +15,8 @@
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
+
+#include <Precision.hxx>
 
 SketchPlugin_Arc::SketchPlugin_Arc()
   : SketchPlugin_Feature()
@@ -50,15 +53,23 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Arc::preview()
       boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->data()->attribute(SKETCH_ATTR_NORM));
     bool aHasPlane = aNDir && !(aNDir->x() == 0 && aNDir->y() == 0 && aNDir->z() == 0);
     if (aHasPlane) {
-      boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
+      boost::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
       // compute the arc start point
       boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(ARC_ATTR_START));
       boost::shared_ptr<GeomAPI_Pnt> aStartPoint(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
 
-      // compute the arc end point
+      // compute and change the arc end point
       boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(ARC_ATTR_END));
+      if (anEndAttr->isInitialized())
+      {
+        boost::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
+          new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
+        boost::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEndAttr->pnt());
+        if (aProjection && anEndAttr->pnt()->distance(aProjection) > Precision::Confusion())
+          anEndAttr->setValue(aProjection);
+      }
       boost::shared_ptr<GeomAPI_Pnt> aEndPoint(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
 
       boost::shared_ptr<GeomAPI_Shape> aCircleShape = 
