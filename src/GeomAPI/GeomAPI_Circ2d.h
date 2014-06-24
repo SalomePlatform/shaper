@@ -13,7 +13,7 @@ class GeomAPI_Dir2d;
 
 /**\class GeomAPI_Circ2d
  * \ingroup DataModel
- * \brief Line in 2D
+ * \brief Circle in 2D
  */
 
 class GEOMAPI_EXPORT GeomAPI_Circ2d: public GeomAPI_Interface
