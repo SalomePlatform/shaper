@@ -113,7 +113,7 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
     return;
   }
 
-  double aX, anY;
+  double aX = 0, anY = 0;
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
   if (theSelected.empty()) {
