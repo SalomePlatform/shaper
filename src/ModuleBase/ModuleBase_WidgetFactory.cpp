@@ -11,6 +11,7 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetFeature.h>
+#include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_WidgetSwitch.h>
 #include <ModuleBase_WidgetSelector.h>
 #include <ModuleBase_WidgetDoubleValue.h>
@@ -123,6 +124,9 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   } else if (theType == WDG_FEATURE_SELECTOR) {
     result = featureSelectorControl(theParent);
 
+  } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
+    result = doubleValueEditor(theParent);
+
   }
   else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
@@ -173,6 +177,13 @@ QWidget* ModuleBase_WidgetFactory::featureSelectorControl(QWidget* theParent)
   ModuleBase_WidgetFeature* aWidget = new ModuleBase_WidgetFeature(theParent, myWidgetApi);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
+}
+
+QWidget* ModuleBase_WidgetFactory::doubleValueEditor(QWidget* theParent)
+{
+  ModuleBase_WidgetEditor* aWidget = new ModuleBase_WidgetEditor(theParent, myWidgetApi);
+  myModelWidgets.append(aWidget);
+  return 0;
 }
 
 QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const

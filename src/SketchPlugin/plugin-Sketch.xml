@@ -27,7 +27,7 @@
         <feature_selector id="ConstraintEntityA" keysequence="SketchPoint"/>
         <feature_selector id="ConstraintEntityB" keysequence="SketchPoint"/>
         <point_selector id="ConstraintFlyoutValuePnt" title="Flyout point" tooltip="Flyout"/>
-        <doublevalue id="ConstraintValue" label="Value:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Constraint value"/>
+        <doublevalue_editor id="ConstraintValue" min="0" step="1.0" tooltip="Constraint value"/>
       </feature>
       <feature id="SketchConstraintLength" title="Length of a line" tooltip="Create constraint for the given length of a line segment">
         <label title="Select a line entity on which to calculate lenght" tooltip="Select a line entity on which to calculate lenght"/>

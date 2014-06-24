@@ -39,6 +39,7 @@ protected:
   QWidget* doubleSpinBoxControl(QWidget* theParent);
   QWidget* pointSelectorControl(QWidget* theParent);
   QWidget* featureSelectorControl(QWidget* theParent);
+  QWidget* doubleValueEditor(QWidget* theParent);
   QWidget* createContainer(const std::string& theType, QWidget* theParent = NULL);
   QWidget* selectorControl(QWidget* theParent);
   QWidget* booleanControl(QWidget* theParent);

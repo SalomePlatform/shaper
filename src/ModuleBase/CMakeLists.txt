@@ -9,6 +9,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_ModelWidget.h
 	ModuleBase_WidgetBoolValue.h
 	ModuleBase_WidgetDoubleValue.h
+	ModuleBase_WidgetEditor.h
 	ModuleBase_WidgetFactory.h
 	ModuleBase_WidgetFeature.h
 	ModuleBase_WidgetPoint2D.h
@@ -24,6 +25,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_ModelWidget.cpp
 	ModuleBase_WidgetBoolValue.cpp
 	ModuleBase_WidgetDoubleValue.cpp
+	ModuleBase_WidgetEditor.cpp
 	ModuleBase_WidgetFactory.cpp
 	ModuleBase_WidgetFeature.cpp
 	ModuleBase_WidgetPoint2D.cpp
