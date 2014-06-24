@@ -120,10 +120,20 @@ protected:
   //void setPointSelectionMode(const PartSet_SelectionMode& theMode,
   //                           const bool isToEmitSignal = true);
 
-  /// Set the widget point
+  /// Returns true if the active widget is the point selector widget
+  /// \return the boolean value
+  bool isPointWidget() const;
+
+  /// Set the point to the active widget
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
-  void setWidgetPoint(double theX, double theY);
+  /// \return true if the point is set
+  bool setWidgetPoint(double theX, double theY);
+
+  /// Set the feature to the active widget
+  /// \param theFeature a feature
+  /// \return true if the feature is set
+  bool setWidgetFeature(const FeaturePtr& theFeature);
 
 private:
   //boost::shared_ptr<PartSet_FeaturePrs> myFeaturePrs; ///< the feature presentation

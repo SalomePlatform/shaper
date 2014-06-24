@@ -9,6 +9,7 @@ SET(PROJECT_HEADERS
   Config_XMLReader.h
   Config_ModuleReader.h
   Config_FeatureReader.h
+  Config_Keywords.h
   Config_WidgetAPI.h
   Config_WidgetReader.h
   Config_PointerMessage.h

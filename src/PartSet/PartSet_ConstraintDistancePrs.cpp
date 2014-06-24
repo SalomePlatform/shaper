@@ -87,25 +87,11 @@ PartSet_SelectionMode PartSet_ConstraintDistancePrs::setPoint(double theX, doubl
   switch (theMode)
   {
     case SM_LastPoint: {
-      boost::shared_ptr<GeomDataAPI_Point2D> aPoint_A = getFeaturePoint(feature(),
-                                                                        CONSTRAINT_ATTR_ENTITY_A);
-      boost::shared_ptr<GeomDataAPI_Point2D> aPoint_B = getFeaturePoint(feature(),
-                                                                        CONSTRAINT_ATTR_ENTITY_B);
+      boost::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = 
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(feature()->data()->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
+      aFlyOutAttr->setValue(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
 
-      boost::shared_ptr<GeomAPI_Pnt2d> aPoint = boost::shared_ptr<GeomAPI_Pnt2d>
-                                                             (new GeomAPI_Pnt2d(theX, theY));
-      boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin = boost::shared_ptr<GeomAPI_Lin2d>
-                                        (new GeomAPI_Lin2d(aPoint_A->x(), aPoint_A->y(),
-                                                           aPoint_B->x(), aPoint_B->y()));
-      boost::shared_ptr<GeomAPI_Pnt2d> aResult = aFeatureLin->project(aPoint);
-      double aDistance = aPoint->distance(aResult);
-
-      if (!aFeatureLin->isRight(aPoint))
-        aDistance = -aDistance;
-
-      AttributeDoublePtr aFlyoutAttr = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>
-                                      (feature()->data()->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
-      aFlyoutAttr->setValue(aDistance);
+      boost::shared_ptr<GeomAPI_Pnt2d> aFlyOutPnt = aFlyOutAttr->pnt();
 
       aMode = SM_DonePoint;
     }
@@ -131,14 +117,21 @@ Handle(AIS_InteractiveObject) PartSet_ConstraintDistancePrs::createPresentation(
   if (!aPoint_A || !aPoint_B)
     return anAIS;
 
+  // fly out calculation
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeDouble> aFlyoutAttr = 
-          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE));
-  double aFlyout = aFlyoutAttr->value();
+  boost::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
+  boost::shared_ptr<GeomAPI_Pnt2d> aFlyOutPnt = aFlyOutAttr->pnt();
 
-  boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = 
-          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_VALUE));
-  double aValue = aValueAttr->value();
+  boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin = boost::shared_ptr<GeomAPI_Lin2d>
+                                    (new GeomAPI_Lin2d(aPoint_A->x(), aPoint_A->y(),
+                                                        aPoint_B->x(), aPoint_B->y()));
+  boost::shared_ptr<GeomAPI_Pnt2d> aResult = aFeatureLin->project(aFlyOutPnt);
+  double aDistance = aFlyOutPnt->distance(aResult);
+
+  if (!aFeatureLin->isRight(aFlyOutPnt))
+    aDistance = -aDistance;
+  double aFlyout = aDistance;
 
   gp_Pnt aPoint1, aPoint2;
   PartSet_Tools::convertTo3D(aPoint_A->x(), aPoint_A->y(), theSketch, aPoint1);
@@ -150,6 +143,14 @@ Handle(AIS_InteractiveObject) PartSet_ConstraintDistancePrs::createPresentation(
   if (aFlyout < 0) {
     aP1 = aPoint2;
     aP2 = aPoint1;
+  }
+
+  // value calculation
+  boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = 
+         boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_VALUE));
+  double aValue = aValueAttr->value();
+  if (aValue == 0) { // TODO! the default value
+    aValue = aP1.Distance(aP2);
   }
 
   if (anAIS.IsNull())

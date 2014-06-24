@@ -10,6 +10,7 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetPoint2D.h>
+#include <ModuleBase_WidgetFeature.h>
 #include <ModuleBase_WidgetSwitch.h>
 #include <ModuleBase_WidgetSelector.h>
 #include <ModuleBase_WidgetDoubleValue.h>
@@ -119,7 +120,11 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   } else if (theType == WDG_POINT_SELECTOR) {
     result = pointSelectorControl(theParent);
 
-  } else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
+  } else if (theType == WDG_FEATURE_SELECTOR) {
+    result = featureSelectorControl(theParent);
+
+  }
+  else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
   }
 #ifdef _DEBUG
@@ -159,6 +164,13 @@ QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
 {
   ModuleBase_WidgetPoint2D* aWidget = new ModuleBase_WidgetPoint2D(theParent, myWidgetApi);
+  myModelWidgets.append(aWidget);
+  return aWidget->getControl();
+}
+
+QWidget* ModuleBase_WidgetFactory::featureSelectorControl(QWidget* theParent)
+{
+  ModuleBase_WidgetFeature* aWidget = new ModuleBase_WidgetFeature(theParent, myWidgetApi);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }

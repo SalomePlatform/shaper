@@ -16,11 +16,13 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Arc.h>
+#include <SketchPlugin_ConstraintDistance.h>
 
 #include <GeomAPI_Pnt2d.h>
 
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetPoint2D.h>
+#include <ModuleBase_WidgetFeature.h>
 
 #include <XGUI_ViewerPrs.h>
 #include <XGUI_Constants.h>
@@ -40,7 +42,7 @@ using namespace std;
 
 PartSet_OperationFeatureCreate::PartSet_OperationFeatureCreate(const QString& theId,
                                                                QObject* theParent,
-                                                               FeaturePtr theFeature)
+                                                                 FeaturePtr theFeature)
 : PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature), myActiveWidget(0)
 {
 }
@@ -51,7 +53,8 @@ PartSet_OperationFeatureCreate::~PartSet_OperationFeatureCreate()
 
 bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
 {
-  return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND /*|| theId == SKETCH_CIRCLE_KIND ||
+  return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND /*||
+         theId == SKETCH_CONSTRAINT_DISTANCE_KIND/*|| theId == SKETCH_CIRCLE_KIND ||
          theId == SKETCH_ARC_KIND*/;
 }
 
@@ -143,7 +146,17 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
       anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
     }
   }*/
-  setWidgetPoint(aX, anY);
+  bool isApplyed = false;
+  if (isPointWidget())
+    isApplyed = setWidgetPoint(aX, anY);
+  else {
+    if (!theSelected.empty()) {
+      XGUI_ViewerPrs aPrs = theSelected.front();
+      FeaturePtr aFeature = aPrs.feature();
+      if (aFeature)
+        isApplyed = setWidgetFeature(aFeature);
+    }
+  }
   flushUpdated();
   emit activateNextWidget(myActiveWidget);
 }
@@ -281,8 +294,26 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
   }
 }*/
 
-void PartSet_OperationFeatureCreate::setWidgetPoint(double theX, double theY)
+bool PartSet_OperationFeatureCreate::isPointWidget() const
+{
+  return dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
+}
+
+bool PartSet_OperationFeatureCreate::setWidgetPoint(double theX, double theY)
 {
   ModuleBase_WidgetPoint2D* aWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
+  if (!aWidget)
+    return false;
+
   aWidget->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
+  return true;
+}
+
+bool PartSet_OperationFeatureCreate::setWidgetFeature(const FeaturePtr& theFeature)
+{
+  ModuleBase_WidgetFeature* aWidget = dynamic_cast<ModuleBase_WidgetFeature*>(myActiveWidget);
+  if (!aWidget)
+    return false;
+
+  return aWidget->setFeature(theFeature);
 }

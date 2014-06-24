@@ -10,6 +10,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetBoolValue.h
 	ModuleBase_WidgetDoubleValue.h
 	ModuleBase_WidgetFactory.h
+	ModuleBase_WidgetFeature.h
 	ModuleBase_WidgetPoint2D.h
 	ModuleBase_WidgetSwitch.h
 	ModuleBase_WidgetSelector.h
@@ -24,6 +25,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetBoolValue.cpp
 	ModuleBase_WidgetDoubleValue.cpp
 	ModuleBase_WidgetFactory.cpp
+	ModuleBase_WidgetFeature.cpp
 	ModuleBase_WidgetPoint2D.cpp
 	ModuleBase_WidgetSwitch.cpp
 	ModuleBase_WidgetSelector.cpp
