@@ -167,14 +167,14 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
   if (aDistAttr)
   {
     aDistance = aDistAttr->value();
+    // SketchPlugin circle defined by its radius, but SolveSpace uses constraint for diameter
+    if (aConstrType == SLVS_C_DIAMETER)
+      aDistance *= 2.0;
     if (aConstrMapIter != myConstraintMap.end() && fabs(aConstrIter->valA - aDistance) > tolerance)
     {
       myNeedToSolve = true;
       aConstrIter->valA = aDistance;
     }
-    // SketchPlugin circle defined by its radius, but SolveSpace uses constraint for diameter
-    if (aConstrType == SLVS_C_DIAMETER)
-      aDistance *= 2.0;
   }
 
   Slvs_hEntity aConstrEnt[CONSTRAINT_ATTR_SIZE]; // parameters of the constraint
@@ -327,7 +327,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
   const bool isEntExists = (myEntityFeatMap.find(theEntity) != myEntityFeatMap.end());
 
   // SketchPlugin features
-  boost::shared_ptr<SketchPlugin_Feature> aFeature;
+  boost::shared_ptr<SketchPlugin_Feature> aFeature =
     boost::dynamic_pointer_cast<SketchPlugin_Feature>(theEntity);
   if (aFeature)
   { // Verify the feature by its kind
@@ -1103,7 +1103,7 @@ int Search(const uint32_t& theEntityID, const std::vector<T>& theEntities)
   int aVecSize = theEntities.size();
   while (aResIndex >= 0 && theEntities[aResIndex].h > theEntityID)
     aResIndex--;
-  while (aResIndex < aVecSize && theEntities[aResIndex].h < theEntityID)
+  while (aResIndex < aVecSize && aResIndex >= 0 && theEntities[aResIndex].h < theEntityID)
     aResIndex++;
   if (aResIndex == -1)
     aResIndex = aVecSize;
