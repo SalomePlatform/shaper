@@ -139,7 +139,7 @@ void PartSet_OperationEditConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V
 
   blockSelection(true);
   if (myCurPoint.myIsInitialized) {
-    double aCurX, aCurY;
+    /*double aCurX, aCurY;
     PartSet_Tools::convertTo2D(myCurPoint.myPoint, sketch(), theView, aCurX, aCurY);
 
     double aX, anY;
@@ -153,7 +153,19 @@ void PartSet_OperationEditConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V
         anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
       }
     }
-    myFeaturePrs->setPoint(aX, anY, SM_LastPoint);
+    myFeaturePrs->setPoint(aX, anY, SM_LastPoint);*/
+    double aCurX, aCurY;
+    PartSet_Tools::convertTo2D(myCurPoint.myPoint, sketch(), theView, aCurX, aCurY);
+
+    double aX, anY;
+    PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+
+    double aDeltaX = aX - aCurX;
+    double aDeltaY = anY - aCurY;
+
+    boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(feature());
+    aSketchFeature->move(aDeltaX, aDeltaY);
   }
   sendFeatures();
 

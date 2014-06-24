@@ -41,6 +41,11 @@ public:
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual Handle_AIS_InteractiveObject getAISShape(Handle_AIS_InteractiveObject thePrevious);
 
+  /// Moves the feature
+  /// \param theDeltaX the delta for X coordinate is moved
+  /// \param theDeltaY the delta for Y coordinate is moved
+  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
+
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintDistance();
 };
