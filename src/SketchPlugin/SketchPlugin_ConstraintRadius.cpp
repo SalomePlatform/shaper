@@ -40,14 +40,20 @@ void SketchPlugin_ConstraintRadius::execute()
     FeaturePtr aFeature = aRef->feature();
     if (aFeature) {
       double aRadius = 0;
+      boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
       if (aFeature->getKind() == SKETCH_CIRCLE_KIND) {
         AttributeDoublePtr anAttribute = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>
-                                            (aFeature->data()->attribute(CIRCLE_ATTR_RADIUS));
+                                            (aData->attribute(CIRCLE_ATTR_RADIUS));
         if (anAttribute)
           aRadius = anAttribute->value();
       }
       else if (aFeature->getKind() == SKETCH_ARC_KIND) {
-        //aLength = PartSet_FeatureArcPrs::radius(theFeature);
+        boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
+          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_CENTER));
+        boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
+          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_START));
+        if (aCenterAttr && aStartAttr)
+          aRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
       }
       boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = 
         boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CONSTRAINT_ATTR_VALUE));
