@@ -22,9 +22,3 @@ void SketchPlugin_ConstraintCoincidence::execute()
 {
 }
 
-const boost::shared_ptr<GeomAPI_Shape>&  SketchPlugin_ConstraintCoincidence::preview()
-{
-  /// \todo Preview for point coincidence
-  return getPreview();
-}
-

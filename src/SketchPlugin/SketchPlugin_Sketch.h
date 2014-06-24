@@ -8,6 +8,7 @@
 #include "SketchPlugin.h"
 #include <SketchPlugin_Feature.h>
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_Pln.h>
 #include <list>
 
 /// Sketch feature kind
@@ -48,6 +49,9 @@ public:
   /// Returns the sketch preview
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
+  /// Returns the sketch preview
+  SKETCHPLUGIN_EXPORT virtual Handle_AIS_InteractiveObject getAISShape(Handle_AIS_InteractiveObject thePrevious);
+
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
   SKETCHPLUGIN_EXPORT virtual const void addSub(
@@ -71,6 +75,9 @@ public:
 
   /// Use plugin manager for features creation
   SketchPlugin_Sketch();
+
+  /// Returns the basis plane for the sketch
+  boost::shared_ptr<GeomAPI_Pln> plane();
 protected:
   /// Creates a plane and append it to the list
   /// \param theX the X normal value

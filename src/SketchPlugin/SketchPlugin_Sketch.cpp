@@ -12,6 +12,14 @@
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
 
+#include <AIS_InteractiveObject.hxx>
+#include <AIS_Shape.hxx>
+
+#include <Quantity_NameOfColor.hxx>
+
+const Quantity_NameOfColor SKETCH_PLANE_COLOR = Quantity_NOC_CHOCOLATE; /// the plane edge color
+const int SKETCH_WIDTH = 4; /// the plane edge width
+
 using namespace std;
 
 // face of the square-face displayed for selection of general plane
@@ -72,6 +80,16 @@ void SketchPlugin_Sketch::execute()
   data()->store(aCompound);
 }
 
+Handle(AIS_InteractiveObject) SketchPlugin_Sketch::getAISShape(Handle(AIS_InteractiveObject) thePrevious)
+{
+  Handle(AIS_InteractiveObject) anAIS = SketchPlugin_Feature::getAISShape(thePrevious);
+  Handle(AIS_Shape) aShapeAIS = Handle(AIS_Shape)::DownCast(anAIS);
+  aShapeAIS->SetColor(Quantity_Color(SKETCH_PLANE_COLOR));
+  aShapeAIS->SetWidth(SKETCH_WIDTH);
+  aShapeAIS->Redisplay();
+  return anAIS;
+}
+
 const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Sketch::preview()
 {
   if (isPlaneSet()) {
@@ -126,4 +144,17 @@ bool SketchPlugin_Sketch::isPlaneSet()
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_NORM));
 
   return aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
+}
+
+boost::shared_ptr<GeomAPI_Pln> SketchPlugin_Sketch::plane()
+{
+  boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(SKETCH_ATTR_ORIGIN));
+  boost::shared_ptr<GeomDataAPI_Dir> aNorm = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_NORM));
+
+  if (!anOrigin || !aNorm)
+    return boost::shared_ptr<GeomAPI_Pln>();
+
+  return boost::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(anOrigin->pnt(), aNorm->dir()));
 }

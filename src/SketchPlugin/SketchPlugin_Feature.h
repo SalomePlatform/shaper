@@ -11,6 +11,7 @@
 
 class SketchPlugin_Sketch;
 class GeomAPI_Pnt2d;
+class Handle_AIS_InteractiveObject;
 
 /**\class SketchPlugin_Feature
  * \ingroup DataModel
@@ -24,6 +25,9 @@ public:
   /// \param theSketch the owner of this feature
   /// \return the built preview
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview() = 0;
+
+  /// Returns the AIS preview
+  SKETCHPLUGIN_EXPORT virtual Handle_AIS_InteractiveObject getAISShape(Handle_AIS_InteractiveObject thePrevious);
 
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
