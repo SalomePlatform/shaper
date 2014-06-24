@@ -48,14 +48,10 @@ public:
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-protected slots:
-  /// Slot to check the editing stop
-  void onStopEditing();
-
 private:
-  QLineEdit* myEditor;
   FeaturePtr myFeature; ///< the current widget feature
   QStringList myFeatureKinds; ///< the kinds of possible features
+  double myValue;
 };
 
 #endif

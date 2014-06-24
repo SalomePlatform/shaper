@@ -19,22 +19,19 @@
 
 #include <QWidget>
 #include <QLineEdit>
+#include <QTimer>
+#include <QDialog>
+#include <QLayout>
 
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
                                                  const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent, theData)
+: ModuleBase_ModelWidget(theParent, theData), myValue(0)
 {
-  myEditor = new QLineEdit(0);
-  myEditor->setWindowFlags(Qt::ToolTip);
-  myEditor->setFocusPolicy(Qt::StrongFocus);
-
-  connect(myEditor, SIGNAL(returnPressed()), this, SLOT(onStopEditing()));
-  connect(myEditor, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesChanged()));
 }
 
 ModuleBase_WidgetEditor::~ModuleBase_WidgetEditor()
 {
-  delete myEditor;
+  //delete myEditor;
 }
 
 bool ModuleBase_WidgetEditor::storeValue(FeaturePtr theFeature) const
@@ -42,13 +39,9 @@ bool ModuleBase_WidgetEditor::storeValue(FeaturePtr theFeature) const
   DataPtr aData = theFeature->data();
   AttributeDoublePtr aReal = aData->real(attributeID());
   bool isOk;
-  double aValue = myEditor->text().toDouble(&isOk);
-  if (isOk && aReal->value() != aValue) {
-    //ModuleBase_WidgetPoint2D* that = (ModuleBase_WidgetPoint2D*) this;
-    //bool isBlocked = that->blockSignals(true);
-    aReal->setValue(aValue);
+  if (isOk && aReal->value() != myValue) {
+    aReal->setValue(myValue);
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
-    //that->blockSignals(isBlocked);
   }
   return true;
 }
@@ -58,9 +51,7 @@ bool ModuleBase_WidgetEditor::restoreValue(FeaturePtr theFeature)
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   AttributeDoublePtr aRef = aData->real(attributeID());
 
-  //bool isBlocked = this->blockSignals(true);
-  myEditor->setText(QString::number(aRef->value()));
-  //this->blockSignals(isBlocked);
+  myValue = aRef->value();
   return true;
 }
 
@@ -68,11 +59,22 @@ void ModuleBase_WidgetEditor::focusTo()
 {
   QPoint aPoint = QCursor::pos();
 
-  myEditor->move(aPoint);
-  myEditor->show();
+  QDialog aDlg;
+  aDlg.setWindowFlags(Qt::FramelessWindowHint);
+  QHBoxLayout* aLay = new QHBoxLayout(&aDlg);
+  aLay->setContentsMargins(0,0,0,0);
 
-  myEditor->selectAll();
-  myEditor->setFocus();
+  QLineEdit* aEditor = new QLineEdit(QString::number(myValue), &aDlg);
+  connect(aEditor, SIGNAL(returnPressed()), &aDlg, SLOT(accept()));
+  aLay->addWidget(aEditor);
+
+  aDlg.move(aPoint);
+  int aRes = aDlg.exec();
+
+  if (aRes == QDialog::Accepted)
+    myValue = aEditor->text().toDouble();
+
+  emit focusOutWidget(this);
 }
 
 QWidget* ModuleBase_WidgetEditor::getControl() const
@@ -86,8 +88,3 @@ QList<QWidget*> ModuleBase_WidgetEditor::getControls() const
   return aControls;
 }
 
-void ModuleBase_WidgetEditor::onStopEditing()
-{
-  myEditor->hide();
-  emit focusOutWidget(this);
-}
