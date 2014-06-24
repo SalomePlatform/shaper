@@ -73,22 +73,24 @@ Handle(AIS_InteractiveObject) SketchPlugin_ConstraintLength::getAISShape(
   // fly out calculation
   boost::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = 
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
-  boost::shared_ptr<GeomAPI_Pnt2d> aFlyOutPnt = aFlyOutAttr->pnt();
+  double aFlyout = 0;
+  if (aFlyOutAttr->isInitialized()) {
+    boost::shared_ptr<GeomAPI_Pnt2d> aFlyOutPnt = aFlyOutAttr->pnt();
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aStartPoint =
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(LINE_ATTR_START));
-  boost::shared_ptr<GeomDataAPI_Point2D> anEndPoint =
-     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(LINE_ATTR_END));
+    boost::shared_ptr<GeomDataAPI_Point2D> aStartPoint =
+      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(LINE_ATTR_START));
+    boost::shared_ptr<GeomDataAPI_Point2D> anEndPoint =
+       boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(LINE_ATTR_END));
 
-  boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin = boost::shared_ptr<GeomAPI_Lin2d>
-                                             (new GeomAPI_Lin2d(aStartPoint->x(), aStartPoint->y(),
-                                                                anEndPoint->x(), anEndPoint->y()));
-  boost::shared_ptr<GeomAPI_Pnt2d> aProjectedPoint = aFeatureLin->project(aFlyOutPnt);
-  double aDistance = aFlyOutPnt->distance(aProjectedPoint);
-  if (!aFeatureLin->isRight(aFlyOutPnt))
-    aDistance = -aDistance;
-  double aFlyout = aDistance;
-
+    boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin = boost::shared_ptr<GeomAPI_Lin2d>
+                                               (new GeomAPI_Lin2d(aStartPoint->x(), aStartPoint->y(),
+                                                                  anEndPoint->x(), anEndPoint->y()));
+    boost::shared_ptr<GeomAPI_Pnt2d> aProjectedPoint = aFeatureLin->project(aFlyOutPnt);
+    double aDistance = aFlyOutPnt->distance(aProjectedPoint);
+    if (!aFeatureLin->isRight(aFlyOutPnt))
+      aDistance = -aDistance;
+    aFlyout = aDistance;
+  }
   // value
   boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CONSTRAINT_ATTR_VALUE));
