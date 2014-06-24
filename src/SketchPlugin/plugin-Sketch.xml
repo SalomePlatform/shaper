@@ -37,7 +37,7 @@
       </feature>
       <feature id="SketchConstraintRadius" title="Radius of a circle or an arc" tooltip="Create constraint for the given radius of a circle or an arc">
         <label title="Select two points on a circle or an arc of circle on which to calculate radius" tooltip="Select two points on a circle or an arc of circle on which to calculate radius"/>
-        <feature_selector id="ConstraintEntityA" keysequence="SketchPoint" internal="1"/>
+        <feature_selector id="ConstraintEntityA" keysequence="SketchCircle SketchArc" internal="1"/>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
         <doublevalue_editor id="ConstraintValue"/>
       </feature>
