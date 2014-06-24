@@ -4,10 +4,8 @@
 
 #include "Model_AttributeRefAttr.h"
 #include "Model_Application.h"
-#include "Model_Events.h"
 #include "Model_Data.h"
 #include <ModelAPI_Feature.h>
-#include <Events_Loop.h>
 
 using namespace std;
 
@@ -21,15 +19,12 @@ void Model_AttributeRefAttr::setAttr(boost::shared_ptr<ModelAPI_Attribute> theAt
   boost::shared_ptr<Model_Data> aData = 
     boost::dynamic_pointer_cast<Model_Data>(theAttr->owner()->data());
   string anID = aData->id(theAttr);
-  if (feature() == theAttr->owner() && myID->Get().IsEqual(anID.c_str()))
+  if (myIsInitialized && feature() == theAttr->owner() && myID->Get().IsEqual(anID.c_str()))
     return; // nothing is changed
 
   myRef->Set(aData->label());
   myID->Set(aData->id(theAttr).c_str());
-
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-  Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
-  Events_Loop::loop()->send(aMsg);
+  owner()->data()->sendAttributeUpdated(this);
 }
 
 boost::shared_ptr<ModelAPI_Attribute> Model_AttributeRefAttr::attr()
@@ -46,15 +41,12 @@ boost::shared_ptr<ModelAPI_Attribute> Model_AttributeRefAttr::attr()
 
 void Model_AttributeRefAttr::setFeature(FeaturePtr theFeature)
 {
-  if (myID->Get().Length() != 0 || feature() != theFeature) {
+  if (!myIsInitialized || myID->Get().Length() != 0 || feature() != theFeature) {
     boost::shared_ptr<Model_Data> aData = 
       boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
     myRef->Set(aData->label());
     myID->Set(""); // feature is identified by the empty ID
-
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-    Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
-    Events_Loop::loop()->send(aMsg);
+    owner()->data()->sendAttributeUpdated(this);
   }
 }
 
@@ -75,8 +67,8 @@ FeaturePtr Model_AttributeRefAttr::feature()
 
 Model_AttributeRefAttr::Model_AttributeRefAttr(TDF_Label& theLabel)
 {
-  // check the attribute could be already presented in this doc (after load document)
-  if (!theLabel.FindAttribute(TDataStd_Comment::GetID(), myID)) {
+  myIsInitialized = theLabel.FindAttribute(TDataStd_Comment::GetID(), myID) == Standard_True;
+  if (!myIsInitialized) {
     // create attribute: not initialized by value yet
     myID = TDataStd_Comment::Set(theLabel, "");
     myRef = TDF_Reference::Set(theLabel, theLabel); // not initialized: reference to itself

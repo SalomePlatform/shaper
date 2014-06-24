@@ -207,6 +207,25 @@ bool Model_Data::isValid()
   return !myLab.IsNull() && myLab.HasAttribute();
 }
 
+list<boost::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const string theType)
+{
+  list<boost::shared_ptr<ModelAPI_Attribute> > aResult;
+  map<string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = myAttrs.begin();
+  for(; anAttrsIter != myAttrs.end(); anAttrsIter++) {
+    if (theType.empty() || anAttrsIter->second->attributeType() == theType) {
+    }
+  }
+  return aResult;
+}
+
+void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
+{
+  theAttr->setInitialized();
+  static const Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
+  Model_FeatureUpdatedMessage aMsg(myFeature, anEvent);
+  Events_Loop::loop()->send(aMsg);
+}
+
 #include <TNaming_Builder.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TopoDS_Shape.hxx>
