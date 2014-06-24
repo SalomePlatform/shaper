@@ -42,7 +42,7 @@ bool ModuleBase_IOperation::isGranted(ModuleBase_IOperation* /*theOperation*/) c
   return false;
 }
 
-void ModuleBase_IOperation::setModelWidgets(const std::string& theXmlRepresentation,
+/*void ModuleBase_IOperation::setModelWidgets(const std::string& theXmlRepresentation,
                                             QList<ModuleBase_ModelWidget*> theWidgets)
 {
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast = theWidgets.end();
@@ -50,7 +50,7 @@ void ModuleBase_IOperation::setModelWidgets(const std::string& theXmlRepresentat
     QObject::connect(*anIt, SIGNAL(valuesChanged()),  this, SLOT(storeCustomValue()));
   }
   getDescription()->setModelWidgets(theXmlRepresentation, theWidgets);
-}
+}*/
 
 boost::shared_ptr<ModelAPI_Document> ModuleBase_IOperation::document() const
 {

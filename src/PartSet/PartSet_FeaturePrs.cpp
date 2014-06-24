@@ -48,26 +48,3 @@ PartSet_SelectionMode PartSet_FeaturePrs::setFeature(FeaturePtr theFeature,
 {
   return SM_FirstPoint;
 }
-
-void PartSet_FeaturePrs::setConstraints(double theX, double theY,
-                                        const PartSet_SelectionMode& theMode)
-{
-  // find a feature point by the selection mode
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = featurePoint(theMode);
-
-  // get all sketch features. If the point with the given coordinates belong to any sketch feature,
-  // the constraint is created between the feature point and the found sketch point
-  boost::shared_ptr<ModelAPI_Data> aData = sketch()->data();
-  boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SKETCH_ATTR_FEATURES));
-
-  std::list<FeaturePtr > aFeatures = aRefList->list();
-  std::list<FeaturePtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
-  for (; anIt != aLast; anIt++)
-  {
-    FeaturePtr aFeature = *anIt;
-    boost::shared_ptr<GeomDataAPI_Point2D> aFPoint = PartSet_Tools::findPoint(aFeature, theX, theY);
-    if (aFPoint)
-      PartSet_Tools::createConstraint(sketch(), aFPoint, aPoint);
-  }
-}

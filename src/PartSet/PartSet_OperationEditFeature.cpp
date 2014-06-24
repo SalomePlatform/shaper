@@ -57,7 +57,7 @@ void PartSet_OperationEditFeature::init(FeaturePtr theFeature,
                                      const std::list<XGUI_ViewerPrs>& theSelected,
                                      const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
-  setFeature(theFeature);
+  setEditingFeature(theFeature);
 
   if (!theHighlighted.empty()) {
     // if there is highlighted object, we check whether it is in the list of selected objects
@@ -132,14 +132,17 @@ void PartSet_OperationEditFeature::mouseMoved(QMouseEvent* theEvent, Handle(V3d_
     double aDeltaX = aX - aCurX;
     double aDeltaY = anY - aCurY;
 
-    PartSet_Tools::moveFeature(feature(), aDeltaX, aDeltaY);
+    boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(feature());
+    aSketchFeature->move(aDeltaX, aDeltaY);
 
     std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = (*anIt).feature();
       if (!aFeature || aFeature == feature())
         continue;
-      PartSet_Tools::moveFeature(aFeature, aDeltaX, aDeltaY);
+      aSketchFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+      aSketchFeature->move(aDeltaX, aDeltaY);
     }
   }
   sendFeatures();
@@ -168,7 +171,7 @@ void PartSet_OperationEditFeature::mouseReleased(QMouseEvent* theEvent, Handle(V
 
 void PartSet_OperationEditFeature::startOperation()
 {
-  // do nothing in order to do not create a new feature
+  PartSet_OperationSketchBase::startOperation();
   emit multiSelectionEnabled(false);
 
   if (myFeatures.size() > 1)

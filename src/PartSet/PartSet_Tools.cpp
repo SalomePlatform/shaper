@@ -6,6 +6,7 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Document.h>
 
 #include <GeomDataAPI_Point.h>
@@ -194,36 +195,18 @@ FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theVie
     aPrs = *anIt;
     if (!aPrs.feature())
       continue;
-    double aDelta = distanceToPoint(aPrs.feature(), aX, anY);
+    boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
+                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(aPrs.feature());
+    if (!aSketchFeature)
+      continue;
+    double aDelta = aSketchFeature->distanceToPoint(
+                               boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
     if (aMinDelta < 0 || aMinDelta > aDelta) {
       aMinDelta = aDelta;
       aDeltaFeature = aPrs.feature();
     }
   }
   return aDeltaFeature;
-}
-
-double PartSet_Tools::distanceToPoint(FeaturePtr theFeature,
-                                      double theX, double theY)
-{
-  boost::shared_ptr<PartSet_FeaturePrs> aFeaturePrs = PartSet_Tools::createFeaturePrs(
-                                           theFeature->getKind(), FeaturePtr(), theFeature);
-  double aDelta = 0;
-  if (aFeaturePrs)
-    aDelta = aFeaturePrs->distanceToPoint(theFeature, theX, theY);
-
-  return aDelta;
-}
-
-void PartSet_Tools::moveFeature(FeaturePtr theFeature, double theDeltaX, double theDeltaY)
-{
-  if (!theFeature)
-    return;
-
-  boost::shared_ptr<PartSet_FeaturePrs> aFeaturePrs = PartSet_Tools::createFeaturePrs(
-                                           theFeature->getKind(), FeaturePtr(), theFeature);
-  if (aFeaturePrs)
-  aFeaturePrs->move(theDeltaX, theDeltaY);
 }
 
 boost::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
@@ -316,6 +299,33 @@ void PartSet_Tools::createConstraint(FeaturePtr theSketch,
 
   if (aFeature) // TODO: generate an error if feature was not created
     aFeature->execute();
+}
+
+void PartSet_Tools::setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
+                                   const std::string& theAttribute, double theX, double theY)
+{
+  // find a feature point by the selection mode
+  //boost::shared_ptr<GeomDataAPI_Point2D> aPoint = featurePoint(theMode);
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->data()->attribute(theAttribute));
+  if (!aPoint)
+    return;
+
+  // get all sketch features. If the point with the given coordinates belong to any sketch feature,
+  // the constraint is created between the feature point and the found sketch point
+  boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
+  boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SKETCH_ATTR_FEATURES));
+
+  std::list<FeaturePtr > aFeatures = aRefList->list();
+  std::list<FeaturePtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
+  for (; anIt != aLast; anIt++)
+  {
+    FeaturePtr aFeature = *anIt;
+    boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;// = aFeature->findPoint(theX, theY);
+    if (aFPoint)
+      PartSet_Tools::createConstraint(theSketch, aFPoint, aPoint);
+  }
 }
 
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findPoint(FeaturePtr theFeature,

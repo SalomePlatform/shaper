@@ -54,6 +54,14 @@ public:
   /// \return a control list
   virtual QList<QWidget*> getControls() const = 0;
 
+  /// Returns whether the control has a default value
+  /// \return a boolean value
+  bool hasDefaultValue() const { return myHasDefaultValue; }
+
+  /// Returns the attribute name
+  /// \returns the string value
+  std::string attributeID() const;
+
 signals:
   /// The signal about widget values changed
   void valuesChanged();
@@ -63,9 +71,7 @@ signals:
   void keyReleased(const std::string& theAttributeName, QKeyEvent* theEvent);
 
 protected:
-  /// Returns the attribute name
-  /// \returns the string value
-  std::string attributeID() const;
+  bool myHasDefaultValue; /// the boolean state whether the control has a default value
 
 private:
   std::string myAttributeID; /// the attribute name of the model feature

@@ -53,6 +53,15 @@ public:
   SKETCHPLUGIN_EXPORT virtual const void addSub(
     const FeaturePtr& theFeature);
 
+  /// Moves the feature
+  /// \param theDeltaX the delta for X coordinate is moved
+  /// \param theDeltaY the delta for Y coordinate is moved
+  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY) {};
+
+  /// Return the distance between the feature and the point
+  /// \param thePoint the point
+  virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) { return 0; };
+
   /// Converts a 2D sketch space point into point in 3D space
   SKETCHPLUGIN_EXPORT boost::shared_ptr<GeomAPI_Pnt> to3D(
     const double theX, const double theY);

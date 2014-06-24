@@ -107,8 +107,9 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
       }
     }
     ModuleBase_ModelWidget* aWidget = theWidgets.first();
-    if (aWidget)
-      aWidget->focusTo();
+    if (aWidget) {
+      activateWidget(aWidget);
+    }
   }
 }
 
@@ -161,4 +162,29 @@ void XGUI_PropertyPanel::onFocusActivated(const std::string& theAttributeName)
       }
     }
   }
+}
+
+void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
+{
+  ModuleBase_ModelWidget* aNextWidget = 0;
+
+  QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(),
+                                                 aLast = myWidgets.end();
+  for (;anIt != aLast; anIt++)
+  {
+    if ((*anIt) == theWidget) {
+      anIt++;
+      if (anIt != aLast)
+        aNextWidget = *anIt;
+      break;
+    }
+  }
+  activateWidget(aNextWidget);
+}
+
+void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
+{
+  if (theWidget)
+    theWidget->focusTo();
+  emit widgetActivated(theWidget);
 }

@@ -281,8 +281,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   //An operation passed by message. Start it, process and commit.
   const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
-    // TODO: Clear previous content
-    //myPropertyPanel->cleanContent();
+    myPropertyPanel->cleanContent();
     ModuleBase_Operation* anOperation =
         (ModuleBase_Operation*)(aPartSetMsg->pointer());
 
@@ -312,16 +311,25 @@ void XGUI_Workshop::onOperationStarted()
     connectWithOperation(aOperation);
 
     showPropertyPanel();
-    // TODO: Clear previous content
-    /*
     QString aXmlRepr = aOperation->getDescription()->xmlRepresentation();
     ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(), myModuleConnector);
     QWidget* aContent = myPropertyPanel->contentWidget();
     qDeleteAll(aContent->children());
     aFactory.createWidget(aContent);
-    myPropertyPanel->setModelWidgets(aFactory.getModelWidgets());
-    */
-    myPropertyPanel->setModelWidgets(aOperation->getDescription()->modelWidgets());
+    
+    QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
+    QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
+    ModuleBase_ModelWidget* aWidget;
+    for (; anIt != aLast; anIt++) {
+      aWidget = *anIt;
+      QObject::connect(aWidget, SIGNAL(valuesChanged()),  aOperation, SLOT(storeCustomValue()));
+      // Init default values
+      if (!aOperation->isEditOperation() && aWidget->hasDefaultValue()) {
+        aWidget->storeValue(aOperation->feature());
+      }
+    }
+
+    myPropertyPanel->setModelWidgets(aWidgets);
     myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
   }
   updateCommandStatus();
@@ -718,6 +726,11 @@ void XGUI_Workshop::createDockWidgets()
 
   connect(myPropertyPanel, SIGNAL(keyReleased(const std::string&, QKeyEvent*)),
           myOperationMgr, SLOT(onKeyReleased(const std::string&, QKeyEvent*)));
+
+  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
+          myOperationMgr, SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
+  connect(myOperationMgr, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)),
+          myPropertyPanel, SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
 }
 
 //******************************************************

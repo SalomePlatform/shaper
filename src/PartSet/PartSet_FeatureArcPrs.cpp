@@ -94,51 +94,6 @@ PartSet_SelectionMode PartSet_FeatureArcPrs::getNextMode(const std::string& theA
   return aMode;
 }
 
-void PartSet_FeatureArcPrs::move(double theDeltaX, double theDeltaY)
-{
-  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
-  if (!aData->isValid())
-    return;
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_CENTER));
-  aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_START));
-  aPoint2->setValue(aPoint2->x() + theDeltaX, aPoint2->y() + theDeltaY);
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint3 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_END));
-  aPoint3->setValue(aPoint3->x() + theDeltaX, aPoint3->y() + theDeltaY);
-}
-
-double PartSet_FeatureArcPrs::distanceToPoint(FeaturePtr theFeature,
-                                               double theX, double theY)
-{
-  double aDelta = 0;
-  if (!theFeature || theFeature->getKind() != getKind())
-    return aDelta;
-  boost::shared_ptr<GeomAPI_Pnt2d> aPoint2d(new GeomAPI_Pnt2d(theX, theY));
-
-
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_CENTER));
-  aDelta = aPoint1->pnt()->distance(aPoint2d);
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_START));
-  aDelta = qMin(aDelta, aPoint2->pnt()->distance(aPoint2d));
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint3 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_END));
-  aDelta = qMin(aDelta, aPoint3->pnt()->distance(aPoint2d));
-
-  return aDelta;
-}
-
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureArcPrs::findPoint(FeaturePtr theFeature,
                                                                         double theX, double theY)
 {

@@ -11,6 +11,7 @@
 #include <QObject>
 
 class ModelAPI_Feature;
+class GeomAPI_Pnt2d;
 
 class QGroupBox;
 class QDoubleSpinBox;
@@ -30,6 +31,10 @@ public:
   ModuleBase_WidgetPoint2D(QWidget* theParent, const Config_WidgetAPI* theData);
   /// Destructor
   virtual ~ModuleBase_WidgetPoint2D();
+
+  /// Fill the widget values by given point
+  /// \param thePoint the point
+  void setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed

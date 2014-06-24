@@ -62,6 +62,10 @@ void ModuleBase_Operation::storeCustomValue()
     aCustom->storeValue(myFeature);
 }
 
+void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
+{
+}
+
 void ModuleBase_Operation::startOperation()
 {
   if (!myIsEditing)
@@ -104,11 +108,11 @@ FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
   if (aFeature) { // TODO: generate an error if feature was not created
     aFeature->execute();
     // Init default values
-    QList<ModuleBase_ModelWidget*> aWidgets = getDescription()->modelWidgets();
+    /*QList<ModuleBase_ModelWidget*> aWidgets = getDescription()->modelWidgets();
     QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
     for (; anIt != aLast; anIt++) {
       (*anIt)->storeValue(aFeature);
-    }
+    }*/
   }
 
   if (theFlushMessage)
@@ -123,6 +127,6 @@ void ModuleBase_Operation::setFeature(FeaturePtr theFeature)
 
 void ModuleBase_Operation::setEditingFeature(FeaturePtr theFeature)
 {
-  myFeature = theFeature;
+  setFeature(theFeature);
   myIsEditing = true;
 }

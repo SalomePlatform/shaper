@@ -69,12 +69,6 @@ public:
   static FeaturePtr nearestFeature(QPoint thePoint, Handle_V3d_View theView, FeaturePtr theSketch,
                                    const std::list<XGUI_ViewerPrs>& theFeatures);
 
-  /// \brief Move the feature.
-  /// \param theFeature the source feature
-  /// \param theDeltaX the delta for X coordinate is moved
-  /// \param theDeltaY the delta for Y coordinate is moved
-  static void moveFeature(FeaturePtr theFeature, double theDeltaX, double theDeltaY);
-
   /// Returns pointer to the root document.
   static boost::shared_ptr<ModelAPI_Document> document();
 
@@ -116,6 +110,15 @@ public:
                                boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
                                boost::shared_ptr<GeomDataAPI_Point2D> thePoint2);
 
+  /// Creates constrains of the current 
+  /// \param theSketch a sketch feature
+  /// \param theFeature a source feature
+  /// \param theAttribute a name of the requried attribute attribute
+  /// \param theX the horizontal coordnate of the point
+  /// \param theY the vertical coordnate of the point
+  static void setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
+                             const std::string& theAttribute, double theX, double theY);
+
   /// Find a point in the line with given coordinates
   /// \param theFeature the line feature
   /// \param theX the horizontal point coordinate
@@ -138,13 +141,6 @@ public:
   /// \param theKind a feature kind
   /// \return the boolean value
   static bool isConstraintFeature(const std::string& theKind);
-
-private:
-  /// Return the distance between the feature and the point
-  /// \param theFeature feature object
-  /// \param theX the horizontal coordinate of the point
-  /// \param theX the vertical coordinate of the point
-  static double distanceToPoint(FeaturePtr theFeature, double theX, double theY);
 };
 
 #endif

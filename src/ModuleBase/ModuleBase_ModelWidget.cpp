@@ -9,7 +9,7 @@
 #include <QWidget>
 
 ModuleBase_ModelWidget::ModuleBase_ModelWidget(QObject* theParent, const Config_WidgetAPI* theData)
- : QObject(theParent)
+ : QObject(theParent), myHasDefaultValue(false)
 {
   myAttributeID = theData ? theData->widgetId() : "";
 }

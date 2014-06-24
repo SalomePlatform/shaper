@@ -14,6 +14,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomAPI_Pnt2d.h>
 
 #include <QGroupBox>
 #include <QGridLayout>
@@ -68,6 +69,16 @@ ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
 
 ModuleBase_WidgetPoint2D::~ModuleBase_WidgetPoint2D()
 {
+}
+
+void ModuleBase_WidgetPoint2D::setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  bool isBlocked = this->blockSignals(true);
+  myXSpin->setValue(thePoint->x());
+  myYSpin->setValue(thePoint->y());
+  this->blockSignals(isBlocked);
+
+  emit valuesChanged();
 }
 
 bool ModuleBase_WidgetPoint2D::storeValue(FeaturePtr theFeature) const

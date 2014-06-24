@@ -46,6 +46,8 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
   connect(theOperation, SIGNAL(stopped()), this, SLOT(onOperationStopped()));
   connect(theOperation, SIGNAL(started()), this, SIGNAL(operationStarted()));
   connect(theOperation, SIGNAL(resumed()), this, SIGNAL(operationResumed()));
+  connect(theOperation, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)),
+          this, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)));
 
   theOperation->start();
   return true;
@@ -163,4 +165,11 @@ void XGUI_OperationMgr::onKeyReleased(const std::string& theName, QKeyEvent* the
   ModuleBase_Operation* anOperation = currentOperation();
   if (anOperation)
     anOperation->keyReleased(theName, theEvent);
+}
+
+void XGUI_OperationMgr::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
+{
+  ModuleBase_Operation* anOperation = currentOperation();
+  if (anOperation)
+    anOperation->onWidgetActivated(theWidget);
 }

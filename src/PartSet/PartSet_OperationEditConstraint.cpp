@@ -69,7 +69,7 @@ void PartSet_OperationEditConstraint::init(FeaturePtr theFeature,
                                      const std::list<XGUI_ViewerPrs>& theSelected,
                                      const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
-  setFeature(theFeature);
+  setEditingFeature(theFeature);
   myFeaturePrs->init(theFeature);
 
   /*
@@ -145,10 +145,7 @@ void PartSet_OperationEditConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V
     double aX, anY;
     PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
 
-    /*double aDeltaX = aX - aCurX;
-    double aDeltaY = anY - aCurY;
 
-    PartSet_Tools::moveFeature(feature(), aDeltaX, aDeltaY);*/
     if (feature()->getKind() == PartSet_ConstraintRadiusPrs::getKind()) {
       boost::shared_ptr<PartSet_ConstraintRadiusPrs> anArcPrs =
                               boost::dynamic_pointer_cast<PartSet_ConstraintRadiusPrs>(myFeaturePrs);
@@ -157,15 +154,6 @@ void PartSet_OperationEditConstraint::mouseMoved(QMouseEvent* theEvent, Handle(V
       }
     }
     myFeaturePrs->setPoint(aX, anY, SM_LastPoint);
-
-
-    /*std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
-    for (; anIt != aLast; anIt++) {
-      FeaturePtr aFeature = (*anIt).feature();
-      if (!aFeature || aFeature == feature())
-        continue;
-      PartSet_Tools::moveFeature(aFeature, aDeltaX, aDeltaY);
-    }*/
   }
   sendFeatures();
 
@@ -208,7 +196,7 @@ void PartSet_OperationEditConstraint::mouseDoubleClick(QMouseEvent* theEvent, Ha
 
 void PartSet_OperationEditConstraint::startOperation()
 {
-  // do nothing in order to do not create a new feature
+  PartSet_OperationSketchBase::startOperation();
   emit multiSelectionEnabled(false);
 
   //if (myFeatures.size() > 1)

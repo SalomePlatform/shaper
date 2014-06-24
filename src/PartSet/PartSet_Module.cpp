@@ -4,6 +4,7 @@
 #include <PartSet_OperationEditFeature.h>
 #include <PartSet_OperationEditConstraint.h>
 #include <PartSet_OperationCreateConstraint.h>
+#include <PartSet_OperationFeatureCreate.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetFactory.h>
@@ -341,7 +342,9 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
     PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
     if (aPrevOp)
       aSketch = aPrevOp->sketch();
-    if (PartSet_OperationCreateFeature::canProcessKind(theCmdId))
+    if (PartSet_OperationFeatureCreate::canProcessKind(theCmdId))
+      anOperation = new PartSet_OperationFeatureCreate(theCmdId.c_str(), this, aSketch);
+    else if (PartSet_OperationCreateFeature::canProcessKind(theCmdId))
       anOperation = new PartSet_OperationCreateFeature(theCmdId.c_str(), this, aSketch);
     else if (theCmdId == PartSet_OperationEditFeature::Type())
       anOperation = new PartSet_OperationEditFeature(theCmdId.c_str(), this, aSketch);
@@ -364,16 +367,17 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   std::string aXmlCfg = aWdgReader.featureWidgetCfg(aFeatureKind);
   std::string aDescription = aWdgReader.featureDescription(aFeatureKind);
 
-  QString aXmlRepr = QString::fromStdString(aXmlCfg);
-  ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(),
-                                                               myWorkshop->moduleConnector());
-  QWidget* aContent = myWorkshop->propertyPanel()->contentWidget();
-  qDeleteAll(aContent->children());
-  aFactory.createWidget(aContent);
+  //QString aXmlRepr = QString::fromStdString(aXmlCfg);
+  //ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(),
+  //                                                             myWorkshop->moduleConnector());
+  //QWidget* aContent = myWorkshop->propertyPanel()->contentWidget();
+  //qDeleteAll(aContent->children());
+  //aFactory.createWidget(aContent);
 
   anOperation->getDescription()->setDescription(QString::fromStdString(aDescription));
+  anOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
 
-  anOperation->setModelWidgets(aXmlRepr.toStdString(), aFactory.getModelWidgets());
+  //anOperation->setModelWidgets(aXmlRepr.toStdString(), aFactory.getModelWidgets());
 
   // connect the operation
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);

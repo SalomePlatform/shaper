@@ -6,6 +6,8 @@
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
 
+#include <GeomAPI_Pnt2d.h>
+
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
 
@@ -68,4 +70,47 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Arc::preview()
     setPreview(aCompound);
   }
   return getPreview();
+}
+
+void SketchPlugin_Arc::move(double theDeltaX, double theDeltaY)
+{
+  boost::shared_ptr<ModelAPI_Data> aData = data();
+  if (!aData->isValid())
+    return;
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_CENTER));
+  aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_START));
+  aPoint2->setValue(aPoint2->x() + theDeltaX, aPoint2->y() + theDeltaY);
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint3 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_END));
+  aPoint3->setValue(aPoint3->x() + theDeltaX, aPoint3->y() + theDeltaY);
+}
+
+double SketchPlugin_Arc::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  double aDelta = 0;
+  boost::shared_ptr<ModelAPI_Data> aData = data();
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_CENTER));
+  aDelta = aPoint1->pnt()->distance(thePoint);
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_START));
+  double aDistance = aPoint2->pnt()->distance(thePoint);
+  if (aDelta < aDistance)
+    aDelta = aDistance;
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint3 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(ARC_ATTR_END));
+  aDistance = aPoint3->pnt()->distance(thePoint);
+  if (aDelta < aDistance)
+    aDelta = aDistance;
+
+  return aDelta;
 }

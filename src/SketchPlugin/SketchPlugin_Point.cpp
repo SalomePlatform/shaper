@@ -4,7 +4,11 @@
 
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Sketch.h"
+
 #include <ModelAPI_Data.h>
+
+#include <GeomAPI_Pnt2d.h>
+
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 
@@ -36,4 +40,24 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Point::preview()
     setPreview(aPointShape);
   }
   return getPreview();
+}
+
+void SketchPlugin_Point::move(double theDeltaX, double theDeltaY)
+{
+  boost::shared_ptr<ModelAPI_Data> aData = data();
+  if (!aData->isValid())
+    return;
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(POINT_ATTR_COORD));
+  aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
+}
+
+double SketchPlugin_Point::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+{
+  boost::shared_ptr<ModelAPI_Data> aData = data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(POINT_ATTR_COORD));
+
+  return aPoint->pnt()->distance(thePoint);
 }
