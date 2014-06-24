@@ -45,6 +45,11 @@ protected:
   QWidget* booleanControl(QWidget* theParent);
   QWidget* point2dDistanceControl(QWidget* theParent);
 
+  /// Check whether the XML definition for the given type contains internal property
+  /// \param theType the widget type
+  /// \return the boolean result
+  bool isInternalWidget(const std::string& theType);
+
   QString qs(const std::string& theStdString) const;
 
 private:

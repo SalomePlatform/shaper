@@ -61,7 +61,11 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
     //Create a widget (doublevalue, groupbox, toolbox, etc.
     QWidget* aWidget = createWidgetByType(aWdgType, theParent);
     if (aWidget) {
-      aWidgetLay->addWidget(aWidget);
+      if (!isInternalWidget(aWdgType)) {
+        aWidgetLay->addWidget(aWidget);
+      }
+      else
+        aWidget->setVisible(false);
     }
     if (myWidgetApi->isContainerWidget()) {
       //if current widget is groupbox (container) process it's children recursively
@@ -195,6 +199,16 @@ QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const
   return QString::fromStdString(theStdString);
 }
 
+bool ModuleBase_WidgetFactory::isInternalWidget(const std::string& theType)
+{
+  std::string prop = myWidgetApi->getProperty(FEATURE_INTERNAL);
+
+  std::transform(prop.begin(), prop.end(), prop.begin(), ::tolower);
+  if(prop.empty() || prop == "false" || prop == "0") {
+    return false;
+  }
+  return true; 
+}
 
 QWidget* ModuleBase_WidgetFactory::selectorControl(QWidget* theParent)
 {
