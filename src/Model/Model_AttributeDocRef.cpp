@@ -4,20 +4,17 @@
 
 #include "Model_AttributeDocRef.h"
 #include "Model_Application.h"
-#include "Model_Events.h"
-#include <Events_Loop.h>
+#include <ModelAPI_Feature.h>
+#include <ModelAPI_Data.h>
 
 using namespace std;
 
 void Model_AttributeDocRef::setValue(boost::shared_ptr<ModelAPI_Document> theDoc)
 {
   TCollection_ExtendedString aNewID(theDoc->id().c_str());
-  if (myComment->Get() != aNewID) {
+  if (!myIsInitialized || myComment->Get() != aNewID) {
     myComment->Set(TCollection_ExtendedString(theDoc->id().c_str()));
-
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-    Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
-    Events_Loop::loop()->send(aMsg);
+    owner()->data()->sendAttributeUpdated(this);
   }
 }
 
@@ -32,8 +29,8 @@ boost::shared_ptr<ModelAPI_Document> Model_AttributeDocRef::value()
 
 Model_AttributeDocRef::Model_AttributeDocRef(TDF_Label& theLabel)
 {
-  // check the attribute could be already presented in this doc (after load document)
-  if (!theLabel.FindAttribute(TDataStd_Comment::GetID(), myComment)) {
+  myIsInitialized = theLabel.FindAttribute(TDataStd_Comment::GetID(), myComment) == Standard_True;
+  if (!myIsInitialized) {
     // create attribute: not initialized by value yet, just empty string
     myComment = TDataStd_Comment::Set(theLabel, "");
   } else { // document was already referenced: try to set it as loaded by demand

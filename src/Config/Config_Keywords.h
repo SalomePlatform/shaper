@@ -31,8 +31,10 @@ const static char* WDG_SELECTOR = "selector";
 
 //Specific widget containers
 const static char* WDG_POINT_SELECTOR = "point_selector";
+const static char* WDG_POINT2D_DISTANCE = "point2ddistance";
 
 const static char* WDG_FEATURE_SELECTOR = "feature_selector";
+const static char* WDG_DOUBLEVALUE_EDITOR = "doublevalue_editor";
 
 const static char* _ID = "id";
 //const static char* WORKBENCH_ID = "id";
@@ -46,6 +48,7 @@ const static char* FEATURE_NESTED = "nested";
 const static char* FEATURE_INTERNAL = "internal";
 const static char* SOURCE_FILE = "path";
 
+const static char* PREVIOUS_FEATURE_PARAM = "previous_feature_param";
 
 // doublevalue properties:
 const static char* INFO_WDG_TEXT = FEATURE_TEXT;

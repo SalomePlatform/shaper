@@ -11,10 +11,12 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetFeature.h>
+#include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_WidgetSwitch.h>
 #include <ModuleBase_WidgetSelector.h>
 #include <ModuleBase_WidgetDoubleValue.h>
 #include <ModuleBase_WidgetBoolValue.h>
+#include <ModuleBase_WidgetPoint2dDistance.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -59,7 +61,11 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
     //Create a widget (doublevalue, groupbox, toolbox, etc.
     QWidget* aWidget = createWidgetByType(aWdgType, theParent);
     if (aWidget) {
-      aWidgetLay->addWidget(aWidget);
+      if (!isInternalWidget(aWdgType)) {
+        aWidgetLay->addWidget(aWidget);
+      }
+      else
+        aWidget->setVisible(false);
     }
     if (myWidgetApi->isContainerWidget()) {
       //if current widget is groupbox (container) process it's children recursively
@@ -123,6 +129,12 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   } else if (theType == WDG_FEATURE_SELECTOR) {
     result = featureSelectorControl(theParent);
 
+  } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
+    result = doubleValueEditor(theParent);
+  
+  } else if (theType == WDG_POINT2D_DISTANCE) {
+    result = point2dDistanceControl(theParent);
+
   }
   else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
@@ -175,11 +187,28 @@ QWidget* ModuleBase_WidgetFactory::featureSelectorControl(QWidget* theParent)
   return aWidget->getControl();
 }
 
+QWidget* ModuleBase_WidgetFactory::doubleValueEditor(QWidget* theParent)
+{
+  ModuleBase_WidgetEditor* aWidget = new ModuleBase_WidgetEditor(theParent, myWidgetApi);
+  myModelWidgets.append(aWidget);
+  return 0;
+}
+
 QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const
 {
   return QString::fromStdString(theStdString);
 }
 
+bool ModuleBase_WidgetFactory::isInternalWidget(const std::string& theType)
+{
+  std::string prop = myWidgetApi->getProperty(FEATURE_INTERNAL);
+
+  std::transform(prop.begin(), prop.end(), prop.begin(), ::tolower);
+  if(prop.empty() || prop == "false" || prop == "0") {
+    return false;
+  }
+  return true; 
+}
 
 QWidget* ModuleBase_WidgetFactory::selectorControl(QWidget* theParent)
 {
@@ -195,4 +224,13 @@ QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
   myModelWidgets.append(aBoolWgt);
 
   return aBoolWgt->getControl();
+}
+
+
+QWidget* ModuleBase_WidgetFactory::point2dDistanceControl(QWidget* theParent)
+{
+  ModuleBase_WidgetPoint2dDistance* aDistWgt = new ModuleBase_WidgetPoint2dDistance(theParent, myWidgetApi);
+  myModelWidgets.append(aDistWgt);
+
+  return aDistWgt->getControl();
 }

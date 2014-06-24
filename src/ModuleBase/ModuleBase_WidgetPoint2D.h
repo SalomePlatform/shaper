@@ -55,10 +55,14 @@ public:
   /// \param theEvent the processed event
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
+  void initFromPrevious(FeaturePtr theFeature);
+
 private:
   QGroupBox* myGroupBox; ///< the parent group box for all intenal widgets
   QDoubleSpinBox* myXSpin; ///< the spin box for the X coordinate
   QDoubleSpinBox* myYSpin; ///< the spin box for the Y coordinate
+
+  std::string myOptionParam; /// Parameter name which has to be taken from previous feature
 };
 
 #endif

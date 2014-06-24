@@ -69,6 +69,9 @@ signals:
   /// \param theAttributeName a name of the attribute
   /// \param theEvent key release event
   void keyReleased(const std::string& theAttributeName, QKeyEvent* theEvent);
+  /// The signal about the widget is lost focus
+  /// \param theWidget the model base widget
+  void focusOutWidget(ModuleBase_ModelWidget* theWidget);
 
 protected:
   bool myHasDefaultValue; /// the boolean state whether the control has a default value

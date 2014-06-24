@@ -7,13 +7,12 @@
 #include "Model_Events.h"
 #include "Model_Data.h"
 #include <ModelAPI_Feature.h>
-#include <Events_Loop.h>
 
 using namespace std;
 
 void Model_AttributeReference::setValue(FeaturePtr theFeature)
 {
-  if (value() != theFeature) {
+  if (!myIsInitialized || value() != theFeature) {
     boost::shared_ptr<Model_Data> aData = 
       boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
     if (myRef.IsNull()) {
@@ -23,10 +22,7 @@ void Model_AttributeReference::setValue(FeaturePtr theFeature)
     } else {
       myRef->Set(aData->label());
     }
-
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-    Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
-    Events_Loop::loop()->send(aMsg);
+    owner()->data()->sendAttributeUpdated(this);
   }
 }
 
@@ -46,8 +42,6 @@ FeaturePtr Model_AttributeReference::value()
 
 Model_AttributeReference::Model_AttributeReference(TDF_Label& theLabel)
 {
-  // check the attribute could be already presented in this doc (after load document)
-  if (!theLabel.FindAttribute(TDF_Reference::GetID(), myRef)) {
-    // create attribute: not initialized by value yet: attribute is not set to the label!
-  }
+  // not initialized by value yet: attribute is not set to the label!
+  myIsInitialized = theLabel.FindAttribute(TDF_Reference::GetID(), myRef) == Standard_True;
 }

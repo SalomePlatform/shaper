@@ -9,12 +9,12 @@
         <point_selector id="PointCoordindates" title="Point" tooltip="Point"/>
       </feature>
       <feature id="SketchLine" title="Line" tooltip="Create a new line" icon=":icons/line.png">
-        <point_selector id="StartPoint" title="Start point" tooltip="Start point of the line"/>
+        <point_selector id="StartPoint" title="Start point" tooltip="Start point of the line" previous_feature_param="EndPoint"/>
         <point_selector id="EndPoint" title="End point" tooltip="End point of the line"/>
       </feature>
       <feature id="SketchCircle" title="Circle" tooltip="Create a new circle" icon="">
         <point_selector id="CircleCenter" title="Center" tooltip="Center of the circle"/>
-        <doublevalue id="CircleRadius" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set Radius"/>
+        <point2ddistance id="CircleRadius" first_point="CircleCenter" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set Radius"/>
       </feature>
       <feature id="SketchArc" title="Arc" tooltip="Create a new arc of a circle" icon="">
         <point_selector id="ArcCenter" title="Center" tooltip="Center of the arc"/>
@@ -24,10 +24,10 @@
       <feature id="SketchConstraintCoincidence" title="Points coincidence" tooltip="Create constraint for the coincidence of two points" internal="1"/>
       <feature id="SketchConstraintDistance" title="Distance between objects" tooltip="Create constraint for the distance from a point to an object">
         <label title="Select point and another feature (point or point on line) between which to calculate distance" tooltip="Select point and another feature (point or point on line) between which to calculate distance"/>
-        <feature_selector id="ConstraintEntityA" keysequence="SketchPoint"/>
-        <feature_selector id="ConstraintEntityB" keysequence="SketchPoint"/>
-        <point_selector id="ConstraintFlyoutValuePnt" title="Flyout point" tooltip="Flyout"/>
-        <doublevalue id="ConstraintValue" label="Value:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Constraint value"/>
+        <feature_selector id="ConstraintEntityA" keysequence="SketchPoint" internal="1"/>
+        <feature_selector id="ConstraintEntityB" keysequence="SketchPoint" internal="1"/>
+        <point_selector id="ConstraintFlyoutValuePnt" title="Flyout point" tooltip="Flyout" internal="1"/>
+        <doublevalue_editor id="ConstraintValue" min="0" step="1.0" tooltip="Constraint value"/>
       </feature>
       <feature id="SketchConstraintLength" title="Length of a line" tooltip="Create constraint for the given length of a line segment">
         <label title="Select a line entity on which to calculate lenght" tooltip="Select a line entity on which to calculate lenght"/>
