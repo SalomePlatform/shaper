@@ -19,7 +19,7 @@ enum PartSet_SelectionMode
   SM_DonePoint
 };
 
-const int CONSTRAINT_TEXT_HEIGHT = 28; /// the text height of the constraint
-const int CONSTRAINT_TEXT_SELECTION_TOLERANCE = 20; /// the text selection tolerance
+////const int CONSTRAINT_TEXT_HEIGHT = 28; /// the text height of the constraint
+////const int CONSTRAINT_TEXT_SELECTION_TOLERANCE = 20; /// the text selection tolerance
 
 #endif

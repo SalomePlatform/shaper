@@ -10,7 +10,6 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <PartSet_Listener.h>
 #include <PartSet_TestOCC.h>
-#include <PartSet_Presentation.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModelAPI_Object.h>
@@ -433,13 +432,13 @@ void PartSet_Module::visualizePreview(FeaturePtr theFeature, bool isDisplay,
 
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   if (isDisplay) {
-    boost::shared_ptr<GeomAPI_Shape> aPreview = aPreviewOp->preview(theFeature);
-    Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
-                           theFeature, aPreviewOp->sketch(),
-                           aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
-                           aDisplayer->getAISObject(theFeature));
-
-    aDisplayer->redisplay(theFeature, anAIS, false);
+    boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+      boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
+    if (aSPFeature)
+    {
+      Handle(AIS_InteractiveObject) anAIS = aSPFeature->getAISShape(aDisplayer->getAISObject(theFeature));
+      aDisplayer->redisplay(theFeature, anAIS, false);
+    }
   }
   else
     aDisplayer->erase(theFeature, false);
@@ -481,11 +480,12 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
                                                          anIt = aList.begin(), aLast = aList.end();
   for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = (*anIt).first;
-    boost::shared_ptr<GeomAPI_Shape> aPreview = (*anIt).second;
-    Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
-                           aFeature, aPreviewOp->sketch(),
-                           aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
-                           aDisplayer->getAISObject(aFeature));
+    boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+      boost::dynamic_pointer_cast<SketchPlugin_Feature>((*anIt).first);
+    if (!aSPFeature)
+      continue;
+
+    Handle(AIS_InteractiveObject) anAIS = aSPFeature->getAISShape(aDisplayer->getAISObject(aFeature));
     if (!anAIS.IsNull())
       aDisplayer->redisplay(aFeature, anAIS, false);
     aDisplayer->activateInLocalContext(aFeature, aModes, false);

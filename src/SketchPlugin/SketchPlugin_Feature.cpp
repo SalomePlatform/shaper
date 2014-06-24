@@ -5,6 +5,10 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_AttributeRefList.h>
 
+#include <AIS_InteractiveObject.hxx>
+#include <AIS_Shape.hxx>
+#include <TopoDS_Shape.hxx>
+
 SketchPlugin_Feature::SketchPlugin_Feature()
 {
   mySketch = 0;
@@ -42,4 +46,31 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
     }
   }
   return mySketch;
+}
+
+Handle(AIS_InteractiveObject) SketchPlugin_Feature::getAISShape(Handle(AIS_InteractiveObject) thePrevious)
+{
+  boost::shared_ptr<GeomAPI_Shape> aPreview = preview();
+
+  Handle(AIS_InteractiveObject) anAIS = thePrevious;
+  const TopoDS_Shape& aShape = aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape();
+  if (!anAIS.IsNull())
+  {
+    Handle(AIS_Shape) aShapeAIS = Handle(AIS_Shape)::DownCast(anAIS);
+    if (!aShapeAIS.IsNull()) {
+      // if the AIS object is displayed in the opened local context in some mode, additional
+      // AIS sub objects are created there. They should be rebuild for correct selecting.
+      // It is possible to correct it by closing local context before the shape set and opening
+      // after. Another workaround to thrown down the selection and reselecting the AIS.
+      // If there was a problem here, try the first solution with close/open local context.
+
+      aShapeAIS->Set(aShape);
+      aShapeAIS->Redisplay(Standard_True);
+    }
+  }
+  else
+  {
+    anAIS = new AIS_Shape(aShape);
+  }
+  return anAIS;
 }
