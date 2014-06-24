@@ -61,11 +61,11 @@ bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
   return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND ||
          theId == SKETCH_CIRCLE_KIND /*||
          theId == SKETCH_ARC_KIND*/ ||
-         theId == SKETCH_CONSTRAINT_DISTANCE_KIND ||
+         theId == SKETCH_CONSTRAINT_DISTANCE_KIND /*||
          theId == SKETCH_CONSTRAINT_LENGTH_KIND ||
          theId == SKETCH_CONSTRAINT_RADIUS_KIND ||
          theId == SKETCH_CONSTRAINT_PARALLEL_KIND ||
-         theId == SKETCH_CONSTRAINT_PERPENDICULAR_KIND;
+         theId == SKETCH_CONSTRAINT_PERPENDICULAR_KIND*/;
 }
 
 bool PartSet_OperationFeatureCreate::canBeCommitted() const
