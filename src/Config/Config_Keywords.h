@@ -34,6 +34,7 @@ const static char* WDG_POINT_SELECTOR = "point_selector";
 const static char* WDG_POINT2D_DISTANCE = "point2ddistance";
 
 const static char* WDG_FEATURE_SELECTOR = "feature_selector";
+const static char* WDG_DOUBLEVALUE_EDITOR = "doublevalue_editor";
 
 const static char* _ID = "id";
 //const static char* WORKBENCH_ID = "id";

@@ -39,10 +39,16 @@ protected:
   QWidget* doubleSpinBoxControl(QWidget* theParent);
   QWidget* pointSelectorControl(QWidget* theParent);
   QWidget* featureSelectorControl(QWidget* theParent);
+  QWidget* doubleValueEditor(QWidget* theParent);
   QWidget* createContainer(const std::string& theType, QWidget* theParent = NULL);
   QWidget* selectorControl(QWidget* theParent);
   QWidget* booleanControl(QWidget* theParent);
   QWidget* point2dDistanceControl(QWidget* theParent);
+
+  /// Check whether the XML definition for the given type contains internal property
+  /// \param theType the widget type
+  /// \return the boolean result
+  bool isInternalWidget(const std::string& theType);
 
   QString qs(const std::string& theStdString) const;
 

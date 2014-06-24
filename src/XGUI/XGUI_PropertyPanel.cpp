@@ -92,6 +92,9 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
     for (; anIt != aLast; anIt++) {
       connect(*anIt, SIGNAL(keyReleased(const std::string&, QKeyEvent*)),
               this, SIGNAL(keyReleased(const std::string&, QKeyEvent*)));
+
+      connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
+              this, SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
     }
     ModuleBase_ModelWidget* aLastWidget = theWidgets.last();
     if (aLastWidget) {
