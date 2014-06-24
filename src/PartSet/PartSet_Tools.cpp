@@ -302,13 +302,14 @@ void PartSet_Tools::createConstraint(FeaturePtr theSketch,
 }
 
 void PartSet_Tools::setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
-                                   const std::string& theAttribute, double theX, double theY)
+                                   const std::string& theAttribute,
+                                   double theClickedX, double theClickedY)
 {
   // find a feature point by the selection mode
   //boost::shared_ptr<GeomDataAPI_Point2D> aPoint = featurePoint(theMode);
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+  boost::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint =
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->data()->attribute(theAttribute));
-  if (!aPoint)
+  if (!aFeaturePoint)
     return;
 
   // get all sketch features. If the point with the given coordinates belong to any sketch feature,
@@ -319,26 +320,26 @@ void PartSet_Tools::setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
 
   std::list<FeaturePtr > aFeatures = aRefList->list();
   std::list<FeaturePtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
+  std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes;
+  boost::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = boost::shared_ptr<GeomAPI_Pnt2d>
+                                                     (new GeomAPI_Pnt2d(theClickedX, theClickedY));
   for (; anIt != aLast; anIt++)
   {
     FeaturePtr aFeature = *anIt;
-    boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;// = aFeature->findPoint(theX, theY);
+    // find the given point in the feature attributes
+    anAttiributes = aFeature->data()->attributes(GeomDataAPI_Point2D::type());
+    std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
+                                                                      aLast = anAttiributes.end();
+    boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;
+    for (;anIt!=aLast && !aFPoint; anIt++) {
+      boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint =
+                                          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+      if (aCurPoint && aCurPoint->pnt()->distance(aClickedPoint) < Precision::Confusion())
+        aFPoint = aCurPoint;
+    }
     if (aFPoint)
-      PartSet_Tools::createConstraint(theSketch, aFPoint, aPoint);
+      PartSet_Tools::createConstraint(theSketch, aFPoint, aFeaturePoint);
   }
-}
-
-boost::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::findPoint(FeaturePtr theFeature,
-                                                                double theX, double theY)
-{
-  boost::shared_ptr<PartSet_FeaturePrs> aFeaturePrs = PartSet_Tools::createFeaturePrs(
-                                           theFeature->getKind(), FeaturePtr(), theFeature);
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
-  if (aFeaturePrs)
-    aPoint2D = aFeaturePrs->findPoint(theFeature, theX, theY);
-
-  return aPoint2D;
 }
 
 boost::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(FeaturePtr theSketch)

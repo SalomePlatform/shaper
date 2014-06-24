@@ -114,17 +114,10 @@ public:
   /// \param theSketch a sketch feature
   /// \param theFeature a source feature
   /// \param theAttribute a name of the requried attribute attribute
-  /// \param theX the horizontal coordnate of the point
-  /// \param theY the vertical coordnate of the point
+  /// \param theClickedX the horizontal coordnate of the point
+  /// \param theClickedY the vertical coordnate of the point
   static void setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
-                             const std::string& theAttribute, double theX, double theY);
-
-  /// Find a point in the line with given coordinates
-  /// \param theFeature the line feature
-  /// \param theX the horizontal point coordinate
-  /// \param theY the vertical point coordinate
-  static boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
-                                                          double theY);
+                             const std::string& theAttribute, double theClickedX, double theClickedY);
 
   /// Create a sketch plane instance
   /// \param theSketch a sketch feature

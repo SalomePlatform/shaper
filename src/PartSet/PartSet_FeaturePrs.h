@@ -59,13 +59,6 @@ public:
   /// \return next attribute selection mode
   virtual PartSet_SelectionMode getNextMode(const std::string& theAttribute) const = 0;
 
-  /// Find a point in the line with given coordinates
-  /// \param theFeature the line feature
-  /// \param theX the horizontal point coordinate
-  /// \param theY the vertical point coordinate
-  virtual boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
-                                                           double theY) = 0;
-
 protected:
   /// Returns the operation feature
   /// \return the feature

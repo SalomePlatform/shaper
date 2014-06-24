@@ -243,13 +243,6 @@ PartSet_SelectionMode PartSet_ConstraintRadiusPrs::getNextMode(const std::string
   return SM_FirstPoint;
 }
 
-boost::shared_ptr<GeomDataAPI_Point2D> PartSet_ConstraintRadiusPrs::findPoint(FeaturePtr theFeature,
-                                                                           double theX, double theY)
-{
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
-  return aPoint2D;
-}
-
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_ConstraintRadiusPrs::featurePoint
                                                      (const PartSet_SelectionMode& theMode)
 {

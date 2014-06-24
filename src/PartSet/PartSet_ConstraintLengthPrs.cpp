@@ -120,13 +120,6 @@ PartSet_SelectionMode PartSet_ConstraintLengthPrs::getNextMode(const std::string
   return SM_FirstPoint;
 }
 
-boost::shared_ptr<GeomDataAPI_Point2D> PartSet_ConstraintLengthPrs::findPoint(FeaturePtr theFeature,
-                                                                           double theX, double theY)
-{
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
-  return aPoint2D;
-}
-
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_ConstraintLengthPrs::featurePoint
                                                      (const PartSet_SelectionMode& theMode)
 {

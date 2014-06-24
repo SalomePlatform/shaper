@@ -213,6 +213,7 @@ list<boost::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const string
   map<string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = myAttrs.begin();
   for(; anAttrsIter != myAttrs.end(); anAttrsIter++) {
     if (theType.empty() || anAttrsIter->second->attributeType() == theType) {
+      aResult.push_back(anAttrsIter->second);
     }
   }
   return aResult;
