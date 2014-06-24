@@ -13,6 +13,8 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomDataAPI_Point2D.h>
 
+#include <AIS_InteractiveObject.hxx>
+
 using namespace std;
 
 // face of the square-face displayed for selection of general plane

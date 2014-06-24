@@ -10,7 +10,6 @@
 #include <XGUI_ViewerPrs.h>
 #include <XGUI_ViewerProxy.h>
 #include <PartSet_FeaturePrs.h>
-#include <PartSet_Presentation.h>
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketchBase.h>
 
@@ -149,9 +148,9 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
 
     XGUI_Displayer* aDisplayer = theWorkshop->displayer();
 
-    Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
-                           aFeature, aSketch,
-                           aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), NULL);
+    boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+      boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    Handle(AIS_InteractiveObject) anAIS = aSPFeature->getAISShape(NULL);
     if (!anAIS.IsNull())
       aDisplayer->redisplay(aFeature, anAIS, false);
 
@@ -205,11 +204,9 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
 
   Handle(AIS_InteractiveObject) aPrevAIS;
-  FeaturePtr aSketch;//NULL
-  Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
-                          aFeature, aSketch,
-                          aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(),
-                          aPrevAIS);
+  boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+    boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+  Handle(AIS_InteractiveObject) anAIS = aSPFeature->getAISShape(aPrevAIS);
   if (!anAIS.IsNull())
     theWorkshop->displayer()->redisplay(aFeature, anAIS, true);
   //std::list<int> aModes;

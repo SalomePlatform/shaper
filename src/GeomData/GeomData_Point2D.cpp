@@ -3,9 +3,9 @@
 // Author:      Mikhail PONIKAROV
 
 #include "GeomData_Point2D.h"
-#include "Model_Events.h"
-#include <Events_Loop.h>
 #include <GeomAPI_Pnt2d.h>
+#include <ModelAPI_Feature.h>
+#include <ModelAPI_Data.h>
 
 using namespace std;
 
@@ -14,15 +14,14 @@ void GeomData_Point2D::setValue(const double theX, const double theY)
   if (myCoords->Value(0) != theX || myCoords->Value(1) != theY) {
     myCoords->SetValue(0, theX);
     myCoords->SetValue(1, theY);
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-    Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
-    Events_Loop::loop()->send(aMsg);
+    owner()->data()->sendAttributeUpdated(this);
   }
 }
 
 void GeomData_Point2D::setValue(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   setValue(thePoint->x(), thePoint->y());
+  owner()->data()->sendAttributeUpdated(this);
 }
 
 double GeomData_Point2D::x() const
@@ -44,8 +43,8 @@ boost::shared_ptr<GeomAPI_Pnt2d> GeomData_Point2D::pnt()
 
 GeomData_Point2D::GeomData_Point2D(TDF_Label& theLabel)
 {
-  // check the attribute could be already presented in this doc (after load document)
-  if (!theLabel.FindAttribute(TDataStd_RealArray::GetID(), myCoords)) {
+  myIsInitialized = theLabel.FindAttribute(TDataStd_RealArray::GetID(), myCoords) == Standard_True;
+  if (!myIsInitialized) {
     // create attribute: not initialized by value yet, just zero
     myCoords = TDataStd_RealArray::Set(theLabel, 0, 1);
   }

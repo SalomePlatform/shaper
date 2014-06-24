@@ -4,10 +4,8 @@
 
 #include "Model_AttributeRefList.h"
 #include "Model_Application.h"
-#include "Model_Events.h"
 #include "Model_Data.h"
 #include <ModelAPI_Feature.h>
-#include <Events_Loop.h>
 #include <TDF_ListIteratorOfLabelList.hxx>
 
 using namespace std;
@@ -18,9 +16,7 @@ void Model_AttributeRefList::append(FeaturePtr theFeature)
     boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
   myRef->Append(aData->label());
 
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-  Model_FeatureUpdatedMessage aMsg(owner(), anEvent);
-  Events_Loop::loop()->send(aMsg);
+  owner()->data()->sendAttributeUpdated(this);
 }
 
 void Model_AttributeRefList::remove(FeaturePtr theFeature)
@@ -29,6 +25,7 @@ void Model_AttributeRefList::remove(FeaturePtr theFeature)
     boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
   myRef->Remove(aData->label());
 
+  owner()->data()->sendAttributeUpdated(this);
 }
 
 int Model_AttributeRefList::size()
@@ -52,8 +49,8 @@ list<FeaturePtr > Model_AttributeRefList::list()
 
 Model_AttributeRefList::Model_AttributeRefList(TDF_Label& theLabel)
 {
-  // check the attribute could be already presented in this doc (after load document)
-  if (!theLabel.FindAttribute(TDataStd_ReferenceList::GetID(), myRef)) {
+  myIsInitialized = theLabel.FindAttribute(TDataStd_ReferenceList::GetID(), myRef) == Standard_True;
+  if (!myIsInitialized) {
     myRef = TDataStd_ReferenceList::Set(theLabel);
   }
 }

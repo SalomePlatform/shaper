@@ -26,6 +26,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_Point.cpp
     SketchPlugin_Circle.cpp
     SketchPlugin_Arc.cpp
+    SketchPlugin_Constraint.cpp
     SketchPlugin_ConstraintCoincidence.cpp
     SketchPlugin_ConstraintDistance.cpp
     SketchPlugin_ConstraintLength.cpp
@@ -38,13 +39,15 @@ SET(PROJECT_LIBRARIES
     GeomAPI
     GeomAlgoAPI
     ModelAPI
+    ${CAS_KERNEL}
+    ${CAS_VIEWER}
 )
 
 SET(XML_RESOURCES
   plugin-Sketch.xml
 )
 
-ADD_DEFINITIONS(-DSKETCHPLUGIN_EXPORTS ${BOOST_DEFINITIONS})
+ADD_DEFINITIONS(-DSKETCHPLUGIN_EXPORTS ${BOOST_DEFINITIONS} ${CAS_DEFINITIONS})
 ADD_LIBRARY(SketchPlugin MODULE ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES})
 TARGET_LINK_LIBRARIES(SketchPlugin ${PROJECT_LIBRARIES})
 
@@ -53,6 +56,7 @@ INCLUDE_DIRECTORIES(
   ../GeomAPI
   ../GeomAlgoAPI
   ../GeomDataAPI
+  ${CAS_INCLUDE_DIRS}
 )
 
 INSTALL(TARGETS SketchPlugin DESTINATION plugins)

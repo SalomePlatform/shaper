@@ -9,6 +9,8 @@
 #include <GeomDataAPI_Point2D.h>
 #include <SketchPlugin_Point.h>
 
+#include <AIS_InteractiveObject.hxx>
+
 SketchPlugin_ConstraintRadius::SketchPlugin_ConstraintRadius()
 {
 }
@@ -26,9 +28,10 @@ void SketchPlugin_ConstraintRadius::execute()
 {
 }
 
-const boost::shared_ptr<GeomAPI_Shape>&  SketchPlugin_ConstraintRadius::preview()
+Handle(AIS_InteractiveObject) SketchPlugin_ConstraintRadius::getAISShape(
+  Handle_AIS_InteractiveObject thePrevious)
 {
   /// \todo Preview for diameter constraint
-  return getPreview();
+  return thePrevious;
 }
 

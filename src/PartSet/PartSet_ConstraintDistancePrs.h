@@ -46,15 +46,6 @@ public:
   virtual PartSet_SelectionMode setPoint(double theX, double theY,
                                          const PartSet_SelectionMode& theMode);
 
-  /// Creates an AIS presentation if the previous is null or update the given one
-  /// \param theFeature a feature
-  /// \param theSketch a feature sketch
-  /// \param thePrevious a previuos AIS presentation
-  /// \return a created/changed AIS object with the feature parameters
-  static Handle_AIS_InteractiveObject createPresentation(FeaturePtr theFeature,
-                                                         FeaturePtr theSketch,
-                                                         Handle_AIS_InteractiveObject thePreviuos);
-
   /// Returns the feature attribute name for the selection mode
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode
   virtual std::string getAttribute(const PartSet_SelectionMode& theMode) const;
