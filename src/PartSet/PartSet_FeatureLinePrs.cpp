@@ -148,28 +148,6 @@ void PartSet_FeatureLinePrs::projectPointOnLine(FeaturePtr theFeature,
   }
 }
 
-boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureLinePrs::findPoint(FeaturePtr theFeature,
-                                                                         double theX, double theY)
-{
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
-  if (!theFeature || theFeature->getKind() != getKind())
-    return aPoint2D;
-
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
-  if (fabs(aPoint->x() - theX) < Precision::Confusion() &&
-      fabs(aPoint->y() - theY) < Precision::Confusion())
-    aPoint2D = aPoint;
-  else {
-    aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
-    if (fabs(aPoint->x() - theX) < Precision::Confusion() &&
-        fabs(aPoint->y() - theY) < Precision::Confusion())
-      aPoint2D = aPoint;
-  }
-  return aPoint2D;
-}
-
 boost::shared_ptr<GeomAPI_Lin2d> PartSet_FeatureLinePrs::createLin2d(FeaturePtr theFeature)
 {
   boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin;

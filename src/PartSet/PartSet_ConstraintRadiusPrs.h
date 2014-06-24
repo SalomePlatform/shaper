@@ -49,15 +49,6 @@ public:
   virtual PartSet_SelectionMode setPoint(double theX, double theY,
                                          const PartSet_SelectionMode& theMode);
 
-  /// Creates an AIS presentation if the previous is null or update the given one
-  /// \param theFeature a feature
-  /// \param theSketch a feature sketch
-  /// \param thePrevious a previuos AIS presentation
-  /// \return a created/changed AIS object with the feature parameters
-  static Handle_AIS_InteractiveObject createPresentation(FeaturePtr theFeature,
-                                                         FeaturePtr theSketch,
-                                                         Handle_AIS_InteractiveObject thePreviuos);
-
   /// Returns the feature attribute name for the selection mode
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode
   virtual std::string getAttribute(const PartSet_SelectionMode& theMode) const;
@@ -67,12 +58,6 @@ public:
   /// \return next attribute selection mode
   virtual PartSet_SelectionMode getNextMode(const std::string& theAttribute) const;
 
-  /// Find a point in the line with given coordinates
-  /// \param theFeature the line feature
-  /// \param theX the horizontal point coordinate
-  /// \param theY the vertical point coordinate
-  virtual boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
-                                                           double theY);
   /// Project the view point on the feature. The output coordinates belong to the feature
   /// \param theFeature a feature
   /// \param theSketch the sketch feature

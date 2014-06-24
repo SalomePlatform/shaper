@@ -92,22 +92,6 @@ PartSet_SelectionMode PartSet_FeatureCirclePrs::getNextMode(const std::string& t
   return aMode;
 }
 
-boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeatureCirclePrs::findPoint(FeaturePtr theFeature,
-                                                                           double theX, double theY)
-{
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
-  if (!theFeature || theFeature->getKind() != getKind())
-    return aPoint2D;
-
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
-  if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
-    aPoint2D = aPoint;
-
-  return aPoint2D;
-}
-
 void PartSet_FeatureCirclePrs::projectPointOnFeature(FeaturePtr theFeature, FeaturePtr theSketch,
                                                      gp_Pnt& thePoint, Handle(V3d_View) theView,
                                                      double& theX, double& theY)

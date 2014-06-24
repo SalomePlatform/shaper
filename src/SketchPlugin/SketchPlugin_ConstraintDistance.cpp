@@ -43,16 +43,15 @@ void SketchPlugin_ConstraintDistance::execute()
   boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr_B = 
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_B));
 
-  AttributeDoublePtr anAttribute =
+  AttributeDoublePtr anAttr_Value =
       boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_VALUE));
-
-  if (anAttr_A && anAttr_B && anAttribute->value() == 0)
+  if (anAttr_A && anAttr_B && !anAttr_Value->isInitialized())
   {
     FeaturePtr aFeature_A = anAttr_A->feature();
     FeaturePtr aFeature_B = anAttr_B->feature();
 
     double aValue = 40; // TODO
-    anAttribute->setValue(aValue);
+    anAttr_Value->setValue(aValue);
   }
 }
 

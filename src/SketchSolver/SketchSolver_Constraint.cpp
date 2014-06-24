@@ -183,7 +183,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
           theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[indAttr])
         );
-      if (!anAttr || !anAttr->isFeature()) continue;
+      if (!anAttr || !anAttr->isFeature() || !anAttr->feature()) continue;
       const std::string& aKind = anAttr->feature()->getKind();
       if (aKind.compare(SKETCH_LINE_KIND) == 0)
       {

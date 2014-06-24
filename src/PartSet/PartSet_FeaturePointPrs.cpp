@@ -71,22 +71,6 @@ PartSet_SelectionMode PartSet_FeaturePointPrs::getNextMode(const std::string& th
   return aMode;
 }
 
-boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeaturePointPrs::findPoint(FeaturePtr theFeature,
-                                                                          double theX, double theY)
-{
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D;
-  if (!theFeature || theFeature->getKind() != getKind())
-    return aPoint2D;
-
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(POINT_ATTR_COORD));
-  if (fabs(aPoint->x() - theX) < Precision::Confusion() && fabs(aPoint->y() - theY) < Precision::Confusion() )
-    aPoint2D = aPoint;
-
-  return aPoint2D;
-}
-
 boost::shared_ptr<GeomDataAPI_Point2D> PartSet_FeaturePointPrs::featurePoint
                                                      (const PartSet_SelectionMode& theMode)
 {

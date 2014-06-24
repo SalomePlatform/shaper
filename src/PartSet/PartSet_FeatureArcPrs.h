@@ -61,13 +61,6 @@ public:
   static void projectPointOnFeature(FeaturePtr theFeature, FeaturePtr theSketch, gp_Pnt& thePoint,
                                     Handle_V3d_View theView, double& theX, double& theY);
 
-  /// Find a point in the line with given coordinates
-  /// \param theFeature the line feature
-  /// \param theX the horizontal point coordinate
-  /// \param theY the vertical point coordinate
-  virtual boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
-                                                           double theY);
-
   /// Computes the feature's radius
   /// \param theFeature an arc feature
   /// \return the double value

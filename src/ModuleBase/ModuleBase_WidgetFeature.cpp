@@ -31,7 +31,7 @@ ModuleBase_WidgetFeature::~ModuleBase_WidgetFeature()
 
 bool ModuleBase_WidgetFeature::setFeature(const FeaturePtr& theFeature)
 {
-  if (!theFeature && myFeatureKinds.contains(theFeature->getKind().c_str()))
+  if (!theFeature || !myFeatureKinds.contains(theFeature->getKind().c_str()))
     return false;
 
   //bool isBlocked = this->blockSignals(true);

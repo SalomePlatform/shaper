@@ -55,12 +55,6 @@ public:
   /// \return next attribute selection mode
   virtual PartSet_SelectionMode getNextMode(const std::string& theAttribute) const;
 
-  /// Find a point in the line with given coordinates
-  /// \param theFeature the line feature
-  /// \param theX the horizontal point coordinate
-  /// \param theY the vertical point coordinate
-  virtual boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
-                                                           double theY);
 protected:
   /// Returns the feature point in the selection mode position.
   /// \param theMode the current operation selection mode. The feature attribute depends on the mode

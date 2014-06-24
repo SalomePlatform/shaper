@@ -69,13 +69,6 @@ public:
                           const gp_Pnt& thePoint, Handle_V3d_View theView,
                           double& theX, double& theY);
 
-  /// Find a point in the line with given coordinates
-  /// \param theFeature the line feature
-  /// \param theX the horizontal point coordinate
-  /// \param theY the vertical point coordinate
-  virtual boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
-                                                           double theY);
-
   /// Creates a lin 2d object on a base of the line feature
   /// \param theFeature the line feature
   static boost::shared_ptr<GeomAPI_Lin2d> createLin2d(FeaturePtr theFeature);
