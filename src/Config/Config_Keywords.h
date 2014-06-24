@@ -48,6 +48,7 @@ const static char* FEATURE_NESTED = "nested";
 const static char* FEATURE_INTERNAL = "internal";
 const static char* SOURCE_FILE = "path";
 
+const static char* PREVIOUS_FEATURE_PARAM = "previous_feature_param";
 
 // doublevalue properties:
 const static char* INFO_WDG_TEXT = FEATURE_TEXT;

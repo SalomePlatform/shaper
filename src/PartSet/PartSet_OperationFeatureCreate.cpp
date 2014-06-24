@@ -211,10 +211,9 @@ void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* t
   myActiveWidget = theWidget;
 
   if (myInitFeature && myActiveWidget) {
-    // TODO: to be realized in the custom point selector. The last point values of the init feature
-    // should be to to the start point of a new feature
-    //myActiveWidget->init(myInitFeature);
-    //PartSet_FeatureLinePrs::setFeature(myInitFeature, SM_FirstPoint);
+    ModuleBase_WidgetPoint2D* aWgt = dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
+    if (aWgt)
+      aWgt->initFromPrevious(myInitFeature);
     myInitFeature = FeaturePtr();
     emit activateNextWidget(myActiveWidget);
   }
