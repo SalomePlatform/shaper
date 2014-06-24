@@ -110,6 +110,15 @@ public:
                                boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
                                boost::shared_ptr<GeomDataAPI_Point2D> thePoint2);
 
+  /// Creates constrains of the current 
+  /// \param theSketch a sketch feature
+  /// \param theFeature a source feature
+  /// \param theAttribute a name of the requried attribute attribute
+  /// \param theX the horizontal coordnate of the point
+  /// \param theY the vertical coordnate of the point
+  static void setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
+                             const std::string& theAttribute, double theX, double theY);
+
   /// Find a point in the line with given coordinates
   /// \param theFeature the line feature
   /// \param theX the horizontal point coordinate

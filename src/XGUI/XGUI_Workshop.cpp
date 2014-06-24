@@ -324,7 +324,7 @@ void XGUI_Workshop::onOperationStarted()
       aWidget = *anIt;
       QObject::connect(aWidget, SIGNAL(valuesChanged()),  aOperation, SLOT(storeCustomValue()));
       // Init default values
-      if (!aOperation->isEditOperation()) {
+      if (!aOperation->isEditOperation() && aWidget->hasDefaultValue()) {
         aWidget->storeValue(aOperation->feature());
       }
     }
@@ -726,6 +726,11 @@ void XGUI_Workshop::createDockWidgets()
 
   connect(myPropertyPanel, SIGNAL(keyReleased(const std::string&, QKeyEvent*)),
           myOperationMgr, SLOT(onKeyReleased(const std::string&, QKeyEvent*)));
+
+  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
+          myOperationMgr, SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
+  connect(myOperationMgr, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)),
+          myPropertyPanel, SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
 }
 
 //******************************************************

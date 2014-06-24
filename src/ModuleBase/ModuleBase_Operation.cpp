@@ -62,6 +62,10 @@ void ModuleBase_Operation::storeCustomValue()
     aCustom->storeValue(myFeature);
 }
 
+void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
+{
+}
+
 void ModuleBase_Operation::startOperation()
 {
   if (!myIsEditing)
@@ -123,6 +127,6 @@ void ModuleBase_Operation::setFeature(FeaturePtr theFeature)
 
 void ModuleBase_Operation::setEditingFeature(FeaturePtr theFeature)
 {
-  myFeature = theFeature;
+  setFeature(theFeature);
   myIsEditing = true;
 }

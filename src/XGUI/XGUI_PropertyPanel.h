@@ -38,12 +38,24 @@ public slots:
   /// slot to set the focus to the widget visualized an attribute with the given name
   /// \param theAttributteName
   void onFocusActivated(const std::string& theAttributeName);
+  /// slot to activate the next widget in the property panel
+  /// \param theWidget a widget. The next widget should be activated
+  void onActivateNextWidget(ModuleBase_ModelWidget* theWidget);
 
 signals:
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theAttributeName a name of the attribute
   /// \param theEvent key release event
   void keyReleased(const std::string& theAttributeName, QKeyEvent* theEvent);
+  /// The signal about the widget activation
+  /// \param theWidget the activated widget
+  void widgetActivated(ModuleBase_ModelWidget* theWidget);
+
+protected:
+  /// Activate the widget, which means the focus on the widget.
+  /// The signal about the widget activation is emitted
+  /// \param theWidget
+  void activateWidget(ModuleBase_ModelWidget* theWidget);
 
 private:
   QWidget* myCustomWidget;

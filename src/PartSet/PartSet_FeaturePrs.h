@@ -66,12 +66,6 @@ public:
   virtual boost::shared_ptr<GeomDataAPI_Point2D> findPoint(FeaturePtr theFeature, double theX,
                                                            double theY) = 0;
 
-  /// Creates constrains of the current 
-  /// \param theX the horizontal coordnate of the point
-  /// \param theY the vertical coordnate of the point
-  /// \param theMode the current operation selection mode. The feature attribute depends on the mode
-  void setConstraints(double theX, double theY, const PartSet_SelectionMode& theMode);
-
 protected:
   /// Returns the operation feature
   /// \return the feature

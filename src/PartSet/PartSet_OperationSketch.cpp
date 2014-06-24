@@ -62,7 +62,8 @@ void PartSet_OperationSketch::init(FeaturePtr theFeature,
                                    const std::list<XGUI_ViewerPrs>& /*theSelected*/,
                                    const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
-  setFeature(theFeature);
+  if (theFeature)
+    setEditingFeature(theFeature);
 }
 
 FeaturePtr PartSet_OperationSketch::sketch() const
@@ -167,10 +168,9 @@ bool PartSet_OperationSketch::isNestedOperationsEnabled() const
 
 void PartSet_OperationSketch::startOperation()
 {
-  if (!feature()) {
-    setFeature(createFeature());
+  PartSet_OperationSketchBase::startOperation();
+  if (!isEditOperation())
     emit fitAllView();
-  }
 }
 
 bool PartSet_OperationSketch::hasSketchPlane() const

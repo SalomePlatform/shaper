@@ -30,7 +30,7 @@ void ModuleBase_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature, const boo
                                                               (aData->attribute(myFirstPntName));
   double aRadius = thePnt->distance(aPoint->pnt());
   AttributeDoublePtr aReal = aData->real(attributeID());
-  if (aReal && aReal->value() != mySpinBox->value()) {
+  if (aReal && (aReal->value() != aRadius)) {
     aReal->setValue(aRadius);
     mySpinBox->setValue(aRadius);
   }

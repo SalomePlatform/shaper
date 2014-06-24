@@ -62,6 +62,9 @@ signals:
   void operationStopped(ModuleBase_Operation* theOperation);
   /// Signal about an operation is resumed. It is emitted after the resume() of operation is done.
   void operationResumed();
+  /// Signal about the necessety of the next widget activating
+  /// \param theWidget the model widget
+  void activateNextWidget(ModuleBase_ModelWidget* theWidget);
 
 protected:
   /// Sets the current operation or NULL
@@ -92,6 +95,10 @@ protected slots:
   /// \param theName the attribute name
   /// \param theEvent the mouse event
   void onKeyReleased(const std::string& theName, QKeyEvent* theEvent);
+
+  /// SLOT, that reacts to the widget activation
+  /// \param theWidget an activated widget
+  void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
 private:
   typedef QList<ModuleBase_Operation*> Operations; ///< definition for a list of operations

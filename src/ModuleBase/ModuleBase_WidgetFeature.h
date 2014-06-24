@@ -1,26 +1,23 @@
-// File:        ModuleBase_WidgetPoint2D.h
+// File:        ModuleBase_WidgetFeature.h
 // Created:     25 Apr 2014
 // Author:      Natalia ERMOLAEVA
 
-#ifndef ModuleBase_WidgetPoint2D_H
-#define ModuleBase_WidgetPoint2D_H
+#ifndef ModuleBase_WidgetFeature_H
+#define ModuleBase_WidgetFeature_H
 
 #include <ModuleBase.h>
 #include "ModuleBase_ModelWidget.h"
 
 #include <QObject>
+#include <QStringList>
 
 class ModelAPI_Feature;
-class GeomAPI_Pnt2d;
 
-class QGroupBox;
-class QDoubleSpinBox;
-
-/**\class ModuleBase_WidgetPoint2D
+/**\class ModuleBase_WidgetFeature
  * \ingroup GUI
  * \brief Custom widget. An abstract class to be redefined to fill with some GUI controls
  */
-class MODULEBASE_EXPORT ModuleBase_WidgetPoint2D : public ModuleBase_ModelWidget
+class MODULEBASE_EXPORT ModuleBase_WidgetFeature : public ModuleBase_ModelWidget
 {
   Q_OBJECT
 public:
@@ -28,13 +25,13 @@ public:
   /// \theParent the parent object
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
-  ModuleBase_WidgetPoint2D(QWidget* theParent, const Config_WidgetAPI* theData);
+  ModuleBase_WidgetFeature(QWidget* theParent, const Config_WidgetAPI* theData);
   /// Destructor
-  virtual ~ModuleBase_WidgetPoint2D();
+  virtual ~ModuleBase_WidgetFeature();
 
   /// Fill the widget values by given point
   /// \param thePoint the point
-  void setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+  bool setFeature(const FeaturePtr& theFeature);
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed
@@ -50,15 +47,9 @@ public:
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-  /// Process key release envent on the widget spin box controls
-  /// \param theObject the object where the event happens
-  /// \param theEvent the processed event
-  virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
-
 private:
-  QGroupBox* myGroupBox; ///< the parent group box for all intenal widgets
-  QDoubleSpinBox* myXSpin; ///< the spin box for the X coordinate
-  QDoubleSpinBox* myYSpin; ///< the spin box for the Y coordinate
+  FeaturePtr myFeature; ///< the current widget feature
+  QStringList myFeatureKinds; ///< the kinds of possible features
 };
 
 #endif
