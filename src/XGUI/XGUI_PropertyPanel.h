@@ -36,9 +36,6 @@ protected:
 
 public slots:
   void updateContentWidget(FeaturePtr theFeature);
-  /// slot to set the focus to the widget visualized an attribute with the given name
-  /// \param theAttributteName
-  void onFocusActivated(const std::string& theAttributeName);
   /// slot to activate the next widget in the property panel
   /// \param theWidget a widget. The next widget should be activated
   void onActivateNextWidget(ModuleBase_ModelWidget* theWidget);
@@ -56,12 +53,6 @@ signals:
   /// \param the feature
   /// \param the attribute of the feature
   void storedPoint2D(FeaturePtr theFeature, const std::string& theAttribute);
-
-protected:
-  /// Activate the widget, which means the focus on the widget.
-  /// The signal about the widget activation is emitted
-  /// \param theWidget
-  void activateWidget(ModuleBase_ModelWidget* theWidget);
 
 private:
   QWidget* myCustomWidget;

@@ -114,12 +114,6 @@ protected:
   virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
 protected:
-  ///< Set the point selection mode. Emit signal about focus change if necessary.
-  /// \param theMode a new selection mode
-  /// \param isToEmitSignal the neccessity to emit signal
-  //void setPointSelectionMode(const PartSet_SelectionMode& theMode,
-  //                           const bool isToEmitSignal = true);
-
   /// Returns true if the active widget is the point selector widget
   /// \return the boolean value
   bool isPointWidget() const;

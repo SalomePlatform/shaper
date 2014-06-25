@@ -97,6 +97,9 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
       connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
               this, SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
 
+      connect(*anIt, SIGNAL(activated(ModuleBase_ModelWidget*)),
+              this, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)));
+
       ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
       if (aPointWidget)
         connect(aPointWidget, SIGNAL(storedPoint2D(FeaturePtr, const std::string&)),
@@ -115,10 +118,7 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
         setTabOrder(anOkBtn, aCancelBtn);
       }
     }
-    ModuleBase_ModelWidget* aWidget = theWidgets.first();
-    if (aWidget) {
-      activateWidget(aWidget);
-    }
+    onActivateNextWidget(0);
   }
 }
 
@@ -158,50 +158,20 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
   repaint();
 }
 
-void XGUI_PropertyPanel::onFocusActivated(const std::string& theAttributeName)
-{
-  if (theAttributeName == XGUI::PROP_PANEL_OK) {
-    QPushButton* aBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
-    aBtn->setFocus();
-  }
-  if (theAttributeName == XGUI::PROP_PANEL_CANCEL) {
-    QPushButton* aBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
-    aBtn->setFocus();
-  }
-  else {
-    foreach(ModuleBase_ModelWidget* eachWidget, myWidgets) {
-      if (eachWidget->canFocusTo(theAttributeName)) {
-        eachWidget->focusTo();
-        break;
-      }
-    }
-  }
-}
-
 void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
 {
   ModuleBase_ModelWidget* aNextWidget = 0;
-
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(),
                                                  aLast = myWidgets.end();
-  for (;anIt != aLast; anIt++)
+  bool isFoundWidget = false;
+  for (;anIt != aLast && !aNextWidget; anIt++)
   {
-    if ((*anIt) == theWidget) {
-      anIt++;
-      if (anIt != aLast)
+    if (isFoundWidget || !theWidget) {
+      if ((*anIt)->focusTo()) {
         aNextWidget = *anIt;
-      break;
+      }
     }
+    isFoundWidget = (*anIt) == theWidget;
   }
-  activateWidget(aNextWidget);
-}
-
-void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
-{
-  emit widgetActivated(theWidget);
-  // it is important that the signal widgetActivated goes before the focusTo() calling
-  // in order to handle next possible signal in the focusTo() method
-  // (e.g. the widget editor sends a signal about the widget deactivation)
-  if (theWidget)
-    theWidget->focusTo();
+  emit widgetActivated(aNextWidget);
 }

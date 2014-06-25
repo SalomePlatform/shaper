@@ -149,13 +149,6 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
       }
     }
   }
-  /*if (feature()->getKind() == SKETCH_ARC_KIND) {
-    boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
-                              boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
-    if (anArcPrs) {
-      anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
-    }
-  }*/
   bool isApplyed = false;
   if (isPointWidget())
     isApplyed = setWidgetPoint(aX, anY);
@@ -183,15 +176,6 @@ void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3
     double aX, anY;
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
     PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-    /*if (myPointSelectionMode == SM_ThirdPoint) {
-      if (feature()->getKind() == SKETCH_ARC_KIND) {
-        boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
-                                boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
-        if (anArcPrs) {
-          anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
-        }
-      }
-    }*/
     setWidgetPoint(aX, anY);
     flushUpdated();
   }
@@ -291,19 +275,6 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
     flushCreated();
   return aNewFeature;
 }
-
-/*void PartSet_OperationFeatureCreate::setPointSelectionMode(const PartSet_SelectionMode& theMode,
-                                                           const bool isToEmitSignal)
-{
-  myPointSelectionMode = theMode;
-  if (isToEmitSignal) {
-    std::string aName = myFeaturePrs->getAttribute(theMode);
-    if (aName.empty() && theMode == SM_DonePoint) {
-      aName = XGUI::PROP_PANEL_OK;
-    }
-    emit focusActivated(aName);
-  }
-}*/
 
 bool PartSet_OperationFeatureCreate::isPointWidget() const
 {

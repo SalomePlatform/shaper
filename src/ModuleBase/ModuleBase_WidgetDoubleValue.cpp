@@ -123,6 +123,10 @@ bool ModuleBase_WidgetDoubleValue::eventFilter(QObject *theObject, QEvent *theEv
 {
   if (theObject == mySpinBox) {
     if (theEvent->type() == QEvent::KeyRelease) {
+      QKeyEvent* aKeyEvent = (QKeyEvent*)theEvent;
+      if (aKeyEvent && aKeyEvent->key() == Qt::Key_Return) {
+        emit focusOutWidget(this);
+      }
       emit keyReleased(attributeID(), (QKeyEvent*) theEvent);
       return true;
     }

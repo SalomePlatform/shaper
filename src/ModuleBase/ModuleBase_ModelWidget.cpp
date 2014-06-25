@@ -22,12 +22,7 @@ bool ModuleBase_ModelWidget::isInitialized(FeaturePtr theFeature) const
   return theFeature->data()->attribute(attributeID())->isInitialized();
 }
 
-bool ModuleBase_ModelWidget::canFocusTo(const std::string& theAttributeName) const
-{
-  return theAttributeName == attributeID();
-}
-
-void ModuleBase_ModelWidget::focusTo()
+bool ModuleBase_ModelWidget::focusTo()
 {
   QList<QWidget*> aControls = getControls();
   QList<QWidget*>::const_iterator anIt = aControls.begin(), aLast = aControls.end();
@@ -38,6 +33,7 @@ void ModuleBase_ModelWidget::focusTo()
       break;
     }
   }
+  return true;
 }
 
 std::string ModuleBase_ModelWidget::attributeID() const
