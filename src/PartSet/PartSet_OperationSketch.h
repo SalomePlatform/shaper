@@ -109,10 +109,6 @@ protected:
   /// \param theShape the shape
   void setSketchPlane(const TopoDS_Shape& theShape);
 
-  /// Returns the operation type, which is feature or constraint edit opeation
-  /// \param theFeature a feature instance
-  std::string getOperationType(FeaturePtr theFeature);
-
 private:
   std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
 };

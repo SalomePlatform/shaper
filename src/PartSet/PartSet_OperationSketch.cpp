@@ -112,6 +112,10 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
   if (!hasSketchPlane()) {
   }
   else {
+    /// TODO: OCC bug: 25034 - the highlighted list should be filled not only for AIS_Shape
+    /// but for other IO, for example constraint dimensions.
+    /// It is empty and we have to use the process mouse release to start edition operation
+    /// for these objects
     if (theSelected.size() == 1) {
       FeaturePtr aFeature = theSelected.front().feature();
       if (aFeature)
