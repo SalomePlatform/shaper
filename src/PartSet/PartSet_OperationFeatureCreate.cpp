@@ -17,6 +17,7 @@
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
 
 #include <GeomAPI_Pnt2d.h>
 
@@ -61,7 +62,8 @@ bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
          theId == SKETCH_CONSTRAINT_LENGTH_KIND ||
          theId == SKETCH_CONSTRAINT_RADIUS_KIND ||
          theId == SKETCH_CONSTRAINT_PARALLEL_KIND ||
-         theId == SKETCH_CONSTRAINT_PERPENDICULAR_KIND;
+         theId == SKETCH_CONSTRAINT_PERPENDICULAR_KIND ||
+         theId == SKETCH_CONSTRAINT_COINCIDENCE_KIND;
 }
 
 bool PartSet_OperationFeatureCreate::canBeCommitted() const

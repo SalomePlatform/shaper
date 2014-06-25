@@ -1,7 +1,7 @@
 <plugin>
   <workbench id="Sketch">
     <group id="Basic">
-      <feature id="Sketch" nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular" title="Sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
+      <feature id="Sketch" nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintCoincidence" title="Sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
         <label title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch"/> 
       <!--icon=":pictures/x_point.png"-->
       </feature>
@@ -21,7 +21,11 @@
         <point_selector id="ArcStartPoint" title="Start point" tooltip="Start point of the arc"/>
         <point_selector id="ArcEndPoint" title="End point" tooltip="End point of the arc"/>
       </feature>
-      <feature id="SketchConstraintCoincidence" title="Points coincidence" tooltip="Create constraint for the coincidence of two points" internal="1"/>
+      <feature id="SketchConstraintCoincidence" title="Points coincidence" tooltip="Create constraint for the coincidence of two points">
+        <label title="Select two points to become coincident" tooltip="Select two points to become coincident"/>
+        <feature_selector id="ConstraintEntityA" label="First point" tooltip="Select an entity in the viewer" keysequence="SketchPoint"/>
+        <feature_selector id="ConstraintEntityB" label="Last point" tooltip="Select an entity in the viewer" keysequence="SketchPoint"/>
+      </feature>
       <feature id="SketchConstraintDistance" title="Distance between objects" tooltip="Create constraint for the distance from a point to an object">
         <label title="Select point and another feature (point or point on line) between which to calculate distance" tooltip="Select point and another feature (point or point on line) between which to calculate distance"/>
         <feature_selector id="ConstraintEntityA" label="First point" tooltip="Select an entity in the viewer" keysequence="SketchPoint"/>
