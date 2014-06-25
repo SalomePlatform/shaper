@@ -22,16 +22,10 @@
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_Constraint.h>
-
-#include <PartSet_FeatureLinePrs.h>
-#include <PartSet_FeaturePointPrs.h>
-#include <PartSet_FeatureCirclePrs.h>
-#include <PartSet_FeatureArcPrs.h>
-
-#include <PartSet_ConstraintLengthPrs.h>
-#include <PartSet_ConstraintRadiusPrs.h>
-#include <PartSet_ConstraintDistancePrs.h>
 
 #include <XGUI_ViewerPrs.h>
 
@@ -140,41 +134,6 @@ void PartSet_Tools::convertTo3D(const double theX, const double theY,
 
   boost::shared_ptr<GeomAPI_Pnt> aPoint = boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
   thePoint = gp_Pnt(aPoint->x(), aPoint->y(), aPoint->z());
-}
-
-boost::shared_ptr<PartSet_FeaturePrs> PartSet_Tools::createFeaturePrs(const std::string& theKind,
-                                                                      FeaturePtr theSketch,
-                                                                      FeaturePtr theFeature)
-{
-  boost::shared_ptr<PartSet_FeaturePrs> aFeaturePrs;
-
-  if (theKind == PartSet_FeaturePointPrs::getKind()) {
-    aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeaturePointPrs(theSketch));
-  }
-  else if (theKind == PartSet_FeatureLinePrs::getKind()) {
-    aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeatureLinePrs(theSketch));
-  }
-  else if (theKind == PartSet_FeatureCirclePrs::getKind()) {
-    aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeatureCirclePrs(theSketch));
-  }
-  else if (theKind == PartSet_FeatureArcPrs::getKind()) {
-    aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_FeatureArcPrs(theSketch));
-  }
-  else if (theKind == PartSet_ConstraintLengthPrs::getKind()) {
-    aFeaturePrs = boost::shared_ptr<PartSet_FeaturePrs>(new PartSet_ConstraintLengthPrs(theSketch));
-  }
-  else if (theKind == PartSet_ConstraintRadiusPrs::getKind()) {
-    aFeaturePrs = boost::shared_ptr<PartSet_ConstraintRadiusPrs>(new PartSet_ConstraintRadiusPrs(theSketch));
-  }
-  else if (theKind == PartSet_ConstraintDistancePrs::getKind()) {
-    aFeaturePrs = boost::shared_ptr<PartSet_ConstraintDistancePrs>(new PartSet_ConstraintDistancePrs(theSketch));
-  }
-
-
-  if (theFeature && aFeaturePrs)
-    aFeaturePrs->init(theFeature);
-
-  return aFeaturePrs;
 }
 
 FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
@@ -381,7 +340,7 @@ boost::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(
 
 bool PartSet_Tools::isConstraintFeature(const std::string& theKind)
 {
-  return theKind == PartSet_ConstraintLengthPrs::getKind() ||
-         theKind == PartSet_ConstraintDistancePrs::getKind() ||
-         theKind == PartSet_ConstraintRadiusPrs::getKind();
+  return theKind == SKETCH_CONSTRAINT_DISTANCE_KIND ||
+         theKind == SKETCH_CONSTRAINT_LENGTH_KIND ||
+         theKind == SKETCH_CONSTRAINT_RADIUS_KIND;
 }

@@ -23,7 +23,6 @@ class GeomDataAPI_Point2D;
 class GeomAPI_Pln;
 class GeomAPI_Pnt2d;
 class GeomAPI_Pnt;
-class PartSet_FeaturePrs;
 
 /*!
  \class PartSet_Tools
@@ -52,14 +51,6 @@ public:
   /// \param thePoint the 3D point in the viewer
   static void convertTo3D(const double theX, const double theY, FeaturePtr theSketch,
                           gp_Pnt& thePoint);
-
-  /// Creates the feature presentation
-  /// \param theKind a feature kind
-  /// \param theSketch the sketch of the feature
-  /// \param theFeature the feature
-  static boost::shared_ptr<PartSet_FeaturePrs> createFeaturePrs(const std::string& theKind,
-                                                                FeaturePtr theSketch,
-                                                                FeaturePtr theFeature = FeaturePtr());
 
   /// Returns a feature that is under the mouse point
   /// \param thePoint a screen point

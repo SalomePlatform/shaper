@@ -12,7 +12,6 @@
 
 #include <QObject>
 
-class PartSet_FeaturePrs;
 class GeomDataAPI_Point2D;
 class QMouseEvent;
 class QKeyEvent;
@@ -130,10 +129,8 @@ protected:
   bool setWidgetFeature(const FeaturePtr& theFeature);
 
 private:
-  //boost::shared_ptr<PartSet_FeaturePrs> myFeaturePrs; ///< the feature presentation
   FeaturePtr myInitFeature; ///< the initial feature
   FeaturePtr mySketch; ///< the sketch of the feature
-  //PartSet_SelectionMode myPointSelectionMode; ///< point selection mode
 
   ModuleBase_ModelWidget* myActiveWidget; ///< the active widget
 };

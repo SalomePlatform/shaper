@@ -6,10 +6,6 @@
 
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketch.h>
-#include <PartSet_FeaturePointPrs.h>
-#include <PartSet_FeatureLinePrs.h>
-#include <PartSet_FeatureCirclePrs.h>
-#include <PartSet_FeatureArcPrs.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Point.h>
@@ -139,12 +135,8 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
         PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
         // move to selected line
         if (feature()->getKind() == SKETCH_LINE_KIND) {
-          //boost::shared_ptr<PartSet_FeatureLinePrs> aLinePrs =
-          //                       boost::dynamic_pointer_cast<PartSet_FeatureLinePrs>(myFeaturePrs);
-          //if (aLinePrs) {
-          //  FeaturePtr aFeature = aPrs.feature();
-            //aLinePrs->projectPointOnLine(aFeature, myPointSelectionMode, aPoint, theView, aX, anY);
-          //}
+          //FeaturePtr aFeature = aPrs.feature();
+          //projectPointOnLine(aFeature, myPointSelectionMode, aPoint, theView, aX, anY);
         }
       }
     }
