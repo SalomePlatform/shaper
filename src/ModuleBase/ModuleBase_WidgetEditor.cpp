@@ -29,6 +29,12 @@ ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
 {
 }
 
+ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent, const std::string& theAttribute)
+: ModuleBase_ModelWidget(theParent, 0), myValue(0)
+{
+  this->setAttributeID(theAttribute);
+}
+
 ModuleBase_WidgetEditor::~ModuleBase_WidgetEditor()
 {
 }
@@ -87,3 +93,11 @@ QList<QWidget*> ModuleBase_WidgetEditor::getControls() const
   return aControls;
 }
 
+void ModuleBase_WidgetEditor::editFeatureValue(FeaturePtr theFeature, const std::string theAttribute)
+{
+  ModuleBase_WidgetEditor anEditor(0, theAttribute);
+
+  anEditor.restoreValue(theFeature);
+  anEditor.focusTo();
+  anEditor.storeValue(theFeature);
+}

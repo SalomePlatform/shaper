@@ -6,7 +6,10 @@
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketch.h>
 
+#include <SketchPlugin_Constraint.h>
+
 #include <ModuleBase_OperationDescription.h>
+#include <ModuleBase_WidgetEditor.h>
 #include <Model_Events.h>
 
 #include <XGUI_ViewerPrs.h>
@@ -66,12 +69,14 @@ FeaturePtr PartSet_OperationFeatureEdit::sketch() const
 }
 
 void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                             const std::list<XGUI_ViewerPrs>& /*theSelected*/,
+                                             const std::list<XGUI_ViewerPrs>& theSelected,
                                              const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
   FeaturePtr aFeature;
   if (!theHighlighted.empty())
     aFeature = theHighlighted.front().feature();
+  if (!aFeature && !theSelected.empty()) // changed for a constrain
+    aFeature = theSelected.front().feature();
 
   if (!aFeature || aFeature != feature())
   {
@@ -123,6 +128,23 @@ void PartSet_OperationFeatureEdit::mouseReleased(QMouseEvent* theEvent, Handle(V
                                               const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
   blockSelection(false);
+}
+
+void PartSet_OperationFeatureEdit::mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
+                                                    const std::list<XGUI_ViewerPrs>& theSelected,
+                                                    const std::list<XGUI_ViewerPrs>& theHighlighted)
+{
+  // changed
+  if (!theSelected.empty()) {
+    bool isValid;
+    double aValue = PartSet_Tools::featureValue(feature(), CONSTRAINT_ATTR_VALUE, isValid);
+    if (isValid) {
+      ModuleBase_WidgetEditor::editFeatureValue(feature(), CONSTRAINT_ATTR_VALUE);
+
+      //QPoint aPos = theEvent->globalPos();
+      //myEditor->start(aPos, aValue);
+    }
+  }
 }
 
 void PartSet_OperationFeatureEdit::startOperation()

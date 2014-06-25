@@ -6,7 +6,6 @@
 
 #include <PartSet_OperationFeatureEdit.h>
 #include <PartSet_OperationFeatureEditMulti.h>
-#include <PartSet_OperationEditConstraint.h>
 #include <PartSet_Tools.h>
 
 #include <SketchPlugin_Sketch.h>
@@ -245,10 +244,5 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
 
 std::string PartSet_OperationSketch::getOperationType(FeaturePtr theFeature)
 {
-  std::string aType = PartSet_OperationFeatureEdit::Type();
-
-  if (PartSet_Tools::isConstraintFeature(theFeature->getKind())) {
-    aType = PartSet_OperationEditConstraint::Type();
-  }
-  return aType;
+  return PartSet_OperationFeatureEdit::Type();
 }

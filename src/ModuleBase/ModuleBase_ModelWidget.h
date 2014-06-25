@@ -74,6 +74,10 @@ signals:
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
 
 protected:
+  /// Returns the attribute name
+  /// \returns the string value
+  void setAttributeID(const std::string& theAttribute) { myAttributeID = theAttribute; }
+
   bool myHasDefaultValue; /// the boolean state whether the control has a default value
 
 private:

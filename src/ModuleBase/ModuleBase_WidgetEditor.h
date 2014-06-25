@@ -27,6 +27,12 @@ public:
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
   ModuleBase_WidgetEditor(QWidget* theParent, const Config_WidgetAPI* theData);
+  /// Constructor
+  /// \theParent the parent object
+  /// \theParent the parent object
+  /// \theData the widget configuation. The attribute of the model widget is obtained from
+  ModuleBase_WidgetEditor(QWidget* theParent, const std::string& theAttribute);
+
   /// Destructor
   virtual ~ModuleBase_WidgetEditor();
 
@@ -47,6 +53,8 @@ public:
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
+
+  static void editFeatureValue(FeaturePtr theFeature, const std::string theAttribute);
 
 private:
   FeaturePtr myFeature; ///< the current widget feature
