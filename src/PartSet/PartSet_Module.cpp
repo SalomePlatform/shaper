@@ -1,10 +1,11 @@
 #include <PartSet_Module.h>
 #include <PartSet_OperationSketch.h>
 #include <PartSet_OperationCreateFeature.h>
-#include <PartSet_OperationEditFeature.h>
 #include <PartSet_OperationEditConstraint.h>
 #include <PartSet_OperationCreateConstraint.h>
 #include <PartSet_OperationFeatureCreate.h>
+#include <PartSet_OperationFeatureEditMulti.h>
+#include <PartSet_OperationFeatureEdit.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetFactory.h>
@@ -252,8 +253,8 @@ void PartSet_Module::onLaunchOperation(std::string theName, FeaturePtr theFeatur
   {
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     // refill the features list with avoiding of the features, obtained only by vertex shape (TODO)
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected(TopAbs_VERTEX);
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted(TopAbs_VERTEX);
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
     aPreviewOp->init(theFeature, aSelected, aHighlighted);
   } else {
     anOperation->setEditingFeature(theFeature);
@@ -268,14 +269,13 @@ void PartSet_Module::onMultiSelectionEnabled(bool theEnabled)
   aViewer->enableMultiselection(theEnabled);
 }
 
-void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop)
+void PartSet_Module::onStopSelection(const QFeatureList& theFeatures, const bool isStop)
 {
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   if (!isStop) {
-    std::list<XGUI_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
-    FeaturePtr aFeature;
+    QFeatureList::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
     for (; anIt != aLast; anIt++) {
-      activateFeature((*anIt).feature(), false);
+      activateFeature((*anIt), false);
     }
   }
   aDisplayer->stopSelection(theFeatures, isStop, false);
@@ -286,7 +286,7 @@ void PartSet_Module::onStopSelection(const std::list<XGUI_ViewerPrs>& theFeature
   aDisplayer->updateViewer();
 }
 
-void PartSet_Module::onSetSelection(const std::list<XGUI_ViewerPrs>& theFeatures)
+void PartSet_Module::onSetSelection(const QFeatureList& theFeatures)
 {
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   aDisplayer->setSelected(theFeatures, false);
@@ -343,10 +343,12 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
       aSketch = aPrevOp->sketch();
     if (PartSet_OperationFeatureCreate::canProcessKind(theCmdId))
       anOperation = new PartSet_OperationFeatureCreate(theCmdId.c_str(), this, aSketch);
-    else if (PartSet_OperationCreateFeature::canProcessKind(theCmdId))
+	else if (PartSet_OperationCreateFeature::canProcessKind(theCmdId))
       anOperation = new PartSet_OperationCreateFeature(theCmdId.c_str(), this, aSketch);
-    else if (theCmdId == PartSet_OperationEditFeature::Type())
-      anOperation = new PartSet_OperationEditFeature(theCmdId.c_str(), this, aSketch);
+	else if (theCmdId == PartSet_OperationFeatureEditMulti::Type())
+		anOperation = new PartSet_OperationFeatureEditMulti(theCmdId.c_str(), this, aSketch);
+    else if (theCmdId == PartSet_OperationFeatureEdit::Type())
+      anOperation = new PartSet_OperationFeatureEdit(theCmdId.c_str(), this, aSketch);
     else if (PartSet_OperationCreateConstraint::canProcessKind(theCmdId))
       anOperation = new PartSet_OperationCreateConstraint(theCmdId.c_str(), this, aSketch);
     else if (theCmdId == PartSet_OperationEditConstraint::Type())
@@ -390,10 +392,10 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
 
     connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)),
             this, SLOT(onMultiSelectionEnabled(bool)));
-    connect(aPreviewOp, SIGNAL(stopSelection(const std::list<XGUI_ViewerPrs>&, const bool)),
-            this, SLOT(onStopSelection(const std::list<XGUI_ViewerPrs>&, const bool)));
-    connect(aPreviewOp, SIGNAL(setSelection(const std::list<XGUI_ViewerPrs>&)),
-            this, SLOT(onSetSelection(const std::list<XGUI_ViewerPrs>&)));
+    connect(aPreviewOp, SIGNAL(stopSelection(const QFeatureList&, const bool)),
+            this, SLOT(onStopSelection(const QFeatureList&, const bool)));
+    connect(aPreviewOp, SIGNAL(setSelection(const QFeatureList&)),
+            this, SLOT(onSetSelection(const QFeatureList&)));
 
      connect(aPreviewOp, SIGNAL(closeLocalContext()),
              this, SLOT(onCloseLocalContext()));

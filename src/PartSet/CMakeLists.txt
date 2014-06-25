@@ -19,8 +19,9 @@ SET(PROJECT_HEADERS
 	PartSet_OperationCreateConstraint.h
 	PartSet_OperationCreateFeature.h
 	PartSet_OperationEditConstraint.h
-	PartSet_OperationEditFeature.h
 	PartSet_OperationFeatureCreate.h
+	PartSet_OperationFeatureEdit.h
+	PartSet_OperationFeatureEditMulti.h
 	PartSet_OperationSketchBase.h
 	PartSet_OperationSketch.h
 	PartSet_TestOCC.h
@@ -42,8 +43,9 @@ SET(PROJECT_SOURCES
 	PartSet_OperationCreateConstraint.cpp
 	PartSet_OperationCreateFeature.cpp
 	PartSet_OperationEditConstraint.cpp
-	PartSet_OperationEditFeature.cpp
 	PartSet_OperationFeatureCreate.cpp
+	PartSet_OperationFeatureEdit.cpp
+	PartSet_OperationFeatureEditMulti.cpp
 	PartSet_OperationSketchBase.cpp
 	PartSet_OperationSketch.cpp
 	PartSet_TestOCC.cpp

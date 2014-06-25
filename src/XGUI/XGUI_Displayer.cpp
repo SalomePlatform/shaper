@@ -217,16 +217,16 @@ void XGUI_Displayer::activateInLocalContext(FeaturePtr theFeature,
     updateViewer();
 }
 
-void XGUI_Displayer::stopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop,
+void XGUI_Displayer::stopSelection(const QFeatureList& theFeatures, const bool isStop,
                                    const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
   Handle(AIS_Shape) anAIS;
-  std::list<XGUI_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
+  QFeatureList::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
   FeaturePtr aFeature;
   for (; anIt != aLast; anIt++) {
-    aFeature = (*anIt).feature();
+    aFeature = *anIt;
     if (isVisible(aFeature))
       anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[aFeature]);
     if (anAIS.IsNull())
@@ -247,38 +247,15 @@ void XGUI_Displayer::stopSelection(const std::list<XGUI_ViewerPrs>& theFeatures,
     updateViewer();
 }
 
-void XGUI_Displayer::setSelected(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isUpdateViewer)
+void XGUI_Displayer::setSelected(const QFeatureList& theFeatures, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-
-  std::list<XGUI_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
-  FeaturePtr aFeature;
-
-  Handle(AIS_Shape) anAIS;
   // we need to unhighligth objects manually in the current local context
   // in couple with the selection clear (TODO)
   Handle(AIS_LocalContext) aLocalContext = aContext->LocalContext();
   if (!aLocalContext.IsNull())
     aLocalContext->UnhilightLastDetected(myWorkshop->viewer()->activeView());
-  aContext->ClearSelected(false);
 
-  for (; anIt != aLast; anIt++) {
-    aFeature = (*anIt).feature();
-    if (isVisible(aFeature))
-      anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[aFeature]);
-    if (anAIS.IsNull())
-      continue;
-    aContext->AddOrRemoveSelected(anAIS, false);
-  }
- 
-  if (isUpdateViewer)
-    updateViewer();
-}
-
-
-void XGUI_Displayer::setSelected(const QFeatureList& theFeatures, const bool isUpdateViewer)
-{
-  Handle(AIS_InteractiveContext) aContext = AISContext();
   aContext->ClearSelected();
   foreach(FeaturePtr aFeature, theFeatures) {
     FeaturePtr aRFeature = XGUI_Tools::realFeature(aFeature);

@@ -1,9 +1,9 @@
-// File:        PartSet_OperationEditFeature.h
+// File:        PartSet_OperationFeatureEdit.h
 // Created:     05 May 2014
 // Author:      Natalia ERMOLAEVA
 
-#ifndef PartSet_OperationEditFeature_H
-#define PartSet_OperationEditFeature_H
+#ifndef PartSet_OperationFeatureEdit_H
+#define PartSet_OperationFeatureEdit_H
 
 #include "PartSet.h"
 
@@ -13,10 +13,10 @@
 class QMouseEvent;
 
 /*!
- \class PartSet_OperationEditFeature
+ \class PartSet_OperationFeatureEdit
  * \brief The operation for the sketch feature creation
 */
-class PARTSET_EXPORT PartSet_OperationEditFeature : public PartSet_OperationSketchBase                                                 
+class PARTSET_EXPORT PartSet_OperationFeatureEdit : public PartSet_OperationSketchBase                                                 
 {
   Q_OBJECT
   /// Struct to define gp point, with the state is the point is initialized
@@ -55,10 +55,10 @@ public:
   /// \param theId the feature identifier
   /// \param theParent the operation parent
   /// \param theFeature the parent feature
-  PartSet_OperationEditFeature(const QString& theId, QObject* theParent,
+  PartSet_OperationFeatureEdit(const QString& theId, QObject* theParent,
                             FeaturePtr theFeature);
   /// Destructor
-  virtual ~PartSet_OperationEditFeature();
+  virtual ~PartSet_OperationFeatureEdit();
 
   /// Returns that this operator can be started above already running one.
   /// The runned operation should be the sketch feature modified operation
@@ -131,7 +131,6 @@ protected:
 
 private:
   FeaturePtr mySketch; ///< the sketch feature
-  std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
   Point myCurPoint; ///< the current 3D point clicked or moved
   bool myIsBlockedSelection; ///< the state of the last state of selection blocked signal
 };

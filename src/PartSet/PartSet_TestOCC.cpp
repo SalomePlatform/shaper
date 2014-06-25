@@ -184,9 +184,9 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
     //aDisplayer->activateInLocalContext(aFeature, aModes, true);
     myTestFeature = aFeature;
 
-    std::list<XGUI_ViewerPrs> aPrs;
-    aPrs.push_back(XGUI_ViewerPrs(myTestFeature, TopoDS_Shape(), NULL));
-    aDisplayer->setSelected(aPrs, true);
+    QFeatureList aFeatureList;
+    aFeatureList.append(myTestFeature);
+    aDisplayer->setSelected(aFeatureList, true);
   }
 }
 
@@ -215,9 +215,9 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   //aModes.push_back(TopAbs_EDGE);
   //aDisplayer->activateInLocalContext(aFeature, aModes, true);
 
-  /*std::list<XGUI_ViewerPrs> aPrs;
-  aPrs.push_back(XGUI_ViewerPrs(myTestFeature, TopoDS_Shape()));
-  theWorkshop->displayer()->setSelected(aPrs, true);*/
+  /*QFeatureList aFeatureList;
+  aFeatureList.append(myTestFeature);
+  theWorkshop->displayer()->setSelected(aFeatureList, true);*/
 
   theWorkshop->displayer()->updateViewer();
 }

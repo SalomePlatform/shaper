@@ -106,13 +106,8 @@ public:
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void stopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop,
+  void stopSelection(const QFeatureList& theFeatures, const bool isStop,
                      const bool isUpdateViewer);
-
-  /// Set the features are selected
-  /// \param theFeatures a list of features to be selected
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void setSelected(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isUpdateViewer);
 
   /**
   * Add presentations which corresponds to the given features to current selection

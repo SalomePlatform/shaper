@@ -13,6 +13,9 @@
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Operation.h>
+
+#include <XGUI_Constants.h>
+
 #include <QObject>
 
 #include <map>
@@ -134,10 +137,10 @@ signals:
   /// signal to enable/disable selection in the viewer
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
-  void stopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool theToStop);
+  void stopSelection(const QFeatureList& theFeatures, const bool theToStop);
   /// signal to set selection in the viewer
   /// \param theFeatures a list of features to be disabled
-  void setSelection(const std::list<XGUI_ViewerPrs>& theFeatures);
+  void setSelection(const QFeatureList& theFeatures);
 
   /// signal to close the operation local context if it is opened
   void closeLocalContext();

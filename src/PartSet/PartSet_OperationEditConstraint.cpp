@@ -233,7 +233,7 @@ void PartSet_OperationEditConstraint::blockSelection(bool isBlocked, const bool 
 
   myIsBlockedSelection = isBlocked;
   if (isBlocked) {
-    emit setSelection(std::list<XGUI_ViewerPrs>());
+    emit setSelection(QFeatureList());
     //emit stopSelection(myFeatures, true);
   }
   else {

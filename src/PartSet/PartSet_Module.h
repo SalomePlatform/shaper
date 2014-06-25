@@ -105,11 +105,11 @@ public slots:
   /// SLOT, to stop or start selection mode for the features
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
-  void onStopSelection(const std::list<XGUI_ViewerPrs>& theFeatures, const bool isStop);
+  void onStopSelection(const QFeatureList& theFeatures, const bool isStop);
 
   /// SLOT, to set selection
   /// \param theFeatures a list of features to be selected
-  void onSetSelection(const std::list<XGUI_ViewerPrs>& theFeatures);
+  void onSetSelection(const QFeatureList& theFeatures);
 
   /// SLOT, to close the viewer local context
   void onCloseLocalContext();

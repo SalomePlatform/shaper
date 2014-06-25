@@ -4,7 +4,8 @@
 
 #include <PartSet_OperationSketch.h>
 
-#include <PartSet_OperationEditFeature.h>
+#include <PartSet_OperationFeatureEdit.h>
+#include <PartSet_OperationFeatureEditMulti.h>
 #include <PartSet_OperationEditConstraint.h>
 #include <PartSet_Tools.h>
 
@@ -92,8 +93,12 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
 
     if (theHighlighted.size() == 1) {
       FeaturePtr aFeature = theHighlighted.front().feature();
-      if (aFeature)
-        restartOperation(getOperationType(aFeature), aFeature);
+      if (aFeature) {
+        std::string anOperationType = getOperationType(aFeature);
+        if (theSelected.size() > 1)
+          anOperationType = PartSet_OperationFeatureEditMulti::Type();
+        restartOperation(anOperationType, aFeature);
+      }
     }
     else
       myFeatures = theHighlighted;
@@ -125,7 +130,7 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View)
     FeaturePtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), theView, feature(),
                                                         myFeatures);
     if (aFeature)
-      restartOperation(getOperationType(aFeature), aFeature);
+		restartOperation(PartSet_OperationFeatureEditMulti::Type(), aFeature);
   }
 }
 
@@ -240,7 +245,7 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
 
 std::string PartSet_OperationSketch::getOperationType(FeaturePtr theFeature)
 {
-  std::string aType = PartSet_OperationEditFeature::Type();
+  std::string aType = PartSet_OperationFeatureEdit::Type();
 
   if (PartSet_Tools::isConstraintFeature(theFeature->getKind())) {
     aType = PartSet_OperationEditConstraint::Type();
