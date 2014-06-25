@@ -57,6 +57,12 @@ public:
 
   void initFromPrevious(FeaturePtr theFeature);
 
+signals:
+  /// Signal about the point 2d set to the feature
+  /// \param the feature
+  /// \param the attribute of the feature
+  void storedPoint2D(FeaturePtr theFeature, const std::string& theAttribute);
+
 private:
   QGroupBox* myGroupBox; ///< the parent group box for all intenal widgets
   QDoubleSpinBox* myXSpin; ///< the spin box for the X coordinate

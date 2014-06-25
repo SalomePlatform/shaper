@@ -7,6 +7,7 @@
 
 #include <XGUI_Constants.h>
 #include <XGUI_PropertyPanel.h>
+#include <ModuleBase_WidgetPoint2D.h>
 
 #include <QWidget>
 #include <QVBoxLayout>
@@ -95,6 +96,11 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
 
       connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
               this, SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
+
+      ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
+      if (aPointWidget)
+        connect(aPointWidget, SIGNAL(storedPoint2D(FeaturePtr, const std::string&)),
+                this, SIGNAL(storedPoint2D(FeaturePtr, const std::string&)));
     }
     ModuleBase_ModelWidget* aLastWidget = theWidgets.last();
     if (aLastWidget) {

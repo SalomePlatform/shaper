@@ -51,6 +51,11 @@ signals:
   /// \param theWidget the activated widget
   void widgetActivated(ModuleBase_ModelWidget* theWidget);
 
+  /// Signal about the point 2d set to the feature
+  /// \param the feature
+  /// \param the attribute of the feature
+  void storedPoint2D(FeaturePtr theFeature, const std::string& theAttribute);
+
 protected:
   /// Activate the widget, which means the focus on the widget.
   /// The signal about the widget activation is emitted

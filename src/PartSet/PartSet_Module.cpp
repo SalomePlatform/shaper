@@ -15,6 +15,10 @@
 #include <ModuleBase_Operation.h>
 #include <ModelAPI_Object.h>
 
+#include <ModelAPI_Data.h>
+#include <GeomDataAPI_Point2D.h>
+#include <PartSet_Tools.h>
+
 #include <XGUI_MainWindow.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_Viewer.h>
@@ -84,7 +88,6 @@ PartSet_Module::PartSet_Module(XGUI_Workshop* theWshop)
           this, SLOT(onKeyRelease(QKeyEvent*)));
   connect(myWorkshop->viewer(), SIGNAL(mouseDoubleClick(QMouseEvent*)),
           this, SLOT(onMouseDoubleClick(QMouseEvent*)));
-
 }
 
 PartSet_Module::~PartSet_Module()
@@ -149,6 +152,9 @@ void PartSet_Module::onOperationStarted()
     XGUI_PropertyPanel* aPropPanel = myWorkshop->propertyPanel();
     connect(aPreviewOp, SIGNAL(focusActivated(const std::string&)),
             aPropPanel, SLOT(onFocusActivated(const std::string&)));
+
+    connect(aPropPanel, SIGNAL(storedPoint2D(FeaturePtr, const std::string&)),
+      this, SLOT(onStorePoint2D(FeaturePtr, const std::string&)), Qt::UniqueConnection);
   }
 }
 
@@ -161,6 +167,8 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
     XGUI_PropertyPanel* aPropPanel = myWorkshop->propertyPanel();
     disconnect(aPreviewOp, SIGNAL(focusActivated(const std::string&)),
                aPropPanel, SLOT(onFocusActivated(const std::string&)));
+    //disconnect(aPropPanel, SIGNAL(storedPoint2D(FeaturePtr, const std::string&)),
+    //           this, SLOT(onStorePoint2D(FeaturePtr, const std::string&)));
   }
 }
 
@@ -512,4 +520,18 @@ void PartSet_Module::editFeature(FeaturePtr theFeature)
       updateCurrentPreview(aFeature->getKind());
     }
 //  }
+}
+
+void PartSet_Module::onStorePoint2D(FeaturePtr theFeature, const std::string& theAttribute)
+{
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
+                                       myWorkshop->operationMgr()->currentOperation());
+  if (!aPreviewOp)
+    return;
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->data()->attribute(theAttribute));
+
+  PartSet_Tools::setConstraints(aPreviewOp->sketch(), theFeature, theAttribute,
+                                aPoint->x(), aPoint->y());
 }

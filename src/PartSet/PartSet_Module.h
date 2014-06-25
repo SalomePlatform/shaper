@@ -119,6 +119,12 @@ public slots:
   /// \param theMode the mode appeared on the feature
   void onFeatureConstructed(FeaturePtr theFeature,
                             int theMode);
+
+  /// Slot which reacts to the point 2d set to the feature. Creates a constraint
+  /// \param the feature
+  /// \param the attribute of the feature
+  void onStorePoint2D(FeaturePtr theFeature, const std::string& theAttribute);
+
 protected:
   /// Creates a new operation
   /// \param theCmdId the operation name

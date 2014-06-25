@@ -146,7 +146,10 @@ void ModuleBase_WidgetPoint2D::initFromPrevious(FeaturePtr theFeature)
   if (aPoint) {
     bool isBlocked = this->blockSignals(true);
     myXSpin->setValue(aPoint->x());
-    this->blockSignals(isBlocked);
     myYSpin->setValue(aPoint->y());
+    this->blockSignals(isBlocked);
+
+    emit valuesChanged();
+    emit storedPoint2D(theFeature, myOptionParam);
   }
 }
