@@ -24,30 +24,30 @@
       <feature id="SketchConstraintCoincidence" title="Points coincidence" tooltip="Create constraint for the coincidence of two points" internal="1"/>
       <feature id="SketchConstraintDistance" title="Distance between objects" tooltip="Create constraint for the distance from a point to an object">
         <label title="Select point and another feature (point or point on line) between which to calculate distance" tooltip="Select point and another feature (point or point on line) between which to calculate distance"/>
-        <feature_selector id="ConstraintEntityA" keysequence="SketchPoint" internal="1"/>
-        <feature_selector id="ConstraintEntityB" keysequence="SketchPoint" internal="1"/>
+        <feature_selector id="ConstraintEntityA" label="First point" tooltip="Select an entity in the viewer" keysequence="SketchPoint"/>
+        <feature_selector id="ConstraintEntityB" label="Last point" tooltip="Select an entity in the viewer" keysequence="SketchPoint"/>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
         <doublevalue_editor id="ConstraintValue"/>
       </feature>
       <feature id="SketchConstraintLength" title="Length of a line" tooltip="Create constraint for the given length of a line segment">
         <label title="Select a line entity on which to calculate lenght" tooltip="Select a line entity on which to calculate lenght"/>
-        <feature_selector id="ConstraintEntityA" keysequence="SketchLine" internal="1"/>
+        <feature_selector id="ConstraintEntityA" label="Line" tooltip="Select an entity in the viewer" keysequence="SketchLine"/>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
         <doublevalue_editor id="ConstraintValue"/>
       </feature>
       <feature id="SketchConstraintRadius" title="Radius of a circle or an arc" tooltip="Create constraint for the given radius of a circle or an arc">
         <label title="Select two points on a circle or an arc of circle on which to calculate radius" tooltip="Select two points on a circle or an arc of circle on which to calculate radius"/>
-        <feature_selector id="ConstraintEntityA" keysequence="SketchCircle SketchArc" internal="1"/>
+        <feature_selector id="ConstraintEntityA" label="Circle or Arc" tooltip="Select an entity in the viewer" keysequence="SketchCircle SketchArc"/>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
         <doublevalue_editor id="ConstraintValue"/>
       </feature>
       <feature id="SketchConstraintParallel" title="Parallelism of a lines" tooltip="Create constraint defining two parallel lines">
-        <feature_selector id="ConstraintEntityA" keysequence="SketchLine" internal="1"/>
-        <feature_selector id="ConstraintEntityB" keysequence="SketchLine" internal="1"/>
+        <feature_selector id="ConstraintEntityA" label="First line" tooltip="Select an entity in the viewer" keysequence="SketchLine"/>
+        <feature_selector id="ConstraintEntityB" label="Last line" tooltip="Select an entity in the viewer" keysequence="SketchLine"/>
       </feature>
       <feature id="SketchConstraintPerpendicular" title="Orthgonality of a lines" tooltip="Create constraint defining two perpendicular lines">
-        <feature_selector id="ConstraintEntityA" keysequence="SketchLine" internal="1"/>
-        <feature_selector id="ConstraintEntityB" keysequence="SketchLine" internal="1"/>
+        <feature_selector id="ConstraintEntityA" label="First line" tooltip="Select an entity in the viewer" keysequence="SketchLine"/>
+        <feature_selector id="ConstraintEntityB" label="Last line" tooltip="Select an entity in the viewer" keysequence="SketchLine"/>
       </feature>
     </group>
   </workbench>

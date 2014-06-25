@@ -64,8 +64,9 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
       if (!isInternalWidget(aWdgType)) {
         aWidgetLay->addWidget(aWidget);
       }
-      else
+      else {
         aWidget->setVisible(false);
+      }
     }
     if (myWidgetApi->isContainerWidget()) {
       //if current widget is groupbox (container) process it's children recursively

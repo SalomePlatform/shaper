@@ -16,6 +16,9 @@
 #include <ModelAPI_AttributeRefAttr.h>
 
 #include <QWidget>
+#include <QLineEdit>
+#include <QHBoxLayout>
+#include <QLabel>
 
 ModuleBase_WidgetFeature::ModuleBase_WidgetFeature(QWidget* theParent,
                                                    const Config_WidgetAPI* theData)
@@ -23,6 +26,26 @@ ModuleBase_WidgetFeature::ModuleBase_WidgetFeature(QWidget* theParent,
 {
   QString aKinds = QString::fromStdString(theData->getProperty(FEATURE_KEYSEQUENCE));
   myFeatureKinds = aKinds.split(" ");
+
+  myContainer = new QWidget(theParent);
+  QHBoxLayout* aControlLay = new QHBoxLayout(myContainer);
+  aControlLay->setContentsMargins(0, 0, 0, 0);
+
+  QString aLabelText = QString::fromStdString(theData->widgetLabel());
+  myLabel = new QLabel(aLabelText, myContainer);
+  aControlLay->addWidget(myLabel);
+
+  myEditor = new QLineEdit(myContainer);
+  QString anObjName = QString::fromStdString(attributeID());
+  myEditor->setObjectName(anObjName);
+  myEditor->setReadOnly(true);
+  aControlLay->addWidget(myEditor);
+
+  QString aTTip = QString::fromStdString(theData->widgetTooltip());
+  myEditor->setToolTip(aTTip);
+
+  aControlLay->addWidget(myEditor);
+  aControlLay->setStretch(1, 1);
 }
 
 ModuleBase_WidgetFeature::~ModuleBase_WidgetFeature()
@@ -34,9 +57,8 @@ bool ModuleBase_WidgetFeature::setFeature(const FeaturePtr& theFeature)
   if (!theFeature || !myFeatureKinds.contains(theFeature->getKind().c_str()))
     return false;
 
-  //bool isBlocked = this->blockSignals(true);
   myFeature = theFeature;
-  //this->blockSignals(isBlocked);
+  myEditor->setText(theFeature ? theFeature->data()->getName().c_str() : "");
   emit valuesChanged();
   return true;
 }
@@ -48,11 +70,9 @@ bool ModuleBase_WidgetFeature::storeValue(FeaturePtr theFeature) const
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
   ModuleBase_WidgetFeature* that = (ModuleBase_WidgetFeature*) this;
-  //bool isBlocked = that->blockSignals(true);
   aRef->setFeature(myFeature);
   theFeature->execute();
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
-  //that->blockSignals(isBlocked);
 
   return true;
 }
@@ -63,19 +83,20 @@ bool ModuleBase_WidgetFeature::restoreValue(FeaturePtr theFeature)
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
-  //bool isBlocked = this->blockSignals(true);
   myFeature = aRef->feature();
-  //this->blockSignals(isBlocked);
+  myEditor->setText(myFeature ? myFeature->data()->getName().c_str() : "");
   return true;
 }
 
 QWidget* ModuleBase_WidgetFeature::getControl() const
 {
-  return 0;
+  return myContainer;
 }
 
 QList<QWidget*> ModuleBase_WidgetFeature::getControls() const
 {
-  QList<QWidget*> aControls;
-  return aControls;
+  QList<QWidget*> aList;
+  aList.append(myLabel);
+  aList.append(myEditor);
+  return aList;
 }

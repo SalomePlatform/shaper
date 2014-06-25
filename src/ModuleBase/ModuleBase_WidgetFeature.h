@@ -12,6 +12,9 @@
 #include <QStringList>
 
 class ModelAPI_Feature;
+class QWidget;
+class QLabel;
+class QLineEdit;
 
 /**\class ModuleBase_WidgetFeature
  * \ingroup GUI
@@ -50,6 +53,10 @@ public:
 private:
   FeaturePtr myFeature; ///< the current widget feature
   QStringList myFeatureKinds; ///< the kinds of possible features
+
+  QWidget*   myContainer; /// the parent top control
+  QLabel*    myLabel; /// the editor information label
+  QLineEdit* myEditor; ///< the feature editor to visualize the feature name
 };
 
 #endif
