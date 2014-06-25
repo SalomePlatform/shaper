@@ -293,6 +293,11 @@ void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin
       (*aGroupIter)->updateEntityIfPossible(anAttribute);
     }
   }
+
+  std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter;
+  for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
+    if (!(*aGroupIter)->isEmpty())
+      (*aGroupIter)->updateRelatedConstraints(theFeature);
 }
 
 

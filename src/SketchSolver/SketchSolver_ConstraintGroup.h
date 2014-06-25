@@ -94,6 +94,12 @@ public:
    */
   void resolveConstraints();
 
+  /** \brief Searches the constraints built on the entity and emit the signal to update them
+   *  \param[in] theEntity attribute of the constraint
+   */
+  void updateRelatedConstraints(boost::shared_ptr<ModelAPI_Attribute> theEntity)  const;
+  void updateRelatedConstraints(boost::shared_ptr<ModelAPI_Feature>   theFeature) const;
+
 protected:
   /** \brief Adds or updates an entity in the group
    *

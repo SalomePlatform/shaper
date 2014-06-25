@@ -6,6 +6,7 @@
 
 #include <SketchSolver_Constraint.h>
 
+#include <Events_Error.h>
 #include <Events_Loop.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
@@ -29,6 +30,8 @@
 
 /// Tolerance for value of parameters
 const double tolerance = 1.e-10;
+
+const std::string ERROR_SOLVE_CONSTRAINTS = "Conflicting constraints";
 
 /// This value is used to give unique index to the groups
 static Slvs_hGroup myGroupIndexer = 0;
@@ -559,7 +562,8 @@ void SketchSolver_ConstraintGroup::resolveConstraints()
     for ( ; anEntIter != myEntityAttrMap.end(); anEntIter++)
       updateAttribute(anEntIter->first, anEntIter->second);
   }
-  /// \todo Implement error handling
+  else if (!myConstraints.empty())
+    Events_Error::send(ERROR_SOLVE_CONSTRAINTS, this);
 
   removeTemporaryConstraints();
   myNeedToSolve = false;
@@ -855,6 +859,8 @@ void SketchSolver_ConstraintGroup::updateEntityIfPossible(
 
     // Restore flag of changes
     myNeedToSolve = myNeedToSolve || aNeedToSolveCopy;
+
+    updateRelatedConstraints(theEntity);
   }
 }
 
@@ -1089,6 +1095,61 @@ bool SketchSolver_ConstraintGroup::addCoincidentPoints(
   return true;
 }
 
+
+// ============================================================================
+//  Function: updateRelatedConstraints
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  emit the signal to update constraints
+// ============================================================================
+void SketchSolver_ConstraintGroup::updateRelatedConstraints(
+                    boost::shared_ptr<ModelAPI_Attribute> theEntity) const
+{
+  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::const_iterator
+    aConstrIter = myConstraintMap.begin();
+  for ( ; aConstrIter != myConstraintMap.end(); aConstrIter++)
+  {
+    std::list< boost::shared_ptr<ModelAPI_Attribute> > anAttributes = 
+      aConstrIter->first->data()->attributes(theEntity->attributeType());
+
+    std::list< boost::shared_ptr<ModelAPI_Attribute> >::iterator
+      anAttrIter = anAttributes.begin();
+    for ( ; anAttrIter != anAttributes.end(); anAttrIter++)
+      if (*anAttrIter == theEntity)
+      {
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
+        Model_FeatureUpdatedMessage aMsg(aConstrIter->first, anEvent);
+        Events_Loop::loop()->send(aMsg, true);
+        break;
+      }
+  }
+}
+
+void SketchSolver_ConstraintGroup::updateRelatedConstraints(
+                    boost::shared_ptr<ModelAPI_Feature> theFeature) const
+{
+  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::const_iterator
+    aConstrIter = myConstraintMap.begin();
+  for ( ; aConstrIter != myConstraintMap.end(); aConstrIter++)
+  {
+    std::list< boost::shared_ptr<ModelAPI_Attribute> > anAttributes = 
+      aConstrIter->first->data()->attributes(std::string());
+
+    std::list< boost::shared_ptr<ModelAPI_Attribute> >::iterator
+      anAttrIter = anAttributes.begin();
+    for ( ; anAttrIter != anAttributes.end(); anAttrIter++)
+    {
+      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRefAttr = 
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
+      if (aRefAttr && aRefAttr->isFeature() && aRefAttr->feature() == theFeature)
+      {
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
+        Model_FeatureUpdatedMessage aMsg(aConstrIter->first, anEvent);
+        Events_Loop::loop()->send(aMsg, true);
+        break;
+      }
+    }
+  }
+}
 
 
 
