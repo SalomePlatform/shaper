@@ -26,6 +26,8 @@
 #include <SketchPlugin_Line.h>
 
 #include <V3d_View.hxx>
+#include <AIS_DimensionOwner.hxx>
+#include <AIS_DimensionSelectionMode.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -134,13 +136,19 @@ void PartSet_OperationFeatureEdit::mouseDoubleClick(QMouseEvent* theEvent, Handl
                                                     const std::list<XGUI_ViewerPrs>& theSelected,
                                                     const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
-  // changed
+  // TODO the functionality is important only for constraint feature. Should be moved in another place
   if (!theSelected.empty()) {
-    bool isValid;
-    double aValue = PartSet_Tools::featureValue(feature(), CONSTRAINT_ATTR_VALUE, isValid);
-    if (isValid) {
-      ModuleBase_WidgetEditor::editFeatureValue(feature(), CONSTRAINT_ATTR_VALUE);
-      flushUpdated();
+    XGUI_ViewerPrs aFeaturePrs = theSelected.front();
+    if (!aFeaturePrs.owner().IsNull()) {
+      Handle(AIS_DimensionOwner) anOwner = Handle(AIS_DimensionOwner)::DownCast(aFeaturePrs.owner());
+      if (!anOwner.IsNull() && anOwner->SelectionMode() == AIS_DSM_Text) {
+        bool isValid;
+        double aValue = PartSet_Tools::featureValue(feature(), CONSTRAINT_ATTR_VALUE, isValid);
+        if (isValid) {
+          ModuleBase_WidgetEditor::editFeatureValue(feature(), CONSTRAINT_ATTR_VALUE);
+          flushUpdated();
+        }
+      }
     }
   }
 }
