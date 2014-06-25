@@ -27,6 +27,7 @@ public:
 
   QWidget* contentWidget();
   void setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets);
+  const QList<ModuleBase_ModelWidget*>& modelWidgets() const;
 
   void cleanContent();
 

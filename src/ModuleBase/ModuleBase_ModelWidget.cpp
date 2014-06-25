@@ -4,6 +4,9 @@
 
 #include "ModuleBase_ModelWidget.h"
 
+#include <ModelAPI_Data.h>
+#include <ModelAPI_Attribute.h>
+
 #include "Config_WidgetAPI.h"
 
 #include <QWidget>
@@ -12,6 +15,11 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QObject* theParent, const Config_
  : QObject(theParent), myHasDefaultValue(false)
 {
   myAttributeID = theData ? theData->widgetId() : "";
+}
+
+bool ModuleBase_ModelWidget::isInitialized(FeaturePtr theFeature) const
+{
+  return theFeature->data()->attribute(attributeID())->isInitialized();
 }
 
 bool ModuleBase_ModelWidget::canFocusTo(const std::string& theAttributeName) const

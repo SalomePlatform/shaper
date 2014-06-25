@@ -43,42 +43,44 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Arc::preview()
     // compute a circle point in 3D view
     boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
       boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(ARC_ATTR_CENTER));
-    boost::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
-    // make a visible point
-    boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
-    aShapes.push_back(aCenterPointShape);
-
-    // make a visible circle
-    boost::shared_ptr<GeomDataAPI_Dir> aNDir = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->data()->attribute(SKETCH_ATTR_NORM));
-    bool aHasPlane = aNDir && !(aNDir->x() == 0 && aNDir->y() == 0 && aNDir->z() == 0);
-    if (aHasPlane) {
-      boost::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
       // compute the arc start point
       boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(ARC_ATTR_START));
-      boost::shared_ptr<GeomAPI_Pnt> aStartPoint(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
+      if (aCenterAttr->isInitialized() && aStartAttr->isInitialized()) {
+      boost::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
+      // make a visible point
+      boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
+      aShapes.push_back(aCenterPointShape);
 
-      // compute and change the arc end point
-      boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(ARC_ATTR_END));
-      if (anEndAttr->isInitialized())
-      {
-        boost::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
-          new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
-        boost::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEndAttr->pnt());
-        if (aProjection && anEndAttr->pnt()->distance(aProjection) > Precision::Confusion())
-          anEndAttr->setValue(aProjection);
+      // make a visible circle
+      boost::shared_ptr<GeomDataAPI_Dir> aNDir = 
+        boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->data()->attribute(SKETCH_ATTR_NORM));
+      bool aHasPlane = aNDir && !(aNDir->x() == 0 && aNDir->y() == 0 && aNDir->z() == 0);
+      if (aHasPlane) {
+        boost::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
+        boost::shared_ptr<GeomAPI_Pnt> aStartPoint(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
+
+        // compute and change the arc end point
+        boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
+          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(ARC_ATTR_END));
+        if (anEndAttr->isInitialized())
+        {
+          boost::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
+            new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
+          boost::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEndAttr->pnt());
+          if (aProjection && anEndAttr->pnt()->distance(aProjection) > Precision::Confusion())
+            anEndAttr->setValue(aProjection);
+        }
+        boost::shared_ptr<GeomAPI_Pnt> aEndPoint(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
+
+        boost::shared_ptr<GeomAPI_Shape> aCircleShape = 
+                   GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStartPoint, aEndPoint, aNormal);
+        if (aCircleShape)
+          aShapes.push_back(aCircleShape);
       }
-      boost::shared_ptr<GeomAPI_Pnt> aEndPoint(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
-
-      boost::shared_ptr<GeomAPI_Shape> aCircleShape = 
-                 GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStartPoint, aEndPoint, aNormal);
-      if (aCircleShape)
-        aShapes.push_back(aCircleShape);
+      boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+      setPreview(aCompound);
     }
-    boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
-    setPreview(aCompound);
   }
   return getPreview();
 }

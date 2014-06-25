@@ -167,8 +167,10 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
         isApplyed = setWidgetFeature(aFeature);
     }
   }
-  flushUpdated();
-  emit activateNextWidget(myActiveWidget);
+  if (isApplyed) {
+    flushUpdated();
+    emit activateNextWidget(myActiveWidget);
+  }
 }
 
 void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)

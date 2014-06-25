@@ -122,6 +122,11 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
   }
 }
 
+const QList<ModuleBase_ModelWidget*>& XGUI_PropertyPanel::modelWidgets() const
+{
+  return myWidgets;
+}
+
 bool XGUI_PropertyPanel::eventFilter(QObject *theObject, QEvent *theEvent)
 {
   QPushButton* anOkBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_OK);

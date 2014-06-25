@@ -155,6 +155,8 @@ protected slots:
 
   void onContextMenuCommand(const QString& theId, bool isChecked);
 
+  void onWidgetValuesChanged();
+
 private:
   void initMenu();
 

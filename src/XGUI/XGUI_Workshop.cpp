@@ -322,7 +322,9 @@ void XGUI_Workshop::onOperationStarted()
     ModuleBase_ModelWidget* aWidget;
     for (; anIt != aLast; anIt++) {
       aWidget = *anIt;
-      QObject::connect(aWidget, SIGNAL(valuesChanged()),  aOperation, SLOT(storeCustomValue()));
+      //QObject::connect(aWidget, SIGNAL(valuesChanged()),  aOperation, SLOT(storeCustomValue()));
+      QObject::connect(aWidget, SIGNAL(valuesChanged()),
+                       this, SLOT(onWidgetValuesChanged()));
       // Init default values
       if (!aOperation->isEditOperation() && aWidget->hasDefaultValue()) {
         aWidget->storeValue(aOperation->feature());
@@ -821,6 +823,26 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     showFeatures(aFeatures, true);
   else if (theId == "HIDE_CMD")
     showFeatures(aFeatures, false);
+}
+
+//**************************************************************
+void XGUI_Workshop::onWidgetValuesChanged()
+{
+  ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
+  FeaturePtr aFeature = anOperation->feature();
+
+  ModuleBase_ModelWidget* aSenderWidget = dynamic_cast<ModuleBase_ModelWidget*>(sender());
+  //if (aCustom)
+  //  aCustom->storeValue(aFeature);
+
+  const QList<ModuleBase_ModelWidget*>& aWidgets = myPropertyPanel->modelWidgets();
+  QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
+  for (; anIt != aLast; anIt++) {
+    ModuleBase_ModelWidget* aCustom = *anIt;
+    if (aCustom && (!aCustom->isInitialized(aFeature) || aCustom == aSenderWidget)) {
+      aCustom->storeValue(aFeature);
+    }
+  }
 }
 
 //**************************************************************

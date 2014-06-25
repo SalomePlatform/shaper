@@ -36,6 +36,11 @@ public:
   /// Destructor
   virtual ~ModuleBase_ModelWidget() {};
 
+  /// Returns the state whether the attribute of the feature is initialized
+  /// \param theFeature a model feature to be checked
+  /// \return the boolean result
+  bool isInitialized(FeaturePtr theFeature) const;
+
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed
   virtual bool storeValue(FeaturePtr theFeature) const = 0;
