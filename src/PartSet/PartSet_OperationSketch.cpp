@@ -93,7 +93,7 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
     if (theHighlighted.size() == 1) {
       FeaturePtr aFeature = theHighlighted.front().feature();
       if (aFeature) {
-        std::string anOperationType = getOperationType(aFeature);
+        std::string anOperationType = PartSet_OperationFeatureEdit::Type();
         if (theSelected.size() > 1)
           anOperationType = PartSet_OperationFeatureEditMulti::Type();
         restartOperation(anOperationType, aFeature);
@@ -119,7 +119,7 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
     if (theSelected.size() == 1) {
       FeaturePtr aFeature = theSelected.front().feature();
       if (aFeature)
-        restartOperation(getOperationType(aFeature), aFeature);
+        restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
     }
   }
 }
@@ -244,9 +244,4 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
   emit featureConstructed(feature(), FM_Hide);
   emit closeLocalContext();
   emit planeSelected(aDir->x(), aDir->y(), aDir->z());
-}
-
-std::string PartSet_OperationSketch::getOperationType(FeaturePtr theFeature)
-{
-  return PartSet_OperationFeatureEdit::Type();
 }
