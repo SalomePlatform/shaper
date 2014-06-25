@@ -307,7 +307,8 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
 
 bool PartSet_OperationFeatureCreate::isPointWidget() const
 {
-  return dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
+  return dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget) ||
+         dynamic_cast<ModuleBase_WidgetPoint2dDistance*>(myActiveWidget);
 }
 
 bool PartSet_OperationFeatureCreate::setWidgetPoint(double theX, double theY)

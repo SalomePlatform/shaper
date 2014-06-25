@@ -35,7 +35,8 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent, c
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   myLabel = new QLabel(aLabelText, myContainer);
-  myLabel->setPixmap(QPixmap(aLabelIcon));
+  if (!aLabelIcon.isEmpty())
+    myLabel->setPixmap(QPixmap(aLabelIcon));
   aControlLay->addWidget(myLabel);
 
   mySpinBox = new QDoubleSpinBox(myContainer);
