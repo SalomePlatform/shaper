@@ -193,7 +193,7 @@ QWidget* ModuleBase_WidgetFactory::doubleValueEditor(QWidget* theParent)
 {
   ModuleBase_WidgetEditor* aWidget = new ModuleBase_WidgetEditor(theParent, myWidgetApi);
   myModelWidgets.append(aWidget);
-  return 0;
+  return aWidget->getControl();
 }
 
 QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const

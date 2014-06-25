@@ -22,82 +22,68 @@
 #include <QTimer>
 #include <QDialog>
 #include <QLayout>
+#include <QDoubleSpinBox>
 
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
                                                  const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent, theData), myValue(0)
+: ModuleBase_WidgetDoubleValue(theParent, theData)
 {
 }
 
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent, const std::string& theAttribute)
-: ModuleBase_ModelWidget(theParent, 0), myValue(0)
+: ModuleBase_WidgetDoubleValue(theParent, 0)
 {
-  this->setAttributeID(theAttribute);
+  setAttributeID(theAttribute);
 }
 
 ModuleBase_WidgetEditor::~ModuleBase_WidgetEditor()
 {
 }
 
-bool ModuleBase_WidgetEditor::storeValue(FeaturePtr theFeature) const
+double editedValue(double theValue, bool& isDone)
 {
-  DataPtr aData = theFeature->data();
-  AttributeDoublePtr aReal = aData->real(attributeID());
-  if (aReal->value() != myValue) {
-    aReal->setValue(myValue);
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
-  }
-  return true;
-}
-
-bool ModuleBase_WidgetEditor::restoreValue(FeaturePtr theFeature)
-{
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  AttributeDoublePtr aRef = aData->real(attributeID());
-
-  myValue = aRef->value();
-  return true;
-}
-
-void ModuleBase_WidgetEditor::focusTo()
-{
-  QPoint aPoint = QCursor::pos();
-
   QDialog aDlg;
   aDlg.setWindowFlags(Qt::FramelessWindowHint);
   QHBoxLayout* aLay = new QHBoxLayout(&aDlg);
   aLay->setContentsMargins(0,0,0,0);
 
-  QLineEdit* aEditor = new QLineEdit(QString::number(myValue), &aDlg);
-  connect(aEditor, SIGNAL(returnPressed()), &aDlg, SLOT(accept()));
+  QLineEdit* aEditor = new QLineEdit(QString::number(theValue), &aDlg);
+  QObject::connect(aEditor, SIGNAL(returnPressed()), &aDlg, SLOT(accept()));
   aLay->addWidget(aEditor);
 
+  QPoint aPoint = QCursor::pos();
   aDlg.move(aPoint);
-  int aRes = aDlg.exec();
 
-  if (aRes == QDialog::Accepted)
-    myValue = aEditor->text().toDouble();
+  isDone = aDlg.exec() == QDialog::Accepted;
+  double aValue = theValue;
+  if (isDone)
+    aValue = aEditor->text().toDouble();
+  return aValue;
+}
 
+void ModuleBase_WidgetEditor::focusTo()
+{
+  double aValue = mySpinBox->value();
+  bool isDone;
+  aValue = editedValue(aValue, isDone);
+
+  if (isDone) {
+    bool isBlocked = mySpinBox->blockSignals(true);
+    mySpinBox->setValue(aValue);
+    mySpinBox->blockSignals(isBlocked);
+  }
   emit valuesChanged();
   emit focusOutWidget(this);
 }
 
-QWidget* ModuleBase_WidgetEditor::getControl() const
-{
-  return 0;
-}
-
-QList<QWidget*> ModuleBase_WidgetEditor::getControls() const
-{
-  QList<QWidget*> aControls;
-  return aControls;
-}
-
 void ModuleBase_WidgetEditor::editFeatureValue(FeaturePtr theFeature, const std::string theAttribute)
 {
-  ModuleBase_WidgetEditor anEditor(0, theAttribute);
+  DataPtr aData = theFeature->data();
+  AttributeDoublePtr aRef = aData->real(theAttribute);
+  double aValue = aRef->value();
 
-  anEditor.restoreValue(theFeature);
-  anEditor.focusTo();
-  anEditor.storeValue(theFeature);
+  bool isDone;
+  aValue = editedValue(aValue, isDone);
+  if (isDone)
+    aRef->setValue(aValue);
 }

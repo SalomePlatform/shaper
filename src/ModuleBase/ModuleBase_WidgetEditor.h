@@ -6,7 +6,7 @@
 #define ModuleBase_WidgetEditor_H
 
 #include <ModuleBase.h>
-#include "ModuleBase_ModelWidget.h"
+#include "ModuleBase_WidgetDoubleValue.h"
 
 #include <QObject>
 #include <QStringList>
@@ -18,7 +18,7 @@ class QLineEdit;
  * \ingroup GUI
  * \brief Custom widget. An abstract class to be redefined to fill with some GUI controls
  */
-class MODULEBASE_EXPORT ModuleBase_WidgetEditor : public ModuleBase_ModelWidget
+class MODULEBASE_EXPORT ModuleBase_WidgetEditor : public ModuleBase_WidgetDoubleValue
 {
   Q_OBJECT
 public:
@@ -36,30 +36,18 @@ public:
   /// Destructor
   virtual ~ModuleBase_WidgetEditor();
 
-  /// Saves the internal parameters to the given feature
-  /// \param theFeature a model feature to be changed
-  virtual bool storeValue(FeaturePtr theFeature) const;
-
-  virtual bool restoreValue(FeaturePtr theFeature);
-
   /// Set focus to the first control of the current widget. The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
   virtual void focusTo();
 
-  /// Returns the internal parent wiget control, that can be shown anywhere
-  /// \returns the widget
-  QWidget* getControl() const;
-
-  /// Returns list of widget controls
-  /// \return a control list
-  virtual QList<QWidget*> getControls() const;
-
+  /// Creates an editor for the real value and set the new value to the feature
+  /// \param theFeature the model feature
+  /// \param theAttribute the feature attribute
   static void editFeatureValue(FeaturePtr theFeature, const std::string theAttribute);
 
 private:
   FeaturePtr myFeature; ///< the current widget feature
   QStringList myFeatureKinds; ///< the kinds of possible features
-  double myValue;
 };
 
 #endif

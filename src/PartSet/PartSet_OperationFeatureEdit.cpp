@@ -140,9 +140,7 @@ void PartSet_OperationFeatureEdit::mouseDoubleClick(QMouseEvent* theEvent, Handl
     double aValue = PartSet_Tools::featureValue(feature(), CONSTRAINT_ATTR_VALUE, isValid);
     if (isValid) {
       ModuleBase_WidgetEditor::editFeatureValue(feature(), CONSTRAINT_ATTR_VALUE);
-
-      //QPoint aPos = theEvent->globalPos();
-      //myEditor->start(aPos, aValue);
+      flushUpdated();
     }
   }
 }
