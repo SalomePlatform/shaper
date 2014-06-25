@@ -16,8 +16,6 @@ SET(PROJECT_HEADERS
 	PartSet_FeaturePointPrs.h
 	PartSet_Listener.h
 	PartSet_Module.h
-	PartSet_OperationCreateConstraint.h
-	PartSet_OperationCreateFeature.h
 	PartSet_OperationFeatureCreate.h
 	PartSet_OperationFeatureEdit.h
 	PartSet_OperationFeatureEditMulti.h
@@ -39,8 +37,6 @@ SET(PROJECT_SOURCES
 	PartSet_FeaturePointPrs.cpp
 	PartSet_Listener.cpp
 	PartSet_Module.cpp
-	PartSet_OperationCreateConstraint.cpp
-	PartSet_OperationCreateFeature.cpp
 	PartSet_OperationFeatureCreate.cpp
 	PartSet_OperationFeatureEdit.cpp
 	PartSet_OperationFeatureEditMulti.cpp

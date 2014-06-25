@@ -1,7 +1,5 @@
 #include <PartSet_Module.h>
 #include <PartSet_OperationSketch.h>
-#include <PartSet_OperationCreateFeature.h>
-#include <PartSet_OperationCreateConstraint.h>
 #include <PartSet_OperationFeatureCreate.h>
 #include <PartSet_OperationFeatureEditMulti.h>
 #include <PartSet_OperationFeatureEdit.h>
@@ -350,14 +348,10 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
       aSketch = aPrevOp->sketch();
     if (PartSet_OperationFeatureCreate::canProcessKind(theCmdId))
       anOperation = new PartSet_OperationFeatureCreate(theCmdId.c_str(), this, aSketch);
-	else if (PartSet_OperationCreateFeature::canProcessKind(theCmdId))
-      anOperation = new PartSet_OperationCreateFeature(theCmdId.c_str(), this, aSketch);
-	else if (theCmdId == PartSet_OperationFeatureEditMulti::Type())
+    else if (theCmdId == PartSet_OperationFeatureEditMulti::Type())
 		anOperation = new PartSet_OperationFeatureEditMulti(theCmdId.c_str(), this, aSketch);
     else if (theCmdId == PartSet_OperationFeatureEdit::Type())
       anOperation = new PartSet_OperationFeatureEdit(theCmdId.c_str(), this, aSketch);
-    else if (PartSet_OperationCreateConstraint::canProcessKind(theCmdId))
-      anOperation = new PartSet_OperationCreateConstraint(theCmdId.c_str(), this, aSketch);
   }
 
   if (!anOperation) {
