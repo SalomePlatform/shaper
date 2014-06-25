@@ -839,7 +839,7 @@ void XGUI_Workshop::onWidgetValuesChanged()
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
   for (; anIt != aLast; anIt++) {
     ModuleBase_ModelWidget* aCustom = *anIt;
-    if (aCustom && (!aCustom->isInitialized(aFeature) || aCustom == aSenderWidget)) {
+    if (aCustom && (/*!aCustom->isInitialized(aFeature) ||*/ aCustom == aSenderWidget)) {
       aCustom->storeValue(aFeature);
     }
   }

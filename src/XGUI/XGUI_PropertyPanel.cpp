@@ -198,7 +198,10 @@ void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
 
 void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
 {
+  emit widgetActivated(theWidget);
+  // it is important that the signal widgetActivated goes before the focusTo() calling
+  // in order to handle next possible signal in the focusTo() method
+  // (e.g. the widget editor sends a signal about the widget deactivation)
   if (theWidget)
     theWidget->focusTo();
-  emit widgetActivated(theWidget);
 }
