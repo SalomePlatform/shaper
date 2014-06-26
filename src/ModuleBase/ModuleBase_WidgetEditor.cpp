@@ -61,7 +61,7 @@ double editedValue(double theValue, bool& isDone)
   return aValue;
 }
 
-void ModuleBase_WidgetEditor::focusTo()
+bool ModuleBase_WidgetEditor::focusTo()
 {
   double aValue = mySpinBox->value();
   bool isDone;
@@ -74,6 +74,8 @@ void ModuleBase_WidgetEditor::focusTo()
   }
   emit valuesChanged();
   emit focusOutWidget(this);
+
+  return false;
 }
 
 void ModuleBase_WidgetEditor::editFeatureValue(FeaturePtr theFeature, const std::string theAttribute)

@@ -129,6 +129,10 @@ bool ModuleBase_WidgetPoint2D::eventFilter(QObject *theObject, QEvent *theEvent)
 {
   if (theObject == myXSpin || theObject == myYSpin) {
     if (theEvent->type() == QEvent::KeyRelease) {
+      QKeyEvent* aKeyEvent = (QKeyEvent*)theEvent;
+      if (aKeyEvent && aKeyEvent->key() == Qt::Key_Return) {
+        emit focusOutWidget(this);
+      }
       emit keyReleased(attributeID(), (QKeyEvent*) theEvent);
       return true;
     }

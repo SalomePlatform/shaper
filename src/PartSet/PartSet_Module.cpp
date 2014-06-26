@@ -155,9 +155,6 @@ void PartSet_Module::onOperationStarted()
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp) {
     XGUI_PropertyPanel* aPropPanel = myWorkshop->propertyPanel();
-    connect(aPreviewOp, SIGNAL(focusActivated(const std::string&)),
-            aPropPanel, SLOT(onFocusActivated(const std::string&)));
-
     connect(aPropPanel, SIGNAL(storedPoint2D(FeaturePtr, const std::string&)),
       this, SLOT(onStorePoint2D(FeaturePtr, const std::string&)), Qt::UniqueConnection);
   }
@@ -170,8 +167,6 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
   if (aPreviewOp) {
     XGUI_PropertyPanel* aPropPanel = myWorkshop->propertyPanel();
-    disconnect(aPreviewOp, SIGNAL(focusActivated(const std::string&)),
-               aPropPanel, SLOT(onFocusActivated(const std::string&)));
     //disconnect(aPropPanel, SIGNAL(storedPoint2D(FeaturePtr, const std::string&)),
     //           this, SLOT(onStorePoint2D(FeaturePtr, const std::string&)));
   }

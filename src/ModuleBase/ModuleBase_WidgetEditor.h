@@ -38,7 +38,8 @@ public:
 
   /// Set focus to the first control of the current widget. The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
-  virtual void focusTo();
+  /// \return the state whether the widget can accept the focus
+  virtual bool focusTo();
 
   /// Creates an editor for the real value and set the new value to the feature
   /// \param theFeature the model feature

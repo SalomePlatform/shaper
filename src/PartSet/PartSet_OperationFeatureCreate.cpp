@@ -6,10 +6,6 @@
 
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketch.h>
-#include <PartSet_FeaturePointPrs.h>
-#include <PartSet_FeatureLinePrs.h>
-#include <PartSet_FeatureCirclePrs.h>
-#include <PartSet_FeatureArcPrs.h>
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Point.h>
@@ -21,6 +17,7 @@
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
 
 #include <GeomAPI_Pnt2d.h>
 
@@ -65,7 +62,8 @@ bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
          theId == SKETCH_CONSTRAINT_LENGTH_KIND ||
          theId == SKETCH_CONSTRAINT_RADIUS_KIND ||
          theId == SKETCH_CONSTRAINT_PARALLEL_KIND ||
-         theId == SKETCH_CONSTRAINT_PERPENDICULAR_KIND;
+         theId == SKETCH_CONSTRAINT_PERPENDICULAR_KIND ||
+         theId == SKETCH_CONSTRAINT_COINCIDENCE_KIND;
 }
 
 bool PartSet_OperationFeatureCreate::canBeCommitted() const
@@ -143,23 +141,12 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
         PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
         // move to selected line
         if (feature()->getKind() == SKETCH_LINE_KIND) {
-          //boost::shared_ptr<PartSet_FeatureLinePrs> aLinePrs =
-          //                       boost::dynamic_pointer_cast<PartSet_FeatureLinePrs>(myFeaturePrs);
-          //if (aLinePrs) {
-          //  FeaturePtr aFeature = aPrs.feature();
-            //aLinePrs->projectPointOnLine(aFeature, myPointSelectionMode, aPoint, theView, aX, anY);
-          //}
+          //FeaturePtr aFeature = aPrs.feature();
+          //projectPointOnLine(aFeature, myPointSelectionMode, aPoint, theView, aX, anY);
         }
       }
     }
   }
-  /*if (feature()->getKind() == SKETCH_ARC_KIND) {
-    boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
-                              boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
-    if (anArcPrs) {
-      anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
-    }
-  }*/
   bool isApplyed = false;
   if (isPointWidget())
     isApplyed = setWidgetPoint(aX, anY);
@@ -187,15 +174,6 @@ void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3
     double aX, anY;
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
     PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-    /*if (myPointSelectionMode == SM_ThirdPoint) {
-      if (feature()->getKind() == SKETCH_ARC_KIND) {
-        boost::shared_ptr<PartSet_FeatureArcPrs> anArcPrs =
-                                boost::dynamic_pointer_cast<PartSet_FeatureArcPrs>(myFeaturePrs);
-        if (anArcPrs) {
-          anArcPrs->projectPointOnFeature(feature(), sketch(), aPoint, theView, aX, anY);
-        }
-      }
-    }*/
     setWidgetPoint(aX, anY);
     flushUpdated();
   }
@@ -296,22 +274,10 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
   return aNewFeature;
 }
 
-/*void PartSet_OperationFeatureCreate::setPointSelectionMode(const PartSet_SelectionMode& theMode,
-                                                           const bool isToEmitSignal)
-{
-  myPointSelectionMode = theMode;
-  if (isToEmitSignal) {
-    std::string aName = myFeaturePrs->getAttribute(theMode);
-    if (aName.empty() && theMode == SM_DonePoint) {
-      aName = XGUI::PROP_PANEL_OK;
-    }
-    emit focusActivated(aName);
-  }
-}*/
-
 bool PartSet_OperationFeatureCreate::isPointWidget() const
 {
-  return dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
+  return dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget) ||
+         dynamic_cast<ModuleBase_WidgetPoint2dDistance*>(myActiveWidget);
 }
 
 bool PartSet_OperationFeatureCreate::setWidgetPoint(double theX, double theY)

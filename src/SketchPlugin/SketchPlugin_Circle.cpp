@@ -41,25 +41,27 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Circle::preview()
     // compute a circle point in 3D view
     boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
       boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CIRCLE_ATTR_CENTER));
-    boost::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
-    // make a visible point
-    boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
-    aShapes.push_back(aCenterPointShape);
+    if (aCenterAttr->isInitialized()) {
+      boost::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
+      // make a visible point
+      boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
+      aShapes.push_back(aCenterPointShape);
 
-    // make a visible circle
-    boost::shared_ptr<GeomDataAPI_Dir> aNDir = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->data()->attribute(SKETCH_ATTR_NORM));
-    bool aHasPlane = aNDir && !(aNDir->x() == 0 && aNDir->y() == 0 && aNDir->z() == 0);
-    if (aHasPlane) {
-      boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
-      // compute the circle radius
-      AttributeDoublePtr aRadiusAttr = 
-        boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CIRCLE_ATTR_RADIUS));
-      double aRadius = aRadiusAttr->value();
+      // make a visible circle
+      boost::shared_ptr<GeomDataAPI_Dir> aNDir = 
+        boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->data()->attribute(SKETCH_ATTR_NORM));
+      bool aHasPlane = aNDir && !(aNDir->x() == 0 && aNDir->y() == 0 && aNDir->z() == 0);
+      if (aHasPlane) {
+        boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
+        // compute the circle radius
+        AttributeDoublePtr aRadiusAttr = 
+          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CIRCLE_ATTR_RADIUS));
+        double aRadius = aRadiusAttr->value();
 
-      boost::shared_ptr<GeomAPI_Shape> aCircleShape = 
-                              GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, aRadius);
-      aShapes.push_back(aCircleShape);
+        boost::shared_ptr<GeomAPI_Shape> aCircleShape = 
+                                GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, aRadius);
+        aShapes.push_back(aCircleShape);
+      }
     }
     boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
     setPreview(aCompound);

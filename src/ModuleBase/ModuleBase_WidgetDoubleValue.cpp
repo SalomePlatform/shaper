@@ -35,7 +35,8 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent, c
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   myLabel = new QLabel(aLabelText, myContainer);
-  myLabel->setPixmap(QPixmap(aLabelIcon));
+  if (!aLabelIcon.isEmpty())
+    myLabel->setPixmap(QPixmap(aLabelIcon));
   aControlLay->addWidget(myLabel);
 
   mySpinBox = new QDoubleSpinBox(myContainer);
@@ -122,6 +123,10 @@ bool ModuleBase_WidgetDoubleValue::eventFilter(QObject *theObject, QEvent *theEv
 {
   if (theObject == mySpinBox) {
     if (theEvent->type() == QEvent::KeyRelease) {
+      QKeyEvent* aKeyEvent = (QKeyEvent*)theEvent;
+      if (aKeyEvent && aKeyEvent->key() == Qt::Key_Return) {
+        emit focusOutWidget(this);
+      }
       emit keyReleased(attributeID(), (QKeyEvent*) theEvent);
       return true;
     }
