@@ -12,6 +12,8 @@
 #include <AIS_ParallelRelation.hxx>
 #include <Geom_Plane.hxx>
 
+#include <GeomDataAPI_Point2D.h>
+
 SketchPlugin_ConstraintParallel::SketchPlugin_ConstraintParallel()
 {
 }
@@ -20,6 +22,7 @@ void SketchPlugin_ConstraintParallel::initAttributes()
 {
   data()->addAttribute(CONSTRAINT_ATTR_ENTITY_A, ModelAPI_AttributeRefAttr::type());
   data()->addAttribute(CONSTRAINT_ATTR_ENTITY_B, ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT, GeomDataAPI_Point2D::type());
 }
 
 void SketchPlugin_ConstraintParallel::execute()

@@ -317,16 +317,14 @@ void PartSet_Module::onFeatureConstructed(FeaturePtr theFeature, int theMode)
     FeaturePtr aSketch;
     PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
     if (aPrevOp) {
-      std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> > aList = aPrevOp->subPreview();
+      std::list<FeaturePtr> aList = aPrevOp->subFeatures();
       XGUI_Displayer* aDisplayer = myWorkshop->displayer();
       std::list<int> aModes = aPrevOp->getSelectionModes(aPrevOp->feature());
 
-      std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >::const_iterator
-                                                             anIt = aList.begin(), aLast = aList.end();
-      for (; anIt != aLast; anIt++) {
-        FeaturePtr aFeature = (*anIt).first;
-        visualizePreview(aFeature, false, false);
-      }
+      std::list<FeaturePtr>::const_iterator anIt = aList.begin(),
+                                            aLast = aList.end();
+      for (; anIt != aLast; anIt++)
+        visualizePreview(*anIt, false, false);
       aDisplayer->updateViewer();
     }
   }
@@ -477,23 +475,19 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
   if (!aFeature || aFeature->getKind() != theCmdId)
     return;
 
-  std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> > aList = aPreviewOp->subPreview();
+  std::list<FeaturePtr> aList = aPreviewOp->subFeatures();
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   std::list<int> aModes = aPreviewOp->getSelectionModes(aPreviewOp->feature());
 
-  std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >::const_iterator
-                                                         anIt = aList.begin(), aLast = aList.end();
+  std::list<FeaturePtr>::const_iterator anIt = aList.begin(), 
+                                        aLast = aList.end();
   for (; anIt != aLast; anIt++) {
-    FeaturePtr aFeature = (*anIt).first;
     boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
-      boost::dynamic_pointer_cast<SketchPlugin_Feature>((*anIt).first);
+      boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
     if (!aSPFeature)
       continue;
-
-    Handle(AIS_InteractiveObject) anAIS = aSPFeature->getAISShape(aDisplayer->getAISObject(aFeature));
-    if (!anAIS.IsNull())
-      aDisplayer->redisplay(aFeature, anAIS, false);
-    aDisplayer->activateInLocalContext(aFeature, aModes, false);
+    visualizePreview(*anIt, true, false);
+    aDisplayer->activateInLocalContext(*anIt, aModes, false);
   }
   aDisplayer->updateViewer();
 }
