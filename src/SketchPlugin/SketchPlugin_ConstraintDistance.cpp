@@ -38,28 +38,14 @@ void SketchPlugin_ConstraintDistance::execute()
 {
   boost::shared_ptr<ModelAPI_Data> aData = data();
 
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr_A = 
-          boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr_B = 
-          boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_B));
-
-  AttributeDoublePtr anAttr_Value =
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint_A = getFeaturePoint(aData, CONSTRAINT_ATTR_ENTITY_A);
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint_B = getFeaturePoint(aData, CONSTRAINT_ATTR_ENTITY_B);
+  if (aPoint_A && aPoint_B) {
+    AttributeDoublePtr anAttr_Value =
       boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_VALUE));
-  if (anAttr_A->isInitialized() && anAttr_B->isInitialized() && !anAttr_Value->isInitialized())
-  {
-    FeaturePtr aFeature_A = anAttr_A->feature();
-    FeaturePtr aFeature_B = anAttr_B->feature();
-    if (aFeature_A && aFeature_A) {
-      // calculate the distance
-      boost::shared_ptr<GeomDataAPI_Point2D> aPoint_A =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                                             (aFeature_A->data()->attribute(POINT_ATTR_COORD));
-      boost::shared_ptr<GeomDataAPI_Point2D> aPoint_B =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                                             (aFeature_B->data()->attribute(POINT_ATTR_COORD));
-      if (aPoint_A && aPoint_B) {
-        anAttr_Value->setValue(aPoint_A->pnt()->distance(aPoint_B->pnt()));
-      }
+
+    if (!anAttr_Value->isInitialized()) {
+      anAttr_Value->setValue(aPoint_A->pnt()->distance(aPoint_B->pnt()));
     }
   }
 }
@@ -165,6 +151,9 @@ boost::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
   if (aFeature && aFeature->getKind() == SKETCH_POINT_KIND)
     aPointAttr = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                            (aFeature->data()->attribute(POINT_ATTR_COORD));
+  else {
+    if (anAttr->attr())
+      aPointAttr = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
+  }
   return aPointAttr;
 }
-

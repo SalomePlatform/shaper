@@ -10,6 +10,7 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetPoint2D.h>
+#include <ModuleBase_WidgetFeatureOrAttribute.h>
 #include <ModuleBase_WidgetFeature.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_WidgetSwitch.h>
@@ -131,6 +132,9 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   } else if (theType == WDG_FEATURE_SELECTOR) {
     result = featureSelectorControl(theParent);
 
+  } else if (theType == WDG_FEATURE_OR_ATTRIBUTE_SELECTOR) {
+    result = featureOrAttributeSelectorControl(theParent);
+
   } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
     result = doubleValueEditor(theParent);
   
@@ -185,6 +189,14 @@ QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
 QWidget* ModuleBase_WidgetFactory::featureSelectorControl(QWidget* theParent)
 {
   ModuleBase_WidgetFeature* aWidget = new ModuleBase_WidgetFeature(theParent, myWidgetApi);
+  myModelWidgets.append(aWidget);
+  return aWidget->getControl();
+}
+
+QWidget* ModuleBase_WidgetFactory::featureOrAttributeSelectorControl(QWidget* theParent)
+{
+  ModuleBase_WidgetFeatureOrAttribute* aWidget = new ModuleBase_WidgetFeatureOrAttribute(theParent,
+                                                                                      myWidgetApi);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }

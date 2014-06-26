@@ -55,7 +55,20 @@ public:
 protected:
   /// Fill the widget values by given point
   /// \param thePoint the point
+  /// \return the boolean result of the feature set
   bool setFeature(const FeaturePtr& theFeature);
+
+  /// Returns current widget feature
+  /// \return the feature
+  const FeaturePtr& feature() const { return myFeature; }
+
+  /// Returns the widget editor
+  /// \return the editor
+  QLineEdit* editor() const { return myEditor; }
+
+  /// Returns the possible feature kinds
+  /// \return the list of kinds
+  const QStringList& featureKinds() const { return myFeatureKinds; }
 
 private:
   FeaturePtr myFeature; ///< the current widget feature

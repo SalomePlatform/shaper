@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetEditor.h
 	ModuleBase_WidgetFactory.h
 	ModuleBase_WidgetFeature.h
+	ModuleBase_WidgetFeatureOrAttribute.h
 	ModuleBase_WidgetPoint2D.h
 	ModuleBase_WidgetSwitch.h
 	ModuleBase_WidgetSelector.h
@@ -31,6 +32,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetEditor.cpp
 	ModuleBase_WidgetFactory.cpp
 	ModuleBase_WidgetFeature.cpp
+	ModuleBase_WidgetFeatureOrAttribute.cpp
 	ModuleBase_WidgetPoint2D.cpp
 	ModuleBase_WidgetSwitch.cpp
 	ModuleBase_WidgetSelector.cpp
