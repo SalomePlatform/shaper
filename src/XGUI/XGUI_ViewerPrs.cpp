@@ -50,3 +50,11 @@ const TopoDS_Shape& XGUI_ViewerPrs::shape() const
 {
   return myShape;
 }
+
+bool XGUI_ViewerPrs::operator==(const XGUI_ViewerPrs& thePrs)
+{
+  bool aFeature = (myFeature.get() == thePrs.feature().get());
+  bool aOwner = (myOwner.Access() == thePrs.owner().Access());
+  bool aShape = myShape.IsEqual(thePrs.shape());
+  return aFeature && aOwner && aShape;
+}

@@ -56,6 +56,8 @@ public:
   /// \return a shape instance
   const TopoDS_Shape& shape() const;
 
+  bool operator==(const XGUI_ViewerPrs&);
+
 private:
   FeaturePtr myFeature; /// the feature
   Handle(SelectMgr_EntityOwner) myOwner; /// the selection owner

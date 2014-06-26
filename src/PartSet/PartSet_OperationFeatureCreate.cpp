@@ -86,12 +86,11 @@ std::list<int> PartSet_OperationFeatureCreate::getSelectionModes(FeaturePtr theF
 void PartSet_OperationFeatureCreate::initSelection(const std::list<XGUI_ViewerPrs>& theSelected,
                                                    const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
+  myPreSelection = theSelected;
 }
 
 void PartSet_OperationFeatureCreate::initFeature(FeaturePtr theFeature)
 {
-  //if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
-  //  return;
   myInitFeature = theFeature;
 }
 
@@ -190,7 +189,15 @@ void PartSet_OperationFeatureCreate::keyReleased(std::string theName, QKeyEvent*
 void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
 {
   myActiveWidget = theWidget;
-
+  if (myPreSelection.size() > 0) {
+    const XGUI_ViewerPrs& aPrs = myPreSelection.front();
+    ModuleBase_WidgetValueFeature aValue;
+    aValue.setFeature(aPrs.feature());
+    if (myActiveWidget->setValue(&aValue)) {
+      myPreSelection.remove(aPrs);
+      emit activateNextWidget(myActiveWidget);
+    }
+  } 
   if (myInitFeature && myActiveWidget) {
     ModuleBase_WidgetPoint2D* aWgt = dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
     if (aWgt && aWgt->initFromPrevious(myInitFeature)) { 

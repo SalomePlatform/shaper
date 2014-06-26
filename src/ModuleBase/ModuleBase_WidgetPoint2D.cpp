@@ -80,8 +80,11 @@ bool ModuleBase_WidgetPoint2D::setValue(ModuleBase_WidgetValue* theValue)
     ModuleBase_WidgetValueFeature* aFeatureValue = 
                          dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue) {
-      setPoint(aFeatureValue->point());
-      isDone = true;
+      boost::shared_ptr<GeomAPI_Pnt2d> aPoint = aFeatureValue->point();
+      if (aPoint) {
+        setPoint(aPoint);
+        isDone = true;
+      }
     }
   }
   return isDone;

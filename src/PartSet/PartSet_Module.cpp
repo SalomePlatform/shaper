@@ -138,14 +138,14 @@ void PartSet_Module::onFeatureTriggered()
 void PartSet_Module::launchOperation(const QString& theCmdId)
 {
   ModuleBase_Operation* anOperation = createOperation(theCmdId.toStdString());
-  //PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  //if (aPreviewOp) {
-  //  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  //  // Initialise operation with preliminary selection
-  //  std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
-  //  std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
-  //  aPreviewOp->initSelection(aSelected, aHighlighted);
-  //} 
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aPreviewOp) {
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    // Initialise operation with preliminary selection
+    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
+    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+    aPreviewOp->initSelection(aSelected, aHighlighted);
+  } 
   sendOperation(anOperation);
 }
 

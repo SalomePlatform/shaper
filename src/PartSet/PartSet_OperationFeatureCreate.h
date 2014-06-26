@@ -127,6 +127,8 @@ private:
   FeaturePtr mySketch; ///< the sketch of the feature
 
   ModuleBase_ModelWidget* myActiveWidget; ///< the active widget
+
+  std::list<XGUI_ViewerPrs> myPreSelection;
 };
 
 #endif
