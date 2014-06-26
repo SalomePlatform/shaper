@@ -58,12 +58,11 @@ std::list<int> PartSet_OperationFeatureEdit::getSelectionModes(FeaturePtr theFea
   return PartSet_OperationSketchBase::getSelectionModes(theFeature);
 }
 
-void PartSet_OperationFeatureEdit::init(FeaturePtr theFeature,
-                                     const std::list<XGUI_ViewerPrs>& theSelected,
-                                     const std::list<XGUI_ViewerPrs>& theHighlighted)
+void PartSet_OperationFeatureEdit::initFeature(FeaturePtr theFeature)
 {
   setEditingFeature(theFeature);
 }
+
 
 FeaturePtr PartSet_OperationFeatureEdit::sketch() const
 {

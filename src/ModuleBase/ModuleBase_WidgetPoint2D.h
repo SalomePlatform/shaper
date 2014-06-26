@@ -55,7 +55,7 @@ public:
   /// \param theEvent the processed event
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
-  void initFromPrevious(FeaturePtr theFeature);
+  bool initFromPrevious(FeaturePtr theFeature);
 
 signals:
   /// Signal about the point 2d set to the feature

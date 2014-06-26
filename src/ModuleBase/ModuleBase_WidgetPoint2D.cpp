@@ -140,10 +140,10 @@ bool ModuleBase_WidgetPoint2D::eventFilter(QObject *theObject, QEvent *theEvent)
   return ModuleBase_ModelWidget::eventFilter(theObject, theEvent);
 }
 
-void ModuleBase_WidgetPoint2D::initFromPrevious(FeaturePtr theFeature)
+bool ModuleBase_WidgetPoint2D::initFromPrevious(FeaturePtr theFeature)
 {
   if (myOptionParam.length() == 0)
-    return;
+    return false;
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myOptionParam));
@@ -155,5 +155,7 @@ void ModuleBase_WidgetPoint2D::initFromPrevious(FeaturePtr theFeature)
 
     emit valuesChanged();
     emit storedPoint2D(theFeature, myOptionParam);
+    return true;
   }
+  return false;
 }

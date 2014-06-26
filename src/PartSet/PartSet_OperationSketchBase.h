@@ -57,12 +57,14 @@ public:
   /// \return the selection mode
   virtual std::list<int> getSelectionModes(FeaturePtr theFeature) const;
 
-  /// Initializes some fields accorging to the feature
+  /// Initializes the operation with previously created feature. It is used in sequental operations
+  virtual void initFeature(FeaturePtr theFeature) {}
+
+  /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void init(FeaturePtr theFeature,
-                    const std::list<XGUI_ViewerPrs>& theSelected,
-                    const std::list<XGUI_ViewerPrs>& theHighlighted) {}
+  virtual void initSelection(const std::list<XGUI_ViewerPrs>& theSelected,
+    const std::list<XGUI_ViewerPrs>& theHighlighted) {}
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance

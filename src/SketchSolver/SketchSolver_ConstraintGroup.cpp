@@ -209,11 +209,17 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
   {
     // Several points may be coincident, it is not necessary to store all constraints between them.
     // Try to find sequence of coincident points which connects the points of new constraint
-    if (aConstrType == SLVS_C_POINTS_COINCIDENT &&
-        !addCoincidentPoints(aConstrEnt[0], aConstrEnt[1]))
+    if (aConstrType == SLVS_C_POINTS_COINCIDENT)
     {
-      myExtraCoincidence.insert(theConstraint); // the constraint is stored for further purposes
-      return false;
+      if (aConstrEnt[0] == aConstrEnt[1]) // no need to add self coincidence
+      {
+        return false;
+      }
+      if (!addCoincidentPoints(aConstrEnt[0], aConstrEnt[1]))
+      {
+        myExtraCoincidence.insert(theConstraint); // the constraint is stored for further purposes
+        return false;
+      }
     }
 
     // Create SolveSpace constraint structure

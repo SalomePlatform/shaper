@@ -13,6 +13,7 @@
 
 class Handle_AIS_InteractiveContext;
 class XGUI_Workshop;
+class XGUI_Displayer;
 
 /**
 * Implementation of IWorkshop interface which provides access to Workshop sevices at module level
@@ -29,7 +30,7 @@ public:
   virtual Handle(AIS_InteractiveContext) AISContext() const;
 
   //! Returns list of currently selected data objects
-  QFeatureList selectedFeatures() const; 
+  virtual QFeatureList selectedFeatures() const; 
 
 private:
   XGUI_Workshop* myWorkshop;
