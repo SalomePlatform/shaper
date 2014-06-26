@@ -39,6 +39,9 @@ public:
   /// \brief Returns the sketch preview
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
+  /// Returns the AIS preview
+  SKETCHPLUGIN_EXPORT virtual Handle_AIS_InteractiveObject getAISShape(Handle_AIS_InteractiveObject thePrevious);
+
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintPerpendicular();
 };
