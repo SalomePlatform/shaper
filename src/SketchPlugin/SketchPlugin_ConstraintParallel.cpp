@@ -6,13 +6,17 @@
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
+
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Sketch.h>
 
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_ParallelRelation.hxx>
 #include <Geom_Plane.hxx>
 
 #include <GeomDataAPI_Point2D.h>
+#include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_Pnt.h>
 
 SketchPlugin_ConstraintParallel::SketchPlugin_ConstraintParallel()
 {
@@ -61,11 +65,16 @@ Handle_AIS_InteractiveObject SketchPlugin_ConstraintParallel::getAISShape(Handle
   boost::shared_ptr<GeomAPI_Shape> aLine2 = aLine2Feature->preview();
   Handle(Geom_Plane) aPlane = new Geom_Plane(sketch()->plane()->impl<gp_Pln>());
 
+  boost::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
+  boost::shared_ptr<GeomAPI_Pnt2d> aFOPnt2d = aFlyoutAttr->pnt();
+  boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFOPnt2d->x(), aFOPnt2d->y());
+
   if (anAIS.IsNull())
   {
     Handle(AIS_ParallelRelation) aParallel = 
       new AIS_ParallelRelation(aLine1->impl<TopoDS_Shape>(), aLine2->impl<TopoDS_Shape>(), aPlane);
-
+    aParallel->SetPosition(aFlyoutPnt->impl<gp_Pnt>());
     anAIS = aParallel;
   }
   else
@@ -76,9 +85,21 @@ Handle_AIS_InteractiveObject SketchPlugin_ConstraintParallel::getAISShape(Handle
       aParallel->SetFirstShape(aLine1->impl<TopoDS_Shape>());
       aParallel->SetSecondShape(aLine2->impl<TopoDS_Shape>());
       aParallel->SetPlane(aPlane);
+      aParallel->SetPosition(aFlyoutPnt->impl<gp_Pnt>());
       aParallel->Redisplay(Standard_True);
     }
   }
   return anAIS;
+}
+
+void SketchPlugin_ConstraintParallel::move(double theDeltaX, double theDeltaY)
+{
+  boost::shared_ptr<ModelAPI_Data> aData = data();
+  if (!aData->isValid())
+    return;
+
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
+  aPoint->setValue(aPoint->x() + theDeltaX, aPoint->y() + theDeltaY);
 }
 
