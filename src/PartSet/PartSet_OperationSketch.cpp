@@ -58,9 +58,9 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(FeaturePtr theFeature)
   return aModes;
 }
 
-void PartSet_OperationSketch::init(FeaturePtr theFeature,
-                                   const std::list<XGUI_ViewerPrs>& /*theSelected*/,
-                                   const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
+
+/// Initializes the operation with previously created feature. It is used in sequental operations
+void PartSet_OperationSketch::initFeature(FeaturePtr theFeature)
 {
   if (theFeature)
     setEditingFeature(theFeature);

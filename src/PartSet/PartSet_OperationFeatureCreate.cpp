@@ -91,8 +91,8 @@ void PartSet_OperationFeatureCreate::initSelection(const std::list<XGUI_ViewerPr
 
 void PartSet_OperationFeatureCreate::initFeature(FeaturePtr theFeature)
 {
-//  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
-//    return;
+  //if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
+  //  return;
   myInitFeature = theFeature;
 }
 
