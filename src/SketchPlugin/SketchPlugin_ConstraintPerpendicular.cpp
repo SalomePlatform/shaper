@@ -4,6 +4,8 @@
 
 #include "SketchPlugin_ConstraintPerpendicular.h"
 
+#include <GeomDataAPI_Point2D.h>
+
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
 #include <SketchPlugin_Line.h>
@@ -20,6 +22,7 @@ void SketchPlugin_ConstraintPerpendicular::initAttributes()
 {
   data()->addAttribute(CONSTRAINT_ATTR_ENTITY_A, ModelAPI_AttributeRefAttr::type());
   data()->addAttribute(CONSTRAINT_ATTR_ENTITY_B, ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT, GeomDataAPI_Point2D::type());
 }
 
 void SketchPlugin_ConstraintPerpendicular::execute()

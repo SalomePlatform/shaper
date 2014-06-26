@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QStringList>
 
+class ModuleBase_WidgetValue;
 class ModelAPI_Feature;
 class QWidget;
 class QLabel;
@@ -32,9 +33,10 @@ public:
   /// Destructor
   virtual ~ModuleBase_WidgetFeature();
 
-  /// Fill the widget values by given point
-  /// \param thePoint the point
-  bool setFeature(const FeaturePtr& theFeature);
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// \param theValue the wrapped widget value
+  virtual bool setValue(ModuleBase_WidgetValue* theValue);
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed
@@ -49,6 +51,11 @@ public:
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
+
+protected:
+  /// Fill the widget values by given point
+  /// \param thePoint the point
+  bool setFeature(const FeaturePtr& theFeature);
 
 private:
   FeaturePtr myFeature; ///< the current widget feature

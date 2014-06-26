@@ -48,12 +48,9 @@ bool PartSet_OperationFeatureEditMulti::isGranted(ModuleBase_IOperation* theOper
   return theOperation->getDescription()->operationId().toStdString() == PartSet_OperationSketch::Type();
 }
 
-void PartSet_OperationFeatureEditMulti::init(FeaturePtr theFeature,
-                                     const std::list<XGUI_ViewerPrs>& theSelected,
-                                     const std::list<XGUI_ViewerPrs>& theHighlighted)
+void PartSet_OperationFeatureEditMulti::initSelection(const std::list<XGUI_ViewerPrs>& theSelected,
+                                                      const std::list<XGUI_ViewerPrs>& theHighlighted)
 {
-  setEditingFeature(theFeature);
-
   if (!theHighlighted.empty()) {
     // if there is highlighted object, we check whether it is in the list of selected objects
     // in that case this object is a handle of the moved lines. If there no such object in the selection,
@@ -71,6 +68,11 @@ void PartSet_OperationFeatureEditMulti::init(FeaturePtr theFeature,
   }
   else
     myFeatures = theSelected;
+}
+
+void PartSet_OperationFeatureEditMulti::initFeature(FeaturePtr theFeature)
+{
+  setEditingFeature(theFeature);
 }
 
 FeaturePtr PartSet_OperationFeatureEditMulti::sketch() const

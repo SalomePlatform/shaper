@@ -3,6 +3,7 @@
 // Author:      Natalia ERMOLAEVA
 
 #include <ModuleBase_WidgetPoint2D.h>
+#include <ModuleBase_WidgetValueFeature.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -70,6 +71,20 @@ ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
 
 ModuleBase_WidgetPoint2D::~ModuleBase_WidgetPoint2D()
 {
+}
+
+bool ModuleBase_WidgetPoint2D::setValue(ModuleBase_WidgetValue* theValue)
+{
+  bool isDone = false;
+  if (theValue) {
+    ModuleBase_WidgetValueFeature* aFeatureValue = 
+                         dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
+    if (aFeatureValue) {
+      setPoint(aFeatureValue->point());
+      isDone = true;
+    }
+  }
+  return isDone;
 }
 
 void ModuleBase_WidgetPoint2D::setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
@@ -140,10 +155,10 @@ bool ModuleBase_WidgetPoint2D::eventFilter(QObject *theObject, QEvent *theEvent)
   return ModuleBase_ModelWidget::eventFilter(theObject, theEvent);
 }
 
-void ModuleBase_WidgetPoint2D::initFromPrevious(FeaturePtr theFeature)
+bool ModuleBase_WidgetPoint2D::initFromPrevious(FeaturePtr theFeature)
 {
   if (myOptionParam.length() == 0)
-    return;
+    return false;
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myOptionParam));
@@ -155,5 +170,7 @@ void ModuleBase_WidgetPoint2D::initFromPrevious(FeaturePtr theFeature)
 
     emit valuesChanged();
     emit storedPoint2D(theFeature, myOptionParam);
+    return true;
   }
+  return false;
 }
