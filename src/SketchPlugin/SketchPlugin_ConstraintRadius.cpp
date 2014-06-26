@@ -13,6 +13,9 @@
 
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Circ.h>
+#include <GeomAPI_Circ2d.h>
+#include <GeomAPI_Dir.h>
+#include <GeomAPI_XYZ.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
 
@@ -123,14 +126,13 @@ Handle(AIS_InteractiveObject) SketchPlugin_ConstraintRadius::getAISShape(
   // We want to show a radius dimension starting from the circle centre and 
   // ending at the user-defined point.
   // Also, if anchor point coincides with myP2, the radius dimension is not displayed at all.
-  gp_Pnt anAPnt = anAnchor->impl<gp_Pnt>();
-  double aDelta = 1/1000.0;
-  if (anAnchor->x() != 0)
-    anAnchor->setX(anAnchor->x() + aDelta);
-  if (anAnchor->y() != 0)
-    anAnchor->setY(anAnchor->y() + aDelta);
-  if (anAnchor->z() != 0)
-    anAnchor->setZ(anAnchor->z() + aDelta);
+  boost::shared_ptr<GeomAPI_XYZ> anAnchorXYZ = anAnchor->xyz();
+  anAnchorXYZ = anAnchorXYZ->decreased(aCenter->xyz());
+  boost::shared_ptr<GeomAPI_Dir> aDeltaDir(new GeomAPI_Dir(anAnchorXYZ));
+  const double aDelta = 1e-3;
+  anAnchor->setX(anAnchor->x() + aDelta * aDeltaDir->x());
+  anAnchor->setY(anAnchor->y() + aDelta * aDeltaDir->y());
+  anAnchor->setZ(anAnchor->z() + aDelta * aDeltaDir->z());
 
   if (anAIS.IsNull())
   {
@@ -169,7 +171,34 @@ void SketchPlugin_ConstraintRadius::move(double theDeltaX, double theDeltaY)
   if (!aData->isValid())
     return;
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
-  aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
+    boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(data()->attribute(CONSTRAINT_ATTR_ENTITY_A));
+  FeaturePtr aFeature = aRef->feature();
+  if (!aFeature)
+    return;
+  std::string aCenterAttrName;
+  if (aFeature->getKind() == SKETCH_CIRCLE_KIND)
+    aCenterAttrName = CIRCLE_ATTR_CENTER;
+  else if (aFeature->getKind() == SKETCH_ARC_KIND)
+    aCenterAttrName = ARC_ATTR_CENTER;
+  boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(aCenterAttrName));
+  boost::shared_ptr<GeomAPI_Pnt2d> aCenter = aCenterAttr->pnt();
+
+  // The specified delta applied on the circle curve, 
+  // so it will be scaled due to distance between flyout and center points
+  boost::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
+  boost::shared_ptr<GeomAPI_Pnt2d> aFlyout = aFlyoutAttr->pnt();
+
+  boost::shared_ptr<ModelAPI_AttributeDouble> aRadius =
+    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(CONSTRAINT_ATTR_VALUE));
+  double aScale = aFlyout->distance(aCenter) / aRadius->value();
+
+  boost::shared_ptr<GeomAPI_Circ2d> aCircle(new GeomAPI_Circ2d(aCenter, aFlyout));
+  aFlyout->setX(aFlyout->x() + aScale * theDeltaX);
+  aFlyout->setY(aFlyout->y() + aScale * theDeltaY);
+  aFlyout = aCircle->project(aFlyout);
+
+  aFlyoutAttr->setValue(aFlyout->x(), aFlyout->y());
 }
