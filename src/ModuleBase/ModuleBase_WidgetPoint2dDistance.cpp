@@ -32,8 +32,12 @@ bool ModuleBase_WidgetPoint2dDistance::setValue(ModuleBase_WidgetValue* theValue
     ModuleBase_WidgetValueFeature* aFeatureValue = 
                          dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue) {
-      setPoint(aFeatureValue->feature(), aFeatureValue->point());
-      isDone = true;
+      boost::shared_ptr<GeomAPI_Pnt2d> aPnt = aFeatureValue->point();
+      FeaturePtr aFeature = aFeatureValue->feature();
+      if (aFeature && aPnt) {
+        setPoint(aFeature, aPnt);
+        isDone = true;
+      }
     }
   }
   return isDone;

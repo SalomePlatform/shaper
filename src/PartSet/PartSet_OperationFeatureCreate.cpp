@@ -189,7 +189,7 @@ void PartSet_OperationFeatureCreate::keyReleased(std::string theName, QKeyEvent*
 void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
 {
   myActiveWidget = theWidget;
-  if (myPreSelection.size() > 0) {
+  if ((myPreSelection.size() > 0) && myActiveWidget) {
     const XGUI_ViewerPrs& aPrs = myPreSelection.front();
     ModuleBase_WidgetValueFeature aValue;
     aValue.setFeature(aPrs.feature());
