@@ -72,10 +72,9 @@ public:
   /// \param theEvent the mouse event
   virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
 
-  /// Returns the map of the operation previews including the nested feature previews
-  /// \return the map of feature to the feature preview
-  virtual std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >
-                                                                           subPreview() const;
+  /// Returns the list of the nested features
+  /// \return the list of subfeatures
+  virtual std::list<FeaturePtr> subFeatures() const;
 
   /// Virtual method called when operation stopped - committed or aborted.
   /// Emits a signal to hide the preview of the operation

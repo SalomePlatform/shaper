@@ -15,8 +15,11 @@
 #include <ModuleBase_Operation.h>
 
 #include <XGUI_Constants.h>
+#include <XGUI_Displayer.h>
 
 #include <QObject>
+
+#include <AIS_InteractiveObject.hxx>
 
 #include <map>
 
@@ -48,9 +51,9 @@ public:
   /// \param theFeature the feature object to obtain the preview
   static boost::shared_ptr<GeomAPI_Shape> preview(FeaturePtr theFeature);
 
-  /// Returns the map of the operation previews including the nested feature previews
-  /// \return the map of feature to the feature preview
-  virtual std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> > subPreview() const;
+  /// Returns the list of the nested features
+  /// \return the list of subfeatures
+  virtual std::list<FeaturePtr> subFeatures() const;
 
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode

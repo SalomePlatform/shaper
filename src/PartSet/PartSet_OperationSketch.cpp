@@ -137,29 +137,15 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View)
   }
 }
 
-std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >
-                                                        PartSet_OperationSketch::subPreview() const
+std::list<FeaturePtr> PartSet_OperationSketch::subFeatures() const
 {
-  std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> > aPreviewMap;
-
-  boost::shared_ptr<SketchPlugin_Feature> aFeature;
-
   boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
   if (!aData->isValid())
-    return aPreviewMap;
+    return std::list<FeaturePtr>();
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SKETCH_ATTR_FEATURES));
 
-  std::list<FeaturePtr > aFeatures = aRefList->list();
-  std::list<FeaturePtr >::const_iterator anIt = aFeatures.begin(),
-                                                                  aLast = aFeatures.end();
-  for (; anIt != aLast; anIt++) {
-    aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
-    boost::shared_ptr<GeomAPI_Shape> aPreview = aFeature->preview();
-    if (aPreview)
-      aPreviewMap[aFeature] = aPreview;
-  }
-  return aPreviewMap;
+  return aRefList->list();
 }
 
 void PartSet_OperationSketch::stopOperation()

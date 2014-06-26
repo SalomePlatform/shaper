@@ -38,10 +38,9 @@ boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview(
   return aFeature->preview();
 }
 
-std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >
-                                                     PartSet_OperationSketchBase::subPreview() const
+std::list<FeaturePtr> PartSet_OperationSketchBase::subFeatures() const
 {
-  return std::map<FeaturePtr, boost::shared_ptr<GeomAPI_Shape> >();
+  return std::list<FeaturePtr>();
 }
 
 std::list<int> PartSet_OperationSketchBase::getSelectionModes(FeaturePtr theFeature) const
