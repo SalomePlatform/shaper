@@ -86,14 +86,18 @@ std::list<int> PartSet_OperationFeatureCreate::getSelectionModes(FeaturePtr theF
   return aModes;
 }
 
-void PartSet_OperationFeatureCreate::init(FeaturePtr theFeature,
-                                       const std::list<XGUI_ViewerPrs>& /*theSelected*/,
-                                       const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
+void PartSet_OperationFeatureCreate::initSelection(const std::list<XGUI_ViewerPrs>& theSelected,
+                                                   const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
 {
-  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
-    return;
+}
+
+void PartSet_OperationFeatureCreate::initFeature(FeaturePtr theFeature)
+{
+//  if (!theFeature || theFeature->getKind() != SKETCH_LINE_KIND)
+//    return;
   myInitFeature = theFeature;
 }
+
 
 FeaturePtr PartSet_OperationFeatureCreate::sketch() const
 {
@@ -214,10 +218,10 @@ void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* t
 
   if (myInitFeature && myActiveWidget) {
     ModuleBase_WidgetPoint2D* aWgt = dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
-    if (aWgt)
-      aWgt->initFromPrevious(myInitFeature);
-    myInitFeature = FeaturePtr();
-    emit activateNextWidget(myActiveWidget);
+    if (aWgt && aWgt->initFromPrevious(myInitFeature)) { 
+      myInitFeature = FeaturePtr();
+      emit activateNextWidget(myActiveWidget);
+    }
   }
 }
 

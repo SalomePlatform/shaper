@@ -138,6 +138,14 @@ void PartSet_Module::onFeatureTriggered()
 void PartSet_Module::launchOperation(const QString& theCmdId)
 {
   ModuleBase_Operation* anOperation = createOperation(theCmdId.toStdString());
+  //PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  //if (aPreviewOp) {
+  //  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  //  // Initialise operation with preliminary selection
+  //  std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
+  //  std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+  //  aPreviewOp->initSelection(aSelected, aHighlighted);
+  //} 
   sendOperation(anOperation);
 }
 
@@ -260,7 +268,8 @@ void PartSet_Module::onLaunchOperation(std::string theName, FeaturePtr theFeatur
     // refill the features list with avoiding of the features, obtained only by vertex shape (TODO)
     std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
     std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
-    aPreviewOp->init(theFeature, aSelected, aHighlighted);
+    aPreviewOp->initFeature(theFeature);
+    aPreviewOp->initSelection(aSelected, aHighlighted);
   } else {
     anOperation->setEditingFeature(theFeature);
   }

@@ -31,3 +31,4 @@ QFeatureList XGUI_ModuleConnector::selectedFeatures() const
 {
   return myWorkshop->selector()->selectedFeatures();
 }
+
