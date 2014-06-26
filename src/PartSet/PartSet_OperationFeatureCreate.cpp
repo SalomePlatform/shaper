@@ -23,8 +23,7 @@
 
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetPoint2D.h>
-#include <ModuleBase_WidgetFeature.h>
-#include <ModuleBase_WidgetPoint2dDistance.h>
+#include <ModuleBase_WidgetValueFeature.h>
 
 #include <XGUI_ViewerPrs.h>
 #include <XGUI_Constants.h>
@@ -147,17 +146,15 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
       }
     }
   }
-  bool isApplyed = false;
-  if (isPointWidget())
-    isApplyed = setWidgetPoint(aX, anY);
-  else {
-    if (!theSelected.empty()) {
-      XGUI_ViewerPrs aPrs = theSelected.front();
-      FeaturePtr aFeature = aPrs.feature();
-      if (aFeature)
-        isApplyed = setWidgetFeature(aFeature);
-    }
+  FeaturePtr aFeature;
+  if (!theSelected.empty()) {
+    XGUI_ViewerPrs aPrs = theSelected.front();
+    aFeature = aPrs.feature();
   }
+  else
+    aFeature = feature(); // for the widget distance only
+
+  bool isApplyed = setWidgetValue(aFeature, aX, anY);
   if (isApplyed) {
     flushUpdated();
     emit activateNextWidget(myActiveWidget);
@@ -174,7 +171,7 @@ void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3
     double aX, anY;
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
     PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-    setWidgetPoint(aX, anY);
+    setWidgetValue(feature(), aX, anY);
     flushUpdated();
   }
 }
@@ -274,34 +271,14 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
   return aNewFeature;
 }
 
-bool PartSet_OperationFeatureCreate::isPointWidget() const
+bool PartSet_OperationFeatureCreate::setWidgetValue(FeaturePtr theFeature, double theX, double theY)
 {
-  return dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget) ||
-         dynamic_cast<ModuleBase_WidgetPoint2dDistance*>(myActiveWidget);
-}
+  ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
+  aValue->setFeature(theFeature);
+  aValue->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
+  bool isApplyed = myActiveWidget->setValue(aValue);
 
-bool PartSet_OperationFeatureCreate::setWidgetPoint(double theX, double theY)
-{
-  boost::shared_ptr<GeomAPI_Pnt2d> aPoint(new GeomAPI_Pnt2d(theX, theY));
-  ModuleBase_WidgetPoint2D* aWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
-  if (aWidget) {
-    aWidget->setPoint(aPoint);
-    return true;
-  } else {
-    ModuleBase_WidgetPoint2dDistance* aWgt = dynamic_cast<ModuleBase_WidgetPoint2dDistance*>(myActiveWidget);
-    if (aWgt) {
-      aWgt->setPoint(feature(), aPoint);
-      return true;
-    }
-  }
-  return false;
-}
+  delete aValue;
 
-bool PartSet_OperationFeatureCreate::setWidgetFeature(const FeaturePtr& theFeature)
-{
-  ModuleBase_WidgetFeature* aWidget = dynamic_cast<ModuleBase_WidgetFeature*>(myActiveWidget);
-  if (!aWidget)
-    return false;
-
-  return aWidget->setFeature(theFeature);
+  return isApplyed;
 }

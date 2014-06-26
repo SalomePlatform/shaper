@@ -17,6 +17,8 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetSelector.h
 	ModuleBase_IWorkshop.h
 	ModuleBase_WidgetPoint2dDistance.h
+	ModuleBase_WidgetValue.h
+	ModuleBase_WidgetValueFeature.h
 )
 
 SET(PROJECT_SOURCES
@@ -33,6 +35,8 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetSwitch.cpp
 	ModuleBase_WidgetSelector.cpp
 	ModuleBase_WidgetPoint2dDistance.cpp
+	ModuleBase_WidgetValue.cpp
+	ModuleBase_WidgetValueFeature.cpp
 )
 
 SET(PROJECT_LIBRARIES

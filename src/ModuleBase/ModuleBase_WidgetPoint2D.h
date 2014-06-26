@@ -11,6 +11,7 @@
 #include <QObject>
 
 class ModelAPI_Feature;
+class ModuleBase_WidgetValue;
 class GeomAPI_Pnt2d;
 
 class QGroupBox;
@@ -32,9 +33,10 @@ public:
   /// Destructor
   virtual ~ModuleBase_WidgetPoint2D();
 
-  /// Fill the widget values by given point
-  /// \param thePoint the point
-  void setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// \param theValue the wrapped widget value
+  virtual bool setValue(ModuleBase_WidgetValue* theValue);
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed
@@ -62,6 +64,11 @@ signals:
   /// \param the feature
   /// \param the attribute of the feature
   void storedPoint2D(FeaturePtr theFeature, const std::string& theAttribute);
+
+protected:
+  /// Fill the widget values by given point
+  /// \param thePoint the point
+  void setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
 private:
   QGroupBox* myGroupBox; ///< the parent group box for all intenal widgets

@@ -9,6 +9,7 @@
 #include "ModuleBase.h"
 #include "ModuleBase_WidgetDoubleValue.h"
 
+class ModuleBase_WidgetValue;
 class GeomAPI_Pnt2d;
 
 class MODULEBASE_EXPORT ModuleBase_WidgetPoint2dDistance: public ModuleBase_WidgetDoubleValue
@@ -22,6 +23,12 @@ public:
 
   virtual ~ModuleBase_WidgetPoint2dDistance();
 
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// \param theValue the wrapped widget value
+  virtual bool setValue(ModuleBase_WidgetValue* theValue);
+
+protected:
   /// Set the second point which defines a value in the widget as a distance with a first point defined by feature
   void setPoint(FeaturePtr theFeature, const boost::shared_ptr<GeomAPI_Pnt2d>& thePnt);
 

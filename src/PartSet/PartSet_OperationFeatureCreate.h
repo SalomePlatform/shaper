@@ -115,20 +115,12 @@ protected:
   virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
 protected:
-  /// Returns true if the active widget is the point selector widget
-  /// \return the boolean value
-  bool isPointWidget() const;
-
-  /// Set the point to the active widget
+  /// Set value to the active widget
+  /// \param theFeature the feature
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
   /// \return true if the point is set
-  bool setWidgetPoint(double theX, double theY);
-
-  /// Set the feature to the active widget
-  /// \param theFeature a feature
-  /// \return true if the feature is set
-  bool setWidgetFeature(const FeaturePtr& theFeature);
+  bool setWidgetValue(FeaturePtr theFeature, double theX, double theY);
 
 private:
   FeaturePtr myInitFeature; ///< the initial feature

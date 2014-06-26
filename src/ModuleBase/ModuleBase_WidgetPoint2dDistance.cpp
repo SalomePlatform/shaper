@@ -3,6 +3,7 @@
 // Author:      Vitaly Smetannikov
 
 #include "ModuleBase_WidgetPoint2dDistance.h"
+#include "ModuleBase_WidgetValueFeature.h"
 
 #include <GeomAPI_Pnt2d.h>
 #include <Config_WidgetAPI.h>
@@ -21,6 +22,21 @@ ModuleBase_WidgetPoint2dDistance::ModuleBase_WidgetPoint2dDistance(QWidget* theP
 
 ModuleBase_WidgetPoint2dDistance::~ModuleBase_WidgetPoint2dDistance()
 {
+}
+
+bool ModuleBase_WidgetPoint2dDistance::setValue(ModuleBase_WidgetValue* theValue)
+{
+  bool isDone = false;
+
+  if (theValue) {
+    ModuleBase_WidgetValueFeature* aFeatureValue = 
+                         dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
+    if (aFeatureValue) {
+      setPoint(aFeatureValue->feature(), aFeatureValue->point());
+      isDone = true;
+    }
+  }
+  return isDone;
 }
 
 void ModuleBase_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature, const boost::shared_ptr<GeomAPI_Pnt2d>& thePnt)

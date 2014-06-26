@@ -4,6 +4,9 @@
 
 #include <ModuleBase_WidgetFeature.h>
 
+#include <ModuleBase_WidgetValueFeature.h>
+#include <ModuleBase_WidgetValue.h>
+
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
 
@@ -50,6 +53,19 @@ ModuleBase_WidgetFeature::ModuleBase_WidgetFeature(QWidget* theParent,
 
 ModuleBase_WidgetFeature::~ModuleBase_WidgetFeature()
 {
+}
+
+bool ModuleBase_WidgetFeature::setValue(ModuleBase_WidgetValue* theValue)
+{
+  bool isDone = false;
+
+  if (theValue) {
+    ModuleBase_WidgetValueFeature* aFeatureValue = 
+                         dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
+    if (aFeatureValue)
+      isDone = setFeature(aFeatureValue->feature());
+  }
+  return isDone;
 }
 
 bool ModuleBase_WidgetFeature::setFeature(const FeaturePtr& theFeature)

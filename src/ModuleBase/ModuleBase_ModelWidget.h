@@ -15,6 +15,7 @@
 
 class Config_WidgetAPI;
 class ModelAPI_Feature;
+class ModuleBase_WidgetValue;
 class QKeyEvent;
 
 /**\class ModuleBase_ModelWidget
@@ -35,6 +36,11 @@ public:
   ModuleBase_ModelWidget(QObject* theParent, const Config_WidgetAPI* theData);
   /// Destructor
   virtual ~ModuleBase_ModelWidget() {};
+
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// \param theValue the wrapped widget value
+  virtual bool setValue(ModuleBase_WidgetValue* theValue) { return false; };
 
   /// Returns the state whether the attribute of the feature is initialized
   /// \param theFeature a model feature to be checked
