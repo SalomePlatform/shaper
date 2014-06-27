@@ -146,8 +146,9 @@ protected:
   /** \brief Change values of attribute by parameters received from SolveSpace solver
    *  \param[in,out] theAttribute pointer to the attribute to be changed
    *  \param[in]     theEntityID  identifier of SolveSpace entity, which contains updated data
+   *  \return \c true if the attribute's value has changed
    */
-  void updateAttribute(boost::shared_ptr<ModelAPI_Attribute> theAttribute, const Slvs_hEntity& theEntityID);
+  bool updateAttribute(boost::shared_ptr<ModelAPI_Attribute> theAttribute, const Slvs_hEntity& theEntityID);
 
   /** \brief Adds a constraint for a point which should not be changed during computations
    *  \param[in] theEntity the base for the constraint

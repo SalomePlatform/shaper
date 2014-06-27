@@ -566,7 +566,8 @@ void SketchSolver_ConstraintGroup::resolveConstraints()
     std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator
       anEntIter = myEntityAttrMap.begin();
     for ( ; anEntIter != myEntityAttrMap.end(); anEntIter++)
-      updateAttribute(anEntIter->first, anEntIter->second);
+      if (updateAttribute(anEntIter->first, anEntIter->second))
+        updateRelatedConstraints(anEntIter->first);
   }
   else if (!myConstraints.empty())
     Events_Error::send(ERROR_SOLVE_CONSTRAINTS, this);
@@ -789,7 +790,7 @@ bool SketchSolver_ConstraintGroup::updateGroup()
 //  Class:    SketchSolver_ConstraintGroup
 //  Purpose:  update features of sketch after resolving constraints
 // ============================================================================
-void SketchSolver_ConstraintGroup::updateAttribute(
+bool SketchSolver_ConstraintGroup::updateAttribute(
                 boost::shared_ptr<ModelAPI_Attribute> theAttribute,
                 const Slvs_hEntity&                   theEntityID)
 {
@@ -804,10 +805,16 @@ void SketchSolver_ConstraintGroup::updateAttribute(
     boost::dynamic_pointer_cast<GeomDataAPI_Point>(theAttribute);
   if (aPoint)
   {
-    aPoint->setValue(myParams[aFirstParamPos].val,
-                     myParams[aFirstParamPos+1].val,
-                     myParams[aFirstParamPos+2].val);
-    return ;
+    if (fabs(aPoint->x() - myParams[aFirstParamPos].val) > tolerance ||
+        fabs(aPoint->y() - myParams[aFirstParamPos+1].val) > tolerance ||
+        fabs(aPoint->z() - myParams[aFirstParamPos+2].val) > tolerance)
+    {
+      aPoint->setValue(myParams[aFirstParamPos].val,
+                       myParams[aFirstParamPos+1].val,
+                       myParams[aFirstParamPos+2].val);
+      return true;
+    }
+    return false;
   }
 
   // Point in 2D
@@ -815,9 +822,14 @@ void SketchSolver_ConstraintGroup::updateAttribute(
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
   if (aPoint2D)
   {
-    aPoint2D->setValue(myParams[aFirstParamPos].val,
-                       myParams[aFirstParamPos+1].val);
-    return ;
+    if (fabs(aPoint2D->x() - myParams[aFirstParamPos].val) > tolerance ||
+        fabs(aPoint2D->y() - myParams[aFirstParamPos+1].val) > tolerance)
+    {
+      aPoint2D->setValue(myParams[aFirstParamPos].val,
+                         myParams[aFirstParamPos+1].val);
+      return true;
+    }
+    return false;
   }
 
   // Scalar value
@@ -825,11 +837,16 @@ void SketchSolver_ConstraintGroup::updateAttribute(
     boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
   if (aScalar)
   {
-    aScalar->setValue(myParams[aFirstParamPos].val);
-    return ;
+    if (fabs(aScalar->value() - myParams[aFirstParamPos].val) > tolerance)
+    {
+      aScalar->setValue(myParams[aFirstParamPos].val);
+      return true;
+    }
+    return false;
   }
 
   /// \todo Support other types of entities
+  return false;
 }
 
 // ============================================================================
@@ -866,7 +883,8 @@ void SketchSolver_ConstraintGroup::updateEntityIfPossible(
     // Restore flag of changes
     myNeedToSolve = myNeedToSolve || aNeedToSolveCopy;
 
-    updateRelatedConstraints(theEntity);
+    if (myNeedToSolve)
+      updateRelatedConstraints(theEntity);
   }
 }
 
@@ -1115,18 +1133,26 @@ void SketchSolver_ConstraintGroup::updateRelatedConstraints(
   for ( ; aConstrIter != myConstraintMap.end(); aConstrIter++)
   {
     std::list< boost::shared_ptr<ModelAPI_Attribute> > anAttributes = 
-      aConstrIter->first->data()->attributes(theEntity->attributeType());
+      aConstrIter->first->data()->attributes(std::string());
 
     std::list< boost::shared_ptr<ModelAPI_Attribute> >::iterator
       anAttrIter = anAttributes.begin();
     for ( ; anAttrIter != anAttributes.end(); anAttrIter++)
-      if (*anAttrIter == theEntity)
+    {
+      bool isUpd = (*anAttrIter == theEntity);
+      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRefAttr = 
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
+      if (aRefAttr && !aRefAttr->isFeature() && aRefAttr->attr() == theEntity)
+        isUpd = true;
+
+      if (isUpd)
       {
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
         Model_FeatureUpdatedMessage aMsg(aConstrIter->first, anEvent);
         Events_Loop::loop()->send(aMsg, true);
         break;
       }
+    }
   }
 }
 
