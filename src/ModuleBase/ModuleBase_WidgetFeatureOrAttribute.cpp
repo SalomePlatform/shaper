@@ -48,25 +48,26 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
     if (aFeatureValue) {
       boost::shared_ptr<GeomAPI_Pnt2d> aValuePoint = aFeatureValue->point();
       FeaturePtr aValueFeature = aFeatureValue->feature();
-
-      if (aValueFeature) {
-        isDone = setFeature(aValueFeature);
-      }
-      if (!isDone) {
-        // find the given point in the feature attributes
-        std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes =
-                                      aValueFeature->data()->attributes(GeomDataAPI_Point2D::type());
-        std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
-                                                                          aLast = anAttiributes.end();
-        boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;
-        for (;anIt!=aLast && !aFPoint; anIt++) {
-          boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint =
-                                              boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
-          if (aCurPoint && aCurPoint->pnt()->distance(aValuePoint) < Precision::Confusion())
-            aFPoint = aCurPoint;
+      if (aValuePoint && aValueFeature) {
+        if (aValueFeature) {
+          isDone = setFeature(aValueFeature);
         }
-        if (aFPoint)
-          isDone = setAttribute(aFPoint);
+        if (!isDone) {
+          // find the given point in the feature attributes
+          std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes =
+                                        aValueFeature->data()->attributes(GeomDataAPI_Point2D::type());
+          std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
+                                                                            aLast = anAttiributes.end();
+          boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;
+          for (;anIt!=aLast && !aFPoint; anIt++) {
+            boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint =
+                                                boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+            if (aCurPoint && aCurPoint->pnt()->distance(aValuePoint) < Precision::Confusion())
+              aFPoint = aCurPoint;
+          }
+          if (aFPoint)
+            isDone = setAttribute(aFPoint);
+        }
       }
     }
   }
