@@ -61,3 +61,13 @@ const boost::shared_ptr<GeomAPI_Pnt> GeomAPI_Circ::project(const boost::shared_p
   return aResult;
 }
 
+const boost::shared_ptr<GeomAPI_Pnt> GeomAPI_Circ::center() const
+{
+  const gp_Pnt& aCenter = MY_CIRC->Location();
+  return boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aCenter.X(), aCenter.Y(), aCenter.Z()));
+}
+
+double GeomAPI_Circ::radius() const
+{
+  return MY_CIRC->Radius();
+}

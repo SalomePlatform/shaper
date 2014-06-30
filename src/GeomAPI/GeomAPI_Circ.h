@@ -24,6 +24,12 @@ public:
                const boost::shared_ptr<GeomAPI_Dir>& theDir,
                double theRadius);
 
+  /// Return center of the circle
+  const boost::shared_ptr<GeomAPI_Pnt> center() const;
+
+  /// Return radius of the circle
+  double radius() const;
+
   /// Project point on circle
   const boost::shared_ptr<GeomAPI_Pnt> project(const boost::shared_ptr<GeomAPI_Pnt>& thePoint) const;
 };

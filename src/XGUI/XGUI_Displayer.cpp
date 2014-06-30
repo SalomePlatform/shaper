@@ -47,20 +47,22 @@ void XGUI_Displayer::display(FeaturePtr theFeature, bool isUpdateViewer)
   boost::shared_ptr<GeomAPI_Shape> aShapePtr = aFeature->data()->shape();
 
   if (aShapePtr) {
-    TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
-    display(aFeature, aShape, isUpdateViewer);
+    boost::shared_ptr<GeomAPI_AISObject> anAIS(new GeomAPI_AISObject());
+    anAIS->createShape(aShapePtr);
+    display(aFeature, anAIS, isUpdateViewer);
   }
 }
 
 void XGUI_Displayer::display(FeaturePtr theFeature,
-                             const TopoDS_Shape& theShape, bool isUpdateViewer)
+                             boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
-  Handle(AIS_Shape) anAIS = new AIS_Shape(theShape);
-  myFeature2AISObjectMap[theFeature] = anAIS;
+  myFeature2AISObjectMap[theFeature] = theAIS;
 
-  aContext->Display(anAIS, isUpdateViewer);
+  Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
+  if (!anAISIO.IsNull())
+    aContext->Display(anAISIO, isUpdateViewer);
 }
 
 
@@ -133,20 +135,24 @@ void XGUI_Displayer::erase(FeaturePtr theFeature,
     return;
 
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  Handle(AIS_InteractiveObject) anAIS = myFeature2AISObjectMap[aFeature];
-  if (!anAIS.IsNull())
+  boost::shared_ptr<GeomAPI_AISObject> anObject = myFeature2AISObjectMap[aFeature];
+  if (anObject)
   {
-    aContext->Erase(anAIS, isUpdateViewer);
+    Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
+    if (!anAIS.IsNull())
+      aContext->Erase(anAIS, isUpdateViewer);
   }
   myFeature2AISObjectMap.erase(aFeature);
 }
 
 
 bool XGUI_Displayer::redisplay(FeaturePtr theFeature,
-                               Handle(AIS_InteractiveObject) theAIS,
+                               boost::shared_ptr<GeomAPI_AISObject> theAIS,
                                const bool isUpdateViewer)
 {
   bool isCreated = false;
+  Handle(AIS_InteractiveObject) anAIS = 
+    theAIS ? theAIS->impl<Handle(AIS_InteractiveObject)>() : Handle(AIS_InteractiveObject)();
   Handle(AIS_InteractiveContext) aContext = AISContext();
   // Open local context if there is no one
   if (!aContext->HasOpenedContext()) {
@@ -157,12 +163,13 @@ bool XGUI_Displayer::redisplay(FeaturePtr theFeature,
     //aContext->SetPixelTolerance(MOUSE_SENSITIVITY_IN_PIXEL);
   }
   // display or redisplay presentation
-  if (isVisible(theFeature) && !myFeature2AISObjectMap[theFeature].IsNull()) {
-      aContext->RecomputeSelectionOnly(theAIS);
+  boost::shared_ptr<GeomAPI_AISObject> anObj = myFeature2AISObjectMap[theFeature];
+  if (isVisible(theFeature) && anObj && !anObj->empty()) {
+      aContext->RecomputeSelectionOnly(anAIS);
   }
   else {
     myFeature2AISObjectMap[theFeature] = theAIS;
-    aContext->Display(theAIS, false);
+    aContext->Display(anAIS, false);
     isCreated = true;
   }
   if (isUpdateViewer)
@@ -179,10 +186,12 @@ void XGUI_Displayer::redisplay(FeaturePtr theFeature, bool isUpdateViewer)
 
   boost::shared_ptr<GeomAPI_Shape> aShapePtr = aFeature->data()->shape();
   if (aShapePtr) {
-    Handle(AIS_InteractiveObject) aAISObj = getAISObject(aFeature);
-    Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(aAISObj);
-    aAISShape->Set(aShapePtr->impl<TopoDS_Shape>());
+    boost::shared_ptr<GeomAPI_AISObject> aAISObj = getAISObject(aFeature);
+    Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(aAISObj->impl<Handle(AIS_InteractiveObject)>());
+    if (!aAISShape.IsNull())
+      return;
 
+    aAISShape->Set(aShapePtr->impl<TopoDS_Shape>());
     AISContext()->Redisplay(aAISShape);
   }
 }
@@ -199,18 +208,22 @@ void XGUI_Displayer::activateInLocalContext(FeaturePtr theFeature,
   // display or redisplay presentation
   Handle(AIS_InteractiveObject) anAIS;
   if (isVisible(theFeature))
-    anAIS = Handle(AIS_InteractiveObject)::DownCast(myFeature2AISObjectMap[theFeature]);
+  {
+    boost::shared_ptr<GeomAPI_AISObject> anObj = myFeature2AISObjectMap[theFeature];
+    if (anObj)
+      anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
+  }
 
   // Activate selection of objects from prs
   if (!anAIS.IsNull()) {
-	aContext->Load(anAIS, -1, true/*allow decomposition*/);
+    aContext->Load(anAIS, -1, true/*allow decomposition*/);
     aContext->Deactivate(anAIS);
 
     std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
     for (; anIt != aLast; anIt++)
     {
       aContext->Activate(anAIS, (*anIt));
-	}
+    }
   }
 
   if (isUpdateViewer)
@@ -228,7 +241,7 @@ void XGUI_Displayer::stopSelection(const QFeatureList& theFeatures, const bool i
   for (; anIt != aLast; anIt++) {
     aFeature = *anIt;
     if (isVisible(aFeature))
-      anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[aFeature]);
+      anAIS = Handle(AIS_Shape)::DownCast(myFeature2AISObjectMap[aFeature]->impl<Handle(AIS_InteractiveObject)>());
     if (anAIS.IsNull())
       continue;
 
@@ -262,9 +275,13 @@ void XGUI_Displayer::setSelected(const QFeatureList& theFeatures, const bool isU
     if (myFeature2AISObjectMap.find(aRFeature) == myFeature2AISObjectMap.end()) 
       return;
 
-    Handle(AIS_InteractiveObject) anAIS = myFeature2AISObjectMap[aRFeature];
-    if (!anAIS.IsNull())
-      aContext->AddOrRemoveSelected(anAIS, false);
+    boost::shared_ptr<GeomAPI_AISObject> anObj = myFeature2AISObjectMap[aRFeature];
+    if (anObj)
+    {
+      Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
+      if (!anAIS.IsNull())
+        aContext->AddOrRemoveSelected(anAIS, false);
+    }
   }
   if (isUpdateViewer)
     updateViewer();
@@ -302,7 +319,9 @@ void XGUI_Displayer::eraseDeletedFeatures(const bool isUpdateViewer)
   {
     FeaturePtr aFeature = (*aFIt).first;
     if (!aFeature || !aFeature->data() || !aFeature->data()->isValid()) {
-      Handle(AIS_InteractiveObject) anAIS = (*aFIt).second;
+      boost::shared_ptr<GeomAPI_AISObject> anObj = (*aFIt).second;
+      if (!anObj) continue;
+      Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anAIS.IsNull()) {
         aContext->Erase(anAIS, false);
         aRemoved.push_back(aFeature);
@@ -324,10 +343,10 @@ void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
   closeAllContexts(true);
 }
 
-Handle(AIS_InteractiveObject) XGUI_Displayer::getAISObject(
+boost::shared_ptr<GeomAPI_AISObject> XGUI_Displayer::getAISObject(
                                               FeaturePtr theFeature) const
 {
-  Handle(AIS_InteractiveObject) anIO;
+  boost::shared_ptr<GeomAPI_AISObject> anIO;
   if (myFeature2AISObjectMap.find(theFeature) != myFeature2AISObjectMap.end())
     anIO = (myFeature2AISObjectMap.find(theFeature))->second;
   return anIO;
@@ -339,7 +358,9 @@ FeaturePtr XGUI_Displayer::getFeature(Handle(AIS_InteractiveObject) theIO) const
   FeatureToAISMap::const_iterator aFIt = myFeature2AISObjectMap.begin(),
                                   aFLast = myFeature2AISObjectMap.end();
   for (; aFIt != aFLast && !aFeature; aFIt++) {
-    Handle(AIS_InteractiveObject) anAIS = (*aFIt).second;
+    boost::shared_ptr<GeomAPI_AISObject> anObj = (*aFIt).second;
+    if (!anObj) continue;
+    Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
     if (anAIS != theIO)
       continue;
     aFeature = (*aFIt).first;

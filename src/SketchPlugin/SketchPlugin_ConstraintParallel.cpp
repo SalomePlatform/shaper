@@ -10,10 +10,6 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Sketch.h>
 
-#include <AIS_InteractiveObject.hxx>
-#include <AIS_ParallelRelation.hxx>
-#include <Geom_Plane.hxx>
-
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Pnt.h>
@@ -40,11 +36,11 @@ const boost::shared_ptr<GeomAPI_Shape>&  SketchPlugin_ConstraintParallel::previe
 }
 
 
-Handle_AIS_InteractiveObject SketchPlugin_ConstraintParallel::getAISShape(Handle_AIS_InteractiveObject thePrevious)
+boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintParallel::getAISObject(
+                    boost::shared_ptr<GeomAPI_AISObject> thePrevious)
 {
-  Handle(AIS_InteractiveObject) anAIS = thePrevious;
   if (!sketch())
-    return anAIS;
+    return thePrevious;
 
   boost::shared_ptr<ModelAPI_Data> aData = data();
   boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr1 = 
@@ -53,42 +49,26 @@ Handle_AIS_InteractiveObject SketchPlugin_ConstraintParallel::getAISShape(Handle
     boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_B));
   if (!anAttr1 || !anAttr1->isFeature() || 
       !anAttr2 || !anAttr2->isFeature())
-    return anAIS;
+    return thePrevious;
   boost::shared_ptr<SketchPlugin_Line> aLine1Feature = 
     boost::dynamic_pointer_cast<SketchPlugin_Line>(anAttr1->feature());
   boost::shared_ptr<SketchPlugin_Line> aLine2Feature = 
     boost::dynamic_pointer_cast<SketchPlugin_Line>(anAttr2->feature());
   if (!aLine1Feature || !aLine2Feature)
-    return anAIS;
+    return thePrevious;
 
+  boost::shared_ptr<GeomAPI_Pln> aPlane = sketch()->plane();
   boost::shared_ptr<GeomAPI_Shape> aLine1 = aLine1Feature->preview();
   boost::shared_ptr<GeomAPI_Shape> aLine2 = aLine2Feature->preview();
-  Handle(Geom_Plane) aPlane = new Geom_Plane(sketch()->plane()->impl<gp_Pln>());
 
   boost::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
-  boost::shared_ptr<GeomAPI_Pnt2d> aFOPnt2d = aFlyoutAttr->pnt();
-  boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFOPnt2d->x(), aFOPnt2d->y());
+  boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
 
-  if (anAIS.IsNull())
-  {
-    Handle(AIS_ParallelRelation) aParallel = 
-      new AIS_ParallelRelation(aLine1->impl<TopoDS_Shape>(), aLine2->impl<TopoDS_Shape>(), aPlane);
-    aParallel->SetPosition(aFlyoutPnt->impl<gp_Pnt>());
-    anAIS = aParallel;
-  }
-  else
-  {
-    Handle(AIS_ParallelRelation) aParallel = Handle(AIS_ParallelRelation)::DownCast(anAIS);
-    if (!aParallel.IsNull())
-    {
-      aParallel->SetFirstShape(aLine1->impl<TopoDS_Shape>());
-      aParallel->SetSecondShape(aLine2->impl<TopoDS_Shape>());
-      aParallel->SetPlane(aPlane);
-      aParallel->SetPosition(aFlyoutPnt->impl<gp_Pnt>());
-      aParallel->Redisplay(Standard_True);
-    }
-  }
+  boost::shared_ptr<GeomAPI_AISObject> anAIS = thePrevious;
+  if (!anAIS)
+    anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject);
+  anAIS->createParallel(aLine1, aLine2, aFlyoutPnt, aPlane);
   return anAIS;
 }
 

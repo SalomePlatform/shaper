@@ -49,8 +49,9 @@ public:
   /// Returns the sketch preview
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
-  /// Returns the sketch preview
-  SKETCHPLUGIN_EXPORT virtual Handle_AIS_InteractiveObject getAISShape(Handle_AIS_InteractiveObject thePrevious);
+  /// Returns the AIS preview
+  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
+                                boost::shared_ptr<GeomAPI_AISObject> thePrevious);
 
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature

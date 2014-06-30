@@ -8,6 +8,7 @@
 #include "SketchPlugin.h"
 #include <ModelAPI_Feature.h>
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_AISObject.h>
 
 class SketchPlugin_Sketch;
 class GeomAPI_Pnt2d;
@@ -27,7 +28,8 @@ public:
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview() = 0;
 
   /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual Handle_AIS_InteractiveObject getAISShape(Handle_AIS_InteractiveObject thePrevious);
+  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
+                                boost::shared_ptr<GeomAPI_AISObject> thePrevious) = 0;
 
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
@@ -53,6 +55,9 @@ protected:
   /// Return the shape from the internal preview field
   /// \return theShape a preview shape
   const boost::shared_ptr<GeomAPI_Shape>& getPreview() const;
+  /// Common method for other features to produce AIS shape
+  boost::shared_ptr<GeomAPI_AISObject> prepareAISShape(
+                      boost::shared_ptr<GeomAPI_AISObject> thePrevious);
   /// Sets the higher-level feature for the sub-feature (sketch for line)
   void setSketch(SketchPlugin_Sketch* theSketch) {mySketch = theSketch;}
   /// Returns the sketch of this feature

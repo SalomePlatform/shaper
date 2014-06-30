@@ -28,6 +28,12 @@ public:
                  const boost::shared_ptr<GeomAPI_Dir2d>& theDir,
                  double theRadius);
 
+  /// Return center of the circle
+  const boost::shared_ptr<GeomAPI_Pnt2d> center() const;
+
+  /// Return radius of the circle
+  double radius() const;
+
   /// Project point on line
   const boost::shared_ptr<GeomAPI_Pnt2d> project(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) const;
 };

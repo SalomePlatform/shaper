@@ -69,6 +69,12 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Circle::preview()
   return getPreview();
 }
 
+boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Circle::getAISObject(
+                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+{
+  return prepareAISShape(thePrevious);
+}
+
 void SketchPlugin_Circle::move(double theDeltaX, double theDeltaY)
 {
   boost::shared_ptr<ModelAPI_Data> aData = data();

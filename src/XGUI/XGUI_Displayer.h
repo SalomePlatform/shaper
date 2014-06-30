@@ -11,6 +11,8 @@
 #include <QString>
 #include <boost/shared_ptr.hpp>
 
+#include <GeomAPI_AISObject.h>
+
 #include <TopoDS_Shape.hxx>
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_InteractiveContext.hxx>
@@ -56,9 +58,9 @@ public:
 
   /// Display the feature and a shape. This shape would be associated to the given feature
   /// \param theFeature a feature instance
-  /// \param theShape a shape
+  /// \param theAIS AIS presentation
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void display(FeaturePtr theFeature, const TopoDS_Shape& theShape, bool isUpdateViewer = true);
+  void display(FeaturePtr theFeature, boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdateViewer = true);
   
   /// Returns a list of viewer selected presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
@@ -81,7 +83,8 @@ public:
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the presentation is created
   bool redisplay(FeaturePtr theFeature,
-                 Handle(AIS_InteractiveObject) theAIS, const bool isUpdateViewer = true);
+                 boost::shared_ptr<GeomAPI_AISObject> theAIS, 
+                 const bool isUpdateViewer = true);
 
   /** Redisplay the shape if it was displayed
   * \param theFeature a feature instance
@@ -139,7 +142,7 @@ public:
   /// Searches the interactive object by feature
   /// \param theFeature the feature or NULL if it not visualized
   /// \return theIO an interactive object
-  Handle(AIS_InteractiveObject) getAISObject(FeaturePtr theFeature) const;
+  boost::shared_ptr<GeomAPI_AISObject> getAISObject(FeaturePtr theFeature) const;
 
 protected:
   /// Searches the feature by interactive object
@@ -156,7 +159,7 @@ protected:
 protected:
   XGUI_Workshop* myWorkshop;
 
-  typedef std::map<FeaturePtr, Handle(AIS_InteractiveObject) > FeatureToAISMap;
+  typedef std::map<FeaturePtr, boost::shared_ptr<GeomAPI_AISObject> > FeatureToAISMap;
   FeatureToAISMap myFeature2AISObjectMap;
 };
 

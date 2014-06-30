@@ -15,10 +15,6 @@
 #include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
 
-#include <AIS_LengthDimension.hxx>
-#include <gp_Pnt.hxx>
-#include <gp_Pln.hxx>
-
 SketchPlugin_ConstraintLength::SketchPlugin_ConstraintLength()
 {
 }
@@ -54,8 +50,8 @@ void SketchPlugin_ConstraintLength::execute()
   }
 }
 
-Handle(AIS_InteractiveObject) SketchPlugin_ConstraintLength::getAISShape(
-  Handle_AIS_InteractiveObject thePrevious)
+boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintLength::getAISObject(
+                    boost::shared_ptr<GeomAPI_AISObject> thePrevious)
 {
   if (!sketch())
     return thePrevious;
@@ -70,81 +66,30 @@ Handle(AIS_InteractiveObject) SketchPlugin_ConstraintLength::getAISShape(
   if (!aFeature || aFeature->getKind() != SKETCH_LINE_KIND)
     return thePrevious;
 
-  // fly out calculation
   boost::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = 
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
-  double aFlyout = 0;
-  if (aFlyOutAttr->isInitialized()) {
-    boost::shared_ptr<GeomAPI_Pnt2d> aFlyOutPnt = aFlyOutAttr->pnt();
 
-    boost::shared_ptr<GeomDataAPI_Point2D> aStartPoint =
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(LINE_ATTR_START));
-    boost::shared_ptr<GeomDataAPI_Point2D> anEndPoint =
-       boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(LINE_ATTR_END));
+  DataPtr aData = aFeature->data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aStartPoint =
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
+  boost::shared_ptr<GeomDataAPI_Point2D> anEndPoint =
+      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
 
-    boost::shared_ptr<GeomAPI_Lin2d> aFeatureLin = boost::shared_ptr<GeomAPI_Lin2d>
-                                               (new GeomAPI_Lin2d(aStartPoint->x(), aStartPoint->y(),
-                                                                  anEndPoint->x(), anEndPoint->y()));
-    boost::shared_ptr<GeomAPI_Pnt2d> aProjectedPoint = aFeatureLin->project(aFlyOutPnt);
-    double aDistance = aFlyOutPnt->distance(aProjectedPoint);
-    if (!aFeatureLin->isRight(aFlyOutPnt))
-      aDistance = -aDistance;
-    aFlyout = aDistance;
-  }
-  // value
+  boost::shared_ptr<GeomAPI_Pnt> aPoint1 = sketch()->to3D(aStartPoint->x(), aStartPoint->y());
+  boost::shared_ptr<GeomAPI_Pnt> aPoint2 = sketch()->to3D(anEndPoint->x(),  anEndPoint->y());
+  boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = aFlyOutAttr->isInitialized() ? 
+                                              sketch()->to3D(aFlyOutAttr->x(), aFlyOutAttr->y()) : 
+                                              boost::shared_ptr<GeomAPI_Pnt>();
+
+  // value calculation
   boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CONSTRAINT_ATTR_VALUE));
   double aValue = aValueAttr->value();
 
-  boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
-  if (!aData->isValid())
-    return thePrevious;
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPointStart =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_START));
-  boost::shared_ptr<GeomDataAPI_Point2D> aPointEnd =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(LINE_ATTR_END));
-
-  //Build dimension here
-  boost::shared_ptr<GeomAPI_Pnt> aPoint1 = sketch()->to3D(aPointStart->x(), aPointStart->y());
-  boost::shared_ptr<GeomAPI_Pnt> aPoint2 = sketch()->to3D(aPointEnd->x(),   aPointEnd->y());
-
-  Handle(AIS_InteractiveObject) anAIS = thePrevious;
-  if (anAIS.IsNull())
-  {
-    Handle(AIS_LengthDimension) aDimAIS = 
-      new AIS_LengthDimension(aPoint1->impl<gp_Pnt>(), aPoint2->impl<gp_Pnt>(), aPlane->impl<gp_Pln>());
-    aDimAIS->SetCustomValue(aValue);
-
-    Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
-    anAspect->MakeArrows3d (Standard_False);
-    anAspect->MakeText3d(false/*is text 3d*/);
-    anAspect->TextAspect()->SetHeight(CONSTRAINT_TEXT_HEIGHT);
-    anAspect->MakeTextShaded(false/*is test shaded*/);
-    aDimAIS->DimensionAspect()->MakeUnitsDisplayed(false/*is units displayed*/);
-    /*if (isUnitsDisplayed)
-    {
-      aDimAIS->SetDisplayUnits (aDimDlg->GetUnits ());
-    }*/
-    aDimAIS->SetDimensionAspect (anAspect);
-    aDimAIS->SetFlyout(aFlyout);
-    aDimAIS->SetSelToleranceForText2d(CONSTRAINT_TEXT_SELECTION_TOLERANCE);
-
-    anAIS = aDimAIS;
-  }
-  else
-  {
-    // update presentation
-    Handle(AIS_LengthDimension) aDimAIS = Handle(AIS_LengthDimension)::DownCast(anAIS);
-    if (!aDimAIS.IsNull()) 
-    {
-      aDimAIS->SetMeasuredGeometry(aPoint1->impl<gp_Pnt>(), aPoint2->impl<gp_Pnt>(), aPlane->impl<gp_Pln>());
-      aDimAIS->SetCustomValue(aValue);
-      aDimAIS->SetFlyout(aFlyout);
-
-      aDimAIS->Redisplay(Standard_True);
-    }
-  }
+  boost::shared_ptr<GeomAPI_AISObject> anAIS = thePrevious;
+  if (!anAIS)
+    anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject);
+  anAIS->createDistance(aPoint1, aPoint2, aFlyoutPnt, aPlane, aValue);
   return anAIS;
 }
 

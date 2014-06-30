@@ -40,7 +40,8 @@ public:
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
   /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual Handle_AIS_InteractiveObject getAISShape(Handle_AIS_InteractiveObject thePrevious);
+  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
+                                boost::shared_ptr<GeomAPI_AISObject> thePrevious);
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved

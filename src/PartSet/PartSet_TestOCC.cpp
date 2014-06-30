@@ -37,8 +37,8 @@ void PartSet_TestOCC::testSelection(XGUI_Workshop* theWorkshop)
                                theWorkshop->viewer()->activeView());
     PartSet_TestOCC::changeTestLine(theWorkshop);
   }
-  Handle(AIS_InteractiveObject) anIO = theWorkshop->displayer()->getAISObject(myTestFeature);
-  if (!anIO.IsNull()) {
+  boost::shared_ptr<GeomAPI_AISObject> anIO = theWorkshop->displayer()->getAISObject(myTestFeature);
+  if (!anIO->empty()) {
     theWorkshop->viewer()->AISContext()->MoveTo(0, 0, theWorkshop->viewer()->activeView());
     theWorkshop->viewer()->AISContext()->Select(0, 0, 2500, 2500, theWorkshop->viewer()->activeView());
   }
@@ -147,10 +147,11 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
 
     XGUI_Displayer* aDisplayer = theWorkshop->displayer();
 
+    boost::shared_ptr<GeomAPI_AISObject> aPrevAIS;
     boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    Handle(AIS_InteractiveObject) anAIS = aSPFeature->getAISShape(NULL);
-    if (!anAIS.IsNull())
+    boost::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
+    if (!anAIS->empty())
       aDisplayer->redisplay(aFeature, anAIS, false);
 
     std::list<int> aModes;
@@ -202,11 +203,11 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   PartSet_Tools::setFeaturePoint(aFeature, 200/*aDelta*2*/, 200/*aDelta*2*/, LINE_ATTR_END);
   boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
 
-  Handle(AIS_InteractiveObject) aPrevAIS;
+  boost::shared_ptr<GeomAPI_AISObject> aPrevAIS;
   boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
     boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-  Handle(AIS_InteractiveObject) anAIS = aSPFeature->getAISShape(aPrevAIS);
-  if (!anAIS.IsNull())
+  boost::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
+  if (!anAIS->empty())
     theWorkshop->displayer()->redisplay(aFeature, anAIS, true);
   //std::list<int> aModes;
   //aModes.clear();

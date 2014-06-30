@@ -13,8 +13,6 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomDataAPI_Point2D.h>
 
-#include <AIS_InteractiveObject.hxx>
-
 using namespace std;
 
 // face of the square-face displayed for selection of general plane
@@ -55,6 +53,13 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Line::preview()
   }
   return getPreview();
 }
+
+boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Line::getAISObject(
+                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+{
+  return prepareAISShape(thePrevious);
+}
+
 
 void SketchPlugin_Line::move(double theDeltaX, double theDeltaY)
 {
