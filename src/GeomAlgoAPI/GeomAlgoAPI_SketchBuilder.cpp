@@ -128,6 +128,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
 
   BOPCol_IndexedDataMapOfShapeListOfShape aMapVE; // map between vertexes and edges
   BOPTools::MapShapesAndAncestors(aFeaturesCompound, TopAbs_VERTEX, TopAbs_EDGE, aMapVE);
+  if (aMapVE.IsEmpty()) // in case of not-initialized circle
+    return;
 
   gp_Dir aDirX = theDirX->impl<gp_Dir>();
   gp_Dir aDirY = theDirY->impl<gp_Dir>();

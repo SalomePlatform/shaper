@@ -36,7 +36,7 @@ public:
   {if (theFeature) myFeatures.insert(theFeature);}
 
   /// Returns the feature that has been updated
-  std::set<FeaturePtr > features() const {return myFeatures;}
+  std::set<FeaturePtr> features() const {return myFeatures;}
 
   //! Creates a new empty group (to store it in the loop before flush)
   virtual Events_MessageGroup* newEmpty() {
