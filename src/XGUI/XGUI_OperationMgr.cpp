@@ -108,10 +108,16 @@ bool XGUI_OperationMgr::canStartOperation(ModuleBase_Operation* theOperation)
 
 bool XGUI_OperationMgr::canStopOperation()
 {
-  int anAnswer = QMessageBox::question(0, tr("Operation launch"),
-                              tr("Previous operation is not finished and will be aborted"),
-                              QMessageBox::Ok, QMessageBox::Cancel);
-  return anAnswer == QMessageBox::Ok;
+  ModuleBase_Operation* anOperation = currentOperation();
+  if (anOperation) {
+    if (anOperation->isModified()) {
+      int anAnswer = QMessageBox::question(qApp->activeWindow(), tr("Operation launch"),
+                                  tr("Previous operation is not finished and will be aborted"),
+                                  QMessageBox::Ok, QMessageBox::Cancel);
+      return anAnswer == QMessageBox::Ok;
+    }
+  }
+  return true;
 }
 
 void XGUI_OperationMgr::onCommitOperation()
@@ -124,8 +130,20 @@ void XGUI_OperationMgr::onCommitOperation()
 void XGUI_OperationMgr::onAbortOperation()
 {
   ModuleBase_Operation* anOperation = currentOperation();
-  if (anOperation)
+  if (anOperation && canAbortOperation())
     anOperation->abort();
+}
+
+bool XGUI_OperationMgr::canAbortOperation()
+{
+  ModuleBase_Operation* anOperation = currentOperation();
+  if (anOperation && anOperation->isModified()) {
+      int anAnswer = QMessageBox::question(qApp->activeWindow(), tr("Cancel operation"),
+                                  tr("Operation %1 will be cancelled. Continue?").arg(anOperation->id()),
+                                  QMessageBox::Yes, QMessageBox::No);
+      return anAnswer == QMessageBox::Yes;
+  }
+  return true;
 }
 
 void XGUI_OperationMgr::onOperationStopped()

@@ -11,6 +11,8 @@
 #include <AIS_DimensionSelectionMode.hxx>
 
 #include <QKeyEvent>
+#include <QMessageBox>
+#include <QApplication>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -89,7 +91,15 @@ void PartSet_OperationSketchBase::keyReleased(const int theKey)
 {
   switch (theKey) {
     case Qt::Key_Escape: {
-      abort();
+      bool toAbort = true;
+      if (isModified()) {
+        int anAnswer = QMessageBox::question(qApp->activeWindow(), tr("Cancel operation"),
+                                  tr("Operation %1 will be cancelled. Continue?").arg(id()),
+                                  QMessageBox::Yes, QMessageBox::No);
+        toAbort = (anAnswer == QMessageBox::Yes);
+      }
+      if (toAbort)
+        abort();
     }
     break;
     default:

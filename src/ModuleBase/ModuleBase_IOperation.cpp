@@ -17,7 +17,7 @@
 #endif
 
 ModuleBase_IOperation::ModuleBase_IOperation(const QString& theId, QObject* theParent)
- : QObject(theParent)
+ : QObject(theParent), myIsEditing(false), myIsModified(false)
 {
   myDescription = new ModuleBase_OperationDescription(theId);
 }
