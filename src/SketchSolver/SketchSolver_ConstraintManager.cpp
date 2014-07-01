@@ -8,7 +8,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Data.h>
-#include <Model_Events.h>
+#include <ModelAPI_Events.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -63,10 +63,12 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED) || 
       theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_MOVED))
   {
-    const Model_FeatureUpdatedMessage* anUpdateMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+    const ModelAPI_FeatureUpdatedMessage* anUpdateMsg = 
+      dynamic_cast<const ModelAPI_FeatureUpdatedMessage*>(theMessage);
     std::set< FeaturePtr > aFeatures = anUpdateMsg->features();
 
-    bool isModifiedEvt = theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_MOVED);
+    bool isModifiedEvt = 
+      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_MOVED);
     if (!isModifiedEvt)
     {
       std::set< FeaturePtr >::iterator aFeatIter;
@@ -102,7 +104,8 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED))
   {
-    const Model_FeatureDeletedMessage* aDeleteMsg = dynamic_cast<const Model_FeatureDeletedMessage*>(theMessage);
+    const ModelAPI_FeatureDeletedMessage* aDeleteMsg = 
+      dynamic_cast<const ModelAPI_FeatureDeletedMessage*>(theMessage);
     const std::set<std::string>& aFeatureGroups = aDeleteMsg->groups();
 
     // Find SKETCH_KIND in groups. The constraint groups should be updated when an object removed from Sketch

@@ -7,7 +7,7 @@
 #include <PartSet_OperationSketch.h>
 
 #include <ModuleBase_OperationDescription.h>
-#include <Model_Events.h>
+#include <ModelAPI_Events.h>
 
 #include <XGUI_ViewerPrs.h>
 
@@ -16,7 +16,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 
-#include <Model_Events.h>
+#include <ModelAPI_Events.h>
 
 #include <Events_Loop.h>
 
@@ -190,8 +190,7 @@ void PartSet_OperationFeatureEditMulti::sendFeatures()
     if (!aFeature)
       continue;
 
-    Model_FeatureUpdatedMessage aMessage(aFeature, anEvent);
-    Events_Loop::loop()->send(aMessage);
+    ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
   }
   Events_Loop::loop()->flush(anEvent);
   flushUpdated();

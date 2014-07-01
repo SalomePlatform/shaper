@@ -17,6 +17,7 @@ SET(PROJECT_HEADERS
     ModelAPI_AttributeRefAttr.h
     ModelAPI_AttributeRefList.h
     ModelAPI_AttributeBoolean.h
+    ModelAPI_Events.h
 )
 
 SET(PROJECT_SOURCES
@@ -33,7 +34,7 @@ SET_TARGET_PROPERTIES(ModelAPI PROPERTIES LINKER_LANGUAGE CXX)
 TARGET_LINK_LIBRARIES(ModelAPI ${PROJECT_LIBRARIES})
 
 INCLUDE_DIRECTORIES(
-  ../Config
+  ../Config ../Events
 )
 
 SET(CMAKE_SWIG_FLAGS "")

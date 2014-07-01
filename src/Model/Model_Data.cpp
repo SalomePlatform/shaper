@@ -49,8 +49,7 @@ void Model_Data::setName(string theName)
   }
   if (isModified) {
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-    Model_FeatureUpdatedMessage aMsg(myFeature, anEvent);
-    Events_Loop::loop()->send(aMsg, false);
+    ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent, false);
   }
 }
 
@@ -223,8 +222,7 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
 {
   theAttr->setInitialized();
   static const Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-  Model_FeatureUpdatedMessage aMsg(myFeature, anEvent);
-  Events_Loop::loop()->send(aMsg);
+  ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent);
 }
 
 #include <TNaming_Builder.hxx>

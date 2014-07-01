@@ -9,7 +9,7 @@
 #include <XGUI_Displayer.h>
 
 #include <Events_Loop.h>
-#include <Model_Events.h>
+#include <ModelAPI_Events.h>
 
 #include <SketchPlugin_Sketch.h>
 
@@ -39,8 +39,8 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
   if (aType == EVENT_FEATURE_UPDATED ||
       aType == EVENT_FEATURE_CREATED)
   {
-    const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>
-                                                                                    (theMessage);
+    const ModelAPI_FeatureUpdatedMessage* aUpdMsg = 
+      dynamic_cast<const ModelAPI_FeatureUpdatedMessage*>(theMessage);
     std::set<FeaturePtr > aFeatures = aUpdMsg->features();
     std::set<FeaturePtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
     for (; anIt != aLast; anIt++) {
@@ -56,7 +56,8 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
   }
   if (aType == EVENT_FEATURE_DELETED)
   {
-    const Model_FeatureDeletedMessage* aDelMsg = dynamic_cast<const Model_FeatureDeletedMessage*>(theMessage);
+    const ModelAPI_FeatureDeletedMessage* aDelMsg = 
+      dynamic_cast<const ModelAPI_FeatureDeletedMessage*>(theMessage);
     boost::shared_ptr<ModelAPI_Document> aDoc = aDelMsg->document();
 
     std::set<std::string> aGroups = aDelMsg->groups();

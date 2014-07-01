@@ -386,8 +386,7 @@ void Model_Document::addFeature(const FeaturePtr theFeature)
 
   // event: feature is added
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);
-  Model_FeatureUpdatedMessage aMsg(theFeature, anEvent);
-  Events_Loop::loop()->send(aMsg);
+  ModelAPI_EventCreator::get()->sendUpdated(theFeature, anEvent);
 }
 
 /// Appenad to the array of references a new referenced label.
@@ -444,8 +443,7 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
   RemoveFromRefArray(groupLabel(FEATURES_GROUP), aData->label());
 
   // event: feature is added
-  Model_FeatureDeletedMessage aMsg(theFeature->document(), theFeature->getGroup());
-  Events_Loop::loop()->send(aMsg);
+  ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), theFeature->getGroup());
 }
 
 FeaturePtr Model_Document::feature(TDF_Label& theLabel)
@@ -607,11 +605,9 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       aFIter = myFeatures.erase(aFIter);
       // event: model is updated
       if (aFeature->isInHistory()) {
-        Model_FeatureDeletedMessage aMsg1(aThis, FEATURES_GROUP);
-        Events_Loop::loop()->send(aMsg1);
+        ModelAPI_EventCreator::get()->sendDeleted(aThis, FEATURES_GROUP);
       }
-      Model_FeatureDeletedMessage aMsg2(aThis, aFeature->getGroup());
-      Events_Loop::loop()->send(aMsg2);
+      ModelAPI_EventCreator::get()->sendDeleted(aThis, aFeature->getGroup());
     } else if (aDSTag < aFeatureTag) { // a new feature is inserted
       // create a feature
       FeaturePtr aFeature = ModelAPI_PluginManager::get()->createFeature(
@@ -635,12 +631,10 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
 
       // event: model is updated
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_CREATED);
-      Model_FeatureUpdatedMessage aMsg1(aFeature, anEvent);
-      Events_Loop::loop()->send(aMsg1);
+      ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
       FeaturePtr anObj = objectByFeature(aFeature);
       if (anObj) {
-        Model_FeatureUpdatedMessage aMsg2(anObj, anEvent);
-        Events_Loop::loop()->send(aMsg2);
+        ModelAPI_EventCreator::get()->sendUpdated(anObj, anEvent);
       }
 
       // feature for this label is added, so go to the next label
@@ -648,8 +642,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
     } else { // nothing is changed, both iterators are incremented
       if (theMarkUpdated) {
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-        Model_FeatureUpdatedMessage aMsg(*aFIter, anEvent);
-        Events_Loop::loop()->send(aMsg);
+        ModelAPI_EventCreator::get()->sendUpdated(*aFIter, anEvent);
       }
       aFIter++;
       aFLabIter.Next();
