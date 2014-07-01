@@ -6,9 +6,10 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
-#include <Model_Events.h>
+#include <ModelAPI_Events.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <Events_Loop.h>
 
 using namespace std;
 
@@ -21,8 +22,8 @@ Model_Update::Model_Update()
 
 void Model_Update::processEvent(const Events_Message* theMessage)
 {
-  const Model_FeatureUpdatedMessage* aMsg = 
-    dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+  const ModelAPI_FeatureUpdatedMessage* aMsg = 
+    dynamic_cast<const ModelAPI_FeatureUpdatedMessage*>(theMessage);
   myInitial = aMsg->features();
   // collect all documents involved into the update
   set<boost::shared_ptr<ModelAPI_Document> > aDocs;

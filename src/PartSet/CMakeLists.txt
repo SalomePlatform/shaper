@@ -66,7 +66,6 @@ SOURCE_GROUP ("Resource Files" FILES ${PROJECT_RESOURCES})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI 
                     ${CMAKE_SOURCE_DIR}/src/Config
                     ${CMAKE_SOURCE_DIR}/src/Events
-                    ${CMAKE_SOURCE_DIR}/src/Model
                     ${CMAKE_SOURCE_DIR}/src/ModuleBase
                     ${CMAKE_SOURCE_DIR}/src/ModelAPI
                     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
@@ -86,7 +85,7 @@ ADD_LIBRARY(PartSet SHARED
 )
 
 # The Qt5Widgets_LIBRARIES variable also includes QtGui and QtCore
-TARGET_LINK_LIBRARIES(PartSet ${PROJECT_LIBRARIES} XGUI ModelAPI Model GeomAlgoAPI)
+TARGET_LINK_LIBRARIES(PartSet ${PROJECT_LIBRARIES} XGUI ModelAPI GeomAlgoAPI)
 
 ADD_DEPENDENCIES(PartSet ModuleBase)
 

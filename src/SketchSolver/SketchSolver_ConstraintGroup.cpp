@@ -13,7 +13,7 @@
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefList.h>
-#include <Model_Events.h>
+#include <ModelAPI_Events.h>
 
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintLength.h>
@@ -1148,8 +1148,7 @@ void SketchSolver_ConstraintGroup::updateRelatedConstraints(
       if (isUpd)
       {
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-        Model_FeatureUpdatedMessage aMsg(aConstrIter->first, anEvent);
-        Events_Loop::loop()->send(aMsg, true);
+        ModelAPI_EventCreator::get()->sendUpdated(aConstrIter->first, anEvent);
         break;
       }
     }
@@ -1175,8 +1174,7 @@ void SketchSolver_ConstraintGroup::updateRelatedConstraints(
       if (aRefAttr && aRefAttr->isFeature() && aRefAttr->feature() == theFeature)
       {
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-        Model_FeatureUpdatedMessage aMsg(aConstrIter->first, anEvent);
-        Events_Loop::loop()->send(aMsg, true);
+        ModelAPI_EventCreator::get()->sendUpdated(aConstrIter->first, anEvent);
         break;
       }
     }
