@@ -85,3 +85,14 @@ const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::project(const boost::shar
   return aResult;
 }
 
+const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::center() const
+{
+  const gp_Pnt2d& aCenter = MY_CIRC2D->Location();
+  return boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aCenter.X(), aCenter.Y()));
+}
+
+double GeomAPI_Circ2d::radius() const
+{
+  return MY_CIRC2D->Radius();
+}
+

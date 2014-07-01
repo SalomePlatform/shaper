@@ -128,6 +128,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
 
   BOPCol_IndexedDataMapOfShapeListOfShape aMapVE; // map between vertexes and edges
   BOPTools::MapShapesAndAncestors(aFeaturesCompound, TopAbs_VERTEX, TopAbs_EDGE, aMapVE);
+  if (aMapVE.IsEmpty()) // in case of not-initialized circle
+    return;
 
   gp_Dir aDirX = theDirX->impl<gp_Dir>();
   gp_Dir aDirY = theDirY->impl<gp_Dir>();
@@ -250,10 +252,16 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
     {
       std::list<TopoDS_Shape>::reverse_iterator aVRIter = aProcVertexes.rbegin();
       std::list<TopoDS_Shape>::reverse_iterator aERIter = aProcEdges.rbegin();
-      for (++aERIter, ++aVRIter; aERIter != aProcEdges.rend(); aERIter++, aVRIter++)
+      if (aVRIter != aProcVertexes.rend())
+        aVRIter++;
+      if (aERIter != aProcEdges.rend())
+        aERIter++;
+
+      for ( ; aERIter != aProcEdges.rend(); aERIter++, aVRIter++)
         if (aMapVE.FindFromKey(*aVRIter).Size() > 2)
           break;
-      if (aERIter != aProcEdges.rend() || aMapVE.FindFromKey(*aVRIter).Size() == 1)
+      if (aERIter != aProcEdges.rend() || 
+         (aVRIter != aProcVertexes.rend() && aMapVE.FindFromKey(*aVRIter).Size() == 1))
       { // the branching vertex was found or current list of edges is a wire without branches
         std::list<TopoDS_Shape>::iterator aEIter;
         TopoDS_Shape aCurEdge;
@@ -295,7 +303,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
         aProcVertexes.reverse();
         aProcEdges.reverse();
         aNextVertex = aProcVertexes.back();
-        aNextDir = getOuterEdgeDirection(aProcEdges.back(), aNextVertex);
+        aNextDir = aProcEdges.empty() ? aDirY : 
+                   getOuterEdgeDirection(aProcEdges.back(), aNextVertex);
       }
     }
 
@@ -497,7 +506,8 @@ void createFace(const TopoDS_Shape&                      theStartVertex,
   for ( ; anEdgeIter != theEndOfEdges; anEdgeIter++)
   {
     TopoDS_Edge anEdge = *((TopoDS_Edge*)(&(*anEdgeIter)));
-    addEdgeToWire(anEdge, aBuilder, aCurVertex, aResWire);
+    if (!anEdge.IsNull())
+      addEdgeToWire(anEdge, aBuilder, aCurVertex, aResWire);
   }
 
   BRepBuilderAPI_MakeFace aFaceBuilder(thePlane, aResWire);

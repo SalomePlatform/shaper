@@ -40,9 +40,7 @@
 #include <Events_Error.h>
 
 #include <GeomAPI_Shape.h>
-
-#include <AIS_ListOfInteractive.hxx>
-//#include <AIS_DimensionSelectionMode.hxx>
+#include <GeomAPI_AISObject.h>
 
 #include <QObject>
 #include <QMouseEvent>
@@ -437,7 +435,8 @@ void PartSet_Module::visualizePreview(FeaturePtr theFeature, bool isDisplay,
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
     if (aSPFeature)
     {
-      Handle(AIS_InteractiveObject) anAIS = aSPFeature->getAISShape(aDisplayer->getAISObject(theFeature));
+      boost::shared_ptr<GeomAPI_AISObject> anAIS = 
+        aSPFeature->getAISObject(aDisplayer->getAISObject(theFeature));
       aDisplayer->redisplay(theFeature, anAIS, false);
     }
   }

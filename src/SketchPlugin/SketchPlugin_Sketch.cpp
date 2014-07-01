@@ -5,6 +5,7 @@
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <GeomAPI_AISObject.h>
 #include <GeomAPI_XYZ.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
@@ -12,13 +13,9 @@
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
 
-#include <AIS_InteractiveObject.hxx>
-#include <AIS_Shape.hxx>
 
-#include <Quantity_NameOfColor.hxx>
-
-const Quantity_NameOfColor SKETCH_PLANE_COLOR = Quantity_NOC_CHOCOLATE; /// the plane edge color
-const int SKETCH_WIDTH = 4; /// the plane edge width
+const int SKETCH_PLANE_COLOR = Colors::COLOR_BROWN; /// the plane edge color
+const double SKETCH_WIDTH = 4.0; /// the plane edge width
 
 using namespace std;
 
@@ -70,6 +67,8 @@ void SketchPlugin_Sketch::execute()
       aFeaturesPreview.push_back(aPreview);
   }
 
+  if (aFeaturesPreview.empty())
+    return ;
   std::list< boost::shared_ptr<GeomAPI_Shape> > aLoops;
   std::list< boost::shared_ptr<GeomAPI_Shape> > aWires;
   GeomAlgoAPI_SketchBuilder::createFaces(anOrigin->pnt(), aDirX->dir(), aDirY->dir(), aNorm->dir(),
@@ -80,13 +79,13 @@ void SketchPlugin_Sketch::execute()
   data()->store(aCompound);
 }
 
-Handle(AIS_InteractiveObject) SketchPlugin_Sketch::getAISShape(Handle(AIS_InteractiveObject) thePrevious)
+boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Sketch::getAISObject(
+                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
 {
-  Handle(AIS_InteractiveObject) anAIS = SketchPlugin_Feature::getAISShape(thePrevious);
-  Handle(AIS_Shape) aShapeAIS = Handle(AIS_Shape)::DownCast(anAIS);
-  aShapeAIS->SetColor(Quantity_Color(SKETCH_PLANE_COLOR));
-  aShapeAIS->SetWidth(SKETCH_WIDTH);
-  aShapeAIS->Redisplay();
+  boost::shared_ptr<GeomAPI_AISObject> anAIS = prepareAISShape(thePrevious);
+  anAIS->setColor(SKETCH_PLANE_COLOR);
+  anAIS->setWidth(SKETCH_WIDTH);
+  //anAIS->Redisplay();
   return anAIS;
 }
 

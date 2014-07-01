@@ -14,6 +14,7 @@ SET(PROJECT_HEADERS
     Model_AttributeRefList.h
     Model_AttributeBoolean.h
     Model_Events.h
+    Model_Update.h
 )
 
 SET(PROJECT_SOURCES
@@ -29,7 +30,9 @@ SET(PROJECT_SOURCES
     Model_AttributeRefList.cpp
     Model_AttributeBoolean.cpp
     Model_Events.cpp
+    Model_Update.cpp
 )
+
 SET(PROJECT_LIBRARIES
     ModelAPI 
     Events 

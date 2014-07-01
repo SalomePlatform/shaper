@@ -4,9 +4,8 @@
 
 #include "SketchPlugin_Constraint.h"
 
-#include <AIS_InteractiveObject.hxx>
-
-Handle_AIS_InteractiveObject SketchPlugin_Constraint::getAISShape(Handle_AIS_InteractiveObject thePrevious)
+boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Constraint::getAISObject(
+                              boost::shared_ptr<GeomAPI_AISObject> thePrevious)
 { 
   return thePrevious;
 }

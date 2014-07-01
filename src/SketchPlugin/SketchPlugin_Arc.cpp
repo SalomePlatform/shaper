@@ -16,7 +16,7 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
-#include <Precision.hxx>
+const double tolerance = 1e-7;
 
 SketchPlugin_Arc::SketchPlugin_Arc()
   : SketchPlugin_Feature()
@@ -68,7 +68,7 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Arc::preview()
           boost::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
             new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
           boost::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEndAttr->pnt());
-          if (aProjection && anEndAttr->pnt()->distance(aProjection) > Precision::Confusion())
+          if (aProjection && anEndAttr->pnt()->distance(aProjection) > tolerance)
             anEndAttr->setValue(aProjection);
         }
         boost::shared_ptr<GeomAPI_Pnt> aEndPoint(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
@@ -83,6 +83,12 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Arc::preview()
     }
   }
   return getPreview();
+}
+
+boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Arc::getAISObject(
+                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+{
+  return prepareAISShape(thePrevious);
 }
 
 void SketchPlugin_Arc::move(double theDeltaX, double theDeltaY)

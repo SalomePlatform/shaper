@@ -12,9 +12,6 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <list>
 
-const int CONSTRAINT_TEXT_HEIGHT = 28; /// the text height of the constraint
-const int CONSTRAINT_TEXT_SELECTION_TOLERANCE = 20; /// the text selection tolerance
-
 
 /*  Description: 
  *    Each constraint uses a set of parameters. In the SolveSpace library 
@@ -69,7 +66,8 @@ public:
   SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
   /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual Handle_AIS_InteractiveObject getAISShape(Handle_AIS_InteractiveObject thePrevious);
+  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
+                                boost::shared_ptr<GeomAPI_AISObject> thePrevious);
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved

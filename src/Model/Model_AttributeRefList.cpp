@@ -33,7 +33,7 @@ int Model_AttributeRefList::size()
   return myRef->Extent();
 }
 
-list<FeaturePtr > Model_AttributeRefList::list()
+list<FeaturePtr> Model_AttributeRefList::list()
 {
   std::list< FeaturePtr > aResult;
   boost::shared_ptr<Model_Document> aDoc = 
