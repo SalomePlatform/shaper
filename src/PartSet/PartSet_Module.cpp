@@ -524,6 +524,6 @@ void PartSet_Module::onStorePoint2D(FeaturePtr theFeature, const std::string& th
 
 bool PartSet_Module::isFeatureEnabled(const QString& theCmdId) const
 {
-  qDebug("### isFeatureEnabled %s", qPrintable(theCmdId));
+  //qDebug("### isFeatureEnabled %s", qPrintable(theCmdId));
   return true;
 }
