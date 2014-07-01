@@ -48,11 +48,10 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
     if (aFeatureValue) {
       boost::shared_ptr<GeomAPI_Pnt2d> aValuePoint = aFeatureValue->point();
       FeaturePtr aValueFeature = aFeatureValue->feature();
-
       if (aValueFeature) {
         isDone = setFeature(aValueFeature);
       }
-      if (!isDone) {
+      if (!isDone && aValuePoint) {
         // find the given point in the feature attributes
         std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes =
                                       aValueFeature->data()->attributes(GeomDataAPI_Point2D::type());

@@ -389,8 +389,6 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
     connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)),
             this, SLOT(onMultiSelectionEnabled(bool)));
 
-    connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)),
-            this, SLOT(onMultiSelectionEnabled(bool)));
     connect(aPreviewOp, SIGNAL(stopSelection(const QFeatureList&, const bool)),
             this, SLOT(onStopSelection(const QFeatureList&, const bool)));
     connect(aPreviewOp, SIGNAL(setSelection(const QFeatureList&)),

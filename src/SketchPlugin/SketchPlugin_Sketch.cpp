@@ -67,6 +67,8 @@ void SketchPlugin_Sketch::execute()
       aFeaturesPreview.push_back(aPreview);
   }
 
+  if (aFeaturesPreview.empty())
+    return ;
   std::list< boost::shared_ptr<GeomAPI_Shape> > aLoops;
   std::list< boost::shared_ptr<GeomAPI_Shape> > aWires;
   GeomAlgoAPI_SketchBuilder::createFaces(anOrigin->pnt(), aDirX->dir(), aDirY->dir(), aNorm->dir(),

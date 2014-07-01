@@ -41,7 +41,9 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Circle::preview()
     // compute a circle point in 3D view
     boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
       boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CIRCLE_ATTR_CENTER));
-    if (aCenterAttr->isInitialized()) {
+    AttributeDoublePtr aRadiusAttr = 
+      boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CIRCLE_ATTR_RADIUS));
+    if (aCenterAttr->isInitialized() && aRadiusAttr->isInitialized()) {
       boost::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
       // make a visible point
       boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
@@ -54,8 +56,6 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Circle::preview()
       if (aHasPlane) {
         boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
         // compute the circle radius
-        AttributeDoublePtr aRadiusAttr = 
-          boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CIRCLE_ATTR_RADIUS));
         double aRadius = aRadiusAttr->value();
 
         boost::shared_ptr<GeomAPI_Shape> aCircleShape = 
