@@ -1,4 +1,4 @@
-#include "XGUI_Module.h"
+#include "ModuleBase_IModule.h"
 #include "XGUI_Constants.h"
 #include "XGUI_Command.h"
 #include "XGUI_MainMenu.h"
@@ -85,6 +85,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myDisplayer = new XGUI_Displayer(this);
 
   mySelector = new XGUI_SelectionMgr(this);
+  connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(updateModuleCommands()));
 
   myOperationMgr = new XGUI_OperationMgr(this);
   myActionsMgr = new XGUI_ActionsMgr(this);
@@ -575,7 +576,7 @@ void XGUI_Workshop::onRedo()
 }
 
 //******************************************************
-XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
+ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 {
   QString libName =
       QString::fromStdString(library(theModule.toStdString()));
@@ -623,7 +624,7 @@ XGUI_Module* XGUI_Workshop::loadModule(const QString& theModule)
   }
 #endif
 
-  XGUI_Module* aModule = crtInst ? crtInst(this) : 0;
+  ModuleBase_IModule* aModule = crtInst ? crtInst(this) : 0;
 
   if (!err.isEmpty()) {
     if (mainWindow()) {
@@ -687,6 +688,26 @@ void XGUI_Workshop::updateCommandStatus()
     }
   }
   myActionsMgr->update();
+}
+
+//******************************************************
+void XGUI_Workshop::updateModuleCommands()
+{
+  QList<QAction*> aCommands;
+  if (isSalomeMode()) { // update commands in SALOME mode
+    aCommands = salomeConnector()->commandList();
+  } else {
+    XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
+    foreach (XGUI_Workbench* aWb, aMenuBar->workbenches()) {
+      if (aWb != aMenuBar->generalPage()) {
+        foreach(XGUI_Command* aCmd, aWb->features())
+          aCommands.append(aCmd);
+      }
+    }
+  }
+  foreach(QAction* aCmd, aCommands) {
+    aCmd->setEnabled(myPartSetModule->isFeatureEnabled(aCmd->data().toString()));
+  }
 }
 
 //******************************************************

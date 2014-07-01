@@ -553,4 +553,5 @@ QModelIndex XGUI_DocumentDataModel::featureIndex(const FeaturePtr theFeature) co
         QModelIndex();
     }
   }
+  return QModelIndex();
 }

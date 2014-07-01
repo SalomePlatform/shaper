@@ -6,7 +6,7 @@
 #define XGUI_Displayer_H
 
 #include "XGUI.h"
-#include "XGUI_Constants.h"
+#include <ModuleBase_Definitions.h>
 
 #include <QString>
 #include <boost/shared_ptr.hpp>

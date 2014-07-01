@@ -4,15 +4,16 @@
 #include "XGUI.h"
 #include "XGUI_Constants.h"
 #include <Events_Listener.h>
+#include <ModuleBase_Definitions.h>
 
 #include <QObject>
 #include <QMap>
 #include <QIcon>
 #include <QKeySequence>
 
+
 class XGUI_MainWindow;
 class XGUI_Command;
-class XGUI_Module;
 class XGUI_Workbench;
 class XGUI_SelectionMgr;
 class XGUI_Displayer;
@@ -28,6 +29,7 @@ class XGUI_ContextMenuMgr;
 class XGUI_ModuleConnector;
 
 class ModuleBase_Operation;
+class ModuleBase_IModule;
 
 class Config_FeatureMessage;
 class Config_PointerMessage;
@@ -119,6 +121,7 @@ signals:
 
 public slots:
   void updateCommandStatus();
+  void updateModuleCommands();
 
   void onNew();
   void onOpen();
@@ -160,7 +163,7 @@ protected slots:
 private:
   void initMenu();
 
-  XGUI_Module* loadModule(const QString& theModule);
+  ModuleBase_IModule* loadModule(const QString& theModule);
   bool activateModule();
 
   QDockWidget* createObjectBrowser(QWidget* theParent);
@@ -170,7 +173,7 @@ private:
   void createDockWidgets();
 
   XGUI_MainWindow* myMainWindow;
-  XGUI_Module* myPartSetModule;
+  ModuleBase_IModule* myPartSetModule;
   XGUI_ObjectsBrowser* myObjectBrowser;
   XGUI_PropertyPanel* myPropertyPanel;
   XGUI_SelectionMgr* mySelector;

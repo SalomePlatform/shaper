@@ -4,6 +4,7 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	ModuleBase.h
 	ModuleBase_IOperation.h
+	ModuleBase_IModule.h
 	ModuleBase_Operation.h
 	ModuleBase_OperationDescription.h	
 	ModuleBase_ModelWidget.h
@@ -20,6 +21,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetPoint2dDistance.h
 	ModuleBase_WidgetValue.h
 	ModuleBase_WidgetValueFeature.h
+	ModuleBase_Definitions.h
 )
 
 SET(PROJECT_SOURCES

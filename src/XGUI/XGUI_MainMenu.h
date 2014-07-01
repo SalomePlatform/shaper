@@ -33,7 +33,7 @@ public:
   XGUI_Workbench* addWorkbench(const QString& theId, const QString& theText = "");
 
   //! Returns workbench (menu group) by the given name.
-  XGUI_Workbench* findWorkbench(const QString& theId);
+  XGUI_Workbench* findWorkbench(const QString& theId)  const;
 
   //! Returns General page (predefined workbench)
   XGUI_Workbench* generalPage() const { return myGeneralPage; }
@@ -46,6 +46,8 @@ public:
 
   //! Returns list of created commands
   QList<XGUI_Command*> features() const;
+
+  QList<XGUI_Workbench*> workbenches() const;
 
   virtual bool eventFilter(QObject *theWatched, QEvent *theEvent);
 

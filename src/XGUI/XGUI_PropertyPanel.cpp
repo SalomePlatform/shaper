@@ -5,8 +5,8 @@
  *      Author: sbh
  */
 
-#include <XGUI_Constants.h>
 #include <XGUI_PropertyPanel.h>
+#include <XGUI_Constants.h>
 #include <ModuleBase_WidgetPoint2D.h>
 
 #include <QWidget>
@@ -22,7 +22,8 @@
 #include <iostream>
 #endif
 
-XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
+XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent) :
+QDockWidget(theParent)
 {
   this->setWindowTitle(tr("Property Panel"));
   QAction* aViewAct = this->toggleViewAction();
@@ -97,8 +98,8 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
       connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
               this, SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
 
-      connect(*anIt, SIGNAL(activated(ModuleBase_ModelWidget*)),
-              this, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)));
+      //connect(*anIt, SIGNAL(activated(ModuleBase_ModelWidget*)),
+      //        this, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)));
 
       ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
       if (aPointWidget)

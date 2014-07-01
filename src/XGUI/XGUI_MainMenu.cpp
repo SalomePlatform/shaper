@@ -54,7 +54,7 @@ XGUI_Workbench* XGUI_MainMenu::addWorkbench(const QString& theId, const QString&
 /*
  * Searches for already created workbench with given name.
  */
-XGUI_Workbench* XGUI_MainMenu::findWorkbench(const QString& theObjName)
+XGUI_Workbench* XGUI_MainMenu::findWorkbench(const QString& theObjName) const
 {
   return myDesktop->findChild<XGUI_Workbench*>(theObjName);
 }
@@ -94,3 +94,14 @@ QList<XGUI_Command*> XGUI_MainMenu::features() const
   return aList;
 }
 
+QList<XGUI_Workbench*> XGUI_MainMenu::workbenches() const
+{
+  QList<XGUI_Workbench*> aList;
+  aList.append(myGeneralPage);
+  foreach(QDockWidget* aDoc, myMenuTabs) {
+    XGUI_Workbench* aWb = dynamic_cast<XGUI_Workbench*>(aDoc->widget());
+    if (aWb)
+      aList.append(aWb);
+  }
+  return aList;
+}

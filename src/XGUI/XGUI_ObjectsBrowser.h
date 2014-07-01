@@ -3,7 +3,7 @@
 #define XGUI_ObjectsBrowser_H
 
 #include "XGUI.h"
-#include "XGUI_Constants.h"
+#include <ModuleBase_Definitions.h>
 
 #include <QWidget>
 #include <QTreeView>

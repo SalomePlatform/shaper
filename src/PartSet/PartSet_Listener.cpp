@@ -7,6 +7,7 @@
 #include <PartSet_Module.h>
 
 #include <XGUI_Displayer.h>
+#include <XGUI_Workshop.h>
 
 #include <Events_Loop.h>
 #include <Model_Events.h>

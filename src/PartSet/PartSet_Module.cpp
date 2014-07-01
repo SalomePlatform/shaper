@@ -53,7 +53,7 @@
 #endif
 
 /*!Create and return new instance of XGUI_Module*/
-extern "C" PARTSET_EXPORT XGUI_Module* createModule(XGUI_Workshop* theWshop)
+extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(XGUI_Workshop* theWshop)
 {
   return new PartSet_Module(theWshop);
 }
@@ -521,4 +521,10 @@ void PartSet_Module::onStorePoint2D(FeaturePtr theFeature, const std::string& th
 
   PartSet_Tools::setConstraints(aPreviewOp->sketch(), theFeature, theAttribute,
                                 aPoint->x(), aPoint->y());
+}
+
+bool PartSet_Module::isFeatureEnabled(const QString& theCmdId) const
+{
+  qDebug("### isFeatureEnabled %s", qPrintable(theCmdId));
+  return true;
 }

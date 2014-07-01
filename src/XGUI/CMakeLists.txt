@@ -8,7 +8,6 @@ SET(PROJECT_HEADERS
 	XGUI_MainMenu.h
 	XGUI_MainWindow.h
 	XGUI_MenuGroupPanel.h
-	XGUI_Module.h
 	XGUI_Tools.h
 	XGUI_Workbench.h
 	XGUI_Workshop.h

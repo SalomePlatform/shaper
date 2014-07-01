@@ -3,8 +3,10 @@
 
 #include "PartSet.h"
 
-#include <XGUI_Module.h>
+#include <ModuleBase_IModule.h>
+#include <ModuleBase_Definitions.h>
 #include <XGUI_Command.h>
+#include <ModelAPI_Feature.h>
 
 #include <QMap>
 #include <QObject>
@@ -18,8 +20,9 @@ class QKeyEvent;
 class PartSet_Listener;
 class ModelAPI_Feature;
 class XGUI_ViewerPrs;
+class ModuleBase_Operation;
 
-class PARTSET_EXPORT PartSet_Module: public QObject, public XGUI_Module
+class PARTSET_EXPORT PartSet_Module: public ModuleBase_IModule
 {
 Q_OBJECT
 
@@ -31,14 +34,22 @@ public:
   /// \returns a workshop instance
   XGUI_Workshop* workshop() const;
 
+  /// Reads description of features from XML file 
   virtual void createFeatures();
+
+  /// Called on creation of menu item in desktop
   virtual void featureCreated(QAction* theFeature);
+
+  /// Returnc list of nested commands for the given feature
   virtual QStringList nestedFeatures(QString theFeature);
   std::string featureFile(const std::string&);
 
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
   virtual void launchOperation(const QString& theCmdId);
+
+  /// Called when it is necessary to update a command state (enable or disable it)
+  virtual bool isFeatureEnabled(const QString& theCmdId) const;
 
   /// Displays or erase the current operation preview, if it has it.
   /// \param theFeature the feature instance to be displayed
