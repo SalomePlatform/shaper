@@ -15,14 +15,16 @@
 
 class ModelAPI_Document;
 
-/// Event ID that feature is created (comes with Model_FeatureUpdatedMessage)
+/// Event ID that feature is created (comes with ModelAPI_FeatureUpdatedMessage)
 static const char * EVENT_FEATURE_CREATED = "FeatureCreated";
 /// Event ID that data of feature is updated (comes with Model_FeatureUpdatedMessage)
 static const char * EVENT_FEATURE_UPDATED = "FeatureUpdated";
 /// Event ID that data of feature is deleted (comes with Model_FeatureDeletedMessage)
 static const char * EVENT_FEATURE_DELETED = "FeatureDeleted";
-/// Event ID that data of feature is updated (comes with Model_FeaturesMovedMessage)
+/// Event ID that data of feature is updated (comes with ModelAPI_FeatureUpdatedMessage)
 static const char * EVENT_FEATURE_MOVED = "FeaturesMoved";
+/// Event ID that visualization must be redisplayed (comes with ModelAPI_FeatureUpdatedMessage)
+static const char * EVENT_FEATURE_TO_REDISPLAY = "FeaturesToRedisplay";
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class ModelAPI_FeatureUpdatedMessage : public Events_MessageGroup {

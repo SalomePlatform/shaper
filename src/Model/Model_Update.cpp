@@ -42,6 +42,9 @@ void Model_Update::processEvent(const Events_Message* theMessage)
     }
   }
   myUpdated.clear();
+  // flush
+  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_FEATURE_TO_REDISPLAY);
+  Events_Loop::loop()->flush(EVENT_DISP);
 }
 
 bool Model_Update::updateFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
@@ -77,6 +80,8 @@ bool Model_Update::updateFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
   bool anExecute = aMustbeUpdated || myInitial.find(theFeature) != myInitial.end();
   if (anExecute) {
     theFeature->execute();
+    static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_FEATURE_TO_REDISPLAY);
+    ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
   }
   myUpdated[theFeature] = anExecute;
   return anExecute;
