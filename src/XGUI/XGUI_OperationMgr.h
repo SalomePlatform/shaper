@@ -81,6 +81,9 @@ protected:
   /// Returns whether the operation can be stopped.
   bool canStopOperation();
 
+  /// Returns true if the operation can be aborted
+  bool canAbortOperation();
+
 protected slots:
   /// Slot that commits the current operation.
   void onCommitOperation();

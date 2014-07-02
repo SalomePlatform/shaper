@@ -31,6 +31,10 @@ public:
   //! Sets relation between the command (with given Id) and it's nested actions.
   void addNestedCommands(const QString& theId, const QStringList& theCommands);
 
+  QStringList nestedCommands(const QString& theId) const;
+
+  bool isNested(const QString& theId) const;
+
 public slots:
   //! Update workbench actions according to OperationMgr state:
   //! No active operations: all actions but nested are available

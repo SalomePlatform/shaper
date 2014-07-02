@@ -524,6 +524,20 @@ void PartSet_Module::onStorePoint2D(FeaturePtr theFeature, const std::string& th
 
 bool PartSet_Module::isFeatureEnabled(const QString& theCmdId) const
 {
-  //qDebug("### isFeatureEnabled %s", qPrintable(theCmdId));
-  return true;
+  XGUI_OperationMgr* aOpMgr = myWorkshop->operationMgr();
+  XGUI_ActionsMgr* aActMgr = myWorkshop->actionsMgr();
+
+  ModuleBase_Operation* aOperation = aOpMgr->currentOperation();
+  if (!aOperation)
+    return !aActMgr->isNested(theCmdId);
+
+  PartSet_OperationFeatureEdit* aSketchEdtOp = dynamic_cast<PartSet_OperationFeatureEdit*>(aOperation);
+  if (aSketchEdtOp) {
+    QStringList aConstraintList;
+    aConstraintList<<"SketchConstraintDistance"<<"SketchConstraintLength"
+      <<"SketchConstraintRadius"<<"SketchConstraintParallel"<<"SketchConstraintPerpendicular";
+    return aConstraintList.contains(theCmdId);
+  }
+  QStringList aList = aActMgr->nestedCommands(aOperation->id());
+  return aList.contains(theCmdId);
 }

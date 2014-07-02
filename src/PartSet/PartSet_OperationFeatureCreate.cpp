@@ -286,6 +286,6 @@ bool PartSet_OperationFeatureCreate::setWidgetValue(FeaturePtr theFeature, doubl
   bool isApplyed = myActiveWidget->setValue(aValue);
 
   delete aValue;
-
+  myIsModified = (myIsModified || isApplyed);
   return isApplyed;
 }

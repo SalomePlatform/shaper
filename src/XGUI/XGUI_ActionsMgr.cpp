@@ -116,3 +116,20 @@ void XGUI_ActionsMgr::updateCheckState()
     setActionChecked(eachCommand, true);
   }
 }
+
+QStringList XGUI_ActionsMgr::nestedCommands(const QString& theId) const
+{
+  if (myNestedActions.contains(theId))
+    return myNestedActions[theId];
+  return QStringList();
+}
+
+bool XGUI_ActionsMgr::isNested(const QString& theId) const
+{
+  foreach(QString aId, myNestedActions.keys()) {
+    QStringList aList = myNestedActions[aId];
+    if (aList.contains(theId))
+      return true;
+  }
+  return false;
+}

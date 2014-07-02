@@ -76,6 +76,12 @@ public:
   //void setModelWidgets(const std::string& theXmlRepresentation,
   //                     QList<ModuleBase_ModelWidget*> theWidgets);
 
+  /// Returns True if data of its feature was modified during operation
+  virtual bool isModified() const { return myIsModified; }
+
+  /// Returns True id the current operation is launched in editing mode
+  bool isEditOperation() const { return myIsEditing; }
+
 signals:
   void started(); /// the operation is started
   void aborted(); /// the operation is aborted
@@ -133,6 +139,12 @@ protected:
 
   /// Returns pointer to the root document.
   boost::shared_ptr<ModelAPI_Document> document() const;
+
+  /// Editing feature flag
+  bool myIsEditing;
+
+  /// Modified feature flag
+  bool myIsModified;
 
 private:
   ModuleBase_OperationDescription* myDescription; /// the container to have the operation description

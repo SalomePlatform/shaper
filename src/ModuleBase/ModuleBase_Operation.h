@@ -72,8 +72,6 @@ public:
   /// Sets the operation feature
   void setEditingFeature(FeaturePtr theFeature);
 
-  bool isEditOperation() const { return myIsEditing; }
-
 public slots:
   /// Slots which listen the mode widget activation
   /// \param theWidget the model widget
@@ -113,8 +111,6 @@ private:
 
 private:
   FeaturePtr myFeature; /// the operation feature to be handled
-
-  bool myIsEditing;
 };
 
 #endif

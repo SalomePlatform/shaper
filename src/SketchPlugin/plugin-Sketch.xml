@@ -21,6 +21,9 @@
         <point_selector id="ArcStartPoint" title="Start point" tooltip="Start point of the arc"/>
         <point_selector id="ArcEndPoint" title="End point" tooltip="End point of the arc"/>
       </feature>
+    </group>
+	  
+    <group id="Constraints">
       <feature id="SketchConstraintCoincidence" title="Coincident" tooltip="Create constraint for the coincidence of two points" internal="1"/>
       <feature id="SketchConstraintDistance" title="Distance" tooltip="Create constraint for the distance from a point to an object">
         <label title="Select point and another feature (point or point on line) between which to calculate distance" tooltip="Select point and another feature (point or point on line) between which to calculate distance"/>

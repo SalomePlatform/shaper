@@ -24,7 +24,7 @@
 #endif
 
 ModuleBase_Operation::ModuleBase_Operation(const QString& theId, QObject* theParent)
-: ModuleBase_IOperation(theId, theParent), myIsEditing(false)
+: ModuleBase_IOperation(theId, theParent)
 {
 }
 
@@ -106,6 +106,7 @@ FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
   boost::shared_ptr<ModelAPI_Document> aDoc = document();
   FeaturePtr aFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
   if (aFeature) { // TODO: generate an error if feature was not created
+    myIsModified = true;
     aFeature->execute();
     // Init default values
     /*QList<ModuleBase_ModelWidget*> aWidgets = getDescription()->modelWidgets();
