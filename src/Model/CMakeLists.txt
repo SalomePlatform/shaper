@@ -15,6 +15,7 @@ SET(PROJECT_HEADERS
     Model_AttributeBoolean.h
     Model_Events.h
     Model_Update.h
+    Model_Validator.h
 )
 
 SET(PROJECT_SOURCES
@@ -31,6 +32,7 @@ SET(PROJECT_SOURCES
     Model_AttributeBoolean.cpp
     Model_Events.cpp
     Model_Update.cpp
+    Model_Validator.cpp
 )
 
 SET(PROJECT_LIBRARIES

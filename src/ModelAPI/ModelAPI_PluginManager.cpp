@@ -20,6 +20,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Validator.h>
 
 #include <Config_ModuleReader.h>
 
@@ -42,7 +43,7 @@ ModelAPI_PluginManager::ModelAPI_PluginManager()
 {
 }
 
-void ModelAPI_PluginManager::SetPluginManager(
+void ModelAPI_PluginManager::setPluginManager(
   boost::shared_ptr<ModelAPI_PluginManager> theManager)
 {
   MY_MANAGER = theManager;

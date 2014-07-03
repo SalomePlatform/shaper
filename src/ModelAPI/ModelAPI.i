@@ -12,6 +12,7 @@
   #include "ModelAPI_AttributeDouble.h"
   #include "ModelAPI_AttributeReference.h"
   #include "ModelAPI_AttributeRefAttr.h"
+  #include "ModelAPI_Validator.h"
 %}
 
 // to avoid error on this
@@ -46,3 +47,4 @@
 %include "ModelAPI_AttributeDouble.h"
 %include "ModelAPI_AttributeReference.h"
 %include "ModelAPI_AttributeRefAttr.h"
+%include "ModelAPI_Validator.h"

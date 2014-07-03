@@ -18,6 +18,7 @@ SET(PROJECT_HEADERS
     ModelAPI_AttributeRefList.h
     ModelAPI_AttributeBoolean.h
     ModelAPI_Events.h
+    ModelAPI_Validator.h
 )
 
 SET(PROJECT_SOURCES

@@ -12,6 +12,7 @@
 class ModelAPI_Feature;
 class ModelAPI_Plugin;
 class ModelAPI_Document;
+class ModelAPI_ValidatorsFactory;
 
 /**\class ModelAPI_PluginManager
  * \ingroup DataModel
@@ -47,6 +48,9 @@ public:
   virtual boost::shared_ptr<ModelAPI_Document> copy(
     boost::shared_ptr<ModelAPI_Document> theSource, std::string theID) = 0;
 
+  /// Returns the validators factory: the only one instance per application
+  virtual ModelAPI_ValidatorsFactory* validators() = 0;
+
   /// Is needed for python wrapping by swig, call Get to get an instance
   ModelAPI_PluginManager();
 
@@ -57,12 +61,11 @@ protected:
   /// Creates the feature object using plugins functionality
   virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
 
-  static void SetPluginManager(boost::shared_ptr<ModelAPI_PluginManager> theManager);
+  static void setPluginManager(boost::shared_ptr<ModelAPI_PluginManager> theManager);
 
   friend class Model_Document;
 };
 
 typedef boost::shared_ptr<ModelAPI_PluginManager> PluginManagerPtr;
-
 
 #endif

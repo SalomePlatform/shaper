@@ -9,6 +9,7 @@
 #include <Model_Document.h>
 #include <Model_Application.h>
 #include <Model_Events.h>
+#include <Model_Validator.h>
 #include <Events_Loop.h>
 #include <Events_Error.h>
 #include <Config_FeatureMessage.h>
@@ -99,7 +100,7 @@ Model_PluginManager::Model_PluginManager()
 {
   myPluginsInfoLoaded = false;
   myCheckTransactions = true;
-  ModelAPI_PluginManager::SetPluginManager(boost::shared_ptr<ModelAPI_PluginManager>(this));
+  ModelAPI_PluginManager::setPluginManager(boost::shared_ptr<ModelAPI_PluginManager>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID FeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
@@ -142,4 +143,10 @@ void Model_PluginManager::LoadPluginsInfo()
 void Model_PluginManager::registerPlugin(ModelAPI_Plugin* thePlugin)
 {
   myPluginObjs[myCurrentPluginName] = thePlugin;
+}
+
+ModelAPI_ValidatorsFactory* Model_PluginManager::validators()
+{
+  static Model_ValidatorsFactory* aFactory = new Model_ValidatorsFactory;
+  return aFactory;
 }
