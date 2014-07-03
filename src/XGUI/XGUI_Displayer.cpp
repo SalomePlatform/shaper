@@ -188,7 +188,7 @@ void XGUI_Displayer::redisplay(FeaturePtr theFeature, bool isUpdateViewer)
   if (aShapePtr) {
     boost::shared_ptr<GeomAPI_AISObject> aAISObj = getAISObject(aFeature);
     Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(aAISObj->impl<Handle(AIS_InteractiveObject)>());
-    if (!aAISShape.IsNull())
+    if (aAISShape.IsNull())
       return;
 
     aAISShape->Set(aShapePtr->impl<TopoDS_Shape>());

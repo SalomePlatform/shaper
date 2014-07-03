@@ -120,13 +120,12 @@ void XGUI_Workshop::startApplication()
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Error::errorID()); //!< Listening application errors.
   //TODO(sbh): Implement static method to extract event id [SEID]
-  Events_ID aFeatureId = aLoop->eventByName(EVENT_FEATURE_LOADED);
-  aLoop->registerListener(this, aFeatureId);
-  Events_ID aPartSetId = aLoop->eventByName("PartSetModuleEvent");
-  aLoop->registerListener(this, aPartSetId);
-  Events_ID aFeatureUpdatedId = aLoop->eventByName(EVENT_FEATURE_UPDATED);
-  aLoop->registerListener(this, aFeatureUpdatedId);
+  aLoop->registerListener(this, aLoop->eventByName(EVENT_FEATURE_LOADED));
+  // TODO Is it good to use non standard event within workshop?
+  aLoop->registerListener(this, aLoop->eventByName("PartSetModuleEvent"));
+  aLoop->registerListener(this, aLoop->eventByName(EVENT_FEATURE_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_TO_REDISPLAY));
 
   activateModule();
   if (myMainWindow) {
@@ -222,28 +221,17 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     }
     return;
   }
+
   // Process creation of Part
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED)) {
     const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    std::set<FeaturePtr> aFeatures = aUpdMsg->features();
+    onFeatureCreatedMsg(aUpdMsg);
+  }
 
-    std::set<FeaturePtr>::const_iterator aIt;
-    bool aHasPart = false;
-    for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
-      FeaturePtr aFeature = (*aIt);
-      if (aFeature->getKind() == PARTSET_PART_KIND) {
-        aHasPart = true;
-        //break;
-      } else {
-        myDisplayer->display(aFeature, false);
-      }
-    }
-    myDisplayer->updateViewer();
-    if (aHasPart) {
-      //The created part will be created in Object Browser later and we have to activate it
-      // only when it is created everywere
-      QTimer::singleShot(50, this, SLOT(activateLastPart()));
-    }
+  // Redisplay feature
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_TO_REDISPLAY)) {
+    const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+    onFeatureRedisplayMsg(aUpdMsg);
   }
 
   //Update property panel on corresponding message. If there is no current operation (no
@@ -252,39 +240,14 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   if (theMessage->eventID() == aFeatureUpdatedId) {
     const Model_FeatureUpdatedMessage* anUpdateMsg =
         dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-
-    std::set<FeaturePtr> aFeatures = anUpdateMsg->features();
-    if (myOperationMgr->hasOperation())
-    {
-      FeaturePtr aCurrentFeature = myOperationMgr->currentOperation()->feature();
-      std::set<FeaturePtr>::const_iterator aIt;
-      for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
-        FeaturePtr aNewFeature = (*aIt);
-        if(aNewFeature == aCurrentFeature) {
-          myPropertyPanel->updateContentWidget(aCurrentFeature);
-          break;
-        } 
-      }
-    }
-    // Redisplay feature if it is modified
-    std::set<FeaturePtr>::const_iterator aIt;
-    for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
-      FeaturePtr aFeature = (*aIt);
-      if (aFeature->getKind() != PARTSET_PART_KIND) {
-        if (myDisplayer->isVisible(aFeature))
-          myDisplayer->redisplay(aFeature, false);
-        else 
-          myDisplayer->display(aFeature, false);
-      }
-    }
-    myDisplayer->updateViewer();
+    onFeatureUpdatedMsg(anUpdateMsg);
   }
+
   //An operation passed by message. Start it, process and commit.
   const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
   if (aPartSetMsg) {
     myPropertyPanel->cleanContent();
-    ModuleBase_Operation* anOperation =
-        (ModuleBase_Operation*)(aPartSetMsg->pointer());
+    ModuleBase_Operation* anOperation = (ModuleBase_Operation*)aPartSetMsg->pointer();
 
     if (myOperationMgr->startOperation(anOperation)) {
       myPropertyPanel->updateContentWidget(anOperation->feature());
@@ -300,9 +263,67 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   if (anAppError) {
     emit errorOccurred(QString::fromLatin1(anAppError->description()));
   }
-
 }
 
+//******************************************************
+void XGUI_Workshop::onFeatureUpdatedMsg(const Model_FeatureUpdatedMessage* theMsg)
+{
+  std::set<FeaturePtr> aFeatures = theMsg->features();
+  if (myOperationMgr->hasOperation())
+  {
+    FeaturePtr aCurrentFeature = myOperationMgr->currentOperation()->feature();
+    std::set<FeaturePtr>::const_iterator aIt;
+    for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
+      FeaturePtr aNewFeature = (*aIt);
+      if(aNewFeature == aCurrentFeature) {
+        myPropertyPanel->updateContentWidget(aCurrentFeature);
+        break;
+      } 
+    }
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onFeatureRedisplayMsg(const Model_FeatureUpdatedMessage* theMsg)
+{
+  std::set<FeaturePtr> aFeatures = theMsg->features();
+  std::set<FeaturePtr>::const_iterator aIt;
+  for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
+    FeaturePtr aFeature = (*aIt);
+    if (aFeature->getKind() != PARTSET_PART_KIND) {
+      if (myDisplayer->isVisible(aFeature))
+        myDisplayer->redisplay(aFeature, false);
+      else 
+        myDisplayer->display(aFeature, false);
+    }
+  }
+  myDisplayer->updateViewer();
+}
+
+//******************************************************
+void XGUI_Workshop::onFeatureCreatedMsg(const Model_FeatureUpdatedMessage* theMsg)
+{
+  std::set<FeaturePtr> aFeatures = theMsg->features();
+
+  std::set<FeaturePtr>::const_iterator aIt;
+  bool aHasPart = false;
+  for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
+    FeaturePtr aFeature = (*aIt);
+    if (aFeature->getKind() == PARTSET_PART_KIND) {
+      aHasPart = true;
+      //break;
+    } else {
+      myDisplayer->display(aFeature, false);
+    }
+  }
+  myDisplayer->updateViewer();
+  if (aHasPart) {
+    //The created part will be created in Object Browser later and we have to activate it
+    // only when it is created everywere
+    QTimer::singleShot(50, this, SLOT(activateLastPart()));
+  }
+}
+ 
 //******************************************************
 void XGUI_Workshop::onOperationStarted()
 {

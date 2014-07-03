@@ -37,6 +37,8 @@ class Config_PointerMessage;
 class QWidget;
 class QDockWidget;
 
+class Model_FeatureUpdatedMessage;
+
 /**\class XGUI_Workshop
  * \ingroup GUI
  * \brief Class which defines a configuration of the application (Workshop) and launches it.
@@ -146,6 +148,10 @@ protected:
   void addFeature(const Config_FeatureMessage*);
   void connectWithOperation(ModuleBase_Operation* theOperation);
   void saveDocument(QString theName);
+
+  void onFeatureUpdatedMsg(const Model_FeatureUpdatedMessage* theMsg);
+  void onFeatureCreatedMsg(const Model_FeatureUpdatedMessage* theMsg);
+  void onFeatureRedisplayMsg(const Model_FeatureUpdatedMessage* theMsg);
 
 protected slots:
   /// SLOT, that is called after the operation is started. Update workshop state according to
