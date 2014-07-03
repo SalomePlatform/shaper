@@ -25,6 +25,8 @@ static const char * EVENT_FEATURE_DELETED = "FeatureDeleted";
 static const char * EVENT_FEATURE_MOVED = "FeaturesMoved";
 /// Event ID that visualization must be redisplayed (comes with ModelAPI_FeatureUpdatedMessage)
 static const char * EVENT_FEATURE_TO_REDISPLAY = "FeaturesToRedisplay";
+/// Event ID that visualization must be redisplayed (comes with ModelAPI_FeatureUpdatedMessage)
+static const char * EVENT_OPERATION_LAUNCHED = "OperationLaunched";
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class ModelAPI_FeatureUpdatedMessage : public Events_MessageGroup {

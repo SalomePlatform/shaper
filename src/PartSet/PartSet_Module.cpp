@@ -11,6 +11,7 @@
 
 #include <ModuleBase_Operation.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Events.h>
 
 #include <ModelAPI_Data.h>
 #include <GeomDataAPI_Point2D.h>
@@ -411,8 +412,7 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
 
 void PartSet_Module::sendOperation(ModuleBase_Operation* theOperation)
 {
-  //TODO(sbh): Implement static method to extract event id [SEID]
-  static Events_ID aModuleEvent = Events_Loop::eventByName("PartSetModuleEvent");
+  static Events_ID aModuleEvent = Events_Loop::eventByName(EVENT_OPERATION_LAUNCHED);
   Config_PointerMessage aMessage(aModuleEvent, this);
   aMessage.setPointer(theOperation);
   Events_Loop::loop()->send(aMessage);

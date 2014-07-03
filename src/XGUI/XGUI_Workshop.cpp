@@ -120,10 +120,10 @@ void XGUI_Workshop::startApplication()
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Error::errorID()); //!< Listening application errors.
   //TODO(sbh): Implement static method to extract event id [SEID]
-  aLoop->registerListener(this, aLoop->eventByName(EVENT_FEATURE_LOADED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_LOADED));
   // TODO Is it good to use non standard event within workshop?
-  aLoop->registerListener(this, aLoop->eventByName("PartSetModuleEvent"));
-  aLoop->registerListener(this, aLoop->eventByName(EVENT_FEATURE_UPDATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OPERATION_LAUNCHED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_TO_REDISPLAY));
 
@@ -236,16 +236,15 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
-  static Events_ID aFeatureUpdatedId = Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED);
-  if (theMessage->eventID() == aFeatureUpdatedId) {
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED)) {
     const Model_FeatureUpdatedMessage* anUpdateMsg =
         dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
     onFeatureUpdatedMsg(anUpdateMsg);
   }
 
   //An operation passed by message. Start it, process and commit.
-  const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
-  if (aPartSetMsg) {
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OPERATION_LAUNCHED)) {
+    const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
     myPropertyPanel->cleanContent();
     ModuleBase_Operation* anOperation = (ModuleBase_Operation*)aPartSetMsg->pointer();
 

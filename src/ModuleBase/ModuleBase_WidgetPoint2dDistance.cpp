@@ -48,6 +48,8 @@ void ModuleBase_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature, const boo
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                                               (aData->attribute(myFirstPntName));
+  if (!aPoint) return;
+
   double aRadius = thePnt->distance(aPoint->pnt());
   AttributeDoublePtr aReal = aData->real(attributeID());
   if (aReal && (aReal->value() != aRadius)) {
