@@ -54,13 +54,15 @@ public:
   /// Display the feature. Obtain the visualized object from the feature.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void display(FeaturePtr theFeature, bool isUpdateViewer = true);
+  /// Returns true if the Feature succesfully displayed
+  bool display(FeaturePtr theFeature, bool isUpdateViewer = true);
 
   /// Display the feature and a shape. This shape would be associated to the given feature
   /// \param theFeature a feature instance
   /// \param theAIS AIS presentation
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void display(FeaturePtr theFeature, boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdateViewer = true);
+  /// Returns true if the Feature succesfully displayed
+  bool display(FeaturePtr theFeature, boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdateViewer = true);
   
   /// Returns a list of viewer selected presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
@@ -90,7 +92,7 @@ public:
   * \param theFeature a feature instance
   * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   */
-  void redisplay(FeaturePtr theFeature, bool isUpdateViewer = true);
+  bool redisplay(FeaturePtr theFeature, bool isUpdateViewer = true);
 
   /// Redisplay the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance

@@ -113,9 +113,9 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
     return;
   }
 
-  double aX = 0, anY = 0;
-
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
+  double aX = aPoint.X(), anY = aPoint.Y();
+
   if (theSelected.empty()) {
     PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
   }

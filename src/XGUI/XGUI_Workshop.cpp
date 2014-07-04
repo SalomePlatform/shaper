@@ -245,7 +245,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   //An operation passed by message. Start it, process and commit.
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OPERATION_LAUNCHED)) {
     const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
-    myPropertyPanel->cleanContent();
+    //myPropertyPanel->cleanContent();
     ModuleBase_Operation* anOperation = (ModuleBase_Operation*)aPartSetMsg->pointer();
 
     if (myOperationMgr->startOperation(anOperation)) {
@@ -287,16 +287,15 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const Model_FeatureUpdatedMessage* the
 {
   std::set<FeaturePtr> aFeatures = theMsg->features();
   std::set<FeaturePtr>::const_iterator aIt;
+  bool isDisplayed = false;
   for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
     FeaturePtr aFeature = (*aIt);
     if (aFeature->getKind() != PARTSET_PART_KIND) {
-      if (myDisplayer->isVisible(aFeature))
-        myDisplayer->redisplay(aFeature, false);
-      else 
-        myDisplayer->display(aFeature, false);
+      isDisplayed = myDisplayer->redisplay(aFeature, false);
     }
   }
-  myDisplayer->updateViewer();
+  if (isDisplayed)
+    myDisplayer->updateViewer();
 }
 
 //******************************************************
@@ -306,16 +305,18 @@ void XGUI_Workshop::onFeatureCreatedMsg(const Model_FeatureUpdatedMessage* theMs
 
   std::set<FeaturePtr>::const_iterator aIt;
   bool aHasPart = false;
+  bool isDisplayed = false;
   for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
     FeaturePtr aFeature = (*aIt);
     if (aFeature->getKind() == PARTSET_PART_KIND) {
       aHasPart = true;
       //break;
     } else {
-      myDisplayer->display(aFeature, false);
+      isDisplayed = myDisplayer->display(aFeature, false);
     }
   }
-  myDisplayer->updateViewer();
+  if (isDisplayed)
+    myDisplayer->updateViewer();
   if (aHasPart) {
     //The created part will be created in Object Browser later and we have to activate it
     // only when it is created everywere
@@ -334,9 +335,9 @@ void XGUI_Workshop::onOperationStarted()
     showPropertyPanel();
     QString aXmlRepr = aOperation->getDescription()->xmlRepresentation();
     ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(), myModuleConnector);
-    QWidget* aContent = myPropertyPanel->contentWidget();
-    qDeleteAll(aContent->children());
-    aFactory.createWidget(aContent);
+
+    myPropertyPanel->cleanContent();
+    aFactory.createWidget(myPropertyPanel->contentWidget());
     
     QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
     QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
@@ -364,7 +365,7 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   //!< No need for property panel
   updateCommandStatus();
   hidePropertyPanel();
-  //myPropertyPanel->cleanContent();
+  myPropertyPanel->cleanContent();
 }
 
 /*

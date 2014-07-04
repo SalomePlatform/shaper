@@ -226,7 +226,7 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
 
   flushUpdated();
-
+  
   emit featureConstructed(feature(), FM_Hide);
   emit closeLocalContext();
   emit planeSelected(aDir->x(), aDir->y(), aDir->z());

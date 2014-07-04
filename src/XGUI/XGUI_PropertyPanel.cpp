@@ -72,17 +72,8 @@ XGUI_PropertyPanel::~XGUI_PropertyPanel()
 
 void XGUI_PropertyPanel::cleanContent()
 {
-  myWidgets.clear();
-  
-  QLayoutItem* aItem = myMainLayout->takeAt(myMainLayout->count() - 1);
-  delete aItem;
-
-  myMainLayout->removeWidget(myCustomWidget);
-  delete myCustomWidget;
-
-  myCustomWidget = new QWidget(widget());
-  myMainLayout->addWidget(myCustomWidget);
-  myMainLayout->addStretch(1);
+  myWidgets.clear(); 
+  qDeleteAll(myCustomWidget->children());
 }
 
 void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets)
@@ -165,8 +156,7 @@ void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(),
                                                  aLast = myWidgets.end();
   bool isFoundWidget = false;
-  for (;anIt != aLast && !aNextWidget; anIt++)
-  {
+  for (;anIt != aLast && !aNextWidget; anIt++) {
     if (isFoundWidget || !theWidget) {
       if ((*anIt)->focusTo()) {
         aNextWidget = *anIt;

@@ -183,8 +183,7 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
 {
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
                                        myWorkshop->operationMgr()->currentOperation());
-  if (aPreviewOp)
-  {
+  if (aPreviewOp) {
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
     std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();

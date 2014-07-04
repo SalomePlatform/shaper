@@ -41,7 +41,7 @@ bool XGUI_Displayer::isVisible(FeaturePtr theFeature)
   return myFeature2AISObjectMap.find(aFeature) != myFeature2AISObjectMap.end();
 }
 
-void XGUI_Displayer::display(FeaturePtr theFeature, bool isUpdateViewer)
+bool XGUI_Displayer::display(FeaturePtr theFeature, bool isUpdateViewer)
 {
   FeaturePtr aFeature = XGUI_Tools::realFeature(theFeature);
   boost::shared_ptr<GeomAPI_Shape> aShapePtr = aFeature->data()->shape();
@@ -49,20 +49,23 @@ void XGUI_Displayer::display(FeaturePtr theFeature, bool isUpdateViewer)
   if (aShapePtr) {
     boost::shared_ptr<GeomAPI_AISObject> anAIS(new GeomAPI_AISObject());
     anAIS->createShape(aShapePtr);
-    display(aFeature, anAIS, isUpdateViewer);
+    return display(aFeature, anAIS, isUpdateViewer);
   }
+  return false;
 }
 
-void XGUI_Displayer::display(FeaturePtr theFeature,
+bool XGUI_Displayer::display(FeaturePtr theFeature,
                              boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
-  myFeature2AISObjectMap[theFeature] = theAIS;
-
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
-  if (!anAISIO.IsNull())
+  if (!anAISIO.IsNull()) {
+    myFeature2AISObjectMap[theFeature] = theAIS;
     aContext->Display(anAISIO, isUpdateViewer);
+    return true;
+  }
+  return false;
 }
 
 
@@ -136,11 +139,12 @@ void XGUI_Displayer::erase(FeaturePtr theFeature,
 
   Handle(AIS_InteractiveContext) aContext = AISContext();
   boost::shared_ptr<GeomAPI_AISObject> anObject = myFeature2AISObjectMap[aFeature];
-  if (anObject)
-  {
+  if (anObject)  {
     Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
-    if (!anAIS.IsNull())
+    if (!anAIS.IsNull()) {
       aContext->Erase(anAIS, isUpdateViewer);
+      
+    }
   }
   myFeature2AISObjectMap.erase(aFeature);
 }
@@ -178,22 +182,23 @@ bool XGUI_Displayer::redisplay(FeaturePtr theFeature,
   return isCreated;
 }
 
-void XGUI_Displayer::redisplay(FeaturePtr theFeature, bool isUpdateViewer)
+bool XGUI_Displayer::redisplay(FeaturePtr theFeature, bool isUpdateViewer)
 {
   FeaturePtr aFeature = XGUI_Tools::realFeature(theFeature);
   if (!isVisible(aFeature))
-    return;
+    return false;
 
   boost::shared_ptr<GeomAPI_Shape> aShapePtr = aFeature->data()->shape();
   if (aShapePtr) {
     boost::shared_ptr<GeomAPI_AISObject> aAISObj = getAISObject(aFeature);
     Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(aAISObj->impl<Handle(AIS_InteractiveObject)>());
-    if (aAISShape.IsNull())
-      return;
-
-    aAISShape->Set(aShapePtr->impl<TopoDS_Shape>());
-    AISContext()->Redisplay(aAISShape);
+    if (!aAISShape.IsNull()) {
+      aAISShape->Set(aShapePtr->impl<TopoDS_Shape>());
+      AISContext()->Redisplay(aAISShape);
+      return true;
+    }
   }
+  return false;
 }
 
 void XGUI_Displayer::activateInLocalContext(FeaturePtr theFeature,
