@@ -73,6 +73,8 @@ boost::shared_ptr<ModelAPI_Document> Model_PluginManager::currentDocument()
 void Model_PluginManager::setCurrentDocument(boost::shared_ptr<ModelAPI_Document> theDoc)
 {
   myCurrentDoc = theDoc;
+  static Events_Message aMsg(Events_Loop::eventByName("CurrentDocumentChanged"));
+  Events_Loop::loop()->send(aMsg);
 }
 
 boost::shared_ptr<ModelAPI_Document> Model_PluginManager::copy(
