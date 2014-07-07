@@ -32,3 +32,7 @@ QFeatureList XGUI_ModuleConnector::selectedFeatures() const
   return myWorkshop->selector()->selectedFeatures();
 }
 
+ModuleBase_IModule* XGUI_ModuleConnector::module() const
+{
+  return myWorkshop->module();
+}

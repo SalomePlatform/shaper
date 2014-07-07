@@ -74,7 +74,7 @@ QString XGUI_Workshop::featureIcon(const std::string& theId)
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   : QObject(),
   myCurrentDir(QString()),
-  myPartSetModule(NULL),
+  myModule(NULL),
   mySalomeConnector(theConnector),
   myPropertyPanel(0),
   myObjectBrowser(0),
@@ -396,7 +396,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
                               QKeySequence(), isUsePropPanel);
     salomeConnector()->setNestedActions(aId, aNestedFeatures.split(" "));
     myActionsMgr->addCommand(aAction);
-    myPartSetModule->featureCreated(aAction);
+    myModule->featureCreated(aAction);
   } else {
 
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
@@ -418,7 +418,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
                                                 QKeySequence(), isUsePropPanel);
     aCommand->setNestedCommands(aNestedFeatures.split(" ", QString::SkipEmptyParts));
     myActionsMgr->addCommand(aCommand);
-    myPartSetModule->featureCreated(aCommand);
+    myModule->featureCreated(aCommand);
   }
 }
 
@@ -662,10 +662,10 @@ bool XGUI_Workshop::activateModule()
 {
   Config_ModuleReader aModuleReader;
   QString moduleName = QString::fromStdString(aModuleReader.getModuleName());
-  myPartSetModule = loadModule(moduleName);
-  if (!myPartSetModule)
+  myModule = loadModule(moduleName);
+  if (!myModule)
     return false;
-  myPartSetModule->createFeatures();
+  myModule->createFeatures();
   myActionsMgr->update();
   return true;
 }
@@ -727,7 +727,7 @@ void XGUI_Workshop::updateModuleCommands()
     }
   }
   foreach(QAction* aCmd, aCommands) {
-    aCmd->setEnabled(myPartSetModule->isFeatureEnabled(aCmd->data().toString()));
+    aCmd->setEnabled(myModule->isFeatureEnabled(aCmd->data().toString()));
   }
 }
 
@@ -815,7 +815,7 @@ void XGUI_Workshop::onFeatureTriggered()
   if (aCmd) {
     QString aId = salomeConnector()->commandId(aCmd);
     if (!aId.isNull())
-      myPartSetModule->launchOperation(aId);
+      myModule->launchOperation(aId);
   }
 }
 

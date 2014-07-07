@@ -117,6 +117,8 @@ public:
   //! Show the given features in 3d Viewer
   void showFeatures(QFeatureList theList, bool isVisible);
 
+  ModuleBase_IModule* module() const { return myModule; }
+
 signals:
   void salomeViewerSelection();
   void errorOccurred(const QString&);
@@ -179,7 +181,7 @@ private:
   void createDockWidgets();
 
   XGUI_MainWindow* myMainWindow;
-  ModuleBase_IModule* myPartSetModule;
+  ModuleBase_IModule* myModule;
   XGUI_ObjectsBrowser* myObjectBrowser;
   XGUI_PropertyPanel* myPropertyPanel;
   XGUI_SelectionMgr* mySelector;

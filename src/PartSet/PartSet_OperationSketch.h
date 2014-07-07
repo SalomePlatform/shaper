@@ -82,6 +82,10 @@ public:
   /// \return enabled state
   virtual bool isNestedOperationsEnabled() const;
 
+  /// Returns whether the sketch plane is set
+  /// \return the boolean value whether the sketch is set
+  bool hasSketchPlane() const;
+
 signals:
   /// signal about the sketch plane is selected
   /// \param theX the value in the X direction of the plane
@@ -95,10 +99,6 @@ protected:
   /// Virtual method called when operation started (see start() method for more description)
   /// Default impl calls corresponding slot and commits immediately.
   virtual void startOperation();
-
-  /// Returns whether the sketch plane is set
-  /// \return the boolean value whether the sketch is set
-  bool hasSketchPlane() const;
 
   /// Set the plane to the current sketch
   /// \param theShape the shape

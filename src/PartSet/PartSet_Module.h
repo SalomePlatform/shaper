@@ -68,6 +68,11 @@ public:
   /// \param theCmdId the operation name
   void updateCurrentPreview(const std::string& theCmdId);
 
+  /// Creates custom widgets for property panel
+  virtual QWidget* createWidgetByType(const std::string& theType, QWidget* theParent, 
+    Config_WidgetAPI* theWidgetApi, QList<ModuleBase_ModelWidget*>& theModelWidgets);
+
+
 public slots:
   void onFeatureTriggered();
   /// SLOT, that is called after the operation is started. Connect on the focus activated signal

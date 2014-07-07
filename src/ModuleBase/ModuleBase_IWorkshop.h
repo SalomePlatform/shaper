@@ -13,6 +13,8 @@
 
 #include <QObject>
 
+class ModuleBase_IModule;
+
 /**
 * Class which provides access to Workshop object serveces
 */
@@ -29,6 +31,9 @@ public:
 
   //! Returns list of currently selected data objects
   virtual QList<FeaturePtr> selectedFeatures() const = 0; 
+
+  //! Returns instance of loaded module
+  virtual ModuleBase_IModule* module() const = 0;
 
 signals:
   void selectionChanged();

@@ -6,6 +6,8 @@
 
 class QAction;
 class XGUI_Workshop;
+class Config_WidgetAPI;
+class ModuleBase_ModelWidget;
 
 /**
 * Interface to a module
@@ -25,6 +27,13 @@ public:
 
   /// Called when it is necessary to update a command state (enable or disable it)
   virtual bool isFeatureEnabled(const QString& theCmdId) const = 0;
+
+  /// Creates custom widgets for property panel
+  virtual QWidget* createWidgetByType(const std::string& theType, QWidget* theParent, 
+    Config_WidgetAPI* theWidgetApi, QList<ModuleBase_ModelWidget*>& theModelWidgets)
+  {
+    return 0;
+  }
 
   virtual ~ModuleBase_IModule() {};
 };

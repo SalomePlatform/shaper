@@ -8,6 +8,7 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <PartSet_Listener.h>
 #include <PartSet_TestOCC.h>
+#include <PartSet_WidgetSketchLabel.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModelAPI_Object.h>
@@ -539,4 +540,16 @@ bool PartSet_Module::isFeatureEnabled(const QString& theCmdId) const
   }
   QStringList aList = aActMgr->nestedCommands(aOperation->id());
   return aList.contains(theCmdId);
+}
+
+QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget* theParent, 
+                         Config_WidgetAPI* theWidgetApi, QList<ModuleBase_ModelWidget*>& theModelWidgets)
+{
+  if (theType == "sketch-start-label") {
+    PartSet_WidgetSketchLabel* aWgt = new PartSet_WidgetSketchLabel(theParent, theWidgetApi);
+    aWgt->setOperationsMgr(myWorkshop->operationMgr());
+    theModelWidgets.append(aWgt);
+    return aWgt->getControl();
+  } else
+    return 0;
 }
