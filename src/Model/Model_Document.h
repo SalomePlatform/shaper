@@ -116,6 +116,7 @@ protected:
 
   friend class Model_Application;
   friend class Model_PluginManager;
+  friend class DFBrowser;
 
 private:
   std::string myID; ///< identifier of the document in the application

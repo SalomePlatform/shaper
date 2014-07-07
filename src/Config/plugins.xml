@@ -3,4 +3,5 @@
   <plugin library="SketchPlugin" configuration="plugin-Sketch.xml"/>
   <plugin library="ConstructionPlugin" configuration="plugin-Construction.xml"/>
   <plugin library="SketchSolver"/>
+  <plugin library="DFBrowser"/>
 </plugins>

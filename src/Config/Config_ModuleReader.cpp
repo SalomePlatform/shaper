@@ -90,14 +90,14 @@ void Config_ModuleReader::loadLibrary(const std::string theLibName)
 
 #ifdef WIN32
   HINSTANCE aModLib = ::LoadLibrary(aFileName.c_str());
-  if (!aModLib) {
+  if (!aModLib && theLibName != "DFBrowser") { // don't shor error for internal debugging tool
     std::string errorMsg = "Failed to load " + aFileName;
     std::cerr << errorMsg << std::endl;
     Events_Error::send(errorMsg);
   }
 #else
   void* aModLib = dlopen( aFileName.c_str(), RTLD_LAZY | RTLD_GLOBAL );
-  if ( !aModLib ) {
+  if ( !aModLib  && theLibName != "DFBrowser") { // don't shor error for internal debugging tool
     std::cerr << "Failed to load " << aFileName.c_str() << std::endl;
   }
 #endif
