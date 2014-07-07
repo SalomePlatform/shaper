@@ -1,6 +1,5 @@
 #include "ConstructionPlugin_Plugin.h"
 #include "ConstructionPlugin_Point.h"
-#include "ConstructionPlugin_Extrusion.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
@@ -20,8 +19,6 @@ FeaturePtr ConstructionPlugin_Plugin::createFeature(string theFeatureID)
 {
   if (theFeatureID == CONSTRUCTION_POINT_KIND) {
     return FeaturePtr(new ConstructionPlugin_Point);
-  } else if (theFeatureID == CONSTRUCTION_EXTRUSION_KIND) {
-    return FeaturePtr(new ConstructionPlugin_Extrusion);
   }
   // feature of such kind is not found
   return FeaturePtr();
