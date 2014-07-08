@@ -28,14 +28,18 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Validator.h>
 
 #include <PartSetPlugin_Part.h>
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
+
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
+#include <ModuleBase_ViewSelectionValidator.h>
+
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
@@ -85,7 +89,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myDisplayer = new XGUI_Displayer(this);
 
   mySelector = new XGUI_SelectionMgr(this);
-  connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(updateModuleCommands()));
+  //connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(updateModuleCommands()));
 
   myOperationMgr = new XGUI_OperationMgr(this);
   myActionsMgr = new XGUI_ActionsMgr(this);
@@ -95,6 +99,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           this, SLOT(onContextMenuCommand(const QString&, bool)));
 
   myViewerProxy = new XGUI_ViewerProxy(this);
+  connect(myViewerProxy, SIGNAL(selectionChanged()), this, SLOT(updateCommandsOnViewSelection()));
   
   myModuleConnector = new XGUI_ModuleConnector(this);
 
@@ -712,7 +717,7 @@ void XGUI_Workshop::updateCommandStatus()
 }
 
 //******************************************************
-void XGUI_Workshop::updateModuleCommands()
+QList<QAction*> XGUI_Workshop::getModuleCommands() const
 {
   QList<QAction*> aCommands;
   if (isSalomeMode()) { // update commands in SALOME mode
@@ -726,9 +731,7 @@ void XGUI_Workshop::updateModuleCommands()
       }
     }
   }
-  foreach(QAction* aCmd, aCommands) {
-    aCmd->setEnabled(myModule->isFeatureEnabled(aCmd->data().toString()));
-  }
+  return aCommands;
 }
 
 //******************************************************
@@ -954,4 +957,25 @@ void XGUI_Workshop::showFeatures(QFeatureList theList, bool isVisible)
     }
   }
   myDisplayer->updateViewer();
+}
+
+//**************************************************************
+void XGUI_Workshop::updateCommandsOnViewSelection()
+{
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  Handle(AIS_InteractiveContext) aContext = viewer()->AISContext();
+
+  QList<QAction*> aActions = getModuleCommands();
+  foreach(QAction* aAction, aActions) {
+    QString aId = aAction->data().toString();
+    const ModelAPI_Validator* aValidator = aFactory->validator(aId.toStdString());
+    if (aValidator) {
+      const ModuleBase_ViewSelectionValidator* aSelValidator = 
+        dynamic_cast<const ModuleBase_ViewSelectionValidator*>(aValidator);
+      if (aSelValidator) {
+        aAction->setEnabled(aSelValidator->isValid(aContext));
+      }
+    }
+  }
 }

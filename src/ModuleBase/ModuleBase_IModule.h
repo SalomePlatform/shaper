@@ -26,7 +26,7 @@ public:
   virtual void launchOperation(const QString& theCmdId) = 0;
 
   /// Called when it is necessary to update a command state (enable or disable it)
-  virtual bool isFeatureEnabled(const QString& theCmdId) const = 0;
+  //virtual bool isFeatureEnabled(const QString& theCmdId) const = 0;
 
   /// Creates custom widgets for property panel
   virtual QWidget* createWidgetByType(const std::string& theType, QWidget* theParent, 

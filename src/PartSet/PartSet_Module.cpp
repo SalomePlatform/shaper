@@ -522,7 +522,7 @@ void PartSet_Module::onStorePoint2D(FeaturePtr theFeature, const std::string& th
                                 aPoint->x(), aPoint->y());
 }
 
-bool PartSet_Module::isFeatureEnabled(const QString& theCmdId) const
+/*bool PartSet_Module::isFeatureEnabled(const QString& theCmdId) const
 {
   XGUI_OperationMgr* aOpMgr = myWorkshop->operationMgr();
   XGUI_ActionsMgr* aActMgr = myWorkshop->actionsMgr();
@@ -540,7 +540,7 @@ bool PartSet_Module::isFeatureEnabled(const QString& theCmdId) const
   }
   QStringList aList = aActMgr->nestedCommands(aOperation->id());
   return aList.contains(theCmdId);
-}
+}*/
 
 QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget* theParent, 
                          Config_WidgetAPI* theWidgetApi, QList<ModuleBase_ModelWidget*>& theModelWidgets)

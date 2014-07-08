@@ -38,6 +38,7 @@ class QWidget;
 class QDockWidget;
 
 class Model_FeatureUpdatedMessage;
+class QAction;
 
 /**\class XGUI_Workshop
  * \ingroup GUI
@@ -125,7 +126,7 @@ signals:
 
 public slots:
   void updateCommandStatus();
-  void updateModuleCommands();
+  void updateCommandsOnViewSelection();
 
   void onNew();
   void onOpen();
@@ -154,6 +155,8 @@ protected:
   void onFeatureUpdatedMsg(const Model_FeatureUpdatedMessage* theMsg);
   void onFeatureCreatedMsg(const Model_FeatureUpdatedMessage* theMsg);
   void onFeatureRedisplayMsg(const Model_FeatureUpdatedMessage* theMsg);
+
+  QList<QAction*> getModuleCommands() const;
 
 protected slots:
   /// SLOT, that is called after the operation is started. Update workshop state according to

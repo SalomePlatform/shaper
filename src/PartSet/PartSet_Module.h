@@ -49,7 +49,7 @@ public:
   virtual void launchOperation(const QString& theCmdId);
 
   /// Called when it is necessary to update a command state (enable or disable it)
-  virtual bool isFeatureEnabled(const QString& theCmdId) const;
+  //virtual bool isFeatureEnabled(const QString& theCmdId) const;
 
   /// Displays or erase the current operation preview, if it has it.
   /// \param theFeature the feature instance to be displayed
