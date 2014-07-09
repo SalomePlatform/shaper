@@ -6,7 +6,6 @@
 #define XGUI_Displayer_H
 
 #include "XGUI.h"
-#include <ModuleBase_Definitions.h>
 
 #include <QString>
 #include <boost/shared_ptr.hpp>
@@ -20,7 +19,8 @@
 
 #include <ModelAPI_Feature.h>
 
-#include <XGUI_ViewerPrs.h>
+#include <ModuleBase_Definitions.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <map>
 #include <vector>
@@ -64,21 +64,6 @@ public:
   /// Returns true if the Feature succesfully displayed
   bool display(FeaturePtr theFeature, boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdateViewer = true);
   
-  /// Returns a list of viewer selected presentations
-  /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
-  /// \return list of presentations
-  std::list<XGUI_ViewerPrs> getSelected(const int theShapeTypeToSkip = -1);
-
-  /**
-  * Returns list of features currently selected in 3d viewer
-  */
-  QFeatureList selectedFeatures() const;
-
-  /// Returns a list of viewer highlited presentations
-  /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
-  /// \return list of presentations
-  std::list<XGUI_ViewerPrs> getHighlighted(const int theShapeTypeToSkip = -1);
-
   /// Display the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
   /// \param theAIS an AIS object
@@ -146,11 +131,12 @@ public:
   /// \return theIO an interactive object
   boost::shared_ptr<GeomAPI_AISObject> getAISObject(FeaturePtr theFeature) const;
 
-protected:
   /// Searches the feature by interactive object
   /// \param theIO an interactive object
   /// \return feature the feature or NULL if it not visualized
   FeaturePtr getFeature(Handle(AIS_InteractiveObject) theIO) const;
+
+protected:
   /// Deactivate local selection
   /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
   void closeAllContexts(const bool isUpdateViewer);

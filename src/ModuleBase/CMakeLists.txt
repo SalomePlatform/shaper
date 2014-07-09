@@ -22,7 +22,9 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetValue.h
 	ModuleBase_WidgetValueFeature.h
 	ModuleBase_Definitions.h
-	ModuleBase_ViewSelectionValidator.h
+	ModuleBase_SelectionValidator.h
+	ModuleBase_ISelection.h
+	ModuleBase_ViewerPrs.h
 )
 
 SET(PROJECT_SOURCES

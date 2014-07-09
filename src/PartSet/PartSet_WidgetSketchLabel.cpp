@@ -42,6 +42,7 @@ void PartSet_WidgetSketchLabel::setOperationsMgr(XGUI_OperationMgr* theMgr)
   ModuleBase_Operation* aOperation = theMgr->currentOperation();
   if (aOperation->inherits("PartSet_OperationSketch")) {
     PartSet_OperationSketch* aSketchOpe = static_cast<PartSet_OperationSketch*>(aOperation);
+    updateLabel(aSketchOpe);
     connect(aSketchOpe, SIGNAL(planeSelected(double, double, double)), 
             this, SLOT(onPlaneSelected()));
   }
@@ -50,7 +51,12 @@ void PartSet_WidgetSketchLabel::setOperationsMgr(XGUI_OperationMgr* theMgr)
 void PartSet_WidgetSketchLabel::onPlaneSelected()
 {
   PartSet_OperationSketch* aSketchOpe = static_cast<PartSet_OperationSketch*>(sender());
-  if (aSketchOpe->hasSketchPlane()) {
+  updateLabel(aSketchOpe);
+}
+
+void PartSet_WidgetSketchLabel::updateLabel(PartSet_OperationSketch* theSketchOpe)
+{
+  if (theSketchOpe->hasSketchPlane()) {
     myLabel->setText("");
     myLabel->setToolTip("");
   } else {

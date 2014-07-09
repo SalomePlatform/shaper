@@ -6,6 +6,7 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_MainWindow.h"
 #include "XGUI_ViewerProxy.h"
+#include "XGUI_Selection.h"
 
 #include "PartSetPlugin_Part.h"
 
@@ -98,7 +99,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
 {
   QMenu* aMenu = new QMenu();
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QFeatureList aFeatures = aSelMgr->selectedFeatures();
+  QFeatureList aFeatures = aSelMgr->selection()->selectedFeatures();
   if (aFeatures.size() == 1) {
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
     FeaturePtr aFeature = aFeatures.first();
@@ -152,7 +153,7 @@ QMenu* XGUI_ContextMenuMgr::viewerMenu() const
 void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
 {
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QFeatureList aFeatures = aSelMgr->selectedFeatures();
+  QFeatureList aFeatures = aSelMgr->selection()->selectedFeatures();
   if (aFeatures.size() > 0) {
     if (aFeatures.size() == 1)
       theMenu->addAction(action("EDIT_CMD"));

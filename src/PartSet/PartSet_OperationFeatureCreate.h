@@ -60,8 +60,8 @@ public:
   /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void initSelection(const std::list<XGUI_ViewerPrs>& theSelected,
-    const std::list<XGUI_ViewerPrs>& theHighlighted);
+  virtual void initSelection(const std::list<ModuleBase_ViewerPrs>& theSelected,
+    const std::list<ModuleBase_ViewerPrs>& theHighlighted);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
@@ -73,8 +73,8 @@ public:
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<XGUI_ViewerPrs>& theSelected,
-                            const std::list<XGUI_ViewerPrs>& theHighlighted);
+                            const std::list<ModuleBase_ViewerPrs>& theSelected,
+                            const std::list<ModuleBase_ViewerPrs>& theHighlighted);
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
@@ -128,7 +128,7 @@ private:
 
   ModuleBase_ModelWidget* myActiveWidget; ///< the active widget
 
-  std::list<XGUI_ViewerPrs> myPreSelection;
+  std::list<ModuleBase_ViewerPrs> myPreSelection;
 };
 
 #endif

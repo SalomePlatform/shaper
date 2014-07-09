@@ -24,6 +24,7 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_OperationMgr.h>
 #include <XGUI_SelectionMgr.h>
+#include <XGUI_Selection.h>
 #include <XGUI_ViewPort.h>
 #include <XGUI_ActionsMgr.h>
 #include <XGUI_ViewerProxy.h>
@@ -140,10 +141,10 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
   ModuleBase_Operation* anOperation = createOperation(theCmdId.toStdString());
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    XGUI_Selection* aSelection = myWorkshop->selector()->selection();
     // Initialise operation with preliminary selection
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
+    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
     aPreviewOp->initSelection(aSelected, aHighlighted);
   } 
   sendOperation(anOperation);
@@ -174,7 +175,7 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::onContextMenuCommand(const QString& theId, bool isChecked)
 {
-  QFeatureList aFeatures = myWorkshop->selector()->selectedFeatures();
+  QFeatureList aFeatures = myWorkshop->selector()->selection()->selectedFeatures();
   if (theId == "EDIT_CMD" && (aFeatures.size() > 0)) {
     editFeature(aFeatures.first());
   }
@@ -185,9 +186,10 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp) {
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+    XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+    // Initialise operation with preliminary selection
+    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
+    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
 
     aPreviewOp->mousePressed(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
   }
@@ -199,9 +201,10 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+    XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+    // Initialise operation with preliminary selection
+    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
+    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
 
     aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
   }
@@ -230,9 +233,10 @@ void PartSet_Module::onMouseDoubleClick(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+    XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+    // Initialise operation with preliminary selection
+    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
+    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
     aPreviewOp->mouseDoubleClick(theEvent, myWorkshop->viewer()->activeView(), aSelected,
                                  aHighlighted);
   }
@@ -258,10 +262,10 @@ void PartSet_Module::onLaunchOperation(std::string theName, FeaturePtr theFeatur
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp)
   {
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    // refill the features list with avoiding of the features, obtained only by vertex shape (TODO)
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+    XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+    // Initialise operation with preliminary selection
+    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
+    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
     aPreviewOp->initFeature(theFeature);
     aPreviewOp->initSelection(aSelected, aHighlighted);
   } else {

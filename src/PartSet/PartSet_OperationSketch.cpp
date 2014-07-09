@@ -20,7 +20,7 @@
 #include <GeomDataAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
 
-#include <XGUI_ViewerPrs.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <AIS_Shape.hxx>
 #include <AIS_ListOfInteractive.hxx>
@@ -72,12 +72,12 @@ FeaturePtr PartSet_OperationSketch::sketch() const
 }
 
 void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                           const std::list<XGUI_ViewerPrs>& theSelected,
-                                           const std::list<XGUI_ViewerPrs>& theHighlighted)
+                                           const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                           const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
   if (!hasSketchPlane()) {
     if (!theHighlighted.empty()) {
-      XGUI_ViewerPrs aPrs = theHighlighted.front();
+      ModuleBase_ViewerPrs aPrs = theHighlighted.front();
       const TopoDS_Shape& aShape = aPrs.shape();
       if (!aShape.IsNull())
         setSketchPlane(aShape);
@@ -106,8 +106,8 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
 }
 
 void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                            const std::list<XGUI_ViewerPrs>& theSelected,
-                                            const std::list<XGUI_ViewerPrs>& theHighlighted)
+                                            const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                            const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
   if (!hasSketchPlane()) {
   }

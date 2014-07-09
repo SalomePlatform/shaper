@@ -11,6 +11,7 @@
 
 class QLabel;
 class XGUI_OperationMgr; 
+class PartSet_OperationSketch;
 
 class PARTSET_EXPORT PartSet_WidgetSketchLabel : public ModuleBase_ModelWidget
 {
@@ -38,6 +39,8 @@ private slots:
   void onPlaneSelected();
 
 private:
+  void updateLabel(PartSet_OperationSketch* theSketchOpe);
+
   QLabel* myLabel;
   QString myText;
   QString myTooltip;

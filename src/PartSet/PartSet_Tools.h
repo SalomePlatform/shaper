@@ -18,7 +18,7 @@
 #include <list>
 
 class Handle_V3d_View;
-class XGUI_ViewerPrs;
+class ModuleBase_ViewerPrs;
 class GeomDataAPI_Point2D;
 class GeomAPI_Pln;
 class GeomAPI_Pnt2d;
@@ -58,7 +58,7 @@ public:
   /// \param theSketch the sketch feature
   /// \param theFeatures the list of selected presentations
   static FeaturePtr nearestFeature(QPoint thePoint, Handle_V3d_View theView, FeaturePtr theSketch,
-                                   const std::list<XGUI_ViewerPrs>& theFeatures);
+                                   const std::list<ModuleBase_ViewerPrs>& theFeatures);
 
   /// Returns pointer to the root document.
   static boost::shared_ptr<ModelAPI_Document> document();

@@ -28,10 +28,10 @@ SET(PROJECT_HEADERS
     XGUI_ErrorDialog.h
     XGUI_SalomeViewer.h
     XGUI_ViewerProxy.h
-    XGUI_ViewerPrs.h
     XGUI_PropertyPanel.h
     XGUI_ContextMenuMgr.h
     XGUI_ModuleConnector.h
+	XGUI_Selection.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -60,10 +60,10 @@ SET(PROJECT_SOURCES
     XGUI_ActionsMgr.cpp
     XGUI_ErrorDialog.cpp
     XGUI_ViewerProxy.cpp
-    XGUI_ViewerPrs.cpp
     XGUI_PropertyPanel.cpp
     XGUI_ContextMenuMgr.cpp
     XGUI_ModuleConnector.cpp
+	XGUI_Selection.cpp
 )
 
 SET(PROJECT_RESOURCES 

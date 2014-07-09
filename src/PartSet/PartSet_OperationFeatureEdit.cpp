@@ -10,9 +10,9 @@
 
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetEditor.h>
-#include <ModelAPI_Events.h>
+#include <ModuleBase_ViewerPrs.h>
 
-#include <XGUI_ViewerPrs.h>
+#include <ModelAPI_Events.h>
 
 #include <SketchPlugin_Feature.h>
 #include <GeomDataAPI_Point2D.h>
@@ -70,8 +70,8 @@ FeaturePtr PartSet_OperationFeatureEdit::sketch() const
 }
 
 void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                             const std::list<XGUI_ViewerPrs>& theSelected,
-                                             const std::list<XGUI_ViewerPrs>& theHighlighted)
+                                             const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                             const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
   FeaturePtr aFeature;
   if (!theHighlighted.empty())
@@ -125,19 +125,19 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, Handle(V3d_
 }
 
 void PartSet_OperationFeatureEdit::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                              const std::list<XGUI_ViewerPrs>& /*theSelected*/,
-                                              const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
+                                              const std::list<ModuleBase_ViewerPrs>& /*theSelected*/,
+                                              const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
 {
   blockSelection(false);
 }
 
 void PartSet_OperationFeatureEdit::mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                                    const std::list<XGUI_ViewerPrs>& theSelected,
-                                                    const std::list<XGUI_ViewerPrs>& theHighlighted)
+                                                    const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                                    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
   // TODO the functionality is important only for constraint feature. Should be moved in another place
   if (!theSelected.empty()) {
-    XGUI_ViewerPrs aFeaturePrs = theSelected.front();
+    ModuleBase_ViewerPrs aFeaturePrs = theSelected.front();
     if (!aFeaturePrs.owner().IsNull()) {
       Handle(AIS_DimensionOwner) anOwner = Handle(AIS_DimensionOwner)::DownCast(aFeaturePrs.owner());
       if (!anOwner.IsNull() && anOwner->SelectionMode() == AIS_DSM_Text) {

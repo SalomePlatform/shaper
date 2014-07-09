@@ -27,7 +27,7 @@
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_Constraint.h>
 
-#include <XGUI_ViewerPrs.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <V3d_View.hxx>
 #include <gp_Pln.hxx>
@@ -138,18 +138,18 @@ void PartSet_Tools::convertTo3D(const double theX, const double theY,
 
 FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
                                          FeaturePtr theSketch,
-                                         const std::list<XGUI_ViewerPrs>& theFeatures)
+                                         const std::list<ModuleBase_ViewerPrs>& theFeatures)
 {
   double aX, anY;
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(thePoint, theView);
   PartSet_Tools::convertTo2D(aPoint, theSketch, theView, aX, anY);
 
   FeaturePtr aFeature;
-  std::list<XGUI_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
+  std::list<ModuleBase_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures.end();
 
   FeaturePtr aDeltaFeature;   
   double aMinDelta = -1;
-  XGUI_ViewerPrs aPrs;
+  ModuleBase_ViewerPrs aPrs;
   for (; anIt != aLast; anIt++) {
     aPrs = *anIt;
     if (!aPrs.feature())

@@ -6,6 +6,7 @@
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_Displayer.h"
+#include "XGUI_Selection.h"
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_PluginManager.h>
@@ -17,10 +18,12 @@
 XGUI_SelectionMgr::XGUI_SelectionMgr(XGUI_Workshop* theParent) :
   QObject(theParent), myWorkshop(theParent)
 {
+  mySelection = new XGUI_Selection(myWorkshop);
 }
 
 XGUI_SelectionMgr::~XGUI_SelectionMgr()
 {
+  delete mySelection;
 }
 
 //**************************************************************
@@ -37,24 +40,29 @@ void XGUI_SelectionMgr::connectViewers()
 //**************************************************************
 void XGUI_SelectionMgr::onObjectBrowserSelection()
 {
-  QFeatureList aFeatures = selectedFeatures();
+  QFeatureList aFeatures = myWorkshop->objectBrowser()->selectedFeatures();
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   aDisplayer->setSelected(aFeatures);
-
   emit selectionChanged();
 }
 
 //**************************************************************
 void XGUI_SelectionMgr::onViewerSelection()
 {
-  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  QFeatureList aFeatures = aDisplayer->selectedFeatures();
+  QFeatureList aFeatures;
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
+    Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
+    FeaturePtr aFeature = myWorkshop->displayer()->getFeature(anIO);
+    if (aFeature)
+      aFeatures.append(aFeature);
+  }
   myWorkshop->objectBrowser()->setFeaturesSelected(aFeatures);
   emit selectionChanged();
 }
 
 //**************************************************************
-QFeatureList XGUI_SelectionMgr::selectedFeatures() const 
+/*QFeatureList XGUI_SelectionMgr::selectedFeatures() const 
 { 
   return myWorkshop->objectBrowser()->selectedFeatures(); 
 }
@@ -84,4 +92,4 @@ void XGUI_SelectionMgr::selectedShapes(NCollection_List<TopoDS_Shape>& theList) 
     if (!aShape.IsNull())
       theList.Append(aShape);
   }
-}
+}*/

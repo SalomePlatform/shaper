@@ -24,8 +24,8 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetValueFeature.h>
+#include <ModuleBase_ViewerPrs.h>
 
-#include <XGUI_ViewerPrs.h>
 #include <XGUI_Constants.h>
 
 #include <V3d_View.hxx>
@@ -83,8 +83,8 @@ std::list<int> PartSet_OperationFeatureCreate::getSelectionModes(FeaturePtr theF
   return aModes;
 }
 
-void PartSet_OperationFeatureCreate::initSelection(const std::list<XGUI_ViewerPrs>& theSelected,
-                                                   const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
+void PartSet_OperationFeatureCreate::initSelection(const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                                   const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
 {
   myPreSelection = theSelected;
 }
@@ -101,8 +101,8 @@ FeaturePtr PartSet_OperationFeatureCreate::sketch() const
 }
 
 void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                                const std::list<XGUI_ViewerPrs>& theSelected,
-                                                const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
+                                                const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                                const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
 {
   if (canBeCommitted())
   {
@@ -120,7 +120,7 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
     PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
   }
   else {
-    XGUI_ViewerPrs aPrs = theSelected.front();
+    ModuleBase_ViewerPrs aPrs = theSelected.front();
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull()) // the point is selected
     {
@@ -147,7 +147,7 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
   }
   FeaturePtr aFeature;
   if (!theSelected.empty()) {
-    XGUI_ViewerPrs aPrs = theSelected.front();
+    ModuleBase_ViewerPrs aPrs = theSelected.front();
     aFeature = aPrs.feature();
   }
   else
@@ -190,7 +190,7 @@ void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* t
 {
   myActiveWidget = theWidget;
   if ((myPreSelection.size() > 0) && myActiveWidget) {
-    const XGUI_ViewerPrs& aPrs = myPreSelection.front();
+    const ModuleBase_ViewerPrs& aPrs = myPreSelection.front();
     ModuleBase_WidgetValueFeature aValue;
     aValue.setFeature(aPrs.feature());
     if (myActiveWidget->setValue(&aValue)) {

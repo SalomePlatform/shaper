@@ -7,6 +7,7 @@
 #include "XGUI_Workshop.h"
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_SelectionMgr.h"
+#include "XGUI_Selection.h"
 
 
 
@@ -29,7 +30,7 @@ Handle(AIS_InteractiveContext) XGUI_ModuleConnector::AISContext() const
 
 QFeatureList XGUI_ModuleConnector::selectedFeatures() const
 {
-  return myWorkshop->selector()->selectedFeatures();
+  return myWorkshop->selector()->selection()->selectedFeatures();
 }
 
 ModuleBase_IModule* XGUI_ModuleConnector::module() const

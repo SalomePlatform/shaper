@@ -10,6 +10,7 @@
 #include "XGUI_Viewer.h"
 #include "ModuleBase_WidgetFactory.h"
 #include "XGUI_SelectionMgr.h"
+#include "XGUI_Selection.h"
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_OperationMgr.h"
@@ -38,7 +39,7 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
-#include <ModuleBase_ViewSelectionValidator.h>
+#include <ModuleBase_SelectionValidator.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -857,7 +858,7 @@ XGUI_SalomeViewer* XGUI_Workshop::salomeViewer() const
 //**************************************************************
 void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
 {
-  QFeatureList aFeatures = mySelector->selectedFeatures();
+  QFeatureList aFeatures = mySelector->selection()->selectedFeatures();
   if ((theId == "ACTIVATE_PART_CMD") && (aFeatures.size() > 0))
     activatePart(aFeatures.first());
   else if (theId == "DEACTIVATE_PART_CMD") 
@@ -964,17 +965,17 @@ void XGUI_Workshop::updateCommandsOnViewSelection()
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  Handle(AIS_InteractiveContext) aContext = viewer()->AISContext();
+  XGUI_Selection* aSelection = mySelector->selection();
 
   QList<QAction*> aActions = getModuleCommands();
   foreach(QAction* aAction, aActions) {
     QString aId = aAction->data().toString();
     const ModelAPI_Validator* aValidator = aFactory->validator(aId.toStdString());
     if (aValidator) {
-      const ModuleBase_ViewSelectionValidator* aSelValidator = 
-        dynamic_cast<const ModuleBase_ViewSelectionValidator*>(aValidator);
+      const ModuleBase_SelectionValidator* aSelValidator = 
+        dynamic_cast<const ModuleBase_SelectionValidator*>(aValidator);
       if (aSelValidator) {
-        aAction->setEnabled(aSelValidator->isValid(aContext));
+        aAction->setEnabled(aSelValidator->isValid(aSelection));
       }
     }
   }
