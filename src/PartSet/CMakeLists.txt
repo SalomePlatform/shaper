@@ -16,6 +16,7 @@ SET(PROJECT_HEADERS
 	PartSet_TestOCC.h
 	PartSet_Tools.h
 	PartSet_WidgetSketchLabel.h
+	PartSet_Validators.h
 )
 
 SET(PROJECT_SOURCES
@@ -30,6 +31,7 @@ SET(PROJECT_SOURCES
 	PartSet_TestOCC.cpp
 	PartSet_Tools.cpp
 	PartSet_WidgetSketchLabel.cpp
+	PartSet_Validators.cpp
 )
 
 SET(PROJECT_RESOURCES 
