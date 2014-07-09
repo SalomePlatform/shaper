@@ -83,8 +83,8 @@ public:
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
   virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<XGUI_ViewerPrs>& theSelected,
-                            const std::list<XGUI_ViewerPrs>& theHighlighted);
+                            const std::list<ModuleBase_ViewerPrs>& theSelected,
+                            const std::list<ModuleBase_ViewerPrs>& theHighlighted);
   /// Gives the current mouse point in the viewer
   /// \param theEvent the mouse event
   /// \param theView a viewer to have the viewer the eye position
@@ -95,8 +95,8 @@ public:
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<XGUI_ViewerPrs>& theSelected,
-                            const std::list<XGUI_ViewerPrs>& theHighlighted);
+                            const std::list<ModuleBase_ViewerPrs>& theSelected,
+                            const std::list<ModuleBase_ViewerPrs>& theHighlighted);
 
   /// Processes the mouse double click in the point
   /// \param theEvent the mouse event
@@ -104,8 +104,8 @@ public:
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
   virtual void mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                const std::list<XGUI_ViewerPrs>& theSelected,
-                                const std::list<XGUI_ViewerPrs>& theHighlighted);
+                                const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                const std::list<ModuleBase_ViewerPrs>& theHighlighted);
 protected:
   /// \brief Virtual method called when operation is started
   /// Virtual method called when operation started (see start() method for more description)

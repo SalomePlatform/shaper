@@ -7,9 +7,9 @@
 #include <PartSet_OperationSketch.h>
 
 #include <ModuleBase_OperationDescription.h>
-#include <ModelAPI_Events.h>
+#include <ModuleBase_ViewerPrs.h>
 
-#include <XGUI_ViewerPrs.h>
+#include <ModelAPI_Events.h>
 
 #include <SketchPlugin_Feature.h>
 #include <GeomDataAPI_Point2D.h>
@@ -48,8 +48,8 @@ bool PartSet_OperationFeatureEditMulti::isGranted(ModuleBase_IOperation* theOper
   return theOperation->getDescription()->operationId().toStdString() == PartSet_OperationSketch::Type();
 }
 
-void PartSet_OperationFeatureEditMulti::initSelection(const std::list<XGUI_ViewerPrs>& theSelected,
-                                                      const std::list<XGUI_ViewerPrs>& theHighlighted)
+void PartSet_OperationFeatureEditMulti::initSelection(const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                                      const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
   if (!theHighlighted.empty()) {
     // if there is highlighted object, we check whether it is in the list of selected objects
@@ -57,7 +57,7 @@ void PartSet_OperationFeatureEditMulti::initSelection(const std::list<XGUI_Viewe
     // the hightlighted object should moved and the selection is skipped. The skipped selection will be
     // deselected in the viewer by blockSelection signal in the startOperation method.
     bool isSelected = false;
-    std::list<XGUI_ViewerPrs>::const_iterator anIt = theSelected.begin(), aLast = theSelected.end();
+    std::list<ModuleBase_ViewerPrs>::const_iterator anIt = theSelected.begin(), aLast = theSelected.end();
     for (; anIt != aLast && !isSelected; anIt++) {
       isSelected = (*anIt).feature() == feature();
     }
@@ -81,8 +81,8 @@ FeaturePtr PartSet_OperationFeatureEditMulti::sketch() const
 }
 
 void PartSet_OperationFeatureEditMulti::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                             const std::list<XGUI_ViewerPrs>& /*theSelected*/,
-                                             const std::list<XGUI_ViewerPrs>& theHighlighted)
+                                             const std::list<ModuleBase_ViewerPrs>& /*theSelected*/,
+                                             const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
 }
 
@@ -108,7 +108,7 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Handle
                            boost::dynamic_pointer_cast<SketchPlugin_Feature>(feature());
     aSketchFeature->move(aDeltaX, aDeltaY);
 
-    std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
+    std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = (*anIt).feature();
       if (!aFeature || aFeature == feature())
@@ -123,12 +123,12 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Handle
 }
 
 void PartSet_OperationFeatureEditMulti::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                              const std::list<XGUI_ViewerPrs>& /*theSelected*/,
-                                              const std::list<XGUI_ViewerPrs>& /*theHighlighted*/)
+                                              const std::list<ModuleBase_ViewerPrs>& /*theSelected*/,
+                                              const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
 {
-  std::list<XGUI_ViewerPrs> aFeatures = myFeatures;
+  std::list<ModuleBase_ViewerPrs> aFeatures = myFeatures;
   commit();
-  std::list<XGUI_ViewerPrs>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
+  std::list<ModuleBase_ViewerPrs>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
   for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = (*anIt).feature();
     if (aFeature) {
@@ -163,7 +163,7 @@ void PartSet_OperationFeatureEditMulti::blockSelection(bool isBlocked, const boo
 
   myIsBlockedSelection = isBlocked;
   QFeatureList aFeatureList;
-  std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(),
+  std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(),
                                             aLast = myFeatures.end();
   for(; anIt != aLast; anIt++)
     aFeatureList.append((*anIt).feature());
@@ -184,7 +184,7 @@ void PartSet_OperationFeatureEditMulti::sendFeatures()
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_MOVED);
 
   std::list<FeaturePtr > aFeatures;
-  std::list<XGUI_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
+  std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
   for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = (*anIt).feature();
     if (!aFeature)

@@ -6,9 +6,6 @@
       </feature>
       <feature id="Axis" title="Axis" tooltip="Create a new axis" icon=":icons/axis.png" keysequence="" internal="true"/>
       <feature id="Plane" title="Plane" tooltip="Create a new plane" icon=":icons/plane.png" keysequence="" internal="true"/>
-      <feature id="Extrusion" title="Extrusion" tooltip="Create a shape by extrusion of a contour" icon=":icons/extrusion.png">
-          <source path="extrusion_widget.xml"/>
-      </feature>
     </group>
 </workbench>  
 </plugin>

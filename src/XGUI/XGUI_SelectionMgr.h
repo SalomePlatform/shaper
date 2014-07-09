@@ -12,6 +12,7 @@
 
 class XGUI_Workshop;
 class XGUI_ObjectsBrowser;
+class XGUI_Selection;
 
 /**\class XGUI_SelectionMgr
  * \ingroup GUI
@@ -25,17 +26,19 @@ public:
   XGUI_SelectionMgr(XGUI_Workshop* theParent);
   virtual ~XGUI_SelectionMgr();
 
+  XGUI_Selection* selection() const { return mySelection; }
+
   //! Returns list of currently selected data objects
-  QFeatureList selectedFeatures() const; 
+  //QFeatureList selectedFeatures() const; 
   
   //! Returns list of currently selected QModelIndexes
-  QModelIndexList selectedIndexes() const;
+  //QModelIndexList selectedIndexes() const;
 
   //! Returns list of currently selected AIS objects
-  void selectedAISObjects(AIS_ListOfInteractive& theList) const;
+  //void selectedAISObjects(AIS_ListOfInteractive& theList) const;
 
   //! Returns list of currently selected shapes
-  void selectedShapes(NCollection_List<TopoDS_Shape>& theList) const;
+  //void selectedShapes(NCollection_List<TopoDS_Shape>& theList) const;
 
   //! Connects the manager to all viewers accessible by Workshop
   void connectViewers();
@@ -49,8 +52,8 @@ private slots:
   void onViewerSelection();
 
 private:
-
   XGUI_Workshop* myWorkshop;
+  XGUI_Selection* mySelection;
 };
 
 #endif

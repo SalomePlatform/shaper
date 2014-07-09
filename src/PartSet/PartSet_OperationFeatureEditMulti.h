@@ -71,8 +71,8 @@ public:
   /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void initSelection(const std::list<XGUI_ViewerPrs>& theSelected,
-    const std::list<XGUI_ViewerPrs>& theHighlighted);
+  virtual void initSelection(const std::list<ModuleBase_ViewerPrs>& theSelected,
+    const std::list<ModuleBase_ViewerPrs>& theHighlighted);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
@@ -84,8 +84,8 @@ public:
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
   virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<XGUI_ViewerPrs>& theSelected,
-                            const std::list<XGUI_ViewerPrs>& theHighlighted);
+                            const std::list<ModuleBase_ViewerPrs>& theSelected,
+                            const std::list<ModuleBase_ViewerPrs>& theHighlighted);
   /// Gives the current mouse point in the viewer
   /// \param theEvent the mouse event
   /// \param theView a viewer to have the viewer the eye position
@@ -96,8 +96,8 @@ public:
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<XGUI_ViewerPrs>& theSelected,
-                            const std::list<XGUI_ViewerPrs>& theHighlighted);
+                            const std::list<ModuleBase_ViewerPrs>& theSelected,
+                            const std::list<ModuleBase_ViewerPrs>& theHighlighted);
 protected:
   /// \brief Virtual method called when operation is started
   /// Virtual method called when operation started (see start() method for more description)
@@ -121,7 +121,7 @@ protected:
 
 private:
   FeaturePtr mySketch; ///< the sketch feature
-  std::list<XGUI_ViewerPrs> myFeatures; ///< the features to apply the edit operation
+  std::list<ModuleBase_ViewerPrs> myFeatures; ///< the features to apply the edit operation
   Point myCurPoint; ///< the current 3D point clicked or moved
   bool myIsBlockedSelection; ///< the state of the last state of selection blocked signal
 };

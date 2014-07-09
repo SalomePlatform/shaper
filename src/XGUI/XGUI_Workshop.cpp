@@ -10,6 +10,7 @@
 #include "XGUI_Viewer.h"
 #include "ModuleBase_WidgetFactory.h"
 #include "XGUI_SelectionMgr.h"
+#include "XGUI_Selection.h"
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_OperationMgr.h"
@@ -28,14 +29,18 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Validator.h>
 
 #include <PartSetPlugin_Part.h>
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
+
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
+#include <ModuleBase_SelectionValidator.h>
+
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
@@ -74,7 +79,7 @@ QString XGUI_Workshop::featureIcon(const std::string& theId)
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   : QObject(),
   myCurrentDir(QString()),
-  myPartSetModule(NULL),
+  myModule(NULL),
   mySalomeConnector(theConnector),
   myPropertyPanel(0),
   myObjectBrowser(0),
@@ -85,7 +90,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myDisplayer = new XGUI_Displayer(this);
 
   mySelector = new XGUI_SelectionMgr(this);
-  connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(updateModuleCommands()));
+  //connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(updateModuleCommands()));
 
   myOperationMgr = new XGUI_OperationMgr(this);
   myActionsMgr = new XGUI_ActionsMgr(this);
@@ -95,6 +100,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           this, SLOT(onContextMenuCommand(const QString&, bool)));
 
   myViewerProxy = new XGUI_ViewerProxy(this);
+  connect(myViewerProxy, SIGNAL(selectionChanged()), this, SLOT(updateCommandsOnViewSelection()));
   
   myModuleConnector = new XGUI_ModuleConnector(this);
 
@@ -396,7 +402,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
                               QKeySequence(), isUsePropPanel);
     salomeConnector()->setNestedActions(aId, aNestedFeatures.split(" "));
     myActionsMgr->addCommand(aAction);
-    myPartSetModule->featureCreated(aAction);
+    myModule->featureCreated(aAction);
   } else {
 
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
@@ -418,7 +424,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
                                                 QKeySequence(), isUsePropPanel);
     aCommand->setNestedCommands(aNestedFeatures.split(" ", QString::SkipEmptyParts));
     myActionsMgr->addCommand(aCommand);
-    myPartSetModule->featureCreated(aCommand);
+    myModule->featureCreated(aCommand);
   }
 }
 
@@ -662,10 +668,10 @@ bool XGUI_Workshop::activateModule()
 {
   Config_ModuleReader aModuleReader;
   QString moduleName = QString::fromStdString(aModuleReader.getModuleName());
-  myPartSetModule = loadModule(moduleName);
-  if (!myPartSetModule)
+  myModule = loadModule(moduleName);
+  if (!myModule)
     return false;
-  myPartSetModule->createFeatures();
+  myModule->createFeatures();
   myActionsMgr->update();
   return true;
 }
@@ -712,7 +718,7 @@ void XGUI_Workshop::updateCommandStatus()
 }
 
 //******************************************************
-void XGUI_Workshop::updateModuleCommands()
+QList<QAction*> XGUI_Workshop::getModuleCommands() const
 {
   QList<QAction*> aCommands;
   if (isSalomeMode()) { // update commands in SALOME mode
@@ -726,9 +732,7 @@ void XGUI_Workshop::updateModuleCommands()
       }
     }
   }
-  foreach(QAction* aCmd, aCommands) {
-    aCmd->setEnabled(myPartSetModule->isFeatureEnabled(aCmd->data().toString()));
-  }
+  return aCommands;
 }
 
 //******************************************************
@@ -815,7 +819,7 @@ void XGUI_Workshop::onFeatureTriggered()
   if (aCmd) {
     QString aId = salomeConnector()->commandId(aCmd);
     if (!aId.isNull())
-      myPartSetModule->launchOperation(aId);
+      myModule->launchOperation(aId);
   }
 }
 
@@ -854,7 +858,7 @@ XGUI_SalomeViewer* XGUI_Workshop::salomeViewer() const
 //**************************************************************
 void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
 {
-  QFeatureList aFeatures = mySelector->selectedFeatures();
+  QFeatureList aFeatures = mySelector->selection()->selectedFeatures();
   if ((theId == "ACTIVATE_PART_CMD") && (aFeatures.size() > 0))
     activatePart(aFeatures.first());
   else if (theId == "DEACTIVATE_PART_CMD") 
@@ -954,4 +958,25 @@ void XGUI_Workshop::showFeatures(QFeatureList theList, bool isVisible)
     }
   }
   myDisplayer->updateViewer();
+}
+
+//**************************************************************
+void XGUI_Workshop::updateCommandsOnViewSelection()
+{
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  XGUI_Selection* aSelection = mySelector->selection();
+
+  QList<QAction*> aActions = getModuleCommands();
+  foreach(QAction* aAction, aActions) {
+    QString aId = aAction->data().toString();
+    const ModelAPI_Validator* aValidator = aFactory->validator(aId.toStdString());
+    if (aValidator) {
+      const ModuleBase_SelectionValidator* aSelValidator = 
+        dynamic_cast<const ModuleBase_SelectionValidator*>(aValidator);
+      if (aSelValidator) {
+        aAction->setEnabled(aSelValidator->isValid(aSelection));
+      }
+    }
+  }
 }

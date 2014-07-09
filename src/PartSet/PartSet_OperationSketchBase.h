@@ -26,7 +26,7 @@
 class Handle_V3d_View;
 class QMouseEvent;
 class GeomAPI_Shape;
-class XGUI_ViewerPrs;
+class ModuleBase_ViewerPrs;
 
 /*!
   \class PartSet_OperationSketchBase
@@ -66,8 +66,8 @@ public:
   /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void initSelection(const std::list<XGUI_ViewerPrs>& theSelected,
-    const std::list<XGUI_ViewerPrs>& theHighlighted) {}
+  virtual void initSelection(const std::list<ModuleBase_ViewerPrs>& theSelected,
+    const std::list<ModuleBase_ViewerPrs>& theHighlighted) {}
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
@@ -79,8 +79,8 @@ public:
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
   virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<XGUI_ViewerPrs>& theSelected,
-                            const std::list<XGUI_ViewerPrs>& theHighlighted);
+                            const std::list<ModuleBase_ViewerPrs>& theSelected,
+                            const std::list<ModuleBase_ViewerPrs>& theHighlighted);
 
   /// Processes the mouse release in the point
   /// \param theEvent the mouse event
@@ -88,8 +88,8 @@ public:
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
   virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                             const std::list<XGUI_ViewerPrs>& theSelected,
-                             const std::list<XGUI_ViewerPrs>& theHighlighted);
+                             const std::list<ModuleBase_ViewerPrs>& theSelected,
+                             const std::list<ModuleBase_ViewerPrs>& theHighlighted);
 
   /// Processes the mouse move in the point
   /// \param theEvent the mouse event
@@ -102,8 +102,8 @@ public:
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
   virtual void mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<XGUI_ViewerPrs>& theSelected,
-                            const std::list<XGUI_ViewerPrs>& theHighlighted);
+                            const std::list<ModuleBase_ViewerPrs>& theSelected,
+                            const std::list<ModuleBase_ViewerPrs>& theHighlighted);
 
   /// Processes the key pressed in the view
   /// \param theKey a key value
@@ -130,7 +130,7 @@ signals:
                           int theMode);
   /// Signal about the features should be selected
   /// \param theSelected the list of selected presentations
-  void featureSelected(const std::list<XGUI_ViewerPrs>& theSelected);
+  void featureSelected(const std::list<ModuleBase_ViewerPrs>& theSelected);
   /// signal to enable/disable multi selection in the viewer
   /// \param theEnabled the boolean state
   void multiSelectionEnabled(bool theEnabled);

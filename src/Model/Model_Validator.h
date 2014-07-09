@@ -46,8 +46,8 @@ public:
 
   /// Returns the result of "validate" method for attribute of validator.
   /// If validator is not exists, returns true: everything is valid by default.
-  MODEL_EXPORT virtual bool validate(
-    const boost::shared_ptr<ModelAPI_Feature>& theFeature, const std::string& theAttrID) const;
+  //MODEL_EXPORT virtual bool validate(
+  //  const boost::shared_ptr<ModelAPI_Feature>& theFeature, const std::string& theAttrID) const;
 
 protected:
   /// Get instance from PluginManager

@@ -7,11 +7,11 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_OperationMgr.h>
 #include <XGUI_Displayer.h>
-#include <XGUI_ViewerPrs.h>
 #include <XGUI_ViewerProxy.h>
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketchBase.h>
 
+#include <ModuleBase_ViewerPrs.h>
 #include <ModelAPI_Feature.h>
 
 #include <SketchPlugin_Line.h>

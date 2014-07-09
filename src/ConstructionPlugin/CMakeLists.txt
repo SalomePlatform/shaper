@@ -4,13 +4,11 @@ SET(PROJECT_HEADERS
     ConstructionPlugin.h
     ConstructionPlugin_Plugin.h
     ConstructionPlugin_Point.h
-    ConstructionPlugin_Extrusion.h
 )
 
 SET(PROJECT_SOURCES
     ConstructionPlugin_Plugin.cpp
     ConstructionPlugin_Point.cpp
-    ConstructionPlugin_Extrusion.cpp
 )
 
 ADD_DEFINITIONS(-DCONSTRUCTIONPLUGIN_EXPORTS ${BOOST_DEFINITIONS})
@@ -26,7 +24,6 @@ INCLUDE_DIRECTORIES(
 SET(XML_RESOURCES
   plugin-Construction.xml
   point_widget.xml
-  extrusion_widget.xml
 )
 
 INSTALL(TARGETS ConstructionPlugin DESTINATION plugins)

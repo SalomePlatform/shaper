@@ -38,6 +38,7 @@ class QWidget;
 class QDockWidget;
 
 class Model_FeatureUpdatedMessage;
+class QAction;
 
 /**\class XGUI_Workshop
  * \ingroup GUI
@@ -117,13 +118,15 @@ public:
   //! Show the given features in 3d Viewer
   void showFeatures(QFeatureList theList, bool isVisible);
 
+  ModuleBase_IModule* module() const { return myModule; }
+
 signals:
   void salomeViewerSelection();
   void errorOccurred(const QString&);
 
 public slots:
   void updateCommandStatus();
-  void updateModuleCommands();
+  void updateCommandsOnViewSelection();
 
   void onNew();
   void onOpen();
@@ -153,6 +156,8 @@ protected:
   void onFeatureCreatedMsg(const Model_FeatureUpdatedMessage* theMsg);
   void onFeatureRedisplayMsg(const Model_FeatureUpdatedMessage* theMsg);
 
+  QList<QAction*> getModuleCommands() const;
+
 protected slots:
   /// SLOT, that is called after the operation is started. Update workshop state according to
   /// the started operation, e.g. visualizes the property panel and connect to it.
@@ -179,7 +184,7 @@ private:
   void createDockWidgets();
 
   XGUI_MainWindow* myMainWindow;
-  ModuleBase_IModule* myPartSetModule;
+  ModuleBase_IModule* myModule;
   XGUI_ObjectsBrowser* myObjectBrowser;
   XGUI_PropertyPanel* myPropertyPanel;
   XGUI_SelectionMgr* mySelector;

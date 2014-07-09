@@ -2,7 +2,7 @@
   <workbench id="Sketch">
     <group id="Basic">
       <feature id="Sketch" nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular" title="Sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
-        <label title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch"/> 
+        <sketch-start-label title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch"/> 
       <!--icon=":pictures/x_point.png"-->
       </feature>
       <feature id="SketchPoint" title="Point" tooltip="Create a new point" icon=":icons/point.png">

@@ -31,6 +31,9 @@ public:
   //! Returns list of currently selected data objects
   virtual QFeatureList selectedFeatures() const; 
 
+  //! Returns instance of loaded module
+  virtual ModuleBase_IModule* module() const;
+
 private:
   XGUI_Workshop* myWorkshop;
 };

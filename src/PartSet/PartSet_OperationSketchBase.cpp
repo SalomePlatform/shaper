@@ -69,21 +69,21 @@ FeaturePtr PartSet_OperationSketchBase::createFeature(const bool theFlushMessage
 
 
 void PartSet_OperationSketchBase::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                               const std::list<XGUI_ViewerPrs>& theSelected,
-                                               const std::list<XGUI_ViewerPrs>& theHighlighted)
+                                               const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                               const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
 }
 void PartSet_OperationSketchBase::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                                const std::list<XGUI_ViewerPrs>& theSelected,
-                                                const std::list<XGUI_ViewerPrs>& theHighlighted)
+                                                const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                                const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
 }
 void PartSet_OperationSketchBase::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
 }
 void PartSet_OperationSketchBase::mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                                   const std::list<XGUI_ViewerPrs>& theSelected,
-                                                   const std::list<XGUI_ViewerPrs>& theHighlighted)
+                                                   const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                                   const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
 }
 

@@ -18,6 +18,8 @@
 #include <ModuleBase_WidgetDoubleValue.h>
 #include <ModuleBase_WidgetBoolValue.h>
 #include <ModuleBase_WidgetPoint2dDistance.h>
+#include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_IModule.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -144,10 +146,12 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   }
   else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
-  }
+  } else {
+    result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi, myModelWidgets);
 #ifdef _DEBUG
-  else { qDebug() << "ModuleBase_WidgetFactory::fillWidget: find bad widget type"; }
+    if (!result) { qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type"); }
 #endif
+  }
   return result;
 }
 

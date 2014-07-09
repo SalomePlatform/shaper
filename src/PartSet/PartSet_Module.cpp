@@ -8,10 +8,13 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <PartSet_Listener.h>
 #include <PartSet_TestOCC.h>
+#include <PartSet_WidgetSketchLabel.h>
+#include <PartSet_Validators.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Validator.h>
 
 #include <ModelAPI_Data.h>
 #include <GeomDataAPI_Point2D.h>
@@ -23,6 +26,7 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_OperationMgr.h>
 #include <XGUI_SelectionMgr.h>
+#include <XGUI_Selection.h>
 #include <XGUI_ViewPort.h>
 #include <XGUI_ActionsMgr.h>
 #include <XGUI_ViewerProxy.h>
@@ -100,6 +104,16 @@ void PartSet_Module::createFeatures()
   Config_ModuleReader aXMLReader = Config_ModuleReader();
   aXMLReader.readAll();
   myFeaturesInFiles = aXMLReader.featuresInFiles();
+
+  //!! Test registering of validators
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  
+  aFactory->registerValidator("PartSet_DistanceValidator", new PartSet_DistanceValidator);
+  aFactory->assignValidator("PartSet_DistanceValidator", "SketchConstraintDistance");
+
+  aFactory->registerValidator("PartSet_LengthValidator", new PartSet_LengthValidator);
+  aFactory->assignValidator("PartSet_LengthValidator", "SketchConstraintLength");
 }
 
 void PartSet_Module::featureCreated(QAction* theFeature)
@@ -139,10 +153,10 @@ void PartSet_Module::launchOperation(const QString& theCmdId)
   ModuleBase_Operation* anOperation = createOperation(theCmdId.toStdString());
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    XGUI_Selection* aSelection = myWorkshop->selector()->selection();
     // Initialise operation with preliminary selection
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
+    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
     aPreviewOp->initSelection(aSelected, aHighlighted);
   } 
   sendOperation(anOperation);
@@ -173,7 +187,7 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::onContextMenuCommand(const QString& theId, bool isChecked)
 {
-  QFeatureList aFeatures = myWorkshop->selector()->selectedFeatures();
+  QFeatureList aFeatures = myWorkshop->selector()->selection()->selectedFeatures();
   if (theId == "EDIT_CMD" && (aFeatures.size() > 0)) {
     editFeature(aFeatures.first());
   }
@@ -184,9 +198,10 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp) {
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+    XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+    // Initialise operation with preliminary selection
+    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
+    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
 
     aPreviewOp->mousePressed(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
   }
@@ -198,9 +213,10 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+    XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+    // Initialise operation with preliminary selection
+    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
+    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
 
     aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
   }
@@ -229,9 +245,10 @@ void PartSet_Module::onMouseDoubleClick(QMouseEvent* theEvent)
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp)
   {
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+    XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+    // Initialise operation with preliminary selection
+    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
+    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
     aPreviewOp->mouseDoubleClick(theEvent, myWorkshop->viewer()->activeView(), aSelected,
                                  aHighlighted);
   }
@@ -257,10 +274,10 @@ void PartSet_Module::onLaunchOperation(std::string theName, FeaturePtr theFeatur
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp)
   {
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    // refill the features list with avoiding of the features, obtained only by vertex shape (TODO)
-    std::list<XGUI_ViewerPrs> aSelected = aDisplayer->getSelected();
-    std::list<XGUI_ViewerPrs> aHighlighted = aDisplayer->getHighlighted();
+    XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+    // Initialise operation with preliminary selection
+    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
+    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
     aPreviewOp->initFeature(theFeature);
     aPreviewOp->initSelection(aSelected, aHighlighted);
   } else {
@@ -521,7 +538,7 @@ void PartSet_Module::onStorePoint2D(FeaturePtr theFeature, const std::string& th
                                 aPoint->x(), aPoint->y());
 }
 
-bool PartSet_Module::isFeatureEnabled(const QString& theCmdId) const
+/*bool PartSet_Module::isFeatureEnabled(const QString& theCmdId) const
 {
   XGUI_OperationMgr* aOpMgr = myWorkshop->operationMgr();
   XGUI_ActionsMgr* aActMgr = myWorkshop->actionsMgr();
@@ -539,4 +556,16 @@ bool PartSet_Module::isFeatureEnabled(const QString& theCmdId) const
   }
   QStringList aList = aActMgr->nestedCommands(aOperation->id());
   return aList.contains(theCmdId);
+}*/
+
+QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget* theParent, 
+                         Config_WidgetAPI* theWidgetApi, QList<ModuleBase_ModelWidget*>& theModelWidgets)
+{
+  if (theType == "sketch-start-label") {
+    PartSet_WidgetSketchLabel* aWgt = new PartSet_WidgetSketchLabel(theParent, theWidgetApi);
+    aWgt->setOperationsMgr(myWorkshop->operationMgr());
+    theModelWidgets.append(aWgt);
+    return aWgt->getControl();
+  } else
+    return 0;
 }

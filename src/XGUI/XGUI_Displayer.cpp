@@ -69,65 +69,6 @@ bool XGUI_Displayer::display(FeaturePtr theFeature,
 }
 
 
-std::list<XGUI_ViewerPrs> XGUI_Displayer::getSelected(const int theShapeTypeToSkip)
-{
-  std::set<FeaturePtr > aPrsFeatures;
-  std::list<XGUI_ViewerPrs> aPresentations;
-
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
-    Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
-    TopoDS_Shape aShape = aContext->SelectedShape();
-
-    if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
-      continue;
-
-    FeaturePtr aFeature = getFeature(anIO);
-    if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
-      continue;
-    Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
-    aPresentations.push_back(XGUI_ViewerPrs(aFeature, aShape, anOwner));
-    aPrsFeatures.insert(aFeature);
-  }
-  return aPresentations;
-}
-
-QFeatureList XGUI_Displayer::selectedFeatures() const
-{
-  QFeatureList aSelectedList;
-
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
-    Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
-    FeaturePtr aFeature = getFeature(anIO);
-    if (aFeature)
-      aSelectedList.append(aFeature);
-  }
-  return aSelectedList;
-}
-
-
-std::list<XGUI_ViewerPrs> XGUI_Displayer::getHighlighted(const int theShapeTypeToSkip)
-{
-  std::set<FeaturePtr > aPrsFeatures;
-  std::list<XGUI_ViewerPrs> aPresentations;
-
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
-    Handle(AIS_InteractiveObject) anIO = aContext->DetectedInteractive();
-    TopoDS_Shape aShape = aContext->DetectedShape();
-    if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
-      continue;
-
-    FeaturePtr aFeature = getFeature(anIO);
-    if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
-      continue;
-    aPresentations.push_back(XGUI_ViewerPrs(aFeature, aShape, NULL));
-    aPrsFeatures.insert(aFeature);
-  }
-
-  return aPresentations;
-}
 
 void XGUI_Displayer::erase(FeaturePtr theFeature,
                            const bool isUpdateViewer)
