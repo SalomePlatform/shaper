@@ -11,7 +11,7 @@
 #include <ModelAPI_Validator.h>
 
 
-class MODULEBASE_EXPORT ModuleBase_SelectionValidator: public ModelAPI_Validator
+class ModuleBase_SelectionValidator: public ModelAPI_Validator
 {
 public:
   virtual bool isValid(const ModuleBase_ISelection* theSelection) const = 0;

@@ -9,10 +9,12 @@
 #include <PartSet_Listener.h>
 #include <PartSet_TestOCC.h>
 #include <PartSet_WidgetSketchLabel.h>
+#include <PartSet_Validators.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Validator.h>
 
 #include <ModelAPI_Data.h>
 #include <GeomDataAPI_Point2D.h>
@@ -102,6 +104,16 @@ void PartSet_Module::createFeatures()
   Config_ModuleReader aXMLReader = Config_ModuleReader();
   aXMLReader.readAll();
   myFeaturesInFiles = aXMLReader.featuresInFiles();
+
+  //!! Test registering of validators
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  
+  aFactory->registerValidator("PartSet_DistanceValidator", new PartSet_DistanceValidator);
+  aFactory->assignValidator("PartSet_DistanceValidator", "SketchConstraintDistance");
+
+  aFactory->registerValidator("PartSet_LengthValidator", new PartSet_LengthValidator);
+  aFactory->assignValidator("PartSet_LengthValidator", "SketchConstraintLength");
 }
 
 void PartSet_Module::featureCreated(QAction* theFeature)
