@@ -21,6 +21,11 @@ Config_FeatureMessage::Config_FeatureMessage(const Events_ID theId, const void* 
   myNestedFeatures = "";
 }
 
+Config_FeatureMessage::~Config_FeatureMessage()
+{
+
+}
+
 const std::string& Config_FeatureMessage::icon() const
 {
   return myIcon;

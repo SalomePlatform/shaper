@@ -15,6 +15,7 @@ const static char* NODE_WORKBENCH = "workbench";
 const static char* NODE_GROUP = "group";
 const static char* NODE_FEATURE = "feature";
 const static char* NODE_SOURCE = "source";
+const static char* NODE_VALIDATOR = "validator";
 
 //Widgets
 const static char* WDG_DOUBLEVALUE = "doublevalue";
@@ -37,19 +38,22 @@ const static char* WDG_FEATURE_SELECTOR = "feature_selector";
 const static char* WDG_FEATURE_OR_ATTRIBUTE_SELECTOR = "feature_or_attribute_selector";
 const static char* WDG_DOUBLEVALUE_EDITOR = "doublevalue_editor";
 
+//Common Widget's or Feature's Properties
 const static char* _ID = "id";
-//const static char* WORKBENCH_ID = "id";
-//const static char* GROUP_ID = "id";
-//const static char* FEATURE_ID = "id";
-const static char* FEATURE_TEXT = "title";
 const static char* FEATURE_TOOLTIP = "tooltip";
 const static char* FEATURE_ICON = "icon";
+const static char* FEATURE_TEXT = "title";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
 const static char* FEATURE_NESTED = "nested";
 const static char* FEATURE_INTERNAL = "internal";
-const static char* SOURCE_FILE = "path";
-
+// TODO: Rename
 const static char* PREVIOUS_FEATURE_PARAM = "previous_feature_param";
+const static char* ANY_WDG_TOOLTIP = FEATURE_TOOLTIP;
+const static char* ANY_WDG_ICON = FEATURE_ICON;
+const static char* ANY_WDG_LABEL = "label";
+
+const static char* SOURCE_FILE = "path";
+const static char* VALIDATOR_PARAMETERS = "parameters";
 
 // doublevalue properties:
 const static char* INFO_WDG_TEXT = FEATURE_TEXT;

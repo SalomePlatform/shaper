@@ -11,6 +11,7 @@
 #include "Config_def.h"
 
 #include <string>
+#include <list>
 #include <stdarg.h>
 
 //>> Forward declaration of xmlNodePtr.
@@ -48,6 +49,13 @@ CONFIG_EXPORT bool isNode(xmlNodePtr theNode, const char* theNodeName, ...);
  * given node.
  */
 CONFIG_EXPORT bool hasChild(xmlNodePtr theNode);
+
+/*
+ *
+ */
+CONFIG_EXPORT bool getValidatorInfo(xmlNodePtr theNode,
+                                    std::string& outValidatorId,
+                                    std::list<std::string>& outValidatorParameters);
 
 /*!
  \brief Convert the given parameter to the platform-specific library name.

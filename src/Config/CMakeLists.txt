@@ -14,6 +14,7 @@ SET(PROJECT_HEADERS
   Config_WidgetReader.h
   Config_PointerMessage.h
   Config_Common.h
+  Config_ValidatorMessage.h
  )
  
 SET(PROJECT_SOURCES
@@ -25,6 +26,7 @@ SET(PROJECT_SOURCES
   Config_WidgetReader.cpp
   Config_PointerMessage.cpp
   Config_Common.cpp
+  Config_ValidatorMessage.cpp
 )
 
 SET(XML_RESOURCES

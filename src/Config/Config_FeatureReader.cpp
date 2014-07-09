@@ -18,6 +18,7 @@
 
 #include <string>
 #include <algorithm>
+#include <list>
 
 #ifdef _DEBUG
 #include <iostream>
@@ -53,45 +54,45 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
     //If a feature has xml definition for it's widget:
     aMessage.setUseInput(hasChild(theNode));
     aEvLoop->send(aMessage);
-  }
   //The m_last* variables always defined before fillFeature() call. XML is a tree.
-  if (isNode(theNode, NODE_GROUP, NULL)) {
+  } else if (isNode(theNode, NODE_GROUP, NULL)) {
     myLastGroup = getProperty(theNode, _ID);
-  }
-  if (isNode(theNode, NODE_WORKBENCH, NULL)) {
+  } else if (isNode(theNode, NODE_WORKBENCH, NULL)) {
     myLastWorkbench = getProperty(theNode, _ID);
+  //Process SOURCE, VALIDATOR nodes.
   }
-  //Process SOURCE nodes.
   Config_XMLReader::processNode(theNode);
 }
 
 bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
 {
-  return isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL);
+  return isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NODE_FEATURE, NULL);
 }
 
-void Config_FeatureReader::fillFeature(xmlNodePtr theRoot, Config_FeatureMessage& outFtMessage)
+void Config_FeatureReader::fillFeature(xmlNodePtr theNode,
+                                       Config_FeatureMessage& outFeatureMessage)
 {
-  outFtMessage.setId(getProperty(theRoot, _ID));
-  outFtMessage.setPluginLibrary(myLibraryName);
-  outFtMessage.setNestedFeatures(getProperty(theRoot, FEATURE_NESTED));
-  bool isFtInternal = isInternalFeature(theRoot);
-  outFtMessage.setInternal(isFtInternal);
-  if(isFtInternal) {
+  outFeatureMessage.setId(getProperty(theNode, _ID));
+  outFeatureMessage.setPluginLibrary(myLibraryName);
+  outFeatureMessage.setNestedFeatures(getProperty(theNode, FEATURE_NESTED));
+
+  bool isInternal = isInternalFeature(theNode);
+  outFeatureMessage.setInternal(isInternal);
+  if(isInternal) {
     //Internal feature has no visual representation.
     return;
   }
-  outFtMessage.setText(getProperty(theRoot, FEATURE_TEXT));
-  outFtMessage.setTooltip(getProperty(theRoot, FEATURE_TOOLTIP));
-  outFtMessage.setIcon(getProperty(theRoot, FEATURE_ICON));
-  outFtMessage.setKeysequence(getProperty(theRoot, FEATURE_KEYSEQUENCE));
-  outFtMessage.setGroupId(myLastGroup);
-  outFtMessage.setWorkbenchId(myLastWorkbench);
+  outFeatureMessage.setText(getProperty(theNode, FEATURE_TEXT));
+  outFeatureMessage.setTooltip(getProperty(theNode, FEATURE_TOOLTIP));
+  outFeatureMessage.setIcon(getProperty(theNode, FEATURE_ICON));
+  outFeatureMessage.setKeysequence(getProperty(theNode, FEATURE_KEYSEQUENCE));
+  outFeatureMessage.setGroupId(myLastGroup);
+  outFeatureMessage.setWorkbenchId(myLastWorkbench);
 }
 
-bool Config_FeatureReader::isInternalFeature(xmlNodePtr theRoot)
+bool Config_FeatureReader::isInternalFeature(xmlNodePtr theNode)
 {
-  std::string prop = getProperty(theRoot, FEATURE_INTERNAL);
+  std::string prop = getProperty(theNode, FEATURE_INTERNAL);
   std::transform(prop.begin(), prop.end(), prop.begin(), ::tolower);
   if(prop.empty() || prop == "false" || prop == "0") {
     return false;

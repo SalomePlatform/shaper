@@ -6,9 +6,12 @@
  */
 
 #include "Config_Common.h"
+#include <Config_Keywords.h>
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+
+#include <sstream> //for stringstream
 
 bool isElementNode(xmlNodePtr theNode)
 {
@@ -49,6 +52,31 @@ bool hasChild(xmlNodePtr theNode)
     }
   }
   return false;
+}
+
+bool getValidatorInfo(xmlNodePtr theNode,
+                      std::string& outValidatorId,
+                      std::list<std::string>& outValidatorParameters)
+{
+  //Validator id:
+  char* anIdProp = (char*) xmlGetProp(theNode, BAD_CAST _ID);
+  if (!anIdProp || anIdProp[0] == 0) {
+    return false;
+  }
+  outValidatorId = std::string(anIdProp);
+
+  //Validator parameters:
+  char* aParamProp = (char*) xmlGetProp(theNode, BAD_CAST VALIDATOR_PARAMETERS);
+  if (aParamProp && aParamProp[0] != 0) {
+    std::string aPropString = std::string(aParamProp);
+    std::stringstream aPropStringStream(aPropString);
+    char COMMA_DELIM = ',';
+    std::string aValidatorParameter;
+    while (std::getline(aPropStringStream, aValidatorParameter, ',')) {
+      outValidatorParameters.push_back(aValidatorParameter);
+    }
+  }
+  return true;
 }
 
 std::string library(const std::string& theLibName)

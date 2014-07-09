@@ -8,6 +8,7 @@
 #include <Config_XMLReader.h>
 #include <Config_Keywords.h>
 #include <Config_Common.h>
+#include <Config_ValidatorMessage.h>
 
 #include <Events_Loop.h>
 #include <libxml/parser.h>
@@ -72,6 +73,8 @@ void Config_XMLReader::processNode(xmlNodePtr theNode)
     #ifdef _DEBUG
     std::cout << "Config_XMLReader::sourced node: " << aSourceFile << std::endl;
     #endif
+  } else if (isNode(theNode, NODE_VALIDATOR, NULL)) {
+    processValidator(theNode);
   }
 }
 
@@ -89,7 +92,9 @@ bool Config_XMLReader::processChildren(xmlNodePtr aNode)
  */
 xmlNodePtr Config_XMLReader::findRoot()
 {
-  myXmlDoc = xmlParseFile(myDocumentPath.c_str());
+  if (myXmlDoc == NULL) {
+    myXmlDoc = xmlParseFile(myDocumentPath.c_str());
+  }
   if (myXmlDoc == NULL) {
 #ifdef _DEBUG
     std::cout << "Config_XMLReader::import: " << "Document " << myDocumentPath
@@ -117,7 +122,10 @@ void Config_XMLReader::readRecursively(xmlNodePtr theParent)
     return;
   xmlNodePtr aNode = theParent->xmlChildrenNode;
   for(; aNode; aNode = aNode->next) {
-    processNode(aNode);
+    //Still no text processing in features...
+    if(isElementNode(aNode)) {
+      processNode(aNode);
+    }
     if (processChildren(aNode)) {
       readRecursively(aNode);
     }
@@ -135,13 +143,32 @@ xmlNodePtr Config_XMLReader::node(void* theNode)
 /*
  * Returns named property for a given node as std::string.
  */
-std::string Config_XMLReader::getProperty(xmlNodePtr theNode, const char* name)
+std::string Config_XMLReader::getProperty(xmlNodePtr theNode, const char* theName)
 {
   std::string result = "";
-  char* aPropChars = (char*) xmlGetProp(theNode, BAD_CAST name);
+  char* aPropChars = (char*) xmlGetProp(theNode, BAD_CAST theName);
   if (!aPropChars || aPropChars[0] == 0)
     return result;
   result = std::string(aPropChars);
   return result;
 }
 
+void Config_XMLReader::processValidator(xmlNodePtr theNode)
+{
+  Events_ID aValidatoEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
+  Events_Loop* aEvLoop = Events_Loop::loop();
+  Config_ValidatorMessage aMessage(aValidatoEvent, this);
+  std::string aValidatorId;
+  std::list<std::string> aValidatorParameters;
+  getValidatorInfo(theNode, aValidatorId, aValidatorParameters);
+  aMessage.setValidatorId(aValidatorId);
+  aMessage.setValidatorParameters(aValidatorParameters);
+  if(isNode(theNode->parent, NODE_FEATURE, NULL)) {
+    aMessage.setFeatureId(getProperty(theNode->parent, _ID));
+  } else {
+    xmlNodePtr aWdgNode = theNode->parent;
+    aMessage.setAttributeId(getProperty(aWdgNode, _ID));
+    aMessage.setFeatureId(getProperty(aWdgNode->parent, _ID));
+  }
+  aEvLoop->send(aMessage);
+}

@@ -44,7 +44,7 @@ void Config_WidgetReader::processNode(xmlNodePtr theNode)
 {
   if (isNode(theNode, NODE_FEATURE, NULL)) {
     std::string aNodeName = getProperty(theNode, _ID);
-    myWidgetCache[aNodeName] = dumpNode(theNode);;
+    myWidgetCache[aNodeName] = dumpNode(theNode);
     myDescriptionCache[aNodeName] = getProperty(theNode, FEATURE_TEXT);
   }
   //Process SOURCE nodes.
@@ -67,6 +67,9 @@ std::string Config_WidgetReader::dumpNode(xmlNodePtr theNode)
   if (isNode(aChildrenNode, NODE_SOURCE, NULL)) {
     Config_XMLReader aSourceReader = 
       Config_XMLReader(getProperty(aChildrenNode, SOURCE_FILE));
+    //Register all validators in the sourced xml
+    aSourceReader.readAll();
+    //Dump!
     xmlNodePtr aSourceRoot = aSourceReader.findRoot();
     int size = xmlNodeDump(buffer, aSourceRoot->doc, aSourceRoot, 0, 1);
   } else {

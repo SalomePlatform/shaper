@@ -49,6 +49,7 @@ protected:
 
   xmlNodePtr node(void* theNode);
   std::string getProperty(xmlNodePtr theNode, const char* property);
+  void processValidator(xmlNodePtr theNode);
 
 protected:
   std::string myDocumentPath;

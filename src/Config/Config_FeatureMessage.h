@@ -33,6 +33,7 @@ class Config_FeatureMessage: public Events_Message
 public:
   //const Events_ID theID, const void* theSender = 0
   CONFIG_EXPORT Config_FeatureMessage(const Events_ID theId, const void* theParent = 0);
+  CONFIG_EXPORT virtual ~Config_FeatureMessage();
 
   //Auto-generated getters/setters
   CONFIG_EXPORT const std::string& icon() const;

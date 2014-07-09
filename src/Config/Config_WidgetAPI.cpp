@@ -94,20 +94,20 @@ std::string Config_WidgetAPI::getProperty(const char* thePropName) const
 
 std::string Config_WidgetAPI::widgetId() const
 {
-  return getProperty("id");
-}
-
-std::string Config_WidgetAPI::widgetTooltip() const
-{
-  return getProperty("tooltip");
+  return getProperty(_ID);
 }
 
 std::string Config_WidgetAPI::widgetIcon() const
 {
-  return getProperty("icon");
+  return getProperty(ANY_WDG_ICON);
 }
 
 std::string Config_WidgetAPI::widgetLabel() const
 {
-  return getProperty("label");
+  return getProperty(ANY_WDG_LABEL);
+}
+
+std::string Config_WidgetAPI::widgetTooltip() const
+{
+  return getProperty(ANY_WDG_TOOLTIP);
 }
