@@ -10,13 +10,36 @@
 #include <ModuleBase_SelectionValidator.h>
 #include <ModuleBase_ISelection.h>
 
+//! A class to validate a selection for Distance constraint operation
 class PartSet_DistanceValidator: public ModuleBase_SelectionValidator
 {
 public:
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
+//! A class to validate a selection for Length constraint operation
 class PartSet_LengthValidator: public ModuleBase_SelectionValidator
+{
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+};
+
+//! A class to validate a selection for Perpendicular constraint operation
+class PartSet_PerpendicularValidator: public ModuleBase_SelectionValidator
+{
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+};
+
+//! A class to validate a selection for Perpendicular constraint operation
+class PartSet_ParallelValidator: public ModuleBase_SelectionValidator
+{
+public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+};
+
+//! A class to validate a selection for Perpendicular constraint operation
+class PartSet_RadiusValidator: public ModuleBase_SelectionValidator
 {
 public:
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;

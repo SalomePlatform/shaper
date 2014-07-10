@@ -114,6 +114,15 @@ void PartSet_Module::createFeatures()
 
   aFactory->registerValidator("PartSet_LengthValidator", new PartSet_LengthValidator);
   aFactory->assignValidator("PartSet_LengthValidator", "SketchConstraintLength");
+
+  aFactory->registerValidator("PartSet_PerpendicularValidator", new PartSet_PerpendicularValidator);
+  aFactory->assignValidator("PartSet_PerpendicularValidator", "SketchConstraintPerpendicular");
+
+  aFactory->registerValidator("PartSet_ParallelValidator", new PartSet_ParallelValidator);
+  aFactory->assignValidator("PartSet_ParallelValidator", "SketchConstraintParallel");
+
+  aFactory->registerValidator("PartSet_RadiusValidator", new PartSet_RadiusValidator);
+  aFactory->assignValidator("PartSet_RadiusValidator", "SketchConstraintRadius");
 }
 
 void PartSet_Module::featureCreated(QAction* theFeature)
