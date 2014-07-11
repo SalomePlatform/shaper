@@ -10,16 +10,6 @@ SketchPlugin_Feature::SketchPlugin_Feature()
   mySketch = 0;
 }
 
-void SketchPlugin_Feature::setPreview(const boost::shared_ptr<GeomAPI_Shape>& theShape)
-{
-  myPreview = theShape;
-}
-
-const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Feature::getPreview() const
-{
-  return myPreview;
-}
-
 SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
 {
   if (!mySketch) {
@@ -27,7 +17,7 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
     int aSketches = document()->size("Construction");
     for(int a = 0; a < aSketches && !mySketch; a++) {
       boost::shared_ptr<SketchPlugin_Sketch> aSketch = boost::
-        dynamic_pointer_cast<SketchPlugin_Sketch>(document()->feature("Construction", a, true));
+        dynamic_pointer_cast<SketchPlugin_Sketch>(document()->object("Construction", a));
       if (aSketch) {
         std::list<FeaturePtr > aList = 
           aSketch->data()->reflist(SKETCH_ATTR_FEATURES)->list();
@@ -47,6 +37,7 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
 boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Feature::prepareAISShape(
                         boost::shared_ptr<GeomAPI_AISObject> thePrevious)
 {
+  document()->result();
   boost::shared_ptr<GeomAPI_Shape> aPreview = preview();
   boost::shared_ptr<GeomAPI_AISObject> aResult = thePrevious;
   if (!aResult)

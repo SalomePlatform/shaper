@@ -110,7 +110,7 @@ bool ModuleBase_WidgetPoint2D::storeValue(FeaturePtr theFeature) const
   ModuleBase_WidgetPoint2D* that = (ModuleBase_WidgetPoint2D*) this;
   bool isBlocked = that->blockSignals(true);
   aPoint->setValue(myXSpin->value(), myYSpin->value());
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   that->blockSignals(isBlocked);
 
   return true;

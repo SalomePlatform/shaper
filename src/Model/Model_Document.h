@@ -8,6 +8,7 @@
 #include <Model.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
 
 #include <TDocStd_Document.hxx>
 #include <map>
@@ -64,7 +65,7 @@ public:
   //! \param creates feature and puts it in the document
   MODEL_EXPORT virtual FeaturePtr addFeature(std::string theID);
 
-  //! Removes the feature from the document
+  //! Removes the feature from the document (with result)
   MODEL_EXPORT virtual void removeFeature(FeaturePtr theFeature);
 
   //! Returns the existing feature by the label
@@ -81,11 +82,17 @@ public:
   //! \param theGroupID group that contains a feature
   //! \param theIndex zero-based index of feature in the group
   //! \param isOperation if it is true, returns feature (not Object)
-  MODEL_EXPORT virtual FeaturePtr 
-    feature(const std::string& theGroupID, const int theIndex, const bool isOperation = false);
+  MODEL_EXPORT virtual ObjectPtr object(const std::string& theGroupID, const int theIndex);
 
   //! Returns the number of features in the group
   MODEL_EXPORT virtual int size(const std::string& theGroupID);
+
+  //! Allows to store the result in the data tree of the document (attaches 'data' of result to tree)
+  MODEL_EXPORT virtual void storeResult(
+    boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex);
+
+  /// Creates a construction cresults
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction();
 
 protected:
 
@@ -95,13 +102,6 @@ protected:
   //! Initializes feature with a unique name in this group (unique name is generated as 
   //! feature type + "_" + index
   void setUniqueName(FeaturePtr theFeature);
-
-  //! Adds to the document the new feature
-  void addFeature(const FeaturePtr theFeature);
-
-  //! Returns the object by the feature
-  FeaturePtr objectByFeature(
-    const FeaturePtr theFeature);
 
   //! Synchronizes myFeatures list with the updated document
   void synchronizeFeatures(const bool theMarkUpdated = false);
@@ -114,6 +114,11 @@ protected:
   //! performas compactification of all nested operations into one
   void compactNested();
 
+  //! Initializes the data fields of the feature
+  void Model_Document::initData(ObjectPtr theObj, TDF_Label& theLab, const int theTag);
+
+
+
   friend class Model_Application;
   friend class Model_PluginManager;
   friend class DFBrowser;
@@ -125,8 +130,8 @@ private:
   int myTransactionsAfterSave;
   /// number of nested transactions performed (or -1 if not nested)
   int myNestedNum;
-  /// All features managed by this document (not only in history of OB)
-  std::vector<FeaturePtr > myFeatures;
+  /// All objects managed by this document (not only in history of OB)
+  std::map<std::string, std::vector<ObjectPtr> > myObjs;
 
   ///< set of identifiers of sub-documents of this document
   std::set<std::string> mySubs;

@@ -41,10 +41,10 @@ SketchSolver_ConstraintManager::SketchSolver_ConstraintManager()
   myGroups.clear();
 
   // Register in event loop
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_MOVED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_MOVED));
 }
 
 SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
@@ -59,16 +59,16 @@ SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
 // ============================================================================
 void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessage)
 {
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED) ||
-      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED) || 
-      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_MOVED))
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED) ||
+      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED) || 
+      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED))
   {
-    const ModelAPI_FeatureUpdatedMessage* anUpdateMsg = 
-      dynamic_cast<const ModelAPI_FeatureUpdatedMessage*>(theMessage);
+    const ModelAPI_ObjectUpdatedMessage* anUpdateMsg = 
+      dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     std::set< FeaturePtr > aFeatures = anUpdateMsg->features();
 
     bool isModifiedEvt = 
-      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_MOVED);
+      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
     if (!isModifiedEvt)
     {
       std::set< FeaturePtr >::iterator aFeatIter;
@@ -102,7 +102,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
     // Solve the set of constraints
     resolveConstraints();
   }
-  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED))
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED))
   {
     const ModelAPI_FeatureDeletedMessage* aDeleteMsg = 
       dynamic_cast<const ModelAPI_FeatureDeletedMessage*>(theMessage);
@@ -374,6 +374,6 @@ void SketchSolver_ConstraintManager::resolveConstraints()
     (*aGroupIter)->resolveConstraints();
 
   // Features may be updated => send events
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 }
 

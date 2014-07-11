@@ -195,7 +195,7 @@ FeaturePtr PartSet_OperationFeatureEdit::createFeature(const bool /*theFlushMess
 
 void PartSet_OperationFeatureEdit::sendFeatures()
 {
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_MOVED);
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
 
   FeaturePtr aFeature = feature();
   ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);

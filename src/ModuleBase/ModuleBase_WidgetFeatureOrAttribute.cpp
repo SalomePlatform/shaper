@@ -85,7 +85,7 @@ bool ModuleBase_WidgetFeatureOrAttribute::storeValue(FeaturePtr theFeature) cons
     aRef->setAttr(myAttribute);
 
   theFeature->execute();
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
   return true;
 }

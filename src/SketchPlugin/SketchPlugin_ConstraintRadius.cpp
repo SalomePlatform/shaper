@@ -30,7 +30,7 @@ void SketchPlugin_ConstraintRadius::initAttributes()
   data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT, GeomDataAPI_Point2D::type());
 }
 
-void SketchPlugin_ConstraintRadius::execute()
+void SketchPlugin_ConstraintRadius::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
 {
   if (data()->attribute(CONSTRAINT_ATTR_ENTITY_A)->isInitialized() &&
       !data()->attribute(CONSTRAINT_ATTR_VALUE)->isInitialized()) {

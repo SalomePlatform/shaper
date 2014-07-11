@@ -26,7 +26,7 @@ void SketchPlugin_ConstraintLength::initAttributes()
   data()->addAttribute(CONSTRAINT_ATTR_ENTITY_A, ModelAPI_AttributeRefAttr::type());
 }
 
-void SketchPlugin_ConstraintLength::execute()
+void SketchPlugin_ConstraintLength::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
 {
   if (data()->attribute(CONSTRAINT_ATTR_ENTITY_A)->isInitialized() &&
       !data()->attribute(CONSTRAINT_ATTR_VALUE)->isInitialized()) {

@@ -5,33 +5,51 @@
 #ifndef ModelAPI_Object_HeaderFile
 #define ModelAPI_Object_HeaderFile
 
-#include "ModelAPI_Feature.h"
+#include "ModelAPI.h"
 
 #include <boost/shared_ptr.hpp>
 
+class ModelAPI_Data;
+class ModelAPI_Document;
+
 /**\class ModelAPI_Object
  * \ingroup DataModel
- * \brief Represents the result of some feature in the object browser
- * under the specific folder. Just a reference to specific feature-operation
- * with possibility to rename it.
+ * \brief Represents any object in the data model and in the object browser.
+ *
+ * It may be feature or result of the feature. User just may set name for it
+ * or change this name later. Generic class for Feature, Body, Parameter and other
+ * objects related to the features and their results. Contains attributes of this 
+ * object in the "Data".
  */
-class ModelAPI_Object : public ModelAPI_Feature
+class ModelAPI_Object
 {
+  boost::shared_ptr<ModelAPI_Data> myData; ///< manager of the data model of a feature
+  boost::shared_ptr<ModelAPI_Document> myDoc; ///< document this feature belongs to
 public:
+  /// By default object is displayed in the object browser.
+  virtual bool isInHistory() {return true;}
 
-  /// It is never located in history
-  MODELAPI_EXPORT virtual bool isInHistory() {return false;}
+  /// Returns the data manager of this object: attributes
+  virtual boost::shared_ptr<ModelAPI_Data> data() {return myData;}
 
-  /// Reference to the feature-operation that produces this object
-  MODELAPI_EXPORT virtual FeaturePtr featureRef() = 0;
+  /// Returns true if feature refers to the same data model instance
+  virtual bool isSame(const boost::shared_ptr<ModelAPI_Object>& theObject)
+    {return theObject.get() == this;}
 
-  /// Returns the name of this object (by default equal to the name of feature)
-  MODELAPI_EXPORT virtual std::string getName() = 0;
+  /// Returns document this feature belongs to
+  virtual boost::shared_ptr<ModelAPI_Document> document()
+    {return myDoc;}
 
-  /// Defines the name of the object
-  MODELAPI_EXPORT virtual void setName(std::string theName) = 0;
+protected:
+  /// Sets the data manager of an object (document does)
+  virtual void setData(boost::shared_ptr<ModelAPI_Data> theData) 
+    {myData = theData;}
+
+  /// Sets the data manager of an object (document does)
+  virtual void setDoc(boost::shared_ptr<ModelAPI_Document> theDoc) {myDoc = theDoc;}
+
+  friend class Model_Document;
 };
-
 
 typedef boost::shared_ptr<ModelAPI_Object> ObjectPtr;
 

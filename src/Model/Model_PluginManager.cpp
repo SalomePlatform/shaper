@@ -47,6 +47,8 @@ FeaturePtr Model_PluginManager::createFeature(string theFeatureID)
     } else {
       Events_Error::send(string("Can not load plugin '") + myCurrentPluginName + "'");
     }
+  } else {
+      Events_Error::send(string("Feature '") + theFeatureID + "' not found in any plugin");
   }
 
   return FeaturePtr(); // return nothing
@@ -107,9 +109,9 @@ Model_PluginManager::Model_PluginManager()
   Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID FeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
   aLoop->registerListener(this, FeatureEvent);
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 }
 
 void Model_PluginManager::processEvent(const Events_Message* theMessage)

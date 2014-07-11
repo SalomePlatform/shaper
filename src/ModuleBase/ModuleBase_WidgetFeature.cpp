@@ -88,7 +88,7 @@ bool ModuleBase_WidgetFeature::storeValue(FeaturePtr theFeature) const
   ModuleBase_WidgetFeature* that = (ModuleBase_WidgetFeature*) this;
   aRef->setFeature(myFeature);
   theFeature->execute();
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
   return true;
 }

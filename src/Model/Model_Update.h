@@ -11,6 +11,7 @@
 #include <set>
 #include <map>
 
+class ModelAPI_Object;
 class ModelAPI_Feature;
 
 /**\class Model_Update
@@ -20,9 +21,9 @@ class ModelAPI_Feature;
 class Model_Update : public Events_Listener
 {
   ///< initial set of updated features that must be processed
-  std::set<boost::shared_ptr<ModelAPI_Feature> > myInitial;
+  std::set<boost::shared_ptr<ModelAPI_Object> > myInitial;
   ///< already updated and processed features and modificated feature flag
-  std::map<boost::shared_ptr<ModelAPI_Feature>, bool> myUpdated;
+  std::map<boost::shared_ptr<ModelAPI_Object>, bool> myUpdated;
 public:
   /// Is called only once, on startup of the application
   Model_Update();

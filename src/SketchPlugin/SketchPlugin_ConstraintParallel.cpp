@@ -25,16 +25,9 @@ void SketchPlugin_ConstraintParallel::initAttributes()
   data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT, GeomDataAPI_Point2D::type());
 }
 
-void SketchPlugin_ConstraintParallel::execute()
+void SketchPlugin_ConstraintParallel::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
 {
 }
-
-const boost::shared_ptr<GeomAPI_Shape>&  SketchPlugin_ConstraintParallel::preview()
-{
-  /// \todo Preview for parallel constraint
-  return getPreview();
-}
-
 
 boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintParallel::getAISObject(
                     boost::shared_ptr<GeomAPI_AISObject> thePrevious)

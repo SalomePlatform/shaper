@@ -47,7 +47,7 @@ bool ModuleBase_WidgetBoolValue::storeValue(FeaturePtr theFeature) const
 
   if (aBool->value() != myCheckBox->isChecked()) {
     aBool->setValue(myCheckBox->isChecked());
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   }
   return true;
 }

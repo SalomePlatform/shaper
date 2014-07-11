@@ -1147,7 +1147,7 @@ void SketchSolver_ConstraintGroup::updateRelatedConstraints(
 
       if (isUpd)
       {
-        static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
         ModelAPI_EventCreator::get()->sendUpdated(aConstrIter->first, anEvent);
         break;
       }
@@ -1173,7 +1173,7 @@ void SketchSolver_ConstraintGroup::updateRelatedConstraints(
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
       if (aRefAttr && aRefAttr->isFeature() && aRefAttr->feature() == theFeature)
       {
-        static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
         ModelAPI_EventCreator::get()->sendUpdated(aConstrIter->first, anEvent);
         break;
       }

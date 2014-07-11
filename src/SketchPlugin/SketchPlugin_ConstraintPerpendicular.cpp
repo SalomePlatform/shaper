@@ -25,14 +25,8 @@ void SketchPlugin_ConstraintPerpendicular::initAttributes()
   data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT, GeomDataAPI_Point2D::type());
 }
 
-void SketchPlugin_ConstraintPerpendicular::execute()
+void SketchPlugin_ConstraintPerpendicular::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
 {
-}
-
-const boost::shared_ptr<GeomAPI_Shape>&  SketchPlugin_ConstraintPerpendicular::preview()
-{
-  /// \todo Preview for perpendicular constraint
-  return getPreview();
 }
 
 boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintPerpendicular::getAISObject(

@@ -106,7 +106,7 @@ bool ModuleBase_WidgetSelector::storeValue(FeaturePtr theFeature) const
   FeaturePtr aFeature = aRef->value();
   if (!(aFeature && aFeature->isSame(mySelectedFeature))) {
     aRef->setValue(mySelectedFeature);
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   }
   return true;
 }

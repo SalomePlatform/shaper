@@ -18,7 +18,7 @@ void SketchPlugin_ConstraintCoincidence::initAttributes()
   data()->addAttribute(CONSTRAINT_ATTR_ENTITY_B, ModelAPI_AttributeRefAttr::type());
 }
 
-void SketchPlugin_ConstraintCoincidence::execute()
+void SketchPlugin_ConstraintCoincidence::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
 {
 }
 

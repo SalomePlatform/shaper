@@ -26,8 +26,8 @@ class Model_Data: public ModelAPI_Data
   /// All attributes of the object identified by the attribute ID
   std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> > myAttrs;
 
-  /// needed here to emit signal that feature changed on change of the attribute
-  FeaturePtr myFeature;
+  /// needed here to emit signal that object changed on change of the attribute
+  ObjectPtr myObject;
 
   Model_Data();
 
@@ -41,7 +41,7 @@ class Model_Data: public ModelAPI_Data
 
 public:
   /// Returns the name of the feature visible by the user in the object browser
-  MODEL_EXPORT virtual std::string getName();
+  MODEL_EXPORT virtual std::string name();
   /// Defines the name of the feature visible by the user in the object browser
   MODEL_EXPORT virtual void setName(std::string theName);
   /// Returns the attribute that references to another document
@@ -76,10 +76,8 @@ public:
   /// Returns true if it is correctly connected t othe data model
   MODEL_EXPORT virtual bool isValid();
 
-  /// Stores the shape (called by the execution method).
-  MODEL_EXPORT virtual void store(const boost::shared_ptr<GeomAPI_Shape>& theShape);
-  /// Returns the shape-result produced by this feature
-  MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape> shape();
+  /// Returns the label where the shape must be stored (used in ResultBody)
+  TDF_Label& shapeLab() {return myLab;}
 
   /// Initializes object by the attributes: must be called just after the object is created
   /// for each attribute of the object
@@ -94,9 +92,9 @@ public:
   /// Puts feature to the document data sub-structure
   MODEL_EXPORT void setLabel(TDF_Label& theLab);
 
-  /// Sets the feature of this data
-  MODEL_EXPORT virtual void setFeature(FeaturePtr theFeature)
-    {myFeature = theFeature;}
+  /// Sets the object of this data
+  MODEL_EXPORT virtual void setObject(ObjectPtr theObject)
+    {myObject = theObject;}
 };
 
 #endif

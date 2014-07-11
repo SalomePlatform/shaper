@@ -129,8 +129,8 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_LOADED));
   // TODO Is it good to use non standard event within workshop?
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OPERATION_LAUNCHED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_TO_REDISPLAY));
 
   activateModule();
@@ -229,7 +229,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   }
 
   // Process creation of Part
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED)) {
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
     const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
     onFeatureCreatedMsg(aUpdMsg);
   }
@@ -242,7 +242,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED)) {
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
     const Model_FeatureUpdatedMessage* anUpdateMsg =
         dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
     onFeatureUpdatedMsg(anUpdateMsg);

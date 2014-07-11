@@ -181,7 +181,7 @@ void PartSet_OperationFeatureEditMulti::blockSelection(bool isBlocked, const boo
 
 void PartSet_OperationFeatureEditMulti::sendFeatures()
 {
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_MOVED);
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
 
   std::list<FeaturePtr > aFeatures;
   std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();

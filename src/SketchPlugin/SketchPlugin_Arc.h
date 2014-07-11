@@ -30,18 +30,11 @@ public:
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {static std::string MY_KIND = SKETCH_ARC_KIND; return MY_KIND;}
 
-  /// Returns to which group in the document must be added feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getGroup()
-  {static std::string MY_GROUP = SKETCH_KIND; return MY_GROUP;}
-
-  /// Creates a new part document if needed
+  /// Creates an arc-shape
   SKETCHPLUGIN_EXPORT virtual void execute();
 
   /// Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
-
-  /// Returns the sketch preview
-  SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(

@@ -5,6 +5,7 @@
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Lin2d.h>
@@ -29,11 +30,7 @@ void SketchPlugin_Line::initAttributes()
   data()->addAttribute(LINE_ATTR_END, GeomDataAPI_Point2D::type());
 }
 
-void SketchPlugin_Line::execute() 
-{
-}
-
-const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Line::preview()
+void SketchPlugin_Line::execute(boost::shared_ptr<ModelAPI_Result>& theResult) 
 {
   SketchPlugin_Sketch* aSketch = sketch();
   if (aSketch) {
@@ -48,18 +45,11 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Line::preview()
       boost::shared_ptr<GeomAPI_Pnt> anEnd(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
       // make linear edge
       boost::shared_ptr<GeomAPI_Shape> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
-      setPreview(anEdge);
+      // store the result
+      boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theResult)->setShape(anEdge);
     }
   }
-  return getPreview();
 }
-
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Line::getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
-{
-  return prepareAISShape(thePrevious);
-}
-
 
 void SketchPlugin_Line::move(double theDeltaX, double theDeltaY)
 {

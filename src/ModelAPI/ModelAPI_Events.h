@@ -11,32 +11,32 @@
 #include <string>
 #include <set>
 
-#include "ModelAPI_Feature.h"
+#include "ModelAPI_Object.h"
 
 class ModelAPI_Document;
 
-/// Event ID that feature is created (comes with ModelAPI_FeatureUpdatedMessage)
-static const char * EVENT_FEATURE_CREATED = "FeatureCreated";
-/// Event ID that data of feature is updated (comes with Model_FeatureUpdatedMessage)
-static const char * EVENT_FEATURE_UPDATED = "FeatureUpdated";
-/// Event ID that data of feature is deleted (comes with Model_FeatureDeletedMessage)
-static const char * EVENT_FEATURE_DELETED = "FeatureDeleted";
-/// Event ID that data of feature is updated (comes with ModelAPI_FeatureUpdatedMessage)
-static const char * EVENT_FEATURE_MOVED = "FeaturesMoved";
-/// Event ID that visualization must be redisplayed (comes with ModelAPI_FeatureUpdatedMessage)
-static const char * EVENT_FEATURE_TO_REDISPLAY = "FeaturesToRedisplay";
-/// Event ID that visualization must be redisplayed (comes with ModelAPI_FeatureUpdatedMessage)
+/// Event ID that feature is created (comes with ModelAPI_ObjectUpdatedMessage)
+static const char * EVENT_OBJECT_CREATED = "ObjectCreated";
+/// Event ID that data of feature is updated (comes with Model_ObjectUpdatedMessage)
+static const char * EVENT_OBJECT_UPDATED = "ObjectUpdated";
+/// Event ID that data of feature is deleted (comes with Model_ObjectDeletedMessage)
+static const char * EVENT_OBJECT_DELETED = "ObjectDeleted";
+/// Event ID that data of feature is updated (comes with ModelAPI_ObjectUpdatedMessage)
+static const char * EVENT_OBJECT_MOVED = "ObjectsMoved";
+/// Event ID that visualization must be redisplayed (comes with ModelAPI_ObjectUpdatedMessage)
+static const char * EVENT_OBJECT_TO_REDISPLAY = "ObjectsToRedisplay";
+/// Event ID that visualization must be redisplayed (comes with ModelAPI_ObjectUpdatedMessage)
 static const char * EVENT_OPERATION_LAUNCHED = "OperationLaunched";
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
-class ModelAPI_FeatureUpdatedMessage : public Events_MessageGroup {
+class ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup {
 protected:
-  ModelAPI_FeatureUpdatedMessage(const Events_ID theID, const void* theSender = 0)
+  ModelAPI_ObjectUpdatedMessage(const Events_ID theID, const void* theSender = 0)
     : Events_MessageGroup(theID, theSender) {}
 
 public:
   /// Returns the feature that has been updated
-  virtual std::set<FeaturePtr> features() const = 0;
+  virtual std::set<ObjectPtr> features() const = 0;
 
   //! Creates a new empty group (to store it in the loop before flush)
   virtual Events_MessageGroup* newEmpty() = 0;
@@ -46,9 +46,9 @@ public:
 };
 
 /// Message that feature was deleted (used for Object Browser update)
-class ModelAPI_FeatureDeletedMessage : public Events_MessageGroup {
+class ModelAPI_ObjectDeletedMessage : public Events_MessageGroup {
 protected:
-  ModelAPI_FeatureDeletedMessage(const Events_ID theID, const void* theSender = 0)
+  ModelAPI_ObjectDeletedMessage(const Events_ID theID, const void* theSender = 0)
     : Events_MessageGroup(theID, theSender) {}
 
 public:
@@ -69,7 +69,7 @@ public:
 class MODELAPI_EXPORT ModelAPI_EventCreator {
 public:
   /// creates created, updated or moved messages and sends to the loop
-  virtual void sendUpdated(const FeaturePtr& theFeature, const Events_ID& theEvent,
+  virtual void sendUpdated(const ObjectPtr& theObject, const Events_ID& theEvent,
                            const bool isGroupped = true) const = 0;
   /// creates deleted message and sends to the loop
   virtual void sendDeleted(

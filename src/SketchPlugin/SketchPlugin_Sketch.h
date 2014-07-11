@@ -41,13 +41,10 @@ public:
   {static std::string MY_GROUP = "Construction"; return MY_GROUP;}
 
   /// Creates a new part document if needed
-  SKETCHPLUGIN_EXPORT virtual void execute();
+  SKETCHPLUGIN_EXPORT virtual void execute(boost::shared_ptr<ModelAPI_Result>& theResult);
 
   /// Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
-
-  /// Returns the sketch preview
-  SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(

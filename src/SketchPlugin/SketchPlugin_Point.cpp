@@ -6,6 +6,7 @@
 #include "SketchPlugin_Sketch.h"
 
 #include <ModelAPI_Data.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAPI_Pnt2d.h>
 
@@ -23,11 +24,7 @@ void SketchPlugin_Point::initAttributes()
   data()->addAttribute(POINT_ATTR_COORD, GeomDataAPI_Point2D::type());
 }
 
-void SketchPlugin_Point::execute() 
-{
-}
-
-const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Point::preview()
+void SketchPlugin_Point::execute(boost::shared_ptr<ModelAPI_Result>& theResult) 
 {
   SketchPlugin_Sketch* aSketch = sketch();
   if (aSketch) {
@@ -37,15 +34,8 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Point::preview()
     boost::shared_ptr<GeomAPI_Pnt> aPoint3D(aSketch->to3D(aPoint->x(), aPoint->y()));
     // make a visible point
     boost::shared_ptr<GeomAPI_Shape> aPointShape = GeomAlgoAPI_PointBuilder::point(aPoint3D);
-    setPreview(aPointShape);
+    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theResult)->setShape(aPointShape);
   }
-  return getPreview();
-}
-
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Point::getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
-{
-  return prepareAISShape(thePrevious);
 }
 
 void SketchPlugin_Point::move(double theDeltaX, double theDeltaY)

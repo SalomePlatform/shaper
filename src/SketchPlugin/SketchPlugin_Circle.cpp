@@ -5,16 +5,14 @@
 #include "SketchPlugin_Circle.h"
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAPI_Pnt2d.h>
-
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
-
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
-
 #include <ModelAPI_AttributeDouble.h>
 
 SketchPlugin_Circle::SketchPlugin_Circle()
@@ -28,11 +26,7 @@ void SketchPlugin_Circle::initAttributes()
   data()->addAttribute(CIRCLE_ATTR_RADIUS, ModelAPI_AttributeDouble::type());
 }
 
-void SketchPlugin_Circle::execute()
-{
-}
-
-const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Circle::preview()
+void SketchPlugin_Circle::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
 {
   SketchPlugin_Sketch* aSketch = sketch();
   if (aSketch) {
@@ -64,15 +58,9 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Circle::preview()
       }
     }
     boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
-    setPreview(aCompound);
+      // store the result
+    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theResult)->setShape(aCompound);
   }
-  return getPreview();
-}
-
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Circle::getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
-{
-  return prepareAISShape(thePrevious);
 }
 
 void SketchPlugin_Circle::move(double theDeltaX, double theDeltaY)

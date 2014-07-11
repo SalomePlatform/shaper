@@ -24,9 +24,9 @@ PartSet_Listener::PartSet_Listener(PartSet_Module* theModule)
 : myModule(theModule)
 {
   Events_Loop* aLoop = Events_Loop::loop();
-  aLoop->registerListener(this, aLoop->eventByName(EVENT_FEATURE_UPDATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
+  aLoop->registerListener(this, aLoop->eventByName(EVENT_OBJECT_UPDATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 }
 
 PartSet_Listener::~PartSet_Listener()
@@ -37,25 +37,25 @@ PartSet_Listener::~PartSet_Listener()
 void PartSet_Listener::processEvent(const Events_Message* theMessage)
 {
   QString aType = QString(theMessage->eventID().eventText());
-  if (aType == EVENT_FEATURE_UPDATED ||
-      aType == EVENT_FEATURE_CREATED)
+  if (aType == EVENT_OBJECT_UPDATED ||
+      aType == EVENT_OBJECT_CREATED)
   {
-    const ModelAPI_FeatureUpdatedMessage* aUpdMsg = 
-      dynamic_cast<const ModelAPI_FeatureUpdatedMessage*>(theMessage);
+    const ModelAPI_ObjectUpdatedMessage* aUpdMsg = 
+      dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     std::set<FeaturePtr > aFeatures = aUpdMsg->features();
     std::set<FeaturePtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = *anIt;
       if (myModule->workshop()->displayer()->isVisible(aFeature) ||
-          aType == EVENT_FEATURE_CREATED) {
+          aType == EVENT_OBJECT_CREATED) {
         myModule->visualizePreview(aFeature, true, false);
-        //if (aType == EVENT_FEATURE_CREATED)
+        //if (aType == EVENT_OBJECT_CREATED)
           myModule->activateFeature(aFeature, true);
       }
     }
     myModule->workshop()->displayer()->updateViewer();
   }
-  if (aType == EVENT_FEATURE_DELETED)
+  if (aType == EVENT_OBJECT_DELETED)
   {
     const ModelAPI_FeatureDeletedMessage* aDelMsg = 
       dynamic_cast<const ModelAPI_FeatureDeletedMessage*>(theMessage);

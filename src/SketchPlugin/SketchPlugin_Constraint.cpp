@@ -9,9 +9,3 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Constraint::getAISObject(
 { 
   return thePrevious;
 }
-
-const boost::shared_ptr<GeomAPI_Shape>&  SketchPlugin_Constraint::preview()
-{
-  return getPreview();
-}
-

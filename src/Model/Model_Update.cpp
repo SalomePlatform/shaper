@@ -17,17 +17,17 @@ Model_Update MY_INSTANCE; /// the only one instance initialized on load of the l
 
 Model_Update::Model_Update()
 {
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 }
 
 void Model_Update::processEvent(const Events_Message* theMessage)
 {
-  const ModelAPI_FeatureUpdatedMessage* aMsg = 
-    dynamic_cast<const ModelAPI_FeatureUpdatedMessage*>(theMessage);
+  const ModelAPI_ObjectUpdatedMessage* aMsg = 
+    dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
   myInitial = aMsg->features();
   // collect all documents involved into the update
   set<boost::shared_ptr<ModelAPI_Document> > aDocs;
-  set<boost::shared_ptr<ModelAPI_Feature> >::iterator aFIter = myInitial.begin();
+  set<boost::shared_ptr<ModelAPI_Object> >::iterator aFIter = myInitial.begin();
   for(; aFIter != myInitial.end(); aFIter++) {
     aDocs.insert((*aFIter)->document());
   }
@@ -36,14 +36,15 @@ void Model_Update::processEvent(const Events_Message* theMessage)
   for(; aDIter != aDocs.end(); aDIter++) {
     int aNbFeatures = (*aDIter)->size(FEATURES_GROUP);
     for(int aFIndex = 0; aFIndex < aNbFeatures; aFIndex++) {
-      boost::shared_ptr<ModelAPI_Feature> aFeature = (*aDIter)->feature(FEATURES_GROUP, aFIndex);
+      boost::shared_ptr<ModelAPI_Feature> aFeature = 
+        boost::dynamic_pointer_cast<ModelAPI_Feature>((*aDIter)->object(FEATURES_GROUP, aFIndex));
       if (aFeature)
         updateFeature(aFeature);
     }
   }
   myUpdated.clear();
   // flush
-  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_FEATURE_TO_REDISPLAY);
+  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   Events_Loop::loop()->flush(EVENT_DISP);
 }
 
@@ -80,7 +81,7 @@ bool Model_Update::updateFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
   bool anExecute = aMustbeUpdated || myInitial.find(theFeature) != myInitial.end();
   if (anExecute) {
     theFeature->execute();
-    static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_FEATURE_TO_REDISPLAY);
+    static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
     ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
   }
   myUpdated[theFeature] = anExecute;
