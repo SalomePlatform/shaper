@@ -108,21 +108,11 @@ void PartSet_Module::createFeatures()
   //!! Test registering of validators
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  
   aFactory->registerValidator("PartSet_DistanceValidator", new PartSet_DistanceValidator);
-  aFactory->assignValidator("PartSet_DistanceValidator", "SketchConstraintDistance");
-
   aFactory->registerValidator("PartSet_LengthValidator", new PartSet_LengthValidator);
-  aFactory->assignValidator("PartSet_LengthValidator", "SketchConstraintLength");
-
   aFactory->registerValidator("PartSet_PerpendicularValidator", new PartSet_PerpendicularValidator);
-  aFactory->assignValidator("PartSet_PerpendicularValidator", "SketchConstraintPerpendicular");
-
   aFactory->registerValidator("PartSet_ParallelValidator", new PartSet_ParallelValidator);
-  aFactory->assignValidator("PartSet_ParallelValidator", "SketchConstraintParallel");
-
   aFactory->registerValidator("PartSet_RadiusValidator", new PartSet_RadiusValidator);
-  aFactory->assignValidator("PartSet_RadiusValidator", "SketchConstraintRadius");
 }
 
 void PartSet_Module::featureCreated(QAction* theFeature)
