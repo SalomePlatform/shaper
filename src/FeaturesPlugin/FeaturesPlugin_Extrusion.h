@@ -28,10 +28,6 @@ public:
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind() 
   { static std::string MY_KIND = FEATURES_EXTRUSION_KIND; return MY_KIND; }
 
-  /// Returns to which group in the document must be added feature
-  FEATURESPLUGIN_EXPORT virtual const std::string& getGroup() 
-  { static std::string MY_GROUP = "Construction";  return MY_GROUP; }
-
   /// Creates a new part document if needed
   FEATURESPLUGIN_EXPORT virtual void execute();
 

@@ -88,11 +88,15 @@ public:
   MODEL_EXPORT virtual int size(const std::string& theGroupID);
 
   //! Allows to store the result in the data tree of the document (attaches 'data' of result to tree)
-  MODEL_EXPORT virtual void storeResult(boost::shared_ptr<ModelAPI_Feature> theFeature,
-    boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex);
+  MODEL_EXPORT virtual void storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
+    boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex = 0);
 
   /// Creates a construction cresults
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction();
+  /// Creates a body results
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultBody> createBody();
+  /// Creates a part results
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultPart> createPart();
 
 protected:
 

@@ -61,7 +61,7 @@ void SketchPlugin_Circle::execute()
       // store the result
       boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
       aConstr->setShape(aCompound);
-      results().push_back(aConstr);
+      setResult(aConstr);
   }
 }
 

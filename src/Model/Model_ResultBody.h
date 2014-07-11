@@ -29,7 +29,7 @@ public:
 
 protected:
   /// Makes a body on the given feature
-  Model_ResultBody(const boost::shared_ptr<ModelAPI_Feature>& theFeature);
+  Model_ResultBody();
 
   friend class Model_Document;
 };

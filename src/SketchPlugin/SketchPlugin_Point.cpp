@@ -36,7 +36,7 @@ void SketchPlugin_Point::execute()
     boost::shared_ptr<GeomAPI_Shape> aPointShape = GeomAlgoAPI_PointBuilder::point(aPoint3D);
     boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
     aConstr->setShape(aPointShape);
-    results().push_back(aConstr);
+    setResult(aConstr);
   }
 }
 

@@ -18,9 +18,6 @@
 class Model_ResultPart : public ModelAPI_ResultPart
 {
 public:
-  /// Returns the group identifier of this result
-  virtual std::string group()
-    {static std::string MY_GROUP = "Parts"; return MY_GROUP;}
   /// Returns the part-document of this result
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> partDoc();
   /// Part has no stored feature: this method returns NULL
@@ -28,7 +25,7 @@ public:
 
 protected:
   /// makes a result on a temporary feature (an action)
-  Model_ResultPart(const boost::shared_ptr<ModelAPI_Feature>& theFeature);
+  Model_ResultPart();
 
   friend class Model_Document;
 };

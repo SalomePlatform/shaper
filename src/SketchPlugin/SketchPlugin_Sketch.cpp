@@ -47,7 +47,7 @@ void SketchPlugin_Sketch::execute()
     boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aFaces);
     boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
     aConstr->setShape(aCompound);
-    results().push_back(aConstr);
+    setResult(aConstr);
     return;
   }
   if (!data()->isValid())
@@ -95,7 +95,7 @@ void SketchPlugin_Sketch::execute()
   boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aLoops);
   boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
   aConstr->setShape(aCompound);
-  results().push_back(aConstr);
+  setResult(aConstr);
 }
 
 boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Sketch::getAISObject(

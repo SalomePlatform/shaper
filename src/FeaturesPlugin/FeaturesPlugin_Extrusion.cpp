@@ -6,6 +6,8 @@
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeBoolean.h>
@@ -34,12 +36,19 @@ void FeaturesPlugin_Extrusion::execute()
   FeaturePtr aFaceFeature = aFaceRef->value();
   if (!aFaceFeature)
     return;
-  boost::shared_ptr<GeomAPI_Shape> aFace = aFaceFeature->data()->shape();
+  boost::shared_ptr<ModelAPI_ResultConstruction> aConstr =
+    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFaceFeature->firstResult());
+  if (!aConstr) 
+    return;
+  boost::shared_ptr<GeomAPI_Shape> aFace = aConstr->shape();
   if (!aFace)
     return;
 
   double aSize = data()->real(EXTRUSION_SIZE)->value();
   if (data()->boolean(EXTRUSION_REVERSE)->value())
     aSize = -aSize;
-  data()->store(GeomAlgoAPI_Extrusion::makeExtrusion(aFace, aSize));
+  boost::shared_ptr<ModelAPI_ResultBody> aResult = document()->createBody();
+  aResult->store(GeomAlgoAPI_Extrusion::makeExtrusion(aFace, aSize));
+  document()->storeResult(data(), aResult);
+  setResult(aResult);
 }

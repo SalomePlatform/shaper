@@ -14,6 +14,9 @@ class ModelAPI_Feature;
 class ModelAPI_Object;
 class ModelAPI_Result;
 class ModelAPI_ResultConstruction;
+class ModelAPI_ResultBody;
+class ModelAPI_ResultPart;
+class ModelAPI_Data;
 
 /**\class Model_Document
  * \ingroup DataModel
@@ -86,6 +89,15 @@ public:
 
   /// Creates a construction cresults
   virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction() = 0;
+  /// Creates a body results
+  virtual boost::shared_ptr<ModelAPI_ResultBody> createBody() = 0;
+  /// Creates a part results
+  virtual boost::shared_ptr<ModelAPI_ResultPart> createPart() = 0;
+
+  //! Allows to store the result in the data tree of the document (attaches 'data' of result to tree)
+  virtual void storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
+    boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex = 0) = 0;
+
 
 protected:
   /// Only for SWIG wrapping it is here

@@ -39,11 +39,14 @@ public:
   /// Computes or recomputes the results
   virtual void execute() = 0;
 
-  // returns the current results of the feature
+  /// returns the current results of the feature
   std::list<boost::shared_ptr<ModelAPI_Result> >& results() {return myResults;}
-  // returns the first result in the list or NULL reference
+  /// returns the first result in the list or NULL reference
   boost::shared_ptr<ModelAPI_Result> firstResult() 
   {return myResults.size() ? *(myResults.begin()) : boost::shared_ptr<ModelAPI_Result>();}
+  /// sets the alone result
+  void setResult(const boost::shared_ptr<ModelAPI_Result>& theResult) 
+  {myResults.clear(); myResults.push_back(theResult);}
 
   /// Returns true if this feature must not be created: this is just an action
   /// that is not stored in the features history and data model (like "delete part").

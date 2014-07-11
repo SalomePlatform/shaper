@@ -26,14 +26,14 @@ void PartSetPlugin_Duplicate::initAttributes()
     boost::shared_ptr<PartSetPlugin_Part> aSource; // searching for source document attribute
     for(int a = aRoot->size(getGroup()) - 1; a >= 0; a--) {
       aSource = boost::dynamic_pointer_cast<PartSetPlugin_Part>(
-        aRoot->feature(getGroup(), a, true));
+        aRoot->object(ModelAPI_Feature::group(), a));
       if (aSource->data()->docRef(PART_ATTR_DOC_REF)->value() == aPManager->currentDocument())
         break;
       aSource.reset();
     }
     if (aSource) {
       boost::shared_ptr<ModelAPI_Document> aCopy = 
-        aPManager->copy(aSource->data()->docRef(PART_ATTR_DOC_REF)->value(), data()->getName());
+        aPManager->copy(aSource->data()->docRef(PART_ATTR_DOC_REF)->value(), data()->name());
       aRef->setFeature(aSource);
     }
   }

@@ -20,9 +20,6 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   boost::shared_ptr<ModelAPI_Feature> myOwner; ///< owner of this result
   boost::shared_ptr<GeomAPI_Shape> myShape; ///< shape of this result created "on the fly"
 public:
-  /// Returns the group identifier of this result
-  virtual std::string group()
-    {static std::string MY_GROUP = "Construction"; return MY_GROUP;}
   /// Sets the result
   MODEL_EXPORT virtual void setShape(boost::shared_ptr<GeomAPI_Shape> theShape);
   /// Returns the shape-result produced by this feature

@@ -9,8 +9,7 @@
 #include <TopoDS_Shape.hxx>
 #include <GeomAPI_Shape.h>
 
-Model_ResultBody::Model_ResultBody(const boost::shared_ptr<ModelAPI_Feature>& theFeature)
-  : myOwner(theFeature)
+Model_ResultBody::Model_ResultBody()
 {
 }
 

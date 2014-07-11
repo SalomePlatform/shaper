@@ -372,10 +372,10 @@ FeaturePtr Model_Document::addFeature(string theID)
   return aFeature;
 }
 
-void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Feature> theFeature,
+void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
   boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex)
 {
-  initData(theResult, boost::dynamic_pointer_cast<Model_Data>(theFeature->data())->
+  initData(theResult, boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
     label().Father().FindChild(TAG_FEATURE_RESULTS), theResultIndex);
 }
 
@@ -589,7 +589,7 @@ void Model_Document::initData(ObjectPtr theObj, TDF_Label& theLab, const int the
   boost::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
   boost::shared_ptr<Model_Data> aData(new Model_Data);
-  aData->setLabel(theLab.FindChild(theTag));
+  aData->setLabel(theLab.FindChild(theTag + 1));
   aData->setObject(theObj);
   theObj->setDoc(aThis);
   theObj->setData(aData);
@@ -673,5 +673,17 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
 boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstruction()
 {
   boost::shared_ptr<ModelAPI_ResultConstruction> aResult(new Model_ResultConstruction());
+  return aResult;
+}
+
+boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody()
+{
+  boost::shared_ptr<ModelAPI_ResultBody> aResult(new Model_ResultBody());
+  return aResult;
+}
+
+boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart()
+{
+  boost::shared_ptr<ModelAPI_ResultPart> aResult(new Model_ResultPart());
   return aResult;
 }

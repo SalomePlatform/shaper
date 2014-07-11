@@ -7,6 +7,7 @@
 #include "ModelAPI_Document.h"
 #include "ModelAPI_Data.h"
 #include "ModelAPI_AttributeDouble.h"
+#include <ModelAPI_ResultConstruction.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAPI_Pnt.h>
 
@@ -28,5 +29,7 @@ void ConstructionPlugin_Point::execute()
   boost::shared_ptr<GeomAPI_Pnt> aPnt(new GeomAPI_Pnt(
     data()->real(POINT_ATTR_X)->value(), data()->real(POINT_ATTR_Y)->value(), data()->real(POINT_ATTR_Z)->value()));
 
-  data()->store(GeomAlgoAPI_PointBuilder::point(aPnt));
+  boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
+  aConstr->setShape(GeomAlgoAPI_PointBuilder::point(aPnt));
+  results().push_back(aConstr);
 }

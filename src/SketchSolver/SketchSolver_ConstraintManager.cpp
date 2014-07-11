@@ -65,34 +65,35 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
   {
     const ModelAPI_ObjectUpdatedMessage* anUpdateMsg = 
       dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
-    std::set< FeaturePtr > aFeatures = anUpdateMsg->features();
+    std::set< ObjectPtr > aFeatures = anUpdateMsg->features();
 
     bool isModifiedEvt = 
       theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
     if (!isModifiedEvt)
     {
-      std::set< FeaturePtr >::iterator aFeatIter;
+      std::set< ObjectPtr >::iterator aFeatIter;
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++)
       {
+        FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFeatIter);
         // Only sketches and constraints can be added by Create event
-        const std::string& aFeatureKind = (*aFeatIter)->getKind();
+        const std::string& aFeatureKind = aFeature->getKind();
         if (aFeatureKind.compare(SKETCH_KIND) == 0)
         {
           boost::shared_ptr<SketchPlugin_Feature> aSketch =
-            boost::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
+            boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
           if (aSketch)
             changeWorkplane(aSketch);
           continue;
         }
         boost::shared_ptr<SketchPlugin_Constraint> aConstraint =
-          boost::dynamic_pointer_cast<SketchPlugin_Constraint>(*aFeatIter);
+          boost::dynamic_pointer_cast<SketchPlugin_Constraint>(aFeature);
         if (aConstraint)
           changeConstraint(aConstraint);
         else
         {
           // Sketch plugin features can be only updated
           boost::shared_ptr<SketchPlugin_Feature> aFeature =
-            boost::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
+            boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
           if (aFeature)
             updateEntity(aFeature);
         }
@@ -104,8 +105,8 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED))
   {
-    const ModelAPI_FeatureDeletedMessage* aDeleteMsg = 
-      dynamic_cast<const ModelAPI_FeatureDeletedMessage*>(theMessage);
+    const ModelAPI_ObjectDeletedMessage* aDeleteMsg = 
+      dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
     const std::set<std::string>& aFeatureGroups = aDeleteMsg->groups();
 
     // Find SKETCH_KIND in groups. The constraint groups should be updated when an object removed from Sketch
