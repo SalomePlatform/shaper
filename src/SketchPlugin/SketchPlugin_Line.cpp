@@ -30,7 +30,7 @@ void SketchPlugin_Line::initAttributes()
   data()->addAttribute(LINE_ATTR_END, GeomDataAPI_Point2D::type());
 }
 
-void SketchPlugin_Line::execute(boost::shared_ptr<ModelAPI_Result>& theResult) 
+void SketchPlugin_Line::execute() 
 {
   SketchPlugin_Sketch* aSketch = sketch();
   if (aSketch) {
@@ -46,7 +46,9 @@ void SketchPlugin_Line::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
       // make linear edge
       boost::shared_ptr<GeomAPI_Shape> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
       // store the result
-      boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theResult)->setShape(anEdge);
+      boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
+      aConstr->setShape(anEdge);
+      results().push_back(aConstr);
     }
   }
 }

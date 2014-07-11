@@ -21,7 +21,7 @@ class ModelAPI_ResultBody : public ModelAPI_Result
 public:
   /// Returns the group identifier of this result
   virtual std::string group()
-    {static std::string MY_GROUP = "Bodies"; return MY_GROUP;}
+  {static std::string MY_GROUP = "Bodies"; return MY_GROUP;}
 
   /// Stores the shape (called by the execution method).
   virtual void store(const boost::shared_ptr<GeomAPI_Shape>& theShape) = 0;

@@ -6,6 +6,7 @@
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Sketch.h>
@@ -25,7 +26,7 @@ void SketchPlugin_ConstraintPerpendicular::initAttributes()
   data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT, GeomDataAPI_Point2D::type());
 }
 
-void SketchPlugin_ConstraintPerpendicular::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
+void SketchPlugin_ConstraintPerpendicular::execute()
 {
 }
 
@@ -51,8 +52,13 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintPerpendicular::getAI
     return thePrevious;
 
   boost::shared_ptr<GeomAPI_Pln> aPlane = sketch()->plane();
-  boost::shared_ptr<GeomAPI_Shape> aLine1 = aLine1Feature->preview();
-  boost::shared_ptr<GeomAPI_Shape> aLine2 = aLine2Feature->preview();
+  boost::shared_ptr<GeomAPI_Shape> aLine1, aLine2;
+  boost::shared_ptr<ModelAPI_ResultConstruction> aConst1 = 
+    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aLine1Feature->firstResult());
+  if (aConst1) aLine1 = aConst1->shape();
+  boost::shared_ptr<ModelAPI_ResultConstruction> aConst2 = 
+    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aLine1Feature->firstResult());
+  if (aConst2) aLine2 = aConst2->shape();
 
   boost::shared_ptr<GeomAPI_AISObject> anAIS = thePrevious;
   if (!anAIS)

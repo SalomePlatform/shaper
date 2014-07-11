@@ -14,13 +14,12 @@ boost::shared_ptr<GeomAPI_Shape>& Model_ResultConstruction::shape()
   return myShape;
 }
 
+/*
 boost::shared_ptr<ModelAPI_Feature> Model_ResultConstruction::owner()
 {
   return myOwner;
-}
+}*/
 
-Model_ResultConstruction::Model_ResultConstruction(
-  const boost::shared_ptr<ModelAPI_Feature>& theFeature)
-  : myOwner(theFeature)
+Model_ResultConstruction::Model_ResultConstruction()
 {
 }

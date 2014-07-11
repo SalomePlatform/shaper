@@ -26,7 +26,7 @@ void SketchPlugin_Circle::initAttributes()
   data()->addAttribute(CIRCLE_ATTR_RADIUS, ModelAPI_AttributeDouble::type());
 }
 
-void SketchPlugin_Circle::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
+void SketchPlugin_Circle::execute()
 {
   SketchPlugin_Sketch* aSketch = sketch();
   if (aSketch) {
@@ -59,7 +59,9 @@ void SketchPlugin_Circle::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
     }
     boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
       // store the result
-    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theResult)->setShape(aCompound);
+      boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
+      aConstr->setShape(aCompound);
+      results().push_back(aConstr);
   }
 }
 

@@ -28,7 +28,7 @@ public:
   /// Returns the shape-result produced by this feature
   MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape>& shape();
   /// Returns the source feature of this result
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> owner();
+  //MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> owner();
 
 protected:
   /// Makes a body on the given feature

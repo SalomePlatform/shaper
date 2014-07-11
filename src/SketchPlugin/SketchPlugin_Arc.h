@@ -37,13 +37,9 @@ public:
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
   /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious);
-
-  /// Adds sub-feature of the higher level feature (sub-element of the sketch)
-  /// \param theFeature sub-feature
-  SKETCHPLUGIN_EXPORT virtual const void addSub(
-    const FeaturePtr& theFeature) {};
+  virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
+                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+  {return simpleAISObject(firstResult(), thePrevious);}
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved

@@ -351,12 +351,12 @@ FeaturePtr Model_Document::addFeature(string theID)
   if (aFeature) {
     TDF_Label aFeatureLab;
     if (!aFeature->isAction()) {// do not add action to the data model
-      TDF_Label aFeaturesLab = groupLabel(FEATURES_GROUP);
+      TDF_Label aFeaturesLab = groupLabel(ModelAPI_Feature::group());
       aFeatureLab = aFeaturesLab.NewChild();
       initData(aFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
       // keep the feature ID to restore document later correctly
       TDataStd_Comment::Set(aFeatureLab, aFeature->getKind().c_str());
-      myObjs[FEATURES_GROUP].push_back(aFeature);
+      myObjs[ModelAPI_Feature::group()].push_back(aFeature);
       // store feature in the history of features array
       if (aFeature->isInHistory()) {
         AddToRefArray(aFeaturesLab, aFeatureLab);
@@ -372,10 +372,10 @@ FeaturePtr Model_Document::addFeature(string theID)
   return aFeature;
 }
 
-void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Result> theResult,
-  const int theResultIndex)
+void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex)
 {
-  initData(theResult, boost::dynamic_pointer_cast<Model_Data>(theResult->owner()->data())->
+  initData(theResult, boost::dynamic_pointer_cast<Model_Data>(theFeature->data())->
     label().Father().FindChild(TAG_FEATURE_RESULTS), theResultIndex);
 }
 
@@ -415,7 +415,7 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
   boost::shared_ptr<Model_Data> aData = boost::static_pointer_cast<Model_Data>(theFeature->data());
   TDF_Label aFeatureLabel = aData->label().Father();
   // remove feature from the myObjects list
-  std::vector<ObjectPtr>& aVec = myObjs[FEATURES_GROUP];
+  std::vector<ObjectPtr>& aVec = myObjs[ModelAPI_Feature::group()];
   std::vector<ObjectPtr>::iterator anIter = aVec.begin();
   while(anIter != aVec.end()) {
     if (*anIter == theFeature) {
@@ -427,10 +427,10 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
   // erase all attributes under the label of feature
   aFeatureLabel.ForgetAllAttributes();
   // remove it from the references array
-  RemoveFromRefArray(groupLabel(FEATURES_GROUP), aData->label());
+  RemoveFromRefArray(groupLabel(ModelAPI_Feature::group()), aData->label());
 
   // event: feature is deleted
-  ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), FEATURES_GROUP);
+  ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
 }
 
 /// returns the object group name by the object label
@@ -445,7 +445,7 @@ static string groupName(TDF_Label theObjectLabel) {
 FeaturePtr Model_Document::feature(TDF_Label& theLabel)
 {
   // iterate all features, may be optimized later by keeping labels-map
-  std::vector<ObjectPtr>& aVec = myObjs[FEATURES_GROUP];
+  std::vector<ObjectPtr>& aVec = myObjs[ModelAPI_Feature::group()];
   vector<ObjectPtr>::iterator aFIter = aVec.begin();
   for(; aFIter != aVec.end(); aFIter++) {
     boost::shared_ptr<Model_Data> aData = 
@@ -466,7 +466,7 @@ boost::shared_ptr<ModelAPI_Document> Model_Document::subDocument(string theDocID
 
 ObjectPtr Model_Document::object(const string& theGroupID, const int theIndex)
 {
-  if (theGroupID == FEATURES_GROUP) {
+  if (theGroupID == ModelAPI_Feature::group()) {
     std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = myObjs.find(theGroupID);
     if (aFind != myObjs.end()) {
       int aSize = aFind->second.size();
@@ -475,7 +475,7 @@ ObjectPtr Model_Document::object(const string& theGroupID, const int theIndex)
     }
   } else {
     // iterate all features in order to find the needed result
-    std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = myObjs.find(FEATURES_GROUP);
+    std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = myObjs.find(ModelAPI_Feature::group());
     if (aFind != myObjs.end()) {
       vector<ObjectPtr>::iterator aFIter = aFind->second.begin();
       for(int anIndex = 0; aFIter != aFind->second.end(); aFIter++) {
@@ -499,14 +499,14 @@ ObjectPtr Model_Document::object(const string& theGroupID, const int theIndex)
 int Model_Document::size(const string& theGroupID) 
 {
   int aResult = 0;
-  if (theGroupID == FEATURES_GROUP) {
+  if (theGroupID == ModelAPI_Feature::group()) {
     std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = myObjs.find(theGroupID);
     if (aFind != myObjs.end()) {
       aResult = aFind->second.size();
     }
   } else {
     // iterate all features in order to find the needed result
-    std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = myObjs.find(FEATURES_GROUP);
+    std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = myObjs.find(ModelAPI_Feature::group());
     if (aFind != myObjs.end()) {
       vector<ObjectPtr>::iterator aFIter = aFind->second.begin();
       for(; aFIter != aFind->second.end(); aFIter++) {
@@ -560,9 +560,9 @@ void Model_Document::setUniqueName(FeaturePtr theFeature)
   string aName; // result
   // first count all objects of such kind to start with index = count + 1
   int a, aNumObjects = 0;
-  int aSize = size(FEATURES_GROUP);
+  int aSize = size(ModelAPI_Feature::group());
   for(a = 0; a < aSize; a++) {
-    if (boost::dynamic_pointer_cast<ModelAPI_Feature>(object(FEATURES_GROUP, a))->getKind()
+    if (boost::dynamic_pointer_cast<ModelAPI_Feature>(object(ModelAPI_Feature::group(), a))->getKind()
         == theFeature->getKind())
       aNumObjects++;
   }
@@ -572,7 +572,7 @@ void Model_Document::setUniqueName(FeaturePtr theFeature)
   aName = aNameStream.str();
   // check this is unique, if not, increase index by 1
   for(a = 0; a < aSize;) {
-    if (boost::dynamic_pointer_cast<ModelAPI_Feature>(object(FEATURES_GROUP, a))
+    if (boost::dynamic_pointer_cast<ModelAPI_Feature>(object(ModelAPI_Feature::group(), a))
           ->data()->name() == aName) {
       aNumObjects++;
       stringstream aNameStream;
@@ -670,7 +670,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
     setCheckTransactions(true);
 }
 
-boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction()
+boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstruction()
 {
   boost::shared_ptr<ModelAPI_ResultConstruction> aResult(new Model_ResultConstruction());
   return aResult;

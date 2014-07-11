@@ -36,7 +36,7 @@ void SketchPlugin_Sketch::initAttributes()
   data()->addAttribute(SKETCH_ATTR_FEATURES, ModelAPI_AttributeRefList::type());
 }
 
-void SketchPlugin_Sketch::execute(boost::shared_ptr<ModelAPI_Result>& theResult) 
+void SketchPlugin_Sketch::execute() 
 {
   if (!isPlaneSet()) {
     std::list<boost::shared_ptr<GeomAPI_Shape> > aFaces;
@@ -45,7 +45,9 @@ void SketchPlugin_Sketch::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
     addPlane(0, 1, 0, aFaces); // XZ plane
     addPlane(0, 0, 1, aFaces); // XY plane
     boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aFaces);
-    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theResult)->setShape(aCompound);
+    boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
+    aConstr->setShape(aCompound);
+    results().push_back(aConstr);
     return;
   }
   if (!data()->isValid())
@@ -74,7 +76,7 @@ void SketchPlugin_Sketch::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
   for (; anIt != aLast; anIt++) {
     aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
     boost::shared_ptr<ModelAPI_ResultConstruction> aRes = 
-      boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(document()->result(aFeature));
+      boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFeature->firstResult());
     if (aRes) {
       boost::shared_ptr<GeomAPI_Shape> aShape = aRes->shape();
       if (aShape)
@@ -91,17 +93,19 @@ void SketchPlugin_Sketch::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
 
   aLoops.insert(aLoops.end(), aWires.begin(), aWires.end());
   boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aLoops);
-  boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theResult)->setShape(aCompound);
+  boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
+  aConstr->setShape(aCompound);
+  results().push_back(aConstr);
 }
 
 boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Sketch::getAISObject(
                                 boost::shared_ptr<GeomAPI_AISObject> thePrevious)
 {
-  boost::shared_ptr<GeomAPI_AISObject> anAIS = prepareAISShape(thePrevious);
-  anAIS->setColor(SKETCH_PLANE_COLOR);
-  anAIS->setWidth(SKETCH_WIDTH);
+  boost::shared_ptr<GeomAPI_AISObject> aResult = simpleAISObject(firstResult(), thePrevious);
+  aResult->setColor(SKETCH_PLANE_COLOR);
+  aResult->setWidth(SKETCH_WIDTH);
   //anAIS->Redisplay();
-  return anAIS;
+  return aResult;
 }
 
 const void SketchPlugin_Sketch::addSub(const FeaturePtr& theFeature)

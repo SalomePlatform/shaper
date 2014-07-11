@@ -29,17 +29,15 @@ public:
   {static std::string MY_KIND = SKETCH_CIRCLE_KIND; return MY_KIND;}
 
   /// Creates a new part document if needed
-  SKETCHPLUGIN_EXPORT virtual void execute(boost::shared_ptr<ModelAPI_Result>& theResult);
+  SKETCHPLUGIN_EXPORT virtual void execute();
 
   /// Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
-  /// Returns the sketch preview
-  SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
-
   /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious);
+  virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
+                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+  {return simpleAISObject(firstResult(), thePrevious);}
 
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature

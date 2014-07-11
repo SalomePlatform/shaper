@@ -30,7 +30,7 @@ void SketchPlugin_ConstraintDistance::initAttributes()
   data()->addAttribute(CONSTRAINT_ATTR_ENTITY_B, ModelAPI_AttributeRefAttr::type());
 }
 
-void SketchPlugin_ConstraintDistance::execute(boost::shared_ptr<ModelAPI_Result>& theResult)
+void SketchPlugin_ConstraintDistance::execute()
 {
   boost::shared_ptr<ModelAPI_Data> aData = data();
 

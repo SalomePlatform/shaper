@@ -15,18 +15,6 @@ class ModelAPI_Object;
 class ModelAPI_Result;
 class ModelAPI_ResultConstruction;
 
-/// Common groups identifiers
-/// Group of parameters
-static const std::string PARAMETERS_GROUP = "Parameters";
-/// Group of constructions
-static const std::string CONSTRUCTIONS_GROUP = "Construction";
-/// Group of parts
-static const std::string PARTS_GROUP = "Parts";
-/// Group of bodies
-static const std::string BODIES_GROUP = "Bodies";
-/// All created fetaures of the document (a history)
-static const std::string FEATURES_GROUP = "Features";
-
 /**\class Model_Document
  * \ingroup DataModel
  * \brief Document for internal data structure of any object storage.
