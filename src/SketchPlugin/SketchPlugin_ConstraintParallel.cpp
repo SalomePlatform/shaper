@@ -41,13 +41,13 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintParallel::getAISObje
     boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
   boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr2 = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_B));
-  if (!anAttr1 || !anAttr1->isFeature() || 
-      !anAttr2 || !anAttr2->isFeature())
+  if (!anAttr1 || !anAttr1->isObject() || 
+      !anAttr2 || !anAttr2->isObject())
     return thePrevious;
   boost::shared_ptr<SketchPlugin_Line> aLine1Feature = 
-    boost::dynamic_pointer_cast<SketchPlugin_Line>(anAttr1->feature());
+    boost::dynamic_pointer_cast<SketchPlugin_Line>(anAttr1->object());
   boost::shared_ptr<SketchPlugin_Line> aLine2Feature = 
-    boost::dynamic_pointer_cast<SketchPlugin_Line>(anAttr2->feature());
+    boost::dynamic_pointer_cast<SketchPlugin_Line>(anAttr2->object());
   if (!aLine1Feature || !aLine2Feature)
     return thePrevious;
 

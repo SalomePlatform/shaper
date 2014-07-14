@@ -34,7 +34,7 @@ void PartSetPlugin_Duplicate::initAttributes()
     if (aSource) {
       boost::shared_ptr<ModelAPI_Document> aCopy = 
         aPManager->copy(aSource->data()->docRef(PART_ATTR_DOC_REF)->value(), data()->name());
-      aRef->setFeature(aSource);
+      aRef->setObject(aSource);
     }
   }
 }

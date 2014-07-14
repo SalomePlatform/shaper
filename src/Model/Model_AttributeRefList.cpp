@@ -10,19 +10,19 @@
 
 using namespace std;
 
-void Model_AttributeRefList::append(FeaturePtr theFeature)
+void Model_AttributeRefList::append(ObjectPtr theObject)
 {
   boost::shared_ptr<Model_Data> aData = 
-    boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
+    boost::dynamic_pointer_cast<Model_Data>(theObject->data());
   myRef->Append(aData->label());
 
   owner()->data()->sendAttributeUpdated(this);
 }
 
-void Model_AttributeRefList::remove(FeaturePtr theFeature)
+void Model_AttributeRefList::remove(ObjectPtr theObject)
 {
   boost::shared_ptr<Model_Data> aData = 
-    boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
+    boost::dynamic_pointer_cast<Model_Data>(theObject->data());
   myRef->Remove(aData->label());
 
   owner()->data()->sendAttributeUpdated(this);
@@ -33,15 +33,15 @@ int Model_AttributeRefList::size()
   return myRef->Extent();
 }
 
-list<FeaturePtr> Model_AttributeRefList::list()
+list<ObjectPtr> Model_AttributeRefList::list()
 {
-  std::list< FeaturePtr > aResult;
+  std::list< ObjectPtr > aResult;
   boost::shared_ptr<Model_Document> aDoc = 
     boost::dynamic_pointer_cast<Model_Document>(owner()->document());
   if (aDoc) {
     const TDF_LabelList& aList = myRef->List();
     for(TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
-      aResult.push_back(aDoc->feature(aLIter.Value()));
+      aResult.push_back(aDoc->object(aLIter.Value()));
     }
   }
   return aResult;

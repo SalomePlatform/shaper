@@ -24,16 +24,16 @@ public:
   MODELAPI_EXPORT virtual std::string attributeType() {return type();}
 
   /// Appends the feature to the end of a list
-  MODELAPI_EXPORT virtual void append(FeaturePtr theFeature) = 0;
+  MODELAPI_EXPORT virtual void append(ObjectPtr theObject) = 0;
 
   /// Erases the first meet of the feature in the list
-  MODELAPI_EXPORT virtual void remove(FeaturePtr theFeature) = 0;
+  MODELAPI_EXPORT virtual void remove(ObjectPtr theObject) = 0;
 
   /// Returns number of features in the list
   MODELAPI_EXPORT virtual int size() = 0;
 
   /// Returns the list of features
-  MODELAPI_EXPORT virtual std::list<FeaturePtr > list() = 0;
+  MODELAPI_EXPORT virtual std::list<ObjectPtr > list() = 0;
 
 protected:
   /// Objects are created for features automatically
