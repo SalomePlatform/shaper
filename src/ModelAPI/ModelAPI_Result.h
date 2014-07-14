@@ -22,7 +22,7 @@ public:
   //virtual boost::shared_ptr<ModelAPI_Feature> owner() = 0;
 
   /// Returns the group identifier of this result
-  virtual std::string groupName() = 0;
+  //virtual std::string groupName() = 0;
 };
 
 //! Pointer on feature object

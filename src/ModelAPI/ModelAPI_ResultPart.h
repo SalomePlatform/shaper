@@ -30,6 +30,6 @@ public:
 };
 
 //! Pointer on feature object
-typedef boost::shared_ptr<ModelAPI_ResultPart> ResultPart;
+typedef boost::shared_ptr<ModelAPI_ResultPart> ResultPartPtr;
 
 #endif

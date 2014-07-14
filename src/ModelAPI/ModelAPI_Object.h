@@ -40,6 +40,9 @@ public:
   virtual boost::shared_ptr<ModelAPI_Document> document()
     {return myDoc;}
 
+  /// Returns the group identifier of this object
+  virtual std::string groupName() = 0;
+
 protected:
   /// Sets the data manager of an object (document does)
   virtual void setData(boost::shared_ptr<ModelAPI_Data> theData) 

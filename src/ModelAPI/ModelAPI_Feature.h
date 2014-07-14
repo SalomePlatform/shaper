@@ -33,6 +33,9 @@ public:
   static std::string group()
     {static std::string MY_GROUP = "Features"; return MY_GROUP;}
 
+  /// Returns the group identifier of this result
+  virtual std::string groupName() { return group(); }
+
   /// Request for initialization of data model of the feature: adding all attributes
   virtual void initAttributes() = 0;
 

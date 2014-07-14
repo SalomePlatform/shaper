@@ -148,7 +148,7 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
   FeaturePtr aFeature;
   if (!theSelected.empty()) {
     ModuleBase_ViewerPrs aPrs = theSelected.front();
-    aFeature = aPrs.feature();
+    aFeature = aPrs.result();
   }
   else
     aFeature = feature(); // for the widget distance only
@@ -192,7 +192,7 @@ void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* t
   if ((myPreSelection.size() > 0) && myActiveWidget) {
     const ModuleBase_ViewerPrs& aPrs = myPreSelection.front();
     ModuleBase_WidgetValueFeature aValue;
-    aValue.setFeature(aPrs.feature());
+    aValue.setFeature(aPrs.result());
     if (myActiveWidget->setValue(&aValue)) {
       myPreSelection.remove(aPrs);
       emit activateNextWidget(myActiveWidget);

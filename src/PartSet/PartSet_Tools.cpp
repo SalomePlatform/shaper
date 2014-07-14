@@ -152,17 +152,17 @@ FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theVie
   ModuleBase_ViewerPrs aPrs;
   for (; anIt != aLast; anIt++) {
     aPrs = *anIt;
-    if (!aPrs.feature())
+    if (!aPrs.result())
       continue;
     boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
-                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(aPrs.feature());
+                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(aPrs.result());
     if (!aSketchFeature)
       continue;
     double aDelta = aSketchFeature->distanceToPoint(
                                boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
     if (aMinDelta < 0 || aMinDelta > aDelta) {
       aMinDelta = aDelta;
-      aDeltaFeature = aPrs.feature();
+      aDeltaFeature = aPrs.result();
     }
   }
   return aDeltaFeature;

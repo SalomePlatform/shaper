@@ -42,23 +42,26 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
   {
     const ModelAPI_ObjectUpdatedMessage* aUpdMsg = 
       dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
-    std::set<FeaturePtr > aFeatures = aUpdMsg->features();
-    std::set<FeaturePtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
+    std::set<ObjectPtr > aFeatures = aUpdMsg->features();
+    std::set<ObjectPtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
     for (; anIt != aLast; anIt++) {
-      FeaturePtr aFeature = *anIt;
-      if (myModule->workshop()->displayer()->isVisible(aFeature) ||
-          aType == EVENT_OBJECT_CREATED) {
-        myModule->visualizePreview(aFeature, true, false);
-        //if (aType == EVENT_OBJECT_CREATED)
-          myModule->activateFeature(aFeature, true);
+      ObjectPtr aObject = *anIt;
+      ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+      if (aResult) {
+        if (myModule->workshop()->displayer()->isVisible(aResult) ||
+            aType == EVENT_OBJECT_CREATED) {
+          myModule->visualizePreview(aResult, true, false);
+          //if (aType == EVENT_OBJECT_CREATED)
+          myModule->activateFeature(aResult, true);
+        }
       }
     }
     myModule->workshop()->displayer()->updateViewer();
   }
   if (aType == EVENT_OBJECT_DELETED)
   {
-    const ModelAPI_FeatureDeletedMessage* aDelMsg = 
-      dynamic_cast<const ModelAPI_FeatureDeletedMessage*>(theMessage);
+    const ModelAPI_ObjectDeletedMessage* aDelMsg = 
+      dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
     boost::shared_ptr<ModelAPI_Document> aDoc = aDelMsg->document();
 
     std::set<std::string> aGroups = aDelMsg->groups();

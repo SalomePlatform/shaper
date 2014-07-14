@@ -73,11 +73,11 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
                                              const std::list<ModuleBase_ViewerPrs>& theSelected,
                                              const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  FeaturePtr aFeature;
+  ResultPtr aFeature;
   if (!theHighlighted.empty())
-    aFeature = theHighlighted.front().feature();
+    aFeature = theHighlighted.front().result();
   if (!aFeature && !theSelected.empty()) // changed for a constrain
-    aFeature = theSelected.front().feature();
+    aFeature = theSelected.front().result();
 
   if (!aFeature || aFeature != feature())
   {
@@ -88,7 +88,7 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
     if(aHasShift && !theHighlighted.empty()) {
       QFeatureList aSelected;
       aSelected.push_back(feature());
-      aSelected.push_back(theHighlighted.front().feature());
+      aSelected.push_back(theHighlighted.front().result());
       emit setSelection(aSelected);
     }
     else if (aFeature) {
