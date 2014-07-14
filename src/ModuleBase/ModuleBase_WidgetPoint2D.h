@@ -39,10 +39,10 @@ public:
   virtual bool setValue(ModuleBase_WidgetValue* theValue);
 
   /// Saves the internal parameters to the given feature
-  /// \param theFeature a model feature to be changed
-  virtual bool storeValue(FeaturePtr theFeature) const;
+  /// \param theObject a model feature to be changed
+  virtual bool storeValue(ObjectPtr theObject) const;
 
-  virtual bool restoreValue(FeaturePtr theFeature);
+  virtual bool restoreValue(ObjectPtr theObject);
 
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
@@ -57,13 +57,13 @@ public:
   /// \param theEvent the processed event
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
-  bool initFromPrevious(FeaturePtr theFeature);
+  bool initFromPrevious(ObjectPtr theObject);
 
 signals:
   /// Signal about the point 2d set to the feature
   /// \param the feature
   /// \param the attribute of the feature
-  void storedPoint2D(FeaturePtr theFeature, const std::string& theAttribute);
+  void storedPoint2D(ObjectPtr theObject, const std::string& theAttribute);
 
 protected:
   /// Fill the widget values by given point

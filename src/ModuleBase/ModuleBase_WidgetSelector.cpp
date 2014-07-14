@@ -99,14 +99,14 @@ ModuleBase_WidgetSelector::~ModuleBase_WidgetSelector()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::storeValue(FeaturePtr theFeature) const
+bool ModuleBase_WidgetSelector::storeValue(ObjectPtr theObject) const
 {
-  DataPtr aData = theFeature->data();
+  DataPtr aData = theObject->data();
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
 
-  FeaturePtr aFeature = aRef->value();
-  if (!(aFeature && aFeature->isSame(mySelectedObject))) {
+  ObjectPtr aObject = aRef->value();
+  if (!(aObject && aObject->isSame(mySelectedObject))) {
     aRef->setValue(mySelectedObject);
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   }
@@ -114,9 +114,9 @@ bool ModuleBase_WidgetSelector::storeValue(FeaturePtr theFeature) const
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::restoreValue(FeaturePtr theFeature)
+bool ModuleBase_WidgetSelector::restoreValue(ObjectPtr theObject)
 {
-  DataPtr aData = theFeature->data();
+  DataPtr aData = theObject->data();
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(attributeID());
 
   bool isBlocked = this->blockSignals(true);

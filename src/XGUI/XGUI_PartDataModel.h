@@ -103,7 +103,7 @@ public:
   virtual QModelIndex findGroup(const std::string& theGroup) const;
 
   //! Return a Part object
-  virtual ObjectPtr part() const;
+  virtual ResultPartPtr part() const;
 
 private: 
 

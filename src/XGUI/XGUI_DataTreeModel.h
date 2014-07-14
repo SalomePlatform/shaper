@@ -7,6 +7,7 @@
 
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <QAbstractItemModel>
 #include <QColor>

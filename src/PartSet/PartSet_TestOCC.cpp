@@ -18,7 +18,7 @@
 #include <ModelAPI_Document.h>
 
 static double myTestDelta;
-static FeaturePtr myTestFeature;
+static ResultPtr myTestObject;
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Shape.hxx>
@@ -31,13 +31,13 @@ static FeaturePtr myTestFeature;
 
 void PartSet_TestOCC::testSelection(XGUI_Workshop* theWorkshop)
 {
-  if (!myTestFeature) {
+  if (!myTestObject) {
     PartSet_TestOCC::createTestLine(theWorkshop);
     PartSet_TestOCC::moveMouse(theWorkshop->viewer()->AISContext(),
                                theWorkshop->viewer()->activeView());
     PartSet_TestOCC::changeTestLine(theWorkshop);
   }
-  boost::shared_ptr<GeomAPI_AISObject> anIO = theWorkshop->displayer()->getAISObject(myTestFeature);
+  boost::shared_ptr<GeomAPI_AISObject> anIO = theWorkshop->displayer()->getAISObject(myTestObject);
   if (!anIO->empty()) {
     theWorkshop->viewer()->AISContext()->MoveTo(0, 0, theWorkshop->viewer()->activeView());
     theWorkshop->viewer()->AISContext()->Select(0, 0, 2500, 2500, theWorkshop->viewer()->activeView());
@@ -182,10 +182,10 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
     //aModes.push_back(TopAbs_VERTEX);
     //aModes.push_back(TopAbs_EDGE);
     //aDisplayer->activateInLocalContext(aFeature, aModes, true);
-    myTestFeature = aFeature;
+    myTestObject = aFeature;
 
     QFeatureList aFeatureList;
-    aFeatureList.append(myTestFeature);
+    aFeatureList.append(myTestObject);
     aDisplayer->setSelected(aFeatureList, true);
   }
 }
@@ -193,9 +193,9 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
 void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
 {
   // change the line
-  if (!myTestFeature)
+  if (!myTestObject)
     return;
-  FeaturePtr aFeature = myTestFeature;
+  FeaturePtr aFeature = myTestObject;
 
   myTestDelta = myTestDelta - 50;
   double aDelta = myTestDelta;
@@ -216,7 +216,7 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   //aDisplayer->activateInLocalContext(aFeature, aModes, true);
 
   /*QFeatureList aFeatureList;
-  aFeatureList.append(myTestFeature);
+  aFeatureList.append(myTestObject);
   theWorkshop->displayer()->setSelected(aFeatureList, true);*/
 
   theWorkshop->displayer()->updateViewer();

@@ -20,15 +20,15 @@ public:
   XGUI_DataTree(QWidget* theParent);
   virtual ~XGUI_DataTree();
 
-  //! Returns list of currently selected features
-  QList<ObjectPtr> selectedFeatures() const { return mySelectedData; }
+  //! Returns list of currently selected objects
+  QList<ObjectPtr> selectedObjects() const { return mySelectedData; }
 
   XGUI_DocumentDataModel* dataModel() const;
 
 signals:
   //! Emited when selection is changed
   void selectionChanged();
-  void activePartChanged(FeaturePtr thePart); 
+  void activePartChanged(ObjectPtr thePart); 
  
   //! Emited on context menu request
   void contextMenuRequested(QContextMenuEvent* theEvent);
@@ -64,10 +64,10 @@ public:
   //! Returns Model which provides access to data objects
   XGUI_DocumentDataModel* dataModel() const { return myDocModel; }
 
-  //! Returns list of currently selected features
+  //! Returns list of currently selected objects
   QList<ObjectPtr> selectedObjects() const { return myObjectsList; }
 
-  void setFeaturesSelected(const QFeatureList& theFeatures);
+  void setObjectsSelected(const QList<ObjectPtr>& theObjects);
 
   //! Returns currently selected indexes
   QModelIndexList selectedIndexes() const { return myTreeView->selectionModel()->selectedIndexes(); }
@@ -76,7 +76,7 @@ public:
   XGUI_DataTree* treeView() const { return myTreeView; }
 
   //! Activates currently selected part. Signal activePartChanged will not be sent
-  void activatePart(const FeaturePtr& thePart);
+  void activatePart(const ObjectPtr& thePart);
 
   void rebuildDataTree();
 
@@ -85,7 +85,7 @@ signals:
   void selectionChanged();
 
   //! Emited when current active document is changed
-  void activePartChanged(FeaturePtr thePart); 
+  void activePartChanged(ObjectPtr thePart); 
  
   //! Emited on context menu request
   void contextMenuRequested(QContextMenuEvent* theEvent);
@@ -94,7 +94,7 @@ protected:
   virtual bool eventFilter(QObject* obj, QEvent* theEvent);
 
 private slots:
-  void onActivePartChanged(FeaturePtr thePart);
+  void onActivePartChanged(ObjectPtr thePart);
   void onContextMenuRequested(QContextMenuEvent* theEvent);
   void onLabelContextMenuRequested(const QPoint& thePnt);
 

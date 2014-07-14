@@ -33,10 +33,10 @@ public:
   virtual ~ModuleBase_WidgetSelector();
 
   /// Saves the internal parameters to the given feature
-  /// \param theFeature a model feature to be changed
-  virtual bool storeValue(FeaturePtr theFeature) const;
+  /// \param theObject a model feature to be changed
+  virtual bool storeValue(ObjectPtr theObject) const;
 
-  virtual bool restoreValue(FeaturePtr theFeature);
+  virtual bool restoreValue(ObjectPtr theObject);
 
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
@@ -66,7 +66,7 @@ private:
   void enableOthersControls(bool toEnable) const;
   void updateSelectionName();
   void raisePanel() const;
-  bool isAccepted(const ObjectPtr theFeature) const;
+  bool isAccepted(const ObjectPtr theObject) const;
 
   static TopAbs_ShapeEnum shapeType(const QString& theType);
 

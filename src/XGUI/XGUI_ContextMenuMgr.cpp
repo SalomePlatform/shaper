@@ -13,6 +13,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <QAction>
 #include <QContextMenuEvent>
@@ -99,27 +100,30 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
 {
   QMenu* aMenu = new QMenu();
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QList<ObjectPtr> aFeatures = aSelMgr->selection()->selectedObjects();
-  if (aFeatures.size() == 1) {
+  QList<ObjectPtr> aObjects = aSelMgr->selection()->selectedObjects();
+  if (aObjects.size() == 1) {
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-    FeaturePtr aFeature = aFeatures.first();
+    ObjectPtr aObject = aObjects.first();
     //Process Feature
-    if (aFeature) {
-      if (aFeature->getKind() == PARTSET_PART_KIND) {
-        ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
-        DocumentPtr aFeaDoc = aObject->featureRef()->data()->docRef("PartDocument")->value();
+    if (aObject) {
+      ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+      if (aPart) {
+        DocumentPtr aFeaDoc = aPart->document();
         if (aMgr->currentDocument() == aFeaDoc)
           aMenu->addAction(action("DEACTIVATE_PART_CMD"));
         else 
           aMenu->addAction(action("ACTIVATE_PART_CMD"));
       } else {
-        aMenu->addAction(action("EDIT_CMD"));
+        ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+        if (aResult) {
+          aMenu->addAction(action("EDIT_CMD"));
 
-        XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-        if (aDisplayer->isVisible(aFeature))
-          aMenu->addAction(action("HIDE_CMD"));
-        else
-          aMenu->addAction(action("SHOW_CMD"));
+          XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+          if (aDisplayer->isVisible(aResult))
+            aMenu->addAction(action("HIDE_CMD"));
+          else
+            aMenu->addAction(action("SHOW_CMD"));
+        }
       }
       aMenu->addAction(action("DELETE_CMD"));
       aMenu->addSeparator();

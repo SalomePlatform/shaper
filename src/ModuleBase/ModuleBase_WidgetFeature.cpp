@@ -70,7 +70,7 @@ bool ModuleBase_WidgetFeature::setValue(ModuleBase_WidgetValue* theValue)
 
 bool ModuleBase_WidgetFeature::setFeature(const FeaturePtr& theFeature)
 {
-  if (!theFeature || !myFeatureKinds.contains(theFeature->getKind().c_str()))
+  if (!myFeatureKinds.contains(theFeature->getKind().c_str()))
     return false;
 
   myFeature = theFeature;
@@ -79,29 +79,36 @@ bool ModuleBase_WidgetFeature::setFeature(const FeaturePtr& theFeature)
   return true;
 }
 
-bool ModuleBase_WidgetFeature::storeValue(FeaturePtr theFeature) const
+bool ModuleBase_WidgetFeature::storeValue(ObjectPtr theObject) const
 {
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+  if (!aFeature)
+    return false;
+  boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
   ModuleBase_WidgetFeature* that = (ModuleBase_WidgetFeature*) this;
-  aRef->setFeature(myFeature);
-  theFeature->execute();
+  aRef->setObject(myFeature);
+  aFeature->execute();
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
   return true;
 }
 
-bool ModuleBase_WidgetFeature::restoreValue(FeaturePtr theFeature)
+bool ModuleBase_WidgetFeature::restoreValue(ObjectPtr theObject)
 {
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<ModelAPI_Data> aData = theObject->data();
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
-  myFeature = aRef->feature();
-  myEditor->setText(myFeature ? myFeature->data()->name().c_str() : "");
-  return true;
+  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aRef->object());
+  if (aFeature) {
+    myFeature = aFeature;
+    myEditor->setText(myFeature ? myFeature->data()->name().c_str() : "");
+    return true;
+  }
+  return false;
 }
 
 QWidget* ModuleBase_WidgetFeature::getControl() const

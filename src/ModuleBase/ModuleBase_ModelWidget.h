@@ -43,15 +43,15 @@ public:
   virtual bool setValue(ModuleBase_WidgetValue* theValue) { return false; };
 
   /// Returns the state whether the attribute of the feature is initialized
-  /// \param theFeature a model feature to be checked
+  /// \param theObject a model feature to be checked
   /// \return the boolean result
-  bool isInitialized(FeaturePtr theFeature) const;
+  bool isInitialized(ObjectPtr theObject) const;
 
   /// Saves the internal parameters to the given feature
-  /// \param theFeature a model feature to be changed
-  virtual bool storeValue(FeaturePtr theFeature) const = 0;
+  /// \param theObject a model feature to be changed
+  virtual bool storeValue(ObjectPtr theObject) const = 0;
 
-  virtual bool restoreValue(FeaturePtr theFeature) = 0;
+  virtual bool restoreValue(ObjectPtr theObject) = 0;
 
   /// Set focus to the first control of the current widget. The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
