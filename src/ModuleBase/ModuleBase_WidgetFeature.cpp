@@ -74,7 +74,7 @@ bool ModuleBase_WidgetFeature::setFeature(const FeaturePtr& theFeature)
     return false;
 
   myFeature = theFeature;
-  myEditor->setText(theFeature ? theFeature->data()->getName().c_str() : "");
+  myEditor->setText(theFeature ? theFeature->data()->name().c_str() : "");
   emit valuesChanged();
   return true;
 }
@@ -100,7 +100,7 @@ bool ModuleBase_WidgetFeature::restoreValue(FeaturePtr theFeature)
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
   myFeature = aRef->feature();
-  myEditor->setText(myFeature ? myFeature->data()->getName().c_str() : "");
+  myEditor->setText(myFeature ? myFeature->data()->name().c_str() : "");
   return true;
 }
 

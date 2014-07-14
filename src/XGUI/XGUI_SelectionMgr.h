@@ -28,18 +28,6 @@ public:
 
   XGUI_Selection* selection() const { return mySelection; }
 
-  //! Returns list of currently selected data objects
-  //QFeatureList selectedFeatures() const; 
-  
-  //! Returns list of currently selected QModelIndexes
-  //QModelIndexList selectedIndexes() const;
-
-  //! Returns list of currently selected AIS objects
-  //void selectedAISObjects(AIS_ListOfInteractive& theList) const;
-
-  //! Returns list of currently selected shapes
-  //void selectedShapes(NCollection_List<TopoDS_Shape>& theList) const;
-
   //! Connects the manager to all viewers accessible by Workshop
   void connectViewers();
 

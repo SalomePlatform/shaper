@@ -102,7 +102,7 @@ bool ModuleBase_WidgetFeatureOrAttribute::restoreValue(FeaturePtr theFeature)
 
   std::string aText = "";
   if (aFeature)
-    aText = aFeature->data()->getName().c_str();
+    aText = aFeature->data()->name().c_str();
   else if (myAttribute)
     aText = myAttribute->attributeType().c_str();
 

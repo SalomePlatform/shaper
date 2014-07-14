@@ -131,7 +131,7 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OPERATION_LAUNCHED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_TO_REDISPLAY));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
   activateModule();
   if (myMainWindow) {
@@ -230,21 +230,21 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 
   // Process creation of Part
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
-    const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+    const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
     onFeatureCreatedMsg(aUpdMsg);
   }
 
   // Redisplay feature
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_TO_REDISPLAY)) {
-    const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
+    const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
     onFeatureRedisplayMsg(aUpdMsg);
   }
 
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
-    const Model_FeatureUpdatedMessage* anUpdateMsg =
-        dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+    const Model_ObjectUpdatedMessage* anUpdateMsg =
+        dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
     onFeatureUpdatedMsg(anUpdateMsg);
   }
 
@@ -271,7 +271,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureUpdatedMsg(const Model_FeatureUpdatedMessage* theMsg)
+void XGUI_Workshop::onFeatureUpdatedMsg(const Model_ObjectUpdatedMessage* theMsg)
 {
   std::set<FeaturePtr> aFeatures = theMsg->features();
   if (myOperationMgr->hasOperation())
@@ -289,7 +289,7 @@ void XGUI_Workshop::onFeatureUpdatedMsg(const Model_FeatureUpdatedMessage* theMs
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureRedisplayMsg(const Model_FeatureUpdatedMessage* theMsg)
+void XGUI_Workshop::onFeatureRedisplayMsg(const Model_ObjectUpdatedMessage* theMsg)
 {
   std::set<FeaturePtr> aFeatures = theMsg->features();
   std::set<FeaturePtr>::const_iterator aIt;
@@ -305,7 +305,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const Model_FeatureUpdatedMessage* the
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureCreatedMsg(const Model_FeatureUpdatedMessage* theMsg)
+void XGUI_Workshop::onFeatureCreatedMsg(const Model_ObjectUpdatedMessage* theMsg)
 {
   std::set<FeaturePtr> aFeatures = theMsg->features();
 

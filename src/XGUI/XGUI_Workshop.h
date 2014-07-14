@@ -37,7 +37,7 @@ class Config_PointerMessage;
 class QWidget;
 class QDockWidget;
 
-class Model_FeatureUpdatedMessage;
+class Model_ObjectUpdatedMessage;
 class QAction;
 
 /**\class XGUI_Workshop
@@ -152,9 +152,9 @@ protected:
   void connectWithOperation(ModuleBase_Operation* theOperation);
   void saveDocument(QString theName);
 
-  void onFeatureUpdatedMsg(const Model_FeatureUpdatedMessage* theMsg);
-  void onFeatureCreatedMsg(const Model_FeatureUpdatedMessage* theMsg);
-  void onFeatureRedisplayMsg(const Model_FeatureUpdatedMessage* theMsg);
+  void onFeatureUpdatedMsg(const Model_ObjectUpdatedMessage* theMsg);
+  void onFeatureCreatedMsg(const Model_ObjectUpdatedMessage* theMsg);
+  void onFeatureRedisplayMsg(const Model_ObjectUpdatedMessage* theMsg);
 
   QList<QAction*> getModuleCommands() const;
 

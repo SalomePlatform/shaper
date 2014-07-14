@@ -23,14 +23,14 @@ public:
 
   //! Returns Feature object by the given Model index.
   //! Returns 0 if the given index is not index of a feature
-  virtual FeaturePtr feature(const QModelIndex& theIndex) const = 0;
+  virtual ObjectPtr feature(const QModelIndex& theIndex) const = 0;
 
   //! Returns QModelIndex which corresponds to the given feature
   //! If the feature is not found then index is not valid
-  virtual QModelIndex featureIndex(const FeaturePtr& theFeature) const = 0;
+  virtual QModelIndex featureIndex(const ObjectPtr& theFeature) const = 0;
 
   //! Returns parent index of the given feature
-  virtual QModelIndex findParent(const FeaturePtr& theFeature) const = 0;
+  virtual QModelIndex findParent(const ObjectPtr& theFeature) const = 0;
 
   //! Returns index corresponded to the group
   virtual QModelIndex findGroup(const std::string& theGroup) const = 0;
@@ -60,7 +60,7 @@ public:
   virtual bool hasDocument(const DocumentPtr& theDoc) const = 0;
 
   //! Return a Part object
-  virtual FeaturePtr part() const = 0;
+  virtual ObjectPtr part() const = 0;
 
 protected:
   //! Id of the current part object in the document

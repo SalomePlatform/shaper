@@ -5,12 +5,14 @@
 
 #include "ModuleBase_WidgetSelector.h"
 #include "ModuleBase_IWorkshop.h"
+#include "ModuleBase_Tools.h"
 
 #include <Events_Loop.h>
 #include <Model_Events.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Result.h>
 #include <ModelAPI_AttributeReference.h>
 #include <Config_WidgetAPI.h>
 
@@ -104,8 +106,8 @@ bool ModuleBase_WidgetSelector::storeValue(FeaturePtr theFeature) const
     boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
 
   FeaturePtr aFeature = aRef->value();
-  if (!(aFeature && aFeature->isSame(mySelectedFeature))) {
-    aRef->setValue(mySelectedFeature);
+  if (!(aFeature && aFeature->isSame(mySelectedObject))) {
+    aRef->setValue(mySelectedObject);
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   }
   return true;
@@ -118,7 +120,7 @@ bool ModuleBase_WidgetSelector::restoreValue(FeaturePtr theFeature)
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(attributeID());
 
   bool isBlocked = this->blockSignals(true);
-  mySelectedFeature = aRef->value();
+  mySelectedObject = aRef->value();
   updateSelectionName(); 
 
   this->blockSignals(isBlocked);
@@ -138,19 +140,19 @@ QList<QWidget*> ModuleBase_WidgetSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetSelector::onSelectionChanged()
 {
-  QList<FeaturePtr> aFeatures = myWorkshop->selectedFeatures();
-  if (aFeatures.size() > 0) {
-    FeaturePtr aFeature = aFeatures.first();
-    if ((!mySelectedFeature) && (!aFeature))
+  QList<ObjectPtr> aObjects = myWorkshop->selectedObjects();
+  if (aObjects.size() > 0) {
+    ObjectPtr aObject = aObjects.first();
+    if ((!mySelectedObject) && (!aObject))
       return;
-    if (mySelectedFeature && aFeature && mySelectedFeature->isSame(aFeature))
+    if (mySelectedObject && aObject && mySelectedObject->isSame(aObject))
       return;
 
     // Check that the selection corresponds to selection type
-    if (!isAccepted(aFeature)) return;
+    if (!isAccepted(aObject)) return;
 
-    mySelectedFeature = aFeature;
-    if (mySelectedFeature) {
+    mySelectedObject = aObject;
+    if (mySelectedObject) {
       updateSelectionName();
       activateSelection(false);
       raisePanel();
@@ -162,9 +164,10 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::isAccepted(const FeaturePtr theFeature) const
+bool ModuleBase_WidgetSelector::isAccepted(const ObjectPtr theResult) const
 {
-  boost::shared_ptr<GeomAPI_Shape> aShapePtr = theFeature->data()->shape();
+  ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theResult);
+  boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModuleBase_Tools::shape(aResult);
   if (!aShapePtr) return false;
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
   if (aShape.IsNull()) return false;
@@ -188,12 +191,8 @@ bool ModuleBase_WidgetSelector::isAccepted(const FeaturePtr theFeature) const
 //********************************************************************
 void ModuleBase_WidgetSelector::updateSelectionName()
 {
-  if (mySelectedFeature) {
-    std::string aName;
-    if (mySelectedFeature->data())
-      aName = mySelectedFeature->data()->getName();
-    else 
-      aName = boost::dynamic_pointer_cast<ModelAPI_Object>(mySelectedFeature)->getName();
+  if (mySelectedObject) {
+    std::string aName = mySelectedObject->data()->name();
  
     myTextLine->setText(QString::fromStdString(aName));
   } else 

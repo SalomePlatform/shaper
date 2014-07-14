@@ -9,7 +9,6 @@
 
 #include <boost/shared_ptr.hpp>
 
-class TopoDS_Shape;
 /*!
  \brief Return directory part of the file path.
 
@@ -72,11 +71,6 @@ namespace XGUI_Tools
    \param theFeature a feature
   */
   std::string XGUI_EXPORT featureInfo(FeaturePtr theFeature);
-
-  /**
-  * Returns pointer on real feature
-  */
-  FeaturePtr realFeature(const FeaturePtr theFeature);
 }
 
 #endif

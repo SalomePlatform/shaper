@@ -4,6 +4,7 @@
 
 #include "XGUI.h"
 #include <ModuleBase_Definitions.h>
+#include <ModelAPI_Object.h>
 
 #include <QWidget>
 #include <QTreeView>
@@ -20,7 +21,7 @@ public:
   virtual ~XGUI_DataTree();
 
   //! Returns list of currently selected features
-  QFeatureList selectedFeatures() const { return mySelectedData; }
+  QList<ObjectPtr> selectedFeatures() const { return mySelectedData; }
 
   XGUI_DocumentDataModel* dataModel() const;
 
@@ -45,7 +46,7 @@ private slots:
 
 private:
   //! List of currently selected data
-  QFeatureList mySelectedData;
+  QList<ObjectPtr> mySelectedData;
 };
 
 
@@ -64,7 +65,7 @@ public:
   XGUI_DocumentDataModel* dataModel() const { return myDocModel; }
 
   //! Returns list of currently selected features
-  QFeatureList selectedFeatures() const { return myFeaturesList; }
+  QList<ObjectPtr> selectedObjects() const { return myObjectsList; }
 
   void setFeaturesSelected(const QFeatureList& theFeatures);
 
@@ -111,7 +112,7 @@ private:
   QLineEdit* myActiveDocLbl;
   XGUI_DataTree* myTreeView;
 
-  QFeatureList myFeaturesList;
+  QList<ObjectPtr> myObjectsList;
 };
 
 #endif

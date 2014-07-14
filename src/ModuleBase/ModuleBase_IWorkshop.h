@@ -7,7 +7,7 @@
 
 #include "ModuleBase.h"
 
-#include <ModelAPI_Feature.h>
+#include <ModelAPI_Object.h>
 
 #include <AIS_InteractiveContext.hxx>
 
@@ -30,7 +30,7 @@ public:
   virtual Handle(AIS_InteractiveContext) AISContext() const = 0;
 
   //! Returns list of currently selected data objects
-  virtual QList<FeaturePtr> selectedFeatures() const = 0; 
+  virtual QList<ObjectPtr> selectedObjects() const = 0; 
 
   //! Returns instance of loaded module
   virtual ModuleBase_IModule* module() const = 0;

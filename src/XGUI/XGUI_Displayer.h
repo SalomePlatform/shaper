@@ -17,7 +17,7 @@
 #include <AIS_InteractiveContext.hxx>
 #include <NCollection_List.hxx>
 
-#include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
 
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -49,27 +49,27 @@ public:
 
   /// Returns the feature visibility state.
   /// \param theFeature a feature instance
-  bool isVisible(FeaturePtr theFeature);
+  bool isVisible(ResultPtr theResult);
 
   /// Display the feature. Obtain the visualized object from the feature.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// Returns true if the Feature succesfully displayed
-  bool display(FeaturePtr theFeature, bool isUpdateViewer = true);
+  bool display(ResultPtr theFeature, bool isUpdateViewer = true);
 
   /// Display the feature and a shape. This shape would be associated to the given feature
   /// \param theFeature a feature instance
   /// \param theAIS AIS presentation
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// Returns true if the Feature succesfully displayed
-  bool display(FeaturePtr theFeature, boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdateViewer = true);
+  bool display(ResultPtr theResult, boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdateViewer = true);
   
   /// Display the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
   /// \param theAIS an AIS object
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the presentation is created
-  bool redisplay(FeaturePtr theFeature,
+  bool redisplay(ResultPtr theFeature,
                  boost::shared_ptr<GeomAPI_AISObject> theAIS, 
                  const bool isUpdateViewer = true);
 
@@ -77,7 +77,7 @@ public:
   * \param theFeature a feature instance
   * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   */
-  bool redisplay(FeaturePtr theFeature, bool isUpdateViewer = true);
+  bool redisplay(ResultPtr theFeature, bool isUpdateViewer = true);
 
   /// Redisplay the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
@@ -89,14 +89,14 @@ public:
   /// \param theShape a shape
   /// \param theMode a list of local selection modes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void activateInLocalContext(FeaturePtr theFeature,
+  void activateInLocalContext(ResultPtr theFeature,
                               const std::list<int>& theModes, const bool isUpdateViewer = true);
 
   /// Stop the current selection and color the given features to the selection color
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void stopSelection(const QFeatureList& theFeatures, const bool isStop,
+  void stopSelection(const QResultList& theFeatures, const bool isStop,
                      const bool isUpdateViewer);
 
   /**
@@ -104,12 +104,12 @@ public:
   * \param theFeatures a list of features to be selected
   * isUpdateViewer the parameter whether the viewer should be update immediatelly
   */
-  void setSelected(const QFeatureList& theFeatures, bool isUpdateViewer = true);
+  void setSelected(const QResultList& theFeatures, bool isUpdateViewer = true);
 
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void erase(FeaturePtr theFeature, const bool isUpdateViewer = true);
+  void erase(ResultPtr theResult, const bool isUpdateViewer = true);
 
   /// Erase all presentations
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -117,7 +117,7 @@ public:
 
   /// Erase AIS interactive objects, which has an empty feature in the internal map
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void eraseDeletedFeatures(const bool isUpdateViewer = true);
+  void eraseDeletedResults(const bool isUpdateViewer = true);
 
   /// Deactivates selection of sub-shapes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -129,12 +129,12 @@ public:
   /// Searches the interactive object by feature
   /// \param theFeature the feature or NULL if it not visualized
   /// \return theIO an interactive object
-  boost::shared_ptr<GeomAPI_AISObject> getAISObject(FeaturePtr theFeature) const;
+  boost::shared_ptr<GeomAPI_AISObject> getAISObject(ResultPtr theFeature) const;
 
   /// Searches the feature by interactive object
   /// \param theIO an interactive object
   /// \return feature the feature or NULL if it not visualized
-  FeaturePtr getFeature(Handle(AIS_InteractiveObject) theIO) const;
+  ResultPtr getResult(Handle(AIS_InteractiveObject) theIO) const;
 
 protected:
   /// Deactivate local selection
@@ -147,8 +147,8 @@ protected:
 protected:
   XGUI_Workshop* myWorkshop;
 
-  typedef std::map<FeaturePtr, boost::shared_ptr<GeomAPI_AISObject> > FeatureToAISMap;
-  FeatureToAISMap myFeature2AISObjectMap;
+  typedef std::map<ResultPtr, boost::shared_ptr<GeomAPI_AISObject> > ResultToAISMap;
+  ResultToAISMap myResult2AISObjectMap;
 };
 
 

@@ -11,7 +11,7 @@
 #include <TopoDS_Shape.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 
-#include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
 
 /**\class ModuleBase_ViewerPrs
  * \ingroup Module base
@@ -27,21 +27,21 @@ public:
   /// \param theFeature a model feature
   /// \param theShape a viewer shape
   /// \param theOwner a selection owner
-  ModuleBase_ViewerPrs(FeaturePtr theFeature,
+  ModuleBase_ViewerPrs(ResultPtr theResult,
                  const TopoDS_Shape& theShape,
                  Handle_SelectMgr_EntityOwner theOwner)
-  : myFeature(theFeature), myShape(theShape), myOwner(theOwner) {}
+  : myResult(theResult), myShape(theShape), myOwner(theOwner) {}
   
   /// Destructor
   virtual ~ModuleBase_ViewerPrs() {}
 
   /// Sets the feature.
   /// \param theFeature a feature instance
-  void setFeature(FeaturePtr theFeature) { myFeature = theFeature; }
+  void setFeature(ResultPtr theResult) { myResult = theResult; }
 
   /// Returns the feature.
   /// \return a feature instance
-  FeaturePtr feature() const { return myFeature; }
+  ResultPtr result() const { return myResult; }
 
   /// Returns the presentation owner
   /// \param the owner
@@ -61,14 +61,14 @@ public:
 
   bool operator==(const ModuleBase_ViewerPrs& thePrs)
   {
-    bool aFeature = (myFeature.get() == thePrs.feature().get());
+    bool aResult = (myResult.get() == thePrs.result().get());
     bool aOwner = (myOwner.Access() == thePrs.owner().Access());
     bool aShape = myShape.IsEqual(thePrs.shape());
-    return aFeature && aOwner && aShape;
+    return aResult && aOwner && aShape;
   }
 
 private:
-  FeaturePtr myFeature; /// the feature
+  ResultPtr myResult; /// the feature
   Handle(SelectMgr_EntityOwner) myOwner; /// the selection owner
   TopoDS_Shape myShape; /// the shape
 };

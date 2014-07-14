@@ -18,7 +18,11 @@ class ModelAPI_ResultPart : public ModelAPI_Result
 {
 public:
   /// Returns the group identifier of this result
-  virtual std::string group()
+  virtual std::string groupName()
+    { return group(); }
+
+  /// Returns the group identifier of this result
+  static std::string group()
     {static std::string MY_GROUP = "Parts"; return MY_GROUP;}
 
   /// Returns the part-document of this result

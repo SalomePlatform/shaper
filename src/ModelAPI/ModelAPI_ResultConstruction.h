@@ -19,8 +19,13 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
 {
 public:
   /// Returns the group identifier of this result
-  virtual std::string group()
+  virtual std::string groupName()
+    { return group(); }
+
+  /// Returns the group identifier of this result
+  static std::string group()
     {static std::string MY_GROUP = "Construction"; return MY_GROUP;}
+
 
   /// Returns the shape-result produced by this feature
   virtual boost::shared_ptr<GeomAPI_Shape>& shape() = 0;

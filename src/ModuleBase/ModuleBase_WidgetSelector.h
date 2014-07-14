@@ -8,7 +8,7 @@
 #include "ModuleBase.h"
 #include "ModuleBase_ModelWidget.h"
 
-#include <ModelAPI_Feature.h>
+#include <ModelAPI_Object.h>
 
 #include <TopAbs_ShapeEnum.hxx>
 
@@ -49,7 +49,7 @@ public:
   void setActivationOnStart(bool toActivate) { myActivateOnStart = toActivate; }
   bool activateOnStart() const { return myActivateOnStart; }
 
-  FeaturePtr selectedFeature() const { return mySelectedFeature; }
+  ObjectPtr selectedFeature() const { return mySelectedObject; }
 
 public slots:
 
@@ -66,7 +66,7 @@ private:
   void enableOthersControls(bool toEnable) const;
   void updateSelectionName();
   void raisePanel() const;
-  bool isAccepted(const FeaturePtr theFeature) const;
+  bool isAccepted(const ObjectPtr theFeature) const;
 
   static TopAbs_ShapeEnum shapeType(const QString& theType);
 
@@ -79,7 +79,7 @@ private:
 
   bool myActivateOnStart;
 
-  FeaturePtr mySelectedFeature;
+  ObjectPtr mySelectedObject;
   QStringList myShapeTypes;
 };
 

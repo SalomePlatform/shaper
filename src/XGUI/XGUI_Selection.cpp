@@ -22,7 +22,7 @@ XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
 
 std::list<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) const
 {
-  std::set<FeaturePtr> aPrsFeatures;
+  std::set<ResultPtr> aPrsFeatures;
   std::list<ModuleBase_ViewerPrs> aPresentations;
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
@@ -33,7 +33,7 @@ std::list<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSk
     if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
       continue;
 
-    FeaturePtr aFeature = myWorkshop->displayer()->getFeature(anIO);
+    ResultPtr aFeature = myWorkshop->displayer()->getResult(anIO);
     if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
       continue;
     Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
@@ -45,7 +45,7 @@ std::list<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSk
 
 std::list<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeToSkip) const
 {
-  std::set<FeaturePtr > aPrsFeatures;
+  std::set<ResultPtr> aPrsFeatures;
   std::list<ModuleBase_ViewerPrs> aPresentations;
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
@@ -55,29 +55,33 @@ std::list<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeT
     if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
       continue;
 
-    FeaturePtr aFeature = myWorkshop->displayer()->getFeature(anIO);
-    if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
+    ResultPtr aResult = myWorkshop->displayer()->getResult(anIO);
+    if (aPrsFeatures.find(aResult) != aPrsFeatures.end())
       continue;
-    aPresentations.push_back(ModuleBase_ViewerPrs(aFeature, aShape, NULL));
-    aPrsFeatures.insert(aFeature);
+    aPresentations.push_back(ModuleBase_ViewerPrs(aResult, aShape, NULL));
+    aPrsFeatures.insert(aResult);
   }
 
   return aPresentations;
 }
 
-QFeatureList XGUI_Selection::selectedFeatures() const
+QList<ObjectPtr> XGUI_Selection::selectedObjects() const
 {
-  return myWorkshop->objectBrowser()->selectedFeatures();
-  //QFeatureList aSelectedList;
+  return myWorkshop->objectBrowser()->selectedObjects();
+}
+  
+QResultList XGUI_Selection::selectedResults() const
+{
+  QResultList aSelectedList;
 
-  //Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  //for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
-  //  Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
-  //  FeaturePtr aFeature = myWorkshop->displayer()->getFeature(anIO);
-  //  if (aFeature)
-  //    aSelectedList.append(aFeature);
-  //}
-  //return aSelectedList;
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
+    Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
+    ResultPtr aResult = myWorkshop->displayer()->getResult(anIO);
+    if (aResult)
+      aSelectedList.append(aResult);
+  }
+  return aSelectedList;
 }
 
 

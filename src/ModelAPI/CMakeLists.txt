@@ -24,6 +24,7 @@ SET(PROJECT_HEADERS
     ModelAPI_ResultBody.h
     ModelAPI_ResultConstruction.h
     ModelAPI_ResultPart.h
+	ModelAPI_ResultParameters.h
 )
 
 SET(PROJECT_SOURCES

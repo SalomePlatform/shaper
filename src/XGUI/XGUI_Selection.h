@@ -36,9 +36,14 @@ public:
   std::list<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const;
 
   /**
-  * Returns list of features currently selected in 3d viewer
+  * Returns list of currently selected objects
   */
-  QFeatureList selectedFeatures() const;
+  QList<ObjectPtr> selectedObjects() const;
+
+  /**
+  * Returns list of currently selected results
+  */
+  QResultList selectedResults() const;
   
   //! Returns list of currently selected QModelIndexes
   QModelIndexList selectedIndexes() const;

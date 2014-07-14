@@ -483,7 +483,7 @@ ObjectPtr Model_Document::object(const string& theGroupID, const int theIndex)
           boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter)->results();
         list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
         for(; aRIter != aResults.cend(); aRIter++) {
-          if ((*aRIter)->isInHistory() && (*aRIter)->group() == theGroupID) {
+          if ((*aRIter)->isInHistory() && (*aRIter)->groupName() == theGroupID) {
             if (anIndex == theIndex)
               return *aRIter;
             anIndex++;
@@ -514,7 +514,7 @@ int Model_Document::size(const string& theGroupID)
           boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter)->results();
         list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
         for(; aRIter != aResults.cend(); aRIter++) {
-          if ((*aRIter)->isInHistory() && (*aRIter)->group() == theGroupID) {
+          if ((*aRIter)->isInHistory() && (*aRIter)->groupName() == theGroupID) {
             aResult++;
           }
         }

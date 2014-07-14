@@ -99,7 +99,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
 {
   QMenu* aMenu = new QMenu();
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QFeatureList aFeatures = aSelMgr->selection()->selectedFeatures();
+  QList<ObjectPtr> aFeatures = aSelMgr->selection()->selectedObjects();
   if (aFeatures.size() == 1) {
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
     FeaturePtr aFeature = aFeatures.first();
@@ -153,13 +153,14 @@ QMenu* XGUI_ContextMenuMgr::viewerMenu() const
 void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
 {
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QFeatureList aFeatures = aSelMgr->selection()->selectedFeatures();
-  if (aFeatures.size() > 0) {
-    if (aFeatures.size() == 1)
+  QList<ObjectPtr> aObjects = aSelMgr->selection()->selectedObjects();
+  if (aObjects.size() > 0) {
+    if (aObjects.size() == 1)
       theMenu->addAction(action("EDIT_CMD"));
     bool isVisible = false;
-    foreach(FeaturePtr aFeature, aFeatures) {
-      if (myWorkshop->displayer()->isVisible(aFeature)) {
+    foreach(ObjectPtr aObject, aObjects) {
+      ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+      if (aRes && myWorkshop->displayer()->isVisible(aRes)) {
         isVisible = true;
         break;
       }

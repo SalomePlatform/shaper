@@ -20,7 +20,11 @@ class ModelAPI_ResultBody : public ModelAPI_Result
 {
 public:
   /// Returns the group identifier of this result
-  virtual std::string group()
+  virtual std::string groupName()
+    { return group(); }
+
+  /// Returns the group identifier of this result
+  static std::string group()
   {static std::string MY_GROUP = "Bodies"; return MY_GROUP;}
 
   /// Stores the shape (called by the execution method).
