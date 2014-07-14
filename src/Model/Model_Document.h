@@ -72,6 +72,10 @@ public:
   //! \param theLabel base label of the feature
   MODEL_EXPORT virtual FeaturePtr feature(TDF_Label& theLabel);
 
+  //! Returns the existing object: result or feature
+  //! \param theLabel base label of the object
+  MODEL_EXPORT virtual ObjectPtr object(TDF_Label& theLabel);
+
   //! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
 

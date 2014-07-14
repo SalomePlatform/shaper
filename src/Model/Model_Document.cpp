@@ -456,6 +456,29 @@ FeaturePtr Model_Document::feature(TDF_Label& theLabel)
   return FeaturePtr(); // not found
 }
 
+ObjectPtr Model_Document::object(TDF_Label& theLabel)
+{
+  // iterate all features, may be optimized later by keeping labels-map
+  std::vector<ObjectPtr>& aVec = myObjs[ModelAPI_Feature::group()];
+  vector<ObjectPtr>::iterator aFIter = aVec.begin();
+  for(; aFIter != aVec.end(); aFIter++) {
+    boost::shared_ptr<Model_Data> aData = 
+      boost::dynamic_pointer_cast<Model_Data>((*aFIter)->data());
+    if (aData->label().IsEqual(theLabel))
+      return *aFIter;
+    list<boost::shared_ptr<ModelAPI_Result> >& aResults = 
+      boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter)->results();
+    list<boost::shared_ptr<ModelAPI_Result> >::iterator aRIter = aResults.begin();
+    for(; aRIter != aResults.end(); aRIter++) {
+      boost::shared_ptr<Model_Data> aResData = 
+        boost::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
+      if (aResData->label().IsEqual(theLabel))
+        return *aRIter;
+    }
+  }
+  return FeaturePtr(); // not found
+}
+
 boost::shared_ptr<ModelAPI_Document> Model_Document::subDocument(string theDocID)
 {
   // just store sub-document identifier here to manage it later

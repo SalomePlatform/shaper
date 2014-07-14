@@ -17,8 +17,8 @@
 class ModelAPI_AttributeRefAttr : public ModelAPI_Attribute
 {
 public:
-  /// Returns true if this attribute references to a feature (not to the attribute)
-  MODELAPI_EXPORT virtual bool isFeature() = 0;
+  /// Returns true if this attribute references to a object (not to the attribute)
+  MODELAPI_EXPORT virtual bool isObject() = 0;
 
   /// Defines the reference to the attribute
   MODELAPI_EXPORT virtual void setAttr(boost::shared_ptr<ModelAPI_Attribute> theAttr) = 0;
@@ -26,11 +26,11 @@ public:
   /// Returns attribute referenced from this attribute
   MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attr() = 0;
 
-  /// Defines the reference to the feature
-  MODELAPI_EXPORT virtual void setFeature(FeaturePtr theFeature) = 0;
+  /// Defines the reference to the object
+  MODELAPI_EXPORT virtual void setObject(ObjectPtr theFeature) = 0;
 
-  /// Returns feature referenced from this attribute
-  MODELAPI_EXPORT virtual FeaturePtr feature() = 0;
+  /// Returns object referenced from this attribute
+  MODELAPI_EXPORT virtual ObjectPtr object() = 0;
 
   /// Returns the type of this class of attributes
   MODELAPI_EXPORT static std::string type() {return "RefAttr";}

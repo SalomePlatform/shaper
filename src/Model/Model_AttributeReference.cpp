@@ -10,11 +10,11 @@
 
 using namespace std;
 
-void Model_AttributeReference::setValue(FeaturePtr theFeature)
+void Model_AttributeReference::setValue(ObjectPtr theObject)
 {
-  if (!myIsInitialized || value() != theFeature) {
+  if (!myIsInitialized || value() != theObject) {
     boost::shared_ptr<Model_Data> aData = 
-      boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
+      boost::dynamic_pointer_cast<Model_Data>(theObject->data());
     if (myRef.IsNull()) {
       boost::shared_ptr<Model_Data> aMyData = 
         boost::dynamic_pointer_cast<Model_Data>(owner()->data());
@@ -26,14 +26,14 @@ void Model_AttributeReference::setValue(FeaturePtr theFeature)
   }
 }
 
-FeaturePtr Model_AttributeReference::value()
+ObjectPtr Model_AttributeReference::value()
 {
   if (!myRef.IsNull()) {
     boost::shared_ptr<Model_Document> aDoc = 
       boost::dynamic_pointer_cast<Model_Document>(owner()->document());
     if (aDoc) {
       TDF_Label aRefLab = myRef->Get();
-      return aDoc->feature(aRefLab);
+      return aDoc->object(aRefLab);
     }
   }
   // not initialized

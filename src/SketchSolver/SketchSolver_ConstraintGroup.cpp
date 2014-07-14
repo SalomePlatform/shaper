@@ -121,11 +121,12 @@ bool SketchSolver_ConstraintGroup::isInteract(
         theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[i])
       );
     if (!aCAttrRef) continue;
-    if (!aCAttrRef->isFeature() && 
+    if (!aCAttrRef->isObject() && 
         myEntityAttrMap.find(aCAttrRef->attr()) != myEntityAttrMap.end())
       return true;
-    if (aCAttrRef->isFeature() && 
-        myEntityFeatMap.find(aCAttrRef->feature()) != myEntityFeatMap.end())
+    if (aCAttrRef->isObject() && 
+        myEntityFeatMap.find(boost::dynamic_pointer_cast<ModelAPI_Feature>(aCAttrRef->object())) 
+        != myEntityFeatMap.end())
       return true;
   }
 
@@ -193,14 +194,15 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
     // For the length constraint the start and end points of the line should be added to the entities list instead of line
     if (aConstrType == SLVS_C_PT_PT_DISTANCE && theConstraint->getKind().compare(SKETCH_CONSTRAINT_LENGTH_KIND) == 0)
     {
-      boost::shared_ptr<ModelAPI_Data> aData = aConstrAttr->feature()->data();
+      boost::shared_ptr<ModelAPI_Data> aData = aConstrAttr->object()->data();
       aConstrEnt[indAttr]   = changeEntity(aData->attribute(LINE_ATTR_START));
       aConstrEnt[indAttr+1] = changeEntity(aData->attribute(LINE_ATTR_END));
-      myEntityFeatMap[aConstrAttr->feature()] = 0; // measured object is added into the map of objects to avoid problems with interaction betwee constraint and group
+       // measured object is added into the map of objects to avoid problems with interaction betwee constraint and group
+      myEntityFeatMap[boost::dynamic_pointer_cast<ModelAPI_Feature>(aConstrAttr->object())] = 0;
       break; // there should be no other entities
     }
-    else if (aConstrAttr->isFeature())
-      aConstrEnt[indAttr] = changeEntity(aConstrAttr->feature());
+    else if (aConstrAttr->isObject())
+      aConstrEnt[indAttr] = changeEntity(boost::dynamic_pointer_cast<ModelAPI_Feature>(aConstrAttr->object()));
     else
       aConstrEnt[indAttr] = changeEntity(aConstrAttr->attr());
   }
@@ -1142,7 +1144,7 @@ void SketchSolver_ConstraintGroup::updateRelatedConstraints(
       bool isUpd = (*anAttrIter == theEntity);
       boost::shared_ptr<ModelAPI_AttributeRefAttr> aRefAttr = 
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
-      if (aRefAttr && !aRefAttr->isFeature() && aRefAttr->attr() == theEntity)
+      if (aRefAttr && !aRefAttr->isObject() && aRefAttr->attr() == theEntity)
         isUpd = true;
 
       if (isUpd)
@@ -1171,7 +1173,7 @@ void SketchSolver_ConstraintGroup::updateRelatedConstraints(
     {
       boost::shared_ptr<ModelAPI_AttributeRefAttr> aRefAttr = 
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
-      if (aRefAttr && aRefAttr->isFeature() && aRefAttr->feature() == theFeature)
+      if (aRefAttr && aRefAttr->isObject() && aRefAttr->object() == theFeature)
       {
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
         ModelAPI_EventCreator::get()->sendUpdated(aConstrIter->first, anEvent);

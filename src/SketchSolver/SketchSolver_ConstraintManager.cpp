@@ -352,8 +352,8 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
 
     boost::shared_ptr<ModelAPI_AttributeRefList> aWPFeatures =
       boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aWP->data()->attribute(SKETCH_ATTR_FEATURES));
-    std::list< FeaturePtr > aFeaturesList = aWPFeatures->list();
-    std::list< FeaturePtr >::const_iterator anIter;
+    std::list< ObjectPtr >& aFeaturesList = aWPFeatures->list();
+    std::list< ObjectPtr >::const_iterator anIter;
     for (anIter = aFeaturesList.begin(); anIter != aFeaturesList.end(); anIter++)
       if (*anIter == theConstraint)
         return aWP; // workplane is found
