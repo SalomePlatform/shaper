@@ -123,9 +123,10 @@ void Config_XMLReader::readRecursively(xmlNodePtr theParent)
   xmlNodePtr aNode = theParent->xmlChildrenNode;
   for(; aNode; aNode = aNode->next) {
     //Still no text processing in features...
-    if(isElementNode(aNode)) {
-      processNode(aNode);
+    if(!isElementNode(aNode)) {
+      continue;
     }
+    processNode(aNode);
     if (processChildren(aNode)) {
       readRecursively(aNode);
     }
@@ -163,12 +164,12 @@ void Config_XMLReader::processValidator(xmlNodePtr theNode)
   getValidatorInfo(theNode, aValidatorId, aValidatorParameters);
   aMessage.setValidatorId(aValidatorId);
   aMessage.setValidatorParameters(aValidatorParameters);
-  if(isNode(theNode->parent, NODE_FEATURE, NULL)) {
-    aMessage.setFeatureId(getProperty(theNode->parent, _ID));
+  xmlNodePtr aFeatureOrWdgNode = theNode->parent;
+  if(isNode(aFeatureOrWdgNode, NODE_FEATURE, NULL)) {
+    aMessage.setFeatureId(getProperty(aFeatureOrWdgNode, _ID));
   } else {
-    xmlNodePtr aWdgNode = theNode->parent;
-    aMessage.setAttributeId(getProperty(aWdgNode, _ID));
-    aMessage.setFeatureId(getProperty(aWdgNode->parent, _ID));
+    aMessage.setAttributeId(getProperty(aFeatureOrWdgNode, _ID));
+    aMessage.setFeatureId(myCurrentFeature);
   }
   aEvLoop->send(aMessage);
 }
