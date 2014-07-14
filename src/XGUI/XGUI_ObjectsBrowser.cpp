@@ -46,9 +46,9 @@ void XGUI_DataTree::onSelectionChanged(const QItemSelection& theSelected,
   XGUI_DocumentDataModel* aModel = dataModel();
   QModelIndexList::const_iterator aIt;
   for (aIt = aIndexes.constBegin(); aIt != aIndexes.constEnd(); ++aIt) {
-    ObjectPtr aFeature = aModel->feature(*aIt);
-    if (aFeature)
-      mySelectedData.append(aFeature);
+    ObjectPtr aObject = aModel->object(*aIt);
+    if (aObject)
+      mySelectedData.append(aObject);
   }
   emit selectionChanged();
 }
@@ -86,10 +86,7 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
     ObjectPtr aFeature = mySelectedData.first();
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
     aMgr->rootDocument()->startOperation();
-    if (!XGUI_Tools::isModelObject(aFeature))
-      aFeature->data()->setName(qPrintable(aRes));
-    else
-      boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature)->setName(qPrintable(aRes));
+    aFeature->data()->setName(qPrintable(aRes));
     aMgr->rootDocument()->finishOperation();
   }
 }
@@ -235,7 +232,7 @@ void XGUI_ObjectsBrowser::closeDocNameEditing(bool toSave)
 }
 
 //***************************************************
-void XGUI_ObjectsBrowser::activatePart(const ObjectPtr& thePart)
+void XGUI_ObjectsBrowser::activatePart(const ResultPartPtr& thePart)
 {
   if (thePart) {
     QModelIndex aIndex = myDocModel->partIndex(thePart);
@@ -248,7 +245,7 @@ void XGUI_ObjectsBrowser::activatePart(const ObjectPtr& thePart)
       if (myDocModel->activePartIndex().isValid()) {
         myTreeView->setExpanded(aIndex.parent(), true);
         myTreeView->setExpanded(aIndex, true);
-        onActivePartChanged(myDocModel->feature(aIndex));
+        onActivePartChanged(myDocModel->object(aIndex));
       } else {
         onActivePartChanged(ObjectPtr());
       }
@@ -266,7 +263,7 @@ void XGUI_ObjectsBrowser::activatePart(const ObjectPtr& thePart)
 //***************************************************
 void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent) 
 {
-  myObjectsList = myTreeView->selectedFeatures();
+  myObjectsList = myTreeView->selectedObjects();
   bool toEnable = myObjectsList.size() > 0;
   foreach(QAction* aCmd, actions()) {
     aCmd->setEnabled(toEnable);

@@ -70,12 +70,13 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
     case ConstructFolder:
       return QIcon(":pictures/constr_folder.png");
     case ConstructObject:
-      {
-        DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
-        ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultConstruction::group(), theIndex.row());
-        if (aObject)
-          return QIcon(XGUI_Workshop::featureIcon(aObject->getKind()));
-      }
+      return QIcon(":pictures/constr_object.png");
+      //{
+      //  DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+      //  ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultConstruction::group(), theIndex.row());
+      //  if (aObject)
+      //    return QIcon(XGUI_Workshop::featureIcon(aObject->getKind()));
+      //}
     }
     break;
 
@@ -238,7 +239,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
         DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
         ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
         if (aObject)
-          return boost::dynamic_pointer_cast<ModelAPI_Object>(aObject)->getName().c_str();
+          return boost::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
       }
     case ParamsFolder:
       return tr("Parameters") + QString(" (%1)").arg(rowCount(theIndex));
@@ -277,16 +278,18 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
     case BodiesFolder:
       return QIcon(":pictures/constr_folder.png");
     case ConstructObject:
-      {
-        ObjectPtr aObject = partDocument()->object(ModelAPI_ResultConstruction::group(), theIndex.row());
-        if (aObject)
-          return QIcon(XGUI_Workshop::featureIcon(aObject->getKind()));
-      }
+      return QIcon(":pictures/constr_object.png");
+      //{
+      //  ObjectPtr aObject = partDocument()->object(ModelAPI_ResultConstruction::group(), theIndex.row());
+      //  if (aObject)
+      //    return QIcon(XGUI_Workshop::featureIcon(aObject->getKind()));
+      //}
     case HistoryObject:
       {
         ObjectPtr aObject = partDocument()->object(ModelAPI_Feature::group(), theIndex.row() - 3);
-        if (aObject)
-          return QIcon(XGUI_Workshop::featureIcon(aObject->getKind()));
+        FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+        if (aFeature)
+          return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
       }
     }
    break;
@@ -435,10 +438,11 @@ QModelIndex XGUI_PartDataModel::findGroup(const std::string& theGroup) const
   return QModelIndex();
 }
 
-ObjectPtr XGUI_PartDataModel::part() const
+ResultPartPtr XGUI_PartDataModel::part() const
 {
   DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
-  return aRootDoc->object(ModelAPI_ResultPart::group(), myId);
+  ObjectPtr aObj = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
+  return boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
 }
 
 QModelIndex XGUI_PartDataModel::objectIndex(const ObjectPtr& theObject) const

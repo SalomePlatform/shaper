@@ -5,6 +5,7 @@
 #include "XGUI_Constants.h"
 #include <Events_Listener.h>
 #include <ModuleBase_Definitions.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <QObject>
 #include <QMap>
@@ -110,13 +111,13 @@ public:
 
   //! Activates or deactivates a part
   //! If PartPtr is Null pointer then PartSet will be activated
-  void activatePart(FeaturePtr theFeature);
+  void activatePart(ResultPartPtr theFeature);
 
   //! Delete features
-  void deleteFeatures(QFeatureList theList);
+  void deleteObjects(const QList<ObjectPtr>& theList);
 
   //! Show the given features in 3d Viewer
-  void showFeatures(QFeatureList theList, bool isVisible);
+  void showObjects(const QList<ObjectPtr>& theList, bool isVisible);
 
   ModuleBase_IModule* module() const { return myModule; }
 
@@ -142,7 +143,7 @@ public slots:
   void hideObjectBrowser();
 
   void onFeatureTriggered();
-  void changeCurrentDocument(FeaturePtr thePart);
+  void changeCurrentDocument(ObjectPtr theObj);
 
   void activateLastPart();
 

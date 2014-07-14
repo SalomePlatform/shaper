@@ -5,6 +5,7 @@
 #include "XGUI.h"
 #include <ModuleBase_Definitions.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <QWidget>
 #include <QTreeView>
@@ -76,7 +77,7 @@ public:
   XGUI_DataTree* treeView() const { return myTreeView; }
 
   //! Activates currently selected part. Signal activePartChanged will not be sent
-  void activatePart(const ObjectPtr& thePart);
+  void activatePart(const ResultPartPtr& thePart);
 
   void rebuildDataTree();
 

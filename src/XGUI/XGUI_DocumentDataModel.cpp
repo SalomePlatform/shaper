@@ -193,7 +193,8 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
     {
       int aOffset = historyOffset();
       DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
-      ObjectPtr aFeature = aRootDoc->object(ModelAPI_Feature::group(), theIndex.row() - aOffset);
+      ObjectPtr aObj = aRootDoc->object(ModelAPI_Feature::group(), theIndex.row() - aOffset);
+      FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
       if (!aFeature)
         return QVariant();
       switch (theRole) {
@@ -372,7 +373,7 @@ ObjectPtr XGUI_DocumentDataModel::object(const QModelIndex& theIndex) const
     return ObjectPtr();
 
   const XGUI_FeaturesModel* aModel = dynamic_cast<const XGUI_FeaturesModel*>(aIndex->model());
-  return aModel->feature(*aIndex);
+  return aModel->object(*aIndex);
 }
 
 bool XGUI_DocumentDataModel::insertRows(int theRow, int theCount, const QModelIndex& theParent)
@@ -475,11 +476,11 @@ bool XGUI_DocumentDataModel::activatedIndex(const QModelIndex& theIndex)
   return false;
 }
 
-ObjectPtr XGUI_DocumentDataModel::activePart() const
+ResultPartPtr XGUI_DocumentDataModel::activePart() const
 {
   if (myActivePart) 
     return myActivePart->part();
-  return ObjectPtr();
+  return ResultPartPtr();
 }
 
 void XGUI_DocumentDataModel::deactivatePart() 
@@ -500,7 +501,7 @@ Qt::ItemFlags XGUI_DocumentDataModel::flags(const QModelIndex& theIndex) const
   return aFlags;
 }
 
-QModelIndex XGUI_DocumentDataModel::partIndex(const ObjectPtr& theObject) const 
+QModelIndex XGUI_DocumentDataModel::partIndex(const ResultPartPtr& theObject) const 
 {
   int aRow = -1;
   XGUI_PartModel* aModel = 0;
@@ -517,7 +518,7 @@ QModelIndex XGUI_DocumentDataModel::partIndex(const ObjectPtr& theObject) const
   return QModelIndex();
 }
 
-QModelIndex XGUI_DocumentDataModel::featureIndex(const ObjectPtr theObject) const
+QModelIndex XGUI_DocumentDataModel::objectIndex(const ObjectPtr theObject) const
 {
   // Check that this feature belongs to root document
   DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
@@ -532,7 +533,7 @@ QModelIndex XGUI_DocumentDataModel::featureIndex(const ObjectPtr theObject) cons
       }
       return index(aId + historyOffset(), 0, QModelIndex());
     } else {
-      QModelIndex aIndex = myModel->featureIndex(theObject);
+      QModelIndex aIndex = myModel->objectIndex(theObject);
       return aIndex.isValid()? 
         createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex)) :
         QModelIndex();
@@ -546,7 +547,7 @@ QModelIndex XGUI_DocumentDataModel::featureIndex(const ObjectPtr theObject) cons
       }
     }
     if (aPartModel) {
-      QModelIndex aIndex = aPartModel->featureIndex(theObject);
+      QModelIndex aIndex = aPartModel->objectIndex(theObject);
       return aIndex.isValid()? 
         createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex)) :
         QModelIndex();
