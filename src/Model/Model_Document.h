@@ -102,6 +102,11 @@ public:
   /// Creates a part results
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultPart> createPart();
 
+  //! Returns a feature by result (owner of result)
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
+    feature(const boost::shared_ptr<ModelAPI_Result>& theResult);
+
+
 protected:
 
   //! Returns (creates if needed) the group label
