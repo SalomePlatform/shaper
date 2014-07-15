@@ -39,6 +39,7 @@ class QWidget;
 class QDockWidget;
 
 class Model_ObjectUpdatedMessage;
+class Model_ObjectDeletedMessage;
 class QAction;
 
 /**\class XGUI_Workshop
@@ -156,6 +157,7 @@ protected:
   void onFeatureUpdatedMsg(const Model_ObjectUpdatedMessage* theMsg);
   void onFeatureCreatedMsg(const Model_ObjectUpdatedMessage* theMsg);
   void onFeatureRedisplayMsg(const Model_ObjectUpdatedMessage* theMsg);
+  void onObjectDeletedMsg(const Model_ObjectDeletedMessage* theMsg);
 
   QList<QAction*> getModuleCommands() const;
 
