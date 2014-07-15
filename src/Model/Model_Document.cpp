@@ -358,13 +358,13 @@ FeaturePtr Model_Document::addFeature(std::string theID)
       initData(aFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
       // keep the feature ID to restore document later correctly
       TDataStd_Comment::Set(aFeatureLab, aFeature->getKind().c_str());
+      setUniqueName(aFeature);
       myObjs[ModelAPI_Feature::group()].push_back(aFeature);
       // store feature in the history of features array
       if (aFeature->isInHistory()) {
         AddToRefArray(aFeaturesLab, aFeatureLab);
       }
     }
-    setUniqueName(aFeature);
     if (!aFeature->isAction()) {// do not add action to the data model
       // event: feature is added
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
@@ -698,7 +698,11 @@ void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData
   theResult->setDoc(aThis);
   initData(theResult, boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
     label().Father().FindChild(TAG_FEATURE_RESULTS), theResultIndex);
-  theResult->data()->setName(theFeatureData->name());
+  if (theResult->data()->name().empty()) { // if was not initialized, generate event and set a name
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+    ModelAPI_EventCreator::get()->sendUpdated(theResult, anEvent);
+    theResult->data()->setName(theFeatureData->name());
+  }
 }
 
 boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstruction(

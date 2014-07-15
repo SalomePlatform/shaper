@@ -31,9 +31,7 @@ void PartSetPlugin_Part::execute()
   // create a result only once
   if (results().empty()) {
     boost::shared_ptr<ModelAPI_ResultPart> aResult = document()->createPart(data());
-    document()->storeResult(data(), aResult);
-    if (aResult->data()->name().empty())
-      aResult->data()->setName(data()->name());
+    setResult(aResult);
   }
 }
 

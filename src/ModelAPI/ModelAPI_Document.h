@@ -97,10 +97,6 @@ public:
   virtual boost::shared_ptr<ModelAPI_ResultPart> createPart(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
 
-  //! Allows to store the result in the data tree of the document (attaches 'data' of result to tree)
-  virtual void storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
-    boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex = 0) = 0;
-
   //! Returns a feature by result (owner of result)
   virtual boost::shared_ptr<ModelAPI_Feature> feature(
     const boost::shared_ptr<ModelAPI_Result>& theResult) = 0;
