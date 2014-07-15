@@ -36,7 +36,7 @@ Model_ObjectUpdatedMessage::Model_ObjectUpdatedMessage(
   if (theObject) myObjects.insert(theObject);
 }
 
-std::set<ObjectPtr> Model_ObjectUpdatedMessage::features() const 
+std::set<ObjectPtr> Model_ObjectUpdatedMessage::objects() const 
 {
   return myObjects;
 }

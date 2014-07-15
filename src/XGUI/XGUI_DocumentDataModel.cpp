@@ -50,14 +50,18 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
   // Created object event *******************
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
     const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
-    std::set<ObjectPtr> aFeatures = aUpdMsg->features();
+    std::set<ObjectPtr> aObjects = aUpdMsg->objects();
 
     std::set<ObjectPtr>::const_iterator aIt;
-    for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
-      ObjectPtr aFeature = (*aIt);
-      DocumentPtr aDoc = aFeature->document();
+    for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+      ObjectPtr aObject = (*aIt);
+      FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+      if (aFeature && (!aFeature->isInHistory()))
+        continue;
+
+      DocumentPtr aDoc = aObject->document();
       if (aDoc == aRootDoc) {  // If root objects
-        if (aFeature->groupName().compare(ModelAPI_ResultPart::group()) == 0) { // Update only Parts group
+        if (aObject->groupName() == ModelAPI_ResultPart::group()) { // Update only Parts group
           // Add a new part
           int aStart = myPartModels.size();
           XGUI_PartDataModel* aModel = new XGUI_PartDataModel(this);
@@ -65,7 +69,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
           myPartModels.append(aModel);
           insertRow(aStart, partFolderNode());
         } else { // Update top groups (other except parts
-          QModelIndex aIndex = myModel->findParent(aFeature);
+          QModelIndex aIndex = myModel->findParent(aObject);
           int aStart = myModel->rowCount(aIndex) - 1;
           aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
           insertRow(aStart, aIndex);
@@ -80,7 +84,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
           }
         }
         if (aPartModel) {
-          QModelIndex aIndex = aPartModel->findParent(aFeature);
+          QModelIndex aIndex = aPartModel->findParent(aObject);
           int aStart = aPartModel->rowCount(aIndex) - 1;
           aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
           insertRow(aStart, aIndex);

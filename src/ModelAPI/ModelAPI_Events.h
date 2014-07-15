@@ -36,7 +36,7 @@ protected:
 
 public:
   /// Returns the feature that has been updated
-  virtual std::set<ObjectPtr> features() const = 0;
+  virtual std::set<ObjectPtr> objects() const = 0;
 
   //! Creates a new empty group (to store it in the loop before flush)
   virtual Events_MessageGroup* newEmpty() = 0;

@@ -65,7 +65,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
   {
     const ModelAPI_ObjectUpdatedMessage* anUpdateMsg = 
       dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
-    std::set< ObjectPtr > aFeatures = anUpdateMsg->features();
+    std::set< ObjectPtr > aFeatures = anUpdateMsg->objects();
 
     bool isModifiedEvt = 
       theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);

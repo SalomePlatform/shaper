@@ -42,7 +42,7 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
   {
     const ModelAPI_ObjectUpdatedMessage* aUpdMsg = 
       dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
-    std::set<ObjectPtr > aFeatures = aUpdMsg->features();
+    std::set<ObjectPtr > aFeatures = aUpdMsg->objects();
     std::set<ObjectPtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
     for (; anIt != aLast; anIt++) {
       ObjectPtr aObject = *anIt;
