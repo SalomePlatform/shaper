@@ -10,26 +10,29 @@
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
-/// Coincidence constraint kind
-const std::string SKETCH_CONSTRAINT_COINCIDENCE_KIND("SketchConstraintCoincidence");
-
 /** \class SketchPlugin_ConstraintCoincidence
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint which defines equivalence of two points
  *
  *  These constraint has two attributes:
- *  CONSTRAINT_ATTR_ENTITY_A and CONSTRAINT_ATTR_ENTITY_B
+ *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
 class SketchPlugin_ConstraintCoincidence: public SketchPlugin_Constraint
 {
 public:
+  /// Parallel constraint kind
+  inline static const std::string& ID()
+  {
+    static const std::string MY_CONSTRAINT_COINCIDENCE_ID("SketchConstraintCoincidence");
+    return MY_CONSTRAINT_COINCIDENCE_ID;
+  }
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SKETCH_CONSTRAINT_COINCIDENCE_KIND; return MY_KIND;}
+  {static std::string MY_KIND = SketchPlugin_ConstraintCoincidence::ID(); return MY_KIND;}
 
   /// \brief Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
-  {static std::string MY_GROUP = SKETCH_KIND; return MY_GROUP;}
+  {static std::string MY_GROUP = SketchPlugin_Sketch::ID(); return MY_GROUP;}
 
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();

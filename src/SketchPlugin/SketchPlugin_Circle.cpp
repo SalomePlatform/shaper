@@ -24,8 +24,8 @@ SketchPlugin_Circle::SketchPlugin_Circle()
 
 void SketchPlugin_Circle::initAttributes()
 {
-  data()->addAttribute(CIRCLE_ATTR_CENTER, GeomDataAPI_Point2D::type());
-  data()->addAttribute(CIRCLE_ATTR_RADIUS, ModelAPI_AttributeDouble::type());
+  data()->addAttribute(SketchPlugin_Circle::CENTER_ID(), GeomDataAPI_Point2D::type());
+  data()->addAttribute(SketchPlugin_Circle::RADIUS_ID(), ModelAPI_AttributeDouble::type());
 }
 
 void SketchPlugin_Circle::execute()
@@ -40,9 +40,9 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Circle::preview()
 
     // compute a circle point in 3D view
     boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CIRCLE_ATTR_CENTER));
+      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Circle::CENTER_ID()));
     AttributeDoublePtr aRadiusAttr = 
-      boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(CIRCLE_ATTR_RADIUS));
+      boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Circle::RADIUS_ID()));
     if (aCenterAttr->isInitialized() && aRadiusAttr->isInitialized()) {
       boost::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
       // make a visible point
@@ -51,7 +51,7 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Circle::preview()
 
       // make a visible circle
       boost::shared_ptr<GeomDataAPI_Dir> aNDir = 
-        boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->data()->attribute(SKETCH_ATTR_NORM));
+        boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
       bool aHasPlane = aNDir && !(aNDir->x() == 0 && aNDir->y() == 0 && aNDir->z() == 0);
       if (aHasPlane) {
         boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
@@ -82,7 +82,7 @@ void SketchPlugin_Circle::move(double theDeltaX, double theDeltaY)
     return;
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Circle::CENTER_ID()));
   aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
 }
 
@@ -90,7 +90,7 @@ double SketchPlugin_Circle::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2
 {
   boost::shared_ptr<ModelAPI_Data> aData = data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CIRCLE_ATTR_CENTER));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Circle::CENTER_ID()));
 
   return aPoint->pnt()->distance(thePoint);
 }

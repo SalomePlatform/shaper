@@ -142,9 +142,9 @@ void PartSet_OperationFeatureEdit::mouseDoubleClick(QMouseEvent* theEvent, Handl
       Handle(AIS_DimensionOwner) anOwner = Handle(AIS_DimensionOwner)::DownCast(aFeaturePrs.owner());
       if (!anOwner.IsNull() && anOwner->SelectionMode() == AIS_DSM_Text) {
         bool isValid;
-        double aValue = PartSet_Tools::featureValue(feature(), CONSTRAINT_ATTR_VALUE, isValid);
+        double aValue = PartSet_Tools::featureValue(feature(), SketchPlugin_Constraint::VALUE(), isValid);
         if (isValid) {
-          ModuleBase_WidgetEditor::editFeatureValue(feature(), CONSTRAINT_ATTR_VALUE);
+          ModuleBase_WidgetEditor::editFeatureValue(feature(), SketchPlugin_Constraint::VALUE());
           flushUpdated();
         }
       }

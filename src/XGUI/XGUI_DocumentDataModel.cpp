@@ -56,7 +56,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
       FeaturePtr aFeature = (*aIt);
       DocumentPtr aDoc = aFeature->document();
       if (aDoc == aRootDoc) {  // If root objects
-        if (aFeature->getGroup().compare(PARTS_GROUP) == 0) { // Update only Parts group
+        if (aFeature->getGroup().compare(ModelAPI_Document::PARTS_GROUP()) == 0) { // Update only Parts group
           // Add a new part
           int aStart = myPartModels.size();
           XGUI_PartDataModel* aModel = new XGUI_PartDataModel(this);
@@ -96,7 +96,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
     for (aIt = aGroups.begin(); aIt != aGroups.end(); ++aIt) {
       std::string aGroup = (*aIt);
       if (aDoc == aRootDoc) {  // If root objects
-        if (aGroup.compare(PARTS_GROUP) == 0) { // Updsate only Parts group
+        if (aGroup.compare(ModelAPI_Document::PARTS_GROUP()) == 0) { // Updsate only Parts group
           int aStart = myPartModels.size() - 1;
           removeSubModel(aStart);
           removeRow(aStart, partFolderNode());
@@ -151,7 +151,7 @@ void XGUI_DocumentDataModel::rebuildDataTree()
   beginResetModel();
   clearModelIndexes();
 
-  int aNbParts = aRootDoc->size(PARTS_GROUP);
+  int aNbParts = aRootDoc->size(ModelAPI_Document::PARTS_GROUP());
   if (myPartModels.size() != aNbParts) { // resize internal models
     while (myPartModels.size() > aNbParts) {
       delete myPartModels.last();
@@ -192,7 +192,7 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
     {
       int aOffset = historyOffset();
       DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
-      FeaturePtr aFeature = aRootDoc->feature(FEATURES_GROUP, theIndex.row() - aOffset);
+      FeaturePtr aFeature = aRootDoc->feature(ModelAPI_Document::FEATURES_GROUP(), theIndex.row() - aOffset);
       if (!aFeature)
         return QVariant();
       switch (theRole) {
@@ -236,7 +236,7 @@ int XGUI_DocumentDataModel::rowCount(const QModelIndex& theParent) const
     // Size of external models
     int aVal = historyOffset();
     // Plus history size
-    aVal += aRootDoc->size(FEATURES_GROUP);
+    aVal += aRootDoc->size(ModelAPI_Document::FEATURES_GROUP());
     return aVal;
   }
   if (theParent.internalId() == PartsFolder) {
@@ -364,7 +364,7 @@ FeaturePtr XGUI_DocumentDataModel::feature(const QModelIndex& theIndex) const
   if (theIndex.internalId() == HistoryNode) {
     DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
     int aOffset = historyOffset();
-    return aRootDoc->feature(FEATURES_GROUP, theIndex.row() - aOffset);
+    return aRootDoc->feature(ModelAPI_Document::FEATURES_GROUP(), theIndex.row() - aOffset);
   }
   QModelIndex* aIndex = toSourceModelIndex(theIndex);
   if (!isSubModel(aIndex->model())) 
@@ -527,8 +527,8 @@ QModelIndex XGUI_DocumentDataModel::featureIndex(const FeaturePtr theFeature) co
     // This feature belongs to histrory or top model
     if (theFeature->isInHistory()) {
       int aId;
-      for (aId = 0; aId < aRootDoc->size(FEATURES_GROUP); aId++) {
-        if (theFeature == aRootDoc->feature(FEATURES_GROUP, aId))
+      for (aId = 0; aId < aRootDoc->size(ModelAPI_Document::FEATURES_GROUP()); aId++) {
+        if (theFeature == aRootDoc->feature(ModelAPI_Document::FEATURES_GROUP(), aId))
           break;
       }
       return index(aId + historyOffset(), 0, QModelIndex());

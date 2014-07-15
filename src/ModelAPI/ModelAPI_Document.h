@@ -12,16 +12,6 @@
 
 class ModelAPI_Feature;
 
-/// Common groups identifiers
-/// Group of parameters
-static const std::string PARAMETERS_GROUP = "Parameters";
-/// Group of constructions
-static const std::string CONSTRUCTIONS_GROUP = "Construction";
-/// Group of parts
-static const std::string PARTS_GROUP = "Parts";
-/// All created fetaures of the document (a history)
-static const std::string FEATURES_GROUP = "Features";
-
 /**\class Model_Document
  * \ingroup DataModel
  * \brief Document for internal data structure of any object storage.
@@ -31,6 +21,32 @@ static const std::string FEATURES_GROUP = "Features";
 class ModelAPI_Document
 {
 public:
+  //! Common groups identifiers
+  //! Group of parameters
+  inline static const std::string& PARAMETERS_GROUP()
+  {
+    static const std::string MY_PARAMETERS_GROUP = "Parameters";
+    return MY_PARAMETERS_GROUP;
+  }
+  //! Group of constructions
+  inline static const std::string& CONSTRUCTIONS_GROUP()
+  {
+    static const std::string MY_CONSTRUCTIONS_GROUP = "Construction";
+    return MY_CONSTRUCTIONS_GROUP;
+  }
+  //! Group of parts
+  inline static const std::string& PARTS_GROUP()
+  {
+    static const std::string MY_PARTS_GROUP = "Parts";
+    return MY_PARTS_GROUP;
+  }
+  //! All created fetaures of the document (a history)
+  inline static const std::string& FEATURES_GROUP()
+  {
+    static const std::string MY_FEATURES_GROUP = "Features";
+    return MY_FEATURES_GROUP;
+  }
+
   //! Loads the OCAF document from the file.
   //! \param theFileName full name of the file to load
   //! \param theStudyID identifier of the SALOME study to associate with loaded file

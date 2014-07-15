@@ -296,7 +296,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const Model_FeatureUpdatedMessage* the
   bool isDisplayed = false;
   for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
     FeaturePtr aFeature = (*aIt);
-    if (aFeature->getKind() != PARTSET_PART_KIND) {
+    if (aFeature->getKind() != PartSetPlugin_Part::ID()) {
       isDisplayed = myDisplayer->redisplay(aFeature, false);
     }
   }
@@ -314,7 +314,7 @@ void XGUI_Workshop::onFeatureCreatedMsg(const Model_FeatureUpdatedMessage* theMs
   bool isDisplayed = false;
   for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
     FeaturePtr aFeature = (*aIt);
-    if (aFeature->getKind() == PARTSET_PART_KIND) {
+    if (aFeature->getKind() == PartSetPlugin_Part::ID()) {
       aHasPart = true;
       //break;
     } else {
@@ -903,7 +903,8 @@ void XGUI_Workshop::activateLastPart()
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   DocumentPtr aDoc = aMgr->rootDocument();
-  FeaturePtr aLastPart = aDoc->feature(PARTS_GROUP, aDoc->size(PARTS_GROUP) - 1, true);
+  FeaturePtr aLastPart = aDoc->feature(ModelAPI_Document::PARTS_GROUP(),
+                                       aDoc->size(ModelAPI_Document::PARTS_GROUP()) - 1, true);
   activatePart(aLastPart);
 }
 
@@ -918,7 +919,7 @@ void XGUI_Workshop::deleteFeatures(QFeatureList theList)
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
     aMgr->rootDocument()->startOperation();
     foreach (FeaturePtr aFeature, theList) {
-      if (aFeature->getKind() == PARTSET_PART_KIND) {
+      if (aFeature->getKind() == PartSetPlugin_Part::ID()) {
         DocumentPtr aDoc;
         if (!XGUI_Tools::isModelObject(aFeature)) {
           aDoc = aFeature->data()->docRef("PartDocument")->value();

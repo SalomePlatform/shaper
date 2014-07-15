@@ -10,12 +10,6 @@
 #include "SketchPlugin_Feature.h"
 #include <list>
 
-/// Point feature kind
-const std::string SKETCH_POINT_KIND("SketchPoint");
-
-/// Coordinates of the point
-const std::string POINT_ATTR_COORD("PointCoordindates");
-
 /**\class SketchPlugin_Point
  * \ingroup DataModel
  * \brief Feature for creation of a new point.
@@ -23,13 +17,25 @@ const std::string POINT_ATTR_COORD("PointCoordindates");
 class SketchPlugin_Point: public SketchPlugin_Feature
 {
 public:
+  /// Point feature kind
+  inline static const std::string& ID()
+  {
+    static const std::string MY_POINT_ID("SketchPoint");
+    return MY_POINT_ID;
+  }
+  /// Coordinates of the point
+  inline static const std::string& COORD_ID()
+  {
+    static const std::string MY_COORD_ID("PointCoordindates");
+    return MY_COORD_ID;
+  }
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SKETCH_POINT_KIND; return MY_KIND;}
+  {static std::string MY_KIND = SketchPlugin_Point::ID(); return MY_KIND;}
 
   /// Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
-  {static std::string MY_GROUP = SKETCH_KIND; return MY_GROUP;}
+  {static std::string MY_GROUP = SketchPlugin_Sketch::ID(); return MY_GROUP;}
 
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();

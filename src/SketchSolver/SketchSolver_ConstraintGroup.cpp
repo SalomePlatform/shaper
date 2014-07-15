@@ -31,7 +31,20 @@
 /// Tolerance for value of parameters
 const double tolerance = 1.e-10;
 
-const std::string ERROR_SOLVE_CONSTRAINTS = "Conflicting constraints";
+/*
+ * Collects all sketch solver error' codes
+ * as inline static functions
+ * TODO: Move this class into a separate file
+ */
+class SketchSolver_Error {
+public:
+  /// The value parameter for the constraint
+  inline static const std::string& CONSTRAINTS()
+  {
+    static const std::string MY_ERROR_VALUE("Conflicting constraints");
+    return MY_ERROR_VALUE;
+  }
+};
 
 /// This value is used to give unique index to the groups
 static Slvs_hGroup myGroupIndexer = 0;
@@ -118,7 +131,7 @@ bool SketchSolver_ConstraintGroup::isInteract(
   {
     boost::shared_ptr<ModelAPI_AttributeRefAttr> aCAttrRef =
       boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        theConstraint->data()->attribute(CONSTRAINT_ATTRIBUTES[i])
+        theConstraint->data()->attribute(SketchPlugin_Constraint::ATTRIBUTE(i))
       );
     if (!aCAttrRef) continue;
     if (!aCAttrRef->isFeature() && 
@@ -166,7 +179,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
   // Create constraint parameters
   double aDistance = 0.0; // scalar value of the constraint
   AttributeDoublePtr aDistAttr =
-    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theConstraint->data()->attribute(CONSTRAINT_ATTR_VALUE));
+    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theConstraint->data()->attribute(SketchPlugin_Constraint::VALUE()));
   if (aDistAttr)
   {
     aDistance = aDistAttr->value();
@@ -191,11 +204,11 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
     if (!aConstrAttr) continue;
 
     // For the length constraint the start and end points of the line should be added to the entities list instead of line
-    if (aConstrType == SLVS_C_PT_PT_DISTANCE && theConstraint->getKind().compare(SKETCH_CONSTRAINT_LENGTH_KIND) == 0)
+    if (aConstrType == SLVS_C_PT_PT_DISTANCE && theConstraint->getKind().compare(SketchPlugin_ConstraintLength::ID()) == 0)
     {
       boost::shared_ptr<ModelAPI_Data> aData = aConstrAttr->feature()->data();
-      aConstrEnt[indAttr]   = changeEntity(aData->attribute(LINE_ATTR_START));
-      aConstrEnt[indAttr+1] = changeEntity(aData->attribute(LINE_ATTR_END));
+      aConstrEnt[indAttr]   = changeEntity(aData->attribute(SketchPlugin_Line::START_ID()));
+      aConstrEnt[indAttr+1] = changeEntity(aData->attribute(SketchPlugin_Line::END_ID()));
       myEntityFeatMap[aConstrAttr->feature()] = 0; // measured object is added into the map of objects to avoid problems with interaction betwee constraint and group
       break; // there should be no other entities
     }
@@ -343,10 +356,10 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
     const std::string& aFeatureKind = aFeature->getKind();
 
     // Line
-    if (aFeatureKind.compare(SKETCH_LINE_KIND) == 0)
+    if (aFeatureKind.compare(SketchPlugin_Line::ID()) == 0)
     {
-      Slvs_hEntity aStart = changeEntity(aFeature->data()->attribute(LINE_ATTR_START));
-      Slvs_hEntity aEnd   = changeEntity(aFeature->data()->attribute(LINE_ATTR_END));
+      Slvs_hEntity aStart = changeEntity(aFeature->data()->attribute(SketchPlugin_Line::START_ID()));
+      Slvs_hEntity aEnd   = changeEntity(aFeature->data()->attribute(SketchPlugin_Line::END_ID()));
 
       if (isEntExists)
         return aEntIter->second;
@@ -358,10 +371,10 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
       return aLineEntity.h;
     }
     // Circle
-    else if (aFeatureKind.compare(SKETCH_CIRCLE_KIND) == 0)
+    else if (aFeatureKind.compare(SketchPlugin_Circle::ID()) == 0)
     {
-      Slvs_hEntity aCenter = changeEntity(aFeature->data()->attribute(CIRCLE_ATTR_CENTER));
-      Slvs_hEntity aRadius = changeEntity(aFeature->data()->attribute(CIRCLE_ATTR_RADIUS));
+      Slvs_hEntity aCenter = changeEntity(aFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
+      Slvs_hEntity aRadius = changeEntity(aFeature->data()->attribute(SketchPlugin_Circle::RADIUS_ID()));
 
       if (isEntExists)
         return aEntIter->second;
@@ -374,11 +387,11 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
       return aCircleEntity.h;
     }
     // Arc
-    else if (aFeatureKind.compare(SKETCH_ARC_KIND) == 0)
+    else if (aFeatureKind.compare(SketchPlugin_Arc::ID()) == 0)
     {
-      Slvs_hEntity aCenter = changeEntity(aFeature->data()->attribute(ARC_ATTR_CENTER));
-      Slvs_hEntity aStart  = changeEntity(aFeature->data()->attribute(ARC_ATTR_START));
-      Slvs_hEntity aEnd    = changeEntity(aFeature->data()->attribute(ARC_ATTR_END));
+      Slvs_hEntity aCenter = changeEntity(aFeature->data()->attribute(SketchPlugin_Arc::CENTER_ID()));
+      Slvs_hEntity aStart  = changeEntity(aFeature->data()->attribute(SketchPlugin_Arc::START_ID()));
+      Slvs_hEntity aEnd    = changeEntity(aFeature->data()->attribute(SketchPlugin_Arc::END_ID()));
 
       if (isEntExists)
         return aEntIter->second;
@@ -390,9 +403,9 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
       return anArcEntity.h;
     }
     // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
-    else if (aFeatureKind.compare(SKETCH_POINT_KIND) == 0)
+    else if (aFeatureKind.compare(SketchPlugin_Point::ID()) == 0)
     {
-      Slvs_hEntity aPoint = changeEntity(aFeature->data()->attribute(POINT_ATTR_COORD));
+      Slvs_hEntity aPoint = changeEntity(aFeature->data()->attribute(SketchPlugin_Point::COORD_ID()));
 
       if (isEntExists)
         return aEntIter->second;
@@ -473,7 +486,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeNormal(
 bool SketchSolver_ConstraintGroup::addWorkplane(
                 boost::shared_ptr<SketchPlugin_Feature> theSketch)
 {
-  if (myWorkplane.h || theSketch->getKind().compare(SKETCH_KIND) != 0)
+  if (myWorkplane.h || theSketch->getKind().compare(SketchPlugin_Sketch::ID()) != 0)
     return false; // the workplane already exists or the function parameter is not Sketch
 
   mySketch = theSketch;
@@ -489,10 +502,10 @@ bool SketchSolver_ConstraintGroup::addWorkplane(
 bool SketchSolver_ConstraintGroup::updateWorkplane()
 {
   // Get parameters of workplane
-  boost::shared_ptr<ModelAPI_Attribute> aDirX    = mySketch->data()->attribute(SKETCH_ATTR_DIRX);
-  boost::shared_ptr<ModelAPI_Attribute> aDirY    = mySketch->data()->attribute(SKETCH_ATTR_DIRY);
-  boost::shared_ptr<ModelAPI_Attribute> aNorm    = mySketch->data()->attribute(SKETCH_ATTR_NORM);
-  boost::shared_ptr<ModelAPI_Attribute> anOrigin = mySketch->data()->attribute(SKETCH_ATTR_ORIGIN);
+  boost::shared_ptr<ModelAPI_Attribute> aDirX    = mySketch->data()->attribute(SketchPlugin_Sketch::DIRX_ID());
+  boost::shared_ptr<ModelAPI_Attribute> aDirY    = mySketch->data()->attribute(SketchPlugin_Sketch::DIRY_ID());
+  boost::shared_ptr<ModelAPI_Attribute> aNorm    = mySketch->data()->attribute(SketchPlugin_Sketch::NORM_ID());
+  boost::shared_ptr<ModelAPI_Attribute> anOrigin = mySketch->data()->attribute(SketchPlugin_Sketch::ORIGIN_ID());
   // Transform them into SolveSpace format
   Slvs_hEntity aNormalWP = changeNormal(aDirX, aDirY, aNorm);
   if (!aNormalWP) return false;
@@ -570,7 +583,7 @@ void SketchSolver_ConstraintGroup::resolveConstraints()
         updateRelatedConstraints(anEntIter->first);
   }
   else if (!myConstraints.empty())
-    Events_Error::send(ERROR_SOLVE_CONSTRAINTS, this);
+    Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
 
   removeTemporaryConstraints();
   myNeedToSolve = false;
@@ -758,7 +771,7 @@ bool SketchSolver_ConstraintGroup::updateGroup()
   {
     if (!aConstrIter->first->data()->isValid())
     {
-      if (aConstrIter->first->getKind().compare(SKETCH_CONSTRAINT_COINCIDENCE_KIND) == 0)
+      if (aConstrIter->first->getKind().compare(SketchPlugin_ConstraintCoincidence::ID()) == 0)
         isCCRemoved = true;
       std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::reverse_iterator
         aCopyIter = aConstrIter++;

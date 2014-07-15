@@ -510,7 +510,7 @@ void PartSet_Module::editFeature(FeaturePtr theFeature)
   if (!theFeature)
     return;
 
-//  if (theFeature->getKind() == SKETCH_KIND) {
+//  if (theFeature->getKind() == SketchPlugin_Sketch::ID()) {
     FeaturePtr aFeature = theFeature;
     if (XGUI_Tools::isModelObject(aFeature)) {
       ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);

@@ -26,37 +26,37 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
 
 FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
 {
-  if (theFeatureID == SKETCH_KIND) {
+  if (theFeatureID == SketchPlugin_Sketch::ID()) {
     return FeaturePtr(new SketchPlugin_Sketch);
   }
-  else if (theFeatureID == SKETCH_POINT_KIND) {
+  else if (theFeatureID == SketchPlugin_Point::ID()) {
     return FeaturePtr(new SketchPlugin_Point);
   }
-  else if (theFeatureID == SKETCH_LINE_KIND) {
+  else if (theFeatureID == SketchPlugin_Line::ID()) {
     return FeaturePtr(new SketchPlugin_Line);
   }
-  else if (theFeatureID == SKETCH_CIRCLE_KIND) {
+  else if (theFeatureID == SketchPlugin_Circle::ID()) {
     return FeaturePtr(new SketchPlugin_Circle);
   }
-  else if (theFeatureID == SKETCH_ARC_KIND) {
+  else if (theFeatureID == SketchPlugin_Arc::ID()) {
     return FeaturePtr(new SketchPlugin_Arc);
   }
-  else if (theFeatureID == SKETCH_CONSTRAINT_COINCIDENCE_KIND) {
+  else if (theFeatureID == SketchPlugin_ConstraintCoincidence::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintCoincidence);
   }
-  else if (theFeatureID == SKETCH_CONSTRAINT_DISTANCE_KIND) {
+  else if (theFeatureID == SketchPlugin_ConstraintDistance::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintDistance);
   }
-  else if (theFeatureID == SKETCH_CONSTRAINT_LENGTH_KIND) {
+  else if (theFeatureID == SketchPlugin_ConstraintLength::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintLength);
   }
-  else if (theFeatureID == SKETCH_CONSTRAINT_PARALLEL_KIND) {
+  else if (theFeatureID == SketchPlugin_ConstraintParallel::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintParallel);
   }
-  else if (theFeatureID == SKETCH_CONSTRAINT_PERPENDICULAR_KIND) {
+  else if (theFeatureID == SketchPlugin_ConstraintPerpendicular::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintPerpendicular);
   }
-  else if (theFeatureID == SKETCH_CONSTRAINT_RADIUS_KIND) {
+  else if (theFeatureID == SketchPlugin_ConstraintRadius::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintRadius);
   }
   // feature of such kind is not found

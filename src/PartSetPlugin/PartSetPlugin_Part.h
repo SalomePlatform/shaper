@@ -8,12 +8,6 @@
 #include "PartSetPlugin.h"
 #include <ModelAPI_Feature.h>
 
-/// Part kind
-const std::string PARTSET_PART_KIND("Part");
-
-/// part reference attribute
-const std::string PART_ATTR_DOC_REF = "PartDocument";
-
 /**\class PartSetPlugin_Part
  * \ingroup DataModel
  * \brief Feature for creation of the new part in PartSet.
@@ -21,9 +15,21 @@ const std::string PART_ATTR_DOC_REF = "PartDocument";
 class PartSetPlugin_Part: public ModelAPI_Feature
 {
 public:
+  /// Part kind
+  inline static const std::string& ID()
+  {
+    static const std::string MY_PART_KIND("Part");
+    return MY_PART_KIND;
+  }
+  /// part reference attribute
+  inline static const std::string& DOC_REF()
+  {
+    static const std::string MY_DOC_REF("PartDocument");
+    return MY_DOC_REF;
+  }
   /// Returns the kind of a feature
   PARTSETPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = PARTSET_PART_KIND; return MY_KIND;}
+  {static std::string MY_KIND = PartSetPlugin_Part::ID(); return MY_KIND;}
 
   /// Returns to which group in the document must be added feature
   PARTSETPLUGIN_EXPORT virtual const std::string& getGroup() 

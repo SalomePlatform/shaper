@@ -7,9 +7,6 @@
 
 #include "PartSetPlugin_Part.h"
 
-/// the reference to copy: reference to the attribute
-const std::string PART_DUPLICATE_ATTR_REF = "Origin";
-
 /**\class PartSetPlugin_Duplicate
  * \ingroup DataModel
  * \brief Duplicates the active part (not root). Creates a new "part" feature.
@@ -17,6 +14,12 @@ const std::string PART_DUPLICATE_ATTR_REF = "Origin";
 class PartSetPlugin_Duplicate: public PartSetPlugin_Part
 {
 public:
+  /// the reference to copy: reference to the attribute
+  inline static const std::string& DOC_REF()
+  {
+    static const std::string MY_DUPLICATE_ID("Origin");
+    return MY_DUPLICATE_ID;
+  }
   /// Makes a new part, copy of active
   PartSetPlugin_Duplicate();
 

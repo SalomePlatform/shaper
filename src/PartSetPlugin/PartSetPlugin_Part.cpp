@@ -16,12 +16,12 @@ PartSetPlugin_Part::PartSetPlugin_Part()
 
 void PartSetPlugin_Part::initAttributes()
 {
-  data()->addAttribute(PART_ATTR_DOC_REF, ModelAPI_AttributeDocRef::type());
+  data()->addAttribute(PartSetPlugin_Part::DOC_REF(), ModelAPI_AttributeDocRef::type());
 }
 
 void PartSetPlugin_Part::execute() 
 {
-  boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->docRef(PART_ATTR_DOC_REF);
+  boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->docRef(PartSetPlugin_Part::DOC_REF());
   if (!aDocRef->value()) { // create a document if not yet created
     boost::shared_ptr<ModelAPI_Document> aPartSetDoc = 
       ModelAPI_PluginManager::get()->rootDocument();

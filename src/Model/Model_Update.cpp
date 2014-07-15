@@ -34,9 +34,9 @@ void Model_Update::processEvent(const Events_Message* theMessage)
   // iterate all features of features-documents to update them
   set<boost::shared_ptr<ModelAPI_Document> >::iterator aDIter = aDocs.begin();
   for(; aDIter != aDocs.end(); aDIter++) {
-    int aNbFeatures = (*aDIter)->size(FEATURES_GROUP);
+    int aNbFeatures = (*aDIter)->size(ModelAPI_Document::FEATURES_GROUP());
     for(int aFIndex = 0; aFIndex < aNbFeatures; aFIndex++) {
-      boost::shared_ptr<ModelAPI_Feature> aFeature = (*aDIter)->feature(FEATURES_GROUP, aFIndex);
+      boost::shared_ptr<ModelAPI_Feature> aFeature = (*aDIter)->feature(ModelAPI_Document::FEATURES_GROUP(), aFIndex);
       if (aFeature)
         updateFeature(aFeature);
     }

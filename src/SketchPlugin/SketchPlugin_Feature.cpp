@@ -30,7 +30,7 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
         dynamic_pointer_cast<SketchPlugin_Sketch>(document()->feature("Construction", a, true));
       if (aSketch) {
         std::list<FeaturePtr > aList = 
-          aSketch->data()->reflist(SKETCH_ATTR_FEATURES)->list();
+          aSketch->data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
         std::list<FeaturePtr >::iterator aSub = aList.begin();
         for(; aSub != aList.end(); aSub++) {
           if ((*aSub)->data()->isEqual(data())) {

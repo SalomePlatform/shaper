@@ -354,7 +354,7 @@ void Model_Document::addFeature(const FeaturePtr theFeature)
 
   boost::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
-  TDF_Label aFeaturesLab = groupLabel(FEATURES_GROUP);
+  TDF_Label aFeaturesLab = groupLabel(ModelAPI_Document::FEATURES_GROUP());
   TDF_Label aFeatureLab = aFeaturesLab.NewChild();
 
   // organize feature and data objects
@@ -440,7 +440,7 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
   // erase all attributes under the label of feature
   aFeatureLabel.ForgetAllAttributes();
   // remove it from the references array
-  RemoveFromRefArray(groupLabel(FEATURES_GROUP), aData->label());
+  RemoveFromRefArray(groupLabel(ModelAPI_Document::FEATURES_GROUP()), aData->label());
 
   // event: feature is added
   ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), theFeature->getGroup());
@@ -477,7 +477,7 @@ FeaturePtr Model_Document::feature(
       TDF_Label aFeatureLab = aRefs->Value(theIndex);
       FeaturePtr aFeature = feature(aFeatureLab);
 
-      if (theGroupID == FEATURES_GROUP || isOperation) { // just returns the feature from the history
+      if (theGroupID == ModelAPI_Document::FEATURES_GROUP() || isOperation) { // just returns the feature from the history
         return aFeature;
       } else { // create a new object from the group to return it
         Handle(TDataStd_Name) aName; // name of the object
@@ -537,7 +537,7 @@ void Model_Document::setUniqueName(FeaturePtr theFeature)
   string aName; // result
   // iterate all features but also iterate group of this feature if object is not in history
   list<string> aGroups;
-  aGroups.push_back(FEATURES_GROUP);
+  aGroups.push_back(ModelAPI_Document::FEATURES_GROUP());
   if (!theFeature->isInHistory()) {
     aGroups.push_back(theFeature->getGroup());
   }
@@ -588,7 +588,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   // update features
   vector<FeaturePtr >::iterator aFIter = myFeatures.begin();
   // and in parallel iterate labels of features
-  TDF_ChildIDIterator aFLabIter(groupLabel(FEATURES_GROUP), TDataStd_Comment::GetID());
+  TDF_ChildIDIterator aFLabIter(groupLabel(ModelAPI_Document::FEATURES_GROUP()), TDataStd_Comment::GetID());
   while(aFIter != myFeatures.end() || aFLabIter.More()) {
     static const int INFINITE_TAG = INT_MAX; // no label means that it exists somwhere in infinite
     int aFeatureTag = INFINITE_TAG; 
@@ -605,7 +605,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       aFIter = myFeatures.erase(aFIter);
       // event: model is updated
       if (aFeature->isInHistory()) {
-        ModelAPI_EventCreator::get()->sendDeleted(aThis, FEATURES_GROUP);
+        ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_Document::FEATURES_GROUP());
       }
       ModelAPI_EventCreator::get()->sendDeleted(aThis, aFeature->getGroup());
     } else if (aDSTag < aFeatureTag) { // a new feature is inserted

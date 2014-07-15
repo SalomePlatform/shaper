@@ -35,7 +35,7 @@ public:
   MODEL_EXPORT virtual const std::string& getKind() {return myRef->getKind();}
 
   /// Returns to which group in the document must be added feature
-  MODEL_EXPORT virtual const std::string& getGroup() {return FEATURES_GROUP;}
+  MODEL_EXPORT virtual const std::string& getGroup() {return ModelAPI_Document::FEATURES_GROUP();}
 
   /// Returns document this feature belongs to
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> document()

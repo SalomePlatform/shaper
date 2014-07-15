@@ -11,20 +11,6 @@
 #include <GeomAPI_Pln.h>
 #include <list>
 
-/// Sketch feature kind
-const std::string SKETCH_KIND("Sketch");
-
-/// Origin point of the sketcher in 3D space
-const std::string SKETCH_ATTR_ORIGIN("Origin");
-/// Vector X inside of the sketch plane
-const std::string SKETCH_ATTR_DIRX("DirX");
-/// Vector Y inside of the sketch plane
-const std::string SKETCH_ATTR_DIRY("DirY");
-/// Vector Z, normal to the sketch plane
-const std::string SKETCH_ATTR_NORM("Norm");
-/// All features of this sketch (list of references)
-const std::string SKETCH_ATTR_FEATURES("Features");
-
 /**\class SketchPlugin_Sketch
  * \ingroup DataModel
  * \brief Feature for creation of the new part in PartSet.
@@ -32,9 +18,46 @@ const std::string SKETCH_ATTR_FEATURES("Features");
 class SketchPlugin_Sketch: public SketchPlugin_Feature
 {
 public:
+  /// Sketch feature kind
+  inline static const std::string& ID()
+  {
+    static const std::string MY_SKETCH_ID("Sketch");
+    return MY_SKETCH_ID;
+  }
+  /// Origin point of the sketcher in 3D space
+  inline static const std::string& ORIGIN_ID()
+  {
+    static const std::string MY_ORIGIN_ID("Origin");
+    return MY_ORIGIN_ID;
+  }
+  /// Vector X inside of the sketch plane
+  inline static const std::string& DIRX_ID()
+  {
+    static const std::string MY_DIRX_ID("DirX");
+    return MY_DIRX_ID;
+  }
+  /// Vector Y inside of the sketch plane
+  inline static const std::string& DIRY_ID()
+  {
+    static const std::string MY_DIRY_ID("DirY");
+    return MY_DIRY_ID;
+  }
+  /// Vector Z, normal to the sketch plane
+  inline static const std::string& NORM_ID()
+  {
+    static const std::string MY_NORM_ID("Norm");
+    return MY_NORM_ID;
+  }
+  /// All features of this sketch (list of references)
+  inline static const std::string& FEATURES_ID()
+  {
+    static const std::string MY_FEATURES_ID("Features");
+    return MY_FEATURES_ID;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SKETCH_KIND; return MY_KIND;}
+  {static std::string MY_KIND = SketchPlugin_Sketch::ID(); return MY_KIND;}
 
   /// Returns to which group in the document must be added feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 

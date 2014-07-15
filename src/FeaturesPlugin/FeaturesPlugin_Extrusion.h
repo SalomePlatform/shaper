@@ -8,25 +8,37 @@
 #include "FeaturesPlugin.h"
 #include <ModelAPI_Feature.h>
 
-/// Extrusion kind
-const std::string FEATURES_EXTRUSION_KIND("Extrusion");
-
-/// attribute name of referenced face
-const std::string EXTRUSION_FACE = "extrusion_face";
-
-/// attribute name of extrusion size
-const std::string EXTRUSION_SIZE = "extrusion_size";
-
-/// attribute name of reverse direction
-const std::string EXTRUSION_REVERSE = "extrusion_reverse";
-
-
 class FeaturesPlugin_Extrusion: public ModelAPI_Feature
 {
 public:
+  /// Extrusion kind
+  inline static const std::string& ID()
+  {
+    static const std::string MY_EXTRUSION_ID("Extrusion");
+    return MY_EXTRUSION_ID;
+  }
+  /// attribute name of referenced face
+  inline static const std::string& FACE_ID()
+  {
+    static const std::string MY_FACE_ID("FeaturesPlugin_Extrusion::FACE_ID()");
+    return MY_FACE_ID;
+  }
+  /// attribute name of extrusion size
+  inline static const std::string& SIZE_ID()
+  {
+    static const std::string MY_SIZE_ID("FeaturesPlugin_Extrusion::SIZE_ID()");
+    return MY_SIZE_ID;
+  }
+    /// attribute name of reverse direction
+  inline static const std::string& REVERSE_ID()
+  {
+    static const std::string MY_REVERSE_ID("FeaturesPlugin_Extrusion::REVERSE_ID()");
+    return MY_REVERSE_ID;
+  }
+
   /// Returns the kind of a feature
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind() 
-  { static std::string MY_KIND = FEATURES_EXTRUSION_KIND; return MY_KIND; }
+  { static std::string MY_KIND = FeaturesPlugin_Extrusion::ID(); return MY_KIND; }
 
   /// Returns to which group in the document must be added feature
   FEATURESPLUGIN_EXPORT virtual const std::string& getGroup() 
