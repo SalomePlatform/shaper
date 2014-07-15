@@ -123,9 +123,13 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
             aMenu->addAction(action("HIDE_CMD"));
           else
             aMenu->addAction(action("SHOW_CMD"));
+        } else {
+          FeaturePtr aResult = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+          if (aResult) {
+            aMenu->addAction(action("DELETE_CMD"));
+          }
         }
       }
-      aMenu->addAction(action("DELETE_CMD"));
       aMenu->addSeparator();
 
     // Process Root object (document)

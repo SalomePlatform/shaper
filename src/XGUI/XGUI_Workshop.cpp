@@ -133,6 +133,7 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 
   activateModule();
   if (myMainWindow) {
@@ -233,12 +234,14 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
     const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
     onFeatureCreatedMsg(aUpdMsg);
+    return;
   }
 
   // Redisplay feature
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
     const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
     onFeatureRedisplayMsg(aUpdMsg);
+    return;
   }
 
   //Update property panel on corresponding message. If there is no current operation (no
@@ -247,6 +250,14 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     const Model_ObjectUpdatedMessage* anUpdateMsg =
         dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
     onFeatureUpdatedMsg(anUpdateMsg);
+    return;
+  }
+
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
+    const Model_ObjectDeletedMessage* aDelMsg =
+        dynamic_cast<const Model_ObjectDeletedMessage*>(theMessage);
+    onObjectDeletedMsg(aDelMsg);
+    return;
   }
 
   //An operation passed by message. Start it, process and commit.
@@ -296,7 +307,8 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const Model_ObjectUpdatedMessage* theM
   std::set<ObjectPtr>::const_iterator aIt;
   bool isDisplayed = false;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
-    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(*aIt);
+    ObjectPtr aObj = (*aIt);
+    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
     if (aRes) {
       isDisplayed = myDisplayer->redisplay(aRes, false);
     }
@@ -331,6 +343,12 @@ void XGUI_Workshop::onFeatureCreatedMsg(const Model_ObjectUpdatedMessage* theMsg
     // only when it is created everywere
     QTimer::singleShot(50, this, SLOT(activateLastPart()));
   }
+}
+
+//******************************************************
+void XGUI_Workshop::onObjectDeletedMsg(const Model_ObjectDeletedMessage* theMsg)
+{
+  //std::set<ObjectPtr> aFeatures = theMsg->objects();
 }
  
 //******************************************************
@@ -917,7 +935,7 @@ void XGUI_Workshop::deleteObjects(const QList<ObjectPtr>& theList)
                                                           tr("Seleted features will be deleted. Continue?"), 
                                                           QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
   // ToDo: definbe deleting method
-  /*  if (aRes == QMessageBox::Yes) {
+  if (aRes == QMessageBox::Yes) {
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
     aMgr->rootDocument()->startOperation();
     foreach (ObjectPtr aObj, theList) {
@@ -927,14 +945,16 @@ void XGUI_Workshop::deleteObjects(const QList<ObjectPtr>& theList)
         if (aDoc == aMgr->currentDocument()) {
           aDoc->close();
         }
-        aMgr->rootDocument()->removeFeature(aPart->owner());
+        //aMgr->rootDocument()->removeFeature(aPart->owner());
       } else {
-        aObj->document()->removeFeature(aObj);
+        FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+        if (aFeature)
+          aObj->document()->removeFeature(aFeature);
       }
     }
     myDisplayer->updateViewer();
     aMgr->rootDocument()->finishOperation();
-  }*/
+  }
 }
 
 //**************************************************************
