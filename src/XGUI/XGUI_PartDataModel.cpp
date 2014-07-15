@@ -390,7 +390,7 @@ DocumentPtr XGUI_PartDataModel::partDocument() const
 {
   DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
   ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
-  return aObject->data()->docRef("PartDocument")->value();
+  return aObject->document();
 }
  
 ObjectPtr XGUI_PartDataModel::object(const QModelIndex& theIndex) const

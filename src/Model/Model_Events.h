@@ -36,7 +36,7 @@ class Model_ObjectUpdatedMessage : public ModelAPI_ObjectUpdatedMessage {
 public:
 
   /// Returns the feature that has been updated
-  virtual std::set<ObjectPtr> features() const;
+  virtual std::set<ObjectPtr> objects() const;
 
   //! Creates a new empty group (to store it in the loop before flush)
   virtual Events_MessageGroup* newEmpty();

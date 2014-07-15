@@ -24,7 +24,7 @@ void Model_Update::processEvent(const Events_Message* theMessage)
 {
   const ModelAPI_ObjectUpdatedMessage* aMsg = 
     dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
-  myInitial = aMsg->features();
+  myInitial = aMsg->objects();
   // collect all documents involved into the update
   set<boost::shared_ptr<ModelAPI_Document> > aDocs;
   set<boost::shared_ptr<ModelAPI_Object> >::iterator aFIter = myInitial.begin();

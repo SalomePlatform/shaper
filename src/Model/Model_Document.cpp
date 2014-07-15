@@ -484,11 +484,19 @@ boost::shared_ptr<ModelAPI_Document> Model_Document::subDocument(std::string the
 ObjectPtr Model_Document::object(const std::string& theGroupID, const int theIndex)
 {
   if (theGroupID == ModelAPI_Feature::group()) {
-    std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = myObjs.find(theGroupID);
+    // features may be not in history but in the myObjs, so, iterate all
+    int anIndex = 0;
+    std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = 
+      myObjs.find(ModelAPI_Feature::group());
     if (aFind != myObjs.end()) {
-      int aSize = aFind->second.size();
-      if (theIndex >= 0 && theIndex < aSize)
-        return aFind->second[theIndex];
+      std::vector<ObjectPtr>::iterator aFIter = aFind->second.begin();
+      for(; aFIter != aFind->second.end(); aFIter++) {
+        if ((*aFIter)->isInHistory()) {
+          if (theIndex == anIndex)
+            return *aFIter;
+          anIndex++;
+        }
+      }
     }
   } else {
     // iterate all features in order to find the needed result
@@ -518,9 +526,16 @@ int Model_Document::size(const std::string& theGroupID)
 {
   int aResult = 0;
   if (theGroupID == ModelAPI_Feature::group()) {
-    std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = myObjs.find(theGroupID);
+    // features may be not in history but in the myObjs, so, iterate all
+    std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = 
+      myObjs.find(ModelAPI_Feature::group());
     if (aFind != myObjs.end()) {
-      aResult = aFind->second.size();
+      std::vector<ObjectPtr>::iterator aFIter = aFind->second.begin();
+      for(; aFIter != aFind->second.end(); aFIter++) {
+        if ((*aFIter)->isInHistory()) {
+          aResult++;
+        }
+      }
     }
   } else {
     // iterate all features in order to find the needed result

@@ -274,7 +274,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 //******************************************************
 void XGUI_Workshop::onFeatureUpdatedMsg(const Model_ObjectUpdatedMessage* theMsg)
 {
-  std::set<ObjectPtr> aFeatures = theMsg->features();
+  std::set<ObjectPtr> aFeatures = theMsg->objects();
   if (myOperationMgr->hasOperation())
   {
     FeaturePtr aCurrentFeature = myOperationMgr->currentOperation()->feature();
@@ -292,10 +292,10 @@ void XGUI_Workshop::onFeatureUpdatedMsg(const Model_ObjectUpdatedMessage* theMsg
 //******************************************************
 void XGUI_Workshop::onFeatureRedisplayMsg(const Model_ObjectUpdatedMessage* theMsg)
 {
-  std::set<ObjectPtr> aFeatures = theMsg->features();
+  std::set<ObjectPtr> aObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
   bool isDisplayed = false;
-  for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
+  for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(*aIt);
     if (aRes) {
       isDisplayed = myDisplayer->redisplay(aRes, false);
@@ -308,7 +308,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const Model_ObjectUpdatedMessage* theM
 //******************************************************
 void XGUI_Workshop::onFeatureCreatedMsg(const Model_ObjectUpdatedMessage* theMsg)
 {
-  std::set<ObjectPtr> aFeatures = theMsg->features();
+  std::set<ObjectPtr> aFeatures = theMsg->objects();
 
   std::set<ObjectPtr>::const_iterator aIt;
   bool aHasPart = false;
