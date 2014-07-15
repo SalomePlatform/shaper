@@ -88,11 +88,14 @@ public:
   virtual ~ModelAPI_Document() {}
 
   /// Creates a construction cresults
-  virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction() = 0;
+  virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   /// Creates a body results
-  virtual boost::shared_ptr<ModelAPI_ResultBody> createBody() = 0;
+  virtual boost::shared_ptr<ModelAPI_ResultBody> createBody(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   /// Creates a part results
-  virtual boost::shared_ptr<ModelAPI_ResultPart> createPart() = 0;
+  virtual boost::shared_ptr<ModelAPI_ResultPart> createPart(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
 
   //! Allows to store the result in the data tree of the document (attaches 'data' of result to tree)
   virtual void storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,

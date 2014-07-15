@@ -91,16 +91,15 @@ public:
   //! Returns the number of features in the group
   MODEL_EXPORT virtual int size(const std::string& theGroupID);
 
-  //! Allows to store the result in the data tree of the document (attaches 'data' of result to tree)
-  MODEL_EXPORT virtual void storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
-    boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex = 0);
-
   /// Creates a construction cresults
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction();
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a body results
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultBody> createBody();
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultBody> createBody(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a part results
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultPart> createPart();
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultPart> createPart(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
 
   //! Returns a feature by result (owner of result)
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
@@ -130,6 +129,9 @@ protected:
   //! Initializes the data fields of the feature
   void Model_Document::initData(ObjectPtr theObj, TDF_Label& theLab, const int theTag);
 
+  //! Allows to store the result in the data tree of the document (attaches 'data' of result to tree)
+  MODEL_EXPORT virtual void storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
+    boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex = 0);
 
 
   friend class Model_Application;

@@ -46,7 +46,8 @@ void SketchPlugin_Line::execute()
       // make linear edge
       boost::shared_ptr<GeomAPI_Shape> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
       // store the result
-      boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
+      boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
+        document()->createConstruction(data());
       aConstr->setShape(anEdge);
       setResult(aConstr);
     }

@@ -374,13 +374,6 @@ FeaturePtr Model_Document::addFeature(std::string theID)
   return aFeature;
 }
 
-void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
-  boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex)
-{
-  initData(theResult, boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
-    label().Father().FindChild(TAG_FEATURE_RESULTS), theResultIndex);
-}
-
 /// Appenad to the array of references a new referenced label.
 /// If theIndex is not -1, removes element at thisindex, not theReferenced.
 /// \returns the index of removed element
@@ -697,21 +690,38 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
     setCheckTransactions(true);
 }
 
-boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstruction()
+void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
+  boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex)
+{
+  boost::shared_ptr<ModelAPI_Document> aThis = 
+    Model_Application::getApplication()->getDocument(myID);
+  theResult->setDoc(aThis);
+  initData(theResult, boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
+    label().Father().FindChild(TAG_FEATURE_RESULTS), theResultIndex);
+  theResult->data()->setName(theFeatureData->name());
+}
+
+boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstruction(
+  const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
   boost::shared_ptr<ModelAPI_ResultConstruction> aResult(new Model_ResultConstruction());
+  storeResult(theFeatureData, aResult);
   return aResult;
 }
 
-boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody()
+boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody(
+  const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
   boost::shared_ptr<ModelAPI_ResultBody> aResult(new Model_ResultBody());
+  storeResult(theFeatureData, aResult);
   return aResult;
 }
 
-boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart()
+boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
+  const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
   boost::shared_ptr<ModelAPI_ResultPart> aResult(new Model_ResultPart());
+  storeResult(theFeatureData, aResult);
   return aResult;
 }
 

@@ -29,7 +29,7 @@ void ConstructionPlugin_Point::execute()
   boost::shared_ptr<GeomAPI_Pnt> aPnt(new GeomAPI_Pnt(
     data()->real(POINT_ATTR_X)->value(), data()->real(POINT_ATTR_Y)->value(), data()->real(POINT_ATTR_Z)->value()));
 
-  boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
+  boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
   aConstr->setShape(GeomAlgoAPI_PointBuilder::point(aPnt));
-  results().push_back(aConstr);
+  setResult(aConstr);
 }

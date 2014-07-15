@@ -75,6 +75,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++)
       {
         FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFeatIter);
+        if (!aFeature) continue;
         // Only sketches and constraints can be added by Create event
         const std::string& aFeatureKind = aFeature->getKind();
         if (aFeatureKind.compare(SKETCH_KIND) == 0)
@@ -92,10 +93,10 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
         else
         {
           // Sketch plugin features can be only updated
-          boost::shared_ptr<SketchPlugin_Feature> aFeature =
+          boost::shared_ptr<SketchPlugin_Feature> aSFeature =
             boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-          if (aFeature)
-            updateEntity(aFeature);
+          if (aSFeature)
+            updateEntity(aSFeature);
         }
       }
     }

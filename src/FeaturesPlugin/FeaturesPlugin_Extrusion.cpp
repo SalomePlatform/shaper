@@ -44,8 +44,7 @@ void FeaturesPlugin_Extrusion::execute()
   double aSize = data()->real(EXTRUSION_SIZE)->value();
   if (data()->boolean(EXTRUSION_REVERSE)->value())
     aSize = -aSize;
-  boost::shared_ptr<ModelAPI_ResultBody> aResult = document()->createBody();
+  boost::shared_ptr<ModelAPI_ResultBody> aResult = document()->createBody(data());
   aResult->store(GeomAlgoAPI_Extrusion::makeExtrusion(aFace, aSize));
-  document()->storeResult(data(), aResult);
   setResult(aResult);
 }

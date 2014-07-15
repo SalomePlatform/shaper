@@ -45,7 +45,8 @@ void SketchPlugin_Sketch::execute()
     addPlane(0, 1, 0, aFaces); // XZ plane
     addPlane(0, 0, 1, aFaces); // XY plane
     boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aFaces);
-    boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
+    boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
+      document()->createConstruction(data());
     aConstr->setShape(aCompound);
     setResult(aConstr);
     return;
@@ -91,7 +92,7 @@ void SketchPlugin_Sketch::execute()
 
   aLoops.insert(aLoops.end(), aWires.begin(), aWires.end());
   boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aLoops);
-  boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction();
+  boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
   aConstr->setShape(aCompound);
   setResult(aConstr);
 }
