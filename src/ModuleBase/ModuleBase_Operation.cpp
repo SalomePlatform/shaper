@@ -93,12 +93,12 @@ void ModuleBase_Operation::afterCommitOperation()
 
 void ModuleBase_Operation::flushUpdated()
 {
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 }
 
 void ModuleBase_Operation::flushCreated()
 {
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_CREATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
 }
 
 FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)

@@ -28,9 +28,9 @@ Handle(AIS_InteractiveContext) XGUI_ModuleConnector::AISContext() const
 }
 
 
-QFeatureList XGUI_ModuleConnector::selectedFeatures() const
+QList<ObjectPtr> XGUI_ModuleConnector::selectedObjects() const
 {
-  return myWorkshop->selector()->selection()->selectedFeatures();
+  return myWorkshop->selector()->selection()->selectedObjects();
 }
 
 ModuleBase_IModule* XGUI_ModuleConnector::module() const

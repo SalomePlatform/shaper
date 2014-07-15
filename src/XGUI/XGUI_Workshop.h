@@ -5,6 +5,7 @@
 #include "XGUI_Constants.h"
 #include <Events_Listener.h>
 #include <ModuleBase_Definitions.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <QObject>
 #include <QMap>
@@ -37,7 +38,7 @@ class Config_PointerMessage;
 class QWidget;
 class QDockWidget;
 
-class Model_FeatureUpdatedMessage;
+class Model_ObjectUpdatedMessage;
 class QAction;
 
 /**\class XGUI_Workshop
@@ -110,13 +111,13 @@ public:
 
   //! Activates or deactivates a part
   //! If PartPtr is Null pointer then PartSet will be activated
-  void activatePart(FeaturePtr theFeature);
+  void activatePart(ResultPartPtr theFeature);
 
   //! Delete features
-  void deleteFeatures(QFeatureList theList);
+  void deleteObjects(const QList<ObjectPtr>& theList);
 
   //! Show the given features in 3d Viewer
-  void showFeatures(QFeatureList theList, bool isVisible);
+  void showObjects(const QList<ObjectPtr>& theList, bool isVisible);
 
   ModuleBase_IModule* module() const { return myModule; }
 
@@ -142,7 +143,7 @@ public slots:
   void hideObjectBrowser();
 
   void onFeatureTriggered();
-  void changeCurrentDocument(FeaturePtr thePart);
+  void changeCurrentDocument(ObjectPtr theObj);
 
   void activateLastPart();
 
@@ -152,9 +153,9 @@ protected:
   void connectWithOperation(ModuleBase_Operation* theOperation);
   void saveDocument(QString theName);
 
-  void onFeatureUpdatedMsg(const Model_FeatureUpdatedMessage* theMsg);
-  void onFeatureCreatedMsg(const Model_FeatureUpdatedMessage* theMsg);
-  void onFeatureRedisplayMsg(const Model_FeatureUpdatedMessage* theMsg);
+  void onFeatureUpdatedMsg(const Model_ObjectUpdatedMessage* theMsg);
+  void onFeatureCreatedMsg(const Model_ObjectUpdatedMessage* theMsg);
+  void onFeatureRedisplayMsg(const Model_ObjectUpdatedMessage* theMsg);
 
   QList<QAction*> getModuleCommands() const;
 

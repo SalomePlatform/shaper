@@ -9,6 +9,7 @@
 #include <ModelAPI_Feature.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_AISObject.h>
+#include <ModelAPI_Document.h>
 
 class SketchPlugin_Sketch;
 class GeomAPI_Pnt2d;
@@ -22,19 +23,18 @@ class Handle_AIS_InteractiveObject;
 class SketchPlugin_Feature: public ModelAPI_Feature
 {
 public:
-  /// Returns the sketch preview
-  /// \param theSketch the owner of this feature
-  /// \return the built preview
-  SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview() = 0;
-
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
                                 boost::shared_ptr<GeomAPI_AISObject> thePrevious) = 0;
 
+  /// Simple creation of interactive object by the result of the object
+  static boost::shared_ptr<GeomAPI_AISObject> simpleAISObject(
+    boost::shared_ptr<ModelAPI_Result> theRes, boost::shared_ptr<GeomAPI_AISObject> thePrevious);
+
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
   SKETCHPLUGIN_EXPORT virtual const void addSub(
-    const FeaturePtr& theFeature) = 0;
+    const FeaturePtr& theFeature) {};
 
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
   SKETCHPLUGIN_EXPORT virtual bool isInHistory() {return false;}
@@ -49,15 +49,6 @@ public:
   virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) = 0;
 
 protected:
-  /// Set the shape to the internal preview field
-  /// \param theShape a preview shape
-  void setPreview(const boost::shared_ptr<GeomAPI_Shape>& theShape); ///< the preview shape
-  /// Return the shape from the internal preview field
-  /// \return theShape a preview shape
-  const boost::shared_ptr<GeomAPI_Shape>& getPreview() const;
-  /// Common method for other features to produce AIS shape
-  boost::shared_ptr<GeomAPI_AISObject> prepareAISShape(
-                      boost::shared_ptr<GeomAPI_AISObject> thePrevious);
   /// Sets the higher-level feature for the sub-feature (sketch for line)
   void setSketch(SketchPlugin_Sketch* theSketch) {mySketch = theSketch;}
   /// Returns the sketch of this feature

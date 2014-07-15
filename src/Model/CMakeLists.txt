@@ -6,7 +6,6 @@ SET(PROJECT_HEADERS
     Model_Document.h
     Model_PluginManager.h
     Model_Data.h
-    Model_Object.h
     Model_AttributeDouble.h
     Model_AttributeDocRef.h
     Model_AttributeReference.h
@@ -16,6 +15,9 @@ SET(PROJECT_HEADERS
     Model_Events.h
     Model_Update.h
     Model_Validator.h
+    Model_ResultBody.h
+    Model_ResultConstruction.h
+    Model_ResultPart.h
 )
 
 SET(PROJECT_SOURCES
@@ -23,7 +25,6 @@ SET(PROJECT_SOURCES
     Model_Document.cpp
     Model_PluginManager.cpp
     Model_Data.cpp
-    Model_Object.cpp
     Model_AttributeDouble.cpp
     Model_AttributeDocRef.cpp
     Model_AttributeReference.cpp
@@ -33,6 +34,9 @@ SET(PROJECT_SOURCES
     Model_Events.cpp
     Model_Update.cpp
     Model_Validator.cpp
+    Model_ResultBody.cpp
+    Model_ResultConstruction.cpp
+    Model_ResultPart.cpp
 )
 
 SET(PROJECT_LIBRARIES

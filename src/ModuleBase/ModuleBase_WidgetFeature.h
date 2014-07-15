@@ -40,9 +40,9 @@ public:
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed
-  virtual bool storeValue(FeaturePtr theFeature) const;
+  virtual bool storeValue(ObjectPtr theObject) const;
 
-  virtual bool restoreValue(FeaturePtr theFeature);
+  virtual bool restoreValue(ObjectPtr theObject);
 
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
@@ -56,11 +56,11 @@ protected:
   /// Fill the widget values by given point
   /// \param thePoint the point
   /// \return the boolean result of the feature set
-  bool setFeature(const FeaturePtr& theFeature);
+  bool setFeature(const FeaturePtr& theObject);
 
   /// Returns current widget feature
   /// \return the feature
-  const FeaturePtr& feature() const { return myFeature; }
+  const FeaturePtr feature() const { return myFeature; }
 
   /// Returns the widget editor
   /// \return the editor

@@ -73,28 +73,30 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
                                              const std::list<ModuleBase_ViewerPrs>& theSelected,
                                              const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  FeaturePtr aFeature;
+  ResultPtr aFeature;
   if (!theHighlighted.empty())
-    aFeature = theHighlighted.front().feature();
+    aFeature = theHighlighted.front().result();
   if (!aFeature && !theSelected.empty()) // changed for a constrain
-    aFeature = theSelected.front().feature();
-
-  if (!aFeature || aFeature != feature())
+    aFeature = theSelected.front().result();
+  // TODO
+  /*if (!aFeature || aFeature != feature())
   {
     commit();
     emit featureConstructed(feature(), FM_Deactivation);
 
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
     if(aHasShift && !theHighlighted.empty()) {
-      QFeatureList aSelected;
+      QResultList aSelected;
+      // TODO
       aSelected.push_back(feature());
-      aSelected.push_back(theHighlighted.front().feature());
+      aSelected.push_back(theHighlighted.front().result());
       emit setSelection(aSelected);
     }
+    // TODO
     else if (aFeature) {
       restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
     }
-  }
+  }*/
 }
 
 void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
@@ -195,7 +197,7 @@ FeaturePtr PartSet_OperationFeatureEdit::createFeature(const bool /*theFlushMess
 
 void PartSet_OperationFeatureEdit::sendFeatures()
 {
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_MOVED);
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
 
   FeaturePtr aFeature = feature();
   ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);

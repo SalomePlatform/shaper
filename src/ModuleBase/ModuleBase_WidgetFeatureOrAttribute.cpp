@@ -47,7 +47,8 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
                          dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue) {
       boost::shared_ptr<GeomAPI_Pnt2d> aValuePoint = aFeatureValue->point();
-      FeaturePtr aValueFeature = aFeatureValue->feature();
+      //TODO
+/*      FeaturePtr aValueFeature = aFeatureValue->feature();
       if (aValueFeature) {
         isDone = setFeature(aValueFeature);
       }
@@ -66,7 +67,7 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
         }
         if (aFPoint)
           isDone = setAttribute(aFPoint);
-      }
+      }*/
     }
   }
   return isDone;
@@ -80,12 +81,12 @@ bool ModuleBase_WidgetFeatureOrAttribute::storeValue(FeaturePtr theFeature) cons
 
   ModuleBase_WidgetFeatureOrAttribute* that = (ModuleBase_WidgetFeatureOrAttribute*) this;
   if (feature())
-    aRef->setFeature(feature());
+    aRef->setObject(feature());
   else if (myAttribute)
     aRef->setAttr(myAttribute);
 
   theFeature->execute();
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
   return true;
 }
@@ -96,18 +97,21 @@ bool ModuleBase_WidgetFeatureOrAttribute::restoreValue(FeaturePtr theFeature)
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
-  FeaturePtr aFeature = aRef->feature();
-  setFeature(aFeature);
-  myAttribute = aRef->attr();
+  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aRef->object());
+  if (aFeature) {
+    setFeature(aFeature);
+    myAttribute = aRef->attr();
 
-  std::string aText = "";
-  if (aFeature)
-    aText = aFeature->data()->getName().c_str();
-  else if (myAttribute)
-    aText = myAttribute->attributeType().c_str();
+    std::string aText = "";
+    if (aFeature)
+      aText = aFeature->data()->name().c_str();
+    else if (myAttribute)
+      aText = myAttribute->attributeType().c_str();
 
-  editor()->setText(aText.c_str());
-  return true;
+    editor()->setText(aText.c_str());
+    return true;
+  }
+  return false;
 }
 
 bool ModuleBase_WidgetFeatureOrAttribute::setAttribute(const boost::shared_ptr<ModelAPI_Attribute>& theAttribute)

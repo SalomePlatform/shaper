@@ -20,6 +20,11 @@ SET(PROJECT_HEADERS
     ModelAPI_Events.h
     ModelAPI_Validator.h
     ModelAPI_FeatureValidator.h
+    ModelAPI_Result.h
+    ModelAPI_ResultBody.h
+    ModelAPI_ResultConstruction.h
+    ModelAPI_ResultPart.h
+	ModelAPI_ResultParameters.h
 )
 
 SET(PROJECT_SOURCES

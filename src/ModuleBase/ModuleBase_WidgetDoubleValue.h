@@ -25,10 +25,10 @@ public:
   virtual ~ModuleBase_WidgetDoubleValue();
 
   /// Saves the internal parameters to the given feature
-  /// \param theFeature a model feature to be changed
-  virtual bool storeValue(FeaturePtr theFeature) const;
+  /// \param theObject a model feature to be changed
+  virtual bool storeValue(ObjectPtr theObject) const;
 
-  virtual bool restoreValue(FeaturePtr theFeature);
+  virtual bool restoreValue(ObjectPtr theObject);
 
   /// Returns list of widget controls
   /// \return a control list

@@ -20,11 +20,11 @@ class Model_AttributeReference : public ModelAPI_AttributeReference
 {
   Handle_TDF_Reference myRef; ///< references to the feature label
 public:
-  /// Defines the feature referenced from this attribute
-  MODEL_EXPORT virtual void setValue(FeaturePtr theFeature);
+  /// Defines the object referenced from this attribute
+  MODEL_EXPORT virtual void setValue(ObjectPtr theObject);
 
-  /// Returns feature referenced from this attribute
-  MODEL_EXPORT virtual FeaturePtr value();
+  /// Returns object referenced from this attribute
+  MODEL_EXPORT virtual ObjectPtr value();
 
 protected:
   /// Objects are created for features automatically

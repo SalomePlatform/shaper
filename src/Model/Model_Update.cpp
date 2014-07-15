@@ -17,72 +17,77 @@ Model_Update MY_INSTANCE; /// the only one instance initialized on load of the l
 
 Model_Update::Model_Update()
 {
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 }
 
 void Model_Update::processEvent(const Events_Message* theMessage)
 {
-  const ModelAPI_FeatureUpdatedMessage* aMsg = 
-    dynamic_cast<const ModelAPI_FeatureUpdatedMessage*>(theMessage);
+  const ModelAPI_ObjectUpdatedMessage* aMsg = 
+    dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
   myInitial = aMsg->features();
   // collect all documents involved into the update
   set<boost::shared_ptr<ModelAPI_Document> > aDocs;
-  set<boost::shared_ptr<ModelAPI_Feature> >::iterator aFIter = myInitial.begin();
+  set<boost::shared_ptr<ModelAPI_Object> >::iterator aFIter = myInitial.begin();
   for(; aFIter != myInitial.end(); aFIter++) {
     aDocs.insert((*aFIter)->document());
   }
   // iterate all features of features-documents to update them
   set<boost::shared_ptr<ModelAPI_Document> >::iterator aDIter = aDocs.begin();
   for(; aDIter != aDocs.end(); aDIter++) {
-    int aNbFeatures = (*aDIter)->size(ModelAPI_Document::FEATURES_GROUP());
+    int aNbFeatures = (*aDIter)->size(ModelAPI_Feature::group());
     for(int aFIndex = 0; aFIndex < aNbFeatures; aFIndex++) {
-      boost::shared_ptr<ModelAPI_Feature> aFeature = (*aDIter)->feature(ModelAPI_Document::FEATURES_GROUP(), aFIndex);
+      boost::shared_ptr<ModelAPI_Object> aFeature = boost::dynamic_pointer_cast<ModelAPI_Object>
+        ((*aDIter)->object(ModelAPI_Feature::group(), aFIndex));
       if (aFeature)
-        updateFeature(aFeature);
+        updateObject(aFeature);
     }
   }
   myUpdated.clear();
   // flush
-  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_FEATURE_TO_REDISPLAY);
+  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   Events_Loop::loop()->flush(EVENT_DISP);
 }
 
-bool Model_Update::updateFeature(boost::shared_ptr<ModelAPI_Feature> theFeature)
+bool Model_Update::updateObject(boost::shared_ptr<ModelAPI_Object> theObject)
 {
   // check it is already processed
-  if (myUpdated.find(theFeature) != myUpdated.end())
-    return myUpdated[theFeature];
+  if (myUpdated.find(theObject) != myUpdated.end())
+    return myUpdated[theObject];
   // check all features this feature depended on (recursive call of updateFeature)
-  bool aMustbeUpdated = myInitial.find(theFeature) != myInitial.end();
-  // references
-  list<boost::shared_ptr<ModelAPI_Attribute> > aRefs = 
-    theFeature->data()->attributes(ModelAPI_AttributeReference::type());
-  list<boost::shared_ptr<ModelAPI_Attribute> >::iterator aRefsIter = aRefs.begin();
-  for(; aRefsIter != aRefs.end(); aRefsIter++) {
-    boost::shared_ptr<ModelAPI_Feature> aSub =
-      boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(*aRefsIter)->value();
-    if (aSub && aSub != theFeature && updateFeature(aSub))
-      aMustbeUpdated = true;
-  }
-  // lists of references
-  aRefs = theFeature->data()->attributes(ModelAPI_AttributeRefList::type());
-  for(aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
-    list<FeaturePtr> aListRef = 
-      boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*aRefsIter)->list();
-    list<FeaturePtr>::iterator aListIter = aListRef.begin();
-    for(; aListIter != aListRef.end(); aListIter++) {
-      boost::shared_ptr<ModelAPI_Feature> aSub = *aListIter;
-      if (aSub && updateFeature(aSub))
+  bool anExecute = myInitial.find(theObject) != myInitial.end();
+  bool aMustbeUpdated = myInitial.find(theObject) != myInitial.end();
+  FeaturePtr aRealFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+  if (aRealFeature) { // only real feature contains references to other objects
+    // references
+    list<boost::shared_ptr<ModelAPI_Attribute> > aRefs = 
+      theObject->data()->attributes(ModelAPI_AttributeReference::type());
+    list<boost::shared_ptr<ModelAPI_Attribute> >::iterator aRefsIter = aRefs.begin();
+    for(; aRefsIter != aRefs.end(); aRefsIter++) {
+      boost::shared_ptr<ModelAPI_Object> aSub =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(*aRefsIter)->value();
+      if (aSub && aSub != theObject && updateObject(aSub))
         aMustbeUpdated = true;
     }
+    // lists of references
+    aRefs = theObject->data()->attributes(ModelAPI_AttributeRefList::type());
+    for(aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
+      list<ObjectPtr> aListRef = 
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*aRefsIter)->list();
+      list<ObjectPtr>::iterator aListIter = aListRef.begin();
+      for(; aListIter != aListRef.end(); aListIter++) {
+        boost::shared_ptr<ModelAPI_Object> aSub = *aListIter;
+        if (aSub && updateObject(aSub))
+          aMustbeUpdated = true;
+      }
+    }
+    // execute feature if it must be updated
+    anExecute = aMustbeUpdated || anExecute;
+    if (anExecute) {
+      aRealFeature->execute();
+      static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      ModelAPI_EventCreator::get()->sendUpdated(theObject, EVENT_DISP);
+    }
   }
-  // execute feature if it must be updated
-  bool anExecute = aMustbeUpdated || myInitial.find(theFeature) != myInitial.end();
-  if (anExecute) {
-    theFeature->execute();
-    static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_FEATURE_TO_REDISPLAY);
-    ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
-  }
-  myUpdated[theFeature] = anExecute;
+  myUpdated[theObject] = anExecute;
   return anExecute;
 }

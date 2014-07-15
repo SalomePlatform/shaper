@@ -2,6 +2,7 @@
 
 #include <TopoDS_Shape.hxx>
 #include <ModelAPI_Object.h>
+#include <GeomAPI_Shape.h>
 
 #include <QDir>
 
@@ -71,7 +72,7 @@ std::string featureInfo(FeaturePtr theFeature)
 }
 
 //******************************************************************
-FeaturePtr realFeature(const FeaturePtr theFeature)
+/*FeaturePtr realFeature(const FeaturePtr theFeature)
 {
   if (theFeature->data()) {
     return theFeature;
@@ -79,6 +80,7 @@ FeaturePtr realFeature(const FeaturePtr theFeature)
     ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
     return aObject->featureRef();
   }
-}
+}*/
+
 
 }

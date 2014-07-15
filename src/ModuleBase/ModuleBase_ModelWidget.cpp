@@ -17,9 +17,9 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QObject* theParent, const Config_
   myAttributeID = theData ? theData->widgetId() : "";
 }
 
-bool ModuleBase_ModelWidget::isInitialized(FeaturePtr theFeature) const
+bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
 {
-  return theFeature->data()->attribute(attributeID())->isInitialized();
+  return theObject->data()->attribute(attributeID())->isInitialized();
 }
 
 bool ModuleBase_ModelWidget::focusTo()

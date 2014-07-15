@@ -7,6 +7,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_ResultPart.h>
 #include <Model_Events.h>
 #include <ModelAPI_Object.h>
 
@@ -26,9 +27,9 @@ XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
   : QAbstractItemModel(theParent), myActivePart(0)
 {
   // Register in event loop
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 
   // Create a top part of data tree model
   myModel = new XGUI_TopDataModel(this);
@@ -47,16 +48,16 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
   DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
 
   // Created object event *******************
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED)) {
-    const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    std::set<FeaturePtr> aFeatures = aUpdMsg->features();
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
+    const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
+    std::set<ObjectPtr> aFeatures = aUpdMsg->features();
 
-    std::set<FeaturePtr>::const_iterator aIt;
+    std::set<ObjectPtr>::const_iterator aIt;
     for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
-      FeaturePtr aFeature = (*aIt);
+      ObjectPtr aFeature = (*aIt);
       DocumentPtr aDoc = aFeature->document();
       if (aDoc == aRootDoc) {  // If root objects
-        if (aFeature->getGroup().compare(ModelAPI_Document::PARTS_GROUP()) == 0) { // Update only Parts group
+        if (aFeature->groupName().compare(ModelAPI_ResultPart::group()) == 0) { // Update only Parts group
           // Add a new part
           int aStart = myPartModels.size();
           XGUI_PartDataModel* aModel = new XGUI_PartDataModel(this);
@@ -87,8 +88,8 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
       }
     }
   // Deleted object event ***********************
-  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED)) {
-    const Model_FeatureDeletedMessage* aUpdMsg = dynamic_cast<const Model_FeatureDeletedMessage*>(theMessage);
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
+    const Model_ObjectDeletedMessage* aUpdMsg = dynamic_cast<const Model_ObjectDeletedMessage*>(theMessage);
     DocumentPtr aDoc = aUpdMsg->document();
     std::set<std::string> aGroups = aUpdMsg->groups();
 
@@ -96,7 +97,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
     for (aIt = aGroups.begin(); aIt != aGroups.end(); ++aIt) {
       std::string aGroup = (*aIt);
       if (aDoc == aRootDoc) {  // If root objects
-        if (aGroup.compare(ModelAPI_Document::PARTS_GROUP()) == 0) { // Updsate only Parts group
+        if (aGroup.compare(ModelAPI_ResultPart::group()) == 0) { // Updsate only Parts group
           int aStart = myPartModels.size() - 1;
           removeSubModel(aStart);
           removeRow(aStart, partFolderNode());
@@ -129,9 +130,9 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
       }
     }
   // Deleted object event ***********************
-  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED)) {
-    //const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
-    //FeaturePtr aFeature = aUpdMsg->feature();
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
+    //const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
+    //ObjectPtr aFeature = aUpdMsg->feature();
     //DocumentPtr aDoc = aFeature->document();
     
     // TODO: Identify the necessary index by the modified feature
@@ -151,7 +152,7 @@ void XGUI_DocumentDataModel::rebuildDataTree()
   beginResetModel();
   clearModelIndexes();
 
-  int aNbParts = aRootDoc->size(ModelAPI_Document::PARTS_GROUP());
+  int aNbParts = aRootDoc->size(ModelAPI_ResultPart::group());
   if (myPartModels.size() != aNbParts) { // resize internal models
     while (myPartModels.size() > aNbParts) {
       delete myPartModels.last();
@@ -192,13 +193,14 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
     {
       int aOffset = historyOffset();
       DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
-      FeaturePtr aFeature = aRootDoc->feature(ModelAPI_Document::FEATURES_GROUP(), theIndex.row() - aOffset);
+      ObjectPtr aObj = aRootDoc->object(ModelAPI_Feature::group(), theIndex.row() - aOffset);
+      FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
       if (!aFeature)
         return QVariant();
       switch (theRole) {
       case Qt::DisplayRole:
         if (aFeature)
-          return aFeature->data()->getName().c_str();
+          return aFeature->data()->name().c_str();
         else 
           return QVariant();
       case Qt::DecorationRole:
@@ -236,7 +238,7 @@ int XGUI_DocumentDataModel::rowCount(const QModelIndex& theParent) const
     // Size of external models
     int aVal = historyOffset();
     // Plus history size
-    aVal += aRootDoc->size(ModelAPI_Document::FEATURES_GROUP());
+    aVal += aRootDoc->size(ModelAPI_Feature::group());
     return aVal;
   }
   if (theParent.internalId() == PartsFolder) {
@@ -357,21 +359,21 @@ void XGUI_DocumentDataModel::clearModelIndexes()
   myIndexes.clear();
 }
 
-FeaturePtr XGUI_DocumentDataModel::feature(const QModelIndex& theIndex) const
+ObjectPtr XGUI_DocumentDataModel::object(const QModelIndex& theIndex) const
 {
   if (theIndex.internalId() == PartsFolder)
-    return FeaturePtr();
+    return ObjectPtr();
   if (theIndex.internalId() == HistoryNode) {
     DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
     int aOffset = historyOffset();
-    return aRootDoc->feature(ModelAPI_Document::FEATURES_GROUP(), theIndex.row() - aOffset);
+    return aRootDoc->object(ModelAPI_Feature::group(), theIndex.row() - aOffset);
   }
   QModelIndex* aIndex = toSourceModelIndex(theIndex);
   if (!isSubModel(aIndex->model())) 
-    return FeaturePtr();
+    return ObjectPtr();
 
   const XGUI_FeaturesModel* aModel = dynamic_cast<const XGUI_FeaturesModel*>(aIndex->model());
-  return aModel->feature(*aIndex);
+  return aModel->object(*aIndex);
 }
 
 bool XGUI_DocumentDataModel::insertRows(int theRow, int theCount, const QModelIndex& theParent)
@@ -474,11 +476,11 @@ bool XGUI_DocumentDataModel::activatedIndex(const QModelIndex& theIndex)
   return false;
 }
 
-FeaturePtr XGUI_DocumentDataModel::activePart() const
+ResultPartPtr XGUI_DocumentDataModel::activePart() const
 {
   if (myActivePart) 
     return myActivePart->part();
-  return FeaturePtr();
+  return ResultPartPtr();
 }
 
 void XGUI_DocumentDataModel::deactivatePart() 
@@ -493,21 +495,19 @@ void XGUI_DocumentDataModel::deactivatePart()
 Qt::ItemFlags XGUI_DocumentDataModel::flags(const QModelIndex& theIndex) const
 {
   Qt::ItemFlags aFlags = QAbstractItemModel::flags(theIndex);
-  if (feature(theIndex)) {
+  if (object(theIndex)) {
     aFlags |= Qt::ItemIsEditable;
   }
   return aFlags;
 }
 
-QModelIndex XGUI_DocumentDataModel::partIndex(const FeaturePtr& theFeature) const 
+QModelIndex XGUI_DocumentDataModel::partIndex(const ResultPartPtr& theObject) const 
 {
-  FeaturePtr aFeature = XGUI_Tools::realFeature(theFeature);
-
   int aRow = -1;
   XGUI_PartModel* aModel = 0;
   foreach (XGUI_PartModel* aPartModel, myPartModels) {
     aRow++;
-    if (aPartModel->part() == aFeature) {
+    if (aPartModel->part() == theObject) {
       aModel = aPartModel;
       break;
     }
@@ -518,22 +518,22 @@ QModelIndex XGUI_DocumentDataModel::partIndex(const FeaturePtr& theFeature) cons
   return QModelIndex();
 }
 
-QModelIndex XGUI_DocumentDataModel::featureIndex(const FeaturePtr theFeature) const
+QModelIndex XGUI_DocumentDataModel::objectIndex(const ObjectPtr theObject) const
 {
   // Check that this feature belongs to root document
   DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
-  DocumentPtr aDoc = theFeature->document();
+  DocumentPtr aDoc = theObject->document();
   if (aDoc == aRootDoc) {
     // This feature belongs to histrory or top model
-    if (theFeature->isInHistory()) {
+    if (theObject->isInHistory()) {
       int aId;
-      for (aId = 0; aId < aRootDoc->size(ModelAPI_Document::FEATURES_GROUP()); aId++) {
-        if (theFeature == aRootDoc->feature(ModelAPI_Document::FEATURES_GROUP(), aId))
+      for (aId = 0; aId < aRootDoc->size(ModelAPI_Feature::group()); aId++) {
+        if (theObject == aRootDoc->object(ModelAPI_Feature::group(), aId))
           break;
       }
       return index(aId + historyOffset(), 0, QModelIndex());
     } else {
-      QModelIndex aIndex = myModel->featureIndex(theFeature);
+      QModelIndex aIndex = myModel->objectIndex(theObject);
       return aIndex.isValid()? 
         createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex)) :
         QModelIndex();
@@ -547,7 +547,7 @@ QModelIndex XGUI_DocumentDataModel::featureIndex(const FeaturePtr theFeature) co
       }
     }
     if (aPartModel) {
-      QModelIndex aIndex = aPartModel->featureIndex(theFeature);
+      QModelIndex aIndex = aPartModel->objectIndex(theObject);
       return aIndex.isValid()? 
         createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex)) :
         QModelIndex();

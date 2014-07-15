@@ -104,9 +104,10 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
           theConstraint->data()->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr))
         );
       if (!anAttr) continue;
-      if (anAttr->isFeature() && anAttr->feature())
+      if (anAttr->isObject() && anAttr->object())
       { // verify posiible entities
-        const std::string& aKind = anAttr->feature()->getKind();
+        const std::string& aKind = boost::dynamic_pointer_cast<ModelAPI_Feature>
+          (anAttr->object())->getKind();
         if (aKind.compare(SketchPlugin_Point::ID()) == 0)
         {
           myAttributesList[aNbPoints++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
@@ -159,8 +160,9 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
           theConstraint->data()->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr))
         );
       if (!anAttr) continue;
-      if (anAttr->isFeature() && anAttr->feature() &&
-          anAttr->feature()->getKind().compare(SketchPlugin_Line::ID()) == 0)
+      if (anAttr->isObject() && anAttr->object() &&
+        boost::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->object())->getKind().
+        compare(SketchPlugin_Line::ID()) == 0)
       {
         myAttributesList[aNbLines++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
         break;
@@ -183,8 +185,9 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
           theConstraint->data()->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr))
         );
-      if (!anAttr || !anAttr->isFeature() || !anAttr->feature()) continue;
-      const std::string& aKind = anAttr->feature()->getKind();
+      if (!anAttr || !anAttr->isObject() || !anAttr->object()) continue;
+      const std::string& aKind = boost::dynamic_pointer_cast<ModelAPI_Feature>
+        (anAttr->object())->getKind();
       if (aKind.compare(SketchPlugin_Line::ID()) == 0)
       {
         myAttributesList[aNbEntities++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
@@ -206,8 +209,9 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
           theConstraint->data()->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr))
         );
-      if (!anAttr || !anAttr->isFeature() || !anAttr->feature()) continue;
-      const std::string& aKind = anAttr->feature()->getKind();
+      if (!anAttr || !anAttr->isObject() || !anAttr->object()) continue;
+      const std::string& aKind = boost::dynamic_pointer_cast<ModelAPI_Feature>
+        (anAttr->object())->getKind();
       if (aKind.compare(SketchPlugin_Circle::ID()) == 0 || aKind.compare(SketchPlugin_Arc::ID()) == 0)
       {
         myAttributesList[aNbEntities++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);

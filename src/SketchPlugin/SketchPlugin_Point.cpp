@@ -6,6 +6,7 @@
 #include "SketchPlugin_Sketch.h"
 
 #include <ModelAPI_Data.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAPI_Pnt2d.h>
 
@@ -25,10 +26,6 @@ void SketchPlugin_Point::initAttributes()
 
 void SketchPlugin_Point::execute() 
 {
-}
-
-const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Point::preview()
-{
   SketchPlugin_Sketch* aSketch = sketch();
   if (aSketch) {
     // compute a point in 3D view
@@ -37,15 +34,10 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Point::preview()
     boost::shared_ptr<GeomAPI_Pnt> aPoint3D(aSketch->to3D(aPoint->x(), aPoint->y()));
     // make a visible point
     boost::shared_ptr<GeomAPI_Shape> aPointShape = GeomAlgoAPI_PointBuilder::point(aPoint3D);
-    setPreview(aPointShape);
+    boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
+    aConstr->setShape(aPointShape);
+    setResult(aConstr);
   }
-  return getPreview();
-}
-
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Point::getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
-{
-  return prepareAISShape(thePrevious);
 }
 
 void SketchPlugin_Point::move(double theDeltaX, double theDeltaY)

@@ -101,24 +101,24 @@ void ModuleBase_WidgetPoint2D::setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& 
   emit valuesChanged();
 }
 
-bool ModuleBase_WidgetPoint2D::storeValue(FeaturePtr theFeature) const
+bool ModuleBase_WidgetPoint2D::storeValue(ObjectPtr theObject) const
 {
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<ModelAPI_Data> aData = theObject->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(attributeID()));
 
   ModuleBase_WidgetPoint2D* that = (ModuleBase_WidgetPoint2D*) this;
   bool isBlocked = that->blockSignals(true);
   aPoint->setValue(myXSpin->value(), myYSpin->value());
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   that->blockSignals(isBlocked);
 
   return true;
 }
 
-bool ModuleBase_WidgetPoint2D::restoreValue(FeaturePtr theFeature)
+bool ModuleBase_WidgetPoint2D::restoreValue(ObjectPtr theObject)
 {
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<ModelAPI_Data> aData = theObject->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(attributeID()));
 
@@ -158,11 +158,11 @@ bool ModuleBase_WidgetPoint2D::eventFilter(QObject *theObject, QEvent *theEvent)
   return ModuleBase_ModelWidget::eventFilter(theObject, theEvent);
 }
 
-bool ModuleBase_WidgetPoint2D::initFromPrevious(FeaturePtr theFeature)
+bool ModuleBase_WidgetPoint2D::initFromPrevious(ObjectPtr theObject)
 {
   if (myOptionParam.length() == 0)
     return false;
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  boost::shared_ptr<ModelAPI_Data> aData = theObject->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myOptionParam));
   if (aPoint) {
@@ -172,7 +172,7 @@ bool ModuleBase_WidgetPoint2D::initFromPrevious(FeaturePtr theFeature)
     this->blockSignals(isBlocked);
 
     emit valuesChanged();
-    emit storedPoint2D(theFeature, myOptionParam);
+    emit storedPoint2D(theObject, myOptionParam);
     return true;
   }
   return false;

@@ -7,6 +7,7 @@
 #include "ModelAPI_Document.h"
 #include "ModelAPI_Data.h"
 #include "ModelAPI_AttributeDocRef.h"
+#include <ModelAPI_ResultPart.h>
 
 using namespace std;
 
@@ -25,7 +26,12 @@ void PartSetPlugin_Part::execute()
   if (!aDocRef->value()) { // create a document if not yet created
     boost::shared_ptr<ModelAPI_Document> aPartSetDoc = 
       ModelAPI_PluginManager::get()->rootDocument();
-    aDocRef->setValue(aPartSetDoc->subDocument(data()->getName()));
+    aDocRef->setValue(aPartSetDoc->subDocument(data()->name()));
+  }
+  // create a result only once
+  if (results().empty()) {
+    boost::shared_ptr<ModelAPI_ResultPart> aResult = document()->createPart(data());
+    setResult(aResult);
   }
 }
 

@@ -4,20 +4,11 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_ResultConstruction.h>
 
 SketchPlugin_Feature::SketchPlugin_Feature()
 {
   mySketch = 0;
-}
-
-void SketchPlugin_Feature::setPreview(const boost::shared_ptr<GeomAPI_Shape>& theShape)
-{
-  myPreview = theShape;
-}
-
-const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Feature::getPreview() const
-{
-  return myPreview;
 }
 
 SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
@@ -27,11 +18,11 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
     int aSketches = document()->size("Construction");
     for(int a = 0; a < aSketches && !mySketch; a++) {
       boost::shared_ptr<SketchPlugin_Sketch> aSketch = boost::
-        dynamic_pointer_cast<SketchPlugin_Sketch>(document()->feature("Construction", a, true));
+        dynamic_pointer_cast<SketchPlugin_Sketch>(document()->object("Construction", a));
       if (aSketch) {
-        std::list<FeaturePtr > aList = 
+        std::list<ObjectPtr> aList =
           aSketch->data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
-        std::list<FeaturePtr >::iterator aSub = aList.begin();
+        std::list<ObjectPtr>::iterator aSub = aList.begin();
         for(; aSub != aList.end(); aSub++) {
           if ((*aSub)->data()->isEqual(data())) {
             mySketch = aSketch.get();
@@ -44,10 +35,15 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
   return mySketch;
 }
 
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Feature::prepareAISShape(
-                        boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Feature::simpleAISObject(
+    boost::shared_ptr<ModelAPI_Result> theRes, boost::shared_ptr<GeomAPI_AISObject> thePrevious)
 {
-  boost::shared_ptr<GeomAPI_Shape> aPreview = preview();
+  boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
+    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theRes);
+
+  boost::shared_ptr<GeomAPI_Shape> aPreview;
+  if (aConstr) aPreview = aConstr->shape();
+
   boost::shared_ptr<GeomAPI_AISObject> aResult = thePrevious;
   if (!aResult)
     aResult = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());

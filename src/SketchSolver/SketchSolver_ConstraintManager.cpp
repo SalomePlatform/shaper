@@ -41,10 +41,10 @@ SketchSolver_ConstraintManager::SketchSolver_ConstraintManager()
   myGroups.clear();
 
   // Register in event loop
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_DELETED));
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_MOVED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_MOVED));
 }
 
 SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
@@ -59,42 +59,44 @@ SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
 // ============================================================================
 void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessage)
 {
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED) ||
-      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED) || 
-      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_MOVED))
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED) ||
+      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED) || 
+      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED))
   {
-    const ModelAPI_FeatureUpdatedMessage* anUpdateMsg = 
-      dynamic_cast<const ModelAPI_FeatureUpdatedMessage*>(theMessage);
-    std::set< FeaturePtr > aFeatures = anUpdateMsg->features();
+    const ModelAPI_ObjectUpdatedMessage* anUpdateMsg = 
+      dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
+    std::set< ObjectPtr > aFeatures = anUpdateMsg->features();
 
     bool isModifiedEvt = 
-      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_MOVED);
+      theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
     if (!isModifiedEvt)
     {
-      std::set< FeaturePtr >::iterator aFeatIter;
+      std::set< ObjectPtr >::iterator aFeatIter;
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++)
       {
+        FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFeatIter);
+        if (!aFeature) continue;
         // Only sketches and constraints can be added by Create event
-        const std::string& aFeatureKind = (*aFeatIter)->getKind();
+        const std::string& aFeatureKind = aFeature->getKind();
         if (aFeatureKind.compare(SketchPlugin_Sketch::ID()) == 0)
         {
           boost::shared_ptr<SketchPlugin_Feature> aSketch =
-            boost::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
+            boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
           if (aSketch)
             changeWorkplane(aSketch);
           continue;
         }
         boost::shared_ptr<SketchPlugin_Constraint> aConstraint =
-          boost::dynamic_pointer_cast<SketchPlugin_Constraint>(*aFeatIter);
+          boost::dynamic_pointer_cast<SketchPlugin_Constraint>(aFeature);
         if (aConstraint)
           changeConstraint(aConstraint);
         else
         {
           // Sketch plugin features can be only updated
-          boost::shared_ptr<SketchPlugin_Feature> aFeature =
-            boost::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-          if (aFeature)
-            updateEntity(aFeature);
+          boost::shared_ptr<SketchPlugin_Feature> aSFeature =
+            boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+          if (aSFeature)
+            updateEntity(aSFeature);
         }
       }
     }
@@ -102,10 +104,10 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
     // Solve the set of constraints
     resolveConstraints();
   }
-  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_DELETED))
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED))
   {
-    const ModelAPI_FeatureDeletedMessage* aDeleteMsg = 
-      dynamic_cast<const ModelAPI_FeatureDeletedMessage*>(theMessage);
+    const ModelAPI_ObjectDeletedMessage* aDeleteMsg = 
+      dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
     const std::set<std::string>& aFeatureGroups = aDeleteMsg->groups();
 
     // Find SketchPlugin_Sketch::ID() in groups. The constraint groups should be updated when an object removed from Sketch
@@ -351,8 +353,8 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
 
     boost::shared_ptr<ModelAPI_AttributeRefList> aWPFeatures =
       boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aWP->data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
-    std::list< FeaturePtr > aFeaturesList = aWPFeatures->list();
-    std::list< FeaturePtr >::const_iterator anIter;
+    std::list< ObjectPtr >& aFeaturesList = aWPFeatures->list();
+    std::list< ObjectPtr >::const_iterator anIter;
     for (anIter = aFeaturesList.begin(); anIter != aFeaturesList.end(); anIter++)
       if (*anIter == theConstraint)
         return aWP; // workplane is found
@@ -374,6 +376,6 @@ void SketchSolver_ConstraintManager::resolveConstraints()
     (*aGroupIter)->resolveConstraints();
 
   // Features may be updated => send events
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 }
 

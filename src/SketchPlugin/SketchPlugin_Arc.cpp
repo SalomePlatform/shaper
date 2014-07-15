@@ -5,13 +5,12 @@
 #include "SketchPlugin_Arc.h"
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Pnt2d.h>
-
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
-
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
@@ -31,10 +30,6 @@ void SketchPlugin_Arc::initAttributes()
 }
 
 void SketchPlugin_Arc::execute() 
-{
-}
-
-const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Arc::preview()
 {
   SketchPlugin_Sketch* aSketch = sketch();
   if (aSketch) {
@@ -79,16 +74,13 @@ const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Arc::preview()
           aShapes.push_back(aCircleShape);
       }
       boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
-      setPreview(aCompound);
+      // store the result
+      boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
+        document()->createConstruction(data());
+      aConstr->setShape(aCompound);
+      results().push_back(aConstr);
     }
   }
-  return getPreview();
-}
-
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Arc::getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
-{
-  return prepareAISShape(thePrevious);
 }
 
 void SketchPlugin_Arc::move(double theDeltaX, double theDeltaY)

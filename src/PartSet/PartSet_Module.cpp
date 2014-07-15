@@ -108,12 +108,11 @@ void PartSet_Module::createFeatures()
   //!! Test registering of validators
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  
   aFactory->registerValidator("PartSet_DistanceValidator", new PartSet_DistanceValidator);
-  aFactory->assignValidator("PartSet_DistanceValidator", "SketchConstraintDistance");
-
   aFactory->registerValidator("PartSet_LengthValidator", new PartSet_LengthValidator);
-  aFactory->assignValidator("PartSet_LengthValidator", "SketchConstraintLength");
+  aFactory->registerValidator("PartSet_PerpendicularValidator", new PartSet_PerpendicularValidator);
+  aFactory->registerValidator("PartSet_ParallelValidator", new PartSet_ParallelValidator);
+  aFactory->registerValidator("PartSet_RadiusValidator", new PartSet_RadiusValidator);
 }
 
 void PartSet_Module::featureCreated(QAction* theFeature)
@@ -187,9 +186,11 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::onContextMenuCommand(const QString& theId, bool isChecked)
 {
-  QFeatureList aFeatures = myWorkshop->selector()->selection()->selectedFeatures();
+  QList<ObjectPtr> aFeatures = myWorkshop->selector()->selection()->selectedObjects();
   if (theId == "EDIT_CMD" && (aFeatures.size() > 0)) {
-    editFeature(aFeatures.first());
+    FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aFeatures.first());
+    if (aFeature)
+      editFeature(aFeature);
   }
 }
 
@@ -302,7 +303,16 @@ void PartSet_Module::onStopSelection(const QFeatureList& theFeatures, const bool
       activateFeature((*anIt), false);
     }
   }
-  aDisplayer->stopSelection(theFeatures, isStop, false);
+  QResultList aResults;
+  foreach(FeaturePtr aFeature, theFeatures) {
+    if (aFeature->results().size() > 0) {
+      std::list<ResultPtr>& aResList = aFeature->results();
+      std::list<ResultPtr>::iterator aIt;
+      for (aIt = aResList.begin(); aIt != aResList.end(); ++aIt)
+        aResults.append(*aIt);
+    }
+  }
+  aDisplayer->stopSelection(aResults, isStop, false);
 
   XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
   aViewer->enableSelection(!isStop);
@@ -310,7 +320,7 @@ void PartSet_Module::onStopSelection(const QFeatureList& theFeatures, const bool
   aDisplayer->updateViewer();
 }
 
-void PartSet_Module::onSetSelection(const QFeatureList& theFeatures)
+void PartSet_Module::onSetSelection(const QResultList& theFeatures)
 {
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   aDisplayer->setSelected(theFeatures, false);
@@ -326,7 +336,7 @@ void PartSet_Module::onCloseLocalContext()
 void PartSet_Module::onFeatureConstructed(FeaturePtr theFeature, int theMode)
 {
   bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Hide;
-  visualizePreview(theFeature, isDisplay, false);
+  // TODO visualizePreview(theFeature, isDisplay, false);
   if (!isDisplay) {
     ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
     FeaturePtr aSketch;
@@ -339,7 +349,7 @@ void PartSet_Module::onFeatureConstructed(FeaturePtr theFeature, int theMode)
       std::list<FeaturePtr>::const_iterator anIt = aList.begin(),
                                             aLast = aList.end();
       for (; anIt != aLast; anIt++)
-        visualizePreview(*anIt, false, false);
+        visualizePreview((*anIt)->firstResult(), false, false);
       aDisplayer->updateViewer();
     }
   }
@@ -434,7 +444,7 @@ void PartSet_Module::sendOperation(ModuleBase_Operation* theOperation)
   Events_Loop::loop()->send(aMessage);
 }
 
-void PartSet_Module::visualizePreview(FeaturePtr theFeature, bool isDisplay,
+void PartSet_Module::visualizePreview(ResultPtr theFeature, bool isDisplay,
                                       const bool isUpdateViewer)
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
@@ -469,7 +479,7 @@ void PartSet_Module::activateFeature(FeaturePtr theFeature, const bool isUpdateV
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    aDisplayer->activateInLocalContext(theFeature, aPreviewOp->getSelectionModes(theFeature),
+    aDisplayer->activateInLocalContext(theFeature->firstResult(), aPreviewOp->getSelectionModes(theFeature),
                                        isUpdateViewer);
   }
 }
@@ -499,8 +509,8 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
     if (!aSPFeature)
       continue;
-    visualizePreview(*anIt, true, false);
-    aDisplayer->activateInLocalContext(*anIt, aModes, false);
+    visualizePreview((*anIt)->firstResult(), true, false);
+    aDisplayer->activateInLocalContext((*anIt)->firstResult(), aModes, false);
   }
   aDisplayer->updateViewer();
 }
@@ -510,17 +520,17 @@ void PartSet_Module::editFeature(FeaturePtr theFeature)
   if (!theFeature)
     return;
 
-//  if (theFeature->getKind() == SketchPlugin_Sketch::ID()) {
-    FeaturePtr aFeature = theFeature;
-    if (XGUI_Tools::isModelObject(aFeature)) {
-      ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
-      aFeature = aObject->featureRef();
-    }
+//  if (theFeature->getKind() == SKETCH_KIND) {
+    //FeaturePtr aFeature = theFeature;
+    //if (XGUI_Tools::isModelObject(aFeature)) {
+    //  ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
+    //  aFeature = aObject->featureRef();
+    //}
 
-    if (aFeature) {
-      onLaunchOperation(aFeature->getKind(), aFeature);
-      updateCurrentPreview(aFeature->getKind());
-    }
+    //if (aFeature) {
+      onLaunchOperation(theFeature->getKind(), theFeature);
+      updateCurrentPreview(theFeature->getKind());
+    //}
 //  }
 }
 

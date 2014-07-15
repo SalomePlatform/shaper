@@ -11,6 +11,12 @@
 #include <vector>
 
 class ModelAPI_Feature;
+class ModelAPI_Object;
+class ModelAPI_Result;
+class ModelAPI_ResultConstruction;
+class ModelAPI_ResultBody;
+class ModelAPI_ResultPart;
+class ModelAPI_Data;
 
 /**\class Model_Document
  * \ingroup DataModel
@@ -21,92 +27,79 @@ class ModelAPI_Feature;
 class ModelAPI_Document
 {
 public:
-  //! Common groups identifiers
-  //! Group of parameters
-  inline static const std::string& PARAMETERS_GROUP()
-  {
-    static const std::string MY_PARAMETERS_GROUP = "Parameters";
-    return MY_PARAMETERS_GROUP;
-  }
-  //! Group of constructions
-  inline static const std::string& CONSTRUCTIONS_GROUP()
-  {
-    static const std::string MY_CONSTRUCTIONS_GROUP = "Construction";
-    return MY_CONSTRUCTIONS_GROUP;
-  }
-  //! Group of parts
-  inline static const std::string& PARTS_GROUP()
-  {
-    static const std::string MY_PARTS_GROUP = "Parts";
-    return MY_PARTS_GROUP;
-  }
-  //! All created fetaures of the document (a history)
-  inline static const std::string& FEATURES_GROUP()
-  {
-    static const std::string MY_FEATURES_GROUP = "Features";
-    return MY_FEATURES_GROUP;
-  }
-
   //! Loads the OCAF document from the file.
   //! \param theFileName full name of the file to load
   //! \param theStudyID identifier of the SALOME study to associate with loaded file
   //! \returns true if file was loaded successfully
-  MODELAPI_EXPORT virtual bool load(const char* theFileName) = 0;
+  virtual bool load(const char* theFileName) = 0;
 
   //! Saves the OCAF document to the file.
   //! \param theFileName full name of the file to store
   //! \returns true if file was stored successfully
-  MODELAPI_EXPORT virtual bool save(const char* theFileName) = 0;
+  virtual bool save(const char* theFileName) = 0;
 
   //! Removes document data
-  MODELAPI_EXPORT virtual void close() = 0;
+  virtual void close() = 0;
 
   //! Starts a new operation (opens a tansaction)
-  MODELAPI_EXPORT virtual void startOperation() = 0;
+  virtual void startOperation() = 0;
   //! Finishes the previously started operation (closes the transaction)
-  MODELAPI_EXPORT virtual void finishOperation() = 0;
+  virtual void finishOperation() = 0;
   //! Aborts the operation 
-  MODELAPI_EXPORT virtual void abortOperation() = 0;
+  virtual void abortOperation() = 0;
   //! Returns true if operation has been started, but not yet finished or aborted
-  MODELAPI_EXPORT virtual bool isOperation() = 0;
+  virtual bool isOperation() = 0;
   //! Returns true if document was modified (since creation/opening)
-  MODELAPI_EXPORT virtual bool isModified() = 0;
+  virtual bool isModified() = 0;
 
   //! Returns True if there are available Undos
-  MODELAPI_EXPORT virtual bool canUndo() = 0;
+  virtual bool canUndo() = 0;
   //! Undoes last operation
-  MODELAPI_EXPORT virtual void undo() = 0;
+  virtual void undo() = 0;
   //! Returns True if there are available Redos
-  MODELAPI_EXPORT virtual bool canRedo() = 0;
+  virtual bool canRedo() = 0;
   //! Redoes last operation
-  MODELAPI_EXPORT virtual void redo() = 0;
+  virtual void redo() = 0;
 
   //! Adds to the document the new feature of the given feature id
-  //! \param creates feature and puts it in the document
-  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
+  //! \param creates feature and puts it in the document (if it is not action)
+  virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
 
   //! Removes the feature from the document
-  MODELAPI_EXPORT virtual void removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
+  virtual void removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
 
   ///! Adds a new sub-document by the identifier, or returns existing one if it is already exist
-  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Document> 
+  virtual boost::shared_ptr<ModelAPI_Document> 
     subDocument(std::string theDocID) = 0;
 
-  ///! Returns the id of hte document
-  MODELAPI_EXPORT virtual const std::string& id() const = 0;
+  ///! Returns the id of the document
+  virtual const std::string& id() const = 0;
 
-  //! Returns the feature in the group by the index (started from zero)
-  //! \param theGroupID group that contains a feature
+  //! Returns the object in the group by the index (started from zero)
+  //! \param theGroupID group that contains an object
   //! \param theIndex zero-based index of feature in the group
-  //! \param isOperation if it is true, returns feature (not Object)
-  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
-    feature(const std::string& theGroupID, const int theIndex, const bool isOperation = false) = 0;
+  virtual boost::shared_ptr<ModelAPI_Object> 
+    object(const std::string& theGroupID, const int theIndex) = 0;
 
-  //! Returns the number of features in the group
-  MODELAPI_EXPORT virtual int size(const std::string& theGroupID) = 0;
+  //! Returns the number of objects in the group of objects
+  virtual int size(const std::string& theGroupID) = 0;
 
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Document() {}
+
+  /// Creates a construction cresults
+  virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+  /// Creates a body results
+  virtual boost::shared_ptr<ModelAPI_ResultBody> createBody(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+  /// Creates a part results
+  virtual boost::shared_ptr<ModelAPI_ResultPart> createPart(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+
+  //! Returns a feature by result (owner of result)
+  virtual boost::shared_ptr<ModelAPI_Feature> feature(
+    const boost::shared_ptr<ModelAPI_Result>& theResult) = 0;
 
 protected:
   /// Only for SWIG wrapping it is here

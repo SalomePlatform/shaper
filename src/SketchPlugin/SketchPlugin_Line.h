@@ -40,27 +40,16 @@ public:
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
   {static std::string MY_KIND = SketchPlugin_Line::ID(); return MY_KIND;}
 
-  /// Returns to which group in the document must be added feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
-  {static std::string MY_GROUP = SketchPlugin_Sketch::ID(); return MY_GROUP;}
-
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
   /// Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
-  /// Returns the sketch preview
-  SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
-
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious);
-
-  /// Adds sub-feature of the higher level feature (sub-element of the sketch)
-  /// \param theFeature sub-feature
-  SKETCHPLUGIN_EXPORT virtual const void addSub(
-    const FeaturePtr& theFeature) {};
+                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+  {return simpleAISObject(firstResult(), thePrevious);}
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved

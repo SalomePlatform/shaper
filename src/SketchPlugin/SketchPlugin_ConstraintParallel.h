@@ -29,18 +29,11 @@ public:
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
   {static std::string MY_KIND = SketchPlugin_ConstraintParallel::ID(); return MY_KIND;}
 
-  /// \brief Returns to which group in the document must be added feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
-  {static std::string MY_GROUP = SketchPlugin_Sketch::ID(); return MY_GROUP;}
-
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
   /// \brief Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
-
-  /// \brief Returns the sketch preview
-  SKETCHPLUGIN_EXPORT virtual const boost::shared_ptr<GeomAPI_Shape>& preview();
 
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(

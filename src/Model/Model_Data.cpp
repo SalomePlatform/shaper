@@ -15,6 +15,7 @@
 #include <TDataStd_Name.hxx>
 #include "Model_Events.h"
 #include <Events_Loop.h>
+#include <Events_Error.h>
 
 using namespace std;
 
@@ -27,7 +28,7 @@ void Model_Data::setLabel(TDF_Label& theLab)
   myLab = theLab;
 }
 
-string Model_Data::getName()
+string Model_Data::name()
 {
   Handle(TDataStd_Name) aName;
   if (myLab.FindAttribute(TDataStd_Name::GetID(), aName))
@@ -48,8 +49,8 @@ void Model_Data::setName(string theName)
       aName->Set(theName.c_str());
   }
   if (isModified) {
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-    ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent, false);
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+    ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent, false);
   }
 }
 
@@ -78,10 +79,11 @@ void Model_Data::addAttribute(string theID, string theAttrType)
 
   if (anAttr) {
     myAttrs[theID] = boost::shared_ptr<ModelAPI_Attribute>(anAttr);
-    anAttr->setFeature(myFeature);
+    anAttr->setObject(myObject);
   }
-  else
-    ; // TODO: generate error on unknown attribute request and/or add mechanism for customization
+  else {
+    Events_Error::send("Can not create unknown type of attribute " + theAttrType);
+  }
 }
 
 boost::shared_ptr<ModelAPI_AttributeDocRef> Model_Data::docRef(const string theID)
@@ -221,37 +223,6 @@ list<boost::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const string
 void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
 {
   theAttr->setInitialized();
-  static const Events_ID anEvent = Events_Loop::eventByName(EVENT_FEATURE_UPDATED);
-  ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent);
-}
-
-#include <TNaming_Builder.hxx>
-#include <TNaming_NamedShape.hxx>
-#include <TopoDS_Shape.hxx>
-#include <GeomAPI_Shape.h>
-
-void Model_Data::store(const boost::shared_ptr<GeomAPI_Shape>& theShape)
-{
-  // the simplest way is to keep this attribute here, on Data
-  // TODO: add naming structure in separated document for shape storage
-  TNaming_Builder aBuilder(myLab);
-  if (!theShape) return; // bad shape
-  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
-  if (aShape.IsNull()) return; // null shape inside
-
-  aBuilder.Generated(aShape);
-}
-
-boost::shared_ptr<GeomAPI_Shape> Model_Data::shape()
-{
-  Handle(TNaming_NamedShape) aName;
-  if (myLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
-    TopoDS_Shape aShape = aName->Get();
-    if (!aShape.IsNull()) {
-      boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
-      aRes->setImpl(new TopoDS_Shape(aShape));
-      return aRes;
-    }
-  }
-  return boost::shared_ptr<GeomAPI_Shape>();
+  static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
 }

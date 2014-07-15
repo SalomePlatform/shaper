@@ -12,6 +12,7 @@
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
+#include <ModelAPI_ResultConstruction.h>
 
 
 const int SKETCH_PLANE_COLOR = Colors::COLOR_BROWN; /// the plane edge color
@@ -37,6 +38,19 @@ void SketchPlugin_Sketch::initAttributes()
 
 void SketchPlugin_Sketch::execute() 
 {
+  if (!isPlaneSet()) {
+    std::list<boost::shared_ptr<GeomAPI_Shape> > aFaces;
+
+    addPlane(1, 0, 0, aFaces); // YZ plane
+    addPlane(0, 1, 0, aFaces); // XZ plane
+    addPlane(0, 0, 1, aFaces); // XY plane
+    boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aFaces);
+    boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
+      document()->createConstruction(data());
+    aConstr->setShape(aCompound);
+    setResult(aConstr);
+    return;
+  }
   if (!data()->isValid())
     return ;
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
@@ -51,20 +65,22 @@ void SketchPlugin_Sketch::execute()
   boost::shared_ptr<GeomDataAPI_Dir> aNorm = 
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SketchPlugin_Sketch::NORM_ID()));
 
-  std::list<boost::shared_ptr<ModelAPI_Feature> > aFeatures = aRefList->list();
+  std::list<ObjectPtr> aFeatures = aRefList->list();
   if (aFeatures.empty())
     return ;
 
-  std::list<boost::shared_ptr<ModelAPI_Feature> >::const_iterator anIt = aFeatures.begin(),
-                                                                  aLast = aFeatures.end();
-
+  std::list<ObjectPtr>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
   boost::shared_ptr<SketchPlugin_Feature> aFeature;
   std::list< boost::shared_ptr<GeomAPI_Shape> > aFeaturesPreview;
   for (; anIt != aLast; anIt++) {
     aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
-    boost::shared_ptr<GeomAPI_Shape> aPreview = aFeature->preview();
-    if (aPreview)
-      aFeaturesPreview.push_back(aPreview);
+    boost::shared_ptr<ModelAPI_ResultConstruction> aRes = 
+      boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFeature->firstResult());
+    if (aRes) {
+      boost::shared_ptr<GeomAPI_Shape> aShape = aRes->shape();
+      if (aShape)
+        aFeaturesPreview.push_back(aShape);
+    }
   }
 
   if (aFeaturesPreview.empty())
@@ -76,34 +92,19 @@ void SketchPlugin_Sketch::execute()
 
   aLoops.insert(aLoops.end(), aWires.begin(), aWires.end());
   boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aLoops);
-  data()->store(aCompound);
+  boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
+  aConstr->setShape(aCompound);
+  setResult(aConstr);
 }
 
 boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Sketch::getAISObject(
                                 boost::shared_ptr<GeomAPI_AISObject> thePrevious)
 {
-  boost::shared_ptr<GeomAPI_AISObject> anAIS = prepareAISShape(thePrevious);
-  anAIS->setColor(SKETCH_PLANE_COLOR);
-  anAIS->setWidth(SKETCH_WIDTH);
+  boost::shared_ptr<GeomAPI_AISObject> aResult = simpleAISObject(firstResult(), thePrevious);
+  aResult->setColor(SKETCH_PLANE_COLOR);
+  aResult->setWidth(SKETCH_WIDTH);
   //anAIS->Redisplay();
-  return anAIS;
-}
-
-const boost::shared_ptr<GeomAPI_Shape>& SketchPlugin_Sketch::preview()
-{
-  if (isPlaneSet()) {
-    setPreview(boost::shared_ptr<GeomAPI_Shape>());
-  }
-  else {
-    std::list<boost::shared_ptr<GeomAPI_Shape> > aFaces;
-
-    addPlane(1, 0, 0, aFaces); // YZ plane
-    addPlane(0, 1, 0, aFaces); // XZ plane
-    addPlane(0, 0, 1, aFaces); // XY plane
-    boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aFaces);
-    setPreview(aCompound);
-  }
-  return getPreview();
+  return aResult;
 }
 
 const void SketchPlugin_Sketch::addSub(const FeaturePtr& theFeature)

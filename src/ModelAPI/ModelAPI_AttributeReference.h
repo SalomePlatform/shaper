@@ -16,11 +16,11 @@
 class ModelAPI_AttributeReference : public ModelAPI_Attribute
 {
 public:
-  /// Defines the feature referenced from this attribute
-  MODELAPI_EXPORT virtual void setValue(FeaturePtr theFeature) = 0;
+  /// Defines the object referenced from this attribute
+  MODELAPI_EXPORT virtual void setValue(ObjectPtr theObject) = 0;
 
-  /// Returns feature referenced from this attribute
-  MODELAPI_EXPORT virtual FeaturePtr value() = 0;
+  /// Returns object referenced from this attribute
+  MODELAPI_EXPORT virtual ObjectPtr value() = 0;
 
   /// Returns the type of this class of attributes
   MODELAPI_EXPORT static std::string type() {return "Reference";}

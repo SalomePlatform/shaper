@@ -30,6 +30,7 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <PartSetPlugin_Part.h>
 
@@ -129,9 +130,9 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_LOADED));
   // TODO Is it good to use non standard event within workshop?
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OPERATION_LAUNCHED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_UPDATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_CREATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_TO_REDISPLAY));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
   activateModule();
   if (myMainWindow) {
@@ -229,22 +230,22 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   }
 
   // Process creation of Part
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_CREATED)) {
-    const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
+    const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
     onFeatureCreatedMsg(aUpdMsg);
   }
 
   // Redisplay feature
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_TO_REDISPLAY)) {
-    const Model_FeatureUpdatedMessage* aUpdMsg = dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
+    const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
     onFeatureRedisplayMsg(aUpdMsg);
   }
 
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_UPDATED)) {
-    const Model_FeatureUpdatedMessage* anUpdateMsg =
-        dynamic_cast<const Model_FeatureUpdatedMessage*>(theMessage);
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
+    const Model_ObjectUpdatedMessage* anUpdateMsg =
+        dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
     onFeatureUpdatedMsg(anUpdateMsg);
   }
 
@@ -271,15 +272,15 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureUpdatedMsg(const Model_FeatureUpdatedMessage* theMsg)
+void XGUI_Workshop::onFeatureUpdatedMsg(const Model_ObjectUpdatedMessage* theMsg)
 {
-  std::set<FeaturePtr> aFeatures = theMsg->features();
+  std::set<ObjectPtr> aFeatures = theMsg->features();
   if (myOperationMgr->hasOperation())
   {
     FeaturePtr aCurrentFeature = myOperationMgr->currentOperation()->feature();
-    std::set<FeaturePtr>::const_iterator aIt;
+    std::set<ObjectPtr>::const_iterator aIt;
     for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
-      FeaturePtr aNewFeature = (*aIt);
+      ObjectPtr aNewFeature = (*aIt);
       if(aNewFeature == aCurrentFeature) {
         myPropertyPanel->updateContentWidget(aCurrentFeature);
         break;
@@ -289,15 +290,15 @@ void XGUI_Workshop::onFeatureUpdatedMsg(const Model_FeatureUpdatedMessage* theMs
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureRedisplayMsg(const Model_FeatureUpdatedMessage* theMsg)
+void XGUI_Workshop::onFeatureRedisplayMsg(const Model_ObjectUpdatedMessage* theMsg)
 {
-  std::set<FeaturePtr> aFeatures = theMsg->features();
-  std::set<FeaturePtr>::const_iterator aIt;
+  std::set<ObjectPtr> aFeatures = theMsg->features();
+  std::set<ObjectPtr>::const_iterator aIt;
   bool isDisplayed = false;
   for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
-    FeaturePtr aFeature = (*aIt);
-    if (aFeature->getKind() != PartSetPlugin_Part::ID()) {
-      isDisplayed = myDisplayer->redisplay(aFeature, false);
+    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(*aIt);
+    if (aRes) {
+      isDisplayed = myDisplayer->redisplay(aRes, false);
     }
   }
   if (isDisplayed)
@@ -305,20 +306,22 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const Model_FeatureUpdatedMessage* the
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureCreatedMsg(const Model_FeatureUpdatedMessage* theMsg)
+void XGUI_Workshop::onFeatureCreatedMsg(const Model_ObjectUpdatedMessage* theMsg)
 {
-  std::set<FeaturePtr> aFeatures = theMsg->features();
+  std::set<ObjectPtr> aFeatures = theMsg->features();
 
-  std::set<FeaturePtr>::const_iterator aIt;
+  std::set<ObjectPtr>::const_iterator aIt;
   bool aHasPart = false;
   bool isDisplayed = false;
   for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
-    FeaturePtr aFeature = (*aIt);
-    if (aFeature->getKind() == PartSetPlugin_Part::ID()) {
+     ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
+    if (aPart) {
       aHasPart = true;
       //break;
     } else {
-      isDisplayed = myDisplayer->display(aFeature, false);
+      ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(*aIt);
+      if (aRes)
+        isDisplayed = myDisplayer->display(aRes, false);
     }
   }
   if (isDisplayed)
@@ -824,19 +827,13 @@ void XGUI_Workshop::onFeatureTriggered()
 }
 
 //******************************************************
-void XGUI_Workshop::changeCurrentDocument(FeaturePtr thePart)
+void XGUI_Workshop::changeCurrentDocument(ObjectPtr theObj)
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-  if (thePart) {
-    DocumentPtr aFeaDoc;
-    if (!XGUI_Tools::isModelObject(thePart)) {
-      aFeaDoc = thePart->data()->docRef("PartDocument")->value();
-    } else {
-      ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(thePart);
-      aFeaDoc = aObject->featureRef()->data()->docRef("PartDocument")->value();
-    }
-    if (aFeaDoc)
-      aMgr->setCurrentDocument(aFeaDoc);
+  if (theObj) {
+    DocumentPtr aPartDoc = theObj->document();
+    if (aPartDoc)
+      aMgr->setCurrentDocument(aPartDoc);
   } else {
     aMgr->setCurrentDocument(aMgr->rootDocument());
   }
@@ -858,17 +855,19 @@ XGUI_SalomeViewer* XGUI_Workshop::salomeViewer() const
 //**************************************************************
 void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
 {
-  QFeatureList aFeatures = mySelector->selection()->selectedFeatures();
-  if ((theId == "ACTIVATE_PART_CMD") && (aFeatures.size() > 0))
-    activatePart(aFeatures.first());
-  else if (theId == "DEACTIVATE_PART_CMD") 
-    activatePart(FeaturePtr());
+  QList<ObjectPtr> aObjects = mySelector->selection()->selectedObjects();
+  if ((theId == "ACTIVATE_PART_CMD") && (aObjects.size() > 0)) {
+    ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObjects.first());
+    if (aPart)
+      activatePart(aPart);
+  } else if (theId == "DEACTIVATE_PART_CMD") 
+    activatePart(ResultPartPtr());
   else if (theId == "DELETE_CMD")
-    deleteFeatures(aFeatures);
+    deleteObjects(aObjects);
   else if (theId == "SHOW_CMD")
-    showFeatures(aFeatures, true);
+    showObjects(aObjects, true);
   else if (theId == "HIDE_CMD")
-    showFeatures(aFeatures, false);
+    showObjects(aObjects, false);
 }
 
 //**************************************************************
@@ -892,7 +891,7 @@ void XGUI_Workshop::onWidgetValuesChanged()
 }
 
 //**************************************************************
-void XGUI_Workshop::activatePart(FeaturePtr theFeature)
+void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
 {
   changeCurrentDocument(theFeature);
   myObjectBrowser->activatePart(theFeature);
@@ -903,59 +902,52 @@ void XGUI_Workshop::activateLastPart()
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   DocumentPtr aDoc = aMgr->rootDocument();
-  FeaturePtr aLastPart = aDoc->feature(ModelAPI_Document::PARTS_GROUP(),
-                                       aDoc->size(ModelAPI_Document::PARTS_GROUP()) - 1, true);
-  activatePart(aLastPart);
+  std::string aGrpName = ModelAPI_ResultPart::group();
+  ObjectPtr aLastPart = aDoc->object(aGrpName, aDoc->size(aGrpName) - 1);
+  ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aLastPart);
+  if (aPart)
+    activatePart(aPart);
 }
 
 //**************************************************************
-void XGUI_Workshop::deleteFeatures(QFeatureList theList)
+void XGUI_Workshop::deleteObjects(const QList<ObjectPtr>& theList)
 {
   QMainWindow* aDesktop = isSalomeMode()? salomeConnector()->desktop() : myMainWindow;
   QMessageBox::StandardButton aRes = QMessageBox::warning(aDesktop, tr("Delete features"), 
                                                           tr("Seleted features will be deleted. Continue?"), 
                                                           QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
-  if (aRes == QMessageBox::Yes) {
+  // ToDo: definbe deleting method
+  /*  if (aRes == QMessageBox::Yes) {
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
     aMgr->rootDocument()->startOperation();
-    foreach (FeaturePtr aFeature, theList) {
-      if (aFeature->getKind() == PartSetPlugin_Part::ID()) {
-        DocumentPtr aDoc;
-        if (!XGUI_Tools::isModelObject(aFeature)) {
-          aDoc = aFeature->data()->docRef("PartDocument")->value();
-        } else {
-          ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
-          aDoc = aObject->featureRef()->data()->docRef("PartDocument")->value();
-          aFeature = aObject->featureRef();
-        }
+    foreach (ObjectPtr aObj, theList) {
+      ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+      if (aPart) {
+        DocumentPtr aDoc = aPart->document();
         if (aDoc == aMgr->currentDocument()) {
           aDoc->close();
         }
+        aMgr->rootDocument()->removeFeature(aPart->owner());
       } else {
-        if (XGUI_Tools::isModelObject(aFeature)) {
-          ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
-          aFeature = aObject->featureRef();
-        }
+        aObj->document()->removeFeature(aObj);
       }
-      if (myDisplayer->isVisible(aFeature))
-        myDisplayer->erase(aFeature, false);
-      aFeature->document()->removeFeature(aFeature);
     }
     myDisplayer->updateViewer();
     aMgr->rootDocument()->finishOperation();
-  }
+  }*/
 }
 
 //**************************************************************
-void XGUI_Workshop::showFeatures(QFeatureList theList, bool isVisible)
+void XGUI_Workshop::showObjects(const QList<ObjectPtr>& theList, bool isVisible)
 {
-  if (isVisible) {
-    foreach (FeaturePtr aFeature, theList) {
-      myDisplayer->display(aFeature, false);
-    }
-  } else {
-    foreach (FeaturePtr aFeature, theList) {
-      myDisplayer->erase(aFeature, false);
+  foreach (ObjectPtr aObj, theList) {
+    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    if (aRes) {
+      if (isVisible) {
+        myDisplayer->display(aRes, false);
+      } else {
+        myDisplayer->erase(aRes, false);
+      }
     }
   }
   myDisplayer->updateViewer();

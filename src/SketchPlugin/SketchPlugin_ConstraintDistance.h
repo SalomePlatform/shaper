@@ -32,10 +32,6 @@ public:
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
   {static std::string MY_KIND = SketchPlugin_ConstraintDistance::ID(); return MY_KIND;}
 
-  /// \brief Returns to which group in the document must be added feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getGroup() 
-  {static std::string MY_GROUP = SketchPlugin_Sketch::ID(); return MY_GROUP;}
-
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 

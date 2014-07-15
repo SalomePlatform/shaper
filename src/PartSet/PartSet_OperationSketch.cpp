@@ -91,12 +91,12 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
       return;
 
     if (theHighlighted.size() == 1) {
-      FeaturePtr aFeature = theHighlighted.front().feature();
+      ResultPtr aFeature = theHighlighted.front().result();
       if (aFeature) {
         std::string anOperationType = PartSet_OperationFeatureEdit::Type();
         if (theSelected.size() > 1)
           anOperationType = PartSet_OperationFeatureEditMulti::Type();
-        restartOperation(anOperationType, aFeature);
+        // TODO restartOperation(anOperationType, aFeature);
       }
     }
     else
@@ -117,9 +117,10 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
     /// It is empty and we have to use the process mouse release to start edition operation
     /// for these objects
     if (theSelected.size() == 1) {
-      FeaturePtr aFeature = theSelected.front().feature();
-      if (aFeature)
-        restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+      ResultPtr aFeature = theSelected.front().result();
+      // TODO
+      //if (aFeature)
+      //  restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
     }
   }
 }
@@ -145,7 +146,15 @@ std::list<FeaturePtr> PartSet_OperationSketch::subFeatures() const
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SketchPlugin_Sketch::FEATURES_ID()));
 
-  return aRefList->list();
+  std::list<ObjectPtr> aList = aRefList->list();
+  std::list<ObjectPtr>::iterator aIt;
+  std::list<FeaturePtr> aFeaList;
+  for (aIt = aList.begin(); aIt != aList.end(); ++aIt) {
+    FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*aIt);
+    if (aFeature)
+      aFeaList.push_back(aFeature);
+  }
+  return aFeaList;
 }
 
 void PartSet_OperationSketch::stopOperation()

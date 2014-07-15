@@ -28,26 +28,31 @@ public:
   /// Returns a list of viewer selected presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  std::list<ModuleBase_ViewerPrs> getSelected(int theShapeTypeToSkip = -1) const;
+  virtual std::list<ModuleBase_ViewerPrs> getSelected(int theShapeTypeToSkip = -1) const;
 
   /// Returns a list of viewer highlited presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  std::list<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const;
+  virtual std::list<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const;
 
   /**
-  * Returns list of features currently selected in 3d viewer
+  * Returns list of currently selected objects
   */
-  QFeatureList selectedFeatures() const;
+  virtual QList<ObjectPtr> selectedObjects() const;
+
+  /**
+  * Returns list of currently selected results
+  */
+  virtual QResultList selectedResults() const;
   
   //! Returns list of currently selected QModelIndexes
-  QModelIndexList selectedIndexes() const;
+  virtual QModelIndexList selectedIndexes() const;
 
   //! Returns list of currently selected AIS objects
-  void selectedAISObjects(AIS_ListOfInteractive& theList) const;
+  virtual void selectedAISObjects(AIS_ListOfInteractive& theList) const;
 
   //! Returns list of currently selected shapes
-  void selectedShapes(NCollection_List<TopoDS_Shape>& theList) const;
+  virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theList) const;
 
 private:
   XGUI_Workshop* myWorkshop;

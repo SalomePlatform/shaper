@@ -33,7 +33,12 @@ public:
   /**
   * Returns list of features currently selected in 3d viewer
   */
-  virtual QFeatureList selectedFeatures() const = 0;
+  virtual QList<ObjectPtr> selectedObjects() const = 0;
+
+  /**
+  * Returns list of currently selected results
+  */
+  virtual QResultList selectedResults() const = 0;
   
   //! Returns list of currently selected QModelIndexes
   virtual QModelIndexList selectedIndexes() const = 0;

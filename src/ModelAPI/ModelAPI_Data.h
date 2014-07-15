@@ -31,7 +31,7 @@ class MODELAPI_EXPORT ModelAPI_Data
 public:
 
   /// Returns the name of the feature visible by the user in the object browser
-  virtual std::string getName() = 0;
+  virtual std::string name() = 0;
 
   /// Defines the name of the feature visible by the user in the object browser
   virtual void setName(std::string theName) = 0;
@@ -63,11 +63,6 @@ public:
   virtual bool isEqual(const boost::shared_ptr<ModelAPI_Data> theData) = 0;
   /// Returns true if it is correctly connected t othe data model
   virtual bool isValid() = 0;
-
-  /// Stores the shape (called by the execution method).
-  virtual void store(const boost::shared_ptr<GeomAPI_Shape>& theShape) = 0;
-  /// Returns the shape-result produced by this feature
-  virtual boost::shared_ptr<GeomAPI_Shape> shape() = 0;
 
   /// Initializes object by the attributes: must be called just after the object is created
   /// for each attribute of the object

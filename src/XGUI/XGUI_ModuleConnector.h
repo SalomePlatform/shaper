@@ -29,7 +29,7 @@ public:
   virtual Handle(AIS_InteractiveContext) AISContext() const;
 
   //! Returns list of currently selected data objects
-  virtual QFeatureList selectedFeatures() const; 
+  virtual QList<ObjectPtr> selectedObjects() const; 
 
   //! Returns instance of loaded module
   virtual ModuleBase_IModule* module() const;

@@ -145,19 +145,21 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
       }
     }
   }
-  FeaturePtr aFeature;
+  ResultPtr aFeature;
   if (!theSelected.empty()) {
     ModuleBase_ViewerPrs aPrs = theSelected.front();
-    aFeature = aPrs.feature();
+    aFeature = aPrs.result();
   }
-  else
-    aFeature = feature(); // for the widget distance only
+  // TODO
+  //else
+  //  aFeature = feature(); // for the widget distance only
 
-  bool isApplyed = setWidgetValue(aFeature, aX, anY);
+  // TODO
+  /*bool isApplyed = setWidgetValue(aFeature, aX, anY);
   if (isApplyed) {
     flushUpdated();
     emit activateNextWidget(myActiveWidget);
-  }
+  }*/
 }
 
 void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
@@ -192,7 +194,7 @@ void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* t
   if ((myPreSelection.size() > 0) && myActiveWidget) {
     const ModuleBase_ViewerPrs& aPrs = myPreSelection.front();
     ModuleBase_WidgetValueFeature aValue;
-    aValue.setFeature(aPrs.feature());
+    aValue.setResult(aPrs.result());
     if (myActiveWidget->setValue(&aValue)) {
       myPreSelection.remove(aPrs);
       emit activateNextWidget(myActiveWidget);
@@ -281,7 +283,7 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
 bool PartSet_OperationFeatureCreate::setWidgetValue(FeaturePtr theFeature, double theX, double theY)
 {
   ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
-  aValue->setFeature(theFeature);
+  aValue->setResult(theFeature->firstResult());
   aValue->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
   bool isApplyed = myActiveWidget->setValue(aValue);
 

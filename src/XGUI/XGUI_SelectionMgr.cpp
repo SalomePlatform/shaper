@@ -12,6 +12,8 @@
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Result.h>
+#include <ModelAPI_Object.h>
 
 
 
@@ -40,24 +42,30 @@ void XGUI_SelectionMgr::connectViewers()
 //**************************************************************
 void XGUI_SelectionMgr::onObjectBrowserSelection()
 {
-  QFeatureList aFeatures = myWorkshop->objectBrowser()->selectedFeatures();
+  QList<ObjectPtr> aObjects = myWorkshop->objectBrowser()->selectedObjects();
+  QResultList aResults;
+  foreach(ObjectPtr aObject, aObjects) {
+    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+    if (aRes)
+      aResults.append(aRes);
+  }
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  aDisplayer->setSelected(aFeatures);
+  aDisplayer->setSelected(aResults);
   emit selectionChanged();
 }
 
 //**************************************************************
 void XGUI_SelectionMgr::onViewerSelection()
 {
-  QFeatureList aFeatures;
+  QList<ObjectPtr> aFeatures;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
     Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
-    FeaturePtr aFeature = myWorkshop->displayer()->getFeature(anIO);
-    if (aFeature)
-      aFeatures.append(aFeature);
+    ResultPtr aResult = myWorkshop->displayer()->getResult(anIO);
+    if (aResult)
+      aFeatures.append(aResult);
   }
-  myWorkshop->objectBrowser()->setFeaturesSelected(aFeatures);
+  myWorkshop->objectBrowser()->setObjectsSelected(aFeatures);
   emit selectionChanged();
 }
 

@@ -13,7 +13,7 @@ class Model_EventCreator : public ModelAPI_EventCreator {
 public:
   /// creates created, updated or moved messages and sends to the loop
   virtual void sendUpdated(
-    const FeaturePtr& theFeature, const Events_ID& theEvent, const bool isGroupped = true) const;
+    const ObjectPtr& theObject, const Events_ID& theEvent, const bool isGroupped = true) const;
   /// creates deleted message and sends to the loop
   virtual void sendDeleted(
     const boost::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theGroup) const;
@@ -23,20 +23,20 @@ public:
 };
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
-class Model_FeatureUpdatedMessage : public ModelAPI_FeatureUpdatedMessage {
-  std::set<FeaturePtr> myFeatures; ///< which feature is changed
+class Model_ObjectUpdatedMessage : public ModelAPI_ObjectUpdatedMessage {
+  std::set<ObjectPtr> myObjects; ///< which feature is changed
 
   /// Sender is not important, all information is located in the feature.
   /// Use ModelAPI for creation of this event. Used for creation, movement and edition events.
-  Model_FeatureUpdatedMessage(
-    const FeaturePtr& theFeature,
+  Model_ObjectUpdatedMessage(
+    const ObjectPtr& theObject,
     const Events_ID& theEvent);
 
   friend class Model_EventCreator;
 public:
 
   /// Returns the feature that has been updated
-  virtual std::set<FeaturePtr> features() const;
+  virtual std::set<ObjectPtr> features() const;
 
   //! Creates a new empty group (to store it in the loop before flush)
   virtual Events_MessageGroup* newEmpty();
@@ -46,12 +46,12 @@ public:
 };
 
 /// Message that feature was deleted (used for Object Browser update)
-class Model_FeatureDeletedMessage : public ModelAPI_FeatureDeletedMessage {
+class Model_ObjectDeletedMessage : public ModelAPI_ObjectDeletedMessage {
   boost::shared_ptr<ModelAPI_Document> myDoc; ///< document owner of the feature
   std::set<std::string> myGroups; ///< group identifiers that contained the deleted feature
 
   /// Use ModelAPI for creation of this event.
-  Model_FeatureDeletedMessage(
+  Model_ObjectDeletedMessage(
     const boost::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theGroup);
 
   friend class Model_EventCreator;
