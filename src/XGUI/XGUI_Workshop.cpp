@@ -310,7 +310,12 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const Model_ObjectUpdatedMessage* theM
     ObjectPtr aObj = (*aIt);
     ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
     if (aRes) {
-      isDisplayed = myDisplayer->redisplay(aRes, false);
+      if (aRes->data())
+        isDisplayed = myDisplayer->redisplay(aRes, false);
+      else {
+        myDisplayer->erase(aRes, false);
+        isDisplayed = true;
+      }
     }
   }
   if (isDisplayed)
