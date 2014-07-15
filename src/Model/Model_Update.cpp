@@ -9,6 +9,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_Result.h>
 #include <Events_Loop.h>
 
 using namespace std;
@@ -84,8 +85,14 @@ bool Model_Update::updateObject(boost::shared_ptr<ModelAPI_Object> theObject)
     anExecute = aMustbeUpdated || anExecute;
     if (anExecute) {
       aRealFeature->execute();
+      // redisplay all results
       static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-      ModelAPI_EventCreator::get()->sendUpdated(theObject, EVENT_DISP);
+      const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aRealFeature->results();
+      std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+      for(; aRIter != aResults.cend(); aRIter++) {
+        boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+        ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
+      }
     }
   }
   myUpdated[theObject] = anExecute;
