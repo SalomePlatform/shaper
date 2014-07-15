@@ -750,24 +750,48 @@ void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData
 boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstruction(
   const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  boost::shared_ptr<ModelAPI_ResultConstruction> aResult(new Model_ResultConstruction());
-  storeResult(theFeatureData, aResult);
+  ObjectPtr anOldObject = object(boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
+    label().Father().FindChild(TAG_FEATURE_RESULTS).FindChild(theIndex + 1));
+  boost::shared_ptr<ModelAPI_ResultConstruction> aResult;
+  if (anOldObject) {
+    aResult = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anOldObject);
+  }
+  if (!aResult) {
+    aResult = boost::shared_ptr<ModelAPI_ResultConstruction>(new Model_ResultConstruction);
+    storeResult(theFeatureData, aResult);
+  }
   return aResult;
 }
 
 boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody(
   const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  boost::shared_ptr<ModelAPI_ResultBody> aResult(new Model_ResultBody());
-  storeResult(theFeatureData, aResult);
+  ObjectPtr anOldObject = object(boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
+    label().Father().FindChild(TAG_FEATURE_RESULTS).FindChild(theIndex + 1));
+  boost::shared_ptr<ModelAPI_ResultBody> aResult;
+  if (anOldObject) {
+    aResult = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(anOldObject);
+  }
+  if (!aResult) {
+    aResult = boost::shared_ptr<ModelAPI_ResultBody>(new Model_ResultBody);
+    storeResult(theFeatureData, aResult);
+  }
   return aResult;
 }
 
 boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
   const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  boost::shared_ptr<ModelAPI_ResultPart> aResult(new Model_ResultPart());
-  storeResult(theFeatureData, aResult);
+  ObjectPtr anOldObject = object(boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
+    label().Father().FindChild(TAG_FEATURE_RESULTS).FindChild(theIndex + 1));
+  boost::shared_ptr<ModelAPI_ResultPart> aResult;
+  if (anOldObject) {
+    aResult = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(anOldObject);
+  }
+  if (!aResult) {
+    aResult = boost::shared_ptr<ModelAPI_ResultPart>(new Model_ResultPart);
+    storeResult(theFeatureData, aResult);
+  }
   return aResult;
 }
 
