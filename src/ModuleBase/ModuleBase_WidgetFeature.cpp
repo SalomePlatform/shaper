@@ -62,8 +62,9 @@ bool ModuleBase_WidgetFeature::setValue(ModuleBase_WidgetValue* theValue)
   if (theValue) {
     ModuleBase_WidgetValueFeature* aFeatureValue = 
                          dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
-    if (aFeatureValue)
-      isDone = setFeature(aFeatureValue->feature());
+    // TODO
+//    if (aFeatureValue)
+//      isDone = setFeature(aFeatureValue->feature());
   }
   return isDone;
 }

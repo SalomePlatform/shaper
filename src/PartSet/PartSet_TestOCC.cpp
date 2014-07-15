@@ -152,12 +152,12 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
     boost::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
     if (!anAIS->empty())
-      aDisplayer->redisplay(aFeature, anAIS, false);
+      aDisplayer->redisplay(aFeature->firstResult(), anAIS, false);
 
     std::list<int> aModes;
     aModes.push_back(TopAbs_VERTEX);
     aModes.push_back(TopAbs_EDGE);
-    aDisplayer->activateInLocalContext(aFeature, aModes, true);
+    aDisplayer->activateInLocalContext(aFeature->firstResult(), aModes, true);
 
     // change the line
     /*double aDelta = -200;
@@ -182,9 +182,9 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
     //aModes.push_back(TopAbs_VERTEX);
     //aModes.push_back(TopAbs_EDGE);
     //aDisplayer->activateInLocalContext(aFeature, aModes, true);
-    myTestObject = aFeature;
+    myTestObject = aFeature->firstResult();
 
-    QFeatureList aFeatureList;
+    QResultList aFeatureList;
     aFeatureList.append(myTestObject);
     aDisplayer->setSelected(aFeatureList, true);
   }
@@ -195,13 +195,14 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   // change the line
   if (!myTestObject)
     return;
-  FeaturePtr aFeature = myTestObject;
+  ResultPtr aFeature = myTestObject;
 
   myTestDelta = myTestDelta - 50;
   double aDelta = myTestDelta;
-  PartSet_Tools::setFeaturePoint(aFeature, -100/*aDelta*/, -100/*aDelta*/, LINE_ATTR_START);
-  PartSet_Tools::setFeaturePoint(aFeature, 200/*aDelta*2*/, 200/*aDelta*2*/, LINE_ATTR_END);
-  boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
+  // TODO
+  //PartSet_Tools::setFeaturePoint(aFeature, -100/*aDelta*/, -100/*aDelta*/, LINE_ATTR_START);
+  //PartSet_Tools::setFeaturePoint(aFeature, 200/*aDelta*2*/, 200/*aDelta*2*/, LINE_ATTR_END);
+  //boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
 
   boost::shared_ptr<GeomAPI_AISObject> aPrevAIS;
   boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 

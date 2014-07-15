@@ -14,14 +14,14 @@ ModuleBase_WidgetValueFeature::~ModuleBase_WidgetValueFeature()
 {
 }
 
-void ModuleBase_WidgetValueFeature::setFeature(const FeaturePtr& theFeature)
+void ModuleBase_WidgetValueFeature::setResult(const ResultPtr& theFeature)
 {
-  myFeature = theFeature;
+  myResult = theFeature;
 }
 
-const FeaturePtr& ModuleBase_WidgetValueFeature::feature() const
+const ResultPtr& ModuleBase_WidgetValueFeature::result() const
 {
-  return myFeature;
+  return myResult;
 }
 
 void ModuleBase_WidgetValueFeature::setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)

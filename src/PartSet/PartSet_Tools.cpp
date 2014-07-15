@@ -162,7 +162,7 @@ FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theVie
                                boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
     if (aMinDelta < 0 || aMinDelta > aDelta) {
       aMinDelta = aDelta;
-      aDeltaFeature = aPrs.result();
+      // TODO aDeltaFeature = aPrs.result();
     }
   }
   return aDeltaFeature;
@@ -225,7 +225,7 @@ FeaturePtr PartSet_Tools::feature(FeaturePtr theFeature, const std::string& theA
   boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(theAttribute));
   if (anAttr) {
-    aFeature = anAttr->feature();
+    aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->object());
     if (!theKind.empty() && aFeature && aFeature->getKind() != theKind) {
       aFeature = FeaturePtr();
     }
@@ -277,14 +277,14 @@ void PartSet_Tools::setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
         boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SKETCH_ATTR_FEATURES));
 
-  std::list<FeaturePtr > aFeatures = aRefList->list();
-  std::list<FeaturePtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
+  std::list<ObjectPtr > aFeatures = aRefList->list();
+  std::list<ObjectPtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
   std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes;
   boost::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = boost::shared_ptr<GeomAPI_Pnt2d>
                                                      (new GeomAPI_Pnt2d(theClickedX, theClickedY));
   for (; anIt != aLast; anIt++)
   {
-    FeaturePtr aFeature = *anIt;
+    FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
     // find the given point in the feature attributes
     anAttiributes = aFeature->data()->attributes(GeomDataAPI_Point2D::type());
     std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),

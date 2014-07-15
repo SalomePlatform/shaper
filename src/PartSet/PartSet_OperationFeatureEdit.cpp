@@ -78,23 +78,25 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
     aFeature = theHighlighted.front().result();
   if (!aFeature && !theSelected.empty()) // changed for a constrain
     aFeature = theSelected.front().result();
-
-  if (!aFeature || aFeature != feature())
+  // TODO
+  /*if (!aFeature || aFeature != feature())
   {
     commit();
     emit featureConstructed(feature(), FM_Deactivation);
 
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
     if(aHasShift && !theHighlighted.empty()) {
-      QFeatureList aSelected;
+      QResultList aSelected;
+      // TODO
       aSelected.push_back(feature());
       aSelected.push_back(theHighlighted.front().result());
       emit setSelection(aSelected);
     }
+    // TODO
     else if (aFeature) {
       restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
     }
-  }
+  }*/
 }
 
 void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)

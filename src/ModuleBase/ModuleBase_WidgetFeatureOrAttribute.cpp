@@ -47,7 +47,8 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
                          dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue) {
       boost::shared_ptr<GeomAPI_Pnt2d> aValuePoint = aFeatureValue->point();
-      FeaturePtr aValueFeature = aFeatureValue->feature();
+      //TODO
+/*      FeaturePtr aValueFeature = aFeatureValue->feature();
       if (aValueFeature) {
         isDone = setFeature(aValueFeature);
       }
@@ -66,7 +67,7 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
         }
         if (aFPoint)
           isDone = setAttribute(aFPoint);
-      }
+      }*/
     }
   }
   return isDone;

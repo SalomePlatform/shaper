@@ -4,6 +4,7 @@
 
 #include <PartSet_OperationSketchBase.h>
 #include <PartSet_Tools.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <SketchPlugin_Feature.h>
 #include <V3d_View.hxx>
@@ -35,9 +36,13 @@ boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview(
 {
   boost::shared_ptr<SketchPlugin_Feature> aFeature = 
                               boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
-  if (!aFeature)
-    return boost::shared_ptr<GeomAPI_Shape>();
-  return aFeature->preview();
+  if (aFeature) {
+    ResultPtr aRes = aFeature->firstResult();
+    ResultBodyPtr aBody = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(aRes);
+    if (aBody)
+      return aBody->shape();
+  }
+  return boost::shared_ptr<GeomAPI_Shape>();
 }
 
 std::list<FeaturePtr> PartSet_OperationSketchBase::subFeatures() const

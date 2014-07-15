@@ -58,9 +58,10 @@ void PartSet_OperationFeatureEditMulti::initSelection(const std::list<ModuleBase
     // deselected in the viewer by blockSelection signal in the startOperation method.
     bool isSelected = false;
     std::list<ModuleBase_ViewerPrs>::const_iterator anIt = theSelected.begin(), aLast = theSelected.end();
-    for (; anIt != aLast && !isSelected; anIt++) {
+    // TODO
+    /*for (; anIt != aLast && !isSelected; anIt++) {
       isSelected = (*anIt).feature() == feature();
-    }
+    }*/
     if (!isSelected)
       myFeatures = theHighlighted;
     else
@@ -109,13 +110,14 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Handle
     aSketchFeature->move(aDeltaX, aDeltaY);
 
     std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
-    for (; anIt != aLast; anIt++) {
+    // TODO
+    /*for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = (*anIt).feature();
       if (!aFeature || aFeature == feature())
         continue;
       aSketchFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
       aSketchFeature->move(aDeltaX, aDeltaY);
-    }
+    }*/
   }
   sendFeatures();
 
@@ -129,12 +131,13 @@ void PartSet_OperationFeatureEditMulti::mouseReleased(QMouseEvent* theEvent, Han
   std::list<ModuleBase_ViewerPrs> aFeatures = myFeatures;
   commit();
   std::list<ModuleBase_ViewerPrs>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
-  for (; anIt != aLast; anIt++) {
+  // TODO
+  /*for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = (*anIt).feature();
     if (aFeature) {
       emit featureConstructed(aFeature, FM_Deactivation);
 	}
-  }
+  }*/
 }
 
 void PartSet_OperationFeatureEditMulti::startOperation()
@@ -165,8 +168,8 @@ void PartSet_OperationFeatureEditMulti::blockSelection(bool isBlocked, const boo
   QFeatureList aFeatureList;
   std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(),
                                             aLast = myFeatures.end();
-  for(; anIt != aLast; anIt++)
-    aFeatureList.append((*anIt).feature());
+  /*for(; anIt != aLast; anIt++)
+    aFeatureList.append((*anIt).feature());*/
   if (isBlocked) {
     emit setSelection(QFeatureList());
     emit stopSelection(aFeatureList, true);
@@ -185,13 +188,14 @@ void PartSet_OperationFeatureEditMulti::sendFeatures()
 
   std::list<FeaturePtr > aFeatures;
   std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
-  for (; anIt != aLast; anIt++) {
+  // TODO
+  /*for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = (*anIt).feature();
     if (!aFeature)
       continue;
 
     ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
-  }
+  }*/
   Events_Loop::loop()->flush(anEvent);
   flushUpdated();
 }

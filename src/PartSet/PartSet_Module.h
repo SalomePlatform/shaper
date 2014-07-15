@@ -55,7 +55,7 @@ public:
   /// \param theFeature the feature instance to be displayed
   /// \param isDisplay the state whether the presentation should be displayed or erased
   /// \param isUpdateViewer the flag whether the viewer should be updated
-  void visualizePreview(FeaturePtr theFeature, bool isDisplay,
+  void visualizePreview(ResultPtr theResult, bool isDisplay,
                         const bool isUpdateViewer = true);
 
   /// Activates the feature in the displayer
@@ -125,7 +125,7 @@ public slots:
 
   /// SLOT, to set selection
   /// \param theFeatures a list of features to be selected
-  void onSetSelection(const QFeatureList& theFeatures);
+  void onSetSelection(const QResultList& theFeatures);
 
   /// SLOT, to close the viewer local context
   void onCloseLocalContext();

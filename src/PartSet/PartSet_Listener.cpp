@@ -46,13 +46,13 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
     std::set<ObjectPtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
     for (; anIt != aLast; anIt++) {
       ObjectPtr aObject = *anIt;
-      ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
-      if (aResult) {
-        if (myModule->workshop()->displayer()->isVisible(aResult) ||
+      FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+      if (aFeature) {
+        if (myModule->workshop()->displayer()->isVisible(aFeature->firstResult()) ||
             aType == EVENT_OBJECT_CREATED) {
-          myModule->visualizePreview(aResult, true, false);
+          myModule->visualizePreview(aFeature->firstResult(), true, false);
           //if (aType == EVENT_OBJECT_CREATED)
-          myModule->activateFeature(aResult, true);
+          myModule->activateFeature(aFeature, true);
         }
       }
     }
@@ -69,7 +69,7 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
     for (; anIt != aLast; anIt++) {
       std::string aGroup = *anIt;
       if (aGroup.compare(SKETCH_KIND) == 0) { // Update only Sketch group
-        myModule->workshop()->displayer()->eraseDeletedFeatures();
+        myModule->workshop()->displayer()->eraseDeletedResults();
         myModule->updateCurrentPreview(aGroup);
       }
     }

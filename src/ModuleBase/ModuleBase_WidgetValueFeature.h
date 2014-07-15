@@ -8,7 +8,7 @@
 #include <ModuleBase.h>
 #include <ModuleBase_WidgetValue.h>
 
-#include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
 
 #include <boost/shared_ptr.hpp>
 
@@ -28,11 +28,11 @@ public:
 
   /// Fill the widget values by given point
   /// \param thePoint the point
-  void setFeature(const FeaturePtr& theFeature);
+  void setResult(const ResultPtr& theFeature);
 
   /// Returns the widget values by given point
   /// \return theFeature the current feature
-  const FeaturePtr& feature() const;
+  const ResultPtr& result() const;
 
   /// Fill the widget values by given point
   /// \param thePoint the point
@@ -43,7 +43,7 @@ public:
   const boost::shared_ptr<GeomAPI_Pnt2d>& point() const;
 
 private:
-  FeaturePtr myFeature;
+  ResultPtr myResult;
   boost::shared_ptr<GeomAPI_Pnt2d> myPoint;
 };
 
