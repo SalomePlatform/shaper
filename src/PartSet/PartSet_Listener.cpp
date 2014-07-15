@@ -68,7 +68,7 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
     std::set<std::string>::const_iterator anIt = aGroups.begin(), aLast = aGroups.end();
     for (; anIt != aLast; anIt++) {
       std::string aGroup = *anIt;
-      if (aGroup.compare(SKETCH_KIND) == 0) { // Update only Sketch group
+      if (aGroup.compare(SketchPlugin_Sketch::ID()) == 0) { // Update only Sketch group
         myModule->workshop()->displayer()->eraseDeletedResults();
         myModule->updateCurrentPreview(aGroup);
       }

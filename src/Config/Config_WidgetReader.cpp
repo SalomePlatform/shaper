@@ -14,6 +14,8 @@
 #include <libxml/xpath.h>
 #include <libxml/xmlstring.h>
 
+#include <list>
+
 #ifdef _DEBUG
 #include <iostream>
 #endif
@@ -43,9 +45,9 @@ std::string Config_WidgetReader::featureDescription(const std::string& theFeatur
 void Config_WidgetReader::processNode(xmlNodePtr theNode)
 {
   if (isNode(theNode, NODE_FEATURE, NULL)) {
-    std::string aNodeName = getProperty(theNode, _ID);
-    myWidgetCache[aNodeName] = dumpNode(theNode);
-    myDescriptionCache[aNodeName] = getProperty(theNode, FEATURE_TEXT);
+    myCurrentFeature = getProperty(theNode, _ID);
+    myWidgetCache[myCurrentFeature] = dumpNode(theNode);
+    myDescriptionCache[myCurrentFeature] = getProperty(theNode, FEATURE_TEXT);
   }
   //Process SOURCE nodes.
   Config_XMLReader::processNode(theNode);
@@ -53,7 +55,38 @@ void Config_WidgetReader::processNode(xmlNodePtr theNode)
 
 bool Config_WidgetReader::processChildren(xmlNodePtr theNode)
 {
-  return isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL);
+  //Read all nodes recursively, source and validator nodes have no children
+  return !isNode(theNode, NODE_VALIDATOR, NODE_SOURCE, NULL);
+}
+
+void Config_WidgetReader::resolveSourceNodes(xmlNodePtr theNode)
+{
+  xmlNodePtr aNode = xmlFirstElementChild(theNode);
+  std::list<xmlNodePtr> aSourceNodes;
+  while(aNode != NULL) {
+    if (isNode(aNode, NODE_SOURCE, NULL)) {
+      Config_XMLReader aSourceReader = Config_XMLReader(getProperty(aNode, SOURCE_FILE));
+      xmlNodePtr aSourceRoot = aSourceReader.findRoot();
+      if (!aSourceRoot) {
+        continue;
+      }
+      xmlNodePtr aSourceNode = xmlFirstElementChild(aSourceRoot);
+      xmlNodePtr aTargetNode = xmlDocCopyNodeList(aNode->doc, aSourceNode);
+      while(aTargetNode != NULL) {
+        xmlNodePtr aNextNode = xmlNextElementSibling(aTargetNode);
+        xmlAddPrevSibling(aNode, aTargetNode);
+        aTargetNode = aNextNode;
+      }
+      aSourceNodes.push_back(aNode);
+    }
+    aNode = xmlNextElementSibling(aNode);
+  }
+  //Remove "SOURCE" node.
+  std::list<xmlNodePtr>::iterator it = aSourceNodes.begin();
+  for(; it != aSourceNodes.end(); it++) {
+    xmlUnlinkNode(*it);
+    xmlFreeNode(*it);
+  }
 }
 
 std::string Config_WidgetReader::dumpNode(xmlNodePtr theNode)
@@ -62,19 +95,11 @@ std::string Config_WidgetReader::dumpNode(xmlNodePtr theNode)
   if (!hasChild(theNode)) {
     return result;
   }
-  xmlNodePtr aChildrenNode = xmlFirstElementChild(theNode);
+  //Replace all "source" nodes with content;
+  resolveSourceNodes(theNode);
   xmlBufferPtr buffer = xmlBufferCreate();
-  if (isNode(aChildrenNode, NODE_SOURCE, NULL)) {
-    Config_XMLReader aSourceReader = 
-      Config_XMLReader(getProperty(aChildrenNode, SOURCE_FILE));
-    //Register all validators in the sourced xml
-    aSourceReader.readAll();
-    //Dump!
-    xmlNodePtr aSourceRoot = aSourceReader.findRoot();
-    int size = xmlNodeDump(buffer, aSourceRoot->doc, aSourceRoot, 0, 1);
-  } else {
-    int size = xmlNodeDump(buffer, theNode->doc, theNode, 0, 1);
-  }
+  int size = xmlNodeDump(buffer, theNode->doc, theNode, 0, 0);
   result = std::string((char*) (buffer->content));
+  xmlBufferFree(buffer);
   return result;
 }

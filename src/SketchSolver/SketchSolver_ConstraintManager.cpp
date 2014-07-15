@@ -78,7 +78,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
         if (!aFeature) continue;
         // Only sketches and constraints can be added by Create event
         const std::string& aFeatureKind = aFeature->getKind();
-        if (aFeatureKind.compare(SKETCH_KIND) == 0)
+        if (aFeatureKind.compare(SketchPlugin_Sketch::ID()) == 0)
         {
           boost::shared_ptr<SketchPlugin_Feature> aSketch =
             boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
@@ -110,10 +110,10 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
       dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
     const std::set<std::string>& aFeatureGroups = aDeleteMsg->groups();
 
-    // Find SKETCH_KIND in groups. The constraint groups should be updated when an object removed from Sketch
+    // Find SketchPlugin_Sketch::ID() in groups. The constraint groups should be updated when an object removed from Sketch
     std::set<std::string>::const_iterator aFGrIter;
     for (aFGrIter = aFeatureGroups.begin(); aFGrIter != aFeatureGroups.end(); aFGrIter++)
-      if (aFGrIter->compare(SKETCH_KIND) == 0)
+      if (aFGrIter->compare(SketchPlugin_Sketch::ID()) == 0)
         break;
     
     if (aFGrIter != aFeatureGroups.end())
@@ -261,26 +261,26 @@ void SketchSolver_ConstraintManager::updateEntity(boost::shared_ptr<SketchPlugin
   std::vector<std::string> anAttrList;
   const std::string& aFeatureKind = theFeature->getKind();
   // Point
-  if (aFeatureKind.compare(SKETCH_POINT_KIND) == 0)
-    anAttrList.push_back(POINT_ATTR_COORD);
+  if (aFeatureKind.compare(SketchPlugin_Point::ID()) == 0)
+    anAttrList.push_back(SketchPlugin_Point::COORD_ID());
   // Line
-  else if (aFeatureKind.compare(SKETCH_LINE_KIND) == 0)
+  else if (aFeatureKind.compare(SketchPlugin_Line::ID()) == 0)
   {
-    anAttrList.push_back(LINE_ATTR_START);
-    anAttrList.push_back(LINE_ATTR_END);
+    anAttrList.push_back(SketchPlugin_Line::START_ID());
+    anAttrList.push_back(SketchPlugin_Line::END_ID());
   }
   // Circle
-  else if (aFeatureKind.compare(SKETCH_CIRCLE_KIND) == 0)
+  else if (aFeatureKind.compare(SketchPlugin_Circle::ID()) == 0)
   {
-    anAttrList.push_back(CIRCLE_ATTR_CENTER);
-    anAttrList.push_back(CIRCLE_ATTR_RADIUS);
+    anAttrList.push_back(SketchPlugin_Circle::CENTER_ID());
+    anAttrList.push_back(SketchPlugin_Circle::RADIUS_ID());
   }
   // Arc
-  else if (aFeatureKind.compare(SKETCH_ARC_KIND) == 0)
+  else if (aFeatureKind.compare(SketchPlugin_Arc::ID()) == 0)
   {
-    anAttrList.push_back(ARC_ATTR_CENTER);
-    anAttrList.push_back(ARC_ATTR_START);
-    anAttrList.push_back(ARC_ATTR_END);
+    anAttrList.push_back(SketchPlugin_Arc::CENTER_ID());
+    anAttrList.push_back(SketchPlugin_Arc::START_ID());
+    anAttrList.push_back(SketchPlugin_Arc::END_ID());
   }
   /// \todo Other types of features should be implemented
 
@@ -352,7 +352,7 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
       continue;
 
     boost::shared_ptr<ModelAPI_AttributeRefList> aWPFeatures =
-      boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aWP->data()->attribute(SKETCH_ATTR_FEATURES));
+      boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aWP->data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
     std::list< ObjectPtr >& aFeaturesList = aWPFeatures->list();
     std::list< ObjectPtr >::const_iterator anIter;
     for (anIter = aFeaturesList.begin(); anIter != aFeaturesList.end(); anIter++)

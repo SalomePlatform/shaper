@@ -77,12 +77,12 @@ void PartSet_Tools::convertTo2D(const gp_Pnt& thePoint, FeaturePtr theSketch,
   boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
 
   boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SKETCH_ATTR_ORIGIN));
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
 
   boost::shared_ptr<GeomDataAPI_Dir> aX = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRX));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
   boost::shared_ptr<GeomDataAPI_Dir> anY = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRY));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
 
   gp_Pnt anOriginPnt(anOrigin->x(), anOrigin->y(), anOrigin->z());
   gp_Vec aVec(anOriginPnt, thePoint);
@@ -100,7 +100,7 @@ void PartSet_Tools::convertTo2D(const gp_Pnt& thePoint, FeaturePtr theSketch,
     anEyeVec.Normalize();
 
     boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
-                  boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_NORM));
+                  boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::NORM_ID()));
     gp_Vec aNormalVec(aNormal->x(), aNormal->y(), aNormal->z());
 
     double aDen = anEyeVec * aNormalVec;
@@ -123,11 +123,11 @@ void PartSet_Tools::convertTo3D(const double theX, const double theY,
   boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
 
   boost::shared_ptr<GeomDataAPI_Point> aC = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SKETCH_ATTR_ORIGIN));
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
   boost::shared_ptr<GeomDataAPI_Dir> aX = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRX));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
   boost::shared_ptr<GeomDataAPI_Dir> aY = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_DIRY));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
 
   boost::shared_ptr<GeomAPI_XYZ> aSum = aC->pnt()->xyz()->added(
     aX->dir()->xyz()->multiplied(theX))->added(aY->dir()->xyz()->multiplied(theY));
@@ -238,7 +238,7 @@ void PartSet_Tools::createConstraint(FeaturePtr theSketch,
                                      boost::shared_ptr<GeomDataAPI_Point2D> thePoint2)
 {
   boost::shared_ptr<ModelAPI_Document> aDoc = document();
-  FeaturePtr aFeature = aDoc->addFeature(SKETCH_CONSTRAINT_COINCIDENCE_KIND);
+  FeaturePtr aFeature = aDoc->addFeature(SketchPlugin_ConstraintCoincidence::ID());
 
   if (theSketch) {
     boost::shared_ptr<SketchPlugin_Feature> aSketch = 
@@ -249,11 +249,11 @@ void PartSet_Tools::createConstraint(FeaturePtr theSketch,
   boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
 
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef1 =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
   aRef1->setAttr(thePoint1);
 
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef2 =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_B));
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
   aRef2->setAttr(thePoint2);
 
   if (aFeature) // TODO: generate an error if feature was not created
@@ -275,7 +275,7 @@ void PartSet_Tools::setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
   // the constraint is created between the feature point and the found sketch point
   boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SKETCH_ATTR_FEATURES));
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SketchPlugin_Sketch::FEATURES_ID()));
 
   std::list<ObjectPtr > aFeatures = aRefList->list();
   std::list<ObjectPtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
@@ -308,9 +308,9 @@ boost::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(FeaturePtr theSketch)
 
   boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
   boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SKETCH_ATTR_ORIGIN));
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
   boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SKETCH_ATTR_NORM));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::NORM_ID()));
   aA = aNormal->x();
   aB = aNormal->y();
   aC = aNormal->z();
@@ -329,18 +329,18 @@ boost::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(
     return aPoint;
 
   boost::shared_ptr<GeomDataAPI_Point> aC = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point>(theSketch->data()->attribute(SKETCH_ATTR_ORIGIN));
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(theSketch->data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
   boost::shared_ptr<GeomDataAPI_Dir> aX = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theSketch->data()->attribute(SKETCH_ATTR_DIRX));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theSketch->data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
   boost::shared_ptr<GeomDataAPI_Dir> aY = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theSketch->data()->attribute(SKETCH_ATTR_DIRY));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theSketch->data()->attribute(SketchPlugin_Sketch::DIRY_ID()));
 
   return thePoint2D->to3D(aC->pnt(), aX->dir(), aY->dir());
 }
 
 bool PartSet_Tools::isConstraintFeature(const std::string& theKind)
 {
-  return theKind == SKETCH_CONSTRAINT_DISTANCE_KIND ||
-         theKind == SKETCH_CONSTRAINT_LENGTH_KIND ||
-         theKind == SKETCH_CONSTRAINT_RADIUS_KIND;
+  return theKind == SketchPlugin_ConstraintDistance::ID() ||
+         theKind == SketchPlugin_ConstraintLength::ID() ||
+         theKind == SketchPlugin_ConstraintRadius::ID();
 }

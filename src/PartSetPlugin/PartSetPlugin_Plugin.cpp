@@ -18,7 +18,7 @@ PartSetPlugin_Plugin::PartSetPlugin_Plugin()
 
 FeaturePtr PartSetPlugin_Plugin::createFeature(string theFeatureID)
 {
-  if (theFeatureID == PARTSET_PART_KIND) {
+  if (theFeatureID == PartSetPlugin_Part::ID()) {
     return FeaturePtr(new PartSetPlugin_Part);
   }
   if (theFeatureID == "duplicate") {

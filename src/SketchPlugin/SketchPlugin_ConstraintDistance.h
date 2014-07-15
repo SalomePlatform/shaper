@@ -10,23 +10,27 @@
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
-/// Distance constraint kind
-const std::string SKETCH_CONSTRAINT_DISTANCE_KIND("SketchConstraintDistance");
-
 /** \class SketchPlugin_ConstraintDistance
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint which defines a distance
  *         between a point and another feature (point, line, plane or face)
  *
  *  These constraint has three attributes:
- *  CONSTRAINT_ATTR_VALUE, CONSTRAINT_ATTR_ENTITY_A and CONSTRAINT_ATTR_ENTITY_B
+ *  SketchPlugin_Constraint::VALUE(), SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
 class SketchPlugin_ConstraintDistance: public SketchPlugin_Constraint
 {
 public:
+  /// Distance constraint kind
+  inline static const std::string& ID()
+  {
+    static const std::string MY_CONSTRAINT_DISTANCE_ID("SketchConstraintDistance");
+    return MY_CONSTRAINT_DISTANCE_ID;
+  }
+
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SKETCH_CONSTRAINT_DISTANCE_KIND; return MY_KIND;}
+  {static std::string MY_KIND = SketchPlugin_ConstraintDistance::ID(); return MY_KIND;}
 
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();

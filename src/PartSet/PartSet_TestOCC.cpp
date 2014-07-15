@@ -132,7 +132,7 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
   if (aPreviewOp) {
     // create a line
     boost::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_PluginManager::get()->rootDocument();
-    FeaturePtr aFeature = aDoc->addFeature(SKETCH_LINE_KIND);
+    FeaturePtr aFeature = aDoc->addFeature(SketchPlugin_Line::ID());
     if (aFeature) // TODO: generate an error if feature was not created
       aFeature->execute();
 
@@ -140,8 +140,8 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
                         boost::dynamic_pointer_cast<SketchPlugin_Feature>(aPreviewOp->sketch());
     aSketch->addSub(aFeature);
 
-    PartSet_Tools::setFeaturePoint(aFeature, 100, 100, LINE_ATTR_START);
-    PartSet_Tools::setFeaturePoint(aFeature, 150, 300, LINE_ATTR_END);
+    PartSet_Tools::setFeaturePoint(aFeature, 100, 100, SketchPlugin_Line::START_ID());
+    PartSet_Tools::setFeaturePoint(aFeature, 150, 300, SketchPlugin_Line::END_ID());
 
     boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
 
@@ -163,8 +163,8 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
     /*double aDelta = -200;
     for (int i = 0; i < 20; i++) {
       aDelta = aDelta - i*2;
-      PartSet_Tools::setFeaturePoint(aFeature, 100+aDelta, 200+aDelta, LINE_ATTR_START);
-      PartSet_Tools::setFeaturePoint(aFeature, 300+aDelta, 500+aDelta, LINE_ATTR_END);
+      PartSet_Tools::setFeaturePoint(aFeature, 100+aDelta, 200+aDelta, SketchPlugin_Line::START_ID());
+      PartSet_Tools::setFeaturePoint(aFeature, 300+aDelta, 500+aDelta, SketchPlugin_Line::END_ID());
 
       boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
       Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(

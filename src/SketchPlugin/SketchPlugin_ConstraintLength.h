@@ -10,23 +10,26 @@
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
-/// Length constraint kind
-const std::string SKETCH_CONSTRAINT_LENGTH_KIND("SketchConstraintLength");
-
 /** \class SketchPlugin_ConstraintLength
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint which defines a length of a line segment
  *
  *  These constraint has two attributes:
- *  CONSTRAINT_ATTR_VALUE (length) and CONSTRAINT_ATTR_ENTITY_A (segment),
- *  CONSTRAINT_ATTR_FLYOUT_VALUE_PNT (distance of a constraints handle)
+ *  SketchPlugin_Constraint::VALUE() (length) and SketchPlugin_Constraint::ENTITY_A() (segment),
+ *  SketchPlugin_Constraint::FLYOUT_VALUE_PNT() (distance of a constraints handle)
  */
 class SketchPlugin_ConstraintLength: public SketchPlugin_Constraint
 {
 public:
+  /// Length constraint kind
+  inline static const std::string& ID()
+  {
+    static const std::string MY_CONSTRAINT_LENGTH_ID("SketchConstraintLength");
+    return MY_CONSTRAINT_LENGTH_ID;
+  }
   /// \brief Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SKETCH_CONSTRAINT_LENGTH_KIND; return MY_KIND;}
+  {static std::string MY_KIND = SketchPlugin_ConstraintLength::ID(); return MY_KIND;}
 
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();

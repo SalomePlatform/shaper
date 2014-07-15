@@ -17,7 +17,7 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
 
 FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
 {
-  if (theFeatureID == FEATURES_EXTRUSION_KIND) {
+  if (theFeatureID == FeaturesPlugin_Extrusion::ID()) {
     return FeaturePtr(new FeaturesPlugin_Extrusion);
   }
   // feature of such kind is not found

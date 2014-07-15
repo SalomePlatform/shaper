@@ -9,16 +9,6 @@
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
 
-/// Arc feature kind
-const std::string SKETCH_ARC_KIND("SketchArc");
-
-/// Central 2D point of the circle which contains the arc
-const std::string ARC_ATTR_CENTER("ArcCenter");
-/// Start 2D point of the arc
-const std::string ARC_ATTR_START("ArcStartPoint");
-/// End 2D point of the arc
-const std::string ARC_ATTR_END("ArcEndPoint");
-
 /**\class SketchPlugin_Arc
  * \ingroup DataModel
  * \brief Feature for creation of the new arc of circle in PartSet.
@@ -26,9 +16,35 @@ const std::string ARC_ATTR_END("ArcEndPoint");
 class SketchPlugin_Arc: public SketchPlugin_Feature
 {
 public:
+  /// Arc feature kind
+  inline static const std::string& ID()
+  {
+    static const std::string MY_SKETCH_ARC_ID("SketchArc");
+    return MY_SKETCH_ARC_ID;
+  }
+
+  /// Central 2D point of the circle which contains the arc
+  inline static const std::string& CENTER_ID()
+  {
+    static const std::string MY_CENTER_ID = "ArcCenter";
+    return MY_CENTER_ID;
+  }
+  /// Start 2D point of the arc
+  inline static const std::string& START_ID()
+  {
+    static const std::string MY_START_ID = "ArcStartPoint";
+    return MY_START_ID;
+  }
+  /// End 2D point of the arc
+  inline static const std::string& END_ID()
+  {
+    static const std::string MY_END_ID = "ArcEndPoint";
+    return MY_END_ID;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
-  {static std::string MY_KIND = SKETCH_ARC_KIND; return MY_KIND;}
+  {static std::string MY_KIND = SketchPlugin_Arc::ID(); return MY_KIND;}
 
   /// Creates an arc-shape
   SKETCHPLUGIN_EXPORT virtual void execute();

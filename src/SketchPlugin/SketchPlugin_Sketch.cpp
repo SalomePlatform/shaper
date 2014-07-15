@@ -29,11 +29,11 @@ SketchPlugin_Sketch::SketchPlugin_Sketch()
 
 void SketchPlugin_Sketch::initAttributes()
 {
-  data()->addAttribute(SKETCH_ATTR_ORIGIN, GeomDataAPI_Point::type());
-  data()->addAttribute(SKETCH_ATTR_DIRX, GeomDataAPI_Dir::type());
-  data()->addAttribute(SKETCH_ATTR_DIRY, GeomDataAPI_Dir::type());
-  data()->addAttribute(SKETCH_ATTR_NORM, GeomDataAPI_Dir::type());
-  data()->addAttribute(SKETCH_ATTR_FEATURES, ModelAPI_AttributeRefList::type());
+  data()->addAttribute(SketchPlugin_Sketch::ORIGIN_ID(), GeomDataAPI_Point::type());
+  data()->addAttribute(SketchPlugin_Sketch::DIRX_ID(), GeomDataAPI_Dir::type());
+  data()->addAttribute(SketchPlugin_Sketch::DIRY_ID(), GeomDataAPI_Dir::type());
+  data()->addAttribute(SketchPlugin_Sketch::NORM_ID(), GeomDataAPI_Dir::type());
+  data()->addAttribute(SketchPlugin_Sketch::FEATURES_ID(), ModelAPI_AttributeRefList::type());
 }
 
 void SketchPlugin_Sketch::execute() 
@@ -54,16 +54,16 @@ void SketchPlugin_Sketch::execute()
   if (!data()->isValid())
     return ;
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
-    boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(SKETCH_ATTR_FEATURES));
+    boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
 
   boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(SKETCH_ATTR_ORIGIN));
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
   boost::shared_ptr<GeomDataAPI_Dir> aDirX = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_DIRX));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
   boost::shared_ptr<GeomDataAPI_Dir> aDirY = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_DIRY));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SketchPlugin_Sketch::DIRY_ID()));
   boost::shared_ptr<GeomDataAPI_Dir> aNorm = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_NORM));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SketchPlugin_Sketch::NORM_ID()));
 
   std::list<ObjectPtr> aFeatures = aRefList->list();
   if (aFeatures.empty())
@@ -110,7 +110,7 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Sketch::getAISObject(
 const void SketchPlugin_Sketch::addSub(const FeaturePtr& theFeature)
 {
   boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature)->setSketch(this);
-  data()->reflist(SKETCH_ATTR_FEATURES)->append(theFeature);
+  data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->append(theFeature);
 }
 
 void SketchPlugin_Sketch::addPlane(double theX, double theY, double theZ,
@@ -126,11 +126,11 @@ void SketchPlugin_Sketch::addPlane(double theX, double theY, double theZ,
 boost::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, const double theY)
 {
   boost::shared_ptr<GeomDataAPI_Point> aC = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(SKETCH_ATTR_ORIGIN));
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
   boost::shared_ptr<GeomDataAPI_Dir> aX = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_DIRX));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
   boost::shared_ptr<GeomDataAPI_Dir> aY = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_DIRY));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SketchPlugin_Sketch::DIRY_ID()));
 
   boost::shared_ptr<GeomAPI_XYZ> aSum = aC->pnt()->xyz()->added(
     aX->dir()->xyz()->multiplied(theX))->added(aY->dir()->xyz()->multiplied(theY));
@@ -141,7 +141,7 @@ boost::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, cons
 bool SketchPlugin_Sketch::isPlaneSet()
 {
   boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_NORM));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SketchPlugin_Sketch::NORM_ID()));
 
   return aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
 }
@@ -149,9 +149,9 @@ bool SketchPlugin_Sketch::isPlaneSet()
 boost::shared_ptr<GeomAPI_Pln> SketchPlugin_Sketch::plane()
 {
   boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(SKETCH_ATTR_ORIGIN));
+    boost::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
   boost::shared_ptr<GeomDataAPI_Dir> aNorm = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SKETCH_ATTR_NORM));
+    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SketchPlugin_Sketch::NORM_ID()));
 
   if (!anOrigin || !aNorm)
     return boost::shared_ptr<GeomAPI_Pln>();

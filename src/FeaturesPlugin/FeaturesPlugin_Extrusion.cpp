@@ -22,15 +22,15 @@ FeaturesPlugin_Extrusion::FeaturesPlugin_Extrusion()
 
 void FeaturesPlugin_Extrusion::initAttributes()
 {
-  data()->addAttribute(EXTRUSION_FACE, ModelAPI_AttributeReference::type());
-  data()->addAttribute(EXTRUSION_SIZE, ModelAPI_AttributeDouble::type());
-  data()->addAttribute(EXTRUSION_REVERSE, ModelAPI_AttributeBoolean::type());
+  data()->addAttribute(FeaturesPlugin_Extrusion::FACE_ID(), ModelAPI_AttributeReference::type());
+  data()->addAttribute(FeaturesPlugin_Extrusion::SIZE_ID(), ModelAPI_AttributeDouble::type());
+  data()->addAttribute(FeaturesPlugin_Extrusion::REVERSE_ID(), ModelAPI_AttributeBoolean::type());
 }
 
 void FeaturesPlugin_Extrusion::execute()
 {
   boost::shared_ptr<ModelAPI_AttributeReference> aFaceRef = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(data()->attribute(EXTRUSION_FACE));
+    boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(data()->attribute(FeaturesPlugin_Extrusion::FACE_ID()));
   if (!aFaceRef)
     return;
   boost::shared_ptr<ModelAPI_ResultConstruction> aConstr =
@@ -41,8 +41,8 @@ void FeaturesPlugin_Extrusion::execute()
   if (!aFace)
     return;
 
-  double aSize = data()->real(EXTRUSION_SIZE)->value();
-  if (data()->boolean(EXTRUSION_REVERSE)->value())
+  double aSize = data()->real(FeaturesPlugin_Extrusion::SIZE_ID())->value();
+  if (data()->boolean(FeaturesPlugin_Extrusion::REVERSE_ID())->value())
     aSize = -aSize;
   boost::shared_ptr<ModelAPI_ResultBody> aResult = document()->createBody(data());
   aResult->store(GeomAlgoAPI_Extrusion::makeExtrusion(aFace, aSize));

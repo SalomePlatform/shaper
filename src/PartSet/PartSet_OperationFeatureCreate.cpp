@@ -54,15 +54,15 @@ PartSet_OperationFeatureCreate::~PartSet_OperationFeatureCreate()
 
 bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
 {
-  return theId == SKETCH_LINE_KIND || theId == SKETCH_POINT_KIND ||
-         theId == SKETCH_CIRCLE_KIND ||
-         theId == SKETCH_ARC_KIND ||
-         theId == SKETCH_CONSTRAINT_DISTANCE_KIND ||
-         theId == SKETCH_CONSTRAINT_LENGTH_KIND ||
-         theId == SKETCH_CONSTRAINT_RADIUS_KIND ||
-         theId == SKETCH_CONSTRAINT_PARALLEL_KIND ||
-         theId == SKETCH_CONSTRAINT_PERPENDICULAR_KIND ||
-         theId == SKETCH_CONSTRAINT_COINCIDENCE_KIND;
+  return theId == SketchPlugin_Line::ID() || theId == SketchPlugin_Point::ID() ||
+         theId == SketchPlugin_Circle::ID() ||
+         theId == SketchPlugin_Arc::ID() ||
+         theId == SketchPlugin_ConstraintDistance::ID() ||
+         theId == SketchPlugin_ConstraintLength::ID() ||
+         theId == SketchPlugin_ConstraintRadius::ID() ||
+         theId == SketchPlugin_ConstraintParallel::ID() ||
+         theId == SketchPlugin_ConstraintPerpendicular::ID() ||
+         theId == SketchPlugin_ConstraintCoincidence::ID();
 }
 
 bool PartSet_OperationFeatureCreate::canBeCommitted() const
@@ -138,7 +138,7 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
       {
         PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
         // move to selected line
-        if (feature()->getKind() == SKETCH_LINE_KIND) {
+        if (feature()->getKind() == SketchPlugin_Line::ID()) {
           //FeaturePtr aFeature = aPrs.feature();
           //projectPointOnLine(aFeature, myPointSelectionMode, aPoint, theView, aX, anY);
         }

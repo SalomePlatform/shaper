@@ -17,9 +17,9 @@ PartSetPlugin_Duplicate::PartSetPlugin_Duplicate()
 void PartSetPlugin_Duplicate::initAttributes()
 {
   PartSetPlugin_Part::initAttributes();
-  data()->addAttribute(PART_DUPLICATE_ATTR_REF, ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(PartSetPlugin_Duplicate::DOC_REF(), ModelAPI_AttributeRefAttr::type());
 
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = data()->refattr(PART_DUPLICATE_ATTR_REF);
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = data()->refattr(PartSetPlugin_Duplicate::DOC_REF());
   if (!aRef->attr()) { // create a copy: if not created yet attribute is not initialized
     boost::shared_ptr<ModelAPI_PluginManager> aPManager = ModelAPI_PluginManager::get();
     boost::shared_ptr<ModelAPI_Document> aRoot = aPManager->rootDocument();
@@ -27,13 +27,13 @@ void PartSetPlugin_Duplicate::initAttributes()
     for(int a = aRoot->size(getGroup()) - 1; a >= 0; a--) {
       aSource = boost::dynamic_pointer_cast<PartSetPlugin_Part>(
         aRoot->object(ModelAPI_Feature::group(), a));
-      if (aSource->data()->docRef(PART_ATTR_DOC_REF)->value() == aPManager->currentDocument())
+      if (aSource->data()->docRef(PartSetPlugin_Part::DOC_REF())->value() == aPManager->currentDocument())
         break;
       aSource.reset();
     }
     if (aSource) {
       boost::shared_ptr<ModelAPI_Document> aCopy = 
-        aPManager->copy(aSource->data()->docRef(PART_ATTR_DOC_REF)->value(), data()->name());
+        aPManager->copy(aSource->data()->docRef(PartSetPlugin_Part::DOC_REF())->value(), data()->name());
       aRef->setObject(aSource);
     }
   }

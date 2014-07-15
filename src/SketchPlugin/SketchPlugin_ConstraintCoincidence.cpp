@@ -14,8 +14,8 @@ SketchPlugin_ConstraintCoincidence::SketchPlugin_ConstraintCoincidence()
 
 void SketchPlugin_ConstraintCoincidence::initAttributes()
 {
-  data()->addAttribute(CONSTRAINT_ATTR_ENTITY_A, ModelAPI_AttributeRefAttr::type());
-  data()->addAttribute(CONSTRAINT_ATTR_ENTITY_B, ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::type());
 }
 
 void SketchPlugin_ConstraintCoincidence::execute()

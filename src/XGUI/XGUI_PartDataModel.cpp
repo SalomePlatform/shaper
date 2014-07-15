@@ -106,7 +106,6 @@ int XGUI_TopDataModel::rowCount(const QModelIndex& theParent) const
 
   if (theParent.internalId() == ConstructFolder)
     return aRootDoc->size(ModelAPI_ResultConstruction::group());
-
   return 0;
 }
 

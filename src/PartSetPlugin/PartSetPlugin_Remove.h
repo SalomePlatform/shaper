@@ -8,9 +8,6 @@
 #include "PartSetPlugin.h"
 #include <ModelAPI_Feature.h>
 
-/// Extrusion kind
-const std::string PARTSET_REMOVE_KIND("Remove");
-
 /**\class PartSetPlugin_Remove
  * \ingroup DataModel
  * \brief Feature for creation of the new part in PartSet.
@@ -18,9 +15,15 @@ const std::string PARTSET_REMOVE_KIND("Remove");
 class PartSetPlugin_Remove: public ModelAPI_Feature
 {
 public:
+  /// Remove kind
+  inline static const std::string& ID()
+  {
+    static const std::string MY_REMOVE_KIND("Remove");
+    return MY_REMOVE_KIND;
+  }
   /// Returns the kind of a feature
   PARTSETPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = PARTSET_REMOVE_KIND; return MY_KIND;}
+  {static std::string MY_KIND = PartSetPlugin_Remove::ID(); return MY_KIND;}
 
   /// Returns to which group in the document must be added feature
   PARTSETPLUGIN_EXPORT virtual const std::string& getGroup() 

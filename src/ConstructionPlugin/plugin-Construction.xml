@@ -2,9 +2,12 @@
   <workbench id="Construction">
     <group id="Basic">
       <feature id="Point" title="Point" tooltip="Create a new point" icon=":icons/point.png">
+        <validator id="test" parameters="x,y,z"/>
         <source path="point_widget.xml"/>
       </feature>
-      <feature id="Axis" title="Axis" tooltip="Create a new axis" icon=":icons/axis.png" keysequence="" internal="true"/>
+      <feature id="Axis" title="Axis" tooltip="Create a new axis" icon=":icons/axis.png" keysequence="" internal="true">
+        <validator id="inside" parameters="a,b"/> 
+      </feature>
       <feature id="Plane" title="Plane" tooltip="Create a new plane" icon=":icons/plane.png" keysequence="" internal="true"/>
     </group>
 </workbench>  

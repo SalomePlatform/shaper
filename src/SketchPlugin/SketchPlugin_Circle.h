@@ -9,14 +9,6 @@
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
 
-/// Circle feature kind
-const std::string SKETCH_CIRCLE_KIND("SketchCircle");
-
-/// 2D point - center of the circle
-const std::string CIRCLE_ATTR_CENTER("CircleCenter");
-/// Radius of the circle
-const std::string CIRCLE_ATTR_RADIUS("CircleRadius");
-
 /**\class SketchPlugin_Circle
  * \ingroup DataModel
  * \brief Feature for creation of the new circle in PartSet.
@@ -24,9 +16,30 @@ const std::string CIRCLE_ATTR_RADIUS("CircleRadius");
 class SketchPlugin_Circle: public SketchPlugin_Feature
 {
 public:
+  /// Circle feature kind
+  inline static const std::string& ID()
+  {
+    static const std::string MY_CIRCLE_ID("SketchCircle");
+    return MY_CIRCLE_ID;
+  }
+
+  /// 2D point - center of the circle
+  inline static const std::string& CENTER_ID()
+  {
+    static const std::string MY_CIRCLE_CENTER_ID("CircleCenter");
+    return MY_CIRCLE_CENTER_ID;
+  }
+
+  /// Radius of the circle
+  inline static const std::string& RADIUS_ID()
+  {
+    static const std::string MY_CIRCLE_RADIUS_ID("CircleRadius");
+    return MY_CIRCLE_RADIUS_ID;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SKETCH_CIRCLE_KIND; return MY_KIND;}
+  {static std::string MY_KIND = SketchPlugin_Circle::ID(); return MY_KIND;}
 
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();

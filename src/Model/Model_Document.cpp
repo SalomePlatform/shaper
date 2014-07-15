@@ -344,7 +344,6 @@ static void AddToRefArray(TDF_Label& theArrayLab, TDF_Label& theReferenced) {
   }
 }
 
-
 FeaturePtr Model_Document::addFeature(std::string theID)
 {
   TDF_Label anEmptyLab;
@@ -426,6 +425,15 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
 
   // event: feature is deleted
   ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
+  // results of this feature must be redisplayed
+  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
+  std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+  for(; aRIter != aResults.cend(); aRIter++) {
+    boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+    aRes->setData(boost::shared_ptr<ModelAPI_Data>()); // deleted flag
+    ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
+  }
 }
 
 /// returns the object group name by the object label
@@ -595,9 +603,10 @@ void Model_Document::setUniqueName(FeaturePtr theFeature)
   std::string aName; // result
   // first count all objects of such kind to start with index = count + 1
   int a, aNumObjects = 0;
-  int aSize = size(ModelAPI_Feature::group());
+  int aSize = myObjs.find(ModelAPI_Feature::group()) == myObjs.end() ? 
+    0 : myObjs[ModelAPI_Feature::group()].size();
   for(a = 0; a < aSize; a++) {
-    if (boost::dynamic_pointer_cast<ModelAPI_Feature>(object(ModelAPI_Feature::group(), a))->
+    if (boost::dynamic_pointer_cast<ModelAPI_Feature>(myObjs[ModelAPI_Feature::group()][a])->
         getKind() == theFeature->getKind())
       aNumObjects++;
   }
@@ -607,8 +616,17 @@ void Model_Document::setUniqueName(FeaturePtr theFeature)
   aName = aNameStream.str();
   // check this is unique, if not, increase index by 1
   for(a = 0; a < aSize;) {
-    if (boost::dynamic_pointer_cast<ModelAPI_Feature>(object(ModelAPI_Feature::group(), a))
-          ->data()->name() == aName) {
+    FeaturePtr aFeature = 
+      boost::dynamic_pointer_cast<ModelAPI_Feature>(myObjs[ModelAPI_Feature::group()][a]);
+    bool isSameName = aFeature->isInHistory() && aFeature->data()->name() == aName;
+    if (!isSameName) { // check also results to avoid same results names (actual for Parts)
+      const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+      std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+      for(; aRIter != aResults.cend(); aRIter++) {
+        isSameName = (*aRIter)->isInHistory() && (*aRIter)->data()->name() == aName;
+      }
+    }
+    if (isSameName) {
       aNumObjects++;
       std::stringstream aNameStream;
       aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
@@ -663,6 +681,15 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
           ModelAPI_EventCreator::get()->sendDeleted(aThis, aGroupName);
         }
         ModelAPI_EventCreator::get()->sendDeleted(aThis, aGroupName);
+        // results of this feature must be redisplayed (hided)
+        static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+        const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = boost::dynamic_pointer_cast<ModelAPI_Feature>(anObj)->results();
+        std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+        for(; aRIter != aResults.cend(); aRIter++) {
+          boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+          aRes->setData(boost::shared_ptr<ModelAPI_Data>()); // deleted flag
+          ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
+        }
       } else if (aDSTag < aFeatureTag) { // a new feature is inserted
         // create a feature
         TDF_Label aLab = aLabIter.Value()->Label();

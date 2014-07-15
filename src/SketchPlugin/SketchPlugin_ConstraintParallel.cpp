@@ -21,9 +21,9 @@ SketchPlugin_ConstraintParallel::SketchPlugin_ConstraintParallel()
 
 void SketchPlugin_ConstraintParallel::initAttributes()
 {
-  data()->addAttribute(CONSTRAINT_ATTR_ENTITY_A, ModelAPI_AttributeRefAttr::type());
-  data()->addAttribute(CONSTRAINT_ATTR_ENTITY_B, ModelAPI_AttributeRefAttr::type());
-  data()->addAttribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT, GeomDataAPI_Point2D::type());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::type());
 }
 
 void SketchPlugin_ConstraintParallel::execute()
@@ -38,9 +38,9 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintParallel::getAISObje
 
   boost::shared_ptr<ModelAPI_Data> aData = data();
   boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr1 = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_A));
+    boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
   boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr2 = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(CONSTRAINT_ATTR_ENTITY_B));
+    boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
   if (!anAttr1 || !anAttr1->isObject() || 
       !anAttr2 || !anAttr2->isObject())
     return thePrevious;
@@ -61,7 +61,7 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintParallel::getAISObje
   if (aConst2) aLine2 = aConst2->shape();
 
   boost::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
 
   boost::shared_ptr<GeomAPI_AISObject> anAIS = thePrevious;
@@ -78,7 +78,7 @@ void SketchPlugin_ConstraintParallel::move(double theDeltaX, double theDeltaY)
     return;
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CONSTRAINT_ATTR_FLYOUT_VALUE_PNT));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   aPoint->setValue(aPoint->x() + theDeltaX, aPoint->y() + theDeltaY);
 }
 

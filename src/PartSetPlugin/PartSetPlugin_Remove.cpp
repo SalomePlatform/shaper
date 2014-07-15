@@ -17,12 +17,12 @@ void PartSetPlugin_Remove::execute()
   for(int a = aRoot->size(getGroup()) - 1; a >= 0; a--) {
     FeaturePtr aFeature = 
       boost::dynamic_pointer_cast<ModelAPI_Feature>(aRoot->object(ModelAPI_Feature::group(), a));
-    if (aFeature->getKind() == PARTSET_PART_KIND) {
+    if (aFeature->getKind() == PartSetPlugin_Part::ID()) {
       boost::shared_ptr<PartSetPlugin_Part> aPart = 
         boost::static_pointer_cast<PartSetPlugin_Part>(aFeature);
-      if (aPart->data()->docRef(PART_ATTR_DOC_REF)->value() == aPManager->currentDocument()) {
+      if (aPart->data()->docRef(PartSetPlugin_Part::DOC_REF())->value() == aPManager->currentDocument()) {
         // do remove
-        aPart->data()->docRef(PART_ATTR_DOC_REF)->value()->close();
+        aPart->data()->docRef(PartSetPlugin_Part::DOC_REF())->value()->close();
         aRoot->removeFeature(aPart);
       }
     }

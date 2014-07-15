@@ -52,6 +52,9 @@ protected:
   void processValidator(xmlNodePtr theNode);
 
 protected:
+  std::string myCurrentFeature;
+
+protected:
   std::string myDocumentPath;
   xmlDocPtr   myXmlDoc;
 };
