@@ -19,3 +19,11 @@ boost::shared_ptr<ModelAPI_Feature> Model_ResultPart::owner()
 Model_ResultPart::Model_ResultPart()
 {
 }
+
+void Model_ResultPart::setData(boost::shared_ptr<ModelAPI_Data> theData)
+{
+  ModelAPI_Result::setData(theData);
+  if (theData) {
+    data()->addAttribute(DOC_REF(), ModelAPI_AttributeDocRef::type());
+  }
+}

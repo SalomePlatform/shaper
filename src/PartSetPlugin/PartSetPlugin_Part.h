@@ -21,12 +21,6 @@ public:
     static const std::string MY_PART_KIND("Part");
     return MY_PART_KIND;
   }
-  /// part reference attribute
-  inline static const std::string& DOC_REF()
-  {
-    static const std::string MY_DOC_REF("PartDocument");
-    return MY_DOC_REF;
-  }
   /// Returns the kind of a feature
   PARTSETPLUGIN_EXPORT virtual const std::string& getKind() 
   {static std::string MY_KIND = PartSetPlugin_Part::ID(); return MY_KIND;}

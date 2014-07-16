@@ -7,6 +7,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
+#include <ModelAPI_ResultPart.h>
 
 void PartSetPlugin_Remove::execute()
 {
@@ -20,9 +21,10 @@ void PartSetPlugin_Remove::execute()
     if (aFeature->getKind() == PartSetPlugin_Part::ID()) {
       boost::shared_ptr<PartSetPlugin_Part> aPart = 
         boost::static_pointer_cast<PartSetPlugin_Part>(aFeature);
-      if (aPart->data()->docRef(PartSetPlugin_Part::DOC_REF())->value() == aPManager->currentDocument()) {
+      if (aPart->data()->docRef(ModelAPI_ResultPart::DOC_REF())->value() == 
+        aPManager->currentDocument()) {
         // do remove
-        aPart->data()->docRef(PartSetPlugin_Part::DOC_REF())->value()->close();
+        aPart->data()->docRef(ModelAPI_ResultPart::DOC_REF())->value()->close();
         aRoot->removeFeature(aPart);
       }
     }

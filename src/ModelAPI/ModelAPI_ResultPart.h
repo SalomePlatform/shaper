@@ -25,6 +25,13 @@ public:
   static std::string group()
     {static std::string MY_GROUP = "Parts"; return MY_GROUP;}
 
+  /// part document reference attribute
+  inline static const std::string& DOC_REF()
+  {
+    static const std::string MY_DOC_REF("PartDocument");
+    return MY_DOC_REF;
+  }
+
   /// Returns the part-document of this result
   virtual boost::shared_ptr<ModelAPI_Document> partDoc() = 0;
 };

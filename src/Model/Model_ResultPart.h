@@ -27,6 +27,9 @@ protected:
   /// makes a result on a temporary feature (an action)
   Model_ResultPart();
 
+  /// Sets the data manager of an object (document does), here also attributes are initialized
+  virtual void setData(boost::shared_ptr<ModelAPI_Data> theData);
+
   friend class Model_Document;
 };
 

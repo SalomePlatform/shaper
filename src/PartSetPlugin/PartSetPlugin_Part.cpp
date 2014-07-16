@@ -16,22 +16,23 @@ PartSetPlugin_Part::PartSetPlugin_Part()
 }
 
 void PartSetPlugin_Part::initAttributes()
-{
-  data()->addAttribute(PartSetPlugin_Part::DOC_REF(), ModelAPI_AttributeDocRef::type());
+{// all is in part result
 }
 
 void PartSetPlugin_Part::execute() 
 {
-  boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->docRef(PartSetPlugin_Part::DOC_REF());
+  ResultPartPtr aResult = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
+  if (!aResult) {
+    aResult = document()->createPart(data());
+    setResult(aResult);
+  }
+  boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef =
+    aResult->data()->docRef(ModelAPI_ResultPart::DOC_REF());
+
   if (!aDocRef->value()) { // create a document if not yet created
     boost::shared_ptr<ModelAPI_Document> aPartSetDoc = 
       ModelAPI_PluginManager::get()->rootDocument();
     aDocRef->setValue(aPartSetDoc->subDocument(data()->name()));
-  }
-  // create a result only once
-  if (results().empty()) {
-    boost::shared_ptr<ModelAPI_ResultPart> aResult = document()->createPart(data());
-    setResult(aResult);
   }
 }
 

@@ -46,7 +46,7 @@ public:
   std::list<boost::shared_ptr<ModelAPI_Result> >& results() {return myResults;}
   /// returns the first result in the list or NULL reference
   boost::shared_ptr<ModelAPI_Result> firstResult() 
-  {return myResults.size() ? *(myResults.begin()) : boost::shared_ptr<ModelAPI_Result>();}
+  {return myResults.empty() ? boost::shared_ptr<ModelAPI_Result>() : *(myResults.begin());}
   /// sets the alone result
   void setResult(const boost::shared_ptr<ModelAPI_Result>& theResult) 
   {myResults.clear(); myResults.push_back(theResult);}
