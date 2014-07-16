@@ -50,7 +50,7 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
       if (aFeature) {
         if (myModule->workshop()->displayer()->isVisible(aFeature->firstResult()) ||
             aType == EVENT_OBJECT_CREATED) {
-          myModule->visualizePreview(aFeature->firstResult(), true, false);
+          myModule->visualizePreview(aFeature, true, false);
           //if (aType == EVENT_OBJECT_CREATED)
           myModule->activateFeature(aFeature, true);
         }

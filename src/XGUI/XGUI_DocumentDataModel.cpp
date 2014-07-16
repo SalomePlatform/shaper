@@ -85,7 +85,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
         }
         if (aPartModel) {
           QModelIndex aIndex = aPartModel->findParent(aObject);
-          int aStart = aPartModel->rowCount(aIndex) - 1;
+          int aStart = aPartModel->rowCount(aIndex); // check this index
           aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
           insertRow(aStart, aIndex);
         }
@@ -101,7 +101,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
     for (aIt = aGroups.begin(); aIt != aGroups.end(); ++aIt) {
       std::string aGroup = (*aIt);
       if (aDoc == aRootDoc) {  // If root objects
-        if (aGroup.compare(ModelAPI_ResultPart::group()) == 0) { // Updsate only Parts group
+        if (aGroup == ModelAPI_ResultPart::group()) { // Update only Parts group
           int aStart = myPartModels.size() - 1;
           removeSubModel(aStart);
           removeRow(aStart, partFolderNode());
@@ -246,6 +246,7 @@ int XGUI_DocumentDataModel::rowCount(const QModelIndex& theParent) const
     return aVal;
   }
   if (theParent.internalId() == PartsFolder) {
+    int aSize = myPartModels.size();
     return myPartModels.size();
   }
   if (theParent.internalId() == HistoryNode) {

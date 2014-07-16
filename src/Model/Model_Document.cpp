@@ -350,16 +350,18 @@ FeaturePtr Model_Document::addFeature(std::string theID)
   TDF_Label anEmptyLab;
   FeaturePtr anEmptyFeature;
   FeaturePtr aFeature = ModelAPI_PluginManager::get()->createFeature(theID);
+  boost::shared_ptr<Model_Document> aDocToAdd = 
+    boost::dynamic_pointer_cast<Model_Document>(aFeature->documentToAdd());
   if (aFeature) {
     TDF_Label aFeatureLab;
     if (!aFeature->isAction()) {// do not add action to the data model
-      TDF_Label aFeaturesLab = groupLabel(ModelAPI_Feature::group());
+      TDF_Label aFeaturesLab = aDocToAdd->groupLabel(ModelAPI_Feature::group());
       aFeatureLab = aFeaturesLab.NewChild();
-      initData(aFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
+      aDocToAdd->initData(aFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
       // keep the feature ID to restore document later correctly
       TDataStd_Comment::Set(aFeatureLab, aFeature->getKind().c_str());
-      setUniqueName(aFeature);
-      myObjs[ModelAPI_Feature::group()].push_back(aFeature);
+      aDocToAdd->setUniqueName(aFeature);
+      aDocToAdd->myObjs[ModelAPI_Feature::group()].push_back(aFeature);
       // store feature in the history of features array
       if (aFeature->isInHistory()) {
         AddToRefArray(aFeaturesLab, aFeatureLab);
@@ -434,6 +436,7 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
     boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
     aRes->setData(boost::shared_ptr<ModelAPI_Data>()); // deleted flag
     ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
+    ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), aRes->groupName());
   }
 }
 
@@ -681,7 +684,6 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
         if (anObj->isInHistory()) {
           ModelAPI_EventCreator::get()->sendDeleted(aThis, aGroupName);
         }
-        ModelAPI_EventCreator::get()->sendDeleted(aThis, aGroupName);
         // results of this feature must be redisplayed (hided)
         static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
         const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = boost::dynamic_pointer_cast<ModelAPI_Feature>(anObj)->results();
@@ -690,6 +692,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
           boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
           aRes->setData(boost::shared_ptr<ModelAPI_Data>()); // deleted flag
           ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
+          ModelAPI_EventCreator::get()->sendDeleted(aThis, aRes->groupName());
         }
       } else if (aDSTag < aFeatureTag) { // a new feature is inserted
         // create a feature

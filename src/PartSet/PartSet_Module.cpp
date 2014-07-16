@@ -349,7 +349,7 @@ void PartSet_Module::onFeatureConstructed(FeaturePtr theFeature, int theMode)
       std::list<FeaturePtr>::const_iterator anIt = aList.begin(),
                                             aLast = aList.end();
       for (; anIt != aLast; anIt++)
-        visualizePreview((*anIt)->firstResult(), false, false);
+        visualizePreview((*anIt), false, false);
       aDisplayer->updateViewer();
     }
   }
@@ -444,7 +444,7 @@ void PartSet_Module::sendOperation(ModuleBase_Operation* theOperation)
   Events_Loop::loop()->send(aMessage);
 }
 
-void PartSet_Module::visualizePreview(ResultPtr theFeature, bool isDisplay,
+void PartSet_Module::visualizePreview(FeaturePtr theFeature, bool isDisplay,
                                       const bool isUpdateViewer)
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
@@ -455,19 +455,19 @@ void PartSet_Module::visualizePreview(ResultPtr theFeature, bool isDisplay,
   if (!aPreviewOp)
     return;
 
+  ResultPtr aResult = theFeature->firstResult();
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   if (isDisplay) {
     boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
-    if (aSPFeature)
-    {
+    if (aSPFeature) {
       boost::shared_ptr<GeomAPI_AISObject> anAIS = 
-        aSPFeature->getAISObject(aDisplayer->getAISObject(theFeature));
-      aDisplayer->redisplay(theFeature, anAIS, false);
+        aSPFeature->getAISObject(aDisplayer->getAISObject(aResult));
+      aDisplayer->redisplay(aResult, anAIS, false);
     }
   }
   else
-    aDisplayer->erase(theFeature, false);
+    aDisplayer->erase(aResult, false);
 
   if (isUpdateViewer)
     aDisplayer->updateViewer();
@@ -509,7 +509,7 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
     if (!aSPFeature)
       continue;
-    visualizePreview((*anIt)->firstResult(), true, false);
+    visualizePreview((*anIt), true, false);
     aDisplayer->activateInLocalContext((*anIt)->firstResult(), aModes, false);
   }
   aDisplayer->updateViewer();

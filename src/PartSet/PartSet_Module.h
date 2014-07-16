@@ -55,7 +55,7 @@ public:
   /// \param theFeature the feature instance to be displayed
   /// \param isDisplay the state whether the presentation should be displayed or erased
   /// \param isUpdateViewer the flag whether the viewer should be updated
-  void visualizePreview(ResultPtr theResult, bool isDisplay,
+  void visualizePreview(FeaturePtr theFeature, bool isDisplay,
                         const bool isUpdateViewer = true);
 
   /// Activates the feature in the displayer

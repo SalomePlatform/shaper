@@ -885,8 +885,7 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   QList<ObjectPtr> aObjects = mySelector->selection()->selectedObjects();
   if ((theId == "ACTIVATE_PART_CMD") && (aObjects.size() > 0)) {
     ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObjects.first());
-    if (aPart)
-      activatePart(aPart);
+    activatePart(aPart);
   } else if (theId == "DEACTIVATE_PART_CMD") 
     activatePart(ResultPartPtr());
   else if (theId == "DELETE_CMD")

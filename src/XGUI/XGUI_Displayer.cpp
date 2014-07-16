@@ -87,7 +87,7 @@ void XGUI_Displayer::erase(ResultPtr theResult,
 }
 
 
-bool XGUI_Displayer::redisplay(ResultPtr theFeature,
+bool XGUI_Displayer::redisplay(ResultPtr theResult,
                                boost::shared_ptr<GeomAPI_AISObject> theAIS,
                                const bool isUpdateViewer)
 {
@@ -104,12 +104,12 @@ bool XGUI_Displayer::redisplay(ResultPtr theFeature,
     //aContext->SetPixelTolerance(MOUSE_SENSITIVITY_IN_PIXEL);
   }
   // display or redisplay presentation
-  boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[theFeature];
-  if (isVisible(theFeature) && anObj && !anObj->empty()) {
+  boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[theResult];
+  if (isVisible(theResult) && anObj && !anObj->empty()) {
       aContext->RecomputeSelectionOnly(anAIS);
   }
   else {
-    myResult2AISObjectMap[theFeature] = theAIS;
+    myResult2AISObjectMap[theResult] = theAIS;
     aContext->Display(anAIS, false);
     isCreated = true;
   }
