@@ -854,12 +854,16 @@ void XGUI_Workshop::changeCurrentDocument(ObjectPtr theObj)
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   if (theObj) {
-    DocumentPtr aPartDoc = theObj->document();
-    if (aPartDoc)
-      aMgr->setCurrentDocument(aPartDoc);
-  } else {
-    aMgr->setCurrentDocument(aMgr->rootDocument());
-  }
+    ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(theObj);
+    if (aPart) {
+      DocumentPtr aPartDoc = aPart->partDoc();
+      if (aPartDoc) {
+        aMgr->setCurrentDocument(aPartDoc);
+        return;
+      }
+    }
+  } 
+  aMgr->setCurrentDocument(aMgr->rootDocument());
 }
 
 //******************************************************

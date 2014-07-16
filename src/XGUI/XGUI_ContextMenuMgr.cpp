@@ -108,24 +108,22 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     if (aObject) {
       ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
       if (aPart) {
-        DocumentPtr aFeaDoc = aPart->partDoc();
-        if (aMgr->currentDocument() == aFeaDoc)
+        if (aMgr->currentDocument() == aPart->partDoc())
           aMenu->addAction(action("DEACTIVATE_PART_CMD"));
         else 
           aMenu->addAction(action("ACTIVATE_PART_CMD"));
       } else {
         ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
         if (aResult) {
-          aMenu->addAction(action("EDIT_CMD"));
-
           XGUI_Displayer* aDisplayer = myWorkshop->displayer();
           if (aDisplayer->isVisible(aResult))
             aMenu->addAction(action("HIDE_CMD"));
           else
             aMenu->addAction(action("SHOW_CMD"));
         } else {
-          FeaturePtr aResult = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
-          if (aResult) {
+          FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+          if (aFeature) {
+            aMenu->addAction(action("EDIT_CMD"));
             aMenu->addAction(action("DELETE_CMD"));
           }
         }
