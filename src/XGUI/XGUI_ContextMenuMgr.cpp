@@ -108,7 +108,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     if (aObject) {
       ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
       if (aPart) {
-        DocumentPtr aFeaDoc = aPart->document();
+        DocumentPtr aFeaDoc = aPart->partDoc();
         if (aMgr->currentDocument() == aFeaDoc)
           aMenu->addAction(action("DEACTIVATE_PART_CMD"));
         else 
