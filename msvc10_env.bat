@@ -132,7 +132,8 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @REM -------------------------
 
 @SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
-@SET PATH=%ROOT_DIR%\install\plugins;%PATH%
+@SET PATH=%ROOT_DIR%\install\plugins;%ROOT_DIR%\install\bin;%PATH%
+@SET PYTHONPATH=%ROOT_DIR%\install\swig;%PYTHONPATH%
 
 @REM -------------------------
 if "%GUI_ROOT_DIR%" == "" (
