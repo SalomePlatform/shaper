@@ -8,7 +8,7 @@
 #include "ModuleBase_Tools.h"
 
 #include <Events_Loop.h>
-#include <Model_Events.h>
+#include <ModelAPI_Events.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -29,6 +29,8 @@
 #include <QString>
 #include <QEvent>
 #include <QDockWidget>
+
+#include <stdexcept>
 
 
 typedef QMap<QString, TopAbs_ShapeEnum> ShapeTypes;

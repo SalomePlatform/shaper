@@ -23,7 +23,7 @@
 #include "XGUI_ContextMenuMgr.h"
 #include "XGUI_ModuleConnector.h"
 
-#include <Model_Events.h>
+#include <ModelAPI_Events.h>
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
@@ -232,14 +232,14 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 
   // Process creation of Part
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
-    const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
+    const ModelAPI_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureCreatedMsg(aUpdMsg);
     return;
   }
 
   // Redisplay feature
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
-    const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
+    const ModelAPI_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureRedisplayMsg(aUpdMsg);
     return;
   }
@@ -247,15 +247,15 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
-    const Model_ObjectUpdatedMessage* anUpdateMsg =
-        dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
+    const ModelAPI_ObjectUpdatedMessage* anUpdateMsg =
+        dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureUpdatedMsg(anUpdateMsg);
     return;
   }
 
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
-    const Model_ObjectDeletedMessage* aDelMsg =
-        dynamic_cast<const Model_ObjectDeletedMessage*>(theMessage);
+    const ModelAPI_ObjectDeletedMessage* aDelMsg =
+        dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
     onObjectDeletedMsg(aDelMsg);
     return;
   }
@@ -283,7 +283,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureUpdatedMsg(const Model_ObjectUpdatedMessage* theMsg)
+void XGUI_Workshop::onFeatureUpdatedMsg(const ModelAPI_ObjectUpdatedMessage* theMsg)
 {
   std::set<ObjectPtr> aFeatures = theMsg->objects();
   if (myOperationMgr->hasOperation())
@@ -301,7 +301,7 @@ void XGUI_Workshop::onFeatureUpdatedMsg(const Model_ObjectUpdatedMessage* theMsg
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureRedisplayMsg(const Model_ObjectUpdatedMessage* theMsg)
+void XGUI_Workshop::onFeatureRedisplayMsg(const ModelAPI_ObjectUpdatedMessage* theMsg)
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
@@ -317,7 +317,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const Model_ObjectUpdatedMessage* theM
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureCreatedMsg(const Model_ObjectUpdatedMessage* theMsg)
+void XGUI_Workshop::onFeatureCreatedMsg(const ModelAPI_ObjectUpdatedMessage* theMsg)
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
 
@@ -344,7 +344,7 @@ void XGUI_Workshop::onFeatureCreatedMsg(const Model_ObjectUpdatedMessage* theMsg
 }
 
 //******************************************************
-void XGUI_Workshop::onObjectDeletedMsg(const Model_ObjectDeletedMessage* theMsg)
+void XGUI_Workshop::onObjectDeletedMsg(const ModelAPI_ObjectDeletedMessage* theMsg)
 {
   //std::set<ObjectPtr> aFeatures = theMsg->objects();
 }

@@ -8,6 +8,8 @@
 #include "ModelAPI_Result.h"
 #include <GeomAPI_Shape.h>
 
+#include <string>
+
 /**\class ModelAPI_ResultBody
  * \ingroup DataModel
  * \brief The body (shape) result of a feature.
@@ -20,8 +22,9 @@ class ModelAPI_ResultBody : public ModelAPI_Result
 {
 public:
   /// Returns the group identifier of this result
-  virtual std::string groupName()
-    { return group(); }
+  virtual std::string groupName() {
+    return group();
+  }
 
   /// Returns the group identifier of this result
   static std::string group()

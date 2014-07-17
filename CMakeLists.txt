@@ -13,13 +13,28 @@ INCLUDE(FindSolveSpace)
 INCLUDE(FindCAS)
 
 IF(UNIX)
-    IF(CMAKE_COMPILER_IS_GNUCC)
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-        MESSAGE(STATUS "Setting -std=c++0x flag for the gcc...")
-        MESSAGE(STATUS "Now gcc flags are: " ${CMAKE_CXX_FLAGS})
-        
-	SET(CMAKE_SHARED_LINKER_FLAGS "${SMAKE_SHARED_LINKER_FLAGS} -Wl,-E")
-    ENDIF(CMAKE_COMPILER_IS_GNUCC)
+  IF(CMAKE_COMPILER_IS_GNUCC)
+    #C++11 is not supported on some platforms, disable it 
+    MESSAGE(STATUS "Setting -std=c++0x flag for the gcc...")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    
+    #Supporting test coverage checks (gcov) in the DEBUG mode
+    IF(CMAKE_BUILD_TYPE MATCHES Debug)
+      INCLUDE(CodeCoverage)
+      MESSAGE(STATUS "Setting flags for gcov support the the gcc...")
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
+      SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
+      SET(CMAKE_SHARED_LINKER_FLAGS "-lgcov")
+      
+      SETUP_TARGET_FOR_COVERAGE(test_coverage  # Name for custom target.
+				                ctest          # Name of the test driver executable that runs the tests.
+				                coverage)      # Name of output directory.
+    ENDIF(CMAKE_BUILD_TYPE MATCHES Debug)
+    
+    #SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -E")
+    MESSAGE(STATUS "gcc flags are: " ${CMAKE_CXX_FLAGS})
+    MESSAGE(STATUS "linker flags are: " ${CMAKE_SHARED_LINKER_FLAGS})
+  ENDIF(CMAKE_COMPILER_IS_GNUCC)
 ENDIF(UNIX)
 
 

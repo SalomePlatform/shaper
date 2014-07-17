@@ -8,7 +8,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultPart.h>
-#include <Model_Events.h>
+#include <ModelAPI_Events.h>
 #include <ModelAPI_Object.h>
 
 #include <Events_Loop.h>
@@ -19,6 +19,7 @@
 #include <QString>
 #include <QBrush>
 
+#include <set>
 
 #define ACTIVE_COLOR QColor(0,72,140)
 #define PASSIVE_COLOR Qt::black
@@ -49,7 +50,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
 
   // Created object event *******************
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
-    const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
+    const ModelAPI_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     std::set<ObjectPtr> aObjects = aUpdMsg->objects();
 
     std::set<ObjectPtr>::const_iterator aIt;
@@ -93,7 +94,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
     }
   // Deleted object event ***********************
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
-    const Model_ObjectDeletedMessage* aUpdMsg = dynamic_cast<const Model_ObjectDeletedMessage*>(theMessage);
+    const ModelAPI_ObjectDeletedMessage* aUpdMsg = dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
     DocumentPtr aDoc = aUpdMsg->document();
     std::set<std::string> aGroups = aUpdMsg->groups();
 
@@ -135,7 +136,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
     }
   // Deleted object event ***********************
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
-    //const Model_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const Model_ObjectUpdatedMessage*>(theMessage);
+    //const ModelAPI_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     //ObjectPtr aFeature = aUpdMsg->feature();
     //DocumentPtr aDoc = aFeature->document();
     

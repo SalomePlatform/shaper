@@ -5,8 +5,8 @@
 #include "SketchPlugin_ConstraintDistance.h"
 #include <SketchPlugin_Point.h>
 
-#include <GeomAPI_Lin2D.h>
-#include <GeomAPI_Pnt2D.h>
+#include <GeomAPI_Lin2d.h>
+#include <GeomAPI_Pnt2d.h>
 #include <GeomDataAPI_Point2D.h>
 
 #include <ModelAPI_AttributeDouble.h>

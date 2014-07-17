@@ -11,10 +11,16 @@
 #include <ModelAPI_Result.h>
 
 #include <TDocStd_Document.hxx>
+#include <NCollection_DataMap.hxx>
+#include <TDF_Label.hxx>
 #include <map>
 #include <set>
 
 class Handle_Model_Document;
+
+// for TDF_Label map usage
+static  Standard_Integer HashCode(const TDF_Label& theLab,const Standard_Integer theUpper);
+static  Standard_Boolean IsEqual(const TDF_Label& theLab1,const TDF_Label& theLab2);
 
 /**\class Model_Document
  * \ingroup DataModel
@@ -74,7 +80,7 @@ public:
 
   //! Returns the existing object: result or feature
   //! \param theLabel base label of the object
-  MODEL_EXPORT virtual ObjectPtr object(TDF_Label& theLabel);
+  MODEL_EXPORT virtual ObjectPtr object(TDF_Label theLabel);
 
   //! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
@@ -108,8 +114,8 @@ public:
 
 protected:
 
-  //! Returns (creates if needed) the group label
-  TDF_Label groupLabel(const std::string theGroup);
+  //! Returns (creates if needed) the features label
+  TDF_Label featuresLabel();
 
   //! Initializes feature with a unique name in this group (unique name is generated as 
   //! feature type + "_" + index
@@ -127,7 +133,7 @@ protected:
   void compactNested();
 
   //! Initializes the data fields of the feature
-  void Model_Document::initData(ObjectPtr theObj, TDF_Label& theLab, const int theTag);
+  void initData(ObjectPtr theObj, TDF_Label theLab, const int theTag);
 
   //! Allows to store the result in the data tree of the document (attaches 'data' of result to tree)
   MODEL_EXPORT virtual void storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
@@ -145,8 +151,9 @@ private:
   int myTransactionsAfterSave;
   /// number of nested transactions performed (or -1 if not nested)
   int myNestedNum;
-  /// All objects managed by this document (not only in history of OB)
-  std::map<std::string, std::vector<ObjectPtr> > myObjs;
+  /// All features managed by this document (not only in history of OB)
+  /// For optimization mapped by labels
+  NCollection_DataMap<TDF_Label, FeaturePtr> myObjs;
 
   ///< set of identifiers of sub-documents of this document
   std::set<std::string> mySubs;

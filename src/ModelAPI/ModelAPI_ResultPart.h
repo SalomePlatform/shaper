@@ -7,6 +7,8 @@
 
 #include "ModelAPI_Result.h"
 
+#include <string>
+
 /**\class ModelAPI_ResultPart
  * \ingroup DataModel
  * \brief The Part document, result of a creation of new part feature.

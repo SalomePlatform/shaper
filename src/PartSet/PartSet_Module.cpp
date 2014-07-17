@@ -330,9 +330,9 @@ void PartSet_Module::onStopSelection(const QFeatureList& theFeatures, const bool
   QResultList aResults;
   foreach(FeaturePtr aFeature, theFeatures) {
     if (aFeature->results().size() > 0) {
-      std::list<ResultPtr>& aResList = aFeature->results();
-      std::list<ResultPtr>::iterator aIt;
-      for (aIt = aResList.begin(); aIt != aResList.end(); ++aIt)
+      const std::list<ResultPtr>& aResList = aFeature->results();
+      std::list<ResultPtr>::const_iterator aIt;
+      for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt)
         aResults.append(*aIt);
     }
   }

@@ -90,7 +90,7 @@ public:
   MODEL_EXPORT virtual void sendAttributeUpdated(ModelAPI_Attribute* theAttr);
 
   /// Puts feature to the document data sub-structure
-  MODEL_EXPORT void setLabel(TDF_Label& theLab);
+  MODEL_EXPORT void setLabel(TDF_Label theLab);
 
   /// Sets the object of this data
   MODEL_EXPORT virtual void setObject(ObjectPtr theObject)
