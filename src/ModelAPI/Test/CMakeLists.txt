@@ -1,0 +1,5 @@
+INCLUDE(Common)
+
+ENABLE_TESTING()
+ADD_TEST(ModelAPITest 
+         ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_undo.py)

@@ -19,7 +19,7 @@ IF(UNIX)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
     
     #Supporting test coverage checks (gcov) in the DEBUG mode
-    IF(CMAKE_BUILD_TYPE MATCHES Debug)
+    IF(USE_TEST_COVERAGE)
       INCLUDE(CodeCoverage)
       MESSAGE(STATUS "Setting flags for gcov support the the gcc...")
       SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
@@ -29,7 +29,7 @@ IF(UNIX)
       SETUP_TARGET_FOR_COVERAGE(test_coverage  # Name for custom target.
 				                ctest          # Name of the test driver executable that runs the tests.
 				                coverage)      # Name of output directory.
-    ENDIF(CMAKE_BUILD_TYPE MATCHES Debug)
+    ENDIF(USE_TEST_COVERAGE)
     
     #SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -E")
     MESSAGE(STATUS "gcc flags are: " ${CMAKE_CXX_FLAGS})
