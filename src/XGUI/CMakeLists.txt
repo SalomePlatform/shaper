@@ -115,7 +115,6 @@ INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/src/Events
 					 ${PROJECT_SOURCE_DIR}/src/PyConsole
 					 ${PROJECT_SOURCE_DIR}/src/ModelAPI
 					 ${PROJECT_SOURCE_DIR}/src/GeomAPI
-				     ${PROJECT_SOURCE_DIR}/src/Model
 					 ${PROJECT_SOURCE_DIR}/src/ModuleBase
 					 ${PROJECT_SOURCE_DIR}/src/PartSetPlugin
 					 ${CAS_INCLUDE_DIRS})

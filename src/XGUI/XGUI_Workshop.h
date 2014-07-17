@@ -38,8 +38,8 @@ class Config_PointerMessage;
 class QWidget;
 class QDockWidget;
 
-class Model_ObjectUpdatedMessage;
-class Model_ObjectDeletedMessage;
+class ModelAPI_ObjectUpdatedMessage;
+class ModelAPI_ObjectDeletedMessage;
 class QAction;
 
 /**\class XGUI_Workshop
@@ -154,10 +154,10 @@ protected:
   void connectWithOperation(ModuleBase_Operation* theOperation);
   void saveDocument(QString theName);
 
-  void onFeatureUpdatedMsg(const Model_ObjectUpdatedMessage* theMsg);
-  void onFeatureCreatedMsg(const Model_ObjectUpdatedMessage* theMsg);
-  void onFeatureRedisplayMsg(const Model_ObjectUpdatedMessage* theMsg);
-  void onObjectDeletedMsg(const Model_ObjectDeletedMessage* theMsg);
+  void onFeatureUpdatedMsg(const ModelAPI_ObjectUpdatedMessage* theMsg);
+  void onFeatureCreatedMsg(const ModelAPI_ObjectUpdatedMessage* theMsg);
+  void onFeatureRedisplayMsg(const ModelAPI_ObjectUpdatedMessage* theMsg);
+  void onObjectDeletedMsg(const ModelAPI_ObjectDeletedMessage* theMsg);
 
   QList<QAction*> getModuleCommands() const;
 

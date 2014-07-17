@@ -20,6 +20,9 @@
 #include <TDataStd_HLabelArray1.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDF_Reference.hxx>
+#include <TDF_Label.hxx>
+
+#include <boost/shared_ptr.hpp>
 
 #include <climits>
 #ifndef WIN32
@@ -463,7 +466,7 @@ FeaturePtr Model_Document::feature(TDF_Label& theLabel)
   return FeaturePtr(); // not found
 }
 
-ObjectPtr Model_Document::object(TDF_Label& theLabel)
+ObjectPtr Model_Document::object(TDF_Label theLabel)
 {
   // iterate all features, may be optimized later by keeping labels-map
   std::vector<ObjectPtr>& aVec = myObjs[ModelAPI_Feature::group()];
@@ -642,7 +645,7 @@ void Model_Document::setUniqueName(FeaturePtr theFeature)
   theFeature->data()->setName(aName);
 }
 
-void Model_Document::initData(ObjectPtr theObj, TDF_Label& theLab, const int theTag) {
+void Model_Document::initData(ObjectPtr theObj, TDF_Label theLab, const int theTag) {
   boost::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
   boost::shared_ptr<Model_Data> aData(new Model_Data);
@@ -662,7 +665,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   std::map<std::string, std::vector<ObjectPtr> >::reverse_iterator aGroupIter = myObjs.rbegin();
   for(; aGroupIter != myObjs.rend(); aGroupIter++) {
     std::vector<ObjectPtr>::iterator anObjIter = aGroupIter->second.begin();
-    // and in parallel iterate labels of features
+    // and in parallel iterate labels of features+
     const std::string& aGroupName = aGroupIter->first;
     TDF_ChildIDIterator aLabIter(groupLabel(aGroupName), TDataStd_Comment::GetID());
     while(anObjIter != aGroupIter->second.end() || aLabIter.More()) {

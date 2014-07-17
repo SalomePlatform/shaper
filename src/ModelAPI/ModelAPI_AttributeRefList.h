@@ -33,7 +33,7 @@ public:
   MODELAPI_EXPORT virtual int size() = 0;
 
   /// Returns the list of features
-  MODELAPI_EXPORT virtual std::list<ObjectPtr > list() = 0;
+  MODELAPI_EXPORT virtual std::list<ObjectPtr> list() = 0;
 
 protected:
   /// Objects are created for features automatically

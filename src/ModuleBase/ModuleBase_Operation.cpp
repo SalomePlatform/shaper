@@ -15,7 +15,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
-#include <Model_Events.h>
+#include <ModelAPI_Events.h>
 
 #include <Events_Loop.h>
 

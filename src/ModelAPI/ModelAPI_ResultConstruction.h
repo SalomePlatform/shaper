@@ -8,6 +8,8 @@
 #include "ModelAPI_Result.h"
 #include <GeomAPI_Shape.h>
 
+#include <string>
+
 /**\class ModelAPI_ResultConstruction
  * \ingroup DataModel
  * \brief The construction element result of a feature.

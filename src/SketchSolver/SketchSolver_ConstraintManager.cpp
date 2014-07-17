@@ -9,6 +9,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Object.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -17,6 +18,8 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Sketch.h>
+
+#include <list>
 
 
 // Initialization of constraint manager self pointer
@@ -353,8 +356,8 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
 
     boost::shared_ptr<ModelAPI_AttributeRefList> aWPFeatures =
       boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aWP->data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
-    std::list< ObjectPtr >& aFeaturesList = aWPFeatures->list();
-    std::list< ObjectPtr >::const_iterator anIter;
+    std::list<ObjectPtr> aFeaturesList = aWPFeatures->list();
+    std::list<ObjectPtr>::const_iterator anIter;
     for (anIter = aFeaturesList.begin(); anIter != aFeaturesList.end(); anIter++)
       if (*anIter == theConstraint)
         return aWP; // workplane is found

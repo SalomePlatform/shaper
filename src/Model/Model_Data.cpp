@@ -17,13 +17,14 @@
 #include <Events_Loop.h>
 #include <Events_Error.h>
 
+
 using namespace std;
 
 Model_Data::Model_Data()
 {
 }
 
-void Model_Data::setLabel(TDF_Label& theLab)
+void Model_Data::setLabel(TDF_Label theLab)
 {
   myLab = theLab;
 }

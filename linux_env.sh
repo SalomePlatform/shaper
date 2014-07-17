@@ -28,7 +28,7 @@ export LD_LIBRARY_PATH=${QT4_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
 ##
 #------ boost ------
 export BOOST_ROOT_DIR=${PDIR}/boost-1.52.0
-export LD_LIBRARY_PATH=${BOOST_ROOT_DIR}/lib
+export LD_LIBRARY_PATH=${BOOST_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
 ##
 #------ swig ------
 export SWIG_ROOT_DIR=${PDIR}/swig-2.0.8
@@ -100,5 +100,6 @@ export LIB=${LD_LIBRARY_PATH}
 #------ NewGEOM ------
 export INST_DIR=${ROOT_DIR}/install
 export PATH=${INST_DIR}/bin:${INST_DIR}/plugins:${PATH}
-export LD_LIBRARY_PATH=${INST_DIR}/bin:${INST_DIR}/swig:${INST_DIR}/plugins:${PATH}${LD_LIBRARY_PATH}
+export PYTHONPATH=${INST_DIR}/swig:${PYTHONPATH}
+export LD_LIBRARY_PATH=${INST_DIR}/bin:${INST_DIR}/swig:${INST_DIR}/plugins:${LD_LIBRARY_PATH}
 export NEW_GEOM_CONFIG_FILE=${INST_DIR}/plugins
