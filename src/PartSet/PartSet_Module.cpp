@@ -46,14 +46,25 @@
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_AISObject.h>
+#include <AIS_Shape.hxx>
 
 #include <QObject>
 #include <QMouseEvent>
 #include <QString>
 
+#include <GeomAlgoAPI_FaceBuilder.h>
+#include <GeomDataAPI_Dir.h>
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
+
+
+//const int SKETCH_PLANE_COLOR = Colors::COLOR_BROWN; /// the plane edge color
+const double SKETCH_WIDTH = 4.0; /// the plane edge width
+// face of the square-face displayed for selection of general plane
+const double PLANE_SIZE = 200;
+
 
 /*!Create and return new instance of XGUI_Module*/
 extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(XGUI_Workshop* theWshop)
@@ -212,14 +223,26 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
 {
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
                                        myWorkshop->operationMgr()->currentOperation());
-  if (aPreviewOp)
-  {
+  if (aPreviewOp) {
     XGUI_Selection* aSelection = myWorkshop->selector()->selection();
     // Initialise operation with preliminary selection
     std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
     std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
 
-    aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
+    PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
+    if (aSketchOp) {
+      if ((!aSketchOp->hasSketchPlane()) && (aSelected.size() > 0)) {
+        Handle(AIS_InteractiveObject) aAIS = aSelected.front().interactive();
+        if ((aAIS == myXPlane->impl<Handle(AIS_InteractiveObject)>()) ||
+            (aAIS == myYPlane->impl<Handle(AIS_InteractiveObject)>()) ||
+            (aAIS == myZPlane->impl<Handle(AIS_InteractiveObject)>()) ) {
+
+          Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(aAIS);
+          aSketchOp->setSketchPlane(aAISShape->Shape());
+        }
+      }
+    } else
+      aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
   }
 }
 
@@ -257,6 +280,7 @@ void PartSet_Module::onMouseDoubleClick(QMouseEvent* theEvent)
 
 void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
 {
+  erasePlanes();
   myWorkshop->viewer()->setViewProjection(theX, theY, theZ);
   myWorkshop->actionsMgr()->update();
 
@@ -444,6 +468,53 @@ void PartSet_Module::sendOperation(ModuleBase_Operation* theOperation)
   Events_Loop::loop()->send(aMessage);
 }
 
+boost::shared_ptr<GeomAPI_Shape> getPlane(double theX, double theY, double theZ)
+{
+  boost::shared_ptr<GeomAPI_Pnt> anOrigin(new GeomAPI_Pnt(0, 0, 0));
+  boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(theX, theY, theZ));
+  return GeomAlgoAPI_FaceBuilder::square(anOrigin, aNormal, PLANE_SIZE);
+}
+
+void PartSet_Module::showPlanes()
+{
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  // Show selection planes
+  if (!myXPlane) {
+    boost::shared_ptr<GeomAPI_Shape> aPlaneX = getPlane(1, 0, 0);
+    myXPlane = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
+    myXPlane->createShape(aPlaneX);
+    myXPlane->setColor(Colors::COLOR_RED);
+    myXPlane->setWidth(SKETCH_WIDTH);
+  }
+  if (!myYPlane) {
+    boost::shared_ptr<GeomAPI_Shape> aPlaneY = getPlane(0, 1, 0);
+    myYPlane = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
+    myYPlane->createShape(aPlaneY);
+    myYPlane->setColor(Colors::COLOR_GREEN);
+    myYPlane->setWidth(SKETCH_WIDTH);
+  }
+  if (!myZPlane) {
+    boost::shared_ptr<GeomAPI_Shape> aPlaneZ = getPlane(0, 0, 1);
+    myZPlane = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
+    myZPlane->createShape(aPlaneZ);
+    myZPlane->setColor(Colors::COLOR_BLUE);
+    myZPlane->setWidth(SKETCH_WIDTH);
+  }
+  aDisplayer->display(myXPlane, false);
+  aDisplayer->display(myYPlane, false);
+  aDisplayer->display(myZPlane, false);
+  aDisplayer->updateViewer();
+}
+
+void PartSet_Module::erasePlanes()
+{
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  aDisplayer->erase(myXPlane, false);
+  aDisplayer->erase(myYPlane, false);
+  aDisplayer->erase(myZPlane, false);
+  aDisplayer->updateViewer();
+}
+
 void PartSet_Module::visualizePreview(FeaturePtr theFeature, bool isDisplay,
                                       const bool isUpdateViewer)
 {
@@ -461,9 +532,9 @@ void PartSet_Module::visualizePreview(FeaturePtr theFeature, bool isDisplay,
     boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
     if (aSPFeature) {
+      showPlanes();
       //boost::shared_ptr<GeomAPI_AISObject> anAIS = 
       //  aSPFeature->getAISObject(aDisplayer->getAISObject(aResult));
-      aDisplayer->display(aSPFeature, false);
       //aDisplayer->redisplay(aResult, anAIS, false);
     }
   }
@@ -478,11 +549,11 @@ void PartSet_Module::activateFeature(FeaturePtr theFeature, const bool isUpdateV
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp) {
+/* TODO  if (aPreviewOp) {
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     aDisplayer->activateInLocalContext(theFeature->firstResult(), aPreviewOp->getSelectionModes(theFeature),
                                        isUpdateViewer);
-  }
+  }*/
 }
 
 void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)

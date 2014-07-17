@@ -57,6 +57,9 @@ public:
   /// Returns true if the Feature succesfully displayed
   void display(ObjectPtr theObject, bool isUpdateViewer = true);
 
+  /// Display the given AIS object. To hide this object use corresponde erase method
+  void display(boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdate = true);
+
   /// Redisplay the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -88,6 +91,9 @@ public:
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void erase(ObjectPtr theObject, const bool isUpdateViewer = true);
+
+  /// Erase the given AIS object displayed by corresponded display method
+  void erase(boost::shared_ptr<GeomAPI_AISObject> theAIS, const bool isUpdate = true);
 
   /// Erase all presentations
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly

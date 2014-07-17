@@ -9,14 +9,13 @@
 #include <SketchPlugin_Feature.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pln.h>
-#include <GeomAPI_IPresentable.h>
 #include <list>
 
 /**\class SketchPlugin_Sketch
  * \ingroup DataModel
  * \brief Feature for creation of the new part in PartSet.
  */
-class SketchPlugin_Sketch: public SketchPlugin_Feature, public GeomAPI_IPresentable
+class SketchPlugin_Sketch: public SketchPlugin_Feature
 {
 public:
   /// Sketch feature kind
@@ -66,10 +65,6 @@ public:
   /// Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
-  /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious);
-
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
   SKETCHPLUGIN_EXPORT virtual const void addSub(
@@ -102,8 +97,8 @@ protected:
   /// \param theY the Y normal value
   /// \param theZ the Z normal value
   /// \param theShapes the list of result shapes
-  void addPlane(double theX, double theY, double theZ,
-                std::list<boost::shared_ptr<GeomAPI_Shape> >& theShapes) const;
+  //void addPlane(double theX, double theY, double theZ,
+  //              std::list<boost::shared_ptr<GeomAPI_Shape> >& theShapes) const;
 
   /// Checks whether the plane is set in the sketch.
   /// \returns the boolean state

@@ -21,6 +21,7 @@ class PartSet_Listener;
 class ModelAPI_Feature;
 class XGUI_ViewerPrs;
 class ModuleBase_Operation;
+class GeomAPI_AISObject;
 
 class PARTSET_EXPORT PartSet_Module: public ModuleBase_IModule
 {
@@ -156,11 +157,20 @@ protected:
   //! Edits the feature
   void editFeature(FeaturePtr theFeature);
 
+
+  //! Shopws working planes in viewer 3d
+  void showPlanes();
+  void erasePlanes();
+
 private:
   XGUI_Workshop* myWorkshop;
   PartSet_Listener* myListener;
 
   std::map<std::string, std::string> myFeaturesInFiles;
+
+  boost::shared_ptr<GeomAPI_AISObject> myXPlane;
+  boost::shared_ptr<GeomAPI_AISObject> myYPlane;
+  boost::shared_ptr<GeomAPI_AISObject> myZPlane;
 };
 
 #endif

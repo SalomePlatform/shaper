@@ -90,7 +90,6 @@ void XGUI_Displayer::erase(ObjectPtr theObject, const bool isUpdateViewer)
     Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
     if (!anAIS.IsNull()) {
       aContext->Erase(anAIS, isUpdateViewer);
-      
     }
   }
   myResult2AISObjectMap.erase(theObject);
@@ -344,3 +343,22 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
 { 
   return myWorkshop->viewer()->AISContext(); 
 }
+
+
+void XGUI_Displayer::display(boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdate)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
+  if (!anAISIO.IsNull())
+    aContext->Display(anAISIO, isUpdate);
+}
+
+void XGUI_Displayer::erase(boost::shared_ptr<GeomAPI_AISObject> theAIS, const bool isUpdate)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
+  if (!anAISIO.IsNull()) {
+    aContext->Remove(anAISIO, isUpdate);
+  }
+}
+

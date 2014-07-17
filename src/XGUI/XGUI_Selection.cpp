@@ -24,21 +24,28 @@ std::list<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSk
 {
   std::set<ObjectPtr> aPrsFeatures;
   std::list<ModuleBase_ViewerPrs> aPresentations;
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
+    ModuleBase_ViewerPrs aPrs;
+
     Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
-    TopoDS_Shape aShape = aContext->SelectedShape();
+    aPrs.setInteractive(anIO);
 
-    if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
-      continue;
-
-    ObjectPtr aFeature = myWorkshop->displayer()->getObject(anIO);
-    if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
-      continue;
+    ObjectPtr aFeature = aDisplayer->getObject(anIO);
+    if (aPrsFeatures.find(aFeature) == aPrsFeatures.end()) {
+      aPrs.setFeature(aFeature);
+      aPrsFeatures.insert(aFeature);
+    }
+    if (aContext->HasOpenedContext()) {
+      TopoDS_Shape aShape = aContext->SelectedShape();
+      if (!aShape.IsNull() && (aShape.ShapeType() != theShapeTypeToSkip))
+        aPrs.setShape(aShape);
+    }
     Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
-    aPresentations.push_back(ModuleBase_ViewerPrs(aFeature, aShape, anOwner));
-    aPrsFeatures.insert(aFeature);
+    aPrs.setOwner(anOwner);
+    aPresentations.push_back(aPrs);
   }
   return aPresentations;
 }
@@ -47,21 +54,26 @@ std::list<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeT
 {
   std::set<ObjectPtr> aPrsFeatures;
   std::list<ModuleBase_ViewerPrs> aPresentations;
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
+    ModuleBase_ViewerPrs aPrs;
     Handle(AIS_InteractiveObject) anIO = aContext->DetectedInteractive();
-    TopoDS_Shape aShape = aContext->DetectedShape();
-    if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
-      continue;
+    aPrs.setInteractive(anIO);
 
-    ObjectPtr aResult = myWorkshop->displayer()->getObject(anIO);
-    if (aPrsFeatures.find(aResult) != aPrsFeatures.end())
-      continue;
-    aPresentations.push_back(ModuleBase_ViewerPrs(aResult, aShape, NULL));
-    aPrsFeatures.insert(aResult);
+    ObjectPtr aResult = aDisplayer->getObject(anIO);
+    if (aPrsFeatures.find(aResult) == aPrsFeatures.end()) {
+      aPrs.setFeature(aResult);
+      aPrsFeatures.insert(aResult);
+    }
+    if (aContext->HasOpenedContext()) {
+      TopoDS_Shape aShape = aContext->DetectedShape();
+      if (!aShape.IsNull() && aShape.ShapeType() != theShapeTypeToSkip)
+        aPrs.setShape(aShape);
+    }
+    aPresentations.push_back(aPrs);
   }
-
   return aPresentations;
 }
 
