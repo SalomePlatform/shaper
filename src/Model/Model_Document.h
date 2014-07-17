@@ -11,10 +11,16 @@
 #include <ModelAPI_Result.h>
 
 #include <TDocStd_Document.hxx>
+#include <NCollection_DataMap.hxx>
+#include <TDF_Label.hxx>
 #include <map>
 #include <set>
 
 class Handle_Model_Document;
+
+// for TDF_Label map usage
+static  Standard_Integer HashCode(const TDF_Label& theLab,const Standard_Integer theUpper);
+static  Standard_Boolean IsEqual(const TDF_Label& theLab1,const TDF_Label& theLab2);
 
 /**\class Model_Document
  * \ingroup DataModel
@@ -108,8 +114,8 @@ public:
 
 protected:
 
-  //! Returns (creates if needed) the group label
-  TDF_Label groupLabel(const std::string theGroup);
+  //! Returns (creates if needed) the features label
+  TDF_Label featuresLabel();
 
   //! Initializes feature with a unique name in this group (unique name is generated as 
   //! feature type + "_" + index
@@ -145,8 +151,9 @@ private:
   int myTransactionsAfterSave;
   /// number of nested transactions performed (or -1 if not nested)
   int myNestedNum;
-  /// All objects managed by this document (not only in history of OB)
-  std::map<std::string, std::vector<ObjectPtr> > myObjs;
+  /// All features managed by this document (not only in history of OB)
+  /// For optimization mapped by labels
+  NCollection_DataMap<TDF_Label, FeaturePtr> myObjs;
 
   ///< set of identifiers of sub-documents of this document
   std::set<std::string> mySubs;

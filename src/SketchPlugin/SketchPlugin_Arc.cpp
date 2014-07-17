@@ -78,7 +78,7 @@ void SketchPlugin_Arc::execute()
       boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
         document()->createConstruction(data());
       aConstr->setShape(aCompound);
-      results().push_back(aConstr);
+      setResult(aConstr);
     }
   }
 }
