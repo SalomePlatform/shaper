@@ -9,13 +9,14 @@
 #include <SketchPlugin_Feature.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pln.h>
+#include <GeomAPI_IPresentable.h>
 #include <list>
 
 /**\class SketchPlugin_Sketch
  * \ingroup DataModel
  * \brief Feature for creation of the new part in PartSet.
  */
-class SketchPlugin_Sketch: public SketchPlugin_Feature
+class SketchPlugin_Sketch: public SketchPlugin_Feature, public GeomAPI_IPresentable
 {
 public:
   /// Sketch feature kind

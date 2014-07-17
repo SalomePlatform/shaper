@@ -49,35 +49,13 @@ public:
 
   /// Returns the feature visibility state.
   /// \param theFeature a feature instance
-  bool isVisible(ResultPtr theResult);
+  bool isVisible(ObjectPtr theObject);
 
   /// Display the feature. Obtain the visualized object from the feature.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// Returns true if the Feature succesfully displayed
-  bool display(ResultPtr theFeature, bool isUpdateViewer = true);
-
-  /// Display the feature and a shape. This shape would be associated to the given feature
-  /// \param theFeature a feature instance
-  /// \param theAIS AIS presentation
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  /// Returns true if the Feature succesfully displayed
-  bool display(ResultPtr theResult, boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdateViewer = true);
-  
-  /// Display the shape and activate selection of sub-shapes
-  /// \param theFeature a feature instance
-  /// \param theAIS an AIS object
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  /// \returns true if the presentation is created
-  bool redisplay(ResultPtr theFeature,
-                 boost::shared_ptr<GeomAPI_AISObject> theAIS, 
-                 const bool isUpdateViewer = true);
-
-  /** Redisplay the shape if it was displayed
-  * \param theFeature a feature instance
-  * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  */
-  bool redisplay(ResultPtr theFeature, bool isUpdateViewer = true);
+  void display(ObjectPtr theObject, bool isUpdateViewer = true);
 
   /// Redisplay the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
@@ -109,7 +87,7 @@ public:
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void erase(ResultPtr theResult, const bool isUpdateViewer = true);
+  void erase(ObjectPtr theObject, const bool isUpdateViewer = true);
 
   /// Erase all presentations
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -129,12 +107,12 @@ public:
   /// Searches the interactive object by feature
   /// \param theFeature the feature or NULL if it not visualized
   /// \return theIO an interactive object
-  boost::shared_ptr<GeomAPI_AISObject> getAISObject(ResultPtr theFeature) const;
+  boost::shared_ptr<GeomAPI_AISObject> getAISObject(ObjectPtr theFeature) const;
 
   /// Searches the feature by interactive object
   /// \param theIO an interactive object
   /// \return feature the feature or NULL if it not visualized
-  ResultPtr getResult(Handle(AIS_InteractiveObject) theIO) const;
+  ObjectPtr getObject(Handle(AIS_InteractiveObject) theIO) const;
 
 protected:
   /// Deactivate local selection
@@ -144,10 +122,32 @@ protected:
   /// Returns currently installed AIS_InteractiveContext
   Handle(AIS_InteractiveContext) AISContext() const;
 
+  /// Display the feature and a shape. This shape would be associated to the given feature
+  /// \param theFeature a feature instance
+  /// \param theAIS AIS presentation
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  /// Returns true if the Feature succesfully displayed
+  void display(ObjectPtr theObject, boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdateViewer = true);
+  
+  /// Display the shape and activate selection of sub-shapes
+  /// \param theFeature a feature instance
+  /// \param theAIS an AIS object
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  /// \returns true if the presentation is created
+  //bool redisplay(ObjectPtr theObject,
+  //               boost::shared_ptr<GeomAPI_AISObject> theAIS, 
+  //               const bool isUpdateViewer = true);
+
+  /** Redisplay the shape if it was displayed
+  * \param theFeature a feature instance
+  * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  */
+  void redisplay(ObjectPtr theObject, bool isUpdateViewer = true);
+
 protected:
   XGUI_Workshop* myWorkshop;
 
-  typedef std::map<ResultPtr, boost::shared_ptr<GeomAPI_AISObject> > ResultToAISMap;
+  typedef std::map<ObjectPtr, boost::shared_ptr<GeomAPI_AISObject> > ResultToAISMap;
   ResultToAISMap myResult2AISObjectMap;
 };
 

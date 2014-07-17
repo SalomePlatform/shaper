@@ -73,11 +73,11 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
                                              const std::list<ModuleBase_ViewerPrs>& theSelected,
                                              const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  ResultPtr aFeature;
+  ObjectPtr aFeature;
   if (!theHighlighted.empty())
-    aFeature = theHighlighted.front().result();
+    aFeature = theHighlighted.front().object();
   if (!aFeature && !theSelected.empty()) // changed for a constrain
-    aFeature = theSelected.front().result();
+    aFeature = theSelected.front().object();
   // TODO
   /*if (!aFeature || aFeature != feature())
   {

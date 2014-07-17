@@ -19,6 +19,7 @@ SET(PROJECT_HEADERS
     GeomAPI_Pln.h
     GeomAPI_Shape.h
     GeomAPI_AISObject.h
+	GeomAPI_IPresentable.h
 )
 
 SET(PROJECT_SOURCES

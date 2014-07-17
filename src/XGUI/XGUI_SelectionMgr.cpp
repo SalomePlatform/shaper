@@ -61,7 +61,7 @@ void XGUI_SelectionMgr::onViewerSelection()
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
     Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
-    ResultPtr aResult = myWorkshop->displayer()->getResult(anIO);
+    ObjectPtr aResult = myWorkshop->displayer()->getObject(anIO);
     if (aResult)
       aFeatures.append(aResult);
   }
