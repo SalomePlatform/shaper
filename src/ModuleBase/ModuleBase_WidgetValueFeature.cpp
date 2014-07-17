@@ -14,12 +14,12 @@ ModuleBase_WidgetValueFeature::~ModuleBase_WidgetValueFeature()
 {
 }
 
-void ModuleBase_WidgetValueFeature::setResult(const ResultPtr& theFeature)
+void ModuleBase_WidgetValueFeature::setObject(const ObjectPtr& theFeature)
 {
   myResult = theFeature;
 }
 
-const ResultPtr& ModuleBase_WidgetValueFeature::result() const
+const ObjectPtr& ModuleBase_WidgetValueFeature::object() const
 {
   return myResult;
 }

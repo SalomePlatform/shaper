@@ -145,10 +145,10 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
       }
     }
   }
-  ResultPtr aFeature;
+  ObjectPtr aFeature;
   if (!theSelected.empty()) {
     ModuleBase_ViewerPrs aPrs = theSelected.front();
-    aFeature = aPrs.result();
+    aFeature = aPrs.object();
   }
   // TODO
   //else
@@ -194,7 +194,7 @@ void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* t
   if ((myPreSelection.size() > 0) && myActiveWidget) {
     const ModuleBase_ViewerPrs& aPrs = myPreSelection.front();
     ModuleBase_WidgetValueFeature aValue;
-    aValue.setResult(aPrs.result());
+    aValue.setObject(aPrs.object());
     if (myActiveWidget->setValue(&aValue)) {
       myPreSelection.remove(aPrs);
       emit activateNextWidget(myActiveWidget);
@@ -283,7 +283,7 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
 bool PartSet_OperationFeatureCreate::setWidgetValue(FeaturePtr theFeature, double theX, double theY)
 {
   ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
-  aValue->setResult(theFeature->firstResult());
+  aValue->setObject(theFeature);
   aValue->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
   bool isApplyed = myActiveWidget->setValue(aValue);
 

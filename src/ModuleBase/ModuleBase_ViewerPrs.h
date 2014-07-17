@@ -27,7 +27,7 @@ public:
   /// \param theFeature a model feature
   /// \param theShape a viewer shape
   /// \param theOwner a selection owner
-  ModuleBase_ViewerPrs(ResultPtr theResult,
+  ModuleBase_ViewerPrs(ObjectPtr theResult,
                  const TopoDS_Shape& theShape,
                  Handle_SelectMgr_EntityOwner theOwner)
   : myResult(theResult), myShape(theShape), myOwner(theOwner) {}
@@ -37,11 +37,11 @@ public:
 
   /// Sets the feature.
   /// \param theFeature a feature instance
-  void setFeature(ResultPtr theResult) { myResult = theResult; }
+  void setFeature(ObjectPtr theResult) { myResult = theResult; }
 
   /// Returns the feature.
   /// \return a feature instance
-  ResultPtr result() const { return myResult; }
+  ObjectPtr object() const { return myResult; }
 
   /// Returns the presentation owner
   /// \param the owner
@@ -61,14 +61,14 @@ public:
 
   bool operator==(const ModuleBase_ViewerPrs& thePrs)
   {
-    bool aResult = (myResult.get() == thePrs.result().get());
+    bool aResult = (myResult.get() == thePrs.object().get());
     bool aOwner = (myOwner.Access() == thePrs.owner().Access());
     bool aShape = myShape.IsEqual(thePrs.shape());
     return aResult && aOwner && aShape;
   }
 
 private:
-  ResultPtr myResult; /// the feature
+  ObjectPtr myResult; /// the feature
   Handle(SelectMgr_EntityOwner) myOwner; /// the selection owner
   TopoDS_Shape myShape; /// the shape
 };

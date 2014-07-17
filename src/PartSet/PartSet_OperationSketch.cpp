@@ -91,7 +91,7 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
       return;
 
     if (theHighlighted.size() == 1) {
-      ResultPtr aFeature = theHighlighted.front().result();
+      ObjectPtr aFeature = theHighlighted.front().object();
       if (aFeature) {
         std::string anOperationType = PartSet_OperationFeatureEdit::Type();
         if (theSelected.size() > 1)
@@ -117,7 +117,7 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
     /// It is empty and we have to use the process mouse release to start edition operation
     /// for these objects
     if (theSelected.size() == 1) {
-      ResultPtr aFeature = theSelected.front().result();
+      ObjectPtr aFeature = theSelected.front().object();
       // TODO
       //if (aFeature)
       //  restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);

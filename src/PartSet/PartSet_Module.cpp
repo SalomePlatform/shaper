@@ -461,9 +461,10 @@ void PartSet_Module::visualizePreview(FeaturePtr theFeature, bool isDisplay,
     boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
     if (aSPFeature) {
-      boost::shared_ptr<GeomAPI_AISObject> anAIS = 
-        aSPFeature->getAISObject(aDisplayer->getAISObject(aResult));
-      aDisplayer->redisplay(aResult, anAIS, false);
+      //boost::shared_ptr<GeomAPI_AISObject> anAIS = 
+      //  aSPFeature->getAISObject(aDisplayer->getAISObject(aResult));
+      aDisplayer->display(aSPFeature, false);
+      //aDisplayer->redisplay(aResult, anAIS, false);
     }
   }
   else

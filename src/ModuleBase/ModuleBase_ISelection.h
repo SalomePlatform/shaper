@@ -38,7 +38,7 @@ public:
   /**
   * Returns list of currently selected results
   */
-  virtual QResultList selectedResults() const = 0;
+  virtual QList<ObjectPtr> selectedPresentations() const = 0;
   
   //! Returns list of currently selected QModelIndexes
   virtual QModelIndexList selectedIndexes() const = 0;

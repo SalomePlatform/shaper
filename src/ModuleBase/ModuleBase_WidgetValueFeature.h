@@ -28,11 +28,11 @@ public:
 
   /// Fill the widget values by given point
   /// \param thePoint the point
-  void setResult(const ResultPtr& theFeature);
+  void setObject(const ObjectPtr& theFeature);
 
   /// Returns the widget values by given point
   /// \return theFeature the current feature
-  const ResultPtr& result() const;
+  const ObjectPtr& object() const;
 
   /// Fill the widget values by given point
   /// \param thePoint the point
@@ -43,7 +43,7 @@ public:
   const boost::shared_ptr<GeomAPI_Pnt2d>& point() const;
 
 private:
-  ResultPtr myResult;
+  ObjectPtr myResult;
   boost::shared_ptr<GeomAPI_Pnt2d> myPoint;
 };
 

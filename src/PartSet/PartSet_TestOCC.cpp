@@ -150,9 +150,10 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
     boost::shared_ptr<GeomAPI_AISObject> aPrevAIS;
     boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    boost::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
-    if (!anAIS->empty())
-      aDisplayer->redisplay(aFeature->firstResult(), anAIS, false);
+    //boost::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
+    //if (!anAIS->empty())
+    aDisplayer->display(aFeature, false);
+      //aDisplayer->redisplay(aFeature->firstResult(), anAIS, false);
 
     std::list<int> aModes;
     aModes.push_back(TopAbs_VERTEX);
@@ -207,9 +208,10 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   boost::shared_ptr<GeomAPI_AISObject> aPrevAIS;
   boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
     boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-  boost::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
-  if (!anAIS->empty())
-    theWorkshop->displayer()->redisplay(aFeature, anAIS, true);
+  //boost::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
+  //if (!anAIS->empty())
+  theWorkshop->displayer()->display(aFeature, true);
+  //  theWorkshop->displayer()->redisplay(aFeature, anAIS, true);
   //std::list<int> aModes;
   //aModes.clear();
   //aModes.push_back(TopAbs_VERTEX);

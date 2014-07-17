@@ -22,7 +22,7 @@ XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
 
 std::list<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) const
 {
-  std::set<ResultPtr> aPrsFeatures;
+  std::set<ObjectPtr> aPrsFeatures;
   std::list<ModuleBase_ViewerPrs> aPresentations;
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
@@ -33,7 +33,7 @@ std::list<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSk
     if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
       continue;
 
-    ResultPtr aFeature = myWorkshop->displayer()->getResult(anIO);
+    ObjectPtr aFeature = myWorkshop->displayer()->getObject(anIO);
     if (aPrsFeatures.find(aFeature) != aPrsFeatures.end())
       continue;
     Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
@@ -45,7 +45,7 @@ std::list<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSk
 
 std::list<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeToSkip) const
 {
-  std::set<ResultPtr> aPrsFeatures;
+  std::set<ObjectPtr> aPrsFeatures;
   std::list<ModuleBase_ViewerPrs> aPresentations;
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
@@ -55,7 +55,7 @@ std::list<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeT
     if (theShapeTypeToSkip >= 0 && !aShape.IsNull() && aShape.ShapeType() == theShapeTypeToSkip)
       continue;
 
-    ResultPtr aResult = myWorkshop->displayer()->getResult(anIO);
+    ObjectPtr aResult = myWorkshop->displayer()->getObject(anIO);
     if (aPrsFeatures.find(aResult) != aPrsFeatures.end())
       continue;
     aPresentations.push_back(ModuleBase_ViewerPrs(aResult, aShape, NULL));
@@ -70,14 +70,14 @@ QList<ObjectPtr> XGUI_Selection::selectedObjects() const
   return myWorkshop->objectBrowser()->selectedObjects();
 }
   
-QResultList XGUI_Selection::selectedResults() const
+QList<ObjectPtr> XGUI_Selection::selectedPresentations() const
 {
-  QResultList aSelectedList;
+  QList<ObjectPtr> aSelectedList;
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
     Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
-    ResultPtr aResult = myWorkshop->displayer()->getResult(anIO);
+    ObjectPtr aResult = myWorkshop->displayer()->getObject(anIO);
     if (aResult)
       aSelectedList.append(aResult);
   }

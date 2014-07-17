@@ -305,40 +305,33 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const ModelAPI_ObjectUpdatedMessage* t
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
-  bool isDisplayed = false;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
-    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-    if (aRes) {
-      if (aRes->data())
-        isDisplayed = myDisplayer->redisplay(aRes, false);
-      else {
-        myDisplayer->erase(aRes, false);
-        isDisplayed = true;
-      }
+    if (aObj->data())
+      myDisplayer->display(aObj, false);
+    else {
+      myDisplayer->erase(aObj, false);
     }
   }
-  if (isDisplayed)
-    myDisplayer->updateViewer();
+  myDisplayer->updateViewer();
 }
 
 //******************************************************
 void XGUI_Workshop::onFeatureCreatedMsg(const ModelAPI_ObjectUpdatedMessage* theMsg)
 {
-  std::set<ObjectPtr> aFeatures = theMsg->objects();
+  std::set<ObjectPtr> aObjects = theMsg->objects();
 
   std::set<ObjectPtr>::const_iterator aIt;
   bool aHasPart = false;
   bool isDisplayed = false;
-  for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
+  for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
      ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
     if (aPart) {
       aHasPart = true;
       //break;
     } else {
-      ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(*aIt);
-      if (aRes)
-        isDisplayed = myDisplayer->display(aRes, false);
+      myDisplayer->display(*aIt, false);
+      isDisplayed = true;
     }
   }
   if (isDisplayed)
