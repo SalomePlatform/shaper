@@ -15,7 +15,7 @@ class PartSetPlugin_Duplicate: public PartSetPlugin_Part
 {
 public:
   /// the reference to copy: reference to the attribute
-  inline static const std::string& DOC_REF()
+  inline static const std::string& ORIGIN_REF()
   {
     static const std::string MY_DUPLICATE_ID("Origin");
     return MY_DUPLICATE_ID;

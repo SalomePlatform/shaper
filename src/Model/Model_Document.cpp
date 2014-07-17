@@ -362,7 +362,6 @@ FeaturePtr Model_Document::addFeature(std::string theID)
       aDocToAdd->initData(aFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
       // keep the feature ID to restore document later correctly
       TDataStd_Comment::Set(aFeatureLab, aFeature->getKind().c_str());
-      aDocToAdd->setUniqueName(aFeature);
       aDocToAdd->myObjs.Bind(aFeatureLab, aFeature);
       // store feature in the history of features array
       if (aFeature->isInHistory()) {
@@ -445,7 +444,9 @@ FeaturePtr Model_Document::feature(TDF_Label& theLabel)
 
 ObjectPtr Model_Document::object(TDF_Label theLabel)
 {
-  TDF_Label aFeatureLabel = theLabel.Father().Father();
+  if (feature(theLabel)) // feature by label
+    return feature(theLabel);
+  TDF_Label aFeatureLabel = theLabel.Father().Father(); // let's suppose it is result
   FeaturePtr aFeature = feature(aFeatureLabel);
   if (aFeature) {
     const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
@@ -547,6 +548,7 @@ TDF_Label Model_Document::featuresLabel()
 
 void Model_Document::setUniqueName(FeaturePtr theFeature)
 {
+  if (!theFeature->data()->name().empty()) return; // not needed, name is already defined
   std::string aName; // result
   // first count all objects of such kind to start with index = count + 1
   int aNumObjects = 0;
@@ -586,12 +588,15 @@ void Model_Document::initData(ObjectPtr theObj, TDF_Label theLab, const int theT
   boost::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
   boost::shared_ptr<Model_Data> aData(new Model_Data);
-  aData->setLabel(theLab.FindChild(theTag + 1));
+  aData->setLabel(theLab.FindChild(theTag));
   aData->setObject(theObj);
   theObj->setDoc(aThis);
   theObj->setData(aData);
   FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
-  if (aFeature) aFeature->initAttributes();
+  if (aFeature) {
+    setUniqueName(aFeature); // must be before "initAttributes" because duplicate part uses name
+    aFeature->initAttributes();
+  }
 }
 
 void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
@@ -669,7 +674,7 @@ void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData
     Model_Application::getApplication()->getDocument(myID);
   theResult->setDoc(aThis);
   initData(theResult, boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
-    label().Father().FindChild(TAG_FEATURE_RESULTS), theResultIndex);
+    label().Father().FindChild(TAG_FEATURE_RESULTS), theResultIndex + 1);
   if (theResult->data()->name().empty()) { // if was not initialized, generate event and set a name
     theResult->data()->setName(theFeatureData->name());
   }
