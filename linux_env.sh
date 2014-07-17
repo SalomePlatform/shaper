@@ -97,6 +97,10 @@ export CASROOT=${CAS_ROOT_DIR}
 ##
 export LIB=${LD_LIBRARY_PATH}
 
+#------ lcov ------
+export LCOV_ROOT_DIR=${PDIR}/lcov-1.11
+export PATH=${LCOV_ROOT_DIR}/bin:${PATH}
+
 #------ NewGEOM ------
 export INST_DIR=${ROOT_DIR}/install
 export PATH=${INST_DIR}/bin:${INST_DIR}/plugins:${PATH}
