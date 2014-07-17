@@ -43,13 +43,11 @@ public:
   virtual void execute() = 0;
 
   /// returns the current results of the feature
-  std::list<boost::shared_ptr<ModelAPI_Result> >& results() {return myResults;}
+  MODELAPI_EXPORT const std::list<boost::shared_ptr<ModelAPI_Result> >& results();
   /// returns the first result in the list or NULL reference
-  boost::shared_ptr<ModelAPI_Result> firstResult() 
-  {return myResults.empty() ? boost::shared_ptr<ModelAPI_Result>() : *(myResults.begin());}
+  MODELAPI_EXPORT boost::shared_ptr<ModelAPI_Result> firstResult();
   /// sets the alone result
-  void setResult(const boost::shared_ptr<ModelAPI_Result>& theResult) 
-  {myResults.clear(); myResults.push_back(theResult);}
+  MODELAPI_EXPORT void setResult(const boost::shared_ptr<ModelAPI_Result>& theResult);
 
   /// Returns true if this feature must not be created: this is just an action
   /// that is not stored in the features history and data model (like "delete part").
@@ -57,11 +55,10 @@ public:
 
   /// Must return document where the new feature must be added to
   /// By default it is current document
-  virtual boost::shared_ptr<ModelAPI_Document> documentToAdd()
-  {return ModelAPI_PluginManager::get()->currentDocument();}
+  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Document> documentToAdd();
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_Feature() {}
+  MODELAPI_EXPORT virtual ~ModelAPI_Feature();
 };
 
 //! Pointer on feature object

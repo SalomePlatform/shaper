@@ -20,9 +20,8 @@
 #include <TDataStd_HLabelArray1.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDF_Reference.hxx>
-#include <TDF_Label.hxx>
-
-#include <boost/shared_ptr.hpp>
+#include <TDF_ChildIDIterator.hxx>
+#include <TDF_LabelMapHasher.hxx>
 
 #include <climits>
 #ifndef WIN32
@@ -358,13 +357,13 @@ FeaturePtr Model_Document::addFeature(std::string theID)
   if (aFeature) {
     TDF_Label aFeatureLab;
     if (!aFeature->isAction()) {// do not add action to the data model
-      TDF_Label aFeaturesLab = aDocToAdd->groupLabel(ModelAPI_Feature::group());
+      TDF_Label aFeaturesLab = aDocToAdd->featuresLabel();
       aFeatureLab = aFeaturesLab.NewChild();
       aDocToAdd->initData(aFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
       // keep the feature ID to restore document later correctly
       TDataStd_Comment::Set(aFeatureLab, aFeature->getKind().c_str());
       aDocToAdd->setUniqueName(aFeature);
-      aDocToAdd->myObjs[ModelAPI_Feature::group()].push_back(aFeature);
+      aDocToAdd->myObjs.Bind(aFeatureLab, aFeature);
       // store feature in the history of features array
       if (aFeature->isInHistory()) {
         AddToRefArray(aFeaturesLab, aFeatureLab);
@@ -414,20 +413,14 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
 {
   boost::shared_ptr<Model_Data> aData = boost::static_pointer_cast<Model_Data>(theFeature->data());
   TDF_Label aFeatureLabel = aData->label().Father();
-  // remove feature from the myObjects list
-  std::vector<ObjectPtr>& aVec = myObjs[ModelAPI_Feature::group()];
-  std::vector<ObjectPtr>::iterator anIter = aVec.begin();
-  while(anIter != aVec.end()) {
-    if (*anIter == theFeature) {
-      anIter = aVec.erase(anIter);
-    } else {
-      anIter++;
-    }
-  }
+  if (myObjs.IsBound(aFeatureLabel)) 
+    myObjs.UnBind(aFeatureLabel);
+  else return; // not found feature => do not remove
+
   // erase all attributes under the label of feature
   aFeatureLabel.ForgetAllAttributes();
   // remove it from the references array
-  RemoveFromRefArray(groupLabel(ModelAPI_Feature::group()), aData->label());
+  RemoveFromRefArray(featuresLabel(), aData->label());
 
   // event: feature is deleted
   ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
@@ -443,43 +436,21 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
   }
 }
 
-/// returns the object group name by the object label
-static std::string groupName(TDF_Label theObjectLabel) {
-  TDF_Label aGroupLab = theObjectLabel.Father();
-  Handle(TDataStd_Comment) aComment;
-  if (aGroupLab.FindAttribute(TDataStd_Comment::GetID(), aComment))
-    return std::string(TCollection_AsciiString(aComment->Get()).ToCString());
-  return ""; // not found
-}
-
 FeaturePtr Model_Document::feature(TDF_Label& theLabel)
 {
-  // iterate all features, may be optimized later by keeping labels-map
-  std::vector<ObjectPtr>& aVec = myObjs[ModelAPI_Feature::group()];
-  std::vector<ObjectPtr>::iterator aFIter = aVec.begin();
-  for(; aFIter != aVec.end(); aFIter++) {
-    boost::shared_ptr<Model_Data> aData = 
-      boost::dynamic_pointer_cast<Model_Data>((*aFIter)->data());
-    if (aData->label().IsEqual(theLabel))
-      return boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter);
-  }
+  if (myObjs.IsBound(theLabel))
+    return myObjs.Find(theLabel);
   return FeaturePtr(); // not found
 }
 
 ObjectPtr Model_Document::object(TDF_Label theLabel)
 {
-  // iterate all features, may be optimized later by keeping labels-map
-  std::vector<ObjectPtr>& aVec = myObjs[ModelAPI_Feature::group()];
-  std::vector<ObjectPtr>::iterator aFIter = aVec.begin();
-  for(; aFIter != aVec.end(); aFIter++) {
-    boost::shared_ptr<Model_Data> aData = 
-      boost::dynamic_pointer_cast<Model_Data>((*aFIter)->data());
-    if (aData->label().IsEqual(theLabel))
-      return *aFIter;
-    std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = 
-      boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter)->results();
-    std::list<boost::shared_ptr<ModelAPI_Result> >::iterator aRIter = aResults.begin();
-    for(; aRIter != aResults.end(); aRIter++) {
+  TDF_Label aFeatureLabel = theLabel.Father().Father();
+  FeaturePtr aFeature = feature(aFeatureLabel);
+  if (aFeature) {
+    const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+    std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.cbegin();
+    for(; aRIter != aResults.cend(); aRIter++) {
       boost::shared_ptr<Model_Data> aResData = 
         boost::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
       if (aResData->label().IsEqual(theLabel))
@@ -500,36 +471,27 @@ boost::shared_ptr<ModelAPI_Document> Model_Document::subDocument(std::string the
 ObjectPtr Model_Document::object(const std::string& theGroupID, const int theIndex)
 {
   if (theGroupID == ModelAPI_Feature::group()) {
-    // features may be not in history but in the myObjs, so, iterate all
-    int anIndex = 0;
-    std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = 
-      myObjs.find(ModelAPI_Feature::group());
-    if (aFind != myObjs.end()) {
-      std::vector<ObjectPtr>::iterator aFIter = aFind->second.begin();
-      for(; aFIter != aFind->second.end(); aFIter++) {
-        if ((*aFIter)->isInHistory()) {
-          if (theIndex == anIndex)
-            return *aFIter;
-          anIndex++;
-        }
-      }
-    }
+    Handle(TDataStd_ReferenceArray) aRefs;
+    if (!featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs))
+      return ObjectPtr();
+    if (aRefs->Lower() > theIndex || aRefs->Upper() < theIndex)
+      return ObjectPtr();
+    TDF_Label aFeatureLabel = aRefs->Value(theIndex);
+    return feature(aFeatureLabel);
   } else {
-    // iterate all features in order to find the needed result
-    std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = 
-      myObjs.find(ModelAPI_Feature::group());
-    if (aFind != myObjs.end()) {
-      std::vector<ObjectPtr>::iterator aFIter = aFind->second.begin();
-      for(int anIndex = 0; aFIter != aFind->second.end(); aFIter++) {
-        const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = 
-          boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter)->results();
-        std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-        for(; aRIter != aResults.cend(); aRIter++) {
-          if ((*aRIter)->isInHistory() && (*aRIter)->groupName() == theGroupID) {
-            if (anIndex == theIndex)
-              return *aRIter;
-            anIndex++;
-          }
+    // comment must be in any feature: it is kind
+    int anIndex = 0;
+    TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
+    for(; aLabIter.More(); aLabIter.Next()) {
+      TDF_Label aFLabel = aLabIter.Value()->Label();
+      FeaturePtr aFeature = feature(aFLabel);
+      const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+      std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+      for(; aRIter != aResults.cend(); aRIter++) {
+        if ((*aRIter)->isInHistory() && (*aRIter)->groupName() == theGroupID) {
+          if (anIndex == theIndex)
+            return *aRIter;
+          anIndex++;
         }
       }
     }
@@ -542,31 +504,20 @@ int Model_Document::size(const std::string& theGroupID)
 {
   int aResult = 0;
   if (theGroupID == ModelAPI_Feature::group()) {
-    // features may be not in history but in the myObjs, so, iterate all
-    std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = 
-      myObjs.find(ModelAPI_Feature::group());
-    if (aFind != myObjs.end()) {
-      std::vector<ObjectPtr>::iterator aFIter = aFind->second.begin();
-      for(; aFIter != aFind->second.end(); aFIter++) {
-        if ((*aFIter)->isInHistory()) {
-          aResult++;
-        }
-      }
-    }
+    Handle(TDataStd_ReferenceArray) aRefs;
+    if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs))
+      return aRefs->Length();
   } else {
-    // iterate all features in order to find the needed result
-    std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = 
-      myObjs.find(ModelAPI_Feature::group());
-    if (aFind != myObjs.end()) {
-      std::vector<ObjectPtr>::iterator aFIter = aFind->second.begin();
-      for(; aFIter != aFind->second.end(); aFIter++) {
-        const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = 
-          boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter)->results();
-        std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-        for(; aRIter != aResults.cend(); aRIter++) {
-          if ((*aRIter)->isInHistory() && (*aRIter)->groupName() == theGroupID) {
-            aResult++;
-          }
+    // comment must be in any feature: it is kind
+    TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
+    for(; aLabIter.More(); aLabIter.Next()) {
+      TDF_Label aFLabel = aLabIter.Value()->Label();
+      FeaturePtr aFeature = feature(aFLabel);
+      const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+      std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+      for(; aRIter != aResults.cend(); aRIter++) {
+        if ((*aRIter)->isInHistory() && (*aRIter)->groupName() == theGroupID) {
+          aResult++;
         }
       }
     }
@@ -589,32 +540,19 @@ Model_Document::Model_Document(const std::string theID)
   myDoc->CommitCommand();
 }
 
-TDF_Label Model_Document::groupLabel(const std::string theGroup)
+TDF_Label Model_Document::featuresLabel()
 {
-  // searching for existing
-  TCollection_ExtendedString aGroup(theGroup.c_str());
-  TDF_ChildIDIterator aGroupIter(myDoc->Main().FindChild(TAG_OBJECTS), TDataStd_Comment::GetID());
-  for(; aGroupIter.More(); aGroupIter.Next()) {
-    Handle(TDataStd_Comment) aName = Handle(TDataStd_Comment)::DownCast(aGroupIter.Value());
-    if (aName->Get() == aGroup)
-      return aGroupIter.Value()->Label();
-  }
-  // create a new
-  TDF_Label aNew = myDoc->Main().FindChild(TAG_OBJECTS).NewChild();
-  TDataStd_Comment::Set(aNew, aGroup);
-  return aNew;
+  return myDoc->Main().FindChild(TAG_OBJECTS);
 }
 
 void Model_Document::setUniqueName(FeaturePtr theFeature)
 {
   std::string aName; // result
   // first count all objects of such kind to start with index = count + 1
-  int a, aNumObjects = 0;
-  int aSize = myObjs.find(ModelAPI_Feature::group()) == myObjs.end() ? 
-    0 : myObjs[ModelAPI_Feature::group()].size();
-  for(a = 0; a < aSize; a++) {
-    if (boost::dynamic_pointer_cast<ModelAPI_Feature>(myObjs[ModelAPI_Feature::group()][a])->
-        getKind() == theFeature->getKind())
+  int aNumObjects = 0;
+  NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myObjs);
+  for(; aFIter.More(); aFIter.Next()) {
+    if (aFIter.Value()->getKind() == theFeature->getKind())
       aNumObjects++;
   }
   // generate candidate name
@@ -622,9 +560,8 @@ void Model_Document::setUniqueName(FeaturePtr theFeature)
   aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
   aName = aNameStream.str();
   // check this is unique, if not, increase index by 1
-  for(a = 0; a < aSize;) {
-    FeaturePtr aFeature = 
-      boost::dynamic_pointer_cast<ModelAPI_Feature>(myObjs[ModelAPI_Feature::group()][a]);
+  for(aFIter.Initialize(myObjs); aFIter.More(); ) {
+    FeaturePtr aFeature = aFIter.Value();
     bool isSameName = aFeature->isInHistory() && aFeature->data()->name() == aName;
     if (!isSameName) { // check also results to avoid same results names (actual for Parts)
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
@@ -639,8 +576,8 @@ void Model_Document::setUniqueName(FeaturePtr theFeature)
       aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
       aName = aNameStream.str();
       // reinitialize iterator to make sure a new name is unique
-      a = 0;
-    } else a++;
+      aFIter.Initialize(myObjs);
+    } else aFIter.Next();
   }
   theFeature->data()->setName(aName);
 }
@@ -661,73 +598,59 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
 {
   boost::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
-  // update all objects: iterate from the end: as they appeared in the list
-  std::map<std::string, std::vector<ObjectPtr> >::reverse_iterator aGroupIter = myObjs.rbegin();
-  for(; aGroupIter != myObjs.rend(); aGroupIter++) {
-    std::vector<ObjectPtr>::iterator anObjIter = aGroupIter->second.begin();
-    // and in parallel iterate labels of features+
-    const std::string& aGroupName = aGroupIter->first;
-    TDF_ChildIDIterator aLabIter(groupLabel(aGroupName), TDataStd_Comment::GetID());
-    while(anObjIter != aGroupIter->second.end() || aLabIter.More()) {
-      static const int INFINITE_TAG = INT_MAX; // no label means that it exists somwhere in infinite
-      int aFeatureTag = INFINITE_TAG; 
-      if (anObjIter != aGroupIter->second.end()) { // existing tag for feature
-        boost::shared_ptr<Model_Data> aData = 
-          boost::dynamic_pointer_cast<Model_Data>((*anObjIter)->data());
-        aFeatureTag = aData->label().Tag();
-      }
-      int aDSTag = INFINITE_TAG; 
-      if (aLabIter.More()) { // next label in DS is existing
-        aDSTag = aLabIter.Value()->Label().Tag();
-      }
-      if (aDSTag > aFeatureTag) { // feature is removed
-        ObjectPtr anObj = *anObjIter;
-        anObjIter = aGroupIter->second.erase(anObjIter);
-        // event: model is updated
-        if (anObj->isInHistory()) {
-          ModelAPI_EventCreator::get()->sendDeleted(aThis, aGroupName);
-        }
-        // results of this feature must be redisplayed (hided)
-        static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-        const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = boost::dynamic_pointer_cast<ModelAPI_Feature>(anObj)->results();
-        std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-        for(; aRIter != aResults.cend(); aRIter++) {
-          boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-          aRes->setData(boost::shared_ptr<ModelAPI_Data>()); // deleted flag
-          ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
-          ModelAPI_EventCreator::get()->sendDeleted(aThis, aRes->groupName());
-        }
-      } else if (aDSTag < aFeatureTag) { // a new feature is inserted
-        // create a feature
-        TDF_Label aLab = aLabIter.Value()->Label();
-        ObjectPtr aNewObj = ModelAPI_PluginManager::get()->createFeature(
-          TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
-          .ToCString());
-        // this must be before "setData" to redo the sketch line correctly
-        if (anObjIter == aGroupIter->second.end()) {
-          aGroupIter->second.push_back(aNewObj);
-          anObjIter = aGroupIter->second.end();
-        } else {
-          anObjIter++;
-          aGroupIter->second.insert(anObjIter, aNewObj);
-        }
-        initData(aNewObj, aLab, TAG_FEATURE_ARGUMENTS);
+  // update all objects by checking are they of labels or not
+  std::set<FeaturePtr> aCheckedFeatures;
+  TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
+  for(; aLabIter.More(); aLabIter.Next()) {
+    TDF_Label aFeatureLabel = aLabIter.Value()->Label();
+    if (!myObjs.IsBound(aFeatureLabel)) { // a new feature is inserted
+      // create a feature
+      FeaturePtr aNewObj = ModelAPI_PluginManager::get()->createFeature(
+        TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
+        .ToCString());
+      // this must be before "setData" to redo the sketch line correctly
+      myObjs.Bind(aFeatureLabel, aNewObj);
+      aCheckedFeatures.insert(aNewObj);
+      initData(aNewObj, aFeatureLabel, TAG_FEATURE_ARGUMENTS);
+      aNewObj->execute(); // to restore results list
 
-        // event: model is updated
-        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-        ModelAPI_EventCreator::get()->sendUpdated(aNewObj, anEvent);
-        // feature for this label is added, so go to the next label
-        aLabIter.Next();
-      } else { // nothing is changed, both iterators are incremented
-        if (theMarkUpdated) {
-          static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-          ModelAPI_EventCreator::get()->sendUpdated(*anObjIter, anEvent);
-        }
-        anObjIter++;
-        aLabIter.Next();
+      // event: model is updated
+      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+      ModelAPI_EventCreator::get()->sendUpdated(aNewObj, anEvent);
+      // feature for this label is added, so go to the next label
+    } else { // nothing is changed, both iterators are incremented
+      aCheckedFeatures.insert(myObjs.Find(aFeatureLabel));
+      if (theMarkUpdated) {
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+        ModelAPI_EventCreator::get()->sendUpdated(myObjs.Find(aFeatureLabel), anEvent);
       }
     }
   }
+  // check all features are checked: if not => it was removed
+  NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myObjs);
+  while(aFIter.More()) {
+    if (aCheckedFeatures.find(aFIter.Value()) == aCheckedFeatures.end()) {
+      FeaturePtr aFeature = aFIter.Value();
+      TDF_Label aLab = aFIter.Key();
+      aFIter.Next();
+      myObjs.UnBind(aLab);
+      // event: model is updated
+      if (aFeature->isInHistory()) {
+        ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_Feature::group());
+      }
+      // results of this feature must be redisplayed (hided)
+      static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+      std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+      for(; aRIter != aResults.cend(); aRIter++) {
+        boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+        aRes->setData(boost::shared_ptr<ModelAPI_Data>()); // deleted flag
+        ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
+        ModelAPI_EventCreator::get()->sendDeleted(aThis, aRes->groupName());
+      }
+    } else aFIter.Next();
+  }
+
   // after all updates, sends a message that groups of features were created or updated
   boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
     setCheckTransactions(false);
@@ -748,8 +671,6 @@ void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData
   initData(theResult, boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
     label().Father().FindChild(TAG_FEATURE_RESULTS), theResultIndex);
   if (theResult->data()->name().empty()) { // if was not initialized, generate event and set a name
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-    ModelAPI_EventCreator::get()->sendUpdated(theResult, anEvent);
     theResult->data()->setName(theFeatureData->name());
   }
 }
@@ -805,21 +726,20 @@ boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
 boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
   const boost::shared_ptr<ModelAPI_Result>& theResult)
 {
-  // iterate all features in order to find the needed result
-  std::map<std::string, std::vector<ObjectPtr> >::iterator aFind = 
-    myObjs.find(ModelAPI_Feature::group());
-  if (aFind != myObjs.end()) {
-    std::vector<ObjectPtr>::iterator aFIter = aFind->second.begin();
-    for(; aFIter != aFind->second.end(); aFIter++) {
-      FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter);
-      const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
-      std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      for(; aRIter != aResults.cend(); aRIter++) {
-        if (*aRIter == theResult) {
-          return aFeature;
-        }
-      }
-    }
+  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theResult->data());
+  if (aData) {
+    TDF_Label aFeatureLab = aData->label().Father().Father();
+    return feature(aFeatureLab);
   }
   return FeaturePtr();
+}
+
+Standard_Integer HashCode(const TDF_Label& theLab,const Standard_Integer theUpper)
+{
+  return TDF_LabelMapHasher::HashCode(theLab, theUpper);
+
+}
+Standard_Boolean IsEqual(const TDF_Label& theLab1,const TDF_Label& theLab2)
+{
+  return TDF_LabelMapHasher::IsEqual(theLab1, theLab2);
 }
