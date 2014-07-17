@@ -37,6 +37,7 @@
 
 using namespace std;
 
+
 PartSet_OperationSketch::PartSet_OperationSketch(const QString& theId,
 	                                             QObject* theParent)
 : PartSet_OperationSketchBase(theId, theParent)
@@ -75,15 +76,7 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
                                            const std::list<ModuleBase_ViewerPrs>& theSelected,
                                            const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  if (!hasSketchPlane()) {
-    if (!theHighlighted.empty()) {
-      ModuleBase_ViewerPrs aPrs = theHighlighted.front();
-      const TopoDS_Shape& aShape = aPrs.shape();
-      if (!aShape.IsNull())
-        setSketchPlane(aShape);
-    }
-  }
-  else {
+  if (hasSketchPlane()){
     // if shift button is pressed and there are some already selected objects, the operation should
     // not be started. We just want to combine some selected objects.
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
@@ -109,9 +102,7 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
                                             const std::list<ModuleBase_ViewerPrs>& theSelected,
                                             const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  if (!hasSketchPlane()) {
-  }
-  else {
+  if (hasSketchPlane()) {
     /// TODO: OCC bug: 25034 - the highlighted list should be filled not only for AIS_Shape
     /// but for other IO, for example constraint dimensions.
     /// It is empty and we have to use the process mouse release to start edition operation
@@ -168,6 +159,7 @@ bool PartSet_OperationSketch::isNestedOperationsEnabled() const
 {
   return hasSketchPlane();
 }
+
 
 void PartSet_OperationSketch::startOperation()
 {

@@ -15,13 +15,7 @@
 #include <ModelAPI_ResultConstruction.h>
 
 
-const int SKETCH_PLANE_COLOR = Colors::COLOR_BROWN; /// the plane edge color
-const double SKETCH_WIDTH = 4.0; /// the plane edge width
-
 using namespace std;
-
-// face of the square-face displayed for selection of general plane
-const double PLANE_SIZE = 200;
 
 SketchPlugin_Sketch::SketchPlugin_Sketch()
 {
@@ -38,19 +32,6 @@ void SketchPlugin_Sketch::initAttributes()
 
 void SketchPlugin_Sketch::execute() 
 {
-  if (!isPlaneSet()) {
-    std::list<boost::shared_ptr<GeomAPI_Shape> > aFaces;
-
-    addPlane(1, 0, 0, aFaces); // YZ plane
-    addPlane(0, 1, 0, aFaces); // XZ plane
-    addPlane(0, 0, 1, aFaces); // XY plane
-    boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aFaces);
-    boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
-      document()->createConstruction(data());
-    aConstr->setShape(aCompound);
-    setResult(aConstr);
-    return;
-  }
   if (!data()->isValid())
     return ;
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
@@ -97,30 +78,10 @@ void SketchPlugin_Sketch::execute()
   setResult(aConstr);
 }
 
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Sketch::getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious)
-{
-  boost::shared_ptr<GeomAPI_AISObject> aResult = simpleAISObject(firstResult(), thePrevious);
-  aResult->setColor(SKETCH_PLANE_COLOR);
-  aResult->setWidth(SKETCH_WIDTH);
-  //anAIS->Redisplay();
-  return aResult;
-}
-
 const void SketchPlugin_Sketch::addSub(const FeaturePtr& theFeature)
 {
   boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature)->setSketch(this);
   data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->append(theFeature);
-}
-
-void SketchPlugin_Sketch::addPlane(double theX, double theY, double theZ,
-                                   std::list<boost::shared_ptr<GeomAPI_Shape> >& theShapes) const
-{
-  boost::shared_ptr<GeomAPI_Pnt> anOrigin(new GeomAPI_Pnt(0, 0, 0));
-  boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(theX, theY, theZ));
-  boost::shared_ptr<GeomAPI_Shape> aFace = 
-    GeomAlgoAPI_FaceBuilder::square(anOrigin, aNormal, PLANE_SIZE);
-  theShapes.push_back(aFace);
 }
 
 boost::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, const double theY)

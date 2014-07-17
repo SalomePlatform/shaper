@@ -86,6 +86,10 @@ public:
   /// \return the boolean value whether the sketch is set
   bool hasSketchPlane() const;
 
+  /// Set the plane to the current sketch
+  /// \param theShape the shape
+  void setSketchPlane(const TopoDS_Shape& theShape);
+
 signals:
   /// signal about the sketch plane is selected
   /// \param theX the value in the X direction of the plane
@@ -99,10 +103,6 @@ protected:
   /// Virtual method called when operation started (see start() method for more description)
   /// Default impl calls corresponding slot and commits immediately.
   virtual void startOperation();
-
-  /// Set the plane to the current sketch
-  /// \param theShape the shape
-  void setSketchPlane(const TopoDS_Shape& theShape);
 
 private:
   std::list<ModuleBase_ViewerPrs> myFeatures; ///< the features to apply the edit operation

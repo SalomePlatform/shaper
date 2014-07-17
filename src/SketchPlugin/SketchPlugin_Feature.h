@@ -23,10 +23,6 @@ class Handle_AIS_InteractiveObject;
 class SketchPlugin_Feature: public ModelAPI_Feature
 {
 public:
-  /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious) = 0;
-
   /// Simple creation of interactive object by the result of the object
   static boost::shared_ptr<GeomAPI_AISObject> simpleAISObject(
     boost::shared_ptr<ModelAPI_Result> theRes, boost::shared_ptr<GeomAPI_AISObject> thePrevious);

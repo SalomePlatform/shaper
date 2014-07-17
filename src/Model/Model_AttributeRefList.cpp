@@ -41,7 +41,11 @@ list<ObjectPtr> Model_AttributeRefList::list()
   if (aDoc) {
     const TDF_LabelList& aList = myRef->List();
     for(TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
-      aResult.push_back(aDoc->object(aLIter.Value()));
+      ObjectPtr anObj = aDoc->object(aLIter.Value());
+      if (!anObj) { // try to use father (for feature)
+        anObj = aDoc->object(aLIter.Value().Father());
+      }
+      aResult.push_back(anObj);
     }
   }
   return aResult;

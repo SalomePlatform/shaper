@@ -10,6 +10,7 @@
 #include <boost/shared_ptr.hpp>
 #include <TopoDS_Shape.hxx>
 #include <SelectMgr_EntityOwner.hxx>
+#include <AIS_InteractiveObject.hxx>
 
 #include <ModelAPI_Result.h>
 
@@ -59,18 +60,24 @@ public:
   /// \return a shape instance
   const TopoDS_Shape& shape() const { return myShape; }
 
+  void setInteractive(const Handle(AIS_InteractiveObject)& theIO) { myInteractive = theIO; }
+
+  Handle(AIS_InteractiveObject) interactive() const { return myInteractive; }
+
   bool operator==(const ModuleBase_ViewerPrs& thePrs)
   {
     bool aResult = (myResult.get() == thePrs.object().get());
     bool aOwner = (myOwner.Access() == thePrs.owner().Access());
     bool aShape = myShape.IsEqual(thePrs.shape());
-    return aResult && aOwner && aShape;
+    bool aIO = myInteractive == thePrs.interactive();
+    return aResult && aOwner && aShape && aIO;
   }
 
 private:
   ObjectPtr myResult; /// the feature
   Handle(SelectMgr_EntityOwner) myOwner; /// the selection owner
   TopoDS_Shape myShape; /// the shape
+  Handle(AIS_InteractiveObject) myInteractive;
 };
 
 #endif

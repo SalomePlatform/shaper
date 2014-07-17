@@ -29,6 +29,9 @@ const int CONSTRAINT_TEXT_SELECTION_TOLERANCE = 20; /// the text selection toler
 
 // Initialization of color constants
 int Colors::COLOR_BROWN = Quantity_NOC_BROWN;
+int Colors::COLOR_RED = Quantity_NOC_RED;
+int Colors::COLOR_GREEN = Quantity_NOC_GREEN;
+int Colors::COLOR_BLUE = Quantity_NOC_BLUE1;
 
 
 GeomAPI_AISObject::GeomAPI_AISObject()
