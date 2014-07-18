@@ -22,7 +22,7 @@ void Model_AttributeRefAttr::setAttr(boost::shared_ptr<ModelAPI_Attribute> theAt
   if (myIsInitialized && object() == theAttr->owner() && myID->Get().IsEqual(anID.c_str()))
     return; // nothing is changed
 
-  myRef->Set(aData->label());
+  myRef->Set(aData->label().Father());
   myID->Set(aData->id(theAttr).c_str());
   owner()->data()->sendAttributeUpdated(this);
 }
@@ -44,7 +44,7 @@ void Model_AttributeRefAttr::setObject(ObjectPtr theObject)
   if (!myIsInitialized || myID->Get().Length() != 0 || object() != theObject) {
     boost::shared_ptr<Model_Data> aData = 
       boost::dynamic_pointer_cast<Model_Data>(theObject->data());
-    myRef->Set(aData->label());
+    myRef->Set(aData->label().Father());
     myID->Set(""); // feature is identified by the empty ID
     owner()->data()->sendAttributeUpdated(this);
   }
@@ -57,7 +57,6 @@ ObjectPtr Model_AttributeRefAttr::object()
       boost::dynamic_pointer_cast<Model_Document>(owner()->document());
     if (aDoc) {
       TDF_Label aRefLab = myRef->Get();
-      TDF_Label anObjLab = aRefLab.Father();
       return aDoc->object(aRefLab);
     }
   }
