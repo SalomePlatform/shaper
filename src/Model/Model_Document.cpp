@@ -456,7 +456,7 @@ ObjectPtr Model_Document::object(TDF_Label theLabel)
     for(; aRIter != aResults.cend(); aRIter++) {
       boost::shared_ptr<Model_Data> aResData = 
         boost::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
-      if (aResData->label().IsEqual(theLabel))
+      if (aResData->label().Father().IsEqual(theLabel))
         return *aRIter;
     }
   }
@@ -735,7 +735,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
 {
   boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theResult->data());
   if (aData) {
-    TDF_Label aFeatureLab = aData->label().Father().Father();
+    TDF_Label aFeatureLab = aData->label().Father().Father().Father();
     return feature(aFeatureLab);
   }
   return FeaturePtr();

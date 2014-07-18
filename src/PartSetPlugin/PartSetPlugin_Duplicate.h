@@ -25,6 +25,9 @@ public:
 
   /// Request for initialization of data model of the feature: adding all attributes
   PARTSETPLUGIN_EXPORT virtual void initAttributes();
+
+  /// doesn't call creation of new document, just does nothing if document was not copied
+  PARTSETPLUGIN_EXPORT virtual void execute();
 };
 
 #endif

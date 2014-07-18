@@ -35,5 +35,12 @@ void PartSetPlugin_Duplicate::initAttributes()
     boost::shared_ptr<ModelAPI_Document> aCopy = aPManager->copy(
       aSource->data()->docRef(ModelAPI_ResultPart::DOC_REF())->value(),
       data()->name());
+    data()->refattr(ORIGIN_REF())->setObject(aSource);
   }
+}
+
+void PartSetPlugin_Duplicate::execute()
+{
+  if (data()->refattr(ORIGIN_REF())->object())
+    PartSetPlugin_Part::execute();
 }
