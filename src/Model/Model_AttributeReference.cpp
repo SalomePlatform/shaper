@@ -18,7 +18,7 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
     if (myRef.IsNull()) {
       boost::shared_ptr<Model_Data> aMyData = 
         boost::dynamic_pointer_cast<Model_Data>(owner()->data());
-      myRef = TDF_Reference::Set(aMyData->label(), aData->label());
+      myRef = TDF_Reference::Set(aMyData->label(), aData->label().Father());
     } else {
       myRef->Set(aData->label());
     }

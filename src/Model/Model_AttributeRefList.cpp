@@ -14,7 +14,7 @@ void Model_AttributeRefList::append(ObjectPtr theObject)
 {
   boost::shared_ptr<Model_Data> aData = 
     boost::dynamic_pointer_cast<Model_Data>(theObject->data());
-  myRef->Append(aData->label());
+  myRef->Append(aData->label().Father()); // store label of the object
 
   owner()->data()->sendAttributeUpdated(this);
 }
@@ -23,7 +23,7 @@ void Model_AttributeRefList::remove(ObjectPtr theObject)
 {
   boost::shared_ptr<Model_Data> aData = 
     boost::dynamic_pointer_cast<Model_Data>(theObject->data());
-  myRef->Remove(aData->label());
+  myRef->Remove(aData->label().Father());
 
   owner()->data()->sendAttributeUpdated(this);
 }
@@ -42,9 +42,6 @@ list<ObjectPtr> Model_AttributeRefList::list()
     const TDF_LabelList& aList = myRef->List();
     for(TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
       ObjectPtr anObj = aDoc->object(aLIter.Value());
-      if (!anObj) { // try to use father (for feature)
-        anObj = aDoc->object(aLIter.Value().Father());
-      }
       aResult.push_back(anObj);
     }
   }

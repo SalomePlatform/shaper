@@ -444,17 +444,19 @@ FeaturePtr Model_Document::feature(TDF_Label& theLabel)
 
 ObjectPtr Model_Document::object(TDF_Label theLabel)
 {
-  if (feature(theLabel)) // feature by label
+  // try feature by label
+  FeaturePtr aFeature = feature(theLabel);
+  if (aFeature)
     return feature(theLabel);
   TDF_Label aFeatureLabel = theLabel.Father().Father(); // let's suppose it is result
-  FeaturePtr aFeature = feature(aFeatureLabel);
+  aFeature = feature(aFeatureLabel);
   if (aFeature) {
     const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
     std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.cbegin();
     for(; aRIter != aResults.cend(); aRIter++) {
       boost::shared_ptr<Model_Data> aResData = 
         boost::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
-      if (aResData->label().IsEqual(theLabel))
+      if (aResData->label().Father().IsEqual(theLabel))
         return *aRIter;
     }
   }
@@ -673,8 +675,8 @@ void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData
   boost::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
   theResult->setDoc(aThis);
-  initData(theResult, boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
-    label().Father().FindChild(TAG_FEATURE_RESULTS), theResultIndex + 1);
+  initData(theResult, boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->label().
+    Father().FindChild(TAG_FEATURE_RESULTS).FindChild(theResultIndex + 1), TAG_FEATURE_ARGUMENTS);
   if (theResult->data()->name().empty()) { // if was not initialized, generate event and set a name
     theResult->data()->setName(theFeatureData->name());
   }
@@ -733,7 +735,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
 {
   boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theResult->data());
   if (aData) {
-    TDF_Label aFeatureLab = aData->label().Father().Father();
+    TDF_Label aFeatureLab = aData->label().Father().Father().Father();
     return feature(aFeatureLab);
   }
   return FeaturePtr();
