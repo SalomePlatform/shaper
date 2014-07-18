@@ -1,4 +1,5 @@
 INCLUDE(Common)
+INCLUDE(UnitTest)
 
 SET(PROJECT_HEADERS
     ConstructionPlugin.h
@@ -29,5 +30,5 @@ SET(XML_RESOURCES
 INSTALL(TARGETS ConstructionPlugin DESTINATION plugins)
 INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
 
-ENABLE_TESTING()
-ADD_SUBDIRECTORY(Test)
+ADD_UNIT_TESTS(TestPointName.py
+              )
