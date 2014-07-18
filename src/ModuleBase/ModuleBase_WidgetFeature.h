@@ -56,11 +56,11 @@ protected:
   /// Fill the widget values by given point
   /// \param thePoint the point
   /// \return the boolean result of the feature set
-  bool setFeature(const FeaturePtr& theObject);
+  bool setObject(const ObjectPtr& theObject);
 
   /// Returns current widget feature
   /// \return the feature
-  const FeaturePtr feature() const { return myFeature; }
+  const ObjectPtr object() const { return myObject; }
 
   /// Returns the widget editor
   /// \return the editor
@@ -68,11 +68,11 @@ protected:
 
   /// Returns the possible feature kinds
   /// \return the list of kinds
-  const QStringList& featureKinds() const { return myFeatureKinds; }
+  const QStringList& featureKinds() const { return myObjectKinds; }
 
 private:
-  FeaturePtr myFeature; ///< the current widget feature
-  QStringList myFeatureKinds; ///< the kinds of possible features
+  ObjectPtr myObject; ///< the current widget feature
+  QStringList myObjectKinds; ///< the kinds of possible features
 
   QWidget*   myContainer; /// the parent top control
   QLabel*    myLabel; /// the editor information label

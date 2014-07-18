@@ -185,7 +185,7 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
     //aDisplayer->activateInLocalContext(aFeature, aModes, true);
     myTestObject = aFeature->firstResult();
 
-    QResultList aFeatureList;
+    QList<ObjectPtr> aFeatureList;
     aFeatureList.append(myTestObject);
     aDisplayer->setSelected(aFeatureList, true);
   }

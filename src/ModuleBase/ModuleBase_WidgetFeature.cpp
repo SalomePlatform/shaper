@@ -28,7 +28,7 @@ ModuleBase_WidgetFeature::ModuleBase_WidgetFeature(QWidget* theParent,
 : ModuleBase_ModelWidget(theParent, theData)
 {
   QString aKinds = QString::fromStdString(theData->getProperty(FEATURE_KEYSEQUENCE));
-  myFeatureKinds = aKinds.split(" ");
+  myObjectKinds = aKinds.split(" ");
 
   myContainer = new QWidget(theParent);
   QHBoxLayout* aControlLay = new QHBoxLayout(myContainer);
@@ -62,20 +62,20 @@ bool ModuleBase_WidgetFeature::setValue(ModuleBase_WidgetValue* theValue)
   if (theValue) {
     ModuleBase_WidgetValueFeature* aFeatureValue = 
                          dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
-    // TODO
-//    if (aFeatureValue)
-//      isDone = setFeature(aFeatureValue->feature());
+    if (aFeatureValue)
+      isDone = setObject(aFeatureValue->object());
   }
   return isDone;
 }
 
-bool ModuleBase_WidgetFeature::setFeature(const FeaturePtr& theFeature)
+bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject)
 {
-  if (!myFeatureKinds.contains(theFeature->getKind().c_str()))
-    return false;
+  // TODO
+  //if (!myObjectKinds.contains(theObject->getKind().c_str()))
+  //  return false;
 
-  myFeature = theFeature;
-  myEditor->setText(theFeature ? theFeature->data()->name().c_str() : "");
+  myObject = theObject;
+  myEditor->setText(theObject ? theObject->data()->name().c_str() : "");
   emit valuesChanged();
   return true;
 }
@@ -90,7 +90,7 @@ bool ModuleBase_WidgetFeature::storeValue(ObjectPtr theObject) const
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
   ModuleBase_WidgetFeature* that = (ModuleBase_WidgetFeature*) this;
-  aRef->setObject(myFeature);
+  aRef->setObject(myObject);
   aFeature->execute();
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
@@ -105,8 +105,8 @@ bool ModuleBase_WidgetFeature::restoreValue(ObjectPtr theObject)
 
   FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aRef->object());
   if (aFeature) {
-    myFeature = aFeature;
-    myEditor->setText(myFeature ? myFeature->data()->name().c_str() : "");
+    myObject = aFeature;
+    myEditor->setText(myObject ? myObject->data()->name().c_str() : "");
     return true;
   }
   return false;

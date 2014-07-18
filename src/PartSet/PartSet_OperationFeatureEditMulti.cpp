@@ -165,13 +165,13 @@ void PartSet_OperationFeatureEditMulti::blockSelection(bool isBlocked, const boo
     return;
 
   myIsBlockedSelection = isBlocked;
-  QFeatureList aFeatureList;
+  QList<ObjectPtr> aFeatureList;
   std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(),
                                             aLast = myFeatures.end();
   /*for(; anIt != aLast; anIt++)
     aFeatureList.append((*anIt).feature());*/
   if (isBlocked) {
-    emit setSelection(QFeatureList());
+    emit setSelection(QList<ObjectPtr>());
     emit stopSelection(aFeatureList, true);
   }
   else {

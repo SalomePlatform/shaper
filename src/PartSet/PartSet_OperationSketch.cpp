@@ -86,10 +86,10 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
     if (theHighlighted.size() == 1) {
       ObjectPtr aFeature = theHighlighted.front().object();
       if (aFeature) {
-        std::string anOperationType = PartSet_OperationFeatureEdit::Type();
-        if (theSelected.size() > 1)
-          anOperationType = PartSet_OperationFeatureEditMulti::Type();
-        // TODO restartOperation(anOperationType, aFeature);
+        std::string anOperationType = (theSelected.size() > 1)?
+          PartSet_OperationFeatureEditMulti::Type() :
+          PartSet_OperationFeatureEdit::Type();
+        restartOperation(anOperationType, aFeature);
       }
     }
     else
@@ -109,9 +109,8 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
     /// for these objects
     if (theSelected.size() == 1) {
       ObjectPtr aFeature = theSelected.front().object();
-      // TODO
-      //if (aFeature)
-      //  restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+      if (aFeature)
+        restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
     }
   }
 }

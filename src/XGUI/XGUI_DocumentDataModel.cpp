@@ -531,12 +531,15 @@ QModelIndex XGUI_DocumentDataModel::objectIndex(const ObjectPtr theObject) const
   DocumentPtr aDoc = theObject->document();
   if (aDoc == aRootDoc) {
     // This feature belongs to histrory or top model
-    if (theObject->isInHistory()) {
+    FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+    if (aFeature) {
       int aId;
-      for (aId = 0; aId < aRootDoc->size(ModelAPI_Feature::group()); aId++) {
+      int aNb = aRootDoc->size(ModelAPI_Feature::group());
+      for (aId = 0; aId < aNb; aId++) {
         if (theObject == aRootDoc->object(ModelAPI_Feature::group(), aId))
           break;
       }
+      Q_ASSERT(aId < aNb);
       return index(aId + historyOffset(), 0, QModelIndex());
     } else {
       QModelIndex aIndex = myModel->objectIndex(theObject);

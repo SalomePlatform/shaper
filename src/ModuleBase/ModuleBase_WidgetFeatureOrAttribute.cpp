@@ -47,10 +47,9 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
                          dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue) {
       boost::shared_ptr<GeomAPI_Pnt2d> aValuePoint = aFeatureValue->point();
-      //TODO
-/*      FeaturePtr aValueFeature = aFeatureValue->feature();
+      ObjectPtr aValueFeature = aFeatureValue->object();
       if (aValueFeature) {
-        isDone = setFeature(aValueFeature);
+        isDone = setObject(aValueFeature);
       }
       if (!isDone && aValuePoint) {
         // find the given point in the feature attributes
@@ -67,7 +66,7 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
         }
         if (aFPoint)
           isDone = setAttribute(aFPoint);
-      }*/
+      }
     }
   }
   return isDone;
@@ -80,8 +79,8 @@ bool ModuleBase_WidgetFeatureOrAttribute::storeValue(FeaturePtr theFeature) cons
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
   ModuleBase_WidgetFeatureOrAttribute* that = (ModuleBase_WidgetFeatureOrAttribute*) this;
-  if (feature())
-    aRef->setObject(feature());
+  if (object())
+    aRef->setObject(object());
   else if (myAttribute)
     aRef->setAttr(myAttribute);
 
@@ -99,7 +98,7 @@ bool ModuleBase_WidgetFeatureOrAttribute::restoreValue(FeaturePtr theFeature)
 
   FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aRef->object());
   if (aFeature) {
-    setFeature(aFeature);
+    setObject(aFeature);
     myAttribute = aRef->attr();
 
     std::string aText = "";

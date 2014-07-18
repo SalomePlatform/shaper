@@ -58,7 +58,7 @@ public:
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual std::list<int> getSelectionModes(FeaturePtr theFeature) const;
+  virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
 
   /// Initializes the operation with previously created feature. It is used in sequental operations
   virtual void initFeature(FeaturePtr theFeature) {}
@@ -116,13 +116,13 @@ public:
   /// \param theType a type of an operation started
   /// theFeature the operation argument
   void restartOperation(const std::string& theType,
-         FeaturePtr theFeature = FeaturePtr());
+         ObjectPtr theFeature = ObjectPtr());
 
 signals:
   /// signal about the request to launch operation
   /// theName the operation name
   /// theFeature the operation argument
-  void launchOperation(std::string theName, FeaturePtr theFeature);
+  void launchOperation(std::string theName, ObjectPtr theFeature);
   /// Signal about the feature construing is finished
   /// \param theFeature the result feature
   /// \param theMode the mode of the feature modification
@@ -138,10 +138,10 @@ signals:
   /// signal to enable/disable selection in the viewer
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
-  void stopSelection(const QFeatureList& theFeatures, const bool theToStop);
+  void stopSelection(const QList<ObjectPtr>& theFeatures, const bool theToStop);
   /// signal to set selection in the viewer
   /// \param theFeatures a list of features to be disabled
-  void setSelection(const QFeatureList& theFeatures);
+  void setSelection(const QList<ObjectPtr>& theFeatures);
 
   /// signal to close the operation local context if it is opened
   void closeLocalContext();

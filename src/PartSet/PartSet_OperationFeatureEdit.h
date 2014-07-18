@@ -68,7 +68,7 @@ public:
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual std::list<int> getSelectionModes(FeaturePtr theFeature) const;
+  virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
 
   /// Initializes the operation with previously created feature. It is used in sequental operations
   virtual void initFeature(FeaturePtr theFeature);

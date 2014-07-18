@@ -69,7 +69,7 @@ public:
     bool aResult = (myResult.get() == thePrs.object().get());
     bool aOwner = (myOwner.Access() == thePrs.owner().Access());
     bool aShape = myShape.IsEqual(thePrs.shape());
-    bool aIO = myInteractive == thePrs.interactive();
+    bool aIO = (myInteractive == thePrs.interactive());
     return aResult && aOwner && aShape && aIO;
   }
 

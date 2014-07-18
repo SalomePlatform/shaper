@@ -152,7 +152,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
   }
 }
 
-void XGUI_Displayer::activateInLocalContext(ResultPtr theResult,
+void XGUI_Displayer::activateInLocalContext(ObjectPtr theResult,
                                          const std::list<int>& theModes, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -186,14 +186,14 @@ void XGUI_Displayer::activateInLocalContext(ResultPtr theResult,
     updateViewer();
 }
 
-void XGUI_Displayer::stopSelection(const QResultList& theResults, const bool isStop,
+void XGUI_Displayer::stopSelection(const QList<ObjectPtr>& theResults, const bool isStop,
                                    const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
   Handle(AIS_Shape) anAIS;
-  QResultList::const_iterator anIt = theResults.begin(), aLast = theResults.end();
-  ResultPtr aFeature;
+  QList<ObjectPtr>::const_iterator anIt = theResults.begin(), aLast = theResults.end();
+  ObjectPtr aFeature;
   for (; anIt != aLast; anIt++) {
     aFeature = *anIt;
     if (isVisible(aFeature))
@@ -216,7 +216,7 @@ void XGUI_Displayer::stopSelection(const QResultList& theResults, const bool isS
     updateViewer();
 }
 
-void XGUI_Displayer::setSelected(const QResultList& theResults, const bool isUpdateViewer)
+void XGUI_Displayer::setSelected(const QList<ObjectPtr>& theResults, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   // we need to unhighligth objects manually in the current local context
@@ -226,13 +226,12 @@ void XGUI_Displayer::setSelected(const QResultList& theResults, const bool isUpd
     aLocalContext->UnhilightLastDetected(myWorkshop->viewer()->activeView());
 
   aContext->ClearSelected();
-  foreach(ResultPtr aResult, theResults) {
+  foreach(ObjectPtr aResult, theResults) {
     if (myResult2AISObjectMap.find(aResult) == myResult2AISObjectMap.end()) 
-      return;
+      continue;
 
     boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[aResult];
-    if (anObj)
-    {
+    if (anObj) {
       Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anAIS.IsNull())
         aContext->AddOrRemoveSelected(anAIS, false);

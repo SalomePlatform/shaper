@@ -70,14 +70,14 @@ public:
   /// \param theShape a shape
   /// \param theMode a list of local selection modes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void activateInLocalContext(ResultPtr theFeature,
+  void activateInLocalContext(ObjectPtr theFeature,
                               const std::list<int>& theModes, const bool isUpdateViewer = true);
 
   /// Stop the current selection and color the given features to the selection color
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void stopSelection(const QResultList& theFeatures, const bool isStop,
+  void stopSelection(const QList<ObjectPtr>& theFeatures, const bool isStop,
                      const bool isUpdateViewer);
 
   /**
@@ -85,7 +85,7 @@ public:
   * \param theFeatures a list of features to be selected
   * isUpdateViewer the parameter whether the viewer should be update immediatelly
   */
-  void setSelected(const QResultList& theFeatures, bool isUpdateViewer = true);
+  void setSelected(const QList<ObjectPtr>& theFeatures, bool isUpdateViewer = true);
 
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance

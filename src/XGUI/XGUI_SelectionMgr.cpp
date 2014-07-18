@@ -43,14 +43,8 @@ void XGUI_SelectionMgr::connectViewers()
 void XGUI_SelectionMgr::onObjectBrowserSelection()
 {
   QList<ObjectPtr> aObjects = myWorkshop->objectBrowser()->selectedObjects();
-  QResultList aResults;
-  foreach(ObjectPtr aObject, aObjects) {
-    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
-    if (aRes)
-      aResults.append(aRes);
-  }
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  aDisplayer->setSelected(aResults);
+  aDisplayer->setSelected(aObjects);
   emit selectionChanged();
 }
 
@@ -65,7 +59,10 @@ void XGUI_SelectionMgr::onViewerSelection()
     if (aResult)
       aFeatures.append(aResult);
   }
+  bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
   myWorkshop->objectBrowser()->setObjectsSelected(aFeatures);
+  myWorkshop->objectBrowser()->blockSignals(aBlocked);
+
   emit selectionChanged();
 }
 

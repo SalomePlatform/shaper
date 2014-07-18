@@ -75,7 +75,7 @@ bool PartSet_OperationFeatureCreate::isGranted(ModuleBase_IOperation* theOperati
   return theOperation->getDescription()->operationId().toStdString() == PartSet_OperationSketch::Type();
 }
 
-std::list<int> PartSet_OperationFeatureCreate::getSelectionModes(FeaturePtr theFeature) const
+std::list<int> PartSet_OperationFeatureCreate::getSelectionModes(ObjectPtr theFeature) const
 {
   std::list<int> aModes;
   if (theFeature != feature())
@@ -149,17 +149,14 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
   if (!theSelected.empty()) {
     ModuleBase_ViewerPrs aPrs = theSelected.front();
     aFeature = aPrs.object();
-  }
-  // TODO
-  //else
-  //  aFeature = feature(); // for the widget distance only
+  } else
+    aFeature = feature(); // for the widget distance only
 
-  // TODO
-  /*bool isApplyed = setWidgetValue(aFeature, aX, anY);
+  bool isApplyed = setWidgetValue(aFeature, aX, anY);
   if (isApplyed) {
     flushUpdated();
     emit activateNextWidget(myActiveWidget);
-  }*/
+  }
 }
 
 void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
@@ -280,7 +277,7 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
   return aNewFeature;
 }
 
-bool PartSet_OperationFeatureCreate::setWidgetValue(FeaturePtr theFeature, double theX, double theY)
+bool PartSet_OperationFeatureCreate::setWidgetValue(ObjectPtr theFeature, double theX, double theY)
 {
   ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
   aValue->setObject(theFeature);

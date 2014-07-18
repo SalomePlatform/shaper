@@ -62,7 +62,7 @@ public:
   /// Activates the feature in the displayer
   /// \param theFeature the feature instance to be displayed
   /// \param isUpdateViewer the flag whether the viewer should be updated
-  void activateFeature(FeaturePtr theFeature,
+  void activateFeature(ObjectPtr theFeature,
                        const bool isUpdateViewer);
 
   /// Updates current operation preview, if it has it.
@@ -122,11 +122,11 @@ public slots:
   /// SLOT, to stop or start selection mode for the features
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
-  void onStopSelection(const QFeatureList& theFeatures, const bool isStop);
+  void onStopSelection(const QList<ObjectPtr>& theFeatures, const bool isStop);
 
   /// SLOT, to set selection
   /// \param theFeatures a list of features to be selected
-  void onSetSelection(const QResultList& theFeatures);
+  void onSetSelection(const QList<ObjectPtr>& theFeatures);
 
   /// SLOT, to close the viewer local context
   void onCloseLocalContext();

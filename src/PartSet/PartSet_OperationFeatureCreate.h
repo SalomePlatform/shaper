@@ -52,7 +52,7 @@ public:
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode
-  virtual std::list<int> getSelectionModes(FeaturePtr theFeature) const;
+  virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
 
   /// Initializes the operation with previously created feature. It is used in sequental operations
   virtual void initFeature(FeaturePtr theFeature);
@@ -120,7 +120,7 @@ protected:
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
   /// \return true if the point is set
-  bool setWidgetValue(FeaturePtr theFeature, double theX, double theY);
+  bool setWidgetValue(ObjectPtr theFeature, double theX, double theY);
 
 private:
   FeaturePtr myInitFeature; ///< the initial feature

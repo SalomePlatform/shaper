@@ -50,18 +50,20 @@ std::list<FeaturePtr> PartSet_OperationSketchBase::subFeatures() const
   return std::list<FeaturePtr>();
 }
 
-std::list<int> PartSet_OperationSketchBase::getSelectionModes(FeaturePtr theFeature) const
+std::list<int> PartSet_OperationSketchBase::getSelectionModes(ObjectPtr theFeature) const
 {
   std::list<int> aModes;
-  if (PartSet_Tools::isConstraintFeature(theFeature->getKind())) {
-      aModes.clear();
-      aModes.push_back(AIS_DSM_Text);
-      aModes.push_back(AIS_DSM_Line);
+  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
+  if (aFeature) {
+    if (PartSet_Tools::isConstraintFeature(aFeature->getKind())) {
+        aModes.clear();
+        aModes.push_back(AIS_DSM_Text);
+        aModes.push_back(AIS_DSM_Line);
+        return aModes;
+    }
   }
-  else {
-    aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)TopAbs_VERTEX));
-    aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)TopAbs_EDGE));
-  }
+  aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)TopAbs_VERTEX));
+  aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)TopAbs_EDGE));
   return aModes;
 }
 FeaturePtr PartSet_OperationSketchBase::createFeature(const bool theFlushMessage)
@@ -118,7 +120,7 @@ void PartSet_OperationSketchBase::keyReleased(std::string theName, QKeyEvent* th
 }
 
 void PartSet_OperationSketchBase::restartOperation(const std::string& theType,
-                                                   FeaturePtr theFeature)
+                                                   ObjectPtr theFeature)
 {
   emit launchOperation(theType, theFeature);
 }
