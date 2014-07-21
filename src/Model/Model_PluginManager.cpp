@@ -13,6 +13,7 @@
 #include <Events_Loop.h>
 #include <Events_Error.h>
 #include <Config_FeatureMessage.h>
+#include <Config_ValidatorMessage.h>
 #include <Config_ModuleReader.h>
 
 #include <TDF_CopyTool.hxx>
@@ -107,17 +108,19 @@ Model_PluginManager::Model_PluginManager()
   ModelAPI_PluginManager::setPluginManager(boost::shared_ptr<ModelAPI_PluginManager>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
-  static Events_ID FeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
-  aLoop->registerListener(this, FeatureEvent);
+  static const Events_ID kFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
+  aLoop->registerListener(this, kFeatureEvent);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_VALIDATOR_LOADED));
 }
 
 void Model_PluginManager::processEvent(const Events_Message* theMessage)
 {
-  static Events_ID FeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
-  if (theMessage->eventID() == FeatureEvent) {
+  static const Events_ID kFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
+  static const Events_ID kValidatorEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
+  if (theMessage->eventID() == kFeatureEvent) {
     const Config_FeatureMessage* aMsg =
       dynamic_cast<const Config_FeatureMessage*>(theMessage);
     if (aMsg) {
@@ -128,6 +131,16 @@ void Model_PluginManager::processEvent(const Events_Message* theMessage)
     }
     // plugins information was started to load, so, it will be loaded
     myPluginsInfoLoaded = true;
+  } else if (theMessage->eventID() == kValidatorEvent) {
+    const Config_ValidatorMessage* aMsg = dynamic_cast<const Config_ValidatorMessage*>(theMessage);
+    if (aMsg) {
+      if (aMsg->attributeId().empty()) { // feature validator
+        validators()->assignValidator(aMsg->validatorId(), aMsg->featureId());
+      } else { // attribute validator
+        validators()->assignValidator(aMsg->validatorId(), aMsg->featureId(),
+          aMsg->attributeId(), aMsg->parameters());
+      }
+    }
   } else { // create/update/delete
     if (myCheckTransactions && !rootDocument()->isOperation())
       Events_Error::send("Modification of data structure outside of the transaction");

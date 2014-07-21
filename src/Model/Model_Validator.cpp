@@ -28,8 +28,9 @@ void Model_ValidatorsFactory::assignValidator(const string& theID, const string&
     isError = true;
   }
   if (myFeatures.find(theFeatureID) != myFeatures.end()) {
-      Events_Error::send(
-        string("Validator for feature ") + theFeatureID + " is already registered");
+    // TODO: it is called many times now because of not-optimized XML reader
+      //Events_Error::send(
+      //  string("Validator for feature ") + theFeatureID + " is already registered");
     isError = true;
   }
   if (!isError)
@@ -62,9 +63,10 @@ void Model_ValidatorsFactory::assignValidator(const string& theID,
         pair<ModelAPI_Validator*, list<string> >(aVal->second, theArguments);
     }
   } else {
-    Events_Error::send(
-      string("Validator ") + theID + " for feature " + theFeatureID +
-              "attribute " + theAttrID + " is already registered");
+    // TODO: it is called many times now because of not-optimized XML reader
+    //Events_Error::send(
+    //  string("Validator ") + theID + " for feature " + theFeatureID +
+    //          "attribute " + theAttrID + " is already registered");
     isError = true;
   }
 }
