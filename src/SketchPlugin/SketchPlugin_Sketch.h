@@ -9,13 +9,14 @@
 #include <SketchPlugin_Feature.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pln.h>
+#include <GeomAPI_IPresentable.h>
 #include <list>
 
 /**\class SketchPlugin_Sketch
  * \ingroup DataModel
  * \brief Feature for creation of the new part in PartSet.
  */
-class SketchPlugin_Sketch: public SketchPlugin_Feature
+class SketchPlugin_Sketch: public SketchPlugin_Feature, public GeomAPI_IPresentable
 {
 public:
   /// Sketch feature kind
@@ -91,6 +92,10 @@ public:
 
   /// Returns the basis plane for the sketch
   boost::shared_ptr<GeomAPI_Pln> plane();
+
+  virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
+                            boost::shared_ptr<GeomAPI_AISObject> thePrevious);
+
 protected:
   /// Creates a plane and append it to the list
   /// \param theX the X normal value

@@ -20,19 +20,19 @@ public:
   /// attribute name of referenced face
   inline static const std::string& FACE_ID()
   {
-    static const std::string MY_FACE_ID("FeaturesPlugin_Extrusion::FACE_ID()");
+    static const std::string MY_FACE_ID("extrusion_face");
     return MY_FACE_ID;
   }
   /// attribute name of extrusion size
   inline static const std::string& SIZE_ID()
   {
-    static const std::string MY_SIZE_ID("FeaturesPlugin_Extrusion::SIZE_ID()");
+    static const std::string MY_SIZE_ID("extrusion_size");
     return MY_SIZE_ID;
   }
     /// attribute name of reverse direction
   inline static const std::string& REVERSE_ID()
   {
-    static const std::string MY_REVERSE_ID("FeaturesPlugin_Extrusion::REVERSE_ID()");
+    static const std::string MY_REVERSE_ID("extrusion_reverse");
     return MY_REVERSE_ID;
   }
 

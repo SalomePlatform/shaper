@@ -8,12 +8,13 @@
 #include "SketchPlugin.h"
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
+#include <GeomAPI_IPresentable.h>
 
 /**\class SketchPlugin_Arc
  * \ingroup DataModel
  * \brief Feature for creation of the new arc of circle in PartSet.
  */
-class SketchPlugin_Arc: public SketchPlugin_Feature
+class SketchPlugin_Arc: public SketchPlugin_Feature//, public GeomAPI_IPresentable
 {
 public:
   /// Arc feature kind

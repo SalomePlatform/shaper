@@ -56,8 +56,8 @@ public:
   /// \param theFeature the feature instance to be displayed
   /// \param isDisplay the state whether the presentation should be displayed or erased
   /// \param isUpdateViewer the flag whether the viewer should be updated
-  void visualizePreview(FeaturePtr theFeature, bool isDisplay,
-                        const bool isUpdateViewer = true);
+  //void visualizePreview(FeaturePtr theFeature, bool isDisplay,
+  //                      const bool isUpdateViewer = true);
 
   /// Activates the feature in the displayer
   /// \param theFeature the feature instance to be displayed
@@ -157,20 +157,11 @@ protected:
   //! Edits the feature
   void editFeature(FeaturePtr theFeature);
 
-
-  //! Shopws working planes in viewer 3d
-  void showPlanes();
-  void erasePlanes();
-
 private:
   XGUI_Workshop* myWorkshop;
   PartSet_Listener* myListener;
 
   std::map<std::string, std::string> myFeaturesInFiles;
-
-  boost::shared_ptr<GeomAPI_AISObject> myXPlane;
-  boost::shared_ptr<GeomAPI_AISObject> myYPlane;
-  boost::shared_ptr<GeomAPI_AISObject> myZPlane;
 };
 
 #endif

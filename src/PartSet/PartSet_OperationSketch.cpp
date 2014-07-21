@@ -48,7 +48,7 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 {
 }
 
-std::list<int> PartSet_OperationSketch::getSelectionModes(FeaturePtr theFeature) const
+std::list<int> PartSet_OperationSketch::getSelectionModes(ObjectPtr theFeature) const
 {
   std::list<int> aModes;
   if (!hasSketchPlane())
@@ -95,6 +95,13 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
     else
       myFeatures = theHighlighted;
 
+  } else {
+    if (!theHighlighted.empty()) {
+      ModuleBase_ViewerPrs aPrs = theHighlighted.front();
+      const TopoDS_Shape& aShape = aPrs.shape();
+      if (!aShape.IsNull())
+        setSketchPlane(aShape);
+    }
   }
 }
 
