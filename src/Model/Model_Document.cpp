@@ -222,10 +222,17 @@ void Model_Document::compactNested() {
 void Model_Document::finishOperation()
 {
   // just to be sure that everybody knows that changes were performed
+  
+  if (!myDoc->HasOpenCommand() && myNestedNum != -1)
+    boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
+      setCheckTransactions(false); // for nested transaction commit
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  if (!myDoc->HasOpenCommand() && myNestedNum != -1)
+    boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
+      setCheckTransactions(true); // for nested transaction commit
 
   if (myNestedNum != -1) // this nested transaction is owervritten
     myNestedNum++;

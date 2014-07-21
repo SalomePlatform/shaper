@@ -30,12 +30,14 @@ void SketchPlugin_Point::execute()
   if (aSketch) {
     // compute a point in 3D view
     boost::shared_ptr<GeomDataAPI_Point2D> aPoint = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Point::COORD_ID()));
+      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      data()->attribute(SketchPlugin_Point::COORD_ID()));
     boost::shared_ptr<GeomAPI_Pnt> aPoint3D(aSketch->to3D(aPoint->x(), aPoint->y()));
     // make a visible point
     boost::shared_ptr<GeomAPI_Shape> aPointShape = GeomAlgoAPI_PointBuilder::point(aPoint3D);
     boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
     aConstr->setShape(aPointShape);
+    aConstr->setIsInHistory(false);
     setResult(aConstr);
   }
 }
@@ -47,7 +49,8 @@ void SketchPlugin_Point::move(double theDeltaX, double theDeltaY)
     return;
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Point::COORD_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Point::COORD_ID()));
   aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
 }
 
@@ -55,7 +58,8 @@ double SketchPlugin_Point::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d
 {
   boost::shared_ptr<ModelAPI_Data> aData = data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Point::COORD_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Point::COORD_ID()));
 
   return aPoint->pnt()->distance(thePoint);
 }

@@ -37,19 +37,23 @@ void SketchPlugin_Arc::execute()
 
     // compute a circle point in 3D view
     boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Arc::CENTER_ID()));
+      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      data()->attribute(SketchPlugin_Arc::CENTER_ID()));
       // compute the arc start point
       boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Arc::START_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        data()->attribute(SketchPlugin_Arc::START_ID()));
       if (aCenterAttr->isInitialized() && aStartAttr->isInitialized()) {
-      boost::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
+      boost::shared_ptr<GeomAPI_Pnt> aCenter(
+        aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
       // make a visible point
       boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
       aShapes.push_back(aCenterPointShape);
 
       // make a visible circle
       boost::shared_ptr<GeomDataAPI_Dir> aNDir = 
-        boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
       bool aHasPlane = aNDir && !(aNDir->x() == 0 && aNDir->y() == 0 && aNDir->z() == 0);
       if (aHasPlane) {
         boost::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
@@ -57,7 +61,8 @@ void SketchPlugin_Arc::execute()
 
         // compute and change the arc end point
         boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
-          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Arc::END_ID()));
+          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(
+          SketchPlugin_Arc::END_ID()));
         if (anEndAttr->isInitialized())
         {
           boost::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
@@ -78,6 +83,7 @@ void SketchPlugin_Arc::execute()
       boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
         document()->createConstruction(data());
       aConstr->setShape(aCompound);
+      aConstr->setIsInHistory(false);
       setResult(aConstr);
     }
   }
@@ -90,15 +96,18 @@ void SketchPlugin_Arc::move(double theDeltaX, double theDeltaY)
     return;
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::CENTER_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Arc::CENTER_ID()));
   aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Arc::START_ID()));
   aPoint2->setValue(aPoint2->x() + theDeltaX, aPoint2->y() + theDeltaY);
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint3 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::END_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Arc::END_ID()));
   aPoint3->setValue(aPoint3->x() + theDeltaX, aPoint3->y() + theDeltaY);
 }
 
@@ -108,17 +117,20 @@ double SketchPlugin_Arc::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>&
   boost::shared_ptr<ModelAPI_Data> aData = data();
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::CENTER_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Arc::CENTER_ID()));
   aDelta = aPoint1->pnt()->distance(thePoint);
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Arc::START_ID()));
   double aDistance = aPoint2->pnt()->distance(thePoint);
   if (aDelta < aDistance)
     aDelta = aDistance;
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint3 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::END_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Arc::END_ID()));
   aDistance = aPoint3->pnt()->distance(thePoint);
   if (aDelta < aDistance)
     aDelta = aDistance;

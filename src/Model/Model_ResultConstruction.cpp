@@ -14,12 +14,12 @@ boost::shared_ptr<GeomAPI_Shape>& Model_ResultConstruction::shape()
   return myShape;
 }
 
-/*
-boost::shared_ptr<ModelAPI_Feature> Model_ResultConstruction::owner()
-{
-  return myOwner;
-}*/
-
 Model_ResultConstruction::Model_ResultConstruction()
 {
+  myIsInHistory = true;
+}
+
+void Model_ResultConstruction::setIsInHistory(const bool isInHistory)
+{
+  myIsInHistory = isInHistory;
 }

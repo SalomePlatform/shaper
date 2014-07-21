@@ -36,10 +36,12 @@ void SketchPlugin_Line::execute()
   if (aSketch) {
     // compute a start point in 3D view
     boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Line::START_ID()));
+      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      data()->attribute(SketchPlugin_Line::START_ID()));
     // compute an end point in 3D view
     boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Line::END_ID()));
+      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      data()->attribute(SketchPlugin_Line::END_ID()));
     if (aStartAttr->isInitialized() && anEndAttr->isInitialized()) {
       boost::shared_ptr<GeomAPI_Pnt> aStart(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
       boost::shared_ptr<GeomAPI_Pnt> anEnd(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
@@ -49,6 +51,7 @@ void SketchPlugin_Line::execute()
       boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
         document()->createConstruction(data());
       aConstr->setShape(anEdge);
+      aConstr->setIsInHistory(false);
       setResult(aConstr);
     }
   }
@@ -61,11 +64,13 @@ void SketchPlugin_Line::move(double theDeltaX, double theDeltaY)
     return;
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::START_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Line::START_ID()));
   aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Line::END_ID()));
   aPoint2->setValue(aPoint2->x() + theDeltaX, aPoint2->y() + theDeltaY);
 }
 
@@ -75,9 +80,11 @@ double SketchPlugin_Line::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>
 
   boost::shared_ptr<ModelAPI_Data> aData = data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::START_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Line::START_ID()));
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Line::END_ID()));
 
   GeomAPI_Lin2d aLin2d(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y());
 

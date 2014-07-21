@@ -34,6 +34,9 @@ public:
 
   /// Sets the result
   virtual void setShape(boost::shared_ptr<GeomAPI_Shape> theShape) = 0;
+
+  /// Sets the flag that it must be displayed in history (default is true)
+  virtual void setIsInHistory(const bool isInHistory) = 0;
 };
 
 //! Pointer on feature object
