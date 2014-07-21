@@ -293,10 +293,15 @@ void PartSet_Module::onFitAllView()
   myWorkshop->viewer()->fitAll();
 }
 
-void PartSet_Module::onLaunchOperation(std::string theName, FeaturePtr theFeature)
+void PartSet_Module::onLaunchOperation(std::string theName, ObjectPtr theFeature)
 {
+  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
+  if (!aFeature) {
+    qDebug("Warning! Restart operation without feature!");
+    return;
+  }
   ModuleBase_Operation* anOperation = createOperation(theName.c_str(),
-                                                      theFeature ? theFeature->getKind() : "");
+                                                      theFeature ? aFeature->getKind() : "");
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp)
   {
@@ -304,10 +309,10 @@ void PartSet_Module::onLaunchOperation(std::string theName, FeaturePtr theFeatur
     // Initialise operation with preliminary selection
     std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
     std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-    aPreviewOp->initFeature(theFeature);
+    aPreviewOp->initFeature(aFeature);
     aPreviewOp->initSelection(aSelected, aHighlighted);
   } else {
-    anOperation->setEditingFeature(theFeature);
+    anOperation->setEditingFeature(aFeature);
   }
   sendOperation(anOperation);
   myWorkshop->actionsMgr()->updateCheckState();
@@ -435,8 +440,8 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   if (aPreviewOp) {
     connect(aPreviewOp, SIGNAL(featureConstructed(FeaturePtr, int)),
             this, SLOT(onFeatureConstructed(FeaturePtr, int)));
-    connect(aPreviewOp, SIGNAL(launchOperation(std::string, FeaturePtr)),
-            this, SLOT(onLaunchOperation(std::string, FeaturePtr)));
+    connect(aPreviewOp, SIGNAL(launchOperation(std::string, ObjectPtr)),
+            this, SLOT(onLaunchOperation(std::string, ObjectPtr)));
     connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)),
             this, SLOT(onMultiSelectionEnabled(bool)));
 

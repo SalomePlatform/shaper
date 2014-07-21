@@ -72,6 +72,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
         } else { // Update top groups (other except parts
           QModelIndex aIndex = myModel->findParent(aObject);
           int aStart = myModel->rowCount(aIndex) - 1;
+          if (aStart < 0) aStart = 0;
           aIndex = createIndex(aIndex.row(), aIndex.column(), (void*)getModelIndex(aIndex));
           insertRow(aStart, aIndex);
         }
