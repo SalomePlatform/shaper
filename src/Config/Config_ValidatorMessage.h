@@ -1,7 +1,7 @@
 /*
  * Config_ValidatorMessage.h
  *
- *  Created on: 08 июля 2014 г.
+ *  Created on: 08 Jul 2014 г.
  *      Author: sbh
  */
 
@@ -31,8 +31,8 @@ public:
   //CONFIG_EXPORT static const char* UID() const;
 
   CONFIG_EXPORT const std::string& validatorId() const;
-  const std::string& featureId() const;
-  const std::string& attributeId() const;
+  CONFIG_EXPORT const std::string& featureId() const;
+  CONFIG_EXPORT const std::string& attributeId() const;
   CONFIG_EXPORT const std::list<std::string>& parameters() const;
   CONFIG_EXPORT bool isValid() const;
 

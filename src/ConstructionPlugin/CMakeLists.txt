@@ -12,9 +12,17 @@ SET(PROJECT_SOURCES
     ConstructionPlugin_Point.cpp
 )
 
+SET(XML_RESOURCES
+  plugin-Construction.xml
+  point_widget.xml
+)
+
 ADD_DEFINITIONS(-DCONSTRUCTIONPLUGIN_EXPORTS ${BOOST_DEFINITIONS})
-ADD_LIBRARY(ConstructionPlugin SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+ADD_LIBRARY(ConstructionPlugin SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES})
 TARGET_LINK_LIBRARIES(ConstructionPlugin ${PROJECT_LIBRARIES} ModelAPI GeomAPI GeomAlgoAPI)
+
+INSTALL(TARGETS ConstructionPlugin DESTINATION plugins)
+INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
 
 INCLUDE_DIRECTORIES(
   ../ModelAPI
@@ -22,13 +30,6 @@ INCLUDE_DIRECTORIES(
   ../GeomAlgoAPI
 )
 
-SET(XML_RESOURCES
-  plugin-Construction.xml
-  point_widget.xml
-)
-
-INSTALL(TARGETS ConstructionPlugin DESTINATION plugins)
-INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
 
 ADD_UNIT_TESTS(TestPointName.py
               )
