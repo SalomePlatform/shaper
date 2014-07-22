@@ -44,6 +44,21 @@ static const int TAG_HISTORY = 3; // tag of the history sub-tree (python dump)
 static const int TAG_FEATURE_ARGUMENTS = 1; ///< where the arguments are located
 static const int TAG_FEATURE_RESULTS = 2; ///< where the results are located
 
+
+Model_Document::Model_Document(const std::string theID)
+    : myID(theID), myDoc(new TDocStd_Document("BinOcaf")) // binary OCAF format
+{
+  myDoc->SetUndoLimit(UNDO_LIMIT);
+  myTransactionsAfterSave = 0;
+  myNestedNum = -1;
+  //myDoc->SetNestedTransactionMode();
+  // to have something in the document and avoid empty doc open/save problem
+  // in transaction for nesting correct working
+  myDoc->NewCommand();
+  TDataStd_Integer::Set(myDoc->Main().Father(), 0);
+  myDoc->CommitCommand();
+}
+
 /// Returns the file name of this document by the nameof directory and identifuer of a document
 static TCollection_ExtendedString DocFileName(const char* theFileName, const std::string& theID)
 {
@@ -426,7 +441,7 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
   // erase all attributes under the label of feature
   aFeatureLabel.ForgetAllAttributes();
   // remove it from the references array
-  RemoveFromRefArray(featuresLabel(), aData->label());
+  RemoveFromRefArray(featuresLabel(), aFeatureLabel);
 
   // event: feature is deleted
   ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
@@ -534,20 +549,6 @@ int Model_Document::size(const std::string& theGroupID)
   }
   // group is not found
   return aResult;
-}
-
-Model_Document::Model_Document(const std::string theID)
-    : myID(theID), myDoc(new TDocStd_Document("BinOcaf")) // binary OCAF format
-{
-  myDoc->SetUndoLimit(UNDO_LIMIT);
-  myTransactionsAfterSave = 0;
-  myNestedNum = -1;
-  //myDoc->SetNestedTransactionMode();
-  // to have something in the document and avoid empty doc open/save problem
-  // in transaction for nesting correct working
-  myDoc->NewCommand();
-  TDataStd_Integer::Set(myDoc->Main().Father(), 0);
-  myDoc->CommitCommand();
 }
 
 TDF_Label Model_Document::featuresLabel()
