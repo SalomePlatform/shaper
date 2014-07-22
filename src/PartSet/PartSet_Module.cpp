@@ -344,8 +344,23 @@ void PartSet_Module::onCloseLocalContext()
 
 void PartSet_Module::onFeatureConstructed(FeaturePtr theFeature, int theMode)
 {
+  ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
+  PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
+  if (aPrevOp) {
+    std::list<FeaturePtr> aList = aPrevOp->subFeatures();
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    std::list<int> aModes = aPrevOp->getSelectionModes(aPrevOp->feature());
+    std::list<FeaturePtr>::iterator aSFIt; 
+    for (aSFIt = aList.begin(); aSFIt != aList.end(); ++aSFIt) {
+      std::list<ResultPtr> aResults = (*aSFIt)->results();
+      std::list<ResultPtr>::iterator aIt;
+      for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+        aDisplayer->activateInLocalContext((*aIt), aModes, false);
+      }
+    }
+  }
   ModelAPI_EventCreator::get()->sendUpdated(theFeature, 
-    Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+      Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
 /*  bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Hide;
   // TODO visualizePreview(theFeature, isDisplay, false);
@@ -494,6 +509,14 @@ void PartSet_Module::activateFeature(ObjectPtr theFeature, const bool isUpdateVi
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     aDisplayer->activateInLocalContext(theFeature, aPreviewOp->getSelectionModes(theFeature),
                                         isUpdateViewer);
+/*    FeaturePtr aFeature = aPreviewOp->feature();
+    if (aFeature) {
+      std::list<ResultPtr> aResList = aFeature->results();
+      std::list<ResultPtr>::iterator aIt;
+      for (aIt = aResList.begin(); aIt != aResList.end(); ++aIt) {
+        aDisplayer->deactivate((*aIt), false);
+      }
+    }*/
   }
 }
 
@@ -523,7 +546,7 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
     if (!aSPFeature)
       continue;
     //visualizePreview((*anIt), true, false);
-    aDisplayer->activateInLocalContext((*anIt)->firstResult(), aModes, false);
+    aDisplayer->activateInLocalContext((*anIt), aModes, false);
   }
   aDisplayer->updateViewer();
 }

@@ -57,8 +57,7 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
     }
     myModule->workshop()->displayer()->updateViewer();
   }
-  if (aType == EVENT_OBJECT_DELETED)
-  {
+  if (aType == EVENT_OBJECT_DELETED) {
     const ModelAPI_ObjectDeletedMessage* aDelMsg = 
       dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
     boost::shared_ptr<ModelAPI_Document> aDoc = aDelMsg->document();

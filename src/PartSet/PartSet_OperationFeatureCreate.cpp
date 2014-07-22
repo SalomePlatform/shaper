@@ -271,7 +271,7 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
   //myFeaturePrs->init(aNewFeature);
   //myFeaturePrs->setFeature(myInitFeature, SM_FirstPoint);
 
-  emit featureConstructed(aNewFeature, FM_Activation);
+//TODO  emit featureConstructed(aNewFeature, FM_Activation);
   if (theFlushMessage)
     flushCreated();
   return aNewFeature;

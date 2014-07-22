@@ -137,7 +137,12 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View)
 
 std::list<FeaturePtr> PartSet_OperationSketch::subFeatures() const
 {
-  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+  std::list<FeaturePtr> aFeaList;
+  FeaturePtr aFeature = feature();
+  if (!aFeature)
+    return aFeaList;
+
+  boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
   if (!aData->isValid())
     return std::list<FeaturePtr>();
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
@@ -145,7 +150,6 @@ std::list<FeaturePtr> PartSet_OperationSketch::subFeatures() const
 
   std::list<ObjectPtr> aList = aRefList->list();
   std::list<ObjectPtr>::iterator aIt;
-  std::list<FeaturePtr> aFeaList;
   for (aIt = aList.begin(); aIt != aList.end(); ++aIt) {
     FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*aIt);
     if (aFeature)

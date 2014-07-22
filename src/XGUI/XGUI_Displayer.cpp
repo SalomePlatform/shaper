@@ -165,14 +165,9 @@ void XGUI_Displayer::activateInLocalContext(ObjectPtr theResult,
     aContext->ClearCurrents(false);
     aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
   }
-/*  std::list<int>::const_iterator anIt;
-  for (anIt = theModes.begin(); anIt != theModes.end(); anIt++)
-    aContext->ActivateStandardMode((TopAbs_ShapeEnum)(*anIt));
-    */
   // display or redisplay presentation
   Handle(AIS_InteractiveObject) anAIS;
-  if (isVisible(theResult))
-  {
+  if (isVisible(theResult)) {
     boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[theResult];
     if (anObj)
       anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
@@ -180,18 +175,29 @@ void XGUI_Displayer::activateInLocalContext(ObjectPtr theResult,
 
   // Activate selection of objects from prs
   if (!anAIS.IsNull()) {
+    aContext->ClearSelected(false); // ToCheck
     aContext->Load(anAIS, -1, true/*allow decomposition*/);
     aContext->Deactivate(anAIS);
 
     std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
-    for (; anIt != aLast; anIt++)
-    {
+    for (; anIt != aLast; anIt++) {
       aContext->Activate(anAIS, (*anIt));
     }
   }
 
   if (isUpdateViewer)
     updateViewer();
+}
+
+void XGUI_Displayer::deactvate(ObjectPtr theObject, bool toUpdate)
+{
+  if (isVisible(theObject)) {
+    Handle(AIS_InteractiveContext) aContext = AISContext();
+
+     boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[theObject];
+     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
+     aContext->Deactivate(anAIS);
+  }
 }
 
 void XGUI_Displayer::stopSelection(const QList<ObjectPtr>& theResults, const bool isStop,
