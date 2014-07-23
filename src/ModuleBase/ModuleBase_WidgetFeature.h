@@ -29,7 +29,7 @@ public:
   /// \theParent the parent object
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
-  ModuleBase_WidgetFeature(QWidget* theParent, const Config_WidgetAPI* theData);
+  ModuleBase_WidgetFeature(QWidget* theParent, const Config_WidgetAPI* theData, const std::string& theParentId);
   /// Destructor
   virtual ~ModuleBase_WidgetFeature();
 

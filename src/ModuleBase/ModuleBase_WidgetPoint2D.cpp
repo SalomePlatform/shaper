@@ -28,8 +28,9 @@
 #include <climits>
 
 ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
-                                                   const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent, theData)
+                                                   const Config_WidgetAPI* theData, 
+                                                   const std::string& theParentId)
+: ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   myOptionParam = theData->getProperty(PREVIOUS_FEATURE_PARAM);
   myGroupBox = new QGroupBox(QString::fromStdString(theData->getProperty(CONTAINER_PAGE_NAME)),

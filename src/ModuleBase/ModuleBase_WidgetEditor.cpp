@@ -25,13 +25,14 @@
 #include <QDoubleSpinBox>
 
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
-                                                 const Config_WidgetAPI* theData)
-: ModuleBase_WidgetDoubleValue(theParent, theData)
+                                                 const Config_WidgetAPI* theData, 
+                                                 const std::string& theParentId)
+: ModuleBase_WidgetDoubleValue(theParent, theData, theParentId)
 {
 }
 
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent, const std::string& theAttribute)
-: ModuleBase_WidgetDoubleValue(theParent, 0)
+: ModuleBase_WidgetDoubleValue(theParent, 0, "")
 {
   setAttributeID(theAttribute);
 }

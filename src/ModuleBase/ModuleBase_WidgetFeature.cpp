@@ -6,6 +6,7 @@
 
 #include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_WidgetValue.h>
+#include <ModuleBase_ResultValidators.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -17,6 +18,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_Validator.h>
 
 #include <QWidget>
 #include <QLineEdit>
@@ -24,11 +26,13 @@
 #include <QLabel>
 
 ModuleBase_WidgetFeature::ModuleBase_WidgetFeature(QWidget* theParent,
-                                                   const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent, theData)
+                                                   const Config_WidgetAPI* theData, 
+                                                   const std::string& theParentId)
+: ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
-  QString aKinds = QString::fromStdString(theData->getProperty(FEATURE_KEYSEQUENCE));
-  myObjectKinds = aKinds.split(" ");
+  //QString aKinds = QString::fromStdString(theData->getProperty(FEATURE_KEYSEQUENCE));
+  //myObjectKinds = aKinds.split(" ");
+  //theData->
 
   myContainer = new QWidget(theParent);
   QHBoxLayout* aControlLay = new QHBoxLayout(myContainer);
@@ -70,6 +74,17 @@ bool ModuleBase_WidgetFeature::setValue(ModuleBase_WidgetValue* theValue)
 
 bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject)
 {
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  const ModelAPI_Validator* aValidator = aFactory->validator(parentID(), attributeID());
+  if (aValidator) {
+    const ModuleBase_ResultValidator* aResValidator = 
+      dynamic_cast<const ModuleBase_ResultValidator*>(aValidator);
+    if (aResValidator) {
+      if (!aResValidator->isValid(theObject))
+        return false;
+    }
+  }
   // TODO
   //if (!myObjectKinds.contains(theObject->getKind().c_str()))
   //  return false;

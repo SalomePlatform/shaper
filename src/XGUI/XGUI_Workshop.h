@@ -177,6 +177,9 @@ protected slots:
 private:
   void initMenu();
 
+  void registerValidators() const;
+
+
   ModuleBase_IModule* loadModule(const QString& theModule);
   bool activateModule();
 

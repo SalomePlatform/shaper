@@ -43,6 +43,9 @@ public:
 
   /// Provides a validator for the feature, returns NULL if no validator
   MODEL_EXPORT virtual const ModelAPI_Validator* validator(const std::string& theFeatureID) const;
+  /// Provides a validator for the attribute, returns NULL if no validator
+  MODEL_EXPORT virtual const ModelAPI_Validator* validator(
+    const std::string& theFeatureID, const std::string& theAttrID) const;
 
   /// Returns the result of "validate" method for attribute of validator.
   /// If validator is not exists, returns true: everything is valid by default.

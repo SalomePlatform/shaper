@@ -28,7 +28,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetSelector: public ModuleBase_ModelWidget
 public:
   ModuleBase_WidgetSelector(QWidget* theParent, 
                             ModuleBase_IWorkshop* theWorkshop, 
-                            const Config_WidgetAPI* theData);
+                            const Config_WidgetAPI* theData, const std::string& theParentId);
 
   virtual ~ModuleBase_WidgetSelector();
 

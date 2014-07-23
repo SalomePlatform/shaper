@@ -13,8 +13,9 @@
 #include <QLabel>
 
 PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent, 
-                                                     const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent, theData)
+  const Config_WidgetAPI* theData, 
+  const std::string& theParentId)
+: ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   myText = QString::fromStdString(theData->getProperty("title"));
   myLabel = new QLabel(myText, theParent);

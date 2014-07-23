@@ -14,8 +14,9 @@
 
 #include <QDoubleSpinBox>
 
-ModuleBase_WidgetPoint2dDistance::ModuleBase_WidgetPoint2dDistance(QWidget* theParent, const Config_WidgetAPI* theData)
-  : ModuleBase_WidgetDoubleValue(theParent, theData)
+ModuleBase_WidgetPoint2dDistance::ModuleBase_WidgetPoint2dDistance(QWidget* theParent, 
+  const Config_WidgetAPI* theData, const std::string& theParentId)
+  : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId)
 {
   myFirstPntName = theData->getProperty("first_point");
 }

@@ -11,8 +11,10 @@
 
 #include <QWidget>
 
-ModuleBase_ModelWidget::ModuleBase_ModelWidget(QObject* theParent, const Config_WidgetAPI* theData)
- : QObject(theParent), myHasDefaultValue(false)
+ModuleBase_ModelWidget::ModuleBase_ModelWidget(QObject* theParent, 
+  const Config_WidgetAPI* theData, 
+  const std::string& theParentId)
+ : QObject(theParent), myHasDefaultValue(false), myParentId(theParentId)
 {
   myAttributeID = theData ? theData->widgetId() : "";
 }
@@ -34,9 +36,4 @@ bool ModuleBase_ModelWidget::focusTo()
     }
   }
   return true;
-}
-
-std::string ModuleBase_ModelWidget::attributeID() const
-{
-  return myAttributeID;
 }

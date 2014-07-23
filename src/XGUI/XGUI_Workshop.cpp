@@ -41,6 +41,7 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_SelectionValidator.h>
+#include <ModuleBase_ResultValidators.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -135,6 +136,7 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 
+  registerValidators();
   activateModule();
   if (myMainWindow) {
     myMainWindow->show();
@@ -996,4 +998,16 @@ void XGUI_Workshop::updateCommandsOnViewSelection()
       }
     }
   }
+}
+
+
+//**************************************************************
+void XGUI_Workshop::registerValidators() const
+{
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+
+  aFactory->registerValidator("ModuleBase_ResulPointValidator", new ModuleBase_ResulPointValidator);
+  aFactory->registerValidator("ModuleBase_ResulLineValidator", new ModuleBase_ResulLineValidator);
+  aFactory->registerValidator("ModuleBase_ResulArcValidator", new ModuleBase_ResulArcValidator);
 }

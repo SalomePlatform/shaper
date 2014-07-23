@@ -54,6 +54,7 @@ ModuleBase_WidgetFactory::~ModuleBase_WidgetFactory()
 
 void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
 {
+  myParentId = myWidgetApi->widgetId();
   if (!myWidgetApi->toChildWidget())
     return;
 
@@ -177,7 +178,8 @@ QWidget* ModuleBase_WidgetFactory::createContainer(const std::string& theType, Q
 
 QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 {
-  ModuleBase_WidgetDoubleValue* aDblWgt = new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi);
+  ModuleBase_WidgetDoubleValue* aDblWgt = 
+    new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aDblWgt);
 
   return aDblWgt->getControl();
@@ -185,29 +187,32 @@ QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 
 QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetPoint2D* aWidget = new ModuleBase_WidgetPoint2D(theParent, myWidgetApi);
+  ModuleBase_WidgetPoint2D* aWidget = 
+    new ModuleBase_WidgetPoint2D(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
 
 QWidget* ModuleBase_WidgetFactory::featureSelectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetFeature* aWidget = new ModuleBase_WidgetFeature(theParent, myWidgetApi);
+  ModuleBase_WidgetFeature* aWidget = 
+    new ModuleBase_WidgetFeature(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
 
 QWidget* ModuleBase_WidgetFactory::featureOrAttributeSelectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetFeatureOrAttribute* aWidget = new ModuleBase_WidgetFeatureOrAttribute(theParent,
-                                                                                      myWidgetApi);
+  ModuleBase_WidgetFeatureOrAttribute* aWidget = 
+    new ModuleBase_WidgetFeatureOrAttribute(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
 
 QWidget* ModuleBase_WidgetFactory::doubleValueEditor(QWidget* theParent)
 {
-  ModuleBase_WidgetEditor* aWidget = new ModuleBase_WidgetEditor(theParent, myWidgetApi);
+  ModuleBase_WidgetEditor* aWidget = 
+    new ModuleBase_WidgetEditor(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
@@ -230,7 +235,8 @@ bool ModuleBase_WidgetFactory::isInternalWidget(const std::string& theType)
 
 QWidget* ModuleBase_WidgetFactory::selectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetSelector* aSelector = new ModuleBase_WidgetSelector(theParent, myWorkshop, myWidgetApi);
+  ModuleBase_WidgetSelector* aSelector = 
+    new ModuleBase_WidgetSelector(theParent, myWorkshop, myWidgetApi, myParentId);
   myModelWidgets.append(aSelector);
   return aSelector->getControl();
 }
@@ -238,7 +244,8 @@ QWidget* ModuleBase_WidgetFactory::selectorControl(QWidget* theParent)
 
 QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
 {
-  ModuleBase_WidgetBoolValue* aBoolWgt = new ModuleBase_WidgetBoolValue(theParent, myWidgetApi);
+  ModuleBase_WidgetBoolValue* aBoolWgt = 
+    new ModuleBase_WidgetBoolValue(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aBoolWgt);
 
   return aBoolWgt->getControl();
@@ -247,7 +254,8 @@ QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
 
 QWidget* ModuleBase_WidgetFactory::point2dDistanceControl(QWidget* theParent)
 {
-  ModuleBase_WidgetPoint2dDistance* aDistWgt = new ModuleBase_WidgetPoint2dDistance(theParent, myWidgetApi);
+  ModuleBase_WidgetPoint2dDistance* aDistWgt = 
+    new ModuleBase_WidgetPoint2dDistance(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aDistWgt);
 
   return aDistWgt->getControl();

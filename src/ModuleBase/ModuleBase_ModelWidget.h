@@ -33,7 +33,7 @@ public:
   /// Constructor
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
-  ModuleBase_ModelWidget(QObject* theParent, const Config_WidgetAPI* theData);
+  ModuleBase_ModelWidget(QObject* theParent, const Config_WidgetAPI* theData, const std::string& theParentId);
   /// Destructor
   virtual ~ModuleBase_ModelWidget() {};
 
@@ -68,7 +68,11 @@ public:
 
   /// Returns the attribute name
   /// \returns the string value
-  std::string attributeID() const;
+  std::string attributeID() const { return myAttributeID; }
+
+  /// Returns the parent of the attribute
+  /// \returns the string value
+  std::string parentID() const { return myParentId; }
 
 signals:
   /// The signal about widget values changed
@@ -90,6 +94,7 @@ protected:
 
 private:
   std::string myAttributeID; /// the attribute name of the model feature
+  std::string myParentId;    /// name of parent
 };
 
 #endif

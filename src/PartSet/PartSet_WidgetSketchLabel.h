@@ -17,7 +17,9 @@ class PARTSET_EXPORT PartSet_WidgetSketchLabel : public ModuleBase_ModelWidget
 {
   Q_OBJECT
 public:
-  PartSet_WidgetSketchLabel(QWidget* theParent, const Config_WidgetAPI* theData);
+  PartSet_WidgetSketchLabel(QWidget* theParent, 
+    const Config_WidgetAPI* theData, 
+    const std::string& theParentId);
 
   virtual ~PartSet_WidgetSketchLabel() {};
 

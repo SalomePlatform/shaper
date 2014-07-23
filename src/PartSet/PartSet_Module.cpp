@@ -106,10 +106,6 @@ XGUI_Workshop* PartSet_Module::workshop() const
 
 void PartSet_Module::createFeatures()
 {
-  Config_ModuleReader aXMLReader = Config_ModuleReader();
-  aXMLReader.readAll();
-  myFeaturesInFiles = aXMLReader.featuresInFiles();
-
   //!! Test registering of validators
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
@@ -118,6 +114,10 @@ void PartSet_Module::createFeatures()
   aFactory->registerValidator("PartSet_PerpendicularValidator", new PartSet_PerpendicularValidator);
   aFactory->registerValidator("PartSet_ParallelValidator", new PartSet_ParallelValidator);
   aFactory->registerValidator("PartSet_RadiusValidator", new PartSet_RadiusValidator);
+
+  Config_ModuleReader aXMLReader = Config_ModuleReader();
+  aXMLReader.readAll();
+  myFeaturesInFiles = aXMLReader.featuresInFiles();
 }
 
 void PartSet_Module::featureCreated(QAction* theFeature)
@@ -613,7 +613,7 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
                          Config_WidgetAPI* theWidgetApi, QList<ModuleBase_ModelWidget*>& theModelWidgets)
 {
   if (theType == "sketch-start-label") {
-    PartSet_WidgetSketchLabel* aWgt = new PartSet_WidgetSketchLabel(theParent, theWidgetApi);
+    PartSet_WidgetSketchLabel* aWgt = new PartSet_WidgetSketchLabel(theParent, theWidgetApi, "");
     aWgt->setOperationsMgr(myWorkshop->operationMgr());
     theModelWidgets.append(aWgt);
     return aWgt->getControl();
