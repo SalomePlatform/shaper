@@ -360,7 +360,8 @@ void PartSet_Module::onFeatureConstructed(FeaturePtr theFeature, int theMode)
           aDisplayer->activateInLocalContext((*aIt), aModes, false);
         }
       }
-      FeaturePtr aFeature = aPrevOp->feature();
+    }
+/*      FeaturePtr aFeature = aPrevOp->feature();
       if (aFeature) {
         std::list<ResultPtr> aResList = aFeature->results();
         std::list<ResultPtr>::iterator aIt;
@@ -368,7 +369,7 @@ void PartSet_Module::onFeatureConstructed(FeaturePtr theFeature, int theMode)
           aDisplayer->deactivate((*aIt), false);
         }
       }
-    }
+    }*/
     ModelAPI_EventCreator::get()->sendUpdated(theFeature, 
         Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 //  }
@@ -519,8 +520,8 @@ void PartSet_Module::activateFeature(ObjectPtr theFeature, const bool isUpdateVi
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    aDisplayer->activateInLocalContext(theFeature, aPreviewOp->getSelectionModes(theFeature),
-                                        isUpdateViewer);
+    std::list<int> aModes = aPreviewOp->getSelectionModes(theFeature);
+    aDisplayer->activateInLocalContext(theFeature, aModes, isUpdateViewer);
   }
 }
 

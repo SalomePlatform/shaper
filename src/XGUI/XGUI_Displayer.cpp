@@ -183,6 +183,7 @@ void XGUI_Displayer::activateInLocalContext(ObjectPtr theResult,
   // Activate selection of objects from prs
   if (!anAIS.IsNull()) {
     aContext->ClearSelected(false); // ToCheck
+    //aContext->upClearSelected(false); // ToCheck
     aContext->Load(anAIS, -1, true/*allow decomposition*/);
     aContext->Deactivate(anAIS);
 
