@@ -33,6 +33,7 @@ void ModelAPI_Feature::setResult(const boost::shared_ptr<ModelAPI_Result>& theRe
   myResults.push_back(theResult);
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
   ModelAPI_EventCreator::get()->sendUpdated(theResult, anEvent);
+  //TODO VSV:Create event for first Feature Events_Loop::loop()->flush(anEvent);
 }
 
 boost::shared_ptr<ModelAPI_Document> ModelAPI_Feature::documentToAdd()
