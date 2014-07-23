@@ -146,11 +146,11 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
     }
   }
   ObjectPtr aFeature;
-  if (!theSelected.empty()) {
+/* TODO if (!theSelected.empty()) {
     ModuleBase_ViewerPrs aPrs = theSelected.front();
     aFeature = aPrs.object();
-  } else
-    aFeature = feature(); // for the widget distance only
+  } else*/
+  aFeature = feature(); // for the widget distance only
 
   bool isApplyed = setWidgetValue(aFeature, aX, anY);
   if (isApplyed) {
@@ -271,7 +271,7 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
   //myFeaturePrs->init(aNewFeature);
   //myFeaturePrs->setFeature(myInitFeature, SM_FirstPoint);
 
-  emit featureConstructed(aNewFeature, FM_Activation);
+//TODO  emit featureConstructed(aNewFeature, FM_Activation);
   if (theFlushMessage)
     flushCreated();
   return aNewFeature;

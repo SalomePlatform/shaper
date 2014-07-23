@@ -8,12 +8,13 @@
 #include "SketchPlugin.h"
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Sketch.h>
+#include <GeomAPI_IPresentable.h>
 
 /**\class SketchPlugin_Circle
  * \ingroup DataModel
  * \brief Feature for creation of the new circle in PartSet.
  */
-class SketchPlugin_Circle: public SketchPlugin_Feature
+class SketchPlugin_Circle: public SketchPlugin_Feature//, public GeomAPI_IPresentable
 {
 public:
   /// Circle feature kind

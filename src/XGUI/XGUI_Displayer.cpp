@@ -48,17 +48,17 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
   } else {
     boost::shared_ptr<GeomAPI_AISObject> anAIS;
 
-    ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-    if (aResult) {
-      boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModuleBase_Tools::shape(aResult);
-      if (aShapePtr) {
-        anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
-        anAIS->createShape(aShapePtr);
-      }
+    GeomPresentablePtr aPrs = boost::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
+    if (aPrs) {
+      anAIS = aPrs->getAISObject(boost::shared_ptr<GeomAPI_AISObject>());
     } else {
-      GeomPresentablePtr aPrs = boost::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
-      if (aPrs) {
-        anAIS = aPrs->getAISObject(boost::shared_ptr<GeomAPI_AISObject>());
+      ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+      if (aResult) {
+        boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModuleBase_Tools::shape(aResult);
+        if (aShapePtr) {
+          anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
+          anAIS->createShape(aShapePtr);
+        }
       }
     }
     if (anAIS)
@@ -131,24 +131,35 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
   if (!isVisible(theObject))
     return;
 
-  ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-  if (aResult) {
-    boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModuleBase_Tools::shape(aResult);
-    if (aShapePtr) {
-      boost::shared_ptr<GeomAPI_AISObject> aAISObj = getAISObject(theObject);
-      Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(aAISObj->impl<Handle(AIS_InteractiveObject)>());
-      if (!aAISShape.IsNull()) {
-        aAISShape->Set(aShapePtr->impl<TopoDS_Shape>());
-        AISContext()->Redisplay(aAISShape, isUpdateViewer);
+  Handle(AIS_InteractiveObject) aAISIO;
+  boost::shared_ptr<GeomAPI_AISObject> aAISObj = getAISObject(theObject);
+  GeomPresentablePtr aPrs = boost::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
+  if (aPrs) {
+    boost::shared_ptr<GeomAPI_AISObject> aAIS_Obj = aPrs->getAISObject(aAISObj);
+    if (aAISObj && !aAIS_Obj) {
+      erase(theObject, isUpdateViewer);
+      return;
+    }
+    aAISIO = aAIS_Obj->impl<Handle(AIS_InteractiveObject)>();
+  } else {
+    ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aResult) {
+      boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModuleBase_Tools::shape(aResult);
+      if (aShapePtr) {
+        Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(aAISObj->impl<Handle(AIS_InteractiveObject)>());
+        if (!aAISShape.IsNull()) {
+          aAISShape->Set(aShapePtr->impl<TopoDS_Shape>());
+          aAISIO = aAISShape;
+        }
       }
     }
-  } else {
-    GeomPresentablePtr aPrs = boost::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
-    if (aPrs) {
-      boost::shared_ptr<GeomAPI_AISObject> aAISObj = aPrs->getAISObject(getAISObject(theObject));
-      Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-      AISContext()->Redisplay(aAISIO, isUpdateViewer);
-    }
+  }
+  if (!aAISIO.IsNull()) {
+    Handle(AIS_InteractiveContext) aContext = AISContext();
+    aContext->Redisplay(aAISIO, isUpdateViewer);
+    //if (aContext->HasOpenedContext()) {
+    //  aContext->Load(aAISIO, -1, true/*allow decomposition*/);
+    //}
   }
 }
 
@@ -163,8 +174,7 @@ void XGUI_Displayer::activateInLocalContext(ObjectPtr theResult,
   }
   // display or redisplay presentation
   Handle(AIS_InteractiveObject) anAIS;
-  if (isVisible(theResult))
-  {
+  if (isVisible(theResult)) {
     boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[theResult];
     if (anObj)
       anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
@@ -172,18 +182,30 @@ void XGUI_Displayer::activateInLocalContext(ObjectPtr theResult,
 
   // Activate selection of objects from prs
   if (!anAIS.IsNull()) {
+    aContext->ClearSelected(false); // ToCheck
+    //aContext->upClearSelected(false); // ToCheck
     aContext->Load(anAIS, -1, true/*allow decomposition*/);
     aContext->Deactivate(anAIS);
 
     std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
-    for (; anIt != aLast; anIt++)
-    {
+    for (; anIt != aLast; anIt++) {
       aContext->Activate(anAIS, (*anIt));
     }
   }
 
   if (isUpdateViewer)
     updateViewer();
+}
+
+void XGUI_Displayer::deactivate(ObjectPtr theObject, bool toUpdate)
+{
+  if (isVisible(theObject)) {
+    Handle(AIS_InteractiveContext) aContext = AISContext();
+
+     boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[theObject];
+     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
+     aContext->Deactivate(anAIS);
+  }
 }
 
 void XGUI_Displayer::stopSelection(const QList<ObjectPtr>& theResults, const bool isStop,

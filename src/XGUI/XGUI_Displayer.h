@@ -120,6 +120,8 @@ public:
   /// \return feature the feature or NULL if it not visualized
   ObjectPtr getObject(Handle(AIS_InteractiveObject) theIO) const;
 
+  void deactivate(ObjectPtr theFeature, bool toUpdate);
+
 protected:
   /// Deactivate local selection
   /// \param isUpdateViewer the state wether the viewer should be updated immediatelly

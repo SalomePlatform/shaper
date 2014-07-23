@@ -16,6 +16,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Result.h>
 
 #include <Events_Loop.h>
 
@@ -69,7 +70,7 @@ void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
 void ModuleBase_Operation::startOperation()
 {
   if (!myIsEditing)
-    setFeature(createFeature());
+    createFeature();
   //emit callSlot();
   //commit();
 }
@@ -104,10 +105,10 @@ void ModuleBase_Operation::flushCreated()
 FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
 {
   boost::shared_ptr<ModelAPI_Document> aDoc = document();
-  FeaturePtr aFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
-  if (aFeature) { // TODO: generate an error if feature was not created
+  myFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
+  if (myFeature) { // TODO: generate an error if feature was not created
     myIsModified = true;
-    aFeature->execute();
+    myFeature->execute();
     // Init default values
     /*QList<ModuleBase_ModelWidget*> aWidgets = getDescription()->modelWidgets();
     QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
@@ -118,7 +119,7 @@ FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
 
   if (theFlushMessage)
     flushCreated();
-  return aFeature;
+  return myFeature;
 }
 
 void ModuleBase_Operation::setFeature(FeaturePtr theFeature)
@@ -130,4 +131,20 @@ void ModuleBase_Operation::setEditingFeature(FeaturePtr theFeature)
 {
   setFeature(theFeature);
   myIsEditing = true;
+}
+
+bool ModuleBase_Operation::hasObject(ObjectPtr theObj) const
+{
+  FeaturePtr aFeature = feature();
+  if (aFeature) {
+    if (aFeature.get() == theObj.get())
+      return true;
+    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+      if ((*aIt).get() == theObj.get())
+        return true;
+    }
+  }
+  return false;
 }

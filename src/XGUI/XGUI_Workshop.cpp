@@ -307,10 +307,11 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const ModelAPI_ObjectUpdatedMessage* t
   std::set<ObjectPtr>::const_iterator aIt;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
-    if (aObj->data())
-      myDisplayer->display(aObj, false);
-    else {
+    if (!aObj->data() )
       myDisplayer->erase(aObj, false);
+    else {
+      if (myDisplayer->isVisible(aObj)) // TODO VSV: Correction sketch drawing
+        myDisplayer->display(aObj, false); // In order to update presentation
     }
   }
   myDisplayer->updateViewer();
@@ -325,13 +326,15 @@ void XGUI_Workshop::onFeatureCreatedMsg(const ModelAPI_ObjectUpdatedMessage* the
   bool aHasPart = false;
   bool isDisplayed = false;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
-     ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
+    ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
     if (aPart) {
       aHasPart = true;
-      //break;
     } else {
-      myDisplayer->display(*aIt, false);
-      isDisplayed = true;
+      ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
+      if (aOperation->hasObject(*aIt)) { // Display only current operation results
+        myDisplayer->display(*aIt, false);
+        isDisplayed = true;
+      }
     }
   }
   if (isDisplayed)

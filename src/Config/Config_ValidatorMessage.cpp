@@ -1,7 +1,7 @@
 /*
  * Config_ValidatorMessage.cpp
  *
- *  Created on: 08 июля 2014 г.
+ *  Created on: 08 Jul 2014 г.
  *      Author: sbh
  */
 

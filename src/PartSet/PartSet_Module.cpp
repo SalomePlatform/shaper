@@ -60,12 +60,6 @@
 #endif
 
 
-//const int SKETCH_PLANE_COLOR = Colors::COLOR_BROWN; /// the plane edge color
-const double SKETCH_WIDTH = 4.0; /// the plane edge width
-// face of the square-face displayed for selection of general plane
-const double PLANE_SIZE = 200;
-
-
 /*!Create and return new instance of XGUI_Module*/
 extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(XGUI_Workshop* theWshop)
 {
@@ -229,21 +223,7 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
     std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
     std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
 
-    PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
-    if (aSketchOp) {
-      if ((!aSketchOp->hasSketchPlane()) && (aSelected.size() > 0)) {
-        Handle(AIS_InteractiveObject) aAIS = aSelected.front().interactive();
-        if ((aAIS == myXPlane->impl<Handle(AIS_InteractiveObject)>()) ||
-            (aAIS == myYPlane->impl<Handle(AIS_InteractiveObject)>()) ||
-            (aAIS == myZPlane->impl<Handle(AIS_InteractiveObject)>()) ) {
-
-          Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(aAIS);
-          aSketchOp->setSketchPlane(aAISShape->Shape());
-        }
-      } else 
-        aSketchOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
-    } else
-      aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
+    aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
   }
 }
 
@@ -281,7 +261,7 @@ void PartSet_Module::onMouseDoubleClick(QMouseEvent* theEvent)
 
 void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
 {
-  erasePlanes();
+  //erasePlanes();
   myWorkshop->viewer()->setViewProjection(theX, theY, theZ);
   myWorkshop->actionsMgr()->update();
 
@@ -364,7 +344,38 @@ void PartSet_Module::onCloseLocalContext()
 
 void PartSet_Module::onFeatureConstructed(FeaturePtr theFeature, int theMode)
 {
-  bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Hide;
+//  bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Hide;
+//  if (isDisplay) {
+    ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
+    PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
+    if (aPrevOp) {
+      std::list<FeaturePtr> aList = aPrevOp->subFeatures();
+      XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+      std::list<int> aModes = aPrevOp->getSelectionModes(aPrevOp->feature());
+      std::list<FeaturePtr>::iterator aSFIt; 
+      for (aSFIt = aList.begin(); aSFIt != aList.end(); ++aSFIt) {
+        std::list<ResultPtr> aResults = (*aSFIt)->results();
+        std::list<ResultPtr>::iterator aIt;
+        for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+          aDisplayer->activateInLocalContext((*aIt), aModes, false);
+        }
+      }
+    }
+/*      FeaturePtr aFeature = aPrevOp->feature();
+      if (aFeature) {
+        std::list<ResultPtr> aResList = aFeature->results();
+        std::list<ResultPtr>::iterator aIt;
+        for (aIt = aResList.begin(); aIt != aResList.end(); ++aIt) {
+          aDisplayer->deactivate((*aIt), false);
+        }
+      }
+    }*/
+    ModelAPI_EventCreator::get()->sendUpdated(theFeature, 
+        Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+//  }
+//  else
+//    ->erase(theFeature->firstResult(), true);
+/*  bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Hide;
   // TODO visualizePreview(theFeature, isDisplay, false);
   if (!isDisplay) {
     ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
@@ -377,15 +388,15 @@ void PartSet_Module::onFeatureConstructed(FeaturePtr theFeature, int theMode)
 
       std::list<FeaturePtr>::const_iterator anIt = aList.begin(),
                                             aLast = aList.end();
-      for (; anIt != aLast; anIt++)
-        visualizePreview((*anIt), false, false);
-      aDisplayer->updateViewer();
+      //TODO for (; anIt != aLast; anIt++)
+      //  visualizePreview((*anIt), false, false);
+      //aDisplayer->updateViewer();
     }
   }
 
   if (theMode == PartSet_OperationSketchBase::FM_Activation ||
       theMode == PartSet_OperationSketchBase::FM_Deactivation)
-    activateFeature(theFeature, true);
+    activateFeature(theFeature, true);*/
 }
 
 ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdId,
@@ -473,54 +484,8 @@ void PartSet_Module::sendOperation(ModuleBase_Operation* theOperation)
   Events_Loop::loop()->send(aMessage);
 }
 
-boost::shared_ptr<GeomAPI_Shape> getPlane(double theX, double theY, double theZ)
-{
-  boost::shared_ptr<GeomAPI_Pnt> anOrigin(new GeomAPI_Pnt(0, 0, 0));
-  boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(theX, theY, theZ));
-  return GeomAlgoAPI_FaceBuilder::square(anOrigin, aNormal, PLANE_SIZE);
-}
 
-void PartSet_Module::showPlanes()
-{
-  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  // Show selection planes
-  if (!myXPlane) {
-    boost::shared_ptr<GeomAPI_Shape> aPlaneX = getPlane(1, 0, 0);
-    myXPlane = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
-    myXPlane->createShape(aPlaneX);
-    myXPlane->setColor(Colors::COLOR_RED);
-    myXPlane->setWidth(SKETCH_WIDTH);
-  }
-  if (!myYPlane) {
-    boost::shared_ptr<GeomAPI_Shape> aPlaneY = getPlane(0, 1, 0);
-    myYPlane = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
-    myYPlane->createShape(aPlaneY);
-    myYPlane->setColor(Colors::COLOR_GREEN);
-    myYPlane->setWidth(SKETCH_WIDTH);
-  }
-  if (!myZPlane) {
-    boost::shared_ptr<GeomAPI_Shape> aPlaneZ = getPlane(0, 0, 1);
-    myZPlane = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
-    myZPlane->createShape(aPlaneZ);
-    myZPlane->setColor(Colors::COLOR_BLUE);
-    myZPlane->setWidth(SKETCH_WIDTH);
-  }
-  aDisplayer->display(myXPlane, false);
-  aDisplayer->display(myYPlane, false);
-  aDisplayer->display(myZPlane, false);
-  aDisplayer->updateViewer();
-}
-
-void PartSet_Module::erasePlanes()
-{
-  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  aDisplayer->erase(myXPlane, false);
-  aDisplayer->erase(myYPlane, false);
-  aDisplayer->erase(myZPlane, false);
-  aDisplayer->updateViewer();
-}
-
-void PartSet_Module::visualizePreview(FeaturePtr theFeature, bool isDisplay,
+/*void PartSet_Module::visualizePreview(FeaturePtr theFeature, bool isDisplay,
                                       const bool isUpdateViewer)
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
@@ -547,19 +512,16 @@ void PartSet_Module::visualizePreview(FeaturePtr theFeature, bool isDisplay,
 
   if (isUpdateViewer)
     aDisplayer->updateViewer();
-}
+}*/
 
 void PartSet_Module::activateFeature(ObjectPtr theFeature, const bool isUpdateViewer)
 {
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    PartSet_OperationSketch* aOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
-    if (!aOp) {
-      XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-      aDisplayer->activateInLocalContext(theFeature, aPreviewOp->getSelectionModes(theFeature),
-                                         isUpdateViewer);
-    }
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    std::list<int> aModes = aPreviewOp->getSelectionModes(theFeature);
+    aDisplayer->activateInLocalContext(theFeature, aModes, isUpdateViewer);
   }
 }
 
@@ -588,8 +550,8 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
     if (!aSPFeature)
       continue;
-    visualizePreview((*anIt), true, false);
-    aDisplayer->activateInLocalContext((*anIt)->firstResult(), aModes, false);
+    //visualizePreview((*anIt), true, false);
+    aDisplayer->activateInLocalContext((*anIt), aModes, false);
   }
   aDisplayer->updateViewer();
 }

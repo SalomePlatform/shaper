@@ -72,6 +72,9 @@ public:
   /// Sets the operation feature
   void setEditingFeature(FeaturePtr theFeature);
 
+  /// Returns True if the current operation works with the given object (feature or result)
+  virtual bool hasObject(ObjectPtr theObj) const;
+
 public slots:
   /// Slots which listen the mode widget activation
   /// \param theWidget the model widget
@@ -105,11 +108,11 @@ protected:
   /// \returns the created feature
   virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
-private:
+protected:
   /// Sets the operation feature
   void setFeature(FeaturePtr theFeature);
 
-private:
+protected:
   FeaturePtr myFeature; /// the operation feature to be handled
 };
 
