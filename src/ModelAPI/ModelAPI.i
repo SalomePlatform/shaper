@@ -13,6 +13,8 @@
   #include "ModelAPI_AttributeReference.h"
   #include "ModelAPI_AttributeRefAttr.h"
   #include "ModelAPI_Validator.h"
+  #include "ModelAPI_AttributeRefList.h"
+  #include "ModelAPI_Result.h"
 %}
 
 // to avoid error on this
@@ -21,7 +23,7 @@
 // standard definitions
 %include "typemaps.i"
 %include "std_string.i"
-//%include <std_shared_ptr.i>
+%include "std_list.i"
 
 // boost pointers
 %include <boost_shared_ptr.i>
@@ -35,6 +37,8 @@
 %shared_ptr(ModelAPI_AttributeDouble)
 %shared_ptr(ModelAPI_AttributeReference)
 %shared_ptr(ModelAPI_AttributeRefAttr)
+%shared_ptr(ModelAPI_AttributeRefList)
+%shared_ptr(ModelAPI_Result)
 
 // all supported interfaces
 %include "ModelAPI_Document.h"
@@ -48,3 +52,7 @@
 %include "ModelAPI_AttributeReference.h"
 %include "ModelAPI_AttributeRefAttr.h"
 %include "ModelAPI_Validator.h"
+%include "ModelAPI_AttributeRefList.h"
+%include "ModelAPI_Result.h"
+
+%template(ObjectList) std::list<boost::shared_ptr<ModelAPI_Object> >;
