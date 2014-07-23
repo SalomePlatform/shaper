@@ -68,10 +68,10 @@ std::list<int> PartSet_OperationSketchBase::getSelectionModes(ObjectPtr theFeatu
 }
 FeaturePtr PartSet_OperationSketchBase::createFeature(const bool theFlushMessage)
 {
-  FeaturePtr aFeature = ModuleBase_Operation::createFeature(theFlushMessage);
-  if (aFeature)
-    emit featureConstructed(aFeature, FM_Activation);
-  return aFeature;
+  ModuleBase_Operation::createFeature(theFlushMessage);
+  if (myFeature)
+    emit featureConstructed(myFeature, FM_Activation);
+  return myFeature;
 }
 
 

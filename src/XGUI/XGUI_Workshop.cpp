@@ -330,8 +330,11 @@ void XGUI_Workshop::onFeatureCreatedMsg(const ModelAPI_ObjectUpdatedMessage* the
     if (aPart) {
       aHasPart = true;
     } else {
-      myDisplayer->display(*aIt, false);
-      isDisplayed = true;
+      ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
+      if (aOperation->hasObject(*aIt)) { // Display only current operation results
+        myDisplayer->display(*aIt, false);
+        isDisplayed = true;
+      }
     }
   }
   if (isDisplayed)
