@@ -467,7 +467,8 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
     aCommand = aMenu->feature(theOperation->getDescription()->operationId());
   }
   //Abort operation on uncheck the command
-  connect(aCommand, SIGNAL(triggered(bool)), theOperation, SLOT(setRunning(bool)));
+  if (aCommand)
+    connect(aCommand, SIGNAL(triggered(bool)), theOperation, SLOT(setRunning(bool)));
 }
 
 /*
@@ -767,7 +768,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   aObjDock->setWindowTitle(tr("Object browser"));
   aObjDock->setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
-  connect(myObjectBrowser, SIGNAL(activePartChanged(FeaturePtr)), this, SLOT(changeCurrentDocument(FeaturePtr)));
+  connect(myObjectBrowser, SIGNAL(activePartChanged(ObjectPtr)), this, SLOT(changeCurrentDocument(ObjectPtr)));
   aObjDock->setWidget(myObjectBrowser);
 
   myContextMenuMgr->connectObjectBrowser();

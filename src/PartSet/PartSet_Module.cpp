@@ -172,8 +172,8 @@ void PartSet_Module::onOperationStarted()
                                        myWorkshop->operationMgr()->currentOperation());
   if (aPreviewOp) {
     XGUI_PropertyPanel* aPropPanel = myWorkshop->propertyPanel();
-    connect(aPropPanel, SIGNAL(storedPoint2D(FeaturePtr, const std::string&)),
-      this, SLOT(onStorePoint2D(FeaturePtr, const std::string&)), Qt::UniqueConnection);
+    connect(aPropPanel, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)),
+      this, SLOT(onStorePoint2D(ObjectPtr, const std::string&)), Qt::UniqueConnection);
   }
 }
 
@@ -184,8 +184,8 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
   if (aPreviewOp) {
     XGUI_PropertyPanel* aPropPanel = myWorkshop->propertyPanel();
-    //disconnect(aPropPanel, SIGNAL(storedPoint2D(FeaturePtr, const std::string&)),
-    //           this, SLOT(onStorePoint2D(FeaturePtr, const std::string&)));
+    //disconnect(aPropPanel, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)),
+    //           this, SLOT(onStorePoint2D(ObjectPtr, const std::string&)));
   }
 }
 
@@ -273,15 +273,22 @@ void PartSet_Module::onFitAllView()
   myWorkshop->viewer()->fitAll();
 }
 
-void PartSet_Module::onLaunchOperation(std::string theName, ObjectPtr theFeature)
+void PartSet_Module::onLaunchOperation(std::string theName, ObjectPtr theObject)
 {
-  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
+  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
   if (!aFeature) {
-    qDebug("Warning! Restart operation without feature!");
-    return;
+    ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aResult) {
+      PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+      DocumentPtr aDoc = aMgr->rootDocument();
+      aFeature = aDoc->feature(aResult);
+    } else {
+      qDebug("Warning! Restart operation without feature!");
+      return;
+    }
   }
   ModuleBase_Operation* anOperation = createOperation(theName.c_str(),
-                                                      theFeature ? aFeature->getKind() : "");
+                                                      aFeature ? aFeature->getKind() : "");
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp)
   {
@@ -361,15 +368,6 @@ void PartSet_Module::onFeatureConstructed(FeaturePtr theFeature, int theMode)
         }
       }
     }
-/*      FeaturePtr aFeature = aPrevOp->feature();
-      if (aFeature) {
-        std::list<ResultPtr> aResList = aFeature->results();
-        std::list<ResultPtr>::iterator aIt;
-        for (aIt = aResList.begin(); aIt != aResList.end(); ++aIt) {
-          aDisplayer->deactivate((*aIt), false);
-        }
-      }
-    }*/
     ModelAPI_EventCreator::get()->sendUpdated(theFeature, 
         Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 //  }
@@ -575,17 +573,19 @@ void PartSet_Module::editFeature(FeaturePtr theFeature)
 //  }
 }
 
-void PartSet_Module::onStorePoint2D(FeaturePtr theFeature, const std::string& theAttribute)
+void PartSet_Module::onStorePoint2D(ObjectPtr theFeature, const std::string& theAttribute)
 {
+  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
+
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
                                        myWorkshop->operationMgr()->currentOperation());
   if (!aPreviewOp)
     return;
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->data()->attribute(theAttribute));
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(theAttribute));
 
-  PartSet_Tools::setConstraints(aPreviewOp->sketch(), theFeature, theAttribute,
+  PartSet_Tools::setConstraints(aPreviewOp->sketch(), aFeature, theAttribute,
                                 aPoint->x(), aPoint->y());
 }
 
