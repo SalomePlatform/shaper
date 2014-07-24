@@ -13,7 +13,9 @@
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_Document.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintLength.h>
@@ -137,10 +139,16 @@ bool SketchSolver_ConstraintGroup::isInteract(
     if (!aCAttrRef->isObject() && 
         myEntityAttrMap.find(aCAttrRef->attr()) != myEntityAttrMap.end())
       return true;
-    if (aCAttrRef->isObject() && 
-        myEntityFeatMap.find(boost::dynamic_pointer_cast<ModelAPI_Feature>(aCAttrRef->object())) 
-        != myEntityFeatMap.end())
-      return true;
+    if (aCAttrRef->isObject())
+    { // Obtain a base feature for the object
+      ResultConstructionPtr aRC = 
+        boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aCAttrRef->object());
+      if (!aRC) continue;
+      boost::shared_ptr<ModelAPI_Document> aDoc = aRC->document();
+      FeaturePtr aFeature = aDoc->feature(aRC);
+      if (myEntityFeatMap.find(aFeature) != myEntityFeatMap.end())
+        return true;
+    }
   }
 
   // Entities did not found
@@ -204,18 +212,29 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
       );
     if (!aConstrAttr) continue;
 
+    // Convert the object of the attribute to the feature
+    FeaturePtr aFeature;
+    if (aConstrAttr->isObject() && aConstrAttr->object())
+    {
+      ResultConstructionPtr aRC = 
+        boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aConstrAttr->object());
+      if (!aRC) continue;
+      boost::shared_ptr<ModelAPI_Document> aDoc = aRC->document();
+      aFeature = aDoc->feature(aRC);
+    }
+
     // For the length constraint the start and end points of the line should be added to the entities list instead of line
     if (aConstrType == SLVS_C_PT_PT_DISTANCE && theConstraint->getKind().compare(SketchPlugin_ConstraintLength::ID()) == 0)
     {
-      boost::shared_ptr<ModelAPI_Data> aData = aConstrAttr->object()->data();
+      boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
       aConstrEnt[indAttr]   = changeEntity(aData->attribute(SketchPlugin_Line::START_ID()));
       aConstrEnt[indAttr+1] = changeEntity(aData->attribute(SketchPlugin_Line::END_ID()));
-       // measured object is added into the map of objects to avoid problems with interaction betwee constraint and group
-      myEntityFeatMap[boost::dynamic_pointer_cast<ModelAPI_Feature>(aConstrAttr->object())] = 0;
+      // measured object is added into the map of objects to avoid problems with interaction between constraint and group
+      myEntityFeatMap[aFeature] = 0;
       break; // there should be no other entities
     }
     else if (aConstrAttr->isObject())
-      aConstrEnt[indAttr] = changeEntity(boost::dynamic_pointer_cast<ModelAPI_Feature>(aConstrAttr->object()));
+      aConstrEnt[indAttr] = changeEntity(aFeature);
     else
       aConstrEnt[indAttr] = changeEntity(aConstrAttr->attr());
   }
@@ -227,9 +246,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
     if (aConstrType == SLVS_C_POINTS_COINCIDENT)
     {
       if (aConstrEnt[0] == aConstrEnt[1]) // no need to add self coincidence
-      {
         return false;
-      }
       if (!addCoincidentPoints(aConstrEnt[0], aConstrEnt[1]))
       {
         myExtraCoincidence.insert(theConstraint); // the constraint is stored for further purposes

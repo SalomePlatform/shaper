@@ -18,8 +18,9 @@ SET(PROJECT_HEADERS
     GeomAPI_Dir2d.h
     GeomAPI_Pln.h
     GeomAPI_Shape.h
+    GeomAPI_Edge.h
     GeomAPI_AISObject.h
-	GeomAPI_IPresentable.h
+    GeomAPI_IPresentable.h
 )
 
 SET(PROJECT_SOURCES
@@ -36,6 +37,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Dir2d.cpp
     GeomAPI_Pln.cpp
     GeomAPI_Shape.cpp
+    GeomAPI_Edge.cpp
     GeomAPI_AISObject.cpp
 )
 

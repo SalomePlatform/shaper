@@ -13,24 +13,24 @@
 #include <gp_Ax2.hxx>
 #include <gp_Circ.hxx>
 
-boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_EdgeBuilder::line(
+boost::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
   boost::shared_ptr<GeomAPI_Pnt> theStart, boost::shared_ptr<GeomAPI_Pnt> theEnd)
 {
   const gp_Pnt& aStart = theStart->impl<gp_Pnt>();
   const gp_Pnt& anEnd = theEnd->impl<gp_Pnt>();
 
   if (aStart.IsEqual(anEnd, Precision::Confusion()))
-    return boost::shared_ptr<GeomAPI_Shape>();
+    return boost::shared_ptr<GeomAPI_Edge>();
   if (Abs(aStart.SquareDistance(anEnd)) > 1.e+100)
-    return boost::shared_ptr<GeomAPI_Shape>();
+    return boost::shared_ptr<GeomAPI_Edge>();
   BRepBuilderAPI_MakeEdge anEdgeBuilder(aStart, anEnd);
-  boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
+  boost::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
   TopoDS_Edge anEdge = anEdgeBuilder.Edge();
   aRes->setImpl(new TopoDS_Shape(anEdge));
   return aRes;
 }
 
-boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_EdgeBuilder::lineCircle(
+boost::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircle(
     boost::shared_ptr<GeomAPI_Pnt> theCenter,
     boost::shared_ptr<GeomAPI_Dir> theNormal, double theRadius)
 {
@@ -40,13 +40,13 @@ boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_EdgeBuilder::lineCircle(
   gp_Circ aCircle(gp_Ax2(aCenter, aDir), theRadius);
 
   BRepBuilderAPI_MakeEdge anEdgeBuilder(aCircle);
-  boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
+  boost::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
   TopoDS_Edge anEdge = anEdgeBuilder.Edge();
   aRes->setImpl(new TopoDS_Shape(anEdge));
   return aRes;
 }
 
-boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
+boost::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
     boost::shared_ptr<GeomAPI_Pnt> theCenter,
     boost::shared_ptr<GeomAPI_Pnt> theStartPoint,
     boost::shared_ptr<GeomAPI_Pnt> theEndPoint,
@@ -68,12 +68,12 @@ boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
   else
     anEdgeBuilder = BRepBuilderAPI_MakeEdge(aCircle, aStart, anEnd);
 
-  boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
+  boost::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
   anEdgeBuilder.Build();
 
   if (anEdgeBuilder.IsDone())
     aRes->setImpl(new TopoDS_Shape(anEdgeBuilder.Edge()));
   else
-    aRes = boost::shared_ptr<GeomAPI_Shape>();
+    aRes = boost::shared_ptr<GeomAPI_Edge>();
   return aRes;
 }

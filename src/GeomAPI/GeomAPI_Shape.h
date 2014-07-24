@@ -17,6 +17,12 @@ class GEOMAPI_EXPORT GeomAPI_Shape: public GeomAPI_Interface
 public:
   /// Creation of empty (null) shape
   GeomAPI_Shape();
+
+  /// Returns whether the shape is a vertex
+  virtual bool isVertex() const;
+
+  /// Returns whether the shape is an edge
+  virtual bool isEdge() const;
 };
 
 #endif
