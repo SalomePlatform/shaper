@@ -1,6 +1,6 @@
 <source>
   <doublevalue id="x" label="X:" max="50" step="1.0" default="0" icon=":pictures/x_point.png" tooltip="Set X">
-    <validator id="between" parameters="a,b"/> 
+    <!-- validator id="between" parameters="a,b"/ --> 
   </doublevalue>
   <doublevalue id="y" label="Y:" min="x" default="1" icon=":pictures/y_point.png" tooltip="Set Y"/>
   <doublevalue id="z" label="Z:" min="-20" step="0.1" default="2" icon=":pictures/z_point.png" tooltip="Set Z"/>

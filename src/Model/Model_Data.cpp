@@ -49,10 +49,11 @@ void Model_Data::setName(string theName)
     if (isModified)
       aName->Set(theName.c_str());
   }
-  if (isModified) {
+  // to do not cause the update of the result on name change
+  /*if (isModified) {
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
     ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent, false);
-  }
+  }*/
 }
 
 void Model_Data::addAttribute(string theID, string theAttrType)
@@ -224,6 +225,8 @@ list<boost::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const string
 void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
 {
   theAttr->setInitialized();
-  static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-  ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
+  if (theAttr->isArgument()) {
+    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+    ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
+  }
 }

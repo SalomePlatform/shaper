@@ -21,6 +21,7 @@ class ModelAPI_Attribute
   boost::shared_ptr<ModelAPI_Object> myObject;
 protected: // accessible from the attributes
   bool myIsInitialized;
+  bool myIsArgument;
 public:
   
   /// Returns the type of this class of attributes, not static method
@@ -43,9 +44,16 @@ public:
   /// Makes attribute initialized
   MODELAPI_EXPORT void setInitialized() {myIsInitialized = true;}
 
+  /// Set this attribute is argument for result (change of this attribute requires update of result).
+  /// By default it is true.
+  MODELAPI_EXPORT void setIsArgument(const bool theFlag) {myIsArgument = theFlag;}
+
+  /// Returns true if attribute causes the result change
+  MODELAPI_EXPORT bool isArgument() {return myIsArgument;}
+
 protected:
   /// Objects are created for features automatically
-  ModelAPI_Attribute() {myIsInitialized = false;}
+  ModelAPI_Attribute() {myIsInitialized = false; myIsArgument = true;}
 
 };
 
