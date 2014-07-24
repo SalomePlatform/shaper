@@ -15,10 +15,19 @@
   #include "ModelAPI_Validator.h"
   #include "ModelAPI_AttributeRefList.h"
   #include "ModelAPI_Result.h"
+  #include "ModelAPI_ResultConstruction.h"
+  
+  template<class T> boost::shared_ptr<T> castTo(boost::shared_ptr<ModelAPI_Result> theObject) 
+  { 
+    return boost::dynamic_pointer_cast<T>(theObject); 
+  }
+  
+   
 %}
 
 // to avoid error on this
 #define MODELAPI_EXPORT
+#define GEOMAPI_EXPORT
 
 // standard definitions
 %include "typemaps.i"
@@ -39,6 +48,7 @@
 %shared_ptr(ModelAPI_AttributeRefAttr)
 %shared_ptr(ModelAPI_AttributeRefList)
 %shared_ptr(ModelAPI_Result)
+%shared_ptr(ModelAPI_ResultConstruction)
 
 // all supported interfaces
 %include "ModelAPI_Document.h"
@@ -54,5 +64,10 @@
 %include "ModelAPI_Validator.h"
 %include "ModelAPI_AttributeRefList.h"
 %include "ModelAPI_Result.h"
+%include "ModelAPI_ResultConstruction.h"
 
 %template(ObjectList) std::list<boost::shared_ptr<ModelAPI_Object> >;
+%template(ResultList) std::list<boost::shared_ptr<ModelAPI_Result> >;
+
+template<class T> boost::shared_ptr<T> castTo(boost::shared_ptr<ModelAPI_Result> theObject);
+%template(modelAPI_ResultConstruction) castTo<ModelAPI_ResultConstruction>;
