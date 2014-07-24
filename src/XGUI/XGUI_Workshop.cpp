@@ -329,7 +329,9 @@ void XGUI_Workshop::onFeatureCreatedMsg(const ModelAPI_ObjectUpdatedMessage* the
     ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
     if (aPart) {
       aHasPart = true;
-    } else {
+    // If a feature is created from the aplication's python console  
+    // it doesn't stored in the operation mgr and doesn't displayed
+    } else if(myOperationMgr->hasOperation()) {
       ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
       if (aOperation->hasObject(*aIt)) { // Display only current operation results
         myDisplayer->display(*aIt, false);
