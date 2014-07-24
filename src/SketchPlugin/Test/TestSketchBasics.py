@@ -4,11 +4,10 @@
 from GeomDataAPI import *
 from ModelAPI import *
 
-__updated__ = "2014-07-23"
+__updated__ = "2014-07-24"
 
 aPluginManager = ModelAPI_PluginManager.get()
 aDocument = aPluginManager.rootDocument()
-aDocument.startOperation()
 #===============================================================================
 # Test ModelAPI static methods
 # TODO: Move this test in the ModelAPI progect 
@@ -29,6 +28,7 @@ assert (GeomDataAPI_Point2D.type() == "Point2D")
 #=========================================================================
 # Creation of a sketch
 #=========================================================================
+aDocument.startOperation()
 aSketchFeature = aDocument.addFeature("Sketch")
 assert (aSketchFeature.getKind() == "Sketch")
 aSketchFeatureData = aSketchFeature.data()
@@ -57,9 +57,11 @@ norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 assert (norm.x() == 0)
 assert (norm.y() == 0)
 assert (norm.z() == 1)
+aDocument.finishOperation()
 #=========================================================================
 # Creation of a point
 #=========================================================================
+aDocument.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
 assert (not aSketchReflist.isInitialized())
 assert(aSketchReflist.size() == 0)
@@ -83,9 +85,11 @@ aSketchPointData = aSketchPoint.data()
 coords = geomDataAPI_Point2D(aSketchPointData.attribute("PointCoordindates"))
 assert (coords.x() == 10.0)
 assert (coords.y() == 10.0)
+aDocument.finishOperation()
 #===============================================================================
 # Creation of a line
 #===============================================================================
+aDocument.startOperation()
 aSketchLine = aDocument.addFeature("SketchLine")
 aSketchReflist.append(aSketchLine)
 assert (aSketchReflist.size() == 2)
@@ -112,9 +116,15 @@ assert (aLineStartPoint.x() == 50.0)
 assert (aLineStartPoint.y() == 50.0)
 assert (aLineEndPoint.x() == 60.0)
 assert (aLineEndPoint.y() == 60.0)
-aSketchLine.firstResult()
+aDocument.finishOperation()
+#===============================================================================
+# Check results
+#===============================================================================
+aResult = aSketchLine.firstResult()
+aResultConstruction = modelAPI_ResultConstruction(aResult)
+aShape = aResultConstruction.shape()
+assert (aShape is not None)
+assert (not aShape.isNull())
  #==============================================================================
  # Finish the test
  #==============================================================================
-aDocument.finishOperation()
-
