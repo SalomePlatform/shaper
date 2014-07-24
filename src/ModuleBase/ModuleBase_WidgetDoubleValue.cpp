@@ -25,8 +25,10 @@
 #endif
 
 
-ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent, const Config_WidgetAPI* theData)
-  : ModuleBase_ModelWidget(theParent, theData)
+ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent, 
+  const Config_WidgetAPI* theData, 
+  const std::string& theParentId)
+  : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aControlLay = new QHBoxLayout(myContainer);

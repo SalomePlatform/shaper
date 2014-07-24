@@ -19,7 +19,7 @@ public:
   /// Constructor
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
-  ModuleBase_WidgetBoolValue(QWidget* theParent, const Config_WidgetAPI* theData);
+  ModuleBase_WidgetBoolValue(QWidget* theParent, const Config_WidgetAPI* theData, const std::string& theParentId);
 
   virtual ~ModuleBase_WidgetBoolValue();
 

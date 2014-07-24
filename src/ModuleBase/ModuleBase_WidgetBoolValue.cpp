@@ -17,8 +17,10 @@
 #include <QLayout>
 #include <QCheckBox>
 
-ModuleBase_WidgetBoolValue::ModuleBase_WidgetBoolValue(QWidget* theParent, const Config_WidgetAPI* theData)
-  : ModuleBase_ModelWidget(theParent, theData)
+ModuleBase_WidgetBoolValue::ModuleBase_WidgetBoolValue(QWidget* theParent, 
+  const Config_WidgetAPI* theData, 
+  const std::string& theParentId)
+  : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   QString aText = QString::fromStdString(theData->widgetLabel());
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());

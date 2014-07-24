@@ -146,11 +146,11 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
     }
   }
   ObjectPtr aFeature;
-/* TODO if (!theSelected.empty()) {
+  if (!theSelected.empty()) {
     ModuleBase_ViewerPrs aPrs = theSelected.front();
     aFeature = aPrs.object();
-  } else*/
-  aFeature = feature(); // for the widget distance only
+  } else
+    aFeature = feature(); // for the widget distance only
 
   bool isApplyed = setWidgetValue(aFeature, aX, anY);
   if (isApplyed) {

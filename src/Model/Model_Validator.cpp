@@ -79,6 +79,18 @@ const ModelAPI_Validator* Model_ValidatorsFactory::validator(const string& theFe
   return NULL; // not found
 }
 
+const ModelAPI_Validator* Model_ValidatorsFactory::validator(
+  const std::string& theFeatureID, const std::string& theAttrID) const
+{
+  map<string, map<string, pair<ModelAPI_Validator*, list<string> > > >::const_iterator
+    aFeature = myAttrs.find(theFeatureID);
+  if (aFeature == myAttrs.cend()) return NULL; // feature is not found
+  map<string, pair<ModelAPI_Validator*, list<string> > >::const_iterator 
+    anAttr = aFeature->second.find(theAttrID);
+  if (anAttr == aFeature->second.cend()) return NULL; // attribute is not found
+  return anAttr->second.first;
+}
+
 /*bool Model_ValidatorsFactory::validate(
   const boost::shared_ptr<ModelAPI_Feature>& theFeature, const string& theAttrID ) const
 {

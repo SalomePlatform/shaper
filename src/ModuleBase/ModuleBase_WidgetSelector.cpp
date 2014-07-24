@@ -56,8 +56,9 @@ TopAbs_ShapeEnum ModuleBase_WidgetSelector::shapeType(const QString& theType)
 
 ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent, 
                                                      ModuleBase_IWorkshop* theWorkshop, 
-                                                     const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent, theData), myWorkshop(theWorkshop), myActivateOnStart(false)
+                                                     const Config_WidgetAPI* theData,
+                                                     const std::string& theParentId)
+: ModuleBase_ModelWidget(theParent, theData, theParentId), myWorkshop(theWorkshop), myActivateOnStart(false)
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aLayout = new QHBoxLayout(myContainer);

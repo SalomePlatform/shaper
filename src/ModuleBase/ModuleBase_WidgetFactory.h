@@ -58,6 +58,7 @@ private:
   ModuleBase_IWorkshop*   myWorkshop;
 
   QList<ModuleBase_ModelWidget*> myModelWidgets;
+  std::string myParentId;
 };
 
 #endif /* ModuleBase_WidgetFactory_H_ */
