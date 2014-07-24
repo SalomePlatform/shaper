@@ -121,9 +121,8 @@ aDocument.finishOperation()
 # Check results
 #===============================================================================
 aResult = aSketchLine.firstResult()
-assert (aResult is not None)
 aResultConstruction = modelAPI_ResultConstruction(aResult)
-aShape = aResult.shape()
+aShape = aResultConstruction.shape()
 assert (aShape is not None)
 assert (not aShape.isNull())
  #==============================================================================
