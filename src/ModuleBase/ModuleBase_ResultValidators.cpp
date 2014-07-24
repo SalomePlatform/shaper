@@ -71,6 +71,7 @@ bool ModuleBase_ResulArcValidator::isValid(const ObjectPtr theObject) const
   if (aShape.IsNull())
     return false;
 
+  TopAbs_ShapeEnum aa = aShape.ShapeType();
   if (aShape.ShapeType() == TopAbs_EDGE) {
     TopoDS_Edge aEdge = TopoDS::Edge(aShape);
     Standard_Real aStart, aEnd;

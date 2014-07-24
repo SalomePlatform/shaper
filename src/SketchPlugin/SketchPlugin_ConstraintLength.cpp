@@ -9,11 +9,14 @@
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Result.h>
 
 #include <GeomDataAPI_Point2D.h>
 
 #include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
+
+
 
 SketchPlugin_ConstraintLength::SketchPlugin_ConstraintLength()
 {
@@ -33,7 +36,7 @@ void SketchPlugin_ConstraintLength::execute()
 
     boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
       boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    ObjectPtr aFeature = aRef->object();
+    FeaturePtr aFeature = SketchPlugin_Sketch::getFeature(aRef->object());
     if (aFeature) {
       // set length value
       boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =

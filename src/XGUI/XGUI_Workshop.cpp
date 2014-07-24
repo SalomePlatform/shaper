@@ -312,7 +312,13 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const ModelAPI_ObjectUpdatedMessage* t
     if (!aObj->data() )
       myDisplayer->erase(aObj, false);
     else {
-      if (myDisplayer->isVisible(aObj)) // TODO VSV: Correction sketch drawing
+      //if (myDisplayer->isVisible(aObj)) // TODO VSV: Correction sketch drawing
+      if(myOperationMgr->hasOperation()) {
+        ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
+        if (aOperation->hasObject(aObj)) { // Display only current operation results
+          myDisplayer->display(aObj, false);        
+        }
+      } else if (myDisplayer->isVisible(aObj))
         myDisplayer->display(aObj, false); // In order to update presentation
     }
   }
@@ -988,6 +994,8 @@ void XGUI_Workshop::updateCommandsOnViewSelection()
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   XGUI_Selection* aSelection = mySelector->selection();
+  if (aSelection->getSelected().size() == 0)
+    return;
 
   QList<QAction*> aActions = getModuleCommands();
   foreach(QAction* aAction, aActions) {

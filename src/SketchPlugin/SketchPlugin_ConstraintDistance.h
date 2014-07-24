@@ -7,7 +7,9 @@
 
 #include "SketchPlugin.h"
 #include "SketchPlugin_Constraint.h"
-#include <SketchPlugin_Sketch.h>
+#include "SketchPlugin_Sketch.h"
+
+#include <GeomAPI_IPresentable.h>
 #include <list>
 
 /** \class SketchPlugin_ConstraintDistance
@@ -18,7 +20,8 @@
  *  These constraint has three attributes:
  *  SketchPlugin_Constraint::VALUE(), SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
-class SketchPlugin_ConstraintDistance: public SketchPlugin_Constraint
+class SketchPlugin_ConstraintDistance: public SketchPlugin_Constraint, 
+                                       public GeomAPI_IPresentable
 {
 public:
   /// Distance constraint kind
