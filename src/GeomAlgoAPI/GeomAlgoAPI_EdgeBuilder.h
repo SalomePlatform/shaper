@@ -6,7 +6,7 @@
 #define GeomAlgoAPI_EdgeBuilder_HeaderFile
 
 #include <GeomAlgoAPI.h>
-#include <GeomAPI_Shape.h>
+#include <GeomAPI_Edge.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Dir.h>
 #include <boost/shared_ptr.hpp>
@@ -20,16 +20,16 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
 {
 public:
   /// Creates linear edge by two points
-  static boost::shared_ptr<GeomAPI_Shape> line(
+  static boost::shared_ptr<GeomAPI_Edge> line(
     boost::shared_ptr<GeomAPI_Pnt> theStart, boost::shared_ptr<GeomAPI_Pnt> theEnd);
 
   /// Creates linear edge in a form of a circle by a point and a circle radius
-  static boost::shared_ptr<GeomAPI_Shape> lineCircle(
+  static boost::shared_ptr<GeomAPI_Edge> lineCircle(
     boost::shared_ptr<GeomAPI_Pnt> theCenter,
     boost::shared_ptr<GeomAPI_Dir> theNormal, double theRadius);
 
   /// Creates linear edge in a form of a circle arc by a three points
-  static boost::shared_ptr<GeomAPI_Shape> lineCircleArc(
+  static boost::shared_ptr<GeomAPI_Edge> lineCircleArc(
     boost::shared_ptr<GeomAPI_Pnt> theCenter,
     boost::shared_ptr<GeomAPI_Pnt> theStartPoint,
     boost::shared_ptr<GeomAPI_Pnt> theEndPoint,

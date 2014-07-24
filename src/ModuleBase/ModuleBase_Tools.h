@@ -9,6 +9,7 @@
 #include "ModuleBase.h"
 
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Feature.h>
 
 class GeomAPI_Shape;
 
@@ -19,6 +20,8 @@ namespace ModuleBase_Tools
   * Returns returns a shape if the result has a shape method. Otherwise returns NULL pointer
   */
   MODULEBASE_EXPORT boost::shared_ptr<GeomAPI_Shape> shape(ResultPtr theResult);
+
+  MODULEBASE_EXPORT FeaturePtr feature(ObjectPtr theObject);
 
 };
 

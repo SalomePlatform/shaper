@@ -134,8 +134,7 @@ public slots:
   /// SLOT, to visualize the feature in another local context mode
   /// \param theFeature the feature to be put in another local context mode
   /// \param theMode the mode appeared on the feature
-  void onFeatureConstructed(FeaturePtr theFeature,
-                            int theMode);
+  void onFeatureConstructed(ObjectPtr theFeature, int theMode);
 
   /// Slot which reacts to the point 2d set to the feature. Creates a constraint
   /// \param the feature

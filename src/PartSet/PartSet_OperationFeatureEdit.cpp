@@ -11,6 +11,7 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_Tools.h>
 
 #include <ModelAPI_Events.h>
 
@@ -73,11 +74,13 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
                                              const std::list<ModuleBase_ViewerPrs>& theSelected,
                                              const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  ObjectPtr aFeature;
+  ObjectPtr aObject;
   if (!theHighlighted.empty())
-    aFeature = theHighlighted.front().object();
-  if (!aFeature && !theSelected.empty()) // changed for a constrain
-    aFeature = theSelected.front().object();
+    aObject = theHighlighted.front().object();
+  if (!aObject && !theSelected.empty()) // changed for a constrain
+    aObject = theSelected.front().object();
+
+  FeaturePtr aFeature = ModuleBase_Tools::feature(aObject);
   if (!aFeature || aFeature != feature()) {
     commit();
     emit featureConstructed(feature(), FM_Deactivation);
@@ -85,8 +88,15 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
     if(aHasShift && !theHighlighted.empty()) {
       QList<ObjectPtr> aSelected;
-      aSelected.push_back(feature());
-      aSelected.push_back(theHighlighted.front().object());
+      std::list<ModuleBase_ViewerPrs>::const_iterator aIt;
+      for (aIt = theSelected.cbegin(); aIt != theSelected.cend(); ++aIt)
+        aSelected.append((*aIt).object());
+      /*for (aIt = theHighlighted.cbegin(); aIt != theHighlighted.cend(); ++aIt) {
+        if (!aSelected.contains((*aIt).object()))
+          aSelected.append((*aIt).object());
+      }*/
+      //aSelected.push_back(feature());
+      //aSelected.push_back(theHighlighted.front().object());
       emit setSelection(aSelected);
     }
     else if (aFeature) {

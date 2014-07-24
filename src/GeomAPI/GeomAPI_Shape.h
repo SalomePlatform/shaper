@@ -23,6 +23,11 @@ public:
 
   bool isNull();
 
+  /// Returns whether the shape is a vertex
+  virtual bool isVertex() const;
+
+  /// Returns whether the shape is an edge
+  virtual bool isEdge() const;
 };
 
 #endif
