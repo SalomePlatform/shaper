@@ -3,22 +3,24 @@
 #include <PartSet_OperationFeatureCreate.h>
 #include <PartSet_OperationFeatureEditMulti.h>
 #include <PartSet_OperationFeatureEdit.h>
-#include <ModuleBase_Operation.h>
-#include <ModuleBase_OperationDescription.h>
-#include <ModuleBase_WidgetFactory.h>
 #include <PartSet_Listener.h>
 #include <PartSet_TestOCC.h>
 #include <PartSet_WidgetSketchLabel.h>
 #include <PartSet_Validators.h>
+#include <PartSet_Tools.h>
 
 #include <ModuleBase_Operation.h>
+#include <ModuleBase_OperationDescription.h>
+#include <ModuleBase_WidgetFactory.h>
+#include <ModuleBase_Operation.h>
+#include <ModuleBase_Tools.h>
+
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Validator.h>
-
 #include <ModelAPI_Data.h>
+
 #include <GeomDataAPI_Point2D.h>
-#include <PartSet_Tools.h>
 
 #include <XGUI_MainWindow.h>
 #include <XGUI_Displayer.h>
@@ -275,17 +277,10 @@ void PartSet_Module::onFitAllView()
 
 void PartSet_Module::onLaunchOperation(std::string theName, ObjectPtr theObject)
 {
-  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+  FeaturePtr aFeature = ModuleBase_Tools::feature(theObject);
   if (!aFeature) {
-    ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-    if (aResult) {
-      PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-      DocumentPtr aDoc = aMgr->rootDocument();
-      aFeature = aDoc->feature(aResult);
-    } else {
-      qDebug("Warning! Restart operation without feature!");
-      return;
-    }
+    qDebug("Warning! Restart operation without feature!");
+    return;
   }
   ModuleBase_Operation* anOperation = createOperation(theName.c_str(),
                                                       aFeature ? aFeature->getKind() : "");
