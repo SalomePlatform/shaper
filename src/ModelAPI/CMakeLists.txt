@@ -77,5 +77,5 @@ INSTALL(TARGETS _ModelAPI DESTINATION swig)
 INSTALL(TARGETS ModelAPI DESTINATION bin)
 INSTALL(FILES ${SWIG_SCRIPTS} DESTINATION swig)
 
-ADD_UNIT_TESTS(TestUndoRedo.py
-              )
+ADD_UNIT_TESTS(TestConstants.py
+               TestUndoRedo.py)

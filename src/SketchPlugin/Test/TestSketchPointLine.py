@@ -8,23 +8,6 @@ __updated__ = "2014-07-24"
 
 aPluginManager = ModelAPI_PluginManager.get()
 aDocument = aPluginManager.rootDocument()
-#===============================================================================
-# Test ModelAPI static methods
-# TODO: Move this test in the ModelAPI progect 
-#===============================================================================
-assert (ModelAPI_Feature.group() == "Features")
-assert (ModelAPI_AttributeDocRef.type() == "DocRef")
-assert (ModelAPI_AttributeDouble.type() == "Double")
-assert (ModelAPI_AttributeReference.type() == "Reference")
-assert (ModelAPI_AttributeRefAttr.type() == "RefAttr")
-assert (ModelAPI_AttributeRefList.type() == "RefList")
-#===============================================================================
-# Test GeomDataAPI static methods
-# TODO: Move this test in the GeomDataAPI progect 
-#===============================================================================
-assert (GeomDataAPI_Point.type() == "Point")
-assert (GeomDataAPI_Dir.type() == "Dir")  
-assert (GeomDataAPI_Point2D.type() == "Point2D")  
 #=========================================================================
 # Creation of a sketch
 #=========================================================================
@@ -91,6 +74,7 @@ aDocument.finishOperation()
 #===============================================================================
 aDocument.startOperation()
 aSketchLine = aDocument.addFeature("SketchLine")
+assert (aSketchLine.getKind() == "SketchLine")
 aSketchReflist.append(aSketchLine)
 assert (aSketchReflist.size() == 2)
 assert (len(aSketchReflist.list()) == 2)
@@ -118,13 +102,10 @@ assert (aLineEndPoint.x() == 60.0)
 assert (aLineEndPoint.y() == 60.0)
 aDocument.finishOperation()
 #===============================================================================
-# Check results
+# Check the results
 #===============================================================================
 aResult = aSketchLine.firstResult()
 aResultConstruction = modelAPI_ResultConstruction(aResult)
 aShape = aResultConstruction.shape()
 assert (aShape is not None)
 assert (not aShape.isNull())
- #==============================================================================
- # Finish the test
- #==============================================================================
