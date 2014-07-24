@@ -37,7 +37,7 @@ string Model_Data::name()
   return ""; // not defined
 }
 
-void Model_Data::setName(string theName)
+void Model_Data::setName(const string& theName)
 {
   bool isModified = false;
   Handle(TDataStd_Name) aName;
@@ -56,7 +56,7 @@ void Model_Data::setName(string theName)
   }*/
 }
 
-void Model_Data::addAttribute(string theID, string theAttrType)
+void Model_Data::addAttribute(const string& theID, const string theAttrType)
 {
   TDF_Label anAttrLab = myLab.FindChild(myAttrs.size() + 1);
   ModelAPI_Attribute* anAttr = 0;
@@ -88,7 +88,7 @@ void Model_Data::addAttribute(string theID, string theAttrType)
   }
 }
 
-boost::shared_ptr<ModelAPI_AttributeDocRef> Model_Data::docRef(const string theID)
+boost::shared_ptr<ModelAPI_AttributeDocRef> Model_Data::docRef(const string& theID)
 {
   map<string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
@@ -103,7 +103,7 @@ boost::shared_ptr<ModelAPI_AttributeDocRef> Model_Data::docRef(const string theI
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeDouble> Model_Data::real(const string theID)
+boost::shared_ptr<ModelAPI_AttributeDouble> Model_Data::real(const string& theID)
 {
   map<string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
@@ -118,7 +118,7 @@ boost::shared_ptr<ModelAPI_AttributeDouble> Model_Data::real(const string theID)
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeBoolean> Model_Data::boolean(const std::string theID)
+boost::shared_ptr<ModelAPI_AttributeBoolean> Model_Data::boolean(const std::string& theID)
 {
   map<string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
@@ -133,7 +133,7 @@ boost::shared_ptr<ModelAPI_AttributeBoolean> Model_Data::boolean(const std::stri
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeReference> Model_Data::reference(const string theID)
+boost::shared_ptr<ModelAPI_AttributeReference> Model_Data::reference(const string& theID)
 {
   map<string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
@@ -148,7 +148,7 @@ boost::shared_ptr<ModelAPI_AttributeReference> Model_Data::reference(const strin
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeRefAttr> Model_Data::refattr(const string theID)
+boost::shared_ptr<ModelAPI_AttributeRefAttr> Model_Data::refattr(const string& theID)
 {
   map<string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
@@ -163,7 +163,7 @@ boost::shared_ptr<ModelAPI_AttributeRefAttr> Model_Data::refattr(const string th
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeRefList> Model_Data::reflist(const string theID)
+boost::shared_ptr<ModelAPI_AttributeRefList> Model_Data::reflist(const string& theID)
 {
   map<string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
@@ -178,7 +178,7 @@ boost::shared_ptr<ModelAPI_AttributeRefList> Model_Data::reflist(const string th
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_Attribute> Model_Data::attribute(const std::string theID)
+boost::shared_ptr<ModelAPI_Attribute> Model_Data::attribute(const std::string& theID)
 {
   boost::shared_ptr<ModelAPI_Attribute> aResult;
   if (myAttrs.find(theID) == myAttrs.end()) // no such attribute
@@ -186,7 +186,7 @@ boost::shared_ptr<ModelAPI_Attribute> Model_Data::attribute(const std::string th
   return myAttrs[theID];
 }
 
-const string& Model_Data::id(const boost::shared_ptr<ModelAPI_Attribute> theAttr)
+const string& Model_Data::id(const boost::shared_ptr<ModelAPI_Attribute>& theAttr)
 {
   map<string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = myAttrs.begin();
   for(; anAttr != myAttrs.end(); anAttr++) {
@@ -197,7 +197,7 @@ const string& Model_Data::id(const boost::shared_ptr<ModelAPI_Attribute> theAttr
   return anEmpty;
 }
 
-bool Model_Data::isEqual(const boost::shared_ptr<ModelAPI_Data> theData)
+bool Model_Data::isEqual(const boost::shared_ptr<ModelAPI_Data>& theData)
 {
   boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theData);
   if (aData)
@@ -210,7 +210,7 @@ bool Model_Data::isValid()
   return !myLab.IsNull() && myLab.HasAttribute();
 }
 
-list<boost::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const string theType)
+list<boost::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const string& theType)
 {
   list<boost::shared_ptr<ModelAPI_Attribute> > aResult;
   map<string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = myAttrs.begin();
