@@ -344,7 +344,7 @@ void PartSet_Module::onCloseLocalContext()
   aDisplayer->closeLocalContexts();
 }
 
-void PartSet_Module::onFeatureConstructed(FeaturePtr theFeature, int theMode)
+void PartSet_Module::onFeatureConstructed(ObjectPtr theFeature, int theMode)
 {
 //  bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Hide;
 //  if (isDisplay) {
@@ -442,8 +442,8 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   // connect the operation
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
-    connect(aPreviewOp, SIGNAL(featureConstructed(FeaturePtr, int)),
-            this, SLOT(onFeatureConstructed(FeaturePtr, int)));
+    connect(aPreviewOp, SIGNAL(featureConstructed(ObjectPtr, int)),
+            this, SLOT(onFeatureConstructed(ObjectPtr, int)));
     connect(aPreviewOp, SIGNAL(launchOperation(std::string, ObjectPtr)),
             this, SLOT(onLaunchOperation(std::string, ObjectPtr)));
     connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)),

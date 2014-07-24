@@ -8,6 +8,7 @@
 
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_Tools.h>
 
 #include <ModelAPI_Events.h>
 
@@ -58,10 +59,9 @@ void PartSet_OperationFeatureEditMulti::initSelection(const std::list<ModuleBase
     // deselected in the viewer by blockSelection signal in the startOperation method.
     bool isSelected = false;
     std::list<ModuleBase_ViewerPrs>::const_iterator anIt = theSelected.begin(), aLast = theSelected.end();
-    // TODO
-    /*for (; anIt != aLast && !isSelected; anIt++) {
-      isSelected = (*anIt).feature() == feature();
-    }*/
+    for (; anIt != aLast && !isSelected; anIt++) {
+      isSelected = ModuleBase_Tools::feature((*anIt).object()) == feature();
+    }
     if (!isSelected)
       myFeatures = theHighlighted;
     else
@@ -110,14 +110,17 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Handle
     aSketchFeature->move(aDeltaX, aDeltaY);
 
     std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
-    // TODO
-    /*for (; anIt != aLast; anIt++) {
-      FeaturePtr aFeature = (*anIt).feature();
-      if (!aFeature || aFeature == feature())
+    for (; anIt != aLast; anIt++) {
+      ObjectPtr aObject = (*anIt).object();
+      if (!aObject || aObject == feature())
         continue;
-      aSketchFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-      aSketchFeature->move(aDeltaX, aDeltaY);
-    }*/
+      FeaturePtr aFeature = ModuleBase_Tools::feature(aObject);
+      if (aFeature) {
+        aSketchFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+        if (aSketchFeature)
+          aSketchFeature->move(aDeltaX, aDeltaY);
+      }
+    }
   }
   sendFeatures();
 
@@ -131,13 +134,12 @@ void PartSet_OperationFeatureEditMulti::mouseReleased(QMouseEvent* theEvent, Han
   std::list<ModuleBase_ViewerPrs> aFeatures = myFeatures;
   commit();
   std::list<ModuleBase_ViewerPrs>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
-  // TODO
-  /*for (; anIt != aLast; anIt++) {
-    FeaturePtr aFeature = (*anIt).feature();
+  for (; anIt != aLast; anIt++) {
+    ObjectPtr aFeature = (*anIt).object();
     if (aFeature) {
       emit featureConstructed(aFeature, FM_Deactivation);
-	}
-  }*/
+	  }
+  }
 }
 
 void PartSet_OperationFeatureEditMulti::startOperation()
@@ -188,14 +190,13 @@ void PartSet_OperationFeatureEditMulti::sendFeatures()
 
   std::list<FeaturePtr > aFeatures;
   std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures.end();
-  // TODO
-  /*for (; anIt != aLast; anIt++) {
-    FeaturePtr aFeature = (*anIt).feature();
+  for (; anIt != aLast; anIt++) {
+    ObjectPtr aFeature = (*anIt).object();
     if (!aFeature)
       continue;
 
     ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
-  }*/
+  }
   Events_Loop::loop()->flush(anEvent);
   flushUpdated();
 }

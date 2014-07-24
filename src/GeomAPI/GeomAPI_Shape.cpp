@@ -9,5 +9,10 @@
 #define MY_PNT static_cast<gp_Pnt*>(myImpl)
 
 GeomAPI_Shape::GeomAPI_Shape()
-  : GeomAPI_Interface(new TopoDS_Shape())
-{}
+    : GeomAPI_Interface(new TopoDS_Shape()) {
+}
+
+bool GeomAPI_Shape::isNull()
+{
+  return MY_SHAPE->IsNull();
+}

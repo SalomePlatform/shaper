@@ -123,14 +123,16 @@ signals:
   /// theName the operation name
   /// theFeature the operation argument
   void launchOperation(std::string theName, ObjectPtr theFeature);
+  
   /// Signal about the feature construing is finished
   /// \param theFeature the result feature
   /// \param theMode the mode of the feature modification
-  void featureConstructed(FeaturePtr theFeature,
-                          int theMode);
+  void featureConstructed(ObjectPtr theFeature, int theMode);
+
   /// Signal about the features should be selected
   /// \param theSelected the list of selected presentations
   void featureSelected(const std::list<ModuleBase_ViewerPrs>& theSelected);
+  
   /// signal to enable/disable multi selection in the viewer
   /// \param theEnabled the boolean state
   void multiSelectionEnabled(bool theEnabled);
@@ -139,6 +141,7 @@ signals:
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
   void stopSelection(const QList<ObjectPtr>& theFeatures, const bool theToStop);
+  
   /// signal to set selection in the viewer
   /// \param theFeatures a list of features to be disabled
   void setSelection(const QList<ObjectPtr>& theFeatures);

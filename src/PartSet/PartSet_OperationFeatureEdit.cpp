@@ -88,8 +88,15 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
     if(aHasShift && !theHighlighted.empty()) {
       QList<ObjectPtr> aSelected;
-      aSelected.push_back(feature());
-      aSelected.push_back(theHighlighted.front().object());
+      std::list<ModuleBase_ViewerPrs>::const_iterator aIt;
+      for (aIt = theSelected.cbegin(); aIt != theSelected.cend(); ++aIt)
+        aSelected.append((*aIt).object());
+      /*for (aIt = theHighlighted.cbegin(); aIt != theHighlighted.cend(); ++aIt) {
+        if (!aSelected.contains((*aIt).object()))
+          aSelected.append((*aIt).object());
+      }*/
+      //aSelected.push_back(feature());
+      //aSelected.push_back(theHighlighted.front().object());
       emit setSelection(aSelected);
     }
     else if (aFeature) {
