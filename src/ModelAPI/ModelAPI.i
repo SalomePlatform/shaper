@@ -1,6 +1,8 @@
 /* ModelAPI.i */
 %module ModelAPI
 %{
+  #include "GeomAPI_Interface.h"
+  #include "GeomAPI_Shape.h"
   #include "ModelAPI.h"
   #include "ModelAPI_Document.h"
   #include "ModelAPI_PluginManager.h"
@@ -36,6 +38,9 @@
 
 // boost pointers
 %include <boost_shared_ptr.i>
+// For ModelAPI_ResultConstruction.shape()
+%shared_ptr(GeomAPI_Interface)
+%shared_ptr(GeomAPI_Shape)
 %shared_ptr(ModelAPI_Document)
 %shared_ptr(ModelAPI_PluginManager)
 %shared_ptr(ModelAPI_Object)
@@ -51,6 +56,8 @@
 %shared_ptr(ModelAPI_ResultConstruction)
 
 // all supported interfaces
+%include "GeomAPI_Interface.h"
+%include "GeomAPI_Shape.h"
 %include "ModelAPI_Document.h"
 %include "ModelAPI_PluginManager.h"
 %include "ModelAPI_Object.h"
