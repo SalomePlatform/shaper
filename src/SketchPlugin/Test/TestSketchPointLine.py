@@ -23,6 +23,7 @@ diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
 diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 norm.setValue(0, 0, 1)
+aDocument.finishOperation()
 # check that values have been changed
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
 assert (origin.x() == 0)
@@ -40,7 +41,6 @@ norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 assert (norm.x() == 0)
 assert (norm.y() == 0)
 assert (norm.z() == 1)
-aDocument.finishOperation()
 #=========================================================================
 # Creation of a point
 #=========================================================================
@@ -60,6 +60,7 @@ assert (not coords.isInitialized())
 # Simulate SketchPlugin_Point::move(...)
 coords.setValue(10., 10.)
 assert (coords.isInitialized())
+aDocument.finishOperation()
 # check that values have been changed
 aSketchReflist = aSketchFeatureData.reflist("Features")
 assert (aSketchReflist.size() == 1)
@@ -68,7 +69,6 @@ aSketchPointData = aSketchPoint.data()
 coords = geomDataAPI_Point2D(aSketchPointData.attribute("PointCoordindates"))
 assert (coords.x() == 10.0)
 assert (coords.y() == 10.0)
-aDocument.finishOperation()
 #===============================================================================
 # Creation of a line
 #===============================================================================
@@ -92,6 +92,7 @@ aLineStartPoint.setValue(50., 50.)
 aLineEndPoint.setValue(60., 60.)
 assert (aLineStartPoint.isInitialized())
 assert (aLineEndPoint.isInitialized())
+aDocument.finishOperation()
 # check that values have been changed
 aSketchLineData = aSketchLine.data()
 aLineStartPoint = geomDataAPI_Point2D(aSketchLineData.attribute("StartPoint"))
@@ -100,7 +101,6 @@ assert (aLineStartPoint.x() == 50.0)
 assert (aLineStartPoint.y() == 50.0)
 assert (aLineEndPoint.x() == 60.0)
 assert (aLineEndPoint.y() == 60.0)
-aDocument.finishOperation()
 #===============================================================================
 # Check the results
 #===============================================================================
