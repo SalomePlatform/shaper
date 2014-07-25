@@ -81,6 +81,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
     {
       boost::shared_ptr<ModelAPI_Attribute> anAttr =
         theConstraint->data()->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+      if (!anAttr) continue;
       switch (typeOfAttribute(anAttr))
       {
       case POINT2D: // the attribute is a 2D point
