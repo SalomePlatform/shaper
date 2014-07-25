@@ -78,11 +78,13 @@ public:
   //! Returns the object in the group by the index (started from zero)
   //! \param theGroupID group that contains an object
   //! \param theIndex zero-based index of feature in the group
+  //! \param theHidden if it is true, it counts also the features that are not in tree
   virtual boost::shared_ptr<ModelAPI_Object> 
-    object(const std::string& theGroupID, const int theIndex) = 0;
+    object(const std::string& theGroupID, const int theIndex, const bool theHidden = false) = 0;
 
   //! Returns the number of objects in the group of objects
-  virtual int size(const std::string& theGroupID) = 0;
+  //! If theHidden is true, it counts also the features that are not in tree
+  virtual int size(const std::string& theGroupID, const bool theHidden = false) = 0;
 
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Document() {}
