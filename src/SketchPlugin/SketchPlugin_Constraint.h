@@ -10,6 +10,9 @@
 #include <SketchPlugin_Sketch.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefAttr.h>
+
+#include <GeomAPI_IPresentable.h>
+
 #include <list>
 
 
@@ -34,7 +37,8 @@ const unsigned int CONSTRAINT_ATTR_SIZE = 4;
  *  \brief Feature for creation of a new constraint between other features.
  *         Base class for all constraints.
  */
-class SketchPlugin_Constraint: public SketchPlugin_Feature
+class SketchPlugin_Constraint: public SketchPlugin_Feature, 
+                               public GeomAPI_IPresentable
 {
 public:
   /// The value parameter for the constraint

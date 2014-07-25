@@ -85,9 +85,6 @@ bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject)
         return false;
     }
   }
-  // TODO
-  //if (!myObjectKinds.contains(theObject->getKind().c_str()))
-  //  return false;
 
   myObject = theObject;
   myEditor->setText(theObject ? theObject->data()->name().c_str() : "");
@@ -107,8 +104,7 @@ bool ModuleBase_WidgetFeature::storeValue(ObjectPtr theObject) const
   ModuleBase_WidgetFeature* that = (ModuleBase_WidgetFeature*) this;
   aRef->setObject(myObject);
   aFeature->execute();
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-
+  updateObject(theObject);
   return true;
 }
 

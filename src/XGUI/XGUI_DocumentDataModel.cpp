@@ -540,8 +540,8 @@ QModelIndex XGUI_DocumentDataModel::objectIndex(const ObjectPtr theObject) const
         if (theObject == aRootDoc->object(ModelAPI_Feature::group(), aId))
           break;
       }
-      Q_ASSERT(aId < aNb);
-      return index(aId + historyOffset(), 0, QModelIndex());
+      if (aId < aNb)
+        return index(aId + historyOffset(), 0, QModelIndex());
     } else {
       QModelIndex aIndex = myModel->objectIndex(theObject);
       return aIndex.isValid()? 

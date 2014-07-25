@@ -90,6 +90,8 @@ protected:
   /// \returns the string value
   void setAttributeID(const std::string& theAttribute) { myAttributeID = theAttribute; }
 
+  void updateObject(ObjectPtr theObj) const;
+
   bool myHasDefaultValue; /// the boolean state whether the control has a default value
 
 private:

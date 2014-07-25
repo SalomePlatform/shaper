@@ -111,7 +111,7 @@ bool ModuleBase_WidgetSelector::storeValue(ObjectPtr theObject) const
   ObjectPtr aObject = aRef->value();
   if (!(aObject && aObject->isSame(mySelectedObject))) {
     aRef->setValue(mySelectedObject);
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+    updateObject(theObject);
   }
   return true;
 }

@@ -96,7 +96,7 @@ bool ModuleBase_WidgetDoubleValue::storeValue(ObjectPtr theObject) const
   AttributeDoublePtr aReal = aData->real(attributeID());
   if (aReal->value() != mySpinBox->value()) {
     aReal->setValue(mySpinBox->value());
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+    updateObject(theObject);
   }
   return true;
 }

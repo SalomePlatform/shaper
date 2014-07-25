@@ -314,15 +314,6 @@ void PartSet_Module::onStopSelection(const QList<ObjectPtr>& theFeatures, const 
       activateFeature(aObject, false);
     }
   }
-  //ObjectPtr aResults;
-  //foreach(ObjectPtr aFeature, theFeatures) {
-/* TODO    if (aFeature->results().size() > 0) {
-      const std::list<ResultPtr>& aResList = aFeature->results();
-      std::list<ResultPtr>::const_iterator aIt;
-      for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt)
-        aResults.append(*aIt);
-    }
-  }*/
   aDisplayer->stopSelection(theFeatures, isStop, false);
 
   XGUI_ViewerProxy* aViewer = myWorkshop->viewer();

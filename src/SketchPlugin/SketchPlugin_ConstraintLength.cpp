@@ -65,7 +65,7 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintLength::getAISObject
     boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
   if (!anAttr)
     return thePrevious;
-  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->object());
+  FeaturePtr aFeature = SketchPlugin_Sketch::getFeature(anAttr->object());
   if (!aFeature || aFeature->getKind() != SketchPlugin_Line::ID())
     return thePrevious;
 

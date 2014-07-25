@@ -6,8 +6,11 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Attribute.h>
+#include <ModelAPI_Events.h>
 
 #include "Config_WidgetAPI.h"
+
+#include <Events_Loop.h>
 
 #include <QWidget>
 
@@ -36,4 +39,12 @@ bool ModuleBase_ModelWidget::focusTo()
     }
   }
   return true;
+}
+
+
+void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj) const
+{
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
 }
