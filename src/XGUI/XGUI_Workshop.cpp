@@ -312,14 +312,16 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const ModelAPI_ObjectUpdatedMessage* t
     if (!aObj->data() )
       myDisplayer->erase(aObj, false);
     else {
-      //if (myDisplayer->isVisible(aObj)) // TODO VSV: Correction sketch drawing
-      if(myOperationMgr->hasOperation()) {
-        ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-        if (aOperation->hasObject(aObj)) { // Display only current operation results
-          myDisplayer->display(aObj, false);        
-        }
-      } else if (myDisplayer->isVisible(aObj))
+      if (myDisplayer->isVisible(aObj)) // TODO VSV: Correction sketch drawing
         myDisplayer->display(aObj, false); // In order to update presentation
+      else {
+        if(myOperationMgr->hasOperation()) {
+          ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
+          if (aOperation->hasObject(aObj)) { // Display only current operation results
+            myDisplayer->display(aObj, false);        
+          }
+        }
+      }
     }
   }
   myDisplayer->updateViewer();
