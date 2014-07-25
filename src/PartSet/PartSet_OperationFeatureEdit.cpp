@@ -126,6 +126,8 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, Handle(V3d_
     boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
                            boost::dynamic_pointer_cast<SketchPlugin_Feature>(feature());
     aSketchFeature->move(aDeltaX, aDeltaY);
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    ModelAPI_EventCreator::get()->sendUpdated(feature(), anEvent);
   }
   sendFeatures();
 
