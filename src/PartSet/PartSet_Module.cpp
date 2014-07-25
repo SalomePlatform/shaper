@@ -346,28 +346,28 @@ void PartSet_Module::onCloseLocalContext()
 
 void PartSet_Module::onFeatureConstructed(ObjectPtr theFeature, int theMode)
 {
-//  bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Hide;
-//  if (isDisplay) {
-    ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
-    PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
-    if (aPrevOp) {
-      std::list<FeaturePtr> aList = aPrevOp->subFeatures();
-      XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-      std::list<int> aModes = aPrevOp->getSelectionModes(aPrevOp->feature());
-      std::list<FeaturePtr>::iterator aSFIt; 
-      for (aSFIt = aList.begin(); aSFIt != aList.end(); ++aSFIt) {
-        std::list<ResultPtr> aResults = (*aSFIt)->results();
-        std::list<ResultPtr>::iterator aIt;
-        for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+  bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Hide;
+  ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
+  PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
+  if (aPrevOp) {
+    std::list<FeaturePtr> aList = aPrevOp->subFeatures();
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    std::list<int> aModes = aPrevOp->getSelectionModes(aPrevOp->feature());
+    std::list<FeaturePtr>::iterator aSFIt; 
+    for (aSFIt = aList.begin(); aSFIt != aList.end(); ++aSFIt) {
+      std::list<ResultPtr> aResults = (*aSFIt)->results();
+      std::list<ResultPtr>::iterator aIt;
+      for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+        if (isDisplay)
           aDisplayer->activateInLocalContext((*aIt), aModes, false);
-        }
+        else
+          aDisplayer->erase((*aIt), false);
       }
     }
+  }
+  if (isDisplay)
     ModelAPI_EventCreator::get()->sendUpdated(theFeature, 
         Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
-//  }
-//  else
-//    ->erase(theFeature->firstResult(), true);
 /*  bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Hide;
   // TODO visualizePreview(theFeature, isDisplay, false);
   if (!isDisplay) {
@@ -543,8 +543,13 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
       boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
     if (!aSPFeature)
       continue;
-    //visualizePreview((*anIt), true, false);
-    aDisplayer->activateInLocalContext((*anIt), aModes, false);
+    std::list<ResultPtr> aResults = aSPFeature->results();
+    std::list<ResultPtr>::const_iterator aRIt;
+    for (aRIt = aResults.cbegin(); aRIt != aResults.cend(); ++aRIt) {
+      aDisplayer->display((*aRIt), false);
+      aDisplayer->activateInLocalContext((*aRIt), aModes, false);
+    }
+    aDisplayer->display(aSPFeature, false);
   }
   aDisplayer->updateViewer();
 }
