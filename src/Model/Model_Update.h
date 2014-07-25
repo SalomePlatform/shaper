@@ -32,7 +32,11 @@ public:
   MODEL_EXPORT virtual void processEvent(const Events_Message* theMessage);
 
 protected:
-  /// Recoursively checks and updates the object if needed
+  /// Recoursively checks and updates the feature if needed (calls the execute method)
+  /// Returns true if feature was updated.
+  bool updateFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
+
+  /// Recoursively checks and updates the object (result or feature) if needed (calls updateFeature)
   /// Returns true if object was updated.
   bool updateObject(boost::shared_ptr<ModelAPI_Object> theObject);
 };

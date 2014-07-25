@@ -92,10 +92,13 @@ public:
   //! \param theGroupID group that contains a feature
   //! \param theIndex zero-based index of feature in the group
   //! \param isOperation if it is true, returns feature (not Object)
-  MODEL_EXPORT virtual ObjectPtr object(const std::string& theGroupID, const int theIndex);
+  //! \param theHidden if it is true, it counts also the features that are not in tree
+  MODEL_EXPORT virtual ObjectPtr object(const std::string& theGroupID, const int theIndex,
+    const bool theHidden = false);
 
   //! Returns the number of features in the group
-  MODEL_EXPORT virtual int size(const std::string& theGroupID);
+  //! If theHidden is true, it counts also the features that are not in tree
+  MODEL_EXPORT virtual int size(const std::string& theGroupID, const bool theHidden = false);
 
   /// Creates a construction cresults
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction(

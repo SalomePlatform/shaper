@@ -37,6 +37,26 @@ void ModelAPI_Feature::setResult(const boost::shared_ptr<ModelAPI_Result>& theRe
   Events_Loop::loop()->flush(anEvent);
 }
 
+void ModelAPI_Feature::setResult(
+  const boost::shared_ptr<ModelAPI_Result>& theResult, const int theIndex) 
+{
+  std::list<boost::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
+  for(int anIndex = 0; anIndex < theIndex; anIndex++) {
+    aResIter++;
+  }
+  if (aResIter == myResults.end()) { // append
+    myResults.push_back(theResult);
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+    ModelAPI_EventCreator::get()->sendUpdated(theResult, anEvent);
+    // Create event for first Feature, send it to make "created" earlier than "updated"
+    Events_Loop::loop()->flush(anEvent);
+  } else { // update
+    *aResIter = theResult;
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+    ModelAPI_EventCreator::get()->sendUpdated(theResult, anEvent);
+  }
+}
+
 boost::shared_ptr<ModelAPI_Document> ModelAPI_Feature::documentToAdd()
 {
   return ModelAPI_PluginManager::get()->currentDocument();

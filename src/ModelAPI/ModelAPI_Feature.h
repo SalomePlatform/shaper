@@ -48,6 +48,9 @@ public:
   MODELAPI_EXPORT boost::shared_ptr<ModelAPI_Result> firstResult();
   /// sets the alone result
   MODELAPI_EXPORT void setResult(const boost::shared_ptr<ModelAPI_Result>& theResult);
+  /// sets the result by index (zero based), results before this must be set before
+  MODELAPI_EXPORT void setResult(
+    const boost::shared_ptr<ModelAPI_Result>& theResult, const int theIndex);
 
   /// Returns true if this feature must not be created: this is just an action
   /// that is not stored in the features history and data model (like "delete part").

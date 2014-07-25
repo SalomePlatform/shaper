@@ -137,12 +137,12 @@ bool ModuleBase_Operation::hasObject(ObjectPtr theObj) const
 {
   FeaturePtr aFeature = feature();
   if (aFeature) {
-    if (aFeature.get() == theObj.get())
+    if (aFeature == theObj)
       return true;
     std::list<ResultPtr> aResults = aFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-      if ((*aIt).get() == theObj.get())
+      if ((*aIt) == theObj)
         return true;
     }
   }

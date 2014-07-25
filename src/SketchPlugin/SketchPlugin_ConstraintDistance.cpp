@@ -104,7 +104,7 @@ boost::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
   boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theData->attribute(theAttribute));
   if (anAttr)
-    aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->object());
+    aFeature = SketchPlugin_Sketch::getFeature(anAttr->object());
 
   if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID())
     aPointAttr = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
