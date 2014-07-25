@@ -8,23 +8,6 @@ __updated__ = "2014-07-24"
 
 aPluginManager = ModelAPI_PluginManager.get()
 aDocument = aPluginManager.rootDocument()
-#===============================================================================
-# Test ModelAPI static methods
-# TODO: Move this test in the ModelAPI progect 
-#===============================================================================
-assert (ModelAPI_Feature.group() == "Features")
-assert (ModelAPI_AttributeDocRef.type() == "DocRef")
-assert (ModelAPI_AttributeDouble.type() == "Double")
-assert (ModelAPI_AttributeReference.type() == "Reference")
-assert (ModelAPI_AttributeRefAttr.type() == "RefAttr")
-assert (ModelAPI_AttributeRefList.type() == "RefList")
-#===============================================================================
-# Test GeomDataAPI static methods
-# TODO: Move this test in the GeomDataAPI progect 
-#===============================================================================
-assert (GeomDataAPI_Point.type() == "Point")
-assert (GeomDataAPI_Dir.type() == "Dir")  
-assert (GeomDataAPI_Point2D.type() == "Point2D")  
 #=========================================================================
 # Creation of a sketch
 #=========================================================================
@@ -40,6 +23,7 @@ diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
 diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 norm.setValue(0, 0, 1)
+aDocument.finishOperation()
 # check that values have been changed
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
 assert (origin.x() == 0)
@@ -57,7 +41,6 @@ norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 assert (norm.x() == 0)
 assert (norm.y() == 0)
 assert (norm.z() == 1)
-aDocument.finishOperation()
 #=========================================================================
 # Creation of a point
 #=========================================================================
@@ -77,6 +60,7 @@ assert (not coords.isInitialized())
 # Simulate SketchPlugin_Point::move(...)
 coords.setValue(10., 10.)
 assert (coords.isInitialized())
+aDocument.finishOperation()
 # check that values have been changed
 aSketchReflist = aSketchFeatureData.reflist("Features")
 assert (aSketchReflist.size() == 1)
@@ -85,12 +69,12 @@ aSketchPointData = aSketchPoint.data()
 coords = geomDataAPI_Point2D(aSketchPointData.attribute("PointCoordindates"))
 assert (coords.x() == 10.0)
 assert (coords.y() == 10.0)
-aDocument.finishOperation()
 #===============================================================================
 # Creation of a line
 #===============================================================================
 aDocument.startOperation()
 aSketchLine = aDocument.addFeature("SketchLine")
+assert (aSketchLine.getKind() == "SketchLine")
 aSketchReflist.append(aSketchLine)
 assert (aSketchReflist.size() == 2)
 assert (len(aSketchReflist.list()) == 2)
@@ -108,6 +92,7 @@ aLineStartPoint.setValue(50., 50.)
 aLineEndPoint.setValue(60., 60.)
 assert (aLineStartPoint.isInitialized())
 assert (aLineEndPoint.isInitialized())
+aDocument.finishOperation()
 # check that values have been changed
 aSketchLineData = aSketchLine.data()
 aLineStartPoint = geomDataAPI_Point2D(aSketchLineData.attribute("StartPoint"))
@@ -116,15 +101,11 @@ assert (aLineStartPoint.x() == 50.0)
 assert (aLineStartPoint.y() == 50.0)
 assert (aLineEndPoint.x() == 60.0)
 assert (aLineEndPoint.y() == 60.0)
-aDocument.finishOperation()
 #===============================================================================
-# Check results
+# Check the results
 #===============================================================================
 aResult = aSketchLine.firstResult()
 aResultConstruction = modelAPI_ResultConstruction(aResult)
 aShape = aResultConstruction.shape()
 assert (aShape is not None)
 assert (not aShape.isNull())
- #==============================================================================
- # Finish the test
- #==============================================================================
