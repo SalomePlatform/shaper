@@ -89,7 +89,7 @@ void XGUI_Displayer::erase(ObjectPtr theObject, const bool isUpdateViewer)
   if (anObject)  {
     Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
     if (!anAIS.IsNull()) {
-      aContext->Erase(anAIS, isUpdateViewer);
+      aContext->Remove(anAIS, isUpdateViewer);
     }
   }
   myResult2AISObjectMap.erase(theObject);
@@ -299,7 +299,7 @@ void XGUI_Displayer::eraseDeletedResults(const bool isUpdateViewer)
       if (!anObj) continue;
       Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anAIS.IsNull()) {
-        aContext->Erase(anAIS, false);
+        aContext->Remove(anAIS, false);
         aRemoved.push_back(aFeature);
       }
     }

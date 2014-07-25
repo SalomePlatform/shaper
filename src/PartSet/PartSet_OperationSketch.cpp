@@ -14,6 +14,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_Events.h>
 
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomDataAPI_Point.h>
@@ -21,6 +22,7 @@
 #include <GeomAPI_XYZ.h>
 
 #include <ModuleBase_ViewerPrs.h>
+#include <Events_Loop.h>
 
 #include <AIS_Shape.hxx>
 #include <AIS_ListOfInteractive.hxx>
@@ -163,6 +165,16 @@ void PartSet_OperationSketch::stopOperation()
   PartSet_OperationSketchBase::stopOperation();
   emit featureConstructed(feature(), FM_Hide);
   emit closeLocalContext();
+
+  FeaturePtr aFeature = feature();
+  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr>::const_iterator aIt;
+  for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+    ModelAPI_EventCreator::get()->sendUpdated(*aIt, 
+      Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  }
+  //ModelAPI_EventCreator::get()->sendUpdated(aFeature, 
+  //  Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
 bool PartSet_OperationSketch::isNestedOperationsEnabled() const
