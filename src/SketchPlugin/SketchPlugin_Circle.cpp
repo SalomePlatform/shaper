@@ -45,7 +45,7 @@ void SketchPlugin_Circle::execute()
       boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
       //aShapes.push_back(aCenterPointShape);
       boost::shared_ptr<ModelAPI_ResultConstruction> aConstr1 = 
-        document()->createConstruction(data());
+        document()->createConstruction(data(), 0);
       aConstr1->setShape(aCenterPointShape);
       aConstr1->setIsInHistory(false);
       setResult(aConstr1, 0);
@@ -64,7 +64,7 @@ void SketchPlugin_Circle::execute()
                                 GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, aRadius);
         aShapes.push_back(aCircleShape);
         boost::shared_ptr<ModelAPI_ResultConstruction> aConstr2 = 
-          document()->createConstruction(data());
+          document()->createConstruction(data(), 1);
         aConstr2->setShape(aCircleShape);
         aConstr2->setIsInHistory(false);
         setResult(aConstr2, 1);
