@@ -52,6 +52,7 @@ aDocument.finishOperation()
 #=========================================================================
 aDocument.startOperation()
 aCoincidenceConstraint = aDocument.addFeature("SketchConstraintLength")
+aSketchReflist.append(aCoincidenceConstraint)
 aConstraintData = aCoincidenceConstraint.data()
 aLength = aConstraintData.real("ConstraintValue")
 refattrA = aConstraintData.refattr("ConstraintEntityA")
@@ -78,10 +79,10 @@ aDocument.startOperation()
 aLineAStartPoint.setValue(aLineAStartPoint.x() + deltaX,
                           aLineAStartPoint.y())
 aDocument.finishOperation()
-assert (aLineAStartPoint.x() == 40)
-assert (aLineAStartPoint.y() == 25)
-assert (aLineAEndPoint.x() == 140)
-assert (aLineAEndPoint.y() == 25)
+assert (aLineAEndPoint.x() - aLineAStartPoint.x() == 100)
+#assert (aLineAStartPoint.y() == 25)
+#assert (aLineAEndPoint.x() == 140)
+#assert (aLineAEndPoint.y() == 25)
 #=========================================================================
 # TODO: improve test
 # 1. remove constraint, move line's start point to

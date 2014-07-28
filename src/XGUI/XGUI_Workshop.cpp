@@ -309,7 +309,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const ModelAPI_ObjectUpdatedMessage* t
   std::set<ObjectPtr>::const_iterator aIt;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
-    if (!aObj->data() )
+    if (!aObj->data() || !aObj->data()->isValid())
       myDisplayer->erase(aObj, false);
     else {
       if (myDisplayer->isVisible(aObj)) // TODO VSV: Correction sketch drawing
