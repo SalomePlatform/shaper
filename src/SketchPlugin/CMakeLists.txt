@@ -62,4 +62,6 @@ INSTALL(TARGETS SketchPlugin DESTINATION plugins)
 INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
 
 ADD_UNIT_TESTS(TestSketchPointLine.py
-               TestSketchArcCircle.py)
+               TestSketchArcCircle.py
+               TestConstraintConcidence.py
+               TestConstraintLength.py)
