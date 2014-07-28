@@ -70,8 +70,9 @@ aDocument.finishOperation()
 # Link arc's end and line's start points with concidence constraint
 #=========================================================================
 aDocument.startOperation()
-aCoincidenceConstraint = aDocument.addFeature("SketchConstraintCoincidence")
-aConstraintData = aCoincidenceConstraint.data()
+aConstraint = aDocument.addFeature("SketchConstraintCoincidence")
+aSketchReflist.append(aConstraint)
+aConstraintData = aConstraint.data()
 reflistA = aConstraintData.refattr("ConstraintEntityA")
 reflistB = aConstraintData.refattr("ConstraintEntityB")
 reflistA.setAttr(anArcEndPoint)
@@ -93,10 +94,8 @@ aLineEndPoint.setValue(aLineEndPoint.x() + deltaX,
                        aLineEndPoint.y() + deltaY)
 aDocument.finishOperation()
 # check that arc's points are moved also
-print ("assert anArcEndPoint.x() == %d" % anArcEndPoint.x())
-print ("assert anArcEndPoint.y() == %d" % anArcEndPoint.y())
-print ("assert aLineStartPoint.x() == %d" % aLineStartPoint.x())
-print ("assert aLineStartPoint.y() == %d" % aLineStartPoint.y())
+assert (anArcEndPoint.x() == aLineStartPoint.x())
+assert (anArcEndPoint.y() == aLineStartPoint.y())
 #=========================================================================
 # TODO: improve test
 # 1. remove constraint, move line to check that constraint are not applied

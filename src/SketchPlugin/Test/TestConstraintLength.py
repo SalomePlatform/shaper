@@ -51,8 +51,9 @@ aDocument.finishOperation()
 # Make a constraint to keep the length
 #=========================================================================
 aDocument.startOperation()
-aCoincidenceConstraint = aDocument.addFeature("SketchConstraintLength")
-aConstraintData = aCoincidenceConstraint.data()
+aConstraint = aDocument.addFeature("SketchConstraintLength")
+aSketchReflist.append(aConstraint)
+aConstraintData = aConstraint.data()
 aLength = aConstraintData.real("ConstraintValue")
 refattrA = aConstraintData.refattr("ConstraintEntityA")
 assert (not aLength.isInitialized())
@@ -78,10 +79,10 @@ aDocument.startOperation()
 aLineAStartPoint.setValue(aLineAStartPoint.x() + deltaX,
                           aLineAStartPoint.y())
 aDocument.finishOperation()
-assert (aLineAStartPoint.x() == 40)
 assert (aLineAStartPoint.y() == 25)
-assert (aLineAEndPoint.x() == 140)
 assert (aLineAEndPoint.y() == 25)
+# length of the line is the same
+assert (aLineAEndPoint.x() - aLineAStartPoint.x() == 100)
 #=========================================================================
 # TODO: improve test
 # 1. remove constraint, move line's start point to
