@@ -723,7 +723,7 @@ boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstructio
   }
   if (!aResult) {
     aResult = boost::shared_ptr<ModelAPI_ResultConstruction>(new Model_ResultConstruction);
-    storeResult(theFeatureData, aResult);
+    storeResult(theFeatureData, aResult, theIndex);
   }
   return aResult;
 }
@@ -739,7 +739,7 @@ boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody(
   }
   if (!aResult) {
     aResult = boost::shared_ptr<ModelAPI_ResultBody>(new Model_ResultBody);
-    storeResult(theFeatureData, aResult);
+    storeResult(theFeatureData, aResult, theIndex);
   }
   return aResult;
 }
@@ -755,7 +755,7 @@ boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
   }
   if (!aResult) {
     aResult = boost::shared_ptr<ModelAPI_ResultPart>(new Model_ResultPart);
-    storeResult(theFeatureData, aResult);
+    storeResult(theFeatureData, aResult, theIndex);
   }
   return aResult;
 }
