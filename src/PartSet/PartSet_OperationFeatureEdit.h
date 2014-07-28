@@ -106,6 +106,11 @@ public:
   virtual void mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
                                 const std::list<ModuleBase_ViewerPrs>& theSelected,
                                 const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+
+  /// Processes the key pressed in the view
+  /// \param theKey a key value
+  virtual void keyReleased(const int theKey);
+
 protected:
   /// \brief Virtual method called when operation is started
   /// Virtual method called when operation started (see start() method for more description)
