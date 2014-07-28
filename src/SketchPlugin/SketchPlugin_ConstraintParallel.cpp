@@ -63,10 +63,10 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintParallel::getAISObje
   boost::shared_ptr<GeomAPI_Pln> aPlane = sketch()->plane();
   boost::shared_ptr<GeomAPI_Shape> aLine1, aLine2;
   boost::shared_ptr<ModelAPI_ResultConstruction> aConst1 = 
-    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aLine1Feature->firstResult());
+    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anAttr1->object());
   if (aConst1) aLine1 = aConst1->shape();
   boost::shared_ptr<ModelAPI_ResultConstruction> aConst2 = 
-    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aLine1Feature->firstResult());
+    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anAttr2->object());
   if (aConst2) aLine2 = aConst2->shape();
 
   boost::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
