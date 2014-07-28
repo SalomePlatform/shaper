@@ -48,7 +48,13 @@ void SketchPlugin_Arc::execute()
         aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
       // make a visible point
       boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
-      aShapes.push_back(aCenterPointShape);
+      //aShapes.push_back(aCenterPointShape);
+      boost::shared_ptr<ModelAPI_ResultConstruction> aConstr1 = 
+        document()->createConstruction(data(), 0);
+      aConstr1->setShape(aCenterPointShape);
+      aConstr1->setIsInHistory(false);
+      setResult(aConstr1, 0);
+
 
       // make a visible circle
       boost::shared_ptr<GeomDataAPI_Dir> aNDir = 
@@ -75,9 +81,16 @@ void SketchPlugin_Arc::execute()
 
         boost::shared_ptr<GeomAPI_Shape> aCircleShape = 
                    GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStartPoint, aEndPoint, aNormal);
-        if (aCircleShape)
-          aShapes.push_back(aCircleShape);
+        if (aCircleShape) {
+          boost::shared_ptr<ModelAPI_ResultConstruction> aConstr2 = 
+            document()->createConstruction(data(), 1);
+          aConstr2->setShape(aCircleShape);
+          aConstr2->setIsInHistory(false);
+          setResult(aConstr2, 1);
+          //aShapes.push_back(aCircleShape);
+        }
       }
+      /*
       boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
       // store the result
       boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
@@ -85,6 +98,7 @@ void SketchPlugin_Arc::execute()
       aConstr->setShape(aCompound);
       aConstr->setIsInHistory(false);
       setResult(aConstr);
+      */
     }
   }
 }
