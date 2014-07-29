@@ -52,7 +52,9 @@ private:
     ParamsFolder,
     ParamObject,
     ConstructFolder,
-    ConstructObject
+    ConstructObject,
+    BodiesFolder,
+    BodiesObject
   };
 
 };

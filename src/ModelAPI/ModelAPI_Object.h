@@ -32,7 +32,7 @@ public:
   /// Returns the data manager of this object: attributes
   virtual boost::shared_ptr<ModelAPI_Data> data() {return myData;}
 
-  /// Returns true if feature refers to the same data model instance
+  /// Returns true if object refers to the same data model instance
   virtual bool isSame(const boost::shared_ptr<ModelAPI_Object>& theObject)
     {return theObject.get() == this;}
 

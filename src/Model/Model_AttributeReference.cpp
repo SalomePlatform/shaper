@@ -15,20 +15,14 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
   if (!myIsInitialized || value() != theObject) {
     boost::shared_ptr<Model_Data> aData = 
       boost::dynamic_pointer_cast<Model_Data>(theObject->data());
-    if (myRef.IsNull()) {
-      boost::shared_ptr<Model_Data> aMyData = 
-        boost::dynamic_pointer_cast<Model_Data>(owner()->data());
-      myRef = TDF_Reference::Set(aMyData->label(), aData->label().Father());
-    } else {
-      myRef->Set(aData->label());
-    }
+    myRef->Set(aData->label().Father()); // references to the feature label
     owner()->data()->sendAttributeUpdated(this);
   }
 }
 
 ObjectPtr Model_AttributeReference::value()
 {
-  if (!myRef.IsNull()) {
+  if (myIsInitialized) {
     boost::shared_ptr<Model_Document> aDoc = 
       boost::dynamic_pointer_cast<Model_Document>(owner()->document());
     if (aDoc) {
@@ -42,6 +36,7 @@ ObjectPtr Model_AttributeReference::value()
 
 Model_AttributeReference::Model_AttributeReference(TDF_Label& theLabel)
 {
-  // not initialized by value yet: attribute is not set to the label!
   myIsInitialized = theLabel.FindAttribute(TDF_Reference::GetID(), myRef) == Standard_True;
+  if (!myIsInitialized)
+    myRef = TDF_Reference::Set(theLabel, theLabel); // not initialized references to itself
 }

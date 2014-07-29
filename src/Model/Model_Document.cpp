@@ -214,7 +214,7 @@ void Model_Document::startOperation()
     myIsEmptyTr[myTransactionsAfterSave] = false;
     myTransactionsAfterSave++;
     myDoc->NewCommand();
-  } else { // start of simple command
+  } else { // start the simple command
     myDoc->NewCommand();
   }
   // new command for all subs
@@ -224,12 +224,16 @@ void Model_Document::startOperation()
 }
 
 void Model_Document::compactNested() {
+  bool allWasEmpty = true;
   while(myNestedNum != -1) {
     myTransactionsAfterSave--;
+    if (!myIsEmptyTr[myTransactionsAfterSave]) {
+      allWasEmpty = false;
+    }
     myIsEmptyTr.erase(myTransactionsAfterSave);
     myNestedNum--;
   }
-  myIsEmptyTr[myTransactionsAfterSave] = false;
+  myIsEmptyTr[myTransactionsAfterSave] = allWasEmpty;
   myTransactionsAfterSave++;
   myDoc->PerformDeltaCompaction();
 }
@@ -258,7 +262,7 @@ void Model_Document::finishOperation()
     }
   } else {
     // returns false if delta is empty and no transaction was made
-    myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand() && (myNestedNum == -1);
+    myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();// && (myNestedNum == -1);
     myTransactionsAfterSave++;
   }
 
@@ -681,10 +685,12 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
       for(; aRIter != aResults.cend(); aRIter++) {
         boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-        aRes->setData(boost::shared_ptr<ModelAPI_Data>()); // deleted flag
+        //aRes->setData(boost::shared_ptr<ModelAPI_Data>()); // deleted flag
         ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
         ModelAPI_EventCreator::get()->sendDeleted(aThis, aRes->groupName());
       }
+      // redisplay also removed feature (used for sketch and AISObject)
+      ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
     } else aFIter.Next();
   }
 
@@ -695,6 +701,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   if (theMarkUpdated)
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
     setCheckTransactions(true);
 }

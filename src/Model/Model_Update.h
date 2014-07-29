@@ -24,6 +24,8 @@ class Model_Update : public Events_Listener
   std::set<boost::shared_ptr<ModelAPI_Object> > myInitial;
   ///< already updated and processed features and modificated feature flag
   std::map<boost::shared_ptr<ModelAPI_Object>, bool> myUpdated;
+  ///< to know that all next updates are caused by this execution
+  bool isExecuted;
 public:
   /// Is called only once, on startup of the application
   Model_Update();

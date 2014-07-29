@@ -30,12 +30,14 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
-#include <ModelAPI_ResultPart.h>
+#include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <PartSetPlugin_Part.h>
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
+#include <Events_LongOp.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Operation.h>
@@ -135,6 +137,7 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  aLoop->registerListener(this, Events_Loop::eventByName("LongOperation"));
 
   registerValidators();
   activateModule();
@@ -223,8 +226,7 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 {
   //A message to start feature creation received.
-  static Events_ID aFeatureLoadedId = Events_Loop::loop()->eventByName(EVENT_FEATURE_LOADED);
-  if (theMessage->eventID() == aFeatureLoadedId) {
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_LOADED)) {
     const Config_FeatureMessage* aFeatureMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
     if(!aFeatureMsg->isInternal()) {
       addFeature(aFeatureMsg);
@@ -259,6 +261,14 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     const ModelAPI_ObjectDeletedMessage* aDelMsg =
         dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
     onObjectDeletedMsg(aDelMsg);
+    return;
+  }
+
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName("LongOperation")) {
+    if (Events_LongOp::isPerformed())
+      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    else
+      QApplication::restoreOverrideCursor();
     return;
   }
 
@@ -309,7 +319,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const ModelAPI_ObjectUpdatedMessage* t
   std::set<ObjectPtr>::const_iterator aIt;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
-    if (!aObj->data() )
+    if (!aObj->data() || !aObj->data()->isValid())
       myDisplayer->erase(aObj, false);
     else {
       if (myDisplayer->isVisible(aObj)) // TODO VSV: Correction sketch drawing
@@ -568,8 +578,9 @@ void XGUI_Workshop::onOpen()
   }
   QApplication::setOverrideCursor(Qt::WaitCursor);
   aDoc->load(myCurrentDir.toLatin1().constData());
-  updateCommandStatus();
   myObjectBrowser->rebuildDataTree();
+  displayAllResults();
+  updateCommandStatus();
   QApplication::restoreOverrideCursor();
 }
 
@@ -1023,4 +1034,33 @@ void XGUI_Workshop::registerValidators() const
   aFactory->registerValidator("ModuleBase_ResulPointValidator", new ModuleBase_ResulPointValidator);
   aFactory->registerValidator("ModuleBase_ResulLineValidator", new ModuleBase_ResulLineValidator);
   aFactory->registerValidator("ModuleBase_ResulArcValidator", new ModuleBase_ResulArcValidator);
+}
+
+
+//**************************************************************
+void XGUI_Workshop::displayAllResults()
+{
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  DocumentPtr aRootDoc = aMgr->rootDocument();
+  displayDocumentResults(aRootDoc);
+  for (int i = 0; i < aRootDoc->size(ModelAPI_ResultPart::group()); i++) {
+    ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), i);
+    ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+    displayDocumentResults(aPart->partDoc());
+  }
+  myDisplayer->updateViewer();
+}
+
+//**************************************************************
+void XGUI_Workshop::displayDocumentResults(DocumentPtr theDoc)
+{
+  displayGroupResults(theDoc, ModelAPI_ResultConstruction::group());
+  displayGroupResults(theDoc, ModelAPI_ResultBody::group());
+}
+
+//**************************************************************
+void XGUI_Workshop::displayGroupResults(DocumentPtr theDoc, std::string theGroup)
+{
+  for (int i = 0; i < theDoc->size(theGroup); i++)
+    myDisplayer->display(theDoc->object(theGroup, i), false);
 }

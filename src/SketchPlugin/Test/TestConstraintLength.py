@@ -51,9 +51,9 @@ aDocument.finishOperation()
 # Make a constraint to keep the length
 #=========================================================================
 aDocument.startOperation()
-aConstraint = aDocument.addFeature("SketchConstraintLength")
-aSketchReflist.append(aConstraint)
-aConstraintData = aConstraint.data()
+aCoincidenceConstraint = aDocument.addFeature("SketchConstraintLength")
+aSketchReflist.append(aCoincidenceConstraint)
+aConstraintData = aCoincidenceConstraint.data()
 aLength = aConstraintData.real("ConstraintValue")
 refattrA = aConstraintData.refattr("ConstraintEntityA")
 assert (not aLength.isInitialized())

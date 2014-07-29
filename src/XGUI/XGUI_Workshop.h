@@ -6,6 +6,7 @@
 #include <Events_Listener.h>
 #include <ModuleBase_Definitions.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Document.h>
 
 #include <QObject>
 #include <QMap>
@@ -160,6 +161,10 @@ protected:
   void onObjectDeletedMsg(const ModelAPI_ObjectDeletedMessage* theMsg);
 
   QList<QAction*> getModuleCommands() const;
+
+  void displayAllResults();
+  void displayDocumentResults(DocumentPtr theDoc);
+  void displayGroupResults(DocumentPtr theDoc, std::string theGroup);
 
 protected slots:
   /// SLOT, that is called after the operation is started. Update workshop state according to

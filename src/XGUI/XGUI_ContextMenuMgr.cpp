@@ -161,8 +161,8 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   QList<ObjectPtr> aObjects = aSelMgr->selection()->selectedObjects();
   if (aObjects.size() > 0) {
-    if (aObjects.size() == 1)
-      theMenu->addAction(action("EDIT_CMD"));
+    //if (aObjects.size() == 1)
+    //  theMenu->addAction(action("EDIT_CMD"));
     bool isVisible = false;
     foreach(ObjectPtr aObject, aObjects) {
       ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
@@ -175,7 +175,7 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
       theMenu->addAction(action("HIDE_CMD"));
     else 
       theMenu->addAction(action("SHOW_CMD"));
-    theMenu->addAction(action("DELETE_CMD"));
+    //theMenu->addAction(action("DELETE_CMD"));
   }
   if (!myWorkshop->isSalomeMode()) {
     QMdiArea* aMDI = myWorkshop->mainWindow()->mdiArea();
