@@ -179,6 +179,8 @@ protected slots:
 
   void onWidgetValuesChanged();
 
+  void onStartWaiting();
+
 private:
   void initMenu();
 

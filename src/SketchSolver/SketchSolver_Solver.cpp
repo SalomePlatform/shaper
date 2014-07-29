@@ -3,6 +3,7 @@
 // Author:  Artem ZHIDKOV
 
 #include "SketchSolver_Solver.h"
+#include <Events_LongOp.h>
 
 SketchSolver_Solver::SketchSolver_Solver()
 {
@@ -111,7 +112,9 @@ int SketchSolver_Solver::solve()
   if (myEquationsSystem.constraints <= 0)
     return SLVS_RESULT_EMPTY_SET;
 
+  Events_LongOp::start(this);
   Slvs_Solve(&myEquationsSystem, myGroupID);
+  Events_LongOp::end(this);
 
   return myEquationsSystem.result;
 }

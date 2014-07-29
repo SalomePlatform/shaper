@@ -17,7 +17,7 @@ class EVENTS_EXPORT Events_LongOp: public Events_Message
 public:
   virtual ~Events_LongOp();
   /// Returns the identifier of this event
-  static Events_ID errorID();
+  static Events_ID eventID();
   /// Starts the long operation
   static void start(void* theSender = 0);
   /// Stops the long operation

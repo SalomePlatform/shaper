@@ -264,10 +264,11 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     return;
   }
 
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName("LongOperation")) {
+  if (theMessage->eventID() == Events_LongOp::eventID()) {
     if (Events_LongOp::isPerformed())
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    else
+      //QTimer::singleShot(10, this, SLOT(onStartWaiting()));
+    else 
       QApplication::restoreOverrideCursor();
     return;
   }
@@ -291,6 +292,14 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
   if (anAppError) {
     emit errorOccurred(QString::fromLatin1(anAppError->description()));
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onStartWaiting()
+{
+  if (Events_LongOp::isPerformed()) {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
   }
 }
 

@@ -10,7 +10,7 @@
 std::map<void*, int> MY_SENDERS;
 
 Events_LongOp::Events_LongOp(void* theSender)
- : Events_Message(Events_LongOp::errorID(), theSender)
+ : Events_Message(Events_LongOp::eventID(), theSender)
 {
 }
 
@@ -18,7 +18,7 @@ Events_LongOp::~Events_LongOp()
 {
 }
 
-Events_ID Events_LongOp::errorID()
+Events_ID Events_LongOp::eventID()
 {
   Events_Loop* aLoop = Events_Loop::loop();
   return aLoop->eventByName("LongOperation");
@@ -33,8 +33,8 @@ void Events_LongOp::start(void* theSender)
     MY_SENDERS[theSender]++;
 
   if (toSend) {
-    Events_LongOp anError(theSender);
-    Events_Loop::loop()->send(anError);
+    Events_LongOp anEvent(theSender);
+    Events_Loop::loop()->send(anEvent);
   }
 }
 
@@ -46,8 +46,8 @@ void Events_LongOp::end(void* theSender)
     else MY_SENDERS[theSender] = aCount - 1;
   }
   if (MY_SENDERS.empty()) {
-    Events_LongOp anError(theSender);
-    Events_Loop::loop()->send(anError);
+    Events_LongOp anEvent(theSender);
+    Events_Loop::loop()->send(anEvent);
   }
 }
 
