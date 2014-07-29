@@ -1,21 +1,42 @@
 """
-    TestConstraintLength.py
-    Unit test of SketchPlugin_ConstraintLength class
+    TestConstraintDistance.py
+    Unit test of SketchPlugin_ConstraintDistance class
+    
+    SketchPlugin_Constraint
+        static const std::string MY_CONSTRAINT_VALUE("ConstraintValue");
+        static const std::string MY_FLYOUT_VALUE_PNT("ConstraintFlyoutValuePnt");
+        static const std::string MY_ENTITY_A("ConstraintEntityA");
+        static const std::string MY_ENTITY_B("ConstraintEntityB");
+        static const std::string MY_ENTITY_C("ConstraintEntityC");
+        static const std::string MY_ENTITY_D("ConstraintEntityD");
         
-    SketchPlugin_ConstraintLength
-        static const std::string MY_CONSTRAINT_LENGTH_ID("SketchConstraintLength");
+    SketchPlugin_ConstraintDistance
+        static const std::string MY_CONSTRAINT_DISTANCE_ID("SketchConstraintDistance");
         data()->addAttribute(SketchPlugin_Constraint::VALUE(),    ModelAPI_AttributeDouble::type());
         data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::type());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
-
+        data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::type());
+        
+    
 """
 from GeomDataAPI import *
 from ModelAPI import *
+import math
 #=========================================================================
 # Initialization of the test
 #=========================================================================
 
 __updated__ = "2014-07-29"
+
+
+def distance(pointA, pointB):
+    """
+    subroutine to calculate distance between two points
+    result of calculated distance is has 10**-5 precision
+    """
+    xdiff = math.pow((pointA.x() - pointB.x()), 2)
+    ydiff = math.pow((pointA.y() - pointB.y()), 2)
+    return round(math.sqrt(xdiff + ydiff), 5)
 
 aPluginManager = ModelAPI_PluginManager.get()
 aDocument = aPluginManager.rootDocument()
@@ -35,58 +56,63 @@ norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 norm.setValue(0, 0, 1)
 aDocument.finishOperation()
 #=========================================================================
-# Create a line with length 100
+# Create a point and a line
 #=========================================================================
 aDocument.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
-aSketchLineA = aDocument.addFeature("SketchLine")
-aSketchReflist.append(aSketchLineA)
+aSketchPoint = aDocument.addFeature("SketchPoint")
+aSketchReflist.append(aSketchPoint)
+aSketchPointData = aSketchPoint.data()
+aSketchPointCoords = geomDataAPI_Point2D(
+    aSketchPointData.attribute("PointCoordindates"))
+aSketchPointCoords.setValue(50., 50.)
+aSketchLine = aDocument.addFeature("SketchLine")
+aSketchReflist.append(aSketchLine)
 aLineAStartPoint = geomDataAPI_Point2D(
-    aSketchLineA.data().attribute("StartPoint"))
-aLineAEndPoint = geomDataAPI_Point2D(aSketchLineA.data().attribute("EndPoint"))
+    aSketchLine.data().attribute("StartPoint"))
+aLineAEndPoint = geomDataAPI_Point2D(aSketchLine.data().attribute("EndPoint"))
 aLineAStartPoint.setValue(0., 25.)
 aLineAEndPoint.setValue(100., 25.)
 aDocument.finishOperation()
 #=========================================================================
-# Make a constraint to keep the length
+# Make a constraint to keep the distance
 #=========================================================================
+assert (distance(aSketchPointCoords, aLineAStartPoint) != 25.)
 aDocument.startOperation()
-aConstraint = aDocument.addFeature("SketchConstraintLength")
+aConstraint = aDocument.addFeature("SketchConstraintDistance")
 aSketchReflist.append(aConstraint)
 aConstraintData = aConstraint.data()
-aLength = aConstraintData.real("ConstraintValue")
+aDistance = aConstraintData.real("ConstraintValue")
 refattrA = aConstraintData.refattr("ConstraintEntityA")
-assert (not aLength.isInitialized())
+refattrB = aConstraintData.refattr("ConstraintEntityB")
+assert (not aDistance.isInitialized())
 assert (not refattrA.isInitialized())
-# aLength.setValue(100.)
-# refattrA.setObject(aSketchLineA)
-aResult = aSketchLineA.firstResult()
-assert (aResult is not None)
-refattrA.setObject(modelAPI_ResultConstruction(aResult))
+assert (not refattrB.isInitialized())
+aDistance.setValue(25.)
+aLineResult = aSketchLine.firstResult()
+assert (aLineResult is not None)
+refattrA.setAttr(aSketchPointCoords)
+refattrB.setAttr(aLineAStartPoint)
 aDocument.finishOperation()
-assert (aLength.isInitialized())
+assert (aDistance.isInitialized())
 assert (refattrA.isInitialized())
+assert (refattrB.isInitialized())
 #=========================================================================
-# Check values and move one constrainted object
+# Move line, check that distance is constant
 #=========================================================================
-deltaX = 40.
-# move start point, check that end point are moved also
-assert (aLineAStartPoint.x() == 0)
-assert (aLineAStartPoint.y() == 25)
-assert (aLineAEndPoint.x() == 100)
-assert (aLineAEndPoint.y() == 25)
+assert (distance(aSketchPointCoords, aLineAStartPoint) == 25.)
 aDocument.startOperation()
-aLineAStartPoint.setValue(aLineAStartPoint.x() + deltaX,
-                          aLineAStartPoint.y())
+aLineAStartPoint.setValue(0., 40.)
+aLineAEndPoint.setValue(100., 40.)
 aDocument.finishOperation()
-assert (aLineAStartPoint.y() == 25)
-assert (aLineAEndPoint.y() == 25)
-# length of the line is the same
-assert (aLineAEndPoint.x() - aLineAStartPoint.x() == 100)
+assert (distance(aSketchPointCoords, aLineAStartPoint) == 25.)
 #=========================================================================
 # TODO: improve test
 # 1. remove constraint, move line's start point to
 #    check that constraint are not applied
+# 2. check constrained distance between:
+#    * point and line
+#    * two lines
 #=========================================================================
 #=========================================================================
 # End of test

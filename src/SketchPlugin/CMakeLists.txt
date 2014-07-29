@@ -64,4 +64,8 @@ INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
 ADD_UNIT_TESTS(TestSketchPointLine.py
                TestSketchArcCircle.py
                TestConstraintConcidence.py
-               TestConstraintLength.py)
+               TestConstraintLength.py
+               TestConstraintDistance.py
+               TestConstraintParallel.py
+               TestConstraintPerpendicular.py
+               TestConstraintRadius.py)
