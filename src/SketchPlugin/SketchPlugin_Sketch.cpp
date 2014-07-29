@@ -61,12 +61,19 @@ void SketchPlugin_Sketch::execute()
   std::list< boost::shared_ptr<GeomAPI_Shape> > aFeaturesPreview;
   for (; anIt != aLast; anIt++) {
     aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
-    boost::shared_ptr<ModelAPI_ResultConstruction> aRes = 
-      boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFeature->firstResult());
-    if (aRes) {
-      boost::shared_ptr<GeomAPI_Shape> aShape = aRes->shape();
-      if (aShape)
-        aFeaturesPreview.push_back(aShape);
+    if (aFeature) {
+
+      const std::list<boost::shared_ptr<ModelAPI_Result> >& aRes = aFeature->results();
+      std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = aRes.cbegin();
+      for(; aResIter != aRes.cend(); aResIter++) {
+        boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
+          boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aResIter);
+        if (aConstr) {
+          boost::shared_ptr<GeomAPI_Shape> aShape = aConstr->shape();
+          if (aShape)
+            aFeaturesPreview.push_back(aShape);
+        }
+      }
     }
   }
 
