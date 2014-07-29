@@ -285,8 +285,7 @@ void PartSet_Module::onLaunchOperation(std::string theName, ObjectPtr theObject)
   ModuleBase_Operation* anOperation = createOperation(theName.c_str(),
                                                       aFeature ? aFeature->getKind() : "");
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp)
-  {
+  if (aPreviewOp) {
     XGUI_Selection* aSelection = myWorkshop->selector()->selection();
     // Initialise operation with preliminary selection
     std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
@@ -523,8 +522,14 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
   if (!aFeature || aFeature->getKind() != theCmdId)
     return;
 
-  std::list<FeaturePtr> aList = aPreviewOp->subFeatures();
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  // Hide result of sketch
+  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr>::const_iterator aIt;
+  for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt)
+    aDisplayer->erase(*aIt, false);
+
+  std::list<FeaturePtr> aList = aPreviewOp->subFeatures();
   std::list<int> aModes = aPreviewOp->getSelectionModes(aPreviewOp->feature());
 
   std::list<FeaturePtr>::const_iterator anIt = aList.begin(), 
