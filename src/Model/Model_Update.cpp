@@ -24,6 +24,8 @@ Model_Update::Model_Update()
 
 void Model_Update::processEvent(const Events_Message* theMessage)
 {
+  if (isExecuted) return; // nothing to do: it is executed now
+  isExecuted = true;
   const ModelAPI_ObjectUpdatedMessage* aMsg = 
     dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
   myInitial = aMsg->objects();
@@ -48,6 +50,7 @@ void Model_Update::processEvent(const Events_Message* theMessage)
   // flush
   static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   Events_Loop::loop()->flush(EVENT_DISP);
+  isExecuted = false;
 }
 
 bool Model_Update::updateFeature(FeaturePtr theFeature)
