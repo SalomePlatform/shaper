@@ -30,7 +30,8 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
-#include <ModelAPI_ResultPart.h>
+#include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <PartSetPlugin_Part.h>
 
@@ -568,8 +569,9 @@ void XGUI_Workshop::onOpen()
   }
   QApplication::setOverrideCursor(Qt::WaitCursor);
   aDoc->load(myCurrentDir.toLatin1().constData());
-  updateCommandStatus();
   myObjectBrowser->rebuildDataTree();
+  displayAllResults();
+  updateCommandStatus();
   QApplication::restoreOverrideCursor();
 }
 
@@ -1023,4 +1025,33 @@ void XGUI_Workshop::registerValidators() const
   aFactory->registerValidator("ModuleBase_ResulPointValidator", new ModuleBase_ResulPointValidator);
   aFactory->registerValidator("ModuleBase_ResulLineValidator", new ModuleBase_ResulLineValidator);
   aFactory->registerValidator("ModuleBase_ResulArcValidator", new ModuleBase_ResulArcValidator);
+}
+
+
+//**************************************************************
+void XGUI_Workshop::displayAllResults()
+{
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  DocumentPtr aRootDoc = aMgr->rootDocument();
+  displayDocumentResults(aRootDoc);
+  for (int i = 0; i < aRootDoc->size(ModelAPI_ResultPart::group()); i++) {
+    ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), i);
+    ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+    displayDocumentResults(aPart->partDoc());
+  }
+  myDisplayer->updateViewer();
+}
+
+//**************************************************************
+void XGUI_Workshop::displayDocumentResults(DocumentPtr theDoc)
+{
+  displayGroupResults(theDoc, ModelAPI_ResultConstruction::group());
+  displayGroupResults(theDoc, ModelAPI_ResultBody::group());
+}
+
+//**************************************************************
+void XGUI_Workshop::displayGroupResults(DocumentPtr theDoc, std::string theGroup)
+{
+  for (int i = 0; i < theDoc->size(theGroup); i++)
+    myDisplayer->display(theDoc->object(theGroup, i), false);
 }
