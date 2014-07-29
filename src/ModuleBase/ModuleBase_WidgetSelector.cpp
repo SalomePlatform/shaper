@@ -104,6 +104,10 @@ ModuleBase_WidgetSelector::~ModuleBase_WidgetSelector()
 //********************************************************************
 bool ModuleBase_WidgetSelector::storeValue(ObjectPtr theObject) const
 {
+  FeaturePtr aSelectedFeature = ModuleBase_Tools::feature(mySelectedObject);
+  if (aSelectedFeature == theObject) // In order to avoid selection of the same object
+    return false;
+
   DataPtr aData = theObject->data();
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
@@ -157,7 +161,7 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
     mySelectedObject = aObject;
     if (mySelectedObject) {
       updateSelectionName();
-      activateSelection(false);
+      myActivateBtn->setChecked(false);
       raisePanel();
     } else {
       myTextLine->setText("");
@@ -207,7 +211,7 @@ bool ModuleBase_WidgetSelector::eventFilter(QObject* theObj, QEvent* theEvent)
 {
   if (theObj == myTextLine) {
     if (theEvent->type() == QEvent::Polish) {
-      activateSelection(myActivateOnStart);
+      myActivateBtn->setChecked(myActivateOnStart);
       onSelectionChanged();
     }
   }

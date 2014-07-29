@@ -188,6 +188,15 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
     XGUI_PropertyPanel* aPropPanel = myWorkshop->propertyPanel();
     //disconnect(aPropPanel, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)),
     //           this, SLOT(onStorePoint2D(ObjectPtr, const std::string&)));
+  } else {
+    // Activate results of current feature for selection
+    FeaturePtr aFeature = theOperation->feature();
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+      aDisplayer->activate(*aIt);
+    }
   }
 }
 
@@ -294,6 +303,13 @@ void PartSet_Module::onLaunchOperation(std::string theName, ObjectPtr theObject)
     aPreviewOp->initSelection(aSelected, aHighlighted);
   } else {
     anOperation->setEditingFeature(aFeature);
+    //Deactivate result of current feature in order to avoid its selection
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+      aDisplayer->deactivate(*aIt);
+    }
   }
   sendOperation(anOperation);
   myWorkshop->actionsMgr()->updateCheckState();

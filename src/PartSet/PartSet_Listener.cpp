@@ -53,7 +53,7 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
     std::set<ObjectPtr > aFeatures = aUpdMsg->objects();
     std::set<ObjectPtr >::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
     for (; anIt != aLast; anIt++) {
-      aDisplayer->deactivate(*anIt, false);
+      aDisplayer->deactivate(*anIt);
       FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
       if (aFeature)
         myModule->activateFeature(aFeature, false);

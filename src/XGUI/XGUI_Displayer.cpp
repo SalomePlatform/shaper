@@ -197,7 +197,7 @@ void XGUI_Displayer::activateInLocalContext(ObjectPtr theResult,
     updateViewer();
 }
 
-void XGUI_Displayer::deactivate(ObjectPtr theObject, bool toUpdate)
+void XGUI_Displayer::deactivate(ObjectPtr theObject)
 {
   if (isVisible(theObject)) {
     Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -205,6 +205,17 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject, bool toUpdate)
      boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[theObject];
      Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
      aContext->Deactivate(anAIS);
+  }
+}
+
+void XGUI_Displayer::activate(ObjectPtr theObject)
+{
+  if (isVisible(theObject)) {
+    Handle(AIS_InteractiveContext) aContext = AISContext();
+
+     boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[theObject];
+     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
+     aContext->Activate(anAIS);
   }
 }
 
