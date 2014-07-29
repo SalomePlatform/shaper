@@ -26,14 +26,16 @@ Events_ID Events_LongOp::errorID()
 
 void Events_LongOp::start(void* theSender)
 {
-  if (MY_SENDERS.empty()) {
-    Events_LongOp anError(theSender);
-    Events_Loop::loop()->send(anError);
-  }
+  bool toSend = MY_SENDERS.empty();
   if (MY_SENDERS.find(theSender) == MY_SENDERS.end())
     MY_SENDERS[theSender] = 1;
   else 
     MY_SENDERS[theSender]++;
+
+  if (toSend) {
+    Events_LongOp anError(theSender);
+    Events_Loop::loop()->send(anError);
+  }
 }
 
 void Events_LongOp::end(void* theSender)
