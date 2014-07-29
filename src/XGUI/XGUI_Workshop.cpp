@@ -37,6 +37,7 @@
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
+#include <Events_LongOp.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Operation.h>
@@ -136,6 +137,7 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  aLoop->registerListener(this, Events_Loop::eventByName("LongOperation"));
 
   registerValidators();
   activateModule();
@@ -224,8 +226,7 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 {
   //A message to start feature creation received.
-  static Events_ID aFeatureLoadedId = Events_Loop::loop()->eventByName(EVENT_FEATURE_LOADED);
-  if (theMessage->eventID() == aFeatureLoadedId) {
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_LOADED)) {
     const Config_FeatureMessage* aFeatureMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
     if(!aFeatureMsg->isInternal()) {
       addFeature(aFeatureMsg);
@@ -260,6 +261,14 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     const ModelAPI_ObjectDeletedMessage* aDelMsg =
         dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
     onObjectDeletedMsg(aDelMsg);
+    return;
+  }
+
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName("LongOperation")) {
+    if (Events_LongOp::isPerformed())
+      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    else
+      QApplication::restoreOverrideCursor();
     return;
   }
 

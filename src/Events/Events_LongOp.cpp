@@ -48,3 +48,8 @@ void Events_LongOp::end(void* theSender)
     Events_Loop::loop()->send(anError);
   }
 }
+
+bool Events_LongOp::isPerformed()
+{
+  return !MY_SENDERS.empty();
+}
