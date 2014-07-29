@@ -644,6 +644,11 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       FeaturePtr aNewObj = ModelAPI_PluginManager::get()->createFeature(
         TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
         .ToCString());
+      if (!aNewObj) { // somethig is wrong, most probably, the opened document has invalid structure
+        Events_Error::send("Invalid type of object in the document");
+        aLabIter.Value()->Label().ForgetAllAttributes();
+        continue;
+      }
       // this must be before "setData" to redo the sketch line correctly
       myObjs.Bind(aFeatureLabel, aNewObj);
       aNewFeatures.insert(aNewObj);

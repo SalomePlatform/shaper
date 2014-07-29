@@ -41,7 +41,8 @@ void SketchPlugin_Sketch::execute()
   if (!data()->isValid())
     return ;
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
-    boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
+    boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+    data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
 
   boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
     boost::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
