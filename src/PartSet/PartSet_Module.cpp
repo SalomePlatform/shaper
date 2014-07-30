@@ -369,6 +369,8 @@ void PartSet_Module::onFeatureConstructed(ObjectPtr theFeature, int theMode)
         else
           aDisplayer->erase((*aIt), false);
       }
+      if (!isDisplay)
+        aDisplayer->erase((*aSFIt), false);
     }
   }
   if (isDisplay)
@@ -562,6 +564,7 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
       aDisplayer->activateInLocalContext((*aRIt), aModes, false);
     }
     aDisplayer->display(aSPFeature, false);
+    aDisplayer->activateInLocalContext(aSPFeature, aModes, false);
   }
   aDisplayer->updateViewer();
 }
