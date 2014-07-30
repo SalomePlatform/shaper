@@ -4,6 +4,7 @@
 
 #include "SketchPlugin_ConstraintDistance.h"
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_Circle.h>
 
 #include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
@@ -109,6 +110,9 @@ boost::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
   if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID())
     aPointAttr = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                            (aFeature->data()->attribute(SketchPlugin_Point::COORD_ID()));
+  else if (aFeature && aFeature->getKind() == SketchPlugin_Circle::ID())
+    aPointAttr = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
+                                          (aFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
   else {
     if (anAttr->attr())
       aPointAttr = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->attr());
