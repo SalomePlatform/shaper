@@ -100,6 +100,8 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
         myUpdated[aRes] = true;
         ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
       }
+      // to redisplay "presentable" feature (for ex. distance constraint)
+      ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
     } else { // returns also true is results were updated: for sketch that refers to sub-features but results of sub-features were changed
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
