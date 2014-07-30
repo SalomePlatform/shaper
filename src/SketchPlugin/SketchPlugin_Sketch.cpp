@@ -174,8 +174,7 @@ FeaturePtr SketchPlugin_Sketch::getFeature(ObjectPtr theObject)
   if (!aFeature) {
     ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if (aResult) {
-      PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-      DocumentPtr aDoc = aMgr->rootDocument();
+      DocumentPtr aDoc = aResult->document();
       return aDoc->feature(aResult);
     }
   }
