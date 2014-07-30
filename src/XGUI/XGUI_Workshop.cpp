@@ -1040,9 +1040,9 @@ void XGUI_Workshop::registerValidators() const
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
-  aFactory->registerValidator("ModuleBase_ResulPointValidator", new ModuleBase_ResulPointValidator);
-  aFactory->registerValidator("ModuleBase_ResulLineValidator", new ModuleBase_ResulLineValidator);
-  aFactory->registerValidator("ModuleBase_ResulArcValidator", new ModuleBase_ResulArcValidator);
+  aFactory->registerValidator("ModuleBase_ResultPointValidator", new ModuleBase_ResultPointValidator);
+  aFactory->registerValidator("ModuleBase_ResultLineValidator", new ModuleBase_ResultLineValidator);
+  aFactory->registerValidator("ModuleBase_ResultArcValidator", new ModuleBase_ResultArcValidator);
 }
 
 

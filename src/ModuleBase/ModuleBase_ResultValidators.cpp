@@ -29,7 +29,7 @@ TopoDS_Shape shape(ResultPtr theResult)
 }
 
 
-bool ModuleBase_ResulPointValidator::isValid(const ObjectPtr theObject) const
+bool ModuleBase_ResultPointValidator::isValid(const ObjectPtr theObject) const
 {
   ResultPtr aResult = result(theObject);
   if (!aResult)
@@ -42,7 +42,7 @@ bool ModuleBase_ResulPointValidator::isValid(const ObjectPtr theObject) const
 }
 
 
-bool ModuleBase_ResulLineValidator::isValid(const ObjectPtr theObject) const
+bool ModuleBase_ResultLineValidator::isValid(const ObjectPtr theObject) const
 {
   ResultPtr aResult = result(theObject);
   if (!aResult)
@@ -62,7 +62,7 @@ bool ModuleBase_ResulLineValidator::isValid(const ObjectPtr theObject) const
 }
 
 
-bool ModuleBase_ResulArcValidator::isValid(const ObjectPtr theObject) const
+bool ModuleBase_ResultArcValidator::isValid(const ObjectPtr theObject) const
 {
   ResultPtr aResult = result(theObject);
   if (!aResult)

@@ -15,19 +15,19 @@ public:
   virtual bool isValid(const ObjectPtr theObject) const = 0;
 };
 
-class ModuleBase_ResulPointValidator: public ModuleBase_ResultValidator
+class ModuleBase_ResultPointValidator: public ModuleBase_ResultValidator
 {
 public:
   MODULEBASE_EXPORT virtual bool isValid(const ObjectPtr theObject) const;
 };
 
-class ModuleBase_ResulLineValidator: public ModuleBase_ResultValidator
+class ModuleBase_ResultLineValidator: public ModuleBase_ResultValidator
 {
 public:
   MODULEBASE_EXPORT virtual bool isValid(const ObjectPtr theObject) const;
 };
 
-class ModuleBase_ResulArcValidator: public ModuleBase_ResultValidator
+class ModuleBase_ResultArcValidator: public ModuleBase_ResultValidator
 {
 public:
   MODULEBASE_EXPORT virtual bool isValid(const ObjectPtr theObject) const;

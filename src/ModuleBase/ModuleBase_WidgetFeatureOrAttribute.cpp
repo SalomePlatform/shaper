@@ -6,6 +6,7 @@
 
 #include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_WidgetValue.h>
+#include <ModuleBase_Tools.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -48,33 +49,39 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
                          dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue) {
       boost::shared_ptr<GeomAPI_Pnt2d> aValuePoint = aFeatureValue->point();
-      ObjectPtr aValueFeature = aFeatureValue->object();
-      if (aValueFeature) {
-        isDone = setObject(aValueFeature);
+      ObjectPtr aObject = aFeatureValue->object();
+      if (aObject) {
+        isDone = setObject(aObject);
       }
       if (!isDone && aValuePoint) {
-        // find the given point in the feature attributes
-        std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes =
-                                      aValueFeature->data()->attributes(GeomDataAPI_Point2D::type());
-        std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
-                                                                          aLast = anAttiributes.end();
-        boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;
-        for (;anIt!=aLast && !aFPoint; anIt++) {
-          boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint =
-                                              boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
-          if (aCurPoint && aCurPoint->pnt()->distance(aValuePoint) < Precision::Confusion())
-            aFPoint = aCurPoint;
+        FeaturePtr aFeature = ModuleBase_Tools::feature(aObject);
+        if (aFeature) {
+          // find the given point in the feature attributes
+          std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes =
+                                        aFeature->data()->attributes(GeomDataAPI_Point2D::type());
+          std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
+                                                                            aLast = anAttiributes.end();
+          boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;
+          for (;anIt!=aLast && !aFPoint; anIt++) {
+            boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint =
+                                                boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+            if (aCurPoint && aCurPoint->pnt()->distance(aValuePoint) < Precision::Confusion())
+              aFPoint = aCurPoint;
+          }
+          if (aFPoint)
+            isDone = setAttribute(aFPoint);
         }
-        if (aFPoint)
-          isDone = setAttribute(aFPoint);
       }
     }
   }
   return isDone;
 }
 
-bool ModuleBase_WidgetFeatureOrAttribute::storeValue(FeaturePtr theFeature) const
+bool ModuleBase_WidgetFeatureOrAttribute::storeValue(ObjectPtr theFeature) const
 {
+  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
+  if (!aFeature)
+    return false;
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
@@ -85,19 +92,19 @@ bool ModuleBase_WidgetFeatureOrAttribute::storeValue(FeaturePtr theFeature) cons
   else if (myAttribute)
     aRef->setAttr(myAttribute);
 
-  theFeature->execute();
+  aFeature->execute();
   updateObject(theFeature);
 
   return true;
 }
 
-bool ModuleBase_WidgetFeatureOrAttribute::restoreValue(FeaturePtr theFeature)
+bool ModuleBase_WidgetFeatureOrAttribute::restoreValue(ObjectPtr theFeature)
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
-  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aRef->object());
+  FeaturePtr aFeature = ModuleBase_Tools::feature(aRef->object());
   if (aFeature) {
     setObject(aFeature);
     myAttribute = aRef->attr();
@@ -116,7 +123,7 @@ bool ModuleBase_WidgetFeatureOrAttribute::restoreValue(FeaturePtr theFeature)
 
 bool ModuleBase_WidgetFeatureOrAttribute::setAttribute(const boost::shared_ptr<ModelAPI_Attribute>& theAttribute)
 {
-  if (!theAttribute || !featureKinds().contains(theAttribute->attributeType().c_str()))
+  if (!theAttribute)// || !featureKinds().contains(theAttribute->attributeType().c_str()))
     return false;
 
   myAttribute = theAttribute;
