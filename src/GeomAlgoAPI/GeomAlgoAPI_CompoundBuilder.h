@@ -2,8 +2,8 @@
 // Created:     24 Apr 2014
 // Author:      Natalia ERMOLAEVA
 
-#ifndef GeomAlgoAPI_CompoundBuilder_HeaderFile
-#define GeomAlgoAPI_CompoundBuilder_HeaderFile
+#ifndef GeomAlgoAPI_CompoundBuilder_H_
+#define GeomAlgoAPI_CompoundBuilder_H_
 
 #include <GeomAlgoAPI.h>
 #include <GeomAPI_Shape.h>

@@ -2,8 +2,8 @@
 // Created:     8 May 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef Model_AttributeRefList_HeaderFile
-#define Model_AttributeRefList_HeaderFile
+#ifndef Model_AttributeRefList_H_
+#define Model_AttributeRefList_H_
 
 #include "Model.h"
 #include "ModelAPI_AttributeRefList.h"

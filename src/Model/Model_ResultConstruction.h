@@ -2,8 +2,8 @@
 // Created:     07 Jul 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef Model_ResultConstruction_HeaderFile
-#define Model_ResultConstruction_HeaderFile
+#ifndef Model_ResultConstruction_H_
+#define Model_ResultConstruction_H_
 
 #include "Model.h"
 #include <ModelAPI_ResultConstruction.h>

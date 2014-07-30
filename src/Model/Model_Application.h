@@ -3,8 +3,8 @@
 // Author:      Mikhail PONIKAROV
 // Copyright:   CEA 2011
 
-#ifndef Model_Application_HeaderFile
-#define Model_Application_HeaderFile
+#ifndef Model_Application_H_
+#define Model_Application_H_
 
 #include <Model_Document.h> 
 #include <TDocStd_Application.hxx>

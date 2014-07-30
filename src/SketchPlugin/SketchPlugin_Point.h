@@ -2,8 +2,8 @@
 // Created: 07 May 2014
 // Author:  Artem ZHIDKOV
 
-#ifndef SketchPlugin_Point_HeaderFile
-#define SketchPlugin_Point_HeaderFile
+#ifndef SketchPlugin_Point_H_
+#define SketchPlugin_Point_H_
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Sketch.h>

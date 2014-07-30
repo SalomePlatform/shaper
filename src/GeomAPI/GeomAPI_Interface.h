@@ -2,8 +2,8 @@
 // Created:     23 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomAPI_Interface_HeaderFile
-#define GeomAPI_Interface_HeaderFile
+#ifndef GeomAPI_Interface_H_
+#define GeomAPI_Interface_H_
 
 #include <GeomAPI.h>
 

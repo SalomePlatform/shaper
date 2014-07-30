@@ -2,8 +2,8 @@
 // Created:     24 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomData_Dir_HeaderFile
-#define GeomData_Dir_HeaderFile
+#ifndef GeomData_Dir_H_
+#define GeomData_Dir_H_
 
 #include "GeomData.h"
 #include "GeomDataAPI_Dir.h"

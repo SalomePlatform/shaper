@@ -2,8 +2,8 @@
 // Created:     8 May 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ModelAPI_AttributeRefAttr_HeaderFile
-#define ModelAPI_AttributeRefAttr_HeaderFile
+#ifndef ModelAPI_AttributeRefAttr_H_
+#define ModelAPI_AttributeRefAttr_H_
 
 #include "ModelAPI_Attribute.h"
 #include "ModelAPI_Feature.h"

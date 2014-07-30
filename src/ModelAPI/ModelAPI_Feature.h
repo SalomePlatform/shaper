@@ -2,8 +2,8 @@
 // Created:     21 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ModelAPI_Feature_HeaderFile
-#define ModelAPI_Feature_HeaderFile
+#ifndef ModelAPI_Feature_H_
+#define ModelAPI_Feature_H_
 
 #include "ModelAPI_Object.h"
 #include "ModelAPI_PluginManager.h"

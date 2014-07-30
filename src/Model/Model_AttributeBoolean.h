@@ -2,8 +2,8 @@
 // Created:     2 june 2014
 // Author:      Vitaly Smetannikov
 
-#ifndef Model_AttributeBoolean_HeaderFile
-#define Model_AttributeBoolean_HeaderFile
+#ifndef Model_AttributeBoolean_H_
+#define Model_AttributeBoolean_H_
 
 #include "Model.h"
 #include "ModelAPI_AttributeBoolean.h"

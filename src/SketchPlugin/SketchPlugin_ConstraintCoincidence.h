@@ -2,8 +2,8 @@
 // Created: 08 May 2014
 // Author:  Artem ZHIDKOV
 
-#ifndef SketchPlugin_ConstraintCoincidence_HeaderFile
-#define SketchPlugin_ConstraintCoincidence_HeaderFile
+#ifndef SketchPlugin_ConstraintCoincidence_H_
+#define SketchPlugin_ConstraintCoincidence_H_
 
 #include "SketchPlugin.h"
 #include "SketchPlugin_Constraint.h"

@@ -2,8 +2,8 @@
 // Created:     26 May 2014
 // Author:      Artem ZHIDKOV
 
-#ifndef SketchPlugin_Circle_HeaderFile
-#define SketchPlugin_Circle_HeaderFile
+#ifndef SketchPlugin_Circle_H_
+#define SketchPlugin_Circle_H_
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Feature.h>

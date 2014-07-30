@@ -2,8 +2,8 @@
 // Created:     31 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ModelAPI_Plugin_HeaderFile
-#define ModelAPI_Plugin_HeaderFile
+#ifndef ModelAPI_Plugin_H_
+#define ModelAPI_Plugin_H_
 
 #include "ModelAPI.h"
 #include <string>

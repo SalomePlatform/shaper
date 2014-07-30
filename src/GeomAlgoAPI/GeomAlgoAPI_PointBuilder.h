@@ -2,8 +2,8 @@
 // Created:     02 Jun 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomAlgoAPI_PointBuilder_HeaderFile
-#define GeomAlgoAPI_PointBuilder_HeaderFile
+#ifndef GeomAlgoAPI_PointBuilder_H_
+#define GeomAlgoAPI_PointBuilder_H_
 
 #include <GeomAlgoAPI.h>
 #include <boost/shared_ptr.hpp>

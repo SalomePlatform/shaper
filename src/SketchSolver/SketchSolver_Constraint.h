@@ -2,8 +2,8 @@
 // Created: 27 May 2014
 // Author:  Artem ZHIDKOV
 
-#ifndef SketchSolver_Constraint_Headerfile
-#define SketchSolver_Constraint_Headerfile
+#ifndef SketchSolver_Constraint_H_
+#define SketchSolver_Constraint_H_
 
 #include "SketchSolver.h"
 

@@ -2,8 +2,8 @@
 // Created:     31 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ConstructionPlugin_Plugin_HeaderFile
-#define ConstructionPlugin_Plugin_HeaderFile
+#ifndef ConstructionPlugin_Plugin_H_
+#define ConstructionPlugin_Plugin_H_
 
 
 #include "ConstructionPlugin.h"

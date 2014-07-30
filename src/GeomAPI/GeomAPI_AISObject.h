@@ -2,8 +2,8 @@
 // Created:     25 Jun 2014
 // Author:      Artem ZHIDKOV
 
-#ifndef GeomAPI_AISObject_HeaderFile
-#define GeomAPI_AISObject_HeaderFile
+#ifndef GeomAPI_AISObject_H_
+#define GeomAPI_AISObject_H_
 
 #include <GeomAPI_Interface.h>
 

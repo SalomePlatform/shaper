@@ -2,8 +2,8 @@
 // Created: 23 May 2014
 // Author:  Artem ZHIDKOV
 
-#ifndef SketchPlugin_ConstraintDistance_HeaderFile
-#define SketchPlugin_ConstraintDistance_HeaderFile
+#ifndef SketchPlugin_ConstraintDistance_H_
+#define SketchPlugin_ConstraintDistance_H_
 
 #include "SketchPlugin.h"
 #include "SketchPlugin_Constraint.h"

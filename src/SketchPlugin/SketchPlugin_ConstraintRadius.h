@@ -2,8 +2,8 @@
 // Created: 26 May 2014
 // Author:  Artem ZHIDKOV
 
-#ifndef SketchPlugin_ConstraintRadius_HeaderFile
-#define SketchPlugin_ConstraintRadius_HeaderFile
+#ifndef SketchPlugin_ConstraintRadius_H_
+#define SketchPlugin_ConstraintRadius_H_
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Sketch.h>

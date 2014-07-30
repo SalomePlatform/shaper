@@ -2,8 +2,8 @@
 // Created:     27 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef PartSetPlugin_Part_HeaderFile
-#define PartSetPlugin_Part_HeaderFile
+#ifndef PartSetPlugin_Part_H_
+#define PartSetPlugin_Part_H_
 
 #include "PartSetPlugin.h"
 #include <ModelAPI_Feature.h>

@@ -2,8 +2,8 @@
 // Created:	Thu Mar 13 2014
 // Author:	Mikhail PONIKAROV
 
-#ifndef Events_Message_HeaderFile
-#define Events_Message_HeaderFile
+#ifndef Events_Message_H_
+#define Events_Message_H_
 
 #include <Events.h>
 

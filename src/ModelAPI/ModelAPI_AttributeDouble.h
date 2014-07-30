@@ -2,8 +2,8 @@
 // Created:     2 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ModelAPI_AttributeDouble_HeaderFile
-#define ModelAPI_AttributeDouble_HeaderFile
+#ifndef ModelAPI_AttributeDouble_H_
+#define ModelAPI_AttributeDouble_H_
 
 #include "ModelAPI_Attribute.h"
 

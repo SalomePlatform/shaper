@@ -2,8 +2,8 @@
 // Created:     20 May 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef PartSetPlugin_Duplicate_HeaderFile
-#define PartSetPlugin_Duplicate_HeaderFile
+#ifndef PartSetPlugin_Duplicate_H_
+#define PartSetPlugin_Duplicate_H_
 
 #include "PartSetPlugin_Part.h"
 
