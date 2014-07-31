@@ -23,6 +23,8 @@ XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
   setHeaderHidden(true);
   setModel(new XGUI_DocumentDataModel(this));
   setEditTriggers(QAbstractItemView::NoEditTriggers);
+  setSelectionBehavior(QAbstractItemView::SelectRows);
+  setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   connect(selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
           this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
