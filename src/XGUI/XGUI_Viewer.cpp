@@ -197,7 +197,9 @@ QMdiSubWindow* XGUI_Viewer::createView(V3d_TypeOfView theType)
 
 XGUI_ViewWindow* XGUI_Viewer::activeViewWindow() const
 {
-  return dynamic_cast<XGUI_ViewWindow*>(myActiveView->widget());
+  if (myActiveView)
+    return dynamic_cast<XGUI_ViewWindow*>(myActiveView->widget());
+  return 0;
 }
 
 void XGUI_Viewer::getSelectedObjects(AIS_ListOfInteractive& theList)

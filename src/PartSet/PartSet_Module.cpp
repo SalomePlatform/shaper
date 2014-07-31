@@ -214,13 +214,14 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
 {
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
                                        myWorkshop->operationMgr()->currentOperation());
-  if (aPreviewOp) {
+  Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
+  if (aPreviewOp && (!aView.IsNull())) {
     XGUI_Selection* aSelection = myWorkshop->selector()->selection();
     // Initialise operation with preliminary selection
     std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
     std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
 
-    aPreviewOp->mousePressed(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
+    aPreviewOp->mousePressed(theEvent, aView, aSelected, aHighlighted);
   }
 }
 
@@ -228,13 +229,14 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
 {
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
                                        myWorkshop->operationMgr()->currentOperation());
-  if (aPreviewOp) {
+  Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
+  if (aPreviewOp && (!aView.IsNull())) {
     XGUI_Selection* aSelection = myWorkshop->selector()->selection();
     // Initialise operation with preliminary selection
     std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
     std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
 
-    aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer()->activeView(), aSelected, aHighlighted);
+    aPreviewOp->mouseReleased(theEvent, aView, aSelected, aHighlighted);
   }
 }
 
@@ -242,8 +244,9 @@ void PartSet_Module::onMouseMoved(QMouseEvent* theEvent)
 {
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
                                        myWorkshop->operationMgr()->currentOperation());
-  if (aPreviewOp)
-    aPreviewOp->mouseMoved(theEvent, myWorkshop->viewer()->activeView());
+  Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
+  if (aPreviewOp && (!aView.IsNull()))
+    aPreviewOp->mouseMoved(theEvent, aView);
 }
 
 void PartSet_Module::onKeyRelease(QKeyEvent* theEvent)
@@ -259,14 +262,13 @@ void PartSet_Module::onMouseDoubleClick(QMouseEvent* theEvent)
 {
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(
                                        myWorkshop->operationMgr()->currentOperation());
-  if (aPreviewOp)
-  {
+  Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
+  if (aPreviewOp && (!aView.IsNull())) {
     XGUI_Selection* aSelection = myWorkshop->selector()->selection();
     // Initialise operation with preliminary selection
     std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
     std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-    aPreviewOp->mouseDoubleClick(theEvent, myWorkshop->viewer()->activeView(), aSelected,
-                                 aHighlighted);
+    aPreviewOp->mouseDoubleClick(theEvent, aView, aSelected, aHighlighted);
   }
 }
 
