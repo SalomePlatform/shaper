@@ -359,6 +359,8 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
       if (aVert2.More())
       { // second shape is not inside first, change the shapes order and repeat comparision
         const TopoDS_Face& aF2 = (*anIter2)->impl<TopoDS_Face>();
+        if (aF2.ShapeType() != TopAbs_FACE) // TODO: MPV - this workaround must be fixed later by AZV, now it just removes crash
+          continue;
         TopExp_Explorer aVert1((*anIter1)->impl<TopoDS_Shape>(), TopAbs_VERTEX);
         for ( ; aVert1.More(); aVert1.Next())
         {
