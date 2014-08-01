@@ -12,6 +12,10 @@ INCLUDE(FindSalome)
 INCLUDE(FindSolveSpace)
 INCLUDE(FindCAS)
 
+IF(NOT ${HAVE_SALOME})
+	INCLUDE(FindSUIT)
+ENDIF(NOT ${HAVE_SALOME})
+
 IF(UNIX)
   IF(CMAKE_COMPILER_IS_GNUCC)
     #C++11 is not supported on some platforms, disable it 
@@ -53,9 +57,6 @@ ADD_SUBDIRECTORY (src/SketchPlugin)
 ADD_SUBDIRECTORY (src/SketchSolver)
 ADD_SUBDIRECTORY (src/ModuleBase)
 ADD_SUBDIRECTORY (src/PartSet)
-ADD_SUBDIRECTORY (src/PyConsole)
-ADD_SUBDIRECTORY (src/PyEvent)
-ADD_SUBDIRECTORY (src/PyInterp)
 ADD_SUBDIRECTORY (src/XGUI)
 ADD_SUBDIRECTORY (src/GeomApp)
 

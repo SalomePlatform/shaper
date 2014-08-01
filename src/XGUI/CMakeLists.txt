@@ -80,9 +80,8 @@ SET(PROJECT_LIBRARIES
 	${QT_LIBRARIES}
 	${CAS_VIEWER}
 	${CAS_KERNEL}
-	PyConsole
-	PyInterp
-	PyEvent
+	${PyConsole}
+	${PyInterp}
 	ModelAPI
 	ModuleBase
 )
@@ -111,13 +110,12 @@ ADD_DEFINITIONS( -DXGUI_EXPORTS ${CAS_DEFINITIONS} )
 
 INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/src/Events
 					 ${PROJECT_SOURCE_DIR}/src/Config
-					 ${PROJECT_SOURCE_DIR}/src/PyInterp
-					 ${PROJECT_SOURCE_DIR}/src/PyConsole
 					 ${PROJECT_SOURCE_DIR}/src/ModelAPI
 					 ${PROJECT_SOURCE_DIR}/src/GeomAPI
 					 ${PROJECT_SOURCE_DIR}/src/ModuleBase
 					 ${PROJECT_SOURCE_DIR}/src/PartSetPlugin
-					 ${CAS_INCLUDE_DIRS})
+					 ${CAS_INCLUDE_DIRS}
+					 ${SUIT_INCLUDE})
 
 LINK_DIRECTORIES($ENV{PYTHON_LIB_DIR})
 
