@@ -76,13 +76,18 @@ bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject)
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  const ModelAPI_Validator* aValidator = aFactory->validator(parentID(), attributeID());
-  if (aValidator) {
-    const ModuleBase_ResultValidator* aResValidator = 
-      dynamic_cast<const ModuleBase_ResultValidator*>(aValidator);
-    if (aResValidator) {
-      if (!aResValidator->isValid(theObject))
-        return false;
+  std::list<ModelAPI_Validator*> aValidators;
+  std::list<std::list<std::string> > anArguments;
+  aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
+  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
+  for(; aValidator != aValidators.end(); aValidator++) {
+    if (*aValidator) {
+      const ModuleBase_ResultValidator* aResValidator = 
+        dynamic_cast<const ModuleBase_ResultValidator*>(*aValidator);
+      if (aResValidator) {
+        if (!aResValidator->isValid(theObject))
+          return false;
+      }
     }
   }
 
