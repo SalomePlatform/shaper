@@ -9,6 +9,7 @@
 
 #include "ModuleBase_OperationDescription.h"
 #include "ModuleBase_ModelWidget.h"
+#include "ModuleBase_FeatureValidator.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Document.h>
@@ -17,6 +18,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Validator.h>
 
 #include <Events_Loop.h>
 
@@ -90,6 +92,27 @@ void ModuleBase_Operation::commitOperation()
 
 void ModuleBase_Operation::afterCommitOperation()
 {
+}
+
+bool ModuleBase_Operation::canBeCommitted() const
+{
+  if (ModuleBase_IOperation::canBeCommitted()) {
+    FeaturePtr aFeature = feature();
+    std::string aId = aFeature->getKind();
+
+    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+    ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+    const ModelAPI_Validator* aValidator = aFactory->validator(aId);
+    if (aValidator) {
+      const ModuleBase_FeatureValidator* aFValidator = 
+        dynamic_cast<const ModuleBase_FeatureValidator*>(aValidator);
+      if (aFValidator) {
+        return aFValidator->isValid(aFeature);
+      }
+    }
+    return true;
+  }
+  return false;
 }
 
 void ModuleBase_Operation::flushUpdated()

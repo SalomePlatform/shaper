@@ -131,14 +131,15 @@ void PartSet_OperationFeatureEditMulti::mouseReleased(QMouseEvent* theEvent, Han
                                               const std::list<ModuleBase_ViewerPrs>& /*theSelected*/,
                                               const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
 {
-  std::list<ModuleBase_ViewerPrs> aFeatures = myFeatures;
-  commit();
-  std::list<ModuleBase_ViewerPrs>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
-  for (; anIt != aLast; anIt++) {
-    ObjectPtr aFeature = (*anIt).object();
-    if (aFeature) {
-      emit featureConstructed(aFeature, FM_Deactivation);
-	  }
+  if (commit()) {
+    std::list<ModuleBase_ViewerPrs> aFeatures = myFeatures;
+    std::list<ModuleBase_ViewerPrs>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
+    for (; anIt != aLast; anIt++) {
+      ObjectPtr aFeature = (*anIt).object();
+      if (aFeature) {
+        emit featureConstructed(aFeature, FM_Deactivation);
+	    }
+    }
   }
 }
 

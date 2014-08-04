@@ -108,7 +108,7 @@ XGUI_Workshop* PartSet_Module::workshop() const
 
 void PartSet_Module::createFeatures()
 {
-  //!! Test registering of validators
+  //Registering of validators
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("PartSet_DistanceValidator", new PartSet_DistanceValidator);

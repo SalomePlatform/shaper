@@ -82,25 +82,26 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
 
   FeaturePtr aFeature = ModuleBase_Tools::feature(aObject);
   if (!aFeature || aFeature != feature()) {
-    commit();
-    emit featureConstructed(feature(), FM_Deactivation);
+    if (commit()) {
+      emit featureConstructed(feature(), FM_Deactivation);
 
-    bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
-    if(aHasShift && !theHighlighted.empty()) {
-      QList<ObjectPtr> aSelected;
-      std::list<ModuleBase_ViewerPrs>::const_iterator aIt;
-      for (aIt = theSelected.cbegin(); aIt != theSelected.cend(); ++aIt)
-        aSelected.append((*aIt).object());
-      /*for (aIt = theHighlighted.cbegin(); aIt != theHighlighted.cend(); ++aIt) {
-        if (!aSelected.contains((*aIt).object()))
+      bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+      if(aHasShift && !theHighlighted.empty()) {
+        QList<ObjectPtr> aSelected;
+        std::list<ModuleBase_ViewerPrs>::const_iterator aIt;
+        for (aIt = theSelected.cbegin(); aIt != theSelected.cend(); ++aIt)
           aSelected.append((*aIt).object());
-      }*/
-      //aSelected.push_back(feature());
-      //aSelected.push_back(theHighlighted.front().object());
-      emit setSelection(aSelected);
-    }
-    else if (aFeature) {
-      restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+        /*for (aIt = theHighlighted.cbegin(); aIt != theHighlighted.cend(); ++aIt) {
+          if (!aSelected.contains((*aIt).object()))
+            aSelected.append((*aIt).object());
+        }*/
+        //aSelected.push_back(feature());
+        //aSelected.push_back(theHighlighted.front().object());
+        emit setSelection(aSelected);
+      }
+      else if (aFeature) {
+        restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+      }
     }
   }
 }

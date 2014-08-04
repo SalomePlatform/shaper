@@ -10,6 +10,10 @@
 #include <ModuleBase_SelectionValidator.h>
 #include <ModuleBase_ISelection.h>
 
+/*
+* Selector validators
+*/
+
 //! A class to validate a selection for Distance constraint operation
 class PartSet_DistanceValidator: public ModuleBase_SelectionValidator
 {
@@ -44,5 +48,6 @@ class PartSet_RadiusValidator: public ModuleBase_SelectionValidator
 public:
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
+
 
 #endif

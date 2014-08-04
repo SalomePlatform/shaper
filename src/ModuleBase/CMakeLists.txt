@@ -27,6 +27,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_ViewerPrs.h
 	ModuleBase_Tools.h
 	ModuleBase_ResultValidators.h
+	ModuleBase_FeatureValidator.h
 )
 
 SET(PROJECT_SOURCES

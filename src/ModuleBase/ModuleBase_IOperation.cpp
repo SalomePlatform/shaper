@@ -81,17 +81,21 @@ void ModuleBase_IOperation::abort()
   emit stopped();
 }
 
-void ModuleBase_IOperation::commit()
+bool ModuleBase_IOperation::commit()
 {
-  commitOperation();
-  emit committed();
+  if (canBeCommitted()) {
+    commitOperation();
+    emit committed();
 
-  stopOperation();
+    stopOperation();
 
-  document()->finishOperation();
-  emit stopped();
+    document()->finishOperation();
+    emit stopped();
   
-  afterCommitOperation();
+    afterCommitOperation();
+    return true;
+  }
+  return false;
 }
 
 void ModuleBase_IOperation::setRunning(bool theState)

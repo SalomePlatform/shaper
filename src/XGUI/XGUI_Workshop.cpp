@@ -282,8 +282,8 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     if (myOperationMgr->startOperation(anOperation)) {
       myPropertyPanel->updateContentWidget(anOperation->feature());
       if (!anOperation->getDescription()->hasXmlRepresentation()) {
-        anOperation->commit();
-        updateCommandStatus();
+        if (anOperation->commit())
+          updateCommandStatus();
       }
     }
     return;

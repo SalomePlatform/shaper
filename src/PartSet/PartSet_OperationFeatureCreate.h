@@ -40,10 +40,6 @@ public:
   /// Destructor
   virtual ~PartSet_OperationFeatureCreate();
 
-  /// Verifies whether this operator can be commited.
-  /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
-  virtual bool canBeCommitted() const;
-
   /// Returns that this operator can be started above already running one.
    /// The runned operation should be the sketch feature modified operation
   /// \param theOperation the previous running operation
@@ -113,6 +109,10 @@ protected:
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
   virtual FeaturePtr createFeature(const bool theFlushMessage = true);
+
+  /// Verifies whether this operator can be commited.
+  /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
+  virtual bool canBeCommitted() const;
 
 protected:
   /// Set value to the active widget
