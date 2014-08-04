@@ -1022,12 +1022,16 @@ void XGUI_Workshop::updateCommandsOnViewSelection()
   QList<QAction*> aActions = getModuleCommands();
   foreach(QAction* aAction, aActions) {
     QString aId = aAction->data().toString();
-    const ModelAPI_Validator* aValidator = aFactory->validator(aId.toStdString());
-    if (aValidator) {
-      const ModuleBase_SelectionValidator* aSelValidator = 
-        dynamic_cast<const ModuleBase_SelectionValidator*>(aValidator);
-      if (aSelValidator) {
-        aAction->setEnabled(aSelValidator->isValid(aSelection));
+    std::list<ModelAPI_Validator*> aValidators;
+    aFactory->validators(aId.toStdString(), aValidators);
+    std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
+    for(; aValidator != aValidators.end(); aValidator++) {
+      if (*aValidator) {
+        const ModuleBase_SelectionValidator* aSelValidator = 
+          dynamic_cast<const ModuleBase_SelectionValidator*>(*aValidator);
+        if (aSelValidator) {
+          aAction->setEnabled(aSelValidator->isValid(aSelection));
+        }
       }
     }
   }
