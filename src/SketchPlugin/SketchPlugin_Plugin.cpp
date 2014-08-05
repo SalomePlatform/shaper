@@ -24,7 +24,6 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  aFactory->registerValidator("SketchPlugin_DistanceFeatureValidator", new SketchPlugin_DistanceFeatureValidator);
 
   // register this plugin
   ModelAPI_PluginManager::get()->registerPlugin(this);

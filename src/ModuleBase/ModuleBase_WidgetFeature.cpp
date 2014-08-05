@@ -80,16 +80,20 @@ bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject)
   std::list<std::list<std::string> > anArguments;
   aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
   std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
+  bool isValid = true;
   for(; aValidator != aValidators.end(); aValidator++) {
-    if (*aValidator) {
-      const ModuleBase_ResultValidator* aResValidator = 
-        dynamic_cast<const ModuleBase_ResultValidator*>(*aValidator);
-      if (aResValidator) {
-        if (!aResValidator->isValid(theObject))
-          return false;
+    const ModuleBase_ResultValidator* aResValidator = 
+      dynamic_cast<const ModuleBase_ResultValidator*>(*aValidator);
+    if (aResValidator) {
+      isValid = false;
+      if (aResValidator->isValid(theObject)) {
+        isValid = true;
+        break;
       }
     }
   }
+  if (!isValid)
+    return false;
 
   myObject = theObject;
   myEditor->setText(theObject ? theObject->data()->name().c_str() : "");

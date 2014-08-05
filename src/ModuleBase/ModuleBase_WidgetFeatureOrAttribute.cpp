@@ -53,7 +53,7 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
       if (aObject) {
         isDone = setObject(aObject);
       }
-      if (!isDone && aValuePoint) {
+      if (aValuePoint) {
         FeaturePtr aFeature = ModuleBase_Tools::feature(aObject);
         if (aFeature) {
           // find the given point in the feature attributes
@@ -89,7 +89,7 @@ bool ModuleBase_WidgetFeatureOrAttribute::storeValue(ObjectPtr theFeature) const
   ModuleBase_WidgetFeatureOrAttribute* that = (ModuleBase_WidgetFeatureOrAttribute*) this;
   if (object())
     aRef->setObject(object());
-  else if (myAttribute)
+  if (myAttribute)
     aRef->setAttr(myAttribute);
 
   aFeature->execute();
@@ -112,7 +112,7 @@ bool ModuleBase_WidgetFeatureOrAttribute::restoreValue(ObjectPtr theFeature)
     std::string aText = "";
     if (aFeature)
       aText = aFeature->data()->name().c_str();
-    else if (myAttribute)
+    if (myAttribute)
       aText = myAttribute->attributeType().c_str();
 
     editor()->setText(aText.c_str());

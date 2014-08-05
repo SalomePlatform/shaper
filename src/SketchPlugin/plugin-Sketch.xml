@@ -30,14 +30,15 @@
         <label title="Select point and another feature (point or point on line) between which to calculate distance" tooltip="Select point and another feature (point or point on line) between which to calculate distance"/>
         <feature_or_attribute_selector id="ConstraintEntityA" label="First object" tooltip="Select an point in the viewer">
           <validator id="ModuleBase_ResultPointValidator"/>
+          <validator id="ModuleBase_ResultLineValidator"/>
         </feature_or_attribute_selector>
         <feature_or_attribute_selector id="ConstraintEntityB" label="Last object" tooltip="Select an point in the viewer">
           <validator id="ModuleBase_ResultPointValidator"/>
+          <validator id="ModuleBase_ResultLineValidator"/>
         </feature_or_attribute_selector>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
         <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue"/>
         <validator id="PartSet_DistanceValidator"/>
-        <validator id="SketchPlugin_DistanceFeatureValidator"/> 
       </feature>
       
       <feature id="SketchConstraintLength" title="Length" tooltip="Create constraint for the given length of a line segment">

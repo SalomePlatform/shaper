@@ -271,6 +271,8 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
 
 bool PartSet_OperationFeatureCreate::setWidgetValue(ObjectPtr theFeature, double theX, double theY)
 {
+  if (!myActiveWidget)
+    return false;
   ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
   aValue->setObject(theFeature);
   aValue->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));

@@ -102,12 +102,15 @@ bool ModuleBase_Operation::canBeCommitted() const
 
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
     ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-    const ModelAPI_Validator* aValidator = aFactory->validator(aId);
-    if (aValidator) {
+    std::list<ModelAPI_Validator*> aValidators;
+    aFactory->validators(aId, aValidators);
+    std::list<ModelAPI_Validator*>::const_iterator aIt;
+    for (aIt = aValidators.cbegin(); aIt != aValidators.cend(); ++aIt) {
       const ModuleBase_FeatureValidator* aFValidator = 
-        dynamic_cast<const ModuleBase_FeatureValidator*>(aValidator);
+        dynamic_cast<const ModuleBase_FeatureValidator*>(*aIt);
       if (aFValidator) {
-        return aFValidator->isValid(aFeature);
+        if (!aFValidator->isValid(aFeature))
+          return false;
       }
     }
     return true;

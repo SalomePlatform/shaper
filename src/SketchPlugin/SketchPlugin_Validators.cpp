@@ -38,7 +38,8 @@ bool SketchPlugin_DistanceFeatureValidator::isValid(const FeaturePtr theFeature)
   if (!aRefA || !aRefB)
     return false;
 
-  FeaturePtr aFetureA = SketchPlugin_Sketch::getFeature(aRefA->object());
+  return true;
+/*  FeaturePtr aFetureA = SketchPlugin_Sketch::getFeature(aRefA->object());
   FeaturePtr aFetureB = SketchPlugin_Sketch::getFeature(aRefB->object());
   if (!aFetureA || !aFetureB)
     return false;
@@ -52,5 +53,5 @@ bool SketchPlugin_DistanceFeatureValidator::isValid(const FeaturePtr theFeature)
     return isValidType(aTypeA);
   } else
     return isValidType(aTypeA) && isValidType(aTypeB);
-  return false;
+  return false;*/
 }
