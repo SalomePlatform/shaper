@@ -44,7 +44,8 @@ protected:
   /// Set the attribute
   /// \param theAttribute value
   /// \return the boolean result of the attribute set
-  bool setAttribute(const boost::shared_ptr<ModelAPI_Attribute>& theAttribute);
+  bool setAttribute(const boost::shared_ptr<ModelAPI_Attribute>& theAttribute, 
+                    bool theSendEvent = true);
 
 protected:
   boost::shared_ptr<ModelAPI_Attribute> myAttribute; /// < the attribute

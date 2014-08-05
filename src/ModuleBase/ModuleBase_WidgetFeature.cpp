@@ -7,6 +7,7 @@
 #include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_WidgetValue.h>
 #include <ModuleBase_ResultValidators.h>
+#include <ModuleBase_Tools.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -72,7 +73,7 @@ bool ModuleBase_WidgetFeature::setValue(ModuleBase_WidgetValue* theValue)
   return isDone;
 }
 
-bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject)
+bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject, bool theSendEvent)
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
@@ -95,9 +96,10 @@ bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject)
   if (!isValid)
     return false;
 
-  myObject = theObject;
+  myObject = ModuleBase_Tools::feature(theObject);
   myEditor->setText(theObject ? theObject->data()->name().c_str() : "");
-  emit valuesChanged();
+  if (theSendEvent)
+    emit valuesChanged();
   return true;
 }
 
