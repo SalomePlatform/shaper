@@ -144,7 +144,8 @@ QWidget* XGUI_PropertyPanel::contentWidget()
 void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
 {
   foreach(ModuleBase_ModelWidget* eachWidget, myWidgets) {
-    eachWidget->restoreValue(theFeature);
+    eachWidget->setFeature(theFeature);
+    eachWidget->restoreValue();
   }
   // the repaint is used here to immediatelly react in GUI to the values change.
   repaint();

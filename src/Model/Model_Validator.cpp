@@ -3,6 +3,7 @@
 // Author:      Mikhail PONIKAROV
 
 #include <Model_Validator.h>
+#include <Model_ResultValidators.h>
 #include <ModelAPI_Feature.h>
 #include <Events_Error.h>
 
@@ -90,4 +91,17 @@ void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
 
 Model_ValidatorsFactory::Model_ValidatorsFactory() : ModelAPI_ValidatorsFactory()
 {
+  registerValidator("Model_ResultPointValidator", new Model_ResultPointValidator);
+  registerValidator("Model_ResultLineValidator", new Model_ResultLineValidator);
+  registerValidator("Model_ResultArcValidator", new Model_ResultArcValidator);
+}
+
+
+const ModelAPI_Validator* Model_ValidatorsFactory::validator(const std::string& theID) const
+{
+  std::map<std::string, ModelAPI_Validator*>::const_iterator aIt = myIDs.find(theID);
+  if (aIt != myIDs.end()) {
+    return aIt->second;
+  }
+  return NULL;
 }

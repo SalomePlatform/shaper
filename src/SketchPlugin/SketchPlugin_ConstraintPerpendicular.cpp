@@ -45,13 +45,13 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintPerpendicular::getAI
       !anAttr2 || !anAttr2->isObject())
     return thePrevious;
 
-  FeaturePtr aFeature = SketchPlugin_Sketch::getFeature(anAttr1->object());
+  FeaturePtr aFeature = ModelAPI_Feature::feature(anAttr1->object());
   if (!aFeature)
     return thePrevious;
   boost::shared_ptr<SketchPlugin_Line> aLine1Feature = 
     boost::dynamic_pointer_cast<SketchPlugin_Line>(aFeature);
 
-  aFeature = SketchPlugin_Sketch::getFeature(anAttr2->object());
+  aFeature = ModelAPI_Feature::feature(anAttr2->object());
   if (!aFeature)
     return thePrevious;
   boost::shared_ptr<SketchPlugin_Line> aLine2Feature = 

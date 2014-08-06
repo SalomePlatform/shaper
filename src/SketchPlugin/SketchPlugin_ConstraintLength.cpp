@@ -36,7 +36,7 @@ void SketchPlugin_ConstraintLength::execute()
 
     boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
       boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    FeaturePtr aFeature = SketchPlugin_Sketch::getFeature(aRef->object());
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
     if (aFeature) {
       // set length value
       boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
@@ -65,7 +65,7 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintLength::getAISObject
     boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
   if (!anAttr)
     return thePrevious;
-  FeaturePtr aFeature = SketchPlugin_Sketch::getFeature(anAttr->object());
+  FeaturePtr aFeature = ModelAPI_Feature::feature(anAttr->object());
   if (!aFeature || aFeature->getKind() != SketchPlugin_Line::ID())
     return thePrevious;
 

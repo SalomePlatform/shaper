@@ -6,11 +6,11 @@
 #include "XGUI_Viewer.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_ViewerProxy.h"
-#include "ModuleBase_Tools.h"
 
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Tools.h>
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_IPresentable.h>
@@ -54,7 +54,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
     } else {
       ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
       if (aResult) {
-        boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModuleBase_Tools::shape(aResult);
+        boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
         if (aShapePtr) {
           anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
           anAIS->createShape(aShapePtr);
@@ -144,7 +144,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
   } else {
     ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if (aResult) {
-      boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModuleBase_Tools::shape(aResult);
+      boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
       if (aShapePtr) {
         Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(aAISObj->impl<Handle(AIS_InteractiveObject)>());
         if (!aAISShape.IsNull()) {

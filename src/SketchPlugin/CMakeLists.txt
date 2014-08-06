@@ -57,7 +57,6 @@ INCLUDE_DIRECTORIES(
   ../GeomAPI
   ../GeomAlgoAPI
   ../GeomDataAPI
-  ../ModuleBase
 )
 
 INSTALL(TARGETS SketchPlugin DESTINATION plugins)

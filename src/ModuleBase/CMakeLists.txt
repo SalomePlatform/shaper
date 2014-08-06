@@ -25,9 +25,6 @@ SET(PROJECT_HEADERS
 	ModuleBase_SelectionValidator.h
 	ModuleBase_ISelection.h
 	ModuleBase_ViewerPrs.h
-	ModuleBase_Tools.h
-	ModuleBase_ResultValidators.h
-	ModuleBase_FeatureValidator.h
 )
 
 SET(PROJECT_SOURCES
@@ -47,8 +44,6 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetPoint2dDistance.cpp
 	ModuleBase_WidgetValue.cpp
 	ModuleBase_WidgetValueFeature.cpp
-	ModuleBase_Tools.cpp
-	ModuleBase_ResultValidators.cpp
 )
 
 SET(PROJECT_LIBRARIES

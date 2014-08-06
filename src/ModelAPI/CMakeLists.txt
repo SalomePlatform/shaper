@@ -26,11 +26,15 @@ SET(PROJECT_HEADERS
     ModelAPI_ResultConstruction.h
     ModelAPI_ResultPart.h
     ModelAPI_ResultParameters.h
+	ModelAPI_ResultValidator.h
+	ModelAPI_AttributeValidator.h
+	ModelAPI_Tools.h
 )
 
 SET(PROJECT_SOURCES
     ModelAPI_Feature.cpp
     ModelAPI_PluginManager.cpp
+	ModelAPI_Tools.cpp
 )
 
 SET(PROJECT_LIBRARIES

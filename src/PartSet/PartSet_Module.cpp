@@ -13,7 +13,6 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_Operation.h>
-#include <ModuleBase_Tools.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
@@ -288,7 +287,7 @@ void PartSet_Module::onFitAllView()
 
 void PartSet_Module::onLaunchOperation(std::string theName, ObjectPtr theObject)
 {
-  FeaturePtr aFeature = ModuleBase_Tools::feature(theObject);
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
   if (!aFeature) {
     qDebug("Warning! Restart operation without feature!");
     return;

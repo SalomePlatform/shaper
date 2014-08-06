@@ -28,6 +28,7 @@ public:
 
   /// Returns whether the shape is an edge
   virtual bool isEdge() const;
+
 };
 
 #endif

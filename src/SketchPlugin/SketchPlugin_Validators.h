@@ -6,14 +6,17 @@
 #define SketchPlugin_Validators_H
 
 #include "SketchPlugin.h"
-#include <ModuleBase_FeatureValidator.h>
+//#include <ModuleBase_FeatureValidator.h>
+#include <ModelAPI_AttributeValidator.h>
 
 
-//! A class to validate a selection for Perpendicular constraint operation
-class SketchPlugin_DistanceFeatureValidator: public ModuleBase_FeatureValidator
+class SketchPlugin_DistanceAttrValidator: public ModelAPI_AttributeValidator
 {
 public:
-  SKETCHPLUGIN_EXPORT virtual bool isValid(const FeaturePtr theFeature) const;
+  virtual bool isValid(const FeaturePtr& theFeature, 
+                       const std::list<std::string>& theArguments,
+                       const ObjectPtr& theObject) const;
+
 };
 
 #endif

@@ -14,7 +14,6 @@
 #include <boost/shared_ptr.hpp>
 
 class Config_WidgetAPI;
-class ModelAPI_Feature;
 class ModuleBase_WidgetValue;
 class QKeyEvent;
 
@@ -49,9 +48,9 @@ public:
 
   /// Saves the internal parameters to the given feature
   /// \param theObject a model feature to be changed
-  virtual bool storeValue(ObjectPtr theObject) const = 0;
+  virtual bool storeValue() const = 0;
 
-  virtual bool restoreValue(ObjectPtr theObject) = 0;
+  virtual bool restoreValue() = 0;
 
   /// Set focus to the first control of the current widget. The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
@@ -74,6 +73,9 @@ public:
   /// \returns the string value
   std::string parentID() const { return myParentId; }
 
+  FeaturePtr feature() const { return myFeature;}
+  void setFeature(const FeaturePtr& theFeature) { myFeature = theFeature; }
+
 signals:
   /// The signal about widget values changed
   void valuesChanged();
@@ -94,9 +96,10 @@ protected:
 
   bool myHasDefaultValue; /// the boolean state whether the control has a default value
 
-private:
+
   std::string myAttributeID; /// the attribute name of the model feature
   std::string myParentId;    /// name of parent
+  FeaturePtr myFeature;
 };
 
 #endif

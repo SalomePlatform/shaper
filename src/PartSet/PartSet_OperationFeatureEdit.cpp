@@ -11,15 +11,14 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_ViewerPrs.h>
-#include <ModuleBase_Tools.h>
 
 #include <ModelAPI_Events.h>
 
 #include <SketchPlugin_Feature.h>
 #include <GeomDataAPI_Point2D.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
-
 #include <ModelAPI_Events.h>
 
 #include <Events_Loop.h>
@@ -80,7 +79,7 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
   if (!aObject && !theSelected.empty()) // changed for a constrain
     aObject = theSelected.front().object();
 
-  FeaturePtr aFeature = ModuleBase_Tools::feature(aObject);
+  FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
   if (!aFeature || aFeature != feature()) {
     if (commit()) {
       emit featureConstructed(feature(), FM_Deactivation);

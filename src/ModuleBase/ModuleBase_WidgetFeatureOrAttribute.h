@@ -36,9 +36,9 @@ public:
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed
-  virtual bool storeValue(ObjectPtr theFeature) const;
+  virtual bool storeValue() const;
 
-  virtual bool restoreValue(ObjectPtr theFeature);
+  virtual bool restoreValue();
 
 protected:
   /// Set the attribute

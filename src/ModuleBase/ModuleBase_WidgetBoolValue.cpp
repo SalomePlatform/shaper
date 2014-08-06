@@ -42,21 +42,21 @@ QWidget* ModuleBase_WidgetBoolValue::getControl() const
   return myCheckBox; 
 }
 
-bool ModuleBase_WidgetBoolValue::storeValue(ObjectPtr theObject) const
+bool ModuleBase_WidgetBoolValue::storeValue() const
 {
-  DataPtr aData = theObject->data();
+  DataPtr aData = myFeature->data();
   boost::shared_ptr<ModelAPI_AttributeBoolean> aBool = aData->boolean(attributeID());
 
   if (aBool->value() != myCheckBox->isChecked()) {
     aBool->setValue(myCheckBox->isChecked());
-    updateObject(theObject);
+    updateObject(myFeature);
   }
   return true;
 }
 
-bool ModuleBase_WidgetBoolValue::restoreValue(ObjectPtr theObject)
+bool ModuleBase_WidgetBoolValue::restoreValue()
 {
-  DataPtr aData = theObject->data();
+  DataPtr aData = myFeature->data();
   boost::shared_ptr<ModelAPI_AttributeBoolean> aRef = aData->boolean(attributeID());
 
   bool isBlocked = myCheckBox->blockSignals(true);

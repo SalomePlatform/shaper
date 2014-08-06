@@ -6,20 +6,20 @@
 
 #include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_WidgetValue.h>
-#include <ModuleBase_ResultValidators.h>
-#include <ModuleBase_Tools.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
 
 #include <Events_Loop.h>
-#include <ModelAPI_Events.h>
 
+#include <ModelAPI_Events.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_ResultValidator.h>
+#include <ModelAPI_AttributeValidator.h>
 
 #include <QWidget>
 #include <QLineEdit>
@@ -31,10 +31,6 @@ ModuleBase_WidgetFeature::ModuleBase_WidgetFeature(QWidget* theParent,
                                                    const std::string& theParentId)
 : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
-  //QString aKinds = QString::fromStdString(theData->getProperty(FEATURE_KEYSEQUENCE));
-  //myObjectKinds = aKinds.split(" ");
-  //theData->
-
   myContainer = new QWidget(theParent);
   QHBoxLayout* aControlLay = new QHBoxLayout(myContainer);
   aControlLay->setContentsMargins(0, 0, 0, 0);
@@ -80,11 +76,13 @@ bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject, bool theSen
   std::list<ModelAPI_Validator*> aValidators;
   std::list<std::list<std::string> > anArguments;
   aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
+
+  // Check the type of selected object
   std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
   bool isValid = true;
   for(; aValidator != aValidators.end(); aValidator++) {
-    const ModuleBase_ResultValidator* aResValidator = 
-      dynamic_cast<const ModuleBase_ResultValidator*>(*aValidator);
+    const ModelAPI_ResultValidator* aResValidator = 
+      dynamic_cast<const ModelAPI_ResultValidator*>(*aValidator);
     if (aResValidator) {
       isValid = false;
       if (aResValidator->isValid(theObject)) {
@@ -96,35 +94,49 @@ bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject, bool theSen
   if (!isValid)
     return false;
 
-  myObject = ModuleBase_Tools::feature(theObject);
+  // Check the acceptability of the object as attribute
+  aValidator = aValidators.begin();
+  std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
+  for(; aValidator != aValidators.end(); aValidator++, aArgs++) {
+    const ModelAPI_AttributeValidator* aAttrValidator = 
+      dynamic_cast<const ModelAPI_AttributeValidator*>(*aValidator);
+    if (aAttrValidator) {
+      if (!aAttrValidator->isValid(myFeature, *aArgs, theObject)) {
+        return false;
+      }
+    }
+  }
+
+  myObject = theObject;
   myEditor->setText(theObject ? theObject->data()->name().c_str() : "");
   if (theSendEvent)
     emit valuesChanged();
   return true;
 }
 
-bool ModuleBase_WidgetFeature::storeValue(ObjectPtr theObject) const
+bool ModuleBase_WidgetFeature::storeValue() const
 {
-  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
-  if (!aFeature)
-    return false;
-  boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
+  //FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+  //if (!aFeature)
+  //  return false;
+  boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
   ModuleBase_WidgetFeature* that = (ModuleBase_WidgetFeature*) this;
   aRef->setObject(myObject);
-  aFeature->execute();
-  updateObject(theObject);
+  myFeature->execute();
+  updateObject(myFeature);
   return true;
 }
 
-bool ModuleBase_WidgetFeature::restoreValue(ObjectPtr theObject)
+bool ModuleBase_WidgetFeature::restoreValue()
 {
-  boost::shared_ptr<ModelAPI_Data> aData = theObject->data();
+  boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
           boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
+  ObjectPtr aObj = aRef->object();
   FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aRef->object());
   if (aFeature) {
     myObject = aFeature;

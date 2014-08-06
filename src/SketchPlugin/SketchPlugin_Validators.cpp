@@ -3,55 +3,33 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include "SketchPlugin_Validators.h"
-#include "SketchPlugin_Constraint.h"
-#include "SketchPlugin_Sketch.h"
-#include "SketchPlugin_Point.h"
-#include "SketchPlugin_Line.h"
-#include "SketchPlugin_Circle.h"
-#include "SketchPlugin_Arc.h"
+#include "SketchPlugin_ConstraintDistance.h"
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_ResultValidator.h>
+#include <GeomDataAPI_Point2D.h>
 
 
-bool isValidType(const std::string& theType)
+bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature, 
+                                                 const std::list<std::string>& theArguments,
+                                                 const ObjectPtr& theObject) const
 {
-  return (theType == SketchPlugin_Point::ID()) || 
-         (theType == SketchPlugin_Circle::ID()) ||
-         (theType == SketchPlugin_Arc::ID());
+  std::string aParamA = theArguments.front();
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+
+  // If the object is not a line then it is accepted
+  const ModelAPI_ResultValidator* aLineValidator = dynamic_cast<const ModelAPI_ResultValidator*>(
+                                              aFactory->validator("Model_ResultLineValidator"));
+  if (!aLineValidator->isValid(theObject))
+    return true;
+
+  // If it is a line then we have to check that first attribute id not a line
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = getFeaturePoint(theFeature->data(), aParamA);
+  if (aPoint)
+    return true;
+  return false;
 }
 
-bool SketchPlugin_DistanceFeatureValidator::isValid(const FeaturePtr theFeature) const
-{
-  if (!theFeature)
-    return false;
-  if (!theFeature->data() || !theFeature->data()->isValid())
-    return false;
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
 
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRefA =
-          boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-          aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
 
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRefB =
-          boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-          aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
-
-  if (!aRefA || !aRefB)
-    return false;
-
-  return true;
-/*  FeaturePtr aFetureA = SketchPlugin_Sketch::getFeature(aRefA->object());
-  FeaturePtr aFetureB = SketchPlugin_Sketch::getFeature(aRefB->object());
-  if (!aFetureA || !aFetureB)
-    return false;
-
-  std::string aTypeA = aFetureA->getKind();
-  std::string aTypeB = aFetureB->getKind();
-
-  if (aTypeA == SketchPlugin_Line::ID()) {
-    return isValidType(aTypeB);
-  } else if (aTypeB == SketchPlugin_Line::ID()) {
-    return isValidType(aTypeA);
-  } else
-    return isValidType(aTypeA) && isValidType(aTypeB);
-  return false;*/
-}

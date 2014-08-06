@@ -73,6 +73,9 @@ public:
     std::list<ModelAPI_Validator*>& theValidators, 
     std::list<std::list<std::string> >& theArguments) const = 0;
 
+  /// Returns registered validator by its Id
+  virtual const ModelAPI_Validator* validator(const std::string& theID) const = 0;
+
   /// Returns the result of "validate" method for attribute of validator.
   /// If validator is not exists, returns true: everything is valid by default.
   //virtual bool validate(

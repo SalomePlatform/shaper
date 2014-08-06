@@ -14,16 +14,6 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
 
-/// Obtain the point object from specified constraint parameter
-static boost::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(
-            DataPtr             theData,
-            const std::string&  theAttribute);
-
-static boost::shared_ptr<SketchPlugin_Line> getFeatureLine(DataPtr theData, const std::string& theAttribute);
-
-static boost::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(const boost::shared_ptr<SketchPlugin_Line>& theLine, 
-                                                           const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
-
 
 SketchPlugin_ConstraintDistance::SketchPlugin_ConstraintDistance()
 {
@@ -153,7 +143,7 @@ boost::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
   boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theData->attribute(theAttribute));
   if (anAttr)
-    aFeature = SketchPlugin_Sketch::getFeature(anAttr->object());
+    aFeature = ModelAPI_Feature::feature(anAttr->object());
 
   if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID())
     aPointAttr = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
@@ -177,7 +167,7 @@ boost::shared_ptr<SketchPlugin_Line> getFeatureLine(DataPtr theData, const std::
   boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theData->attribute(theAttribute));
   if (anAttr) {
-    FeaturePtr aFeature = SketchPlugin_Sketch::getFeature(anAttr->object());
+    FeaturePtr aFeature = ModelAPI_Feature::feature(anAttr->object());
     if (aFeature && aFeature->getKind() == SketchPlugin_Line::ID()) {
       aLine = boost::dynamic_pointer_cast<SketchPlugin_Line>(aFeature);
     }

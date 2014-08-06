@@ -8,7 +8,6 @@
 
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_ViewerPrs.h>
-#include <ModuleBase_Tools.h>
 
 #include <ModelAPI_Events.h>
 
@@ -60,7 +59,7 @@ void PartSet_OperationFeatureEditMulti::initSelection(const std::list<ModuleBase
     bool isSelected = false;
     std::list<ModuleBase_ViewerPrs>::const_iterator anIt = theSelected.begin(), aLast = theSelected.end();
     for (; anIt != aLast && !isSelected; anIt++) {
-      isSelected = ModuleBase_Tools::feature((*anIt).object()) == feature();
+      isSelected = ModelAPI_Feature::feature((*anIt).object()) == feature();
     }
     if (!isSelected)
       myFeatures = theHighlighted;
@@ -114,7 +113,7 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Handle
       ObjectPtr aObject = (*anIt).object();
       if (!aObject || aObject == feature())
         continue;
-      FeaturePtr aFeature = ModuleBase_Tools::feature(aObject);
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
       if (aFeature) {
         aSketchFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature)

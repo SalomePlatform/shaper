@@ -8,8 +8,12 @@
 #include "SketchPlugin.h"
 #include "SketchPlugin_Constraint.h"
 #include "SketchPlugin_Sketch.h"
+#include "ModelAPI_Data.h"
 
 #include <list>
+
+class SketchPlugin_Line;
+class GeomDataAPI_Point2D;
 
 /** \class SketchPlugin_ConstraintDistance
  *  \ingroup DataModel
@@ -51,5 +55,16 @@ public:
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintDistance();
 };
+
+
+/// Obtain the point object from specified constraint parameter
+boost::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
+                                                       const std::string&  theAttribute);
+
+boost::shared_ptr<SketchPlugin_Line> getFeatureLine(DataPtr theData, const std::string& theAttribute);
+
+boost::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(const boost::shared_ptr<SketchPlugin_Line>& theLine, 
+                                                    const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+
 
 #endif

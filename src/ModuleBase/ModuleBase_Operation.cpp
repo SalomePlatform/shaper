@@ -9,7 +9,6 @@
 
 #include "ModuleBase_OperationDescription.h"
 #include "ModuleBase_ModelWidget.h"
-#include "ModuleBase_FeatureValidator.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Document.h>
@@ -62,7 +61,7 @@ void ModuleBase_Operation::storeCustomValue()
 
   ModuleBase_ModelWidget* aCustom = dynamic_cast<ModuleBase_ModelWidget*>(sender());
   if (aCustom)
-    aCustom->storeValue(myFeature);
+    aCustom->storeValue();
 }
 
 void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
@@ -97,7 +96,7 @@ void ModuleBase_Operation::afterCommitOperation()
 bool ModuleBase_Operation::canBeCommitted() const
 {
   if (ModuleBase_IOperation::canBeCommitted()) {
-    FeaturePtr aFeature = feature();
+/*    FeaturePtr aFeature = feature();
     std::string aId = aFeature->getKind();
 
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
@@ -112,7 +111,7 @@ bool ModuleBase_Operation::canBeCommitted() const
         if (!aFValidator->isValid(aFeature))
           return false;
       }
-    }
+    }*/
     return true;
   }
   return false;

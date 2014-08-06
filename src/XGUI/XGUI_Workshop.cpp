@@ -403,12 +403,15 @@ void XGUI_Workshop::onOperationStarted()
     ModuleBase_ModelWidget* aWidget;
     for (; anIt != aLast; anIt++) {
       aWidget = *anIt;
+      aWidget->setFeature(aOperation->feature());
       //QObject::connect(aWidget, SIGNAL(valuesChanged()),  aOperation, SLOT(storeCustomValue()));
       QObject::connect(aWidget, SIGNAL(valuesChanged()),
                        this, SLOT(onWidgetValuesChanged()));
       // Init default values
       if (!aOperation->isEditOperation() && aWidget->hasDefaultValue()) {
-        aWidget->storeValue(aOperation->feature());
+        //aWidget->storeValue(aOperation->feature());
+        
+        aWidget->storeValue();
       }
     }
 
@@ -940,7 +943,8 @@ void XGUI_Workshop::onWidgetValuesChanged()
   for (; anIt != aLast; anIt++) {
     ModuleBase_ModelWidget* aCustom = *anIt;
     if (aCustom && (/*!aCustom->isInitialized(aFeature) ||*/ aCustom == aSenderWidget)) {
-      aCustom->storeValue(aFeature);
+      //aCustom->storeValue(aFeature);
+      aCustom->storeValue();
     }
   }
 }
@@ -1043,10 +1047,6 @@ void XGUI_Workshop::registerValidators() const
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-
-  aFactory->registerValidator("ModuleBase_ResultPointValidator", new ModuleBase_ResultPointValidator);
-  aFactory->registerValidator("ModuleBase_ResultLineValidator", new ModuleBase_ResultLineValidator);
-  aFactory->registerValidator("ModuleBase_ResultArcValidator", new ModuleBase_ResultArcValidator);
 }
 
 
