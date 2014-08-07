@@ -1004,12 +1004,12 @@ void XGUI_ViewWindow::resetState()
   setTransformRequested(NOTHING);
 }
 
-XGUI_ViewBackground XGUI_ViewWindow::background() const
+Qtx::BackgroundData XGUI_ViewWindow::background() const
 {
-  return myViewPort ? myViewPort->background() : XGUI_ViewBackground();
+  return myViewPort ? myViewPort->background() : Qtx::BackgroundData();
 }
 
-void XGUI_ViewWindow::setBackground(const XGUI_ViewBackground& theBackground)
+void XGUI_ViewWindow::setBackground(const Qtx::BackgroundData& theBackground)
 {
   if (myViewPort) 
   	myViewPort->setBackground( theBackground );

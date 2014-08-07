@@ -492,7 +492,7 @@ void XGUI_ViewPort::zoom(int x0, int y0, int x, int y)
 /*!
  Sets the background data
  */
-void XGUI_ViewPort::setBackground(const XGUI_ViewBackground& bgData)
+void XGUI_ViewPort::setBackground(const Qtx::BackgroundData& bgData)
 {
   if (bgData.isValid()) {
     myBackground = bgData;

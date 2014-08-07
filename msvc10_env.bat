@@ -149,6 +149,8 @@ if "%GUI_ROOT_DIR%" == "" (
 @REM -------------------------
 
 
+@SET NewGeomResources=%ROOT_DIR%\install\resources
+
 rem -------- Visual Studio --------------------
 rem Detect Visual Studio (either commercial or Express edition)
 if "%VS100COMNTOOLS%" == "" (

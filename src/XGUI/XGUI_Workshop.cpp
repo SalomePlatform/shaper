@@ -50,6 +50,8 @@
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
 
+#include <SUIT_ResourceMgr.h>
+
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -69,6 +71,7 @@
 #include <dlfcn.h>
 #endif
 
+SUIT_ResourceMgr* XGUI_Workshop::myResourceMgr = 0;
 
 QMap<QString, QString> XGUI_Workshop::myIcons;
 
@@ -89,6 +92,10 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myObjectBrowser(0),
   myDisplayer(0)
 {
+  if (!myResourceMgr) {
+    myResourceMgr = new SUIT_ResourceMgr("NewGeom");
+    myResourceMgr->setCurrentFormat("xml");
+  }
   myMainWindow = mySalomeConnector? 0 : new XGUI_MainWindow();
 
   myDisplayer = new XGUI_Displayer(this);
