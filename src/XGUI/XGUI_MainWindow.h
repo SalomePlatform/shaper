@@ -44,6 +44,8 @@ public:
 public slots:
   void showPythonConsole();
   void hidePythonConsole();
+  void dockPythonConsole();
+  void undockPythonConsole();
 
   void createSubWindow();
   
@@ -59,12 +61,29 @@ signals:
 
 protected:
   void closeEvent(QCloseEvent* event);
+  void createMainMenu();
 
 private:
   XGUI_MainMenu* myMenuBar;
   XGUI_Viewer* myViewer;
 
   PyConsole_EnhConsole* myPythonConsole;
+  //! Python console can be a dock widget if true, else as the tab.
+  bool myIsConsoleDocked;
+};
+
+class XGUI_EXPORT CloseEventWatcher: public QObject {
+  Q_OBJECT
+
+ public:
+  CloseEventWatcher(QObject* theParent);
+
+ signals:
+  void widgetClosed();
+
+ protected:
+  bool eventFilter(QObject *obj, QEvent *);
+
 };
 
 #endif

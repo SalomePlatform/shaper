@@ -18,11 +18,11 @@
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     : QMainWindow(parent), 
-    myPythonConsole(0)
+    myPythonConsole(0),
+    myIsConsoleDocked(false)
 {
   setWindowTitle(tr("New Geom"));
-  myMenuBar = new XGUI_MainMenu(this);
-
+  createMainMenu();
   QMdiArea* aMdiArea = new QMdiArea(this);
   aMdiArea->setContextMenuPolicy(Qt::ActionsContextMenu);
   setCentralWidget(aMdiArea);
@@ -67,15 +67,8 @@ QMdiArea* XGUI_MainWindow::mdiArea() const
 void XGUI_MainWindow::showPythonConsole()
 {
   if (!myPythonConsole) {
-
-    QDockWidget* aDoc = new QDockWidget(this);
-    aDoc->setFeatures(QDockWidget::AllDockWidgetFeatures | QDockWidget::DockWidgetVerticalTitleBar);
-    aDoc->setMinimumHeight(0);
-    aDoc->setWindowTitle("Console");
-    myPythonConsole = new PyConsole_EnhConsole( aDoc, new PyConsole_EnhInterp());
-    aDoc->setWidget(myPythonConsole);
-    addDockWidget(Qt::TopDockWidgetArea, aDoc);
-    tabifyDockWidget(myMenuBar->getLastDockWindow(), aDoc);
+    myPythonConsole = new PyConsole_EnhConsole(this, new PyConsole_EnhInterp());
+    undockPythonConsole();
   }
   myPythonConsole->parentWidget()->show();
 }
@@ -85,6 +78,44 @@ void XGUI_MainWindow::hidePythonConsole()
 {
   if (myPythonConsole)
     myPythonConsole->parentWidget()->hide();
+}
+
+//******************************************************
+void XGUI_MainWindow::dockPythonConsole()
+{
+  if (!myPythonConsole)
+    return;
+  myMenuBar->removeConsole();
+  QDockWidget* aDock = new QDockWidget(this);
+  aDock->setFeatures(QDockWidget::AllDockWidgetFeatures |
+                     QDockWidget::DockWidgetVerticalTitleBar);
+  aDock->setAllowedAreas(Qt::LeftDockWidgetArea  |
+                         Qt::RightDockWidgetArea |
+                         Qt::BottomDockWidgetArea);
+  aDock->setMinimumHeight(0);
+  aDock->setWindowTitle("Console");
+  aDock->setWidget(myPythonConsole);
+  addDockWidget(Qt::BottomDockWidgetArea, aDock);
+  // Undock python console if widget is closed...
+  CloseEventWatcher* aWatcher =  new CloseEventWatcher(aDock);
+  connect(aWatcher, SIGNAL(widgetClosed()),
+          this,     SLOT(undockPythonConsole()));
+  aDock->installEventFilter(aWatcher);
+}
+
+void XGUI_MainWindow::undockPythonConsole()
+{
+  if (!myPythonConsole)
+    return;
+  QDockWidget* aDock = qobject_cast<QDockWidget*>(myPythonConsole->parentWidget());
+  //When the application starts console will be displayed as
+  //a wokbench tab, so there is no dock yet
+  if(aDock) {
+    aDock->hide();
+    aDock->setWidget(NULL);
+    aDock->deleteLater();
+  }
+  myMenuBar->insertConsole(myPythonConsole);
 }
 
 //******************************************************
@@ -205,3 +236,30 @@ void XGUI_MainWindow::closeEvent(QCloseEvent * event)
   emit exitKeySequence();
   event->ignore();
 }
+
+void XGUI_MainWindow::createMainMenu()
+{
+  myMenuBar = new XGUI_MainMenu(this);
+  QDockWidget* aMenuDock = new QDockWidget(this);
+  aMenuDock->setWidget(myMenuBar);
+  aMenuDock->setAllowedAreas(Qt::TopDockWidgetArea);
+  aMenuDock->setFeatures(QDockWidget::DockWidgetVerticalTitleBar);
+  aMenuDock->setWindowTitle(tr("General"));
+  addDockWidget(Qt::TopDockWidgetArea, aMenuDock);
+}
+
+CloseEventWatcher::CloseEventWatcher(QObject* theParent)
+    : QObject(theParent)
+{}
+
+bool CloseEventWatcher::eventFilter(QObject *obj, QEvent *event) {
+  if (event->type() == QEvent::Close) {
+    emit widgetClosed();
+    event->ignore();
+    return true;
+  } else {
+    // standard event processing
+    return QObject::eventFilter(obj, event);
+  }
+}
+

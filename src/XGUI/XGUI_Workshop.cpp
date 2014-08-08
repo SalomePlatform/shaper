@@ -168,10 +168,8 @@ void XGUI_Workshop::initMenu()
     salomeConnector()->addEditMenuSeparator();
     return;
   }
-  XGUI_Workbench* aPage = myMainWindow->menuObject()->generalPage();
-
   // File commands group
-  XGUI_MenuGroupPanel* aGroup = aPage->addGroup("Default");
+  XGUI_MenuGroupPanel* aGroup = myMainWindow->menuObject()->generalPage();
 
   XGUI_Command* aCommand;
 
@@ -208,11 +206,11 @@ void XGUI_Workshop::initMenu()
                                 QIcon(":pictures/close.png"), QKeySequence::Close);
   aCommand->connectTo(this, SLOT(onExit()));
   //FIXME: SBH's test action. Can be used for some GUI tests.
-  //#ifdef _DEBUG
-  //  aCommand = aGroup->addFeature("TEST_CMD", "Test!", "Private debug button",
-  //                                QIcon(":pictures/close.png"));
-  //  aCommand->connectTo(myActionsMgr, SLOT(update()));
-  //#endif
+//  #ifdef _DEBUG
+//    aCommand = aGroup->addFeature("TEST_CMD", "Test!", "Private debug button",
+//                                  QIcon(":pictures/close.png"), QKeySequence(), true);
+//    aCommand->connectTo(myMainWindow, SLOT(dockPythonConsole()));
+//  #endif
 }
 
 //******************************************************
@@ -775,10 +773,8 @@ QList<QAction*> XGUI_Workshop::getModuleCommands() const
   } else {
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
     foreach (XGUI_Workbench* aWb, aMenuBar->workbenches()) {
-      if (aWb != aMenuBar->generalPage()) {
-        foreach(XGUI_Command* aCmd, aWb->features())
-          aCommands.append(aCmd);
-      }
+      foreach(XGUI_Command* aCmd, aWb->features())
+        aCommands.append(aCmd);
     }
   }
   return aCommands;
