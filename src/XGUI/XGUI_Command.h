@@ -3,22 +3,10 @@
 
 #include "XGUI.h"
 #include <QWidgetAction>
-#include <QPushButton>
+
 
 #define MIN_BUTTON_HEIGHT 25
 #define MIN_BUTTON_WIDTH 60
-
-class XGUI_EXPORT XGUI_MenuButton: public QPushButton
-{
-  Q_OBJECT
- public:
-  XGUI_MenuButton(const QIcon & icon, const QString & text, QWidget * parent = 0);
-
-// protected:
-//  virtual void enterEvent(QEvent * event);
-//  virtual void leaveEvent(QEvent * event);
-
-};
 
 /**\class XGUI_Command
  * \ingroup GUI
