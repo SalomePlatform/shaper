@@ -7,6 +7,7 @@
      <file>pictures/redo.png</file>
      <file>pictures/undo.png</file>
      <file>pictures/rebuild.png</file>
+     <file>pictures/preferences.png</file>
 
      <file>pictures/occ_view_back.png</file>
      <file>pictures/occ_view_bottom.png</file>
@@ -59,5 +60,7 @@
      <file>pictures/rename_edit.png</file>
      <file>pictures/eye_pencil.png</file>
      <file>pictures/eye_pencil_closed.png</file>
+   
+     <file>pictures/view_prefs.png</file>
  </qresource>
  </RCC>

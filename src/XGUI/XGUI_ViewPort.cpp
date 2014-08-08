@@ -156,7 +156,7 @@ void XGUI_ViewPort::updateBackground()
   // In OCCT 6.5.3 all above mentioned problems are fixed; so, above comment should be removed as soon
   // as SALOME is migrated to OCCT 6.5.3. The same concerns #ifdef statements in the below code
   switch(myBackground.mode()) {
-  case XGUI::ColorBackground: {
+  case Qtx::ColorBackground: {
     QColor c = myBackground.color();
     if (c.isValid()) {
       // Unset texture should be done here
@@ -171,7 +171,7 @@ void XGUI_ViewPort::updateBackground()
     }
     break;
   }
-  case XGUI::SimpleGradientBackground: {
+  case Qtx::SimpleGradientBackground: {
     QColor c1, c2;
     int type = myBackground.gradient(c1, c2);
     if (c1.isValid() && type >= XGUI::HorizontalGradient && type <= XGUI::LastGradient) {
@@ -222,7 +222,7 @@ void XGUI_ViewPort::updateBackground()
     }
     break;
   }
-  case XGUI::CustomGradientBackground:
+  case Qtx::CustomGradientBackground:
     // NOT IMPLEMENTED YET
     break;
   default:

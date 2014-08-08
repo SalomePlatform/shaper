@@ -43,8 +43,6 @@ class ModelAPI_ObjectUpdatedMessage;
 class ModelAPI_ObjectDeletedMessage;
 class QAction;
 
-class SUIT_ResourceMgr;
-
 /**\class XGUI_Workshop
  * \ingroup GUI
  * \brief Class which defines a configuration of the application (Workshop) and launches it.
@@ -113,8 +111,6 @@ public:
   //! Returns icon name according to feature Id
   static QString featureIcon(const std::string& theId);
 
-  static SUIT_ResourceMgr* resourceMgr() { return myResourceMgr; }
-
   //! Activates or deactivates a part
   //! If PartPtr is Null pointer then PartSet will be activated
   void activatePart(ResultPartPtr theFeature);
@@ -142,6 +138,7 @@ public slots:
   void onExit();
   void onUndo();
   void onRedo();
+  void onPreferences();
 
   void showPropertyPanel();
   void hidePropertyPanel();
@@ -216,9 +213,6 @@ private:
 
   QString myCurrentDir;
   static QMap<QString, QString> myIcons;
-
-  static SUIT_ResourceMgr* myResourceMgr;
-
 };
 
 #endif

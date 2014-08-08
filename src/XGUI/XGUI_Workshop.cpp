@@ -8,7 +8,6 @@
 #include "XGUI_Workbench.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_Viewer.h"
-#include "ModuleBase_WidgetFactory.h"
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_Selection.h"
 #include "XGUI_ObjectsBrowser.h"
@@ -22,6 +21,7 @@
 #include "XGUI_PropertyPanel.h"
 #include "XGUI_ContextMenuMgr.h"
 #include "XGUI_ModuleConnector.h"
+#include "XGUI_Preferences.h"
 
 #include <ModelAPI_Events.h>
 #include <ModelAPI_PluginManager.h>
@@ -44,13 +44,12 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_SelectionValidator.h>
 #include <ModuleBase_ResultValidators.h>
+#include "ModuleBase_WidgetFactory.h"
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
-
-#include <SUIT_ResourceMgr.h>
 
 #include <QApplication>
 #include <QFileDialog>
@@ -71,8 +70,6 @@
 #include <dlfcn.h>
 #endif
 
-SUIT_ResourceMgr* XGUI_Workshop::myResourceMgr = 0;
-
 QMap<QString, QString> XGUI_Workshop::myIcons;
 
 QString XGUI_Workshop::featureIcon(const std::string& theId)
@@ -92,10 +89,6 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myObjectBrowser(0),
   myDisplayer(0)
 {
-  if (!myResourceMgr) {
-    myResourceMgr = new SUIT_ResourceMgr("NewGeom");
-    myResourceMgr->setCurrentFormat("xml");
-  }
   myMainWindow = mySalomeConnector? 0 : new XGUI_MainWindow();
 
   myDisplayer = new XGUI_Displayer(this);
@@ -210,6 +203,10 @@ void XGUI_Workshop::initMenu()
   //aCommand = aGroup->addFeature("NEW_CMD", tr("New"), tr("Create a new document"),
   //                              QIcon(":pictures/new.png"), QKeySequence::New);
   //aCommand->connectTo(this, SLOT(onNew()));
+
+  aCommand = aGroup->addFeature("PREF_CMD", tr("Preferences"), tr("Edit preferences"),
+                                QIcon(":pictures/preferences.png"), QKeySequence::Preferences);
+  aCommand->connectTo(this, SLOT(onPreferences()));
 
   aCommand = aGroup->addFeature("EXIT_CMD", tr("Exit"), tr("Exit application"),
                                 QIcon(":pictures/close.png"), QKeySequence::Close);
@@ -665,6 +662,12 @@ void XGUI_Workshop::onRedo()
     operationMgr()->abortOperation();
   aDoc->redo();
   updateCommandStatus();
+}
+
+//******************************************************
+void XGUI_Workshop::onPreferences()
+{
+  XGUI_Preferences::editPreferences();
 }
 
 //******************************************************

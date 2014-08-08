@@ -51,13 +51,13 @@ enum Mode2dType
 };
 
 //! Types of background in view window
-enum BackgroundMode
-{
-  NoBackground,              // no (invalid) background data
-  ColorBackground,           // single color
-  SimpleGradientBackground,  // simple two-color gradient
-  CustomGradientBackground   // custom (complex) gradient
-};
+//enum BackgroundMode
+//{
+//  NoBackground,              // no (invalid) background data
+//  ColorBackground,           // single color
+//  SimpleGradientBackground,  // simple two-color gradient
+//  CustomGradientBackground   // custom (complex) gradient
+//};
 
 //! Texture mode
 enum TextureMode

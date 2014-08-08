@@ -2,7 +2,7 @@
 #include "XGUI_MainWindow.h"
 #include "XGUI_ViewWindow.h"
 #include "XGUI_ViewPort.h"
-#include "XGUI_Workshop.h"
+#include "XGUI_Preferences.h"
 
 #include <SUIT_ResourceMgr.h>
 
@@ -184,7 +184,7 @@ QMdiSubWindow* XGUI_Viewer::createView(V3d_TypeOfView theType)
   if (myViews.size() == 0) 
     setTrihedronShown(true);
 
-  Qtx::BackgroundData aBk = XGUI_Workshop::resourceMgr()->backgroundValue("Viewer", "background");
+  Qtx::BackgroundData aBk = XGUI_Preferences::resourceMgr()->backgroundValue("Viewer", "background");
   view->setBackground(aBk);
   view->updateEnabledDrawMode();
 

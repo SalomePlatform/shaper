@@ -31,6 +31,7 @@ SET(PROJECT_HEADERS
     XGUI_ContextMenuMgr.h
     XGUI_ModuleConnector.h
 	XGUI_Selection.h
+	XGUI_Preferences.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -62,6 +63,7 @@ SET(PROJECT_SOURCES
     XGUI_ContextMenuMgr.cpp
     XGUI_ModuleConnector.cpp
 	XGUI_Selection.cpp
+	XGUI_Preferences.cpp
 )
 
 SET(PROJECT_RESOURCES 
