@@ -2,8 +2,8 @@
 // Created:     07 Jul 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ModelAPI_ResultBody_HeaderFile
-#define ModelAPI_ResultBody_HeaderFile
+#ifndef ModelAPI_ResultBody_H_
+#define ModelAPI_ResultBody_H_
 
 #include "ModelAPI_Result.h"
 #include <GeomAPI_Shape.h>

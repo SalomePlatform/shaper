@@ -2,8 +2,8 @@
 // Created:     25 Jun 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef Model_Update_HeaderFile
-#define Model_Update_HeaderFile
+#ifndef Model_Update_H_
+#define Model_Update_H_
 
 #include "Model.h"
 #include "Events_Listener.h"

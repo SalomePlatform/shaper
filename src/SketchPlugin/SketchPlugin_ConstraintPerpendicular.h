@@ -2,8 +2,8 @@
 // Created: 26 May 2014
 // Author:  Artem ZHIDKOV
 
-#ifndef SketchPlugin_ConstraintPerpendicular_HeaderFile
-#define SketchPlugin_ConstraintPerpendicular_HeaderFile
+#ifndef SketchPlugin_ConstraintPerpendicular_H_
+#define SketchPlugin_ConstraintPerpendicular_H_
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Sketch.h>

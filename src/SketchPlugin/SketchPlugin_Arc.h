@@ -2,8 +2,8 @@
 // Created:     26 May 2014
 // Author:      Artem ZHIDKOV
 
-#ifndef SketchPlugin_Arc_HeaderFile
-#define SketchPlugin_Arc_HeaderFile
+#ifndef SketchPlugin_Arc_H_
+#define SketchPlugin_Arc_H_
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Feature.h>

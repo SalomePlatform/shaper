@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QList>
 #include <QMap>
+#include <QWidget>
 
 class XGUI_Command;
 class XGUI_MainWindow;
@@ -17,14 +18,22 @@ class QAction;
 class QDockWidget;
 class QEvent;
 
-
 /**\class XGUI_MainMenu
  * \ingroup GUI
  * \brief Class for creation of main menu (set of workbenches)
  */
-class XGUI_EXPORT XGUI_MainMenu: public QObject
+class XGUI_EXPORT XGUI_MainMenu: public QWidget
 {
-Q_OBJECT
+  Q_OBJECT
+
+  //! Size of menu item
+  //TODO(sbh, vsv): Move to the settings
+  enum ItemSize {
+    Small = 20,
+    Medium = 25,
+    Large = 30
+  };
+
 public:
   XGUI_MainMenu(XGUI_MainWindow *parent);
   virtual ~XGUI_MainMenu();
@@ -36,10 +45,10 @@ public:
   XGUI_Workbench* findWorkbench(const QString& theId)  const;
 
   //! Returns General page (predefined workbench)
-  XGUI_Workbench* generalPage() const { return myGeneralPage; }
+  XGUI_MenuGroupPanel* generalPage() const { return myGeneralPage; }
 
   //! Rerturns last created workbench in dock widget container
-  QDockWidget* getLastDockWindow() const { return myMenuTabs.last(); }
+  //QDockWidget* getLastDockWindow() const;
 
   //! Returns already created command by its ID
   XGUI_Command* feature(const QString& theId) const;
@@ -51,10 +60,19 @@ public:
 
   virtual bool eventFilter(QObject *theWatched, QEvent *theEvent);
 
+  //! Displays given console as a tab in the workbench
+  void insertConsole(QWidget*);
+  //! Removes already created tab with python console
+  void removeConsole();
+
+  int menuItemSize() const;
+  int menuItemRowsCount() const;
+  int menuHeight() const;
+
 private:
   XGUI_MainWindow* myDesktop;
-  QList<QDockWidget*> myMenuTabs;
-  XGUI_Workbench* myGeneralPage;
+  QTabWidget* myMenuTabs;
+  XGUI_MenuGroupPanel* myGeneralPage;
 
   QMap<XGUI_Command*, bool> myCommandState;
 };

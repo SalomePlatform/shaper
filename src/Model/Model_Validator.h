@@ -2,8 +2,8 @@
 // Created:     2 Jul 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef Model_Validator_HeaderFile
-#define Model_Validator_HeaderFile
+#ifndef Model_Validator_H_
+#define Model_Validator_H_
 
 #include <Model.h>
 #include <ModelAPI_Validator.h>

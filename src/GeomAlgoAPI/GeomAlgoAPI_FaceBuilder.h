@@ -2,8 +2,8 @@
 // Created:     23 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomAlgoAPI_FaceBuilder_HeaderFile
-#define GeomAlgoAPI_FaceBuilder_HeaderFile
+#ifndef GeomAlgoAPI_FaceBuilder_H_
+#define GeomAlgoAPI_FaceBuilder_H_
 
 #include <GeomAlgoAPI.h>
 #include <GeomAPI_Shape.h>

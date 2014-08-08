@@ -2,8 +2,8 @@
 // Created:     06 Jun 2014
 // Author:      Artem ZHIDKOV
 
-#ifndef GeomAlgoAPI_Extrusion_HeaderFile
-#define GeomAlgoAPI_Extrusion_HeaderFile
+#ifndef GeomAlgoAPI_Extrusion_H_
+#define GeomAlgoAPI_Extrusion_H_
 
 #include <GeomAlgoAPI.h>
 #include <GeomAPI_Shape.h>

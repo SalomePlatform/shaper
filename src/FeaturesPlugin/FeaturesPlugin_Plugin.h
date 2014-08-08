@@ -2,8 +2,8 @@
 // Created:     07 July 2014
 // Author:      Vitaly SMETANNIKOV
 
-#ifndef FeaturesPlugin_Plugin_HeaderFile
-#define FeaturesPlugin_Plugin_HeaderFile
+#ifndef FeaturesPlugin_Plugin_H_
+#define FeaturesPlugin_Plugin_H_
 
 
 #include "FeaturesPlugin.h"

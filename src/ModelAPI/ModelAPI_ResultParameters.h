@@ -2,8 +2,8 @@
 // Created:     07 Jul 2014
 // Author:      Vitaly SMETANNIKOV
 
-#ifndef ModelAPI_ResultParameters_HeaderFile
-#define ModelAPI_ResultParameters_HeaderFile
+#ifndef ModelAPI_ResultParameters_H_
+#define ModelAPI_ResultParameters_H_
 
 #include "ModelAPI_Result.h"
 

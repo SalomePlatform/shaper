@@ -2,8 +2,8 @@
 // Created:     17 July 2014
 // Author:      Vitaly SMETANNIKOV
 
-#ifndef GeomAPI_IPresentable_HeaderFile
-#define GeomAPI_IPresentable_HeaderFile
+#ifndef GeomAPI_IPresentable_H_
+#define GeomAPI_IPresentable_H_
 
 #include "GeomAPI_AISObject.h"
 

@@ -2,8 +2,8 @@
 // Created:     24 Jul 2014
 // Author:      Artem ZHIDKOV
 
-#ifndef GeomAPI_Edge_HeaderFile
-#define GeomAPI_Edge_HeaderFile
+#ifndef GeomAPI_Edge_H_
+#define GeomAPI_Edge_H_
 
 #include <GeomAPI_Shape.h>
 

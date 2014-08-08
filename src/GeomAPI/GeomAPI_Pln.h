@@ -2,8 +2,8 @@
 // Created:     23 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomAPI_Pln_HeaderFile
-#define GeomAPI_Pln_HeaderFile
+#ifndef GeomAPI_Pln_H_
+#define GeomAPI_Pln_H_
 
 #include <boost/shared_ptr.hpp>
 #include <GeomAPI_Interface.h>

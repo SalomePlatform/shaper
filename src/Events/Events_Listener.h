@@ -2,8 +2,8 @@
 // Created:	Thu Mar 13 2014
 // Author:	Mikhail PONIKAROV
 
-#ifndef Events_Listener_HeaderFile
-#define Events_Listener_HeaderFile
+#ifndef Events_Listener_H_
+#define Events_Listener_H_
 
 #include <Events.h>
 class Events_Message;

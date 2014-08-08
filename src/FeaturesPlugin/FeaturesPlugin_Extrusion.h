@@ -2,8 +2,8 @@
 // Created:     30 May 2014
 // Author:      Vitaly SMETANNIKOV
 
-#ifndef FeaturesPlugin_Extrusion_HeaderFile
-#define FeaturesPlugin_Extrusion_HeaderFile
+#ifndef FeaturesPlugin_Extrusion_H_
+#define FeaturesPlugin_Extrusion_H_
 
 #include "FeaturesPlugin.h"
 #include <ModelAPI_Feature.h>

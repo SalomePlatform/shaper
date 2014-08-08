@@ -2,8 +2,8 @@
 // Created:     24 Jun 2014
 // Author:      Artem ZHIDKOV
 
-#ifndef GeomAPI_Circ_HeaderFile
-#define GeomAPI_Circ_HeaderFile
+#ifndef GeomAPI_Circ_H_
+#define GeomAPI_Circ_H_
 
 #include <GeomAPI_Interface.h>
 #include <boost/shared_ptr.hpp>

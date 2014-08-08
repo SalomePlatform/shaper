@@ -2,8 +2,8 @@
 // Created:     3 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ConstructionPlugin_Point_HeaderFile
-#define ConstructionPlugin_Point_HeaderFile
+#ifndef ConstructionPlugin_Point_H_
+#define ConstructionPlugin_Point_H_
 
 #include "ConstructionPlugin.h"
 #include <ModelAPI_Feature.h>

@@ -2,8 +2,8 @@
 // Created:     24 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomData_Point_HeaderFile
-#define GeomData_Point_HeaderFile
+#ifndef GeomData_Point_H_
+#define GeomData_Point_H_
 
 #include "GeomData.h"
 #include "GeomDataAPI_Point.h"

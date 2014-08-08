@@ -2,8 +2,8 @@
 // Created:     23 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomAPI_Shape_HeaderFile
-#define GeomAPI_Shape_HeaderFile
+#ifndef GeomAPI_Shape_H_
+#define GeomAPI_Shape_H_
 
 #include <GeomAPI_Interface.h>
 

@@ -2,8 +2,8 @@
 // Created:	Thu Mar 13 2014
 // Author:	Mikhail PONIKAROV
 
-#ifndef Events_Loop_HeaderFile
-#define Events_Loop_HeaderFile
+#ifndef Events_Loop_H_
+#define Events_Loop_H_
 
 #include <Events_Message.h>
 #include <Events_Listener.h>

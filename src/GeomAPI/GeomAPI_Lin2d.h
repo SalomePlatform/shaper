@@ -2,8 +2,8 @@
 // Created:     29 May 2014
 // Author:      Artem ZHIDKOV
 
-#ifndef GeomAPI_Lin2d_HeaderFile
-#define GeomAPI_Lin2d_HeaderFile
+#ifndef GeomAPI_Lin2d_H_
+#define GeomAPI_Lin2d_H_
 
 #include <GeomAPI_Interface.h>
 #include <boost/shared_ptr.hpp>

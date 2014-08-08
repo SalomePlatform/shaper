@@ -2,8 +2,8 @@
 // Created:     8 May 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef Model_AttributeReference_HeaderFile
-#define Model_AttributeReference_HeaderFile
+#ifndef Model_AttributeReference_H_
+#define Model_AttributeReference_H_
 
 #include "Model.h"
 #include "ModelAPI_AttributeReference.h"

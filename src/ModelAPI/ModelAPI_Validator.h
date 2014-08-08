@@ -2,8 +2,8 @@
 // Created:     2 Jul 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ModelAPI_Validator_HeaderFile
-#define ModelAPI_Validator_HeaderFile
+#ifndef ModelAPI_Validator_H_
+#define ModelAPI_Validator_H_
 
 #include <ModelAPI.h>
 #include <boost/shared_ptr.hpp>

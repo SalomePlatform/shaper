@@ -2,8 +2,8 @@
 // Created:     27 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef SketchPlugin_Sketch_HeaderFile
-#define SketchPlugin_Sketch_HeaderFile
+#ifndef SketchPlugin_Sketch_H_
+#define SketchPlugin_Sketch_H_
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Feature.h>

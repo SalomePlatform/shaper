@@ -2,8 +2,8 @@
 // Created:     10 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef Model_Events_HeaderFile
-#define Model_Events_HeaderFile
+#ifndef Model_Events_H_
+#define Model_Events_H_
 
 #include <Model.h>
 #include <ModelAPI_Events.h>

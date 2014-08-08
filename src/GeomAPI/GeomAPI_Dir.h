@@ -2,8 +2,8 @@
 // Created:     23 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomAPI_Dir_HeaderFile
-#define GeomAPI_Dir_HeaderFile
+#ifndef GeomAPI_Dir_H_
+#define GeomAPI_Dir_H_
 
 #include <GeomAPI_Interface.h>
 #include <boost/shared_ptr.hpp>

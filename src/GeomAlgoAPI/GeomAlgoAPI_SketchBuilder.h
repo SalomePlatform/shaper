@@ -2,8 +2,8 @@
 // Created:     02 Jun 2014
 // Author:      Artem ZHIDKOV
 
-#ifndef GeomAlgoAPI_SketchBuilder_HeaderFile
-#define GeomAlgoAPI_SketchBuilder_HeaderFile
+#ifndef GeomAlgoAPI_SketchBuilder_H_
+#define GeomAlgoAPI_SketchBuilder_H_
 
 #include <GeomAlgoAPI.h>
 

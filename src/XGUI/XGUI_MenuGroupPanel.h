@@ -2,20 +2,22 @@
 #define XGUI_MenuGroupPanel_H
 
 #include "XGUI.h"
-#include <QWidget>
+#include <QFrame>
 #include <QMap>
 
 class XGUI_Command;
 class QGridLayout;
 
+
 /**\class XGUI_MenuGroupPanel
  * \ingroup GUI
  * \brief Represents a one group in a page of main menu (workbench)
  */
-class XGUI_EXPORT XGUI_MenuGroupPanel: public QWidget
+class XGUI_EXPORT XGUI_MenuGroupPanel: public QFrame
 {
-Q_OBJECT
-public:
+  Q_OBJECT
+
+ public:
   explicit XGUI_MenuGroupPanel(QWidget *parent = 0);
 
   //! Adding a new feature (Command) in the group

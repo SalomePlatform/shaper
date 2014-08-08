@@ -9,7 +9,9 @@
 
 #include <QObject>
 #include <QMap>
+#include <QList>
 #include <QStringList>
+#include <QKeySequence>
 
 class XGUI_Command;
 class XGUI_Workshop;
@@ -35,6 +37,8 @@ public:
 
   bool isNested(const QString& theId) const;
 
+  QKeySequence registerShortcut(const QString& theKeySequence);
+
 public slots:
   //! Update workbench actions according to OperationMgr state:
   //! No active operations: all actions but nested are available
@@ -58,7 +62,9 @@ protected:
 private:
   QMap<QString, QAction*> myActions;
   QMap<QString, QStringList> myNestedActions;
+  QList<QKeySequence> myShortcuts;
 
+  XGUI_Workshop* myWorkshop;
   XGUI_OperationMgr* myOperationMgr;
 };
 

@@ -2,8 +2,8 @@
 // Created:     08 Jul 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef Model_ResultBody_HeaderFile
-#define Model_ResultBody_HeaderFile
+#ifndef Model_ResultBody_H_
+#define Model_ResultBody_H_
 
 #include "Model.h"
 #include <ModelAPI_ResultBody.h>

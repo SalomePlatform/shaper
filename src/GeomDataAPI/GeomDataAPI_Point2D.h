@@ -2,8 +2,8 @@
 // Created:     24 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomDataAPI_Point2D_HeaderFile
-#define GeomDataAPI_Point2D_HeaderFile
+#ifndef GeomDataAPI_Point2D_H_
+#define GeomDataAPI_Point2D_H_
 
 #include "GeomDataAPI.h"
 #include <ModelAPI_Attribute.h>

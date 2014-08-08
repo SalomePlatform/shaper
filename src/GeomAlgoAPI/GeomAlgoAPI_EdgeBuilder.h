@@ -2,8 +2,8 @@
 // Created:     23 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef GeomAlgoAPI_EdgeBuilder_HeaderFile
-#define GeomAlgoAPI_EdgeBuilder_HeaderFile
+#ifndef GeomAlgoAPI_EdgeBuilder_H_
+#define GeomAlgoAPI_EdgeBuilder_H_
 
 #include <GeomAlgoAPI.h>
 #include <GeomAPI_Edge.h>

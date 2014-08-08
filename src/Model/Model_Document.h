@@ -2,8 +2,8 @@
 // Created:     28 Feb 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef Model_Document_HeaderFile
-#define Model_Document_HeaderFile
+#ifndef Model_Document_H_
+#define Model_Document_H_
 
 #include <Model.h>
 #include <ModelAPI_Document.h>

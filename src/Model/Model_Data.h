@@ -2,8 +2,8 @@
 // Created:     21 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef Model_Data_HeaderFile
-#define Model_Data_HeaderFile
+#ifndef Model_Data_H_
+#define Model_Data_H_
 
 #include "Model.h"
 #include <ModelAPI_Data.h>

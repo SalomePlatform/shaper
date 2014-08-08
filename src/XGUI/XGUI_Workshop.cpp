@@ -168,10 +168,8 @@ void XGUI_Workshop::initMenu()
     salomeConnector()->addEditMenuSeparator();
     return;
   }
-  XGUI_Workbench* aPage = myMainWindow->menuObject()->generalPage();
-
   // File commands group
-  XGUI_MenuGroupPanel* aGroup = aPage->addGroup("Default");
+  XGUI_MenuGroupPanel* aGroup = myMainWindow->menuObject()->generalPage();
 
   XGUI_Command* aCommand;
 
@@ -212,11 +210,11 @@ void XGUI_Workshop::initMenu()
                                 QIcon(":pictures/close.png"), QKeySequence::Close);
   aCommand->connectTo(this, SLOT(onExit()));
   //FIXME: SBH's test action. Can be used for some GUI tests.
-  //#ifdef _DEBUG
-  //  aCommand = aGroup->addFeature("TEST_CMD", "Test!", "Private debug button",
-  //                                QIcon(":pictures/close.png"));
-  //  aCommand->connectTo(myActionsMgr, SLOT(update()));
-  //#endif
+//  #ifdef _DEBUG
+//    aCommand = aGroup->addFeature("TEST_CMD", "Test!", "Private debug button",
+//                                  QIcon(":pictures/close.png"), QKeySequence(), true);
+//    aCommand->connectTo(myMainWindow, SLOT(dockPythonConsole()));
+//  #endif
 }
 
 //******************************************************
@@ -452,15 +450,15 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
   QString aWchName = QString::fromStdString(theMessage->workbenchId());
   QString aNestedFeatures = QString::fromStdString(theMessage->nestedFeatures());
   bool isUsePropPanel = theMessage->isUseInput();
-  QString aId = QString::fromStdString(theMessage->id());
+  QString aFeatureId = QString::fromStdString(theMessage->id());
   if (isSalomeMode()) {
     QAction* aAction = salomeConnector()->addFeature(aWchName,
-                              aId,
+                              aFeatureId,
                               QString::fromStdString(theMessage->text()),
                               QString::fromStdString(theMessage->tooltip()),
                               QIcon(theMessage->icon().c_str()),
                               QKeySequence(), isUsePropPanel);
-    salomeConnector()->setNestedActions(aId, aNestedFeatures.split(" "));
+    salomeConnector()->setNestedActions(aFeatureId, aNestedFeatures.split(" "));
     myActionsMgr->addCommand(aAction);
     myModule->featureCreated(aAction);
   } else {
@@ -476,12 +474,15 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
     if (!aGroup) {
       aGroup = aPage->addGroup(aGroupName);
     }
-    //Create feature...
-    XGUI_Command* aCommand = aGroup->addFeature(aId,
+    // Check if hotkey sequence is already defined:
+    QKeySequence aHotKey = myActionsMgr->registerShortcut(
+        QString::fromStdString(theMessage->keysequence()));
+    // Create feature...
+    XGUI_Command* aCommand = aGroup->addFeature(aFeatureId,
                                                 QString::fromStdString(theMessage->text()),
                                                 QString::fromStdString(theMessage->tooltip()),
                                                 QIcon(theMessage->icon().c_str()),
-                                                QKeySequence(), isUsePropPanel);
+                                                aHotKey, isUsePropPanel);
     aCommand->setNestedCommands(aNestedFeatures.split(" ", QString::SkipEmptyParts));
     myActionsMgr->addCommand(aCommand);
     myModule->featureCreated(aCommand);
@@ -794,10 +795,8 @@ QList<QAction*> XGUI_Workshop::getModuleCommands() const
   } else {
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
     foreach (XGUI_Workbench* aWb, aMenuBar->workbenches()) {
-      if (aWb != aMenuBar->generalPage()) {
-        foreach(XGUI_Command* aCmd, aWb->features())
-          aCommands.append(aCmd);
-      }
+      foreach(XGUI_Command* aCmd, aWb->features())
+        aCommands.append(aCmd);
     }
   }
   return aCommands;

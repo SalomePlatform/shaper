@@ -2,8 +2,8 @@
 // Created:     2 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef Model_AttributeDouble_HeaderFile
-#define Model_AttributeDouble_HeaderFile
+#ifndef Model_AttributeDouble_H_
+#define Model_AttributeDouble_H_
 
 #include "Model.h"
 #include "ModelAPI_AttributeDouble.h"

@@ -10,13 +10,16 @@
 #include <iostream>
 
 XGUI_MenuGroupPanel::XGUI_MenuGroupPanel(QWidget *parent)
-    : QWidget(parent), myNewRow(0), myNewCol(0), myMaxRow(1)
+    : QFrame(parent), myNewRow(0), myNewCol(0), myMaxRow(1)
 {
   myLayout = new QGridLayout(this);
   myLayout->setSpacing(0);
   myLayout->setMargin(0);
   myLayout->setContentsMargins(0, 0, 0, 0);
+  setFrameShape(QFrame::NoFrame);
 }
+
+
 
 void XGUI_MenuGroupPanel::addCommand(XGUI_Command* theAction)
 {
@@ -68,9 +71,9 @@ XGUI_Command* XGUI_MenuGroupPanel::addFeature(const QString& theId, const QStrin
 {
   XGUI_Command* aCommand = new XGUI_Command(theId, theIcon, theTitle, this, isCheckable);
   aCommand->setToolTip(theTip);
-  if (!theKeys.isEmpty())
+  if (!theKeys.isEmpty()) {
     aCommand->setShortcut(theKeys);
-
+  }
   addCommand(aCommand);
   return aCommand;
 }

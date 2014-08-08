@@ -2,8 +2,8 @@
 // Created:     07 Jul 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ModelAPI_Result_HeaderFile
-#define ModelAPI_Result_HeaderFile
+#ifndef ModelAPI_Result_H_
+#define ModelAPI_Result_H_
 
 #include "ModelAPI_Object.h"
 
