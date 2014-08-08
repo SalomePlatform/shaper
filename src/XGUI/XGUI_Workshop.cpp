@@ -436,15 +436,15 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
   QString aWchName = QString::fromStdString(theMessage->workbenchId());
   QString aNestedFeatures = QString::fromStdString(theMessage->nestedFeatures());
   bool isUsePropPanel = theMessage->isUseInput();
-  QString aId = QString::fromStdString(theMessage->id());
+  QString aFeatureId = QString::fromStdString(theMessage->id());
   if (isSalomeMode()) {
     QAction* aAction = salomeConnector()->addFeature(aWchName,
-                              aId,
+                              aFeatureId,
                               QString::fromStdString(theMessage->text()),
                               QString::fromStdString(theMessage->tooltip()),
                               QIcon(theMessage->icon().c_str()),
                               QKeySequence(), isUsePropPanel);
-    salomeConnector()->setNestedActions(aId, aNestedFeatures.split(" "));
+    salomeConnector()->setNestedActions(aFeatureId, aNestedFeatures.split(" "));
     myActionsMgr->addCommand(aAction);
     myModule->featureCreated(aAction);
   } else {
@@ -460,12 +460,15 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
     if (!aGroup) {
       aGroup = aPage->addGroup(aGroupName);
     }
-    //Create feature...
-    XGUI_Command* aCommand = aGroup->addFeature(aId,
+    // Check if hotkey sequence is already defined:
+    QKeySequence aHotKey = myActionsMgr->registerShortcut(
+        QString::fromStdString(theMessage->keysequence()));
+    // Create feature...
+    XGUI_Command* aCommand = aGroup->addFeature(aFeatureId,
                                                 QString::fromStdString(theMessage->text()),
                                                 QString::fromStdString(theMessage->tooltip()),
                                                 QIcon(theMessage->icon().c_str()),
-                                                QKeySequence(), isUsePropPanel);
+                                                aHotKey, isUsePropPanel);
     aCommand->setNestedCommands(aNestedFeatures.split(" ", QString::SkipEmptyParts));
     myActionsMgr->addCommand(aCommand);
     myModule->featureCreated(aCommand);

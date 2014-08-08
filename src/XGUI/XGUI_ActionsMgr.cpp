@@ -9,18 +9,27 @@
 #include "XGUI_SalomeConnector.h"
 
 #include <ModuleBase_Operation.h>
+#include <Events_Error.h>
 
 #include <QAction>
 
 #ifdef _DEBUG
+#include <iostream>
 #include <QDebug>
 #endif
 
 
 XGUI_ActionsMgr::XGUI_ActionsMgr(XGUI_Workshop* theParent)
- : QObject(theParent), myOperationMgr(theParent->operationMgr())
+ : QObject(theParent),
+   myWorkshop(theParent),
+   myOperationMgr(theParent->operationMgr())
 {
-
+  // Default shortcuts
+  myShortcuts << QKeySequence::Save;
+  myShortcuts << QKeySequence::Undo;
+  myShortcuts << QKeySequence::Redo;
+  myShortcuts << QKeySequence::Open;
+  myShortcuts << QKeySequence::Close;
 }
 
 XGUI_ActionsMgr::~XGUI_ActionsMgr()
@@ -132,4 +141,19 @@ bool XGUI_ActionsMgr::isNested(const QString& theId) const
       return true;
   }
   return false;
+}
+
+QKeySequence XGUI_ActionsMgr::registerShortcut(const QString& theKeySequence)
+{
+  if(theKeySequence.isEmpty()) {
+    return QKeySequence();
+  }
+  QKeySequence aResult(theKeySequence);
+  if(myShortcuts.contains(aResult)) {
+    QString aMessage = tr("Shortcut %1 is already defined. Ignore.").arg(theKeySequence);
+    Events_Error::send(aMessage.toStdString());
+    return QKeySequence();
+  }
+  myShortcuts.append(aResult);
+  return aResult;
 }
