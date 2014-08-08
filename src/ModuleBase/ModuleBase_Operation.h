@@ -112,6 +112,10 @@ protected:
   /// Sets the operation feature
   void setFeature(FeaturePtr theFeature);
 
+  /// Verifies whether this operator can be commited.
+  /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
+  virtual bool canBeCommitted() const;
+
 protected:
   FeaturePtr myFeature; /// the operation feature to be handled
 };

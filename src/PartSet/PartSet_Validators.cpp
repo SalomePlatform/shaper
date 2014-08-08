@@ -99,3 +99,4 @@ bool PartSet_RadiusValidator::isValid(const ModuleBase_ISelection* theSelection)
   }
   return (aCount > 0) && (aCount < 2);
 }
+

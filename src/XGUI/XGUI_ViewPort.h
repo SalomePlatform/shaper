@@ -2,7 +2,8 @@
 #define XGUI_ViewPort_H
 
 #include "XGUI.h"
-#include "XGUI_ViewBackground.h"
+
+#include <Qtx.h>
 
 #include <QWidget>
 #include <V3d_Viewer.hxx>
@@ -52,17 +53,17 @@ public:
     return myIsAdvancedZoomingEnabled;
   }
 
-  XGUI_ViewBackground background() const
+  Qtx::BackgroundData background() const
   {
     return myBackground;
   }
 
-  void setBackground(const XGUI_ViewBackground& bgData);
+  void setBackground(const Qtx::BackgroundData& bgData);
 
   void syncronizeWith( const XGUI_ViewPort* ref );
 
 signals:
-  void vpChangeBackground(const XGUI_ViewBackground&);
+  void vpChangeBackground(const Qtx::BackgroundData&);
   void vpClosed();
   void vpMapped();
   void vpTransformed();
@@ -94,7 +95,7 @@ private:
 
   double myScale;
 
-  XGUI_ViewBackground myBackground;
+  Qtx::BackgroundData myBackground;
   int myBgImgHeight;
   int myBgImgWidth;
 };

@@ -17,6 +17,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintParallel.h
     SketchPlugin_ConstraintPerpendicular.h
     SketchPlugin_ConstraintRadius.h
+	SketchPlugin_Validators.h
 )
 
 SET(PROJECT_SOURCES
@@ -34,6 +35,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintParallel.cpp
     SketchPlugin_ConstraintPerpendicular.cpp
     SketchPlugin_ConstraintRadius.cpp
+	SketchPlugin_Validators.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -55,7 +57,6 @@ INCLUDE_DIRECTORIES(
   ../GeomAPI
   ../GeomAlgoAPI
   ../GeomDataAPI
-  ../ModuleBase
 )
 
 INSTALL(TARGETS SketchPlugin DESTINATION plugins)

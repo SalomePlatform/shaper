@@ -90,20 +90,20 @@ ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 {
 }
 
-bool ModuleBase_WidgetDoubleValue::storeValue(ObjectPtr theObject) const
+bool ModuleBase_WidgetDoubleValue::storeValue() const
 {
-  DataPtr aData = theObject->data();
+  DataPtr aData = myFeature->data();
   AttributeDoublePtr aReal = aData->real(attributeID());
   if (aReal->value() != mySpinBox->value()) {
     aReal->setValue(mySpinBox->value());
-    updateObject(theObject);
+    updateObject(myFeature);
   }
   return true;
 }
 
-bool ModuleBase_WidgetDoubleValue::restoreValue(ObjectPtr theObject)
+bool ModuleBase_WidgetDoubleValue::restoreValue()
 {
-  DataPtr aData = theObject->data();
+  DataPtr aData = myFeature->data();
   AttributeDoublePtr aRef = aData->real(attributeID());
 
   bool isBlocked = mySpinBox->blockSignals(true);

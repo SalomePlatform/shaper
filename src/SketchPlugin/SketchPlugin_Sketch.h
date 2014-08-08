@@ -96,8 +96,6 @@ public:
   virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
                             boost::shared_ptr<GeomAPI_AISObject> thePrevious);
 
-  static FeaturePtr getFeature(ObjectPtr theObject);
-
 protected:
   /// Creates a plane and append it to the list
   /// \param theX the X normal value

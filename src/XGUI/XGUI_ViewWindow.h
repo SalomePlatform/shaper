@@ -3,7 +3,8 @@
 
 #include "XGUI.h"
 #include "XGUI_Constants.h"
-#include "XGUI_ViewBackground.h"
+
+#include <Qtx.h>
 
 #include <QFrame>
 #include <QIcon>
@@ -76,10 +77,10 @@ public:
   bool transformEnabled(const OperationType) const;
 
   //! Returns View background object
-  XGUI_ViewBackground background() const;
+  Qtx::BackgroundData background() const;
 
   //! Sets View background object
-  void setBackground(const XGUI_ViewBackground& theBackground);
+  void setBackground(const Qtx::BackgroundData& theBackground);
 
   //! Returns true if the current view window can be closed
   bool closable() const { return myClosable; }

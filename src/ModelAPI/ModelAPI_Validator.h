@@ -65,11 +65,16 @@ public:
     const std::list<std::string>& theArguments) = 0;
 
   /// Provides a validator for the feature, returns NULL if no validator
-  virtual const ModelAPI_Validator* validator(const std::string& theFeatureID) const = 0;
-
+  virtual void validators(const std::string& theFeatureID, 
+    std::list<ModelAPI_Validator*>& theResult) const = 0;
   /// Provides a validator for the attribute, returns NULL if no validator
-  virtual const ModelAPI_Validator* validator(
-    const std::string& theFeatureID, const std::string& theAttrID) const = 0;
+  virtual void validators(
+    const std::string& theFeatureID, const std::string& theAttrID,
+    std::list<ModelAPI_Validator*>& theValidators, 
+    std::list<std::list<std::string> >& theArguments) const = 0;
+
+  /// Returns registered validator by its Id
+  virtual const ModelAPI_Validator* validator(const std::string& theID) const = 0;
 
   /// Returns the result of "validate" method for attribute of validator.
   /// If validator is not exists, returns true: everything is valid by default.

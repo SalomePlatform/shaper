@@ -57,10 +57,6 @@ public:
   /// /returns the instance of the description class
   ModuleBase_OperationDescription* getDescription() const;
 
-  /// Verifies whether this operator can be commited.
-  /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
-  virtual bool canBeCommitted() const;
-
   /// Verifies whether this operator can be always started above any already running one
   /// \return Returns TRUE if current operation must not be checked for ActiveOperation->IsValid( this )
   /// This method must be redefined in derived operation if operation of derived class
@@ -111,7 +107,7 @@ public slots:
   /// Commits operation
   /// Public slot. Commits operation. This slot is not virtual and cannot be redefined.
   /// Redefine commitOperation method to change behavior of operation instead
-  void commit();
+  bool commit();
 
   /// Alias for start/abort slots
   /// Public slot. Aborts operation if false, else does nothing.
@@ -127,15 +123,23 @@ protected:
   /// Virtual method called when operation started (see start() method for more description)
   /// Default impl calls corresponding slot and commits immediately.
   virtual void startOperation() = 0;
+
   /// Virtual method called when operation stopped - committed or aborted.
   virtual void stopOperation() = 0;
+
   /// Virtual method called when operation aborted (see abort() method for more description)
   virtual void abortOperation() = 0;
+
   /// Virtual method called when operation committed (see commit() method for more description)
   virtual void commitOperation() = 0;
+
   /// Virtual method called after operation committed (see commit() method for more description)
   /// it is important that the method is called after the stop() signal is emitted
   virtual void afterCommitOperation() = 0;
+
+  /// Verifies whether this operator can be commited.
+  /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
+  virtual bool canBeCommitted() const;
 
   /// Returns pointer to the root document.
   boost::shared_ptr<ModelAPI_Document> document() const;

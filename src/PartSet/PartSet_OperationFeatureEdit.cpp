@@ -11,15 +11,14 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_ViewerPrs.h>
-#include <ModuleBase_Tools.h>
 
 #include <ModelAPI_Events.h>
 
 #include <SketchPlugin_Feature.h>
 #include <GeomDataAPI_Point2D.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
-
 #include <ModelAPI_Events.h>
 
 #include <Events_Loop.h>
@@ -80,27 +79,28 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
   if (!aObject && !theSelected.empty()) // changed for a constrain
     aObject = theSelected.front().object();
 
-  FeaturePtr aFeature = ModuleBase_Tools::feature(aObject);
+  FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
   if (!aFeature || aFeature != feature()) {
-    commit();
-    emit featureConstructed(feature(), FM_Deactivation);
+    if (commit()) {
+      emit featureConstructed(feature(), FM_Deactivation);
 
-    bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
-    if(aHasShift && !theHighlighted.empty()) {
-      QList<ObjectPtr> aSelected;
-      std::list<ModuleBase_ViewerPrs>::const_iterator aIt;
-      for (aIt = theSelected.cbegin(); aIt != theSelected.cend(); ++aIt)
-        aSelected.append((*aIt).object());
-      /*for (aIt = theHighlighted.cbegin(); aIt != theHighlighted.cend(); ++aIt) {
-        if (!aSelected.contains((*aIt).object()))
+      bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+      if(aHasShift && !theHighlighted.empty()) {
+        QList<ObjectPtr> aSelected;
+        std::list<ModuleBase_ViewerPrs>::const_iterator aIt;
+        for (aIt = theSelected.cbegin(); aIt != theSelected.cend(); ++aIt)
           aSelected.append((*aIt).object());
-      }*/
-      //aSelected.push_back(feature());
-      //aSelected.push_back(theHighlighted.front().object());
-      emit setSelection(aSelected);
-    }
-    else if (aFeature) {
-      restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+        /*for (aIt = theHighlighted.cbegin(); aIt != theHighlighted.cend(); ++aIt) {
+          if (!aSelected.contains((*aIt).object()))
+            aSelected.append((*aIt).object());
+        }*/
+        //aSelected.push_back(feature());
+        //aSelected.push_back(theHighlighted.front().object());
+        emit setSelection(aSelected);
+      }
+      else if (aFeature) {
+        restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+      }
     }
   }
 }

@@ -41,7 +41,8 @@ void SketchPlugin_Sketch::execute()
   if (!data()->isValid())
     return ;
   boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
-    boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
+    boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(
+    data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
 
   boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
     boost::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
@@ -165,18 +166,4 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Sketch::
     return aAIS;
   }
   return boost::shared_ptr<GeomAPI_AISObject>();
-}
-
-FeaturePtr SketchPlugin_Sketch::getFeature(ObjectPtr theObject)
-{
-  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
-  if (!aFeature) {
-    ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-    if (aResult) {
-      PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-      DocumentPtr aDoc = aMgr->rootDocument();
-      return aDoc->feature(aResult);
-    }
-  }
-  return aFeature;
 }

@@ -5,10 +5,10 @@
 
 #include "ModuleBase_WidgetSelector.h"
 #include "ModuleBase_IWorkshop.h"
-#include "ModuleBase_Tools.h"
 
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Tools.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -102,24 +102,28 @@ ModuleBase_WidgetSelector::~ModuleBase_WidgetSelector()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::storeValue(ObjectPtr theObject) const
+bool ModuleBase_WidgetSelector::storeValue() const
 {
-  DataPtr aData = theObject->data();
+  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(mySelectedObject);
+  if (aSelectedFeature == myFeature) // In order to avoid selection of the same object
+    return false;
+
+  DataPtr aData = myFeature->data();
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
 
   ObjectPtr aObject = aRef->value();
   if (!(aObject && aObject->isSame(mySelectedObject))) {
     aRef->setValue(mySelectedObject);
-    updateObject(theObject);
+    updateObject(myFeature);
   }
   return true;
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::restoreValue(ObjectPtr theObject)
+bool ModuleBase_WidgetSelector::restoreValue()
 {
-  DataPtr aData = theObject->data();
+  DataPtr aData = myFeature->data();
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(attributeID());
 
   bool isBlocked = this->blockSignals(true);
@@ -157,7 +161,7 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
     mySelectedObject = aObject;
     if (mySelectedObject) {
       updateSelectionName();
-      activateSelection(false);
+      myActivateBtn->setChecked(false);
       raisePanel();
     } else {
       myTextLine->setText("");
@@ -170,7 +174,7 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
 bool ModuleBase_WidgetSelector::isAccepted(const ObjectPtr theResult) const
 {
   ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theResult);
-  boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModuleBase_Tools::shape(aResult);
+  boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
   if (!aShapePtr) return false;
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
   if (aShape.IsNull()) return false;
@@ -207,7 +211,7 @@ bool ModuleBase_WidgetSelector::eventFilter(QObject* theObj, QEvent* theEvent)
 {
   if (theObj == myTextLine) {
     if (theEvent->type() == QEvent::Polish) {
-      activateSelection(myActivateOnStart);
+      myActivateBtn->setChecked(myActivateOnStart);
       onSelectionChanged();
     }
   }

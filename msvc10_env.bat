@@ -136,11 +136,20 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @SET PYTHONPATH=%ROOT_DIR%\install\swig;%PYTHONPATH%
 
 @REM -------------------------
+@REM SUIT
+@SET SUIT_DIR=%PDIR%\suit
+@SET PATH=%SUIT_DIR%\bin;%PATH%
+@REM -------------------------
+
+
+@REM -------------------------
 if "%GUI_ROOT_DIR%" == "" (
   @SET GUI_ROOT_DIR=%ROOT_DIR%\SALOME\GUI\DEBUG\GUI_INSTALL
 )
 @REM -------------------------
 
+
+@SET NewGeomResources=%ROOT_DIR%\install\resources
 
 rem -------- Visual Studio --------------------
 rem Detect Visual Studio (either commercial or Express edition)

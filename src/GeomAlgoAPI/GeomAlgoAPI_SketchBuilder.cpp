@@ -157,6 +157,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   gp_Dir aNextDir;
   while (aMapVE.Extent() > 0)
   {
+    if (aCurVertex.IsNull())
+      return;
     findNextVertex(aCurVertex, aMapVE, aCurDir, aCurNorm, aNextVertex, aBindingEdge, aNextDir);
     aCurNorm = aNorm;
 
@@ -210,7 +212,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
       if (!aPatch.IsNull())
       {
         boost::shared_ptr<GeomAPI_Shape> aFace(new GeomAPI_Shape);
-        aFace->setImpl(new TopoDS_Shape(aPatch));
+        aFace->setImpl(new TopoDS_Face(aPatch));
         theResultFaces.push_back(aFace);
       }
       // push the edges used in the loop to the map
@@ -344,6 +346,8 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
     for (++anIter2; anIter2 != theFaces.end(); anIter2++)
     {
       const TopoDS_Face& aF1 = (*anIter1)->impl<TopoDS_Face>();
+      if (aF1.ShapeType() != TopAbs_FACE) // TODO: MPV - this workaround must be fixed later by AZV, now it just removes crash
+        continue;
       TopExp_Explorer aVert2((*anIter2)->impl<TopoDS_Shape>(), TopAbs_VERTEX);
       for ( ; aVert2.More(); aVert2.Next())
       {
@@ -355,6 +359,8 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
       if (aVert2.More())
       { // second shape is not inside first, change the shapes order and repeat comparision
         const TopoDS_Face& aF2 = (*anIter2)->impl<TopoDS_Face>();
+        if (aF2.ShapeType() != TopAbs_FACE) // TODO: MPV - this workaround must be fixed later by AZV, now it just removes crash
+          continue;
         TopExp_Explorer aVert1((*anIter1)->impl<TopoDS_Shape>(), TopAbs_VERTEX);
         for ( ; aVert1.More(); aVert1.Next())
         {

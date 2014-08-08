@@ -37,7 +37,7 @@ void SketchPlugin_ConstraintRadius::execute()
 
     boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
       boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    FeaturePtr aFeature = SketchPlugin_Sketch::getFeature(aRef->object());
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
     if (aFeature) {
       double aRadius = 0;
       boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
@@ -73,7 +73,7 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintRadius::getAISObject
     boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
   if (!anAttr)
     return thePrevious;
-  FeaturePtr aFeature = SketchPlugin_Sketch::getFeature(anAttr->object());
+  FeaturePtr aFeature = ModelAPI_Feature::feature(anAttr->object());
   std::string aKind = aFeature ? aFeature->getKind() : "";
   if (aKind != SketchPlugin_Circle::ID() && aKind != SketchPlugin_Arc::ID())
     return thePrevious;
@@ -130,7 +130,7 @@ void SketchPlugin_ConstraintRadius::move(double theDeltaX, double theDeltaY)
 
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
     boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  FeaturePtr aFeature = SketchPlugin_Sketch::getFeature(aRef->object());
+  FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
   if (!aFeature)
     return;
   std::string aCenterAttrName;

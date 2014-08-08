@@ -17,6 +17,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Validator.h>
 
 #include <Events_Loop.h>
 
@@ -60,7 +61,7 @@ void ModuleBase_Operation::storeCustomValue()
 
   ModuleBase_ModelWidget* aCustom = dynamic_cast<ModuleBase_ModelWidget*>(sender());
   if (aCustom)
-    aCustom->storeValue(myFeature);
+    aCustom->storeValue();
 }
 
 void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
@@ -90,6 +91,30 @@ void ModuleBase_Operation::commitOperation()
 
 void ModuleBase_Operation::afterCommitOperation()
 {
+}
+
+bool ModuleBase_Operation::canBeCommitted() const
+{
+  if (ModuleBase_IOperation::canBeCommitted()) {
+/*    FeaturePtr aFeature = feature();
+    std::string aId = aFeature->getKind();
+
+    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+    ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+    std::list<ModelAPI_Validator*> aValidators;
+    aFactory->validators(aId, aValidators);
+    std::list<ModelAPI_Validator*>::const_iterator aIt;
+    for (aIt = aValidators.cbegin(); aIt != aValidators.cend(); ++aIt) {
+      const ModuleBase_FeatureValidator* aFValidator = 
+        dynamic_cast<const ModuleBase_FeatureValidator*>(*aIt);
+      if (aFValidator) {
+        if (!aFValidator->isValid(aFeature))
+          return false;
+      }
+    }*/
+    return true;
+  }
+  return false;
 }
 
 void ModuleBase_Operation::flushUpdated()

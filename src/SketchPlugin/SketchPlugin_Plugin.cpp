@@ -10,8 +10,10 @@
 #include "SketchPlugin_ConstraintParallel.h"
 #include "SketchPlugin_ConstraintPerpendicular.h"
 #include "SketchPlugin_ConstraintRadius.h"
+#include "SketchPlugin_Validators.h"
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Validator.h>
 
 using namespace std;
 
@@ -20,6 +22,10 @@ static SketchPlugin_Plugin* MY_INSTANCE = new SketchPlugin_Plugin();
 
 SketchPlugin_Plugin::SketchPlugin_Plugin() 
 {
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  aFactory->registerValidator("SketchPlugin_DistanceAttrValidator", new SketchPlugin_DistanceAttrValidator);
+
   // register this plugin
   ModelAPI_PluginManager::get()->registerPlugin(this);
 }

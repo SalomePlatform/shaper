@@ -120,7 +120,9 @@ public:
   /// \return feature the feature or NULL if it not visualized
   ObjectPtr getObject(Handle(AIS_InteractiveObject) theIO) const;
 
-  void deactivate(ObjectPtr theFeature, bool toUpdate);
+  void deactivate(ObjectPtr theFeature);
+
+  void activate(ObjectPtr theFeature);
 
 protected:
   /// Deactivate local selection

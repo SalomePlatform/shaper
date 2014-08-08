@@ -102,24 +102,24 @@ void ModuleBase_WidgetPoint2D::setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& 
   emit valuesChanged();
 }
 
-bool ModuleBase_WidgetPoint2D::storeValue(ObjectPtr theObject) const
+bool ModuleBase_WidgetPoint2D::storeValue() const
 {
-  boost::shared_ptr<ModelAPI_Data> aData = theObject->data();
+  boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(attributeID()));
 
   ModuleBase_WidgetPoint2D* that = (ModuleBase_WidgetPoint2D*) this;
   bool isBlocked = that->blockSignals(true);
   aPoint->setValue(myXSpin->value(), myYSpin->value());
-  updateObject(theObject);
+  updateObject(myFeature);
   that->blockSignals(isBlocked);
 
   return true;
 }
 
-bool ModuleBase_WidgetPoint2D::restoreValue(ObjectPtr theObject)
+bool ModuleBase_WidgetPoint2D::restoreValue()
 {
-  boost::shared_ptr<ModelAPI_Data> aData = theObject->data();
+  boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(attributeID()));
 

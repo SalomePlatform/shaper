@@ -10,7 +10,7 @@
 std::map<void*, int> MY_SENDERS;
 
 Events_LongOp::Events_LongOp(void* theSender)
- : Events_Message(Events_LongOp::errorID(), theSender)
+ : Events_Message(Events_LongOp::eventID(), theSender)
 {
 }
 
@@ -18,7 +18,7 @@ Events_LongOp::~Events_LongOp()
 {
 }
 
-Events_ID Events_LongOp::errorID()
+Events_ID Events_LongOp::eventID()
 {
   Events_Loop* aLoop = Events_Loop::loop();
   return aLoop->eventByName("LongOperation");
@@ -26,14 +26,16 @@ Events_ID Events_LongOp::errorID()
 
 void Events_LongOp::start(void* theSender)
 {
-  if (MY_SENDERS.empty()) {
-    Events_LongOp anError(theSender);
-    Events_Loop::loop()->send(anError);
-  }
+  bool toSend = MY_SENDERS.empty();
   if (MY_SENDERS.find(theSender) == MY_SENDERS.end())
     MY_SENDERS[theSender] = 1;
   else 
     MY_SENDERS[theSender]++;
+
+  if (toSend) {
+    Events_LongOp anEvent(theSender);
+    Events_Loop::loop()->send(anEvent);
+  }
 }
 
 void Events_LongOp::end(void* theSender)
@@ -44,8 +46,8 @@ void Events_LongOp::end(void* theSender)
     else MY_SENDERS[theSender] = aCount - 1;
   }
   if (MY_SENDERS.empty()) {
-    Events_LongOp anError(theSender);
-    Events_Loop::loop()->send(anError);
+    Events_LongOp anEvent(theSender);
+    Events_Loop::loop()->send(anEvent);
   }
 }
 

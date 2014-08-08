@@ -62,6 +62,9 @@ public:
 
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Feature();
+
+  MODELAPI_EXPORT static boost::shared_ptr<ModelAPI_Feature> feature(ObjectPtr theObject);
+
 };
 
 //! Pointer on feature object

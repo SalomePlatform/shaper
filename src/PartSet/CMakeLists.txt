@@ -77,6 +77,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI
                     ${CMAKE_SOURCE_DIR}/src/SketchPlugin
                     ${CMAKE_SOURCE_DIR}/src/GeomAPI
                     ${CAS_INCLUDE_DIRS}
+					${SUIT_INCLUDE}
 )
 
 ADD_DEFINITIONS(-DPARTSET_EXPORTS ${CAS_DEFINITIONS})

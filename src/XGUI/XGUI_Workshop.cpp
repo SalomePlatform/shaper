@@ -50,6 +50,8 @@
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
 
+#include <SUIT_ResourceMgr.h>
+
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -69,6 +71,7 @@
 #include <dlfcn.h>
 #endif
 
+SUIT_ResourceMgr* XGUI_Workshop::myResourceMgr = 0;
 
 QMap<QString, QString> XGUI_Workshop::myIcons;
 
@@ -89,6 +92,10 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myObjectBrowser(0),
   myDisplayer(0)
 {
+  if (!myResourceMgr) {
+    myResourceMgr = new SUIT_ResourceMgr("NewGeom");
+    myResourceMgr->setCurrentFormat("xml");
+  }
   myMainWindow = mySalomeConnector? 0 : new XGUI_MainWindow();
 
   myDisplayer = new XGUI_Displayer(this);
@@ -262,10 +269,11 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     return;
   }
 
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName("LongOperation")) {
+  if (theMessage->eventID() == Events_LongOp::eventID()) {
     if (Events_LongOp::isPerformed())
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    else
+      //QTimer::singleShot(10, this, SLOT(onStartWaiting()));
+    else 
       QApplication::restoreOverrideCursor();
     return;
   }
@@ -279,8 +287,8 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     if (myOperationMgr->startOperation(anOperation)) {
       myPropertyPanel->updateContentWidget(anOperation->feature());
       if (!anOperation->getDescription()->hasXmlRepresentation()) {
-        anOperation->commit();
-        updateCommandStatus();
+        if (anOperation->commit())
+          updateCommandStatus();
       }
     }
     return;
@@ -289,6 +297,14 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
   if (anAppError) {
     emit errorOccurred(QString::fromLatin1(anAppError->description()));
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onStartWaiting()
+{
+  if (Events_LongOp::isPerformed()) {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
   }
 }
 
@@ -392,12 +408,15 @@ void XGUI_Workshop::onOperationStarted()
     ModuleBase_ModelWidget* aWidget;
     for (; anIt != aLast; anIt++) {
       aWidget = *anIt;
+      aWidget->setFeature(aOperation->feature());
       //QObject::connect(aWidget, SIGNAL(valuesChanged()),  aOperation, SLOT(storeCustomValue()));
       QObject::connect(aWidget, SIGNAL(valuesChanged()),
                        this, SLOT(onWidgetValuesChanged()));
       // Init default values
       if (!aOperation->isEditOperation() && aWidget->hasDefaultValue()) {
-        aWidget->storeValue(aOperation->feature());
+        //aWidget->storeValue(aOperation->feature());
+        
+        aWidget->storeValue();
       }
     }
 
@@ -930,7 +949,8 @@ void XGUI_Workshop::onWidgetValuesChanged()
   for (; anIt != aLast; anIt++) {
     ModuleBase_ModelWidget* aCustom = *anIt;
     if (aCustom && (/*!aCustom->isInitialized(aFeature) ||*/ aCustom == aSenderWidget)) {
-      aCustom->storeValue(aFeature);
+      //aCustom->storeValue(aFeature);
+      aCustom->storeValue();
     }
   }
 }
@@ -1012,12 +1032,16 @@ void XGUI_Workshop::updateCommandsOnViewSelection()
   QList<QAction*> aActions = getModuleCommands();
   foreach(QAction* aAction, aActions) {
     QString aId = aAction->data().toString();
-    const ModelAPI_Validator* aValidator = aFactory->validator(aId.toStdString());
-    if (aValidator) {
-      const ModuleBase_SelectionValidator* aSelValidator = 
-        dynamic_cast<const ModuleBase_SelectionValidator*>(aValidator);
-      if (aSelValidator) {
-        aAction->setEnabled(aSelValidator->isValid(aSelection));
+    std::list<ModelAPI_Validator*> aValidators;
+    aFactory->validators(aId.toStdString(), aValidators);
+    std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
+    for(; aValidator != aValidators.end(); aValidator++) {
+      if (*aValidator) {
+        const ModuleBase_SelectionValidator* aSelValidator = 
+          dynamic_cast<const ModuleBase_SelectionValidator*>(*aValidator);
+        if (aSelValidator) {
+          aAction->setEnabled(aSelValidator->isValid(aSelection));
+        }
       }
     }
   }
@@ -1029,10 +1053,6 @@ void XGUI_Workshop::registerValidators() const
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-
-  aFactory->registerValidator("ModuleBase_ResulPointValidator", new ModuleBase_ResulPointValidator);
-  aFactory->registerValidator("ModuleBase_ResulLineValidator", new ModuleBase_ResulLineValidator);
-  aFactory->registerValidator("ModuleBase_ResulArcValidator", new ModuleBase_ResulArcValidator);
 }
 
 

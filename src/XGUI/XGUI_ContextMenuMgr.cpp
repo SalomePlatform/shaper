@@ -101,40 +101,50 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
   QMenu* aMenu = new QMenu();
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
   QList<ObjectPtr> aObjects = aSelMgr->selection()->selectedObjects();
-  if (aObjects.size() == 1) {
+  int aSelected = aObjects.size();
+  if (aSelected > 0) {
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-    ObjectPtr aObject = aObjects.first();
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     //Process Feature
-    if (aObject) {
-      ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-      if (aPart) {
-        if (aMgr->currentDocument() == aPart->partDoc())
-          aMenu->addAction(action("DEACTIVATE_PART_CMD"));
-        else 
-          aMenu->addAction(action("ACTIVATE_PART_CMD"));
-      } else {
-        ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
-        if (aResult) {
-          XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-          if (aDisplayer->isVisible(aResult))
+    if (aSelected == 1) {
+      ObjectPtr aObject = aObjects.first();
+      if (aObject) {
+        ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+        FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+        if (aPart) {
+          if (aMgr->currentDocument() == aPart->partDoc())
+            aMenu->addAction(action("DEACTIVATE_PART_CMD"));
+          else 
+            aMenu->addAction(action("ACTIVATE_PART_CMD"));
+        } else if (aFeature) {
+          aMenu->addAction(action("EDIT_CMD"));
+        } else {
+          if (aDisplayer->isVisible(aObject))
             aMenu->addAction(action("HIDE_CMD"));
           else
             aMenu->addAction(action("SHOW_CMD"));
-        } else {
-          FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
-          if (aFeature) {
-            aMenu->addAction(action("EDIT_CMD"));
-            aMenu->addAction(action("DELETE_CMD"));
-          }
         }
+      } else { // If feature is 0 the it means that selected root object (document)
+        if (aMgr->currentDocument() != aMgr->rootDocument()) 
+          aMenu->addAction(action("ACTIVATE_PART_CMD"));
       }
-      aMenu->addSeparator();
-
-    // Process Root object (document)
-    } else { // If feature is 0 the it means that selected root object (document)
-      if (aMgr->currentDocument() != aMgr->rootDocument()) {
-        aMenu->addAction(action("ACTIVATE_PART_CMD"));
+    } else if (aSelected >= 1) {
+      bool hasResult = false;
+      bool hasFeature = false;
+      foreach(ObjectPtr aObj, aObjects) {
+        FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+        ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+        if (aResult) hasResult = true;
+        if (aFeature) hasFeature = true;
+        if (hasFeature && hasResult)
+          break;
       }
+      if (hasResult) {
+        aMenu->addAction(action("SHOW_CMD"));
+        aMenu->addAction(action("HIDE_CMD"));
+      }
+      if (hasFeature)
+        aMenu->addAction(action("DELETE_CMD"));
     }
   }
   aMenu->addActions(myWorkshop->objectBrowser()->actions());

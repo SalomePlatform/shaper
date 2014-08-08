@@ -8,6 +8,7 @@
 #include <Model.h>
 #include <ModelAPI_Validator.h>
 #include <map>
+#include <set>
 
 /**\class Model_ValidatorsFactory
  * \ingroup DataModel
@@ -23,10 +24,14 @@
  */
 class Model_ValidatorsFactory: public ModelAPI_ValidatorsFactory
 {
+private:
   std::map<std::string, ModelAPI_Validator*> myIDs; ///< map from ID to registered validator
-  std::map<std::string, ModelAPI_Validator*> myFeatures; ///< validators by feature ID
-  std::map<std::string, std::map<std::string, std::pair<ModelAPI_Validator*, 
-    std::list<std::string> > > > myAttrs; ///< validators and arguments by feature and attribute IDs
+  /// validators IDs by feature ID
+  std::map<std::string, std::set<std::string> > myFeatures; 
+  /// set of pairs: validators IDs, list of arguments
+  typedef std::set<std::pair<std::string, std::list<std::string> > > AttrValidators;
+  /// validators IDs and arguments by feature and attribute IDs
+  std::map<std::string, std::map<std::string, AttrValidators> > myAttrs;
 public:
   /// Registers the instance of the validator by the ID
   MODEL_EXPORT virtual void registerValidator(
@@ -42,10 +47,16 @@ public:
     const std::list<std::string>& theArguments);
 
   /// Provides a validator for the feature, returns NULL if no validator
-  MODEL_EXPORT virtual const ModelAPI_Validator* validator(const std::string& theFeatureID) const;
+  MODEL_EXPORT virtual void validators(const std::string& theFeatureID, 
+    std::list<ModelAPI_Validator*>& theResult) const;
   /// Provides a validator for the attribute, returns NULL if no validator
-  MODEL_EXPORT virtual const ModelAPI_Validator* validator(
-    const std::string& theFeatureID, const std::string& theAttrID) const;
+  MODEL_EXPORT virtual void validators(
+    const std::string& theFeatureID, const std::string& theAttrID,
+    std::list<ModelAPI_Validator*>& theValidators, 
+    std::list<std::list<std::string> >& theArguments) const;
+
+  /// Returns registered validator by its Id
+  virtual const ModelAPI_Validator* validator(const std::string& theID) const;
 
   /// Returns the result of "validate" method for attribute of validator.
   /// If validator is not exists, returns true: everything is valid by default.

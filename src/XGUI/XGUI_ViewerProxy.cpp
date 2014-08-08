@@ -37,7 +37,9 @@ Handle(V3d_View) XGUI_ViewerProxy::activeView() const
     return myWorkshop->salomeConnector()->viewer()->activeView();
   } else {
     XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-    return aViewer->activeViewWindow()->viewPort()->getView();
+    return (aViewer->activeViewWindow())?
+      aViewer->activeViewWindow()->viewPort()->getView():
+      Handle(V3d_View)();
   }
 }
  
@@ -58,7 +60,8 @@ void XGUI_ViewerProxy::fitAll()
   }
   else {
     XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-    aViewer->activeViewWindow()->viewPort()->fitAll();
+    if (aViewer->activeViewWindow())
+      aViewer->activeViewWindow()->viewPort()->fitAll();
   }
 }
 

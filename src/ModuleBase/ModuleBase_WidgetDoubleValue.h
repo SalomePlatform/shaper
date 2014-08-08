@@ -26,9 +26,9 @@ public:
 
   /// Saves the internal parameters to the given feature
   /// \param theObject a model feature to be changed
-  virtual bool storeValue(ObjectPtr theObject) const;
+  virtual bool storeValue() const;
 
-  virtual bool restoreValue(ObjectPtr theObject);
+  virtual bool restoreValue();
 
   /// Returns list of widget controls
   /// \return a control list

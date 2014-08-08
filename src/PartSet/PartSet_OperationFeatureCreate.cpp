@@ -67,7 +67,9 @@ bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
 
 bool PartSet_OperationFeatureCreate::canBeCommitted() const
 {
-  return !myActiveWidget;
+  if (PartSet_OperationSketchBase::canBeCommitted())
+    return !myActiveWidget;
+  return false;
 }
 
 bool PartSet_OperationFeatureCreate::isGranted(ModuleBase_IOperation* theOperation) const
@@ -104,11 +106,9 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
                                                 const std::list<ModuleBase_ViewerPrs>& theSelected,
                                                 const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
 {
-  if (canBeCommitted())
-  {
+  if (commit()) {
     // if the point creation is finished, the next mouse release should commit the modification
     // the next release can happens by double click in the viewer
-    commit();
     restartOperation(feature()->getKind(), feature());
     return;
   }
@@ -161,8 +161,7 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
 
 void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
-  if (canBeCommitted()) {
-    commit();
+  if (commit()) {
     restartOperation(feature()->getKind(), feature());
   }
   else {
@@ -210,21 +209,14 @@ void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
 {
   switch (theKey) {
     case Qt::Key_Return: {
-      if (canBeCommitted())
-      {
-        commit();
+      if (commit()) {
         // it start a new line creation at a free point
         restartOperation(feature()->getKind(), FeaturePtr());
       }
     }
     break;
     case Qt::Key_Escape: {
-      if (canBeCommitted())
-      {
-        commit();
-      }
-      else
-      {
+      if (!commit()) {
         abort();
       }
     }
@@ -279,6 +271,8 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
 
 bool PartSet_OperationFeatureCreate::setWidgetValue(ObjectPtr theFeature, double theX, double theY)
 {
+  if (!myActiveWidget)
+    return false;
   ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
   aValue->setObject(theFeature);
   aValue->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));

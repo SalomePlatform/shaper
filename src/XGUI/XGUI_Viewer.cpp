@@ -2,6 +2,9 @@
 #include "XGUI_MainWindow.h"
 #include "XGUI_ViewWindow.h"
 #include "XGUI_ViewPort.h"
+#include "XGUI_Workshop.h"
+
+#include <SUIT_ResourceMgr.h>
 
 #include <QMdiArea>
 #include <QMdiSubWindow>
@@ -181,8 +184,8 @@ QMdiSubWindow* XGUI_Viewer::createView(V3d_TypeOfView theType)
   if (myViews.size() == 0) 
     setTrihedronShown(true);
 
-  view->setBackground(XGUI_ViewBackground(XGUI::VerticalGradient, Qt::white, QColor(Qt::blue).lighter()));
-  //view->setBackground(XGUI_ViewBackground(Qt::black));
+  Qtx::BackgroundData aBk = XGUI_Workshop::resourceMgr()->backgroundValue("Viewer", "background");
+  view->setBackground(aBk);
   view->updateEnabledDrawMode();
 
   QMdiArea* aMDI = myMainWindow->mdiArea();
@@ -197,7 +200,9 @@ QMdiSubWindow* XGUI_Viewer::createView(V3d_TypeOfView theType)
 
 XGUI_ViewWindow* XGUI_Viewer::activeViewWindow() const
 {
-  return dynamic_cast<XGUI_ViewWindow*>(myActiveView->widget());
+  if (myActiveView)
+    return dynamic_cast<XGUI_ViewWindow*>(myActiveView->widget());
+  return 0;
 }
 
 void XGUI_Viewer::getSelectedObjects(AIS_ListOfInteractive& theList)

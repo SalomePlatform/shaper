@@ -40,9 +40,9 @@ public:
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed
-  virtual bool storeValue(ObjectPtr theObject) const;
+  virtual bool storeValue() const;
 
-  virtual bool restoreValue(ObjectPtr theObject);
+  virtual bool restoreValue();
 
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
@@ -56,7 +56,7 @@ protected:
   /// Fill the widget values by given point
   /// \param thePoint the point
   /// \return the boolean result of the feature set
-  bool setObject(const ObjectPtr& theObject);
+  bool setObject(const ObjectPtr& theObject, bool theSendEvent = true);
 
   /// Returns current widget feature
   /// \return the feature
@@ -70,7 +70,6 @@ protected:
   /// \return the list of kinds
   const QStringList& featureKinds() const { return myObjectKinds; }
 
-private:
   ObjectPtr myObject; ///< the current widget feature
   QStringList myObjectKinds; ///< the kinds of possible features
 

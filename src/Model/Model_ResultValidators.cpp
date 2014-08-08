@@ -1,11 +1,11 @@
-// File:        ModuleBase_ResultValidators.cpp
+// File:        Model_ResultValidators.cpp
 // Created:     23 July 2014
 // Author:      Vitaly SMETANNIKOV
 
-#include "ModuleBase_ResultValidators.h"
-#include "ModuleBase_Tools.h"
+#include "Model_ResultValidators.h"
 
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Tools.h>
 #include <GeomAPI_Shape.h>
 
 #include <TopoDS_Shape.hxx>
@@ -22,14 +22,14 @@ ResultPtr result(const ObjectPtr theObject)
 
 TopoDS_Shape shape(ResultPtr theResult)
 {
-  boost::shared_ptr<GeomAPI_Shape> aShape = ModuleBase_Tools::shape(theResult);
+  boost::shared_ptr<GeomAPI_Shape> aShape = ModelAPI_Tools::shape(theResult);
   if (aShape)
     return aShape->impl<TopoDS_Shape>();
   return TopoDS_Shape();
 }
 
 
-bool ModuleBase_ResultPointValidator::isValid(const ObjectPtr theObject) const
+bool Model_ResultPointValidator::isValid(const ObjectPtr theObject) const
 {
   ResultPtr aResult = result(theObject);
   if (!aResult)
@@ -42,7 +42,7 @@ bool ModuleBase_ResultPointValidator::isValid(const ObjectPtr theObject) const
 }
 
 
-bool ModuleBase_ResultLineValidator::isValid(const ObjectPtr theObject) const
+bool Model_ResultLineValidator::isValid(const ObjectPtr theObject) const
 {
   ResultPtr aResult = result(theObject);
   if (!aResult)
@@ -62,7 +62,7 @@ bool ModuleBase_ResultLineValidator::isValid(const ObjectPtr theObject) const
 }
 
 
-bool ModuleBase_ResultArcValidator::isValid(const ObjectPtr theObject) const
+bool Model_ResultArcValidator::isValid(const ObjectPtr theObject) const
 {
   ResultPtr aResult = result(theObject);
   if (!aResult)
