@@ -26,7 +26,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM CASCADE
-@SET CAS_ROOT_DIR=%PDIR%\OCCT-6.7.0
+@SET CAS_ROOT_DIR=%PDIR%\OCCT-6.7.1
 @SET CASROOT=%CAS_ROOT_DIR%
 @REM -------------------------
 

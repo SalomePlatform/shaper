@@ -78,26 +78,18 @@ void XGUI_PreferencesDlg::createEditors()
               tr("First corner gradient")   << tr("Second corner gradient")   <<
               tr("Third corner gradient")   << tr("Fourth corner gradient");
   
-  QList<QVariant> anIndicesList;
-  QIntList idList;
-  idList   << XGUI::HorizontalGradient << XGUI::VerticalGradient <<
-              XGUI::Diagonal1Gradient  << XGUI::Diagonal2Gradient <<
-              XGUI::Corner1Gradient    << XGUI::Corner2Gradient   <<
-              XGUI::Corner3Gradient    << XGUI::Corner4Gradient;
-
-  foreach(int gid, idList ) anIndicesList << gid;
+  QList<QVariant> idList;
+  for (int i = 0; i < gradList.size(); i++)
+    idList << i;
 
   int bgGroup = myPreferences->addItem( tr( "Background" ), viewTab );
-
-  //QIntList txtList;
-  //txtList  << Qtx::CenterTexture << Qtx::TileTexture << Qtx::StretchTexture;
 
   QString aImgFiles("Image files (*.bmp *.gif *.pix *.xwd *.rgb *.rs)");
 
   int bgId = myPreferences->addItem( tr("Viewer 3d" ), bgGroup,
                                   SUIT_PreferenceMgr::Background, "Viewer", "background" );
   myPreferences->setItemProperty( "gradient_names", gradList, bgId );
-  //myPreferences->setItemProperty( "gradient_ids", anIndicesList, bgId );
+  myPreferences->setItemProperty( "gradient_ids", idList, bgId );
   myPreferences->setItemProperty( "texture_enabled", true, bgId );
   myPreferences->setItemProperty( "texture_center_enabled", true, bgId );
   myPreferences->setItemProperty( "texture_tile_enabled", true, bgId );
