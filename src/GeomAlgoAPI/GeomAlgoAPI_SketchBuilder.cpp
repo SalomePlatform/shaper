@@ -31,6 +31,8 @@
 
 #include <Precision.hxx>
 
+#include <assert.h>
+
 #ifndef DBL_MAX
 #define DBL_MAX 1.7976931348623158e+308 
 #endif
@@ -40,7 +42,7 @@ const double tolerance = Precision::Confusion();
 // This value helps to find direction on the boundaries of curve.
 // It is not significant for lines, but is used for circles to avoid 
 // wrong directions of movement (when two edges are tangent on the certain vertex)
-const double shift     = acos(1.0 - 2.0 * tolerance);
+const double shift     = acos(1.0 - 3.0 * tolerance);
 
 /// \brief Search first vertex - the vertex with lowest x coordinate, which is used in 2 edges at least
 static const TopoDS_Shape& findStartVertex(
@@ -104,14 +106,25 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   BOPAlgo_PaveFiller aPF;
   TopoDS_Shape aFeaturesCompound;
 
-  if (theFeatures.size() == 1)
+  // Obtain only edges from the features list
+  std::list< boost::shared_ptr<GeomAPI_Shape> > anEdges;
+  std::list< boost::shared_ptr<GeomAPI_Shape> >::const_iterator aFeatIt = theFeatures.begin();
+  for ( ; aFeatIt != theFeatures.end(); aFeatIt++)
+  {
+    boost::shared_ptr<GeomAPI_Shape> aShape(*aFeatIt);
+    const TopoDS_Edge& anEdge = aShape->impl<TopoDS_Edge>();
+    if (anEdge.ShapeType() == TopAbs_EDGE)
+      anEdges.push_back(aShape);
+  }
+
+  if (anEdges.size() == 1)
   { // If there is only one feature, BOPAlgo_Builder will decline to work. Need to process it anyway
-    aFeaturesCompound = theFeatures.front()->impl<TopoDS_Shape>();
+    aFeaturesCompound = anEdges.front()->impl<TopoDS_Shape>();
   }
   else
   {
-    std::list< boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = theFeatures.begin();
-    for (; anIt != theFeatures.end(); anIt++)
+    std::list< boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = anEdges.begin();
+    for (; anIt != anEdges.end(); anIt++)
     {
       boost::shared_ptr<GeomAPI_Shape> aPreview(*anIt);
       aBuilder.AddArgument(aPreview->impl<TopoDS_Edge>());
@@ -346,8 +359,7 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
     for (++anIter2; anIter2 != theFaces.end(); anIter2++)
     {
       const TopoDS_Face& aF1 = (*anIter1)->impl<TopoDS_Face>();
-      if (aF1.ShapeType() != TopAbs_FACE) // TODO: MPV - this workaround must be fixed later by AZV, now it just removes crash
-        continue;
+      assert(aF1.ShapeType() == TopAbs_FACE); // all items in result list should be faces
       TopExp_Explorer aVert2((*anIter2)->impl<TopoDS_Shape>(), TopAbs_VERTEX);
       for ( ; aVert2.More(); aVert2.Next())
       {
@@ -359,8 +371,7 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
       if (aVert2.More())
       { // second shape is not inside first, change the shapes order and repeat comparision
         const TopoDS_Face& aF2 = (*anIter2)->impl<TopoDS_Face>();
-        if (aF2.ShapeType() != TopAbs_FACE) // TODO: MPV - this workaround must be fixed later by AZV, now it just removes crash
-          continue;
+        assert(aF2.ShapeType() == TopAbs_FACE); // all items in result list should be faces
         TopExp_Explorer aVert1((*anIter1)->impl<TopoDS_Shape>(), TopAbs_VERTEX);
         for ( ; aVert1.More(); aVert1.Next())
         {
@@ -373,14 +384,30 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
         { // first shape should be cut from the second
           BRepAlgoAPI_Cut aCut((*anIter2)->impl<TopoDS_Shape>(),
                                (*anIter1)->impl<TopoDS_Shape>());
-          (*anIter2)->setImpl(new TopoDS_Shape(aCut.Shape()));
+          aCut.Build();
+          TopExp_Explorer anExp(aCut.Shape(), TopAbs_FACE);
+          (*anIter2)->setImpl(new TopoDS_Shape(anExp.Current()));
+          for (anExp.Next(); anExp.More(); anExp.Next())
+          {
+            boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
+            aShape->setImpl(new TopoDS_Shape(anExp.Current()));
+            theFaces.push_back(aShape);
+          }
         }
       }
       else
       { // second shape should be cut from the first
         BRepAlgoAPI_Cut aCut((*anIter1)->impl<TopoDS_Shape>(),
                              (*anIter2)->impl<TopoDS_Shape>());
-        (*anIter1)->setImpl(new TopoDS_Shape(aCut.Shape()));
+        aCut.Build();
+        TopExp_Explorer anExp(aCut.Shape(), TopAbs_FACE);
+        (*anIter1)->setImpl(new TopoDS_Shape(anExp.Current()));
+        for (anExp.Next(); anExp.More(); anExp.Next())
+        {
+          boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
+          aShape->setImpl(new TopoDS_Shape(anExp.Current()));
+          theFaces.push_back(aShape);
+        }
       }
     }
   }
@@ -588,12 +615,14 @@ gp_Dir getOuterEdgeDirection(const TopoDS_Shape& theEdge,
 
   gp_Pnt aPnt;
   gp_Vec aTang;
-  aCurve->D1(aFirst + shift, aPnt, aTang);
+  // A direction is determined not in the boundary points but in the points with small shift.
+  // It was done to avoid tangency between circle and other edge in the shared vertex.
+  aCurve->D1(aFirst + shift > aLast ? aFirst : aFirst + shift, aPnt, aTang);
   aCurve->D0(aFirst, aPnt);
   if (aVertexPnt.IsEqual(aPnt, tolerance))
     return gp_Dir(aTang.Reversed());
 
-  aCurve->D1(aLast - shift, aPnt, aTang);
+  aCurve->D1(aLast - shift < aFirst ? aLast : aLast - shift, aPnt, aTang);
   return gp_Dir(aTang);
 }
 
