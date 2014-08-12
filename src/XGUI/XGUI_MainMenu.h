@@ -28,11 +28,11 @@ class XGUI_EXPORT XGUI_MainMenu: public QWidget
 
   //! Size of menu item
   //TODO(sbh, vsv): Move to the settings
-  enum ItemSize {
-    Small = 20,
-    Medium = 25,
-    Large = 30
-  };
+  //enum ItemSize {
+  //  Small = 20,
+  //  Medium = 25,
+  //  Large = 30
+  //};
 
 public:
   XGUI_MainMenu(XGUI_MainWindow *parent);
@@ -68,6 +68,8 @@ public:
   int menuItemSize() const;
   int menuItemRowsCount() const;
   int menuHeight() const;
+
+  void updateFromResources();
 
 private:
   XGUI_MainWindow* myDesktop;

@@ -198,6 +198,17 @@ QMdiSubWindow* XGUI_Viewer::createView(V3d_TypeOfView theType)
   return aWnd;
 }
 
+void XGUI_Viewer::updateFromResources()
+{
+  Qtx::BackgroundData aBk = XGUI_Preferences::resourceMgr()->backgroundValue("Viewer", "background");
+  foreach (QMdiSubWindow* aWnd, myViews) {
+    XGUI_ViewWindow* aView = dynamic_cast<XGUI_ViewWindow*>(aWnd->widget());
+    if (aView)
+      aView->setBackground(aBk);
+  }
+}
+
+
 XGUI_ViewWindow* XGUI_Viewer::activeViewWindow() const
 {
   if (myActiveView)
