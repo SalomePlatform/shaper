@@ -128,6 +128,7 @@ public:
   //! Add action to the viewer
   void addAction(QAction* theAction) { myActions.append(theAction); }
 
+  void updateFromResources();
 
   static void setHotButton(XGUI::InteractionStyle theInteractionStyle, XGUI::HotOperation theOper,
                            Qt::KeyboardModifiers theState, Qt::MouseButtons theButton);

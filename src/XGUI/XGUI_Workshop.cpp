@@ -670,7 +670,21 @@ void XGUI_Workshop::onRedo()
 //******************************************************
 void XGUI_Workshop::onPreferences()
 {
-  XGUI_Preferences::editPreferences();
+  XGUI_Prefs aModif;
+  XGUI_Preferences::editPreferences(aModif);
+  if (aModif.size() > 0) {
+    QString aSection;
+    foreach (XGUI_Pref aPref, aModif) {
+      aSection = aPref.first;
+      if (aSection == XGUI_Preferences::VIEWER_SECTION) {
+        if (!isSalomeMode()) 
+          myMainWindow->viewer()->updateFromResources();
+      } else if (aSection == XGUI_Preferences::MENU_SECTION) {
+        if (!isSalomeMode()) 
+          myMainWindow->menuObject()->updateFromResources();
+      }
+    }
+  }
 }
 
 //******************************************************

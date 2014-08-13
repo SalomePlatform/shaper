@@ -3,6 +3,9 @@
 #include <XGUI_MenuGroupPanel.h>
 #include <XGUI_MainWindow.h>
 #include <XGUI_Command.h>
+#include <XGUI_Preferences.h>
+
+#include <SUIT_ResourceMgr.h>
 
 #include <QLayout>
 #include <QTabWidget>
@@ -117,9 +120,9 @@ QList<XGUI_Command*> XGUI_MainMenu::features() const
 
 int XGUI_MainMenu::menuItemSize() const
 {
-  //TODO(sbh, vsv): get this value from the preferences
-  static const ItemSize DEFAULT_ITEM_SIZE = Medium;
-  return (int) DEFAULT_ITEM_SIZE;
+  int DEFAULT_ITEM_SIZE = XGUI_Preferences::resourceMgr()->integerValue(
+    XGUI_Preferences::MENU_SECTION, "item_size");
+  return DEFAULT_ITEM_SIZE;
 }
 
 int XGUI_MainMenu::menuHeight() const
@@ -132,7 +135,11 @@ int XGUI_MainMenu::menuHeight() const
 
 int XGUI_MainMenu::menuItemRowsCount() const
 {
-  //TODO(sbh, vsv): get this value from the preferences
-  static const int DEFAULT_ITEM_ROWS_COUNT = 3;
+  int DEFAULT_ITEM_ROWS_COUNT = XGUI_Preferences::resourceMgr()->integerValue(
+    XGUI_Preferences::MENU_SECTION, "rows_number");
   return DEFAULT_ITEM_ROWS_COUNT;
+}
+
+void XGUI_MainMenu::updateFromResources()
+{
 }

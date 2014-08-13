@@ -2,7 +2,12 @@
 -->
 <document>
   <section name="Viewer" >
-    <!-- OCC viewer preferences -->
+    <!-- Viewer preferences -->
     <parameter name="background" value="bt=2;fn=;tm=0;ts=false;c1=#cddbff;c2=#698fff;gt=1;gr=" />
- </section>
+  </section>
+  <section name="Menu" >
+    <!-- Menu bar preferences -->
+    <parameter name="item_size" value="25" />
+    <parameter name="rows_number" value="3" />
+  </section>
 </document>

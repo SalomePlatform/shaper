@@ -10,6 +10,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -116,7 +117,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
     // Find SketchPlugin_Sketch::ID() in groups. The constraint groups should be updated when an object removed from Sketch
     std::set<std::string>::const_iterator aFGrIter;
     for (aFGrIter = aFeatureGroups.begin(); aFGrIter != aFeatureGroups.end(); aFGrIter++)
-      if (aFGrIter->compare(SketchPlugin_Sketch::ID()) == 0)
+      if (aFGrIter->compare(ModelAPI_ResultConstruction::group()) == 0)
         break;
     
     if (aFGrIter != aFeatureGroups.end())
