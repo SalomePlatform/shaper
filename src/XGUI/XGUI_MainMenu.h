@@ -56,8 +56,6 @@ public:
   //! Returns list of created commands
   QList<XGUI_Command*> features() const;
 
-  QList<XGUI_Workbench*> workbenches() const;
-
   virtual bool eventFilter(QObject *theWatched, QEvent *theEvent);
 
   //! Displays given console as a tab in the workbench
@@ -65,8 +63,13 @@ public:
   //! Removes already created tab with python console
   void removeConsole();
 
+  //! Defines size of menu item.
+  //! In the future this value should be extracted from the preferences.
   int menuItemSize() const;
+  //! Defines number of menu item rows.
+  //! In the future this value should be extracted from the preferences.
   int menuItemRowsCount() const;
+  //! Defines height of the main menu. (Number of rows * row height)
   int menuHeight() const;
 
 private:

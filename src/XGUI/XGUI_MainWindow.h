@@ -44,7 +44,9 @@ public:
 public slots:
   void showPythonConsole();
   void hidePythonConsole();
+  //! Python console can be a dock widget 
   void dockPythonConsole();
+  //! or can be a tab in the main menu.
   void undockPythonConsole();
 
   void createSubWindow();
@@ -68,8 +70,6 @@ private:
   XGUI_Viewer* myViewer;
 
   PyConsole_EnhConsole* myPythonConsole;
-  //! Python console can be a dock widget if true, else as the tab.
-  bool myIsConsoleDocked;
 };
 
 class XGUI_EXPORT CloseEventWatcher: public QObject {

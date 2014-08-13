@@ -161,6 +161,8 @@ protected:
   void onFeatureRedisplayMsg(const ModelAPI_ObjectUpdatedMessage* theMsg);
   void onObjectDeletedMsg(const ModelAPI_ObjectDeletedMessage* theMsg);
 
+  void validateOperation(const QString& theOperationId);
+
   QList<QAction*> getModuleCommands() const;
 
   void displayAllResults();

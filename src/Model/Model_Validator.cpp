@@ -4,6 +4,7 @@
 
 #include <Model_Validator.h>
 #include <Model_ResultValidators.h>
+#include <Model_FeatureValidator.h>
 #include <ModelAPI_Feature.h>
 #include <Events_Error.h>
 
@@ -94,6 +95,7 @@ Model_ValidatorsFactory::Model_ValidatorsFactory() : ModelAPI_ValidatorsFactory(
   registerValidator("Model_ResultPointValidator", new Model_ResultPointValidator);
   registerValidator("Model_ResultLineValidator", new Model_ResultLineValidator);
   registerValidator("Model_ResultArcValidator", new Model_ResultArcValidator);
+  registerValidator("Model_FeatureValidator", new Model_FeatureValidator);
 }
 
 

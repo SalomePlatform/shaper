@@ -54,6 +54,9 @@ public:
 
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
+public slots:
+  void validateCurrentOperation();
+
 signals:
   /// Signal about an operation is started. It is emitted after the start() of operation is done.
   void operationStarted();
@@ -62,6 +65,8 @@ signals:
   void operationStopped(ModuleBase_Operation* theOperation);
   /// Signal about an operation is resumed. It is emitted after the resume() of operation is done.
   void operationResumed();
+  /// Signal is emitted after the validate methods calls.
+  void operationValidated(bool);
   /// Signal about the necessety of the next widget activating
   /// \param theWidget the model widget
   void activateNextWidget(ModuleBase_ModelWidget* theWidget);
@@ -83,6 +88,8 @@ protected:
 
   /// Returns true if the operation can be aborted
   bool canAbortOperation();
+
+  void validateOperation(ModuleBase_Operation* theOperation);
 
 protected slots:
   /// Slot that commits the current operation.

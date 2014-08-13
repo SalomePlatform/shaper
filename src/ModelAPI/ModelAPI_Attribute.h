@@ -57,4 +57,7 @@ protected:
 
 };
 
+//! Pointer on attribute object
+typedef boost::shared_ptr<ModelAPI_Attribute> AttributePtr;
+
 #endif
