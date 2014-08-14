@@ -9,16 +9,12 @@ export ROOT_DIR=$(pwd)/..
 export ROOT_DIR=`cd "${ROOT_DIR}";pwd`
 
 #------ Python ------
-export PYTHON_ROOT_DIR=${PDIR}/Python-2.7.3
-export PYTHONHOME=${PYTHON_ROOT_DIR}
-export PYTHON_INCLUDE=${PYTHON_ROOT_DIR}/include/python2.7
+export PYTHONHOME=${PDIR}/Python-2.7.3
+export PYTHON_INCLUDE=${PYTHONHOME}/include/python2.7
 export PYTHON_VERSION=2.7
-export PATH=${PYTHON_ROOT_DIR}/bin:${PATH}
-export LD_LIBRARY_PATH=${PYTHON_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
-export PYTHONPATH=${PYTHON_ROOT_DIR}/lib/python2.7
-#For cmake
-export PYTHON_LIB_DIR=${PYTHON_ROOT_DIR}/lib
-export PYTHON_INC_DIR=${PYTHON_INCLUDE}
+export PATH=${PYTHONHOME}/bin:${PATH}
+export LD_LIBRARY_PATH=${PYTHONHOME}/lib:${LD_LIBRARY_PATH}
+export PYTHONPATH=${PYTHONHOME}/lib/python2.7
 ##
 #------ Qt ------
 export QT4_ROOT_DIR=${PDIR}/qt-4.8.4
@@ -59,24 +55,19 @@ export PATH=${TBB_ROOT_DIR}/bin/intel64/cc4.1.0_libc2.4_kernel2.6.16.21:${PATH}
 export LD_LIBRARY_PATH=${TBB_ROOT_DIR}/lib/intel64/cc4.1.0_libc2.4_kernel2.6.16.21:${LD_LIBRARY_PATH}
 ##
 #------ libxml2 ------
-export LIBXML2_ROOT_DIR=${PDIR}/libxml2-2.9.0
-export PATH=${LIBXML2_ROOT_DIR}/bin:${PATH}
-export LD_LIBRARY_PATH=${LIBXML2_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
-# DO NOT rename following 3 variables, 
-# they are required by CMake "find(Libxml2)" procedure
-export LIBXML2_INCLUDE_DIR=${LIBXML2_ROOT_DIR}/include/libxml2
-export LIBXML2_LIB_DIR=${LIBXML2_ROOT_DIR}/lib
-export LIBXML2_BIN_DIR=${LIBXML2_ROOT_DIR}/bin
+export LIBXML_DIR=${PDIR}/libxml2-2.9.0
+export PATH=${LIBXML_DIR}/bin:${PATH}
+export LD_LIBRARY_PATH=${LIBXML_DIR}/lib:${LD_LIBRARY_PATH}
 ##
 #------ SolveSpace ------
 export SOLVESPACE_ROOT_DIR=${PDIR}/solvespace-2.0
 export LD_LIBRARY_PATH=${SOLVESPACE_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
 ##
 #------ OCCT ------
-export CAS_ROOT_DIR=${PDIR}/OCCT-6.7.0
+export CAS_ROOT_DIR=${PDIR}/OCCT-6.7.1
 
-export PATH=${CAS_ROOT_DIR}:${CAS_ROOT_DIR}/bin:${PATH}
-export LD_LIBRARY_PATH=${CAS_ROOT_DIR}:${CAS_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
+export PATH=${CAS_ROOT_DIR}/bin:${PATH}
+export LD_LIBRARY_PATH=${CAS_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
 export CSF_GraphicShr=${CAS_ROOT_DIR}/lib/libTKOpenGl.so
 # Variable for Foundation Classes : 
 export CSF_UnitsLexicon=${CAS_ROOT_DIR}/src/UnitsAPI/Lexi_Expr.dat 
@@ -92,18 +83,20 @@ export CSF_PluginDefaults=${CAS_ROOT_DIR}/src/StdResource
 export CSF_StandardDefaults=${CAS_ROOT_DIR}/src/StdResource
 # Activation of OCCT Kernel multithreading :
 export MMGT_REENTRANT=1
-# this variable only needed for DRAWEXE
-export CASROOT=${CAS_ROOT_DIR}
-##
-export LIB=${LD_LIBRARY_PATH}
 
 #------ lcov ------
 export LCOV_ROOT_DIR=${PDIR}/lcov-1.11
 export PATH=${LCOV_ROOT_DIR}/bin:${PATH}
 
+#------ SUIT ------
+export SUIT_DIR=${PDIR}/suit
+export LD_LIBRARY_PATH=${SUIT_DIR}/lib/salome:${LD_LIBRARY_PATH}
+
 #------ NewGEOM ------
-export INST_DIR=${ROOT_DIR}/install
-export PATH=${INST_DIR}/bin:${INST_DIR}/plugins:${PATH}
-export PYTHONPATH=${INST_DIR}/swig:${PYTHONPATH}
-export LD_LIBRARY_PATH=${INST_DIR}/bin:${INST_DIR}/swig:${INST_DIR}/plugins:${LD_LIBRARY_PATH}
-export NEW_GEOM_CONFIG_FILE=${INST_DIR}/plugins
+export NEW_GEOM_ROOT_DIR=${ROOT_DIR}/install
+export PATH=${NEW_GEOM_ROOT_DIR}/bin:${NEW_GEOM_ROOT_DIR}/plugins:${PATH}
+export PYTHONPATH=${NEW_GEOM_ROOT_DIR}/swig:${PYTHONPATH}
+export LD_LIBRARY_PATH=${NEW_GEOM_ROOT_DIR}/bin:${NEW_GEOM_ROOT_DIR}/swig:${NEW_GEOM_ROOT_DIR}/plugins:${LD_LIBRARY_PATH}
+export NEW_GEOM_CONFIG_FILE=${NEW_GEOM_ROOT_DIR}/plugins
+export NewGeomResources=${NEW_GEOM_ROOT_DIR}/resources
+
