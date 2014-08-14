@@ -5,6 +5,8 @@
 #include "XGUI_OperationMgr.h"
 
 #include "ModuleBase_Operation.h"
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_FeatureValidator.h>
 
 #include <QMessageBox>
 #include <QApplication>
@@ -50,6 +52,7 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
           this, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)));
 
   theOperation->start();
+  validateCurrentOperation();
   return true;
 }
 
@@ -70,6 +73,39 @@ QStringList XGUI_OperationMgr::operationList()
     result << eachOperation->id();
   }
   return result;
+}
+
+void XGUI_OperationMgr::validateOperation(ModuleBase_Operation* theOperation)
+{
+  //Get operation Id and feature to validate
+  QString anOperationId = theOperation->id();
+  FeaturePtr aFeature = theOperation->feature();
+  //Get validators for the Id
+  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  std::list<ModelAPI_Validator*> aValidators;
+  aFactory->validators(anOperationId.toStdString(), aValidators);
+  //
+  std::list<ModelAPI_Validator*>::iterator it = aValidators.begin();
+  bool isValid = true;
+  for(; it != aValidators.end(); it++) {
+    const ModelAPI_FeatureValidator* aFeatureValidator =
+        dynamic_cast<const ModelAPI_FeatureValidator*>(*it);
+    if (!aFeatureValidator) continue;
+    if (!aFeatureValidator->isValid(aFeature)) {
+      isValid = false;
+      break;
+    }
+  }
+  emit operationValidated(isValid);
+}
+
+void XGUI_OperationMgr::validateCurrentOperation()
+{
+  if(!hasOperation())
+    return;
+  ModuleBase_Operation* anOperation = currentOperation();
+  validateOperation(currentOperation());
 }
 
 bool XGUI_OperationMgr::eventFilter(QObject *theObject, QEvent *theEvent)

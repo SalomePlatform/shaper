@@ -39,6 +39,8 @@ public slots:
   /// slot to activate the next widget in the property panel
   /// \param theWidget a widget. The next widget should be activated
   void onActivateNextWidget(ModuleBase_ModelWidget* theWidget);
+  // Enables / disables "ok" ("accept") button
+  void setAcceptEnabled(bool);
 
 signals:
   /// The signal about key release on the control, that corresponds to the attribute

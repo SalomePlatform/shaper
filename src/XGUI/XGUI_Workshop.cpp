@@ -321,6 +321,7 @@ void XGUI_Workshop::onFeatureUpdatedMsg(const ModelAPI_ObjectUpdatedMessage* the
       } 
     }
   }
+  myOperationMgr->validateCurrentOperation();
 }
 
 //******************************************************
@@ -384,7 +385,7 @@ void XGUI_Workshop::onObjectDeletedMsg(const ModelAPI_ObjectDeletedMessage* theM
 {
   //std::set<ObjectPtr> aFeatures = theMsg->objects();
 }
- 
+
 //******************************************************
 void XGUI_Workshop::onOperationStarted()
 {
@@ -395,7 +396,8 @@ void XGUI_Workshop::onOperationStarted()
 
     showPropertyPanel();
     QString aXmlRepr = aOperation->getDescription()->xmlRepresentation();
-    ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(), myModuleConnector);
+    ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(),
+                                                                 myModuleConnector);
 
     myPropertyPanel->cleanContent();
     aFactory.createWidget(myPropertyPanel->contentWidget());
@@ -808,9 +810,8 @@ QList<QAction*> XGUI_Workshop::getModuleCommands() const
     aCommands = salomeConnector()->commandList();
   } else {
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
-    foreach (XGUI_Workbench* aWb, aMenuBar->workbenches()) {
-      foreach(XGUI_Command* aCmd, aWb->features())
-        aCommands.append(aCmd);
+    foreach(XGUI_Command* aCmd, aMenuBar->features()) {
+      aCommands.append(aCmd);
     }
   }
   return aCommands;
@@ -860,6 +861,9 @@ void XGUI_Workshop::createDockWidgets()
           myOperationMgr, SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
   connect(myOperationMgr, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)),
           myPropertyPanel, SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
+  connect(myOperationMgr, SIGNAL(operationValidated(bool)),
+          myPropertyPanel, SLOT(setAcceptEnabled(bool)));
+
 }
 
 //******************************************************

@@ -18,8 +18,7 @@
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     : QMainWindow(parent), 
-    myPythonConsole(0),
-    myIsConsoleDocked(false)
+    myPythonConsole(0)
 {
   setWindowTitle(tr("New Geom"));
   createMainMenu();

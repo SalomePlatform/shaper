@@ -11,6 +11,7 @@
       <feature id="SketchLine" title="Line" tooltip="Create a new line" icon=":icons/line.png">
         <point_selector id="StartPoint" title="Start point" tooltip="Start point of the line" previous_feature_param="EndPoint"/>
         <point_selector id="EndPoint" title="End point" tooltip="End point of the line"/>
+        <validator id="Model_FeatureValidator" />
       </feature>
       <feature id="SketchCircle" title="Circle" tooltip="Create a new circle" icon=":icons/circle.png">
         <point_selector id="CircleCenter" title="Center" tooltip="Center of the circle"/>

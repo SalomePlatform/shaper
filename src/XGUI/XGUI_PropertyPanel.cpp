@@ -167,3 +167,9 @@ void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
   }
   emit widgetActivated(aNextWidget);
 }
+
+void XGUI_PropertyPanel::setAcceptEnabled(bool isEnabled)
+{
+  QPushButton* anOkBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
+  anOkBtn->setEnabled(isEnabled);
+}
