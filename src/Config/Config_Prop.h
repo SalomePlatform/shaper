@@ -15,7 +15,7 @@ class Config_Prop
 {
 public:
 
-  enum PropType { Auto, Space, Bool, Color, String, Selector,
+  enum PropType { Disabled, Space, Bool, Color, String, Selector,
                   DblSpin, IntSpin, Double, Integer,
                   GroupBox, Tab, Frame, Font, DirList, File,
 		              Slider, Shortcut, ShortcutTree, BiColor, Background };
@@ -42,9 +42,20 @@ public:
 
   std::string section() const { return mySection; }
   std::string name() const { return myName; }
+
   std::string title() const { return myTitle; }
+  void setTitle(const std::string& theTitle) { myTitle = theTitle; }
+
   PropType type() const { return myType; }
+  void setType(PropType theType) { myType = theType; }
+
   std::string value() const { return myValue; }
+  void setValue(const std::string& theValue) { myValue = theValue; }
+
+  bool operator==(const Config_Prop* theProp) const
+  {
+    return (mySection == theProp->section()) && (myName == theProp->name());
+  }
 
 private:
   std::string mySection;

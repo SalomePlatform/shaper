@@ -42,6 +42,35 @@ bool XGUI_Preferences::editPreferences(XGUI_Prefs& theModified)
 }
 
 
+void XGUI_Preferences::updateCustomProps()
+{
+  Config_Properties aProps = Config_PropManager::getProperties();
+  Config_Properties::iterator aIt;
+  for (aIt = aProps.begin(); aIt != aProps.end(); ++ aIt) {
+    Config_Prop* aProp = (*aIt);
+    QString aVal = myResourceMgr->stringValue(QString(aProp->section().c_str()), 
+                                              QString(aProp->name().c_str()));
+    if (!aVal.isNull())
+      aProp->setValue(qPrintable(aVal));
+  }
+}
+
+
+void XGUI_Preferences::loadCustomProps()
+{
+  QStringList aSections = myResourceMgr->sections();
+  foreach (QString aSection, aSections) {
+    QStringList aParams = myResourceMgr->parameters(aSection);
+    foreach (QString aParam, aParams) {
+      Config_PropManager::registerProp(qPrintable(aSection),
+                                       qPrintable(aParam),
+                                       "", Config_Prop::Disabled, 
+                                       qPrintable(myResourceMgr->stringValue(aSection, aParam)));
+    }
+  }
+}
+
+
 
 //**********************************************************
 //**********************************************************
@@ -78,18 +107,15 @@ XGUI_PreferencesDlg::~XGUI_PreferencesDlg()
 
 void XGUI_PreferencesDlg::createEditors()
 {
-  int aLFpage = myPreferences->addItem("Desktop");
-  //myPreferences->setItemIcon(aLFpage, QIcon(":pictures/view_prefs.png"));
+  int aPage = myPreferences->addItem(tr("Desktop"));
+  myPreferences->setItemIcon(aPage, QIcon(":pictures/view_prefs.png"));
 
-  createMenuPage(aLFpage);
-  createViewerPage(aLFpage);
+  createMenuPage(aPage);
+  createViewerPage(aPage);
 
-  std::list<std::string> aOwners = Config_PropManager::getOwners();
-  std::list<std::string>::const_iterator aIt;
-  for (aIt = aOwners.cbegin(); aIt != aOwners.cend(); ++ aIt) {
-    int aPage = myPreferences->addItem((*aIt).c_str());
-    createCustomPage(aPage, Config_PropManager::getProperties((*aIt)));
-  }
+  aPage = myPreferences->addItem(tr("Module"));
+  myPreferences->setItemIcon(aPage, QIcon(":pictures/module.png"));
+  createCustomPage(aPage);
 }
 
 void XGUI_PreferencesDlg::createViewerPage(int thePageId)
@@ -152,44 +178,35 @@ void XGUI_PreferencesDlg::createMenuPage(int thePageId)
 }
 
 
-void XGUI_PreferencesDlg::createCustomPage(int thePageId, Config_Properties& theProps)
+void XGUI_PreferencesDlg::createCustomPage(int thePageId)
 {
   SUIT_ResourceMgr* aResMgr = XGUI_Preferences::resourceMgr();
   bool isResModified = false;
 
-  // Sort by sections
-  QMap<QString, Config_Properties> aGroupMap;
-  Config_Properties::const_iterator aIt;
-  for (aIt = theProps.cbegin(); aIt != theProps.cend(); ++aIt) {
-    QString aGroup((*aIt)->section().c_str());
-    if (aGroupMap.contains(aGroup)) {
-      aGroupMap[aGroup].push_back(*aIt);
-    } else {
-      Config_Properties aProps;
-      aProps.push_back(*aIt);
-      aGroupMap[aGroup] = aProps;
-    }
-    // check that the property is defined
-    QString aName((*aIt)->name().c_str());
-    if (!aResMgr->hasValue(aGroup, aName)) {
-      aResMgr->setValue(aGroup, aName, QString((*aIt)->value().c_str()));
-      isResModified = true;
-    }
-  }
-  if (isResModified)
-    aResMgr->save();
-
   // Make a Tab from each section
-  QMap<QString, Config_Properties>::iterator it;
-  for (it = aGroupMap.begin(); it != aGroupMap.end(); ++it) {
-    int aTab = myPreferences->addItem(it.key(), thePageId );
+  std::list<std::string> aSections = Config_PropManager::getSections();
+  std::list<std::string>::const_iterator it;
+  for (it = aSections.cbegin(); it != aSections.cend(); ++it) {
+    Config_Properties aProps = Config_PropManager::getProperties(*it);
+    int aTab = myPreferences->addItem(QString((*it).c_str()), thePageId );
     myPreferences->setItemProperty( "columns", 2, aTab );
-    Config_Properties& aProps = it.value();
+
+    Config_Properties::const_iterator aIt;
     for (aIt = aProps.cbegin(); aIt != aProps.cend(); ++aIt) {
-      myPreferences->addItem( QString((*aIt)->title().c_str()), aTab,
-                              (SUIT_PreferenceMgr::PrefItemType)(*aIt)->type(), 
-                              QString((*aIt)->section().c_str()), 
-                               QString((*aIt)->name().c_str()) );
+      Config_Prop* aProp = (*aIt);
+      // check that the property is defined
+      QString aSection(aProp->section().c_str());
+      QString aName(aProp->name().c_str());
+      if (!aResMgr->hasValue(aSection, aName)) {
+        aResMgr->setValue(aSection, aName, QString(aProp->value().c_str()));
+        isResModified = true;
+      }
+      // Add item
+      if (aProp->type() != Config_Prop::Disabled)
+        myPreferences->addItem( tr(aProp->title().c_str()), aTab,
+                                (SUIT_PreferenceMgr::PrefItemType)aProp->type(), 
+                                QString(aProp->section().c_str()), 
+                                QString(aProp->name().c_str()) );
     }
   }
 }
@@ -199,8 +216,12 @@ void XGUI_PreferencesDlg::accept()
 {
   myPreferences->store();
   myIsChanged = true;
+
+  // Save custom properties
+  XGUI_Preferences::updateCustomProps();
   QDialog::accept();
 }
+
 
 void XGUI_PreferencesDlg::modified(XGUI_Prefs& theModified) const
 {

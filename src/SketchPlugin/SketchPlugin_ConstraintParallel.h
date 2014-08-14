@@ -10,7 +10,7 @@
 #include "SketchPlugin_Constraint.h"
 
 
-#define PARALLEL_COLOR "255, 255, 0"
+#define PARALLEL_COLOR "#ffff00"
 
 /** \class SketchPlugin_ConstraintParallel
  *  \ingroup DataModel

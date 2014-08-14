@@ -123,9 +123,7 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintRadius::getAISObject
   anAIS->createRadius(aCircle, aFlyoutPnt, aValue);
 
   // Set color from preferences
-  std::string aColor = Config_PropManager::value("Sketcher", "Visualization", 
-                                                 "radius_color", RADIUS_COLOR);
-  std::vector<int> aRGB = stringToRGB(aColor);
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "radius_color", RADIUS_COLOR);
   anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }

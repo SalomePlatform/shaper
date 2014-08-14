@@ -118,9 +118,7 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintDistance::getAISObje
   anAIS->createDistance(aPoint1, aPoint2, aFlyoutPnt, aPlane, aValue);
 
   // Set color from preferences
-  std::string aColor = Config_PropManager::value("Sketcher", "Visualization", 
-                                                 "distance_color", DISTANCE_COLOR);
-  std::vector<int> aRGB = stringToRGB(aColor);
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "distance_color", DISTANCE_COLOR);
   anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }

@@ -81,9 +81,7 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintParallel::getAISObje
   anAIS->createParallel(aLine1, aLine2, aFlyoutPnt, aPlane);
 
   // Set color from preferences
-  std::string aColor = Config_PropManager::value("Sketcher", "Visualization", 
-                                                 "parallel_color", PARALLEL_COLOR);
-  std::vector<int> aRGB = stringToRGB(aColor);
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "parallel_color", PARALLEL_COLOR);
   anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }

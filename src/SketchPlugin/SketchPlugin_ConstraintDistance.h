@@ -15,7 +15,7 @@
 class SketchPlugin_Line;
 class GeomDataAPI_Point2D;
 
-#define DISTANCE_COLOR "255, 0, 255"
+#define DISTANCE_COLOR "#ff00ff"
 
 /** \class SketchPlugin_ConstraintDistance
  *  \ingroup DataModel

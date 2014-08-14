@@ -32,19 +32,29 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   ModelAPI_PluginManager::get()->registerPlugin(this);
 
   // register sketcher properties
-  Config_PropManager::registerProp("Sketcher", "Visualization", 
+  Config_PropManager::registerProp("Sketch planes", 
+                                   "planes_color", "Color",
+                                   Config_Prop::Color, SKETCH_PLANE_COLOR);
+  Config_PropManager::registerProp("Sketch planes", 
+                                   "planes_size", "Size",
+                                   Config_Prop::Double, PLANE_SIZE);
+  Config_PropManager::registerProp("Sketch planes", 
+                                   "planes_thikness", "Thickness",
+                                   Config_Prop::Integer, SKETCH_WIDTH);
+
+  Config_PropManager::registerProp("Visualization", 
                                    "parallel_color", "Parallel constraint color",
                                    Config_Prop::Color, PARALLEL_COLOR);
-  Config_PropManager::registerProp("Sketcher", "Visualization", 
+  Config_PropManager::registerProp("Visualization", 
                                    "perpendicular_color", "Perpendicular constraint color",
                                    Config_Prop::Color, PERPENDICULAR_COLOR);
-  Config_PropManager::registerProp("Sketcher", "Visualization", 
+  Config_PropManager::registerProp("Visualization", 
                                    "distance_color", "Distance color",
                                    Config_Prop::Color, DISTANCE_COLOR);
-  Config_PropManager::registerProp("Sketcher", "Visualization", 
+  Config_PropManager::registerProp("Visualization", 
                                    "length_color", "Length color",
                                    Config_Prop::Color, LENGTH_COLOR);
-  Config_PropManager::registerProp("Sketcher", "Visualization", 
+  Config_PropManager::registerProp("Visualization", 
                                    "radius_color", "Radius color",
                                    Config_Prop::Color, RADIUS_COLOR);
 }

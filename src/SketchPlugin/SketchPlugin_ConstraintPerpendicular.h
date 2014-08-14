@@ -9,7 +9,7 @@
 #include <SketchPlugin_Sketch.h>
 #include "SketchPlugin_Constraint.h"
 
-#define PERPENDICULAR_COLOR "255, 255, 0"
+#define PERPENDICULAR_COLOR "#ffff00"
 
 /** \class SketchPlugin_ConstraintPerpendicular
  *  \ingroup DataModel

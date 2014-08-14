@@ -10,7 +10,7 @@
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
-#define LENGTH_COLOR "255, 0, 255"
+#define LENGTH_COLOR "#ff00ff"
 
 /** \class SketchPlugin_ConstraintLength
  *  \ingroup DataModel

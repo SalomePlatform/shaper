@@ -26,46 +26,40 @@ public:
   * \param theValue - initial value of the property
   * Returns True if the property succesfully registered
   */
-  static bool registerProp(const std::string& theOwnerId, 
-                           const std::string& theSection,
+  static bool registerProp(const std::string& theSection,
                            const std::string& theName,
                            const std::string& theTitle,
                            Config_Prop::PropType theType,
                            const std::string& theValue);
 
-  //! Returns list of registered owners.
-  static std::list<std::string> getOwners();
+  static Config_Prop* findProp(const std::string& theSection,
+                               const std::string& theName);
 
-  //! Returns list of properties by its owner.
-  static Config_Properties getProperties(const std::string& theOwnerId);
+  static Config_Properties getProperties();
 
   //! Returns list of registered section names.
-  static std::list<std::string> getSections(const std::string& theOwnerId);
+  static std::list<std::string> getSections();
 
   //! Returns list of properties by its owner and section.
-  static Config_Properties getProperties(const std::string& theOwnerId, const std::string& theSection);
+  static Config_Properties getProperties(const std::string& theSection);
 
   //! Returns value of the property by its owner, section, and name
-  static std::string value(const std::string& theOwnerId, 
-                           const std::string& theSection, 
-                           const std::string& theName,
-                           const std::string& theDefault);              
+  static std::string string(const std::string& theSection, 
+                            const std::string& theName,
+                            const std::string& theDefault);              
+  static std::vector<int> color(const std::string& theSection, 
+                                const std::string& theName,
+                                const std::string& theDefault);              
+  static int integer(const std::string& theSection, 
+                      const std::string& theName,
+                      const std::string& theDefault);              
+  static double real(const std::string& theSection, 
+                      const std::string& theName,
+                      const std::string& theDefault);              
 
 private:
-
-  /** 
-  * Registers property parameters
-  * \param theOwnerId - name of owner (name of plugin for example)
-  * \param theProp - the Property object.
-  * Returns True if the property succesfully registered
-  */
-  static bool registerProp(const std::string& theOwnerId, 
-                           Config_Prop* theProp);
-
-  static std::map<std::string, Config_Properties> myPropMap;
+  static Config_Properties myProps;
 };
 
-
-CONFIG_EXPORT std::vector<int> stringToRGB(const std::string& theColor);
 
 #endif

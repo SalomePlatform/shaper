@@ -9,7 +9,7 @@
 #include <SketchPlugin_Sketch.h>
 #include "SketchPlugin_Constraint.h"
 
-#define RADIUS_COLOR "255, 0, 255"
+#define RADIUS_COLOR "#ff00ff"
 
 /** \class SketchPlugin_ConstraintRadius
  *  \ingroup DataModel

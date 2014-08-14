@@ -77,9 +77,7 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintPerpendicular::getAI
   anAIS->createPerpendicular(aLine1, aLine2, aPlane);
 
   // Set color from preferences
-  std::string aColor = Config_PropManager::value("Sketcher", "Visualization", 
-                                                 "perpendicular_color", PERPENDICULAR_COLOR);
-  std::vector<int> aRGB = stringToRGB(aColor);
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "perpendicular_color", PERPENDICULAR_COLOR);
   anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }
