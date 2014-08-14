@@ -7,6 +7,7 @@
 
 #include "XGUI.h"
 
+#include <Config_PropManager.h>
 #include <SUIT_PreferenceMgr.h>
 #include <QDialog>
 
@@ -75,6 +76,7 @@ private:
   void createEditors();
   void createViewerPage(int thePageId);
   void createMenuPage(int thePageId);
+  void createCustomPage(int thePageId, Config_Properties& theProps);
   
   XGUI_PreferencesMgr* myPreferences;
   bool myIsChanged;

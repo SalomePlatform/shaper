@@ -15,6 +15,8 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Validator.h>
 
+#include <Config_PropManager.h>
+
 using namespace std;
 
 // the only created instance of this plugin
@@ -28,6 +30,23 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
 
   // register this plugin
   ModelAPI_PluginManager::get()->registerPlugin(this);
+
+  // register sketcher properties
+  Config_PropManager::registerProp("Sketcher", "Visualization", 
+                                   "parallel_color", "Parallel constraint color",
+                                   Config_Prop::Color, PARALLEL_COLOR);
+  Config_PropManager::registerProp("Sketcher", "Visualization", 
+                                   "perpendicular_color", "Perpendicular constraint color",
+                                   Config_Prop::Color, PERPENDICULAR_COLOR);
+  Config_PropManager::registerProp("Sketcher", "Visualization", 
+                                   "distance_color", "Distance color",
+                                   Config_Prop::Color, DISTANCE_COLOR);
+  Config_PropManager::registerProp("Sketcher", "Visualization", 
+                                   "length_color", "Length color",
+                                   Config_Prop::Color, LENGTH_COLOR);
+  Config_PropManager::registerProp("Sketcher", "Visualization", 
+                                   "radius_color", "Radius color",
+                                   Config_Prop::Color, RADIUS_COLOR);
 }
 
 FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)

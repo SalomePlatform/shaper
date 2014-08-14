@@ -15,6 +15,8 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Pnt.h>
 
+#include <Config_PropManager.h>
+
 SketchPlugin_ConstraintParallel::SketchPlugin_ConstraintParallel()
 {
 }
@@ -77,6 +79,12 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintParallel::getAISObje
   if (!anAIS)
     anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject);
   anAIS->createParallel(aLine1, aLine2, aFlyoutPnt, aPlane);
+
+  // Set color from preferences
+  std::string aColor = Config_PropManager::value("Sketcher", "Visualization", 
+                                                 "parallel_color", PARALLEL_COLOR);
+  std::vector<int> aRGB = stringToRGB(aColor);
+  anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }
 

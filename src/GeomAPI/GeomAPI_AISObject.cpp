@@ -234,7 +234,12 @@ void GeomAPI_AISObject::setColor(const int& theColor)
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (anAIS.IsNull())
     return ;
-  anAIS->SetColor(Quantity_Color((Quantity_NameOfColor)theColor));
+  Quantity_Color aColor((Quantity_NameOfColor)theColor);
+  anAIS->SetColor(aColor);
+  Handle(AIS_Dimension) aDimAIS = Handle(AIS_Dimension)::DownCast(anAIS);
+  if (!aDimAIS.IsNull()) {
+    aDimAIS->DimensionAspect()->SetCommonColor(aColor);
+  }
 }
 
 void GeomAPI_AISObject::setWidth(const double& theWidth)
@@ -243,6 +248,19 @@ void GeomAPI_AISObject::setWidth(const double& theWidth)
   if (anAIS.IsNull())
     return ;
   anAIS->SetWidth(theWidth);
+}
+
+void GeomAPI_AISObject::setColor(int theR, int theG, int theB)
+{
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (anAIS.IsNull())
+    return ;
+  Quantity_Color aColor(theR/255., theG/255., theB/255., Quantity_TOC_RGB);
+  anAIS->SetColor(aColor);
+  Handle(AIS_Dimension) aDimAIS = Handle(AIS_Dimension)::DownCast(anAIS);
+  if (!aDimAIS.IsNull()) {
+    aDimAIS->DimensionAspect()->SetCommonColor(aColor);
+  }
 }
 
 bool GeomAPI_AISObject::empty() const

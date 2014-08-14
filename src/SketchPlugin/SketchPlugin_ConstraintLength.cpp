@@ -16,6 +16,7 @@
 #include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
 
+#include <Config_PropManager.h>
 
 
 SketchPlugin_ConstraintLength::SketchPlugin_ConstraintLength()
@@ -93,6 +94,12 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintLength::getAISObject
   if (!anAIS)
     anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject);
   anAIS->createDistance(aPoint1, aPoint2, aFlyoutPnt, aPlane, aValue);
+
+  // Set color from preferences
+  std::string aColor = Config_PropManager::value("Sketcher", "Visualization", 
+                                                 "length_color", LENGTH_COLOR);
+  std::vector<int> aRGB = stringToRGB(aColor);
+  anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }
 

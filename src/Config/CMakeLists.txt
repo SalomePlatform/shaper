@@ -15,6 +15,8 @@ SET(PROJECT_HEADERS
   Config_PointerMessage.h
   Config_Common.h
   Config_ValidatorMessage.h
+  Config_Prop.h
+  Config_PropManager.h
  )
  
 SET(PROJECT_SOURCES
@@ -27,6 +29,7 @@ SET(PROJECT_SOURCES
   Config_PointerMessage.cpp
   Config_Common.cpp
   Config_ValidatorMessage.cpp
+  Config_PropManager.cpp
 )
 
 SET(XML_RESOURCES

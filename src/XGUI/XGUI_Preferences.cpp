@@ -79,10 +79,17 @@ XGUI_PreferencesDlg::~XGUI_PreferencesDlg()
 void XGUI_PreferencesDlg::createEditors()
 {
   int aLFpage = myPreferences->addItem("Desktop");
-  myPreferences->setItemIcon(aLFpage, QIcon(":pictures/view_prefs.png"));
+  //myPreferences->setItemIcon(aLFpage, QIcon(":pictures/view_prefs.png"));
 
   createMenuPage(aLFpage);
   createViewerPage(aLFpage);
+
+  std::list<std::string> aOwners = Config_PropManager::getOwners();
+  std::list<std::string>::const_iterator aIt;
+  for (aIt = aOwners.cbegin(); aIt != aOwners.cend(); ++ aIt) {
+    int aPage = myPreferences->addItem((*aIt).c_str());
+    createCustomPage(aPage, Config_PropManager::getProperties((*aIt)));
+  }
 }
 
 void XGUI_PreferencesDlg::createViewerPage(int thePageId)
@@ -143,6 +150,50 @@ void XGUI_PreferencesDlg::createMenuPage(int thePageId)
   myPreferences->setItemProperty( "min", 1, aRowsNb );
   myPreferences->setItemProperty( "max", 10, aRowsNb );
 }
+
+
+void XGUI_PreferencesDlg::createCustomPage(int thePageId, Config_Properties& theProps)
+{
+  SUIT_ResourceMgr* aResMgr = XGUI_Preferences::resourceMgr();
+  bool isResModified = false;
+
+  // Sort by sections
+  QMap<QString, Config_Properties> aGroupMap;
+  Config_Properties::const_iterator aIt;
+  for (aIt = theProps.cbegin(); aIt != theProps.cend(); ++aIt) {
+    QString aGroup((*aIt)->section().c_str());
+    if (aGroupMap.contains(aGroup)) {
+      aGroupMap[aGroup].push_back(*aIt);
+    } else {
+      Config_Properties aProps;
+      aProps.push_back(*aIt);
+      aGroupMap[aGroup] = aProps;
+    }
+    // check that the property is defined
+    QString aName((*aIt)->name().c_str());
+    if (!aResMgr->hasValue(aGroup, aName)) {
+      aResMgr->setValue(aGroup, aName, QString((*aIt)->value().c_str()));
+      isResModified = true;
+    }
+  }
+  if (isResModified)
+    aResMgr->save();
+
+  // Make a Tab from each section
+  QMap<QString, Config_Properties>::iterator it;
+  for (it = aGroupMap.begin(); it != aGroupMap.end(); ++it) {
+    int aTab = myPreferences->addItem(it.key(), thePageId );
+    myPreferences->setItemProperty( "columns", 2, aTab );
+    Config_Properties& aProps = it.value();
+    for (aIt = aProps.cbegin(); aIt != aProps.cend(); ++aIt) {
+      myPreferences->addItem( QString((*aIt)->title().c_str()), aTab,
+                              (SUIT_PreferenceMgr::PrefItemType)(*aIt)->type(), 
+                              QString((*aIt)->section().c_str()), 
+                               QString((*aIt)->name().c_str()) );
+    }
+  }
+}
+
 
 void XGUI_PreferencesDlg::accept()
 {

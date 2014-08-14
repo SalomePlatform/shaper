@@ -9,6 +9,8 @@
 #include <SketchPlugin_Sketch.h>
 #include "SketchPlugin_Constraint.h"
 
+#define PERPENDICULAR_COLOR "255, 255, 0"
+
 /** \class SketchPlugin_ConstraintPerpendicular
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint for perpendicularity of two lines

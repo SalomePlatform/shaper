@@ -9,6 +9,9 @@
 #include <SketchPlugin_Sketch.h>
 #include "SketchPlugin_Constraint.h"
 
+
+#define PARALLEL_COLOR "255, 255, 0"
+
 /** \class SketchPlugin_ConstraintParallel
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint parallelism of two lines

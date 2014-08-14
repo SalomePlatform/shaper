@@ -9,6 +9,8 @@
 #include <SketchPlugin_Sketch.h>
 #include "SketchPlugin_Constraint.h"
 
+#define RADIUS_COLOR "255, 0, 255"
+
 /** \class SketchPlugin_ConstraintRadius
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint which defines 

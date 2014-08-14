@@ -10,6 +10,8 @@
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
+#define LENGTH_COLOR "255, 0, 255"
+
 /** \class SketchPlugin_ConstraintLength
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint which defines a length of a line segment

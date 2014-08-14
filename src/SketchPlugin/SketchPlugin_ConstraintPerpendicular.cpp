@@ -15,6 +15,8 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Pnt.h>
 
+#include <Config_PropManager.h>
+
 SketchPlugin_ConstraintPerpendicular::SketchPlugin_ConstraintPerpendicular()
 {
 }
@@ -73,6 +75,12 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintPerpendicular::getAI
   if (!anAIS)
     anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject);
   anAIS->createPerpendicular(aLine1, aLine2, aPlane);
+
+  // Set color from preferences
+  std::string aColor = Config_PropManager::value("Sketcher", "Visualization", 
+                                                 "perpendicular_color", PERPENDICULAR_COLOR);
+  std::vector<int> aRGB = stringToRGB(aColor);
+  anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }
 
