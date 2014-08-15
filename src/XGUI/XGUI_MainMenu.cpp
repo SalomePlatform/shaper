@@ -121,7 +121,7 @@ QList<XGUI_Command*> XGUI_MainMenu::features() const
 int XGUI_MainMenu::menuItemSize() const
 {
   int DEFAULT_ITEM_SIZE = XGUI_Preferences::resourceMgr()->integerValue(
-    XGUI_Preferences::MENU_SECTION, "item_size");
+    XGUI_Preferences::MENU_SECTION, "item_size", 25);
   return DEFAULT_ITEM_SIZE;
 }
 
@@ -136,7 +136,7 @@ int XGUI_MainMenu::menuHeight() const
 int XGUI_MainMenu::menuItemRowsCount() const
 {
   int DEFAULT_ITEM_ROWS_COUNT = XGUI_Preferences::resourceMgr()->integerValue(
-    XGUI_Preferences::MENU_SECTION, "rows_number");
+    XGUI_Preferences::MENU_SECTION, "rows_number", 3);
   return DEFAULT_ITEM_ROWS_COUNT;
 }
 
