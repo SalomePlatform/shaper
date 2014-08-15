@@ -8,6 +8,7 @@
 
 #include <Events_Error.h>
 #include <Events_Loop.h>
+#include <GeomAPI_XY.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
@@ -148,11 +149,54 @@ bool SketchSolver_ConstraintGroup::isInteract(
       FeaturePtr aFeature = aDoc->feature(aRC);
       if (myEntityFeatMap.find(aFeature) != myEntityFeatMap.end())
         return true;
+      // search attributes of a feature to be parameters of constraint
+      std::list< boost::shared_ptr<ModelAPI_Attribute> >
+        aFeatAttrList = aFeature->data()->attributes(std::string());
+      std::list< boost::shared_ptr<ModelAPI_Attribute> >::const_iterator
+        aFAIter = aFeatAttrList.begin();
+      for ( ; aFAIter != aFeatAttrList.end(); aFAIter++)
+        if (myEntityAttrMap.find(*aFAIter) != myEntityAttrMap.end())
+          return true;
     }
   }
 
   // Entities did not found
   return false;
+}
+
+// ============================================================================
+//  Function: checkConstraintConsistence
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  verifies and changes parameters of the constraint
+// ============================================================================
+void SketchSolver_ConstraintGroup::checkConstraintConsistence(Slvs_Constraint& theConstraint)
+{
+  if (theConstraint.type == SLVS_C_PT_LINE_DISTANCE)
+  {
+    // Get constraint parameters and check the sign of constraint value
+    
+    // point coordinates
+    int aPtPos = Search(theConstraint.ptA, myEntities);
+    int aPtParamPos = Search(myEntities[aPtPos].param[0], myParams);
+    boost::shared_ptr<GeomAPI_XY> aPoint(
+      new GeomAPI_XY(myParams[aPtParamPos].val, myParams[aPtParamPos+1].val));
+
+    // line coordinates
+    int aLnPos = Search(theConstraint.entityA, myEntities);
+    aPtPos = Search(myEntities[aLnPos].point[0], myEntities);
+    aPtParamPos = Search(myEntities[aPtPos].param[0], myParams);
+    boost::shared_ptr<GeomAPI_XY> aStart(
+      new GeomAPI_XY(-myParams[aPtParamPos].val, -myParams[aPtParamPos+1].val));
+    aPtPos = Search(myEntities[aLnPos].point[1], myEntities);
+    aPtParamPos = Search(myEntities[aPtPos].param[0], myParams);
+    boost::shared_ptr<GeomAPI_XY> aEnd(
+      new GeomAPI_XY(myParams[aPtParamPos].val, myParams[aPtParamPos+1].val));
+
+    aEnd = aEnd->added(aStart);
+    aPoint = aPoint->added(aStart);
+    if (aPoint->cross(aEnd) * theConstraint.valA < 0.0)
+      theConstraint.valA *= -1.0;
+  }
 }
 
 // ============================================================================
@@ -260,7 +304,11 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
                           aDistance, aConstrEnt[0], aConstrEnt[1], aConstrEnt[2], aConstrEnt[3]);
     myConstraints.push_back(aConstraint);
     myConstraintMap[theConstraint] = aConstraint.h;
+    int aConstrPos = Search(aConstraint.h, myConstraints);
+    aConstrIter = myConstraints.begin() + aConstrPos;
   }
+
+  checkConstraintConsistence(*aConstrIter);
   return true;
 }
 

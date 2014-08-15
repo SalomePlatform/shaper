@@ -174,6 +174,12 @@ private:
    */
   bool addCoincidentPoints(const Slvs_hEntity& thePoint1, const Slvs_hEntity& thePoint2);
 
+  /** \brief Verifies and changes parameters of constriant, 
+   *         e.g. sign of the distance between line and point
+   *  \param[in,out] theConstraint SolveSpace constraint to be verified
+   */
+  void checkConstraintConsistence(Slvs_Constraint& theConstraint);
+
 private:
   // SolveSpace entities
   Slvs_hGroup                  myID;            ///< the index of the group
