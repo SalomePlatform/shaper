@@ -7,6 +7,7 @@
 
 #include "XGUI.h"
 
+#include <Config_PropManager.h>
 #include <SUIT_PreferenceMgr.h>
 #include <QDialog>
 
@@ -29,6 +30,10 @@ public:
   static bool editPreferences(XGUI_Prefs& theModified);
 
   static SUIT_ResourceMgr* resourceMgr();
+
+  static void updateCustomProps();
+
+  static void loadCustomProps();
 
 private:
   static SUIT_ResourceMgr* myResourceMgr;
@@ -75,6 +80,9 @@ private:
   void createEditors();
   void createViewerPage(int thePageId);
   void createMenuPage(int thePageId);
+  void createCustomPage(int thePageId);
+
+  void updateCustomProps();
   
   XGUI_PreferencesMgr* myPreferences;
   bool myIsChanged;

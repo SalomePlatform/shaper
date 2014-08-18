@@ -19,6 +19,8 @@
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Dir.h>
 
+#include <Config_PropManager.h>
+
 SketchPlugin_ConstraintRadius::SketchPlugin_ConstraintRadius()
 {
 }
@@ -119,6 +121,10 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintRadius::getAISObject
   if (!anAIS)
     anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject);
   anAIS->createRadius(aCircle, aFlyoutPnt, aValue);
+
+  // Set color from preferences
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "radius_color", RADIUS_COLOR);
+  anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }
 

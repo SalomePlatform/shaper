@@ -84,6 +84,13 @@ public:
    */
   void setColor(const int& theColor);
 
+  /** \brief Assigns the color for the shape
+   *  \param[in] theR value of the red component
+   *  \param[in] theG value of the green component
+   *  \param[in] theB value of the blue component
+   */
+  void setColor(int theR, int theG, int theB);
+
   /// \brief Assigns the width of the lines of shape
   void setWidth(const double& theWidth);
 

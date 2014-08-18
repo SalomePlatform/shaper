@@ -206,8 +206,10 @@ void XGUI_OperationMgr::onOperationStopped()
       break;
     }
   }
-  if (aResultOp)
+  if (aResultOp) {
     resumeOperation(aResultOp);
+    validateCurrentOperation();
+  }
 }
 
 void XGUI_OperationMgr::onKeyReleased(const std::string& theName, QKeyEvent* theEvent)

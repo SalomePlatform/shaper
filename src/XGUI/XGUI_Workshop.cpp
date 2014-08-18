@@ -145,6 +145,7 @@ void XGUI_Workshop::startApplication()
     myMainWindow->show();
     updateCommandStatus();
   }
+  XGUI_Preferences::loadCustomProps();
   onNew();
 }
 

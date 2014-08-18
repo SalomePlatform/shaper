@@ -16,8 +16,6 @@
 
 using namespace std;
 
-// face of the square-face displayed for selection of general plane
-const double PLANE_SIZE = 200;
 
 SketchPlugin_Line::SketchPlugin_Line()
   : SketchPlugin_Feature()

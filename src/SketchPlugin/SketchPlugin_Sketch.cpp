@@ -14,13 +14,9 @@
 #include <GeomAlgoAPI_SketchBuilder.h>
 #include <ModelAPI_ResultConstruction.h>
 
+#include <Config_PropManager.h>
 
 using namespace std;
-
-const int SKETCH_PLANE_COLOR = Colors::COLOR_BROWN; /// the plane edge color
-const double SKETCH_WIDTH = 4.0; /// the plane edge width
-// face of the square-face displayed for selection of general plane
-const double PLANE_SIZE = 200;
 
 
 SketchPlugin_Sketch::SketchPlugin_Sketch()
@@ -138,8 +134,9 @@ void addPlane(double theX, double theY, double theZ, std::list<boost::shared_ptr
 {
   boost::shared_ptr<GeomAPI_Pnt> anOrigin(new GeomAPI_Pnt(0, 0, 0));
   boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(theX, theY, theZ));
+  double aSize = Config_PropManager::integer("Sketch definition", "Size of planes", PLANE_SIZE);
   boost::shared_ptr<GeomAPI_Shape> aFace = 
-    GeomAlgoAPI_FaceBuilder::square(anOrigin, aNormal, PLANE_SIZE);
+    GeomAlgoAPI_FaceBuilder::square(anOrigin, aNormal, aSize);
   theShapes.push_back(aFace);
 }
 
@@ -160,8 +157,15 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Sketch::
       boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aFaces);
       aAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
       aAIS->createShape(aCompound);
-      aAIS->setColor(SKETCH_PLANE_COLOR);
-      aAIS->setWidth(SKETCH_WIDTH);
+
+      std::vector<int> aRGB = Config_PropManager::color("Sketch definition", 
+                                                        "planes_color", 
+                                                        SKETCH_PLANE_COLOR);
+      aAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
+
+      aAIS->setWidth(Config_PropManager::integer("Sketch definition", 
+                                                 "planes_thikness",
+                                                 SKETCH_WIDTH));
     }
     return aAIS;
   }

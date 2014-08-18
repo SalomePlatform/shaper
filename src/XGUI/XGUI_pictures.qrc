@@ -62,5 +62,6 @@
      <file>pictures/eye_pencil_closed.png</file>
    
      <file>pictures/view_prefs.png</file>
+     <file>pictures/module.png</file>
  </qresource>
  </RCC>
