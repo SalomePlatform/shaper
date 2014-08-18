@@ -1,7 +1,7 @@
 #------ Setting products installation directory ------
 
 if [ "${PDIR}" = "" ] ; then
-    export PDIR=/dn48/newgeom/common/products
+    export PDIR=/dn48/newgeom/common/SALOME-7.4.0
 fi
 
 # Find absolute path to ROOT_DIR
@@ -40,8 +40,7 @@ export FREETYPE_ROOT_DIR=${PDIR}/freetype-2.4.11
 export LD_LIBRARY_PATH=${FREETYPE_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
 ##
 #------ freeimage ------
-export FREEIMAGE_ROOT_DIR=${PDIR}/freeimage-3.15.4
-export PATH=${FREEIMAGE_ROOT_DIR}/bin:${PATH}
+export FREEIMAGE_ROOT_DIR=${PDIR}/freeimage-3.16.0
 export LD_LIBRARY_PATH=${FREEIMAGE_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
 ##
 #------ gl2ps ------
@@ -66,31 +65,35 @@ export LD_LIBRARY_PATH=${SOLVESPACE_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
 #------ OCCT ------
 export CAS_ROOT_DIR=${PDIR}/OCCT-6.7.1
 
-export PATH=${CAS_ROOT_DIR}/bin:${PATH}
-export LD_LIBRARY_PATH=${CAS_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
-export CSF_GraphicShr=${CAS_ROOT_DIR}/lib/libTKOpenGl.so
-# Variable for Foundation Classes : 
-export CSF_UnitsLexicon=${CAS_ROOT_DIR}/src/UnitsAPI/Lexi_Expr.dat 
-export CSF_UnitsDefinition=${CAS_ROOT_DIR}/src/UnitsAPI/Units.dat 
-# Variable for DataExchange : 
-export CSF_SHMessage=${CAS_ROOT_DIR}/src/SHMessage
-export CSF_XSMessage=${CAS_ROOT_DIR}/src/XSMessage 
-# Variable for Font : 
-export CSF_MDTVFontDirectory=${CAS_ROOT_DIR}/src/FontMFT 
-export CSF_MDTVTexturesDirectory=${CAS_ROOT_DIR}/src/Textures
-# Defaults
-export CSF_PluginDefaults=${CAS_ROOT_DIR}/src/StdResource 
-export CSF_StandardDefaults=${CAS_ROOT_DIR}/src/StdResource
-# Activation of OCCT Kernel multithreading :
-export MMGT_REENTRANT=1
-
 #------ lcov ------
 export LCOV_ROOT_DIR=${PDIR}/lcov-1.11
 export PATH=${LCOV_ROOT_DIR}/bin:${PATH}
 
 #------ SUIT ------
-export SUIT_DIR=${PDIR}/suit
+export SUIT_DIR=${PDIR}/GUI_7.4.0
+export PATH=${SUIT_DIR}/bin/salome:${PATH}
 export LD_LIBRARY_PATH=${SUIT_DIR}/lib/salome:${LD_LIBRARY_PATH}
+
+# CAS_ROOT_DIR has to be in the PATH for CMake's FindCAS procedures
+export PATH=${CAS_ROOT_DIR}:${CAS_ROOT_DIR}/bin:${PATH}
+export LD_LIBRARY_PATH=${CAS_ROOT_DIR}/lib:${LD_LIBRARY_PATH}
+export CSF_GraphicShr=${CAS_ROOT_DIR}/lib/libTKOpenGl.so
+# Variable for Foundation Classes :
+export CSF_UnitsLexicon=${CAS_ROOT_DIR}/src/UnitsAPI/Lexi_Expr.dat
+export CSF_UnitsDefinition=${CAS_ROOT_DIR}/src/UnitsAPI/Units.dat
+# Variable for DataExchange :
+export CSF_SHMessage=${CAS_ROOT_DIR}/src/SHMessage
+export CSF_XSMessage=${CAS_ROOT_DIR}/src/XSMessage
+# Variable for Font :
+export CSF_MDTVFontDirectory=${CAS_ROOT_DIR}/src/FontMFT
+export CSF_MDTVTexturesDirectory=${CAS_ROOT_DIR}/src/Textures
+# Defaults
+export CSF_PluginDefaults=${CAS_ROOT_DIR}/src/StdResource
+export CSF_StandardDefaults=${CAS_ROOT_DIR}/src/StdResource
+# Activation of OCCT Kernel multithreading :
+export MMGT_REENTRANT=1
+# For CMake
+export LIB=${LD_LIBRARY_PATH}
 
 #------ NewGEOM ------
 export NEW_GEOM_ROOT_DIR=${ROOT_DIR}/install
