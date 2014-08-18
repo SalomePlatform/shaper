@@ -66,11 +66,12 @@ QMdiArea* XGUI_MainWindow::mdiArea() const
 void XGUI_MainWindow::showPythonConsole()
 {
   // TODO: Check why PyConsole can not be created
-  //if (!myPythonConsole) {
-  //  myPythonConsole = new PyConsole_EnhConsole(this, new PyConsole_EnhInterp());
-  //  undockPythonConsole();
-  //}
-  //myPythonConsole->parentWidget()->show();
+  if (!myPythonConsole) {
+    myPythonConsole = new PyConsole_EnhConsole(this, new PyConsole_EnhInterp());
+    myPythonConsole->setObjectName("PythonConsole");
+    undockPythonConsole();
+  }
+  myPythonConsole->parentWidget()->show();
 }
 
 //******************************************************

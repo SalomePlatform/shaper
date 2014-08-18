@@ -48,6 +48,7 @@ XGUI_Workbench* XGUI_MainMenu::addWorkbench(const QString& theId, const QString&
   XGUI_Workbench* aPage = new XGUI_Workbench(myMenuTabs);
   aPage->setObjectName(theId);
   myMenuTabs->addTab(aPage, aTitle);
+  myWorkbenches.append(aPage);
   return aPage;
 }
 
@@ -99,8 +100,8 @@ XGUI_Command* XGUI_MainMenu::feature(const QString& theId) const
   XGUI_Command* result;
   result = myGeneralPage->feature(theId);
   if (!result) {
-    for (int aTabIdx = 0; aTabIdx < myMenuTabs->count(); ++aTabIdx) {
-      XGUI_Workbench* aWbn = static_cast<XGUI_Workbench*>(myMenuTabs->widget(aTabIdx));
+    XGUI_Workbench* aWbn;
+    foreach (aWbn, myWorkbenches) {
       result = aWbn->feature(theId);
       if (result) break;
     }
@@ -111,8 +112,8 @@ XGUI_Command* XGUI_MainMenu::feature(const QString& theId) const
 QList<XGUI_Command*> XGUI_MainMenu::features() const
 {
   QList<XGUI_Command*> aList = myGeneralPage->features();
-  for (int aTabIdx = 0; aTabIdx < myMenuTabs->count(); ++aTabIdx) {
-    XGUI_Workbench* aWbn = static_cast<XGUI_Workbench*>(myMenuTabs->widget(aTabIdx));
+  XGUI_Workbench* aWbn;
+  foreach (aWbn, myWorkbenches) {
     aList.append(aWbn->features());
   }
   return aList;

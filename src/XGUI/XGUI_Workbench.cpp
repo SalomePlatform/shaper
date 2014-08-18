@@ -188,8 +188,8 @@ XGUI_Command* XGUI_Workbench::feature(const QString& theId) const
 QList<XGUI_Command*> XGUI_Workbench::features() const
 {
   QList<XGUI_Command*> aList;
-  QList<XGUI_MenuGroupPanel*>::const_iterator aIt;
-  for (aIt = myGroups.constBegin(); aIt != myGroups.constEnd(); ++aIt) 
-    aList.append((*aIt)->features());
+  foreach (XGUI_MenuGroupPanel* aGroup, myGroups) {
+    aList.append(aGroup->features());
+  }
   return aList;
 }

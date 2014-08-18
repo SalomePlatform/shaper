@@ -78,6 +78,7 @@ private:
   XGUI_MainWindow* myDesktop;
   QTabWidget* myMenuTabs;
   XGUI_MenuGroupPanel* myGeneralPage;
+  QList<XGUI_Workbench*> myWorkbenches;
 
   QMap<XGUI_Command*, bool> myCommandState;
 };
