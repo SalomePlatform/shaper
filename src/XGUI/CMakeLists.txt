@@ -81,15 +81,16 @@ SET(TEXT_RESOURCES
 SET(PROJECT_LIBRARIES
     Events
     Config
+	ModelAPI
+	ModuleBase
 	${QT_LIBRARIES}
 	${CAS_VIEWER}
 	${CAS_KERNEL}
+	${PYTHON_LIBRARIES}
 	${PyConsole}
 	${PyInterp}
 	${suit}
 	${qtx}
-	ModelAPI
-	ModuleBase
 )
 
 IF(WIN32) 
