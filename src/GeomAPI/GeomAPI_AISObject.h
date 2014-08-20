@@ -98,5 +98,8 @@ public:
   bool empty() const;
 };
 
+//! Pointer on attribute object
+typedef boost::shared_ptr<GeomAPI_AISObject> AISObjectPtr;
+
 #endif
 

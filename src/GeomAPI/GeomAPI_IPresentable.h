@@ -16,8 +16,7 @@ public:
   /** Returns the AIS preview
   *   \param thePrevious - defines a presentation if it was created previously
   */
-  virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
-                            boost::shared_ptr<GeomAPI_AISObject> thePrevious) = 0;
+  virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious) = 0;
 };
 
 typedef boost::shared_ptr<GeomAPI_IPresentable> GeomPresentablePtr;

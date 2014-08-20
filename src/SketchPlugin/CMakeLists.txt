@@ -11,6 +11,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_Circle.h
     SketchPlugin_Arc.h
     SketchPlugin_Constraint.h
+    SketchPlugin_ConstraintBase.h
     SketchPlugin_ConstraintCoincidence.h
     SketchPlugin_ConstraintDistance.h
     SketchPlugin_ConstraintLength.h
@@ -28,7 +29,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_Point.cpp
     SketchPlugin_Circle.cpp
     SketchPlugin_Arc.cpp
-    SketchPlugin_Constraint.cpp
+    SketchPlugin_ConstraintBase.cpp
     SketchPlugin_ConstraintCoincidence.cpp
     SketchPlugin_ConstraintDistance.cpp
     SketchPlugin_ConstraintLength.cpp

@@ -7,7 +7,7 @@
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Sketch.h>
-#include "SketchPlugin_Constraint.h"
+#include "SketchPlugin_ConstraintBase.h"
 
 #define RADIUS_COLOR "#ff00ff"
 
@@ -19,7 +19,7 @@
  *  These constraint has two attributes:
  *  SketchPlugin_Constraint::VALUE() (radius), SketchPlugin_Constraint::ENTITY_A() (a circle)
  */
-class SketchPlugin_ConstraintRadius: public SketchPlugin_Constraint
+class SketchPlugin_ConstraintRadius: public SketchPlugin_ConstraintBase
 {
 public:
   /// Radius constraint kind
@@ -38,8 +38,7 @@ public:
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
   /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious);
+  SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved

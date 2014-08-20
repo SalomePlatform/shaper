@@ -6,7 +6,7 @@
 #define SketchPlugin_ConstraintCoincidence_H_
 
 #include "SketchPlugin.h"
-#include "SketchPlugin_Constraint.h"
+#include "SketchPlugin_ConstraintBase.h"
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
@@ -17,7 +17,7 @@
  *  These constraint has two attributes:
  *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
-class SketchPlugin_ConstraintCoincidence: public SketchPlugin_Constraint
+class SketchPlugin_ConstraintCoincidence: public SketchPlugin_ConstraintBase
 {
 public:
   /// Parallel constraint kind

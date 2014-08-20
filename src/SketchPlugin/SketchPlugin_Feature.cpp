@@ -35,8 +35,8 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
   return mySketch;
 }
 
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Feature::simpleAISObject(
-    boost::shared_ptr<ModelAPI_Result> theRes, boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+AISObjectPtr SketchPlugin_Feature::simpleAISObject(
+    boost::shared_ptr<ModelAPI_Result> theRes, AISObjectPtr thePrevious)
 {
   boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
     boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theRes);
@@ -44,9 +44,9 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Feature::simpleAISObject(
   boost::shared_ptr<GeomAPI_Shape> aPreview;
   if (aConstr) aPreview = aConstr->shape();
 
-  boost::shared_ptr<GeomAPI_AISObject> aResult = thePrevious;
+  AISObjectPtr aResult = thePrevious;
   if (!aResult)
-    aResult = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
+    aResult = AISObjectPtr(new GeomAPI_AISObject());
   aResult->createShape(aPreview);
   return aResult;
 }

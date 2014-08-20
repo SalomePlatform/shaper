@@ -64,8 +64,7 @@ void SketchPlugin_ConstraintRadius::execute()
   }
 }
 
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintRadius::getAISObject(
-                    boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePrevious)
 {
   if (!sketch())
     return thePrevious;
@@ -117,9 +116,9 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintRadius::getAISObject
   if (aValueAttr && aValueAttr->isInitialized())
    aValue = aValueAttr->value();
 
-  boost::shared_ptr<GeomAPI_AISObject> anAIS = thePrevious;
+  AISObjectPtr anAIS = thePrevious;
   if (!anAIS)
-    anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject);
+    anAIS = AISObjectPtr(new GeomAPI_AISObject);
   anAIS->createRadius(aCircle, aFlyoutPnt, aValue);
 
   // Set color from preferences

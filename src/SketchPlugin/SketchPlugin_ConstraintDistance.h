@@ -6,7 +6,7 @@
 #define SketchPlugin_ConstraintDistance_H_
 
 #include "SketchPlugin.h"
-#include "SketchPlugin_Constraint.h"
+#include "SketchPlugin_ConstraintBase.h"
 #include "SketchPlugin_Sketch.h"
 #include "ModelAPI_Data.h"
 
@@ -25,7 +25,7 @@ class GeomDataAPI_Point2D;
  *  These constraint has three attributes:
  *  SketchPlugin_Constraint::VALUE(), SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
-class SketchPlugin_ConstraintDistance: public SketchPlugin_Constraint
+class SketchPlugin_ConstraintDistance: public SketchPlugin_ConstraintBase
 {
 public:
   /// Distance constraint kind
@@ -46,8 +46,7 @@ public:
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
   /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious);
+  SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved

@@ -7,7 +7,7 @@
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Sketch.h>
-#include "SketchPlugin_Constraint.h"
+#include "SketchPlugin_ConstraintBase.h"
 
 #define PERPENDICULAR_COLOR "#ffff00"
 
@@ -18,7 +18,7 @@
  *  These constraint has two attributes:
  *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
-class SketchPlugin_ConstraintPerpendicular: public SketchPlugin_Constraint
+class SketchPlugin_ConstraintPerpendicular: public SketchPlugin_ConstraintBase
 {
 public:
   /// Perpendicular constraint kind
@@ -38,8 +38,7 @@ public:
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
   /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious);
+  SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved

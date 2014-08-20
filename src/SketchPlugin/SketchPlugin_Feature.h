@@ -24,8 +24,8 @@ class SketchPlugin_Feature: public ModelAPI_Feature
 {
 public:
   /// Simple creation of interactive object by the result of the object
-  static boost::shared_ptr<GeomAPI_AISObject> simpleAISObject(
-    boost::shared_ptr<ModelAPI_Result> theRes, boost::shared_ptr<GeomAPI_AISObject> thePrevious);
+  static AISObjectPtr simpleAISObject(
+    boost::shared_ptr<ModelAPI_Result> theRes, AISObjectPtr thePrevious);
 
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature

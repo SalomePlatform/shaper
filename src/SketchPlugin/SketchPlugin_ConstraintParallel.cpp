@@ -32,8 +32,7 @@ void SketchPlugin_ConstraintParallel::execute()
 {
 }
 
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintParallel::getAISObject(
-                    boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+AISObjectPtr SketchPlugin_ConstraintParallel::getAISObject(AISObjectPtr thePrevious)
 {
   if (!sketch())
     return thePrevious;
@@ -75,9 +74,9 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintParallel::getAISObje
     boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
 
-  boost::shared_ptr<GeomAPI_AISObject> anAIS = thePrevious;
+  AISObjectPtr anAIS = thePrevious;
   if (!anAIS)
-    anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject);
+    anAIS = AISObjectPtr(new GeomAPI_AISObject);
   anAIS->createParallel(aLine1, aLine2, aFlyoutPnt, aPlane);
 
   // Set color from preferences

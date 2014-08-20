@@ -6,7 +6,7 @@
 #define SketchPlugin_ConstraintLength_H_
 
 #include "SketchPlugin.h"
-#include "SketchPlugin_Constraint.h"
+#include "SketchPlugin_ConstraintBase.h"
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
@@ -20,7 +20,7 @@
  *  SketchPlugin_Constraint::VALUE() (length) and SketchPlugin_Constraint::ENTITY_A() (segment),
  *  SketchPlugin_Constraint::FLYOUT_VALUE_PNT() (distance of a constraints handle)
  */
-class SketchPlugin_ConstraintLength: public SketchPlugin_Constraint
+class SketchPlugin_ConstraintLength: public SketchPlugin_ConstraintBase
 {
 public:
   /// Length constraint kind
@@ -40,8 +40,7 @@ public:
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
   /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
-                                boost::shared_ptr<GeomAPI_AISObject> thePrevious);
+  SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved

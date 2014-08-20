@@ -140,14 +140,13 @@ void addPlane(double theX, double theY, double theZ, std::list<boost::shared_ptr
   theShapes.push_back(aFace);
 }
 
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Sketch::
-  getAISObject(boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+AISObjectPtr SketchPlugin_Sketch::getAISObject(AISObjectPtr thePrevious)
 {
   boost::shared_ptr<GeomDataAPI_Dir> aNorm = 
     boost::dynamic_pointer_cast<GeomDataAPI_Dir>(data()->attribute(SketchPlugin_Sketch::NORM_ID()));
 
   if (!aNorm || (aNorm->x() == 0 && aNorm->y() == 0 && aNorm->z() == 0)) {
-    boost::shared_ptr<GeomAPI_AISObject> aAIS = thePrevious;
+    AISObjectPtr aAIS = thePrevious;
     if (!aAIS) {
       std::list<boost::shared_ptr<GeomAPI_Shape> > aFaces;
 
@@ -155,7 +154,7 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Sketch::
       addPlane(0, 1, 0, aFaces); // XZ plane
       addPlane(0, 0, 1, aFaces); // XY plane
       boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aFaces);
-      aAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
+      aAIS = AISObjectPtr(new GeomAPI_AISObject());
       aAIS->createShape(aCompound);
 
       std::vector<int> aRGB = Config_PropManager::color("Sketch definition", 
@@ -169,5 +168,5 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_Sketch::
     }
     return aAIS;
   }
-  return boost::shared_ptr<GeomAPI_AISObject>();
+  return AISObjectPtr();
 }

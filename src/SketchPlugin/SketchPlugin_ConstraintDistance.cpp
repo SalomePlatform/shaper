@@ -62,8 +62,7 @@ void SketchPlugin_ConstraintDistance::execute()
 }
 
 //*************************************************************************************
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintDistance::getAISObject(
-                    boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevious)
 {
   if (!sketch())
     return thePrevious;
@@ -112,9 +111,9 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintDistance::getAISObje
     boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
   double aValue = aValueAttr->value();
 
-  boost::shared_ptr<GeomAPI_AISObject> anAIS = thePrevious;
+  AISObjectPtr anAIS = thePrevious;
   if (!anAIS)
-    anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject);
+    anAIS = AISObjectPtr(new GeomAPI_AISObject);
   anAIS->createDistance(aPoint1, aPoint2, aFlyoutPnt, aPlane, aValue);
 
   // Set color from preferences

@@ -102,8 +102,7 @@ public:
   /// Returns the basis plane for the sketch
   boost::shared_ptr<GeomAPI_Pln> plane();
 
-  virtual boost::shared_ptr<GeomAPI_AISObject> getAISObject(
-                            boost::shared_ptr<GeomAPI_AISObject> thePrevious);
+  virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
 protected:
   /// Creates a plane and append it to the list

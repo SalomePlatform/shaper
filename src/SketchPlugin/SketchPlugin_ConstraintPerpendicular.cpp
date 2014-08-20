@@ -32,8 +32,7 @@ void SketchPlugin_ConstraintPerpendicular::execute()
 {
 }
 
-boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintPerpendicular::getAISObject(
-                    boost::shared_ptr<GeomAPI_AISObject> thePrevious)
+AISObjectPtr SketchPlugin_ConstraintPerpendicular::getAISObject(AISObjectPtr thePrevious)
 {
   if (!sketch())
     return thePrevious;
@@ -71,9 +70,9 @@ boost::shared_ptr<GeomAPI_AISObject> SketchPlugin_ConstraintPerpendicular::getAI
     boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anAttr2->object());
   if (aConst2) aLine2 = aConst2->shape();
 
-  boost::shared_ptr<GeomAPI_AISObject> anAIS = thePrevious;
+  AISObjectPtr anAIS = thePrevious;
   if (!anAIS)
-    anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject);
+    anAIS = AISObjectPtr(new GeomAPI_AISObject);
   anAIS->createPerpendicular(aLine1, aLine2, aPlane);
 
   // Set color from preferences
