@@ -32,7 +32,7 @@ XGUI_MainMenu::XGUI_MainMenu(XGUI_MainWindow *parent)
   aMainLayout->setContentsMargins(0, 2, 2, 0);
   aMainLayout->setSpacing(2);
   setLayout(aMainLayout);
-  setFixedHeight(menuHeight());
+  updateFromResources();
 }
 
 XGUI_MainMenu::~XGUI_MainMenu(void)
@@ -122,16 +122,14 @@ QList<XGUI_Command*> XGUI_MainMenu::features() const
 int XGUI_MainMenu::menuItemSize() const
 {
   const int kDefaultItemSize = 25;
-  int anItemSize = XGUI_Preferences::resourceMgr()->integerValue(
-    XGUI_Preferences::MENU_SECTION, "item_size", kDefaultItemSize);
-  return anItemSize;
+  return kDefaultItemSize;
 }
 
 int XGUI_MainMenu::menuHeight() const
 {
   // Default group has no tabs above --> one extra row
   int rows = menuItemRowsCount() + 1;
-  const int kMarginsSpacings = 4;
+  const int kMarginsSpacings = 5;
   return rows * menuItemSize() + kMarginsSpacings;
 }
 
@@ -145,4 +143,6 @@ int XGUI_MainMenu::menuItemRowsCount() const
 
 void XGUI_MainMenu::updateFromResources()
 {
+  setFixedHeight(menuHeight());
+  repaint();
 }

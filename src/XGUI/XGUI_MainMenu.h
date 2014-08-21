@@ -26,14 +26,6 @@ class XGUI_EXPORT XGUI_MainMenu: public QWidget
 {
   Q_OBJECT
 
-  //! Size of menu item
-  //TODO(sbh, vsv): Move to the settings
-  //enum ItemSize {
-  //  Small = 20,
-  //  Medium = 25,
-  //  Large = 30
-  //};
-
 public:
   XGUI_MainMenu(XGUI_MainWindow *parent);
   virtual ~XGUI_MainMenu();

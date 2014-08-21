@@ -154,19 +154,7 @@ void XGUI_PreferencesDlg::createMenuPage(int thePageId)
   int aMenuTab = myPreferences->addItem(tr("Main menu"), thePageId );
 
   int aSizeGroup = myPreferences->addItem(tr("Size"), aMenuTab );
-  myPreferences->setItemProperty( "columns", 2, aSizeGroup );
-
-  int aItemSizeItem = myPreferences->addItem( tr( "Item size" ), 
-                                              aSizeGroup, 
-                                              SUIT_PreferenceMgr::Selector,
-                                              XGUI_Preferences::MENU_SECTION, 
-                                              "item_size" );
-  QStringList aValuesList;
-  QList<QVariant> anIndicesList;
-  aValuesList << tr("Small") << tr("Medium") << tr("Large");
-  anIndicesList << 20 << 25 << 30;
-  myPreferences->setItemProperty( "strings", aValuesList,   aItemSizeItem );
-  myPreferences->setItemProperty( "indexes", anIndicesList, aItemSizeItem );
+  myPreferences->setItemProperty( "columns", 1, aSizeGroup );
 
   int aRowsNb = myPreferences->addItem( tr( "Number of rows" ), 
                                         aSizeGroup,
@@ -174,7 +162,7 @@ void XGUI_PreferencesDlg::createMenuPage(int thePageId)
                                         XGUI_Preferences::MENU_SECTION, 
                                         "rows_number" );
   myPreferences->setItemProperty( "min", 1, aRowsNb );
-  myPreferences->setItemProperty( "max", 10, aRowsNb );
+  myPreferences->setItemProperty( "max", 6, aRowsNb );
 }
 
 
