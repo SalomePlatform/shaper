@@ -14,15 +14,20 @@
  * Loop detects such messages and accumulates them without sending. On "flush" loop sends it
  * as a group-message.
  */
-class EVENTS_EXPORT Events_MessageGroup : public Events_Message {
+class EVENTS_EXPORT Events_MessageGroup : public Events_Message
+{
 
-public:
+ public:
 
   //! Creates the message
   Events_MessageGroup(const Events_ID theID, const void* theSender = 0)
-    : Events_Message(theID, theSender) {}
+      : Events_Message(theID, theSender)
+  {
+  }
   //! do nothing in the destructor yet
-  virtual ~Events_MessageGroup() {}
+  virtual ~Events_MessageGroup()
+  {
+  }
 
   //! Creates a new empty group (to store it in the loop before flush)
   virtual Events_MessageGroup* newEmpty() = 0;

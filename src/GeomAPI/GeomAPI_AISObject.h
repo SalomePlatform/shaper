@@ -30,7 +30,7 @@ struct GEOMAPI_EXPORT Colors
 
 class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
 {
-public:
+ public:
   /// \brief Creation of empty AIS object
   GeomAPI_AISObject();
 
@@ -47,8 +47,7 @@ public:
   void createDistance(boost::shared_ptr<GeomAPI_Pnt> theStartPoint,
                       boost::shared_ptr<GeomAPI_Pnt> theEndPoint,
                       boost::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
-                      boost::shared_ptr<GeomAPI_Pln> thePlane,
-                      double                         theDistance);
+                      boost::shared_ptr<GeomAPI_Pln> thePlane, double theDistance);
 
   /** \brief Creates AIS_RadiusDimension object
    *  \param[in] theCircle      the radius is created for this circle
@@ -56,8 +55,7 @@ public:
    *  \param[in] theRadius      value of the radius to be shown
    */
   void createRadius(boost::shared_ptr<GeomAPI_Circ> theCircle,
-                    boost::shared_ptr<GeomAPI_Pnt>  theFlyoutPoint,
-                    double                          theRadius);
+                    boost::shared_ptr<GeomAPI_Pnt> theFlyoutPoint, double theRadius);
 
   /** \brief Creates AIS_ParallelRelation object for two lines
    *  \param[in] theLine1       first parallel line
@@ -67,8 +65,8 @@ public:
    */
   void createParallel(boost::shared_ptr<GeomAPI_Shape> theLine1,
                       boost::shared_ptr<GeomAPI_Shape> theLine2,
-                      boost::shared_ptr<GeomAPI_Pnt>   theFlyoutPoint,
-                      boost::shared_ptr<GeomAPI_Pln>   thePlane);
+                      boost::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
+                      boost::shared_ptr<GeomAPI_Pln> thePlane);
 
   /** \brief Creates AIS_PerpendicularRelation object for two lines
    *  \param[in] theLine1       first parallel line
@@ -77,7 +75,7 @@ public:
    */
   void createPerpendicular(boost::shared_ptr<GeomAPI_Shape> theLine1,
                            boost::shared_ptr<GeomAPI_Shape> theLine2,
-                           boost::shared_ptr<GeomAPI_Pln>   thePlane);
+                           boost::shared_ptr<GeomAPI_Pln> thePlane);
 
   /** \brief Assigns the color for the shape
    *  \param[in] theColor index of the color

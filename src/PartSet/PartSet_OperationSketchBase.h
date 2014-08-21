@@ -29,17 +29,22 @@ class GeomAPI_Shape;
 class ModuleBase_ViewerPrs;
 
 /*!
-  \class PartSet_OperationSketchBase
-  * \brief The base operation for the sketch features.
-  *  Base class for all sketch operations. It provides an access to the feature preview
-*/
+ \class PartSet_OperationSketchBase
+ * \brief The base operation for the sketch features.
+ *  Base class for all sketch operations. It provides an access to the feature preview
+ */
 class PARTSET_EXPORT PartSet_OperationSketchBase : public ModuleBase_Operation
 {
-  Q_OBJECT
-public:
-  enum FeatureActionMode { FM_Activation, FM_Deactivation, FM_Hide };
+Q_OBJECT
+ public:
+  enum FeatureActionMode
+  {
+    FM_Activation,
+    FM_Deactivation,
+    FM_Hide
+  };
 
-public:
+ public:
   /// Constructor
   /// \param theId an feature index
   /// \param theParent the object parent
@@ -61,13 +66,17 @@ public:
   virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
 
   /// Initializes the operation with previously created feature. It is used in sequental operations
-  virtual void initFeature(FeaturePtr theFeature) {}
+  virtual void initFeature(FeaturePtr theFeature)
+  {
+  }
 
   /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
   virtual void initSelection(const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& theHighlighted) {}
+                             const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+  {
+  }
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
@@ -102,8 +111,8 @@ public:
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
   virtual void mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<ModuleBase_ViewerPrs>& theSelected,
-                            const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+                                const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                const std::list<ModuleBase_ViewerPrs>& theHighlighted);
 
   /// Processes the key pressed in the view
   /// \param theKey a key value
@@ -115,15 +124,14 @@ public:
   /// If the provided feature is empty, the current operation feature is used.
   /// \param theType a type of an operation started
   /// theFeature the operation argument
-  void restartOperation(const std::string& theType,
-         ObjectPtr theFeature = ObjectPtr());
+  void restartOperation(const std::string& theType, ObjectPtr theFeature = ObjectPtr());
 
 signals:
   /// signal about the request to launch operation
   /// theName the operation name
   /// theFeature the operation argument
   void launchOperation(std::string theName, ObjectPtr theFeature);
-  
+
   /// Signal about the feature construing is finished
   /// \param theFeature the result feature
   /// \param theMode the mode of the feature modification
@@ -132,7 +140,7 @@ signals:
   /// Signal about the features should be selected
   /// \param theSelected the list of selected presentations
   void featureSelected(const std::list<ModuleBase_ViewerPrs>& theSelected);
-  
+
   /// signal to enable/disable multi selection in the viewer
   /// \param theEnabled the boolean state
   void multiSelectionEnabled(bool theEnabled);
@@ -141,7 +149,7 @@ signals:
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
   void stopSelection(const QList<ObjectPtr>& theFeatures, const bool theToStop);
-  
+
   /// signal to set selection in the viewer
   /// \param theFeatures a list of features to be disabled
   void setSelection(const QList<ObjectPtr>& theFeatures);
@@ -149,7 +157,7 @@ signals:
   /// signal to close the operation local context if it is opened
   void closeLocalContext();
 
-protected:
+ protected:
   /// Creates an operation new feature
   /// In addition to the default realization it appends the created line feature to
   /// the sketch feature

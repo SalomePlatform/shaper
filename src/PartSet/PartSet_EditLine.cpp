@@ -7,7 +7,7 @@
 #include <QLineEdit>
 
 PartSet_EditLine::PartSet_EditLine(QWidget* theParent)
-: QObject(theParent)
+    : QObject(theParent)
 {
   myEditor = new QLineEdit(theParent);
   myEditor->setWindowFlags(Qt::ToolTip);

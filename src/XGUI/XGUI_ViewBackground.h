@@ -47,7 +47,7 @@ typedef QList<QColor> QColorList;     //!< list of colors
  */
 class XGUI_EXPORT XGUI_ViewBackground
 {
-public:
+ public:
   XGUI_ViewBackground();
   XGUI_ViewBackground(const QColor& theColor);
   XGUI_ViewBackground(XGUI::GradientType type, const QColor& theColor1, const QColor& theColor2);
@@ -96,7 +96,7 @@ public:
   const QGradient* gradient() const;
   void setGradient(const QGradient&);
 
-private:
+ private:
   XGUI::BackgroundMode myMode;
   XGUI::TextureMode myTextureMode;
   QString myFileName;

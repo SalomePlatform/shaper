@@ -15,9 +15,9 @@ class GeomAPI_XYZ;
  * \brief 3D direction defined by three normalized coordinates
  */
 
-class GEOMAPI_EXPORT GeomAPI_Dir: public GeomAPI_Interface
+class GEOMAPI_EXPORT GeomAPI_Dir : public GeomAPI_Interface
 {
-public:
+ public:
   /// Creation of direction by coordinates
   GeomAPI_Dir(const double theX, const double theY, const double theZ);
   /// Creation of direction by coordinates

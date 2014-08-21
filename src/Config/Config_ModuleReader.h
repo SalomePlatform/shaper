@@ -15,13 +15,11 @@
 #include <list>
 #include <string>
 
-
-class Config_ModuleReader: public Config_XMLReader
+class Config_ModuleReader : public Config_XMLReader
 {
 
-public:
-  CONFIG_EXPORT Config_ModuleReader(const char* theEventGenerated = 0);
-  CONFIG_EXPORT virtual ~Config_ModuleReader();
+ public:
+  CONFIG_EXPORT Config_ModuleReader(const char* theEventGenerated = 0);CONFIG_EXPORT virtual ~Config_ModuleReader();
 
   CONFIG_EXPORT const std::map<std::string, std::string>& featuresInFiles() const;
 
@@ -30,15 +28,14 @@ public:
   /// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
   CONFIG_EXPORT static void loadLibrary(const std::string theLibName);
 
-protected:
+ protected:
   void processNode(xmlNodePtr aNode);
   bool processChildren(xmlNodePtr aNode);
 
   std::list<std::string> importPlugin(const std::string& thePluginLibrary,
                                       const std::string& thePluginFile);
 
-
-private:
+ private:
   std::map<std::string, std::string> myFeaturesInFiles;
   const char* myEventGenerated;
 

@@ -14,9 +14,9 @@
  * \ingroup DataModel
  * \brief Feature for creation of the new part in PartSet.
  */
-class SketchPlugin_Line: public SketchPlugin_Feature
+class SketchPlugin_Line : public SketchPlugin_Feature
 {
-public:
+ public:
   /// Arc feature kind
   inline static const std::string& ID()
   {
@@ -29,7 +29,7 @@ public:
     static const std::string MY_START_ID("StartPoint");
     return MY_START_ID;
   }
-    /// End 2D point of the line
+  /// End 2D point of the line
   inline static const std::string& END_ID()
   {
     static const std::string MY_END_ID("EndPoint");
@@ -37,8 +37,11 @@ public:
   }
 
   /// Returns the kind of a feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SketchPlugin_Line::ID(); return MY_KIND;}
+  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    static std::string MY_KIND = SketchPlugin_Line::ID();
+    return MY_KIND;
+  }
 
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
@@ -48,7 +51,9 @@ public:
 
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious)
-  {return simpleAISObject(firstResult(), thePrevious);}
+  {
+    return simpleAISObject(firstResult(), thePrevious);
+  }
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved

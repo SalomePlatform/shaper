@@ -24,7 +24,8 @@
 #endif
 
 Config_ModuleReader::Config_ModuleReader(const char* theEventGenerated)
-    : Config_XMLReader("plugins.xml"), myEventGenerated(theEventGenerated)
+    : Config_XMLReader("plugins.xml"),
+      myEventGenerated(theEventGenerated)
 {
 }
 
@@ -57,7 +58,7 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
     std::string aPluginLibrary = getProperty(theNode, PLUGIN_LIBRARY);
     std::list<std::string> aFeatures = importPlugin(aPluginLibrary, aPluginConf);
     std::list<std::string>::iterator it = aFeatures.begin();
-    for(; it != aFeatures.end(); it++) {
+    for (; it != aFeatures.end(); it++) {
       myFeaturesInFiles[*it] = aPluginConf;
     }
   }
@@ -71,7 +72,7 @@ bool Config_ModuleReader::processChildren(xmlNodePtr theNode)
 std::list<std::string> Config_ModuleReader::importPlugin(const std::string& thePluginLibrary,
                                                          const std::string& thePluginFile)
 {
-  if (thePluginFile.empty()) { //probably a third party library
+  if (thePluginFile.empty()) {  //probably a third party library
     loadLibrary(thePluginLibrary);
     return std::list<std::string>();
   }
@@ -90,14 +91,14 @@ void Config_ModuleReader::loadLibrary(const std::string theLibName)
 
 #ifdef WIN32
   HINSTANCE aModLib = ::LoadLibrary(aFileName.c_str());
-  if (!aModLib && theLibName != "DFBrowser") { // don't shor error for internal debugging tool
+  if (!aModLib && theLibName != "DFBrowser") {  // don't shor error for internal debugging tool
     std::string errorMsg = "Failed to load " + aFileName;
     std::cerr << errorMsg << std::endl;
     Events_Error::send(errorMsg);
   }
 #else
   void* aModLib = dlopen( aFileName.c_str(), RTLD_LAZY | RTLD_GLOBAL );
-  if ( !aModLib  && theLibName != "DFBrowser") { // don't shor error for internal debugging tool
+  if ( !aModLib && theLibName != "DFBrowser") {  // don't shor error for internal debugging tool
     std::cerr << "Failed to load " << aFileName.c_str() << std::endl;
   }
 #endif

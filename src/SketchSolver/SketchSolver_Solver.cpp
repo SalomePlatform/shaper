@@ -30,21 +30,21 @@ SketchSolver_Solver::SketchSolver_Solver()
 SketchSolver_Solver::~SketchSolver_Solver()
 {
   if (myEquationsSystem.param)
-    delete [] myEquationsSystem.param;
+    delete[] myEquationsSystem.param;
   if (myEquationsSystem.entity)
-    delete [] myEquationsSystem.entity;
+    delete[] myEquationsSystem.entity;
   if (myEquationsSystem.constraint)
-    delete [] myEquationsSystem.constraint;
+    delete[] myEquationsSystem.constraint;
   if (myEquationsSystem.failed)
-    delete [] myEquationsSystem.failed;
+    delete[] myEquationsSystem.failed;
 }
 
 void SketchSolver_Solver::setParameters(const std::vector<Slvs_Param>& theParameters)
 {
-  if (theParameters.size() != myEquationsSystem.params) // number of parameters was changed => reallocate the memory
-  {
+  if (theParameters.size() != myEquationsSystem.params)  // number of parameters was changed => reallocate the memory
+      {
     if (myEquationsSystem.param)
-      delete [] myEquationsSystem.param;
+      delete[] myEquationsSystem.param;
     myEquationsSystem.params = theParameters.size();
     myEquationsSystem.param = new Slvs_Param[theParameters.size()];
   }
@@ -57,8 +57,7 @@ void SketchSolver_Solver::setParameters(const std::vector<Slvs_Param>& theParame
 
 void SketchSolver_Solver::setDraggedParameters(const std::vector<Slvs_hParam>& theDragged)
 {
-  if (theDragged.size() == 0)
-  {
+  if (theDragged.size() == 0) {
     myEquationsSystem.dragged[0] = 0;
     myEquationsSystem.dragged[1] = 0;
     myEquationsSystem.dragged[2] = 0;
@@ -71,10 +70,10 @@ void SketchSolver_Solver::setDraggedParameters(const std::vector<Slvs_hParam>& t
 
 void SketchSolver_Solver::setEntities(const std::vector<Slvs_Entity>& theEntities)
 {
-  if (theEntities.size() != myEquationsSystem.entities) // number of entities was changed => reallocate the memory
-  {
+  if (theEntities.size() != myEquationsSystem.entities)  // number of entities was changed => reallocate the memory
+      {
     if (myEquationsSystem.entity)
-      delete [] myEquationsSystem.entity;
+      delete[] myEquationsSystem.entity;
     myEquationsSystem.entities = theEntities.size();
     myEquationsSystem.entity = new Slvs_Entity[theEntities.size()];
   }
@@ -87,16 +86,16 @@ void SketchSolver_Solver::setEntities(const std::vector<Slvs_Entity>& theEntitie
 
 void SketchSolver_Solver::setConstraints(const std::vector<Slvs_Constraint>& theConstraints)
 {
-  if (theConstraints.size() != myEquationsSystem.constraints) // number of constraints was changed => reallocate the memory
-  {
+  if (theConstraints.size() != myEquationsSystem.constraints)  // number of constraints was changed => reallocate the memory
+      {
     if (myEquationsSystem.constraint)
-      delete [] myEquationsSystem.constraint;
+      delete[] myEquationsSystem.constraint;
     myEquationsSystem.constraints = theConstraints.size();
     myEquationsSystem.constraint = new Slvs_Constraint[theConstraints.size()];
 
     // Assign the memory for the failed constraints
     if (myEquationsSystem.failed)
-      delete [] myEquationsSystem.failed;
+      delete[] myEquationsSystem.failed;
     myEquationsSystem.failed = new Slvs_hConstraint[theConstraints.size()];
     myEquationsSystem.faileds = theConstraints.size();
   }
@@ -125,13 +124,12 @@ bool SketchSolver_Solver::getResult(std::vector<Slvs_Param>& theParameters)
     return false;
 
   if (theParameters.size() != myEquationsSystem.params)
-    return false; // number of parameters is not the same
+    return false;  // number of parameters is not the same
 
   std::vector<Slvs_Param>::iterator aParamIter = theParameters.begin();
-  for (int i = 0; i < myEquationsSystem.params; i++, aParamIter++)
-  {
+  for (int i = 0; i < myEquationsSystem.params; i++, aParamIter++) {
     if (myEquationsSystem.param[i].h != aParamIter->h)
-      return false; // sequence of parameters was changed
+      return false;  // sequence of parameters was changed
     aParamIter->val = myEquationsSystem.param[i].val;
   }
 

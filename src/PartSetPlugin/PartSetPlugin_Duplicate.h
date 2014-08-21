@@ -11,9 +11,9 @@
  * \ingroup DataModel
  * \brief Duplicates the active part (not root). Creates a new "part" feature.
  */
-class PartSetPlugin_Duplicate: public PartSetPlugin_Part
+class PartSetPlugin_Duplicate : public PartSetPlugin_Part
 {
-public:
+ public:
   /// the reference to copy: reference to the attribute
   inline static const std::string& ORIGIN_REF()
   {

@@ -1,4 +1,3 @@
-
 #ifndef XGUI_DataTreeModel_H
 #define XGUI_DataTreeModel_H
 
@@ -18,9 +17,12 @@
  */
 class XGUI_EXPORT XGUI_FeaturesModel : public QAbstractItemModel
 {
-public:
-  XGUI_FeaturesModel(QObject* theParent):
-      QAbstractItemModel(theParent), myItemsColor(Qt::black) {}
+ public:
+  XGUI_FeaturesModel(QObject* theParent)
+      : QAbstractItemModel(theParent),
+        myItemsColor(Qt::black)
+  {
+  }
 
   //! Returns Feature object by the given Model index.
   //! Returns 0 if the given index is not index of a feature
@@ -36,14 +38,19 @@ public:
   //! Returns index corresponded to the group
   virtual QModelIndex findGroup(const std::string& theGroup) const = 0;
 
-  void setItemsColor(const QColor& theColor) { myItemsColor = theColor; }
+  void setItemsColor(const QColor& theColor)
+  {
+    myItemsColor = theColor;
+  }
 
-  QColor itemsColor() const { return myItemsColor; }
+  QColor itemsColor() const
+  {
+    return myItemsColor;
+  }
 
-protected:
+ protected:
   QColor myItemsColor;
 };
-
 
 /**\class XGUI_PartModel
  * \ingroup GUI
@@ -51,11 +58,16 @@ protected:
  */
 class XGUI_PartModel : public XGUI_FeaturesModel
 {
-public:
-  XGUI_PartModel(QObject* theParent):
-      XGUI_FeaturesModel(theParent) {}
+ public:
+  XGUI_PartModel(QObject* theParent)
+      : XGUI_FeaturesModel(theParent)
+  {
+  }
 
-  void setPartId(int theId) { myId = theId; }
+  void setPartId(int theId)
+  {
+    myId = theId;
+  }
 
   //! Returns true if the given document is a sub-document of this tree
   virtual bool hasDocument(const DocumentPtr& theDoc) const = 0;
@@ -63,10 +75,9 @@ public:
   //! Return a Part object
   virtual ResultPartPtr part() const = 0;
 
-protected:
+ protected:
   //! Id of the current part object in the document
   int myId;
 };
-
 
 #endif

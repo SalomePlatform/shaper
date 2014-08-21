@@ -17,13 +17,13 @@
  */
 class Model_ResultPart : public ModelAPI_ResultPart
 {
-public:
+ public:
   /// Returns the part-document of this result
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> partDoc();
   /// Part has no stored feature: this method returns NULL
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> owner();
 
-protected:
+ protected:
   /// makes a result on a temporary feature (an action)
   Model_ResultPart();
 

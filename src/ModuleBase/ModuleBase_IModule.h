@@ -10,11 +10,11 @@ class Config_WidgetAPI;
 class ModuleBase_ModelWidget;
 
 /**
-* Interface to a module
-*/
-class ModuleBase_IModule: public QObject
+ * Interface to a module
+ */
+class ModuleBase_IModule : public QObject
 {
-public:
+ public:
   /// Reads description of features from XML file 
   virtual void createFeatures() = 0;
 
@@ -29,21 +29,24 @@ public:
   //virtual bool isFeatureEnabled(const QString& theCmdId) const = 0;
 
   /// Creates custom widgets for property panel
-  virtual QWidget* createWidgetByType(const std::string& theType, QWidget* theParent, 
-    Config_WidgetAPI* theWidgetApi, QList<ModuleBase_ModelWidget*>& theModelWidgets)
+  virtual QWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
+                                      Config_WidgetAPI* theWidgetApi,
+                                      QList<ModuleBase_ModelWidget*>& theModelWidgets)
   {
     return 0;
   }
 
-  virtual ~ModuleBase_IModule() {};
+  virtual ~ModuleBase_IModule()
+  {
+  }
+  ;
 };
 
 //! This function must return a new module instance.
-extern "C"
-{
+extern "C" {
 typedef ModuleBase_IModule* (*CREATE_FUNC)(XGUI_Workshop*);
 }
 
 #define CREATE_MODULE "createModule"
 
-#endif //ModuleBase_IModule
+#endif //ModuleBase_IModule

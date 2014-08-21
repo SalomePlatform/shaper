@@ -2,7 +2,6 @@
 // Created:     2 June 2014
 // Author:      Vitaly Smetannikov
 
-
 #include "ModuleBase_WidgetSelector.h"
 #include "ModuleBase_IWorkshop.h"
 
@@ -32,7 +31,6 @@
 
 #include <stdexcept>
 
-
 typedef QMap<QString, TopAbs_ShapeEnum> ShapeTypes;
 static ShapeTypes MyShapeTypes;
 
@@ -46,19 +44,18 @@ TopAbs_ShapeEnum ModuleBase_WidgetSelector::shapeType(const QString& theType)
     MyShapeTypes["shell"] = TopAbs_SHELL;
     MyShapeTypes["solid"] = TopAbs_SOLID;
   }
-  if (MyShapeTypes.contains(theType)) 
+  if (MyShapeTypes.contains(theType))
     return MyShapeTypes[theType];
   throw std::invalid_argument("Shape type defined in XML is not implemented!");
 }
 
-
-
-
-ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent, 
-                                                     ModuleBase_IWorkshop* theWorkshop, 
+ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
+                                                     ModuleBase_IWorkshop* theWorkshop,
                                                      const Config_WidgetAPI* theData,
                                                      const std::string& theParentId)
-: ModuleBase_ModelWidget(theParent, theData, theParentId), myWorkshop(theWorkshop), myActivateOnStart(false)
+    : ModuleBase_ModelWidget(theParent, theData, theParentId),
+      myWorkshop(theWorkshop),
+      myActivateOnStart(false)
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aLayout = new QHBoxLayout(myContainer);
@@ -105,12 +102,12 @@ ModuleBase_WidgetSelector::~ModuleBase_WidgetSelector()
 bool ModuleBase_WidgetSelector::storeValue() const
 {
   FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(mySelectedObject);
-  if (aSelectedFeature == myFeature) // In order to avoid selection of the same object
+  if (aSelectedFeature == myFeature)  // In order to avoid selection of the same object
     return false;
 
   DataPtr aData = myFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
+  boost::shared_ptr<ModelAPI_AttributeReference> aRef = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeReference>(aData->attribute(attributeID()));
 
   ObjectPtr aObject = aRef->value();
   if (!(aObject && aObject->isSame(mySelectedObject))) {
@@ -128,7 +125,7 @@ bool ModuleBase_WidgetSelector::restoreValue()
 
   bool isBlocked = this->blockSignals(true);
   mySelectedObject = aRef->value();
-  updateSelectionName(); 
+  updateSelectionName();
 
   this->blockSignals(isBlocked);
   return true;
@@ -156,7 +153,8 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
       return;
 
     // Check that the selection corresponds to selection type
-    if (!isAccepted(aObject)) return;
+    if (!isAccepted(aObject))
+      return;
 
     mySelectedObject = aObject;
     if (mySelectedObject) {
@@ -175,19 +173,23 @@ bool ModuleBase_WidgetSelector::isAccepted(const ObjectPtr theResult) const
 {
   ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theResult);
   boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
-  if (!aShapePtr) return false;
+  if (!aShapePtr)
+    return false;
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
-  if (aShape.IsNull()) return false;
+  if (aShape.IsNull())
+    return false;
 
   TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
   if (aShapeType == TopAbs_COMPOUND) {
-    foreach (QString aType, myShapeTypes) {
+    foreach (QString aType, myShapeTypes)
+    {
       TopExp_Explorer aEx(aShape, shapeType(aType));
       if (aEx.More())
         return true;
     }
   } else {
-    foreach (QString aType, myShapeTypes) {
+    foreach (QString aType, myShapeTypes)
+    {
       if (shapeType(aType) == aShapeType)
         return true;
     }
@@ -200,9 +202,9 @@ void ModuleBase_WidgetSelector::updateSelectionName()
 {
   if (mySelectedObject) {
     std::string aName = mySelectedObject->data()->name();
- 
+
     myTextLine->setText(QString::fromStdString(aName));
-  } else 
+  } else
     myTextLine->setText("");
 }
 
@@ -223,8 +225,10 @@ void ModuleBase_WidgetSelector::enableOthersControls(bool toEnable) const
 {
   QWidget* aParent = myContainer->parentWidget();
   QList<QWidget*> aChldList = aParent->findChildren<QWidget*>();
-  foreach(QWidget* aWgt, aChldList) {
-    if ((aWgt != myLabel) && (aWgt != myActivateBtn) && (aWgt != myTextLine) && (aWgt != myContainer))
+  foreach(QWidget* aWgt, aChldList)
+  {
+    if ((aWgt != myLabel) && (aWgt != myActivateBtn) && (aWgt != myTextLine)
+        && (aWgt != myContainer))
       aWgt->setEnabled(toEnable);
   }
 }
@@ -251,7 +255,8 @@ void ModuleBase_WidgetSelector::raisePanel() const
   while (!aParent->inherits("QDockWidget")) {
     aLastPanel = aParent;
     aParent = aParent->parentWidget();
-    if (!aParent) return;
+    if (!aParent)
+      return;
   }
   if (aParent->inherits("QDockWidget")) {
     QDockWidget* aTabWgt = (QDockWidget*) aParent;

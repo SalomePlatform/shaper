@@ -28,7 +28,7 @@ class GeomAPI_Shape;
 
 class MODELAPI_EXPORT ModelAPI_Data
 {
-public:
+ public:
 
   /// Returns the name of the feature visible by the user in the object browser
   virtual std::string name() = 0;
@@ -55,7 +55,7 @@ public:
   /// Returns all attributes ofthe feature of the given type
   /// or all attributes if "theType" is empty
   virtual std::list<boost::shared_ptr<ModelAPI_Attribute> >
-    attributes(const std::string& theType) = 0;
+  attributes(const std::string& theType) = 0;
   /// Identifier by the id (not fast, iteration by map)
   /// \param theAttr attribute already created in this data
   virtual const std::string& id(const boost::shared_ptr<ModelAPI_Attribute>& theAttr) = 0;
@@ -75,15 +75,17 @@ public:
   virtual void sendAttributeUpdated(ModelAPI_Attribute* theAttr) = 0;
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_Data() {}
+  virtual ~ModelAPI_Data()
+  {
+  }
 
-protected:
+ protected:
   /// Objects are created for features automatically
   ModelAPI_Data()
-  {}
+  {
+  }
 };
 
 typedef boost::shared_ptr<ModelAPI_Data> DataPtr;
-
 
 #endif

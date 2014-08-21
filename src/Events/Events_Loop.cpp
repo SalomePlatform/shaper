@@ -24,8 +24,8 @@ Events_ID Events_Loop::eventByName(const char* theName)
   char* aResult;
   string aName(theName);
   map<string, char*>::iterator aFound = CREATED_EVENTS.find(aName);
-  if (aFound == CREATED_EVENTS.end()) { //not created yet
-    aResult = strdup(theName); // copy to make unique internal pointer
+  if (aFound == CREATED_EVENTS.end()) {  //not created yet
+    aResult = strdup(theName);  // copy to make unique internal pointer
     CREATED_EVENTS[aName] = aResult;
   } else
     aResult = aFound->second;
@@ -39,9 +39,9 @@ void Events_Loop::send(Events_Message& theMessage, bool isGroup)
   if (isGroup) {
     Events_MessageGroup* aGroup = dynamic_cast<Events_MessageGroup*>(&theMessage);
     if (aGroup) {
-      std::map<char*, Events_MessageGroup*>::iterator aMyGroup = 
-        myGroups.find(aGroup->eventID().eventText());
-      if (aMyGroup == myGroups.end()) { // create a new group of messages for accumulation
+      std::map<char*, Events_MessageGroup*>::iterator aMyGroup = myGroups.find(
+          aGroup->eventID().eventText());
+      if (aMyGroup == myGroups.end()) {  // create a new group of messages for accumulation
         myGroups[aGroup->eventID().eventText()] = aGroup->newEmpty();
         aMyGroup = myGroups.find(aGroup->eventID().eventText());
       }
@@ -59,14 +59,14 @@ void Events_Loop::send(Events_Message& theMessage, bool isGroup)
         theMessage.sender());
     if (aFindSender != aFindID->second.end()) {
       list<Events_Listener*>& aListeners = aFindSender->second;
-      for(list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
+      for (list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
         (*aL)->processEvent(&theMessage);
     }
-    if (theMessage.sender()) { // also call for NULL senders registered
+    if (theMessage.sender()) {  // also call for NULL senders registered
       aFindSender = aFindID->second.find(NULL);
       if (aFindSender != aFindID->second.end()) {
         list<Events_Listener*>& aListeners = aFindSender->second;
-        for(list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
+        for (list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
           (*aL)->processEvent(&theMessage);
       }
     }
@@ -74,34 +74,33 @@ void Events_Loop::send(Events_Message& theMessage, bool isGroup)
 }
 
 void Events_Loop::registerListener(Events_Listener* theListener, const Events_ID theID,
-                                  void* theSender)
+                                   void* theSender)
 {
   map<char*, map<void*, list<Events_Listener*> > >::iterator aFindID = myListeners.find(
       theID.eventText());
-  if (aFindID == myListeners.end()) { // create container associated with ID
+  if (aFindID == myListeners.end()) {  // create container associated with ID
     myListeners[theID.eventText()] = map<void*, list<Events_Listener*> >();
     aFindID = myListeners.find(theID.eventText());
   }
 
   map<void*, list<Events_Listener*> >::iterator aFindSender = aFindID->second.find(theSender);
-  if (aFindSender == aFindID->second.end()) { // create container associated with sender
+  if (aFindSender == aFindID->second.end()) {  // create container associated with sender
     aFindID->second[theSender] = list<Events_Listener*>();
     aFindSender = aFindID->second.find(theSender);
   }
   // check that listener was not registered wit hsuch parameters before
   list<Events_Listener*>& aListeners = aFindSender->second;
-  for(list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
+  for (list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
     if (*aL == theListener)
-      return; // avoid duplicates
+      return;  // avoid duplicates
 
   aListeners.push_back(theListener);
 }
 
 void Events_Loop::flush(const Events_ID& theID)
 {
-  std::map<char*, Events_MessageGroup*>::iterator aMyGroup = 
-    myGroups.find(theID.eventText());
-  if (aMyGroup != myGroups.end()) { // really sends
+  std::map<char*, Events_MessageGroup*>::iterator aMyGroup = myGroups.find(theID.eventText());
+  if (aMyGroup != myGroups.end()) {  // really sends
     Events_MessageGroup* aGroup = aMyGroup->second;
     myGroups.erase(aMyGroup);
     send(*aGroup, false);

@@ -25,14 +25,15 @@
 #include <QDoubleSpinBox>
 
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
-                                                 const Config_WidgetAPI* theData, 
+                                                 const Config_WidgetAPI* theData,
                                                  const std::string& theParentId)
-: ModuleBase_WidgetDoubleValue(theParent, theData, theParentId)
+    : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId)
 {
 }
 
-ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent, const std::string& theAttribute)
-: ModuleBase_WidgetDoubleValue(theParent, 0, "")
+ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
+                                                 const std::string& theAttribute)
+    : ModuleBase_WidgetDoubleValue(theParent, 0, "")
 {
   setAttributeID(theAttribute);
 }
@@ -46,7 +47,7 @@ double editedValue(double theValue, bool& isDone)
   QDialog aDlg;
   aDlg.setWindowFlags(Qt::FramelessWindowHint);
   QHBoxLayout* aLay = new QHBoxLayout(&aDlg);
-  aLay->setContentsMargins(0,0,0,0);
+  aLay->setContentsMargins(0, 0, 0, 0);
 
   QLineEdit* aEditor = new QLineEdit(QString::number(theValue), &aDlg);
   aEditor->setValidator(new QDoubleValidator(aEditor));
@@ -80,7 +81,8 @@ bool ModuleBase_WidgetEditor::focusTo()
   return false;
 }
 
-void ModuleBase_WidgetEditor::editFeatureValue(FeaturePtr theFeature, const std::string theAttribute)
+void ModuleBase_WidgetEditor::editFeatureValue(FeaturePtr theFeature,
+                                               const std::string theAttribute)
 {
   DataPtr aData = theFeature->data();
   AttributeDoublePtr aRef = aData->real(theAttribute);

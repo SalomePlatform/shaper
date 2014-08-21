@@ -20,49 +20,80 @@
  */
 class ModuleBase_ViewerPrs
 {
-public:
+ public:
   /// Constructor
-  ModuleBase_ViewerPrs() {}
-  
+  ModuleBase_ViewerPrs()
+  {
+  }
+
   /// Constructor
   /// \param theFeature a model feature
   /// \param theShape a viewer shape
   /// \param theOwner a selection owner
-  ModuleBase_ViewerPrs(ObjectPtr theResult,
-                 const TopoDS_Shape& theShape,
-                 Handle_SelectMgr_EntityOwner theOwner)
-  : myResult(theResult), myShape(theShape), myOwner(theOwner) {}
-  
+  ModuleBase_ViewerPrs(ObjectPtr theResult, const TopoDS_Shape& theShape,
+                       Handle_SelectMgr_EntityOwner theOwner)
+      : myResult(theResult),
+        myShape(theShape),
+        myOwner(theOwner)
+  {
+  }
+
   /// Destructor
-  virtual ~ModuleBase_ViewerPrs() {}
+  virtual ~ModuleBase_ViewerPrs()
+  {
+  }
 
   /// Sets the feature.
   /// \param theFeature a feature instance
-  void setFeature(ObjectPtr theResult) { myResult = theResult; }
+  void setFeature(ObjectPtr theResult)
+  {
+    myResult = theResult;
+  }
 
   /// Returns the feature.
   /// \return a feature instance
-  ObjectPtr object() const { return myResult; }
+  ObjectPtr object() const
+  {
+    return myResult;
+  }
 
   /// Returns the presentation owner
   /// \param the owner
-  void setOwner(Handle_SelectMgr_EntityOwner theOwner) { myOwner = theOwner; }
+  void setOwner(Handle_SelectMgr_EntityOwner theOwner)
+  {
+    myOwner = theOwner;
+  }
 
   /// Returns the presentation owner
   /// \return an owner
-  Handle_SelectMgr_EntityOwner owner() const { return myOwner; }
+  Handle_SelectMgr_EntityOwner owner() const
+  {
+    return myOwner;
+  }
 
   /// Sets the shape
   /// \param theShape a shape instance
-  void setShape(const TopoDS_Shape& theShape) { myShape = theShape; }
+  void setShape(const TopoDS_Shape& theShape)
+  {
+    myShape = theShape;
+  }
 
   /// Returns the shape
   /// \return a shape instance
-  const TopoDS_Shape& shape() const { return myShape; }
+  const TopoDS_Shape& shape() const
+  {
+    return myShape;
+  }
 
-  void setInteractive(const Handle(AIS_InteractiveObject)& theIO) { myInteractive = theIO; }
+  void setInteractive(const Handle(AIS_InteractiveObject)& theIO)
+  {
+    myInteractive = theIO;
+  }
 
-  Handle(AIS_InteractiveObject) interactive() const { return myInteractive; }
+  Handle(AIS_InteractiveObject) interactive() const
+  {
+    return myInteractive;
+  }
 
   bool operator==(const ModuleBase_ViewerPrs& thePrs)
   {
@@ -73,10 +104,10 @@ public:
     return aResult && aOwner && aShape && aIO;
   }
 
-private:
-  ObjectPtr myResult; /// the feature
-  Handle(SelectMgr_EntityOwner) myOwner; /// the selection owner
-  TopoDS_Shape myShape; /// the shape
+ private:
+  ObjectPtr myResult;  /// the feature
+  Handle(SelectMgr_EntityOwner) myOwner;  /// the selection owner
+  TopoDS_Shape myShape;  /// the shape
   Handle(AIS_InteractiveObject) myInteractive;
 };
 

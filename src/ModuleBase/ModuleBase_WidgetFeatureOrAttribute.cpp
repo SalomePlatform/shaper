@@ -30,10 +30,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-ModuleBase_WidgetFeatureOrAttribute::ModuleBase_WidgetFeatureOrAttribute(QWidget* theParent,
-                                                   const Config_WidgetAPI* theData, 
-                                                   const std::string& theParentId)
-: ModuleBase_WidgetFeature(theParent, theData, theParentId)
+ModuleBase_WidgetFeatureOrAttribute::ModuleBase_WidgetFeatureOrAttribute(
+    QWidget* theParent, const Config_WidgetAPI* theData, const std::string& theParentId)
+    : ModuleBase_WidgetFeature(theParent, theData, theParentId)
 {
 }
 
@@ -46,8 +45,8 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
   bool isDone = false;
 
   if (theValue) {
-    ModuleBase_WidgetValueFeature* aFeatureValue = 
-                         dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
+    ModuleBase_WidgetValueFeature* aFeatureValue =
+        dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue) {
       boost::shared_ptr<GeomAPI_Pnt2d> aValuePoint = aFeatureValue->point();
       ObjectPtr aObject = aFeatureValue->object();
@@ -58,14 +57,14 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
         FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
         if (aFeature) {
           // find the given point in the feature attributes
-          std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes =
-                                        aFeature->data()->attributes(GeomDataAPI_Point2D::type());
-          std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
-                                                                            aLast = anAttiributes.end();
+          std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes = aFeature->data()
+              ->attributes(GeomDataAPI_Point2D::type());
+          std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes
+              .begin(), aLast = anAttiributes.end();
           boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;
-          for (;anIt!=aLast && !aFPoint; anIt++) {
-            boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint =
-                                                boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+          for (; anIt != aLast && !aFPoint; anIt++) {
+            boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint = boost::dynamic_pointer_cast<
+                GeomDataAPI_Point2D>(*anIt);
             if (aCurPoint && aCurPoint->pnt()->distance(aValuePoint) < Precision::Confusion())
               aFPoint = aCurPoint;
           }
@@ -87,8 +86,8 @@ bool ModuleBase_WidgetFeatureOrAttribute::storeValue() const
   //  return false;
 
   boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
-          boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
   if (myObject)
     aRef->setObject(myObject);
@@ -104,8 +103,8 @@ bool ModuleBase_WidgetFeatureOrAttribute::storeValue() const
 bool ModuleBase_WidgetFeatureOrAttribute::restoreValue()
 {
   boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
-          boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
   ObjectPtr aObj = aRef->object();
   FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
@@ -126,10 +125,9 @@ bool ModuleBase_WidgetFeatureOrAttribute::restoreValue()
 }
 
 bool ModuleBase_WidgetFeatureOrAttribute::setAttribute(
-                                    const boost::shared_ptr<ModelAPI_Attribute>& theAttribute,
-                                    bool theSendEvent)
+    const boost::shared_ptr<ModelAPI_Attribute>& theAttribute, bool theSendEvent)
 {
-  if (!theAttribute)// || !featureKinds().contains(theAttribute->attributeType().c_str()))
+  if (!theAttribute)  // || !featureKinds().contains(theAttribute->attributeType().c_str()))
     return false;
 
   myAttribute = theAttribute;

@@ -23,11 +23,11 @@ class XGUI_ViewerPrs;
 class ModuleBase_Operation;
 class GeomAPI_AISObject;
 
-class PARTSET_EXPORT PartSet_Module: public ModuleBase_IModule
+class PARTSET_EXPORT PartSet_Module : public ModuleBase_IModule
 {
 Q_OBJECT
 
-public:
+ public:
   PartSet_Module(XGUI_Workshop* theWshop);
   virtual ~PartSet_Module();
 
@@ -62,19 +62,18 @@ public:
   /// Activates the feature in the displayer
   /// \param theFeature the feature instance to be displayed
   /// \param isUpdateViewer the flag whether the viewer should be updated
-  void activateFeature(ObjectPtr theFeature,
-                       const bool isUpdateViewer);
+  void activateFeature(ObjectPtr theFeature, const bool isUpdateViewer);
 
   /// Updates current operation preview, if it has it.
   /// \param theCmdId the operation name
   void updateCurrentPreview(const std::string& theCmdId);
 
   /// Creates custom widgets for property panel
-  virtual QWidget* createWidgetByType(const std::string& theType, QWidget* theParent, 
-    Config_WidgetAPI* theWidgetApi, QList<ModuleBase_ModelWidget*>& theModelWidgets);
+  virtual QWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
+                                      Config_WidgetAPI* theWidgetApi,
+                                      QList<ModuleBase_ModelWidget*>& theModelWidgets);
 
-
-public slots:
+ public slots:
   void onFeatureTriggered();
   /// SLOT, that is called after the operation is started. Connect on the focus activated signal
   void onOperationStarted();
@@ -141,7 +140,7 @@ public slots:
   /// \param the attribute of the feature
   void onStorePoint2D(ObjectPtr theFeature, const std::string& theAttribute);
 
-protected:
+ protected:
   /// Creates a new operation
   /// \param theCmdId the operation name
   /// \param theFeatureKind a kind of feature to get the feature xml description
@@ -152,11 +151,11 @@ protected:
   /// \param theOperation the operation
   void sendOperation(ModuleBase_Operation* theOperation);
 
-protected:
+ protected:
   //! Edits the feature
   void editFeature(FeaturePtr theFeature);
 
-private:
+ private:
   XGUI_Workshop* myWorkshop;
   PartSet_Listener* myListener;
 

@@ -22,7 +22,7 @@ boost::shared_ptr<ModelAPI_Document> Model_AttributeDocRef::value()
 {
   if (myComment->Get().Length())
     return Model_Application::getApplication()->getDocument(
-      TCollection_AsciiString(myComment->Get()).ToCString());
+        TCollection_AsciiString(myComment->Get()).ToCString());
   // not initialized
   return boost::shared_ptr<ModelAPI_Document>();
 }
@@ -33,7 +33,7 @@ Model_AttributeDocRef::Model_AttributeDocRef(TDF_Label& theLabel)
   if (!myIsInitialized) {
     // create attribute: not initialized by value yet, just empty string
     myComment = TDataStd_Comment::Set(theLabel, "");
-  } else { // document was already referenced: try to set it as loaded by demand
+  } else {  // document was already referenced: try to set it as loaded by demand
     Handle(Model_Application) anApp = Model_Application::getApplication();
     string anID(TCollection_AsciiString(myComment->Get()).ToCString());
     if (!anApp->hasDocument(anID)) {

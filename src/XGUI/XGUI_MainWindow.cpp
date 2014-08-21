@@ -17,26 +17,26 @@
 #include <QCloseEvent>
 
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
-    : QMainWindow(parent), 
-    myPythonConsole(0)
+    : QMainWindow(parent),
+      myPythonConsole(0)
 {
   setWindowTitle(tr("New Geom"));
   createMainMenu();
   QMdiArea* aMdiArea = new QMdiArea(this);
   aMdiArea->setContextMenuPolicy(Qt::ActionsContextMenu);
   setCentralWidget(aMdiArea);
-  connect(aMdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), 
-          this, SLOT(onViewActivated(QMdiSubWindow*)));
+  connect(aMdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this,
+          SLOT(onViewActivated(QMdiSubWindow*)));
 
   // Create actions of MDI area
   QAction* aAction = new QAction(QIcon(":pictures/new_view.png"), tr("Create Window"), aMdiArea);
   aMdiArea->addAction(aAction);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(createSubWindow()));
-  
+
   aAction = new QAction(QIcon(":pictures/tile_views.png"), tr("Tile"), aMdiArea);
   aMdiArea->addAction(aAction);
   connect(aAction, SIGNAL(triggered(bool)), aMdiArea, SLOT(tileSubWindows()));
-  
+
   aAction = new QAction(QIcon(":pictures/cascade_views.png"), tr("Cascade"), aMdiArea);
   aMdiArea->addAction(aAction);
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(cascadeWindows()));
@@ -46,10 +46,10 @@ XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
   aMdiArea->addAction(aAction);
 
   myViewer = new XGUI_Viewer(this);
-  connect(myViewer, SIGNAL(viewCreated(XGUI_ViewWindow*)), 
-          this, SLOT(onViewCreated(XGUI_ViewWindow*)));
-  connect(myViewer, SIGNAL(deleteView(XGUI_ViewWindow*)), 
-          this, SLOT(onDeleteView(XGUI_ViewWindow*)));
+  connect(myViewer, SIGNAL(viewCreated(XGUI_ViewWindow*)), this,
+          SLOT(onViewCreated(XGUI_ViewWindow*)));
+  connect(myViewer, SIGNAL(deleteView(XGUI_ViewWindow*)), this,
+          SLOT(onDeleteView(XGUI_ViewWindow*)));
 }
 
 XGUI_MainWindow::~XGUI_MainWindow(void)
@@ -88,19 +88,16 @@ void XGUI_MainWindow::dockPythonConsole()
     return;
   myMenuBar->removeConsole();
   QDockWidget* aDock = new QDockWidget(this);
-  aDock->setFeatures(QDockWidget::AllDockWidgetFeatures |
-                     QDockWidget::DockWidgetVerticalTitleBar);
-  aDock->setAllowedAreas(Qt::LeftDockWidgetArea  |
-                         Qt::RightDockWidgetArea |
-                         Qt::BottomDockWidgetArea);
+  aDock->setFeatures(QDockWidget::AllDockWidgetFeatures | QDockWidget::DockWidgetVerticalTitleBar);
+  aDock->setAllowedAreas(
+      Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
   aDock->setMinimumHeight(0);
   aDock->setWindowTitle("Console");
   aDock->setWidget(myPythonConsole);
   addDockWidget(Qt::BottomDockWidgetArea, aDock);
   // Undock python console if widget is closed...
-  CloseEventWatcher* aWatcher =  new CloseEventWatcher(aDock);
-  connect(aWatcher, SIGNAL(widgetClosed()),
-          this,     SLOT(undockPythonConsole()));
+  CloseEventWatcher* aWatcher = new CloseEventWatcher(aDock);
+  connect(aWatcher, SIGNAL(widgetClosed()), this, SLOT(undockPythonConsole()));
   aDock->installEventFilter(aWatcher);
 }
 
@@ -111,7 +108,7 @@ void XGUI_MainWindow::undockPythonConsole()
   QDockWidget* aDock = qobject_cast<QDockWidget*>(myPythonConsole->parentWidget());
   //When the application starts console will be displayed as
   //a wokbench tab, so there is no dock yet
-  if(aDock) {
+  if (aDock) {
     aDock->hide();
     aDock->setWidget(NULL);
     aDock->deleteLater();
@@ -130,7 +127,7 @@ void XGUI_MainWindow::cascadeWindows()
 {
   QMdiArea* aMdiArea = static_cast<QMdiArea*>(centralWidget());
   QList<QMdiSubWindow*> aWindows = aMdiArea->subWindowList();
-  
+
   QSize aSize = aMdiArea->size();
   QRect aRect = aMdiArea->geometry();
   const int aOffset = 30;
@@ -139,7 +136,8 @@ void XGUI_MainWindow::cascadeWindows()
   int w = aSize.width() / 2;
   int h = aSize.height() / 2;
   QMdiSubWindow* aLastWnd;
-  foreach(QMdiSubWindow* aWnd, aWindows) {
+  foreach(QMdiSubWindow* aWnd, aWindows)
+  {
     aWnd->showNormal();
     aWnd->raise();
     x = aOffset * i;
@@ -152,8 +150,7 @@ void XGUI_MainWindow::cascadeWindows()
       y = 0;
       j = 0;
     }
-    aWnd->setGeometry(QStyle::visualRect(aWnd->layoutDirection(), aRect, 
-      QRect(x, y, w, h)));
+    aWnd->setGeometry(QStyle::visualRect(aWnd->layoutDirection(), aRect, QRect(x, y, w, h)));
     i++;
     j++;
     viewer()->onWindowActivated(aWnd);
@@ -174,7 +171,8 @@ void XGUI_MainWindow::onViewCreated(XGUI_ViewWindow* theWindow)
   aMDIWidget->addAction(aAction);
 
   QList<QAction*> aActions = aMDIWidget->actions();
-  foreach(QAction* aAct, aActions) {
+  foreach(QAction* aAct, aActions)
+  {
     if (aAct->isCheckable())
       aAct->setChecked(false);
   }
@@ -189,7 +187,8 @@ void XGUI_MainWindow::onDeleteView(XGUI_ViewWindow* theWindow)
   QList<QAction*> aActions = aMDIWidget->actions();
 
   QAction* aDelAct = 0;
-  foreach(QAction* aAct, aActions) {
+  foreach(QAction* aAct, aActions)
+  {
     if (aAct->text() == aTitle) {
       aDelAct = aAct;
       break;
@@ -206,7 +205,8 @@ void XGUI_MainWindow::activateView()
 
   QList<QMdiSubWindow*> aWndList = aMdiArea->subWindowList();
   QMdiSubWindow* aTargetView = 0;
-  foreach(QMdiSubWindow* aWnd, aWndList) {
+  foreach(QMdiSubWindow* aWnd, aWndList)
+  {
     if (aWnd->windowTitle() == aWndTitle) {
       aWnd->raise();
       aWnd->activateWindow();
@@ -226,7 +226,8 @@ void XGUI_MainWindow::onViewActivated(QMdiSubWindow* theSubWnd)
   QMdiArea* aMdiArea = static_cast<QMdiArea*>(centralWidget());
   QString aWndTitle = theSubWnd->windowTitle();
   QList<QAction*> aActionList = aMdiArea->actions();
-  foreach(QAction* aAct, aActionList) {
+  foreach(QAction* aAct, aActionList)
+  {
     if (aAct->isCheckable())
       aAct->setChecked(aAct->text() == aWndTitle);
   }
@@ -251,9 +252,11 @@ void XGUI_MainWindow::createMainMenu()
 
 CloseEventWatcher::CloseEventWatcher(QObject* theParent)
     : QObject(theParent)
-{}
+{
+}
 
-bool CloseEventWatcher::eventFilter(QObject *obj, QEvent *event) {
+bool CloseEventWatcher::eventFilter(QObject *obj, QEvent *event)
+{
   if (event->type() == QEvent::Close) {
     emit widgetClosed();
     event->ignore();

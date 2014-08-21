@@ -9,8 +9,9 @@
 #define MY_XY static_cast<gp_XY*>(myImpl)
 
 GeomAPI_XY::GeomAPI_XY(const double theX, const double theY)
-  : GeomAPI_Interface(new gp_XY(theX, theY))
-{}
+    : GeomAPI_Interface(new gp_XY(theX, theY))
+{
+}
 
 double GeomAPI_XY::x() const
 {
@@ -32,18 +33,15 @@ void GeomAPI_XY::setY(const double theY)
   return MY_XY->SetY(theY);
 }
 
-const boost::shared_ptr<GeomAPI_XY> GeomAPI_XY::added(
-  const boost::shared_ptr<GeomAPI_XY>& theArg)
+const boost::shared_ptr<GeomAPI_XY> GeomAPI_XY::added(const boost::shared_ptr<GeomAPI_XY>& theArg)
 {
-  boost::shared_ptr<GeomAPI_XY> aResult(
-    new GeomAPI_XY(MY_XY->X() + theArg->x(), MY_XY->Y() + theArg->y()));
+  boost::shared_ptr<GeomAPI_XY> aResult(new GeomAPI_XY(MY_XY->X() + theArg->x(), MY_XY->Y() + theArg->y()));
   return aResult;
 }
 
 const boost::shared_ptr<GeomAPI_XY> GeomAPI_XY::multiplied(const double theArg)
 {
-  boost::shared_ptr<GeomAPI_XY> aResult(
-    new GeomAPI_XY(MY_XY->X() * theArg, MY_XY->Y() * theArg));
+  boost::shared_ptr<GeomAPI_XY> aResult(new GeomAPI_XY(MY_XY->X() * theArg, MY_XY->Y() * theArg));
   return aResult;
 }
 

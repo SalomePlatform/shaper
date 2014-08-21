@@ -16,9 +16,8 @@
 
 using namespace std;
 
-
 SketchPlugin_Line::SketchPlugin_Line()
-  : SketchPlugin_Feature()
+    : SketchPlugin_Feature()
 {
 }
 
@@ -28,26 +27,24 @@ void SketchPlugin_Line::initAttributes()
   data()->addAttribute(SketchPlugin_Line::END_ID(), GeomDataAPI_Point2D::type());
 }
 
-void SketchPlugin_Line::execute() 
+void SketchPlugin_Line::execute()
 {
   SketchPlugin_Sketch* aSketch = sketch();
   if (aSketch) {
     // compute a start point in 3D view
-    boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      data()->attribute(SketchPlugin_Line::START_ID()));
+    boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = boost::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Line::START_ID()));
     // compute an end point in 3D view
-    boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      data()->attribute(SketchPlugin_Line::END_ID()));
+    boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = boost::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Line::END_ID()));
     if (aStartAttr->isInitialized() && anEndAttr->isInitialized()) {
       boost::shared_ptr<GeomAPI_Pnt> aStart(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
       boost::shared_ptr<GeomAPI_Pnt> anEnd(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
       // make linear edge
       boost::shared_ptr<GeomAPI_Shape> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
       // store the result
-      boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = 
-        document()->createConstruction(data());
+      boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(
+          data());
       aConstr->setShape(anEdge);
       aConstr->setIsInHistory(false);
       setResult(aConstr);
@@ -61,14 +58,12 @@ void SketchPlugin_Line::move(double theDeltaX, double theDeltaY)
   if (!aData->isValid())
     return;
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aData->attribute(SketchPlugin_Line::START_ID()));
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aData->attribute(SketchPlugin_Line::START_ID()));
   aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aData->attribute(SketchPlugin_Line::END_ID()));
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aData->attribute(SketchPlugin_Line::END_ID()));
   aPoint2->setValue(aPoint2->x() + theDeltaX, aPoint2->y() + theDeltaY);
 }
 
@@ -77,20 +72,17 @@ double SketchPlugin_Line::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>
   double aDelta = 0;
 
   boost::shared_ptr<ModelAPI_Data> aData = data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aData->attribute(SketchPlugin_Line::START_ID()));
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aData->attribute(SketchPlugin_Line::END_ID()));
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aData->attribute(SketchPlugin_Line::START_ID()));
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aData->attribute(SketchPlugin_Line::END_ID()));
 
   GeomAPI_Lin2d aLin2d(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y());
 
-  if (false/*projection*/) { // TODO: if it has not been necessary, remove this block
+  if (false/*projection*/) {  // TODO: if it has not been necessary, remove this block
     boost::shared_ptr<GeomAPI_Pnt2d> aResult = aLin2d.project(thePoint);
     aDelta = aResult->distance(thePoint);
-  }
-  else { // distance
+  } else {  // distance
     aDelta = aLin2d.distance(thePoint);
   }
 

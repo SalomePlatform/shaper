@@ -1,4 +1,3 @@
-
 #include "XGUI_ViewPort.h"
 #include "XGUI_ViewWindow.h"
 #include "XGUI_Viewer.h"
@@ -28,7 +27,6 @@ static int sx = 0;
 static int sy = 0;
 static Standard_Boolean zRotation = Standard_False;
 
-
 /*!
  Create native view window for CasCade view [ static ]
  */
@@ -44,12 +42,10 @@ Handle(Aspect_Window) CreateCasWindow(const Handle(V3d_View)& view, WId winId)
   return viewWindow;
 }
 
-
 //************************************************************************
 //************************************************************************
 //************************************************************************
-XGUI_ViewPort::XGUI_ViewPort(XGUI_ViewWindow* theParent,
-                             const Handle(V3d_Viewer)& theViewer,
+XGUI_ViewPort::XGUI_ViewPort(XGUI_ViewWindow* theParent, const Handle(V3d_Viewer)& theViewer,
                              V3d_TypeOfView theType)
     : QWidget(theParent),
       myPaintersRedrawing(false),
@@ -92,7 +88,7 @@ bool XGUI_ViewPort::mapView(const Handle(V3d_View)& theView)
   if (!mapped(theView)) {
     theView->SetWindow(myWindow);
     //if (theView != activeView())
-      //theView->View()->Deactivate();
+    //theView->View()->Deactivate();
   }
 
   /* create static trihedron (16551: EDF PAL 501) */
@@ -155,78 +151,80 @@ void XGUI_ViewPort::updateBackground()
   //   single-colored).
   // In OCCT 6.5.3 all above mentioned problems are fixed; so, above comment should be removed as soon
   // as SALOME is migrated to OCCT 6.5.3. The same concerns #ifdef statements in the below code
-  switch(myBackground.mode()) {
-  case Qtx::ColorBackground: {
-    QColor c = myBackground.color();
-    if (c.isValid()) {
-      // Unset texture should be done here
-      // ...
-      Quantity_Color qCol(c.red() / 255., c.green() / 255., c.blue() / 255., Quantity_TOC_RGB);
-      activeView()->SetBgGradientStyle(Aspect_GFM_NONE); // cancel gradient background
-      activeView()->SetBgImageStyle(Aspect_FM_NONE); // cancel texture background
-      // then change background color
-      activeView()->SetBackgroundColor(qCol);
-      // update viewer
-      activeView()->Update();
-    }
-    break;
-  }
-  case Qtx::SimpleGradientBackground: {
-    QColor c1, c2;
-    int type = myBackground.gradient(c1, c2);
-    if (c1.isValid() && type >= XGUI::HorizontalGradient && type <= XGUI::LastGradient) {
-      // Unset texture should be done here
-      // ...
-      // Get colors and set-up gradiented background
-      if (!c2.isValid())
-        c2 = c1;
-      Quantity_Color qCol1(c1.red() / 255., c1.green() / 255., c1.blue() / 255., Quantity_TOC_RGB);
-      Quantity_Color qCol2(c2.red() / 255., c2.green() / 255., c2.blue() / 255., Quantity_TOC_RGB);
-      activeView()->SetBgImageStyle(Aspect_FM_NONE); // cancel texture background
-      switch(type) {
-      case XGUI::HorizontalGradient:
-        activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_HOR,
-        Standard_True);
-        break;
-      case XGUI::VerticalGradient:
-        activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_VER,
-        Standard_True);
-        break;
-      case XGUI::Diagonal1Gradient:
-        activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_DIAG1,
-        Standard_True);
-        break;
-      case XGUI::Diagonal2Gradient:
-        activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_DIAG2,
-        Standard_True);
-        break;
-      case XGUI::Corner1Gradient:
-        activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_CORNER1,
-        Standard_True);
-        break;
-      case XGUI::Corner2Gradient:
-        activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_CORNER2,
-        Standard_True);
-        break;
-      case XGUI::Corner3Gradient:
-        activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_CORNER3,
-        Standard_True);
-        break;
-      case XGUI::Corner4Gradient:
-        activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_CORNER4,
-        Standard_True);
-        break;
-      default:
-        break;
+  switch (myBackground.mode()) {
+    case Qtx::ColorBackground: {
+      QColor c = myBackground.color();
+      if (c.isValid()) {
+        // Unset texture should be done here
+        // ...
+        Quantity_Color qCol(c.red() / 255., c.green() / 255., c.blue() / 255., Quantity_TOC_RGB);
+        activeView()->SetBgGradientStyle(Aspect_GFM_NONE);  // cancel gradient background
+        activeView()->SetBgImageStyle(Aspect_FM_NONE);  // cancel texture background
+        // then change background color
+        activeView()->SetBackgroundColor(qCol);
+        // update viewer
+        activeView()->Update();
       }
+      break;
     }
-    break;
-  }
-  case Qtx::CustomGradientBackground:
-    // NOT IMPLEMENTED YET
-    break;
-  default:
-    break;
+    case Qtx::SimpleGradientBackground: {
+      QColor c1, c2;
+      int type = myBackground.gradient(c1, c2);
+      if (c1.isValid() && type >= XGUI::HorizontalGradient && type <= XGUI::LastGradient) {
+        // Unset texture should be done here
+        // ...
+        // Get colors and set-up gradiented background
+        if (!c2.isValid())
+          c2 = c1;
+        Quantity_Color qCol1(c1.red() / 255., c1.green() / 255., c1.blue() / 255.,
+                             Quantity_TOC_RGB);
+        Quantity_Color qCol2(c2.red() / 255., c2.green() / 255., c2.blue() / 255.,
+                             Quantity_TOC_RGB);
+        activeView()->SetBgImageStyle(Aspect_FM_NONE);  // cancel texture background
+        switch (type) {
+          case XGUI::HorizontalGradient:
+            activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_HOR,
+            Standard_True);
+            break;
+          case XGUI::VerticalGradient:
+            activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_VER,
+            Standard_True);
+            break;
+          case XGUI::Diagonal1Gradient:
+            activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_DIAG1,
+            Standard_True);
+            break;
+          case XGUI::Diagonal2Gradient:
+            activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_DIAG2,
+            Standard_True);
+            break;
+          case XGUI::Corner1Gradient:
+            activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_CORNER1,
+            Standard_True);
+            break;
+          case XGUI::Corner2Gradient:
+            activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_CORNER2,
+            Standard_True);
+            break;
+          case XGUI::Corner3Gradient:
+            activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_CORNER3,
+            Standard_True);
+            break;
+          case XGUI::Corner4Gradient:
+            activeView()->SetBgGradientColors(qCol1, qCol2, Aspect_GFM_CORNER4,
+            Standard_True);
+            break;
+          default:
+            break;
+        }
+      }
+      break;
+    }
+    case Qtx::CustomGradientBackground:
+      // NOT IMPLEMENTED YET
+      break;
+    default:
+      break;
   }
   // VSR: In OCCT before v6.5.3 below code can't be used because of very ugly bug - it has been impossible to
   // clear the background texture image as soon as it was once set to the viewer.
@@ -236,21 +234,21 @@ void XGUI_ViewPort::updateBackground()
     QFileInfo fi(fileName);
     if (!fileName.isEmpty() && fi.exists()) {
       // set texture image: file name and fill mode
-      switch(textureMode) {
-      case XGUI::CenterTexture:
-        activeView()->SetBackgroundImage(fi.absoluteFilePath().toLatin1().constData(),
-                                         Aspect_FM_CENTERED);
-        break;
-      case XGUI::TileTexture:
-        activeView()->SetBackgroundImage(fi.absoluteFilePath().toLatin1().constData(),
-                                         Aspect_FM_TILED);
-        break;
-      case XGUI::StretchTexture:
-        activeView()->SetBackgroundImage(fi.absoluteFilePath().toLatin1().constData(),
-                                         Aspect_FM_STRETCH);
-        break;
-      default:
-        break;
+      switch (textureMode) {
+        case XGUI::CenterTexture:
+          activeView()->SetBackgroundImage(fi.absoluteFilePath().toLatin1().constData(),
+                                           Aspect_FM_CENTERED);
+          break;
+        case XGUI::TileTexture:
+          activeView()->SetBackgroundImage(fi.absoluteFilePath().toLatin1().constData(),
+                                           Aspect_FM_TILED);
+          break;
+        case XGUI::StretchTexture:
+          activeView()->SetBackgroundImage(fi.absoluteFilePath().toLatin1().constData(),
+                                           Aspect_FM_STRETCH);
+          break;
+        default:
+          break;
       }
       activeView()->Update();
     }
@@ -351,36 +349,36 @@ void XGUI_ViewPort::startRotation(int x, int y, int theRotationPointType,
                                   const gp_Pnt& theSelectedPoint)
 {
   if (!activeView().IsNull()) {
-    switch(theRotationPointType) {
-    case XGUI::GRAVITY:
-      activeView()->StartRotation(x, y, 0.45);
-      break;
-    case XGUI::SELECTED:
-      sx = x;
-      sy = y;
+    switch (theRotationPointType) {
+      case XGUI::GRAVITY:
+        activeView()->StartRotation(x, y, 0.45);
+        break;
+      case XGUI::SELECTED:
+        sx = x;
+        sy = y;
 
-      double X, Y;
-      activeView()->Size(X, Y);
-      rx = Standard_Real(activeView()->Convert(X));
-      ry = Standard_Real(activeView()->Convert(Y));
+        double X, Y;
+        activeView()->Size(X, Y);
+        rx = Standard_Real(activeView()->Convert(X));
+        ry = Standard_Real(activeView()->Convert(Y));
 
-      activeView()->Rotate(0., 0., 0., theSelectedPoint.X(), theSelectedPoint.Y(),
-                           theSelectedPoint.Z(),
-                           Standard_True);
+        activeView()->Rotate(0., 0., 0., theSelectedPoint.X(), theSelectedPoint.Y(),
+                             theSelectedPoint.Z(),
+                             Standard_True);
 
-      Quantity_Ratio zRotationThreshold;
-      zRotation = Standard_False;
-      zRotationThreshold = 0.45;
-      if (zRotationThreshold > 0.) {
-        Standard_Real dx = Abs(sx - rx / 2.);
-        Standard_Real dy = Abs(sy - ry / 2.);
-        Standard_Real dd = zRotationThreshold * (rx + ry) / 2.;
-        if (dx > dd || dy > dd)
-          zRotation = Standard_True;
-      }
-      break;
-    default:
-      break;
+        Quantity_Ratio zRotationThreshold;
+        zRotation = Standard_False;
+        zRotationThreshold = 0.45;
+        if (zRotationThreshold > 0.) {
+          Standard_Real dx = Abs(sx - rx / 2.);
+          Standard_Real dy = Abs(sy - ry / 2.);
+          Standard_Real dd = zRotationThreshold * (rx + ry) / 2.;
+          if (dx > dd || dy > dd)
+            zRotation = Standard_True;
+        }
+        break;
+      default:
+        break;
     }
     activeView()->DepthFitAll();
   }
@@ -392,28 +390,28 @@ void XGUI_ViewPort::startRotation(int x, int y, int theRotationPointType,
 void XGUI_ViewPort::rotate(int x, int y, int theRotationPointType, const gp_Pnt& theSelectedPoint)
 {
   if (!activeView().IsNull()) {
-    switch(theRotationPointType) {
-    case XGUI::GRAVITY:
-      activeView()->Rotation(x, y);
-      break;
-    case XGUI::SELECTED:
-      double dx, dy, dz;
-      if (zRotation) {
-        dz = atan2(Standard_Real(x) - rx / 2., ry / 2. - Standard_Real(y))
-            - atan2(sx - rx / 2., ry / 2. - sy);
-        dx = dy = 0.;
-      } else {
-        dx = (Standard_Real(x) - sx) * M_PI / rx;
-        dy = (sy - Standard_Real(y)) * M_PI / ry;
-        dz = 0.;
-      }
+    switch (theRotationPointType) {
+      case XGUI::GRAVITY:
+        activeView()->Rotation(x, y);
+        break;
+      case XGUI::SELECTED:
+        double dx, dy, dz;
+        if (zRotation) {
+          dz = atan2(Standard_Real(x) - rx / 2., ry / 2. - Standard_Real(y))
+              - atan2(sx - rx / 2., ry / 2. - sy);
+          dx = dy = 0.;
+        } else {
+          dx = (Standard_Real(x) - sx) * M_PI / rx;
+          dy = (sy - Standard_Real(y)) * M_PI / ry;
+          dz = 0.;
+        }
 
-      activeView()->Rotate(dx, dy, dz, theSelectedPoint.X(), theSelectedPoint.Y(),
-                           theSelectedPoint.Z(),
-                           Standard_False);
-      break;
-    default:
-      break;
+        activeView()->Rotate(dx, dy, dz, theSelectedPoint.X(), theSelectedPoint.Y(),
+                             theSelectedPoint.Z(),
+                             Standard_False);
+        break;
+      default:
+        break;
     }
     emit vpTransformed();
   }
@@ -503,52 +501,57 @@ void XGUI_ViewPort::setBackground(const Qtx::BackgroundData& bgData)
 
 void XGUI_ViewPort::fitAll(bool theKeepScale, bool theWithZ, bool theUpd)
 {
-  if ( activeView().IsNull() )
+  if (activeView().IsNull())
     return;
 
-  if ( theKeepScale )
+  if (theKeepScale)
     myScale = activeView()->Scale();
 
   Standard_Real aMargin = 0.01;
-  activeView()->FitAll( aMargin, theWithZ, theUpd );
+  activeView()->FitAll(aMargin, theWithZ, theUpd);
   activeView()->SetZSize(0.);
-  emit vpTransformed( );
+  emit vpTransformed();
 }
 
-void XGUI_ViewPort::syncronizeWith( const XGUI_ViewPort* ref )
+void XGUI_ViewPort::syncronizeWith(const XGUI_ViewPort* ref)
 {
   Handle(V3d_View) refView = ref->getView();
   Handle(V3d_View) tgtView = getView();
 
   /*  The following params are copied:
-      - view type( ortho/persp )
-      - position of view point
-      - orientation of high point
-      - position of the eye
-      - projection vector
-      - view center ( 2D )
-      - view twist
-      - view scale
-  */
+   - view type( ortho/persp )
+   - position of view point
+   - orientation of high point
+   - position of the eye
+   - projection vector
+   - view center ( 2D )
+   - view twist
+   - view scale
+   */
 
   /* we'll update after setting all params */
-  tgtView->SetImmediateUpdate( Standard_False );
+  tgtView->SetImmediateUpdate( Standard_False);
 
   /* perspective */
-  if ( refView->Type() == V3d_PERSPECTIVE )
-    tgtView->SetFocale( refView->Focale() );
+  if (refView->Type() == V3d_PERSPECTIVE)
+    tgtView->SetFocale(refView->Focale());
 
   /* copy params */
   Standard_Real x, y, z;
-  refView->At( x, y, z ); tgtView->SetAt( x, y, z );
-  refView->Up( x, y, z ); tgtView->SetUp( x, y, z );
-  refView->Eye( x, y, z ); tgtView->SetEye( x, y, z );
-  refView->Proj( x, y, z ); tgtView->SetProj( x, y, z );
-  refView->Center( x, y ); tgtView->SetCenter( x, y );
-  tgtView->SetScale( refView->Scale() );
-  tgtView->SetTwist( refView->Twist() );
+  refView->At(x, y, z);
+  tgtView->SetAt(x, y, z);
+  refView->Up(x, y, z);
+  tgtView->SetUp(x, y, z);
+  refView->Eye(x, y, z);
+  tgtView->SetEye(x, y, z);
+  refView->Proj(x, y, z);
+  tgtView->SetProj(x, y, z);
+  refView->Center(x, y);
+  tgtView->SetCenter(x, y);
+  tgtView->SetScale(refView->Scale());
+  tgtView->SetTwist(refView->Twist());
 
   /* update */
   tgtView->Update();
-  tgtView->SetImmediateUpdate( Standard_True );
+  tgtView->SetImmediateUpdate( Standard_True);
 }

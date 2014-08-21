@@ -9,7 +9,7 @@ using namespace std;
 // the only created instance of this plugin
 static FeaturesPlugin_Plugin* MY_INSTANCE = new FeaturesPlugin_Plugin();
 
-FeaturesPlugin_Plugin::FeaturesPlugin_Plugin() 
+FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
 {
   // register this plugin
   ModelAPI_PluginManager::get()->registerPlugin(this);

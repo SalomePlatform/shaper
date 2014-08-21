@@ -22,8 +22,8 @@
 #include <iostream>
 #endif
 
-XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent) :
-QDockWidget(theParent)
+XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
+    : QDockWidget(theParent)
 {
   this->setWindowTitle(tr("Property Panel"));
   QAction* aViewAct = this->toggleViewAction();
@@ -72,7 +72,7 @@ XGUI_PropertyPanel::~XGUI_PropertyPanel()
 
 void XGUI_PropertyPanel::cleanContent()
 {
-  myWidgets.clear(); 
+  myWidgets.clear();
   qDeleteAll(myCustomWidget->children());
 }
 
@@ -81,21 +81,22 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
   myWidgets = theWidgets;
 
   if (!theWidgets.empty()) {
-    QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast = theWidgets.end();
+    QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast =
+        theWidgets.end();
     for (; anIt != aLast; anIt++) {
-      connect(*anIt, SIGNAL(keyReleased(const std::string&, QKeyEvent*)),
-              this, SIGNAL(keyReleased(const std::string&, QKeyEvent*)));
+      connect(*anIt, SIGNAL(keyReleased(const std::string&, QKeyEvent*)), this,
+              SIGNAL(keyReleased(const std::string&, QKeyEvent*)));
 
-      connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
-              this, SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
+      connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)), this,
+              SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
 
       //connect(*anIt, SIGNAL(activated(ModuleBase_ModelWidget*)),
       //        this, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)));
 
       ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
       if (aPointWidget)
-        connect(aPointWidget, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)),
-                this, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)));
+        connect(aPointWidget, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)), this,
+                SIGNAL(storedPoint2D(ObjectPtr, const std::string&)));
     }
     ModuleBase_ModelWidget* aLastWidget = theWidgets.last();
     if (aLastWidget) {
@@ -125,7 +126,7 @@ bool XGUI_PropertyPanel::eventFilter(QObject *theObject, QEvent *theEvent)
   QPushButton* aCancelBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
   if (theObject == anOkBtn || theObject == aCancelBtn) {
     if (theEvent->type() == QEvent::KeyRelease) {
-      QKeyEvent* aKeyEvent = (QKeyEvent*)theEvent;
+      QKeyEvent* aKeyEvent = (QKeyEvent*) theEvent;
       if (aKeyEvent && aKeyEvent->key() == Qt::Key_Return) {
         // TODO: this is enter button processing when the focus is on "Apply" or "Cancel" buttons
         emit keyReleased("", (QKeyEvent*) theEvent);
@@ -143,7 +144,8 @@ QWidget* XGUI_PropertyPanel::contentWidget()
 
 void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
 {
-  foreach(ModuleBase_ModelWidget* eachWidget, myWidgets) {
+  foreach(ModuleBase_ModelWidget* eachWidget, myWidgets)
+  {
     eachWidget->setFeature(theFeature);
     eachWidget->restoreValue();
   }
@@ -154,10 +156,9 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
 void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
 {
   ModuleBase_ModelWidget* aNextWidget = 0;
-  QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(),
-                                                 aLast = myWidgets.end();
+  QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;
-  for (;anIt != aLast && !aNextWidget; anIt++) {
+  for (; anIt != aLast && !aNextWidget; anIt++) {
     if (isFoundWidget || !theWidget) {
       if ((*anIt)->focusTo()) {
         aNextWidget = *anIt;

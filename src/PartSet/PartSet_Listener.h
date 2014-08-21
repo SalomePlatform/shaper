@@ -14,10 +14,10 @@ class PartSet_Module;
 /*!
  \class PartSet_Listener
  * \brief The operation for the sketch feature creation
-*/
+ */
 class PARTSET_EXPORT PartSet_Listener : public Events_Listener
 {
-public:
+ public:
   /// Constructor
   /// \param theId the feature identifier
   /// \param theParent the operation parent
@@ -28,8 +28,8 @@ public:
   /// This method is called by loop when the event is started to process.
   virtual void processEvent(const Events_Message* theMessage);
 
-private:
-  PartSet_Module* myModule; ///< the current module
+ private:
+  PartSet_Module* myModule;  ///< the current module
 };
 
 #endif

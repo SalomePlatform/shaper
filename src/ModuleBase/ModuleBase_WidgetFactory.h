@@ -21,8 +21,9 @@ class ModuleBase_IWorkshop;
 
 class MODULEBASE_EXPORT ModuleBase_WidgetFactory
 {
-public:
-  ModuleBase_WidgetFactory(const std::string& theXmlRepresentation, ModuleBase_IWorkshop* theWorkshop);
+ public:
+  ModuleBase_WidgetFactory(const std::string& theXmlRepresentation,
+                           ModuleBase_IWorkshop* theWorkshop);
   virtual ~ModuleBase_WidgetFactory();
 
   void createWidget(QWidget* theParent);
@@ -32,7 +33,7 @@ public:
     return myModelWidgets;
   }
 
-protected:
+ protected:
   //Widgets
   QWidget* createWidgetByType(const std::string& theType, QWidget* theParent = NULL);
   QWidget* labelControl(QWidget* theParent);
@@ -53,9 +54,9 @@ protected:
 
   QString qs(const std::string& theStdString) const;
 
-private:
+ private:
   Config_WidgetAPI* myWidgetApi;
-  ModuleBase_IWorkshop*   myWorkshop;
+  ModuleBase_IWorkshop* myWorkshop;
 
   QList<ModuleBase_ModelWidget*> myModelWidgets;
   std::string myParentId;

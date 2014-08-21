@@ -9,7 +9,7 @@ using namespace std;
 // the only created instance of this plugin
 static ConstructionPlugin_Plugin* MY_INSTANCE = new ConstructionPlugin_Plugin();
 
-ConstructionPlugin_Plugin::ConstructionPlugin_Plugin() 
+ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
 {
   // register this plugin
   ModelAPI_PluginManager::get()->registerPlugin(this);

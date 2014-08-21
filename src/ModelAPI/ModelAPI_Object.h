@@ -23,33 +23,48 @@ class ModelAPI_Document;
  */
 class ModelAPI_Object
 {
-  boost::shared_ptr<ModelAPI_Data> myData; ///< manager of the data model of a feature
-  boost::shared_ptr<ModelAPI_Document> myDoc; ///< document this feature belongs to
-public:
+  boost::shared_ptr<ModelAPI_Data> myData;  ///< manager of the data model of a feature
+  boost::shared_ptr<ModelAPI_Document> myDoc;  ///< document this feature belongs to
+ public:
   /// By default object is displayed in the object browser.
-  virtual bool isInHistory() {return true;}
+  virtual bool isInHistory()
+  {
+    return true;
+  }
 
   /// Returns the data manager of this object: attributes
-  virtual boost::shared_ptr<ModelAPI_Data> data() {return myData;}
+  virtual boost::shared_ptr<ModelAPI_Data> data()
+  {
+    return myData;
+  }
 
   /// Returns true if object refers to the same data model instance
   virtual bool isSame(const boost::shared_ptr<ModelAPI_Object>& theObject)
-    {return theObject.get() == this;}
+  {
+    return theObject.get() == this;
+  }
 
   /// Returns document this feature belongs to
   virtual boost::shared_ptr<ModelAPI_Document> document()
-    {return myDoc;}
+  {
+    return myDoc;
+  }
 
   /// Returns the group identifier of this object
   virtual std::string groupName() = 0;
 
-protected:
+ protected:
   /// Sets the data manager of an object (document does)
-  virtual void setData(boost::shared_ptr<ModelAPI_Data> theData) 
-    {myData = theData;}
+  virtual void setData(boost::shared_ptr<ModelAPI_Data> theData)
+  {
+    myData = theData;
+  }
 
   /// Sets the data manager of an object (document does)
-  virtual void setDoc(boost::shared_ptr<ModelAPI_Document> theDoc) {myDoc = theDoc;}
+  virtual void setDoc(boost::shared_ptr<ModelAPI_Document> theDoc)
+  {
+    myDoc = theDoc;
+  }
 
   friend class Model_Document;
 };

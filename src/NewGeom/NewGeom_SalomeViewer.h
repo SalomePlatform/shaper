@@ -1,5 +1,4 @@
 
-
 #ifndef NewGeom_SalomeViewer_H
 #define NewGeom_SalomeViewer_H
 
@@ -13,10 +12,10 @@ class QKeyEvent;
 
 class NewGeom_OCCSelector;
 
-class NewGeom_SalomeViewer: public XGUI_SalomeViewer
+class NewGeom_SalomeViewer : public XGUI_SalomeViewer
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   NewGeom_SalomeViewer(QObject* theParent);
 
   //! Returns AIS_InteractiveContext from current OCCViewer
@@ -45,9 +44,12 @@ public:
 
   void setSelector(NewGeom_OCCSelector* theSel);
 
-  NewGeom_OCCSelector* selector() const { return mySelector; }
+  NewGeom_OCCSelector* selector() const
+  {
+    return mySelector;
+  }
 
-private slots:
+ private slots:
   void onMousePress(SUIT_ViewWindow*, QMouseEvent*);
   void onMouseRelease(SUIT_ViewWindow*, QMouseEvent*);
   void onMouseDoubleClick(SUIT_ViewWindow*, QMouseEvent*);
@@ -55,8 +57,7 @@ private slots:
   void onKeyPress(SUIT_ViewWindow*, QKeyEvent*);
   void onKeyRelease(SUIT_ViewWindow*, QKeyEvent*);
 
-
-private:
+ private:
   NewGeom_OCCSelector* mySelector;
 
 };

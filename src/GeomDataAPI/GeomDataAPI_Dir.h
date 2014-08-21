@@ -17,7 +17,7 @@ class GeomAPI_Dir;
 
 class GeomDataAPI_Dir : public ModelAPI_Attribute
 {
-public:
+ public:
   /// Defines the double value
   virtual void setValue(const double theX, const double theY, const double theZ) = 0;
   /// Defines the direction
@@ -33,15 +33,22 @@ public:
   virtual boost::shared_ptr<GeomAPI_Dir> dir() = 0;
 
   /// Returns the type of this class of attributes
-  static inline std::string type() {return std::string("Dir");}
+  static inline std::string type()
+  {
+    return std::string("Dir");
+  }
 
   /// Returns the type of this class of attributes, not static method
-  virtual std::string attributeType() {return type();}
+  virtual std::string attributeType()
+  {
+    return type();
+  }
 
-protected:
+ protected:
   /// Objects are created for features automatically
   GeomDataAPI_Dir()
-  {}
+  {
+  }
 };
 
 #endif

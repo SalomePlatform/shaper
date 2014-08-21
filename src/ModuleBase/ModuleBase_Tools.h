@@ -2,7 +2,6 @@
 // Created:     11 July 2014
 // Author:      Vitaly Smetannikov
 
-
 #ifndef ModuleBase_Tools_H
 #define ModuleBase_Tools_H
 
@@ -13,16 +12,16 @@
 
 class GeomAPI_Shape;
 
-namespace ModuleBase_Tools 
-{
+namespace ModuleBase_Tools {
 
-  /**
-  * Returns returns a shape if the result has a shape method. Otherwise returns NULL pointer
-  */
-  MODULEBASE_EXPORT boost::shared_ptr<GeomAPI_Shape> shape(ResultPtr theResult);
+/**
+ * Returns returns a shape if the result has a shape method. Otherwise returns NULL pointer
+ */
+MODULEBASE_EXPORT boost::shared_ptr<GeomAPI_Shape> shape(ResultPtr theResult);
 
-  MODULEBASE_EXPORT FeaturePtr feature(ObjectPtr theObject);
+MODULEBASE_EXPORT FeaturePtr feature(ObjectPtr theObject);
 
-};
+}
+;
 
 #endif

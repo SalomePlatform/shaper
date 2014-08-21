@@ -8,9 +8,9 @@
 #include "FeaturesPlugin.h"
 #include <ModelAPI_Feature.h>
 
-class FeaturesPlugin_Extrusion: public ModelAPI_Feature
+class FeaturesPlugin_Extrusion : public ModelAPI_Feature
 {
-public:
+ public:
   /// Extrusion kind
   inline static const std::string& ID()
   {
@@ -29,7 +29,7 @@ public:
     static const std::string MY_SIZE_ID("extrusion_size");
     return MY_SIZE_ID;
   }
-    /// attribute name of reverse direction
+  /// attribute name of reverse direction
   inline static const std::string& REVERSE_ID()
   {
     static const std::string MY_REVERSE_ID("extrusion_reverse");
@@ -37,8 +37,11 @@ public:
   }
 
   /// Returns the kind of a feature
-  FEATURESPLUGIN_EXPORT virtual const std::string& getKind() 
-  { static std::string MY_KIND = FeaturesPlugin_Extrusion::ID(); return MY_KIND; }
+  FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    static std::string MY_KIND = FeaturesPlugin_Extrusion::ID();
+    return MY_KIND;
+  }
 
   /// Creates a new part document if needed
   FEATURESPLUGIN_EXPORT virtual void execute();

@@ -1,4 +1,3 @@
-
 #ifndef XGUI_PartDataModel_H
 #define XGUI_PartDataModel_H
 
@@ -12,8 +11,8 @@
  */
 class XGUI_EXPORT XGUI_TopDataModel : public XGUI_FeaturesModel
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   XGUI_TopDataModel(QObject* theParent);
   virtual ~XGUI_TopDataModel();
 
@@ -25,8 +24,8 @@ public:
   virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
   virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
-  virtual QModelIndex index(int theRow, int theColumn, 
-                            const QModelIndex& theParent = QModelIndex()) const;
+  virtual QModelIndex index(int theRow, int theColumn, const QModelIndex& theParent =
+                                QModelIndex()) const;
 
   virtual QModelIndex parent(const QModelIndex& theIndex) const;
 
@@ -46,9 +45,10 @@ public:
   //! Returns index corresponded to the group
   virtual QModelIndex findGroup(const std::string& theGroup) const;
 
-private:
+ private:
   //! Types of QModelIndexes
-  enum DataIds {
+  enum DataIds
+  {
     ParamsFolder,
     ParamObject,
     ConstructFolder,
@@ -59,7 +59,6 @@ private:
 
 };
 
-
 /**\class XGUI_PartDataModel
  * \ingroup GUI
  * \brief This is a data model for Object Browser (QTreeView).
@@ -67,8 +66,8 @@ private:
  */
 class XGUI_PartDataModel : public XGUI_PartModel
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   XGUI_PartDataModel(QObject* theParent);
   virtual ~XGUI_PartDataModel();
 
@@ -80,8 +79,8 @@ public:
   virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
   virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
-  virtual QModelIndex index(int theRow, int theColumn, 
-                            const QModelIndex& theParent = QModelIndex()) const;
+  virtual QModelIndex index(int theRow, int theColumn, const QModelIndex& theParent =
+                                QModelIndex()) const;
 
   virtual QModelIndex parent(const QModelIndex& theIndex) const;
 
@@ -107,13 +106,14 @@ public:
   //! Return a Part object
   virtual ResultPartPtr part() const;
 
-private: 
+ private:
 
   //! Returns document of the current part
   DocumentPtr partDocument() const;
 
   //! Types of QModelIndexes
-  enum DataIds {
+  enum DataIds
+  {
     MyRoot,
     ParamsFolder,
     ParamObject,

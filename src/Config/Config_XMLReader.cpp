@@ -15,11 +15,11 @@
 #include <libxml/tree.h>
 
 /*
-#ifdef WIN32
-//For GetModuleFileNameW
-#include <windows.h>
-#endif
-*/
+ #ifdef WIN32
+ //For GetModuleFileNameW
+ #include <windows.h>
+ #endif
+ */
 
 #ifdef _DEBUG
 #include <iostream>
@@ -70,9 +70,9 @@ void Config_XMLReader::processNode(xmlNodePtr theNode)
     std::string aSourceFile = getProperty(theNode, SOURCE_FILE);
     Config_XMLReader aSourceReader = Config_XMLReader(aSourceFile);
     readRecursively(aSourceReader.findRoot());
-    #ifdef _DEBUG
+#ifdef _DEBUG
     std::cout << "Config_XMLReader::sourced node: " << aSourceFile << std::endl;
-    #endif
+#endif
   } else if (isNode(theNode, NODE_VALIDATOR, NULL)) {
     processValidator(theNode);
   }
@@ -121,9 +121,9 @@ void Config_XMLReader::readRecursively(xmlNodePtr theParent)
   if (!theParent)
     return;
   xmlNodePtr aNode = theParent->xmlChildrenNode;
-  for(; aNode; aNode = aNode->next) {
+  for (; aNode; aNode = aNode->next) {
     //Still no text processing in features...
-    if(!isElementNode(aNode)) {
+    if (!isElementNode(aNode)) {
       continue;
     }
     processNode(aNode);
@@ -165,7 +165,7 @@ void Config_XMLReader::processValidator(xmlNodePtr theNode)
   aMessage.setValidatorId(aValidatorId);
   aMessage.setValidatorParameters(aValidatorParameters);
   xmlNodePtr aFeatureOrWdgNode = theNode->parent;
-  if(isNode(aFeatureOrWdgNode, NODE_FEATURE, NULL)) {
+  if (isNode(aFeatureOrWdgNode, NODE_FEATURE, NULL)) {
     aMessage.setFeatureId(getProperty(aFeatureOrWdgNode, _ID));
   } else {
     aMessage.setAttributeId(getProperty(aFeatureOrWdgNode, _ID));

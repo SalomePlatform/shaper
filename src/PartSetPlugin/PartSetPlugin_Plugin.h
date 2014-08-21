@@ -5,18 +5,17 @@
 #ifndef PartSetPlugin_Plugin_H_
 #define PartSetPlugin_Plugin_H_
 
-
 #include "PartSetPlugin.h"
 #include "ModelAPI_Plugin.h"
 #include "ModelAPI_Feature.h"
 
-class PARTSETPLUGIN_EXPORT PartSetPlugin_Plugin: public ModelAPI_Plugin
+class PARTSETPLUGIN_EXPORT PartSetPlugin_Plugin : public ModelAPI_Plugin
 {
-public:
+ public:
   /// Creates the feature object of this plugin by the feature string ID
   virtual FeaturePtr createFeature(std::string theFeatureID);
 
-public:
+ public:
   /// Is needed for python wrapping by swig
   PartSetPlugin_Plugin();
 };

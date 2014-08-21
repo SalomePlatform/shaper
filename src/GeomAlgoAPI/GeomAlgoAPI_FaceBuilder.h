@@ -19,11 +19,12 @@
 
 class GEOMALGOAPI_EXPORT GeomAlgoAPI_FaceBuilder
 {
-public:
+ public:
   /// Creates square planar face by given point of the center,
   /// normal to the plane and size of square
   static boost::shared_ptr<GeomAPI_Shape> square(boost::shared_ptr<GeomAPI_Pnt> theCenter,
-    boost::shared_ptr<GeomAPI_Dir> theNormal, const double theSize);
+                                                 boost::shared_ptr<GeomAPI_Dir> theNormal,
+                                                 const double theSize);
 
   /// Returns the plane of the planar face. If it is not planar, returns empty ptr.
   static boost::shared_ptr<GeomAPI_Pln> plane(boost::shared_ptr<GeomAPI_Shape> theFace);

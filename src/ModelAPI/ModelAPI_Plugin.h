@@ -18,16 +18,21 @@ class ModelAPI_Feature;
 
 class MODELAPI_EXPORT ModelAPI_Plugin
 {
-public:
+ public:
   /// Creates the feature object of this plugin by the feature string ID
   virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_Plugin() {}
+  virtual ~ModelAPI_Plugin()
+  {
+  }
 
-protected:
+ protected:
   /// Is needed for python wrapping by swig
-  ModelAPI_Plugin() {};
+  ModelAPI_Plugin()
+  {
+  }
+  ;
 };
 
 #endif

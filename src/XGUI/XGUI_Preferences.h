@@ -18,12 +18,11 @@ class QWidget;
 typedef QPair<QString, QString> XGUI_Pref;
 typedef QList<XGUI_Pref> XGUI_Prefs;
 
-
 //***********************************************************************
 /// Class for manipulation  with preferences in the application
 class XGUI_EXPORT XGUI_Preferences
 {
-public:
+ public:
   static const QString VIEWER_SECTION;
   static const QString MENU_SECTION;
 
@@ -35,7 +34,7 @@ public:
 
   static void loadCustomProps();
 
-private:
+ private:
   static SUIT_ResourceMgr* myResourceMgr;
 };
 
@@ -43,50 +42,58 @@ private:
 /// Manager of preferences
 class XGUI_EXPORT XGUI_PreferencesMgr : public SUIT_PreferenceMgr
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   XGUI_PreferencesMgr(QtxResourceMgr* theResource, QWidget* theParent)
-    :SUIT_PreferenceMgr(theResource, theParent) {}
+      : SUIT_PreferenceMgr(theResource, theParent)
+  {
+  }
 
-  virtual ~XGUI_PreferencesMgr() {}
+  virtual ~XGUI_PreferencesMgr()
+  {
+  }
 
-  XGUI_Prefs modified() const { return myModified; }
+  XGUI_Prefs modified() const
+  {
+    return myModified;
+  }
 
-protected:
-  virtual void changedResources( const ResourceMap& theMap);
+ protected:
+  virtual void changedResources(const ResourceMap& theMap);
 
-private:
+ private:
   XGUI_Prefs myModified;
 };
 
-
 //***********************************************************************
 /// Dialog box for preferences editing
-class XGUI_EXPORT XGUI_PreferencesDlg: public QDialog
+class XGUI_EXPORT XGUI_PreferencesDlg : public QDialog
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   XGUI_PreferencesDlg(SUIT_ResourceMgr* theResurces, QWidget* theParent = 0);
   virtual ~XGUI_PreferencesDlg();
 
-  bool isChanged() const { return myIsChanged; }
+  bool isChanged() const
+  {
+    return myIsChanged;
+  }
 
   void modified(XGUI_Prefs& theModified) const;
 
-public slots:
+ public slots:
   virtual void accept();
 
-private:
+ private:
   void createEditors();
   void createViewerPage(int thePageId);
   void createMenuPage(int thePageId);
   void createCustomPage(int thePageId);
 
   void updateCustomProps();
-  
+
   XGUI_PreferencesMgr* myPreferences;
   bool myIsChanged;
 };
-
 
 #endif

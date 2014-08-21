@@ -16,7 +16,8 @@
 #include <QTabBar>
 
 XGUI_MainMenu::XGUI_MainMenu(XGUI_MainWindow *parent)
-    : QWidget(parent), myDesktop(parent)
+    : QWidget(parent),
+      myDesktop(parent)
 {
   myGeneralPage = new XGUI_MenuGroupPanel(this);
   myGeneralPage->setObjectName("Default");
@@ -60,7 +61,6 @@ XGUI_Workbench* XGUI_MainMenu::findWorkbench(const QString& theObjName) const
   return myDesktop->findChild<XGUI_Workbench*>(theObjName);
 }
 
-
 bool XGUI_MainMenu::eventFilter(QObject *theWatched, QEvent *theEvent)
 {
   if (theWatched == myGeneralPage) {
@@ -81,12 +81,9 @@ void XGUI_MainMenu::insertConsole(QWidget* theConsole)
   aCloseTabButton->setFixedSize(16, 16);
   aCloseTabButton->setIcon(QIcon(":pictures/wnd_close.png"));
   aCloseTabButton->setFlat(true);
-  aTabBar->setTabButton(aConsoleTabId,
-                        QTabBar::RightSide,
-                        aCloseTabButton);
+  aTabBar->setTabButton(aConsoleTabId, QTabBar::RightSide, aCloseTabButton);
 
-  connect(aCloseTabButton, SIGNAL(clicked()),
-          myDesktop, SLOT(dockPythonConsole()));
+  connect(aCloseTabButton, SIGNAL(clicked()), myDesktop, SLOT(dockPythonConsole()));
 }
 
 void XGUI_MainMenu::removeConsole()
@@ -101,9 +98,11 @@ XGUI_Command* XGUI_MainMenu::feature(const QString& theId) const
   result = myGeneralPage->feature(theId);
   if (!result) {
     XGUI_Workbench* aWbn;
-    foreach (aWbn, myWorkbenches) {
+    foreach (aWbn, myWorkbenches)
+    {
       result = aWbn->feature(theId);
-      if (result) break;
+      if (result)
+        break;
     }
   }
   return result;
@@ -113,7 +112,8 @@ QList<XGUI_Command*> XGUI_MainMenu::features() const
 {
   QList<XGUI_Command*> aList = myGeneralPage->features();
   XGUI_Workbench* aWbn;
-  foreach (aWbn, myWorkbenches) {
+  foreach (aWbn, myWorkbenches)
+  {
     aList.append(aWbn->features());
   }
   return aList;
@@ -136,8 +136,8 @@ int XGUI_MainMenu::menuHeight() const
 int XGUI_MainMenu::menuItemRowsCount() const
 {
   const int kDefaultRowsCount = 3;
-  int aRowsCount = XGUI_Preferences::resourceMgr()->integerValue(
-    XGUI_Preferences::MENU_SECTION, "rows_number", kDefaultRowsCount);
+  int aRowsCount = XGUI_Preferences::resourceMgr()->integerValue(XGUI_Preferences::MENU_SECTION,
+                                                                 "rows_number", kDefaultRowsCount);
   return aRowsCount;
 }
 

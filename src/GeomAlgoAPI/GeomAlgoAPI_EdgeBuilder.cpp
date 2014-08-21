@@ -14,7 +14,7 @@
 #include <gp_Circ.hxx>
 
 boost::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
-  boost::shared_ptr<GeomAPI_Pnt> theStart, boost::shared_ptr<GeomAPI_Pnt> theEnd)
+    boost::shared_ptr<GeomAPI_Pnt> theStart, boost::shared_ptr<GeomAPI_Pnt> theEnd)
 {
   const gp_Pnt& aStart = theStart->impl<gp_Pnt>();
   const gp_Pnt& anEnd = theEnd->impl<gp_Pnt>();
@@ -31,8 +31,8 @@ boost::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
 }
 
 boost::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircle(
-    boost::shared_ptr<GeomAPI_Pnt> theCenter,
-    boost::shared_ptr<GeomAPI_Dir> theNormal, double theRadius)
+    boost::shared_ptr<GeomAPI_Pnt> theCenter, boost::shared_ptr<GeomAPI_Dir> theNormal,
+    double theRadius)
 {
   const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
   const gp_Dir& aDir = theNormal->impl<gp_Dir>();
@@ -47,10 +47,8 @@ boost::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircle(
 }
 
 boost::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
-    boost::shared_ptr<GeomAPI_Pnt> theCenter,
-    boost::shared_ptr<GeomAPI_Pnt> theStartPoint,
-    boost::shared_ptr<GeomAPI_Pnt> theEndPoint,
-    boost::shared_ptr<GeomAPI_Dir> theNormal)
+    boost::shared_ptr<GeomAPI_Pnt> theCenter, boost::shared_ptr<GeomAPI_Pnt> theStartPoint,
+    boost::shared_ptr<GeomAPI_Pnt> theEndPoint, boost::shared_ptr<GeomAPI_Dir> theNormal)
 {
   const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
   const gp_Dir& aDir = theNormal->impl<gp_Dir>();
@@ -62,8 +60,8 @@ boost::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircleArc(
   const gp_Pnt& anEnd = theEndPoint->impl<gp_Pnt>();
 
   BRepBuilderAPI_MakeEdge anEdgeBuilder;
-  if (aStart.IsEqual(anEnd, Precision::Confusion()) ||
-      gp_Pnt(0, 0, 0).IsEqual(anEnd, Precision::Confusion()))
+  if (aStart.IsEqual(anEnd, Precision::Confusion())
+      || gp_Pnt(0, 0, 0).IsEqual(anEnd, Precision::Confusion()))
     anEdgeBuilder = BRepBuilderAPI_MakeEdge(aCircle);
   else
     anEdgeBuilder = BRepBuilderAPI_MakeEdge(aCircle, aStart, anEnd);

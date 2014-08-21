@@ -9,7 +9,7 @@
 #include <QString>
 
 ModuleBase_OperationDescription::ModuleBase_OperationDescription(const QString& theId)
-: myOperationId(theId)
+    : myOperationId(theId)
 {
 }
 
@@ -33,19 +33,19 @@ void ModuleBase_OperationDescription::setDescription(const QString& theDescripti
 }
 
 /*void ModuleBase_OperationDescription::setModelWidgets(const std::string& theXmlRepresentation,
-                                                      const QList<ModuleBase_ModelWidget*>& theWidgets)
-{
-  myWidgets.clear();
-  QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast = theWidgets.end();
-  for (; anIt != aLast; anIt++)
-    myWidgets.push_back(*anIt);
-  myXmlRepresentation = theXmlRepresentation;
-}*/
+ const QList<ModuleBase_ModelWidget*>& theWidgets)
+ {
+ myWidgets.clear();
+ QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast = theWidgets.end();
+ for (; anIt != aLast; anIt++)
+ myWidgets.push_back(*anIt);
+ myXmlRepresentation = theXmlRepresentation;
+ }*/
 
 /*const QList<ModuleBase_ModelWidget*>& ModuleBase_OperationDescription::modelWidgets() const
-{
-  return myWidgets;
-}*/
+ {
+ return myWidgets;
+ }*/
 
 const QString& ModuleBase_OperationDescription::xmlRepresentation() const
 {

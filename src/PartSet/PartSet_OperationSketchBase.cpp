@@ -21,9 +21,8 @@
 
 using namespace std;
 
-PartSet_OperationSketchBase::PartSet_OperationSketchBase(const QString& theId,
-	                                                     QObject* theParent)
-: ModuleBase_Operation(theId, theParent)
+PartSet_OperationSketchBase::PartSet_OperationSketchBase(const QString& theId, QObject* theParent)
+    : ModuleBase_Operation(theId, theParent)
 {
 }
 
@@ -31,11 +30,10 @@ PartSet_OperationSketchBase::~PartSet_OperationSketchBase()
 {
 }
 
-boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview(
-                                      FeaturePtr theFeature)
+boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview(FeaturePtr theFeature)
 {
-  boost::shared_ptr<SketchPlugin_Feature> aFeature = 
-                              boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
+  boost::shared_ptr<SketchPlugin_Feature> aFeature = boost::dynamic_pointer_cast<
+      SketchPlugin_Feature>(theFeature);
   if (aFeature) {
     ResultPtr aRes = aFeature->firstResult();
     ResultBodyPtr aBody = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(aRes);
@@ -62,8 +60,8 @@ std::list<int> PartSet_OperationSketchBase::getSelectionModes(ObjectPtr theFeatu
   //      return aModes;
   //  }
   //}
-  aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)TopAbs_VERTEX));
-  aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)TopAbs_EDGE));
+  aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
+  aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
   aModes.push_back(AIS_DSM_Text);
   aModes.push_back(AIS_DSM_Line);
   return aModes;
@@ -76,23 +74,25 @@ FeaturePtr PartSet_OperationSketchBase::createFeature(const bool theFlushMessage
   return myFeature;
 }
 
-
-void PartSet_OperationSketchBase::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                               const std::list<ModuleBase_ViewerPrs>& theSelected,
-                                               const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+void PartSet_OperationSketchBase::mousePressed(
+    QMouseEvent* theEvent, Handle_V3d_View theView,
+    const std::list<ModuleBase_ViewerPrs>& theSelected,
+    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
 }
-void PartSet_OperationSketchBase::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                                const std::list<ModuleBase_ViewerPrs>& theSelected,
-                                                const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+void PartSet_OperationSketchBase::mouseReleased(
+    QMouseEvent* theEvent, Handle_V3d_View theView,
+    const std::list<ModuleBase_ViewerPrs>& theSelected,
+    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
 }
 void PartSet_OperationSketchBase::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
 }
-void PartSet_OperationSketchBase::mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                                   const std::list<ModuleBase_ViewerPrs>& theSelected,
-                                                   const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+void PartSet_OperationSketchBase::mouseDoubleClick(
+    QMouseEvent* theEvent, Handle_V3d_View theView,
+    const std::list<ModuleBase_ViewerPrs>& theSelected,
+    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
 }
 
@@ -102,17 +102,18 @@ void PartSet_OperationSketchBase::keyReleased(const int theKey)
     case Qt::Key_Escape: {
       bool toAbort = true;
       if (isModified()) {
-        int anAnswer = QMessageBox::question(qApp->activeWindow(), tr("Cancel operation"),
-                                  tr("Operation %1 will be cancelled. Continue?").arg(id()),
-                                  QMessageBox::Yes, QMessageBox::No);
+        int anAnswer = QMessageBox::question(
+            qApp->activeWindow(), tr("Cancel operation"),
+            tr("Operation %1 will be cancelled. Continue?").arg(id()), QMessageBox::Yes,
+            QMessageBox::No);
         toAbort = (anAnswer == QMessageBox::Yes);
       }
       if (toAbort)
         abort();
     }
-    break;
+      break;
     default:
-    break;
+      break;
   }
 }
 
@@ -121,8 +122,7 @@ void PartSet_OperationSketchBase::keyReleased(std::string theName, QKeyEvent* th
   keyReleased(theEvent->key());
 }
 
-void PartSet_OperationSketchBase::restartOperation(const std::string& theType,
-                                                   ObjectPtr theFeature)
+void PartSet_OperationSketchBase::restartOperation(const std::string& theType, ObjectPtr theFeature)
 {
   emit launchOperation(theType, theFeature);
 }

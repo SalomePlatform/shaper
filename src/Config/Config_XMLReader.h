@@ -32,16 +32,15 @@ struct _xmlDoc;
  */
 class Config_XMLReader
 {
-public:
-  CONFIG_EXPORT Config_XMLReader(const std::string& theXmlFile);
-  CONFIG_EXPORT virtual ~Config_XMLReader();
+ public:
+  CONFIG_EXPORT Config_XMLReader(const std::string& theXmlFile);CONFIG_EXPORT virtual ~Config_XMLReader();
 
   CONFIG_EXPORT void readAll();
 
-public:
+ public:
   CONFIG_EXPORT xmlNodePtr findRoot();
 
-protected:
+ protected:
   virtual void processNode(xmlNodePtr aNode);
   virtual bool processChildren(xmlNodePtr aNode);
 
@@ -51,12 +50,12 @@ protected:
   std::string getProperty(xmlNodePtr theNode, const char* property);
   void processValidator(xmlNodePtr theNode);
 
-protected:
+ protected:
   std::string myCurrentFeature;
 
-protected:
+ protected:
   std::string myDocumentPath;
-  xmlDocPtr   myXmlDoc;
+  xmlDocPtr myXmlDoc;
 };
 
 #endif /* CONFIG_XMLREADER_H_ */

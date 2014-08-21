@@ -18,15 +18,18 @@ class Handle_AIS_InteractiveObject;
 /*!
  \class PartSet_OperationSketch
  * \brief The operation for the sketch feature creation
-*/
+ */
 class PARTSET_EXPORT PartSet_OperationSketch : public PartSet_OperationSketchBase
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   /// Returns the operation type key
-  static std::string Type() { return SketchPlugin_Sketch::ID(); }
+  static std::string Type()
+  {
+    return SketchPlugin_Sketch::ID();
+  }
 
-public:
+ public:
   /// Constructor
   /// \param theId the feature identifier
   /// \param theParent the operation parent
@@ -99,13 +102,13 @@ signals:
   // signal about the viewer fit all perform
   void fitAllView();
 
-protected:
+ protected:
   /// Virtual method called when operation started (see start() method for more description)
   /// Default impl calls corresponding slot and commits immediately.
   virtual void startOperation();
 
-private:
-  std::list<ModuleBase_ViewerPrs> myFeatures; ///< the features to apply the edit operation
+ private:
+  std::list<ModuleBase_ViewerPrs> myFeatures;  ///< the features to apply the edit operation
 };
 
 #endif

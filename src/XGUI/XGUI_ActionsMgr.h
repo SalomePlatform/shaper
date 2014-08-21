@@ -18,11 +18,11 @@ class XGUI_Workshop;
 class XGUI_OperationMgr;
 class QAction;
 
-class XGUI_EXPORT XGUI_ActionsMgr: public QObject
+class XGUI_EXPORT XGUI_ActionsMgr : public QObject
 {
-  Q_OBJECT
+Q_OBJECT
 
-public:
+ public:
   XGUI_ActionsMgr(XGUI_Workshop* theWorkshop);
   virtual ~XGUI_ActionsMgr();
 
@@ -39,7 +39,7 @@ public:
 
   QKeySequence registerShortcut(const QString& theKeySequence);
 
-public slots:
+ public slots:
   //! Update workbench actions according to OperationMgr state:
   //! No active operations: all actions but nested are available
   //! There is active operation: current operation + it's nested
@@ -48,7 +48,7 @@ public slots:
   //! Sets all commands checked if it's operation is active.
   void updateCheckState();
 
-protected:
+ protected:
   //! Sets all actions to isEnabled state.
   void setAllEnabled(bool isEnabled);
   //! Sets all nested actions to isEnabled state for the command with given ID.
@@ -59,7 +59,7 @@ protected:
   //! Sets the action with theId to theEnabled state.
   void setActionEnabled(const QString& theId, const bool theEnabled);
 
-private:
+ private:
   QMap<QString, QAction*> myActions;
   QMap<QString, QStringList> myNestedActions;
   QList<QKeySequence> myShortcuts;

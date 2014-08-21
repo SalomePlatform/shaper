@@ -1,5 +1,4 @@
 
-
 #include "NewGeom_Module.h"
 #include "NewGeom_DataModel.h"
 #include "NewGeom_OCCSelector.h"
@@ -24,19 +23,21 @@
 #include <QAction>
 
 extern "C" {
-  NewGeom_EXPORT CAM_Module* createModule() {
-    return new NewGeom_Module();
-  }
-    
-  NewGeom_EXPORT char* getModuleVersion() {
-    return "0.0";
-  }
+NewGeom_EXPORT CAM_Module* createModule()
+{
+  return new NewGeom_Module();
 }
 
+NewGeom_EXPORT char* getModuleVersion()
+{
+  return "0.0";
+}
+}
 
 //******************************************************
 NewGeom_Module::NewGeom_Module()
-: LightApp_Module( "NewGeom" ), mySelector(0)
+    : LightApp_Module("NewGeom"),
+      mySelector(0)
 {
   myWorkshop = new XGUI_Workshop(this);
   myProxyViewer = new NewGeom_SalomeViewer(this);
@@ -51,20 +52,20 @@ NewGeom_Module::~NewGeom_Module()
 void NewGeom_Module::initialize(CAM_Application* theApp)
 {
   LightApp_Module::initialize(theApp);
-  
+
   myWorkshop->startApplication();
 }
 
 //******************************************************
 void NewGeom_Module::windows(QMap<int, int>& theWndMap) const
 {
-  theWndMap.insert( LightApp_Application::WT_PyConsole, Qt::BottomDockWidgetArea );
+  theWndMap.insert(LightApp_Application::WT_PyConsole, Qt::BottomDockWidgetArea);
 }
 
 //******************************************************
 void NewGeom_Module::viewManagers(QStringList& theList) const
 {
-  theList.append( OCCViewer_Viewer::Type() );
+  theList.append(OCCViewer_Viewer::Type());
 }
 
 //******************************************************
@@ -72,8 +73,8 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
 {
   bool isDone = LightApp_Module::activateModule(theStudy);
   if (isDone) {
-    setMenuShown( true );
-    setToolShown( true );
+    setMenuShown(true);
+    setToolShown(true);
 
     if (!mySelector) {
       ViewManagerList OCCViewManagers;
@@ -83,7 +84,7 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
       }
     }
     myWorkshop->propertyPanel()->hide();
-    QtxPopupMgr* aMgr = popupMgr(); // Create popup manager
+    QtxPopupMgr* aMgr = popupMgr();  // Create popup manager
     action(myEraseAll)->setEnabled(false);
   }
   return isDone;
@@ -92,14 +93,14 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
 //******************************************************
 bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
 {
-  setMenuShown( false );
-  setToolShown( false );
+  setMenuShown(false);
+  setToolShown(false);
   //myWorkshop->contextMenuMgr()->disconnectViewer();
   return LightApp_Module::deactivateModule(theStudy);
 }
 
 //******************************************************
-void NewGeom_Module::onViewManagerAdded( SUIT_ViewManager* theMgr )
+void NewGeom_Module::onViewManagerAdded(SUIT_ViewManager* theMgr)
 {
   if ((!mySelector)) {
     mySelector = createSelector(theMgr);
@@ -111,12 +112,12 @@ NewGeom_OCCSelector* NewGeom_Module::createSelector(SUIT_ViewManager* theMgr)
 {
   if (theMgr->getType() == OCCViewer_Viewer::Type()) {
     OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(theMgr->getViewModel());
-    NewGeom_OCCSelector* aSelector = new NewGeom_OCCSelector(aViewer, 
-                                                             getApp()->selectionMgr());
+    NewGeom_OCCSelector* aSelector = new NewGeom_OCCSelector(aViewer, getApp()->selectionMgr());
     LightApp_SelectionMgr* aMgr = getApp()->selectionMgr();
     QList<SUIT_Selector*> aList;
     aMgr->selectors(aList);
-    foreach(SUIT_Selector* aSel, aList) {
+    foreach(SUIT_Selector* aSel, aList)
+    {
       aSel->setEnabled(aSel == aSelector);
     }
     myProxyViewer->setSelector(aSelector);
@@ -128,16 +129,13 @@ NewGeom_OCCSelector* NewGeom_Module::createSelector(SUIT_ViewManager* theMgr)
 //******************************************************
 CAM_DataModel* NewGeom_Module::createDataModel()
 {
-  return new NewGeom_DataModel( this );
+  return new NewGeom_DataModel(this);
 }
 
 //******************************************************
-QAction* NewGeom_Module::addFeature(const QString& theWBName,
-                                    const QString& theId, 
-                                    const QString& theTitle, 
-                                    const QString& theTip,
-                                    const QIcon& theIcon, 
-                                    const QKeySequence& theKeys,
+QAction* NewGeom_Module::addFeature(const QString& theWBName, const QString& theId,
+                                    const QString& theTitle, const QString& theTip,
+                                    const QIcon& theIcon, const QKeySequence& theKeys,
                                     bool isCheckable)
 {
   int aMenu = createMenu(theWBName, -1, -1, 50);
@@ -147,44 +145,41 @@ QAction* NewGeom_Module::addFeature(const QString& theWBName,
   myActionsList.append(theId);
   SUIT_Desktop* aDesk = application()->desktop();
   int aKeys = 0;
-  for (int i = 0; i < theKeys.count(); i++) 
+  for (int i = 0; i < theKeys.count(); i++)
     aKeys += theKeys[i];
-  QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk, 
+  QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
                                   isCheckable);
   aAction->setData(theId);
-  int aItemId = createMenu( aId,  aMenu, -1, 10 );
-  int aToolId = createTool( aId, aTool );
+  int aItemId = createMenu(aId, aMenu, -1, 10);
+  int aToolId = createTool(aId, aTool);
   return aAction;
 }
 
 //******************************************************
-QAction* NewGeom_Module::addEditCommand(const QString& theId,
-                                        const QString& theTitle,
-                                        const QString& theTip,
-                                        const QIcon& theIcon, 
-                                        const QKeySequence& theKeys,
-                                        bool isCheckable)
+QAction* NewGeom_Module::addEditCommand(const QString& theId, const QString& theTitle,
+                                        const QString& theTip, const QIcon& theIcon,
+                                        const QKeySequence& theKeys, bool isCheckable)
 {
-  int aMenu = createMenu(tr( "MEN_DESK_EDIT" ), -1, -1);
+  int aMenu = createMenu(tr("MEN_DESK_EDIT"), -1, -1);
 
   int aId = myActionsList.size();
   myActionsList.append(theId);
   SUIT_Desktop* aDesk = application()->desktop();
   int aKeys = 0;
-  for (int i = 0; i < theKeys.count(); i++) 
+  for (int i = 0; i < theKeys.count(); i++)
     aKeys += theKeys[i];
-  QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk, 
+  QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
                                   isCheckable);
   aAction->setData(theId);
-  createMenu( aId, aMenu, 10 );
+  createMenu(aId, aMenu, 10);
   return aAction;
 }
 
 //******************************************************
 void NewGeom_Module::addEditMenuSeparator()
 {
-  int aMenu = createMenu(tr( "MEN_DESK_EDIT" ), -1, -1);
-  createMenu( separator(), aMenu, -1, 10 );
+  int aMenu = createMenu(tr("MEN_DESK_EDIT"), -1, -1);
+  createMenu(separator(), aMenu, -1, 10);
 }
 
 //******************************************************

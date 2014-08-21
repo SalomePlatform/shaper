@@ -20,13 +20,14 @@ class QLineEdit;
  */
 class MODULEBASE_EXPORT ModuleBase_WidgetEditor : public ModuleBase_WidgetDoubleValue
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   /// Constructor
   /// \theParent the parent object
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
-  ModuleBase_WidgetEditor(QWidget* theParent, const Config_WidgetAPI* theData, const std::string& theParentId);
+  ModuleBase_WidgetEditor(QWidget* theParent, const Config_WidgetAPI* theData,
+                          const std::string& theParentId);
   /// Constructor
   /// \theParent the parent object
   /// \theParent the parent object
@@ -46,9 +47,9 @@ public:
   /// \param theAttribute the feature attribute
   static void editFeatureValue(FeaturePtr theFeature, const std::string theAttribute);
 
-private:
-  FeaturePtr myFeature; ///< the current widget feature
-  QStringList myFeatureKinds; ///< the kinds of possible features
+ private:
+  FeaturePtr myFeature;  ///< the current widget feature
+  QStringList myFeatureKinds;  ///< the kinds of possible features
 };
 
 #endif

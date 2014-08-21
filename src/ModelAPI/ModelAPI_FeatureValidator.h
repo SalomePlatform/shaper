@@ -8,9 +8,9 @@
 #include "ModelAPI.h"
 #include "ModelAPI_Validator.h"
 
-class ModelAPI_FeatureValidator: public ModelAPI_Validator
+class ModelAPI_FeatureValidator : public ModelAPI_Validator
 {
-public:
+ public:
   /// Returns true if feature and/or attributes are valid
   /// \param theFeature the validated feature
   /// \param theAttr the validated attribute ID, empty string of feature is validated

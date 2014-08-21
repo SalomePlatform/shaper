@@ -12,8 +12,8 @@ using namespace std;
 
 void GeomData_Dir::setValue(const double theX, const double theY, const double theZ)
 {
-  if (!myIsInitialized || myCoords->Value(0) != theX || myCoords->Value(1) != theY || 
-       myCoords->Value(2) != theZ) {
+  if (!myIsInitialized || myCoords->Value(0) != theX || myCoords->Value(1) != theY
+      || myCoords->Value(2) != theZ) {
     myCoords->SetValue(0, theX);
     myCoords->SetValue(1, theY);
     myCoords->SetValue(2, theZ);
@@ -44,8 +44,8 @@ double GeomData_Dir::z() const
 
 boost::shared_ptr<GeomAPI_Dir> GeomData_Dir::dir()
 {
-  return boost::shared_ptr<GeomAPI_Dir>(new GeomAPI_Dir(
-    myCoords->Value(0), myCoords->Value(1), myCoords->Value(2)));
+  return boost::shared_ptr<GeomAPI_Dir>(
+      new GeomAPI_Dir(myCoords->Value(0), myCoords->Value(1), myCoords->Value(2)));
 }
 
 GeomData_Dir::GeomData_Dir(TDF_Label& theLabel)

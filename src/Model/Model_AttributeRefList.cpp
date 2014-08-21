@@ -12,17 +12,15 @@ using namespace std;
 
 void Model_AttributeRefList::append(ObjectPtr theObject)
 {
-  boost::shared_ptr<Model_Data> aData = 
-    boost::dynamic_pointer_cast<Model_Data>(theObject->data());
-  myRef->Append(aData->label().Father()); // store label of the object
+  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theObject->data());
+  myRef->Append(aData->label().Father());  // store label of the object
 
   owner()->data()->sendAttributeUpdated(this);
 }
 
 void Model_AttributeRefList::remove(ObjectPtr theObject)
 {
-  boost::shared_ptr<Model_Data> aData = 
-    boost::dynamic_pointer_cast<Model_Data>(theObject->data());
+  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theObject->data());
   myRef->Remove(aData->label().Father());
 
   owner()->data()->sendAttributeUpdated(this);
@@ -35,12 +33,12 @@ int Model_AttributeRefList::size()
 
 list<ObjectPtr> Model_AttributeRefList::list()
 {
-  std::list< ObjectPtr > aResult;
-  boost::shared_ptr<Model_Document> aDoc = 
-    boost::dynamic_pointer_cast<Model_Document>(owner()->document());
+  std::list<ObjectPtr> aResult;
+  boost::shared_ptr<Model_Document> aDoc = boost::dynamic_pointer_cast<Model_Document>(
+      owner()->document());
   if (aDoc) {
     const TDF_LabelList& aList = myRef->List();
-    for(TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
+    for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
       ObjectPtr anObj = aDoc->object(aLIter.Value());
       aResult.push_back(anObj);
     }

@@ -20,7 +20,6 @@
 #include <iostream>
 #endif
 
-
 Config_WidgetReader::Config_WidgetReader(const std::string& theXmlFile)
     : Config_XMLReader(theXmlFile)
 
@@ -40,7 +39,6 @@ std::string Config_WidgetReader::featureDescription(const std::string& theFeatur
 {
   return myDescriptionCache[theFeatureName];
 }
-
 
 void Config_WidgetReader::processNode(xmlNodePtr theNode)
 {
@@ -63,7 +61,7 @@ void Config_WidgetReader::resolveSourceNodes(xmlNodePtr theNode)
 {
   xmlNodePtr aNode = xmlFirstElementChild(theNode);
   std::list<xmlNodePtr> aSourceNodes;
-  while(aNode != NULL) {
+  while (aNode != NULL) {
     if (isNode(aNode, NODE_SOURCE, NULL)) {
       Config_XMLReader aSourceReader = Config_XMLReader(getProperty(aNode, SOURCE_FILE));
       xmlNodePtr aSourceRoot = aSourceReader.findRoot();
@@ -72,7 +70,7 @@ void Config_WidgetReader::resolveSourceNodes(xmlNodePtr theNode)
       }
       xmlNodePtr aSourceNode = xmlFirstElementChild(aSourceRoot);
       xmlNodePtr aTargetNode = xmlDocCopyNodeList(aNode->doc, aSourceNode);
-      while(aTargetNode != NULL) {
+      while (aTargetNode != NULL) {
         xmlNodePtr aNextNode = xmlNextElementSibling(aTargetNode);
         xmlAddPrevSibling(aNode, aTargetNode);
         aTargetNode = aNextNode;
@@ -83,7 +81,7 @@ void Config_WidgetReader::resolveSourceNodes(xmlNodePtr theNode)
   }
   //Remove "SOURCE" node.
   std::list<xmlNodePtr>::iterator it = aSourceNodes.begin();
-  for(; it != aSourceNodes.end(); it++) {
+  for (; it != aSourceNodes.end(); it++) {
     xmlUnlinkNode(*it);
     xmlFreeNode(*it);
   }

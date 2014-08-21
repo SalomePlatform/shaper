@@ -16,9 +16,9 @@ const unsigned int CONSTRAINT_ATTR_SIZE = 4;
  *  \brief Abstract interface to the SketchPlugin_ConstraintBase
  *         For more info see: SketchPlugin_ConstraintBase.h
  */
-class SketchPlugin_Constraint: public SketchPlugin_Feature
+class SketchPlugin_Constraint : public SketchPlugin_Feature
 {
-public:
+ public:
   /// The value parameter for the constraint
   inline static const std::string& VALUE()
   {
@@ -57,21 +57,29 @@ public:
   }
 
   /// List of constraint attributes
-  inline static const std::string& ATTRIBUTE(const int theNumber) {
+  inline static const std::string& ATTRIBUTE(const int theNumber)
+  {
     switch (theNumber) {
-      case 0: return ENTITY_A();
-      case 1: return ENTITY_B();
-      case 2: return ENTITY_C();
-      case 3: return ENTITY_D();
-      default: break;
+      case 0:
+        return ENTITY_A();
+      case 1:
+        return ENTITY_B();
+      case 2:
+        return ENTITY_C();
+      case 3:
+        return ENTITY_D();
+      default:
+        break;
     }
     static const std::string EMPTY_STRING("");
     return EMPTY_STRING;
   }
 
-protected:
+ protected:
   /// \brief Use plugin manager for features creation
-  SketchPlugin_Constraint() {}
+  SketchPlugin_Constraint()
+  {
+  }
 };
 
 #endif

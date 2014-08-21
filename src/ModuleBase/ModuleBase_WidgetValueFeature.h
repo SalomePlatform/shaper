@@ -20,7 +20,7 @@ class GeomAPI_Pnt2d;
  */
 class MODULEBASE_EXPORT ModuleBase_WidgetValueFeature : public ModuleBase_WidgetValue
 {
-public:
+ public:
   /// Constructor
   ModuleBase_WidgetValueFeature();
   /// Destructor
@@ -42,7 +42,7 @@ public:
   /// \return the current point
   const boost::shared_ptr<GeomAPI_Pnt2d>& point() const;
 
-private:
+ private:
   ObjectPtr myResult;
   boost::shared_ptr<GeomAPI_Pnt2d> myPoint;
 };

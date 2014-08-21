@@ -1,5 +1,4 @@
 
-
 #ifndef NewGeom_Module_H
 #define NewGeom_Module_H
 
@@ -12,42 +11,36 @@
 #include <QStringList>
 #include <QMap>
 
-class XGUI_Workshop; 
+class XGUI_Workshop;
 class NewGeom_OCCSelector;
 class OCCViewer_Viewer;
 
 /** 
-* An implementation of SALOME connector class for implementation of
-* XGUI functionality as a module of SALOME
-*/
-class NewGeom_EXPORT NewGeom_Module: public LightApp_Module, public XGUI_SalomeConnector
+ * An implementation of SALOME connector class for implementation of
+ * XGUI functionality as a module of SALOME
+ */
+class NewGeom_EXPORT NewGeom_Module : public LightApp_Module, public XGUI_SalomeConnector
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   NewGeom_Module();
   virtual ~NewGeom_Module();
 
   //----- LightAPP_Module interface ---------------
-  virtual void initialize( CAM_Application* theApp);
-  virtual void windows( QMap<int, int>& theWndMap) const;
-  virtual void viewManagers( QStringList& theList) const;
+  virtual void initialize(CAM_Application* theApp);
+  virtual void windows(QMap<int, int>& theWndMap) const;
+  virtual void viewManagers(QStringList& theList) const;
   virtual void selectionChanged();
 
   //--- XGUI connector interface -----
-  virtual QAction* addFeature(const QString& theWBName,
-                              const QString& theId, 
-                              const QString& theTitle, 
-                              const QString& theTip,
-                              const QIcon& theIcon, 
+  virtual QAction* addFeature(const QString& theWBName, const QString& theId,
+                              const QString& theTitle, const QString& theTip, const QIcon& theIcon,
                               const QKeySequence& theKeys = QKeySequence(),
                               bool isCheckable = false);
 
-  virtual QAction* addEditCommand(const QString& theId,
-                                  const QString& theTitle,
-                                  const QString& theTip,
-                                  const QIcon& theIcon, 
-                                  const QKeySequence& theKeys,
-                                  bool isCheckable);
+  virtual QAction* addEditCommand(const QString& theId, const QString& theTitle,
+                                  const QString& theTip, const QIcon& theIcon,
+                                  const QKeySequence& theKeys, bool isCheckable);
 
   virtual void addEditMenuSeparator();
 
@@ -66,7 +59,10 @@ public:
   virtual QStringList nestedActions(const QString& theId) const;
 
   //! Returns interface to Salome viewer
-  virtual XGUI_SalomeViewer* viewer() const { return myProxyViewer; }
+  virtual XGUI_SalomeViewer* viewer() const
+  {
+    return myProxyViewer;
+  }
 
   //! Returns list of defined actions (just by NewGeom module)
   virtual QList<QAction*> commandList() const;
@@ -76,18 +72,17 @@ public:
 
   virtual void contextMenuPopup(const QString& theClient, QMenu* theMenu, QString& theTitle);
 
-public slots:
-  virtual bool activateModule( SUIT_Study* theStudy);
-  virtual bool deactivateModule( SUIT_Study* theStudy);
+ public slots:
+  virtual bool activateModule(SUIT_Study* theStudy);
+  virtual bool deactivateModule(SUIT_Study* theStudy);
 
-protected slots:
-  virtual void onViewManagerAdded( SUIT_ViewManager* theMgr );
+ protected slots:
+  virtual void onViewManagerAdded(SUIT_ViewManager* theMgr);
 
-protected:
+ protected:
   CAM_DataModel* createDataModel();
 
-
-private:
+ private:
   NewGeom_OCCSelector* createSelector(SUIT_ViewManager* theMgr);
 
   QStringList myActionsList;

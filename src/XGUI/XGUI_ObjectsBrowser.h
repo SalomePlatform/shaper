@@ -1,4 +1,3 @@
-
 #ifndef XGUI_ObjectsBrowser_H
 #define XGUI_ObjectsBrowser_H
 
@@ -13,68 +12,81 @@
 class XGUI_DocumentDataModel;
 class QLineEdit;
 
-
-class XGUI_DataTree: public QTreeView
+class XGUI_DataTree : public QTreeView
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   XGUI_DataTree(QWidget* theParent);
   virtual ~XGUI_DataTree();
 
   //! Returns list of currently selected objects
-  QList<ObjectPtr> selectedObjects() const { return mySelectedData; }
+  QList<ObjectPtr> selectedObjects() const
+  {
+    return mySelectedData;
+  }
 
   XGUI_DocumentDataModel* dataModel() const;
 
 signals:
   //! Emited when selection is changed
   void selectionChanged();
-  void activePartChanged(ObjectPtr thePart); 
- 
+  void activePartChanged(ObjectPtr thePart);
+
   //! Emited on context menu request
   void contextMenuRequested(QContextMenuEvent* theEvent);
 
-protected slots:
+ protected slots:
   virtual void commitData(QWidget* theEditor);
 
-protected:
+ protected:
   virtual void mouseDoubleClickEvent(QMouseEvent* theEvent);
   virtual void contextMenuEvent(QContextMenuEvent* theEvent);
 
-private slots:
+ private slots:
   //! Called when selection in Data Tree is changed
   void onSelectionChanged(const QItemSelection& theSelected, const QItemSelection& theDeselected);
 
-private:
+ private:
   //! List of currently selected data
   QList<ObjectPtr> mySelectedData;
 };
-
 
 /**\class XGUI_ObjectsBrowser
  * \ingroup GUI
  * \brief Object browser window object. Represents data tree of current data structure
  */
- class XGUI_EXPORT XGUI_ObjectsBrowser : public QWidget
+class XGUI_EXPORT XGUI_ObjectsBrowser : public QWidget
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   XGUI_ObjectsBrowser(QWidget* theParent);
   virtual ~XGUI_ObjectsBrowser();
 
   //! Returns Model which provides access to data objects
-  XGUI_DocumentDataModel* dataModel() const { return myDocModel; }
+  XGUI_DocumentDataModel* dataModel() const
+  {
+    return myDocModel;
+  }
 
   //! Returns list of currently selected objects
-  QList<ObjectPtr> selectedObjects() const { return myObjectsList; }
+  QList<ObjectPtr> selectedObjects() const
+  {
+    return myObjectsList;
+  }
 
   void setObjectsSelected(const QList<ObjectPtr>& theObjects);
 
   //! Returns currently selected indexes
-  QModelIndexList selectedIndexes() const { return myTreeView->selectionModel()->selectedIndexes(); }
+  QModelIndexList selectedIndexes() const
+  {
+    return myTreeView->selectionModel()->selectedIndexes();
+  }
 
   //! Returns TreeView widget
-  XGUI_DataTree* treeView() const { return myTreeView; }
+  XGUI_DataTree* treeView() const
+  {
+    return myTreeView;
+  }
 
   //! Activates currently selected part. Signal activePartChanged will not be sent
   void activatePart(const ResultPartPtr& thePart);
@@ -86,15 +98,15 @@ signals:
   void selectionChanged();
 
   //! Emited when current active document is changed
-  void activePartChanged(ObjectPtr thePart); 
- 
+  void activePartChanged(ObjectPtr thePart);
+
   //! Emited on context menu request
   void contextMenuRequested(QContextMenuEvent* theEvent);
 
-protected:
+ protected:
   virtual bool eventFilter(QObject* obj, QEvent* theEvent);
 
-private slots:
+ private slots:
   void onActivePartChanged(ObjectPtr thePart);
   void onContextMenuRequested(QContextMenuEvent* theEvent);
   void onLabelContextMenuRequested(const QPoint& thePnt);
@@ -104,7 +116,7 @@ private slots:
 
   void onSelectionChanged();
 
-private:
+ private:
   void closeDocNameEditing(bool toSave);
 
   //! Internal model

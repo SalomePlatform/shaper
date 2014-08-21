@@ -29,12 +29,15 @@ static const char * EVENT_OBJECT_TO_REDISPLAY = "ObjectsToRedisplay";
 static const char * EVENT_OPERATION_LAUNCHED = "OperationLaunched";
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
-class ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup {
-protected:
+class ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
+{
+ protected:
   ModelAPI_ObjectUpdatedMessage(const Events_ID theID, const void* theSender = 0)
-    : Events_MessageGroup(theID, theSender) {}
+      : Events_MessageGroup(theID, theSender)
+  {
+  }
 
-public:
+ public:
   /// Returns the feature that has been updated
   virtual std::set<ObjectPtr> objects() const = 0;
 
@@ -46,17 +49,20 @@ public:
 };
 
 /// Message that feature was deleted (used for Object Browser update)
-class ModelAPI_ObjectDeletedMessage : public Events_MessageGroup {
-protected:
+class ModelAPI_ObjectDeletedMessage : public Events_MessageGroup
+{
+ protected:
   ModelAPI_ObjectDeletedMessage(const Events_ID theID, const void* theSender = 0)
-    : Events_MessageGroup(theID, theSender) {}
+      : Events_MessageGroup(theID, theSender)
+  {
+  }
 
-public:
+ public:
   /// Returns the feature that has been updated
   virtual boost::shared_ptr<ModelAPI_Document> document() const = 0;
 
   /// Returns the group where the feature was deleted
-  virtual const std::set<std::string >& groups() const = 0;
+  virtual const std::set<std::string>& groups() const = 0;
 
   virtual Events_MessageGroup* newEmpty() = 0;
 
@@ -66,18 +72,19 @@ public:
 };
 
 /// Allows to create ModelAPI messages
-class MODELAPI_EXPORT ModelAPI_EventCreator {
-public:
+class MODELAPI_EXPORT ModelAPI_EventCreator
+{
+ public:
   /// creates created, updated or moved messages and sends to the loop
   virtual void sendUpdated(const ObjectPtr& theObject, const Events_ID& theEvent,
                            const bool isGroupped = true) const = 0;
   /// creates deleted message and sends to the loop
-  virtual void sendDeleted(
-    const boost::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theGroup) const = 0;
+  virtual void sendDeleted(const boost::shared_ptr<ModelAPI_Document>& theDoc,
+                           const std::string& theGroup) const = 0;
 
   /// returns the creator instance
   static const ModelAPI_EventCreator* get();
-  
+
   /// sets the creator instance
   static void set(const ModelAPI_EventCreator* theCreator);
 };

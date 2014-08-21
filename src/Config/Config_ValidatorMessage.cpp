@@ -8,7 +8,7 @@
 #include <Config_ValidatorMessage.h>
 
 Config_ValidatorMessage::Config_ValidatorMessage(const Events_ID theId, const void* theParent)
-: Events_Message(theId, theParent)
+    : Events_Message(theId, theParent)
 {
   myValidatorId = "";
   myFeatureId = "";

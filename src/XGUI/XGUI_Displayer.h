@@ -36,7 +36,7 @@ class XGUI_Workshop;
  */
 class XGUI_EXPORT XGUI_Displayer
 {
-public:
+ public:
   /// Constructor
   /// \param theViewer the viewer
   XGUI_Displayer(XGUI_Workshop* theWorkshop);
@@ -70,8 +70,8 @@ public:
   /// \param theShape a shape
   /// \param theMode a list of local selection modes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void activateInLocalContext(ObjectPtr theFeature,
-                              const std::list<int>& theModes, const bool isUpdateViewer = true);
+  void activateInLocalContext(ObjectPtr theFeature, const std::list<int>& theModes,
+                              const bool isUpdateViewer = true);
 
   /// Stop the current selection and color the given features to the selection color
   /// \param theFeatures a list of features to be disabled
@@ -81,10 +81,10 @@ public:
                      const bool isUpdateViewer);
 
   /**
-  * Add presentations which corresponds to the given features to current selection
-  * \param theFeatures a list of features to be selected
-  * isUpdateViewer the parameter whether the viewer should be update immediatelly
-  */
+   * Add presentations which corresponds to the given features to current selection
+   * \param theFeatures a list of features to be selected
+   * isUpdateViewer the parameter whether the viewer should be update immediatelly
+   */
   void setSelected(const QList<ObjectPtr>& theFeatures, bool isUpdateViewer = true);
 
   /// Erase the feature and a shape.
@@ -124,7 +124,7 @@ public:
 
   void activate(ObjectPtr theFeature);
 
-protected:
+ protected:
   /// Deactivate local selection
   /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
   void closeAllContexts(const bool isUpdateViewer);
@@ -137,8 +137,9 @@ protected:
   /// \param theAIS AIS presentation
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// Returns true if the Feature succesfully displayed
-  void display(ObjectPtr theObject, boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdateViewer = true);
-  
+  void display(ObjectPtr theObject, boost::shared_ptr<GeomAPI_AISObject> theAIS,
+               bool isUpdateViewer = true);
+
   /// Display the shape and activate selection of sub-shapes
   /// \param theFeature a feature instance
   /// \param theAIS an AIS object
@@ -149,17 +150,16 @@ protected:
   //               const bool isUpdateViewer = true);
 
   /** Redisplay the shape if it was displayed
-  * \param theFeature a feature instance
-  * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  */
+   * \param theFeature a feature instance
+   * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+   */
   void redisplay(ObjectPtr theObject, bool isUpdateViewer = true);
 
-protected:
+ protected:
   XGUI_Workshop* myWorkshop;
 
   typedef std::map<ObjectPtr, boost::shared_ptr<GeomAPI_AISObject> > ResultToAISMap;
   ResultToAISMap myResult2AISObjectMap;
 };
-
 
 #endif

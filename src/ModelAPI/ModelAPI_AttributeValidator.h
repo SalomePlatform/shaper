@@ -9,12 +9,10 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
 
-
-class ModelAPI_AttributeValidator: public ModelAPI_Validator
+class ModelAPI_AttributeValidator : public ModelAPI_Validator
 {
-public:
-  virtual bool isValid(const FeaturePtr& theFeature, 
-                       const std::list<std::string>& theArguments,
+ public:
+  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
                        const ObjectPtr& theObject) const = 0;
 };
 

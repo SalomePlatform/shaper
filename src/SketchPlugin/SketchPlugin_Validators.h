@@ -9,12 +9,10 @@
 //#include <ModuleBase_FeatureValidator.h>
 #include <ModelAPI_AttributeValidator.h>
 
-
-class SketchPlugin_DistanceAttrValidator: public ModelAPI_AttributeValidator
+class SketchPlugin_DistanceAttrValidator : public ModelAPI_AttributeValidator
 {
-public:
-  virtual bool isValid(const FeaturePtr& theFeature, 
-                       const std::list<std::string>& theArguments,
+ public:
+  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
                        const ObjectPtr& theObject) const;
 
 };

@@ -20,9 +20,9 @@ class ModelAPI_Attribute;
  * to get/set attributes from the document and compute result of an operation.
  */
 
-class Model_Data: public ModelAPI_Data
+class Model_Data : public ModelAPI_Data
 {
-  TDF_Label myLab; ///< label of the feature in the document
+  TDF_Label myLab;  ///< label of the feature in the document
   /// All attributes of the object identified by the attribute ID
   std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> > myAttrs;
 
@@ -32,14 +32,17 @@ class Model_Data: public ModelAPI_Data
   Model_Data();
 
   /// Returns label of this feature
-  TDF_Label label() {return myLab;}
+  TDF_Label label()
+  {
+    return myLab;
+  }
 
   friend class Model_Document;
   friend class Model_AttributeReference;
   friend class Model_AttributeRefAttr;
   friend class Model_AttributeRefList;
 
-public:
+ public:
   /// Returns the name of the feature visible by the user in the object browser
   MODEL_EXPORT virtual std::string name();
   /// Defines the name of the feature visible by the user in the object browser
@@ -49,24 +52,24 @@ public:
   /// Returns the attribute that contains real value with double precision
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID);
   /// Returns the attribute that contains reference to a feature
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeReference> 
-    reference(const std::string& theID);
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeReference>
+  reference(const std::string& theID);
   /// Returns the attribute that contains reference to an attribute of a feature
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeRefAttr>
-    refattr(const std::string& theID);
+  refattr(const std::string& theID);
   /// Returns the attribute that contains list of references to features
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeRefList> 
-    reflist(const std::string& theID);
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeRefList>
+  reflist(const std::string& theID);
   /// Returns the attribute that contains boolean value
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeBoolean> 
-    boolean(const std::string& theID);
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeBoolean>
+  boolean(const std::string& theID);
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string& theID);
   /// Returns all attributes ofthe feature of the given type
   /// or all attributes if "theType" is empty
   MODEL_EXPORT virtual std::list<boost::shared_ptr<ModelAPI_Attribute> >
-    attributes(const std::string& theType);
+  attributes(const std::string& theType);
 
   /// Identifier by the id (not fast, iteration by map)
   /// \param theAttr attribute already created in this data
@@ -77,7 +80,10 @@ public:
   MODEL_EXPORT virtual bool isValid();
 
   /// Returns the label where the shape must be stored (used in ResultBody)
-  TDF_Label& shapeLab() {return myLab;}
+  TDF_Label& shapeLab()
+  {
+    return myLab;
+  }
 
   /// Initializes object by the attributes: must be called just after the object is created
   /// for each attribute of the object
@@ -94,7 +100,9 @@ public:
 
   /// Sets the object of this data
   MODEL_EXPORT virtual void setObject(ObjectPtr theObject)
-    {myObject = theObject;}
+  {
+    myObject = theObject;
+  }
 };
 
 #endif

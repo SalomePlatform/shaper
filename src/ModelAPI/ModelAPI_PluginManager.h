@@ -23,7 +23,7 @@ class ModelAPI_ValidatorsFactory;
 
 class MODELAPI_EXPORT ModelAPI_PluginManager
 {
-public:
+ public:
   /// Returns the real implementation (the alone instance per application) of the plugin manager
   static boost::shared_ptr<ModelAPI_PluginManager> get();
 
@@ -45,8 +45,8 @@ public:
   virtual void setCurrentDocument(boost::shared_ptr<ModelAPI_Document> theDoc) = 0;
 
   /// Copies the document to the new one wit hthe given id
-  virtual boost::shared_ptr<ModelAPI_Document> copy(
-    boost::shared_ptr<ModelAPI_Document> theSource, std::string theID) = 0;
+  virtual boost::shared_ptr<ModelAPI_Document> copy(boost::shared_ptr<ModelAPI_Document> theSource,
+                                                    std::string theID) = 0;
 
   /// Returns the validators factory: the only one instance per application
   virtual ModelAPI_ValidatorsFactory* validators() = 0;
@@ -55,9 +55,11 @@ public:
   ModelAPI_PluginManager();
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_PluginManager() {}
+  virtual ~ModelAPI_PluginManager()
+  {
+  }
 
-protected:
+ protected:
   /// Creates the feature object using plugins functionality
   virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
 

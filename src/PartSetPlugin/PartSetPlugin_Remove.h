@@ -12,9 +12,9 @@
  * \ingroup DataModel
  * \brief Feature for creation of the new part in PartSet.
  */
-class PartSetPlugin_Remove: public ModelAPI_Feature
+class PartSetPlugin_Remove : public ModelAPI_Feature
 {
-public:
+ public:
   /// Remove kind
   inline static const std::string& ID()
   {
@@ -22,24 +22,37 @@ public:
     return MY_REMOVE_KIND;
   }
   /// Returns the kind of a feature
-  PARTSETPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = PartSetPlugin_Remove::ID(); return MY_KIND;}
+  PARTSETPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    static std::string MY_KIND = PartSetPlugin_Remove::ID();
+    return MY_KIND;
+  }
 
   /// Returns to which group in the document must be added feature
-  PARTSETPLUGIN_EXPORT virtual const std::string& getGroup() 
-  {static std::string MY_GROUP = "Parts"; return MY_GROUP;}
+  PARTSETPLUGIN_EXPORT virtual const std::string& getGroup()
+  {
+    static std::string MY_GROUP = "Parts";
+    return MY_GROUP;
+  }
 
   /// Request for initialization of data model of the feature: adding all attributes
-  PARTSETPLUGIN_EXPORT virtual void initAttributes() {}
+  PARTSETPLUGIN_EXPORT virtual void initAttributes()
+  {
+  }
 
   /// Not normal feature that stored in the tree
-  PARTSETPLUGIN_EXPORT virtual bool isAction() {return true;}
+  PARTSETPLUGIN_EXPORT virtual bool isAction()
+  {
+    return true;
+  }
 
   /// Performs the "remove"
   PARTSETPLUGIN_EXPORT virtual void execute();
 
   /// Use plugin manager for features creation
-  PartSetPlugin_Remove() {}
+  PartSetPlugin_Remove()
+  {
+  }
 };
 
 #endif

@@ -19,13 +19,14 @@ class ModelAPI_Attribute;
  */
 class MODULEBASE_EXPORT ModuleBase_WidgetFeatureOrAttribute : public ModuleBase_WidgetFeature
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   /// Constructor
   /// \theParent the parent object
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
-  ModuleBase_WidgetFeatureOrAttribute(QWidget* theParent, const Config_WidgetAPI* theData, const std::string& theParentId);
+  ModuleBase_WidgetFeatureOrAttribute(QWidget* theParent, const Config_WidgetAPI* theData,
+                                      const std::string& theParentId);
   /// Destructor
   virtual ~ModuleBase_WidgetFeatureOrAttribute();
 
@@ -40,15 +41,15 @@ public:
 
   virtual bool restoreValue();
 
-protected:
+ protected:
   /// Set the attribute
   /// \param theAttribute value
   /// \return the boolean result of the attribute set
-  bool setAttribute(const boost::shared_ptr<ModelAPI_Attribute>& theAttribute, 
-                    bool theSendEvent = true);
+  bool setAttribute(const boost::shared_ptr<ModelAPI_Attribute>& theAttribute, bool theSendEvent =
+                        true);
 
-protected:
-  boost::shared_ptr<ModelAPI_Attribute> myAttribute; /// < the attribute
+ protected:
+  boost::shared_ptr<ModelAPI_Attribute> myAttribute;  /// < the attribute
 };
 
 #endif

@@ -13,7 +13,6 @@
 #include <QIcon>
 #include <QKeySequence>
 
-
 class XGUI_MainWindow;
 class XGUI_Command;
 class XGUI_Workbench;
@@ -47,10 +46,10 @@ class QAction;
  * \ingroup GUI
  * \brief Class which defines a configuration of the application (Workshop) and launches it.
  */
-class XGUI_EXPORT XGUI_Workshop: public QObject, public Events_Listener
+class XGUI_EXPORT XGUI_Workshop : public QObject, public Events_Listener
 {
 Q_OBJECT
-public:
+ public:
 
   XGUI_Workshop(XGUI_SalomeConnector* theConnector = 0);
   virtual ~XGUI_Workshop();
@@ -65,22 +64,41 @@ public:
   }
 
   //! Returns selection manager object
-  XGUI_SelectionMgr* selector() const { return mySelector; }
+  XGUI_SelectionMgr* selector() const
+  {
+    return mySelector;
+  }
 
   //! Returns displayer
-  XGUI_Displayer* displayer() const { return myDisplayer; }
+  XGUI_Displayer* displayer() const
+  {
+    return myDisplayer;
+  }
 
   //! ! Returns operation manager.
-  XGUI_OperationMgr* operationMgr() const { return myOperationMgr; }
+  XGUI_OperationMgr* operationMgr() const
+  {
+    return myOperationMgr;
+  }
 
   //! ! Returns an actions manager
-  XGUI_ActionsMgr* actionsMgr() const { return myActionsMgr; };
+  XGUI_ActionsMgr* actionsMgr() const
+  {
+    return myActionsMgr;
+  }
+  ;
 
   //! Returns property panel widget
-  XGUI_PropertyPanel* propertyPanel() const { return myPropertyPanel; }
+  XGUI_PropertyPanel* propertyPanel() const
+  {
+    return myPropertyPanel;
+  }
 
   //! Returns context menu manager object
-  XGUI_ContextMenuMgr* contextMenuMgr() const { return myContextMenuMgr; }
+  XGUI_ContextMenuMgr* contextMenuMgr() const
+  {
+    return myContextMenuMgr;
+  }
 
   //! Creates and adds a new workbench (menu group) with the given name and returns it
   XGUI_Workbench* addWorkbench(const QString& theName);
@@ -89,24 +107,39 @@ public:
   virtual void processEvent(const Events_Message* theMessage);
 
   //! Returns an object which provides interface to Salome Module (LightApp_Module)
-  XGUI_SalomeConnector* salomeConnector() const { return mySalomeConnector; }
+  XGUI_SalomeConnector* salomeConnector() const
+  {
+    return mySalomeConnector;
+  }
 
   //! Provides an object which provides interface to Salome Viewer
   XGUI_SalomeViewer* salomeViewer() const;
 
   //! Returns true if the application works as SALOME module
-  bool isSalomeMode() const { return mySalomeConnector != 0; }
+  bool isSalomeMode() const
+  {
+    return mySalomeConnector != 0;
+  }
 
   //! Returns Object browser
-  XGUI_ObjectsBrowser* objectBrowser() const { return myObjectBrowser; }
+  XGUI_ObjectsBrowser* objectBrowser() const
+  {
+    return myObjectBrowser;
+  }
 
   void salomeViewerSelectionChanged();
 
-  XGUI_ViewerProxy* viewer() const { return myViewerProxy; }
+  XGUI_ViewerProxy* viewer() const
+  {
+    return myViewerProxy;
+  }
 
   /// Returns the module connectory
   /// \returns the instance of connector
-  XGUI_ModuleConnector* moduleConnector() const { return myModuleConnector; }
+  XGUI_ModuleConnector* moduleConnector() const
+  {
+    return myModuleConnector;
+  }
 
   //! Returns icon name according to feature Id
   static QString featureIcon(const std::string& theId);
@@ -121,13 +154,16 @@ public:
   //! Show the given features in 3d Viewer
   void showObjects(const QList<ObjectPtr>& theList, bool isVisible);
 
-  ModuleBase_IModule* module() const { return myModule; }
+  ModuleBase_IModule* module() const
+  {
+    return myModule;
+  }
 
 signals:
   void salomeViewerSelection();
   void errorOccurred(const QString&);
 
-public slots:
+ public slots:
   void updateCommandStatus();
   void updateCommandsOnViewSelection();
 
@@ -150,7 +186,7 @@ public slots:
 
   void activateLastPart();
 
-protected:
+ protected:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
   void connectWithOperation(ModuleBase_Operation* theOperation);
@@ -169,7 +205,7 @@ protected:
   void displayDocumentResults(DocumentPtr theDoc);
   void displayGroupResults(DocumentPtr theDoc, std::string theGroup);
 
-protected slots:
+ protected slots:
   /// SLOT, that is called after the operation is started. Update workshop state according to
   /// the started operation, e.g. visualizes the property panel and connect to it.
   void onOperationStarted();
@@ -184,11 +220,10 @@ protected slots:
 
   void onStartWaiting();
 
-private:
+ private:
   void initMenu();
 
   void registerValidators() const;
-
 
   ModuleBase_IModule* loadModule(const QString& theModule);
   bool activateModule();
@@ -205,7 +240,7 @@ private:
   XGUI_PropertyPanel* myPropertyPanel;
   XGUI_SelectionMgr* mySelector;
   XGUI_Displayer* myDisplayer;
-  XGUI_OperationMgr* myOperationMgr; ///< manager to manipulate through the operations
+  XGUI_OperationMgr* myOperationMgr;  ///< manager to manipulate through the operations
   XGUI_ActionsMgr* myActionsMgr;
   XGUI_SalomeConnector* mySalomeConnector;
   XGUI_ErrorDialog* myErrorDlg;

@@ -9,8 +9,9 @@
 #define MY_XYZ static_cast<gp_XYZ*>(myImpl)
 
 GeomAPI_XYZ::GeomAPI_XYZ(const double theX, const double theY, const double theZ)
-  : GeomAPI_Interface(new gp_XYZ(theX, theY, theZ))
-{}
+    : GeomAPI_Interface(new gp_XYZ(theX, theY, theZ))
+{
+}
 
 double GeomAPI_XYZ::x() const
 {
@@ -43,25 +44,25 @@ void GeomAPI_XYZ::setZ(const double theZ)
 }
 
 const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::added(
-  const boost::shared_ptr<GeomAPI_XYZ>& theArg)
+    const boost::shared_ptr<GeomAPI_XYZ>& theArg)
 {
   boost::shared_ptr<GeomAPI_XYZ> aResult(new GeomAPI_XYZ(MY_XYZ->X() + theArg->x(),
-    MY_XYZ->Y() + theArg->y(), MY_XYZ->Z() + theArg->z()));
+  MY_XYZ->Y() + theArg->y(), MY_XYZ->Z() + theArg->z()));
   return aResult;
 }
 
 const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::decreased(
-  const boost::shared_ptr<GeomAPI_XYZ>& theArg)
+    const boost::shared_ptr<GeomAPI_XYZ>& theArg)
 {
   boost::shared_ptr<GeomAPI_XYZ> aResult(new GeomAPI_XYZ(MY_XYZ->X() - theArg->x(),
-    MY_XYZ->Y() - theArg->y(), MY_XYZ->Z() - theArg->z()));
+  MY_XYZ->Y() - theArg->y(), MY_XYZ->Z() - theArg->z()));
   return aResult;
 }
 
 const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::multiplied(const double theArg)
 {
   boost::shared_ptr<GeomAPI_XYZ> aResult(new GeomAPI_XYZ(MY_XYZ->X() * theArg,
-    MY_XYZ->Y() * theArg, MY_XYZ->Z() * theArg));
+  MY_XYZ->Y() * theArg, MY_XYZ->Z() * theArg));
   return aResult;
 }
 
@@ -70,7 +71,8 @@ double GeomAPI_XYZ::dot(const boost::shared_ptr<GeomAPI_XYZ>& theArg) const
   return MY_XYZ->Dot(theArg->impl<gp_XYZ>());
 }
 
-const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::cross(const boost::shared_ptr<GeomAPI_XYZ>& theArg) const
+const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::cross(
+    const boost::shared_ptr<GeomAPI_XYZ>& theArg) const
 {
   gp_XYZ aResult = MY_XYZ->Crossed(theArg->impl<gp_XYZ>());
   return boost::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(aResult.X(), aResult.Y(), aResult.Z()));

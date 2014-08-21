@@ -19,29 +19,28 @@ class QKeyEvent;
 /*!
  \class PartSet_OperationFeatureCreate
  * \brief The operation for the sketch feature creation
-*/
+ */
 class PARTSET_EXPORT PartSet_OperationFeatureCreate : public PartSet_OperationSketchBase
 {
-  Q_OBJECT
+Q_OBJECT
 
-public:
+ public:
   /// Returns true if the feature with the given kind can be created by this operation
   /// \param theId the feature kind
   /// \return the boolean result
   static bool canProcessKind(const std::string& theId);
 
-public:
+ public:
   /// Constructor
   /// \param theId the feature identifier
   /// \param theParent the operation parent
   /// \param theSketch the parent feature
-  PartSet_OperationFeatureCreate(const QString& theId, QObject* theParent,
-                                 FeaturePtr theSketch);
+  PartSet_OperationFeatureCreate(const QString& theId, QObject* theParent, FeaturePtr theSketch);
   /// Destructor
   virtual ~PartSet_OperationFeatureCreate();
 
   /// Returns that this operator can be started above already running one.
-   /// The runned operation should be the sketch feature modified operation
+  /// The runned operation should be the sketch feature modified operation
   /// \param theOperation the previous running operation
   virtual bool isGranted(ModuleBase_IOperation* theOperation) const;
 
@@ -57,7 +56,7 @@ public:
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
   virtual void initSelection(const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+                             const std::list<ModuleBase_ViewerPrs>& theHighlighted);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
@@ -68,9 +67,9 @@ public:
   /// \param theView a viewer to have the viewer the eye position
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
- virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<ModuleBase_ViewerPrs>& theSelected,
-                            const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
+                             const std::list<ModuleBase_ViewerPrs>& theSelected,
+                             const std::list<ModuleBase_ViewerPrs>& theHighlighted);
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
@@ -81,12 +80,12 @@ public:
 
   virtual void keyReleased(std::string theName, QKeyEvent* theEvent);
 
-public slots:
+ public slots:
   /// Slots which listen the mode widget activation
   /// \param theWidget the model widget
   virtual void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
-protected:
+ protected:
   /// \brief Virtual method called when operation is started
   /// Virtual method called when operation started (see start() method for more description)
   /// After the parent operation body perform, set sketch feature to the created line feature
@@ -114,7 +113,7 @@ protected:
   /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
   virtual bool canBeCommitted() const;
 
-protected:
+ protected:
   /// Set value to the active widget
   /// \param theFeature the feature
   /// \param theX the horizontal coordinate
@@ -122,11 +121,11 @@ protected:
   /// \return true if the point is set
   bool setWidgetValue(ObjectPtr theFeature, double theX, double theY);
 
-private:
-  FeaturePtr myInitFeature; ///< the initial feature
-  FeaturePtr mySketch; ///< the sketch of the feature
+ private:
+  FeaturePtr myInitFeature;  ///< the initial feature
+  FeaturePtr mySketch;  ///< the sketch of the feature
 
-  ModuleBase_ModelWidget* myActiveWidget; ///< the active widget
+  ModuleBase_ModelWidget* myActiveWidget;  ///< the active widget
 
   std::list<ModuleBase_ViewerPrs> myPreSelection;
 };

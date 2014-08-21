@@ -18,11 +18,10 @@
 #include <QDebug>
 #endif
 
-
 XGUI_ActionsMgr::XGUI_ActionsMgr(XGUI_Workshop* theParent)
- : QObject(theParent),
-   myWorkshop(theParent),
-   myOperationMgr(theParent->operationMgr())
+    : QObject(theParent),
+      myWorkshop(theParent),
+      myOperationMgr(theParent->operationMgr())
 {
   // Default shortcuts
   myShortcuts << QKeySequence::Save;
@@ -36,11 +35,10 @@ XGUI_ActionsMgr::~XGUI_ActionsMgr()
 {
 }
 
-
 void XGUI_ActionsMgr::addCommand(QAction* theCmd)
 {
   QString aId = theCmd->data().toString();
-  if(aId.isEmpty()) {
+  if (aId.isEmpty()) {
     return;
   }
   myActions.insert(aId, theCmd);
@@ -60,7 +58,7 @@ void XGUI_ActionsMgr::addNestedCommands(const QString& theId, const QStringList&
 
 void XGUI_ActionsMgr::update()
 {
-  if(myOperationMgr->hasOperation()) {
+  if (myOperationMgr->hasOperation()) {
     setAllEnabled(false);
     ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
     QString anOperationId = anOperation->id();
@@ -76,7 +74,8 @@ void XGUI_ActionsMgr::update()
 
 void XGUI_ActionsMgr::setAllEnabled(bool isEnabled)
 {
-  foreach(QString eachAction, myActions.keys()) {
+  foreach(QString eachAction, myActions.keys())
+  {
     setActionEnabled(eachAction, isEnabled);
   }
 }
@@ -85,14 +84,16 @@ void XGUI_ActionsMgr::setAllEnabled(bool isEnabled)
 void XGUI_ActionsMgr::setNestedCommandsEnabled(bool theEnabled, const QString& theParent)
 {
   QStringList ltNestedActions;
-  if(theParent.isEmpty()) { //Disable ALL nested
-    foreach(QString eachParent, myNestedActions.keys()) {
+  if (theParent.isEmpty()) {  //Disable ALL nested
+    foreach(QString eachParent, myNestedActions.keys())
+    {
       ltNestedActions << myNestedActions[eachParent];
     }
   } else {
     ltNestedActions << myNestedActions[theParent];
   }
-  foreach(QString eachNested, ltNestedActions) {
+  foreach(QString eachNested, ltNestedActions)
+  {
     setActionEnabled(eachNested, theEnabled);
   }
 }
@@ -100,16 +101,15 @@ void XGUI_ActionsMgr::setNestedCommandsEnabled(bool theEnabled, const QString& t
 void XGUI_ActionsMgr::setActionChecked(const QString& theId, const bool theChecked)
 {
   QAction* anAction = myActions[theId];
-  if(anAction && anAction->isCheckable()) {
+  if (anAction && anAction->isCheckable()) {
     anAction->setChecked(theChecked);
   }
 }
 
-
 void XGUI_ActionsMgr::setActionEnabled(const QString& theId, const bool theEnabled)
 {
   QAction* anAction = myActions[theId];
-  if(anAction) {
+  if (anAction) {
     anAction->setEnabled(theEnabled);
   }
 }
@@ -117,11 +117,13 @@ void XGUI_ActionsMgr::setActionEnabled(const QString& theId, const bool theEnabl
 void XGUI_ActionsMgr::updateCheckState()
 {
   QString eachCommand = QString();
-  foreach(eachCommand, myActions.keys()) {
+  foreach(eachCommand, myActions.keys())
+  {
     setActionChecked(eachCommand, false);
   }
   QStringList ltActiveCommands = myOperationMgr->operationList();
-  foreach(eachCommand, ltActiveCommands) {
+  foreach(eachCommand, ltActiveCommands)
+  {
     setActionChecked(eachCommand, true);
   }
 }
@@ -135,7 +137,8 @@ QStringList XGUI_ActionsMgr::nestedCommands(const QString& theId) const
 
 bool XGUI_ActionsMgr::isNested(const QString& theId) const
 {
-  foreach(QString aId, myNestedActions.keys()) {
+  foreach(QString aId, myNestedActions.keys())
+  {
     QStringList aList = myNestedActions[aId];
     if (aList.contains(theId))
       return true;
@@ -145,11 +148,11 @@ bool XGUI_ActionsMgr::isNested(const QString& theId) const
 
 QKeySequence XGUI_ActionsMgr::registerShortcut(const QString& theKeySequence)
 {
-  if(theKeySequence.isEmpty()) {
+  if (theKeySequence.isEmpty()) {
     return QKeySequence();
   }
   QKeySequence aResult(theKeySequence);
-  if(myShortcuts.contains(aResult)) {
+  if (myShortcuts.contains(aResult)) {
     QString aMessage = tr("Shortcut %1 is already defined. Ignore.").arg(theKeySequence);
     Events_Error::send(aMessage.toStdString());
     return QKeySequence();

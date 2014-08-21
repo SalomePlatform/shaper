@@ -14,9 +14,10 @@
 
 #include <QDoubleSpinBox>
 
-ModuleBase_WidgetPoint2dDistance::ModuleBase_WidgetPoint2dDistance(QWidget* theParent, 
-  const Config_WidgetAPI* theData, const std::string& theParentId)
-  : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId)
+ModuleBase_WidgetPoint2dDistance::ModuleBase_WidgetPoint2dDistance(QWidget* theParent,
+                                                                   const Config_WidgetAPI* theData,
+                                                                   const std::string& theParentId)
+    : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId)
 {
   myFirstPntName = theData->getProperty("first_point");
 }
@@ -30,8 +31,8 @@ bool ModuleBase_WidgetPoint2dDistance::setValue(ModuleBase_WidgetValue* theValue
   bool isDone = false;
 
   if (theValue) {
-    ModuleBase_WidgetValueFeature* aFeatureValue = 
-                         dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
+    ModuleBase_WidgetValueFeature* aFeatureValue =
+        dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue) {
       boost::shared_ptr<GeomAPI_Pnt2d> aPnt = aFeatureValue->point();
       ObjectPtr aObject = aFeatureValue->object();
@@ -45,12 +46,14 @@ bool ModuleBase_WidgetPoint2dDistance::setValue(ModuleBase_WidgetValue* theValue
   return isDone;
 }
 
-void ModuleBase_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature, const boost::shared_ptr<GeomAPI_Pnt2d>& thePnt)
+void ModuleBase_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
+                                                const boost::shared_ptr<GeomAPI_Pnt2d>& thePnt)
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                                                              (aData->attribute(myFirstPntName));
-  if (!aPoint) return;
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aData->attribute(myFirstPntName));
+  if (!aPoint)
+    return;
 
   double aRadius = thePnt->distance(aPoint->pnt());
   AttributeDoublePtr aReal = aData->real(attributeID());

@@ -14,9 +14,9 @@
  * \ingroup DataModel
  * \brief Feature for creation of the new arc of circle in PartSet.
  */
-class SketchPlugin_Arc: public SketchPlugin_Feature//, public GeomAPI_IPresentable
+class SketchPlugin_Arc : public SketchPlugin_Feature  //, public GeomAPI_IPresentable
 {
-public:
+ public:
   /// Arc feature kind
   inline static const std::string& ID()
   {
@@ -45,7 +45,10 @@ public:
 
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
-  {static std::string MY_KIND = SketchPlugin_Arc::ID(); return MY_KIND;}
+  {
+    static std::string MY_KIND = SketchPlugin_Arc::ID();
+    return MY_KIND;
+  }
 
   /// Creates an arc-shape
   SKETCHPLUGIN_EXPORT virtual void execute();
@@ -55,7 +58,9 @@ public:
 
   /// Returns the AIS preview
   virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious)
-  {return simpleAISObject(firstResult(), thePrevious);}
+  {
+    return simpleAISObject(firstResult(), thePrevious);
+  }
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved

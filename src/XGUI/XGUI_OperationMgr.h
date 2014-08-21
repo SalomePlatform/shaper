@@ -26,8 +26,8 @@ class QKeyEvent;
  */
 class XGUI_EXPORT XGUI_OperationMgr : public QObject
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   /// Constructor
   /// \param theParent the parent
   XGUI_OperationMgr(QObject* theParent);
@@ -54,7 +54,7 @@ public:
 
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
-public slots:
+ public slots:
   void validateCurrentOperation();
 
 signals:
@@ -71,7 +71,7 @@ signals:
   /// \param theWidget the model widget
   void activateNextWidget(ModuleBase_ModelWidget* theWidget);
 
-protected:
+ protected:
   /// Sets the current operation or NULL
   /// \param theOperation the started operation
   /// \param isCheckBeforeStart the flag whether to check whether the operation can be started
@@ -91,7 +91,7 @@ protected:
 
   void validateOperation(ModuleBase_Operation* theOperation);
 
-protected slots:
+ protected slots:
   /// Slot that commits the current operation.
   void onCommitOperation();
   /// Slot that aborts the current operation.
@@ -110,10 +110,10 @@ protected slots:
   /// \param theWidget an activated widget
   void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
-private:
-  typedef QList<ModuleBase_Operation*> Operations; ///< definition for a list of operations
-  Operations myOperations; ///< a stack of started operations. The active operation is on top,
-                           // others are suspended and started by the active is finished
+ private:
+  typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations
+  Operations myOperations;  ///< a stack of started operations. The active operation is on top,
+                            // others are suspended and started by the active is finished
 };
 
 #endif

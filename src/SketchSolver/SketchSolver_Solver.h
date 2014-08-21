@@ -18,7 +18,6 @@ typedef unsigned int UINT32;
 
 #include <vector>
 
-
 #define SLVS_RESULT_EMPTY_SET -1
 
 // Unknown constraint (for error reporting)
@@ -26,17 +25,18 @@ typedef unsigned int UINT32;
 // Unknown entity
 #define SLVS_E_UNKNOWN 0
 
-
 class SketchSolver_Solver
 {
-public:
+ public:
   SketchSolver_Solver();
   ~SketchSolver_Solver();
 
   /** \brief Initialize the ID of the group
    */
   inline void setGroupID(Slvs_hGroup theGroupID)
-  { myGroupID = theGroupID; }
+  {
+    myGroupID = theGroupID;
+  }
 
   /** \brief Change array of parameters
    *  \param[in] theParameters vector of parameters
@@ -70,9 +70,9 @@ public:
    */
   bool getResult(std::vector<Slvs_Param>& theParameters);
 
-private:
+ private:
   Slvs_hGroup myGroupID;         ///< identifier of the group to be solved
-  Slvs_System myEquationsSystem; ///< set of equations for solving in SolveSpace
+  Slvs_System myEquationsSystem;  ///< set of equations for solving in SolveSpace
 };
 
 #endif

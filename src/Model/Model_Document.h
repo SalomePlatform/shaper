@@ -19,8 +19,8 @@
 class Handle_Model_Document;
 
 // for TDF_Label map usage
-static  Standard_Integer HashCode(const TDF_Label& theLab,const Standard_Integer theUpper);
-static  Standard_Boolean IsEqual(const TDF_Label& theLab1,const TDF_Label& theLab2);
+static Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper);
+static Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2);
 
 /**\class Model_Document
  * \ingroup DataModel
@@ -28,9 +28,9 @@ static  Standard_Boolean IsEqual(const TDF_Label& theLab1,const TDF_Label& theLa
  * Document contains all data that must be stored/retrived in the file.
  * Also it provides acces to this data: open/save, transactions management etc.
  */
-class Model_Document: public ModelAPI_Document
+class Model_Document : public ModelAPI_Document
 {
-public:
+ public:
 
   //! Loads the OCAF document from the file.
   //! \param theFileName full name of the file to load
@@ -86,7 +86,10 @@ public:
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
 
   ///! Returns the id of hte document
-  MODEL_EXPORT virtual const std::string& id() const {return myID;}
+  MODEL_EXPORT virtual const std::string& id() const
+  {
+    return myID;
+  }
 
   //! Returns the feature in the group by the index (started from zero)
   //! \param theGroupID group that contains a feature
@@ -94,7 +97,7 @@ public:
   //! \param isOperation if it is true, returns feature (not Object)
   //! \param theHidden if it is true, it counts also the features that are not in tree
   MODEL_EXPORT virtual ObjectPtr object(const std::string& theGroupID, const int theIndex,
-    const bool theHidden = false);
+                                        const bool theHidden = false);
 
   //! Returns the number of features in the group
   //! If theHidden is true, it counts also the features that are not in tree
@@ -102,20 +105,19 @@ public:
 
   /// Creates a construction cresults
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
-    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a body results
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultBody> createBody(
-    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a part results
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultPart> createPart(
-    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
 
   //! Returns a feature by result (owner of result)
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
-    feature(const boost::shared_ptr<ModelAPI_Result>& theResult);
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature>
+  feature(const boost::shared_ptr<ModelAPI_Result>& theResult);
 
-
-protected:
+ protected:
 
   //! Returns (creates if needed) the features label
   TDF_Label featuresLabel();
@@ -130,7 +132,10 @@ protected:
   //! Creates new document with binary file format
   Model_Document(const std::string theID);
 
-  Handle_TDocStd_Document document() {return myDoc;}
+  Handle_TDocStd_Document document()
+  {
+    return myDoc;
+  }
 
   //! performas compactification of all nested operations into one
   void compactNested();
@@ -140,16 +145,16 @@ protected:
 
   //! Allows to store the result in the data tree of the document (attaches 'data' of result to tree)
   MODEL_EXPORT virtual void storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
-    boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex = 0);
-
+                                        boost::shared_ptr<ModelAPI_Result> theResult,
+                                        const int theResultIndex = 0);
 
   friend class Model_Application;
   friend class Model_PluginManager;
   friend class DFBrowser;
 
-private:
-  std::string myID; ///< identifier of the document in the application
-  Handle_TDocStd_Document myDoc; ///< OCAF document
+ private:
+  std::string myID;  ///< identifier of the document in the application
+  Handle_TDocStd_Document myDoc;  ///< OCAF document
   /// number of transactions after the last "save" call, used for "IsModified" method
   int myTransactionsAfterSave;
   /// number of nested transactions performed (or -1 if not nested)

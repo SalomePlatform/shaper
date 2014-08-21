@@ -14,10 +14,10 @@
 class QComboBox;
 class QVBoxLayout;
 
-class MODULEBASE_EXPORT ModuleBase_WidgetSwitch: public QFrame
+class MODULEBASE_EXPORT ModuleBase_WidgetSwitch : public QFrame
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   ModuleBase_WidgetSwitch(QWidget* parent = NULL);
   virtual ~ModuleBase_WidgetSwitch();
 
@@ -35,16 +35,16 @@ public:
   void setPageName(int index, const QString & text);
   void setPageToolTip(int index, const QString & toolTip);
 
-public slots:
+ public slots:
   void setCurrentIndex(int index);
 
 signals:
   void currentPageChanged(int);
 
-protected:
+ protected:
   void refresh();
 
-private:
+ private:
   QVBoxLayout* myMainLay;
   QComboBox* myCombo;
   QWidgetList myCases;

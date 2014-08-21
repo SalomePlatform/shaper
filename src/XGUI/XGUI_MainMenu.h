@@ -22,11 +22,11 @@ class QEvent;
  * \ingroup GUI
  * \brief Class for creation of main menu (set of workbenches)
  */
-class XGUI_EXPORT XGUI_MainMenu: public QWidget
+class XGUI_EXPORT XGUI_MainMenu : public QWidget
 {
-  Q_OBJECT
+Q_OBJECT
 
-public:
+ public:
   XGUI_MainMenu(XGUI_MainWindow *parent);
   virtual ~XGUI_MainMenu();
 
@@ -34,10 +34,13 @@ public:
   XGUI_Workbench* addWorkbench(const QString& theId, const QString& theText = "");
 
   //! Returns workbench (menu group) by the given name.
-  XGUI_Workbench* findWorkbench(const QString& theId)  const;
+  XGUI_Workbench* findWorkbench(const QString& theId) const;
 
   //! Returns General page (predefined workbench)
-  XGUI_MenuGroupPanel* generalPage() const { return myGeneralPage; }
+  XGUI_MenuGroupPanel* generalPage() const
+  {
+    return myGeneralPage;
+  }
 
   //! Rerturns last created workbench in dock widget container
   //QDockWidget* getLastDockWindow() const;
@@ -66,7 +69,7 @@ public:
 
   void updateFromResources();
 
-private:
+ private:
   XGUI_MainWindow* myDesktop;
   QTabWidget* myMenuTabs;
   XGUI_MenuGroupPanel* myGeneralPage;

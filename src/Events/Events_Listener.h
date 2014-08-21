@@ -15,9 +15,10 @@ class Events_Message;
  * If some object wants to listen some events it must inherit
  * this class and register in the Loop.
  */
-class EVENTS_EXPORT Events_Listener {
+class EVENTS_EXPORT Events_Listener
+{
 
-public:
+ public:
   //! This method is called by loop when the event is started to process.
   virtual void processEvent(const Events_Message* theMessage) = 0;
 };

@@ -17,15 +17,15 @@
 
 class Model_AttributeDocRef : public ModelAPI_AttributeDocRef
 {
-  Handle_TDataStd_Comment myComment; ///< reference to document is identified as string-id
-public:
+  Handle_TDataStd_Comment myComment;  ///< reference to document is identified as string-id
+ public:
   /// Defines the document referenced from this attribute
   MODEL_EXPORT virtual void setValue(boost::shared_ptr<ModelAPI_Document> theDoc);
 
   /// Returns document referenced from this attribute
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> value();
 
-protected:
+ protected:
   /// Initializes attibutes
   Model_AttributeDocRef(TDF_Label& theLabel);
 

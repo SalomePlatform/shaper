@@ -1,4 +1,3 @@
-
 #ifndef XGUI_DocumentDataModel_H
 #define XGUI_DocumentDataModel_H
 
@@ -22,9 +21,8 @@ class XGUI_TopDataModel;
  */
 class XGUI_EXPORT XGUI_DocumentDataModel : public QAbstractItemModel, public Events_Listener
 {
-  Q_OBJECT
-public:
-
+Q_OBJECT
+ public:
 
   XGUI_DocumentDataModel(QObject* theParent);
   virtual ~XGUI_DocumentDataModel();
@@ -32,16 +30,15 @@ public:
   // Event Listener method
   virtual void processEvent(const Events_Message* theMessage);
 
-
   virtual QVariant data(const QModelIndex& theIndex, int theRole) const;
-  virtual QVariant headerData(int theSection, Qt::Orientation theOrient,
-                              int theRole = Qt::DisplayRole) const;
+  virtual QVariant headerData(int theSection, Qt::Orientation theOrient, int theRole =
+                                  Qt::DisplayRole) const;
 
   virtual int rowCount(const QModelIndex& theParent = QModelIndex()) const;
   virtual int columnCount(const QModelIndex& theParent = QModelIndex()) const;
 
-  virtual QModelIndex index(int theRow, int theColumn, 
-                            const QModelIndex &parent = QModelIndex()) const;
+  virtual QModelIndex index(int theRow, int theColumn, const QModelIndex &parent =
+                                QModelIndex()) const;
 
   virtual QModelIndex parent(const QModelIndex& theIndex) const;
 
@@ -71,17 +68,23 @@ public:
   ResultPartPtr activePart() const;
 
   //! Retrurns QModelIndex of active part
-  QModelIndex activePartIndex() const { return myActivePartIndex; }
+  QModelIndex activePartIndex() const
+  {
+    return myActivePartIndex;
+  }
 
   //! Deactivates a Part
   void deactivatePart();
 
   void rebuildDataTree();
 
-private:
+ private:
 
-  enum {PartsFolder, HistoryNode};
-
+  enum
+  {
+    PartsFolder,
+    HistoryNode
+  };
 
   //! Converts QModelIndex of this model to QModelIndex of a one of sub-models.
   QModelIndex* toSourceModelIndex(const QModelIndex& theProxy) const;
@@ -108,7 +111,6 @@ private:
   QModelIndex partFolderNode() const;
 
   int historyOffset() const;
-
 
   //! Data model of top part of data tree (not parts object)
   XGUI_TopDataModel* myModel;

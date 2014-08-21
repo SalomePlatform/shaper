@@ -12,17 +12,18 @@
 #include <boost/shared_ptr.hpp>
 
 bool Model_FeatureValidator::isValid(const boost::shared_ptr<ModelAPI_Feature>& theFeature
-                                     /*, const std::string theAttr*/
-                                     /*, std::list<std::string> theArguments*/) const
+/*, const std::string theAttr*/
+/*, std::list<std::string> theArguments*/) const
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  if(!aData->isValid())
+  if (!aData->isValid())
     return false;
   const std::string kAllTypes = "";
   std::list<AttributePtr> aLtAttributes = aData->attributes(kAllTypes);
   std::list<AttributePtr>::iterator it = aLtAttributes.begin();
-  for( ; it != aLtAttributes.end(); it++) {
-    if(!(*it)->isInitialized()) return false;
+  for (; it != aLtAttributes.end(); it++) {
+    if (!(*it)->isInitialized())
+      return false;
   }
   return true;
 }

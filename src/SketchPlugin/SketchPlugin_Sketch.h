@@ -25,9 +25,9 @@
  * \ingroup DataModel
  * \brief Feature for creation of the new part in PartSet.
  */
-class SketchPlugin_Sketch: public SketchPlugin_Feature, public GeomAPI_IPresentable
+class SketchPlugin_Sketch : public SketchPlugin_Feature, public GeomAPI_IPresentable
 {
-public:
+ public:
   /// Sketch feature kind
   inline static const std::string& ID()
   {
@@ -66,8 +66,11 @@ public:
   }
 
   /// Returns the kind of a feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SketchPlugin_Sketch::ID(); return MY_KIND;}
+  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    static std::string MY_KIND = SketchPlugin_Sketch::ID();
+    return MY_KIND;
+  }
 
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
@@ -77,24 +80,32 @@ public:
 
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
-  SKETCHPLUGIN_EXPORT virtual const void addSub(
-    const FeaturePtr& theFeature);
+  SKETCHPLUGIN_EXPORT virtual const void addSub(const FeaturePtr& theFeature);
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved
   /// \param theDeltaY the delta for Y coordinate is moved
-  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY) {};
+  SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY)
+  {
+  }
+  ;
 
   /// Return the distance between the feature and the point
   /// \param thePoint the point
-  virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) { return 0; };
+  virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+  {
+    return 0;
+  }
+  ;
 
   /// Converts a 2D sketch space point into point in 3D space
-  SKETCHPLUGIN_EXPORT boost::shared_ptr<GeomAPI_Pnt> to3D(
-    const double theX, const double theY);
+  SKETCHPLUGIN_EXPORT boost::shared_ptr<GeomAPI_Pnt> to3D(const double theX, const double theY);
 
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
-  SKETCHPLUGIN_EXPORT virtual bool isInHistory() {return true;}
+  SKETCHPLUGIN_EXPORT virtual bool isInHistory()
+  {
+    return true;
+  }
 
   /// Use plugin manager for features creation
   SketchPlugin_Sketch();
@@ -104,7 +115,7 @@ public:
 
   virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
-protected:
+ protected:
   /// Creates a plane and append it to the list
   /// \param theX the X normal value
   /// \param theY the Y normal value

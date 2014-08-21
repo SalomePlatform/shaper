@@ -1,4 +1,3 @@
-
 #ifndef XGUI_ContextMenuMgr_H
 #define XGUI_ContextMenuMgr_H
 
@@ -13,12 +12,12 @@ class QContextMenuEvent;
 class QMenu;
 
 /**
-* A claas wihich provides manement of context menu
-*/
-class XGUI_EXPORT XGUI_ContextMenuMgr: public QObject
+ * A claas wihich provides manement of context menu
+ */
+class XGUI_EXPORT XGUI_ContextMenuMgr : public QObject
 {
 Q_OBJECT
-public:
+ public:
   XGUI_ContextMenuMgr(XGUI_Workshop* theParent);
   virtual ~XGUI_ContextMenuMgr();
 
@@ -46,19 +45,18 @@ public:
 signals:
   void actionTriggered(const QString& theId, bool isChecked);
 
-private slots:
+ private slots:
   void onAction(bool isChecked);
 
   void onContextMenuRequest(QContextMenuEvent* theEvent);
 
-private:
+ private:
   /** 
-  * Add action
-  * \param theId - string ID of the item
-  * \param theAction - action to add
-  */
+   * Add action
+   * \param theId - string ID of the item
+   * \param theAction - action to add
+   */
   void addAction(const QString& theId, QAction* theAction);
-
 
   QMenu* objectBrowserMenu() const;
   QMenu* viewerMenu() const;

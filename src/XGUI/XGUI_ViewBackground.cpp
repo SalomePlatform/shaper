@@ -5,7 +5,9 @@
  Creates invalid background data.
  */
 XGUI_ViewBackground::XGUI_ViewBackground()
-    : myTextureMode(XGUI::CenterTexture), myGradientType(XGUI::NoGradient), myTextureShown(false)
+    : myTextureMode(XGUI::CenterTexture),
+      myGradientType(XGUI::NoGradient),
+      myTextureShown(false)
 {
   setMode(XGUI::NoBackground);
 }
@@ -16,7 +18,9 @@ XGUI_ViewBackground::XGUI_ViewBackground()
  \param c color
  */
 XGUI_ViewBackground::XGUI_ViewBackground(const QColor& theColor)
-    : myTextureMode(XGUI::CenterTexture), myGradientType(XGUI::NoGradient), myTextureShown(false)
+    : myTextureMode(XGUI::CenterTexture),
+      myGradientType(XGUI::NoGradient),
+      myTextureShown(false)
 {
   setColor(theColor);
 }
@@ -31,7 +35,9 @@ XGUI_ViewBackground::XGUI_ViewBackground(const QColor& theColor)
  */
 XGUI_ViewBackground::XGUI_ViewBackground(XGUI::GradientType type, const QColor& c1,
                                          const QColor& c2)
-    : myTextureMode(XGUI::CenterTexture), myGradientType(XGUI::NoGradient), myTextureShown(false)
+    : myTextureMode(XGUI::CenterTexture),
+      myGradientType(XGUI::NoGradient),
+      myTextureShown(false)
 {
   setGradient(type, c1, c2);
 }
@@ -42,7 +48,9 @@ XGUI_ViewBackground::XGUI_ViewBackground(XGUI::GradientType type, const QColor& 
  \param grad gradient data
  */
 XGUI_ViewBackground::XGUI_ViewBackground(const QGradient& grad)
-    : myTextureMode(XGUI::CenterTexture), myGradientType(XGUI::NoGradient), myTextureShown(false)
+    : myTextureMode(XGUI::CenterTexture),
+      myGradientType(XGUI::NoGradient),
+      myTextureShown(false)
 {
   setGradient(grad);
 }

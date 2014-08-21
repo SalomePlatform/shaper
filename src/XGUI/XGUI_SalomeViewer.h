@@ -12,14 +12,17 @@ class QKeyEvent;
 class QContextMenuEvent;
 
 /**
-* A Base object for definition of connector object to
-* Salome Viewer. Reimplemented in NewGeom_SalomeViewer class
-*/
-class XGUI_EXPORT XGUI_SalomeViewer: public QObject
+ * A Base object for definition of connector object to
+ * Salome Viewer. Reimplemented in NewGeom_SalomeViewer class
+ */
+class XGUI_EXPORT XGUI_SalomeViewer : public QObject
 {
-  Q_OBJECT
-public:
-  XGUI_SalomeViewer(QObject* theParent):QObject(theParent) {}
+Q_OBJECT
+ public:
+  XGUI_SalomeViewer(QObject* theParent)
+      : QObject(theParent)
+  {
+  }
 
   //! Returns AIS_InteractiveContext from current OCCViewer
   virtual Handle(AIS_InteractiveContext) AISContext() const = 0;

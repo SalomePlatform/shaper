@@ -5,7 +5,6 @@
  *      Author: nds
  */
 
-
 #ifndef ModuleBase_IOperation_H
 #define ModuleBase_IOperation_H
 
@@ -37,11 +36,11 @@ class ModuleBase_OperationDescription;
  *  - virtual void      commitOperation();
  */
 
-class MODULEBASE_EXPORT ModuleBase_IOperation: public QObject
+class MODULEBASE_EXPORT ModuleBase_IOperation : public QObject
 {
 Q_OBJECT
 
-public:
+ public:
   /// Constructor
   /// Constructs an empty operation. Constructor should work very fast because many
   /// operators may be created after starting workshop but only several from them
@@ -73,19 +72,25 @@ public:
   //                     QList<ModuleBase_ModelWidget*> theWidgets);
 
   /// Returns True if data of its feature was modified during operation
-  virtual bool isModified() const { return myIsModified; }
+  virtual bool isModified() const
+  {
+    return myIsModified;
+  }
 
   /// Returns True id the current operation is launched in editing mode
-  bool isEditOperation() const { return myIsEditing; }
+  bool isEditOperation() const
+  {
+    return myIsEditing;
+  }
 
 signals:
-  void started(); /// the operation is started
-  void aborted(); /// the operation is aborted
-  void committed(); /// the operation is committed
-  void stopped(); /// the operation is aborted or committed
-  void resumed(); /// the operation is resumed
+  void started();  /// the operation is started
+  void aborted();  /// the operation is aborted
+  void committed();  /// the operation is committed
+  void stopped();  /// the operation is aborted or committed
+  void resumed();  /// the operation is resumed
 
-public slots:
+ public slots:
   /// Starts operation
   /// Public slot. Verifies whether operation can be started and starts operation.
   /// This slot is not virtual and cannot be redefined. Redefine startOperation method
@@ -119,7 +124,7 @@ public slots:
   /// Stores a custom value in model.
   virtual void storeCustomValue() = 0;
 
-protected:
+ protected:
   /// Virtual method called when operation started (see start() method for more description)
   /// Default impl calls corresponding slot and commits immediately.
   virtual void startOperation() = 0;
@@ -150,8 +155,8 @@ protected:
   /// Modified feature flag
   bool myIsModified;
 
-private:
-  ModuleBase_OperationDescription* myDescription; /// the container to have the operation description
+ private:
+  ModuleBase_OperationDescription* myDescription;  /// the container to have the operation description
 };
 
 #endif

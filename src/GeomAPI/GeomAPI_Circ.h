@@ -16,13 +16,12 @@ class GeomAPI_Dir;
  * \brief Circle in 3D
  */
 
-class GEOMAPI_EXPORT GeomAPI_Circ: public GeomAPI_Interface
+class GEOMAPI_EXPORT GeomAPI_Circ : public GeomAPI_Interface
 {
-public:
+ public:
   /// Creation of circle defined by center point, direction and circle radius
   GeomAPI_Circ(const boost::shared_ptr<GeomAPI_Pnt>& theCenter,
-               const boost::shared_ptr<GeomAPI_Dir>& theDir,
-               double theRadius);
+               const boost::shared_ptr<GeomAPI_Dir>& theDir, double theRadius);
 
   /// Return center of the circle
   const boost::shared_ptr<GeomAPI_Pnt> center() const;
@@ -31,7 +30,8 @@ public:
   double radius() const;
 
   /// Project point on circle
-  const boost::shared_ptr<GeomAPI_Pnt> project(const boost::shared_ptr<GeomAPI_Pnt>& thePoint) const;
+  const boost::shared_ptr<GeomAPI_Pnt> project(
+      const boost::shared_ptr<GeomAPI_Pnt>& thePoint) const;
 };
 
 #endif

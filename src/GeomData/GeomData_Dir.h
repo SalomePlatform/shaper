@@ -19,8 +19,8 @@ class GeomAPI_Dir;
  */
 class GeomData_Dir : public GeomDataAPI_Dir
 {
-  Handle_TDataStd_RealArray myCoords; ///< X, Y and Z doubles as real array attribute [0; 2]
-public:
+  Handle_TDataStd_RealArray myCoords;  ///< X, Y and Z doubles as real array attribute [0; 2]
+ public:
   /// Defines the double value
   GEOMDATA_EXPORT virtual void setValue(const double theX, const double theY, const double theZ);
   /// Defines the direction
@@ -35,7 +35,7 @@ public:
   /// Returns the direction of this attribute
   GEOMDATA_EXPORT virtual boost::shared_ptr<GeomAPI_Dir> dir();
 
-protected:
+ protected:
   /// Initializes attributes
   GEOMDATA_EXPORT GeomData_Dir(TDF_Label& theLabel);
 

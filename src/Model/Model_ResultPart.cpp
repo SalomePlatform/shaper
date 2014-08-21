@@ -13,7 +13,7 @@ boost::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
 
 boost::shared_ptr<ModelAPI_Feature> Model_ResultPart::owner()
 {
-  return boost::shared_ptr<ModelAPI_Feature>(); // return empty pointer
+  return boost::shared_ptr<ModelAPI_Feature>();  // return empty pointer
 }
 
 Model_ResultPart::Model_ResultPart()

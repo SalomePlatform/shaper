@@ -24,11 +24,10 @@
 #define DBL_MAX 1.7976931348623158e+308 
 #endif
 
-
-ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent, 
-  const Config_WidgetAPI* theData, 
-  const std::string& theParentId)
-  : ModuleBase_ModelWidget(theParent, theData, theParentId)
+ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
+                                                           const Config_WidgetAPI* theData,
+                                                           const std::string& theParentId)
+    : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aControlLay = new QHBoxLayout(myContainer);
@@ -125,7 +124,7 @@ bool ModuleBase_WidgetDoubleValue::eventFilter(QObject *theObject, QEvent *theEv
 {
   if (theObject == mySpinBox) {
     if (theEvent->type() == QEvent::KeyRelease) {
-      QKeyEvent* aKeyEvent = (QKeyEvent*)theEvent;
+      QKeyEvent* aKeyEvent = (QKeyEvent*) theEvent;
       if (aKeyEvent && aKeyEvent->key() == Qt::Key_Return) {
         emit focusOutWidget(this);
       }

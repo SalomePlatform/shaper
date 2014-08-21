@@ -15,12 +15,12 @@ class GeomAPI_Pnt;
  * \brief Line in 3D
  */
 
-class GEOMAPI_EXPORT GeomAPI_Lin: public GeomAPI_Interface
+class GEOMAPI_EXPORT GeomAPI_Lin : public GeomAPI_Interface
 {
-public:
+ public:
   /// Creation of line defined by cordinates of start and end points
   GeomAPI_Lin(const double theStartX, const double theStartY, const double theStartZ,
-              const double theEndX,   const double theEndY,   const double theEndZ);
+              const double theEndX, const double theEndY, const double theEndZ);
   /// Creation of line defined by start and end points
   GeomAPI_Lin(const boost::shared_ptr<GeomAPI_Pnt>& theStart,
               const boost::shared_ptr<GeomAPI_Pnt>& theEnd);
@@ -28,9 +28,11 @@ public:
   /// Distance between two points
   double distance(const boost::shared_ptr<GeomAPI_Pnt>& thePoint) const;
   /// Intersection of two lines
-  const boost::shared_ptr<GeomAPI_Pnt> intersect(const boost::shared_ptr<GeomAPI_Lin>& theLine) const;
+  const boost::shared_ptr<GeomAPI_Pnt> intersect(
+      const boost::shared_ptr<GeomAPI_Lin>& theLine) const;
   /// Project point on line
-  const boost::shared_ptr<GeomAPI_Pnt> project(const boost::shared_ptr<GeomAPI_Pnt>& thePoint) const;
+  const boost::shared_ptr<GeomAPI_Pnt> project(
+      const boost::shared_ptr<GeomAPI_Pnt>& thePoint) const;
 };
 
 #endif

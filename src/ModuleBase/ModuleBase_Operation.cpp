@@ -26,7 +26,7 @@
 #endif
 
 ModuleBase_Operation::ModuleBase_Operation(const QString& theId, QObject* theParent)
-: ModuleBase_IOperation(theId, theParent)
+    : ModuleBase_IOperation(theId, theParent)
 {
 }
 
@@ -51,11 +51,11 @@ bool ModuleBase_Operation::isNestedOperationsEnabled() const
 
 void ModuleBase_Operation::storeCustomValue()
 {
-  if(!myFeature){
-    #ifdef _DEBUG
+  if (!myFeature) {
+#ifdef _DEBUG
     qDebug() << "ModuleBase_Operation::storeCustom: " <<
-        "trying to store value without opening a transaction.";
-    #endif
+    "trying to store value without opening a transaction.";
+#endif
     return;
   }
 
@@ -86,7 +86,8 @@ void ModuleBase_Operation::abortOperation()
 
 void ModuleBase_Operation::commitOperation()
 {
-  if (myFeature) myFeature->execute();
+  if (myFeature)
+    myFeature->execute();
 }
 
 void ModuleBase_Operation::afterCommitOperation()
@@ -96,22 +97,22 @@ void ModuleBase_Operation::afterCommitOperation()
 bool ModuleBase_Operation::canBeCommitted() const
 {
   if (ModuleBase_IOperation::canBeCommitted()) {
-/*    FeaturePtr aFeature = feature();
-    std::string aId = aFeature->getKind();
+    /*    FeaturePtr aFeature = feature();
+     std::string aId = aFeature->getKind();
 
-    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-    ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-    std::list<ModelAPI_Validator*> aValidators;
-    aFactory->validators(aId, aValidators);
-    std::list<ModelAPI_Validator*>::const_iterator aIt;
-    for (aIt = aValidators.cbegin(); aIt != aValidators.cend(); ++aIt) {
-      const ModuleBase_FeatureValidator* aFValidator = 
-        dynamic_cast<const ModuleBase_FeatureValidator*>(*aIt);
-      if (aFValidator) {
-        if (!aFValidator->isValid(aFeature))
-          return false;
-      }
-    }*/
+     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+     ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+     std::list<ModelAPI_Validator*> aValidators;
+     aFactory->validators(aId, aValidators);
+     std::list<ModelAPI_Validator*>::const_iterator aIt;
+     for (aIt = aValidators.cbegin(); aIt != aValidators.cend(); ++aIt) {
+     const ModuleBase_FeatureValidator* aFValidator = 
+     dynamic_cast<const ModuleBase_FeatureValidator*>(*aIt);
+     if (aFValidator) {
+     if (!aFValidator->isValid(aFeature))
+     return false;
+     }
+     }*/
     return true;
   }
   return false;
@@ -131,15 +132,15 @@ FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
 {
   boost::shared_ptr<ModelAPI_Document> aDoc = document();
   myFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
-  if (myFeature) { // TODO: generate an error if feature was not created
+  if (myFeature) {  // TODO: generate an error if feature was not created
     myIsModified = true;
     myFeature->execute();
     // Init default values
     /*QList<ModuleBase_ModelWidget*> aWidgets = getDescription()->modelWidgets();
-    QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
-    for (; anIt != aLast; anIt++) {
-      (*anIt)->storeValue(aFeature);
-    }*/
+     QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
+     for (; anIt != aLast; anIt++) {
+     (*anIt)->storeValue(aFeature);
+     }*/
   }
 
   if (theFlushMessage)

@@ -18,7 +18,7 @@
  */
 class SketchSolver_Constraint
 {
-public:
+ public:
   SketchSolver_Constraint();
   SketchSolver_Constraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
@@ -30,16 +30,20 @@ public:
   const int& getType(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
   /// \brief Returns the type of myConstraint member
   inline const int& getType() const
-  { return myType; }
+  {
+    return myType;
+  }
 
   /// \brief Returns list of attributes names in the correct order required by SolveSpace
   inline const std::vector<std::string>& getAttributes() const
-  { return myAttributesList; }
+  {
+    return myAttributesList;
+  }
 
-private:
+ private:
   boost::shared_ptr<SketchPlugin_Constraint> myConstraint;
-  int                                        myType;
-  std::vector<std::string>                   myAttributesList;
+  int myType;
+  std::vector<std::string> myAttributesList;
 };
 
 #endif

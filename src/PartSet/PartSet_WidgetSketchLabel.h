@@ -10,24 +10,32 @@
 #include <ModuleBase_ModelWidget.h>
 
 class QLabel;
-class XGUI_OperationMgr; 
+class XGUI_OperationMgr;
 class PartSet_OperationSketch;
 
 class PARTSET_EXPORT PartSet_WidgetSketchLabel : public ModuleBase_ModelWidget
 {
-  Q_OBJECT
-public:
-  PartSet_WidgetSketchLabel(QWidget* theParent, 
-    const Config_WidgetAPI* theData, 
-    const std::string& theParentId);
+Q_OBJECT
+ public:
+  PartSet_WidgetSketchLabel(QWidget* theParent, const Config_WidgetAPI* theData,
+                            const std::string& theParentId);
 
-  virtual ~PartSet_WidgetSketchLabel() {};
+  virtual ~PartSet_WidgetSketchLabel()
+  {
+  }
+  ;
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed
-  virtual bool storeValue() const { return true;}
+  virtual bool storeValue() const
+  {
+    return true;
+  }
 
-  virtual bool restoreValue() { return true;}
+  virtual bool restoreValue()
+  {
+    return true;
+  }
 
   /// Returns list of widget controls
   /// \return a control list
@@ -37,10 +45,10 @@ public:
 
   void setOperationsMgr(XGUI_OperationMgr* theMgr);
 
-private slots:
+ private slots:
   void onPlaneSelected();
 
-private:
+ private:
   void updateLabel(PartSet_OperationSketch* theSketchOpe);
 
   QLabel* myLabel;

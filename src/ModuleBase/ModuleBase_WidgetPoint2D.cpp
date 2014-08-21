@@ -28,9 +28,9 @@
 #include <climits>
 
 ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
-                                                   const Config_WidgetAPI* theData, 
+                                                   const Config_WidgetAPI* theData,
                                                    const std::string& theParentId)
-: ModuleBase_ModelWidget(theParent, theData, theParentId)
+    : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   myOptionParam = theData->getProperty(PREVIOUS_FEATURE_PARAM);
   myGroupBox = new QGroupBox(QString::fromStdString(theData->getProperty(CONTAINER_PAGE_NAME)),
@@ -49,7 +49,7 @@ ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
     myXSpin->setMaximum(DBL_MAX);
     myXSpin->setToolTip("X");
     aGroupLay->addWidget(myXSpin, 0, 1);
-    
+
     connect(myXSpin, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
   }
   {
@@ -78,8 +78,8 @@ bool ModuleBase_WidgetPoint2D::setValue(ModuleBase_WidgetValue* theValue)
 {
   bool isDone = false;
   if (theValue) {
-    ModuleBase_WidgetValueFeature* aFeatureValue = 
-                         dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
+    ModuleBase_WidgetValueFeature* aFeatureValue =
+        dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue) {
       boost::shared_ptr<GeomAPI_Pnt2d> aPoint = aFeatureValue->point();
       if (aPoint) {
@@ -105,8 +105,8 @@ void ModuleBase_WidgetPoint2D::setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& 
 bool ModuleBase_WidgetPoint2D::storeValue() const
 {
   boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(attributeID()));
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aData->attribute(attributeID()));
 
   ModuleBase_WidgetPoint2D* that = (ModuleBase_WidgetPoint2D*) this;
   bool isBlocked = that->blockSignals(true);
@@ -120,8 +120,8 @@ bool ModuleBase_WidgetPoint2D::storeValue() const
 bool ModuleBase_WidgetPoint2D::restoreValue()
 {
   boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(attributeID()));
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aData->attribute(attributeID()));
 
   bool isBlocked = this->blockSignals(true);
   myXSpin->setValue(aPoint->x());
@@ -148,7 +148,7 @@ bool ModuleBase_WidgetPoint2D::eventFilter(QObject *theObject, QEvent *theEvent)
 {
   if (theObject == myXSpin || theObject == myYSpin) {
     if (theEvent->type() == QEvent::KeyRelease) {
-      QKeyEvent* aKeyEvent = (QKeyEvent*)theEvent;
+      QKeyEvent* aKeyEvent = (QKeyEvent*) theEvent;
       if (aKeyEvent && aKeyEvent->key() == Qt::Key_Return) {
         emit focusOutWidget(this);
       }
@@ -164,8 +164,8 @@ bool ModuleBase_WidgetPoint2D::initFromPrevious(ObjectPtr theObject)
   if (myOptionParam.length() == 0)
     return false;
   boost::shared_ptr<ModelAPI_Data> aData = theObject->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint =
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(myOptionParam));
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aData->attribute(myOptionParam));
   if (aPoint) {
     bool isBlocked = this->blockSignals(true);
     myXSpin->setValue(aPoint->x());

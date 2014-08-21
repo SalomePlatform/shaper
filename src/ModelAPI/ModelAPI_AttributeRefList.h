@@ -16,12 +16,18 @@
 
 class ModelAPI_AttributeRefList : public ModelAPI_Attribute
 {
-public:
+ public:
   /// Returns the type of this class of attributes
-  MODELAPI_EXPORT static std::string type() {return "RefList";}
+  MODELAPI_EXPORT static std::string type()
+  {
+    return "RefList";
+  }
 
   /// Returns the type of this class of attributes, not static method
-  MODELAPI_EXPORT virtual std::string attributeType() {return type();}
+  MODELAPI_EXPORT virtual std::string attributeType()
+  {
+    return type();
+  }
 
   /// Appends the feature to the end of a list
   MODELAPI_EXPORT virtual void append(ObjectPtr theObject) = 0;
@@ -35,10 +41,11 @@ public:
   /// Returns the list of features
   MODELAPI_EXPORT virtual std::list<ObjectPtr> list() = 0;
 
-protected:
+ protected:
   /// Objects are created for features automatically
   MODELAPI_EXPORT ModelAPI_AttributeRefList()
-  {}
+  {
+  }
 };
 
 #endif

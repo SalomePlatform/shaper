@@ -16,24 +16,23 @@
 
 class Config_FeatureMessage;
 
-class Config_FeatureReader: public Config_XMLReader
+class Config_FeatureReader : public Config_XMLReader
 {
-public:
-  Config_FeatureReader(const std::string& theXmlFile,
-                       const std::string& theLibraryName,
+ public:
+  Config_FeatureReader(const std::string& theXmlFile, const std::string& theLibraryName,
                        const char* theEventGenerated = 0);
   virtual ~Config_FeatureReader();
 
   std::list<std::string> features() const;
 
-protected:
+ protected:
   void processNode(xmlNodePtr aNode);
   bool processChildren(xmlNodePtr aNode);
 
   void fillFeature(xmlNodePtr theRoot, Config_FeatureMessage& outFeatureMessage);
   bool isInternalFeature(xmlNodePtr theRoot);
 
-private:
+ private:
   std::string myLastWorkbench;
   std::string myLastGroup;
   std::string myLibraryName;

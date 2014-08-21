@@ -12,13 +12,10 @@
 #include <QApplication>
 #include <QDialogButtonBox>
 
-
 const QString XGUI_Preferences::VIEWER_SECTION = "Viewer";
 const QString XGUI_Preferences::MENU_SECTION = "Menu";
 
-
 SUIT_ResourceMgr* XGUI_Preferences::myResourceMgr = 0;
-
 
 SUIT_ResourceMgr* XGUI_Preferences::resourceMgr()
 {
@@ -41,60 +38,58 @@ bool XGUI_Preferences::editPreferences(XGUI_Prefs& theModified)
   return false;
 }
 
-
 void XGUI_Preferences::updateCustomProps()
 {
   Config_Properties aProps = Config_PropManager::getProperties();
   Config_Properties::iterator aIt;
-  for (aIt = aProps.begin(); aIt != aProps.end(); ++ aIt) {
+  for (aIt = aProps.begin(); aIt != aProps.end(); ++aIt) {
     Config_Prop* aProp = (*aIt);
-    QString aVal = myResourceMgr->stringValue(QString(aProp->section().c_str()), 
+    QString aVal = myResourceMgr->stringValue(QString(aProp->section().c_str()),
                                               QString(aProp->name().c_str()));
     if (!aVal.isNull())
       aProp->setValue(qPrintable(aVal));
   }
 }
 
-
 void XGUI_Preferences::loadCustomProps()
 {
   QStringList aSections = myResourceMgr->sections();
-  foreach (QString aSection, aSections) {
+  foreach (QString aSection, aSections)
+  {
     QStringList aParams = myResourceMgr->parameters(aSection);
-    foreach (QString aParam, aParams) {
-      Config_PropManager::registerProp(qPrintable(aSection),
-                                       qPrintable(aParam),
-                                       "", Config_Prop::Disabled, 
+    foreach (QString aParam, aParams)
+    {
+      Config_PropManager::registerProp(qPrintable(aSection), qPrintable(aParam), "",
+                                       Config_Prop::Disabled,
                                        qPrintable(myResourceMgr->stringValue(aSection, aParam)));
     }
   }
 }
 
-
-
 //**********************************************************
 //**********************************************************
 //**********************************************************
 XGUI_PreferencesDlg::XGUI_PreferencesDlg(SUIT_ResourceMgr* theResurces, QWidget* theParent)
-  : QDialog(theParent), myIsChanged(false)
+    : QDialog(theParent),
+      myIsChanged(false)
 {
-  setWindowTitle( tr("Edit preferences") );
+  setWindowTitle(tr("Edit preferences"));
 
   QVBoxLayout* main = new QVBoxLayout(this);
-  main->setMargin( 5 );
-  main->setSpacing( 5 );
+  main->setMargin(5);
+  main->setSpacing(5);
 
   myPreferences = new XGUI_PreferencesMgr(theResurces, this);
-  main->addWidget( myPreferences );
+  main->addWidget(myPreferences);
 
-  setFocusProxy( myPreferences );
-  myPreferences->setFrameStyle( QFrame::Box | QFrame::Sunken );
+  setFocusProxy(myPreferences);
+  myPreferences->setFrameStyle(QFrame::Box | QFrame::Sunken);
 
-  QDialogButtonBox* aBtnBox = new QDialogButtonBox(
-    QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
+  QDialogButtonBox* aBtnBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                                                   Qt::Horizontal, this);
   main->addWidget(aBtnBox);
   connect(aBtnBox, SIGNAL(accepted()), this, SLOT(accept()));
-  connect(aBtnBox, SIGNAL(rejected()), this, SLOT(reject()));  
+  connect(aBtnBox, SIGNAL(rejected()), this, SLOT(reject()));
   createEditors();
 
   myPreferences->retrieve();
@@ -120,51 +115,47 @@ void XGUI_PreferencesDlg::createEditors()
 
 void XGUI_PreferencesDlg::createViewerPage(int thePageId)
 {
-  int viewTab = myPreferences->addItem( tr("Viewer"), thePageId );
+  int viewTab = myPreferences->addItem(tr("Viewer"), thePageId);
 
   QStringList gradList;
-  gradList << tr("Horizontal gradient")     << tr("Vertical gradient")        <<
-              tr("First diagonal gradient") << tr("Second diagonal gradient") <<
-              tr("First corner gradient")   << tr("Second corner gradient")   <<
-              tr("Third corner gradient")   << tr("Fourth corner gradient");
-  
+  gradList << tr("Horizontal gradient") << tr("Vertical gradient") << tr("First diagonal gradient")
+           << tr("Second diagonal gradient") << tr("First corner gradient")
+           << tr("Second corner gradient") << tr("Third corner gradient")
+           << tr("Fourth corner gradient");
+
   QList<QVariant> idList;
   for (int i = 0; i < gradList.size(); i++)
     idList << i;
 
-  int bgGroup = myPreferences->addItem( tr( "Background" ), viewTab );
+  int bgGroup = myPreferences->addItem(tr("Background"), viewTab);
 
   QString aImgFiles("Image files (*.bmp *.gif *.pix *.xwd *.rgb *.rs)");
 
-  int bgId = myPreferences->addItem( tr("Viewer 3d" ), bgGroup,
-                                  SUIT_PreferenceMgr::Background, 
-                                  XGUI_Preferences::VIEWER_SECTION, "background" );
-  myPreferences->setItemProperty( "gradient_names", gradList, bgId );
-  myPreferences->setItemProperty( "gradient_ids", idList, bgId );
-  myPreferences->setItemProperty( "texture_enabled", true, bgId );
-  myPreferences->setItemProperty( "texture_center_enabled", true, bgId );
-  myPreferences->setItemProperty( "texture_tile_enabled", true, bgId );
-  myPreferences->setItemProperty( "texture_stretch_enabled", true, bgId );
-  myPreferences->setItemProperty( "custom_enabled", false, bgId );
-  myPreferences->setItemProperty( "image_formats", aImgFiles, bgId );
+  int bgId = myPreferences->addItem(tr("Viewer 3d"), bgGroup, SUIT_PreferenceMgr::Background,
+                                    XGUI_Preferences::VIEWER_SECTION, "background");
+  myPreferences->setItemProperty("gradient_names", gradList, bgId);
+  myPreferences->setItemProperty("gradient_ids", idList, bgId);
+  myPreferences->setItemProperty("texture_enabled", true, bgId);
+  myPreferences->setItemProperty("texture_center_enabled", true, bgId);
+  myPreferences->setItemProperty("texture_tile_enabled", true, bgId);
+  myPreferences->setItemProperty("texture_stretch_enabled", true, bgId);
+  myPreferences->setItemProperty("custom_enabled", false, bgId);
+  myPreferences->setItemProperty("image_formats", aImgFiles, bgId);
 }
 
 void XGUI_PreferencesDlg::createMenuPage(int thePageId)
 {
-  int aMenuTab = myPreferences->addItem(tr("Main menu"), thePageId );
+  int aMenuTab = myPreferences->addItem(tr("Main menu"), thePageId);
 
-  int aSizeGroup = myPreferences->addItem(tr("Size"), aMenuTab );
-  myPreferences->setItemProperty( "columns", 1, aSizeGroup );
+  int aSizeGroup = myPreferences->addItem(tr("Size"), aMenuTab);
+  myPreferences->setItemProperty("columns", 1, aSizeGroup);
 
-  int aRowsNb = myPreferences->addItem( tr( "Number of rows" ), 
-                                        aSizeGroup,
-                                        SUIT_PreferenceMgr::IntSpin, 
-                                        XGUI_Preferences::MENU_SECTION, 
-                                        "rows_number" );
-  myPreferences->setItemProperty( "min", 1, aRowsNb );
-  myPreferences->setItemProperty( "max", 6, aRowsNb );
+  int aRowsNb = myPreferences->addItem(tr("Number of rows"), aSizeGroup,
+                                       SUIT_PreferenceMgr::IntSpin, XGUI_Preferences::MENU_SECTION,
+                                       "rows_number");
+  myPreferences->setItemProperty("min", 1, aRowsNb);
+  myPreferences->setItemProperty("max", 6, aRowsNb);
 }
-
 
 void XGUI_PreferencesDlg::createCustomPage(int thePageId)
 {
@@ -176,8 +167,8 @@ void XGUI_PreferencesDlg::createCustomPage(int thePageId)
   std::list<std::string>::const_iterator it;
   for (it = aSections.cbegin(); it != aSections.cend(); ++it) {
     Config_Properties aProps = Config_PropManager::getProperties(*it);
-    int aTab = myPreferences->addItem(QString((*it).c_str()), thePageId );
-    myPreferences->setItemProperty( "columns", 2, aTab );
+    int aTab = myPreferences->addItem(QString((*it).c_str()), thePageId);
+    myPreferences->setItemProperty("columns", 2, aTab);
 
     Config_Properties::const_iterator aIt;
     for (aIt = aProps.cbegin(); aIt != aProps.cend(); ++aIt) {
@@ -191,14 +182,12 @@ void XGUI_PreferencesDlg::createCustomPage(int thePageId)
       }
       // Add item
       if (aProp->type() != Config_Prop::Disabled)
-        myPreferences->addItem( tr(aProp->title().c_str()), aTab,
-                                (SUIT_PreferenceMgr::PrefItemType)aProp->type(), 
-                                QString(aProp->section().c_str()), 
-                                QString(aProp->name().c_str()) );
+        myPreferences->addItem(tr(aProp->title().c_str()), aTab,
+                               (SUIT_PreferenceMgr::PrefItemType) aProp->type(),
+                               QString(aProp->section().c_str()), QString(aProp->name().c_str()));
     }
   }
 }
-
 
 void XGUI_PreferencesDlg::accept()
 {
@@ -210,25 +199,22 @@ void XGUI_PreferencesDlg::accept()
   QDialog::accept();
 }
 
-
 void XGUI_PreferencesDlg::modified(XGUI_Prefs& theModified) const
 {
   theModified = myPreferences->modified();
 }
 
-
-
 //**********************************************************
 //**********************************************************
 //**********************************************************
-void XGUI_PreferencesMgr::changedResources( const ResourceMap& theMap)
+void XGUI_PreferencesMgr::changedResources(const ResourceMap& theMap)
 {
   myModified.clear();
   ResourceMap::ConstIterator it;
   QString sec, param;
-  for (it = theMap.begin(); it != theMap.end(); ++it ) {
+  for (it = theMap.begin(); it != theMap.end(); ++it) {
     XGUI_Pref aPref;
-    it.key()->resource( aPref.first, aPref.second );
+    it.key()->resource(aPref.first, aPref.second);
     myModified.append(aPref);
   }
 }

@@ -15,14 +15,16 @@ Model_ResultBody::Model_ResultBody()
 
 void Model_ResultBody::store(const boost::shared_ptr<GeomAPI_Shape>& theShape)
 {
-  boost::shared_ptr<Model_Data> aData =  boost::dynamic_pointer_cast<Model_Data>(data());
+  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
     TDF_Label& aShapeLab = aData->shapeLab();
     // TODO: to add the naming mechanism for shape storage in the next iteration
     TNaming_Builder aBuilder(aShapeLab);
-    if (!theShape) return; // bad shape
+    if (!theShape)
+      return;  // bad shape
     TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
-    if (aShape.IsNull()) return; // null shape inside
+    if (aShape.IsNull())
+      return;  // null shape inside
 
     aBuilder.Generated(aShape);
   }
@@ -30,7 +32,7 @@ void Model_ResultBody::store(const boost::shared_ptr<GeomAPI_Shape>& theShape)
 
 boost::shared_ptr<GeomAPI_Shape> Model_ResultBody::shape()
 {
-  boost::shared_ptr<Model_Data> aData =  boost::dynamic_pointer_cast<Model_Data>(data());
+  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
     TDF_Label& aShapeLab = aData->shapeLab();
     Handle(TNaming_NamedShape) aName;

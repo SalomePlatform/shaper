@@ -29,13 +29,13 @@ void FeaturesPlugin_Extrusion::initAttributes()
 
 void FeaturesPlugin_Extrusion::execute()
 {
-  boost::shared_ptr<ModelAPI_AttributeReference> aFaceRef = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(data()->attribute(FeaturesPlugin_Extrusion::FACE_ID()));
+  boost::shared_ptr<ModelAPI_AttributeReference> aFaceRef = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeReference>(data()->attribute(FeaturesPlugin_Extrusion::FACE_ID()));
   if (!aFaceRef)
     return;
-  boost::shared_ptr<ModelAPI_ResultConstruction> aConstr =
-    boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFaceRef->value());
-  if (!aConstr) 
+  boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = boost::dynamic_pointer_cast<
+      ModelAPI_ResultConstruction>(aFaceRef->value());
+  if (!aConstr)
     return;
   boost::shared_ptr<GeomAPI_Shape> aFace = aConstr->shape();
   if (!aFace)

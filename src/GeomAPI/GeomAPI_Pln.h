@@ -16,9 +16,9 @@ class GeomAPI_Dir;
  * \brief 3D point defined by three coordinates
  */
 
-class GEOMAPI_EXPORT GeomAPI_Pln: public GeomAPI_Interface
+class GEOMAPI_EXPORT GeomAPI_Pln : public GeomAPI_Interface
 {
-public:
+ public:
   /// Creation of plane by the point and normal
   GeomAPI_Pln(const boost::shared_ptr<GeomAPI_Pnt>& thePoint,
               const boost::shared_ptr<GeomAPI_Dir>& theNormal);

@@ -18,8 +18,8 @@
  */
 class Model_ResultBody : public ModelAPI_ResultBody
 {
-  boost::shared_ptr<ModelAPI_Feature> myOwner; ///< owner of this result
-public:
+  boost::shared_ptr<ModelAPI_Feature> myOwner;  ///< owner of this result
+ public:
   /// Stores the shape (called by the execution method).
   MODEL_EXPORT virtual void store(const boost::shared_ptr<GeomAPI_Shape>& theShape);
   /// Returns the shape-result produced by this feature
@@ -27,7 +27,7 @@ public:
   /// Returns the source feature of this result
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> owner();
 
-protected:
+ protected:
   /// Makes a body on the given feature
   Model_ResultBody();
 

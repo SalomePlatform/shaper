@@ -8,14 +8,14 @@
 #include "GeomAPI_AISObject.h"
 
 /**
-* A class which defines an interface of object which is able to create its own presentation
-*/ 
+ * A class which defines an interface of object which is able to create its own presentation
+ */
 class GeomAPI_IPresentable
 {
-public:
+ public:
   /** Returns the AIS preview
-  *   \param thePrevious - defines a presentation if it was created previously
-  */
+   *   \param thePrevious - defines a presentation if it was created previously
+   */
   virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious) = 0;
 };
 

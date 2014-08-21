@@ -9,15 +9,15 @@
 #include <BRep_Builder.hxx>
 #include <TopoDS_Compound.hxx>
 
-boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_CompoundBuilder::compound
-                            (std::list<boost::shared_ptr<GeomAPI_Shape> > theShapes)
+boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_CompoundBuilder::compound(
+    std::list<boost::shared_ptr<GeomAPI_Shape> > theShapes)
 {
   BRep_Builder aBuilder;
   TopoDS_Compound aComp;
   aBuilder.MakeCompound(aComp);
 
-  std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = theShapes.begin(),
-                                                               aLast = theShapes.end();
+  std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = theShapes.begin(), aLast =
+      theShapes.end();
   for (; anIt != aLast; anIt++) {
     aBuilder.Add(aComp, (*anIt)->impl<TopoDS_Shape>());
   }

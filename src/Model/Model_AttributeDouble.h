@@ -17,15 +17,15 @@
 
 class Model_AttributeDouble : public ModelAPI_AttributeDouble
 {
-  Handle_TDataStd_Real myReal; ///< double is Real attribute
-public:
+  Handle_TDataStd_Real myReal;  ///< double is Real attribute
+ public:
   /// Defines the double value
   MODEL_EXPORT virtual void setValue(const double theValue);
 
   /// Returns the double value
   MODEL_EXPORT virtual double value();
 
-protected:
+ protected:
   /// Initializes attibutes
   Model_AttributeDouble(TDF_Label& theLabel);
 

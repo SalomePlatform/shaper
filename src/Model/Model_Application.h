@@ -19,13 +19,14 @@ DEFINE_STANDARD_HANDLE(Model_Application, TDocStd_Application)
  * Application supports the formats and document management. It is uses OCAF-lke
  * architecture and just implements specific features of the module.
  */
-class Model_Application: public TDocStd_Application
+class Model_Application : public TDocStd_Application
 {
-public:
+ public:
   // useful methods inside of the module
 
   // CASCADE RTTI
-  DEFINE_STANDARD_RTTI(Model_Application);
+  DEFINE_STANDARD_RTTI(Model_Application)
+  ;
 
   //! Retuns the application: one per process    
   MODEL_EXPORT static Handle_Model_Application getApplication();
@@ -41,7 +42,7 @@ public:
   //! Defines that specified document must be loaded by demand
   void setLoadByDemand(std::string theID);
 
-public:
+ public:
   // Redefined OCAF methods
   //! Return name of resource (i.e. "Standard")
   Standard_CString ResourcesName();
@@ -53,7 +54,7 @@ public:
   //! the static instance of the object (or derive your own application)
   Model_Application();
 
-private:
+ private:
   /// Map from string identifiers to created documents of an application
   std::map<std::string, boost::shared_ptr<Model_Document> > myDocs;
   /// Path for the loaded by demand documents

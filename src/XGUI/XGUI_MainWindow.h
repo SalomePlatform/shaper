@@ -18,11 +18,11 @@ class QCloseEvent;
  * \brief Main window of the application (Desktop).
  * It contains: Object Browser, 3d Viewer, Python console, property panel, main menu
  */
-class XGUI_EXPORT XGUI_MainWindow: public QMainWindow
+class XGUI_EXPORT XGUI_MainWindow : public QMainWindow
 {
 Q_OBJECT
 
-public:
+ public:
   XGUI_MainWindow(QWidget* parent = 0);
   virtual ~XGUI_MainWindow();
 
@@ -41,7 +41,7 @@ public:
     return myViewer;
   }
 
-public slots:
+ public slots:
   void showPythonConsole();
   void hidePythonConsole();
   //! Python console can be a dock widget 
@@ -50,8 +50,8 @@ public slots:
   void undockPythonConsole();
 
   void createSubWindow();
-  
-private slots:
+
+ private slots:
   void cascadeWindows();
   void onViewCreated(XGUI_ViewWindow* theWindow);
   void onDeleteView(XGUI_ViewWindow* theWindow);
@@ -61,24 +61,25 @@ private slots:
 signals:
   void exitKeySequence();
 
-protected:
+ protected:
   void closeEvent(QCloseEvent* event);
   void createMainMenu();
 
-private:
+ private:
   XGUI_MainMenu* myMenuBar;
   XGUI_Viewer* myViewer;
 
   PyConsole_EnhConsole* myPythonConsole;
 };
 
-class XGUI_EXPORT CloseEventWatcher: public QObject {
-  Q_OBJECT
+class XGUI_EXPORT CloseEventWatcher : public QObject
+{
+Q_OBJECT
 
  public:
   CloseEventWatcher(QObject* theParent);
 
- signals:
+signals:
   void widgetClosed();
 
  protected:

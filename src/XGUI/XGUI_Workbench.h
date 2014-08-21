@@ -13,10 +13,10 @@ class CommandsArea;
 class QHBoxLayout;
 class QPushButton;
 
-class XGUI_EXPORT XGUI_Workbench: public QWidget
+class XGUI_EXPORT XGUI_Workbench : public QWidget
 {
 Q_OBJECT
-public:
+ public:
   XGUI_Workbench(QWidget* theParent);
 
   XGUI_MenuGroupPanel* addGroup(const QString& theId);
@@ -28,16 +28,15 @@ public:
   //! Returns list of created commands
   QList<XGUI_Command*> features() const;
 
-private slots:
+ private slots:
   void onLeftScroll();
   void onRightScroll();
 
-protected:
+ protected:
   virtual void resizeEvent(QResizeEvent * theEvent);
   virtual bool eventFilter(QObject *theObj, QEvent *theEvent);
 
-
-private:
+ private:
   void addSeparator();
   bool isExceedsLeft();
   bool isExceedsRight();

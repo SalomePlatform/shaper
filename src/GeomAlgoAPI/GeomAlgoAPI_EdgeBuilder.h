@@ -18,22 +18,21 @@
 
 class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
 {
-public:
+ public:
   /// Creates linear edge by two points
-  static boost::shared_ptr<GeomAPI_Edge> line(
-    boost::shared_ptr<GeomAPI_Pnt> theStart, boost::shared_ptr<GeomAPI_Pnt> theEnd);
+  static boost::shared_ptr<GeomAPI_Edge> line(boost::shared_ptr<GeomAPI_Pnt> theStart,
+                                              boost::shared_ptr<GeomAPI_Pnt> theEnd);
 
   /// Creates linear edge in a form of a circle by a point and a circle radius
-  static boost::shared_ptr<GeomAPI_Edge> lineCircle(
-    boost::shared_ptr<GeomAPI_Pnt> theCenter,
-    boost::shared_ptr<GeomAPI_Dir> theNormal, double theRadius);
+  static boost::shared_ptr<GeomAPI_Edge> lineCircle(boost::shared_ptr<GeomAPI_Pnt> theCenter,
+                                                    boost::shared_ptr<GeomAPI_Dir> theNormal,
+                                                    double theRadius);
 
   /// Creates linear edge in a form of a circle arc by a three points
-  static boost::shared_ptr<GeomAPI_Edge> lineCircleArc(
-    boost::shared_ptr<GeomAPI_Pnt> theCenter,
-    boost::shared_ptr<GeomAPI_Pnt> theStartPoint,
-    boost::shared_ptr<GeomAPI_Pnt> theEndPoint,
-    boost::shared_ptr<GeomAPI_Dir> theNormal);
+  static boost::shared_ptr<GeomAPI_Edge> lineCircleArc(boost::shared_ptr<GeomAPI_Pnt> theCenter,
+                                                       boost::shared_ptr<GeomAPI_Pnt> theStartPoint,
+                                                       boost::shared_ptr<GeomAPI_Pnt> theEndPoint,
+                                                       boost::shared_ptr<GeomAPI_Dir> theNormal);
 };
 
 #endif

@@ -10,7 +10,10 @@
 #include <iostream>
 
 XGUI_MenuGroupPanel::XGUI_MenuGroupPanel(QWidget *parent)
-    : QFrame(parent), myNewRow(0), myNewCol(0), myMaxRow(1)
+    : QFrame(parent),
+      myNewRow(0),
+      myNewCol(0),
+      myMaxRow(1)
 {
   myLayout = new QGridLayout(this);
   myLayout->setSpacing(0);
@@ -18,8 +21,6 @@ XGUI_MenuGroupPanel::XGUI_MenuGroupPanel(QWidget *parent)
   myLayout->setContentsMargins(0, 0, 0, 0);
   setFrameShape(QFrame::NoFrame);
 }
-
-
 
 void XGUI_MenuGroupPanel::addCommand(XGUI_Command* theAction)
 {
@@ -59,10 +60,11 @@ void XGUI_MenuGroupPanel::resizeEvent(QResizeEvent* theEvent)
   myMaxRow = aMaxRow;
   myNewRow = 0;
   myNewCol = 0;
-  foreach(QWidget* eachWidget, myActionWidget) {
+  foreach(QWidget* eachWidget, myActionWidget)
+  {
     placeWidget(eachWidget);
   }
-  myLayout->setRowStretch(myMaxRow + 1,  1);
+  myLayout->setRowStretch(myMaxRow + 1, 1);
 }
 
 XGUI_Command* XGUI_MenuGroupPanel::addFeature(const QString& theId, const QString& theTitle,
@@ -78,10 +80,10 @@ XGUI_Command* XGUI_MenuGroupPanel::addFeature(const QString& theId, const QStrin
   return aCommand;
 }
 
-
 XGUI_Command* XGUI_MenuGroupPanel::feature(const QString& theId) const
 {
-  foreach (XGUI_Command* aCmd, myActions) {
+  foreach (XGUI_Command* aCmd, myActions)
+  {
     if (aCmd->data().toString() == theId)
       return aCmd;
   }

@@ -17,9 +17,9 @@ class GeomAPI_Dir;
  * \brief 2D point defined by two coordinates
  */
 
-class GEOMAPI_EXPORT GeomAPI_Pnt2d: public GeomAPI_Interface
+class GEOMAPI_EXPORT GeomAPI_Pnt2d : public GeomAPI_Interface
 {
-public:
+ public:
   /// Creation of point by coordinates
   GeomAPI_Pnt2d(const double theX, const double theY);
   /// Creation of point by coordinates

@@ -15,7 +15,7 @@
 
 using namespace std;
 
-Model_Update MY_INSTANCE; /// the only one instance initialized on load of the library
+Model_Update MY_INSTANCE;  /// the only one instance initialized on load of the library
 
 Model_Update::Model_Update()
 {
@@ -25,25 +25,26 @@ Model_Update::Model_Update()
 
 void Model_Update::processEvent(const Events_Message* theMessage)
 {
-  if (isExecuted) return; // nothing to do: it is executed now
+  if (isExecuted)
+    return;  // nothing to do: it is executed now
   //Events_LongOp::start(this);
   isExecuted = true;
-  const ModelAPI_ObjectUpdatedMessage* aMsg = 
-    dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
+  const ModelAPI_ObjectUpdatedMessage* aMsg =
+      dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
   myInitial = aMsg->objects();
   // collect all documents involved into the update
   set<boost::shared_ptr<ModelAPI_Document> > aDocs;
   set<boost::shared_ptr<ModelAPI_Object> >::iterator aFIter = myInitial.begin();
-  for(; aFIter != myInitial.end(); aFIter++) {
+  for (; aFIter != myInitial.end(); aFIter++) {
     aDocs.insert((*aFIter)->document());
   }
   // iterate all features of features-documents to update them (including hidden)
   set<boost::shared_ptr<ModelAPI_Document> >::iterator aDIter = aDocs.begin();
-  for(; aDIter != aDocs.end(); aDIter++) {
+  for (; aDIter != aDocs.end(); aDIter++) {
     int aNbFeatures = (*aDIter)->size(ModelAPI_Feature::group(), true);
-    for(int aFIndex = 0; aFIndex < aNbFeatures; aFIndex++) {
-      FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>
-        ((*aDIter)->object(ModelAPI_Feature::group(), aFIndex, true));
+    for (int aFIndex = 0; aFIndex < aNbFeatures; aFIndex++) {
+      FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(
+          (*aDIter)->object(ModelAPI_Feature::group(), aFIndex, true));
       if (aFeature)
         updateFeature(aFeature);
     }
@@ -63,25 +64,25 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
     return myUpdated[theFeature];
   // check all features this feature depended on (recursive call of updateFeature)
   bool aMustbeUpdated = myInitial.find(theFeature) != myInitial.end();
-  if (theFeature) { // only real feature contains references to other objects
+  if (theFeature) {  // only real feature contains references to other objects
     // references
-    list<boost::shared_ptr<ModelAPI_Attribute> > aRefs = 
-      theFeature->data()->attributes(ModelAPI_AttributeReference::type());
+    list<boost::shared_ptr<ModelAPI_Attribute> > aRefs = theFeature->data()->attributes(
+        ModelAPI_AttributeReference::type());
     list<boost::shared_ptr<ModelAPI_Attribute> >::iterator aRefsIter = aRefs.begin();
-    for(; aRefsIter != aRefs.end(); aRefsIter++) {
-      boost::shared_ptr<ModelAPI_Object> aSub =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(*aRefsIter)->value();
+    for (; aRefsIter != aRefs.end(); aRefsIter++) {
+      boost::shared_ptr<ModelAPI_Object> aSub = boost::dynamic_pointer_cast<
+          ModelAPI_AttributeReference>(*aRefsIter)->value();
       if (updateObject(aSub)) {
         aMustbeUpdated = true;
       }
     }
     // lists of references
     aRefs = theFeature->data()->attributes(ModelAPI_AttributeRefList::type());
-    for(aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
-      list<ObjectPtr> aListRef = 
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*aRefsIter)->list();
+    for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
+      list<ObjectPtr> aListRef = boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*aRefsIter)
+          ->list();
       list<ObjectPtr>::iterator aListIter = aListRef.begin();
-      for(; aListIter != aListRef.end(); aListIter++) {
+      for (; aListIter != aListRef.end(); aListIter++) {
         boost::shared_ptr<ModelAPI_Object> aSub = *aListIter;
         if (updateObject(aSub)) {
           aMustbeUpdated = true;
@@ -95,17 +96,17 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
       static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      for(; aRIter != aResults.cend(); aRIter++) {
+      for (; aRIter != aResults.cend(); aRIter++) {
         boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
         myUpdated[aRes] = true;
         ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
       }
       // to redisplay "presentable" feature (for ex. distance constraint)
       ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
-    } else { // returns also true is results were updated: for sketch that refers to sub-features but results of sub-features were changed
+    } else {  // returns also true is results were updated: for sketch that refers to sub-features but results of sub-features were changed
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      for(; aRIter != aResults.cend(); aRIter++) {
+      for (; aRIter != aResults.cend(); aRIter++) {
         if (myInitial.find(*aRIter) != myInitial.end()) {
           aMustbeUpdated = true;
           break;
@@ -119,15 +120,15 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
 
 bool Model_Update::updateObject(boost::shared_ptr<ModelAPI_Object> theObject)
 {
-  if (!theObject) 
+  if (!theObject)
     return false;
   FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
-  if (aFeature) { // for feature just call update Feature
+  if (aFeature) {  // for feature just call update Feature
     return updateFeature(aFeature);
   }
   // check general object, possible just a result
   if (myUpdated.find(theObject) != myUpdated.end())
-    return myUpdated[theObject]; // already processed
+    return myUpdated[theObject];  // already processed
   // check the feature of this object must be executed
   ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
   if (aResult) {
@@ -138,5 +139,5 @@ bool Model_Update::updateObject(boost::shared_ptr<ModelAPI_Object> theObject)
   }
   if (myInitial.find(theObject) != myInitial.end())
     return true;
-  return false; // nothing is known
+  return false;  // nothing is known
 }

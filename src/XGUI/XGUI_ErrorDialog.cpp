@@ -20,10 +20,10 @@ XGUI_ErrorDialog::XGUI_ErrorDialog(QWidget* parent)
   myErrorLog = new QTextEdit(this);
   myErrorLog->setReadOnly(true);
   aDlgLay->addWidget(myErrorLog);
-  QDialogButtonBox* aButtonBox =
-      new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, this);
+  QDialogButtonBox* aButtonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal,
+                                                      this);
   aDlgLay->addWidget(aButtonBox);
-  aDlgLay->setContentsMargins(2,2,2,2);
+  aDlgLay->setContentsMargins(2, 2, 2, 2);
   aDlgLay->setSpacing(2);
   setLayout(aDlgLay);
   resize(420, 240);
@@ -56,7 +56,7 @@ void XGUI_ErrorDialog::addError(const QString& theError)
 {
   myErrors.append(theError);
   refresh();
-  if(!isVisible()) {
+  if (!isVisible()) {
     show();
     raise();
     activateWindow();

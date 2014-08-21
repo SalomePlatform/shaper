@@ -16,7 +16,7 @@
 
 class ModelAPI_AttributeRefAttr : public ModelAPI_Attribute
 {
-public:
+ public:
   /// Returns true if this attribute references to a object (not to the attribute)
   MODELAPI_EXPORT virtual bool isObject() = 0;
 
@@ -33,18 +33,27 @@ public:
   MODELAPI_EXPORT virtual ObjectPtr object() = 0;
 
   /// Returns the type of this class of attributes
-  MODELAPI_EXPORT static std::string type() {return "RefAttr";}
+  MODELAPI_EXPORT static std::string type()
+  {
+    return "RefAttr";
+  }
 
   /// Returns the type of this class of attributes, not static method
-  MODELAPI_EXPORT virtual std::string attributeType() {return type();}
+  MODELAPI_EXPORT virtual std::string attributeType()
+  {
+    return type();
+  }
 
   /// To virtually destroy the fields of successors
-  MODELAPI_EXPORT virtual ~ModelAPI_AttributeRefAttr() {}
+  MODELAPI_EXPORT virtual ~ModelAPI_AttributeRefAttr()
+  {
+  }
 
-protected:
+ protected:
   /// Objects are created for features automatically
   MODELAPI_EXPORT ModelAPI_AttributeRefAttr()
-  {}
+  {
+  }
 };
 
 #endif

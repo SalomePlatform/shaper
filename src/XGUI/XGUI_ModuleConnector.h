@@ -5,7 +5,6 @@
 #ifndef XGUI_ModuleConnector_H
 #define XGUI_ModuleConnector_H
 
-
 #include "XGUI.h"
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_IWorkshop.h>
@@ -15,12 +14,12 @@ class XGUI_Workshop;
 class XGUI_Displayer;
 
 /**
-* Implementation of IWorkshop interface which provides access to Workshop sevices at module level
-*/
-class XGUI_EXPORT XGUI_ModuleConnector: public ModuleBase_IWorkshop
+ * Implementation of IWorkshop interface which provides access to Workshop sevices at module level
+ */
+class XGUI_EXPORT XGUI_ModuleConnector : public ModuleBase_IWorkshop
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   XGUI_ModuleConnector(XGUI_Workshop* theWorkshop);
 
   virtual ~XGUI_ModuleConnector();
@@ -29,12 +28,12 @@ public:
   virtual Handle(AIS_InteractiveContext) AISContext() const;
 
   //! Returns list of currently selected data objects
-  virtual QList<ObjectPtr> selectedObjects() const; 
+  virtual QList<ObjectPtr> selectedObjects() const;
 
   //! Returns instance of loaded module
   virtual ModuleBase_IModule* module() const;
 
-private:
+ private:
   XGUI_Workshop* myWorkshop;
 };
 

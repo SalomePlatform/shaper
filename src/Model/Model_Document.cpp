@@ -34,19 +34,19 @@
 # define _separator_ '/'
 #endif
 
-static const int UNDO_LIMIT = 10; // number of possible undo operations
+static const int UNDO_LIMIT = 10;  // number of possible undo operations
 
-static const int TAG_GENERAL = 1; // general properties tag
-static const int TAG_OBJECTS = 2; // tag of the objects sub-tree (features, results)
-static const int TAG_HISTORY = 3; // tag of the history sub-tree (python dump)
+static const int TAG_GENERAL = 1;  // general properties tag
+static const int TAG_OBJECTS = 2;  // tag of the objects sub-tree (features, results)
+static const int TAG_HISTORY = 3;  // tag of the history sub-tree (python dump)
 
 // feature sub-labels
-static const int TAG_FEATURE_ARGUMENTS = 1; ///< where the arguments are located
-static const int TAG_FEATURE_RESULTS = 2; ///< where the results are located
-
+static const int TAG_FEATURE_ARGUMENTS = 1;  ///< where the arguments are located
+static const int TAG_FEATURE_RESULTS = 2;  ///< where the results are located
 
 Model_Document::Model_Document(const std::string theID)
-    : myID(theID), myDoc(new TDocStd_Document("BinOcaf")) // binary OCAF format
+    : myID(theID),
+      myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
 {
   myDoc->SetUndoLimit(UNDO_LIMIT);
   myTransactionsAfterSave = 0;
@@ -62,10 +62,10 @@ Model_Document::Model_Document(const std::string theID)
 /// Returns the file name of this document by the nameof directory and identifuer of a document
 static TCollection_ExtendedString DocFileName(const char* theFileName, const std::string& theID)
 {
-  TCollection_ExtendedString aPath ((const Standard_CString)theFileName);
+  TCollection_ExtendedString aPath((const Standard_CString) theFileName);
   aPath += _separator_;
   aPath += theID.c_str();
-  aPath += ".cbf"; // standard binary file extension
+  aPath += ".cbf";  // standard binary file extension
   return aPath;
 }
 
@@ -75,59 +75,68 @@ bool Model_Document::load(const char* theFileName)
   if (this == Model_PluginManager::get()->rootDocument().get()) {
     anApp->setLoadPath(theFileName);
   }
-  TCollection_ExtendedString aPath (DocFileName(theFileName, myID));
+  TCollection_ExtendedString aPath(DocFileName(theFileName, myID));
   PCDM_ReaderStatus aStatus = (PCDM_ReaderStatus) -1;
-  try
-  {
+  try {
     aStatus = anApp->Open(aPath, myDoc);
-  }
-  catch (Standard_Failure)
-  {
+  } catch (Standard_Failure) {
     Handle(Standard_Failure) aFail = Standard_Failure::Caught();
-    Events_Error::send(std::string("Exception in opening of document: ") + aFail->GetMessageString());
+    Events_Error::send(
+        std::string("Exception in opening of document: ") + aFail->GetMessageString());
     return false;
   }
   bool isError = aStatus != PCDM_RS_OK;
-  if (isError)
-  {
-    switch (aStatus)
-    {
-    case PCDM_RS_UnknownDocument: 
-      Events_Error::send(std::string("Can not open document: PCDM_RS_UnknownDocument")); break;
-    case PCDM_RS_AlreadyRetrieved: 
-      Events_Error::send(std::string("Can not open document: PCDM_RS_AlreadyRetrieved")); break;
-    case PCDM_RS_AlreadyRetrievedAndModified:
-      Events_Error::send(
-        std::string("Can not open document: PCDM_RS_AlreadyRetrievedAndModified"));
-      break;
-    case PCDM_RS_NoDriver:
-      Events_Error::send(std::string("Can not open document: PCDM_RS_NoDriver")); break;
-    case PCDM_RS_UnknownFileDriver:
-      Events_Error::send(std::string("Can not open document: PCDM_RS_UnknownFileDriver")); break;
-    case PCDM_RS_OpenError:
-      Events_Error::send(std::string("Can not open document: PCDM_RS_OpenError")); break;
-    case PCDM_RS_NoVersion:
-      Events_Error::send(std::string("Can not open document: PCDM_RS_NoVersion")); break;
-    case PCDM_RS_NoModel:
-      Events_Error::send(std::string("Can not open document: PCDM_RS_NoModel")); break;
-    case PCDM_RS_NoDocument:
-      Events_Error::send(std::string("Can not open document: PCDM_RS_NoDocument")); break;
-    case PCDM_RS_FormatFailure:
-      Events_Error::send(std::string("Can not open document: PCDM_RS_FormatFailure")); break;
-    case PCDM_RS_TypeNotFoundInSchema:
-      Events_Error::send(std::string("Can not open document: PCDM_RS_TypeNotFoundInSchema")); 
-      break;
-    case PCDM_RS_UnrecognizedFileFormat:
-      Events_Error::send(std::string("Can not open document: PCDM_RS_UnrecognizedFileFormat")); 
-      break;
-    case PCDM_RS_MakeFailure:
-      Events_Error::send(std::string("Can not open document: PCDM_RS_MakeFailure")); break;
-    case PCDM_RS_PermissionDenied:
-      Events_Error::send(std::string("Can not open document: PCDM_RS_PermissionDenied")); break;
-    case PCDM_RS_DriverFailure:
-      Events_Error::send(std::string("Can not open document: PCDM_RS_DriverFailure")); break;
-    default:
-      Events_Error::send(std::string("Can not open document: unknown error")); break;
+  if (isError) {
+    switch (aStatus) {
+      case PCDM_RS_UnknownDocument:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_UnknownDocument"));
+        break;
+      case PCDM_RS_AlreadyRetrieved:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_AlreadyRetrieved"));
+        break;
+      case PCDM_RS_AlreadyRetrievedAndModified:
+        Events_Error::send(
+            std::string("Can not open document: PCDM_RS_AlreadyRetrievedAndModified"));
+        break;
+      case PCDM_RS_NoDriver:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_NoDriver"));
+        break;
+      case PCDM_RS_UnknownFileDriver:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_UnknownFileDriver"));
+        break;
+      case PCDM_RS_OpenError:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_OpenError"));
+        break;
+      case PCDM_RS_NoVersion:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_NoVersion"));
+        break;
+      case PCDM_RS_NoModel:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_NoModel"));
+        break;
+      case PCDM_RS_NoDocument:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_NoDocument"));
+        break;
+      case PCDM_RS_FormatFailure:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_FormatFailure"));
+        break;
+      case PCDM_RS_TypeNotFoundInSchema:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_TypeNotFoundInSchema"));
+        break;
+      case PCDM_RS_UnrecognizedFileFormat:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_UnrecognizedFileFormat"));
+        break;
+      case PCDM_RS_MakeFailure:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_MakeFailure"));
+        break;
+      case PCDM_RS_PermissionDenied:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_PermissionDenied"));
+        break;
+      case PCDM_RS_DriverFailure:
+        Events_Error::send(std::string("Can not open document: PCDM_RS_DriverFailure"));
+        break;
+      default:
+        Events_Error::send(std::string("Can not open document: unknown error"));
+        break;
     }
   }
   if (!isError) {
@@ -144,7 +153,7 @@ bool Model_Document::save(const char* theFileName)
 #ifdef WIN32
     CreateDirectory(theFileName, NULL);
 #else
-    mkdir(theFileName, 0x1ff); 
+    mkdir(theFileName, 0x1ff);
 #endif
   }
   // filename in the dir is id of document inside of the given directory
@@ -152,33 +161,31 @@ bool Model_Document::save(const char* theFileName)
   PCDM_StoreStatus aStatus;
   try {
     aStatus = Model_Application::getApplication()->SaveAs(myDoc, aPath);
-  }
-  catch (Standard_Failure) {
+  } catch (Standard_Failure) {
     Handle(Standard_Failure) aFail = Standard_Failure::Caught();
-    Events_Error::send(std::string("Exception in saving of document: ") + aFail->GetMessageString());
+    Events_Error::send(
+        std::string("Exception in saving of document: ") + aFail->GetMessageString());
     return false;
   }
   bool isDone = aStatus == PCDM_SS_OK || aStatus == PCDM_SS_No_Obj;
-  if (!isDone)
-  {
-    switch (aStatus)
-    {
-    case PCDM_SS_DriverFailure:
-      Events_Error::send(std::string("Can not save document: PCDM_SS_DriverFailure"));
-      break;
-    case PCDM_SS_WriteFailure:
-      Events_Error::send(std::string("Can not save document: PCDM_SS_WriteFailure"));
-      break;
-    case PCDM_SS_Failure:
-    default:
-      Events_Error::send(std::string("Can not save document: PCDM_SS_Failure"));
-      break;
+  if (!isDone) {
+    switch (aStatus) {
+      case PCDM_SS_DriverFailure:
+        Events_Error::send(std::string("Can not save document: PCDM_SS_DriverFailure"));
+        break;
+      case PCDM_SS_WriteFailure:
+        Events_Error::send(std::string("Can not save document: PCDM_SS_WriteFailure"));
+        break;
+      case PCDM_SS_Failure:
+      default:
+        Events_Error::send(std::string("Can not save document: PCDM_SS_Failure"));
+        break;
     }
   }
   myTransactionsAfterSave = 0;
-  if (isDone) { // save also sub-documents if any
+  if (isDone) {  // save also sub-documents if any
     std::set<std::string>::iterator aSubIter = mySubs.begin();
-    for(; aSubIter != mySubs.end() && isDone; aSubIter++)
+    for (; aSubIter != mySubs.end() && isDone; aSubIter++)
       isDone = subDocument(*aSubIter)->save(theFileName);
   }
   return isDone;
@@ -187,26 +194,25 @@ bool Model_Document::save(const char* theFileName)
 void Model_Document::close()
 {
   boost::shared_ptr<ModelAPI_PluginManager> aPM = Model_PluginManager::get();
-  if (this != aPM->rootDocument().get() && 
-      this == aPM->currentDocument().get()) {
+  if (this != aPM->rootDocument().get() && this == aPM->currentDocument().get()) {
     aPM->setCurrentDocument(aPM->rootDocument());
   }
   // close all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for(; aSubIter != mySubs.end(); aSubIter++)
+  for (; aSubIter != mySubs.end(); aSubIter++)
     subDocument(*aSubIter)->close();
   mySubs.clear();
   // close this
   /* do not close because it can be undoed
-  if (myDoc->CanClose() == CDM_CCS_OK)
-    myDoc->Close();
-  Model_Application::getApplication()->deleteDocument(myID);
-  */
+   if (myDoc->CanClose() == CDM_CCS_OK)
+   myDoc->Close();
+   Model_Application::getApplication()->deleteDocument(myID);
+   */
 }
 
 void Model_Document::startOperation()
 {
-  if (myDoc->HasOpenCommand()) { // start of nested command
+  if (myDoc->HasOpenCommand()) {  // start of nested command
     if (myNestedNum == -1) {
       myNestedNum = 0;
       myDoc->InitDeltaCompaction();
@@ -214,18 +220,19 @@ void Model_Document::startOperation()
     myIsEmptyTr[myTransactionsAfterSave] = false;
     myTransactionsAfterSave++;
     myDoc->NewCommand();
-  } else { // start the simple command
+  } else {  // start the simple command
     myDoc->NewCommand();
   }
   // new command for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for(; aSubIter != mySubs.end(); aSubIter++)
+  for (; aSubIter != mySubs.end(); aSubIter++)
     subDocument(*aSubIter)->startOperation();
 }
 
-void Model_Document::compactNested() {
+void Model_Document::compactNested()
+{
   bool allWasEmpty = true;
-  while(myNestedNum != -1) {
+  while (myNestedNum != -1) {
     myTransactionsAfterSave--;
     if (!myIsEmptyTr[myTransactionsAfterSave]) {
       allWasEmpty = false;
@@ -241,19 +248,19 @@ void Model_Document::compactNested() {
 void Model_Document::finishOperation()
 {
   // just to be sure that everybody knows that changes were performed
-  
+
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
-    boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
-      setCheckTransactions(false); // for nested transaction commit
+    boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
+        ->setCheckTransactions(false);  // for nested transaction commit
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
-    boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
-      setCheckTransactions(true); // for nested transaction commit
+    boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
+        ->setCheckTransactions(true);  // for nested transaction commit
 
-  if (myNestedNum != -1) // this nested transaction is owervritten
+  if (myNestedNum != -1)  // this nested transaction is owervritten
     myNestedNum++;
   if (!myDoc->HasOpenCommand()) {
     if (myNestedNum != -1) {
@@ -262,20 +269,20 @@ void Model_Document::finishOperation()
     }
   } else {
     // returns false if delta is empty and no transaction was made
-    myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();// && (myNestedNum == -1);
+    myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();  // && (myNestedNum == -1);
     myTransactionsAfterSave++;
   }
 
   // finish for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for(; aSubIter != mySubs.end(); aSubIter++)
+  for (; aSubIter != mySubs.end(); aSubIter++)
     subDocument(*aSubIter)->finishOperation();
 }
 
 void Model_Document::abortOperation()
 {
-  if (myNestedNum > 0 && !myDoc->HasOpenCommand()) { // abort all what was done in nested
-    // first compact all nested
+  if (myNestedNum > 0 && !myDoc->HasOpenCommand()) {  // abort all what was done in nested
+      // first compact all nested
     compactNested();
     // for nested it is undo and clear redos
     myDoc->Undo();
@@ -283,21 +290,21 @@ void Model_Document::abortOperation()
     myTransactionsAfterSave--;
     myIsEmptyTr.erase(myTransactionsAfterSave);
   } else {
-    if (myNestedNum == 0) // abort only high-level
+    if (myNestedNum == 0)  // abort only high-level
       myNestedNum = -1;
     myDoc->AbortCommand();
   }
   synchronizeFeatures(true);
   // abort for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
-    for(; aSubIter != mySubs.end(); aSubIter++)
+  for (; aSubIter != mySubs.end(); aSubIter++)
     subDocument(*aSubIter)->abortOperation();
 }
 
 bool Model_Document::isOperation()
 {
   // operation is opened for all documents: no need to check subs
-  return myDoc->HasOpenCommand() == Standard_True;
+  return myDoc->HasOpenCommand() == Standard_True ;
 }
 
 bool Model_Document::isModified()
@@ -308,11 +315,12 @@ bool Model_Document::isModified()
 
 bool Model_Document::canUndo()
 {
-  if (myDoc->GetAvailableUndos() > 0 && myNestedNum != 0 && myTransactionsAfterSave != 0 /* for omitting the first useless transaction */)
+  if (myDoc->GetAvailableUndos() > 0 && myNestedNum != 0
+      && myTransactionsAfterSave != 0 /* for omitting the first useless transaction */)
     return true;
   // check other subs contains operation that can be undoed
   std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for(; aSubIter != mySubs.end(); aSubIter++)
+  for (; aSubIter != mySubs.end(); aSubIter++)
     if (subDocument(*aSubIter)->canUndo())
       return true;
   return false;
@@ -321,13 +329,14 @@ bool Model_Document::canUndo()
 void Model_Document::undo()
 {
   myTransactionsAfterSave--;
-  if (myNestedNum > 0) myNestedNum--;
+  if (myNestedNum > 0)
+    myNestedNum--;
   if (!myIsEmptyTr[myTransactionsAfterSave])
     myDoc->Undo();
   synchronizeFeatures(true);
   // undo for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for(; aSubIter != mySubs.end(); aSubIter++)
+  for (; aSubIter != mySubs.end(); aSubIter++)
     subDocument(*aSubIter)->undo();
 }
 
@@ -337,7 +346,7 @@ bool Model_Document::canRedo()
     return true;
   // check other subs contains operation that can be redoed
   std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for(; aSubIter != mySubs.end(); aSubIter++)
+  for (; aSubIter != mySubs.end(); aSubIter++)
     if (subDocument(*aSubIter)->canRedo())
       return true;
   return false;
@@ -345,27 +354,29 @@ bool Model_Document::canRedo()
 
 void Model_Document::redo()
 {
-  if (myNestedNum != -1) myNestedNum++;
+  if (myNestedNum != -1)
+    myNestedNum++;
   if (!myIsEmptyTr[myTransactionsAfterSave])
     myDoc->Redo();
   myTransactionsAfterSave++;
   synchronizeFeatures(true);
   // redo for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for(; aSubIter != mySubs.end(); aSubIter++)
+  for (; aSubIter != mySubs.end(); aSubIter++)
     subDocument(*aSubIter)->redo();
 }
 
 /// Appenad to the array of references a new referenced label
-static void AddToRefArray(TDF_Label& theArrayLab, TDF_Label& theReferenced) {
+static void AddToRefArray(TDF_Label& theArrayLab, TDF_Label& theReferenced)
+{
   Handle(TDataStd_ReferenceArray) aRefs;
   if (!theArrayLab.FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
     aRefs = TDataStd_ReferenceArray::Set(theArrayLab, 0, 0);
     aRefs->SetValue(0, theReferenced);
-  } else { // extend array by one more element
-    Handle(TDataStd_HLabelArray1) aNewArray = 
-      new TDataStd_HLabelArray1(aRefs->Lower(), aRefs->Upper() + 1);
-    for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) {
+  } else {  // extend array by one more element
+    Handle(TDataStd_HLabelArray1) aNewArray = new TDataStd_HLabelArray1(aRefs->Lower(),
+                                                                        aRefs->Upper() + 1);
+    for (int a = aRefs->Lower(); a <= aRefs->Upper(); a++) {
       aNewArray->SetValue(a, aRefs->Value(a));
     }
     aNewArray->SetValue(aRefs->Upper() + 1, theReferenced);
@@ -378,11 +389,11 @@ FeaturePtr Model_Document::addFeature(std::string theID)
   TDF_Label anEmptyLab;
   FeaturePtr anEmptyFeature;
   FeaturePtr aFeature = ModelAPI_PluginManager::get()->createFeature(theID);
-  boost::shared_ptr<Model_Document> aDocToAdd = 
-    boost::dynamic_pointer_cast<Model_Document>(aFeature->documentToAdd());
+  boost::shared_ptr<Model_Document> aDocToAdd = boost::dynamic_pointer_cast<Model_Document>(
+      aFeature->documentToAdd());
   if (aFeature) {
     TDF_Label aFeatureLab;
-    if (!aFeature->isAction()) {// do not add action to the data model
+    if (!aFeature->isAction()) {  // do not add action to the data model
       TDF_Label aFeaturesLab = aDocToAdd->featuresLabel();
       aFeatureLab = aFeaturesLab.NewChild();
       aDocToAdd->initData(aFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
@@ -394,7 +405,7 @@ FeaturePtr Model_Document::addFeature(std::string theID)
         AddToRefArray(aFeaturesLab, aFeatureLab);
       }
     }
-    if (!aFeature->isAction()) {// do not add action to the data model
+    if (!aFeature->isAction()) {  // do not add action to the data model
       // event: feature is added
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
@@ -406,21 +417,22 @@ FeaturePtr Model_Document::addFeature(std::string theID)
 /// Appenad to the array of references a new referenced label.
 /// If theIndex is not -1, removes element at thisindex, not theReferenced.
 /// \returns the index of removed element
-static int RemoveFromRefArray(
-  TDF_Label theArrayLab, TDF_Label theReferenced, const int theIndex = -1) {
-  int aResult = -1; // no returned
+static int RemoveFromRefArray(TDF_Label theArrayLab, TDF_Label theReferenced, const int theIndex =
+                                  -1)
+{
+  int aResult = -1;  // no returned
   Handle(TDataStd_ReferenceArray) aRefs;
   if (theArrayLab.FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
-    if (aRefs->Length() == 1) { // just erase an array
+    if (aRefs->Length() == 1) {  // just erase an array
       if ((theIndex == -1 && aRefs->Value(0) == theReferenced) || theIndex == 0) {
         theArrayLab.ForgetAttribute(TDataStd_ReferenceArray::GetID());
       }
       aResult = 0;
-    } else { // reduce the array
-      Handle(TDataStd_HLabelArray1) aNewArray = 
-        new TDataStd_HLabelArray1(aRefs->Lower(), aRefs->Upper() - 1);
+    } else {  // reduce the array
+      Handle(TDataStd_HLabelArray1) aNewArray = new TDataStd_HLabelArray1(aRefs->Lower(),
+                                                                          aRefs->Upper() - 1);
       int aCount = aRefs->Lower();
-      for(int a = aCount; a <= aRefs->Upper(); a++, aCount++) {
+      for (int a = aCount; a <= aRefs->Upper(); a++, aCount++) {
         if ((theIndex == -1 && aRefs->Value(a) == theReferenced) || theIndex == a) {
           aCount--;
           aResult = a;
@@ -438,9 +450,10 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
 {
   boost::shared_ptr<Model_Data> aData = boost::static_pointer_cast<Model_Data>(theFeature->data());
   TDF_Label aFeatureLabel = aData->label().Father();
-  if (myObjs.IsBound(aFeatureLabel)) 
+  if (myObjs.IsBound(aFeatureLabel))
     myObjs.UnBind(aFeatureLabel);
-  else return; // not found feature => do not remove
+  else
+    return;  // not found feature => do not remove
 
   // erase all attributes under the label of feature
   aFeatureLabel.ForgetAllAttributes();
@@ -453,9 +466,9 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
   static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
   std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-  for(; aRIter != aResults.cend(); aRIter++) {
+  for (; aRIter != aResults.cend(); aRIter++) {
     boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-    aRes->setData(boost::shared_ptr<ModelAPI_Data>()); // deleted flag
+    aRes->setData(boost::shared_ptr<ModelAPI_Data>());  // deleted flag
     ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
     ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), aRes->groupName());
   }
@@ -465,7 +478,7 @@ FeaturePtr Model_Document::feature(TDF_Label& theLabel)
 {
   if (myObjs.IsBound(theLabel))
     return myObjs.Find(theLabel);
-  return FeaturePtr(); // not found
+  return FeaturePtr();  // not found
 }
 
 ObjectPtr Model_Document::object(TDF_Label theLabel)
@@ -474,19 +487,19 @@ ObjectPtr Model_Document::object(TDF_Label theLabel)
   FeaturePtr aFeature = feature(theLabel);
   if (aFeature)
     return feature(theLabel);
-  TDF_Label aFeatureLabel = theLabel.Father().Father(); // let's suppose it is result
+  TDF_Label aFeatureLabel = theLabel.Father().Father();  // let's suppose it is result
   aFeature = feature(aFeatureLabel);
   if (aFeature) {
     const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
     std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.cbegin();
-    for(; aRIter != aResults.cend(); aRIter++) {
-      boost::shared_ptr<Model_Data> aResData = 
-        boost::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
+    for (; aRIter != aResults.cend(); aRIter++) {
+      boost::shared_ptr<Model_Data> aResData = boost::dynamic_pointer_cast<Model_Data>(
+          (*aRIter)->data());
       if (aResData->label().Father().IsEqual(theLabel))
         return *aRIter;
     }
   }
-  return FeaturePtr(); // not found
+  return FeaturePtr();  // not found
 }
 
 boost::shared_ptr<ModelAPI_Document> Model_Document::subDocument(std::string theDocID)
@@ -497,14 +510,14 @@ boost::shared_ptr<ModelAPI_Document> Model_Document::subDocument(std::string the
   return Model_Application::getApplication()->getDocument(theDocID);
 }
 
-ObjectPtr Model_Document::object(const std::string& theGroupID, 
-  const int theIndex, const bool theHidden)
+ObjectPtr Model_Document::object(const std::string& theGroupID, const int theIndex,
+                                 const bool theHidden)
 {
   if (theGroupID == ModelAPI_Feature::group()) {
     if (theHidden) {
       int anIndex = 0;
       TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
-      for(; aLabIter.More(); aLabIter.Next()) {
+      for (; aLabIter.More(); aLabIter.Next()) {
         if (theIndex == anIndex) {
           TDF_Label aFLabel = aLabIter.Value()->Label();
           return feature(aFLabel);
@@ -524,12 +537,12 @@ ObjectPtr Model_Document::object(const std::string& theGroupID,
     // comment must be in any feature: it is kind
     int anIndex = 0;
     TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
-    for(; aLabIter.More(); aLabIter.Next()) {
+    for (; aLabIter.More(); aLabIter.Next()) {
       TDF_Label aFLabel = aLabIter.Value()->Label();
       FeaturePtr aFeature = feature(aFLabel);
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      for(; aRIter != aResults.cend(); aRIter++) {
+      for (; aRIter != aResults.cend(); aRIter++) {
         if ((theHidden || (*aRIter)->isInHistory()) && (*aRIter)->groupName() == theGroupID) {
           if (anIndex == theIndex)
             return *aRIter;
@@ -542,7 +555,7 @@ ObjectPtr Model_Document::object(const std::string& theGroupID,
   return ObjectPtr();
 }
 
-int Model_Document::size(const std::string& theGroupID, const bool theHidden) 
+int Model_Document::size(const std::string& theGroupID, const bool theHidden)
 {
   int aResult = 0;
   if (theGroupID == ModelAPI_Feature::group()) {
@@ -556,12 +569,12 @@ int Model_Document::size(const std::string& theGroupID, const bool theHidden)
   } else {
     // comment must be in any feature: it is kind
     TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
-    for(; aLabIter.More(); aLabIter.Next()) {
+    for (; aLabIter.More(); aLabIter.Next()) {
       TDF_Label aFLabel = aLabIter.Value()->Label();
       FeaturePtr aFeature = feature(aFLabel);
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      for(; aRIter != aResults.cend(); aRIter++) {
+      for (; aRIter != aResults.cend(); aRIter++) {
         if ((theHidden || (*aRIter)->isInHistory()) && (*aRIter)->groupName() == theGroupID) {
           aResult++;
         }
@@ -579,45 +592,48 @@ TDF_Label Model_Document::featuresLabel()
 
 void Model_Document::setUniqueName(FeaturePtr theFeature)
 {
-  if (!theFeature->data()->name().empty()) return; // not needed, name is already defined
-  std::string aName; // result
+  if (!theFeature->data()->name().empty())
+    return;  // not needed, name is already defined
+  std::string aName;  // result
   // first count all objects of such kind to start with index = count + 1
   int aNumObjects = 0;
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myObjs);
-  for(; aFIter.More(); aFIter.Next()) {
+  for (; aFIter.More(); aFIter.Next()) {
     if (aFIter.Value()->getKind() == theFeature->getKind())
       aNumObjects++;
   }
   // generate candidate name
   std::stringstream aNameStream;
-  aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
+  aNameStream << theFeature->getKind() << "_" << aNumObjects + 1;
   aName = aNameStream.str();
   // check this is unique, if not, increase index by 1
-  for(aFIter.Initialize(myObjs); aFIter.More(); ) {
+  for (aFIter.Initialize(myObjs); aFIter.More();) {
     FeaturePtr aFeature = aFIter.Value();
     bool isSameName = aFeature->isInHistory() && aFeature->data()->name() == aName;
-    if (!isSameName) { // check also results to avoid same results names (actual for Parts)
+    if (!isSameName) {  // check also results to avoid same results names (actual for Parts)
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      for(; aRIter != aResults.cend(); aRIter++) {
+      for (; aRIter != aResults.cend(); aRIter++) {
         isSameName = (*aRIter)->isInHistory() && (*aRIter)->data()->name() == aName;
       }
     }
     if (isSameName) {
       aNumObjects++;
       std::stringstream aNameStream;
-      aNameStream<<theFeature->getKind()<<"_"<<aNumObjects + 1;
+      aNameStream << theFeature->getKind() << "_" << aNumObjects + 1;
       aName = aNameStream.str();
       // reinitialize iterator to make sure a new name is unique
       aFIter.Initialize(myObjs);
-    } else aFIter.Next();
+    } else
+      aFIter.Next();
   }
   theFeature->data()->setName(aName);
 }
 
-void Model_Document::initData(ObjectPtr theObj, TDF_Label theLab, const int theTag) {
-  boost::shared_ptr<ModelAPI_Document> aThis = 
-    Model_Application::getApplication()->getDocument(myID);
+void Model_Document::initData(ObjectPtr theObj, TDF_Label theLab, const int theTag)
+{
+  boost::shared_ptr<ModelAPI_Document> aThis = Model_Application::getApplication()->getDocument(
+      myID);
   boost::shared_ptr<Model_Data> aData(new Model_Data);
   aData->setLabel(theLab.FindChild(theTag));
   aData->setObject(theObj);
@@ -625,26 +641,26 @@ void Model_Document::initData(ObjectPtr theObj, TDF_Label theLab, const int theT
   theObj->setData(aData);
   FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
   if (aFeature) {
-    setUniqueName(aFeature); // must be before "initAttributes" because duplicate part uses name
+    setUniqueName(aFeature);  // must be before "initAttributes" because duplicate part uses name
     aFeature->initAttributes();
   }
 }
 
 void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
 {
-  boost::shared_ptr<ModelAPI_Document> aThis = 
-    Model_Application::getApplication()->getDocument(myID);
+  boost::shared_ptr<ModelAPI_Document> aThis = Model_Application::getApplication()->getDocument(
+      myID);
   // update all objects by checking are they of labels or not
   std::set<FeaturePtr> aNewFeatures, aKeptFeatures;
   TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
-  for(; aLabIter.More(); aLabIter.Next()) {
+  for (; aLabIter.More(); aLabIter.Next()) {
     TDF_Label aFeatureLabel = aLabIter.Value()->Label();
-    if (!myObjs.IsBound(aFeatureLabel)) { // a new feature is inserted
+    if (!myObjs.IsBound(aFeatureLabel)) {  // a new feature is inserted
       // create a feature
       FeaturePtr aNewObj = ModelAPI_PluginManager::get()->createFeature(
-        TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
-        .ToCString());
-      if (!aNewObj) { // somethig is wrong, most probably, the opened document has invalid structure
+          TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
+              .ToCString());
+      if (!aNewObj) {  // somethig is wrong, most probably, the opened document has invalid structure
         Events_Error::send("Invalid type of object in the document");
         aLabIter.Value()->Label().ForgetAllAttributes();
         continue;
@@ -658,7 +674,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
       ModelAPI_EventCreator::get()->sendUpdated(aNewObj, anEvent);
       // feature for this label is added, so go to the next label
-    } else { // nothing is changed, both iterators are incremented
+    } else {  // nothing is changed, both iterators are incremented
       aKeptFeatures.insert(myObjs.Find(aFeatureLabel));
       if (theMarkUpdated) {
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
@@ -668,14 +684,14 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   }
   // execute new features to restore results: after features creation to make all references valid
   /*std::set<FeaturePtr>::iterator aNewIter = aNewFeatures.begin();
-  for(; aNewIter != aNewFeatures.end(); aNewIter++) {
-      (*aNewIter)->execute();
-  }*/
+   for(; aNewIter != aNewFeatures.end(); aNewIter++) {
+   (*aNewIter)->execute();
+   }*/
   // check all features are checked: if not => it was removed
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myObjs);
-  while(aFIter.More()) {
-    if (aKeptFeatures.find(aFIter.Value()) == aKeptFeatures.end() &&
-        aNewFeatures.find(aFIter.Value()) == aNewFeatures.end()) {
+  while (aFIter.More()) {
+    if (aKeptFeatures.find(aFIter.Value()) == aKeptFeatures.end()
+        && aNewFeatures.find(aFIter.Value()) == aNewFeatures.end()) {
       FeaturePtr aFeature = aFIter.Value();
       TDF_Label aLab = aFIter.Key();
       aFIter.Next();
@@ -688,7 +704,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      for(; aRIter != aResults.cend(); aRIter++) {
+      for (; aRIter != aResults.cend(); aRIter++) {
         boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
         //aRes->setData(boost::shared_ptr<ModelAPI_Data>()); // deleted flag
         ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
@@ -696,39 +712,45 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       }
       // redisplay also removed feature (used for sketch and AISObject)
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
-    } else aFIter.Next();
+    } else
+      aFIter.Next();
   }
 
   // after all updates, sends a message that groups of features were created or updated
-  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
-    setCheckTransactions(false);
+  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->setCheckTransactions(
+      false);
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   if (theMarkUpdated)
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->
-    setCheckTransactions(true);
+  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->setCheckTransactions(
+      true);
 }
 
 void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
-  boost::shared_ptr<ModelAPI_Result> theResult, const int theResultIndex)
+                                 boost::shared_ptr<ModelAPI_Result> theResult,
+                                 const int theResultIndex)
 {
-  boost::shared_ptr<ModelAPI_Document> aThis = 
-    Model_Application::getApplication()->getDocument(myID);
+  boost::shared_ptr<ModelAPI_Document> aThis = Model_Application::getApplication()->getDocument(
+      myID);
   theResult->setDoc(aThis);
-  initData(theResult, boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->label().
-    Father().FindChild(TAG_FEATURE_RESULTS).FindChild(theResultIndex + 1), TAG_FEATURE_ARGUMENTS);
-  if (theResult->data()->name().empty()) { // if was not initialized, generate event and set a name
+  initData(
+      theResult,
+      boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->label().Father().FindChild(
+          TAG_FEATURE_RESULTS).FindChild(theResultIndex + 1),
+      TAG_FEATURE_ARGUMENTS);
+  if (theResult->data()->name().empty()) {  // if was not initialized, generate event and set a name
     theResult->data()->setName(theFeatureData->name());
   }
 }
 
 boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstruction(
-  const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  ObjectPtr anOldObject = object(boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
-    label().Father().FindChild(TAG_FEATURE_RESULTS).FindChild(theIndex + 1));
+  ObjectPtr anOldObject = object(
+      boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->label().Father().FindChild(
+          TAG_FEATURE_RESULTS).FindChild(theIndex + 1));
   boost::shared_ptr<ModelAPI_ResultConstruction> aResult;
   if (anOldObject) {
     aResult = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anOldObject);
@@ -741,10 +763,11 @@ boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstructio
 }
 
 boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody(
-  const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  ObjectPtr anOldObject = object(boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
-    label().Father().FindChild(TAG_FEATURE_RESULTS).FindChild(theIndex + 1));
+  ObjectPtr anOldObject = object(
+      boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->label().Father().FindChild(
+          TAG_FEATURE_RESULTS).FindChild(theIndex + 1));
   boost::shared_ptr<ModelAPI_ResultBody> aResult;
   if (anOldObject) {
     aResult = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(anOldObject);
@@ -757,10 +780,11 @@ boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody(
 }
 
 boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
-  const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  ObjectPtr anOldObject = object(boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->
-    label().Father().FindChild(TAG_FEATURE_RESULTS).FindChild(theIndex + 1));
+  ObjectPtr anOldObject = object(
+      boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->label().Father().FindChild(
+          TAG_FEATURE_RESULTS).FindChild(theIndex + 1));
   boost::shared_ptr<ModelAPI_ResultPart> aResult;
   if (anOldObject) {
     aResult = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(anOldObject);
@@ -773,7 +797,7 @@ boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
 }
 
 boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
-  const boost::shared_ptr<ModelAPI_Result>& theResult)
+    const boost::shared_ptr<ModelAPI_Result>& theResult)
 {
   boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theResult->data());
   if (aData) {
@@ -783,12 +807,12 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
   return FeaturePtr();
 }
 
-Standard_Integer HashCode(const TDF_Label& theLab,const Standard_Integer theUpper)
+Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper)
 {
   return TDF_LabelMapHasher::HashCode(theLab, theUpper);
 
 }
-Standard_Boolean IsEqual(const TDF_Label& theLab1,const TDF_Label& theLab2)
+Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2)
 {
   return TDF_LabelMapHasher::IsEqual(theLab1, theLab2);
 }

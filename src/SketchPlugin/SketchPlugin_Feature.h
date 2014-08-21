@@ -20,20 +20,25 @@ class Handle_AIS_InteractiveObject;
  * \brief Feature for creation of the new feature in PartSet. This is an abstract class to give
  * an interface to create the sketch feature preview.
  */
-class SketchPlugin_Feature: public ModelAPI_Feature
+class SketchPlugin_Feature : public ModelAPI_Feature
 {
-public:
+ public:
   /// Simple creation of interactive object by the result of the object
-  static AISObjectPtr simpleAISObject(
-    boost::shared_ptr<ModelAPI_Result> theRes, AISObjectPtr thePrevious);
+  static AISObjectPtr simpleAISObject(boost::shared_ptr<ModelAPI_Result> theRes,
+                                      AISObjectPtr thePrevious);
 
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
-  SKETCHPLUGIN_EXPORT virtual const void addSub(
-    const FeaturePtr& theFeature) {};
+  SKETCHPLUGIN_EXPORT virtual const void addSub(const FeaturePtr& theFeature)
+  {
+  }
+  ;
 
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
-  SKETCHPLUGIN_EXPORT virtual bool isInHistory() {return false;}
+  SKETCHPLUGIN_EXPORT virtual bool isInHistory()
+  {
+    return false;
+  }
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved
@@ -44,9 +49,12 @@ public:
   /// \param thePoint the point
   virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) = 0;
 
-protected:
+ protected:
   /// Sets the higher-level feature for the sub-feature (sketch for line)
-  void setSketch(SketchPlugin_Sketch* theSketch) {mySketch = theSketch;}
+  void setSketch(SketchPlugin_Sketch* theSketch)
+  {
+    mySketch = theSketch;
+  }
   /// Returns the sketch of this feature
   SketchPlugin_Sketch* sketch();
   /// initializes mySketch
@@ -54,9 +62,9 @@ protected:
 
   friend class SketchPlugin_Sketch;
 
-private:
-  boost::shared_ptr<GeomAPI_Shape> myPreview; ///< the preview shape
-  SketchPlugin_Sketch* mySketch; /// sketch that contains this feature
+ private:
+  boost::shared_ptr<GeomAPI_Shape> myPreview;  ///< the preview shape
+  SketchPlugin_Sketch* mySketch;  /// sketch that contains this feature
 };
 
 #endif

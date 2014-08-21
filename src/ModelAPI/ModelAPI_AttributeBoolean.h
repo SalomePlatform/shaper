@@ -14,7 +14,7 @@
 
 class ModelAPI_AttributeBoolean : public ModelAPI_Attribute
 {
-public:
+ public:
   /// Defines the double value
   MODELAPI_EXPORT virtual void setValue(bool theValue) = 0;
 
@@ -22,17 +22,27 @@ public:
   MODELAPI_EXPORT virtual bool value() = 0;
 
   /// Returns the type of this class of attributes
-  MODELAPI_EXPORT static std::string type() {return "Boolean";}
+  MODELAPI_EXPORT static std::string type()
+  {
+    return "Boolean";
+  }
 
   /// Returns the type of this class of attributes, not static method
-  MODELAPI_EXPORT virtual std::string attributeType() {return type();}
+  MODELAPI_EXPORT virtual std::string attributeType()
+  {
+    return type();
+  }
 
   /// To virtually destroy the fields of successors
-  MODELAPI_EXPORT virtual ~ModelAPI_AttributeBoolean() {}
+  MODELAPI_EXPORT virtual ~ModelAPI_AttributeBoolean()
+  {
+  }
 
-protected:
+ protected:
   /// Objects are created for features automatically
-  MODELAPI_EXPORT ModelAPI_AttributeBoolean() {}
+  MODELAPI_EXPORT ModelAPI_AttributeBoolean()
+  {
+  }
 };
 
 #endif

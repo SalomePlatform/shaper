@@ -13,12 +13,14 @@
 #define MY_PNT2D static_cast<gp_Pnt2d*>(myImpl)
 
 GeomAPI_Pnt2d::GeomAPI_Pnt2d(const double theX, const double theY)
-  : GeomAPI_Interface(new gp_Pnt2d(theX, theY))
-{}
+    : GeomAPI_Interface(new gp_Pnt2d(theX, theY))
+{
+}
 
 GeomAPI_Pnt2d::GeomAPI_Pnt2d(const boost::shared_ptr<GeomAPI_XY>& theCoords)
-  : GeomAPI_Interface(new gp_Pnt2d(theCoords->x(), theCoords->y()))
-{}
+    : GeomAPI_Interface(new gp_Pnt2d(theCoords->x(), theCoords->y()))
+{
+}
 
 double GeomAPI_Pnt2d::x() const
 {
@@ -44,8 +46,8 @@ boost::shared_ptr<GeomAPI_Pnt> GeomAPI_Pnt2d::to3D(const boost::shared_ptr<GeomA
                                                    const boost::shared_ptr<GeomAPI_Dir>& theDirX,
                                                    const boost::shared_ptr<GeomAPI_Dir>& theDirY)
 {
-  boost::shared_ptr<GeomAPI_XYZ> aSum = theOrigin->xyz()->added(
-    theDirX->xyz()->multiplied(x()))->added(theDirY->xyz()->multiplied(y()));
+  boost::shared_ptr<GeomAPI_XYZ> aSum = theOrigin->xyz()->added(theDirX->xyz()->multiplied(x()))
+      ->added(theDirY->xyz()->multiplied(y()));
 
   return boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
 }

@@ -16,15 +16,18 @@ class QWidget;
 /*!
  \class PartSet_EditLine
  * \brief The class to give an editor to modify a real value
-*/
+ */
 class PARTSET_EXPORT PartSet_EditLine : public QObject
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   /// Constructor
   PartSet_EditLine(QWidget* theParent);
   /// Destructor
-  virtual ~PartSet_EditLine() {};
+  virtual ~PartSet_EditLine()
+  {
+  }
+  ;
 
   /// Show the editor in the given global position
   /// \param thePoint a position
@@ -43,17 +46,17 @@ signals:
   /// \param theValue the editor value
   void stopped(double theValue);
 
-protected:
+ protected:
   /// Returns the editor value
   /// \return the real value
   double getValue() const;
 
-protected slots:
+ protected slots:
   /// Slot to check the editing stop
   void onStopEditing();
 
-protected:
-  QLineEdit* myEditor; /// the value editor
+ protected:
+  QLineEdit* myEditor;  /// the value editor
 };
 
 #endif

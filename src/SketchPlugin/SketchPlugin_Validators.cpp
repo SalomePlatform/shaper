@@ -9,8 +9,7 @@
 #include <ModelAPI_ResultValidator.h>
 #include <GeomDataAPI_Point2D.h>
 
-
-bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature, 
+bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
                                                  const std::list<std::string>& theArguments,
                                                  const ObjectPtr& theObject) const
 {
@@ -19,8 +18,8 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
   // If the object is not a line then it is accepted
-  const ModelAPI_ResultValidator* aLineValidator = dynamic_cast<const ModelAPI_ResultValidator*>(
-                                              aFactory->validator("Model_ResultLineValidator"));
+  const ModelAPI_ResultValidator* aLineValidator =
+      dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("Model_ResultLineValidator"));
   if (!aLineValidator->isValid(theObject))
     return true;
 
@@ -30,6 +29,4 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
     return true;
   return false;
 }
-
-
 

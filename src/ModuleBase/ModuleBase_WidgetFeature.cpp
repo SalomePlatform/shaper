@@ -27,9 +27,9 @@
 #include <QLabel>
 
 ModuleBase_WidgetFeature::ModuleBase_WidgetFeature(QWidget* theParent,
-                                                   const Config_WidgetAPI* theData, 
+                                                   const Config_WidgetAPI* theData,
                                                    const std::string& theParentId)
-: ModuleBase_ModelWidget(theParent, theData, theParentId)
+    : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aControlLay = new QHBoxLayout(myContainer);
@@ -61,8 +61,8 @@ bool ModuleBase_WidgetFeature::setValue(ModuleBase_WidgetValue* theValue)
   bool isDone = false;
 
   if (theValue) {
-    ModuleBase_WidgetValueFeature* aFeatureValue = 
-                         dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
+    ModuleBase_WidgetValueFeature* aFeatureValue =
+        dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue)
       isDone = setObject(aFeatureValue->object());
   }
@@ -80,9 +80,9 @@ bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject, bool theSen
   // Check the type of selected object
   std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
   bool isValid = true;
-  for(; aValidator != aValidators.end(); aValidator++) {
-    const ModelAPI_ResultValidator* aResValidator = 
-      dynamic_cast<const ModelAPI_ResultValidator*>(*aValidator);
+  for (; aValidator != aValidators.end(); aValidator++) {
+    const ModelAPI_ResultValidator* aResValidator =
+        dynamic_cast<const ModelAPI_ResultValidator*>(*aValidator);
     if (aResValidator) {
       isValid = false;
       if (aResValidator->isValid(theObject)) {
@@ -97,9 +97,9 @@ bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject, bool theSen
   // Check the acceptability of the object as attribute
   aValidator = aValidators.begin();
   std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
-  for(; aValidator != aValidators.end(); aValidator++, aArgs++) {
-    const ModelAPI_AttributeValidator* aAttrValidator = 
-      dynamic_cast<const ModelAPI_AttributeValidator*>(*aValidator);
+  for (; aValidator != aValidators.end(); aValidator++, aArgs++) {
+    const ModelAPI_AttributeValidator* aAttrValidator =
+        dynamic_cast<const ModelAPI_AttributeValidator*>(*aValidator);
     if (aAttrValidator) {
       if (!aAttrValidator->isValid(myFeature, *aArgs, theObject)) {
         return false;
@@ -120,8 +120,8 @@ bool ModuleBase_WidgetFeature::storeValue() const
   //if (!aFeature)
   //  return false;
   boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
-          boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
   ModuleBase_WidgetFeature* that = (ModuleBase_WidgetFeature*) this;
   aRef->setObject(myObject);
@@ -133,8 +133,8 @@ bool ModuleBase_WidgetFeature::storeValue() const
 bool ModuleBase_WidgetFeature::restoreValue()
 {
   boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
-          boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
   ObjectPtr aObj = aRef->object();
   FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aRef->object());

@@ -12,7 +12,6 @@
 
 #include <list>
 
-
 int shapesNbPoints(const ModuleBase_ISelection* theSelection)
 {
   std::list<ModuleBase_ViewerPrs> aList = theSelection->getSelected();

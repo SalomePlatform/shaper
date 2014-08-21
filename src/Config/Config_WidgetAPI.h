@@ -25,10 +25,9 @@ typedef xmlDoc *xmlDocPtr;
 struct _xmlDoc;
 //<<
 
-
 class CONFIG_EXPORT Config_WidgetAPI
 {
-public:
+ public:
   Config_WidgetAPI(std::string theRawXml);
   virtual ~Config_WidgetAPI();
 
@@ -47,7 +46,7 @@ public:
 
   std::string getProperty(const char* thePropName) const;
 
-private:
+ private:
   xmlDocPtr myDoc;
   xmlNodePtr myCurrentNode;
 

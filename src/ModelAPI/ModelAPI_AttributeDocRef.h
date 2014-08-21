@@ -15,7 +15,7 @@
 
 class ModelAPI_AttributeDocRef : public ModelAPI_Attribute
 {
-public:
+ public:
   /// Defines the document referenced from this attribute
   MODELAPI_EXPORT virtual void setValue(boost::shared_ptr<ModelAPI_Document> theDoc) = 0;
 
@@ -23,18 +23,27 @@ public:
   MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Document> value() = 0;
 
   /// Returns the type of this class of attributes
-  MODELAPI_EXPORT static std::string type() {return "DocRef";}
+  MODELAPI_EXPORT static std::string type()
+  {
+    return "DocRef";
+  }
 
   /// Returns the type of this class of attributes, not static method
-  MODELAPI_EXPORT virtual std::string attributeType() {return type();}
+  MODELAPI_EXPORT virtual std::string attributeType()
+  {
+    return type();
+  }
 
   /// To virtually destroy the fields of successors
-  MODELAPI_EXPORT virtual ~ModelAPI_AttributeDocRef() {}
+  MODELAPI_EXPORT virtual ~ModelAPI_AttributeDocRef()
+  {
+  }
 
-protected:
+ protected:
   /// Objects are created for features automatically
   MODELAPI_EXPORT ModelAPI_AttributeDocRef()
-  {}
+  {
+  }
 };
 
 #endif

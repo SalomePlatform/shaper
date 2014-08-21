@@ -15,7 +15,6 @@
 
 #include <list>
 
-
 /*  Description: 
  *    Each constraint uses a set of parameters. In the SolveSpace library 
  *    these parameters are named "valA", "ptA", "ptB", "entityA", "entityB". 
@@ -35,10 +34,9 @@
  *         Some feature's methods implemented here as dummy to
  *         Base class for all constraints.
  */
-class SketchPlugin_ConstraintBase: public SketchPlugin_Constraint,
-                                   public GeomAPI_IPresentable
+class SketchPlugin_ConstraintBase : public SketchPlugin_Constraint, public GeomAPI_IPresentable
 {
-public:
+ public:
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
@@ -55,9 +53,11 @@ public:
   /// \param thePoint the point
   virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
-protected:
+ protected:
   /// \brief Use plugin manager for features creation
-  SketchPlugin_ConstraintBase() {}
+  SketchPlugin_ConstraintBase()
+  {
+  }
 };
 
 #endif

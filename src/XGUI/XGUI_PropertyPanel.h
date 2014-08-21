@@ -18,10 +18,10 @@
 class QKeyEvent;
 class QVBoxLayout;
 
-class XGUI_EXPORT XGUI_PropertyPanel: public QDockWidget
+class XGUI_EXPORT XGUI_PropertyPanel : public QDockWidget
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   XGUI_PropertyPanel(QWidget* theParent);
   virtual ~XGUI_PropertyPanel();
 
@@ -31,10 +31,10 @@ public:
 
   void cleanContent();
 
-protected:
+ protected:
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
-public slots:
+ public slots:
   void updateContentWidget(FeaturePtr theFeature);
   /// slot to activate the next widget in the property panel
   /// \param theWidget a widget. The next widget should be activated
@@ -56,7 +56,7 @@ signals:
   /// \param the attribute of the feature
   void storedPoint2D(ObjectPtr theFeature, const std::string& theAttribute);
 
-private:
+ private:
   QWidget* myCustomWidget;
 
   QList<ModuleBase_ModelWidget*> myWidgets;

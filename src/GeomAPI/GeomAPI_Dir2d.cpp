@@ -10,12 +10,14 @@
 #define MY_DIR static_cast<gp_Dir2d*>(myImpl)
 
 GeomAPI_Dir2d::GeomAPI_Dir2d(const double theX, const double theY)
-  : GeomAPI_Interface(new gp_Dir2d(theX, theY))
-{}
+    : GeomAPI_Interface(new gp_Dir2d(theX, theY))
+{
+}
 
 GeomAPI_Dir2d::GeomAPI_Dir2d(const boost::shared_ptr<GeomAPI_XY>& theCoords)
-  : GeomAPI_Interface(new gp_Dir2d(theCoords->x(), theCoords->y()))
-{}
+    : GeomAPI_Interface(new gp_Dir2d(theCoords->x(), theCoords->y()))
+{
+}
 
 double GeomAPI_Dir2d::x() const
 {
@@ -27,7 +29,7 @@ double GeomAPI_Dir2d::y() const
   return MY_DIR->Y();
 }
 
-const boost::shared_ptr<GeomAPI_XY> GeomAPI_Dir2d::xy() 
+const boost::shared_ptr<GeomAPI_XY> GeomAPI_Dir2d::xy()
 {
   return boost::shared_ptr<GeomAPI_XY>(new GeomAPI_XY(MY_DIR->X(), MY_DIR->Y()));
 }

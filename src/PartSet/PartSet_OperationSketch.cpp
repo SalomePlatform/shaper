@@ -39,10 +39,8 @@
 
 using namespace std;
 
-
-PartSet_OperationSketch::PartSet_OperationSketch(const QString& theId,
-	                                             QObject* theParent)
-: PartSet_OperationSketchBase(theId, theParent)
+PartSet_OperationSketch::PartSet_OperationSketch(const QString& theId, QObject* theParent)
+    : PartSet_OperationSketchBase(theId, theParent)
 {
 }
 
@@ -61,7 +59,6 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(ObjectPtr theFeature) 
   return aModes;
 }
 
-
 /// Initializes the operation with previously created feature. It is used in sequental operations
 void PartSet_OperationSketch::initFeature(FeaturePtr theFeature)
 {
@@ -78,7 +75,7 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
                                            const std::list<ModuleBase_ViewerPrs>& theSelected,
                                            const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  if (hasSketchPlane()){
+  if (hasSketchPlane()) {
     // if shift button is pressed and there are some already selected objects, the operation should
     // not be started. We just want to combine some selected objects.
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
@@ -88,13 +85,12 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_Vie
     if (theHighlighted.size() == 1) {
       ObjectPtr aFeature = theHighlighted.front().object();
       if (aFeature) {
-        std::string anOperationType = (theSelected.size() > 1)?
-          PartSet_OperationFeatureEditMulti::Type() :
-          PartSet_OperationFeatureEdit::Type();
+        std::string anOperationType =
+            (theSelected.size() > 1) ?
+                PartSet_OperationFeatureEditMulti::Type() : PartSet_OperationFeatureEdit::Type();
         restartOperation(anOperationType, aFeature);
       }
-    }
-    else
+    } else
       myFeatures = theHighlighted;
 
   } else {
@@ -126,14 +122,14 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
 
 void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
-  if (!hasSketchPlane() || !(theEvent->buttons() &  Qt::LeftButton) || myFeatures.empty())
+  if (!hasSketchPlane() || !(theEvent->buttons() & Qt::LeftButton) || myFeatures.empty())
     return;
 
   if (myFeatures.size() != 1) {
     FeaturePtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), theView, feature(),
                                                         myFeatures);
     if (aFeature)
-		restartOperation(PartSet_OperationFeatureEditMulti::Type(), aFeature);
+      restartOperation(PartSet_OperationFeatureEditMulti::Type(), aFeature);
   }
 }
 
@@ -147,8 +143,8 @@ std::list<FeaturePtr> PartSet_OperationSketch::subFeatures() const
   boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
   if (!aData->isValid())
     return std::list<FeaturePtr>();
-  boost::shared_ptr<ModelAPI_AttributeRefList> aRefList =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(aData->attribute(SketchPlugin_Sketch::FEATURES_ID()));
+  boost::shared_ptr<ModelAPI_AttributeRefList> aRefList = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeRefList>(aData->attribute(SketchPlugin_Sketch::FEATURES_ID()));
 
   std::list<ObjectPtr> aList = aRefList->list();
   std::list<ObjectPtr>::iterator aIt;
@@ -170,8 +166,8 @@ void PartSet_OperationSketch::stopOperation()
   std::list<ResultPtr> aResults = aFeature->results();
   std::list<ResultPtr>::const_iterator aIt;
   for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-    ModelAPI_EventCreator::get()->sendUpdated(*aIt, 
-      Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    ModelAPI_EventCreator::get()->sendUpdated(
+        *aIt, Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
   }
   //ModelAPI_EventCreator::get()->sendUpdated(aFeature, 
   //  Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
@@ -181,7 +177,6 @@ bool PartSet_OperationSketch::isNestedOperationsEnabled() const
 {
   return hasSketchPlane();
 }
-
 
 void PartSet_OperationSketch::startOperation()
 {
@@ -197,8 +192,8 @@ bool PartSet_OperationSketch::hasSketchPlane() const
   if (feature()) {
     boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
     AttributeDoublePtr anAttr;
-    boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+    boost::shared_ptr<GeomDataAPI_Dir> aNormal = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        aData->attribute(SketchPlugin_Sketch::NORM_ID()));
     aHasPlane = aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
   }
   return aHasPlane;
@@ -230,26 +225,27 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
   // X axis is preferable to be dirX on the sketch
   const double tol = Precision::Confusion();
   bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
-  boost::shared_ptr<GeomAPI_Dir> aTempDir(isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
+  boost::shared_ptr<GeomAPI_Dir> aTempDir(
+      isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
   boost::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
   boost::shared_ptr<GeomAPI_Dir> aXDir(new GeomAPI_Dir(aYDir->cross(aNormDir)));
 
-  boost::shared_ptr<GeomDataAPI_Point> anOrigin = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point>(aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  boost::shared_ptr<GeomDataAPI_Point> anOrigin = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+      aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
   anOrigin->setValue(anOrigPnt);
-  boost::shared_ptr<GeomDataAPI_Dir> aNormal = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+  boost::shared_ptr<GeomDataAPI_Dir> aNormal = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(SketchPlugin_Sketch::NORM_ID()));
   aNormal->setValue(aNormDir);
-  boost::shared_ptr<GeomDataAPI_Dir> aDirX = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
+  boost::shared_ptr<GeomDataAPI_Dir> aDirX = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
   aDirX->setValue(aXDir);
-  boost::shared_ptr<GeomDataAPI_Dir> aDirY = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
+  boost::shared_ptr<GeomDataAPI_Dir> aDirY = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
   aDirY->setValue(aYDir);
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
 
   flushUpdated();
-  
+
   emit featureConstructed(feature(), FM_Hide);
   emit closeLocalContext();
   emit planeSelected(aDir->x(), aDir->y(), aDir->z());

@@ -27,19 +27,27 @@ class QKeyEvent;
  */
 class MODULEBASE_EXPORT ModuleBase_ModelWidget : public QObject
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   /// Constructor
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
-  ModuleBase_ModelWidget(QObject* theParent, const Config_WidgetAPI* theData, const std::string& theParentId);
+  ModuleBase_ModelWidget(QObject* theParent, const Config_WidgetAPI* theData,
+                         const std::string& theParentId);
   /// Destructor
-  virtual ~ModuleBase_ModelWidget() {};
+  virtual ~ModuleBase_ModelWidget()
+  {
+  }
+  ;
 
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValue the wrapped widget value
-  virtual bool setValue(ModuleBase_WidgetValue* theValue) { return false; };
+  virtual bool setValue(ModuleBase_WidgetValue* theValue)
+  {
+    return false;
+  }
+  ;
 
   /// Returns the state whether the attribute of the feature is initialized
   /// \param theObject a model feature to be checked
@@ -63,18 +71,33 @@ public:
 
   /// Returns whether the control has a default value
   /// \return a boolean value
-  bool hasDefaultValue() const { return myHasDefaultValue; }
+  bool hasDefaultValue() const
+  {
+    return myHasDefaultValue;
+  }
 
   /// Returns the attribute name
   /// \returns the string value
-  std::string attributeID() const { return myAttributeID; }
+  std::string attributeID() const
+  {
+    return myAttributeID;
+  }
 
   /// Returns the parent of the attribute
   /// \returns the string value
-  std::string parentID() const { return myParentId; }
+  std::string parentID() const
+  {
+    return myParentId;
+  }
 
-  FeaturePtr feature() const { return myFeature;}
-  void setFeature(const FeaturePtr& theFeature) { myFeature = theFeature; }
+  FeaturePtr feature() const
+  {
+    return myFeature;
+  }
+  void setFeature(const FeaturePtr& theFeature)
+  {
+    myFeature = theFeature;
+  }
 
 signals:
   /// The signal about widget values changed
@@ -87,17 +110,19 @@ signals:
   /// \param theWidget the model base widget
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
 
-protected:
+ protected:
   /// Returns the attribute name
   /// \returns the string value
-  void setAttributeID(const std::string& theAttribute) { myAttributeID = theAttribute; }
+  void setAttributeID(const std::string& theAttribute)
+  {
+    myAttributeID = theAttribute;
+  }
 
   void updateObject(ObjectPtr theObj) const;
 
-  bool myHasDefaultValue; /// the boolean state whether the control has a default value
+  bool myHasDefaultValue;  /// the boolean state whether the control has a default value
 
-
-  std::string myAttributeID; /// the attribute name of the model feature
+  std::string myAttributeID;  /// the attribute name of the model feature
   std::string myParentId;    /// name of parent
   FeaturePtr myFeature;
 };

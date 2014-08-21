@@ -8,11 +8,10 @@
 #include "ModelAPI_Validator.h"
 #include "ModelAPI_Object.h"
 
-class ModelAPI_ResultValidator: public ModelAPI_Validator
+class ModelAPI_ResultValidator : public ModelAPI_Validator
 {
-public:
+ public:
   virtual bool isValid(const ObjectPtr theObject) const = 0;
 };
-
 
 #endif

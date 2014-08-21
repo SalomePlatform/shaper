@@ -9,10 +9,10 @@
 #include <ModelAPI_Result.h>
 #include <GeomAPI_Shape.h>
 
-namespace ModelAPI_Tools 
-{
-  /// Returns shape from the given Result object
-  MODELAPI_EXPORT boost::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult);
-};
+namespace ModelAPI_Tools {
+/// Returns shape from the given Result object
+MODELAPI_EXPORT boost::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult);
+}
+;
 
 #endif

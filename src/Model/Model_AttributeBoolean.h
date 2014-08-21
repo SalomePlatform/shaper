@@ -17,15 +17,15 @@
 
 class Model_AttributeBoolean : public ModelAPI_AttributeBoolean
 {
-  Handle_TDataStd_Integer myBool; ///< double is Real attribute
-public:
+  Handle_TDataStd_Integer myBool;  ///< double is Real attribute
+ public:
   /// Defines the double value
   MODEL_EXPORT virtual void setValue(bool theValue);
 
   /// Returns the double value
   MODEL_EXPORT virtual bool value();
 
-protected:
+ protected:
   /// Initializes attibutes
   Model_AttributeBoolean(TDF_Label& theLabel);
 

@@ -14,9 +14,9 @@
  * \ingroup DataModel
  * \brief Feature for creation of a new point.
  */
-class SketchPlugin_Point: public SketchPlugin_Feature
+class SketchPlugin_Point : public SketchPlugin_Feature
 {
-public:
+ public:
   /// Point feature kind
   inline static const std::string& ID()
   {
@@ -30,8 +30,11 @@ public:
     return MY_COORD_ID;
   }
   /// Returns the kind of a feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SketchPlugin_Point::ID(); return MY_KIND;}
+  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    static std::string MY_KIND = SketchPlugin_Point::ID();
+    return MY_KIND;
+  }
 
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
@@ -41,7 +44,9 @@ public:
 
   /// Returns the AIS preview
   virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious)
-  {return simpleAISObject(firstResult(), thePrevious);}
+  {
+    return simpleAISObject(firstResult(), thePrevious);
+  }
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved

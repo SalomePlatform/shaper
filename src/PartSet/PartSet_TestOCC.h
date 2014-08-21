@@ -14,11 +14,14 @@ class Handle_V3d_View;
 /*!
  \class PartSet_TestOCC
  * \brief The operation to test OCC viewer work
-*/
+ */
 class PARTSET_EXPORT PartSet_TestOCC
 {
-public:
-  PartSet_TestOCC() {};
+ public:
+  PartSet_TestOCC()
+  {
+  }
+  ;
 
   /// Creates a line feature, select it, modify the line. Check whether the highlight is correct.
   /// \param the workshop to provide an access to the application information
@@ -38,7 +41,7 @@ public:
   static void local_selection_erase(Handle_AIS_InteractiveContext theContext,
                                     Handle_V3d_View theView);
 
-private:
+ private:
 
   /// Creates a temporary line
   /// \param the workshop to get the operation manager and the displayer

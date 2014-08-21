@@ -18,10 +18,9 @@ class GeomAPI_Pnt;
 
 class GEOMALGOAPI_EXPORT GeomAlgoAPI_PointBuilder
 {
-public:
+ public:
   /// Creates linear edge by two points
-  static boost::shared_ptr<GeomAPI_Shape> point(
-    boost::shared_ptr<GeomAPI_Pnt> thePoint);
+  static boost::shared_ptr<GeomAPI_Shape> point(boost::shared_ptr<GeomAPI_Pnt> thePoint);
 };
 
 #endif

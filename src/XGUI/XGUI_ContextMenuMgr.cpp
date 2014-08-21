@@ -1,4 +1,3 @@
-
 #include "XGUI_ContextMenuMgr.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_ObjectsBrowser.h"
@@ -20,8 +19,9 @@
 #include <QMenu>
 #include <QMdiArea>
 
-XGUI_ContextMenuMgr::XGUI_ContextMenuMgr(XGUI_Workshop* theParent) :
-QObject(theParent), myWorkshop(theParent)
+XGUI_ContextMenuMgr::XGUI_ContextMenuMgr(XGUI_Workshop* theParent)
+    : QObject(theParent),
+      myWorkshop(theParent)
 {
 }
 
@@ -89,7 +89,7 @@ void XGUI_ContextMenuMgr::onContextMenuRequest(QContextMenuEvent* theEvent)
   else if (sender() == myWorkshop->viewer()) {
     aMenu = viewerMenu();
   }
-  
+
   if (aMenu && (aMenu->actions().size() > 0)) {
     aMenu->exec(theEvent->globalPos());
     delete aMenu;
@@ -114,7 +114,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
         if (aPart) {
           if (aMgr->currentDocument() == aPart->partDoc())
             aMenu->addAction(action("DEACTIVATE_PART_CMD"));
-          else 
+          else
             aMenu->addAction(action("ACTIVATE_PART_CMD"));
         } else if (aFeature) {
           aMenu->addAction(action("EDIT_CMD"));
@@ -124,18 +124,21 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
           else
             aMenu->addAction(action("SHOW_CMD"));
         }
-      } else { // If feature is 0 the it means that selected root object (document)
-        if (aMgr->currentDocument() != aMgr->rootDocument()) 
+      } else {  // If feature is 0 the it means that selected root object (document)
+        if (aMgr->currentDocument() != aMgr->rootDocument())
           aMenu->addAction(action("ACTIVATE_PART_CMD"));
       }
     } else if (aSelected >= 1) {
       bool hasResult = false;
       bool hasFeature = false;
-      foreach(ObjectPtr aObj, aObjects) {
+      foreach(ObjectPtr aObj, aObjects)
+      {
         FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
         ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-        if (aResult) hasResult = true;
-        if (aFeature) hasFeature = true;
+        if (aResult)
+          hasResult = true;
+        if (aFeature)
+          hasFeature = true;
         if (hasFeature && hasResult)
           break;
       }
@@ -174,7 +177,8 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
     //if (aObjects.size() == 1)
     //  theMenu->addAction(action("EDIT_CMD"));
     bool isVisible = false;
-    foreach(ObjectPtr aObject, aObjects) {
+    foreach(ObjectPtr aObject, aObjects)
+    {
       ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
       if (aRes && myWorkshop->displayer()->isVisible(aRes)) {
         isVisible = true;
@@ -183,7 +187,7 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
     }
     if (isVisible)
       theMenu->addAction(action("HIDE_CMD"));
-    else 
+    else
       theMenu->addAction(action("SHOW_CMD"));
     //theMenu->addAction(action("DELETE_CMD"));
   }
@@ -198,13 +202,13 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
 
 void XGUI_ContextMenuMgr::connectObjectBrowser() const
 {
-  connect(myWorkshop->objectBrowser(), SIGNAL(contextMenuRequested(QContextMenuEvent*)), 
-    this, SLOT(onContextMenuRequest(QContextMenuEvent*)));
+  connect(myWorkshop->objectBrowser(), SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
+          SLOT(onContextMenuRequest(QContextMenuEvent*)));
 }
 
 void XGUI_ContextMenuMgr::connectViewer() const
 {
-  connect(myWorkshop->viewer(), SIGNAL(contextMenuRequested(QContextMenuEvent*)), 
-    this, SLOT(onContextMenuRequest(QContextMenuEvent*)));
+  connect(myWorkshop->viewer(), SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
+          SLOT(onContextMenuRequest(QContextMenuEvent*)));
 }
 

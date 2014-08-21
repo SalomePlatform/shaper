@@ -19,7 +19,7 @@ void Model_AttributeBoolean::setValue(bool theValue)
 
 bool Model_AttributeBoolean::value()
 {
-  return myBool->Get() == Standard_True;
+  return myBool->Get() == Standard_True ;
 }
 
 Model_AttributeBoolean::Model_AttributeBoolean(TDF_Label& theLabel)

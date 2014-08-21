@@ -20,15 +20,19 @@
  */
 class ModelAPI_ResultBody : public ModelAPI_Result
 {
-public:
+ public:
   /// Returns the group identifier of this result
-  virtual std::string groupName() {
+  virtual std::string groupName()
+  {
     return group();
   }
 
   /// Returns the group identifier of this result
   static std::string group()
-  {static std::string MY_GROUP = "Bodies"; return MY_GROUP;}
+  {
+    static std::string MY_GROUP = "Bodies";
+    return MY_GROUP;
+  }
 
   /// Stores the shape (called by the execution method).
   virtual void store(const boost::shared_ptr<GeomAPI_Shape>& theShape) = 0;
@@ -36,13 +40,16 @@ public:
   virtual boost::shared_ptr<GeomAPI_Shape> shape() = 0;
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_ResultBody() {}
+  virtual ~ModelAPI_ResultBody()
+  {
+  }
 
-protected:
+ protected:
   /// Use plugin manager for features creation: this method is 
   /// defined here only for SWIG-wrapping
   ModelAPI_ResultBody()
-  {}
+  {
+  }
 };
 
 //! Pointer on feature object

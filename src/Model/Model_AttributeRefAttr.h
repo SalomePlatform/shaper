@@ -19,10 +19,10 @@
 
 class Model_AttributeRefAttr : public ModelAPI_AttributeRefAttr
 {
-  Handle_TDF_Reference myRef; ///< reference to the feature label
-   ///< ID of the referenced attirbute (empty if this is a reference to a feature)
+  Handle_TDF_Reference myRef;  ///< reference to the feature label
+  ///< ID of the referenced attirbute (empty if this is a reference to a feature)
   Handle_TDataStd_Comment myID;
-public:
+ public:
   /// Returns true if this attribute references to a object (not to the attribute)
   MODEL_EXPORT virtual bool isObject();
 
@@ -38,7 +38,7 @@ public:
   /// Returns object referenced from this attribute
   MODEL_EXPORT virtual ObjectPtr object();
 
-protected:
+ protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeRefAttr(TDF_Label& theLabel);
 

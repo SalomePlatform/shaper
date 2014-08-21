@@ -10,7 +10,7 @@ using namespace std;
 // the only created instance of this plugin
 static PartSetPlugin_Plugin* MY_INSTANCE = new PartSetPlugin_Plugin();
 
-PartSetPlugin_Plugin::PartSetPlugin_Plugin() 
+PartSetPlugin_Plugin::PartSetPlugin_Plugin()
 {
   // register this plugin
   ModelAPI_PluginManager::get()->registerPlugin(this);
@@ -27,6 +27,6 @@ FeaturePtr PartSetPlugin_Plugin::createFeature(string theFeatureID)
   if (theFeatureID == "remove") {
     return FeaturePtr(new PartSetPlugin_Remove);
   }
-    // feature of such kind is not found
+  // feature of such kind is not found
   return FeaturePtr();
 }

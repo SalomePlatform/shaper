@@ -9,7 +9,7 @@
 #include <Events_Loop.h>
 
 Events_Error::Events_Error(char* theDescription, const void* theSender)
- : Events_Message(Events_Error::errorID(), theSender)
+    : Events_Message(Events_Error::errorID(), theSender)
 {
   myDescription = theDescription;
 }
@@ -37,5 +37,5 @@ void Events_Error::send(char* theDescription, const void* theSender)
 
 void Events_Error::send(std::string theDescription, const void* theSender)
 {
-  Events_Error::send((char*)theDescription.c_str(), theSender);
+  Events_Error::send((char*) theDescription.c_str(), theSender);
 }

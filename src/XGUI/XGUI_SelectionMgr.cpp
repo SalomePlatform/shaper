@@ -15,10 +15,9 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Object.h>
 
-
-
-XGUI_SelectionMgr::XGUI_SelectionMgr(XGUI_Workshop* theParent) :
-  QObject(theParent), myWorkshop(theParent)
+XGUI_SelectionMgr::XGUI_SelectionMgr(XGUI_Workshop* theParent)
+    : QObject(theParent),
+      myWorkshop(theParent)
 {
   mySelection = new XGUI_Selection(myWorkshop);
 }
@@ -31,12 +30,11 @@ XGUI_SelectionMgr::~XGUI_SelectionMgr()
 //**************************************************************
 void XGUI_SelectionMgr::connectViewers()
 {
-  connect(myWorkshop->objectBrowser(), SIGNAL(selectionChanged()), 
-    this, SLOT(onObjectBrowserSelection()));
+  connect(myWorkshop->objectBrowser(), SIGNAL(selectionChanged()), this,
+          SLOT(onObjectBrowserSelection()));
 
   //Connect to other viewers
-  connect(myWorkshop->viewer(), SIGNAL(selectionChanged()),
-    this, SLOT(onViewerSelection()));
+  connect(myWorkshop->viewer(), SIGNAL(selectionChanged()), this, SLOT(onViewerSelection()));
 }
 
 //**************************************************************
@@ -68,33 +66,33 @@ void XGUI_SelectionMgr::onViewerSelection()
 
 //**************************************************************
 /*QFeatureList XGUI_SelectionMgr::selectedFeatures() const 
-{ 
-  return myWorkshop->objectBrowser()->selectedFeatures(); 
-}
+ { 
+ return myWorkshop->objectBrowser()->selectedFeatures(); 
+ }
 
-//**************************************************************
-QModelIndexList XGUI_SelectionMgr::selectedIndexes() const 
-{ 
-  return myWorkshop->objectBrowser()->selectedIndexes();
-}
+ //**************************************************************
+ QModelIndexList XGUI_SelectionMgr::selectedIndexes() const 
+ { 
+ return myWorkshop->objectBrowser()->selectedIndexes();
+ }
 
-//**************************************************************
-void XGUI_SelectionMgr::selectedAISObjects(AIS_ListOfInteractive& theList) const
-{
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  theList.Clear();
-  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
-    theList.Append(aContext->SelectedInteractive());
-}
+ //**************************************************************
+ void XGUI_SelectionMgr::selectedAISObjects(AIS_ListOfInteractive& theList) const
+ {
+ Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+ theList.Clear();
+ for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
+ theList.Append(aContext->SelectedInteractive());
+ }
 
-//**************************************************************
-void XGUI_SelectionMgr::selectedShapes(NCollection_List<TopoDS_Shape>& theList) const
-{
-  theList.Clear();
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
-    TopoDS_Shape aShape = aContext->SelectedShape();
-    if (!aShape.IsNull())
-      theList.Append(aShape);
-  }
-}*/
+ //**************************************************************
+ void XGUI_SelectionMgr::selectedShapes(NCollection_List<TopoDS_Shape>& theList) const
+ {
+ theList.Clear();
+ Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+ for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
+ TopoDS_Shape aShape = aContext->SelectedShape();
+ if (!aShape.IsNull())
+ theList.Append(aShape);
+ }
+ }*/

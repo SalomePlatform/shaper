@@ -15,9 +15,9 @@ class GeomAPI_XY;
  * \brief 2D direction defined by three normalized coordinates
  */
 
-class GEOMAPI_EXPORT GeomAPI_Dir2d: public GeomAPI_Interface
+class GEOMAPI_EXPORT GeomAPI_Dir2d : public GeomAPI_Interface
 {
-public:
+ public:
   /// Creation of direction by coordinates
   GeomAPI_Dir2d(const double theX, const double theY);
   /// Creation of direction by coordinates

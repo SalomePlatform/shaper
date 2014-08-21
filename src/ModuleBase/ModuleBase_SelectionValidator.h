@@ -10,10 +10,9 @@
 
 #include <ModelAPI_Validator.h>
 
-
-class ModuleBase_SelectionValidator: public ModelAPI_Validator
+class ModuleBase_SelectionValidator : public ModelAPI_Validator
 {
-public:
+ public:
   virtual bool isValid(const ModuleBase_ISelection* theSelection) const = 0;
 };
 

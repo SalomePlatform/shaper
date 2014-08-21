@@ -14,9 +14,9 @@
  * \ingroup DataModel
  * \brief Feature for creation of the new circle in PartSet.
  */
-class SketchPlugin_Circle: public SketchPlugin_Feature//, public GeomAPI_IPresentable
+class SketchPlugin_Circle : public SketchPlugin_Feature  //, public GeomAPI_IPresentable
 {
-public:
+ public:
   /// Circle feature kind
   inline static const std::string& ID()
   {
@@ -39,8 +39,11 @@ public:
   }
 
   /// Returns the kind of a feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SketchPlugin_Circle::ID(); return MY_KIND;}
+  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    static std::string MY_KIND = SketchPlugin_Circle::ID();
+    return MY_KIND;
+  }
 
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
@@ -50,12 +53,16 @@ public:
 
   /// Returns the AIS preview
   virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious)
-  {return simpleAISObject(firstResult(), thePrevious);}
+  {
+    return simpleAISObject(firstResult(), thePrevious);
+  }
 
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature
-  SKETCHPLUGIN_EXPORT virtual const void addSub(
-    const FeaturePtr& theFeature) {};
+  SKETCHPLUGIN_EXPORT virtual const void addSub(const FeaturePtr& theFeature)
+  {
+  }
+  ;
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved

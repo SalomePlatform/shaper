@@ -25,9 +25,9 @@ class GeomDataAPI_Point2D;
  *  These constraint has three attributes:
  *  SketchPlugin_Constraint::VALUE(), SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
-class SketchPlugin_ConstraintDistance: public SketchPlugin_ConstraintBase
+class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
 {
-public:
+ public:
   /// Distance constraint kind
   inline static const std::string& ID()
   {
@@ -36,8 +36,11 @@ public:
   }
 
   /// \brief Returns the kind of a feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SketchPlugin_ConstraintDistance::ID(); return MY_KIND;}
+  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    static std::string MY_KIND = SketchPlugin_ConstraintDistance::ID();
+    return MY_KIND;
+  }
 
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
@@ -57,15 +60,15 @@ public:
   SketchPlugin_ConstraintDistance();
 };
 
-
 /// Obtain the point object from specified constraint parameter
 boost::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
-                                                       const std::string&  theAttribute);
+                                                       const std::string& theAttribute);
 
-boost::shared_ptr<SketchPlugin_Line> getFeatureLine(DataPtr theData, const std::string& theAttribute);
+boost::shared_ptr<SketchPlugin_Line> getFeatureLine(DataPtr theData,
+                                                    const std::string& theAttribute);
 
-boost::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(const boost::shared_ptr<SketchPlugin_Line>& theLine, 
-                                                    const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
-
+boost::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(
+    const boost::shared_ptr<SketchPlugin_Line>& theLine,
+    const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
 #endif

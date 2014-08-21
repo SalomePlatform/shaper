@@ -13,11 +13,11 @@
 
 #include <string>
 
-class EVENTS_EXPORT Events_Error: public Events_Message
+class EVENTS_EXPORT Events_Error : public Events_Message
 {
-  char* myDescription; ///< pointer to the description of the error
+  char* myDescription;  ///< pointer to the description of the error
 
-public:
+ public:
   virtual ~Events_Error();
 
   static Events_ID errorID();
@@ -25,7 +25,7 @@ public:
   static void send(char* theDescription, const void* theSender = 0);
   static void send(std::string theDescription, const void* theSender = 0);
 
-protected:
+ protected:
   Events_Error(char* theDescription, const void* theSender = 0);
 };
 

@@ -17,8 +17,8 @@
 
 class GeomData_Point2D : public GeomDataAPI_Point2D
 {
-  Handle_TDataStd_RealArray myCoords; ///< X and Y doubles as real array attribute [0; 1]
-public:
+  Handle_TDataStd_RealArray myCoords;  ///< X and Y doubles as real array attribute [0; 1]
+ public:
   /// Defines the double value
   GEOMDATA_EXPORT virtual void setValue(const double theX, const double theY);
   /// Defines the point
@@ -31,7 +31,7 @@ public:
   /// Returns the 2D point
   GEOMDATA_EXPORT virtual boost::shared_ptr<GeomAPI_Pnt2d> pnt();
 
-protected:
+ protected:
   /// Initializes attributes
   GEOMDATA_EXPORT GeomData_Point2D(TDF_Label& theLabel);
 

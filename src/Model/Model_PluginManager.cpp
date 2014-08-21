@@ -21,14 +21,14 @@
 #include <TDF_RelocationTable.hxx>
 #include <TDF_ClosureTool.hxx>
 
-
 using namespace std;
 
 static Model_PluginManager* myImpl = new Model_PluginManager();
 
 FeaturePtr Model_PluginManager::createFeature(string theFeatureID)
 {
-  if (this != myImpl) return myImpl->createFeature(theFeatureID);
+  if (this != myImpl)
+    return myImpl->createFeature(theFeatureID);
 
   LoadPluginsInfo();
   if (myPlugins.find(theFeatureID) != myPlugins.end()) {
@@ -38,27 +38,27 @@ FeaturePtr Model_PluginManager::createFeature(string theFeatureID)
       Config_ModuleReader::loadLibrary(myCurrentPluginName);
     }
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
-      FeaturePtr aCreated = 
-        myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
+      FeaturePtr aCreated = myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
       if (!aCreated) {
-        Events_Error::send(string("Can not initialize feature '") + theFeatureID +
-          "' in plugin '" + myCurrentPluginName + "'");
+        Events_Error::send(
+            string("Can not initialize feature '") + theFeatureID + "' in plugin '"
+                + myCurrentPluginName + "'");
       }
       return aCreated;
     } else {
       Events_Error::send(string("Can not load plugin '") + myCurrentPluginName + "'");
     }
   } else {
-      Events_Error::send(string("Feature '") + theFeatureID + "' not found in any plugin");
+    Events_Error::send(string("Feature '") + theFeatureID + "' not found in any plugin");
   }
 
-  return FeaturePtr(); // return nothing
+  return FeaturePtr();  // return nothing
 }
 
 boost::shared_ptr<ModelAPI_Document> Model_PluginManager::rootDocument()
 {
   return boost::shared_ptr<ModelAPI_Document>(
-    Model_Application::getApplication()->getDocument("root"));
+      Model_Application::getApplication()->getDocument("root"));
 }
 
 bool Model_PluginManager::hasRootDocument()
@@ -81,14 +81,14 @@ void Model_PluginManager::setCurrentDocument(boost::shared_ptr<ModelAPI_Document
 }
 
 boost::shared_ptr<ModelAPI_Document> Model_PluginManager::copy(
-  boost::shared_ptr<ModelAPI_Document> theSource, std::string theID) 
+    boost::shared_ptr<ModelAPI_Document> theSource, std::string theID)
 {
   // create a new document
   boost::shared_ptr<Model_Document> aNew = boost::dynamic_pointer_cast<Model_Document>(
-    Model_Application::getApplication()->getDocument(theID));
+      Model_Application::getApplication()->getDocument(theID));
   // make a copy of all labels
-  TDF_Label aSourceRoot = 
-    boost::dynamic_pointer_cast<Model_Document>(theSource)->document()->Main().Father();
+  TDF_Label aSourceRoot = boost::dynamic_pointer_cast<Model_Document>(theSource)->document()->Main()
+      .Father();
   TDF_Label aTargetRoot = aNew->document()->Main().Father();
   Handle(TDF_DataSet) aDS = new TDF_DataSet;
   aDS->AddLabel(aSourceRoot);
@@ -121,8 +121,7 @@ void Model_PluginManager::processEvent(const Events_Message* theMessage)
   static const Events_ID kFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
   static const Events_ID kValidatorEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
   if (theMessage->eventID() == kFeatureEvent) {
-    const Config_FeatureMessage* aMsg =
-      dynamic_cast<const Config_FeatureMessage*>(theMessage);
+    const Config_FeatureMessage* aMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
     if (aMsg) {
       // proccess the plugin info, load plugin
       if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
@@ -134,14 +133,14 @@ void Model_PluginManager::processEvent(const Events_Message* theMessage)
   } else if (theMessage->eventID() == kValidatorEvent) {
     const Config_ValidatorMessage* aMsg = dynamic_cast<const Config_ValidatorMessage*>(theMessage);
     if (aMsg) {
-      if (aMsg->attributeId().empty()) { // feature validator
+      if (aMsg->attributeId().empty()) {  // feature validator
         validators()->assignValidator(aMsg->validatorId(), aMsg->featureId());
-      } else { // attribute validator
-        validators()->assignValidator(aMsg->validatorId(), aMsg->featureId(),
-          aMsg->attributeId(), aMsg->parameters());
+      } else {  // attribute validator
+        validators()->assignValidator(aMsg->validatorId(), aMsg->featureId(), aMsg->attributeId(),
+                                      aMsg->parameters());
       }
     }
-  } else { // create/update/delete
+  } else {  // create/update/delete
     if (myCheckTransactions && !rootDocument()->isOperation())
       Events_Error::send("Modification of data structure outside of the transaction");
   }
@@ -149,7 +148,7 @@ void Model_PluginManager::processEvent(const Events_Message* theMessage)
 
 void Model_PluginManager::LoadPluginsInfo()
 {
-  if (myPluginsInfoLoaded) // nothing to do
+  if (myPluginsInfoLoaded)  // nothing to do
     return;
 
   // Read plugins information from XML files

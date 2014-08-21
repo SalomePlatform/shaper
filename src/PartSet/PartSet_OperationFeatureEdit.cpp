@@ -37,10 +37,11 @@
 
 using namespace std;
 
-PartSet_OperationFeatureEdit::PartSet_OperationFeatureEdit(const QString& theId,
-	                                          QObject* theParent,
-                                              FeaturePtr theFeature)
-: PartSet_OperationSketchBase(theId, theParent), mySketch(theFeature), myIsBlockedSelection(false)
+PartSet_OperationFeatureEdit::PartSet_OperationFeatureEdit(const QString& theId, QObject* theParent,
+                                                           FeaturePtr theFeature)
+    : PartSet_OperationSketchBase(theId, theParent),
+      mySketch(theFeature),
+      myIsBlockedSelection(false)
 {
 }
 
@@ -50,7 +51,8 @@ PartSet_OperationFeatureEdit::~PartSet_OperationFeatureEdit()
 
 bool PartSet_OperationFeatureEdit::isGranted(ModuleBase_IOperation* theOperation) const
 {
-  return theOperation->getDescription()->operationId().toStdString() == PartSet_OperationSketch::Type();
+  return theOperation->getDescription()->operationId().toStdString()
+      == PartSet_OperationSketch::Type();
 }
 
 std::list<int> PartSet_OperationFeatureEdit::getSelectionModes(ObjectPtr theFeature) const
@@ -63,20 +65,20 @@ void PartSet_OperationFeatureEdit::initFeature(FeaturePtr theFeature)
   setEditingFeature(theFeature);
 }
 
-
 FeaturePtr PartSet_OperationFeatureEdit::sketch() const
 {
   return mySketch;
 }
 
-void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                             const std::list<ModuleBase_ViewerPrs>& theSelected,
-                                             const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+void PartSet_OperationFeatureEdit::mousePressed(
+    QMouseEvent* theEvent, Handle(V3d_View) theView,
+    const std::list<ModuleBase_ViewerPrs>& theSelected,
+    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
   ObjectPtr aObject;
   if (!theHighlighted.empty())
     aObject = theHighlighted.front().object();
-  if (!aObject && !theSelected.empty()) // changed for a constrain
+  if (!aObject && !theSelected.empty())  // changed for a constrain
     aObject = theSelected.front().object();
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
@@ -85,20 +87,19 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
       emit featureConstructed(feature(), FM_Deactivation);
 
       bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
-      if(aHasShift && !theHighlighted.empty()) {
+      if (aHasShift && !theHighlighted.empty()) {
         QList<ObjectPtr> aSelected;
         std::list<ModuleBase_ViewerPrs>::const_iterator aIt;
         for (aIt = theSelected.cbegin(); aIt != theSelected.cend(); ++aIt)
           aSelected.append((*aIt).object());
         /*for (aIt = theHighlighted.cbegin(); aIt != theHighlighted.cend(); ++aIt) {
-          if (!aSelected.contains((*aIt).object()))
-            aSelected.append((*aIt).object());
-        }*/
+         if (!aSelected.contains((*aIt).object()))
+         aSelected.append((*aIt).object());
+         }*/
         //aSelected.push_back(feature());
         //aSelected.push_back(theHighlighted.front().object());
         emit setSelection(aSelected);
-      }
-      else if (aFeature) {
+      } else if (aFeature) {
         restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
       }
     }
@@ -107,7 +108,7 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
 
 void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
-  if (!(theEvent->buttons() &  Qt::LeftButton))
+  if (!(theEvent->buttons() & Qt::LeftButton))
     return;
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
@@ -123,8 +124,8 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, Handle(V3d_
     double aDeltaX = aX - aCurX;
     double aDeltaY = anY - aCurY;
 
-    boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = 
-                           boost::dynamic_pointer_cast<SketchPlugin_Feature>(feature());
+    boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
+        SketchPlugin_Feature>(feature());
     aSketchFeature->move(aDeltaX, aDeltaY);
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
     ModelAPI_EventCreator::get()->sendUpdated(feature(), anEvent);
@@ -134,25 +135,29 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, Handle(V3d_
   myCurPoint.setPoint(aPoint);
 }
 
-void PartSet_OperationFeatureEdit::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                              const std::list<ModuleBase_ViewerPrs>& /*theSelected*/,
-                                              const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
+void PartSet_OperationFeatureEdit::mouseReleased(
+    QMouseEvent* theEvent, Handle(V3d_View) theView,
+    const std::list<ModuleBase_ViewerPrs>& /*theSelected*/,
+    const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
 {
   blockSelection(false);
 }
 
-void PartSet_OperationFeatureEdit::mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                                    const std::list<ModuleBase_ViewerPrs>& theSelected,
-                                                    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+void PartSet_OperationFeatureEdit::mouseDoubleClick(
+    QMouseEvent* theEvent, Handle_V3d_View theView,
+    const std::list<ModuleBase_ViewerPrs>& theSelected,
+    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
   // TODO the functionality is important only for constraint feature. Should be moved in another place
   if (!theSelected.empty()) {
     ModuleBase_ViewerPrs aFeaturePrs = theSelected.front();
     if (!aFeaturePrs.owner().IsNull()) {
-      Handle(AIS_DimensionOwner) anOwner = Handle(AIS_DimensionOwner)::DownCast(aFeaturePrs.owner());
+      Handle(AIS_DimensionOwner) anOwner = Handle(AIS_DimensionOwner)::DownCast(
+          aFeaturePrs.owner());
       if (!anOwner.IsNull() && anOwner->SelectionMode() == AIS_DSM_Text) {
         bool isValid;
-        double aValue = PartSet_Tools::featureValue(feature(), SketchPlugin_Constraint::VALUE(), isValid);
+        double aValue = PartSet_Tools::featureValue(feature(), SketchPlugin_Constraint::VALUE(),
+                                                    isValid);
         if (isValid) {
           ModuleBase_WidgetEditor::editFeatureValue(feature(), SketchPlugin_Constraint::VALUE());
           flushUpdated();
@@ -162,12 +167,11 @@ void PartSet_OperationFeatureEdit::mouseDoubleClick(QMouseEvent* theEvent, Handl
   }
 }
 
-
 void PartSet_OperationFeatureEdit::keyReleased(const int theKey)
 {
   if (theKey == Qt::Key_Return) {
     commit();
-  } else 
+  } else
     PartSet_OperationSketchBase::keyReleased(theKey);
 }
 
@@ -198,8 +202,7 @@ void PartSet_OperationFeatureEdit::blockSelection(bool isBlocked, const bool isR
   if (isBlocked) {
     emit setSelection(QList<ObjectPtr>());
     emit stopSelection(aFeatureList, true);
-  }
-  else {
+  } else {
     emit stopSelection(aFeatureList, false);
     if (isRestoreSelection)
       emit setSelection(aFeatureList);

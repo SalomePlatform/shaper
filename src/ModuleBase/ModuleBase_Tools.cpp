@@ -7,8 +7,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Document.h>
 
-namespace ModuleBase_Tools
-{
+namespace ModuleBase_Tools {
 
 //******************************************************************
 

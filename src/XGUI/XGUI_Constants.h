@@ -1,8 +1,7 @@
 #ifndef XGUI_Constants_H
 #define XGUI_Constants_H
 
-namespace XGUI
-{
+namespace XGUI {
 
 //! Types of gradient type used in background of Viewer 3d
 enum GradientType
@@ -22,32 +21,41 @@ enum GradientType
 //! Type of rotation point in viewer 3d
 enum RotationPointType
 {
-  GRAVITY, SELECTED
+  GRAVITY,
+  SELECTED
 };
 
 //! Type of ribbon rect in Viewer 3d
 enum SketchingType
 {
-  NoSketching, Rect, Polygon
+  NoSketching,
+  Rect,
+  Polygon
 };
-
 
 //! View window operations accessible by hot keys
 enum HotOperation
 {
-  PAN, ZOOM, ROTATE, FIT_AREA
+  PAN,
+  ZOOM,
+  ROTATE,
+  FIT_AREA
 };
 
 //! Types of view window interactions
 enum InteractionStyle
 {
-  STANDARD, KEY_FREE
+  STANDARD,
+  KEY_FREE
 };
 
 //! Types of 2d mode in viewer 3d
 enum Mode2dType
 {
-  No2dMode, XYPlane, XZPlane, YZPlane
+  No2dMode,
+  XYPlane,
+  XZPlane,
+  YZPlane
 };
 
 //! Types of background in view window
@@ -71,6 +79,7 @@ const static char* PROP_PANEL = "property_panel_dock";
 const static char* PROP_PANEL_OK = "property_panel_ok";
 const static char* PROP_PANEL_CANCEL = "property_panel_cancel";
 
-};
+}
+;
 
 #endif

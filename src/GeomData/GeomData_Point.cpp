@@ -11,8 +11,8 @@ using namespace std;
 
 void GeomData_Point::setValue(const double theX, const double theY, const double theZ)
 {
-  if (!myIsInitialized || myCoords->Value(0) != theX || myCoords->Value(1) != theY || 
-       myCoords->Value(2) != theZ) {
+  if (!myIsInitialized || myCoords->Value(0) != theX || myCoords->Value(1) != theY
+      || myCoords->Value(2) != theZ) {
     myCoords->SetValue(0, theX);
     myCoords->SetValue(1, theY);
     myCoords->SetValue(2, theZ);
@@ -43,8 +43,8 @@ double GeomData_Point::z() const
 
 boost::shared_ptr<GeomAPI_Pnt> GeomData_Point::pnt()
 {
-  boost::shared_ptr<GeomAPI_Pnt> aResult(new GeomAPI_Pnt(
-    myCoords->Value(0), myCoords->Value(1), myCoords->Value(2)));
+  boost::shared_ptr<GeomAPI_Pnt> aResult(
+      new GeomAPI_Pnt(myCoords->Value(0), myCoords->Value(1), myCoords->Value(2)));
   return aResult;
 }
 

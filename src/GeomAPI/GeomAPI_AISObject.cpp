@@ -23,9 +23,8 @@
 #include <AIS_RadiusDimension.hxx>
 #include <AIS_Shape.hxx>
 
-
-const int CONSTRAINT_TEXT_HEIGHT = 28; /// the text height of the constraint
-const int CONSTRAINT_TEXT_SELECTION_TOLERANCE = 20; /// the text selection tolerance
+const int CONSTRAINT_TEXT_HEIGHT = 28;  /// the text height of the constraint
+const int CONSTRAINT_TEXT_SELECTION_TOLERANCE = 20;  /// the text selection tolerance
 
 // Initialization of color constants
 int Colors::COLOR_BROWN = Quantity_NOC_BROWN;
@@ -33,23 +32,21 @@ int Colors::COLOR_RED = Quantity_NOC_RED;
 int Colors::COLOR_GREEN = Quantity_NOC_GREEN;
 int Colors::COLOR_BLUE = Quantity_NOC_BLUE1;
 
-
 GeomAPI_AISObject::GeomAPI_AISObject()
-  : GeomAPI_Interface(new Handle(AIS_InteractiveObject)())
+    : GeomAPI_Interface(new Handle(AIS_InteractiveObject)())
 {
 }
 
 void GeomAPI_AISObject::createShape(boost::shared_ptr<GeomAPI_Shape> theShape)
 {
-  const TopoDS_Shape& aTDS = (theShape && theShape->implPtr<TopoDS_Shape>()) ?
-                             theShape->impl<TopoDS_Shape>() : TopoDS_Shape();
+  const TopoDS_Shape& aTDS =
+      (theShape && theShape->implPtr<TopoDS_Shape>()) ?
+          theShape->impl<TopoDS_Shape>() : TopoDS_Shape();
 
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
-  if (!anAIS.IsNull())
-  {
+  if (!anAIS.IsNull()) {
     Handle(AIS_Shape) aShapeAIS = Handle(AIS_Shape)::DownCast(anAIS);
-    if (aShapeAIS)
-    {
+    if (aShapeAIS) {
       // if the AIS object is displayed in the opened local context in some mode, additional
       // AIS sub objects are created there. They should be rebuild for correct selecting.
       // It is possible to correct it by closing local context before the shape set and opening
@@ -59,27 +56,24 @@ void GeomAPI_AISObject::createShape(boost::shared_ptr<GeomAPI_Shape> theShape)
       aShapeAIS->Set(aTDS);
       aShapeAIS->Redisplay(Standard_True);
     }
-  }
-  else
+  } else
     setImpl(new Handle(AIS_InteractiveObject)(new AIS_Shape(aTDS)));
 }
-
 
 void GeomAPI_AISObject::createDistance(boost::shared_ptr<GeomAPI_Pnt> theStartPoint,
                                        boost::shared_ptr<GeomAPI_Pnt> theEndPoint,
                                        boost::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
-                                       boost::shared_ptr<GeomAPI_Pln> thePlane,
-                                       double                         theDistance)
+                                       boost::shared_ptr<GeomAPI_Pln> thePlane, double theDistance)
 {
   double aFlyout = 0;
-  if (theFlyoutPoint)
-  {
-    boost::shared_ptr<GeomAPI_Lin> aLine = 
-      boost::shared_ptr<GeomAPI_Lin>(new GeomAPI_Lin(theStartPoint, theEndPoint));
+  if (theFlyoutPoint) {
+    boost::shared_ptr<GeomAPI_Lin> aLine = boost::shared_ptr<GeomAPI_Lin>(
+        new GeomAPI_Lin(theStartPoint, theEndPoint));
     double aDist = aLine->distance(theFlyoutPoint);
 
     boost::shared_ptr<GeomAPI_XYZ> aLineDir = theEndPoint->xyz()->decreased(theStartPoint->xyz());
-    boost::shared_ptr<GeomAPI_XYZ> aFOutDir = theFlyoutPoint->xyz()->decreased(theStartPoint->xyz());
+    boost::shared_ptr<GeomAPI_XYZ> aFOutDir = theFlyoutPoint->xyz()->decreased(
+        theStartPoint->xyz());
     boost::shared_ptr<GeomAPI_XYZ> aNorm = thePlane->direction()->xyz();
     if (aLineDir->cross(aFOutDir)->dot(aNorm) < 0)
       aDist = -aDist;
@@ -87,14 +81,14 @@ void GeomAPI_AISObject::createDistance(boost::shared_ptr<GeomAPI_Pnt> theStartPo
   }
 
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
-  if (anAIS.IsNull())
-  {
-    Handle(AIS_LengthDimension) aDimAIS = new AIS_LengthDimension(
-      theStartPoint->impl<gp_Pnt>(), theEndPoint->impl<gp_Pnt>(), thePlane->impl<gp_Pln>());
+  if (anAIS.IsNull()) {
+    Handle(AIS_LengthDimension) aDimAIS = new AIS_LengthDimension(theStartPoint->impl<gp_Pnt>(),
+                                                                  theEndPoint->impl<gp_Pnt>(),
+                                                                  thePlane->impl<gp_Pln>());
     aDimAIS->SetCustomValue(theDistance);
 
     Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
-    anAspect->MakeArrows3d (Standard_False);
+    anAspect->MakeArrows3d(Standard_False);
     anAspect->MakeText3d(false);
     anAspect->TextAspect()->SetHeight(CONSTRAINT_TEXT_HEIGHT);
     anAspect->MakeTextShaded(false);
@@ -104,12 +98,11 @@ void GeomAPI_AISObject::createDistance(boost::shared_ptr<GeomAPI_Pnt> theStartPo
     aDimAIS->SetFlyout(aFlyout);
 
     setImpl(new Handle(AIS_InteractiveObject)(aDimAIS));
-  }
-  else {
+  } else {
     // update presentation
     Handle(AIS_LengthDimension) aDimAIS = Handle(AIS_LengthDimension)::DownCast(anAIS);
     if (!aDimAIS.IsNull()) {
-      aDimAIS->SetMeasuredGeometry(theStartPoint->impl<gp_Pnt>(), theEndPoint->impl<gp_Pnt>(), 
+      aDimAIS->SetMeasuredGeometry(theStartPoint->impl<gp_Pnt>(), theEndPoint->impl<gp_Pnt>(),
                                    thePlane->impl<gp_Pln>());
       aDimAIS->SetCustomValue(theDistance);
       aDimAIS->SetFlyout(aFlyout);
@@ -120,8 +113,8 @@ void GeomAPI_AISObject::createDistance(boost::shared_ptr<GeomAPI_Pnt> theStartPo
 }
 
 void GeomAPI_AISObject::createRadius(boost::shared_ptr<GeomAPI_Circ> theCircle,
-                                     boost::shared_ptr<GeomAPI_Pnt>  theFlyoutPoint,
-                                     double                          theRadius)
+                                     boost::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
+                                     double theRadius)
 {
   boost::shared_ptr<GeomAPI_Pnt> aCenter = theCircle->center();
 
@@ -141,29 +134,25 @@ void GeomAPI_AISObject::createRadius(boost::shared_ptr<GeomAPI_Circ> theCircle,
   anAnchor->setZ(anAnchor->z() + aDelta * aDeltaDir->z());
 
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
-  if (anAIS.IsNull())
-  {
-    Handle(AIS_RadiusDimension) aDimAIS = 
-      new AIS_RadiusDimension(theCircle->impl<gp_Circ>(), anAnchor->impl<gp_Pnt>());
+  if (anAIS.IsNull()) {
+    Handle(AIS_RadiusDimension) aDimAIS = new AIS_RadiusDimension(theCircle->impl<gp_Circ>(),
+                                                                  anAnchor->impl<gp_Pnt>());
     aDimAIS->SetCustomValue(theRadius);
 
     Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
-    anAspect->MakeArrows3d (Standard_False);
+    anAspect->MakeArrows3d(Standard_False);
     anAspect->MakeText3d(false);
     anAspect->TextAspect()->SetHeight(CONSTRAINT_TEXT_HEIGHT);
     anAspect->MakeTextShaded(false);
     aDimAIS->DimensionAspect()->MakeUnitsDisplayed(false);
-    aDimAIS->SetDimensionAspect (anAspect);
+    aDimAIS->SetDimensionAspect(anAspect);
     aDimAIS->SetSelToleranceForText2d(CONSTRAINT_TEXT_SELECTION_TOLERANCE);
 
     setImpl(new Handle(AIS_InteractiveObject)(aDimAIS));
-  }
-  else
-  {
+  } else {
     // update presentation
     Handle(AIS_RadiusDimension) aDimAIS = Handle(AIS_RadiusDimension)::DownCast(anAIS);
-    if (!aDimAIS.IsNull())
-    {
+    if (!aDimAIS.IsNull()) {
       aDimAIS->SetMeasuredGeometry(theCircle->impl<gp_Circ>(), anAnchor->impl<gp_Pnt>());
       aDimAIS->SetCustomValue(theRadius);
       aDimAIS->Redisplay(Standard_True);
@@ -173,25 +162,21 @@ void GeomAPI_AISObject::createRadius(boost::shared_ptr<GeomAPI_Circ> theCircle,
 
 void GeomAPI_AISObject::createParallel(boost::shared_ptr<GeomAPI_Shape> theLine1,
                                        boost::shared_ptr<GeomAPI_Shape> theLine2,
-                                       boost::shared_ptr<GeomAPI_Pnt>   theFlyoutPoint,
-                                       boost::shared_ptr<GeomAPI_Pln>   thePlane)
+                                       boost::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
+                                       boost::shared_ptr<GeomAPI_Pln> thePlane)
 {
   Handle(Geom_Plane) aPlane = new Geom_Plane(thePlane->impl<gp_Pln>());
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
-  if (anAIS.IsNull())
-  {
-    Handle(AIS_ParallelRelation) aParallel = 
-      new AIS_ParallelRelation(theLine1->impl<TopoDS_Shape>(), theLine2->impl<TopoDS_Shape>(), aPlane);
+  if (anAIS.IsNull()) {
+    Handle(AIS_ParallelRelation) aParallel = new AIS_ParallelRelation(
+        theLine1->impl<TopoDS_Shape>(), theLine2->impl<TopoDS_Shape>(), aPlane);
     if (theFlyoutPoint)
       aParallel->SetPosition(theFlyoutPoint->impl<gp_Pnt>());
 
     setImpl(new Handle(AIS_InteractiveObject)(aParallel));
-  }
-  else
-  {
+  } else {
     Handle(AIS_ParallelRelation) aParallel = Handle(AIS_ParallelRelation)::DownCast(anAIS);
-    if (!aParallel.IsNull())
-    {
+    if (!aParallel.IsNull()) {
       aParallel->SetFirstShape(theLine1->impl<TopoDS_Shape>());
       aParallel->SetSecondShape(theLine2->impl<TopoDS_Shape>());
       aParallel->SetPlane(aPlane);
@@ -204,22 +189,19 @@ void GeomAPI_AISObject::createParallel(boost::shared_ptr<GeomAPI_Shape> theLine1
 
 void GeomAPI_AISObject::createPerpendicular(boost::shared_ptr<GeomAPI_Shape> theLine1,
                                             boost::shared_ptr<GeomAPI_Shape> theLine2,
-                                            boost::shared_ptr<GeomAPI_Pln>   thePlane)
+                                            boost::shared_ptr<GeomAPI_Pln> thePlane)
 {
   Handle(Geom_Plane) aPlane = new Geom_Plane(thePlane->impl<gp_Pln>());
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
-  if (anAIS.IsNull())
-  {
-    Handle(AIS_PerpendicularRelation) aPerpendicular = 
-      new AIS_PerpendicularRelation(theLine1->impl<TopoDS_Shape>(), theLine2->impl<TopoDS_Shape>(), aPlane);
+  if (anAIS.IsNull()) {
+    Handle(AIS_PerpendicularRelation) aPerpendicular = new AIS_PerpendicularRelation(
+        theLine1->impl<TopoDS_Shape>(), theLine2->impl<TopoDS_Shape>(), aPlane);
 
     setImpl(new Handle(AIS_InteractiveObject)(aPerpendicular));
-  }
-  else
-  {
-    Handle(AIS_PerpendicularRelation) aPerpendicular = Handle(AIS_PerpendicularRelation)::DownCast(anAIS);
-    if (!aPerpendicular.IsNull())
-    {
+  } else {
+    Handle(AIS_PerpendicularRelation) aPerpendicular = Handle(AIS_PerpendicularRelation)::DownCast(
+        anAIS);
+    if (!aPerpendicular.IsNull()) {
       aPerpendicular->SetFirstShape(theLine1->impl<TopoDS_Shape>());
       aPerpendicular->SetSecondShape(theLine2->impl<TopoDS_Shape>());
       aPerpendicular->SetPlane(aPlane);
@@ -228,13 +210,12 @@ void GeomAPI_AISObject::createPerpendicular(boost::shared_ptr<GeomAPI_Shape> the
   }
 }
 
-
 void GeomAPI_AISObject::setColor(const int& theColor)
 {
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (anAIS.IsNull())
-    return ;
-  Quantity_Color aColor((Quantity_NameOfColor)theColor);
+    return;
+  Quantity_Color aColor((Quantity_NameOfColor) theColor);
   anAIS->SetColor(aColor);
   Handle(AIS_Dimension) aDimAIS = Handle(AIS_Dimension)::DownCast(anAIS);
   if (!aDimAIS.IsNull()) {
@@ -246,7 +227,7 @@ void GeomAPI_AISObject::setWidth(const double& theWidth)
 {
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (anAIS.IsNull())
-    return ;
+    return;
   anAIS->SetWidth(theWidth);
 }
 
@@ -254,8 +235,8 @@ void GeomAPI_AISObject::setColor(int theR, int theG, int theB)
 {
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (anAIS.IsNull())
-    return ;
-  Quantity_Color aColor(theR/255., theG/255., theB/255., Quantity_TOC_RGB);
+    return;
+  Quantity_Color aColor(theR / 255., theG / 255., theB / 255., Quantity_TOC_RGB);
   anAIS->SetColor(aColor);
   Handle(AIS_Dimension) aDimAIS = Handle(AIS_Dimension)::DownCast(anAIS);
   if (!aDimAIS.IsNull()) {
@@ -265,8 +246,8 @@ void GeomAPI_AISObject::setColor(int theR, int theG, int theB)
 
 bool GeomAPI_AISObject::empty() const
 {
-  Handle(AIS_InteractiveObject) anAIS = 
-    const_cast<GeomAPI_AISObject*>(this)->impl<Handle(AIS_InteractiveObject)>();
+  Handle(AIS_InteractiveObject) anAIS = const_cast<GeomAPI_AISObject*>(this)
+      ->impl<Handle(AIS_InteractiveObject)>();
   if (anAIS.IsNull())
     return true;
   return false;

@@ -14,9 +14,8 @@
 
 #include <set>
 
-
 XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
-: myWorkshop(theWorkshop)
+    : myWorkshop(theWorkshop)
 {
 }
 
@@ -81,7 +80,7 @@ QList<ObjectPtr> XGUI_Selection::selectedObjects() const
 {
   return myWorkshop->objectBrowser()->selectedObjects();
 }
-  
+
 QList<ObjectPtr> XGUI_Selection::selectedPresentations() const
 {
   QList<ObjectPtr> aSelectedList;
@@ -96,10 +95,9 @@ QList<ObjectPtr> XGUI_Selection::selectedPresentations() const
   return aSelectedList;
 }
 
-
 //**************************************************************
-QModelIndexList XGUI_Selection::selectedIndexes() const 
-{ 
+QModelIndexList XGUI_Selection::selectedIndexes() const
+{
   return myWorkshop->objectBrowser()->selectedIndexes();
 }
 

@@ -6,12 +6,11 @@
 #include "XGUI_Viewer.h"
 #include "XGUI_SalomeConnector.h"
 
-
 XGUI_ViewerProxy::XGUI_ViewerProxy(XGUI_Workshop* theParent)
-: XGUI_SalomeViewer(theParent), myWorkshop(theParent)
+    : XGUI_SalomeViewer(theParent),
+      myWorkshop(theParent)
 {
 }
-
 
 Handle(AIS_InteractiveContext) XGUI_ViewerProxy::AISContext() const
 {
@@ -37,18 +36,17 @@ Handle(V3d_View) XGUI_ViewerProxy::activeView() const
     return myWorkshop->salomeConnector()->viewer()->activeView();
   } else {
     XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-    return (aViewer->activeViewWindow())?
-      aViewer->activeViewWindow()->viewPort()->getView():
-      Handle(V3d_View)();
+    return (aViewer->activeViewWindow()) ? aViewer->activeViewWindow()->viewPort()->getView() :
+    Handle(V3d_View)();
   }
 }
- 
+
 void XGUI_ViewerProxy::setViewProjection(double theX, double theY, double theZ)
 {
   Handle(V3d_View) aView3d = activeView();
-  if ( !aView3d.IsNull() ) {
+  if (!aView3d.IsNull()) {
     aView3d->SetProj(theX, theY, theZ);
-    aView3d->FitAll( 0.01, true, true );
+    aView3d->FitAll(0.01, true, true);
     aView3d->SetZSize(0.);
   }
 }
@@ -57,8 +55,7 @@ void XGUI_ViewerProxy::fitAll()
 {
   if (myWorkshop->isSalomeMode()) {
     myWorkshop->salomeConnector()->viewer()->fitAll();
-  }
-  else {
+  } else {
     XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
     if (aViewer->activeViewWindow())
       aViewer->activeViewWindow()->viewPort()->fitAll();
@@ -70,69 +67,54 @@ void XGUI_ViewerProxy::connectToViewer()
   if (myWorkshop->isSalomeMode()) {
     XGUI_SalomeViewer* aViewer = myWorkshop->salomeConnector()->viewer();
 
-    connect(aViewer, SIGNAL(lastViewClosed()),
-            this, SIGNAL(lastViewClosed()));
-    connect(aViewer, SIGNAL(tryCloseView()),
-            this, SIGNAL(tryCloseView()));
-    connect(aViewer, SIGNAL(deleteView()),
-            this, SIGNAL(deleteView()));
-    connect(aViewer, SIGNAL(viewCreated()),
-            this, SIGNAL(viewCreated()));
-    connect(aViewer, SIGNAL(activated()),
-            this, SIGNAL(activated()));
+    connect(aViewer, SIGNAL(lastViewClosed()), this, SIGNAL(lastViewClosed()));
+    connect(aViewer, SIGNAL(tryCloseView()), this, SIGNAL(tryCloseView()));
+    connect(aViewer, SIGNAL(deleteView()), this, SIGNAL(deleteView()));
+    connect(aViewer, SIGNAL(viewCreated()), this, SIGNAL(viewCreated()));
+    connect(aViewer, SIGNAL(activated()), this, SIGNAL(activated()));
 
-    connect(aViewer, SIGNAL(mousePress(QMouseEvent*)),
-            this, SIGNAL(mousePress(QMouseEvent*)));
+    connect(aViewer, SIGNAL(mousePress(QMouseEvent*)), this, SIGNAL(mousePress(QMouseEvent*)));
 
-    connect(aViewer, SIGNAL(mouseRelease(QMouseEvent*)),
-            this, SIGNAL(mouseRelease(QMouseEvent*)));
-    
-    connect(aViewer, SIGNAL(mouseDoubleClick(QMouseEvent*)),
-            this, SIGNAL(mouseDoubleClick(QMouseEvent*)));
-    
-    connect(aViewer, SIGNAL(mouseMove(QMouseEvent*)),
-            this, SIGNAL(mouseMove(QMouseEvent*)));
-    
-    connect(aViewer, SIGNAL(keyPress(QKeyEvent*)),
-            this, SIGNAL(keyPress(QKeyEvent*)));
-    
-    connect(aViewer, SIGNAL(keyRelease(QKeyEvent*)),
-            this, SIGNAL(keyRelease(QKeyEvent*)));
+    connect(aViewer, SIGNAL(mouseRelease(QMouseEvent*)), this, SIGNAL(mouseRelease(QMouseEvent*)));
+
+    connect(aViewer, SIGNAL(mouseDoubleClick(QMouseEvent*)), this,
+            SIGNAL(mouseDoubleClick(QMouseEvent*)));
+
+    connect(aViewer, SIGNAL(mouseMove(QMouseEvent*)), this, SIGNAL(mouseMove(QMouseEvent*)));
+
+    connect(aViewer, SIGNAL(keyPress(QKeyEvent*)), this, SIGNAL(keyPress(QKeyEvent*)));
+
+    connect(aViewer, SIGNAL(keyRelease(QKeyEvent*)), this, SIGNAL(keyRelease(QKeyEvent*)));
 
     connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
-    connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), 
-            this, SIGNAL(contextMenuRequested(QContextMenuEvent*)));
+    connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
+            SIGNAL(contextMenuRequested(QContextMenuEvent*)));
 
   } else {
     XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
 
-    connect(aViewer, SIGNAL(lastViewClosed()),
-            this, SIGNAL(lastViewClosed()));
-    connect(aViewer, SIGNAL(tryCloseView(XGUI_ViewWindow*)),
-            this, SIGNAL(tryCloseView()));
-    connect(aViewer, SIGNAL(deleteView(XGUI_ViewWindow*)),
-            this, SIGNAL(deleteView()));
-    connect(aViewer, SIGNAL(viewCreated(XGUI_ViewWindow*)),
-            this, SIGNAL(viewCreated()));
-    connect(aViewer, SIGNAL(activated(XGUI_ViewWindow*)),
-            this, SIGNAL(activated()));
+    connect(aViewer, SIGNAL(lastViewClosed()), this, SIGNAL(lastViewClosed()));
+    connect(aViewer, SIGNAL(tryCloseView(XGUI_ViewWindow*)), this, SIGNAL(tryCloseView()));
+    connect(aViewer, SIGNAL(deleteView(XGUI_ViewWindow*)), this, SIGNAL(deleteView()));
+    connect(aViewer, SIGNAL(viewCreated(XGUI_ViewWindow*)), this, SIGNAL(viewCreated()));
+    connect(aViewer, SIGNAL(activated(XGUI_ViewWindow*)), this, SIGNAL(activated()));
 
-    connect(aViewer, SIGNAL(mousePress(XGUI_ViewWindow*, QMouseEvent*)),
-            this, SLOT(onMousePress(XGUI_ViewWindow*, QMouseEvent*)));
-    connect(aViewer, SIGNAL(mouseRelease(XGUI_ViewWindow*, QMouseEvent*)),
-            this, SLOT(onMouseRelease(XGUI_ViewWindow*, QMouseEvent*)));
-    connect(aViewer, SIGNAL(mouseDoubleClick(XGUI_ViewWindow*, QMouseEvent*)),
-            this, SLOT(onMouseDoubleClick(XGUI_ViewWindow*, QMouseEvent*)));
-    connect(aViewer, SIGNAL(mouseMove(XGUI_ViewWindow*, QMouseEvent*)),
-            this, SLOT(onMouseMove(XGUI_ViewWindow*, QMouseEvent*)));
-    connect(aViewer, SIGNAL(keyPress(XGUI_ViewWindow*, QKeyEvent*)),
-            this, SLOT(onKeyPress(XGUI_ViewWindow*, QKeyEvent*)));
-    connect(aViewer, SIGNAL(keyRelease(XGUI_ViewWindow*, QKeyEvent*)),
-            this, SLOT(onKeyRelease(XGUI_ViewWindow*, QKeyEvent*)));
+    connect(aViewer, SIGNAL(mousePress(XGUI_ViewWindow*, QMouseEvent*)), this,
+            SLOT(onMousePress(XGUI_ViewWindow*, QMouseEvent*)));
+    connect(aViewer, SIGNAL(mouseRelease(XGUI_ViewWindow*, QMouseEvent*)), this,
+            SLOT(onMouseRelease(XGUI_ViewWindow*, QMouseEvent*)));
+    connect(aViewer, SIGNAL(mouseDoubleClick(XGUI_ViewWindow*, QMouseEvent*)), this,
+            SLOT(onMouseDoubleClick(XGUI_ViewWindow*, QMouseEvent*)));
+    connect(aViewer, SIGNAL(mouseMove(XGUI_ViewWindow*, QMouseEvent*)), this,
+            SLOT(onMouseMove(XGUI_ViewWindow*, QMouseEvent*)));
+    connect(aViewer, SIGNAL(keyPress(XGUI_ViewWindow*, QKeyEvent*)), this,
+            SLOT(onKeyPress(XGUI_ViewWindow*, QKeyEvent*)));
+    connect(aViewer, SIGNAL(keyRelease(XGUI_ViewWindow*, QKeyEvent*)), this,
+            SLOT(onKeyRelease(XGUI_ViewWindow*, QKeyEvent*)));
 
     connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
-    connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), 
-            this, SIGNAL(contextMenuRequested(QContextMenuEvent*)));
+    connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
+            SIGNAL(contextMenuRequested(QContextMenuEvent*)));
   }
 }
 

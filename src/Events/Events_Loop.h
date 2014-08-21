@@ -23,17 +23,20 @@ class Events_MessageGroup;
  * Performing of events is processed in separated thread, so, sender takes 
  * control back immideately.
  */
-class Events_Loop {
+class Events_Loop
+{
   /// map from event ID to sender pointer to listeners that must be called for this
-  std::map<char*, std::map<void*, std::list<Events_Listener*> > >
-    myListeners;
+  std::map<char*, std::map<void*, std::list<Events_Listener*> > > myListeners;
 
   /// map from event ID to groupped messages (accumulated on flush)
   std::map<char*, Events_MessageGroup*> myGroups;
 
   //! The empty constructor, will be called at startup of the application, only once
-  Events_Loop() {};
-public:
+  Events_Loop()
+  {
+  }
+  ;
+ public:
   ///! Returns the main object of the loop, one per application.
   EVENTS_EXPORT static Events_Loop* loop();
   //! Returns the unique event by the given name. Call this method only on initialization of object
@@ -46,8 +49,8 @@ public:
 
   //! Registers (or adds if such listener is already registered) a listener 
   //! that will be called on the event and from the defined sender
-  EVENTS_EXPORT void registerListener(Events_Listener* theListener, const Events_ID theID, 
-    void* theSender = 0);
+  EVENTS_EXPORT void registerListener(Events_Listener* theListener, const Events_ID theID,
+                                      void* theSender = 0);
 
   //! Initializes sending of a group-message by the given ID
   EVENTS_EXPORT void flush(const Events_ID& theID);

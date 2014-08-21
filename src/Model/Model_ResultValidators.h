@@ -9,21 +9,21 @@
 #include <ModelAPI_ResultValidator.h>
 #include <ModelAPI_Object.h>
 
-class Model_ResultPointValidator: public ModelAPI_ResultValidator
+class Model_ResultPointValidator : public ModelAPI_ResultValidator
 {
-public:
+ public:
   MODEL_EXPORT virtual bool isValid(const ObjectPtr theObject) const;
 };
 
-class Model_ResultLineValidator: public ModelAPI_ResultValidator
+class Model_ResultLineValidator : public ModelAPI_ResultValidator
 {
-public:
+ public:
   MODEL_EXPORT virtual bool isValid(const ObjectPtr theObject) const;
 };
 
-class Model_ResultArcValidator: public ModelAPI_ResultValidator
+class Model_ResultArcValidator : public ModelAPI_ResultValidator
 {
-public:
+ public:
   MODEL_EXPORT virtual bool isValid(const ObjectPtr theObject) const;
 };
 

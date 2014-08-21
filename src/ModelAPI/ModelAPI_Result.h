@@ -17,7 +17,7 @@ class ModelAPI_Feature;
  */
 class ModelAPI_Result : public ModelAPI_Object
 {
-public:
+ public:
   /// Returns the source feature of this result
   //virtual boost::shared_ptr<ModelAPI_Feature> owner() = 0;
 

@@ -23,13 +23,14 @@ class QDoubleSpinBox;
  */
 class MODULEBASE_EXPORT ModuleBase_WidgetPoint2D : public ModuleBase_ModelWidget
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   /// Constructor
   /// \theParent the parent object
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
-  ModuleBase_WidgetPoint2D(QWidget* theParent, const Config_WidgetAPI* theData, const std::string& theParentId);
+  ModuleBase_WidgetPoint2D(QWidget* theParent, const Config_WidgetAPI* theData,
+                           const std::string& theParentId);
   /// Destructor
   virtual ~ModuleBase_WidgetPoint2D();
 
@@ -65,17 +66,17 @@ signals:
   /// \param the attribute of the feature
   void storedPoint2D(ObjectPtr theObject, const std::string& theAttribute);
 
-protected:
+ protected:
   /// Fill the widget values by given point
   /// \param thePoint the point
   void setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
-private:
-  QGroupBox* myGroupBox; ///< the parent group box for all intenal widgets
-  QDoubleSpinBox* myXSpin; ///< the spin box for the X coordinate
-  QDoubleSpinBox* myYSpin; ///< the spin box for the Y coordinate
+ private:
+  QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets
+  QDoubleSpinBox* myXSpin;  ///< the spin box for the X coordinate
+  QDoubleSpinBox* myYSpin;  ///< the spin box for the Y coordinate
 
-  std::string myOptionParam; /// Parameter name which has to be taken from previous feature
+  std::string myOptionParam;  /// Parameter name which has to be taken from previous feature
 };
 
 #endif

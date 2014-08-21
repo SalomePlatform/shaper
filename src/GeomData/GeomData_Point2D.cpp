@@ -37,7 +37,7 @@ double GeomData_Point2D::y() const
 boost::shared_ptr<GeomAPI_Pnt2d> GeomData_Point2D::pnt()
 {
   boost::shared_ptr<GeomAPI_Pnt2d> aResult(
-    new GeomAPI_Pnt2d(myCoords->Value(0), myCoords->Value(1)));
+      new GeomAPI_Pnt2d(myCoords->Value(0), myCoords->Value(1)));
   return aResult;
 }
 

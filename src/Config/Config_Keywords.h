@@ -66,7 +66,6 @@ const static char* DOUBLE_WDG_DFLT = "default";
 //toolbox/switch properties
 const static char* CONTAINER_PAGE_NAME = "title";
 
-
 /*
  * Hardcoded xml entities of plugins.xml
  */

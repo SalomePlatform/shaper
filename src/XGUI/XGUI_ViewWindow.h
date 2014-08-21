@@ -23,16 +23,16 @@ class XGUI_RectRubberBand;
 class QMdiSubWindow;
 
 /*!
-  \class XGUI_ViewWindow
-  \ingroup GUI
-  \brief Implements a one view window of 3d viewer object.
-  It contains a view port object (drawing area) and toolbars for view camera and window management.
-  Also it managements events in view port
-*/
-class XGUI_EXPORT XGUI_ViewWindow: public QFrame
+ \class XGUI_ViewWindow
+ \ingroup GUI
+ \brief Implements a one view window of 3d viewer object.
+ It contains a view port object (drawing area) and toolbars for view camera and window management.
+ Also it managements events in view port
+ */
+class XGUI_EXPORT XGUI_ViewWindow : public QFrame
 {
 Q_OBJECT
-public:
+ public:
   //! Types of viewer operations
   enum OperationType
   {
@@ -83,16 +83,28 @@ public:
   void setBackground(const Qtx::BackgroundData& theBackground);
 
   //! Returns true if the current view window can be closed
-  bool closable() const { return myClosable; }
+  bool closable() const
+  {
+    return myClosable;
+  }
 
   //! Sets the current view window closable or not
-  void setClosable( const bool isClosable ) { myClosable = isClosable; }
+  void setClosable(const bool isClosable)
+  {
+    myClosable = isClosable;
+  }
 
   //! Enable/Disable drawing of ribbon line
-  void enableDrawMode(bool toEnable) { myEnableDrawMode = toEnable; }
+  void enableDrawMode(bool toEnable)
+  {
+    myEnableDrawMode = toEnable;
+  }
 
   //! Returns true if ribbon line drawing enabled
-  bool isDrawModeEnabled() const { return myEnableDrawMode; }
+  bool isDrawModeEnabled() const
+  {
+    return myEnableDrawMode;
+  }
 
   //! Updates drawing mode in the view window
   void updateEnabledDrawMode();
@@ -113,7 +125,7 @@ signals:
   void tryClosing(XGUI_ViewWindow*);
 
   //! Emited when window is closing
-  void closed( QMdiSubWindow* );
+  void closed(QMdiSubWindow*);
 
   //! Emited on mouse press in view port
   void mousePressed(XGUI_ViewWindow*, QMouseEvent*);
@@ -126,20 +138,20 @@ signals:
 
   //! Emited on mouse moving in view port
   void mouseMoving(XGUI_ViewWindow*, QMouseEvent*);
- 
+
   //! Emited on key press in view port
   void keyPressed(XGUI_ViewWindow*, QKeyEvent*);
- 
+
   //! Emited on key release in view port
   void keyReleased(XGUI_ViewWindow*, QKeyEvent*);
- 
+
   //! Emited on context menu request in view port
   void contextMenuRequested(QContextMenuEvent *e);
 
   //void viewModified(XGUI_ViewWindow*);
-  void viewCloned( QMdiSubWindow* theView );
+  void viewCloned(QMdiSubWindow* theView);
 
-public slots:
+ public slots:
   //! Start zooming operation
   void activateZoom();
 
@@ -189,7 +201,7 @@ public slots:
 
   void windowDeactivated();
 
-protected:
+ protected:
   virtual void changeEvent(QEvent* theEvent);
 
   virtual bool eventFilter(QObject *theObj, QEvent *theEvent);
@@ -198,7 +210,7 @@ protected:
 
   virtual void contextMenuEvent(QContextMenuEvent* theEvent);
 
-private slots:
+ private slots:
   void onClose();
   void onMinimize();
   void onMaximize();
@@ -206,7 +218,7 @@ private slots:
   void updateToolBar();
 //  void repaintToolBar();
 
-private:
+ private:
   enum WindowState
   {
     MinimizedState,
@@ -240,7 +252,7 @@ private:
     myEventStarted = bOn;
   }
 
-private:
+ private:
   XGUI_Viewer* myViewer;
 
   QLabel* myPicture;
@@ -287,7 +299,7 @@ private:
 
   gp_Pnt mySelectedPoint;
 
-  XGUI_RectRubberBand* myRectBand; //!< selection rectangle rubber band
+  XGUI_RectRubberBand* myRectBand;  //!< selection rectangle rubber band
 
   typedef QMap<OperationType, bool> MapOfTransformStatus;
   MapOfTransformStatus myStatus;
@@ -297,48 +309,52 @@ private:
 
 //******************************************************
 /*!
-  \class ViewerToolbar
-  \ingroup GUI
-  \brief Provides a toolbar widget with treansparent background over OCCT View window
-*/
-class ViewerToolbar: public QToolBar
+ \class ViewerToolbar
+ \ingroup GUI
+ \brief Provides a toolbar widget with treansparent background over OCCT View window
+ */
+class ViewerToolbar : public QToolBar
 {
 Q_OBJECT
-public:
+ public:
   ViewerToolbar(QWidget* theParent, XGUI_ViewPort* thePort);
 
-protected slots:
-  void onViewPortResized() { myResize = true; }
+ protected slots:
+  void onViewPortResized()
+  {
+    myResize = true;
+  }
 
-protected:
+ protected:
   virtual void paintEvent(QPaintEvent* theEvent);
 
-
-
-private:
+ private:
   XGUI_ViewPort* myVPort;
   bool myResize;
 };
 
 //******************************************************
 /*!
-  \class ViewerToolbar
-  \ingroup GUI
-  \brief Provides a Label widget with treansparent background over OCCT View window
-*/
-class ViewerLabel: public QLabel
+ \class ViewerToolbar
+ \ingroup GUI
+ \brief Provides a Label widget with treansparent background over OCCT View window
+ */
+class ViewerLabel : public QLabel
 {
 Q_OBJECT
-public:
+ public:
   ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort);
 
-protected slots:
-  void onViewPortResized() { myResize = true; }
+ protected slots:
+  void onViewPortResized()
+  {
+    myResize = true;
+  }
 
-protected:
+ protected:
   virtual void paintEvent(QPaintEvent* theEvent);
 
-private:
+ private:
   XGUI_ViewPort* myVPort;
   bool myResize;
 };

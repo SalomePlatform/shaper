@@ -13,9 +13,9 @@
  * \brief 3 coordinates: they may represent vector or point or something else
  */
 
-class GEOMAPI_EXPORT GeomAPI_XYZ: public GeomAPI_Interface
+class GEOMAPI_EXPORT GeomAPI_XYZ : public GeomAPI_Interface
 {
-public:
+ public:
   /// Creation by coordinates
   GeomAPI_XYZ(const double theX, const double theY, const double theZ);
 

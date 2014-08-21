@@ -81,15 +81,15 @@ QString XGUI_Workshop::featureIcon(const std::string& theId)
 }
 
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
-  : QObject(),
-  myCurrentDir(QString()),
-  myModule(NULL),
-  mySalomeConnector(theConnector),
-  myPropertyPanel(0),
-  myObjectBrowser(0),
-  myDisplayer(0)
+    : QObject(),
+      myCurrentDir(QString()),
+      myModule(NULL),
+      mySalomeConnector(theConnector),
+      myPropertyPanel(0),
+      myObjectBrowser(0),
+      myDisplayer(0)
 {
-  myMainWindow = mySalomeConnector? 0 : new XGUI_MainWindow();
+  myMainWindow = mySalomeConnector ? 0 : new XGUI_MainWindow();
 
   myDisplayer = new XGUI_Displayer(this);
 
@@ -100,20 +100,22 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myActionsMgr = new XGUI_ActionsMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(myMainWindow);
   myContextMenuMgr = new XGUI_ContextMenuMgr(this);
-  connect(myContextMenuMgr, SIGNAL(actionTriggered(const QString&, bool)), 
-          this, SLOT(onContextMenuCommand(const QString&, bool)));
+  connect(myContextMenuMgr, SIGNAL(actionTriggered(const QString&, bool)), this,
+          SLOT(onContextMenuCommand(const QString&, bool)));
 
   myViewerProxy = new XGUI_ViewerProxy(this);
   connect(myViewerProxy, SIGNAL(selectionChanged()), this, SLOT(updateCommandsOnViewSelection()));
-  
+
   myModuleConnector = new XGUI_ModuleConnector(this);
 
   connect(myOperationMgr, SIGNAL(operationStarted()), SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationResumed()), SLOT(onOperationStarted()));
-  connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)), SLOT(onOperationStopped(ModuleBase_Operation*)));
+  connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
+          SLOT(onOperationStopped(ModuleBase_Operation*)));
   connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
   connect(myOperationMgr, SIGNAL(operationStarted()), myActionsMgr, SLOT(update()));
-  connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)), myActionsMgr, SLOT(update()));
+  connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)), myActionsMgr,
+          SLOT(update()));
   connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
 }
 
@@ -128,7 +130,7 @@ void XGUI_Workshop::startApplication()
   initMenu();
   //Initialize event listening
   Events_Loop* aLoop = Events_Loop::loop();
-  aLoop->registerListener(this, Events_Error::errorID()); //!< Listening application errors.
+  aLoop->registerListener(this, Events_Error::errorID());  //!< Listening application errors.
   //TODO(sbh): Implement static method to extract event id [SEID]
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_LOADED));
   // TODO Is it good to use non standard event within workshop?
@@ -156,15 +158,14 @@ void XGUI_Workshop::initMenu()
 
   if (isSalomeMode()) {
     // Create only Undo, Redo commands
-    QAction* aAction = salomeConnector()->addEditCommand("UNDO_CMD", 
-                                      tr("Undo"), tr("Undo last command"),
-                                      QIcon(":pictures/undo.png"), 
-                                      QKeySequence::Undo, false);
+    QAction* aAction = salomeConnector()->addEditCommand("UNDO_CMD", tr("Undo"),
+                                                         tr("Undo last command"),
+                                                         QIcon(":pictures/undo.png"),
+                                                         QKeySequence::Undo, false);
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onUndo()));
-    aAction = salomeConnector()->addEditCommand("REDO_CMD", 
-                                      tr("Redo"), tr("Redo last command"),
-                                      QIcon(":pictures/redo.png"), 
-                                      QKeySequence::Redo, false);
+    aAction = salomeConnector()->addEditCommand("REDO_CMD", tr("Redo"), tr("Redo last command"),
+                                                QIcon(":pictures/redo.png"), QKeySequence::Redo,
+                                                false);
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRedo()));
     salomeConnector()->addEditMenuSeparator();
     return;
@@ -230,8 +231,9 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 {
   //A message to start feature creation received.
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_LOADED)) {
-    const Config_FeatureMessage* aFeatureMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
-    if(!aFeatureMsg->isInternal()) {
+    const Config_FeatureMessage* aFeatureMsg =
+        dynamic_cast<const Config_FeatureMessage*>(theMessage);
+    if (!aFeatureMsg->isInternal()) {
       addFeature(aFeatureMsg);
     }
     return;
@@ -239,14 +241,16 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 
   // Process creation of Part
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
-    const ModelAPI_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
+    const ModelAPI_ObjectUpdatedMessage* aUpdMsg =
+        dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureCreatedMsg(aUpdMsg);
     return;
   }
 
   // Redisplay feature
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
-    const ModelAPI_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
+    const ModelAPI_ObjectUpdatedMessage* aUpdMsg =
+        dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureRedisplayMsg(aUpdMsg);
     return;
   }
@@ -270,17 +274,18 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   if (theMessage->eventID() == Events_LongOp::eventID()) {
     if (Events_LongOp::isPerformed())
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      //QTimer::singleShot(10, this, SLOT(onStartWaiting()));
-    else 
+    //QTimer::singleShot(10, this, SLOT(onStartWaiting()));
+    else
       QApplication::restoreOverrideCursor();
     return;
   }
 
   //An operation passed by message. Start it, process and commit.
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OPERATION_LAUNCHED)) {
-    const Config_PointerMessage* aPartSetMsg = dynamic_cast<const Config_PointerMessage*>(theMessage);
+    const Config_PointerMessage* aPartSetMsg =
+        dynamic_cast<const Config_PointerMessage*>(theMessage);
     //myPropertyPanel->cleanContent();
-    ModuleBase_Operation* anOperation = (ModuleBase_Operation*)aPartSetMsg->pointer();
+    ModuleBase_Operation* anOperation = (ModuleBase_Operation*) aPartSetMsg->pointer();
 
     if (myOperationMgr->startOperation(anOperation)) {
       myPropertyPanel->updateContentWidget(anOperation->feature());
@@ -310,16 +315,15 @@ void XGUI_Workshop::onStartWaiting()
 void XGUI_Workshop::onFeatureUpdatedMsg(const ModelAPI_ObjectUpdatedMessage* theMsg)
 {
   std::set<ObjectPtr> aFeatures = theMsg->objects();
-  if (myOperationMgr->hasOperation())
-  {
+  if (myOperationMgr->hasOperation()) {
     FeaturePtr aCurrentFeature = myOperationMgr->currentOperation()->feature();
     std::set<ObjectPtr>::const_iterator aIt;
     for (aIt = aFeatures.begin(); aIt != aFeatures.end(); ++aIt) {
       ObjectPtr aNewFeature = (*aIt);
-      if(aNewFeature == aCurrentFeature) {
+      if (aNewFeature == aCurrentFeature) {
         myPropertyPanel->updateContentWidget(aCurrentFeature);
         break;
-      } 
+      }
     }
   }
   myOperationMgr->validateCurrentOperation();
@@ -335,13 +339,13 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const ModelAPI_ObjectUpdatedMessage* t
     if (!aObj->data() || !aObj->data()->isValid())
       myDisplayer->erase(aObj, false);
     else {
-      if (myDisplayer->isVisible(aObj)) // TODO VSV: Correction sketch drawing
-        myDisplayer->display(aObj, false); // In order to update presentation
+      if (myDisplayer->isVisible(aObj))  // TODO VSV: Correction sketch drawing
+        myDisplayer->display(aObj, false);  // In order to update presentation
       else {
-        if(myOperationMgr->hasOperation()) {
+        if (myOperationMgr->hasOperation()) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-          if (aOperation->hasObject(aObj)) { // Display only current operation results
-            myDisplayer->display(aObj, false);        
+          if (aOperation->hasObject(aObj)) {  // Display only current operation results
+            myDisplayer->display(aObj, false);
           }
         }
       }
@@ -362,11 +366,11 @@ void XGUI_Workshop::onFeatureCreatedMsg(const ModelAPI_ObjectUpdatedMessage* the
     ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
     if (aPart) {
       aHasPart = true;
-    // If a feature is created from the aplication's python console  
-    // it doesn't stored in the operation mgr and doesn't displayed
-    } else if(myOperationMgr->hasOperation()) {
+      // If a feature is created from the aplication's python console  
+      // it doesn't stored in the operation mgr and doesn't displayed
+    } else if (myOperationMgr->hasOperation()) {
       ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-      if (aOperation->hasObject(*aIt)) { // Display only current operation results
+      if (aOperation->hasObject(*aIt)) {  // Display only current operation results
         myDisplayer->display(*aIt, false);
         isDisplayed = true;
       }
@@ -392,7 +396,7 @@ void XGUI_Workshop::onOperationStarted()
 {
   ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
 
-  if(aOperation->getDescription()->hasXmlRepresentation()) { //!< No need for property panel
+  if (aOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
     connectWithOperation(aOperation);
 
     showPropertyPanel();
@@ -402,7 +406,7 @@ void XGUI_Workshop::onOperationStarted()
 
     myPropertyPanel->cleanContent();
     aFactory.createWidget(myPropertyPanel->contentWidget());
-    
+
     QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
     QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
     ModuleBase_ModelWidget* aWidget;
@@ -410,12 +414,11 @@ void XGUI_Workshop::onOperationStarted()
       aWidget = *anIt;
       aWidget->setFeature(aOperation->feature());
       //QObject::connect(aWidget, SIGNAL(valuesChanged()),  aOperation, SLOT(storeCustomValue()));
-      QObject::connect(aWidget, SIGNAL(valuesChanged()),
-                       this, SLOT(onWidgetValuesChanged()));
+      QObject::connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
       // Init default values
       if (!aOperation->isEditOperation() && aWidget->hasDefaultValue()) {
         //aWidget->storeValue(aOperation->feature());
-        
+
         aWidget->storeValue();
       }
     }
@@ -455,12 +458,11 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
   bool isUsePropPanel = theMessage->isUseInput();
   QString aFeatureId = QString::fromStdString(theMessage->id());
   if (isSalomeMode()) {
-    QAction* aAction = salomeConnector()->addFeature(aWchName,
-                              aFeatureId,
-                              QString::fromStdString(theMessage->text()),
-                              QString::fromStdString(theMessage->tooltip()),
-                              QIcon(theMessage->icon().c_str()),
-                              QKeySequence(), isUsePropPanel);
+    QAction* aAction = salomeConnector()->addFeature(aWchName, aFeatureId,
+                                                     QString::fromStdString(theMessage->text()),
+                                                     QString::fromStdString(theMessage->tooltip()),
+                                                     QIcon(theMessage->icon().c_str()),
+                                                     QKeySequence(), isUsePropPanel);
     salomeConnector()->setNestedActions(aFeatureId, aNestedFeatures.split(" "));
     myActionsMgr->addCommand(aAction);
     myModule->featureCreated(aAction);
@@ -484,8 +486,8 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
     XGUI_Command* aCommand = aGroup->addFeature(aFeatureId,
                                                 QString::fromStdString(theMessage->text()),
                                                 QString::fromStdString(theMessage->tooltip()),
-                                                QIcon(theMessage->icon().c_str()),
-                                                aHotKey, isUsePropPanel);
+                                                QIcon(theMessage->icon().c_str()), aHotKey,
+                                                isUsePropPanel);
     aCommand->setNestedCommands(aNestedFeatures.split(" ", QString::SkipEmptyParts));
     myActionsMgr->addCommand(aCommand);
     myModule->featureCreated(aCommand);
@@ -528,14 +530,13 @@ void XGUI_Workshop::onExit()
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   DocumentPtr aDoc = aMgr->rootDocument();
-  if(aDoc->isModified()) {
+  if (aDoc->isModified()) {
     int anAnswer = QMessageBox::question(
-        myMainWindow, tr("Save current file"),
-        tr("The document is modified, save before exit?"),
+        myMainWindow, tr("Save current file"), tr("The document is modified, save before exit?"),
         QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
-    if(anAnswer == QMessageBox::Save) {
+    if (anAnswer == QMessageBox::Save) {
       bool saved = onSave();
-      if(!saved) {
+      if (!saved) {
         return;
       }
     } else if (anAnswer == QMessageBox::Cancel) {
@@ -571,13 +572,13 @@ void XGUI_Workshop::onOpen()
   //save current file before close if modified
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   DocumentPtr aDoc = aMgr->rootDocument();
-  if(aDoc->isModified()) {
+  if (aDoc->isModified()) {
     //TODO(sbh): re-launch the app?
     int anAnswer = QMessageBox::question(
         myMainWindow, tr("Save current file"),
         tr("The document is modified, save before opening another?"),
         QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
-    if(anAnswer == QMessageBox::Save) {
+    if (anAnswer == QMessageBox::Save) {
       onSave();
     } else if (anAnswer == QMessageBox::Cancel) {
       return;
@@ -588,10 +589,10 @@ void XGUI_Workshop::onOpen()
 
   //show file dialog, check if readable and open
   myCurrentDir = QFileDialog::getExistingDirectory(mainWindow());
-  if(myCurrentDir.isEmpty())
+  if (myCurrentDir.isEmpty())
     return;
   QFileInfo aFileInfo(myCurrentDir);
-  if(!aFileInfo.exists() || !aFileInfo.isReadable()) {
+  if (!aFileInfo.exists() || !aFileInfo.isReadable()) {
     QMessageBox::critical(myMainWindow, tr("Warning"), tr("Unable to open the file."));
     myCurrentDir = "";
     return;
@@ -607,7 +608,7 @@ void XGUI_Workshop::onOpen()
 //******************************************************
 bool XGUI_Workshop::onSave()
 {
-  if(myCurrentDir.isEmpty()) {
+  if (myCurrentDir.isEmpty()) {
     return onSaveAs();
   }
   saveDocument(myCurrentDir);
@@ -625,18 +626,19 @@ bool XGUI_Workshop::onSaveAs()
   dialog.setOptions(QFileDialog::HideNameFilterDetails | QFileDialog::ShowDirsOnly);
   dialog.setViewMode(QFileDialog::Detail);
 
-  if(!dialog.exec()) {
+  if (!dialog.exec()) {
     return false;
   }
   QString aTempDir = dialog.selectedFiles().first();
   QDir aDir(aTempDir);
-  if(aDir.exists() && !aDir.entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries).isEmpty()) {
-    int answer = QMessageBox::question(myMainWindow,
-                                       //: Title of the dialog which asks user if he wants to save study in existing non-empty folder
-                                       tr("Save"),
-                                       tr("The folder already contains some files, save anyway?"),
-                                       QMessageBox::Save|QMessageBox::Cancel);
-    if(answer == QMessageBox::Cancel) {
+  if (aDir.exists() && !aDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).isEmpty()) {
+    int answer = QMessageBox::question(
+        myMainWindow,
+        //: Title of the dialog which asks user if he wants to save study in existing non-empty folder
+        tr("Save"),
+        tr("The folder already contains some files, save anyway?"),
+        QMessageBox::Save | QMessageBox::Cancel);
+    if (answer == QMessageBox::Cancel) {
       return false;
     }
   }
@@ -675,13 +677,14 @@ void XGUI_Workshop::onPreferences()
   XGUI_Preferences::editPreferences(aModif);
   if (aModif.size() > 0) {
     QString aSection;
-    foreach (XGUI_Pref aPref, aModif) {
+    foreach (XGUI_Pref aPref, aModif)
+    {
       aSection = aPref.first;
       if (aSection == XGUI_Preferences::VIEWER_SECTION) {
-        if (!isSalomeMode()) 
+        if (!isSalomeMode())
           myMainWindow->viewer()->updateFromResources();
       } else if (aSection == XGUI_Preferences::MENU_SECTION) {
-        if (!isSalomeMode()) 
+        if (!isSalomeMode())
           myMainWindow->menuObject()->updateFromResources();
       }
     }
@@ -691,11 +694,9 @@ void XGUI_Workshop::onPreferences()
 //******************************************************
 ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 {
-  QString libName =
-      QString::fromStdString(library(theModule.toStdString()));
+  QString libName = QString::fromStdString(library(theModule.toStdString()));
   if (libName.isEmpty()) {
-    qWarning(
-    qPrintable( tr( "Information about module \"%1\" doesn't exist." ).arg( theModule ) ));
+    qWarning(qPrintable(tr("Information about module \"%1\" doesn't exist.").arg(theModule)));
     return 0;
   }
 
@@ -743,7 +744,7 @@ ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
     if (mainWindow()) {
       QMessageBox::warning(mainWindow(), tr("Error"), err);
     } else {
-      qWarning( qPrintable( err ));
+      qWarning(qPrintable(err));
     }
   }
   return aModule;
@@ -766,7 +767,7 @@ bool XGUI_Workshop::activateModule()
 void XGUI_Workshop::updateCommandStatus()
 {
   QList<QAction*> aCommands;
-  if (isSalomeMode()) { // update commands in SALOME mode
+  if (isSalomeMode()) {  // update commands in SALOME mode
     aCommands = salomeConnector()->commandList();
   } else {
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
@@ -777,26 +778,29 @@ void XGUI_Workshop::updateCommandStatus()
   if (aMgr->hasRootDocument()) {
     QAction* aUndoCmd;
     QAction* aRedoCmd;
-    foreach(QAction* aCmd, aCommands) {
+    foreach(QAction* aCmd, aCommands)
+    {
       QString aId = aCmd->data().toString();
       if (aId == "UNDO_CMD")
         aUndoCmd = aCmd;
       else if (aId == "REDO_CMD")
         aRedoCmd = aCmd;
-      else // Enable all commands
+      else
+        // Enable all commands
         aCmd->setEnabled(true);
     }
     DocumentPtr aDoc = aMgr->rootDocument();
     aUndoCmd->setEnabled(aDoc->canUndo());
     aRedoCmd->setEnabled(aDoc->canRedo());
   } else {
-    foreach(QAction* aCmd, aCommands) {
+    foreach(QAction* aCmd, aCommands)
+    {
       QString aId = aCmd->data().toString();
       if (aId == "NEW_CMD")
         aCmd->setEnabled(true);
       else if (aId == "EXIT_CMD")
         aCmd->setEnabled(true);
-      else 
+      else
         aCmd->setEnabled(false);
     }
   }
@@ -807,11 +811,12 @@ void XGUI_Workshop::updateCommandStatus()
 QList<QAction*> XGUI_Workshop::getModuleCommands() const
 {
   QList<QAction*> aCommands;
-  if (isSalomeMode()) { // update commands in SALOME mode
+  if (isSalomeMode()) {  // update commands in SALOME mode
     aCommands = salomeConnector()->commandList();
   } else {
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
-    foreach(XGUI_Command* aCmd, aMenuBar->features()) {
+    foreach(XGUI_Command* aCmd, aMenuBar->features())
+    {
       aCommands.append(aCmd);
     }
   }
@@ -824,9 +829,11 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   QDockWidget* aObjDock = new QDockWidget(theParent);
   aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   aObjDock->setWindowTitle(tr("Object browser"));
-  aObjDock->setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
+  aObjDock->setStyleSheet(
+      "::title { position: relative; padding-left: 5px; text-align: left center }");
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock);
-  connect(myObjectBrowser, SIGNAL(activePartChanged(ObjectPtr)), this, SLOT(changeCurrentDocument(ObjectPtr)));
+  connect(myObjectBrowser, SIGNAL(activePartChanged(ObjectPtr)), this,
+          SLOT(changeCurrentDocument(ObjectPtr)));
   aObjDock->setWidget(myObjectBrowser);
 
   myContextMenuMgr->connectObjectBrowser();
@@ -840,13 +847,12 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
  */
 void XGUI_Workshop::createDockWidgets()
 {
-  QMainWindow* aDesktop = isSalomeMode()? salomeConnector()->desktop() :
-                                          myMainWindow;
+  QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
   QDockWidget* aObjDock = createObjectBrowser(aDesktop);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
   myPropertyPanel = new XGUI_PropertyPanel(aDesktop);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanel);
-  hidePropertyPanel(); //<! Invisible by default
+  hidePropertyPanel();  //<! Invisible by default
   hideObjectBrowser();
   aDesktop->tabifyDockWidget(aObjDock, myPropertyPanel);
 
@@ -855,15 +861,15 @@ void XGUI_Workshop::createDockWidgets()
   QPushButton* aCancelBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
   connect(aCancelBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onAbortOperation()));
 
-  connect(myPropertyPanel, SIGNAL(keyReleased(const std::string&, QKeyEvent*)),
-          myOperationMgr, SLOT(onKeyReleased(const std::string&, QKeyEvent*)));
+  connect(myPropertyPanel, SIGNAL(keyReleased(const std::string&, QKeyEvent*)), myOperationMgr,
+          SLOT(onKeyReleased(const std::string&, QKeyEvent*)));
 
-  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
-          myOperationMgr, SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
-  connect(myOperationMgr, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)),
-          myPropertyPanel, SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
-  connect(myOperationMgr, SIGNAL(operationValidated(bool)),
-          myPropertyPanel, SLOT(setAcceptEnabled(bool)));
+  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), myOperationMgr,
+          SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
+  connect(myOperationMgr, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)), myPropertyPanel,
+          SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
+  connect(myOperationMgr, SIGNAL(operationValidated(bool)), myPropertyPanel,
+          SLOT(setAcceptEnabled(bool)));
 
 }
 
@@ -922,7 +928,7 @@ void XGUI_Workshop::changeCurrentDocument(ObjectPtr theObj)
         return;
       }
     }
-  } 
+  }
   aMgr->setCurrentDocument(aMgr->rootDocument());
 }
 
@@ -932,11 +938,10 @@ void XGUI_Workshop::salomeViewerSelectionChanged()
   emit salomeViewerSelection();
 }
 
-
 //**************************************************************
-XGUI_SalomeViewer* XGUI_Workshop::salomeViewer() const 
-{ 
-  return mySalomeConnector->viewer(); 
+XGUI_SalomeViewer* XGUI_Workshop::salomeViewer() const
+{
+  return mySalomeConnector->viewer();
 }
 
 //**************************************************************
@@ -946,7 +951,7 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   if ((theId == "ACTIVATE_PART_CMD") && (aObjects.size() > 0)) {
     ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObjects.first());
     activatePart(aPart);
-  } else if (theId == "DEACTIVATE_PART_CMD") 
+  } else if (theId == "DEACTIVATE_PART_CMD")
     activatePart(ResultPartPtr());
   else if (theId == "DELETE_CMD")
     deleteObjects(aObjects);
@@ -970,7 +975,7 @@ void XGUI_Workshop::onWidgetValuesChanged()
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
   for (; anIt != aLast; anIt++) {
     ModuleBase_ModelWidget* aCustom = *anIt;
-    if (aCustom && (/*!aCustom->isInitialized(aFeature) ||*/ aCustom == aSenderWidget)) {
+    if (aCustom && (/*!aCustom->isInitialized(aFeature) ||*/aCustom == aSenderWidget)) {
       //aCustom->storeValue(aFeature);
       aCustom->storeValue();
     }
@@ -999,15 +1004,16 @@ void XGUI_Workshop::activateLastPart()
 //**************************************************************
 void XGUI_Workshop::deleteObjects(const QList<ObjectPtr>& theList)
 {
-  QMainWindow* aDesktop = isSalomeMode()? salomeConnector()->desktop() : myMainWindow;
-  QMessageBox::StandardButton aRes = QMessageBox::warning(aDesktop, tr("Delete features"), 
-                                                          tr("Seleted features will be deleted. Continue?"), 
-                                                          QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
+  QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
+  QMessageBox::StandardButton aRes = QMessageBox::warning(
+      aDesktop, tr("Delete features"), tr("Seleted features will be deleted. Continue?"),
+      QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
   // ToDo: definbe deleting method
   if (aRes == QMessageBox::Yes) {
     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
     aMgr->rootDocument()->startOperation();
-    foreach (ObjectPtr aObj, theList) {
+    foreach (ObjectPtr aObj, theList)
+    {
       ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
       if (aPart) {
         DocumentPtr aDoc = aPart->document();
@@ -1029,7 +1035,8 @@ void XGUI_Workshop::deleteObjects(const QList<ObjectPtr>& theList)
 //**************************************************************
 void XGUI_Workshop::showObjects(const QList<ObjectPtr>& theList, bool isVisible)
 {
-  foreach (ObjectPtr aObj, theList) {
+  foreach (ObjectPtr aObj, theList)
+  {
     ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
     if (aRes) {
       if (isVisible) {
@@ -1052,15 +1059,16 @@ void XGUI_Workshop::updateCommandsOnViewSelection()
     return;
 
   QList<QAction*> aActions = getModuleCommands();
-  foreach(QAction* aAction, aActions) {
+  foreach(QAction* aAction, aActions)
+  {
     QString aId = aAction->data().toString();
     std::list<ModelAPI_Validator*> aValidators;
     aFactory->validators(aId.toStdString(), aValidators);
     std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
-    for(; aValidator != aValidators.end(); aValidator++) {
+    for (; aValidator != aValidators.end(); aValidator++) {
       if (*aValidator) {
-        const ModuleBase_SelectionValidator* aSelValidator = 
-          dynamic_cast<const ModuleBase_SelectionValidator*>(*aValidator);
+        const ModuleBase_SelectionValidator* aSelValidator =
+            dynamic_cast<const ModuleBase_SelectionValidator*>(*aValidator);
         if (aSelValidator) {
           aAction->setEnabled(aSelValidator->isValid(aSelection));
         }
@@ -1069,14 +1077,12 @@ void XGUI_Workshop::updateCommandsOnViewSelection()
   }
 }
 
-
 //**************************************************************
 void XGUI_Workshop::registerValidators() const
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 }
-
 
 //**************************************************************
 void XGUI_Workshop::displayAllResults()

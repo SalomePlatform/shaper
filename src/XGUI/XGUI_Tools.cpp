@@ -9,8 +9,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace XGUI_Tools
-{
+namespace XGUI_Tools {
 //******************************************************************
 QString dir(const QString& path, bool isAbs)
 {
@@ -25,7 +24,7 @@ QString dir(const QString& path, bool isAbs)
 QString file(const QString& path, bool withExt)
 {
   QString fPath = path;
-  while(!fPath.isEmpty() && (fPath[fPath.length() - 1] == '\\' || fPath[fPath.length() - 1] == '/'))
+  while (!fPath.isEmpty() && (fPath[fPath.length() - 1] == '\\' || fPath[fPath.length() - 1] == '/'))
     fPath.remove(fPath.length() - 1, 1);
 
   if (withExt)
@@ -65,7 +64,7 @@ bool isModelObject(FeaturePtr theFeature)
 //******************************************************************
 std::string featureInfo(FeaturePtr theFeature)
 {
-  std::ostringstream aStream; 
+  std::ostringstream aStream;
   if (theFeature)
     aStream << theFeature.get() << " " << theFeature->getKind();
   return QString(aStream.str().c_str()).toStdString();
@@ -73,14 +72,13 @@ std::string featureInfo(FeaturePtr theFeature)
 
 //******************************************************************
 /*FeaturePtr realFeature(const FeaturePtr theFeature)
-{
-  if (theFeature->data()) {
-    return theFeature;
-  } else {
-    ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
-    return aObject->featureRef();
-  }
-}*/
-
+ {
+ if (theFeature->data()) {
+ return theFeature;
+ } else {
+ ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
+ return aObject->featureRef();
+ }
+ }*/
 
 }

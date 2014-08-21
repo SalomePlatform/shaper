@@ -4,21 +4,14 @@
 
 #include "Config_PropManager.h"
 
-
-
 std::vector<int> stringToRGB(const std::string& theColor);
 int stringToInteger(const std::string& theInt);
 double stringToDouble(const std::string& theDouble);
 
-
 Config_Properties Config_PropManager::myProps;
 
-
-
-bool Config_PropManager::registerProp(const std::string& theSection,
-                                      const std::string& theName,
-                                      const std::string& theTitle,
-                                      Config_Prop::PropType theType,
+bool Config_PropManager::registerProp(const std::string& theSection, const std::string& theName,
+                                      const std::string& theTitle, Config_Prop::PropType theType,
                                       const std::string& theValue)
 {
   Config_Prop* aProp = findProp(theSection, theName);
@@ -35,8 +28,7 @@ bool Config_PropManager::registerProp(const std::string& theSection,
   return true;
 }
 
-Config_Prop* Config_PropManager::findProp(const std::string& theSection,
-                                          const std::string& theName)
+Config_Prop* Config_PropManager::findProp(const std::string& theSection, const std::string& theName)
 {
   Config_Properties::const_iterator aIt;
   for (aIt = myProps.cbegin(); aIt != myProps.cend(); ++aIt) {
@@ -46,7 +38,6 @@ Config_Prop* Config_PropManager::findProp(const std::string& theSection,
   }
   return NULL;
 }
-
 
 Config_Properties Config_PropManager::getProperties()
 {
@@ -86,10 +77,8 @@ Config_Properties Config_PropManager::getProperties(const std::string& theSectio
   return aRes;
 }
 
-
-std::string Config_PropManager::string(const std::string& theSection, 
-                                      const std::string& theName,
-                                      const std::string& theDefault)
+std::string Config_PropManager::string(const std::string& theSection, const std::string& theName,
+                                       const std::string& theDefault)
 {
   Config_Properties aProps = getProperties(theSection);
   Config_Properties::const_iterator aIt;
@@ -101,8 +90,7 @@ std::string Config_PropManager::string(const std::string& theSection,
   return theDefault;
 }
 
-
-std::vector<int> Config_PropManager::color(const std::string& theSection, 
+std::vector<int> Config_PropManager::color(const std::string& theSection,
                                            const std::string& theName,
                                            const std::string& theDefault)
 {
@@ -110,23 +98,19 @@ std::vector<int> Config_PropManager::color(const std::string& theSection,
   return stringToRGB(aStr);
 }
 
-int Config_PropManager::integer(const std::string& theSection, 
-                      const std::string& theName,
-                      const std::string& theDefault)
+int Config_PropManager::integer(const std::string& theSection, const std::string& theName,
+                                const std::string& theDefault)
 {
   std::string aStr = string(theSection, theName, theDefault);
   return stringToInteger(aStr);
 }
 
-double Config_PropManager::real(const std::string& theSection, 
-                      const std::string& theName,
-                      const std::string& theDefault)
+double Config_PropManager::real(const std::string& theSection, const std::string& theName,
+                                const std::string& theDefault)
 {
   std::string aStr = string(theSection, theName, theDefault);
   return stringToDouble(aStr);
 }
-
-
 
 std::vector<int> stringToRGB(const std::string& theColor)
 {

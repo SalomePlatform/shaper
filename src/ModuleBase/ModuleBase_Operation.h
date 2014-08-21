@@ -5,7 +5,6 @@
  *      Author: sbh
  */
 
-
 #ifndef ModuleBase_Operation_H
 #define ModuleBase_Operation_H
 
@@ -40,11 +39,11 @@ class QKeyEvent;
  *  - virtual void      commitOperation();
  */
 
-class MODULEBASE_EXPORT ModuleBase_Operation: public ModuleBase_IOperation
+class MODULEBASE_EXPORT ModuleBase_Operation : public ModuleBase_IOperation
 {
 Q_OBJECT
 
-public:
+ public:
   /// Constructor
   /// \param theId the operation identifier
   /// \param theParent the QObject parent
@@ -67,7 +66,10 @@ public:
   /// Stores a custom value in model.
   void storeCustomValue();
 
-  virtual void keyReleased(std::string theName, QKeyEvent* theEvent) {};
+  virtual void keyReleased(std::string theName, QKeyEvent* theEvent)
+  {
+  }
+  ;
 
   /// Sets the operation feature
   void setEditingFeature(FeaturePtr theFeature);
@@ -75,7 +77,7 @@ public:
   /// Returns True if the current operation works with the given object (feature or result)
   virtual bool hasObject(ObjectPtr theObj) const;
 
-public slots:
+ public slots:
   /// Slots which listen the mode widget activation
   /// \param theWidget the model widget
   virtual void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
@@ -85,7 +87,7 @@ signals:
   /// \param theWidget the previous active widget
   void activateNextWidget(ModuleBase_ModelWidget* theWidget);
 
-protected:
+ protected:
   /// Virtual method called when operation started (see start() method for more description)
   /// Default impl calls corresponding slot and commits immediately.
   virtual void startOperation();
@@ -108,7 +110,7 @@ protected:
   /// \returns the created feature
   virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
-protected:
+ protected:
   /// Sets the operation feature
   void setFeature(FeaturePtr theFeature);
 
@@ -116,8 +118,8 @@ protected:
   /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
   virtual bool canBeCommitted() const;
 
-protected:
-  FeaturePtr myFeature; /// the operation feature to be handled
+ protected:
+  FeaturePtr myFeature;  /// the operation feature to be handled
 };
 
 #endif

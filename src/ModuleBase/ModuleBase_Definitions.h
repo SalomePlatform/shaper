@@ -1,4 +1,3 @@
-
 #ifndef ModuleBase_Definitions_H
 #define ModuleBase_Definitions_H
 
@@ -9,8 +8,7 @@
 typedef QList<int> QIntList;       //!< list of int values
 typedef QList<short> QShortList;     //!< list of short int values
 typedef QList<double> QDoubleList;    //!< list of double values
-typedef QList<FeaturePtr> QFeatureList; //!< List of features
-typedef QList<ResultPtr> QResultList; //!< List of results
-
+typedef QList<FeaturePtr> QFeatureList;  //!< List of features
+typedef QList<ResultPtr> QResultList;  //!< List of results
 
 #endif

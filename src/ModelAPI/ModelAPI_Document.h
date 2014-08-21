@@ -26,7 +26,7 @@ class ModelAPI_Data;
  */
 class ModelAPI_Document
 {
-public:
+ public:
   //! Loads the OCAF document from the file.
   //! \param theFileName full name of the file to load
   //! \param theStudyID identifier of the SALOME study to associate with loaded file
@@ -69,8 +69,8 @@ public:
   virtual void removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
 
   ///! Adds a new sub-document by the identifier, or returns existing one if it is already exist
-  virtual boost::shared_ptr<ModelAPI_Document> 
-    subDocument(std::string theDocID) = 0;
+  virtual boost::shared_ptr<ModelAPI_Document>
+  subDocument(std::string theDocID) = 0;
 
   ///! Returns the id of the document
   virtual const std::string& id() const = 0;
@@ -79,39 +79,40 @@ public:
   //! \param theGroupID group that contains an object
   //! \param theIndex zero-based index of feature in the group
   //! \param theHidden if it is true, it counts also the features that are not in tree
-  virtual boost::shared_ptr<ModelAPI_Object> 
-    object(const std::string& theGroupID, const int theIndex, const bool theHidden = false) = 0;
+  virtual boost::shared_ptr<ModelAPI_Object>
+  object(const std::string& theGroupID, const int theIndex, const bool theHidden = false) = 0;
 
   //! Returns the number of objects in the group of objects
   //! If theHidden is true, it counts also the features that are not in tree
   virtual int size(const std::string& theGroupID, const bool theHidden = false) = 0;
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_Document() {}
+  virtual ~ModelAPI_Document()
+  {
+  }
 
   /// Creates a construction cresults
   virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
-    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   /// Creates a body results
   virtual boost::shared_ptr<ModelAPI_ResultBody> createBody(
-    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   /// Creates a part results
   virtual boost::shared_ptr<ModelAPI_ResultPart> createPart(
-    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
 
   //! Returns a feature by result (owner of result)
   virtual boost::shared_ptr<ModelAPI_Feature> feature(
-    const boost::shared_ptr<ModelAPI_Result>& theResult) = 0;
+      const boost::shared_ptr<ModelAPI_Result>& theResult) = 0;
 
-protected:
+ protected:
   /// Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document()
-  {}
+  {
+  }
 };
-
 
 //! Pointer on document object
 typedef boost::shared_ptr<ModelAPI_Document> DocumentPtr;
-
 
 #endif

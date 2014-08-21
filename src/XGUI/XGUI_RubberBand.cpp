@@ -21,13 +21,14 @@
  */
 
 XGUI_AbstractRubberBand::XGUI_AbstractRubberBand(QWidget* theParent)
-    : QWidget(theParent), myPoints(), myIsClosed(false)
+    : QWidget(theParent),
+      myPoints(),
+      myIsClosed(false)
 {
   setAttribute(Qt::WA_TransparentForMouseEvents);
 #ifndef WIN32
   setAttribute(Qt::WA_NoSystemBackground);
-#endif //WIN32  setAttribute(Qt::WA_WState_ExplicitShowHide);  setVisible(false);  theParent->installEventFilter(this);
-  setGeometry(QRect(QPoint(0, 0), theParent->size()));
+#endif //WIN32  setAttribute(Qt::WA_WState_ExplicitShowHide);  setVisible(false);  theParent->installEventFilter(this);  setGeometry(QRect(QPoint(0, 0), theParent->size()));
 }
 
 /*!
@@ -100,7 +101,7 @@ QRegion createRegion(const QPointF& p1, const QPointF& p2)
   if (p1 == p2)
     return QRegion();
 
-  QLineF n = QLineF(p1, p2).normalVector(); //.unitVector();
+  QLineF n = QLineF(p1, p2).normalVector();  //.unitVector();
   n.setLength(1);
   n.translate(p1 * -1);
   QPointF nPoint = n.p2();
@@ -116,7 +117,7 @@ void XGUI_AbstractRubberBand::updateMask()
   QRegion r;
 
   QVectorIterator<QPoint> it(myPoints);
-  while(it.hasNext()) {
+  while (it.hasNext()) {
     QPoint p = it.next();
     if (!it.hasNext())
       break;
@@ -151,7 +152,7 @@ void XGUI_RectRubberBand::initGeometry(const QRect& theRect)
 {
   myPoints.clear();
   myPoints << theRect.topLeft() << theRect.topRight() << theRect.bottomRight()
-      << theRect.bottomLeft();
+           << theRect.bottomLeft();
   //setMask( QRegion( myPoints ) );
   updateMask();
 }
@@ -175,7 +176,7 @@ void XGUI_RectRubberBand::setEndPoint(const QPoint& thePoint)
 void XGUI_RectRubberBand::clearGeometry()
 {
   QMutableVectorIterator<QPoint> i(myPoints);
-  while(i.hasNext()) {
+  while (i.hasNext()) {
     i.next();
     i.setValue(QPoint(-1, -1));
   }

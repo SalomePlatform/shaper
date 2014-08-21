@@ -18,14 +18,19 @@
  */
 class ModelAPI_ResultPart : public ModelAPI_Result
 {
-public:
+ public:
   /// Returns the group identifier of this result
   virtual std::string groupName()
-    { return group(); }
+  {
+    return group();
+  }
 
   /// Returns the group identifier of this result
   static std::string group()
-    {static std::string MY_GROUP = "Parts"; return MY_GROUP;}
+  {
+    static std::string MY_GROUP = "Parts";
+    return MY_GROUP;
+  }
 
   /// part document reference attribute
   inline static const std::string& DOC_REF()

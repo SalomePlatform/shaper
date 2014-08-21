@@ -40,7 +40,8 @@ void PartSet_TestOCC::testSelection(XGUI_Workshop* theWorkshop)
   boost::shared_ptr<GeomAPI_AISObject> anIO = theWorkshop->displayer()->getAISObject(myTestObject);
   if (!anIO->empty()) {
     theWorkshop->viewer()->AISContext()->MoveTo(0, 0, theWorkshop->viewer()->activeView());
-    theWorkshop->viewer()->AISContext()->Select(0, 0, 2500, 2500, theWorkshop->viewer()->activeView());
+    theWorkshop->viewer()->AISContext()->Select(0, 0, 2500, 2500,
+                                                theWorkshop->viewer()->activeView());
   }
 }
 
@@ -96,7 +97,7 @@ void PartSet_TestOCC::local_selection_change_shape(Handle_AIS_InteractiveContext
 }
 
 void PartSet_TestOCC::local_selection_erase(Handle_AIS_InteractiveContext theContext,
-                                    Handle_V3d_View theView)
+                                            Handle_V3d_View theView)
 {
   // 1. Create shape
   gp_Pnt aPnt1(100, 100, 0);
@@ -127,17 +128,17 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
 
   ModuleBase_Operation* anOperation = theWorkshop->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-    FeaturePtr aSketch;
+  FeaturePtr aSketch;
 
   if (aPreviewOp) {
     // create a line
     boost::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_PluginManager::get()->rootDocument();
     FeaturePtr aFeature = aDoc->addFeature(SketchPlugin_Line::ID());
-    if (aFeature) // TODO: generate an error if feature was not created
+    if (aFeature)  // TODO: generate an error if feature was not created
       aFeature->execute();
 
-    boost::shared_ptr<SketchPlugin_Feature> aSketch = 
-                        boost::dynamic_pointer_cast<SketchPlugin_Feature>(aPreviewOp->sketch());
+    boost::shared_ptr<SketchPlugin_Feature> aSketch = boost::dynamic_pointer_cast<
+        SketchPlugin_Feature>(aPreviewOp->sketch());
     aSketch->addSub(aFeature);
 
     PartSet_Tools::setFeaturePoint(aFeature, 100, 100, SketchPlugin_Line::START_ID());
@@ -148,12 +149,12 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
     XGUI_Displayer* aDisplayer = theWorkshop->displayer();
 
     boost::shared_ptr<GeomAPI_AISObject> aPrevAIS;
-    boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
-      boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    boost::shared_ptr<SketchPlugin_Feature> aSPFeature = boost::dynamic_pointer_cast<
+        SketchPlugin_Feature>(aFeature);
     //boost::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
     //if (!anAIS->empty())
     aDisplayer->display(aFeature, false);
-      //aDisplayer->redisplay(aFeature->firstResult(), anAIS, false);
+    //aDisplayer->redisplay(aFeature->firstResult(), anAIS, false);
 
     std::list<int> aModes;
     aModes.push_back(TopAbs_VERTEX);
@@ -162,22 +163,22 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
 
     // change the line
     /*double aDelta = -200;
-    for (int i = 0; i < 20; i++) {
-      aDelta = aDelta - i*2;
-      PartSet_Tools::setFeaturePoint(aFeature, 100+aDelta, 200+aDelta, SketchPlugin_Line::START_ID());
-      PartSet_Tools::setFeaturePoint(aFeature, 300+aDelta, 500+aDelta, SketchPlugin_Line::END_ID());
+     for (int i = 0; i < 20; i++) {
+     aDelta = aDelta - i*2;
+     PartSet_Tools::setFeaturePoint(aFeature, 100+aDelta, 200+aDelta, SketchPlugin_Line::START_ID());
+     PartSet_Tools::setFeaturePoint(aFeature, 300+aDelta, 500+aDelta, SketchPlugin_Line::END_ID());
 
-      boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
-      Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
-                             aFeature, aSketch,
-                             aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), NULL);
-      if (!anAIS.IsNull())
-        aDisplayer->redisplay(aFeature, anAIS, true);
+     boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
+     Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
+     aFeature, aSketch,
+     aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), NULL);
+     if (!anAIS.IsNull())
+     aDisplayer->redisplay(aFeature, anAIS, true);
 
-      int aVal = 90;
-      for (int j = 0; j < 10000000; j++)
-        aVal = aVal/aVal+aVal*2;
-    }*/
+     int aVal = 90;
+     for (int j = 0; j < 10000000; j++)
+     aVal = aVal/aVal+aVal*2;
+     }*/
     //std::list<int> aModes;
     //aModes.clear();
     //aModes.push_back(TopAbs_VERTEX);
@@ -206,8 +207,8 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   //boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
 
   boost::shared_ptr<GeomAPI_AISObject> aPrevAIS;
-  boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
-    boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+  boost::shared_ptr<SketchPlugin_Feature> aSPFeature = boost::dynamic_pointer_cast<
+      SketchPlugin_Feature>(aFeature);
   //boost::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
   //if (!anAIS->empty())
   theWorkshop->displayer()->display(aFeature, true);
@@ -219,8 +220,8 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   //aDisplayer->activateInLocalContext(aFeature, aModes, true);
 
   /*QFeatureList aFeatureList;
-  aFeatureList.append(myTestObject);
-  theWorkshop->displayer()->setSelected(aFeatureList, true);*/
+   aFeatureList.append(myTestObject);
+   theWorkshop->displayer()->setSelected(aFeatureList, true);*/
 
   theWorkshop->displayer()->updateViewer();
 }

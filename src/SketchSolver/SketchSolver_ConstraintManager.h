@@ -20,7 +20,6 @@
 #include <vector>
 #include <set>
 
-
 /** \class   SketchSolver_ConstraintManager
  *  \ingroup DataModel
  *  \brief   Listens the changes of SketchPlugin features and transforms the Constraint
@@ -34,7 +33,7 @@
  */
 class SketchSolver_ConstraintManager : public Events_Listener
 {
-public:
+ public:
   /** \brief Main method to create constraint manager
    *  \return pointer to the singleton
    */
@@ -45,7 +44,7 @@ public:
    */
   virtual void processEvent(const Events_Message* theMessage);
 
-protected:
+ protected:
   SketchSolver_ConstraintManager();
   ~SketchSolver_ConstraintManager();
 
@@ -84,24 +83,24 @@ protected:
    */
   void resolveConstraints();
 
-private:
+ private:
   /** \brief Searches list of groups which interact with specified constraint
    *  \param[in]  theConstraint constraint to be found
    *  \param[out] theGroups     list of group indexes interacted with constraint
    */
   void findGroups(boost::shared_ptr<SketchPlugin_Constraint> theConstraint,
-                  std::set<Slvs_hGroup>&                     theGroupIDs) const;
+                  std::set<Slvs_hGroup>& theGroupIDs) const;
 
   /** \brief Searches in the list of groups the workplane which constains specified constraint
    *  \param[in] theConstraint constraint to be found
    *  \return workplane containing the constraint
    */
   boost::shared_ptr<SketchPlugin_Feature> findWorkplaneForConstraint(
-                  boost::shared_ptr<SketchPlugin_Constraint> theConstraint) const;
+      boost::shared_ptr<SketchPlugin_Constraint> theConstraint) const;
 
-private:
-  static SketchSolver_ConstraintManager*    _self;    ///< Self pointer to implement singleton functionality
-  std::vector<SketchSolver_ConstraintGroup*> myGroups; ///< Groups of constraints
+ private:
+  static SketchSolver_ConstraintManager* _self;  ///< Self pointer to implement singleton functionality
+  std::vector<SketchSolver_ConstraintGroup*> myGroups;  ///< Groups of constraints
 };
 
 #endif

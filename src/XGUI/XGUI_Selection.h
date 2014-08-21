@@ -20,9 +20,9 @@
 
 class XGUI_Workshop;
 
-class XGUI_EXPORT XGUI_Selection: public ModuleBase_ISelection
+class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
 {
-public:
+ public:
   XGUI_Selection(XGUI_Workshop* theWorkshop);
 
   /// Returns a list of viewer selected presentations
@@ -36,15 +36,15 @@ public:
   virtual std::list<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const;
 
   /**
-  * Returns list of currently selected objects
-  */
+   * Returns list of currently selected objects
+   */
   virtual QList<ObjectPtr> selectedObjects() const;
 
   /**
-  * Returns list of currently selected results
-  */
+   * Returns list of currently selected results
+   */
   virtual QList<ObjectPtr> selectedPresentations() const;
-  
+
   //! Returns list of currently selected QModelIndexes
   virtual QModelIndexList selectedIndexes() const;
 
@@ -54,7 +54,7 @@ public:
   //! Returns list of currently selected shapes
   virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theList) const;
 
-private:
+ private:
   XGUI_Workshop* myWorkshop;
 };
 

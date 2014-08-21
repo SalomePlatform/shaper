@@ -13,7 +13,7 @@
  */
 class MODULEBASE_EXPORT ModuleBase_WidgetValue
 {
-public:
+ public:
   /// Constructor
   ModuleBase_WidgetValue();
   /// Destructor

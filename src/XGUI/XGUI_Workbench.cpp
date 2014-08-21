@@ -8,15 +8,15 @@
 #define SCROLL_STEP 20
 
 //**************************************************
-class CommandsArea: public QScrollArea
+class CommandsArea : public QScrollArea
 {
-public:
+ public:
   CommandsArea(QWidget* theParent)
       : QScrollArea(theParent)
   {
   }
 
-protected:
+ protected:
   virtual void resizeEvent(QResizeEvent * theEvent);
 };
 
@@ -84,7 +84,7 @@ XGUI_MenuGroupPanel* XGUI_Workbench::addGroup(const QString& theId)
   XGUI_MenuGroupPanel* aGroup = new XGUI_MenuGroupPanel(myChildWidget);
   aGroup->setObjectName(theId);
   myLayout->addWidget(aGroup);
-  if(theId != "Default") {
+  if (theId != "Default") {
     addSeparator();
   }
   myLayout->addStretch();
@@ -188,7 +188,8 @@ XGUI_Command* XGUI_Workbench::feature(const QString& theId) const
 QList<XGUI_Command*> XGUI_Workbench::features() const
 {
   QList<XGUI_Command*> aList;
-  foreach (XGUI_MenuGroupPanel* aGroup, myGroups) {
+  foreach (XGUI_MenuGroupPanel* aGroup, myGroups)
+  {
     aList.append(aGroup->features());
   }
   return aList;

@@ -14,7 +14,6 @@
 #include <BRep_Tool.hxx>
 #include <GeomAdaptor_Curve.hxx>
 
-
 ResultPtr result(const ObjectPtr theObject)
 {
   return boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
@@ -28,7 +27,6 @@ TopoDS_Shape shape(ResultPtr theResult)
   return TopoDS_Shape();
 }
 
-
 bool Model_ResultPointValidator::isValid(const ObjectPtr theObject) const
 {
   ResultPtr aResult = result(theObject);
@@ -40,7 +38,6 @@ bool Model_ResultPointValidator::isValid(const ObjectPtr theObject) const
 
   return aShape.ShapeType() == TopAbs_VERTEX;
 }
-
 
 bool Model_ResultLineValidator::isValid(const ObjectPtr theObject) const
 {
@@ -60,7 +57,6 @@ bool Model_ResultLineValidator::isValid(const ObjectPtr theObject) const
   }
   return false;
 }
-
 
 bool Model_ResultArcValidator::isValid(const ObjectPtr theObject) const
 {

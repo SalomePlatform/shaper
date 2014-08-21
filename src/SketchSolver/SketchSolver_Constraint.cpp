@@ -30,7 +30,7 @@
 /// Possible types of attributes (used to determine constraint type)
 enum AttrType
 {
-  UNKNOWN, // Something wrong during type determination
+  UNKNOWN,  // Something wrong during type determination
   POINT2D,
   POINT3D,
   LINE,
@@ -41,24 +41,23 @@ enum AttrType
 /// Calculate type of the attribute
 static AttrType typeOfAttribute(boost::shared_ptr<ModelAPI_Attribute> theAttribute);
 
-
-
 SketchSolver_Constraint::SketchSolver_Constraint()
-  : myConstraint(boost::shared_ptr<SketchPlugin_Constraint>()),
-    myType(SLVS_C_UNKNOWN),
-    myAttributesList()
+    : myConstraint(boost::shared_ptr<SketchPlugin_Constraint>()),
+      myType(SLVS_C_UNKNOWN),
+      myAttributesList()
 {
 }
 
 SketchSolver_Constraint::SketchSolver_Constraint(
-                boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
-  : myConstraint(theConstraint),
-    myAttributesList()
+    boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
+    : myConstraint(theConstraint),
+      myAttributesList()
 {
   myType = getType(myConstraint);
 }
 
-const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
+const int& SketchSolver_Constraint::getType(
+    boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
 {
   myType = SLVS_C_UNKNOWN;
   if (!theConstraint)
@@ -71,30 +70,28 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
 
   const std::string& aConstraintKind = theConstraint->getKind();
   // Constraint for coincidence of two points
-  if (aConstraintKind.compare(SketchPlugin_ConstraintCoincidence::ID()) == 0)
-  {
+  if (aConstraintKind.compare(SketchPlugin_ConstraintCoincidence::ID()) == 0) {
     int anAttrPos = 0;
     // Verify the constraint has only two attributes and they are points
-    int aPt2d = 0; // bit-mapped field, each bit indicates whether the attribute is 2D point
-    int aPt3d = 0; // bit-mapped field, the same information for 3D points
-    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
-    {
-      boost::shared_ptr<ModelAPI_Attribute> anAttr =
-        theConstraint->data()->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
-      if (!anAttr) continue;
-      switch (typeOfAttribute(anAttr))
-      {
-      case POINT2D: // the attribute is a 2D point
-        aPt2d |= (1 << indAttr);
-        myAttributesList[anAttrPos++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
-        break;
-      case POINT3D: // the attribute is a 3D point
-        aPt3d |= (1 << indAttr);
-        myAttributesList[anAttrPos++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
-        break;
-      default:
-        // Attribute neither 2D nor 3D point is not supported by this type of constraint
-        return getType();
+    int aPt2d = 0;  // bit-mapped field, each bit indicates whether the attribute is 2D point
+    int aPt3d = 0;  // bit-mapped field, the same information for 3D points
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
+      boost::shared_ptr<ModelAPI_Attribute> anAttr = theConstraint->data()->attribute(
+          SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+      if (!anAttr)
+        continue;
+      switch (typeOfAttribute(anAttr)) {
+        case POINT2D:  // the attribute is a 2D point
+          aPt2d |= (1 << indAttr);
+          myAttributesList[anAttrPos++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
+          break;
+        case POINT3D:  // the attribute is a 3D point
+          aPt3d |= (1 << indAttr);
+          myAttributesList[anAttrPos++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
+          break;
+        default:
+          // Attribute neither 2D nor 3D point is not supported by this type of constraint
+          return getType();
       }
     }
     // The constrained points should be in first and second positions,
@@ -106,21 +103,18 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
   }
 
   // Constraint for distance between point and another entity
-  if (aConstraintKind.compare(SketchPlugin_ConstraintDistance::ID()) == 0)
-  {
+  if (aConstraintKind.compare(SketchPlugin_ConstraintDistance::ID()) == 0) {
     int aNbPoints = 0;
     int aNbEntities = 0;
-    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
-    {
-      boost::shared_ptr<ModelAPI_Attribute> anAttr =
-        theConstraint->data()->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
-      switch (typeOfAttribute(anAttr))
-      {
-      case POINT2D:
-      case POINT3D:
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
+      boost::shared_ptr<ModelAPI_Attribute> anAttr = theConstraint->data()->attribute(
+          SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+      switch (typeOfAttribute(anAttr)) {
+        case POINT2D:
+        case POINT3D:
           myAttributesList[aNbPoints++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
           break;
-      case LINE:
+        case LINE:
           // entities are placed starting from SketchPlugin_Constraint::ENTITY_C() attribute
           myAttributesList[2 + aNbEntities++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
           myType = SLVS_C_PT_LINE_DISTANCE;
@@ -128,7 +122,7 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
       }
     }
     // Verify the correctness of constraint arguments
-    if (aNbPoints == 2 && aNbEntities ==0)
+    if (aNbPoints == 2 && aNbEntities == 0)
       myType = SLVS_C_PT_PT_DISTANCE;
     else if (aNbPoints != 1 || aNbEntities != 1)
       myType = SLVS_C_UNKNOWN;
@@ -136,13 +130,11 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
   }
 
   // Constraint for the given length of a line
-  if (aConstraintKind.compare(SketchPlugin_ConstraintLength::ID()) == 0)
-  {
+  if (aConstraintKind.compare(SketchPlugin_ConstraintLength::ID()) == 0) {
     int aNbLines = 0;
-    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
-    {
-      boost::shared_ptr<ModelAPI_Attribute> anAttr =
-        theConstraint->data()->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
+      boost::shared_ptr<ModelAPI_Attribute> anAttr = theConstraint->data()->attribute(
+          SketchPlugin_Constraint::ATTRIBUTE(indAttr));
       if (typeOfAttribute(anAttr) == LINE)
         myAttributesList[aNbLines++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
     }
@@ -154,13 +146,11 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
   // Constraint for two parallel/perpendicular lines
   bool isParallel = (aConstraintKind.compare(SketchPlugin_ConstraintParallel::ID()) == 0);
   bool isPerpendicular = (aConstraintKind.compare(SketchPlugin_ConstraintPerpendicular::ID()) == 0);
-  if (isParallel || isPerpendicular)
-  {
-    int aNbEntities = 2; // lines in SolveSpace constraints should start from SketchPlugin_Constraint::ENTITY_C() attribute
-    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
-    {
-      boost::shared_ptr<ModelAPI_Attribute> anAttr =
-        theConstraint->data()->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+  if (isParallel || isPerpendicular) {
+    int aNbEntities = 2;  // lines in SolveSpace constraints should start from SketchPlugin_Constraint::ENTITY_C() attribute
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
+      boost::shared_ptr<ModelAPI_Attribute> anAttr = theConstraint->data()->attribute(
+          SketchPlugin_Constraint::ATTRIBUTE(indAttr));
       if (typeOfAttribute(anAttr) == LINE)
         myAttributesList[aNbEntities++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
     }
@@ -170,13 +160,11 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
   }
 
   // Constraint for radius of a circle or an arc of circle
-  if (aConstraintKind.compare(SketchPlugin_ConstraintRadius::ID()) == 0)
-  {
-    int aNbEntities = 2; // lines in SolveSpace constraints should started from SketchPlugin_Constraint::ENTITY_C() attribute
-    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
-    {
-      boost::shared_ptr<ModelAPI_Attribute> anAttr =
-        theConstraint->data()->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+  if (aConstraintKind.compare(SketchPlugin_ConstraintRadius::ID()) == 0) {
+    int aNbEntities = 2;  // lines in SolveSpace constraints should started from SketchPlugin_Constraint::ENTITY_C() attribute
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
+      boost::shared_ptr<ModelAPI_Attribute> anAttr = theConstraint->data()->attribute(
+          SketchPlugin_Constraint::ATTRIBUTE(indAttr));
       AttrType aType = typeOfAttribute(anAttr);
       if (aType == CIRCLE || aType == ARC)
         myAttributesList[aNbEntities++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
@@ -191,26 +179,25 @@ const int& SketchSolver_Constraint::getType(boost::shared_ptr<SketchPlugin_Const
   return getType();
 }
 
-
 // ================= Auxiliary functions ==============================
 AttrType typeOfAttribute(boost::shared_ptr<ModelAPI_Attribute> theAttribute)
 {
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttrRef =
-    boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (!anAttrRef) return UNKNOWN;
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttrRef = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(theAttribute);
+  if (!anAttrRef)
+    return UNKNOWN;
 
-  if (anAttrRef->isObject())
-  {
-    ResultConstructionPtr aRC = 
-      boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anAttrRef->object());
-    if (!aRC) return UNKNOWN;
+  if (anAttrRef->isObject()) {
+    ResultConstructionPtr aRC = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
+        anAttrRef->object());
+    if (!aRC)
+      return UNKNOWN;
 
     if (aRC->shape()->isVertex())
       return POINT3D;
-    else if (aRC->shape()->isEdge())
-    {
-      boost::shared_ptr<GeomAPI_Edge> anEdge = 
-        boost::dynamic_pointer_cast<GeomAPI_Edge>(aRC->shape());
+    else if (aRC->shape()->isEdge()) {
+      boost::shared_ptr<GeomAPI_Edge> anEdge = boost::dynamic_pointer_cast<GeomAPI_Edge>(
+          aRC->shape());
       if (anEdge->isLine())
         return LINE;
       else if (anEdge->isCircle())
@@ -218,9 +205,7 @@ AttrType typeOfAttribute(boost::shared_ptr<ModelAPI_Attribute> theAttribute)
       else if (anEdge->isArc())
         return ARC;
     }
-  }
-  else
-  {
+  } else {
     const std::string aType = anAttrRef->attr()->attributeType();
     if (aType == GeomDataAPI_Point2D::type())
       return POINT2D;

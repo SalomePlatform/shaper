@@ -10,12 +10,12 @@ class QMainWindow;
 class XGUI_SalomeViewer;
 
 /**
-* An interface which provides a connection of XGUI functionality 
-* with functionality of SALOME module interface.
-*/
+ * An interface which provides a connection of XGUI functionality 
+ * with functionality of SALOME module interface.
+ */
 class XGUI_EXPORT XGUI_SalomeConnector
 {
-public:
+ public:
   //! Creates a feature (command) in SALOME desktop
   //! \param theWBName - a workbench name
   //! \param theId - an id of the feature
@@ -25,13 +25,9 @@ public:
   //! \param isCheckable - is checkable or not
   //! \param theKeys - hot keys
   //! returns created action
-  virtual QAction* addFeature(const QString& theWBName,
-                              const QString& theId, 
-                              const QString& theTitle, 
-                              const QString& theTip,
-                              const QIcon& theIcon, 
-                              const QKeySequence& theKeys,
-                              bool isCheckable) = 0;
+  virtual QAction* addFeature(const QString& theWBName, const QString& theId,
+                              const QString& theTitle, const QString& theTip, const QIcon& theIcon,
+                              const QKeySequence& theKeys, bool isCheckable) = 0;
 
   //! Creates a command in Edit menu of SALOME desktop
   //! \param theId - an id of the feature
@@ -41,12 +37,9 @@ public:
   //! \param isCheckable - is checkable or not
   //! \param theKeys - hot keys
   //! returns created action
-  virtual QAction* addEditCommand(const QString& theId,
-                                  const QString& theTitle,
-                                  const QString& theTip,
-                                  const QIcon& theIcon, 
-                                  const QKeySequence& theKeys,
-                                  bool isCheckable) = 0;
+  virtual QAction* addEditCommand(const QString& theId, const QString& theTitle,
+                                  const QString& theTip, const QIcon& theIcon,
+                                  const QKeySequence& theKeys, bool isCheckable) = 0;
 
   //! Insert separator into Edit menu of SALOME desktop
   virtual void addEditMenuSeparator() = 0;

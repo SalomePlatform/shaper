@@ -23,13 +23,14 @@ class QLineEdit;
  */
 class MODULEBASE_EXPORT ModuleBase_WidgetFeature : public ModuleBase_ModelWidget
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   /// Constructor
   /// \theParent the parent object
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
-  ModuleBase_WidgetFeature(QWidget* theParent, const Config_WidgetAPI* theData, const std::string& theParentId);
+  ModuleBase_WidgetFeature(QWidget* theParent, const Config_WidgetAPI* theData,
+                           const std::string& theParentId);
   /// Destructor
   virtual ~ModuleBase_WidgetFeature();
 
@@ -52,7 +53,7 @@ public:
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-protected:
+ protected:
   /// Fill the widget values by given point
   /// \param thePoint the point
   /// \return the boolean result of the feature set
@@ -60,22 +61,31 @@ protected:
 
   /// Returns current widget feature
   /// \return the feature
-  const ObjectPtr object() const { return myObject; }
+  const ObjectPtr object() const
+  {
+    return myObject;
+  }
 
   /// Returns the widget editor
   /// \return the editor
-  QLineEdit* editor() const { return myEditor; }
+  QLineEdit* editor() const
+  {
+    return myEditor;
+  }
 
   /// Returns the possible feature kinds
   /// \return the list of kinds
-  const QStringList& featureKinds() const { return myObjectKinds; }
+  const QStringList& featureKinds() const
+  {
+    return myObjectKinds;
+  }
 
-  ObjectPtr myObject; ///< the current widget feature
-  QStringList myObjectKinds; ///< the kinds of possible features
+  ObjectPtr myObject;  ///< the current widget feature
+  QStringList myObjectKinds;  ///< the kinds of possible features
 
-  QWidget*   myContainer; /// the parent top control
-  QLabel*    myLabel; /// the editor information label
-  QLineEdit* myEditor; ///< the feature editor to visualize the feature name
+  QWidget* myContainer;  /// the parent top control
+  QLabel* myLabel;  /// the editor information label
+  QLineEdit* myEditor;  ///< the feature editor to visualize the feature name
 };
 
 #endif

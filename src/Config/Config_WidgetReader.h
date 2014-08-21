@@ -14,23 +14,21 @@
 #include <map>
 #include <string>
 
-
-class Config_WidgetReader: public Config_XMLReader
+class Config_WidgetReader : public Config_XMLReader
 {
-public:
-  CONFIG_EXPORT Config_WidgetReader(const std::string& theXmlFile);
-  CONFIG_EXPORT virtual ~Config_WidgetReader();
+ public:
+  CONFIG_EXPORT Config_WidgetReader(const std::string& theXmlFile);CONFIG_EXPORT virtual ~Config_WidgetReader();
 
-  CONFIG_EXPORT std::string featureWidgetCfg(const std::string& theFeatureName);
-  CONFIG_EXPORT std::string featureDescription(const std::string& theFeatureName);
+  CONFIG_EXPORT std::string featureWidgetCfg(const std::string& theFeatureName);CONFIG_EXPORT std::string featureDescription(
+      const std::string& theFeatureName);
 
-protected:
+ protected:
   void processNode(xmlNodePtr theNode);
   bool processChildren(xmlNodePtr theNode);
   std::string dumpNode(xmlNodePtr theNode);
   void resolveSourceNodes(xmlNodePtr theNode);
 
-private:
+ private:
   std::map<std::string, std::string> myWidgetCache;
   std::map<std::string, std::string> myDescriptionCache;
 

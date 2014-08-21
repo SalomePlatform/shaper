@@ -27,38 +27,37 @@ SketchPlugin_ConstraintRadius::SketchPlugin_ConstraintRadius()
 
 void SketchPlugin_ConstraintRadius::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Constraint::VALUE(),    ModelAPI_AttributeDouble::type());
+  data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeDouble::type());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
   data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::type());
 }
 
 void SketchPlugin_ConstraintRadius::execute()
 {
-  if (data()->attribute(SketchPlugin_Constraint::ENTITY_A())->isInitialized() &&
-      !data()->attribute(SketchPlugin_Constraint::VALUE())->isInitialized()) {
+  if (data()->attribute(SketchPlugin_Constraint::ENTITY_A())->isInitialized()
+      && !data()->attribute(SketchPlugin_Constraint::VALUE())->isInitialized()) {
 
-    boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
-      boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
+    boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+        ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
     FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
     if (aFeature) {
       double aRadius = 0;
       boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
       if (aFeature->getKind() == SketchPlugin_Circle::ID()) {
-        AttributeDoublePtr anAttribute = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>
-                                            (aData->attribute(SketchPlugin_Circle::RADIUS_ID()));
+        AttributeDoublePtr anAttribute = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+            aData->attribute(SketchPlugin_Circle::RADIUS_ID()));
         if (anAttribute)
           aRadius = anAttribute->value();
-      }
-      else if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
-        boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
-          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::CENTER_ID()));
-        boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
-          boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));
+      } else if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
+        boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = boost::dynamic_pointer_cast<
+            GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::CENTER_ID()));
+        boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = boost::dynamic_pointer_cast<
+            GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));
         if (aCenterAttr && aStartAttr)
           aRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
       }
-      boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = 
-        boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
+      boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = boost::dynamic_pointer_cast<
+          ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
       aValueAttr->setValue(aRadius);
     }
   }
@@ -70,8 +69,8 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
     return thePrevious;
 
   boost::shared_ptr<ModelAPI_Data> aData = data();
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
   if (!anAttr)
     return thePrevious;
   FeaturePtr aFeature = ModelAPI_Feature::feature(anAttr->object());
@@ -80,8 +79,8 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
     return thePrevious;
 
   // Flyout point
-  boost::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+  boost::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = boost::dynamic_pointer_cast<
+      GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   if (!aFlyoutAttr->isInitialized())
     return thePrevious;
   boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
@@ -91,30 +90,31 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
   boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr;
   double aRadius;
   if (aKind == SketchPlugin_Circle::ID()) {
-    aCenterAttr = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Circle::CENTER_ID()));
-    AttributeDoublePtr aCircRadius = 
-      boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Circle::RADIUS_ID()));
+    aCenterAttr = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Circle::CENTER_ID()));
+    AttributeDoublePtr aCircRadius = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+        aData->attribute(SketchPlugin_Circle::RADIUS_ID()));
     aRadius = aCircRadius->value();
-  }
-  else if (aKind == SketchPlugin_Arc::ID()) {
-    aCenterAttr = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::CENTER_ID()));
-    boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));
+  } else if (aKind == SketchPlugin_Arc::ID()) {
+    aCenterAttr = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Arc::CENTER_ID()));
+    boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = boost::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));
     aRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
   }
 
   boost::shared_ptr<GeomAPI_Pnt> aCenter = sketch()->to3D(aCenterAttr->x(), aCenterAttr->y());
-  boost::shared_ptr<GeomDataAPI_Dir> aNDir = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Dir>(sketch()->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+  boost::shared_ptr<GeomDataAPI_Dir> aNDir = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      sketch()->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
   boost::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
   boost::shared_ptr<GeomAPI_Circ> aCircle(new GeomAPI_Circ(aCenter, aNormal, aRadius));
 
   // Value
-  boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
+  boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
   double aValue = aRadius;
   if (aValueAttr && aValueAttr->isInitialized())
-   aValue = aValueAttr->value();
+    aValue = aValueAttr->value();
 
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS)
@@ -133,8 +133,8 @@ void SketchPlugin_ConstraintRadius::move(double theDeltaX, double theDeltaY)
   if (!aData->isValid())
     return;
 
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef =
-    boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
   FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
   if (!aFeature)
     return;
@@ -143,18 +143,18 @@ void SketchPlugin_ConstraintRadius::move(double theDeltaX, double theDeltaY)
     aCenterAttrName = SketchPlugin_Circle::CENTER_ID();
   else if (aFeature->getKind() == SketchPlugin_Arc::ID())
     aCenterAttrName = SketchPlugin_Arc::CENTER_ID();
-  boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aFeature->data()->attribute(aCenterAttrName));
+  boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = boost::dynamic_pointer_cast<
+      GeomDataAPI_Point2D>(aFeature->data()->attribute(aCenterAttrName));
   boost::shared_ptr<GeomAPI_Pnt2d> aCenter = aCenterAttr->pnt();
 
   // The specified delta applied on the circle curve, 
   // so it will be scaled due to distance between flyout and center points
-  boost::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+  boost::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = boost::dynamic_pointer_cast<
+      GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   boost::shared_ptr<GeomAPI_Pnt2d> aFlyout = aFlyoutAttr->pnt();
 
-  boost::shared_ptr<ModelAPI_AttributeDouble> aRadius =
-    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
+  boost::shared_ptr<ModelAPI_AttributeDouble> aRadius = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
   double aScale = aFlyout->distance(aCenter) / aRadius->value();
 
   boost::shared_ptr<GeomAPI_Circ2d> aCircle(new GeomAPI_Circ2d(aCenter, aFlyout));

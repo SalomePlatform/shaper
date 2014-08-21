@@ -12,13 +12,11 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-
 Config_WidgetAPI::Config_WidgetAPI(std::string theRawXml)
 {
   myDoc = xmlParseDoc(BAD_CAST theRawXml.c_str());
   myCurrentNode = xmlDocGetRootElement(myDoc);
 }
-
 
 Config_WidgetAPI::~Config_WidgetAPI()
 {
@@ -31,9 +29,9 @@ bool Config_WidgetAPI::toNextWidget()
   xmlNodePtr aNextNode = myCurrentNode;
   do {
     aNextNode = aNextNode->next;
-  } while(aNextNode && !isElementNode(aNextNode));
+  } while (aNextNode && !isElementNode(aNextNode));
 
-  if(!aNextNode) {
+  if (!aNextNode) {
     toParentWidget();
     return false;
   }
@@ -43,11 +41,11 @@ bool Config_WidgetAPI::toNextWidget()
 
 bool Config_WidgetAPI::toChildWidget()
 {
-  if(myCurrentNode && hasChild(myCurrentNode)) {
+  if (myCurrentNode && hasChild(myCurrentNode)) {
     myCurrentNode = myCurrentNode->children;
-    while(!isElementNode(myCurrentNode)) {
+    while (!isElementNode(myCurrentNode)) {
       myCurrentNode = myCurrentNode->next;
-    } 
+    }
     return true;
   }
   return false;
@@ -55,7 +53,7 @@ bool Config_WidgetAPI::toChildWidget()
 
 bool Config_WidgetAPI::toParentWidget()
 {
-  if(myCurrentNode) {
+  if (myCurrentNode) {
     myCurrentNode = myCurrentNode->parent;
   }
   return myCurrentNode != NULL;
@@ -64,7 +62,7 @@ bool Config_WidgetAPI::toParentWidget()
 std::string Config_WidgetAPI::widgetType() const
 {
   std::string result = "";
-  if(myCurrentNode) {
+  if (myCurrentNode) {
     result = std::string((char *) myCurrentNode->name);
   }
   return result;
@@ -73,13 +71,13 @@ std::string Config_WidgetAPI::widgetType() const
 bool Config_WidgetAPI::isContainerWidget() const
 {
   return isNode(myCurrentNode, WDG_GROUP, WDG_CHECK_GROUP,
-                               NULL);
+  NULL);
 }
 
 bool Config_WidgetAPI::isPagedWidget() const
 {
   return isNode(myCurrentNode, WDG_TOOLBOX, WDG_SWITCH,
-                               NULL);
+  NULL);
 }
 
 std::string Config_WidgetAPI::getProperty(const char* thePropName) const

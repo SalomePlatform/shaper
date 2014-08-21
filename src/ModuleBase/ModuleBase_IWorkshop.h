@@ -16,21 +16,27 @@
 class ModuleBase_IModule;
 
 /**
-* Class which provides access to Workshop object serveces
-*/
-class MODULEBASE_EXPORT ModuleBase_IWorkshop: public QObject
+ * Class which provides access to Workshop object serveces
+ */
+class MODULEBASE_EXPORT ModuleBase_IWorkshop : public QObject
 {
 Q_OBJECT
-public:
-  ModuleBase_IWorkshop(QObject* theParent):QObject(theParent) {}
+ public:
+  ModuleBase_IWorkshop(QObject* theParent)
+      : QObject(theParent)
+  {
+  }
 
-  virtual ~ModuleBase_IWorkshop() {};
+  virtual ~ModuleBase_IWorkshop()
+  {
+  }
+  ;
 
   //! Returns AIS_InteractiveContext from current OCCViewer
   virtual Handle(AIS_InteractiveContext) AISContext() const = 0;
 
   //! Returns list of currently selected data objects
-  virtual QList<ObjectPtr> selectedObjects() const = 0; 
+  virtual QList<ObjectPtr> selectedObjects() const = 0;
 
   //! Returns instance of loaded module
   virtual ModuleBase_IModule* module() const = 0;

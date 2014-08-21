@@ -13,14 +13,15 @@ class QWidget;
 class QLabel;
 class QDoubleSpinBox;
 
-class MODULEBASE_EXPORT ModuleBase_WidgetDoubleValue: public ModuleBase_ModelWidget
+class MODULEBASE_EXPORT ModuleBase_WidgetDoubleValue : public ModuleBase_ModelWidget
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   /// Constructor
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
-  ModuleBase_WidgetDoubleValue(QWidget* theParent, const Config_WidgetAPI* theData, const std::string& theParentId);
+  ModuleBase_WidgetDoubleValue(QWidget* theParent, const Config_WidgetAPI* theData,
+                               const std::string& theParentId);
 
   virtual ~ModuleBase_WidgetDoubleValue();
 
@@ -36,16 +37,19 @@ public:
 
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
-  QWidget* getControl() const { return myContainer; }
+  QWidget* getControl() const
+  {
+    return myContainer;
+  }
 
   /// Process key release envent on the widget spin box controls
   /// \param theObject the object where the event happens
   /// \param theEvent the processed event
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
-protected:
-  QWidget*     myContainer;
-  QLabel*      myLabel;
+ protected:
+  QWidget* myContainer;
+  QLabel* myLabel;
   QDoubleSpinBox* mySpinBox;
 };
 

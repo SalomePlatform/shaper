@@ -17,7 +17,7 @@ class GeomAPI_Pnt;
 
 class GeomDataAPI_Point : public ModelAPI_Attribute
 {
-public:
+ public:
   /// Defines the double value
   virtual void setValue(const double theX, const double theY, const double theZ) = 0;
   /// Defines the point
@@ -33,15 +33,22 @@ public:
   virtual boost::shared_ptr<GeomAPI_Pnt> pnt() = 0;
 
   /// Returns the type of this class of attributes
-  static inline std::string type() {return std::string("Point");}
+  static inline std::string type()
+  {
+    return std::string("Point");
+  }
 
   /// Returns the type of this class of attributes, not static method
-  virtual std::string attributeType() {return type();}
+  virtual std::string attributeType()
+  {
+    return type();
+  }
 
-protected:
+ protected:
   /// Objects are created for features automatically
   GeomDataAPI_Point()
-  {}
+  {
+  }
 };
 
 #endif

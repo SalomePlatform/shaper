@@ -1,5 +1,4 @@
 
-
 #ifndef NEWGEOM_DATAMODEL_H
 #define NEWGEOM_DATAMODEL_H
 
@@ -9,22 +8,22 @@
 class NewGeom_EXPORT NewGeom_DataModel : public LightApp_DataModel
 {
   Q_OBJECT
-public:
-  NewGeom_DataModel( CAM_Module* theModule );
+ public:
+  NewGeom_DataModel(CAM_Module* theModule);
   virtual ~NewGeom_DataModel();
 
-  virtual bool open( const QString& thePath, CAM_Study* theStudy, QStringList theFiles );
-  virtual bool save( QStringList& theFiles );
-  virtual bool saveAs( const QString& thePath, CAM_Study* theStudy, QStringList& theFiles );
+  virtual bool open(const QString& thePath, CAM_Study* theStudy, QStringList theFiles);
+  virtual bool save(QStringList& theFiles);
+  virtual bool saveAs(const QString& thePath, CAM_Study* theStudy, QStringList& theFiles);
   virtual bool close();
-  virtual bool create( CAM_Study* theStudy );
+  virtual bool create(CAM_Study* theStudy);
 
   virtual bool isModified() const;
   virtual bool isSaved() const;
 
-  virtual void update( LightApp_DataObject* theObj = 0, LightApp_Study* theStudy = 0 );
+  virtual void update(LightApp_DataObject* theObj = 0, LightApp_Study* theStudy = 0);
 
-private:
+ private:
   QString myStudyPath;
 
 };

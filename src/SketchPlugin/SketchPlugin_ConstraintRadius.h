@@ -19,17 +19,21 @@
  *  These constraint has two attributes:
  *  SketchPlugin_Constraint::VALUE() (radius), SketchPlugin_Constraint::ENTITY_A() (a circle)
  */
-class SketchPlugin_ConstraintRadius: public SketchPlugin_ConstraintBase
+class SketchPlugin_ConstraintRadius : public SketchPlugin_ConstraintBase
 {
-public:
+ public:
   /// Radius constraint kind
-  inline static const std::string& ID() {
+  inline static const std::string& ID()
+  {
     static const std::string MY_CONSTRAINT_RADIUS_ID("SketchConstraintRadius");
     return MY_CONSTRAINT_RADIUS_ID;
   }
   /// \brief Returns the kind of a feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SketchPlugin_ConstraintRadius::ID(); return MY_KIND;}
+  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    static std::string MY_KIND = SketchPlugin_ConstraintRadius::ID();
+    return MY_KIND;
+  }
 
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();

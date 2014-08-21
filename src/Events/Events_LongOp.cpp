@@ -10,7 +10,7 @@
 std::map<void*, int> MY_SENDERS;
 
 Events_LongOp::Events_LongOp(void* theSender)
- : Events_Message(Events_LongOp::eventID(), theSender)
+    : Events_Message(Events_LongOp::eventID(), theSender)
 {
 }
 
@@ -29,7 +29,7 @@ void Events_LongOp::start(void* theSender)
   bool toSend = MY_SENDERS.empty();
   if (MY_SENDERS.find(theSender) == MY_SENDERS.end())
     MY_SENDERS[theSender] = 1;
-  else 
+  else
     MY_SENDERS[theSender]++;
 
   if (toSend) {
@@ -42,8 +42,10 @@ void Events_LongOp::end(void* theSender)
 {
   if (MY_SENDERS.find(theSender) != MY_SENDERS.end()) {
     int aCount = MY_SENDERS[theSender];
-    if (aCount <= 1) MY_SENDERS.erase(theSender);
-    else MY_SENDERS[theSender] = aCount - 1;
+    if (aCount <= 1)
+      MY_SENDERS.erase(theSender);
+    else
+      MY_SENDERS[theSender] = aCount - 1;
   }
   if (MY_SENDERS.empty()) {
     Events_LongOp anEvent(theSender);

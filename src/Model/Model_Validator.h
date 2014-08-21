@@ -22,38 +22,39 @@
  * All the needed information is provided to the validator as an argument,
  * this allows to work with them independently from the feature specific object.
  */
-class Model_ValidatorsFactory: public ModelAPI_ValidatorsFactory
+class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
 {
-private:
-  std::map<std::string, ModelAPI_Validator*> myIDs; ///< map from ID to registered validator
+ private:
+  std::map<std::string, ModelAPI_Validator*> myIDs;  ///< map from ID to registered validator
   /// validators IDs by feature ID
-  std::map<std::string, std::set<std::string> > myFeatures; 
+  std::map<std::string, std::set<std::string> > myFeatures;
   /// set of pairs: validators IDs, list of arguments
   typedef std::set<std::pair<std::string, std::list<std::string> > > AttrValidators;
   /// validators IDs and arguments by feature and attribute IDs
   std::map<std::string, std::map<std::string, AttrValidators> > myAttrs;
-public:
+ public:
   /// Registers the instance of the validator by the ID
-  MODEL_EXPORT virtual void registerValidator(
-    const std::string& theID, ModelAPI_Validator* theValidator);
+  MODEL_EXPORT virtual void registerValidator(const std::string& theID,
+                                              ModelAPI_Validator* theValidator);
 
   /// Assigns validator to the feature
-  MODEL_EXPORT virtual void assignValidator(
-    const std::string& theID, const std::string& theFeatureID);
+  MODEL_EXPORT virtual void assignValidator(const std::string& theID,
+                                            const std::string& theFeatureID);
 
   /// Assigns validator to the attribute of the feature
-  MODEL_EXPORT virtual void assignValidator(const std::string& theID, 
-    const std::string& theFeatureID, const std::string& theAttrID,
-    const std::list<std::string>& theArguments);
+  MODEL_EXPORT virtual void assignValidator(const std::string& theID,
+                                            const std::string& theFeatureID,
+                                            const std::string& theAttrID,
+                                            const std::list<std::string>& theArguments);
 
   /// Provides a validator for the feature, returns NULL if no validator
-  MODEL_EXPORT virtual void validators(const std::string& theFeatureID, 
-    std::list<ModelAPI_Validator*>& theResult) const;
+  MODEL_EXPORT virtual void validators(const std::string& theFeatureID,
+                                       std::list<ModelAPI_Validator*>& theResult) const;
   /// Provides a validator for the attribute, returns NULL if no validator
-  MODEL_EXPORT virtual void validators(
-    const std::string& theFeatureID, const std::string& theAttrID,
-    std::list<ModelAPI_Validator*>& theValidators, 
-    std::list<std::list<std::string> >& theArguments) const;
+  MODEL_EXPORT virtual void validators(const std::string& theFeatureID,
+                                       const std::string& theAttrID,
+                                       std::list<ModelAPI_Validator*>& theValidators,
+                                       std::list<std::list<std::string> >& theArguments) const;
 
   /// Returns registered validator by its Id
   virtual const ModelAPI_Validator* validator(const std::string& theID) const;
@@ -63,7 +64,7 @@ public:
   //MODEL_EXPORT virtual bool validate(
   //  const boost::shared_ptr<ModelAPI_Feature>& theFeature, const std::string& theAttrID) const;
 
-protected:
+ protected:
   /// Get instance from PluginManager
   Model_ValidatorsFactory();
 

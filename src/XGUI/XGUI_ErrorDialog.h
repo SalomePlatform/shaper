@@ -13,20 +13,17 @@
 
 class QTextEdit;
 
-class XGUI_ErrorDialog: public QDialog
+class XGUI_ErrorDialog : public QDialog
 {
-  Q_OBJECT
-public:
-  XGUI_EXPORT XGUI_ErrorDialog(QWidget* parent);
-  XGUI_EXPORT virtual ~XGUI_ErrorDialog();
+Q_OBJECT
+ public:
+  XGUI_EXPORT XGUI_ErrorDialog(QWidget* parent);XGUI_EXPORT virtual ~XGUI_ErrorDialog();
 
-public slots:
-  XGUI_EXPORT void refresh();
-  XGUI_EXPORT void clear();
-  XGUI_EXPORT void addError(const QString&);
-  XGUI_EXPORT void removeError(const QString&);
+ public slots:
+  XGUI_EXPORT void refresh();XGUI_EXPORT void clear();XGUI_EXPORT void addError(const QString&);XGUI_EXPORT void removeError(
+      const QString&);
 
-private:
+ private:
   QTextEdit* myErrorLog;
   QStringList myErrors;
 };

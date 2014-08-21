@@ -2,8 +2,6 @@
 // Created:     02 Jun 2014
 // Author:      Mikhail PONIKAROV
 
-
-
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Shape.h>

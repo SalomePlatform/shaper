@@ -12,19 +12,23 @@
  * \brief Interface to the edge object
  */
 
-class GEOMAPI_EXPORT GeomAPI_Edge: public GeomAPI_Shape
+class GEOMAPI_EXPORT GeomAPI_Edge : public GeomAPI_Shape
 {
-public:
+ public:
   /// Creation of empty (null) shape
   GeomAPI_Edge();
 
   /// Returns whether the shape is a vertex
   virtual bool isVertex() const
-  { return false; }
+  {
+    return false;
+  }
 
   /// Returns whether the shape is an edge
   virtual bool isEdge() const
-  { return true; }
+  {
+    return true;
+  }
 
   /// Verifies that the edge is a line
   bool isLine() const;

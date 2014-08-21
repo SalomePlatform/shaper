@@ -12,10 +12,10 @@
 
 class XGUI_ViewWindow;
 
-class XGUI_EXPORT XGUI_ViewPort: public QWidget
+class XGUI_EXPORT XGUI_ViewPort : public QWidget
 {
 Q_OBJECT
-public:
+ public:
   XGUI_ViewPort(XGUI_ViewWindow* theParent, const Handle(V3d_Viewer)& theViewer,
                 V3d_TypeOfView theType = V3d_ORTHOGRAPHIC);
   virtual ~XGUI_ViewPort();
@@ -60,7 +60,7 @@ public:
 
   void setBackground(const Qtx::BackgroundData& bgData);
 
-  void syncronizeWith( const XGUI_ViewPort* ref );
+  void syncronizeWith(const XGUI_ViewPort* ref);
 
 signals:
   void vpChangeBackground(const Qtx::BackgroundData&);
@@ -70,11 +70,11 @@ signals:
   void vpUpdated();
   void resized();
 
-protected:
+ protected:
   virtual void paintEvent(QPaintEvent*);
   virtual void resizeEvent(QResizeEvent*);
 
-private:
+ private:
   Handle(V3d_View) activeView() const
   {
     return myActiveView;

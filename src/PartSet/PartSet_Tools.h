@@ -27,10 +27,10 @@ class GeomAPI_Pnt;
 /*!
  \class PartSet_Tools
  * \brief The operation for the sketch feature creation
-*/
+ */
 class PARTSET_EXPORT PartSet_Tools
 {
-public:
+ public:
   /// Converts the 2D screen point to the 3D point on the view according to the point of view
   /// \param thePoint a screen point
   /// \param theView a 3D view
@@ -42,7 +42,8 @@ public:
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
   static void convertTo2D(const gp_Pnt& thePoint, FeaturePtr theSketch,
-                          Handle(V3d_View) theView, double& theX, double& theY);
+  Handle(V3d_View) theView,
+                          double& theX, double& theY);
 
   /// \brief Converts the 2D projected coodinates on the sketch plane to the 3D point.
   /// \param theX the X coordinate
@@ -82,8 +83,7 @@ public:
   /// \param theAttribute the feature attribute
   /// \param isValid an output parameter whether the value is valid
   /// \returns the feature value
-  static double featureValue(FeaturePtr theFeature, const std::string& theAttribute,
-                             bool& isValid);
+  static double featureValue(FeaturePtr theFeature, const std::string& theAttribute, bool& isValid);
 
   /// Find a feature in the attribute of the given feature. If the kind is not empty,
   /// the return feature should be this type. Otherwise it is null
@@ -92,7 +92,7 @@ public:
   /// \param theKind an output feature kind
   /// \return the feature
   static FeaturePtr feature(FeaturePtr theFeature, const std::string& theAttribute,
-                             const std::string& theKind);
+                            const std::string& theKind);
 
   /// Creates a constraint on two points
   /// \param thePoint1 the first point
@@ -108,7 +108,8 @@ public:
   /// \param theClickedX the horizontal coordnate of the point
   /// \param theClickedY the vertical coordnate of the point
   static void setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
-                             const std::string& theAttribute, double theClickedX, double theClickedY);
+                             const std::string& theAttribute, double theClickedX,
+                             double theClickedY);
 
   /// Create a sketch plane instance
   /// \param theSketch a sketch feature

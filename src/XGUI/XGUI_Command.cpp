@@ -3,14 +3,16 @@
 #include <QToolButton>
 
 XGUI_Command::XGUI_Command(const QString& theId, QObject * parent, bool isCheckable)
-    : QWidgetAction(parent), myCheckable(isCheckable)
+    : QWidgetAction(parent),
+      myCheckable(isCheckable)
 {
   setData(theId);
 }
 
 XGUI_Command::XGUI_Command(const QString& theId, const QIcon& icon, const QString& text,
                            QObject* parent, bool isCheckable)
-    : QWidgetAction(parent), myCheckable(isCheckable)
+    : QWidgetAction(parent),
+      myCheckable(isCheckable)
 {
   setIcon(icon);
   setText(text);
@@ -52,7 +54,7 @@ QWidget* XGUI_Command::createWidget(QWidget* theParent)
 
 void XGUI_Command::connectTo(const QObject* theResiver, const char* theSlot)
 {
-    connect(this, SIGNAL(triggered(bool)), theResiver, theSlot);
+  connect(this, SIGNAL(triggered(bool)), theResiver, theSlot);
 }
 
 const QStringList& XGUI_Command::nestedCommands() const

@@ -15,9 +15,9 @@ class GeomAPI_XYZ;
  * \brief 3D point defined by three coordinates
  */
 
-class GEOMAPI_EXPORT GeomAPI_Pnt: public GeomAPI_Interface
+class GEOMAPI_EXPORT GeomAPI_Pnt : public GeomAPI_Interface
 {
-public:
+ public:
   /// Creation of point by coordinates
   GeomAPI_Pnt(const double theX, const double theY, const double theZ);
   /// Creation of point by coordinates

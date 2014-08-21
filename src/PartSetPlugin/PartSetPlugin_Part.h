@@ -12,9 +12,9 @@
  * \ingroup DataModel
  * \brief Feature for creation of the new part in PartSet.
  */
-class PartSetPlugin_Part: public ModelAPI_Feature
+class PartSetPlugin_Part : public ModelAPI_Feature
 {
-public:
+ public:
   /// Part kind
   inline static const std::string& ID()
   {
@@ -22,12 +22,18 @@ public:
     return MY_PART_KIND;
   }
   /// Returns the kind of a feature
-  PARTSETPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = PartSetPlugin_Part::ID(); return MY_KIND;}
+  PARTSETPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    static std::string MY_KIND = PartSetPlugin_Part::ID();
+    return MY_KIND;
+  }
 
   /// Returns to which group in the document must be added feature
-  PARTSETPLUGIN_EXPORT virtual const std::string& getGroup() 
-  {static std::string MY_GROUP = "Parts"; return MY_GROUP;}
+  PARTSETPLUGIN_EXPORT virtual const std::string& getGroup()
+  {
+    static std::string MY_GROUP = "Parts";
+    return MY_GROUP;
+  }
 
   /// Creates a new part document if needed
   PARTSETPLUGIN_EXPORT virtual void execute();
@@ -38,7 +44,10 @@ public:
   PARTSETPLUGIN_EXPORT virtual boost::shared_ptr<ModelAPI_Document> documentToAdd();
 
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
-  PARTSETPLUGIN_EXPORT virtual bool isInHistory() {return false;}
+  PARTSETPLUGIN_EXPORT virtual bool isInHistory()
+  {
+    return false;
+  }
 
   /// Use plugin manager for features creation
   PartSetPlugin_Part();

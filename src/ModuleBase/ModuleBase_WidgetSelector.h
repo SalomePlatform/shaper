@@ -14,7 +14,6 @@
 
 #include <QStringList>
 
-
 class Config_WidgetAPI;
 class QWidget;
 class QLabel;
@@ -22,12 +21,11 @@ class QLineEdit;
 class QToolButton;
 class ModuleBase_IWorkshop;
 
-class MODULEBASE_EXPORT ModuleBase_WidgetSelector: public ModuleBase_ModelWidget
+class MODULEBASE_EXPORT ModuleBase_WidgetSelector : public ModuleBase_ModelWidget
 {
-  Q_OBJECT
-public:
-  ModuleBase_WidgetSelector(QWidget* theParent, 
-                            ModuleBase_IWorkshop* theWorkshop, 
+Q_OBJECT
+ public:
+  ModuleBase_WidgetSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
                             const Config_WidgetAPI* theData, const std::string& theParentId);
 
   virtual ~ModuleBase_WidgetSelector();
@@ -40,29 +38,41 @@ public:
 
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
-  QWidget* getControl() const { return myContainer; }
+  QWidget* getControl() const
+  {
+    return myContainer;
+  }
 
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-  void setActivationOnStart(bool toActivate) { myActivateOnStart = toActivate; }
-  bool activateOnStart() const { return myActivateOnStart; }
+  void setActivationOnStart(bool toActivate)
+  {
+    myActivateOnStart = toActivate;
+  }
+  bool activateOnStart() const
+  {
+    return myActivateOnStart;
+  }
 
-  ObjectPtr selectedFeature() const { return mySelectedObject; }
+  ObjectPtr selectedFeature() const
+  {
+    return mySelectedObject;
+  }
 
-public slots:
+ public slots:
 
   /// Activate or deactivate selection
   void activateSelection(bool toActivate);
 
-protected:
+ protected:
   bool eventFilter(QObject* theObj, QEvent* theEvent);
 
-private slots:
+ private slots:
   void onSelectionChanged();
 
-private:
+ private:
   void enableOthersControls(bool toEnable) const;
   void updateSelectionName();
   void raisePanel() const;
@@ -70,9 +80,9 @@ private:
 
   static TopAbs_ShapeEnum shapeType(const QString& theType);
 
-  QWidget*     myContainer;
-  QLabel*      myLabel;
-  QLineEdit*   myTextLine;
+  QWidget* myContainer;
+  QLabel* myLabel;
+  QLineEdit* myTextLine;
   QToolButton* myActivateBtn;
 
   ModuleBase_IWorkshop* myWorkshop;

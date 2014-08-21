@@ -13,26 +13,43 @@
 /// Class which describes a one property
 class Config_Prop
 {
-public:
+ public:
 
-  enum PropType { Disabled, Space, Bool, Color, String, Selector,
-                  DblSpin, IntSpin, Double, Integer,
-                  GroupBox, Tab, Frame, Font, DirList, File,
-		              Slider, Shortcut, ShortcutTree, BiColor, Background };
-
+  enum PropType
+  {
+    Disabled,
+    Space,
+    Bool,
+    Color,
+    String,
+    Selector,
+    DblSpin,
+    IntSpin,
+    Double,
+    Integer,
+    GroupBox,
+    Tab,
+    Frame,
+    Font,
+    DirList,
+    File,
+    Slider,
+    Shortcut,
+    ShortcutTree,
+    BiColor,
+    Background
+  };
 
   /** 
-  * Creates a one property
-  * \param theSection - name of section (domain of using) of the property.
-  * \param theName - name (title) of the value.
-  * \param theType - type of the value.
-  * \param theValue - initial value of the property.
-  */
-  Config_Prop(const std::string& theSection,
-              const std::string& theName,
-              const std::string& theTitle,
-              PropType theType,
-              const std::string& theValue ) {
+   * Creates a one property
+   * \param theSection - name of section (domain of using) of the property.
+   * \param theName - name (title) of the value.
+   * \param theType - type of the value.
+   * \param theValue - initial value of the property.
+   */
+  Config_Prop(const std::string& theSection, const std::string& theName,
+              const std::string& theTitle, PropType theType, const std::string& theValue)
+  {
     mySection = theSection;
     myName = theName;
     myTitle = theTitle;
@@ -40,24 +57,48 @@ public:
     myValue = theValue;
   }
 
-  std::string section() const { return mySection; }
-  std::string name() const { return myName; }
+  std::string section() const
+  {
+    return mySection;
+  }
+  std::string name() const
+  {
+    return myName;
+  }
 
-  std::string title() const { return myTitle; }
-  void setTitle(const std::string& theTitle) { myTitle = theTitle; }
+  std::string title() const
+  {
+    return myTitle;
+  }
+  void setTitle(const std::string& theTitle)
+  {
+    myTitle = theTitle;
+  }
 
-  PropType type() const { return myType; }
-  void setType(PropType theType) { myType = theType; }
+  PropType type() const
+  {
+    return myType;
+  }
+  void setType(PropType theType)
+  {
+    myType = theType;
+  }
 
-  std::string value() const { return myValue; }
-  void setValue(const std::string& theValue) { myValue = theValue; }
+  std::string value() const
+  {
+    return myValue;
+  }
+  void setValue(const std::string& theValue)
+  {
+    myValue = theValue;
+  }
 
   bool operator==(const Config_Prop* theProp) const
   {
     return (mySection == theProp->section()) && (myName == theProp->name());
   }
 
-private:
+ private:
   std::string mySection;
   std::string myName;
   std::string myTitle;

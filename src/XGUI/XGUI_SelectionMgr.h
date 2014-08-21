@@ -21,12 +21,15 @@ class XGUI_Selection;
  */
 class XGUI_EXPORT XGUI_SelectionMgr : public QObject
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   XGUI_SelectionMgr(XGUI_Workshop* theParent);
   virtual ~XGUI_SelectionMgr();
 
-  XGUI_Selection* selection() const { return mySelection; }
+  XGUI_Selection* selection() const
+  {
+    return mySelection;
+  }
 
   //! Connects the manager to all viewers accessible by Workshop
   void connectViewers();
@@ -35,11 +38,11 @@ signals:
   //! Emited when selection in a one of viewers was changed
   void selectionChanged();
 
-private slots:
+ private slots:
   void onObjectBrowserSelection();
   void onViewerSelection();
 
-private:
+ private:
   XGUI_Workshop* myWorkshop;
   XGUI_Selection* mySelection;
 };

@@ -18,7 +18,7 @@
 
 class ModuleBase_ISelection
 {
-public:
+ public:
 
   /// Returns a list of viewer selected presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
@@ -31,15 +31,15 @@ public:
   virtual std::list<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const = 0;
 
   /**
-  * Returns list of features currently selected in 3d viewer
-  */
+   * Returns list of features currently selected in 3d viewer
+   */
   virtual QList<ObjectPtr> selectedObjects() const = 0;
 
   /**
-  * Returns list of currently selected results
-  */
+   * Returns list of currently selected results
+   */
   virtual QList<ObjectPtr> selectedPresentations() const = 0;
-  
+
   //! Returns list of currently selected QModelIndexes
   virtual QModelIndexList selectedIndexes() const = 0;
 

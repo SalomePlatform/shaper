@@ -43,7 +43,7 @@
 
 ModuleBase_WidgetFactory::ModuleBase_WidgetFactory(const std::string& theXmlRepresentation,
                                                    ModuleBase_IWorkshop* theWorkshop)
- : myWorkshop(theWorkshop)
+    : myWorkshop(theWorkshop)
 {
   myWidgetApi = new Config_WidgetAPI(theXmlRepresentation);
 }
@@ -60,15 +60,14 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
 
   QVBoxLayout* aWidgetLay = new QVBoxLayout(theParent);
   aWidgetLay->setContentsMargins(2, 2, 2, 2);
-  do { //Iterate over each node
+  do {  //Iterate over each node
     std::string aWdgType = myWidgetApi->widgetType();
     //Create a widget (doublevalue, groupbox, toolbox, etc.
     QWidget* aWidget = createWidgetByType(aWdgType, theParent);
     if (aWidget) {
       if (!isInternalWidget(aWdgType)) {
         aWidgetLay->addWidget(aWidget);
-      }
-      else {
+      } else {
         aWidget->setVisible(false);
       }
     }
@@ -90,13 +89,13 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
         if (aWdgType == WDG_SWITCH) {
           ModuleBase_WidgetSwitch* aSwitch = qobject_cast<ModuleBase_WidgetSwitch*>(aWidget);
           aSwitch->addPage(aPage, aPageName);
-        } else if (aWdgType == WDG_TOOLBOX){
+        } else if (aWdgType == WDG_TOOLBOX) {
           QToolBox* aToolbox = qobject_cast<QToolBox*>(aWidget);
           aToolbox->addItem(aPage, aPageName);
         }
-      } while(myWidgetApi->toNextWidget());
+      } while (myWidgetApi->toNextWidget());
     }
-  } while(myWidgetApi->toNextWidget());
+  } while (myWidgetApi->toNextWidget());
   theParent->setLayout(aWidgetLay);
 }
 
@@ -114,7 +113,8 @@ QWidget* ModuleBase_WidgetFactory::labelControl(QWidget* theParent)
   return result;
 }
 
-QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType, QWidget* theParent)
+QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType,
+                                                      QWidget* theParent)
 {
   QWidget* result = NULL;
   if (theType == WDG_DOUBLEVALUE) {
@@ -140,17 +140,17 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
 
   } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
     result = doubleValueEditor(theParent);
-  
+
   } else if (theType == WDG_POINT2D_DISTANCE) {
     result = point2dDistanceControl(theParent);
 
-  }
-  else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
+  } else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
   } else {
-    result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi, myModelWidgets);
+    result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi,
+                                                      myModelWidgets);
 #ifdef _DEBUG
-    if (!result) { qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type"); }
+    if (!result) {qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type");}
 #endif
   }
   return result;
@@ -171,15 +171,15 @@ QWidget* ModuleBase_WidgetFactory::createContainer(const std::string& theType, Q
     result = NULL;
   }
 #ifdef _DEBUG
-  else { qDebug() << "ModuleBase_WidgetFactory::fillWidget: find bad container type"; }
+  else {qDebug() << "ModuleBase_WidgetFactory::fillWidget: find bad container type";}
 #endif
   return result;
 }
 
 QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 {
-  ModuleBase_WidgetDoubleValue* aDblWgt = 
-    new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi, myParentId);
+  ModuleBase_WidgetDoubleValue* aDblWgt = new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi,
+                                                                           myParentId);
   myModelWidgets.append(aDblWgt);
 
   return aDblWgt->getControl();
@@ -187,32 +187,32 @@ QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 
 QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetPoint2D* aWidget = 
-    new ModuleBase_WidgetPoint2D(theParent, myWidgetApi, myParentId);
+  ModuleBase_WidgetPoint2D* aWidget = new ModuleBase_WidgetPoint2D(theParent, myWidgetApi,
+                                                                   myParentId);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
 
 QWidget* ModuleBase_WidgetFactory::featureSelectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetFeature* aWidget = 
-    new ModuleBase_WidgetFeature(theParent, myWidgetApi, myParentId);
+  ModuleBase_WidgetFeature* aWidget = new ModuleBase_WidgetFeature(theParent, myWidgetApi,
+                                                                   myParentId);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
 
 QWidget* ModuleBase_WidgetFactory::featureOrAttributeSelectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetFeatureOrAttribute* aWidget = 
-    new ModuleBase_WidgetFeatureOrAttribute(theParent, myWidgetApi, myParentId);
+  ModuleBase_WidgetFeatureOrAttribute* aWidget = new ModuleBase_WidgetFeatureOrAttribute(
+      theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
 
 QWidget* ModuleBase_WidgetFactory::doubleValueEditor(QWidget* theParent)
 {
-  ModuleBase_WidgetEditor* aWidget = 
-    new ModuleBase_WidgetEditor(theParent, myWidgetApi, myParentId);
+  ModuleBase_WidgetEditor* aWidget = new ModuleBase_WidgetEditor(theParent, myWidgetApi,
+                                                                 myParentId);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
@@ -227,35 +227,34 @@ bool ModuleBase_WidgetFactory::isInternalWidget(const std::string& theType)
   std::string prop = myWidgetApi->getProperty(FEATURE_INTERNAL);
 
   std::transform(prop.begin(), prop.end(), prop.begin(), ::tolower);
-  if(prop.empty() || prop == "false" || prop == "0") {
+  if (prop.empty() || prop == "false" || prop == "0") {
     return false;
   }
-  return true; 
+  return true;
 }
 
 QWidget* ModuleBase_WidgetFactory::selectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetSelector* aSelector = 
-    new ModuleBase_WidgetSelector(theParent, myWorkshop, myWidgetApi, myParentId);
+  ModuleBase_WidgetSelector* aSelector = new ModuleBase_WidgetSelector(theParent, myWorkshop,
+                                                                       myWidgetApi, myParentId);
   myModelWidgets.append(aSelector);
   return aSelector->getControl();
 }
 
-
 QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
 {
-  ModuleBase_WidgetBoolValue* aBoolWgt = 
-    new ModuleBase_WidgetBoolValue(theParent, myWidgetApi, myParentId);
+  ModuleBase_WidgetBoolValue* aBoolWgt = new ModuleBase_WidgetBoolValue(theParent, myWidgetApi,
+                                                                        myParentId);
   myModelWidgets.append(aBoolWgt);
 
   return aBoolWgt->getControl();
 }
 
-
 QWidget* ModuleBase_WidgetFactory::point2dDistanceControl(QWidget* theParent)
 {
-  ModuleBase_WidgetPoint2dDistance* aDistWgt = 
-    new ModuleBase_WidgetPoint2dDistance(theParent, myWidgetApi, myParentId);
+  ModuleBase_WidgetPoint2dDistance* aDistWgt = new ModuleBase_WidgetPoint2dDistance(theParent,
+                                                                                    myWidgetApi,
+                                                                                    myParentId);
   myModelWidgets.append(aDistWgt);
 
   return aDistWgt->getControl();

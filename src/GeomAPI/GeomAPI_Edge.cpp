@@ -12,15 +12,16 @@
 #include <Geom_Circle.hxx>
 
 GeomAPI_Edge::GeomAPI_Edge()
-  : GeomAPI_Shape()
-{}
+    : GeomAPI_Shape()
+{
+}
 
 bool GeomAPI_Edge::isLine() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   Handle(BRep_TEdge) anEdge = Handle(BRep_TEdge)::DownCast(aShape.TShape());
   if (anEdge->Curves().Extent() != 1)
-    return false; // too many curves in the edge
+    return false;  // too many curves in the edge
   Handle(Geom_Curve) aCurve = anEdge->Curves().First()->Curve3D();
   if (aCurve->IsKind(STANDARD_TYPE(Geom_Line)))
     return true;
@@ -32,7 +33,7 @@ bool GeomAPI_Edge::isCircle() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   Handle(BRep_TEdge) anEdge = Handle(BRep_TEdge)::DownCast(aShape.TShape());
   if (anEdge->Curves().Extent() != 1)
-    return false; // too many curves in the edge
+    return false;  // too many curves in the edge
   Handle(Geom_Curve) aCurve = anEdge->Curves().First()->Curve3D();
   if (aCurve->IsKind(STANDARD_TYPE(Geom_Circle)) && aCurve->IsClosed())
     return true;
@@ -44,7 +45,7 @@ bool GeomAPI_Edge::isArc() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   Handle(BRep_TEdge) anEdge = Handle(BRep_TEdge)::DownCast(aShape.TShape());
   if (anEdge->Curves().Extent() != 1)
-    return false; // too many curves in the edge
+    return false;  // too many curves in the edge
   Handle(Geom_Curve) aCurve = anEdge->Curves().First()->Curve3D();
   if (aCurve->IsKind(STANDARD_TYPE(Geom_Circle)) && !aCurve->IsClosed())
     return true;

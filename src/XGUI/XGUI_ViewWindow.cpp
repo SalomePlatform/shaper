@@ -78,9 +78,10 @@ const char* imageCrossCursor[] = { "32 32 3 1", ". c None", "a c #000000", "# c 
     "................................", "................................",
     "................................", "................................" };
 
-
 ViewerToolbar::ViewerToolbar(QWidget* theParent, XGUI_ViewPort* thePort)
-  : QToolBar(theParent), myVPort(thePort), myResize(false)
+    : QToolBar(theParent),
+      myVPort(thePort),
+      myResize(false)
 {
   connect(myVPort, SIGNAL(resized()), this, SLOT(onViewPortResized()));
 }
@@ -95,8 +96,8 @@ void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
   QPoint aGlobPnt = mapToGlobal(aRect.topLeft());
   QPoint aPnt = myVPort->mapFromGlobal(aGlobPnt);
 
-  QRect aImgRect(QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(),
-                       aRect.width(), aRect.height()));
+  QRect aImgRect(
+      QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(), aRect.width(), aRect.height()));
   QImage aImg = myVPort->dumpView(aImgRect, myResize);
   if (!aImg.isNull())
     aPainter.drawImage(aRect, aImg);
@@ -112,11 +113,11 @@ void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
     style->drawPrimitive(QStyle::PE_IndicatorToolBarHandle, &aOpt, &aPainter, this);
 }
 
-
-
 //**************************************************************************
 ViewerLabel::ViewerLabel(QWidget* theParent, XGUI_ViewPort* thePort)
-  : QLabel(theParent), myVPort(thePort), myResize(false)
+    : QLabel(theParent),
+      myVPort(thePort),
+      myResize(false)
 {
   connect(myVPort, SIGNAL(resized()), this, SLOT(onViewPortResized()));
 }
@@ -128,8 +129,8 @@ void ViewerLabel::paintEvent(QPaintEvent* theEvent)
   QPoint aGlobPnt = mapToGlobal(aRect.topLeft());
   QPoint aPnt = myVPort->mapFromGlobal(aGlobPnt);
 
-  QRect aImgRect(QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(), 
-                 aRect.width(), aRect.height()));
+  QRect aImgRect(
+      QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(), aRect.width(), aRect.height()));
   QImage aImg = myVPort->dumpView(aImgRect, myResize);
   if (!aImg.isNull())
     QPainter(this).drawImage(aRect, aImg);
@@ -141,25 +142,34 @@ void ViewerLabel::paintEvent(QPaintEvent* theEvent)
 //**************************************************************************
 //**************************************************************************
 XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
-    : QFrame(), 
-    myViewer(theViewer), 
-    myMoving(false), 
-    MinimizeIco(":pictures/wnd_minimize.png"), 
-    MaximizeIco(":pictures/wnd_maximize.png"), 
-    CloseIco(":pictures/wnd_close.png"), 
-    RestoreIco(":pictures/wnd_restore.png"), 
-    myInteractionStyle(XGUI::STANDARD), 
-    myRectBand(0), 
-    myIsKeyFree(false), 
-    my2dMode(XGUI::No2dMode), 
-    myCurrPointType(XGUI::GRAVITY), 
-    myPrevPointType(XGUI::GRAVITY), 
-    myRotationPointSelection(false),
-    myClosable(true),
-    myStartX(0), myStartY(0), myCurrX(0), myCurrY(0), myCurScale(0.0), myCurSketch(0),
-    myDrawRect(false), myEnableDrawMode(false), myCursorIsHand(false), myEventStarted(false),
-    myIsActive(false),
-    myLastState(WindowNormalState), myOperation(NOTHING)
+    : QFrame(),
+      myViewer(theViewer),
+      myMoving(false),
+      MinimizeIco(":pictures/wnd_minimize.png"),
+      MaximizeIco(":pictures/wnd_maximize.png"),
+      CloseIco(":pictures/wnd_close.png"),
+      RestoreIco(":pictures/wnd_restore.png"),
+      myInteractionStyle(XGUI::STANDARD),
+      myRectBand(0),
+      myIsKeyFree(false),
+      my2dMode(XGUI::No2dMode),
+      myCurrPointType(XGUI::GRAVITY),
+      myPrevPointType(XGUI::GRAVITY),
+      myRotationPointSelection(false),
+      myClosable(true),
+      myStartX(0),
+      myStartY(0),
+      myCurrX(0),
+      myCurrY(0),
+      myCurScale(0.0),
+      myCurSketch(0),
+      myDrawRect(false),
+      myEnableDrawMode(false),
+      myCursorIsHand(false),
+      myEventStarted(false),
+      myIsActive(false),
+      myLastState(WindowNormalState),
+      myOperation(NOTHING)
 {
   mySelectedPoint = gp_Pnt(0., 0., 0.);
   setFrameStyle(QFrame::Raised);
@@ -185,14 +195,14 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
   QVBoxLayout* aVPLay = new QVBoxLayout(myViewPort);
   aVPLay->setMargin(0);
   aVPLay->setSpacing(0);
-  aVPLay->setContentsMargins(0,0,0,0);
+  aVPLay->setContentsMargins(0, 0, 0, 0);
 
   QHBoxLayout* aToolLay = new QHBoxLayout();
   aToolLay->setMargin(0);
   aToolLay->setSpacing(0);
-  aToolLay->setContentsMargins(0,0,0,0);
+  aToolLay->setContentsMargins(0, 0, 0, 0);
   aVPLay->addLayout(aToolLay);
-  aVPLay->addStretch(); 
+  aVPLay->addStretch();
 
   myGripWgt = new ViewerLabel(this, myViewPort);
   myGripWgt->setPixmap(QPixmap(":pictures/wnd_grip.png"));
@@ -201,10 +211,10 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
   myGripWgt->setCursor(Qt::OpenHandCursor);
   aToolLay->addWidget(myGripWgt);
 
-    // Create Viewer management buttons
+  // Create Viewer management buttons
   myViewBar = new ViewerToolbar(this, myViewPort);
   myViewBar->setCursor(Qt::PointingHandCursor);
-  aToolLay->addWidget(myViewBar); 
+  aToolLay->addWidget(myViewBar);
   aToolLay->addStretch();
 
   QAction* aBtn;
@@ -270,7 +280,7 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
   connect(aBtn, SIGNAL(triggered()), SLOT(cloneView()));
   myViewBar->addAction(aBtn);
 
-    // Create Window management buttons
+  // Create Window management buttons
   myWindowBar = new ViewerToolbar(this, myViewPort);
   myWindowBar->setCursor(Qt::PointingHandCursor);
   aToolLay->addWidget(myWindowBar);
@@ -293,15 +303,14 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
   //Support copy of background on updating of viewer
   connect(myViewPort, SIGNAL(vpTransformed()), this, SLOT(updateToolBar()));
   connect(myViewPort, SIGNAL(vpUpdated()), this, SLOT(updateToolBar()));
-  connect(this, SIGNAL(vpTransformationFinished(XGUI_ViewWindow::OperationType)), 
-          this, SLOT(updateToolBar()));
+  connect(this, SIGNAL(vpTransformationFinished(XGUI_ViewWindow::OperationType)), this,
+          SLOT(updateToolBar()));
 }
 
 //****************************************************************
 XGUI_ViewWindow::~XGUI_ViewWindow()
 {
 }
-
 
 //****************************************************************
 void XGUI_ViewWindow::showEvent(QShowEvent* theEvent)
@@ -318,7 +327,7 @@ void XGUI_ViewWindow::changeEvent(QEvent* theEvent)
     if (isMinimized()) {
       if (myPicture->isHidden()) {
         myViewBar->hide();
-        myGripWgt->hide(); 
+        myGripWgt->hide();
         myWindowBar->hide();
         myViewPort->hide();
         myPicture->show();
@@ -340,8 +349,6 @@ void XGUI_ViewWindow::changeEvent(QEvent* theEvent)
     QWidget::changeEvent(theEvent);
 }
 
-
-
 //****************************************************************
 void XGUI_ViewWindow::windowActivated()
 {
@@ -354,9 +361,10 @@ void XGUI_ViewWindow::windowActivated()
     }
     myViewBar->show();
     myWindowBar->show();
-    myGripWgt->setVisible(!(isMaximized() || isMinimized() ||
-        parentWidget()->isMaximized() || parentWidget()->isMinimized()));
-  } else 
+    myGripWgt->setVisible(
+        !(isMaximized() || isMinimized() || parentWidget()->isMaximized()
+            || parentWidget()->isMinimized()));
+  } else
     myIsActive = false;
 }
 
@@ -372,10 +380,9 @@ void XGUI_ViewWindow::windowDeactivated()
     }
     myViewBar->hide();
     myWindowBar->hide();
-    myGripWgt->hide(); 
+    myGripWgt->hide();
   }
 }
-
 
 //****************************************************************
 void XGUI_ViewWindow::onClose()
@@ -397,15 +404,16 @@ void XGUI_ViewWindow::onMinimize()
   int aH = height();
   double aR = aW / 100.;
   int aNewH = int(aH / aR);
-  myPicture->setPixmap(aPMap.scaled(100,  aNewH));
+  myPicture->setPixmap(aPMap.scaled(100, aNewH));
 
-  myLastState = (isMaximized() || parentWidget()->isMaximized()) ? MaximizedState : WindowNormalState;
+  myLastState =
+      (isMaximized() || parentWidget()->isMaximized()) ? MaximizedState : WindowNormalState;
   showMinimized();
   parentWidget()->showMinimized();
   parentWidget()->setGeometry(parentWidget()->x(), parentWidget()->y(), 100, aNewH);
   parentWidget()->lower();
   windowDeactivated();
-  myViewer->onWindowMinimized((QMdiSubWindow*)parentWidget());
+  myViewer->onWindowMinimized((QMdiSubWindow*) parentWidget());
 }
 
 //****************************************************************
@@ -424,7 +432,7 @@ void XGUI_ViewWindow::onMaximize()
   }
   parentWidget()->activateWindow();
   myMinimizeBtn->setIcon(MinimizeIco);
-  
+
   //  In order to avoid frosen background in toolbars when it shown as a second view
   QTimer::singleShot(50, parentWidget(), SLOT(setFocus()));
 }
@@ -432,57 +440,57 @@ void XGUI_ViewWindow::onMaximize()
 //****************************************************************
 bool XGUI_ViewWindow::processWindowControls(QObject *theObj, QEvent *theEvent)
 {
-  switch(theEvent->type()) {
-  case QEvent::MouseButtonPress: {
-    QMouseEvent* aEvent = static_cast<QMouseEvent*>(theEvent);
-    if ((aEvent->button() == Qt::LeftButton) && (!myMoving)) {
-      myMoving = true;
-      myMousePnt = aEvent->globalPos();
-      return true;
-    }
-  }
-    break;
-  case QEvent::MouseButtonRelease: {
-    QMouseEvent* aEvent = static_cast<QMouseEvent*>(theEvent);
-    if ((aEvent->button() == Qt::LeftButton) && myMoving) {
-      myMoving = false;
-      return true;
-    }
-  }
-    break;
-  case QEvent::MouseMove: {
-    QMouseEvent* aEvent = static_cast<QMouseEvent*>(theEvent);
-    if (myMoving) {
-      QMdiSubWindow* aParent = static_cast<QMdiSubWindow*>(parentWidget());
-      QMdiArea* aMDIArea = aParent->mdiArea();
-
-      QPoint aPnt = aEvent->globalPos();
-      QPoint aMDIPnt = aMDIArea->mapFromGlobal(aPnt);
-      if (aMDIArea->rect().contains(aMDIPnt)) {
-                    int aX = aParent->x() + (aPnt.x() - myMousePnt.x());
-                    int aY = aParent->y() + (aPnt.y() - myMousePnt.y());
-                    aParent->move(aX, aY);
-        myMousePnt = aPnt;
+  switch (theEvent->type()) {
+    case QEvent::MouseButtonPress: {
+      QMouseEvent* aEvent = static_cast<QMouseEvent*>(theEvent);
+      if ((aEvent->button() == Qt::LeftButton) && (!myMoving)) {
+        myMoving = true;
+        myMousePnt = aEvent->globalPos();
+        return true;
       }
-      return true;
     }
-  }
-    break;
-  case QEvent::MouseButtonDblClick:
-    if (theObj == myPicture) {
-      myMoving = false;
-      if (myLastState == MaximizedState) {
-        showMaximized();
-      } else {
-        showNormal();
+      break;
+    case QEvent::MouseButtonRelease: {
+      QMouseEvent* aEvent = static_cast<QMouseEvent*>(theEvent);
+      if ((aEvent->button() == Qt::LeftButton) && myMoving) {
+        myMoving = false;
+        return true;
       }
-      myViewer->onWindowActivated((QMdiSubWindow*)parentWidget());
-
-      //  In order to avoid frosen background in toolbars when it shown as a second view
-      QTimer::singleShot(20, parentWidget(), SLOT(setFocus()));
-
-      return true;
     }
+      break;
+    case QEvent::MouseMove: {
+      QMouseEvent* aEvent = static_cast<QMouseEvent*>(theEvent);
+      if (myMoving) {
+        QMdiSubWindow* aParent = static_cast<QMdiSubWindow*>(parentWidget());
+        QMdiArea* aMDIArea = aParent->mdiArea();
+
+        QPoint aPnt = aEvent->globalPos();
+        QPoint aMDIPnt = aMDIArea->mapFromGlobal(aPnt);
+        if (aMDIArea->rect().contains(aMDIPnt)) {
+          int aX = aParent->x() + (aPnt.x() - myMousePnt.x());
+          int aY = aParent->y() + (aPnt.y() - myMousePnt.y());
+          aParent->move(aX, aY);
+          myMousePnt = aPnt;
+        }
+        return true;
+      }
+    }
+      break;
+    case QEvent::MouseButtonDblClick:
+      if (theObj == myPicture) {
+        myMoving = false;
+        if (myLastState == MaximizedState) {
+          showMaximized();
+        } else {
+          showNormal();
+        }
+        myViewer->onWindowActivated((QMdiSubWindow*) parentWidget());
+
+        //  In order to avoid frosen background in toolbars when it shown as a second view
+        QTimer::singleShot(20, parentWidget(), SLOT(setFocus()));
+
+        return true;
+      }
   }
   return false;
 }
@@ -490,34 +498,33 @@ bool XGUI_ViewWindow::processWindowControls(QObject *theObj, QEvent *theEvent)
 //****************************************************************
 bool XGUI_ViewWindow::processViewPort(QEvent *theEvent)
 {
-  switch(theEvent->type()) {
-  case QEvent::MouseButtonPress:
-    vpMousePressEvent((QMouseEvent*) theEvent);
-    return true;
+  switch (theEvent->type()) {
+    case QEvent::MouseButtonPress:
+      vpMousePressEvent((QMouseEvent*) theEvent);
+      return true;
 
-  case QEvent::MouseButtonRelease:
-    vpMouseReleaseEvent((QMouseEvent*) theEvent);
-    return true;
+    case QEvent::MouseButtonRelease:
+      vpMouseReleaseEvent((QMouseEvent*) theEvent);
+      return true;
 
-  case QEvent::MouseMove:
-    vpMouseMoveEvent((QMouseEvent*) theEvent);
-    return true;
+    case QEvent::MouseMove:
+      vpMouseMoveEvent((QMouseEvent*) theEvent);
+      return true;
 
-  case QEvent::MouseButtonDblClick:
-    emit mouseDoubleClicked(this, (QMouseEvent*) theEvent);
-    return true;
-    case QEvent::Wheel:
-        {
-            QWheelEvent* aEvent = (QWheelEvent*) theEvent;
-            myViewPort->startZoomAtPoint( aEvent->x(), aEvent->y() );
-            double aDelta = (double)( aEvent->delta() ) / ( 15 * 8 );
-            int x  = aEvent->x();
-            int y  = aEvent->y();
-            int x1 = (int)( aEvent->x() + width()*aDelta/100 );
-            int y1 = (int)( aEvent->y() + height()*aDelta/100 );
-            myViewPort->zoom( x, y, x1, y1 );
-        }
-        return true;
+    case QEvent::MouseButtonDblClick:
+      emit mouseDoubleClicked(this, (QMouseEvent*) theEvent);
+      return true;
+    case QEvent::Wheel: {
+      QWheelEvent* aEvent = (QWheelEvent*) theEvent;
+      myViewPort->startZoomAtPoint(aEvent->x(), aEvent->y());
+      double aDelta = (double) (aEvent->delta()) / (15 * 8);
+      int x = aEvent->x();
+      int y = aEvent->y();
+      int x1 = (int) (aEvent->x() + width() * aDelta / 100);
+      int y1 = (int) (aEvent->y() + height() * aDelta / 100);
+      myViewPort->zoom(x, y, x1, y1);
+    }
+      return true;
   }
   return false;
 }
@@ -575,97 +582,97 @@ void XGUI_ViewWindow::vpMousePressEvent(QMouseEvent* theEvent)
     aSwitchToZoom = getButtonState(theEvent, anInteractionStyle) == ZOOMVIEW;
   }
 
-  switch(myOperation) {
-  case WINDOWFIT:
-    if (theEvent->button() == Qt::LeftButton)
-      emit vpTransformationStarted(WINDOWFIT);
-    break;
+  switch (myOperation) {
+    case WINDOWFIT:
+      if (theEvent->button() == Qt::LeftButton)
+        emit vpTransformationStarted(WINDOWFIT);
+      break;
 
-  case PANGLOBAL:
-    if (theEvent->button() == Qt::LeftButton)
-      emit vpTransformationStarted(PANGLOBAL);
-    break;
+    case PANGLOBAL:
+      if (theEvent->button() == Qt::LeftButton)
+        emit vpTransformationStarted(PANGLOBAL);
+      break;
 
-  case ZOOMVIEW:
-    if (theEvent->button() == Qt::LeftButton) {
-      myViewPort->startZoomAtPoint(myStartX, myStartY);
-      emit vpTransformationStarted(ZOOMVIEW);
-    }
-    break;
-
-  case PANVIEW:
-    if (aSwitchToZoom) {
-      myViewPort->startZoomAtPoint(myStartX, myStartY);
-      activateZoom();
-    } else if (theEvent->button() == Qt::LeftButton)
-      emit vpTransformationStarted(PANVIEW);
-    break;
-
-  case ROTATE:
-    if (aSwitchToZoom) {
-      myViewPort->startZoomAtPoint(myStartX, myStartY);
-      activateZoom();
-    } else if (theEvent->button() == Qt::LeftButton) {
-      myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
-      emit vpTransformationStarted(ROTATE);
-    }
-    break;
-
-  default:
-    /*  Try to activate a transformation */
-    OperationType aState;
-    if (interactionStyle() == XGUI::STANDARD)
-      aState = getButtonState(theEvent, anInteractionStyle);
-    else {
-      aState = XGUI_ViewWindow::NOTHING;
-      myIsKeyFree = true;
-    }
-    switch(aState) {
     case ZOOMVIEW:
-      myViewPort->startZoomAtPoint(myStartX, myStartY);
-      activateZoom();
+      if (theEvent->button() == Qt::LeftButton) {
+        myViewPort->startZoomAtPoint(myStartX, myStartY);
+        emit vpTransformationStarted(ZOOMVIEW);
+      }
       break;
+
     case PANVIEW:
-      activatePanning();
+      if (aSwitchToZoom) {
+        myViewPort->startZoomAtPoint(myStartX, myStartY);
+        activateZoom();
+      } else if (theEvent->button() == Qt::LeftButton)
+        emit vpTransformationStarted(PANVIEW);
       break;
+
     case ROTATE:
-      activateRotation();
-      myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
+      if (aSwitchToZoom) {
+        myViewPort->startZoomAtPoint(myStartX, myStartY);
+        activateZoom();
+      } else if (theEvent->button() == Qt::LeftButton) {
+        myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
+        emit vpTransformationStarted(ROTATE);
+      }
       break;
+
     default:
-      if (myRotationPointSelection) {
-        if (theEvent->button() == Qt::LeftButton) {
-          Handle(AIS_InteractiveContext) ic = myViewer->AISContext();
-          ic->Select();
-          for(ic->InitSelected(); ic->MoreSelected(); ic->NextSelected()) {
-            TopoDS_Shape aShape = ic->SelectedShape();
-            if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) {
-              gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(ic->SelectedShape()));
-              /*if ( mySetRotationPointDlg ) {
-               myRotationPointSelection = false;
-               mySetRotationPointDlg->setCoords(aPnt.X(), aPnt.Y(), aPnt.Z());
-               }*/
-            } else {
-              myCurrPointType = myPrevPointType;
-              break;
+      /*  Try to activate a transformation */
+      OperationType aState;
+      if (interactionStyle() == XGUI::STANDARD)
+        aState = getButtonState(theEvent, anInteractionStyle);
+      else {
+        aState = XGUI_ViewWindow::NOTHING;
+        myIsKeyFree = true;
+      }
+      switch (aState) {
+        case ZOOMVIEW:
+          myViewPort->startZoomAtPoint(myStartX, myStartY);
+          activateZoom();
+          break;
+        case PANVIEW:
+          activatePanning();
+          break;
+        case ROTATE:
+          activateRotation();
+          myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
+          break;
+        default:
+          if (myRotationPointSelection) {
+            if (theEvent->button() == Qt::LeftButton) {
+              Handle(AIS_InteractiveContext) ic = myViewer->AISContext();
+              ic->Select();
+              for (ic->InitSelected(); ic->MoreSelected(); ic->NextSelected()) {
+                TopoDS_Shape aShape = ic->SelectedShape();
+                if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) {
+                  gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(ic->SelectedShape()));
+                  /*if ( mySetRotationPointDlg ) {
+                   myRotationPointSelection = false;
+                   mySetRotationPointDlg->setCoords(aPnt.X(), aPnt.Y(), aPnt.Z());
+                   }*/
+                } else {
+                  myCurrPointType = myPrevPointType;
+                  break;
+                }
+              }
+              if (ic->NbSelected() == 0)
+                myCurrPointType = myPrevPointType;
+              //if ( mySetRotationPointDlg ) mySetRotationPointDlg->toggleChange();
+              ic->CloseAllContexts();
+              myOperation = NOTHING;
+              myViewPort->setCursor(myCursor);
+              myCursorIsHand = false;
+              myRotationPointSelection = false;
             }
-          }
-          if (ic->NbSelected() == 0)
-            myCurrPointType = myPrevPointType;
-          //if ( mySetRotationPointDlg ) mySetRotationPointDlg->toggleChange();
-          ic->CloseAllContexts();
-          myOperation = NOTHING;
-          myViewPort->setCursor(myCursor);
-          myCursorIsHand = false;
-          myRotationPointSelection = false;
-        }
-      } else
-        emit mousePressed(this, theEvent);
-      break;
-    }
-    /* notify that we start a transformation */
-    if (transformRequested())
-      emit vpTransformationStarted(myOperation);
+          } else
+            emit mousePressed(this, theEvent);
+          break;
+      }
+      /* notify that we start a transformation */
+      if (transformRequested())
+        emit vpTransformationStarted(myOperation);
   }
   if (transformRequested())
     setTransformInProcess(true);
@@ -689,51 +696,51 @@ void XGUI_ViewWindow::contextMenuEvent(QContextMenuEvent* theEvent)
 //****************************************************************
 void XGUI_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
 {
-  switch(myOperation) {
-  case NOTHING: {
-    int prevState = myCurSketch;
-    /*            if(theEvent->button() == Qt::RightButton) {
-     QList<OCCViewer_ViewSketcher*>::Iterator it;
-     for ( it = mySketchers.begin(); it != mySketchers.end() && myCurSketch != -1; ++it ) {
-     OCCViewer_ViewSketcher* sk = (*it);
-     if( ( sk->sketchButton() & theEvent->button() ) && sk->sketchButton() == myCurSketch )
-     myCurSketch = -1;
-     }
-     }
-     */
-    emit mouseReleased(this, theEvent);
-  }
-    break;
-  case ROTATE:
-    myViewPort->endRotation();
-    resetState();
-    break;
-
-  case PANVIEW:
-  case ZOOMVIEW:
-    resetState();
-    break;
-
-  case PANGLOBAL:
-    if (theEvent->button() == Qt::LeftButton) {
-      myViewPort->setCenter(theEvent->x(), theEvent->y());
-      myViewPort->getView()->SetScale(myCurScale);
-      resetState();
+  switch (myOperation) {
+    case NOTHING: {
+      int prevState = myCurSketch;
+      /*            if(theEvent->button() == Qt::RightButton) {
+       QList<OCCViewer_ViewSketcher*>::Iterator it;
+       for ( it = mySketchers.begin(); it != mySketchers.end() && myCurSketch != -1; ++it ) {
+       OCCViewer_ViewSketcher* sk = (*it);
+       if( ( sk->sketchButton() & theEvent->button() ) && sk->sketchButton() == myCurSketch )
+       myCurSketch = -1;
+       }
+       }
+       */
+      emit mouseReleased(this, theEvent);
     }
-    break;
-
-  case WINDOWFIT:
-    if (theEvent->button() == Qt::LeftButton) {
-      myCurrX = theEvent->x();
-      myCurrY = theEvent->y();
-      drawRect();
-      QRect rect = XGUI_Tools::makeRect(myStartX, myStartY, myCurrX, myCurrY);
-      if (!rect.isEmpty())
-        myViewPort->fitRect(rect);
-      endDrawRect();
+      break;
+    case ROTATE:
+      myViewPort->endRotation();
       resetState();
-    }
-    break;
+      break;
+
+    case PANVIEW:
+    case ZOOMVIEW:
+      resetState();
+      break;
+
+    case PANGLOBAL:
+      if (theEvent->button() == Qt::LeftButton) {
+        myViewPort->setCenter(theEvent->x(), theEvent->y());
+        myViewPort->getView()->SetScale(myCurScale);
+        resetState();
+      }
+      break;
+
+    case WINDOWFIT:
+      if (theEvent->button() == Qt::LeftButton) {
+        myCurrX = theEvent->x();
+        myCurrY = theEvent->y();
+        drawRect();
+        QRect rect = XGUI_Tools::makeRect(myStartX, myStartY, myCurrX, myCurrY);
+        if (!rect.isEmpty())
+          myViewPort->fitRect(rect);
+        endDrawRect();
+        resetState();
+      }
+      break;
   }
 
   // NOTE: viewer 3D detects a rectangle of selection using this event
@@ -755,97 +762,97 @@ void XGUI_ViewWindow::vpMouseMoveEvent(QMouseEvent* theEvent)
 {
   if (myIsKeyFree && interactionStyle() == XGUI::KEY_FREE) {
     myIsKeyFree = false;
-    switch(getButtonState(theEvent, interactionStyle())) {
-    case ZOOMVIEW:
-      myViewPort->startZoomAtPoint(myStartX, myStartY);
-      activateZoom();
-      break;
-    case PANVIEW:
-      activatePanning();
-      break;
-    case ROTATE:
-      activateRotation();
-      myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
-      break;
-    default:
-      break;
+    switch (getButtonState(theEvent, interactionStyle())) {
+      case ZOOMVIEW:
+        myViewPort->startZoomAtPoint(myStartX, myStartY);
+        activateZoom();
+        break;
+      case PANVIEW:
+        activatePanning();
+        break;
+      case ROTATE:
+        activateRotation();
+        myViewPort->startRotation(myStartX, myStartY, myCurrPointType, mySelectedPoint);
+        break;
+      default:
+        break;
     }
   }
 
   myCurrX = theEvent->x();
   myCurrY = theEvent->y();
-  switch(myOperation) {
-  case ROTATE:
-    myViewPort->rotate(myCurrX, myCurrY, myCurrPointType, mySelectedPoint);
-    break;
+  switch (myOperation) {
+    case ROTATE:
+      myViewPort->rotate(myCurrX, myCurrY, myCurrPointType, mySelectedPoint);
+      break;
 
-  case ZOOMVIEW:
-    myViewPort->zoom(myStartX, myStartY, myCurrX, myCurrY);
-    myStartX = myCurrX;
-    myStartY = myCurrY;
-    break;
+    case ZOOMVIEW:
+      myViewPort->zoom(myStartX, myStartY, myCurrX, myCurrY);
+      myStartX = myCurrX;
+      myStartY = myCurrY;
+      break;
 
-  case PANVIEW:
-    myViewPort->pan(myCurrX - myStartX, myStartY - myCurrY);
-    myStartX = myCurrX;
-    myStartY = myCurrY;
-    break;
+    case PANVIEW:
+      myViewPort->pan(myCurrX - myStartX, myStartY - myCurrY);
+      myStartX = myCurrX;
+      myStartY = myCurrY;
+      break;
 
-  case PANGLOBAL:
-    break;
+    case PANGLOBAL:
+      break;
 
-  default:
-    if (myRotationPointSelection /*|| isSketcherStyle()*/) {
-      emit mouseMoving(this, theEvent);
-    } else {
-      int aState = theEvent->modifiers();
-      int aButton = theEvent->buttons();
-      int anInteractionStyle = interactionStyle();
-      if (((anInteractionStyle == XGUI::STANDARD) && (aButton == Qt::LeftButton)
-          && (aState == Qt::NoModifier || Qt::ShiftModifier))
-          || ((anInteractionStyle == XGUI::KEY_FREE) && (aButton == Qt::LeftButton)
-              && (aState == Qt::ControlModifier
-                  || aState == (Qt::ControlModifier | Qt::ShiftModifier)))) {
-        myDrawRect = myEnableDrawMode;
-        if (myDrawRect) {
-          drawRect();
-          if (!myCursorIsHand) {   // we are going to sketch a rectangle
-            QCursor handCursor(Qt::PointingHandCursor);
-            myCursorIsHand = true;
-            myCursor = cursor();
-            myViewPort->setCursor(handCursor);
+    default:
+      if (myRotationPointSelection /*|| isSketcherStyle()*/) {
+        emit mouseMoving(this, theEvent);
+      } else {
+        int aState = theEvent->modifiers();
+        int aButton = theEvent->buttons();
+        int anInteractionStyle = interactionStyle();
+        if (((anInteractionStyle == XGUI::STANDARD) && (aButton == Qt::LeftButton)
+            && (aState == Qt::NoModifier || Qt::ShiftModifier))
+            || ((anInteractionStyle == XGUI::KEY_FREE) && (aButton == Qt::LeftButton)
+                && (aState == Qt::ControlModifier
+                    || aState == (Qt::ControlModifier | Qt::ShiftModifier)))) {
+          myDrawRect = myEnableDrawMode;
+          if (myDrawRect) {
+            drawRect();
+            if (!myCursorIsHand) {   // we are going to sketch a rectangle
+              QCursor handCursor(Qt::PointingHandCursor);
+              myCursorIsHand = true;
+              myCursor = cursor();
+              myViewPort->setCursor(handCursor);
+            }
           }
-        }
-        emit mouseMoving(this, theEvent);
-      } /* else if ( ( (anInteractionStyle == XGUI::STANDARD) &&
-       (aButton == Qt::RightButton) && 
-       ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) ||
-       ( (anInteractionStyle == XGUI::KEY_FREE) &&
-       (aButton == Qt::RightButton) && 
-       ( aState == Qt::ControlModifier || aState == ( Qt::ControlModifier|Qt::ShiftModifier ) ) ) ) {
-       OCCViewer_ViewSketcher* sketcher = 0;
-       QList<OCCViewer_ViewSketcher*>::Iterator it;
-       for ( it = mySketchers.begin(); it != mySketchers.end() && !sketcher; ++it ) {
-       OCCViewer_ViewSketcher* sk = (*it);
-       if( sk->isDefault() && sk->sketchButton() == aButton )
-       sketcher = sk;
-       }
-       if ( sketcher && myCurSketch == -1 ) {
-       activateSketching( sketcher->type() );
-       if ( mypSketcher ) {
-       myCurSketch = mypSketcher->sketchButton();
+          emit mouseMoving(this, theEvent);
+        } /* else if ( ( (anInteractionStyle == XGUI::STANDARD) &&
+         (aButton == Qt::RightButton) && 
+         ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) ||
+         ( (anInteractionStyle == XGUI::KEY_FREE) &&
+         (aButton == Qt::RightButton) && 
+         ( aState == Qt::ControlModifier || aState == ( Qt::ControlModifier|Qt::ShiftModifier ) ) ) ) {
+         OCCViewer_ViewSketcher* sketcher = 0;
+         QList<OCCViewer_ViewSketcher*>::Iterator it;
+         for ( it = mySketchers.begin(); it != mySketchers.end() && !sketcher; ++it ) {
+         OCCViewer_ViewSketcher* sk = (*it);
+         if( sk->isDefault() && sk->sketchButton() == aButton )
+         sketcher = sk;
+         }
+         if ( sketcher && myCurSketch == -1 ) {
+         activateSketching( sketcher->type() );
+         if ( mypSketcher ) {
+         myCurSketch = mypSketcher->sketchButton();
 
-       if ( l_mbPressEvent )  {
-       QApplication::sendEvent( getViewPort(), l_mbPressEvent );
-       delete l_mbPressEvent;
-       l_mbPressEvent = 0;
-       }
-       QApplication::sendEvent( getViewPort(), theEvent );
-       }
-       }
-       } */else
-        emit mouseMoving(this, theEvent);
-    }
+         if ( l_mbPressEvent )  {
+         QApplication::sendEvent( getViewPort(), l_mbPressEvent );
+         delete l_mbPressEvent;
+         l_mbPressEvent = 0;
+         }
+         QApplication::sendEvent( getViewPort(), theEvent );
+         }
+         }
+         } */else
+          emit mouseMoving(this, theEvent);
+      }
   }
 }
 
@@ -943,22 +950,22 @@ void XGUI_ViewWindow::activatePanning()
 }
 
 /*!
-  \brief Start global panning operation
+ \brief Start global panning operation
 
-  Sets the corresponding cursor for the widget.
-*/
+ Sets the corresponding cursor for the widget.
+ */
 void XGUI_ViewWindow::activateGlobalPanning()
 {
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) {
-    QPixmap globalPanPixmap (imageCrossCursor);
-    QCursor glPanCursor (globalPanPixmap);
+  if (!aView3d.IsNull()) {
+    QPixmap globalPanPixmap(imageCrossCursor);
+    QCursor glPanCursor(globalPanPixmap);
     myCurScale = aView3d->Scale();
     aView3d->FitAll(0.01, false);
     myCursor = cursor();                // save old cursor
-    myViewPort->fitAll(); // fits view before selecting a new scene center
-    if( setTransformRequested( PANGLOBAL ) )
-      myViewPort->setCursor( glPanCursor );
+    myViewPort->fitAll();  // fits view before selecting a new scene center
+    if (setTransformRequested(PANGLOBAL))
+      myViewPort->setCursor(glPanCursor);
   }
 }
 
@@ -1011,20 +1018,20 @@ Qtx::BackgroundData XGUI_ViewWindow::background() const
 
 void XGUI_ViewWindow::setBackground(const Qtx::BackgroundData& theBackground)
 {
-  if (myViewPort) 
-  	myViewPort->setBackground( theBackground );
+  if (myViewPort)
+    myViewPort->setBackground(theBackground);
 }
 
 /*!
-   \brief Create one more window with same content.
-*/
+ \brief Create one more window with same content.
+ */
 void XGUI_ViewWindow::cloneView()
 {
   QMdiSubWindow* vw = myViewer->createView();
   XGUI_ViewWindow* aNewWnd = static_cast<XGUI_ViewWindow*>(vw->widget());
   aNewWnd->viewPort()->syncronizeWith(myViewPort);
 
-  emit viewCloned( vw );
+  emit viewCloned(vw);
 
   //  In order to avoid frosen background in toolbars when it shown as a second view
   QTimer::singleShot(20, vw, SLOT(setFocus()));
@@ -1034,15 +1041,16 @@ void XGUI_ViewWindow::dumpView()
 {
   QString aFilter(tr("Images Files (*.bmp *.png *.jpg *.jpeg *.eps *.ps)"));
   QString aSelectedFilter;
-  QString aFileName = QFileDialog::getSaveFileName(this, "Save picture", QString(), aFilter, &aSelectedFilter);
+  QString aFileName = QFileDialog::getSaveFileName(this, "Save picture", QString(), aFilter,
+                                                   &aSelectedFilter);
   if (!aFileName.isNull()) {
-    QApplication::setOverrideCursor( Qt::WaitCursor );
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     QImage aPicture = myViewPort->dumpView();
 
     QString aFmt = XGUI_Tools::extension(aFileName).toUpper();
-    if( aFmt.isEmpty() )
-      aFmt = QString( "BMP" ); // default format
-    else if( aFmt == "JPG" )
+    if (aFmt.isEmpty())
+      aFmt = QString("BMP");  // default format
+    else if (aFmt == "JPG")
       aFmt = "JPEG";
 
     Handle(Visual3d_View) a3dView = myViewPort->getView()->View();
@@ -1051,127 +1059,125 @@ void XGUI_ViewWindow::dumpView()
     else if (aFmt == "EPS")
       a3dView->Export(strdup(qPrintable(aFileName)), Graphic3d_EF_EnhPostScript);
     else
-      aPicture.save( aFileName, aFmt.toLatin1() );
+      aPicture.save(aFileName, aFmt.toLatin1());
     QApplication::restoreOverrideCursor();
   }
 }
 
 void XGUI_ViewWindow::fitAll()
 {
-  emit vpTransformationStarted( FITALLVIEW );
+  emit vpTransformationStarted(FITALLVIEW);
   myViewPort->fitAll();
-  emit vpTransformationFinished( FITALLVIEW );
+  emit vpTransformationFinished(FITALLVIEW);
 }
 
 /*!
-  \brief Starts fit operation.
+ \brief Starts fit operation.
 
-  Sets the corresponding cursor for the widget.
-*/
+ Sets the corresponding cursor for the widget.
+ */
 void XGUI_ViewWindow::activateWindowFit()
 {
-  if ( !transformRequested() && !myCursorIsHand )
-    myCursor = cursor();                /* save old cursor */
+  if (!transformRequested() && !myCursorIsHand)
+    myCursor = cursor(); /* save old cursor */
 
-  if ( myOperation != WINDOWFIT ) {
-    QCursor handCursor (Qt::PointingHandCursor);
-    if( setTransformRequested ( WINDOWFIT ) ) {
-      myViewPort->setCursor ( handCursor );
+  if (myOperation != WINDOWFIT) {
+    QCursor handCursor(Qt::PointingHandCursor);
+    if (setTransformRequested(WINDOWFIT)) {
+      myViewPort->setCursor(handCursor);
       myCursorIsHand = true;
     }
   }
 }
 
-
 /*!
-  \brief Perform "front view" transformation.
-*/
+ \brief Perform "front view" transformation.
+ */
 void XGUI_ViewWindow::frontView()
 {
-  emit vpTransformationStarted ( FRONTVIEW );
+  emit vpTransformationStarted(FRONTVIEW);
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) 
-    aView3d->SetProj (V3d_Xpos);
+  if (!aView3d.IsNull())
+    aView3d->SetProj(V3d_Xpos);
   myViewPort->fitAll();
-  emit vpTransformationFinished ( FRONTVIEW );
+  emit vpTransformationFinished(FRONTVIEW);
 }
 
 /*!
-  \brief Perform "back view" transformation.
-*/
+ \brief Perform "back view" transformation.
+ */
 void XGUI_ViewWindow::backView()
 {
-  emit vpTransformationStarted ( BACKVIEW );
+  emit vpTransformationStarted(BACKVIEW);
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) 
-    aView3d->SetProj (V3d_Xneg);
+  if (!aView3d.IsNull())
+    aView3d->SetProj(V3d_Xneg);
   myViewPort->fitAll();
-  emit vpTransformationFinished ( BACKVIEW );
+  emit vpTransformationFinished(BACKVIEW);
 }
 
 /*!
-  \brief Perform "top view" transformation.
-*/
+ \brief Perform "top view" transformation.
+ */
 void XGUI_ViewWindow::topView()
 {
-  emit vpTransformationStarted ( TOPVIEW );
+  emit vpTransformationStarted(TOPVIEW);
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) 
-    aView3d->SetProj (V3d_Zpos);
+  if (!aView3d.IsNull())
+    aView3d->SetProj(V3d_Zpos);
   myViewPort->fitAll();
-  emit vpTransformationFinished ( TOPVIEW );
+  emit vpTransformationFinished(TOPVIEW);
 }
 
 /*!
-  \brief Perform "bottom view" transformation.
-*/
+ \brief Perform "bottom view" transformation.
+ */
 void XGUI_ViewWindow::bottomView()
 {
-  emit vpTransformationStarted ( BOTTOMVIEW );
+  emit vpTransformationStarted(BOTTOMVIEW);
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) 
-    aView3d->SetProj (V3d_Zneg);
+  if (!aView3d.IsNull())
+    aView3d->SetProj(V3d_Zneg);
   myViewPort->fitAll();
-  emit vpTransformationFinished ( BOTTOMVIEW );
+  emit vpTransformationFinished(BOTTOMVIEW);
 }
 
 /*!
-  \brief Perform "left view" transformation.
-*/
+ \brief Perform "left view" transformation.
+ */
 void XGUI_ViewWindow::leftView()
 {
-  emit vpTransformationStarted ( LEFTVIEW );
+  emit vpTransformationStarted(LEFTVIEW);
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) 
-    aView3d->SetProj (V3d_Yneg);
+  if (!aView3d.IsNull())
+    aView3d->SetProj(V3d_Yneg);
   myViewPort->fitAll();
-  emit vpTransformationFinished ( LEFTVIEW );
+  emit vpTransformationFinished(LEFTVIEW);
 }
 
 /*!
-  \brief Perform "right view" transformation.
-*/
+ \brief Perform "right view" transformation.
+ */
 void XGUI_ViewWindow::rightView()
 {
-  emit vpTransformationStarted ( RIGHTVIEW );
+  emit vpTransformationStarted(RIGHTVIEW);
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) 
-    aView3d->SetProj (V3d_Ypos);
+  if (!aView3d.IsNull())
+    aView3d->SetProj(V3d_Ypos);
   myViewPort->fitAll();
-  emit vpTransformationFinished ( RIGHTVIEW );
+  emit vpTransformationFinished(RIGHTVIEW);
 }
 
 void XGUI_ViewWindow::reset()
 {
-  emit vpTransformationStarted( RESETVIEW );
-  bool upd = myViewPort->getView()->SetImmediateUpdate( false );
-  myViewPort->getView()->Reset( false );
-  myViewPort->fitAll( false, true, false );
-  myViewPort->getView()->SetImmediateUpdate( upd );
+  emit vpTransformationStarted(RESETVIEW);
+  bool upd = myViewPort->getView()->SetImmediateUpdate(false);
+  myViewPort->getView()->Reset(false);
+  myViewPort->fitAll(false, true, false);
+  myViewPort->getView()->SetImmediateUpdate(upd);
   myViewPort->getView()->Update();
-  emit vpTransformationFinished( RESETVIEW );
+  emit vpTransformationFinished(RESETVIEW);
 }
-
 
 void XGUI_ViewWindow::updateToolBar()
 {
@@ -1181,10 +1187,9 @@ void XGUI_ViewWindow::updateToolBar()
 }
 
 /*!
-  \brief Update state of enable draw mode state.
-*/
+ \brief Update state of enable draw mode state.
+ */
 void XGUI_ViewWindow::updateEnabledDrawMode()
 {
-  myEnableDrawMode = myViewer->isSelectionEnabled() && 
-                     myViewer->isMultiSelectionEnabled();
+  myEnableDrawMode = myViewer->isSelectionEnabled() && myViewer->isMultiSelectionEnabled();
 }

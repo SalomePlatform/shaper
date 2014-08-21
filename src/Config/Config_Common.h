@@ -53,8 +53,7 @@ CONFIG_EXPORT bool hasChild(xmlNodePtr theNode);
 /*
  *
  */
-CONFIG_EXPORT bool getValidatorInfo(xmlNodePtr theNode,
-                                    std::string& outValidatorId,
+CONFIG_EXPORT bool getValidatorInfo(xmlNodePtr theNode, std::string& outValidatorId,
                                     std::list<std::string>& outValidatorParameters);
 
 /*!

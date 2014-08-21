@@ -9,7 +9,6 @@
 #include <SketchPlugin_Sketch.h>
 #include "SketchPlugin_ConstraintBase.h"
 
-
 #define PARALLEL_COLOR "#ffff00"
 
 /** \class SketchPlugin_ConstraintParallel
@@ -19,9 +18,9 @@
  *  These constraint has two attributes:
  *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
-class SketchPlugin_ConstraintParallel: public SketchPlugin_ConstraintBase
+class SketchPlugin_ConstraintParallel : public SketchPlugin_ConstraintBase
 {
-public:
+ public:
   /// Parallel constraint kind
   inline static const std::string& ID()
   {
@@ -29,8 +28,11 @@ public:
     return MY_CONSTRAINT_PARALLEL_ID;
   }
   /// \brief Returns the kind of a feature
-  SKETCHPLUGIN_EXPORT virtual const std::string& getKind() 
-  {static std::string MY_KIND = SketchPlugin_ConstraintParallel::ID(); return MY_KIND;}
+  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    static std::string MY_KIND = SketchPlugin_ConstraintParallel::ID();
+    return MY_KIND;
+  }
 
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();

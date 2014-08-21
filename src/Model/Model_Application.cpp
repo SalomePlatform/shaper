@@ -29,7 +29,7 @@ const boost::shared_ptr<Model_Document>& Model_Application::getDocument(string t
   // load it if it must be loaded by demand
   if (myLoadedByDemand.find(theDocID) != myLoadedByDemand.end() && !myPath.empty()) {
     aNew->load(myPath.c_str());
-    myLoadedByDemand.erase(theDocID); // done, don't do it anymore
+    myLoadedByDemand.erase(theDocID);  // done, don't do it anymore
   }
 
   return myDocs[theDocID];
@@ -69,7 +69,7 @@ Model_Application::Model_Application()
 //=======================================================================
 void Model_Application::Formats(TColStd_SequenceOfExtendedString& theFormats)
 {
-  theFormats.Append(TCollection_ExtendedString("BinOcaf")); // standard binary schema
+  theFormats.Append(TCollection_ExtendedString("BinOcaf"));  // standard binary schema
 }
 
 //=======================================================================

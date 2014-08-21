@@ -16,14 +16,13 @@
 #include <vector>
 #include <set>
 
-
 /** \class   SketchSolver_ConstraintGroup
  *  \ingroup DataModel
  *  \brief   Keeps the group of constraints which based on the same entities
  */
 class SketchSolver_ConstraintGroup
 {
-public:
+ public:
   /** \brief New group based on specified workplane.
    *         Throws an exception if theWorkplane is not an object of SketchPlugin_Sketch type
    *  \remark Type of theSketch is not verified inside
@@ -34,15 +33,21 @@ public:
 
   /// \brief Returns group's unique identifier
   inline const Slvs_hGroup& getId() const
-  {return myID;}
+  {
+    return myID;
+  }
 
   /// \brief Returns true if the group has no constraints yet
   inline bool isEmpty() const
-  {return myConstraints.empty();}
+  {
+    return myConstraints.empty();
+  }
 
   /// \brief Check for valid sketch data
   inline bool isWorkplaneValid() const
-  {return mySketch->data()->isValid();}
+  {
+    return mySketch->data()->isValid();
+  }
 
   /** \brief Adds or updates a constraint in the group
    *  \param[in] theConstraint constraint to be changed
@@ -63,7 +68,9 @@ public:
   bool isBaseWorkplane(boost::shared_ptr<SketchPlugin_Feature> theWorkplane) const;
 
   boost::shared_ptr<SketchPlugin_Feature> getWorkplane() const
-  { return mySketch; }
+  {
+    return mySketch;
+  }
 
   /** \brief Update parameters of workplane. Should be called when Update event is coming.
    *  \return \c true if workplane updated successfully, \c false if workplane parameters are not consistent
@@ -97,10 +104,10 @@ public:
   /** \brief Searches the constraints built on the entity and emit the signal to update them
    *  \param[in] theEntity attribute of the constraint
    */
-  void updateRelatedConstraints(boost::shared_ptr<ModelAPI_Attribute> theEntity)  const;
-  void updateRelatedConstraints(boost::shared_ptr<ModelAPI_Feature>   theFeature) const;
+  void updateRelatedConstraints(boost::shared_ptr<ModelAPI_Attribute> theEntity) const;
+  void updateRelatedConstraints(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
-protected:
+ protected:
   /** \brief Adds or updates an entity in the group
    *
    *  The parameters of entity will be parsed and added to the list of SolveSpace parameters.
@@ -110,7 +117,7 @@ protected:
    *  \return identifier of changed entity or 0 if entity could not be changed
    */
   Slvs_hEntity changeEntity(boost::shared_ptr<ModelAPI_Attribute> theEntity);
-  Slvs_hEntity changeEntity(FeaturePtr   theEntity);
+  Slvs_hEntity changeEntity(FeaturePtr theEntity);
 
   /** \brief Adds or updates a normal in the group
    *
@@ -148,7 +155,8 @@ protected:
    *  \param[in]     theEntityID  identifier of SolveSpace entity, which contains updated data
    *  \return \c true if the attribute's value has changed
    */
-  bool updateAttribute(boost::shared_ptr<ModelAPI_Attribute> theAttribute, const Slvs_hEntity& theEntityID);
+  bool updateAttribute(boost::shared_ptr<ModelAPI_Attribute> theAttribute,
+                       const Slvs_hEntity& theEntityID);
 
   /** \brief Adds a constraint for a point which should not be changed during computations
    *  \param[in] theEntity the base for the constraint
@@ -159,7 +167,7 @@ protected:
    */
   void removeTemporaryConstraints();
 
-private:
+ private:
   /** \brief Creates a workplane from the sketch parameters
    *  \param[in] theSketch parameters of workplane are the attributes of this sketch
    *  \return \c true if success, \c false if workplane parameters are not consistent
@@ -180,40 +188,34 @@ private:
    */
   void checkConstraintConsistence(Slvs_Constraint& theConstraint);
 
-private:
+ private:
   // SolveSpace entities
-  Slvs_hGroup                  myID;            ///< the index of the group
-  Slvs_Entity                  myWorkplane;     ///< Workplane for the current group
-  std::vector<Slvs_Param>      myParams;        ///< List of parameters of the constraints
-  Slvs_hParam                  myParamMaxID;    ///< Actual maximal ID of parameters (not equal to myParams size)
-  std::vector<Slvs_Entity>     myEntities;      ///< List of entities of the constaints
-  Slvs_hEntity                 myEntityMaxID;   ///< Actual maximal ID of entities (not equal to myEntities size)
+  Slvs_hGroup myID;            ///< the index of the group
+  Slvs_Entity myWorkplane;     ///< Workplane for the current group
+  std::vector<Slvs_Param> myParams;        ///< List of parameters of the constraints
+  Slvs_hParam myParamMaxID;    ///< Actual maximal ID of parameters (not equal to myParams size)
+  std::vector<Slvs_Entity> myEntities;      ///< List of entities of the constaints
+  Slvs_hEntity myEntityMaxID;   ///< Actual maximal ID of entities (not equal to myEntities size)
   std::vector<Slvs_Constraint> myConstraints;   ///< List of constraints in SolveSpace format
-  Slvs_hConstraint             myConstrMaxID;   ///< Actual maximal ID of constraints (not equal to myConstraints size)
-  bool                         myNeedToSolve;   ///< Indicator that something changed in the group and constraint system need to be rebuilt
+  Slvs_hConstraint myConstrMaxID;  ///< Actual maximal ID of constraints (not equal to myConstraints size)
+  bool myNeedToSolve;  ///< Indicator that something changed in the group and constraint system need to be rebuilt
 
-  SketchSolver_Solver          myConstrSolver;  ///< Solver for set of equations obtained by constraints
+  SketchSolver_Solver myConstrSolver;  ///< Solver for set of equations obtained by constraints
 
-  std::vector<Slvs_hParam>     myTempPointWhereDragged; ///< Parameters of one of the points which is moved by user
-  Slvs_hEntity                 myTempPointWDrgdID;      ///< Identifier of such point
-  std::list<Slvs_hConstraint>  myTempConstraints;       ///< The list of identifiers of temporary constraints (SLVS_C_WHERE_DRAGGED) applied for all other points moved by user
+  std::vector<Slvs_hParam> myTempPointWhereDragged;  ///< Parameters of one of the points which is moved by user
+  Slvs_hEntity myTempPointWDrgdID;      ///< Identifier of such point
+  std::list<Slvs_hConstraint> myTempConstraints;  ///< The list of identifiers of temporary constraints (SLVS_C_WHERE_DRAGGED) applied for all other points moved by user
 
   // SketchPlugin entities
-  boost::shared_ptr<SketchPlugin_Feature>
-                               mySketch;        ///< Equivalent to workplane
-  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>
-                               myConstraintMap; ///< The map between SketchPlugin and SolveSpace constraints
-  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>
-                               myEntityAttrMap;     ///< The map between "attribute" parameters of constraints and their equivalent SolveSpace entities
-  std::map<FeaturePtr, Slvs_hEntity>
-                               myEntityFeatMap;     ///< The map between "feature" parameters of constraints and their equivalent SolveSpace entities
+  boost::shared_ptr<SketchPlugin_Feature> mySketch;        ///< Equivalent to workplane
+  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint> myConstraintMap;  ///< The map between SketchPlugin and SolveSpace constraints
+  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity> myEntityAttrMap;  ///< The map between "attribute" parameters of constraints and their equivalent SolveSpace entities
+  std::map<FeaturePtr, Slvs_hEntity> myEntityFeatMap;  ///< The map between "feature" parameters of constraints and their equivalent SolveSpace entities
 
   // Conincident items
-  std::vector< std::set<Slvs_hEntity> >
-                               myCoincidentPoints; ///< Stores the lists of identifiers of coincident points (to avoid unnecessary coincidence constraints)
-  std::set< boost::shared_ptr<SketchPlugin_Constraint> >
-                               myExtraCoincidence; ///< Additional coincidence constraints which are not necessary (coincidence between points already done
-                                                   ///< by other constraints) but created by GUI tools. Useful when some coincidence constraints were removed
+  std::vector<std::set<Slvs_hEntity> > myCoincidentPoints;  ///< Stores the lists of identifiers of coincident points (to avoid unnecessary coincidence constraints)
+  std::set<boost::shared_ptr<SketchPlugin_Constraint> > myExtraCoincidence;  ///< Additional coincidence constraints which are not necessary (coincidence between points already done
+                                                                             ///< by other constraints) but created by GUI tools. Useful when some coincidence constraints were removed
 };
 
 #endif

@@ -24,9 +24,12 @@ class ModelAPI_Feature;
  */
 class MODELAPI_EXPORT ModelAPI_Validator
 {
-public:
+ public:
   // Make virtual destructor in order to make the class polymorphic
-  virtual ~ModelAPI_Validator() {};
+  virtual ~ModelAPI_Validator()
+  {
+  }
+  ;
 
   /// Returns true if feature and/or attributes are valid
   /// \param theFeature the validated feature
@@ -52,7 +55,7 @@ typedef boost::shared_ptr<ModelAPI_Validator> ValidatorPtr;
  */
 class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
 {
-public:
+ public:
   /// Registers the instance of the validator by the ID
   virtual void registerValidator(const std::string& theID, ModelAPI_Validator* theValidator) = 0;
 
@@ -60,18 +63,17 @@ public:
   virtual void assignValidator(const std::string& theID, const std::string& theFeatureID) = 0;
 
   /// Assigns validator to the attribute of the feature
-  virtual void assignValidator(const std::string& theID, 
-    const std::string& theFeatureID, const std::string& theAttrID,
-    const std::list<std::string>& theArguments) = 0;
+  virtual void assignValidator(const std::string& theID, const std::string& theFeatureID,
+                               const std::string& theAttrID,
+                               const std::list<std::string>& theArguments) = 0;
 
   /// Provides a validator for the feature, returns NULL if no validator
-  virtual void validators(const std::string& theFeatureID, 
-    std::list<ModelAPI_Validator*>& theResult) const = 0;
+  virtual void validators(const std::string& theFeatureID,
+                          std::list<ModelAPI_Validator*>& theResult) const = 0;
   /// Provides a validator for the attribute, returns NULL if no validator
-  virtual void validators(
-    const std::string& theFeatureID, const std::string& theAttrID,
-    std::list<ModelAPI_Validator*>& theValidators, 
-    std::list<std::list<std::string> >& theArguments) const = 0;
+  virtual void validators(const std::string& theFeatureID, const std::string& theAttrID,
+                          std::list<ModelAPI_Validator*>& theValidators,
+                          std::list<std::list<std::string> >& theArguments) const = 0;
 
   /// Returns registered validator by its Id
   virtual const ModelAPI_Validator* validator(const std::string& theID) const = 0;
@@ -81,9 +83,11 @@ public:
   //virtual bool validate(
   //  const boost::shared_ptr<ModelAPI_Feature>& theFeature, const std::string& theAttrID) const = 0;
 
-protected:
+ protected:
   /// Get instance from PluginManager
-  ModelAPI_ValidatorsFactory() {}
+  ModelAPI_ValidatorsFactory()
+  {
+  }
 };
 
 #endif

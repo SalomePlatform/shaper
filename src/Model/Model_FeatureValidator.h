@@ -11,9 +11,9 @@
 
 #include <boost/shared_ptr.hpp>
 
-class Model_FeatureValidator: public ModelAPI_FeatureValidator
+class Model_FeatureValidator : public ModelAPI_FeatureValidator
 {
-public:
+ public:
   /// Returns true if feature and/or attributes are valid
   /// \param theFeature the validated feature
   MODEL_EXPORT virtual bool isValid(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const;

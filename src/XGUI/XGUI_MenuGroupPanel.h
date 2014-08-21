@@ -8,14 +8,13 @@
 class XGUI_Command;
 class QGridLayout;
 
-
 /**\class XGUI_MenuGroupPanel
  * \ingroup GUI
  * \brief Represents a one group in a page of main menu (workbench)
  */
-class XGUI_EXPORT XGUI_MenuGroupPanel: public QFrame
+class XGUI_EXPORT XGUI_MenuGroupPanel : public QFrame
 {
-  Q_OBJECT
+Q_OBJECT
 
  public:
   explicit XGUI_MenuGroupPanel(QWidget *parent = 0);
@@ -29,18 +28,21 @@ class XGUI_EXPORT XGUI_MenuGroupPanel: public QFrame
   XGUI_Command* feature(const QString& theId) const;
 
   //! Returns list of created commands
-  QList<XGUI_Command*> features() const { return myActions; }
+  QList<XGUI_Command*> features() const
+  {
+    return myActions;
+  }
 
-protected:
+ protected:
   virtual void resizeEvent(QResizeEvent *theEvent);
 
-private:
+ private:
   void addWidget(QWidget* theWgt);
   void placeWidget(QWidget* theWgt);
   void addCommand(XGUI_Command* theAction);
 
   QList<XGUI_Command*> myActions;
-  QWidgetList          myActionWidget;
+  QWidgetList myActionWidget;
 
   QGridLayout* myLayout;
   int myNewRow;

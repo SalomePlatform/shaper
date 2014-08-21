@@ -12,14 +12,15 @@ class Config_WidgetAPI;
 class QWidget;
 class QCheckBox;
 
-class MODULEBASE_EXPORT ModuleBase_WidgetBoolValue: public ModuleBase_ModelWidget
+class MODULEBASE_EXPORT ModuleBase_WidgetBoolValue : public ModuleBase_ModelWidget
 {
-  Q_OBJECT
-public:
+Q_OBJECT
+ public:
   /// Constructor
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
-  ModuleBase_WidgetBoolValue(QWidget* theParent, const Config_WidgetAPI* theData, const std::string& theParentId);
+  ModuleBase_WidgetBoolValue(QWidget* theParent, const Config_WidgetAPI* theData,
+                             const std::string& theParentId);
 
   virtual ~ModuleBase_WidgetBoolValue();
 
@@ -37,7 +38,7 @@ public:
   /// \returns the widget
   QWidget* getControl() const;
 
-private:
+ private:
   QCheckBox* myCheckBox;
 };
 

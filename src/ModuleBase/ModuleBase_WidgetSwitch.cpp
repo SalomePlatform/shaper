@@ -12,7 +12,7 @@
 #include <QSpacerItem>
 
 ModuleBase_WidgetSwitch::ModuleBase_WidgetSwitch(QWidget* parent)
-: QFrame(parent)
+    : QFrame(parent)
 {
   myMainLay = new QVBoxLayout(this);
   myMainLay->setContentsMargins(2, 4, 2, 2);
@@ -20,10 +20,8 @@ ModuleBase_WidgetSwitch::ModuleBase_WidgetSwitch(QWidget* parent)
   myCombo->hide();
   myMainLay->addWidget(myCombo);
   this->setFrameShape(QFrame::StyledPanel);
-  connect(myCombo, SIGNAL(currentIndexChanged(int)),
-          this, SLOT(setCurrentIndex(int)));
-  connect(myCombo, SIGNAL(currentIndexChanged(int)),
-          this, SIGNAL(currentPageChanged(int)));
+  connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCurrentIndex(int)));
+  connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SIGNAL(currentPageChanged(int)));
 
 }
 
@@ -60,7 +58,7 @@ int ModuleBase_WidgetSwitch::indexOf(QWidget* theWidget) const
 int ModuleBase_WidgetSwitch::insertPage(int theIndex, QWidget* theWidget, const QString& theName)
 {
   int index = theIndex < count() ? theIndex : count();
-  if(count() == 0)
+  if (count() == 0)
     myCombo->show();
   myCombo->insertItem(index, theName);
   myCases.insert(index, theWidget);
@@ -116,10 +114,11 @@ void ModuleBase_WidgetSwitch::setCurrentIndex(int index)
 
 void ModuleBase_WidgetSwitch::refresh()
 {
-  foreach(QWidget* eachWidget, myCases) {
+  foreach(QWidget* eachWidget, myCases)
+  {
     eachWidget->setVisible(false);
   }
-  if(currentIndex() >= myCases.count())
+  if (currentIndex() >= myCases.count())
     return;
   myCases[currentIndex()]->setVisible(true);
 }

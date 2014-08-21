@@ -12,9 +12,9 @@
  * Informs the application that the long operation is performed.
  * Causes waiting coursor in GUI.
  */
-class EVENTS_EXPORT Events_LongOp: public Events_Message
+class EVENTS_EXPORT Events_LongOp : public Events_Message
 {
-public:
+ public:
   virtual ~Events_LongOp();
   /// Returns the identifier of this event
   static Events_ID eventID();
@@ -23,9 +23,9 @@ public:
   /// Stops the long operation
   static void end(void* theSender = 0);
   /// Returns true if the long operation is performed
-  static bool isPerformed(); 
+  static bool isPerformed();
 
-protected:
+ protected:
   Events_LongOp(void* theSender = 0);
 };
 

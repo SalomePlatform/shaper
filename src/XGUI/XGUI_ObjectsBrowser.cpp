@@ -15,10 +15,8 @@
 #include <QMouseEvent>
 #include <QAction>
 
-
-
 XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
-  : QTreeView(theParent)
+    : QTreeView(theParent)
 {
   setHeaderHidden(true);
   setModel(new XGUI_DocumentDataModel(this));
@@ -26,7 +24,7 @@ XGUI_DataTree::XGUI_DataTree(QWidget* theParent)
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-  connect(selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
+  connect(selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
           this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
 }
 
@@ -34,14 +32,13 @@ XGUI_DataTree::~XGUI_DataTree()
 {
 }
 
-XGUI_DocumentDataModel* XGUI_DataTree::dataModel() const 
-{ 
-  return static_cast<XGUI_DocumentDataModel*>(model()); 
+XGUI_DocumentDataModel* XGUI_DataTree::dataModel() const
+{
+  return static_cast<XGUI_DocumentDataModel*>(model());
 }
 
-
-void XGUI_DataTree::onSelectionChanged(const QItemSelection& theSelected, 
-                                             const QItemSelection& theDeselected)
+void XGUI_DataTree::onSelectionChanged(const QItemSelection& theSelected,
+                                       const QItemSelection& theDeselected)
 {
   mySelectedData.clear();
   QModelIndexList aIndexes = selectionModel()->selectedIndexes();
@@ -71,7 +68,7 @@ void XGUI_DataTree::mouseDoubleClickEvent(QMouseEvent* theEvent)
         setExpanded(aIndex, true);
       emit activePartChanged(aModel->activePart());
     }
-  } else 
+  } else
     QTreeView::mouseDoubleClickEvent(theEvent);
 }
 
@@ -97,7 +94,7 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
 //********************************************************************
 //********************************************************************
 XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
-  : QWidget(theParent)
+    : QWidget(theParent)
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   aLayout->setContentsMargins(0, 0, 0, 0);
@@ -135,7 +132,7 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   myActiveDocLbl->installEventFilter(this);
 
   aLabelLay->addWidget(myActiveDocLbl);
-  aLabelLay->setStretch(1,1);
+  aLabelLay->setStretch(1, 1);
 
   myTreeView = new XGUI_DataTree(this);
   aLayout->addWidget(myTreeView);
@@ -146,14 +143,16 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   aLabelWgt->setFrameShadow(myTreeView->frameShadow());
 
   connect(myTreeView, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-  connect(myTreeView, SIGNAL(activePartChanged(ObjectPtr)), this, SLOT(onActivePartChanged(ObjectPtr)));
-  connect(myTreeView, SIGNAL(activePartChanged(ObjectPtr)), this, SIGNAL(activePartChanged(ObjectPtr)));
+  connect(myTreeView, SIGNAL(activePartChanged(ObjectPtr)), this,
+          SLOT(onActivePartChanged(ObjectPtr)));
+  connect(myTreeView, SIGNAL(activePartChanged(ObjectPtr)), this,
+          SIGNAL(activePartChanged(ObjectPtr)));
 
-  connect(myActiveDocLbl, SIGNAL(customContextMenuRequested(const QPoint&)), 
-          this, SLOT(onLabelContextMenuRequested(const QPoint&)));
-  connect(myTreeView, SIGNAL(contextMenuRequested(QContextMenuEvent*)), 
-          this, SLOT(onContextMenuRequested(QContextMenuEvent*)));
-  
+  connect(myActiveDocLbl, SIGNAL(customContextMenuRequested(const QPoint&)), this,
+          SLOT(onLabelContextMenuRequested(const QPoint&)));
+  connect(myTreeView, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
+          SLOT(onContextMenuRequested(QContextMenuEvent*)));
+
   onActivePartChanged(ObjectPtr());
 
   // Create internal actions
@@ -174,7 +173,7 @@ void XGUI_ObjectsBrowser::onActivePartChanged(ObjectPtr thePart)
   QPalette aPalet = myActiveDocLbl->palette();
   if (thePart) {
     aPalet.setColor(QPalette::Text, Qt::black);
-  }  else {
+  } else {
     aPalet.setColor(QPalette::Text, QColor(0, 72, 140));
   }
   myActiveDocLbl->setPalette(aPalet);
@@ -204,13 +203,13 @@ bool XGUI_ObjectsBrowser::eventFilter(QObject* obj, QEvent* theEvent)
       } else if (theEvent->type() == QEvent::KeyRelease) {
         QKeyEvent* aEvent = (QKeyEvent*) theEvent;
         switch (aEvent->key()) {
-        case Qt::Key_Return: // Accept current input
-          closeDocNameEditing(true);
-          break;
-        case Qt::Key_Escape: // Cancel the input
-          closeDocNameEditing(false);
-          break;
-        } 
+          case Qt::Key_Return:  // Accept current input
+            closeDocNameEditing(true);
+            break;
+          case Qt::Key_Escape:  // Cancel the input
+            closeDocNameEditing(false);
+            break;
+        }
       }
     }
   }
@@ -263,11 +262,12 @@ void XGUI_ObjectsBrowser::activatePart(const ResultPartPtr& thePart)
 }
 
 //***************************************************
-void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent) 
+void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent)
 {
   myObjectsList = myTreeView->selectedObjects();
   bool toEnable = myObjectsList.size() > 0;
-  foreach(QAction* aCmd, actions()) {
+  foreach(QAction* aCmd, actions())
+  {
     aCmd->setEnabled(toEnable);
   }
   emit contextMenuRequested(theEvent);
@@ -278,12 +278,13 @@ void XGUI_ObjectsBrowser::onLabelContextMenuRequested(const QPoint& thePnt)
 {
   myObjectsList.clear();
   //Empty feature pointer means that selected root document
-  myObjectsList.append(ObjectPtr()); 
+  myObjectsList.append(ObjectPtr());
 
-  foreach(QAction* aCmd, actions()) {
+  foreach(QAction* aCmd, actions())
+  {
     aCmd->setEnabled(true);
   }
-  QContextMenuEvent aEvent( QContextMenuEvent::Mouse, thePnt, myActiveDocLbl->mapToGlobal(thePnt) );
+  QContextMenuEvent aEvent(QContextMenuEvent::Mouse, thePnt, myActiveDocLbl->mapToGlobal(thePnt));
   emit contextMenuRequested(&aEvent);
 }
 
@@ -292,10 +293,11 @@ void XGUI_ObjectsBrowser::onEditItem()
 {
   if (myObjectsList.size() > 0) {
     ObjectPtr aFeature = myObjectsList.first();
-    if (aFeature) { // Selection happens in TreeView
+    if (aFeature) {  // Selection happens in TreeView
       // Find index which corresponds the feature
       QModelIndex aIndex;
-      foreach(QModelIndex aIdx, selectedIndexes()) {
+      foreach(QModelIndex aIdx, selectedIndexes())
+      {
         ObjectPtr aFea = dataModel()->object(aIdx);
         if (dataModel()->object(aIdx)->isSame(aFeature)) {
           aIndex = aIdx;
@@ -306,7 +308,7 @@ void XGUI_ObjectsBrowser::onEditItem()
         myTreeView->setCurrentIndex(aIndex);
         myTreeView->edit(aIndex);
       }
-    } else { //Selection happens in Upper label
+    } else {  //Selection happens in Upper label
       myActiveDocLbl->setReadOnly(false);
       myActiveDocLbl->setFocus();
       myActiveDocLbl->selectAll();
@@ -337,7 +339,8 @@ void XGUI_ObjectsBrowser::setObjectsSelected(const QList<ObjectPtr>& theObjects)
   QItemSelectionModel* aSelectModel = myTreeView->selectionModel();
   aSelectModel->clear();
 
-  foreach(ObjectPtr aFeature, theObjects) {
+  foreach(ObjectPtr aFeature, theObjects)
+  {
     QModelIndex aIndex = myDocModel->objectIndex(aFeature);
     if (aIndex.isValid()) {
       aSelectModel->select(aIndex, QItemSelectionModel::Select);

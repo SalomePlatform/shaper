@@ -18,8 +18,8 @@
 
 class Model_AttributeRefList : public ModelAPI_AttributeRefList
 {
-  Handle_TDataStd_ReferenceList myRef; ///< references to the features labels
-public:
+  Handle_TDataStd_ReferenceList myRef;  ///< references to the features labels
+ public:
   /// Appends the feature to the end of a list
   MODEL_EXPORT virtual void append(ObjectPtr theObject);
 
@@ -30,9 +30,9 @@ public:
   MODEL_EXPORT virtual int size();
 
   /// Returns the list of features
-  MODEL_EXPORT virtual std::list<ObjectPtr > list();
+  MODEL_EXPORT virtual std::list<ObjectPtr> list();
 
-protected:
+ protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeRefList(TDF_Label& theLabel);
 
