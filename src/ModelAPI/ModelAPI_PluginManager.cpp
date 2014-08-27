@@ -56,17 +56,17 @@ boost::shared_ptr<ModelAPI_PluginManager> ModelAPI_PluginManager::get()
   return MY_MANAGER;
 }
 
-const ModelAPI_EventCreator* MY_CREATOR = 0;  ///< instance of the events creator, one pre application
+const ModelAPI_EventCreator* MY_API_CREATOR = 0;  ///< instance of the events creator, one pre application
 
 const ModelAPI_EventCreator* ModelAPI_EventCreator::get()
 {
-  if (!MY_CREATOR) {  // import Model library that implements this interface of ModelAPI
+  if (!MY_API_CREATOR) {  // import Model library that implements this interface of ModelAPI
     Config_ModuleReader::loadLibrary("Model");
   }
-  return MY_CREATOR;
+  return MY_API_CREATOR;
 }
 
 void ModelAPI_EventCreator::set(const ModelAPI_EventCreator* theCreator)
 {
-  MY_CREATOR = theCreator;
+  MY_API_CREATOR = theCreator;
 }
