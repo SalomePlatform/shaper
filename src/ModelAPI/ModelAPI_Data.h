@@ -16,6 +16,7 @@ class ModelAPI_AttributeReference;
 class ModelAPI_AttributeRefAttr;
 class ModelAPI_AttributeRefList;
 class ModelAPI_AttributeBoolean;
+class ModelAPI_AttributeString;
 class ModelAPI_Document;
 class ModelAPI_Attribute;
 class GeomAPI_Shape;
@@ -48,6 +49,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual boost::shared_ptr<ModelAPI_AttributeRefList> reflist(const std::string& theID) = 0;
   /// Returns the attribute that contains boolean value
   virtual boost::shared_ptr<ModelAPI_AttributeBoolean> boolean(const std::string& theID) = 0;
+  /// Returns the attribute that contains boolean value
+  virtual boost::shared_ptr<ModelAPI_AttributeString> string(const std::string& theID) = 0;
 
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute

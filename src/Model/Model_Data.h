@@ -5,12 +5,26 @@
 #ifndef Model_Data_H_
 #define Model_Data_H_
 
-#include "Model.h"
+#include <Model.h>
+#include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeDocRef.h>
+#include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Object.h>
+
 #include <TDF_Label.hxx>
 
+#include <boost/smart_ptr/shared_ptr.hpp>
+
 #include <map>
+#include <list>
+#include <string>
 
 class ModelAPI_Attribute;
 
@@ -53,23 +67,26 @@ class Model_Data : public ModelAPI_Data
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID);
   /// Returns the attribute that contains reference to a feature
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeReference>
-  reference(const std::string& theID);
+    reference(const std::string& theID);
   /// Returns the attribute that contains reference to an attribute of a feature
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeRefAttr>
-  refattr(const std::string& theID);
+    refattr(const std::string& theID);
   /// Returns the attribute that contains list of references to features
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeRefList>
-  reflist(const std::string& theID);
+    reflist(const std::string& theID);
   /// Returns the attribute that contains boolean value
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeBoolean>
-  boolean(const std::string& theID);
+    boolean(const std::string& theID);
+  /// Returns the attribute that contains real value with double precision
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeString>
+    string(const std::string& theID);
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string& theID);
   /// Returns all attributes ofthe feature of the given type
   /// or all attributes if "theType" is empty
   MODEL_EXPORT virtual std::list<boost::shared_ptr<ModelAPI_Attribute> >
-  attributes(const std::string& theType);
+    attributes(const std::string& theType);
 
   /// Identifier by the id (not fast, iteration by map)
   /// \param theAttr attribute already created in this data

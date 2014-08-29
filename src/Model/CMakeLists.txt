@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
     Model_AttributeRefAttr.h
     Model_AttributeRefList.h
     Model_AttributeBoolean.h
+    Model_AttributeString.h
     Model_Events.h
     Model_Update.h
     Model_Validator.h
@@ -33,6 +34,7 @@ SET(PROJECT_SOURCES
     Model_AttributeRefAttr.cpp
     Model_AttributeRefList.cpp
     Model_AttributeBoolean.cpp
+    Model_AttributeString.cpp
     Model_Events.cpp
     Model_Update.cpp
     Model_Validator.cpp

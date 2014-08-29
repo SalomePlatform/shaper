@@ -10,7 +10,7 @@
 #include <TDataStd_Integer.hxx>
 #include <TDF_Label.hxx>
 
-/**\class Model_AttributeDouble
+/**\class Model_AttributeBoolean
  * \ingroup DataModel
  * \brief Attribute that contains real value with double precision.
  */
