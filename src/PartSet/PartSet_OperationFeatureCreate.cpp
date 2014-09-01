@@ -73,12 +73,6 @@ bool PartSet_OperationFeatureCreate::canBeCommitted() const
   return false;
 }
 
-bool PartSet_OperationFeatureCreate::isGranted(ModuleBase_IOperation* theOperation) const
-{
-  return theOperation->getDescription()->operationId().toStdString()
-      == PartSet_OperationSketch::Type();
-}
-
 std::list<int> PartSet_OperationFeatureCreate::getSelectionModes(ObjectPtr theFeature) const
 {
   std::list<int> aModes;

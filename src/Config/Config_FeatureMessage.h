@@ -48,4 +48,4 @@ class Config_FeatureMessage : public Events_Message
       bool isInternal);
 };
 
-#endif // CONFIG_MESSAGE_H
+#endif // CONFIG_MESSAGE_H

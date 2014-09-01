@@ -113,9 +113,16 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
     /// It is empty and we have to use the process mouse release to start edition operation
     /// for these objects
     if (theSelected.size() == 1) {
-      ObjectPtr aFeature = theSelected.front().object();
-      if (aFeature)
-        restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+      ObjectPtr aObject = theSelected.front().object();
+      if (aObject) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
+        if (aFeature) {
+          QStringList aNested = this->nestedFeatures();
+          if ((!aNested.isEmpty()) && aNested.contains(QString(aFeature->getKind().c_str()))) {
+            restartOperation(PartSet_OperationFeatureEdit::Type(), aObject);
+          }
+        }
+      }
     }
   }
 }
@@ -249,4 +256,11 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
   emit featureConstructed(feature(), FM_Hide);
   emit closeLocalContext();
   emit planeSelected(aDir->x(), aDir->y(), aDir->z());
+}
+
+
+bool PartSet_OperationSketch::isValid(ModuleBase_IOperation* theOperation) const
+{
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
+  return aPreviewOp != NULL;
 }

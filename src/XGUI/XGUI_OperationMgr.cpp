@@ -133,11 +133,15 @@ bool XGUI_OperationMgr::canStartOperation(ModuleBase_Operation* theOperation)
 {
   bool aCanStart = true;
   ModuleBase_Operation* aCurrentOp = currentOperation();
-  if (aCurrentOp && !theOperation->isGranted(aCurrentOp)) {
-    if (canStopOperation()) {
-      aCurrentOp->abort();
-    } else {
-      aCanStart = false;
+  if (aCurrentOp) {
+    if (!theOperation->isGranted()) {
+      if (!aCurrentOp->isValid(theOperation)) {
+        if (canStopOperation()) {
+          aCurrentOp->abort();
+        } else {
+          aCanStart = false;
+        }
+      }
     }
   }
   return aCanStart;

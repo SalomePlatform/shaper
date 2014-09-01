@@ -39,11 +39,6 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_OperationFeatureCreate();
 
-  /// Returns that this operator can be started above already running one.
-  /// The runned operation should be the sketch feature modified operation
-  /// \param theOperation the previous running operation
-  virtual bool isGranted(ModuleBase_IOperation* theOperation) const;
-
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode

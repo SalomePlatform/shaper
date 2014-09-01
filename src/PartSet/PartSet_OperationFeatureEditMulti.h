@@ -70,11 +70,6 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_OperationFeatureEditMulti();
 
-  /// Returns that this operator can be started above already running one.
-  /// The runned operation should be the sketch feature modified operation
-  /// \param theOperation the previous running operation
-  virtual bool isGranted(ModuleBase_IOperation* theOperation) const;
-
   /// Initializes the operation with previously created feature. It is used in sequental operations
   virtual void initFeature(FeaturePtr theFeature);
 

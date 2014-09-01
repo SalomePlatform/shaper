@@ -170,7 +170,16 @@ void XGUI_Displayer::activateInLocalContext(ObjectPtr theResult, const std::list
   if (!aContext->HasOpenedContext()) {
     aContext->ClearCurrents(false);
     aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
+    //aContext->OpenLocalContext();
+    //aContext->NotUseDisplayedObjects();
   }
+  //!!! Test
+  //aContext->UseDisplayedObjects();
+  //std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
+  //for (; anIt != aLast; anIt++) {
+  //  aContext->ActivateStandardMode((TopAbs_ShapeEnum)(*anIt));
+  //}
+  //!!! Test end
   // display or redisplay presentation
   Handle(AIS_InteractiveObject) anAIS;
   if (isVisible(theResult)) {

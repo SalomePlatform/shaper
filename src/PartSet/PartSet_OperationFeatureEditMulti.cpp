@@ -45,11 +45,6 @@ PartSet_OperationFeatureEditMulti::~PartSet_OperationFeatureEditMulti()
 {
 }
 
-bool PartSet_OperationFeatureEditMulti::isGranted(ModuleBase_IOperation* theOperation) const
-{
-  return theOperation->getDescription()->operationId().toStdString()
-      == PartSet_OperationSketch::Type();
-}
 
 void PartSet_OperationFeatureEditMulti::initSelection(
     const std::list<ModuleBase_ViewerPrs>& theSelected,
