@@ -115,13 +115,7 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
     if (theSelected.size() == 1) {
       ObjectPtr aObject = theSelected.front().object();
       if (aObject) {
-        FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-        if (aFeature) {
-          QStringList aNested = this->nestedFeatures();
-          if ((!aNested.isEmpty()) && aNested.contains(QString(aFeature->getKind().c_str()))) {
-            restartOperation(PartSet_OperationFeatureEdit::Type(), aObject);
-          }
-        }
+        restartOperation(PartSet_OperationFeatureEdit::Type(), aObject);
       }
     }
   }
@@ -264,3 +258,4 @@ bool PartSet_OperationSketch::isValid(ModuleBase_IOperation* theOperation) const
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
   return aPreviewOp != NULL;
 }
+

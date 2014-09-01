@@ -124,5 +124,15 @@ void PartSet_OperationSketchBase::keyReleased(std::string theName, QKeyEvent* th
 
 void PartSet_OperationSketchBase::restartOperation(const std::string& theType, ObjectPtr theFeature)
 {
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theFeature);
+  if (aFeature) {
+    QStringList aNested = this->nestedFeatures();
+    if (!aNested.isEmpty()) {
+      if (aNested.contains(QString(aFeature->getKind().c_str()))) 
+        emit launchOperation(theType, theFeature);
+      else
+        return;
+    }
+  }
   emit launchOperation(theType, theFeature);
 }

@@ -124,6 +124,14 @@ class XGUI_EXPORT XGUI_Displayer
 
   void activate(ObjectPtr theFeature);
 
+  /// Activates in local context displayed outside of the context.
+  /// \param theModes - selection modes to activate
+  /// \param theFilter - filter for selection
+  void activateObjectsOutOfContext(const std::list<int>& theModes, 
+                                   Handle(SelectMgr_Filter) theFilter);
+
+  void deactivateObjectsOutOfContext();
+
  protected:
   /// Deactivate local selection
   /// \param isUpdateViewer the state wether the viewer should be updated immediatelly

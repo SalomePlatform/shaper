@@ -49,6 +49,9 @@
 #include <GeomAPI_AISObject.h>
 #include <AIS_Shape.hxx>
 
+#include <StdSelect_FaceFilter.hxx>
+#include <StdSelect_TypeOfFace.hxx>
+
 #include <QObject>
 #include <QMouseEvent>
 #include <QString>
@@ -347,6 +350,7 @@ void PartSet_Module::onSetSelection(const QList<ObjectPtr>& theFeatures)
 void PartSet_Module::onCloseLocalContext()
 {
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  aDisplayer->deactivateObjectsOutOfContext();
   aDisplayer->closeLocalContexts();
 }
 
@@ -519,6 +523,13 @@ void PartSet_Module::activateFeature(ObjectPtr theFeature, const bool isUpdateVi
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     std::list<int> aModes = aPreviewOp->getSelectionModes(theFeature);
     aDisplayer->activateInLocalContext(theFeature, aModes, isUpdateViewer);
+
+    // If this is a Sketcher then activate objects (planar faces) outside of context
+    PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
+    if (aSketchOp) {
+      Handle(StdSelect_FaceFilter) aFilter = new StdSelect_FaceFilter(StdSelect_Plane);
+      aDisplayer->activateObjectsOutOfContext(aModes, aFilter);
+    }
   }
 }
 
