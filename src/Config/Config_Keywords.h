@@ -30,13 +30,14 @@ const static char* WDG_SWITCH = "switch";
 const static char* WDG_SWITCH_CASE = "case";
 const static char* WDG_SELECTOR = "selector";
 
-//Specific widget containers
+//Specific widgets
 const static char* WDG_POINT_SELECTOR = "point_selector";
 const static char* WDG_POINT2D_DISTANCE = "point2ddistance";
-
 const static char* WDG_FEATURE_SELECTOR = "feature_selector";
 const static char* WDG_FEATURE_OR_ATTRIBUTE_SELECTOR = "feature_or_attribute_selector";
 const static char* WDG_DOUBLEVALUE_EDITOR = "doublevalue_editor";
+const static char* WDG_FILE_SELECTOR= "file_selector";
+
 
 //Common Widget's or Feature's Properties
 const static char* _ID = "id";

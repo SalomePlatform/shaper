@@ -1,0 +1,20 @@
+<plugin>
+  <workbench id="Features">
+    <group id="Exchange">
+      <feature
+        id="Import"
+        title="Import"
+        tooltip="Import a mesh"
+        icon=":icons/import.png">
+        <file_selector
+          id="import_file_selector"
+          title="Import file"
+          path="D:\NewGEOM\data\brep-step"
+          formats="BREP,STEP" />
+        <!-- TODO: pass formats as validator 
+        <validator id="Format" parameters="BREP:BREPImport,STEP:STEPImport" /> 
+        -->
+      </feature>
+    </group>
+  </workbench>
+</plugin>
