@@ -39,11 +39,6 @@ bool ModuleBase_IOperation::canBeCommitted() const
   return true;
 }
 
-bool ModuleBase_IOperation::isGranted(ModuleBase_IOperation* /*theOperation*/) const
-{
-  return false;
-}
-
 /*void ModuleBase_IOperation::setModelWidgets(const std::string& theXmlRepresentation,
  QList<ModuleBase_ModelWidget*> theWidgets)
  {

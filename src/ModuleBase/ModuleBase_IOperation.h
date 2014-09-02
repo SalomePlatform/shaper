@@ -13,6 +13,7 @@
 #include <QObject>
 #include <QString>
 #include <QList>
+#include <QStringList>
 
 #include <boost/shared_ptr.hpp>
 
@@ -56,14 +57,20 @@ Q_OBJECT
   /// /returns the instance of the description class
   ModuleBase_OperationDescription* getDescription() const;
 
-  /// Verifies whether this operator can be always started above any already running one
-  /// \return Returns TRUE if current operation must not be checked for ActiveOperation->IsValid( this )
-  /// This method must be redefined in derived operation if operation of derived class
-  /// must be always can start above any launched one. Default impl returns FALSE,
-  /// so it is being checked for IsValid, but some operations may overload IsGranted()
-  /// In this case they will always start, no matter what operation is running.
-  /// \param theOperation the previous running operation
-  virtual bool isGranted(ModuleBase_IOperation* theOperation) const;
+  /**
+  * Must return true if this operation can be launched as nested for any current operation
+  * and it is not necessary to check this operation on validity. By default 
+  * the operation is not granted.
+  * The method has to be redefined for granted operations.
+  */
+  virtual bool isGranted() const  { return false; }
+
+  /**
+  * Must return True if the given opertation can be launched as nested to current one.
+  * By default it returns false and it has to be redefined for operations which expect
+  * launching of nested operations
+  */
+  virtual bool isValid(ModuleBase_IOperation* theOperation) const { return false; }
 
   /// Sets a list of model widgets, according to the operation feature xml definition
   /// \param theXmlRepresentation an xml feature definition
@@ -82,6 +89,12 @@ Q_OBJECT
   {
     return myIsEditing;
   }
+
+  /// Returns list of nested features
+  QStringList nestedFeatures() const { return myNestedFeatures; }
+
+  /// Sets list of nested features
+  void setNestedFeatures(const QStringList& theList) { myNestedFeatures = theList; }
 
 signals:
   void started();  /// the operation is started
@@ -157,6 +170,8 @@ signals:
 
  private:
   ModuleBase_OperationDescription* myDescription;  /// the container to have the operation description
+
+  QStringList myNestedFeatures;
 };
 
 #endif

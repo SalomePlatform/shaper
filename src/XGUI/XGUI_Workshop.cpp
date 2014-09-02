@@ -395,6 +395,7 @@ void XGUI_Workshop::onObjectDeletedMsg(const ModelAPI_ObjectDeletedMessage* theM
 void XGUI_Workshop::onOperationStarted()
 {
   ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
+  aOperation->setNestedFeatures(myActionsMgr->nestedCommands(aOperation->id()));
 
   if (aOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
     connectWithOperation(aOperation);

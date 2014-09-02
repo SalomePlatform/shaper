@@ -20,7 +20,6 @@
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 #include <AIS_DimensionSelectionMode.hxx>
-
 #include <AIS_Shape.hxx>
 
 #include <set>
@@ -169,7 +168,9 @@ void XGUI_Displayer::activateInLocalContext(ObjectPtr theResult, const std::list
   // Open local context if there is no one
   if (!aContext->HasOpenedContext()) {
     aContext->ClearCurrents(false);
-    aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
+    //aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
+    aContext->OpenLocalContext();
+    aContext->NotUseDisplayedObjects();
   }
   // display or redisplay presentation
   Handle(AIS_InteractiveObject) anAIS;
@@ -329,6 +330,7 @@ void XGUI_Displayer::eraseDeletedResults(const bool isUpdateViewer)
 
 void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
 {
+  AISContext()->ClearSelected(false);
   closeAllContexts(true);
 }
 
@@ -396,3 +398,32 @@ void XGUI_Displayer::erase(boost::shared_ptr<GeomAPI_AISObject> theAIS, const bo
   }
 }
 
+void XGUI_Displayer::activateObjectsOutOfContext(const std::list<int>& theModes, 
+                                                 Handle(SelectMgr_Filter) theFilter)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  // Open local context if there is no one
+  if (!aContext->HasOpenedContext()) 
+    return;
+
+  aContext->UseDisplayedObjects();
+  std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
+  for (; anIt != aLast; anIt++) {
+    aContext->ActivateStandardMode((TopAbs_ShapeEnum)(*anIt));
+  }
+
+  if (!theFilter.IsNull())
+    aContext->AddFilter(theFilter);
+}
+
+
+void XGUI_Displayer::deactivateObjectsOutOfContext()
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  // Open local context if there is no one
+  if (!aContext->HasOpenedContext()) 
+    return;
+
+  aContext->RemoveFilters();
+  aContext->NotUseDisplayedObjects();
+}

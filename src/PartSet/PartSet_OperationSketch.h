@@ -37,6 +37,10 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_OperationSketch();
 
+  /// Returns True if the given operation is a Sketcher operation
+  virtual bool isValid(ModuleBase_IOperation* theOperation) const;
+
+
   /// Returns the operation local selection mode
   /// \param theFeature the feature object to get the selection mode
   /// \return the selection mode

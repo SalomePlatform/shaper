@@ -61,4 +61,4 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT void setInternal(bool isInternal);
 };
 
-#endif // CONFIG_MESSAGE_H
+#endif // CONFIG_MESSAGE_H
