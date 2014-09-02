@@ -29,7 +29,6 @@ class MODELAPI_EXPORT ModelAPI_Validator
   virtual ~ModelAPI_Validator()
   {
   }
-  ;
 
   /// Returns true if feature and/or attributes are valid
   /// \param theFeature the validated feature

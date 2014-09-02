@@ -38,7 +38,6 @@ Q_OBJECT
   virtual ~ModuleBase_ModelWidget()
   {
   }
-  ;
 
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
@@ -47,7 +46,6 @@ Q_OBJECT
   {
     return false;
   }
-  ;
 
   /// Returns the state whether the attribute of the feature is initialized
   /// \param theObject a model feature to be checked
