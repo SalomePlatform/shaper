@@ -65,6 +65,7 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   //  const boost::shared_ptr<ModelAPI_Feature>& theFeature, const std::string& theAttrID) const;
 
  protected:
+  void addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators) const;
   /// Get instance from PluginManager
   Model_ValidatorsFactory();
 
