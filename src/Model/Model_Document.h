@@ -115,7 +115,11 @@ class Model_Document : public ModelAPI_Document
 
   //! Returns a feature by result (owner of result)
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature>
-  feature(const boost::shared_ptr<ModelAPI_Result>& theResult);
+    feature(const boost::shared_ptr<ModelAPI_Result>& theResult);
+
+  ///! Returns true if parametric updater need to execute feature on recomputartion
+  ///! On abort, undo or redo it is not necessary: results in document are updated automatically
+  bool executeFeatures() {return myExecuteFeatures;}
 
  protected:
 
@@ -167,6 +171,8 @@ class Model_Document : public ModelAPI_Document
   std::set<std::string> mySubs;
   /// transaction indexes (related to myTransactionsAfterSave) which were empty in this doc
   std::map<int, bool> myIsEmptyTr;
+  /// If it is true, features are not executed on update (on abort, undo, redo)
+  bool myExecuteFeatures;
 };
 
 #endif

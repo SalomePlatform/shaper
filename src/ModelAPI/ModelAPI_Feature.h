@@ -58,6 +58,10 @@ class ModelAPI_Feature : public ModelAPI_Object
   MODELAPI_EXPORT void setResult(const boost::shared_ptr<ModelAPI_Result>& theResult,
                                  const int theIndex);
 
+  /// Returns true if result is persistent (stored in document) and on undo-redo, save-open
+  /// it is not needed to recompute it.
+  virtual bool isPersistentResult() {return true;}
+
   /// Returns true if this feature must not be created: this is just an action
   /// that is not stored in the features history and data model (like "delete part").
   virtual bool isAction()

@@ -51,6 +51,7 @@ Model_Document::Model_Document(const std::string theID)
   myDoc->SetUndoLimit(UNDO_LIMIT);
   myTransactionsAfterSave = 0;
   myNestedNum = -1;
+  myExecuteFeatures = true;
   //myDoc->SetNestedTransactionMode();
   // to have something in the document and avoid empty doc open/save problem
   // in transaction for nesting correct working
@@ -719,6 +720,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   // after all updates, sends a message that groups of features were created or updated
   boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->setCheckTransactions(
       false);
+  myExecuteFeatures = false;
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   if (theMarkUpdated)
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
@@ -726,6 +728,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->setCheckTransactions(
       true);
+  myExecuteFeatures = true;
 }
 
 void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
