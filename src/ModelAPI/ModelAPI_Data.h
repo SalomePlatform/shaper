@@ -11,11 +11,13 @@
 #include <boost/shared_ptr.hpp>
 
 class ModelAPI_AttributeDocRef;
+class ModelAPI_AttributeInteger;
 class ModelAPI_AttributeDouble;
 class ModelAPI_AttributeReference;
 class ModelAPI_AttributeRefAttr;
 class ModelAPI_AttributeRefList;
 class ModelAPI_AttributeBoolean;
+class ModelAPI_AttributeString;
 class ModelAPI_Document;
 class ModelAPI_Attribute;
 class GeomAPI_Shape;
@@ -40,6 +42,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual boost::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string& theID) = 0;
   /// Returns the attribute that contains real value with double precision
   virtual boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID) = 0;
+  /// Returns the attribute that contains integer value
+  virtual boost::shared_ptr<ModelAPI_AttributeInteger> integer(const std::string& theID) = 0;
   /// Returns the attribute that contains reference to a feature
   virtual boost::shared_ptr<ModelAPI_AttributeReference> reference(const std::string& theID) = 0;
   /// Returns the attribute that contains reference to an attribute of a feature
@@ -48,6 +52,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual boost::shared_ptr<ModelAPI_AttributeRefList> reflist(const std::string& theID) = 0;
   /// Returns the attribute that contains boolean value
   virtual boost::shared_ptr<ModelAPI_AttributeBoolean> boolean(const std::string& theID) = 0;
+  /// Returns the attribute that contains boolean value
+  virtual boost::shared_ptr<ModelAPI_AttributeString> string(const std::string& theID) = 0;
 
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute

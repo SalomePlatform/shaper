@@ -86,8 +86,6 @@ void ModuleBase_Operation::abortOperation()
 
 void ModuleBase_Operation::commitOperation()
 {
-  if (myFeature)
-    myFeature->execute();
 }
 
 void ModuleBase_Operation::afterCommitOperation()
@@ -134,7 +132,8 @@ FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
   myFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
   if (myFeature) {  // TODO: generate an error if feature was not created
     myIsModified = true;
-    myFeature->execute();
+    // Model update should call "execute" of a feature.
+    //myFeature->execute();
     // Init default values
     /*QList<ModuleBase_ModelWidget*> aWidgets = getDescription()->modelWidgets();
      QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();

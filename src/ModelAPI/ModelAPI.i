@@ -12,6 +12,8 @@
   #include "ModelAPI_Attribute.h"
   #include "ModelAPI_AttributeDocRef.h"
   #include "ModelAPI_AttributeDouble.h"
+  #include "ModelAPI_AttributeInteger.h"
+  #include "ModelAPI_AttributeString.h"
   #include "ModelAPI_AttributeReference.h"
   #include "ModelAPI_AttributeRefAttr.h"
   #include "ModelAPI_Validator.h"
@@ -49,6 +51,8 @@
 %shared_ptr(ModelAPI_Attribute)
 %shared_ptr(ModelAPI_AttributeDocRef)
 %shared_ptr(ModelAPI_AttributeDouble)
+%shared_ptr(ModelAPI_AttributeInteger)
+%shared_ptr(ModelAPI_AttributeString)
 %shared_ptr(ModelAPI_AttributeReference)
 %shared_ptr(ModelAPI_AttributeRefAttr)
 %shared_ptr(ModelAPI_AttributeRefList)
@@ -66,6 +70,8 @@
 %include "ModelAPI_Attribute.h"
 %include "ModelAPI_AttributeDocRef.h"
 %include "ModelAPI_AttributeDouble.h"
+%include "ModelAPI_AttributeInteger.h"
+%include "ModelAPI_AttributeString.h"
 %include "ModelAPI_AttributeReference.h"
 %include "ModelAPI_AttributeRefAttr.h"
 %include "ModelAPI_Validator.h"

@@ -26,6 +26,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_ISelection.h
 	ModuleBase_ViewerPrs.h
 	ModuleBase_WidgetChoice.h
+	ModuleBase_WidgetFileSelector.h
 )
 
 SET(PROJECT_SOURCES
@@ -44,8 +45,9 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetSelector.cpp
 	ModuleBase_WidgetPoint2dDistance.cpp
 	ModuleBase_WidgetValue.cpp
-	ModuleBase_WidgetValueFeature.cpp
+	ModuleBase_WidgetValueFeature.cpp	
 	ModuleBase_WidgetChoice.cpp
+	ModuleBase_WidgetFileSelector.cpp
 )
 
 SET(PROJECT_LIBRARIES

@@ -31,6 +31,7 @@ class CONFIG_EXPORT Config_WidgetAPI
   Config_WidgetAPI(std::string theRawXml);
   virtual ~Config_WidgetAPI();
 
+  //TODO(sbh): Make these fields protected, accessible only for WidgetFactory
   bool toNextWidget();
   bool toChildWidget();
   bool toParentWidget();

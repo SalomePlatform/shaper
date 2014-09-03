@@ -130,6 +130,12 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @SET PYTHONPATH=%ROOT_DIR%\install\swig;%PYTHONPATH%
 
 @REM -------------------------
+@REM PTHREAD
+@SET PATH=%PDIR%\pthreads-2.9.1\lib;%PATH%
+@REM -------------------------
+
+
+@REM -------------------------
 @REM SUIT
 @SET SUIT_DIR=%PDIR%\suit
 @SET PATH=%SUIT_DIR%\bin;%PATH%

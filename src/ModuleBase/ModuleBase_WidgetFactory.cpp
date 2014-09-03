@@ -18,6 +18,7 @@
 #include <ModuleBase_WidgetDoubleValue.h>
 #include <ModuleBase_WidgetBoolValue.h>
 #include <ModuleBase_WidgetPoint2dDistance.h>
+#include <ModuleBase_WidgetFileSelector.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IModule.h>
 
@@ -143,7 +144,8 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
 
   } else if (theType == WDG_POINT2D_DISTANCE) {
     result = point2dDistanceControl(theParent);
-
+  } else if (theType == WDG_FILE_SELECTOR) {
+    result = fileSelectorControl(theParent);
   } else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
   } else {
@@ -258,4 +260,13 @@ QWidget* ModuleBase_WidgetFactory::point2dDistanceControl(QWidget* theParent)
   myModelWidgets.append(aDistWgt);
 
   return aDistWgt->getControl();
+}
+
+QWidget* ModuleBase_WidgetFactory::fileSelectorControl(QWidget* theParent)
+{
+  ModuleBase_WidgetFileSelector* aFileSelectorWgt =
+      new ModuleBase_WidgetFileSelector(theParent, myWidgetApi, myParentId);
+  myModelWidgets.append(aFileSelectorWgt);
+
+  return aFileSelectorWgt->getControl();
 }
