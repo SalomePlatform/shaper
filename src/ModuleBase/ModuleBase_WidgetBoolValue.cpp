@@ -46,11 +46,8 @@ bool ModuleBase_WidgetBoolValue::storeValue() const
 {
   DataPtr aData = myFeature->data();
   boost::shared_ptr<ModelAPI_AttributeBoolean> aBool = aData->boolean(attributeID());
-
-  if (aBool->value() != myCheckBox->isChecked()) {
-    aBool->setValue(myCheckBox->isChecked());
-    updateObject(myFeature);
-  }
+  aBool->setValue(myCheckBox->isChecked());
+  updateObject(myFeature);
   return true;
 }
 

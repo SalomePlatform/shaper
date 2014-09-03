@@ -12,6 +12,8 @@ using namespace std;
 
 void Model_AttributeReference::setValue(ObjectPtr theObject)
 {
+  if(!theObject)
+    return;
   if (!myIsInitialized || value() != theObject) {
     boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(
         theObject->data());

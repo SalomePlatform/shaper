@@ -29,8 +29,6 @@ ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
                                                              const std::string& theParentId)
     : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
-  myHasDefaultValue = false;
-
   myTitle = QString::fromStdString(theData->getProperty("title"));
   //TODO(sbh): Get them from the feature
   myFormats = getSupportedFormats(theData);
@@ -67,12 +65,9 @@ bool ModuleBase_WidgetFileSelector::storeValue() const
 {
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
-  QString aModelValue = QString::fromStdString(aStringAttr->value());
   QString aWidgetValue = myPathField->text();
-  if(aModelValue != aWidgetValue) {
-    aStringAttr->setValue(aWidgetValue.toStdString());
-    updateObject(myFeature);
-  }
+  aStringAttr->setValue(aWidgetValue.toStdString());
+  updateObject(myFeature);
   return true;
 }
 

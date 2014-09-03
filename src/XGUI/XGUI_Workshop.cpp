@@ -417,7 +417,7 @@ void XGUI_Workshop::onOperationStarted()
       //QObject::connect(aWidget, SIGNAL(valuesChanged()),  aOperation, SLOT(storeCustomValue()));
       QObject::connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
       // Init default values
-      if (!aOperation->isEditOperation() && aWidget->hasDefaultValue()) {
+      if (!aOperation->isEditOperation()) {
         //aWidget->storeValue(aOperation->feature());
 
         aWidget->storeValue();

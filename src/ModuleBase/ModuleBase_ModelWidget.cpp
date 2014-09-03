@@ -17,7 +17,6 @@
 ModuleBase_ModelWidget::ModuleBase_ModelWidget(QObject* theParent, const Config_WidgetAPI* theData,
                                                const std::string& theParentId)
     : QObject(theParent),
-      myHasDefaultValue(false),
       myParentId(theParentId)
 {
   myAttributeID = theData ? theData->widgetId() : "";

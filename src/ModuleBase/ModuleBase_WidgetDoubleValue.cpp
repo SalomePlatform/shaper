@@ -69,7 +69,6 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
 
   aProp = theData->getProperty(DOUBLE_WDG_DFLT);
   double aDefVal = QString::fromStdString(aProp).toDouble(&isOk);
-  myHasDefaultValue = isOk;
   if (isOk) {
     mySpinBox->setValue(aDefVal);
   }
@@ -93,10 +92,8 @@ bool ModuleBase_WidgetDoubleValue::storeValue() const
 {
   DataPtr aData = myFeature->data();
   AttributeDoublePtr aReal = aData->real(attributeID());
-  if (aReal->value() != mySpinBox->value()) {
-    aReal->setValue(mySpinBox->value());
-    updateObject(myFeature);
-  }
+  aReal->setValue(mySpinBox->value());
+  updateObject(myFeature);
   return true;
 }
 
