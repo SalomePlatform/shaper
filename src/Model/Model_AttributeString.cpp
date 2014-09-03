@@ -1,6 +1,6 @@
 // File:        Model_AttributeString.cpp
-// Created:     2 june 2014
-// Author:      Vitaly Smetannikov
+// Created:     25 august 2014
+// Author:      sbh
 
 #include <Model_AttributeString.h>
 #include <ModelAPI_AttributeString.h>

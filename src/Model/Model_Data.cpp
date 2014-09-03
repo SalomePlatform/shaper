@@ -4,6 +4,7 @@
 
 #include <Model_Data.h>
 #include <Model_AttributeDocRef.h>
+#include <Model_AttributeInteger.h>
 #include <Model_AttributeDouble.h>
 #include <Model_AttributeReference.h>
 #include <Model_AttributeRefAttr.h>
@@ -19,6 +20,8 @@
 #include <Events_Error.h>
 
 #include <TDataStd_Name.hxx>
+
+#include <string>
 
 Model_Data::Model_Data()
 {
@@ -62,8 +65,14 @@ void Model_Data::addAttribute(const std::string& theID, const std::string theAtt
   ModelAPI_Attribute* anAttr = 0;
   if (theAttrType == ModelAPI_AttributeDocRef::type()) {
     anAttr = new Model_AttributeDocRef(anAttrLab);
+  } else if (theAttrType == Model_AttributeInteger::type()) {
+    anAttr = new Model_AttributeInteger(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeDouble::type()) {
     anAttr = new Model_AttributeDouble(anAttrLab);
+  } else if (theAttrType == Model_AttributeBoolean::type()) {
+    anAttr = new Model_AttributeBoolean(anAttrLab);
+  } else if (theAttrType == Model_AttributeString::type()) {
+    anAttr = new Model_AttributeString(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeReference::type()) {
     anAttr = new Model_AttributeReference(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeRefAttr::type()) {
@@ -76,10 +85,6 @@ void Model_Data::addAttribute(const std::string& theID, const std::string theAtt
     anAttr = new GeomData_Dir(anAttrLab);
   } else if (theAttrType == GeomData_Point2D::type()) {
     anAttr = new GeomData_Point2D(anAttrLab);
-  } else if (theAttrType == Model_AttributeBoolean::type()) {
-    anAttr = new Model_AttributeBoolean(anAttrLab);
-  } else if (theAttrType == Model_AttributeString::type()) {
-    anAttr = new Model_AttributeString(anAttrLab);
   }
   if (anAttr) {
     myAttrs[theID] = boost::shared_ptr<ModelAPI_Attribute>(anAttr);
@@ -113,6 +118,21 @@ boost::shared_ptr<ModelAPI_AttributeDouble> Model_Data::real(const std::string& 
   }
   boost::shared_ptr<ModelAPI_AttributeDouble> aRes = boost::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(aFound->second);
+  if (!aRes) {
+    // TODO: generate error on invalid attribute type request
+  }
+  return aRes;
+}
+
+boost::shared_ptr<ModelAPI_AttributeInteger> Model_Data::integer(const std::string& theID)
+{
+  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
+  if (aFound == myAttrs.end()) {
+    // TODO: generate error on unknown attribute request and/or add mechanism for customization
+    return boost::shared_ptr<ModelAPI_AttributeInteger>();
+  }
+  boost::shared_ptr<ModelAPI_AttributeInteger> aRes = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeInteger>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
   }

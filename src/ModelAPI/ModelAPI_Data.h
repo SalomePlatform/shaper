@@ -11,6 +11,7 @@
 #include <boost/shared_ptr.hpp>
 
 class ModelAPI_AttributeDocRef;
+class ModelAPI_AttributeInteger;
 class ModelAPI_AttributeDouble;
 class ModelAPI_AttributeReference;
 class ModelAPI_AttributeRefAttr;
@@ -41,6 +42,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual boost::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string& theID) = 0;
   /// Returns the attribute that contains real value with double precision
   virtual boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID) = 0;
+  /// Returns the attribute that contains integer value
+  virtual boost::shared_ptr<ModelAPI_AttributeInteger> integer(const std::string& theID) = 0;
   /// Returns the attribute that contains reference to a feature
   virtual boost::shared_ptr<ModelAPI_AttributeReference> reference(const std::string& theID) = 0;
   /// Returns the attribute that contains reference to an attribute of a feature
