@@ -25,7 +25,11 @@ Events_ID Events_Loop::eventByName(const char* theName)
   string aName(theName);
   map<string, char*>::iterator aFound = CREATED_EVENTS.find(aName);
   if (aFound == CREATED_EVENTS.end()) {  //not created yet
+#ifdef WIN32
+    aResult = _strdup(theName);  // copy to make unique internal pointer
+#else
     aResult = strdup(theName);  // copy to make unique internal pointer
+#endif
     CREATED_EVENTS[aName] = aResult;
   } else
     aResult = aFound->second;

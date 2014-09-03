@@ -4,6 +4,8 @@
 
 #include "ModuleBase_WidgetChoice.h"
 
+#include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_Data.h>
 #include <Config_WidgetAPI.h>
 
 #include <QWidget>
@@ -23,11 +25,17 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   myLabel = new QLabel(aLabelText, myContainer);
-  myLabel->setPixmap(QPixmap(aLabelIcon));
+  if (!aLabelIcon.isEmpty())
+    myLabel->setPixmap(QPixmap(aLabelIcon));
   aLayout->addWidget(myLabel);
 
   myCombo = new QComboBox(myContainer);
-  aLayout->addWidget(myCombo);
+  aLayout->addWidget(myCombo, 1);
+ 
+  std::string aTypes = theData->getProperty("string_list");
+  QStringList aList = QString(aTypes.c_str()).split(' ');
+  myCombo->addItems(aList);
+
   connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentIndexChanged(int)));
 }
 
@@ -37,11 +45,22 @@ ModuleBase_WidgetChoice::~ModuleBase_WidgetChoice()
   
 bool ModuleBase_WidgetChoice::storeValue() const
 {
+  DataPtr aData = myFeature->data();
+  boost::shared_ptr<ModelAPI_AttributeInteger> aIntAttr = aData->integer(attributeID());
+
+  aIntAttr->setValue(myCombo->currentIndex());
+  updateObject(myFeature);
   return true;
 }
 
 bool ModuleBase_WidgetChoice::restoreValue()
 {
+  DataPtr aData = myFeature->data();
+  boost::shared_ptr<ModelAPI_AttributeInteger> aIntAttr = aData->integer(attributeID());
+
+  bool isBlocked = myCombo->blockSignals(true);
+  myCombo->setCurrentIndex(aIntAttr->value());
+  myCombo->blockSignals(isBlocked);
   return true;
 }
 
@@ -61,4 +80,6 @@ QList<QWidget*> ModuleBase_WidgetChoice::getControls() const
 
 void ModuleBase_WidgetChoice::onCurrentIndexChanged(int theIndex)
 {
+  emit valuesChanged();
+  emit focusOutWidget(this);
 }

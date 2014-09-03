@@ -19,6 +19,7 @@
 #include <ModuleBase_WidgetBoolValue.h>
 #include <ModuleBase_WidgetPoint2dDistance.h>
 #include <ModuleBase_WidgetFileSelector.h>
+#include <ModuleBase_WidgetChoice.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IModule.h>
 
@@ -142,10 +143,18 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
     result = doubleValueEditor(theParent);
 
+  } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
+    result = doubleValueEditor(theParent);
+
   } else if (theType == WDG_POINT2D_DISTANCE) {
     result = point2dDistanceControl(theParent);
+
   } else if (theType == WDG_FILE_SELECTOR) {
     result = fileSelectorControl(theParent);
+
+  } else if (theType == WDG_CHOICE) {
+    result = choiceControl(theParent);
+
   } else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
   } else {
@@ -270,3 +279,13 @@ QWidget* ModuleBase_WidgetFactory::fileSelectorControl(QWidget* theParent)
 
   return aFileSelectorWgt->getControl();
 }
+
+QWidget* ModuleBase_WidgetFactory::choiceControl(QWidget* theParent)
+{
+  ModuleBase_WidgetChoice* aChoiceWgt = new ModuleBase_WidgetChoice(theParent, myWidgetApi,
+                                                                        myParentId);
+  myModelWidgets.append(aChoiceWgt);
+
+  return aChoiceWgt->getControl();
+}
+

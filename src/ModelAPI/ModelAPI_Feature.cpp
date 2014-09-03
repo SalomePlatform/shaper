@@ -50,7 +50,7 @@ void ModelAPI_Feature::setResult(const boost::shared_ptr<ModelAPI_Result>& theRe
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
     ModelAPI_EventCreator::get()->sendUpdated(theResult, anEvent);
     // Create event for first Feature, send it to make "created" earlier than "updated"
-    Events_Loop::loop()->flush(anEvent);
+    //Events_Loop::loop()->flush(anEvent);
   } else {  // update
     *aResIter = theResult;
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);

@@ -54,8 +54,7 @@ ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
                                                      const Config_WidgetAPI* theData,
                                                      const std::string& theParentId)
     : ModuleBase_ModelWidget(theParent, theData, theParentId),
-      myWorkshop(theWorkshop),
-      myActivateOnStart(false)
+      myWorkshop(theWorkshop)
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aLayout = new QHBoxLayout(myContainer);
@@ -64,7 +63,8 @@ ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   myLabel = new QLabel(aLabelText, myContainer);
-  myLabel->setPixmap(QPixmap(aLabelIcon));
+  if (!aLabelIcon.isEmpty())
+    myLabel->setPixmap(QPixmap(aLabelIcon));
 
   aLayout->addWidget(myLabel);
 
@@ -77,8 +77,9 @@ ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
   myBasePalet = myTextLine->palette();
   myInactivePalet = myBasePalet;
   myInactivePalet.setBrush(QPalette::Base, QBrush(Qt::gray, Qt::Dense6Pattern));
+  myTextLine->setPalette(myInactivePalet);
 
-  aLayout->addWidget(myTextLine);
+  aLayout->addWidget(myTextLine, 1);
 
   myActivateBtn = new QToolButton(myContainer);
   myActivateBtn->setIcon(QIcon(":icons/hand_point.png"));
@@ -88,13 +89,8 @@ ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
 
   aLayout->addWidget(myActivateBtn);
 
-  QString aActivateTxt = QString::fromStdString(theData->getProperty("activate"));
-  if (!aActivateTxt.isNull()) {
-    myActivateOnStart = (aActivateTxt == "true");
-  }
-
   std::string aTypes = theData->getProperty("shape_types");
-  myShapeTypes = QString(aTypes.c_str()).split(',');
+  myShapeTypes = QString(aTypes.c_str()).split(' ');
 }
 
 //********************************************************************
@@ -215,10 +211,10 @@ void ModuleBase_WidgetSelector::updateSelectionName()
 bool ModuleBase_WidgetSelector::eventFilter(QObject* theObj, QEvent* theEvent)
 {
   if (theObj == myTextLine) {
-    if (theEvent->type() == QEvent::Polish) {
-      myActivateBtn->setChecked(myActivateOnStart);
-      onSelectionChanged();
-    }
+    //if (theEvent->type() == QEvent::Polish) {
+    //  myActivateBtn->setChecked(myActivateOnStart);
+    //  onSelectionChanged();
+    //}
   }
   return ModuleBase_ModelWidget::eventFilter(theObj, theEvent);
 }

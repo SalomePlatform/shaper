@@ -117,8 +117,9 @@ bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject, bool theSen
 bool ModuleBase_WidgetFeature::storeValue() const
 {
   //FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
-  //if (!aFeature)
-  //  return false;
+  if (!myObject)
+    return false;
+
   boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));

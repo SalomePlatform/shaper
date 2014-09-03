@@ -1055,9 +1055,17 @@ void XGUI_ViewWindow::dumpView()
 
     Handle(Visual3d_View) a3dView = myViewPort->getView()->View();
     if (aFmt == "PS")
+#ifdef WIN32
+      a3dView->Export(_strdup(qPrintable(aFileName)), Graphic3d_EF_PostScript);
+#else
       a3dView->Export(strdup(qPrintable(aFileName)), Graphic3d_EF_PostScript);
+#endif
     else if (aFmt == "EPS")
+#ifdef WIN32
+      a3dView->Export(_strdup(qPrintable(aFileName)), Graphic3d_EF_EnhPostScript);
+#else
       a3dView->Export(strdup(qPrintable(aFileName)), Graphic3d_EF_EnhPostScript);
+#endif
     else
       aPicture.save(aFileName, aFmt.toLatin1());
     QApplication::restoreOverrideCursor();

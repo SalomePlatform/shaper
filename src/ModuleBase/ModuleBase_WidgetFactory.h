@@ -47,6 +47,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
   QWidget* booleanControl(QWidget* theParent);
   QWidget* point2dDistanceControl(QWidget* theParent);
   QWidget* fileSelectorControl(QWidget* theParent);
+  QWidget* choiceControl(QWidget* theParent);
 
   /// Check whether the XML definition for the given type contains internal property
   /// \param theType the widget type

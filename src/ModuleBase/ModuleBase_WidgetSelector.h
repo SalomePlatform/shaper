@@ -50,15 +50,6 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-  void setActivationOnStart(bool toActivate)
-  {
-    myActivateOnStart = toActivate;
-  }
-  bool activateOnStart() const
-  {
-    return myActivateOnStart;
-  }
-
   ObjectPtr selectedFeature() const
   {
     return mySelectedObject;
@@ -89,8 +80,6 @@ Q_OBJECT
   QToolButton* myActivateBtn;
 
   ModuleBase_IWorkshop* myWorkshop;
-
-  bool myActivateOnStart;
 
   ObjectPtr mySelectedObject;
   QStringList myShapeTypes;

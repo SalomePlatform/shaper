@@ -37,6 +37,11 @@ class FeaturesPlugin_Boolean : public ModelAPI_Feature
     return MY_TOOL_ID;
   }
 
+  enum {
+    BOOL_CUT,
+    BOOL_FUSE,
+    BOOL_COMMON
+  };
 
 
   /// Returns the kind of a feature

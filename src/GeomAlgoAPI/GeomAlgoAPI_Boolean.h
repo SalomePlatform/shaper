@@ -17,13 +17,28 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean
 {
  public:
   /* \brief Creates cut boolean operation
-   * \param[in] theShape face or wire to be extruded
+   * \param[in] theShape the main shape
    * \param[in] theTool  toole shape for boolean
    * \return a solid as result of operation
    */
   static boost::shared_ptr<GeomAPI_Shape> makeCut(boost::shared_ptr<GeomAPI_Shape> theShape,
                                                         boost::shared_ptr<GeomAPI_Shape> theTool);
 
+  /* \brief Creates fuse boolean operation
+   * \param[in] theShape the main shape
+   * \param[in] theTool  second shape
+   * \return a solid as result of operation
+   */
+  static boost::shared_ptr<GeomAPI_Shape> makeFuse(boost::shared_ptr<GeomAPI_Shape> theShape,
+                                                   boost::shared_ptr<GeomAPI_Shape> theTool);
+
+  /* \brief Creates common boolean operation
+   * \param[in] theShape the main shape
+   * \param[in] theTool  second shape
+   * \return a solid as result of operation
+   */
+  static boost::shared_ptr<GeomAPI_Shape> makeCommon(boost::shared_ptr<GeomAPI_Shape> theShape,
+                                                     boost::shared_ptr<GeomAPI_Shape> theTool);
 };
 
 #endif
