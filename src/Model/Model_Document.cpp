@@ -649,8 +649,11 @@ void Model_Document::initData(ObjectPtr theObj, TDF_Label theLab, const int theT
 
 void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
 {
-  boost::shared_ptr<ModelAPI_Document> aThis = Model_Application::getApplication()->getDocument(
-      myID);
+  boost::shared_ptr<ModelAPI_Document> aThis = 
+    Model_Application::getApplication()->getDocument(myID);
+  // after all updates, sends a message that groups of features were created or updated
+  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
+    ->setCheckTransactions(false);
   // update all objects by checking are they of labels or not
   std::set<FeaturePtr> aNewFeatures, aKeptFeatures;
   TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
@@ -674,13 +677,17 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       // event: model is updated
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
       ModelAPI_EventCreator::get()->sendUpdated(aNewObj, anEvent);
-      // feature for this label is added, so go to the next label
+
+      // update results of the appeared feature
+      updateResults(aNewObj);
     } else {  // nothing is changed, both iterators are incremented
-      aKeptFeatures.insert(myObjs.Find(aFeatureLabel));
+      FeaturePtr aFeature = myObjs.Find(aFeatureLabel);
+      aKeptFeatures.insert(aFeature);
       if (theMarkUpdated) {
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-        ModelAPI_EventCreator::get()->sendUpdated(myObjs.Find(aFeatureLabel), anEvent);
+        ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
       }
+      updateResults(aFeature);
     }
   }
   // execute new features to restore results: after features creation to make all references valid
@@ -717,32 +724,33 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       aFIter.Next();
   }
 
-  // after all updates, sends a message that groups of features were created or updated
-  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->setCheckTransactions(
-      false);
   myExecuteFeatures = false;
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   if (theMarkUpdated)
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())->setCheckTransactions(
-      true);
+  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
+    ->setCheckTransactions(true);
   myExecuteFeatures = true;
+}
+
+TDF_Label Model_Document::resultLabel(
+  const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theResultIndex) 
+{
+  const boost::shared_ptr<Model_Data>& aData = 
+    boost::dynamic_pointer_cast<Model_Data>(theFeatureData);
+  return aData->label().Father().FindChild(TAG_FEATURE_RESULTS).FindChild(theResultIndex + 1);
 }
 
 void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
                                  boost::shared_ptr<ModelAPI_Result> theResult,
                                  const int theResultIndex)
 {
-  boost::shared_ptr<ModelAPI_Document> aThis = Model_Application::getApplication()->getDocument(
-      myID);
+  boost::shared_ptr<ModelAPI_Document> aThis = 
+    Model_Application::getApplication()->getDocument(myID);
   theResult->setDoc(aThis);
-  initData(
-      theResult,
-      boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->label().Father().FindChild(
-          TAG_FEATURE_RESULTS).FindChild(theResultIndex + 1),
-      TAG_FEATURE_ARGUMENTS);
+  initData(theResult, resultLabel(theFeatureData, theResultIndex), TAG_FEATURE_ARGUMENTS);
   if (theResult->data()->name().empty()) {  // if was not initialized, generate event and set a name
     theResult->data()->setName(theFeatureData->name());
   }
@@ -751,9 +759,7 @@ void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData
 boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstruction(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  ObjectPtr anOldObject = object(
-      boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->label().Father().FindChild(
-          TAG_FEATURE_RESULTS).FindChild(theIndex + 1));
+  ObjectPtr anOldObject = object(resultLabel(theFeatureData, theIndex));
   boost::shared_ptr<ModelAPI_ResultConstruction> aResult;
   if (anOldObject) {
     aResult = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anOldObject);
@@ -768,9 +774,7 @@ boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstructio
 boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  ObjectPtr anOldObject = object(
-      boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->label().Father().FindChild(
-          TAG_FEATURE_RESULTS).FindChild(theIndex + 1));
+  ObjectPtr anOldObject = object(resultLabel(theFeatureData, theIndex));
   boost::shared_ptr<ModelAPI_ResultBody> aResult;
   if (anOldObject) {
     aResult = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(anOldObject);
@@ -785,9 +789,7 @@ boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody(
 boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  ObjectPtr anOldObject = object(
-      boost::dynamic_pointer_cast<Model_Data>(theFeatureData)->label().Father().FindChild(
-          TAG_FEATURE_RESULTS).FindChild(theIndex + 1));
+  ObjectPtr anOldObject = object(resultLabel(theFeatureData, theIndex));
   boost::shared_ptr<ModelAPI_ResultPart> aResult;
   if (anOldObject) {
     aResult = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(anOldObject);
@@ -808,6 +810,40 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
     return feature(aFeatureLab);
   }
   return FeaturePtr();
+}
+
+void Model_Document::updateResults(FeaturePtr theFeature)
+{
+  // for not persistent is will be done by parametric updater automatically
+  if (!theFeature->isPersistentResult()) return;
+  // check the existing results and remove them if there is nothing on the label
+  std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
+  while(aResIter != theFeature->results().cend()) {
+    ResultBodyPtr aBody = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(*aResIter);
+    if (aBody) {
+      if (!aBody->data()->isValid()) { 
+        // found a disappeared result => remove it
+        theFeature->removeResult(aBody);
+        // start iterate from beginning because iterator is corrupted by removing
+        aResIter = theFeature->results().cbegin();
+        continue;
+      }
+    }
+    aResIter++;
+  }
+  // check that results are presented on all labels
+  int aResSize = theFeature->results().size();
+  TDF_ChildIterator aLabIter(resultLabel(theFeature->data(), 0).Father());
+  for(; aLabIter.More(); aLabIter.Next()) {
+    // here must be at least Name
+    int aResIndex = aLabIter.Value().Tag() - 1;
+    if (aLabIter.Value().FindChild(TAG_FEATURE_ARGUMENTS).HasAttribute() && 
+        aResSize <= aResIndex) 
+    {
+      ResultBodyPtr aNewBody = createBody(theFeature->data(), aResIndex);
+      theFeature->setResult(aNewBody, aResIndex);
+    }
+  }
 }
 
 Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper)

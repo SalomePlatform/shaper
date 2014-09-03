@@ -152,6 +152,13 @@ class Model_Document : public ModelAPI_Document
                                         boost::shared_ptr<ModelAPI_Result> theResult,
                                         const int theResultIndex = 0);
 
+  //! returns the label of result by index; creates this label if it was not created before
+  TDF_Label Model_Document::resultLabel(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theResultIndex);
+
+  //! Updates the results list of the feature basing on the current data tree
+  void updateResults(FeaturePtr theFeature);
+
   friend class Model_Application;
   friend class Model_PluginManager;
   friend class DFBrowser;

@@ -57,6 +57,8 @@ class ModelAPI_Feature : public ModelAPI_Object
   /// sets the result by index (zero based), results before this must be set before
   MODELAPI_EXPORT void setResult(const boost::shared_ptr<ModelAPI_Result>& theResult,
                                  const int theIndex);
+  /// removes the result from the feature
+  MODELAPI_EXPORT void removeResult(const boost::shared_ptr<ModelAPI_Result>& theResult);
 
   /// Returns true if result is persistent (stored in document) and on undo-redo, save-open
   /// it is not needed to recompute it.
