@@ -1,9 +1,9 @@
 // File:        Model_AttributeString.h
-// Created:     2 june 2014
-// Author:      Vitaly Smetannikov
+// Created:     25 august 2014
+// Author:      sbh
 
-#ifndef Model_AttributeString_H_
-#define Model_AttributeString_H_
+#ifndef MODEL_ATTRIBUTESTRING_H_
+#define MODEL_ATTRIBUTESTRING_H_
 
 #include <Model.h>
 #include <ModelAPI_AttributeString.h>
@@ -20,12 +20,12 @@
 
 class Model_AttributeString : public ModelAPI_AttributeString
 {
-  Handle_TDataStd_Name myString;  ///< double is Real attribute
+  Handle_TDataStd_Name myString;
  public:
-  /// Defines the double value
+  /// Defines the std::string value
   MODEL_EXPORT virtual void setValue(const std::string& theValue);
 
-  /// Returns the double value
+  /// Returns the std::string  value
   MODEL_EXPORT virtual std::string value();
 
  protected:

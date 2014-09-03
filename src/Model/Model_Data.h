@@ -10,6 +10,7 @@
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
@@ -65,6 +66,9 @@ class Model_Data : public ModelAPI_Data
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string& theID);
   /// Returns the attribute that contains real value with double precision
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID);
+  /// Returns the attribute that contains integer value
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeInteger>
+    integer(const std::string& theID);
   /// Returns the attribute that contains reference to a feature
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeReference>
     reference(const std::string& theID);

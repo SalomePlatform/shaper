@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
     ModelAPI_Object.h
     ModelAPI_Document.h
     ModelAPI_Attribute.h
+    ModelAPI_AttributeInteger.h
     ModelAPI_AttributeDouble.h
     ModelAPI_AttributeDocRef.h
     ModelAPI_AttributeReference.h
