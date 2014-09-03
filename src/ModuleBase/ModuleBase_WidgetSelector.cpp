@@ -74,6 +74,10 @@ ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
   myTextLine->setToolTip(aToolTip);
   myTextLine->installEventFilter(this);
 
+  myBasePalet = myTextLine->palette();
+  myInactivePalet = myBasePalet;
+  myInactivePalet.setBrush(QPalette::Base, QBrush(Qt::gray, Qt::Dense6Pattern));
+
   aLayout->addWidget(myTextLine);
 
   myActivateBtn = new QToolButton(myContainer);
@@ -165,6 +169,7 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
       myTextLine->setText("");
     }
     emit valuesChanged();
+    emit focusOutWidget(this);
   }
 }
 
@@ -181,15 +186,13 @@ bool ModuleBase_WidgetSelector::isAccepted(const ObjectPtr theResult) const
 
   TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
   if (aShapeType == TopAbs_COMPOUND) {
-    foreach (QString aType, myShapeTypes)
-    {
+    foreach (QString aType, myShapeTypes) {
       TopExp_Explorer aEx(aShape, shapeType(aType));
       if (aEx.More())
         return true;
     }
   } else {
-    foreach (QString aType, myShapeTypes)
-    {
+    foreach (QString aType, myShapeTypes) {
       if (shapeType(aType) == aShapeType)
         return true;
     }
@@ -237,7 +240,11 @@ void ModuleBase_WidgetSelector::enableOthersControls(bool toEnable) const
 void ModuleBase_WidgetSelector::activateSelection(bool toActivate)
 {
   enableOthersControls(!toActivate);
-  myTextLine->setEnabled(toActivate);
+  //myTextLine->setEnabled(toActivate);
+  if (toActivate)
+    myTextLine->setPalette(myBasePalet);
+  else
+    myTextLine->setPalette(myInactivePalet);
 
   if (toActivate)
     connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
@@ -262,4 +269,11 @@ void ModuleBase_WidgetSelector::raisePanel() const
     QDockWidget* aTabWgt = (QDockWidget*) aParent;
     aTabWgt->raise();
   }
+}
+
+//********************************************************************
+bool ModuleBase_WidgetSelector::focusTo()
+{
+  myActivateBtn->setChecked(true);
+  return true;
 }

@@ -29,6 +29,7 @@ const static char* WDG_TOOLBOX_BOX = "box";
 const static char* WDG_SWITCH = "switch";
 const static char* WDG_SWITCH_CASE = "case";
 const static char* WDG_SELECTOR = "selector";
+const static char* WDG_CHOICE = "choice";
 
 //Specific widgets
 const static char* WDG_POINT_SELECTOR = "point_selector";

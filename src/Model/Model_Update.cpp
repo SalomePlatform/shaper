@@ -3,6 +3,7 @@
 // Author:      Mikhail PONIKAROV
 
 #include <Model_Update.h>
+#include <Model_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -91,7 +92,10 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
     }
     // execute feature if it must be updated
     if (aMustbeUpdated) {
-      theFeature->execute();
+
+      if (boost::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
+          !theFeature->isPersistentResult())
+        theFeature->execute();
       // redisplay all results
       static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();

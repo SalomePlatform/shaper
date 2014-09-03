@@ -49,7 +49,10 @@ class SketchPlugin_Feature : public ModelAPI_Feature
   /// \param thePoint the point
   virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) = 0;
 
- protected:
+  /// Construction result is allways recomuted on the fly
+  SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
+
+protected:
   /// Sets the higher-level feature for the sub-feature (sketch for line)
   void setSketch(SketchPlugin_Sketch* theSketch)
   {

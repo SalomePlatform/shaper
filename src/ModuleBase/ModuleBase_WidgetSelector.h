@@ -13,6 +13,7 @@
 #include <TopAbs_ShapeEnum.hxx>
 
 #include <QStringList>
+#include <QPalette>
 
 class Config_WidgetAPI;
 class QWidget;
@@ -35,6 +36,8 @@ Q_OBJECT
   virtual bool storeValue() const;
 
   virtual bool restoreValue();
+
+  virtual bool focusTo();
 
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
@@ -91,6 +94,9 @@ Q_OBJECT
 
   ObjectPtr mySelectedObject;
   QStringList myShapeTypes;
+
+  QPalette myBasePalet;
+  QPalette myInactivePalet;
 };
 
 #endif

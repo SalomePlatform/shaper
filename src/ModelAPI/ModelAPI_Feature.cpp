@@ -58,6 +58,16 @@ void ModelAPI_Feature::setResult(const boost::shared_ptr<ModelAPI_Result>& theRe
   }
 }
 
+void ModelAPI_Feature::removeResult(const boost::shared_ptr<ModelAPI_Result>& theResult)
+{
+  std::list<boost::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
+  for(; aResIter != myResults.end(); aResIter++) {
+    if (*aResIter == theResult) {
+      myResults.erase(aResIter);
+    }
+  }
+}
+
 boost::shared_ptr<ModelAPI_Document> ModelAPI_Feature::documentToAdd()
 {
   return ModelAPI_PluginManager::get()->currentDocument();
