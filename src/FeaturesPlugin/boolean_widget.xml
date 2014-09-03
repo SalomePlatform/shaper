@@ -1,0 +1,16 @@
+<source>
+  <selector id="main_object" 
+    label="Main object" 
+    icon=":icons/cut_shape.png" 
+    tooltip="Select an object to cut"
+    activate="true"
+    shape_types="solid,shell"
+  />
+  <selector id="tool_object" 
+    label="Tool object" 
+    icon=":icons/cut_tool.png" 
+    tooltip="Select a tool"
+    activate="false"
+    shape_types="solid"
+  />
+</source>

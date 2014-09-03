@@ -1,5 +1,6 @@
 #include "FeaturesPlugin_Plugin.h"
 #include "FeaturesPlugin_Extrusion.h"
+#include "FeaturesPlugin_Boolean.h"
 
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
@@ -19,6 +20,9 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
 {
   if (theFeatureID == FeaturesPlugin_Extrusion::ID()) {
     return FeaturePtr(new FeaturesPlugin_Extrusion);
+  } else
+  if (theFeatureID == FeaturesPlugin_Boolean::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Boolean);
   }
   // feature of such kind is not found
   return FeaturePtr();

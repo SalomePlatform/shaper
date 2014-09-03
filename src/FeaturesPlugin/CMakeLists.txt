@@ -4,11 +4,13 @@ SET(PROJECT_HEADERS
     FeaturesPlugin.h
     FeaturesPlugin_Plugin.h
     FeaturesPlugin_Extrusion.h
+	FeaturesPlugin_Boolean.h
 )
 
 SET(PROJECT_SOURCES
     FeaturesPlugin_Plugin.cpp
     FeaturesPlugin_Extrusion.cpp
+	FeaturesPlugin_Boolean.cpp
 )
 
 ADD_DEFINITIONS(-DFEATURESPLUGIN_EXPORTS ${BOOST_DEFINITIONS})
@@ -24,6 +26,7 @@ INCLUDE_DIRECTORIES(
 SET(XML_RESOURCES
   plugin-Features.xml
   extrusion_widget.xml
+  boolean_widget.xml
 )
 
 INSTALL(TARGETS FeaturesPlugin DESTINATION plugins)

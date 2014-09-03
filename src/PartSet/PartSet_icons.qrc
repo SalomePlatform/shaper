@@ -9,6 +9,8 @@
      <file>icons/remove.png</file>
      <file>icons/extrusion.png</file>
      <file>icons/cut.png</file>
+     <file>icons/cut_tool.png</file>
+     <file>icons/cut_shape.png</file>
      <file>icons/fusion.png</file>
      <file>icons/revol.png</file>
      <file>icons/common.png</file>
