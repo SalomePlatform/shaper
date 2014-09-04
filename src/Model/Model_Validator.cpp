@@ -3,7 +3,6 @@
 // Author:      Mikhail PONIKAROV
 
 #include <Model_Validator.h>
-#include <Model_ResultValidators.h>
 #include <Model_FeatureValidator.h>
 #include <ModelAPI_Feature.h>
 #include <Events_Error.h>
@@ -22,9 +21,30 @@ void Model_ValidatorsFactory::assignValidator(const std::string& theID,
                                               const std::string& theFeatureID)
 {
   if (myFeatures.find(theFeatureID) == myFeatures.end()) {
-    myFeatures[theFeatureID] = std::set<std::string>();
+    myFeatures[theFeatureID] = AttrValidators();
   }
-  myFeatures[theFeatureID].insert(theID);
+  if (myFeatures[theFeatureID].find(theID) != myFeatures[theFeatureID].end()) {
+    //Events_Error::send(std::string("Validator ") + theID + 
+    //  " for feature " + theFeatureID + "is already registered");
+  } else {
+    myFeatures[theFeatureID][theID] = std::list<std::string>();
+  }
+}
+
+void Model_ValidatorsFactory::assignValidator(const std::string& theID,
+                                              const std::string& theFeatureID,
+                                              const std::list<std::string>& theArguments)
+{
+  if (myFeatures.find(theFeatureID) == myFeatures.end()) {
+    myFeatures[theFeatureID] = AttrValidators();
+  }
+
+  if (myFeatures[theFeatureID].find(theID) != myFeatures[theFeatureID].end()) {
+    //Events_Error::send(std::string("Validator ") + theID + 
+    //  " for feature " + theFeatureID + "is already registered");
+  } else {
+    myFeatures[theFeatureID][theID] = theArguments;
+  }
 }
 
 void Model_ValidatorsFactory::assignValidator(const std::string& theID,
@@ -44,23 +64,24 @@ void Model_ValidatorsFactory::assignValidator(const std::string& theID,
   if (anAttr == aFeature->second.end()) {
     aFeature->second[theAttrID] = AttrValidators();
   }
-  aFeature->second[theAttrID].insert(
-      std::pair<std::string, std::list<std::string> >(theID, theArguments));
+  aFeature->second[theAttrID][theID] = theArguments;
 }
 
 void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
-                                         std::list<ModelAPI_Validator*>& theResult) const
+                                         std::list<ModelAPI_Validator*>& theResult,
+                                         std::list<std::list<std::string> >& theArguments) const
 {
-  std::map<std::string, std::set<std::string> >::const_iterator aFeature = myFeatures.find(
-      theFeatureID);
+  std::map<std::string, AttrValidators>::const_iterator aFeature = myFeatures.find(theFeatureID);
   if (aFeature != myFeatures.cend()) {
-    std::set<std::string>::const_iterator aValIter = aFeature->second.cbegin();
+    AttrValidators::const_iterator aValIter = aFeature->second.cbegin();
     for (; aValIter != aFeature->second.cend(); aValIter++) {
-      std::map<std::string, ModelAPI_Validator*>::const_iterator aFound = myIDs.find(*aValIter);
+      std::map<std::string, ModelAPI_Validator*>::const_iterator aFound = 
+        myIDs.find(aValIter->first);
       if (aFound == myIDs.end()) {
-        Events_Error::send(std::string("Validator ") + *aValIter + " was not registered");
+        Events_Error::send(std::string("Validator ") + aValIter->first + " was not registered");
       } else {
         theResult.push_back(aFound->second);
+        theArguments.push_back(aValIter->second);
       }
     }
   }
@@ -95,9 +116,6 @@ void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
 Model_ValidatorsFactory::Model_ValidatorsFactory()
     : ModelAPI_ValidatorsFactory()
 {
-  registerValidator("Model_ResultPointValidator", new Model_ResultPointValidator);
-  registerValidator("Model_ResultLineValidator", new Model_ResultLineValidator);
-  registerValidator("Model_ResultArcValidator", new Model_ResultArcValidator);
   registerValidator("Model_FeatureValidator", new Model_FeatureValidator);
 }
 

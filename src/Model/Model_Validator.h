@@ -26,10 +26,10 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
 {
  private:
   std::map<std::string, ModelAPI_Validator*> myIDs;  ///< map from ID to registered validator
+  /// validators IDs to list of arguments
+  typedef std::map<std::string, std::list<std::string> > AttrValidators;
   /// validators IDs by feature ID
-  std::map<std::string, std::set<std::string> > myFeatures;
-  /// set of pairs: validators IDs, list of arguments
-  typedef std::set<std::pair<std::string, std::list<std::string> > > AttrValidators;
+  std::map<std::string, AttrValidators> myFeatures;
   /// validators IDs and arguments by feature and attribute IDs
   std::map<std::string, std::map<std::string, AttrValidators> > myAttrs;
  public:
@@ -41,6 +41,11 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   MODEL_EXPORT virtual void assignValidator(const std::string& theID,
                                             const std::string& theFeatureID);
 
+  /// Assigns validator to the feature with arguments of the validator
+  MODEL_EXPORT virtual void assignValidator(const std::string& theID,
+                                            const std::string& theFeatureID,
+                                            const std::list<std::string>& theArguments);
+
   /// Assigns validator to the attribute of the feature
   MODEL_EXPORT virtual void assignValidator(const std::string& theID,
                                             const std::string& theFeatureID,
@@ -49,7 +54,8 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
 
   /// Provides a validator for the feature, returns NULL if no validator
   MODEL_EXPORT virtual void validators(const std::string& theFeatureID,
-                                       std::list<ModelAPI_Validator*>& theResult) const;
+                                       std::list<ModelAPI_Validator*>& theResult,
+                                       std::list<std::list<std::string> >& theArguments) const;
   /// Provides a validator for the attribute, returns NULL if no validator
   MODEL_EXPORT virtual void validators(const std::string& theFeatureID,
                                        const std::string& theAttrID,

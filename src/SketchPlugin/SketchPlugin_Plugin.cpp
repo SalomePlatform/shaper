@@ -11,6 +11,7 @@
 #include "SketchPlugin_ConstraintPerpendicular.h"
 #include "SketchPlugin_ConstraintRadius.h"
 #include "SketchPlugin_Validators.h"
+#include "SketchPlugin_ResultValidators.h"
 #include <ModelAPI_PluginManager.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Validator.h>
@@ -28,6 +29,9 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("SketchPlugin_DistanceAttrValidator",
                               new SketchPlugin_DistanceAttrValidator);
+  aFactory->registerValidator("Sketch_ResultPointValidator", new SketchPlugin_ResultPointValidator);
+  aFactory->registerValidator("Sketch_ResultLineValidator", new SketchPlugin_ResultLineValidator);
+  aFactory->registerValidator("Sketch_ResultArcValidator", new SketchPlugin_ResultArcValidator);
 
   // register this plugin
   ModelAPI_PluginManager::get()->registerPlugin(this);

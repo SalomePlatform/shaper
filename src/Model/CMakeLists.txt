@@ -20,8 +20,7 @@ SET(PROJECT_HEADERS
     Model_ResultBody.h
     Model_ResultConstruction.h
     Model_ResultPart.h
-	Model_ResultValidators.h
-	Model_FeatureValidator.h
+    Model_FeatureValidator.h
 )
 
 SET(PROJECT_SOURCES
@@ -43,8 +42,7 @@ SET(PROJECT_SOURCES
     Model_ResultBody.cpp
     Model_ResultConstruction.cpp
     Model_ResultPart.cpp
-	Model_ResultValidators.cpp
-	Model_FeatureValidator.cpp
+    Model_FeatureValidator.cpp
 )
 
 SET(PROJECT_LIBRARIES

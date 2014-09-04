@@ -43,7 +43,6 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_SelectionValidator.h>
-#include <ModuleBase_ResultValidators.h>
 #include "ModuleBase_WidgetFactory.h"
 
 #include <Config_Common.h>
@@ -1064,7 +1063,8 @@ void XGUI_Workshop::updateCommandsOnViewSelection()
   {
     QString aId = aAction->data().toString();
     std::list<ModelAPI_Validator*> aValidators;
-    aFactory->validators(aId.toStdString(), aValidators);
+    std::list<std::list<std::string> > anArguments;
+    aFactory->validators(aId.toStdString(), aValidators, anArguments);
     std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
     for (; aValidator != aValidators.end(); aValidator++) {
       if (*aValidator) {

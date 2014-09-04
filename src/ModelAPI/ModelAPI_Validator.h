@@ -61,6 +61,11 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
   /// Assigns validator to the feature
   virtual void assignValidator(const std::string& theID, const std::string& theFeatureID) = 0;
 
+  /// Assigns validator to the feature with arguments of the validator
+  virtual void assignValidator(const std::string& theID,
+                                            const std::string& theFeatureID,
+                                            const std::list<std::string>& theArguments) = 0;
+
   /// Assigns validator to the attribute of the feature
   virtual void assignValidator(const std::string& theID, const std::string& theFeatureID,
                                const std::string& theAttrID,
@@ -68,7 +73,8 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
 
   /// Provides a validator for the feature, returns NULL if no validator
   virtual void validators(const std::string& theFeatureID,
-                          std::list<ModelAPI_Validator*>& theResult) const = 0;
+                          std::list<ModelAPI_Validator*>& theResult,
+                          std::list<std::list<std::string> >& theArguments) const = 0;
   /// Provides a validator for the attribute, returns NULL if no validator
   virtual void validators(const std::string& theFeatureID, const std::string& theAttrID,
                           std::list<ModelAPI_Validator*>& theValidators,

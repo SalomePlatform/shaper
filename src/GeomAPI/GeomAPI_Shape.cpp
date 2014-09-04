@@ -6,7 +6,7 @@
 
 #include <TopoDS_Shape.hxx>
 
-#define MY_PNT static_cast<gp_Pnt*>(myImpl)
+#define MY_SHAPE static_cast<TopoDS_Shape*>(myImpl)
 
 GeomAPI_Shape::GeomAPI_Shape()
     : GeomAPI_Interface(new TopoDS_Shape())
@@ -15,17 +15,17 @@ GeomAPI_Shape::GeomAPI_Shape()
 
 bool GeomAPI_Shape::isNull()
 {
-  return MY_SHAPE->IsNull();
+  return MY_SHAPE->IsNull() == Standard_True;
 }
 
 bool GeomAPI_Shape::isVertex() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
-  return aShape.TShape()->ShapeType() == TopAbs_VERTEX;
+  return !aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX;
 }
 
 bool GeomAPI_Shape::isEdge() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
-  return aShape.TShape()->ShapeType() == TopAbs_EDGE;
+  return aShape.ShapeType() == TopAbs_EDGE;
 }

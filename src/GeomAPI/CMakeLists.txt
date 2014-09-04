@@ -21,6 +21,7 @@ SET(PROJECT_HEADERS
     GeomAPI_Edge.h
     GeomAPI_AISObject.h
     GeomAPI_IPresentable.h
+    GeomAPI_Curve.h 
 )
 
 SET(PROJECT_SOURCES
@@ -39,6 +40,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Shape.cpp
     GeomAPI_Edge.cpp
     GeomAPI_AISObject.cpp
+    GeomAPI_Curve.cpp
 )
 
 ADD_DEFINITIONS(-DGEOMAPI_EXPORTS ${CAS_DEFINITIONS})

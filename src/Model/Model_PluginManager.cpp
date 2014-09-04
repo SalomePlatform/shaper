@@ -134,7 +134,7 @@ void Model_PluginManager::processEvent(const Events_Message* theMessage)
     const Config_ValidatorMessage* aMsg = dynamic_cast<const Config_ValidatorMessage*>(theMessage);
     if (aMsg) {
       if (aMsg->attributeId().empty()) {  // feature validator
-        validators()->assignValidator(aMsg->validatorId(), aMsg->featureId());
+        validators()->assignValidator(aMsg->validatorId(), aMsg->featureId(), aMsg->parameters());
       } else {  // attribute validator
         validators()->assignValidator(aMsg->validatorId(), aMsg->featureId(), aMsg->attributeId(),
                                       aMsg->parameters());

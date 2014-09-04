@@ -11,10 +11,6 @@
  * \ingroup DataModel
  * \brief Interface to the topological shape object
  */
-class TopoDS_Shape;
-
-#define MY_SHAPE static_cast<TopoDS_Shape*>(myImpl)
-
 class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
 {
  public:

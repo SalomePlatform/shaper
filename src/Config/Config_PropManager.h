@@ -27,10 +27,10 @@ class Config_PropManager
    * Returns True if the property succesfully registered
    */
   CONFIG_EXPORT static bool registerProp(const std::string& theSection, const std::string& theName,
-                           const std::string& theTitle, Config_Prop::PropType theType,
-                           const std::string& theValue);
+    const std::string& theTitle, Config_Prop::PropType theType, const std::string& theValue);
 
-  CONFIG_EXPORT static Config_Prop* findProp(const std::string& theSection, const std::string& theName);
+  CONFIG_EXPORT static Config_Prop* findProp(
+    const std::string& theSection, const std::string& theName);
 
   CONFIG_EXPORT static Config_Properties getProperties();
 
@@ -41,14 +41,17 @@ class Config_PropManager
   CONFIG_EXPORT static Config_Properties getProperties(const std::string& theSection);
 
   //! Returns value of the property by its owner, section, and name
-  CONFIG_EXPORT static std::string string(const std::string& theSection, const std::string& theName,
-                            const std::string& theDefault);
-  CONFIG_EXPORT static std::vector<int> color(const std::string& theSection, const std::string& theName,
-                                const std::string& theDefault);
-  CONFIG_EXPORT static int integer(const std::string& theSection, const std::string& theName,
-                     const std::string& theDefault);
-  CONFIG_EXPORT static double real(const std::string& theSection, const std::string& theName,
-                     const std::string& theDefault);
+  CONFIG_EXPORT static std::string string(
+    const std::string& theSection, const std::string& theName, const std::string& theDefault);
+  
+  CONFIG_EXPORT static std::vector<int> color(
+    const std::string& theSection, const std::string& theName, const std::string& theDefault);
+  
+  CONFIG_EXPORT static int integer(
+    const std::string& theSection, const std::string& theName, const std::string& theDefault);
+  
+  CONFIG_EXPORT static double real(
+    const std::string& theSection, const std::string& theName, const std::string& theDefault);
 
  private:
   CONFIG_EXPORT static Config_Properties myProps;
