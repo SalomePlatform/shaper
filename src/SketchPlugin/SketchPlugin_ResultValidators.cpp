@@ -39,4 +39,3 @@ bool SketchPlugin_ResultArcValidator::isValid(const ObjectPtr theObject) const
   boost::shared_ptr<GeomAPI_Shape> aShape = ModelAPI_Tools::shape(aResult);
   return aShape && aShape->isEdge() && GeomAPI_Curve(aShape).isCircle();
 }
-

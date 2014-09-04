@@ -83,10 +83,8 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
   /// Returns registered validator by its Id
   virtual const ModelAPI_Validator* validator(const std::string& theID) const = 0;
 
-  /// Returns the result of "validate" method for attribute of validator.
-  /// If validator is not exists, returns true: everything is valid by default.
-  //virtual bool validate(
-  //  const boost::shared_ptr<ModelAPI_Feature>& theFeature, const std::string& theAttrID) const = 0;
+  /// Returns true if feature and all its attributes are valid.
+  virtual bool validate(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const = 0;
 
  protected:
   /// Get instance from PluginManager

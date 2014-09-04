@@ -19,7 +19,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_ResultValidator.h>
-#include <ModelAPI_AttributeValidator.h>
+#include <ModelAPI_RefAttrValidator.h>
 
 #include <QWidget>
 #include <QLineEdit>
@@ -98,8 +98,8 @@ bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject, bool theSen
   aValidator = aValidators.begin();
   std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
   for (; aValidator != aValidators.end(); aValidator++, aArgs++) {
-    const ModelAPI_AttributeValidator* aAttrValidator =
-        dynamic_cast<const ModelAPI_AttributeValidator*>(*aValidator);
+    const ModelAPI_RefAttrValidator* aAttrValidator =
+        dynamic_cast<const ModelAPI_RefAttrValidator*>(*aValidator);
     if (aAttrValidator) {
       if (!aAttrValidator->isValid(myFeature, *aArgs, theObject)) {
         return false;

@@ -11,9 +11,8 @@
 class ExchangePlugin_ImportFormatValidator : public ModelAPI_AttributeValidator
 {
  public:
-  virtual bool isValid(const FeaturePtr& theFeature,
-                       const std::list<std::string>& theArguments,
-                       const ObjectPtr& theObject) const;
+  virtual bool isValid(
+    const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const;
 
 };
 

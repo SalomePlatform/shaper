@@ -87,10 +87,13 @@ class Model_Data : public ModelAPI_Data
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string& theID);
-  /// Returns all attributes ofthe feature of the given type
+  /// Returns all attributes of the feature of the given type
   /// or all attributes if "theType" is empty
   MODEL_EXPORT virtual std::list<boost::shared_ptr<ModelAPI_Attribute> >
     attributes(const std::string& theType);
+  /// Returns all attributes ids of the feature of the given type
+  /// or all attributes if "theType" is empty
+  MODEL_EXPORT virtual std::list<std::string> attributesIDs(const std::string& theType);
 
   /// Identifier by the id (not fast, iteration by map)
   /// \param theAttr attribute already created in this data

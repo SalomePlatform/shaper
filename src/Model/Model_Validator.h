@@ -63,12 +63,10 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
                                        std::list<std::list<std::string> >& theArguments) const;
 
   /// Returns registered validator by its Id
-  virtual const ModelAPI_Validator* validator(const std::string& theID) const;
+  MODEL_EXPORT virtual const ModelAPI_Validator* validator(const std::string& theID) const;
 
-  /// Returns the result of "validate" method for attribute of validator.
-  /// If validator is not exists, returns true: everything is valid by default.
-  //MODEL_EXPORT virtual bool validate(
-  //  const boost::shared_ptr<ModelAPI_Feature>& theFeature, const std::string& theAttrID) const;
+  /// Returns true if feature and all its attributes are valid.
+  MODEL_EXPORT virtual bool validate(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const;
 
  protected:
   void addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators) const;

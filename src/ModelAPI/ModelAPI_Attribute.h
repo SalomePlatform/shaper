@@ -40,7 +40,7 @@ class ModelAPI_Attribute
   }
 
   /// Returns the owner of this attribute
-  MODELAPI_EXPORT const boost::shared_ptr<ModelAPI_Object>& owner()
+  MODELAPI_EXPORT const boost::shared_ptr<ModelAPI_Object>& owner() const
   {
     return myObject;
   }

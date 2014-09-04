@@ -84,22 +84,8 @@ void XGUI_OperationMgr::validateOperation(ModuleBase_Operation* theOperation)
   //Get validators for the Id
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  std::list<ModelAPI_Validator*> aValidators;
-  std::list<std::list<std::string> > anArguments;
-  aFactory->validators(anOperationId.toStdString(), aValidators, anArguments);
-  //
-  std::list<ModelAPI_Validator*>::iterator it = aValidators.begin();
-  bool isValid = true;
-  for (; it != aValidators.end(); it++) {
-    const ModelAPI_FeatureValidator* aFeatureValidator =
-        dynamic_cast<const ModelAPI_FeatureValidator*>(*it);
-    if (!aFeatureValidator)
-      continue;
-    if (!aFeatureValidator->isValid(aFeature)) {
-      isValid = false;
-      break;
-    }
-  }
+
+  bool isValid = aFactory->validate(aFeature);
   emit operationValidated(isValid);
 }
 

@@ -6,12 +6,17 @@
 #define SketchPlugin_Validators_H
 
 #include "SketchPlugin.h"
-//#include <ModuleBase_FeatureValidator.h>
-#include <ModelAPI_AttributeValidator.h>
+#include <ModelAPI_RefAttrValidator.h>
 
 class SketchPlugin_DistanceAttrValidator : public ModelAPI_AttributeValidator
 {
  public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  virtual bool isValid(
+    const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const;
+  //! Returns true if object is good for the feature attribute
   virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
                        const ObjectPtr& theObject) const;
 

@@ -30,3 +30,15 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
   return false;
 }
 
+bool SketchPlugin_DistanceAttrValidator::isValid(
+  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
+{
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+    boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (anAttr) {
+    const ObjectPtr& anObj = theAttribute->owner();
+    const FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
+    return isValid(aFeature, theArguments, anAttr->object());
+  }
+  return true; // it may be not reference attribute, in this case, it is OK
+}

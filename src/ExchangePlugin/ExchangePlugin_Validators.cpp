@@ -11,9 +11,8 @@
 #include <string>
 
 
-bool ExchangePlugin_ImportFormatValidator::isValid(const FeaturePtr& theFeature,
-                                                 const std::list<std::string>& theArguments,
-                                                 const ObjectPtr& theObject) const
+bool ExchangePlugin_ImportFormatValidator::isValid(
+  const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();

@@ -16,7 +16,8 @@ class Model_FeatureValidator : public ModelAPI_FeatureValidator
  public:
   /// Returns true if feature and/or attributes are valid
   /// \param theFeature the validated feature
-  MODEL_EXPORT virtual bool isValid(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const;
+  MODEL_EXPORT virtual bool isValid(const boost::shared_ptr<ModelAPI_Feature>& theFeature,
+    const std::list<std::string>& theArguments) const;
 };
 
 #endif

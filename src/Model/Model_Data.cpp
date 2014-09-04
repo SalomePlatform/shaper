@@ -251,10 +251,24 @@ bool Model_Data::isValid()
 std::list<boost::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const std::string& theType)
 {
   std::list<boost::shared_ptr<ModelAPI_Attribute> > aResult;
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = myAttrs.begin();
+  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = 
+    myAttrs.begin();
   for (; anAttrsIter != myAttrs.end(); anAttrsIter++) {
     if (theType.empty() || anAttrsIter->second->attributeType() == theType) {
       aResult.push_back(anAttrsIter->second);
+    }
+  }
+  return aResult;
+}
+
+std::list<std::string> Model_Data::attributesIDs(const std::string& theType) 
+{
+  std::list<std::string> aResult;
+  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = 
+    myAttrs.begin();
+  for (; anAttrsIter != myAttrs.end(); anAttrsIter++) {
+    if (theType.empty() || anAttrsIter->second->attributeType() == theType) {
+      aResult.push_back(anAttrsIter->first);
     }
   }
   return aResult;
