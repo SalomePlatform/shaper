@@ -827,7 +827,7 @@ QList<QAction*> XGUI_Workshop::getModuleCommands() const
 QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
 {
   QDockWidget* aObjDock = new QDockWidget(theParent);
-  aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  //aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   aObjDock->setWindowTitle(tr("Object browser"));
   aObjDock->setStyleSheet(
       "::title { position: relative; padding-left: 5px; text-align: left center }");
