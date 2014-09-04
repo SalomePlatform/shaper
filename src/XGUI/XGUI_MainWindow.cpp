@@ -89,8 +89,8 @@ void XGUI_MainWindow::dockPythonConsole()
   myMenuBar->removeConsole();
   QDockWidget* aDock = new QDockWidget(this);
   aDock->setFeatures(QDockWidget::AllDockWidgetFeatures | QDockWidget::DockWidgetVerticalTitleBar);
-//  aDock->setAllowedAreas(
-//      Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
+  aDock->setAllowedAreas(
+      Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
   aDock->setMinimumHeight(0);
   aDock->setWindowTitle("Console");
   aDock->setWidget(myPythonConsole);

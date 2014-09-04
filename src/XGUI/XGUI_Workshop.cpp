@@ -827,7 +827,7 @@ QList<QAction*> XGUI_Workshop::getModuleCommands() const
 QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
 {
   QDockWidget* aObjDock = new QDockWidget(theParent);
-  //aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
   aObjDock->setWindowTitle(tr("Object browser"));
   aObjDock->setStyleSheet(
       "::title { position: relative; padding-left: 5px; text-align: left center }");
@@ -851,6 +851,7 @@ void XGUI_Workshop::createDockWidgets()
   QDockWidget* aObjDock = createObjectBrowser(aDesktop);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
   myPropertyPanel = new XGUI_PropertyPanel(aDesktop);
+  myPropertyPanel->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanel);
   hidePropertyPanel();  //<! Invisible by default
   hideObjectBrowser();
