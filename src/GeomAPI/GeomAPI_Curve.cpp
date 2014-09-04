@@ -28,7 +28,7 @@ GeomAPI_Curve::GeomAPI_Curve(const boost::shared_ptr<GeomAPI_Shape>& theShape)
     Standard_Real aStart, anEnd;
     Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aStart, anEnd);
     if (!aCurve.IsNull()) {
-      setImpl(&aCurve);
+      setImpl(new Handle(Geom_Curve)(aCurve));
     }
   }
 }

@@ -14,12 +14,9 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-/*
- #ifdef WIN32
- //For GetModuleFileNameW
- #include <windows.h>
- #endif
- */
+#ifdef WIN32
+#pragma warning(disable : 4996) // for getenv
+#endif
 
 #ifdef _DEBUG
 #include <iostream>

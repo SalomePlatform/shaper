@@ -29,12 +29,12 @@
       <feature id="SketchConstraintDistance" title="Distance" tooltip="Create constraint for the distance from a point to an object">
         <label title="Select point and another feature (point or point on line) between which to calculate distance" tooltip="Select point and another feature (point or point on line) between which to calculate distance"/>
         <feature_or_attribute_selector id="ConstraintEntityA" label="First object" tooltip="Select an point in the viewer">
-          <validator id="Model_ResultPointValidator"/>
-          <validator id="Model_ResultLineValidator"/>
+          <validator id="SketchPlugin_ResultPointValidator"/>
+          <validator id="SketchPlugin_ResultLineValidator"/>
         </feature_or_attribute_selector>
         <feature_or_attribute_selector id="ConstraintEntityB" label="Last object" tooltip="Select an point in the viewer">
-          <validator id="Model_ResultPointValidator"/>
-          <validator id="Model_ResultLineValidator"/>
+          <validator id="SketchPlugin_ResultPointValidator"/>
+          <validator id="SketchPlugin_ResultLineValidator"/>
           <validator id="SketchPlugin_DistanceAttrValidator" parameters="ConstraintEntityA"/>
         </feature_or_attribute_selector>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
@@ -45,7 +45,7 @@
       <feature id="SketchConstraintLength" title="Length" tooltip="Create constraint for the given length of a line segment">
         <label title="Select a line on which to calculate lenght" tooltip="Select a line on which to calculate lenght"/>
         <feature_selector id="ConstraintEntityA" label="Line" tooltip="Select an line in the viewer">
-          <validator id="Model_ResultLineValidator"/>
+          <validator id="SketchPlugin_ResultLineValidator"/>
         </feature_selector>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
         <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue"/>
@@ -55,7 +55,7 @@
       <feature id="SketchConstraintRadius" title="Radius" tooltip="Create constraint for the given radius of a circle or an arc">
         <label title="Select a circle or an arc on which to calculate radius" tooltip="Select a circle or an arc on which to calculate radius"/>
         <feature_selector id="ConstraintEntityA" label="Circle or Arc" tooltip="Select a circle or an arc in the viewer">
-          <validator id="Model_ResultArcValidator"/>
+          <validator id="SketchPlugin_ResultArcValidator"/>
         </feature_selector>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
         <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue"/>
@@ -64,10 +64,10 @@
       
       <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines">
         <feature_selector id="ConstraintEntityA" label="First line" tooltip="Select an line in the viewer">
-          <validator id="Model_ResultLineValidator"/>
+          <validator id="SketchPlugin_ResultLineValidator"/>
         </feature_selector>
         <feature_selector id="ConstraintEntityB" label="Last line" tooltip="Select an line in the viewer">
-          <validator id="Model_ResultLineValidator"/>
+          <validator id="SketchPlugin_ResultLineValidator"/>
         </feature_selector>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
         <validator id="PartSet_ParallelValidator"/>
@@ -75,10 +75,10 @@
       
       <feature id="SketchConstraintPerpendicular" title="Perpendicular" tooltip="Create constraint defining two perpendicular lines">
         <feature_selector id="ConstraintEntityA" label="First line" tooltip="Select an line in the viewer">
-          <validator id="Model_ResultLineValidator"/>
+          <validator id="SketchPlugin_ResultLineValidator"/>
         </feature_selector>
         <feature_selector id="ConstraintEntityB" label="Last line" tooltip="Select an line in the viewer">
-          <validator id="Model_ResultLineValidator"/>
+          <validator id="SketchPlugin_ResultLineValidator"/>
         </feature_selector>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
         <validator id="PartSet_PerpendicularValidator"/>
