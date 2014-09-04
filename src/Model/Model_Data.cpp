@@ -282,3 +282,9 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
     ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
   }
 }
+
+void Model_Data::erase()
+{
+  if (!myLab.IsNull())
+    myLab.ForgetAllAttributes();
+}

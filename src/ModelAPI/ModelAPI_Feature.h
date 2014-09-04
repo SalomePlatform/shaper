@@ -59,6 +59,8 @@ class ModelAPI_Feature : public ModelAPI_Object
                                  const int theIndex);
   /// removes the result from the feature
   MODELAPI_EXPORT void removeResult(const boost::shared_ptr<ModelAPI_Result>& theResult);
+  /// removes all results from the feature
+  MODELAPI_EXPORT void eraseResults();
 
   /// Returns true if result is persistent (stored in document) and on undo-redo, save-open
   /// it is not needed to recompute it.

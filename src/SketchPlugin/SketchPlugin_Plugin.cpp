@@ -29,6 +29,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("SketchPlugin_DistanceAttrValidator",
                               new SketchPlugin_DistanceAttrValidator);
+  aFactory->registerValidator("SketchPlugin_RadiusValidator",
+                              new SketchPlugin_RadiusValidator);
   aFactory->registerValidator("SketchPlugin_ResultPointValidator", new SketchPlugin_ResultPointValidator);
   aFactory->registerValidator("SketchPlugin_ResultLineValidator", new SketchPlugin_ResultLineValidator);
   aFactory->registerValidator("SketchPlugin_ResultArcValidator", new SketchPlugin_ResultArcValidator);

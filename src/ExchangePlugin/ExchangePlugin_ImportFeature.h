@@ -27,7 +27,7 @@
 #define UnLoadLib( handle ) dlclose( handle );
 #endif
 
-class EXCHANGEPLUGIN_EXPORT ExchangePlugin_ImportFeature : public ModelAPI_Feature
+class ExchangePlugin_ImportFeature : public ModelAPI_Feature
 {
  public:
   /// Extrusion kind
@@ -43,26 +43,26 @@ class EXCHANGEPLUGIN_EXPORT ExchangePlugin_ImportFeature : public ModelAPI_Featu
     return MY_FILE_PATH_ID;
   }
 
-  ExchangePlugin_ImportFeature();
-  virtual ~ExchangePlugin_ImportFeature();
+  EXCHANGEPLUGIN_EXPORT ExchangePlugin_ImportFeature();
+  EXCHANGEPLUGIN_EXPORT virtual ~ExchangePlugin_ImportFeature();
 
   /// Returns the unique kind of a feature
-  virtual const std::string& getKind();
+  EXCHANGEPLUGIN_EXPORT virtual const std::string& getKind();
 
   /// Request for initialization of data model of the feature: adding all attributes
-  virtual void initAttributes();
+  EXCHANGEPLUGIN_EXPORT virtual void initAttributes();
 
   /// Computes or recomputes the results
-  virtual void execute();
+  EXCHANGEPLUGIN_EXPORT virtual void execute();
 
-  virtual bool isInHistory()
+  EXCHANGEPLUGIN_EXPORT virtual bool isInHistory()
   {
     return false;
   }
 
  protected:
-  bool importFile(const std::string& theFileName);
-  LibHandle loadImportPlugin(const std::string& theFormatName);
+  EXCHANGEPLUGIN_EXPORT bool importFile(const std::string& theFileName);
+  EXCHANGEPLUGIN_EXPORT LibHandle loadImportPlugin(const std::string& theFormatName);
   
 };
 

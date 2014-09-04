@@ -11,6 +11,7 @@
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Validator.h>
 #include <Events_Loop.h>
 #include <Events_LongOp.h>
 
@@ -94,8 +95,14 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
     if (aMustbeUpdated) {
 
       if (boost::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
-          !theFeature->isPersistentResult())
-        theFeature->execute();
+          !theFeature->isPersistentResult()) {
+        ModelAPI_ValidatorsFactory* aFactory = ModelAPI_PluginManager::get()->validators();
+        if (aFactory->validate(theFeature)) {
+          theFeature->execute();
+        } else {
+          theFeature->eraseResults();
+        }
+      }
       // redisplay all results
       static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();

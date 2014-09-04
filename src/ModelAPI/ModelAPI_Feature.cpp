@@ -5,6 +5,7 @@
 #include "ModelAPI_Feature.h"
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <Events_Loop.h>
 
@@ -63,9 +64,25 @@ void ModelAPI_Feature::removeResult(const boost::shared_ptr<ModelAPI_Result>& th
   std::list<boost::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
   for(; aResIter != myResults.end(); aResIter++) {
     if (*aResIter == theResult) {
+      std::string aGroup = (*aResIter)->groupName();
+      (*aResIter)->data()->erase();
       myResults.erase(aResIter);
+      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+      ModelAPI_EventCreator::get()->sendDeleted(document(), aGroup);
+      break;
     }
   }
+}
+
+void ModelAPI_Feature::eraseResults()
+{
+  std::list<boost::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
+  for(; aResIter != myResults.end(); aResIter++) {
+      (*aResIter)->data()->erase();
+      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+      ModelAPI_EventCreator::get()->sendDeleted(document(), (*aResIter)->groupName());
+  }
+  myResults.clear();
 }
 
 boost::shared_ptr<ModelAPI_Document> ModelAPI_Feature::documentToAdd()

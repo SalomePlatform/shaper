@@ -7,6 +7,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_ResultValidator.h>
+#include <ModelAPI_AttributeDouble.h>
 #include <GeomDataAPI_Point2D.h>
 
 bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
@@ -41,4 +42,12 @@ bool SketchPlugin_DistanceAttrValidator::isValid(
     return isValid(aFeature, theArguments, anAttr->object());
   }
   return true; // it may be not reference attribute, in this case, it is OK
+}
+
+bool SketchPlugin_RadiusValidator::isValid(
+    const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const
+{
+  boost::shared_ptr<ModelAPI_AttributeDouble> aDouble = 
+    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
+  return aDouble->isInitialized() && aDouble->value() > 1.e-5;
 }

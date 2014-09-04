@@ -83,6 +83,9 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// makes attribute initialized
   virtual void sendAttributeUpdated(ModelAPI_Attribute* theAttr) = 0;
 
+  /// Erases all the data from the data model
+  virtual void erase() = 0;
+
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Data()
   {

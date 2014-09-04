@@ -127,6 +127,8 @@ class Model_Data : public ModelAPI_Data
   {
     myObject = theObject;
   }
+
+  MODEL_EXPORT virtual void erase();
 };
 
 #endif

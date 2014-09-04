@@ -14,7 +14,9 @@
       </feature>
       <feature id="SketchCircle" title="Circle" tooltip="Create a new circle" icon=":icons/circle.png">
         <point_selector id="CircleCenter" title="Center" tooltip="Center of the circle"/>
-        <point2ddistance id="CircleRadius" first_point="CircleCenter" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set Radius"/>
+        <point2ddistance id="CircleRadius" first_point="CircleCenter" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set Radius">
+          <validator id="SketchPlugin_RadiusValidator"/>
+        </point2ddistance>
       </feature>
       <feature id="SketchArc" title="Arc" tooltip="Create a new arc of a circle" icon=":icons/arc.png">
         <point_selector id="ArcCenter" title="Center" tooltip="Center of the arc"/>
