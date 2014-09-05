@@ -960,6 +960,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     showObjects(aObjects, true);
   else if (theId == "HIDE_CMD")
     showObjects(aObjects, false);
+  else if (theId == "SHOW_ONLY_CMD")
+    showOnlyObjects(aObjects);
 }
 
 //**************************************************************
@@ -1049,6 +1051,14 @@ void XGUI_Workshop::showObjects(const QList<ObjectPtr>& theList, bool isVisible)
   }
   myDisplayer->updateViewer();
 }
+
+//**************************************************************
+void XGUI_Workshop::showOnlyObjects(const QList<ObjectPtr>& theList)
+{
+  myDisplayer->eraseAll(false);
+  showObjects(theList, true);
+}
+
 
 //**************************************************************
 void XGUI_Workshop::updateCommandsOnViewSelection()
