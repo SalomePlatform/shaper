@@ -29,7 +29,7 @@
       <feature id="SketchConstraintCoincidence" title="Coincident" tooltip="Create constraint for the coincidence of two points" internal="1"/>
 
       <feature id="SketchConstraintDistance" title="Distance" tooltip="Create constraint for the distance from a point to an object">
-        <label title="Select point and another feature (point or point on line) between which to calculate distance" tooltip="Select point and another feature (point or point on line) between which to calculate distance"/>
+        <label title="Select point and another object (point or point on line) between which to calculate distance" tooltip="Select point and another feature (point or point on line) between which to calculate distance"/>
         <feature_or_attribute_selector id="ConstraintEntityA" label="First object" tooltip="Select an point in the viewer">
           <validator id="SketchPlugin_ResultPointValidator"/>
           <validator id="SketchPlugin_ResultLineValidator"/>
