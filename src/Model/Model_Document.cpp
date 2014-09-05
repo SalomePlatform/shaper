@@ -90,50 +90,50 @@ bool Model_Document::load(const char* theFileName)
   if (isError) {
     switch (aStatus) {
       case PCDM_RS_UnknownDocument:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_UnknownDocument"));
+        Events_Error::send(std::string("Can not open document: unknown format"));
         break;
       case PCDM_RS_AlreadyRetrieved:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_AlreadyRetrieved"));
+        Events_Error::send(std::string("Can not open document: already opened"));
         break;
       case PCDM_RS_AlreadyRetrievedAndModified:
         Events_Error::send(
-            std::string("Can not open document: PCDM_RS_AlreadyRetrievedAndModified"));
+            std::string("Can not open document: already opened and modified"));
         break;
       case PCDM_RS_NoDriver:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_NoDriver"));
+        Events_Error::send(std::string("Can not open document: driver library is not found"));
         break;
       case PCDM_RS_UnknownFileDriver:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_UnknownFileDriver"));
+        Events_Error::send(std::string("Can not open document: unknown driver for opening"));
         break;
       case PCDM_RS_OpenError:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_OpenError"));
+        Events_Error::send(std::string("Can not open document: file open error"));
         break;
       case PCDM_RS_NoVersion:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_NoVersion"));
+        Events_Error::send(std::string("Can not open document: invalid version"));
         break;
       case PCDM_RS_NoModel:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_NoModel"));
+        Events_Error::send(std::string("Can not open document: no data model"));
         break;
       case PCDM_RS_NoDocument:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_NoDocument"));
+        Events_Error::send(std::string("Can not open document: no document inside"));
         break;
       case PCDM_RS_FormatFailure:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_FormatFailure"));
+        Events_Error::send(std::string("Can not open document: format failure"));
         break;
       case PCDM_RS_TypeNotFoundInSchema:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_TypeNotFoundInSchema"));
+        Events_Error::send(std::string("Can not open document: invalid object"));
         break;
       case PCDM_RS_UnrecognizedFileFormat:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_UnrecognizedFileFormat"));
+        Events_Error::send(std::string("Can not open document: unrecognized file format"));
         break;
       case PCDM_RS_MakeFailure:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_MakeFailure"));
+        Events_Error::send(std::string("Can not open document: make failure"));
         break;
       case PCDM_RS_PermissionDenied:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_PermissionDenied"));
+        Events_Error::send(std::string("Can not open document: permission denied"));
         break;
       case PCDM_RS_DriverFailure:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_DriverFailure"));
+        Events_Error::send(std::string("Can not open document: driver failure"));
         break;
       default:
         Events_Error::send(std::string("Can not open document: unknown error"));
@@ -172,14 +172,14 @@ bool Model_Document::save(const char* theFileName)
   if (!isDone) {
     switch (aStatus) {
       case PCDM_SS_DriverFailure:
-        Events_Error::send(std::string("Can not save document: PCDM_SS_DriverFailure"));
+        Events_Error::send(std::string("Can not save document: save driver-library failure"));
         break;
       case PCDM_SS_WriteFailure:
-        Events_Error::send(std::string("Can not save document: PCDM_SS_WriteFailure"));
+        Events_Error::send(std::string("Can not save document: file writing failure"));
         break;
       case PCDM_SS_Failure:
       default:
-        Events_Error::send(std::string("Can not save document: PCDM_SS_Failure"));
+        Events_Error::send(std::string("Can not save document"));
         break;
     }
   }
