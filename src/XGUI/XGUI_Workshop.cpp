@@ -1115,6 +1115,8 @@ void XGUI_Workshop::displayAllResults()
 //**************************************************************
 void XGUI_Workshop::displayDocumentResults(DocumentPtr theDoc)
 {
+  if (!theDoc)
+    return;
   displayGroupResults(theDoc, ModelAPI_ResultConstruction::group());
   displayGroupResults(theDoc, ModelAPI_ResultBody::group());
 }
