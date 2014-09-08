@@ -988,6 +988,8 @@ void XGUI_Workshop::onWidgetValuesChanged()
 //**************************************************************
 void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
 {
+  if (theFeature)
+    theFeature->activate();
   changeCurrentDocument(theFeature);
   myObjectBrowser->activatePart(theFeature);
 }

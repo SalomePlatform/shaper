@@ -333,7 +333,13 @@ int XGUI_PartDataModel::rowCount(const QModelIndex& parent) const
   }
   switch (parent.internalId()) {
     case MyRoot:
-      return 3 + partDocument()->size(ModelAPI_Feature::group());
+      {
+        DocumentPtr aDoc = partDocument();
+        if (aDoc)
+          return 3 + aDoc->size(ModelAPI_Feature::group());
+        else 
+          return 0;
+      }
     case ParamsFolder:
       return partDocument()->size(ModelAPI_ResultParameters::group());
     case ConstructFolder:
