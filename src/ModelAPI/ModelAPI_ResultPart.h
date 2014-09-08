@@ -41,6 +41,9 @@ class ModelAPI_ResultPart : public ModelAPI_Result
 
   /// Returns the part-document of this result
   virtual boost::shared_ptr<ModelAPI_Document> partDoc() = 0;
+
+  /// Sets this document as current and if it is not loaded yet, loads it
+  virtual void activate() = 0;
 };
 
 //! Pointer on feature object

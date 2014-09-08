@@ -253,10 +253,11 @@ void Model_Document::finishOperation()
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
         ->setCheckTransactions(false);  // for nested transaction commit
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
         ->setCheckTransactions(true);  // for nested transaction commit
@@ -654,6 +655,9 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   // after all updates, sends a message that groups of features were created or updated
   boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
     ->setCheckTransactions(false);
+  Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->activateFlushes(false);
+
   // update all objects by checking are they of labels or not
   std::set<FeaturePtr> aNewFeatures, aKeptFeatures;
   TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
@@ -709,7 +713,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
         ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_Feature::group());
       }
       // results of this feature must be redisplayed (hided)
-      static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
       for (; aRIter != aResults.cend(); aRIter++) {
@@ -725,11 +729,14 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   }
 
   myExecuteFeatures = false;
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  if (theMarkUpdated)
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  aLoop->activateFlushes(true);
+
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  if (theMarkUpdated) {
+    aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  }
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
     ->setCheckTransactions(true);
   myExecuteFeatures = true;
