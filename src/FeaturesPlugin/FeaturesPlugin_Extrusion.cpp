@@ -33,12 +33,20 @@ void FeaturesPlugin_Extrusion::execute()
       ModelAPI_AttributeReference>(data()->attribute(FeaturesPlugin_Extrusion::FACE_ID()));
   if (!aFaceRef)
     return;
+  boost::shared_ptr<GeomAPI_Shape> aFace;
   boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = boost::dynamic_pointer_cast<
       ModelAPI_ResultConstruction>(aFaceRef->value());
-  if (!aConstr)
-    return;
-  boost::shared_ptr<GeomAPI_Shape> aFace = aConstr->shape();
-  if (!aFace)
+  if (aConstr) {
+    aFace = aConstr->shape();
+  }
+  if (!aFace) {
+    // Check for body
+    boost::shared_ptr<ModelAPI_ResultBody> aBody = boost::dynamic_pointer_cast<
+        ModelAPI_ResultBody>(aFaceRef->value());
+    if (aBody) 
+      aFace = aBody->shape();
+  }
+  if (!aFace) 
     return;
 
   double aSize = data()->real(FeaturesPlugin_Extrusion::SIZE_ID())->value();

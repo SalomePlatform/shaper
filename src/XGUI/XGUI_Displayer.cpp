@@ -279,25 +279,22 @@ void XGUI_Displayer::setSelected(const QList<ObjectPtr>& theResults, const bool 
     updateViewer();
 }
 
-/*void XGUI_Displayer::EraseAll(const bool isUpdateViewer)
+void XGUI_Displayer::eraseAll(const bool isUpdateViewer)
  {
- Handle(AIS_InteractiveContext) ic = AISContext();
+   Handle(AIS_InteractiveContext) ic = AISContext();
 
- AIS_ListOfInteractive aList;
- ic->DisplayedObjects(aList);
- AIS_ListIteratorOfListOfInteractive anIter(aList);
- for (; anIter.More(); anIter.Next()) {
- if ((anIter.Value()->DynamicType() == STANDARD_TYPE(AIS_Trihedron)))
- continue;
-
- // erase an object
- Handle(AIS_InteractiveObject) anIO = anIter.Value();
- ic->Erase(anIO, false);
+   ResultToAISMap::iterator aIt;
+   for (aIt = myResult2AISObjectMap.begin(); aIt != myResult2AISObjectMap.end(); aIt++) {
+     // erase an object
+     boost::shared_ptr<GeomAPI_AISObject> aAISObj = (*aIt).second;
+     Handle(AIS_InteractiveObject) anIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+     if (!anIO.IsNull())
+      ic->Remove(anIO, false);
+   }
+   myResult2AISObjectMap.clear();
+   if (isUpdateViewer)
+     updateViewer();
  }
- myResult2AISObjectMap.clear();
- if (isUpdateViewer)
- updateViewer();
- }*/
 
 void XGUI_Displayer::eraseDeletedResults(const bool isUpdateViewer)
 {

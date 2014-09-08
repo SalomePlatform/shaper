@@ -31,25 +31,21 @@ void SketchPlugin_ConstraintLength::initAttributes()
 
 void SketchPlugin_ConstraintLength::execute()
 {
-  if (data()->attribute(SketchPlugin_Constraint::ENTITY_A())->isInitialized()
-      && !data()->attribute(SketchPlugin_Constraint::VALUE())->isInitialized()) {
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
+  if (aFeature) {
+    // set length value
+    boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 = boost::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(aFeature->data()->attribute(SketchPlugin_Line::START_ID()));
+    boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 = boost::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(aFeature->data()->attribute(SketchPlugin_Line::END_ID()));
 
-    boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
-        ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
-    if (aFeature) {
-      // set length value
-      boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 = boost::dynamic_pointer_cast<
-          GeomDataAPI_Point2D>(aFeature->data()->attribute(SketchPlugin_Line::START_ID()));
-      boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 = boost::dynamic_pointer_cast<
-          GeomDataAPI_Point2D>(aFeature->data()->attribute(SketchPlugin_Line::END_ID()));
+    double aLenght = aPoint1->pnt()->distance(aPoint2->pnt());
 
-      double aLenght = aPoint1->pnt()->distance(aPoint2->pnt());
-
-      boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = boost::dynamic_pointer_cast<
-          ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-      aValueAttr->setValue(aLenght);
-    }
+    boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = boost::dynamic_pointer_cast<
+        ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
+    aValueAttr->setValue(aLenght);
   }
 }
 

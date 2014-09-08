@@ -17,10 +17,10 @@ class QKeyEvent;
 
 /**\class XGUI_OperationMgr
  * \ingroup GUI
- * \brief Operation manager. Servers to manupulate to the workshop operations. Contains a stack
- * of started operations. In simple case, if only one operration is started, the stack contains
+ * \brief Operation manager. Servers to manipulate to the workshop operations. Contains a stack
+ * of started operations. In simple case, if only one operation is started, the stack contains
  * one operation. It is possible for some kind of operations to start them above already
- * started one. In that case, the previous active operation becames suspended, a new one - active.
+ * started one. In that case, the previous active operation becomes suspended, a new one - active.
  * The new operation is added to the top of the stack. Then it is finished, it is removed from
  * the stack and the previous operation is activated.
  */

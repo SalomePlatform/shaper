@@ -46,6 +46,9 @@ void XGUI_ContextMenuMgr::createActions()
   aAction = new QAction(QIcon(":pictures/eye_pencil.png"), tr("Show"), this);
   addAction("SHOW_CMD", aAction);
 
+  aAction = new QAction(QIcon(":pictures/eye_pencil.png"), tr("Show only"), this);
+  addAction("SHOW_ONLY_CMD", aAction);
+
   aAction = new QAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide"), this);
   addAction("HIDE_CMD", aAction);
 }
@@ -121,8 +124,10 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
         } else {
           if (aDisplayer->isVisible(aObject))
             aMenu->addAction(action("HIDE_CMD"));
-          else
+          else {
             aMenu->addAction(action("SHOW_CMD"));
+          }
+          aMenu->addAction(action("SHOW_ONLY_CMD"));
         }
       } else {  // If feature is 0 the it means that selected root object (document)
         if (aMgr->currentDocument() != aMgr->rootDocument())
@@ -145,6 +150,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
       if (hasResult) {
         aMenu->addAction(action("SHOW_CMD"));
         aMenu->addAction(action("HIDE_CMD"));
+        aMenu->addAction(action("SHOW_ONLY_CMD"));
       }
       if (hasFeature)
         aMenu->addAction(action("DELETE_CMD"));
