@@ -53,6 +53,8 @@ void XGUI_Preferences::updateCustomProps()
 
 void XGUI_Preferences::loadCustomProps()
 {
+  if(!myResourceMgr)
+    return;
   QStringList aSections = myResourceMgr->sections();
   foreach (QString aSection, aSections)
   {

@@ -105,9 +105,9 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @REM -------------------------
 @REM LIBXML2
-@SET LIBXML_DIR=%PDIR%\libxml2-2.9.0
-@SET PATH=%LIBXML_DIR%\lib;%PATH%
-@SET PATH=%LIBXML_DIR%\bin;%PATH%
+@SET LIBXML2_ROOT_DIR=%PDIR%\libxml2-2.9.0
+@SET PATH=%LIBXML2_ROOT_DIR%\lib;%PATH%
+@SET PATH=%LIBXML2_ROOT_DIR%\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
