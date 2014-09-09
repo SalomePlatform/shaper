@@ -960,6 +960,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     showObjects(aObjects, true);
   else if (theId == "HIDE_CMD")
     showObjects(aObjects, false);
+  else if (theId == "SHOW_ONLY_CMD")
+    showOnlyObjects(aObjects);
 }
 
 //**************************************************************
@@ -986,6 +988,8 @@ void XGUI_Workshop::onWidgetValuesChanged()
 //**************************************************************
 void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
 {
+  if (theFeature)
+    theFeature->activate();
   changeCurrentDocument(theFeature);
   myObjectBrowser->activatePart(theFeature);
 }
@@ -1051,6 +1055,14 @@ void XGUI_Workshop::showObjects(const QList<ObjectPtr>& theList, bool isVisible)
 }
 
 //**************************************************************
+void XGUI_Workshop::showOnlyObjects(const QList<ObjectPtr>& theList)
+{
+  myDisplayer->eraseAll(false);
+  showObjects(theList, true);
+}
+
+
+//**************************************************************
 void XGUI_Workshop::updateCommandsOnViewSelection()
 {
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
@@ -1103,6 +1115,8 @@ void XGUI_Workshop::displayAllResults()
 //**************************************************************
 void XGUI_Workshop::displayDocumentResults(DocumentPtr theDoc)
 {
+  if (!theDoc)
+    return;
   displayGroupResults(theDoc, ModelAPI_ResultConstruction::group());
   displayGroupResults(theDoc, ModelAPI_ResultBody::group());
 }

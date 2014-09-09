@@ -97,7 +97,7 @@ class XGUI_EXPORT XGUI_Displayer
 
   /// Erase all presentations
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  //void EraseAll(const bool isUpdateViewer = true);
+  void eraseAll(const bool isUpdateViewer = true);
 
   /// Erase AIS interactive objects, which has an empty feature in the internal map
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly

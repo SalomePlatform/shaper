@@ -154,6 +154,9 @@ Q_OBJECT
   //! Show the given features in 3d Viewer
   void showObjects(const QList<ObjectPtr>& theList, bool isVisible);
 
+  //! Show the given features in 3d Viewer
+  void showOnlyObjects(const QList<ObjectPtr>& theList);
+
   ModuleBase_IModule* module() const
   {
     return myModule;

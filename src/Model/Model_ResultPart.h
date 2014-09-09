@@ -23,7 +23,10 @@ class Model_ResultPart : public ModelAPI_ResultPart
   /// Part has no stored feature: this method returns NULL
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> owner();
 
- protected:
+  /// Sets this document as current and if it is not loaded yet, loads it
+  MODEL_EXPORT virtual void activate();
+
+protected:
   /// makes a result on a temporary feature (an action)
   Model_ResultPart();
 

@@ -24,7 +24,7 @@ class ModelAPI_Document;
 class ModelAPI_Object
 {
   boost::shared_ptr<ModelAPI_Data> myData;  ///< manager of the data model of a feature
-  boost::shared_ptr<ModelAPI_Document> myDoc;  ///< document this feature belongs to
+  boost::shared_ptr<ModelAPI_Document> myDoc;  ///< document this object belongs to
  public:
   /// By default object is displayed in the object browser.
   virtual bool isInHistory()

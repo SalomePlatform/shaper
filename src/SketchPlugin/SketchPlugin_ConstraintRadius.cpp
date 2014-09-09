@@ -34,32 +34,28 @@ void SketchPlugin_ConstraintRadius::initAttributes()
 
 void SketchPlugin_ConstraintRadius::execute()
 {
-  if (data()->attribute(SketchPlugin_Constraint::ENTITY_A())->isInitialized()
-      && !data()->attribute(SketchPlugin_Constraint::VALUE())->isInitialized()) {
-
-    boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
-        ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
-    if (aFeature) {
-      double aRadius = 0;
-      boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
-      if (aFeature->getKind() == SketchPlugin_Circle::ID()) {
-        AttributeDoublePtr anAttribute = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-            aData->attribute(SketchPlugin_Circle::RADIUS_ID()));
-        if (anAttribute)
-          aRadius = anAttribute->value();
-      } else if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
-        boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = boost::dynamic_pointer_cast<
-            GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::CENTER_ID()));
-        boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = boost::dynamic_pointer_cast<
-            GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));
-        if (aCenterAttr && aStartAttr)
-          aRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
-      }
-      boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = boost::dynamic_pointer_cast<
-          ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-      aValueAttr->setValue(aRadius);
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
+  if (aFeature) {
+    double aRadius = 0;
+    boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
+    if (aFeature->getKind() == SketchPlugin_Circle::ID()) {
+      AttributeDoublePtr anAttribute = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+          aData->attribute(SketchPlugin_Circle::RADIUS_ID()));
+      if (anAttribute)
+        aRadius = anAttribute->value();
+    } else if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
+      boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = boost::dynamic_pointer_cast<
+          GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::CENTER_ID()));
+      boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = boost::dynamic_pointer_cast<
+          GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));
+      if (aCenterAttr && aStartAttr)
+        aRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
     }
+    boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = boost::dynamic_pointer_cast<
+        ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
+    aValueAttr->setValue(aRadius);
   }
 }
 

@@ -15,6 +15,7 @@
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
+#include <TDataStd_UAttribute.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TDataStd_ReferenceArray.hxx>
 #include <TDataStd_HLabelArray1.hxx>
@@ -90,50 +91,50 @@ bool Model_Document::load(const char* theFileName)
   if (isError) {
     switch (aStatus) {
       case PCDM_RS_UnknownDocument:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_UnknownDocument"));
+        Events_Error::send(std::string("Can not open document: unknown format"));
         break;
       case PCDM_RS_AlreadyRetrieved:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_AlreadyRetrieved"));
+        Events_Error::send(std::string("Can not open document: already opened"));
         break;
       case PCDM_RS_AlreadyRetrievedAndModified:
         Events_Error::send(
-            std::string("Can not open document: PCDM_RS_AlreadyRetrievedAndModified"));
+            std::string("Can not open document: already opened and modified"));
         break;
       case PCDM_RS_NoDriver:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_NoDriver"));
+        Events_Error::send(std::string("Can not open document: driver library is not found"));
         break;
       case PCDM_RS_UnknownFileDriver:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_UnknownFileDriver"));
+        Events_Error::send(std::string("Can not open document: unknown driver for opening"));
         break;
       case PCDM_RS_OpenError:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_OpenError"));
+        Events_Error::send(std::string("Can not open document: file open error"));
         break;
       case PCDM_RS_NoVersion:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_NoVersion"));
+        Events_Error::send(std::string("Can not open document: invalid version"));
         break;
       case PCDM_RS_NoModel:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_NoModel"));
+        Events_Error::send(std::string("Can not open document: no data model"));
         break;
       case PCDM_RS_NoDocument:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_NoDocument"));
+        Events_Error::send(std::string("Can not open document: no document inside"));
         break;
       case PCDM_RS_FormatFailure:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_FormatFailure"));
+        Events_Error::send(std::string("Can not open document: format failure"));
         break;
       case PCDM_RS_TypeNotFoundInSchema:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_TypeNotFoundInSchema"));
+        Events_Error::send(std::string("Can not open document: invalid object"));
         break;
       case PCDM_RS_UnrecognizedFileFormat:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_UnrecognizedFileFormat"));
+        Events_Error::send(std::string("Can not open document: unrecognized file format"));
         break;
       case PCDM_RS_MakeFailure:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_MakeFailure"));
+        Events_Error::send(std::string("Can not open document: make failure"));
         break;
       case PCDM_RS_PermissionDenied:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_PermissionDenied"));
+        Events_Error::send(std::string("Can not open document: permission denied"));
         break;
       case PCDM_RS_DriverFailure:
-        Events_Error::send(std::string("Can not open document: PCDM_RS_DriverFailure"));
+        Events_Error::send(std::string("Can not open document: driver failure"));
         break;
       default:
         Events_Error::send(std::string("Can not open document: unknown error"));
@@ -172,14 +173,14 @@ bool Model_Document::save(const char* theFileName)
   if (!isDone) {
     switch (aStatus) {
       case PCDM_SS_DriverFailure:
-        Events_Error::send(std::string("Can not save document: PCDM_SS_DriverFailure"));
+        Events_Error::send(std::string("Can not save document: save driver-library failure"));
         break;
       case PCDM_SS_WriteFailure:
-        Events_Error::send(std::string("Can not save document: PCDM_SS_WriteFailure"));
+        Events_Error::send(std::string("Can not save document: file writing failure"));
         break;
       case PCDM_SS_Failure:
       default:
-        Events_Error::send(std::string("Can not save document: PCDM_SS_Failure"));
+        Events_Error::send(std::string("Can not save document"));
         break;
     }
   }
@@ -253,10 +254,11 @@ void Model_Document::finishOperation()
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
         ->setCheckTransactions(false);  // for nested transaction commit
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
         ->setCheckTransactions(true);  // for nested transaction commit
@@ -654,6 +656,9 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   // after all updates, sends a message that groups of features were created or updated
   boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
     ->setCheckTransactions(false);
+  Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->activateFlushes(false);
+
   // update all objects by checking are they of labels or not
   std::set<FeaturePtr> aNewFeatures, aKeptFeatures;
   TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
@@ -709,7 +714,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
         ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_Feature::group());
       }
       // results of this feature must be redisplayed (hided)
-      static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
       for (; aRIter != aResults.cend(); aRIter++) {
@@ -725,11 +730,14 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   }
 
   myExecuteFeatures = false;
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  if (theMarkUpdated)
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  aLoop->activateFlushes(true);
+
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  if (theMarkUpdated) {
+    aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  }
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
     ->setCheckTransactions(true);
   myExecuteFeatures = true;
@@ -756,10 +764,16 @@ void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData
   }
 }
 
+static const Standard_GUID ID_CONSTRUCTION("b59fa408-8ab1-42b8-980c-af5adeebe7e4");
+static const Standard_GUID ID_BODY("c1148e9a-9b17-4e9c-9160-18e918fd0013");
+static const Standard_GUID ID_PART("1b3319b9-3e0a-4298-a1dc-3fb5aaf9be59");
+
 boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstruction(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  ObjectPtr anOldObject = object(resultLabel(theFeatureData, theIndex));
+  TDF_Label aLab = resultLabel(theFeatureData, theIndex);
+  TDataStd_UAttribute::Set(aLab, ID_CONSTRUCTION);
+  ObjectPtr anOldObject = object(aLab);
   boost::shared_ptr<ModelAPI_ResultConstruction> aResult;
   if (anOldObject) {
     aResult = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(anOldObject);
@@ -774,7 +788,9 @@ boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstructio
 boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  ObjectPtr anOldObject = object(resultLabel(theFeatureData, theIndex));
+  TDF_Label aLab = resultLabel(theFeatureData, theIndex);
+  TDataStd_UAttribute::Set(aLab, ID_BODY);
+  ObjectPtr anOldObject = object(aLab);
   boost::shared_ptr<ModelAPI_ResultBody> aResult;
   if (anOldObject) {
     aResult = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(anOldObject);
@@ -789,7 +805,9 @@ boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody(
 boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
-  ObjectPtr anOldObject = object(resultLabel(theFeatureData, theIndex));
+  TDF_Label aLab = resultLabel(theFeatureData, theIndex);
+  TDataStd_UAttribute::Set(aLab, ID_PART);
+  ObjectPtr anOldObject = object(aLab);
   boost::shared_ptr<ModelAPI_ResultPart> aResult;
   if (anOldObject) {
     aResult = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(anOldObject);
@@ -835,13 +853,21 @@ void Model_Document::updateResults(FeaturePtr theFeature)
   int aResSize = theFeature->results().size();
   TDF_ChildIterator aLabIter(resultLabel(theFeature->data(), 0).Father());
   for(; aLabIter.More(); aLabIter.Next()) {
-    // here must be at least Name
+    // here must be GUID of the feature
     int aResIndex = aLabIter.Value().Tag() - 1;
-    if (aLabIter.Value().FindChild(TAG_FEATURE_ARGUMENTS).HasAttribute() && 
-        aResSize <= aResIndex) 
-    {
-      ResultBodyPtr aNewBody = createBody(theFeature->data(), aResIndex);
-      theFeature->setResult(aNewBody, aResIndex);
+    ResultPtr aNewBody;
+    if (aResSize <= aResIndex) {
+      TDF_Label anArgLab = aLabIter.Value();
+      if (anArgLab.IsAttribute(ID_BODY)) {
+        aNewBody = createBody(theFeature->data(), aResIndex);
+      } else if (anArgLab.IsAttribute(ID_PART)) {
+        aNewBody = createPart(theFeature->data(), aResIndex);
+      } else if (!anArgLab.IsAttribute(ID_CONSTRUCTION)) {
+        Events_Error::send("Unknown type of result if found in the document");
+      }
+      if (aNewBody) {
+        theFeature->setResult(aNewBody, aResIndex);
+      }
     }
   }
 }

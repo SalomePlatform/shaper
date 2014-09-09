@@ -152,6 +152,7 @@ bool XGUI_OperationMgr::canStopOperation()
 void XGUI_OperationMgr::onCommitOperation()
 {
   ModuleBase_Operation* anOperation = currentOperation();
+  anOperation->onWidgetActivated(NULL);
   if (anOperation)
     anOperation->commit();
 }

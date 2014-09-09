@@ -29,12 +29,12 @@
       <feature id="SketchConstraintCoincidence" title="Coincident" tooltip="Create constraint for the coincidence of two points" internal="1"/>
 
       <feature id="SketchConstraintDistance" title="Distance" tooltip="Create constraint for the distance from a point to an object">
-        <label title="Select point and another feature (point or point on line) between which to calculate distance" tooltip="Select point and another feature (point or point on line) between which to calculate distance"/>
-        <feature_or_attribute_selector id="ConstraintEntityA" label="First object" tooltip="Select an point in the viewer">
+        <label title="Select objects for distance difinition. Following objects can be accepted: point, line end point, line, center of circle or arc."/>
+        <feature_or_attribute_selector id="ConstraintEntityA" label="First object" tooltip="Select point, line end point, line, center of circle or arc.">
           <validator id="SketchPlugin_ResultPointValidator"/>
           <validator id="SketchPlugin_ResultLineValidator"/>
         </feature_or_attribute_selector>
-        <feature_or_attribute_selector id="ConstraintEntityB" label="Last object" tooltip="Select an point in the viewer">
+        <feature_or_attribute_selector id="ConstraintEntityB" label="Last object" tooltip="Select point, line end point, line, center of circle or arc.">
           <validator id="SketchPlugin_ResultPointValidator"/>
           <validator id="SketchPlugin_ResultLineValidator"/>
           <validator id="SketchPlugin_DistanceAttrValidator" parameters="ConstraintEntityA"/>

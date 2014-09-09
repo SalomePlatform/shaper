@@ -5,6 +5,7 @@
 #include <Model_ResultPart.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
+#include <ModelAPI_PluginManager.h>
 
 boost::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
 {
@@ -26,4 +27,18 @@ void Model_ResultPart::setData(boost::shared_ptr<ModelAPI_Data> theData)
   if (theData) {
     data()->addAttribute(DOC_REF(), ModelAPI_AttributeDocRef::type());
   }
+}
+
+void Model_ResultPart::activate()
+{
+  boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->docRef(DOC_REF());
+  
+  if (!aDocRef->value()) {  // create (or open) a document if it is not yet created
+    boost::shared_ptr<ModelAPI_Document> aDoc = document()->subDocument(data()->name());
+    if (aDoc) {
+      aDocRef->setValue(aDoc);
+    }
+  }
+  if (aDocRef->value())
+    ModelAPI_PluginManager::get()->setCurrentDocument(aDocRef->value());
 }

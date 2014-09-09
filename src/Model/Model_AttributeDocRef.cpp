@@ -11,6 +11,7 @@ using namespace std;
 
 void Model_AttributeDocRef::setValue(boost::shared_ptr<ModelAPI_Document> theDoc)
 {
+  myDoc = theDoc;
   TCollection_ExtendedString aNewID(theDoc->id().c_str());
   if (!myIsInitialized || myComment->Get() != aNewID) {
     myComment->Set(TCollection_ExtendedString(theDoc->id().c_str()));
@@ -20,11 +21,7 @@ void Model_AttributeDocRef::setValue(boost::shared_ptr<ModelAPI_Document> theDoc
 
 boost::shared_ptr<ModelAPI_Document> Model_AttributeDocRef::value()
 {
-  if (myComment->Get().Length())
-    return Model_Application::getApplication()->getDocument(
-        TCollection_AsciiString(myComment->Get()).ToCString());
-  // not initialized
-  return boost::shared_ptr<ModelAPI_Document>();
+  return myDoc;
 }
 
 Model_AttributeDocRef::Model_AttributeDocRef(TDF_Label& theLabel)

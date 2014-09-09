@@ -103,6 +103,8 @@ void Events_Loop::registerListener(Events_Listener* theListener, const Events_ID
 
 void Events_Loop::flush(const Events_ID& theID)
 {
+  if (!myFlushActive)
+    return;
   std::map<char*, Events_MessageGroup*>::iterator aMyGroup = myGroups.find(theID.eventText());
   if (aMyGroup != myGroups.end()) {  // really sends
     Events_MessageGroup* aGroup = aMyGroup->second;
@@ -110,4 +112,9 @@ void Events_Loop::flush(const Events_ID& theID)
     send(*aGroup, false);
     delete aGroup;
   }
+}
+
+void Events_Loop::activateFlushes(const bool theActivate)
+{
+  myFlushActive = theActivate;
 }

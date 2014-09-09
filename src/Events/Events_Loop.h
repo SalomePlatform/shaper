@@ -31,11 +31,12 @@ class Events_Loop
   /// map from event ID to groupped messages (accumulated on flush)
   std::map<char*, Events_MessageGroup*> myGroups;
 
+  /// to process flushes or not
+  bool myFlushActive;
+
   //! The empty constructor, will be called at startup of the application, only once
-  Events_Loop()
-  {
-  }
-  ;
+  Events_Loop() : myFlushActive(true) {}
+
  public:
   ///! Returns the main object of the loop, one per application.
   EVENTS_EXPORT static Events_Loop* loop();
@@ -54,6 +55,10 @@ class Events_Loop
 
   //! Initializes sending of a group-message by the given ID
   EVENTS_EXPORT void flush(const Events_ID& theID);
+
+  //! Allows to disable flushes: needed in synchronization of document mechanism 
+  //! (to synchronize all and only then flush create, update, etc in correct order)
+  EVENTS_EXPORT void activateFlushes(const bool theActivate);
 };
 
 #endif

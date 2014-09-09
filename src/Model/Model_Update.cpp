@@ -14,6 +14,7 @@
 #include <ModelAPI_Validator.h>
 #include <Events_Loop.h>
 #include <Events_LongOp.h>
+#include <Events_Error.h>
 
 using namespace std;
 
@@ -98,7 +99,13 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
           !theFeature->isPersistentResult()) {
         ModelAPI_ValidatorsFactory* aFactory = ModelAPI_PluginManager::get()->validators();
         if (aFactory->validate(theFeature)) {
-          theFeature->execute();
+          try {
+            theFeature->execute();
+          } catch(...) {
+            Events_Error::send(
+              "Feature " + theFeature->getKind() + " has failed during the execution");
+            theFeature->eraseResults();
+          }
         } else {
           theFeature->eraseResults();
         }

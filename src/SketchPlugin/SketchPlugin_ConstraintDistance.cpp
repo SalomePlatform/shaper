@@ -36,26 +36,24 @@ void SketchPlugin_ConstraintDistance::execute()
   AttributeDoublePtr anAttr_Value = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
       aData->attribute(SketchPlugin_Constraint::VALUE()));
 
-  if (!anAttr_Value->isInitialized()) {
-    boost::shared_ptr<GeomDataAPI_Point2D> aPoint_A = getFeaturePoint(
-        aData, SketchPlugin_Constraint::ENTITY_A());
-    boost::shared_ptr<GeomDataAPI_Point2D> aPoint_B = getFeaturePoint(
-        aData, SketchPlugin_Constraint::ENTITY_B());
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint_A = getFeaturePoint(
+      aData, SketchPlugin_Constraint::ENTITY_A());
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint_B = getFeaturePoint(
+      aData, SketchPlugin_Constraint::ENTITY_B());
 
-    if (aPoint_A && aPoint_B) {  // both points
-      anAttr_Value->setValue(aPoint_A->pnt()->distance(aPoint_B->pnt()));
-    } else {
-      if (!aPoint_A && aPoint_B) {  //Line and point
-        boost::shared_ptr<SketchPlugin_Line> aLine = getFeatureLine(
-            aData, SketchPlugin_Constraint::ENTITY_A());
-        if (aLine)
-          anAttr_Value->setValue(aLine->distanceToPoint(aPoint_B->pnt()));
-      } else if (aPoint_A && !aPoint_B) {  // Point and line
-        boost::shared_ptr<SketchPlugin_Line> aLine = getFeatureLine(
-            aData, SketchPlugin_Constraint::ENTITY_B());
-        if (aLine)
-          anAttr_Value->setValue(aLine->distanceToPoint(aPoint_A->pnt()));
-      }
+  if (aPoint_A && aPoint_B) {  // both points
+    anAttr_Value->setValue(aPoint_A->pnt()->distance(aPoint_B->pnt()));
+  } else {
+    if (!aPoint_A && aPoint_B) {  //Line and point
+      boost::shared_ptr<SketchPlugin_Line> aLine = getFeatureLine(
+          aData, SketchPlugin_Constraint::ENTITY_A());
+      if (aLine)
+        anAttr_Value->setValue(aLine->distanceToPoint(aPoint_B->pnt()));
+    } else if (aPoint_A && !aPoint_B) {  // Point and line
+      boost::shared_ptr<SketchPlugin_Line> aLine = getFeatureLine(
+          aData, SketchPlugin_Constraint::ENTITY_B());
+      if (aLine)
+        anAttr_Value->setValue(aLine->distanceToPoint(aPoint_A->pnt()));
     }
   }
 }
