@@ -73,6 +73,8 @@ rem @SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
 @SET PYTHON_INCLUDE=%PYTHONHOME%\include
 @REM -------------------------
 
+@SET PATH=%GEOM_ROOT_DIR%\lib\salome;%PATH%
+
 
 IF "%ARCH%" == "Win64" (
   call "%VS100COMNTOOLS%..\..\VC\vcvarsall.bat" x64
