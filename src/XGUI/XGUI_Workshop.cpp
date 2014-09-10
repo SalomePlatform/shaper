@@ -406,8 +406,11 @@ void XGUI_Workshop::onObjectDeletedMsg(const ModelAPI_ObjectDeletedMessage* theM
 void XGUI_Workshop::onOperationStarted()
 {
   ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-  aOperation->setNestedFeatures(myActionsMgr->nestedCommands(aOperation->id()));
-
+  if (this->isSalomeMode()) 
+    aOperation->setNestedFeatures(mySalomeConnector->nestedActions(aOperation->id()));
+  else 
+    aOperation->setNestedFeatures(myActionsMgr->nestedCommands(aOperation->id()));
+  
   if (aOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
     connectWithOperation(aOperation);
 
@@ -475,7 +478,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
                                                      QString::fromStdString(theMessage->tooltip()),
                                                      QIcon(theMessage->icon().c_str()),
                                                      QKeySequence(), isUsePropPanel);
-    salomeConnector()->setNestedActions(aFeatureId, aNestedFeatures.split(" "));
+    salomeConnector()->setNestedActions(aFeatureId, aNestedFeatures.split(" ", QString::SkipEmptyParts));
     myActionsMgr->addCommand(aAction);
     myModule->featureCreated(aAction);
   } else {

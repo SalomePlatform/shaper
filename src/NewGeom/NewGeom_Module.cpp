@@ -284,8 +284,10 @@ void NewGeom_Module::contextMenuPopup(const QString& theClient, QMenu* theMenu, 
 //******************************************************
 void NewGeom_Module::createPreferences()
 {
-  XGUI_Preferences::updateCustomProps();
   LightApp_Preferences* pref = preferences();
+  if (!pref)
+    return;
+  XGUI_Preferences::updateCustomProps();
   QString aModName = moduleName();
 
   QtxPreferenceItem* item = pref->findItem(aModName, true );
