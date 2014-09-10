@@ -159,6 +159,9 @@ void Model_PluginManager::LoadPluginsInfo()
 void Model_PluginManager::registerPlugin(ModelAPI_Plugin* thePlugin)
 {
   myPluginObjs[myCurrentPluginName] = thePlugin;
+  static Events_ID EVENT_LOAD = Events_Loop::loop()->eventByName(EVENT_PLUGIN_LOADED);
+  ModelAPI_EventCreator::get()->sendUpdated(ObjectPtr(), EVENT_LOAD);
+  Events_Loop::loop()->flush(EVENT_LOAD);
 }
 
 ModelAPI_ValidatorsFactory* Model_PluginManager::validators()

@@ -27,6 +27,8 @@ static const char * EVENT_OBJECT_MOVED = "ObjectsMoved";
 static const char * EVENT_OBJECT_TO_REDISPLAY = "ObjectsToRedisplay";
 /// Event ID that visualization must be redisplayed (comes with ModelAPI_ObjectUpdatedMessage)
 static const char * EVENT_OPERATION_LAUNCHED = "OperationLaunched";
+/// Event ID that plugin is loaded (comes with ModelAPI_ObjectUpdatedMessage)
+static const char * EVENT_PLUGIN_LOADED = "PliginLoaded";
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup

@@ -208,7 +208,7 @@ signals:
   void displayDocumentResults(DocumentPtr theDoc);
   void displayGroupResults(DocumentPtr theDoc, std::string theGroup);
 
- protected slots:
+ private slots:
   /// SLOT, that is called after the operation is started. Update workshop state according to
   /// the started operation, e.g. visualizes the property panel and connect to it.
   void onOperationStarted();
@@ -253,6 +253,8 @@ signals:
 
   QString myCurrentDir;
   static QMap<QString, QString> myIcons;
+
+  bool myUpdatePrefs;
 };
 
 #endif

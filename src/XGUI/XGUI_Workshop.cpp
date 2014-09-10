@@ -86,7 +86,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
       mySalomeConnector(theConnector),
       myPropertyPanel(0),
       myObjectBrowser(0),
-      myDisplayer(0)
+      myDisplayer(0),
+      myUpdatePrefs(false)
 {
   myMainWindow = mySalomeConnector ? 0 : new XGUI_MainWindow();
 
@@ -139,6 +140,7 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->registerListener(this, Events_Loop::eventByName("LongOperation"));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_PLUGIN_LOADED));
 
   registerValidators();
   activateModule();
@@ -243,6 +245,15 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     const ModelAPI_ObjectUpdatedMessage* aUpdMsg =
         dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureCreatedMsg(aUpdMsg);
+    if (myUpdatePrefs) {
+      if (mySalomeConnector)
+        mySalomeConnector->createPreferences();
+      myUpdatePrefs = false;
+    }
+    return;
+  }
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_PLUGIN_LOADED)) {
+    myUpdatePrefs = true;
     return;
   }
 
@@ -301,6 +312,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     emit errorOccurred(QString::fromLatin1(anAppError->description()));
   }
 }
+
 
 //******************************************************
 void XGUI_Workshop::onStartWaiting()
