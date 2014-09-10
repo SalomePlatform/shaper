@@ -60,7 +60,7 @@
           <validator id="SketchPlugin_ResultArcValidator"/>
         </feature_selector>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
-        <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue"/>
+        <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue" default="computed"/>
         <validator id="PartSet_RadiusValidator"/>
       </feature>
       

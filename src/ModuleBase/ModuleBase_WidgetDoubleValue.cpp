@@ -67,10 +67,12 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
     mySpinBox->setSingleStep(aStepVal);
   }
 
-  aProp = theData->getProperty(DOUBLE_WDG_DFLT);
+  aProp = theData->getProperty(DOUBLE_WDG_DEFAULT);
   double aDefVal = QString::fromStdString(aProp).toDouble(&isOk);
   if (isOk) {
     mySpinBox->setValue(aDefVal);
+  } else if (aProp == DOUBLE_WDG_DEFAULT_COMPUTED){
+    myIsComputedDefault = true;
   }
 
   QString aTTip = QString::fromStdString(theData->widgetTooltip());

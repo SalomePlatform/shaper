@@ -63,7 +63,8 @@ const static char* INFO_WDG_TOOLTIP = FEATURE_TOOLTIP;
 const static char* DOUBLE_WDG_MIN = "min";
 const static char* DOUBLE_WDG_MAX = "max";
 const static char* DOUBLE_WDG_STEP = "step";
-const static char* DOUBLE_WDG_DFLT = "default";
+const static char* DOUBLE_WDG_DEFAULT = "default";
+const static char* DOUBLE_WDG_DEFAULT_COMPUTED = "computed";
 
 //toolbox/switch properties
 const static char* CONTAINER_PAGE_NAME = "title";

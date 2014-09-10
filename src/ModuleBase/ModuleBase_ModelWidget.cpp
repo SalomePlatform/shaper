@@ -19,12 +19,19 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QObject* theParent, const Config_
     : QObject(theParent),
       myParentId(theParentId)
 {
+  myIsComputedDefault = false;
   myAttributeID = theData ? theData->widgetId() : "";
 }
 
 bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
 {
   return theObject->data()->attribute(attributeID())->isInitialized();
+}
+
+void ModuleBase_ModelWidget::setAttributeComputedState(ObjectPtr theObject) const
+{
+  if(myIsComputedDefault)
+    theObject->data()->attribute(attributeID())->setComputedDefault();
 }
 
 bool ModuleBase_ModelWidget::focusTo()

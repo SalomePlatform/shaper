@@ -31,13 +31,6 @@ ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
 {
 }
 
-ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
-                                                 const std::string& theAttribute)
-    : ModuleBase_WidgetDoubleValue(theParent, 0, "")
-{
-  setAttributeID(theAttribute);
-}
-
 ModuleBase_WidgetEditor::~ModuleBase_WidgetEditor()
 {
 }
