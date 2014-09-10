@@ -32,6 +32,7 @@ SET(PROJECT_HEADERS
     XGUI_ModuleConnector.h
 	XGUI_Selection.h
 	XGUI_Preferences.h
+	XGUI_IPrefMgr.h
 )
 
 SET(PROJECT_AUTOMOC 

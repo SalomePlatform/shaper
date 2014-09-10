@@ -133,7 +133,7 @@ void addPlane(double theX, double theY, double theZ,
 {
   boost::shared_ptr<GeomAPI_Pnt> anOrigin(new GeomAPI_Pnt(0, 0, 0));
   boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(theX, theY, theZ));
-  double aSize = Config_PropManager::integer("Sketch definition", "Size of planes", PLANE_SIZE);
+  double aSize = Config_PropManager::integer("Sketch planes", "Size of planes", PLANE_SIZE);
   boost::shared_ptr<GeomAPI_Shape> aFace = GeomAlgoAPI_FaceBuilder::square(anOrigin, aNormal,
                                                                            aSize);
   theShapes.push_back(aFace);
@@ -156,11 +156,11 @@ AISObjectPtr SketchPlugin_Sketch::getAISObject(AISObjectPtr thePrevious)
       aAIS = AISObjectPtr(new GeomAPI_AISObject());
       aAIS->createShape(aCompound);
 
-      std::vector<int> aRGB = Config_PropManager::color("Sketch definition", "planes_color",
+      std::vector<int> aRGB = Config_PropManager::color("Sketch planes", "planes_color",
       SKETCH_PLANE_COLOR);
       aAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
 
-      aAIS->setWidth(Config_PropManager::integer("Sketch definition", "planes_thikness",
+      aAIS->setWidth(Config_PropManager::integer("Sketch planes", "planes_thikness",
       SKETCH_WIDTH));
     }
     return aAIS;
