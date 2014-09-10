@@ -112,7 +112,7 @@ Q_OBJECT
   /// SLOT, to fit all current viewer
   void onFitAllView();
 
-  void onLaunchOperation(std::string theName, ObjectPtr theFeature);
+  void onRestartOperation(std::string theName, ObjectPtr theFeature);
 
   /// SLOT, to switch on/off the multi selection in the viewer
   /// \param theEnabled the enabled state

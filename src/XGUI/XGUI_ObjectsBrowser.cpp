@@ -203,7 +203,8 @@ bool XGUI_ObjectsBrowser::eventFilter(QObject* obj, QEvent* theEvent)
       } else if (theEvent->type() == QEvent::KeyRelease) {
         QKeyEvent* aEvent = (QKeyEvent*) theEvent;
         switch (aEvent->key()) {
-          case Qt::Key_Return:  // Accept current input
+          case Qt::Key_Return:
+          case Qt::Key_Enter:  // Accept current input
             closeDocNameEditing(true);
             break;
           case Qt::Key_Escape:  // Cancel the input

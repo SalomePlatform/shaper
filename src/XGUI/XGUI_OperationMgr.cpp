@@ -104,7 +104,7 @@ bool XGUI_OperationMgr::eventFilter(QObject *theObject, QEvent *theEvent)
     if (aKeyEvent && aKeyEvent->key() == Qt::Key_Escape) {
       // TODO: this is Escape button processing when the property panel has empty content,
       // but the operation should be stopped by the Enter has been clicked
-      onKeyReleased("", aKeyEvent);
+      onKeyReleased(aKeyEvent);
       return true;
     }
   }
@@ -206,11 +206,11 @@ void XGUI_OperationMgr::onOperationStopped()
   }
 }
 
-void XGUI_OperationMgr::onKeyReleased(const std::string& theName, QKeyEvent* theEvent)
+void XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
 {
   ModuleBase_Operation* anOperation = currentOperation();
   if (anOperation)
-    anOperation->keyReleased(theName, theEvent);
+    anOperation->keyReleased(theEvent->key());
 }
 
 void XGUI_OperationMgr::onWidgetActivated(ModuleBase_ModelWidget* theWidget)

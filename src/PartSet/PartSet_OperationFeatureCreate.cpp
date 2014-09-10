@@ -167,16 +167,6 @@ void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3
   }
 }
 
-void PartSet_OperationFeatureCreate::keyReleased(std::string theName, QKeyEvent* theEvent)
-{
-  int aKeyType = theEvent->key();
-  // the second point should be activated by any modification in the property panel
-  if (!theName.empty()) {
-    //setPointSelectionMode(myFeaturePrs->getNextMode(theName), false);
-  }
-  keyReleased(theEvent->key());
-}
-
 void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
 {
   myActiveWidget = theWidget;
@@ -201,10 +191,11 @@ void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* t
 void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
 {
   switch (theKey) {
-    case Qt::Key_Return: {
+    case Qt::Key_Return:
+    case Qt::Key_Enter: {
       if (commit()) {
         // it start a new line creation at a free point
-        restartOperation(feature()->getKind(), FeaturePtr());
+        restartOperation(feature()->getKind());
       }
     }
       break;
@@ -213,6 +204,7 @@ void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
         abort();
       }
     }
+      break;
     default:
       break;
   }

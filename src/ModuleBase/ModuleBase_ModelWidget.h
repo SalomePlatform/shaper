@@ -96,7 +96,7 @@ signals:
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theAttributeName a name of the attribute
   /// \param theEvent key release event
-  void keyReleased(const std::string& theAttributeName, QKeyEvent* theEvent);
+  void keyReleased(QKeyEvent* theEvent);
   /// The signal about the widget is lost focus
   /// \param theWidget the model base widget
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
