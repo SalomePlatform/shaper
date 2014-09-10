@@ -264,11 +264,12 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
     // For the length constraint the start and end points of the line should be added to the entities list instead of line
     if (aConstrType == SLVS_C_PT_PT_DISTANCE
         && theConstraint->getKind().compare(SketchPlugin_ConstraintLength::ID()) == 0) {
-      boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
-      aConstrEnt[indAttr] = changeEntity(aData->attribute(SketchPlugin_Line::START_ID()));
-      aConstrEnt[indAttr + 1] = changeEntity(aData->attribute(SketchPlugin_Line::END_ID()));
-      // measured object is added into the map of objects to avoid problems with interaction between constraint and group
-      myEntityFeatMap[aFeature] = 0;
+      Slvs_hEntity aLineEnt = changeEntity(aFeature);
+      int aEntPos = Search(aLineEnt, myEntities);
+      aConstrEnt[indAttr++] = myEntities[aEntPos].point[0];
+      aConstrEnt[indAttr++] = myEntities[aEntPos].point[1];
+      while (indAttr < CONSTRAINT_ATTR_SIZE)
+        aConstrEnt[indAttr++] = 0;
       break;  // there should be no other entities
     } else if (aConstrAttr->isObject())
       aConstrEnt[indAttr] = changeEntity(aFeature);

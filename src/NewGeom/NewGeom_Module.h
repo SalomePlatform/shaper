@@ -72,6 +72,9 @@ Q_OBJECT
 
   virtual void contextMenuPopup(const QString& theClient, QMenu* theMenu, QString& theTitle);
 
+  virtual void createPreferences();
+  virtual void preferencesChanged(const QString& theSection, const QString& theParam);
+
  public slots:
   virtual bool activateModule(SUIT_Study* theStudy);
   virtual bool deactivateModule(SUIT_Study* theStudy);

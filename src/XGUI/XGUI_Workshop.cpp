@@ -86,7 +86,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
       mySalomeConnector(theConnector),
       myPropertyPanel(0),
       myObjectBrowser(0),
-      myDisplayer(0)
+      myDisplayer(0),
+      myUpdatePrefs(false)
 {
   myMainWindow = mySalomeConnector ? 0 : new XGUI_MainWindow();
 
@@ -139,6 +140,7 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->registerListener(this, Events_Loop::eventByName("LongOperation"));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_PLUGIN_LOADED));
 
   registerValidators();
   activateModule();
@@ -243,6 +245,15 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     const ModelAPI_ObjectUpdatedMessage* aUpdMsg =
         dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureCreatedMsg(aUpdMsg);
+    if (myUpdatePrefs) {
+      if (mySalomeConnector)
+        mySalomeConnector->createPreferences();
+      myUpdatePrefs = false;
+    }
+    return;
+  }
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_PLUGIN_LOADED)) {
+    myUpdatePrefs = true;
     return;
   }
 
@@ -301,6 +312,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     emit errorOccurred(QString::fromLatin1(anAppError->description()));
   }
 }
+
 
 //******************************************************
 void XGUI_Workshop::onStartWaiting()
@@ -394,8 +406,11 @@ void XGUI_Workshop::onObjectDeletedMsg(const ModelAPI_ObjectDeletedMessage* theM
 void XGUI_Workshop::onOperationStarted()
 {
   ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-  aOperation->setNestedFeatures(myActionsMgr->nestedCommands(aOperation->id()));
-
+  if (this->isSalomeMode()) 
+    aOperation->setNestedFeatures(mySalomeConnector->nestedActions(aOperation->id()));
+  else 
+    aOperation->setNestedFeatures(myActionsMgr->nestedCommands(aOperation->id()));
+  
   if (aOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
     connectWithOperation(aOperation);
 
@@ -463,7 +478,7 @@ void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
                                                      QString::fromStdString(theMessage->tooltip()),
                                                      QIcon(theMessage->icon().c_str()),
                                                      QKeySequence(), isUsePropPanel);
-    salomeConnector()->setNestedActions(aFeatureId, aNestedFeatures.split(" "));
+    salomeConnector()->setNestedActions(aFeatureId, aNestedFeatures.split(" ", QString::SkipEmptyParts));
     myActionsMgr->addCommand(aAction);
     myModule->featureCreated(aAction);
   } else {
