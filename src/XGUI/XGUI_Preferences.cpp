@@ -5,6 +5,8 @@
 #include "XGUI_Preferences.h"
 #include "XGUI_Constants.h"
 
+#include <Config_PropManager.h>
+
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_PreferenceMgr.h>
 
@@ -47,7 +49,7 @@ void XGUI_Preferences::updateCustomProps()
     QString aVal = myResourceMgr->stringValue(QString(aProp->section().c_str()),
                                               QString(aProp->name().c_str()));
     if (!aVal.isNull())
-      aProp->setValue(qPrintable(aVal));
+      aProp->setValue(aVal.toStdString());
   }
 }
 
@@ -61,12 +63,73 @@ void XGUI_Preferences::loadCustomProps()
     QStringList aParams = myResourceMgr->parameters(aSection);
     foreach (QString aParam, aParams)
     {
-      Config_PropManager::registerProp(qPrintable(aSection), qPrintable(aParam), "",
+      Config_PropManager::registerProp(aSection.toStdString(), aParam.toStdString(), "",
                                        Config_Prop::Disabled,
-                                       qPrintable(myResourceMgr->stringValue(aSection, aParam)));
+                                       myResourceMgr->stringValue(aSection, aParam).toStdString());
     }
   }
 }
+
+
+void XGUI_Preferences::createEditContent(XGUI_IPrefMgr* thePref, int thePage)
+{
+  thePref->prefMgr()->setItemIcon(thePage, QIcon(":pictures/module.png"));
+  createCustomPage(thePref, thePage);
+}
+
+
+void XGUI_Preferences::createCustomPage(XGUI_IPrefMgr* thePref, int thePageId)
+{
+  SUIT_ResourceMgr* aResMgr = XGUI_Preferences::resourceMgr();
+  bool isResModified = false;
+
+  // Make a Tab from each section
+  std::list<std::string> aSections = Config_PropManager::getSections();
+  std::list<std::string>::const_iterator it;
+  for (it = aSections.cbegin(); it != aSections.cend(); ++it) {
+    Config_Properties aProps = Config_PropManager::getProperties(*it);
+    int aTab = thePref->prefMgr()->addItem(QString((*it).c_str()), thePageId);
+    thePref->prefMgr()->setItemProperty("columns", 2, aTab);
+
+    Config_Properties::const_iterator aIt;
+    for (aIt = aProps.cbegin(); aIt != aProps.cend(); ++aIt) {
+      Config_Prop* aProp = (*aIt);
+      // check that the property is defined
+      QString aSection(aProp->section().c_str());
+      QString aName(aProp->name().c_str());
+      if (!aResMgr->hasValue(aSection, aName)) {
+        aResMgr->setValue(aSection, aName, QString(aProp->value().c_str()));
+        isResModified = true;
+      }
+      // Add item
+      if (aProp->type() != Config_Prop::Disabled)
+        thePref->addPreference(QObject::tr(aProp->title().c_str()), aTab,
+                               (SUIT_PreferenceMgr::PrefItemType) aProp->type(),
+                               QString(aProp->section().c_str()), QString(aProp->name().c_str()));
+    }
+  }
+}
+
+//**********************************************************
+//**********************************************************
+//**********************************************************
+class XGUI_PrefMgr: public XGUI_IPrefMgr
+{
+public:
+  XGUI_PrefMgr(XGUI_PreferencesMgr* theMgr):myMgr(theMgr) {}
+
+  virtual int addPreference(const QString& theLbl, int pId, 
+                            SUIT_PreferenceMgr::PrefItemType theType,
+                            const QString& theSection, const QString& theName )
+  {
+    return myMgr->addItem(theLbl, pId, theType, theSection, theName);
+  }
+
+  virtual SUIT_PreferenceMgr* prefMgr() const { return myMgr; }
+
+private:
+  XGUI_PreferencesMgr* myMgr;
+};
 
 //**********************************************************
 //**********************************************************
@@ -112,7 +175,9 @@ void XGUI_PreferencesDlg::createEditors()
 
   aPage = myPreferences->addItem(tr("Module"));
   myPreferences->setItemIcon(aPage, QIcon(":pictures/module.png"));
-  createCustomPage(aPage);
+
+  XGUI_PrefMgr aMgr(myPreferences);
+  XGUI_Preferences::createEditContent(&aMgr, aPage);
 }
 
 void XGUI_PreferencesDlg::createViewerPage(int thePageId)
@@ -157,38 +222,6 @@ void XGUI_PreferencesDlg::createMenuPage(int thePageId)
                                        "rows_number");
   myPreferences->setItemProperty("min", 1, aRowsNb);
   myPreferences->setItemProperty("max", 6, aRowsNb);
-}
-
-void XGUI_PreferencesDlg::createCustomPage(int thePageId)
-{
-  SUIT_ResourceMgr* aResMgr = XGUI_Preferences::resourceMgr();
-  bool isResModified = false;
-
-  // Make a Tab from each section
-  std::list<std::string> aSections = Config_PropManager::getSections();
-  std::list<std::string>::const_iterator it;
-  for (it = aSections.cbegin(); it != aSections.cend(); ++it) {
-    Config_Properties aProps = Config_PropManager::getProperties(*it);
-    int aTab = myPreferences->addItem(QString((*it).c_str()), thePageId);
-    myPreferences->setItemProperty("columns", 2, aTab);
-
-    Config_Properties::const_iterator aIt;
-    for (aIt = aProps.cbegin(); aIt != aProps.cend(); ++aIt) {
-      Config_Prop* aProp = (*aIt);
-      // check that the property is defined
-      QString aSection(aProp->section().c_str());
-      QString aName(aProp->name().c_str());
-      if (!aResMgr->hasValue(aSection, aName)) {
-        aResMgr->setValue(aSection, aName, QString(aProp->value().c_str()));
-        isResModified = true;
-      }
-      // Add item
-      if (aProp->type() != Config_Prop::Disabled)
-        myPreferences->addItem(tr(aProp->title().c_str()), aTab,
-                               (SUIT_PreferenceMgr::PrefItemType) aProp->type(),
-                               QString(aProp->section().c_str()), QString(aProp->name().c_str()));
-    }
-  }
 }
 
 void XGUI_PreferencesDlg::accept()

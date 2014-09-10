@@ -6,6 +6,7 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ContextMenuMgr.h>
+#include <XGUI_Preferences.h>
 
 #include <LightApp_Application.h>
 #include <LightApp_SelectionMgr.h>
@@ -15,9 +16,13 @@
 #include <SUIT_Selector.h>
 #include <SUIT_Desktop.h>
 #include <SUIT_ViewManager.h>
+#include <SUIT_ResourceMgr.h>
 
 #include <QtxPopupMgr.h>
 #include <QtxActionMenuMgr.h>
+#include <QtxResourceMgr.h>
+
+#include <Config_PropManager.h>
 
 #include <QDockWidget>
 #include <QAction>
@@ -34,6 +39,28 @@ NewGeom_EXPORT char* getModuleVersion()
 }
 }
 
+class NewGeom_PrefMgr: public XGUI_IPrefMgr
+{
+public:
+  NewGeom_PrefMgr(LightApp_Preferences* theMgr, const QString& theModName):myMgr(theMgr), myModName(theModName) {}
+
+  virtual int addPreference(const QString& theLbl, int pId, 
+                            SUIT_PreferenceMgr::PrefItemType theType,
+                            const QString& theSection, const QString& theName )
+  {
+    return myMgr->addPreference(myModName, theLbl, pId, theType, theSection, theName);
+  }
+
+  virtual SUIT_PreferenceMgr* prefMgr() const { return myMgr; }
+
+private:
+  LightApp_Preferences* myMgr;
+  QString myModName;
+};
+
+
+
+
 //******************************************************
 NewGeom_Module::NewGeom_Module()
     : LightApp_Module("NewGeom"),
@@ -41,6 +68,9 @@ NewGeom_Module::NewGeom_Module()
 {
   myWorkshop = new XGUI_Workshop(this);
   myProxyViewer = new NewGeom_SalomeViewer(this);
+
+  XGUI_Preferences::setResourceMgr(application()->resourceMgr());
+  XGUI_Preferences::loadCustomProps();
 }
 
 //******************************************************
@@ -145,7 +175,7 @@ QAction* NewGeom_Module::addFeature(const QString& theWBName, const QString& the
   myActionsList.append(theId);
   SUIT_Desktop* aDesk = application()->desktop();
   int aKeys = 0;
-  for (int i = 0; i < theKeys.count(); i++)
+  for (unsigned int i = 0; i < theKeys.count(); i++)
     aKeys += theKeys[i];
   QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
                                   isCheckable);
@@ -166,7 +196,7 @@ QAction* NewGeom_Module::addEditCommand(const QString& theId, const QString& the
   myActionsList.append(theId);
   SUIT_Desktop* aDesk = application()->desktop();
   int aKeys = 0;
-  for (int i = 0; i < theKeys.count(); i++)
+  for (unsigned int i = 0; i < theKeys.count(); i++)
     aKeys += theKeys[i];
   QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
                                   isCheckable);
@@ -248,4 +278,29 @@ void NewGeom_Module::contextMenuPopup(const QString& theClient, QMenu* theMenu, 
 {
   myWorkshop->contextMenuMgr()->addViewerItems(theMenu);
   LightApp_Module::contextMenuPopup(theClient, theMenu, theTitle);
+}
+
+
+//******************************************************
+void NewGeom_Module::createPreferences()
+{
+  XGUI_Preferences::updateCustomProps();
+  LightApp_Preferences* pref = preferences();
+  int catId = pref->addPreference( moduleName(), -1 );
+  if ( catId == -1 )
+    return;
+  NewGeom_PrefMgr aMgr(pref, moduleName());
+  XGUI_Preferences::createEditContent(&aMgr, catId);
+  pref->retrieve();
+}
+
+//******************************************************
+void NewGeom_Module::preferencesChanged(const QString& theSection, const QString& theParam)
+{
+  SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
+  QString aVal = aResMgr->stringValue(theSection, theParam);
+  if (!aVal.isNull()) {
+    Config_Prop* aProp = Config_PropManager::findProp(theSection.toStdString(), theParam.toStdString());
+    aProp->setValue(aVal.toStdString());
+  }
 }

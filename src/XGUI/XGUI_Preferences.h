@@ -6,8 +6,8 @@
 #define XGUI_Preferences_H
 
 #include "XGUI.h"
+#include "XGUI_IPrefMgr.h"
 
-#include <Config_PropManager.h>
 #include <SUIT_PreferenceMgr.h>
 #include <QDialog>
 
@@ -28,13 +28,26 @@ class XGUI_EXPORT XGUI_Preferences
 
   static bool editPreferences(XGUI_Prefs& theModified);
 
+  /// Returns currently installed resource manager
   static SUIT_ResourceMgr* resourceMgr();
 
+  /// Sets a resource manager
+  /// It is used in case of necessity to define external resource manager (not NewGeom)
+  static void setResourceMgr(SUIT_ResourceMgr* theMgr) { myResourceMgr = theMgr; }
+
+  /// Updates properties defined by module from SUIT_ResourceMgr to Config_PropManager
   static void updateCustomProps();
 
+  /// Loads properties defined by module to Config_PropManager
   static void loadCustomProps();
 
- private:
+  /// 
+  static void createEditContent(XGUI_IPrefMgr* thePref, int thePage);
+
+private:
+  /// Creates content of preferences editing widget
+  static void createCustomPage(XGUI_IPrefMgr* thePref, int thePageId);
+
   static SUIT_ResourceMgr* myResourceMgr;
 };
 
@@ -88,7 +101,7 @@ Q_OBJECT
   void createEditors();
   void createViewerPage(int thePageId);
   void createMenuPage(int thePageId);
-  void createCustomPage(int thePageId);
+  //void createCustomPage(int thePageId);
 
   void updateCustomProps();
 
