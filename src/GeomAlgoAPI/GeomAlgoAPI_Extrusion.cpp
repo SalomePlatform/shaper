@@ -40,11 +40,7 @@ boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Extrusion::makeExtrusion(
   TopExp_Explorer aFaceExp(aShape, TopAbs_FACE);
   for (; aFaceExp.More(); aFaceExp.Next()) {
     const TopoDS_Face& aFace = (const TopoDS_Face&) aFaceExp.Current();
-    Handle(BRep_TFace) aBFace = Handle(BRep_TFace)::DownCast(aFace.TShape());
-    if (aBFace.IsNull())
-      return boost::shared_ptr<GeomAPI_Shape>();
-
-    Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(aBFace->Surface());
+    Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(BRep_Tool::Surface(aFace));
     if (aPlane.IsNull())  // non-planar shapes is not supported for extrusion yet
       continue;
 

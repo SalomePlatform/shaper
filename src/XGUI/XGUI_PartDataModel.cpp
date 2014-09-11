@@ -1,7 +1,7 @@
 #include "XGUI_PartDataModel.h"
 #include "XGUI_Workshop.h"
 
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
@@ -42,7 +42,7 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
         case ParamsFolder:
           return tr("Parameters") + QString(" (%1)").arg(rowCount(theIndex));
         case ParamObject: {
-          DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+          DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
           ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultParameters::group(), theIndex.row());
           if (aObject)
             return aObject->data()->name().c_str();
@@ -51,7 +51,7 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
         case ConstructFolder:
           return tr("Constructions") + QString(" (%1)").arg(rowCount(theIndex));
         case ConstructObject: {
-          DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+          DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
           ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultConstruction::group(),
                                                theIndex.row());
           if (aObject)
@@ -61,7 +61,7 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
         case BodiesFolder:
           return tr("Bodies") + QString(" (%1)").arg(rowCount(theIndex));
         case BodiesObject: {
-          DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+          DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
           ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultBody::group(), theIndex.row());
           if (aObject)
             return aObject->data()->name().c_str();
@@ -103,7 +103,7 @@ int XGUI_TopDataModel::rowCount(const QModelIndex& theParent) const
   if (!theParent.isValid())
     return 3;
 
-  DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   if (theParent.internalId() == ParamsFolder)
     return aRootDoc->size(ModelAPI_ResultParameters::group());
 
@@ -175,15 +175,15 @@ ObjectPtr XGUI_TopDataModel::object(const QModelIndex& theIndex) const
     case BodiesFolder:
       return ObjectPtr();
     case ParamObject: {
-      DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+      DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
       return aRootDoc->object(ModelAPI_ResultParameters::group(), theIndex.row());
     }
     case ConstructObject: {
-      DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+      DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
       return aRootDoc->object(ModelAPI_ResultConstruction::group(), theIndex.row());
     }
     case BodiesObject: {
-      DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+      DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
       return aRootDoc->object(ModelAPI_ResultBody::group(), theIndex.row());
     }
   }
@@ -210,7 +210,7 @@ QModelIndex XGUI_TopDataModel::objectIndex(const ObjectPtr& theObject) const
 {
   QModelIndex aIndex;
   if (theObject) {
-    DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
     std::string aGroup = theObject->groupName();
     int aNb = aRootDoc->size(aGroup);
     int aRow = -1;
@@ -251,7 +251,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
       // return a name
       switch (theIndex.internalId()) {
         case MyRoot: {
-          DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+          DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
           ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
           if (aObject)
             return boost::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
@@ -325,7 +325,7 @@ QVariant XGUI_PartDataModel::headerData(int section, Qt::Orientation orientation
 int XGUI_PartDataModel::rowCount(const QModelIndex& parent) const
 {
   if (!parent.isValid()) {
-    DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
     if (aRootDoc->object(ModelAPI_ResultPart::group(), myId))
       return 1;
     else
@@ -410,7 +410,7 @@ bool XGUI_PartDataModel::hasChildren(const QModelIndex& theParent) const
 
 DocumentPtr XGUI_PartDataModel::partDocument() const
 {
-  DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
   ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
   return aPart->partDoc();
@@ -420,7 +420,7 @@ ObjectPtr XGUI_PartDataModel::object(const QModelIndex& theIndex) const
 {
   switch (theIndex.internalId()) {
     case MyRoot: {
-      DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+      DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
       return aRootDoc->object(ModelAPI_ResultPart::group(), myId);
     }
     case ParamsFolder:
@@ -462,7 +462,7 @@ QModelIndex XGUI_PartDataModel::findGroup(const std::string& theGroup) const
 
 ResultPartPtr XGUI_PartDataModel::part() const
 {
-  DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   ObjectPtr aObj = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
   return boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
 }

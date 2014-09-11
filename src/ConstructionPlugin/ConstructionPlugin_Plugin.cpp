@@ -1,7 +1,7 @@
 #include "ConstructionPlugin_Plugin.h"
 #include "ConstructionPlugin_Point.h"
 
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 
 using namespace std;
@@ -12,7 +12,7 @@ static ConstructionPlugin_Plugin* MY_INSTANCE = new ConstructionPlugin_Plugin();
 ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
 {
   // register this plugin
-  ModelAPI_PluginManager::get()->registerPlugin(this);
+  ModelAPI_Session::get()->registerPlugin(this);
 }
 
 FeaturePtr ConstructionPlugin_Plugin::createFeature(string theFeatureID)

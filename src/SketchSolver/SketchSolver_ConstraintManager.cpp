@@ -56,7 +56,7 @@ SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
 
 // ============================================================================
 //  Function: processEvent
-//  Class:    SketchSolver_PluginManager
+//  Class:    SketchSolver_Session
 //  Purpose:  listen the event loop and process the message
 // ============================================================================
 void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessage)
@@ -136,7 +136,7 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
 
 // ============================================================================
 //  Function: changeWorkplane
-//  Class:    SketchSolver_PluginManager
+//  Class:    SketchSolver_Session
 //  Purpose:  update workplane by given parameters of the sketch
 // ============================================================================
 bool SketchSolver_ConstraintManager::changeWorkplane(
@@ -167,7 +167,7 @@ bool SketchSolver_ConstraintManager::changeWorkplane(
 
 // ============================================================================
 //  Function: changeConstraint
-//  Class:    SketchSolver_PluginManager
+//  Class:    SketchSolver_Session
 //  Purpose:  create/update the constraint and place it into appropriate group
 // ============================================================================
 bool SketchSolver_ConstraintManager::changeConstraint(
@@ -235,7 +235,7 @@ bool SketchSolver_ConstraintManager::changeConstraint(
 
 // ============================================================================
 //  Function: updateEntity
-//  Class:    SketchSolver_PluginManager
+//  Class:    SketchSolver_Session
 //  Purpose:  update any element on the sketch, which is used by constraints
 // ============================================================================
 void SketchSolver_ConstraintManager::updateEntity(
@@ -286,7 +286,7 @@ void SketchSolver_ConstraintManager::updateEntity(
 
 // ============================================================================
 //  Function: findGroups
-//  Class:    SketchSolver_PluginManager
+//  Class:    SketchSolver_Session
 //  Purpose:  search groups of entities interacting with given constraint
 // ============================================================================
 void SketchSolver_ConstraintManager::findGroups(
@@ -312,7 +312,7 @@ void SketchSolver_ConstraintManager::findGroups(
 
 // ============================================================================
 //  Function: findWorkplaneForConstraint
-//  Class:    SketchSolver_PluginManager
+//  Class:    SketchSolver_Session
 //  Purpose:  search workplane containing given constraint
 // ============================================================================
 boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWorkplaneForConstraint(
@@ -342,7 +342,7 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
 
 // ============================================================================
 //  Function: resolveConstraints
-//  Class:    SketchSolver_PluginManager
+//  Class:    SketchSolver_Session
 //  Purpose:  change entities according to available constraints
 // ============================================================================
 void SketchSolver_ConstraintManager::resolveConstraints()

@@ -47,7 +47,7 @@ typedef boost::shared_ptr<ModelAPI_Validator> ValidatorPtr;
  * Allows to get a validator by the feature identifier and 
  * the attribute identifier (if attribute is validated).
  * All accessible validators mustbe registered by the ID string first.
- * The instance of this factory can be get in the PluginManager.
+ * The instance of this factory can be get in the Session.
  * Keeps the validator objects alive and just returns one of it by request.
  * All the needed information is provided to the validator as an argument,
  * this allows to work with them independently from the feature specific object.
@@ -87,7 +87,7 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
   virtual bool validate(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const = 0;
 
  protected:
-  /// Get instance from PluginManager
+  /// Get instance from Session
   ModelAPI_ValidatorsFactory()
   {
   }

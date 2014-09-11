@@ -3,7 +3,7 @@
 #include "XGUI_Workshop.h"
 #include "XGUI_Tools.h"
 
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
@@ -45,7 +45,7 @@ XGUI_DocumentDataModel::~XGUI_DocumentDataModel()
 
 void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
 {
-  DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
 
   // Created object event *******************
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
@@ -155,7 +155,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
 
 void XGUI_DocumentDataModel::rebuildDataTree()
 {
-  DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
 
   beginResetModel();
   clearModelIndexes();
@@ -200,7 +200,7 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
           case HistoryNode:
           {
             int aOffset = historyOffset();
-            DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+            DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
             ObjectPtr aObj = aRootDoc->object(ModelAPI_Feature::group(), theIndex.row() - aOffset);
             FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
             if (!aFeature)
@@ -242,7 +242,7 @@ QVariant XGUI_DocumentDataModel::headerData(int theSection, Qt::Orientation theO
 int XGUI_DocumentDataModel::rowCount(const QModelIndex& theParent) const
 {
   if (!theParent.isValid()) {
-    DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
     // Size of external models
     int aVal = historyOffset();
     // Plus history size
@@ -371,7 +371,7 @@ ObjectPtr XGUI_DocumentDataModel::object(const QModelIndex& theIndex) const
   if (theIndex.internalId() == PartsFolder)
     return ObjectPtr();
   if (theIndex.internalId() == HistoryNode) {
-    DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
     int aOffset = historyOffset();
     return aRootDoc->object(ModelAPI_Feature::group(), theIndex.row() - aOffset);
   }
@@ -529,7 +529,7 @@ QModelIndex XGUI_DocumentDataModel::partIndex(const ResultPartPtr& theObject) co
 QModelIndex XGUI_DocumentDataModel::objectIndex(const ObjectPtr theObject) const
 {
   // Check that this feature belongs to root document
-  DocumentPtr aRootDoc = ModelAPI_PluginManager::get()->rootDocument();
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   DocumentPtr aDoc = theObject->document();
   if (aDoc == aRootDoc) {
     // This feature belongs to histrory or top model

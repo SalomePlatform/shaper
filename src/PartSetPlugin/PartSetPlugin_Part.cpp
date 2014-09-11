@@ -3,7 +3,7 @@
 // Author:      Mikhail PONIKAROV
 
 #include "PartSetPlugin_Part.h"
-#include "ModelAPI_PluginManager.h"
+#include "ModelAPI_Session.h"
 #include "ModelAPI_Document.h"
 #include "ModelAPI_Data.h"
 #include "ModelAPI_AttributeDocRef.h"
@@ -32,7 +32,7 @@ void PartSetPlugin_Part::execute()
   
   if (!aDocRef->value()) {  // create a document if not yet created
     boost::shared_ptr<ModelAPI_Document> aPartSetDoc =
-        ModelAPI_PluginManager::get()->rootDocument();
+        ModelAPI_Session::get()->moduleDocument();
     aDocRef->setValue(aPartSetDoc->subDocument(data()->name()));
   }
   */
@@ -40,5 +40,5 @@ void PartSetPlugin_Part::execute()
 
 boost::shared_ptr<ModelAPI_Document> PartSetPlugin_Part::documentToAdd()
 {
-  return ModelAPI_PluginManager::get()->rootDocument();
+  return ModelAPI_Session::get()->moduleDocument();
 }

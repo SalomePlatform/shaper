@@ -98,12 +98,14 @@ Q_OBJECT
   virtual void accept();
 
  private:
-  void createEditors();
-  void createViewerPage(int thePageId);
-  void createMenuPage(int thePageId);
-  //void createCustomPage(int thePageId);
+   /// Create editors for aplication properties
+   void createEditors();
 
-  void updateCustomProps();
+   /// Create a viewer page in dialog box
+   void createViewerPage(int thePageId);
+   
+   /// Create menu properties page in the dialog box
+   void createMenuPage(int thePageId);
 
   XGUI_PreferencesMgr* myPreferences;
   bool myIsChanged;

@@ -5,7 +5,7 @@ INCLUDE(UnitTest)
 
 SET(PROJECT_HEADERS
     ModelAPI.h
-    ModelAPI_PluginManager.h
+    ModelAPI_Session.h
     ModelAPI_Plugin.h
     ModelAPI_Feature.h
     ModelAPI_Data.h
@@ -36,7 +36,7 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
     ModelAPI_Feature.cpp
-    ModelAPI_PluginManager.cpp
+    ModelAPI_Session.cpp
     ModelAPI_Tools.cpp
 )
 

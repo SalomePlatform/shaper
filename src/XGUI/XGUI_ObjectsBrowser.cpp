@@ -3,7 +3,7 @@
 #include "XGUI_Tools.h"
 
 #include <ModelAPI_Data.h>
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
 
@@ -83,10 +83,10 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
   if (aEditor) {
     QString aRes = aEditor->text();
     ObjectPtr aFeature = mySelectedData.first();
-    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-    aMgr->rootDocument()->startOperation();
+    SessionPtr aMgr = ModelAPI_Session::get();
+    aMgr->startOperation();
     aFeature->data()->setName(qPrintable(aRes));
-    aMgr->rootDocument()->finishOperation();
+    aMgr->finishOperation();
   }
 }
 
@@ -119,8 +119,8 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
 
   aLabelLay->addWidget(aLbl);
 
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-  DocumentPtr aDoc = aMgr->rootDocument();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->moduleDocument();
   // TODO: Find a name of the root document
 
   myActiveDocLbl = new QLineEdit(tr("Part set"), aLabelWgt);
@@ -226,8 +226,8 @@ void XGUI_ObjectsBrowser::closeDocNameEditing(bool toSave)
   myActiveDocLbl->setReadOnly(true);
   if (toSave) {
     // TODO: Save the name of root document
-    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-    DocumentPtr aDoc = aMgr->rootDocument();
+    SessionPtr aMgr = ModelAPI_Session::get();
+    DocumentPtr aDoc = aMgr->moduleDocument();
   } else {
     myActiveDocLbl->setText(myActiveDocLbl->property("OldText").toString());
   }

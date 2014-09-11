@@ -24,7 +24,7 @@
 #include "XGUI_Preferences.h"
 
 #include <ModelAPI_Events.h>
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
@@ -237,11 +237,10 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     if (!aFeatureMsg->isInternal()) {
       addFeature(aFeatureMsg);
     }
-    return;
   }
 
   // Process creation of Part
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
     const ModelAPI_ObjectUpdatedMessage* aUpdMsg =
         dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureCreatedMsg(aUpdMsg);
@@ -250,48 +249,42 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
         mySalomeConnector->createPreferences();
       myUpdatePrefs = false;
     }
-    return;
   }
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_PLUGIN_LOADED)) {
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_PLUGIN_LOADED)) {
     myUpdatePrefs = true;
-    return;
   }
 
   // Redisplay feature
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
     const ModelAPI_ObjectUpdatedMessage* aUpdMsg =
         dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureRedisplayMsg(aUpdMsg);
-    return;
   }
 
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
     const ModelAPI_ObjectUpdatedMessage* anUpdateMsg =
         dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureUpdatedMsg(anUpdateMsg);
-    return;
   }
 
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     const ModelAPI_ObjectDeletedMessage* aDelMsg =
         dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
     onObjectDeletedMsg(aDelMsg);
-    return;
   }
 
-  if (theMessage->eventID() == Events_LongOp::eventID()) {
+  else if (theMessage->eventID() == Events_LongOp::eventID()) {
     if (Events_LongOp::isPerformed())
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QTimer::singleShot(10, this, SLOT(onStartWaiting()));
     else
       QApplication::restoreOverrideCursor();
-    return;
   }
 
   //An operation passed by message. Start it, process and commit.
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OPERATION_LAUNCHED)) {
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OPERATION_LAUNCHED)) {
     const Config_PointerMessage* aPartSetMsg =
         dynamic_cast<const Config_PointerMessage*>(theMessage);
     //myPropertyPanel->cleanContent();
@@ -304,12 +297,17 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
           updateCommandStatus();
       }
     }
-    return;
+  } else {
+    //Show error dialog if error message received.
+    const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
+    if (anAppError) {
+      emit errorOccurred(QString::fromLatin1(anAppError->description()));
+    }
   }
-  //Show error dialog if error message received.
-  const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
-  if (anAppError) {
-    emit errorOccurred(QString::fromLatin1(anAppError->description()));
+  if (!isSalomeMode()) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    if (aMgr->isModified() != myMainWindow->isModifiedState())
+      myMainWindow->setModifiedState(aMgr->isModified());
   }
 }
 
@@ -528,21 +526,19 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
 /*
  * Saves document with given name.
  */
-void XGUI_Workshop::saveDocument(QString theName)
+void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>& theFileNames)
 {
   QApplication::restoreOverrideCursor();
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-  DocumentPtr aDoc = aMgr->rootDocument();
-  aDoc->save(theName.toLatin1().constData());
+  SessionPtr aMgr = ModelAPI_Session::get();
+  aMgr->save(theName.toLatin1().constData(), theFileNames);
   QApplication::restoreOverrideCursor();
 }
 
 //******************************************************
 void XGUI_Workshop::onExit()
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-  DocumentPtr aDoc = aMgr->rootDocument();
-  if (aDoc->isModified()) {
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->isModified()) {
     int anAnswer = QMessageBox::question(
         myMainWindow, tr("Save current file"), tr("The document is modified, save before exit?"),
         QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
@@ -582,9 +578,8 @@ void XGUI_Workshop::onNew()
 void XGUI_Workshop::onOpen()
 {
   //save current file before close if modified
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-  DocumentPtr aDoc = aMgr->rootDocument();
-  if (aDoc->isModified()) {
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->isModified()) {
     //TODO(sbh): re-launch the app?
     int anAnswer = QMessageBox::question(
         myMainWindow, tr("Save current file"),
@@ -595,7 +590,7 @@ void XGUI_Workshop::onOpen()
     } else if (anAnswer == QMessageBox::Cancel) {
       return;
     }
-    aDoc->close();
+    aMgr->moduleDocument()->close();
     myCurrentDir = "";
   }
 
@@ -610,7 +605,7 @@ void XGUI_Workshop::onOpen()
     return;
   }
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  aDoc->load(myCurrentDir.toLatin1().constData());
+  aMgr->load(myCurrentDir.toLatin1().constData());
   myObjectBrowser->rebuildDataTree();
   displayAllResults();
   updateCommandStatus();
@@ -623,8 +618,10 @@ bool XGUI_Workshop::onSave()
   if (myCurrentDir.isEmpty()) {
     return onSaveAs();
   }
-  saveDocument(myCurrentDir);
+  std::list<std::string> aFiles;
+  saveDocument(myCurrentDir, aFiles);
   updateCommandStatus();
+  myMainWindow->setModifiedState(false);
   return true;
 }
 
@@ -655,6 +652,10 @@ bool XGUI_Workshop::onSaveAs()
     }
   }
   myCurrentDir = aTempDir;
+  if (!isSalomeMode()) {
+    myMainWindow->setCurrentDir(myCurrentDir, false);
+    myMainWindow->setModifiedState(false);
+  }
   return onSave();
 }
 
@@ -662,11 +663,10 @@ bool XGUI_Workshop::onSaveAs()
 void XGUI_Workshop::onUndo()
 {
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-  DocumentPtr aDoc = aMgr->rootDocument();
-  if (aDoc->isOperation())
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->isOperation())
     operationMgr()->abortOperation();
-  aDoc->undo();
+  aMgr->undo();
   updateCommandStatus();
 }
 
@@ -674,11 +674,10 @@ void XGUI_Workshop::onUndo()
 void XGUI_Workshop::onRedo()
 {
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-  DocumentPtr aDoc = aMgr->rootDocument();
-  if (aDoc->isOperation())
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->isOperation())
     operationMgr()->abortOperation();
-  aDoc->redo();
+  aMgr->redo();
   updateCommandStatus();
 }
 
@@ -786,8 +785,8 @@ void XGUI_Workshop::updateCommandStatus()
     foreach (XGUI_Command* aCmd, aMenuBar->features())
       aCommands.append(aCmd);
   }
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-  if (aMgr->hasRootDocument()) {
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->hasModuleDocument()) {
     QAction* aUndoCmd;
     QAction* aRedoCmd;
     foreach(QAction* aCmd, aCommands)
@@ -801,9 +800,8 @@ void XGUI_Workshop::updateCommandStatus()
         // Enable all commands
         aCmd->setEnabled(true);
     }
-    DocumentPtr aDoc = aMgr->rootDocument();
-    aUndoCmd->setEnabled(aDoc->canUndo());
-    aRedoCmd->setEnabled(aDoc->canRedo());
+    aUndoCmd->setEnabled(aMgr->canUndo());
+    aRedoCmd->setEnabled(aMgr->canRedo());
   } else {
     foreach(QAction* aCmd, aCommands)
     {
@@ -931,18 +929,18 @@ void XGUI_Workshop::onFeatureTriggered()
 //******************************************************
 void XGUI_Workshop::changeCurrentDocument(ObjectPtr theObj)
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   if (theObj) {
     ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(theObj);
     if (aPart) {
       DocumentPtr aPartDoc = aPart->partDoc();
       if (aPartDoc) {
-        aMgr->setCurrentDocument(aPartDoc);
+        aMgr->setActiveDocument(aPartDoc);
         return;
       }
     }
   }
-  aMgr->setCurrentDocument(aMgr->rootDocument());
+  aMgr->setActiveDocument(aMgr->moduleDocument());
 }
 
 //******************************************************
@@ -1009,8 +1007,8 @@ void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
 //**************************************************************
 void XGUI_Workshop::activateLastPart()
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-  DocumentPtr aDoc = aMgr->rootDocument();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->moduleDocument();
   std::string aGrpName = ModelAPI_ResultPart::group();
   ObjectPtr aLastPart = aDoc->object(aGrpName, aDoc->size(aGrpName) - 1);
   ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aLastPart);
@@ -1027,17 +1025,17 @@ void XGUI_Workshop::deleteObjects(const QList<ObjectPtr>& theList)
       QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
   // ToDo: definbe deleting method
   if (aRes == QMessageBox::Yes) {
-    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-    aMgr->rootDocument()->startOperation();
+    SessionPtr aMgr = ModelAPI_Session::get();
+    aMgr->startOperation();
     foreach (ObjectPtr aObj, theList)
     {
       ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
       if (aPart) {
         DocumentPtr aDoc = aPart->document();
-        if (aDoc == aMgr->currentDocument()) {
+        if (aDoc == aMgr->activeDocument()) {
           aDoc->close();
         }
-        //aMgr->rootDocument()->removeFeature(aPart->owner());
+        //aMgr->moduleDocument()->removeFeature(aPart->owner());
       } else {
         FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
         if (aFeature)
@@ -1045,7 +1043,7 @@ void XGUI_Workshop::deleteObjects(const QList<ObjectPtr>& theList)
       }
     }
     myDisplayer->updateViewer();
-    aMgr->rootDocument()->finishOperation();
+    aMgr->finishOperation();
   }
 }
 
@@ -1077,7 +1075,7 @@ void XGUI_Workshop::showOnlyObjects(const QList<ObjectPtr>& theList)
 //**************************************************************
 void XGUI_Workshop::updateCommandsOnViewSelection()
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   XGUI_Selection* aSelection = mySelector->selection();
   if (aSelection->getSelected().size() == 0)
@@ -1106,15 +1104,15 @@ void XGUI_Workshop::updateCommandsOnViewSelection()
 //**************************************************************
 void XGUI_Workshop::registerValidators() const
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 }
 
 //**************************************************************
 void XGUI_Workshop::displayAllResults()
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
-  DocumentPtr aRootDoc = aMgr->rootDocument();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aRootDoc = aMgr->moduleDocument();
   displayDocumentResults(aRootDoc);
   for (int i = 0; i < aRootDoc->size(ModelAPI_ResultPart::group()); i++) {
     ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), i);

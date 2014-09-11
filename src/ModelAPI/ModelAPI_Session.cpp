@@ -1,8 +1,8 @@
-// File:        ModelAPI_PluginManager.hxx
+// File:        ModelAPI_Session.hxx
 // Created:     20 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 // to avoid unresolved ModelAPI_Document()
 #include <ModelAPI_Document.h>
 // to avoid unresolved ModelAPI_Feature()
@@ -39,18 +39,18 @@ using namespace std;
 #endif
 
 /// Manager that will be initialized from Model package, one per application
-boost::shared_ptr<ModelAPI_PluginManager> MY_MANAGER;
+boost::shared_ptr<ModelAPI_Session> MY_MANAGER;
 
-ModelAPI_PluginManager::ModelAPI_PluginManager()
+ModelAPI_Session::ModelAPI_Session()
 {
 }
 
-void ModelAPI_PluginManager::setPluginManager(boost::shared_ptr<ModelAPI_PluginManager> theManager)
+void ModelAPI_Session::setSession(boost::shared_ptr<ModelAPI_Session> theManager)
 {
   MY_MANAGER = theManager;
 }
 
-boost::shared_ptr<ModelAPI_PluginManager> ModelAPI_PluginManager::get()
+boost::shared_ptr<ModelAPI_Session> ModelAPI_Session::get()
 {
   if (!MY_MANAGER) {  // import Model library that implements this interface of ModelAPI
     Config_ModuleReader::loadLibrary("Model");

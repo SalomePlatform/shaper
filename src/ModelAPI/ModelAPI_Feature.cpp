@@ -88,7 +88,7 @@ void ModelAPI_Feature::eraseResults()
 
 boost::shared_ptr<ModelAPI_Document> ModelAPI_Feature::documentToAdd()
 {
-  return ModelAPI_PluginManager::get()->currentDocument();
+  return ModelAPI_Session::get()->activeDocument();
 }
 
 ModelAPI_Feature::~ModelAPI_Feature()

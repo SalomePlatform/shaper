@@ -16,11 +16,13 @@
 #include <QTimer>
 #include <QCloseEvent>
 
+
 XGUI_MainWindow::XGUI_MainWindow(QWidget* parent)
     : QMainWindow(parent),
-      myPythonConsole(0)
+      myPythonConsole(0), myIsModified(false)
 {
-  setWindowTitle(tr("New Geom"));
+  myTitle = tr("New Geom");
+  updateTitle();
   createMainMenu();
   QMdiArea* aMdiArea = new QMdiArea(this);
   aMdiArea->setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -248,6 +250,31 @@ void XGUI_MainWindow::createMainMenu()
   aMenuDock->setFeatures(QDockWidget::DockWidgetVerticalTitleBar);
   aMenuDock->setWindowTitle(tr("General"));
   addDockWidget(Qt::TopDockWidgetArea, aMenuDock);
+}
+
+
+void XGUI_MainWindow::updateTitle()
+{
+  QString aTitle = myTitle;
+  if (!myCurrentDir.isNull())
+    aTitle += ":" + myCurrentDir;
+  if (myIsModified)
+    aTitle += "*";
+  setWindowTitle(aTitle);
+}
+
+void XGUI_MainWindow::setCurrentDir(const QString& theDir, bool toUpdate)
+{
+  myCurrentDir = theDir;
+  if (toUpdate)
+    updateTitle();
+}
+
+void XGUI_MainWindow::setModifiedState(bool isModified, bool toUpdate)
+{
+  myIsModified = isModified;
+  if (toUpdate)
+    updateTitle();
 }
 
 CloseEventWatcher::CloseEventWatcher(QObject* theParent)

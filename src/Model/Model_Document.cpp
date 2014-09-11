@@ -5,7 +5,7 @@
 #include <Model_Document.h>
 #include <Model_Data.h>
 #include <Model_Application.h>
-#include <Model_PluginManager.h>
+#include <Model_Session.h>
 #include <Model_Events.h>
 #include <Model_ResultPart.h>
 #include <Model_ResultConstruction.h>
@@ -65,6 +65,9 @@ Model_Document::Model_Document(const std::string theID)
 static TCollection_ExtendedString DocFileName(const char* theFileName, const std::string& theID)
 {
   TCollection_ExtendedString aPath((const Standard_CString) theFileName);
+  // remove end-separators
+  while(aPath.Length() && (aPath.Value(aPath.Length()) == '\\' || aPath.Value(aPath.Length()) == '/'))
+    aPath.Remove(aPath.Length());
   aPath += _separator_;
   aPath += theID.c_str();
   aPath += ".cbf";  // standard binary file extension
@@ -74,7 +77,7 @@ static TCollection_ExtendedString DocFileName(const char* theFileName, const std
 bool Model_Document::load(const char* theFileName)
 {
   Handle(Model_Application) anApp = Model_Application::getApplication();
-  if (this == Model_PluginManager::get()->rootDocument().get()) {
+  if (this == Model_Session::get()->moduleDocument().get()) {
     anApp->setLoadPath(theFileName);
   }
   TCollection_ExtendedString aPath(DocFileName(theFileName, myID));
@@ -148,10 +151,10 @@ bool Model_Document::load(const char* theFileName)
   return !isError;
 }
 
-bool Model_Document::save(const char* theFileName)
+bool Model_Document::save(const char* theFileName, std::list<std::string>& theResults)
 {
   // create a directory in the root document if it is not yet exist
-  if (this == Model_PluginManager::get()->rootDocument().get()) {
+  if (this == Model_Session::get()->moduleDocument().get()) {
 #ifdef WIN32
     CreateDirectory(theFileName, NULL);
 #else
@@ -186,23 +189,25 @@ bool Model_Document::save(const char* theFileName)
   }
   myTransactionsAfterSave = 0;
   if (isDone) {  // save also sub-documents if any
+    theResults.push_back(TCollection_AsciiString(aPath).ToCString());
     std::set<std::string>::iterator aSubIter = mySubs.begin();
-    for (; aSubIter != mySubs.end() && isDone; aSubIter++)
-      isDone = subDocument(*aSubIter)->save(theFileName);
+    for (; aSubIter != mySubs.end() && isDone; aSubIter++) {
+      isDone = subDoc(*aSubIter)->save(theFileName, theResults);
+    }
   }
   return isDone;
 }
 
 void Model_Document::close()
 {
-  boost::shared_ptr<ModelAPI_PluginManager> aPM = Model_PluginManager::get();
-  if (this != aPM->rootDocument().get() && this == aPM->currentDocument().get()) {
-    aPM->setCurrentDocument(aPM->rootDocument());
+  boost::shared_ptr<ModelAPI_Session> aPM = Model_Session::get();
+  if (this != aPM->moduleDocument().get() && this == aPM->activeDocument().get()) {
+    aPM->setActiveDocument(aPM->moduleDocument());
   }
   // close all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
-    subDocument(*aSubIter)->close();
+    subDoc(*aSubIter)->close();
   mySubs.clear();
   // close this
   /* do not close because it can be undoed
@@ -228,7 +233,7 @@ void Model_Document::startOperation()
   // new command for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
-    subDocument(*aSubIter)->startOperation();
+    subDoc(*aSubIter)->startOperation();
 }
 
 void Model_Document::compactNested()
@@ -252,7 +257,7 @@ void Model_Document::finishOperation()
   // just to be sure that everybody knows that changes were performed
 
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
-    boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
+    boost::static_pointer_cast<Model_Session>(Model_Session::get())
         ->setCheckTransactions(false);  // for nested transaction commit
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
@@ -260,7 +265,7 @@ void Model_Document::finishOperation()
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
-    boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
+    boost::static_pointer_cast<Model_Session>(Model_Session::get())
         ->setCheckTransactions(true);  // for nested transaction commit
 
   if (myNestedNum != -1)  // this nested transaction is owervritten
@@ -279,7 +284,7 @@ void Model_Document::finishOperation()
   // finish for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
-    subDocument(*aSubIter)->finishOperation();
+    subDoc(*aSubIter)->finishOperation();
 }
 
 void Model_Document::abortOperation()
@@ -301,7 +306,7 @@ void Model_Document::abortOperation()
   // abort for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
-    subDocument(*aSubIter)->abortOperation();
+    subDoc(*aSubIter)->abortOperation();
 }
 
 bool Model_Document::isOperation()
@@ -313,7 +318,7 @@ bool Model_Document::isOperation()
 bool Model_Document::isModified()
 {
   // is modified if at least one operation was commited and not undoed
-  return myTransactionsAfterSave > 0;
+  return myTransactionsAfterSave > 0 || isOperation();
 }
 
 bool Model_Document::canUndo()
@@ -324,7 +329,7 @@ bool Model_Document::canUndo()
   // check other subs contains operation that can be undoed
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
-    if (subDocument(*aSubIter)->canUndo())
+    if (subDoc(*aSubIter)->canUndo())
       return true;
   return false;
 }
@@ -340,7 +345,7 @@ void Model_Document::undo()
   // undo for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
-    subDocument(*aSubIter)->undo();
+    subDoc(*aSubIter)->undo();
 }
 
 bool Model_Document::canRedo()
@@ -350,7 +355,7 @@ bool Model_Document::canRedo()
   // check other subs contains operation that can be redoed
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
-    if (subDocument(*aSubIter)->canRedo())
+    if (subDoc(*aSubIter)->canRedo())
       return true;
   return false;
 }
@@ -366,7 +371,7 @@ void Model_Document::redo()
   // redo for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
-    subDocument(*aSubIter)->redo();
+    subDoc(*aSubIter)->redo();
 }
 
 /// Appenad to the array of references a new referenced label
@@ -391,7 +396,7 @@ FeaturePtr Model_Document::addFeature(std::string theID)
 {
   TDF_Label anEmptyLab;
   FeaturePtr anEmptyFeature;
-  FeaturePtr aFeature = ModelAPI_PluginManager::get()->createFeature(theID);
+  FeaturePtr aFeature = ModelAPI_Session::get()->createFeature(theID);
   boost::shared_ptr<Model_Document> aDocToAdd = boost::dynamic_pointer_cast<Model_Document>(
       aFeature->documentToAdd());
   if (aFeature) {
@@ -511,6 +516,15 @@ boost::shared_ptr<ModelAPI_Document> Model_Document::subDocument(std::string the
   if (mySubs.find(theDocID) == mySubs.end())
     mySubs.insert(theDocID);
   return Model_Application::getApplication()->getDocument(theDocID);
+}
+
+boost::shared_ptr<Model_Document> Model_Document::subDoc(std::string theDocID)
+{
+  // just store sub-document identifier here to manage it later
+  if (mySubs.find(theDocID) == mySubs.end())
+    mySubs.insert(theDocID);
+  return boost::dynamic_pointer_cast<Model_Document>(
+    Model_Application::getApplication()->getDocument(theDocID));
 }
 
 ObjectPtr Model_Document::object(const std::string& theGroupID, const int theIndex,
@@ -654,7 +668,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   boost::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
   // after all updates, sends a message that groups of features were created or updated
-  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
+  boost::static_pointer_cast<Model_Session>(Model_Session::get())
     ->setCheckTransactions(false);
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->activateFlushes(false);
@@ -666,7 +680,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
     TDF_Label aFeatureLabel = aLabIter.Value()->Label();
     if (!myObjs.IsBound(aFeatureLabel)) {  // a new feature is inserted
       // create a feature
-      FeaturePtr aNewObj = ModelAPI_PluginManager::get()->createFeature(
+      FeaturePtr aNewObj = ModelAPI_Session::get()->createFeature(
           TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
               .ToCString());
       if (!aNewObj) {  // somethig is wrong, most probably, the opened document has invalid structure
@@ -738,7 +752,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   }
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
+  boost::static_pointer_cast<Model_Session>(Model_Session::get())
     ->setCheckTransactions(true);
   myExecuteFeatures = true;
 }
@@ -862,8 +876,8 @@ void Model_Document::updateResults(FeaturePtr theFeature)
         aNewBody = createBody(theFeature->data(), aResIndex);
       } else if (anArgLab.IsAttribute(ID_PART)) {
         aNewBody = createPart(theFeature->data(), aResIndex);
-      } else if (!anArgLab.IsAttribute(ID_CONSTRUCTION)) {
-        Events_Error::send("Unknown type of result if found in the document");
+      } else if (!anArgLab.IsAttribute(ID_CONSTRUCTION) && anArgLab.FindChild(1).HasAttribute()) {
+        Events_Error::send("Unknown type of result is found in the document");
       }
       if (aNewBody) {
         theFeature->setResult(aNewBody, aResIndex);

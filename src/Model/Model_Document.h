@@ -40,8 +40,9 @@ class Model_Document : public ModelAPI_Document
 
   //! Saves the OCAF document to the file.
   //! \param theFileName full name of the file to store
+  //! \param theResults the result full file names that were stored by "save"
   //! \returns true if file was stored successfully
-  MODEL_EXPORT virtual bool save(const char* theFileName);
+  MODEL_EXPORT virtual bool save(const char* theFileName, std::list<std::string>& theResults);
 
   //! Removes document data
   MODEL_EXPORT virtual void close();
@@ -84,6 +85,9 @@ class Model_Document : public ModelAPI_Document
 
   //! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
+
+  //! Internal sub-document by ID
+  MODEL_EXPORT virtual boost::shared_ptr<Model_Document> subDoc(std::string theDocID);
 
   ///! Returns the id of hte document
   MODEL_EXPORT virtual const std::string& id() const
@@ -159,7 +163,7 @@ class Model_Document : public ModelAPI_Document
   void updateResults(FeaturePtr theFeature);
 
   friend class Model_Application;
-  friend class Model_PluginManager;
+  friend class Model_Session;
   friend class DFBrowser;
 
  private:

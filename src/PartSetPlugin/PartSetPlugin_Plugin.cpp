@@ -2,7 +2,7 @@
 #include "PartSetPlugin_Part.h"
 #include "PartSetPlugin_Duplicate.h"
 #include "PartSetPlugin_Remove.h"
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 
 using namespace std;
@@ -13,7 +13,7 @@ static PartSetPlugin_Plugin* MY_INSTANCE = new PartSetPlugin_Plugin();
 PartSetPlugin_Plugin::PartSetPlugin_Plugin()
 {
   // register this plugin
-  ModelAPI_PluginManager::get()->registerPlugin(this);
+  ModelAPI_Session::get()->registerPlugin(this);
 }
 
 FeaturePtr PartSetPlugin_Plugin::createFeature(string theFeatureID)

@@ -5,7 +5,7 @@
 #include <ExchangePlugin_Plugin.h>
 #include <ExchangePlugin_ImportFeature.h>
 
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
@@ -17,7 +17,7 @@ static ExchangePlugin_Plugin* MY_INSTANCE = new ExchangePlugin_Plugin();
 ExchangePlugin_Plugin::ExchangePlugin_Plugin()
 {
   // register this plugin
-  ModelAPI_PluginManager::get()->registerPlugin(this);
+  ModelAPI_Session::get()->registerPlugin(this);
 }
 
 FeaturePtr ExchangePlugin_Plugin::createFeature(string theFeatureID)

@@ -10,6 +10,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Validator.h>
 #include <Events_Loop.h>
@@ -79,6 +80,25 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
         aMustbeUpdated = true;
       }
     }
+    // reference to attribute or object
+    list<boost::shared_ptr<ModelAPI_Attribute> > aRefAttrs = theFeature->data()->attributes(
+        ModelAPI_AttributeRefAttr::type());
+    for (aRefsIter = aRefAttrs.begin(); aRefsIter != aRefAttrs.end(); aRefsIter++) {
+      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*aRefsIter);
+      if (!aRef) continue;
+      if (aRef->isObject()) {
+        boost::shared_ptr<ModelAPI_Object> aSub = aRef->object();
+        if (updateObject(aSub)) {
+          aMustbeUpdated = true;
+        }
+      } else if (aRef->attr()) { // reference to the attribute
+        boost::shared_ptr<ModelAPI_Object> aSub = aRef->attr()->owner();
+        if (updateObject(aSub)) {
+          aMustbeUpdated = true;
+        }
+      }
+    }
     // lists of references
     aRefs = theFeature->data()->attributes(ModelAPI_AttributeRefList::type());
     for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
@@ -97,7 +117,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
 
       if (boost::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
           !theFeature->isPersistentResult()) {
-        ModelAPI_ValidatorsFactory* aFactory = ModelAPI_PluginManager::get()->validators();
+        ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
         if (aFactory->validate(theFeature)) {
           try {
             theFeature->execute();

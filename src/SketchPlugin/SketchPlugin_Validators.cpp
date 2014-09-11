@@ -15,7 +15,7 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
                                                  const ObjectPtr& theObject) const
 {
   std::string aParamA = theArguments.front();
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
   // If the object is not a line then it is accepted

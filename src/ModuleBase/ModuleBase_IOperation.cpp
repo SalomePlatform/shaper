@@ -10,7 +10,7 @@
 #include "ModuleBase_ModelWidget.h"
 
 #include <ModelAPI_Document.h>
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -51,12 +51,12 @@ bool ModuleBase_IOperation::canBeCommitted() const
 
 boost::shared_ptr<ModelAPI_Document> ModuleBase_IOperation::document() const
 {
-  return ModelAPI_PluginManager::get()->rootDocument();
+  return ModelAPI_Session::get()->moduleDocument();
 }
 
 void ModuleBase_IOperation::start()
 {
-  document()->startOperation();
+  ModelAPI_Session::get()->startOperation();
 
   startOperation();
   emit started();
@@ -74,7 +74,7 @@ void ModuleBase_IOperation::abort()
 
   stopOperation();
 
-  document()->abortOperation();
+  ModelAPI_Session::get()->abortOperation();
   emit stopped();
 }
 
@@ -86,7 +86,7 @@ bool ModuleBase_IOperation::commit()
 
     stopOperation();
 
-    document()->finishOperation();
+    ModelAPI_Session::get()->finishOperation();
     emit stopped();
 
     afterCommitOperation();

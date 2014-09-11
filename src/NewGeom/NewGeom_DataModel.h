@@ -5,11 +5,13 @@
 #include "NewGeom.h"
 #include <LightApp_DataModel.h>
 
+class NewGeom_Module;
+
 class NewGeom_EXPORT NewGeom_DataModel : public LightApp_DataModel
 {
   Q_OBJECT
  public:
-  NewGeom_DataModel(CAM_Module* theModule);
+  NewGeom_DataModel(NewGeom_Module* theModule);
   virtual ~NewGeom_DataModel();
 
   virtual bool open(const QString& thePath, CAM_Study* theStudy, QStringList theFiles);
@@ -25,7 +27,7 @@ class NewGeom_EXPORT NewGeom_DataModel : public LightApp_DataModel
 
  private:
   QString myStudyPath;
-
+  NewGeom_Module* myModule;
 };
 
 #endif
