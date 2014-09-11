@@ -577,9 +577,11 @@ void XGUI_Workshop::onNew()
 //******************************************************
 void XGUI_Workshop::onOpen()
 {
+  if(!myOperationMgr->abortOperation())
+    return;
   //save current file before close if modified
-  SessionPtr aMgr = ModelAPI_Session::get();
-  if (aMgr->isModified()) {
+  SessionPtr aSession = ModelAPI_Session::get();
+  if (aSession->isModified()) {
     //TODO(sbh): re-launch the app?
     int anAnswer = QMessageBox::question(
         myMainWindow, tr("Save current file"),
@@ -590,7 +592,7 @@ void XGUI_Workshop::onOpen()
     } else if (anAnswer == QMessageBox::Cancel) {
       return;
     }
-    aMgr->moduleDocument()->close();
+    aSession->moduleDocument()->close();
     myCurrentDir = "";
   }
 
@@ -605,7 +607,7 @@ void XGUI_Workshop::onOpen()
     return;
   }
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  aMgr->load(myCurrentDir.toLatin1().constData());
+  aSession->load(myCurrentDir.toLatin1().constData());
   myObjectBrowser->rebuildDataTree();
   displayAllResults();
   updateCommandStatus();
@@ -615,6 +617,8 @@ void XGUI_Workshop::onOpen()
 //******************************************************
 bool XGUI_Workshop::onSave()
 {
+  if(!myOperationMgr->abortOperation())
+    return false;
   if (myCurrentDir.isEmpty()) {
     return onSaveAs();
   }
@@ -628,6 +632,8 @@ bool XGUI_Workshop::onSave()
 //******************************************************
 bool XGUI_Workshop::onSaveAs()
 {
+  if(!myOperationMgr->abortOperation())
+    return false;
   QFileDialog dialog(mainWindow());
   dialog.setWindowTitle(tr("Select directory to save files..."));
   dialog.setFileMode(QFileDialog::Directory);
