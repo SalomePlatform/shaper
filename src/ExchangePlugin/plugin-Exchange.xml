@@ -4,12 +4,12 @@
       <feature
         id="Import"
         title="Import"
-        tooltip="Import a mesh"
+        tooltip="Import shape"
         icon=":icons/import.png">
         <file_selector
           id="import_file_selector"
           title="Import file"
-          path="D:\NewGEOM\data\brep-step"
+          path=""
           formats="BREP,STEP" />
         <!-- TODO: pass formats as validator 
         <validator id="Format" parameters="BREP:BREPImport,STEP:STEPImport" /> 

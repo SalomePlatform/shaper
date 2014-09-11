@@ -137,10 +137,9 @@ bool ModuleBase_WidgetFeature::restoreValue()
   boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
-  ObjectPtr aObj = aRef->object();
-  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aRef->object());
-  if (aFeature) {
-    myObject = aFeature;
+  ObjectPtr anObjPtr = aRef->object();
+  if (anObjPtr) {
+    myObject = anObjPtr;
     myEditor->setText(myObject ? myObject->data()->name().c_str() : "");
     return true;
   }

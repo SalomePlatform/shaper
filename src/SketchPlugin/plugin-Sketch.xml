@@ -40,7 +40,7 @@
           <validator id="SketchPlugin_DistanceAttrValidator" parameters="ConstraintEntityA"/>
         </feature_or_attribute_selector>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
-        <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue"/>
+        <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue" default="computed"/>
         <validator id="PartSet_DistanceValidator"/>
       </feature>
       
@@ -50,7 +50,7 @@
           <validator id="SketchPlugin_ResultLineValidator"/>
         </feature_selector>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
-        <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue"/>
+        <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue" default="computed"/>
         <validator id="PartSet_LengthValidator"/> 
       </feature>
       

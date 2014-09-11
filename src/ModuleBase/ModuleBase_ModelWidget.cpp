@@ -28,12 +28,6 @@ bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
   return theObject->data()->attribute(attributeID())->isInitialized();
 }
 
-void ModuleBase_ModelWidget::setAttributeComputedState(ObjectPtr theObject) const
-{
-  if(myIsComputedDefault)
-    theObject->data()->attribute(attributeID())->setComputedDefault();
-}
-
 bool ModuleBase_ModelWidget::focusTo()
 {
   QList<QWidget*> aControls = getControls();

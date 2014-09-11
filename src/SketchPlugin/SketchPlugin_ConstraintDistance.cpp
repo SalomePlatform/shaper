@@ -33,28 +33,36 @@ void SketchPlugin_ConstraintDistance::initAttributes()
 void SketchPlugin_ConstraintDistance::execute()
 {
   boost::shared_ptr<ModelAPI_Data> aData = data();
-  AttributeDoublePtr anAttr_Value = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+  AttributeDoublePtr anAttrValue = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
       aData->attribute(SketchPlugin_Constraint::VALUE()));
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint_A = getFeaturePoint(
-      aData, SketchPlugin_Constraint::ENTITY_A());
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint_B = getFeaturePoint(
-      aData, SketchPlugin_Constraint::ENTITY_B());
+  if(anAttrValue->isInitialized())
+    return;
+  boost::shared_ptr<GeomDataAPI_Point2D> aPointA =
+      getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_A());
+  boost::shared_ptr<GeomDataAPI_Point2D> aPointB =
+      getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_B());
 
-  if (aPoint_A && aPoint_B) {  // both points
-    anAttr_Value->setValue(aPoint_A->pnt()->distance(aPoint_B->pnt()));
+  double aDistance = -1.;
+  if (aPointA && aPointB) {  // both points
+    aDistance = aPointA->pnt()->distance(aPointB->pnt());
   } else {
-    if (!aPoint_A && aPoint_B) {  //Line and point
-      boost::shared_ptr<SketchPlugin_Line> aLine = getFeatureLine(
-          aData, SketchPlugin_Constraint::ENTITY_A());
-      if (aLine)
-        anAttr_Value->setValue(aLine->distanceToPoint(aPoint_B->pnt()));
-    } else if (aPoint_A && !aPoint_B) {  // Point and line
-      boost::shared_ptr<SketchPlugin_Line> aLine = getFeatureLine(
-          aData, SketchPlugin_Constraint::ENTITY_B());
-      if (aLine)
-        anAttr_Value->setValue(aLine->distanceToPoint(aPoint_A->pnt()));
+    if (!aPointA && aPointB) {  //Line and point
+      boost::shared_ptr<SketchPlugin_Line> aLine =
+          getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
+      if (aLine) {
+        aDistance = aLine->distanceToPoint(aPointB->pnt());
+      }
+    } else if (aPointA && !aPointB) {  // Point and line
+      boost::shared_ptr<SketchPlugin_Line> aLine =
+          getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+      if (aLine) {
+        aDistance = aLine->distanceToPoint(aPointA->pnt());
+      }
     }
+  }
+  if(aDistance >= 0) {
+    anAttrValue->setValue(aDistance);
   }
 }
 
