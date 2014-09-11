@@ -52,11 +52,6 @@ void Model_Data::setName(const std::string& theName)
     if (isModified)
       aName->Set(theName.c_str());
   }
-  // to do not cause the update of the result on name change
-  /*if (isModified) {
-   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-   ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent, false);
-   }*/
 }
 
 void Model_Data::addAttribute(const std::string& theID, const std::string theAttrType)

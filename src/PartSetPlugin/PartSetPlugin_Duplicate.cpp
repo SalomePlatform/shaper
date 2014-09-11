@@ -21,13 +21,13 @@ void PartSetPlugin_Duplicate::initAttributes()
   data()->addAttribute(ORIGIN_REF(), ModelAPI_AttributeRefAttr::type());
 
   boost::shared_ptr<ModelAPI_Session> aPManager = ModelAPI_Session::get();
-  boost::shared_ptr<ModelAPI_Document> aRoot = aPManager->rootDocument();
+  boost::shared_ptr<ModelAPI_Document> aRoot = aPManager->moduleDocument();
   boost::shared_ptr<ModelAPI_ResultPart> aSource;  // searching for source document attribute
   for (int a = aRoot->size(getGroup()) - 1; a >= 0; a--) {
     aSource = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aRoot->object(getGroup(), a));
     if (aSource && aSource->data()
         && aSource->data()->docRef(ModelAPI_ResultPart::DOC_REF())->value()
-            == aPManager->currentDocument())
+            == aPManager->activeDocument())
       break;
     aSource.reset();
   }

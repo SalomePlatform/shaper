@@ -25,6 +25,64 @@ using namespace std;
 
 static Model_Session* myImpl = new Model_Session();
 
+// t oredirect all calls to the root document
+#define ROOT_DOC boost::dynamic_pointer_cast<Model_Document>(moduleDocument())
+
+bool Model_Session::load(const char* theFileName)
+{
+  return ROOT_DOC->load(theFileName);
+}
+
+bool Model_Session::save(const char* theFileName, std::list<std::string>& theResults)
+{
+  return ROOT_DOC->save(theFileName, theResults);
+}
+
+void Model_Session::startOperation()
+{
+  ROOT_DOC->startOperation();
+}
+
+void Model_Session::finishOperation()
+{
+  ROOT_DOC->finishOperation();
+}
+
+void Model_Session::abortOperation()
+{
+  ROOT_DOC->abortOperation();
+}
+
+bool Model_Session::isOperation()
+{
+  return ROOT_DOC->isOperation();
+}
+
+bool Model_Session::isModified()
+{
+  return ROOT_DOC->isModified();
+}
+
+bool Model_Session::canUndo()
+{
+  return ROOT_DOC->canUndo();
+}
+
+void Model_Session::undo()
+{
+  ROOT_DOC->undo();
+}
+
+bool Model_Session::canRedo()
+{
+  return ROOT_DOC->canRedo();
+}
+
+void Model_Session::redo()
+{
+  ROOT_DOC->redo();
+}
+
 FeaturePtr Model_Session::createFeature(string theFeatureID)
 {
   if (this != myImpl)
@@ -55,25 +113,25 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
   return FeaturePtr();  // return nothing
 }
 
-boost::shared_ptr<ModelAPI_Document> Model_Session::rootDocument()
+boost::shared_ptr<ModelAPI_Document> Model_Session::moduleDocument()
 {
   return boost::shared_ptr<ModelAPI_Document>(
       Model_Application::getApplication()->getDocument("root"));
 }
 
-bool Model_Session::hasRootDocument()
+bool Model_Session::hasModuleDocument()
 {
   return Model_Application::getApplication()->hasDocument("root");
 }
 
-boost::shared_ptr<ModelAPI_Document> Model_Session::currentDocument()
+boost::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
 {
   if (!myCurrentDoc || !Model_Application::getApplication()->hasDocument(myCurrentDoc->id()))
-    myCurrentDoc = rootDocument();
+    myCurrentDoc = moduleDocument();
   return myCurrentDoc;
 }
 
-void Model_Session::setCurrentDocument(boost::shared_ptr<ModelAPI_Document> theDoc)
+void Model_Session::setActiveDocument(boost::shared_ptr<ModelAPI_Document> theDoc)
 {
   myCurrentDoc = theDoc;
   static Events_Message aMsg(Events_Loop::eventByName("CurrentDocumentChanged"));
@@ -141,7 +199,7 @@ void Model_Session::processEvent(const Events_Message* theMessage)
       }
     }
   } else {  // create/update/delete
-    if (myCheckTransactions && !rootDocument()->isOperation())
+    if (myCheckTransactions && !isOperation())
       Events_Error::send("Modification of data structure outside of the transaction");
   }
 }

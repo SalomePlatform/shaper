@@ -115,7 +115,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
         ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
         FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
         if (aPart) {
-          if (aMgr->currentDocument() == aPart->partDoc())
+          if (aMgr->activeDocument() == aPart->partDoc())
             aMenu->addAction(action("DEACTIVATE_PART_CMD"));
           else
             aMenu->addAction(action("ACTIVATE_PART_CMD"));
@@ -130,7 +130,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
           aMenu->addAction(action("SHOW_ONLY_CMD"));
         }
       } else {  // If feature is 0 the it means that selected root object (document)
-        if (aMgr->currentDocument() != aMgr->rootDocument())
+        if (aMgr->activeDocument() != aMgr->moduleDocument())
           aMenu->addAction(action("ACTIVATE_PART_CMD"));
       }
     } else if (aSelected >= 1) {
