@@ -202,6 +202,9 @@ signals:
 
   void activateLastPart();
 
+  /// Display all results of the current document
+  void displayAllResults();
+
  protected:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
@@ -216,7 +219,6 @@ signals:
 
   QList<QAction*> getModuleCommands() const;
 
-  void displayAllResults();
   void displayDocumentResults(DocumentPtr theDoc);
   void displayGroupResults(DocumentPtr theDoc, std::string theGroup);
 

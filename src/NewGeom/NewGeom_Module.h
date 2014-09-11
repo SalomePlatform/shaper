@@ -77,6 +77,8 @@ Q_OBJECT
 
   XGUI_Workshop* workshop() const { return myWorkshop; }
 
+  void setIsOpened(bool theOpened) { myIsOpened = theOpened; }
+
  public slots:
   virtual bool activateModule(SUIT_Study* theStudy);
   virtual bool deactivateModule(SUIT_Study* theStudy);
@@ -99,6 +101,8 @@ Q_OBJECT
   NewGeom_SalomeViewer* myProxyViewer;
 
   QMap<QString, QStringList> myNestedActions;
+
+  bool myIsOpened;
 };
 
 #endif
