@@ -65,6 +65,9 @@ Model_Document::Model_Document(const std::string theID)
 static TCollection_ExtendedString DocFileName(const char* theFileName, const std::string& theID)
 {
   TCollection_ExtendedString aPath((const Standard_CString) theFileName);
+  // remove end-separators
+  while(aPath.Length() && (aPath.Value(aPath.Length()) == '\\' || aPath.Value(aPath.Length()) == '/'))
+    aPath.Remove(aPath.Length());
   aPath += _separator_;
   aPath += theID.c_str();
   aPath += ".cbf";  // standard binary file extension
