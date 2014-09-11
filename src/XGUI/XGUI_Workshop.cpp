@@ -305,7 +305,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     }
   }
   if (!isSalomeMode()) {
-    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+    SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aDoc = aMgr->rootDocument();
     if (aDoc->isModified() != myMainWindow->isModifiedState())
       myMainWindow->setModifiedState(aDoc->isModified());
