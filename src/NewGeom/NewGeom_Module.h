@@ -75,6 +75,8 @@ Q_OBJECT
   virtual void createPreferences();
   virtual void preferencesChanged(const QString& theSection, const QString& theParam);
 
+  XGUI_Workshop* workshop() const { return myWorkshop; }
+
  public slots:
   virtual bool activateModule(SUIT_Study* theStudy);
   virtual bool deactivateModule(SUIT_Study* theStudy);

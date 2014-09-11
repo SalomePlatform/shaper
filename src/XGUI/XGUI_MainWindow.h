@@ -51,6 +51,17 @@ Q_OBJECT
 
   void createSubWindow();
 
+  /// Add name of current directory into title of desktop window
+  void setCurrentDir(const QString& theDir, bool toUpdate = true);
+
+  /// Add asterisk to a title of the window
+  void setModifiedState(bool isModified, bool toUpdate = true);
+
+  /// Returns current state of modification
+  bool isModifiedState() const { return myIsModified; }
+
+  void updateTitle();
+
  private slots:
   void cascadeWindows();
   void onViewCreated(XGUI_ViewWindow* theWindow);
@@ -68,6 +79,10 @@ signals:
  private:
   XGUI_MainMenu* myMenuBar;
   XGUI_Viewer* myViewer;
+
+  QString myTitle;
+  QString myCurrentDir;
+  bool myIsModified;
 
   PyConsole_EnhConsole* myPythonConsole;
 };

@@ -237,11 +237,10 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
     if (!aFeatureMsg->isInternal()) {
       addFeature(aFeatureMsg);
     }
-    return;
   }
 
   // Process creation of Part
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
     const ModelAPI_ObjectUpdatedMessage* aUpdMsg =
         dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureCreatedMsg(aUpdMsg);
@@ -250,48 +249,42 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
         mySalomeConnector->createPreferences();
       myUpdatePrefs = false;
     }
-    return;
   }
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_PLUGIN_LOADED)) {
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_PLUGIN_LOADED)) {
     myUpdatePrefs = true;
-    return;
   }
 
   // Redisplay feature
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
     const ModelAPI_ObjectUpdatedMessage* aUpdMsg =
         dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureRedisplayMsg(aUpdMsg);
-    return;
   }
 
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
     const ModelAPI_ObjectUpdatedMessage* anUpdateMsg =
         dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
     onFeatureUpdatedMsg(anUpdateMsg);
-    return;
   }
 
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     const ModelAPI_ObjectDeletedMessage* aDelMsg =
         dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
     onObjectDeletedMsg(aDelMsg);
-    return;
   }
 
-  if (theMessage->eventID() == Events_LongOp::eventID()) {
+  else if (theMessage->eventID() == Events_LongOp::eventID()) {
     if (Events_LongOp::isPerformed())
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QTimer::singleShot(10, this, SLOT(onStartWaiting()));
     else
       QApplication::restoreOverrideCursor();
-    return;
   }
 
   //An operation passed by message. Start it, process and commit.
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OPERATION_LAUNCHED)) {
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OPERATION_LAUNCHED)) {
     const Config_PointerMessage* aPartSetMsg =
         dynamic_cast<const Config_PointerMessage*>(theMessage);
     //myPropertyPanel->cleanContent();
@@ -304,12 +297,18 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
           updateCommandStatus();
       }
     }
-    return;
+  } else {
+    //Show error dialog if error message received.
+    const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
+    if (anAppError) {
+      emit errorOccurred(QString::fromLatin1(anAppError->description()));
+    }
   }
-  //Show error dialog if error message received.
-  const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
-  if (anAppError) {
-    emit errorOccurred(QString::fromLatin1(anAppError->description()));
+  if (!isSalomeMode()) {
+    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+    DocumentPtr aDoc = aMgr->rootDocument();
+    if (aDoc->isModified() != myMainWindow->isModifiedState())
+      myMainWindow->setModifiedState(aDoc->isModified());
   }
 }
 
@@ -528,13 +527,12 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
 /*
  * Saves document with given name.
  */
-void XGUI_Workshop::saveDocument(QString theName)
+void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>& theFileNames)
 {
   QApplication::restoreOverrideCursor();
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   DocumentPtr aDoc = aMgr->rootDocument();
-  std::list<std::string> aFileNames;
-  aDoc->save(theName.toLatin1().constData(), aFileNames);
+  aDoc->save(theName.toLatin1().constData(), theFileNames);
   QApplication::restoreOverrideCursor();
 }
 
@@ -624,8 +622,10 @@ bool XGUI_Workshop::onSave()
   if (myCurrentDir.isEmpty()) {
     return onSaveAs();
   }
-  saveDocument(myCurrentDir);
+  std::list<std::string> aFiles;
+  saveDocument(myCurrentDir, aFiles);
   updateCommandStatus();
+  myMainWindow->setModifiedState(false);
   return true;
 }
 
@@ -656,6 +656,10 @@ bool XGUI_Workshop::onSaveAs()
     }
   }
   myCurrentDir = aTempDir;
+  if (!isSalomeMode()) {
+    myMainWindow->setCurrentDir(myCurrentDir, false);
+    myMainWindow->setModifiedState(false);
+  }
   return onSave();
 }
 

@@ -162,6 +162,19 @@ Q_OBJECT
     return myModule;
   }
 
+  /// Returns current directory whic contains data files
+  QString currentDataDir() const { return myCurrentDir; }
+
+  /// Returns current directory whic contains data files
+  void setCurrentDataDir(const QString& theDir) { myCurrentDir = theDir; }
+
+  /**
+  * Save the current document into a directory
+  * \param theName - path to the directory
+  * \param theFileNames - returned file names created in this directory
+  */
+  void saveDocument(const QString& theName, std::list<std::string>& theFileNames);
+
 signals:
   void salomeViewerSelection();
   void errorOccurred(const QString&);
@@ -193,7 +206,6 @@ signals:
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
   void connectWithOperation(ModuleBase_Operation* theOperation);
-  void saveDocument(QString theName);
 
   void onFeatureUpdatedMsg(const ModelAPI_ObjectUpdatedMessage* theMsg);
   void onFeatureCreatedMsg(const ModelAPI_ObjectUpdatedMessage* theMsg);
