@@ -171,7 +171,7 @@ FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theVie
 
 boost::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
 {
-  return ModelAPI_PluginManager::get()->rootDocument();
+  return ModelAPI_Session::get()->rootDocument();
 }
 
 void PartSet_Tools::setFeaturePoint(FeaturePtr theFeature, double theX, double theY,

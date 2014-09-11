@@ -12,7 +12,7 @@
 #include "SketchPlugin_ConstraintRadius.h"
 #include "SketchPlugin_Validators.h"
 #include "SketchPlugin_ResultValidators.h"
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Validator.h>
 
@@ -25,7 +25,7 @@ static SketchPlugin_Plugin* MY_INSTANCE = new SketchPlugin_Plugin();
 
 SketchPlugin_Plugin::SketchPlugin_Plugin()
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("SketchPlugin_DistanceAttrValidator",
                               new SketchPlugin_DistanceAttrValidator);
@@ -36,7 +36,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   aFactory->registerValidator("SketchPlugin_ResultArcValidator", new SketchPlugin_ResultArcValidator);
 
   // register this plugin
-  ModelAPI_PluginManager::get()->registerPlugin(this);
+  ModelAPI_Session::get()->registerPlugin(this);
 
   // register sketcher properties
   Config_PropManager::registerProp("Sketch planes", "planes_color", "Color", Config_Prop::Color,

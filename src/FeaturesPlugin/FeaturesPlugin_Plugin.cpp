@@ -2,7 +2,7 @@
 #include "FeaturesPlugin_Extrusion.h"
 #include "FeaturesPlugin_Boolean.h"
 
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 
 using namespace std;
@@ -13,7 +13,7 @@ static FeaturesPlugin_Plugin* MY_INSTANCE = new FeaturesPlugin_Plugin();
 FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
 {
   // register this plugin
-  ModelAPI_PluginManager::get()->registerPlugin(this);
+  ModelAPI_Session::get()->registerPlugin(this);
 }
 
 FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)

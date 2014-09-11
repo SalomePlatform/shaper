@@ -117,7 +117,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
 
       if (boost::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
           !theFeature->isPersistentResult()) {
-        ModelAPI_ValidatorsFactory* aFactory = ModelAPI_PluginManager::get()->validators();
+        ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
         if (aFactory->validate(theFeature)) {
           try {
             theFeature->execute();

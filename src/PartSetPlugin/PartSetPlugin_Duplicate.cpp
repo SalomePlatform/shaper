@@ -20,7 +20,7 @@ void PartSetPlugin_Duplicate::initAttributes()
   PartSetPlugin_Part::initAttributes();
   data()->addAttribute(ORIGIN_REF(), ModelAPI_AttributeRefAttr::type());
 
-  boost::shared_ptr<ModelAPI_PluginManager> aPManager = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Session> aPManager = ModelAPI_Session::get();
   boost::shared_ptr<ModelAPI_Document> aRoot = aPManager->rootDocument();
   boost::shared_ptr<ModelAPI_ResultPart> aSource;  // searching for source document attribute
   for (int a = aRoot->size(getGroup()) - 1; a >= 0; a--) {

@@ -1,12 +1,12 @@
-// File:        Model_PluginManager.hxx
+// File:        Model_Session.hxx
 // Created:     20 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef Model_PluginManager_H_
-#define Model_PluginManager_H_
+#ifndef Model_Session_H_
+#define Model_Session_H_
 
 #include "Model.h"
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Feature.h>
 
 #include <Events_Listener.h>
@@ -14,13 +14,13 @@
 
 class Model_Document;
 
-/**\class Model_PluginManager
+/**\class Model_Session
  * \ingroup DataModel
  * \brief Object that knows (from the initial XML file) which
  * plugin contains which feature, loads and stores reference to loaded plugins by
  * the feature functionality request.
  */
-class Model_PluginManager : public ModelAPI_PluginManager, public Events_Listener
+class Model_Session : public ModelAPI_Session, public Events_Listener
 {
   bool myPluginsInfoLoaded;  ///< it true if plugins information is loaded
   /// map of feature IDs to plugin name
@@ -63,7 +63,7 @@ class Model_PluginManager : public ModelAPI_PluginManager, public Events_Listene
   }
 
   /// Is called only once, on startup of the application
-  Model_PluginManager();
+  Model_Session();
 
  protected:
   /// Loads (if not done yet) the information about the features and plugins

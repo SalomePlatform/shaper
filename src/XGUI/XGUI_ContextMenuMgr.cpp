@@ -106,7 +106,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
   QList<ObjectPtr> aObjects = aSelMgr->selection()->selectedObjects();
   int aSelected = aObjects.size();
   if (aSelected > 0) {
-    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+    SessionPtr aMgr = ModelAPI_Session::get();
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     //Process Feature
     if (aSelected == 1) {

@@ -5,7 +5,7 @@
 #include <Model_ResultPart.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 
 boost::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
 {
@@ -40,5 +40,5 @@ void Model_ResultPart::activate()
     }
   }
   if (aDocRef->value())
-    ModelAPI_PluginManager::get()->setCurrentDocument(aDocRef->value());
+    ModelAPI_Session::get()->setCurrentDocument(aDocRef->value());
 }

@@ -160,7 +160,7 @@ class Model_Document : public ModelAPI_Document
   void updateResults(FeaturePtr theFeature);
 
   friend class Model_Application;
-  friend class Model_PluginManager;
+  friend class Model_Session;
   friend class DFBrowser;
 
  private:
