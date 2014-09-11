@@ -613,6 +613,7 @@ void XGUI_Workshop::onOpen()
   myObjectBrowser->rebuildDataTree();
   displayAllResults();
   updateCommandStatus();
+  myMainWindow->setCurrentDir(myCurrentDir);
   QApplication::restoreOverrideCursor();
 }
 
