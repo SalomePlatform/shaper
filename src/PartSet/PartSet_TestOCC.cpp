@@ -132,7 +132,7 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
 
   if (aPreviewOp) {
     // create a line
-    boost::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_Session::get()->rootDocument();
+    boost::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_Session::get()->moduleDocument();
     FeaturePtr aFeature = aDoc->addFeature(SketchPlugin_Line::ID());
     if (aFeature)  // TODO: generate an error if feature was not created
       aFeature->execute();

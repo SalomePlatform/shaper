@@ -7,6 +7,7 @@
 
 #include "ModelAPI.h"
 #include <string>
+#include <list>
 #include <boost/shared_ptr.hpp>
 
 class ModelAPI_Feature;
@@ -27,22 +28,54 @@ class MODELAPI_EXPORT ModelAPI_Session
   /// Returns the real implementation (the alone instance per application) of the plugin manager
   static boost::shared_ptr<ModelAPI_Session> get();
 
+  //! Loads the OCAF document from the file.
+  //! \param theFileName full name of the file to load
+  //! \param theStudyID identifier of the SALOME study to associate with loaded file
+  //! \returns true if file was loaded successfully
+  virtual bool load(const char* theFileName) = 0;
+
+  //! Saves the OCAF document to the file.
+  //! \param theFileName full name of the file to store
+  //! \param theResults the result full file names that were stored by "save"
+  //! \returns true if file was stored successfully
+  virtual bool save(const char* theFileName, std::list<std::string>& theResults) = 0;
+
+  //! Starts a new operation (opens a tansaction)
+  virtual void startOperation() = 0;
+  //! Finishes the previously started operation (closes the transaction)
+  virtual void finishOperation() = 0;
+  //! Aborts the operation 
+  virtual void abortOperation() = 0;
+  //! Returns true if operation has been started, but not yet finished or aborted
+  virtual bool isOperation() = 0;
+  //! Returns true if document was modified (since creation/opening)
+  virtual bool isModified() = 0;
+
+  //! Returns True if there are available Undos
+  virtual bool canUndo() = 0;
+  //! Undoes last operation
+  virtual void undo() = 0;
+  //! Returns True if there are available Redos
+  virtual bool canRedo() = 0;
+  //! Redoes last operation
+  virtual void redo() = 0;
+
   /// Registers the plugin that creates features.
   /// It is obligatory for each plugin to call this function on loading to be found by 
   /// the plugin manager on call of the feature)
   virtual void registerPlugin(ModelAPI_Plugin* thePlugin) = 0;
 
   /// Returns the root document of the application (that may contains sub-documents)
-  virtual boost::shared_ptr<ModelAPI_Document> rootDocument() = 0;
+  virtual boost::shared_ptr<ModelAPI_Document> moduleDocument() = 0;
 
   /// Return true if root document has been already created
-  virtual bool hasRootDocument() = 0;
+  virtual bool hasModuleDocument() = 0;
 
   /// Returns the current document that used for current work in the application
-  virtual boost::shared_ptr<ModelAPI_Document> currentDocument() = 0;
+  virtual boost::shared_ptr<ModelAPI_Document> activeDocument() = 0;
 
   /// Defines the current document that used for current work in the application
-  virtual void setCurrentDocument(boost::shared_ptr<ModelAPI_Document> theDoc) = 0;
+  virtual void setActiveDocument(boost::shared_ptr<ModelAPI_Document> theDoc) = 0;
 
   /// Copies the document to the new one with the given id
   virtual boost::shared_ptr<ModelAPI_Document> copy(boost::shared_ptr<ModelAPI_Document> theSource,

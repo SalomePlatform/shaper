@@ -86,6 +86,9 @@ class Model_Document : public ModelAPI_Document
   //! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
 
+  //! Internal sub-document by ID
+  MODEL_EXPORT virtual boost::shared_ptr<Model_Document> subDoc(std::string theDocID);
+
   ///! Returns the id of hte document
   MODEL_EXPORT virtual const std::string& id() const
   {

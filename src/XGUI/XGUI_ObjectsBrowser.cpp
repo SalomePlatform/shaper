@@ -84,9 +84,9 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
     QString aRes = aEditor->text();
     ObjectPtr aFeature = mySelectedData.first();
     SessionPtr aMgr = ModelAPI_Session::get();
-    aMgr->rootDocument()->startOperation();
+    aMgr->startOperation();
     aFeature->data()->setName(qPrintable(aRes));
-    aMgr->rootDocument()->finishOperation();
+    aMgr->finishOperation();
   }
 }
 
@@ -120,7 +120,7 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
   aLabelLay->addWidget(aLbl);
 
   SessionPtr aMgr = ModelAPI_Session::get();
-  DocumentPtr aDoc = aMgr->rootDocument();
+  DocumentPtr aDoc = aMgr->moduleDocument();
   // TODO: Find a name of the root document
 
   myActiveDocLbl = new QLineEdit(tr("Part set"), aLabelWgt);
@@ -227,7 +227,7 @@ void XGUI_ObjectsBrowser::closeDocNameEditing(bool toSave)
   if (toSave) {
     // TODO: Save the name of root document
     SessionPtr aMgr = ModelAPI_Session::get();
-    DocumentPtr aDoc = aMgr->rootDocument();
+    DocumentPtr aDoc = aMgr->moduleDocument();
   } else {
     myActiveDocLbl->setText(myActiveDocLbl->property("OldText").toString());
   }
