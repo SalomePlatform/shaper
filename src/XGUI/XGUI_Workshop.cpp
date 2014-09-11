@@ -533,7 +533,8 @@ void XGUI_Workshop::saveDocument(QString theName)
   QApplication::restoreOverrideCursor();
   PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
   DocumentPtr aDoc = aMgr->rootDocument();
-  aDoc->save(theName.toLatin1().constData());
+  std::list<std::string> aFileNames;
+  aDoc->save(theName.toLatin1().constData(), aFileNames);
   QApplication::restoreOverrideCursor();
 }
 

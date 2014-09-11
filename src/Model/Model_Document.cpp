@@ -148,7 +148,7 @@ bool Model_Document::load(const char* theFileName)
   return !isError;
 }
 
-bool Model_Document::save(const char* theFileName)
+bool Model_Document::save(const char* theFileName, std::list<std::string>& theResults)
 {
   // create a directory in the root document if it is not yet exist
   if (this == Model_PluginManager::get()->rootDocument().get()) {
@@ -186,9 +186,10 @@ bool Model_Document::save(const char* theFileName)
   }
   myTransactionsAfterSave = 0;
   if (isDone) {  // save also sub-documents if any
+    theResults.push_back(TCollection_AsciiString(aPath).ToCString());
     std::set<std::string>::iterator aSubIter = mySubs.begin();
     for (; aSubIter != mySubs.end() && isDone; aSubIter++)
-      isDone = subDocument(*aSubIter)->save(theFileName);
+      isDone = subDocument(*aSubIter)->save(theFileName, theResults);
   }
   return isDone;
 }
