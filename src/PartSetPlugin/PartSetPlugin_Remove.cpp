@@ -19,12 +19,12 @@ void PartSetPlugin_Remove::execute()
     ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(
         aRoot->object(ModelAPI_ResultPart::group(), a));
     if (aPart
-        && aPart->data()->docRef(ModelAPI_ResultPart::DOC_REF())->value()
+        && aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->value()
             == aPManager->activeDocument()) {
       FeaturePtr aFeature = aRoot->feature(aPart);
       if (aFeature) {
         // do remove
-        aPart->data()->docRef(ModelAPI_ResultPart::DOC_REF())->value()->close();
+        aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->value()->close();
         aRoot->removeFeature(aFeature);
       }
     }

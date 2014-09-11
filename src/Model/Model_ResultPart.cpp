@@ -9,7 +9,7 @@
 
 boost::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
 {
-  return data()->docRef("PartDocument")->value();
+  return data()->document("PartDocument")->value();
 }
 
 boost::shared_ptr<ModelAPI_Feature> Model_ResultPart::owner()
@@ -31,7 +31,7 @@ void Model_ResultPart::setData(boost::shared_ptr<ModelAPI_Data> theData)
 
 void Model_ResultPart::activate()
 {
-  boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->docRef(DOC_REF());
+  boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->document(DOC_REF());
   
   if (!aDocRef->value()) {  // create (or open) a document if it is not yet created
     boost::shared_ptr<ModelAPI_Document> aDoc = document()->subDocument(data()->name());
