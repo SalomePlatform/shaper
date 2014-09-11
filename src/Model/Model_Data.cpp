@@ -89,7 +89,7 @@ void Model_Data::addAttribute(const std::string& theID, const std::string theAtt
   }
 }
 
-boost::shared_ptr<ModelAPI_AttributeDocRef> Model_Data::docRef(const std::string& theID)
+boost::shared_ptr<ModelAPI_AttributeDocRef> Model_Data::document(const std::string& theID)
 {
   std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
