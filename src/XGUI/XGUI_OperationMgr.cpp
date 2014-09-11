@@ -141,9 +141,10 @@ bool XGUI_OperationMgr::canStopOperation()
     if (anOperation->isModified()) {
       int anAnswer = QMessageBox::question(
           qApp->activeWindow(), tr("Operation launch"),
-          tr("Previous operation is not finished and will be aborted"), QMessageBox::Ok,
+          tr("Previous operation is not finished, abort it?"),
+          QMessageBox::Abort | QMessageBox::Cancel,
           QMessageBox::Cancel);
-      return anAnswer == QMessageBox::Ok;
+      return anAnswer == QMessageBox::Abort;
     }
   }
   return true;
