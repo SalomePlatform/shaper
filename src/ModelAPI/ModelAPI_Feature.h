@@ -6,7 +6,7 @@
 #define ModelAPI_Feature_H_
 
 #include "ModelAPI_Object.h"
-#include "ModelAPI_PluginManager.h"
+#include "ModelAPI_Session.h"
 
 #include <string>
 #include <list>

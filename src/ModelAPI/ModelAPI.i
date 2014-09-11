@@ -5,7 +5,7 @@
   #include "GeomAPI_Shape.h"
   #include "ModelAPI.h"
   #include "ModelAPI_Document.h"
-  #include "ModelAPI_PluginManager.h"
+  #include "ModelAPI_Session.h"
   #include "ModelAPI_Object.h"
   #include "ModelAPI_Feature.h"
   #include "ModelAPI_Data.h"
@@ -44,7 +44,7 @@
 %shared_ptr(GeomAPI_Interface)
 %shared_ptr(GeomAPI_Shape)
 %shared_ptr(ModelAPI_Document)
-%shared_ptr(ModelAPI_PluginManager)
+%shared_ptr(ModelAPI_Session)
 %shared_ptr(ModelAPI_Object)
 %shared_ptr(ModelAPI_Feature)
 %shared_ptr(ModelAPI_Data)
@@ -63,7 +63,7 @@
 %include "GeomAPI_Interface.h"
 %include "GeomAPI_Shape.h"
 %include "ModelAPI_Document.h"
-%include "ModelAPI_PluginManager.h"
+%include "ModelAPI_Session.h"
 %include "ModelAPI_Object.h"
 %include "ModelAPI_Feature.h"
 %include "ModelAPI_Data.h"

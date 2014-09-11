@@ -82,7 +82,7 @@ void XGUI_OperationMgr::validateOperation(ModuleBase_Operation* theOperation)
   QString anOperationId = theOperation->id();
   FeaturePtr aFeature = theOperation->feature();
   //Get validators for the Id
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
   bool isValid = aFactory->validate(aFeature);

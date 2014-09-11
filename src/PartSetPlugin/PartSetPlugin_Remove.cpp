@@ -11,7 +11,7 @@
 
 void PartSetPlugin_Remove::execute()
 {
-  boost::shared_ptr<ModelAPI_PluginManager> aPManager = ModelAPI_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Session> aPManager = ModelAPI_Session::get();
   boost::shared_ptr<ModelAPI_Document> aRoot = aPManager->rootDocument();
   boost::shared_ptr<ModelAPI_Document> aCurrent;
   boost::shared_ptr<PartSetPlugin_Part> a;

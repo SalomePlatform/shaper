@@ -17,7 +17,7 @@
  * Allows to get a validator by the feature identifier and 
  * the attribute identifier (if attribute is validated).
  * All accessible validators mustbe registered by the ID string first.
- * The instance of this factory can be get in the PluginManager.
+ * The instance of this factory can be get in the Session.
  * Keeps the validator objects alive and just returns one of it by request.
  * All the needed information is provided to the validator as an argument,
  * this allows to work with them independently from the feature specific object.
@@ -70,10 +70,10 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
 
  protected:
   void addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators) const;
-  /// Get instance from PluginManager
+  /// Get instance from Session
   Model_ValidatorsFactory();
 
-  friend class Model_PluginManager;
+  friend class Model_Session;
 };
 
 #endif

@@ -71,7 +71,7 @@ bool ModuleBase_WidgetFeature::setValue(ModuleBase_WidgetValue* theValue)
 
 bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject, bool theSendEvent)
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   std::list<ModelAPI_Validator*> aValidators;
   std::list<std::list<std::string> > anArguments;

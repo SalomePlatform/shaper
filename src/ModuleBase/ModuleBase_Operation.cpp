@@ -98,7 +98,7 @@ bool ModuleBase_Operation::canBeCommitted() const
     /*    FeaturePtr aFeature = feature();
      std::string aId = aFeature->getKind();
 
-     PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+     SessionPtr aMgr = ModelAPI_Session::get();
      ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
      std::list<ModelAPI_Validator*> aValidators;
      aFactory->validators(aId, aValidators);

@@ -24,7 +24,7 @@
 #include "XGUI_Preferences.h"
 
 #include <ModelAPI_Events.h>
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
@@ -530,7 +530,7 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
 void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>& theFileNames)
 {
   QApplication::restoreOverrideCursor();
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = aMgr->rootDocument();
   aDoc->save(theName.toLatin1().constData(), theFileNames);
   QApplication::restoreOverrideCursor();
@@ -539,7 +539,7 @@ void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>&
 //******************************************************
 void XGUI_Workshop::onExit()
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = aMgr->rootDocument();
   if (aDoc->isModified()) {
     int anAnswer = QMessageBox::question(
@@ -581,7 +581,7 @@ void XGUI_Workshop::onNew()
 void XGUI_Workshop::onOpen()
 {
   //save current file before close if modified
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = aMgr->rootDocument();
   if (aDoc->isModified()) {
     //TODO(sbh): re-launch the app?
@@ -667,7 +667,7 @@ bool XGUI_Workshop::onSaveAs()
 void XGUI_Workshop::onUndo()
 {
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = aMgr->rootDocument();
   if (aDoc->isOperation())
     operationMgr()->abortOperation();
@@ -679,7 +679,7 @@ void XGUI_Workshop::onUndo()
 void XGUI_Workshop::onRedo()
 {
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = aMgr->rootDocument();
   if (aDoc->isOperation())
     operationMgr()->abortOperation();
@@ -791,7 +791,7 @@ void XGUI_Workshop::updateCommandStatus()
     foreach (XGUI_Command* aCmd, aMenuBar->features())
       aCommands.append(aCmd);
   }
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->hasRootDocument()) {
     QAction* aUndoCmd;
     QAction* aRedoCmd;
@@ -936,7 +936,7 @@ void XGUI_Workshop::onFeatureTriggered()
 //******************************************************
 void XGUI_Workshop::changeCurrentDocument(ObjectPtr theObj)
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   if (theObj) {
     ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(theObj);
     if (aPart) {
@@ -1014,7 +1014,7 @@ void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
 //**************************************************************
 void XGUI_Workshop::activateLastPart()
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = aMgr->rootDocument();
   std::string aGrpName = ModelAPI_ResultPart::group();
   ObjectPtr aLastPart = aDoc->object(aGrpName, aDoc->size(aGrpName) - 1);
@@ -1032,7 +1032,7 @@ void XGUI_Workshop::deleteObjects(const QList<ObjectPtr>& theList)
       QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
   // ToDo: definbe deleting method
   if (aRes == QMessageBox::Yes) {
-    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+    SessionPtr aMgr = ModelAPI_Session::get();
     aMgr->rootDocument()->startOperation();
     foreach (ObjectPtr aObj, theList)
     {
@@ -1082,7 +1082,7 @@ void XGUI_Workshop::showOnlyObjects(const QList<ObjectPtr>& theList)
 //**************************************************************
 void XGUI_Workshop::updateCommandsOnViewSelection()
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   XGUI_Selection* aSelection = mySelector->selection();
   if (aSelection->getSelected().size() == 0)
@@ -1111,14 +1111,14 @@ void XGUI_Workshop::updateCommandsOnViewSelection()
 //**************************************************************
 void XGUI_Workshop::registerValidators() const
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 }
 
 //**************************************************************
 void XGUI_Workshop::displayAllResults()
 {
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aRootDoc = aMgr->rootDocument();
   displayDocumentResults(aRootDoc);
   for (int i = 0; i < aRootDoc->size(ModelAPI_ResultPart::group()); i++) {
