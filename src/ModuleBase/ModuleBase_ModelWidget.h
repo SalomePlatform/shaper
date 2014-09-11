@@ -52,6 +52,13 @@ Q_OBJECT
   /// \return the boolean result
   bool isInitialized(ObjectPtr theObject) const;
 
+  void setAttributeComputedState(ObjectPtr theObject) const;
+
+  bool isComputedDefault()
+  {
+    return myIsComputedDefault;
+  }
+
   /// Saves the internal parameters to the given feature
   /// \param theObject a model feature to be changed
   virtual bool storeValue() const = 0;
@@ -88,6 +95,8 @@ Q_OBJECT
   void setFeature(const FeaturePtr& theFeature)
   {
     myFeature = theFeature;
+    if(theFeature)
+     setAttributeComputedState(theFeature);
   }
 
 signals:
@@ -96,7 +105,7 @@ signals:
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theAttributeName a name of the attribute
   /// \param theEvent key release event
-  void keyReleased(const std::string& theAttributeName, QKeyEvent* theEvent);
+  void keyReleased(QKeyEvent* theEvent);
   /// The signal about the widget is lost focus
   /// \param theWidget the model base widget
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
@@ -114,6 +123,8 @@ signals:
   std::string myAttributeID;  /// the attribute name of the model feature
   std::string myParentId;    /// name of parent
   FeaturePtr myFeature;
+
+  bool myIsComputedDefault;
 };
 
 #endif

@@ -10,7 +10,7 @@
 #include "ModuleBase_ModelWidget.h"
 
 #include <ModelAPI_Document.h>
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -51,7 +51,7 @@ bool ModuleBase_IOperation::canBeCommitted() const
 
 boost::shared_ptr<ModelAPI_Document> ModuleBase_IOperation::document() const
 {
-  return ModelAPI_PluginManager::get()->rootDocument();
+  return ModelAPI_Session::get()->rootDocument();
 }
 
 void ModuleBase_IOperation::start()

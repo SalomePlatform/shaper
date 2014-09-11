@@ -28,13 +28,7 @@ struct _xmlDoc;
 class CONFIG_EXPORT Config_WidgetAPI
 {
  public:
-  Config_WidgetAPI(std::string theRawXml);
   virtual ~Config_WidgetAPI();
-
-  //TODO(sbh): Make these fields protected, accessible only for WidgetFactory
-  bool toNextWidget();
-  bool toChildWidget();
-  bool toParentWidget();
 
   std::string widgetType() const;
   bool isContainerWidget() const;
@@ -47,10 +41,20 @@ class CONFIG_EXPORT Config_WidgetAPI
 
   std::string getProperty(const char* thePropName) const;
 
+  bool isComputedDefault() const;
+
+ protected:
+  /// These fields are accessible for ModuleBase_WidgetFactory only
+  Config_WidgetAPI(std::string theRawXml);
+  bool toNextWidget();
+  bool toChildWidget();
+  bool toParentWidget();
+
  private:
   xmlDocPtr myDoc;
   xmlNodePtr myCurrentNode;
 
+  friend class ModuleBase_WidgetFactory;
 };
 
 #endif /* CONFIG_WIDGETAPI_H_ */

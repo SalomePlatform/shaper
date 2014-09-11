@@ -284,12 +284,22 @@ void NewGeom_Module::contextMenuPopup(const QString& theClient, QMenu* theMenu, 
 //******************************************************
 void NewGeom_Module::createPreferences()
 {
-  XGUI_Preferences::updateCustomProps();
   LightApp_Preferences* pref = preferences();
-  int catId = pref->addPreference( moduleName(), -1 );
+  if (!pref)
+    return;
+  XGUI_Preferences::updateCustomProps();
+  QString aModName = moduleName();
+
+  QtxPreferenceItem* item = pref->findItem(aModName, true );
+  if ( item && (!item->isEmpty() )) {
+    item->parentItem()->removeItem(item);
+    delete item;
+  }
+
+  int catId = pref->addPreference(aModName, -1 );
   if ( catId == -1 )
     return;
-  NewGeom_PrefMgr aMgr(pref, moduleName());
+  NewGeom_PrefMgr aMgr(pref, aModName);
   XGUI_Preferences::createEditContent(&aMgr, catId);
   pref->retrieve();
 }

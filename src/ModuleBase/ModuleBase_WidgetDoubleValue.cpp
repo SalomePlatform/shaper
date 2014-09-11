@@ -67,10 +67,12 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
     mySpinBox->setSingleStep(aStepVal);
   }
 
-  aProp = theData->getProperty(DOUBLE_WDG_DFLT);
+  aProp = theData->getProperty(DOUBLE_WDG_DEFAULT);
   double aDefVal = QString::fromStdString(aProp).toDouble(&isOk);
   if (isOk) {
     mySpinBox->setValue(aDefVal);
+  } else if (aProp == DOUBLE_WDG_DEFAULT_COMPUTED){
+    myIsComputedDefault = true;
   }
 
   QString aTTip = QString::fromStdString(theData->widgetTooltip());
@@ -122,10 +124,11 @@ bool ModuleBase_WidgetDoubleValue::eventFilter(QObject *theObject, QEvent *theEv
   if (theObject == mySpinBox) {
     if (theEvent->type() == QEvent::KeyRelease) {
       QKeyEvent* aKeyEvent = (QKeyEvent*) theEvent;
-      if (aKeyEvent && aKeyEvent->key() == Qt::Key_Return) {
+      if (aKeyEvent && (aKeyEvent->key() == Qt::Key_Return ||
+                        aKeyEvent->key() == Qt::Key_Enter)) {
         emit focusOutWidget(this);
       }
-      emit keyReleased(attributeID(), (QKeyEvent*) theEvent);
+      emit keyReleased((QKeyEvent*) theEvent);
       return true;
     }
   }

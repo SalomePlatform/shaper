@@ -9,6 +9,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <vector>
+#include <list>
 
 class ModelAPI_Feature;
 class ModelAPI_Object;
@@ -35,8 +36,9 @@ class ModelAPI_Document
 
   //! Saves the OCAF document to the file.
   //! \param theFileName full name of the file to store
+  //! \param theResults the result full file names that were stored by "save"
   //! \returns true if file was stored successfully
-  virtual bool save(const char* theFileName) = 0;
+  virtual bool save(const char* theFileName, std::list<std::string>& theResults) = 0;
 
   //! Removes document data
   virtual void close() = 0;

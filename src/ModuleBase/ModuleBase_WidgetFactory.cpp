@@ -143,9 +143,6 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
     result = doubleValueEditor(theParent);
 
-  } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
-    result = doubleValueEditor(theParent);
-
   } else if (theType == WDG_POINT2D_DISTANCE) {
     result = point2dDistanceControl(theParent);
 

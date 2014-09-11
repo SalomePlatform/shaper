@@ -118,8 +118,6 @@ Q_OBJECT
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);
 
-  virtual void keyReleased(std::string theName, QKeyEvent* theEvent);
-
   /// Emits a signal about the operation start. This signal has an information about the feature.
   /// If the provided feature is empty, the current operation feature is used.
   /// \param theType a type of an operation started
@@ -130,7 +128,7 @@ signals:
   /// signal about the request to launch operation
   /// theName the operation name
   /// theFeature the operation argument
-  void launchOperation(std::string theName, ObjectPtr theFeature);
+  void restartRequired(std::string theName, ObjectPtr theFeature);
 
   /// Signal about the feature construing is finished
   /// \param theFeature the result feature

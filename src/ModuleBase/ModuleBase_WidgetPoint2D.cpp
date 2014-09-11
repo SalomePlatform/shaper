@@ -36,7 +36,7 @@ ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
   myGroupBox = new QGroupBox(QString::fromStdString(theData->getProperty(CONTAINER_PAGE_NAME)),
                              theParent);
   QGridLayout* aGroupLay = new QGridLayout(myGroupBox);
-  aGroupLay->setContentsMargins(0, 0, 0, 0);
+  aGroupLay->setContentsMargins(2, 0, 2, 0);
   aGroupLay->setColumnStretch(1, 1);
   {
     QLabel* aLabel = new QLabel(myGroupBox);
@@ -149,10 +149,11 @@ bool ModuleBase_WidgetPoint2D::eventFilter(QObject *theObject, QEvent *theEvent)
   if (theObject == myXSpin || theObject == myYSpin) {
     if (theEvent->type() == QEvent::KeyRelease) {
       QKeyEvent* aKeyEvent = (QKeyEvent*) theEvent;
-      if (aKeyEvent && aKeyEvent->key() == Qt::Key_Return) {
+      if (aKeyEvent && (aKeyEvent->key() == Qt::Key_Return ||
+                        aKeyEvent->key() == Qt::Key_Enter)) {
         emit focusOutWidget(this);
       }
-      emit keyReleased(attributeID(), (QKeyEvent*) theEvent);
+      emit keyReleased((QKeyEvent*) theEvent);
       return true;
     }
   }

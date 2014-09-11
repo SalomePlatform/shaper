@@ -3,7 +3,7 @@
 // Author:      Mikhail PONIKAROV
 
 #include "ConstructionPlugin_Point.h"
-#include "ModelAPI_PluginManager.h"
+#include "ModelAPI_Session.h"
 #include "ModelAPI_Document.h"
 #include "ModelAPI_Data.h"
 #include "ModelAPI_AttributeDouble.h"

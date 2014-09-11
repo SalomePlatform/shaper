@@ -3,7 +3,7 @@
 #include "XGUI_Tools.h"
 
 #include <ModelAPI_Data.h>
-#include <ModelAPI_PluginManager.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
 
@@ -83,7 +83,7 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
   if (aEditor) {
     QString aRes = aEditor->text();
     ObjectPtr aFeature = mySelectedData.first();
-    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+    SessionPtr aMgr = ModelAPI_Session::get();
     aMgr->rootDocument()->startOperation();
     aFeature->data()->setName(qPrintable(aRes));
     aMgr->rootDocument()->finishOperation();
@@ -119,7 +119,7 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
 
   aLabelLay->addWidget(aLbl);
 
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = aMgr->rootDocument();
   // TODO: Find a name of the root document
 
@@ -203,7 +203,8 @@ bool XGUI_ObjectsBrowser::eventFilter(QObject* obj, QEvent* theEvent)
       } else if (theEvent->type() == QEvent::KeyRelease) {
         QKeyEvent* aEvent = (QKeyEvent*) theEvent;
         switch (aEvent->key()) {
-          case Qt::Key_Return:  // Accept current input
+          case Qt::Key_Return:
+          case Qt::Key_Enter:  // Accept current input
             closeDocNameEditing(true);
             break;
           case Qt::Key_Escape:  // Cancel the input
@@ -225,7 +226,7 @@ void XGUI_ObjectsBrowser::closeDocNameEditing(bool toSave)
   myActiveDocLbl->setReadOnly(true);
   if (toSave) {
     // TODO: Save the name of root document
-    PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+    SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aDoc = aMgr->rootDocument();
   } else {
     myActiveDocLbl->setText(myActiveDocLbl->property("OldText").toString());

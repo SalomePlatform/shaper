@@ -5,7 +5,7 @@
 #include <Model_Document.h>
 #include <Model_Data.h>
 #include <Model_Application.h>
-#include <Model_PluginManager.h>
+#include <Model_Session.h>
 #include <Model_Events.h>
 #include <Model_ResultPart.h>
 #include <Model_ResultConstruction.h>
@@ -74,7 +74,7 @@ static TCollection_ExtendedString DocFileName(const char* theFileName, const std
 bool Model_Document::load(const char* theFileName)
 {
   Handle(Model_Application) anApp = Model_Application::getApplication();
-  if (this == Model_PluginManager::get()->rootDocument().get()) {
+  if (this == Model_Session::get()->rootDocument().get()) {
     anApp->setLoadPath(theFileName);
   }
   TCollection_ExtendedString aPath(DocFileName(theFileName, myID));
@@ -148,10 +148,10 @@ bool Model_Document::load(const char* theFileName)
   return !isError;
 }
 
-bool Model_Document::save(const char* theFileName)
+bool Model_Document::save(const char* theFileName, std::list<std::string>& theResults)
 {
   // create a directory in the root document if it is not yet exist
-  if (this == Model_PluginManager::get()->rootDocument().get()) {
+  if (this == Model_Session::get()->rootDocument().get()) {
 #ifdef WIN32
     CreateDirectory(theFileName, NULL);
 #else
@@ -186,16 +186,17 @@ bool Model_Document::save(const char* theFileName)
   }
   myTransactionsAfterSave = 0;
   if (isDone) {  // save also sub-documents if any
+    theResults.push_back(TCollection_AsciiString(aPath).ToCString());
     std::set<std::string>::iterator aSubIter = mySubs.begin();
     for (; aSubIter != mySubs.end() && isDone; aSubIter++)
-      isDone = subDocument(*aSubIter)->save(theFileName);
+      isDone = subDocument(*aSubIter)->save(theFileName, theResults);
   }
   return isDone;
 }
 
 void Model_Document::close()
 {
-  boost::shared_ptr<ModelAPI_PluginManager> aPM = Model_PluginManager::get();
+  boost::shared_ptr<ModelAPI_Session> aPM = Model_Session::get();
   if (this != aPM->rootDocument().get() && this == aPM->currentDocument().get()) {
     aPM->setCurrentDocument(aPM->rootDocument());
   }
@@ -252,7 +253,7 @@ void Model_Document::finishOperation()
   // just to be sure that everybody knows that changes were performed
 
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
-    boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
+    boost::static_pointer_cast<Model_Session>(Model_Session::get())
         ->setCheckTransactions(false);  // for nested transaction commit
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
@@ -260,7 +261,7 @@ void Model_Document::finishOperation()
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
-    boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
+    boost::static_pointer_cast<Model_Session>(Model_Session::get())
         ->setCheckTransactions(true);  // for nested transaction commit
 
   if (myNestedNum != -1)  // this nested transaction is owervritten
@@ -391,7 +392,7 @@ FeaturePtr Model_Document::addFeature(std::string theID)
 {
   TDF_Label anEmptyLab;
   FeaturePtr anEmptyFeature;
-  FeaturePtr aFeature = ModelAPI_PluginManager::get()->createFeature(theID);
+  FeaturePtr aFeature = ModelAPI_Session::get()->createFeature(theID);
   boost::shared_ptr<Model_Document> aDocToAdd = boost::dynamic_pointer_cast<Model_Document>(
       aFeature->documentToAdd());
   if (aFeature) {
@@ -654,7 +655,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   boost::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
   // after all updates, sends a message that groups of features were created or updated
-  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
+  boost::static_pointer_cast<Model_Session>(Model_Session::get())
     ->setCheckTransactions(false);
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->activateFlushes(false);
@@ -666,7 +667,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
     TDF_Label aFeatureLabel = aLabIter.Value()->Label();
     if (!myObjs.IsBound(aFeatureLabel)) {  // a new feature is inserted
       // create a feature
-      FeaturePtr aNewObj = ModelAPI_PluginManager::get()->createFeature(
+      FeaturePtr aNewObj = ModelAPI_Session::get()->createFeature(
           TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
               .ToCString());
       if (!aNewObj) {  // somethig is wrong, most probably, the opened document has invalid structure
@@ -738,7 +739,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   }
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  boost::static_pointer_cast<Model_PluginManager>(Model_PluginManager::get())
+  boost::static_pointer_cast<Model_Session>(Model_Session::get())
     ->setCheckTransactions(true);
   myExecuteFeatures = true;
 }

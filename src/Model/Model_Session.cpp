@@ -1,8 +1,8 @@
-// File:        Model_PluginManager.cxx
+// File:        Model_Session.cxx
 // Created:     20 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#include <Model_PluginManager.h>
+#include <Model_Session.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Plugin.h>
 #include <Model_Data.h>
@@ -23,9 +23,9 @@
 
 using namespace std;
 
-static Model_PluginManager* myImpl = new Model_PluginManager();
+static Model_Session* myImpl = new Model_Session();
 
-FeaturePtr Model_PluginManager::createFeature(string theFeatureID)
+FeaturePtr Model_Session::createFeature(string theFeatureID)
 {
   if (this != myImpl)
     return myImpl->createFeature(theFeatureID);
@@ -55,32 +55,32 @@ FeaturePtr Model_PluginManager::createFeature(string theFeatureID)
   return FeaturePtr();  // return nothing
 }
 
-boost::shared_ptr<ModelAPI_Document> Model_PluginManager::rootDocument()
+boost::shared_ptr<ModelAPI_Document> Model_Session::rootDocument()
 {
   return boost::shared_ptr<ModelAPI_Document>(
       Model_Application::getApplication()->getDocument("root"));
 }
 
-bool Model_PluginManager::hasRootDocument()
+bool Model_Session::hasRootDocument()
 {
   return Model_Application::getApplication()->hasDocument("root");
 }
 
-boost::shared_ptr<ModelAPI_Document> Model_PluginManager::currentDocument()
+boost::shared_ptr<ModelAPI_Document> Model_Session::currentDocument()
 {
   if (!myCurrentDoc || !Model_Application::getApplication()->hasDocument(myCurrentDoc->id()))
     myCurrentDoc = rootDocument();
   return myCurrentDoc;
 }
 
-void Model_PluginManager::setCurrentDocument(boost::shared_ptr<ModelAPI_Document> theDoc)
+void Model_Session::setCurrentDocument(boost::shared_ptr<ModelAPI_Document> theDoc)
 {
   myCurrentDoc = theDoc;
   static Events_Message aMsg(Events_Loop::eventByName("CurrentDocumentChanged"));
   Events_Loop::loop()->send(aMsg);
 }
 
-boost::shared_ptr<ModelAPI_Document> Model_PluginManager::copy(
+boost::shared_ptr<ModelAPI_Document> Model_Session::copy(
     boost::shared_ptr<ModelAPI_Document> theSource, std::string theID)
 {
   // create a new document
@@ -101,11 +101,11 @@ boost::shared_ptr<ModelAPI_Document> Model_PluginManager::copy(
   return aNew;
 }
 
-Model_PluginManager::Model_PluginManager()
+Model_Session::Model_Session()
 {
   myPluginsInfoLoaded = false;
   myCheckTransactions = true;
-  ModelAPI_PluginManager::setPluginManager(boost::shared_ptr<ModelAPI_PluginManager>(this));
+  ModelAPI_Session::setSession(boost::shared_ptr<ModelAPI_Session>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
   static const Events_ID kFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
@@ -116,7 +116,7 @@ Model_PluginManager::Model_PluginManager()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_VALIDATOR_LOADED));
 }
 
-void Model_PluginManager::processEvent(const Events_Message* theMessage)
+void Model_Session::processEvent(const Events_Message* theMessage)
 {
   static const Events_ID kFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
   static const Events_ID kValidatorEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
@@ -146,7 +146,7 @@ void Model_PluginManager::processEvent(const Events_Message* theMessage)
   }
 }
 
-void Model_PluginManager::LoadPluginsInfo()
+void Model_Session::LoadPluginsInfo()
 {
   if (myPluginsInfoLoaded)  // nothing to do
     return;
@@ -156,12 +156,15 @@ void Model_PluginManager::LoadPluginsInfo()
   aXMLReader.readAll();
 }
 
-void Model_PluginManager::registerPlugin(ModelAPI_Plugin* thePlugin)
+void Model_Session::registerPlugin(ModelAPI_Plugin* thePlugin)
 {
   myPluginObjs[myCurrentPluginName] = thePlugin;
+  static Events_ID EVENT_LOAD = Events_Loop::loop()->eventByName(EVENT_PLUGIN_LOADED);
+  ModelAPI_EventCreator::get()->sendUpdated(ObjectPtr(), EVENT_LOAD);
+  Events_Loop::loop()->flush(EVENT_LOAD);
 }
 
-ModelAPI_ValidatorsFactory* Model_PluginManager::validators()
+ModelAPI_ValidatorsFactory* Model_Session::validators()
 {
   static Model_ValidatorsFactory* aFactory = new Model_ValidatorsFactory;
   return aFactory;

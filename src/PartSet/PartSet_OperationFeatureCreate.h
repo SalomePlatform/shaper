@@ -73,8 +73,6 @@ Q_OBJECT
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);
 
-  virtual void keyReleased(std::string theName, QKeyEvent* theEvent);
-
  public slots:
   /// Slots which listen the mode widget activation
   /// \param theWidget the model widget

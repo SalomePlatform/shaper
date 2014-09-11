@@ -79,40 +79,40 @@ void XGUI_PropertyPanel::cleanContent()
 void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets)
 {
   myWidgets = theWidgets;
+  if (theWidgets.empty()) return;
 
-  if (!theWidgets.empty()) {
-    QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast =
-        theWidgets.end();
-    for (; anIt != aLast; anIt++) {
-      connect(*anIt, SIGNAL(keyReleased(const std::string&, QKeyEvent*)), this,
-              SIGNAL(keyReleased(const std::string&, QKeyEvent*)));
+  QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast =
+      theWidgets.end();
+  for (; anIt != aLast; anIt++) {
+    //TODO(sbh): Think how to connect prop panle hotkeys and operations mgr
+    connect(*anIt, SIGNAL(keyReleased(QKeyEvent*)), this,
+            SIGNAL(keyReleased(QKeyEvent*)));
 
-      connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)), this,
-              SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
+    connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)), this,
+            SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
 
-      //connect(*anIt, SIGNAL(activated(ModuleBase_ModelWidget*)),
-      //        this, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)));
+    //connect(*anIt, SIGNAL(activated(ModuleBase_ModelWidget*)),
+    //        this, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)));
 
-      ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
-      if (aPointWidget)
-        connect(aPointWidget, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)), this,
-                SIGNAL(storedPoint2D(ObjectPtr, const std::string&)));
-    }
-    ModuleBase_ModelWidget* aLastWidget = theWidgets.last();
-    if (aLastWidget) {
-      QList<QWidget*> aControls = aLastWidget->getControls();
-      if (!aControls.empty()) {
-        QWidget* aLastControl = aControls.last();
-
-        QPushButton* anOkBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
-        QPushButton* aCancelBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
-
-        setTabOrder(aLastControl, anOkBtn);
-        setTabOrder(anOkBtn, aCancelBtn);
-      }
-    }
-    onActivateNextWidget(0);
+    ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
+    if (aPointWidget)
+      connect(aPointWidget, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)), this,
+              SIGNAL(storedPoint2D(ObjectPtr, const std::string&)));
   }
+  ModuleBase_ModelWidget* aLastWidget = theWidgets.last();
+  if (aLastWidget) {
+    QList<QWidget*> aControls = aLastWidget->getControls();
+    if (!aControls.empty()) {
+      QWidget* aLastControl = aControls.last();
+
+      QPushButton* anOkBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
+      QPushButton* aCancelBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
+
+      setTabOrder(aLastControl, anOkBtn);
+      setTabOrder(anOkBtn, aCancelBtn);
+    }
+  }
+  onActivateNextWidget(NULL);
 }
 
 const QList<ModuleBase_ModelWidget*>& XGUI_PropertyPanel::modelWidgets() const
@@ -127,9 +127,10 @@ bool XGUI_PropertyPanel::eventFilter(QObject *theObject, QEvent *theEvent)
   if (theObject == anOkBtn || theObject == aCancelBtn) {
     if (theEvent->type() == QEvent::KeyRelease) {
       QKeyEvent* aKeyEvent = (QKeyEvent*) theEvent;
-      if (aKeyEvent && aKeyEvent->key() == Qt::Key_Return) {
+      if (aKeyEvent && (aKeyEvent->key() == Qt::Key_Return ||
+                        aKeyEvent->key() == Qt::Key_Enter)) {
         // TODO: this is enter button processing when the focus is on "Apply" or "Cancel" buttons
-        emit keyReleased("", (QKeyEvent*) theEvent);
+        //emit keyReleased("", (QKeyEvent*) theEvent);
         return true;
       }
     }

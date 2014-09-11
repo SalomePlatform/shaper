@@ -109,7 +109,7 @@ XGUI_Workshop* PartSet_Module::workshop() const
 void PartSet_Module::createFeatures()
 {
   //Registering of validators
-  PluginManagerPtr aMgr = ModelAPI_PluginManager::get();
+  SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("PartSet_DistanceValidator", new PartSet_DistanceValidator);
   aFactory->registerValidator("PartSet_LengthValidator", new PartSet_LengthValidator);
@@ -286,15 +286,12 @@ void PartSet_Module::onFitAllView()
   myWorkshop->viewer()->fitAll();
 }
 
-void PartSet_Module::onLaunchOperation(std::string theName, ObjectPtr theObject)
+void PartSet_Module::onRestartOperation(std::string theName, ObjectPtr theObject)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  if (!aFeature) {
-    qDebug("Warning! Restart operation without feature!");
-    return;
-  }
-  ModuleBase_Operation* anOperation = createOperation(theName.c_str(),
-                                                      aFeature ? aFeature->getKind() : "");
+
+  std::string aKind = aFeature ? aFeature->getKind() : "";
+  ModuleBase_Operation* anOperation = createOperation(theName, aKind);
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aPreviewOp) {
     XGUI_Selection* aSelection = myWorkshop->selector()->selection();
@@ -303,7 +300,7 @@ void PartSet_Module::onLaunchOperation(std::string theName, ObjectPtr theObject)
     std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
     aPreviewOp->initFeature(aFeature);
     aPreviewOp->initSelection(aSelected, aHighlighted);
-  } else {
+  } else if (aFeature) {
     anOperation->setEditingFeature(aFeature);
     //Deactivate result of current feature in order to avoid its selection
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
@@ -415,14 +412,16 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
     ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
     FeaturePtr aSketch;
     PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
-    if (aPrevOp)
+    if (aPrevOp) {
       aSketch = aPrevOp->sketch();
-    if (PartSet_OperationFeatureCreate::canProcessKind(theCmdId))
+    }
+    if (PartSet_OperationFeatureCreate::canProcessKind(theCmdId)) {
       anOperation = new PartSet_OperationFeatureCreate(theCmdId.c_str(), this, aSketch);
-    else if (theCmdId == PartSet_OperationFeatureEditMulti::Type())
+    } else if (theCmdId == PartSet_OperationFeatureEditMulti::Type()) {
       anOperation = new PartSet_OperationFeatureEditMulti(theCmdId.c_str(), this, aSketch);
-    else if (theCmdId == PartSet_OperationFeatureEdit::Type())
+    } else if (theCmdId == PartSet_OperationFeatureEdit::Type()) {
       anOperation = new PartSet_OperationFeatureEdit(theCmdId.c_str(), this, aSketch);
+    }
   }
 
   if (!anOperation) {
@@ -455,8 +454,8 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   if (aPreviewOp) {
     connect(aPreviewOp, SIGNAL(featureConstructed(ObjectPtr, int)), this,
             SLOT(onFeatureConstructed(ObjectPtr, int)));
-    connect(aPreviewOp, SIGNAL(launchOperation(std::string, ObjectPtr)), this,
-            SLOT(onLaunchOperation(std::string, ObjectPtr)));
+    connect(aPreviewOp, SIGNAL(restartRequired(std::string, ObjectPtr)), this,
+            SLOT(onRestartOperation(std::string, ObjectPtr)));
     connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)), this,
             SLOT(onMultiSelectionEnabled(bool)));
 
@@ -588,7 +587,7 @@ void PartSet_Module::editFeature(FeaturePtr theFeature)
   //}
 
   //if (aFeature) {
-  onLaunchOperation(theFeature->getKind(), theFeature);
+  onRestartOperation(theFeature->getKind(), theFeature);
   updateCurrentPreview(theFeature->getKind());
   //}
 //  }

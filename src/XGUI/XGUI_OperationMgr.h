@@ -104,7 +104,7 @@ signals:
   /// SLOT, that is called by the key in the property panel is clicked.
   /// \param theName the attribute name
   /// \param theEvent the mouse event
-  void onKeyReleased(const std::string& theName, QKeyEvent* theEvent);
+  void onKeyReleased(QKeyEvent* theEvent);
 
   /// SLOT, that reacts to the widget activation
   /// \param theWidget an activated widget

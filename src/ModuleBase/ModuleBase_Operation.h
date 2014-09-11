@@ -66,16 +66,13 @@ Q_OBJECT
   /// Stores a custom value in model.
   void storeCustomValue();
 
-  virtual void keyReleased(std::string theName, QKeyEvent* theEvent)
-  {
-  }
-  ;
-
   /// Sets the operation feature
   void setEditingFeature(FeaturePtr theFeature);
 
   /// Returns True if the current operation works with the given object (feature or result)
   virtual bool hasObject(ObjectPtr theObj) const;
+
+  virtual void keyReleased(const int theKey);
 
  public slots:
   /// Slots which listen the mode widget activation

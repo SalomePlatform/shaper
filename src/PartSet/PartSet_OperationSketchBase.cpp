@@ -103,8 +103,10 @@ void PartSet_OperationSketchBase::keyReleased(const int theKey)
       bool toAbort = true;
       if (isModified()) {
         int anAnswer = QMessageBox::question(
-            qApp->activeWindow(), tr("Cancel operation"),
-            tr("Operation %1 will be cancelled. Continue?").arg(id()), QMessageBox::Yes,
+            qApp->activeWindow(),
+            tr("Cancel operation"),
+            tr("Do you want to cancel %1 operation?").arg(id()),
+            QMessageBox::Yes,
             QMessageBox::No);
         toAbort = (anAnswer == QMessageBox::Yes);
       }
@@ -117,11 +119,6 @@ void PartSet_OperationSketchBase::keyReleased(const int theKey)
   }
 }
 
-void PartSet_OperationSketchBase::keyReleased(std::string theName, QKeyEvent* theEvent)
-{
-  keyReleased(theEvent->key());
-}
-
 void PartSet_OperationSketchBase::restartOperation(const std::string& theType, ObjectPtr theFeature)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theFeature);
@@ -129,10 +126,10 @@ void PartSet_OperationSketchBase::restartOperation(const std::string& theType, O
     QStringList aNested = this->nestedFeatures();
     if (!aNested.isEmpty()) {
       if (aNested.contains(QString(aFeature->getKind().c_str()))) 
-        emit launchOperation(theType, theFeature);
+        emit restartRequired(theType, theFeature);
       else
         return;
     }
   }
-  emit launchOperation(theType, theFeature);
+  emit restartRequired(theType, theFeature);
 }

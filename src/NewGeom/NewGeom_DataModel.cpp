@@ -1,7 +1,8 @@
 #include "NewGeom_DataModel.h"
+#include "NewGeom_Module.h"
 
-NewGeom_DataModel::NewGeom_DataModel(CAM_Module* theModule)
-    : LightApp_DataModel(theModule)
+NewGeom_DataModel::NewGeom_DataModel(NewGeom_Module* theModule)
+    : LightApp_DataModel(theModule), myModule(theModule)
 {
 }
 

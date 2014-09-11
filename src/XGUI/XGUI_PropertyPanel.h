@@ -44,9 +44,8 @@ Q_OBJECT
 
 signals:
   /// The signal about key release on the control, that corresponds to the attribute
-  /// \param theAttributeName a name of the attribute
   /// \param theEvent key release event
-  void keyReleased(const std::string& theAttributeName, QKeyEvent* theEvent);
+  void keyReleased(QKeyEvent* theEvent);
   /// The signal about the widget activation
   /// \param theWidget the activated widget
   void widgetActivated(ModuleBase_ModelWidget* theWidget);
