@@ -22,7 +22,6 @@ class ModelAPI_Attribute
  protected:
   // accessible from the attributes
   bool myIsInitialized;
-  bool myIsComputedDefault;
   bool myIsArgument;
  public:
 
@@ -58,19 +57,6 @@ class ModelAPI_Attribute
     myIsInitialized = true;
   }
 
-  /// Returns true if attribute's default value was computed
-  MODELAPI_EXPORT bool isComputedDefault()
-  {
-    return myIsComputedDefault;
-  }
-
-  /// Tells that attribute's default value was computed
-  MODELAPI_EXPORT void setComputedDefault()
-  {
-    myIsComputedDefault = true;
-    myIsInitialized = false;
-  }
-
   /// Set this attribute is argument for result (change of this attribute requires update of result).
   /// By default it is true.
   MODELAPI_EXPORT void setIsArgument(const bool theFlag)
@@ -89,7 +75,6 @@ class ModelAPI_Attribute
   ModelAPI_Attribute()
   {
     myIsInitialized = false;
-    myIsComputedDefault = false;
     myIsArgument = true;
   }
 

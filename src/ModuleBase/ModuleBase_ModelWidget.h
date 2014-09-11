@@ -52,8 +52,6 @@ Q_OBJECT
   /// \return the boolean result
   bool isInitialized(ObjectPtr theObject) const;
 
-  void setAttributeComputedState(ObjectPtr theObject) const;
-
   bool isComputedDefault()
   {
     return myIsComputedDefault;
@@ -95,8 +93,6 @@ Q_OBJECT
   void setFeature(const FeaturePtr& theFeature)
   {
     myFeature = theFeature;
-    if(theFeature)
-     setAttributeComputedState(theFeature);
   }
 
 signals:

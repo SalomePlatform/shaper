@@ -55,7 +55,9 @@ void SketchPlugin_ConstraintRadius::execute()
     }
     boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = boost::dynamic_pointer_cast<
         ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-    aValueAttr->setValue(aRadius);
+    if(!aValueAttr->isInitialized()) {
+      aValueAttr->setValue(aRadius);
+    }
   }
 }
 

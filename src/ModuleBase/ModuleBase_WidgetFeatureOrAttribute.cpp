@@ -30,8 +30,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-ModuleBase_WidgetFeatureOrAttribute::ModuleBase_WidgetFeatureOrAttribute(
-    QWidget* theParent, const Config_WidgetAPI* theData, const std::string& theParentId)
+ModuleBase_WidgetFeatureOrAttribute::ModuleBase_WidgetFeatureOrAttribute(QWidget* theParent, 
+                                                                         const Config_WidgetAPI* theData, 
+                                                                         const std::string& theParentId)
     : ModuleBase_WidgetFeature(theParent, theData, theParentId)
 {
 }
