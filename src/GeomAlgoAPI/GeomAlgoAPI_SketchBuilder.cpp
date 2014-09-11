@@ -15,8 +15,7 @@
 #include <BOPTools.hxx>
 #include <BRep_Builder.hxx>
 #include <BRep_Curve3D.hxx>
-#include <BRep_TEdge.hxx>
-#include <BRep_TVertex.hxx>
+#include <BRep_Tool.hxx>
 #include <BRepAlgoAPI_Cut.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepClass_FaceClassifier.hxx>
@@ -44,39 +43,40 @@ const double tolerance = Precision::Confusion();
 const double shift = acos(1.0 - 3.0 * tolerance);
 
 /// \brief Search first vertex - the vertex with lowest x coordinate, which is used in 2 edges at least
-static const TopoDS_Shape& findStartVertex(const BOPCol_IndexedDataMapOfShapeListOfShape& theMapVE,
+static const TopoDS_Vertex& findStartVertex(const BOPCol_IndexedDataMapOfShapeListOfShape& theMapVE,
                                            const gp_Dir& theDirX, const gp_Dir& theDirY);
 
 /// \brief Search the vertex on the sketch candidate to be the next one in the loop
-static void findNextVertex(const TopoDS_Shape& theStartVertex,
+static void findNextVertex(const TopoDS_Vertex& theStartVertex,
                            const BOPCol_IndexedDataMapOfShapeListOfShape& theVertexEdgeMap,
                            const gp_Dir& theStartDir, const gp_Dir& theNormal,
-                           TopoDS_Shape& theNextVertex, TopoDS_Shape& theNextEdge,
+                           TopoDS_Vertex& theNextVertex, TopoDS_Edge& theNextEdge,
                            gp_Dir& theNextDir);
 
 /// \brief Create planar face using the edges surrounding it
-static void createFace(const TopoDS_Shape& theStartVertex,
-                       const std::list<TopoDS_Shape>::iterator& theStartEdge,
-                       const std::list<TopoDS_Shape>::iterator& theEndOfEdges,
+static void createFace(const TopoDS_Vertex& theStartVertex,
+                       const std::list<TopoDS_Edge>::iterator& theStartEdge,
+                       const std::list<TopoDS_Edge>::iterator& theEndOfEdges,
                        const gp_Pln& thePlane, TopoDS_Face& theResFace);
 
 /// \bief Create planar wire
-static void createWireList(const TopoDS_Shape& theStartVertex,
-                           const std::list<TopoDS_Shape>::iterator& theStartEdge,
-                           const std::list<TopoDS_Shape>::iterator& theEndOfEdges,
-                           const std::set<Handle(TopoDS_TShape)>& theEdgesInLoops,
+static void createWireList(const TopoDS_Vertex& theStartVertex,
+                           const std::list<TopoDS_Edge>::iterator& theStartEdge,
+                           const std::list<TopoDS_Edge>::iterator& theEndOfEdges,
+                           const std::set<TopoDS_Edge*>& theEdgesInLoops,
                            std::list<TopoDS_Wire>& theResWires);
 
 /// \brief Calculate outer tengency on the edge in specified vertex
-static gp_Dir getOuterEdgeDirection(const TopoDS_Shape& theEdge, const TopoDS_Shape& theVertex);
+static gp_Dir getOuterEdgeDirection(const TopoDS_Edge& theEdge, const TopoDS_Vertex& theVertex);
 
 /// \brief Unnecessary edges will be removed from the map.
 ///        Positions of iterator will be updated
-static void removeWasteEdges(std::list<TopoDS_Shape>::iterator& theStartVertex,
-                             std::list<TopoDS_Shape>::iterator& theStartEdge,
-                             const std::list<TopoDS_Shape>::iterator& theEndOfVertexes,
-                             const std::list<TopoDS_Shape>::iterator& theEndOfEdges,
+static void removeWasteEdges(std::list<TopoDS_Vertex>::iterator& theStartVertex,
+                             std::list<TopoDS_Edge>::iterator& theStartEdge,
+                             const std::list<TopoDS_Vertex>::iterator& theEndOfVertexes,
+                             const std::list<TopoDS_Edge>::iterator& theEndOfEdges,
                              BOPCol_IndexedDataMapOfShapeListOfShape& theMapVE);
+
 
 void GeomAlgoAPI_SketchBuilder::createFaces(
     const boost::shared_ptr<GeomAPI_Pnt>& theOrigin, const boost::shared_ptr<GeomAPI_Dir>& theDirX,
@@ -135,22 +135,22 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   gp_Pln aPlane(theOrigin->impl<gp_Pnt>(), aNorm);
 
   // Set of edges used in loops
-  std::set<Handle(TopoDS_TShape)> anEdgesInLoops;
+  std::set<TopoDS_Edge*> anEdgesInLoops;
   // Lists for processed vertexes and edges
-  std::list<TopoDS_Shape> aProcVertexes;
-  std::list<TopoDS_Shape> aProcEdges;
+  std::list<TopoDS_Vertex> aProcVertexes;
+  std::list<TopoDS_Edge> aProcEdges;
 
   // Search the start vertex
-  TopoDS_Shape aStartVertex = findStartVertex(aMapVE, aDirX, aDirY);
+  TopoDS_Vertex aStartVertex = findStartVertex(aMapVE, aDirX, aDirY);
   aProcVertexes.push_back(aStartVertex);
 
-  TopoDS_Shape aCurVertex = aStartVertex;
+  TopoDS_Vertex aCurVertex = aStartVertex;
   gp_Dir aCurDir = aDirY.Reversed();
   gp_Dir aCurNorm = aNorm.Reversed();
 
   // Go through the edges and find loops
-  TopoDS_Shape aNextVertex;
-  TopoDS_Shape aBindingEdge;
+  TopoDS_Vertex aNextVertex;
+  TopoDS_Edge aBindingEdge;
   gp_Dir aNextDir;
   while (aMapVE.Extent() > 0) {
     if (aCurVertex.IsNull())
@@ -159,25 +159,29 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
     aCurNorm = aNorm;
 
     // Try to find next vertex in the list of already processed
-    std::list<TopoDS_Shape>::iterator aVertIter = aProcVertexes.begin();
-    std::list<TopoDS_Shape>::iterator anEdgeIter = aProcEdges.begin();
+    bool isLoopFound = false;
+    std::list<TopoDS_Vertex>::iterator aVertIter = aProcVertexes.begin();
+    std::list<TopoDS_Edge>::iterator anEdgeIter = aProcEdges.begin();
     for (; aVertIter != aProcVertexes.end(); aVertIter++) {
-      if (aVertIter->TShape() == aNextVertex.TShape())
+      if (aVertIter->IsSame(aNextVertex)) {
+        isLoopFound = true;
         break;
+      }
       if (anEdgeIter != aProcEdges.end())
         anEdgeIter++;
     }
 
+    bool isCircleFound = (isLoopFound && anEdgeIter == aProcEdges.end());
     aProcVertexes.push_back(aNextVertex);
     aProcEdges.push_back(aBindingEdge);
 
-    // The loop was found
-    if (aVertIter != aProcVertexes.end()) {
-      // If the binding edge is a full circle, then the list may be empty before addition. Need to update edge iterator
-      if (aProcEdges.size() == 1)
-        anEdgeIter = aProcEdges.begin();
-
-      if (aVertIter != aProcVertexes.begin()) {
+    if (isLoopFound) {
+      // If the binding edge is a full circle, then it may be added recently. Need to update edge iterator
+      if (isCircleFound) {
+        anEdgeIter = aProcEdges.end();
+        anEdgeIter--;
+      }
+      else if (aVertIter != aProcVertexes.begin()) {
         // Check the orientation of the loop
         gp_Dir aCN = getOuterEdgeDirection(*anEdgeIter, *aVertIter);
         gp_Dir aCP = getOuterEdgeDirection(aProcEdges.back(), *aVertIter);
@@ -185,16 +189,26 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
         aCP.Reverse();
         if (aCN.DotCross(aCP, aNorm) < -tolerance) {
           // The found loop has wrong orientation and may contain sub-loops.
-          // Need to check it onle again with another initial direction.
+          // Need to check it once again with another initial direction.
           aCurVertex = *aVertIter;
           do {
             aProcVertexes.pop_back();
             aProcEdges.pop_back();
           } while (aCurVertex != aProcVertexes.back());
-          aCurDir = getOuterEdgeDirection(aProcEdges.back(), aCurVertex);
+          aCurDir = aCN.Reversed();
           aCurNorm = aNorm.Reversed();
           continue;
         }
+      }
+
+      if (!isCircleFound && anEdgeIter != aProcEdges.end() && 
+          anEdgeIter->IsSame(aProcEdges.back())) { // The loop on the same edge taken twice
+        aProcVertexes.pop_back();
+        aProcEdges.pop_back();
+        aCurVertex = aProcVertexes.back();
+        aCurDir = getOuterEdgeDirection(aProcEdges.back(), aCurVertex);
+        aCurNorm = aNorm.Reversed();
+        continue;
       }
 
       // When the orientation is correct or the edges looped through
@@ -207,19 +221,19 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
         theResultFaces.push_back(aFace);
       }
       // push the edges used in the loop to the map
-      std::list<TopoDS_Shape>::iterator anIter;
+      std::list<TopoDS_Edge>::iterator anIter;
       for (anIter = anEdgeIter; anIter != aProcEdges.end(); anIter++)
-        anEdgesInLoops.insert(anIter->TShape());
+        anEdgesInLoops.insert(&(*anIter));
       // remove unnecessary edges
-      std::list<TopoDS_Shape>::iterator aCopyVLoop = aVertIter;
-      std::list<TopoDS_Shape>::iterator aCopyELoop = anEdgeIter;
+      std::list<TopoDS_Vertex>::iterator aCopyVLoop = aVertIter;
+      std::list<TopoDS_Edge>::iterator aCopyELoop = anEdgeIter;
       removeWasteEdges(aVertIter, anEdgeIter, aProcVertexes.end(), aProcEdges.end(), aMapVE);
 
       // revert the list of remaining edges
-      std::list<TopoDS_Shape> aRemainVertexes;
+      std::list<TopoDS_Vertex> aRemainVertexes;
       for (; aVertIter != aProcVertexes.end(); aVertIter++)
         aRemainVertexes.push_front(*aVertIter);
-      std::list<TopoDS_Shape> aRemainEdges;
+      std::list<TopoDS_Edge> aRemainEdges;
       for (; anEdgeIter != aProcEdges.end(); anEdgeIter++)
         aRemainEdges.push_front(*anEdgeIter);
       // remove edges and vertexes used in the loop and add remaining ones
@@ -242,8 +256,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
     // we need to go back through the list of already checked edges to find a branching vertex
     if (!aMapVE.IsEmpty() && aMapVE.Contains(aNextVertex)
         && aMapVE.FindFromKey(aNextVertex).Size() == 1) {
-      std::list<TopoDS_Shape>::reverse_iterator aVRIter = aProcVertexes.rbegin();
-      std::list<TopoDS_Shape>::reverse_iterator aERIter = aProcEdges.rbegin();
+      std::list<TopoDS_Vertex>::reverse_iterator aVRIter = aProcVertexes.rbegin();
+      std::list<TopoDS_Edge>::reverse_iterator aERIter = aProcEdges.rbegin();
       if (aVRIter != aProcVertexes.rend())
         aVRIter++;
       if (aERIter != aProcEdges.rend())
@@ -254,8 +268,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
           break;
       if (aERIter != aProcEdges.rend()
           || (aVRIter != aProcVertexes.rend() && aMapVE.FindFromKey(*aVRIter).Size() == 1)) {  // the branching vertex was found or current list of edges is a wire without branches
-        std::list<TopoDS_Shape>::iterator aEIter;
-        TopoDS_Shape aCurEdge;
+        std::list<TopoDS_Edge>::iterator aEIter;
+        TopoDS_Edge aCurEdge;
         if (aERIter != aProcEdges.rend()) {
           aEIter = aERIter.base();
           aCurEdge = *aERIter;
@@ -270,8 +284,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
             aWire->setImpl(new TopoDS_Shape(*aTailIter));
             theResultWires.push_back(aWire);
           }
-        std::list<TopoDS_Shape>::iterator aVIter = aVRIter.base();
-        std::list<TopoDS_Shape>::iterator aEItCopy = aEIter;
+        std::list<TopoDS_Vertex>::iterator aVIter = aVRIter.base();
+        std::list<TopoDS_Edge>::iterator aEItCopy = aEIter;
         removeWasteEdges(--aVIter, aEItCopy, aProcVertexes.end(), aProcEdges.end(), aMapVE);
 
         aProcEdges.erase(aEIter, aProcEdges.end());
@@ -299,7 +313,6 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
       aProcVertexes.clear();
       aProcEdges.clear();
 
-      TopoDS_Shape aStartEdge;
       aStartVertex = findStartVertex(aMapVE, aDirX, aDirY);
       aProcVertexes.push_back(aStartVertex);
       aNextVertex = aStartVertex;
@@ -329,9 +342,9 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
       assert(aF1.ShapeType() == TopAbs_FACE);  // all items in result list should be faces
       TopExp_Explorer aVert2((*anIter2)->impl<TopoDS_Shape>(), TopAbs_VERTEX);
       for (; aVert2.More(); aVert2.Next()) {
-        Handle(BRep_TVertex) aV = Handle(BRep_TVertex)::DownCast(aVert2.Current().TShape());
-        aClassifier.Perform(aF1, aV->Pnt(), tolerance);
-        if (aClassifier.State() != TopAbs_IN)
+        const TopoDS_Vertex& aV = (const TopoDS_Vertex&)aVert2.Current();
+        aClassifier.Perform(aF1, BRep_Tool::Pnt(aV), tolerance);
+        if (aClassifier.State() != TopAbs_IN && aClassifier.State() != TopAbs_ON)
           break;
       }
       if (aVert2.More()) {  // second shape is not inside first, change the shapes order and repeat comparision
@@ -339,9 +352,9 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
         assert(aF2.ShapeType() == TopAbs_FACE);  // all items in result list should be faces
         TopExp_Explorer aVert1((*anIter1)->impl<TopoDS_Shape>(), TopAbs_VERTEX);
         for (; aVert1.More(); aVert1.Next()) {
-          Handle(BRep_TVertex) aV = Handle(BRep_TVertex)::DownCast(aVert1.Current().TShape());
-          aClassifier.Perform(aF2, aV->Pnt(), tolerance);
-          if (aClassifier.State() != TopAbs_IN)
+          const TopoDS_Vertex& aV = (const TopoDS_Vertex&)aVert2.Current();
+          aClassifier.Perform(aF2, BRep_Tool::Pnt(aV), tolerance);
+          if (aClassifier.State() != TopAbs_IN && aClassifier.State() != TopAbs_ON)
             break;
         }
         if (!aVert1.More()) {  // first shape should be cut from the second
@@ -371,7 +384,7 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
 }
 
 // =================== Auxiliary functions ====================================
-const TopoDS_Shape& findStartVertex(const BOPCol_IndexedDataMapOfShapeListOfShape& theMapVE,
+const TopoDS_Vertex& findStartVertex(const BOPCol_IndexedDataMapOfShapeListOfShape& theMapVE,
                                     const gp_Dir& theDirX, const gp_Dir& theDirY)
 {
   int aStartVertexInd = 1;
@@ -380,8 +393,7 @@ const TopoDS_Shape& findStartVertex(const BOPCol_IndexedDataMapOfShapeListOfShap
   int aNbVert = theMapVE.Extent();
   for (int i = 1; i <= aNbVert; i++) {
     const TopoDS_Vertex& aV = (const TopoDS_Vertex&) theMapVE.FindKey(i);
-    const Handle(BRep_TVertex)& aVert = (const Handle(BRep_TVertex)&) aV.TShape();
-    const gp_Pnt& aVertPnt = aVert->Pnt();
+    const gp_Pnt& aVertPnt = BRep_Tool::Pnt(aV);
 
     double aX = aVertPnt.XYZ().Dot(theDirX.XYZ());
     double aY = aVertPnt.XYZ().Dot(theDirY.XYZ());
@@ -392,19 +404,20 @@ const TopoDS_Shape& findStartVertex(const BOPCol_IndexedDataMapOfShapeListOfShap
       aStartVertexInd = i;
     }
   }
-  return theMapVE.FindKey(aStartVertexInd);
+  return static_cast<const TopoDS_Vertex&>(theMapVE.FindKey(aStartVertexInd));
 }
 
-void findNextVertex(const TopoDS_Shape& theStartVertex,
+void findNextVertex(const TopoDS_Vertex& theStartVertex,
                     const BOPCol_IndexedDataMapOfShapeListOfShape& theVertexEdgeMap,
-                    const gp_Dir& theStartDir, const gp_Dir& theNormal, TopoDS_Shape& theNextVertex,
-                    TopoDS_Shape& theNextEdge, gp_Dir& theNextDir)
+                    const gp_Dir& theStartDir, const gp_Dir& theNormal, TopoDS_Vertex& theNextVertex,
+                    TopoDS_Edge& theNextEdge, gp_Dir& theNextDir)
 {
   const BOPCol_ListOfShape& anEdgesList = theVertexEdgeMap.FindFromKey(theStartVertex);
   BOPCol_ListOfShape::Iterator aEdIter(anEdgesList);
   double aBestEdgeProj = DBL_MAX;
   for (; aEdIter.More(); aEdIter.Next()) {
-    gp_Dir aTang = getOuterEdgeDirection(aEdIter.Value(), theStartVertex);
+    const TopoDS_Edge& anEdge = static_cast<const TopoDS_Edge&>(aEdIter.Value());
+    gp_Dir aTang = getOuterEdgeDirection(anEdge, theStartVertex);
     aTang.Reverse();
 
     // The projection is normalized in segment (-1, 1),
@@ -418,22 +431,22 @@ void findNextVertex(const TopoDS_Shape& theStartVertex,
 
     if (aProj < aBestEdgeProj) {
       aBestEdgeProj = aProj;
-      theNextEdge = aEdIter.Value();
+      theNextEdge = anEdge;
       TopExp_Explorer aVertExp(theNextEdge, TopAbs_VERTEX);
       for (; aVertExp.More(); aVertExp.Next())
-        if (aVertExp.Current().TShape() != theStartVertex.TShape()) {
-          theNextVertex = aVertExp.Current();
-          theNextDir = getOuterEdgeDirection(aEdIter.Value(), theNextVertex);
+        if (!aVertExp.Current().IsSame(theStartVertex)) {
+          theNextVertex = static_cast<const TopoDS_Vertex&>(aVertExp.Current());
+          theNextDir = getOuterEdgeDirection(anEdge, theNextVertex);
           break;
         }
       if (!aVertExp.More()) {  // This edge is a full circle
         TopoDS_Vertex aV1, aV2;
-        TopExp::Vertices(*(const TopoDS_Edge*) (&theNextEdge), aV1, aV2);
+        TopExp::Vertices(theNextEdge, aV1, aV2);
         if (aV1.Orientation() == theStartVertex.Orientation())
           theNextVertex = aV2;
         else
           theNextVertex = aV1;
-        theNextDir = getOuterEdgeDirection(aEdIter.Value(), theNextVertex);
+        theNextDir = getOuterEdgeDirection(anEdge, theNextVertex);
       }
     }
   }
@@ -449,12 +462,12 @@ static void addEdgeToWire(const TopoDS_Edge& theEdge, const BRep_Builder& theBui
   TopExp_Explorer aVertExp(theEdge, TopAbs_VERTEX);
   for (; aVertExp.More(); aVertExp.Next()) {
     const TopoDS_Shape& aVertex = aVertExp.Current();
-    if (aVertex.TShape() == theSpliceVertex.TShape()
+    if (aVertex.IsSame(theSpliceVertex)
         && aVertex.Orientation() != theEdge.Orientation()) {  // Current vertex is the last for the edge, so its orientation is wrong, need to revert the edge
       anEdge.Reverse();
       break;
     }
-    if (aVertex.TShape() != theSpliceVertex.TShape()) {
+    if (!aVertex.IsSame(theSpliceVertex)) {
       aCurVertChanged = aVertex;
       isCurVertChanged = true;
     }
@@ -464,21 +477,21 @@ static void addEdgeToWire(const TopoDS_Edge& theEdge, const BRep_Builder& theBui
   theBuilder.Add(theWire, anEdge);
 }
 
-void createFace(const TopoDS_Shape& theStartVertex,
-                const std::list<TopoDS_Shape>::iterator& theStartEdge,
-                const std::list<TopoDS_Shape>::iterator& theEndOfEdges, const gp_Pln& thePlane,
+void createFace(const TopoDS_Vertex& theStartVertex,
+                const std::list<TopoDS_Edge>::iterator& theStartEdge,
+                const std::list<TopoDS_Edge>::iterator& theEndOfEdges,
+                const gp_Pln& thePlane,
                 TopoDS_Face& theResFace)
 {
   TopoDS_Wire aResWire;
   BRep_Builder aBuilder;
   aBuilder.MakeWire(aResWire);
 
-  TopoDS_Shape aCurVertex = theStartVertex;
-  std::list<TopoDS_Shape>::const_iterator anEdgeIter = theStartEdge;
+  TopoDS_Vertex aCurVertex = theStartVertex;
+  std::list<TopoDS_Edge>::const_iterator anEdgeIter = theStartEdge;
   for (; anEdgeIter != theEndOfEdges; anEdgeIter++) {
-    TopoDS_Edge anEdge = *((TopoDS_Edge*) (&(*anEdgeIter)));
-    if (!anEdge.IsNull())
-      addEdgeToWire(anEdge, aBuilder, aCurVertex, aResWire);
+    if (!anEdgeIter->IsNull())
+      addEdgeToWire(*anEdgeIter, aBuilder, aCurVertex, aResWire);
   }
 
   BRepBuilderAPI_MakeFace aFaceBuilder(thePlane, aResWire);
@@ -486,23 +499,23 @@ void createFace(const TopoDS_Shape& theStartVertex,
     theResFace = aFaceBuilder.Face();
 }
 
-void createWireList(const TopoDS_Shape& theStartVertex,
-                    const std::list<TopoDS_Shape>::iterator& theStartEdge,
-                    const std::list<TopoDS_Shape>::iterator& theEndOfEdges,
-                    const std::set<Handle(TopoDS_TShape)>& theEdgesInLoops,
+void createWireList(const TopoDS_Vertex& theStartVertex,
+                    const std::list<TopoDS_Edge>::iterator& theStartEdge,
+                    const std::list<TopoDS_Edge>::iterator& theEndOfEdges,
+                    const std::set<TopoDS_Edge*>& theEdgesInLoops,
                     std::list<TopoDS_Wire>& theResWires)
 {
   BRep_Builder aBuilder;
   bool needNewWire = true;
-  TopoDS_Shape aCurVertex = theStartVertex;
+  TopoDS_Vertex aCurVertex = theStartVertex;
 
-  std::list<TopoDS_Shape>::iterator anIter = theStartEdge;
+  std::list<TopoDS_Edge>::iterator anIter = theStartEdge;
   while (anIter != theEndOfEdges) {
-    while (anIter != theEndOfEdges && needNewWire && theEdgesInLoops.count(anIter->TShape()) != 0) {
+    while (anIter != theEndOfEdges && needNewWire && theEdgesInLoops.count(&(*anIter)) != 0) {
       TopExp_Explorer aVertExp(*anIter, TopAbs_VERTEX);
       for (; aVertExp.More(); aVertExp.Next())
-        if (aVertExp.Current().TShape() != aCurVertex.TShape()) {
-          aCurVertex = aVertExp.Current();
+        if (!aVertExp.Current().IsSame(aCurVertex)) {
+          aCurVertex = static_cast<const TopoDS_Vertex&>(aVertExp.Current());
           break;
         }
       anIter++;
@@ -515,32 +528,25 @@ void createWireList(const TopoDS_Shape& theStartVertex,
       aBuilder.MakeWire(aWire);
       theResWires.push_back(aWire);
       needNewWire = false;
-    } else if (theEdgesInLoops.count(anIter->TShape()) != 0) {  // There was found the edge already used in loop.
-                                                                // Current wire should be released and new one should started
+    } else if (theEdgesInLoops.count(&(*anIter)) != 0) {  // There was found the edge already used in loop.
+                                                          // Current wire should be released and new one should started
       needNewWire = true;
       continue;
     }
 
-    TopoDS_Edge anEdge = *((TopoDS_Edge*) (&(*anIter)));
-    addEdgeToWire(anEdge, aBuilder, aCurVertex, theResWires.back());
+    addEdgeToWire(*anIter, aBuilder, aCurVertex, theResWires.back());
     anIter++;
   }
 }
 
-gp_Dir getOuterEdgeDirection(const TopoDS_Shape& theEdge, const TopoDS_Shape& theVertex)
+gp_Dir getOuterEdgeDirection(const TopoDS_Edge& theEdge, const TopoDS_Vertex& theVertex)
 {
-  const Handle(BRep_TVertex)& aVertex = (const Handle(BRep_TVertex)&) theVertex.TShape();
-  gp_Pnt aVertexPnt = aVertex->Pnt();
-
-  const Handle(BRep_TEdge)& anEdge = (const Handle(BRep_TEdge)&) theEdge.TShape();
+  gp_Pnt aVertexPnt = BRep_Tool::Pnt(theVertex);
 
   // Convert the edge to the curve to calculate the tangency.
   // There should be only one curve in the edge.
-  Handle(BRep_Curve3D) aEdCurve =
-  Handle(BRep_Curve3D)::DownCast(anEdge->Curves().First());
   double aFirst, aLast;
-  aEdCurve->Range(aFirst, aLast);
-  Handle(Geom_Curve) aCurve = aEdCurve->Curve3D();
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(theEdge, aFirst, aLast);
 
   gp_Pnt aPnt;
   gp_Vec aTang;
@@ -555,10 +561,10 @@ gp_Dir getOuterEdgeDirection(const TopoDS_Shape& theEdge, const TopoDS_Shape& th
   return gp_Dir(aTang);
 }
 
-void removeWasteEdges(std::list<TopoDS_Shape>::iterator& theStartVertex,
-                      std::list<TopoDS_Shape>::iterator& theStartEdge,
-                      const std::list<TopoDS_Shape>::iterator& theEndOfVertexes,
-                      const std::list<TopoDS_Shape>::iterator& theEndOfEdges,
+void removeWasteEdges(std::list<TopoDS_Vertex>::iterator& theStartVertex,
+                      std::list<TopoDS_Edge>::iterator& theStartEdge,
+                      const std::list<TopoDS_Vertex>::iterator& theEndOfVertexes,
+                      const std::list<TopoDS_Edge>::iterator& theEndOfEdges,
                       BOPCol_IndexedDataMapOfShapeListOfShape& theMapVE)
 {
   bool isVertStep = true;
@@ -566,7 +572,7 @@ void removeWasteEdges(std::list<TopoDS_Shape>::iterator& theStartVertex,
     BOPCol_ListOfShape& aBunch = theMapVE.ChangeFromKey(*theStartVertex);
     BOPCol_ListOfShape::Iterator anApprEdge(aBunch);
     for (; anApprEdge.More(); anApprEdge.Next())
-      if (anApprEdge.Value() == *theStartEdge)
+      if (anApprEdge.Value().IsSame(*theStartEdge))
         break;
     if (anApprEdge.More())
       aBunch.Remove(anApprEdge);
