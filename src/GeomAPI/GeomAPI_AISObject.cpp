@@ -92,6 +92,7 @@ void GeomAPI_AISObject::createDistance(boost::shared_ptr<GeomAPI_Pnt> theStartPo
     anAspect->MakeText3d(false);
     anAspect->TextAspect()->SetHeight(CONSTRAINT_TEXT_HEIGHT);
     anAspect->MakeTextShaded(false);
+    anAspect->ArrowAspect()->SetLength(theDistance / 10.);
     aDimAIS->DimensionAspect()->MakeUnitsDisplayed(false);
     aDimAIS->SetDimensionAspect(anAspect);
     aDimAIS->SetSelToleranceForText2d(CONSTRAINT_TEXT_SELECTION_TOLERANCE);

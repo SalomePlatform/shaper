@@ -7,6 +7,7 @@
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ContextMenuMgr.h>
 #include <XGUI_Preferences.h>
+#include <XGUI_ObjectsBrowser.h>
 
 #include <LightApp_Application.h>
 #include <LightApp_SelectionMgr.h>
@@ -26,6 +27,8 @@
 
 #include <QDockWidget>
 #include <QAction>
+#include <QTimer>
+
 
 extern "C" {
 NewGeom_EXPORT CAM_Module* createModule()
@@ -64,7 +67,7 @@ private:
 //******************************************************
 NewGeom_Module::NewGeom_Module()
     : LightApp_Module("NewGeom"),
-      mySelector(0)
+      mySelector(0), myIsOpened(0)
 {
   myWorkshop = new XGUI_Workshop(this);
   myProxyViewer = new NewGeom_SalomeViewer(this);
@@ -116,6 +119,13 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
     myWorkshop->propertyPanel()->hide();
     QtxPopupMgr* aMgr = popupMgr();  // Create popup manager
     action(myEraseAll)->setEnabled(false);
+
+    if (myIsOpened) {
+      myWorkshop->objectBrowser()->rebuildDataTree();
+      myWorkshop->updateCommandStatus();
+      myIsOpened = false;
+      QTimer::singleShot(1000, myWorkshop, SLOT(displayAllResults()));
+    }
   }
   return isDone;
 }

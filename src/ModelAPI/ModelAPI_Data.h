@@ -39,7 +39,7 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual void setName(const std::string& theName) = 0;
 
   /// Returns the attribute that references to another document
-  virtual boost::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string& theID) = 0;
+  virtual boost::shared_ptr<ModelAPI_AttributeDocRef> document(const std::string& theID) = 0;
   /// Returns the attribute that contains real value with double precision
   virtual boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID) = 0;
   /// Returns the attribute that contains integer value

@@ -63,7 +63,7 @@ class Model_Data : public ModelAPI_Data
   /// Defines the name of the feature visible by the user in the object browser
   MODEL_EXPORT virtual void setName(const std::string& theName);
   /// Returns the attribute that references to another document
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeDocRef> docRef(const std::string& theID);
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeDocRef> document(const std::string& theID);
   /// Returns the attribute that contains real value with double precision
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID);
   /// Returns the attribute that contains integer value

@@ -19,7 +19,10 @@ NewGeom_SalomeViewer::NewGeom_SalomeViewer(QObject* theParent)
 //**********************************************
 Handle(AIS_InteractiveContext) NewGeom_SalomeViewer::AISContext() const
 {
-  return mySelector->viewer()->getAISContext();
+  if (mySelector && mySelector->viewer())
+    return mySelector->viewer()->getAISContext();
+  Handle(AIS_InteractiveContext) aNull;
+  return aNull;
 }
 
 //**********************************************

@@ -257,7 +257,7 @@ void XGUI_MainWindow::updateTitle()
 {
   QString aTitle = myTitle;
   if (!myCurrentDir.isNull())
-    aTitle += ":" + myCurrentDir;
+    aTitle += " - " + myCurrentDir;
   if (myIsModified)
     aTitle += "*";
   setWindowTitle(aTitle);
