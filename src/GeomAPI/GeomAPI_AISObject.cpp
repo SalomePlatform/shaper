@@ -144,6 +144,7 @@ void GeomAPI_AISObject::createRadius(boost::shared_ptr<GeomAPI_Circ> theCircle,
     anAspect->MakeArrows3d(Standard_False);
     anAspect->MakeText3d(false);
     anAspect->TextAspect()->SetHeight(CONSTRAINT_TEXT_HEIGHT);
+    anAspect->ArrowAspect()->SetLength(theRadius / 5.);
     anAspect->MakeTextShaded(false);
     aDimAIS->DimensionAspect()->MakeUnitsDisplayed(false);
     aDimAIS->SetDimensionAspect(anAspect);
