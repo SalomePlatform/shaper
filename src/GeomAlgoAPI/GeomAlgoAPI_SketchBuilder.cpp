@@ -196,7 +196,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
             aProcEdges.pop_back();
           } while (aCurVertex != aProcVertexes.back());
           aCurDir = aCN.Reversed();
-          aCurNorm = aNorm.Reversed();
+          //aCurNorm = aNorm.Reversed();
           continue;
         }
       }
@@ -229,27 +229,16 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
       std::list<TopoDS_Edge>::iterator aCopyELoop = anEdgeIter;
       removeWasteEdges(aVertIter, anEdgeIter, aProcVertexes.end(), aProcEdges.end(), aMapVE);
 
-      // revert the list of remaining edges
-      std::list<TopoDS_Vertex> aRemainVertexes;
-      for (; aVertIter != aProcVertexes.end(); aVertIter++)
-        aRemainVertexes.push_front(*aVertIter);
-      std::list<TopoDS_Edge> aRemainEdges;
-      for (; anEdgeIter != aProcEdges.end(); anEdgeIter++)
-        aRemainEdges.push_front(*anEdgeIter);
-      // remove edges and vertexes used in the loop and add remaining ones
-      aProcVertexes.erase(aCopyVLoop, aProcVertexes.end());
-      aProcVertexes.insert(aProcVertexes.end(), aRemainVertexes.begin(), aRemainVertexes.end());
-      aProcEdges.erase(aCopyELoop, aProcEdges.end());
-      aProcEdges.insert(aProcEdges.end(), aRemainEdges.begin(), aRemainEdges.end());
-
       // Recalculate current vertex and current direction
-      if (!aProcVertexes.empty()) {
-        aNextVertex = aProcVertexes.back();
-        if (!aProcEdges.empty())
-          aNextDir = getOuterEdgeDirection(aProcEdges.back(), aNextVertex);
-        else
-          aNextDir = aDirY;
+      aProcEdges.clear();
+      aProcVertexes.clear();
+      if (aMapVE.Extent() > 0)
+      {
+        aNextVertex = findStartVertex(aMapVE, aDirX, aDirY);
+        aProcVertexes.push_back(aNextVertex);
       }
+      aNextDir = aDirY.Reversed();
+      aCurNorm = aNorm.Reversed();
     }
 
     // if next vertex connected only to alone edge, this is a part of wire (not a closed loop),
@@ -344,7 +333,8 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
       for (; aVert2.More(); aVert2.Next()) {
         const TopoDS_Vertex& aV = (const TopoDS_Vertex&)aVert2.Current();
         aClassifier.Perform(aF1, BRep_Tool::Pnt(aV), tolerance);
-        if (aClassifier.State() != TopAbs_IN && aClassifier.State() != TopAbs_ON)
+        TopAbs_State aState = aClassifier.State();
+        if (aState != TopAbs_IN && aState != TopAbs_ON)
           break;
       }
       if (aVert2.More()) {  // second shape is not inside first, change the shapes order and repeat comparision
@@ -354,29 +344,42 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
         for (; aVert1.More(); aVert1.Next()) {
           const TopoDS_Vertex& aV = (const TopoDS_Vertex&)aVert2.Current();
           aClassifier.Perform(aF2, BRep_Tool::Pnt(aV), tolerance);
-          if (aClassifier.State() != TopAbs_IN && aClassifier.State() != TopAbs_ON)
+          TopAbs_State aState = aClassifier.State();
+          if (aState != TopAbs_IN && aState != TopAbs_ON)
             break;
         }
         if (!aVert1.More()) {  // first shape should be cut from the second
           BRepAlgoAPI_Cut aCut((*anIter2)->impl<TopoDS_Shape>(), (*anIter1)->impl<TopoDS_Shape>());
           aCut.Build();
           TopExp_Explorer anExp(aCut.Shape(), TopAbs_FACE);
-          (*anIter2)->setImpl(new TopoDS_Shape(anExp.Current()));
+          bool isFirstFace = true;
           for (anExp.Next(); anExp.More(); anExp.Next()) {
-            boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
-            aShape->setImpl(new TopoDS_Shape(anExp.Current()));
-            theFaces.push_back(aShape);
+            if (anExp.Current().ShapeType() != TopAbs_FACE) continue;
+            if (isFirstFace) {
+              (*anIter2)->setImpl(new TopoDS_Shape(anExp.Current()));
+              isFirstFace = false;
+            } else {
+              boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
+              aShape->setImpl(new TopoDS_Shape(anExp.Current()));
+              theFaces.push_back(aShape);
+            }
           }
         }
       } else {  // second shape should be cut from the first
         BRepAlgoAPI_Cut aCut((*anIter1)->impl<TopoDS_Shape>(), (*anIter2)->impl<TopoDS_Shape>());
         aCut.Build();
         TopExp_Explorer anExp(aCut.Shape(), TopAbs_FACE);
-        (*anIter1)->setImpl(new TopoDS_Shape(anExp.Current()));
+        bool isFirstFace = true;
         for (anExp.Next(); anExp.More(); anExp.Next()) {
-          boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
-          aShape->setImpl(new TopoDS_Shape(anExp.Current()));
-          theFaces.push_back(aShape);
+          if (anExp.Current().ShapeType() != TopAbs_FACE) continue;
+          if (isFirstFace) {
+            (*anIter1)->setImpl(new TopoDS_Shape(anExp.Current()));
+            isFirstFace = false;
+          } else {
+            boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
+            aShape->setImpl(new TopoDS_Shape(anExp.Current()));
+            theFaces.push_back(aShape);
+          }
         }
       }
     }

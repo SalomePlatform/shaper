@@ -559,6 +559,13 @@ void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>&
   QApplication::restoreOverrideCursor();
 }
 
+bool XGUI_Workshop::isActiveOperationAborted()
+{
+  if(!myOperationMgr->hasOperation())
+    return true;
+  return myOperationMgr->abortOperation();
+}
+
 //******************************************************
 void XGUI_Workshop::onExit()
 {
@@ -602,7 +609,7 @@ void XGUI_Workshop::onNew()
 //******************************************************
 void XGUI_Workshop::onOpen()
 {
-  if(!myOperationMgr->abortOperation())
+  if(!isActiveOperationAborted())
     return;
   //save current file before close if modified
   SessionPtr aSession = ModelAPI_Session::get();
@@ -636,14 +643,13 @@ void XGUI_Workshop::onOpen()
   myObjectBrowser->rebuildDataTree();
   displayAllResults();
   updateCommandStatus();
-  myMainWindow->setCurrentDir(myCurrentDir);
   QApplication::restoreOverrideCursor();
 }
 
 //******************************************************
 bool XGUI_Workshop::onSave()
 {
-  if(!myOperationMgr->abortOperation())
+  if(!isActiveOperationAborted())
     return false;
   if (myCurrentDir.isEmpty()) {
     return onSaveAs();
@@ -658,7 +664,7 @@ bool XGUI_Workshop::onSave()
 //******************************************************
 bool XGUI_Workshop::onSaveAs()
 {
-  if(!myOperationMgr->abortOperation())
+  if(!isActiveOperationAborted())
     return false;
   QFileDialog dialog(mainWindow());
   dialog.setWindowTitle(tr("Select directory to save files..."));
