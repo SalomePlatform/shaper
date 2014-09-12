@@ -5,6 +5,7 @@
 #include <ModuleBase_Definitions.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Events.h>
 
 #include <QWidget>
 #include <QTreeView>
@@ -92,6 +93,8 @@ Q_OBJECT
   void activatePart(const ResultPartPtr& thePart);
 
   void rebuildDataTree();
+
+  void processEvent(const Events_Message* theMessage);
 
 signals:
   //! Emited when selection is changed

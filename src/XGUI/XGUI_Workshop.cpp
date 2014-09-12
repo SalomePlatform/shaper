@@ -361,6 +361,8 @@ void XGUI_Workshop::onFeatureUpdatedMsg(const ModelAPI_ObjectUpdatedMessage* the
     }
   }
   myOperationMgr->validateCurrentOperation();
+  if (myObjectBrowser)
+    myObjectBrowser->processEvent(theMsg);
 }
 
 //******************************************************
@@ -410,18 +412,20 @@ void XGUI_Workshop::onFeatureCreatedMsg(const ModelAPI_ObjectUpdatedMessage* the
       }
     }
   }
+  if (myObjectBrowser)
+    myObjectBrowser->processEvent(theMsg);
   if (isDisplayed)
     myDisplayer->updateViewer();
   if (aHasPart) {
-    //The created part will be created in Object Browser later and we have to activate it
-    // only when it is created everywere
-    QTimer::singleShot(50, this, SLOT(activateLastPart()));
+    activateLastPart();
   }
 }
 
 //******************************************************
 void XGUI_Workshop::onObjectDeletedMsg(const ModelAPI_ObjectDeletedMessage* theMsg)
 {
+  if (myObjectBrowser)
+    myObjectBrowser->processEvent(theMsg);
   //std::set<ObjectPtr> aFeatures = theMsg->objects();
 }
 
@@ -1054,8 +1058,9 @@ void XGUI_Workshop::activateLastPart()
   std::string aGrpName = ModelAPI_ResultPart::group();
   ObjectPtr aLastPart = aDoc->object(aGrpName, aDoc->size(aGrpName) - 1);
   ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aLastPart);
-  if (aPart)
+  if (aPart) {
     activatePart(aPart);
+  }
 }
 
 //**************************************************************
