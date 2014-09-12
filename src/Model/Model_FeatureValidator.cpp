@@ -15,6 +15,8 @@ bool Model_FeatureValidator::isValid(const boost::shared_ptr<ModelAPI_Feature>& 
   const std::list<std::string>& theArguments) const
 {
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  if (!aData)
+    return false;
   if (!aData->isValid())
     return false;
   const std::string kAllTypes = "";
