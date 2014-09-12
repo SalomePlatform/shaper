@@ -275,6 +275,9 @@ signals:
   static QMap<QString, QString> myIcons;
 
   bool myUpdatePrefs;
+
+  // Flag to check that part document is in process of activating
+  bool myPartActivating;
 };
 
 #endif

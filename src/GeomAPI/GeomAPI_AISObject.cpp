@@ -23,6 +23,8 @@
 #include <AIS_RadiusDimension.hxx>
 #include <AIS_Shape.hxx>
 
+const double tolerance = 1e-7;
+
 const int CONSTRAINT_TEXT_HEIGHT = 28;  /// the text height of the constraint
 const int CONSTRAINT_TEXT_SELECTION_TOLERANCE = 20;  /// the text selection tolerance
 
@@ -67,9 +69,14 @@ void GeomAPI_AISObject::createDistance(boost::shared_ptr<GeomAPI_Pnt> theStartPo
 {
   double aFlyout = 0;
   if (theFlyoutPoint) {
-    boost::shared_ptr<GeomAPI_Lin> aLine = boost::shared_ptr<GeomAPI_Lin>(
-        new GeomAPI_Lin(theStartPoint, theEndPoint));
-    double aDist = aLine->distance(theFlyoutPoint);
+    double aDist = 0.0;
+    if (theStartPoint->distance(theEndPoint) < tolerance)
+      aDist = theStartPoint->distance(theFlyoutPoint);
+    else {
+      boost::shared_ptr<GeomAPI_Lin> aLine = boost::shared_ptr<GeomAPI_Lin>(
+          new GeomAPI_Lin(theStartPoint, theEndPoint));
+      aDist = aLine->distance(theFlyoutPoint);
+    }
 
     boost::shared_ptr<GeomAPI_XYZ> aLineDir = theEndPoint->xyz()->decreased(theStartPoint->xyz());
     boost::shared_ptr<GeomAPI_XYZ> aFOutDir = theFlyoutPoint->xyz()->decreased(
