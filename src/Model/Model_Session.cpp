@@ -133,9 +133,11 @@ boost::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
 
 void Model_Session::setActiveDocument(boost::shared_ptr<ModelAPI_Document> theDoc)
 {
-  myCurrentDoc = theDoc;
-  static Events_Message aMsg(Events_Loop::eventByName("CurrentDocumentChanged"));
-  Events_Loop::loop()->send(aMsg);
+  if (myCurrentDoc != theDoc) {
+    myCurrentDoc = theDoc;
+    static Events_Message aMsg(Events_Loop::eventByName("CurrentDocumentChanged"));
+    Events_Loop::loop()->send(aMsg);
+  }
 }
 
 boost::shared_ptr<ModelAPI_Document> Model_Session::copy(

@@ -33,7 +33,6 @@ XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
-  aLoop->registerListener(this, Events_Loop::eventByName("CurrentDocumentChanged"));
 
   // Create a top part of data tree model
   myModel = new XGUI_TopDataModel(this);

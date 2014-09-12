@@ -87,7 +87,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
       myPropertyPanel(0),
       myObjectBrowser(0),
       myDisplayer(0),
-      myUpdatePrefs(false)
+      myUpdatePrefs(false),
+      myPartActivating(false)
 {
   myMainWindow = mySalomeConnector ? 0 : new XGUI_MainWindow();
 
@@ -141,6 +142,7 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->registerListener(this, Events_Loop::eventByName("LongOperation"));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_PLUGIN_LOADED));
+  aLoop->registerListener(this, Events_Loop::eventByName("CurrentDocumentChanged"));
 
   registerValidators();
   activateModule();
@@ -297,6 +299,29 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
           updateCommandStatus();
       }
     }
+  }
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName("CurrentDocumentChanged")) {
+    // Find and Activate active part
+    if (myPartActivating)
+      return;
+    SessionPtr aMgr = ModelAPI_Session::get();
+    DocumentPtr aActiveDoc = aMgr->activeDocument();
+    DocumentPtr aDoc = aMgr->moduleDocument();
+    if (aActiveDoc == aDoc) {
+      activatePart(ResultPartPtr()); 
+      return;
+    }
+    std::string aGrpName = ModelAPI_ResultPart::group();
+    for (int i = 0; i < aDoc->size(aGrpName); i++) {
+      ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aDoc->object(aGrpName, i));
+      if (aPart->partDoc() == aActiveDoc) {
+        activatePart(aPart); // Activate a part which corresponds to active Doc
+        return;
+      }
+    }
+    // If not found then activate global document
+    activatePart(ResultPartPtr()); 
+
   } else {
     //Show error dialog if error message received.
     const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
@@ -1005,10 +1030,14 @@ void XGUI_Workshop::onWidgetValuesChanged()
 //**************************************************************
 void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
 {
-  if (theFeature)
-    theFeature->activate();
-  changeCurrentDocument(theFeature);
-  myObjectBrowser->activatePart(theFeature);
+  if (!myPartActivating) {
+    myPartActivating = true;
+    if (theFeature)
+      theFeature->activate();
+    changeCurrentDocument(theFeature);
+    myObjectBrowser->activatePart(theFeature);
+    myPartActivating = false;
+  }
 }
 
 //**************************************************************
