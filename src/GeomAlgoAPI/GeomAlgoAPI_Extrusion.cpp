@@ -10,6 +10,7 @@
 #include <Geom_Plane.hxx>
 #include <Geom_Surface.hxx>
 #include <TopExp_Explorer.hxx>
+#include <BRep_Builder.hxx>
 
 #include <Precision.hxx>
 const double tolerance = Precision::Angular();
@@ -38,6 +39,9 @@ boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Extrusion::makeExtrusion(
 
   const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
   TopExp_Explorer aFaceExp(aShape, TopAbs_FACE);
+  TopoDS_Compound aFaces; // use only faces from the shape: make compound for this
+  BRep_Builder aBuilder;
+  aBuilder.MakeCompound(aFaces);
   for (; aFaceExp.More(); aFaceExp.Next()) {
     const TopoDS_Face& aFace = (const TopoDS_Face&) aFaceExp.Current();
     Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(BRep_Tool::Surface(aFace));
@@ -50,10 +54,15 @@ boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Extrusion::makeExtrusion(
       isFirstNorm = false;
     } else if (!aShapeNormal.IsEqual(aNormal, tolerance))  // non-planar shapes is not supported for extrusion yet
       return boost::shared_ptr<GeomAPI_Shape>();
+    aBuilder.Add(aFaces, aFace);
   }
+  if (aFaces.IsNull())
+    return boost::shared_ptr<GeomAPI_Shape>();
 
   boost::shared_ptr<GeomAPI_Dir> aDir(
       new GeomAPI_Dir(aShapeNormal.X(), aShapeNormal.Y(), aShapeNormal.Z()));
 
-  return GeomAlgoAPI_Extrusion::makeExtrusion(theShape, aDir, theSize);
+  boost::shared_ptr<GeomAPI_Shape> aFacesShape(new (GeomAPI_Shape));
+  aFacesShape->setImpl(new TopoDS_Shape(aFaces));
+  return GeomAlgoAPI_Extrusion::makeExtrusion(aFacesShape, aDir, theSize);
 }
