@@ -8,10 +8,11 @@
 #include "ModuleBase.h"
 #include "ModuleBase_ModelWidget.h"
 
+class ModuleBase_DoubleSpinBox;
 class Config_WidgetAPI;
 class QWidget;
 class QLabel;
-class QDoubleSpinBox;
+class QTimer;
 
 class MODULEBASE_EXPORT ModuleBase_WidgetDoubleValue : public ModuleBase_ModelWidget
 {
@@ -47,10 +48,15 @@ Q_OBJECT
   /// \param theEvent the processed event
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
+ public slots:
+ /// Delayed value chnged: when user starts typing something,
+ // it gives him a 0,5 second to finish typing, when sends valueChnaged() signal
+//  void onValueChanged();
+
  protected:
   QWidget* myContainer;
   QLabel* myLabel;
-  QDoubleSpinBox* mySpinBox;
+  ModuleBase_DoubleSpinBox* mySpinBox;
 };
 
 #endif

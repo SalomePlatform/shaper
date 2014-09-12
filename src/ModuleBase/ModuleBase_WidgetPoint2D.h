@@ -15,7 +15,7 @@ class ModuleBase_WidgetValue;
 class GeomAPI_Pnt2d;
 
 class QGroupBox;
-class QDoubleSpinBox;
+class ModuleBase_DoubleSpinBox;
 
 /**\class ModuleBase_WidgetPoint2D
  * \ingroup GUI
@@ -73,8 +73,8 @@ signals:
 
  private:
   QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets
-  QDoubleSpinBox* myXSpin;  ///< the spin box for the X coordinate
-  QDoubleSpinBox* myYSpin;  ///< the spin box for the Y coordinate
+  ModuleBase_DoubleSpinBox* myXSpin;  ///< the spin box for the X coordinate
+  ModuleBase_DoubleSpinBox* myYSpin;  ///< the spin box for the Y coordinate
 
   std::string myOptionParam;  /// Parameter name which has to be taken from previous feature
 };

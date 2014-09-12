@@ -2,8 +2,9 @@
 // Created:     23 June 2014
 // Author:      Vitaly Smetannikov
 
-#include "ModuleBase_WidgetPoint2dDistance.h"
-#include "ModuleBase_WidgetValueFeature.h"
+#include <ModuleBase_WidgetPoint2dDistance.h>
+#include <ModuleBase_WidgetValueFeature.h>
+#include <ModuleBase_DoubleSpinBox.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <Config_WidgetAPI.h>
@@ -11,8 +12,6 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDouble.h>
-
-#include <QDoubleSpinBox>
 
 ModuleBase_WidgetPoint2dDistance::ModuleBase_WidgetPoint2dDistance(QWidget* theParent,
                                                                    const Config_WidgetAPI* theData,

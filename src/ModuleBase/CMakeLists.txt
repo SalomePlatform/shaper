@@ -27,6 +27,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_ViewerPrs.h
 	ModuleBase_WidgetChoice.h
 	ModuleBase_WidgetFileSelector.h
+	ModuleBase_DoubleSpinBox.h
 )
 
 SET(PROJECT_SOURCES
@@ -48,6 +49,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetValueFeature.cpp	
 	ModuleBase_WidgetChoice.cpp
 	ModuleBase_WidgetFileSelector.cpp
+	ModuleBase_DoubleSpinBox.cpp
 )
 
 SET(PROJECT_LIBRARIES

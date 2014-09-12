@@ -3,6 +3,7 @@
 // Author:      Natalia ERMOLAEVA
 
 #include <ModuleBase_WidgetEditor.h>
+#include <ModuleBase_DoubleSpinBox.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -22,7 +23,6 @@
 #include <QTimer>
 #include <QDialog>
 #include <QLayout>
-#include <QDoubleSpinBox>
 
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
                                                  const Config_WidgetAPI* theData,

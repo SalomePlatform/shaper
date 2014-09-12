@@ -4,6 +4,7 @@
 
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetValueFeature.h>
+#include <ModuleBase_DoubleSpinBox.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -19,7 +20,6 @@
 
 #include <QGroupBox>
 #include <QGridLayout>
-#include <QDoubleSpinBox>
 #include <QLabel>
 #include <QEvent>
 #include <QKeyEvent>
@@ -44,7 +44,7 @@ ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
     aLabel->setPixmap(QPixmap(":pictures/x_point.png"));
     aGroupLay->addWidget(aLabel, 0, 0);
 
-    myXSpin = new QDoubleSpinBox(myGroupBox);
+    myXSpin = new ModuleBase_DoubleSpinBox(myGroupBox);
     myXSpin->setMinimum(-DBL_MAX);
     myXSpin->setMaximum(DBL_MAX);
     myXSpin->setToolTip("X");
@@ -58,7 +58,7 @@ ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
     aLabel->setPixmap(QPixmap(":pictures/y_point.png"));
     aGroupLay->addWidget(aLabel, 1, 0);
 
-    myYSpin = new QDoubleSpinBox(myGroupBox);
+    myYSpin = new ModuleBase_DoubleSpinBox(myGroupBox);
     myYSpin->setMinimum(-DBL_MAX);
     myYSpin->setMaximum(DBL_MAX);
     myYSpin->setToolTip("X");

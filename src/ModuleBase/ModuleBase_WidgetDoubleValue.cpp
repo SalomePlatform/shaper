@@ -3,6 +3,7 @@
 // Author:      Vitaly Smetannikov
 
 #include <ModuleBase_WidgetDoubleValue.h>
+#include <ModuleBase_DoubleSpinBox.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
@@ -16,12 +17,17 @@
 #include <QWidget>
 #include <QLayout>
 #include <QLabel>
-#include <QDoubleSpinBox>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QTimer>
+
+#include <math.h>
 
 #ifndef DBL_MAX
 #define DBL_MAX 1.7976931348623158e+308 
+#endif
+#ifdef _DEBUG
+#include <iostream>
 #endif
 
 ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
@@ -40,7 +46,7 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
     myLabel->setPixmap(QPixmap(aLabelIcon));
   aControlLay->addWidget(myLabel);
 
-  mySpinBox = new QDoubleSpinBox(myContainer);
+  mySpinBox = new ModuleBase_DoubleSpinBox(myContainer);
   QString anObjName = QString::fromStdString(attributeID());
   mySpinBox->setObjectName(anObjName);
 
@@ -64,6 +70,10 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
   aProp = theData->getProperty(DOUBLE_WDG_STEP);
   double aStepVal = QString::fromStdString(aProp).toDouble(&isOk);
   if (isOk) {
+    double aMinStep = pow(10, -1. * (double) mySpinBox->decimals());
+    if(aStepVal < aMinStep){
+      aStepVal = aMinStep;
+    }
     mySpinBox->setSingleStep(aStepVal);
   }
 
@@ -134,3 +144,4 @@ bool ModuleBase_WidgetDoubleValue::eventFilter(QObject *theObject, QEvent *theEv
   }
   return ModuleBase_ModelWidget::eventFilter(theObject, theEvent);
 }
+
