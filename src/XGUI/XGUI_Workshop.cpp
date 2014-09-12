@@ -22,6 +22,7 @@
 #include "XGUI_ContextMenuMgr.h"
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_Preferences.h"
+#include <XGUI_QtEvents.h>
 
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
@@ -57,10 +58,12 @@
 #include <QPushButton>
 #include <QDockWidget>
 #include <QLayout>
-#include <QTimer>
+#include <QThread>
+#include <QObject>
 
 #ifdef _DEBUG
 #include <QDebug>
+#include <iostream>
 #endif
 
 #ifdef WIN32
@@ -232,6 +235,16 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 //******************************************************
 void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 {
+  if (QApplication::instance()->thread() != QThread::currentThread()) {
+    #ifdef _DEBUG
+    std::cout << "XGUI_Workshop::processEvent: " << "Working in another thread." << std::endl;
+    #endif
+    SessionPtr aMgr = ModelAPI_Session::get();
+    PostponeMessageQtEvent* aPostponeEvent = new PostponeMessageQtEvent(aMgr->activeDocument());
+    QApplication::postEvent(this, aPostponeEvent);
+    return;
+  }
+
   //A message to start feature creation received.
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_LOADED)) {
     const Config_FeatureMessage* aFeatureMsg =
@@ -280,7 +293,6 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
   else if (theMessage->eventID() == Events_LongOp::eventID()) {
     if (Events_LongOp::isPerformed())
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    //QTimer::singleShot(10, this, SLOT(onStartWaiting()));
     else
       QApplication::restoreOverrideCursor();
   }
@@ -475,6 +487,31 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   updateCommandStatus();
   hidePropertyPanel();
   myPropertyPanel->cleanContent();
+}
+
+bool XGUI_Workshop::event(QEvent * theEvent)
+{
+  PostponeMessageQtEvent* aPostponedEv = dynamic_cast<PostponeMessageQtEvent*>(theEvent);
+  if (aPostponedEv) {
+#ifdef _DEBUG
+    std::cout << "XGUI_Workshop::event " << "Got PostponeMessageQtEvent" << std::endl;
+    bool isMyThread = (QApplication::instance()->thread() == QThread::currentThread());
+    std::cout << "XGUI_Workshop::event " << "I am in the Qt's thread: "
+              << isMyThread << std::endl;
+#endif
+    boost::shared_ptr<ModelAPI_Document> aDoc = aPostponedEv->resultDoc();
+    if (aDoc) {
+#ifdef _DEBUG
+      std::cout << "XGUI_Workshop::event " << "Passed boost ptr is ok, doc id: " << aDoc->id()
+          << std::endl;
+#endif
+    }
+    //TODO(mpv): After modifications in the XGUI_QtEvents.* this code should be like...
+    //boost::shared_ptr<Events_Message> aEventPtr = aPostponedEv->postponedMessage();
+    //processEvent(aEventPtr);
+    return true;
+  }
+  return false;
 }
 
 /*

@@ -211,6 +211,7 @@ signals:
   void activateLastPart();
 
  protected:
+  bool event(QEvent * theEvent);
   //Event-loop processing methods:
   void addFeature(const Config_FeatureMessage*);
   void connectWithOperation(ModuleBase_Operation* theOperation);

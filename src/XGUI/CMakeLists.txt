@@ -33,6 +33,7 @@ SET(PROJECT_HEADERS
 	XGUI_Selection.h
 	XGUI_Preferences.h
 	XGUI_IPrefMgr.h
+	XGUI_QtEvents.h
 )
 
 SET(PROJECT_AUTOMOC 
@@ -65,6 +66,7 @@ SET(PROJECT_SOURCES
     XGUI_ModuleConnector.cpp
 	XGUI_Selection.cpp
 	XGUI_Preferences.cpp
+	XGUI_QtEvents.cpp
 )
 
 SET(PROJECT_RESOURCES 
