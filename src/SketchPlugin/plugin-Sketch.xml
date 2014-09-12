@@ -28,7 +28,7 @@
     <group id="Constraints">
       <feature id="SketchConstraintCoincidence" title="Coincident" tooltip="Create constraint for the coincidence of two points" internal="1"/>
 
-      <feature id="SketchConstraintDistance" title="Distance" tooltip="Create constraint for the distance from a point to an object">
+      <feature id="SketchConstraintDistance" title="Distance" tooltip="Create constraint for the distance from a point to an object" icon=":icons/distance.png">
         <label title="Select objects for distance difinition. Following objects can be accepted: point, line end point, line, center of circle or arc."/>
         <feature_or_attribute_selector id="ConstraintEntityA" label="First object" tooltip="Select point, line end point, line, center of circle or arc.">
           <validator id="SketchPlugin_ResultPointValidator"/>
@@ -44,7 +44,7 @@
         <validator id="PartSet_DistanceValidator"/>
       </feature>
       
-      <feature id="SketchConstraintLength" title="Length" tooltip="Create constraint for the given length of a line segment">
+      <feature id="SketchConstraintLength" title="Length" tooltip="Create constraint for the given length of a line segment" icon=":icons/length.png">
         <label title="Select a line on which to calculate lenght" tooltip="Select a line on which to calculate lenght"/>
         <feature_selector id="ConstraintEntityA" label="Line" tooltip="Select an line in the viewer">
           <validator id="SketchPlugin_ResultLineValidator"/>
@@ -54,7 +54,7 @@
         <validator id="PartSet_LengthValidator"/> 
       </feature>
       
-      <feature id="SketchConstraintRadius" title="Radius" tooltip="Create constraint for the given radius of a circle or an arc">
+      <feature id="SketchConstraintRadius" title="Radius" tooltip="Create constraint for the given radius of a circle or an arc" icon=":icons/radius_constr.png">
         <label title="Select a circle or an arc on which to calculate radius" tooltip="Select a circle or an arc on which to calculate radius"/>
         <feature_selector id="ConstraintEntityA" label="Circle or Arc" tooltip="Select a circle or an arc in the viewer">
           <validator id="SketchPlugin_ResultArcValidator"/>
@@ -64,7 +64,7 @@
         <validator id="PartSet_RadiusValidator"/>
       </feature>
       
-      <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines">
+      <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines" icon=":icons/parallel.png">
         <feature_selector id="ConstraintEntityA" label="First line" tooltip="Select an line in the viewer">
           <validator id="SketchPlugin_ResultLineValidator"/>
         </feature_selector>
@@ -75,7 +75,7 @@
         <validator id="PartSet_ParallelValidator"/>
       </feature>
       
-      <feature id="SketchConstraintPerpendicular" title="Perpendicular" tooltip="Create constraint defining two perpendicular lines">
+      <feature id="SketchConstraintPerpendicular" title="Perpendicular" tooltip="Create constraint defining two perpendicular lines" icon=":icons/perpendicular.png">
         <feature_selector id="ConstraintEntityA" label="First line" tooltip="Select an line in the viewer">
           <validator id="SketchPlugin_ResultLineValidator"/>
         </feature_selector>
