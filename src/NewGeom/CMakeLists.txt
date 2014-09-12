@@ -22,6 +22,7 @@ SET(PROJECT_SOURCES
 
 SET(PROJECT_RESOURCES
 	resources/LightApp.xml
+	resources/SalomeApp.xml
 	resources/newgeom.png
 )
 
