@@ -109,6 +109,15 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
     setMenuShown(true);
     setToolShown(true);
 
+    QObject* aObj = myWorkshop->objectBrowser()->parent();
+    QDockWidget* aObjDoc = dynamic_cast<QDockWidget*>(aObj);
+    if (aObjDoc) {
+      QAction* aViewAct = aObjDoc->toggleViewAction();
+      aViewAct->setEnabled(true);
+      myWorkshop->objectBrowser()->setVisible(true);
+      aObjDoc->setVisible(true);
+    }
+
     if (!mySelector) {
       ViewManagerList OCCViewManagers;
       application()->viewManagers(OCCViewer_Viewer::Type(), OCCViewManagers);
@@ -135,6 +144,19 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
 {
   setMenuShown(false);
   setToolShown(false);
+
+  myWorkshop->propertyPanel()->setVisible(false);
+  desktop()->removeDockWidget(myWorkshop->propertyPanel());
+
+  QObject* aObj = myWorkshop->objectBrowser()->parent();
+  QDockWidget* aObjDoc = dynamic_cast<QDockWidget*>(aObj);
+  if (aObjDoc) {
+    aObjDoc->setVisible(false);
+    myWorkshop->objectBrowser()->setVisible(false);
+    QAction* aViewAct = aObjDoc->toggleViewAction();
+    aViewAct->setEnabled(false);
+  }
+
   //myWorkshop->contextMenuMgr()->disconnectViewer();
   return LightApp_Module::deactivateModule(theStudy);
 }
