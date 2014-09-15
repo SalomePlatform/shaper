@@ -62,11 +62,13 @@ ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* parent, int thePreci
   loc.setNumberOptions(loc.numberOptions() | QLocale::OmitGroupSeparator | QLocale::RejectGroupSeparator);
   setLocale(loc);
 
+  // MPV 15/09/2014: this must be set before setDecimals; otherwise in release mode setDecimals may crash
+  myPrecision = thePrecision;
+
   // Use precision equal to default Qt decimals
   // it's necessary to set decimals before the range setting,
   // by default Qt rounds boundaries to 2 decimals at setRange
   setDecimals(thePrecision);
-  myPrecision = thePrecision;
 
   connect(lineEdit(), SIGNAL(textChanged( const QString& )), this,
           SLOT(onTextChanged( const QString& )));
