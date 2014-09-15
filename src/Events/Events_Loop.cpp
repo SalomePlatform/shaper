@@ -50,9 +50,9 @@ void Events_Loop::send(const boost::shared_ptr<Events_Message>& theMessage, bool
         myGroups[aGroup->eventID().eventText()] = aGroup->newEmpty();
         aMyGroup = myGroups.find(aGroup->eventID().eventText());
       }
-      boost::shared_ptr<Events_MessageGroup> aNewOne =
+      boost::shared_ptr<Events_MessageGroup> aStored =
         boost::dynamic_pointer_cast<Events_MessageGroup>(aMyGroup->second);
-      aGroup->Join(aNewOne);
+      aStored->Join(aGroup);
       return;
     }
   }
