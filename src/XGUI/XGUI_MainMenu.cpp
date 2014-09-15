@@ -135,7 +135,7 @@ int XGUI_MainMenu::menuHeight() const
 
 int XGUI_MainMenu::menuItemRowsCount() const
 {
-  const int kDefaultRowsCount = 3;
+  static const int kDefaultRowsCount = 3;
   int aRowsCount = XGUI_Preferences::resourceMgr()->integerValue(XGUI_Preferences::MENU_SECTION,
                                                                  "rows_number", kDefaultRowsCount);
   return aRowsCount;
