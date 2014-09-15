@@ -42,7 +42,7 @@ class SketchSolver_ConstraintManager : public Events_Listener
   /** \brief Implementation of Event Listener method
    *  \param[in] theMessage the data of the event
    */
-  virtual void processEvent(const Events_Message* theMessage);
+  virtual void processEvent(const boost::shared_ptr<Events_Message>& theMessage);
 
  protected:
   SketchSolver_ConstraintManager();

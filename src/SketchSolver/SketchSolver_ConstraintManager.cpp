@@ -59,13 +59,14 @@ SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
 //  Class:    SketchSolver_Session
 //  Purpose:  listen the event loop and process the message
 // ============================================================================
-void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessage)
+void SketchSolver_ConstraintManager::processEvent(
+  const boost::shared_ptr<Events_Message>& theMessage)
 {
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
-    const ModelAPI_ObjectUpdatedMessage* anUpdateMsg =
-        dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
+    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aFeatures = anUpdateMsg->objects();
 
     bool isModifiedEvt = theMessage->eventID()
@@ -102,8 +103,8 @@ void SketchSolver_ConstraintManager::processEvent(const Events_Message* theMessa
     // Solve the set of constraints
     resolveConstraints();
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
-    const ModelAPI_ObjectDeletedMessage* aDeleteMsg =
-        dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
+    boost::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleteMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
     const std::set<std::string>& aFeatureGroups = aDeleteMsg->groups();
 
     // Find SketchPlugin_Sketch::ID() in groups. The constraint groups should be updated when an object removed from Sketch
