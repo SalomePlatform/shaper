@@ -417,6 +417,9 @@ FeaturePtr Model_Document::addFeature(std::string theID)
       // event: feature is added
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
+    } else { // feature must be executed
+       // no creation event => updater not working, problem with remove part
+      aFeature->execute();
     }
   }
   return aFeature;

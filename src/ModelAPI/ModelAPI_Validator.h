@@ -29,13 +29,6 @@ class MODELAPI_EXPORT ModelAPI_Validator
   virtual ~ModelAPI_Validator()
   {
   }
-
-  /// Returns true if feature and/or attributes are valid
-  /// \param theFeature the validated feature
-  /// \param theAttr the validated attribute ID, empty string of feature is validated
-  /// \param theArguments list of string, feature attribute names: dependent attributes
-  //virtual bool validate(const boost::shared_ptr<ModelAPI_Feature>& theFeature,
-  //  const std::string theAttr, std::list<std::string> theArguments) const = 0;
 };
 
 typedef boost::shared_ptr<ModelAPI_Validator> ValidatorPtr;

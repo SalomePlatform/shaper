@@ -20,6 +20,8 @@
   #include "ModelAPI_AttributeRefList.h"
   #include "ModelAPI_Result.h"
   #include "ModelAPI_ResultConstruction.h"
+  #include "ModelAPI_ResultBody.h"
+  #include "ModelAPI_ResultPart.h"
   
   template<class T> boost::shared_ptr<T> castTo(boost::shared_ptr<ModelAPI_Result> theObject) 
   { 
@@ -58,6 +60,8 @@
 %shared_ptr(ModelAPI_AttributeRefList)
 %shared_ptr(ModelAPI_Result)
 %shared_ptr(ModelAPI_ResultConstruction)
+%shared_ptr(ModelAPI_ResultBody)
+%shared_ptr(ModelAPI_ResultPart)
 
 // all supported interfaces
 %include "GeomAPI_Interface.h"
@@ -78,9 +82,13 @@
 %include "ModelAPI_AttributeRefList.h"
 %include "ModelAPI_Result.h"
 %include "ModelAPI_ResultConstruction.h"
+%include "ModelAPI_ResultBody.h"
+%include "ModelAPI_ResultPart.h"
 
 %template(ObjectList) std::list<boost::shared_ptr<ModelAPI_Object> >;
 %template(ResultList) std::list<boost::shared_ptr<ModelAPI_Result> >;
 
 template<class T> boost::shared_ptr<T> castTo(boost::shared_ptr<ModelAPI_Result> theObject);
 %template(modelAPI_ResultConstruction) castTo<ModelAPI_ResultConstruction>;
+%template(modelAPI_ResultBody) castTo<ModelAPI_ResultBody>;
+%template(modelAPI_ResultPart) castTo<ModelAPI_ResultPart>;
