@@ -37,19 +37,22 @@ Events_ID Events_Loop::eventByName(const char* theName)
   return Events_ID(aResult);
 }
 
-void Events_Loop::send(Events_Message& theMessage, bool isGroup)
+void Events_Loop::send(const boost::shared_ptr<Events_Message>& theMessage, bool isGroup)
 {
   // if it is grouped message, just accumulate it
   if (isGroup) {
-    Events_MessageGroup* aGroup = dynamic_cast<Events_MessageGroup*>(&theMessage);
+    boost::shared_ptr<Events_MessageGroup> aGroup = 
+      boost::dynamic_pointer_cast<Events_MessageGroup>(theMessage);
     if (aGroup) {
-      std::map<char*, Events_MessageGroup*>::iterator aMyGroup = myGroups.find(
+      std::map<char*, boost::shared_ptr<Events_Message> >::iterator aMyGroup = myGroups.find(
           aGroup->eventID().eventText());
       if (aMyGroup == myGroups.end()) {  // create a new group of messages for accumulation
         myGroups[aGroup->eventID().eventText()] = aGroup->newEmpty();
         aMyGroup = myGroups.find(aGroup->eventID().eventText());
       }
-      aMyGroup->second->Join(*aGroup);
+      boost::shared_ptr<Events_MessageGroup> aNewOne =
+        boost::dynamic_pointer_cast<Events_MessageGroup>(aMyGroup->second);
+      aGroup->Join(aNewOne);
       return;
     }
   }
@@ -57,21 +60,21 @@ void Events_Loop::send(Events_Message& theMessage, bool isGroup)
   // TO DO: make it in thread and with usage of semaphores
 
   map<char*, map<void*, list<Events_Listener*> > >::iterator aFindID = myListeners.find(
-      theMessage.eventID().eventText());
+      theMessage->eventID().eventText());
   if (aFindID != myListeners.end()) {
     map<void*, list<Events_Listener*> >::iterator aFindSender = aFindID->second.find(
-        theMessage.sender());
+        theMessage->sender());
     if (aFindSender != aFindID->second.end()) {
       list<Events_Listener*>& aListeners = aFindSender->second;
       for (list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
-        (*aL)->processEvent(&theMessage);
+        (*aL)->processEvent(theMessage);
     }
-    if (theMessage.sender()) {  // also call for NULL senders registered
+    if (theMessage->sender()) {  // also call for NULL senders registered
       aFindSender = aFindID->second.find(NULL);
       if (aFindSender != aFindID->second.end()) {
         list<Events_Listener*>& aListeners = aFindSender->second;
         for (list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
-          (*aL)->processEvent(&theMessage);
+          (*aL)->processEvent(theMessage);
       }
     }
   }
@@ -105,12 +108,12 @@ void Events_Loop::flush(const Events_ID& theID)
 {
   if (!myFlushActive)
     return;
-  std::map<char*, Events_MessageGroup*>::iterator aMyGroup = myGroups.find(theID.eventText());
+  std::map<char*, boost::shared_ptr<Events_Message>>::iterator aMyGroup =
+    myGroups.find(theID.eventText());
   if (aMyGroup != myGroups.end()) {  // really sends
-    Events_MessageGroup* aGroup = aMyGroup->second;
+    boost::shared_ptr<Events_Message> aGroup = aMyGroup->second;
     myGroups.erase(aMyGroup);
-    send(*aGroup, false);
-    delete aGroup;
+    send(aGroup, false);
   }
 }
 

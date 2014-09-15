@@ -31,7 +31,7 @@ class Model_Update : public Events_Listener
   Model_Update();
 
   /// Processes the feature argument update: executes the results
-  MODEL_EXPORT virtual void processEvent(const Events_Message* theMessage);
+  MODEL_EXPORT virtual void processEvent(const boost::shared_ptr<Events_Message>& theMessage);
 
  protected:
   /// Recoursively checks and updates the feature if needed (calls the execute method)

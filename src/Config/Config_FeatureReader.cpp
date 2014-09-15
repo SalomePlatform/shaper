@@ -47,11 +47,12 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
   Events_ID aMenuItemEvent = Events_Loop::eventByName(myEventGenerated);
   if (isNode(theNode, NODE_FEATURE, NULL)) {
     Events_Loop* aEvLoop = Events_Loop::loop();
-    Config_FeatureMessage aMessage(aMenuItemEvent, this);
+    boost::shared_ptr<Config_FeatureMessage> aMessage(
+      new Config_FeatureMessage(aMenuItemEvent, this));
     fillFeature(theNode, aMessage);
     myFeatures.push_back(getProperty(theNode, _ID));
     //If a feature has xml definition for it's widget:
-    aMessage.setUseInput(hasChild(theNode));
+    aMessage->setUseInput(hasChild(theNode));
     aEvLoop->send(aMessage);
     //The m_last* variables always defined before fillFeature() call. XML is a tree.
   } else if (isNode(theNode, NODE_GROUP, NULL)) {
@@ -68,24 +69,25 @@ bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
   return isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NODE_FEATURE, NULL);
 }
 
-void Config_FeatureReader::fillFeature(xmlNodePtr theNode, Config_FeatureMessage& outFeatureMessage)
+void Config_FeatureReader::fillFeature(xmlNodePtr theNode, 
+  const boost::shared_ptr<Config_FeatureMessage>& outFeatureMessage)
 {
-  outFeatureMessage.setId(getProperty(theNode, _ID));
-  outFeatureMessage.setPluginLibrary(myLibraryName);
-  outFeatureMessage.setNestedFeatures(getProperty(theNode, FEATURE_NESTED));
+  outFeatureMessage->setId(getProperty(theNode, _ID));
+  outFeatureMessage->setPluginLibrary(myLibraryName);
+  outFeatureMessage->setNestedFeatures(getProperty(theNode, FEATURE_NESTED));
 
   bool isInternal = isInternalFeature(theNode);
-  outFeatureMessage.setInternal(isInternal);
+  outFeatureMessage->setInternal(isInternal);
   if (isInternal) {
     //Internal feature has no visual representation.
     return;
   }
-  outFeatureMessage.setText(getProperty(theNode, FEATURE_TEXT));
-  outFeatureMessage.setTooltip(getProperty(theNode, FEATURE_TOOLTIP));
-  outFeatureMessage.setIcon(getProperty(theNode, FEATURE_ICON));
-  outFeatureMessage.setKeysequence(getProperty(theNode, FEATURE_KEYSEQUENCE));
-  outFeatureMessage.setGroupId(myLastGroup);
-  outFeatureMessage.setWorkbenchId(myLastWorkbench);
+  outFeatureMessage->setText(getProperty(theNode, FEATURE_TEXT));
+  outFeatureMessage->setTooltip(getProperty(theNode, FEATURE_TOOLTIP));
+  outFeatureMessage->setIcon(getProperty(theNode, FEATURE_ICON));
+  outFeatureMessage->setKeysequence(getProperty(theNode, FEATURE_KEYSEQUENCE));
+  outFeatureMessage->setGroupId(myLastGroup);
+  outFeatureMessage->setWorkbenchId(myLastWorkbench);
 }
 
 bool Config_FeatureReader::isInternalFeature(xmlNodePtr theNode)

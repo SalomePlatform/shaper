@@ -33,8 +33,9 @@ void Events_LongOp::start(void* theSender)
     MY_SENDERS[theSender]++;
 
   if (toSend) {
-    Events_LongOp anEvent(theSender);
-    Events_Loop::loop()->send(anEvent);
+    boost::shared_ptr<Events_Message> aNewOne = 
+      boost::shared_ptr<Events_Message>(new Events_LongOp(theSender));
+    Events_Loop::loop()->send(aNewOne);
   }
 }
 
@@ -48,8 +49,9 @@ void Events_LongOp::end(void* theSender)
       MY_SENDERS[theSender] = aCount - 1;
   }
   if (MY_SENDERS.empty()) {
-    Events_LongOp anEvent(theSender);
-    Events_Loop::loop()->send(anEvent);
+    boost::shared_ptr<Events_Message> aNewOne = 
+      boost::shared_ptr<Events_Message>(new Events_LongOp(theSender));
+    Events_Loop::loop()->send(aNewOne);
   }
 }
 

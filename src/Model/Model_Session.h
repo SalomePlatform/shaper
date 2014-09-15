@@ -81,7 +81,7 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   MODEL_EXPORT virtual void registerPlugin(ModelAPI_Plugin* thePlugin);
 
   /// Processes the configuration file reading
-  MODEL_EXPORT virtual void processEvent(const Events_Message* theMessage);
+  MODEL_EXPORT virtual void processEvent(const boost::shared_ptr<Events_Message>& theMessage);
 
   /// Copies the document to the new one wit hthe given id
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> copy(

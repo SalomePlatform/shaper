@@ -135,7 +135,7 @@ void Model_Session::setActiveDocument(boost::shared_ptr<ModelAPI_Document> theDo
 {
   if (myCurrentDoc != theDoc) {
     myCurrentDoc = theDoc;
-    static Events_Message aMsg(Events_Loop::eventByName("CurrentDocumentChanged"));
+    static boost::shared_ptr<Events_Message> aMsg(new Events_Message(Events_Loop::eventByName("CurrentDocumentChanged")));
     Events_Loop::loop()->send(aMsg);
   }
 }
@@ -176,12 +176,13 @@ Model_Session::Model_Session()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_VALIDATOR_LOADED));
 }
 
-void Model_Session::processEvent(const Events_Message* theMessage)
+void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
 {
   static const Events_ID kFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
   static const Events_ID kValidatorEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
   if (theMessage->eventID() == kFeatureEvent) {
-    const Config_FeatureMessage* aMsg = dynamic_cast<const Config_FeatureMessage*>(theMessage);
+    const boost::shared_ptr<Config_FeatureMessage> aMsg = 
+      boost::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
     if (aMsg) {
       // proccess the plugin info, load plugin
       if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
@@ -191,7 +192,8 @@ void Model_Session::processEvent(const Events_Message* theMessage)
     // plugins information was started to load, so, it will be loaded
     myPluginsInfoLoaded = true;
   } else if (theMessage->eventID() == kValidatorEvent) {
-    const Config_ValidatorMessage* aMsg = dynamic_cast<const Config_ValidatorMessage*>(theMessage);
+    boost::shared_ptr<Config_ValidatorMessage> aMsg = 
+      boost::dynamic_pointer_cast<Config_ValidatorMessage>(theMessage);
     if (aMsg) {
       if (aMsg->attributeId().empty()) {  // feature validator
         validators()->assignValidator(aMsg->validatorId(), aMsg->featureId(), aMsg->parameters());

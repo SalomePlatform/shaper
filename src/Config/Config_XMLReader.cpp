@@ -155,18 +155,19 @@ void Config_XMLReader::processValidator(xmlNodePtr theNode)
 {
   Events_ID aValidatoEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
   Events_Loop* aEvLoop = Events_Loop::loop();
-  Config_ValidatorMessage aMessage(aValidatoEvent, this);
+  boost::shared_ptr<Config_ValidatorMessage> 
+    aMessage(new Config_ValidatorMessage(aValidatoEvent, this));
   std::string aValidatorId;
   std::list<std::string> aValidatorParameters;
   getValidatorInfo(theNode, aValidatorId, aValidatorParameters);
-  aMessage.setValidatorId(aValidatorId);
-  aMessage.setValidatorParameters(aValidatorParameters);
+  aMessage->setValidatorId(aValidatorId);
+  aMessage->setValidatorParameters(aValidatorParameters);
   xmlNodePtr aFeatureOrWdgNode = theNode->parent;
   if (isNode(aFeatureOrWdgNode, NODE_FEATURE, NULL)) {
-    aMessage.setFeatureId(getProperty(aFeatureOrWdgNode, _ID));
+    aMessage->setFeatureId(getProperty(aFeatureOrWdgNode, _ID));
   } else {
-    aMessage.setAttributeId(getProperty(aFeatureOrWdgNode, _ID));
-    aMessage.setFeatureId(myCurrentFeature);
+    aMessage->setAttributeId(getProperty(aFeatureOrWdgNode, _ID));
+    aMessage->setFeatureId(myCurrentFeature);
   }
   aEvLoop->send(aMessage);
 }

@@ -27,14 +27,14 @@ Model_Update::Model_Update()
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 }
 
-void Model_Update::processEvent(const Events_Message* theMessage)
+void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
 {
   if (isExecuted)
     return;  // nothing to do: it is executed now
   //Events_LongOp::start(this);
   isExecuted = true;
-  const ModelAPI_ObjectUpdatedMessage* aMsg =
-      dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
+  boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
+      boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
   myInitial = aMsg->objects();
   // collect all documents involved into the update
   set<boost::shared_ptr<ModelAPI_Document> > aDocs;

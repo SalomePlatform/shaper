@@ -44,10 +44,10 @@ class ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
   virtual std::set<ObjectPtr> objects() const = 0;
 
   //! Creates a new empty group (to store it in the loop before flush)
-  virtual Events_MessageGroup* newEmpty() = 0;
+  virtual boost::shared_ptr<Events_MessageGroup> newEmpty() = 0;
 
   //! Allows to join the given message with the current one
-  virtual void Join(Events_MessageGroup& theJoined) = 0;
+  virtual void Join(const boost::shared_ptr<Events_MessageGroup>& theJoined) = 0;
 };
 
 /// Message that feature was deleted (used for Object Browser update)
@@ -66,11 +66,11 @@ class ModelAPI_ObjectDeletedMessage : public Events_MessageGroup
   /// Returns the group where the feature was deleted
   virtual const std::set<std::string>& groups() const = 0;
 
-  virtual Events_MessageGroup* newEmpty() = 0;
+  virtual boost::shared_ptr<Events_MessageGroup> newEmpty() = 0;
 
   virtual const Events_ID messageId() = 0;
 
-  virtual void Join(Events_MessageGroup& theJoined) = 0;
+  virtual void Join(const boost::shared_ptr<Events_MessageGroup>& theJoined) = 0;
 };
 
 /// Allows to create ModelAPI messages

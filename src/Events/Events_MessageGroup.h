@@ -6,6 +6,7 @@
 #define Events_MessageGroup_H_
 
 #include <Events_Message.h>
+#include <boost/shared_ptr.hpp>
 
 /**\class Events_Message
  * \ingroup EventsLoop
@@ -30,9 +31,9 @@ class EVENTS_EXPORT Events_MessageGroup : public Events_Message
   }
 
   //! Creates a new empty group (to store it in the loop before flush)
-  virtual Events_MessageGroup* newEmpty() = 0;
+  virtual boost::shared_ptr<Events_MessageGroup> newEmpty() = 0;
   //! Allows to join the given message with the current one
-  virtual void Join(Events_MessageGroup& theJoined) = 0;
+  virtual void Join(const boost::shared_ptr<Events_MessageGroup>& theJoined) = 0;
 };
 
 #endif

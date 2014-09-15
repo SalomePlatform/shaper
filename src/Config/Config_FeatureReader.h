@@ -10,6 +10,7 @@
 
 #include <Config_def.h>
 #include <Config_XMLReader.h>
+#include <boost/shared_ptr.hpp>
 
 #include <string>
 #include <list>
@@ -29,7 +30,8 @@ class Config_FeatureReader : public Config_XMLReader
   void processNode(xmlNodePtr aNode);
   bool processChildren(xmlNodePtr aNode);
 
-  void fillFeature(xmlNodePtr theRoot, Config_FeatureMessage& outFeatureMessage);
+  void fillFeature(xmlNodePtr theRoot, 
+    const boost::shared_ptr<Config_FeatureMessage>& outFeatureMessage);
   bool isInternalFeature(xmlNodePtr theRoot);
 
  private:
