@@ -57,16 +57,10 @@ void XGUI_DataTree::mouseDoubleClickEvent(QMouseEvent* theEvent)
   if (theEvent->button() == Qt::LeftButton) {
     QModelIndex aIndex = currentIndex();
     XGUI_DocumentDataModel* aModel = dataModel();
-
-    if ((aModel->activePartIndex() != aIndex) && aModel->activePartIndex().isValid()) {
-      setExpanded(aModel->activePartIndex(), false);
-    }
-    bool isChanged = aModel->activatedIndex(aIndex);
-    QTreeView::mouseDoubleClickEvent(theEvent);
-    if (isChanged) {
-      if (aModel->activePartIndex().isValid())
-        setExpanded(aIndex, true);
-      emit activePartChanged(aModel->activePart());
+    ObjectPtr aObject = aModel->object(aIndex);
+    ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+    if (aPart) {
+      aPart->activate();
     }
   } else
     QTreeView::mouseDoubleClickEvent(theEvent);
