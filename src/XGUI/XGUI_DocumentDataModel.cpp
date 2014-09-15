@@ -44,14 +44,14 @@ XGUI_DocumentDataModel::~XGUI_DocumentDataModel()
   clearModelIndexes();
 }
 
-void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
+void XGUI_DocumentDataModel::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
 {
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
 
   // Created object event *******************
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
-    const ModelAPI_ObjectUpdatedMessage* aUpdMsg =
-        dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
+    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aObjects = aUpdMsg->objects();
 
     std::set<ObjectPtr>::const_iterator aIt;
@@ -97,8 +97,8 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
     }
     // Deleted object event ***********************
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
-    const ModelAPI_ObjectDeletedMessage* aUpdMsg =
-        dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
+    boost::shared_ptr<ModelAPI_ObjectDeletedMessage> aUpdMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
     DocumentPtr aDoc = aUpdMsg->document();
     std::set<std::string> aGroups = aUpdMsg->groups();
 
@@ -140,7 +140,7 @@ void XGUI_DocumentDataModel::processEvent(const Events_Message* theMessage)
     }
     // Deleted object event ***********************
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
-    //const ModelAPI_ObjectUpdatedMessage* aUpdMsg = dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
+    //boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg = boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     //ObjectPtr aFeature = aUpdMsg->feature();
     //DocumentPtr aDoc = aFeature->document();
 

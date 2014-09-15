@@ -94,7 +94,7 @@ Q_OBJECT
 
   void rebuildDataTree();
 
-  void processEvent(const Events_Message* theMessage);
+  void processEvent(const boost::shared_ptr<Events_Message>& theMessage);
 
 signals:
   //! Emited when selection is changed

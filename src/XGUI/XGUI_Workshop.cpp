@@ -233,7 +233,7 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 }
 
 //******************************************************
-void XGUI_Workshop::processEvent(const Events_Message* theMessage)
+void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
 {
   if (QApplication::instance()->thread() != QThread::currentThread()) {
     #ifdef _DEBUG
@@ -247,8 +247,8 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 
   //A message to start feature creation received.
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_LOADED)) {
-    const Config_FeatureMessage* aFeatureMsg =
-        dynamic_cast<const Config_FeatureMessage*>(theMessage);
+    boost::shared_ptr<Config_FeatureMessage> aFeatureMsg =
+       boost::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
     if (!aFeatureMsg->isInternal()) {
       addFeature(aFeatureMsg);
     }
@@ -256,8 +256,8 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 
   // Process creation of Part
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
-    const ModelAPI_ObjectUpdatedMessage* aUpdMsg =
-        dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
+    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     onFeatureCreatedMsg(aUpdMsg);
     if (myUpdatePrefs) {
       if (mySalomeConnector)
@@ -271,22 +271,22 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 
   // Redisplay feature
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
-    const ModelAPI_ObjectUpdatedMessage* aUpdMsg =
-        dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
+    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     onFeatureRedisplayMsg(aUpdMsg);
   }
 
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
-    const ModelAPI_ObjectUpdatedMessage* anUpdateMsg =
-        dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
+    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     onFeatureUpdatedMsg(anUpdateMsg);
   }
 
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
-    const ModelAPI_ObjectDeletedMessage* aDelMsg =
-        dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
+    boost::shared_ptr<ModelAPI_ObjectDeletedMessage> aDelMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
     onObjectDeletedMsg(aDelMsg);
   }
 
@@ -299,8 +299,8 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 
   //An operation passed by message. Start it, process and commit.
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OPERATION_LAUNCHED)) {
-    const Config_PointerMessage* aPartSetMsg =
-        dynamic_cast<const Config_PointerMessage*>(theMessage);
+    boost::shared_ptr<Config_PointerMessage> aPartSetMsg =
+        boost::dynamic_pointer_cast<Config_PointerMessage>(theMessage);
     //myPropertyPanel->cleanContent();
     ModuleBase_Operation* anOperation = (ModuleBase_Operation*) aPartSetMsg->pointer();
 
@@ -336,7 +336,7 @@ void XGUI_Workshop::processEvent(const Events_Message* theMessage)
 
   } else {
     //Show error dialog if error message received.
-    const Events_Error* anAppError = dynamic_cast<const Events_Error*>(theMessage);
+    boost::shared_ptr<Events_Error> anAppError = boost::dynamic_pointer_cast<Events_Error>(theMessage);
     if (anAppError) {
       emit errorOccurred(QString::fromLatin1(anAppError->description()));
     }
@@ -358,7 +358,7 @@ void XGUI_Workshop::onStartWaiting()
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureUpdatedMsg(const ModelAPI_ObjectUpdatedMessage* theMsg)
+void XGUI_Workshop::onFeatureUpdatedMsg(const boost::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
   std::set<ObjectPtr> aFeatures = theMsg->objects();
   if (myOperationMgr->hasOperation()) {
@@ -378,7 +378,7 @@ void XGUI_Workshop::onFeatureUpdatedMsg(const ModelAPI_ObjectUpdatedMessage* the
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureRedisplayMsg(const ModelAPI_ObjectUpdatedMessage* theMsg)
+void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
@@ -403,7 +403,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const ModelAPI_ObjectUpdatedMessage* t
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureCreatedMsg(const ModelAPI_ObjectUpdatedMessage* theMsg)
+void XGUI_Workshop::onFeatureCreatedMsg(const boost::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
 
@@ -434,7 +434,7 @@ void XGUI_Workshop::onFeatureCreatedMsg(const ModelAPI_ObjectUpdatedMessage* the
 }
 
 //******************************************************
-void XGUI_Workshop::onObjectDeletedMsg(const ModelAPI_ObjectDeletedMessage* theMsg)
+void XGUI_Workshop::onObjectDeletedMsg(const boost::shared_ptr<ModelAPI_ObjectDeletedMessage>& theMsg)
 {
   if (myObjectBrowser)
     myObjectBrowser->processEvent(theMsg);
@@ -517,7 +517,7 @@ bool XGUI_Workshop::event(QEvent * theEvent)
 /*
  *
  */
-void XGUI_Workshop::addFeature(const Config_FeatureMessage* theMessage)
+void XGUI_Workshop::addFeature(const boost::shared_ptr<Config_FeatureMessage>& theMessage)
 {
   if (!theMessage) {
 #ifdef _DEBUG

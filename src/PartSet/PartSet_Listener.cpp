@@ -38,7 +38,7 @@ PartSet_Listener::~PartSet_Listener()
 }
 
 //******************************************************
-void PartSet_Listener::processEvent(const Events_Message* theMessage)
+void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
 {
   ModuleBase_Operation* anOperation = myModule->workshop()->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aSketchOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
@@ -48,8 +48,8 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
   XGUI_Displayer* aDisplayer = myModule->workshop()->displayer();
   QString aType = QString(theMessage->eventID().eventText());
   if (aType == EVENT_OBJECT_CREATED) {
-    const ModelAPI_ObjectUpdatedMessage* aUpdMsg =
-        dynamic_cast<const ModelAPI_ObjectUpdatedMessage*>(theMessage);
+    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aFeatures = aUpdMsg->objects();
     std::set<ObjectPtr>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
     for (; anIt != aLast; anIt++) {
@@ -60,8 +60,8 @@ void PartSet_Listener::processEvent(const Events_Message* theMessage)
     }
 
   } else if (aType == EVENT_OBJECT_DELETED) {
-    const ModelAPI_ObjectDeletedMessage* aDelMsg =
-        dynamic_cast<const ModelAPI_ObjectDeletedMessage*>(theMessage);
+    boost::shared_ptr<ModelAPI_ObjectDeletedMessage> aDelMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
     boost::shared_ptr<ModelAPI_Document> aDoc = aDelMsg->document();
 
     std::set<std::string> aGroups = aDelMsg->groups();

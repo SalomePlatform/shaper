@@ -480,8 +480,9 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
 void PartSet_Module::sendOperation(ModuleBase_Operation* theOperation)
 {
   static Events_ID aModuleEvent = Events_Loop::eventByName(EVENT_OPERATION_LAUNCHED);
-  Config_PointerMessage aMessage(aModuleEvent, this);
-  aMessage.setPointer(theOperation);
+  boost::shared_ptr<Config_PointerMessage> aMessage =
+      boost::shared_ptr<Config_PointerMessage>(new Config_PointerMessage(aModuleEvent, this));
+  aMessage->setPointer(theOperation);
   Events_Loop::loop()->send(aMessage);
 }
 

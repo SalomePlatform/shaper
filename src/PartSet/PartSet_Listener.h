@@ -26,7 +26,7 @@ class PARTSET_EXPORT PartSet_Listener : public Events_Listener
   virtual ~PartSet_Listener();
 
   /// This method is called by loop when the event is started to process.
-  virtual void processEvent(const Events_Message* theMessage);
+  virtual void processEvent(const boost::shared_ptr<Events_Message>& theMessage);
 
  private:
   PartSet_Module* myModule;  ///< the current module

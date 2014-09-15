@@ -344,7 +344,7 @@ void XGUI_ObjectsBrowser::setObjectsSelected(const QList<ObjectPtr>& theObjects)
 }
 
 //***************************************************
-void XGUI_ObjectsBrowser::processEvent(const Events_Message* theMessage) 
+void XGUI_ObjectsBrowser::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
 { 
   myDocModel->processEvent(theMessage); 
 }
