@@ -244,7 +244,7 @@ QValidator::State ModuleBase_DoubleSpinBox::validate(QString& str, int& pos) con
   if (overhead == 0)
     state = v.validate(str, pos);
   else {
-    if (str.length() >= overhead && str.startsWith(pref) && str.right(suff.length()) == suff) {
+    if ((uint)(str.length()) >= overhead && str.startsWith(pref) && str.right(suff.length()) == suff) {
       QString core = str.mid(pref.length(), str.length() - overhead);
       int corePos = pos - pref.length();
       state = v.validate(core, corePos);

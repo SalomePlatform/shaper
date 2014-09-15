@@ -18,29 +18,29 @@ class GeomAPI_Pnt2d;
  * \ingroup GUI
  * \brief Custom widget value. The widget contains a feature and 2D point.
  */
-class MODULEBASE_EXPORT ModuleBase_WidgetValueFeature : public ModuleBase_WidgetValue
+class ModuleBase_WidgetValueFeature : public ModuleBase_WidgetValue
 {
  public:
   /// Constructor
-  ModuleBase_WidgetValueFeature();
+  MODULEBASE_EXPORT ModuleBase_WidgetValueFeature();
   /// Destructor
-  virtual ~ModuleBase_WidgetValueFeature();
+  MODULEBASE_EXPORT virtual ~ModuleBase_WidgetValueFeature();
 
   /// Fill the widget values by given point
   /// \param thePoint the point
-  void setObject(const ObjectPtr& theFeature);
+  MODULEBASE_EXPORT void setObject(const ObjectPtr& theFeature);
 
   /// Returns the widget values by given point
   /// \return theFeature the current feature
-  const ObjectPtr& object() const;
+  MODULEBASE_EXPORT const ObjectPtr& object() const;
 
   /// Fill the widget values by given point
   /// \param thePoint the point
-  void setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+  MODULEBASE_EXPORT void setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
   /// Returns the widget point
   /// \return the current point
-  const boost::shared_ptr<GeomAPI_Pnt2d>& point() const;
+  MODULEBASE_EXPORT const boost::shared_ptr<GeomAPI_Pnt2d>& point() const;
 
  private:
   ObjectPtr myResult;

@@ -99,8 +99,8 @@ class ModuleBase_ViewerPrs
   {
     bool aResult = (myResult.get() == thePrs.object().get());
     bool aOwner = (myOwner.Access() == thePrs.owner().Access());
-    bool aShape = myShape.IsEqual(thePrs.shape());
-    bool aIO = (myInteractive == thePrs.interactive());
+    bool aShape = myShape.IsEqual(thePrs.shape()) == Standard_True;
+    bool aIO = (myInteractive == thePrs.interactive()) == Standard_True;
     return aResult && aOwner && aShape && aIO;
   }
 
