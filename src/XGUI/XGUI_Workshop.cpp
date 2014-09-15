@@ -240,7 +240,7 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
     std::cout << "XGUI_Workshop::processEvent: " << "Working in another thread." << std::endl;
     #endif
     SessionPtr aMgr = ModelAPI_Session::get();
-    PostponeMessageQtEvent* aPostponeEvent = new PostponeMessageQtEvent(aMgr->activeDocument());
+    PostponeMessageQtEvent* aPostponeEvent = new PostponeMessageQtEvent(theMessage);
     QApplication::postEvent(this, aPostponeEvent);
     return;
   }
@@ -499,16 +499,8 @@ bool XGUI_Workshop::event(QEvent * theEvent)
     std::cout << "XGUI_Workshop::event " << "I am in the Qt's thread: "
               << isMyThread << std::endl;
 #endif
-    boost::shared_ptr<ModelAPI_Document> aDoc = aPostponedEv->resultDoc();
-    if (aDoc) {
-#ifdef _DEBUG
-      std::cout << "XGUI_Workshop::event " << "Passed boost ptr is ok, doc id: " << aDoc->id()
-          << std::endl;
-#endif
-    }
-    //TODO(mpv): After modifications in the XGUI_QtEvents.* this code should be like...
-    //boost::shared_ptr<Events_Message> aEventPtr = aPostponedEv->postponedMessage();
-    //processEvent(aEventPtr);
+    boost::shared_ptr<Events_Message> aEventPtr = aPostponedEv->postponedMessage();
+    processEvent(aEventPtr);
     return true;
   }
   return false;
