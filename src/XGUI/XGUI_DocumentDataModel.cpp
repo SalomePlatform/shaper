@@ -477,7 +477,7 @@ bool XGUI_DocumentDataModel::activatedIndex(const QModelIndex& theIndex)
           myActivePart->setItemsColor(ACTIVE_COLOR);
           myModel->setItemsColor(PASSIVE_COLOR);
         } else
-        myModel->setItemsColor(ACTIVE_COLOR);
+          myModel->setItemsColor(ACTIVE_COLOR);
         return true;
       }
     }
