@@ -43,11 +43,3 @@ bool SketchPlugin_DistanceAttrValidator::isValid(
   }
   return true; // it may be not reference attribute, in this case, it is OK
 }
-
-bool SketchPlugin_RadiusValidator::isValid(
-    const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const
-{
-  boost::shared_ptr<ModelAPI_AttributeDouble> aDouble = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
-  return aDouble->isInitialized() && aDouble->value() > 1.e-5;
-}

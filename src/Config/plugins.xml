@@ -5,5 +5,6 @@
   <plugin library="FeaturesPlugin" configuration="plugin-Features.xml"/>
   <plugin library="ExchangePlugin" configuration="plugin-Exchange.xml"/>
   <plugin library="SketchSolver"/>
+  <plugin library="GeomValidators"/>
   <plugin library="DFBrowser"/>
 </plugins>
