@@ -729,9 +729,9 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       aFIter.Next();
       myObjs.UnBind(aLab);
       // event: model is updated
-      if (aFeature->isInHistory()) {
+      //if (aFeature->isInHistory()) {
         ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_Feature::group());
-      }
+      //}
       // results of this feature must be redisplayed (hided)
       static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
@@ -752,10 +752,10 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   aLoop->activateFlushes(true);
 
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   if (theMarkUpdated) {
     aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   }
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   boost::static_pointer_cast<Model_Session>(Model_Session::get())
     ->setCheckTransactions(true);
