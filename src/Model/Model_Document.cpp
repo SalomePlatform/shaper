@@ -224,9 +224,9 @@ void Model_Document::startOperation()
       myNestedNum = 0;
       myDoc->InitDeltaCompaction();
     }
-    myIsEmptyTr[myTransactionsAfterSave] = false;
+    myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();
     myTransactionsAfterSave++;
-    myDoc->NewCommand();
+    myDoc->OpenCommand();
   } else {  // start the simple command
     myDoc->NewCommand();
   }
@@ -236,7 +236,7 @@ void Model_Document::startOperation()
     subDoc(*aSubIter)->startOperation();
 }
 
-void Model_Document::compactNested()
+bool Model_Document::compactNested()
 {
   bool allWasEmpty = true;
   while (myNestedNum != -1) {
@@ -250,6 +250,7 @@ void Model_Document::compactNested()
   myIsEmptyTr[myTransactionsAfterSave] = allWasEmpty;
   myTransactionsAfterSave++;
   myDoc->PerformDeltaCompaction();
+  return !allWasEmpty;
 }
 
 void Model_Document::finishOperation()
@@ -291,9 +292,10 @@ void Model_Document::abortOperation()
 {
   if (myNestedNum > 0 && !myDoc->HasOpenCommand()) {  // abort all what was done in nested
       // first compact all nested
-    compactNested();
-    // for nested it is undo and clear redos
-    myDoc->Undo();
+    if (compactNested()) {
+      // for nested it is undo and clear redos
+      myDoc->Undo();
+    }
     myDoc->ClearRedos();
     myTransactionsAfterSave--;
     myIsEmptyTr.erase(myTransactionsAfterSave);
@@ -727,9 +729,9 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       aFIter.Next();
       myObjs.UnBind(aLab);
       // event: model is updated
-      if (aFeature->isInHistory()) {
+      //if (aFeature->isInHistory()) {
         ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_Feature::group());
-      }
+      //}
       // results of this feature must be redisplayed (hided)
       static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
@@ -750,10 +752,10 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
   aLoop->activateFlushes(true);
 
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   if (theMarkUpdated) {
     aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   }
-  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   boost::static_pointer_cast<Model_Session>(Model_Session::get())
     ->setCheckTransactions(true);

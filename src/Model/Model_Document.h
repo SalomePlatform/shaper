@@ -145,8 +145,9 @@ class Model_Document : public ModelAPI_Document
     return myDoc;
   }
 
-  //! performas compactification of all nested operations into one
-  void compactNested();
+  //! performs compactification of all nested operations into one
+  //! \returns true if resulting transaction is not empty and can be undoed
+  bool compactNested();
 
   //! Initializes the data fields of the feature
   void initData(ObjectPtr theObj, TDF_Label theLab, const int theTag);
