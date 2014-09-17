@@ -86,7 +86,6 @@
           <validator id="SketchPlugin_ResultLine"/>
           <validator id="SketchPlugin_DifferentObjects"/>
         </feature_selector>
-        <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
         <validator id="PartSet_PerpendicularValidator"/>
       </feature>
     </group>
