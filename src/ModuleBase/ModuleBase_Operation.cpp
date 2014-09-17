@@ -174,8 +174,9 @@ bool ModuleBase_Operation::hasObject(ObjectPtr theObj) const
   return false;
 }
 
-void ModuleBase_Operation::keyReleased(const int theKey)
+bool ModuleBase_Operation::keyReleased(const int theKey)
 {
   // Do nothing...
+  return false;
 }
 

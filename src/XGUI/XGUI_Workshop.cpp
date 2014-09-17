@@ -372,7 +372,7 @@ void XGUI_Workshop::onFeatureUpdatedMsg(const boost::shared_ptr<ModelAPI_ObjectU
       }
     }
   }
-  myOperationMgr->validateCurrentOperation();
+  myOperationMgr->onValidateOperation();
   if (myObjectBrowser)
     myObjectBrowser->processEvent(theMsg);
 }
@@ -594,9 +594,7 @@ void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>&
 
 bool XGUI_Workshop::isActiveOperationAborted()
 {
-  if(!myOperationMgr->hasOperation())
-    return true;
-  return myOperationMgr->abortOperation();
+  return myOperationMgr->abortAllOperations();
 }
 
 //******************************************************
@@ -736,7 +734,7 @@ void XGUI_Workshop::onUndo()
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->isOperation())
-    operationMgr()->abortOperation();
+    operationMgr()->onAbortOperation();
   aMgr->undo();
   updateCommandStatus();
 }
@@ -747,7 +745,7 @@ void XGUI_Workshop::onRedo()
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->isOperation())
-    operationMgr()->abortOperation();
+    operationMgr()->onAbortOperation();
   aMgr->redo();
   updateCommandStatus();
 }

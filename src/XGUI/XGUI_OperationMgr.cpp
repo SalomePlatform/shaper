@@ -38,6 +38,16 @@ int XGUI_OperationMgr::operationsCount() const
   return myOperations.count();
 }
 
+QStringList XGUI_OperationMgr::operationList()
+{
+  QStringList result;
+  foreach(ModuleBase_Operation* eachOperation, myOperations)
+  {
+    result << eachOperation->id();
+  }
+  return result;
+}
+
 bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
 {
   if (!canStartOperation(theOperation))
@@ -52,34 +62,32 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
           SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)));
 
   theOperation->start();
-  validateCurrentOperation();
+  onValidateOperation();
   return true;
 }
 
-bool XGUI_OperationMgr::abortOperation()
+bool XGUI_OperationMgr::abortAllOperations()
 {
-  ModuleBase_Operation* aCurrentOp = currentOperation();
-  if (!aCurrentOp || !canStopOperation())
-    return false;
-
-  aCurrentOp->abort();
-  return true;
-}
-
-QStringList XGUI_OperationMgr::operationList()
-{
-  QStringList result;
-  foreach(ModuleBase_Operation* eachOperation, myOperations)
-  {
-    result << eachOperation->id();
+  if (operationsCount() == 1) {
+    onAbortOperation();
+    return true;
+  }
+  QString aMessage = tr("All active operations will be aborted.");
+  int anAnswer = QMessageBox::question(qApp->activeWindow(),
+                                       tr("Abort operation"),
+                                       aMessage,
+                                       QMessageBox::Ok | QMessageBox::Cancel,
+                                       QMessageBox::Cancel);
+  bool result = anAnswer == QMessageBox::Ok;
+  while(result && hasOperation()) {
+    currentOperation()->abort();
   }
   return result;
 }
 
-void XGUI_OperationMgr::validateOperation(ModuleBase_Operation* theOperation)
+bool XGUI_OperationMgr::validateOperation(ModuleBase_Operation* theOperation)
 {
-  //Get operation Id and feature to validate
-  QString anOperationId = theOperation->id();
+  //Get operation feature to validate
   FeaturePtr aFeature = theOperation->feature();
   //Get validators for the Id
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -87,9 +95,10 @@ void XGUI_OperationMgr::validateOperation(ModuleBase_Operation* theOperation)
 
   bool isValid = aFactory->validate(aFeature);
   emit operationValidated(isValid);
+  return isValid;
 }
 
-void XGUI_OperationMgr::validateCurrentOperation()
+void XGUI_OperationMgr::onValidateOperation()
 {
   if (!hasOperation())
     return;
@@ -100,15 +109,22 @@ void XGUI_OperationMgr::validateCurrentOperation()
 bool XGUI_OperationMgr::eventFilter(QObject *theObject, QEvent *theEvent)
 {
   if (theEvent->type() == QEvent::KeyRelease) {
-    QKeyEvent* aKeyEvent = (QKeyEvent*) theEvent;
-    if (aKeyEvent && aKeyEvent->key() == Qt::Key_Escape) {
-      // TODO: this is Escape button processing when the property panel has empty content,
-      // but the operation should be stopped by the Enter has been clicked
+    QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
+    // TODO: this is Escape button processing when the property panel has empty content,
+    // but the operation should be stopped by the Enter has been clicked
+    if(aKeyEvent) {
       onKeyReleased(aKeyEvent);
       return true;
     }
   }
   return QObject::eventFilter(theObject, theEvent);
+}
+
+void XGUI_OperationMgr::commitOperation()
+{
+  if (validateOperation(currentOperation())) {
+    onCommitOperation();
+  }
 }
 
 void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
@@ -123,7 +139,7 @@ bool XGUI_OperationMgr::canStartOperation(ModuleBase_Operation* theOperation)
   if (aCurrentOp) {
     if (!theOperation->isGranted()) {
       if (!aCurrentOp->isValid(theOperation)) {
-        if (canStopOperation()) {
+        if (canAbortOperation()) {
           aCurrentOp->abort();
         } else {
           aCanStart = false;
@@ -134,21 +150,6 @@ bool XGUI_OperationMgr::canStartOperation(ModuleBase_Operation* theOperation)
   return aCanStart;
 }
 
-bool XGUI_OperationMgr::canStopOperation()
-{
-  ModuleBase_Operation* anOperation = currentOperation();
-  if (anOperation) {
-    if (anOperation->isModified()) {
-      int anAnswer = QMessageBox::question(
-          qApp->activeWindow(), tr("Operation launch"),
-          tr("Previous operation is not finished, abort it?"),
-          QMessageBox::Abort | QMessageBox::Cancel,
-          QMessageBox::Cancel);
-      return anAnswer == QMessageBox::Abort;
-    }
-  }
-  return true;
-}
 
 void XGUI_OperationMgr::onCommitOperation()
 {
@@ -160,20 +161,22 @@ void XGUI_OperationMgr::onCommitOperation()
 
 void XGUI_OperationMgr::onAbortOperation()
 {
-  ModuleBase_Operation* anOperation = currentOperation();
-  if (anOperation && canAbortOperation())
-    anOperation->abort();
+  if (hasOperation() && canAbortOperation()) {
+    currentOperation()->abort();
+  }
 }
 
 bool XGUI_OperationMgr::canAbortOperation()
 {
   ModuleBase_Operation* anOperation = currentOperation();
   if (anOperation && anOperation->isModified()) {
-    int anAnswer = QMessageBox::question(
-        qApp->activeWindow(), tr("Cancel operation"),
-        tr("Operation %1 will be cancelled. Continue?").arg(anOperation->id()), QMessageBox::Yes,
-        QMessageBox::No);
-    return anAnswer == QMessageBox::Yes;
+    QString aMessage = tr("%1 operation will be aborted.").arg(anOperation->id());
+    int anAnswer = QMessageBox::question(qApp->activeWindow(),
+                                         tr("Abort operation"),
+                                         aMessage,
+                                         QMessageBox::Ok | QMessageBox::Cancel,
+                                         QMessageBox::Cancel);
+    return anAnswer == QMessageBox::Ok;
   }
   return true;
 }
@@ -203,15 +206,30 @@ void XGUI_OperationMgr::onOperationStopped()
   }
   if (aResultOp) {
     resumeOperation(aResultOp);
-    validateCurrentOperation();
+    onValidateOperation();
   }
 }
 
 void XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
 {
   ModuleBase_Operation* anOperation = currentOperation();
-  if (anOperation)
-    anOperation->keyReleased(theEvent->key());
+  if (anOperation) {
+    bool isFinished = anOperation->keyReleased(theEvent->key());
+    if(isFinished)
+      return;
+  }
+  // Let the manager decide what to do with the given key combination.
+  switch (theEvent->key()) {
+    case Qt::Key_Escape:
+      onAbortOperation();
+      break;
+    case Qt::Key_Return:
+    case Qt::Key_Enter:
+      commitOperation();
+      break;
+    default:
+      break;
+  }
 }
 
 void XGUI_OperationMgr::onWidgetActivated(ModuleBase_ModelWidget* theWidget)

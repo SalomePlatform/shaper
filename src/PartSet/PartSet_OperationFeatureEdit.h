@@ -113,7 +113,7 @@ Q_OBJECT
 
   /// Processes the key pressed in the view
   /// \param theKey a key value
-  virtual void keyReleased(const int theKey);
+  virtual bool keyReleased(const int theKey);
 
  protected:
   /// \brief Virtual method called when operation is started

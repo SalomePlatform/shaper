@@ -35,6 +35,7 @@
 
 #ifdef _DEBUG
 #include <QDebug>
+#include <iostream>
 #endif
 
 #include <QMouseEvent>
@@ -103,13 +104,6 @@ void PartSet_OperationFeatureCreate::mouseReleased(
     const std::list<ModuleBase_ViewerPrs>& theSelected,
     const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
 {
-  if (commit()) {
-    // if the point creation is finished, the next mouse release should commit the modification
-    // the next release can happens by double click in the viewer
-    restartOperation(feature()->getKind(), feature());
-    return;
-  }
-
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
   double aX = aPoint.X(), anY = aPoint.Y();
 
@@ -126,8 +120,7 @@ void PartSet_OperationFeatureCreate::mouseReleased(
           aPoint = BRep_Tool::Pnt(aVertex);
           PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
 
-          PartSet_Tools::setConstraints(sketch(), feature(), myActiveWidget->attributeID(), aX,
-                                        anY);
+          PartSet_Tools::setConstraints(sketch(), feature(), myActiveWidget->attributeID(), aX, anY);
         }
       } else if (aShape.ShapeType() == TopAbs_EDGE)  // the line is selected
           {
@@ -152,19 +145,22 @@ void PartSet_OperationFeatureCreate::mouseReleased(
     flushUpdated();
     emit activateNextWidget(myActiveWidget);
   }
+
+  if (commit()) {
+    // if the point creation is finished, the next mouse release should commit the modification
+    // the next release can happens by double click in the viewer
+    restartOperation(feature()->getKind(), feature());
+    return;
+  }
 }
 
 void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
-  if (commit()) {
-    restartOperation(feature()->getKind(), feature());
-  } else {
     double aX, anY;
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
     PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
     setWidgetValue(feature(), aX, anY);
     flushUpdated();
-  }
 }
 
 void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
@@ -188,7 +184,7 @@ void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* t
   }
 }
 
-void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
+bool PartSet_OperationFeatureCreate::keyReleased(const int theKey)
 {
   switch (theKey) {
     case Qt::Key_Return:
@@ -208,6 +204,7 @@ void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
     default:
       break;
   }
+  return true;
 }
 
 void PartSet_OperationFeatureCreate::startOperation()

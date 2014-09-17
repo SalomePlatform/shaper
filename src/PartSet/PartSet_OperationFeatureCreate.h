@@ -71,7 +71,7 @@ Q_OBJECT
   virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
   /// Processes the key pressed in the view
   /// \param theKey a key value
-  virtual void keyReleased(const int theKey);
+  virtual bool keyReleased(const int theKey);
 
  public slots:
   /// Slots which listen the mode widget activation
