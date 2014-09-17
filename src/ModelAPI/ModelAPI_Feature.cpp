@@ -77,13 +77,17 @@ void ModelAPI_Feature::removeResult(const boost::shared_ptr<ModelAPI_Result>& th
 
 void ModelAPI_Feature::eraseResults()
 {
-  std::list<boost::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
-  for(; aResIter != myResults.end(); aResIter++) {
-      (*aResIter)->data()->erase();
-      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
-      ModelAPI_EventCreator::get()->sendDeleted(document(), (*aResIter)->groupName());
+  if (!myResults.empty()) {
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+    std::list<boost::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
+    for(; aResIter != myResults.end(); aResIter++) {
+        (*aResIter)->data()->erase();
+        ModelAPI_EventCreator::get()->sendDeleted(document(), (*aResIter)->groupName());
+    }
+    myResults.clear();
+    // flush it to avoid left presentations after input of invalid arguments (radius=0)
+    Events_Loop::loop()->flush(anEvent);
   }
-  myResults.clear();
 }
 
 boost::shared_ptr<ModelAPI_Document> ModelAPI_Feature::documentToAdd()

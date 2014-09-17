@@ -224,9 +224,9 @@ void Model_Document::startOperation()
       myNestedNum = 0;
       myDoc->InitDeltaCompaction();
     }
-    myIsEmptyTr[myTransactionsAfterSave] = false;
+    myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();
     myTransactionsAfterSave++;
-    myDoc->NewCommand();
+    myDoc->OpenCommand();
   } else {  // start the simple command
     myDoc->NewCommand();
   }
@@ -236,7 +236,7 @@ void Model_Document::startOperation()
     subDoc(*aSubIter)->startOperation();
 }
 
-void Model_Document::compactNested()
+bool Model_Document::compactNested()
 {
   bool allWasEmpty = true;
   while (myNestedNum != -1) {
@@ -250,6 +250,7 @@ void Model_Document::compactNested()
   myIsEmptyTr[myTransactionsAfterSave] = allWasEmpty;
   myTransactionsAfterSave++;
   myDoc->PerformDeltaCompaction();
+  return !allWasEmpty;
 }
 
 void Model_Document::finishOperation()
@@ -291,9 +292,10 @@ void Model_Document::abortOperation()
 {
   if (myNestedNum > 0 && !myDoc->HasOpenCommand()) {  // abort all what was done in nested
       // first compact all nested
-    compactNested();
-    // for nested it is undo and clear redos
-    myDoc->Undo();
+    if (compactNested()) {
+      // for nested it is undo and clear redos
+      myDoc->Undo();
+    }
     myDoc->ClearRedos();
     myTransactionsAfterSave--;
     myIsEmptyTr.erase(myTransactionsAfterSave);
