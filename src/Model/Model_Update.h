@@ -20,12 +20,17 @@ class ModelAPI_Feature;
  */
 class Model_Update : public Events_Listener
 {
-  ///< initial set of updated features that must be processed
+  /// initial set of updated features that must be processed
   std::set<boost::shared_ptr<ModelAPI_Object> > myInitial;
-  ///< already updated and processed features and modificated feature flag
+  /// already updated and processed features and modificated feature flag
   std::map<boost::shared_ptr<ModelAPI_Object>, bool> myUpdated;
-  ///< to know that all next updates are caused by this execution
+  /// to know that all next updates are caused by this execution
   bool isExecuted;
+  /// to know execute or not automatically all update
+  bool isAutomatic;
+  /// execute just created features for sure
+  bool isCreated;
+
  public:
   /// Is called only once, on startup of the application
   Model_Update();

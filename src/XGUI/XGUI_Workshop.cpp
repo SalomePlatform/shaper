@@ -196,6 +196,7 @@ void XGUI_Workshop::initMenu()
 
   aCommand = aGroup->addFeature("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
                                 QIcon(":pictures/rebuild.png"));
+  aCommand->connectTo(this, SLOT(onRebuild()));
 
   aCommand = aGroup->addFeature("SAVEAS_CMD", tr("Save as..."), tr("Save the document into a file"),
                                 QIcon(":pictures/save.png"));
@@ -748,6 +749,14 @@ void XGUI_Workshop::onRedo()
     operationMgr()->onAbortOperation();
   aMgr->redo();
   updateCommandStatus();
+}
+
+//******************************************************
+void XGUI_Workshop::onRebuild()
+{
+  static const Events_ID aRebuildEvent = Events_Loop::loop()->eventByName("Rebuild");
+  Events_Loop::loop()->send(boost::shared_ptr<Events_Message>(
+    new Events_Message(aRebuildEvent, this)));
 }
 
 //******************************************************

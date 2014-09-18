@@ -41,6 +41,8 @@ class Model_Application : public TDocStd_Application
   void setLoadPath(std::string thePath);
   //! Defines that specified document must be loaded by demand
   void setLoadByDemand(std::string theID);
+  //! Returns true if specified document must be loaded by demand
+  bool isLoadByDemand(std::string theID);
 
  public:
   // Redefined OCAF methods

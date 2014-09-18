@@ -55,7 +55,7 @@ public:
   //! \param theIndex zero-based index of feature in the group
   //! \param theHidden if it is true, it counts also the features that are not in tree
   virtual boost::shared_ptr<ModelAPI_Object>
-  object(const std::string& theGroupID, const int theIndex, const bool theHidden = false) = 0;
+    object(const std::string& theGroupID, const int theIndex, const bool theHidden = false) = 0;
 
   //! Returns the number of objects in the group of objects
   //! If theHidden is true, it counts also the features that are not in tree

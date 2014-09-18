@@ -172,6 +172,9 @@ class Model_Document : public ModelAPI_Document
   //! Removes information that there is a reference to this object
   void objectIsNotReferenced(const ObjectPtr& theObject);
 
+  //! Returns all sub documents
+  const std::set<std::string>& subDocuments() const {return mySubs;}
+
   friend class Model_Application;
   friend class Model_Session;
   friend class Model_AttributeReference;

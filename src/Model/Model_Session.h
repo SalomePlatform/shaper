@@ -75,6 +75,9 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   /// Defines the current document that used for current work in the application
   MODEL_EXPORT virtual void setActiveDocument(boost::shared_ptr<ModelAPI_Document> theDoc);
 
+  /// Returns all the opened documents of the session (without postponed)
+  MODEL_EXPORT virtual std::list<boost::shared_ptr<ModelAPI_Document> > allOpenedDocuments();
+
   /// Registers the plugin that creates features.
   /// It is obligatory for each plugin to call this function on loading to be found by 
   /// the plugin manager on call of the feature)

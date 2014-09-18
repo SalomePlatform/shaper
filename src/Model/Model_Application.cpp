@@ -62,6 +62,12 @@ void Model_Application::setLoadByDemand(std::string theID)
 }
 
 //=======================================================================
+bool Model_Application::isLoadByDemand(std::string theID)
+{
+  return myLoadedByDemand.find(theID) != myLoadedByDemand.end();
+}
+
+//=======================================================================
 Model_Application::Model_Application()
 {
   // store handle to the application to avoid nullification

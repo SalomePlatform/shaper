@@ -147,6 +147,27 @@ void Model_Session::setActiveDocument(boost::shared_ptr<ModelAPI_Document> theDo
   }
 }
 
+std::list<boost::shared_ptr<ModelAPI_Document> > Model_Session::allOpenedDocuments()
+{
+  list<boost::shared_ptr<ModelAPI_Document> > aResult;
+  aResult.push_back(moduleDocument());
+  // add subs recursively
+  list<boost::shared_ptr<ModelAPI_Document> >::iterator aDoc = aResult.begin();
+  for(; aDoc != aResult.end(); aDoc++) {
+    DocumentPtr anAPIDoc = *aDoc;
+    boost::shared_ptr<Model_Document> aDoc = boost::dynamic_pointer_cast<Model_Document>(anAPIDoc);
+    if (aDoc) {
+      std::set<std::string>::const_iterator aSubIter = aDoc->subDocuments().cbegin();
+      for(; aSubIter != aDoc->subDocuments().cend(); aSubIter++) {
+        if (!Model_Application::getApplication()->isLoadByDemand(*aSubIter)) {
+          aResult.push_back(Model_Application::getApplication()->getDocument(*aSubIter));
+        }
+      }
+    }
+  }
+  return aResult;
+}
+
 boost::shared_ptr<ModelAPI_Document> Model_Session::copy(
     boost::shared_ptr<ModelAPI_Document> theSource, std::string theID)
 {
