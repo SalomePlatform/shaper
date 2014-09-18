@@ -27,7 +27,12 @@ class ModelAPI_Data;
  */
 class ModelAPI_Document
 {
- public:
+public:
+  //! Returns the kind of the document: "PartSet", "Part", or something else.
+  //! This kind is used for feature buttons enable/disable depending on active document
+  //! (it uses workbench "document" identifier in XML configuration file for this)
+  virtual const std::string& kind() const = 0;
+
   //! Removes document data
   virtual void close() = 0;
 

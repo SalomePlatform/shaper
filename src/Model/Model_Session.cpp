@@ -90,7 +90,14 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
 
   LoadPluginsInfo();
   if (myPlugins.find(theFeatureID) != myPlugins.end()) {
-    myCurrentPluginName = myPlugins[theFeatureID];
+    std::pair<std::string, std::string>& aPlugin = myPlugins[theFeatureID]; // plugin and doc kind
+    if (!aPlugin.second.empty() && aPlugin.second != activeDocument()->kind()) {
+      Events_Error::send(
+          string("Feature '") + theFeatureID + "' can not be created in document '"
+              + aPlugin.second + "' by the XML definition");
+      return FeaturePtr();
+    }
+    myCurrentPluginName = aPlugin.first;
     if (myPluginObjs.find(myCurrentPluginName) == myPluginObjs.end()) {
       // load plugin library if not yet done
       Config_ModuleReader::loadLibrary(myCurrentPluginName);
@@ -186,7 +193,8 @@ void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMes
     if (aMsg) {
       // proccess the plugin info, load plugin
       if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
-        myPlugins[aMsg->id()] = aMsg->pluginLibrary();
+        myPlugins[aMsg->id()] = std::pair<std::string, std::string>(
+          aMsg->pluginLibrary(), aMsg->documentKind());
       }
     }
     // plugins information was started to load, so, it will be loaded

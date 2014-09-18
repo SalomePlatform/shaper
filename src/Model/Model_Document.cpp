@@ -45,8 +45,8 @@ static const int TAG_HISTORY = 3;  // tag of the history sub-tree (python dump)
 static const int TAG_FEATURE_ARGUMENTS = 1;  ///< where the arguments are located
 static const int TAG_FEATURE_RESULTS = 2;  ///< where the results are located
 
-Model_Document::Model_Document(const std::string theID)
-    : myID(theID),
+Model_Document::Model_Document(const std::string theID, const std::string theKind)
+    : myID(theID), myKind(theKind),
       myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
 {
   myDoc->SetUndoLimit(UNDO_LIMIT);
@@ -565,7 +565,12 @@ ObjectPtr Model_Document::object(const std::string& theGroupID, const int theInd
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
       for (; aRIter != aResults.cend(); aRIter++) {
-        if ((theHidden || (*aRIter)->isInHistory()) && (*aRIter)->groupName() == theGroupID) {
+        if ((*aRIter)->groupName() != theGroupID) continue;
+        bool isIn = theHidden;
+        if (!isIn && (*aRIter)->isInHistory()) { // check that there is nobody references this result
+          isIn = myConcealedResults.find(*aRIter) == myConcealedResults.end();
+        }
+        if (isIn) {
           if (anIndex == theIndex)
             return *aRIter;
           anIndex++;
@@ -597,9 +602,13 @@ int Model_Document::size(const std::string& theGroupID, const bool theHidden)
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
       for (; aRIter != aResults.cend(); aRIter++) {
-        if ((theHidden || (*aRIter)->isInHistory()) && (*aRIter)->groupName() == theGroupID) {
-          aResult++;
+        if ((*aRIter)->groupName() != theGroupID) continue;
+        bool isIn = theHidden;
+        if (!isIn && (*aRIter)->isInHistory()) { // check that there is nobody references this result
+          isIn = myConcealedResults.find(*aRIter) == myConcealedResults.end();
         }
+        if (isIn)
+          aResult++;
       }
     }
   }
@@ -887,6 +896,42 @@ void Model_Document::updateResults(FeaturePtr theFeature)
       if (aNewBody) {
         theFeature->setResult(aNewBody, aResIndex);
       }
+    }
+  }
+}
+
+void Model_Document::objectIsReferenced(const ObjectPtr& theObject)
+{
+  // only bodies are concealed now
+  ResultBodyPtr aResult = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(theObject);
+  if (aResult) {
+    if (myConcealedResults.find(aResult) != myConcealedResults.end()) {
+      Events_Error::send(std::string("The object '") + aResult->data()->name() +
+        "' is already referenced");
+    } else {
+      myConcealedResults.insert(aResult);
+      boost::shared_ptr<ModelAPI_Document> aThis = 
+        Model_Application::getApplication()->getDocument(myID);
+      ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_ResultBody::group());
+    }
+  }
+}
+
+void Model_Document::objectIsNotReferenced(const ObjectPtr& theObject)
+{
+  // only bodies are concealed now
+  ResultBodyPtr aResult = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(theObject);
+  if (aResult) {
+    std::set<ResultPtr>::iterator aFind = myConcealedResults.find(aResult);
+    if (aFind != myConcealedResults.end()) {
+      myConcealedResults.erase(aFind);
+      boost::shared_ptr<ModelAPI_Document> aThis = 
+        Model_Application::getApplication()->getDocument(myID);
+      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+      ModelAPI_EventCreator::get()->sendUpdated(*aFind, anEvent, false);
+    } else {
+      Events_Error::send(std::string("The object '") + aResult->data()->name() +
+        "' was not referenced '");
     }
   }
 }
