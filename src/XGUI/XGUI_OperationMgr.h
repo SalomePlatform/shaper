@@ -78,7 +78,7 @@ signals:
  protected:
 
   /// Commits the current operatin if it is valid
-  void commitOperation();
+  bool commitOperation();
   /// Sets the current operation or NULL
   /// \param theOperation the started operation
   /// \param isCheckBeforeStart the flag whether to check whether the operation can be started
@@ -99,11 +99,7 @@ signals:
   /// Returns true if the operation can be aborted
   bool canAbortOperation();
 
- protected slots:
-  /// Slot that is called by an operation stop. Removes the stopped operation form the stack.
-  /// If there is a suspended operation, restart it.
-  void onOperationStopped();
-
+ public slots:
   /// SLOT, that is called by the key in the property panel is clicked.
   /// \param theName the attribute name
   /// \param theEvent the mouse event
@@ -112,6 +108,11 @@ signals:
   /// SLOT, that reacts to the widget activation
   /// \param theWidget an activated widget
   void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
+
+  protected slots:
+  /// Slot that is called by an operation stop. Removes the stopped operation form the stack.
+  /// If there is a suspended operation, restart it.
+  void onOperationStopped();
 
  private:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations

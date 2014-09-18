@@ -84,9 +84,7 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast =
       theWidgets.end();
   for (; anIt != aLast; anIt++) {
-    //TODO(sbh): Think how to connect prop panle hotkeys and operations mgr
-    connect(*anIt, SIGNAL(keyReleased(QKeyEvent*)), this,
-            SIGNAL(keyReleased(QKeyEvent*)));
+    connect(*anIt, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
 
     connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)), this,
             SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));

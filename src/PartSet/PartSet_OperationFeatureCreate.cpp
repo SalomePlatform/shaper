@@ -184,7 +184,7 @@ void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* t
   }
 }
 
-bool PartSet_OperationFeatureCreate::keyReleased(const int theKey)
+void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
 {
   switch (theKey) {
     case Qt::Key_Return:
@@ -195,16 +195,14 @@ bool PartSet_OperationFeatureCreate::keyReleased(const int theKey)
       }
     }
       break;
-    case Qt::Key_Escape: {
-      if (!commit()) {
-        abort();
-      }
-    }
-      break;
     default:
       break;
   }
-  return true;
+}
+
+void PartSet_OperationFeatureCreate::activateNextToCurrentWidget()
+{
+  emit activateNextWidget(myActiveWidget);
 }
 
 void PartSet_OperationFeatureCreate::startOperation()

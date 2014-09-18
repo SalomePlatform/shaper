@@ -144,22 +144,6 @@ QList<QWidget*> ModuleBase_WidgetPoint2D::getControls() const
   return aControls;
 }
 
-bool ModuleBase_WidgetPoint2D::eventFilter(QObject *theObject, QEvent *theEvent)
-{
-  if (theObject == myXSpin || theObject == myYSpin) {
-    if (theEvent->type() == QEvent::KeyRelease) {
-      QKeyEvent* aKeyEvent = (QKeyEvent*) theEvent;
-      if (aKeyEvent && (aKeyEvent->key() == Qt::Key_Return ||
-                        aKeyEvent->key() == Qt::Key_Enter)) {
-        emit focusOutWidget(this);
-      }
-      emit keyReleased((QKeyEvent*) theEvent);
-      return true;
-    }
-  }
-  return ModuleBase_ModelWidget::eventFilter(theObject, theEvent);
-}
-
 bool ModuleBase_WidgetPoint2D::initFromPrevious(ObjectPtr theObject)
 {
   if (myOptionParam.length() == 0)

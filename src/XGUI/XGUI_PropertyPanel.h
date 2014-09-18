@@ -31,7 +31,6 @@ Q_OBJECT
 
   void cleanContent();
 
- protected:
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
  public slots:

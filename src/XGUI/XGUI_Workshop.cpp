@@ -940,10 +940,8 @@ void XGUI_Workshop::createDockWidgets()
   connect(aOkBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onCommitOperation()));
   QPushButton* aCancelBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
   connect(aCancelBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onAbortOperation()));
-//TODO(sbh): KeyReleasedProblem
   connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)), myOperationMgr,
           SLOT(onKeyReleased(QKeyEvent*)));
-
   connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), myOperationMgr,
           SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
   connect(myOperationMgr, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)), myPropertyPanel,

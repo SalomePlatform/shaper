@@ -208,18 +208,6 @@ void ModuleBase_WidgetSelector::updateSelectionName()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::eventFilter(QObject* theObj, QEvent* theEvent)
-{
-  if (theObj == myTextLine) {
-    //if (theEvent->type() == QEvent::Polish) {
-    //  myActivateBtn->setChecked(myActivateOnStart);
-    //  onSelectionChanged();
-    //}
-  }
-  return ModuleBase_ModelWidget::eventFilter(theObj, theEvent);
-}
-
-//********************************************************************
 void ModuleBase_WidgetSelector::enableOthersControls(bool toEnable) const
 {
   QWidget* aParent = myContainer->parentWidget();

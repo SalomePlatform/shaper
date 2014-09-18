@@ -60,9 +60,6 @@ Q_OBJECT
   /// Activate or deactivate selection
   void activateSelection(bool toActivate);
 
- protected:
-  bool eventFilter(QObject* theObj, QEvent* theEvent);
-
  private slots:
   void onSelectionChanged();
 
