@@ -106,24 +106,24 @@ void PartSet_OperationFeatureCreate::mouseReleased(
 {
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
   double aX = aPoint.X(), anY = aPoint.Y();
+  bool isClosedContour = false;
 
   if (theSelected.empty()) {
     PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
   } else {
     ModuleBase_ViewerPrs aPrs = theSelected.front();
     const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull())  // the point is selected
+    if (!aShape.IsNull())
     {
-      if (aShape.ShapeType() == TopAbs_VERTEX) {
+      if (aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
         const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
         if (!aVertex.IsNull()) {
           aPoint = BRep_Tool::Pnt(aVertex);
           PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-
           PartSet_Tools::setConstraints(sketch(), feature(), myActiveWidget->attributeID(), aX, anY);
+          isClosedContour = true;
         }
-      } else if (aShape.ShapeType() == TopAbs_EDGE)  // the line is selected
-          {
+      } else if (aShape.ShapeType() == TopAbs_EDGE) { // a line is selected
         PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
         // move to selected line
         if (feature()->getKind() == SketchPlugin_Line::ID()) {
@@ -146,7 +146,7 @@ void PartSet_OperationFeatureCreate::mouseReleased(
     emit activateNextWidget(myActiveWidget);
   }
 
-  if (commit()) {
+  if (commit() && !isClosedContour) {
     // if the point creation is finished, the next mouse release should commit the modification
     // the next release can happens by double click in the viewer
     restartOperation(feature()->getKind(), feature());
