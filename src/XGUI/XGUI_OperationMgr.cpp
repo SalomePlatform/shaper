@@ -38,7 +38,7 @@ int XGUI_OperationMgr::operationsCount() const
   return myOperations.count();
 }
 
-QStringList XGUI_OperationMgr::operationList()
+QStringList XGUI_OperationMgr::operationList() const
 {
   QStringList result;
   foreach(ModuleBase_Operation* eachOperation, myOperations) {
@@ -48,6 +48,15 @@ QStringList XGUI_OperationMgr::operationList()
     }
   }
   return result;
+}
+
+ModuleBase_Operation* XGUI_OperationMgr::previousOperation(ModuleBase_Operation* theOperation) const
+{
+  int idx = myOperations.lastIndexOf(theOperation);
+  if(idx == -1 || idx == 0) {
+    return NULL;
+  }
+  return myOperations.at(idx - 1);
 }
 
 bool XGUI_OperationMgr::eventFilter(QObject *theObject, QEvent *theEvent)

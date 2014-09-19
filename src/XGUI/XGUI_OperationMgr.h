@@ -42,7 +42,11 @@ Q_OBJECT
   /// Returns number of operations in the stack
   int operationsCount() const;
   /// Returns list of all operations IDs
-  QStringList operationList();
+  QStringList operationList() const;
+
+  /// Returns previous (parent) operation if given operation started.
+  /// else, or if there is no parent - returns NULL
+  ModuleBase_Operation* previousOperation(ModuleBase_Operation* theOperation) const;
 
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
