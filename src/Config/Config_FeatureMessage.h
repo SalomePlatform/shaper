@@ -24,6 +24,7 @@ class Config_FeatureMessage : public Events_Message
 
   std::string myGroupId;  //Id of feature's group
   std::string myWorkbenchId;  //Id of feature's workbench
+  std::string myDocumentKind;  // kind of the document of the workbench (all documents if empty)
   std::string myPluginLibrary;  //Name of feature's library
 
   bool myUseInput;  //Action is being checked until user commit the operation
@@ -43,6 +44,7 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT const std::string& tooltip() const;
   CONFIG_EXPORT const std::string& groupId() const;
   CONFIG_EXPORT const std::string& workbenchId() const;
+  CONFIG_EXPORT const std::string& documentKind() const;
   CONFIG_EXPORT const std::string& pluginLibrary() const;
   CONFIG_EXPORT const std::string& nestedFeatures() const;
   CONFIG_EXPORT bool isUseInput() const;
@@ -55,6 +57,7 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT void setTooltip(const std::string& tooltip);
   CONFIG_EXPORT void setGroupId(const std::string& groupId);
   CONFIG_EXPORT void setWorkbenchId(const std::string& workbenchId);
+  CONFIG_EXPORT void setDocumentKind(const std::string& documentKind);
   CONFIG_EXPORT void setPluginLibrary(const std::string& thePluginLibrary);
   CONFIG_EXPORT void setNestedFeatures(const std::string& theNestedFeatures);
   CONFIG_EXPORT void setUseInput(bool isUseInput);

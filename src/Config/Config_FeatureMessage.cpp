@@ -91,6 +91,16 @@ void Config_FeatureMessage::setWorkbenchId(const std::string& workbenchId)
   myWorkbenchId = workbenchId;
 }
 
+const std::string& Config_FeatureMessage::documentKind() const
+{
+  return myDocumentKind;
+}
+
+void Config_FeatureMessage::setDocumentKind(const std::string& documentKind)
+{
+  myDocumentKind = documentKind;
+}
+
 void Config_FeatureMessage::setTooltip(const std::string& tooltip)
 {
   myTooltip = tooltip;

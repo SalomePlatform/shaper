@@ -29,6 +29,7 @@ SET(PROJECT_SOURCES
   Config_PointerMessage.cpp
   Config_Common.cpp
   Config_ValidatorMessage.cpp
+  Config_Prop.cpp
   Config_PropManager.cpp
 )
 

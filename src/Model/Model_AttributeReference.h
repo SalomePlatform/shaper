@@ -26,7 +26,9 @@ class Model_AttributeReference : public ModelAPI_AttributeReference
   /// Returns object referenced from this attribute
   MODEL_EXPORT virtual ObjectPtr value();
 
- protected:
+  MODEL_EXPORT ~Model_AttributeReference();
+
+protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeReference(TDF_Label& theLabel);
 

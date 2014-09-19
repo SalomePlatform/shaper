@@ -21,7 +21,6 @@ void Model_AttributeRefAttr::setAttr(boost::shared_ptr<ModelAPI_Attribute> theAt
   string anID = aData->id(theAttr);
   if (myIsInitialized && object() == theAttr->owner() && myID->Get().IsEqual(anID.c_str()))
     return;  // nothing is changed
-
   myRef->Set(aData->label().Father());
   myID->Set(aData->id(theAttr).c_str());
   owner()->data()->sendAttributeUpdated(this);

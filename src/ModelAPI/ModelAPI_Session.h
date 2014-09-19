@@ -77,6 +77,9 @@ class MODELAPI_EXPORT ModelAPI_Session
   /// Defines the current document that used for current work in the application
   virtual void setActiveDocument(boost::shared_ptr<ModelAPI_Document> theDoc) = 0;
 
+  /// Returns all the opened documents of the session (without postponed)
+  virtual std::list<boost::shared_ptr<ModelAPI_Document> > allOpenedDocuments() = 0;
+
   /// Copies the document to the new one with the given id
   virtual boost::shared_ptr<ModelAPI_Document> copy(boost::shared_ptr<ModelAPI_Document> theSource,
                                                     std::string theID) = 0;

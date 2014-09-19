@@ -31,6 +31,10 @@ static Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLa
 class Model_Document : public ModelAPI_Document
 {
  public:
+  //! Returns the kind of the document: "PartSet", "Part", or something else.
+  //! This kind is used for feature buttons enable/disable depending on active document
+  //! (it uses workbench "document" identifier in XML configuration file for this)
+  MODEL_EXPORT virtual const std::string& kind() const {return myKind;}
 
   //! Loads the OCAF document from the file.
   //! \param theFileName full name of the file to load
@@ -138,7 +142,7 @@ class Model_Document : public ModelAPI_Document
   void synchronizeFeatures(const bool theMarkUpdated = false);
 
   //! Creates new document with binary file format
-  Model_Document(const std::string theID);
+  Model_Document(const std::string theID, const std::string theKind);
 
   Handle_TDocStd_Document document()
   {
@@ -163,12 +167,22 @@ class Model_Document : public ModelAPI_Document
   //! Updates the results list of the feature basing on the current data tree
   void updateResults(FeaturePtr theFeature);
 
+  //! Stores information that there is a reference to this object
+  void objectIsReferenced(const ObjectPtr& theObject);
+  //! Removes information that there is a reference to this object
+  void objectIsNotReferenced(const ObjectPtr& theObject);
+
+  //! Returns all sub documents
+  const std::set<std::string>& subDocuments() const {return mySubs;}
+
   friend class Model_Application;
   friend class Model_Session;
+  friend class Model_AttributeReference;
   friend class DFBrowser;
 
  private:
   std::string myID;  ///< identifier of the document in the application
+  std::string myKind;  ///< kind of the document in the application
   Handle_TDocStd_Document myDoc;  ///< OCAF document
   /// number of transactions after the last "save" call, used for "IsModified" method
   int myTransactionsAfterSave;
@@ -177,6 +191,8 @@ class Model_Document : public ModelAPI_Document
   /// All features managed by this document (not only in history of OB)
   /// For optimization mapped by labels
   NCollection_DataMap<TDF_Label, FeaturePtr> myObjs;
+  /// Results that are referenced and must be concealed for object browser
+  std::set<ResultPtr> myConcealedResults;
 
   ///< set of identifiers of sub-documents of this document
   std::set<std::string> mySubs;
