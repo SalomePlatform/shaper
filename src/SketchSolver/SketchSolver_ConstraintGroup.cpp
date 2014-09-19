@@ -817,7 +817,7 @@ bool SketchSolver_ConstraintGroup::updateGroup()
 
     std::set<boost::shared_ptr<SketchPlugin_Constraint> >::iterator aCIter = anExtraCopy.begin();
     for (; aCIter != anExtraCopy.end(); aCIter++)
-      if ((*aCIter)->data()->isValid())
+      if ((*aCIter)->data() && (*aCIter)->data()->isValid())
         changeConstraint(*aCIter);
   }
 

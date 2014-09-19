@@ -167,3 +167,17 @@ AISObjectPtr SketchPlugin_Sketch::getAISObject(AISObjectPtr thePrevious)
   }
   return AISObjectPtr();
 }
+
+void SketchPlugin_Sketch::erase()
+{
+  boost::shared_ptr<ModelAPI_AttributeRefList> aRefList = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeRefList>(data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
+  std::list<ObjectPtr> aFeatures = aRefList->list();
+  std::list<ObjectPtr>::const_iterator anIt = aFeatures.begin();
+  for (; anIt != aFeatures.end(); anIt++) {
+    FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
+    if (aFeature)
+      document()->removeFeature(aFeature);
+  }
+  SketchPlugin_Feature::erase();
+}
