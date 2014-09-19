@@ -46,11 +46,17 @@ void Model_Session::startOperation()
 void Model_Session::finishOperation()
 {
   ROOT_DOC->finishOperation();
+  static boost::shared_ptr<Events_Message> aFinishMsg
+    (new Events_Message(Events_Loop::eventByName("FinishOperation")));
+  Events_Loop::loop()->send(aFinishMsg);
 }
 
 void Model_Session::abortOperation()
 {
   ROOT_DOC->abortOperation();
+  static boost::shared_ptr<Events_Message> anAbortMsg
+    (new Events_Message(Events_Loop::eventByName("AbortOperation")));
+  Events_Loop::loop()->send(anAbortMsg);
 }
 
 bool Model_Session::isOperation()

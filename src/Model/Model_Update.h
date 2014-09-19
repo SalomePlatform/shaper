@@ -28,8 +28,9 @@ class Model_Update : public Events_Listener
   bool isExecuted;
   /// to know execute or not automatically all update
   bool isAutomatic;
-  /// execute just created features for sure
-  bool isCreated;
+  /// just created features: they must be updated immideately even in not-automatic mode for 
+  /// preview; cleared on commit operations
+  std::set<boost::shared_ptr<ModelAPI_Object> > myJustCreatedOrUpdated;
 
  public:
   /// Is called only once, on startup of the application

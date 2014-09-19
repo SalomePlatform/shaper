@@ -22,14 +22,22 @@ using namespace std;
 
 Model_Update MY_INSTANCE;  /// the only one instance initialized on load of the library
 
-Model_Update::Model_Update() : isCreated(false)
+Model_Update::Model_Update()
 {
-  static const Events_ID kChangedEvent = Events_Loop::loop()->eventByName("PreferenceChanged");
-  Events_Loop::loop()->registerListener(this, kChangedEvent);
-  static const Events_ID kRebuildEvent = Events_Loop::loop()->eventByName("Rebuild");
-  Events_Loop::loop()->registerListener(this, kRebuildEvent);
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  Events_Loop* aLoop = Events_Loop::loop();
+  static const Events_ID kChangedEvent = aLoop->eventByName("PreferenceChanged");
+  aLoop->registerListener(this, kChangedEvent);
+  static const Events_ID kRebuildEvent = aLoop->eventByName("Rebuild");
+  aLoop->registerListener(this, kRebuildEvent);
+  static const Events_ID kCreatedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED);
+  aLoop->registerListener(this, kCreatedEvent);
+  static const Events_ID kUpdatedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
+  aLoop->registerListener(this, kUpdatedEvent);
+  static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
+  aLoop->registerListener(this, kOpFinishEvent);
+  static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
+  aLoop->registerListener(this, kOpAbortEvent);
+
   Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild automatically",
                                    Config_Prop::Bool, "false");
   isAutomatic = Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
@@ -37,8 +45,13 @@ Model_Update::Model_Update() : isCreated(false)
 
 void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
 {
-  static const Events_ID kChangedEvent = Events_Loop::loop()->eventByName("PreferenceChanged");
-  static const Events_ID kRebuildEvent = Events_Loop::loop()->eventByName("Rebuild");
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static const Events_ID kChangedEvent = aLoop->eventByName("PreferenceChanged");
+  static const Events_ID kRebuildEvent = aLoop->eventByName("Rebuild");
+  static const Events_ID kCreatedEvent = aLoop->eventByName(EVENT_OBJECT_CREATED);
+  static const Events_ID kUpdatedEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
+  static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
+  static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
   bool isAutomaticChanged = false;
   if (theMessage->eventID() == kChangedEvent) { // automatic and manual rebuild flag is changed
     isAutomatic = 
@@ -48,12 +61,20 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
       isAutomaticChanged = true;
       isAutomatic = true;
     }
+  } else if (theMessage->eventID() == kCreatedEvent || theMessage->eventID() == kUpdatedEvent) {
+    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    const std::set<ObjectPtr>& anObjs = aMsg->objects();
+    std::set<ObjectPtr>::const_iterator anObjIter = anObjs.cbegin();
+    for(; anObjIter != anObjs.cend(); anObjIter++)
+      myJustCreatedOrUpdated.insert(*anObjIter);
+  } else if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent) {
+    myJustCreatedOrUpdated.clear();
+    return;
   }
 
   if (isExecuted)
     return;  // nothing to do: it is executed now
-  // execute just created features anyway
-  isCreated = theMessage->eventID() == Events_Loop::eventByName(EVENT_OBJECT_CREATED);
 
   //Events_LongOp::start(this);
   isExecuted = true;
@@ -86,11 +107,10 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
   }
   myUpdated.clear();
   // flush
-  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  Events_Loop::loop()->flush(EVENT_DISP);
+  static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  aLoop->flush(EVENT_DISP);
   //Events_LongOp::end(this);
   if (isAutomaticChanged) isAutomatic = false;
-  isCreated = false;
   isExecuted = false;
 }
 
@@ -153,18 +173,30 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
           !theFeature->isPersistentResult()) {
         ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
         if (aFactory->validate(theFeature)) {
-          if (isAutomatic || (isCreated && myInitial.find(theFeature) != myInitial.end()) ||
+          if (isAutomatic || (myJustCreatedOrUpdated.find(theFeature) != myJustCreatedOrUpdated.end()) ||
             !theFeature->isPersistentResult() /* execute quick, not persistent results */) {
             try {
               theFeature->execute();
-              theFeature->data()->mustBeUpdated(false);
             } catch(...) {
               Events_Error::send(
                 "Feature " + theFeature->getKind() + " has failed during the execution");
               theFeature->eraseResults();
             }
+            theFeature->data()->mustBeUpdated(false);
+            const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
+            std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+            for (; aRIter != aResults.cend(); aRIter++) {
+              boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+              aRes->data()->mustBeUpdated(false);
+            }
           } else {
             theFeature->data()->mustBeUpdated(true);
+            const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
+            std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+            for (; aRIter != aResults.cend(); aRIter++) {
+              boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+              aRes->data()->mustBeUpdated(true);
+            }
             aMustbeUpdated = false;
           }
         } else {

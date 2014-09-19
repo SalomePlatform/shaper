@@ -41,7 +41,7 @@ class ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 
  public:
   /// Returns the feature that has been updated
-  virtual std::set<ObjectPtr> objects() const = 0;
+  virtual const std::set<ObjectPtr>& objects() const = 0;
 
   //! Creates a new empty group (to store it in the loop before flush)
   virtual boost::shared_ptr<Events_MessageGroup> newEmpty() = 0;

@@ -108,18 +108,30 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
   if (aSelected > 0) {
     SessionPtr aMgr = ModelAPI_Session::get();
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    bool hasResult = false;
+    bool hasFeature = false;
+    foreach(ObjectPtr aObj, aObjects)
+    {
+      FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+      ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+      if (aResult)
+        hasResult = true;
+      if (aFeature)
+        hasFeature = true;
+      if (hasFeature && hasResult)
+        break;
+    }
     //Process Feature
     if (aSelected == 1) {
       ObjectPtr aObject = aObjects.first();
       if (aObject) {
         ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-        FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
         if (aPart) {
           if (aMgr->activeDocument() == aPart->partDoc())
             aMenu->addAction(action("DEACTIVATE_PART_CMD"));
           else
             aMenu->addAction(action("ACTIVATE_PART_CMD"));
-        } else if (aFeature) {
+        } else if (hasFeature) {
           aMenu->addAction(action("EDIT_CMD"));
         } else {
           if (aDisplayer->isVisible(aObject))
@@ -133,28 +145,15 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
         if (aMgr->activeDocument() != aMgr->moduleDocument())
           aMenu->addAction(action("ACTIVATE_PART_CMD"));
       }
-    } else if (aSelected >= 1) {
-      bool hasResult = false;
-      bool hasFeature = false;
-      foreach(ObjectPtr aObj, aObjects)
-      {
-        FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-        ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-        if (aResult)
-          hasResult = true;
-        if (aFeature)
-          hasFeature = true;
-        if (hasFeature && hasResult)
-          break;
-      }
+    } else {
       if (hasResult) {
         aMenu->addAction(action("SHOW_CMD"));
         aMenu->addAction(action("HIDE_CMD"));
         aMenu->addAction(action("SHOW_ONLY_CMD"));
       }
-      if (hasFeature)
-        aMenu->addAction(action("DELETE_CMD"));
     }
+    if (hasFeature)
+      aMenu->addAction(action("DELETE_CMD"));
   }
   aMenu->addActions(myWorkshop->objectBrowser()->actions());
   if (aMenu->actions().size() > 0) {

@@ -798,7 +798,7 @@ bool SketchSolver_ConstraintGroup::updateGroup()
   bool isAllValid = true;
   bool isCCRemoved = false;  // indicates that at least one of coincidence constraints was removed
   while (isAllValid && aConstrIter != myConstraintMap.rend()) {
-    if (!aConstrIter->first->data()->isValid()) {
+    if (!aConstrIter->first->data() || !aConstrIter->first->data()->isValid()) {
       if (aConstrIter->first->getKind().compare(SketchPlugin_ConstraintCoincidence::ID()) == 0)
         isCCRemoved = true;
       std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::reverse_iterator aCopyIter =
@@ -817,7 +817,7 @@ bool SketchSolver_ConstraintGroup::updateGroup()
 
     std::set<boost::shared_ptr<SketchPlugin_Constraint> >::iterator aCIter = anExtraCopy.begin();
     for (; aCIter != anExtraCopy.end(); aCIter++)
-      if ((*aCIter)->data()->isValid())
+      if ((*aCIter)->data() && (*aCIter)->data()->isValid())
         changeConstraint(*aCIter);
   }
 
