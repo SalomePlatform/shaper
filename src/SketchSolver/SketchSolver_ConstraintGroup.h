@@ -46,7 +46,7 @@ class SketchSolver_ConstraintGroup
   /// \brief Check for valid sketch data
   inline bool isWorkplaneValid() const
   {
-    return mySketch->data()->isValid();
+    return mySketch->data() && mySketch->data()->isValid();
   }
 
   /** \brief Adds or updates a constraint in the group

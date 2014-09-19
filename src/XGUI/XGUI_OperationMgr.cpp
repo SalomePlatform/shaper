@@ -114,6 +114,7 @@ bool XGUI_OperationMgr::validateOperation(ModuleBase_Operation* theOperation)
 {
   //Get operation feature to validate
   FeaturePtr aFeature = theOperation->feature();
+  if (!aFeature) return true; // rename operation
   //Get validators for the Id
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();

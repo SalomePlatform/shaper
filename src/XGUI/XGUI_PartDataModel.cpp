@@ -78,8 +78,16 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
         case ConstructFolder:
           return QIcon(":pictures/constr_folder.png");
         case ConstructObject:
-        case BodiesObject:
+        case BodiesObject: {
+          DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+          std::string aGroup = theIndex.internalId() == ConstructObject ?
+            ModelAPI_ResultConstruction::group() : ModelAPI_ResultBody::group();
+          ObjectPtr anObject = aRootDoc->object(aGroup, theIndex.row());
+          if (anObject && anObject->data() && anObject->data()->mustBeUpdated()) {
+            return QIcon(":pictures/constr_object_modified.png");
+          }
           return QIcon(":pictures/constr_object.png");
+        }
       }
       break;
 
@@ -297,8 +305,15 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
         case BodiesFolder:
           return QIcon(":pictures/constr_folder.png");
         case ConstructObject:
-        case BodiesObject:
+        case BodiesObject: {
+          std::string aGroup = theIndex.internalId() == ConstructObject ?
+            ModelAPI_ResultConstruction::group() : ModelAPI_ResultBody::group();
+          ObjectPtr anObject = partDocument()->object(aGroup, theIndex.row());
+          if (anObject && anObject->data() && anObject->data()->mustBeUpdated()) {
+            return QIcon(":pictures/constr_object_modified.png");
+          }
           return QIcon(":pictures/constr_object.png");
+        }
         case HistoryObject: {
           ObjectPtr aObject = partDocument()->object(ModelAPI_Feature::group(), theIndex.row() - 3);
           FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);

@@ -34,7 +34,7 @@ class ModelAPI_Attribute
   }
 
   /// Sets the owner of this attribute
-  MODELAPI_EXPORT void setObject(const boost::shared_ptr<ModelAPI_Object>& theObject)
+  MODELAPI_EXPORT virtual void setObject(const boost::shared_ptr<ModelAPI_Object>& theObject)
   {
     myObject = theObject;
   }
