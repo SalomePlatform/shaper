@@ -110,7 +110,6 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
       setTabOrder(anOkBtn, aCancelBtn);
     }
   }
-  onActivateNextWidget(NULL);
 }
 
 const QList<ModuleBase_ModelWidget*>& XGUI_PropertyPanel::modelWidgets() const

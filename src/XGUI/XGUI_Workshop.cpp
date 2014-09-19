@@ -475,6 +475,7 @@ void XGUI_Workshop::onOperationStarted()
     }
 
     myPropertyPanel->setModelWidgets(aWidgets);
+    myPropertyPanel->onActivateNextWidget(NULL);
     myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
   }
   updateCommandStatus();
@@ -574,11 +575,14 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
     aCommand = salomeConnector()->command(theOperation->getDescription()->operationId());
   } else {
     XGUI_MainMenu* aMenu = myMainWindow->menuObject();
-    aCommand = aMenu->feature(theOperation->getDescription()->operationId());
+    FeaturePtr aFeature = theOperation->feature();
+    if(aFeature)
+      aCommand = aMenu->feature(QString::fromStdString(aFeature->getKind()));
   }
   //Abort operation on uncheck the command
-  if (aCommand)
+  if (aCommand) {
     connect(aCommand, SIGNAL(triggered(bool)), theOperation, SLOT(setRunning(bool)));
+  }
 }
 
 /*
@@ -858,8 +862,7 @@ void XGUI_Workshop::updateCommandStatus()
   if (aMgr->hasModuleDocument()) {
     QAction* aUndoCmd;
     QAction* aRedoCmd;
-    foreach(QAction* aCmd, aCommands)
-    {
+    foreach(QAction* aCmd, aCommands) {
       QString aId = aCmd->data().toString();
       if (aId == "UNDO_CMD")
         aUndoCmd = aCmd;
@@ -872,8 +875,7 @@ void XGUI_Workshop::updateCommandStatus()
     aUndoCmd->setEnabled(aMgr->canUndo());
     aRedoCmd->setEnabled(aMgr->canRedo());
   } else {
-    foreach(QAction* aCmd, aCommands)
-    {
+    foreach(QAction* aCmd, aCommands) {
       QString aId = aCmd->data().toString();
       if (aId == "NEW_CMD")
         aCmd->setEnabled(true);
@@ -1147,16 +1149,27 @@ void XGUI_Workshop::showOnlyObjects(const QList<ObjectPtr>& theList)
 //**************************************************************
 void XGUI_Workshop::updateCommandsOnViewSelection()
 {
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   XGUI_Selection* aSelection = mySelector->selection();
   if (aSelection->getSelected().size() == 0)
     return;
 
+  // Restrict validators to manage only nested (child) features
+  // of the current feature i.e. if current feature is Sketch -
+  // Sketch Features & Constraints can be validated.
+  QStringList aNestedIds;
+  if(myOperationMgr->hasOperation()) {
+    FeaturePtr aFeature = myOperationMgr->currentOperation()->feature();
+    if(aFeature) {
+      aNestedIds << myActionsMgr->nestedCommands(QString::fromStdString(aFeature->getKind()));
+    }
+  }
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   QList<QAction*> aActions = getModuleCommands();
-  foreach(QAction* aAction, aActions)
-  {
+  foreach(QAction* aAction, aActions) {
     QString aId = aAction->data().toString();
+    if(!aNestedIds.contains(aId))
+      continue;
     std::list<ModelAPI_Validator*> aValidators;
     std::list<std::list<std::string> > anArguments;
     aFactory->validators(aId.toStdString(), aValidators, anArguments);

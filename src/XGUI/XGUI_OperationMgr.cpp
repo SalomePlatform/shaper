@@ -41,9 +41,11 @@ int XGUI_OperationMgr::operationsCount() const
 QStringList XGUI_OperationMgr::operationList()
 {
   QStringList result;
-  foreach(ModuleBase_Operation* eachOperation, myOperations)
-  {
-    result << eachOperation->id();
+  foreach(ModuleBase_Operation* eachOperation, myOperations) {
+    FeaturePtr aFeature = eachOperation->feature();
+    if(aFeature) {
+      result << QString::fromStdString(aFeature->getKind());
+    }
   }
   return result;
 }
@@ -80,7 +82,9 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
 
 bool XGUI_OperationMgr::abortAllOperations()
 {
-  if (operationsCount() == 1) {
+  if(!hasOperation()) {
+    return true;
+  } else if (operationsCount() == 1) {
     onAbortOperation();
     return true;
   }
@@ -215,9 +219,6 @@ void XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
 {
   // Let the manager decide what to do with the given key combination.
   ModuleBase_Operation* anOperation = currentOperation();
-  if(anOperation) {
-    anOperation->activateNextToCurrentWidget();
-  }
   bool isRestart = false;
   switch (theEvent->key()) {
     case Qt::Key_Escape: {
@@ -226,6 +227,9 @@ void XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
       break;
     case Qt::Key_Return:
     case Qt::Key_Enter: {
+      if(anOperation) {
+         anOperation->activateNextToCurrentWidget();
+      }
       commitOperation();
     }
       break;
