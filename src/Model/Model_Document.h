@@ -129,6 +129,12 @@ class Model_Document : public ModelAPI_Document
   ///! On abort, undo or redo it is not necessary: results in document are updated automatically
   bool executeFeatures() {return myExecuteFeatures;}
 
+  ///! Reutrns true is result was conecaled because of usage it by other object
+  virtual bool isConcealed(const boost::shared_ptr<ModelAPI_Object>& theResult) {
+    return myConcealedResults.find(boost::dynamic_pointer_cast<ModelAPI_Result>(theResult))
+      != myConcealedResults.end();
+  }
+
  protected:
 
   //! Returns (creates if needed) the features label
