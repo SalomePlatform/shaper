@@ -305,7 +305,7 @@ void XGUI_ViewPort::resizeEvent(QResizeEvent* theEvent)
 }
 
 //***********************************************
-QImage XGUI_ViewPort::dumpView(QRect theRect, bool toUpdate)
+QImage XGUI_ViewPort::dumpView(unsigned char*& theData, QRect theRect, bool toUpdate)
 {
   Handle(V3d_View) view = getView();
   if (view.IsNull())
@@ -322,7 +322,7 @@ QImage XGUI_ViewPort::dumpView(QRect theRect, bool toUpdate)
   }
   QApplication::syncX();
 
-  unsigned char* data = new unsigned char[aWidth * aHeight * 4];
+  theData = new unsigned char[aWidth * aHeight * 4];
 
   QPoint p;
   if (theRect.isNull()) {
@@ -334,9 +334,9 @@ QImage XGUI_ViewPort::dumpView(QRect theRect, bool toUpdate)
       view->Redraw(theRect.x(), theRect.y(), theRect.width(), theRect.height());
     p = theRect.topLeft();
   }
-  glReadPixels(p.x(), p.y(), aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  glReadPixels(p.x(), p.y(), aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE, theData);
 
-  QImage anImage(data, aWidth, aHeight, QImage::Format_ARGB32);
+  QImage anImage(theData, aWidth, aHeight, QImage::Format_ARGB32);
   anImage = anImage.mirrored();
   anImage = anImage.rgbSwapped();
   return anImage;

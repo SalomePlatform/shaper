@@ -25,7 +25,7 @@ Q_OBJECT
     return 0;
   }
 
-  QImage dumpView(QRect theRect = QRect(), bool toUpdate = true);
+  QImage dumpView(unsigned char*& theData, QRect theRect = QRect(), bool toUpdate = true);
 
   Handle(V3d_View) getView() const
   {

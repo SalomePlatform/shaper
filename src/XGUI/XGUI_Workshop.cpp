@@ -126,6 +126,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 //******************************************************
 XGUI_Workshop::~XGUI_Workshop(void)
 {
+  delete myDisplayer;
 }
 
 //******************************************************
