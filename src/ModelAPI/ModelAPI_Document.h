@@ -80,7 +80,10 @@ public:
   virtual boost::shared_ptr<ModelAPI_Feature> feature(
       const boost::shared_ptr<ModelAPI_Result>& theResult) = 0;
 
- protected:
+  ///! Reutrns true is result was conecaled because of usage it by other object
+  virtual bool isConcealed(const boost::shared_ptr<ModelAPI_Object>& theResult) = 0;
+
+protected:
   /// Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document()
   {

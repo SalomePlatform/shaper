@@ -126,6 +126,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 //******************************************************
 XGUI_Workshop::~XGUI_Workshop(void)
 {
+  delete myDisplayer;
 }
 
 //******************************************************
@@ -385,7 +386,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_Objec
   std::set<ObjectPtr>::const_iterator aIt;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
-    if (!aObj->data() || !aObj->data()->isValid())
+    if (!aObj->data() || !aObj->data()->isValid() || aObj->document()->isConcealed(aObj))
       myDisplayer->erase(aObj, false);
     else {
       if (myDisplayer->isVisible(aObj))  // TODO VSV: Correction sketch drawing
@@ -419,7 +420,8 @@ void XGUI_Workshop::onFeatureCreatedMsg(const boost::shared_ptr<ModelAPI_ObjectU
       // it doesn't stored in the operation mgr and doesn't displayed
     } else if (myOperationMgr->hasOperation()) {
       ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-      if (aOperation->hasObject(*aIt)) {  // Display only current operation results
+      if (!(*aIt)->document()->isConcealed(*aIt) &&
+          aOperation->hasObject(*aIt)) {  // Display only current operation results
         myDisplayer->display(*aIt, false);
         isDisplayed = true;
       }

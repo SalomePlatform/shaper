@@ -98,7 +98,8 @@ void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
 
   QRect aImgRect(
       QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(), aRect.width(), aRect.height()));
-  QImage aImg = myVPort->dumpView(aImgRect, myResize);
+  unsigned char* aData = 0;
+  QImage aImg = myVPort->dumpView(aData, aImgRect, myResize);
   if (!aImg.isNull())
     aPainter.drawImage(aRect, aImg);
   myResize = false;
@@ -111,6 +112,8 @@ void ViewerToolbar::paintEvent(QPaintEvent* theEvent)
   aOpt.rect = style->subElementRect(QStyle::SE_ToolBarHandle, &aOpt, this);
   if (aOpt.rect.isValid())
     style->drawPrimitive(QStyle::PE_IndicatorToolBarHandle, &aOpt, &aPainter, this);
+  if (aData)
+    delete aData;
 }
 
 //**************************************************************************
@@ -131,11 +134,14 @@ void ViewerLabel::paintEvent(QPaintEvent* theEvent)
 
   QRect aImgRect(
       QRect(aPnt.x(), aPnt.y() + aVPRect.height() - aRect.height(), aRect.width(), aRect.height()));
-  QImage aImg = myVPort->dumpView(aImgRect, myResize);
+  unsigned char* aData = 0;
+  QImage aImg = myVPort->dumpView(aData, aImgRect, myResize);
   if (!aImg.isNull())
     QPainter(this).drawImage(aRect, aImg);
   myResize = false;
   QLabel::paintEvent(theEvent);
+  if (aData)
+    delete aData;
 }
 
 //**************************************************************************
@@ -399,7 +405,8 @@ void XGUI_ViewWindow::onClose()
 //****************************************************************
 void XGUI_ViewWindow::onMinimize()
 {
-  QPixmap aPMap = QPixmap::fromImage(myViewPort->dumpView());
+  unsigned char* aData = 0;
+  QPixmap aPMap = QPixmap::fromImage(myViewPort->dumpView(aData));
   int aW = width();
   int aH = height();
   double aR = aW / 100.;
@@ -414,6 +421,7 @@ void XGUI_ViewWindow::onMinimize()
   parentWidget()->lower();
   windowDeactivated();
   myViewer->onWindowMinimized((QMdiSubWindow*) parentWidget());
+  delete aData;
 }
 
 //****************************************************************
@@ -1045,7 +1053,8 @@ void XGUI_ViewWindow::dumpView()
                                                    &aSelectedFilter);
   if (!aFileName.isNull()) {
     QApplication::setOverrideCursor(Qt::WaitCursor);
-    QImage aPicture = myViewPort->dumpView();
+    unsigned char* aData = 0;
+    QImage aPicture = myViewPort->dumpView(aData);
 
     QString aFmt = XGUI_Tools::extension(aFileName).toUpper();
     if (aFmt.isEmpty())
@@ -1068,6 +1077,7 @@ void XGUI_ViewWindow::dumpView()
 #endif
     else
       aPicture.save(aFileName, aFmt.toLatin1());
+    delete aData;
     QApplication::restoreOverrideCursor();
   }
 }
