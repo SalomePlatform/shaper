@@ -14,7 +14,7 @@
 #include <ModuleBase_WidgetFeature.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_WidgetSwitch.h>
-#include <ModuleBase_WidgetSelector.h>
+#include <ModuleBase_WidgetShapeSelector.h>
 #include <ModuleBase_WidgetDoubleValue.h>
 #include <ModuleBase_WidgetBoolValue.h>
 #include <ModuleBase_WidgetPoint2dDistance.h>
@@ -125,8 +125,8 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   } else if (theType == WDG_INFO) {
     result = labelControl(theParent);
 
-  } else if (theType == WDG_SELECTOR) {
-    result = selectorControl(theParent);
+  } else if (theType == WDG_SHAPE_SELECTOR) {
+    result = shapeSelectorControl(theParent);
 
   } else if (theType == WDG_BOOLVALUE) {
     result = booleanControl(theParent);
@@ -186,48 +186,82 @@ QWidget* ModuleBase_WidgetFactory::createContainer(const std::string& theType, Q
 
 QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 {
-  ModuleBase_WidgetDoubleValue* aDblWgt = new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi,
-                                                                           myParentId);
+  ModuleBase_WidgetDoubleValue* aDblWgt =
+      new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aDblWgt);
-
   return aDblWgt->getControl();
 }
 
 QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetPoint2D* aWidget = new ModuleBase_WidgetPoint2D(theParent, myWidgetApi,
-                                                                   myParentId);
+  ModuleBase_WidgetPoint2D* aWidget =
+      new ModuleBase_WidgetPoint2D(theParent, myWidgetApi,myParentId);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
 
 QWidget* ModuleBase_WidgetFactory::featureSelectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetFeature* aWidget = new ModuleBase_WidgetFeature(theParent, myWidgetApi,
-                                                                   myParentId);
+  ModuleBase_WidgetFeature* aWidget =
+      new ModuleBase_WidgetFeature(theParent, myWidgetApi,myParentId);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
 
 QWidget* ModuleBase_WidgetFactory::featureOrAttributeSelectorControl(QWidget* theParent)
 {
-  ModuleBase_WidgetFeatureOrAttribute* aWidget = new ModuleBase_WidgetFeatureOrAttribute(
-      theParent, myWidgetApi, myParentId);
+  ModuleBase_WidgetFeatureOrAttribute* aWidget =
+      new ModuleBase_WidgetFeatureOrAttribute(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
 
 QWidget* ModuleBase_WidgetFactory::doubleValueEditor(QWidget* theParent)
 {
-  ModuleBase_WidgetEditor* aWidget = new ModuleBase_WidgetEditor(theParent, myWidgetApi,
-                                                                 myParentId);
+  ModuleBase_WidgetEditor* aWidget =
+      new ModuleBase_WidgetEditor(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aWidget);
   return aWidget->getControl();
 }
 
-QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const
+QWidget* ModuleBase_WidgetFactory::shapeSelectorControl(QWidget* theParent)
 {
-  return QString::fromStdString(theStdString);
+  ModuleBase_WidgetShapeSelector* aSelector =
+      new ModuleBase_WidgetShapeSelector(theParent, myWorkshop, myWidgetApi, myParentId);
+  myModelWidgets.append(aSelector);
+  return aSelector->getControl();
+}
+
+QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
+{
+  ModuleBase_WidgetBoolValue* aBoolWgt =
+      new ModuleBase_WidgetBoolValue(theParent, myWidgetApi, myParentId);
+  myModelWidgets.append(aBoolWgt);
+  return aBoolWgt->getControl();
+}
+
+QWidget* ModuleBase_WidgetFactory::point2dDistanceControl(QWidget* theParent)
+{
+  ModuleBase_WidgetPoint2dDistance* aDistWgt =
+      new ModuleBase_WidgetPoint2dDistance(theParent, myWidgetApi, myParentId);
+  myModelWidgets.append(aDistWgt);
+  return aDistWgt->getControl();
+}
+
+QWidget* ModuleBase_WidgetFactory::fileSelectorControl(QWidget* theParent)
+{
+  ModuleBase_WidgetFileSelector* aFileSelectorWgt =
+      new ModuleBase_WidgetFileSelector(theParent, myWidgetApi, myParentId);
+  myModelWidgets.append(aFileSelectorWgt);
+  return aFileSelectorWgt->getControl();
+}
+
+QWidget* ModuleBase_WidgetFactory::choiceControl(QWidget* theParent)
+{
+  ModuleBase_WidgetChoice* aChoiceWgt =
+      new ModuleBase_WidgetChoice(theParent, myWidgetApi,myParentId);
+  myModelWidgets.append(aChoiceWgt);
+  return aChoiceWgt->getControl();
 }
 
 bool ModuleBase_WidgetFactory::isInternalWidget(const std::string& theType)
@@ -241,48 +275,7 @@ bool ModuleBase_WidgetFactory::isInternalWidget(const std::string& theType)
   return true;
 }
 
-QWidget* ModuleBase_WidgetFactory::selectorControl(QWidget* theParent)
+QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const
 {
-  ModuleBase_WidgetSelector* aSelector = new ModuleBase_WidgetSelector(theParent, myWorkshop,
-                                                                       myWidgetApi, myParentId);
-  myModelWidgets.append(aSelector);
-  return aSelector->getControl();
+  return QString::fromStdString(theStdString);
 }
-
-QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
-{
-  ModuleBase_WidgetBoolValue* aBoolWgt = new ModuleBase_WidgetBoolValue(theParent, myWidgetApi,
-                                                                        myParentId);
-  myModelWidgets.append(aBoolWgt);
-
-  return aBoolWgt->getControl();
-}
-
-QWidget* ModuleBase_WidgetFactory::point2dDistanceControl(QWidget* theParent)
-{
-  ModuleBase_WidgetPoint2dDistance* aDistWgt = new ModuleBase_WidgetPoint2dDistance(theParent,
-                                                                                    myWidgetApi,
-                                                                                    myParentId);
-  myModelWidgets.append(aDistWgt);
-
-  return aDistWgt->getControl();
-}
-
-QWidget* ModuleBase_WidgetFactory::fileSelectorControl(QWidget* theParent)
-{
-  ModuleBase_WidgetFileSelector* aFileSelectorWgt =
-      new ModuleBase_WidgetFileSelector(theParent, myWidgetApi, myParentId);
-  myModelWidgets.append(aFileSelectorWgt);
-
-  return aFileSelectorWgt->getControl();
-}
-
-QWidget* ModuleBase_WidgetFactory::choiceControl(QWidget* theParent)
-{
-  ModuleBase_WidgetChoice* aChoiceWgt = new ModuleBase_WidgetChoice(theParent, myWidgetApi,
-                                                                        myParentId);
-  myModelWidgets.append(aChoiceWgt);
-
-  return aChoiceWgt->getControl();
-}
-

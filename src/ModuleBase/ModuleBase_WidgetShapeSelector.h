@@ -1,9 +1,9 @@
-// File:        ModuleBase_WidgetSelector.h
+// File:        ModuleBase_WidgetShapeSelector.h
 // Created:     2 June 2014
 // Author:      Vitaly Smetannikov
 
-#ifndef ModuleBase_WidgetSelector_H
-#define ModuleBase_WidgetSelector_H
+#ifndef ModuleBase_WidgetShapeSelector_H
+#define ModuleBase_WidgetShapeSelector_H
 
 #include "ModuleBase.h"
 #include "ModuleBase_ModelWidget.h"
@@ -22,14 +22,14 @@ class QLineEdit;
 class QToolButton;
 class ModuleBase_IWorkshop;
 
-class MODULEBASE_EXPORT ModuleBase_WidgetSelector : public ModuleBase_ModelWidget
+class MODULEBASE_EXPORT ModuleBase_WidgetShapeSelector : public ModuleBase_ModelWidget
 {
 Q_OBJECT
  public:
-  ModuleBase_WidgetSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
+  ModuleBase_WidgetShapeSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
                             const Config_WidgetAPI* theData, const std::string& theParentId);
 
-  virtual ~ModuleBase_WidgetSelector();
+  virtual ~ModuleBase_WidgetShapeSelector();
 
   /// Saves the internal parameters to the given feature
   /// \param theObject a model feature to be changed

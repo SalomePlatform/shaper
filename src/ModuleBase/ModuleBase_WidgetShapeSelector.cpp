@@ -1,8 +1,8 @@
-// File:        ModuleBase_WidgetSelector.h
+// File:        ModuleBase_WidgetShapeSelector.h
 // Created:     2 June 2014
 // Author:      Vitaly Smetannikov
 
-#include "ModuleBase_WidgetSelector.h"
+#include "ModuleBase_WidgetShapeSelector.h"
 #include "ModuleBase_IWorkshop.h"
 
 #include <Events_Loop.h>
@@ -34,7 +34,7 @@
 typedef QMap<QString, TopAbs_ShapeEnum> ShapeTypes;
 static ShapeTypes MyShapeTypes;
 
-TopAbs_ShapeEnum ModuleBase_WidgetSelector::shapeType(const QString& theType)
+TopAbs_ShapeEnum ModuleBase_WidgetShapeSelector::shapeType(const QString& theType)
 {
   if (MyShapeTypes.count() == 0) {
     MyShapeTypes["face"] = TopAbs_FACE;
@@ -49,7 +49,7 @@ TopAbs_ShapeEnum ModuleBase_WidgetSelector::shapeType(const QString& theType)
   throw std::invalid_argument("Shape type defined in XML is not implemented!");
 }
 
-ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
+ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParent,
                                                      ModuleBase_IWorkshop* theWorkshop,
                                                      const Config_WidgetAPI* theData,
                                                      const std::string& theParentId)
@@ -94,12 +94,12 @@ ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
 }
 
 //********************************************************************
-ModuleBase_WidgetSelector::~ModuleBase_WidgetSelector()
+ModuleBase_WidgetShapeSelector::~ModuleBase_WidgetShapeSelector()
 {
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::storeValue() const
+bool ModuleBase_WidgetShapeSelector::storeValue() const
 {
   FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(mySelectedObject);
   if (aSelectedFeature == myFeature)  // In order to avoid selection of the same object
@@ -118,7 +118,7 @@ bool ModuleBase_WidgetSelector::storeValue() const
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::restoreValue()
+bool ModuleBase_WidgetShapeSelector::restoreValue()
 {
   DataPtr aData = myFeature->data();
   boost::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(attributeID());
@@ -132,7 +132,7 @@ bool ModuleBase_WidgetSelector::restoreValue()
 }
 
 //********************************************************************
-QList<QWidget*> ModuleBase_WidgetSelector::getControls() const
+QList<QWidget*> ModuleBase_WidgetShapeSelector::getControls() const
 {
   QList<QWidget*> aControls;
   aControls.append(myLabel);
@@ -142,7 +142,7 @@ QList<QWidget*> ModuleBase_WidgetSelector::getControls() const
 }
 
 //********************************************************************
-void ModuleBase_WidgetSelector::onSelectionChanged()
+void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 {
   QList<ObjectPtr> aObjects = myWorkshop->selectedObjects();
   if (aObjects.size() > 0) {
@@ -170,7 +170,7 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::isAccepted(const ObjectPtr theResult) const
+bool ModuleBase_WidgetShapeSelector::isAccepted(const ObjectPtr theResult) const
 {
   ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theResult);
   boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
@@ -197,7 +197,7 @@ bool ModuleBase_WidgetSelector::isAccepted(const ObjectPtr theResult) const
 }
 
 //********************************************************************
-void ModuleBase_WidgetSelector::updateSelectionName()
+void ModuleBase_WidgetShapeSelector::updateSelectionName()
 {
   if (mySelectedObject) {
     std::string aName = mySelectedObject->data()->name();
@@ -208,7 +208,7 @@ void ModuleBase_WidgetSelector::updateSelectionName()
 }
 
 //********************************************************************
-void ModuleBase_WidgetSelector::enableOthersControls(bool toEnable) const
+void ModuleBase_WidgetShapeSelector::enableOthersControls(bool toEnable) const
 {
   QWidget* aParent = myContainer->parentWidget();
   QList<QWidget*> aChldList = aParent->findChildren<QWidget*>();
@@ -221,7 +221,7 @@ void ModuleBase_WidgetSelector::enableOthersControls(bool toEnable) const
 }
 
 //********************************************************************
-void ModuleBase_WidgetSelector::activateSelection(bool toActivate)
+void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
 {
   enableOthersControls(!toActivate);
   //myTextLine->setEnabled(toActivate);
@@ -239,7 +239,7 @@ void ModuleBase_WidgetSelector::activateSelection(bool toActivate)
 }
 
 //********************************************************************
-void ModuleBase_WidgetSelector::raisePanel() const
+void ModuleBase_WidgetShapeSelector::raisePanel() const
 {
   QWidget* aParent = myContainer->parentWidget();
   QWidget* aLastPanel = 0;
@@ -256,7 +256,7 @@ void ModuleBase_WidgetSelector::raisePanel() const
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::focusTo()
+bool ModuleBase_WidgetShapeSelector::focusTo()
 {
   myActivateBtn->setChecked(true);
   return true;
