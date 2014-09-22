@@ -1076,6 +1076,10 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     showObjects(aObjects, false);
   else if (theId == "SHOW_ONLY_CMD")
     showOnlyObjects(aObjects);
+  else if (theId == "SHADING_CMD")
+    setDisplayMode(aObjects, XGUI_Displayer::Shading);
+  else if (theId == "WIREFRAME_CMD")
+    setDisplayMode(aObjects, XGUI_Displayer::Wireframe);
 }
 
 //**************************************************************
@@ -1256,4 +1260,14 @@ void XGUI_Workshop::displayGroupResults(DocumentPtr theDoc, std::string theGroup
 {
   for (int i = 0; i < theDoc->size(theGroup); i++)
     myDisplayer->display(theDoc->object(theGroup, i), false);
+}
+
+//**************************************************************
+void XGUI_Workshop::setDisplayMode(const QList<ObjectPtr>& theList, int theMode)
+{
+  foreach(ObjectPtr aObj, theList) {
+    myDisplayer->setDisplayMode(aObj, (XGUI_Displayer::DisplayMode)theMode, false);
+  }
+  if (theList.size() > 0)
+    myDisplayer->updateViewer();
 }

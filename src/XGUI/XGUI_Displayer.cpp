@@ -35,7 +35,7 @@ XGUI_Displayer::~XGUI_Displayer()
 {
 }
 
-bool XGUI_Displayer::isVisible(ObjectPtr theObject)
+bool XGUI_Displayer::isVisible(ObjectPtr theObject) const
 {
   return myResult2AISObjectMap.find(theObject) != myResult2AISObjectMap.end();
 }
@@ -442,3 +442,37 @@ void XGUI_Displayer::deactivateObjectsOutOfContext()
   aContext->RemoveFilters();
   aContext->NotUseDisplayedObjects();
 }
+
+
+void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bool toUpdate)
+{
+  if (theMode == NoMode)
+    return;
+
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
+
+  boost::shared_ptr<GeomAPI_AISObject> aAISObj = getAISObject(theObject);
+  if (!aAISObj)
+    return;
+
+  Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+  aContext->SetDisplayMode(aAISIO, theMode, toUpdate);
+}
+
+
+XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) const
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return NoMode;
+
+  boost::shared_ptr<GeomAPI_AISObject> aAISObj = getAISObject(theObject);
+  if (!aAISObj)
+    return NoMode;
+
+  Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+  return (XGUI_Displayer::DisplayMode) aAISIO->DisplayMode();
+}
+

@@ -37,6 +37,8 @@ class XGUI_Workshop;
 class XGUI_EXPORT XGUI_Displayer
 {
  public:
+   enum DisplayMode { NoMode = -1, Wireframe, Shading };
+
   /// Constructor
   /// \param theViewer the viewer
   XGUI_Displayer(XGUI_Workshop* theWorkshop);
@@ -49,7 +51,7 @@ class XGUI_EXPORT XGUI_Displayer
 
   /// Returns the feature visibility state.
   /// \param theFeature a feature instance
-  bool isVisible(ObjectPtr theObject);
+  bool isVisible(ObjectPtr theObject) const;
 
   /// Display the feature. Obtain the visualized object from the feature.
   /// \param theFeature a feature instance
@@ -131,6 +133,14 @@ class XGUI_EXPORT XGUI_Displayer
                                    Handle(SelectMgr_Filter) theFilter);
 
   void deactivateObjectsOutOfContext();
+
+  /// Sets display mode for the given object if this object is displayed
+  void setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bool toUpdate = true);
+
+  /// Returns current display mode for the given object.
+  /// If object is not displayed then returns NoMode.
+  DisplayMode displayMode(ObjectPtr theObject) const;
+
 
  protected:
   /// Deactivate local selection
