@@ -25,13 +25,16 @@ Q_OBJECT
   XGUI_PropertyPanel(QWidget* theParent);
   virtual ~XGUI_PropertyPanel();
 
+  /// Returns main widget of the property panel, which children will be created
+  /// by WidgetFactory using the XML definition
   QWidget* contentWidget();
+  /// Brings back all widget created by widget factory for signal/slot
+  /// connections and further processing
   void setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets);
+  /// Returns all property panel's widget created by WidgetFactory
   const QList<ModuleBase_ModelWidget*>& modelWidgets() const;
-
+  /// Removes all widgets in the widget area of the property panel
   void cleanContent();
-
-  virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
  public slots:
   void updateContentWidget(FeaturePtr theFeature);
@@ -56,9 +59,7 @@ signals:
 
  private:
   QWidget* myCustomWidget;
-
   QList<ModuleBase_ModelWidget*> myWidgets;
-
   QVBoxLayout* myMainLayout;
 };
 

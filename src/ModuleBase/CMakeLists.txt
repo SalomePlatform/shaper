@@ -16,7 +16,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetFeatureOrAttribute.h
 	ModuleBase_WidgetPoint2D.h
 	ModuleBase_WidgetSwitch.h
-	ModuleBase_WidgetSelector.h
+	ModuleBase_WidgetShapeSelector.h
 	ModuleBase_IWorkshop.h
 	ModuleBase_WidgetPoint2dDistance.h
 	ModuleBase_WidgetValue.h
@@ -43,7 +43,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetFeatureOrAttribute.cpp
 	ModuleBase_WidgetPoint2D.cpp
 	ModuleBase_WidgetSwitch.cpp
-	ModuleBase_WidgetSelector.cpp
+	ModuleBase_WidgetShapeSelector.cpp
 	ModuleBase_WidgetPoint2dDistance.cpp
 	ModuleBase_WidgetValue.cpp
 	ModuleBase_WidgetValueFeature.cpp	

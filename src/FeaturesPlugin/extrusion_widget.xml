@@ -1,5 +1,5 @@
 <source>
-  <selector id="extrusion_face" 
+  <shape_selector id="extrusion_face" 
     label="Select a face" 
     icon=":icons/sketch.png" 
     tooltip="Select a face for extrusion"

@@ -147,6 +147,8 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName("LongOperation"));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_PLUGIN_LOADED));
   aLoop->registerListener(this, Events_Loop::eventByName("CurrentDocumentChanged"));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOSHOW));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
 
   registerValidators();
   activateModule();
@@ -297,6 +299,28 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     else
       QApplication::restoreOverrideCursor();
+  }
+
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TOSHOW)) {
+    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    const std::set<ObjectPtr>& aObjList = anUpdateMsg->objects();
+    QList<ObjectPtr> aList;
+    std::set<ObjectPtr>::const_iterator aIt;
+    for (aIt = aObjList.cbegin(); aIt != aObjList.cend(); ++aIt)
+      aList.append(*aIt);
+    showObjects(aList, true);
+  }
+
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TOHIDE)) {
+    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    const std::set<ObjectPtr>& aObjList = anUpdateMsg->objects();
+    QList<ObjectPtr> aList;
+    std::set<ObjectPtr>::const_iterator aIt;
+    for (aIt = aObjList.cbegin(); aIt != aObjList.cend(); ++aIt)
+      aList.append(*aIt);
+    showObjects(aList, false);
   }
 
   //An operation passed by message. Start it, process and commit.

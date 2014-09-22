@@ -51,7 +51,6 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   aBtn->setToolTip(tr("Ok"));
   aBtn->setFlat(true);
   aBtnLay->addWidget(aBtn);
-  aBtn->installEventFilter(this);
 
   aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
   aBtn->setToolTip(tr("Cancel"));
@@ -62,8 +61,6 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   myCustomWidget = new QWidget(aContent);
   myMainLayout->addWidget(myCustomWidget);
   myMainLayout->addStretch(1);
-
-  aBtn->installEventFilter(this);
 }
 
 XGUI_PropertyPanel::~XGUI_PropertyPanel()
@@ -115,24 +112,6 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
 const QList<ModuleBase_ModelWidget*>& XGUI_PropertyPanel::modelWidgets() const
 {
   return myWidgets;
-}
-
-bool XGUI_PropertyPanel::eventFilter(QObject *theObject, QEvent *theEvent)
-{
-  QPushButton* anOkBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
-  QPushButton* aCancelBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
-  if (theObject == anOkBtn || theObject == aCancelBtn) {
-    if (theEvent->type() == QEvent::KeyRelease) {
-      QKeyEvent* aKeyEvent = (QKeyEvent*) theEvent;
-      if (aKeyEvent && (aKeyEvent->key() == Qt::Key_Return ||
-                        aKeyEvent->key() == Qt::Key_Enter)) {
-        // TODO: this is enter button processing when the focus is on "Apply" or "Cancel" buttons
-        //emit keyReleased("", (QKeyEvent*) theEvent);
-        return true;
-      }
-    }
-  }
-  return QDockWidget::eventFilter(theObject, theEvent);
 }
 
 QWidget* XGUI_PropertyPanel::contentWidget()

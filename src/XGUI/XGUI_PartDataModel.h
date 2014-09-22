@@ -52,9 +52,7 @@ Q_OBJECT
     ParamsFolder,
     ParamObject,
     ConstructFolder,
-    ConstructObject,
-    BodiesFolder,
-    BodiesObject
+    ConstructObject
   };
 
 };
