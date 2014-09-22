@@ -197,6 +197,7 @@ void XGUI_Workshop::initMenu()
 
   aCommand = aGroup->addFeature("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
                                 QIcon(":pictures/rebuild.png"));
+  aCommand->connectTo(this, SLOT(onRebuild()));
 
   aCommand = aGroup->addFeature("SAVEAS_CMD", tr("Save as..."), tr("Save the document into a file"),
                                 QIcon(":pictures/save.png"));
@@ -373,7 +374,7 @@ void XGUI_Workshop::onFeatureUpdatedMsg(const boost::shared_ptr<ModelAPI_ObjectU
       }
     }
   }
-  myOperationMgr->validateCurrentOperation();
+  myOperationMgr->onValidateOperation();
   if (myObjectBrowser)
     myObjectBrowser->processEvent(theMsg);
 }
@@ -385,7 +386,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_Objec
   std::set<ObjectPtr>::const_iterator aIt;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
-    if (!aObj->data() || !aObj->data()->isValid())
+    if (!aObj->data() || !aObj->data()->isValid() || aObj->document()->isConcealed(aObj))
       myDisplayer->erase(aObj, false);
     else {
       if (myDisplayer->isVisible(aObj))  // TODO VSV: Correction sketch drawing
@@ -419,7 +420,8 @@ void XGUI_Workshop::onFeatureCreatedMsg(const boost::shared_ptr<ModelAPI_ObjectU
       // it doesn't stored in the operation mgr and doesn't displayed
     } else if (myOperationMgr->hasOperation()) {
       ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-      if (aOperation->hasObject(*aIt)) {  // Display only current operation results
+      if (!(*aIt)->document()->isConcealed(*aIt) &&
+          aOperation->hasObject(*aIt)) {  // Display only current operation results
         myDisplayer->display(*aIt, false);
         isDisplayed = true;
       }
@@ -476,6 +478,7 @@ void XGUI_Workshop::onOperationStarted()
     }
 
     myPropertyPanel->setModelWidgets(aWidgets);
+    myPropertyPanel->onActivateNextWidget(NULL);
     myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
   }
   updateCommandStatus();
@@ -575,11 +578,14 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
     aCommand = salomeConnector()->command(theOperation->getDescription()->operationId());
   } else {
     XGUI_MainMenu* aMenu = myMainWindow->menuObject();
-    aCommand = aMenu->feature(theOperation->getDescription()->operationId());
+    FeaturePtr aFeature = theOperation->feature();
+    if(aFeature)
+      aCommand = aMenu->feature(QString::fromStdString(aFeature->getKind()));
   }
   //Abort operation on uncheck the command
-  if (aCommand)
+  if (aCommand) {
     connect(aCommand, SIGNAL(triggered(bool)), theOperation, SLOT(setRunning(bool)));
+  }
 }
 
 /*
@@ -595,9 +601,7 @@ void XGUI_Workshop::saveDocument(const QString& theName, std::list<std::string>&
 
 bool XGUI_Workshop::isActiveOperationAborted()
 {
-  if(!myOperationMgr->hasOperation())
-    return true;
-  return myOperationMgr->abortOperation();
+  return myOperationMgr->abortAllOperations();
 }
 
 //******************************************************
@@ -737,7 +741,7 @@ void XGUI_Workshop::onUndo()
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->isOperation())
-    operationMgr()->abortOperation();
+    operationMgr()->onAbortOperation();
   aMgr->undo();
   updateCommandStatus();
 }
@@ -748,9 +752,17 @@ void XGUI_Workshop::onRedo()
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->isOperation())
-    operationMgr()->abortOperation();
+    operationMgr()->onAbortOperation();
   aMgr->redo();
   updateCommandStatus();
+}
+
+//******************************************************
+void XGUI_Workshop::onRebuild()
+{
+  static const Events_ID aRebuildEvent = Events_Loop::loop()->eventByName("Rebuild");
+  Events_Loop::loop()->send(boost::shared_ptr<Events_Message>(
+    new Events_Message(aRebuildEvent, this)));
 }
 
 //******************************************************
@@ -861,8 +873,7 @@ void XGUI_Workshop::updateCommandStatus()
   if (aMgr->hasModuleDocument()) {
     QAction* aUndoCmd;
     QAction* aRedoCmd;
-    foreach(QAction* aCmd, aCommands)
-    {
+    foreach(QAction* aCmd, aCommands) {
       QString aId = aCmd->data().toString();
       if (aId == "UNDO_CMD")
         aUndoCmd = aCmd;
@@ -875,8 +886,7 @@ void XGUI_Workshop::updateCommandStatus()
     aUndoCmd->setEnabled(aMgr->canUndo());
     aRedoCmd->setEnabled(aMgr->canRedo());
   } else {
-    foreach(QAction* aCmd, aCommands)
-    {
+    foreach(QAction* aCmd, aCommands) {
       QString aId = aCmd->data().toString();
       if (aId == "NEW_CMD")
         aCmd->setEnabled(true);
@@ -943,10 +953,8 @@ void XGUI_Workshop::createDockWidgets()
   connect(aOkBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onCommitOperation()));
   QPushButton* aCancelBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
   connect(aCancelBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onAbortOperation()));
-//TODO(sbh): KeyReleasedProblem
   connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)), myOperationMgr,
           SLOT(onKeyReleased(QKeyEvent*)));
-
   connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), myOperationMgr,
           SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
   connect(myOperationMgr, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)), myPropertyPanel,
@@ -1152,16 +1160,27 @@ void XGUI_Workshop::showOnlyObjects(const QList<ObjectPtr>& theList)
 //**************************************************************
 void XGUI_Workshop::updateCommandsOnViewSelection()
 {
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   XGUI_Selection* aSelection = mySelector->selection();
   if (aSelection->getSelected().size() == 0)
     return;
 
+  // Restrict validators to manage only nested (child) features
+  // of the current feature i.e. if current feature is Sketch -
+  // Sketch Features & Constraints can be validated.
+  QStringList aNestedIds;
+  if(myOperationMgr->hasOperation()) {
+    FeaturePtr aFeature = myOperationMgr->currentOperation()->feature();
+    if(aFeature) {
+      aNestedIds << myActionsMgr->nestedCommands(QString::fromStdString(aFeature->getKind()));
+    }
+  }
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   QList<QAction*> aActions = getModuleCommands();
-  foreach(QAction* aAction, aActions)
-  {
+  foreach(QAction* aAction, aActions) {
     QString aId = aAction->data().toString();
+    if(!aNestedIds.contains(aId))
+      continue;
     std::list<ModelAPI_Validator*> aValidators;
     std::list<std::list<std::string> > anArguments;
     aFactory->validators(aId.toStdString(), aValidators, anArguments);

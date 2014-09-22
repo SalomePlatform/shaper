@@ -16,6 +16,7 @@
 #include <Events_Loop.h>
 #include <Events_LongOp.h>
 #include <Events_Error.h>
+#include <Config_PropManager.h>
 
 using namespace std;
 
@@ -23,27 +24,78 @@ Model_Update MY_INSTANCE;  /// the only one instance initialized on load of the 
 
 Model_Update::Model_Update()
 {
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  Events_Loop* aLoop = Events_Loop::loop();
+  static const Events_ID kChangedEvent = aLoop->eventByName("PreferenceChanged");
+  aLoop->registerListener(this, kChangedEvent);
+  static const Events_ID kRebuildEvent = aLoop->eventByName("Rebuild");
+  aLoop->registerListener(this, kRebuildEvent);
+  static const Events_ID kCreatedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED);
+  aLoop->registerListener(this, kCreatedEvent);
+  static const Events_ID kUpdatedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
+  aLoop->registerListener(this, kUpdatedEvent);
+  static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
+  aLoop->registerListener(this, kOpFinishEvent);
+  static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
+  aLoop->registerListener(this, kOpAbortEvent);
+
+  Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild automatically",
+                                   Config_Prop::Bool, "false");
+  isAutomatic = Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
 }
 
 void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
 {
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static const Events_ID kChangedEvent = aLoop->eventByName("PreferenceChanged");
+  static const Events_ID kRebuildEvent = aLoop->eventByName("Rebuild");
+  static const Events_ID kCreatedEvent = aLoop->eventByName(EVENT_OBJECT_CREATED);
+  static const Events_ID kUpdatedEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
+  static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
+  static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
+  bool isAutomaticChanged = false;
+  if (theMessage->eventID() == kChangedEvent) { // automatic and manual rebuild flag is changed
+    isAutomatic = 
+      Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
+  } else if (theMessage->eventID() == kRebuildEvent) { // the rebuild command
+    if (isAutomatic == false) {
+      isAutomaticChanged = true;
+      isAutomatic = true;
+    }
+  } else if (theMessage->eventID() == kCreatedEvent || theMessage->eventID() == kUpdatedEvent) {
+    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    const std::set<ObjectPtr>& anObjs = aMsg->objects();
+    std::set<ObjectPtr>::const_iterator anObjIter = anObjs.cbegin();
+    for(; anObjIter != anObjs.cend(); anObjIter++)
+      myJustCreatedOrUpdated.insert(*anObjIter);
+  } else if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent) {
+    myJustCreatedOrUpdated.clear();
+    return;
+  }
+
   if (isExecuted)
     return;  // nothing to do: it is executed now
+
   //Events_LongOp::start(this);
   isExecuted = true;
+  list<boost::shared_ptr<ModelAPI_Document> > aDocs;
   boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
       boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
-  myInitial = aMsg->objects();
+  if (aMsg) myInitial = aMsg->objects();
+  else {
+    myInitial.clear();
+    // on change flag all documents must be updated
+    if (isAutomatic) {
+      aDocs = ModelAPI_Session::get()->allOpenedDocuments();
+    }
+  }
   // collect all documents involved into the update
-  set<boost::shared_ptr<ModelAPI_Document> > aDocs;
   set<boost::shared_ptr<ModelAPI_Object> >::iterator aFIter = myInitial.begin();
   for (; aFIter != myInitial.end(); aFIter++) {
-    aDocs.insert((*aFIter)->document());
+    aDocs.push_back((*aFIter)->document());
   }
   // iterate all features of features-documents to update them (including hidden)
-  set<boost::shared_ptr<ModelAPI_Document> >::iterator aDIter = aDocs.begin();
+  list<boost::shared_ptr<ModelAPI_Document> >::iterator aDIter = aDocs.begin();
   for (; aDIter != aDocs.end(); aDIter++) {
     int aNbFeatures = (*aDIter)->size(ModelAPI_Feature::group(), true);
     for (int aFIndex = 0; aFIndex < aNbFeatures; aFIndex++) {
@@ -55,9 +107,10 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
   }
   myUpdated.clear();
   // flush
-  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  Events_Loop::loop()->flush(EVENT_DISP);
+  static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  aLoop->flush(EVENT_DISP);
   //Events_LongOp::end(this);
+  if (isAutomaticChanged) isAutomatic = false;
   isExecuted = false;
 }
 
@@ -69,6 +122,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
   // check all features this feature depended on (recursive call of updateFeature)
   bool aMustbeUpdated = myInitial.find(theFeature) != myInitial.end();
   if (theFeature) {  // only real feature contains references to other objects
+    if (theFeature->data()->mustBeUpdated()) aMustbeUpdated = true;
     // references
     list<boost::shared_ptr<ModelAPI_Attribute> > aRefs = theFeature->data()->attributes(
         ModelAPI_AttributeReference::type());
@@ -119,12 +173,31 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
           !theFeature->isPersistentResult()) {
         ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
         if (aFactory->validate(theFeature)) {
-          try {
-            theFeature->execute();
-          } catch(...) {
-            Events_Error::send(
-              "Feature " + theFeature->getKind() + " has failed during the execution");
-            theFeature->eraseResults();
+          if (isAutomatic || (myJustCreatedOrUpdated.find(theFeature) != myJustCreatedOrUpdated.end()) ||
+            !theFeature->isPersistentResult() /* execute quick, not persistent results */) {
+            try {
+              theFeature->execute();
+            } catch(...) {
+              Events_Error::send(
+                "Feature " + theFeature->getKind() + " has failed during the execution");
+              theFeature->eraseResults();
+            }
+            theFeature->data()->mustBeUpdated(false);
+            const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
+            std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+            for (; aRIter != aResults.cend(); aRIter++) {
+              boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+              aRes->data()->mustBeUpdated(false);
+            }
+          } else {
+            theFeature->data()->mustBeUpdated(true);
+            const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
+            std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+            for (; aRIter != aResults.cend(); aRIter++) {
+              boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+              aRes->data()->mustBeUpdated(true);
+            }
+            aMustbeUpdated = false;
           }
         } else {
           theFeature->eraseResults();

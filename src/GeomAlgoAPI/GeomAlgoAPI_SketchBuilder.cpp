@@ -196,7 +196,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
             aProcEdges.pop_back();
           } while (aCurVertex != aProcVertexes.back());
           aCurDir = aCN.Reversed();
-          //aCurNorm = aNorm.Reversed();
+          aCurNorm = aNorm.Reversed();
           continue;
         }
       }
@@ -229,16 +229,67 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
       std::list<TopoDS_Edge>::iterator aCopyELoop = anEdgeIter;
       removeWasteEdges(aVertIter, anEdgeIter, aProcVertexes.end(), aProcEdges.end(), aMapVE);
 
-      // Recalculate current vertex and current direction
-      aProcEdges.clear();
-      aProcVertexes.clear();
-      if (aMapVE.Extent() > 0)
-      {
-        aNextVertex = findStartVertex(aMapVE, aDirX, aDirY);
-        aProcVertexes.push_back(aNextVertex);
+      // revert the list of remaining edges
+      std::list<TopoDS_Vertex> aRemainVertexes;
+      for (; aVertIter != aProcVertexes.end(); aVertIter++)
+        aRemainVertexes.push_front(*aVertIter);
+      std::list<TopoDS_Edge> aRemainEdges;
+      for (; anEdgeIter != aProcEdges.end(); anEdgeIter++)
+        aRemainEdges.push_front(*anEdgeIter);
+      // remove edges and vertexes used in the loop and add remaining ones
+      if (aCopyVLoop != aProcVertexes.begin()) {
+        aVertIter = aCopyVLoop;
+        aVertIter--;
+      } else
+        aVertIter = aProcVertexes.end();
+      aProcVertexes.erase(aCopyVLoop, aProcVertexes.end());
+      aProcVertexes.insert(aProcVertexes.end(), aRemainVertexes.begin(), aRemainVertexes.end());
+      if (aCopyELoop != aProcEdges.begin()) {
+        anEdgeIter = aCopyELoop;
+        anEdgeIter--;
+      } else
+        anEdgeIter = aProcEdges.end();
+      aProcEdges.erase(aCopyELoop, aProcEdges.end());
+      aProcEdges.insert(aProcEdges.end(), aRemainEdges.begin(), aRemainEdges.end());
+
+      if (aVertIter == aProcVertexes.end())
+        aVertIter = aProcVertexes.begin();
+      else
+        aVertIter++;
+      if (anEdgeIter == aProcEdges.end())
+        anEdgeIter = aProcEdges.begin();
+      else
+        anEdgeIter++;
+      aCopyVLoop = aVertIter;
+      aCopyELoop = anEdgeIter;
+
+      if (aVertIter != aProcVertexes.end() && 
+          aMapVE.Contains(*aVertIter) && aMapVE.FindFromKey(*aVertIter).Extent() <= 1)
+        removeWasteEdges(aVertIter, anEdgeIter, aProcVertexes.end(), aProcEdges.end(), aMapVE);
+      if (aCopyVLoop != aVertIter)
+        aProcVertexes.erase(aCopyVLoop, aVertIter);
+      if (aCopyELoop != anEdgeIter)
+        aProcEdges.erase(aCopyELoop, anEdgeIter);
+
+      // Check whether the next vertex already exists
+      if (aVertIter != aProcVertexes.end())
+        aVertIter++;
+      if (aVertIter != aProcVertexes.end() && anEdgeIter != aProcEdges.end()) {
+        aNextVertex = *aVertIter;
+        aNextDir = getOuterEdgeDirection(*anEdgeIter, aNextVertex);
+        aProcVertexes.erase(++aVertIter, aProcVertexes.end());
+        aProcEdges.erase(++anEdgeIter, aProcEdges.end());
+      } else {
+        // Recalculate current vertex and current direction
+        aProcEdges.clear();
+        aProcVertexes.clear();
+        if (aMapVE.Extent() > 0) {
+          aNextVertex = findStartVertex(aMapVE, aDirX, aDirY);
+          aProcVertexes.push_back(aNextVertex);
+        }
+        aNextDir = aDirY.Reversed();
+        aCurNorm = aNorm.Reversed();
       }
-      aNextDir = aDirY.Reversed();
-      aCurNorm = aNorm.Reversed();
     }
 
     // if next vertex connected only to alone edge, this is a part of wire (not a closed loop),
@@ -353,7 +404,7 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
           aCut.Build();
           TopExp_Explorer anExp(aCut.Shape(), TopAbs_FACE);
           bool isFirstFace = true;
-          for (anExp.Next(); anExp.More(); anExp.Next()) {
+          for (; anExp.More(); anExp.Next()) {
             if (anExp.Current().ShapeType() != TopAbs_FACE) continue;
             if (isFirstFace) {
               (*anIter2)->setImpl(new TopoDS_Shape(anExp.Current()));
@@ -370,7 +421,7 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
         aCut.Build();
         TopExp_Explorer anExp(aCut.Shape(), TopAbs_FACE);
         bool isFirstFace = true;
-        for (anExp.Next(); anExp.More(); anExp.Next()) {
+        for (; anExp.More(); anExp.Next()) {
           if (anExp.Current().ShapeType() != TopAbs_FACE) continue;
           if (isFirstFace) {
             (*anIter1)->setImpl(new TopoDS_Shape(anExp.Current()));
@@ -416,6 +467,7 @@ void findNextVertex(const TopoDS_Vertex& theStartVertex,
                     TopoDS_Edge& theNextEdge, gp_Dir& theNextDir)
 {
   const BOPCol_ListOfShape& anEdgesList = theVertexEdgeMap.FindFromKey(theStartVertex);
+  int anEdgesNum = anEdgesList.Extent();
   BOPCol_ListOfShape::Iterator aEdIter(anEdgesList);
   double aBestEdgeProj = DBL_MAX;
   for (; aEdIter.More(); aEdIter.Next()) {
@@ -427,7 +479,7 @@ void findNextVertex(const TopoDS_Vertex& theStartVertex,
     // where (-1, 0] corresponds to the angles (pi/2, 0] between theStartDir and aTang
     // and [0, 1) corresponds to the angles [0, -pi/2)
     double aProj = (aTang.Dot(theStartDir) - 1.0) * 0.5;
-    if (fabs(fabs(aProj) - 1) < tolerance)
+    if (anEdgesNum > 1 && fabs(fabs(aProj) - 1) < tolerance)
       continue;
     if (theStartDir.DotCross(aTang, theNormal) < tolerance)
       aProj *= -1.0;

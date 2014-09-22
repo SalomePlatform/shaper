@@ -64,12 +64,18 @@ void ModelAPI_Feature::removeResult(const boost::shared_ptr<ModelAPI_Result>& th
 {
   std::list<boost::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
   for(; aResIter != myResults.end(); aResIter++) {
-    if (*aResIter == theResult) {
-      std::string aGroup = (*aResIter)->groupName();
-      (*aResIter)->data()->erase();
+    ResultPtr aRes = *aResIter;
+    if (aRes == theResult) {
+      std::string aGroup = aRes->groupName();
+      aRes->data()->erase();
       myResults.erase(aResIter);
+
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+      static Events_Loop* aLoop = Events_Loop::loop();
+      static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
       ModelAPI_EventCreator::get()->sendDeleted(document(), aGroup);
+      aECreator->sendUpdated(aRes, EVENT_DISP);
       break;
     }
   }
@@ -77,13 +83,22 @@ void ModelAPI_Feature::removeResult(const boost::shared_ptr<ModelAPI_Result>& th
 
 void ModelAPI_Feature::eraseResults()
 {
-  std::list<boost::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
-  for(; aResIter != myResults.end(); aResIter++) {
+  if (!myResults.empty()) {
+    static Events_Loop* aLoop = Events_Loop::loop();
+    static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+
+    std::list<boost::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
+    for(; aResIter != myResults.end(); aResIter++) {
       (*aResIter)->data()->erase();
-      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
       ModelAPI_EventCreator::get()->sendDeleted(document(), (*aResIter)->groupName());
+      aECreator->sendUpdated(*aResIter, EVENT_DISP);
+    }
+    myResults.clear();
+    // flush it to avoid left presentations after input of invalid arguments (radius=0)
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+    Events_Loop::loop()->flush(anEvent);
   }
-  myResults.clear();
 }
 
 boost::shared_ptr<ModelAPI_Document> ModelAPI_Feature::documentToAdd()
@@ -91,13 +106,24 @@ boost::shared_ptr<ModelAPI_Document> ModelAPI_Feature::documentToAdd()
   return ModelAPI_Session::get()->activeDocument();
 }
 
-ModelAPI_Feature::~ModelAPI_Feature()
+void ModelAPI_Feature::erase()
 {
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+
   while (!myResults.empty()) {  // remove one by one with messages
     boost::shared_ptr<ModelAPI_Result> aRes = *(myResults.begin());
     myResults.erase(myResults.begin());
-    ModelAPI_EventCreator::get()->sendDeleted(aRes->document(), aRes->groupName());
+    aECreator->sendDeleted(aRes->document(), aRes->groupName());
+    aECreator->sendUpdated(aRes, EVENT_DISP);
   }
+  ModelAPI_Object::erase();
+}
+
+ModelAPI_Feature::~ModelAPI_Feature()
+{
+  erase();
 }
 
 FeaturePtr ModelAPI_Feature::feature(ObjectPtr theObject)

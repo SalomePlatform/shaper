@@ -127,11 +127,6 @@ void PartSet_Module::featureCreated(QAction* theFeature)
   connect(theFeature, SIGNAL(triggered(bool)), this, SLOT(onFeatureTriggered()));
 }
 
-QStringList PartSet_Module::nestedFeatures(QString)
-{
-  return QStringList();
-}
-
 std::string PartSet_Module::featureFile(const std::string& theFeatureId)
 {
   return myFeaturesInFiles[theFeatureId];

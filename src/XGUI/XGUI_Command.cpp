@@ -1,6 +1,8 @@
 #include "XGUI_Command.h"
 #include <QEvent>
 #include <QToolButton>
+#include <QVariant>
+#include <QDebug>
 
 XGUI_Command::XGUI_Command(const QString& theId, QObject * parent, bool isCheckable)
     : QWidgetAction(parent),

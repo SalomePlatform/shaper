@@ -41,8 +41,6 @@ Q_OBJECT
   /// Called on creation of menu item in desktop
   virtual void featureCreated(QAction* theFeature);
 
-  /// Returnc list of nested commands for the given feature
-  virtual QStringList nestedFeatures(QString theFeature);
   std::string featureFile(const std::string&);
 
   /// Creates an operation and send it to loop

@@ -88,10 +88,8 @@ class Config_Prop
   {
     return myValue;
   }
-  void setValue(const std::string& theValue)
-  {
-    myValue = theValue;
-  }
+
+  CONFIG_EXPORT void setValue(const std::string& theValue);
 
   bool operator==(const Config_Prop* theProp) const
   {

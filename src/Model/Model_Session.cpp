@@ -46,11 +46,17 @@ void Model_Session::startOperation()
 void Model_Session::finishOperation()
 {
   ROOT_DOC->finishOperation();
+  static boost::shared_ptr<Events_Message> aFinishMsg
+    (new Events_Message(Events_Loop::eventByName("FinishOperation")));
+  Events_Loop::loop()->send(aFinishMsg);
 }
 
 void Model_Session::abortOperation()
 {
   ROOT_DOC->abortOperation();
+  static boost::shared_ptr<Events_Message> anAbortMsg
+    (new Events_Message(Events_Loop::eventByName("AbortOperation")));
+  Events_Loop::loop()->send(anAbortMsg);
 }
 
 bool Model_Session::isOperation()
@@ -90,7 +96,14 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
 
   LoadPluginsInfo();
   if (myPlugins.find(theFeatureID) != myPlugins.end()) {
-    myCurrentPluginName = myPlugins[theFeatureID];
+    std::pair<std::string, std::string>& aPlugin = myPlugins[theFeatureID]; // plugin and doc kind
+    if (!aPlugin.second.empty() && aPlugin.second != activeDocument()->kind()) {
+      Events_Error::send(
+          string("Feature '") + theFeatureID + "' can not be created in document '"
+              + aPlugin.second + "' by the XML definition");
+      return FeaturePtr();
+    }
+    myCurrentPluginName = aPlugin.first;
     if (myPluginObjs.find(myCurrentPluginName) == myPluginObjs.end()) {
       // load plugin library if not yet done
       Config_ModuleReader::loadLibrary(myCurrentPluginName);
@@ -140,6 +153,27 @@ void Model_Session::setActiveDocument(boost::shared_ptr<ModelAPI_Document> theDo
   }
 }
 
+std::list<boost::shared_ptr<ModelAPI_Document> > Model_Session::allOpenedDocuments()
+{
+  list<boost::shared_ptr<ModelAPI_Document> > aResult;
+  aResult.push_back(moduleDocument());
+  // add subs recursively
+  list<boost::shared_ptr<ModelAPI_Document> >::iterator aDoc = aResult.begin();
+  for(; aDoc != aResult.end(); aDoc++) {
+    DocumentPtr anAPIDoc = *aDoc;
+    boost::shared_ptr<Model_Document> aDoc = boost::dynamic_pointer_cast<Model_Document>(anAPIDoc);
+    if (aDoc) {
+      std::set<std::string>::const_iterator aSubIter = aDoc->subDocuments().cbegin();
+      for(; aSubIter != aDoc->subDocuments().cend(); aSubIter++) {
+        if (!Model_Application::getApplication()->isLoadByDemand(*aSubIter)) {
+          aResult.push_back(Model_Application::getApplication()->getDocument(*aSubIter));
+        }
+      }
+    }
+  }
+  return aResult;
+}
+
 boost::shared_ptr<ModelAPI_Document> Model_Session::copy(
     boost::shared_ptr<ModelAPI_Document> theSource, std::string theID)
 {
@@ -186,7 +220,8 @@ void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMes
     if (aMsg) {
       // proccess the plugin info, load plugin
       if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
-        myPlugins[aMsg->id()] = aMsg->pluginLibrary();
+        myPlugins[aMsg->id()] = std::pair<std::string, std::string>(
+          aMsg->pluginLibrary(), aMsg->documentKind());
       }
     }
     // plugins information was started to load, so, it will be loaded

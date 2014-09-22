@@ -61,10 +61,10 @@ void XGUI_ActionsMgr::update()
   if (myOperationMgr->hasOperation()) {
     setAllEnabled(false);
     ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
-    QString anOperationId = anOperation->id();
-    setActionEnabled(anOperationId, true);
-    bool isNestedEnabled = anOperation->isNestedOperationsEnabled();
-    setNestedCommandsEnabled(isNestedEnabled, anOperationId);
+    FeaturePtr aFeature = anOperation->feature();
+    QString aFeatureId = QString::fromStdString(aFeature->getKind());
+    setActionEnabled(aFeatureId, true);
+    setNestedStackEnabled(anOperation);
   } else {
     setAllEnabled(true);
     setNestedCommandsEnabled(false);
@@ -80,20 +80,30 @@ void XGUI_ActionsMgr::setAllEnabled(bool isEnabled)
   }
 }
 
+void XGUI_ActionsMgr::setNestedStackEnabled(ModuleBase_Operation* theOperation)
+{
+  if(theOperation == NULL)
+    return;
+  FeaturePtr aFeature = theOperation->feature();
+  QString aFeatureId = QString::fromStdString(aFeature->getKind());
+  bool isNestedEnabled = theOperation->isNestedOperationsEnabled();
+  setNestedCommandsEnabled(isNestedEnabled, aFeatureId);
+
+  setNestedStackEnabled(myOperationMgr->previousOperation(theOperation));
+}
+
 //!
 void XGUI_ActionsMgr::setNestedCommandsEnabled(bool theEnabled, const QString& theParent)
 {
   QStringList ltNestedActions;
   if (theParent.isEmpty()) {  //Disable ALL nested
-    foreach(QString eachParent, myNestedActions.keys())
-    {
+    foreach(QString eachParent, myNestedActions.keys()) {
       ltNestedActions << myNestedActions[eachParent];
     }
   } else {
     ltNestedActions << myNestedActions[theParent];
   }
-  foreach(QString eachNested, ltNestedActions)
-  {
+  foreach(QString eachNested, ltNestedActions) {
     setActionEnabled(eachNested, theEnabled);
   }
 }
@@ -117,13 +127,11 @@ void XGUI_ActionsMgr::setActionEnabled(const QString& theId, const bool theEnabl
 void XGUI_ActionsMgr::updateCheckState()
 {
   QString eachCommand = QString();
-  foreach(eachCommand, myActions.keys())
-  {
+  foreach(eachCommand, myActions.keys()) {
     setActionChecked(eachCommand, false);
   }
   QStringList ltActiveCommands = myOperationMgr->operationList();
-  foreach(eachCommand, ltActiveCommands)
-  {
+  foreach(eachCommand, ltActiveCommands) {
     setActionChecked(eachCommand, true);
   }
 }

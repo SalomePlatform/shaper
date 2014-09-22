@@ -11,7 +11,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_PointBuilder.h
     GeomAlgoAPI_SketchBuilder.h
     GeomAlgoAPI_Extrusion.h
-	GeomAlgoAPI_Boolean.h
+    GeomAlgoAPI_Boolean.h
 )
 
 SET(PROJECT_SOURCES
@@ -21,7 +21,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_PointBuilder.cpp
     GeomAlgoAPI_SketchBuilder.cpp
     GeomAlgoAPI_Extrusion.cpp
-	GeomAlgoAPI_Boolean.cpp
+    GeomAlgoAPI_Boolean.cpp
 )
 
 ADD_DEFINITIONS(-DGEOMALGOAPI_EXPORTS ${CAS_DEFINITIONS})

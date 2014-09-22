@@ -6,6 +6,7 @@
 #define ModelAPI_Object_H_
 
 #include "ModelAPI.h"
+#include "ModelAPI_Data.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -66,7 +67,14 @@ class ModelAPI_Object
     myDoc = theDoc;
   }
 
+  /// removes all fields from this feature
+  MODELAPI_EXPORT virtual void erase() {
+    if (myData) myData->erase();
+    setData(DataPtr());
+  }
+
   friend class Model_Document;
+
 };
 
 typedef boost::shared_ptr<ModelAPI_Object> ObjectPtr;

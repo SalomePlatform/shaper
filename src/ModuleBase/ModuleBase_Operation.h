@@ -72,7 +72,9 @@ Q_OBJECT
   /// Returns True if the current operation works with the given object (feature or result)
   virtual bool hasObject(ObjectPtr theObj) const;
 
-  virtual void keyReleased(const int theKey);
+  virtual void keyReleased(const int theKey) {};
+
+  virtual void activateNextToCurrentWidget() {};
 
  public slots:
   /// Slots which listen the mode widget activation

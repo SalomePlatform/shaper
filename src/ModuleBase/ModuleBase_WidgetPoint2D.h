@@ -53,11 +53,6 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-  /// Process key release envent on the widget spin box controls
-  /// \param theObject the object where the event happens
-  /// \param theEvent the processed event
-  virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
-
   bool initFromPrevious(ObjectPtr theObject);
 
 signals:

@@ -91,6 +91,13 @@ class MODELAPI_EXPORT ModelAPI_Data
   {
   }
 
+  /// Makes feature must be updated later (on rebuild). Normally the Updater must call it
+  /// in case of not-automatic update to true
+  virtual void mustBeUpdated(const bool theFlag) = 0;
+
+  /// Returns true if feature must be updated (re-executed) on rebuild
+  virtual bool mustBeUpdated() = 0;
+
  protected:
   /// Objects are created for features automatically
   ModelAPI_Data()

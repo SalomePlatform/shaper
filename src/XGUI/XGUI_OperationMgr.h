@@ -41,21 +41,29 @@ Q_OBJECT
   bool hasOperation() const;
   /// Returns number of operations in the stack
   int operationsCount() const;
+  /// Returns list of all operations IDs
+  QStringList operationList() const;
+
+  /// Returns previous (parent) operation if given operation started.
+  /// else, or if there is no parent - returns NULL
+  ModuleBase_Operation* previousOperation(ModuleBase_Operation* theOperation) const;
+
+  virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
+
   /// Start the operation and append it to the stack of operations
   /// \param theOperation the started operation
   /// \return the state whether the current operation is started
   bool startOperation(ModuleBase_Operation* theOperation);
 
-  /// Abort the operation and append it to the stack of operations
-  /// \return the state whether the current operation is aborted
-  bool abortOperation();
-  ///Returns list of all operations IDs
-  QStringList operationList();
-
-  virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
+  bool abortAllOperations();
 
  public slots:
-  void validateCurrentOperation();
+  /// Slot that commits the current operation.
+  void onCommitOperation();
+  /// Slot that aborts the current operation.
+  void onAbortOperation();
+  /// Slot that validates the current operation using the validateOperation method.
+  void onValidateOperation();
 
 signals:
   /// Signal about an operation is started. It is emitted after the start() of operation is done.
@@ -72,35 +80,30 @@ signals:
   void activateNextWidget(ModuleBase_ModelWidget* theWidget);
 
  protected:
+
+  /// Commits the current operatin if it is valid
+  bool commitOperation();
   /// Sets the current operation or NULL
   /// \param theOperation the started operation
   /// \param isCheckBeforeStart the flag whether to check whether the operation can be started
   /// \return the state whether the operation is resumed
   void resumeOperation(ModuleBase_Operation* theOperation);
 
+  /// Checks if given operation is Valid, if so sends operationValidated signal
+  /// \param theOperation to be validated
+  /// \return validation state (true means valid)
+  bool validateOperation(ModuleBase_Operation* theOperation);
   /// Returns whether the operation can be started. Check if there is already started operation and
   /// the granted parameter of the launched operation
   /// \param theOperation an operation to check
   bool canStartOperation(ModuleBase_Operation* theOperation);
 
-  /// Returns whether the operation can be stopped.
   bool canStopOperation();
 
   /// Returns true if the operation can be aborted
   bool canAbortOperation();
 
-  void validateOperation(ModuleBase_Operation* theOperation);
-
- protected slots:
-  /// Slot that commits the current operation.
-  void onCommitOperation();
-  /// Slot that aborts the current operation.
-  void onAbortOperation();
-
-  /// Slot that is called by an operation stop. Removes the stopped operation form the stack.
-  /// If there is a suspended operation, restart it.
-  void onOperationStopped();
-
+ public slots:
   /// SLOT, that is called by the key in the property panel is clicked.
   /// \param theName the attribute name
   /// \param theEvent the mouse event
@@ -109,6 +112,11 @@ signals:
   /// SLOT, that reacts to the widget activation
   /// \param theWidget an activated widget
   void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
+
+  protected slots:
+  /// Slot that is called by an operation stop. Removes the stopped operation form the stack.
+  /// If there is a suspended operation, restart it.
+  void onOperationStopped();
 
  private:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations

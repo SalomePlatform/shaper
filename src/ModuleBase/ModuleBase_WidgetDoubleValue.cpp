@@ -128,20 +128,3 @@ QList<QWidget*> ModuleBase_WidgetDoubleValue::getControls() const
   aList.append(mySpinBox);
   return aList;
 }
-
-bool ModuleBase_WidgetDoubleValue::eventFilter(QObject *theObject, QEvent *theEvent)
-{
-  if (theObject == mySpinBox) {
-    if (theEvent->type() == QEvent::KeyRelease) {
-      QKeyEvent* aKeyEvent = (QKeyEvent*) theEvent;
-      if (aKeyEvent && (aKeyEvent->key() == Qt::Key_Return ||
-                        aKeyEvent->key() == Qt::Key_Enter)) {
-        emit focusOutWidget(this);
-      }
-      emit keyReleased((QKeyEvent*) theEvent);
-      return true;
-    }
-  }
-  return ModuleBase_ModelWidget::eventFilter(theObject, theEvent);
-}
-

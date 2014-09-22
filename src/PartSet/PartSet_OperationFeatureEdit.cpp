@@ -161,14 +161,6 @@ void PartSet_OperationFeatureEdit::mouseDoubleClick(
   }
 }
 
-void PartSet_OperationFeatureEdit::keyReleased(const int theKey)
-{
-  if (theKey == Qt::Key_Return || theKey == Qt::Key_Enter) {
-    commit();
-  } else
-    PartSet_OperationSketchBase::keyReleased(theKey);
-}
-
 void PartSet_OperationFeatureEdit::startOperation()
 {
   PartSet_OperationSketchBase::startOperation();

@@ -39,7 +39,7 @@ Model_ObjectUpdatedMessage::Model_ObjectUpdatedMessage(const ObjectPtr& theObjec
     myObjects.insert(theObject);
 }
 
-std::set<ObjectPtr> Model_ObjectUpdatedMessage::objects() const
+const std::set<ObjectPtr>& Model_ObjectUpdatedMessage::objects() const
 {
   return myObjects;
 }

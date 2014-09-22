@@ -20,6 +20,7 @@
 #include <Events_Error.h>
 
 #include <TDataStd_Name.hxx>
+#include <TDataStd_UAttribute.hxx>
 
 #include <string>
 
@@ -282,4 +283,19 @@ void Model_Data::erase()
 {
   if (!myLab.IsNull())
     myLab.ForgetAllAttributes();
+}
+
+Standard_GUID kMustBeUpdatedGUID("baede74c-31a6-4416-9c4d-e48ce65f2005");
+
+void Model_Data::mustBeUpdated(const bool theFlag)
+{
+  if (theFlag)
+    TDataStd_UAttribute::Set(myLab, kMustBeUpdatedGUID);
+  else
+    myLab.ForgetAttribute(kMustBeUpdatedGUID);
+}
+
+bool Model_Data::mustBeUpdated()
+{
+  return myLab.IsAttribute(kMustBeUpdatedGUID) == Standard_True;
 }

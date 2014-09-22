@@ -129,6 +129,13 @@ class Model_Data : public ModelAPI_Data
   }
 
   MODEL_EXPORT virtual void erase();
+
+  /// Makes feature must be updated later (on rebuild). Normally the Updater must call it
+  /// in case of not-automatic update to true
+  MODEL_EXPORT virtual void mustBeUpdated(const bool theFlag);
+
+  /// Returns true if feature must be updated (re-executed) on rebuild
+  MODEL_EXPORT virtual bool mustBeUpdated();
 };
 
 #endif

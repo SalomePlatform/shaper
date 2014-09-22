@@ -16,6 +16,7 @@
 class XGUI_Command;
 class XGUI_Workshop;
 class XGUI_OperationMgr;
+class ModuleBase_Operation;
 class QAction;
 
 class XGUI_EXPORT XGUI_ActionsMgr : public QObject
@@ -51,6 +52,8 @@ Q_OBJECT
  protected:
   //! Sets all actions to isEnabled state.
   void setAllEnabled(bool isEnabled);
+  //! Sets to isEnabled state all siblings of the given operation and it's parents recursively
+  void setNestedStackEnabled(ModuleBase_Operation* theOperation);
   //! Sets all nested actions to isEnabled state for the command with given ID.
   //! If ID is empty - all nested actions will be affected.
   void setNestedCommandsEnabled(bool isEnabled, const QString& theParent = QString());

@@ -114,10 +114,6 @@ Q_OBJECT
                                 const std::list<ModuleBase_ViewerPrs>& theSelected,
                                 const std::list<ModuleBase_ViewerPrs>& theHighlighted);
 
-  /// Processes the key pressed in the view
-  /// \param theKey a key value
-  virtual void keyReleased(const int theKey);
-
   /// Emits a signal about the operation start. This signal has an information about the feature.
   /// If the provided feature is empty, the current operation feature is used.
   /// \param theType a type of an operation started

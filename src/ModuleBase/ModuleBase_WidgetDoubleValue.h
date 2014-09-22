@@ -43,11 +43,6 @@ Q_OBJECT
     return myContainer;
   }
 
-  /// Process key release envent on the widget spin box controls
-  /// \param theObject the object where the event happens
-  /// \param theEvent the processed event
-  virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
-
  public slots:
  /// Delayed value chnged: when user starts typing something,
  // it gives him a 0,5 second to finish typing, when sends valueChnaged() signal

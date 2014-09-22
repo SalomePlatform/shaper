@@ -115,6 +115,9 @@ class SketchPlugin_Sketch : public SketchPlugin_Feature, public GeomAPI_IPresent
 
   virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
+  /// removes also all sub-sketch elements
+  SKETCHPLUGIN_EXPORT virtual void erase();
+
  protected:
   /// Creates a plane and append it to the list
   /// \param theX the X normal value

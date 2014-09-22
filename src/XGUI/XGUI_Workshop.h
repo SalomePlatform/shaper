@@ -198,6 +198,7 @@ signals:
   void onExit();
   void onUndo();
   void onRedo();
+  void onRebuild();
   void onPreferences();
 
   void showPropertyPanel();

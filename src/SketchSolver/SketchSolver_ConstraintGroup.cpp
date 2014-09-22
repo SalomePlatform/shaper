@@ -418,6 +418,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
                                                      aEnd);
       myEntities.push_back(aLineEntity);
       myEntityFeatMap[theEntity] = aLineEntity.h;
+      myNeedToSolve = true;
       return aLineEntity.h;
     }
     // Circle
@@ -435,6 +436,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
                                                   myWorkplane.normal, aRadius);
       myEntities.push_back(aCircleEntity);
       myEntityFeatMap[theEntity] = aCircleEntity.h;
+      myNeedToSolve = true;
       return aCircleEntity.h;
     }
     // Arc
@@ -451,6 +453,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
                                                      myWorkplane.normal, aCenter, aStart, aEnd);
       myEntities.push_back(anArcEntity);
       myEntityFeatMap[theEntity] = anArcEntity.h;
+      myNeedToSolve = true;
       return anArcEntity.h;
     }
     // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
@@ -463,6 +466,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
 
       // Both the sketch point and its attribute (coordinates) link to the same SolveSpace point identifier
       myEntityFeatMap[theEntity] = aPoint;
+      myNeedToSolve = true;
       return aPoint;
     }
   }
@@ -794,7 +798,7 @@ bool SketchSolver_ConstraintGroup::updateGroup()
   bool isAllValid = true;
   bool isCCRemoved = false;  // indicates that at least one of coincidence constraints was removed
   while (isAllValid && aConstrIter != myConstraintMap.rend()) {
-    if (!aConstrIter->first->data()->isValid()) {
+    if (!aConstrIter->first->data() || !aConstrIter->first->data()->isValid()) {
       if (aConstrIter->first->getKind().compare(SketchPlugin_ConstraintCoincidence::ID()) == 0)
         isCCRemoved = true;
       std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::reverse_iterator aCopyIter =
@@ -813,7 +817,7 @@ bool SketchSolver_ConstraintGroup::updateGroup()
 
     std::set<boost::shared_ptr<SketchPlugin_Constraint> >::iterator aCIter = anExtraCopy.begin();
     for (; aCIter != anExtraCopy.end(); aCIter++)
-      if ((*aCIter)->data()->isValid())
+      if ((*aCIter)->data() && (*aCIter)->data()->isValid())
         changeConstraint(*aCIter);
   }
 

@@ -1,0 +1,28 @@
+INCLUDE(Common)
+
+SET(PROJECT_HEADERS
+    GeomValidators.h
+    GeomValidators_Positive.h
+)
+
+SET(PROJECT_SOURCES
+    GeomValidators_Positive.cpp
+)
+
+SET(PROJECT_LIBRARIES
+    ModelAPI 
+    Events 
+)
+
+
+
+ADD_DEFINITIONS(-DGEOMVALIDATORS_EXPORTS ${BOOST_DEFINITIONS})
+ADD_LIBRARY(GeomValidators SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+TARGET_LINK_LIBRARIES(GeomValidators ${PROJECT_LIBRARIES})
+
+INCLUDE_DIRECTORIES(
+  ../ModelAPI
+  ../Events
+)
+
+INSTALL(TARGETS GeomValidators DESTINATION plugins)

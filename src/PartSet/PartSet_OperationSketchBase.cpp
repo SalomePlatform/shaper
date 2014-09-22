@@ -96,29 +96,6 @@ void PartSet_OperationSketchBase::mouseDoubleClick(
 {
 }
 
-void PartSet_OperationSketchBase::keyReleased(const int theKey)
-{
-  switch (theKey) {
-    case Qt::Key_Escape: {
-      bool toAbort = true;
-      if (isModified()) {
-        int anAnswer = QMessageBox::question(
-            qApp->activeWindow(),
-            tr("Cancel operation"),
-            tr("Do you want to cancel %1 operation?").arg(id()),
-            QMessageBox::Yes,
-            QMessageBox::No);
-        toAbort = (anAnswer == QMessageBox::Yes);
-      }
-      if (toAbort)
-        abort();
-    }
-      break;
-    default:
-      break;
-  }
-}
-
 void PartSet_OperationSketchBase::restartOperation(const std::string& theType, ObjectPtr theFeature)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theFeature);

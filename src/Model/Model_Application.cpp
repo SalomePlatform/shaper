@@ -24,7 +24,10 @@ const boost::shared_ptr<Model_Document>& Model_Application::getDocument(string t
   if (myDocs.find(theDocID) != myDocs.end())
     return myDocs[theDocID];
 
-  boost::shared_ptr<Model_Document> aNew(new Model_Document(theDocID));
+  static const std::string thePartSetKind("PartSet");
+  static const std::string thePartKind("Part");
+  boost::shared_ptr<Model_Document> aNew(
+    new Model_Document(theDocID, theDocID == "root" ? thePartSetKind : thePartKind));
   myDocs[theDocID] = aNew;
   // load it if it must be loaded by demand
   if (myLoadedByDemand.find(theDocID) != myLoadedByDemand.end() && !myPath.empty()) {
@@ -56,6 +59,12 @@ void Model_Application::setLoadPath(std::string thePath)
 void Model_Application::setLoadByDemand(std::string theID)
 {
   myLoadedByDemand.insert(theID);
+}
+
+//=======================================================================
+bool Model_Application::isLoadByDemand(std::string theID)
+{
+  return myLoadedByDemand.find(theID) != myLoadedByDemand.end();
 }
 
 //=======================================================================
