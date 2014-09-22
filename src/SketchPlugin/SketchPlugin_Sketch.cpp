@@ -176,8 +176,10 @@ void SketchPlugin_Sketch::erase()
   std::list<ObjectPtr>::const_iterator anIt = aFeatures.begin();
   for (; anIt != aFeatures.end(); anIt++) {
     FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
-    if (aFeature)
-      document()->removeFeature(aFeature);
+    if (aFeature) {
+       // subs are referenced from sketch, but must be removed for sure, so not checkings
+      document()->removeFeature(aFeature, false);
+    }
   }
   SketchPlugin_Feature::erase();
 }

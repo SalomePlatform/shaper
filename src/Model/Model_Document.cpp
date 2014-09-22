@@ -459,16 +459,27 @@ static int RemoveFromRefArray(TDF_Label theArrayLab, TDF_Label theReferenced, co
   return aResult;
 }
 
-void Model_Document::removeFeature(FeaturePtr theFeature)
+void Model_Document::removeFeature(FeaturePtr theFeature, const bool theCheck)
 {
-  // check the feature: it must have no depended objects on it
-  std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
-  for(; aResIter != theFeature->results().cend(); aResIter++) {
-    if (myConcealedResults.find(*aResIter) != myConcealedResults.end()) {
-      Events_Error::send("Feature '" + theFeature->data()->name() + "' is used and can not be deleted");
-      return;
+  if (theCheck) {
+    // check the feature: it must have no depended objects on it
+    std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
+    for(; aResIter != theFeature->results().cend(); aResIter++) {
+      if (myConcealedResults.find(*aResIter) != myConcealedResults.end()) {
+        Events_Error::send("Feature '" + theFeature->data()->name() + "' is used and can not be deleted");
+        return;
+      }
+    }
+    NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator anObjIter(myObjs);
+    for(; anObjIter.More(); anObjIter.Next()) {
+      DataPtr aData = anObjIter.Value()->data();
+      if (aData->referencesTo(theFeature)) {
+        Events_Error::send("Feature '" + theFeature->data()->name() + "' is used and can not be deleted");
+        return;
+      }
     }
   }
+
   boost::shared_ptr<Model_Data> aData = boost::static_pointer_cast<Model_Data>(theFeature->data());
   TDF_Label aFeatureLabel = aData->label().Father();
   if (myObjs.IsBound(aFeatureLabel))
@@ -745,9 +756,6 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
     if (aKeptFeatures.find(aFIter.Value()) == aKeptFeatures.end()
         && aNewFeatures.find(aFIter.Value()) == aNewFeatures.end()) {
       FeaturePtr aFeature = aFIter.Value();
-      TDF_Label aLab = aFIter.Key();
-      aFIter.Next();
-      myObjs.UnBind(aLab);
       // event: model is updated
       //if (aFeature->isInHistory()) {
         ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_Feature::group());
@@ -767,6 +775,10 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       // redisplay also removed feature (used for sketch and AISObject)
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
       aFeature->erase();
+      // unbind after the "erase" call: on abort sketch is removes sub-objects that corrupts aFIter
+      TDF_Label aLab = aFIter.Key();
+      aFIter.Next();
+      myObjs.UnBind(aLab);
     } else
       aFIter.Next();
   }

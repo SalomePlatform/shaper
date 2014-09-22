@@ -41,11 +41,11 @@ public:
   virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
 
   //! Removes the feature from the document
-  virtual void removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeature) = 0;
+  virtual void removeFeature(
+    boost::shared_ptr<ModelAPI_Feature> theFeature, const bool theCheck = true) = 0;
 
   ///! Adds a new sub-document by the identifier, or returns existing one if it is already exist
-  virtual boost::shared_ptr<ModelAPI_Document>
-    subDocument(std::string theDocID) = 0;
+  virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID) = 0;
 
   ///! Returns the id of the document
   virtual const std::string& id() const = 0;

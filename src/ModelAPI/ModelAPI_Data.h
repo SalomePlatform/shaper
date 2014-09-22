@@ -20,6 +20,7 @@ class ModelAPI_AttributeBoolean;
 class ModelAPI_AttributeString;
 class ModelAPI_Document;
 class ModelAPI_Attribute;
+class ModelAPI_Feature;
 class GeomAPI_Shape;
 
 /**\class ModelAPI_Data
@@ -97,6 +98,9 @@ class MODELAPI_EXPORT ModelAPI_Data
 
   /// Returns true if feature must be updated (re-executed) on rebuild
   virtual bool mustBeUpdated() = 0;
+
+  /// Returns true if this data attributes are referenced to the given feature or its results
+  virtual bool referencesTo(const boost::shared_ptr<ModelAPI_Feature>& theFeature) = 0;
 
  protected:
   /// Objects are created for features automatically

@@ -12,6 +12,8 @@
 #include <Model_AttributeBoolean.h>
 #include <Model_AttributeString.h>
 #include <Model_Events.h>
+#include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
 
 #include <GeomData_Point.h>
 #include <GeomData_Point2D.h>
@@ -285,6 +287,7 @@ void Model_Data::erase()
     myLab.ForgetAllAttributes();
 }
 
+/// identifeir of the "must be updated" flag in the data tree
 Standard_GUID kMustBeUpdatedGUID("baede74c-31a6-4416-9c4d-e48ce65f2005");
 
 void Model_Data::mustBeUpdated(const bool theFlag)
@@ -298,4 +301,41 @@ void Model_Data::mustBeUpdated(const bool theFlag)
 bool Model_Data::mustBeUpdated()
 {
   return myLab.IsAttribute(kMustBeUpdatedGUID) == Standard_True;
+}
+
+bool Model_Data::referencesTo(const boost::shared_ptr<ModelAPI_Feature>& theFeature)
+{
+  // collect results of this feature first to check references quickly in the cycle
+  std::set<ObjectPtr> aFeatureObjs;
+  aFeatureObjs.insert(theFeature);
+  std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter =
+    theFeature->results().cbegin();
+  for(; aRIter != theFeature->results().cend(); aRIter++) {
+    if (*aRIter)
+      aFeatureObjs.insert(*aRIter);
+  }
+
+  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = 
+    myAttrs.begin();
+  for (; anAttrsIter != myAttrs.end(); anAttrsIter++) {
+    if (anAttrsIter->second->attributeType() == ModelAPI_AttributeRefAttr::type()) {
+      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRefAttr = 
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttrsIter->second);
+      if (aRefAttr && aRefAttr->isObject()) { // check referenced object
+        if (aFeatureObjs.find(aRefAttr->object()) != aFeatureObjs.end())
+          return true;
+      } else { // check object of referenced attribute
+        boost::shared_ptr<ModelAPI_Attribute> anAttr = aRefAttr->attr();
+        if (anAttr && aFeatureObjs.find(anAttr->owner()) != aFeatureObjs.end())
+          return true;
+      }
+    } else if (anAttrsIter->second->attributeType() == ModelAPI_AttributeReference::type()) {
+      boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
+        boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(anAttrsIter->second);
+      if (aFeatureObjs.find(aRef->value()) != aFeatureObjs.end()) {
+        return true;
+      }
+    }
+  }
+  return false;
 }

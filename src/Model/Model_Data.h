@@ -136,6 +136,9 @@ class Model_Data : public ModelAPI_Data
 
   /// Returns true if feature must be updated (re-executed) on rebuild
   MODEL_EXPORT virtual bool mustBeUpdated();
+
+  /// Returns true if this data attributes are referenced to the given feature or its results
+  MODEL_EXPORT virtual bool referencesTo(const boost::shared_ptr<ModelAPI_Feature>& theFeature);
 };
 
 #endif
