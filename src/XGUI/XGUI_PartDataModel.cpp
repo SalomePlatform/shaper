@@ -58,34 +58,18 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
             return aObject->data()->name().c_str();
         }
           break;
-        case BodiesFolder:
-          return tr("Bodies") + QString(" (%1)").arg(rowCount(theIndex));
-        case BodiesObject: {
-          DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-          ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultBody::group(), theIndex.row());
-          if (aObject)
-            return aObject->data()->name().c_str();
-        }
       }
       break;
 
     case Qt::DecorationRole:
+      {
       // return an Icon
       switch (theIndex.internalId()) {
         case ParamsFolder:
           return QIcon(":pictures/params_folder.png");
-        case BodiesFolder:
         case ConstructFolder:
           return QIcon(":pictures/constr_folder.png");
         case ConstructObject:
-        case BodiesObject: {
-          DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-          std::string aGroup = theIndex.internalId() == ConstructObject ?
-            ModelAPI_ResultConstruction::group() : ModelAPI_ResultBody::group();
-          ObjectPtr anObject = aRootDoc->object(aGroup, theIndex.row());
-          if (anObject && anObject->data() && anObject->data()->mustBeUpdated()) {
-            return QIcon(":pictures/constr_object_modified.png");
-          }
           return QIcon(":pictures/constr_object.png");
         }
       }
@@ -109,7 +93,7 @@ QVariant XGUI_TopDataModel::headerData(int section, Qt::Orientation orientation,
 int XGUI_TopDataModel::rowCount(const QModelIndex& theParent) const
 {
   if (!theParent.isValid())
-    return 3;
+    return 2;
 
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   if (theParent.internalId() == ParamsFolder)
@@ -118,8 +102,6 @@ int XGUI_TopDataModel::rowCount(const QModelIndex& theParent) const
   if (theParent.internalId() == ConstructFolder)
     return aRootDoc->size(ModelAPI_ResultConstruction::group());
 
-  if (theParent.internalId() == BodiesFolder)
-    return aRootDoc->size(ModelAPI_ResultBody::group());
   return 0;
 }
 
@@ -136,8 +118,6 @@ QModelIndex XGUI_TopDataModel::index(int theRow, int theColumn, const QModelInde
         return createIndex(theRow, theColumn, (qint32) ParamsFolder);
       case 1:
         return createIndex(theRow, theColumn, (qint32) ConstructFolder);
-      case 2:
-        return createIndex(theRow, theColumn, (qint32) BodiesFolder);
     }
   } else {
     if (theParent.internalId() == ParamsFolder)
@@ -145,9 +125,6 @@ QModelIndex XGUI_TopDataModel::index(int theRow, int theColumn, const QModelInde
 
     if (theParent.internalId() == ConstructFolder)
       return createIndex(theRow, theColumn, (qint32) ConstructObject);
-
-    if (theParent.internalId() == BodiesFolder)
-      return createIndex(theRow, theColumn, (qint32) BodiesObject);
   }
   return QModelIndex();
 }
@@ -158,14 +135,11 @@ QModelIndex XGUI_TopDataModel::parent(const QModelIndex& theIndex) const
   switch (aId) {
     case ParamsFolder:
     case ConstructFolder:
-    case BodiesFolder:
       return QModelIndex();
     case ParamObject:
       return createIndex(0, 0, (qint32) ParamsFolder);
     case ConstructObject:
       return createIndex(1, 0, (qint32) ConstructFolder);
-    case BodiesObject:
-      return createIndex(2, 0, (qint32) BodiesFolder);
   }
   return QModelIndex();
 }
@@ -180,7 +154,6 @@ ObjectPtr XGUI_TopDataModel::object(const QModelIndex& theIndex) const
   switch (theIndex.internalId()) {
     case ParamsFolder:
     case ConstructFolder:
-    case BodiesFolder:
       return ObjectPtr();
     case ParamObject: {
       DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
@@ -189,10 +162,6 @@ ObjectPtr XGUI_TopDataModel::object(const QModelIndex& theIndex) const
     case ConstructObject: {
       DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
       return aRootDoc->object(ModelAPI_ResultConstruction::group(), theIndex.row());
-    }
-    case BodiesObject: {
-      DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
-      return aRootDoc->object(ModelAPI_ResultBody::group(), theIndex.row());
     }
   }
   return ObjectPtr();
@@ -209,8 +178,6 @@ QModelIndex XGUI_TopDataModel::findGroup(const std::string& theGroup) const
     return createIndex(0, 0, (qint32) ParamsFolder);
   if (theGroup == ModelAPI_ResultConstruction::group())
     return createIndex(1, 0, (qint32) ConstructFolder);
-  if (theGroup == ModelAPI_ResultBody::group())
-    return createIndex(2, 0, (qint32) BodiesFolder);
   return QModelIndex();
 }
 
@@ -233,8 +200,6 @@ QModelIndex XGUI_TopDataModel::objectIndex(const ObjectPtr& theObject) const
         return createIndex(aRow, 0, (qint32) ParamObject);
       if (aGroup == ModelAPI_ResultConstruction::group())
         return createIndex(aRow, 0, (qint32) ConstructObject);
-      if (aGroup == ModelAPI_ResultBody::group())
-        return createIndex(aRow, 0, (qint32) BodiesObject);
     }
   }
   return aIndex;
