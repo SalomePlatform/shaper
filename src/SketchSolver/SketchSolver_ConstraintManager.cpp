@@ -349,11 +349,14 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
 // ============================================================================
 void SketchSolver_ConstraintManager::resolveConstraints()
 {
+  bool needToUpdate = false;
   std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
-    (*aGroupIter)->resolveConstraints();
+    if ((*aGroupIter)->resolveConstraints())
+      needToUpdate = true;
 
   // Features may be updated => send events
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  if (needToUpdate)
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 }
 
