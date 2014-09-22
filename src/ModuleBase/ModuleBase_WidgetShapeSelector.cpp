@@ -161,6 +161,9 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
       updateSelectionName();
       myActivateBtn->setChecked(false);
       raisePanel();
+      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TOHIDE);
+      ModelAPI_EventCreator::get()->sendUpdated(mySelectedObject, anEvent);
+      Events_Loop::loop()->flush(anEvent);
     } else {
       myTextLine->setText("");
     }
