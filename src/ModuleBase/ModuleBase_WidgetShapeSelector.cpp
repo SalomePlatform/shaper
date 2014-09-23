@@ -54,7 +54,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
                                                      const Config_WidgetAPI* theData,
                                                      const std::string& theParentId)
     : ModuleBase_ModelWidget(theParent, theData, theParentId),
-      myWorkshop(theWorkshop)
+      myWorkshop(theWorkshop), myIsActive(false)
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aLayout = new QHBoxLayout(myContainer);
@@ -72,6 +72,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   myTextLine = new QLineEdit(myContainer);
   myTextLine->setReadOnly(true);
   myTextLine->setToolTip(aToolTip);
+  processFocus(myTextLine);
   myTextLine->installEventFilter(this);
 
   myBasePalet = myTextLine->palette();
@@ -80,14 +81,6 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   myTextLine->setPalette(myInactivePalet);
 
   aLayout->addWidget(myTextLine, 1);
-
-  myActivateBtn = new QToolButton(myContainer);
-  myActivateBtn->setIcon(QIcon(":icons/hand_point.png"));
-  myActivateBtn->setCheckable(true);
-  myActivateBtn->setToolTip(tr("Activate/Deactivate selection"));
-  connect(myActivateBtn, SIGNAL(toggled(bool)), this, SLOT(activateSelection(bool)));
-
-  aLayout->addWidget(myActivateBtn);
 
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ');
@@ -137,7 +130,6 @@ QList<QWidget*> ModuleBase_WidgetShapeSelector::getControls() const
   QList<QWidget*> aControls;
   aControls.append(myLabel);
   aControls.append(myTextLine);
-  aControls.append(myActivateBtn);
   return aControls;
 }
 
@@ -159,7 +151,6 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
     mySelectedObject = aObject;
     if (mySelectedObject) {
       updateSelectionName();
-      myActivateBtn->setChecked(false);
       raisePanel();
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TOHIDE);
       ModelAPI_EventCreator::get()->sendUpdated(mySelectedObject, anEvent);
@@ -167,6 +158,7 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
     } else {
       myTextLine->setText("");
     }
+    activateSelection(false);
     emit valuesChanged();
     emit focusOutWidget(this);
   }
@@ -204,41 +196,30 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
 {
   if (mySelectedObject) {
     std::string aName = mySelectedObject->data()->name();
-
     myTextLine->setText(QString::fromStdString(aName));
-  } else
-    myTextLine->setText("");
-}
-
-//********************************************************************
-void ModuleBase_WidgetShapeSelector::enableOthersControls(bool toEnable) const
-{
-  QWidget* aParent = myContainer->parentWidget();
-  QList<QWidget*> aChldList = aParent->findChildren<QWidget*>();
-  foreach(QWidget* aWgt, aChldList)
-  {
-    if ((aWgt != myLabel) && (aWgt != myActivateBtn) && (aWgt != myTextLine)
-        && (aWgt != myContainer))
-      aWgt->setEnabled(toEnable);
+  } else {
+    if (myIsActive)
+      myTextLine->setText(tr("Select an object"));
+    else
+      myTextLine->setText(tr("No object selected"));
   }
 }
+
 
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
 {
-  enableOthersControls(!toActivate);
-  //myTextLine->setEnabled(toActivate);
-  if (toActivate)
+  myIsActive = toActivate;
+  if (myIsActive)
     myTextLine->setPalette(myBasePalet);
   else
     myTextLine->setPalette(myInactivePalet);
+  updateSelectionName();
 
-  if (toActivate)
+  if (myIsActive)
     connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   else
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-
-  myActivateBtn->setDown(toActivate);
 }
 
 //********************************************************************
@@ -261,6 +242,16 @@ void ModuleBase_WidgetShapeSelector::raisePanel() const
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::focusTo()
 {
-  myActivateBtn->setChecked(true);
+  activateSelection(true);
   return true;
+}
+
+//********************************************************************
+bool ModuleBase_WidgetShapeSelector::eventFilter(QObject* theObj, QEvent* theEvent)
+{
+  if (theObj == myTextLine) {
+    if (theEvent->type() == QEvent::FocusIn)
+      activateSelection(true);
+  }
+  return ModuleBase_ModelWidget::eventFilter(theObj, theEvent);
 }
