@@ -6,6 +6,7 @@
 
 #include <PartSet_Module.h>
 #include <PartSet_OperationSketchBase.h>
+#include <PartSet_OperationSketch.h>
 
 #include <XGUI_Displayer.h>
 #include <XGUI_Workshop.h>
@@ -28,7 +29,7 @@ PartSet_Listener::PartSet_Listener(PartSet_Module* theModule)
     : myModule(theModule)
 {
   Events_Loop* aLoop = Events_Loop::loop();
-  //aLoop->registerListener(this, aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  aLoop->registerListener(this, aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 }
@@ -51,12 +52,27 @@ void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& the
     boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
         boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aFeatures = aUpdMsg->objects();
+
+    PartSet_OperationSketch* aSketchOp = 
+      dynamic_cast<PartSet_OperationSketch*>(myModule->workshop()->operationMgr()->currentOperation());
+
     std::set<ObjectPtr>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
     for (; anIt != aLast; anIt++) {
-      aDisplayer->deactivate(*anIt);
-      FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
-      if (aFeature)
-        myModule->activateFeature(aFeature, false);
+      ObjectPtr aObj = (*anIt);
+      aDisplayer->deactivate(aObj);
+      boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
+        boost::dynamic_pointer_cast<SketchPlugin_Sketch>(aObj);
+      if (aSketch) // Activate sketcher for planes selection
+        myModule->activateFeature(aSketch, false);
+      // If current operation is Sketch then there is no active sketching operation
+      // and possible the object was created by Redo operatgion
+      else if (aSketchOp) {
+          XGUI_Displayer* aDisplayer = myModule->workshop()->displayer();
+          // Very possible it is not displayed
+          aDisplayer->display(aObj, false);
+          std::list<int> aModes = aSketchOp->getSelectionModes(aObj);
+          aDisplayer->activateInLocalContext(aObj, aModes, false);
+      }
     }
 
   } else if (aType == EVENT_OBJECT_DELETED) {

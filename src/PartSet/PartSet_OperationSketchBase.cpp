@@ -50,20 +50,16 @@ std::list<FeaturePtr> PartSet_OperationSketchBase::subFeatures() const
 
 std::list<int> PartSet_OperationSketchBase::getSelectionModes(ObjectPtr theFeature) const
 {
+  //TODO: Define position of selection modes definition
   std::list<int> aModes;
-  //FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
-  //if (aFeature) {
-  //  if (PartSet_Tools::isConstraintFeature(aFeature->getKind())) {
-  //      aModes.clear();
-  //      aModes.push_back(AIS_DSM_Text);
-  //      aModes.push_back(AIS_DSM_Line);
-  //      return aModes;
-  //  }
-  //}
-  aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
-  aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
-  aModes.push_back(AIS_DSM_Text);
-  aModes.push_back(AIS_DSM_Line);
+  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
+  if (aFeature && PartSet_Tools::isConstraintFeature(aFeature->getKind())) {
+    aModes.push_back(AIS_DSM_Text);
+    aModes.push_back(AIS_DSM_Line);
+  } else {
+    aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
+    aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
+  }
   return aModes;
 }
 FeaturePtr PartSet_OperationSketchBase::createFeature(const bool theFlushMessage)
