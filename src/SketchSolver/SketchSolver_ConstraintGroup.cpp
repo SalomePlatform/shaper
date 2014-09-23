@@ -281,7 +281,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
       aConstrEnt[indAttr] = changeEntity(aConstrAttr->attr());
   }
 
-  if (aConstrMapIter == myConstraintMap.end()) {
+  if (aConstrMapIter == myConstraintMap.end()) { // Add new constraint
     // Several points may be coincident, it is not necessary to store all constraints between them.
     // Try to find sequence of coincident points which connects the points of new constraint
     if (aConstrType == SLVS_C_POINTS_COINCIDENT) {
@@ -302,6 +302,17 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
     int aConstrPos = Search(aConstraint.h, myConstraints);
     aConstrIter = myConstraints.begin() + aConstrPos;
     myNeedToSolve = true;
+  } else { // Attributes of constraint may be changed => update constraint
+    Slvs_hEntity* aCurrentAttr[] = {&aConstrIter->ptA, &aConstrIter->ptB,
+                                   &aConstrIter->entityA, &aConstrIter->entityB,
+                                   &aConstrIter->entityC, &aConstrIter->entityD};
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
+      if (*(aCurrentAttr[indAttr]) != aConstrEnt[indAttr])
+      {
+        *(aCurrentAttr[indAttr]) = aConstrEnt[indAttr];
+        myNeedToSolve = true;
+      }
+    }
   }
 
   checkConstraintConsistence(*aConstrIter);
