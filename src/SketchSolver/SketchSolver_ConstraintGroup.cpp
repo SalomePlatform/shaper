@@ -123,22 +123,26 @@ bool SketchSolver_ConstraintGroup::isBaseWorkplane(
 //  Purpose:  verify are there any entities in the group used by given constraint
 // ============================================================================
 bool SketchSolver_ConstraintGroup::isInteract(
-    boost::shared_ptr<SketchPlugin_Constraint> theConstraint) const
+    boost::shared_ptr<SketchPlugin_Feature> theFeature) const
 {
   // Check the group is empty
-  if (myWorkplane.h != SLVS_E_UNKNOWN && myConstraints.empty())
+  if (isEmpty())
     return true;
 
-  // Go through constraint entities and verify if some of them already in the group
-  for (int i = 0; i < CONSTRAINT_ATTR_SIZE; i++) {
-    boost::shared_ptr<ModelAPI_AttributeRefAttr> aCAttrRef = boost::dynamic_pointer_cast<
-        ModelAPI_AttributeRefAttr>(
-        theConstraint->data()->attribute(SketchPlugin_Constraint::ATTRIBUTE(i)));
-    if (!aCAttrRef)
-      continue;
-    if (!aCAttrRef->isObject() && myEntityAttrMap.find(aCAttrRef->attr()) != myEntityAttrMap.end())
-      return true;
-    if (aCAttrRef->isObject()) {  // Obtain a base feature for the object
+  // Go through the attributes and verify if some of them already in the group
+  std::list<boost::shared_ptr<ModelAPI_Attribute>> 
+      anAttrList = theFeature->data()->attributes(std::string());
+  std::list<boost::shared_ptr<ModelAPI_Attribute>>::const_iterator
+      anAttrIter = anAttrList.begin();
+  for ( ; anAttrIter != anAttrList.end(); anAttrIter++) {
+    boost::shared_ptr<ModelAPI_AttributeRefAttr> aCAttrRef =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
+    if (!aCAttrRef || !aCAttrRef->isObject()) {
+      boost::shared_ptr<ModelAPI_Attribute> anAttr = 
+          aCAttrRef ? aCAttrRef->attr() : *anAttrIter;
+      if (myEntityAttrMap.find(anAttr) != myEntityAttrMap.end())
+        return true;
+    } else {
       ResultConstructionPtr aRC = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
           aCAttrRef->object());
       if (!aRC)
@@ -297,6 +301,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
     myConstraintMap[theConstraint] = aConstraint.h;
     int aConstrPos = Search(aConstraint.h, myConstraints);
     aConstrIter = myConstraints.begin() + aConstrPos;
+    myNeedToSolve = true;
   }
 
   checkConstraintConsistence(*aConstrIter);
@@ -393,6 +398,8 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
 // ============================================================================
 Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
 {
+  if (!theEntity->data()->isValid())
+    return SLVS_E_UNKNOWN;
   // If the entity is already in the group, try to find it
   std::map<FeaturePtr, Slvs_hEntity>::const_iterator aEntIter = myEntityFeatMap.find(theEntity);
   // defines that the entity already exists
@@ -1027,6 +1034,22 @@ void SketchSolver_ConstraintGroup::removeConstraint(
   myConstraints.erase(myConstraints.begin() + aConstrPos);
   if (aCnstrToRemove == myConstrMaxID)
     myConstrMaxID--;
+
+  // Find all entities which are based on these unused
+  std::vector<Slvs_Entity>::const_iterator anEntIter = myEntities.begin();
+  for ( ; anEntIter != myEntities.end(); anEntIter++)
+    if (anEntIter->type == SLVS_E_LINE_SEGMENT || anEntIter->type == SLVS_E_CIRCLE ||
+        anEntIter->type == SLVS_E_ARC_OF_CIRCLE) {
+      for (int i = 0; i < 4; i++)
+        if (anEntToRemove.find(anEntIter->point[i]) != anEntToRemove.end()) {
+          anEntToRemove.insert(anEntIter->h);
+          for (int j = 0; j < 4; j++)
+            if (anEntIter->param[j] != 0)
+              anEntToRemove.insert(anEntIter->point[j]);
+          break;
+        }
+    }
+
   std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
   for (; aConstrIter != myConstraints.end(); aConstrIter++) {
     Slvs_hEntity aEnts[] = { aConstrIter->ptA, aConstrIter->ptB, aConstrIter->entityA, aConstrIter
@@ -1065,17 +1088,19 @@ void SketchSolver_ConstraintGroup::removeConstraint(
     unsigned int anEntPos = Search(*aRemIter, myEntities);
     if (anEntPos >= myEntities.size())
       continue;
-    unsigned int aParamPos = Search(myEntities[anEntPos].param[0], myParams);
-    if (aParamPos >= myParams.size())
-      continue;
-    int aNbParams = 0;
-    while (myEntities[anEntPos].param[aNbParams] != 0)
-      aNbParams++;
-    if (myEntities[anEntPos].param[aNbParams - 1] == myParamMaxID)
-      myParamMaxID -= aNbParams;
-    myParams.erase(myParams.begin() + aParamPos, myParams.begin() + aParamPos + aNbParams);
-    if (*aRemIter == myEntityMaxID)
-      myEntityMaxID--;
+    if (myEntities[anEntPos].param[0] != 0) {
+      unsigned int aParamPos = Search(myEntities[anEntPos].param[0], myParams);
+      if (aParamPos >= myParams.size())
+        continue;
+      int aNbParams = 0;
+      while (myEntities[anEntPos].param[aNbParams] != 0)
+        aNbParams++;
+      if (myEntities[anEntPos].param[aNbParams - 1] == myParamMaxID)
+        myParamMaxID -= aNbParams;
+      myParams.erase(myParams.begin() + aParamPos, myParams.begin() + aParamPos + aNbParams);
+      if (*aRemIter == myEntityMaxID)
+        myEntityMaxID--;
+    }
     myEntities.erase(myEntities.begin() + anEntPos);
 
     // Remove entity's ID from the lists of conincident points

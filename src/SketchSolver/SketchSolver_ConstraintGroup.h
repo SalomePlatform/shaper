@@ -55,11 +55,11 @@ class SketchSolver_ConstraintGroup
    */
   bool changeConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
-  /** \brief Verifies the constraint uses the objects from this group
-   *  \param[in] theConstraint constraint for verification of interaction
-   *  \return \c true if the constrained objects are used in current group
+  /** \brief Verifies the feature attributes are used in this group
+   *  \param[in] theFeature constraint or any other object for verification of interaction
+   *  \return \c true if some of attributes are used in current group
    */
-  bool isInteract(boost::shared_ptr<SketchPlugin_Constraint> theConstraint) const;
+  bool isInteract(boost::shared_ptr<SketchPlugin_Feature> theFeature) const;
 
   /** \brief Verifies the specified feature is equal to the base workplane for this group
    *  \param[in] theWorkplane the feature to be compared with base workplane
@@ -108,7 +108,6 @@ class SketchSolver_ConstraintGroup
   void updateRelatedConstraints(boost::shared_ptr<ModelAPI_Attribute> theEntity) const;
   void updateRelatedConstraints(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
 
- protected:
   /** \brief Adds or updates an entity in the group
    *
    *  The parameters of entity will be parsed and added to the list of SolveSpace parameters.
@@ -120,6 +119,7 @@ class SketchSolver_ConstraintGroup
   Slvs_hEntity changeEntity(boost::shared_ptr<ModelAPI_Attribute> theEntity);
   Slvs_hEntity changeEntity(FeaturePtr theEntity);
 
+protected:
   /** \brief Adds or updates a normal in the group
    *
    *  Normal is a special entity in SolveSpace, which defines a direction in 3D and

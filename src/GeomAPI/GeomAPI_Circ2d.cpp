@@ -61,28 +61,26 @@ const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::project(
 {
   boost::shared_ptr<GeomAPI_Pnt2d> aResult;
   if (!MY_CIRC2D)
-  return aResult;
+    return aResult;
 
-  Handle(Geom2d_Circle) aCircle = new Geom2d_Circle(MY_CIRC2D->Axis(), MY_CIRC2D->Radius());  //(aCirc);
-
+  const gp_Pnt2d& aCenter = MY_CIRC2D->Location();
   const gp_Pnt2d& aPoint = thePoint->impl<gp_Pnt2d>();
 
-  Geom2dAPI_ProjectPointOnCurve aProj(aPoint, aCircle);
-  Standard_Integer aNbPoint = aProj.NbPoints();
-  double aX, anY;
-  if (aNbPoint > 0) {
-    double aMinDistance = 0, aDistance;
-    for (Standard_Integer j = 1; j <= aNbPoint; j++) {
-      gp_Pnt2d aNewPoint = aProj.Point(j);
-      aDistance = aNewPoint.Distance(aPoint);
-      if (!aMinDistance || aDistance < aMinDistance) {
-        aX = aNewPoint.X();
-        anY = aNewPoint.Y();
-        aMinDistance = aDistance;
-        aResult = boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY));
-      }
-    }
+  double aDist = aCenter.Distance(aPoint);
+  if (aDist < Precision::Confusion())
+    return aResult;
+
+  if (Abs(aDist - MY_CIRC2D->Radius()) < Precision::Confusion()) {
+    // Point on the circle
+    aResult = boost::shared_ptr<GeomAPI_Pnt2d>(
+        new GeomAPI_Pnt2d(thePoint->x(), thePoint->y()));
+  } else {
+    gp_Dir2d aDir(aPoint.XY() - aCenter.XY());
+    gp_XY aNewPoint = aCenter.XY() + aDir.XY() * MY_CIRC2D->Radius();
+    aResult = boost::shared_ptr<GeomAPI_Pnt2d>(
+        new GeomAPI_Pnt2d(aNewPoint.X(), aNewPoint.Y()));
   }
+
   return aResult;
 }
 

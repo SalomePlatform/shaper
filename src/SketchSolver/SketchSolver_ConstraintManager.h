@@ -48,11 +48,11 @@ class SketchSolver_ConstraintManager : public Events_Listener
   SketchSolver_ConstraintManager();
   ~SketchSolver_ConstraintManager();
 
-  /** \brief Adds or updates a constraint in the suitable group
-   *  \param[in] theConstraint constraint to be changed
-   *  \return \c true if the constraint changed successfully
+  /** \brief Adds or updates a constraint or an entity in the suitable group
+   *  \param[in] theFeature sketch feature to be changed
+   *  \return \c true if the feature changed successfully
    */
-  bool changeConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
+  bool changeConstraintOrEntity(boost::shared_ptr<SketchPlugin_Feature> theFeature);
 
   /** \brief Removes a constraint from the manager
    *  \param[in] theConstraint constraint to be removed
@@ -84,19 +84,19 @@ class SketchSolver_ConstraintManager : public Events_Listener
   void resolveConstraints();
 
  private:
-  /** \brief Searches list of groups which interact with specified constraint
-   *  \param[in]  theConstraint constraint to be found
-   *  \param[out] theGroups     list of group indexes interacted with constraint
+  /** \brief Searches list of groups which interact with specified feature
+   *  \param[in]  theFeature  object to be found
+   *  \param[out] theGroups   list of group indexes interacted with the feature
    */
-  void findGroups(boost::shared_ptr<SketchPlugin_Constraint> theConstraint,
+  void findGroups(boost::shared_ptr<SketchPlugin_Feature> theFeature,
                   std::set<Slvs_hGroup>& theGroupIDs) const;
 
-  /** \brief Searches in the list of groups the workplane which constains specified constraint
-   *  \param[in] theConstraint constraint to be found
-   *  \return workplane containing the constraint
+  /** \brief Searches in the list of groups the workplane which constains specified feature
+   *  \param[in] theFeature object to be found
+   *  \return workplane containing the feature
    */
-  boost::shared_ptr<SketchPlugin_Feature> findWorkplaneForConstraint(
-      boost::shared_ptr<SketchPlugin_Constraint> theConstraint) const;
+  boost::shared_ptr<SketchPlugin_Feature> findWorkplane(
+      boost::shared_ptr<SketchPlugin_Feature> theFeature) const;
 
  private:
   static SketchSolver_ConstraintManager* _self;  ///< Self pointer to implement singleton functionality

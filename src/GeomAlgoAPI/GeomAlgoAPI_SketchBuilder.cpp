@@ -155,6 +155,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   while (aMapVE.Extent() > 0) {
     if (aCurVertex.IsNull())
       return;
+    if (!aProcEdges.empty())
+      aBindingEdge = aProcEdges.back();
     findNextVertex(aCurVertex, aMapVE, aCurDir, aCurNorm, aNextVertex, aBindingEdge, aNextDir);
     aCurNorm = aNorm;
 
@@ -466,6 +468,7 @@ void findNextVertex(const TopoDS_Vertex& theStartVertex,
                     const gp_Dir& theStartDir, const gp_Dir& theNormal, TopoDS_Vertex& theNextVertex,
                     TopoDS_Edge& theNextEdge, gp_Dir& theNextDir)
 {
+  theNextVertex = TopoDS_Vertex();
   const BOPCol_ListOfShape& anEdgesList = theVertexEdgeMap.FindFromKey(theStartVertex);
   int anEdgesNum = anEdgesList.Extent();
   BOPCol_ListOfShape::Iterator aEdIter(anEdgesList);
@@ -504,6 +507,18 @@ void findNextVertex(const TopoDS_Vertex& theStartVertex,
         theNextDir = getOuterEdgeDirection(anEdge, theNextVertex);
       }
     }
+  }
+
+  // Probably there are two tangent edges. We will take the edge differs from current one
+  if (theNextVertex.IsNull() && anEdgesNum == 2) {
+    BOPCol_ListOfShape::Iterator aEdIter(anEdgesList);
+    if (aEdIter.Value() == theNextEdge)
+      aEdIter.Next();
+    theNextEdge = static_cast<const TopoDS_Edge&>(aEdIter.Value());
+    TopoDS_Vertex aV1, aV2;
+    TopExp::Vertices(theNextEdge, aV1, aV2);
+    theNextVertex = theStartVertex.IsSame(aV1) ? aV2 : aV1;
+    theNextDir = getOuterEdgeDirection(theNextEdge, theNextVertex);
   }
 }
 
