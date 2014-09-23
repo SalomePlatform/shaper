@@ -112,6 +112,8 @@ bool XGUI_OperationMgr::abortAllOperations()
 
 bool XGUI_OperationMgr::validateOperation(ModuleBase_Operation* theOperation)
 {
+  if (!theOperation)
+    return false;
   //Get operation feature to validate
   FeaturePtr aFeature = theOperation->feature();
   if (!aFeature) return true; // rename operation

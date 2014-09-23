@@ -94,10 +94,8 @@ void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
   switch (theKey) {
     case Qt::Key_Return:
     case Qt::Key_Enter: {
-      if (commit()) {
         // it start a new line creation at a free point
         restartOperation(feature()->getKind());
-      }
     }
       break;
     default:
