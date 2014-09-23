@@ -22,7 +22,7 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
   // If the object is not a line then it is accepted
   const ModelAPI_ResultValidator* aLineValidator =
       dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultLineValidator"));
-  if (!aLineValidator->isValid(theObject))
+  if (aLineValidator && (!aLineValidator->isValid(theObject)))
     return true;
 
   // If it is a line then we have to check that first attribute id not a line
