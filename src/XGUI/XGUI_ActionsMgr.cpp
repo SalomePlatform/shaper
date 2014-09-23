@@ -8,6 +8,8 @@
 #include "XGUI_OperationMgr.h"
 #include "XGUI_SalomeConnector.h"
 
+#include <ModelAPI_Session.h>
+
 #include <ModuleBase_Operation.h>
 #include <Events_Error.h>
 
@@ -69,6 +71,7 @@ void XGUI_ActionsMgr::update()
     setAllEnabled(true);
     setNestedCommandsEnabled(false);
   }
+  updateByDocumentKind();
   updateCheckState();
 }
 
@@ -113,6 +116,25 @@ void XGUI_ActionsMgr::setActionChecked(const QString& theId, const bool theCheck
   QAction* anAction = myActions[theId];
   if (anAction && anAction->isCheckable()) {
     anAction->setChecked(theChecked);
+  }
+}
+
+/*
+ * Disables all actions which have the Document Kind different to
+ * the current document's kind
+ */
+void XGUI_ActionsMgr::updateByDocumentKind()
+{
+  std::string aStdDocKind = ModelAPI_Session::get()->activeDocument()->kind();
+  QString aDocKind = QString::fromStdString(aStdDocKind);
+  foreach(QAction* eachAction, myActions.values()) {
+    XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(eachAction);
+    if(aCmd) {
+      QString aCmdDocKind = aCmd->documentKind();
+      if(!aCmdDocKind.isEmpty() && aCmdDocKind != aDocKind) {
+        eachAction->setEnabled(false);
+      }
+    }
   }
 }
 

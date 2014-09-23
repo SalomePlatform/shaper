@@ -399,6 +399,8 @@ FeaturePtr Model_Document::addFeature(std::string theID)
   TDF_Label anEmptyLab;
   FeaturePtr anEmptyFeature;
   FeaturePtr aFeature = ModelAPI_Session::get()->createFeature(theID);
+  if (!aFeature)
+    return aFeature;
   boost::shared_ptr<Model_Document> aDocToAdd = boost::dynamic_pointer_cast<Model_Document>(
       aFeature->documentToAdd());
   if (aFeature) {

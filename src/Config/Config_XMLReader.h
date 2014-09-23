@@ -47,6 +47,7 @@ class Config_XMLReader
   void readRecursively(xmlNodePtr theParent);
 
   xmlNodePtr node(void* theNode);
+  std::string getNodeName(xmlNodePtr theNode);
   std::string getProperty(xmlNodePtr theNode, const char* property);
   void processValidator(xmlNodePtr theNode);
 

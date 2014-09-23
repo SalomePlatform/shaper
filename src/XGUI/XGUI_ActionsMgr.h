@@ -40,6 +40,8 @@ Q_OBJECT
 
   QKeySequence registerShortcut(const QString& theKeySequence);
 
+  void updateByDocumentKind();
+
  public slots:
   //! Update workbench actions according to OperationMgr state:
   //! No active operations: all actions but nested are available

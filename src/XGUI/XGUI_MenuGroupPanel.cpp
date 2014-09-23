@@ -67,11 +67,25 @@ void XGUI_MenuGroupPanel::resizeEvent(QResizeEvent* theEvent)
   myLayout->setRowStretch(myMaxRow + 1, 1);
 }
 
-XGUI_Command* XGUI_MenuGroupPanel::addFeature(const QString& theId, const QString& theTitle,
-                                              const QString& theTip, const QIcon& theIcon,
-                                              const QKeySequence& theKeys, bool isCheckable)
+XGUI_Command* XGUI_MenuGroupPanel::addFeature(const QString& theId,
+                                              const QString& theTip,
+                                              const QString& theTitle,
+                                              const QIcon& theIcon,
+                                              const QKeySequence& theKeys)
 {
-  XGUI_Command* aCommand = new XGUI_Command(theId, theIcon, theTitle, this, isCheckable);
+  return addFeature(theId, theTip, theTitle, theIcon, QString(), theKeys, false);
+}
+
+XGUI_Command* XGUI_MenuGroupPanel::addFeature(const QString& theId,
+                                              const QString& theTitle,
+                                              const QString& theTip,
+                                              const QIcon& theIcon,
+                                              const QString& theDocumentKind,
+                                              const QKeySequence& theKeys,
+                                              bool isCheckable)
+{
+  XGUI_Command* aCommand = new XGUI_Command(theId, theDocumentKind, theIcon,
+                                            theTitle, this, isCheckable);
   aCommand->setToolTip(theTip);
   if (!theKeys.isEmpty()) {
     aCommand->setShortcut(theKeys);

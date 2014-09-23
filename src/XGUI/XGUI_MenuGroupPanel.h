@@ -20,8 +20,18 @@ Q_OBJECT
   explicit XGUI_MenuGroupPanel(QWidget *parent = 0);
 
   //! Adding a new feature (Command) in the group
-  XGUI_Command* addFeature(const QString& theId, const QString& theTitle, const QString& theTip,
-                           const QIcon& theIcon, const QKeySequence& theKeys = QKeySequence(),
+  XGUI_Command* addFeature(const QString& theId,
+                           const QString& theTip,
+                           const QString& theTitle,
+                           const QIcon& theIcon,
+                           const QKeySequence& theKeys = QKeySequence());
+
+  XGUI_Command* addFeature(const QString& theId,
+                           const QString& theTip,
+                           const QString& theTitle,
+                           const QIcon& theIcon,
+                           const QString& theDocumentKind = QString(),
+                           const QKeySequence& theKeys = QKeySequence(),
                            bool isCheckable = false);
 
   //! Returns already created command by its ID

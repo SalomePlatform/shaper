@@ -14,6 +14,7 @@
 
 #include <string>
 #include <list>
+#include <map>
 
 class Config_FeatureMessage;
 
@@ -34,9 +35,16 @@ class Config_FeatureReader : public Config_XMLReader
     const boost::shared_ptr<Config_FeatureMessage>& outFeatureMessage);
   bool isInternalFeature(xmlNodePtr theRoot);
 
+  void storeAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
+  std::string restoreAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
+  std::string restoreAttribute(const char* theNodeName, const char* theNodeAttribute);
+
  private:
-  std::string myLastWorkbench;
-  std::string myLastGroup;
+  /// A map to store all parent's attributes.
+  /// The key has from "Node_Name:Node_Attribute"
+  std::map<std::string, std::string> myParentAttributes;
+  //std::string myLastWorkbench;
+  //std::string myLastGroup;
   std::string myLibraryName;
 
   std::list<std::string> myFeatures;

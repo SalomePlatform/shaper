@@ -40,6 +40,7 @@ const static char* WDG_DOUBLEVALUE_EDITOR = "doublevalue_editor";
 const static char* WDG_FILE_SELECTOR= "file_selector";
 
 
+const static char* WORKBENCH_DOC = "document";
 //Common Widget's or Feature's Properties
 const static char* _ID = "id";
 const static char* FEATURE_TOOLTIP = "tooltip";

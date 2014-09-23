@@ -138,6 +138,16 @@ xmlNodePtr Config_XMLReader::node(void* theNode)
   return static_cast<xmlNodePtr>(theNode);
 }
 
+std::string Config_XMLReader::getNodeName(xmlNodePtr theNode)
+{
+  std::string result = "";
+  char* aPropChars = (char*) theNode->name;
+  if (!aPropChars || aPropChars[0] == 0)
+    return result;
+  result = std::string(aPropChars);
+  return result;
+}
+
 /*
  * Returns named property for a given node as std::string.
  */

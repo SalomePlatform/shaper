@@ -55,12 +55,11 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
     aMessage->setUseInput(hasChild(theNode));
     aEvLoop->send(aMessage);
     //The m_last* variables always defined before fillFeature() call. XML is a tree.
-  } else if (isNode(theNode, NODE_GROUP, NULL)) {
-    myLastGroup = getProperty(theNode, _ID);
-  } else if (isNode(theNode, NODE_WORKBENCH, NULL)) {
-    myLastWorkbench = getProperty(theNode, _ID);
-    //Process SOURCE, VALIDATOR nodes.
+  } else if (isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL)) {
+    storeAttribute(theNode, _ID);
+    storeAttribute(theNode, WORKBENCH_DOC);
   }
+  //Process SOURCE, VALIDATOR nodes.
   Config_XMLReader::processNode(theNode);
 }
 
@@ -86,8 +85,9 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theNode,
   outFeatureMessage->setTooltip(getProperty(theNode, FEATURE_TOOLTIP));
   outFeatureMessage->setIcon(getProperty(theNode, FEATURE_ICON));
   outFeatureMessage->setKeysequence(getProperty(theNode, FEATURE_KEYSEQUENCE));
-  outFeatureMessage->setGroupId(myLastGroup);
-  outFeatureMessage->setWorkbenchId(myLastWorkbench);
+  outFeatureMessage->setGroupId(restoreAttribute(NODE_GROUP, _ID));
+  outFeatureMessage->setWorkbenchId(restoreAttribute(NODE_WORKBENCH, _ID));
+  outFeatureMessage->setDocumentKind(restoreAttribute(NODE_WORKBENCH, WORKBENCH_DOC));
 }
 
 bool Config_FeatureReader::isInternalFeature(xmlNodePtr theNode)
@@ -98,4 +98,30 @@ bool Config_FeatureReader::isInternalFeature(xmlNodePtr theNode)
     return false;
   }
   return true;
+}
+
+void Config_FeatureReader::storeAttribute(xmlNodePtr theNode,
+                                          const char* theNodeAttribute)
+{
+  std::string aKey = getNodeName(theNode) + ":" + std::string(theNodeAttribute);
+  std::string aValue = getProperty(theNode, theNodeAttribute);
+  if(!aValue.empty()) {
+    myParentAttributes[aKey] = aValue;
+  }
+}
+
+std::string Config_FeatureReader::restoreAttribute(xmlNodePtr theNode,
+                                                   const char* theNodeAttribute)
+{
+  return restoreAttribute(getNodeName(theNode).c_str(), theNodeAttribute);
+}
+std::string Config_FeatureReader::restoreAttribute(const char* theNodeName,
+                                                   const char* theNodeAttribute)
+{
+  std::string aKey = std::string(theNodeName) + ":" + std::string(theNodeAttribute);
+  std::string result = "";
+  if(myParentAttributes.find(aKey) != myParentAttributes.end()) {
+    result = myParentAttributes[aKey];
+  }
+  return result;
 }

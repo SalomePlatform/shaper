@@ -15,17 +15,14 @@ class XGUI_EXPORT XGUI_Command : public QWidgetAction
 {
 Q_OBJECT
  public:
-  XGUI_Command(const QString& theId, QObject * parent, bool isCheckable = false);
-  XGUI_Command(const QString& theId, const QIcon& icon, const QString& text, QObject* parent,
+  XGUI_Command(const QString& theId, const QString& theDocumentKind,
+               QObject * parent, bool isCheckable = false);
+  XGUI_Command(const QString& theId, const QString& theDocumentKind,
+               const QIcon& icon, const QString& text, QObject* parent,
                bool isCheckable = false);
   ~XGUI_Command();
 
-  //VSV: Don't use this method for compatibility with SALOME. Use the construction below
-  /*virtual QString id() const
-   {
-   return data().toString();
-   }*/
-
+  const QString& documentKind() const;
   const QStringList& nestedCommands() const;
   void setNestedCommands(const QStringList& myUnblockableCommands);
 
@@ -38,6 +35,8 @@ Q_OBJECT
 
  private:
   bool myCheckable;
+
+  QString myDocumentKind;
   //! List of Ids of commands which WILL NOT be blocked when the command is on.
   QStringList myNestedCommands;
 };

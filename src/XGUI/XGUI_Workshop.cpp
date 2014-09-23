@@ -198,11 +198,11 @@ void XGUI_Workshop::initMenu()
   aCommand->connectTo(this, SLOT(onRedo()));
 
   aCommand = aGroup->addFeature("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
-                                QIcon(":pictures/rebuild.png"));
+    QIcon(":pictures/rebuild.png"), QKeySequence());
   aCommand->connectTo(this, SLOT(onRebuild()));
 
   aCommand = aGroup->addFeature("SAVEAS_CMD", tr("Save as..."), tr("Save the document into a file"),
-                                QIcon(":pictures/save.png"));
+                                QIcon(":pictures/save.png"), QKeySequence());
   aCommand->connectTo(this, SLOT(onSaveAs()));
   //aCommand->disable();
 
@@ -342,6 +342,7 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
     // Find and Activate active part
     if (myPartActivating)
       return;
+    myActionsMgr->update();
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aActiveDoc = aMgr->activeDocument();
     DocumentPtr aDoc = aMgr->moduleDocument();
@@ -558,7 +559,8 @@ void XGUI_Workshop::addFeature(const boost::shared_ptr<Config_FeatureMessage>& t
                                                      QString::fromStdString(theMessage->text()),
                                                      QString::fromStdString(theMessage->tooltip()),
                                                      QIcon(theMessage->icon().c_str()),
-                                                     QKeySequence(), isUsePropPanel);
+                                                     QKeySequence(),
+                                                     isUsePropPanel);
     salomeConnector()->setNestedActions(aFeatureId, aNestedFeatures.split(" ", QString::SkipEmptyParts));
     myActionsMgr->addCommand(aAction);
     myModule->featureCreated(aAction);
@@ -575,6 +577,7 @@ void XGUI_Workshop::addFeature(const boost::shared_ptr<Config_FeatureMessage>& t
     if (!aGroup) {
       aGroup = aPage->addGroup(aGroupName);
     }
+    QString aDocKind = QString::fromStdString(theMessage->documentKind());
     // Check if hotkey sequence is already defined:
     QKeySequence aHotKey = myActionsMgr->registerShortcut(
         QString::fromStdString(theMessage->keysequence()));
@@ -582,7 +585,9 @@ void XGUI_Workshop::addFeature(const boost::shared_ptr<Config_FeatureMessage>& t
     XGUI_Command* aCommand = aGroup->addFeature(aFeatureId,
                                                 QString::fromStdString(theMessage->text()),
                                                 QString::fromStdString(theMessage->tooltip()),
-                                                QIcon(theMessage->icon().c_str()), aHotKey,
+                                                QIcon(theMessage->icon().c_str()),
+                                                aDocKind,
+                                                aHotKey,
                                                 isUsePropPanel);
     aCommand->setNestedCommands(aNestedFeatures.split(" ", QString::SkipEmptyParts));
     myActionsMgr->addCommand(aCommand);

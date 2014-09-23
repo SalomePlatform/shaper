@@ -1,5 +1,5 @@
 <plugin>
-  <workbench id="Features">
+  <workbench id="Features" document="Part">
     <group id="Basic">
       <feature id="Extrusion" title="Extrusion" tooltip="Create a shape by extrusion of a contour" icon=":icons/extrusion.png">
           <source path="extrusion_widget.xml"/>

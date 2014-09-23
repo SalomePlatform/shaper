@@ -4,17 +4,26 @@
 #include <QVariant>
 #include <QDebug>
 
-XGUI_Command::XGUI_Command(const QString& theId, QObject * parent, bool isCheckable)
+XGUI_Command::XGUI_Command(const QString& theId,
+                           const QString& theDocumentKind,
+                           QObject * parent,
+                           bool isCheckable)
     : QWidgetAction(parent),
-      myCheckable(isCheckable)
+      myCheckable(isCheckable),
+      myDocumentKind(theDocumentKind)
 {
   setData(theId);
 }
 
-XGUI_Command::XGUI_Command(const QString& theId, const QIcon& icon, const QString& text,
-                           QObject* parent, bool isCheckable)
+XGUI_Command::XGUI_Command(const QString& theId,
+                           const QString& theDocumentKind,
+                           const QIcon& icon,
+                           const QString& text,
+                           QObject* parent,
+                           bool isCheckable)
     : QWidgetAction(parent),
-      myCheckable(isCheckable)
+      myCheckable(isCheckable),
+      myDocumentKind(theDocumentKind)
 {
   setIcon(icon);
   setText(text);
@@ -23,6 +32,11 @@ XGUI_Command::XGUI_Command(const QString& theId, const QIcon& icon, const QStrin
 
 XGUI_Command::~XGUI_Command()
 {
+}
+
+const QString& XGUI_Command::documentKind() const
+{
+  return myDocumentKind;
 }
 
 QWidget* XGUI_Command::createWidget(QWidget* theParent)
