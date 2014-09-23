@@ -39,6 +39,9 @@ Events_ID Events_Loop::eventByName(const char* theName)
 
 void Events_Loop::send(const boost::shared_ptr<Events_Message>& theMessage, bool isGroup)
 {
+  if (myImmediateListeners.find(theMessage->eventID().eventText()) != myImmediateListeners.end()) {
+    myImmediateListeners[theMessage->eventID().eventText()]->processEvent(theMessage);
+  }
   // if it is grouped message, just accumulate it
   if (isGroup) {
     boost::shared_ptr<Events_MessageGroup> aGroup = 
@@ -57,7 +60,7 @@ void Events_Loop::send(const boost::shared_ptr<Events_Message>& theMessage, bool
     }
   }
 
-  // TO DO: make it in thread and with usage of semaphores
+  // TODO: make it in thread and with usage of semaphores
 
   map<char*, map<void*, list<Events_Listener*> > >::iterator aFindID = myListeners.find(
       theMessage->eventID().eventText());
@@ -81,8 +84,12 @@ void Events_Loop::send(const boost::shared_ptr<Events_Message>& theMessage, bool
 }
 
 void Events_Loop::registerListener(Events_Listener* theListener, const Events_ID theID,
-                                   void* theSender)
+                                   void* theSender, bool theImmediate)
 {
+  if (theImmediate) { // just register as an immediate
+    myImmediateListeners[theID.eventText()] = theListener;
+    return;
+  }
   map<char*, map<void*, list<Events_Listener*> > >::iterator aFindID = myListeners.find(
       theID.eventText());
   if (aFindID == myListeners.end()) {  // create container associated with ID

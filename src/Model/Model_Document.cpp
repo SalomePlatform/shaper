@@ -255,8 +255,12 @@ bool Model_Document::compactNested()
 
 void Model_Document::finishOperation()
 {
-  // just to be sure that everybody knows that changes were performed
+  // finish for all subs first: to avoid nested finishing and "isOperation" calls problems inside
+  std::set<std::string>::iterator aSubIter = mySubs.begin();
+  for (; aSubIter != mySubs.end(); aSubIter++)
+    subDoc(*aSubIter)->finishOperation();
 
+  // just to be sure that everybody knows that changes were performed
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_Session>(Model_Session::get())
         ->setCheckTransactions(false);  // for nested transaction commit
@@ -282,10 +286,6 @@ void Model_Document::finishOperation()
     myTransactionsAfterSave++;
   }
 
-  // finish for all subs
-  std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for (; aSubIter != mySubs.end(); aSubIter++)
-    subDoc(*aSubIter)->finishOperation();
 }
 
 void Model_Document::abortOperation()

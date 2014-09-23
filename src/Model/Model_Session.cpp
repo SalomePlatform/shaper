@@ -204,9 +204,9 @@ Model_Session::Model_Session()
   Events_Loop* aLoop = Events_Loop::loop();
   static const Events_ID kFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
   aLoop->registerListener(this, kFeatureEvent);
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED), 0, true);
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED), 0, true);
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_VALIDATOR_LOADED));
 }
 
