@@ -7,7 +7,7 @@
 
 #include "PartSet.h"
 
-#include <PartSet_OperationSketchBase.h>
+#include <PartSet_OperationFeatureBase.h>
 #include <QObject>
 
 class QMouseEvent;
@@ -16,7 +16,7 @@ class QMouseEvent;
  \class PartSet_OperationFeatureEdit
  * \brief The operation for the sketch feature creation
  */
-class PARTSET_EXPORT PartSet_OperationFeatureEdit : public PartSet_OperationSketchBase
+class PARTSET_EXPORT PartSet_OperationFeatureEdit : public PartSet_OperationFeatureBase
 {
 Q_OBJECT
   /// Struct to define gp point, with the state is the point is initialized
@@ -25,6 +25,7 @@ Q_OBJECT
     /// Constructor
     Point()
     {
+      myIsInitialized = false;
     }
     /// Constructor
     /// \param thePoint the point
@@ -69,17 +70,8 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_OperationFeatureEdit();
 
-  /// Returns the operation local selection mode
-  /// \param theFeature the feature object to get the selection mode
-  /// \return the selection mode
-  virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
-
   /// Initializes the operation with previously created feature. It is used in sequental operations
   virtual void initFeature(FeaturePtr theFeature);
-
-  /// Returns the operation sketch feature
-  /// \returns the sketch instance
-  virtual FeaturePtr sketch() const;
 
   /// Processes the mouse pressed in the point
   /// \param theEvent the mouse event
@@ -139,7 +131,6 @@ Q_OBJECT
   void sendFeatures();
 
  private:
-  FeaturePtr mySketch;  ///< the sketch feature
   Point myCurPoint;  ///< the current 3D point clicked or moved
   bool myIsBlockedSelection;  ///< the state of the last state of selection blocked signal
 };

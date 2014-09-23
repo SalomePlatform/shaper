@@ -40,6 +40,8 @@ Q_OBJECT
   virtual bool storeValue() const;
 
   virtual bool restoreValue();
+  /// Defines if it is supposed that the widget should interact with the viewer.
+  virtual bool isViewerSelector() { return true; }
 
  protected:
   /// Set the attribute

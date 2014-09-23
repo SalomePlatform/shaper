@@ -43,11 +43,11 @@ ModuleBase_WidgetFeature::ModuleBase_WidgetFeature(QWidget* theParent,
   QString anObjName = QString::fromStdString(attributeID());
   myEditor->setObjectName(anObjName);
   myEditor->setReadOnly(true);
+  processFocus(myEditor);
   aControlLay->addWidget(myEditor);
 
   QString aTTip = QString::fromStdString(theData->widgetTooltip());
   myEditor->setToolTip(aTTip);
-
   aControlLay->addWidget(myEditor);
   aControlLay->setStretch(1, 1);
 }

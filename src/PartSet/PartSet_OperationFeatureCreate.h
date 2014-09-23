@@ -7,7 +7,7 @@
 
 #include "PartSet.h"
 
-#include <PartSet_OperationSketchBase.h>
+#include <PartSet_OperationFeatureBase.h>
 #include <PartSet_Constants.h>
 
 #include <QObject>
@@ -20,7 +20,7 @@ class QKeyEvent;
  \class PartSet_OperationFeatureCreate
  * \brief The operation for the sketch feature creation
  */
-class PARTSET_EXPORT PartSet_OperationFeatureCreate : public PartSet_OperationSketchBase
+class PARTSET_EXPORT PartSet_OperationFeatureCreate : public PartSet_OperationFeatureBase
 {
 Q_OBJECT
 
@@ -30,7 +30,6 @@ Q_OBJECT
   /// \return the boolean result
   static bool canProcessKind(const std::string& theId);
 
- public:
   /// Constructor
   /// \param theId the feature identifier
   /// \param theParent the operation parent
@@ -44,18 +43,10 @@ Q_OBJECT
   /// \return the selection mode
   virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
 
-  /// Initializes the operation with previously created feature. It is used in sequental operations
-  virtual void initFeature(FeaturePtr theFeature);
-
-  /// Initialisation of operation with preliminary selection
-  /// \param theSelected the list of selected presentations
-  /// \param theHighlighted the list of highlighted presentations
-  virtual void initSelection(const std::list<ModuleBase_ViewerPrs>& theSelected,
-                             const std::list<ModuleBase_ViewerPrs>& theHighlighted);
-
-  /// Returns the operation sketch feature
-  /// \returns the sketch instance
-  virtual FeaturePtr sketch() const;
+  /// Gives the current mouse point in the viewer
+  /// \param thePoint a point clicked in the viewer
+  /// \param theEvent the mouse event
+  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theEvent the mouse event
@@ -65,20 +56,12 @@ Q_OBJECT
   virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
                              const std::list<ModuleBase_ViewerPrs>& theSelected,
                              const std::list<ModuleBase_ViewerPrs>& theHighlighted);
-  /// Gives the current mouse point in the viewer
-  /// \param thePoint a point clicked in the viewer
-  /// \param theEvent the mouse event
-  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
   /// Processes the key pressed in the view
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);
 
+  /// alias for activateNextWidget(myActiveWidget);
   virtual void activateNextToCurrentWidget();
-
- public slots:
-  /// Slots which listen the mode widget activation
-  /// \param theWidget the model widget
-  virtual void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
  protected:
   /// \brief Virtual method called when operation is started
@@ -107,22 +90,6 @@ Q_OBJECT
   /// Verifies whether this operator can be commited.
   /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
   virtual bool canBeCommitted() const;
-
- protected:
-  /// Set value to the active widget
-  /// \param theFeature the feature
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  /// \return true if the point is set
-  bool setWidgetValue(ObjectPtr theFeature, double theX, double theY);
-
- private:
-  FeaturePtr myInitFeature;  ///< the initial feature
-  FeaturePtr mySketch;  ///< the sketch of the feature
-
-  ModuleBase_ModelWidget* myActiveWidget;  ///< the active widget
-
-  std::list<ModuleBase_ViewerPrs> myPreSelection;
 };
 
 #endif
