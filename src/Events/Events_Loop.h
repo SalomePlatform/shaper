@@ -28,6 +28,9 @@ class Events_Loop
   /// map from event ID to sender pointer to listeners that must be called for this
   std::map<char*, std::map<void*, std::list<Events_Listener*> > > myListeners;
 
+  /// map from event ID to listeners which must process message without waiting for flush
+  std::map<char*, Events_Listener*> myImmediateListeners;
+
   /// map from event ID to groupped messages (accumulated on flush)
   std::map<char*, boost::shared_ptr<Events_Message> > myGroups;
 
@@ -51,7 +54,7 @@ class Events_Loop
   //! Registers (or adds if such listener is already registered) a listener 
   //! that will be called on the event and from the defined sender
   EVENTS_EXPORT void registerListener(Events_Listener* theListener, const Events_ID theID,
-                                      void* theSender = 0);
+                                      void* theSender = 0, bool theImmediate = false);
 
   //! Initializes sending of a group-message by the given ID
   EVENTS_EXPORT void flush(const Events_ID& theID);
