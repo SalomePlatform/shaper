@@ -50,8 +50,10 @@
           <validator id="SketchPlugin_ResultLine"/>
         </feature_selector>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1"/>
-        <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue" default="computed"/>
-        <validator id="PartSet_LengthValidator"/> 
+        <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue" default="computed">
+          <validator id="GeomValidators_Positive"/>
+        </doublevalue_editor>
+        <validator id="PartSet_LengthValidator"/>
       </feature>
       
       <feature id="SketchConstraintRadius" title="Radius" tooltip="Create constraint for the given radius of a circle or an arc" icon=":icons/radius_constr.png">
