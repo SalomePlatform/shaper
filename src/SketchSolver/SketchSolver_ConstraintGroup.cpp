@@ -77,6 +77,7 @@ SketchSolver_ConstraintGroup::SketchSolver_ConstraintGroup(
 {
   myParams.clear();
   myEntities.clear();
+  myEntOfConstr.clear();
   myConstraints.clear();
 
   myTempConstraints.clear();
@@ -96,6 +97,7 @@ SketchSolver_ConstraintGroup::~SketchSolver_ConstraintGroup()
 {
   myParams.clear();
   myEntities.clear();
+  myEntOfConstr.clear();
   myConstraints.clear();
   myConstraintMap.clear();
   myTempConstraints.clear();
@@ -315,6 +317,13 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
     }
   }
 
+  // Update flags of entities to be used by constraints
+  for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++)
+    if (aConstrEnt[indAttr] != 0) {
+      int aPos = Search(aConstrEnt[indAttr], myEntities);
+      myEntOfConstr[aPos] = true;
+    }
+
   checkConstraintConsistence(*aConstrIter);
   return true;
 }
@@ -330,17 +339,22 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
   // If the entity is already in the group, try to find it
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator aEntIter =
       myEntityAttrMap.find(theEntity);
+  int aEntPos;
   std::vector<Slvs_Param>::const_iterator aParamIter;  // looks at first parameter of already existent entity or at the end of vector otherwise
   if (aEntIter == myEntityAttrMap.end())  // no such entity => should be created
     aParamIter = myParams.end();
   else {  // the entity already exists
-    int aEntPos = Search(aEntIter->second, myEntities);
+    aEntPos = Search(aEntIter->second, myEntities);
     int aParamPos = Search(myEntities[aEntPos].param[0], myParams);
     aParamIter = myParams.begin() + aParamPos;
   }
   const bool isEntExists = (aEntIter != myEntityAttrMap.end());  // defines that the entity already exists
+  const bool isNeedToSolve = myNeedToSolve;
+  myNeedToSolve = false;
 
   // Look over supported types of entities
+  Slvs_Entity aNewEntity;
+  aNewEntity.h = SLVS_E_UNKNOWN;
 
   // Point in 3D
   boost::shared_ptr<GeomDataAPI_Point> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
@@ -349,54 +363,45 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
     Slvs_hParam aX = changeParameter(aPoint->x(), aParamIter);
     Slvs_hParam aY = changeParameter(aPoint->y(), aParamIter);
     Slvs_hParam aZ = changeParameter(aPoint->z(), aParamIter);
+    if (!isEntExists) // New entity
+      aNewEntity = Slvs_MakePoint3d(++myEntityMaxID, myID, aX, aY, aZ);
+  } else {
+    // All entities except 3D points are created on workplane. So, if there is no workplane yet, then error
+    if (myWorkplane.h == SLVS_E_UNKNOWN)
+      return SLVS_E_UNKNOWN;
 
-    if (isEntExists)
-      return aEntIter->second;
-
-    // New entity
-    Slvs_Entity aPtEntity = Slvs_MakePoint3d(++myEntityMaxID, myID, aX, aY, aZ);
-    myEntities.push_back(aPtEntity);
-    myEntityAttrMap[theEntity] = aPtEntity.h;
-    return aPtEntity.h;
+    // Point in 2D
+    boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEntity);
+    if (aPoint2D) {
+      Slvs_hParam aU = changeParameter(aPoint2D->x(), aParamIter);
+      Slvs_hParam aV = changeParameter(aPoint2D->y(), aParamIter);
+      if (!isEntExists) // New entity
+        aNewEntity = Slvs_MakePoint2d(++myEntityMaxID, myID, myWorkplane.h, aU, aV);
+    } else {
+      // Scalar value (used for the distance entities)
+      AttributeDoublePtr aScalar = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theEntity);
+      if (aScalar) {
+        Slvs_hParam aValue = changeParameter(aScalar->value(), aParamIter);
+        if (!isEntExists) // New entity
+          aNewEntity = Slvs_MakeDistance(++myEntityMaxID, myID, myWorkplane.h, aValue);
+      }
+    }
   }
-
-  // All entities except 3D points are created on workplane. So, if there is no workplane yet, then error
-  if (myWorkplane.h == SLVS_E_UNKNOWN)
-    return SLVS_E_UNKNOWN;
-
-  // Point in 2D
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEntity);
-  if (aPoint2D) {
-    Slvs_hParam aU = changeParameter(aPoint2D->x(), aParamIter);
-    Slvs_hParam aV = changeParameter(aPoint2D->y(), aParamIter);
-
-    if (isEntExists)
-      return aEntIter->second;
-
-    // New entity
-    Slvs_Entity aPt2DEntity = Slvs_MakePoint2d(++myEntityMaxID, myID, myWorkplane.h, aU, aV);
-    myEntities.push_back(aPt2DEntity);
-    myEntityAttrMap[theEntity] = aPt2DEntity.h;
-    return aPt2DEntity.h;
-  }
-
-  // Scalar value (used for the distance entities)
-  AttributeDoublePtr aScalar = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theEntity);
-  if (aScalar) {
-    Slvs_hParam aValue = changeParameter(aScalar->value(), aParamIter);
-
-    if (isEntExists)
-      return aEntIter->second;
-
-    // New entity
-    Slvs_Entity aDistance = Slvs_MakeDistance(++myEntityMaxID, myID, myWorkplane.h, aValue);
-    myEntities.push_back(aDistance);
-    myEntityAttrMap[theEntity] = aDistance.h;
-    return aDistance.h;
-  }
-
   /// \todo Other types of entities
+
+  if (isEntExists) {
+    if (!myEntOfConstr[aEntPos]) // the entity is not used by constraints, no need to resolve them
+      myNeedToSolve = isNeedToSolve;
+    return aEntIter->second;
+  }
+
+  if (aNewEntity.h != SLVS_E_UNKNOWN) {
+    myEntities.push_back(aNewEntity);
+    myEntOfConstr.push_back(false);
+    myEntityAttrMap[theEntity] = aNewEntity.h;
+    return aNewEntity.h;
+  }
 
   // Unsupported or wrong entity type
   return SLVS_E_UNKNOWN;
@@ -415,6 +420,9 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
   std::map<FeaturePtr, Slvs_hEntity>::const_iterator aEntIter = myEntityFeatMap.find(theEntity);
   // defines that the entity already exists
   const bool isEntExists = (myEntityFeatMap.find(theEntity) != myEntityFeatMap.end());
+  
+  Slvs_Entity aNewEntity;
+  aNewEntity.h = SLVS_E_UNKNOWN;
 
   // SketchPlugin features
   boost::shared_ptr<SketchPlugin_Feature> aFeature = boost::dynamic_pointer_cast<
@@ -428,16 +436,8 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
           aFeature->data()->attribute(SketchPlugin_Line::START_ID()));
       Slvs_hEntity aEnd = changeEntity(aFeature->data()->attribute(SketchPlugin_Line::END_ID()));
 
-      if (isEntExists)
-        return aEntIter->second;
-
-      // New entity
-      Slvs_Entity aLineEntity = Slvs_MakeLineSegment(++myEntityMaxID, myID, myWorkplane.h, aStart,
-                                                     aEnd);
-      myEntities.push_back(aLineEntity);
-      myEntityFeatMap[theEntity] = aLineEntity.h;
-      myNeedToSolve = true;
-      return aLineEntity.h;
+      if (!isEntExists) // New entity
+        aNewEntity = Slvs_MakeLineSegment(++myEntityMaxID, myID, myWorkplane.h, aStart, aEnd);
     }
     // Circle
     else if (aFeatureKind.compare(SketchPlugin_Circle::ID()) == 0) {
@@ -446,16 +446,9 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
       Slvs_hEntity aRadius = changeEntity(
           aFeature->data()->attribute(SketchPlugin_Circle::RADIUS_ID()));
 
-      if (isEntExists)
-        return aEntIter->second;
-
-      // New entity
-      Slvs_Entity aCircleEntity = Slvs_MakeCircle(++myEntityMaxID, myID, myWorkplane.h, aCenter,
-                                                  myWorkplane.normal, aRadius);
-      myEntities.push_back(aCircleEntity);
-      myEntityFeatMap[theEntity] = aCircleEntity.h;
-      myNeedToSolve = true;
-      return aCircleEntity.h;
+      if (!isEntExists) // New entity
+        aNewEntity = Slvs_MakeCircle(++myEntityMaxID, myID, myWorkplane.h, aCenter,
+                                     myWorkplane.normal, aRadius);
     }
     // Arc
     else if (aFeatureKind.compare(SketchPlugin_Arc::ID()) == 0) {
@@ -464,15 +457,9 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
       Slvs_hEntity aStart = changeEntity(aFeature->data()->attribute(SketchPlugin_Arc::START_ID()));
       Slvs_hEntity aEnd = changeEntity(aFeature->data()->attribute(SketchPlugin_Arc::END_ID()));
 
-      if (isEntExists)
-        return aEntIter->second;
-
-      Slvs_Entity anArcEntity = Slvs_MakeArcOfCircle(++myEntityMaxID, myID, myWorkplane.h,
-                                                     myWorkplane.normal, aCenter, aStart, aEnd);
-      myEntities.push_back(anArcEntity);
-      myEntityFeatMap[theEntity] = anArcEntity.h;
-      myNeedToSolve = true;
-      return anArcEntity.h;
+      if (!isEntExists)
+        aNewEntity = Slvs_MakeArcOfCircle(++myEntityMaxID, myID, myWorkplane.h,
+                                          myWorkplane.normal, aCenter, aStart, aEnd);
     }
     // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
     else if (aFeatureKind.compare(SketchPlugin_Point::ID()) == 0) {
@@ -488,8 +475,19 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
       return aPoint;
     }
   }
-
   /// \todo Other types of features
+
+  if (isEntExists)
+    return aEntIter->second;
+
+  if (aNewEntity.h != SLVS_E_UNKNOWN) {
+    myEntities.push_back(aNewEntity);
+    myEntOfConstr.push_back(false);
+    myEntityFeatMap[theEntity] = aNewEntity.h;
+    myNeedToSolve = true;
+    return aNewEntity.h;
+  }
+
 
   // Unsupported or wrong entity type
   return SLVS_E_UNKNOWN;
@@ -540,6 +538,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeNormal(
   Slvs_Entity aNormal = Slvs_MakeNormal3d(++myEntityMaxID, myID, aNormParams[0], aNormParams[1],
                                           aNormParams[2], aNormParams[3]);
   myEntities.push_back(aNormal);
+  myEntOfConstr.push_back(false);
   myEntityAttrMap[theNorm] = aNormal.h;
   return aNormal.h;
 }
@@ -588,6 +587,7 @@ bool SketchSolver_ConstraintGroup::updateWorkplane()
     myWorkplane = Slvs_MakeWorkplane(++myEntityMaxID, myID, anOriginWP, aNormalWP);
     // Workplane should be added to the list of entities
     myEntities.push_back(myWorkplane);
+    myEntOfConstr.push_back(false);
   }
   return true;
 }
@@ -1113,6 +1113,7 @@ void SketchSolver_ConstraintGroup::removeConstraint(
         myEntityMaxID--;
     }
     myEntities.erase(myEntities.begin() + anEntPos);
+    myEntOfConstr.erase(myEntOfConstr.begin() + anEntPos);
 
     // Remove entity's ID from the lists of conincident points
     std::vector<std::set<Slvs_hEntity> >::iterator aCoPtIter = myCoincidentPoints.begin();
