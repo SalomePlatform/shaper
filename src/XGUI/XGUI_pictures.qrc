@@ -64,5 +64,7 @@
    
      <file>pictures/view_prefs.png</file>
      <file>pictures/module.png</file>
+     <file>pictures/shading.png</file>
+     <file>pictures/wireframe.png</file>
  </qresource>
  </RCC>

@@ -157,6 +157,8 @@ Q_OBJECT
   //! Show the given features in 3d Viewer
   void showOnlyObjects(const QList<ObjectPtr>& theList);
 
+  void setDisplayMode(const QList<ObjectPtr>& theList, int theMode);
+
   ModuleBase_IModule* module() const
   {
     return myModule;

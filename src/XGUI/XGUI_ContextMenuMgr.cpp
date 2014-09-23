@@ -51,6 +51,12 @@ void XGUI_ContextMenuMgr::createActions()
 
   aAction = new QAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide"), this);
   addAction("HIDE_CMD", aAction);
+
+  aAction = new QAction(QIcon(":pictures/shading.png"), tr("Shading"), this);
+  addAction("SHADING_CMD", aAction);
+
+  aAction = new QAction(QIcon(":pictures/wireframe.png"), tr("Wireframe"), this);
+  addAction("WIREFRAME_CMD", aAction);
 }
 
 void XGUI_ContextMenuMgr::addAction(const QString& theId, QAction* theAction)
@@ -134,9 +140,13 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
         } else if (hasFeature) {
           aMenu->addAction(action("EDIT_CMD"));
         } else {
-          if (aDisplayer->isVisible(aObject))
+          if (aDisplayer->isVisible(aObject)) {
             aMenu->addAction(action("HIDE_CMD"));
-          else {
+            if (aDisplayer->displayMode(aObject) == XGUI_Displayer::Shading)
+              aMenu->addAction(action("WIREFRAME_CMD"));
+            else
+              aMenu->addAction(action("SHADING_CMD"));
+          } else {
             aMenu->addAction(action("SHOW_CMD"));
           }
           aMenu->addAction(action("SHOW_ONLY_CMD"));
@@ -150,6 +160,9 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
         aMenu->addAction(action("SHOW_CMD"));
         aMenu->addAction(action("HIDE_CMD"));
         aMenu->addAction(action("SHOW_ONLY_CMD"));
+        aMenu->addSeparator();
+        aMenu->addAction(action("SHADING_CMD"));
+        aMenu->addAction(action("WIREFRAME_CMD"));
       }
     }
     if (hasFeature)
@@ -182,17 +195,23 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
     //if (aObjects.size() == 1)
     //  theMenu->addAction(action("EDIT_CMD"));
     bool isVisible = false;
+    bool isShading = false;
     foreach(ObjectPtr aObject, aObjects)
     {
       ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
       if (aRes && myWorkshop->displayer()->isVisible(aRes)) {
         isVisible = true;
+        isShading = (myWorkshop->displayer()->displayMode(aObject) == XGUI_Displayer::Shading);      
         break;
       }
     }
-    if (isVisible)
+    if (isVisible) {
       theMenu->addAction(action("HIDE_CMD"));
-    else
+      if (isShading)
+        theMenu->addAction(action("WIREFRAME_CMD"));
+      else
+        theMenu->addAction(action("SHADING_CMD"));
+    } else
       theMenu->addAction(action("SHOW_CMD"));
     //theMenu->addAction(action("DELETE_CMD"));
   }

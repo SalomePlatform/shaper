@@ -77,7 +77,8 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual FeaturePtr addFeature(std::string theID);
 
   //! Removes the feature from the document (with result)
-  MODEL_EXPORT virtual void removeFeature(FeaturePtr theFeature);
+  //! \param theCheck if it is false, do not check the references
+  MODEL_EXPORT virtual void removeFeature(FeaturePtr theFeature, const bool theCheck = true);
 
   //! Returns the existing feature by the label
   //! \param theLabel base label of the feature

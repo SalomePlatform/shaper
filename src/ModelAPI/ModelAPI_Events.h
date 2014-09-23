@@ -29,6 +29,10 @@ static const char * EVENT_OBJECT_TO_REDISPLAY = "ObjectsToRedisplay";
 static const char * EVENT_OPERATION_LAUNCHED = "OperationLaunched";
 /// Event ID that plugin is loaded (comes with ModelAPI_ObjectUpdatedMessage)
 static const char * EVENT_PLUGIN_LOADED = "PliginLoaded";
+/// Event ID that data of feature has to be shown (comes with ModelAPI_ObjectUpdatedMessage)
+static const char * EVENT_OBJECT_TOSHOW = "ObjectShow";
+/// Event ID that data of feature has to be shown (comes with ModelAPI_ObjectUpdatedMessage)
+static const char * EVENT_OBJECT_TOHIDE = "ObjectHide";
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup

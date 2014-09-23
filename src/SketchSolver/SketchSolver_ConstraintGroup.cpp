@@ -606,10 +606,10 @@ Slvs_hParam SketchSolver_ConstraintGroup::changeParameter(
 //  Class:    SketchSolver_ConstraintGroup
 //  Purpose:  solve the set of constraints for the current group
 // ============================================================================
-void SketchSolver_ConstraintGroup::resolveConstraints()
+bool SketchSolver_ConstraintGroup::resolveConstraints()
 {
   if (!myNeedToSolve)
-    return;
+    return false;
 
   myConstrSolver.setGroupID(myID);
   myConstrSolver.setParameters(myParams);
@@ -621,7 +621,7 @@ void SketchSolver_ConstraintGroup::resolveConstraints()
   if (aResult == SLVS_RESULT_OKAY) {  // solution succeeded, store results into correspondent attributes
                                       // Obtain result into the same list of parameters
     if (!myConstrSolver.getResult(myParams))
-      return;
+      return true;
 
     // We should go through the attributes map, because only attributes have valued parameters
     std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator anEntIter =
@@ -634,6 +634,7 @@ void SketchSolver_ConstraintGroup::resolveConstraints()
 
   removeTemporaryConstraints();
   myNeedToSolve = false;
+  return true;
 }
 
 // ============================================================================

@@ -147,6 +147,8 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName("LongOperation"));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_PLUGIN_LOADED));
   aLoop->registerListener(this, Events_Loop::eventByName("CurrentDocumentChanged"));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOSHOW));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
 
   registerValidators();
   activateModule();
@@ -297,6 +299,28 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     else
       QApplication::restoreOverrideCursor();
+  }
+
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TOSHOW)) {
+    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    const std::set<ObjectPtr>& aObjList = anUpdateMsg->objects();
+    QList<ObjectPtr> aList;
+    std::set<ObjectPtr>::const_iterator aIt;
+    for (aIt = aObjList.cbegin(); aIt != aObjList.cend(); ++aIt)
+      aList.append(*aIt);
+    showObjects(aList, true);
+  }
+
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TOHIDE)) {
+    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    const std::set<ObjectPtr>& aObjList = anUpdateMsg->objects();
+    QList<ObjectPtr> aList;
+    std::set<ObjectPtr>::const_iterator aIt;
+    for (aIt = aObjList.cbegin(); aIt != aObjList.cend(); ++aIt)
+      aList.append(*aIt);
+    showObjects(aList, false);
   }
 
   //An operation passed by message. Start it, process and commit.
@@ -1052,6 +1076,10 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     showObjects(aObjects, false);
   else if (theId == "SHOW_ONLY_CMD")
     showOnlyObjects(aObjects);
+  else if (theId == "SHADING_CMD")
+    setDisplayMode(aObjects, XGUI_Displayer::Shading);
+  else if (theId == "WIREFRAME_CMD")
+    setDisplayMode(aObjects, XGUI_Displayer::Wireframe);
 }
 
 //**************************************************************
@@ -1232,4 +1260,14 @@ void XGUI_Workshop::displayGroupResults(DocumentPtr theDoc, std::string theGroup
 {
   for (int i = 0; i < theDoc->size(theGroup); i++)
     myDisplayer->display(theDoc->object(theGroup, i), false);
+}
+
+//**************************************************************
+void XGUI_Workshop::setDisplayMode(const QList<ObjectPtr>& theList, int theMode)
+{
+  foreach(ObjectPtr aObj, theList) {
+    myDisplayer->setDisplayMode(aObj, (XGUI_Displayer::DisplayMode)theMode, false);
+  }
+  if (theList.size() > 0)
+    myDisplayer->updateViewer();
 }

@@ -98,8 +98,9 @@ class SketchSolver_ConstraintGroup
   void splitGroup(std::vector<SketchSolver_ConstraintGroup*>& theCuts);
 
   /** \brief Start solution procedure if necessary and update attributes of features
+   *  \return \c false when no need to solve constraints
    */
-  void resolveConstraints();
+  bool resolveConstraints();
 
   /** \brief Searches the constraints built on the entity and emit the signal to update them
    *  \param[in] theEntity attribute of the constraint
