@@ -105,6 +105,8 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void eraseDeletedResults(const bool isUpdateViewer = true);
 
+  void openLocalContext();
+
   /// Deactivates selection of sub-shapes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void closeLocalContexts(const bool isUpdateViewer = true);
@@ -155,7 +157,7 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param theAIS AIS presentation
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// Returns true if the Feature succesfully displayed
-  void display(ObjectPtr theObject, boost::shared_ptr<GeomAPI_AISObject> theAIS,
+  void display(ObjectPtr theObject, boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isShading,
                bool isUpdateViewer = true);
 
   /// Display the shape and activate selection of sub-shapes

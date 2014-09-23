@@ -48,6 +48,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
     boost::shared_ptr<GeomAPI_AISObject> anAIS;
 
     GeomPresentablePtr aPrs = boost::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
+    bool isShading = false;
     if (aPrs) {
       anAIS = aPrs->getAISObject(boost::shared_ptr<GeomAPI_AISObject>());
     } else {
@@ -57,16 +58,17 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
         if (aShapePtr) {
           anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
           anAIS->createShape(aShapePtr);
+          isShading = true;
         }
       }
     }
     if (anAIS)
-      display(theObject, anAIS, isUpdateViewer);
+      display(theObject, anAIS, isShading, isUpdateViewer);
   }
 }
 
-void XGUI_Displayer::display(ObjectPtr theObject, boost::shared_ptr<GeomAPI_AISObject> theAIS,
-                             bool isUpdateViewer)
+void XGUI_Displayer::display(ObjectPtr theObject, boost::shared_ptr<GeomAPI_AISObject> theAIS, 
+                             bool isShading, bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
@@ -75,7 +77,8 @@ void XGUI_Displayer::display(ObjectPtr theObject, boost::shared_ptr<GeomAPI_AISO
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
     myResult2AISObjectMap[theObject] = theAIS;
-    aContext->Display(anAISIO, isUpdateViewer);
+    aContext->Display(anAISIO, false);
+    aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, isUpdateViewer);
   }
 }
 
@@ -96,36 +99,6 @@ void XGUI_Displayer::erase(ObjectPtr theObject, const bool isUpdateViewer)
   }
   myResult2AISObjectMap.erase(theObject);
 }
-
-/*bool XGUI_Displayer::redisplay(ObjectPtr theObject,
- boost::shared_ptr<GeomAPI_AISObject> theAIS,
- const bool isUpdateViewer)
- {
- bool isCreated = false;
- Handle(AIS_InteractiveObject) anAIS = 
- theAIS ? theAIS->impl<Handle(AIS_InteractiveObject)>() : Handle(AIS_InteractiveObject)();
- Handle(AIS_InteractiveContext) aContext = AISContext();
- // Open local context if there is no one
- if (!aContext->HasOpenedContext()) {
- aContext->ClearCurrents(false);
- aContext->OpenLocalContext(false /use displayed objects/, true /allow shape decomposition/);
- // set mouse sensitivity
- //aContext->SetSensitivityMode(StdSelect_SM_WINDOW);
- //aContext->SetPixelTolerance(MOUSE_SENSITIVITY_IN_PIXEL);
- }
- // display or redisplay presentation
- boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[theObject];
- if (isVisible(theObject) && anObj && !anObj->empty()) {
- aContext->Redisplay(anAIS, isUpdateViewer);
- //aContext->RecomputeSelectionOnly(anAIS);
- }
- else {
- myResult2AISObjectMap[theObject] = theAIS;
- aContext->Display(anAIS, isUpdateViewer);
- isCreated = true;
- }
- return isCreated;
- }*/
 
 void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
 {
@@ -341,6 +314,20 @@ void XGUI_Displayer::eraseDeletedResults(const bool isUpdateViewer)
 
   if (isUpdateViewer)
     updateViewer();
+}
+
+void XGUI_Displayer::openLocalContext()
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
+  // Open local context if there is no one
+  if (!aContext->HasOpenedContext()) {
+    aContext->ClearCurrents(false);
+    //aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
+    aContext->OpenLocalContext();
+    aContext->NotUseDisplayedObjects();
+  }
 }
 
 void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
