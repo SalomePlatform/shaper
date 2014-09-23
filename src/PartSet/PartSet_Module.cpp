@@ -287,14 +287,14 @@ void PartSet_Module::onRestartOperation(std::string theName, ObjectPtr theObject
 
   std::string aKind = aFeature ? aFeature->getKind() : "";
   ModuleBase_Operation* anOperation = createOperation(theName, aKind);
-  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp) {
+  PartSet_OperationSketchBase* aSketchOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  if (aSketchOp) {
     XGUI_Selection* aSelection = myWorkshop->selector()->selection();
     // Initialise operation with preliminary selection
     std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
     std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-    aPreviewOp->initFeature(aFeature);
-    aPreviewOp->initSelection(aSelected, aHighlighted);
+    aSketchOp->initFeature(aFeature);
+    aSketchOp->initSelection(aSelected, aHighlighted);
   } else if (aFeature) {
     anOperation->setEditingFeature(aFeature);
     //Deactivate result of current feature in order to avoid its selection

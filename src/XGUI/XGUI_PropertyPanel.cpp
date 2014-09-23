@@ -85,9 +85,8 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
 
     connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)), this,
             SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
-
-    //connect(*anIt, SIGNAL(activated(ModuleBase_ModelWidget*)),
-    //        this, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)));
+    connect(*anIt, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)),
+            this, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)));
 
     ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
     if (aPointWidget)

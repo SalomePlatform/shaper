@@ -13,6 +13,7 @@ SET(PROJECT_HEADERS
 	PartSet_OperationFeatureEditMulti.h
 	PartSet_OperationSketchBase.h
 	PartSet_OperationSketch.h
+	PartSet_OperationFeatureBase.h
 	PartSet_TestOCC.h
 	PartSet_Tools.h
 	PartSet_WidgetSketchLabel.h
@@ -28,6 +29,7 @@ SET(PROJECT_SOURCES
 	PartSet_OperationFeatureEditMulti.cpp
 	PartSet_OperationSketchBase.cpp
 	PartSet_OperationSketch.cpp
+	PartSet_OperationFeatureBase.cpp
 	PartSet_TestOCC.cpp
 	PartSet_Tools.cpp
 	PartSet_WidgetSketchLabel.cpp

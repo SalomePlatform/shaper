@@ -16,6 +16,7 @@ class ModelAPI_Feature;
 class QWidget;
 class QLabel;
 class QLineEdit;
+class QToolButton;
 
 /**\class ModuleBase_WidgetFeature
  * \ingroup GUI
@@ -52,6 +53,8 @@ Q_OBJECT
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
+  /// Defines if it is supposed that the widget should interact with the viewer.
+  virtual bool isViewerSelector() { return true; }
 
  protected:
   /// Fill the widget values by given point
@@ -80,9 +83,11 @@ Q_OBJECT
     return myObjectKinds;
   }
 
+ protected:
   ObjectPtr myObject;  ///< the current widget feature
   QStringList myObjectKinds;  ///< the kinds of possible features
 
+ private:
   QWidget* myContainer;  /// the parent top control
   QLabel* myLabel;  /// the editor information label
   QLineEdit* myEditor;  ///< the feature editor to visualize the feature name

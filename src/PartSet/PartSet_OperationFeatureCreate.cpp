@@ -45,9 +45,7 @@ using namespace std;
 PartSet_OperationFeatureCreate::PartSet_OperationFeatureCreate(const QString& theId,
                                                                QObject* theParent,
                                                                FeaturePtr theFeature)
-    : PartSet_OperationSketchBase(theId, theParent),
-      mySketch(theFeature),
-      myActiveWidget(0)
+    : PartSet_OperationFeatureBase(theId, theParent, theFeature)
 {
 }
 
@@ -82,78 +80,6 @@ std::list<int> PartSet_OperationFeatureCreate::getSelectionModes(ObjectPtr theFe
   return aModes;
 }
 
-void PartSet_OperationFeatureCreate::initSelection(
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
-{
-  myPreSelection = theSelected;
-}
-
-void PartSet_OperationFeatureCreate::initFeature(FeaturePtr theFeature)
-{
-  myInitFeature = theFeature;
-}
-
-FeaturePtr PartSet_OperationFeatureCreate::sketch() const
-{
-  return mySketch;
-}
-
-void PartSet_OperationFeatureCreate::mouseReleased(
-    QMouseEvent* theEvent, Handle(V3d_View) theView,
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
-{
-  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
-  double aX = aPoint.X(), anY = aPoint.Y();
-  bool isClosedContour = false;
-
-  if (theSelected.empty()) {
-    PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-  } else {
-    ModuleBase_ViewerPrs aPrs = theSelected.front();
-    const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull())
-    {
-      if (aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
-        const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
-        if (!aVertex.IsNull()) {
-          aPoint = BRep_Tool::Pnt(aVertex);
-          PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-          PartSet_Tools::setConstraints(sketch(), feature(), myActiveWidget->attributeID(), aX, anY);
-          isClosedContour = true;
-        }
-      } else if (aShape.ShapeType() == TopAbs_EDGE) { // a line is selected
-        PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-        // move to selected line
-        if (feature()->getKind() == SketchPlugin_Line::ID()) {
-          //FeaturePtr aFeature = aPrs.feature();
-          //projectPointOnLine(aFeature, myPointSelectionMode, aPoint, theView, aX, anY);
-        }
-      }
-    }
-  }
-  ObjectPtr aFeature;
-  if (!theSelected.empty()) {
-    ModuleBase_ViewerPrs aPrs = theSelected.front();
-    aFeature = aPrs.object();
-  } else
-    aFeature = feature();  // for the widget distance only
-
-  bool isApplyed = setWidgetValue(aFeature, aX, anY);
-  if (isApplyed) {
-    flushUpdated();
-    emit activateNextWidget(myActiveWidget);
-  }
-
-  if (commit() && !isClosedContour) {
-    // if the point creation is finished, the next mouse release should commit the modification
-    // the next release can happens by double click in the viewer
-    restartOperation(feature()->getKind(), feature());
-    return;
-  }
-}
-
 void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
     double aX, anY;
@@ -161,27 +87,6 @@ void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3
     PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
     setWidgetValue(feature(), aX, anY);
     flushUpdated();
-}
-
-void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
-{
-  myActiveWidget = theWidget;
-  if ((myPreSelection.size() > 0) && myActiveWidget) {
-    const ModuleBase_ViewerPrs& aPrs = myPreSelection.front();
-    ModuleBase_WidgetValueFeature aValue;
-    aValue.setObject(aPrs.object());
-    if (myActiveWidget->setValue(&aValue)) {
-      myPreSelection.remove(aPrs);
-      emit activateNextWidget(myActiveWidget);
-    }
-  }
-  if (myInitFeature && myActiveWidget) {
-    ModuleBase_WidgetPoint2D* aWgt = dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
-    if (aWgt && aWgt->initFromPrevious(myInitFeature)) {
-      myInitFeature = FeaturePtr();
-      emit activateNextWidget(myActiveWidget);
-    }
-  }
 }
 
 void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
@@ -197,6 +102,55 @@ void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
       break;
     default:
       break;
+  }
+}
+
+void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
+                                                 const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                                 const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
+{
+  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
+  double aX = aPoint.X(), anY = aPoint.Y();
+  bool isClosedContour = false;
+
+  if (theSelected.empty()) {
+    PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+  } else {
+    ModuleBase_ViewerPrs aPrs = theSelected.front();
+    const TopoDS_Shape& aShape = aPrs.shape();
+    if (!aShape.IsNull()) {
+      if (aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
+        const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
+        if (!aVertex.IsNull()) {
+          aPoint = BRep_Tool::Pnt(aVertex);
+          PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+          PartSet_Tools::setConstraints(sketch(), feature(), myActiveWidget->attributeID(), aX, anY);
+          isClosedContour = true;
+        }
+      } else if (aShape.ShapeType() == TopAbs_EDGE) { // a line is selected
+        PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+      }
+    }
+  }
+  ObjectPtr aFeature;
+  if (!theSelected.empty()) {
+    ModuleBase_ViewerPrs aPrs = theSelected.front();
+    aFeature = aPrs.object();
+  } else {
+    aFeature = feature();  // for the widget distance only
+  }
+
+  bool isApplyed = setWidgetValue(aFeature, aX, anY);
+  if (isApplyed) {
+    flushUpdated();
+    emit activateNextWidget(myActiveWidget);
+  }
+
+  if (commit() && !isClosedContour) {
+    // if the point creation is finished, the next mouse release should commit the modification
+    // the next release can happens by double click in the viewer
+    restartOperation(feature()->getKind(), feature());
+    return;
   }
 }
 
@@ -247,18 +201,4 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
   if (theFlushMessage)
     flushCreated();
   return aNewFeature;
-}
-
-bool PartSet_OperationFeatureCreate::setWidgetValue(ObjectPtr theFeature, double theX, double theY)
-{
-  if (!myActiveWidget)
-    return false;
-  ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
-  aValue->setObject(theFeature);
-  aValue->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
-  bool isApplyed = myActiveWidget->setValue(aValue);
-
-  delete aValue;
-  myIsModified = (myIsModified || isApplyed);
-  return isApplyed;
 }

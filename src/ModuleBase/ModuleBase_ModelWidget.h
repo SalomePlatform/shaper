@@ -2,8 +2,8 @@
 // Created:     25 Apr 2014
 // Author:      Natalia ERMOLAEVA
 
-#ifndef ModuleBase_ModelWidget_H
-#define ModuleBase_ModelWidget_H
+#ifndef MODULEBASE_MODELWIDGET_H
+#define MODULEBASE_MODELWIDGET_H
 
 #include <ModuleBase.h>
 
@@ -72,6 +72,9 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const = 0;
 
+  /// FocusIn events processing
+  virtual bool eventFilter(QObject* theObject, QEvent *theEvent);
+
   /// Returns the attribute name
   /// \returns the string value
   std::string attributeID() const
@@ -95,6 +98,9 @@ Q_OBJECT
     myFeature = theFeature;
   }
 
+  /// Defines if it is supposed that the widget should interact with the viewer.
+  virtual bool isViewerSelector() { return false; }
+
 signals:
   /// The signal about widget values changed
   void valuesChanged();
@@ -102,6 +108,9 @@ signals:
   /// \param theAttributeName a name of the attribute
   /// \param theEvent key release event
   void keyReleased(QKeyEvent* theEvent);
+  /// The signal about the widget is get focus
+  /// \param theWidget the model base widget
+  void focusInWidget(ModuleBase_ModelWidget* theWidget);
   /// The signal about the widget is lost focus
   /// \param theWidget the model base widget
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
@@ -116,11 +125,18 @@ signals:
 
   void updateObject(ObjectPtr theObj) const;
 
+  /// Let the widget process FocusIn events
+  void processFocus(QWidget* theWidget);
+
   std::string myAttributeID;  /// the attribute name of the model feature
   std::string myParentId;    /// name of parent
   FeaturePtr myFeature;
 
   bool myIsComputedDefault;
+
+ private:
+   /// Contains a list of widgets that may accept focus
+   QList<QWidget*> myFocusInWidgets;
 };
 
 #endif

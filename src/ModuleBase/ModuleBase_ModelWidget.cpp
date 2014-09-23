@@ -12,6 +12,7 @@
 
 #include <Events_Loop.h>
 
+#include <QEvent>
 #include <QWidget>
 
 ModuleBase_ModelWidget::ModuleBase_ModelWidget(QObject* theParent, const Config_WidgetAPI* theData,
@@ -47,4 +48,23 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj) const
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
   ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
+}
+
+void ModuleBase_ModelWidget::processFocus(QWidget* theWidget)
+{
+  theWidget->setFocusPolicy(Qt::StrongFocus);
+  theWidget->installEventFilter(this);
+  myFocusInWidgets.append(theWidget);
+}
+
+bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
+{
+  QWidget* aWidget = dynamic_cast<QWidget*>(theObject);
+  if (theEvent->type() == QEvent::FocusIn && myFocusInWidgets.contains(aWidget)) {
+    emit focusInWidget(this);
+    return true;
+  } else {
+    // pass the event on to the parent class
+    return QObject::eventFilter(theObject, theEvent);
+  }
 }

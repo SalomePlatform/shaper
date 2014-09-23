@@ -37,10 +37,10 @@
 
 using namespace std;
 
-PartSet_OperationFeatureEdit::PartSet_OperationFeatureEdit(const QString& theId, QObject* theParent,
+PartSet_OperationFeatureEdit::PartSet_OperationFeatureEdit(const QString& theId,
+                                                           QObject* theParent,
                                                            FeaturePtr theFeature)
-    : PartSet_OperationSketchBase(theId, theParent),
-      mySketch(theFeature),
+    : PartSet_OperationFeatureBase(theId, theParent, theFeature),
       myIsBlockedSelection(false)
 {
 }
@@ -49,26 +49,20 @@ PartSet_OperationFeatureEdit::~PartSet_OperationFeatureEdit()
 {
 }
 
-std::list<int> PartSet_OperationFeatureEdit::getSelectionModes(ObjectPtr theFeature) const
-{
-  return PartSet_OperationSketchBase::getSelectionModes(theFeature);
-}
-
 void PartSet_OperationFeatureEdit::initFeature(FeaturePtr theFeature)
 {
   setEditingFeature(theFeature);
 }
 
-FeaturePtr PartSet_OperationFeatureEdit::sketch() const
+void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView,
+                                                const std::list<ModuleBase_ViewerPrs>& theSelected,
+                                                const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  return mySketch;
-}
-
-void PartSet_OperationFeatureEdit::mousePressed(
-    QMouseEvent* theEvent, Handle(V3d_View) theView,
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
-{
+  if(myActiveWidget && myActiveWidget->isViewerSelector()) {
+    // Almost do nothing, all stuff in on PartSet_OperationFeatureBase::mouseReleased
+    PartSet_OperationFeatureBase::mousePressed(theEvent, theView, theSelected, theHighlighted);
+    return;
+  }
   ObjectPtr aObject;
   if (!theHighlighted.empty())
     aObject = theHighlighted.front().object();
@@ -131,10 +125,15 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, Handle(V3d_
 
 void PartSet_OperationFeatureEdit::mouseReleased(
     QMouseEvent* theEvent, Handle(V3d_View) theView,
-    const std::list<ModuleBase_ViewerPrs>& /*theSelected*/,
-    const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
+    const std::list<ModuleBase_ViewerPrs>& theSelected,
+    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  blockSelection(false);
+  if(myActiveWidget && myActiveWidget->isViewerSelector()) {
+    // Almost do nothing, all stuff in on PartSet_OperationFeatureBase::mouseReleased
+    PartSet_OperationFeatureBase::mouseReleased(theEvent, theView, theSelected, theHighlighted);
+  } else {
+    blockSelection(false);
+  }
 }
 
 void PartSet_OperationFeatureEdit::mouseDoubleClick(
