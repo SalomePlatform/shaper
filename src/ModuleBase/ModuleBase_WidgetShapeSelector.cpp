@@ -198,9 +198,17 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
     std::string aName = mySelectedObject->data()->name();
     myTextLine->setText(QString::fromStdString(aName));
   } else {
-    if (myIsActive)
-      myTextLine->setText(tr("Select an object"));
-    else
+    if (myIsActive) {
+      QString aMsg = tr("Select a ");
+      int i = 0;
+      foreach (QString aType, myShapeTypes) {
+        if (i > 0)
+          aMsg += " or ";
+        aMsg += aType;
+        i++;
+      }
+      myTextLine->setText(aMsg);
+    } else
       myTextLine->setText(tr("No object selected"));
   }
 }
