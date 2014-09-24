@@ -7,6 +7,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Session.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
