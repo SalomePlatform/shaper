@@ -789,9 +789,17 @@ void XGUI_Workshop::onRedo()
 //******************************************************
 void XGUI_Workshop::onRebuild()
 {
+  SessionPtr aMgr = ModelAPI_Session::get();
+  bool aWasOperation = aMgr->isOperation(); // keep this value
+  if (!aWasOperation) {
+    aMgr->startOperation();
+  }
   static const Events_ID aRebuildEvent = Events_Loop::loop()->eventByName("Rebuild");
   Events_Loop::loop()->send(boost::shared_ptr<Events_Message>(
     new Events_Message(aRebuildEvent, this)));
+  if (!aWasOperation) {
+    aMgr->finishOperation();
+  }
 }
 
 //******************************************************
