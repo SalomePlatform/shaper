@@ -1,5 +1,5 @@
 <plugin>
-  <workbench id="Features">
+  <workbench id="Features" document="Part">
     <group id="Exchange">
       <feature
         id="Import"
