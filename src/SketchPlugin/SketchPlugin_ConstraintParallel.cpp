@@ -73,7 +73,10 @@ AISObjectPtr SketchPlugin_ConstraintParallel::getAISObject(AISObjectPtr thePrevi
 
   boost::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = boost::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
+  boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = boost::shared_ptr<GeomAPI_Pnt>();;
+  if(aFlyoutAttr->isInitialized()) {
+    aFlyoutPnt = sketch()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
+  }
 
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS)

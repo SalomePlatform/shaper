@@ -109,10 +109,10 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
 
   boost::shared_ptr<GeomAPI_Pnt> aPoint1 = sketch()->to3D(aPnt_A->x(), aPnt_A->y());
   boost::shared_ptr<GeomAPI_Pnt> aPoint2 = sketch()->to3D(aPnt_B->x(), aPnt_B->y());
-  boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt =
-      aFlyOutAttr->isInitialized() ?
-          sketch()->to3D(aFlyOutAttr->x(), aFlyOutAttr->y()) : boost::shared_ptr<GeomAPI_Pnt>();
-
+  boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = boost::shared_ptr<GeomAPI_Pnt>();
+  if(aFlyOutAttr->isInitialized()) {
+    aFlyoutPnt = sketch()->to3D(aFlyOutAttr->x(), aFlyOutAttr->y());
+  }
   // value calculation
   boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = boost::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
