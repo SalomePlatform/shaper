@@ -63,7 +63,7 @@ Q_OBJECT
   * the operation is not granted.
   * The method has to be redefined for granted operations.
   */
-  virtual bool isGranted() const  { return false; }
+  virtual bool isGranted(ModuleBase_IOperation* theOperation) const  { return false; }
 
   /**
   * Must return True if the operation's feature is valid.
