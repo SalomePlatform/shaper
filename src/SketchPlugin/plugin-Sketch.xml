@@ -45,7 +45,7 @@
       </feature>
       
       <feature id="SketchConstraintLength" title="Length" tooltip="Create constraint for the given length of a line segment" icon=":icons/length.png">
-        <label title="Select a line on which to calculate lenght" tooltip="Select a line on which to calculate lenght"/>
+        <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
         <feature_selector id="ConstraintEntityA" label="Line" tooltip="Select an line in the viewer">
           <validator id="SketchPlugin_ResultLine"/>
         </feature_selector>
