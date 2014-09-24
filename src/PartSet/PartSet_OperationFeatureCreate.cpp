@@ -160,8 +160,6 @@ void PartSet_OperationFeatureCreate::activateNextToCurrentWidget()
 void PartSet_OperationFeatureCreate::startOperation()
 {
   PartSet_OperationSketchBase::startOperation();
-  //setPointSelectionMode(!myInitFeature ? SM_FirstPoint : SM_SecondPoint);
-
   emit multiSelectionEnabled(false);
 }
 

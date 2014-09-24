@@ -49,6 +49,7 @@ const static char* FEATURE_TEXT = "title";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
 const static char* FEATURE_NESTED = "nested";
 const static char* FEATURE_INTERNAL = "internal";
+const static char* FEATURE_OBLIGATORY = "obligatory";
 // TODO: Rename
 const static char* PREVIOUS_FEATURE_PARAM = "previous_feature_param";
 const static char* ANY_WDG_TOOLTIP = FEATURE_TOOLTIP;

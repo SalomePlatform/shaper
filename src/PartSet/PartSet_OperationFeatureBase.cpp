@@ -116,6 +116,18 @@ void PartSet_OperationFeatureBase::mouseReleased(QMouseEvent* theEvent, Handle(V
 void PartSet_OperationFeatureBase::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
 {
   myActiveWidget = theWidget;
+  activateByPreselection();
+  if (myInitFeature && myActiveWidget) {
+    ModuleBase_WidgetPoint2D* aWgt = dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
+    if (aWgt && aWgt->initFromPrevious(myInitFeature)) {
+      myInitFeature = FeaturePtr();
+      emit activateNextWidget(myActiveWidget);
+    }
+  }
+}
+
+void PartSet_OperationFeatureBase::activateByPreselection()
+{
   if ((myPreSelection.size() > 0) && myActiveWidget) {
     const ModuleBase_ViewerPrs& aPrs = myPreSelection.front();
     ModuleBase_WidgetValueFeature aValue;
@@ -124,12 +136,9 @@ void PartSet_OperationFeatureBase::onWidgetActivated(ModuleBase_ModelWidget* the
       myPreSelection.remove(aPrs);
       emit activateNextWidget(myActiveWidget);
     }
-  }
-  if (myInitFeature && myActiveWidget) {
-    ModuleBase_WidgetPoint2D* aWgt = dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
-    if (aWgt && aWgt->initFromPrevious(myInitFeature)) {
-      myInitFeature = FeaturePtr();
-      emit activateNextWidget(myActiveWidget);
+    // If preselection is enough to make a valid feature - apply it immediately
+    if(isValid()) {
+      commit();
     }
   }
 }

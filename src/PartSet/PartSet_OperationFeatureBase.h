@@ -62,6 +62,8 @@ Q_OBJECT
   virtual void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
  protected:
+  ///
+ void activateByPreselection();
   /// Set value to the active widget
   /// \param theFeature the feature
   /// \param theX the horizontal coordinate

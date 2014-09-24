@@ -49,11 +49,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
   QWidget* fileSelectorControl(QWidget* theParent);
   QWidget* choiceControl(QWidget* theParent);
 
-  /// Check whether the XML definition for the given type contains internal property
-  /// \param theType the widget type
-  /// \return the boolean result
-  bool isInternalWidget(const std::string& theType);
-
   QString qs(const std::string& theStdString) const;
 
  private:

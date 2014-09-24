@@ -8,7 +8,8 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Events.h>
 
-#include "Config_WidgetAPI.h"
+#include <Config_Keywords.h>
+#include <Config_WidgetAPI.h>
 
 #include <Events_Loop.h>
 
@@ -21,12 +22,23 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QObject* theParent, const Config_
       myParentId(theParentId)
 {
   myIsComputedDefault = false;
+  myIsObligatory = theData ? theData->getBooleanAttribute(FEATURE_OBLIGATORY, true) : true;
   myAttributeID = theData ? theData->widgetId() : "";
 }
 
 bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
 {
   return theObject->data()->attribute(attributeID())->isInitialized();
+}
+
+void ModuleBase_ModelWidget::enableFocusProcessing()
+{
+  QList<QWidget*> aMyControls = getControls();
+  foreach(QWidget*  eachControl, aMyControls) {
+    if(!myFocusInWidgets.contains(eachControl)) {
+      enableFocusProcessing(eachControl);
+    }
+  }
 }
 
 bool ModuleBase_ModelWidget::focusTo()
@@ -43,6 +55,7 @@ bool ModuleBase_ModelWidget::focusTo()
   return true;
 }
 
+
 void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj) const
 {
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
@@ -50,7 +63,7 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj) const
   ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
 }
 
-void ModuleBase_ModelWidget::processFocus(QWidget* theWidget)
+void ModuleBase_ModelWidget::enableFocusProcessing(QWidget* theWidget)
 {
   theWidget->setFocusPolicy(Qt::StrongFocus);
   theWidget->installEventFilter(this);
@@ -60,11 +73,10 @@ void ModuleBase_ModelWidget::processFocus(QWidget* theWidget)
 bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
 {
   QWidget* aWidget = dynamic_cast<QWidget*>(theObject);
-  if (theEvent->type() == QEvent::FocusIn && myFocusInWidgets.contains(aWidget)) {
+  if (theEvent->type() == QEvent::MouseButtonRelease && 
+      myFocusInWidgets.contains(aWidget)) {
     emit focusInWidget(this);
-    return true;
-  } else {
-    // pass the event on to the parent class
-    return QObject::eventFilter(theObject, theEvent);
-  }
+  } 
+  // pass the event on to the parent class
+  return QObject::eventFilter(theObject, theEvent);
 }

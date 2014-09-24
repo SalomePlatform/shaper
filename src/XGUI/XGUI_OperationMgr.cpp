@@ -5,8 +5,6 @@
 #include "XGUI_OperationMgr.h"
 
 #include "ModuleBase_Operation.h"
-#include <ModelAPI_Validator.h>
-#include <ModelAPI_FeatureValidator.h>
 
 #include <QMessageBox>
 #include <QApplication>
@@ -110,33 +108,20 @@ bool XGUI_OperationMgr::abortAllOperations()
   return result;
 }
 
-bool XGUI_OperationMgr::validateOperation(ModuleBase_Operation* theOperation)
-{
-  if (!theOperation)
-    return false;
-  //Get operation feature to validate
-  FeaturePtr aFeature = theOperation->feature();
-  if (!aFeature) return true; // rename operation
-  //Get validators for the Id
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-
-  bool isValid = aFactory->validate(aFeature);
-  emit operationValidated(isValid);
-  return isValid;
-}
-
 void XGUI_OperationMgr::onValidateOperation()
 {
   if (!hasOperation())
     return;
   ModuleBase_Operation* anOperation = currentOperation();
-  validateOperation(currentOperation());
+  if(anOperation) {
+    bool isValid = anOperation->isValid();
+    emit operationValidated(isValid);
+  }
 }
 
 bool XGUI_OperationMgr::commitOperation()
 {
-  if (validateOperation(currentOperation())) {
+  if (hasOperation() && currentOperation()->isValid()) {
     onCommitOperation();
     return true;
   }
@@ -150,20 +135,19 @@ void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
 
 bool XGUI_OperationMgr::canStartOperation(ModuleBase_Operation* theOperation)
 {
-  bool aCanStart = true;
+  return true;
+  /*bool aCanStart = true;
   ModuleBase_Operation* aCurrentOp = currentOperation();
   if (aCurrentOp) {
     if (!theOperation->isGranted()) {
-      if (!aCurrentOp->isValid(theOperation)) {
-        if (canAbortOperation()) {
-          aCurrentOp->abort();
-        } else {
-          aCanStart = false;
-        }
+      if (canAbortOperation()) {
+        aCurrentOp->abort();
+      } else {
+        aCanStart = false;
       }
     }
   }
-  return aCanStart;
+  return aCanStart;*/
 }
 
 

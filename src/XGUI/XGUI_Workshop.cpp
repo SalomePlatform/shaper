@@ -495,6 +495,7 @@ void XGUI_Workshop::onOperationStarted()
     for (; anIt != aLast; anIt++) {
       aWidget = *anIt;
       aWidget->setFeature(aOperation->feature());
+      aWidget->enableFocusProcessing();
       QObject::connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
       // Init default values
       if (!aOperation->isEditOperation() && !aWidget->isComputedDefault()) {
