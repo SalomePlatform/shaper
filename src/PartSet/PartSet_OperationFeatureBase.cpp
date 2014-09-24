@@ -134,12 +134,14 @@ void PartSet_OperationFeatureBase::activateByPreselection()
     aValue.setObject(aPrs.object());
     if (myActiveWidget->setValue(&aValue)) {
       myPreSelection.remove(aPrs);
-      emit activateNextWidget(myActiveWidget);
+      if(isValid()) {
+        myActiveWidget = NULL;
+        commit();
+      } else {
+        emit activateNextWidget(myActiveWidget);
+      }
     }
     // If preselection is enough to make a valid feature - apply it immediately
-    if(isValid()) {
-      commit();
-    }
   }
 }
 
