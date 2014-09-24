@@ -20,11 +20,24 @@ bool Model_FeatureValidator::isValid(const boost::shared_ptr<ModelAPI_Feature>& 
   if (!aData->isValid())
     return false;
   const std::string kAllTypes = "";
-  std::list<AttributePtr> aLtAttributes = aData->attributes(kAllTypes);
-  std::list<AttributePtr>::iterator it = aLtAttributes.begin();
+  std::list<std::string> aLtAttributes = aData->attributesIDs(kAllTypes);
+  std::list<std::string>::iterator it = aLtAttributes.begin();
   for (; it != aLtAttributes.end(); it++) {
-    if (!(*it)->isInitialized())
-      return false;
+    AttributePtr anAttr = aData->attribute(*it);
+    if (!anAttr->isInitialized()) {
+      std::map<std::string, std::set<std::string> >::const_iterator aFeatureFind = 
+        myNotObligatory.find(theFeature->getKind());
+      if (aFeatureFind == myNotObligatory.end() ||
+          aFeatureFind->second.find(*it) == aFeatureFind->second.end()) {
+        return false;
+      }
+    }
   }
   return true;
+}
+
+void Model_FeatureValidator::registerNotObligatory(std::string theFeature, std::string theAttribute)
+{
+  std::set<std::string>& anAttrs = myNotObligatory[theFeature];
+  anAttrs.insert(theAttribute);
 }

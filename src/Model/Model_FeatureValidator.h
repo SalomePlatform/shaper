@@ -10,14 +10,21 @@
 #include <ModelAPI_FeatureValidator.h>
 
 #include <boost/shared_ptr.hpp>
+#include <set>
+#include <map>
 
 class Model_FeatureValidator : public ModelAPI_FeatureValidator
 {
+  // not obligatory attributes, not checked for initialization
+  std::map<std::string, std::set<std::string> > myNotObligatory;
  public:
   /// Returns true if feature and/or attributes are valid
   /// \param theFeature the validated feature
   MODEL_EXPORT virtual bool isValid(const boost::shared_ptr<ModelAPI_Feature>& theFeature,
     const std::list<std::string>& theArguments) const;
+
+  // sets not obligatory attributes, not checked for initialization
+  void registerNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 #endif

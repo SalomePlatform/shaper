@@ -68,7 +68,11 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   /// Returns true if feature and all its attributes are valid.
   MODEL_EXPORT virtual bool validate(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const;
 
- protected:
+  /// register that this attribute in feature is not obligatory for the feature execution
+  /// so, it is not needed for the standard validation mechanism
+  virtual void registerNotObligatory(std::string theFeature, std::string theAttribute);
+
+protected:
   void addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators) const;
   /// Get instance from Session
   Model_ValidatorsFactory();

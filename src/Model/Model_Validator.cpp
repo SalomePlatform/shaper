@@ -10,7 +10,7 @@
 #include <ModelAPI_AttributeValidator.h>
 #include <Events_Error.h>
 
-const static std::string DefaultId = "Model_FeatureValidator";
+const static std::string kDefaultId = "Model_FeatureValidator";
 
 void Model_ValidatorsFactory::registerValidator(const std::string& theID,
   ModelAPI_Validator* theValidator)
@@ -121,7 +121,7 @@ void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
 Model_ValidatorsFactory::Model_ValidatorsFactory()
   : ModelAPI_ValidatorsFactory()
 {
-  registerValidator("Model_FeatureValidator", new Model_FeatureValidator);
+  registerValidator(kDefaultId, new Model_FeatureValidator);
 }
 
 const ModelAPI_Validator* Model_ValidatorsFactory::validator(const std::string& theID) const
@@ -135,7 +135,7 @@ const ModelAPI_Validator* Model_ValidatorsFactory::validator(const std::string& 
 
 void Model_ValidatorsFactory::addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators) const
 {
-  std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(DefaultId);
+  std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(kDefaultId);
   if(it == myIDs.end())
     return;
   theValidators.push_back(it->second);
@@ -164,7 +164,7 @@ bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>
     }
   }
   // check default validator
-  std::map<std::string, ModelAPI_Validator*>::const_iterator aDefaultVal = myIDs.find(DefaultId);
+  std::map<std::string, ModelAPI_Validator*>::const_iterator aDefaultVal = myIDs.find(kDefaultId);
   if(aDefaultVal != myIDs.end()) {
     static const std::list<std::string> anEmptyArgList;
     const ModelAPI_FeatureValidator* aFValidator = 
@@ -209,4 +209,16 @@ bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>
     }
   }
   return true;
+}
+
+void Model_ValidatorsFactory::registerNotObligatory(
+  std::string theFeature, std::string theAttribute) 
+{
+  std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(kDefaultId);
+  if (it != myIDs.end()) {
+    Model_FeatureValidator* aValidator = dynamic_cast<Model_FeatureValidator*>(it->second);
+    if (aValidator) {
+      aValidator->registerNotObligatory(theFeature, theAttribute);
+    }
+  }
 }

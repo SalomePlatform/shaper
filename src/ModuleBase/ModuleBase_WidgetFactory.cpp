@@ -22,6 +22,7 @@
 #include <ModuleBase_WidgetChoice.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IModule.h>
+#include <ModelAPI_Validator.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -161,6 +162,17 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
     if (!result) {qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type");}
 #endif
   }
+  if (result) {
+    // register that this attribute in feature is not obligatory for the feature execution
+    // so, it is not needed for the standard validation mechanism
+    bool isObligatory = 
+      myWidgetApi ? myWidgetApi->getBooleanAttribute(FEATURE_OBLIGATORY, true) : true;
+    if (!isObligatory) {
+      ModelAPI_Session::get()->validators()->registerNotObligatory(
+        myParentId, myWidgetApi->widgetId());
+    }
+  }
+
   return result;
 }
 
