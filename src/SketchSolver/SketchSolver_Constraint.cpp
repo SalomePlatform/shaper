@@ -190,7 +190,7 @@ AttrType typeOfAttribute(boost::shared_ptr<ModelAPI_Attribute> theAttribute)
   if (anAttrRef->isObject()) {
     ResultConstructionPtr aRC = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
         anAttrRef->object());
-    if (!aRC)
+    if (!aRC || !aRC->shape())
       return UNKNOWN;
 
     if (aRC->shape()->isVertex())

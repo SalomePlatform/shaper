@@ -60,11 +60,13 @@ Q_OBJECT
   /// Activate or deactivate selection
   void activateSelection(bool toActivate);
 
- private slots:
+private slots:
   void onSelectionChanged();
 
- private:
-  void enableOthersControls(bool toEnable) const;
+protected:
+  bool eventFilter(QObject* theObj, QEvent* theEvent);
+
+private:
   void updateSelectionName();
   void raisePanel() const;
   bool isAccepted(const ObjectPtr theObject) const;
@@ -74,7 +76,7 @@ Q_OBJECT
   QWidget* myContainer;
   QLabel* myLabel;
   QLineEdit* myTextLine;
-  QToolButton* myActivateBtn;
+  //QToolButton* myActivateBtn;
 
   ModuleBase_IWorkshop* myWorkshop;
 
@@ -83,6 +85,8 @@ Q_OBJECT
 
   QPalette myBasePalet;
   QPalette myInactivePalet;
+
+  bool myIsActive;
 };
 
 #endif

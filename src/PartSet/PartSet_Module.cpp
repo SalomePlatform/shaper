@@ -171,6 +171,9 @@ void PartSet_Module::onOperationStarted()
     XGUI_PropertyPanel* aPropPanel = myWorkshop->propertyPanel();
     connect(aPropPanel, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)), this,
             SLOT(onStorePoint2D(ObjectPtr, const std::string&)), Qt::UniqueConnection);
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    aDisplayer->openLocalContext();
+    aDisplayer->deactivateObjectsOutOfContext();
   }
 }
 
@@ -368,6 +371,7 @@ void PartSet_Module::onFeatureConstructed(ObjectPtr theFeature, int theMode)
       if (!isDisplay)
         aDisplayer->erase((*aSFIt), false);
     }
+    aDisplayer->deactivateObjectsOutOfContext();
   }
   if (isDisplay)
     ModelAPI_EventCreator::get()->sendUpdated(
@@ -524,6 +528,8 @@ void PartSet_Module::activateFeature(ObjectPtr theFeature, const bool isUpdateVi
     if (aSketchOp) {
       Handle(StdSelect_FaceFilter) aFilter = new StdSelect_FaceFilter(StdSelect_Plane);
       aDisplayer->activateObjectsOutOfContext(aModes, aFilter);
+    } else {
+      aDisplayer->deactivateObjectsOutOfContext();
     }
   }
 }

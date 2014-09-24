@@ -52,6 +52,9 @@ void XGUI_ContextMenuMgr::createActions()
   aAction = new QAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide"), this);
   addAction("HIDE_CMD", aAction);
 
+  aAction = new QAction(QIcon(":pictures/eye_pencil_closed.png"), tr("Hide all"), this);
+  addAction("HIDEALL_CMD", aAction);
+
   aAction = new QAction(QIcon(":pictures/shading.png"), tr("Shading"), this);
   addAction("SHADING_CMD", aAction);
 
@@ -141,11 +144,12 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
           aMenu->addAction(action("EDIT_CMD"));
         } else {
           if (aDisplayer->isVisible(aObject)) {
-            aMenu->addAction(action("HIDE_CMD"));
             if (aDisplayer->displayMode(aObject) == XGUI_Displayer::Shading)
               aMenu->addAction(action("WIREFRAME_CMD"));
             else
               aMenu->addAction(action("SHADING_CMD"));
+            aMenu->addSeparator();
+            aMenu->addAction(action("HIDE_CMD"));
           } else {
             aMenu->addAction(action("SHOW_CMD"));
           }
@@ -168,6 +172,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     if (hasFeature)
       aMenu->addAction(action("DELETE_CMD"));
   }
+  aMenu->addSeparator();
   aMenu->addActions(myWorkshop->objectBrowser()->actions());
   if (aMenu->actions().size() > 0) {
     return aMenu;
@@ -206,16 +211,21 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
       }
     }
     if (isVisible) {
-      theMenu->addAction(action("HIDE_CMD"));
       if (isShading)
         theMenu->addAction(action("WIREFRAME_CMD"));
       else
         theMenu->addAction(action("SHADING_CMD"));
+      theMenu->addSeparator();
+      theMenu->addAction(action("SHOW_ONLY_CMD"));
+      theMenu->addAction(action("HIDE_CMD"));
     } else
       theMenu->addAction(action("SHOW_CMD"));
     //theMenu->addAction(action("DELETE_CMD"));
   }
+  if (myWorkshop->displayer()->objectsCount() > 0)
+    theMenu->addAction(action("HIDEALL_CMD"));
   if (!myWorkshop->isSalomeMode()) {
+    theMenu->addSeparator();
     QMdiArea* aMDI = myWorkshop->mainWindow()->mdiArea();
     if (aMDI->actions().size() > 0) {
       QMenu* aSubMenu = theMenu->addMenu(tr("Windows"));

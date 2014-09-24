@@ -196,6 +196,7 @@ protected:
   std::vector<Slvs_Param> myParams;        ///< List of parameters of the constraints
   Slvs_hParam myParamMaxID;    ///< Actual maximal ID of parameters (not equal to myParams size)
   std::vector<Slvs_Entity> myEntities;      ///< List of entities of the constaints
+  std::vector<bool> myEntOfConstr; ///< Flags show that certain entity used in constraints
   Slvs_hEntity myEntityMaxID;   ///< Actual maximal ID of entities (not equal to myEntities size)
   std::vector<Slvs_Constraint> myConstraints;   ///< List of constraints in SolveSpace format
   Slvs_hConstraint myConstrMaxID;  ///< Actual maximal ID of constraints (not equal to myConstraints size)

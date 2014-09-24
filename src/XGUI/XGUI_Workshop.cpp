@@ -790,9 +790,17 @@ void XGUI_Workshop::onRedo()
 //******************************************************
 void XGUI_Workshop::onRebuild()
 {
+  SessionPtr aMgr = ModelAPI_Session::get();
+  bool aWasOperation = aMgr->isOperation(); // keep this value
+  if (!aWasOperation) {
+    aMgr->startOperation();
+  }
   static const Events_ID aRebuildEvent = Events_Loop::loop()->eventByName("Rebuild");
   Events_Loop::loop()->send(boost::shared_ptr<Events_Message>(
     new Events_Message(aRebuildEvent, this)));
+  if (!aWasOperation) {
+    aMgr->finishOperation();
+  }
 }
 
 //******************************************************
@@ -1086,6 +1094,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setDisplayMode(aObjects, XGUI_Displayer::Shading);
   else if (theId == "WIREFRAME_CMD")
     setDisplayMode(aObjects, XGUI_Displayer::Wireframe);
+  else if (theId == "HIDEALL_CMD")
+    myDisplayer->eraseAll();
 }
 
 //**************************************************************
