@@ -89,10 +89,6 @@ signals:
   /// \return the state whether the operation is resumed
   void resumeOperation(ModuleBase_Operation* theOperation);
 
-  /// Checks if given operation is Valid, if so sends operationValidated signal
-  /// \param theOperation to be validated
-  /// \return validation state (true means valid)
-  bool validateOperation(ModuleBase_Operation* theOperation);
   /// Returns whether the operation can be started. Check if there is already started operation and
   /// the granted parameter of the launched operation
   /// \param theOperation an operation to check

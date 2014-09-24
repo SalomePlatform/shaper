@@ -41,6 +41,14 @@ class CONFIG_EXPORT Config_WidgetAPI
 
   std::string getProperty(const char* thePropName) const;
 
+  /// Checks if the XML representation of widget has given attribute,
+  /// if yes - returns it's bool value, if no, or if the value can not
+  /// be converted to bool - returns theDefault.
+  /// \param theAttributeName attribute to check
+  /// \param theDefault default value on bad data
+  /// \return the boolean result
+  bool getBooleanAttribute(const char* theAttributeName, bool theDefault) const;
+
   bool isComputedDefault() const;
 
  protected:

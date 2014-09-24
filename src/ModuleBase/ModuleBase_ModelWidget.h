@@ -52,10 +52,13 @@ Q_OBJECT
   /// \return the boolean result
   bool isInitialized(ObjectPtr theObject) const;
 
-  bool isComputedDefault()
-  {
-    return myIsComputedDefault;
-  }
+  /// Returns true, if default value of the widget should be computed
+  /// on operation's execute, like radius for circle's constraint (can not be zero)
+  bool isComputedDefault() { return myIsComputedDefault; }
+
+  /// Returns false for non-obligatory widgets which are
+  /// valid even if they are not initialized
+  bool isObligatory() { return myIsObligatory; }
 
   /// Saves the internal parameters to the given feature
   /// \param theObject a model feature to be changed
@@ -63,6 +66,7 @@ Q_OBJECT
 
   virtual bool restoreValue() = 0;
 
+  void enableFocusProcessing();
   /// Set focus to the first control of the current widget. The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
   /// \return the state whether the widget can accept the focus
@@ -125,14 +129,18 @@ signals:
 
   void updateObject(ObjectPtr theObj) const;
 
+ private:
   /// Let the widget process FocusIn events
-  void processFocus(QWidget* theWidget);
+  void enableFocusProcessing(QWidget* theWidget);
 
-  std::string myAttributeID;  /// the attribute name of the model feature
+ protected:
+  std::string myAttributeID; /// the attribute name of the model feature
   std::string myParentId;    /// name of parent
   FeaturePtr myFeature;
 
-  bool myIsComputedDefault;
+    bool myIsComputedDefault; /// Value should be computed on execute,
+                              /// like radius for circle's constraint (can not be zero)
+    bool myIsObligatory;      /// Non-obligatory widget is valid even if it is not initialized
 
  private:
    /// Contains a list of widgets that may accept focus

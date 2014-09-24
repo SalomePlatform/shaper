@@ -44,6 +44,16 @@ FeaturePtr ModuleBase_Operation::feature() const
   return myFeature;
 }
 
+bool ModuleBase_Operation::isValid() const
+{
+  if (!myFeature)
+    return true; // rename operation
+  //Get validators for the Id
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  return aFactory->validate(myFeature);
+}
+
 bool ModuleBase_Operation::isNestedOperationsEnabled() const
 {
   return true;

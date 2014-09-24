@@ -66,11 +66,10 @@ Q_OBJECT
   virtual bool isGranted() const  { return false; }
 
   /**
-  * Must return True if the given opertation can be launched as nested to current one.
-  * By default it returns false and it has to be redefined for operations which expect
-  * launching of nested operations
+  * Must return True if the operation's feature is valid.
+  * Since IOperation does not have any feature returns false.
   */
-  virtual bool isValid(ModuleBase_IOperation* theOperation) const { return false; }
+  virtual bool isValid() const { return false; }
 
   /// Sets a list of model widgets, according to the operation feature xml definition
   /// \param theXmlRepresentation an xml feature definition

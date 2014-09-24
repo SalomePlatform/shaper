@@ -12,6 +12,9 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+#include <string>
+#include <algorithm>
+
 Config_WidgetAPI::Config_WidgetAPI(std::string theRawXml)
 {
   myDoc = xmlParseDoc(BAD_CAST theRawXml.c_str());
@@ -87,6 +90,19 @@ std::string Config_WidgetAPI::getProperty(const char* thePropName) const
   if (!aPropChars || aPropChars[0] == 0)
     return result;
   result = std::string(aPropChars);
+  return result;
+}
+
+bool Config_WidgetAPI::getBooleanAttribute(const char* theAttributeName, bool theDefault) const
+{
+  std::string prop = getProperty(theAttributeName);
+  std::transform(prop.begin(), prop.end(), prop.begin(), ::tolower);
+  bool result = theDefault;
+  if (prop == "true" || prop == "1") {
+    result = true;
+  } else if (prop == "false" || prop == "0") {
+    result = false;
+  }
   return result;
 }
 

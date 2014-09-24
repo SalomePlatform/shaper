@@ -11,7 +11,7 @@
 #include <ModuleBase.h>
 #include <ModuleBase_IOperation.h>
 
-#include "ModelAPI_Feature.h"
+#include <ModelAPI_Feature.h>
 
 #include <QObject>
 #include <QString>
@@ -56,6 +56,9 @@ Q_OBJECT
   /// Returns the operation feature
   /// \return the feature
   FeaturePtr feature() const;
+
+  /// Returns true is feature of operation is valid.
+  virtual bool isValid() const;
 
   /// Returns whether the nested operations are enabled.
   /// The state can depend on the operation current state.
