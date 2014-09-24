@@ -1093,6 +1093,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setDisplayMode(aObjects, XGUI_Displayer::Shading);
   else if (theId == "WIREFRAME_CMD")
     setDisplayMode(aObjects, XGUI_Displayer::Wireframe);
+  else if (theId == "HIDEALL_CMD")
+    myDisplayer->eraseAll();
 }
 
 //**************************************************************

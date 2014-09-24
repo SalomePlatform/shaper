@@ -144,6 +144,8 @@ class XGUI_EXPORT XGUI_Displayer
   DisplayMode displayMode(ObjectPtr theObject) const;
 
 
+  int objectsCount() const { return myResult2AISObjectMap.size(); }
+
  protected:
   /// Deactivate local selection
   /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
