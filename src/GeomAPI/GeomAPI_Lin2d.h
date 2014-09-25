@@ -35,6 +35,9 @@ class GEOMAPI_EXPORT GeomAPI_Lin2d : public GeomAPI_Interface
       const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) const;
   /// Computes the cross product of the line direction and a vector from the line start point to the point
   bool isRight(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) const;
+
+  /// Returns a location point shifted on theShift in perpendicular direction
+  boost::shared_ptr<GeomAPI_Pnt2d> shiftedLocation(double theShift) const;
 };
 
 #endif

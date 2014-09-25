@@ -69,3 +69,15 @@ bool GeomAPI_Lin2d::isRight(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) co
 
   return aDir.Crossed(aPnt - aLoc) > 0;
 }
+
+
+boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::shiftedLocation(double theShift) const
+{
+  gp_Vec2d aVec = MY_LIN2D->Direction();
+  aVec = aVec.GetNormal();
+  aVec.Normalize();
+  aVec.Reverse();
+  aVec.Scale(theShift);
+  gp_Lin2d aLin = MY_LIN2D->Translated(aVec);
+  return boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aLin.Location().X(), aLin.Location().Y()));
+}
