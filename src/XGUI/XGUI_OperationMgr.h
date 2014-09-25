@@ -37,6 +37,9 @@ Q_OBJECT
   /// Returns the current operation or NULL
   /// \return the current operation
   ModuleBase_Operation* currentOperation() const;
+  /// Check if the given operation is active operation.
+  /// Also, returns false is ther is no active operation.
+  bool isCurrentOperation(ModuleBase_Operation* theOperation);
   /// Returns true is operation manager has at least one non-null operation.
   bool hasOperation() const;
   /// Returns number of operations in the stack

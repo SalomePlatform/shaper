@@ -505,7 +505,11 @@ void XGUI_Workshop::onOperationStarted()
 
     myPropertyPanel->setModelWidgets(aWidgets);
     myPropertyPanel->onActivateNextWidget(NULL);
-    myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
+    // Widget activation (from the previous method) may commit the current operation
+    // if pre-selection is enougth for it. So we shouldn't update prop panel's title
+    if(myOperationMgr->isCurrentOperation(aOperation)) {
+      myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
+    }
   }
   updateCommandStatus();
 }
