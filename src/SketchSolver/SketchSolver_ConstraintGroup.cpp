@@ -322,6 +322,13 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
     if (aConstrEnt[indAttr] != 0) {
       int aPos = Search(aConstrEnt[indAttr], myEntities);
       myEntOfConstr[aPos] = true;
+      // Sub-entities should be used implcitly
+      Slvs_hEntity* aEntPtr = myEntities[aPos].point;
+      while (*aEntPtr != 0) {
+        aPos = Search(*aEntPtr, myEntities);
+        myEntOfConstr[aPos] = true;
+        aEntPtr++;
+      }
     }
 
   checkConstraintConsistence(*aConstrIter);
@@ -393,6 +400,8 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
   if (isEntExists) {
     if (!myEntOfConstr[aEntPos]) // the entity is not used by constraints, no need to resolve them
       myNeedToSolve = isNeedToSolve;
+    else
+      myNeedToSolve = myNeedToSolve || isNeedToSolve;
     return aEntIter->second;
   }
 
