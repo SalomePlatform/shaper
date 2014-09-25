@@ -79,9 +79,10 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
   // Flyout point
   boost::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = boost::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  if (!aFlyoutAttr->isInitialized())
-    return thePrevious;
-  boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
+  boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt;
+  if (aFlyoutAttr->isInitialized()) {
+    aFlyoutPnt = sketch()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
+  } 
 
   // Prepare a circle
   aData = aFeature->data();
@@ -93,12 +94,26 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
     AttributeDoublePtr aCircRadius = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
         aData->attribute(SketchPlugin_Circle::RADIUS_ID()));
     aRadius = aCircRadius->value();
+    if (!aFlyoutPnt) {
+      double aShift = aRadius * 1.1;
+      boost::shared_ptr<GeomAPI_Pnt2d> aPnt = aCenterAttr->pnt();
+      boost::shared_ptr<GeomAPI_Pnt2d> aFPnt = 
+        boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aPnt->x() + aShift, aPnt->y() + aShift));
+      aFlyoutAttr->setValue(aFPnt);
+      aFlyoutPnt = sketch()->to3D(aFPnt->x(), aFPnt->y());
+    }
   } else if (aKind == SketchPlugin_Arc::ID()) {
     aCenterAttr = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aData->attribute(SketchPlugin_Arc::CENTER_ID()));
     boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = boost::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));
     aRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
+    if (!aFlyoutPnt) {
+      boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = boost::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));      
+      aFlyoutAttr->setValue(aStartAttr->pnt());
+      aFlyoutPnt = sketch()->to3D(aStartAttr->pnt()->x(), aStartAttr->pnt()->y());
+    }
   }
 
   boost::shared_ptr<GeomAPI_Pnt> aCenter = sketch()->to3D(aCenterAttr->x(), aCenterAttr->y());
