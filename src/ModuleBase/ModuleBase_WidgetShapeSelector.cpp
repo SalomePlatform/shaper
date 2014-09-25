@@ -167,6 +167,15 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 bool ModuleBase_WidgetShapeSelector::isAccepted(const ObjectPtr theResult) const
 {
   ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theResult);
+  if (myFeature) {
+    // We can not select a result of our feature
+    const std::list<boost::shared_ptr<ModelAPI_Result>>& aRes = myFeature->results();
+    std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
+    for (aIt = aRes.cbegin(); aIt != aRes.cend(); ++aIt) {
+      if ((*aIt) == aResult)
+        return false;
+    }
+  }
   boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
   if (!aShapePtr)
     return false;
@@ -227,6 +236,9 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
     connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   else
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+
+  if (myWorkshop->selectedObjects().size() > 0)
+    onSelectionChanged();
 }
 
 //********************************************************************
