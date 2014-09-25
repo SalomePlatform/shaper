@@ -18,6 +18,7 @@
   #include "ModelAPI_AttributeRefAttr.h"
   #include "ModelAPI_Validator.h"
   #include "ModelAPI_AttributeRefList.h"
+  #include "ModelAPI_AttributeBoolean.h"
   #include "ModelAPI_Result.h"
   #include "ModelAPI_ResultConstruction.h"
   #include "ModelAPI_ResultBody.h"
@@ -58,6 +59,7 @@
 %shared_ptr(ModelAPI_AttributeReference)
 %shared_ptr(ModelAPI_AttributeRefAttr)
 %shared_ptr(ModelAPI_AttributeRefList)
+%shared_ptr(ModelAPI_AttributeBoolean)
 %shared_ptr(ModelAPI_Result)
 %shared_ptr(ModelAPI_ResultConstruction)
 %shared_ptr(ModelAPI_ResultBody)
@@ -84,6 +86,7 @@
 %include "ModelAPI_ResultConstruction.h"
 %include "ModelAPI_ResultBody.h"
 %include "ModelAPI_ResultPart.h"
+%include "ModelAPI_AttributeBoolean.h"
 
 %template(ObjectList) std::list<boost::shared_ptr<ModelAPI_Object> >;
 %template(ResultList) std::list<boost::shared_ptr<ModelAPI_Result> >;
