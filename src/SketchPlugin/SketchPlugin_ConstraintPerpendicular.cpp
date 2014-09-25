@@ -84,12 +84,7 @@ AISObjectPtr SketchPlugin_ConstraintPerpendicular::getAISObject(AISObjectPtr the
 
 void SketchPlugin_ConstraintPerpendicular::move(double theDeltaX, double theDeltaY)
 {
-  boost::shared_ptr<ModelAPI_Data> aData = data();
-  if (!aData->isValid())
-    return;
-
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  aPoint->setValue(aPoint->x() + theDeltaX, aPoint->y() + theDeltaY);
+  //Flyout point of the constraint follows it's features
+  return;
 }
 
