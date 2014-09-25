@@ -25,7 +25,6 @@ void SketchPlugin_ConstraintPerpendicular::initAttributes()
 {
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::type());
-  data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::type());
 }
 
 void SketchPlugin_ConstraintPerpendicular::execute()
