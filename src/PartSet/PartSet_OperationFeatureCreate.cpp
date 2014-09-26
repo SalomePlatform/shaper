@@ -95,6 +95,7 @@ void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
     case Qt::Key_Return:
     case Qt::Key_Enter: {
         // it start a new line creation at a free point
+      if(isValid())
         restartOperation(feature()->getKind());
     }
       break;
