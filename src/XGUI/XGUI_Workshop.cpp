@@ -419,9 +419,9 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_Objec
       else {
         if (myOperationMgr->hasOperation()) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-          if (aOperation->hasObject(aObj)) {  // Display only current operation results
+          // Display only current operation results if operation has preview
+          if (aOperation->hasObject(aObj) && aOperation->hasPreview())
             myDisplayer->display(aObj, false);
-          }
         }
       }
     }

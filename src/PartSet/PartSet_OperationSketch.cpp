@@ -166,12 +166,11 @@ void PartSet_OperationSketch::stopOperation()
   FeaturePtr aFeature = feature();
   std::list<ResultPtr> aResults = aFeature->results();
   std::list<ResultPtr>::const_iterator aIt;
+  Events_ID anEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TOSHOW);
   for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-    ModelAPI_EventCreator::get()->sendUpdated(
-        *aIt, Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    ModelAPI_EventCreator::get()->sendUpdated(*aIt, anEvent);
   }
-  //ModelAPI_EventCreator::get()->sendUpdated(aFeature, 
-  //  Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  Events_Loop::loop()->flush(anEvent);
 }
 
 bool PartSet_OperationSketch::isNestedOperationsEnabled() const

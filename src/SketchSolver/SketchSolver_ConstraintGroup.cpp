@@ -439,6 +439,12 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
   if (aFeature) {  // Verify the feature by its kind
     const std::string& aFeatureKind = aFeature->getKind();
 
+    std::list<AttributePtr> anAttributes = aFeature->data()->attributes(std::string());
+    std::list<AttributePtr>::iterator anAttrIter = anAttributes.begin();
+    for ( ; anAttrIter != anAttributes.end(); anAttrIter++)
+      if (!(*anAttrIter)->isInitialized()) // the entity is not fully initialized, don't add it into solver
+        return SLVS_E_UNKNOWN;
+
     // Line
     if (aFeatureKind.compare(SketchPlugin_Line::ID()) == 0) {
       Slvs_hEntity aStart = changeEntity(
@@ -735,7 +741,7 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
           // Also we need to check sub-entities
           int aEntPos = Search(aConstrEnt[i], myEntities);
           Slvs_hEntity* aSub = myEntities[aEntPos].point;
-          for (int j = 0; *aSub != 0 && j < 4 && !isFound; aSub++)
+          for (int j = 0; *aSub != 0 && j < 4 && !isFound; aSub++, j++)
             isFound = (aGrEntIter->find(*aSub) != aGrEntIter->end());
         }
       if (isFound)
@@ -745,8 +751,13 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
     if (anIndexes.empty()) {
       std::set<Slvs_hEntity> aNewGrEnt;
       for (int i = 0; i < 4; i++)
-        if (aConstrEnt[i] != 0)
+        if (aConstrEnt[i] != 0) {
           aNewGrEnt.insert(aConstrEnt[i]);
+          int aEntPos = Search(aConstrEnt[i], myEntities);
+          Slvs_hEntity* aSub = myEntities[aEntPos].point;
+          for (int j = 0; *aSub != 0 && j < 4; aSub++, j++)
+            aNewGrEnt.insert(*aSub);
+        }
       std::set<Slvs_hConstraint> aNewGrConstr;
       aNewGrConstr.insert(aConstrIter->h);
 
@@ -754,30 +765,36 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
       aGroupsConstr.push_back(aNewGrConstr);
       if (aNewGrEnt.size() > aGroupsEntities[aMaxNbEntities].size())
         aMaxNbEntities = aGroupsEntities.size() - 1;
-    } else if (anIndexes.size() == 1) {  // Add entities indexes into the found group
+    } else {  // Add entities indexes into the found group
       aGrEntIter = aGroupsEntities.begin() + anIndexes.front();
       for (int i = 0; i < 4; i++)
-        if (aConstrEnt[i] != 0)
+        if (aConstrEnt[i] != 0) {
           aGrEntIter->insert(aConstrEnt[i]);
+          int aEntPos = Search(aConstrEnt[i], myEntities);
+          Slvs_hEntity* aSub = myEntities[aEntPos].point;
+          for (int j = 0; *aSub != 0 && j < 4; aSub++, j++)
+            aGrEntIter->insert(*aSub);
+        }
       aGroupsConstr[anIndexes.front()].insert(aConstrIter->h);
       if (aGrEntIter->size() > aGroupsEntities[aMaxNbEntities].size())
         aMaxNbEntities = aGrEntIter - aGroupsEntities.begin();
-    } else {  // There are found several connected groups, merge them
-      std::vector<std::set<Slvs_hEntity> >::iterator aFirstGroup = aGroupsEntities.begin()
-          + anIndexes.front();
-      std::vector<std::set<Slvs_hConstraint> >::iterator aFirstConstr = aGroupsConstr.begin()
-          + anIndexes.front();
-      std::vector<int>::iterator anInd = anIndexes.begin();
-      for (++anInd; anInd != anIndexes.end(); anInd++) {
-        aFirstGroup->insert(aGroupsEntities[*anInd].begin(), aGroupsEntities[*anInd].end());
-        aFirstConstr->insert(aGroupsConstr[*anInd].begin(), aGroupsConstr[*anInd].end());
-      }
-      if (aFirstGroup->size() > aGroupsEntities[aMaxNbEntities].size())
-        aMaxNbEntities = anIndexes.front();
-      // Remove merged groups
-      for (anInd = anIndexes.end() - 1; anInd != anIndexes.begin(); anInd--) {
-        aGroupsEntities.erase(aGroupsEntities.begin() + (*anInd));
-        aGroupsConstr.erase(aGroupsConstr.begin() + (*anInd));
+      if (anIndexes.size() > 1) {  // There are found several connected groups, merge them
+        std::vector<std::set<Slvs_hEntity> >::iterator aFirstGroup = aGroupsEntities.begin()
+            + anIndexes.front();
+        std::vector<std::set<Slvs_hConstraint> >::iterator aFirstConstr = aGroupsConstr.begin()
+            + anIndexes.front();
+        std::vector<int>::iterator anInd = anIndexes.begin();
+        for (++anInd; anInd != anIndexes.end(); anInd++) {
+          aFirstGroup->insert(aGroupsEntities[*anInd].begin(), aGroupsEntities[*anInd].end());
+          aFirstConstr->insert(aGroupsConstr[*anInd].begin(), aGroupsConstr[*anInd].end());
+        }
+        if (aFirstGroup->size() > aGroupsEntities[aMaxNbEntities].size())
+          aMaxNbEntities = anIndexes.front();
+        // Remove merged groups
+        for (anInd = anIndexes.end() - 1; anInd != anIndexes.begin(); anInd--) {
+          aGroupsEntities.erase(aGroupsEntities.begin() + (*anInd));
+          aGroupsConstr.erase(aGroupsConstr.begin() + (*anInd));
+        }
       }
     }
   }

@@ -79,6 +79,10 @@ Q_OBJECT
 
   virtual void activateNextToCurrentWidget() {};
 
+  /// If operation needs to redisplay its result during operation
+  /// then this method has to return True
+  virtual bool hasPreview() const { return false; }
+
  public slots:
   /// Slots which listen the mode widget activation
   /// \param theWidget the model widget

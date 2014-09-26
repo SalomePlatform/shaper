@@ -237,8 +237,8 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
   else
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
 
-  if (myWorkshop->selectedObjects().size() > 0)
-    onSelectionChanged();
+//  if (myWorkshop->selectedObjects().size() > 0)
+//    onSelectionChanged();
 }
 
 //********************************************************************
