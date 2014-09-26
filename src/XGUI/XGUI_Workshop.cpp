@@ -527,12 +527,6 @@ bool XGUI_Workshop::event(QEvent * theEvent)
 {
   PostponeMessageQtEvent* aPostponedEv = dynamic_cast<PostponeMessageQtEvent*>(theEvent);
   if (aPostponedEv) {
-#ifdef _DEBUG
-    std::cout << "XGUI_Workshop::event " << "Got PostponeMessageQtEvent" << std::endl;
-    bool isMyThread = (QApplication::instance()->thread() == QThread::currentThread());
-    std::cout << "XGUI_Workshop::event " << "I am in the Qt's thread: "
-              << isMyThread << std::endl;
-#endif
     boost::shared_ptr<Events_Message> aEventPtr = aPostponedEv->postponedMessage();
     processEvent(aEventPtr);
     return true;
@@ -879,7 +873,7 @@ ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 
   if (!err.isEmpty()) {
     if (mainWindow()) {
-      QMessageBox::warning(mainWindow(), tr("Error"), err);
+      Events_Error::send(err.toStdString());
     } else {
       qWarning(qPrintable(err));
     }
