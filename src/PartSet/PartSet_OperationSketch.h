@@ -97,6 +97,10 @@ Q_OBJECT
   /// \param theShape the shape
   void setSketchPlane(const TopoDS_Shape& theShape);
 
+  /// If operation needs to redisplay its result during operation
+  /// then this method has to return True
+  virtual bool hasPreview() const { return false; }
+
 signals:
   /// signal about the sketch plane is selected
   /// \param theX the value in the X direction of the plane

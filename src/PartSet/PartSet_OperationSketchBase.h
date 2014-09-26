@@ -120,6 +120,10 @@ Q_OBJECT
   /// theFeature the operation argument
   void restartOperation(const std::string& theType, ObjectPtr theFeature = ObjectPtr());
 
+  /// If operation needs to redisplay its result during operation
+  /// then this method has to return True
+  virtual bool hasPreview() const { return true; }
+
 signals:
   /// signal about the request to launch operation
   /// theName the operation name

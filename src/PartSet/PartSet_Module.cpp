@@ -376,28 +376,6 @@ void PartSet_Module::onFeatureConstructed(ObjectPtr theFeature, int theMode)
   if (isDisplay)
     ModelAPI_EventCreator::get()->sendUpdated(
         theFeature, Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  /*  bool isDisplay = theMode != PartSet_OperationSketchBase::FM_Hide;
-   // TODO visualizePreview(theFeature, isDisplay, false);
-   if (!isDisplay) {
-   ModuleBase_Operation* aCurOperation = myWorkshop->operationMgr()->currentOperation();
-   FeaturePtr aSketch;
-   PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
-   if (aPrevOp) {
-   std::list<FeaturePtr> aList = aPrevOp->subFeatures();
-   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-   std::list<int> aModes = aPrevOp->getSelectionModes(aPrevOp->feature());
-
-   std::list<FeaturePtr>::const_iterator anIt = aList.begin(),
-   aLast = aList.end();
-   //TODO for (; anIt != aLast; anIt++)
-   //  visualizePreview((*anIt), false, false);
-   //aDisplayer->updateViewer();
-   }
-   }
-
-   if (theMode == PartSet_OperationSketchBase::FM_Activation ||
-   theMode == PartSet_OperationSketchBase::FM_Deactivation)
-   activateFeature(theFeature, true);*/
 }
 
 ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdId,
@@ -484,35 +462,6 @@ void PartSet_Module::sendOperation(ModuleBase_Operation* theOperation)
   aMessage->setPointer(theOperation);
   Events_Loop::loop()->send(aMessage);
 }
-
-/*void PartSet_Module::visualizePreview(FeaturePtr theFeature, bool isDisplay,
- const bool isUpdateViewer)
- {
- ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
- if (!anOperation)
- return;
-
- PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
- if (!aPreviewOp)
- return;
-
- ResultPtr aResult = theFeature->firstResult();
- XGUI_Displayer* aDisplayer = myWorkshop->displayer();
- if (isDisplay) {
- boost::shared_ptr<SketchPlugin_Feature> aSPFeature = 
- boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
- if (aSPFeature) {
- PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
- if (aSketchOp && !aSketchOp->hasSketchPlane())
- showPlanes();
- }
- }
- else
- aDisplayer->erase(aResult, false);
-
- if (isUpdateViewer)
- aDisplayer->updateViewer();
- }*/
 
 void PartSet_Module::activateFeature(ObjectPtr theFeature, const bool isUpdateViewer)
 {
@@ -610,26 +559,6 @@ void PartSet_Module::onStorePoint2D(ObjectPtr theFeature, const std::string& the
   PartSet_Tools::setConstraints(aPreviewOp->sketch(), aFeature, theAttribute, aPoint->x(),
                                 aPoint->y());
 }
-
-/*bool PartSet_Module::isFeatureEnabled(const QString& theCmdId) const
- {
- XGUI_OperationMgr* aOpMgr = myWorkshop->operationMgr();
- XGUI_ActionsMgr* aActMgr = myWorkshop->actionsMgr();
-
- ModuleBase_Operation* aOperation = aOpMgr->currentOperation();
- if (!aOperation)
- return !aActMgr->isNested(theCmdId);
-
- PartSet_OperationFeatureEdit* aSketchEdtOp = dynamic_cast<PartSet_OperationFeatureEdit*>(aOperation);
- if (aSketchEdtOp) {
- QStringList aConstraintList;
- aConstraintList<<"SketchConstraintDistance"<<"SketchConstraintLength"
- <<"SketchConstraintRadius"<<"SketchConstraintParallel"<<"SketchConstraintPerpendicular";
- return aConstraintList.contains(theCmdId);
- }
- QStringList aList = aActMgr->nestedCommands(aOperation->id());
- return aList.contains(theCmdId);
- }*/
 
 QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget* theParent,
                                             Config_WidgetAPI* theWidgetApi,
