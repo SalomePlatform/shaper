@@ -879,7 +879,7 @@ ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 
   if (!err.isEmpty()) {
     if (mainWindow()) {
-      QMessageBox::warning(mainWindow(), tr("Error"), err);
+      Events_Error::send(err.toStdString());
     } else {
       qWarning(qPrintable(err));
     }
