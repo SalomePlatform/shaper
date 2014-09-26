@@ -46,6 +46,8 @@ SET(PROJECT_LIBRARIES
     GeomAPI
     GeomAlgoAPI
     ModelAPI
+    ${CAS_KERNEL}
+    ${CAS_SHAPE}
 )
 
 SET(XML_RESOURCES
