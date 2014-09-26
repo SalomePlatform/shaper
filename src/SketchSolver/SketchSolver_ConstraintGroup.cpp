@@ -439,6 +439,12 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
   if (aFeature) {  // Verify the feature by its kind
     const std::string& aFeatureKind = aFeature->getKind();
 
+    std::list<AttributePtr> anAttributes = aFeature->data()->attributes(std::string());
+    std::list<AttributePtr>::iterator anAttrIter = anAttributes.begin();
+    for ( ; anAttrIter != anAttributes.end(); anAttrIter++)
+      if (!(*anAttrIter)->isInitialized()) // the entity is not fully initialized, don't add it into solver
+        return SLVS_E_UNKNOWN;
+
     // Line
     if (aFeatureKind.compare(SketchPlugin_Line::ID()) == 0) {
       Slvs_hEntity aStart = changeEntity(
