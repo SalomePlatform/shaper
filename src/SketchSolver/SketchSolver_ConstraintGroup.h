@@ -146,6 +146,11 @@ protected:
   Slvs_hParam changeParameter(const double& theParam,
                               std::vector<Slvs_Param>::const_iterator& thePrmIter);
 
+  /** \brief Removes specified entities and their parameters
+   *  \param[in] theEntities  list of IDs of the entities to be removed
+   */
+  void removeEntitiesById(const std::set<Slvs_hEntity>& theEntities);
+
   /** \brief Removes constraints from the group
    *  \param[in] theConstraint constraint to be removed
    */

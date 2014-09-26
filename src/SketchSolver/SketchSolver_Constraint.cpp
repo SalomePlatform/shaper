@@ -63,6 +63,10 @@ const int& SketchSolver_Constraint::getType(
   if (!theConstraint)
     return getType();
 
+  DataPtr aConstrData = theConstraint->data();
+  if (!aConstrData || !aConstrData->isValid())
+    return getType();
+
   // Assign empty names of attributes
   myAttributesList.clear();
   for (int i = 0; i < CONSTRAINT_ATTR_SIZE; i++)
@@ -76,8 +80,8 @@ const int& SketchSolver_Constraint::getType(
     int aPt2d = 0;  // bit-mapped field, each bit indicates whether the attribute is 2D point
     int aPt3d = 0;  // bit-mapped field, the same information for 3D points
     for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
-      boost::shared_ptr<ModelAPI_Attribute> anAttr = theConstraint->data()->attribute(
-          SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+      boost::shared_ptr<ModelAPI_Attribute> anAttr = 
+          aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
       if (!anAttr)
         continue;
       switch (typeOfAttribute(anAttr)) {
@@ -107,8 +111,8 @@ const int& SketchSolver_Constraint::getType(
     int aNbPoints = 0;
     int aNbEntities = 0;
     for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
-      boost::shared_ptr<ModelAPI_Attribute> anAttr = theConstraint->data()->attribute(
-          SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+      boost::shared_ptr<ModelAPI_Attribute> anAttr = 
+          aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
       switch (typeOfAttribute(anAttr)) {
         case POINT2D:
         case POINT3D:
@@ -133,8 +137,8 @@ const int& SketchSolver_Constraint::getType(
   if (aConstraintKind.compare(SketchPlugin_ConstraintLength::ID()) == 0) {
     int aNbLines = 0;
     for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
-      boost::shared_ptr<ModelAPI_Attribute> anAttr = theConstraint->data()->attribute(
-          SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+      boost::shared_ptr<ModelAPI_Attribute> anAttr = 
+          aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
       if (typeOfAttribute(anAttr) == LINE)
         myAttributesList[aNbLines++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
     }
@@ -149,8 +153,8 @@ const int& SketchSolver_Constraint::getType(
   if (isParallel || isPerpendicular) {
     int aNbEntities = 2;  // lines in SolveSpace constraints should start from SketchPlugin_Constraint::ENTITY_C() attribute
     for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
-      boost::shared_ptr<ModelAPI_Attribute> anAttr = theConstraint->data()->attribute(
-          SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+      boost::shared_ptr<ModelAPI_Attribute> anAttr = 
+          aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
       if (typeOfAttribute(anAttr) == LINE)
         myAttributesList[aNbEntities++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
     }
@@ -163,8 +167,8 @@ const int& SketchSolver_Constraint::getType(
   if (aConstraintKind.compare(SketchPlugin_ConstraintRadius::ID()) == 0) {
     int aNbEntities = 2;  // lines in SolveSpace constraints should started from SketchPlugin_Constraint::ENTITY_C() attribute
     for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
-      boost::shared_ptr<ModelAPI_Attribute> anAttr = theConstraint->data()->attribute(
-          SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+      boost::shared_ptr<ModelAPI_Attribute> anAttr = 
+          aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
       AttrType aType = typeOfAttribute(anAttr);
       if (aType == CIRCLE || aType == ARC)
         myAttributesList[aNbEntities++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);

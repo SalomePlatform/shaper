@@ -730,8 +730,14 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
     for (aGrEntIter = aGroupsEntities.begin(); aGrEntIter != aGroupsEntities.end(); aGrEntIter++) {
       bool isFound = false;
       for (int i = 0; i < 4 && !isFound; i++)
-        if (aConstrEnt[i] != 0)
+        if (aConstrEnt[i] != 0) {
           isFound = (aGrEntIter->find(aConstrEnt[i]) != aGrEntIter->end());
+          // Also we need to check sub-entities
+          int aEntPos = Search(aConstrEnt[i], myEntities);
+          Slvs_hEntity* aSub = myEntities[aEntPos].point;
+          for (int j = 0; *aSub != 0 && j < 4 && !isFound; aSub++)
+            isFound = (aGrEntIter->find(*aSub) != aGrEntIter->end());
+        }
       if (isFound)
         anIndexes.push_back(aGrEntIter - aGroupsEntities.begin());
     }
@@ -825,17 +831,50 @@ bool SketchSolver_ConstraintGroup::updateGroup()
       myConstraintMap.rbegin();
   bool isAllValid = true;
   bool isCCRemoved = false;  // indicates that at least one of coincidence constraints was removed
-  while (isAllValid && aConstrIter != myConstraintMap.rend()) {
+  int aConstrIndex = 0;
+  while (/*isAllValid && */aConstrIter != myConstraintMap.rend()) {
     if (!aConstrIter->first->data() || !aConstrIter->first->data()->isValid()) {
       if (aConstrIter->first->getKind().compare(SketchPlugin_ConstraintCoincidence::ID()) == 0)
         isCCRemoved = true;
-      std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::reverse_iterator aCopyIter =
-          aConstrIter++;
-      removeConstraint(aCopyIter->first);
+      removeConstraint(aConstrIter->first);
       isAllValid = false;
-    } else
+      // Get back the correct position of iterator after the "remove" operation
+      aConstrIter = myConstraintMap.rbegin();
+      for (int i = 0; i < aConstrIndex && aConstrIter != myConstraintMap.rend(); i++)
+        aConstrIter++;
+    } else {
       aConstrIter++;
+      aConstrIndex++;
+    }
   }
+
+  // Check if some entities are invalid too
+  std::set<Slvs_hEntity> anEntToRemove;
+  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator
+      anAttrIter = myEntityAttrMap.begin();
+  while (anAttrIter != myEntityAttrMap.end()) {
+    if (!anAttrIter->first->owner() || !anAttrIter->first->owner()->data() ||
+        !anAttrIter->first->owner()->data()->isValid()) {
+      anEntToRemove.insert(anAttrIter->second);
+      std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator
+          aRemovedIter = anAttrIter;
+      anAttrIter++;
+      myEntityAttrMap.erase(aRemovedIter);
+    } else
+      anAttrIter++;
+  }
+  std::map<FeaturePtr, Slvs_hEntity>::iterator aFeatIter = myEntityFeatMap.begin();
+  while (aFeatIter != myEntityFeatMap.end()) {
+    if (!aFeatIter->first || !aFeatIter->first->data() ||
+        !aFeatIter->first->data()->isValid()) {
+      anEntToRemove.insert(aFeatIter->second);
+      std::map<FeaturePtr, Slvs_hEntity>::iterator aRemovedIter = aFeatIter;
+      aFeatIter++;
+      myEntityFeatMap.erase(aRemovedIter);
+    } else
+      aFeatIter++;
+  }
+  removeEntitiesById(anEntToRemove);
 
   // Probably, need to update coincidence constraints
   if (isCCRemoved && !myExtraCoincidence.empty()) {
@@ -1103,8 +1142,22 @@ void SketchSolver_ConstraintGroup::removeConstraint(
     } else
       anEntFeatIter++;
   }
-  std::set<Slvs_hEntity>::const_reverse_iterator aRemIter = anEntToRemove.rbegin();
-  for (; aRemIter != anEntToRemove.rend(); aRemIter++) {
+
+  removeEntitiesById(anEntToRemove);
+
+  if (myCoincidentPoints.size() == 1 && myCoincidentPoints.front().empty())
+    myCoincidentPoints.clear();
+}
+
+// ============================================================================
+//  Function: removeEntitiesById
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  Removes specified entities and their parameters
+// ============================================================================
+void SketchSolver_ConstraintGroup::removeEntitiesById(const std::set<Slvs_hEntity>& theEntities)
+{
+  std::set<Slvs_hEntity>::const_reverse_iterator aRemIter = theEntities.rbegin();
+  for (; aRemIter != theEntities.rend(); aRemIter++) {
     unsigned int anEntPos = Search(*aRemIter, myEntities);
     if (anEntPos >= myEntities.size())
       continue;
@@ -1129,8 +1182,6 @@ void SketchSolver_ConstraintGroup::removeConstraint(
     for (; aCoPtIter != myCoincidentPoints.end(); aCoPtIter++)
       aCoPtIter->erase(*aRemIter);
   }
-  if (myCoincidentPoints.size() == 1 && myCoincidentPoints.front().empty())
-    myCoincidentPoints.clear();
 }
 
 // ============================================================================
