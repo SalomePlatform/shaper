@@ -17,8 +17,6 @@
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
 
-#include <SketchPlugin_Sketch.h>
-
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -60,10 +58,10 @@ void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& the
     for (; anIt != aLast; anIt++) {
       ObjectPtr aObj = (*anIt);
       aDisplayer->deactivate(aObj);
-      boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
-        boost::dynamic_pointer_cast<SketchPlugin_Sketch>(aObj);
-      if (aSketch) // Activate sketcher for planes selection
-        myModule->activateFeature(aSketch, false);
+      boost::shared_ptr<ModelAPI_Feature> aFeature = 
+        boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+      if (aFeature && (aFeature->getKind() == "Sketch")) // Activate sketcher for planes selection
+        myModule->activateFeature(aFeature, false);
       // If current operation is Sketch then there is no active sketching operation
       // and possible the object was created by Redo operatgion
       else if (aSketchOp) {
