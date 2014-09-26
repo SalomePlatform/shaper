@@ -24,12 +24,12 @@ from ModelAPI import *
 
 __updated__ = "2014-07-28"
 
-aPluginManager = ModelAPI_PluginManager.get()
-aDocument = aPluginManager.rootDocument()
+aSession = ModelAPI_Session.get()
+aDocument = aSession.moduleDocument()
 #=========================================================================
 # Creation of a sketch
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchFeature = aDocument.addFeature("Sketch")
 aSketchFeatureData = aSketchFeature.data()
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
@@ -40,11 +40,11 @@ diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
 diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 norm.setValue(0, 0, 1)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Create a line and an arc
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
 aSketchArc = aDocument.addFeature("SketchArc")
 aSketchReflist.append(aSketchArc)
@@ -65,11 +65,11 @@ aLineEndPoint = geomDataAPI_Point2D(aSketchLineData.attribute("EndPoint"))
 # Lets initialize line start at circle's end:
 aLineStartPoint.setValue(50., 0.)
 aLineEndPoint.setValue(100., 25.)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Link arc's end and line's start points with concidence constraint
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aConstraint = aDocument.addFeature("SketchConstraintCoincidence")
 aSketchReflist.append(aConstraint)
 aConstraintData = aConstraint.data()
@@ -77,7 +77,7 @@ reflistA = aConstraintData.refattr("ConstraintEntityA")
 reflistB = aConstraintData.refattr("ConstraintEntityB")
 reflistA.setAttr(anArcEndPoint)
 reflistB.setAttr(aLineStartPoint)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Check values and move one constrainted object
 #=========================================================================
@@ -87,12 +87,12 @@ assert (aLineStartPoint.x() == 50)
 assert (aLineStartPoint.y() == 0)
 deltaX = deltaY = 40.
 #  move line
-aDocument.startOperation()
+aSession.startOperation()
 aLineStartPoint.setValue(aLineStartPoint.x() + deltaX,
                          aLineStartPoint.y() + deltaY)
 aLineEndPoint.setValue(aLineEndPoint.x() + deltaX,
                        aLineEndPoint.y() + deltaY)
-aDocument.finishOperation()
+aSession.finishOperation()
 # check that arc's points are moved also
 assert (anArcEndPoint.x() == aLineStartPoint.x())
 assert (anArcEndPoint.y() == aLineStartPoint.y())

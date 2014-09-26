@@ -41,8 +41,8 @@ public:
   virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
 
   //! Removes the feature from the document
-  virtual void removeFeature(
-    boost::shared_ptr<ModelAPI_Feature> theFeature, const bool theCheck = true) = 0;
+  virtual void removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeature,
+                             const bool theCheck = true) = 0;
 
   ///! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID) = 0;
@@ -54,8 +54,9 @@ public:
   //! \param theGroupID group that contains an object
   //! \param theIndex zero-based index of feature in the group
   //! \param theHidden if it is true, it counts also the features that are not in tree
-  virtual boost::shared_ptr<ModelAPI_Object>
-    object(const std::string& theGroupID, const int theIndex, const bool theHidden = false) = 0;
+  virtual boost::shared_ptr<ModelAPI_Object> object(const std::string& theGroupID,
+                                                    const int theIndex,
+                                                    const bool theHidden = false) = 0;
 
   //! Returns the number of objects in the group of objects
   //! If theHidden is true, it counts also the features that are not in tree

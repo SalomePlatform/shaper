@@ -22,14 +22,14 @@ from ModelAPI import *
 # Initialization of the test
 #=========================================================================
 
-__updated__ = "2014-07-29"
+__updated__ = "2014-09-26"
 
-aPluginManager = ModelAPI_PluginManager.get()
-aDocument = aPluginManager.rootDocument()
+aSession = ModelAPI_Session.get()
+aDocument = aSession.moduleDocument()
 #=========================================================================
 # Creation of a sketch
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchFeature = aDocument.addFeature("Sketch")
 aSketchFeatureData = aSketchFeature.data()
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
@@ -40,11 +40,11 @@ diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
 diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 norm.setValue(0, 0, 1)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Create two lines which are already perpendicular
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
 # line A
 aSketchLineA = aDocument.addFeature("SketchLine")
@@ -64,20 +64,24 @@ aLineBEndPoint = geomDataAPI_Point2D(
     aSketchLineB.data().attribute("EndPoint"))
 aLineBStartPoint.setValue(25., 40.)
 aLineBEndPoint.setValue(25., 125.)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Make a constraint to keep the length of the line constant
 # to prevent perpendicular constraint collapsing line to point
 #=========================================================================
-aDocument.startOperation()
-aLengthConstraint = aDocument.addFeature("SketchConstraintLength")
-aSketchReflist.append(aLengthConstraint)
-aLengthConstraintData = aLengthConstraint.data()
-refattrA = aLengthConstraintData.refattr("ConstraintEntityA")
-aResultA = modelAPI_ResultConstruction(aSketchLineA.firstResult())
-assert (aResultA is not None)
-refattrA.setObject(aResultA)
-aDocument.finishOperation()
+
+for eachFeature in [aSketchLineA, aSketchLineB]:
+    aSession.startOperation()
+    aLengthConstraint = aDocument.addFeature("SketchConstraintLength")
+    aSketchReflist.append(aLengthConstraint)
+    aLengthConstraintData = aLengthConstraint.data()
+    refattrA = aLengthConstraintData.refattr("ConstraintEntityA")
+    aResultA = modelAPI_ResultConstruction(eachFeature.firstResult())
+    assert (aResultA is not None)
+    refattrA.setObject(aResultA)
+    aLengthConstraint.execute()
+    aSession.finishOperation()
+
 # Coordinates of lines should not be changed after this constraint
 assert (aLineAStartPoint.x() == 0)
 assert (aLineAStartPoint.y() == 25)
@@ -90,10 +94,11 @@ assert (aLineBEndPoint.y() == 125)
 #=========================================================================
 # Link lines with perpendicular constraint
 #=========================================================================
-aDocument.startOperation()
-aParallelConstraint = aDocument.addFeature("SketchConstraintParallel")
-aSketchReflist.append(aParallelConstraint)
-aConstraintData = aParallelConstraint.data()
+aSession.startOperation()
+aPerpendicularConstraint = aDocument.addFeature(
+    "SketchConstraintPerpendicular")
+aSketchReflist.append(aPerpendicularConstraint)
+aConstraintData = aPerpendicularConstraint.data()
 refattrA = aConstraintData.refattr("ConstraintEntityA")
 refattrB = aConstraintData.refattr("ConstraintEntityB")
 # aResultA is already defined for the length constraint
@@ -101,7 +106,8 @@ aResultB = modelAPI_ResultConstruction(aSketchLineB.firstResult())
 assert (aResultB is not None)
 refattrA.setObject(aResultA)
 refattrB.setObject(aResultB)
-aDocument.finishOperation()
+aPerpendicularConstraint.execute()
+aSession.finishOperation()
 #=========================================================================
 # Check values and move one constrainted object
 #=========================================================================

@@ -6,12 +6,12 @@ from ModelAPI import *
 
 __updated__ = "2014-07-24"
 
-aPluginManager = ModelAPI_PluginManager.get()
-aDocument = aPluginManager.rootDocument()
+aSession = ModelAPI_Session.get()
+aDocument = aSession.moduleDocument()
 #=========================================================================
 # Creation of a sketch
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchFeature = aDocument.addFeature("Sketch")
 assert (aSketchFeature.getKind() == "Sketch")
 aSketchFeatureData = aSketchFeature.data()
@@ -23,7 +23,7 @@ diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
 diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 norm.setValue(0, 0, 1)
-aDocument.finishOperation()
+aSession.finishOperation()
 # check that values have been changed
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
 assert (origin.x() == 0)
@@ -44,7 +44,7 @@ assert (norm.z() == 1)
 #=========================================================================
 # Creation of a point
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
 assert (not aSketchReflist.isInitialized())
 assert(aSketchReflist.size() == 0)
@@ -60,7 +60,7 @@ assert (not coords.isInitialized())
 # Simulate SketchPlugin_Point::move(...)
 coords.setValue(10., 10.)
 assert (coords.isInitialized())
-aDocument.finishOperation()
+aSession.finishOperation()
 # check that values have been changed
 aSketchReflist = aSketchFeatureData.reflist("Features")
 assert (aSketchReflist.size() == 1)
@@ -72,7 +72,7 @@ assert (coords.y() == 10.0)
 #===============================================================================
 # Creation of a line
 #===============================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchLine = aDocument.addFeature("SketchLine")
 assert (aSketchLine.getKind() == "SketchLine")
 aSketchReflist.append(aSketchLine)
@@ -92,7 +92,7 @@ aLineStartPoint.setValue(50., 50.)
 aLineEndPoint.setValue(60., 60.)
 assert (aLineStartPoint.isInitialized())
 assert (aLineEndPoint.isInitialized())
-aDocument.finishOperation()
+aSession.finishOperation()
 # check that values have been changed
 aSketchLineData = aSketchLine.data()
 aLineStartPoint = geomDataAPI_Point2D(aSketchLineData.attribute("StartPoint"))

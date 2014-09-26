@@ -24,12 +24,12 @@ from ModelAPI import *
 
 __updated__ = "2014-07-25"
 
-aPluginManager = ModelAPI_PluginManager.get()
-aDocument = aPluginManager.rootDocument()
+aSession = ModelAPI_Session.get()
+aDocument = aSession.moduleDocument()
 #=========================================================================
 # Creation of a sketch
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchFeature = aDocument.addFeature("Sketch")
 aSketchFeatureData = aSketchFeature.data()
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
@@ -40,13 +40,13 @@ diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
 diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 norm.setValue(0, 0, 1)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Creation of an arc
 # 1. Test SketchPlugin_Arc attributes
 # 2. 
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
 assert (not aSketchReflist.isInitialized())
 assert (aSketchReflist.size() == 0)
@@ -70,7 +70,7 @@ assert (anArcEndPoint.x() == 0)
 assert (anArcEndPoint.y() == 0)
 assert (not anArcEndPoint.isInitialized())
 anArcEndPoint.setValue(50., 0.)
-aDocument.finishOperation()
+aSession.finishOperation()
 # check that values have been changed
 aSketchReflist = aSketchFeatureData.reflist("Features")
 assert (aSketchReflist.size() == 1)
@@ -86,12 +86,12 @@ assert (anArcEndPoint.y() == 0.0)
 # 1. Move whole arc
 # 2. Change the start point 
 #===============================================================================
-aDocument.startOperation()
+aSession.startOperation()
 deltaX, deltaY = 5., 10.
 anArcCentr.setValue(anArcCentr.x() + deltaX, anArcCentr.y() + deltaY)
 anArcStartPoint.setValue(anArcStartPoint.x() + deltaX, anArcStartPoint.y() + deltaY)
 anArcEndPoint.setValue(anArcEndPoint.x() + deltaX, anArcEndPoint.y() + deltaY)
-aDocument.finishOperation()
+aSession.finishOperation()
 assert (anArcCentr.x() == 15)
 assert (anArcCentr.y() == 20)
 assert (anArcStartPoint.x() == 5)
@@ -99,11 +99,11 @@ assert (anArcStartPoint.y() == 60)
 assert (anArcEndPoint.x() == 55)
 assert (anArcEndPoint.y() == 10)
 # Change the start point
-aDocument.startOperation()
+aSession.startOperation()
 anArcStartPoint.setValue(anArcStartPoint.x() + deltaX, anArcStartPoint.y())
 aPrevEndPointX = anArcEndPoint.x()
 aPrevEndPointY = anArcEndPoint.y()
-aDocument.finishOperation()
+aSession.finishOperation()
 assert (anArcCentr.x() == 15)
 assert (anArcCentr.y() == 20)
 assert (anArcStartPoint.x() == 10)
@@ -123,7 +123,7 @@ assert (not aShape.isNull())
 # 1. Test SketchPlugin_Circle.h attributes
 # 2. ModelAPI_AttributeDouble attribute
 #===============================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
 # Arc is already added
 assert (aSketchReflist.size() == 1)
@@ -146,21 +146,21 @@ aCircleRadius.setValue(25.)
 assert (anCircleCentr.x() == -25)
 assert (anCircleCentr.y() == -25)
 assert (aCircleRadius.value() == 25)
-aDocument.finishOperation()
+aSession.finishOperation()
 #===============================================================================
 # Edit the Cricle
 # 1. Check that changing the centr of a circle does not affects radius
 # 2. and vise versa; also check that int is acceptable as well as a real
 #===============================================================================
-aDocument.startOperation()
+aSession.startOperation()
 anCircleCentr.setValue(10, 60)
-aDocument.finishOperation()
+aSession.finishOperation()
 assert (anCircleCentr.x() == 10)
 assert (anCircleCentr.y() == 60)
 assert (aCircleRadius.value() == 25)
-aDocument.startOperation()
+aSession.startOperation()
 aCircleRadius.setValue(int(20))
-aDocument.finishOperation()
+aSession.finishOperation()
 assert (anCircleCentr.x() == 10)
 assert (anCircleCentr.y() == 60)
 assert (aCircleRadius.value() == 20)

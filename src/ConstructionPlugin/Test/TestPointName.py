@@ -1,11 +1,19 @@
 from ModelAPI import *
-p = ModelAPI_PluginManager.get()
-f = p.rootDocument().addFeature("Point")
-f_name = f.data().name()
-f.execute()
 
-doc = p.rootDocument()
-f1 = doc.object("Construction", 0)
-f1_name = f1.data().name()
+aSession = ModelAPI_Session.get()
+aDoc = aSession.moduleDocument()
 
-assert (f_name == f1_name)
+aSession.startOperation()
+aFeature = aDoc.addFeature("Point")
+aFeatureData = aFeature.data()
+aFeatureData.real("x").setValue(0.)
+aFeatureData.real("y").setValue(0.)
+aFeatureData.real("z").setValue(0.)
+aFeatureName = aFeatureData.name()
+aFeature.execute()
+aSession.finishOperation()
+
+aFeature1 = aDoc.object("Construction", 0)
+aFeature1Name = aFeature1.data().name()
+
+assert (aFeatureName == aFeature1Name)

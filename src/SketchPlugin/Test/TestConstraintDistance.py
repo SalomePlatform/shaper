@@ -38,12 +38,12 @@ def distance(pointA, pointB):
     ydiff = math.pow((pointA.y() - pointB.y()), 2)
     return round(math.sqrt(xdiff + ydiff), 5)
 
-aPluginManager = ModelAPI_PluginManager.get()
-aDocument = aPluginManager.rootDocument()
+aSession = ModelAPI_Session.get()
+aDocument = aSession.moduleDocument()
 #=========================================================================
 # Creation of a sketch
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchFeature = aDocument.addFeature("Sketch")
 aSketchFeatureData = aSketchFeature.data()
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
@@ -54,11 +54,11 @@ diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
 diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 norm.setValue(0, 0, 1)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Create a point and a line
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
 aSketchPoint = aDocument.addFeature("SketchPoint")
 aSketchReflist.append(aSketchPoint)
@@ -73,12 +73,12 @@ aLineAStartPoint = geomDataAPI_Point2D(
 aLineAEndPoint = geomDataAPI_Point2D(aSketchLine.data().attribute("EndPoint"))
 aLineAStartPoint.setValue(0., 25.)
 aLineAEndPoint.setValue(100., 25.)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Make a constraint to keep the distance
 #=========================================================================
 assert (distance(aSketchPointCoords, aLineAStartPoint) != 25.)
-aDocument.startOperation()
+aSession.startOperation()
 aConstraint = aDocument.addFeature("SketchConstraintDistance")
 aSketchReflist.append(aConstraint)
 aConstraintData = aConstraint.data()
@@ -93,7 +93,7 @@ aLineResult = aSketchLine.firstResult()
 assert (aLineResult is not None)
 refattrA.setAttr(aSketchPointCoords)
 refattrB.setAttr(aLineAStartPoint)
-aDocument.finishOperation()
+aSession.finishOperation()
 assert (aDistance.isInitialized())
 assert (refattrA.isInitialized())
 assert (refattrB.isInitialized())
@@ -101,10 +101,10 @@ assert (refattrB.isInitialized())
 # Move line, check that distance is constant
 #=========================================================================
 assert (distance(aSketchPointCoords, aLineAStartPoint) == 25.)
-aDocument.startOperation()
+aSession.startOperation()
 aLineAStartPoint.setValue(0., 40.)
 aLineAEndPoint.setValue(100., 40.)
-aDocument.finishOperation()
+aSession.finishOperation()
 assert (distance(aSketchPointCoords, aLineAStartPoint) == 25.)
 #=========================================================================
 # TODO: improve test

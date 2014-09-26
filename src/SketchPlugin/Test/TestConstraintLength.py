@@ -15,14 +15,14 @@ from ModelAPI import *
 # Initialization of the test
 #=========================================================================
 
-__updated__ = "2014-07-29"
+__updated__ = "2014-09-26"
 
-aPluginManager = ModelAPI_PluginManager.get()
-aDocument = aPluginManager.rootDocument()
+aSession = ModelAPI_Session.get()
+aDocument = aSession.moduleDocument()
 #=========================================================================
 # Creation of a sketch
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchFeature = aDocument.addFeature("Sketch")
 aSketchFeatureData = aSketchFeature.data()
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
@@ -33,11 +33,11 @@ diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
 diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 norm.setValue(0, 0, 1)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Create a line with length 100
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
 aSketchLineA = aDocument.addFeature("SketchLine")
 aSketchReflist.append(aSketchLineA)
@@ -46,24 +46,25 @@ aLineAStartPoint = geomDataAPI_Point2D(
 aLineAEndPoint = geomDataAPI_Point2D(aSketchLineA.data().attribute("EndPoint"))
 aLineAStartPoint.setValue(0., 25.)
 aLineAEndPoint.setValue(100., 25.)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Make a constraint to keep the length
 #=========================================================================
-aDocument.startOperation()
-aCoincidenceConstraint = aDocument.addFeature("SketchConstraintLength")
-aSketchReflist.append(aCoincidenceConstraint)
-aConstraintData = aCoincidenceConstraint.data()
-aLength = aConstraintData.real("ConstraintValue")
+aSession.startOperation()
+aLengthConstraint = aDocument.addFeature("SketchConstraintLength")
+aSketchReflist.append(aLengthConstraint)
+aConstraintData = aLengthConstraint.data()
 refattrA = aConstraintData.refattr("ConstraintEntityA")
-assert (not aLength.isInitialized())
+aLength = aConstraintData.real("ConstraintValue")
 assert (not refattrA.isInitialized())
-# aLength.setValue(100.)
-# refattrA.setObject(aSketchLineA)
+assert (not aLength.isInitialized())
+
 aResult = aSketchLineA.firstResult()
 assert (aResult is not None)
 refattrA.setObject(modelAPI_ResultConstruction(aResult))
-aDocument.finishOperation()
+# aLength.setValue(100.)
+aLengthConstraint.execute()
+aSession.finishOperation()
 assert (aLength.isInitialized())
 assert (refattrA.isInitialized())
 #=========================================================================
@@ -75,14 +76,22 @@ assert (aLineAStartPoint.x() == 0)
 assert (aLineAStartPoint.y() == 25)
 assert (aLineAEndPoint.x() == 100)
 assert (aLineAEndPoint.y() == 25)
-aDocument.startOperation()
+aSession.startOperation()
 aLineAStartPoint.setValue(aLineAStartPoint.x() + deltaX,
                           aLineAStartPoint.y())
-aDocument.finishOperation()
+aSession.finishOperation()
 assert (aLineAStartPoint.y() == 25)
 assert (aLineAEndPoint.y() == 25)
 # length of the line is the same
 assert (aLineAEndPoint.x() - aLineAStartPoint.x() == 100)
+#=========================================================================
+# Change the length value of the constraint
+#=========================================================================
+aSession.startOperation()
+aLength.setValue(140.)
+aLengthConstraint.execute()
+aSession.finishOperation()
+assert (aLineAEndPoint.x() - aLineAStartPoint.x() == 140)
 #=========================================================================
 # TODO: improve test
 # 1. remove constraint, move line's start point to

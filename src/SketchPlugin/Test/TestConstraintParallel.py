@@ -15,14 +15,14 @@ from ModelAPI import *
 # Initialization of the test
 #=========================================================================
 
-__updated__ = "2014-07-29"
+__updated__ = "2014-09-26"
 
-aPluginManager = ModelAPI_PluginManager.get()
-aDocument = aPluginManager.rootDocument()
+aSession = ModelAPI_Session.get()
+aDocument = aSession.moduleDocument()
 #=========================================================================
 # Creation of a sketch
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchFeature = aDocument.addFeature("Sketch")
 aSketchFeatureData = aSketchFeature.data()
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
@@ -33,11 +33,11 @@ diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
 diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 norm.setValue(0, 0, 1)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Create two lines which are not parallel
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
 # line A
 aSketchLineA = aDocument.addFeature("SketchLine")
@@ -57,20 +57,22 @@ aLineBEndPoint = geomDataAPI_Point2D(
     aSketchLineB.data().attribute("EndPoint"))
 aLineBStartPoint.setValue(0., 50)
 aLineBEndPoint.setValue(80., 75)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Make a constraint to keep the length of the line constant
 # to parallel perpendicular constraint collapsing line to point
 #=========================================================================
-aDocument.startOperation()
-aLengthConstraint = aDocument.addFeature("SketchConstraintLength")
-aSketchReflist.append(aLengthConstraint)
-aLengthConstraintData = aLengthConstraint.data()
-refattrA = aLengthConstraintData.refattr("ConstraintEntityA")
-aResultA = modelAPI_ResultConstruction(aSketchLineA.firstResult())
-assert (aResultA is not None)
-refattrA.setObject(aResultA)
-aDocument.finishOperation()
+for eachFeature in [aSketchLineA, aSketchLineB]:
+    aSession.startOperation()
+    aLengthConstraint = aDocument.addFeature("SketchConstraintLength")
+    aSketchReflist.append(aLengthConstraint)
+    aLengthConstraintData = aLengthConstraint.data()
+    refattrA = aLengthConstraintData.refattr("ConstraintEntityA")
+    aResultA = modelAPI_ResultConstruction(eachFeature.firstResult())
+    assert (aResultA is not None)
+    refattrA.setObject(aResultA)
+    aLengthConstraint.execute()
+    aSession.finishOperation()
 # Coordinates of lines should not be changed after this constraint
 assert (aLineAStartPoint.x() == 0)
 assert (aLineAStartPoint.y() == 25)
@@ -83,19 +85,26 @@ assert (aLineBEndPoint.y() == 75)
 #=========================================================================
 # Link lines with parallel constraint
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aParallelConstraint = aDocument.addFeature("SketchConstraintParallel")
 aSketchReflist.append(aParallelConstraint)
 aConstraintData = aParallelConstraint.data()
 refattrA = aConstraintData.refattr("ConstraintEntityA")
 refattrB = aConstraintData.refattr("ConstraintEntityB")
 # aResultA is already defined for the length constraint
+aResultA = modelAPI_ResultConstruction(eachFeature.firstResult())
 aResultB = modelAPI_ResultConstruction(aSketchLineB.firstResult())
 assert (aResultB is not None)
 refattrA.setObject(aResultA)
 refattrB.setObject(aResultB)
-aDocument.finishOperation()
-# print "Link lines with parallel constraint"
+aParallelConstraint.execute()
+aSession.finishOperation()
+#=========================================================================
+# Check values and move one constrainted object
+#=========================================================================
+deltaX = deltaY = 10.
+# rotate line, check that reference's line points are moved also
+# print "Rotate line, check that reference's line points are moved also"
 # print "assert (aLineAStartPoint.x() == %d)" % aLineAStartPoint.x()
 # print "assert (aLineAStartPoint.y() == %d)" % aLineAStartPoint.y()
 # print "assert (aLineAEndPoint.x() == %d)" % aLineAEndPoint.x()
@@ -104,16 +113,17 @@ aDocument.finishOperation()
 # print "assert (aLineBStartPoint.y() == %d)" % aLineBStartPoint.y()
 # print "assert (aLineBEndPoint.x() == %d)" % aLineBEndPoint.x()
 # print "assert (aLineBEndPoint.y() == %d)" % aLineBEndPoint.y()
-#=========================================================================
-# Check values and move one constrainted object
-#=========================================================================
-deltaX = deltaY = 10.
-# rotate line, check that reference's line points are moved also
+aLineBStartPointXPrev = aLineBStartPoint.x()
+aLineBStartPointYPrev = aLineBStartPoint.y()
+aLineBEndPointXPrev = aLineBEndPoint.x()
+aLineBEndPointYPrev = aLineBEndPoint.y()
+aSession.startOperation()
 aLineAStartPoint.setValue(aLineAStartPoint.x() + deltaX,
                           aLineAStartPoint.y() + deltaY)
 aLineAEndPoint.setValue(aLineAEndPoint.x() - deltaX,
                         aLineAEndPoint.y() - deltaY)
-# print "Rotate line, check that reference's line points are moved also"
+aSession.finishOperation()
+# print "After transformation:"
 # print "assert (aLineAStartPoint.x() == %d)" % aLineAStartPoint.x()
 # print "assert (aLineAStartPoint.y() == %d)" % aLineAStartPoint.y()
 # print "assert (aLineAEndPoint.x() == %d)" % aLineAEndPoint.x()

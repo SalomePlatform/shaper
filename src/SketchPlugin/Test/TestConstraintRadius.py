@@ -24,14 +24,14 @@ import math
 # Initialization of the test
 #=========================================================================
 
-__updated__ = "2014-07-29"
+__updated__ = "2014-09-26"
 
-aPluginManager = ModelAPI_PluginManager.get()
-aDocument = aPluginManager.rootDocument()
+aSession = ModelAPI_Session.get()
+aDocument = aSession.moduleDocument()
 #=========================================================================
 # Creation of a sketch
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchFeature = aDocument.addFeature("Sketch")
 aSketchFeatureData = aSketchFeature.data()
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
@@ -42,11 +42,11 @@ diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
 diry.setValue(0, 1, 0)
 norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
 norm.setValue(0, 0, 1)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Creation of an arc and a circle
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
 aSketchArc = aDocument.addFeature("SketchArc")
 aSketchReflist.append(aSketchArc)
@@ -58,9 +58,9 @@ anArcStartPoint = geomDataAPI_Point2D(
 anArcStartPoint.setValue(0., 50.)
 anArcEndPoint = geomDataAPI_Point2D(aSketchArcData.attribute("ArcEndPoint"))
 anArcEndPoint.setValue(50., 0.)
-aDocument.finishOperation()
+aSession.finishOperation()
 # Circle
-aDocument.startOperation()
+aSession.startOperation()
 aSketchCircle = aDocument.addFeature("SketchCircle")
 aSketchReflist.append(aSketchCircle)
 aSketchCircleData = aSketchCircle.data()
@@ -69,11 +69,11 @@ anCircleCentr = geomDataAPI_Point2D(
 aCircleRadius = aSketchCircleData.real("CircleRadius")
 anCircleCentr.setValue(-25., -25)
 aCircleRadius.setValue(25.)
-aDocument.finishOperation()
+aSession.finishOperation()
 #=========================================================================
 # Make a constraint to keep the radius of the arc
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aConstraint = aDocument.addFeature("SketchConstraintRadius")
 aSketchReflist.append(aConstraint)
 aConstraintData = aConstraint.data()
@@ -82,13 +82,14 @@ aRefObject = aConstraintData.refattr("ConstraintEntityA")
 aResult = aSketchArc.firstResult()
 assert (aResult is not None)
 aRefObject.setObject(modelAPI_ResultConstruction(aResult))
-aDocument.finishOperation()
+aConstraint.execute()
+aSession.finishOperation()
 assert (aRadius.isInitialized())
 assert (aRefObject.isInitialized())
 #=========================================================================
 # Make a constraint to keep the radius of the circle
 #=========================================================================
-aDocument.startOperation()
+aSession.startOperation()
 aConstraint = aDocument.addFeature("SketchConstraintRadius")
 aSketchReflist.append(aConstraint)
 aConstraintData = aConstraint.data()
@@ -97,7 +98,8 @@ aRefObject = aConstraintData.refattr("ConstraintEntityA")
 aResult = aSketchCircle.firstResult()
 assert (aResult is not None)
 aRefObject.setObject(modelAPI_ResultConstruction(aResult))
-aDocument.finishOperation()
+aConstraint.execute()
+aSession.finishOperation()
 assert (aRadius.isInitialized())
 assert (aRefObject.isInitialized())
 #=========================================================================
@@ -115,9 +117,9 @@ anArcPrevEndPointY = anArcEndPoint.y()
 assert (anArcPrevEndPointX == 50.)
 assert (anArcPrevEndPointY == 0.)
 # Move one point of the arc
-aDocument.startOperation()
+aSession.startOperation()
 anArcStartPoint.setValue(0., 60)
-aDocument.finishOperation()
+aSession.finishOperation()
 assert (anArcCentr.x() == 10.)
 assert (anArcCentr.y() == 10.)
 assert (anArcEndPoint.x() != anArcPrevEndPointX)
@@ -129,9 +131,9 @@ assert (anArcEndPoint.y() != anArcPrevEndPointY)
 assert (anCircleCentr.x() == -25)
 assert (anCircleCentr.y() == -25)
 assert (aCircleRadius.value() == 25)
-aDocument.startOperation()
+aSession.startOperation()
 anCircleCentr.setValue(100., 100.)
-aDocument.finishOperation()
+aSession.finishOperation()
 assert (anCircleCentr.x() == 100)
 assert (anCircleCentr.y() == 100)
 assert (aCircleRadius.value() == 25)
