@@ -68,8 +68,7 @@ bool XGUI_OperationMgr::eventFilter(QObject *theObject, QEvent *theEvent)
 {
   if (theEvent->type() == QEvent::KeyRelease) {
     QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-    if(aKeyEvent) {
-      onKeyReleased(aKeyEvent);
+    if(aKeyEvent && onKeyReleased(aKeyEvent)) {
       return true;
     }
   }
@@ -217,11 +216,11 @@ void XGUI_OperationMgr::onOperationStopped()
   }
 }
 
-void XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
+bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
 {
   // Let the manager decide what to do with the given key combination.
   ModuleBase_Operation* anOperation = currentOperation();
-  bool isRestart = false;
+  bool isAccepted = true;
   switch (theEvent->key()) {
     case Qt::Key_Escape: {
       onAbortOperation();
@@ -236,10 +235,13 @@ void XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
     }
       break;
     default:
+      isAccepted = false;
       break;
   }
-  if(anOperation)
+  if(anOperation) {
     anOperation->keyReleased(theEvent->key());
+  }
+  return isAccepted;
 }
 
 void XGUI_OperationMgr::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
