@@ -260,7 +260,7 @@ void XGUI_ObjectsBrowser::activatePart(const ResultPartPtr& thePart)
 void XGUI_ObjectsBrowser::onContextMenuRequested(QContextMenuEvent* theEvent)
 {
   myObjectsList = myTreeView->selectedObjects();
-  bool toEnable = myObjectsList.size() > 0;
+  bool toEnable = myObjectsList.size() == 1;
   foreach(QAction* aCmd, actions())
   {
     aCmd->setEnabled(toEnable);
