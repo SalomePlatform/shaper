@@ -8,7 +8,7 @@
 using namespace std;
 
 // the only created instance of this plugin
-static PartSetPlugin_Plugin* MY_INSTANCE = new PartSetPlugin_Plugin();
+static PartSetPlugin_Plugin* MY_PARTSET_INSTANCE = new PartSetPlugin_Plugin();
 
 PartSetPlugin_Plugin::PartSetPlugin_Plugin()
 {

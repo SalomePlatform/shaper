@@ -8,7 +8,7 @@
 using namespace std;
 
 // the only created instance of this plugin
-static FeaturesPlugin_Plugin* MY_INSTANCE = new FeaturesPlugin_Plugin();
+static FeaturesPlugin_Plugin* MY_FEATURES_INSTANCE = new FeaturesPlugin_Plugin();
 
 FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
 {

@@ -12,7 +12,7 @@
 using namespace std;
 
 // the only created instance of this plugin
-static ExchangePlugin_Plugin* MY_INSTANCE = new ExchangePlugin_Plugin();
+static ExchangePlugin_Plugin* MY_EXCHANGE_INSTANCE = new ExchangePlugin_Plugin();
 
 ExchangePlugin_Plugin::ExchangePlugin_Plugin()
 {

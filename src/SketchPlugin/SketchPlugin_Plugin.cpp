@@ -21,7 +21,7 @@
 using namespace std;
 
 // the only created instance of this plugin
-static SketchPlugin_Plugin* MY_INSTANCE = new SketchPlugin_Plugin();
+static SketchPlugin_Plugin* MY_SKETCH_INSTANCE = new SketchPlugin_Plugin();
 
 SketchPlugin_Plugin::SketchPlugin_Plugin()
 {

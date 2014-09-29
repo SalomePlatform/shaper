@@ -20,7 +20,7 @@
 
 using namespace std;
 
-Model_Update MY_INSTANCE;  /// the only one instance initialized on load of the library
+Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
 
 Model_Update::Model_Update()
 {

@@ -8,14 +8,14 @@
 #include <ModelAPI_Validator.h>
 
 /// Global instance for validators factory
-GeomValidators_Positive MY_INSTANCE;
+GeomValidators_Positive MY_POSITIVE_INSTANCE;
 
 GeomValidators_Positive::GeomValidators_Positive()
 {
   // this validator is registered in the factory on this library loading
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  aFactory->registerValidator("GeomValidators_Positive", &MY_INSTANCE);
+  aFactory->registerValidator("GeomValidators_Positive", this);
 }
 
 bool GeomValidators_Positive::isValid(
