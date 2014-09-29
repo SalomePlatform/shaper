@@ -124,9 +124,14 @@ class XGUI_EXPORT XGUI_Displayer
   /// \return feature the feature or NULL if it not visualized
   ObjectPtr getObject(Handle(AIS_InteractiveObject) theIO) const;
 
+  /// Deactivates the given object (not allow selection)
   void deactivate(ObjectPtr theFeature);
 
+  /// Activates the given object (it can be selected)
   void activate(ObjectPtr theFeature);
+
+  /// Returns true if the given object can be selected
+  bool isActive(ObjectPtr theObject) const;
 
   /// Activates in local context displayed outside of the context.
   /// \param theModes - selection modes to activate
