@@ -466,9 +466,9 @@ void XGUI_Workshop::onFeatureCreatedMsg(const boost::shared_ptr<ModelAPI_ObjectU
     myObjectBrowser->processEvent(theMsg);
   if (isDisplayed)
     myDisplayer->updateViewer();
-  if (aHasPart) {
-    activateLastPart();
-  }
+  //if (aHasPart) { // TODO: Avoid activate last part on loading of document
+  //  activateLastPart();
+  //}
 }
 
 //******************************************************
