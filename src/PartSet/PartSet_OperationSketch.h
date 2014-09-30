@@ -38,7 +38,7 @@ Q_OBJECT
   virtual ~PartSet_OperationSketch();
 
   /// Returns True if the given operation is a Sketcher operation
-  virtual bool isGranted(ModuleBase_IOperation* theOperation) const;
+  virtual bool isGranted(ModuleBase_Operation* theOperation) const;
 
 
   /// Returns the operation local selection mode
