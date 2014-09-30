@@ -8,7 +8,7 @@ pushd %PARENT_DIR%
 popd
 
 @SET SRC_DIR=%ROOT_DIR%\sources
-@SET OCC_LIB_PREFIX=d
+rem @SET OCC_LIB_PREFIX=d
 
 call %SRC_DIR%\msvc10_env.bat
 

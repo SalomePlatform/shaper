@@ -204,6 +204,22 @@ void XGUI_Displayer::activate(ObjectPtr theObject)
   }
 }
 
+bool XGUI_Displayer::isActive(ObjectPtr theObject) const
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return false;
+  if (!isVisible(theObject))
+    return false;
+    
+  boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap.at(theObject);
+  Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
+
+  TColStd_ListOfInteger aModes;
+  aContext->ActivatedModes(anAIS, aModes);
+  return aModes.Extent() > 0;
+}
+
 void XGUI_Displayer::stopSelection(const QList<ObjectPtr>& theResults, const bool isStop,
                                    const bool isUpdateViewer)
 {

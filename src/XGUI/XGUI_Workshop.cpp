@@ -414,14 +414,24 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_Objec
     if (!aObj->data() || !aObj->data()->isValid() || aObj->document()->isConcealed(aObj))
       myDisplayer->erase(aObj, false);
     else {
-      if (myDisplayer->isVisible(aObj))  // TODO VSV: Correction sketch drawing
+      if (myDisplayer->isVisible(aObj))  {
         myDisplayer->display(aObj, false);  // In order to update presentation
-      else {
+        if (myOperationMgr->hasOperation()) {
+          ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
+          if (!aOperation->hasObject(aObj))
+            if (!myDisplayer->isActive(aObj))
+              myDisplayer->activate(aObj);
+        }
+      } else {
         if (myOperationMgr->hasOperation()) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
           // Display only current operation results if operation has preview
-          if (aOperation->hasObject(aObj) && aOperation->hasPreview())
+          if (aOperation->hasObject(aObj) && aOperation->hasPreview()) {
             myDisplayer->display(aObj, false);
+            // Deactivate object of current operation from selection
+            if (myDisplayer->isActive(aObj))
+              myDisplayer->deactivate(aObj);
+          }
         }
       }
     }
@@ -456,9 +466,9 @@ void XGUI_Workshop::onFeatureCreatedMsg(const boost::shared_ptr<ModelAPI_ObjectU
     myObjectBrowser->processEvent(theMsg);
   if (isDisplayed)
     myDisplayer->updateViewer();
-  if (aHasPart) {
-    activateLastPart();
-  }
+  //if (aHasPart) { // TODO: Avoid activate last part on loading of document
+  //  activateLastPart();
+  //}
 }
 
 //******************************************************

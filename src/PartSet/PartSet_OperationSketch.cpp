@@ -252,7 +252,7 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
 }
 
 
-bool PartSet_OperationSketch::isGranted(ModuleBase_IOperation* theOperation) const
+bool PartSet_OperationSketch::isGranted(ModuleBase_Operation* theOperation) const
 {
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
   return aPreviewOp != NULL;

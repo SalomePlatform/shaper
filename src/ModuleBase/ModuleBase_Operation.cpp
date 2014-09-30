@@ -26,12 +26,16 @@
 #endif
 
 ModuleBase_Operation::ModuleBase_Operation(const QString& theId, QObject* theParent)
-    : ModuleBase_IOperation(theId, theParent)
+    : QObject(theParent),
+      myIsEditing(false),
+      myIsModified(false)
 {
+  myDescription = new ModuleBase_OperationDescription(theId);
 }
 
 ModuleBase_Operation::~ModuleBase_Operation()
 {
+  delete myDescription;
 }
 
 QString ModuleBase_Operation::id() const
@@ -104,26 +108,7 @@ void ModuleBase_Operation::afterCommitOperation()
 
 bool ModuleBase_Operation::canBeCommitted() const
 {
-  if (ModuleBase_IOperation::canBeCommitted()) {
-    /*    FeaturePtr aFeature = feature();
-     std::string aId = aFeature->getKind();
-
-     SessionPtr aMgr = ModelAPI_Session::get();
-     ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-     std::list<ModelAPI_Validator*> aValidators;
-     aFactory->validators(aId, aValidators);
-     std::list<ModelAPI_Validator*>::const_iterator aIt;
-     for (aIt = aValidators.cbegin(); aIt != aValidators.cend(); ++aIt) {
-     const ModuleBase_FeatureValidator* aFValidator = 
-     dynamic_cast<const ModuleBase_FeatureValidator*>(*aIt);
-     if (aFValidator) {
-     if (!aFValidator->isValid(aFeature))
-     return false;
-     }
-     }*/
-    return true;
-  }
-  return false;
+  return true;
 }
 
 void ModuleBase_Operation::flushUpdated()
@@ -184,3 +169,57 @@ bool ModuleBase_Operation::hasObject(ObjectPtr theObj) const
   return false;
 }
 
+
+boost::shared_ptr<ModelAPI_Document> ModuleBase_Operation::document() const
+{
+  return ModelAPI_Session::get()->moduleDocument();
+}
+
+
+void ModuleBase_Operation::start()
+{
+  ModelAPI_Session::get()->startOperation();
+
+  startOperation();
+  emit started();
+}
+
+void ModuleBase_Operation::resume()
+{
+  emit resumed();
+}
+
+void ModuleBase_Operation::abort()
+{
+  abortOperation();
+  emit aborted();
+
+  stopOperation();
+
+  ModelAPI_Session::get()->abortOperation();
+  emit stopped();
+}
+
+bool ModuleBase_Operation::commit()
+{
+  if (canBeCommitted()) {
+    commitOperation();
+    emit committed();
+
+    stopOperation();
+
+    ModelAPI_Session::get()->finishOperation();
+    emit stopped();
+
+    afterCommitOperation();
+    return true;
+  }
+  return false;
+}
+
+void ModuleBase_Operation::setRunning(bool theState)
+{
+  if (!theState) {
+    abort();
+  }
+}

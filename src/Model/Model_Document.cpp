@@ -146,6 +146,8 @@ bool Model_Document::load(const char* theFileName)
   }
   if (!isError) {
     myDoc->SetUndoLimit(UNDO_LIMIT);
+    // to avoid the problem that feature is created in the current, not this, document
+    Model_Session::get()->setActiveDocument(anApp->getDocument(myID));
     synchronizeFeatures();
   }
   return !isError;
