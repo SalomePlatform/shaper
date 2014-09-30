@@ -25,6 +25,7 @@ void PartSetPlugin_Part::execute()
   if (!aResult) {
     aResult = document()->createPart(data());
     setResult(aResult);
+    aResult->activate();
   }
   /*
   boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = aResult->data()->docRef(
