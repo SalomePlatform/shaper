@@ -92,8 +92,6 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
   aControlLay->setStretch(1, 1);
 
   connect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
-
-  mySpinBox->installEventFilter(this);
 }
 
 ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()

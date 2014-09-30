@@ -67,8 +67,10 @@ bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
 
 bool PartSet_OperationFeatureCreate::canBeCommitted() const
 {
-  if (PartSet_OperationSketchBase::canBeCommitted())
-    return !myActiveWidget;
+  if (PartSet_OperationSketchBase::canBeCommitted()) {
+    //if(myActiveWidget && !myActiveWidget->isComputedDefault()) {
+    return isValid();
+  }
   return false;
 }
 
@@ -145,11 +147,12 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
     emit activateNextWidget(myActiveWidget);
   }
 
-  if (commit() && !isClosedContour) {
-    // if the point creation is finished, the next mouse release should commit the modification
-    // the next release can happens by double click in the viewer
-    restartOperation(feature()->getKind(), feature());
-    return;
+  if (myActiveWidget == NULL) {
+    if(commit() && !isClosedContour) {
+      // if the point creation is finished, the next mouse release should commit the modification
+      // the next release can happens by double click in the viewer
+      restartOperation(feature()->getKind(), feature());
+    }
   }
 }
 

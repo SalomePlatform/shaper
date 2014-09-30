@@ -131,6 +131,7 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
 
 void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
 {
+  QObject* aSender = sender();
   ModuleBase_ModelWidget* aNextWidget = 0;
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;

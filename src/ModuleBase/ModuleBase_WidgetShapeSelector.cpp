@@ -72,7 +72,6 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   myTextLine = new QLineEdit(myContainer);
   myTextLine->setReadOnly(true);
   myTextLine->setToolTip(aToolTip);
-  myTextLine->installEventFilter(this);
 
   myBasePalet = myTextLine->palette();
   myInactivePalet = myBasePalet;

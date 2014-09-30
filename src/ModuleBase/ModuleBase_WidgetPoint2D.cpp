@@ -66,8 +66,6 @@ ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
 
     connect(myYSpin, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
   }
-  myXSpin->installEventFilter(this);
-  myYSpin->installEventFilter(this);
 }
 
 ModuleBase_WidgetPoint2D::~ModuleBase_WidgetPoint2D()

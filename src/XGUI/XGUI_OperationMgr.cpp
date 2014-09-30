@@ -228,9 +228,6 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
       break;
     case Qt::Key_Return:
     case Qt::Key_Enter: {
-      if(anOperation) {
-         anOperation->activateNextToCurrentWidget();
-      }
       commitOperation();
     }
       break;
