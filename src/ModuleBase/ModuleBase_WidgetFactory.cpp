@@ -22,6 +22,8 @@
 #include <ModuleBase_WidgetChoice.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_Tools.h>
+
 #include <ModelAPI_Validator.h>
 
 #include <Config_Keywords.h>
@@ -62,7 +64,6 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
     return;
 
   QVBoxLayout* aWidgetLay = new QVBoxLayout(theParent);
-  aWidgetLay->setContentsMargins(2, 2, 2, 2);
   do {  //Iterate over each node
     std::string aWdgType = myWidgetApi->widgetType();
     //Create a widget (doublevalue, groupbox, toolbox, etc.
@@ -78,6 +79,7 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
       //if current widget is groupbox (container) process it's children recursively
       QString aGroupName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
       createWidget(aWidget);
+      ModuleBase_Tools::adjustMargins(aWidget);
       QGroupBox* aGrBox = qobject_cast<QGroupBox*>(aWidget);
       aGrBox->setTitle(aGroupName);
     }
@@ -88,6 +90,7 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
       do {
         QString aPageName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
         QWidget* aPage = new QWidget(aWidget);
+        ModuleBase_Tools::adjustMargins(aPage);
         createWidget(aPage);
         if (aWdgType == WDG_SWITCH) {
           ModuleBase_WidgetSwitch* aSwitch = qobject_cast<ModuleBase_WidgetSwitch*>(aWidget);

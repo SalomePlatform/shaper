@@ -4,6 +4,7 @@
 
 #include <ModuleBase_WidgetDoubleValue.h>
 #include <ModuleBase_DoubleSpinBox.h>
+#include <ModuleBase_Tools.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
@@ -37,7 +38,7 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aControlLay = new QHBoxLayout(myContainer);
-  aControlLay->setContentsMargins(0, 0, 0, 0);
+  ModuleBase_Tools::adjustMargins(aControlLay);
 
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
@@ -77,7 +78,7 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
     mySpinBox->setSingleStep(aStepVal);
   }
 
-  aProp = theData->getProperty(DOUBLE_WDG_DEFAULT);
+  aProp = theData->getProperty(ANY_WDG_DEFAULT);
   double aDefVal = QString::fromStdString(aProp).toDouble(&isOk);
   if (isOk) {
     mySpinBox->setValue(aDefVal);

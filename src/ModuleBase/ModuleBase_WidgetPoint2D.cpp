@@ -5,6 +5,7 @@
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_DoubleSpinBox.h>
+#include <ModuleBase_Tools.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -33,10 +34,12 @@ ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
     : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   myOptionParam = theData->getProperty(PREVIOUS_FEATURE_PARAM);
-  myGroupBox = new QGroupBox(QString::fromStdString(theData->getProperty(CONTAINER_PAGE_NAME)),
-                             theParent);
+  QString aPageName = QString::fromStdString(theData->getProperty(CONTAINER_PAGE_NAME));
+  myGroupBox = new QGroupBox(aPageName, theParent);
+  myGroupBox->setFlat(false);
+
   QGridLayout* aGroupLay = new QGridLayout(myGroupBox);
-  aGroupLay->setContentsMargins(2, 0, 2, 0);
+  ModuleBase_Tools::adjustMargins(aGroupLay);
   aGroupLay->setColumnStretch(1, 1);
   {
     QLabel* aLabel = new QLabel(myGroupBox);

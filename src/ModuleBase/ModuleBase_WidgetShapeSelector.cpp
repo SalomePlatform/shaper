@@ -3,7 +3,8 @@
 // Author:      Vitaly Smetannikov
 
 #include "ModuleBase_WidgetShapeSelector.h"
-#include "ModuleBase_IWorkshop.h"
+#include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_Tools.h>
 
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
@@ -58,8 +59,8 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aLayout = new QHBoxLayout(myContainer);
+  ModuleBase_Tools::adjustMargins(aLayout);
 
-  aLayout->setContentsMargins(0, 0, 0, 0);
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   myLabel = new QLabel(aLabelText, myContainer);

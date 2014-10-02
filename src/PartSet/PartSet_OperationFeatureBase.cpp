@@ -115,6 +115,13 @@ void PartSet_OperationFeatureBase::mouseReleased(QMouseEvent* theEvent, Handle(V
 
 void PartSet_OperationFeatureBase::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
 {
+  if(myActiveWidget) {
+    myActiveWidget->setHighlighted(false);
+  }
+  if(theWidget) {
+    theWidget->setHighlighted(true);
+  }
+
   myActiveWidget = theWidget;
   activateByPreselection();
   if (myInitFeature && myActiveWidget) {
