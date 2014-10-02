@@ -4,6 +4,7 @@
 
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_DoubleSpinBox.h>
+#include <ModuleBase_Tools.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -40,7 +41,7 @@ double editedValue(double theValue, bool& isDone)
   QDialog aDlg;
   aDlg.setWindowFlags(Qt::FramelessWindowHint);
   QHBoxLayout* aLay = new QHBoxLayout(&aDlg);
-  aLay->setContentsMargins(0, 0, 0, 0);
+  ModuleBase_Tools::zeroMargins(aLay);
 
   QLineEdit* aEditor = new QLineEdit(QString::number(theValue), &aDlg);
   aEditor->setValidator(new QDoubleValidator(aEditor));

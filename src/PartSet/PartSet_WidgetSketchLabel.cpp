@@ -22,6 +22,7 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   myLabel->setWordWrap(true);
   myTooltip = QString::fromStdString(theData->getProperty("tooltip"));
   myLabel->setToolTip(myTooltip);
+  myLabel->setIndent(5);
 }
 
 QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
