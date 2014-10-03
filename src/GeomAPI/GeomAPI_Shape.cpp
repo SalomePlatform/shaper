@@ -13,9 +13,19 @@ GeomAPI_Shape::GeomAPI_Shape()
 {
 }
 
-bool GeomAPI_Shape::isNull()
+bool GeomAPI_Shape::isNull() const
 {
   return MY_SHAPE->IsNull() == Standard_True;
+}
+
+bool GeomAPI_Shape::isEqual(const boost::shared_ptr<GeomAPI_Shape> theShape) const
+{
+  if (isNull())
+    return theShape->isNull();
+  if (theShape->isNull())
+    return false;
+
+  return MY_SHAPE->IsEqual(theShape->impl<TopoDS_Shape>()) == Standard_True;
 }
 
 bool GeomAPI_Shape::isVertex() const

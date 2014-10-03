@@ -55,6 +55,7 @@ const static char* PREVIOUS_FEATURE_PARAM = "previous_feature_param";
 const static char* ANY_WDG_TOOLTIP = FEATURE_TOOLTIP;
 const static char* ANY_WDG_ICON = FEATURE_ICON;
 const static char* ANY_WDG_LABEL = "label";
+const static char* ANY_WDG_DEFAULT = "default";
 
 const static char* SOURCE_FILE = "path";
 const static char* VALIDATOR_PARAMETERS = "parameters";
@@ -65,7 +66,6 @@ const static char* INFO_WDG_TOOLTIP = FEATURE_TOOLTIP;
 const static char* DOUBLE_WDG_MIN = "min";
 const static char* DOUBLE_WDG_MAX = "max";
 const static char* DOUBLE_WDG_STEP = "step";
-const static char* DOUBLE_WDG_DEFAULT = "default";
 const static char* DOUBLE_WDG_DEFAULT_COMPUTED = "computed";
 
 //toolbox/switch properties

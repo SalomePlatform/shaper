@@ -22,6 +22,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Validator.h>
 

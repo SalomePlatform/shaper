@@ -3,6 +3,7 @@ SET(CMAKE_AUTOMOC ON)
 
 SET(PROJECT_HEADERS
 	ModuleBase.h
+	ModuleBase_Tools.h
 	ModuleBase_IModule.h
 	ModuleBase_Operation.h
 	ModuleBase_OperationDescription.h	
@@ -31,6 +32,7 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
+	ModuleBase_Tools.cpp
 	ModuleBase_Operation.cpp
 	ModuleBase_OperationDescription.cpp
 	ModuleBase_ModelWidget.cpp

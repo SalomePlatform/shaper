@@ -18,7 +18,10 @@ void Model_ResultBody::store(const boost::shared_ptr<GeomAPI_Shape>& theShape)
   boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
     TDF_Label& aShapeLab = aData->shapeLab();
-    // TODO: to add the naming mechanism for shape storage in the next iteration
+    // remove the previous history
+    clean();
+    aShapeLab.ForgetAllAttributes();
+    // store the new shape as primitive
     TNaming_Builder aBuilder(aShapeLab);
     if (!theShape)
       return;  // bad shape
@@ -51,4 +54,59 @@ boost::shared_ptr<GeomAPI_Shape> Model_ResultBody::shape()
 boost::shared_ptr<ModelAPI_Feature> Model_ResultBody::owner()
 {
   return myOwner;
+}
+
+void Model_ResultBody::clean()
+{
+  std::vector<TNaming_Builder*>::iterator aBuilder = myBuilders.begin();
+  for(; aBuilder != myBuilders.end(); aBuilder++)
+    delete *aBuilder;
+}
+
+Model_ResultBody::~Model_ResultBody()
+{
+  clean();
+}
+
+TNaming_Builder* Model_ResultBody::builder(const int theTag)
+{
+  if (myBuilders.size() < (unsigned int)theTag) {
+    myBuilders.insert(myBuilders.end(), theTag - myBuilders.size() + 1, NULL);
+  }
+  if (!myBuilders[theTag]) {
+    boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(data());
+    myBuilders[theTag] = new TNaming_Builder(aData->shapeLab().FindChild(theTag));
+  }
+  return myBuilders[theTag];
+}
+
+void Model_ResultBody::generated(
+  const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag)
+{
+  TopoDS_Shape aShape = theNewShape->impl<TopoDS_Shape>();
+  builder(theTag)->Generated(aShape);
+}
+
+void Model_ResultBody::generated(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+    const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag)
+{
+  TopoDS_Shape anOldShape = theOldShape->impl<TopoDS_Shape>();
+  TopoDS_Shape aNewShape = theNewShape->impl<TopoDS_Shape>();
+  builder(theTag)->Generated(anOldShape, aNewShape);
+}
+
+
+void Model_ResultBody::modified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+    const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag)
+{
+  TopoDS_Shape anOldShape = theOldShape->impl<TopoDS_Shape>();
+  TopoDS_Shape aNewShape = theNewShape->impl<TopoDS_Shape>();
+  builder(theTag)->Modify(anOldShape, aNewShape);
+}
+
+void Model_ResultBody::deleted(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+    const int theTag)
+{
+  TopoDS_Shape aShape = theOldShape->impl<TopoDS_Shape>();
+  builder(theTag)->Delete(aShape);
 }

@@ -44,7 +44,8 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_SelectionValidator.h>
-#include "ModuleBase_WidgetFactory.h"
+#include <ModuleBase_WidgetFactory.h>
+#include <ModuleBase_Tools.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -498,6 +499,7 @@ void XGUI_Workshop::onOperationStarted()
 
     myPropertyPanel->cleanContent();
     aFactory.createWidget(myPropertyPanel->contentWidget());
+    ModuleBase_Tools::zeroMargins(myPropertyPanel->contentWidget());
 
     QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
     QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();

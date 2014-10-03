@@ -101,8 +101,6 @@ void PartSet_OperationFeatureBase::mouseReleased(QMouseEvent* theEvent, Handle(V
   commit();
 }
 
-
-
 /*bool PartSet_OperationFeatureBase::setWidgetValue(ObjectPtr theFeature, double theX, double theY)
 {
   ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();

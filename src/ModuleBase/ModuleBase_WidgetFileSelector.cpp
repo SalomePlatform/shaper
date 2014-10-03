@@ -9,6 +9,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModuleBase_WidgetFileSelector.h>
+#include <ModuleBase_Tools.h>
 
 #include <Config_WidgetAPI.h>
 
@@ -36,7 +37,7 @@ ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
 
   myMainWidget = new QWidget(theParent);
   QGridLayout* aMainLay = new QGridLayout(myMainWidget);
-  aMainLay->setContentsMargins(0, 0, 0, 0);
+  ModuleBase_Tools::adjustMargins(aMainLay);
   QLabel* aTitleLabel = new QLabel(myTitle, myMainWidget);
   aTitleLabel->setIndent(1);
   aMainLay->addWidget(aTitleLabel, 0, 0);

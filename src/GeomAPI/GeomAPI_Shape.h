@@ -6,6 +6,7 @@
 #define GeomAPI_Shape_H_
 
 #include <GeomAPI_Interface.h>
+#include <boost/shared_ptr.hpp>
 
 /**\class GeomAPI_Shape
  * \ingroup DataModel
@@ -17,7 +18,10 @@ class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
   /// Creation of empty (null) shape
   GeomAPI_Shape();
 
-  bool isNull();
+  bool isNull() const;
+
+  /// Returns whether the shapes are equal
+  virtual bool isEqual(const boost::shared_ptr<GeomAPI_Shape> theShape) const;
 
   /// Returns whether the shape is a vertex
   virtual bool isVertex() const;
@@ -28,4 +32,3 @@ class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
 };
 
 #endif
-

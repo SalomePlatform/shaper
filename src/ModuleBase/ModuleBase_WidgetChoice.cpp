@@ -3,6 +3,7 @@
 // Author:      Vitaly Smetannikov
 
 #include "ModuleBase_WidgetChoice.h"
+#include <ModuleBase_Tools.h>
 
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Data.h>
@@ -20,7 +21,7 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aLayout = new QHBoxLayout(myContainer);
-  aLayout->setContentsMargins(0, 0, 0, 0);
+  ModuleBase_Tools::adjustMargins(aLayout);
 
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
