@@ -47,27 +47,53 @@ PartSet_OperationFeatureEditMulti::~PartSet_OperationFeatureEditMulti()
 }
 
 
+bool isContains(const std::list<ModuleBase_ViewerPrs>& theSelected, const ModuleBase_ViewerPrs& thePrs)
+{
+  std::list<ModuleBase_ViewerPrs>::const_iterator anIt;
+  for (anIt = theSelected.cbegin(); anIt != theSelected.cend(); ++anIt) {
+    if ((*anIt).object() == thePrs.object())
+      return true;
+  }
+  return false;
+}
+
+
 void PartSet_OperationFeatureEditMulti::initSelection(
     const std::list<ModuleBase_ViewerPrs>& theSelected,
     const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  if (!theHighlighted.empty()) {
-    // if there is highlighted object, we check whether it is in the list of selected objects
-    // in that case this object is a handle of the moved lines. If there no such object in the selection,
-    // the hightlighted object should moved and the selection is skipped. The skipped selection will be
-    // deselected in the viewer by blockSelection signal in the startOperation method.
-    bool isSelected = false;
-    std::list<ModuleBase_ViewerPrs>::const_iterator anIt = theSelected.begin(), aLast = theSelected
-        .end();
-    for (; anIt != aLast && !isSelected; anIt++) {
-      isSelected = ModelAPI_Feature::feature((*anIt).object()) == feature();
+  //if (!theHighlighted.empty()) {
+  //  // if there is highlighted object, we check whether it is in the list of selected objects
+  //  // in that case this object is a handle of the moved lines. If there no such object in the selection,
+  //  // the hightlighted object should moved and the selection is skipped. The skipped selection will be
+  //  // deselected in the viewer by blockSelection signal in the startOperation method.
+  //  bool isSelected = false;
+  //  std::list<ModuleBase_ViewerPrs>::const_iterator anIt = theSelected.begin(), 
+  //    aLast = theSelected.end();
+  //  for (; anIt != aLast && !isSelected; anIt++) {
+  //    isSelected = ModelAPI_Feature::feature((*anIt).object()) == feature();
+  //  }
+  //  if (!isSelected)
+  //    myFeatures = theHighlighted;
+  //  else
+  //    myFeatures = theSelected;
+  //} else
+  myFeatures = theSelected;
+  // add highlighted elements if they are not selected
+  std::list<ModuleBase_ViewerPrs>::const_iterator anIt;
+  for (anIt = theHighlighted.cbegin(); anIt != theHighlighted.cend(); ++anIt) {
+    if (!isContains(myFeatures, (*anIt)))
+      myFeatures.push_back(*anIt);
+  }
+  // Remove current feature if it is in the list (it will be moved as main feature)
+  FeaturePtr aFea = feature();
+  for (anIt = myFeatures.cbegin(); anIt != myFeatures.cend(); ++anIt) {
+    FeaturePtr aF = ModelAPI_Feature::feature((*anIt).object());
+    if (ModelAPI_Feature::feature((*anIt).object()) == feature()) {
+      myFeatures.erase(anIt);
+      break;
     }
-    if (!isSelected)
-      myFeatures = theHighlighted;
-    else
-      myFeatures = theSelected;
-  } else
-    myFeatures = theSelected;
+  }
 }
 
 FeaturePtr PartSet_OperationFeatureEditMulti::sketch() const
@@ -89,7 +115,7 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Handle
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
 
-/*  blockSelection(true);
+  blockSelection(true);
   if (myCurPoint.myIsInitialized) {
     double aCurX, aCurY;
     PartSet_Tools::convertTo2D(myCurPoint.myPoint, sketch(), theView, aCurX, aCurY);
@@ -101,11 +127,11 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Handle
     double aDeltaY = anY - aCurY;
 
     boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
-        SketchPlugin_Feature>(sketch());
+        SketchPlugin_Feature>(feature());
     aSketchFeature->move(aDeltaX, aDeltaY);
 
-    std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures
-        .end();
+    std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(), 
+      aLast = myFeatures.end();
     for (; anIt != aLast; anIt++) {
       ObjectPtr aObject = (*anIt).object();
       if (!aObject || aObject == feature())
@@ -121,7 +147,6 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Handle
   sendFeatures();
 
   myCurPoint.setPoint(aPoint);
-  */
 }
 
 void PartSet_OperationFeatureEditMulti::mouseReleased(
