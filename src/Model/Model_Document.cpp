@@ -15,7 +15,6 @@
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
-#include <TDataStd_UAttribute.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TDataStd_ReferenceArray.hxx>
 #include <TDataStd_HLabelArray1.hxx>
@@ -49,11 +48,10 @@ Model_Document::Model_Document(const std::string theID, const std::string theKin
     : myID(theID), myKind(theKind),
       myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
 {
-  myDoc->SetUndoLimit(UNDO_LIMIT);
+  myDoc->SetUndoLimit(UNDO_LIMIT);  
   myTransactionsAfterSave = 0;
   myNestedNum = -1;
   myExecuteFeatures = true;
-  //myDoc->SetNestedTransactionMode();
   // to have something in the document and avoid empty doc open/save problem
   // in transaction for nesting correct working
   myDoc->NewCommand();
@@ -822,15 +820,11 @@ void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData
   }
 }
 
-static const Standard_GUID ID_CONSTRUCTION("b59fa408-8ab1-42b8-980c-af5adeebe7e4");
-static const Standard_GUID ID_BODY("c1148e9a-9b17-4e9c-9160-18e918fd0013");
-static const Standard_GUID ID_PART("1b3319b9-3e0a-4298-a1dc-3fb5aaf9be59");
-
 boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstruction(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
   TDF_Label aLab = resultLabel(theFeatureData, theIndex);
-  TDataStd_UAttribute::Set(aLab, ID_CONSTRUCTION);
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultConstruction::group().c_str());
   ObjectPtr anOldObject = object(aLab);
   boost::shared_ptr<ModelAPI_ResultConstruction> aResult;
   if (anOldObject) {
@@ -847,7 +841,7 @@ boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
   TDF_Label aLab = resultLabel(theFeatureData, theIndex);
-  TDataStd_UAttribute::Set(aLab, ID_BODY);
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultBody::group().c_str());
   ObjectPtr anOldObject = object(aLab);
   boost::shared_ptr<ModelAPI_ResultBody> aResult;
   if (anOldObject) {
@@ -864,7 +858,7 @@ boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
   TDF_Label aLab = resultLabel(theFeatureData, theIndex);
-  TDataStd_UAttribute::Set(aLab, ID_PART);
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultPart::group().c_str());
   ObjectPtr anOldObject = object(aLab);
   boost::shared_ptr<ModelAPI_ResultPart> aResult;
   if (anOldObject) {
@@ -916,12 +910,16 @@ void Model_Document::updateResults(FeaturePtr theFeature)
     ResultPtr aNewBody;
     if (aResSize <= aResIndex) {
       TDF_Label anArgLab = aLabIter.Value();
-      if (anArgLab.IsAttribute(ID_BODY)) {
-        aNewBody = createBody(theFeature->data(), aResIndex);
-      } else if (anArgLab.IsAttribute(ID_PART)) {
-        aNewBody = createPart(theFeature->data(), aResIndex);
-      } else if (!anArgLab.IsAttribute(ID_CONSTRUCTION) && anArgLab.FindChild(1).HasAttribute()) {
-        Events_Error::send("Unknown type of result is found in the document");
+      Handle(TDataStd_Comment) aGroup;
+      if (anArgLab.FindAttribute(TDataStd_Comment::GetID(), aGroup)) {
+        if (aGroup->Get() == ModelAPI_ResultBody::group().c_str()) {
+          aNewBody = createBody(theFeature->data(), aResIndex);
+        } else if (aGroup->Get() == ModelAPI_ResultPart::group().c_str()) {
+          aNewBody = createPart(theFeature->data(), aResIndex);
+        } else if (aGroup->Get() != ModelAPI_ResultConstruction::group().c_str()) {
+          Events_Error::send(std::string("Unknown type of result is found in the document:") +
+            TCollection_AsciiString(aGroup->Get()).ToCString());
+        }
       }
       if (aNewBody) {
         theFeature->setResult(aNewBody, aResIndex);

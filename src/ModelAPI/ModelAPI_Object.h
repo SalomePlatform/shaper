@@ -54,6 +54,8 @@ class ModelAPI_Object
   /// Returns the group identifier of this object
   virtual std::string groupName() = 0;
 
+  /// To use virtuality for destructors
+  virtual ~ModelAPI_Object() {}
  protected:
   /// Sets the data manager of an object (document does)
   virtual void setData(boost::shared_ptr<ModelAPI_Data> theData)

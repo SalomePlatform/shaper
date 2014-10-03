@@ -11,16 +11,16 @@
 #include <string>
 
 /**\class ModelAPI_ResultBody
- * \ingroup DataModel
- * \brief The body (shape) result of a feature.
- *
- * Provides a shape that may be displayed in the viewer.
- * May provide really huge results, so, working with this kind
- * of result must be optimized.
- */
+* \ingroup DataModel
+* \brief The body (shape) result of a feature.
+*
+* Provides a shape that may be displayed in the viewer.
+* May provide really huge results, so, working with this kind
+* of result must be optimized.
+*/
 class ModelAPI_ResultBody : public ModelAPI_Result
 {
- public:
+public:
   /// Returns the group identifier of this result
   virtual std::string groupName()
   {
@@ -44,7 +44,28 @@ class ModelAPI_ResultBody : public ModelAPI_Result
   {
   }
 
- protected:
+  /// Records the subshape newShape which was generated during a topological construction.
+  /// As an example, consider the case of a face generated in construction of a box.
+  virtual void generated(
+    const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag = 1) = 0;
+
+  /// Records the shape newShape which was generated from the shape oldShape during a topological 
+  /// construction. As an example, consider the case of a face generated from an edge in 
+  /// construction of a prism.
+  virtual void generated(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+    const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag = 1) = 0;
+
+  /// Records the shape newShape which is a modification of the shape oldShape.
+  /// As an example, consider the case of a face split or merged in a Boolean operation.
+  virtual void modified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+    const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag = 1) = 0;
+
+  /// Records the shape oldShape which was deleted from the current label.
+  /// As an example, consider the case of a face removed by a Boolean operation.
+  virtual void deleted(
+    const boost::shared_ptr<GeomAPI_Shape>& theOldShape, const int theTag = 1) = 0;
+
+protected:
   /// Use plugin manager for features creation: this method is 
   /// defined here only for SWIG-wrapping
   ModelAPI_ResultBody()
