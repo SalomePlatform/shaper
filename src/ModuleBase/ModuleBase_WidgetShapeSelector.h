@@ -55,7 +55,12 @@ Q_OBJECT
     return mySelectedObject;
   }
 
- public slots:
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// \param theValue the wrapped widget value
+  virtual bool setValue(ModuleBase_WidgetValue* theValue);
+
+public slots:
 
   /// Activate or deactivate selection
   void activateSelection(bool toActivate);
@@ -70,6 +75,9 @@ private:
   void updateSelectionName();
   void raisePanel() const;
   bool isAccepted(const ObjectPtr theObject) const;
+
+  // Set the given object as a value of the widget
+  void setObject(ObjectPtr theObj);
 
   static TopAbs_ShapeEnum shapeType(const QString& theType);
 

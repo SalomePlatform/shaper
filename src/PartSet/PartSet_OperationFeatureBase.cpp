@@ -24,7 +24,7 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetValueFeature.h>
-#include <ModuleBase_ViewerPrs.h>
+#include "ModuleBase_IPropertyPanel.h"
 
 #include <XGUI_Constants.h>
 
@@ -46,25 +46,12 @@ PartSet_OperationFeatureBase::PartSet_OperationFeatureBase(const QString& theId,
                                                                QObject* theParent,
                                                                FeaturePtr theFeature)
     : PartSet_OperationSketchBase(theId, theParent),
-      mySketch(theFeature),
-      myActiveWidget(NULL)
+      mySketch(theFeature)
 {
 }
 
 PartSet_OperationFeatureBase::~PartSet_OperationFeatureBase()
 {
-}
-
-void PartSet_OperationFeatureBase::initSelection(
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
-{
-  myPreSelection = theSelected;
-}
-
-void PartSet_OperationFeatureBase::initFeature(FeaturePtr theFeature)
-{
-  myInitFeature = theFeature;
 }
 
 FeaturePtr PartSet_OperationFeatureBase::sketch() const
@@ -90,7 +77,8 @@ void PartSet_OperationFeatureBase::mouseReleased(QMouseEvent* theEvent, Handle(V
         if (!aVertex.IsNull()) {
           aPoint = BRep_Tool::Pnt(aVertex);
           PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-          PartSet_Tools::setConstraints(sketch(), feature(), myActiveWidget->attributeID(), aX, anY);
+          ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+          PartSet_Tools::setConstraints(sketch(), feature(), aActiveWgt->attributeID(), aX, anY);
         }
       } else if (aShape.ShapeType() == TopAbs_EDGE) { // a line is selected
         PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
@@ -108,53 +96,24 @@ void PartSet_OperationFeatureBase::mouseReleased(QMouseEvent* theEvent, Handle(V
   bool isApplyed = setWidgetValue(aFeature, aX, anY);
   if (isApplyed) {
     flushUpdated();
-    emit activateNextWidget(myActiveWidget);
+    myPropertyPanel->activateNextWidget();
   }
   commit();
 }
 
-void PartSet_OperationFeatureBase::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
-{
-  myActiveWidget = theWidget;
-  activateByPreselection();
-  if (myInitFeature && myActiveWidget) {
-    ModuleBase_WidgetPoint2D* aWgt = dynamic_cast<ModuleBase_WidgetPoint2D*>(myActiveWidget);
-    if (aWgt && aWgt->initFromPrevious(myInitFeature)) {
-      myInitFeature = FeaturePtr();
-      emit activateNextWidget(myActiveWidget);
-    }
-  }
-}
 
-void PartSet_OperationFeatureBase::activateByPreselection()
-{
-  if ((myPreSelection.size() > 0) && myActiveWidget) {
-    const ModuleBase_ViewerPrs& aPrs = myPreSelection.front();
-    ModuleBase_WidgetValueFeature aValue;
-    aValue.setObject(aPrs.object());
-    if (myActiveWidget->setValue(&aValue)) {
-      myPreSelection.remove(aPrs);
-      if(isValid()) {
-        myActiveWidget = NULL;
-        commit();
-      } else {
-        emit activateNextWidget(myActiveWidget);
-      }
-    }
-    // If preselection is enough to make a valid feature - apply it immediately
-  }
-}
 
-bool PartSet_OperationFeatureBase::setWidgetValue(ObjectPtr theFeature, double theX, double theY)
+/*bool PartSet_OperationFeatureBase::setWidgetValue(ObjectPtr theFeature, double theX, double theY)
 {
-  if (!myActiveWidget)
+  ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+  if (!aActiveWgt)
     return false;
   ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
   aValue->setObject(theFeature);
   aValue->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
-  bool isApplyed = myActiveWidget->setValue(aValue);
+  bool isApplyed = aActiveWgt->setValue(aValue);
 
   delete aValue;
   myIsModified = (myIsModified || isApplyed);
   return isApplyed;
-}
+}*/

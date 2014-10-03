@@ -23,7 +23,7 @@
 #endif
 
 XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
-    : QDockWidget(theParent)
+    : ModuleBase_IPropertyPanel(theParent), myActiveWidget(0)
 {
   this->setWindowTitle(tr("Property Panel"));
   QAction* aViewAct = this->toggleViewAction();
@@ -76,6 +76,7 @@ void XGUI_PropertyPanel::cleanContent()
 void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets)
 {
   myWidgets = theWidgets;
+  int aS = myWidgets.size();
   if (theWidgets.empty()) return;
 
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast =
@@ -84,7 +85,7 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
     connect(*anIt, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
 
     connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)), this,
-            SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
+            SLOT(activateNextWidget(ModuleBase_ModelWidget*)));
     connect(*anIt, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)),
             this, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)));
 
@@ -120,6 +121,7 @@ QWidget* XGUI_PropertyPanel::contentWidget()
 
 void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
 {
+  int aS = myWidgets.size();
   foreach(ModuleBase_ModelWidget* eachWidget, myWidgets)
   {
     eachWidget->setFeature(theFeature);
@@ -129,7 +131,8 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
   repaint();
 }
 
-void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
+
+void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
 {
   QObject* aSender = sender();
   ModuleBase_ModelWidget* aNextWidget = 0;
@@ -143,7 +146,13 @@ void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
     }
     isFoundWidget = (*anIt) == theWidget;
   }
-  emit widgetActivated(aNextWidget);
+  myActiveWidget = aNextWidget;
+  emit widgetActivated(myActiveWidget);
+}
+
+void XGUI_PropertyPanel::activateNextWidget()
+{
+  activateNextWidget(myActiveWidget);
 }
 
 void XGUI_PropertyPanel::setAcceptEnabled(bool isEnabled)

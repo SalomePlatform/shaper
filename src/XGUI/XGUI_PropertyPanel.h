@@ -11,14 +11,14 @@
 #include "XGUI.h"
 
 #include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_IPropertyPanel.h>
 
-#include <QDockWidget>
 #include <QList>
 
 class QKeyEvent;
 class QVBoxLayout;
 
-class XGUI_EXPORT XGUI_PropertyPanel : public QDockWidget
+class XGUI_EXPORT XGUI_PropertyPanel : public ModuleBase_IPropertyPanel
 {
 Q_OBJECT
  public:
@@ -36,22 +36,22 @@ Q_OBJECT
   /// Removes all widgets in the widget area of the property panel
   void cleanContent();
 
+  /// Returns currently active widget
+  virtual ModuleBase_ModelWidget* activeWidget() const { return myActiveWidget; }
+
+  /// Activate the next widget in the property panel
+  /// \param theWidget a widget. The next widget should be activated
+  virtual void activateNextWidget(ModuleBase_ModelWidget* theWidget);
+
+  /// Activate the next from current widget in the property panel
+  virtual void activateNextWidget();
+
  public slots:
   void updateContentWidget(FeaturePtr theFeature);
-  /// slot to activate the next widget in the property panel
-  /// \param theWidget a widget. The next widget should be activated
-  void onActivateNextWidget(ModuleBase_ModelWidget* theWidget);
   // Enables / disables "ok" ("accept") button
   void setAcceptEnabled(bool);
 
 signals:
-  /// The signal about key release on the control, that corresponds to the attribute
-  /// \param theEvent key release event
-  void keyReleased(QKeyEvent* theEvent);
-  /// The signal about the widget activation
-  /// \param theWidget the activated widget
-  void widgetActivated(ModuleBase_ModelWidget* theWidget);
-
   /// Signal about the point 2d set to the feature
   /// \param the feature
   /// \param the attribute of the feature
@@ -61,6 +61,7 @@ signals:
   QWidget* myCustomWidget;
   QList<ModuleBase_ModelWidget*> myWidgets;
   QVBoxLayout* myMainLayout;
+  ModuleBase_ModelWidget* myActiveWidget;
 };
 
 #endif /* XGUI_PROPERTYPANEL_H_ */

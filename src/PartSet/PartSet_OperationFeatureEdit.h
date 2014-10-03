@@ -70,9 +70,6 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_OperationFeatureEdit();
 
-  /// Initializes the operation with previously created feature. It is used in sequental operations
-  virtual void initFeature(FeaturePtr theFeature);
-
   /// Processes the mouse pressed in the point
   /// \param theEvent the mouse event
   /// \param theView a viewer to have the viewer the eye position

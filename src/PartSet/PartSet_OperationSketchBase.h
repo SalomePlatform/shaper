@@ -65,11 +65,6 @@ Q_OBJECT
   /// \return the selection mode
   virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
 
-  /// Initializes the operation with previously created feature. It is used in sequental operations
-  virtual void initFeature(FeaturePtr theFeature)
-  {
-  }
-
   /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations

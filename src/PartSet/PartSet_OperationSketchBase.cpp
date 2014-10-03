@@ -98,9 +98,7 @@ void PartSet_OperationSketchBase::restartOperation(const std::string& theType, O
   if (aFeature) {
     QStringList aNested = this->nestedFeatures();
     if (!aNested.isEmpty()) {
-      if (aNested.contains(QString(aFeature->getKind().c_str()))) 
-        emit restartRequired(theType, theFeature);
-      else
+      if (!aNested.contains(QString(aFeature->getKind().c_str())))
         return;
     }
   }

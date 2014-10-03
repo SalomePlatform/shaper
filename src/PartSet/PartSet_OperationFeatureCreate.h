@@ -60,8 +60,13 @@ Q_OBJECT
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);
 
-  /// alias for activateNextWidget(myActiveWidget);
-  virtual void activateNextToCurrentWidget();
+  /// Initializes the operation with previously created feature. It is used in sequental operations
+  void initFeature(FeaturePtr theFeature) { myInitFeature = theFeature; }
+
+ public slots:
+  /// Slots which listen the mode widget activation
+  /// \param theWidget the model widget
+  virtual void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
  protected:
   /// \brief Virtual method called when operation is started
@@ -90,6 +95,10 @@ Q_OBJECT
   /// Verifies whether this operator can be commited.
   /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
   virtual bool canBeCommitted() const;
+
+protected:
+  /// Feature of previous operation (for sequintal operations)
+  FeaturePtr myInitFeature;
 };
 
 #endif

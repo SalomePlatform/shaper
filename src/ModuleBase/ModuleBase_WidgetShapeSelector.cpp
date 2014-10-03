@@ -4,6 +4,8 @@
 
 #include "ModuleBase_WidgetShapeSelector.h"
 #include "ModuleBase_IWorkshop.h"
+#include "ModuleBase_WidgetValue.h"
+#include "ModuleBase_WidgetValueFeature.h"
 
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
@@ -72,6 +74,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   myTextLine = new QLineEdit(myContainer);
   myTextLine->setReadOnly(true);
   myTextLine->setToolTip(aToolTip);
+  myTextLine->installEventFilter(this);
 
   myBasePalet = myTextLine->palette();
   myInactivePalet = myBasePalet;
@@ -146,20 +149,26 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
     if (!isAccepted(aObject))
       return;
 
-    mySelectedObject = aObject;
-    if (mySelectedObject) {
-      updateSelectionName();
-      raisePanel();
-      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TOHIDE);
-      ModelAPI_EventCreator::get()->sendUpdated(mySelectedObject, anEvent);
-      Events_Loop::loop()->flush(anEvent);
-    } else {
-      myTextLine->setText("");
-    }
-    activateSelection(false);
-    emit valuesChanged();
-    emit focusOutWidget(this);
+    setObject(aObject);
   }
+}
+
+//********************************************************************
+void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj)
+{
+  if (mySelectedObject == theObj)
+    return;
+  mySelectedObject = theObj;
+  if (mySelectedObject) {
+    raisePanel();
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TOHIDE);
+    ModelAPI_EventCreator::get()->sendUpdated(mySelectedObject, anEvent);
+    Events_Loop::loop()->flush(anEvent);
+  } 
+  updateSelectionName();
+  activateSelection(false);
+  emit valuesChanged();
+  emit focusOutWidget(this);
 }
 
 //********************************************************************
@@ -235,9 +244,6 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
     connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   else
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-
-//  if (myWorkshop->selectedObjects().size() > 0)
-//    onSelectionChanged();
 }
 
 //********************************************************************
@@ -273,3 +279,21 @@ bool ModuleBase_WidgetShapeSelector::eventFilter(QObject* theObj, QEvent* theEve
   }
   return ModuleBase_ModelWidget::eventFilter(theObj, theEvent);
 }
+
+//********************************************************************
+bool ModuleBase_WidgetShapeSelector::setValue(ModuleBase_WidgetValue* theValue)
+{
+  if (theValue) {
+    ModuleBase_WidgetValueFeature* aFeatureValue =
+        dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
+    if (aFeatureValue && aFeatureValue->object()) {
+      ObjectPtr aObject = aFeatureValue->object();
+      if (isAccepted(aObject)) {
+        setObject(aObject);
+        return true;
+      }
+    }
+  }
+  return false;
+}
+

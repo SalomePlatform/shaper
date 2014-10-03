@@ -9,6 +9,9 @@
 
 #include "ModuleBase_OperationDescription.h"
 #include "ModuleBase_ModelWidget.h"
+#include "ModuleBase_WidgetValueFeature.h"
+#include "ModuleBase_ViewerPrs.h"
+#include "ModuleBase_IPropertyPanel.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Document.h>
@@ -19,6 +22,8 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Validator.h>
 
+#include <GeomAPI_Pnt2d.h>
+
 #include <Events_Loop.h>
 
 #ifdef _DEBUG
@@ -28,7 +33,8 @@
 ModuleBase_Operation::ModuleBase_Operation(const QString& theId, QObject* theParent)
     : QObject(theParent),
       myIsEditing(false),
-      myIsModified(false)
+      myIsModified(false),
+      myPropertyPanel(NULL)
 {
   myDescription = new ModuleBase_OperationDescription(theId);
 }
@@ -78,16 +84,10 @@ void ModuleBase_Operation::storeCustomValue()
     aCustom->storeValue();
 }
 
-void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
-{
-}
-
 void ModuleBase_Operation::startOperation()
 {
   if (!myIsEditing)
     createFeature();
-  //emit callSlot();
-  //commit();
 }
 
 void ModuleBase_Operation::stopOperation()
@@ -145,11 +145,6 @@ FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
 void ModuleBase_Operation::setFeature(FeaturePtr theFeature)
 {
   myFeature = theFeature;
-}
-
-void ModuleBase_Operation::setEditingFeature(FeaturePtr theFeature)
-{
-  setFeature(theFeature);
   myIsEditing = true;
 }
 
@@ -186,6 +181,9 @@ void ModuleBase_Operation::start()
 
 void ModuleBase_Operation::resume()
 {
+  if (myPropertyPanel)
+    connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), this,
+            SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
   emit resumed();
 }
 
@@ -193,6 +191,8 @@ void ModuleBase_Operation::abort()
 {
   abortOperation();
   emit aborted();
+  if (myPropertyPanel)
+    disconnect(myPropertyPanel, 0, this, 0);
 
   stopOperation();
 
@@ -205,6 +205,9 @@ bool ModuleBase_Operation::commit()
   if (canBeCommitted()) {
     commitOperation();
     emit committed();
+
+  if (myPropertyPanel)
+    disconnect(myPropertyPanel, 0, this, 0);
 
     stopOperation();
 
@@ -222,4 +225,66 @@ void ModuleBase_Operation::setRunning(bool theState)
   if (!theState) {
     abort();
   }
+}
+
+void ModuleBase_Operation::activateByPreselection()
+{
+  if (!myPropertyPanel)
+    return;
+  ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+  if ((myPreSelection.size() > 0) && aActiveWgt) {
+    const ModuleBase_ViewerPrs& aPrs = myPreSelection.front();
+    ModuleBase_WidgetValueFeature aValue;
+    aValue.setObject(aPrs.object());
+    if (aActiveWgt->setValue(&aValue)) {
+      myPreSelection.remove(aPrs);
+      if(isValid()) {
+        //myActiveWidget = NULL;
+        commit();
+      } else {
+        myPropertyPanel->activateNextWidget();
+        //emit activateNextWidget(myActiveWidget);
+      }
+    }
+    // If preselection is enough to make a valid feature - apply it immediately
+  }
+}
+
+void ModuleBase_Operation::initSelection(
+    const std::list<ModuleBase_ViewerPrs>& theSelected,
+    const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
+{
+  myPreSelection = theSelected;
+}
+
+void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
+{
+  activateByPreselection();
+  //if (theWidget && myPropertyPanel) {
+  //  myPropertyPanel->activateNextWidget();
+  ////  //emit activateNextWidget(myActiveWidget);
+  //}
+}
+
+bool ModuleBase_Operation::setWidgetValue(ObjectPtr theFeature, double theX, double theY)
+{
+  ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+  if (!aActiveWgt)
+    return false;
+  ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
+  aValue->setObject(theFeature);
+  aValue->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
+  bool isApplyed = aActiveWgt->setValue(aValue);
+
+  delete aValue;
+  myIsModified = (myIsModified || isApplyed);
+  return isApplyed;
+}
+
+
+void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp) 
+{ 
+  myPropertyPanel = theProp; 
+  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), this,
+          SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
 }

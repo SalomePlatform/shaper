@@ -152,25 +152,27 @@ void PartSet_Module::onFeatureTriggered()
 void PartSet_Module::launchOperation(const QString& theCmdId)
 {
   ModuleBase_Operation* anOperation = createOperation(theCmdId.toStdString());
-  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp) {
+  //PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
+  //if (aPreviewOp) {
     XGUI_Selection* aSelection = myWorkshop->selector()->selection();
     // Initialise operation with preliminary selection
     std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
     std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-    aPreviewOp->initSelection(aSelected, aHighlighted);
-  }
+    anOperation->initSelection(aSelected, aHighlighted);
+  //}
   sendOperation(anOperation);
 }
 
 void PartSet_Module::onOperationStarted()
 {
-  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(myWorkshop
-      ->operationMgr()->currentOperation());
+  ModuleBase_Operation* aOperation = myWorkshop->operationMgr()->currentOperation();
+
+  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(aOperation);
   if (aPreviewOp) {
     XGUI_PropertyPanel* aPropPanel = myWorkshop->propertyPanel();
     connect(aPropPanel, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)), this,
             SLOT(onStorePoint2D(ObjectPtr, const std::string&)), Qt::UniqueConnection);
+
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     aDisplayer->openLocalContext();
     aDisplayer->deactivateObjectsOutOfContext();
@@ -210,6 +212,7 @@ void PartSet_Module::onContextMenuCommand(const QString& theId, bool isChecked)
 
 void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
 {
+
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(myWorkshop
       ->operationMgr()->currentOperation());
   Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
@@ -296,10 +299,17 @@ void PartSet_Module::onRestartOperation(std::string theName, ObjectPtr theObject
     // Initialise operation with preliminary selection
     std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
     std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-    aSketchOp->initFeature(aFeature);
     aSketchOp->initSelection(aSelected, aHighlighted);
+    PartSet_OperationFeatureCreate* aCreateOp = dynamic_cast<PartSet_OperationFeatureCreate*>(anOperation);
+    if (aCreateOp)
+      aCreateOp->initFeature(aFeature);
+    else {
+      PartSet_OperationFeatureEdit* aEditOp = dynamic_cast<PartSet_OperationFeatureEdit*>(anOperation);
+      if (aEditOp) 
+        anOperation->setFeature(aFeature);
+    }
   } else if (aFeature) {
-    anOperation->setEditingFeature(aFeature);
+    anOperation->setFeature(aFeature);
     //Deactivate result of current feature in order to avoid its selection
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     std::list<ResultPtr> aResults = aFeature->results();

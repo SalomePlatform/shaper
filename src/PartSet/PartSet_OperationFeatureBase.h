@@ -33,15 +33,6 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_OperationFeatureBase();
 
-  /// Initialisation of operation with preliminary selection
-  /// \param theSelected the list of selected presentations
-  /// \param theHighlighted the list of highlighted presentations
-  virtual void initSelection(const std::list<ModuleBase_ViewerPrs>& theSelected,
-                             const std::list<ModuleBase_ViewerPrs>& theHighlighted);
-
-  /// Initializes the operation with previously created feature. It is used in sequental operations
-  virtual void initFeature(FeaturePtr theFeature);
-
   /// Returns the operation sketch feature
   /// \returns the sketch instance
   virtual FeaturePtr sketch() const;
@@ -56,28 +47,16 @@ Q_OBJECT
                              const std::list<ModuleBase_ViewerPrs>& theHighlighted);
 
 
- public slots:
-  /// Slots which listen the mode widget activation
-  /// \param theWidget the model widget
-  virtual void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
-
  protected:
-  ///
- void activateByPreselection();
   /// Set value to the active widget
   /// \param theFeature the feature
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
   /// \return true if the point is set
-  bool setWidgetValue(ObjectPtr theFeature, double theX, double theY);
+  //bool setWidgetValue(ObjectPtr theFeature, double theX, double theY);
 
  protected:
-  FeaturePtr myInitFeature;  ///< the initial feature
   FeaturePtr mySketch;  ///< the sketch of the feature
-  
-  ModuleBase_ModelWidget* myActiveWidget;  ///< the active widget
-
-  std::list<ModuleBase_ViewerPrs> myPreSelection;
 };
 
 #endif

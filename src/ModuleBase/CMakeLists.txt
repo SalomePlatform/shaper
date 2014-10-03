@@ -27,6 +27,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetChoice.h
 	ModuleBase_WidgetFileSelector.h
 	ModuleBase_DoubleSpinBox.h
+	ModuleBase_IPropertyPanel.h
 )
 
 SET(PROJECT_SOURCES

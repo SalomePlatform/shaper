@@ -513,8 +513,9 @@ void XGUI_Workshop::onOperationStarted()
       }
     }
 
+    aOperation->setPropertyPanel(myPropertyPanel);
     myPropertyPanel->setModelWidgets(aWidgets);
-    myPropertyPanel->onActivateNextWidget(NULL);
+    myPropertyPanel->activateNextWidget(NULL);
     // Widget activation (from the previous method) may commit the current operation
     // if pre-selection is enougth for it. So we shouldn't update prop panel's title
     if(myOperationMgr->isCurrentOperation(aOperation)) {
@@ -1001,10 +1002,10 @@ void XGUI_Workshop::createDockWidgets()
   connect(aCancelBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onAbortOperation()));
   connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)), myOperationMgr,
           SLOT(onKeyReleased(QKeyEvent*)));
-  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), myOperationMgr,
-          SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
-  connect(myOperationMgr, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)), myPropertyPanel,
-          SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
+  //connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), myOperationMgr,
+  //        SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
+  //connect(myOperationMgr, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)), myPropertyPanel,
+  //        SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
   connect(myOperationMgr, SIGNAL(operationValidated(bool)), myPropertyPanel,
           SLOT(setAcceptEnabled(bool)));
 

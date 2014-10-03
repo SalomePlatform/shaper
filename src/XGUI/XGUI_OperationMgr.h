@@ -78,9 +78,6 @@ signals:
   void operationResumed();
   /// Signal is emitted after the validate methods calls.
   void operationValidated(bool);
-  /// Signal about the necessety of the next widget activating
-  /// \param theWidget the model widget
-  void activateNextWidget(ModuleBase_ModelWidget* theWidget);
 
  protected:
 
@@ -107,10 +104,6 @@ signals:
   /// \param theName the attribute name
   /// \param theEvent the mouse event
   bool onKeyReleased(QKeyEvent* theEvent);
-
-  /// SLOT, that reacts to the widget activation
-  /// \param theWidget an activated widget
-  void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
   protected slots:
   /// Slot that is called by an operation stop. Removes the stopped operation form the stack.

@@ -11,6 +11,7 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_IPropertyPanel.h>
 
 #include <ModelAPI_Events.h>
 
@@ -43,22 +44,20 @@ PartSet_OperationFeatureEdit::PartSet_OperationFeatureEdit(const QString& theId,
     : PartSet_OperationFeatureBase(theId, theParent, theFeature),
       myIsBlockedSelection(false)
 {
+  myIsEditing = true;
 }
 
 PartSet_OperationFeatureEdit::~PartSet_OperationFeatureEdit()
 {
 }
 
-void PartSet_OperationFeatureEdit::initFeature(FeaturePtr theFeature)
-{
-  setEditingFeature(theFeature);
-}
 
 void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView,
                                                 const std::list<ModuleBase_ViewerPrs>& theSelected,
                                                 const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  if(myActiveWidget && myActiveWidget->isViewerSelector()) {
+  ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+  if(aActiveWgt && aActiveWgt->isViewerSelector()) {
     // Almost do nothing, all stuff in on PartSet_OperationFeatureBase::mouseReleased
     PartSet_OperationFeatureBase::mousePressed(theEvent, theView, theSelected, theHighlighted);
     return;
@@ -128,7 +127,10 @@ void PartSet_OperationFeatureEdit::mouseReleased(
     const std::list<ModuleBase_ViewerPrs>& theSelected,
     const std::list<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  if(myActiveWidget && myActiveWidget->isViewerSelector()) {
+  ModuleBase_ModelWidget* aActiveWgt = 0;
+  if (myPropertyPanel)
+    aActiveWgt = myPropertyPanel->activeWidget();
+  if(aActiveWgt && aActiveWgt->isViewerSelector()) {
     // Almost do nothing, all stuff in on PartSet_OperationFeatureBase::mouseReleased
     PartSet_OperationFeatureBase::mouseReleased(theEvent, theView, theSelected, theHighlighted);
   } else {

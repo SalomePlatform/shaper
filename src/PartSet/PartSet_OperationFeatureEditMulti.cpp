@@ -39,6 +39,7 @@ PartSet_OperationFeatureEditMulti::PartSet_OperationFeatureEditMulti(const QStri
       mySketch(theFeature),
       myIsBlockedSelection(false)
 {
+  myIsEditing = true;
 }
 
 PartSet_OperationFeatureEditMulti::~PartSet_OperationFeatureEditMulti()
@@ -69,11 +70,6 @@ void PartSet_OperationFeatureEditMulti::initSelection(
     myFeatures = theSelected;
 }
 
-void PartSet_OperationFeatureEditMulti::initFeature(FeaturePtr theFeature)
-{
-  setEditingFeature(theFeature);
-}
-
 FeaturePtr PartSet_OperationFeatureEditMulti::sketch() const
 {
   return mySketch;
@@ -93,7 +89,7 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Handle
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
 
-  blockSelection(true);
+/*  blockSelection(true);
   if (myCurPoint.myIsInitialized) {
     double aCurX, aCurY;
     PartSet_Tools::convertTo2D(myCurPoint.myPoint, sketch(), theView, aCurX, aCurY);
@@ -105,7 +101,7 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Handle
     double aDeltaY = anY - aCurY;
 
     boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
-        SketchPlugin_Feature>(feature());
+        SketchPlugin_Feature>(sketch());
     aSketchFeature->move(aDeltaX, aDeltaY);
 
     std::list<ModuleBase_ViewerPrs>::const_iterator anIt = myFeatures.begin(), aLast = myFeatures
@@ -125,6 +121,7 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Handle
   sendFeatures();
 
   myCurPoint.setPoint(aPoint);
+  */
 }
 
 void PartSet_OperationFeatureEditMulti::mouseReleased(

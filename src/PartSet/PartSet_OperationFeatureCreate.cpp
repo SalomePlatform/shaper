@@ -25,6 +25,7 @@
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_IPropertyPanel.h>
 
 #include <XGUI_Constants.h>
 
@@ -125,7 +126,8 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
         if (!aVertex.IsNull()) {
           aPoint = BRep_Tool::Pnt(aVertex);
           PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-          PartSet_Tools::setConstraints(sketch(), feature(), myActiveWidget->attributeID(), aX, anY);
+          ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+          PartSet_Tools::setConstraints(sketch(), feature(), aActiveWgt->attributeID(), aX, anY);
           isClosedContour = true;
         }
       } else if (aShape.ShapeType() == TopAbs_EDGE) { // a line is selected
@@ -144,21 +146,16 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
   bool isApplyed = setWidgetValue(aFeature, aX, anY);
   if (isApplyed) {
     flushUpdated();
-    emit activateNextWidget(myActiveWidget);
+    myPropertyPanel->activateNextWidget();
   }
 
-  if (myActiveWidget == NULL) {
+  if (!myPropertyPanel->activeWidget()) {
     if(commit() && !isClosedContour) {
       // if the point creation is finished, the next mouse release should commit the modification
       // the next release can happens by double click in the viewer
       restartOperation(feature()->getKind(), feature());
     }
   }
-}
-
-void PartSet_OperationFeatureCreate::activateNextToCurrentWidget()
-{
-  emit activateNextWidget(myActiveWidget);
 }
 
 void PartSet_OperationFeatureCreate::startOperation()
@@ -194,11 +191,22 @@ FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMess
 
     aFeature->addSub(aNewFeature);
   }
-  //myFeaturePrs->init(aNewFeature);
-  //myFeaturePrs->setFeature(myInitFeature, SM_FirstPoint);
 
-//TODO  emit featureConstructed(aNewFeature, FM_Activation);
   if (theFlushMessage)
     flushCreated();
   return aNewFeature;
+}
+
+
+void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
+{
+  PartSet_OperationFeatureBase::onWidgetActivated(theWidget);
+  if (myInitFeature && theWidget) {
+    ModuleBase_WidgetPoint2D* aWgt = dynamic_cast<ModuleBase_WidgetPoint2D*>(theWidget);
+    if (aWgt && aWgt->initFromPrevious(myInitFeature)) {
+      myInitFeature = FeaturePtr();
+      if (myPropertyPanel)
+        myPropertyPanel->activateNextWidget();
+    }
+  }
 }

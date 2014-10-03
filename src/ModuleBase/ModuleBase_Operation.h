@@ -9,18 +9,18 @@
 #define ModuleBase_Operation_H
 
 #include <ModuleBase.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Document.h>
 
 #include <QObject>
 #include <QString>
 #include <QStringList>
 
-#include <boost/shared_ptr.hpp>
-
-class ModelAPI_Document;
 class ModuleBase_ModelWidget;
 class ModuleBase_OperationDescription;
+class ModuleBase_IPropertyPanel;
 
 class QKeyEvent;
 
@@ -102,18 +102,26 @@ Q_OBJECT
   virtual bool isNestedOperationsEnabled() const;
 
   /// Sets the operation feature
-  void setEditingFeature(FeaturePtr theFeature);
+  void setFeature(FeaturePtr theFeature);
 
   /// Returns True if the current operation works with the given object (feature or result)
   virtual bool hasObject(ObjectPtr theObj) const;
 
   virtual void keyReleased(const int theKey) {};
 
-  virtual void activateNextToCurrentWidget() {};
-
   /// If operation needs to redisplay its result during operation
   /// then this method has to return True
   virtual bool hasPreview() const { return false; }
+
+  /// Initialisation of operation with preliminary selection
+  /// \param theSelected the list of selected presentations
+  /// \param theHighlighted the list of highlighted presentations
+  virtual void initSelection(const std::list<ModuleBase_ViewerPrs>& theSelected,
+                             const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+
+  virtual void setPropertyPanel(ModuleBase_IPropertyPanel* theProp);
+
+  ModuleBase_IPropertyPanel* propertyPanel() const { return myPropertyPanel; }
 
 signals:
   void started();  /// the operation is started
@@ -121,10 +129,6 @@ signals:
   void committed();  /// the operation is committed
   void stopped();  /// the operation is aborted or committed
   void resumed();  /// the operation is resumed
-
-  /// Signals about the activating of the next widget
-  /// \param theWidget the previous active widget
-  void activateNextWidget(ModuleBase_ModelWidget* theWidget);
 
  public slots:
   /// Starts operation
@@ -191,9 +195,6 @@ signals:
   /// \returns the created feature
   virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
-  /// Sets the operation feature
-  void setFeature(FeaturePtr theFeature);
-
   /// Verifies whether this operator can be commited.
   /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
   virtual bool canBeCommitted() const;
@@ -201,6 +202,15 @@ signals:
   /// Returns pointer to the root document.
   boost::shared_ptr<ModelAPI_Document> document() const;
 
+  ///
+  virtual void activateByPreselection();
+
+  /// Set value to the active widget
+  /// \param theFeature the feature
+  /// \param theX the horizontal coordinate
+  /// \param theY the vertical coordinate
+  /// \return true if the point is set
+  virtual bool setWidgetValue(ObjectPtr theFeature, double theX, double theY);
 
  protected:
   FeaturePtr myFeature;  /// the operation feature to be handled
@@ -217,6 +227,11 @@ signals:
   /// List of nested operations IDs
   QStringList myNestedFeatures;
 
+  /// List of pre-selected object 
+  std::list<ModuleBase_ViewerPrs> myPreSelection;
+
+  /// Access to property panel
+  ModuleBase_IPropertyPanel* myPropertyPanel;
 };
 
 #endif

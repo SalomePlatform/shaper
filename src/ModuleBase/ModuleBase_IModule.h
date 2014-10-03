@@ -49,4 +49,4 @@ typedef ModuleBase_IModule* (*CREATE_FUNC)(XGUI_Workshop*);
 
 #define CREATE_MODULE "createModule"
 
-#endif //ModuleBase_IModule
+#endif //ModuleBase_IModule

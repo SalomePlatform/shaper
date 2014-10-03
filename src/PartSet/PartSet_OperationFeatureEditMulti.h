@@ -70,9 +70,6 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_OperationFeatureEditMulti();
 
-  /// Initializes the operation with previously created feature. It is used in sequental operations
-  virtual void initFeature(FeaturePtr theFeature);
-
   /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations

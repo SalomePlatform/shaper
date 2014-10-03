@@ -59,13 +59,6 @@ std::list<int> PartSet_OperationSketch::getSelectionModes(ObjectPtr theFeature) 
   return aModes;
 }
 
-/// Initializes the operation with previously created feature. It is used in sequental operations
-void PartSet_OperationSketch::initFeature(FeaturePtr theFeature)
-{
-  if (theFeature)
-    setEditingFeature(theFeature);
-}
-
 FeaturePtr PartSet_OperationSketch::sketch() const
 {
   return feature();
