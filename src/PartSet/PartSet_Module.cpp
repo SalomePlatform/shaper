@@ -293,6 +293,7 @@ void PartSet_Module::onRestartOperation(std::string theName, ObjectPtr theObject
 
   std::string aKind = aFeature ? aFeature->getKind() : "";
   ModuleBase_Operation* anOperation = createOperation(theName, aKind);
+
   PartSet_OperationSketchBase* aSketchOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (aSketchOp) {
     XGUI_Selection* aSelection = myWorkshop->selector()->selection();
@@ -304,8 +305,8 @@ void PartSet_Module::onRestartOperation(std::string theName, ObjectPtr theObject
     if (aCreateOp)
       aCreateOp->initFeature(aFeature);
     else {
-      PartSet_OperationFeatureEdit* aEditOp = dynamic_cast<PartSet_OperationFeatureEdit*>(anOperation);
-      if (aEditOp) 
+    //  PartSet_OperationFeatureEdit* aEditOp = dynamic_cast<PartSet_OperationFeatureEdit*>(anOperation);
+    //  if (aEditOp) 
         anOperation->setFeature(aFeature);
     }
   } else if (aFeature) {
