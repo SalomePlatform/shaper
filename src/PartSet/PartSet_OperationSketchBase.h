@@ -65,14 +65,6 @@ Q_OBJECT
   /// \return the selection mode
   virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
 
-  /// Initialisation of operation with preliminary selection
-  /// \param theSelected the list of selected presentations
-  /// \param theHighlighted the list of highlighted presentations
-  virtual void initSelection(const std::list<ModuleBase_ViewerPrs>& theSelected,
-                             const std::list<ModuleBase_ViewerPrs>& theHighlighted)
-  {
-  }
-
   /// Returns the operation sketch feature
   /// \returns the sketch instance
   virtual FeaturePtr sketch() const = 0;
