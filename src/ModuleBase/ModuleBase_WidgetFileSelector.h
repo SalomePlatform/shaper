@@ -50,13 +50,12 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFileSelector : public ModuleBase_ModelW
   void onPathChanged();
 
  protected:
-  QStringList getSupportedFormats(const Config_WidgetAPI* theData) const;
-  QString formatsString(const QStringList theFormats) const;
+  QString formatsString() const;
+  QStringList getValidatorFormats() const;
 
  private:
   QLineEdit* myPathField;
   QWidget* myMainWidget;
-  QStringList myFormats;
 
   QString myTitle;
   QString myDefaultPath;

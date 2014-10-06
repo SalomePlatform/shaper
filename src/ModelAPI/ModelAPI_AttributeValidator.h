@@ -17,8 +17,8 @@ public:
   //! returns true if attribute is valid
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
-  virtual bool isValid(
-    const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const = 0;
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments) const = 0;
 };
 
 #endif

@@ -4,8 +4,10 @@
 
 #include <ExchangePlugin_Plugin.h>
 #include <ExchangePlugin_ImportFeature.h>
+#include <ExchangePlugin_Validators.h>
 
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
@@ -17,7 +19,11 @@ static ExchangePlugin_Plugin* MY_EXCHANGE_INSTANCE = new ExchangePlugin_Plugin()
 ExchangePlugin_Plugin::ExchangePlugin_Plugin()
 {
   // register this plugin
-  ModelAPI_Session::get()->registerPlugin(this);
+  SessionPtr aSession = ModelAPI_Session::get();
+  aSession->registerPlugin(this);
+  ModelAPI_ValidatorsFactory* aFactory = aSession->validators();
+  aFactory->registerValidator("ExchangePlugin_ImportFormat",
+                              new ExchangePlugin_ImportFormatValidator);
 }
 
 FeaturePtr ExchangePlugin_Plugin::createFeature(string theFeatureID)
