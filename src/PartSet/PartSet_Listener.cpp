@@ -39,12 +39,12 @@ PartSet_Listener::~PartSet_Listener()
 //******************************************************
 void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
 {
-  ModuleBase_Operation* anOperation = myModule->workshop()->operationMgr()->currentOperation();
+  ModuleBase_Operation* anOperation = myModule->xWorkshop()->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aSketchOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
   if (!aSketchOp)
     return;
 
-  XGUI_Displayer* aDisplayer = myModule->workshop()->displayer();
+  XGUI_Displayer* aDisplayer = myModule->xWorkshop()->displayer();
   QString aType = QString(theMessage->eventID().eventText());
   if (aType == EVENT_OBJECT_CREATED) {
     boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
@@ -52,7 +52,7 @@ void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& the
     std::set<ObjectPtr> aFeatures = aUpdMsg->objects();
 
     PartSet_OperationSketch* aSketchOp = 
-      dynamic_cast<PartSet_OperationSketch*>(myModule->workshop()->operationMgr()->currentOperation());
+      dynamic_cast<PartSet_OperationSketch*>(myModule->xWorkshop()->operationMgr()->currentOperation());
 
     std::set<ObjectPtr>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
     for (; anIt != aLast; anIt++) {
@@ -65,7 +65,7 @@ void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& the
       // If current operation is Sketch then there is no active sketching operation
       // and possible the object was created by Redo operatgion
       else if (aSketchOp) {
-          XGUI_Displayer* aDisplayer = myModule->workshop()->displayer();
+          XGUI_Displayer* aDisplayer = myModule->xWorkshop()->displayer();
           // Very possible it is not displayed
           aDisplayer->display(aObj, false);
           std::list<int> aModes = aSketchOp->getSelectionModes(aObj);
@@ -83,7 +83,7 @@ void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& the
     for (; anIt != aLast; anIt++) {
       std::string aGroup = *anIt;
       if (aGroup.compare(SketchPlugin_Sketch::ID()) == 0) {  // Update only Sketch group
-        myModule->workshop()->displayer()->eraseDeletedResults();
+        myModule->xWorkshop()->displayer()->eraseDeletedResults();
         myModule->updateCurrentPreview(aGroup);
       }
     }

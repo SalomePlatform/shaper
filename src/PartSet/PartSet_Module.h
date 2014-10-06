@@ -20,6 +20,7 @@ class QKeyEvent;
 class PartSet_Listener;
 class ModelAPI_Feature;
 class XGUI_ViewerPrs;
+class XGUI_Workshop;
 class ModuleBase_Operation;
 class GeomAPI_AISObject;
 
@@ -28,12 +29,8 @@ class PARTSET_EXPORT PartSet_Module : public ModuleBase_IModule
 Q_OBJECT
 
  public:
-  PartSet_Module(XGUI_Workshop* theWshop);
+  PartSet_Module(ModuleBase_IWorkshop* theWshop);
   virtual ~PartSet_Module();
-
-  /// Returns the module workshop
-  /// \returns a workshop instance
-  XGUI_Workshop* workshop() const;
 
   /// Reads description of features from XML file 
   virtual void createFeatures();
@@ -45,17 +42,7 @@ Q_OBJECT
 
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
-  virtual void launchOperation(const QString& theCmdId);
-
-  /// Called when it is necessary to update a command state (enable or disable it)
-  //virtual bool isFeatureEnabled(const QString& theCmdId) const;
-
-  /// Displays or erase the current operation preview, if it has it.
-  /// \param theFeature the feature instance to be displayed
-  /// \param isDisplay the state whether the presentation should be displayed or erased
-  /// \param isUpdateViewer the flag whether the viewer should be updated
-  //void visualizePreview(FeaturePtr theFeature, bool isDisplay,
-  //                      const bool isUpdateViewer = true);
+  //virtual void launchOperation(const QString& theCmdId);
 
   /// Activates the feature in the displayer
   /// \param theFeature the feature instance to be displayed
@@ -71,10 +58,12 @@ Q_OBJECT
                                       Config_WidgetAPI* theWidgetApi,
                                       QList<ModuleBase_ModelWidget*>& theModelWidgets);
 
+  XGUI_Workshop* xWorkshop() const;
+
  public slots:
   void onFeatureTriggered();
   /// SLOT, that is called after the operation is started. Connect on the focus activated signal
-  void onOperationStarted();
+  void onOperationStarted(ModuleBase_Operation* theOperation);
   /// SLOT, that is called after the operation is stopped. Switched off the modfications performed
   /// by the operation start
   void onOperationStopped(ModuleBase_Operation* theOperation);
@@ -145,16 +134,13 @@ Q_OBJECT
   ModuleBase_Operation* createOperation(const std::string& theCmdId,
                                         const std::string& theFeatureKind = "");
 
-  /// Sends the operation
-  /// \param theOperation the operation
-  void sendOperation(ModuleBase_Operation* theOperation);
 
  protected:
   //! Edits the feature
   void editFeature(FeaturePtr theFeature);
 
  private:
-  XGUI_Workshop* myWorkshop;
+  //XGUI_Workshop* myWorkshop;
   PartSet_Listener* myListener;
 
   std::map<std::string, std::string> myFeaturesInFiles;

@@ -30,6 +30,7 @@ SET(PROJECT_LIBRARIES
     Events
     Config
 	XGUI
+	ModuleBase
 	${QT_LIBRARIES}
 	${suit}
 	${std}

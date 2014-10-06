@@ -9,11 +9,12 @@
 
 #include <ModelAPI_Object.h>
 
-#include <AIS_InteractiveContext.hxx>
-
 #include <QObject>
 
 class ModuleBase_IModule;
+class ModuleBase_ISelection;
+class ModuleBase_IViewer;
+class ModuleBase_Operation;
 
 /**
  * Class which provides access to Workshop object serveces
@@ -24,25 +25,27 @@ Q_OBJECT
  public:
   ModuleBase_IWorkshop(QObject* theParent)
       : QObject(theParent)
-  {
-  }
+  {}
 
   virtual ~ModuleBase_IWorkshop()
-  {
-  }
-  ;
+  {}
 
-  //! Returns AIS_InteractiveContext from current OCCViewer
-  virtual Handle(AIS_InteractiveContext) AISContext() const = 0;
-
-  //! Returns list of currently selected data objects
-  virtual QList<ObjectPtr> selectedObjects() const = 0;
+  virtual ModuleBase_ISelection* selection() const = 0;
 
   //! Returns instance of loaded module
   virtual ModuleBase_IModule* module() const = 0;
 
+  //! Returns current viewer
+  virtual ModuleBase_IViewer* viewer() const = 0;
+
+  //! Returns currently active operation
+  virtual ModuleBase_Operation* currentOperation() const = 0;
+
 signals:
   void selectionChanged();
+
+  void operationStarted(ModuleBase_Operation*);
+  void operationStopped(ModuleBase_Operation*);
 };
 
 #endif

@@ -59,7 +59,7 @@ Q_OBJECT
   virtual QStringList nestedActions(const QString& theId) const;
 
   //! Returns interface to Salome viewer
-  virtual XGUI_SalomeViewer* viewer() const
+  virtual ModuleBase_IViewer* viewer() const
   {
     return myProxyViewer;
   }

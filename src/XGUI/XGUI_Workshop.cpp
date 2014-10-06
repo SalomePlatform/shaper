@@ -14,7 +14,6 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_SalomeConnector.h"
-#include "XGUI_SalomeViewer.h"
 #include "XGUI_ActionsMgr.h"
 #include "XGUI_ErrorDialog.h"
 #include "XGUI_ViewerProxy.h"
@@ -46,6 +45,7 @@
 #include <ModuleBase_SelectionValidator.h>
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_IViewer.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -113,7 +113,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
   myModuleConnector = new XGUI_ModuleConnector(this);
 
-  connect(myOperationMgr, SIGNAL(operationStarted()), SLOT(onOperationStarted()));
+  connect(myOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)), 
+          SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationResumed()), SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           SLOT(onOperationStopped(ModuleBase_Operation*)));
@@ -882,7 +883,7 @@ ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
   }
 #endif
 
-  ModuleBase_IModule* aModule = crtInst ? crtInst(this) : 0;
+  ModuleBase_IModule* aModule = crtInst ? crtInst(myModuleConnector) : 0;
 
   if (!err.isEmpty()) {
     if (mainWindow()) {
@@ -1079,7 +1080,7 @@ void XGUI_Workshop::salomeViewerSelectionChanged()
 }
 
 //**************************************************************
-XGUI_SalomeViewer* XGUI_Workshop::salomeViewer() const
+ModuleBase_IViewer* XGUI_Workshop::salomeViewer() const
 {
   return mySalomeConnector->viewer();
 }

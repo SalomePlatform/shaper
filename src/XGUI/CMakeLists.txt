@@ -25,7 +25,6 @@ SET(PROJECT_HEADERS
     XGUI_SalomeConnector.h
     XGUI_ActionsMgr.h
     XGUI_ErrorDialog.h
-    XGUI_SalomeViewer.h
     XGUI_ViewerProxy.h
     XGUI_PropertyPanel.h
     XGUI_ContextMenuMgr.h

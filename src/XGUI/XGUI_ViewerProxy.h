@@ -2,7 +2,7 @@
 #define XGUI_VIEWERPROXY_H
 
 #include "XGUI.h"
-#include "XGUI_SalomeViewer.h"
+#include <ModuleBase_IViewer.h>
 
 class XGUI_Workshop;
 class XGUI_ViewWindow;
@@ -13,7 +13,7 @@ class XGUI_ViewWindow;
  * It is reccomennded to use this class in operation for accessing to viewer 
  * functionality instead of direct access to a viewer
  */
-class XGUI_EXPORT XGUI_ViewerProxy : public XGUI_SalomeViewer
+class XGUI_EXPORT XGUI_ViewerProxy : public ModuleBase_IViewer
 {
 Q_OBJECT
  public:
@@ -44,10 +44,10 @@ Q_OBJECT
   /// \param theX the X projection value
   /// \param theY the Y projection value
   /// \param theZ the Z projection value
-  void setViewProjection(double theX, double theY, double theZ);
+  virtual void setViewProjection(double theX, double theY, double theZ);
 
   //! Sets the view fitted all
-  void fitAll();
+  virtual void fitAll();
 
   /// Connects to a viewer according to current environment
   void connectToViewer();

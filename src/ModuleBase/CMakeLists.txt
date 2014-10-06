@@ -29,10 +29,12 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetFileSelector.h
 	ModuleBase_DoubleSpinBox.h
 	ModuleBase_IPropertyPanel.h
+	ModuleBase_IViewer.h
 )
 
 SET(PROJECT_SOURCES
 	ModuleBase_Tools.cpp
+	ModuleBase_IModule.cpp
 	ModuleBase_Operation.cpp
 	ModuleBase_OperationDescription.cpp
 	ModuleBase_ModelWidget.cpp

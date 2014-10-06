@@ -7,7 +7,7 @@
 #include "XGUI_SalomeConnector.h"
 
 XGUI_ViewerProxy::XGUI_ViewerProxy(XGUI_Workshop* theParent)
-    : XGUI_SalomeViewer(theParent),
+    : ModuleBase_IViewer(theParent),
       myWorkshop(theParent)
 {
 }
@@ -65,7 +65,7 @@ void XGUI_ViewerProxy::fitAll()
 void XGUI_ViewerProxy::connectToViewer()
 {
   if (myWorkshop->isSalomeMode()) {
-    XGUI_SalomeViewer* aViewer = myWorkshop->salomeConnector()->viewer();
+    ModuleBase_IViewer* aViewer = myWorkshop->salomeConnector()->viewer();
 
     connect(aViewer, SIGNAL(lastViewClosed()), this, SIGNAL(lastViewClosed()));
     connect(aViewer, SIGNAL(tryCloseView()), this, SIGNAL(tryCloseView()));

@@ -70,7 +70,7 @@ Q_OBJECT
 
 signals:
   /// Signal about an operation is started. It is emitted after the start() of operation is done.
-  void operationStarted();
+  void operationStarted(ModuleBase_Operation* theOperation);
   /// Signal about an operation is stopped. It is emitted after the stop() of operation is done.
   /// \param theOperation a stopped operation
   void operationStopped(ModuleBase_Operation* theOperation);
@@ -109,6 +109,7 @@ signals:
   /// Slot that is called by an operation stop. Removes the stopped operation form the stack.
   /// If there is a suspended operation, restart it.
   void onOperationStopped();
+  void onOperationStarted();
 
  private:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations

@@ -83,7 +83,7 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
   myOperations.append(theOperation);
 
   connect(theOperation, SIGNAL(stopped()), this, SLOT(onOperationStopped()));
-  connect(theOperation, SIGNAL(started()), this, SIGNAL(operationStarted()));
+  connect(theOperation, SIGNAL(started()), this, SLOT(onOperationStarted()));
   connect(theOperation, SIGNAL(resumed()), this, SIGNAL(operationResumed()));
 
   theOperation->start();
@@ -183,6 +183,12 @@ bool XGUI_OperationMgr::canAbortOperation()
     return anAnswer == QMessageBox::Ok;
   }
   return true;
+}
+
+void XGUI_OperationMgr::onOperationStarted()
+{
+  ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  emit operationStarted(aSenderOperation);
 }
 
 void XGUI_OperationMgr::onOperationStopped()

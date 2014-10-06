@@ -24,14 +24,19 @@ Q_OBJECT
 
   virtual ~XGUI_ModuleConnector();
 
-  //! Returns AIS_InteractiveContext from current OCCViewer
-  virtual Handle(AIS_InteractiveContext) AISContext() const;
-
   //! Returns list of currently selected data objects
-  virtual QList<ObjectPtr> selectedObjects() const;
+  virtual ModuleBase_ISelection* selection() const;
 
   //! Returns instance of loaded module
   virtual ModuleBase_IModule* module() const;
+
+  //! Returns current viewer
+  virtual ModuleBase_IViewer* viewer() const;
+
+  //! Returns currently active operation
+  virtual ModuleBase_Operation* currentOperation() const;
+
+  XGUI_Workshop* workshop() const { return myWorkshop; }
 
  private:
   XGUI_Workshop* myWorkshop;

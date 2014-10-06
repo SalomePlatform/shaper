@@ -4,6 +4,7 @@
 
 #include "ModuleBase_WidgetShapeSelector.h"
 #include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_ISelection.h>
 #include "ModuleBase_WidgetValue.h"
 #include <ModuleBase_Tools.h>
 #include "ModuleBase_WidgetValueFeature.h"
@@ -138,7 +139,7 @@ QList<QWidget*> ModuleBase_WidgetShapeSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 {
-  QList<ObjectPtr> aObjects = myWorkshop->selectedObjects();
+  QList<ObjectPtr> aObjects = myWorkshop->selection()->selectedObjects();
   if (aObjects.size() > 0) {
     ObjectPtr aObject = aObjects.first();
     if ((!mySelectedObject) && (!aObject))
