@@ -202,7 +202,7 @@ signals:
   /// Returns pointer to the root document.
   boost::shared_ptr<ModelAPI_Document> document() const;
 
-  ///
+  /// Activates widgets by preselection if it is accepted
   virtual void activateByPreselection();
 
   /// Set value to the active widget

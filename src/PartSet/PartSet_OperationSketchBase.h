@@ -149,6 +149,9 @@ signals:
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
   virtual FeaturePtr createFeature(const bool theFlushMessage = true);
+
+  /// Activates widgets by preselection if it is accepted
+  virtual void activateByPreselection();
 };
 
 #endif

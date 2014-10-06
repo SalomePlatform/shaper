@@ -152,6 +152,7 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
       return;
 
     setObject(aObject);
+    emit focusOutWidget(this);
   }
 }
 
@@ -170,7 +171,6 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj)
   updateSelectionName();
   activateSelection(false);
   emit valuesChanged();
-  emit focusOutWidget(this);
 }
 
 //********************************************************************

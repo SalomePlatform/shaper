@@ -6,6 +6,10 @@
 #include <PartSet_Tools.h>
 #include <ModelAPI_ResultBody.h>
 
+#include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_WidgetValueFeature.h>
+
 #include <SketchPlugin_Feature.h>
 #include <V3d_View.hxx>
 #include <AIS_Shape.hxx>
@@ -103,4 +107,29 @@ void PartSet_OperationSketchBase::restartOperation(const std::string& theType, O
     }
   }
   emit restartRequired(theType, theFeature);
+}
+
+
+
+void PartSet_OperationSketchBase::activateByPreselection()
+{
+  if (!myPropertyPanel)
+    return;
+  ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+  if ((myPreSelection.size() > 0) && aActiveWgt) {
+    const ModuleBase_ViewerPrs& aPrs = myPreSelection.front();
+    ModuleBase_WidgetValueFeature aValue;
+    aValue.setObject(aPrs.object());
+    if (aActiveWgt->setValue(&aValue)) {
+      myPreSelection.remove(aPrs);
+      if(isValid()) {
+        //myActiveWidget = NULL;
+        commit();
+      } else {
+        myPropertyPanel->activateNextWidget();
+        //emit activateNextWidget(myActiveWidget);
+      }
+    }
+    // If preselection is enough to make a valid feature - apply it immediately
+  }
 }

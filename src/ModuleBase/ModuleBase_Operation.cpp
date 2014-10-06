@@ -238,13 +238,7 @@ void ModuleBase_Operation::activateByPreselection()
     aValue.setObject(aPrs.object());
     if (aActiveWgt->setValue(&aValue)) {
       myPreSelection.remove(aPrs);
-      if(isValid()) {
-        //myActiveWidget = NULL;
-        commit();
-      } else {
-        myPropertyPanel->activateNextWidget();
-        //emit activateNextWidget(myActiveWidget);
-      }
+      myPropertyPanel->activateNextWidget();
     }
     // If preselection is enough to make a valid feature - apply it immediately
   }
