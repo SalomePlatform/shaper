@@ -186,7 +186,7 @@ bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>
     std::list<std::string>::iterator anAttrIter = aLtAttributes.begin();
     for (; anAttrIter != aLtAttributes.end(); anAttrIter++) {
       std::map<std::string, AttrValidators>::const_iterator anAttr = 
-        aFeatureIter->second.find(*anAttrIter);
+          aFeatureIter->second.find(*anAttrIter);
       if (anAttr != aFeatureIter->second.end()) {
         AttrValidators::const_iterator aValIter = anAttr->second.cbegin();
         for (; aValIter != anAttr->second.cend(); aValIter++) {
@@ -198,8 +198,8 @@ bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>
             const ModelAPI_AttributeValidator* anAttrValidator = 
               dynamic_cast<const ModelAPI_AttributeValidator*>(aFound->second);
             if (anAttrValidator) {
-              if (!anAttrValidator->isValid(theFeature->data()->attribute(*anAttrIter),
-                aValIter->second)) {
+              AttributePtr anAttribute = theFeature->data()->attribute(*anAttrIter);
+              if (!anAttrValidator->isValid(anAttribute, aValIter->second)) {
                   return false;
               }
             }
