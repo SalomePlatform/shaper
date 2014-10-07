@@ -14,6 +14,7 @@
 #include <ModelAPI_Tools.h>
 
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_AttributeReference.h>
@@ -186,6 +187,13 @@ bool ModuleBase_WidgetShapeSelector::isAccepted(const ObjectPtr theResult) const
         return false;
     }
   }
+  // Check that object belongs to active document or PartSet
+  DocumentPtr aDoc = aResult->document();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (!(aDoc == aMgr->activeDocument()) || (aDoc == aMgr->moduleDocument()))
+    return false;
+
+  // Check that the shape of necessary type
   boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
   if (!aShapePtr)
     return false;

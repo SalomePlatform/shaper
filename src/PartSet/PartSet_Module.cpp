@@ -79,7 +79,8 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   connect(myWorkshop, SIGNAL(operationStopped(ModuleBase_Operation*)), this,
           SLOT(onOperationStopped(ModuleBase_Operation*)));
 
-  XGUI_ContextMenuMgr* aContextMenuMgr = xWorkshop()->contextMenuMgr();
+  XGUI_Workshop* aXWshop = xWorkshop();
+  XGUI_ContextMenuMgr* aContextMenuMgr = aXWshop->contextMenuMgr();
   connect(aContextMenuMgr, SIGNAL(actionTriggered(const QString&, bool)), this,
           SLOT(onContextMenuCommand(const QString&, bool)));
 
@@ -93,6 +94,8 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
           SLOT(onKeyRelease(QKeyEvent*)));
   connect(myWorkshop->viewer(), SIGNAL(mouseDoubleClick(QMouseEvent*)), this,
           SLOT(onMouseDoubleClick(QMouseEvent*)));
+
+  myDocumentShapeFilter = new XGUI_ShapeDocumentFilter(aXWshop->displayer());
 }
 
 PartSet_Module::~PartSet_Module()
@@ -130,11 +133,6 @@ std::string PartSet_Module::featureFile(const std::string& theFeatureId)
  */
 void PartSet_Module::onFeatureTriggered()
 {
-  //PartSet_TestOCC::local_selection_change_shape(myWorkshop->viewer()->AISContext(),
-  //                                   myWorkshop->viewer()->activeView());
-
-  //PartSet_TestOCC::local_selection_erase(myWorkshop->viewer()->AISContext(),
-  //                                       myWorkshop->viewer()->activeView());
   QAction* aCmd = dynamic_cast<QAction*>(sender());
   //Do nothing on uncheck
   if (aCmd->isCheckable() && !aCmd->isChecked())
@@ -142,19 +140,6 @@ void PartSet_Module::onFeatureTriggered()
   launchOperation(aCmd->data().toString());
 }
 
-//void PartSet_Module::launchOperation(const QString& theCmdId)
-//{
-//  ModuleBase_Operation* anOperation = createOperation(theCmdId.toStdString());
-//  //PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-//  //if (aPreviewOp) {
-//    XGUI_Selection* aSelection = myWorkshop->selector()->selection();
-//    // Initialise operation with preliminary selection
-//    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-//    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-//    anOperation->initSelection(aSelected, aHighlighted);
-//  //}
-//  sendOperation(anOperation);
-//}
 
 void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
 {
@@ -168,6 +153,9 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
     XGUI_Displayer* aDisplayer = aXWshp->displayer();
     aDisplayer->openLocalContext();
     aDisplayer->deactivateObjectsOutOfContext();
+  } else {
+    Handle(AIS_InteractiveContext) aAIS = xWorkshop()->viewer()->AISContext();
+    aAIS->AddFilter(myDocumentShapeFilter);
   }
 }
 
@@ -179,8 +167,6 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
   if (aPreviewOp) {
     XGUI_PropertyPanel* aPropPanel = aXWshp->propertyPanel();
-    //disconnect(aPropPanel, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)),
-    //           this, SLOT(onStorePoint2D(ObjectPtr, const std::string&)));
   } else {
     // Activate results of current feature for selection
     FeaturePtr aFeature = theOperation->feature();
@@ -190,6 +176,9 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
     for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
       aDisplayer->activate(*aIt);
     }
+
+    Handle(AIS_InteractiveContext) aAIS = xWorkshop()->viewer()->AISContext();
+    aAIS->RemoveFilter(myDocumentShapeFilter);
   }
 }
 

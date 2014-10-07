@@ -45,10 +45,6 @@ class XGUI_EXPORT XGUI_Displayer
   /// Destructor
   virtual ~XGUI_Displayer();
 
-  /// Set AIS_InteractiveContext object in case if it was changed
-  /// or can not be initialized in constructor
-  void setAISContext(const Handle(AIS_InteractiveContext)& theAIS);
-
   /// Returns the feature visibility state.
   /// \param theFeature a feature instance
   bool isVisible(ObjectPtr theObject) const;

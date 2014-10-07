@@ -6,6 +6,7 @@
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
 #include <XGUI_Command.h>
+#include <XGUI_ViewerFilters.h>
 #include <ModelAPI_Feature.h>
 
 #include <QMap>
@@ -144,6 +145,9 @@ Q_OBJECT
   PartSet_Listener* myListener;
 
   std::map<std::string, std::string> myFeaturesInFiles;
+
+  /// A filter which provides selection within a current document or whole PartSet
+  Handle(XGUI_ShapeDocumentFilter) myDocumentShapeFilter;
 };
 
 #endif
