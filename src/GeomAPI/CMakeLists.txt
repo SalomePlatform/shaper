@@ -19,6 +19,7 @@ SET(PROJECT_HEADERS
     GeomAPI_Pln.h
     GeomAPI_Shape.h
     GeomAPI_Edge.h
+    GeomAPI_Wire.h
     GeomAPI_AISObject.h
     GeomAPI_IPresentable.h
     GeomAPI_Curve.h 
@@ -39,6 +40,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Pln.cpp
     GeomAPI_Shape.cpp
     GeomAPI_Edge.cpp
+    GeomAPI_Wire.cpp
     GeomAPI_AISObject.cpp
     GeomAPI_Curve.cpp
 )

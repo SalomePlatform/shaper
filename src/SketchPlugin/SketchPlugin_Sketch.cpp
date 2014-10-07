@@ -2,19 +2,31 @@
 // Created:     27 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#include "SketchPlugin_Sketch.h"
-#include <ModelAPI_Data.h>
-#include <ModelAPI_AttributeRefList.h>
+#include <Config_PropManager.h>
+
+#include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_FaceBuilder.h>
+
 #include <GeomAPI_AISObject.h>
+#include <GeomAPI_Dir.h>
+#include <GeomAPI_Wire.h>
 #include <GeomAPI_XYZ.h>
+
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
-#include <GeomAlgoAPI_FaceBuilder.h>
-#include <GeomAlgoAPI_CompoundBuilder.h>
-#include <GeomAlgoAPI_SketchBuilder.h>
+
+#include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_Data.h>
+#include <ModelAPI_Document.h>
+#include <ModelAPI_Feature.h>
+#include <ModelAPI_Object.h>
 #include <ModelAPI_ResultConstruction.h>
 
-#include <Config_PropManager.h>
+#include <SketchPlugin_Sketch.h>
+
+#include <boost/smart_ptr/shared_ptr.hpp>
+
+#include <vector>
 
 using namespace std;
 
@@ -74,15 +86,17 @@ void SketchPlugin_Sketch::execute()
 
   if (aFeaturesPreview.empty())
     return;
-  std::list<boost::shared_ptr<GeomAPI_Shape> > aLoops;
-  std::list<boost::shared_ptr<GeomAPI_Shape> > aWires;
-  GeomAlgoAPI_SketchBuilder::createFaces(anOrigin->pnt(), aDirX->dir(), aDirY->dir(), aNorm->dir(),
-                                         aFeaturesPreview, aLoops, aWires);
 
-  aLoops.insert(aLoops.end(), aWires.begin(), aWires.end());
-  boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aLoops);
+  // Collect all edges as one big wire
+  boost::shared_ptr<GeomAPI_Wire> aBigWire(new GeomAPI_Wire);
+  std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator aShapeIt = aFeaturesPreview.begin();
+  for (; aShapeIt != aFeaturesPreview.end(); ++aShapeIt) {
+    aBigWire->addEdge(*aShapeIt);
+  }
+//  GeomAlgoAPI_SketchBuilder::createFaces(anOrigin->pnt(), aDirX->dir(), aDirY->dir(), aNorm->dir(),
+//                                         aFeaturesPreview, aLoops, aWires);
   boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
-  aConstr->setShape(aCompound);
+  aConstr->setShape(aBigWire);
   setResult(aConstr);
 }
 
