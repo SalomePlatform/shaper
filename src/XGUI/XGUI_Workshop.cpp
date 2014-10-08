@@ -341,10 +341,10 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
     }
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName("CurrentDocumentChanged")) {
+    myActionsMgr->update();
     // Find and Activate active part
     if (myPartActivating)
       return;
-    myActionsMgr->update();
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aActiveDoc = aMgr->activeDocument();
     DocumentPtr aDoc = aMgr->moduleDocument();
