@@ -4,7 +4,8 @@
     icon=":icons/sketch.png" 
     tooltip="Select a face for extrusion"
     activate="true"
-    shape_types="face"
+    shape_types="face wire"
+    use_subshapes="true"
   />
   <doublevalue id="extrusion_size" label="Size" min="0" step="1.0" default="0" icon=":icons/dimension_v.png" tooltip="Set size of extrusion">
     <validator id="GeomValidators_Positive"/>

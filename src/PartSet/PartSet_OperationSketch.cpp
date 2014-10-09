@@ -155,7 +155,10 @@ void PartSet_OperationSketch::stopOperation()
   PartSet_OperationSketchBase::stopOperation();
   emit featureConstructed(feature(), FM_Hide);
   emit closeLocalContext();
+}
 
+void PartSet_OperationSketch::afterCommitOperation()
+{
   FeaturePtr aFeature = feature();
   std::list<ResultPtr> aResults = aFeature->results();
   std::list<ResultPtr>::const_iterator aIt;

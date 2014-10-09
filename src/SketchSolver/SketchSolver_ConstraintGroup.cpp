@@ -79,10 +79,7 @@ SketchSolver_ConstraintGroup::SketchSolver_ConstraintGroup(
   myEntities.clear();
   myEntOfConstr.clear();
   myConstraints.clear();
-
   myTempConstraints.clear();
-  myTempPointWhereDragged.clear();
-  myTempPointWDrgdID = 0;
 
   // Initialize workplane
   myWorkplane.h = SLVS_E_UNKNOWN;
@@ -101,7 +98,6 @@ SketchSolver_ConstraintGroup::~SketchSolver_ConstraintGroup()
   myConstraints.clear();
   myConstraintMap.clear();
   myTempConstraints.clear();
-  myTempPointWhereDragged.clear();
 
   // If the group with maximal identifier is deleted, decrease the indexer
   if (myID == myGroupIndexer)
@@ -397,23 +393,26 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
   }
   /// \todo Other types of entities
 
+  Slvs_hEntity aResult = SLVS_E_UNKNOWN; // Unsupported or wrong entity type
+
   if (isEntExists) {
     if (!myEntOfConstr[aEntPos]) // the entity is not used by constraints, no need to resolve them
       myNeedToSolve = isNeedToSolve;
     else
       myNeedToSolve = myNeedToSolve || isNeedToSolve;
-    return aEntIter->second;
-  }
-
-  if (aNewEntity.h != SLVS_E_UNKNOWN) {
+    aResult = aEntIter->second;
+  } else if (aNewEntity.h != SLVS_E_UNKNOWN) {
     myEntities.push_back(aNewEntity);
     myEntOfConstr.push_back(false);
     myEntityAttrMap[theEntity] = aNewEntity.h;
-    return aNewEntity.h;
+    aResult = aNewEntity.h;
   }
 
-  // Unsupported or wrong entity type
-  return SLVS_E_UNKNOWN;
+  // If the attribute was changed by the user, we need to fix it before solving
+  if (myNeedToSolve && theEntity->isImmutable())
+    addTemporaryConstraintWhereDragged(theEntity);
+
+  return aResult;
 }
 
 // ============================================================================
@@ -648,7 +647,6 @@ bool SketchSolver_ConstraintGroup::resolveConstraints()
   myConstrSolver.setParameters(myParams);
   myConstrSolver.setEntities(myEntities);
   myConstrSolver.setConstraints(myConstraints);
-  myConstrSolver.setDraggedParameters(myTempPointWhereDragged);
 
   int aResult = myConstrSolver.solve();
   if (aResult == SLVS_RESULT_OKAY) {  // solution succeeded, store results into correspondent attributes
@@ -698,18 +696,6 @@ void SketchSolver_ConstraintGroup::mergeGroups(const SketchSolver_ConstraintGrou
         *aTempConstrIter);
     if (aFind != aConstrMap.end())
       myTempConstraints.push_back(aFind->second);
-  }
-
-  if (myTempPointWhereDragged.empty())
-    myTempPointWhereDragged = theGroup.myTempPointWhereDragged;
-  else if (!theGroup.myTempPointWhereDragged.empty()) {  // Need to create additional transient constraint
-    std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator aFeatureIter =
-        theGroup.myEntityAttrMap.begin();
-    for (; aFeatureIter != theGroup.myEntityAttrMap.end(); aFeatureIter++)
-      if (aFeatureIter->second == myTempPointWDrgdID) {
-        addTemporaryConstraintWhereDragged(aFeatureIter->first);
-        break;
-      }
   }
 
   myNeedToSolve = myNeedToSolve || theGroup.myNeedToSolve;
@@ -1015,21 +1001,8 @@ void SketchSolver_ConstraintGroup::addTemporaryConstraintWhereDragged(
   if (anEntIter == myEntityAttrMap.end())
     return;
 
-  // If this is a first dragged point, its parameters should be placed 
-  // into Slvs_System::dragged field to avoid system inconsistense
-  if (myTempPointWhereDragged.empty()) {
-    int anEntPos = Search(anEntIter->second, myEntities);
-    Slvs_hParam* aDraggedParam = myEntities[anEntPos].param;
-    for (int i = 0; i < 4; i++, aDraggedParam++)
-      if (*aDraggedParam != 0)
-        myTempPointWhereDragged.push_back(*aDraggedParam);
-    myTempPointWDrgdID = myEntities[anEntPos].h;
-    return;
-  }
-
   // Get identifiers of all dragged points
   std::set<Slvs_hEntity> aDraggedPntID;
-  aDraggedPntID.insert(myTempPointWDrgdID);
   std::list<Slvs_hConstraint>::iterator aTmpCoIter = myTempConstraints.begin();
   for (; aTmpCoIter != myTempConstraints.end(); aTmpCoIter++) {
     unsigned int aConstrPos = Search(*aTmpCoIter, myConstraints);
@@ -1077,9 +1050,6 @@ void SketchSolver_ConstraintGroup::removeTemporaryConstraints()
       myConstrMaxID--;
   }
   myTempConstraints.clear();
-
-  // Clear basic dragged point
-  myTempPointWhereDragged.clear();
 }
 
 // ============================================================================

@@ -209,8 +209,6 @@ protected:
 
   SketchSolver_Solver myConstrSolver;  ///< Solver for set of equations obtained by constraints
 
-  std::vector<Slvs_hParam> myTempPointWhereDragged;  ///< Parameters of one of the points which is moved by user
-  Slvs_hEntity myTempPointWDrgdID;      ///< Identifier of such point
   std::list<Slvs_hConstraint> myTempConstraints;  ///< The list of identifiers of temporary constraints (SLVS_C_WHERE_DRAGGED) applied for all other points moved by user
 
   // SketchPlugin entities

@@ -112,6 +112,9 @@ signals:
   /// Default impl calls corresponding slot and commits immediately.
   virtual void startOperation();
 
+  /// Virtual method called after operation committed (see commit() method for more description)
+  virtual void afterCommitOperation();
+
  private:
   std::list<ModuleBase_ViewerPrs> myFeatures;  ///< the features to apply the edit operation
 };

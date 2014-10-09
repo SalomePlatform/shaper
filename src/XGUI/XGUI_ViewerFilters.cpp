@@ -15,7 +15,7 @@ IMPLEMENT_STANDARD_HANDLE(XGUI_ShapeDocumentFilter, SelectMgr_Filter);
 IMPLEMENT_STANDARD_RTTIEXT(XGUI_ShapeDocumentFilter, SelectMgr_Filter);
 
 
-//TODO (VSV): Check bug in OCCT: Filter result is ignored
+//TODO (VSV): Check bug in OCCT: Filter result is ignored (bug25340)
 Standard_Boolean XGUI_ShapeDocumentFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   if (theOwner->HasSelectable()) {
