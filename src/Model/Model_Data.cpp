@@ -11,6 +11,7 @@
 #include <Model_AttributeRefList.h>
 #include <Model_AttributeBoolean.h>
 #include <Model_AttributeString.h>
+#include <ModelAPI_AttributeSelection.h>
 #include <Model_Events.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
@@ -177,6 +178,21 @@ boost::shared_ptr<ModelAPI_AttributeReference> Model_Data::reference(const std::
   }
   boost::shared_ptr<ModelAPI_AttributeReference> aRes = boost::dynamic_pointer_cast<
       ModelAPI_AttributeReference>(aFound->second);
+  if (!aRes) {
+    // TODO: generate error on invalid attribute type request
+  }
+  return aRes;
+}
+
+boost::shared_ptr<ModelAPI_AttributeSelection> Model_Data::selection(const std::string& theID)
+{
+  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = myAttrs.find(theID);
+  if (aFound == myAttrs.end()) {
+    // TODO: generate error on unknown attribute request and/or add mechanism for customization
+    return boost::shared_ptr<ModelAPI_AttributeSelection>();
+  }
+  boost::shared_ptr<ModelAPI_AttributeSelection> aRes = 
+    boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
   }

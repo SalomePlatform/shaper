@@ -21,6 +21,7 @@ class ModelAPI_AttributeString;
 class ModelAPI_Document;
 class ModelAPI_Attribute;
 class ModelAPI_Feature;
+class ModelAPI_AttributeSelection;
 class GeomAPI_Shape;
 
 /**\class ModelAPI_Data
@@ -47,6 +48,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual boost::shared_ptr<ModelAPI_AttributeInteger> integer(const std::string& theID) = 0;
   /// Returns the attribute that contains reference to a feature
   virtual boost::shared_ptr<ModelAPI_AttributeReference> reference(const std::string& theID) = 0;
+  /// Returns the attribute that contains selection to a shape
+  virtual boost::shared_ptr<ModelAPI_AttributeSelection> selection(const std::string& theID) = 0;
   /// Returns the attribute that contains reference to an attribute of a feature
   virtual boost::shared_ptr<ModelAPI_AttributeRefAttr> refattr(const std::string& theID) = 0;
   /// Returns the attribute that contains list of references to features

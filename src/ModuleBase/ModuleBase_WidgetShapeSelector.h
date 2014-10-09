@@ -9,6 +9,7 @@
 #include "ModuleBase_ModelWidget.h"
 
 #include <ModelAPI_Object.h>
+#include <GeomAPI_Shape.h>
 
 #include <TopAbs_ShapeEnum.hxx>
 
@@ -77,9 +78,10 @@ private:
   void updateSelectionName();
   void raisePanel() const;
   bool isAccepted(const ObjectPtr theObject) const;
+  bool isAccepted(boost::shared_ptr<GeomAPI_Shape> theShape) const;
 
   // Set the given object as a value of the widget
-  void setObject(ObjectPtr theObj);
+  void setObject(ObjectPtr theObj, boost::shared_ptr<GeomAPI_Shape> theShape = boost::shared_ptr<GeomAPI_Shape>());
 
   QWidget* myContainer;
   QLabel* myLabel;
@@ -89,6 +91,8 @@ private:
   ModuleBase_IWorkshop* myWorkshop;
 
   ObjectPtr mySelectedObject;
+  boost::shared_ptr<GeomAPI_Shape> myShape;
+
   QStringList myShapeTypes;
 
   /// If true then local selector has to be activated in context
