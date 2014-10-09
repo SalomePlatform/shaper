@@ -11,20 +11,26 @@
 #include <ModuleBase.h>
 #include <ModuleBase_ModelWidget.h>
 
+#include <NCollection_List.hxx>
+#include <TopoDS_Shape.hxx>
+
 #include <QList>
 #include <QString>
 #include <QStringList>
 
 class QWidget;
 class QTextEdit;
+class QComboBox;
+class ModuleBase_IWorkshop;
 
 class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_ModelWidget
 {
   Q_OBJECT
  public:
   ModuleBase_WidgetMultiSelector(QWidget* theParent,
-                                const Config_WidgetAPI* theData,
-                                const std::string& theParentId);
+                                 ModuleBase_IWorkshop* theWorkshop,
+                                 const Config_WidgetAPI* theData,
+                                 const std::string& theParentId);
   virtual ~ModuleBase_WidgetMultiSelector();
 
   /// Saves the internal parameters to the given feature
@@ -41,11 +47,29 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
- //public slots:
+  virtual bool eventFilter(QObject* theObj, QEvent* theEvent);
+
+ public slots:
+  void activateSelection(bool toActivate);
+  void onSelectionTypeChanged();
+  void onSelectionChanged();
+
+ protected:
+  void filterShapes(const NCollection_List<TopoDS_Shape>& theShapesToFilter,
+                    NCollection_List<TopoDS_Shape>& theResult);
 
  private:
   QTextEdit* myListControl;
+  QComboBox* myTypeCombo;
   QWidget* myMainWidget;
+
+  //TODO: Move into the base of selectors
+  ModuleBase_IWorkshop* myWorkshop;
+
+  /// If true then local selector has to be activated in context
+  QStringList myShapeTypes;
+  bool myUseSubShapes;
+  bool myIsActive;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

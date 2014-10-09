@@ -2,24 +2,29 @@
 // Created:     2 June 2014
 // Author:      Vitaly Smetannikov
 
-#include "ModuleBase_WidgetShapeSelector.h"
-#include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_WidgetShapeSelector.h>
+#include <ModuleBase_Definitions.h>
 #include <ModuleBase_ISelection.h>
-#include "ModuleBase_WidgetValue.h"
+#include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_Tools.h>
-#include "ModuleBase_WidgetValueFeature.h"
-
+#include <ModuleBase_WidgetValueFeature.h>
+#include <Config_WidgetAPI.h>
 #include <Events_Loop.h>
-#include <ModelAPI_Events.h>
-#include <ModelAPI_Tools.h>
-
+#include <Events_Message.h>
+#include <GeomAPI_Interface.h>
+#include <GeomAPI_Shape.h>
+#include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
-#include <ModelAPI_Object.h>
+#include <ModelAPI_Events.h>
+#include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
 #include <Config_WidgetAPI.h>
+#include <Events_Error.h>
 
 #include <GeomAPI_Shape.h>
 
@@ -35,7 +40,14 @@
 #include <QEvent>
 #include <QDockWidget>
 
+#include <TopExp_Explorer.hxx>
+#include <TopoDS_Shape.hxx>
+
+#include <boost/smart_ptr/shared_ptr.hpp>
+
+#include <list>
 #include <stdexcept>
+#include <xstring>
 
 typedef QMap<QString, TopAbs_ShapeEnum> ShapeTypes;
 static ShapeTypes MyShapeTypes;
@@ -44,16 +56,21 @@ TopAbs_ShapeEnum ModuleBase_WidgetShapeSelector::shapeType(const QString& theTyp
 {
   if (MyShapeTypes.count() == 0) {
     MyShapeTypes["face"] = TopAbs_FACE;
+    MyShapeTypes["faces"] = TopAbs_FACE;
     MyShapeTypes["vertex"] = TopAbs_VERTEX;
+    MyShapeTypes["vertices"] = TopAbs_VERTEX;
     MyShapeTypes["wire"] = TopAbs_WIRE;
     MyShapeTypes["edge"] = TopAbs_EDGE;
+    MyShapeTypes["edges"] = TopAbs_EDGE;
     MyShapeTypes["shell"] = TopAbs_SHELL;
     MyShapeTypes["solid"] = TopAbs_SOLID;
+    MyShapeTypes["solids"] = TopAbs_SOLID;
   }
   QString aType = theType.toLower();
   if (MyShapeTypes.contains(aType))
     return MyShapeTypes[aType];
-  throw std::invalid_argument("Shape type defined in XML is not implemented!");
+  Events_Error::send("Shape type defined in XML is not implemented!");
+  return TopAbs_SHAPE;
 }
 
 ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParent,

@@ -18,15 +18,15 @@ FeaturesPlugin_Group::FeaturesPlugin_Group()
 void FeaturesPlugin_Group::initAttributes()
 {
   data()->addAttribute(FeaturesPlugin_Group::NAME_ID(), ModelAPI_AttributeString::type());
-  data()->addAttribute(FeaturesPlugin_Group::TYPE_ID(), ModelAPI_AttributeInteger::type());
   data()->addAttribute(FeaturesPlugin_Group::LIST_ID(), ModelAPI_AttributeString::type());
 }
 
 void FeaturesPlugin_Group::execute()
 {
-  AttributeIntegerPtr aTypeAttr = boost::dynamic_pointer_cast<ModelAPI_AttributeInteger>(
-      data()->attribute(FeaturesPlugin_Group::TYPE_ID()));
-  if (!aTypeAttr)
+  AttributeStringPtr aNameAttr = boost::dynamic_pointer_cast<ModelAPI_AttributeString>(
+      data()->attribute(FeaturesPlugin_Group::NAME_ID()));
+  if (!aNameAttr)
     return;
-  int aType = aTypeAttr->value();
+  std::string aName = aNameAttr->value();
+  data()->setName(aName);
 }

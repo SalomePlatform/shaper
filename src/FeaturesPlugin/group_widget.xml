@@ -2,14 +2,8 @@
   <stringvalue
     id="group_name"
     label="Name"
-    tooltip="Name of the group"
-    string_list="Vertices Edges Faces Solids" />
-  <choice
-    id="group_type"
-    label="Type"
-    tooltip="Type of geometry entities"
-    string_list="Vertices Edges Faces Solids" />
+    tooltip="Name of the group" />
   <multi_selector id="group_list" 
-    label="Selected objects:"
-    tooltip="List of selected objects" /> 
+    tooltip="List of selected objects" 
+    type_choice="Vertices Edges Faces Solids" /> 
 </source>

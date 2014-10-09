@@ -24,8 +24,8 @@ void adjustMargins(QLayout* theLayout)
 {
   if(!theLayout)
     return;
-  theLayout->setContentsMargins(5, 5, 5, 5);
-  theLayout->setSpacing(5);
+  theLayout->setContentsMargins(2, 5, 5, 2);
+  theLayout->setSpacing(4);
 }
 
 void zeroMargins(QWidget* theWidget)

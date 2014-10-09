@@ -298,7 +298,7 @@ QWidget* ModuleBase_WidgetFactory::lineEditControl(QWidget* theParent)
 QWidget* ModuleBase_WidgetFactory::multiSelectorControl(QWidget* theParent)
 {
   ModuleBase_WidgetMultiSelector* aMultiselectorWgt =
-      new ModuleBase_WidgetMultiSelector(theParent, myWidgetApi,myParentId);
+      new ModuleBase_WidgetMultiSelector(theParent, myWorkshop, myWidgetApi,myParentId);
   myModelWidgets.append(aMultiselectorWgt);
   return aMultiselectorWgt->getControl();
 }
