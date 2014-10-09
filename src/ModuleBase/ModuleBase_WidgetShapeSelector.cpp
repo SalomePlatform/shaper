@@ -172,26 +172,44 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
     if (mySelectedObject && aObject && mySelectedObject->isSame(aObject))
       return;
 
-    // Check that the selection corresponds to selection type
-    if (!isAccepted(aObject))
-      return;
+    // Get sub-shapes from local selection
+    boost::shared_ptr<GeomAPI_Shape> aShape;
+    if (myUseSubShapes) {
+      NCollection_List<TopoDS_Shape> aShapeList;
+      myWorkshop->selection()->selectedShapes(aShapeList);
+      if (aShapeList.Extent() > 0) {
+        aShape = boost::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+        aShape->setImpl(new TopoDS_Shape(aShapeList.First()));
+      }
+    }
 
-    setObject(aObject);
+    // Check that the selection corresponds to selection type
+    if (myUseSubShapes) {
+      if (!isAccepted(aShape))
+        return;
+    } else {
+      if (!isAccepted(aObject))
+        return;
+    }
+    setObject(aObject, aShape);
     emit focusOutWidget(this);
   }
 }
 
 //********************************************************************
-void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj)
+void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, boost::shared_ptr<GeomAPI_Shape> theShape)
 {
   if (mySelectedObject == theObj)
     return;
   mySelectedObject = theObj;
+  myShape = theShape;
   if (mySelectedObject) {
     raisePanel();
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TOHIDE);
-    ModelAPI_EventCreator::get()->sendUpdated(mySelectedObject, anEvent);
-    Events_Loop::loop()->flush(anEvent);
+    if (!myUseSubShapes) {
+      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TOHIDE);
+      ModelAPI_EventCreator::get()->sendUpdated(mySelectedObject, anEvent);
+      Events_Loop::loop()->flush(anEvent);
+    }
   } 
   updateSelectionName();
   activateSelection(false);
@@ -237,6 +255,17 @@ bool ModuleBase_WidgetShapeSelector::isAccepted(const ObjectPtr theResult) const
       if (shapeType(aType) == aShapeType)
         return true;
     }
+  }
+  return false;
+}
+
+//********************************************************************
+bool ModuleBase_WidgetShapeSelector::isAccepted(boost::shared_ptr<GeomAPI_Shape> theShape) const
+{
+  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+  foreach (QString aType, myShapeTypes) {
+    if (aShape.ShapeType() == shapeType(aType))
+      return true;
   }
   return false;
 }

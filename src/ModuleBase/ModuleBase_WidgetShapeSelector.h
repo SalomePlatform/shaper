@@ -76,9 +76,10 @@ private:
   void updateSelectionName();
   void raisePanel() const;
   bool isAccepted(const ObjectPtr theObject) const;
+  bool isAccepted(boost::shared_ptr<GeomAPI_Shape> theShape) const;
 
   // Set the given object as a value of the widget
-  void setObject(ObjectPtr theObj);
+  void setObject(ObjectPtr theObj, boost::shared_ptr<GeomAPI_Shape> theShape = boost::shared_ptr<GeomAPI_Shape>());
 
   static TopAbs_ShapeEnum shapeType(const QString& theType);
 
