@@ -6,6 +6,7 @@
 #define ModuleBase_IWorkshop_H
 
 #include "ModuleBase.h"
+#include "ModuleBase_Definitions.h"
 
 #include <ModelAPI_Object.h>
 
@@ -31,6 +32,13 @@ Q_OBJECT
   {}
 
   virtual ModuleBase_ISelection* selection() const = 0;
+
+  /// Activate sub-shapes selection (opens local context)
+  /// Types has to be dined according to TopAbs_ShapeEnum
+  virtual void activateSubShapesSelection(const QIntList& theTypes) = 0;
+
+  /// Deactivate sub-shapes selection (closes local context)
+  virtual void deactivateSubShapesSelection() = 0;
 
   //! Returns instance of loaded module
   virtual ModuleBase_IModule* module() const = 0;

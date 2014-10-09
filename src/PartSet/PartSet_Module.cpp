@@ -155,6 +155,7 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
     aDisplayer->deactivateObjectsOutOfContext();
   } else {
     Handle(AIS_InteractiveContext) aAIS = xWorkshop()->viewer()->AISContext();
+    //TODO (VSV): We have to open Local context because at neutral point filters don't work (bug 25340)
     aAIS->AddFilter(myDocumentShapeFilter);
   }
 }

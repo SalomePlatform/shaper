@@ -210,8 +210,8 @@ bool ModuleBase_Operation::commit()
     disconnect(myPropertyPanel, 0, this, 0);
 
     stopOperation();
-
     ModelAPI_Session::get()->finishOperation();
+
     emit stopped();
 
     afterCommitOperation();

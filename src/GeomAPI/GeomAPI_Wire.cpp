@@ -18,9 +18,9 @@
 
 GeomAPI_Wire::GeomAPI_Wire() : GeomAPI_Shape()
 {
-  TopoDS_Wire aBigWireImpl;
+  TopoDS_Compound aBigWireImpl;
   BRep_Builder aBuilder;
-  aBuilder.MakeWire(aBigWireImpl);
+  aBuilder.MakeCompound(aBigWireImpl);
   this->setImpl(new TopoDS_Shape(aBigWireImpl));
 }
 

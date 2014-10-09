@@ -91,6 +91,9 @@ private:
   ObjectPtr mySelectedObject;
   QStringList myShapeTypes;
 
+  /// If true then local selector has to be activated in context
+  bool myUseSubShapes;
+
   QPalette myBasePalet;
   QPalette myInactivePalet;
 

@@ -27,6 +27,13 @@ Q_OBJECT
   //! Returns list of currently selected data objects
   virtual ModuleBase_ISelection* selection() const;
 
+  /// Activate sub-shapes selection (opens local context if it was not opened)
+  /// Types has to be dined according to TopAbs_ShapeEnum
+  virtual void activateSubShapesSelection(const QIntList& theTypes);
+
+  /// Deactivate sub-shapes selection (closes local context)
+  virtual void deactivateSubShapesSelection();
+
   //! Returns instance of loaded module
   virtual ModuleBase_IModule* module() const;
 

@@ -59,7 +59,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
                                                      const Config_WidgetAPI* theData,
                                                      const std::string& theParentId)
     : ModuleBase_ModelWidget(theParent, theData, theParentId),
-      myWorkshop(theWorkshop), myIsActive(false)
+      myWorkshop(theWorkshop), myIsActive(false), myUseSubShapes(false)
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aLayout = new QHBoxLayout(myContainer);
@@ -88,6 +88,12 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
 
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ');
+
+  std::string aUseSubShapes = theData->getProperty("use_subshapes");
+  if (aUseSubShapes.length() > 0) {
+    QString aVal(aUseSubShapes.c_str());
+    myUseSubShapes = (aVal.toUpper() == "TRUE");
+  }
 }
 
 //********************************************************************
@@ -250,10 +256,19 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
     myTextLine->setPalette(myInactivePalet);
   updateSelectionName();
 
-  if (myIsActive)
+  if (myIsActive) {
     connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-  else
+    if (myUseSubShapes) {
+      QIntList aList;
+      foreach (QString aType, myShapeTypes)
+        aList.append(shapeType(aType));
+      myWorkshop->activateSubShapesSelection(aList);
+    }
+  } else {
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+    if (myUseSubShapes) 
+      myWorkshop->deactivateSubShapesSelection();
+  }
 }
 
 //********************************************************************
