@@ -54,8 +54,9 @@ void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
   Handle(AIS_InteractiveContext) aAIS = myWorkshop->viewer()->AISContext();
   if (!aAIS->HasOpenedContext())
     aAIS->OpenLocalContext();
-  foreach(int aType, theTypes)
+  foreach(int aType, theTypes) {
     aAIS->ActivateStandardMode((TopAbs_ShapeEnum)aType);
+  }
 }
 
 void XGUI_ModuleConnector::deactivateSubShapesSelection()

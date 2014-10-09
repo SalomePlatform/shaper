@@ -18,6 +18,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_AttributeSelection.h>
 #include <Config_WidgetAPI.h>
 
 #include <GeomAPI_Shape.h>
@@ -99,6 +100,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
 //********************************************************************
 ModuleBase_WidgetShapeSelector::~ModuleBase_WidgetShapeSelector()
 {
+  activateSelection(false);
 }
 
 //********************************************************************
@@ -109,13 +111,22 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
     return false;
 
   DataPtr aData = myFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeReference> aRef = boost::dynamic_pointer_cast<
-      ModelAPI_AttributeReference>(aData->attribute(attributeID()));
+  if (myUseSubShapes) {
+    boost::shared_ptr<ModelAPI_AttributeSelection> aSelect = 
+      boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aData->attribute(attributeID()));
 
-  ObjectPtr aObject = aRef->value();
-  if (!(aObject && aObject->isSame(mySelectedObject))) {
-    aRef->setValue(mySelectedObject);
-    updateObject(myFeature);
+    ResultBodyPtr aBody = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(mySelectedObject);
+    if (aBody)
+      aSelect->setValue(aBody, myShape);
+  } else {
+    boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
+      boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
+
+    ObjectPtr aObject = aRef->value();
+    if (!(aObject && aObject->isSame(mySelectedObject))) {
+      aRef->setValue(mySelectedObject);
+      updateObject(myFeature);
+    }
   }
   return true;
 }
@@ -124,10 +135,17 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
 bool ModuleBase_WidgetShapeSelector::restoreValue()
 {
   DataPtr aData = myFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(attributeID());
-
   bool isBlocked = this->blockSignals(true);
-  mySelectedObject = aRef->value();
+  if (myUseSubShapes) {
+    boost::shared_ptr<ModelAPI_AttributeSelection> aSelect = aData->selection(attributeID());
+    if (aSelect) {
+      mySelectedObject = aSelect->context();
+      myShape = aSelect->value();
+    }
+  } else {
+    boost::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(attributeID());
+    mySelectedObject = aRef->value();
+  }
   updateSelectionName();
 
   this->blockSignals(isBlocked);
