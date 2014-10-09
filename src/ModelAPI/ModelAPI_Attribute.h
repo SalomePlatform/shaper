@@ -23,6 +23,8 @@ class ModelAPI_Attribute
   // accessible from the attributes
   bool myIsInitialized;
   bool myIsArgument;
+  bool myIsImmutable;
+
  public:
 
   /// Returns the type of this class of attributes, not static method
@@ -70,12 +72,29 @@ class ModelAPI_Attribute
     return myIsArgument;
   }
 
+  /// Immutable argument can not be changed programaticaly (e.g. by constraint)
+  /// By default it is false.
+  /// Returns the previous state of the attribute's immutability.
+  MODELAPI_EXPORT bool setImmutable(const bool theFlag)
+  {
+    bool aResult = myIsImmutable;
+    myIsImmutable = theFlag;
+    return aResult;
+  }
+
+  /// Returns true if can not be changed programaticaly
+  MODELAPI_EXPORT bool isImmutable()
+  {
+    return myIsImmutable;
+  }
+
  protected:
   /// Objects are created for features automatically
   ModelAPI_Attribute()
   {
     myIsInitialized = false;
     myIsArgument = true;
+    myIsImmutable = false;
   }
 
 };
