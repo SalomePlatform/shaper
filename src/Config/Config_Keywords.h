@@ -20,6 +20,8 @@ const static char* NODE_VALIDATOR = "validator";
 //Widgets
 const static char* WDG_DOUBLEVALUE = "doublevalue";
 const static char* WDG_BOOLVALUE = "boolvalue";
+const static char* WDG_STRINGVALUE = "stringvalue";
+const static char* WDG_MULTISELECTOR = "multi_selector";
 //Widget containers
 const static char* WDG_INFO = "label";
 const static char* WDG_GROUP = "groupbox";

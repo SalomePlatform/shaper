@@ -30,6 +30,8 @@ SET(PROJECT_HEADERS
 	ModuleBase_DoubleSpinBox.h
 	ModuleBase_IPropertyPanel.h
 	ModuleBase_IViewer.h
+	ModuleBase_WidgetLineEdit.h
+	ModuleBase_WidgetMultiSelector.h
 )
 
 SET(PROJECT_SOURCES
@@ -53,6 +55,8 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetChoice.cpp
 	ModuleBase_WidgetFileSelector.cpp
 	ModuleBase_DoubleSpinBox.cpp
+    ModuleBase_WidgetLineEdit.cpp
+	ModuleBase_WidgetMultiSelector.cpp
 )
 
 SET(PROJECT_LIBRARIES

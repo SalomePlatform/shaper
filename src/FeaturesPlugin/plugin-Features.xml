@@ -8,5 +8,13 @@
           <source path="boolean_widget.xml"/>
       </feature>
     </group>
+    <group id="Collections">
+      <feature id="Group"
+        title="Group"
+        tooltip="Create a new named collection of geometry entities"
+        icon=":icons/group.png">
+        <source path="group_widget.xml"/>
+      </feature>
+    </group>
   </workbench>  
 </plugin>

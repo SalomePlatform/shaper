@@ -49,8 +49,9 @@ TopAbs_ShapeEnum ModuleBase_WidgetShapeSelector::shapeType(const QString& theTyp
     MyShapeTypes["shell"] = TopAbs_SHELL;
     MyShapeTypes["solid"] = TopAbs_SOLID;
   }
-  if (MyShapeTypes.contains(theType))
-    return MyShapeTypes[theType];
+  QString aType = theType.toLower();
+  if (MyShapeTypes.contains(aType))
+    return MyShapeTypes[aType];
   throw std::invalid_argument("Shape type defined in XML is not implemented!");
 }
 

@@ -23,6 +23,8 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_WidgetLineEdit.h>
+#include <ModuleBase_WidgetMultiSelector.h>
 
 #include <ModelAPI_Validator.h>
 
@@ -156,6 +158,12 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   } else if (theType == WDG_CHOICE) {
     result = choiceControl(theParent);
 
+  } else if (theType == WDG_STRINGVALUE) {
+    result = lineEditControl(theParent);
+
+  } else if (theType == WDG_MULTISELECTOR) {
+    result = multiSelectorControl(theParent);
+
   } else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
   } else {
@@ -277,6 +285,22 @@ QWidget* ModuleBase_WidgetFactory::choiceControl(QWidget* theParent)
       new ModuleBase_WidgetChoice(theParent, myWidgetApi,myParentId);
   myModelWidgets.append(aChoiceWgt);
   return aChoiceWgt->getControl();
+}
+
+QWidget* ModuleBase_WidgetFactory::lineEditControl(QWidget* theParent)
+{
+  ModuleBase_WidgetLineEdit* aLineEditWgt =
+      new ModuleBase_WidgetLineEdit(theParent, myWidgetApi,myParentId);
+  myModelWidgets.append(aLineEditWgt);
+  return aLineEditWgt->getControl();
+}
+
+QWidget* ModuleBase_WidgetFactory::multiSelectorControl(QWidget* theParent)
+{
+  ModuleBase_WidgetMultiSelector* aMultiselectorWgt =
+      new ModuleBase_WidgetMultiSelector(theParent, myWidgetApi,myParentId);
+  myModelWidgets.append(aMultiselectorWgt);
+  return aMultiselectorWgt->getControl();
 }
 
 QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const

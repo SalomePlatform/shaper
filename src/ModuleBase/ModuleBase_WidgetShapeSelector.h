@@ -26,6 +26,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetShapeSelector : public ModuleBase_Model
 {
 Q_OBJECT
  public:
+  static TopAbs_ShapeEnum shapeType(const QString& theType);
+
   ModuleBase_WidgetShapeSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
                             const Config_WidgetAPI* theData, const std::string& theParentId);
 
@@ -78,8 +80,6 @@ private:
 
   // Set the given object as a value of the widget
   void setObject(ObjectPtr theObj);
-
-  static TopAbs_ShapeEnum shapeType(const QString& theType);
 
   QWidget* myContainer;
   QLabel* myLabel;
