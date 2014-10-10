@@ -179,6 +179,11 @@ void XGUI_Workshop::initMenu()
                                                 false);
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRedo()));
     salomeConnector()->addEditMenuSeparator();
+    aAction = salomeConnector()->addEditCommand("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
+                                                QIcon(":pictures/rebuild.png"), QKeySequence(),
+                                                false);
+    connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
+    salomeConnector()->addEditMenuSeparator();
     return;
   }
   // File commands group
