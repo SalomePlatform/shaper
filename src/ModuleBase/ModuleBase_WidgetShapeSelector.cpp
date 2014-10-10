@@ -108,11 +108,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ');
 
-  std::string aUseSubShapes = theData->getProperty("use_subshapes");
-  if (aUseSubShapes.length() > 0) {
-    QString aVal(aUseSubShapes.c_str());
-    myUseSubShapes = (aVal.toUpper() == "TRUE");
-  }
+  myUseSubShapes = theData->getBooleanAttribute("use_subshapes", false); 
 }
 
 //********************************************************************
