@@ -165,9 +165,13 @@ protected:
                        const Slvs_hEntity& theEntityID);
 
   /** \brief Adds a constraint for a point which should not be changed during computations
-   *  \param[in] theEntity the base for the constraint
+   *  \param[in] theEntity     the base for the constraint
+   *  \param[in] theAllowToFit this flag shows that the entity may be placed into 
+   *                           the 'dragged' field of SolveSpace solver, so this entity 
+   *                           may be changed a little during solution
    */
-  void addTemporaryConstraintWhereDragged(boost::shared_ptr<ModelAPI_Attribute> theEntity);
+  void addTemporaryConstraintWhereDragged(boost::shared_ptr<ModelAPI_Attribute> theEntity,
+                                          bool theAllowToFit = true);
 
   /** \brief Remove all temporary constraint after computation finished
    */
@@ -209,6 +213,8 @@ protected:
 
   SketchSolver_Solver myConstrSolver;  ///< Solver for set of equations obtained by constraints
 
+  std::vector<Slvs_hParam> myTempPointWhereDragged;  ///< Parameters of one of the points which is moved by user
+  Slvs_hEntity myTempPointWDrgdID;      ///< Identifier of such point
   std::list<Slvs_hConstraint> myTempConstraints;  ///< The list of identifiers of temporary constraints (SLVS_C_WHERE_DRAGGED) applied for all other points moved by user
 
   // SketchPlugin entities
