@@ -79,7 +79,10 @@ SketchSolver_ConstraintGroup::SketchSolver_ConstraintGroup(
   myEntities.clear();
   myEntOfConstr.clear();
   myConstraints.clear();
+
   myTempConstraints.clear();
+  myTempPointWhereDragged.clear();
+  myTempPointWDrgdID = 0;
 
   // Initialize workplane
   myWorkplane.h = SLVS_E_UNKNOWN;
@@ -98,6 +101,7 @@ SketchSolver_ConstraintGroup::~SketchSolver_ConstraintGroup()
   myConstraints.clear();
   myConstraintMap.clear();
   myTempConstraints.clear();
+  myTempPointWhereDragged.clear();
 
   // If the group with maximal identifier is deleted, decrease the indexer
   if (myID == myGroupIndexer)
@@ -410,7 +414,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
 
   // If the attribute was changed by the user, we need to fix it before solving
   if (myNeedToSolve && theEntity->isImmutable())
-    addTemporaryConstraintWhereDragged(theEntity);
+    addTemporaryConstraintWhereDragged(theEntity, false);
 
   return aResult;
 }
@@ -647,6 +651,7 @@ bool SketchSolver_ConstraintGroup::resolveConstraints()
   myConstrSolver.setParameters(myParams);
   myConstrSolver.setEntities(myEntities);
   myConstrSolver.setConstraints(myConstraints);
+  myConstrSolver.setDraggedParameters(myTempPointWhereDragged);
 
   int aResult = myConstrSolver.solve();
   if (aResult == SLVS_RESULT_OKAY) {  // solution succeeded, store results into correspondent attributes
@@ -696,6 +701,18 @@ void SketchSolver_ConstraintGroup::mergeGroups(const SketchSolver_ConstraintGrou
         *aTempConstrIter);
     if (aFind != aConstrMap.end())
       myTempConstraints.push_back(aFind->second);
+  }
+
+  if (myTempPointWhereDragged.empty())
+    myTempPointWhereDragged = theGroup.myTempPointWhereDragged;
+  else if (!theGroup.myTempPointWhereDragged.empty()) {  // Need to create additional transient constraint
+    std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator aFeatureIter =
+        theGroup.myEntityAttrMap.begin();
+    for (; aFeatureIter != theGroup.myEntityAttrMap.end(); aFeatureIter++)
+      if (aFeatureIter->second == myTempPointWDrgdID) {
+        addTemporaryConstraintWhereDragged(aFeatureIter->first);
+        break;
+      }
   }
 
   myNeedToSolve = myNeedToSolve || theGroup.myNeedToSolve;
@@ -993,7 +1010,8 @@ void SketchSolver_ConstraintGroup::updateEntityIfPossible(
 //            which was moved by user
 // ============================================================================
 void SketchSolver_ConstraintGroup::addTemporaryConstraintWhereDragged(
-    boost::shared_ptr<ModelAPI_Attribute> theEntity)
+    boost::shared_ptr<ModelAPI_Attribute> theEntity,
+    bool theAllowToFit)
 {
   // Find identifier of the entity
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator anEntIter =
@@ -1001,8 +1019,21 @@ void SketchSolver_ConstraintGroup::addTemporaryConstraintWhereDragged(
   if (anEntIter == myEntityAttrMap.end())
     return;
 
+  // If this is a first dragged point, its parameters should be placed 
+  // into Slvs_System::dragged field to avoid system inconsistense
+  if (myTempPointWhereDragged.empty() && theAllowToFit) {
+    int anEntPos = Search(anEntIter->second, myEntities);
+    Slvs_hParam* aDraggedParam = myEntities[anEntPos].param;
+    for (int i = 0; i < 4; i++, aDraggedParam++)
+      if (*aDraggedParam != 0)
+        myTempPointWhereDragged.push_back(*aDraggedParam);
+    myTempPointWDrgdID = myEntities[anEntPos].h;
+    return;
+  }
+
   // Get identifiers of all dragged points
   std::set<Slvs_hEntity> aDraggedPntID;
+  aDraggedPntID.insert(myTempPointWDrgdID);
   std::list<Slvs_hConstraint>::iterator aTmpCoIter = myTempConstraints.begin();
   for (; aTmpCoIter != myTempConstraints.end(); aTmpCoIter++) {
     unsigned int aConstrPos = Search(*aTmpCoIter, myConstraints);
@@ -1050,6 +1081,10 @@ void SketchSolver_ConstraintGroup::removeTemporaryConstraints()
       myConstrMaxID--;
   }
   myTempConstraints.clear();
+
+  // Clear basic dragged point
+  myTempPointWhereDragged.clear();
+  myTempPointWDrgdID = SLVS_E_UNKNOWN;
 }
 
 // ============================================================================
