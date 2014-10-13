@@ -14,7 +14,7 @@
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint which defines equivalence of two points
  *
- *  These constraint has two attributes:
+ *  This constraint has two attributes:
  *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
 class SketchPlugin_ConstraintCoincidence : public SketchPlugin_ConstraintBase

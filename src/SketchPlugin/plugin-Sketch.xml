@@ -1,7 +1,7 @@
 <plugin>
   <workbench id="Sketch">
     <group id="Basic">
-      <feature id="Sketch" nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular" title="Sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
+      <feature id="Sketch" nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid" title="Sketch" tooltip="Create a new sketch or edit an existing sketch" icon=":icons/sketch.png">
         <sketch-start-label title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch"/> 
       <!--icon=":pictures/x_point.png"-->
       </feature>
@@ -91,6 +91,14 @@
           <validator id="SketchPlugin_DifferentObjects"/>
         </feature_selector>
         <validator id="PartSet_PerpendicularValidator"/>
+      </feature>
+
+      <feature id="SketchConstraintRigid" title="Rigid" tooltip="Create constraint defining fixed object" icon="">
+        <feature_selector id="ConstraintEntityA" label="Object" tooltip="Select any object in the viewer">
+          <validator id="SketchPlugin_ResultPoint"/>
+          <validator id="SketchPlugin_ResultLine"/>
+          <validator id="SketchPlugin_ResultArc"/>
+        </feature_selector>
       </feature>
     </group>
   </workbench>

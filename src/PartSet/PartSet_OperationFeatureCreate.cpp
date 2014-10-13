@@ -18,6 +18,7 @@
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintRigid.h>
 
 #include <GeomAPI_Pnt2d.h>
 
@@ -63,7 +64,8 @@ bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
       || theId == SketchPlugin_ConstraintRadius::ID()
       || theId == SketchPlugin_ConstraintParallel::ID()
       || theId == SketchPlugin_ConstraintPerpendicular::ID()
-      || theId == SketchPlugin_ConstraintCoincidence::ID();
+      || theId == SketchPlugin_ConstraintCoincidence::ID()
+      || theId == SketchPlugin_ConstraintRigid::ID();
 }
 
 bool PartSet_OperationFeatureCreate::canBeCommitted() const

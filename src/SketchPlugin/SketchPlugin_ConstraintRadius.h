@@ -16,7 +16,7 @@
  *  \brief Feature for creation of a new constraint which defines 
  *         a radius of a circle or an arc of circle
  *
- *  These constraint has two attributes:
+ *  This constraint has two attributes:
  *  SketchPlugin_Constraint::VALUE() (radius), SketchPlugin_Constraint::ENTITY_A() (a circle)
  */
 class SketchPlugin_ConstraintRadius : public SketchPlugin_ConstraintBase

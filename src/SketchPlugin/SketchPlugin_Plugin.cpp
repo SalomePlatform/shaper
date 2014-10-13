@@ -10,6 +10,7 @@
 #include "SketchPlugin_ConstraintParallel.h"
 #include "SketchPlugin_ConstraintPerpendicular.h"
 #include "SketchPlugin_ConstraintRadius.h"
+#include "SketchPlugin_ConstraintRigid.h"
 #include "SketchPlugin_Validators.h"
 #include "SketchPlugin_ResultValidators.h"
 #include <ModelAPI_Session.h>
@@ -83,6 +84,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintPerpendicular);
   } else if (theFeatureID == SketchPlugin_ConstraintRadius::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintRadius);
+  } else if (theFeatureID == SketchPlugin_ConstraintRigid::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintRigid);
   }
   // feature of such kind is not found
   return FeaturePtr();

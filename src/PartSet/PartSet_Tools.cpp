@@ -25,6 +25,7 @@
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintRadius.h>
+#include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_Constraint.h>
 
 #include <ModuleBase_ViewerPrs.h>
@@ -341,5 +342,6 @@ bool PartSet_Tools::isConstraintFeature(const std::string& theKind)
 {
   return theKind == SketchPlugin_ConstraintDistance::ID()
       || theKind == SketchPlugin_ConstraintLength::ID()
-      || theKind == SketchPlugin_ConstraintRadius::ID();
+      || theKind == SketchPlugin_ConstraintRadius::ID()
+      || theKind == SketchPlugin_ConstraintRigid::ID();
 }
