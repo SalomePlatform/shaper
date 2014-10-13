@@ -11,7 +11,7 @@
 #include <Model_AttributeRefList.h>
 #include <Model_AttributeBoolean.h>
 #include <Model_AttributeString.h>
-#include <ModelAPI_AttributeSelection.h>
+#include <Model_AttributeSelection.h>
 #include <Model_Events.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
@@ -74,6 +74,8 @@ void Model_Data::addAttribute(const std::string& theID, const std::string theAtt
     anAttr = new Model_AttributeString(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeReference::type()) {
     anAttr = new Model_AttributeReference(anAttrLab);
+  } else if (theAttrType == ModelAPI_AttributeSelection::type()) {
+    anAttr = new Model_AttributeSelection(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeRefAttr::type()) {
     anAttr = new Model_AttributeRefAttr(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeRefList::type()) {

@@ -157,6 +157,13 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
     aViewAct->setEnabled(false);
   }
 
+  // Delete selector because it has to be redefined on next activation
+  if (mySelector) {
+    myProxyViewer->setSelector(0);
+    delete mySelector;
+    mySelector = 0;
+  }
+
   //myWorkshop->contextMenuMgr()->disconnectViewer();
   return LightApp_Module::deactivateModule(theStudy);
 }
