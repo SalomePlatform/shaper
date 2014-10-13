@@ -7,6 +7,7 @@
 #include <TNaming_Builder.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TopoDS_Shape.hxx>
+#include <TDF_ChildIterator.hxx>
 #include <GeomAPI_Shape.h>
 
 Model_ResultBody::Model_ResultBody()
@@ -20,7 +21,10 @@ void Model_ResultBody::store(const boost::shared_ptr<GeomAPI_Shape>& theShape)
     TDF_Label& aShapeLab = aData->shapeLab();
     // remove the previous history
     clean();
-    aShapeLab.ForgetAllAttributes();
+    aShapeLab.ForgetAttribute(TNaming_NamedShape::GetID());
+    for(TDF_ChildIterator anIter(aShapeLab); anIter.More(); anIter.Next()) {
+      anIter.Value().ForgetAllAttributes();
+    }
     // store the new shape as primitive
     TNaming_Builder aBuilder(aShapeLab);
     if (!theShape)

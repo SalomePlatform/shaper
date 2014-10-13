@@ -99,7 +99,7 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
     std::pair<std::string, std::string>& aPlugin = myPlugins[theFeatureID]; // plugin and doc kind
     if (!aPlugin.second.empty() && aPlugin.second != activeDocument()->kind()) {
       Events_Error::send(
-          string("Feature '") + theFeatureID + "' can not be created in document '"
+          string("Feature '") + theFeatureID + "' can be created only in document '"
               + aPlugin.second + "' by the XML definition");
       return FeaturePtr();
     }
