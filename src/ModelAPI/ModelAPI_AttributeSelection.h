@@ -6,7 +6,7 @@
 #define ModelAPI_AttributeSelection_H_
 
 #include "ModelAPI_Attribute.h"
-#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_Result.h>
 
 /**\class ModelAPI_AttributeSelection
  * \ingroup DataModel
@@ -18,13 +18,13 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
  public:
   /// Defines the result and its selected sub-shape
   virtual void setValue(
-    const ResultBodyPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape) = 0;
+    const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape) = 0;
 
   /// Returns the selected subshape
   virtual boost::shared_ptr<GeomAPI_Shape> value() = 0;
 
   /// Returns the context of the selection (the whole shape owner)
-  virtual ResultBodyPtr context() = 0;
+  virtual ResultPtr context() = 0;
 
   /// Returns the type of this class of attributes
   static std::string type()

@@ -20,13 +20,15 @@ class Model_AttributeSelection : public ModelAPI_AttributeSelection
 public:
   /// Defines the result and its selected sub-shape
   MODEL_EXPORT virtual void setValue(
-    const ResultBodyPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape);
+    const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape);
 
   /// Returns the selected subshape
   MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape> value();
 
   /// Returns the context of the selection (the whole shape owner)
-  MODEL_EXPORT virtual ResultBodyPtr context();
+  MODEL_EXPORT virtual ResultPtr context();
+
+  MODEL_EXPORT virtual void setObject(const boost::shared_ptr<ModelAPI_Object>& theObject);
 
 protected:
   /// Objects are created for features automatically

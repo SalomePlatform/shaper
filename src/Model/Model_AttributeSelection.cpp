@@ -7,6 +7,9 @@
 #include "Model_Events.h"
 #include "Model_Data.h"
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultConstruction.h>
+#include <GeomAPI_Shape.h>
 
 #include <TNaming_Selector.hxx>
 #include <TNaming_NamedShape.hxx>
@@ -14,7 +17,7 @@
 
 using namespace std;
 
-void Model_AttributeSelection::setValue(const ResultBodyPtr& theContext,
+void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   const boost::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
   const boost::shared_ptr<GeomAPI_Shape>& anOldShape = value();
@@ -25,11 +28,22 @@ void Model_AttributeSelection::setValue(const ResultBodyPtr& theContext,
   bool isOldContext = theContext == myRef.value();
   if (!isOldContext)
     myRef.setValue(theContext);
-  
+
   // perform the selection
   TNaming_Selector aSel(myRef.myRef->Label());
   TopoDS_Shape aNewShape = theSubShape ? theSubShape->impl<TopoDS_Shape>() : TopoDS_Shape();
-  TopoDS_Shape aContext = theContext->shape()->impl<TopoDS_Shape>();
+  TopoDS_Shape aContext;
+
+  ResultBodyPtr aBody = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(myRef.value());
+  if (aBody)
+    aContext = aBody->shape()->impl<TopoDS_Shape>();
+  else {
+    ResultConstructionPtr aConstr = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myRef.value());
+    if (aConstr)
+      aContext = aConstr->shape()->impl<TopoDS_Shape>();
+    else
+      throw std::invalid_argument("a result with shape is expected");
+  }
   aSel.Select(aNewShape, aContext);
   myIsInitialized = true;
 
@@ -55,6 +69,12 @@ Model_AttributeSelection::Model_AttributeSelection(TDF_Label& theLabel)
   myIsInitialized = myRef.isInitialized();
 }
 
-ResultBodyPtr Model_AttributeSelection::context() {
-  return boost::dynamic_pointer_cast<ModelAPI_ResultBody>(myRef.value());
+ResultPtr Model_AttributeSelection::context() {
+  return boost::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
+}
+
+
+void Model_AttributeSelection::setObject(const boost::shared_ptr<ModelAPI_Object>& theObject)
+{
+  myRef.setObject(theObject);
 }
