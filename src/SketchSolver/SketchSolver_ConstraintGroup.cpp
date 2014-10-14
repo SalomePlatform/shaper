@@ -9,6 +9,7 @@
 #include <Events_Error.h>
 #include <Events_Loop.h>
 #include <GeomAPI_XY.h>
+#include <GeomAPI_Pnt2d.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
@@ -21,6 +22,7 @@
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintRigid.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
@@ -214,12 +216,14 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
   if (myWorkplane.h == SLVS_E_UNKNOWN)
     return false;
 
+  if (theConstraint && theConstraint->getKind() == SketchPlugin_ConstraintRigid::ID())
+    return changeRigidConstraint(theConstraint);
+
   // Search this constraint in the current group to update it
-  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::const_iterator aConstrMapIter =
-      myConstraintMap.find(theConstraint);
+  ConstraintMap::const_iterator aConstrMapIter = myConstraintMap.find(theConstraint);
   std::vector<Slvs_Constraint>::iterator aConstrIter;
   if (aConstrMapIter != myConstraintMap.end()) {
-    int aConstrPos = Search(aConstrMapIter->second, myConstraints);
+    int aConstrPos = Search(aConstrMapIter->second.front(), myConstraints);
     aConstrIter = myConstraints.begin() + aConstrPos;
   }
 
@@ -247,6 +251,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
     }
   }
 
+  size_t aNbTmpConstraints = myTempConstraints.size();
   Slvs_hEntity aConstrEnt[CONSTRAINT_ATTR_SIZE];  // parameters of the constraint
   for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
     aConstrEnt[indAttr] = SLVS_E_UNKNOWN;
@@ -293,6 +298,44 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
         myExtraCoincidence.insert(theConstraint);  // the constraint is stored for further purposes
         return false;
       }
+      if (aNbTmpConstraints < myTempConstraints.size()) {
+        // There was added temporary constraint. Check that there is no coincident points which already rigid.
+
+        // Get list of already fixed points
+        std::set<Slvs_hEntity> anAlreadyFixed;
+        std::vector<Slvs_Constraint>::const_iterator aCIter = myConstraints.begin();
+        for (; aCIter != myConstraints.end(); aCIter++)
+          if (aCIter->type == SLVS_C_WHERE_DRAGGED) {
+            std::list<Slvs_hConstraint>::const_iterator aTmpIt = myTempConstraints.begin();
+            for (; aTmpIt != myTempConstraints.end(); aTmpIt++)
+              if (*aTmpIt == aCIter->h)
+                break;
+            if (aTmpIt == myTempConstraints.end())
+              anAlreadyFixed.insert(aCIter->ptA);
+          }
+
+        std::set<Slvs_hConstraint> aTmpConstrToDelete;
+        std::list<Slvs_hConstraint>::reverse_iterator aTmpIter = myTempConstraints.rbegin();
+        size_t aCurSize = myTempConstraints.size();
+        for (; aCurSize > aNbTmpConstraints && aTmpIter != myTempConstraints.rend();
+            aTmpIter++, aCurSize--) {
+          int aConstrPos = Search(*aTmpIter, myConstraints);
+          std::vector<std::set<Slvs_hEntity> >::const_iterator
+            aCoincIter = myCoincidentPoints.begin();
+          for (; aCoincIter != myCoincidentPoints.end(); aCoincIter++)
+            if (aCoincIter->find(myConstraints[aConstrPos].ptA) != aCoincIter->end()) {
+              std::set<Slvs_hEntity>::const_iterator anIt;
+              for (anIt = aCoincIter->begin(); anIt != aCoincIter->end(); anIt++)
+                if (anAlreadyFixed.find(*anIt) != anAlreadyFixed.end()) {
+                  aTmpConstrToDelete.insert(*aTmpIter);
+                  break;
+                }
+              break;
+            }
+        }
+        if (!aTmpConstrToDelete.empty())
+          removeTemporaryConstraints(aTmpConstrToDelete);
+      }
     }
 
     // Create SolveSpace constraint structure
@@ -300,7 +343,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
                                                       myWorkplane.h, aDistance, aConstrEnt[0],
                                                       aConstrEnt[1], aConstrEnt[2], aConstrEnt[3]);
     myConstraints.push_back(aConstraint);
-    myConstraintMap[theConstraint] = aConstraint.h;
+    myConstraintMap[theConstraint] = std::vector<Slvs_hEntity>(1, aConstraint.h);
     int aConstrPos = Search(aConstraint.h, myConstraints);
     aConstrIter = myConstraints.begin() + aConstrPos;
     myNeedToSolve = true;
@@ -336,6 +379,151 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
 }
 
 // ============================================================================
+//  Function: changeRigidConstraint
+//  Class:    SketchSolver_ConstraintGroup
+//  Purpose:  create/update the "Rigid" constraint in the group
+// ============================================================================
+bool SketchSolver_ConstraintGroup::changeRigidConstraint(
+    boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
+{
+  // Search this constraint in the current group to update it
+  ConstraintMap::const_iterator aConstrMapIter = myConstraintMap.find(theConstraint);
+  std::vector<Slvs_Constraint>::iterator aConstrIter;
+  if (aConstrMapIter != myConstraintMap.end()) {
+    int aConstrPos = Search(aConstrMapIter->second.front(), myConstraints);
+    aConstrIter = myConstraints.begin() + aConstrPos;
+  }
+
+  // Get constraint type and verify the constraint parameters are correct
+  SketchSolver_Constraint aConstraint(theConstraint);
+  int aConstrType = aConstraint.getType();
+  if (aConstrType == SLVS_C_UNKNOWN
+      || (aConstrMapIter != myConstraintMap.end() && aConstrIter->type != aConstrType))
+    return false;
+  const std::vector<std::string>& aConstraintAttributes = aConstraint.getAttributes();
+
+  Slvs_hEntity aConstrEnt = SLVS_E_UNKNOWN;
+  boost::shared_ptr<ModelAPI_AttributeRefAttr> aConstrAttr = boost::dynamic_pointer_cast<
+      ModelAPI_AttributeRefAttr>(
+      theConstraint->data()->attribute(aConstraintAttributes[0]));
+  if (!aConstrAttr)
+    return false;
+
+  // Convert the object of the attribute to the feature
+  FeaturePtr aFeature;
+  if (aConstrAttr->isObject() && aConstrAttr->object()) {
+    ResultConstructionPtr aRC = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
+        aConstrAttr->object());
+    if (!aRC)
+      return false;
+    boost::shared_ptr<ModelAPI_Document> aDoc = aRC->document();
+    aFeature = aDoc->feature(aRC);
+  }
+
+  aConstrEnt = aConstrAttr->isObject() ? changeEntity(aFeature) : changeEntity(aConstrAttr->attr());
+
+  if (aConstrMapIter == myConstraintMap.end()) { // Add new constraint
+    // Check the fixed entity is not a point.
+    boost::shared_ptr<ModelAPI_AttributeRefAttr> aConstrAttr = boost::dynamic_pointer_cast<
+        ModelAPI_AttributeRefAttr>(theConstraint->data()->attribute(aConstraintAttributes[0]));
+    boost::shared_ptr<GeomDataAPI_Point> aPoint =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point>(aConstrAttr->attr());
+    boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
+        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aConstrAttr->attr());
+    if (aPoint || aPoint2D) {
+      // Create SolveSpace constraint structure
+      Slvs_Constraint aConstraint = Slvs_MakeConstraint(
+          ++myConstrMaxID, myID, aConstrType, myWorkplane.h, 0.0,
+          aConstrEnt, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+      myConstraints.push_back(aConstraint);
+      myConstraintMap[theConstraint] = std::vector<Slvs_hEntity>(1, aConstraint.h);
+      int aConstrPos = Search(aConstraint.h, myConstraints);
+      aConstrIter = myConstraints.begin() + aConstrPos;
+      myNeedToSolve = true;
+    } else {
+      myConstraintMap[theConstraint] = std::vector<Slvs_hEntity>();
+
+      // To avoid SolveSpace problems:
+      // * if the circle is rigid, we will fix its center and radius;
+      // * if the arc is rigid, we will fix its start and end points and radius.
+      double aRadius = 0.0;
+      bool isArc = false;
+      bool isCircle = false;
+      if (aFeature) {
+        if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
+          boost::shared_ptr<GeomDataAPI_Point2D> aCenter =
+              boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+              aFeature->data()->attribute(SketchPlugin_Arc::CENTER_ID()));
+          boost::shared_ptr<GeomDataAPI_Point2D> aStart =
+              boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+              aFeature->data()->attribute(SketchPlugin_Arc::START_ID()));
+          aRadius = aStart->pnt()->distance(aCenter->pnt());
+          isArc = true;
+        } else if (aFeature->getKind() == SketchPlugin_Circle::ID()) {
+          aRadius = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+              aFeature->data()->attribute(SketchPlugin_Circle::RADIUS_ID()))->value();
+          isCircle = true;
+        }
+      }
+
+      // Get list of already fixed points
+      std::set<Slvs_hEntity> anAlreadyFixed;
+      std::vector<Slvs_Constraint>::const_iterator aCIter = myConstraints.begin();
+      for (; aCIter != myConstraints.end(); aCIter++)
+        if (aCIter->type == SLVS_C_WHERE_DRAGGED)
+          anAlreadyFixed.insert(aCIter->ptA);
+
+      // Create constraints to fix the parameters of the entity
+      int aEntPos = Search(aConstrEnt, myEntities);
+      Slvs_hEntity* aPointsPtr = myEntities[aEntPos].point;
+      if (isArc) aPointsPtr++; // avoid to fix center of arc
+      while (*aPointsPtr != 0) {
+        // Avoid to create additional "Rigid" constraints for coincident points
+        bool isCoincAlreadyFixed = false;
+        if (!anAlreadyFixed.empty()) {
+          std::vector<std::set<Slvs_hEntity> >::const_iterator aCoincIter =
+              myCoincidentPoints.begin();
+          for (; !isCoincAlreadyFixed && aCoincIter != myCoincidentPoints.end(); aCoincIter++) {
+            if (aCoincIter->find(*aPointsPtr) == aCoincIter->end())
+              continue;
+            std::set<Slvs_hEntity>::const_iterator anIter = anAlreadyFixed.begin();
+            for (; !isCoincAlreadyFixed && anIter != anAlreadyFixed.end(); anIter++)
+              if (aCoincIter->find(*anIter) != aCoincIter->end())
+                isCoincAlreadyFixed = true;
+          }
+        }
+
+        if (!isCoincAlreadyFixed) {
+          Slvs_Constraint aConstraint = Slvs_MakeConstraint(
+              ++myConstrMaxID, myID, aConstrType, myWorkplane.h, 0.0,
+              *aPointsPtr, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, SLVS_E_UNKNOWN);
+          myConstraints.push_back(aConstraint);
+          myConstraintMap[theConstraint].push_back(aConstraint.h);
+        }
+        aPointsPtr++;
+      }
+
+      if (isArc || isCircle) { // add radius constraint
+        Slvs_Constraint aConstraint = Slvs_MakeConstraint(
+            ++myConstrMaxID, myID, SLVS_C_DIAMETER, myWorkplane.h, 2.0 * aRadius,
+            SLVS_E_UNKNOWN, SLVS_E_UNKNOWN, aConstrEnt, SLVS_E_UNKNOWN);
+        myConstraints.push_back(aConstraint);
+        myConstraintMap[theConstraint].push_back(aConstraint.h);
+      }
+
+      // The object is already rigid, so there is no constraints added
+      if (myConstraintMap[theConstraint].empty()) {
+        myConstraintMap.erase(theConstraint);
+        myNeedToSolve = false;
+      }
+      else
+        myNeedToSolve = true;
+    }
+  }
+  return true;
+}
+
+// ============================================================================
 //  Function: changeEntity
 //  Class:    SketchSolver_ConstraintGroup
 //  Purpose:  create/update the element affected by any constraint
@@ -358,6 +546,28 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
   const bool isEntExists = (aEntIter != myEntityAttrMap.end());  // defines that the entity already exists
   const bool isNeedToSolve = myNeedToSolve;
   myNeedToSolve = false;
+
+  if (isEntExists) {
+    // Verify that the entity is not used by "Rigid" constraint.
+    // If it is used, the object should not move.
+    std::vector<std::set<Slvs_hEntity> >::iterator aCoincIter = myCoincidentPoints.begin();
+    for (; aCoincIter != myCoincidentPoints.end(); aCoincIter++)
+      if (aCoincIter->find(aEntIter->second) != aCoincIter->end())
+        break;
+    std::set<Slvs_hEntity> aCoincident;
+    if (aCoincIter != myCoincidentPoints.end())
+      aCoincident = *aCoincIter;
+    else
+      aCoincident.insert(aEntIter->second);
+
+    std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
+    for (; aConstrIter != myConstraints.end(); aConstrIter++)
+      if (aConstrIter->type == SLVS_C_WHERE_DRAGGED &&
+          aCoincident.find(aConstrIter->ptA) != aCoincident.end()) {
+        myNeedToSolve = true;
+        return aEntIter->second;
+      }
+  }
 
   // Look over supported types of entities
   Slvs_Entity aNewEntity;
@@ -688,11 +898,10 @@ void SketchSolver_ConstraintGroup::mergeGroups(const SketchSolver_ConstraintGrou
   std::map<Slvs_hConstraint, Slvs_hConstraint> aConstrMap;
 
   // Add all constraints from theGroup to the current group
-  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::const_iterator aConstrIter =
-      theGroup.myConstraintMap.begin();
+  ConstraintMap::const_iterator aConstrIter = theGroup.myConstraintMap.begin();
   for (; aConstrIter != theGroup.myConstraintMap.end(); aConstrIter++)
     if (changeConstraint(aConstrIter->first))
-      aConstrMap[aConstrIter->second] = myConstrMaxID;  // the constraint was added => store its ID
+      aConstrMap[aConstrIter->second.back()] = myConstrMaxID;  // the constraint was added => store its ID
 
   // Add temporary constraints from theGroup
   std::list<Slvs_hConstraint>::const_iterator aTempConstrIter = theGroup.myTempConstraints.begin();
@@ -815,14 +1024,13 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
     SketchSolver_ConstraintGroup* aG = new SketchSolver_ConstraintGroup(mySketch);
     aNewGroups.push_back(aG);
   }
-  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::const_iterator aConstrMapIter =
-      myConstraintMap.begin();
+  ConstraintMap::const_iterator aConstrMapIter = myConstraintMap.begin();
   int aConstrMapPos = 0;  // position of iterator in the map (used to restore iterator after removing constraint)
   while (aConstrMapIter != myConstraintMap.end()) {
     std::vector<std::set<Slvs_hConstraint> >::const_iterator aGIter = aGroupsConstr.begin();
     std::vector<SketchSolver_ConstraintGroup*>::iterator aGroup = aNewGroups.begin();
     for (; aGIter != aGroupsConstr.end(); aGIter++, aGroup++)
-      if (aGIter->find(aConstrMapIter->second) != aGIter->end()) {
+      if (aGIter->find(aConstrMapIter->second.front()) != aGIter->end()) {
         (*aGroup)->changeConstraint(aConstrMapIter->first);
         removeConstraint(aConstrMapIter->first);
         // restore iterator
@@ -847,8 +1055,7 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
 // ============================================================================
 bool SketchSolver_ConstraintGroup::updateGroup()
 {
-  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::reverse_iterator aConstrIter =
-      myConstraintMap.rbegin();
+  ConstraintMap::reverse_iterator aConstrIter = myConstraintMap.rbegin();
   bool isAllValid = true;
   bool isCCRemoved = false;  // indicates that at least one of coincidence constraints was removed
   int aConstrIndex = 0;
@@ -1019,27 +1226,19 @@ void SketchSolver_ConstraintGroup::addTemporaryConstraintWhereDragged(
   if (anEntIter == myEntityAttrMap.end())
     return;
 
-  // If this is a first dragged point, its parameters should be placed 
-  // into Slvs_System::dragged field to avoid system inconsistense
-  if (myTempPointWhereDragged.empty() && theAllowToFit) {
-    int anEntPos = Search(anEntIter->second, myEntities);
-    Slvs_hParam* aDraggedParam = myEntities[anEntPos].param;
-    for (int i = 0; i < 4; i++, aDraggedParam++)
-      if (*aDraggedParam != 0)
-        myTempPointWhereDragged.push_back(*aDraggedParam);
-    myTempPointWDrgdID = myEntities[anEntPos].h;
-    return;
-  }
-
   // Get identifiers of all dragged points
   std::set<Slvs_hEntity> aDraggedPntID;
   aDraggedPntID.insert(myTempPointWDrgdID);
-  std::list<Slvs_hConstraint>::iterator aTmpCoIter = myTempConstraints.begin();
+  std::list<Slvs_hConstraint>::const_iterator aTmpCoIter = myTempConstraints.begin();
   for (; aTmpCoIter != myTempConstraints.end(); aTmpCoIter++) {
     unsigned int aConstrPos = Search(*aTmpCoIter, myConstraints);
     if (aConstrPos < myConstraints.size())
       aDraggedPntID.insert(myConstraints[aConstrPos].ptA);
   }
+  std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
+  for (; aConstrIter != myConstraints.end(); aConstrIter++)
+    if (aConstrIter->type == SLVS_C_WHERE_DRAGGED)
+      aDraggedPntID.insert(aConstrIter->ptA);
   // Find whether there is a point coincident with theEntity, which already has SLVS_C_WHERE_DRAGGED
   std::vector<std::set<Slvs_hEntity> >::iterator aCoPtIter = myCoincidentPoints.begin();
   for (; aCoPtIter != myCoincidentPoints.end(); aCoPtIter++) {
@@ -1051,6 +1250,20 @@ void SketchSolver_ConstraintGroup::addTemporaryConstraintWhereDragged(
     for (; aDrgIter != aDraggedPntID.end(); aDrgIter++)
       if (aCoPtIter->find(*aDrgIter) != aCoPtIter->end())
         return;  // the SLVS_C_WHERE_DRAGGED constraint already exists
+  }
+  if (aDraggedPntID.find(anEntIter->second) != aDraggedPntID.end())
+    return;
+
+  // If this is a first dragged point, its parameters should be placed 
+  // into Slvs_System::dragged field to avoid system inconsistense
+  if (myTempPointWhereDragged.empty() && theAllowToFit) {
+    int anEntPos = Search(anEntIter->second, myEntities);
+    Slvs_hParam* aDraggedParam = myEntities[anEntPos].param;
+    for (int i = 0; i < 4; i++, aDraggedParam++)
+      if (*aDraggedParam != 0)
+        myTempPointWhereDragged.push_back(*aDraggedParam);
+    myTempPointWDrgdID = myEntities[anEntPos].h;
+    return;
   }
 
   // Create additional SLVS_C_WHERE_DRAGGED constraint if myTempPointWhereDragged field is not empty
@@ -1066,11 +1279,14 @@ void SketchSolver_ConstraintGroup::addTemporaryConstraintWhereDragged(
 //  Purpose:  remove all transient SLVS_C_WHERE_DRAGGED constraints after
 //            resolving the set of constraints
 // ============================================================================
-void SketchSolver_ConstraintGroup::removeTemporaryConstraints()
+void SketchSolver_ConstraintGroup::removeTemporaryConstraints(
+    const std::set<Slvs_hConstraint>& theRemoved)
 {
   std::list<Slvs_hConstraint>::reverse_iterator aTmpConstrIter;
   for (aTmpConstrIter = myTempConstraints.rbegin(); aTmpConstrIter != myTempConstraints.rend();
       aTmpConstrIter++) {
+    if (!theRemoved.empty() && theRemoved.find(*aTmpConstrIter) == theRemoved.end())
+      continue;
     unsigned int aConstrPos = Search(*aTmpConstrIter, myConstraints);
     if (aConstrPos >= myConstraints.size())
       continue;
@@ -1095,26 +1311,29 @@ void SketchSolver_ConstraintGroup::removeTemporaryConstraints()
 void SketchSolver_ConstraintGroup::removeConstraint(
     boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
 {
-  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::iterator anIterToRemove =
-      myConstraintMap.find(theConstraint);
+  ConstraintMap::iterator anIterToRemove = myConstraintMap.find(theConstraint);
   if (anIterToRemove == myConstraintMap.end())
     return;
 
-  Slvs_hConstraint aCnstrToRemove = anIterToRemove->second;
+  std::vector<Slvs_hConstraint> aCnstrToRemove = anIterToRemove->second;
   // Remove constraint from the map
   myConstraintMap.erase(anIterToRemove);
 
-  // Find unused entities
-  int aConstrPos = Search(aCnstrToRemove, myConstraints);
   std::set<Slvs_hEntity> anEntToRemove;
-  Slvs_hEntity aCnstEnt[] = { myConstraints[aConstrPos].ptA, myConstraints[aConstrPos].ptB,
-      myConstraints[aConstrPos].entityA, myConstraints[aConstrPos].entityB };
-  for (int i = 0; i < 4; i++)
-    if (aCnstEnt[i] != 0)
-      anEntToRemove.insert(aCnstEnt[i]);
-  myConstraints.erase(myConstraints.begin() + aConstrPos);
-  if (aCnstrToRemove == myConstrMaxID)
-    myConstrMaxID--;
+  
+  // Find unused entities
+  std::vector<Slvs_hConstraint>::iterator aCnstrToRemoveIter = aCnstrToRemove.begin();
+  for (; aCnstrToRemoveIter != aCnstrToRemove.end(); aCnstrToRemoveIter++) {
+    int aConstrPos = Search(*aCnstrToRemoveIter, myConstraints);
+    Slvs_hEntity aCnstEnt[] = { myConstraints[aConstrPos].ptA, myConstraints[aConstrPos].ptB,
+        myConstraints[aConstrPos].entityA, myConstraints[aConstrPos].entityB };
+    for (int i = 0; i < 4; i++)
+      if (aCnstEnt[i] != 0)
+        anEntToRemove.insert(aCnstEnt[i]);
+    myConstraints.erase(myConstraints.begin() + aConstrPos);
+    if (*aCnstrToRemoveIter == myConstrMaxID)
+      myConstrMaxID--;
+  }
 
   // Find all entities which are based on these unused
   std::vector<Slvs_Entity>::const_iterator anEntIter = myEntities.begin();
@@ -1257,8 +1476,7 @@ bool SketchSolver_ConstraintGroup::addCoincidentPoints(const Slvs_hEntity& thePo
 void SketchSolver_ConstraintGroup::updateRelatedConstraints(
     boost::shared_ptr<ModelAPI_Attribute> theEntity) const
 {
-  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::const_iterator aConstrIter =
-      myConstraintMap.begin();
+  ConstraintMap::const_iterator aConstrIter = myConstraintMap.begin();
   for (; aConstrIter != myConstraintMap.end(); aConstrIter++) {
     std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttributes = aConstrIter->first->data()
         ->attributes(std::string());
@@ -1283,8 +1501,7 @@ void SketchSolver_ConstraintGroup::updateRelatedConstraints(
 void SketchSolver_ConstraintGroup::updateRelatedConstraints(
     boost::shared_ptr<ModelAPI_Feature> theFeature) const
 {
-  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint>::const_iterator aConstrIter =
-      myConstraintMap.begin();
+  ConstraintMap::const_iterator aConstrIter = myConstraintMap.begin();
   for (; aConstrIter != myConstraintMap.end(); aConstrIter++) {
     std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttributes = aConstrIter->first->data()
         ->attributes(std::string());

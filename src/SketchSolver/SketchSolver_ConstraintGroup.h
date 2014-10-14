@@ -16,6 +16,9 @@
 #include <vector>
 #include <set>
 
+typedef std::map< boost::shared_ptr<SketchPlugin_Constraint>, std::vector<Slvs_hConstraint> >
+  ConstraintMap;
+
 /** \class   SketchSolver_ConstraintGroup
  *  \ingroup DataModel
  *  \brief   Keeps the group of constraints which based on the same entities
@@ -54,6 +57,7 @@ class SketchSolver_ConstraintGroup
    *  \return \c true if the constraint added or updated successfully
    */
   bool changeConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
+  bool changeRigidConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
   /** \brief Verifies the feature attributes are used in this group
    *  \param[in] theFeature constraint or any other object for verification of interaction
@@ -174,8 +178,10 @@ protected:
                                           bool theAllowToFit = true);
 
   /** \brief Remove all temporary constraint after computation finished
+   *  \param[in] theRemoved  indexes of constraints to be removed. If empty, all temporary constraints should be deleted
    */
-  void removeTemporaryConstraints();
+  void removeTemporaryConstraints(const std::set<Slvs_hConstraint>& theRemoved =
+                                                                 std::set<Slvs_hConstraint>());
 
  private:
   /** \brief Creates a workplane from the sketch parameters
@@ -219,7 +225,7 @@ protected:
 
   // SketchPlugin entities
   boost::shared_ptr<SketchPlugin_Feature> mySketch;        ///< Equivalent to workplane
-  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint> myConstraintMap;  ///< The map between SketchPlugin and SolveSpace constraints
+  ConstraintMap myConstraintMap;  ///< The map between SketchPlugin and SolveSpace constraints
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity> myEntityAttrMap;  ///< The map between "attribute" parameters of constraints and their equivalent SolveSpace entities
   std::map<FeaturePtr, Slvs_hEntity> myEntityFeatMap;  ///< The map between "feature" parameters of constraints and their equivalent SolveSpace entities
 

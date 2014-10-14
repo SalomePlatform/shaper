@@ -15,6 +15,7 @@
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintRadius.h>
+#include <SketchPlugin_ConstraintRigid.h>
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Data.h>
@@ -175,6 +176,22 @@ const int& SketchSolver_Constraint::getType(
     }
     if (aNbEntities == 3)
       myType = SLVS_C_DIAMETER;
+    return getType();
+  }
+
+  // Constraint for fixed entity
+  if (aConstraintKind.compare(SketchPlugin_ConstraintRigid::ID()) == 0) {
+    // Verify that only one entity is filled
+    int aNbAttrs = 0;
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
+      boost::shared_ptr<ModelAPI_Attribute> anAttr = 
+          aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+      AttrType aType = typeOfAttribute(anAttr);
+      if (aType != UNKNOWN)
+        myAttributesList[aNbAttrs++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
+    }
+    if (aNbAttrs == 1)
+      myType = SLVS_C_WHERE_DRAGGED;
     return getType();
   }
 
