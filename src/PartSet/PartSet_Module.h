@@ -61,6 +61,14 @@ Q_OBJECT
 
   XGUI_Workshop* xWorkshop() const;
 
+  /// Display the shape and activate selection of sub-shapes
+  /// \param theFeature a feature instance
+  /// \param theShape a shape
+  /// \param theMode a list of local selection modes
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  void activateInLocalContext(ObjectPtr theFeature, const std::list<int>& theModes,
+                              const bool isUpdateViewer = true);
+
  public slots:
   void onFeatureTriggered();
   /// SLOT, that is called after the operation is started. Connect on the focus activated signal

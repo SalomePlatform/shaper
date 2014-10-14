@@ -356,7 +356,7 @@ void PartSet_Module::onFeatureConstructed(ObjectPtr theFeature, int theMode)
       std::list<ResultPtr>::iterator aIt;
       for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
         if (isDisplay)
-          aDisplayer->activateInLocalContext((*aIt), aModes, false);
+          activateInLocalContext((*aIt), aModes, false);
         else
           aDisplayer->erase((*aIt), false);
       }
@@ -453,7 +453,7 @@ void PartSet_Module::activateFeature(ObjectPtr theFeature, const bool isUpdateVi
   if (aPreviewOp) {
     XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
     std::list<int> aModes = aPreviewOp->getSelectionModes(theFeature);
-    aDisplayer->activateInLocalContext(theFeature, aModes, isUpdateViewer);
+    activateInLocalContext(theFeature, aModes, isUpdateViewer);
 
     // If this is a Sketcher then activate objects (planar faces) outside of context
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
@@ -500,10 +500,10 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
     std::list<ResultPtr>::const_iterator aRIt;
     for (aRIt = aResults.cbegin(); aRIt != aResults.cend(); ++aRIt) {
       aDisplayer->display((*aRIt), false);
-      aDisplayer->activateInLocalContext((*aRIt), aModes, false);
+      activateInLocalContext((*aRIt), aModes, false);
     }
     aDisplayer->display(aSPFeature, false);
-    aDisplayer->activateInLocalContext(aSPFeature, aModes, false);
+    activateInLocalContext(aSPFeature, aModes, false);
   }
   aDisplayer->updateViewer();
 }
@@ -564,4 +564,39 @@ XGUI_Workshop* PartSet_Module::xWorkshop() const
     return aConnector->workshop();
   }
   return 0;
+}
+
+
+void PartSet_Module::activateInLocalContext(ObjectPtr theResult, const std::list<int>& theModes,
+                                            const bool isUpdateViewer)
+{
+  XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
+  Handle(AIS_InteractiveContext) aContext = xWorkshop()->viewer()->AISContext();
+  if (aContext.IsNull())
+    return;
+  // Open local context if there is no one
+  if (!aContext->HasOpenedContext()) {
+    aContext->ClearCurrents(false);
+    //aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
+    aContext->OpenLocalContext();
+    aContext->NotUseDisplayedObjects();
+  }
+  // display or redisplay presentation
+  boost::shared_ptr<GeomAPI_AISObject> anAIS = aDisplayer->getAISObject(theResult);
+  // Activate selection of objects from prs
+  if (anAIS) {
+    Handle(AIS_InteractiveObject) aAISObj = anAIS->impl<Handle(AIS_InteractiveObject)>();
+    aContext->ClearSelected(false);  // ToCheck
+    //aContext->upClearSelected(false); // ToCheck
+    aContext->Load(aAISObj, -1, true/*allow decomposition*/);
+    aContext->Deactivate(aAISObj);
+
+    std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
+    for (; anIt != aLast; anIt++) {
+      aContext->Activate(aAISObj, (*anIt));
+    }
+  }
+
+  if (isUpdateViewer)
+    aDisplayer->updateViewer();
 }

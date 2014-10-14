@@ -58,19 +58,6 @@ class XGUI_EXPORT XGUI_Displayer
   /// Display the given AIS object. To hide this object use corresponde erase method
   void display(boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdate = true);
 
-  /// Redisplay the shape and activate selection of sub-shapes
-  /// \param theFeature a feature instance
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  //void redisplay(Handle(AIS_InteractiveObject) theAIS, const bool isUpdateViewer = true);
-
-  /// Display the shape and activate selection of sub-shapes
-  /// \param theFeature a feature instance
-  /// \param theShape a shape
-  /// \param theMode a list of local selection modes
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void activateInLocalContext(ObjectPtr theFeature, const std::list<int>& theModes,
-                              const bool isUpdateViewer = true);
-
   /// Stop the current selection and color the given features to the selection color
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped

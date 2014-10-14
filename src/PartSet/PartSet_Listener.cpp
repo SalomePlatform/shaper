@@ -69,7 +69,7 @@ void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& the
           // Very possible it is not displayed
           aDisplayer->display(aObj, false);
           std::list<int> aModes = aSketchOp->getSelectionModes(aObj);
-          aDisplayer->activateInLocalContext(aObj, aModes, false);
+          myModule->activateInLocalContext(aObj, aModes, false);
       }
     }
 
