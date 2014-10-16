@@ -92,6 +92,7 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void eraseDeletedResults(const bool isUpdateViewer = true);
 
+  /// Opens local context. Does nothing if it is already opened.
   void openLocalContext();
 
   /// Deactivates selection of sub-shapes
@@ -126,16 +127,17 @@ class XGUI_EXPORT XGUI_Displayer
   void deactivate(ObjectPtr theFeature);
 
   /// Activates the given object (it can be selected)
+  /// \param theModes - modes on which it has to be activated (can be empty)
   void activate(ObjectPtr theFeature, const QIntList& theModes);
 
   /// Returns true if the given object can be selected
   bool isActive(ObjectPtr theObject) const;
 
   /// Activates in local context displayed outside of the context.
-  /// \param theModes - selection modes to activate
-  /// \param theFilter - filter for selection
-  void activateObjectsOutOfContext();
+  /// \param theModes - modes on which it has to be activated (can be empty)
+  void activateObjectsOutOfContext(const QIntList& theModes);
 
+  /// Activates in local context displayed outside of the context.
   void deactivateObjectsOutOfContext();
 
   /// Sets display mode for the given object if this object is displayed

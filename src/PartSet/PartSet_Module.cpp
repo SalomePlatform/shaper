@@ -155,11 +155,10 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {
       if (aSketchOp->isEditOperation()) {
-        aDisplayer->openLocalContext();
-        //setSketchingMode();
+        setSketchingMode();
       } else {
         aDisplayer->openLocalContext();
-        aDisplayer->activateObjectsOutOfContext();
+        aDisplayer->activateObjectsOutOfContext(QIntList());
         myPlaneFilter = new StdSelect_FaceFilter(StdSelect_Plane);
         aDisplayer->addSelectionFilter(myPlaneFilter);
         QIntList aModes = sketchSelectionModes(aPreviewOp->feature());
@@ -376,6 +375,10 @@ void PartSet_Module::setSketchingMode()
   //aModes << TopAbs_VERTEX << TopAbs_EDGE;
   //aModes << AIS_DSM_Text << AIS_DSM_Line;
   aDisplayer->setSelectionModes(aModes);
+  aDisplayer->openLocalContext();
+  // Get default selection modes
+  aModes = sketchSelectionModes(ObjectPtr());
+  aDisplayer->activateObjectsOutOfContext(aModes);
 }
 
 void PartSet_Module::onFeatureConstructed(ObjectPtr theFeature, int theMode)

@@ -54,7 +54,8 @@ void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   aDisp->openLocalContext();
-  aDisp->activateObjectsOutOfContext();
+  // Use empty list because we will use standard modes
+  aDisp->activateObjectsOutOfContext(QIntList());
   aDisp->setSelectionModes(theTypes);
 }
 

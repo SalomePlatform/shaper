@@ -396,7 +396,7 @@ void XGUI_Displayer::erase(boost::shared_ptr<GeomAPI_AISObject> theAIS, const bo
   }
 }
 
-void XGUI_Displayer::activateObjectsOutOfContext()
+void XGUI_Displayer::activateObjectsOutOfContext(const QIntList& theModes)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   // Open local context if there is no one
@@ -409,6 +409,13 @@ void XGUI_Displayer::activateObjectsOutOfContext()
   for (aIt = myResult2AISObjectMap.begin(); aIt != myResult2AISObjectMap.end(); aIt++) {
     anAISIO = (*aIt).second->impl<Handle(AIS_InteractiveObject)>();
     aContext->Load(anAISIO, -1, true);
+    if (theModes.size() == 0)
+      aContext->Activate(anAISIO);
+    else {
+      foreach(int aMode, theModes) {
+        aContext->Activate(anAISIO, aMode);
+      }
+    }
   }
 }
 
