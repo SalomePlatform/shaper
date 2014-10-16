@@ -416,6 +416,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_Objec
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
+  QIntList aModes;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
     if (!aObj->data() || !aObj->data()->isValid() || aObj->document()->isConcealed(aObj))
@@ -427,7 +428,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_Objec
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
           if (!aOperation->hasObject(aObj))
             if (!myDisplayer->isActive(aObj))
-              myDisplayer->activate(aObj);
+              myDisplayer->activate(aObj, aModes);
         }
       } else {
         if (myOperationMgr->hasOperation()) {

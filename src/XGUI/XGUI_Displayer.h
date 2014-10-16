@@ -72,6 +72,10 @@ class XGUI_EXPORT XGUI_Displayer
    */
   void setSelected(const QList<ObjectPtr>& theFeatures, bool isUpdateViewer = true);
 
+
+  /// Un select all objects
+  void clearSelected();
+
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -94,6 +98,17 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void closeLocalContexts(const bool isUpdateViewer = true);
 
+  /*
+  * Set modes of selections. Selection mode has to be defined by TopAbs_ShapeEnum.
+  * It doesn't manages a local context
+  * \param theModes - list of selection modes. If the list is empty then all selectoin modes will be cleared.
+  */
+  void setSelectionModes(const QIntList& theModes);
+
+  void addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
+
+  void removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
+
   /// Updates the viewer
   void updateViewer();
 
@@ -111,7 +126,7 @@ class XGUI_EXPORT XGUI_Displayer
   void deactivate(ObjectPtr theFeature);
 
   /// Activates the given object (it can be selected)
-  void activate(ObjectPtr theFeature);
+  void activate(ObjectPtr theFeature, const QIntList& theModes);
 
   /// Returns true if the given object can be selected
   bool isActive(ObjectPtr theObject) const;
@@ -119,8 +134,7 @@ class XGUI_EXPORT XGUI_Displayer
   /// Activates in local context displayed outside of the context.
   /// \param theModes - selection modes to activate
   /// \param theFilter - filter for selection
-  void activateObjectsOutOfContext(const std::list<int>& theModes, 
-                                   Handle(SelectMgr_Filter) theFilter);
+  void activateObjectsOutOfContext();
 
   void deactivateObjectsOutOfContext();
 

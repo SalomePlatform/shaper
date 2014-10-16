@@ -46,8 +46,8 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_AISObject.h>
 #include <AIS_Shape.hxx>
+#include <AIS_DimensionSelectionMode.hxx>
 
-#include <StdSelect_FaceFilter.hxx>
 #include <StdSelect_TypeOfFace.hxx>
 
 #include <QObject>
@@ -143,20 +143,32 @@ void PartSet_Module::onFeatureTriggered()
 
 void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
 {
+  XGUI_Workshop* aXWshp = xWorkshop();
+  XGUI_Displayer* aDisplayer = aXWshp->displayer();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
   if (aPreviewOp) {
-    XGUI_Workshop* aXWshp = xWorkshop();
     XGUI_PropertyPanel* aPropPanel = aXWshp->propertyPanel();
     connect(aPropPanel, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)), this,
             SLOT(onStorePoint2D(ObjectPtr, const std::string&)), Qt::UniqueConnection);
 
-    XGUI_Displayer* aDisplayer = aXWshp->displayer();
-    aDisplayer->openLocalContext();
-    aDisplayer->deactivateObjectsOutOfContext();
+    //aDisplayer->deactivateObjectsOutOfContext();
+    PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
+    if (aSketchOp) {
+      if (aSketchOp->isEditOperation()) {
+        aDisplayer->openLocalContext();
+        //setSketchingMode();
+      } else {
+        aDisplayer->openLocalContext();
+        aDisplayer->activateObjectsOutOfContext();
+        myPlaneFilter = new StdSelect_FaceFilter(StdSelect_Plane);
+        aDisplayer->addSelectionFilter(myPlaneFilter);
+        QIntList aModes = sketchSelectionModes(aPreviewOp->feature());
+        aDisplayer->setSelectionModes(aModes);
+      } 
+    }
   } else {
-    Handle(AIS_InteractiveContext) aAIS = xWorkshop()->viewer()->AISContext();
     //TODO (VSV): We have to open Local context because at neutral point filters don't work (bug 25340)
-    aAIS->AddFilter(myDocumentShapeFilter);
+    aDisplayer->addSelectionFilter(myDocumentShapeFilter);
   }
 }
 
@@ -165,22 +177,44 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
   if (!theOperation)
     return;
   XGUI_Workshop* aXWshp = xWorkshop();
+  XGUI_Displayer* aDisplayer = aXWshp->displayer();
   PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(theOperation);
   if (aPreviewOp) {
     XGUI_PropertyPanel* aPropPanel = aXWshp->propertyPanel();
+
+    PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
+    if (aSketchOp) {
+      aDisplayer->closeLocalContexts();
+    } else {
+      PartSet_OperationFeatureCreate* aCreationOp = 
+        dynamic_cast<PartSet_OperationFeatureCreate*>(aPreviewOp);
+      if (aCreationOp) {
+        // Activate just created object for selection
+        FeaturePtr aFeature = aCreationOp->feature();
+        QIntList aModes = sketchSelectionModes(aFeature);
+        const std::list<ResultPtr>& aResults = aFeature->results();
+        std::list<ResultPtr>::const_iterator anIt, aLast = aResults.end();
+        for (anIt = aResults.begin(); anIt != aLast; anIt++) {
+          aDisplayer->activate(*anIt, aModes);
+        }
+        aDisplayer->activate(aFeature, aModes);
+      }
+    }
   } else {
     // Activate results of current feature for selection
-    FeaturePtr aFeature = theOperation->feature();
-    XGUI_Displayer* aDisplayer = aXWshp->displayer();
-    std::list<ResultPtr> aResults = aFeature->results();
-    std::list<ResultPtr>::const_iterator aIt;
-    for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-      aDisplayer->activate(*aIt);
-    }
+    //FeaturePtr aFeature = theOperation->feature();
+    //XGUI_Displayer* aDisplayer = aXWshp->displayer();
+    //std::list<ResultPtr> aResults = aFeature->results();
+    //std::list<ResultPtr>::const_iterator aIt;
+    //for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+    //  aDisplayer->activate(*aIt);
+    //}
 
-    Handle(AIS_InteractiveContext) aAIS = xWorkshop()->viewer()->AISContext();
-    aAIS->RemoveFilter(myDocumentShapeFilter);
+    // The document limitation selection has to be only during operation
+    aDisplayer->removeSelectionFilter(myDocumentShapeFilter);
   }
+  // Clear selection done during operation
+  aDisplayer->clearSelected();
 }
 
 void PartSet_Module::onContextMenuCommand(const QString& theId, bool isChecked)
@@ -258,11 +292,9 @@ void PartSet_Module::onMouseDoubleClick(QMouseEvent* theEvent)
 
 void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
 {
-  //erasePlanes();
   myWorkshop->viewer()->setViewProjection(theX, theY, theZ);
- xWorkshop()->actionsMgr()->update();
-
-  //PartSet_TestOCC::testSelection(myWorkshop);
+  xWorkshop()->actionsMgr()->update();
+  setSketchingMode();
 }
 
 void PartSet_Module::onFitAllView()
@@ -290,16 +322,16 @@ void PartSet_Module::onRestartOperation(std::string theName, ObjectPtr theObject
     std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
     std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
     aSketchOp->initSelection(aSelected, aHighlighted);
-  } else if (aFeature) {
-    anOperation->setFeature(aFeature);
-    //Deactivate result of current feature in order to avoid its selection
-    XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
-    std::list<ResultPtr> aResults = aFeature->results();
-    std::list<ResultPtr>::const_iterator aIt;
-    for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-      aDisplayer->deactivate(*aIt);
-    }
-  }
+  } //else if (aFeature) {
+    //anOperation->setFeature(aFeature);
+    ////Deactivate result of current feature in order to avoid its selection
+    //XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
+    //std::list<ResultPtr> aResults = aFeature->results();
+    //std::list<ResultPtr>::const_iterator aIt;
+    //for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+    //  aDisplayer->deactivate(*aIt);
+    //}
+  //}
   sendOperation(anOperation);
   xWorkshop()->actionsMgr()->updateCheckState();
 }
@@ -313,12 +345,11 @@ void PartSet_Module::onMultiSelectionEnabled(bool theEnabled)
 void PartSet_Module::onStopSelection(const QList<ObjectPtr>& theFeatures, const bool isStop)
 {
   XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
-  if (!isStop) {
-    foreach(ObjectPtr aObject, theFeatures)
-    {
-      activateFeature(aObject, false);
-    }
-  }
+  //if (!isStop) {
+  //  foreach(ObjectPtr aObject, theFeatures) {
+  //    activateFeature(aObject);
+  //  }
+  //}
   aDisplayer->stopSelection(theFeatures, isStop, false);
 
   ModuleBase_IViewer* aViewer = myWorkshop->viewer();
@@ -334,11 +365,17 @@ void PartSet_Module::onSetSelection(const QList<ObjectPtr>& theFeatures)
   aDisplayer->updateViewer();
 }
 
-void PartSet_Module::onCloseLocalContext()
+void PartSet_Module::setSketchingMode()
 {
   XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
-  aDisplayer->deactivateObjectsOutOfContext();
-  aDisplayer->closeLocalContexts();
+  if (!myPlaneFilter.IsNull()) {
+    aDisplayer->removeSelectionFilter(myPlaneFilter);
+    myPlaneFilter.Nullify();
+  }
+  QIntList aModes;
+  //aModes << TopAbs_VERTEX << TopAbs_EDGE;
+  //aModes << AIS_DSM_Text << AIS_DSM_Line;
+  aDisplayer->setSelectionModes(aModes);
 }
 
 void PartSet_Module::onFeatureConstructed(ObjectPtr theFeature, int theMode)
@@ -349,21 +386,19 @@ void PartSet_Module::onFeatureConstructed(ObjectPtr theFeature, int theMode)
   if (aPrevOp) {
     std::list<FeaturePtr> aList = aPrevOp->subFeatures();
     XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
-    std::list<int> aModes = aPrevOp->getSelectionModes(aPrevOp->feature());
+    QIntList aModes = sketchSelectionModes(aPrevOp->feature());
     std::list<FeaturePtr>::iterator aSFIt;
     for (aSFIt = aList.begin(); aSFIt != aList.end(); ++aSFIt) {
       std::list<ResultPtr> aResults = (*aSFIt)->results();
       std::list<ResultPtr>::iterator aIt;
       for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-        if (isDisplay)
-          activateInLocalContext((*aIt), aModes, false);
-        else
+        if (!isDisplay)
           aDisplayer->erase((*aIt), false);
       }
       if (!isDisplay)
         aDisplayer->erase((*aSFIt), false);
     }
-    aDisplayer->deactivateObjectsOutOfContext();
+    //aDisplayer->deactivateObjectsOutOfContext();
   }
   if (isDisplay)
     ModelAPI_EventCreator::get()->sendUpdated(
@@ -424,8 +459,6 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
     connect(aPreviewOp, SIGNAL(setSelection(const QList<ObjectPtr>&)), this,
             SLOT(onSetSelection(const QList<ObjectPtr>&)));
 
-    connect(aPreviewOp, SIGNAL(closeLocalContext()), this, SLOT(onCloseLocalContext()));
-
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {
       connect(aSketchOp, SIGNAL(planeSelected(double, double, double)), this,
@@ -437,34 +470,6 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
   return anOperation;
 }
 
-//void PartSet_Module::sendOperation(ModuleBase_Operation* theOperation)
-//{
-//  static Events_ID aModuleEvent = Events_Loop::eventByName(EVENT_OPERATION_LAUNCHED);
-//  boost::shared_ptr<Config_PointerMessage> aMessage =
-//      boost::shared_ptr<Config_PointerMessage>(new Config_PointerMessage(aModuleEvent, this));
-//  aMessage->setPointer(theOperation);
-//  Events_Loop::loop()->send(aMessage);
-//}
-
-void PartSet_Module::activateFeature(ObjectPtr theFeature, const bool isUpdateViewer)
-{
-  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  PartSet_OperationSketchBase* aPreviewOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
-  if (aPreviewOp) {
-    XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
-    std::list<int> aModes = aPreviewOp->getSelectionModes(theFeature);
-    activateInLocalContext(theFeature, aModes, isUpdateViewer);
-
-    // If this is a Sketcher then activate objects (planar faces) outside of context
-    PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
-    if (aSketchOp) {
-      Handle(StdSelect_FaceFilter) aFilter = new StdSelect_FaceFilter(StdSelect_Plane);
-      aDisplayer->activateObjectsOutOfContext(aModes, aFilter);
-    } else {
-      aDisplayer->deactivateObjectsOutOfContext();
-    }
-  }
-}
 
 void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
 {
@@ -488,7 +493,6 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
     aDisplayer->erase(*aIt, false);
 
   std::list<FeaturePtr> aList = aPreviewOp->subFeatures();
-  std::list<int> aModes = aPreviewOp->getSelectionModes(aPreviewOp->feature());
 
   std::list<FeaturePtr>::const_iterator anIt = aList.begin(), aLast = aList.end();
   for (; anIt != aLast; anIt++) {
@@ -500,10 +504,10 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
     std::list<ResultPtr>::const_iterator aRIt;
     for (aRIt = aResults.cbegin(); aRIt != aResults.cend(); ++aRIt) {
       aDisplayer->display((*aRIt), false);
-      activateInLocalContext((*aRIt), aModes, false);
+      aDisplayer->activate((*aRIt), sketchSelectionModes((*aRIt)));
     }
     aDisplayer->display(aSPFeature, false);
-    activateInLocalContext(aSPFeature, aModes, false);
+    aDisplayer->activate(aSPFeature, sketchSelectionModes(aSPFeature));
   }
   aDisplayer->updateViewer();
 }
@@ -567,36 +571,21 @@ XGUI_Workshop* PartSet_Module::xWorkshop() const
 }
 
 
-void PartSet_Module::activateInLocalContext(ObjectPtr theResult, const std::list<int>& theModes,
-                                            const bool isUpdateViewer)
+QIntList PartSet_Module::sketchSelectionModes(ObjectPtr theFeature)
 {
-  XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
-  Handle(AIS_InteractiveContext) aContext = xWorkshop()->viewer()->AISContext();
-  if (aContext.IsNull())
-    return;
-  // Open local context if there is no one
-  if (!aContext->HasOpenedContext()) {
-    aContext->ClearCurrents(false);
-    //aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
-    aContext->OpenLocalContext();
-    aContext->NotUseDisplayedObjects();
-  }
-  // display or redisplay presentation
-  boost::shared_ptr<GeomAPI_AISObject> anAIS = aDisplayer->getAISObject(theResult);
-  // Activate selection of objects from prs
-  if (anAIS) {
-    Handle(AIS_InteractiveObject) aAISObj = anAIS->impl<Handle(AIS_InteractiveObject)>();
-    aContext->ClearSelected(false);  // ToCheck
-    //aContext->upClearSelected(false); // ToCheck
-    aContext->Load(aAISObj, -1, true/*allow decomposition*/);
-    aContext->Deactivate(aAISObj);
-
-    std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
-    for (; anIt != aLast; anIt++) {
-      aContext->Activate(aAISObj, (*anIt));
+  QIntList aModes;
+  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
+  if (aFeature) {
+    if (aFeature->getKind() == SketchPlugin_Sketch::ID()) {
+      aModes.append(TopAbs_FACE);
+      return aModes;
+    } else if (PartSet_Tools::isConstraintFeature(aFeature->getKind())) {
+      aModes.append(AIS_DSM_Text);
+      aModes.append(AIS_DSM_Line);
+      return aModes;
     }
-  }
-
-  if (isUpdateViewer)
-    aDisplayer->updateViewer();
+  } 
+  aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
+  aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
+  return aModes;
 }

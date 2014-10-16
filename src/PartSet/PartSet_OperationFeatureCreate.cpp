@@ -77,14 +77,6 @@ bool PartSet_OperationFeatureCreate::canBeCommitted() const
   return false;
 }
 
-std::list<int> PartSet_OperationFeatureCreate::getSelectionModes(ObjectPtr theFeature) const
-{
-  std::list<int> aModes;
-  if (theFeature != feature())
-    aModes = PartSet_OperationSketchBase::getSelectionModes(theFeature);
-  return aModes;
-}
-
 void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
 {
     double aX, anY;

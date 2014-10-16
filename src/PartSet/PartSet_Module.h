@@ -8,6 +8,7 @@
 #include <XGUI_Command.h>
 #include <XGUI_ViewerFilters.h>
 #include <ModelAPI_Feature.h>
+#include <StdSelect_FaceFilter.hxx>
 
 #include <QMap>
 #include <QObject>
@@ -45,11 +46,6 @@ Q_OBJECT
   /// \param theCmdId the operation name
   //virtual void launchOperation(const QString& theCmdId);
 
-  /// Activates the feature in the displayer
-  /// \param theFeature the feature instance to be displayed
-  /// \param isUpdateViewer the flag whether the viewer should be updated
-  void activateFeature(ObjectPtr theFeature, const bool isUpdateViewer);
-
   /// Updates current operation preview, if it has it.
   /// \param theCmdId the operation name
   void updateCurrentPreview(const std::string& theCmdId);
@@ -61,13 +57,9 @@ Q_OBJECT
 
   XGUI_Workshop* xWorkshop() const;
 
-  /// Display the shape and activate selection of sub-shapes
-  /// \param theFeature a feature instance
-  /// \param theShape a shape
-  /// \param theMode a list of local selection modes
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void activateInLocalContext(ObjectPtr theFeature, const std::list<int>& theModes,
-                              const bool isUpdateViewer = true);
+
+  /// Returns list of selection modes for the given object for sketch operation
+  static QIntList sketchSelectionModes(ObjectPtr theFeature);
 
  public slots:
   void onFeatureTriggered();
@@ -123,8 +115,8 @@ Q_OBJECT
   /// \param theFeatures a list of features to be selected
   void onSetSelection(const QList<ObjectPtr>& theFeatures);
 
-  /// SLOT, to close the viewer local context
-  void onCloseLocalContext();
+  /// SLOT, Defines Sketch editing mode
+  void setSketchingMode();
 
   /// SLOT, to visualize the feature in another local context mode
   /// \param theFeature the feature to be put in another local context mode
@@ -156,6 +148,7 @@ Q_OBJECT
 
   /// A filter which provides selection within a current document or whole PartSet
   Handle(XGUI_ShapeDocumentFilter) myDocumentShapeFilter;
+  Handle(StdSelect_FaceFilter) myPlaneFilter;
 };
 
 #endif

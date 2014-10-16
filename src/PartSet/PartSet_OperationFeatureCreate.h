@@ -38,11 +38,6 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_OperationFeatureCreate();
 
-  /// Returns the operation local selection mode
-  /// \param theFeature the feature object to get the selection mode
-  /// \return the selection mode
-  virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
-
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event

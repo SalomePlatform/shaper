@@ -8,6 +8,7 @@
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_Selection.h"
 #include "XGUI_OperationMgr.h"
+#include "XGUI_Displayer.h"
 
 XGUI_ModuleConnector::XGUI_ModuleConnector(XGUI_Workshop* theWorkshop)
     : ModuleBase_IWorkshop(theWorkshop),
@@ -51,16 +52,14 @@ ModuleBase_Operation* XGUI_ModuleConnector::currentOperation() const
 
 void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
 {
-  Handle(AIS_InteractiveContext) aAIS = myWorkshop->viewer()->AISContext();
-  if (!aAIS->HasOpenedContext())
-    aAIS->OpenLocalContext();
-  foreach(int aType, theTypes) {
-    aAIS->ActivateStandardMode((TopAbs_ShapeEnum)aType);
-  }
+  XGUI_Displayer* aDisp = myWorkshop->displayer();
+  aDisp->openLocalContext();
+  aDisp->activateObjectsOutOfContext();
+  aDisp->setSelectionModes(theTypes);
 }
 
 void XGUI_ModuleConnector::deactivateSubShapesSelection()
 {
-  Handle(AIS_InteractiveContext) aAIS = myWorkshop->viewer()->AISContext();
-  aAIS->CloseAllContexts();
+  XGUI_Displayer* aDisp = myWorkshop->displayer();
+  aDisp->closeLocalContexts(false);
 }

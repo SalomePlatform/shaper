@@ -48,17 +48,6 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 {
 }
 
-std::list<int> PartSet_OperationSketch::getSelectionModes(ObjectPtr theFeature) const
-{
-  std::list<int> aModes;
-  if (!hasSketchPlane())
-    aModes.push_back(TopAbs_FACE);
-  else
-    aModes = PartSet_OperationSketchBase::getSelectionModes(theFeature);
-
-  return aModes;
-}
-
 FeaturePtr PartSet_OperationSketch::sketch() const
 {
   return feature();
@@ -154,7 +143,6 @@ void PartSet_OperationSketch::stopOperation()
 {
   PartSet_OperationSketchBase::stopOperation();
   emit featureConstructed(feature(), FM_Hide);
-  emit closeLocalContext();
 }
 
 void PartSet_OperationSketch::afterCommitOperation()
@@ -243,7 +231,6 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
   flushUpdated();
 
   emit featureConstructed(feature(), FM_Hide);
-  emit closeLocalContext();
   emit planeSelected(aDir->x(), aDir->y(), aDir->z());
 }
 

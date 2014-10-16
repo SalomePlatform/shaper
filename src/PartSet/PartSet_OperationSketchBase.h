@@ -60,11 +60,6 @@ Q_OBJECT
   /// \return the list of subfeatures
   virtual std::list<FeaturePtr> subFeatures() const;
 
-  /// Returns the operation local selection mode
-  /// \param theFeature the feature object to get the selection mode
-  /// \return the selection mode
-  virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
-
   /// Returns the operation sketch feature
   /// \returns the sketch instance
   virtual FeaturePtr sketch() const = 0;
@@ -138,9 +133,6 @@ signals:
   /// signal to set selection in the viewer
   /// \param theFeatures a list of features to be disabled
   void setSelection(const QList<ObjectPtr>& theFeatures);
-
-  /// signal to close the operation local context if it is opened
-  void closeLocalContext();
 
  protected:
   /// Creates an operation new feature

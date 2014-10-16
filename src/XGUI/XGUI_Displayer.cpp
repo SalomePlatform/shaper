@@ -21,6 +21,8 @@
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 #include <AIS_DimensionSelectionMode.hxx>
 #include <AIS_Shape.hxx>
+#include <AIS_Dimension.hxx>
+#include <TColStd_ListIteratorOfListOfInteger.hxx>
 
 #include <set>
 
@@ -153,7 +155,7 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject)
   }
 }
 
-void XGUI_Displayer::activate(ObjectPtr theObject)
+void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
 {
   if (isVisible(theObject)) {
     Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -162,7 +164,15 @@ void XGUI_Displayer::activate(ObjectPtr theObject)
 
     boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[theObject];
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-    aContext->Activate(anAIS);
+    if (aContext->HasOpenedContext()) {
+      aContext->Load(anAIS, -1, true);
+    }
+    if (theModes.size() > 0) {
+      foreach(int aMode, theModes) {
+        aContext->Activate(anAIS, aMode);
+      }
+    } else 
+      aContext->Activate(anAIS);
   }
 }
 
@@ -242,6 +252,14 @@ void XGUI_Displayer::setSelected(const QList<ObjectPtr>& theResults, const bool 
   }
   if (isUpdateViewer)
     updateViewer();
+}
+
+
+void XGUI_Displayer::clearSelected()
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext)
+    aContext->ClearSelected();
 }
 
 void XGUI_Displayer::eraseAll(const bool isUpdateViewer)
@@ -378,8 +396,7 @@ void XGUI_Displayer::erase(boost::shared_ptr<GeomAPI_AISObject> theAIS, const bo
   }
 }
 
-void XGUI_Displayer::activateObjectsOutOfContext(const std::list<int>& theModes, 
-                                                 Handle(SelectMgr_Filter) theFilter)
+void XGUI_Displayer::activateObjectsOutOfContext()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   // Open local context if there is no one
@@ -387,13 +404,12 @@ void XGUI_Displayer::activateObjectsOutOfContext(const std::list<int>& theModes,
     return;
 
   aContext->UseDisplayedObjects();
-  std::list<int>::const_iterator anIt = theModes.begin(), aLast = theModes.end();
-  for (; anIt != aLast; anIt++) {
-    aContext->ActivateStandardMode((TopAbs_ShapeEnum)(*anIt));
+  ResultToAISMap::iterator aIt;
+  Handle(AIS_InteractiveObject) anAISIO;
+  for (aIt = myResult2AISObjectMap.begin(); aIt != myResult2AISObjectMap.end(); aIt++) {
+    anAISIO = (*aIt).second->impl<Handle(AIS_InteractiveObject)>();
+    aContext->Load(anAISIO, -1, true);
   }
-
-  if (!theFilter.IsNull())
-    aContext->AddFilter(theFilter);
 }
 
 
@@ -404,7 +420,6 @@ void XGUI_Displayer::deactivateObjectsOutOfContext()
   if (!aContext->HasOpenedContext()) 
     return;
 
-  aContext->RemoveFilters();
   aContext->NotUseDisplayedObjects();
 }
 
@@ -426,6 +441,27 @@ void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bo
   aContext->SetDisplayMode(aAISIO, theMode, toUpdate);
 }
 
+void XGUI_Displayer::setSelectionModes(const QIntList& theModes)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
+  if (!aContext->HasOpenedContext())
+    return;
+  // Clear previous mode
+  const TColStd_ListOfInteger& aModes = aContext->ActivatedStandardModes();
+  if (!aModes.IsEmpty()) {
+    TColStd_ListOfInteger aMModes;
+    aMModes.Assign(aModes);
+    TColStd_ListIteratorOfListOfInteger it(aMModes);
+    for(; it.More(); it.Next()) {
+      aContext->DeactivateStandardMode((TopAbs_ShapeEnum)it.Value());
+    }
+  }
+  foreach(int aMode, theModes) {
+    aContext->ActivateStandardMode((TopAbs_ShapeEnum)aMode);
+  }
+}
 
 XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) const
 {
@@ -441,3 +477,18 @@ XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) con
   return (XGUI_Displayer::DisplayMode) aAISIO->DisplayMode();
 }
 
+void XGUI_Displayer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
+  aContext->AddFilter(theFilter);
+}
+
+void XGUI_Displayer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
+  aContext->RemoveFilter(theFilter);
+}
