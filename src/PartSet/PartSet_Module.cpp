@@ -94,8 +94,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
           SLOT(onKeyRelease(QKeyEvent*)));
   connect(myWorkshop->viewer(), SIGNAL(mouseDoubleClick(QMouseEvent*)), this,
           SLOT(onMouseDoubleClick(QMouseEvent*)));
-
-  myDocumentShapeFilter = new XGUI_ShapeDocumentFilter(aXWshop->displayer());
 }
 
 PartSet_Module::~PartSet_Module()
@@ -165,9 +163,6 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
         aDisplayer->setSelectionModes(aModes);
       } 
     }
-  } else {
-    //TODO (VSV): We have to open Local context because at neutral point filters don't work (bug 25340)
-    aDisplayer->addSelectionFilter(myDocumentShapeFilter);
   }
 }
 
@@ -209,8 +204,8 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
     //  aDisplayer->activate(*aIt);
     //}
 
-    // The document limitation selection has to be only during operation
-    aDisplayer->removeSelectionFilter(myDocumentShapeFilter);
+    
+    
   }
   // Clear selection done during operation
   aDisplayer->clearSelected();

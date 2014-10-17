@@ -56,7 +56,7 @@ class XGUI_EXPORT XGUI_Displayer
   void display(ObjectPtr theObject, bool isUpdateViewer = true);
 
   /// Display the given AIS object. To hide this object use corresponde erase method
-  void display(boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdate = true);
+  void display(AISObjectPtr theAIS, bool isUpdate = true);
 
   /// Stop the current selection and color the given features to the selection color
   /// \param theFeatures a list of features to be disabled
@@ -82,7 +82,7 @@ class XGUI_EXPORT XGUI_Displayer
   void erase(ObjectPtr theObject, const bool isUpdateViewer = true);
 
   /// Erase the given AIS object displayed by corresponded display method
-  void erase(boost::shared_ptr<GeomAPI_AISObject> theAIS, const bool isUpdate = true);
+  void erase(AISObjectPtr theAIS, const bool isUpdate = true);
 
   /// Erase all presentations
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -116,12 +116,13 @@ class XGUI_EXPORT XGUI_Displayer
   /// Searches the interactive object by feature
   /// \param theFeature the feature or NULL if it not visualized
   /// \return theIO an interactive object
-  boost::shared_ptr<GeomAPI_AISObject> getAISObject(ObjectPtr theFeature) const;
+  AISObjectPtr getAISObject(ObjectPtr theFeature) const;
 
   /// Searches the feature by interactive object
   /// \param theIO an interactive object
   /// \return feature the feature or NULL if it not visualized
-  ObjectPtr getObject(Handle(AIS_InteractiveObject) theIO) const;
+  ObjectPtr getObject(const AISObjectPtr& theIO) const;
+  ObjectPtr getObject(const Handle(AIS_InteractiveObject)& theIO) const;
 
   /// Deactivates the given object (not allow selection)
   void deactivate(ObjectPtr theFeature);
@@ -163,7 +164,7 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param theAIS AIS presentation
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// Returns true if the Feature succesfully displayed
-  void display(ObjectPtr theObject, boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isShading,
+  void display(ObjectPtr theObject, AISObjectPtr theAIS, bool isShading,
                bool isUpdateViewer = true);
 
   /// Display the shape and activate selection of sub-shapes
@@ -172,7 +173,7 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the presentation is created
   //bool redisplay(ObjectPtr theObject,
-  //               boost::shared_ptr<GeomAPI_AISObject> theAIS, 
+  //               AISObjectPtr theAIS, 
   //               const bool isUpdateViewer = true);
 
   /** Redisplay the shape if it was displayed
@@ -184,7 +185,7 @@ class XGUI_EXPORT XGUI_Displayer
  protected:
   XGUI_Workshop* myWorkshop;
 
-  typedef std::map<ObjectPtr, boost::shared_ptr<GeomAPI_AISObject> > ResultToAISMap;
+  typedef std::map<ObjectPtr, AISObjectPtr> ResultToAISMap;
   ResultToAISMap myResult2AISObjectMap;
 };
 

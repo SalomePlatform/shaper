@@ -47,18 +47,18 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
   if (isVisible(theObject)) {
     redisplay(theObject, isUpdateViewer);
   } else {
-    boost::shared_ptr<GeomAPI_AISObject> anAIS;
+    AISObjectPtr anAIS;
 
     GeomPresentablePtr aPrs = boost::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
     bool isShading = false;
     if (aPrs) {
-      anAIS = aPrs->getAISObject(boost::shared_ptr<GeomAPI_AISObject>());
+      anAIS = aPrs->getAISObject(AISObjectPtr());
     } else {
       ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
       if (aResult) {
         boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
         if (aShapePtr) {
-          anAIS = boost::shared_ptr<GeomAPI_AISObject>(new GeomAPI_AISObject());
+          anAIS = AISObjectPtr(new GeomAPI_AISObject());
           anAIS->createShape(aShapePtr);
           isShading = true;
         }
@@ -69,7 +69,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
   }
 }
 
-void XGUI_Displayer::display(ObjectPtr theObject, boost::shared_ptr<GeomAPI_AISObject> theAIS, 
+void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS, 
                              bool isShading, bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -92,7 +92,7 @@ void XGUI_Displayer::erase(ObjectPtr theObject, const bool isUpdateViewer)
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
     return;
-  boost::shared_ptr<GeomAPI_AISObject> anObject = myResult2AISObjectMap[theObject];
+  AISObjectPtr anObject = myResult2AISObjectMap[theObject];
   if (anObject) {
     Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
     if (!anAIS.IsNull()) {
@@ -108,10 +108,10 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
     return;
 
   Handle(AIS_InteractiveObject) aAISIO;
-  boost::shared_ptr<GeomAPI_AISObject> aAISObj = getAISObject(theObject);
+  AISObjectPtr aAISObj = getAISObject(theObject);
   GeomPresentablePtr aPrs = boost::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
   if (aPrs) {
-    boost::shared_ptr<GeomAPI_AISObject> aAIS_Obj = aPrs->getAISObject(aAISObj);
+    AISObjectPtr aAIS_Obj = aPrs->getAISObject(aAISObj);
     if (aAISObj && !aAIS_Obj) {
       erase(theObject, isUpdateViewer);
       return;
@@ -149,7 +149,7 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject)
     if (aContext.IsNull())
       return;
 
-    boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[theObject];
+    AISObjectPtr anObj = myResult2AISObjectMap[theObject];
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
     aContext->Deactivate(anAIS);
   }
@@ -162,7 +162,7 @@ void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
     if (aContext.IsNull())
       return;
 
-    boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[theObject];
+    AISObjectPtr anObj = myResult2AISObjectMap[theObject];
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
     if (aContext->HasOpenedContext()) {
       aContext->Load(anAIS, -1, true);
@@ -184,7 +184,7 @@ bool XGUI_Displayer::isActive(ObjectPtr theObject) const
   if (!isVisible(theObject))
     return false;
     
-  boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap.at(theObject);
+  AISObjectPtr anObj = myResult2AISObjectMap.at(theObject);
   Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
 
   TColStd_ListOfInteger aModes;
@@ -243,7 +243,7 @@ void XGUI_Displayer::setSelected(const QList<ObjectPtr>& theResults, const bool 
     if (myResult2AISObjectMap.find(aResult) == myResult2AISObjectMap.end())
       continue;
 
-    boost::shared_ptr<GeomAPI_AISObject> anObj = myResult2AISObjectMap[aResult];
+    AISObjectPtr anObj = myResult2AISObjectMap[aResult];
     if (anObj) {
       Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anAIS.IsNull())
@@ -271,7 +271,7 @@ void XGUI_Displayer::eraseAll(const bool isUpdateViewer)
    ResultToAISMap::iterator aIt;
    for (aIt = myResult2AISObjectMap.begin(); aIt != myResult2AISObjectMap.end(); aIt++) {
      // erase an object
-     boost::shared_ptr<GeomAPI_AISObject> aAISObj = (*aIt).second;
+     AISObjectPtr aAISObj = (*aIt).second;
      Handle(AIS_InteractiveObject) anIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
      if (!anIO.IsNull())
       ic->Remove(anIO, false);
@@ -293,7 +293,7 @@ void XGUI_Displayer::eraseDeletedResults(const bool isUpdateViewer)
   for (; aFIt != aFLast; aFIt++) {
     ObjectPtr aFeature = (*aFIt).first;
     if (!aFeature || !aFeature->data() || !aFeature->data()->isValid()) {
-      boost::shared_ptr<GeomAPI_AISObject> anObj = (*aFIt).second;
+      AISObjectPtr anObj = (*aFIt).second;
       if (!anObj)
         continue;
       Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
@@ -332,21 +332,27 @@ void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
   closeAllContexts(true);
 }
 
-boost::shared_ptr<GeomAPI_AISObject> XGUI_Displayer::getAISObject(ObjectPtr theObject) const
+AISObjectPtr XGUI_Displayer::getAISObject(ObjectPtr theObject) const
 {
-  boost::shared_ptr<GeomAPI_AISObject> anIO;
+  AISObjectPtr anIO;
   if (myResult2AISObjectMap.find(theObject) != myResult2AISObjectMap.end())
     anIO = (myResult2AISObjectMap.find(theObject))->second;
   return anIO;
 }
 
-ObjectPtr XGUI_Displayer::getObject(Handle(AIS_InteractiveObject) theIO) const
+ObjectPtr XGUI_Displayer::getObject(const AISObjectPtr& theIO) const
+{
+  Handle(AIS_InteractiveObject) aRefAIS = theIO->impl<Handle(AIS_InteractiveObject)>();
+  return getObject(aRefAIS);
+}
+
+ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) const
 {
   ObjectPtr aFeature;
   ResultToAISMap::const_iterator aFIt = myResult2AISObjectMap.begin(), aFLast =
       myResult2AISObjectMap.end();
   for (; aFIt != aFLast && !aFeature; aFIt++) {
-    boost::shared_ptr<GeomAPI_AISObject> anObj = (*aFIt).second;
+    AISObjectPtr anObj = (*aFIt).second;
     if (!anObj)
       continue;
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
@@ -379,7 +385,7 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
   return myWorkshop->viewer()->AISContext();
 }
 
-void XGUI_Displayer::display(boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdate)
+void XGUI_Displayer::display(AISObjectPtr theAIS, bool isUpdate)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
@@ -387,7 +393,7 @@ void XGUI_Displayer::display(boost::shared_ptr<GeomAPI_AISObject> theAIS, bool i
     aContext->Display(anAISIO, isUpdate);
 }
 
-void XGUI_Displayer::erase(boost::shared_ptr<GeomAPI_AISObject> theAIS, const bool isUpdate)
+void XGUI_Displayer::erase(AISObjectPtr theAIS, const bool isUpdate)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
@@ -440,7 +446,7 @@ void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bo
   if (aContext.IsNull())
     return;
 
-  boost::shared_ptr<GeomAPI_AISObject> aAISObj = getAISObject(theObject);
+  AISObjectPtr aAISObj = getAISObject(theObject);
   if (!aAISObj)
     return;
 
@@ -476,7 +482,7 @@ XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) con
   if (aContext.IsNull())
     return NoMode;
 
-  boost::shared_ptr<GeomAPI_AISObject> aAISObj = getAISObject(theObject);
+  AISObjectPtr aAISObj = getAISObject(theObject);
   if (!aAISObj)
     return NoMode;
 

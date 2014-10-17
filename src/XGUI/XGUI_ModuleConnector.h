@@ -8,6 +8,7 @@
 #include "XGUI.h"
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_ViewerFilters.h>
 
 class Handle_AIS_InteractiveContext;
 class XGUI_Workshop;
@@ -43,10 +44,19 @@ Q_OBJECT
   //! Returns currently active operation
   virtual ModuleBase_Operation* currentOperation() const;
 
+  //! Returns AIS opbject by data object
+  virtual AISObjectPtr findPresentation(const ObjectPtr& theObject) const;
+
+  //! Returns data object by AIS
+  virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
+
   XGUI_Workshop* workshop() const { return myWorkshop; }
 
- private:
+private:
   XGUI_Workshop* myWorkshop;
+
+  /// A filter which provides selection within a current document or whole PartSet
+  Handle(ModuleBase_ShapeDocumentFilter) myDocumentShapeFilter;
 };
 
 #endif

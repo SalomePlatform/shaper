@@ -6,7 +6,6 @@
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
 #include <XGUI_Command.h>
-#include <XGUI_ViewerFilters.h>
 #include <ModelAPI_Feature.h>
 #include <StdSelect_FaceFilter.hxx>
 
@@ -146,8 +145,6 @@ Q_OBJECT
 
   std::map<std::string, std::string> myFeaturesInFiles;
 
-  /// A filter which provides selection within a current document or whole PartSet
-  Handle(XGUI_ShapeDocumentFilter) myDocumentShapeFilter;
   Handle(StdSelect_FaceFilter) myPlaneFilter;
 };
 
