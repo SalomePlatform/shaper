@@ -20,6 +20,8 @@
 #include <ModelAPI_Data.h>
 
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point.h>
+#include <GeomDataAPI_Dir.h>
 
 #include <XGUI_MainWindow.h>
 #include <XGUI_Displayer.h>
@@ -35,6 +37,7 @@
 #include <XGUI_Tools.h>
 
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Sketch.h>
 
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
@@ -153,7 +156,7 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
     PartSet_OperationSketch* aSketchOp = dynamic_cast<PartSet_OperationSketch*>(aPreviewOp);
     if (aSketchOp) {
       if (aSketchOp->isEditOperation()) {
-        setSketchingMode();
+        setSketchingMode(getSketchPlane(aSketchOp->feature()));
       } else {
         aDisplayer->openLocalContext();
         aDisplayer->activateObjectsOutOfContext(QIntList());
@@ -288,7 +291,10 @@ void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
 {
   myWorkshop->viewer()->setViewProjection(theX, theY, theZ);
   xWorkshop()->actionsMgr()->update();
-  setSketchingMode();
+  // Set working plane
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  FeaturePtr aSketch = anOperation->feature();
+  setSketchingMode(getSketchPlane(aSketch));
 }
 
 void PartSet_Module::onFitAllView()
@@ -359,7 +365,7 @@ void PartSet_Module::onSetSelection(const QList<ObjectPtr>& theFeatures)
   aDisplayer->updateViewer();
 }
 
-void PartSet_Module::setSketchingMode()
+void PartSet_Module::setSketchingMode(const gp_Pln& thePln)
 {
   XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
   if (!myPlaneFilter.IsNull()) {
@@ -367,13 +373,16 @@ void PartSet_Module::setSketchingMode()
     myPlaneFilter.Nullify();
   }
   QIntList aModes;
-  //aModes << TopAbs_VERTEX << TopAbs_EDGE;
-  //aModes << AIS_DSM_Text << AIS_DSM_Line;
+  // Clear standard selection modes
   aDisplayer->setSelectionModes(aModes);
   aDisplayer->openLocalContext();
   // Get default selection modes
   aModes = sketchSelectionModes(ObjectPtr());
   aDisplayer->activateObjectsOutOfContext(aModes);
+
+  // Set filter
+  mySketchFilter = new ModuleBase_ShapeInPlaneFilter(thePln);
+  aDisplayer->addSelectionFilter(mySketchFilter);
 }
 
 void PartSet_Module::onFeatureConstructed(ObjectPtr theFeature, int theMode)
@@ -587,3 +596,17 @@ QIntList PartSet_Module::sketchSelectionModes(ObjectPtr theFeature)
   aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
   return aModes;
 }
+
+
+gp_Pln PartSet_Module::getSketchPlane(FeaturePtr theSketch) const
+{
+  DataPtr aData = theSketch->data();
+  boost::shared_ptr<GeomDataAPI_Point> anOrigin = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+      aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  boost::shared_ptr<GeomDataAPI_Dir> aNorm = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+  gp_Pnt aOrig(anOrigin->x(), anOrigin->y(), anOrigin->z());
+  gp_Dir aDir(aNorm->x(), aNorm->y(), aNorm->z());
+  return gp_Pln(aOrig, aDir);
+}
+

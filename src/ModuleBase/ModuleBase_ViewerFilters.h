@@ -8,12 +8,18 @@
 
 #include <SelectMgr_Filter.hxx>
 #include <SelectMgr_EntityOwner.hxx>
+#include <gp_Pln.hxx>
 
 
 class ModuleBase_IWorkshop;
 
-DEFINE_STANDARD_HANDLE(ModuleBase_ShapeDocumentFilter, SelectMgr_Filter);
 
+/**
+* A filter which provides filtering of selection in 3d viewer.
+* Installing of this filter lets to select objects which belong to 
+* currently active document or to global document
+*/
+DEFINE_STANDARD_HANDLE(ModuleBase_ShapeDocumentFilter, SelectMgr_Filter);
 class ModuleBase_ShapeDocumentFilter: public SelectMgr_Filter
 {
 public:
@@ -26,6 +32,24 @@ public:
 
 private:
   ModuleBase_IWorkshop* myWorkshop;
+};
+
+/**
+* A filter which provides filtering of selection in 3d viewer.
+* Installing of this filter lets to select of Vertexes and Edges which belongs to the given plane
+*/
+DEFINE_STANDARD_HANDLE(ModuleBase_ShapeInPlaneFilter, SelectMgr_Filter);
+class ModuleBase_ShapeInPlaneFilter: public SelectMgr_Filter
+{
+public:
+  Standard_EXPORT ModuleBase_ShapeInPlaneFilter(const gp_Pln& thePane): 
+      SelectMgr_Filter(), myPlane(thePane) {}
+
+  Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
+
+  DEFINE_STANDARD_RTTI(ModuleBase_ShapeInPlaneFilter)
+private:
+  gp_Pln myPlane;
 };
 
 #endif

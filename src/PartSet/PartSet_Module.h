@@ -5,6 +5,7 @@
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
+#include <ModuleBase_ViewerFilters.h>
 #include <XGUI_Command.h>
 #include <ModelAPI_Feature.h>
 #include <StdSelect_FaceFilter.hxx>
@@ -115,7 +116,8 @@ Q_OBJECT
   void onSetSelection(const QList<ObjectPtr>& theFeatures);
 
   /// SLOT, Defines Sketch editing mode
-  void setSketchingMode();
+  /// \param thePln - plane of current sketch
+  void setSketchingMode(const gp_Pln& thePln);
 
   /// SLOT, to visualize the feature in another local context mode
   /// \param theFeature the feature to be put in another local context mode
@@ -139,6 +141,8 @@ Q_OBJECT
   //! Edits the feature
   void editFeature(FeaturePtr theFeature);
 
+  gp_Pln getSketchPlane(FeaturePtr theSketch) const;
+
  private:
   //XGUI_Workshop* myWorkshop;
   PartSet_Listener* myListener;
@@ -146,6 +150,7 @@ Q_OBJECT
   std::map<std::string, std::string> myFeaturesInFiles;
 
   Handle(StdSelect_FaceFilter) myPlaneFilter;
+  Handle(ModuleBase_ShapeInPlaneFilter) mySketchFilter;
 };
 
 #endif
