@@ -235,17 +235,16 @@ FeaturePtr PartSet_Tools::feature(FeaturePtr theFeature, const std::string& theA
   return aFeature;
 }
 
-void PartSet_Tools::createConstraint(FeaturePtr theSketch,
+void PartSet_Tools::createConstraint(CompositeFeaturePtr theSketch,
                                      boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
                                      boost::shared_ptr<GeomDataAPI_Point2D> thePoint2)
 {
-  boost::shared_ptr<ModelAPI_Document> aDoc = document();
-  FeaturePtr aFeature = aDoc->addFeature(SketchPlugin_ConstraintCoincidence::ID());
-
+  FeaturePtr aFeature;
   if (theSketch) {
-    boost::shared_ptr<SketchPlugin_Feature> aSketch = boost::dynamic_pointer_cast<
-        SketchPlugin_Feature>(theSketch);
-    aSketch->addSub(aFeature);
+    aFeature = theSketch->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+  } else {
+    boost::shared_ptr<ModelAPI_Document> aDoc = document();
+    aFeature = aDoc->addFeature(SketchPlugin_ConstraintCoincidence::ID());
   }
 
   boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
@@ -262,7 +261,7 @@ void PartSet_Tools::createConstraint(FeaturePtr theSketch,
     aFeature->execute();
 }
 
-void PartSet_Tools::setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
+void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr theFeature,
                                    const std::string& theAttribute, double theClickedX,
                                    double theClickedY)
 {
@@ -302,7 +301,7 @@ void PartSet_Tools::setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
   }
 }
 
-boost::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(FeaturePtr theSketch)
+boost::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(CompositeFeaturePtr theSketch)
 {
   boost::shared_ptr<GeomAPI_Pln> aPlane;
   double aA, aB, aC, aD;
@@ -322,7 +321,7 @@ boost::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(FeaturePtr theSketch)
 }
 
 boost::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(boost::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
-                                                      FeaturePtr theSketch)
+                                                      CompositeFeaturePtr theSketch)
 {
   boost::shared_ptr<GeomAPI_Pnt> aPoint;
   if (!theSketch || !thePoint2D)

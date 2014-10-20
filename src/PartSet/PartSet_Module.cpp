@@ -416,7 +416,7 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
     anOperation = new PartSet_OperationSketch(theCmdId.c_str(), this);
   } else {
     ModuleBase_Operation* aCurOperation = myWorkshop->currentOperation();
-    FeaturePtr aSketch;
+    CompositeFeaturePtr aSketch;
     PartSet_OperationSketchBase* aPrevOp = dynamic_cast<PartSet_OperationSketchBase*>(aCurOperation);
     if (aPrevOp) {
       aSketch = aPrevOp->sketch();

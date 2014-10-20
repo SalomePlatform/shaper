@@ -121,10 +121,15 @@ void ModuleBase_Operation::flushCreated()
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
 }
 
-FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
+FeaturePtr ModuleBase_Operation::createFeature(
+  const bool theFlushMessage, CompositeFeaturePtr theCompositeFeature)
 {
-  boost::shared_ptr<ModelAPI_Document> aDoc = document();
-  myFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
+  if (theCompositeFeature) {
+    myFeature = theCompositeFeature->addFeature(getDescription()->operationId().toStdString());
+  } else {
+    boost::shared_ptr<ModelAPI_Document> aDoc = document();
+    myFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
+  }
   if (myFeature) {  // TODO: generate an error if feature was not created
     myIsModified = true;
     // Model update should call "execute" of a feature.

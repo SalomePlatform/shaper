@@ -40,7 +40,7 @@ using namespace std;
 
 PartSet_OperationFeatureEdit::PartSet_OperationFeatureEdit(const QString& theId,
                                                            QObject* theParent,
-                                                           FeaturePtr theFeature)
+                                                           CompositeFeaturePtr theFeature)
     : PartSet_OperationFeatureBase(theId, theParent, theFeature),
       myIsBlockedSelection(false)
 {
@@ -197,7 +197,8 @@ void PartSet_OperationFeatureEdit::blockSelection(bool isBlocked, const bool isR
   }
 }
 
-FeaturePtr PartSet_OperationFeatureEdit::createFeature(const bool /*theFlushMessage*/)
+FeaturePtr PartSet_OperationFeatureEdit::createFeature(const bool theFlushMessage,
+  CompositeFeaturePtr theCompositeFeature)
 {
   // do nothing in order to do not create a new feature
   return FeaturePtr();

@@ -34,7 +34,7 @@ using namespace std;
 
 PartSet_OperationFeatureEditMulti::PartSet_OperationFeatureEditMulti(const QString& theId,
                                                                      QObject* theParent,
-                                                                     FeaturePtr theFeature)
+                                                                     CompositeFeaturePtr theFeature)
     : PartSet_OperationSketchBase(theId, theParent),
       mySketch(theFeature),
       myIsBlockedSelection(false)
@@ -96,7 +96,7 @@ void PartSet_OperationFeatureEditMulti::initSelection(
   }
 }
 
-FeaturePtr PartSet_OperationFeatureEditMulti::sketch() const
+CompositeFeaturePtr PartSet_OperationFeatureEditMulti::sketch() const
 {
   return mySketch;
 }

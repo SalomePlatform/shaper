@@ -100,10 +100,25 @@ void SketchPlugin_Sketch::execute()
   setResult(aConstr);
 }
 
-const void SketchPlugin_Sketch::addSub(const FeaturePtr& theFeature)
+boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::addFeature(std::string theID)
 {
-  boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature)->setSketch(this);
-  data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->append(theFeature);
+  boost::shared_ptr<ModelAPI_Feature> aNew = document()->addFeature(theID);
+  if (aNew) {
+    boost::dynamic_pointer_cast<SketchPlugin_Feature>(aNew)->setSketch(this);
+    data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->append(aNew);
+  }
+  return aNew;
+}
+
+int SketchPlugin_Sketch::numberOfSubs() const
+{
+  return data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->size();
+}
+
+boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::subFeature(const int theIndex) const
+{
+  ObjectPtr anObj = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->object(theIndex);
+  return boost::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
 }
 
 boost::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, const double theY)
@@ -195,5 +210,5 @@ void SketchPlugin_Sketch::erase()
       document()->removeFeature(aFeature, false);
     }
   }
-  SketchPlugin_Feature::erase();
+  ModelAPI_CompositeFeature::erase();
 }

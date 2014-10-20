@@ -66,7 +66,7 @@ Q_OBJECT
   /// \param theId the feature identifier
   /// \param theParent the operation parent
   /// \param theFeature the parent feature
-  PartSet_OperationFeatureEdit(const QString& theId, QObject* theParent, FeaturePtr theFeature);
+  PartSet_OperationFeatureEdit(const QString& theId, QObject* theParent, CompositeFeaturePtr theFeature);
   /// Destructor
   virtual ~PartSet_OperationFeatureEdit();
 
@@ -114,7 +114,8 @@ Q_OBJECT
   /// Returns NULL feature. This is an operation of edition, not creation.
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual FeaturePtr createFeature(const bool theFlushMessage = true);
+  virtual FeaturePtr createFeature(const bool theFlushMessage = true, 
+    CompositeFeaturePtr theCompositeFeature = CompositeFeaturePtr());
 
  protected:
   /// Emits a signal about the selection blocking. Emits a signal to change the selection.

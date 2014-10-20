@@ -6,7 +6,7 @@
 #define SketchPlugin_Feature_H_
 
 #include "SketchPlugin.h"
-#include <ModelAPI_Feature.h>
+#include <ModelAPI_CompositeFeature.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_AISObject.h>
 #include <ModelAPI_Document.h>
@@ -26,13 +26,6 @@ class SketchPlugin_Feature : public ModelAPI_Feature
   /// Simple creation of interactive object by the result of the object
   static AISObjectPtr simpleAISObject(boost::shared_ptr<ModelAPI_Result> theRes,
                                       AISObjectPtr thePrevious);
-
-  /// Adds sub-feature of the higher level feature (sub-element of the sketch)
-  /// \param theFeature sub-feature
-  SKETCHPLUGIN_EXPORT virtual const void addSub(const FeaturePtr& theFeature)
-  {
-  }
-  ;
 
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
   SKETCHPLUGIN_EXPORT virtual bool isInHistory()

@@ -46,7 +46,7 @@ using namespace std;
 
 PartSet_OperationFeatureCreate::PartSet_OperationFeatureCreate(const QString& theId,
                                                                QObject* theParent,
-                                                               FeaturePtr theFeature)
+                                                               CompositeFeaturePtr theFeature)
     : PartSet_OperationFeatureBase(theId, theParent, theFeature)
 {
 }
@@ -176,15 +176,10 @@ void PartSet_OperationFeatureCreate::afterCommitOperation()
   emit featureConstructed(feature(), FM_Deactivation);
 }
 
-FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMessage)
+FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMessage,
+  CompositeFeaturePtr theCompositeFeature)
 {
-  FeaturePtr aNewFeature = ModuleBase_Operation::createFeature(false);
-  if (sketch()) {
-    boost::shared_ptr<SketchPlugin_Feature> aFeature = boost::dynamic_pointer_cast<
-        SketchPlugin_Feature>(sketch());
-
-    aFeature->addSub(aNewFeature);
-  }
+  FeaturePtr aNewFeature = ModuleBase_Operation::createFeature(false, sketch());
 
   if (theFlushMessage)
     flushCreated();

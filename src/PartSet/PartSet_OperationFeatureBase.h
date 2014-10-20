@@ -29,13 +29,13 @@ Q_OBJECT
   /// \param theId the feature identifier
   /// \param theParent the operation parent
   /// \param theSketch the parent feature
-  PartSet_OperationFeatureBase(const QString& theId, QObject* theParent, FeaturePtr theSketch);
+  PartSet_OperationFeatureBase(const QString& theId, QObject* theParent, CompositeFeaturePtr theSketch);
   /// Destructor
   virtual ~PartSet_OperationFeatureBase();
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
-  virtual FeaturePtr sketch() const;
+  virtual CompositeFeaturePtr sketch() const;
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theEvent the mouse event
@@ -56,7 +56,7 @@ Q_OBJECT
   //bool setWidgetValue(ObjectPtr theFeature, double theX, double theY);
 
  protected:
-  FeaturePtr mySketch;  ///< the sketch of the feature
+  CompositeFeaturePtr mySketch;  ///< the sketch of the feature
 };
 
 #endif

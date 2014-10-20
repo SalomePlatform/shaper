@@ -65,7 +65,7 @@ class SketchSolver_ConstraintManager : public Events_Listener
    *  \return \c true if the workplane changed successfully
    *  \remark Type of theSketch is not verified inside
    */
-  bool changeWorkplane(boost::shared_ptr<SketchPlugin_Feature> theSketch);
+  bool changeWorkplane(boost::shared_ptr<ModelAPI_CompositeFeature> theSketch);
 
   /** \brief Removes a workplane from the manager.
    *         All groups based on such workplane will be removed too.
@@ -95,7 +95,7 @@ class SketchSolver_ConstraintManager : public Events_Listener
    *  \param[in] theFeature object to be found
    *  \return workplane containing the feature
    */
-  boost::shared_ptr<SketchPlugin_Feature> findWorkplane(
+  boost::shared_ptr<ModelAPI_CompositeFeature> findWorkplane(
       boost::shared_ptr<SketchPlugin_Feature> theFeature) const;
 
  private:
