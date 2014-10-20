@@ -197,7 +197,7 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
         aDisplayer->activate(aFeature, aModes);
       }
     }
-  } else {
+  }// else {
     // Activate results of current feature for selection
     //FeaturePtr aFeature = theOperation->feature();
     //XGUI_Displayer* aDisplayer = aXWshp->displayer();
@@ -205,13 +205,8 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
     //std::list<ResultPtr>::const_iterator aIt;
     //for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
     //  aDisplayer->activate(*aIt);
-    //}
-
-    
-    
-  }
-  // Clear selection done during operation
-  aDisplayer->clearSelected();
+    //}    
+  //}
 }
 
 void PartSet_Module::onContextMenuCommand(const QString& theId, bool isChecked)

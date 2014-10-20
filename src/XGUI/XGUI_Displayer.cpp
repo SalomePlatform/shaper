@@ -258,8 +258,10 @@ void XGUI_Displayer::setSelected(const QList<ObjectPtr>& theResults, const bool 
 void XGUI_Displayer::clearSelected()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext)
+  if (aContext) {
+    aContext->UnhilightCurrents(false);
     aContext->ClearSelected();
+  }
 }
 
 void XGUI_Displayer::eraseAll(const bool isUpdateViewer)

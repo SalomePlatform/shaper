@@ -551,10 +551,10 @@ void XGUI_Viewer::onMouseReleased(XGUI_ViewWindow* theWindow, QMouseEvent* theEv
 
   if (myStartPnt == myEndPnt) {
     // the MoveTo is necessary for the second click in the same point. Otherwise the selection is lost.
-    Handle(V3d_View) aView3d = theWindow->viewPort()->getView();
-    if (!aView3d.IsNull()) {
-      myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView3d);
-    }
+    //Handle(V3d_View) aView3d = theWindow->viewPort()->getView();
+    //if (!aView3d.IsNull()) {
+    //  myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView3d);
+    //}
     if (aHasShift && myMultiSelectionEnabled)
       myAISContext->ShiftSelect();
     else
