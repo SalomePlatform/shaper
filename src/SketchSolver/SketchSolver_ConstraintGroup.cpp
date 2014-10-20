@@ -68,7 +68,7 @@ static int Search(const uint32_t& theEntityID, const std::vector<T>& theEntities
 // ========================================================
 
 SketchSolver_ConstraintGroup::SketchSolver_ConstraintGroup(
-    boost::shared_ptr<SketchPlugin_Feature> theWorkplane)
+    boost::shared_ptr<ModelAPI_CompositeFeature> theWorkplane)
     : myID(++myGroupIndexer),
       myParamMaxID(0),
       myEntityMaxID(0),
@@ -116,7 +116,7 @@ SketchSolver_ConstraintGroup::~SketchSolver_ConstraintGroup()
 //  Purpose:  verify the group is based on the given workplane
 // ============================================================================
 bool SketchSolver_ConstraintGroup::isBaseWorkplane(
-    boost::shared_ptr<SketchPlugin_Feature> theWorkplane) const
+    boost::shared_ptr<ModelAPI_CompositeFeature> theWorkplane) const
 {
   return theWorkplane == mySketch;
 }
@@ -776,7 +776,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeNormal(
 //  Class:    SketchSolver_ConstraintGroup
 //  Purpose:  create workplane for the group
 // ============================================================================
-bool SketchSolver_ConstraintGroup::addWorkplane(boost::shared_ptr<SketchPlugin_Feature> theSketch)
+bool SketchSolver_ConstraintGroup::addWorkplane(boost::shared_ptr<ModelAPI_CompositeFeature> theSketch)
 {
   if (myWorkplane.h || theSketch->getKind().compare(SketchPlugin_Sketch::ID()) != 0)
     return false;  // the workplane already exists or the function parameter is not Sketch

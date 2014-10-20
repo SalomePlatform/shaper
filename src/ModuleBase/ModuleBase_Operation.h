@@ -11,7 +11,7 @@
 #include <ModuleBase.h>
 #include <ModuleBase_ViewerPrs.h>
 
-#include <ModelAPI_Feature.h>
+#include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Document.h>
 
 #include <QObject>
@@ -192,8 +192,10 @@ signals:
 
   /// Creates an operation new feature
   /// \param theFlushMessage the flag whether the create message should be flushed
-  /// \returns the created feature
-  virtual FeaturePtr createFeature(const bool theFlushMessage = true);
+  /// \param theCompositeFeature the feature that must be used for adding the created object or null
+  /// \returns the created 
+  virtual FeaturePtr createFeature(const bool theFlushMessage = true, 
+    CompositeFeaturePtr theCompositeFeature = CompositeFeaturePtr());
 
   /// Verifies whether this operator can be commited.
   /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled

@@ -56,6 +56,7 @@ class Model_Data : public ModelAPI_Data
   friend class Model_AttributeReference;
   friend class Model_AttributeRefAttr;
   friend class Model_AttributeRefList;
+  friend class Model_AttributeSelection;
 
  public:
   /// Returns the name of the feature visible by the user in the object browser

@@ -88,8 +88,8 @@ void SketchSolver_ConstraintManager::processEvent(
         // Only sketches and constraints can be added by Create event
         const std::string& aFeatureKind = aFeature->getKind();
         if (aFeatureKind.compare(SketchPlugin_Sketch::ID()) == 0) {
-          boost::shared_ptr<SketchPlugin_Feature> aSketch = boost::dynamic_pointer_cast<
-              SketchPlugin_Feature>(aFeature);
+          boost::shared_ptr<ModelAPI_CompositeFeature> aSketch = boost::dynamic_pointer_cast<
+              ModelAPI_CompositeFeature>(aFeature);
           if (aSketch)
             changeWorkplane(aSketch);
           continue;
@@ -144,7 +144,7 @@ void SketchSolver_ConstraintManager::processEvent(
 //  Purpose:  update workplane by given parameters of the sketch
 // ============================================================================
 bool SketchSolver_ConstraintManager::changeWorkplane(
-    boost::shared_ptr<SketchPlugin_Feature> theSketch)
+    boost::shared_ptr<ModelAPI_CompositeFeature> theSketch)
 {
   bool aResult = true;  // changed when a workplane wrongly updated
   bool isUpdated = false;
@@ -189,7 +189,7 @@ bool SketchSolver_ConstraintManager::changeConstraintOrEntity(
     // There are no groups applicable for this constraint => create new one
     // The group will be created only for constraints, not for features
     if (!aConstraint) return false;
-    boost::shared_ptr<SketchPlugin_Feature> aWP = findWorkplane(aConstraint);
+    boost::shared_ptr<ModelAPI_CompositeFeature> aWP = findWorkplane(aConstraint);
     if (!aWP)
       return false;
     SketchSolver_ConstraintGroup* aGroup = new SketchSolver_ConstraintGroup(aWP);
@@ -309,7 +309,7 @@ void SketchSolver_ConstraintManager::findGroups(
     boost::shared_ptr<SketchPlugin_Feature> theFeature,
     std::set<Slvs_hGroup>& theGroupIDs) const
 {
-  boost::shared_ptr<SketchPlugin_Feature> aWP = findWorkplane(theFeature);
+  boost::shared_ptr<ModelAPI_CompositeFeature> aWP = findWorkplane(theFeature);
 
   SketchSolver_ConstraintGroup* anEmptyGroup = 0;  // appropriate empty group for specified constraint
   std::vector<SketchSolver_ConstraintGroup*>::const_iterator aGroupIter;
@@ -331,15 +331,15 @@ void SketchSolver_ConstraintManager::findGroups(
 //  Class:    SketchSolver_Session
 //  Purpose:  search workplane containing given feature
 // ============================================================================
-boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWorkplane(
+boost::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_ConstraintManager::findWorkplane(
     boost::shared_ptr<SketchPlugin_Feature> theFeature) const
 {
   // Already verified workplanes
-  std::set<boost::shared_ptr<SketchPlugin_Feature> > aVerified;
+  std::set<boost::shared_ptr<ModelAPI_CompositeFeature> > aVerified;
 
   std::vector<SketchSolver_ConstraintGroup*>::const_iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++) {
-    boost::shared_ptr<SketchPlugin_Feature> aWP = (*aGroupIter)->getWorkplane();
+    boost::shared_ptr<ModelAPI_CompositeFeature> aWP = (*aGroupIter)->getWorkplane();
     if (aVerified.find(aWP) != aVerified.end())
       continue;
 
@@ -353,7 +353,7 @@ boost::shared_ptr<SketchPlugin_Feature> SketchSolver_ConstraintManager::findWork
     aVerified.insert(aWP);
   }
 
-  return boost::shared_ptr<SketchPlugin_Feature>();
+  return boost::shared_ptr<ModelAPI_CompositeFeature>();
 }
 
 // ============================================================================

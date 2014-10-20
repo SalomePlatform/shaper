@@ -44,7 +44,7 @@ using namespace std;
 
 PartSet_OperationFeatureBase::PartSet_OperationFeatureBase(const QString& theId,
                                                                QObject* theParent,
-                                                               FeaturePtr theFeature)
+                                                               CompositeFeaturePtr theFeature)
     : PartSet_OperationSketchBase(theId, theParent),
       mySketch(theFeature)
 {
@@ -54,7 +54,7 @@ PartSet_OperationFeatureBase::~PartSet_OperationFeatureBase()
 {
 }
 
-FeaturePtr PartSet_OperationFeatureBase::sketch() const
+CompositeFeaturePtr PartSet_OperationFeatureBase::sketch() const
 {
   return mySketch;
 }

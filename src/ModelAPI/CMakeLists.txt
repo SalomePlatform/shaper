@@ -8,6 +8,7 @@ SET(PROJECT_HEADERS
     ModelAPI_Session.h
     ModelAPI_Plugin.h
     ModelAPI_Feature.h
+    ModelAPI_CompositeFeature.h
     ModelAPI_Data.h
     ModelAPI_Object.h
     ModelAPI_Document.h

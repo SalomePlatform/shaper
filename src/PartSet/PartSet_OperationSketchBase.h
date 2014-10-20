@@ -62,7 +62,7 @@ Q_OBJECT
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
-  virtual FeaturePtr sketch() const = 0;
+  virtual CompositeFeaturePtr sketch() const = 0;
 
   /// Processes the mouse pressed in the point
   /// \param theEvent the mouse event

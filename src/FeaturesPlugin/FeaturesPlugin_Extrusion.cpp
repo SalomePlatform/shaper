@@ -35,6 +35,8 @@ void FeaturesPlugin_Extrusion::execute()
     return;
   boost::shared_ptr<GeomAPI_Shape> aFace = 
     boost::dynamic_pointer_cast<GeomAPI_Shape>(aFaceRef->value());
+  if (!aFace)
+    return;
 
   double aSize = data()->real(FeaturesPlugin_Extrusion::SIZE_ID())->value();
   if (data()->boolean(FeaturesPlugin_Extrusion::REVERSE_ID())->value())

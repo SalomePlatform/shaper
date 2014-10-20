@@ -48,9 +48,9 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 {
 }
 
-FeaturePtr PartSet_OperationSketch::sketch() const
+CompositeFeaturePtr PartSet_OperationSketch::sketch() const
 {
-  return feature();
+  return boost::dynamic_pointer_cast<ModelAPI_CompositeFeature>(feature());
 }
 
 void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,

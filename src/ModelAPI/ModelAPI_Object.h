@@ -34,7 +34,7 @@ class ModelAPI_Object
   }
 
   /// Returns the data manager of this object: attributes
-  virtual boost::shared_ptr<ModelAPI_Data> data()
+  virtual boost::shared_ptr<ModelAPI_Data> data() const
   {
     return myData;
   }

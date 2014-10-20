@@ -33,6 +33,14 @@ public:
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);
+    /// Performs the selection for the body result (TNaming Selection)
+
+  /// Performs the selection for the body result (TNaming selection)
+  virtual void selectBody(
+    const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape);
+  /// Performs the selection for the construction result (selection by index)
+  virtual void selectConstruction(
+    const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape);
 
   friend class Model_Data;
 };
