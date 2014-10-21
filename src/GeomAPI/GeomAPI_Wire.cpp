@@ -13,6 +13,7 @@
 #include <TopoDS_Wire.hxx>
 #include <BRep_Builder.hxx>
 #include <BRepTools_WireExplorer.hxx>
+#include <TopExp_Explorer.hxx>
 
 #include <list>
 
@@ -37,7 +38,8 @@ void GeomAPI_Wire::addEdge(boost::shared_ptr<GeomAPI_Shape> theEdge)
 std::list<boost::shared_ptr<GeomAPI_Shape> > GeomAPI_Wire::getEdges()
 {
   TopoDS_Shape& aShape = const_cast<TopoDS_Shape&>(impl<TopoDS_Shape>());
-  BRepTools_WireExplorer aWireExp(TopoDS::Wire(aShape));
+  //BRepTools_WireExplorer aWireExp(TopoDS::Wire(aShape));
+  TopExp_Explorer aWireExp(aShape, TopAbs_EDGE);
   std::list<boost::shared_ptr<GeomAPI_Shape> > aResult;
   for (; aWireExp.More(); aWireExp.Next()) {
     boost::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
