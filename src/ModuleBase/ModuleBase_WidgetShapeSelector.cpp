@@ -130,8 +130,10 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
       boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aData->attribute(attributeID()));
 
     ResultPtr aBody = boost::dynamic_pointer_cast<ModelAPI_Result>(mySelectedObject);
-    if (aBody)
+    if (aBody) {
       aSelect->setValue(aBody, myShape);
+      updateObject(myFeature);
+    }
   } else {
     boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
       boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
