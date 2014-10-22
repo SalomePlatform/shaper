@@ -21,17 +21,21 @@ public:
 
   Standard_EXPORT ResultPtr getResult() const { return myResult; }
 
-  Standard_EXPORT virtual Standard_Boolean AcceptDisplayMode(const Standard_Integer theMode) const;
-
   DEFINE_STANDARD_RTTI(ModuleBase_ResultPrs)
 protected:
-  void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+  Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
     const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
+
+  Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
+    const Standard_Integer aMode) ;
 
 private:
   ResultPtr myResult;
 
   bool myIsSketchMode;
+
+  TopoDS_Shape myOriginalShape;
+  std::list<boost::shared_ptr<GeomAPI_Shape> > myFacesList;
 };
 
 
