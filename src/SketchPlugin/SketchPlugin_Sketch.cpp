@@ -93,6 +93,11 @@ void SketchPlugin_Sketch::execute()
   for (; aShapeIt != aFeaturesPreview.end(); ++aShapeIt) {
     aBigWire->addEdge(*aShapeIt);
   }
+  aBigWire->setOrigin(anOrigin->pnt());
+  aBigWire->setDirX(aDirX->dir());
+  aBigWire->setDirY(aDirY->dir());
+  aBigWire->setNorm(aNorm->dir());
+
 //  GeomAlgoAPI_SketchBuilder::createFaces(anOrigin->pnt(), aDirX->dir(), aDirY->dir(), aNorm->dir(),
 //                                         aFeaturesPreview, aLoops, aWires);
   boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
