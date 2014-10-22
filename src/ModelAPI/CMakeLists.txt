@@ -22,6 +22,7 @@ SET(PROJECT_HEADERS
     ModelAPI_AttributeBoolean.h
     ModelAPI_AttributeString.h
     ModelAPI_AttributeSelection.h
+    ModelAPI_AttributeSelectionList.h
     ModelAPI_Events.h
     ModelAPI_Validator.h
     ModelAPI_FeatureValidator.h

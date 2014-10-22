@@ -28,6 +28,7 @@ public:
   /// Returns the context of the selection (the whole shape owner)
   MODEL_EXPORT virtual ResultPtr context();
 
+  /// Sets the feature object
   MODEL_EXPORT virtual void setObject(const boost::shared_ptr<ModelAPI_Object>& theObject);
 
 protected:
@@ -43,6 +44,7 @@ protected:
     const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape);
 
   friend class Model_Data;
+  friend class Model_AttributeSelectionList;
 };
 
 #endif

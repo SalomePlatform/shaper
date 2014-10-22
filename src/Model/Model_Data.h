@@ -76,6 +76,9 @@ class Model_Data : public ModelAPI_Data
   /// Returns the attribute that contains selection to a shape
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeSelection>
     selection(const std::string& theID);
+  /// Returns the attribute that contains selection to a shape
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeSelectionList> 
+    selectionList(const std::string& theID);
   /// Returns the attribute that contains reference to an attribute of a feature
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeRefAttr>
     refattr(const std::string& theID);
