@@ -15,6 +15,7 @@
 #include <TNaming_Selector.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Tool.hxx>
+#include <TNaming_Builder.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TDataStd_ReferenceList.hxx>
 #include <TopTools_MapOfShape.hxx>
@@ -50,7 +51,8 @@ boost::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
     Handle(TNaming_NamedShape) aSelection;
     if (myRef.myRef->Label().FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
       TopoDS_Shape aSelShape = aSelection->Get();
-      aResult->setImpl(&aSelShape);
+      aResult = boost::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
+      aResult->setImpl(new TopoDS_Shape(aSelShape));
     }
   }
   return aResult;
@@ -97,8 +99,6 @@ void Model_AttributeSelection::selectBody(
   aSel.Select(aNewShape, aContext);
 }
 
-#include <BRepTools.hxx>
-
 void Model_AttributeSelection::selectConstruction(
     const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
@@ -114,7 +114,6 @@ void Model_AttributeSelection::selectConstruction(
   const TopoDS_Shape& aSubShape = theSubShape->impl<TopoDS_Shape>();
   TopTools_MapOfShape allEdges;
   for(TopExp_Explorer anEdgeExp(aSubShape, TopAbs_EDGE); anEdgeExp.More(); anEdgeExp.Next()) {
-    BRepTools::Write(anEdgeExp.Current(), "D:\\selected.brep");
     allEdges.Add(anEdgeExp.Current());
   }
   // iterate and store the result ids of sub-elements
@@ -130,7 +129,6 @@ void Model_AttributeSelection::selectConstruction(
         boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
       if (aConstr->shape()) {
         const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
-        BRepTools::Write(aResShape, "D:\\sub.brep");
         if (allEdges.Contains(aResShape)) {
           boost::shared_ptr<Model_Data> aSubData = boost::dynamic_pointer_cast<Model_Data>(aSub->data());
           TDF_Label aSubLab = aSubData->label();
@@ -139,4 +137,7 @@ void Model_AttributeSelection::selectConstruction(
       }
     }
   }
+  // store the selected as primitive
+  TNaming_Builder aBuilder(myRef.myRef->Label());
+  aBuilder.Generated(aSubShape);
 }

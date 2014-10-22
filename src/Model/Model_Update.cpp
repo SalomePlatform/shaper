@@ -13,6 +13,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_CompositeFeature.h>
 #include <Events_Loop.h>
 #include <Events_LongOp.h>
 #include <Events_Error.h>
@@ -89,7 +90,7 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
       aDocs = ModelAPI_Session::get()->allOpenedDocuments();
     }
   }
-  // collect all documents involved into the update
+  // collect all documents involved into the update process
   set<boost::shared_ptr<ModelAPI_Object> >::iterator aFIter = myInitial.begin();
   for (; aFIter != myInitial.end(); aFIter++) {
     aDocs.push_back((*aFIter)->document());
@@ -123,6 +124,18 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
   bool aMustbeUpdated = myInitial.find(theFeature) != myInitial.end();
   if (theFeature) {  // only real feature contains references to other objects
     if (theFeature->data()->mustBeUpdated()) aMustbeUpdated = true;
+
+    // composite feature must be executed after sub-features execution
+    CompositeFeaturePtr aComposite = 
+      boost::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+    if (aComposite) {
+      int aSubsNum = aComposite->numberOfSubs();
+      for(int a = 0; a < aSubsNum; a++) {
+        if (updateFeature(aComposite->subFeature(a)))
+          aMustbeUpdated = true;
+      }
+    }
+
     // references
     list<boost::shared_ptr<ModelAPI_Attribute> > aRefs = theFeature->data()->attributes(
         ModelAPI_AttributeReference::type());
@@ -166,6 +179,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
         }
       }
     }
+
     // execute feature if it must be updated
     if (aMustbeUpdated) {
 
@@ -231,6 +245,11 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
 
 bool Model_Update::updateObject(boost::shared_ptr<ModelAPI_Object> theObject)
 {
+  if (myUpdated.find(theObject) != myUpdated.end())
+    return myUpdated[theObject];  // already processed
+  return myInitial.find(theObject) != myInitial.end();
+
+  /* remove algorithm for update of all features by dependencies tree
   if (!theObject)
     return false;
   FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
@@ -251,4 +270,5 @@ bool Model_Update::updateObject(boost::shared_ptr<ModelAPI_Object> theObject)
   if (myInitial.find(theObject) != myInitial.end())
     return true;
   return false;  // nothing is known
+  */
 }

@@ -123,7 +123,10 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_IPr
   SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
     subFeature(const int theIndex) const;
 
- protected:
+  /// Construction result is allways recomuted on the fly
+  SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
+
+protected:
   /// Creates a plane and append it to the list
   /// \param theX the X normal value
   /// \param theY the Y normal value
