@@ -133,6 +133,7 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
     if (aBody) {
       aSelect->setValue(aBody, myShape);
       updateObject(myFeature);
+      return true;
     }
   } else {
     boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
@@ -142,9 +143,10 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
     if (!(aObject && aObject->isSame(mySelectedObject))) {
       aRef->setValue(mySelectedObject);
       updateObject(myFeature);
+      return true;
     }
   }
-  return true;
+  return false;
 }
 
 //********************************************************************
