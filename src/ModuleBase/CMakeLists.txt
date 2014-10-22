@@ -33,6 +33,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetLineEdit.h
 	ModuleBase_WidgetMultiSelector.h
 	ModuleBase_ViewerFilters.h
+	ModuleBase_ResultPrs.h
 )
 
 SET(PROJECT_SOURCES
@@ -59,12 +60,14 @@ SET(PROJECT_SOURCES
     ModuleBase_WidgetLineEdit.cpp
 	ModuleBase_WidgetMultiSelector.cpp
 	ModuleBase_ViewerFilters.cpp
+	ModuleBase_ResultPrs.cpp
 )
 
 SET(PROJECT_LIBRARIES
     Config
     ModelAPI
 	GeomAPI
+	GeomAlgoAPI
     ${QT_LIBRARIES}
 	${CAS_VIEWER}
 	${CAS_KERNEL}
@@ -89,6 +92,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src/ModelAPI
     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
     ${CMAKE_SOURCE_DIR}/src/GeomAPI
+    ${CMAKE_SOURCE_DIR}/src/GeomAlgoAPI
 )
 
 ADD_DEFINITIONS(-DMODULEBASE_EXPORTS ${CAS_DEFINITIONS})

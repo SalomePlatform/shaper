@@ -12,6 +12,8 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Tools.h>
 
+#include <ModuleBase_ResultPrs.h>
+
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_IPresentable.h>
 
@@ -59,7 +61,8 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
         boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
         if (aShapePtr) {
           anAIS = AISObjectPtr(new GeomAPI_AISObject());
-          anAIS->createShape(aShapePtr);
+          anAIS->setImpl(new Handle(AIS_InteractiveObject)(new ModuleBase_ResultPrs(aResult)));
+          //anAIS->createShape(aShapePtr);
           isShading = true;
         }
       }
