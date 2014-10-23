@@ -114,9 +114,12 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, Handle(V3d_
 
     boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
         SketchPlugin_Feature>(feature());
-    aSketchFeature->move(aDeltaX, aDeltaY);
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
-    ModelAPI_EventCreator::get()->sendUpdated(feature(), anEvent);
+    // MPV: added condition because it could be external edge of some object, not sketch
+    if (aSketchFeature && aSketchFeature->sketch() == sketch().get()) {
+      aSketchFeature->move(aDeltaX, aDeltaY);
+      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      ModelAPI_EventCreator::get()->sendUpdated(feature(), anEvent);
+    }
   }
   sendFeatures();
 

@@ -126,6 +126,11 @@ boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::subFeature(const int th
   return boost::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
 }
 
+int SketchPlugin_Sketch::subFeatureId(const int theIndex) const
+{
+  return subFeature(theIndex)->data()->featureId();
+}
+
 boost::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, const double theY)
 {
   boost::shared_ptr<GeomDataAPI_Point> aC = boost::dynamic_pointer_cast<GeomDataAPI_Point>(

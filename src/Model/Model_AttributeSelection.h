@@ -31,6 +31,10 @@ public:
   /// Sets the feature object
   MODEL_EXPORT virtual void setObject(const boost::shared_ptr<ModelAPI_Object>& theObject);
 
+  /// Updates the underlied selection due to the changes in the referenced objects
+  /// \returns false if update is failed
+  MODEL_EXPORT virtual bool update();
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);

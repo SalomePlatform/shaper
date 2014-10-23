@@ -45,14 +45,14 @@ class SketchPlugin_Feature : public ModelAPI_Feature
   /// Construction result is allways recomuted on the fly
   SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
 
+  /// Returns the sketch of this feature
+  inline SketchPlugin_Sketch* sketch() {return mySketch;}
 protected:
   /// Sets the higher-level feature for the sub-feature (sketch for line)
   void setSketch(SketchPlugin_Sketch* theSketch)
   {
     mySketch = theSketch;
   }
-  /// Returns the sketch of this feature
-  SketchPlugin_Sketch* sketch();
   /// initializes mySketch
   SketchPlugin_Feature();
 

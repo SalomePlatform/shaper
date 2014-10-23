@@ -11,6 +11,7 @@
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
@@ -179,6 +180,17 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
         }
       }
     }
+    // selection attributes: must be called "update" methods if needed
+    aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelection::type());
+    for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
+      boost::shared_ptr<ModelAPI_AttributeSelection> aSel =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
+      if (updateObject(aSel->context())) {
+        aMustbeUpdated = true;
+        aSel->update();
+      }
+    }
+
 
     // execute feature if it must be updated
     if (aMustbeUpdated) {

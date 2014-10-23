@@ -55,6 +55,7 @@ SET(PROJECT_LIBRARIES
     Config 
     GeomData
     GeomAPI
+    GeomAlgoAPI
     ${CAS_OCAF}
     ${CAS_TKCAF}
     ${CAS_SHAPE}
@@ -73,6 +74,7 @@ INCLUDE_DIRECTORIES(
   ../Config
   ../GeomData
   ../GeomDataAPI
+  ../GeomAlgoAPI
   ../GeomAPI
   ${CAS_INCLUDE_DIRS}
 )
