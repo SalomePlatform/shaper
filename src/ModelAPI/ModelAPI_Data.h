@@ -109,6 +109,9 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// Returns true if this data attributes are referenced to the given feature or its results
   virtual bool referencesTo(const boost::shared_ptr<ModelAPI_Feature>& theFeature) = 0;
 
+  /// Returns the identifier of feature-owner, unique in this document
+  virtual int featureId() const = 0;
+
  protected:
   /// Objects are created for features automatically
   ModelAPI_Data()

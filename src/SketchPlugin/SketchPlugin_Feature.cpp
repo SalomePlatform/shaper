@@ -11,6 +11,7 @@ SketchPlugin_Feature::SketchPlugin_Feature()
   mySketch = 0;
 }
 
+/*
 SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
 {
   if (!mySketch) {
@@ -34,7 +35,7 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
     }
   }
   return mySketch;
-}
+}*/
 
 AISObjectPtr SketchPlugin_Feature::simpleAISObject(boost::shared_ptr<ModelAPI_Result> theRes,
                                                    AISObjectPtr thePrevious)

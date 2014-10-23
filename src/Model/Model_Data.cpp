@@ -387,3 +387,8 @@ bool Model_Data::referencesTo(const boost::shared_ptr<ModelAPI_Feature>& theFeat
   }
   return false;
 }
+
+int Model_Data::featureId() const
+{
+  return myLab.Father().Tag(); // tag of the feature label
+}

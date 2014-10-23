@@ -26,6 +26,10 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   /// Returns the context of the selection (the whole shape owner)
   virtual ResultPtr context() = 0;
 
+  /// Updates the underlied selection due to the changes in the referenced objects
+  /// \returns false if update is failed
+  virtual bool update() = 0;
+
   /// Returns the type of this class of attributes
   static std::string type()
   {
