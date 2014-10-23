@@ -8,6 +8,8 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeSelectionList.h>
+
 
 using namespace std;
 
@@ -18,7 +20,7 @@ FeaturesPlugin_Group::FeaturesPlugin_Group()
 void FeaturesPlugin_Group::initAttributes()
 {
   data()->addAttribute(FeaturesPlugin_Group::NAME_ID(), ModelAPI_AttributeString::type());
-  data()->addAttribute(FeaturesPlugin_Group::LIST_ID(), ModelAPI_AttributeString::type());
+  data()->addAttribute(FeaturesPlugin_Group::LIST_ID(), ModelAPI_AttributeSelectionList::type());
 }
 
 void FeaturesPlugin_Group::execute()

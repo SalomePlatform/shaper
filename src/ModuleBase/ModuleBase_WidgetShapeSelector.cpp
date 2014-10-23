@@ -194,7 +194,8 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
     boost::shared_ptr<GeomAPI_Shape> aShape;
     if (myUseSubShapes) {
       NCollection_List<TopoDS_Shape> aShapeList;
-      myWorkshop->selection()->selectedShapes(aShapeList);
+      std::list<ObjectPtr> aOwners;
+      myWorkshop->selection()->selectedShapes(aShapeList, aOwners);
       if (aShapeList.Extent() > 0) {
         aShape = boost::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
         aShape->setImpl(new TopoDS_Shape(aShapeList.First()));

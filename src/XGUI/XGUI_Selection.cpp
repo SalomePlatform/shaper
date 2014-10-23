@@ -111,13 +111,20 @@ void XGUI_Selection::selectedAISObjects(AIS_ListOfInteractive& theList) const
 }
 
 //**************************************************************
-void XGUI_Selection::selectedShapes(NCollection_List<TopoDS_Shape>& theList) const
+void XGUI_Selection::selectedShapes(NCollection_List<TopoDS_Shape>& theList, 
+                                    std::list<ObjectPtr>& theOwners) const
 {
   theList.Clear();
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
     TopoDS_Shape aShape = aContext->SelectedShape();
-    if (!aShape.IsNull())
+    if (!aShape.IsNull()) {
       theList.Append(aShape);
+      Handle(SelectMgr_EntityOwner) aEO = aContext->SelectedOwner();
+      Handle(AIS_InteractiveObject) anObj = 
+        Handle(AIS_InteractiveObject)::DownCast(aEO->Selectable());
+      ObjectPtr anObject = myWorkshop->displayer()->getObject(anObj);
+      theOwners.push_back(anObject);
+    }
   }
 }

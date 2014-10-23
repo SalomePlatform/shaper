@@ -50,4 +50,7 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   }
 };
 
+//! Pointer on double attribute
+typedef boost::shared_ptr<ModelAPI_AttributeSelection> AttributeSelectionPtr;
+
 #endif

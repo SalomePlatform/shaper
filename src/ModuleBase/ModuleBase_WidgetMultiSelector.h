@@ -11,15 +11,19 @@
 #include <ModuleBase.h>
 #include <ModuleBase_ModelWidget.h>
 
+#include <GeomAPI_Shape.h>
+#include <ModelAPI_Result.h>
+
 #include <NCollection_List.hxx>
 #include <TopoDS_Shape.hxx>
 
 #include <QList>
 #include <QString>
 #include <QStringList>
+#include <QPair>
 
 class QWidget;
-class QTextEdit;
+class QListWidget;
 class QComboBox;
 class ModuleBase_IWorkshop;
 
@@ -59,7 +63,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
                     NCollection_List<TopoDS_Shape>& theResult);
 
  private:
-  QTextEdit* myListControl;
+   void updateSelectionList();
+
+  QListWidget* myListControl;
   QComboBox* myTypeCombo;
   QWidget* myMainWidget;
 
@@ -70,6 +76,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
   QStringList myShapeTypes;
   bool myUseSubShapes;
   bool myIsActive;
+
+  typedef QPair<ResultPtr, GeomShapePtr> GeomSelection;
+  QList<GeomSelection> mySelection;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */
