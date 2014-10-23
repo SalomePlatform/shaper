@@ -19,11 +19,11 @@ class FeaturesPlugin_Group : public ModelAPI_Feature
     return MY_GROUP_ID;
   }
   /// attribute name of group name
-  inline static const std::string& NAME_ID()
-  {
-    static const std::string MY_GROUP_NAME_ID("group_name");
-    return MY_GROUP_NAME_ID;
-  }
+  //inline static const std::string& NAME_ID()
+  //{
+  //  static const std::string MY_GROUP_NAME_ID("group_name");
+  //  return MY_GROUP_NAME_ID;
+  //}
   /// attribute name of selected entities list
   inline static const std::string& LIST_ID()
   {

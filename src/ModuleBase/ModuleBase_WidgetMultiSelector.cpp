@@ -11,10 +11,8 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_Tools.h>
 
-#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
-#include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeSelectionList.h>
 
 #include <Config_WidgetAPI.h>
@@ -45,8 +43,9 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   aMainLay->addWidget(aTypeLabel, 0, 0);
 
   myTypeCombo = new QComboBox(myMainWidget);
-  std::string aTypes = theData->getProperty("type_choice");
-  myShapeTypes = QString::fromStdString(aTypes).split(' ');
+  // There is no sence to paramerize list of types while we can not parametrize selection mode
+  QString aTypesStr("Vertices Edges Faces Solids");
+  myShapeTypes = aTypesStr.split(' ');
   myTypeCombo->addItems(myShapeTypes);
   aMainLay->addWidget(myTypeCombo, 0, 1);
 
@@ -70,6 +69,7 @@ ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
   activateSelection(false);
 }
 
+//********************************************************************
 bool ModuleBase_WidgetMultiSelector::storeValue() const
 {
   // A rare case when plugin was not loaded. 
@@ -90,9 +90,9 @@ bool ModuleBase_WidgetMultiSelector::storeValue() const
   return false;
 }
 
+//********************************************************************
 bool ModuleBase_WidgetMultiSelector::restoreValue()
 {
-  return false;
   // A rare case when plugin was not loaded. 
   if(!myFeature)
     return false;
@@ -112,11 +112,13 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
   return false;
 }
 
+//********************************************************************
 QWidget* ModuleBase_WidgetMultiSelector::getControl() const
 {
   return myMainWidget;
 }
 
+//********************************************************************
 QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 {
   QList<QWidget*> result;
@@ -135,6 +137,7 @@ bool ModuleBase_WidgetMultiSelector::eventFilter(QObject* theObj, QEvent* theEve
   return ModuleBase_ModelWidget::eventFilter(theObj, theEvent);
 }
 
+//********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionChanged()
 {
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
@@ -153,23 +156,36 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
     mySelection.append(GeomSelection(aResult, aShape));
   }
   updateSelectionList();
+  storeValue();
   emit valuesChanged();
 }
 
 
+//********************************************************************
 void ModuleBase_WidgetMultiSelector::updateSelectionList()
 {
+  QString aType;
+  if (myTypeCombo->currentText().toLower() == "vertices")
+    aType = "vertex";
+  else if (myTypeCombo->currentText().toLower() == "edges")
+    aType = "edge";
+  else if (myTypeCombo->currentText().toLower() == "faces")
+    aType = "face";
+  else if (myTypeCombo->currentText().toLower() == "solids")
+    aType = "solid";
+ 
   myListControl->clear();
   int i = 1;
   foreach (GeomSelection aSel, mySelection) {
     QString aName(aSel.first->data()->name().c_str());
-    aName += ":" + myTypeCombo->currentText() + QString::number(i);
+    aName += ":" + aType + QString("_%1").arg(i);
     myListControl->addItem(aName);
     i++;
   }
 }
 
 
+//********************************************************************
 void ModuleBase_WidgetMultiSelector::filterShapes(const NCollection_List<TopoDS_Shape>& theShapesToFilter,
                                                   NCollection_List<TopoDS_Shape>& theResult)
 {
@@ -186,6 +202,7 @@ void ModuleBase_WidgetMultiSelector::filterShapes(const NCollection_List<TopoDS_
   }
 }
 
+//********************************************************************
 void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
 {
   myIsActive = toActivate;
@@ -198,6 +215,7 @@ void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
   }
 }
 
+//********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   QString aNewType = myTypeCombo->currentText();

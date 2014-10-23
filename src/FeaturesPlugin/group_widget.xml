@@ -1,8 +1,4 @@
 <source>
-  <stringvalue
-    id="group_name"
-    label="Name"
-    tooltip="Name of the group" />
   <multi_selector id="group_list" 
     tooltip="List of selected objects" 
     type_choice="Vertices Edges Faces Solids" /> 
