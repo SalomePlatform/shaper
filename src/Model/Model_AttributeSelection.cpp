@@ -85,6 +85,7 @@ void Model_AttributeSelection::setObject(const boost::shared_ptr<ModelAPI_Object
 bool Model_AttributeSelection::update()
 {
   ResultPtr aContext = context();
+  if (!aContext) return false;
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {
     // body: just a named shape, use selection mechanism from OCCT
     TNaming_Selector aSelector(myRef.myRef->Label());
