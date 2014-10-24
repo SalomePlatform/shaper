@@ -481,6 +481,9 @@ bool SketchSolver_ConstraintGroup::changeRigidConstraint(
         // Avoid to create additional "Rigid" constraints for coincident points
         bool isCoincAlreadyFixed = false;
         if (!anAlreadyFixed.empty()) {
+          if (anAlreadyFixed.find(*aPointsPtr) != anAlreadyFixed.end())
+            isCoincAlreadyFixed = true;
+
           std::vector<std::set<Slvs_hEntity> >::const_iterator aCoincIter =
               myCoincidentPoints.begin();
           for (; !isCoincAlreadyFixed && aCoincIter != myCoincidentPoints.end(); aCoincIter++) {
@@ -651,28 +654,30 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
       SketchPlugin_Feature>(theEntity);
   if (aFeature) {  // Verify the feature by its kind
     const std::string& aFeatureKind = aFeature->getKind();
-
-    std::list<AttributePtr> anAttributes = aFeature->data()->attributes(std::string());
-    std::list<AttributePtr>::iterator anAttrIter = anAttributes.begin();
-    for ( ; anAttrIter != anAttributes.end(); anAttrIter++)
-      if (!(*anAttrIter)->isInitialized()) // the entity is not fully initialized, don't add it into solver
-        return SLVS_E_UNKNOWN;
+    AttributePtr anAttribute;
 
     // Line
     if (aFeatureKind.compare(SketchPlugin_Line::ID()) == 0) {
-      Slvs_hEntity aStart = changeEntity(
-          aFeature->data()->attribute(SketchPlugin_Line::START_ID()));
-      Slvs_hEntity aEnd = changeEntity(aFeature->data()->attribute(SketchPlugin_Line::END_ID()));
+      anAttribute = aFeature->data()->attribute(SketchPlugin_Line::START_ID());
+      if (!anAttribute->isInitialized()) return SLVS_E_UNKNOWN;
+      Slvs_hEntity aStart = changeEntity(anAttribute);
+
+      anAttribute = aFeature->data()->attribute(SketchPlugin_Line::END_ID());
+      if (!anAttribute->isInitialized()) return SLVS_E_UNKNOWN;
+      Slvs_hEntity aEnd = changeEntity(anAttribute);
 
       if (!isEntExists) // New entity
         aNewEntity = Slvs_MakeLineSegment(++myEntityMaxID, myID, myWorkplane.h, aStart, aEnd);
     }
     // Circle
     else if (aFeatureKind.compare(SketchPlugin_Circle::ID()) == 0) {
-      Slvs_hEntity aCenter = changeEntity(
-          aFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
-      Slvs_hEntity aRadius = changeEntity(
-          aFeature->data()->attribute(SketchPlugin_Circle::RADIUS_ID()));
+      anAttribute = aFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID());
+      if (!anAttribute->isInitialized()) return SLVS_E_UNKNOWN;
+      Slvs_hEntity aCenter = changeEntity(anAttribute);
+
+      anAttribute = aFeature->data()->attribute(SketchPlugin_Circle::RADIUS_ID());
+      if (!anAttribute->isInitialized()) return SLVS_E_UNKNOWN;
+      Slvs_hEntity aRadius = changeEntity(anAttribute);
 
       if (!isEntExists) // New entity
         aNewEntity = Slvs_MakeCircle(++myEntityMaxID, myID, myWorkplane.h, aCenter,
@@ -680,10 +685,17 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
     }
     // Arc
     else if (aFeatureKind.compare(SketchPlugin_Arc::ID()) == 0) {
-      Slvs_hEntity aCenter = changeEntity(
-          aFeature->data()->attribute(SketchPlugin_Arc::CENTER_ID()));
-      Slvs_hEntity aStart = changeEntity(aFeature->data()->attribute(SketchPlugin_Arc::START_ID()));
-      Slvs_hEntity aEnd = changeEntity(aFeature->data()->attribute(SketchPlugin_Arc::END_ID()));
+      anAttribute = aFeature->data()->attribute(SketchPlugin_Arc::CENTER_ID());
+      if (!anAttribute->isInitialized()) return SLVS_E_UNKNOWN;
+      Slvs_hEntity aCenter = changeEntity(anAttribute);
+
+      anAttribute = aFeature->data()->attribute(SketchPlugin_Arc::START_ID());
+      if (!anAttribute->isInitialized()) return SLVS_E_UNKNOWN;
+      Slvs_hEntity aStart = changeEntity(anAttribute);
+
+      anAttribute = aFeature->data()->attribute(SketchPlugin_Arc::END_ID());
+      if (!anAttribute->isInitialized()) return SLVS_E_UNKNOWN;
+      Slvs_hEntity aEnd = changeEntity(anAttribute);
 
       if (!isEntExists)
         aNewEntity = Slvs_MakeArcOfCircle(++myEntityMaxID, myID, myWorkplane.h,
@@ -691,8 +703,9 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
     }
     // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
     else if (aFeatureKind.compare(SketchPlugin_Point::ID()) == 0) {
-      Slvs_hEntity aPoint = changeEntity(
-          aFeature->data()->attribute(SketchPlugin_Point::COORD_ID()));
+      anAttribute = aFeature->data()->attribute(SketchPlugin_Point::COORD_ID());
+      if (!anAttribute->isInitialized()) return SLVS_E_UNKNOWN;
+      Slvs_hEntity aPoint = changeEntity(anAttribute);
 
       if (isEntExists)
         return aEntIter->second;
@@ -715,7 +728,6 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
     myNeedToSolve = true;
     return aNewEntity.h;
   }
-
 
   // Unsupported or wrong entity type
   return SLVS_E_UNKNOWN;
