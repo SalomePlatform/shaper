@@ -42,12 +42,14 @@ boost::shared_ptr<ModelAPI_AttributeSelection>
 
 void Model_AttributeSelectionList::clear()
 {
-  mySubs.clear();
-  TDF_ChildIterator aSubIter(mySize->Label());
-  for(; aSubIter.More(); aSubIter.Next()) {
-    aSubIter.Value().ForgetAllAttributes(Standard_True);
+  if (!mySubs.empty()) {
+    mySubs.clear();
+    TDF_ChildIterator aSubIter(mySize->Label());
+    for(; aSubIter.More(); aSubIter.Next()) {
+      aSubIter.Value().ForgetAllAttributes(Standard_True);
+    }
+    owner()->data()->sendAttributeUpdated(this);
   }
-  owner()->data()->sendAttributeUpdated(this);
 }
 
 Model_AttributeSelectionList::Model_AttributeSelectionList(TDF_Label& theLabel)
