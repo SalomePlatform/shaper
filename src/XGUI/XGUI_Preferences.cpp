@@ -277,7 +277,7 @@ void XGUI_PreferencesDlg::onDefault()
 
   // reset plugin's resources
   XGUI_Preferences::resetConfig();
-  XGUI_Preferences::updateResourcesByConfig(false);
+  XGUI_Preferences::updateResourcesByConfig();
 
   myPreferences->retrieve();
 }
