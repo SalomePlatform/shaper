@@ -50,6 +50,9 @@ class SketchPlugin_Arc : public SketchPlugin_Feature  //, public GeomAPI_IPresen
     return MY_KIND;
   }
 
+  /// Returns true is sketch element is under the rigid constraint
+  SKETCHPLUGIN_EXPORT virtual bool isFixed();
+
   /// Creates an arc-shape
   SKETCHPLUGIN_EXPORT virtual void execute();
 

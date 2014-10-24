@@ -6,6 +6,8 @@
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Lin2d.h>
@@ -25,6 +27,8 @@ void SketchPlugin_Line::initAttributes()
 {
   data()->addAttribute(SketchPlugin_Line::START_ID(), GeomDataAPI_Point2D::type());
   data()->addAttribute(SketchPlugin_Line::END_ID(), GeomDataAPI_Point2D::type());
+  data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 }
 
 void SketchPlugin_Line::execute()
@@ -87,4 +91,8 @@ double SketchPlugin_Line::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>
   }
 
   return aDelta;
+}
+
+bool SketchPlugin_Line::isFixed() {
+  return data()->selection(EXTERNAL_ID())->context();
 }

@@ -12,6 +12,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
@@ -187,10 +188,20 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
         boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
       if (updateObject(aSel->context())) {
         aMustbeUpdated = true;
-        aSel->update();
+        // aSel->update(); // this must be done on execution since it may be long operation
       }
     }
-
+    // lists of selection attributes: must be called "update" methods if needed
+    aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelectionList::type());
+    for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
+      boost::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
+        boost::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
+      for(int a = aSel->size() - 1; a >= 0; a--) {
+        if (updateObject(aSel->value(a)->context())) {
+          aMustbeUpdated = true;
+        }
+      }
+    }
 
     // execute feature if it must be updated
     if (aMustbeUpdated) {
@@ -200,7 +211,24 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
         ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
         if (aFactory->validate(theFeature)) {
           if (isAutomatic || (myJustCreatedOrUpdated.find(theFeature) != myJustCreatedOrUpdated.end()) ||
-            !theFeature->isPersistentResult() /* execute quick, not persistent results */) {
+            !theFeature->isPersistentResult() /* execute quick, not persistent results */) 
+          {
+            // before execution update the selection attributes if any
+            aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelection::type());
+            for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
+              boost::shared_ptr<ModelAPI_AttributeSelection> aSel =
+                boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
+              aSel->update(); // this must be done on execution since it may be long operation
+            }
+            aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelectionList::type());
+            for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
+              boost::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
+                boost::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
+              for(int a = aSel->size() - 1; a >= 0; a--) {
+                aSel->value(a)->update();
+              }
+            }
+            // execute in try-catch to avoid internal problems of the feature
             try {
               theFeature->execute();
             } catch(...) {
