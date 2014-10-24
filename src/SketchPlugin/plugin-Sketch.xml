@@ -93,7 +93,7 @@
         <validator id="PartSet_PerpendicularValidator"/>
       </feature>
 
-      <feature id="SketchConstraintRigid" title="Rigid" tooltip="Create constraint defining fixed object" icon="">
+      <feature id="SketchConstraintRigid" title="Fixed" tooltip="Create constraint defining fixed object" icon=":icons/fixed.png">
         <feature_selector id="ConstraintEntityA" label="Object" tooltip="Select any object in the viewer">
           <validator id="SketchPlugin_ResultPoint"/>
           <validator id="SketchPlugin_ResultLine"/>

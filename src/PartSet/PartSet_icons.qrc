@@ -26,5 +26,6 @@
      <file>icons/distance.png</file>
      <file>icons/radius_constr.png</file>
      <file>icons/shape_group.png</file>
+     <file>icons/fixed.png</file>
  </qresource>
  </RCC>
