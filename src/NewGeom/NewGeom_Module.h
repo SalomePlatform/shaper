@@ -85,6 +85,7 @@ Q_OBJECT
 
  protected slots:
   virtual void onViewManagerAdded(SUIT_ViewManager* theMgr);
+  void onDefaultPreferences();
 
  protected:
   CAM_DataModel* createDataModel();

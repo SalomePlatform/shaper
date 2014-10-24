@@ -29,7 +29,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("SketchPlugin_DistanceAttr",
-                              new SketchPlugin_DistanceAttrValidator);
+                              new SketchPlugin_DistanceAttrValidator);  
   aFactory->registerValidator("SketchPlugin_DifferentObjects",
                               new SketchPlugin_DifferentObjectsValidator);
   aFactory->registerValidator("SketchPlugin_ResultPoint", new SketchPlugin_ResultPointValidator);
@@ -44,7 +44,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                                    SKETCH_PLANE_COLOR);
   Config_PropManager::registerProp("Sketch planes", "planes_size", "Size", Config_Prop::Double,
                                    PLANE_SIZE);
-  Config_PropManager::registerProp("Sketch planes", "planes_thikness", "Thickness",
+  Config_PropManager::registerProp("Sketch planes", "planes_thickness", "Thickness",
                                    Config_Prop::Integer, SKETCH_WIDTH);
 
   Config_PropManager::registerProp("Visualization", "parallel_color", "Parallel constraint color",

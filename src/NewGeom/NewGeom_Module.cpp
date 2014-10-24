@@ -87,6 +87,9 @@ void NewGeom_Module::initialize(CAM_Application* theApp)
   LightApp_Module::initialize(theApp);
 
   myWorkshop->startApplication();
+  LightApp_Application* anApp = dynamic_cast<LightApp_Application*>(theApp);
+  if (anApp)
+    connect(anApp, SIGNAL(preferenceResetToDefaults()), this, SLOT(onDefaultPreferences()));
 }
 
 //******************************************************
@@ -174,6 +177,17 @@ void NewGeom_Module::onViewManagerAdded(SUIT_ViewManager* theMgr)
   if ((!mySelector)) {
     mySelector = createSelector(theMgr);
   }
+}
+
+//******************************************************
+void NewGeom_Module::onDefaultPreferences()
+{
+  XGUI_Preferences::resetConfig();
+  XGUI_Preferences::updateResourcesByConfig();
+
+  LightApp_Preferences* pref = preferences();
+  if (pref)
+    pref->retrieve();
 }
 
 //******************************************************
@@ -326,7 +340,7 @@ void NewGeom_Module::createPreferences()
   LightApp_Preferences* pref = preferences();
   if (!pref)
     return;
-  XGUI_Preferences::updateCustomProps();
+  XGUI_Preferences::updateConfigByResources();
   QString aModName = moduleName();
 
   QtxPreferenceItem* item = pref->findItem(aModName, true );
@@ -348,8 +362,16 @@ void NewGeom_Module::preferencesChanged(const QString& theSection, const QString
 {
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
   QString aVal = aResMgr->stringValue(theSection, theParam);
-  if (!aVal.isNull()) {
-    Config_Prop* aProp = Config_PropManager::findProp(theSection.toStdString(), theParam.toStdString());
-    aProp->setValue(aVal.toStdString());
+  Config_Prop* aProp = Config_PropManager::findProp(theSection.toStdString(), theParam.toStdString());
+  std::string aValue = aVal.toStdString();
+  if (aValue.empty()) {
+    aValue = aProp->defaultValue();
+    aResMgr->setValue(theSection, theParam, QString(aValue.c_str()));
+
+    LightApp_Preferences* pref = preferences();
+    if (pref)
+      pref->retrieve();
   }
+  aProp->setValue(aValue);
+
 }

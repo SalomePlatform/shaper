@@ -194,7 +194,7 @@ AISObjectPtr SketchPlugin_Sketch::getAISObject(AISObjectPtr thePrevious)
       SKETCH_PLANE_COLOR);
       aAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
 
-      aAIS->setWidth(Config_PropManager::integer("Sketch planes", "planes_thikness",
+      aAIS->setWidth(Config_PropManager::integer("Sketch planes", "planes_thickness",
       SKETCH_WIDTH));
     }
     return aAIS;

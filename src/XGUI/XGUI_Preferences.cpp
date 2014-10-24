@@ -13,6 +13,7 @@
 #include <QLayout>
 #include <QApplication>
 #include <QDialogButtonBox>
+#include <QPushButton>
 
 const QString XGUI_Preferences::VIEWER_SECTION = "Viewer";
 const QString XGUI_Preferences::MENU_SECTION = "Menu";
@@ -40,7 +41,7 @@ bool XGUI_Preferences::editPreferences(XGUI_Prefs& theModified)
   return false;
 }
 
-void XGUI_Preferences::updateCustomProps()
+void XGUI_Preferences::updateConfigByResources()
 {
   Config_Properties aProps = Config_PropManager::getProperties();
   Config_Properties::iterator aIt;
@@ -48,8 +49,30 @@ void XGUI_Preferences::updateCustomProps()
     Config_Prop* aProp = (*aIt);
     QString aVal = myResourceMgr->stringValue(QString(aProp->section().c_str()),
                                               QString(aProp->name().c_str()));
-    if (!aVal.isNull())
+    if (!aVal.isEmpty()) {
       aProp->setValue(aVal.toStdString());
+    }
+  }
+}
+
+void XGUI_Preferences::updateResourcesByConfig()
+{
+  Config_Properties aProps = Config_PropManager::getProperties();
+  Config_Properties::iterator aIt;
+  for (aIt = aProps.begin(); aIt != aProps.end(); ++aIt) {
+    Config_Prop* aProp = (*aIt);
+    myResourceMgr->setValue(QString(aProp->section().c_str()), QString(aProp->name().c_str()),
+                            QString(aProp->value().c_str()));
+  }
+}
+
+void XGUI_Preferences::resetConfig()
+{
+  Config_Properties aProps = Config_PropManager::getProperties();
+  Config_Properties::iterator aIt;
+  for (aIt = aProps.begin(); aIt != aProps.end(); ++aIt) {
+    Config_Prop* aProp = (*aIt);
+    aProp->setValue(aProp->defaultValue());
   }
 }
 
@@ -63,9 +86,9 @@ void XGUI_Preferences::loadCustomProps()
     QStringList aParams = myResourceMgr->parameters(aSection);
     foreach (QString aParam, aParams)
     {
-      Config_PropManager::registerProp(aSection.toStdString(), aParam.toStdString(), "",
-                                       Config_Prop::Disabled,
-                                       myResourceMgr->stringValue(aSection, aParam).toStdString());
+      Config_Prop* aProp = Config_PropManager::registerProp(aSection.toStdString(),
+                                       aParam.toStdString(), "", Config_Prop::Disabled);
+      aProp->setValue(myResourceMgr->stringValue(aSection, aParam).toStdString());
     }
   }
 }
@@ -150,8 +173,13 @@ XGUI_PreferencesDlg::XGUI_PreferencesDlg(SUIT_ResourceMgr* theResurces, QWidget*
   setFocusProxy(myPreferences);
   myPreferences->setFrameStyle(QFrame::Box | QFrame::Sunken);
 
-  QDialogButtonBox* aBtnBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+  QDialogButtonBox* aBtnBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel |
+                                                   QDialogButtonBox::Reset,
                                                    Qt::Horizontal, this);
+  QPushButton* aDefaultButton = aBtnBox->button(QDialogButtonBox::Reset);
+  aDefaultButton->setText(tr("Default"));
+  connect(aDefaultButton, SIGNAL(clicked()), this, SLOT(onDefault()));
+
   main->addWidget(aBtnBox);
   connect(aBtnBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(aBtnBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -230,13 +258,28 @@ void XGUI_PreferencesDlg::accept()
   myIsChanged = true;
 
   // Save custom properties
-  XGUI_Preferences::updateCustomProps();
+  XGUI_Preferences::updateConfigByResources();
   QDialog::accept();
 }
 
 void XGUI_PreferencesDlg::modified(XGUI_Prefs& theModified) const
 {
   theModified = myPreferences->modified();
+}
+
+void XGUI_PreferencesDlg::onDefault()
+{
+  // reset main resources
+  QtxResourceMgr::WorkingMode aPrev = myPreferences->resourceMgr()->setWorkingMode
+                                               (QtxResourceMgr::IgnoreUserValues);
+  myPreferences->retrieve();
+  myPreferences->resourceMgr()->setWorkingMode(aPrev);
+
+  // reset plugin's resources
+  XGUI_Preferences::resetConfig();
+  XGUI_Preferences::updateResourcesByConfig(false);
+
+  myPreferences->retrieve();
 }
 
 //**********************************************************
