@@ -7,6 +7,8 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomAPI_Pnt2d.h>
 
@@ -22,6 +24,8 @@ SketchPlugin_Point::SketchPlugin_Point()
 void SketchPlugin_Point::initAttributes()
 {
   data()->addAttribute(SketchPlugin_Point::COORD_ID(), GeomDataAPI_Point2D::type());
+  data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 }
 
 void SketchPlugin_Point::execute()
@@ -60,4 +64,8 @@ double SketchPlugin_Point::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d
       aData->attribute(SketchPlugin_Point::COORD_ID()));
 
   return aPoint->pnt()->distance(thePoint);
+}
+
+bool SketchPlugin_Point::isFixed() {
+  return data()->selection(EXTERNAL_ID())->context();
 }

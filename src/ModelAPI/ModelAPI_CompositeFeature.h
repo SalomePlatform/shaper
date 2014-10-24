@@ -24,6 +24,9 @@ public:
 
   /// Returns the sub-feature by zero-base index
   virtual boost::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex) const = 0;
+
+  /// Returns the sub-feature unique identifier in this composite feature by zero-base index
+  virtual int subFeatureId(const int theIndex) const = 0;
 };
 
 //! Pointer on the composite feature object

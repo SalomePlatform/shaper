@@ -17,9 +17,16 @@ void Model_AttributeSelectionList::append(
 {
   int aNewTag = mySize->Get() + 1;
   TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
-  mySubs.push_back(boost::shared_ptr<Model_AttributeSelection>(
-    new Model_AttributeSelection(aNewLab)));
+
+  boost::shared_ptr<Model_AttributeSelection> aNewAttr = 
+    boost::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aNewLab));
+  if (owner()) {
+    aNewAttr->setObject(owner());
+  }
+  mySubs.push_back(aNewAttr);
   mySize->Set(aNewTag);
+  aNewAttr->setValue(theContext, theSubShape);
+  owner()->data()->sendAttributeUpdated(this);
 }
 
 int Model_AttributeSelectionList::size()
@@ -35,10 +42,13 @@ boost::shared_ptr<ModelAPI_AttributeSelection>
 
 void Model_AttributeSelectionList::clear()
 {
-  mySubs.clear();
-  TDF_ChildIterator aSubIter(mySize->Label());
-  for(; aSubIter.More(); aSubIter.Next()) {
-    aSubIter.Value().ForgetAllAttributes(Standard_True);
+  if (!mySubs.empty()) {
+    mySubs.clear();
+    TDF_ChildIterator aSubIter(mySize->Label());
+    for(; aSubIter.More(); aSubIter.Next()) {
+      aSubIter.Value().ForgetAllAttributes(Standard_True);
+    }
+    owner()->data()->sendAttributeUpdated(this);
   }
 }
 

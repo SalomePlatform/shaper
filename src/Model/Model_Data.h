@@ -146,6 +146,10 @@ class Model_Data : public ModelAPI_Data
 
   /// Returns true if this data attributes are referenced to the given feature or its results
   MODEL_EXPORT virtual bool referencesTo(const boost::shared_ptr<ModelAPI_Feature>& theFeature);
+
+  /// Returns the identifier of feature-owner, unique in this document
+  MODEL_EXPORT virtual int featureId() const;
+
 };
 
 #endif

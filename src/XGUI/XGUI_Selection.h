@@ -52,7 +52,8 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   virtual void selectedAISObjects(AIS_ListOfInteractive& theList) const;
 
   //! Returns list of currently selected shapes
-  virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theList) const;
+  virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theShapes, 
+    std::list<ObjectPtr>& theOwners) const;
 
  private:
   XGUI_Workshop* myWorkshop;

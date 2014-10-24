@@ -19,44 +19,45 @@
  * \brief Interface to the edge object
  */
 
-class GEOMAPI_EXPORT GeomAPI_Wire : public GeomAPI_Shape
+class GeomAPI_Wire : public GeomAPI_Shape
 {
  public:
   /// Creation of empty (null) shape
-  GeomAPI_Wire();
+  GEOMAPI_EXPORT GeomAPI_Wire();
 
-  virtual bool isVertex() const
+  GEOMAPI_EXPORT virtual bool isVertex() const
   {
     return false;
   }
 
   /// Returns whether the shape is an edge
-  virtual bool isEdge() const
+  GEOMAPI_EXPORT virtual bool isEdge() const
   {
     return false;
   }
 
-  void addEdge(boost::shared_ptr<GeomAPI_Shape> theEdge);
-  std::list<boost::shared_ptr<GeomAPI_Shape> > getEdges();
+  GEOMAPI_EXPORT void addEdge(boost::shared_ptr<GeomAPI_Shape> theEdge);
+  GEOMAPI_EXPORT std::list<boost::shared_ptr<GeomAPI_Shape> > getEdges();
 
   /// Returns True if the wire is defined in a plane
-  bool hasPlane() const { return myOrigin && myNorm && myDirX && myDirY; }
+  GEOMAPI_EXPORT bool hasPlane() const { return myOrigin && myNorm && myDirX && myDirY; }
 
   /// Set/Get origin point
-  void setOrigin(const boost::shared_ptr<GeomAPI_Pnt>& theOrigin) { myOrigin = theOrigin; }
-  boost::shared_ptr<GeomAPI_Pnt> origin() const { return myOrigin; }
+  GEOMAPI_EXPORT void setOrigin(const boost::shared_ptr<GeomAPI_Pnt>& theOrigin) 
+  { myOrigin = theOrigin; }
+  GEOMAPI_EXPORT boost::shared_ptr<GeomAPI_Pnt> origin() const { return myOrigin; }
 
   /// Set/Get X direction vector
-  void setDirX(const boost::shared_ptr<GeomAPI_Dir>& theDirX) { myDirX = theDirX; }
-  boost::shared_ptr<GeomAPI_Dir> dirX() const { return myDirX; }
+  GEOMAPI_EXPORT void setDirX(const boost::shared_ptr<GeomAPI_Dir>& theDirX) { myDirX = theDirX; }
+  GEOMAPI_EXPORT boost::shared_ptr<GeomAPI_Dir> dirX() const { return myDirX; }
 
   /// Set/Get Y direction vector
-  void setDirY(const boost::shared_ptr<GeomAPI_Dir>& theDirY) { myDirY = theDirY; }
-  boost::shared_ptr<GeomAPI_Dir> dirY() const { return myDirY; }
+  GEOMAPI_EXPORT void setDirY(const boost::shared_ptr<GeomAPI_Dir>& theDirY) { myDirY = theDirY; }
+  GEOMAPI_EXPORT boost::shared_ptr<GeomAPI_Dir> dirY() const { return myDirY; }
 
   /// Set/Get Normal direction vector
-  void setNorm(const boost::shared_ptr<GeomAPI_Dir>& theNorm) { myNorm = theNorm; }
-  boost::shared_ptr<GeomAPI_Dir> norm() const { return myNorm; }
+  GEOMAPI_EXPORT void setNorm(const boost::shared_ptr<GeomAPI_Dir>& theNorm) { myNorm = theNorm; }
+  GEOMAPI_EXPORT boost::shared_ptr<GeomAPI_Dir> norm() const { return myNorm; }
 
 private:
   boost::shared_ptr<GeomAPI_Pnt> myOrigin;

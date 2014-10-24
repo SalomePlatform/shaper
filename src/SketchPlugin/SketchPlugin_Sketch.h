@@ -123,6 +123,9 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_IPr
   SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
     subFeature(const int theIndex) const;
 
+  /// Returns the sub-feature unique identifier in this composite feature by zero-base index
+  SKETCHPLUGIN_EXPORT virtual int subFeatureId(const int theIndex) const;
+
   /// Construction result is allways recomuted on the fly
   SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
 

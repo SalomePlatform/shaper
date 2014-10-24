@@ -31,4 +31,7 @@ class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
 
 };
 
+//! Pointer on attribute object
+typedef boost::shared_ptr<GeomAPI_Shape> GeomShapePtr;
+
 #endif
