@@ -27,7 +27,7 @@ class Config_PropManager
    * Returns True if the property succesfully registered
    */
   CONFIG_EXPORT static bool registerProp(const std::string& theSection, const std::string& theName,
-    const std::string& theTitle, Config_Prop::PropType theType, const std::string& theDefValue = );
+    const std::string& theTitle, Config_Prop::PropType theType, const std::string& theDefValue = "");
 
   CONFIG_EXPORT static Config_Prop* findProp(
     const std::string& theSection, const std::string& theName);
