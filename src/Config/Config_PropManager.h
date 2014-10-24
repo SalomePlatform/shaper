@@ -23,11 +23,11 @@ class Config_PropManager
    * \param theSection - name of section (domain of using) of the property.
    * \param theName - name (title) of the value.
    * \param theType - type of the value.
-   * \param theValue - initial value of the property
+   * \param theDefValue - default and initial value of the property
    * Returns True if the property succesfully registered
    */
   CONFIG_EXPORT static bool registerProp(const std::string& theSection, const std::string& theName,
-    const std::string& theTitle, Config_Prop::PropType theType, const std::string& theValue);
+    const std::string& theTitle, Config_Prop::PropType theType, const std::string& theDefValue = );
 
   CONFIG_EXPORT static Config_Prop* findProp(
     const std::string& theSection, const std::string& theName);
