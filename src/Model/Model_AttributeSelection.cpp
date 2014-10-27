@@ -56,7 +56,7 @@ boost::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
   boost::shared_ptr<GeomAPI_Shape> aResult;
   if (myIsInitialized) {
     Handle(TNaming_NamedShape) aSelection;
-    if (myRef.myRef->Label().FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
+    if (selectionLabel().FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
       TopoDS_Shape aSelShape = aSelection->Get();
       aResult = boost::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
       aResult->setImpl(new TopoDS_Shape(aSelShape));
@@ -88,7 +88,7 @@ bool Model_AttributeSelection::update()
   if (!aContext) return false;
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {
     // body: just a named shape, use selection mechanism from OCCT
-    TNaming_Selector aSelector(myRef.myRef->Label());
+    TNaming_Selector aSelector(selectionLabel());
     TDF_LabelMap aScope; // empty means the whole document
     return aSelector.Solve(aScope) == Standard_True;
    
@@ -129,7 +129,7 @@ bool Model_AttributeSelection::update()
             for(; aRes != aResults.cend(); aRes++) {
               ResultConstructionPtr aConstr = 
                 boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-              if (aConstr->shape()) {
+              if (aConstr->shape() && aConstr->shape()->isEdge()) {
                 const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
                 TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
                 if (!anEdge.IsNull()) {
@@ -182,7 +182,7 @@ void Model_AttributeSelection::selectBody(
     const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
   // perform the selection
-  TNaming_Selector aSel(myRef.myRef->Label());
+  TNaming_Selector aSel(selectionLabel());
   TopoDS_Shape aNewShape = theSubShape ? theSubShape->impl<TopoDS_Shape>() : TopoDS_Shape();
   TopoDS_Shape aContext;
 
@@ -196,9 +196,6 @@ void Model_AttributeSelection::selectBody(
     else
       throw std::invalid_argument("a result with shape is expected");
   }
-  Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aNewShape, myRef.myRef->Label());
-  TDF_Label aLab = aNS->Label();
-
   aSel.Select(aNewShape, aContext);
 }
 
@@ -233,7 +230,7 @@ void Model_AttributeSelection::selectConstruction(
     for(; aRes != aResults.cend(); aRes++) {
       ResultConstructionPtr aConstr = 
         boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-      if (aConstr->shape()) {
+      if (aConstr->shape() && aConstr->shape()->isEdge()) {
         const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
         TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
         if (!anEdge.IsNull()) {
@@ -249,6 +246,11 @@ void Model_AttributeSelection::selectConstruction(
     }
   }
   // store the selected as primitive
-  TNaming_Builder aBuilder(myRef.myRef->Label());
+  TNaming_Builder aBuilder(selectionLabel());
   aBuilder.Generated(aSubShape);
+}
+
+TDF_Label Model_AttributeSelection::selectionLabel()
+{
+  return myRef.myRef->Label().FindChild(1);
 }

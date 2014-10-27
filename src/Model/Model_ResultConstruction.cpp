@@ -17,6 +17,7 @@ boost::shared_ptr<GeomAPI_Shape>& Model_ResultConstruction::shape()
 Model_ResultConstruction::Model_ResultConstruction()
 {
   myIsInHistory = true;
+  setIsConcealed(false);
 }
 
 void Model_ResultConstruction::setIsInHistory(const bool isInHistory)

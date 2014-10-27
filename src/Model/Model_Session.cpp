@@ -191,7 +191,7 @@ boost::shared_ptr<ModelAPI_Document> Model_Session::copy(
   aRT->SetRelocation(aSourceRoot, aTargetRoot);
   TDF_CopyTool::Copy(aDS, aRT);
 
-  aNew->synchronizeFeatures();
+  aNew->synchronizeFeatures(false, true);
   return aNew;
 }
 

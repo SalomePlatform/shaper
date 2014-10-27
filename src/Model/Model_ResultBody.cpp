@@ -12,6 +12,7 @@
 
 Model_ResultBody::Model_ResultBody()
 {
+  setIsConcealed(false);
 }
 
 void Model_ResultBody::store(const boost::shared_ptr<GeomAPI_Shape>& theShape)
