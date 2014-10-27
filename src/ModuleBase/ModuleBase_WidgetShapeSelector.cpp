@@ -46,8 +46,7 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <list>
-#include <stdexcept>
-#include <xstring>
+#include <string>
 
 typedef QMap<QString, TopAbs_ShapeEnum> ShapeTypes;
 static ShapeTypes MyShapeTypes;

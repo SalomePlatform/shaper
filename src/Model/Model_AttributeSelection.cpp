@@ -13,6 +13,7 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Wire.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
+#include <Events_Error.h>
 
 #include <TNaming_Selector.hxx>
 #include <TNaming_NamedShape.hxx>
@@ -191,10 +192,12 @@ void Model_AttributeSelection::selectBody(
     aContext = aBody->shape()->impl<TopoDS_Shape>();
   else {
     ResultConstructionPtr aConstr = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myRef.value());
-    if (aConstr)
+    if (aConstr) {
       aContext = aConstr->shape()->impl<TopoDS_Shape>();
-    else
-      throw std::invalid_argument("a result with shape is expected");
+    } else {
+      Events_Error::send("A result with shape is expected");
+      return;
+    }
   }
   aSel.Select(aNewShape, aContext);
 }

@@ -270,11 +270,12 @@ void XGUI_PreferencesDlg::modified(XGUI_Prefs& theModified) const
 void XGUI_PreferencesDlg::onDefault()
 {
   // reset main resources
-  QtxResourceMgr::WorkingMode aPrev = myPreferences->resourceMgr()->setWorkingMode
-                                               (QtxResourceMgr::IgnoreUserValues);
+#ifdef WIN32
+  QtxResourceMgr::WorkingMode aPrev =
+      myPreferences->resourceMgr()->setWorkingMode(QtxResourceMgr::IgnoreUserValues);
   myPreferences->retrieve();
   myPreferences->resourceMgr()->setWorkingMode(aPrev);
-
+#endif
   // reset plugin's resources
   XGUI_Preferences::resetConfig();
   XGUI_Preferences::updateResourcesByConfig();
