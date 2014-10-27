@@ -34,14 +34,10 @@ Q_OBJECT
   /// \param theId the feature identifier
   /// \param theParent the operation parent
   /// \param theSketch the parent feature
-  PartSet_OperationFeatureCreate(const QString& theId, QObject* theParent, FeaturePtr theSketch);
+  PartSet_OperationFeatureCreate(
+    const QString& theId, QObject* theParent, CompositeFeaturePtr theSketch);
   /// Destructor
   virtual ~PartSet_OperationFeatureCreate();
-
-  /// Returns the operation local selection mode
-  /// \param theFeature the feature object to get the selection mode
-  /// \return the selection mode
-  virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
 
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
@@ -90,7 +86,8 @@ Q_OBJECT
   /// the sketch feature
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual FeaturePtr createFeature(const bool theFlushMessage = true);
+  virtual FeaturePtr createFeature(const bool theFlushMessage = true,
+    CompositeFeaturePtr theCompositeFeature = CompositeFeaturePtr());
 
   /// Verifies whether this operator can be commited.
   /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled

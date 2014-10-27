@@ -77,6 +77,13 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
                            boost::shared_ptr<GeomAPI_Shape> theLine2,
                            boost::shared_ptr<GeomAPI_Pln> thePlane);
 
+  /** \brief Creates AIS_FixedRelation object for an object
+   *  \param[in] theShape       the object
+   *  \param[in] thePlane       the plane which contains the lines
+   */
+  void createFixed(boost::shared_ptr<GeomAPI_Shape> theShape,
+                   boost::shared_ptr<GeomAPI_Pln> thePlane);
+
   /** \brief Assigns the color for the shape
    *  \param[in] theColor index of the color
    */

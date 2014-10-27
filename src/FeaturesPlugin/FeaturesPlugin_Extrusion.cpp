@@ -45,6 +45,8 @@ void FeaturesPlugin_Extrusion::execute()
 
   boost::shared_ptr<GeomAPI_Shape> aFace = 
     boost::dynamic_pointer_cast<GeomAPI_Shape>(aFaceRef->value());
+  if (!aFace)
+    return;
 
   boost::shared_ptr<GeomAPI_Shape> aContext = 
     boost::dynamic_pointer_cast<GeomAPI_Shape>(aFaceRef->context());

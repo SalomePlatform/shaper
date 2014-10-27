@@ -25,7 +25,7 @@
  * \ingroup DataModel
  * \brief Feature for creation of the new part in PartSet.
  */
-class SketchPlugin_Sketch : public SketchPlugin_Feature, public GeomAPI_IPresentable
+class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_IPresentable
 {
  public:
   /// Sketch feature kind
@@ -78,10 +78,6 @@ class SketchPlugin_Sketch : public SketchPlugin_Feature, public GeomAPI_IPresent
   /// Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
-  /// Adds sub-feature of the higher level feature (sub-element of the sketch)
-  /// \param theFeature sub-feature
-  SKETCHPLUGIN_EXPORT virtual const void addSub(const FeaturePtr& theFeature);
-
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved
   /// \param theDeltaY the delta for Y coordinate is moved
@@ -118,7 +114,22 @@ class SketchPlugin_Sketch : public SketchPlugin_Feature, public GeomAPI_IPresent
   /// removes also all sub-sketch elements
   SKETCHPLUGIN_EXPORT virtual void erase();
 
- protected:
+  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
+
+  /// Returns the number of sub-elements
+  SKETCHPLUGIN_EXPORT virtual int numberOfSubs() const;
+
+  /// Returns the sub-feature by zero-base index
+  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
+    subFeature(const int theIndex) const;
+
+  /// Returns the sub-feature unique identifier in this composite feature by zero-base index
+  SKETCHPLUGIN_EXPORT virtual int subFeatureId(const int theIndex) const;
+
+  /// Construction result is allways recomuted on the fly
+  SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
+
+protected:
   /// Creates a plane and append it to the list
   /// \param theX the X normal value
   /// \param theY the Y normal value

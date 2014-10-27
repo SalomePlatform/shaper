@@ -9,6 +9,7 @@
 #include "ModuleBase_Definitions.h"
 
 #include <ModelAPI_Object.h>
+#include <GeomAPI_AISObject.h>
 
 #include <QObject>
 
@@ -48,6 +49,12 @@ Q_OBJECT
 
   //! Returns currently active operation
   virtual ModuleBase_Operation* currentOperation() const = 0;
+
+  //! Returns AIS opbject by data object
+  virtual AISObjectPtr findPresentation(const ObjectPtr& theObject) const = 0;
+
+  //! Returns data object by AIS
+  virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const = 0;
 
 signals:
   void selectionChanged();

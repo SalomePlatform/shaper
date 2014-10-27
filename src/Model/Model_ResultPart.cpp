@@ -19,6 +19,7 @@ boost::shared_ptr<ModelAPI_Feature> Model_ResultPart::owner()
 
 Model_ResultPart::Model_ResultPart()
 {
+  setIsConcealed(false);
 }
 
 void Model_ResultPart::setData(boost::shared_ptr<ModelAPI_Data> theData)

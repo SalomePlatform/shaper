@@ -40,7 +40,7 @@ using namespace std;
 
 PartSet_OperationFeatureEdit::PartSet_OperationFeatureEdit(const QString& theId,
                                                            QObject* theParent,
-                                                           FeaturePtr theFeature)
+                                                           CompositeFeaturePtr theFeature)
     : PartSet_OperationFeatureBase(theId, theParent, theFeature),
       myIsBlockedSelection(false)
 {
@@ -73,20 +73,21 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3
     if (commit()) {
       emit featureConstructed(feature(), FM_Deactivation);
 
-      bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
-      if (aHasShift && !theHighlighted.empty()) {
-        QList<ObjectPtr> aSelected;
-        std::list<ModuleBase_ViewerPrs>::const_iterator aIt;
-        for (aIt = theSelected.cbegin(); aIt != theSelected.cend(); ++aIt)
-          aSelected.append((*aIt).object());
+      //bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+      //if (aHasShift && !theHighlighted.empty()) {
+      //  QList<ObjectPtr> aSelected;
+      //  std::list<ModuleBase_ViewerPrs>::const_iterator aIt;
+      //  for (aIt = theSelected.cbegin(); aIt != theSelected.cend(); ++aIt)
+      //    aSelected.append((*aIt).object());
         /*for (aIt = theHighlighted.cbegin(); aIt != theHighlighted.cend(); ++aIt) {
          if (!aSelected.contains((*aIt).object()))
          aSelected.append((*aIt).object());
          }*/
         //aSelected.push_back(feature());
         //aSelected.push_back(theHighlighted.front().object());
-        emit setSelection(aSelected);
-      } else if (aFeature) {
+        //emit setSelection(aSelected);
+      //} else 
+      if (aFeature) {
         restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
       }
     }
@@ -113,9 +114,12 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, Handle(V3d_
 
     boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
         SketchPlugin_Feature>(feature());
-    aSketchFeature->move(aDeltaX, aDeltaY);
-    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
-    ModelAPI_EventCreator::get()->sendUpdated(feature(), anEvent);
+    // MPV: added condition because it could be external edge of some object, not sketch
+    if (aSketchFeature && aSketchFeature->sketch() == sketch().get()) {
+      aSketchFeature->move(aDeltaX, aDeltaY);
+      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+      ModelAPI_EventCreator::get()->sendUpdated(feature(), anEvent);
+    }
   }
   sendFeatures();
 
@@ -196,7 +200,8 @@ void PartSet_OperationFeatureEdit::blockSelection(bool isBlocked, const bool isR
   }
 }
 
-FeaturePtr PartSet_OperationFeatureEdit::createFeature(const bool /*theFlushMessage*/)
+FeaturePtr PartSet_OperationFeatureEdit::createFeature(const bool theFlushMessage,
+  CompositeFeaturePtr theCompositeFeature)
 {
   // do nothing in order to do not create a new feature
   return FeaturePtr();

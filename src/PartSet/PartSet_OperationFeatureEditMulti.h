@@ -10,6 +10,8 @@
 #include <PartSet_OperationSketchBase.h>
 #include <QObject>
 
+#include <list>
+
 class QMouseEvent;
 
 /*!
@@ -66,7 +68,7 @@ Q_OBJECT
   /// \param theParent the operation parent
   /// \param theFeature the parent feature
   PartSet_OperationFeatureEditMulti(const QString& theId, QObject* theParent,
-                                    FeaturePtr theFeature);
+                                    CompositeFeaturePtr theFeature);
   /// Destructor
   virtual ~PartSet_OperationFeatureEditMulti();
 
@@ -78,7 +80,7 @@ Q_OBJECT
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
-  virtual FeaturePtr sketch() const;
+  virtual CompositeFeaturePtr sketch() const;
 
   /// Processes the mouse pressed in the point
   /// \param theEvent the mouse event
@@ -122,7 +124,7 @@ Q_OBJECT
   void sendFeatures();
 
  private:
-  FeaturePtr mySketch;  ///< the sketch feature
+  CompositeFeaturePtr mySketch;  ///< the sketch feature
   std::list<ModuleBase_ViewerPrs> myFeatures;  ///< the features to apply the edit operation
   Point myCurPoint;  ///< the current 3D point clicked or moved
   bool myIsBlockedSelection;  ///< the state of the last state of selection blocked signal

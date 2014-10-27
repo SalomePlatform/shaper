@@ -8,6 +8,10 @@
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_Selection.h"
 #include "XGUI_OperationMgr.h"
+#include "XGUI_Displayer.h"
+
+#include <AIS_Shape.hxx>
+
 
 XGUI_ModuleConnector::XGUI_ModuleConnector(XGUI_Workshop* theWorkshop)
     : ModuleBase_IWorkshop(theWorkshop),
@@ -22,10 +26,13 @@ XGUI_ModuleConnector::XGUI_ModuleConnector(XGUI_Workshop* theWorkshop)
     this, SIGNAL(operationStarted(ModuleBase_Operation*)));
   connect(anOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)), 
     this, SIGNAL(operationStopped(ModuleBase_Operation*)));
+
+  myDocumentShapeFilter = new ModuleBase_ShapeDocumentFilter(this);
 }
 
 XGUI_ModuleConnector::~XGUI_ModuleConnector()
 {
+  myDocumentShapeFilter.Nullify();
 }
 
 ModuleBase_ISelection* XGUI_ModuleConnector::selection() const
@@ -51,16 +58,34 @@ ModuleBase_Operation* XGUI_ModuleConnector::currentOperation() const
 
 void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
 {
-  Handle(AIS_InteractiveContext) aAIS = myWorkshop->viewer()->AISContext();
-  if (!aAIS->HasOpenedContext())
-    aAIS->OpenLocalContext();
+  XGUI_Displayer* aDisp = myWorkshop->displayer();
+  aDisp->openLocalContext();
+  // Convert shape types to selection types
+  QIntList aModes;
   foreach(int aType, theTypes) {
-    aAIS->ActivateStandardMode((TopAbs_ShapeEnum)aType);
+    aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)aType));
   }
+  aDisp->activateObjectsOutOfContext(aModes);
+  //TODO: We have to open Local context because at neutral point filters don't work (bug 25340)
+  aDisp->addSelectionFilter(myDocumentShapeFilter);
 }
 
 void XGUI_ModuleConnector::deactivateSubShapesSelection()
 {
-  Handle(AIS_InteractiveContext) aAIS = myWorkshop->viewer()->AISContext();
-  aAIS->CloseAllContexts();
+  XGUI_Displayer* aDisp = myWorkshop->displayer();
+  // The document limitation selection has to be only during operation
+  aDisp->removeSelectionFilter(myDocumentShapeFilter);
+  aDisp->closeLocalContexts(false);
+}
+
+AISObjectPtr XGUI_ModuleConnector::findPresentation(const ObjectPtr& theObject) const
+{
+  XGUI_Displayer* aDisp = myWorkshop->displayer();
+  return aDisp->getAISObject(theObject);
+}
+
+ObjectPtr XGUI_ModuleConnector::findPresentedObject(const AISObjectPtr& theAIS) const
+{
+  XGUI_Displayer* aDisp = myWorkshop->displayer();
+  return aDisp->getObject(theAIS);
 }

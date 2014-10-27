@@ -416,9 +416,15 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_Objec
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
+  QIntList aModes;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
-    if (!aObj->data() || !aObj->data()->isValid() || aObj->document()->isConcealed(aObj))
+    bool aHide = !aObj->data() || !aObj->data()->isValid();
+    if (!aHide) { // check that this is not hidden result
+      ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+      aHide = aRes && aRes->isConcealed();
+    }
+    if (aHide)
       myDisplayer->erase(aObj, false);
     else {
       if (myDisplayer->isVisible(aObj))  {
@@ -427,7 +433,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_Objec
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
           if (!aOperation->hasObject(aObj))
             if (!myDisplayer->isActive(aObj))
-              myDisplayer->activate(aObj);
+              myDisplayer->activate(aObj, aModes);
         }
       } else {
         if (myOperationMgr->hasOperation()) {
@@ -462,8 +468,7 @@ void XGUI_Workshop::onFeatureCreatedMsg(const boost::shared_ptr<ModelAPI_ObjectU
       // it doesn't stored in the operation mgr and doesn't displayed
     } else if (myOperationMgr->hasOperation()) {
       ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-      if (!(*aIt)->document()->isConcealed(*aIt) &&
-          aOperation->hasObject(*aIt)) {  // Display only current operation results
+      if (aOperation->hasObject(*aIt)) {  // Display only current operation results
         myDisplayer->display(*aIt, false);
         isDisplayed = true;
       }
@@ -1010,10 +1015,6 @@ void XGUI_Workshop::createDockWidgets()
   connect(aCancelBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onAbortOperation()));
   connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)), myOperationMgr,
           SLOT(onKeyReleased(QKeyEvent*)));
-  //connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), myOperationMgr,
-  //        SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
-  //connect(myOperationMgr, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)), myPropertyPanel,
-  //        SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
   connect(myOperationMgr, SIGNAL(operationValidated(bool)), myPropertyPanel,
           SLOT(setAcceptEnabled(bool)));
 

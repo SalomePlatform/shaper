@@ -6,7 +6,7 @@
 #define SketchPlugin_Feature_H_
 
 #include "SketchPlugin.h"
-#include <ModelAPI_Feature.h>
+#include <ModelAPI_CompositeFeature.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_AISObject.h>
 #include <ModelAPI_Document.h>
@@ -27,12 +27,12 @@ class SketchPlugin_Feature : public ModelAPI_Feature
   static AISObjectPtr simpleAISObject(boost::shared_ptr<ModelAPI_Result> theRes,
                                       AISObjectPtr thePrevious);
 
-  /// Adds sub-feature of the higher level feature (sub-element of the sketch)
-  /// \param theFeature sub-feature
-  SKETCHPLUGIN_EXPORT virtual const void addSub(const FeaturePtr& theFeature)
+  /// Reference to the external edge or vertex as a AttributeSelection
+  inline static const std::string& EXTERNAL_ID()
   {
+    static const std::string MY_EXTERNAL_ID("External");
+    return MY_EXTERNAL_ID;
   }
-  ;
 
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
   SKETCHPLUGIN_EXPORT virtual bool isInHistory()
@@ -52,14 +52,17 @@ class SketchPlugin_Feature : public ModelAPI_Feature
   /// Construction result is allways recomuted on the fly
   SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
 
+  /// Returns true is sketch element is under the rigid constraint
+  SKETCHPLUGIN_EXPORT virtual bool isFixed() {return false;}
+
+  /// Returns the sketch of this feature
+  inline SketchPlugin_Sketch* sketch() {return mySketch;}
 protected:
   /// Sets the higher-level feature for the sub-feature (sketch for line)
   void setSketch(SketchPlugin_Sketch* theSketch)
   {
     mySketch = theSketch;
   }
-  /// Returns the sketch of this feature
-  SketchPlugin_Sketch* sketch();
   /// initializes mySketch
   SketchPlugin_Feature();
 

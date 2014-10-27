@@ -47,7 +47,8 @@ class ModuleBase_ISelection
   virtual void selectedAISObjects(AIS_ListOfInteractive& theList) const = 0;
 
   //! Returns list of currently selected shapes
-  virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theList) const = 0;
+  virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theList, 
+    std::list<ObjectPtr>& theOwners) const = 0;
 
 };
 

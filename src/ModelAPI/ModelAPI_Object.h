@@ -34,7 +34,7 @@ class ModelAPI_Object
   }
 
   /// Returns the data manager of this object: attributes
-  virtual boost::shared_ptr<ModelAPI_Data> data()
+  virtual boost::shared_ptr<ModelAPI_Data> data() const
   {
     return myData;
   }
@@ -56,6 +56,7 @@ class ModelAPI_Object
 
   /// To use virtuality for destructors
   virtual ~ModelAPI_Object() {}
+
  protected:
   /// Sets the data manager of an object (document does)
   virtual void setData(boost::shared_ptr<ModelAPI_Data> theData)

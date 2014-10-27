@@ -11,16 +11,15 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_Tools.h>
 
-#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
-#include <ModelAPI_Validator.h>
+#include <ModelAPI_AttributeSelectionList.h>
 
 #include <Config_WidgetAPI.h>
 
 #include <QGridLayout>
 #include <QLabel>
-#include <QTextEdit>
+#include <QListWidget>
 #include <QObject>
 #include <QString>
 #include <QComboBox>
@@ -39,17 +38,21 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myMainWidget = new QWidget(theParent);
   QGridLayout* aMainLay = new QGridLayout(myMainWidget);
   ModuleBase_Tools::adjustMargins(aMainLay);
+
   QLabel* aTypeLabel = new QLabel(tr("Type"), myMainWidget);
   aMainLay->addWidget(aTypeLabel, 0, 0);
+
   myTypeCombo = new QComboBox(myMainWidget);
-  std::string aTypes = theData->getProperty("type_choice");
-  myShapeTypes = QString::fromStdString(aTypes).split(' ');
+  // There is no sence to paramerize list of types while we can not parametrize selection mode
+  QString aTypesStr("Vertices Edges Faces Solids");
+  myShapeTypes = aTypesStr.split(' ');
   myTypeCombo->addItems(myShapeTypes);
   aMainLay->addWidget(myTypeCombo, 0, 1);
+
   QLabel* aListLabel = new QLabel(tr("Selected objects:"), myMainWidget);
   aMainLay->addWidget(aListLabel, 1, 0, 1, -1);
-  myListControl = new QTextEdit(myMainWidget);
-  myListControl->setReadOnly(true);
+
+  myListControl = new QListWidget(myMainWidget);
   aMainLay->addWidget(myListControl, 2, 0, 2, -1);
   aMainLay->setColumnStretch(1, 1);
   myMainWidget->setLayout(aMainLay);
@@ -66,40 +69,56 @@ ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
   activateSelection(false);
 }
 
+//********************************************************************
 bool ModuleBase_WidgetMultiSelector::storeValue() const
 {
   // A rare case when plugin was not loaded. 
   if(!myFeature)
     return false;
   DataPtr aData = myFeature->data();
-  AttributeStringPtr aStringAttr = aData->string(attributeID());
-  QString aWidgetValue = myListControl->toPlainText();
-  aStringAttr->setValue(aWidgetValue.toStdString());
-  updateObject(myFeature);
-  return true;
+  AttributeSelectionListPtr aSelectionListAttr = 
+    boost::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
+
+  if (aSelectionListAttr && (mySelection.size() > 0)) {
+    aSelectionListAttr->clear();
+    foreach (GeomSelection aSelec, mySelection) {
+      aSelectionListAttr->append(aSelec.first, aSelec.second);
+    }
+    updateObject(myFeature);
+    return true;
+  }
+  return false;
 }
 
+//********************************************************************
 bool ModuleBase_WidgetMultiSelector::restoreValue()
 {
-  return false;
   // A rare case when plugin was not loaded. 
   if(!myFeature)
     return false;
   DataPtr aData = myFeature->data();
-  AttributeStringPtr aStringAttr = aData->string(attributeID());
+  AttributeSelectionListPtr aSelectionListAttr = 
+    boost::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
 
-  bool isBlocked = myListControl->blockSignals(true);
-  myListControl->setText(QString::fromStdString(aStringAttr->value()));
-  myListControl->blockSignals(isBlocked);
-
-  return true;
+  if (aSelectionListAttr) {
+    mySelection.clear();
+    for (int i = 0; i < aSelectionListAttr->size(); i++) {
+      AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
+      mySelection.append(GeomSelection(aSelectAttr->context(), aSelectAttr->value()));
+    }
+    updateSelectionList();
+    return true;
+  }
+  return false;
 }
 
+//********************************************************************
 QWidget* ModuleBase_WidgetMultiSelector::getControl() const
 {
   return myMainWidget;
 }
 
+//********************************************************************
 QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 {
   QList<QWidget*> result;
@@ -118,19 +137,55 @@ bool ModuleBase_WidgetMultiSelector::eventFilter(QObject* theObj, QEvent* theEve
   return ModuleBase_ModelWidget::eventFilter(theObj, theEvent);
 }
 
+//********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionChanged()
 {
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
-  NCollection_List<TopoDS_Shape> aSelectedShapes, aFilteredShapes;
-  aSelection->selectedShapes(aSelectedShapes);
-  QString aText;
-  if (!aSelectedShapes.IsEmpty()) {
-    filterShapes(aSelectedShapes, aFilteredShapes);
-    aText = QString("Items selected: %1").arg(aFilteredShapes.Size());
+  NCollection_List<TopoDS_Shape> aSelectedShapes; //, aFilteredShapes;
+  std::list<ObjectPtr> aOwnersList;
+  aSelection->selectedShapes(aSelectedShapes, aOwnersList);
+
+  mySelection.clear();
+  std::list<ObjectPtr>::const_iterator aIt;
+  NCollection_List<TopoDS_Shape>::Iterator aShpIt(aSelectedShapes);
+  GeomShapePtr aShape;
+  for (aIt = aOwnersList.cbegin(); aIt != aOwnersList.cend(); aShpIt.Next(), aIt++) {
+    ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(*aIt);
+    aShape = boost::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+    aShape->setImpl(new TopoDS_Shape(aShpIt.Value()));
+    mySelection.append(GeomSelection(aResult, aShape));
   }
-  myListControl->setText(aText);
+  updateSelectionList();
+  storeValue();
+  emit valuesChanged();
 }
 
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::updateSelectionList()
+{
+  QString aType;
+  if (myTypeCombo->currentText().toLower() == "vertices")
+    aType = "vertex";
+  else if (myTypeCombo->currentText().toLower() == "edges")
+    aType = "edge";
+  else if (myTypeCombo->currentText().toLower() == "faces")
+    aType = "face";
+  else if (myTypeCombo->currentText().toLower() == "solids")
+    aType = "solid";
+ 
+  myListControl->clear();
+  int i = 1;
+  foreach (GeomSelection aSel, mySelection) {
+    QString aName(aSel.first->data()->name().c_str());
+    aName += ":" + aType + QString("_%1").arg(i);
+    myListControl->addItem(aName);
+    i++;
+  }
+}
+
+
+//********************************************************************
 void ModuleBase_WidgetMultiSelector::filterShapes(const NCollection_List<TopoDS_Shape>& theShapesToFilter,
                                                   NCollection_List<TopoDS_Shape>& theResult)
 {
@@ -147,6 +202,7 @@ void ModuleBase_WidgetMultiSelector::filterShapes(const NCollection_List<TopoDS_
   }
 }
 
+//********************************************************************
 void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
 {
   myIsActive = toActivate;
@@ -159,6 +215,7 @@ void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
   }
 }
 
+//********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   QString aNewType = myTypeCombo->currentText();

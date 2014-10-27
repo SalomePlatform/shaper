@@ -45,6 +45,9 @@ class SketchPlugin_Circle : public SketchPlugin_Feature  //, public GeomAPI_IPre
     return MY_KIND;
   }
 
+  /// Returns true is sketch element is under the rigid constraint
+  SKETCHPLUGIN_EXPORT virtual bool isFixed();
+
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 

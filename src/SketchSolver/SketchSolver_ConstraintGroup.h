@@ -30,7 +30,7 @@ class SketchSolver_ConstraintGroup
    *         Throws an exception if theWorkplane is not an object of SketchPlugin_Sketch type
    *  \remark Type of theSketch is not verified inside
    */
-  SketchSolver_ConstraintGroup(boost::shared_ptr<SketchPlugin_Feature> theWorkplane);
+  SketchSolver_ConstraintGroup(boost::shared_ptr<ModelAPI_CompositeFeature> theWorkplane);
 
   ~SketchSolver_ConstraintGroup();
 
@@ -69,9 +69,9 @@ class SketchSolver_ConstraintGroup
    *  \param[in] theWorkplane the feature to be compared with base workplane
    *  \return \c true if workplanes are the same
    */
-  bool isBaseWorkplane(boost::shared_ptr<SketchPlugin_Feature> theWorkplane) const;
+  bool isBaseWorkplane(boost::shared_ptr<ModelAPI_CompositeFeature> theWorkplane) const;
 
-  boost::shared_ptr<SketchPlugin_Feature> getWorkplane() const
+  boost::shared_ptr<ModelAPI_CompositeFeature> getWorkplane() const
   {
     return mySketch;
   }
@@ -188,7 +188,7 @@ protected:
    *  \param[in] theSketch parameters of workplane are the attributes of this sketch
    *  \return \c true if success, \c false if workplane parameters are not consistent
    */
-  bool addWorkplane(boost::shared_ptr<SketchPlugin_Feature> theSketch);
+  bool addWorkplane(boost::shared_ptr<ModelAPI_CompositeFeature> theSketch);
 
   /** \brief Add the entities of constraint for points coincidence into the appropriate list
    *  \param[in] thePoint1 identifier of the first point
@@ -224,7 +224,7 @@ protected:
   std::list<Slvs_hConstraint> myTempConstraints;  ///< The list of identifiers of temporary constraints (SLVS_C_WHERE_DRAGGED) applied for all other points moved by user
 
   // SketchPlugin entities
-  boost::shared_ptr<SketchPlugin_Feature> mySketch;        ///< Equivalent to workplane
+  boost::shared_ptr<ModelAPI_CompositeFeature> mySketch;        ///< Equivalent to workplane
   ConstraintMap myConstraintMap;  ///< The map between SketchPlugin and SolveSpace constraints
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity> myEntityAttrMap;  ///< The map between "attribute" parameters of constraints and their equivalent SolveSpace entities
   std::map<FeaturePtr, Slvs_hEntity> myEntityFeatMap;  ///< The map between "feature" parameters of constraints and their equivalent SolveSpace entities

@@ -46,8 +46,7 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <list>
-#include <stdexcept>
-#include <xstring>
+#include <string>
 
 typedef QMap<QString, TopAbs_ShapeEnum> ShapeTypes;
 static ShapeTypes MyShapeTypes;
@@ -130,8 +129,11 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
       boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aData->attribute(attributeID()));
 
     ResultPtr aBody = boost::dynamic_pointer_cast<ModelAPI_Result>(mySelectedObject);
-    if (aBody)
+    if (aBody) {
       aSelect->setValue(aBody, myShape);
+      updateObject(myFeature);
+      return true;
+    }
   } else {
     boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
       boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
@@ -140,9 +142,10 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
     if (!(aObject && aObject->isSame(mySelectedObject))) {
       aRef->setValue(mySelectedObject);
       updateObject(myFeature);
+      return true;
     }
   }
-  return true;
+  return false;
 }
 
 //********************************************************************
@@ -190,7 +193,8 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
     boost::shared_ptr<GeomAPI_Shape> aShape;
     if (myUseSubShapes) {
       NCollection_List<TopoDS_Shape> aShapeList;
-      myWorkshop->selection()->selectedShapes(aShapeList);
+      std::list<ObjectPtr> aOwners;
+      myWorkshop->selection()->selectedShapes(aShapeList, aOwners);
       if (aShapeList.Extent() > 0) {
         aShape = boost::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
         aShape->setImpl(new TopoDS_Shape(aShapeList.First()));
@@ -222,7 +226,6 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, boost::shared_p
     if (!myUseSubShapes) {
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TOHIDE);
       ModelAPI_EventCreator::get()->sendUpdated(mySelectedObject, anEvent);
-      Events_Loop::loop()->flush(anEvent);
     }
   } 
   updateSelectionName();

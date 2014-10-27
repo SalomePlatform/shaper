@@ -35,8 +35,15 @@ class XGUI_EXPORT XGUI_Preferences
   /// It is used in case of necessity to define external resource manager (not NewGeom)
   static void setResourceMgr(SUIT_ResourceMgr* theMgr) { myResourceMgr = theMgr; }
 
-  /// Updates properties defined by module from SUIT_ResourceMgr to Config_PropManager
-  static void updateCustomProps();
+  /// Updates Config_PropManager properties by module from SUIT_ResourceMgr
+  static void updateConfigByResources();
+
+  /// Updates SUIT_ResourceMgr values by Config_PropManager properties
+  /// \param theUpdateOnlyInvalid flag to update only invalid values, if it is false, all are updated
+  static void updateResourcesByConfig();
+
+  /// Set default values to the Config_PropManager properties
+  static void resetConfig();
 
   /// Loads properties defined by module to Config_PropManager
   static void loadCustomProps();
@@ -96,6 +103,9 @@ Q_OBJECT
 
  public slots:
   virtual void accept();
+
+protected slots:
+  void onDefault();
 
  private:
    /// Create editors for aplication properties

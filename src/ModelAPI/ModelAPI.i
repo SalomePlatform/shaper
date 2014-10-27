@@ -17,6 +17,7 @@
   #include "ModelAPI_AttributeReference.h"
   #include "ModelAPI_AttributeRefAttr.h"
   #include "ModelAPI_AttributeSelection.h"
+  #include "ModelAPI_AttributeSelectionList.h"
   #include "ModelAPI_Validator.h"
   #include "ModelAPI_AttributeRefList.h"
   #include "ModelAPI_AttributeBoolean.h"
@@ -62,6 +63,7 @@
 %shared_ptr(ModelAPI_AttributeRefList)
 %shared_ptr(ModelAPI_AttributeBoolean)
 %shared_ptr(ModelAPI_AttributeSelection)
+%shared_ptr(ModelAPI_AttributeSelectionList)
 %shared_ptr(ModelAPI_Result)
 %shared_ptr(ModelAPI_ResultConstruction)
 %shared_ptr(ModelAPI_ResultBody)
@@ -84,6 +86,7 @@
 %include "ModelAPI_AttributeRefAttr.h"
 %include "ModelAPI_AttributeBoolean.h"
 %include "ModelAPI_AttributeSelection.h"
+%include "ModelAPI_AttributeSelectionList.h"
 %include "ModelAPI_AttributeRefList.h"
 %include "ModelAPI_Validator.h"
 %include "ModelAPI_Result.h"

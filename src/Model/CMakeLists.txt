@@ -15,6 +15,7 @@ SET(PROJECT_HEADERS
     Model_AttributeString.h
     Model_AttributeInteger.h
     Model_AttributeSelection.h
+    Model_AttributeSelectionList.h
     Model_Events.h
     Model_Update.h
     Model_Validator.h
@@ -38,6 +39,7 @@ SET(PROJECT_SOURCES
     Model_AttributeString.cpp
     Model_AttributeInteger.cpp
     Model_AttributeSelection.cpp
+    Model_AttributeSelectionList.cpp
     Model_Events.cpp
     Model_Update.cpp
     Model_Validator.cpp
@@ -53,6 +55,7 @@ SET(PROJECT_LIBRARIES
     Config 
     GeomData
     GeomAPI
+    GeomAlgoAPI
     ${CAS_OCAF}
     ${CAS_TKCAF}
     ${CAS_SHAPE}
@@ -71,6 +74,7 @@ INCLUDE_DIRECTORIES(
   ../Config
   ../GeomData
   ../GeomDataAPI
+  ../GeomAlgoAPI
   ../GeomAPI
   ${CAS_INCLUDE_DIRS}
 )

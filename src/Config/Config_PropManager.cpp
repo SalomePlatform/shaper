@@ -10,22 +10,29 @@ double stringToDouble(const std::string& theDouble);
 
 Config_Properties Config_PropManager::myProps;
 
-bool Config_PropManager::registerProp(const std::string& theSection, const std::string& theName,
-                                      const std::string& theTitle, Config_Prop::PropType theType,
-                                      const std::string& theValue)
+Config_Prop* Config_PropManager::registerProp(const std::string& theSection, const std::string& theName,
+                                              const std::string& theTitle, Config_Prop::PropType theType,
+                                              const std::string& theDefaultValue)
 {
   Config_Prop* aProp = findProp(theSection, theName);
+
   if (aProp) {
+    if (aProp->value() == "") {
+      aProp->setValue(theDefaultValue);
+    }
+    if (aProp->defaultValue() == "") {
+      aProp->setDefaultValue(theDefaultValue);
+    }
     if (aProp->type() == Config_Prop::Disabled) {
       aProp->setType(theType);
       aProp->setTitle(theTitle);
-      return true;
     }
-    return false;
   }
-  aProp = new Config_Prop(theSection, theName, theTitle, theType, theValue);
-  myProps.push_back(aProp);
-  return true;
+  else {
+    aProp = new Config_Prop(theSection, theName, theTitle, theType, theDefaultValue);
+    myProps.push_back(aProp);
+  }
+  return aProp;
 }
 
 Config_Prop* Config_PropManager::findProp(const std::string& theSection, const std::string& theName)

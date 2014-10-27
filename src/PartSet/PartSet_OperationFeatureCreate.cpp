@@ -46,7 +46,7 @@ using namespace std;
 
 PartSet_OperationFeatureCreate::PartSet_OperationFeatureCreate(const QString& theId,
                                                                QObject* theParent,
-                                                               FeaturePtr theFeature)
+                                                               CompositeFeaturePtr theFeature)
     : PartSet_OperationFeatureBase(theId, theParent, theFeature)
 {
 }
@@ -75,14 +75,6 @@ bool PartSet_OperationFeatureCreate::canBeCommitted() const
     return isValid();
   }
   return false;
-}
-
-std::list<int> PartSet_OperationFeatureCreate::getSelectionModes(ObjectPtr theFeature) const
-{
-  std::list<int> aModes;
-  if (theFeature != feature())
-    aModes = PartSet_OperationSketchBase::getSelectionModes(theFeature);
-  return aModes;
 }
 
 void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
@@ -184,15 +176,10 @@ void PartSet_OperationFeatureCreate::afterCommitOperation()
   emit featureConstructed(feature(), FM_Deactivation);
 }
 
-FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMessage)
+FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMessage,
+  CompositeFeaturePtr theCompositeFeature)
 {
-  FeaturePtr aNewFeature = ModuleBase_Operation::createFeature(false);
-  if (sketch()) {
-    boost::shared_ptr<SketchPlugin_Feature> aFeature = boost::dynamic_pointer_cast<
-        SketchPlugin_Feature>(sketch());
-
-    aFeature->addSub(aNewFeature);
-  }
+  FeaturePtr aNewFeature = ModuleBase_Operation::createFeature(false, sketch());
 
   if (theFlushMessage)
     flushCreated();

@@ -36,6 +36,9 @@ class SketchPlugin_Point : public SketchPlugin_Feature
     return MY_KIND;
   }
 
+  /// Returns true is sketch element is under the rigid constraint
+  SKETCHPLUGIN_EXPORT virtual bool isFixed();
+
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 

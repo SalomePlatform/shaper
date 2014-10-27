@@ -41,14 +41,9 @@ Q_OBJECT
   virtual bool isGranted(ModuleBase_Operation* theOperation) const;
 
 
-  /// Returns the operation local selection mode
-  /// \param theFeature the feature object to get the selection mode
-  /// \return the selection mode
-  virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
-
   /// Returns the operation sketch feature
   /// \returns the sketch instance
-  virtual FeaturePtr sketch() const;
+  virtual CompositeFeaturePtr sketch() const;
 
   /// Processes the mouse pressed in the point
   /// \param theEvent the mouse event

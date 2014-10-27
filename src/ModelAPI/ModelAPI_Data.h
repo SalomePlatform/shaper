@@ -22,6 +22,7 @@ class ModelAPI_Document;
 class ModelAPI_Attribute;
 class ModelAPI_Feature;
 class ModelAPI_AttributeSelection;
+class ModelAPI_AttributeSelectionList;
 class GeomAPI_Shape;
 
 /**\class ModelAPI_Data
@@ -50,6 +51,9 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual boost::shared_ptr<ModelAPI_AttributeReference> reference(const std::string& theID) = 0;
   /// Returns the attribute that contains selection to a shape
   virtual boost::shared_ptr<ModelAPI_AttributeSelection> selection(const std::string& theID) = 0;
+  /// Returns the attribute that contains selection to a shape
+  virtual boost::shared_ptr<ModelAPI_AttributeSelectionList> 
+    selectionList(const std::string& theID) = 0;
   /// Returns the attribute that contains reference to an attribute of a feature
   virtual boost::shared_ptr<ModelAPI_AttributeRefAttr> refattr(const std::string& theID) = 0;
   /// Returns the attribute that contains list of references to features
@@ -102,8 +106,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// Returns true if feature must be updated (re-executed) on rebuild
   virtual bool mustBeUpdated() = 0;
 
-  /// Returns true if this data attributes are referenced to the given feature or its results
-  virtual bool referencesTo(const boost::shared_ptr<ModelAPI_Feature>& theFeature) = 0;
+  /// Returns the identifier of feature-owner, unique in this document
+  virtual int featureId() const = 0;
 
  protected:
   /// Objects are created for features automatically

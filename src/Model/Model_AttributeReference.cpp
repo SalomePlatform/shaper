@@ -20,9 +20,7 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
 
     boost::shared_ptr<Model_Document> aDoc =
       boost::dynamic_pointer_cast<Model_Document>(owner()->document());
-    if (aDoc) aDoc->objectIsNotReferenced(aDoc->object(myRef->Get()));
     myRef->Set(aData->label().Father());  // references to the feature label
-    boost::shared_dynamic_cast<Model_Document>(owner()->document())->objectIsReferenced(theObject);
 
     owner()->data()->sendAttributeUpdated(this);
   }
@@ -51,7 +49,6 @@ Model_AttributeReference::Model_AttributeReference(TDF_Label& theLabel)
     if (owner()) {
       boost::shared_ptr<Model_Document> aDoc =
         boost::dynamic_pointer_cast<Model_Document>(owner()->document());
-      if (aDoc) aDoc->objectIsReferenced(aDoc->object(myRef->Get()));
     }
   }
 }
@@ -62,7 +59,6 @@ void Model_AttributeReference::setObject(const boost::shared_ptr<ModelAPI_Object
     ModelAPI_AttributeReference::setObject(theObject);
     boost::shared_ptr<Model_Document> aDoc =
       boost::dynamic_pointer_cast<Model_Document>(owner()->document());
-    if (aDoc) aDoc->objectIsReferenced(aDoc->object(myRef->Get()));
   }
 }
 
@@ -71,5 +67,4 @@ Model_AttributeReference::~Model_AttributeReference()
   boost::shared_ptr<Model_Document> aDoc =
     boost::dynamic_pointer_cast<Model_Document>(owner()->document());
   TDF_Label aLab = myRef->Get();
-  if (aDoc && !aLab.IsNull()) aDoc->objectIsNotReferenced(aDoc->object(myRef->Get()));
 }

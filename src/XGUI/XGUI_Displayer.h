@@ -56,7 +56,7 @@ class XGUI_EXPORT XGUI_Displayer
   void display(ObjectPtr theObject, bool isUpdateViewer = true);
 
   /// Display the given AIS object. To hide this object use corresponde erase method
-  void display(boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isUpdate = true);
+  void display(AISObjectPtr theAIS, bool isUpdate = true);
 
   /// Stop the current selection and color the given features to the selection color
   /// \param theFeatures a list of features to be disabled
@@ -72,13 +72,17 @@ class XGUI_EXPORT XGUI_Displayer
    */
   void setSelected(const QList<ObjectPtr>& theFeatures, bool isUpdateViewer = true);
 
+
+  /// Un select all objects
+  void clearSelected();
+
   /// Erase the feature and a shape.
   /// \param theFeature a feature instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void erase(ObjectPtr theObject, const bool isUpdateViewer = true);
 
   /// Erase the given AIS object displayed by corresponded display method
-  void erase(boost::shared_ptr<GeomAPI_AISObject> theAIS, const bool isUpdate = true);
+  void erase(AISObjectPtr theAIS, const bool isUpdate = true);
 
   /// Erase all presentations
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -88,11 +92,23 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void eraseDeletedResults(const bool isUpdateViewer = true);
 
+  /// Opens local context. Does nothing if it is already opened.
   void openLocalContext();
 
   /// Deactivates selection of sub-shapes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void closeLocalContexts(const bool isUpdateViewer = true);
+
+  /*
+  * Set modes of selections. Selection mode has to be defined by TopAbs_ShapeEnum.
+  * It doesn't manages a local context
+  * \param theModes - list of selection modes. If the list is empty then all selectoin modes will be cleared.
+  */
+  void setSelectionModes(const QIntList& theModes);
+
+  void addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
+
+  void removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
 
   /// Updates the viewer
   void updateViewer();
@@ -100,28 +116,29 @@ class XGUI_EXPORT XGUI_Displayer
   /// Searches the interactive object by feature
   /// \param theFeature the feature or NULL if it not visualized
   /// \return theIO an interactive object
-  boost::shared_ptr<GeomAPI_AISObject> getAISObject(ObjectPtr theFeature) const;
+  AISObjectPtr getAISObject(ObjectPtr theFeature) const;
 
   /// Searches the feature by interactive object
   /// \param theIO an interactive object
   /// \return feature the feature or NULL if it not visualized
-  ObjectPtr getObject(Handle(AIS_InteractiveObject) theIO) const;
+  ObjectPtr getObject(const AISObjectPtr& theIO) const;
+  ObjectPtr getObject(const Handle(AIS_InteractiveObject)& theIO) const;
 
   /// Deactivates the given object (not allow selection)
   void deactivate(ObjectPtr theFeature);
 
   /// Activates the given object (it can be selected)
-  void activate(ObjectPtr theFeature);
+  /// \param theModes - modes on which it has to be activated (can be empty)
+  void activate(ObjectPtr theFeature, const QIntList& theModes);
 
   /// Returns true if the given object can be selected
   bool isActive(ObjectPtr theObject) const;
 
   /// Activates in local context displayed outside of the context.
-  /// \param theModes - selection modes to activate
-  /// \param theFilter - filter for selection
-  void activateObjectsOutOfContext(const std::list<int>& theModes, 
-                                   Handle(SelectMgr_Filter) theFilter);
+  /// \param theModes - modes on which it has to be activated (can be empty)
+  void activateObjectsOutOfContext(const QIntList& theModes);
 
+  /// Activates in local context displayed outside of the context.
   void deactivateObjectsOutOfContext();
 
   /// Sets display mode for the given object if this object is displayed
@@ -147,7 +164,7 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param theAIS AIS presentation
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// Returns true if the Feature succesfully displayed
-  void display(ObjectPtr theObject, boost::shared_ptr<GeomAPI_AISObject> theAIS, bool isShading,
+  void display(ObjectPtr theObject, AISObjectPtr theAIS, bool isShading,
                bool isUpdateViewer = true);
 
   /// Display the shape and activate selection of sub-shapes
@@ -156,7 +173,7 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the presentation is created
   //bool redisplay(ObjectPtr theObject,
-  //               boost::shared_ptr<GeomAPI_AISObject> theAIS, 
+  //               AISObjectPtr theAIS, 
   //               const bool isUpdateViewer = true);
 
   /** Redisplay the shape if it was displayed
@@ -168,7 +185,7 @@ class XGUI_EXPORT XGUI_Displayer
  protected:
   XGUI_Workshop* myWorkshop;
 
-  typedef std::map<ObjectPtr, boost::shared_ptr<GeomAPI_AISObject> > ResultToAISMap;
+  typedef std::map<ObjectPtr, AISObjectPtr> ResultToAISMap;
   ResultToAISMap myResult2AISObjectMap;
 };
 
