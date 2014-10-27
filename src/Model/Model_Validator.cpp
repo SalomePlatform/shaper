@@ -211,8 +211,7 @@ bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>
   return true;
 }
 
-void Model_ValidatorsFactory::registerNotObligatory(
-  std::string theFeature, std::string theAttribute) 
+void Model_ValidatorsFactory::registerNotObligatory(std::string theFeature, std::string theAttribute)
 {
   std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(kDefaultId);
   if (it != myIDs.end()) {
@@ -222,3 +221,10 @@ void Model_ValidatorsFactory::registerNotObligatory(
     }
   }
 }
+
+void Model_ValidatorsFactory::registerConcealment(std::string theFeature, std::string theAttribute)
+{
+
+}
+
+

@@ -26,7 +26,6 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent, const Config_
       myParentId(theParentId)
 {
   myIsComputedDefault = false;
-  myIsObligatory = theData ? theData->getBooleanAttribute(FEATURE_OBLIGATORY, true) : true;
   myAttributeID = theData ? theData->widgetId() : "";
 }
 

@@ -48,10 +48,6 @@ Q_OBJECT
   /// on operation's execute, like radius for circle's constraint (can not be zero)
   bool isComputedDefault() { return myIsComputedDefault; }
 
-  /// Returns false for non-obligatory widgets which are
-  /// valid even if they are not initialized
-  bool isObligatory() { return myIsObligatory; }
-
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
 
@@ -145,8 +141,7 @@ signals:
   FeaturePtr myFeature;
 
   bool myIsComputedDefault; /// Value should be computed on execute,
-  /// like radius for circle's constraint (can not be zero)
-  bool myIsObligatory;      /// Non-obligatory widget is valid even if it is not initialized
+                            /// like radius for circle's constraint (can not be zero)
 };
 
 #endif
