@@ -26,9 +26,12 @@ INCLUDE_DIRECTORIES(
   ../ModelAPI
   ../GeomAPI
   ../GeomAlgoAPI
+  ../Events
+  ${CAS_INCLUDE_DIRS}
 )
 
 SET(PROJECT_LIBRARIES
+    Events
     ModelAPI 
     GeomAPI 
     GeomAlgoAPI

@@ -19,12 +19,8 @@ void Model_ResultBody::store(const boost::shared_ptr<GeomAPI_Shape>& theShape)
   boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
     TDF_Label& aShapeLab = aData->shapeLab();
-    // remove the previous history
-    clean();
-    aShapeLab.ForgetAttribute(TNaming_NamedShape::GetID());
-    for(TDF_ChildIterator anIter(aShapeLab); anIter.More(); anIter.Next()) {
-      anIter.Value().ForgetAllAttributes();
-    }
+    // clean builders
+    clean();   
     // store the new shape as primitive
     TNaming_Builder aBuilder(aShapeLab);
     if (!theShape)
@@ -34,6 +30,50 @@ void Model_ResultBody::store(const boost::shared_ptr<GeomAPI_Shape>& theShape)
       return;  // null shape inside
 
     aBuilder.Generated(aShape);
+  }
+}
+
+void Model_ResultBody::storeGenerated(const boost::shared_ptr<GeomAPI_Shape>& theFromShape,
+	                                  const boost::shared_ptr<GeomAPI_Shape>& theToShape)
+{
+  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(data());
+  if (aData) {
+    TDF_Label& aShapeLab = aData->shapeLab();
+    // clean builders
+    clean();   
+    // store the new shape as primitive
+    TNaming_Builder aBuilder(aShapeLab);
+    if (!theFromShape || !theToShape)
+      return;  // bad shape
+    TopoDS_Shape aShapeBasis = theFromShape->impl<TopoDS_Shape>();
+    if (aShapeBasis.IsNull())
+      return;  // null shape inside
+	TopoDS_Shape aShapeNew = theToShape->impl<TopoDS_Shape>();
+    if (aShapeNew.IsNull())
+      return;  // null shape inside
+    aBuilder.Generated(aShapeBasis, aShapeNew);
+  }
+}
+
+void Model_ResultBody::storeModified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+	                                  const boost::shared_ptr<GeomAPI_Shape>& theNewShape)
+{
+  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(data());
+  if (aData) {
+    TDF_Label& aShapeLab = aData->shapeLab();
+    // clean builders
+    clean();   
+    // store the new shape as primitive
+    TNaming_Builder aBuilder(aShapeLab);
+    if (!theOldShape || !theNewShape)
+      return;  // bad shape
+    TopoDS_Shape aShapeOld = theOldShape->impl<TopoDS_Shape>();
+    if (aShapeOld.IsNull())
+      return;  // null shape inside
+	TopoDS_Shape aShapeNew = theNewShape->impl<TopoDS_Shape>();
+    if (aShapeNew.IsNull())
+      return;  // null shape inside
+    aBuilder.Generated(aShapeOld, aShapeNew);
   }
 }
 
