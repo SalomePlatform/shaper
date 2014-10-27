@@ -129,7 +129,7 @@ bool Model_AttributeSelection::update()
             for(; aRes != aResults.cend(); aRes++) {
               ResultConstructionPtr aConstr = 
                 boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-              if (aConstr->shape()) {
+              if (aConstr->shape() && aConstr->shape()->isEdge()) {
                 const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
                 TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
                 if (!anEdge.IsNull()) {
@@ -230,7 +230,7 @@ void Model_AttributeSelection::selectConstruction(
     for(; aRes != aResults.cend(); aRes++) {
       ResultConstructionPtr aConstr = 
         boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-      if (aConstr->shape()) {
+      if (aConstr->shape() && aConstr->shape()->isEdge()) {
         const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
         TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
         if (!anEdge.IsNull()) {

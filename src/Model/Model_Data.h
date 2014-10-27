@@ -149,9 +149,6 @@ class Model_Data : public ModelAPI_Data
   /// Returns true if feature must be updated (re-executed) on rebuild
   MODEL_EXPORT virtual bool mustBeUpdated();
 
-  /// Returns true if this data attributes are referenced to the given feature or its results
-  MODEL_EXPORT virtual bool referencesTo(const boost::shared_ptr<ModelAPI_Feature>& theFeature);
-
   /// Returns the identifier of feature-owner, unique in this document
   MODEL_EXPORT virtual int featureId() const;
 
@@ -160,6 +157,8 @@ private:
   inline void eraseBackReferences() {myRefsToMe.clear();}
   // adds a back reference (with identifier which attribute references to this object
   void addBackReference(FeaturePtr theFeature, std::string theAttrID);
+  // returns all objects referenced to this
+  const std::set<AttributePtr>& refsToMe() {return myRefsToMe;}
   // returns all references by attributes of this data
   // \param the returned list of pairs: id of referenced attribute and list of referenced objects
   void referencesToObjects(std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs);

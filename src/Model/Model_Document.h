@@ -143,6 +143,8 @@ class Model_Document : public ModelAPI_Document
   //! \param theMarkUpdated causes the "update" event for all features
   //! \param theUpdateReferences causes the update of back-references
   void synchronizeFeatures(const bool theMarkUpdated, const bool theUpdateReferences);
+  //! Synchronizes the BackReferences list in Data of Features and Results
+  void synchronizeBackRefs();
 
   //! Creates new document with binary file format
   Model_Document(const std::string theID, const std::string theKind);

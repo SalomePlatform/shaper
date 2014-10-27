@@ -265,10 +265,12 @@ void Model_Document::finishOperation()
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_Session>(Model_Session::get())
         ->setCheckTransactions(false);  // for nested transaction commit
+  synchronizeBackRefs();
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_Session>(Model_Session::get())
@@ -468,18 +470,11 @@ void Model_Document::removeFeature(FeaturePtr theFeature, const bool theCheck)
     // check the feature: it must have no depended objects on it
     std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
     for(; aResIter != theFeature->results().cend(); aResIter++) {
-      /*
-      if (myConcealedResults.find(*aResIter) != myConcealedResults.end()) {
-        Events_Error::send("Feature '" + theFeature->data()->name() + "' is used and can not be deleted");
-        return;
-      }
-      */
-    }
-    NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator anObjIter(myObjs);
-    for(; anObjIter.More(); anObjIter.Next()) {
-      DataPtr aData = anObjIter.Value()->data();
-      if (aData->referencesTo(theFeature)) {
-        Events_Error::send("Feature '" + theFeature->data()->name() + "' is used and can not be deleted");
+      boost::shared_ptr<Model_Data> aData = 
+        boost::dynamic_pointer_cast<Model_Data>((*aResIter)->data());
+      if (aData && !aData->refsToMe().empty()) {
+        Events_Error::send(
+          "Feature '" + theFeature->data()->name() + "' is used and can not be deleted");
         return;
       }
     }
@@ -496,22 +491,11 @@ void Model_Document::removeFeature(FeaturePtr theFeature, const bool theCheck)
   // erase all attributes under the label of feature
   aFeatureLabel.ForgetAllAttributes();
   // remove it from the references array
-  RemoveFromRefArray(featuresLabel(), aFeatureLabel);
-
+  if (theFeature->isInHistory()) {
+    RemoveFromRefArray(featuresLabel(), aFeatureLabel);
+  }
   // event: feature is deleted
   ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
-  /* this is in "erase"
-  // results of this feature must be redisplayed
-  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
-  std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-  for (; aRIter != aResults.cend(); aRIter++) {
-    boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-    aRes->setData(boost::shared_ptr<ModelAPI_Data>());  // deleted flag
-    ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
-    ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), aRes->groupName());
-  }
-  */
 }
 
 FeaturePtr Model_Document::feature(TDF_Label& theLabel)
@@ -789,46 +773,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
   }
 
   if (theUpdateReferences) {
-    // first cycle: erase all data about back-references
-    NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFeatures(myObjs);
-    for(; aFeatures.More(); aFeatures.Next()) {
-      FeaturePtr aFeature = aFeatures.Value();
-      boost::shared_ptr<Model_Data> aFData = 
-        boost::dynamic_pointer_cast<Model_Data>(aFeature->data());
-      if (aFData) {
-        aFData->eraseBackReferences();
-      }
-      const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
-      std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      for (; aRIter != aResults.cend(); aRIter++) {
-        boost::shared_ptr<Model_Data> aResData = 
-          boost::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
-        if (aResData) {
-          aResData->eraseBackReferences();
-        }
-      }
-    }
-
-    // second cycle: set new back-references: only features may have reference, iterate only them
-    ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
-    for(aFeatures.Initialize(myObjs); aFeatures.More(); aFeatures.Next()) {
-      FeaturePtr aFeature = aFeatures.Value();
-      boost::shared_ptr<Model_Data> aFData = 
-        boost::dynamic_pointer_cast<Model_Data>(aFeature->data());
-      if (aFData) {
-        std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
-        aFData->referencesToObjects(aRefs);
-        std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRefsIter = aRefs.begin();
-        for(; aRefsIter != aRefs.end(); aRefsIter++) {
-          std::list<ObjectPtr>::iterator aReferenced = aRefsIter->second.begin();
-          for(; aReferenced != aRefsIter->second.end(); aReferenced++) {
-            boost::shared_ptr<Model_Data> aRefData = 
-              boost::dynamic_pointer_cast<Model_Data>((*aReferenced)->data());
-            aRefData->addBackReference(aFeature, aRefsIter->first); // here the Concealed flag is updated
-          }
-        }
-      }
-    }
+    synchronizeBackRefs();
   }
 
   myExecuteFeatures = false;
@@ -840,9 +785,56 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
     aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   }
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   boost::static_pointer_cast<Model_Session>(Model_Session::get())
     ->setCheckTransactions(true);
   myExecuteFeatures = true;
+}
+
+void Model_Document::synchronizeBackRefs()
+{
+  // first cycle: erase all data about back-references
+  NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFeatures(myObjs);
+  for(; aFeatures.More(); aFeatures.Next()) {
+    FeaturePtr aFeature = aFeatures.Value();
+    boost::shared_ptr<Model_Data> aFData = 
+      boost::dynamic_pointer_cast<Model_Data>(aFeature->data());
+    if (aFData) {
+      aFData->eraseBackReferences();
+    }
+    const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+    std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+    for (; aRIter != aResults.cend(); aRIter++) {
+      boost::shared_ptr<Model_Data> aResData = 
+        boost::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
+      if (aResData) {
+        aResData->eraseBackReferences();
+      }
+    }
+  }
+
+  // second cycle: set new back-references: only features may have reference, iterate only them
+  ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+  for(aFeatures.Initialize(myObjs); aFeatures.More(); aFeatures.Next()) {
+    FeaturePtr aFeature = aFeatures.Value();
+    boost::shared_ptr<Model_Data> aFData = 
+      boost::dynamic_pointer_cast<Model_Data>(aFeature->data());
+    if (aFData) {
+      std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
+      aFData->referencesToObjects(aRefs);
+      std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRefsIter = aRefs.begin();
+      for(; aRefsIter != aRefs.end(); aRefsIter++) {
+        std::list<ObjectPtr>::iterator aRefTo = aRefsIter->second.begin();
+        for(; aRefTo != aRefsIter->second.end(); aRefTo++) {
+          if (*aRefTo) {
+            boost::shared_ptr<Model_Data> aRefData = 
+              boost::dynamic_pointer_cast<Model_Data>((*aRefTo)->data());
+            aRefData->addBackReference(aFeature, aRefsIter->first); // here the Concealed flag is updated
+          }
+        }
+      }
+    }
+  }
 }
 
 TDF_Label Model_Document::resultLabel(
