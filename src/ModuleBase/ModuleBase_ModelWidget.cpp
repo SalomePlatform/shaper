@@ -39,9 +39,8 @@ void ModuleBase_ModelWidget::enableFocusProcessing()
 {
   QList<QWidget*> aMyControls = getControls();
   foreach(QWidget*  eachControl, aMyControls) {
-    if(!myFocusInWidgets.contains(eachControl)) {
-      enableFocusProcessing(eachControl);
-    }
+    eachControl->setFocusPolicy(Qt::StrongFocus);
+    eachControl->installEventFilter(this);
   }
 }
 
@@ -92,20 +91,15 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj) const
   ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
 }
 
-void ModuleBase_ModelWidget::enableFocusProcessing(QWidget* theWidget)
-{
-  theWidget->setFocusPolicy(Qt::StrongFocus);
-  theWidget->installEventFilter(this);
-  myFocusInWidgets.append(theWidget);
-}
-
 bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
 {
   QWidget* aWidget = qobject_cast<QWidget*>(theObject);
-  if (theEvent->type() == QEvent::MouseButtonRelease && 
-      myFocusInWidgets.contains(aWidget)) {
-    emit focusInWidget(this);
+  if (theEvent->type() == QEvent::FocusIn) {
+    if (getControls().contains(aWidget)) {
+      emit focusInWidget(this);
+    }
   } 
   // pass the event on to the parent class
+
   return QObject::eventFilter(theObject, theEvent);
 }

@@ -139,10 +139,6 @@ signals:
 
   void updateObject(ObjectPtr theObj) const;
 
- private:
-  /// Let the widget process FocusIn events
-  void enableFocusProcessing(QWidget* theWidget);
-
  protected:
   std::string myAttributeID; /// the attribute name of the model feature
   std::string myParentId;    /// name of parent
@@ -151,10 +147,6 @@ signals:
   bool myIsComputedDefault; /// Value should be computed on execute,
   /// like radius for circle's constraint (can not be zero)
   bool myIsObligatory;      /// Non-obligatory widget is valid even if it is not initialized
-
- private:
-   /// Contains a list of widgets that may accept focus
-   QList<QWidget*> myFocusInWidgets;
 };
 
 #endif
