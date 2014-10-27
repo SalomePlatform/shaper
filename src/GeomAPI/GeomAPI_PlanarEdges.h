@@ -1,4 +1,4 @@
-// File:        GeomAPI_Wire.hxx
+// File:        GeomAPI_PlanarEdges.hxx
 // Created:     24 Jul 2014
 // Author:      Artem ZHIDKOV
 
@@ -14,16 +14,16 @@
 
 #include <list>
 
-/**\class GeomAPI_Wire
+/**\class GeomAPI_PlanarEdges
  * \ingroup DataModel
  * \brief Interface to the edge object
  */
 
-class GeomAPI_Wire : public GeomAPI_Shape
+class GeomAPI_PlanarEdges : public GeomAPI_Shape
 {
  public:
   /// Creation of empty (null) shape
-  GEOMAPI_EXPORT GeomAPI_Wire();
+  GEOMAPI_EXPORT GeomAPI_PlanarEdges();
 
   GEOMAPI_EXPORT virtual bool isVertex() const
   {

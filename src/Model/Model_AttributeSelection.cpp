@@ -11,7 +11,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <GeomAPI_Shape.h>
-#include <GeomAPI_Wire.h>
+#include <GeomAPI_PlanarEdges.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
 #include <Events_Error.h>
 
@@ -96,7 +96,7 @@ bool Model_AttributeSelection::update()
   } else if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
     // construction: identification by the results indexes, recompute faces and
     // take the face that more close by the indexes
-    boost::shared_ptr<GeomAPI_Wire> aWirePtr = boost::dynamic_pointer_cast<GeomAPI_Wire>(
+    boost::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = boost::dynamic_pointer_cast<GeomAPI_PlanarEdges>(
       boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext)->shape());
     if (aWirePtr && aWirePtr->hasPlane()) {
         // If this is a wire with plane defined thin it is a sketch-like object

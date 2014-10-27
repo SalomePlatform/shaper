@@ -1,9 +1,9 @@
-// File:        GeomAPI_Wire.cpp
+// File:        GeomAPI_PlanarEdges.cpp
 // Created:     06 Oct 2014
 // Author:      Sergey BELASH
 
 #include <GeomAPI_Interface.h>
-#include <GeomAPI_Wire.h>
+#include <GeomAPI_PlanarEdges.h>
 
 #include <Standard_TypeDef.hxx>
 #include <TopAbs_ShapeEnum.hxx>
@@ -17,7 +17,7 @@
 
 #include <list>
 
-GeomAPI_Wire::GeomAPI_Wire() : GeomAPI_Shape()
+GeomAPI_PlanarEdges::GeomAPI_PlanarEdges() : GeomAPI_Shape()
 {
   TopoDS_Compound aBigWireImpl;
   BRep_Builder aBuilder;
@@ -25,7 +25,7 @@ GeomAPI_Wire::GeomAPI_Wire() : GeomAPI_Shape()
   this->setImpl(new TopoDS_Shape(aBigWireImpl));
 }
 
-void GeomAPI_Wire::addEdge(boost::shared_ptr<GeomAPI_Shape> theEdge)
+void GeomAPI_PlanarEdges::addEdge(boost::shared_ptr<GeomAPI_Shape> theEdge)
 {
   const TopoDS_Edge& anEdge = theEdge->impl<TopoDS_Edge>();
   if (anEdge.ShapeType() != TopAbs_EDGE)
@@ -35,7 +35,7 @@ void GeomAPI_Wire::addEdge(boost::shared_ptr<GeomAPI_Shape> theEdge)
   aBuilder.Add(aWire, anEdge);
 }
 
-std::list<boost::shared_ptr<GeomAPI_Shape> > GeomAPI_Wire::getEdges()
+std::list<boost::shared_ptr<GeomAPI_Shape> > GeomAPI_PlanarEdges::getEdges()
 {
   TopoDS_Shape& aShape = const_cast<TopoDS_Shape&>(impl<TopoDS_Shape>());
   //BRepTools_WireExplorer aWireExp(TopoDS::Wire(aShape));

@@ -9,7 +9,7 @@
 
 #include <GeomAPI_AISObject.h>
 #include <GeomAPI_Dir.h>
-#include <GeomAPI_Wire.h>
+#include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_XYZ.h>
 
 #include <GeomDataAPI_Dir.h>
@@ -88,7 +88,7 @@ void SketchPlugin_Sketch::execute()
     return;
 
   // Collect all edges as one big wire
-  boost::shared_ptr<GeomAPI_Wire> aBigWire(new GeomAPI_Wire);
+  boost::shared_ptr<GeomAPI_PlanarEdges> aBigWire(new GeomAPI_PlanarEdges);
   std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator aShapeIt = aFeaturesPreview.begin();
   for (; aShapeIt != aFeaturesPreview.end(); ++aShapeIt) {
     aBigWire->addEdge(*aShapeIt);
