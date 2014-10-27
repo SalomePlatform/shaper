@@ -43,6 +43,7 @@ boost::shared_ptr<ModelAPI_AttributeSelection>
 void Model_AttributeSelectionList::clear()
 {
   if (!mySubs.empty()) {
+    mySize->Set(0);
     mySubs.clear();
     TDF_ChildIterator aSubIter(mySize->Label());
     for(; aSubIter.More(); aSubIter.Next()) {

@@ -130,12 +130,6 @@ class Model_Document : public ModelAPI_Document
   ///! On abort, undo or redo it is not necessary: results in document are updated automatically
   bool executeFeatures() {return myExecuteFeatures;}
 
-  ///! Reutrns true is result was conecaled because of usage it by other object
-  virtual bool isConcealed(const boost::shared_ptr<ModelAPI_Object>& theResult) {
-    return myConcealedResults.find(boost::dynamic_pointer_cast<ModelAPI_Result>(theResult))
-      != myConcealedResults.end();
-  }
-
  protected:
 
   //! Returns (creates if needed) the features label
@@ -146,7 +140,9 @@ class Model_Document : public ModelAPI_Document
   void setUniqueName(FeaturePtr theFeature);
 
   //! Synchronizes myFeatures list with the updated document
-  void synchronizeFeatures(const bool theMarkUpdated = false);
+  //! \param theMarkUpdated causes the "update" event for all features
+  //! \param theUpdateReferences causes the update of back-references
+  void synchronizeFeatures(const bool theMarkUpdated, const bool theUpdateReferences);
 
   //! Creates new document with binary file format
   Model_Document(const std::string theID, const std::string theKind);
@@ -174,11 +170,6 @@ class Model_Document : public ModelAPI_Document
   //! Updates the results list of the feature basing on the current data tree
   void updateResults(FeaturePtr theFeature);
 
-  //! Stores information that there is a reference to this object
-  void objectIsReferenced(const ObjectPtr& theObject);
-  //! Removes information that there is a reference to this object
-  void objectIsNotReferenced(const ObjectPtr& theObject);
-
   //! Returns all sub documents
   const std::set<std::string>& subDocuments() const {return mySubs;}
 
@@ -198,8 +189,6 @@ class Model_Document : public ModelAPI_Document
   /// All features managed by this document (not only in history of OB)
   /// For optimization mapped by labels
   NCollection_DataMap<TDF_Label, FeaturePtr> myObjs;
-  /// Results that are referenced and must be concealed for object browser
-  std::set<ResultPtr> myConcealedResults;
 
   ///< set of identifiers of sub-documents of this document
   std::set<std::string> mySubs;
