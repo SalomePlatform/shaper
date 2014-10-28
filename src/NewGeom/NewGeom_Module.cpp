@@ -343,6 +343,21 @@ QStringList NewGeom_Module::nestedActions(const QString& theId) const
 }
 
 //******************************************************
+void NewGeom_Module::setDocumentKind(const QString& theId, const QString& theKind)
+{
+  myDocumentType[theId] = theKind;
+}
+
+//******************************************************
+QString NewGeom_Module::documentKind(const QString& theId) const
+{
+  if (myDocumentType.contains(theId))
+    return myDocumentType[theId];
+  return QString();
+
+}
+
+//******************************************************
 void NewGeom_Module::selectionChanged()
 {
   LightApp_Module::selectionChanged();
