@@ -110,6 +110,9 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Module
   Handle(V3d_View) aView = theViewer->activeView();
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
 
+  if (theViewer->isSelectionEnabled())
+    theViewer->enableSelection(false);
+
   //blockSelection(true);
   if (myCurPoint.myIsInitialized) {
     double aCurX, aCurY;
@@ -154,6 +157,8 @@ void PartSet_OperationFeatureEditMulti::mouseReleased(
       }
     }
   }
+  if (!theViewer->isSelectionEnabled())
+    theViewer->enableSelection(true);
 }
 
 void PartSet_OperationFeatureEditMulti::startOperation()
