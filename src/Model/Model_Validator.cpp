@@ -211,8 +211,7 @@ bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>
   return true;
 }
 
-void Model_ValidatorsFactory::registerNotObligatory(
-  std::string theFeature, std::string theAttribute) 
+void Model_ValidatorsFactory::registerNotObligatory(std::string theFeature, std::string theAttribute)
 {
   std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(kDefaultId);
   if (it != myIDs.end()) {
@@ -221,4 +220,22 @@ void Model_ValidatorsFactory::registerNotObligatory(
       aValidator->registerNotObligatory(theFeature, theAttribute);
     }
   }
+}
+
+void Model_ValidatorsFactory::registerConcealment(std::string theFeature, std::string theAttribute)
+{
+  std::map<std::string, std::set<std::string> >::iterator aFind = myConcealed.find(theFeature);
+  if (aFind == myConcealed.end()) {
+    std::set<std::string> aNewSet;
+    aNewSet.insert(theAttribute);
+    myConcealed[theFeature] = aNewSet;
+  } else {
+    aFind->second.insert(theAttribute);
+  }
+}
+
+bool Model_ValidatorsFactory::isConcealed(std::string theFeature, std::string theAttribute)
+{
+  std::map<std::string, std::set<std::string> >::iterator aFind = myConcealed.find(theFeature);
+  return aFind != myConcealed.end() && aFind->second.find(theAttribute) != aFind->second.end();
 }

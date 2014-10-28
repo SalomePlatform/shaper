@@ -53,6 +53,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
 
 
   QString qs(const std::string& theStdString) const;
+  void processAttributes();
 
  private:
   Config_WidgetAPI* myWidgetApi;

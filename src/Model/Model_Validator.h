@@ -32,6 +32,10 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   std::map<std::string, AttrValidators> myFeatures;
   /// validators IDs and arguments by feature and attribute IDs
   std::map<std::string, std::map<std::string, AttrValidators> > myAttrs;
+  /// Stores the registered attributes that leads to the concealment of referenced objects in 
+  /// data tree. Map from feature kind to set of attribute IDs.
+  std::map<std::string, std::set<std::string> > myConcealed;
+
  public:
   /// Registers the instance of the validator by the ID
   MODEL_EXPORT virtual void registerValidator(const std::string& theID,
@@ -71,6 +75,13 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   /// register that this attribute in feature is not obligatory for the feature execution
   /// so, it is not needed for the standard validation mechanism
   virtual void registerNotObligatory(std::string theFeature, std::string theAttribute);
+
+  /// register that this attribute conceals in the object browser
+  /// all referenced features after execution
+  virtual void registerConcealment(std::string theFeature, std::string theAttribute);
+
+  /// Returns true that it was registered that attribute conceals the referenced result
+  virtual bool isConcealed(std::string theFeature, std::string theAttribute);
 
 protected:
   void addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators) const;

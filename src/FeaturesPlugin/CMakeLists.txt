@@ -26,14 +26,14 @@ INCLUDE_DIRECTORIES(
   ../ModelAPI
   ../GeomAPI
   ../GeomAlgoAPI
+  ../Events
 )
 
 SET(PROJECT_LIBRARIES
+    Events
     ModelAPI 
     GeomAPI 
     GeomAlgoAPI
-    ${CAS_KERNEL}
-    ${CAS_SHAPE}
 )
 
 ADD_DEFINITIONS(-DFEATURESPLUGIN_EXPORTS ${BOOST_DEFINITIONS})

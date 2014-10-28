@@ -7,6 +7,7 @@
 
 #include <GeomAPI_Interface.h>
 #include <boost/shared_ptr.hpp>
+#include <list>
 
 /**\class GeomAPI_Shape
  * \ingroup DataModel
@@ -30,6 +31,9 @@ class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
   virtual bool isEdge() const;
 
 };
+
+//! Pointer on list of shapes
+typedef std::list<boost::shared_ptr<GeomAPI_Shape> > ListOfShape;
 
 //! Pointer on attribute object
 typedef boost::shared_ptr<GeomAPI_Shape> GeomShapePtr;

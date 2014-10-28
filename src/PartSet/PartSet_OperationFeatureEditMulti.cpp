@@ -25,13 +25,12 @@
 
 #include <V3d_View.hxx>
 
+#include <QMouseEvent>
 #ifdef _DEBUG
 #include <QDebug>
 #endif
 
-#include <QMouseEvent>
-
-using namespace std;
+//using namespace std;
 
 PartSet_OperationFeatureEditMulti::PartSet_OperationFeatureEditMulti(const QString& theId,
                                                                      QObject* theParent,
@@ -85,7 +84,6 @@ void PartSet_OperationFeatureEditMulti::initSelection(
       myFeatures.append(aPrs);
   }
   // Remove current feature if it is in the list (it will be moved as main feature)
-  FeaturePtr aFea = feature();
   foreach (ModuleBase_ViewerPrs aPrs, myFeatures) {
     FeaturePtr aF = ModelAPI_Feature::feature(aPrs.object());
     if (ModelAPI_Feature::feature(aPrs.object()) == feature()) {

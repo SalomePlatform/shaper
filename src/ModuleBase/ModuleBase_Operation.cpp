@@ -187,8 +187,8 @@ void ModuleBase_Operation::start()
 void ModuleBase_Operation::resume()
 {
   if (myPropertyPanel)
-    connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), this,
-            SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
+    connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
+            this,            SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
   emit resumed();
 }
 

@@ -16,6 +16,7 @@
 #include <Model_Events.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomData_Point.h>
 #include <GeomData_Point2D.h>
@@ -351,44 +352,67 @@ bool Model_Data::mustBeUpdated()
   return myLab.IsAttribute(kMustBeUpdatedGUID) == Standard_True;
 }
 
-bool Model_Data::referencesTo(const boost::shared_ptr<ModelAPI_Feature>& theFeature)
-{
-  // collect results of this feature first to check references quickly in the cycle
-  std::set<ObjectPtr> aFeatureObjs;
-  aFeatureObjs.insert(theFeature);
-  std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter =
-    theFeature->results().cbegin();
-  for(; aRIter != theFeature->results().cend(); aRIter++) {
-    if (*aRIter)
-      aFeatureObjs.insert(*aRIter);
-  }
-
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = 
-    myAttrs.begin();
-  for (; anAttrsIter != myAttrs.end(); anAttrsIter++) {
-    if (anAttrsIter->second->attributeType() == ModelAPI_AttributeRefAttr::type()) {
-      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRefAttr = 
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttrsIter->second);
-      if (aRefAttr && aRefAttr->isObject()) { // check referenced object
-        if (aFeatureObjs.find(aRefAttr->object()) != aFeatureObjs.end())
-          return true;
-      } else { // check object of referenced attribute
-        boost::shared_ptr<ModelAPI_Attribute> anAttr = aRefAttr->attr();
-        if (anAttr && aFeatureObjs.find(anAttr->owner()) != aFeatureObjs.end())
-          return true;
-      }
-    } else if (anAttrsIter->second->attributeType() == ModelAPI_AttributeReference::type()) {
-      boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
-        boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(anAttrsIter->second);
-      if (aFeatureObjs.find(aRef->value()) != aFeatureObjs.end()) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
 int Model_Data::featureId() const
 {
   return myLab.Father().Tag(); // tag of the feature label
+}
+
+void Model_Data::eraseBackReferences()
+{
+  myRefsToMe.clear();
+  boost::shared_ptr<ModelAPI_Result> aRes = 
+    boost::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+  if (aRes)
+    aRes->setIsConcealed(false);
+}
+
+void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID)
+{
+  myRefsToMe.insert(theFeature->data()->attribute(theAttrID));
+  if (ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
+    boost::shared_ptr<ModelAPI_Result> aRes = 
+      boost::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+    if (aRes) {
+      aRes->setIsConcealed(true);
+    }
+  }
+}
+
+void Model_Data::referencesToObjects(
+  std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs)
+{
+  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = myAttrs.begin();
+  std::list<ObjectPtr> aReferenced; // not inside of cycle to avoid excess memory menagement
+  for(; anAttr != myAttrs.end(); anAttr++) {
+    std::string aType = anAttr->second->attributeType();
+    if (aType == ModelAPI_AttributeReference::type()) { // reference to object
+      boost::shared_ptr<ModelAPI_AttributeReference> aRef = boost::dynamic_pointer_cast<
+          ModelAPI_AttributeReference>(anAttr->second);
+      aReferenced.push_back(aRef->value());
+      theRefs.push_back(std::pair<std::string, std::list<ObjectPtr> >(anAttr->first, aReferenced));
+    } else if (aType == ModelAPI_AttributeRefAttr::type()) { // reference to attribute or object
+      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+          ModelAPI_AttributeRefAttr>(anAttr->second);
+      aReferenced.push_back(aRef->isObject() ? aRef->object() : aRef->attr()->owner());
+    } else if (aType == ModelAPI_AttributeRefList::type()) { // list of references
+      aReferenced = boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttr->second)->list();
+    } else if (aType == ModelAPI_AttributeSelection::type()) { // selection attribute
+      boost::shared_ptr<ModelAPI_AttributeSelection> aRef = boost::dynamic_pointer_cast<
+          ModelAPI_AttributeSelection>(anAttr->second);
+      aReferenced.push_back(aRef->context());
+      theRefs.push_back(std::pair<std::string, std::list<ObjectPtr> >(anAttr->first, aReferenced));
+    } else if (aType == ModelAPI_AttributeSelectionList::type()) { // list of selection attributes
+      boost::shared_ptr<ModelAPI_AttributeSelectionList> aRef = boost::dynamic_pointer_cast<
+          ModelAPI_AttributeSelectionList>(anAttr->second);
+      for(int a = aRef->size() - 1; a >= 0; a--) {
+        aReferenced.push_back(aRef->value(a)->context());
+      }
+    } else
+      continue; // nothing to do, not reference
+
+    if (!aReferenced.empty()) {
+      theRefs.push_back(std::pair<std::string, std::list<ObjectPtr> >(anAttr->first, aReferenced));
+      aReferenced.clear();
+    }
+  }
 }

@@ -57,7 +57,7 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
 
   EXCHANGEPLUGIN_EXPORT virtual bool isInHistory()
   {
-    return false;
+    return true;
   }
 
  protected:

@@ -129,13 +129,21 @@ void XGUI_ActionsMgr::updateByDocumentKind()
 {
   std::string aStdDocKind = ModelAPI_Session::get()->activeDocument()->kind();
   QString aDocKind = QString::fromStdString(aStdDocKind);
+  XGUI_Workshop* aWorkshop = static_cast<XGUI_Workshop*>(parent());
   foreach(QAction* eachAction, myActions.values()) {
     XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(eachAction);
+    QString aCmdDocKind;
     if(aCmd) {
-      QString aCmdDocKind = aCmd->documentKind();
-      if(!aCmdDocKind.isEmpty() && aCmdDocKind != aDocKind) {
-        eachAction->setEnabled(false);
+      aCmdDocKind = aCmd->documentKind();
+    }
+    else {
+      QString aId = eachAction->data().toString();
+      if (!aId.isEmpty()) {
+        aCmdDocKind = aWorkshop->salomeConnector()->documentKind(aId);
       }
+    }
+    if(!aCmdDocKind.isEmpty() && aCmdDocKind != aDocKind) {
+      eachAction->setEnabled(false);
     }
   }
 }

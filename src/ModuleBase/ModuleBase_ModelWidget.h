@@ -48,10 +48,6 @@ Q_OBJECT
   /// on operation's execute, like radius for circle's constraint (can not be zero)
   bool isComputedDefault() { return myIsComputedDefault; }
 
-  /// Returns false for non-obligatory widgets which are
-  /// valid even if they are not initialized
-  bool isObligatory() { return myIsObligatory; }
-
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
 
@@ -139,22 +135,13 @@ signals:
 
   void updateObject(ObjectPtr theObj) const;
 
- private:
-  /// Let the widget process FocusIn events
-  void enableFocusProcessing(QWidget* theWidget);
-
  protected:
   std::string myAttributeID; /// the attribute name of the model feature
   std::string myParentId;    /// name of parent
   FeaturePtr myFeature;
 
   bool myIsComputedDefault; /// Value should be computed on execute,
-  /// like radius for circle's constraint (can not be zero)
-  bool myIsObligatory;      /// Non-obligatory widget is valid even if it is not initialized
-
- private:
-   /// Contains a list of widgets that may accept focus
-   QList<QWidget*> myFocusInWidgets;
+                            /// like radius for circle's constraint (can not be zero)
 };
 
 #endif

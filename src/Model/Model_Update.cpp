@@ -4,6 +4,7 @@
 
 #include <Model_Update.h>
 #include <Model_Document.h>
+#include <Model_Data.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -137,67 +138,16 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
           aMustbeUpdated = true;
       }
     }
-
-    // references
-    list<boost::shared_ptr<ModelAPI_Attribute> > aRefs = theFeature->data()->attributes(
-        ModelAPI_AttributeReference::type());
-    list<boost::shared_ptr<ModelAPI_Attribute> >::iterator aRefsIter = aRefs.begin();
-    for (; aRefsIter != aRefs.end(); aRefsIter++) {
-      boost::shared_ptr<ModelAPI_Object> aSub = boost::dynamic_pointer_cast<
-          ModelAPI_AttributeReference>(*aRefsIter)->value();
-      if (updateObject(aSub)) {
-        aMustbeUpdated = true;
-      }
-    }
-    // reference to attribute or object
-    list<boost::shared_ptr<ModelAPI_Attribute> > aRefAttrs = theFeature->data()->attributes(
-        ModelAPI_AttributeRefAttr::type());
-    for (aRefsIter = aRefAttrs.begin(); aRefsIter != aRefAttrs.end(); aRefsIter++) {
-      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*aRefsIter);
-      if (!aRef) continue;
-      if (aRef->isObject()) {
-        boost::shared_ptr<ModelAPI_Object> aSub = aRef->object();
-        if (updateObject(aSub)) {
-          aMustbeUpdated = true;
-        }
-      } else if (aRef->attr()) { // reference to the attribute
-        boost::shared_ptr<ModelAPI_Object> aSub = aRef->attr()->owner();
-        if (updateObject(aSub)) {
-          aMustbeUpdated = true;
-        }
-      }
-    }
-    // lists of references
-    aRefs = theFeature->data()->attributes(ModelAPI_AttributeRefList::type());
-    for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
-      list<ObjectPtr> aListRef = boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(*aRefsIter)
-          ->list();
-      list<ObjectPtr>::iterator aListIter = aListRef.begin();
-      for (; aListIter != aListRef.end(); aListIter++) {
-        boost::shared_ptr<ModelAPI_Object> aSub = *aListIter;
-        if (updateObject(aSub)) {
-          aMustbeUpdated = true;
-        }
-      }
-    }
-    // selection attributes: must be called "update" methods if needed
-    aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelection::type());
-    for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
-      boost::shared_ptr<ModelAPI_AttributeSelection> aSel =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
-      if (updateObject(aSel->context())) {
-        aMustbeUpdated = true;
-        // aSel->update(); // this must be done on execution since it may be long operation
-      }
-    }
-    // lists of selection attributes: must be called "update" methods if needed
-    aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelectionList::type());
-    for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
-      boost::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
-      for(int a = aSel->size() - 1; a >= 0; a--) {
-        if (updateObject(aSel->value(a)->context())) {
+    // check all references: if referenced objects are updated, this object also must be updated
+    std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
+    boost::shared_ptr<Model_Data> aData = 
+      boost::dynamic_pointer_cast<Model_Data>(theFeature->data());
+    aData->referencesToObjects(aRefs);
+    std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRef = aRefs.begin();
+    for(; aRef != aRefs.end(); aRef++) {
+      std::list<ObjectPtr>::iterator aRefObj = aRef->second.begin();
+      for(; aRefObj != aRef->second.end(); aRefObj++) {
+        if (updateObject(*aRefObj)) {
           aMustbeUpdated = true;
         }
       }
@@ -214,8 +164,10 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
             !theFeature->isPersistentResult() /* execute quick, not persistent results */) 
           {
             // before execution update the selection attributes if any
-            aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelection::type());
-            for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
+            list<AttributePtr> aRefs = 
+              theFeature->data()->attributes(ModelAPI_AttributeSelection::type());
+            list<AttributePtr>::iterator aRefsIter = aRefs.begin();
+            for (; aRefsIter != aRefs.end(); aRefsIter++) {
               boost::shared_ptr<ModelAPI_AttributeSelection> aSel =
                 boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
               aSel->update(); // this must be done on execution since it may be long operation

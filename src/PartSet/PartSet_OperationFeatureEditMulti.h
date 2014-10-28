@@ -11,6 +11,8 @@
 #include <QObject>
 #include <QList>
 
+#include <list>
+
 class QMouseEvent;
 
 /*!

@@ -5,7 +5,7 @@
 #include "ModuleBase_ResultPrs.h"
 
 #include <ModelAPI_Tools.h>
-#include <GeomAPI_Wire.h>
+#include <GeomAPI_PlanarEdges.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
 
 #include <BRep_Builder.hxx>
@@ -20,8 +20,8 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   : AIS_Shape(TopoDS_Shape()), myResult(theResult), myIsSketchMode(false)
 {
   boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
-  boost::shared_ptr<GeomAPI_Wire> aWirePtr = 
-    boost::dynamic_pointer_cast<GeomAPI_Wire>(aShapePtr);
+  boost::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 
+    boost::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aShapePtr);
   if (aWirePtr) {
     if (aWirePtr->hasPlane() ) {
       // If this is a wire with plane defined thin it is a sketch-like object

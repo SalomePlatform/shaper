@@ -12,6 +12,8 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_SketchBuilder.h
     GeomAlgoAPI_Extrusion.h
     GeomAlgoAPI_Boolean.h
+    GeomAlgoAPI_MakeShape.h
+    GeomAlgoAPI_DFLoader.h
 )
 
 SET(PROJECT_SOURCES
@@ -22,14 +24,18 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_SketchBuilder.cpp
     GeomAlgoAPI_Extrusion.cpp
     GeomAlgoAPI_Boolean.cpp
+    GeomAlgoAPI_MakeShape.cpp
+    GeomAlgoAPI_DFLoader.cpp
 )
 
 SET(PROJECT_LIBRARIES
-    GeomAPI 
+    GeomAPI
+    ModelAPI 
     ${CAS_TKBool} 
     ${CAS_TKBO} 
     ${CAS_TKPrim}
     ${CAS_SHAPE}
+    ${CAS_TKTopAlgo}
 )
 
 ADD_DEFINITIONS(-DGEOMALGOAPI_EXPORTS ${CAS_DEFINITIONS})
@@ -42,6 +48,7 @@ SET_SOURCE_FILES_PROPERTIES(GeomAlgoAPI.i PROPERTIES SWIG_DEFINITIONS "-shadow")
 
 INCLUDE_DIRECTORIES(
   ../GeomAPI
+  ../ModelAPI
   ${CAS_INCLUDE_DIRS}
 )
 
