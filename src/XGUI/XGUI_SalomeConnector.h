@@ -67,6 +67,14 @@ class XGUI_EXPORT XGUI_SalomeConnector
   //! Returns list of nested actions according to the given command ID
   virtual QStringList nestedActions(const QString& theId) const = 0;
 
+  //! Set the document kind of the action by the given command Id
+  //! \param theId - the command ID
+  //! \param theKind - the document kind
+  virtual void setDocumentKind(const QString& theId, const QString& theKind) = 0;
+
+  //! Returns the document kind of the action by the given command ID
+  virtual QString documentKind(const QString& theId) const = 0;
+
   //! Returns interface to Salome viewer
   virtual ModuleBase_IViewer* viewer() const = 0;
 

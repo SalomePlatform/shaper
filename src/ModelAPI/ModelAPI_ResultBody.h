@@ -36,6 +36,15 @@ public:
 
   /// Stores the shape (called by the execution method).
   virtual void store(const boost::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+
+  /// Stores the generated shape (called by the execution method).
+  virtual void storeGenerated(const boost::shared_ptr<GeomAPI_Shape>& theFromShape,
+	                          const boost::shared_ptr<GeomAPI_Shape>& theToShape) = 0;
+
+  /// Stores the modified shape (called by the execution method).
+  virtual void storeModified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+	                          const boost::shared_ptr<GeomAPI_Shape>& theNewShape) = 0;
+
   /// Returns the shape-result produced by this feature
   virtual boost::shared_ptr<GeomAPI_Shape> shape() = 0;
 

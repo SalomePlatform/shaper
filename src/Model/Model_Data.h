@@ -154,7 +154,7 @@ class Model_Data : public ModelAPI_Data
 
 private:
   // removes all information about back references
-  inline void eraseBackReferences() {myRefsToMe.clear();}
+  void eraseBackReferences();
   // adds a back reference (with identifier which attribute references to this object
   void addBackReference(FeaturePtr theFeature, std::string theAttrID);
   // returns all objects referenced to this

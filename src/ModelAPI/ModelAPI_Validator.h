@@ -87,6 +87,9 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
   /// all referenced features after execution
   virtual void registerConcealment(std::string theFeature, std::string theAttribute) = 0;
 
+  /// Returns true that it was registered that attribute conceals the referenced result
+  virtual bool isConcealed(std::string theFeature, std::string theAttribute) = 0;
+
  protected:
   /// Get instance from Session
   ModelAPI_ValidatorsFactory()

@@ -4,12 +4,14 @@
     icon=":icons/cut_shape.png" 
     tooltip="Select an object to cut"
     shape_types="solid shell"
+    concealment="true"
   />
   <shape_selector id="tool_object" 
     label="Tool object" 
     icon=":icons/cut_tool.png" 
     tooltip="Select a tool"
     shape_types="solid"
+    concealment="true"
   />
   <choice id="bool_type" 
     label="Type" 

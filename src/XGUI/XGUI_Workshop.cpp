@@ -585,6 +585,8 @@ void XGUI_Workshop::addFeature(const boost::shared_ptr<Config_FeatureMessage>& t
                                                      QKeySequence(),
                                                      isUsePropPanel);
     salomeConnector()->setNestedActions(aFeatureId, aNestedFeatures.split(" ", QString::SkipEmptyParts));
+    salomeConnector()->setDocumentKind(aFeatureId, QString::fromStdString(theMessage->documentKind()));
+
     myActionsMgr->addCommand(aAction);
     myModule->featureCreated(aAction);
   } else {

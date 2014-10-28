@@ -168,10 +168,10 @@ bool Model_AttributeSelection::update()
             }
           }
         }
-        if (aNewSelected) { // store this new selection
-          selectConstruction(aContext, aNewSelected);
-          return true;
-        }
+      }
+      if (aNewSelected) { // store this new selection
+        selectConstruction(aContext, aNewSelected);
+        return true;
       }
     }
   }

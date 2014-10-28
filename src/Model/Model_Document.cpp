@@ -288,7 +288,6 @@ void Model_Document::finishOperation()
     myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();  // && (myNestedNum == -1);
     myTransactionsAfterSave++;
   }
-
 }
 
 void Model_Document::abortOperation()
@@ -793,6 +792,10 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
 
 void Model_Document::synchronizeBackRefs()
 {
+  boost::shared_ptr<ModelAPI_Document> aThis = 
+    Model_Application::getApplication()->getDocument(myID);
+  // keeps the concealed flags of result to catch the change and create created/deleted events
+  std::list<std::pair<ResultPtr, bool> > aConcealed;
   // first cycle: erase all data about back-references
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFeatures(myObjs);
   for(; aFeatures.More(); aFeatures.Next()) {
@@ -808,6 +811,7 @@ void Model_Document::synchronizeBackRefs()
       boost::shared_ptr<Model_Data> aResData = 
         boost::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
       if (aResData) {
+        aConcealed.push_back(std::pair<ResultPtr, bool>(*aRIter, (*aRIter)->isConcealed()));
         aResData->eraseBackReferences();
       }
     }
@@ -832,6 +836,17 @@ void Model_Document::synchronizeBackRefs()
             aRefData->addBackReference(aFeature, aRefsIter->first); // here the Concealed flag is updated
           }
         }
+      }
+    }
+  }
+  std::list<std::pair<ResultPtr, bool> >::iterator aCIter = aConcealed.begin();
+  for(; aCIter != aConcealed.end(); aCIter++) {
+    if (aCIter->first->isConcealed() != aCIter->second) { // somethign is changed => produce event
+      if (aCIter->second) { // was concealed become not => creation event
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+        ModelAPI_EventCreator::get()->sendUpdated(aCIter->first, anEvent);
+      } else { // was not concealed become concealed => delete event
+        ModelAPI_EventCreator::get()->sendDeleted(aThis, aCIter->first->groupName());
       }
     }
   }
