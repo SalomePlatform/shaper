@@ -15,7 +15,7 @@ from ModelAPI import *
 # Initialization of the test
 #=========================================================================
 
-__updated__ = "2014-09-26"
+__updated__ = "2014-10-28"
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -23,7 +23,8 @@ aDocument = aSession.moduleDocument()
 # Creation of a sketch
 #=========================================================================
 aSession.startOperation()
-aSketchFeature = aDocument.addFeature("Sketch")
+aSketchCommonFeature = aDocument.addFeature("Sketch")
+aSketchFeature = modelAPI_CompositeFeature(aSketchCommonFeature)
 aSketchFeatureData = aSketchFeature.data()
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
 origin.setValue(0, 0, 0)
@@ -38,9 +39,7 @@ aSession.finishOperation()
 # Create a line with length 100
 #=========================================================================
 aSession.startOperation()
-aSketchReflist = aSketchFeatureData.reflist("Features")
-aSketchLineA = aDocument.addFeature("SketchLine")
-aSketchReflist.append(aSketchLineA)
+aSketchLineA = aSketchFeature.addFeature("SketchLine")
 aLineAStartPoint = geomDataAPI_Point2D(
     aSketchLineA.data().attribute("StartPoint"))
 aLineAEndPoint = geomDataAPI_Point2D(aSketchLineA.data().attribute("EndPoint"))
@@ -51,8 +50,7 @@ aSession.finishOperation()
 # Make a constraint to keep the length
 #=========================================================================
 aSession.startOperation()
-aLengthConstraint = aDocument.addFeature("SketchConstraintLength")
-aSketchReflist.append(aLengthConstraint)
+aLengthConstraint = aSketchFeature.addFeature("SketchConstraintLength")
 aConstraintData = aLengthConstraint.data()
 refattrA = aConstraintData.refattr("ConstraintEntityA")
 aLength = aConstraintData.real("ConstraintValue")

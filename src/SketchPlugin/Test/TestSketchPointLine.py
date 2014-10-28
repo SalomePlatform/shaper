@@ -4,7 +4,7 @@
 from GeomDataAPI import *
 from ModelAPI import *
 
-__updated__ = "2014-07-24"
+__updated__ = "2014-10-28"
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -12,7 +12,8 @@ aDocument = aSession.moduleDocument()
 # Creation of a sketch
 #=========================================================================
 aSession.startOperation()
-aSketchFeature = aDocument.addFeature("Sketch")
+aSketchCommonFeature = aDocument.addFeature("Sketch")
+aSketchFeature = modelAPI_CompositeFeature(aSketchCommonFeature)
 assert (aSketchFeature.getKind() == "Sketch")
 aSketchFeatureData = aSketchFeature.data()
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
@@ -49,9 +50,9 @@ aSketchReflist = aSketchFeatureData.reflist("Features")
 assert (not aSketchReflist.isInitialized())
 assert(aSketchReflist.size() == 0)
 assert (len(aSketchReflist.list()) == 0)
-aSketchPoint = aDocument.addFeature("SketchPoint")
+# aSketchPoint = aDocument.addFeature("SketchPoint")
+aSketchPoint = aSketchFeature.addFeature("SketchPoint")
 assert (aSketchPoint.getKind() == "SketchPoint")
-aSketchReflist.append(aSketchPoint)
 aSketchPointData = aSketchPoint.data()
 coords = geomDataAPI_Point2D(aSketchPointData.attribute("PointCoordindates"))
 assert (coords.x() == 0)
@@ -69,18 +70,18 @@ aSketchPointData = aSketchPoint.data()
 coords = geomDataAPI_Point2D(aSketchPointData.attribute("PointCoordindates"))
 assert (coords.x() == 10.0)
 assert (coords.y() == 10.0)
-#===============================================================================
+#=========================================================================
 # Creation of a line
-#===============================================================================
+#=========================================================================
 aSession.startOperation()
-aSketchLine = aDocument.addFeature("SketchLine")
+# aSketchLine = aDocument.addFeature("SketchLine")
+aSketchLine = aSketchFeature.addFeature("SketchLine")
 assert (aSketchLine.getKind() == "SketchLine")
-aSketchReflist.append(aSketchLine)
 assert (aSketchReflist.size() == 2)
 assert (len(aSketchReflist.list()) == 2)
 aSketchLineData = aSketchLine.data()
 aLineStartPoint = geomDataAPI_Point2D(aSketchLineData.attribute("StartPoint"))
-aLineEndPoint= geomDataAPI_Point2D(aSketchLineData.attribute("EndPoint"))
+aLineEndPoint = geomDataAPI_Point2D(aSketchLineData.attribute("EndPoint"))
 assert (aLineStartPoint.x() == 0)
 assert (aLineStartPoint.y() == 0)
 assert (not aLineStartPoint.isInitialized())
@@ -96,15 +97,16 @@ aSession.finishOperation()
 # check that values have been changed
 aSketchLineData = aSketchLine.data()
 aLineStartPoint = geomDataAPI_Point2D(aSketchLineData.attribute("StartPoint"))
-aLineEndPoint= geomDataAPI_Point2D(aSketchLineData.attribute("EndPoint"))
+aLineEndPoint = geomDataAPI_Point2D(aSketchLineData.attribute("EndPoint"))
 assert (aLineStartPoint.x() == 50.0)
 assert (aLineStartPoint.y() == 50.0)
 assert (aLineEndPoint.x() == 60.0)
 assert (aLineEndPoint.y() == 60.0)
-#===============================================================================
+#=========================================================================
 # Check the results
-#===============================================================================
+#=========================================================================
 aResult = aSketchLine.firstResult()
+assert (aResult is not None)
 aResultConstruction = modelAPI_ResultConstruction(aResult)
 aShape = aResultConstruction.shape()
 assert (aShape is not None)

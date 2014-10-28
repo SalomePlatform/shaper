@@ -22,7 +22,7 @@
 from GeomDataAPI import *
 from ModelAPI import *
 
-__updated__ = "2014-07-25"
+__updated__ = "2014-10-28"
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -30,7 +30,9 @@ aDocument = aSession.moduleDocument()
 # Creation of a sketch
 #=========================================================================
 aSession.startOperation()
-aSketchFeature = aDocument.addFeature("Sketch")
+#aSketchFeature = aDocument.addFeature("Sketch")
+aSketchCommonFeature = aDocument.addFeature("Sketch")
+aSketchFeature = modelAPI_CompositeFeature(aSketchCommonFeature)
 aSketchFeatureData = aSketchFeature.data()
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
 origin.setValue(0, 0, 0)
@@ -44,23 +46,23 @@ aSession.finishOperation()
 #=========================================================================
 # Creation of an arc
 # 1. Test SketchPlugin_Arc attributes
-# 2. 
+# 2.
 #=========================================================================
 aSession.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
 assert (not aSketchReflist.isInitialized())
 assert (aSketchReflist.size() == 0)
 assert (len(aSketchReflist.list()) == 0)
-aSketchArc = aDocument.addFeature("SketchArc")
+aSketchArc = aSketchFeature.addFeature("SketchArc")
 assert (aSketchArc.getKind() == "SketchArc")
-aSketchReflist.append(aSketchArc)
 aSketchArcData = aSketchArc.data()
 anArcCentr = geomDataAPI_Point2D(aSketchArcData.attribute("ArcCenter"))
 assert (anArcCentr.x() == 0)
 assert (anArcCentr.y() == 0)
 assert (not anArcCentr.isInitialized())
-anArcCentr.setValue(10.,10.)
-anArcStartPoint = geomDataAPI_Point2D(aSketchArcData.attribute("ArcStartPoint"))
+anArcCentr.setValue(10., 10.)
+anArcStartPoint = geomDataAPI_Point2D(
+    aSketchArcData.attribute("ArcStartPoint"))
 assert (anArcStartPoint.x() == 0)
 assert (anArcStartPoint.y() == 0)
 assert (not anArcStartPoint.isInitialized())
@@ -81,15 +83,16 @@ assert (anArcStartPoint.x() == 0.0)
 assert (anArcStartPoint.y() == 50.0)
 assert (anArcEndPoint.x() == 50.0)
 assert (anArcEndPoint.y() == 0.0)
-#===============================================================================
+#=========================================================================
 # Edit the arc:
 # 1. Move whole arc
-# 2. Change the start point 
-#===============================================================================
+# 2. Change the start point
+#=========================================================================
 aSession.startOperation()
 deltaX, deltaY = 5., 10.
 anArcCentr.setValue(anArcCentr.x() + deltaX, anArcCentr.y() + deltaY)
-anArcStartPoint.setValue(anArcStartPoint.x() + deltaX, anArcStartPoint.y() + deltaY)
+anArcStartPoint.setValue(
+    anArcStartPoint.x() + deltaX, anArcStartPoint.y() + deltaY)
 anArcEndPoint.setValue(anArcEndPoint.x() + deltaX, anArcEndPoint.y() + deltaY)
 aSession.finishOperation()
 assert (anArcCentr.x() == 15)
@@ -111,32 +114,32 @@ assert (anArcStartPoint.y() == 60)
 assert (anArcEndPoint.x() != aPrevEndPointX)
 assert (anArcEndPoint.y() != aPrevEndPointY)
 #=========================================================================
-# Check results of the Arc 
+# Check results of the Arc
 #=========================================================================
 aResult = aSketchArc.firstResult()
 aResultConstruction = modelAPI_ResultConstruction(aResult)
 aShape = aResultConstruction.shape()
 assert (aShape is not None)
 assert (not aShape.isNull())
-#===============================================================================
+#=========================================================================
 # Create a circle
 # 1. Test SketchPlugin_Circle.h attributes
 # 2. ModelAPI_AttributeDouble attribute
-#===============================================================================
+#=========================================================================
 aSession.startOperation()
 aSketchReflist = aSketchFeatureData.reflist("Features")
 # Arc is already added
 assert (aSketchReflist.size() == 1)
 assert (len(aSketchReflist.list()) == 1)
-aSketchCircle = aDocument.addFeature("SketchCircle")
+aSketchCircle = aSketchFeature.addFeature("SketchCircle")
 assert (aSketchCircle.getKind() == "SketchCircle")
-aSketchReflist.append(aSketchCircle)
 aSketchCircleData = aSketchCircle.data()
-anCircleCentr = geomDataAPI_Point2D(aSketchCircleData.attribute("CircleCenter"))
+anCircleCentr = geomDataAPI_Point2D(
+    aSketchCircleData.attribute("CircleCenter"))
 assert (anCircleCentr.x() == 0)
 assert (anCircleCentr.y() == 0)
 assert (not anCircleCentr.isInitialized())
-aCircleRadius = aSketchCircleData.real("CircleRadius");
+aCircleRadius = aSketchCircleData.real("CircleRadius")
 assert (type(aCircleRadius) == ModelAPI_AttributeDouble)
 # ModelAPI_AttributeDouble.type() is checked in ModelAPI_TestConstants
 assert (aCircleRadius.attributeType() == ModelAPI_AttributeDouble.type())
@@ -147,11 +150,11 @@ assert (anCircleCentr.x() == -25)
 assert (anCircleCentr.y() == -25)
 assert (aCircleRadius.value() == 25)
 aSession.finishOperation()
-#===============================================================================
+#=========================================================================
 # Edit the Cricle
 # 1. Check that changing the centr of a circle does not affects radius
 # 2. and vise versa; also check that int is acceptable as well as a real
-#===============================================================================
+#=========================================================================
 aSession.startOperation()
 anCircleCentr.setValue(10, 60)
 aSession.finishOperation()
@@ -164,6 +167,6 @@ aSession.finishOperation()
 assert (anCircleCentr.x() == 10)
 assert (anCircleCentr.y() == 60)
 assert (aCircleRadius.value() == 20)
-#===============================================================================
+#=========================================================================
 # End of test
-#===============================================================================
+#=========================================================================

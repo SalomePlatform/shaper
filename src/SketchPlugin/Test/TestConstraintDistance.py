@@ -26,7 +26,7 @@ import math
 # Initialization of the test
 #=========================================================================
 
-__updated__ = "2014-07-29"
+__updated__ = "2014-10-28"
 
 
 def distance(pointA, pointB):
@@ -44,7 +44,8 @@ aDocument = aSession.moduleDocument()
 # Creation of a sketch
 #=========================================================================
 aSession.startOperation()
-aSketchFeature = aDocument.addFeature("Sketch")
+aSketchCommonFeature = aDocument.addFeature("Sketch")
+aSketchFeature = modelAPI_CompositeFeature(aSketchCommonFeature)
 aSketchFeatureData = aSketchFeature.data()
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
 origin.setValue(0, 0, 0)
@@ -59,15 +60,12 @@ aSession.finishOperation()
 # Create a point and a line
 #=========================================================================
 aSession.startOperation()
-aSketchReflist = aSketchFeatureData.reflist("Features")
-aSketchPoint = aDocument.addFeature("SketchPoint")
-aSketchReflist.append(aSketchPoint)
+aSketchPoint = aSketchFeature.addFeature("SketchPoint")
 aSketchPointData = aSketchPoint.data()
 aSketchPointCoords = geomDataAPI_Point2D(
     aSketchPointData.attribute("PointCoordindates"))
 aSketchPointCoords.setValue(50., 50.)
-aSketchLine = aDocument.addFeature("SketchLine")
-aSketchReflist.append(aSketchLine)
+aSketchLine = aSketchFeature.addFeature("SketchLine")
 aLineAStartPoint = geomDataAPI_Point2D(
     aSketchLine.data().attribute("StartPoint"))
 aLineAEndPoint = geomDataAPI_Point2D(aSketchLine.data().attribute("EndPoint"))
@@ -79,8 +77,7 @@ aSession.finishOperation()
 #=========================================================================
 assert (distance(aSketchPointCoords, aLineAStartPoint) != 25.)
 aSession.startOperation()
-aConstraint = aDocument.addFeature("SketchConstraintDistance")
-aSketchReflist.append(aConstraint)
+aConstraint = aSketchFeature.addFeature("SketchConstraintDistance")
 aConstraintData = aConstraint.data()
 aDistance = aConstraintData.real("ConstraintValue")
 refattrA = aConstraintData.refattr("ConstraintEntityA")

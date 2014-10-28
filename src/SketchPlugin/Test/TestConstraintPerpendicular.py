@@ -22,7 +22,7 @@ from ModelAPI import *
 # Initialization of the test
 #=========================================================================
 
-__updated__ = "2014-09-26"
+__updated__ = "2014-10-28"
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -30,7 +30,8 @@ aDocument = aSession.moduleDocument()
 # Creation of a sketch
 #=========================================================================
 aSession.startOperation()
-aSketchFeature = aDocument.addFeature("Sketch")
+aSketchCommonFeature = aDocument.addFeature("Sketch")
+aSketchFeature = modelAPI_CompositeFeature(aSketchCommonFeature)
 aSketchFeatureData = aSketchFeature.data()
 origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
 origin.setValue(0, 0, 0)
@@ -45,19 +46,16 @@ aSession.finishOperation()
 # Create two lines which are already perpendicular
 #=========================================================================
 aSession.startOperation()
-aSketchReflist = aSketchFeatureData.reflist("Features")
 # line A
-aSketchLineA = aDocument.addFeature("SketchLine")
-aSketchReflist.append(aSketchLineA)
+aSketchLineA = aSketchFeature.addFeature("SketchLine")
 aLineAStartPoint = geomDataAPI_Point2D(
     aSketchLineA.data().attribute("StartPoint"))
 aLineAEndPoint = geomDataAPI_Point2D(
     aSketchLineA.data().attribute("EndPoint"))
-aSketchLineB = aDocument.addFeature("SketchLine")
+# line B
+aSketchLineB = aSketchFeature.addFeature("SketchLine")
 aLineAStartPoint.setValue(0., 25)
 aLineAEndPoint.setValue(85., 25)
-# line B
-aSketchReflist.append(aSketchLineB)
 aLineBStartPoint = geomDataAPI_Point2D(
     aSketchLineB.data().attribute("StartPoint"))
 aLineBEndPoint = geomDataAPI_Point2D(
@@ -72,8 +70,7 @@ aSession.finishOperation()
 
 for eachFeature in [aSketchLineA, aSketchLineB]:
     aSession.startOperation()
-    aLengthConstraint = aDocument.addFeature("SketchConstraintLength")
-    aSketchReflist.append(aLengthConstraint)
+    aLengthConstraint = aSketchFeature.addFeature("SketchConstraintLength")
     aLengthConstraintData = aLengthConstraint.data()
     refattrA = aLengthConstraintData.refattr("ConstraintEntityA")
     aResultA = modelAPI_ResultConstruction(eachFeature.firstResult())
@@ -95,9 +92,8 @@ assert (aLineBEndPoint.y() == 125)
 # Link lines with perpendicular constraint
 #=========================================================================
 aSession.startOperation()
-aPerpendicularConstraint = aDocument.addFeature(
+aPerpendicularConstraint = aSketchFeature.addFeature(
     "SketchConstraintPerpendicular")
-aSketchReflist.append(aPerpendicularConstraint)
 aConstraintData = aPerpendicularConstraint.data()
 refattrA = aConstraintData.refattr("ConstraintEntityA")
 refattrB = aConstraintData.refattr("ConstraintEntityB")
