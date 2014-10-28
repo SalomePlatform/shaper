@@ -27,6 +27,8 @@ class Handle_V3d_View;
 class QMouseEvent;
 class GeomAPI_Shape;
 class ModuleBase_ViewerPrs;
+class ModuleBase_ISelection;
+class ModuleBase_IViewer;
 
 /*!
  \class PartSet_OperationSketchBase
@@ -69,23 +71,20 @@ Q_OBJECT
   /// \param theView a viewer to have the viewer the eye position
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<ModuleBase_ViewerPrs>& theSelected,
-                            const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+  virtual void mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection);
 
   /// Processes the mouse release in the point
   /// \param theEvent the mouse event
   /// \param theView a viewer to have the viewer the eye position
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                             const std::list<ModuleBase_ViewerPrs>& theSelected,
-                             const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+  virtual void mouseReleased(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
+                             ModuleBase_ISelection* theSelection);
 
   /// Processes the mouse move in the point
   /// \param theEvent the mouse event
   /// \param theView a viewer to have the viewer the eye position
-  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
+  virtual void mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer);
 
   /// Processes the mouse double click in the point
   /// \param theEvent the mouse event
@@ -93,8 +92,11 @@ Q_OBJECT
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
   virtual void mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                const std::list<ModuleBase_ViewerPrs>& theSelected,
-                                const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+                                ModuleBase_ISelection* theSelection);
+
+  
+  /// Called on selection changed when the operation is active
+  virtual void selectionChanged(ModuleBase_ISelection* theSelection);
 
   /// Emits a signal about the operation start. This signal has an information about the feature.
   /// If the provided feature is empty, the current operation feature is used.
@@ -123,7 +125,7 @@ signals:
 
   /// signal to enable/disable multi selection in the viewer
   /// \param theEnabled the boolean state
-  void multiSelectionEnabled(bool theEnabled);
+  //void multiSelectionEnabled(bool theEnabled);
 
   /// signal to enable/disable selection in the viewer
   /// \param theFeatures a list of features to be disabled

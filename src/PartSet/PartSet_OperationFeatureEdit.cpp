@@ -5,6 +5,7 @@
 #include <PartSet_OperationFeatureEdit.h>
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketch.h>
+#include <PartSet_OperationFeatureEditMulti.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -12,6 +13,8 @@
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ISelection.h>
+#include <ModuleBase_IViewer.h>
 
 #include <ModelAPI_Events.h>
 
@@ -52,62 +55,82 @@ PartSet_OperationFeatureEdit::~PartSet_OperationFeatureEdit()
 }
 
 
-void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                                const std::list<ModuleBase_ViewerPrs>& theSelected,
-                                                const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection)
 {
   ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
   if(aActiveWgt && aActiveWgt->isViewerSelector()) {
     // Almost do nothing, all stuff in on PartSet_OperationFeatureBase::mouseReleased
-    PartSet_OperationFeatureBase::mousePressed(theEvent, theView, theSelected, theHighlighted);
+    PartSet_OperationFeatureBase::mousePressed(theEvent, theViewer, theSelection);
     return;
   }
+  QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+  QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
+  bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+  if (aHasShift && !aHighlighted.empty()) {
+    foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
+      aSelected.append(aPrs);
+    }
+  }
   ObjectPtr aObject;
-  if (!theHighlighted.empty())
-    aObject = theHighlighted.front().object();
-  if (!aObject && !theSelected.empty())  // changed for a constrain
-    aObject = theSelected.front().object();
+  if (!aSelected.empty()) {
+    aObject = aSelected.first().object();
+  } else {   
+    if (!aHighlighted.empty())
+      aObject = aHighlighted.first().object();
+  }
+  //if (!theHighlighted.empty())
+  //  aObject = theHighlighted.front().object();
+  //if (!aObject && !theSelected.empty())  // changed for a constrain
+  //  aObject = theSelected.front().object();
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-  if (!aFeature || aFeature != feature()) {
+  if (!aFeature || aFeature != feature() || (aSelected.size() > 1)) {
     if (commit()) {
       emit featureConstructed(feature(), FM_Deactivation);
 
+      // If we have selection and prehilighting with shift pressed 
+      // Then we have to select all these objects and restart as multi edit operfation
       //bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
       //if (aHasShift && !theHighlighted.empty()) {
       //  QList<ObjectPtr> aSelected;
       //  std::list<ModuleBase_ViewerPrs>::const_iterator aIt;
       //  for (aIt = theSelected.cbegin(); aIt != theSelected.cend(); ++aIt)
       //    aSelected.append((*aIt).object());
-        /*for (aIt = theHighlighted.cbegin(); aIt != theHighlighted.cend(); ++aIt) {
-         if (!aSelected.contains((*aIt).object()))
-         aSelected.append((*aIt).object());
-         }*/
-        //aSelected.push_back(feature());
-        //aSelected.push_back(theHighlighted.front().object());
-        //emit setSelection(aSelected);
+
+      //  for (aIt = theHighlighted.cbegin(); aIt != theHighlighted.cend(); ++aIt) {
+      //    if (!aSelected.contains((*aIt).object()))
+      //      aSelected.append((*aIt).object());
+      //  }
+      //  emit setSelection(aSelected);
       //} else 
       if (aFeature) {
-        restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+        std::string anOperationType =
+            (aSelected.size() > 1) ?
+                PartSet_OperationFeatureEditMulti::Type() : PartSet_OperationFeatureEdit::Type();
+        restartOperation(anOperationType, aFeature);
       }
+      //}
     }
-  }
+  } 
 }
 
-void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
+void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer)
 {
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
+  Handle(V3d_View) aView = theViewer->activeView();
+  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
 
-  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
+  if (theViewer->isSelectionEnabled())
+    theViewer->enableSelection(false);
 
-  blockSelection(true);
+  //blockSelection(true);
   if (myCurPoint.myIsInitialized) {
     double aCurX, aCurY;
-    PartSet_Tools::convertTo2D(myCurPoint.myPoint, sketch(), theView, aCurX, aCurY);
+    PartSet_Tools::convertTo2D(myCurPoint.myPoint, sketch(), aView, aCurX, aCurY);
 
     double aX, anY;
-    PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+    PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
 
     double aDeltaX = aX - aCurX;
     double aDeltaY = anY - aCurY;
@@ -127,29 +150,30 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, Handle(V3d_
 }
 
 void PartSet_OperationFeatureEdit::mouseReleased(
-    QMouseEvent* theEvent, Handle(V3d_View) theView,
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+    QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
+    ModuleBase_ISelection* theSelection)
 {
   ModuleBase_ModelWidget* aActiveWgt = 0;
   if (myPropertyPanel)
     aActiveWgt = myPropertyPanel->activeWidget();
   if(aActiveWgt && aActiveWgt->isViewerSelector()) {
     // Almost do nothing, all stuff in on PartSet_OperationFeatureBase::mouseReleased
-    PartSet_OperationFeatureBase::mouseReleased(theEvent, theView, theSelected, theHighlighted);
-  } else {
-    blockSelection(false);
-  }
+    PartSet_OperationFeatureBase::mouseReleased(theEvent, theViewer, theSelection);
+  }// else {
+    //blockSelection(false);
+  //}
+  if (!theViewer->isSelectionEnabled())
+    theViewer->enableSelection(true);
 }
 
 void PartSet_OperationFeatureEdit::mouseDoubleClick(
     QMouseEvent* theEvent, Handle_V3d_View theView,
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+    ModuleBase_ISelection* theSelection)
 {
   // TODO the functionality is important only for constraint feature. Should be moved in another place
-  if (!theSelected.empty()) {
-    ModuleBase_ViewerPrs aFeaturePrs = theSelected.front();
+  QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+  if (!aSelected.empty()) {
+    ModuleBase_ViewerPrs aFeaturePrs = aSelected.first();
     if (!aFeaturePrs.owner().IsNull()) {
       Handle(AIS_DimensionOwner) anOwner = Handle(AIS_DimensionOwner)::DownCast(
           aFeaturePrs.owner());
@@ -169,36 +193,36 @@ void PartSet_OperationFeatureEdit::mouseDoubleClick(
 void PartSet_OperationFeatureEdit::startOperation()
 {
   PartSet_OperationSketchBase::startOperation();
-  emit multiSelectionEnabled(false);
+  //emit multiSelectionEnabled(false);
 
   myCurPoint.clear();
 }
 
 void PartSet_OperationFeatureEdit::stopOperation()
 {
-  emit multiSelectionEnabled(true);
+  //emit multiSelectionEnabled(true);
 
-  blockSelection(false, false);
+  //blockSelection(false, false);
 }
 
-void PartSet_OperationFeatureEdit::blockSelection(bool isBlocked, const bool isRestoreSelection)
-{
-  if (myIsBlockedSelection == isBlocked)
-    return;
-
-  myIsBlockedSelection = isBlocked;
-  QList<ObjectPtr> aFeatureList;
-  aFeatureList.append(feature());
-
-  if (isBlocked) {
-    emit setSelection(QList<ObjectPtr>());
-    emit stopSelection(aFeatureList, true);
-  } else {
-    emit stopSelection(aFeatureList, false);
-    if (isRestoreSelection)
-      emit setSelection(aFeatureList);
-  }
-}
+//void PartSet_OperationFeatureEdit::blockSelection(bool isBlocked, const bool isRestoreSelection)
+//{
+//  if (myIsBlockedSelection == isBlocked)
+//    return;
+//
+//  myIsBlockedSelection = isBlocked;
+//  QList<ObjectPtr> aFeatureList;
+//  aFeatureList.append(feature());
+//
+//  //if (isBlocked) {
+//  //  emit setSelection(QList<ObjectPtr>());
+//  //  emit stopSelection(aFeatureList, true);
+//  //} else {
+//  //  emit stopSelection(aFeatureList, false);
+//  //  if (isRestoreSelection)
+//  //    emit setSelection(aFeatureList);
+//  //}
+//}
 
 FeaturePtr PartSet_OperationFeatureEdit::createFeature(const bool theFlushMessage,
   CompositeFeaturePtr theCompositeFeature)

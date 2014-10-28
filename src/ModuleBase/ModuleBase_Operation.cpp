@@ -238,11 +238,11 @@ void ModuleBase_Operation::activateByPreselection()
     return;
   ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
   if ((myPreSelection.size() > 0) && aActiveWgt) {
-    const ModuleBase_ViewerPrs& aPrs = myPreSelection.front();
+    const ModuleBase_ViewerPrs& aPrs = myPreSelection.first();
     ModuleBase_WidgetValueFeature aValue;
     aValue.setObject(aPrs.object());
     if (aActiveWgt->setValue(&aValue)) {
-      myPreSelection.remove(aPrs);
+      myPreSelection.removeOne(aPrs);
       myPropertyPanel->activateNextWidget();
     }
     // If preselection is enough to make a valid feature - apply it immediately
@@ -250,8 +250,8 @@ void ModuleBase_Operation::activateByPreselection()
 }
 
 void ModuleBase_Operation::initSelection(
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
+    const QList<ModuleBase_ViewerPrs>& theSelected,
+    const QList<ModuleBase_ViewerPrs>& /*theHighlighted*/)
 {
   myPreSelection = theSelected;
 }

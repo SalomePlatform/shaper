@@ -10,12 +10,11 @@
 #include <gp_Pnt.hxx>
 
 #include <QPoint>
+#include <QList>
 
 #include <ModelAPI_CompositeFeature.h>
 
 #include <boost/shared_ptr.hpp>
-
-#include <list>
 
 class Handle_V3d_View;
 class ModuleBase_ViewerPrs;
@@ -59,7 +58,7 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theSketch the sketch feature
   /// \param theFeatures the list of selected presentations
   static FeaturePtr nearestFeature(QPoint thePoint, Handle_V3d_View theView, FeaturePtr theSketch,
-                                   const std::list<ModuleBase_ViewerPrs>& theFeatures);
+                                   const QList<ModuleBase_ViewerPrs>& theFeatures);
 
   /// Returns pointer to the root document.
   static boost::shared_ptr<ModelAPI_Document> document();

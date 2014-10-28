@@ -7,6 +7,7 @@
 #include <ModelAPI_ResultBody.h>
 
 #include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_IViewer.h>
 #include <ModuleBase_ModelWidget.h>
 #include <ModuleBase_WidgetValueFeature.h>
 
@@ -60,25 +61,24 @@ FeaturePtr PartSet_OperationSketchBase::createFeature(const bool theFlushMessage
   return myFeature;
 }
 
-void PartSet_OperationSketchBase::mousePressed(
-    QMouseEvent* theEvent, Handle_V3d_View theView,
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+void PartSet_OperationSketchBase::mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection)
 {
 }
 void PartSet_OperationSketchBase::mouseReleased(
-    QMouseEvent* theEvent, Handle_V3d_View theView,
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+    QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
+    ModuleBase_ISelection* theSelection)
 {
 }
-void PartSet_OperationSketchBase::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
+void PartSet_OperationSketchBase::mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer)
 {
 }
 void PartSet_OperationSketchBase::mouseDoubleClick(
     QMouseEvent* theEvent, Handle_V3d_View theView,
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+    ModuleBase_ISelection* theSelection)
+{
+}
+
+void PartSet_OperationSketchBase::selectionChanged(ModuleBase_ISelection* theSelection)
 {
 }
 
@@ -103,11 +103,11 @@ void PartSet_OperationSketchBase::activateByPreselection()
     return;
   ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
   if ((myPreSelection.size() > 0) && aActiveWgt) {
-    const ModuleBase_ViewerPrs& aPrs = myPreSelection.front();
+    const ModuleBase_ViewerPrs& aPrs = myPreSelection.first();
     ModuleBase_WidgetValueFeature aValue;
     aValue.setObject(aPrs.object());
     if (aActiveWgt->setValue(&aValue)) {
-      myPreSelection.remove(aPrs);
+      myPreSelection.removeOne(aPrs);
       if(isValid()) {
         //myActiveWidget = NULL;
         commit();

@@ -9,17 +9,15 @@
 #include <BRep_Tool.hxx>
 #include <GeomAdaptor_Curve.hxx>
 #include <GeomAbs_CurveType.hxx>
+#include <ModuleBase_ISelection.h>
 
 #include <list>
 
 int shapesNbPoints(const ModuleBase_ISelection* theSelection)
 {
-  std::list<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
-  std::list<ModuleBase_ViewerPrs>::iterator it;
-  ModuleBase_ViewerPrs aPrs;
+  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();  
   int aCount = 0;
-  for (it = aList.begin(); it != aList.end(); ++it) {
-    aPrs = *it;
+  foreach (ModuleBase_ViewerPrs aPrs, aList) {
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull()) {
       if (aShape.ShapeType() == TopAbs_VERTEX)
@@ -31,12 +29,9 @@ int shapesNbPoints(const ModuleBase_ISelection* theSelection)
 
 int shapesNbLines(const ModuleBase_ISelection* theSelection)
 {
-  std::list<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
-  std::list<ModuleBase_ViewerPrs>::iterator it;
-  ModuleBase_ViewerPrs aPrs;
+  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
   int aCount = 0;
-  for (it = aList.begin(); it != aList.end(); ++it) {
-    aPrs = *it;
+  foreach(ModuleBase_ViewerPrs aPrs, aList) {
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull()) {
       if (aShape.ShapeType() == TopAbs_EDGE) {
@@ -78,12 +73,10 @@ bool PartSet_ParallelValidator::isValid(const ModuleBase_ISelection* theSelectio
 
 bool PartSet_RadiusValidator::isValid(const ModuleBase_ISelection* theSelection) const
 {
-  std::list<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
-  std::list<ModuleBase_ViewerPrs>::iterator it;
+  QList<ModuleBase_ViewerPrs> aList = theSelection->getSelected();
   ModuleBase_ViewerPrs aPrs;
   int aCount = 0;
-  for (it = aList.begin(); it != aList.end(); ++it) {
-    aPrs = *it;
+  foreach (ModuleBase_ViewerPrs aPrs, aList) {
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull()) {
       if (aShape.ShapeType() == TopAbs_EDGE) {

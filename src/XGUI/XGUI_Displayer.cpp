@@ -239,7 +239,7 @@ void XGUI_Displayer::setSelected(const QList<ObjectPtr>& theResults, const bool 
     if (anObj) {
       Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anAIS.IsNull())
-        aContext->AddOrRemoveSelected(anAIS, false);
+        aContext->SetSelected(anAIS, false);
     }
   }
   if (isUpdateViewer)

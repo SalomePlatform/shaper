@@ -46,6 +46,8 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
                                    const Standard_Integer theMode)
 {
   boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
+  if (!aShapePtr)
+    return;
   myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
   Set(aShapePtr->impl<TopoDS_Shape>());
   AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);

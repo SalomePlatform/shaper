@@ -17,6 +17,7 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
+#include <List>
 
 class ModuleBase_ModelWidget;
 class ModuleBase_OperationDescription;
@@ -116,8 +117,8 @@ Q_OBJECT
   /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void initSelection(const std::list<ModuleBase_ViewerPrs>& theSelected,
-                             const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+  virtual void initSelection(const QList<ModuleBase_ViewerPrs>& theSelected,
+                             const QList<ModuleBase_ViewerPrs>& theHighlighted);
 
   virtual void setPropertyPanel(ModuleBase_IPropertyPanel* theProp);
 
@@ -230,7 +231,7 @@ signals:
   QStringList myNestedFeatures;
 
   /// List of pre-selected object 
-  std::list<ModuleBase_ViewerPrs> myPreSelection;
+  QList<ModuleBase_ViewerPrs> myPreSelection;
 
   /// Access to property panel
   ModuleBase_IPropertyPanel* myPropertyPanel;
