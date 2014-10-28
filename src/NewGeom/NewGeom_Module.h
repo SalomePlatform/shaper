@@ -104,6 +104,8 @@ Q_OBJECT
   QMap<QString, QStringList> myNestedActions;
 
   bool myIsOpened;
+  bool myIsStorePositions;
+
 };
 
 #endif

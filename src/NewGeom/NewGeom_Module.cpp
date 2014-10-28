@@ -8,6 +8,9 @@
 #include <XGUI_ContextMenuMgr.h>
 #include <XGUI_Preferences.h>
 #include <XGUI_ObjectsBrowser.h>
+#include <XGUI_OperationMgr.h>
+
+#include <ModuleBase_Operation.h>
 
 #include <LightApp_Application.h>
 #include <LightApp_SelectionMgr.h>
@@ -128,7 +131,6 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
         mySelector = createSelector(OCCViewManagers.first());
       }
     }
-    myWorkshop->propertyPanel()->hide();
     QtxPopupMgr* aMgr = popupMgr();  // Create popup manager
     action(myEraseAll)->setEnabled(false);
 
@@ -139,6 +141,17 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
       QTimer::singleShot(1000, myWorkshop, SLOT(displayAllResults()));
     }
   }
+  SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
+  myIsStorePositions = aResMgr->booleanValue("Study", "store_positions", true);
+
+  // this following row is caused by #187 bug.
+  // SALOME saves the dock widget positions before deactivateModule() and
+  // load it after the module activation. So, if the panel is visible before
+  // deactivate, it becomes visible after activate.
+  // In order to avoid the visible property panel, the widget position save is
+  // switch off in this module
+  aResMgr->setValue("Study", "store_positions", false);
+
   return isDone;
 }
 
@@ -147,9 +160,6 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
 {
   setMenuShown(false);
   setToolShown(false);
-
-  myWorkshop->propertyPanel()->setVisible(false);
-  desktop()->removeDockWidget(myWorkshop->propertyPanel());
 
   QObject* aObj = myWorkshop->objectBrowser()->parent();
   QDockWidget* aObjDoc = dynamic_cast<QDockWidget*>(aObj);
@@ -160,6 +170,15 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
     aViewAct->setEnabled(false);
   }
 
+  // the active operation should be stopped for the next activation.
+  // There should not be active operation and visualized preview.
+  // Abort operation should be performed before the selection's remove
+  // because the displayed objects should be removed from the viewer, but
+  // the AIS context is obtained from the selector.
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+  if (anOperation)
+    anOperation->abort();
+
   // Delete selector because it has to be redefined on next activation
   if (mySelector) {
     myProxyViewer->setSelector(0);
@@ -168,6 +187,10 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
   }
 
   //myWorkshop->contextMenuMgr()->disconnectViewer();
+
+  SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
+  aResMgr->setValue("Study", "store_positions", myIsStorePositions);
+
   return LightApp_Module::deactivateModule(theStudy);
 }
 
