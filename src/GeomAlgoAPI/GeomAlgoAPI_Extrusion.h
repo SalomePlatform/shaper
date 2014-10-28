@@ -10,14 +10,12 @@
 #include <GeomAPI_Dir.h>
 #include <ModelAPI_ResultBody.h>
 #include <boost/shared_ptr.hpp>
-#include <BRepPrimAPI_MakePrism.hxx>
-#include <TopoDS_Shape.hxx>
 /**\class GeomAlgoAPI_Extrusion
  * \ingroup DataAlgo
  * \brief Allows to create the prism based on a given face and a direction
  */
 
-class GEOMALGOAPI_EXPORT GeomAlgoAPI_Extrusion  
+class GeomAlgoAPI_Extrusion : public GeomAPI_Interface
 {
  public:
 
@@ -31,39 +29,36 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_Extrusion
 														boost::shared_ptr<GeomAPI_Shape> theContext,
                                                         double theSize); */
   /// Constructor
-  GeomAlgoAPI_Extrusion (boost::shared_ptr<GeomAPI_Shape> theBasis, double theSize);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Extrusion (boost::shared_ptr<GeomAPI_Shape> theBasis, double theSize);
 
   /// Returns True if algorithm succeed
-  const bool isDone() const;
+  GEOMALGOAPI_EXPORT const bool isDone() const;
 
   ///  Returns True if resulting shape is valid
-  const bool isValid() const;
+  GEOMALGOAPI_EXPORT const bool isValid() const;
 
   /// Returns True if resulting shape has volume
-  const bool hasVolume() const;
+  GEOMALGOAPI_EXPORT const bool hasVolume() const;
 
   /// Returns result of the Extrusion algorithm which may be a Solid or a Face
-  const boost::shared_ptr<GeomAPI_Shape>& shape () const;
+  GEOMALGOAPI_EXPORT const boost::shared_ptr<GeomAPI_Shape>& shape () const;
 
   /// Returns list of shapes generated from theShape
-  const ListOfShape& generated(const boost::shared_ptr<GeomAPI_Shape> theShape);
+  GEOMALGOAPI_EXPORT void generated(const boost::shared_ptr<GeomAPI_Shape> theShape,
+                                    ListOfShape& theHistory);
 
   /// Returns the first shape 
-  const boost::shared_ptr<GeomAPI_Shape>& firstShape();
+  GEOMALGOAPI_EXPORT const boost::shared_ptr<GeomAPI_Shape>& firstShape();
 
   /// returns last shape
-  const boost::shared_ptr<GeomAPI_Shape>& lastShape();	 
+  GEOMALGOAPI_EXPORT const boost::shared_ptr<GeomAPI_Shape>& lastShape();	 
 
 private:
   /// builds resulting shape
-  void build();
+  void build(const boost::shared_ptr<GeomAPI_Shape>& theBasis);
 
-  BRepPrimAPI_MakePrism * myBuilder;
-  TopoDS_Shape myBasis;
   double mySize;
   bool myDone;
-  TopoDS_Shape myResult;
-  ListOfShape myHistory;
   boost::shared_ptr<GeomAPI_Shape> myShape;
   boost::shared_ptr<GeomAPI_Shape> myFirst;
   boost::shared_ptr<GeomAPI_Shape> myLast;

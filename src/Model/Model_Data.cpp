@@ -16,6 +16,7 @@
 #include <Model_Events.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomData_Point.h>
 #include <GeomData_Point2D.h>
@@ -356,10 +357,25 @@ int Model_Data::featureId() const
   return myLab.Father().Tag(); // tag of the feature label
 }
 
+void Model_Data::eraseBackReferences()
+{
+  myRefsToMe.clear();
+  boost::shared_ptr<ModelAPI_Result> aRes = 
+    boost::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+  if (aRes)
+    aRes->setIsConcealed(false);
+}
+
 void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID)
 {
-  // TODO: the concealment state update
   myRefsToMe.insert(theFeature->data()->attribute(theAttrID));
+  if (ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
+    boost::shared_ptr<ModelAPI_Result> aRes = 
+      boost::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+    if (aRes) {
+      aRes->setIsConcealed(true);
+    }
+  }
 }
 
 void Model_Data::referencesToObjects(

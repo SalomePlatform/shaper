@@ -13,10 +13,7 @@
 #include <ModelAPI_AttributeBoolean.h>
 #include <Events_Error.h>
 #include <GeomAlgoAPI_Extrusion.h>
-#include <TopoDS_Shape.hxx>
-#include <TopTools_DataMapOfShapeShape.hxx>
-#include <TopExp_Explorer.hxx>
-#include <TopTools_MapOfShape.hxx>
+
 using namespace std;
 #define _LATERAL_TAG 1
 #define _FIRST_TAG 2
@@ -25,6 +22,7 @@ using namespace std;
 #include <iostream>
 #include <ostream>
 #endif
+
 FeaturesPlugin_Extrusion::FeaturesPlugin_Extrusion()
 {
 }
@@ -39,7 +37,7 @@ void FeaturesPlugin_Extrusion::initAttributes()
 void FeaturesPlugin_Extrusion::execute()
 {
   boost::shared_ptr<ModelAPI_AttributeSelection> aFaceRef = boost::dynamic_pointer_cast<
-      ModelAPI_AttributeSelection>(data()->attribute(FeaturesPlugin_Extrusion::FACE_ID()));
+    ModelAPI_AttributeSelection>(data()->attribute(FeaturesPlugin_Extrusion::FACE_ID()));
   if (!aFaceRef)
     return;
 
@@ -48,8 +46,19 @@ void FeaturesPlugin_Extrusion::execute()
   if (!aFace)
     return;
 
-  boost::shared_ptr<GeomAPI_Shape> aContext = 
-    boost::dynamic_pointer_cast<GeomAPI_Shape>(aFaceRef->context());
+  boost::shared_ptr<GeomAPI_Shape> aContext;
+  ResultPtr aContextRes = aFaceRef->context();
+  if (aContextRes) {
+    if (aContextRes->groupName() == ModelAPI_ResultBody::group())
+      aContext = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(aContextRes)->shape();
+    else if (aContextRes->groupName() == ModelAPI_ResultConstruction::group())
+      aContext = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes)->shape();
+  }
+  if (!aContext) {
+    std::string aContextError = "The selection context is bad";
+    Events_Error::send(aContextError, this);
+    return;
+  }
 
   double aSize = data()->real(FeaturesPlugin_Extrusion::SIZE_ID())->value();
   if (data()->boolean(FeaturesPlugin_Extrusion::REVERSE_ID())->value())
@@ -59,24 +68,24 @@ void FeaturesPlugin_Extrusion::execute()
   //TCollection_AsciiString anError;
   GeomAlgoAPI_Extrusion aFeature(aFace, aSize);
   if(!aFeature.isDone()) {
-	std::string aFeatureError = "Extrusion algorithm failed";  
+    std::string aFeatureError = "Extrusion algorithm failed";  
     Events_Error::send(aFeatureError, this);
-	return;
-  }
-
-   // Check if shape is valid
-  if (!aFeature.shape()->impl<TopoDS_Shape>().IsNull()) {
-    std::string aShapeError = "Resulting shape is Null";     
-    Events_Error::send(aShapeError, this);
- #ifdef _DEBUG
-    std::cerr << aShapeError << std::endl;
- #endif
     return;
   }
-   if(!aFeature.isValid()) {
-	std::string aFeatureError = "Warning: resulting shape is not valid";  
+
+  // Check if shape is valid
+  if (aFeature.shape()->isNull()) {
+    std::string aShapeError = "Resulting shape is Null";     
+    Events_Error::send(aShapeError, this);
+#ifdef _DEBUG
+    std::cerr << aShapeError << std::endl;
+#endif
+    return;
+  }
+  if(!aFeature.isValid()) {
+    std::string aFeatureError = "Warning: resulting shape is not valid";  
     Events_Error::send(aFeatureError, this);
-	return;
+    return;
   }  
   //LoadNamingDS
   LoadNamingDS(aFeature, aResultBody, aFace, aContext);
@@ -84,27 +93,27 @@ void FeaturesPlugin_Extrusion::execute()
   setResult(aResultBody);
 }
 
-  //============================================================================
+//============================================================================
 void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature, 
-	                             boost::shared_ptr<ModelAPI_ResultBody> theResultBody, 
-								 boost::shared_ptr<GeomAPI_Shape> theBasis,
-	                             boost::shared_ptr<GeomAPI_Shape> theContext)
+  boost::shared_ptr<ModelAPI_ResultBody> theResultBody, 
+  boost::shared_ptr<GeomAPI_Shape> theBasis,
+  boost::shared_ptr<GeomAPI_Shape> theContext)
 {  
 
-	
-    //load result
-	if(theBasis->impl<TopoDS_Shape>().IsEqual(theContext->impl<TopoDS_Shape>()))
-	  theResultBody->store(theFeature.shape());
-	else
-	  theResultBody->storeGenerated(theContext, theFeature.shape());
 
-	TopTools_DataMapOfShapeShape aSubShapes;
-	for (TopExp_Explorer Exp(theFeature.shape()->impl<TopoDS_Shape>(),TopAbs_FACE); Exp.More(); Exp.Next()) {
-	  aSubShapes.Bind(Exp.Current(),Exp.Current());
-	}
+  //load result
+  if(theBasis->isEqual(theContext))
+    theResultBody->store(theFeature.shape());
+  else
+    theResultBody->storeGenerated(theContext, theFeature.shape());
+  /*
+  TopTools_DataMapOfShapeShape aSubShapes;
+  for (TopExp_Explorer Exp(theFeature.shape()->impl<TopoDS_Shape>(),TopAbs_FACE); Exp.More(); Exp.Next()) {
+    aSubShapes.Bind(Exp.Current(),Exp.Current());
+  }
 
-	//Insert lateral face : Face from Edge
-	//GeomAlgoAPI_DFLoader::loadAndOrientGeneratedShapes(*myBuilder, myBasis, TopAbs_EDGE, aLateralFaceBuilder, aSubShapes);
+  //Insert lateral face : Face from Edge
+  //GeomAlgoAPI_DFLoader::loadAndOrientGeneratedShapes(*myBuilder, myBasis, TopAbs_EDGE, aLateralFaceBuilder, aSubShapes);
 
 
   TopTools_MapOfShape aView;
@@ -112,42 +121,42 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature,
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
-	boost::shared_ptr<GeomAPI_Shape> aRootG(new GeomAPI_Shape());
-	aRootG->setImpl((void *)&aRoot);
-	const ListOfShape& aShapes = theFeature.generated(aRootG);
-	std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aShapes.begin(), aLast = aShapes.end();	  
-	for (; anIt != aLast; anIt++) {
+    boost::shared_ptr<GeomAPI_Shape> aRootG(new GeomAPI_Shape());
+    aRootG->setImpl((void *)&aRoot);
+    const ListOfShape& aShapes = theFeature.generated(aRootG);
+    std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aShapes.begin(), aLast = aShapes.end();	  
+    for (; anIt != aLast; anIt++) {
       TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>(); 
       if (aSubShapes.IsBound(aNewShape)) {
         aNewShape.Orientation((aSubShapes(aNewShape)).Orientation());
       }
 
-	  if (!aRoot.IsSame (aNewShape)) {
-		boost::shared_ptr<GeomAPI_Shape> aNew(new GeomAPI_Shape());
-	    aNew->setImpl((void *)&aNewShape);
-		  theResultBody->generated(aRootG, aNew,_LATERAL_TAG); 
-	  }
-	}
+      if (!aRoot.IsSame (aNewShape)) {
+        boost::shared_ptr<GeomAPI_Shape> aNew(new GeomAPI_Shape());
+        aNew->setImpl((void *)&aNewShape);
+        theResultBody->generated(aRootG, aNew,_LATERAL_TAG); 
+      }
+    }
   }
-
   //Insert bottom face
   const boost::shared_ptr<GeomAPI_Shape>& aBottomFace = theFeature.firstShape();
-  if (!aBottomFace->impl<TopoDS_Shape>().IsNull()) {
-	  if (aSubShapes.IsBound(aBottomFace->impl<TopoDS_Shape>())) {
-		aBottomFace->setImpl((void *)&aSubShapes(aBottomFace->impl<TopoDS_Shape>()));
-	  }    
-  theResultBody->generated(aBottomFace, _FIRST_TAG);
+  if (!aBottomFace->isNull()) {
+    if (aSubShapes.IsBound(aBottomFace->impl<TopoDS_Shape>())) {
+      aBottomFace->setImpl((void *)&aSubShapes(aBottomFace->impl<TopoDS_Shape>()));
+    }    
+    theResultBody->generated(aBottomFace, _FIRST_TAG);
   }
 
-  
 
- //Insert top face
+
+  //Insert top face
   boost::shared_ptr<GeomAPI_Shape> aTopFace = theFeature.lastShape();
-  if (!aTopFace->impl<TopoDS_Shape>().IsNull()) {
-	if (aSubShapes.IsBound(aTopFace->impl<TopoDS_Shape>())) {
-		aTopFace->setImpl((void *)&aSubShapes(aTopFace->impl<TopoDS_Shape>()));
-	}
+  if (!aTopFace->isNull()) {
+    if (aSubShapes.IsBound(aTopFace->impl<TopoDS_Shape>())) {
+      aTopFace->setImpl((void *)&aSubShapes(aTopFace->impl<TopoDS_Shape>()));
+    }
     theResultBody->generated(aTopFace, _FIRST_TAG);
   }
+  */
 
 }

@@ -5,54 +5,54 @@
 #include <GeomAlgoAPI_MakeShape.h>
 #include <TopTools_ListOfShape.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
-GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape(BRepBuilderAPI_MakeShape *  theMkShape)
-{ myBuilder = theMkShape;}
+GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape(void* theMkShape)
+  : GeomAPI_Interface(theMkShape)
+{}
 
-const boost::shared_ptr<GeomAPI_Shape>  GeomAlgoAPI_MakeShape::shape() const
+const boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShape::shape() const
 {
-  boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
-  if(myBuilder != NULL) 
-    aShape->setImpl(new TopoDS_Shape(myBuilder->Shape()));
-  return aShape;
+  return myShape;
 }
 
-  /// Returns the  list   of shapes generated   from the shape <theShape>
-const ListOfShape& GeomAlgoAPI_MakeShape::generated(const boost::shared_ptr<GeomAPI_Shape> theShape)
+/// Returns the  list   of shapes generated   from the shape <theShape>
+void GeomAlgoAPI_MakeShape::generated(
+  const boost::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory)
 {
-  myHistory.clear();
-  if(myBuilder != NULL) {
-	const TopTools_ListOfShape& aList =  myBuilder->Generated(theShape->impl<TopoDS_Shape>());
+  BRepBuilderAPI_MakeShape* aBuilder = implPtr<BRepBuilderAPI_MakeShape>();
+  if(aBuilder) {
+    const TopTools_ListOfShape& aList =  aBuilder->Generated(theShape->impl<TopoDS_Shape>());
     TopTools_ListIteratorOfListOfShape it(aList);
-	for(;it.More();it.Next()) {
-		boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
-		aShape->setImpl(&(it.Value()));
-		myHistory.push_back(aShape);
-	}
+    for(;it.More();it.Next()) {
+      boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+      aShape->setImpl(&(it.Value()));
+      theHistory.push_back(aShape);
+    }
   }
-  return myHistory;
 }
 
-  /// Returns the  list   of shapes modified   from the shape <theShape>
-const ListOfShape& GeomAlgoAPI_MakeShape::modified(const boost::shared_ptr<GeomAPI_Shape> theShape)
+/// Returns the  list   of shapes modified   from the shape <theShape>
+void GeomAlgoAPI_MakeShape::modified(
+  const boost::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory)
 {
-  myHistory.clear();
-  if(myBuilder != NULL) {
-	const TopTools_ListOfShape& aList =  myBuilder->Modified(theShape->impl<TopoDS_Shape>());
-	TopTools_ListIteratorOfListOfShape it(aList);
-	for(;it.More();it.Next()) {
-		boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
-		aShape->setImpl(&(it.Value()));
-		myHistory.push_back(aShape);
-	}
+  BRepBuilderAPI_MakeShape* aBuilder = implPtr<BRepBuilderAPI_MakeShape>();
+  if(aBuilder) {
+    const TopTools_ListOfShape& aList =  aBuilder->Modified(theShape->impl<TopoDS_Shape>());
+    TopTools_ListIteratorOfListOfShape it(aList);
+    for(;it.More();it.Next()) {
+      boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+      aShape->setImpl(&(it.Value()));
+      theHistory.push_back(aShape);
+    }
   }
-  return myHistory;
 }
 
-  /// Returns whether the shape is an edge
+/// Returns whether the shape is an edge
 bool GeomAlgoAPI_MakeShape::isDeleted(const boost::shared_ptr<GeomAPI_Shape> theShape)
 {
   bool isDeleted(false);
-  if (myBuilder != NULL) 
-	isDeleted = (bool) myBuilder->IsDeleted(theShape->impl<TopoDS_Shape>());	
+  BRepBuilderAPI_MakeShape* aBuilder = implPtr<BRepBuilderAPI_MakeShape>();
+  if(aBuilder) {
+    isDeleted = aBuilder->IsDeleted(theShape->impl<TopoDS_Shape>()) == Standard_True;
+  }
   return isDeleted;
 }

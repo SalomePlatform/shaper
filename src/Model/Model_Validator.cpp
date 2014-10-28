@@ -224,7 +224,18 @@ void Model_ValidatorsFactory::registerNotObligatory(std::string theFeature, std:
 
 void Model_ValidatorsFactory::registerConcealment(std::string theFeature, std::string theAttribute)
 {
-
+  std::map<std::string, std::set<std::string> >::iterator aFind = myConcealed.find(theFeature);
+  if (aFind == myConcealed.end()) {
+    std::set<std::string> aNewSet;
+    aNewSet.insert(theAttribute);
+    myConcealed[theFeature] = aNewSet;
+  } else {
+    aFind->second.insert(theAttribute);
+  }
 }
 
-
+bool Model_ValidatorsFactory::isConcealed(std::string theFeature, std::string theAttribute)
+{
+  std::map<std::string, std::set<std::string> >::iterator aFind = myConcealed.find(theFeature);
+  return aFind != myConcealed.end() && aFind->second.find(theAttribute) != aFind->second.end();
+}
