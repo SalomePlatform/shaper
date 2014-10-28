@@ -34,9 +34,7 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId)
   ModuleBase_Operation* anOperation = createOperation(theCmdId.toStdString());
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
   // Initialise operation with preliminary selection
-  QList<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-  QList<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-  anOperation->initSelection(aSelected, aHighlighted);
+  anOperation->initSelection(aSelection);
   sendOperation(anOperation);
 }
 

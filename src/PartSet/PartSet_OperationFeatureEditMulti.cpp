@@ -9,6 +9,7 @@
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_IViewer.h>
+#include <ModuleBase_ISelection.h>
 
 #include <ModelAPI_Events.h>
 
@@ -57,9 +58,7 @@ bool isContains(const QList<ModuleBase_ViewerPrs>& theSelected, const ModuleBase
 }
 
 
-void PartSet_OperationFeatureEditMulti::initSelection(
-    const QList<ModuleBase_ViewerPrs>& theSelected,
-    const QList<ModuleBase_ViewerPrs>& theHighlighted)
+void PartSet_OperationFeatureEditMulti::initSelection(ModuleBase_ISelection* theSelection)
 {
   //if (!theHighlighted.empty()) {
   //  // if there is highlighted object, we check whether it is in the list of selected objects
@@ -77,9 +76,10 @@ void PartSet_OperationFeatureEditMulti::initSelection(
   //  else
   //    myFeatures = theSelected;
   //} else
-  myFeatures = theSelected;
+  myFeatures = theSelection->getSelected();
+  QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
   // add highlighted elements if they are not selected
-  foreach (ModuleBase_ViewerPrs aPrs, theHighlighted) {
+  foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
     if (!isContains(myFeatures, aPrs))
       myFeatures.append(aPrs);
   }
@@ -98,20 +98,20 @@ CompositeFeaturePtr PartSet_OperationFeatureEditMulti::sketch() const
   return mySketch;
 }
 
-void PartSet_OperationFeatureEditMulti::mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection)
-{
-}
+//void PartSet_OperationFeatureEditMulti::mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection)
+//{
+//}
 
 void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer)
 {
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
 
-  Handle(V3d_View) aView = theViewer->activeView();
-  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
-
   if (theViewer->isSelectionEnabled())
     theViewer->enableSelection(false);
+
+  Handle(V3d_View) aView = theViewer->activeView();
+  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
 
   //blockSelection(true);
   if (myCurPoint.myIsInitialized) {
@@ -149,6 +149,7 @@ void PartSet_OperationFeatureEditMulti::mouseReleased(
     QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
     ModuleBase_ISelection* theSelection)
 {
+  theViewer->enableSelection(true);
   if (commit()) {
     foreach (ModuleBase_ViewerPrs aPrs, myFeatures) {
       ObjectPtr aFeature = aPrs.object();
@@ -157,8 +158,6 @@ void PartSet_OperationFeatureEditMulti::mouseReleased(
       }
     }
   }
-  if (!theViewer->isSelectionEnabled())
-    theViewer->enableSelection(true);
 }
 
 void PartSet_OperationFeatureEditMulti::startOperation()

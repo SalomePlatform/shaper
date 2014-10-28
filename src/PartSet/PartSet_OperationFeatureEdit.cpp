@@ -86,6 +86,7 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, ModuleBas
   FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
   if (!aFeature || aFeature != feature() || (aSelected.size() > 1)) {
     if (commit()) {
+      theViewer->enableSelection(true);
       emit featureConstructed(feature(), FM_Deactivation);
 
       // If we have selection and prehilighting with shift pressed 
@@ -111,7 +112,7 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, ModuleBas
       }
       //}
     }
-  } 
+  }
 }
 
 void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer)
@@ -121,8 +122,7 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
   Handle(V3d_View) aView = theViewer->activeView();
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
 
-  if (theViewer->isSelectionEnabled())
-    theViewer->enableSelection(false);
+  theViewer->enableSelection(false);
 
   //blockSelection(true);
   if (myCurPoint.myIsInitialized) {
@@ -153,6 +153,7 @@ void PartSet_OperationFeatureEdit::mouseReleased(
     QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
     ModuleBase_ISelection* theSelection)
 {
+  theViewer->enableSelection(true);
   ModuleBase_ModelWidget* aActiveWgt = 0;
   if (myPropertyPanel)
     aActiveWgt = myPropertyPanel->activeWidget();
@@ -162,8 +163,6 @@ void PartSet_OperationFeatureEdit::mouseReleased(
   }// else {
     //blockSelection(false);
   //}
-  if (!theViewer->isSelectionEnabled())
-    theViewer->enableSelection(true);
 }
 
 void PartSet_OperationFeatureEdit::mouseDoubleClick(

@@ -76,7 +76,6 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, ModuleBase_IVi
         std::string anOperationType =
             (aSelected.size() > 1) ?
                 PartSet_OperationFeatureEditMulti::Type() : PartSet_OperationFeatureEdit::Type();
-        //theViewer->enableSelection(false);
         restartOperation(anOperationType, aFeature);
       }
     } //else

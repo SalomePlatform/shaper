@@ -310,9 +310,7 @@ void PartSet_Module::onRestartOperation(std::string theName, ObjectPtr theObject
     }
     ModuleBase_ISelection* aSelection = workshop()->selection();
     // Initialise operation with preliminary selection
-    QList<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-    QList<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-    aSketchOp->initSelection(aSelected, aHighlighted);
+    aSketchOp->initSelection(aSelection);
   } //else if (aFeature) {
     //anOperation->setFeature(aFeature);
     ////Deactivate result of current feature in order to avoid its selection

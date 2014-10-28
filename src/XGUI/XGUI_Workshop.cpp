@@ -513,10 +513,7 @@ void XGUI_Workshop::onOperationStarted()
     ModuleBase_Tools::zeroMargins(myPropertyPanel->contentWidget());
 
     QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
-    QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
-    ModuleBase_ModelWidget* aWidget;
-    for (; anIt != aLast; anIt++) {
-      aWidget = *anIt;
+    foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
       aWidget->setFeature(aOperation->feature());
       aWidget->enableFocusProcessing();
       QObject::connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
@@ -528,7 +525,8 @@ void XGUI_Workshop::onOperationStarted()
 
     aOperation->setPropertyPanel(myPropertyPanel);
     myPropertyPanel->setModelWidgets(aWidgets);
-    myPropertyPanel->activateNextWidget(NULL);
+    if (!aOperation->activateByPreselection())
+      myPropertyPanel->activateNextWidget(NULL);
     // Widget activation (from the previous method) may commit the current operation
     // if pre-selection is enougth for it. So we shouldn't update prop panel's title
     if(myOperationMgr->isCurrentOperation(aOperation)) {
