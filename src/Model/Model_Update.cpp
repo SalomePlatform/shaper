@@ -17,6 +17,7 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Session.h>
 #include <Events_Loop.h>
 #include <Events_LongOp.h>
 #include <Events_Error.h>

@@ -8,6 +8,7 @@
   #include "ModelAPI_Session.h"
   #include "ModelAPI_Object.h"
   #include "ModelAPI_Feature.h"
+  #include "ModelAPI_CompositeFeature.h"
   #include "ModelAPI_Data.h"
   #include "ModelAPI_Attribute.h"
   #include "ModelAPI_AttributeDocRef.h"
@@ -26,12 +27,12 @@
   #include "ModelAPI_ResultBody.h"
   #include "ModelAPI_ResultPart.h"
   
-  template<class T> boost::shared_ptr<T> castTo(boost::shared_ptr<ModelAPI_Result> theObject) 
+  template<class T1, class T2> 
+  boost::shared_ptr<T1> boost_cast(boost::shared_ptr<T2> theObject)
   { 
-    return boost::dynamic_pointer_cast<T>(theObject); 
+    return boost::dynamic_pointer_cast<T1>(theObject); 
   }
   
-   
 %}
 
 // to avoid error on this
@@ -52,6 +53,7 @@
 %shared_ptr(ModelAPI_Session)
 %shared_ptr(ModelAPI_Object)
 %shared_ptr(ModelAPI_Feature)
+%shared_ptr(ModelAPI_CompositeFeature)
 %shared_ptr(ModelAPI_Data)
 %shared_ptr(ModelAPI_Attribute)
 %shared_ptr(ModelAPI_AttributeDocRef)
@@ -76,6 +78,7 @@
 %include "ModelAPI_Session.h"
 %include "ModelAPI_Object.h"
 %include "ModelAPI_Feature.h"
+%include "ModelAPI_CompositeFeature.h"
 %include "ModelAPI_Data.h"
 %include "ModelAPI_Attribute.h"
 %include "ModelAPI_AttributeDocRef.h"
@@ -97,7 +100,10 @@
 %template(ObjectList) std::list<boost::shared_ptr<ModelAPI_Object> >;
 %template(ResultList) std::list<boost::shared_ptr<ModelAPI_Result> >;
 
-template<class T> boost::shared_ptr<T> castTo(boost::shared_ptr<ModelAPI_Result> theObject);
-%template(modelAPI_ResultConstruction) castTo<ModelAPI_ResultConstruction>;
-%template(modelAPI_ResultBody) castTo<ModelAPI_ResultBody>;
-%template(modelAPI_ResultPart) castTo<ModelAPI_ResultPart>;
+template<class T1, class T2> boost::shared_ptr<T1> boost_cast(boost::shared_ptr<T2> theObject);
+%template(modelAPI_CompositeFeature) boost_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
+%template(modelAPI_ResultConstruction) boost_cast<ModelAPI_ResultConstruction, ModelAPI_Result>;
+%template(modelAPI_ResultBody) boost_cast<ModelAPI_ResultBody, ModelAPI_Result>;
+%template(modelAPI_ResultPart) boost_cast<ModelAPI_ResultPart, ModelAPI_Result>;
+
+

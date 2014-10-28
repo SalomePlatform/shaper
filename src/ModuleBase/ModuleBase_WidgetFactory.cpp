@@ -27,6 +27,7 @@
 #include <ModuleBase_WidgetMultiSelector.h>
 
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>

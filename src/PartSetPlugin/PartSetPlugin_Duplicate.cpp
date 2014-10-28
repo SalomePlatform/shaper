@@ -8,6 +8,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Session.h>
 
 using namespace std;
 

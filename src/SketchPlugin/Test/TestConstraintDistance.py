@@ -26,7 +26,7 @@ import math
 # Initialization of the test
 #=========================================================================
 
-__updated__ = "2014-07-29"
+__updated__ = "2014-10-28"
 
 
 def distance(pointA, pointB):
@@ -44,33 +44,28 @@ aDocument = aSession.moduleDocument()
 # Creation of a sketch
 #=========================================================================
 aSession.startOperation()
-aSketchFeature = aDocument.addFeature("Sketch")
-aSketchFeatureData = aSketchFeature.data()
-origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
+aSketchCommonFeature = aDocument.addFeature("Sketch")
+aSketchFeature = modelAPI_CompositeFeature(aSketchCommonFeature)
+origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
-dirx = geomDataAPI_Dir(aSketchFeatureData.attribute("DirX"))
+dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))
 dirx.setValue(1, 0, 0)
-diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
+diry = geomDataAPI_Dir(aSketchFeature.attribute("DirY"))
 diry.setValue(0, 1, 0)
-norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
+norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
 norm.setValue(0, 0, 1)
 aSession.finishOperation()
 #=========================================================================
 # Create a point and a line
 #=========================================================================
 aSession.startOperation()
-aSketchReflist = aSketchFeatureData.reflist("Features")
-aSketchPoint = aDocument.addFeature("SketchPoint")
-aSketchReflist.append(aSketchPoint)
-aSketchPointData = aSketchPoint.data()
+aSketchPoint = aSketchFeature.addFeature("SketchPoint")
 aSketchPointCoords = geomDataAPI_Point2D(
-    aSketchPointData.attribute("PointCoordindates"))
+    aSketchPoint.attribute("PointCoordindates"))
 aSketchPointCoords.setValue(50., 50.)
-aSketchLine = aDocument.addFeature("SketchLine")
-aSketchReflist.append(aSketchLine)
-aLineAStartPoint = geomDataAPI_Point2D(
-    aSketchLine.data().attribute("StartPoint"))
-aLineAEndPoint = geomDataAPI_Point2D(aSketchLine.data().attribute("EndPoint"))
+aSketchLine = aSketchFeature.addFeature("SketchLine")
+aLineAStartPoint = geomDataAPI_Point2D(aSketchLine.attribute("StartPoint"))
+aLineAEndPoint = geomDataAPI_Point2D(aSketchLine.attribute("EndPoint"))
 aLineAStartPoint.setValue(0., 25.)
 aLineAEndPoint.setValue(100., 25.)
 aSession.finishOperation()
@@ -79,12 +74,10 @@ aSession.finishOperation()
 #=========================================================================
 assert (distance(aSketchPointCoords, aLineAStartPoint) != 25.)
 aSession.startOperation()
-aConstraint = aDocument.addFeature("SketchConstraintDistance")
-aSketchReflist.append(aConstraint)
-aConstraintData = aConstraint.data()
-aDistance = aConstraintData.real("ConstraintValue")
-refattrA = aConstraintData.refattr("ConstraintEntityA")
-refattrB = aConstraintData.refattr("ConstraintEntityB")
+aConstraint = aSketchFeature.addFeature("SketchConstraintDistance")
+aDistance = aConstraint.real("ConstraintValue")
+refattrA = aConstraint.refattr("ConstraintEntityA")
+refattrB = aConstraint.refattr("ConstraintEntityB")
 assert (not aDistance.isInitialized())
 assert (not refattrA.isInitialized())
 assert (not refattrB.isInitialized())

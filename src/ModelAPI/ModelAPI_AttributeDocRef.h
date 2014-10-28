@@ -46,4 +46,6 @@ class ModelAPI_AttributeDocRef : public ModelAPI_Attribute
   }
 };
 
+typedef boost::shared_ptr<ModelAPI_AttributeDocRef> AttributeDocRefPtr;
+
 #endif
