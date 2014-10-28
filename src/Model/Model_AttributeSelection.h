@@ -47,6 +47,10 @@ protected:
   virtual void selectConstruction(
     const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape);
 
+  /// Returns the label where TNaming_Selection results are stored
+  /// Note: there must be no attributes stored at the same label because Selector clears this lab
+  TDF_Label selectionLabel();
+
   friend class Model_Data;
   friend class Model_AttributeSelectionList;
 };

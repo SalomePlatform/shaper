@@ -36,13 +36,17 @@ public:
 
   /// Stores the shape (called by the execution method).
   virtual void store(const boost::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+
+  /// Stores the generated shape (called by the execution method).
+  virtual void storeGenerated(const boost::shared_ptr<GeomAPI_Shape>& theFromShape,
+	                          const boost::shared_ptr<GeomAPI_Shape>& theToShape) = 0;
+
+  /// Stores the modified shape (called by the execution method).
+  virtual void storeModified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+	                          const boost::shared_ptr<GeomAPI_Shape>& theNewShape) = 0;
+
   /// Returns the shape-result produced by this feature
   virtual boost::shared_ptr<GeomAPI_Shape> shape() = 0;
-
-  /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_ResultBody()
-  {
-  }
 
   /// Records the subshape newShape which was generated during a topological construction.
   /// As an example, consider the case of a face generated in construction of a box.
@@ -66,11 +70,6 @@ public:
     const boost::shared_ptr<GeomAPI_Shape>& theOldShape, const int theTag = 1) = 0;
 
 protected:
-  /// Use plugin manager for features creation: this method is 
-  /// defined here only for SWIG-wrapping
-  ModelAPI_ResultBody()
-  {
-  }
 };
 
 //! Pointer on feature object

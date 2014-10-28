@@ -3,7 +3,7 @@
 // Author:      Artem ZHIDKOV
 
 #include <GeomAlgoAPI_SketchBuilder.h>
-#include <GeomAPI_Wire.h>
+#include <GeomAPI_PlanarEdges.h>
 
 #include <set>
 
@@ -378,7 +378,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(const boost::shared_ptr<GeomAPI_Pnt>
                                             const boost::shared_ptr<GeomAPI_Shape>& theWire,
                                             std::list<boost::shared_ptr<GeomAPI_Shape> >& theResultFaces)
 {
-  boost::shared_ptr<GeomAPI_Wire> aWire = boost::dynamic_pointer_cast<GeomAPI_Wire>(theWire);
+  boost::shared_ptr<GeomAPI_PlanarEdges> aWire = boost::dynamic_pointer_cast<GeomAPI_PlanarEdges>(theWire);
   if(!aWire)
     return;
   // Filter wires, return only faces.

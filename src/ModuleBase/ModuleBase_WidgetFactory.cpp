@@ -71,7 +71,7 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
     //Create a widget (doublevalue, groupbox, toolbox, etc.
     QWidget* aWidget = createWidgetByType(aWdgType, theParent);
     if (aWidget) {
-      if (!myWidgetApi->getBooleanAttribute(FEATURE_INTERNAL, false)) {
+      if (!myWidgetApi->getBooleanAttribute(ATTRIBUTE_INTERNAL, false)) {
         aWidgetLay->addWidget(aWidget);
       } else {
         aWidget->setVisible(false);
@@ -119,6 +119,25 @@ QWidget* ModuleBase_WidgetFactory::labelControl(QWidget* theParent)
   aLabelLay->addStretch(1);
   result->setLayout(aLabelLay);
   return result;
+}
+
+void ModuleBase_WidgetFactory::processAttributes()
+{
+  // register that this attribute in feature is not obligatory for the feature execution
+  // so, it is not needed for the standard validation mechanism
+  bool isObligatory = true;
+  bool isConcealment = false;
+  if( myWidgetApi ){
+    isObligatory = myWidgetApi->getBooleanAttribute(ATTRIBUTE_OBLIGATORY, true);
+    isConcealment = myWidgetApi->getBooleanAttribute(ATTRIBUTE_CONCEALMENT, false);
+  }
+  boost::shared_ptr<ModelAPI_Session> aSession = ModelAPI_Session::get();
+  if (!isObligatory) {
+    aSession->validators()->registerNotObligatory(myParentId, myWidgetApi->widgetId());
+  }
+  if(isConcealment) {
+    aSession->validators()->registerConcealment(myParentId, myWidgetApi->widgetId());
+  }
 }
 
 QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType,
@@ -174,14 +193,7 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
 #endif
   }
   if (result) {
-    // register that this attribute in feature is not obligatory for the feature execution
-    // so, it is not needed for the standard validation mechanism
-    bool isObligatory = 
-      myWidgetApi ? myWidgetApi->getBooleanAttribute(FEATURE_OBLIGATORY, true) : true;
-    if (!isObligatory) {
-      ModelAPI_Session::get()->validators()->registerNotObligatory(
-        myParentId, myWidgetApi->widgetId());
-    }
+    processAttributes();
   }
 
   return result;

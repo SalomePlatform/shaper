@@ -7,7 +7,8 @@
 
 #include "FeaturesPlugin.h"
 #include <ModelAPI_Feature.h>
-
+#include <ModelAPI_ResultBody.h>
+#include <GeomAlgoAPI_Extrusion.h>
 class FeaturesPlugin_Extrusion : public ModelAPI_Feature
 {
  public:
@@ -51,6 +52,11 @@ class FeaturesPlugin_Extrusion : public ModelAPI_Feature
 
   /// Use plugin manager for features creation
   FeaturesPlugin_Extrusion();
+
+  /// Load Naming data structure of the feature to the document
+  void LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature, boost::shared_ptr<ModelAPI_ResultBody> theResultBody,
+	                boost::shared_ptr<GeomAPI_Shape> theBasis,
+	                boost::shared_ptr<GeomAPI_Shape> theContext);
 };
 
 #endif

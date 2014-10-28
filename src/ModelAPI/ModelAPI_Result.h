@@ -17,12 +17,19 @@ class ModelAPI_Feature;
  */
 class ModelAPI_Result : public ModelAPI_Object
 {
+  bool myIsConcealed; ///< the result is concealed from the data tree (referenced by other objects)
  public:
-  /// Returns the source feature of this result
-  //virtual boost::shared_ptr<ModelAPI_Feature> owner() = 0;
+   /// Returns true if the result is concealed from the data tree (referenced by other objects)
+  inline bool isConcealed() {return myIsConcealed;}
 
-  /// Returns the group identifier of this result
-  //virtual std::string groupName() = 0;
+  /// Returns true if the result is concealed from the data tree (referenced by other objects)
+  inline void setIsConcealed(const bool theValue) {myIsConcealed = theValue;}
+
+  /// To virtually destroy the fields of successors
+  virtual ~ModelAPI_Result()
+  {
+  }
+
 };
 
 //! Pointer on feature object

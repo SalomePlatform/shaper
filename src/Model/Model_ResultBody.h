@@ -28,6 +28,15 @@ class Model_ResultBody : public ModelAPI_ResultBody
 public:
   /// Stores the shape (called by the execution method).
   MODEL_EXPORT virtual void store(const boost::shared_ptr<GeomAPI_Shape>& theShape);
+
+  /// Stores the generated shape (called by the execution method).
+  MODEL_EXPORT virtual void storeGenerated(const boost::shared_ptr<GeomAPI_Shape>& theFromShape,
+	                                       const boost::shared_ptr<GeomAPI_Shape>& theToShape);
+
+  /// Stores the modified shape (called by the execution method).
+  MODEL_EXPORT virtual void storeModified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+	                                       const boost::shared_ptr<GeomAPI_Shape>& theNewShape);
+
   /// Returns the shape-result produced by this feature
   MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape> shape();
   /// Returns the source feature of this result

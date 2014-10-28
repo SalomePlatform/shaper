@@ -46,8 +46,7 @@
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <list>
-#include <stdexcept>
-#include <xstring>
+#include <string>
 
 typedef QMap<QString, TopAbs_ShapeEnum> ShapeTypes;
 static ShapeTypes MyShapeTypes;
@@ -227,7 +226,6 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, boost::shared_p
     if (!myUseSubShapes) {
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TOHIDE);
       ModelAPI_EventCreator::get()->sendUpdated(mySelectedObject, anEvent);
-      Events_Loop::loop()->flush(anEvent);
     }
   } 
   updateSelectionName();

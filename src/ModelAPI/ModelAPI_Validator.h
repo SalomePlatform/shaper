@@ -83,6 +83,10 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
   /// so, it is not needed for the standard validation mechanism
   virtual void registerNotObligatory(std::string theFeature, std::string theAttribute) = 0;
 
+  /// register that this attribute conceals in the object browser
+  /// all referenced features after execution
+  virtual void registerConcealment(std::string theFeature, std::string theAttribute) = 0;
+
  protected:
   /// Get instance from Session
   ModelAPI_ValidatorsFactory()

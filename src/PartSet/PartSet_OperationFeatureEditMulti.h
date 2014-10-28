@@ -10,6 +10,8 @@
 #include <PartSet_OperationSketchBase.h>
 #include <QObject>
 
+#include <list>
+
 class QMouseEvent;
 
 /*!

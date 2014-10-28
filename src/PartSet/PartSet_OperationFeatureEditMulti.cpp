@@ -24,13 +24,12 @@
 
 #include <V3d_View.hxx>
 
+#include <QMouseEvent>
 #ifdef _DEBUG
 #include <QDebug>
 #endif
 
-#include <QMouseEvent>
-
-using namespace std;
+//using namespace std;
 
 PartSet_OperationFeatureEditMulti::PartSet_OperationFeatureEditMulti(const QString& theId,
                                                                      QObject* theParent,
@@ -80,17 +79,16 @@ void PartSet_OperationFeatureEditMulti::initSelection(
   //} else
   myFeatures = theSelected;
   // add highlighted elements if they are not selected
-  std::list<ModuleBase_ViewerPrs>::const_iterator anIt;
-  for (anIt = theHighlighted.cbegin(); anIt != theHighlighted.cend(); ++anIt) {
+  std::list<ModuleBase_ViewerPrs>::const_iterator anIt = theHighlighted.cbegin();
+  for ( ; anIt != theHighlighted.cend(); ++anIt) {
     if (!isContains(myFeatures, (*anIt)))
       myFeatures.push_back(*anIt);
   }
   // Remove current feature if it is in the list (it will be moved as main feature)
-  FeaturePtr aFea = feature();
-  for (anIt = myFeatures.cbegin(); anIt != myFeatures.cend(); ++anIt) {
-    FeaturePtr aF = ModelAPI_Feature::feature((*anIt).object());
-    if (ModelAPI_Feature::feature((*anIt).object()) == feature()) {
-      myFeatures.erase(anIt);
+  std::list<ModuleBase_ViewerPrs>::iterator anEraseIt = myFeatures.begin();
+  for ( ; anEraseIt != myFeatures.end(); ++anEraseIt) {
+    if (ModelAPI_Feature::feature((*anEraseIt).object()) == feature()) {
+      myFeatures.erase(anEraseIt);
       break;
     }
   }
