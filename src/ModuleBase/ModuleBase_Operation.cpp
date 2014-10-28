@@ -21,6 +21,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
 
 #include <GeomAPI_Pnt2d.h>
@@ -279,7 +280,24 @@ bool ModuleBase_Operation::activateByPreselection()
 
 void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection)
 {
-  myPreSelection = theSelection->getSelected();
+  myPreSelection.clear();
+
+  // Check that the selected result are not results of operation feature
+  QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+  FeaturePtr aFeature = feature();
+  if (aFeature) {
+    std::list<ResultPtr> aResults = aFeature->results();
+    QList<ObjectPtr> aResList;
+    std::list<ResultPtr>::const_iterator aIt;
+    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
+      aResList.append(*aIt);
+
+    foreach (ModuleBase_ViewerPrs aPrs, aSelected) {
+      if ((!aResList.contains(aPrs.object())) && (aPrs.object() != aFeature))
+        myPreSelection.append(aPrs);
+    }
+  } else
+    myPreSelection = aSelected;
 }
 
 void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)

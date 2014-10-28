@@ -76,5 +76,6 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(const Handle(SelectMgr_Enti
       }
     }
   }
-  return Standard_False;
+  // This is not object controlled by the filter
+  return Standard_True;
 }
