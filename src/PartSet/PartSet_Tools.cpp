@@ -140,21 +140,17 @@ void PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr
 
 FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
                                          FeaturePtr theSketch,
-                                         const std::list<ModuleBase_ViewerPrs>& theFeatures)
+                                         const QList<ModuleBase_ViewerPrs>& theFeatures)
 {
   double aX, anY;
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(thePoint, theView);
   PartSet_Tools::convertTo2D(aPoint, theSketch, theView, aX, anY);
 
   FeaturePtr aFeature;
-  std::list<ModuleBase_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures
-      .end();
-
   FeaturePtr aDeltaFeature;
   double aMinDelta = -1;
   ModuleBase_ViewerPrs aPrs;
-  for (; anIt != aLast; anIt++) {
-    aPrs = *anIt;
+  foreach (ModuleBase_ViewerPrs aPrs, theFeatures) {
     if (!aPrs.object())
       continue;
     boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<

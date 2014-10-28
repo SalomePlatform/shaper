@@ -16,8 +16,6 @@
 #include <NCollection_List.hxx>
 #include <TopoDS_Shape.hxx>
 
-#include <list>
-
 class XGUI_Workshop;
 
 class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
@@ -28,12 +26,12 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   /// Returns a list of viewer selected presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  virtual std::list<ModuleBase_ViewerPrs> getSelected(int theShapeTypeToSkip = -1) const;
+  virtual QList<ModuleBase_ViewerPrs> getSelected(int theShapeTypeToSkip = -1) const;
 
   /// Returns a list of viewer highlited presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  virtual std::list<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const;
+  virtual QList<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const;
 
   /**
    * Returns list of currently selected objects

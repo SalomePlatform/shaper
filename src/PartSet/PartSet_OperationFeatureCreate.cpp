@@ -27,6 +27,8 @@
 #include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ISelection.h>
+#include <ModuleBase_IViewer.h>
 
 #include <XGUI_Constants.h>
 
@@ -77,11 +79,12 @@ bool PartSet_OperationFeatureCreate::canBeCommitted() const
   return false;
 }
 
-void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
+void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer)
 {
     double aX, anY;
-    gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
-    PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+    Handle(V3d_View) aView = theViewer->activeView();
+    gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
+    PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
     setWidgetValue(feature(), aX, anY);
     flushUpdated();
 }
@@ -101,37 +104,39 @@ void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
   }
 }
 
-void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                                 const std::list<ModuleBase_ViewerPrs>& theSelected,
-                                                 const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
+void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
+                                                   ModuleBase_ISelection* theSelection)
 {
-  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
+  Handle(V3d_View) aView = theViewer->activeView();
+  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
   double aX = aPoint.X(), anY = aPoint.Y();
   bool isClosedContour = false;
 
-  if (theSelected.empty()) {
-    PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+  QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+
+  if (aSelected.empty()) {
+    PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
   } else {
-    ModuleBase_ViewerPrs aPrs = theSelected.front();
+    ModuleBase_ViewerPrs aPrs = aSelected.first();
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull()) {
       if (aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
         const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
         if (!aVertex.IsNull()) {
           aPoint = BRep_Tool::Pnt(aVertex);
-          PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+          PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
           ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
           PartSet_Tools::setConstraints(sketch(), feature(), aActiveWgt->attributeID(), aX, anY);
           isClosedContour = true;
         }
       } else if (aShape.ShapeType() == TopAbs_EDGE) { // a line is selected
-        PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+        PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
       }
     }
   }
   ObjectPtr aFeature;
-  if (!theSelected.empty()) {
-    ModuleBase_ViewerPrs aPrs = theSelected.front();
+  if (!aSelected.empty()) {
+    ModuleBase_ViewerPrs aPrs = aSelected.first();
     aFeature = aPrs.object();
   } else {
     aFeature = feature();  // for the widget distance only
@@ -155,7 +160,7 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
 void PartSet_OperationFeatureCreate::startOperation()
 {
   PartSet_OperationSketchBase::startOperation();
-  emit multiSelectionEnabled(false);
+  //emit multiSelectionEnabled(false);
 }
 
 void PartSet_OperationFeatureCreate::abortOperation()
@@ -167,7 +172,7 @@ void PartSet_OperationFeatureCreate::abortOperation()
 void PartSet_OperationFeatureCreate::stopOperation()
 {
   PartSet_OperationSketchBase::stopOperation();
-  emit multiSelectionEnabled(true);
+  //emit multiSelectionEnabled(true);
 }
 
 void PartSet_OperationFeatureCreate::afterCommitOperation()

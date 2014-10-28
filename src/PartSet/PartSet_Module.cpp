@@ -88,16 +88,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   connect(aContextMenuMgr, SIGNAL(actionTriggered(const QString&, bool)), this,
           SLOT(onContextMenuCommand(const QString&, bool)));
 
-  connect(myWorkshop->viewer(), SIGNAL(mousePress(QMouseEvent*)), this,
-          SLOT(onMousePressed(QMouseEvent*)));
-  connect(myWorkshop->viewer(), SIGNAL(mouseRelease(QMouseEvent*)), this,
-          SLOT(onMouseReleased(QMouseEvent*)));
-  connect(myWorkshop->viewer(), SIGNAL(mouseMove(QMouseEvent*)), this,
-          SLOT(onMouseMoved(QMouseEvent*)));
-  connect(myWorkshop->viewer(), SIGNAL(keyRelease(QKeyEvent*)), this,
-          SLOT(onKeyRelease(QKeyEvent*)));
-  connect(myWorkshop->viewer(), SIGNAL(mouseDoubleClick(QMouseEvent*)), this,
-          SLOT(onMouseDoubleClick(QMouseEvent*)));
 }
 
 PartSet_Module::~PartSet_Module()
@@ -225,14 +215,27 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
   XGUI_Workshop* aXWshp = xWorkshop();
   PartSet_OperationSketchBase* aPreviewOp = 
     dynamic_cast<PartSet_OperationSketchBase*>(workshop()->currentOperation());
-  Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
-  if (aPreviewOp && (!aView.IsNull())) {
+  if (aPreviewOp) {
     ModuleBase_ISelection* aSelection = workshop()->selection();
     // Initialise operation with preliminary selection
-    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
+    //QList<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
+    //QList<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
+    //QList<ObjectPtr> aObjList;
+    //bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+    //if (aHasShift) {
+    //  foreach(ModuleBase_ViewerPrs aPrs, aSelected)
+    //    aObjList.append(aPrs.object());
 
-    aPreviewOp->mousePressed(theEvent, aView, aSelected, aHighlighted);
+    //  foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
+    //    if (!aObjList.contains(aPrs.object()))
+    //      aObjList.append(aPrs.object());
+    //  }
+    //} else {
+    //  foreach(ModuleBase_ViewerPrs aPrs, aHighlighted)
+    //    aObjList.append(aPrs.object());
+    //}
+    //onSetSelection(aObjList);
+    aPreviewOp->mousePressed(theEvent, myWorkshop->viewer(), aSelection);
   }
 }
 
@@ -240,14 +243,10 @@ void PartSet_Module::onMouseReleased(QMouseEvent* theEvent)
 {
   PartSet_OperationSketchBase* aPreviewOp = 
     dynamic_cast<PartSet_OperationSketchBase*>(myWorkshop->currentOperation());
-  Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
-  if (aPreviewOp && (!aView.IsNull())) {
+  if (aPreviewOp) {
     ModuleBase_ISelection* aSelection = workshop()->selection();
     // Initialise operation with preliminary selection
-    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-
-    aPreviewOp->mouseReleased(theEvent, aView, aSelected, aHighlighted);
+    aPreviewOp->mouseReleased(theEvent, myWorkshop->viewer(), aSelection);
   }
 }
 
@@ -255,9 +254,8 @@ void PartSet_Module::onMouseMoved(QMouseEvent* theEvent)
 {
   PartSet_OperationSketchBase* aPreviewOp = 
     dynamic_cast<PartSet_OperationSketchBase*>(myWorkshop->currentOperation());
-  Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
-  if (aPreviewOp && (!aView.IsNull()))
-    aPreviewOp->mouseMoved(theEvent, aView);
+  if (aPreviewOp)
+    aPreviewOp->mouseMoved(theEvent, myWorkshop->viewer());
 }
 
 void PartSet_Module::onKeyRelease(QKeyEvent* theEvent)
@@ -277,9 +275,7 @@ void PartSet_Module::onMouseDoubleClick(QMouseEvent* theEvent)
   if (aPreviewOp && (!aView.IsNull())) {
     ModuleBase_ISelection* aSelection = workshop()->selection();
     // Initialise operation with preliminary selection
-    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-    aPreviewOp->mouseDoubleClick(theEvent, aView, aSelected, aHighlighted);
+    aPreviewOp->mouseDoubleClick(theEvent, aView, aSelection);
   }
 }
 
@@ -315,9 +311,7 @@ void PartSet_Module::onRestartOperation(std::string theName, ObjectPtr theObject
     }
     ModuleBase_ISelection* aSelection = workshop()->selection();
     // Initialise operation with preliminary selection
-    std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-    std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-    aSketchOp->initSelection(aSelected, aHighlighted);
+    aSketchOp->initSelection(aSelection);
   } //else if (aFeature) {
     //anOperation->setFeature(aFeature);
     ////Deactivate result of current feature in order to avoid its selection
@@ -454,8 +448,10 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
             SLOT(onFeatureConstructed(ObjectPtr, int)));
     connect(aPreviewOp, SIGNAL(restartRequired(std::string, ObjectPtr)), this,
             SLOT(onRestartOperation(std::string, ObjectPtr)));
-    connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)), this,
-            SLOT(onMultiSelectionEnabled(bool)));
+    // If manage multi selection the it will be impossible to select more then one
+    // object under operation Edit
+//    connect(aPreviewOp, SIGNAL(multiSelectionEnabled(bool)), this,
+//            SLOT(onMultiSelectionEnabled(bool)));
 
     connect(aPreviewOp, SIGNAL(stopSelection(const QList<ObjectPtr>&, const bool)), this,
             SLOT(onStopSelection(const QList<ObjectPtr>&, const bool)));
@@ -606,3 +602,23 @@ gp_Pln PartSet_Module::getSketchPlane(FeaturePtr theSketch) const
   return gp_Pln(aOrig, aDir);
 }
 
+
+void PartSet_Module::onSelectionChanged()
+{
+  ModuleBase_ISelection* aSelect = myWorkshop->selection();
+  QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
+  // We need to stop edit operation if selection is cleared
+  if (aSelected.size() == 0) {
+    PartSet_OperationFeatureEdit* anEditOp = 
+      dynamic_cast<PartSet_OperationFeatureEdit*>(myWorkshop->currentOperation());
+    if (!anEditOp)
+      return;
+    anEditOp->commit();
+  } else {
+    PartSet_OperationSketchBase* aSketchOp = 
+      dynamic_cast<PartSet_OperationSketchBase*>(myWorkshop->currentOperation());
+    if (aSketchOp) {
+      aSketchOp->selectionChanged(aSelect);
+    }
+  }
+}

@@ -12,6 +12,7 @@
 #include <SketchPlugin_Sketch.h>
 
 #include <QObject>
+#include <QList>
 
 class Handle_AIS_InteractiveObject;
 
@@ -50,22 +51,20 @@ Q_OBJECT
   /// \param theView a viewer to have the viewer the eye position
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<ModuleBase_ViewerPrs>& theSelected,
-                            const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+  virtual void mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection);
+
   /// Processes the mouse release in the point
   /// \param theEvent the mouse event
   /// \param theView a viewer to have the viewer the eye position
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                             const std::list<ModuleBase_ViewerPrs>& theSelected,
-                             const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+  virtual void mouseReleased(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
+                             ModuleBase_ISelection* theSelection);
 
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
+  virtual void mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer);
 
   /// Returns the list of the nested features
   /// \return the list of subfeatures
@@ -88,6 +87,9 @@ Q_OBJECT
   /// Set the plane to the current sketch
   /// \param theShape the shape
   void setSketchPlane(const TopoDS_Shape& theShape);
+  
+  /// Called on selection changed when the operation is active
+  virtual void selectionChanged(ModuleBase_ISelection* theSelection);
 
   /// If operation needs to redisplay its result during operation
   /// then this method has to return True
@@ -111,7 +113,7 @@ signals:
   virtual void afterCommitOperation();
 
  private:
-  std::list<ModuleBase_ViewerPrs> myFeatures;  ///< the features to apply the edit operation
+  QList<ModuleBase_ViewerPrs> myFeatures;  ///< the features to apply the edit operation
 };
 
 #endif

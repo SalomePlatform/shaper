@@ -42,16 +42,15 @@ Q_OBJECT
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
+  virtual void mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer);
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theEvent the mouse event
   /// \param theView a viewer to have the viewer the eye position
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                             const std::list<ModuleBase_ViewerPrs>& theSelected,
-                             const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+  virtual void mouseReleased(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
+                             ModuleBase_ISelection* theSelection);
   /// Processes the key pressed in the view
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);

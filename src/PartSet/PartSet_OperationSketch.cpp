@@ -22,6 +22,8 @@
 #include <GeomAPI_XYZ.h>
 
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_ISelection.h>
+#include <ModuleBase_IViewer.h>
 #include <Events_Loop.h>
 
 #include <AIS_Shape.hxx>
@@ -53,49 +55,62 @@ CompositeFeaturePtr PartSet_OperationSketch::sketch() const
   return boost::dynamic_pointer_cast<ModelAPI_CompositeFeature>(feature());
 }
 
-void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                           const std::list<ModuleBase_ViewerPrs>& theSelected,
-                                           const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection)
 {
   if (hasSketchPlane()) {
     // if shift button is pressed and there are some already selected objects, the operation should
     // not be started. We just want to combine some selected objects.
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
-    if (aHasShift && theSelected.size() > 0)
-      return;
+    QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+    QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
+    //if (aHasShift && (aSelected.size() > 0)) {
+      foreach(ModuleBase_ViewerPrs aPrs, aHighlighted)
+        aSelected.append(aPrs);
+    //}
+    //if (aHasShift && aSelected.size() > 0)
+    //  return;
 
-    if (theHighlighted.size() == 1) {
-      ObjectPtr aFeature = theHighlighted.front().object();
+    if (aSelected.size() > 0) {
+      ObjectPtr aFeature = aSelected.first().object();
       if (aFeature) {
         std::string anOperationType =
-            (theSelected.size() > 1) ?
+            (aSelected.size() > 1) ?
                 PartSet_OperationFeatureEditMulti::Type() : PartSet_OperationFeatureEdit::Type();
         restartOperation(anOperationType, aFeature);
       }
-    } else
-      myFeatures = theHighlighted;
+    } //else
+    //myFeatures = aSelected;
 
-  } else {
-    if (!theHighlighted.empty()) {
-      ModuleBase_ViewerPrs aPrs = theHighlighted.front();
-      const TopoDS_Shape& aShape = aPrs.shape();
-      if (!aShape.IsNull())
-        setSketchPlane(aShape);
-    }
+  } 
+}
+
+
+void PartSet_OperationSketch::selectionChanged(ModuleBase_ISelection* theSelection)
+{
+  if (hasSketchPlane())
+    return;
+
+  QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+  if (!aSelected.empty()) {
+    ModuleBase_ViewerPrs aPrs = aSelected.first();
+    const TopoDS_Shape& aShape = aPrs.shape();
+    if (!aShape.IsNull())
+      setSketchPlane(aShape);
   }
 }
 
-void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                            const std::list<ModuleBase_ViewerPrs>& theSelected,
-                                            const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+
+void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
+                                            ModuleBase_ISelection* theSelection)
 {
+  QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
   if (hasSketchPlane()) {
     /// TODO: OCC bug: 25034 - the highlighted list should be filled not only for AIS_Shape
     /// but for other IO, for example constraint dimensions.
     /// It is empty and we have to use the process mouse release to start edition operation
     /// for these objects
-    if (theSelected.size() == 1) {
-      ObjectPtr aObject = theSelected.front().object();
+    if (aSelected.size() == 1) {
+      ObjectPtr aObject = aSelected.first().object();
       if (aObject) {
         restartOperation(PartSet_OperationFeatureEdit::Type(), aObject);
       }
@@ -103,13 +118,14 @@ void PartSet_OperationSketch::mouseReleased(QMouseEvent* theEvent, Handle_V3d_Vi
   }
 }
 
-void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
+void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer)
 {
   if (!hasSketchPlane() || !(theEvent->buttons() & Qt::LeftButton) || myFeatures.empty())
     return;
 
   if (myFeatures.size() != 1) {
-    FeaturePtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), theView, feature(),
+    Handle(V3d_View) aView = theViewer->activeView();
+    FeaturePtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), aView, feature(),
                                                         myFeatures);
     if (aFeature)
       restartOperation(PartSet_OperationFeatureEditMulti::Type(), aFeature);

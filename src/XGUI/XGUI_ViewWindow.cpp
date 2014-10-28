@@ -175,7 +175,9 @@ XGUI_ViewWindow::XGUI_ViewWindow(XGUI_Viewer* theViewer, V3d_TypeOfView theType)
       myEventStarted(false),
       myIsActive(false),
       myLastState(WindowNormalState),
-      myOperation(NOTHING)
+      myOperation(NOTHING),
+      myGripWgt(0),
+      myPicture(0)
 {
   mySelectedPoint = gp_Pnt(0., 0., 0.);
   setFrameStyle(QFrame::Raised);

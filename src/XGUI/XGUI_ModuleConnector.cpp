@@ -89,3 +89,9 @@ ObjectPtr XGUI_ModuleConnector::findPresentedObject(const AISObjectPtr& theAIS) 
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   return aDisp->getObject(theAIS);
 }
+
+void XGUI_ModuleConnector::setSelected(const QList<ObjectPtr>& theFeatures)
+{
+  XGUI_Displayer* aDisp = myWorkshop->displayer();
+  aDisp->setSelected(theFeatures);
+}

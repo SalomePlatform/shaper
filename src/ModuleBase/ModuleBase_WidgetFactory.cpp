@@ -58,6 +58,7 @@ ModuleBase_WidgetFactory::ModuleBase_WidgetFactory(const std::string& theXmlRepr
 
 ModuleBase_WidgetFactory::~ModuleBase_WidgetFactory()
 {
+  delete myWidgetApi;
 }
 
 void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)

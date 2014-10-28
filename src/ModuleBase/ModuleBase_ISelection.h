@@ -14,7 +14,7 @@
 #include <NCollection_List.hxx>
 #include <TopoDS_Shape.hxx>
 
-#include <list>
+#include <QList>
 
 class ModuleBase_ISelection
 {
@@ -23,12 +23,12 @@ class ModuleBase_ISelection
   /// Returns a list of viewer selected presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  virtual std::list<ModuleBase_ViewerPrs> getSelected(int theShapeTypeToSkip = -1) const = 0;
+  virtual QList<ModuleBase_ViewerPrs> getSelected(int theShapeTypeToSkip = -1) const = 0;
 
   /// Returns a list of viewer highlited presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  virtual std::list<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const = 0;
+  virtual QList<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const = 0;
 
   /**
    * Returns list of features currently selected in 3d viewer
