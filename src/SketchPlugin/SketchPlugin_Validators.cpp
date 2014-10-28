@@ -9,6 +9,7 @@
 #include <ModelAPI_ResultValidator.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_Session.h>
 #include <GeomDataAPI_Point2D.h>
 
 bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,

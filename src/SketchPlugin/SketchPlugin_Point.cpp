@@ -9,6 +9,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 
 #include <GeomAPI_Pnt2d.h>
 

@@ -21,6 +21,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 
 #include <GeomAPI_Pnt2d.h>
 

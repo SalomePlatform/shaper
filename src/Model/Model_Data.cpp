@@ -17,6 +17,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 
 #include <GeomData_Point.h>
 #include <GeomData_Point2D.h>

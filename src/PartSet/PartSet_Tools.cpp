@@ -8,6 +8,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Session.h>
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
