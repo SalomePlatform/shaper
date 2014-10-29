@@ -35,9 +35,9 @@ export PATH=${CASROOT}:${PATH}
 ##
 
 #------ NewGEOM ------
-export NEW_GEOM_ROOT_DIR=${ROOT_DIR}/install
-export PATH=${NEW_GEOM_ROOT_DIR}/bin:${NEW_GEOM_ROOT_DIR}/plugins:${PATH}
-export PYTHONPATH=${NEW_GEOM_ROOT_DIR}/swig:${PYTHONPATH}
-export LD_LIBRARY_PATH=${NEW_GEOM_ROOT_DIR}/bin:${NEW_GEOM_ROOT_DIR}/swig:${NEW_GEOM_ROOT_DIR}/plugins:${LD_LIBRARY_PATH}
-export NEW_GEOM_CONFIG_FILE=${NEW_GEOM_ROOT_DIR}/plugins
-export NewGeomResources=${NEW_GEOM_ROOT_DIR}/resources
+export NEWGEOM_ROOT_DIR=${ROOT_DIR}/install
+export PATH=${NEWGEOM_ROOT_DIR}/bin:${NEWGEOM_ROOT_DIR}/plugins:${PATH}
+export PYTHONPATH=${NEWGEOM_ROOT_DIR}/swig:${PYTHONPATH}
+export LD_LIBRARY_PATH=${NEWGEOM_ROOT_DIR}/bin:${NEWGEOM_ROOT_DIR}/swig:${NEWGEOM_ROOT_DIR}/plugins:${LD_LIBRARY_PATH}
+export NEW_GEOM_CONFIG_FILE=${NEWGEOM_ROOT_DIR}/plugins
+export NewGeomResources=${NEWGEOM_ROOT_DIR}/resources
