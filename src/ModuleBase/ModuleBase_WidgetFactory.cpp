@@ -27,6 +27,7 @@
 #include <ModuleBase_WidgetMultiSelector.h>
 
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -57,6 +58,7 @@ ModuleBase_WidgetFactory::ModuleBase_WidgetFactory(const std::string& theXmlRepr
 
 ModuleBase_WidgetFactory::~ModuleBase_WidgetFactory()
 {
+  delete myWidgetApi;
 }
 
 void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)

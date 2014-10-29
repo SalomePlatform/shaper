@@ -12,6 +12,7 @@
 #include "ModuleBase_WidgetValueFeature.h"
 #include "ModuleBase_ViewerPrs.h"
 #include "ModuleBase_IPropertyPanel.h"
+#include "ModuleBase_ISelection.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Document.h>
@@ -20,7 +21,9 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 
 #include <GeomAPI_Pnt2d.h>
 
@@ -232,33 +235,75 @@ void ModuleBase_Operation::setRunning(bool theState)
   }
 }
 
-void ModuleBase_Operation::activateByPreselection()
+bool ModuleBase_Operation::activateByPreselection()
 {
   if (!myPropertyPanel)
-    return;
-  ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
-  if ((myPreSelection.size() > 0) && aActiveWgt) {
-    const ModuleBase_ViewerPrs& aPrs = myPreSelection.front();
+    return false;
+  if (myPreSelection.empty())
+    return false;
+  const QList<ModuleBase_ModelWidget*>& aWidgets = myPropertyPanel->modelWidgets();
+  if (aWidgets.empty())
+    return false;
+  
+  ModuleBase_ModelWidget* aWgt;
+  ModuleBase_ViewerPrs aPrs;
+  QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
+  QList<ModuleBase_ViewerPrs>::const_iterator aPIt;
+  for (aWIt = aWidgets.constBegin(), aPIt = myPreSelection.constBegin();
+       (aWIt != aWidgets.constEnd()) && (aPIt != myPreSelection.constEnd());
+       ++aWIt, ++aPIt) {
+    aWgt = (*aWIt);
+    aPrs = (*aPIt);
     ModuleBase_WidgetValueFeature aValue;
     aValue.setObject(aPrs.object());
-    if (aActiveWgt->setValue(&aValue)) {
-      myPreSelection.remove(aPrs);
-      myPropertyPanel->activateNextWidget();
-    }
-    // If preselection is enough to make a valid feature - apply it immediately
+    if (!aWgt->setValue(&aValue))
+      break;
   }
+  if (canBeCommitted()) {
+    // if all widgets are filled with selection
+    commit();
+    return true;
+  }
+
+  //ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+  //if ((myPreSelection.size() > 0) && aActiveWgt) {
+  //  const ModuleBase_ViewerPrs& aPrs = myPreSelection.first();
+  //  ModuleBase_WidgetValueFeature aValue;
+  //  aValue.setObject(aPrs.object());
+  //  if (aActiveWgt->setValue(&aValue)) {
+  //    myPreSelection.removeOne(aPrs);
+  //    myPropertyPanel->activateNextWidget();
+  //  }
+  //  // If preselection is enough to make a valid feature - apply it immediately
+  //}
+  return false;
 }
 
-void ModuleBase_Operation::initSelection(
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
+void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection)
 {
-  myPreSelection = theSelected;
+  myPreSelection.clear();
+
+  // Check that the selected result are not results of operation feature
+  QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+  FeaturePtr aFeature = feature();
+  if (aFeature) {
+    std::list<ResultPtr> aResults = aFeature->results();
+    QList<ObjectPtr> aResList;
+    std::list<ResultPtr>::const_iterator aIt;
+    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
+      aResList.append(*aIt);
+
+    foreach (ModuleBase_ViewerPrs aPrs, aSelected) {
+      if ((!aResList.contains(aPrs.object())) && (aPrs.object() != aFeature))
+        myPreSelection.append(aPrs);
+    }
+  } else
+    myPreSelection = aSelected;
 }
 
 void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
 {
-  activateByPreselection();
+  //activateByPreselection();
   //if (theWidget && myPropertyPanel) {
   //  myPropertyPanel->activateNextWidget();
   ////  //emit activateNextWidget(myActiveWidget);

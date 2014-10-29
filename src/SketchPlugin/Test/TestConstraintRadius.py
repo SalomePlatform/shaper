@@ -24,7 +24,7 @@ import math
 # Initialization of the test
 #=========================================================================
 
-__updated__ = "2014-09-26"
+__updated__ = "2014-10-28"
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -32,41 +32,34 @@ aDocument = aSession.moduleDocument()
 # Creation of a sketch
 #=========================================================================
 aSession.startOperation()
-aSketchFeature = aDocument.addFeature("Sketch")
-aSketchFeatureData = aSketchFeature.data()
-origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
+aSketchCommonFeature = aDocument.addFeature("Sketch")
+aSketchFeature = modelAPI_CompositeFeature(aSketchCommonFeature)
+origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
-dirx = geomDataAPI_Dir(aSketchFeatureData.attribute("DirX"))
+dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))
 dirx.setValue(1, 0, 0)
-diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
+diry = geomDataAPI_Dir(aSketchFeature.attribute("DirY"))
 diry.setValue(0, 1, 0)
-norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
+norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
 norm.setValue(0, 0, 1)
 aSession.finishOperation()
 #=========================================================================
 # Creation of an arc and a circle
 #=========================================================================
 aSession.startOperation()
-aSketchReflist = aSketchFeatureData.reflist("Features")
-aSketchArc = aDocument.addFeature("SketchArc")
-aSketchReflist.append(aSketchArc)
-aSketchArcData = aSketchArc.data()
-anArcCentr = geomDataAPI_Point2D(aSketchArcData.attribute("ArcCenter"))
+aSketchArc = aSketchFeature.addFeature("SketchArc")
+anArcCentr = geomDataAPI_Point2D(aSketchArc.attribute("ArcCenter"))
 anArcCentr.setValue(10., 10.)
-anArcStartPoint = geomDataAPI_Point2D(
-    aSketchArcData.attribute("ArcStartPoint"))
+anArcStartPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcStartPoint"))
 anArcStartPoint.setValue(0., 50.)
-anArcEndPoint = geomDataAPI_Point2D(aSketchArcData.attribute("ArcEndPoint"))
+anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcEndPoint"))
 anArcEndPoint.setValue(50., 0.)
 aSession.finishOperation()
 # Circle
 aSession.startOperation()
-aSketchCircle = aDocument.addFeature("SketchCircle")
-aSketchReflist.append(aSketchCircle)
-aSketchCircleData = aSketchCircle.data()
-anCircleCentr = geomDataAPI_Point2D(
-    aSketchCircleData.attribute("CircleCenter"))
-aCircleRadius = aSketchCircleData.real("CircleRadius")
+aSketchCircle = aSketchFeature.addFeature("SketchCircle")
+anCircleCentr = geomDataAPI_Point2D(aSketchCircle.attribute("CircleCenter"))
+aCircleRadius = aSketchCircle.real("CircleRadius")
 anCircleCentr.setValue(-25., -25)
 aCircleRadius.setValue(25.)
 aSession.finishOperation()
@@ -74,11 +67,9 @@ aSession.finishOperation()
 # Make a constraint to keep the radius of the arc
 #=========================================================================
 aSession.startOperation()
-aConstraint = aDocument.addFeature("SketchConstraintRadius")
-aSketchReflist.append(aConstraint)
-aConstraintData = aConstraint.data()
-aRadius = aConstraintData.real("ConstraintValue")
-aRefObject = aConstraintData.refattr("ConstraintEntityA")
+aConstraint = aSketchFeature.addFeature("SketchConstraintRadius")
+aRadius = aConstraint.real("ConstraintValue")
+aRefObject = aConstraint.refattr("ConstraintEntityA")
 aResult = aSketchArc.firstResult()
 assert (aResult is not None)
 aRefObject.setObject(modelAPI_ResultConstruction(aResult))
@@ -90,11 +81,9 @@ assert (aRefObject.isInitialized())
 # Make a constraint to keep the radius of the circle
 #=========================================================================
 aSession.startOperation()
-aConstraint = aDocument.addFeature("SketchConstraintRadius")
-aSketchReflist.append(aConstraint)
-aConstraintData = aConstraint.data()
-aRadius = aConstraintData.real("ConstraintValue")
-aRefObject = aConstraintData.refattr("ConstraintEntityA")
+aConstraint = aSketchFeature.addFeature("SketchConstraintRadius")
+aRadius = aConstraint.real("ConstraintValue")
+aRefObject = aConstraint.refattr("ConstraintEntityA")
 aResult = aSketchCircle.firstResult()
 assert (aResult is not None)
 aRefObject.setObject(modelAPI_ResultConstruction(aResult))

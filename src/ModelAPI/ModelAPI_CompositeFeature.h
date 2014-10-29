@@ -27,6 +27,9 @@ public:
 
   /// Returns the sub-feature unique identifier in this composite feature by zero-base index
   virtual int subFeatureId(const int theIndex) const = 0;
+
+  /// Returns true if feature or reuslt belong to this composite feature as subs
+  virtual bool isSub(ObjectPtr theObject) const = 0;
 };
 
 //! Pointer on the composite feature object

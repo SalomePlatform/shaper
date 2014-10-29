@@ -6,13 +6,12 @@ assert(not aSession.canRedo())
 
 aSession.startOperation()
 aFeature = aDoc.addFeature("Point")
-aFeatureData = aFeature.data()
 # Since validators are introduced we have to initialize all
 # the feature's attributes
-aFeatureData.real("x").setValue(1.)
-aFeatureData.real("y").setValue(-1.)
-aFeatureData.real("z").setValue(0.)
-aFeatureName = aFeatureData.name()
+aFeature.real("x").setValue(1.)
+aFeature.real("y").setValue(-1.)
+aFeature.real("z").setValue(0.)
+aFeatureName = aFeature.name()
 assert(aFeatureName == "Point_1")
 
 aFeature.execute()

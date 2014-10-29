@@ -13,8 +13,6 @@
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent)
     : QObject(theParent)
 {
-  // listen to Escape signal to stop the current operation
-  qApp->installEventFilter(this);
 }
 
 XGUI_OperationMgr::~XGUI_OperationMgr()
@@ -68,8 +66,8 @@ bool XGUI_OperationMgr::eventFilter(QObject *theObject, QEvent *theEvent)
 {
   if (theEvent->type() == QEvent::KeyRelease) {
     QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
-    if(aKeyEvent && onKeyReleased(aKeyEvent)) {
-      return true;
+    if(aKeyEvent) {
+      return onKeyReleased(aKeyEvent);
     }
   }
   return QObject::eventFilter(theObject, theEvent);
@@ -226,10 +224,6 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
   ModuleBase_Operation* anOperation = currentOperation();
   bool isAccepted = true;
   switch (theEvent->key()) {
-    case Qt::Key_Escape: {
-      onAbortOperation();
-    }
-      break;
     case Qt::Key_Return:
     case Qt::Key_Enter: {
       commitOperation();

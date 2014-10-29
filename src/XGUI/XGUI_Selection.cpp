@@ -19,10 +19,10 @@ XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
 {
 }
 
-std::list<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) const
+QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) const
 {
   std::set<ObjectPtr> aPrsFeatures;
-  std::list<ModuleBase_ViewerPrs> aPresentations;
+  QList<ModuleBase_ViewerPrs> aPresentations;
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
@@ -44,15 +44,15 @@ std::list<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSk
     }
     Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
     aPrs.setOwner(anOwner);
-    aPresentations.push_back(aPrs);
+    aPresentations.append(aPrs);
   }
   return aPresentations;
 }
 
-std::list<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeToSkip) const
+QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeToSkip) const
 {
   std::set<ObjectPtr> aPrsFeatures;
-  std::list<ModuleBase_ViewerPrs> aPresentations;
+  QList<ModuleBase_ViewerPrs> aPresentations;
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();

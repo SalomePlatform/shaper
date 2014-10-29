@@ -74,6 +74,9 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(const Handle(SelectMgr_Enti
           return aD1 && aD2 && aD3;
         }
       }
+    } else {
+      // This is not object controlled by the filter
+      return Standard_True;
     }
   }
   return Standard_False;

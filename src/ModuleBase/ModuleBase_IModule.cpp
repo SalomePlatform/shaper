@@ -1,5 +1,6 @@
 
 #include "ModuleBase_IModule.h"
+#include "ModuleBase_IViewer.h"
 #include "ModuleBase_ViewerPrs.h"
 #include "ModuleBase_Operation.h"
 #include "ModuleBase_ISelection.h"
@@ -11,14 +12,29 @@
 #include <Config_PointerMessage.h>
 
 
+ModuleBase_IModule::ModuleBase_IModule(ModuleBase_IWorkshop* theParent)
+  : QObject(theParent), myWorkshop(theParent) 
+{
+  connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+  connect(myWorkshop->viewer(), SIGNAL(mousePress(QMouseEvent*)), this,
+          SLOT(onMousePressed(QMouseEvent*)));
+  connect(myWorkshop->viewer(), SIGNAL(mouseRelease(QMouseEvent*)), this,
+          SLOT(onMouseReleased(QMouseEvent*)));
+  connect(myWorkshop->viewer(), SIGNAL(mouseMove(QMouseEvent*)), this,
+          SLOT(onMouseMoved(QMouseEvent*)));
+  connect(myWorkshop->viewer(), SIGNAL(keyRelease(QKeyEvent*)), this,
+          SLOT(onKeyRelease(QKeyEvent*)));
+  connect(myWorkshop->viewer(), SIGNAL(mouseDoubleClick(QMouseEvent*)), this,
+          SLOT(onMouseDoubleClick(QMouseEvent*)));
+}
+
+
 void ModuleBase_IModule::launchOperation(const QString& theCmdId)
 {
   ModuleBase_Operation* anOperation = createOperation(theCmdId.toStdString());
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
   // Initialise operation with preliminary selection
-  std::list<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-  std::list<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-  anOperation->initSelection(aSelected, aHighlighted);
+  anOperation->initSelection(aSelection);
   sendOperation(anOperation);
 }
 

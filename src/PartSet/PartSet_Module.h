@@ -17,8 +17,6 @@
 
 #include <boost/shared_ptr.hpp>
 
-class QMouseEvent;
-class QKeyEvent;
 class PartSet_Listener;
 class ModelAPI_Feature;
 class XGUI_ViewerPrs;
@@ -70,26 +68,6 @@ Q_OBJECT
   void onOperationStopped(ModuleBase_Operation* theOperation);
   /// SLOT, that is called afetr the popup menu action clicked.
   void onContextMenuCommand(const QString& theId, bool isChecked);
-  /// SLOT, that is called by mouse press in the viewer.
-  /// The mouse released point is sent to the current operation to be processed.
-  /// \param theEvent the mouse event
-  void onMousePressed(QMouseEvent* theEvent);
-  /// SLOT, that is called by mouse release in the viewer.
-  /// The mouse released point is sent to the current operation to be processed.
-  /// \param theEvent the mouse event
-  void onMouseReleased(QMouseEvent* theEvent);
-  /// SLOT, that is called by mouse move in the viewer.
-  /// The mouse moved point is sent to the current operation to be processed.
-  /// \param theEvent the mouse event
-  void onMouseMoved(QMouseEvent* theEvent);
-
-  /// SLOT, that is called by the key in the viewer is clicked.
-  /// \param theEvent the mouse event
-  void onKeyRelease(QKeyEvent* theEvent);
-
-  /// SLOT, that is called by the mouse double click in the viewer.
-  /// \param theEvent the mouse event
-  void onMouseDoubleClick(QMouseEvent* theEvent);
 
   /// SLOT, to apply to the current viewer the operation
   /// \param theX the X projection value
@@ -128,6 +106,33 @@ Q_OBJECT
   /// \param the feature
   /// \param the attribute of the feature
   void onStorePoint2D(ObjectPtr theFeature, const std::string& theAttribute);
+
+protected slots:
+  /// Called on selection changed event
+  virtual void onSelectionChanged();
+
+  /// SLOT, that is called by mouse press in the viewer.
+  /// The mouse released point is sent to the current operation to be processed.
+  /// \param theEvent the mouse event
+  virtual void onMousePressed(QMouseEvent* theEvent);
+
+  /// SLOT, that is called by mouse release in the viewer.
+  /// The mouse released point is sent to the current operation to be processed.
+  /// \param theEvent the mouse event
+  virtual void onMouseReleased(QMouseEvent* theEvent);
+  
+  /// SLOT, that is called by mouse move in the viewer.
+  /// The mouse moved point is sent to the current operation to be processed.
+  /// \param theEvent the mouse event
+  virtual void onMouseMoved(QMouseEvent* theEvent);
+
+  /// SLOT, that is called by the mouse double click in the viewer.
+  /// \param theEvent the mouse event
+  virtual void onMouseDoubleClick(QMouseEvent* theEvent);
+
+  /// SLOT, that is called by the key in the viewer is clicked.
+  /// \param theEvent the mouse event
+  virtual void onKeyRelease(QKeyEvent* theEvent);
 
  protected:
   /// Creates a new operation

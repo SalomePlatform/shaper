@@ -8,6 +8,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Session.h>
 
 void PartSetPlugin_Remove::execute()
 {

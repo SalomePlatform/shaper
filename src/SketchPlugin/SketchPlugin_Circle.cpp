@@ -8,6 +8,8 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_Session.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <GeomDataAPI_Point2D.h>
@@ -15,7 +17,6 @@
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
-#include <ModelAPI_AttributeDouble.h>
 
 SketchPlugin_Circle::SketchPlugin_Circle()
     : SketchPlugin_Feature()

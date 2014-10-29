@@ -24,6 +24,9 @@ public:
   /// Returns currently active widget
   virtual ModuleBase_ModelWidget* activeWidget() const = 0;
 
+  /// Returns all property panel's widget created by WidgetFactory
+  virtual const QList<ModuleBase_ModelWidget*>& modelWidgets() const = 0;
+
 signals:
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theEvent key release event
