@@ -9,13 +9,15 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Dir.h>
 #include <ModelAPI_ResultBody.h>
+#include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAPI_DataMapOfShapeShape.h>
 #include <boost/shared_ptr.hpp>
 /**\class GeomAlgoAPI_Extrusion
  * \ingroup DataAlgo
  * \brief Allows to create the prism based on a given face and a direction
  */
 
-class GeomAlgoAPI_Extrusion : public GeomAPI_Interface
+class GeomAlgoAPI_Extrusion : public GeomAPI_Interface//GeomAlgoAPI_MakeShape
 {
  public:
 
@@ -44,15 +46,21 @@ class GeomAlgoAPI_Extrusion : public GeomAPI_Interface
   GEOMALGOAPI_EXPORT const boost::shared_ptr<GeomAPI_Shape>& shape () const;
 
   /// Returns list of shapes generated from theShape
-  GEOMALGOAPI_EXPORT void generated(const boost::shared_ptr<GeomAPI_Shape> theShape,
-                                    ListOfShape& theHistory);
+ // GEOMALGOAPI_EXPORT void generated(const boost::shared_ptr<GeomAPI_Shape> theShape,
+                                   // ListOfShape& theHistory);
 
   /// Returns the first shape 
   GEOMALGOAPI_EXPORT const boost::shared_ptr<GeomAPI_Shape>& firstShape();
 
   /// returns last shape
-  GEOMALGOAPI_EXPORT const boost::shared_ptr<GeomAPI_Shape>& lastShape();	 
+  GEOMALGOAPI_EXPORT const boost::shared_ptr<GeomAPI_Shape>& lastShape();	
+ 
+  /// Returns map of sub-shapes of the result
+  GEOMALGOAPI_EXPORT void  mapOfShapes (GeomAPI_DataMapOfShapeShape& theMap) const;
 
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape* makeShape () const;
+
+  GEOMALGOAPI_EXPORT  ~GeomAlgoAPI_Extrusion();
 private:
   /// builds resulting shape
   void build(const boost::shared_ptr<GeomAPI_Shape>& theBasis);
@@ -62,6 +70,8 @@ private:
   boost::shared_ptr<GeomAPI_Shape> myShape;
   boost::shared_ptr<GeomAPI_Shape> myFirst;
   boost::shared_ptr<GeomAPI_Shape> myLast;
+  GeomAPI_DataMapOfShapeShape myMap;
+  GeomAlgoAPI_MakeShape * myMkShape;
 };
 
 #endif

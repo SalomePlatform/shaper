@@ -56,6 +56,7 @@ INCLUDE_DIRECTORIES(
   ../Config 
   ../Events
   ../GeomAPI
+  ../GeomAlgoAPI
 )
 
 SET(CMAKE_SWIG_FLAGS "")

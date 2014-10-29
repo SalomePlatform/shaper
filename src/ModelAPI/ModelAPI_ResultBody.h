@@ -7,7 +7,9 @@
 
 #include "ModelAPI_Result.h"
 #include <GeomAPI_Shape.h>
-
+#include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAPI_DataMapOfShapeShape.h>
+#include <boost/shared_ptr.hpp>
 #include <string>
 
 /**\class ModelAPI_ResultBody
@@ -68,7 +70,26 @@ public:
   /// As an example, consider the case of a face removed by a Boolean operation.
   virtual void deleted(
     const boost::shared_ptr<GeomAPI_Shape>& theOldShape, const int theTag = 1) = 0;
-
+  
+  /// load deleted shapes
+  virtual void loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
+                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                               const int  theKindOfShape,
+                                               const int  theTag) = 0;
+  /// load and orient modified shapes
+  virtual void loadAndOrientModifiedShapes (
+	                                           GeomAlgoAPI_MakeShape* theMS,
+                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                               const int  theKindOfShape,
+                                               const int  theTag,
+                                               GeomAPI_DataMapOfShapeShape& theSubShapes) = 0;
+  /// load and orient generated shapes
+  virtual void loadAndOrientGeneratedShapes (
+	                                           GeomAlgoAPI_MakeShape* theMS,
+                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                               const int  theKindOfShape,
+                                               const int  theTag,
+                                               GeomAPI_DataMapOfShapeShape& theSubShapes) = 0;
 protected:
 };
 
