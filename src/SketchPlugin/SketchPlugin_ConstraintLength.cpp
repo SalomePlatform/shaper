@@ -110,8 +110,8 @@ void SketchPlugin_ConstraintLength::move(double theDeltaX, double theDeltaY)
   if (!aData->isValid())
     return;
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
+  aPoint->move(theDeltaX, theDeltaY);
 }
 

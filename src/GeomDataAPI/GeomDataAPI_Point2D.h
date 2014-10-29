@@ -30,6 +30,13 @@ class GeomDataAPI_Point2D : public ModelAPI_Attribute
   /// Returns the 2D point
   virtual boost::shared_ptr<GeomAPI_Pnt2d> pnt() = 0;
 
+  /// Appends the delta values to point
+  void move(const double theDeltaX, const double theDeltaY)
+  {
+    setValue(x() + theDeltaX, y() + theDeltaY);
+  }
+
+
   /// Returns the type of this class of attributes
   static inline std::string type()
   {
