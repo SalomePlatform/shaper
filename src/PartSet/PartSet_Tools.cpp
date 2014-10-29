@@ -28,15 +28,21 @@
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Arc.h>
+#include <SketchPlugin_Line.h>
 
 #include <ModuleBase_ViewerPrs.h>
 
 #include <V3d_View.hxx>
 #include <gp_Pln.hxx>
+#include <gp_Circ.hxx>
 #include <ProjLib.hxx>
 #include <ElSLib.hxx>
 #include <Geom_Line.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
+#include <BRep_Tool.hxx>
+#include <TopoDS.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -178,8 +184,8 @@ void PartSet_Tools::setFeaturePoint(FeaturePtr theFeature, double theX, double t
   if (!theFeature)
     return;
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(theAttribute));
+  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = 
+    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
   if (aPoint)
     aPoint->setValue(theX, theY);
 }
@@ -340,4 +346,67 @@ bool PartSet_Tools::isConstraintFeature(const std::string& theKind)
       || theKind == SketchPlugin_ConstraintLength::ID()
       || theKind == SketchPlugin_ConstraintRadius::ID()
       || theKind == SketchPlugin_ConstraintRigid::ID();
+}
+
+ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& thePrs, CompositeFeaturePtr theSketch)
+{
+  TopoDS_Shape aShape = thePrs.shape();
+  if (aShape.ShapeType() != TopAbs_EDGE)
+    return ResultPtr();
+
+  Standard_Real aStart, aEnd;
+  Handle(V3d_View) aNullView;
+  FeaturePtr myFeature;
+
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(aShape), aStart, aEnd);
+  GeomAdaptor_Curve aAdaptor(aCurve);
+  if (aAdaptor.GetType() == GeomAbs_Line) {
+    // Create line
+    myFeature = theSketch->addFeature(SketchPlugin_Line::ID());
+
+    //DataPtr aData = myFeature->data();
+    //boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
+    //  boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
+
+    //double aX, aY;
+    //gp_Pnt Pnt1 = aAdaptor.Value(aStart);
+    //convertTo2D(Pnt1, theSketch, aNullView, aX, aY);
+    //setFeaturePoint(myFeature, aX, aY, SketchPlugin_Line::START_ID());
+
+    //gp_Pnt Pnt2 = aAdaptor.Value(aEnd);
+    //convertTo2D(Pnt2, theSketch, aNullView, aX, aY);
+    //setFeaturePoint(myFeature, aX, aY, SketchPlugin_Line::END_ID());
+  } else if (aAdaptor.GetType() == GeomAbs_Circle) {
+    if (aAdaptor.IsClosed()) {
+      // Create circle
+      myFeature = theSketch->addFeature(SketchPlugin_Circle::ID());
+      //gp_Circ aCirc = aAdaptor.Circle();
+      //gp_Pnt aCenter = aCirc.Location();
+
+      //double aX, aY;
+      //convertTo2D(aCenter, theSketch, aNullView, aX, aY);
+      //setFeaturePoint(myFeature, aX, aY, SketchPlugin_Circle::CENTER_ID());
+      //setFeatureValue(myFeature, aCirc.Radius(), SketchPlugin_Circle::RADIUS_ID());
+    } else {
+      // Create arc
+      myFeature = theSketch->addFeature(SketchPlugin_Arc::ID());
+    }
+  }
+  if (myFeature) {
+    DataPtr aData = myFeature->data();
+    AttributeSelectionPtr anAttr = 
+      boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+      (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
+
+    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
+    if (anAttr && aRes) {
+      boost::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
+      anEdge->setImpl(new TopoDS_Shape(aShape));
+
+      anAttr->setValue(aRes, anEdge);
+      myFeature->execute();
+      return myFeature->firstResult();
+    }
+  }
+  return ResultPtr();
 }

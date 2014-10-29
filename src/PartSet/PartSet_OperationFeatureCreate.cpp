@@ -36,6 +36,7 @@
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
+#include <TopoDS.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -130,7 +131,14 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Module
           isClosedContour = true;
         }
       } else if (aShape.ShapeType() == TopAbs_EDGE) { // a line is selected
-        PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
+        ObjectPtr aObject = aPrs.object();
+        if (sketch()->isSub(aObject))
+          PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
+        else {
+          // we have to create the selected edge for the current sketch
+          ResultPtr aRes = PartSet_Tools::createFixedObjectByEdge(aPrs, sketch());
+          aSelected.first().setFeature(aRes);
+        }
       }
     }
   }

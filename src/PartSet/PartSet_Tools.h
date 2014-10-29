@@ -7,12 +7,14 @@
 
 #include "PartSet.h"
 
+#include <ModuleBase_ViewerPrs.h>
 #include <gp_Pnt.hxx>
 
 #include <QPoint>
 #include <QList>
 
 #include <ModelAPI_CompositeFeature.h>
+#include <TopoDS_Edge.hxx>
 
 #include <boost/shared_ptr.hpp>
 
@@ -125,6 +127,12 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theKind a feature kind
   /// \return the boolean value
   static bool isConstraintFeature(const std::string& theKind);
+
+  /// Creates a line (arc or circle) by given edge
+  /// Created line will have fixed constraint
+  /// \param theEdge - an edge
+  /// \return - result of created feature
+  static ResultPtr createFixedObjectByEdge(const ModuleBase_ViewerPrs& thePrs, CompositeFeaturePtr theSketch);
 };
 
 #endif
