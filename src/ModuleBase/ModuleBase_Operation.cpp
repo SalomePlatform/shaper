@@ -279,7 +279,8 @@ bool ModuleBase_Operation::activateByPreselection()
   return false;
 }
 
-void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection)
+void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,
+                                         ModuleBase_IViewer* /*theViewer*/)
 {
   myPreSelection.clear();
 

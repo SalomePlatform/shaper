@@ -34,7 +34,7 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId)
   ModuleBase_Operation* anOperation = createOperation(theCmdId.toStdString());
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
   // Initialise operation with preliminary selection
-  anOperation->initSelection(aSelection);
+  anOperation->initSelection(aSelection, myWorkshop->viewer());
   sendOperation(anOperation);
 }
 

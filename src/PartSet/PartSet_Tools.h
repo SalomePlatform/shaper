@@ -63,13 +63,13 @@ class PARTSET_EXPORT PartSet_Tools
   /// Returns pointer to the root document.
   static boost::shared_ptr<ModelAPI_Document> document();
 
-  /// \brief Save the point to the feature. If the attribute is 2D geometry point, it is filled.
+
+  /// Returns a point attribute of the feature by the coordinates if it is
   /// \param theFeature the feature
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
-  /// \param theAttribute the feature attribute
-  static void setFeaturePoint(FeaturePtr theFeature, double theX, double theY,
-                              const std::string& theAttribute);
+  static boost::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(FeaturePtr theFeature,
+                                                                double theX, double theY);
 
   /// \brief Save the double to the feature. If the attribute is double, it is filled.
   /// \param theFeature the feature
