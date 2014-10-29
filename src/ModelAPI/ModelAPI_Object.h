@@ -46,7 +46,7 @@ class ModelAPI_Object
   }
 
   /// Returns document this feature belongs to
-  virtual boost::shared_ptr<ModelAPI_Document> document()
+  virtual boost::shared_ptr<ModelAPI_Document> document() const
   {
     return myDoc;
   }
