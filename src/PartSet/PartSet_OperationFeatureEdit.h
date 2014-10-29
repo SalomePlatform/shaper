@@ -71,6 +71,14 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_OperationFeatureEdit();
 
+
+  /// Initialisation of operation with preliminary selection
+  /// \param theSelected the list of selected presentations
+  /// \param theHighlighted the list of highlighted presentations
+  /// \param theViewer a viewer to have the viewer the eye position
+  virtual void initSelection(ModuleBase_ISelection* theSelection,
+                             ModuleBase_IViewer* theViewer);
+
   /// Processes the mouse pressed in the point
   /// \param theEvent the mouse event
   /// \param theView a viewer to have the viewer the eye position
@@ -127,6 +135,9 @@ Q_OBJECT
   void sendFeatures();
 
  private:
+  // the next map should be removed when selection is processed in the move function
+  std::map<FeaturePtr, std::list<std::string> > myFeature2Attribute; /// a map of a feature to attributes
+
   Point myCurPoint;  ///< the current 3D point clicked or moved
   bool myIsBlockedSelection;  ///< the state of the last state of selection blocked signal
 };

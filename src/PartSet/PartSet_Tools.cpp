@@ -418,3 +418,13 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
   }
   return ResultPtr();
 }
+
+bool PartSet_Tools::isContainPresentation(const QList<ModuleBase_ViewerPrs>& theSelected,
+                                          const ModuleBase_ViewerPrs& thePrs)
+{
+  foreach (ModuleBase_ViewerPrs aPrs, theSelected) {
+    if (aPrs.object() == thePrs.object())
+      return true;
+  }
+  return false;
+}

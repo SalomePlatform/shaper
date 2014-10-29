@@ -133,6 +133,14 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theEdge - an edge
   /// \return - result of created feature
   static ResultPtr createFixedObjectByEdge(const ModuleBase_ViewerPrs& thePrs, CompositeFeaturePtr theSketch);
+
+  /// Checks whether the list of selected presentations contains the given one
+  /// \param theSelected a list of presentations
+  /// \param thePrs a presentation to be found
+  /// \return - result of check, true if the list contains the prs
+  static bool isContainPresentation(const QList<ModuleBase_ViewerPrs>& theSelected,
+                                    const ModuleBase_ViewerPrs& thePrs);
+
 };
 
 #endif

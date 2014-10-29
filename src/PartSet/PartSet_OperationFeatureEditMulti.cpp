@@ -50,17 +50,6 @@ PartSet_OperationFeatureEditMulti::~PartSet_OperationFeatureEditMulti()
 {
 }
 
-
-bool isContains(const QList<ModuleBase_ViewerPrs>& theSelected, const ModuleBase_ViewerPrs& thePrs)
-{
-  foreach (ModuleBase_ViewerPrs aPrs, theSelected) {
-    if (aPrs.object() == thePrs.object())
-      return true;
-  }
-  return false;
-}
-
-
 void PartSet_OperationFeatureEditMulti::initSelection(ModuleBase_ISelection* theSelection,
                                                       ModuleBase_IViewer* theViewer)
 {
@@ -71,14 +60,13 @@ void PartSet_OperationFeatureEditMulti::initSelection(ModuleBase_ISelection* the
   QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
   // add highlighted elements if they are not selected
   foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
-    if (!isContains(aFeatures, aPrs))
+    if (!PartSet_Tools::isContainPresentation(aFeatures, aPrs))
       aFeatures.append(aPrs);
   }
 
   // 1. find all features with skipping features with selected vertex shapes
   myFeature2Attribute.clear();
   // firstly, collect the features without local selection
-  std::set<FeaturePtr> aMovedFeatures;
   foreach (ModuleBase_ViewerPrs aPrs, aFeatures) {
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
