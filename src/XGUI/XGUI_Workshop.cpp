@@ -1008,6 +1008,7 @@ void XGUI_Workshop::createDockWidgets()
   hidePropertyPanel();  //<! Invisible by default
   hideObjectBrowser();
   aDesktop->tabifyDockWidget(aObjDock, myPropertyPanel);
+  myPropertyPanel->installEventFilter(myOperationMgr);
 
   QPushButton* aOkBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
   connect(aOkBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onCommitOperation()));

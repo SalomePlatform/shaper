@@ -3,11 +3,22 @@
 // Author:      Sergey ZARITCHNY
 
 #include <GeomAlgoAPI_MakeShape.h>
+#include <BRepBuilderAPI_MakeShape.hxx>
 #include <TopTools_ListOfShape.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape(void* theMkShape)
-  : GeomAPI_Interface(theMkShape)
+  : GeomAPI_Interface(theMkShape),myShape(new GeomAPI_Shape())
+{
+  myShape->setImpl((void *)&implPtr<BRepBuilderAPI_MakeShape>()->Shape());
+}
+
+GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
+  : GeomAPI_Interface(),myShape(new GeomAPI_Shape())
 {}
+void GeomAlgoAPI_MakeShape::init(void* theMkShape)
+{
+  setImpl((void *)implPtr<BRepBuilderAPI_MakeShape>());
+}
 
 const boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShape::shape() const
 {
@@ -24,7 +35,7 @@ void GeomAlgoAPI_MakeShape::generated(
     TopTools_ListIteratorOfListOfShape it(aList);
     for(;it.More();it.Next()) {
       boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
-      aShape->setImpl(&(it.Value()));
+      aShape->setImpl(new TopoDS_Shape(it.Value()));
       theHistory.push_back(aShape);
     }
   }
@@ -40,7 +51,7 @@ void GeomAlgoAPI_MakeShape::modified(
     TopTools_ListIteratorOfListOfShape it(aList);
     for(;it.More();it.Next()) {
       boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
-      aShape->setImpl(&(it.Value()));
+      aShape->setImpl(new TopoDS_Shape(it.Value()));
       theHistory.push_back(aShape);
     }
   }
