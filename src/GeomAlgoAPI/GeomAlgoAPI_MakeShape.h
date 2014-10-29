@@ -7,16 +7,19 @@
 #include <GeomAPI_Shape.h>
 #include <boost/shared_ptr.hpp>
 #include <GeomAlgoAPI.h>
-#include <BRepBuilderAPI_MakeShape.hxx>
+//#include <BRepBuilderAPI_MakeShape.hxx>
 /**\class GeomAlgoAPI_MakeShape
  * \ingroup DataModel
  * \Interface to the root class of all topological shapes constructions
  */
-class GeomAlgoAPI_MakeShape : GeomAPI_Interface
+class GeomAlgoAPI_MakeShape : public GeomAPI_Interface
 {
  public:
    /// Constructor
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape();
+
   GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape(void* theBuilder);
+
   /// Returns a shape built by the shape construction algorithm
   GEOMALGOAPI_EXPORT const boost::shared_ptr<GeomAPI_Shape>  shape() const;
 
@@ -30,6 +33,8 @@ class GeomAlgoAPI_MakeShape : GeomAPI_Interface
 
   /// Returns whether the shape is an edge
   GEOMALGOAPI_EXPORT virtual bool isDeleted(const boost::shared_ptr<GeomAPI_Shape> theShape);
+
+  GEOMALGOAPI_EXPORT void init(void* theMkShape);
 
   protected:
 	boost::shared_ptr<GeomAPI_Shape> myShape;

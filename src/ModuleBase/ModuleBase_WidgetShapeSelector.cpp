@@ -23,6 +23,7 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultBody.h>
 #include <Config_WidgetAPI.h>
 #include <Events_Error.h>
 
@@ -188,9 +189,16 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
       return;
     if (mySelectedObject && aObject && mySelectedObject->isSame(aObject))
       return;
+    // Check that the selected object is result (others can not be accepted)
+    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+    if (!aRes)
+      return;
+    // Check that the result has a shape
+    GeomShapePtr aShape = ModelAPI_Tools::shape(aRes);
+    if (!aShape)
+      return;
 
     // Get sub-shapes from local selection
-    boost::shared_ptr<GeomAPI_Shape> aShape;
     if (myUseSubShapes) {
       NCollection_List<TopoDS_Shape> aShapeList;
       std::list<ObjectPtr> aOwners;

@@ -18,6 +18,7 @@ using namespace std;
 #define _LATERAL_TAG 1
 #define _FIRST_TAG 2
 #define _LAST_TAG 3
+#define EDGE 6
 #ifdef _DEBUG
 #include <iostream>
 #include <ostream>
@@ -65,7 +66,6 @@ void FeaturesPlugin_Extrusion::execute()
     aSize = -aSize;
 
   boost::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
-  //TCollection_AsciiString anError;
   GeomAlgoAPI_Extrusion aFeature(aFace, aSize);
   if(!aFeature.isDone()) {
     std::string aFeatureError = "Extrusion algorithm failed";  
@@ -105,44 +105,19 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature,
   if(theBasis->isEqual(theContext))
     theResultBody->store(theFeature.shape());
   else
-    theResultBody->storeGenerated(theContext, theFeature.shape());
-  /*
-  TopTools_DataMapOfShapeShape aSubShapes;
-  for (TopExp_Explorer Exp(theFeature.shape()->impl<TopoDS_Shape>(),TopAbs_FACE); Exp.More(); Exp.Next()) {
-    aSubShapes.Bind(Exp.Current(),Exp.Current());
-  }
+    theResultBody->storeGenerated(theContext, theFeature.shape()); 
 
-  //Insert lateral face : Face from Edge
-  //GeomAlgoAPI_DFLoader::loadAndOrientGeneratedShapes(*myBuilder, myBasis, TopAbs_EDGE, aLateralFaceBuilder, aSubShapes);
+  GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
+  theFeature.mapOfShapes(*aSubShapes);
 
+    //Insert lateral face : Face from Edge
+  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theFeature.shape(), EDGE,_LATERAL_TAG, *aSubShapes);
 
-  TopTools_MapOfShape aView;
-  TopExp_Explorer aShapeExplorer (theFeature.shape()->impl<TopoDS_Shape>(), TopAbs_EDGE);
-  for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
-    const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
-    if (!aView.Add(aRoot)) continue;
-    boost::shared_ptr<GeomAPI_Shape> aRootG(new GeomAPI_Shape());
-    aRootG->setImpl((void *)&aRoot);
-    const ListOfShape& aShapes = theFeature.generated(aRootG);
-    std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aShapes.begin(), aLast = aShapes.end();	  
-    for (; anIt != aLast; anIt++) {
-      TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>(); 
-      if (aSubShapes.IsBound(aNewShape)) {
-        aNewShape.Orientation((aSubShapes(aNewShape)).Orientation());
-      }
-
-      if (!aRoot.IsSame (aNewShape)) {
-        boost::shared_ptr<GeomAPI_Shape> aNew(new GeomAPI_Shape());
-        aNew->setImpl((void *)&aNewShape);
-        theResultBody->generated(aRootG, aNew,_LATERAL_TAG); 
-      }
-    }
-  }
   //Insert bottom face
-  const boost::shared_ptr<GeomAPI_Shape>& aBottomFace = theFeature.firstShape();
+  boost::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();  
   if (!aBottomFace->isNull()) {
-    if (aSubShapes.IsBound(aBottomFace->impl<TopoDS_Shape>())) {
-      aBottomFace->setImpl((void *)&aSubShapes(aBottomFace->impl<TopoDS_Shape>()));
+	if (aSubShapes->isBound(aBottomFace)) {	 
+		aBottomFace = aSubShapes->find(aBottomFace);		
     }    
     theResultBody->generated(aBottomFace, _FIRST_TAG);
   }
@@ -152,11 +127,11 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature,
   //Insert top face
   boost::shared_ptr<GeomAPI_Shape> aTopFace = theFeature.lastShape();
   if (!aTopFace->isNull()) {
-    if (aSubShapes.IsBound(aTopFace->impl<TopoDS_Shape>())) {
-      aTopFace->setImpl((void *)&aSubShapes(aTopFace->impl<TopoDS_Shape>()));
+    if (aSubShapes->isBound(aTopFace)) {	 
+      aTopFace = aSubShapes->find(aTopFace);	
     }
-    theResultBody->generated(aTopFace, _FIRST_TAG);
+    theResultBody->generated(aTopFace, _LAST_TAG);
   }
-  */
 
+  
 }

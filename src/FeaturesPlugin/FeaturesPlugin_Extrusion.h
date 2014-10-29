@@ -9,6 +9,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
 #include <GeomAlgoAPI_Extrusion.h>
+#include <GeomAPI_Shape.h>
 class FeaturesPlugin_Extrusion : public ModelAPI_Feature
 {
  public:

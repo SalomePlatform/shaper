@@ -5,7 +5,7 @@
 #include <GeomAlgoAPI_Extrusion.h>
 #include <GeomAlgoAPI_MakeShape.h>
 #include <GeomAlgoAPI_DFLoader.h>
-#include <GeomAlgoAPI_DFLoader.h>
+#include <GeomAlgoAPI_MakeShape.h>
 #include <gp_Pln.hxx>
 #include <BRepPrimAPI_MakePrism.hxx>
 #include <BRepBuilderAPI_MakeShape.hxx>
@@ -27,8 +27,8 @@ const double tolerance = Precision::Angular();
 // Constructor
 GeomAlgoAPI_Extrusion::GeomAlgoAPI_Extrusion(
   boost::shared_ptr<GeomAPI_Shape> theBasis, double theSize)
-: mySize(theSize), myDone(false),
-  myShape(new GeomAPI_Shape()), myFirst(new GeomAPI_Shape()), myLast(new GeomAPI_Shape())
+: mySize(theSize), myDone(false), myShape(new GeomAPI_Shape()),
+  myFirst(new GeomAPI_Shape()), myLast(new GeomAPI_Shape())
 {
   build(theBasis);
 }
@@ -39,7 +39,6 @@ void GeomAlgoAPI_Extrusion::build(const boost::shared_ptr<GeomAPI_Shape>& theBas
   bool isFirstNorm = true;
   gp_Dir aShapeNormal;
 
-  //const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>(); 
   TopoDS_Face aBasis = TopoDS::Face(theBasis->impl<TopoDS_Shape>());
   Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(
     BRep_Tool::Surface(aBasis));
@@ -64,9 +63,17 @@ void GeomAlgoAPI_Extrusion::build(const boost::shared_ptr<GeomAPI_Shape>& theBas
         aResult = GeomAlgoAPI_DFLoader::refineResult(aBuilder->Shape());
       else
         aResult = aBuilder->Shape();
+	
+	for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
+	   boost::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+       aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
+	   myMap.bind(aCurrentShape, aCurrentShape);
+	}   
+ 
       myShape->setImpl(new TopoDS_Shape(aResult));
       myFirst->setImpl(new TopoDS_Shape(aBuilder->FirstShape()));
       myLast->setImpl(new TopoDS_Shape(aBuilder-> LastShape()));
+	  myMkShape = new GeomAlgoAPI_MakeShape (aBuilder);
     }
   }	
 }
@@ -100,7 +107,7 @@ const boost::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::shape () const
 {return myShape;}
 
 //============================================================================
-void GeomAlgoAPI_Extrusion::generated(
+/*void GeomAlgoAPI_Extrusion::generated(
   const boost::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory)
 {
   theHistory.clear();
@@ -115,7 +122,7 @@ void GeomAlgoAPI_Extrusion::generated(
     }
   }
 }
-
+*/
 //============================================================================
 const boost::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::firstShape()
 {
@@ -129,71 +136,22 @@ const boost::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::lastShape()
 }
 
 //============================================================================
-/*
-void GeomAlgoAPI_Extrusion::LoadNamingDS(boost::shared_ptr<ModelAPI_ResultBody> theResultBody, 
-boost::shared_ptr<GeomAPI_Shape> theContext)
+void GeomAlgoAPI_Extrusion::mapOfShapes (GeomAPI_DataMapOfShapeShape& theMap) const
 {
-if(isValid()) {
-const TopoDS_Shape& aShape = myBuilder->Shape();
-TopoDS_Shape aResult = GeomAlgoAPI_DFLoader::refineResult(aShape);
-boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theResultBody->data());
-if (aData) {
-const TDF_Label& aShapeLab = aData->shapeLab();
-const Handle(TDF_TagSource)& Tagger = TDF_TagSource::Set(aShapeLab);
-if (Tagger.IsNull()) return;
-Tagger->Set(0);
-
-TNaming_Builder aBuilder (aShapeLab);
-if(myBasis.IsEqual(theContext->impl<TopoDS_Shape>()))
-aBuilder.Generated(aResult);
-else
-aBuilder.Generated(theContext->impl<TopoDS_Shape>(), aResult);
-
-TopTools_DataMapOfShapeShape aSubShapes;
-for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
-aSubShapes.Bind(Exp.Current(),Exp.Current());
+  theMap = myMap;
 }
 
-//Insert lateral face : Face from Edge
-TNaming_Builder  aLateralFaceBuilder(aShapeLab.NewChild());
-GeomAlgoAPI_DFLoader::loadAndOrientGeneratedShapes(*myBuilder, myBasis, TopAbs_EDGE, aLateralFaceBuilder, aSubShapes);
-
-//Insert bottom face
-TopoDS_Shape aBottomFace = myBuilder->FirstShape();
-if (!aBottomFace.IsNull()) {
-if (aBottomFace.ShapeType() != TopAbs_COMPOUND) {
-TNaming_Builder aBottomBuilder(aShapeLab.NewChild());  //2
-if (aSubShapes.IsBound(aBottomFace)) {
-aBottomFace = aSubShapes(aBottomFace);
-}
-aBottomBuilder.Generated(aBottomFace);
-} else {
-TopoDS_Iterator itr(aBottomFace);
-for (; itr.More(); itr.Next()) {
-TNaming_Builder aBottomBuilder(aShapeLab.NewChild());
-aBottomBuilder.Generated(itr.Value());
-}
+//============================================================================
+GeomAlgoAPI_MakeShape * GeomAlgoAPI_Extrusion::makeShape() const
+{
+  return myMkShape;
 }
 
+//============================================================================
+GeomAlgoAPI_Extrusion::~GeomAlgoAPI_Extrusion()
+{
+  if (myImpl) {    
+	myMap.clear();
+	//delete myImpl;
+  }
 }
-
-//Insert top face
-TopoDS_Shape aTopFace = myBuilder->LastShape();
-if (!aTopFace.IsNull()) {
-if (aTopFace.ShapeType() != TopAbs_COMPOUND) {
-TNaming_Builder aTopBuilder(aShapeLab.NewChild()); //3
-if (aSubShapes.IsBound(aTopFace)) {
-aTopFace = aSubShapes(aTopFace);
-}
-aTopBuilder.Generated(aTopFace);
-} else {
-TopoDS_Iterator itr(aTopFace);
-for (; itr.More(); itr.Next()) {
-TNaming_Builder aTopBuilder(aShapeLab.NewChild());
-aTopBuilder.Generated(itr.Value());
-}
-}
-}
-}
-}
-*/

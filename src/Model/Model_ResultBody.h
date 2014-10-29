@@ -7,6 +7,8 @@
 
 #include "Model.h"
 #include <ModelAPI_ResultBody.h>
+#include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAPI_DataMapOfShapeShape.h>
 #include <vector>
 
 class TNaming_Builder;
@@ -63,6 +65,26 @@ public:
   /// As an example, consider the case of a face removed by a Boolean operation.
   MODEL_EXPORT virtual void deleted(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
     const int theTag = 1);
+
+  /// load deleted shapes
+  MODEL_EXPORT virtual void loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
+                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                               const int  theKindOfShape,
+                                               const int  theTag);
+  /// load and orient modified shapes
+  MODEL_EXPORT virtual void loadAndOrientModifiedShapes (
+	                                           GeomAlgoAPI_MakeShape* theMS,
+                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                               const int  theKindOfShape,
+                                               const int  theTag,
+                                               GeomAPI_DataMapOfShapeShape& theSubShapes);
+   /// load and orient generated shapes
+  MODEL_EXPORT virtual void loadAndOrientGeneratedShapes (
+	                                           GeomAlgoAPI_MakeShape* theMS,
+                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                               const int  theKindOfShape,
+                                               const int  theTag,
+                                               GeomAPI_DataMapOfShapeShape& theSubShapes);
 
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultBody();
