@@ -366,13 +366,14 @@ void PartSet_Module::setSketchingMode(const gp_Pln& thePln)
   // Clear standard selection modes
   aDisplayer->setSelectionModes(aModes);
   aDisplayer->openLocalContext();
-  // Get default selection modes
-  aModes = sketchSelectionModes(ObjectPtr());
-  aDisplayer->activateObjectsOutOfContext(aModes);
 
   // Set filter
   mySketchFilter = new ModuleBase_ShapeInPlaneFilter(thePln);
   aDisplayer->addSelectionFilter(mySketchFilter);
+
+  // Get default selection modes
+  aModes = sketchSelectionModes(ObjectPtr());
+  aDisplayer->activateObjectsOutOfContext(aModes);
 }
 
 void PartSet_Module::onFeatureConstructed(ObjectPtr theFeature, int theMode)
