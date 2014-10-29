@@ -4,7 +4,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin.h
     FeaturesPlugin_Plugin.h
     FeaturesPlugin_Extrusion.h
-	FeaturesPlugin_Boolean.h
+    FeaturesPlugin_Boolean.h
 )
 
 SET(PROJECT_SOURCES
