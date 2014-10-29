@@ -36,10 +36,13 @@ class ModelAPI_AttributeRefList : public ModelAPI_Attribute
   MODELAPI_EXPORT virtual void remove(ObjectPtr theObject) = 0;
 
   /// Returns number of features in the list
-  MODELAPI_EXPORT virtual int size() = 0;
+  MODELAPI_EXPORT virtual int size() const = 0;
 
   /// Returns the list of features
   MODELAPI_EXPORT virtual std::list<ObjectPtr> list() = 0;
+
+ /// Returns the referenced object by the zero-based index
+  MODELAPI_EXPORT virtual ObjectPtr object(const int theIndex) const = 0;
 
  protected:
   /// Objects are created for features automatically
@@ -47,5 +50,7 @@ class ModelAPI_AttributeRefList : public ModelAPI_Attribute
   {
   }
 };
+
+typedef boost::shared_ptr<ModelAPI_AttributeRefList> AttributeRefListPtr;
 
 #endif

@@ -7,20 +7,22 @@
 
 #include "ModelAPI_Result.h"
 #include <GeomAPI_Shape.h>
-
+#include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAPI_DataMapOfShapeShape.h>
+#include <boost/shared_ptr.hpp>
 #include <string>
 
 /**\class ModelAPI_ResultBody
- * \ingroup DataModel
- * \brief The body (shape) result of a feature.
- *
- * Provides a shape that may be displayed in the viewer.
- * May provide really huge results, so, working with this kind
- * of result must be optimized.
- */
+* \ingroup DataModel
+* \brief The body (shape) result of a feature.
+*
+* Provides a shape that may be displayed in the viewer.
+* May provide really huge results, so, working with this kind
+* of result must be optimized.
+*/
 class ModelAPI_ResultBody : public ModelAPI_Result
 {
- public:
+public:
   /// Returns the group identifier of this result
   virtual std::string groupName()
   {
@@ -36,20 +38,59 @@ class ModelAPI_ResultBody : public ModelAPI_Result
 
   /// Stores the shape (called by the execution method).
   virtual void store(const boost::shared_ptr<GeomAPI_Shape>& theShape) = 0;
+
+  /// Stores the generated shape (called by the execution method).
+  virtual void storeGenerated(const boost::shared_ptr<GeomAPI_Shape>& theFromShape,
+	                          const boost::shared_ptr<GeomAPI_Shape>& theToShape) = 0;
+
+  /// Stores the modified shape (called by the execution method).
+  virtual void storeModified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+	                          const boost::shared_ptr<GeomAPI_Shape>& theNewShape) = 0;
+
   /// Returns the shape-result produced by this feature
   virtual boost::shared_ptr<GeomAPI_Shape> shape() = 0;
 
-  /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_ResultBody()
-  {
-  }
+  /// Records the subshape newShape which was generated during a topological construction.
+  /// As an example, consider the case of a face generated in construction of a box.
+  virtual void generated(
+    const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag = 1) = 0;
 
- protected:
-  /// Use plugin manager for features creation: this method is 
-  /// defined here only for SWIG-wrapping
-  ModelAPI_ResultBody()
-  {
-  }
+  /// Records the shape newShape which was generated from the shape oldShape during a topological 
+  /// construction. As an example, consider the case of a face generated from an edge in 
+  /// construction of a prism.
+  virtual void generated(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+    const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag = 1) = 0;
+
+  /// Records the shape newShape which is a modification of the shape oldShape.
+  /// As an example, consider the case of a face split or merged in a Boolean operation.
+  virtual void modified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+    const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag = 1) = 0;
+
+  /// Records the shape oldShape which was deleted from the current label.
+  /// As an example, consider the case of a face removed by a Boolean operation.
+  virtual void deleted(
+    const boost::shared_ptr<GeomAPI_Shape>& theOldShape, const int theTag = 1) = 0;
+  
+  /// load deleted shapes
+  virtual void loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
+                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                               const int  theKindOfShape,
+                                               const int  theTag) = 0;
+  /// load and orient modified shapes
+  virtual void loadAndOrientModifiedShapes (
+	                                           GeomAlgoAPI_MakeShape* theMS,
+                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                               const int  theKindOfShape,
+                                               const int  theTag,
+                                               GeomAPI_DataMapOfShapeShape& theSubShapes) = 0;
+  /// load and orient generated shapes
+  virtual void loadAndOrientGeneratedShapes (
+	                                           GeomAlgoAPI_MakeShape* theMS,
+                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                               const int  theKindOfShape,
+                                               const int  theTag,
+                                               GeomAPI_DataMapOfShapeShape& theSubShapes) = 0;
+protected:
 };
 
 //! Pointer on feature object

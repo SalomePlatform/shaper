@@ -8,6 +8,7 @@ SET(PROJECT_HEADERS
     ModelAPI_Session.h
     ModelAPI_Plugin.h
     ModelAPI_Feature.h
+    ModelAPI_CompositeFeature.h
     ModelAPI_Data.h
     ModelAPI_Object.h
     ModelAPI_Document.h
@@ -20,6 +21,8 @@ SET(PROJECT_HEADERS
     ModelAPI_AttributeRefList.h
     ModelAPI_AttributeBoolean.h
     ModelAPI_AttributeString.h
+    ModelAPI_AttributeSelection.h
+    ModelAPI_AttributeSelectionList.h
     ModelAPI_Events.h
     ModelAPI_Validator.h
     ModelAPI_FeatureValidator.h
@@ -53,6 +56,7 @@ INCLUDE_DIRECTORIES(
   ../Config 
   ../Events
   ../GeomAPI
+  ../GeomAlgoAPI
 )
 
 SET(CMAKE_SWIG_FLAGS "")

@@ -1,0 +1,5 @@
+<source>
+  <multi_selector id="group_list" 
+    tooltip="List of selected objects" 
+    type_choice="Vertices Edges Faces Solids" /> 
+</source>

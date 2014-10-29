@@ -28,7 +28,11 @@ XGUI_AbstractRubberBand::XGUI_AbstractRubberBand(QWidget* theParent)
   setAttribute(Qt::WA_TransparentForMouseEvents);
 #ifndef WIN32
   setAttribute(Qt::WA_NoSystemBackground);
-#endif //WIN32  setAttribute(Qt::WA_WState_ExplicitShowHide);  setVisible(false);  theParent->installEventFilter(this);  setGeometry(QRect(QPoint(0, 0), theParent->size()));
+#endif //WIN32
+  setAttribute(Qt::WA_WState_ExplicitShowHide);
+  setVisible(false);
+  theParent->installEventFilter(this);
+  setGeometry(QRect(QPoint(0, 0), theParent->size()));
 }
 
 /*!

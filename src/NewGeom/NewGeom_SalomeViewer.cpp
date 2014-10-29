@@ -11,7 +11,7 @@
 #include <QContextMenuEvent>
 
 NewGeom_SalomeViewer::NewGeom_SalomeViewer(QObject* theParent)
-    : XGUI_SalomeViewer(theParent),
+    : ModuleBase_IViewer(theParent),
       mySelector(0)
 {
 }
@@ -51,6 +51,8 @@ void NewGeom_SalomeViewer::setSelector(NewGeom_OCCSelector* theSel)
     }
   }
   mySelector = theSel;
+  if (!mySelector)
+    return;
   OCCViewer_Viewer* aViewer = mySelector->viewer();
   SUIT_ViewManager* aMgr = aViewer->getViewManager();
 
@@ -148,5 +150,20 @@ void NewGeom_SalomeViewer::fitAll()
   OCCViewer_ViewFrame* aVFrame = dynamic_cast<OCCViewer_ViewFrame*>(aMgr->getActiveView());
   if (aVFrame) {
     aVFrame->onFitAll();
+  }
+}
+
+//**********************************************
+void NewGeom_SalomeViewer::setViewProjection(double theX, double theY, double theZ)
+{
+  SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
+  OCCViewer_ViewFrame* aVFrame = dynamic_cast<OCCViewer_ViewFrame*>(aMgr->getActiveView());
+  if (aVFrame) {
+    Handle(V3d_View) aView3d = aVFrame->getViewPort()->getView();
+    if (!aView3d.IsNull()) {
+      aView3d->SetProj(theX, theY, theZ);
+      aView3d->FitAll(0.01, true, true);
+      aView3d->SetZSize(0.);
+    }
   }
 }

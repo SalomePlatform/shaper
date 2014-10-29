@@ -11,6 +11,7 @@
 #include <QObject>
 
 class QMouseEvent;
+class ModuleBase_ISelection;
 
 /*!
  \class PartSet_OperationFeatureEdit
@@ -66,33 +67,28 @@ Q_OBJECT
   /// \param theId the feature identifier
   /// \param theParent the operation parent
   /// \param theFeature the parent feature
-  PartSet_OperationFeatureEdit(const QString& theId, QObject* theParent, FeaturePtr theFeature);
+  PartSet_OperationFeatureEdit(const QString& theId, QObject* theParent, CompositeFeaturePtr theFeature);
   /// Destructor
   virtual ~PartSet_OperationFeatureEdit();
-
-  /// Initializes the operation with previously created feature. It is used in sequental operations
-  virtual void initFeature(FeaturePtr theFeature);
 
   /// Processes the mouse pressed in the point
   /// \param theEvent the mouse event
   /// \param theView a viewer to have the viewer the eye position
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void mousePressed(QMouseEvent* theEvent, Handle_V3d_View theView,
-                            const std::list<ModuleBase_ViewerPrs>& theSelected,
-                            const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+  virtual void mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection);
+
   /// Gives the current mouse point in the viewer
   /// \param theEvent the mouse event
   /// \param theView a viewer to have the viewer the eye position
-  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
+  virtual void mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer);
   /// Gives the current selected objects to be processed by the operation
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                             const std::list<ModuleBase_ViewerPrs>& theSelected,
-                             const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+  virtual void mouseReleased(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
+                             ModuleBase_ISelection* theSelection);
 
   /// Processes the mouse double click in the point
   /// \param theEvent the mouse event
@@ -100,8 +96,7 @@ Q_OBJECT
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
   virtual void mouseDoubleClick(QMouseEvent* theEvent, Handle_V3d_View theView,
-                                const std::list<ModuleBase_ViewerPrs>& theSelected,
-                                const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+                                ModuleBase_ISelection* theSelection);
 
  protected:
   /// \brief Virtual method called when operation is started
@@ -117,7 +112,8 @@ Q_OBJECT
   /// Returns NULL feature. This is an operation of edition, not creation.
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual FeaturePtr createFeature(const bool theFlushMessage = true);
+  virtual FeaturePtr createFeature(const bool theFlushMessage = true, 
+    CompositeFeaturePtr theCompositeFeature = CompositeFeaturePtr());
 
  protected:
   /// Emits a signal about the selection blocking. Emits a signal to change the selection.
@@ -125,7 +121,7 @@ Q_OBJECT
   /// the internal operation features are to be selected
   /// \param isBlocked the state whether the operation is blocked or unblocked
   /// \param isRestoreSelection the state whether the selected objects should be reselected
-  void blockSelection(bool isBlocked, const bool isRestoreSelection = true);
+  //void blockSelection(bool isBlocked, const bool isRestoreSelection = true);
 
   /// Sends the features
   void sendFeatures();

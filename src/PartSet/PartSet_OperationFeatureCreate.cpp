@@ -18,6 +18,7 @@
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintRigid.h>
 
 #include <GeomAPI_Pnt2d.h>
 
@@ -25,6 +26,9 @@
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ISelection.h>
+#include <ModuleBase_IViewer.h>
 
 #include <XGUI_Constants.h>
 
@@ -44,7 +48,7 @@ using namespace std;
 
 PartSet_OperationFeatureCreate::PartSet_OperationFeatureCreate(const QString& theId,
                                                                QObject* theParent,
-                                                               FeaturePtr theFeature)
+                                                               CompositeFeaturePtr theFeature)
     : PartSet_OperationFeatureBase(theId, theParent, theFeature)
 {
 }
@@ -62,29 +66,25 @@ bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
       || theId == SketchPlugin_ConstraintRadius::ID()
       || theId == SketchPlugin_ConstraintParallel::ID()
       || theId == SketchPlugin_ConstraintPerpendicular::ID()
-      || theId == SketchPlugin_ConstraintCoincidence::ID();
+      || theId == SketchPlugin_ConstraintCoincidence::ID()
+      || theId == SketchPlugin_ConstraintRigid::ID();
 }
 
 bool PartSet_OperationFeatureCreate::canBeCommitted() const
 {
-  if (PartSet_OperationSketchBase::canBeCommitted())
-    return !myActiveWidget;
+  if (PartSet_OperationSketchBase::canBeCommitted()) {
+    //if(myActiveWidget && !myActiveWidget->isComputedDefault()) {
+    return isValid();
+  }
   return false;
 }
 
-std::list<int> PartSet_OperationFeatureCreate::getSelectionModes(ObjectPtr theFeature) const
-{
-  std::list<int> aModes;
-  if (theFeature != feature())
-    aModes = PartSet_OperationSketchBase::getSelectionModes(theFeature);
-  return aModes;
-}
-
-void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
+void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer)
 {
     double aX, anY;
-    gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
-    PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+    Handle(V3d_View) aView = theViewer->activeView();
+    gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
+    PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
     setWidgetValue(feature(), aX, anY);
     flushUpdated();
 }
@@ -104,36 +104,39 @@ void PartSet_OperationFeatureCreate::keyReleased(const int theKey)
   }
 }
 
-void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle(V3d_View) theView,
-                                                 const std::list<ModuleBase_ViewerPrs>& theSelected,
-                                                 const std::list<ModuleBase_ViewerPrs>& /*theHighlighted*/)
+void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
+                                                   ModuleBase_ISelection* theSelection)
 {
-  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theView);
+  Handle(V3d_View) aView = theViewer->activeView();
+  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
   double aX = aPoint.X(), anY = aPoint.Y();
   bool isClosedContour = false;
 
-  if (theSelected.empty()) {
-    PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+  QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+
+  if (aSelected.empty()) {
+    PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
   } else {
-    ModuleBase_ViewerPrs aPrs = theSelected.front();
+    ModuleBase_ViewerPrs aPrs = aSelected.first();
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull()) {
       if (aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
         const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
         if (!aVertex.IsNull()) {
           aPoint = BRep_Tool::Pnt(aVertex);
-          PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
-          PartSet_Tools::setConstraints(sketch(), feature(), myActiveWidget->attributeID(), aX, anY);
+          PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
+          ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+          PartSet_Tools::setConstraints(sketch(), feature(), aActiveWgt->attributeID(), aX, anY);
           isClosedContour = true;
         }
       } else if (aShape.ShapeType() == TopAbs_EDGE) { // a line is selected
-        PartSet_Tools::convertTo2D(aPoint, sketch(), theView, aX, anY);
+        PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
       }
     }
   }
   ObjectPtr aFeature;
-  if (!theSelected.empty()) {
-    ModuleBase_ViewerPrs aPrs = theSelected.front();
+  if (!aSelected.empty()) {
+    ModuleBase_ViewerPrs aPrs = aSelected.first();
     aFeature = aPrs.object();
   } else {
     aFeature = feature();  // for the widget distance only
@@ -142,26 +145,22 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Handle
   bool isApplyed = setWidgetValue(aFeature, aX, anY);
   if (isApplyed) {
     flushUpdated();
-    emit activateNextWidget(myActiveWidget);
+    myPropertyPanel->activateNextWidget();
   }
 
-  if (commit() && !isClosedContour) {
-    // if the point creation is finished, the next mouse release should commit the modification
-    // the next release can happens by double click in the viewer
-    restartOperation(feature()->getKind(), feature());
-    return;
+  if (!myPropertyPanel->activeWidget()) {
+    if(commit() && !isClosedContour) {
+      // if the point creation is finished, the next mouse release should commit the modification
+      // the next release can happens by double click in the viewer
+      restartOperation(feature()->getKind(), feature());
+    }
   }
-}
-
-void PartSet_OperationFeatureCreate::activateNextToCurrentWidget()
-{
-  emit activateNextWidget(myActiveWidget);
 }
 
 void PartSet_OperationFeatureCreate::startOperation()
 {
   PartSet_OperationSketchBase::startOperation();
-  emit multiSelectionEnabled(false);
+  //emit multiSelectionEnabled(false);
 }
 
 void PartSet_OperationFeatureCreate::abortOperation()
@@ -173,7 +172,7 @@ void PartSet_OperationFeatureCreate::abortOperation()
 void PartSet_OperationFeatureCreate::stopOperation()
 {
   PartSet_OperationSketchBase::stopOperation();
-  emit multiSelectionEnabled(true);
+  //emit multiSelectionEnabled(true);
 }
 
 void PartSet_OperationFeatureCreate::afterCommitOperation()
@@ -182,20 +181,26 @@ void PartSet_OperationFeatureCreate::afterCommitOperation()
   emit featureConstructed(feature(), FM_Deactivation);
 }
 
-FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMessage)
+FeaturePtr PartSet_OperationFeatureCreate::createFeature(const bool theFlushMessage,
+  CompositeFeaturePtr theCompositeFeature)
 {
-  FeaturePtr aNewFeature = ModuleBase_Operation::createFeature(false);
-  if (sketch()) {
-    boost::shared_ptr<SketchPlugin_Feature> aFeature = boost::dynamic_pointer_cast<
-        SketchPlugin_Feature>(sketch());
+  FeaturePtr aNewFeature = ModuleBase_Operation::createFeature(false, sketch());
 
-    aFeature->addSub(aNewFeature);
-  }
-  //myFeaturePrs->init(aNewFeature);
-  //myFeaturePrs->setFeature(myInitFeature, SM_FirstPoint);
-
-//TODO  emit featureConstructed(aNewFeature, FM_Activation);
   if (theFlushMessage)
     flushCreated();
   return aNewFeature;
+}
+
+
+void PartSet_OperationFeatureCreate::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
+{
+  PartSet_OperationFeatureBase::onWidgetActivated(theWidget);
+  if (myInitFeature && theWidget) {
+    ModuleBase_WidgetPoint2D* aWgt = dynamic_cast<ModuleBase_WidgetPoint2D*>(theWidget);
+    if (aWgt && aWgt->initFromPrevious(myInitFeature)) {
+      myInitFeature = FeaturePtr();
+      if (myPropertyPanel)
+        myPropertyPanel->activateNextWidget();
+    }
+  }
 }

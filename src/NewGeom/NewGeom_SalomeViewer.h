@@ -4,7 +4,7 @@
 
 #include "NewGeom.h"
 
-#include <XGUI_SalomeViewer.h>
+#include <ModuleBase_IViewer.h>
 
 class SUIT_ViewWindow;
 class QMouseEvent;
@@ -12,7 +12,7 @@ class QKeyEvent;
 
 class NewGeom_OCCSelector;
 
-class NewGeom_SalomeViewer : public XGUI_SalomeViewer
+class NewGeom_SalomeViewer : public ModuleBase_IViewer
 {
 Q_OBJECT
  public:
@@ -41,6 +41,12 @@ Q_OBJECT
 
   //! Perfroms the fit all for the active view
   virtual void fitAll();
+
+  //! Sets the view projection
+  /// \param theX the X projection value
+  /// \param theY the Y projection value
+  /// \param theZ the Z projection value
+  virtual void setViewProjection(double theX, double theY, double theZ);
 
   void setSelector(NewGeom_OCCSelector* theSel);
 

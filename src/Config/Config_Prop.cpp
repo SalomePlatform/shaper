@@ -16,3 +16,10 @@ void Config_Prop::setValue(const std::string& theValue)
       new Events_Message(aChangedEvent, this)));
   }
 }
+
+void Config_Prop::setDefaultValue(const std::string& theValue)
+{
+  if (theValue != myDefaultValue) {
+    myDefaultValue = theValue;
+  }
+}

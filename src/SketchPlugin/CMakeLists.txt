@@ -18,6 +18,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintParallel.h
     SketchPlugin_ConstraintPerpendicular.h
     SketchPlugin_ConstraintRadius.h
+    SketchPlugin_ConstraintRigid.h
     SketchPlugin_Validators.h
     SketchPlugin_ResultValidators.h 
 )
@@ -37,6 +38,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintParallel.cpp
     SketchPlugin_ConstraintPerpendicular.cpp
     SketchPlugin_ConstraintRadius.cpp
+    SketchPlugin_ConstraintRigid.cpp
     SketchPlugin_Validators.cpp
     SketchPlugin_ResultValidators.cpp
 )

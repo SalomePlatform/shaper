@@ -34,34 +34,34 @@ Q_OBJECT
   /// \param theId the feature identifier
   /// \param theParent the operation parent
   /// \param theSketch the parent feature
-  PartSet_OperationFeatureCreate(const QString& theId, QObject* theParent, FeaturePtr theSketch);
+  PartSet_OperationFeatureCreate(
+    const QString& theId, QObject* theParent, CompositeFeaturePtr theSketch);
   /// Destructor
   virtual ~PartSet_OperationFeatureCreate();
-
-  /// Returns the operation local selection mode
-  /// \param theFeature the feature object to get the selection mode
-  /// \return the selection mode
-  virtual std::list<int> getSelectionModes(ObjectPtr theFeature) const;
 
   /// Gives the current mouse point in the viewer
   /// \param thePoint a point clicked in the viewer
   /// \param theEvent the mouse event
-  virtual void mouseMoved(QMouseEvent* theEvent, Handle_V3d_View theView);
+  virtual void mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer);
 
   /// Gives the current selected objects to be processed by the operation
   /// \param theEvent the mouse event
   /// \param theView a viewer to have the viewer the eye position
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void mouseReleased(QMouseEvent* theEvent, Handle_V3d_View theView,
-                             const std::list<ModuleBase_ViewerPrs>& theSelected,
-                             const std::list<ModuleBase_ViewerPrs>& theHighlighted);
+  virtual void mouseReleased(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
+                             ModuleBase_ISelection* theSelection);
   /// Processes the key pressed in the view
   /// \param theKey a key value
   virtual void keyReleased(const int theKey);
 
-  /// alias for activateNextWidget(myActiveWidget);
-  virtual void activateNextToCurrentWidget();
+  /// Initializes the operation with previously created feature. It is used in sequental operations
+  void initFeature(FeaturePtr theFeature) { myInitFeature = theFeature; }
+
+ public slots:
+  /// Slots which listen the mode widget activation
+  /// \param theWidget the model widget
+  virtual void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
  protected:
   /// \brief Virtual method called when operation is started
@@ -85,11 +85,16 @@ Q_OBJECT
   /// the sketch feature
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature
-  virtual FeaturePtr createFeature(const bool theFlushMessage = true);
+  virtual FeaturePtr createFeature(const bool theFlushMessage = true,
+    CompositeFeaturePtr theCompositeFeature = CompositeFeaturePtr());
 
   /// Verifies whether this operator can be commited.
   /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
   virtual bool canBeCommitted() const;
+
+protected:
+  /// Feature of previous operation (for sequintal operations)
+  FeaturePtr myInitFeature;
 };
 
 #endif

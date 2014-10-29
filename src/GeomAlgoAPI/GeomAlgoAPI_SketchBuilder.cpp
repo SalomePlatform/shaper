@@ -3,6 +3,7 @@
 // Author:      Artem ZHIDKOV
 
 #include <GeomAlgoAPI_SketchBuilder.h>
+#include <GeomAPI_PlanarEdges.h>
 
 #include <set>
 
@@ -369,6 +370,23 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   if (theResultFaces.size() > 1)
     fixIntersections(theResultFaces);
 }
+
+void GeomAlgoAPI_SketchBuilder::createFaces(const boost::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                                            const boost::shared_ptr<GeomAPI_Dir>& theDirX,
+                                            const boost::shared_ptr<GeomAPI_Dir>& theDirY,
+                                            const boost::shared_ptr<GeomAPI_Dir>& theNorm,
+                                            const boost::shared_ptr<GeomAPI_Shape>& theWire,
+                                            std::list<boost::shared_ptr<GeomAPI_Shape> >& theResultFaces)
+{
+  boost::shared_ptr<GeomAPI_PlanarEdges> aWire = boost::dynamic_pointer_cast<GeomAPI_PlanarEdges>(theWire);
+  if(!aWire)
+    return;
+  // Filter wires, return only faces.
+  std::list<boost::shared_ptr<GeomAPI_Shape> > aFilteredWires;
+  createFaces(theOrigin, theDirX, theDirY, theNorm,
+              aWire->getEdges(), theResultFaces, aFilteredWires);
+}
+
 
 void GeomAlgoAPI_SketchBuilder::fixIntersections(
     std::list<boost::shared_ptr<GeomAPI_Shape> >& theFaces)

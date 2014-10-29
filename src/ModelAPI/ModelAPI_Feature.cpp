@@ -7,6 +7,7 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Session.h>
 #include <Events_Loop.h>
 
 const std::list<boost::shared_ptr<ModelAPI_Result> >& ModelAPI_Feature::results()

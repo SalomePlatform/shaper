@@ -6,6 +6,11 @@
 #include <PartSet_Tools.h>
 #include <ModelAPI_ResultBody.h>
 
+#include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_IViewer.h>
+#include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_WidgetValueFeature.h>
+
 #include <SketchPlugin_Feature.h>
 #include <V3d_View.hxx>
 #include <AIS_Shape.hxx>
@@ -48,20 +53,6 @@ std::list<FeaturePtr> PartSet_OperationSketchBase::subFeatures() const
   return std::list<FeaturePtr>();
 }
 
-std::list<int> PartSet_OperationSketchBase::getSelectionModes(ObjectPtr theFeature) const
-{
-  //TODO: Define position of selection modes definition
-  std::list<int> aModes;
-  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
-  if (aFeature && PartSet_Tools::isConstraintFeature(aFeature->getKind())) {
-    aModes.push_back(AIS_DSM_Text);
-    aModes.push_back(AIS_DSM_Line);
-  } else {
-    aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
-    aModes.push_back(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
-  }
-  return aModes;
-}
 FeaturePtr PartSet_OperationSketchBase::createFeature(const bool theFlushMessage)
 {
   ModuleBase_Operation::createFeature(theFlushMessage);
@@ -70,25 +61,24 @@ FeaturePtr PartSet_OperationSketchBase::createFeature(const bool theFlushMessage
   return myFeature;
 }
 
-void PartSet_OperationSketchBase::mousePressed(
-    QMouseEvent* theEvent, Handle_V3d_View theView,
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+void PartSet_OperationSketchBase::mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection)
 {
 }
 void PartSet_OperationSketchBase::mouseReleased(
-    QMouseEvent* theEvent, Handle_V3d_View theView,
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+    QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
+    ModuleBase_ISelection* theSelection)
 {
 }
-void PartSet_OperationSketchBase::mouseMoved(QMouseEvent* theEvent, Handle(V3d_View) theView)
+void PartSet_OperationSketchBase::mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer)
 {
 }
 void PartSet_OperationSketchBase::mouseDoubleClick(
     QMouseEvent* theEvent, Handle_V3d_View theView,
-    const std::list<ModuleBase_ViewerPrs>& theSelected,
-    const std::list<ModuleBase_ViewerPrs>& theHighlighted)
+    ModuleBase_ISelection* theSelection)
+{
+}
+
+void PartSet_OperationSketchBase::selectionChanged(ModuleBase_ISelection* theSelection)
 {
 }
 
@@ -98,11 +88,11 @@ void PartSet_OperationSketchBase::restartOperation(const std::string& theType, O
   if (aFeature) {
     QStringList aNested = this->nestedFeatures();
     if (!aNested.isEmpty()) {
-      if (aNested.contains(QString(aFeature->getKind().c_str()))) 
-        emit restartRequired(theType, theFeature);
-      else
+      if (!aNested.contains(QString(aFeature->getKind().c_str())))
         return;
     }
   }
   emit restartRequired(theType, theFeature);
 }
+
+

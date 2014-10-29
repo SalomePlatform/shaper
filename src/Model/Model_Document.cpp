@@ -10,12 +10,12 @@
 #include <Model_ResultPart.h>
 #include <Model_ResultConstruction.h>
 #include <Model_ResultBody.h>
+#include <ModelAPI_Validator.h>
 #include <Events_Loop.h>
 #include <Events_Error.h>
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
-#include <TDataStd_UAttribute.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TDataStd_ReferenceArray.hxx>
 #include <TDataStd_HLabelArray1.hxx>
@@ -49,11 +49,10 @@ Model_Document::Model_Document(const std::string theID, const std::string theKin
     : myID(theID), myKind(theKind),
       myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
 {
-  myDoc->SetUndoLimit(UNDO_LIMIT);
+  myDoc->SetUndoLimit(UNDO_LIMIT);  
   myTransactionsAfterSave = 0;
   myNestedNum = -1;
   myExecuteFeatures = true;
-  //myDoc->SetNestedTransactionMode();
   // to have something in the document and avoid empty doc open/save problem
   // in transaction for nesting correct working
   myDoc->NewCommand();
@@ -148,7 +147,7 @@ bool Model_Document::load(const char* theFileName)
     myDoc->SetUndoLimit(UNDO_LIMIT);
     // to avoid the problem that feature is created in the current, not this, document
     Model_Session::get()->setActiveDocument(anApp->getDocument(myID));
-    synchronizeFeatures();
+    synchronizeFeatures(false, true);
   }
   return !isError;
 }
@@ -266,10 +265,12 @@ void Model_Document::finishOperation()
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_Session>(Model_Session::get())
         ->setCheckTransactions(false);  // for nested transaction commit
+  synchronizeBackRefs();
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_Session>(Model_Session::get())
@@ -287,7 +288,6 @@ void Model_Document::finishOperation()
     myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();  // && (myNestedNum == -1);
     myTransactionsAfterSave++;
   }
-
 }
 
 void Model_Document::abortOperation()
@@ -306,7 +306,7 @@ void Model_Document::abortOperation()
       myNestedNum = -1;
     myDoc->AbortCommand();
   }
-  synchronizeFeatures(true);
+  synchronizeFeatures(true, false); // references were not changed since transaction start
   // abort for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
@@ -345,7 +345,7 @@ void Model_Document::undo()
     myNestedNum--;
   if (!myIsEmptyTr[myTransactionsAfterSave])
     myDoc->Undo();
-  synchronizeFeatures(true);
+  synchronizeFeatures(true, true);
   // undo for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
@@ -371,7 +371,7 @@ void Model_Document::redo()
   if (!myIsEmptyTr[myTransactionsAfterSave])
     myDoc->Redo();
   myTransactionsAfterSave++;
-  synchronizeFeatures(true);
+  synchronizeFeatures(true, true);
   // redo for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
@@ -469,16 +469,11 @@ void Model_Document::removeFeature(FeaturePtr theFeature, const bool theCheck)
     // check the feature: it must have no depended objects on it
     std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
     for(; aResIter != theFeature->results().cend(); aResIter++) {
-      if (myConcealedResults.find(*aResIter) != myConcealedResults.end()) {
-        Events_Error::send("Feature '" + theFeature->data()->name() + "' is used and can not be deleted");
-        return;
-      }
-    }
-    NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator anObjIter(myObjs);
-    for(; anObjIter.More(); anObjIter.Next()) {
-      DataPtr aData = anObjIter.Value()->data();
-      if (aData->referencesTo(theFeature)) {
-        Events_Error::send("Feature '" + theFeature->data()->name() + "' is used and can not be deleted");
+      boost::shared_ptr<Model_Data> aData = 
+        boost::dynamic_pointer_cast<Model_Data>((*aResIter)->data());
+      if (aData && !aData->refsToMe().empty()) {
+        Events_Error::send(
+          "Feature '" + theFeature->data()->name() + "' is used and can not be deleted");
         return;
       }
     }
@@ -495,22 +490,11 @@ void Model_Document::removeFeature(FeaturePtr theFeature, const bool theCheck)
   // erase all attributes under the label of feature
   aFeatureLabel.ForgetAllAttributes();
   // remove it from the references array
-  RemoveFromRefArray(featuresLabel(), aFeatureLabel);
-
+  if (theFeature->isInHistory()) {
+    RemoveFromRefArray(featuresLabel(), aFeatureLabel);
+  }
   // event: feature is deleted
   ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
-  /* this is in "erase"
-  // results of this feature must be redisplayed
-  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
-  std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-  for (; aRIter != aResults.cend(); aRIter++) {
-    boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-    aRes->setData(boost::shared_ptr<ModelAPI_Data>());  // deleted flag
-    ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
-    ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), aRes->groupName());
-  }
-  */
 }
 
 FeaturePtr Model_Document::feature(TDF_Label& theLabel)
@@ -592,9 +576,9 @@ ObjectPtr Model_Document::object(const std::string& theGroupID, const int theInd
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
       for (; aRIter != aResults.cend(); aRIter++) {
         if ((*aRIter)->groupName() != theGroupID) continue;
-        bool isIn = theHidden;
+        bool isIn = theHidden && (*aRIter)->isInHistory();
         if (!isIn && (*aRIter)->isInHistory()) { // check that there is nobody references this result
-          isIn = myConcealedResults.find(*aRIter) == myConcealedResults.end();
+          isIn = !(*aRIter)->isConcealed();
         }
         if (isIn) {
           if (anIndex == theIndex)
@@ -631,7 +615,7 @@ int Model_Document::size(const std::string& theGroupID, const bool theHidden)
         if ((*aRIter)->groupName() != theGroupID) continue;
         bool isIn = theHidden;
         if (!isIn && (*aRIter)->isInHistory()) { // check that there is nobody references this result
-          isIn = myConcealedResults.find(*aRIter) == myConcealedResults.end();
+          isIn = !(*aRIter)->isConcealed();
         }
         if (isIn)
           aResult++;
@@ -666,12 +650,12 @@ void Model_Document::setUniqueName(FeaturePtr theFeature)
   // check this is unique, if not, increase index by 1
   for (aFIter.Initialize(myObjs); aFIter.More();) {
     FeaturePtr aFeature = aFIter.Value();
-    bool isSameName = aFeature->isInHistory() && aFeature->data()->name() == aName;
+    bool isSameName = aFeature->data()->name() == aName;
     if (!isSameName) {  // check also results to avoid same results names (actual for Parts)
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
       for (; aRIter != aResults.cend(); aRIter++) {
-        isSameName = (*aRIter)->isInHistory() && (*aRIter)->data()->name() == aName;
+        isSameName = (*aRIter)->data()->name() == aName;
       }
     }
     if (isSameName) {
@@ -703,7 +687,7 @@ void Model_Document::initData(ObjectPtr theObj, TDF_Label theLab, const int theT
   }
 }
 
-void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
+void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool theUpdateReferences)
 {
   boost::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
@@ -787,6 +771,10 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
       aFIter.Next();
   }
 
+  if (theUpdateReferences) {
+    synchronizeBackRefs();
+  }
+
   myExecuteFeatures = false;
   aLoop->activateFlushes(true);
 
@@ -796,9 +784,72 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated)
     aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   }
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   boost::static_pointer_cast<Model_Session>(Model_Session::get())
     ->setCheckTransactions(true);
   myExecuteFeatures = true;
+}
+
+void Model_Document::synchronizeBackRefs()
+{
+  boost::shared_ptr<ModelAPI_Document> aThis = 
+    Model_Application::getApplication()->getDocument(myID);
+  // keeps the concealed flags of result to catch the change and create created/deleted events
+  std::list<std::pair<ResultPtr, bool> > aConcealed;
+  // first cycle: erase all data about back-references
+  NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFeatures(myObjs);
+  for(; aFeatures.More(); aFeatures.Next()) {
+    FeaturePtr aFeature = aFeatures.Value();
+    boost::shared_ptr<Model_Data> aFData = 
+      boost::dynamic_pointer_cast<Model_Data>(aFeature->data());
+    if (aFData) {
+      aFData->eraseBackReferences();
+    }
+    const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+    std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+    for (; aRIter != aResults.cend(); aRIter++) {
+      boost::shared_ptr<Model_Data> aResData = 
+        boost::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
+      if (aResData) {
+        aConcealed.push_back(std::pair<ResultPtr, bool>(*aRIter, (*aRIter)->isConcealed()));
+        aResData->eraseBackReferences();
+      }
+    }
+  }
+
+  // second cycle: set new back-references: only features may have reference, iterate only them
+  ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+  for(aFeatures.Initialize(myObjs); aFeatures.More(); aFeatures.Next()) {
+    FeaturePtr aFeature = aFeatures.Value();
+    boost::shared_ptr<Model_Data> aFData = 
+      boost::dynamic_pointer_cast<Model_Data>(aFeature->data());
+    if (aFData) {
+      std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
+      aFData->referencesToObjects(aRefs);
+      std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator aRefsIter = aRefs.begin();
+      for(; aRefsIter != aRefs.end(); aRefsIter++) {
+        std::list<ObjectPtr>::iterator aRefTo = aRefsIter->second.begin();
+        for(; aRefTo != aRefsIter->second.end(); aRefTo++) {
+          if (*aRefTo) {
+            boost::shared_ptr<Model_Data> aRefData = 
+              boost::dynamic_pointer_cast<Model_Data>((*aRefTo)->data());
+            aRefData->addBackReference(aFeature, aRefsIter->first); // here the Concealed flag is updated
+          }
+        }
+      }
+    }
+  }
+  std::list<std::pair<ResultPtr, bool> >::iterator aCIter = aConcealed.begin();
+  for(; aCIter != aConcealed.end(); aCIter++) {
+    if (aCIter->first->isConcealed() != aCIter->second) { // somethign is changed => produce event
+      if (aCIter->second) { // was concealed become not => creation event
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+        ModelAPI_EventCreator::get()->sendUpdated(aCIter->first, anEvent);
+      } else { // was not concealed become concealed => delete event
+        ModelAPI_EventCreator::get()->sendDeleted(aThis, aCIter->first->groupName());
+      }
+    }
+  }
 }
 
 TDF_Label Model_Document::resultLabel(
@@ -822,15 +873,11 @@ void Model_Document::storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData
   }
 }
 
-static const Standard_GUID ID_CONSTRUCTION("b59fa408-8ab1-42b8-980c-af5adeebe7e4");
-static const Standard_GUID ID_BODY("c1148e9a-9b17-4e9c-9160-18e918fd0013");
-static const Standard_GUID ID_PART("1b3319b9-3e0a-4298-a1dc-3fb5aaf9be59");
-
 boost::shared_ptr<ModelAPI_ResultConstruction> Model_Document::createConstruction(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
   TDF_Label aLab = resultLabel(theFeatureData, theIndex);
-  TDataStd_UAttribute::Set(aLab, ID_CONSTRUCTION);
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultConstruction::group().c_str());
   ObjectPtr anOldObject = object(aLab);
   boost::shared_ptr<ModelAPI_ResultConstruction> aResult;
   if (anOldObject) {
@@ -847,7 +894,7 @@ boost::shared_ptr<ModelAPI_ResultBody> Model_Document::createBody(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
   TDF_Label aLab = resultLabel(theFeatureData, theIndex);
-  TDataStd_UAttribute::Set(aLab, ID_BODY);
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultBody::group().c_str());
   ObjectPtr anOldObject = object(aLab);
   boost::shared_ptr<ModelAPI_ResultBody> aResult;
   if (anOldObject) {
@@ -864,7 +911,7 @@ boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
     const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
   TDF_Label aLab = resultLabel(theFeatureData, theIndex);
-  TDataStd_UAttribute::Set(aLab, ID_PART);
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultPart::group().c_str());
   ObjectPtr anOldObject = object(aLab);
   boost::shared_ptr<ModelAPI_ResultPart> aResult;
   if (anOldObject) {
@@ -916,58 +963,20 @@ void Model_Document::updateResults(FeaturePtr theFeature)
     ResultPtr aNewBody;
     if (aResSize <= aResIndex) {
       TDF_Label anArgLab = aLabIter.Value();
-      if (anArgLab.IsAttribute(ID_BODY)) {
-        aNewBody = createBody(theFeature->data(), aResIndex);
-      } else if (anArgLab.IsAttribute(ID_PART)) {
-        aNewBody = createPart(theFeature->data(), aResIndex);
-      } else if (!anArgLab.IsAttribute(ID_CONSTRUCTION) && anArgLab.FindChild(1).HasAttribute()) {
-        Events_Error::send("Unknown type of result is found in the document");
+      Handle(TDataStd_Comment) aGroup;
+      if (anArgLab.FindAttribute(TDataStd_Comment::GetID(), aGroup)) {
+        if (aGroup->Get() == ModelAPI_ResultBody::group().c_str()) {
+          aNewBody = createBody(theFeature->data(), aResIndex);
+        } else if (aGroup->Get() == ModelAPI_ResultPart::group().c_str()) {
+          aNewBody = createPart(theFeature->data(), aResIndex);
+        } else if (aGroup->Get() != ModelAPI_ResultConstruction::group().c_str()) {
+          Events_Error::send(std::string("Unknown type of result is found in the document:") +
+            TCollection_AsciiString(aGroup->Get()).ToCString());
+        }
       }
       if (aNewBody) {
         theFeature->setResult(aNewBody, aResIndex);
       }
-    }
-  }
-}
-
-void Model_Document::objectIsReferenced(const ObjectPtr& theObject)
-{
-  // only bodies are concealed now
-  ResultBodyPtr aResult = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(theObject);
-  if (aResult) {
-    if (myConcealedResults.find(aResult) != myConcealedResults.end()) {
-      Events_Error::send(std::string("The object '") + aResult->data()->name() +
-        "' is already referenced");
-    } else {
-      myConcealedResults.insert(aResult);
-      boost::shared_ptr<ModelAPI_Document> aThis = 
-        Model_Application::getApplication()->getDocument(myID);
-      ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_ResultBody::group());
-
-      static Events_Loop* aLoop = Events_Loop::loop();
-      static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-      static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-      aECreator->sendUpdated(aResult, EVENT_DISP);
-    }
-  }
-}
-
-void Model_Document::objectIsNotReferenced(const ObjectPtr& theObject)
-{
-  // only bodies are concealed now
-  ResultBodyPtr aResult = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(theObject);
-  if (aResult) {
-    std::set<ResultPtr>::iterator aFind = myConcealedResults.find(aResult);
-    if (aFind != myConcealedResults.end()) {
-      ResultPtr aFeature = *aFind;
-      myConcealedResults.erase(aFind);
-      boost::shared_ptr<ModelAPI_Document> aThis = 
-        Model_Application::getApplication()->getDocument(myID);
-      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-      ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent, false);
-    } else {
-      Events_Error::send(std::string("The object '") + aResult->data()->name() +
-        "' was not referenced '");
     }
   }
 }

@@ -1,19 +1,13 @@
 <plugin>
   <workbench id="Features" document="Part">
     <group id="Exchange">
-      <feature
-        id="Import"
-        title="Import"
-        tooltip="Import shape"
-        icon=":icons/import.png">
+      <feature id="Import" title="Import" tooltip="Import shape" icon=":icons/import.png">
         <file_selector
           id="import_file_selector"
           title="Import file"
-          path=""
-          formats="BREP,STEP" />
-        <!-- TODO: pass formats as validator 
-        <validator id="Format" parameters="BREP:BREPImport,STEP:STEPImport" /> 
-        -->
+          path="">
+          <validator id="ExchangePlugin_ImportFormat" parameters="BREP:BREPImport,STEP:STEPImport" />
+        </file_selector>
       </feature>
     </group>
   </workbench>

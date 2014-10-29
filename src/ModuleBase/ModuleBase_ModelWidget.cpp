@@ -16,14 +16,16 @@
 
 #include <QEvent>
 #include <QWidget>
+#include <QGraphicsDropShadowEffect>
+#include <QColor>
+#include <QLabel>
 
-ModuleBase_ModelWidget::ModuleBase_ModelWidget(QObject* theParent, const Config_WidgetAPI* theData,
+ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent, const Config_WidgetAPI* theData,
                                                const std::string& theParentId)
     : QObject(theParent),
       myParentId(theParentId)
 {
   myIsComputedDefault = false;
-  myIsObligatory = theData ? theData->getBooleanAttribute(FEATURE_OBLIGATORY, true) : true;
   myAttributeID = theData ? theData->widgetId() : "";
 }
 
@@ -36,8 +38,32 @@ void ModuleBase_ModelWidget::enableFocusProcessing()
 {
   QList<QWidget*> aMyControls = getControls();
   foreach(QWidget*  eachControl, aMyControls) {
-    if(!myFocusInWidgets.contains(eachControl)) {
-      enableFocusProcessing(eachControl);
+    eachControl->setFocusPolicy(Qt::StrongFocus);
+    eachControl->installEventFilter(this);
+  }
+}
+
+void ModuleBase_ModelWidget::setHighlighted(bool isHighlighted)
+{
+  QList<QWidget*> aWidgetList = getControls();
+  foreach(QWidget* aWidget, aWidgetList) {
+    QLabel* aLabel = qobject_cast<QLabel*>(aWidget);
+    // We won't set the effect to QLabels - it looks ugly
+    if(aLabel) continue;
+    if(isHighlighted) {
+      // If effect is the installed on a different widget, setGraphicsEffect() will
+      // remove the effect from the widget and install it on this widget.
+      // That's why we create a new effect for each widget
+      QGraphicsDropShadowEffect* aGlowEffect = new QGraphicsDropShadowEffect();
+      aGlowEffect->setOffset(.0);
+      aGlowEffect->setBlurRadius(10.0);
+      aGlowEffect->setColor(QColor(0, 170, 255)); // Light-blue color, #00AAFF
+      aWidget->setGraphicsEffect(aGlowEffect);
+    } else {
+      QGraphicsEffect* anEffect = aWidget->graphicsEffect();
+      if(anEffect)
+        anEffect->deleteLater();
+      aWidget->setGraphicsEffect(NULL);
     }
   }
 }
@@ -64,20 +90,15 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj) const
   ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
 }
 
-void ModuleBase_ModelWidget::enableFocusProcessing(QWidget* theWidget)
-{
-  theWidget->setFocusPolicy(Qt::StrongFocus);
-  theWidget->installEventFilter(this);
-  myFocusInWidgets.append(theWidget);
-}
-
 bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
 {
-  QWidget* aWidget = dynamic_cast<QWidget*>(theObject);
-  if (theEvent->type() == QEvent::MouseButtonRelease && 
-      myFocusInWidgets.contains(aWidget)) {
-    emit focusInWidget(this);
+  QWidget* aWidget = qobject_cast<QWidget*>(theObject);
+  if (theEvent->type() == QEvent::FocusIn) {
+    if (getControls().contains(aWidget)) {
+      emit focusInWidget(this);
+    }
   } 
   // pass the event on to the parent class
+
   return QObject::eventFilter(theObject, theEvent);
 }

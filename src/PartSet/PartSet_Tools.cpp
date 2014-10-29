@@ -8,6 +8,7 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Session.h>
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
@@ -25,6 +26,7 @@
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintRadius.h>
+#include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_Constraint.h>
 
 #include <ModuleBase_ViewerPrs.h>
@@ -138,21 +140,17 @@ void PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr
 
 FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
                                          FeaturePtr theSketch,
-                                         const std::list<ModuleBase_ViewerPrs>& theFeatures)
+                                         const QList<ModuleBase_ViewerPrs>& theFeatures)
 {
   double aX, anY;
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(thePoint, theView);
   PartSet_Tools::convertTo2D(aPoint, theSketch, theView, aX, anY);
 
   FeaturePtr aFeature;
-  std::list<ModuleBase_ViewerPrs>::const_iterator anIt = theFeatures.begin(), aLast = theFeatures
-      .end();
-
   FeaturePtr aDeltaFeature;
   double aMinDelta = -1;
   ModuleBase_ViewerPrs aPrs;
-  for (; anIt != aLast; anIt++) {
-    aPrs = *anIt;
+  foreach (ModuleBase_ViewerPrs aPrs, theFeatures) {
     if (!aPrs.object())
       continue;
     boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
@@ -234,17 +232,16 @@ FeaturePtr PartSet_Tools::feature(FeaturePtr theFeature, const std::string& theA
   return aFeature;
 }
 
-void PartSet_Tools::createConstraint(FeaturePtr theSketch,
+void PartSet_Tools::createConstraint(CompositeFeaturePtr theSketch,
                                      boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
                                      boost::shared_ptr<GeomDataAPI_Point2D> thePoint2)
 {
-  boost::shared_ptr<ModelAPI_Document> aDoc = document();
-  FeaturePtr aFeature = aDoc->addFeature(SketchPlugin_ConstraintCoincidence::ID());
-
+  FeaturePtr aFeature;
   if (theSketch) {
-    boost::shared_ptr<SketchPlugin_Feature> aSketch = boost::dynamic_pointer_cast<
-        SketchPlugin_Feature>(theSketch);
-    aSketch->addSub(aFeature);
+    aFeature = theSketch->addFeature(SketchPlugin_ConstraintCoincidence::ID());
+  } else {
+    boost::shared_ptr<ModelAPI_Document> aDoc = document();
+    aFeature = aDoc->addFeature(SketchPlugin_ConstraintCoincidence::ID());
   }
 
   boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
@@ -261,7 +258,7 @@ void PartSet_Tools::createConstraint(FeaturePtr theSketch,
     aFeature->execute();
 }
 
-void PartSet_Tools::setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
+void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr theFeature,
                                    const std::string& theAttribute, double theClickedX,
                                    double theClickedY)
 {
@@ -301,7 +298,7 @@ void PartSet_Tools::setConstraints(FeaturePtr theSketch, FeaturePtr theFeature,
   }
 }
 
-boost::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(FeaturePtr theSketch)
+boost::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(CompositeFeaturePtr theSketch)
 {
   boost::shared_ptr<GeomAPI_Pln> aPlane;
   double aA, aB, aC, aD;
@@ -321,7 +318,7 @@ boost::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(FeaturePtr theSketch)
 }
 
 boost::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(boost::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
-                                                      FeaturePtr theSketch)
+                                                      CompositeFeaturePtr theSketch)
 {
   boost::shared_ptr<GeomAPI_Pnt> aPoint;
   if (!theSketch || !thePoint2D)
@@ -341,5 +338,6 @@ bool PartSet_Tools::isConstraintFeature(const std::string& theKind)
 {
   return theKind == SketchPlugin_ConstraintDistance::ID()
       || theKind == SketchPlugin_ConstraintLength::ID()
-      || theKind == SketchPlugin_ConstraintRadius::ID();
+      || theKind == SketchPlugin_ConstraintRadius::ID()
+      || theKind == SketchPlugin_ConstraintRigid::ID();
 }

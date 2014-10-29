@@ -6,6 +6,7 @@
 
 #include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_WidgetValue.h>
+#include <ModuleBase_Tools.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -20,6 +21,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_ResultValidator.h>
 #include <ModelAPI_RefAttrValidator.h>
+#include <ModelAPI_Session.h>
 
 #include <QWidget>
 #include <QLineEdit>
@@ -33,7 +35,7 @@ ModuleBase_WidgetFeature::ModuleBase_WidgetFeature(QWidget* theParent,
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aControlLay = new QHBoxLayout(myContainer);
-  aControlLay->setContentsMargins(0, 0, 0, 0);
+  ModuleBase_Tools::adjustMargins(aControlLay);
 
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   myLabel = new QLabel(aLabelText, myContainer);

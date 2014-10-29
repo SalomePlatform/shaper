@@ -23,7 +23,8 @@
 #endif
 
 XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
-    : QDockWidget(theParent)
+    : ModuleBase_IPropertyPanel(theParent), 
+    myActiveWidget(NULL)
 {
   this->setWindowTitle(tr("Property Panel"));
   QAction* aViewAct = this->toggleViewAction();
@@ -56,6 +57,7 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   aBtn->setToolTip(tr("Cancel"));
   aBtn->setObjectName(XGUI::PROP_PANEL_CANCEL);
   aBtn->setFlat(true);
+  aBtn->setShortcut(QKeySequence(Qt::Key_Escape));
   aBtnLay->addWidget(aBtn);
 
   myCustomWidget = new QWidget(aContent);
@@ -71,11 +73,13 @@ void XGUI_PropertyPanel::cleanContent()
 {
   myWidgets.clear();
   qDeleteAll(myCustomWidget->children());
+  myActiveWidget = NULL;
 }
 
 void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets)
 {
   myWidgets = theWidgets;
+  int aS = myWidgets.size();
   if (theWidgets.empty()) return;
 
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast =
@@ -84,9 +88,9 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
     connect(*anIt, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
 
     connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)), this,
-            SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
+            SLOT(activateNextWidget(ModuleBase_ModelWidget*)));
     connect(*anIt, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)),
-            this, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)));
+            this, SLOT(activateWidget(ModuleBase_ModelWidget*)));
 
     ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
     if (aPointWidget)
@@ -125,11 +129,11 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
     eachWidget->setFeature(theFeature);
     eachWidget->restoreValue();
   }
-  // the repaint is used here to immediatelly react in GUI to the values change.
+  // the repaint is used here to immediately react in GUI to the values change.
   repaint();
 }
 
-void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
+void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
 {
   ModuleBase_ModelWidget* aNextWidget = 0;
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
@@ -142,11 +146,32 @@ void XGUI_PropertyPanel::onActivateNextWidget(ModuleBase_ModelWidget* theWidget)
     }
     isFoundWidget = (*anIt) == theWidget;
   }
-  emit widgetActivated(aNextWidget);
+  // Normaly focusTo is enough to activate widget
+  // here is a special case on mouse click in the viewer
+  if(aNextWidget == NULL) {
+    activateWidget(NULL);
+  }
+}
+
+void XGUI_PropertyPanel::activateNextWidget()
+{
+  activateNextWidget(myActiveWidget);
 }
 
 void XGUI_PropertyPanel::setAcceptEnabled(bool isEnabled)
 {
   QPushButton* anOkBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
   anOkBtn->setEnabled(isEnabled);
+}
+
+void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
+{
+  if(myActiveWidget) {
+    myActiveWidget->setHighlighted(false);
+  }
+  if(theWidget) {
+    theWidget->setHighlighted(true);
+  }
+  myActiveWidget = theWidget;
+  emit widgetActivated(theWidget);
 }

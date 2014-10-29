@@ -1,9 +1,14 @@
-#include "FeaturesPlugin_Plugin.h"
-#include "FeaturesPlugin_Extrusion.h"
-#include "FeaturesPlugin_Boolean.h"
+#include <FeaturesPlugin_Plugin.h>
+
+#include <FeaturesPlugin_Boolean.h>
+#include <FeaturesPlugin_Extrusion.h>
+#include <FeaturesPlugin_Group.h>
 
 #include <ModelAPI_Session.h>
-#include <ModelAPI_Document.h>
+
+#include <string>
+
+#include <boost/smart_ptr/shared_ptr.hpp>
 
 using namespace std;
 
@@ -20,9 +25,10 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
 {
   if (theFeatureID == FeaturesPlugin_Extrusion::ID()) {
     return FeaturePtr(new FeaturesPlugin_Extrusion);
-  } else
-  if (theFeatureID == FeaturesPlugin_Boolean::ID()) {
+  } else if (theFeatureID == FeaturesPlugin_Boolean::ID()) {
     return FeaturePtr(new FeaturesPlugin_Boolean);
+  } else if (theFeatureID == FeaturesPlugin_Group::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Group);
   }
   // feature of such kind is not found
   return FeaturePtr();

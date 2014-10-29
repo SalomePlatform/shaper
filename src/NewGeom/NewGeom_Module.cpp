@@ -8,6 +8,9 @@
 #include <XGUI_ContextMenuMgr.h>
 #include <XGUI_Preferences.h>
 #include <XGUI_ObjectsBrowser.h>
+#include <XGUI_OperationMgr.h>
+
+#include <ModuleBase_Operation.h>
 
 #include <LightApp_Application.h>
 #include <LightApp_SelectionMgr.h>
@@ -87,6 +90,9 @@ void NewGeom_Module::initialize(CAM_Application* theApp)
   LightApp_Module::initialize(theApp);
 
   myWorkshop->startApplication();
+  LightApp_Application* anApp = dynamic_cast<LightApp_Application*>(theApp);
+  if (anApp)
+    connect(anApp, SIGNAL(preferenceResetToDefaults()), this, SLOT(onDefaultPreferences()));
 }
 
 //******************************************************
@@ -125,7 +131,6 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
         mySelector = createSelector(OCCViewManagers.first());
       }
     }
-    myWorkshop->propertyPanel()->hide();
     QtxPopupMgr* aMgr = popupMgr();  // Create popup manager
     action(myEraseAll)->setEnabled(false);
 
@@ -136,6 +141,17 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
       QTimer::singleShot(1000, myWorkshop, SLOT(displayAllResults()));
     }
   }
+  SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
+  myIsStorePositions = aResMgr->booleanValue("Study", "store_positions", true);
+
+  // this following row is caused by #187 bug.
+  // SALOME saves the dock widget positions before deactivateModule() and
+  // load it after the module activation. So, if the panel is visible before
+  // deactivate, it becomes visible after activate.
+  // In order to avoid the visible property panel, the widget position save is
+  // switch off in this module
+  aResMgr->setValue("Study", "store_positions", false);
+
   return isDone;
 }
 
@@ -144,9 +160,6 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
 {
   setMenuShown(false);
   setToolShown(false);
-
-  myWorkshop->propertyPanel()->setVisible(false);
-  desktop()->removeDockWidget(myWorkshop->propertyPanel());
 
   QObject* aObj = myWorkshop->objectBrowser()->parent();
   QDockWidget* aObjDoc = dynamic_cast<QDockWidget*>(aObj);
@@ -157,7 +170,27 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
     aViewAct->setEnabled(false);
   }
 
+  // the active operation should be stopped for the next activation.
+  // There should not be active operation and visualized preview.
+  // Abort operation should be performed before the selection's remove
+  // because the displayed objects should be removed from the viewer, but
+  // the AIS context is obtained from the selector.
+  ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
+  if (anOperation)
+    anOperation->abort();
+
+  // Delete selector because it has to be redefined on next activation
+  if (mySelector) {
+    myProxyViewer->setSelector(0);
+    delete mySelector;
+    mySelector = 0;
+  }
+
   //myWorkshop->contextMenuMgr()->disconnectViewer();
+
+  SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
+  aResMgr->setValue("Study", "store_positions", myIsStorePositions);
+
   return LightApp_Module::deactivateModule(theStudy);
 }
 
@@ -167,6 +200,17 @@ void NewGeom_Module::onViewManagerAdded(SUIT_ViewManager* theMgr)
   if ((!mySelector)) {
     mySelector = createSelector(theMgr);
   }
+}
+
+//******************************************************
+void NewGeom_Module::onDefaultPreferences()
+{
+  XGUI_Preferences::resetConfig();
+  XGUI_Preferences::updateResourcesByConfig();
+
+  LightApp_Preferences* pref = preferences();
+  if (pref)
+    pref->retrieve();
 }
 
 //******************************************************
@@ -299,6 +343,21 @@ QStringList NewGeom_Module::nestedActions(const QString& theId) const
 }
 
 //******************************************************
+void NewGeom_Module::setDocumentKind(const QString& theId, const QString& theKind)
+{
+  myDocumentType[theId] = theKind;
+}
+
+//******************************************************
+QString NewGeom_Module::documentKind(const QString& theId) const
+{
+  if (myDocumentType.contains(theId))
+    return myDocumentType[theId];
+  return QString();
+
+}
+
+//******************************************************
 void NewGeom_Module::selectionChanged()
 {
   LightApp_Module::selectionChanged();
@@ -319,7 +378,7 @@ void NewGeom_Module::createPreferences()
   LightApp_Preferences* pref = preferences();
   if (!pref)
     return;
-  XGUI_Preferences::updateCustomProps();
+  XGUI_Preferences::updateConfigByResources();
   QString aModName = moduleName();
 
   QtxPreferenceItem* item = pref->findItem(aModName, true );
@@ -341,8 +400,16 @@ void NewGeom_Module::preferencesChanged(const QString& theSection, const QString
 {
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
   QString aVal = aResMgr->stringValue(theSection, theParam);
-  if (!aVal.isNull()) {
-    Config_Prop* aProp = Config_PropManager::findProp(theSection.toStdString(), theParam.toStdString());
-    aProp->setValue(aVal.toStdString());
+  Config_Prop* aProp = Config_PropManager::findProp(theSection.toStdString(), theParam.toStdString());
+  std::string aValue = aVal.toStdString();
+  if (aValue.empty()) {
+    aValue = aProp->defaultValue();
+    aResMgr->setValue(theSection, theParam, QString(aValue.c_str()));
+
+    LightApp_Preferences* pref = preferences();
+    if (pref)
+      pref->retrieve();
   }
+  aProp->setValue(aValue);
+
 }

@@ -186,7 +186,7 @@ bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>
     std::list<std::string>::iterator anAttrIter = aLtAttributes.begin();
     for (; anAttrIter != aLtAttributes.end(); anAttrIter++) {
       std::map<std::string, AttrValidators>::const_iterator anAttr = 
-        aFeatureIter->second.find(*anAttrIter);
+          aFeatureIter->second.find(*anAttrIter);
       if (anAttr != aFeatureIter->second.end()) {
         AttrValidators::const_iterator aValIter = anAttr->second.cbegin();
         for (; aValIter != anAttr->second.cend(); aValIter++) {
@@ -198,8 +198,8 @@ bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>
             const ModelAPI_AttributeValidator* anAttrValidator = 
               dynamic_cast<const ModelAPI_AttributeValidator*>(aFound->second);
             if (anAttrValidator) {
-              if (!anAttrValidator->isValid(theFeature->data()->attribute(*anAttrIter),
-                aValIter->second)) {
+              AttributePtr anAttribute = theFeature->data()->attribute(*anAttrIter);
+              if (!anAttrValidator->isValid(anAttribute, aValIter->second)) {
                   return false;
               }
             }
@@ -211,8 +211,7 @@ bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>
   return true;
 }
 
-void Model_ValidatorsFactory::registerNotObligatory(
-  std::string theFeature, std::string theAttribute) 
+void Model_ValidatorsFactory::registerNotObligatory(std::string theFeature, std::string theAttribute)
 {
   std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(kDefaultId);
   if (it != myIDs.end()) {
@@ -221,4 +220,22 @@ void Model_ValidatorsFactory::registerNotObligatory(
       aValidator->registerNotObligatory(theFeature, theAttribute);
     }
   }
+}
+
+void Model_ValidatorsFactory::registerConcealment(std::string theFeature, std::string theAttribute)
+{
+  std::map<std::string, std::set<std::string> >::iterator aFind = myConcealed.find(theFeature);
+  if (aFind == myConcealed.end()) {
+    std::set<std::string> aNewSet;
+    aNewSet.insert(theAttribute);
+    myConcealed[theFeature] = aNewSet;
+  } else {
+    aFind->second.insert(theAttribute);
+  }
+}
+
+bool Model_ValidatorsFactory::isConcealed(std::string theFeature, std::string theAttribute)
+{
+  std::map<std::string, std::set<std::string> >::iterator aFind = myConcealed.find(theFeature);
+  return aFind != myConcealed.end() && aFind->second.find(theAttribute) != aFind->second.end();
 }

@@ -5,6 +5,7 @@
 #include <ModuleBase_WidgetPoint2D.h>
 #include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_DoubleSpinBox.h>
+#include <ModuleBase_Tools.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -22,7 +23,6 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QEvent>
-#include <QKeyEvent>
 
 #include <cfloat>
 #include <climits>
@@ -33,10 +33,12 @@ ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
     : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   myOptionParam = theData->getProperty(PREVIOUS_FEATURE_PARAM);
-  myGroupBox = new QGroupBox(QString::fromStdString(theData->getProperty(CONTAINER_PAGE_NAME)),
-                             theParent);
+  QString aPageName = QString::fromStdString(theData->getProperty(CONTAINER_PAGE_NAME));
+  myGroupBox = new QGroupBox(aPageName, theParent);
+  myGroupBox->setFlat(false);
+
   QGridLayout* aGroupLay = new QGridLayout(myGroupBox);
-  aGroupLay->setContentsMargins(2, 0, 2, 0);
+  ModuleBase_Tools::adjustMargins(aGroupLay);
   aGroupLay->setColumnStretch(1, 1);
   {
     QLabel* aLabel = new QLabel(myGroupBox);
@@ -66,8 +68,6 @@ ModuleBase_WidgetPoint2D::ModuleBase_WidgetPoint2D(QWidget* theParent,
 
     connect(myYSpin, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
   }
-  myXSpin->installEventFilter(this);
-  myYSpin->installEventFilter(this);
 }
 
 ModuleBase_WidgetPoint2D::~ModuleBase_WidgetPoint2D()
@@ -107,11 +107,18 @@ bool ModuleBase_WidgetPoint2D::storeValue() const
   boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(attributeID()));
-
+  
   ModuleBase_WidgetPoint2D* that = (ModuleBase_WidgetPoint2D*) this;
   bool isBlocked = that->blockSignals(true);
+  bool isImmutable = aPoint->setImmutable(true);
+#ifdef _DEBUG
+  std::string _attr_name = myAttributeID;
+  double _X = myXSpin->value();
+  double _Y = myYSpin->value();
+#endif
   aPoint->setValue(myXSpin->value(), myYSpin->value());
   updateObject(myFeature);
+  aPoint->setImmutable(isImmutable);
   that->blockSignals(isBlocked);
 
   return true;
@@ -123,6 +130,11 @@ bool ModuleBase_WidgetPoint2D::restoreValue()
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(attributeID()));
 
+#ifdef _DEBUG
+  std::string _attr_name = myAttributeID;
+  double _X = aPoint->x();
+  double _Y = aPoint->y();
+#endif
   bool isBlocked = this->blockSignals(true);
   myXSpin->setValue(aPoint->x());
   myYSpin->setValue(aPoint->y());

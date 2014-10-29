@@ -2,19 +2,31 @@
 // Created:     27 Mar 2014
 // Author:      Mikhail PONIKAROV
 
-#include "SketchPlugin_Sketch.h"
-#include <ModelAPI_Data.h>
-#include <ModelAPI_AttributeRefList.h>
+#include <Config_PropManager.h>
+
+#include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_FaceBuilder.h>
+
 #include <GeomAPI_AISObject.h>
+#include <GeomAPI_Dir.h>
+#include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_XYZ.h>
+
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
-#include <GeomAlgoAPI_FaceBuilder.h>
-#include <GeomAlgoAPI_CompoundBuilder.h>
-#include <GeomAlgoAPI_SketchBuilder.h>
+
+#include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_Data.h>
+#include <ModelAPI_Document.h>
+#include <ModelAPI_Feature.h>
+#include <ModelAPI_Object.h>
 #include <ModelAPI_ResultConstruction.h>
 
-#include <Config_PropManager.h>
+#include <SketchPlugin_Sketch.h>
+
+#include <boost/smart_ptr/shared_ptr.hpp>
+
+#include <vector>
 
 using namespace std;
 
@@ -74,22 +86,68 @@ void SketchPlugin_Sketch::execute()
 
   if (aFeaturesPreview.empty())
     return;
-  std::list<boost::shared_ptr<GeomAPI_Shape> > aLoops;
-  std::list<boost::shared_ptr<GeomAPI_Shape> > aWires;
-  GeomAlgoAPI_SketchBuilder::createFaces(anOrigin->pnt(), aDirX->dir(), aDirY->dir(), aNorm->dir(),
-                                         aFeaturesPreview, aLoops, aWires);
 
-  aLoops.insert(aLoops.end(), aWires.begin(), aWires.end());
-  boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aLoops);
+  // Collect all edges as one big wire
+  boost::shared_ptr<GeomAPI_PlanarEdges> aBigWire(new GeomAPI_PlanarEdges);
+  std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator aShapeIt = aFeaturesPreview.begin();
+  for (; aShapeIt != aFeaturesPreview.end(); ++aShapeIt) {
+    aBigWire->addEdge(*aShapeIt);
+  }
+  aBigWire->setOrigin(anOrigin->pnt());
+  aBigWire->setDirX(aDirX->dir());
+  aBigWire->setDirY(aDirY->dir());
+  aBigWire->setNorm(aNorm->dir());
+
+//  GeomAlgoAPI_SketchBuilder::createFaces(anOrigin->pnt(), aDirX->dir(), aDirY->dir(), aNorm->dir(),
+//                                         aFeaturesPreview, aLoops, aWires);
   boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
-  aConstr->setShape(aCompound);
+  aConstr->setShape(aBigWire);
   setResult(aConstr);
 }
 
-const void SketchPlugin_Sketch::addSub(const FeaturePtr& theFeature)
+boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::addFeature(std::string theID)
 {
-  boost::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature)->setSketch(this);
-  data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->append(theFeature);
+  boost::shared_ptr<ModelAPI_Feature> aNew = document()->addFeature(theID);
+  if (aNew) {
+    boost::dynamic_pointer_cast<SketchPlugin_Feature>(aNew)->setSketch(this);
+    data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->append(aNew);
+  }
+  return aNew;
+}
+
+int SketchPlugin_Sketch::numberOfSubs() const
+{
+  return data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->size();
+}
+
+boost::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::subFeature(const int theIndex) const
+{
+  ObjectPtr anObj = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->object(theIndex);
+  return boost::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
+}
+
+int SketchPlugin_Sketch::subFeatureId(const int theIndex) const
+{
+  return subFeature(theIndex)->data()->featureId();
+}
+
+bool SketchPlugin_Sketch::isSub(ObjectPtr theObject) const
+{
+  // check is this feature of result
+  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+  if (!aFeature) {
+    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aRes)
+      aFeature = document()->feature(aRes);
+  }
+  if (aFeature) {
+    list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
+    for(list<ObjectPtr>::iterator aSubIt = aSubs.begin(); aSubIt != aSubs.end(); aSubIt++) {
+      if (*aSubIt == aFeature)
+        return true;
+    }
+  }
+  return false;
 }
 
 boost::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, const double theY)
@@ -160,7 +218,7 @@ AISObjectPtr SketchPlugin_Sketch::getAISObject(AISObjectPtr thePrevious)
       SKETCH_PLANE_COLOR);
       aAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
 
-      aAIS->setWidth(Config_PropManager::integer("Sketch planes", "planes_thikness",
+      aAIS->setWidth(Config_PropManager::integer("Sketch planes", "planes_thickness",
       SKETCH_WIDTH));
     }
     return aAIS;
@@ -181,5 +239,5 @@ void SketchPlugin_Sketch::erase()
       document()->removeFeature(aFeature, false);
     }
   }
-  SketchPlugin_Feature::erase();
+  ModelAPI_CompositeFeature::erase();
 }

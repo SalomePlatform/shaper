@@ -16,8 +16,6 @@
 #include <NCollection_List.hxx>
 #include <TopoDS_Shape.hxx>
 
-#include <list>
-
 class XGUI_Workshop;
 
 class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
@@ -28,12 +26,12 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   /// Returns a list of viewer selected presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  virtual std::list<ModuleBase_ViewerPrs> getSelected(int theShapeTypeToSkip = -1) const;
+  virtual QList<ModuleBase_ViewerPrs> getSelected(int theShapeTypeToSkip = -1) const;
 
   /// Returns a list of viewer highlited presentations
   /// \param theShapeTypeToSkip the shapes with this type will be skipped during the result list build
   /// \return list of presentations
-  virtual std::list<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const;
+  virtual QList<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const;
 
   /**
    * Returns list of currently selected objects
@@ -52,7 +50,8 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   virtual void selectedAISObjects(AIS_ListOfInteractive& theList) const;
 
   //! Returns list of currently selected shapes
-  virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theList) const;
+  virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theShapes, 
+    std::list<ObjectPtr>& theOwners) const;
 
  private:
   XGUI_Workshop* myWorkshop;

@@ -22,7 +22,7 @@ from ModelAPI import *
 # Initialization of the test
 #=========================================================================
 
-__updated__ = "2014-07-28"
+__updated__ = "2014-10-28"
 
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
@@ -31,37 +31,34 @@ aDocument = aSession.moduleDocument()
 #=========================================================================
 aSession.startOperation()
 aSketchFeature = aDocument.addFeature("Sketch")
-aSketchFeatureData = aSketchFeature.data()
-origin = geomDataAPI_Point(aSketchFeatureData.attribute("Origin"))
+origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
 origin.setValue(0, 0, 0)
-dirx = geomDataAPI_Dir(aSketchFeatureData.attribute("DirX"))
+dirx = geomDataAPI_Dir(aSketchFeature.attribute("DirX"))
 dirx.setValue(1, 0, 0)
-diry = geomDataAPI_Dir(aSketchFeatureData.attribute("DirY"))
+diry = geomDataAPI_Dir(aSketchFeature.attribute("DirY"))
 diry.setValue(0, 1, 0)
-norm = geomDataAPI_Dir(aSketchFeatureData.attribute("Norm"))
+norm = geomDataAPI_Dir(aSketchFeature.attribute("Norm"))
 norm.setValue(0, 0, 1)
 aSession.finishOperation()
 #=========================================================================
 # Create a line and an arc
 #=========================================================================
 aSession.startOperation()
-aSketchReflist = aSketchFeatureData.reflist("Features")
+aSketchReflist = aSketchFeature.reflist("Features")
 aSketchArc = aDocument.addFeature("SketchArc")
 aSketchReflist.append(aSketchArc)
-aSketchArcData = aSketchArc.data()
-anArcCentr = geomDataAPI_Point2D(aSketchArcData.attribute("ArcCenter"))
+anArcCentr = geomDataAPI_Point2D(aSketchArc.attribute("ArcCenter"))
 anArcStartPoint = geomDataAPI_Point2D(
-    aSketchArcData.attribute("ArcStartPoint"))
-anArcEndPoint = geomDataAPI_Point2D(aSketchArcData.attribute("ArcEndPoint"))
+    aSketchArc.attribute("ArcStartPoint"))
+anArcEndPoint = geomDataAPI_Point2D(aSketchArc.attribute("ArcEndPoint"))
 aSketchFeature = aDocument.addFeature("SketchConstraintCoincidence")
 anArcCentr.setValue(10., 10.)
 anArcStartPoint.setValue(0., 50.)
 anArcEndPoint.setValue(50., 0.)
 aSketchLine = aDocument.addFeature("SketchLine")
 aSketchReflist.append(aSketchLine)
-aSketchLineData = aSketchLine.data()
-aLineStartPoint = geomDataAPI_Point2D(aSketchLineData.attribute("StartPoint"))
-aLineEndPoint = geomDataAPI_Point2D(aSketchLineData.attribute("EndPoint"))
+aLineStartPoint = geomDataAPI_Point2D(aSketchLine.attribute("StartPoint"))
+aLineEndPoint = geomDataAPI_Point2D(aSketchLine.attribute("EndPoint"))
 # Lets initialize line start at circle's end:
 aLineStartPoint.setValue(50., 0.)
 aLineEndPoint.setValue(100., 25.)
@@ -72,9 +69,8 @@ aSession.finishOperation()
 aSession.startOperation()
 aConstraint = aDocument.addFeature("SketchConstraintCoincidence")
 aSketchReflist.append(aConstraint)
-aConstraintData = aConstraint.data()
-reflistA = aConstraintData.refattr("ConstraintEntityA")
-reflistB = aConstraintData.refattr("ConstraintEntityB")
+reflistA = aConstraint.refattr("ConstraintEntityA")
+reflistB = aConstraint.refattr("ConstraintEntityB")
 reflistA.setAttr(anArcEndPoint)
 reflistB.setAttr(aLineStartPoint)
 aSession.finishOperation()

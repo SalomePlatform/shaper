@@ -32,19 +32,11 @@ Q_OBJECT
   /// Constructor
   /// \theParent the parent object
   /// \theData the widget configuation. The attribute of the model widget is obtained from
-  ModuleBase_ModelWidget(QObject* theParent, const Config_WidgetAPI* theData,
+  ModuleBase_ModelWidget(QWidget* theParent, const Config_WidgetAPI* theData,
                          const std::string& theParentId);
   /// Destructor
   virtual ~ModuleBase_ModelWidget()
   {
-  }
-
-  /// Set the given wrapped value to the current widget
-  /// This value should be processed in the widget according to the needs
-  /// \param theValue the wrapped widget value
-  virtual bool setValue(ModuleBase_WidgetValue* theValue)
-  {
-    return false;
   }
 
   /// Returns the state whether the attribute of the feature is initialized
@@ -56,9 +48,16 @@ Q_OBJECT
   /// on operation's execute, like radius for circle's constraint (can not be zero)
   bool isComputedDefault() { return myIsComputedDefault; }
 
-  /// Returns false for non-obligatory widgets which are
-  /// valid even if they are not initialized
-  bool isObligatory() { return myIsObligatory; }
+  /// Defines if it is supposed that the widget should interact with the viewer.
+  virtual bool isViewerSelector() { return false; }
+
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// \param theValue the wrapped widget value
+  virtual bool setValue(ModuleBase_WidgetValue* theValue)
+  {
+    return false;
+  }
 
   /// Saves the internal parameters to the given feature
   /// \param theObject a model feature to be changed
@@ -66,18 +65,27 @@ Q_OBJECT
 
   virtual bool restoreValue() = 0;
 
-  void enableFocusProcessing();
   /// Set focus to the first control of the current widget. The focus policy of the control is checked.
   /// If the widget has the NonFocus focus policy, it is skipped.
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
 
+  /// Returns the internal parent wiget control, that can be shown anywhere
+  /// \returns the widget
+  virtual QWidget* getControl() const = 0;
+
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const = 0;
 
+
   /// FocusIn events processing
   virtual bool eventFilter(QObject* theObject, QEvent *theEvent);
+
+
+  void enableFocusProcessing();
+
+  void setHighlighted(bool isHighlighted);
 
   /// Returns the attribute name
   /// \returns the string value
@@ -97,13 +105,11 @@ Q_OBJECT
   {
     return myFeature;
   }
+
   void setFeature(const FeaturePtr& theFeature)
   {
     myFeature = theFeature;
   }
-
-  /// Defines if it is supposed that the widget should interact with the viewer.
-  virtual bool isViewerSelector() { return false; }
 
 signals:
   /// The signal about widget values changed
@@ -129,22 +135,13 @@ signals:
 
   void updateObject(ObjectPtr theObj) const;
 
- private:
-  /// Let the widget process FocusIn events
-  void enableFocusProcessing(QWidget* theWidget);
-
  protected:
   std::string myAttributeID; /// the attribute name of the model feature
   std::string myParentId;    /// name of parent
   FeaturePtr myFeature;
 
-    bool myIsComputedDefault; /// Value should be computed on execute,
-                              /// like radius for circle's constraint (can not be zero)
-    bool myIsObligatory;      /// Non-obligatory widget is valid even if it is not initialized
-
- private:
-   /// Contains a list of widgets that may accept focus
-   QList<QWidget*> myFocusInWidgets;
+  bool myIsComputedDefault; /// Value should be computed on execute,
+                            /// like radius for circle's constraint (can not be zero)
 };
 
 #endif

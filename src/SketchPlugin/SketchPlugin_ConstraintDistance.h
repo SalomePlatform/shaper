@@ -22,7 +22,7 @@ class GeomDataAPI_Point2D;
  *  \brief Feature for creation of a new constraint which defines a distance
  *         between a point and another feature (point, line, plane or face)
  *
- *  These constraint has three attributes:
+ *  This constraint has three attributes:
  *  SketchPlugin_Constraint::VALUE(), SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
 class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase

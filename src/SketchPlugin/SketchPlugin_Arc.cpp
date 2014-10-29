@@ -6,6 +6,9 @@
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 
 #include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Pnt2d.h>
@@ -24,9 +27,11 @@ SketchPlugin_Arc::SketchPlugin_Arc()
 
 void SketchPlugin_Arc::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Arc::CENTER_ID(), GeomDataAPI_Point2D::type());
-  data()->addAttribute(SketchPlugin_Arc::START_ID(), GeomDataAPI_Point2D::type());
-  data()->addAttribute(SketchPlugin_Arc::END_ID(), GeomDataAPI_Point2D::type());
+  data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::type());
+  data()->addAttribute(START_ID(), GeomDataAPI_Point2D::type());
+  data()->addAttribute(END_ID(), GeomDataAPI_Point2D::type());
+  data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 }
 
 void SketchPlugin_Arc::execute()
@@ -137,4 +142,8 @@ double SketchPlugin_Arc::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>&
     aDelta = aDistance;
 
   return aDelta;
+}
+
+bool SketchPlugin_Arc::isFixed() {
+  return data()->selection(EXTERNAL_ID())->context();
 }

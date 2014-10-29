@@ -14,7 +14,6 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_SalomeConnector.h"
-#include "XGUI_SalomeViewer.h"
 #include "XGUI_ActionsMgr.h"
 #include "XGUI_ErrorDialog.h"
 #include "XGUI_ViewerProxy.h"
@@ -44,7 +43,9 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_SelectionValidator.h>
-#include "ModuleBase_WidgetFactory.h"
+#include <ModuleBase_WidgetFactory.h>
+#include <ModuleBase_Tools.h>
+#include <ModuleBase_IViewer.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -112,7 +113,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
   myModuleConnector = new XGUI_ModuleConnector(this);
 
-  connect(myOperationMgr, SIGNAL(operationStarted()), SLOT(onOperationStarted()));
+  connect(myOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)), 
+          SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationResumed()), SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           SLOT(onOperationStopped(ModuleBase_Operation*)));
@@ -176,6 +178,11 @@ void XGUI_Workshop::initMenu()
                                                 QIcon(":pictures/redo.png"), QKeySequence::Redo,
                                                 false);
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRedo()));
+    salomeConnector()->addEditMenuSeparator();
+    aAction = salomeConnector()->addEditCommand("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
+                                                QIcon(":pictures/rebuild.png"), QKeySequence(),
+                                                false);
+    connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
     salomeConnector()->addEditMenuSeparator();
     return;
   }
@@ -339,10 +346,10 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
     }
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName("CurrentDocumentChanged")) {
+    myActionsMgr->update();
     // Find and Activate active part
     if (myPartActivating)
       return;
-    myActionsMgr->update();
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aActiveDoc = aMgr->activeDocument();
     DocumentPtr aDoc = aMgr->moduleDocument();
@@ -409,9 +416,15 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_Objec
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
+  QIntList aModes;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
-    if (!aObj->data() || !aObj->data()->isValid() || aObj->document()->isConcealed(aObj))
+    bool aHide = !aObj->data() || !aObj->data()->isValid();
+    if (!aHide) { // check that this is not hidden result
+      ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+      aHide = aRes && aRes->isConcealed();
+    }
+    if (aHide)
       myDisplayer->erase(aObj, false);
     else {
       if (myDisplayer->isVisible(aObj))  {
@@ -420,7 +433,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_Objec
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
           if (!aOperation->hasObject(aObj))
             if (!myDisplayer->isActive(aObj))
-              myDisplayer->activate(aObj);
+              myDisplayer->activate(aObj, aModes);
         }
       } else {
         if (myOperationMgr->hasOperation()) {
@@ -455,8 +468,7 @@ void XGUI_Workshop::onFeatureCreatedMsg(const boost::shared_ptr<ModelAPI_ObjectU
       // it doesn't stored in the operation mgr and doesn't displayed
     } else if (myOperationMgr->hasOperation()) {
       ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-      if (!(*aIt)->document()->isConcealed(*aIt) &&
-          aOperation->hasObject(*aIt)) {  // Display only current operation results
+      if (aOperation->hasObject(*aIt)) {  // Display only current operation results
         myDisplayer->display(*aIt, false);
         isDisplayed = true;
       }
@@ -466,9 +478,9 @@ void XGUI_Workshop::onFeatureCreatedMsg(const boost::shared_ptr<ModelAPI_ObjectU
     myObjectBrowser->processEvent(theMsg);
   if (isDisplayed)
     myDisplayer->updateViewer();
-  if (aHasPart) {
-    activateLastPart();
-  }
+  //if (aHasPart) { // TODO: Avoid activate last part on loading of document
+  //  activateLastPart();
+  //}
 }
 
 //******************************************************
@@ -498,12 +510,10 @@ void XGUI_Workshop::onOperationStarted()
 
     myPropertyPanel->cleanContent();
     aFactory.createWidget(myPropertyPanel->contentWidget());
+    ModuleBase_Tools::zeroMargins(myPropertyPanel->contentWidget());
 
     QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
-    QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
-    ModuleBase_ModelWidget* aWidget;
-    for (; anIt != aLast; anIt++) {
-      aWidget = *anIt;
+    foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
       aWidget->setFeature(aOperation->feature());
       aWidget->enableFocusProcessing();
       QObject::connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
@@ -513,8 +523,10 @@ void XGUI_Workshop::onOperationStarted()
       }
     }
 
+    aOperation->setPropertyPanel(myPropertyPanel);
     myPropertyPanel->setModelWidgets(aWidgets);
-    myPropertyPanel->onActivateNextWidget(NULL);
+    if (!aOperation->activateByPreselection())
+      myPropertyPanel->activateNextWidget(NULL);
     // Widget activation (from the previous method) may commit the current operation
     // if pre-selection is enougth for it. So we shouldn't update prop panel's title
     if(myOperationMgr->isCurrentOperation(aOperation)) {
@@ -571,6 +583,8 @@ void XGUI_Workshop::addFeature(const boost::shared_ptr<Config_FeatureMessage>& t
                                                      QKeySequence(),
                                                      isUsePropPanel);
     salomeConnector()->setNestedActions(aFeatureId, aNestedFeatures.split(" ", QString::SkipEmptyParts));
+    salomeConnector()->setDocumentKind(aFeatureId, QString::fromStdString(theMessage->documentKind()));
+
     myActionsMgr->addCommand(aAction);
     myModule->featureCreated(aAction);
   } else {
@@ -879,7 +893,7 @@ ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
   }
 #endif
 
-  ModuleBase_IModule* aModule = crtInst ? crtInst(this) : 0;
+  ModuleBase_IModule* aModule = crtInst ? crtInst(myModuleConnector) : 0;
 
   if (!err.isEmpty()) {
     if (mainWindow()) {
@@ -994,6 +1008,7 @@ void XGUI_Workshop::createDockWidgets()
   hidePropertyPanel();  //<! Invisible by default
   hideObjectBrowser();
   aDesktop->tabifyDockWidget(aObjDock, myPropertyPanel);
+  myPropertyPanel->installEventFilter(myOperationMgr);
 
   QPushButton* aOkBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
   connect(aOkBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onCommitOperation()));
@@ -1001,10 +1016,6 @@ void XGUI_Workshop::createDockWidgets()
   connect(aCancelBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onAbortOperation()));
   connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)), myOperationMgr,
           SLOT(onKeyReleased(QKeyEvent*)));
-  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), myOperationMgr,
-          SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
-  connect(myOperationMgr, SIGNAL(activateNextWidget(ModuleBase_ModelWidget*)), myPropertyPanel,
-          SLOT(onActivateNextWidget(ModuleBase_ModelWidget*)));
   connect(myOperationMgr, SIGNAL(operationValidated(bool)), myPropertyPanel,
           SLOT(setAcceptEnabled(bool)));
 
@@ -1076,7 +1087,7 @@ void XGUI_Workshop::salomeViewerSelectionChanged()
 }
 
 //**************************************************************
-XGUI_SalomeViewer* XGUI_Workshop::salomeViewer() const
+ModuleBase_IViewer* XGUI_Workshop::salomeViewer() const
 {
   return mySalomeConnector->viewer();
 }

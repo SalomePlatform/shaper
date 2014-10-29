@@ -31,6 +31,7 @@ class XGUI_ModuleConnector;
 
 class ModuleBase_Operation;
 class ModuleBase_IModule;
+class ModuleBase_IViewer;
 
 class Config_FeatureMessage;
 class Config_PointerMessage;
@@ -113,7 +114,7 @@ Q_OBJECT
   }
 
   //! Provides an object which provides interface to Salome Viewer
-  XGUI_SalomeViewer* salomeViewer() const;
+  ModuleBase_IViewer* salomeViewer() const;
 
   //! Returns true if the application works as SALOME module
   bool isSalomeMode() const

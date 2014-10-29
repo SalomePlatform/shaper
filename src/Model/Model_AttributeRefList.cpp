@@ -26,7 +26,7 @@ void Model_AttributeRefList::remove(ObjectPtr theObject)
   owner()->data()->sendAttributeUpdated(this);
 }
 
-int Model_AttributeRefList::size()
+int Model_AttributeRefList::size() const
 {
   return myRef->Extent();
 }
@@ -44,6 +44,21 @@ list<ObjectPtr> Model_AttributeRefList::list()
     }
   }
   return aResult;
+}
+
+ObjectPtr Model_AttributeRefList::object(const int theIndex) const
+{
+  boost::shared_ptr<Model_Document> aDoc = boost::dynamic_pointer_cast<Model_Document>(
+      owner()->document());
+  if (aDoc) {
+    const TDF_LabelList& aList = myRef->List();
+    int anIndex = 0;
+    for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next(), anIndex++) {
+      if (anIndex == theIndex)
+        return aDoc->object(aLIter.Value());
+    }
+  }
+  return ObjectPtr();
 }
 
 Model_AttributeRefList::Model_AttributeRefList(TDF_Label& theLabel)

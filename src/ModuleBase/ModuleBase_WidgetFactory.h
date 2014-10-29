@@ -48,8 +48,12 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
   QWidget* point2dDistanceControl(QWidget* theParent);
   QWidget* fileSelectorControl(QWidget* theParent);
   QWidget* choiceControl(QWidget* theParent);
+  QWidget* lineEditControl(QWidget* theParent);
+  QWidget* multiSelectorControl(QWidget* theParent);
+
 
   QString qs(const std::string& theStdString) const;
+  void processAttributes();
 
  private:
   Config_WidgetAPI* myWidgetApi;

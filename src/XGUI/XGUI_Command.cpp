@@ -49,6 +49,7 @@ QWidget* XGUI_Command::createWidget(QWidget* theParent)
     QString aToolTip = toolTip();
     if (!aKeys.isEmpty()) {
       aToolTip = QString("%1 (%2)").arg(aToolTip).arg(aKeys.toString());
+      aButton->setShortcut(aKeys);
     }
     if (!aToolTip.isEmpty()) {
       aButton->setToolTip(aToolTip);

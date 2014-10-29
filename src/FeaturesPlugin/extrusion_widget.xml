@@ -5,8 +5,9 @@
     tooltip="Select a face for extrusion"
     activate="true"
     shape_types="face"
+    use_subshapes="true"
   />
-  <doublevalue id="extrusion_size" label="Size" min="0" step="1.0" default="10" icon=":icons/dimension_v.png" tooltip="Set size of extrusion">
+  <doublevalue id="extrusion_size" label="Size" min="0" step="1.0" default="1" icon=":icons/dimension_v.png" tooltip="Set size of extrusion">
     <validator id="GeomValidators_Positive"/>
   </doublevalue>
   <boolvalue id="extrusion_reverse" label="Reverse" default="false" tooltip="Reverse default direction"/>

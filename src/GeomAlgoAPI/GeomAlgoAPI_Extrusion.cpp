@@ -3,66 +3,155 @@
 // Author:      Artem ZHIDKOV
 
 #include <GeomAlgoAPI_Extrusion.h>
-
+#include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAlgoAPI_DFLoader.h>
+#include <GeomAlgoAPI_MakeShape.h>
 #include <gp_Pln.hxx>
-
 #include <BRepPrimAPI_MakePrism.hxx>
+#include <BRepBuilderAPI_MakeShape.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_Surface.hxx>
 #include <TopExp_Explorer.hxx>
-#include <BRep_Builder.hxx>
-
+#include <BRepCheck_Analyzer.hxx>
+#include <GProp_GProps.hxx>
+#include <BRepGProp.hxx>
+#include <TopoDS.hxx>
+#include <TopTools_ListIteratorOfListOfShape.hxx>
 #include <Precision.hxx>
+#include <TDF_TagSource.hxx>
+#include <boost/shared_ptr.hpp>
+#include <BRepPrimAPI_MakePrism.hxx>
+#include <TopoDS_Shape.hxx>
+
 const double tolerance = Precision::Angular();
-
-boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Extrusion::makeExtrusion(
-    boost::shared_ptr<GeomAPI_Shape> theShape, boost::shared_ptr<GeomAPI_Dir> theDir,
-    double theSize)
+// Constructor
+GeomAlgoAPI_Extrusion::GeomAlgoAPI_Extrusion(
+  boost::shared_ptr<GeomAPI_Shape> theBasis, double theSize)
+: mySize(theSize), myDone(false), myShape(new GeomAPI_Shape()),
+  myFirst(new GeomAPI_Shape()), myLast(new GeomAPI_Shape())
 {
-  const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
-  gp_Vec aDir(theDir->impl<gp_Dir>().XYZ() * theSize);
-
-  TopoDS_Shape aPrism = BRepPrimAPI_MakePrism(aShape, aDir);
-  if (aPrism.IsNull())
-    return boost::shared_ptr<GeomAPI_Shape>();
-
-  boost::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape());
-  aResult->setImpl(new TopoDS_Shape(aPrism));
-  return aResult;
+  build(theBasis);
 }
 
-boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Extrusion::makeExtrusion(
-    boost::shared_ptr<GeomAPI_Shape> theShape, double theSize)
+//============================================================================
+void GeomAlgoAPI_Extrusion::build(const boost::shared_ptr<GeomAPI_Shape>& theBasis)
 {
   bool isFirstNorm = true;
   gp_Dir aShapeNormal;
 
-  const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
-  TopExp_Explorer aFaceExp(aShape, TopAbs_FACE);
-  TopoDS_Compound aFaces; // use only faces from the shape: make compound for this
-  BRep_Builder aBuilder;
-  aBuilder.MakeCompound(aFaces);
-  for (; aFaceExp.More(); aFaceExp.Next()) {
-    const TopoDS_Face& aFace = (const TopoDS_Face&) aFaceExp.Current();
-    Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(BRep_Tool::Surface(aFace));
-    if (aPlane.IsNull())  // non-planar shapes is not supported for extrusion yet
-      continue;
+  TopoDS_Face aBasis = TopoDS::Face(theBasis->impl<TopoDS_Shape>());
+  Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(
+    BRep_Tool::Surface(aBasis));
+  if (aPlane.IsNull())  // non-planar shapes is not supported for extrusion yet
+    return;
 
-    const gp_Dir& aNormal = aPlane->Pln().Axis().Direction();
-    if (isFirstNorm) {
-      aShapeNormal = aNormal;
-      isFirstNorm = false;
-    } else if (!aShapeNormal.IsEqual(aNormal, tolerance))  // non-planar shapes is not supported for extrusion yet
-      return boost::shared_ptr<GeomAPI_Shape>();
-    aBuilder.Add(aFaces, aFace);
+  const gp_Dir& aNormal = aPlane->Pln().Axis().Direction();  
+  gp_Vec aVec(aNormal);
+  aVec = aVec * mySize;
+
+  BRepPrimAPI_MakePrism* aBuilder = new BRepPrimAPI_MakePrism(aBasis, aVec);
+  if(aBuilder) {
+    setImpl(aBuilder);
+    myDone = aBuilder->IsDone() == Standard_True;
+    if (myDone) {
+      BRepCheck_Analyzer aChecker(aBuilder->Shape());
+      myDone = aChecker.IsValid() == Standard_True;
+    }
+    if(myDone) {
+      TopoDS_Shape aResult;
+      if(aBuilder->Shape().ShapeType() == TopAbs_COMPOUND) 
+        aResult = GeomAlgoAPI_DFLoader::refineResult(aBuilder->Shape());
+      else
+        aResult = aBuilder->Shape();
+	
+	for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
+	   boost::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+       aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
+	   myMap.bind(aCurrentShape, aCurrentShape);
+	}   
+ 
+      myShape->setImpl(new TopoDS_Shape(aResult));
+      myFirst->setImpl(new TopoDS_Shape(aBuilder->FirstShape()));
+      myLast->setImpl(new TopoDS_Shape(aBuilder-> LastShape()));
+	  myMkShape = new GeomAlgoAPI_MakeShape (aBuilder);
+    }
+  }	
+}
+
+//============================================================================
+const bool GeomAlgoAPI_Extrusion::isDone() const
+{return myDone;}
+
+//============================================================================
+const bool GeomAlgoAPI_Extrusion::isValid() const
+{
+  return myDone;
+}
+
+//============================================================================
+const bool GeomAlgoAPI_Extrusion::hasVolume() const
+{
+  bool hasVolume(false);
+  if(isValid()) {
+    const TopoDS_Shape& aRShape = myShape->impl<TopoDS_Shape>();
+    GProp_GProps aGProp;
+    BRepGProp::VolumeProperties(aRShape, aGProp);
+    if(aGProp.Mass() > Precision::Confusion()) 
+      hasVolume = true;	
   }
-  if (aFaces.IsNull())
-    return boost::shared_ptr<GeomAPI_Shape>();
+  return hasVolume;
+}
 
-  boost::shared_ptr<GeomAPI_Dir> aDir(
-      new GeomAPI_Dir(aShapeNormal.X(), aShapeNormal.Y(), aShapeNormal.Z()));
+//============================================================================
+const boost::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::shape () const 
+{return myShape;}
 
-  boost::shared_ptr<GeomAPI_Shape> aFacesShape(new (GeomAPI_Shape));
-  aFacesShape->setImpl(new TopoDS_Shape(aFaces));
-  return GeomAlgoAPI_Extrusion::makeExtrusion(aFacesShape, aDir, theSize);
+//============================================================================
+/*void GeomAlgoAPI_Extrusion::generated(
+  const boost::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory)
+{
+  theHistory.clear();
+  if(myDone) {
+    const TopTools_ListOfShape& aList = implPtr<BRepPrimAPI_MakePrism>()
+      ->Generated(theShape->impl<TopoDS_Shape>());
+    TopTools_ListIteratorOfListOfShape it(aList);
+    for(;it.More();it.Next()) {
+      boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+      aShape->setImpl(&(it.Value()));
+      theHistory.push_back(aShape);
+    }
+  }
+}
+*/
+//============================================================================
+const boost::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::firstShape()
+{
+  return myFirst;
+}
+
+//============================================================================
+const boost::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::lastShape()
+{
+  return myLast;
+}
+
+//============================================================================
+void GeomAlgoAPI_Extrusion::mapOfShapes (GeomAPI_DataMapOfShapeShape& theMap) const
+{
+  theMap = myMap;
+}
+
+//============================================================================
+GeomAlgoAPI_MakeShape * GeomAlgoAPI_Extrusion::makeShape() const
+{
+  return myMkShape;
+}
+
+//============================================================================
+GeomAlgoAPI_Extrusion::~GeomAlgoAPI_Extrusion()
+{
+  if (myImpl) {    
+	myMap.clear();
+	//delete myImpl;
+  }
 }

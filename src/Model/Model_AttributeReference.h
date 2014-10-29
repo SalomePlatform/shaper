@@ -35,6 +35,7 @@ protected:
   MODEL_EXPORT Model_AttributeReference(TDF_Label& theLabel);
 
   friend class Model_Data;
+  friend class Model_AttributeSelection;
 };
 
 #endif

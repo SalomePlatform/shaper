@@ -26,6 +26,7 @@
 #include <map>
 #include <list>
 #include <string>
+#include <set>
 
 class ModelAPI_Attribute;
 
@@ -44,6 +45,9 @@ class Model_Data : public ModelAPI_Data
   /// needed here to emit signal that object changed on change of the attribute
   ObjectPtr myObject;
 
+  /// List of attributes referenced to owner (updated only during the transaction change)
+  std::set<AttributePtr> myRefsToMe;
+
   Model_Data();
 
   /// Returns label of this feature
@@ -53,9 +57,11 @@ class Model_Data : public ModelAPI_Data
   }
 
   friend class Model_Document;
+  friend class Model_Update;
   friend class Model_AttributeReference;
   friend class Model_AttributeRefAttr;
   friend class Model_AttributeRefList;
+  friend class Model_AttributeSelection;
 
  public:
   /// Returns the name of the feature visible by the user in the object browser
@@ -72,6 +78,12 @@ class Model_Data : public ModelAPI_Data
   /// Returns the attribute that contains reference to a feature
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeReference>
     reference(const std::string& theID);
+  /// Returns the attribute that contains selection to a shape
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeSelection>
+    selection(const std::string& theID);
+  /// Returns the attribute that contains selection to a shape
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeSelectionList> 
+    selectionList(const std::string& theID);
   /// Returns the attribute that contains reference to an attribute of a feature
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeRefAttr>
     refattr(const std::string& theID);
@@ -137,8 +149,19 @@ class Model_Data : public ModelAPI_Data
   /// Returns true if feature must be updated (re-executed) on rebuild
   MODEL_EXPORT virtual bool mustBeUpdated();
 
-  /// Returns true if this data attributes are referenced to the given feature or its results
-  MODEL_EXPORT virtual bool referencesTo(const boost::shared_ptr<ModelAPI_Feature>& theFeature);
+  /// Returns the identifier of feature-owner, unique in this document
+  MODEL_EXPORT virtual int featureId() const;
+
+private:
+  // removes all information about back references
+  void eraseBackReferences();
+  // adds a back reference (with identifier which attribute references to this object
+  void addBackReference(FeaturePtr theFeature, std::string theAttrID);
+  // returns all objects referenced to this
+  const std::set<AttributePtr>& refsToMe() {return myRefsToMe;}
+  // returns all references by attributes of this data
+  // \param the returned list of pairs: id of referenced attribute and list of referenced objects
+  void referencesToObjects(std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs);
 };
 
 #endif

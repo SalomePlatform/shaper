@@ -58,8 +58,16 @@ Q_OBJECT
   //! Returns list of nested actions according to the given command ID
   virtual QStringList nestedActions(const QString& theId) const;
 
+  //! Set the document kind of the action by the given command Id
+  //! \param theId - the command ID
+  //! \param theKind - the document kind
+  virtual void setDocumentKind(const QString& theId, const QString& theKind);
+
+  //! Returns the document kind of the action by the given command ID
+  virtual QString documentKind(const QString& theId) const;
+
   //! Returns interface to Salome viewer
-  virtual XGUI_SalomeViewer* viewer() const
+  virtual ModuleBase_IViewer* viewer() const
   {
     return myProxyViewer;
   }
@@ -85,6 +93,7 @@ Q_OBJECT
 
  protected slots:
   virtual void onViewManagerAdded(SUIT_ViewManager* theMgr);
+  void onDefaultPreferences();
 
  protected:
   CAM_DataModel* createDataModel();
@@ -101,8 +110,11 @@ Q_OBJECT
   NewGeom_SalomeViewer* myProxyViewer;
 
   QMap<QString, QStringList> myNestedActions;
+  QMap<QString, QString> myDocumentType;
 
   bool myIsOpened;
+  bool myIsStorePositions;
+
 };
 
 #endif

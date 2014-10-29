@@ -1,8 +1,7 @@
-#ifndef XGUI_SALOMEVIEWER_H
-#define XGUI_SALOMEVIEWER_H
+#ifndef ModuleBase_IViewer_H
+#define ModuleBase_IViewer_H
 
-#include "XGUI.h"
-
+#include "ModuleBase.h"
 #include <QObject>
 #include <AIS_InteractiveContext.hxx>
 #include <V3d_View.hxx>
@@ -15,11 +14,11 @@ class QContextMenuEvent;
  * A Base object for definition of connector object to
  * Salome Viewer. Reimplemented in NewGeom_SalomeViewer class
  */
-class XGUI_EXPORT XGUI_SalomeViewer : public QObject
+class MODULEBASE_EXPORT ModuleBase_IViewer : public QObject
 {
 Q_OBJECT
  public:
-  XGUI_SalomeViewer(QObject* theParent)
+  ModuleBase_IViewer(QObject* theParent)
       : QObject(theParent)
   {
   }
@@ -47,6 +46,13 @@ Q_OBJECT
 
   //! Perfroms the fit all for the active view
   virtual void fitAll() = 0;
+
+  //! Sets the view projection
+  /// \param theX the X projection value
+  /// \param theY the Y projection value
+  /// \param theZ the Z projection value
+  virtual void setViewProjection(double theX, double theY, double theZ) = 0;
+
 
 signals:
   void lastViewClosed();

@@ -15,7 +15,7 @@
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint parallelism of two lines
  *
- *  These constraint has two attributes:
+ *  This constraint has two attributes:
  *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
 class SketchPlugin_ConstraintParallel : public SketchPlugin_ConstraintBase

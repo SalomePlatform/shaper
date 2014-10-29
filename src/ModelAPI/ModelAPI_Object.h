@@ -34,7 +34,7 @@ class ModelAPI_Object
   }
 
   /// Returns the data manager of this object: attributes
-  virtual boost::shared_ptr<ModelAPI_Data> data()
+  virtual boost::shared_ptr<ModelAPI_Data> data() const
   {
     return myData;
   }
@@ -46,13 +46,16 @@ class ModelAPI_Object
   }
 
   /// Returns document this feature belongs to
-  virtual boost::shared_ptr<ModelAPI_Document> document()
+  virtual boost::shared_ptr<ModelAPI_Document> document() const
   {
     return myDoc;
   }
 
   /// Returns the group identifier of this object
   virtual std::string groupName() = 0;
+
+  /// To use virtuality for destructors
+  virtual ~ModelAPI_Object() {}
 
  protected:
   /// Sets the data manager of an object (document does)

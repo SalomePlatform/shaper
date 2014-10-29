@@ -11,14 +11,16 @@ SketchPlugin_Feature::SketchPlugin_Feature()
   mySketch = 0;
 }
 
+/*
 SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
 {
   if (!mySketch) {
     // find sketch that references to this feature
     int aSketches = document()->size(ModelAPI_Feature::group());
     for (int a = 0; a < aSketches && !mySketch; a++) {
-      boost::shared_ptr<SketchPlugin_Sketch> aSketch = boost::dynamic_pointer_cast<
-          SketchPlugin_Sketch>(document()->object(ModelAPI_Feature::group(), a));
+      ObjectPtr anObj = document()->object(ModelAPI_Feature::group(), a);
+      boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
+        boost::dynamic_pointer_cast<SketchPlugin_Sketch>(anObj);
       if (aSketch) {
         std::list<ObjectPtr> aList = aSketch->data()->reflist(SketchPlugin_Sketch::FEATURES_ID())
             ->list();
@@ -33,7 +35,7 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
     }
   }
   return mySketch;
-}
+}*/
 
 AISObjectPtr SketchPlugin_Feature::simpleAISObject(boost::shared_ptr<ModelAPI_Result> theRes,
                                                    AISObjectPtr thePrevious)

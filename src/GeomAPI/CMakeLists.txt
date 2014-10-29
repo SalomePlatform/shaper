@@ -19,9 +19,11 @@ SET(PROJECT_HEADERS
     GeomAPI_Pln.h
     GeomAPI_Shape.h
     GeomAPI_Edge.h
+    GeomAPI_PlanarEdges.h
     GeomAPI_AISObject.h
     GeomAPI_IPresentable.h
     GeomAPI_Curve.h 
+    GeomAPI_DataMapOfShapeShape.h
 )
 
 SET(PROJECT_SOURCES
@@ -39,8 +41,10 @@ SET(PROJECT_SOURCES
     GeomAPI_Pln.cpp
     GeomAPI_Shape.cpp
     GeomAPI_Edge.cpp
+    GeomAPI_PlanarEdges.cpp
     GeomAPI_AISObject.cpp
     GeomAPI_Curve.cpp
+    GeomAPI_DataMapOfShapeShape.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -48,6 +52,7 @@ SET(PROJECT_LIBRARIES
     ${CAS_MODELER} 
     ${CAS_VIEWER}
     ${CAS_SHAPE}
+    ${CAS_TKTopAlgo}
 )
 
 ADD_DEFINITIONS(-DGEOMAPI_EXPORTS ${CAS_DEFINITIONS})

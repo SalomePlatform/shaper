@@ -20,6 +20,8 @@ const static char* NODE_VALIDATOR = "validator";
 //Widgets
 const static char* WDG_DOUBLEVALUE = "doublevalue";
 const static char* WDG_BOOLVALUE = "boolvalue";
+const static char* WDG_STRINGVALUE = "stringvalue";
+const static char* WDG_MULTISELECTOR = "multi_selector";
 //Widget containers
 const static char* WDG_INFO = "label";
 const static char* WDG_GROUP = "groupbox";
@@ -48,13 +50,16 @@ const static char* FEATURE_ICON = "icon";
 const static char* FEATURE_TEXT = "title";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
 const static char* FEATURE_NESTED = "nested";
-const static char* FEATURE_INTERNAL = "internal";
-const static char* FEATURE_OBLIGATORY = "obligatory";
+
+const static char* ATTRIBUTE_INTERNAL = "internal";
+const static char* ATTRIBUTE_OBLIGATORY = "obligatory";
+const static char* ATTRIBUTE_CONCEALMENT = "concealment";
 // TODO: Rename
 const static char* PREVIOUS_FEATURE_PARAM = "previous_feature_param";
 const static char* ANY_WDG_TOOLTIP = FEATURE_TOOLTIP;
 const static char* ANY_WDG_ICON = FEATURE_ICON;
 const static char* ANY_WDG_LABEL = "label";
+const static char* ANY_WDG_DEFAULT = "default";
 
 const static char* SOURCE_FILE = "path";
 const static char* VALIDATOR_PARAMETERS = "parameters";
@@ -65,7 +70,6 @@ const static char* INFO_WDG_TOOLTIP = FEATURE_TOOLTIP;
 const static char* DOUBLE_WDG_MIN = "min";
 const static char* DOUBLE_WDG_MAX = "max";
 const static char* DOUBLE_WDG_STEP = "step";
-const static char* DOUBLE_WDG_DEFAULT = "default";
 const static char* DOUBLE_WDG_DEFAULT_COMPUTED = "computed";
 
 //toolbox/switch properties

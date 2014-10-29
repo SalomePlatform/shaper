@@ -92,7 +92,7 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theNode,
 
 bool Config_FeatureReader::isInternalFeature(xmlNodePtr theNode)
 {
-  std::string prop = getProperty(theNode, FEATURE_INTERNAL);
+  std::string prop = getProperty(theNode, ATTRIBUTE_INTERNAL);
   std::transform(prop.begin(), prop.end(), prop.begin(), ::tolower);
   if (prop.empty() || prop == "false" || prop == "0") {
     return false;

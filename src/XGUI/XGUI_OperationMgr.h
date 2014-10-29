@@ -70,7 +70,7 @@ Q_OBJECT
 
 signals:
   /// Signal about an operation is started. It is emitted after the start() of operation is done.
-  void operationStarted();
+  void operationStarted(ModuleBase_Operation* theOperation);
   /// Signal about an operation is stopped. It is emitted after the stop() of operation is done.
   /// \param theOperation a stopped operation
   void operationStopped(ModuleBase_Operation* theOperation);
@@ -78,9 +78,6 @@ signals:
   void operationResumed();
   /// Signal is emitted after the validate methods calls.
   void operationValidated(bool);
-  /// Signal about the necessety of the next widget activating
-  /// \param theWidget the model widget
-  void activateNextWidget(ModuleBase_ModelWidget* theWidget);
 
  protected:
 
@@ -108,14 +105,11 @@ signals:
   /// \param theEvent the mouse event
   bool onKeyReleased(QKeyEvent* theEvent);
 
-  /// SLOT, that reacts to the widget activation
-  /// \param theWidget an activated widget
-  void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
-
   protected slots:
   /// Slot that is called by an operation stop. Removes the stopped operation form the stack.
   /// If there is a suspended operation, restart it.
   void onOperationStopped();
+  void onOperationStarted();
 
  private:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations

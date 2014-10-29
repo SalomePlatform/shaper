@@ -8,7 +8,10 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 #include <ModuleBase_WidgetFileSelector.h>
+#include <ModuleBase_Tools.h>
 
 #include <Config_WidgetAPI.h>
 
@@ -30,13 +33,11 @@ ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
     : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   myTitle = QString::fromStdString(theData->getProperty("title"));
-  //TODO(sbh): Get them from the feature
-  myFormats = getSupportedFormats(theData);
   myDefaultPath = QString::fromStdString(theData->getProperty("path"));
 
   myMainWidget = new QWidget(theParent);
   QGridLayout* aMainLay = new QGridLayout(myMainWidget);
-  aMainLay->setContentsMargins(0, 0, 0, 0);
+  ModuleBase_Tools::adjustMargins(aMainLay);
   QLabel* aTitleLabel = new QLabel(myTitle, myMainWidget);
   aTitleLabel->setIndent(1);
   aMainLay->addWidget(aTitleLabel, 0, 0);
@@ -63,6 +64,9 @@ ModuleBase_WidgetFileSelector::~ModuleBase_WidgetFileSelector()
 
 bool ModuleBase_WidgetFileSelector::storeValue() const
 {
+  // A rare case when plugin was not loaded. 
+  if(!myFeature)
+    return false;
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
   QString aWidgetValue = myPathField->text();
@@ -73,6 +77,9 @@ bool ModuleBase_WidgetFileSelector::storeValue() const
 
 bool ModuleBase_WidgetFileSelector::restoreValue()
 {
+  // A rare case when plugin was not loaded. 
+  if(!myFeature)
+    return false;
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
 
@@ -100,13 +107,13 @@ QList<QWidget*> ModuleBase_WidgetFileSelector::getControls() const
 bool ModuleBase_WidgetFileSelector::isCurrentPathValid()
 {
   QFileInfo aFile (myPathField->text());
-  return aFile.exists() && myFormats.contains(aFile.suffix(), Qt::CaseInsensitive);
+  return aFile.exists();
 }
 
 
 void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
 {
-  QString aFilter = formatsString(myFormats);
+  QString aFilter = formatsString();
   QString aFileName = QFileDialog::getOpenFileName(myMainWidget, myTitle, myDefaultPath, aFilter);
   if (!aFileName.isEmpty()) {
     myPathField->setText(aFileName);
@@ -121,20 +128,40 @@ void ModuleBase_WidgetFileSelector::onPathChanged()
   emit valuesChanged();
 }
 
-QStringList ModuleBase_WidgetFileSelector::getSupportedFormats(const Config_WidgetAPI* theData) const
-{
-  QString aXMLFormat = QString::fromStdString(theData->getProperty("formats"));
-  aXMLFormat = aXMLFormat.toUpper();
-  const QChar kSep = ',';
-  return aXMLFormat.split(kSep, QString::SkipEmptyParts);
-}
-
-QString ModuleBase_WidgetFileSelector::formatsString(const QStringList theFormats) const
+QString ModuleBase_WidgetFileSelector::formatsString() const
 {
   QStringList aResult;
-  foreach(QString eachFormat, theFormats)  {
+  QStringList aValidatorFormats = getValidatorFormats();
+
+  foreach(QString eachFormat, aValidatorFormats)  {
     aResult << QString("%1 files (*.%1)").arg(eachFormat);
   }
+  aResult << QString("All files (*.*)");
   return aResult.join(";;");
 }
 
+QStringList ModuleBase_WidgetFileSelector::getValidatorFormats() const
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  std::list<ModelAPI_Validator*> allValidators;
+  std::list<std::list<std::string> > allArguments;
+  aFactory->validators(myFeature->getKind(), myAttributeID, allValidators, allArguments);
+  //TODO(sbh): extract as separate method
+  if(allArguments.empty())
+    return QStringList();
+  std::list<std::string> anArgumentList = allArguments.front();
+  std::list<std::string>::const_iterator it = anArgumentList.begin();
+  QStringList aResult;
+  for (; it != anArgumentList.end(); ++it) {
+    std::string anArg = *it;
+    int aSepPos = anArg.find(":");
+    if (aSepPos == std::string::npos) {
+      continue;
+    }
+    QString aFormat = QString::fromStdString(anArg.substr(0, aSepPos));
+    aFormat = aFormat.toUpper();
+    aResult.append(aFormat);
+  }
+  return aResult;
+}

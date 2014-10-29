@@ -9,6 +9,7 @@
 #include "ModuleBase_ModelWidget.h"
 
 #include <ModelAPI_Object.h>
+#include <GeomAPI_Shape.h>
 
 #include <TopAbs_ShapeEnum.hxx>
 
@@ -26,6 +27,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetShapeSelector : public ModuleBase_Model
 {
 Q_OBJECT
  public:
+  static TopAbs_ShapeEnum shapeType(const QString& theType);
+
   ModuleBase_WidgetShapeSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
                             const Config_WidgetAPI* theData, const std::string& theParentId);
 
@@ -55,7 +58,12 @@ Q_OBJECT
     return mySelectedObject;
   }
 
- public slots:
+  /// Set the given wrapped value to the current widget
+  /// This value should be processed in the widget according to the needs
+  /// \param theValue the wrapped widget value
+  virtual bool setValue(ModuleBase_WidgetValue* theValue);
+
+public slots:
 
   /// Activate or deactivate selection
   void activateSelection(bool toActivate);
@@ -70,8 +78,10 @@ private:
   void updateSelectionName();
   void raisePanel() const;
   bool isAccepted(const ObjectPtr theObject) const;
+  bool isAccepted(boost::shared_ptr<GeomAPI_Shape> theShape) const;
 
-  static TopAbs_ShapeEnum shapeType(const QString& theType);
+  // Set the given object as a value of the widget
+  void setObject(ObjectPtr theObj, boost::shared_ptr<GeomAPI_Shape> theShape = boost::shared_ptr<GeomAPI_Shape>());
 
   QWidget* myContainer;
   QLabel* myLabel;
@@ -81,7 +91,12 @@ private:
   ModuleBase_IWorkshop* myWorkshop;
 
   ObjectPtr mySelectedObject;
+  boost::shared_ptr<GeomAPI_Shape> myShape;
+
   QStringList myShapeTypes;
+
+  /// If true then local selector has to be activated in context
+  bool myUseSubShapes;
 
   QPalette myBasePalet;
   QPalette myInactivePalet;

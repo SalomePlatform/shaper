@@ -20,8 +20,8 @@ if "%SALOME_ROOT_DIR%" == "" (
 
 if "%SOLVESPACE_ROOT_DIR%" == "" (
   SET SOLVESPACE_ROOT_DIR=%ROOT_DIR%\products\solvespace-2.0
-  SET PATH=%SOLVESPACE_ROOT_DIR%\lib;"%PATH%"
 )
+SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
 
 cd %SALOME_ROOT_DIR%\WORK
 call set_env.bat %1

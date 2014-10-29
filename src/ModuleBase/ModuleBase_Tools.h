@@ -7,21 +7,22 @@
 
 #include "ModuleBase.h"
 
-#include <ModelAPI_Result.h>
-#include <ModelAPI_Feature.h>
+#include <QWidget>
+#include <QLayout>
 
 class GeomAPI_Shape;
 
 namespace ModuleBase_Tools {
 
-/**
- * Returns returns a shape if the result has a shape method. Otherwise returns NULL pointer
+/*
+ * Methods to adjust margins and spacings.
  */
-MODULEBASE_EXPORT boost::shared_ptr<GeomAPI_Shape> shape(ResultPtr theResult);
+MODULEBASE_EXPORT void adjustMargins(QWidget* theWidget);
+MODULEBASE_EXPORT void adjustMargins(QLayout* theLayout);
 
-MODULEBASE_EXPORT FeaturePtr feature(ObjectPtr theObject);
+MODULEBASE_EXPORT void zeroMargins(QWidget* theWidget);
+MODULEBASE_EXPORT void zeroMargins(QLayout* theLayout);
 
 }
-;
 
 #endif

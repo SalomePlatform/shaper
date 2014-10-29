@@ -19,8 +19,8 @@ public:
   //! returns true if attribute is valid
   //! \param theAttribute the checked attribute
   //! \param theArguments arguments of the attribute
-  GEOMVALIDATORS_EXPORT virtual bool isValid(
-    const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const;
+  GEOMVALIDATORS_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
+                                             const std::list<std::string>& theArguments) const;
 
 };
 

@@ -19,10 +19,10 @@ XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
 {
 }
 
-std::list<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) const
+QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) const
 {
   std::set<ObjectPtr> aPrsFeatures;
-  std::list<ModuleBase_ViewerPrs> aPresentations;
+  QList<ModuleBase_ViewerPrs> aPresentations;
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
@@ -44,15 +44,15 @@ std::list<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSk
     }
     Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
     aPrs.setOwner(anOwner);
-    aPresentations.push_back(aPrs);
+    aPresentations.append(aPrs);
   }
   return aPresentations;
 }
 
-std::list<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeToSkip) const
+QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeToSkip) const
 {
   std::set<ObjectPtr> aPrsFeatures;
-  std::list<ModuleBase_ViewerPrs> aPresentations;
+  QList<ModuleBase_ViewerPrs> aPresentations;
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
@@ -111,13 +111,20 @@ void XGUI_Selection::selectedAISObjects(AIS_ListOfInteractive& theList) const
 }
 
 //**************************************************************
-void XGUI_Selection::selectedShapes(NCollection_List<TopoDS_Shape>& theList) const
+void XGUI_Selection::selectedShapes(NCollection_List<TopoDS_Shape>& theList, 
+                                    std::list<ObjectPtr>& theOwners) const
 {
   theList.Clear();
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
     TopoDS_Shape aShape = aContext->SelectedShape();
-    if (!aShape.IsNull())
+    if (!aShape.IsNull()) {
       theList.Append(aShape);
+      Handle(SelectMgr_EntityOwner) aEO = aContext->SelectedOwner();
+      Handle(AIS_InteractiveObject) anObj = 
+        Handle(AIS_InteractiveObject)::DownCast(aEO->Selectable());
+      ObjectPtr anObject = myWorkshop->displayer()->getObject(anObj);
+      theOwners.push_back(anObject);
+    }
   }
 }

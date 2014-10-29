@@ -22,6 +22,7 @@
 #include <AIS_PerpendicularRelation.hxx>
 #include <AIS_RadiusDimension.hxx>
 #include <AIS_Shape.hxx>
+#include <AIS_FixRelation.hxx>
 
 const double tolerance = 1e-7;
 
@@ -218,6 +219,30 @@ void GeomAPI_AISObject::createPerpendicular(boost::shared_ptr<GeomAPI_Shape> the
     }
   }
 }
+
+
+void GeomAPI_AISObject::createFixed(boost::shared_ptr<GeomAPI_Shape> theShape,
+                                    boost::shared_ptr<GeomAPI_Pln> thePlane)
+{
+  Handle(Geom_Plane) aPlane = new Geom_Plane(thePlane->impl<gp_Pln>());
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (anAIS.IsNull()) {
+    Handle(AIS_FixRelation) aFixPrs = 
+      new AIS_FixRelation(theShape->impl<TopoDS_Shape>(), aPlane);
+
+    setImpl(new Handle(AIS_InteractiveObject)(aFixPrs));
+  } else {
+    Handle(AIS_PerpendicularRelation) aFixPrs = 
+      Handle(AIS_PerpendicularRelation)::DownCast(anAIS);
+    if (!aFixPrs.IsNull()) {
+      aFixPrs->SetFirstShape(theShape->impl<TopoDS_Shape>());
+      aFixPrs->SetPlane(aPlane);
+      aFixPrs->Redisplay(Standard_True);
+    }
+  }
+}
+
+
 
 void GeomAPI_AISObject::setColor(const int& theColor)
 {

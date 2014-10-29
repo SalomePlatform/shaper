@@ -22,7 +22,12 @@
 #include <ModuleBase_WidgetChoice.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_Tools.h>
+#include <ModuleBase_WidgetLineEdit.h>
+#include <ModuleBase_WidgetMultiSelector.h>
+
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -53,6 +58,7 @@ ModuleBase_WidgetFactory::ModuleBase_WidgetFactory(const std::string& theXmlRepr
 
 ModuleBase_WidgetFactory::~ModuleBase_WidgetFactory()
 {
+  delete myWidgetApi;
 }
 
 void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
@@ -62,13 +68,12 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
     return;
 
   QVBoxLayout* aWidgetLay = new QVBoxLayout(theParent);
-  aWidgetLay->setContentsMargins(2, 2, 2, 2);
   do {  //Iterate over each node
     std::string aWdgType = myWidgetApi->widgetType();
     //Create a widget (doublevalue, groupbox, toolbox, etc.
     QWidget* aWidget = createWidgetByType(aWdgType, theParent);
     if (aWidget) {
-      if (!myWidgetApi->getBooleanAttribute(FEATURE_INTERNAL, false)) {
+      if (!myWidgetApi->getBooleanAttribute(ATTRIBUTE_INTERNAL, false)) {
         aWidgetLay->addWidget(aWidget);
       } else {
         aWidget->setVisible(false);
@@ -78,6 +83,7 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
       //if current widget is groupbox (container) process it's children recursively
       QString aGroupName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
       createWidget(aWidget);
+      ModuleBase_Tools::adjustMargins(aWidget);
       QGroupBox* aGrBox = qobject_cast<QGroupBox*>(aWidget);
       aGrBox->setTitle(aGroupName);
     }
@@ -88,6 +94,7 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
       do {
         QString aPageName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
         QWidget* aPage = new QWidget(aWidget);
+        ModuleBase_Tools::adjustMargins(aPage);
         createWidget(aPage);
         if (aWdgType == WDG_SWITCH) {
           ModuleBase_WidgetSwitch* aSwitch = qobject_cast<ModuleBase_WidgetSwitch*>(aWidget);
@@ -114,6 +121,25 @@ QWidget* ModuleBase_WidgetFactory::labelControl(QWidget* theParent)
   aLabelLay->addStretch(1);
   result->setLayout(aLabelLay);
   return result;
+}
+
+void ModuleBase_WidgetFactory::processAttributes()
+{
+  // register that this attribute in feature is not obligatory for the feature execution
+  // so, it is not needed for the standard validation mechanism
+  bool isObligatory = true;
+  bool isConcealment = false;
+  if( myWidgetApi ){
+    isObligatory = myWidgetApi->getBooleanAttribute(ATTRIBUTE_OBLIGATORY, true);
+    isConcealment = myWidgetApi->getBooleanAttribute(ATTRIBUTE_CONCEALMENT, false);
+  }
+  boost::shared_ptr<ModelAPI_Session> aSession = ModelAPI_Session::get();
+  if (!isObligatory) {
+    aSession->validators()->registerNotObligatory(myParentId, myWidgetApi->widgetId());
+  }
+  if(isConcealment) {
+    aSession->validators()->registerConcealment(myParentId, myWidgetApi->widgetId());
+  }
 }
 
 QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType,
@@ -153,6 +179,12 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   } else if (theType == WDG_CHOICE) {
     result = choiceControl(theParent);
 
+  } else if (theType == WDG_STRINGVALUE) {
+    result = lineEditControl(theParent);
+
+  } else if (theType == WDG_MULTISELECTOR) {
+    result = multiSelectorControl(theParent);
+
   } else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
     result = createContainer(theType, theParent);
   } else {
@@ -163,14 +195,7 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
 #endif
   }
   if (result) {
-    // register that this attribute in feature is not obligatory for the feature execution
-    // so, it is not needed for the standard validation mechanism
-    bool isObligatory = 
-      myWidgetApi ? myWidgetApi->getBooleanAttribute(FEATURE_OBLIGATORY, true) : true;
-    if (!isObligatory) {
-      ModelAPI_Session::get()->validators()->registerNotObligatory(
-        myParentId, myWidgetApi->widgetId());
-    }
+    processAttributes();
   }
 
   return result;
@@ -274,6 +299,22 @@ QWidget* ModuleBase_WidgetFactory::choiceControl(QWidget* theParent)
       new ModuleBase_WidgetChoice(theParent, myWidgetApi,myParentId);
   myModelWidgets.append(aChoiceWgt);
   return aChoiceWgt->getControl();
+}
+
+QWidget* ModuleBase_WidgetFactory::lineEditControl(QWidget* theParent)
+{
+  ModuleBase_WidgetLineEdit* aLineEditWgt =
+      new ModuleBase_WidgetLineEdit(theParent, myWidgetApi,myParentId);
+  myModelWidgets.append(aLineEditWgt);
+  return aLineEditWgt->getControl();
+}
+
+QWidget* ModuleBase_WidgetFactory::multiSelectorControl(QWidget* theParent)
+{
+  ModuleBase_WidgetMultiSelector* aMultiselectorWgt =
+      new ModuleBase_WidgetMultiSelector(theParent, myWorkshop, myWidgetApi,myParentId);
+  myModelWidgets.append(aMultiselectorWgt);
+  return aMultiselectorWgt->getControl();
 }
 
 QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const

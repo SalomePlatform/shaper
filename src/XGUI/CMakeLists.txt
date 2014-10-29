@@ -25,7 +25,6 @@ SET(PROJECT_HEADERS
     XGUI_SalomeConnector.h
     XGUI_ActionsMgr.h
     XGUI_ErrorDialog.h
-    XGUI_SalomeViewer.h
     XGUI_ViewerProxy.h
     XGUI_PropertyPanel.h
     XGUI_ContextMenuMgr.h
@@ -125,6 +124,7 @@ INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR}/src/Events
 					 ${PROJECT_SOURCE_DIR}/src/GeomAPI
 					 ${PROJECT_SOURCE_DIR}/src/ModuleBase
 					 ${PROJECT_SOURCE_DIR}/src/PartSetPlugin
+					 ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
 					 ${CAS_INCLUDE_DIRS}
 					 ${SUIT_INCLUDE})
 

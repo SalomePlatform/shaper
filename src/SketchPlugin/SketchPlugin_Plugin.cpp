@@ -10,6 +10,7 @@
 #include "SketchPlugin_ConstraintParallel.h"
 #include "SketchPlugin_ConstraintPerpendicular.h"
 #include "SketchPlugin_ConstraintRadius.h"
+#include "SketchPlugin_ConstraintRigid.h"
 #include "SketchPlugin_Validators.h"
 #include "SketchPlugin_ResultValidators.h"
 #include <ModelAPI_Session.h>
@@ -28,7 +29,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("SketchPlugin_DistanceAttr",
-                              new SketchPlugin_DistanceAttrValidator);
+                              new SketchPlugin_DistanceAttrValidator);  
   aFactory->registerValidator("SketchPlugin_DifferentObjects",
                               new SketchPlugin_DifferentObjectsValidator);
   aFactory->registerValidator("SketchPlugin_ResultPoint", new SketchPlugin_ResultPointValidator);
@@ -43,7 +44,7 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                                    SKETCH_PLANE_COLOR);
   Config_PropManager::registerProp("Sketch planes", "planes_size", "Size", Config_Prop::Double,
                                    PLANE_SIZE);
-  Config_PropManager::registerProp("Sketch planes", "planes_thikness", "Thickness",
+  Config_PropManager::registerProp("Sketch planes", "planes_thickness", "Thickness",
                                    Config_Prop::Integer, SKETCH_WIDTH);
 
   Config_PropManager::registerProp("Visualization", "parallel_color", "Parallel constraint color",
@@ -83,6 +84,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintPerpendicular);
   } else if (theFeatureID == SketchPlugin_ConstraintRadius::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintRadius);
+  } else if (theFeatureID == SketchPlugin_ConstraintRigid::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintRigid);
   }
   // feature of such kind is not found
   return FeaturePtr();

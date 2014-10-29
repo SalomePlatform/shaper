@@ -16,6 +16,9 @@
 #include <vector>
 #include <set>
 
+typedef std::map< boost::shared_ptr<SketchPlugin_Constraint>, std::vector<Slvs_hConstraint> >
+  ConstraintMap;
+
 /** \class   SketchSolver_ConstraintGroup
  *  \ingroup DataModel
  *  \brief   Keeps the group of constraints which based on the same entities
@@ -27,7 +30,7 @@ class SketchSolver_ConstraintGroup
    *         Throws an exception if theWorkplane is not an object of SketchPlugin_Sketch type
    *  \remark Type of theSketch is not verified inside
    */
-  SketchSolver_ConstraintGroup(boost::shared_ptr<SketchPlugin_Feature> theWorkplane);
+  SketchSolver_ConstraintGroup(boost::shared_ptr<ModelAPI_CompositeFeature> theWorkplane);
 
   ~SketchSolver_ConstraintGroup();
 
@@ -54,6 +57,7 @@ class SketchSolver_ConstraintGroup
    *  \return \c true if the constraint added or updated successfully
    */
   bool changeConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
+  bool changeRigidConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
   /** \brief Verifies the feature attributes are used in this group
    *  \param[in] theFeature constraint or any other object for verification of interaction
@@ -65,9 +69,9 @@ class SketchSolver_ConstraintGroup
    *  \param[in] theWorkplane the feature to be compared with base workplane
    *  \return \c true if workplanes are the same
    */
-  bool isBaseWorkplane(boost::shared_ptr<SketchPlugin_Feature> theWorkplane) const;
+  bool isBaseWorkplane(boost::shared_ptr<ModelAPI_CompositeFeature> theWorkplane) const;
 
-  boost::shared_ptr<SketchPlugin_Feature> getWorkplane() const
+  boost::shared_ptr<ModelAPI_CompositeFeature> getWorkplane() const
   {
     return mySketch;
   }
@@ -165,20 +169,26 @@ protected:
                        const Slvs_hEntity& theEntityID);
 
   /** \brief Adds a constraint for a point which should not be changed during computations
-   *  \param[in] theEntity the base for the constraint
+   *  \param[in] theEntity     the base for the constraint
+   *  \param[in] theAllowToFit this flag shows that the entity may be placed into 
+   *                           the 'dragged' field of SolveSpace solver, so this entity 
+   *                           may be changed a little during solution
    */
-  void addTemporaryConstraintWhereDragged(boost::shared_ptr<ModelAPI_Attribute> theEntity);
+  void addTemporaryConstraintWhereDragged(boost::shared_ptr<ModelAPI_Attribute> theEntity,
+                                          bool theAllowToFit = true);
 
   /** \brief Remove all temporary constraint after computation finished
+   *  \param[in] theRemoved  indexes of constraints to be removed. If empty, all temporary constraints should be deleted
    */
-  void removeTemporaryConstraints();
+  void removeTemporaryConstraints(const std::set<Slvs_hConstraint>& theRemoved =
+                                                                 std::set<Slvs_hConstraint>());
 
  private:
   /** \brief Creates a workplane from the sketch parameters
    *  \param[in] theSketch parameters of workplane are the attributes of this sketch
    *  \return \c true if success, \c false if workplane parameters are not consistent
    */
-  bool addWorkplane(boost::shared_ptr<SketchPlugin_Feature> theSketch);
+  bool addWorkplane(boost::shared_ptr<ModelAPI_CompositeFeature> theSketch);
 
   /** \brief Add the entities of constraint for points coincidence into the appropriate list
    *  \param[in] thePoint1 identifier of the first point
@@ -214,8 +224,8 @@ protected:
   std::list<Slvs_hConstraint> myTempConstraints;  ///< The list of identifiers of temporary constraints (SLVS_C_WHERE_DRAGGED) applied for all other points moved by user
 
   // SketchPlugin entities
-  boost::shared_ptr<SketchPlugin_Feature> mySketch;        ///< Equivalent to workplane
-  std::map<boost::shared_ptr<SketchPlugin_Constraint>, Slvs_hConstraint> myConstraintMap;  ///< The map between SketchPlugin and SolveSpace constraints
+  boost::shared_ptr<ModelAPI_CompositeFeature> mySketch;        ///< Equivalent to workplane
+  ConstraintMap myConstraintMap;  ///< The map between SketchPlugin and SolveSpace constraints
   std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity> myEntityAttrMap;  ///< The map between "attribute" parameters of constraints and their equivalent SolveSpace entities
   std::map<FeaturePtr, Slvs_hEntity> myEntityFeatMap;  ///< The map between "feature" parameters of constraints and their equivalent SolveSpace entities
 

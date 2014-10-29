@@ -6,6 +6,10 @@
 #include "SketchPlugin_Sketch.h"
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_Session.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <GeomDataAPI_Point2D.h>
@@ -13,7 +17,6 @@
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
-#include <ModelAPI_AttributeDouble.h>
 
 SketchPlugin_Circle::SketchPlugin_Circle()
     : SketchPlugin_Feature()
@@ -24,6 +27,8 @@ void SketchPlugin_Circle::initAttributes()
 {
   data()->addAttribute(SketchPlugin_Circle::CENTER_ID(), GeomDataAPI_Point2D::type());
   data()->addAttribute(SketchPlugin_Circle::RADIUS_ID(), ModelAPI_AttributeDouble::type());
+  data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 }
 
 void SketchPlugin_Circle::execute()
@@ -97,4 +102,8 @@ double SketchPlugin_Circle::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2
       aData->attribute(SketchPlugin_Circle::CENTER_ID()));
 
   return aPoint->pnt()->distance(thePoint);
+}
+
+bool SketchPlugin_Circle::isFixed() {
+  return data()->selection(EXTERNAL_ID())->context();
 }

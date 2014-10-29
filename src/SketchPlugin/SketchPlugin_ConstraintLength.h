@@ -16,7 +16,7 @@
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint which defines a length of a line segment
  *
- *  These constraint has two attributes:
+ *  This constraint has two attributes:
  *  SketchPlugin_Constraint::VALUE() (length) and SketchPlugin_Constraint::ENTITY_A() (segment),
  *  SketchPlugin_Constraint::FLYOUT_VALUE_PNT() (distance of a constraints handle)
  */

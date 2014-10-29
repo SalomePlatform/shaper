@@ -45,16 +45,17 @@ class Config_Prop
    * \param theSection - name of section (domain of using) of the property.
    * \param theName - name (title) of the value.
    * \param theType - type of the value.
-   * \param theValue - initial value of the property.
+   * \param theDefaultValue - default value of the property. This is an initial property value
    */
   Config_Prop(const std::string& theSection, const std::string& theName,
-              const std::string& theTitle, PropType theType, const std::string& theValue)
+              const std::string& theTitle, PropType theType, const std::string& theDefaultValue)
   {
     mySection = theSection;
     myName = theName;
     myTitle = theTitle;
     myType = theType;
-    myValue = theValue;
+    myValue = theDefaultValue;
+    myDefaultValue = theDefaultValue;
   }
 
   std::string section() const
@@ -90,6 +91,13 @@ class Config_Prop
   }
 
   CONFIG_EXPORT void setValue(const std::string& theValue);
+  
+  std::string defaultValue() const
+  {
+    return myDefaultValue;
+  }
+
+  CONFIG_EXPORT void setDefaultValue(const std::string& theValue);
 
   bool operator==(const Config_Prop* theProp) const
   {
@@ -102,6 +110,7 @@ class Config_Prop
   std::string myTitle;
   PropType myType;
   std::string myValue;
+  std::string myDefaultValue;
 };
 
 typedef std::list<Config_Prop*> Config_Properties;
