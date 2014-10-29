@@ -64,6 +64,8 @@ bool isContains(const QList<ModuleBase_ViewerPrs>& theSelected, const ModuleBase
 void PartSet_OperationFeatureEditMulti::initSelection(ModuleBase_ISelection* theSelection,
                                                       ModuleBase_IViewer* theViewer)
 {
+  // 1. unite selected and hightlighted objects in order to have an opportunity to drag
+  // by the highlighted object
   QList<ModuleBase_ViewerPrs> aFeatures;
   aFeatures = theSelection->getSelected();
   QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
@@ -73,8 +75,7 @@ void PartSet_OperationFeatureEditMulti::initSelection(ModuleBase_ISelection* the
       aFeatures.append(aPrs);
   }
 
-  // firstly iterate the operation presentations and move all features
-  // if there is no selected vertex shape for it. Create a set of moved features
+  // 1. find all features with skipping features with selected vertex shapes
   myFeature2Attribute.clear();
   // firstly, collect the features without local selection
   std::set<FeaturePtr> aMovedFeatures;
@@ -93,12 +94,15 @@ void PartSet_OperationFeatureEditMulti::initSelection(ModuleBase_ISelection* the
       FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
       if (aFeature && myFeature2Attribute.find(aFeature) == myFeature2Attribute.end()) {
         std::list<std::string> aList;
+        // using an empty list as a sign, that this feature should be moved itself
         myFeature2Attribute[aFeature] = aList;
       }
     }
   }
-  // secondly, collect the features with a local selection on them
+  // 2. collect the features with a local selection on them.
   // if the list already has this feature, the local selection is skipped
+  // that means that if the selection contains a feature and a feature with local selected point,
+  // the edit is performed for a full feature
   Handle(V3d_View) aView = theViewer->activeView();
   foreach (ModuleBase_ViewerPrs aPrs, aFeatures) {
     const TopoDS_Shape& aShape = aPrs.shape();
@@ -113,14 +117,13 @@ void PartSet_OperationFeatureEditMulti::initSelection(ModuleBase_ISelection* the
       if (!aFeature)
         continue;
       // if the feature is already moved, do nothing for this feature local selection
-
       if (myFeature2Attribute.find(aFeature) != myFeature2Attribute.end())
         continue;
 
+      // append the attribute of the vertex if it is found on the current feature
       gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
       double aVX, aVY;
       PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aVX, aVY);
-
       boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D = PartSet_Tools::getFeaturePoint(
                                                                     aFeature, aVX, aVY);
       std::string anAttribute = aFeature->data()->id(aPoint2D);
@@ -169,6 +172,7 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Module
     while (aFeatIter != myFeature2Attribute.end()) {
       FeaturePtr aFeature = aFeatIter->first;
       std::list<std::string> anAttributes = aFeatIter->second;
+      // perform edit for the feature
       if (anAttributes.empty()) {
         boost::shared_ptr<SketchPlugin_Feature> aSketchFeature =
                                        boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
@@ -176,6 +180,7 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Module
           aSketchFeature->move(aDeltaX, aDeltaY);
         }
       }
+      // perform edit for the feature's attribute
       else {
         std::list<std::string>::const_iterator anAttrIter = anAttributes.begin(),
                                                anAttrEnd = anAttributes.end();
