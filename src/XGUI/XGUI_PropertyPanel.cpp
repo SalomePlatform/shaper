@@ -57,6 +57,7 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   aBtn->setToolTip(tr("Cancel"));
   aBtn->setObjectName(XGUI::PROP_PANEL_CANCEL);
   aBtn->setFlat(true);
+  aBtn->setShortcut(QKeySequence(Qt::Key_Escape));
   aBtnLay->addWidget(aBtn);
 
   myCustomWidget = new QWidget(aContent);

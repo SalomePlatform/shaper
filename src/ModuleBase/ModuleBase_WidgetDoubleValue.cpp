@@ -19,7 +19,6 @@
 #include <QLayout>
 #include <QLabel>
 #include <QEvent>
-#include <QKeyEvent>
 #include <QTimer>
 
 #include <math.h>

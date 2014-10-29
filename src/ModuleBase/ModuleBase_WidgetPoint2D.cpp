@@ -23,7 +23,6 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QEvent>
-#include <QKeyEvent>
 
 #include <cfloat>
 #include <climits>
