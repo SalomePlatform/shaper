@@ -3,6 +3,8 @@
 
 #include <XGUI_Workshop.h>
 
+#include <ModelAPI_Session.h>
+
 #include <LightApp_Study.h>
 #include <CAM_Application.h>
 #include <SUIT_Tools.h>

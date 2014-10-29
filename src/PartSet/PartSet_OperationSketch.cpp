@@ -76,7 +76,6 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, ModuleBase_IVi
         std::string anOperationType =
             (aSelected.size() > 1) ?
                 PartSet_OperationFeatureEditMulti::Type() : PartSet_OperationFeatureEdit::Type();
-        //theViewer->enableSelection(false);
         restartOperation(anOperationType, aFeature);
       }
     } //else
@@ -88,12 +87,13 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, ModuleBase_IVi
 
 void PartSet_OperationSketch::selectionChanged(ModuleBase_ISelection* theSelection)
 {
-  if (hasSketchPlane())
+  if (hasSketchPlane()) 
     return;
 
   QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
   if (!aSelected.empty()) {
     ModuleBase_ViewerPrs aPrs = aSelected.first();
+    // We have to select a plane before any operation
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull())
       setSketchPlane(aShape);

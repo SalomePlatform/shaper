@@ -76,8 +76,7 @@ Q_OBJECT
   /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void initSelection(const QList<ModuleBase_ViewerPrs>& theSelected,
-                             const QList<ModuleBase_ViewerPrs>& theHighlighted);
+  virtual void initSelection(ModuleBase_ISelection* theSelection);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
@@ -88,7 +87,7 @@ Q_OBJECT
   /// \param theView a viewer to have the viewer the eye position
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection);
+  //virtual void mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection);
 
   /// Gives the current mouse point in the viewer
   /// \param theEvent the mouse event

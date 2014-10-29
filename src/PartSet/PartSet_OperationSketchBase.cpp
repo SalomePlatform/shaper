@@ -96,26 +96,3 @@ void PartSet_OperationSketchBase::restartOperation(const std::string& theType, O
 }
 
 
-
-void PartSet_OperationSketchBase::activateByPreselection()
-{
-  if (!myPropertyPanel)
-    return;
-  ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
-  if ((myPreSelection.size() > 0) && aActiveWgt) {
-    const ModuleBase_ViewerPrs& aPrs = myPreSelection.first();
-    ModuleBase_WidgetValueFeature aValue;
-    aValue.setObject(aPrs.object());
-    if (aActiveWgt->setValue(&aValue)) {
-      myPreSelection.removeOne(aPrs);
-      if(isValid()) {
-        //myActiveWidget = NULL;
-        commit();
-      } else {
-        myPropertyPanel->activateNextWidget();
-        //emit activateNextWidget(myActiveWidget);
-      }
-    }
-    // If preselection is enough to make a valid feature - apply it immediately
-  }
-}

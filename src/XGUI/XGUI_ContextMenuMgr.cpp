@@ -13,6 +13,7 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Session.h>
 
 #include <QAction>
 #include <QContextMenuEvent>

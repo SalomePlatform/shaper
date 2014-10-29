@@ -50,6 +50,10 @@ Q_OBJECT
   //! Returns data object by AIS
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
 
+  //! Select features clearing previous selection. 
+  //! If the list is empty then selection will be cleared
+  virtual void setSelected(const QList<ObjectPtr>& theFeatures);
+
   XGUI_Workshop* workshop() const { return myWorkshop; }
 
 private:

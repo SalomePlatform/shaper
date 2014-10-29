@@ -131,6 +131,25 @@ int SketchPlugin_Sketch::subFeatureId(const int theIndex) const
   return subFeature(theIndex)->data()->featureId();
 }
 
+bool SketchPlugin_Sketch::isSub(ObjectPtr theObject) const
+{
+  // check is this feature of result
+  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+  if (!aFeature) {
+    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aRes)
+      aFeature = document()->feature(aRes);
+  }
+  if (aFeature) {
+    list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
+    for(list<ObjectPtr>::iterator aSubIt = aSubs.begin(); aSubIt != aSubs.end(); aSubIt++) {
+      if (*aSubIt == aFeature)
+        return true;
+    }
+  }
+  return false;
+}
+
 boost::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, const double theY)
 {
   boost::shared_ptr<GeomDataAPI_Point> aC = boost::dynamic_pointer_cast<GeomDataAPI_Point>(

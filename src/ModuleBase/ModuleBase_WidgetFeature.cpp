@@ -21,6 +21,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_ResultValidator.h>
 #include <ModelAPI_RefAttrValidator.h>
+#include <ModelAPI_Session.h>
 
 #include <QWidget>
 #include <QLineEdit>

@@ -232,11 +232,8 @@ void XGUI_Displayer::setSelected(const QList<ObjectPtr>& theResults, const bool 
   aContext->ClearSelected();
   foreach(ObjectPtr aResult, theResults)
   {
-    if (myResult2AISObjectMap.find(aResult) == myResult2AISObjectMap.end())
-      continue;
-
-    AISObjectPtr anObj = myResult2AISObjectMap[aResult];
-    if (anObj) {
+    if (isVisible(aResult)) {
+      AISObjectPtr anObj = myResult2AISObjectMap[aResult];
       Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anAIS.IsNull())
         aContext->SetSelected(anAIS, false);

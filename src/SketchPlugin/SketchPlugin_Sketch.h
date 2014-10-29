@@ -126,6 +126,9 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_IPr
   /// Returns the sub-feature unique identifier in this composite feature by zero-base index
   SKETCHPLUGIN_EXPORT virtual int subFeatureId(const int theIndex) const;
 
+  /// Returns true if feature or reuslt belong to this composite feature as subs
+  SKETCHPLUGIN_EXPORT virtual bool isSub(ObjectPtr theObject) const;
+
   /// Construction result is allways recomuted on the fly
   SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
 

@@ -9,6 +9,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 #include <ModuleBase_WidgetFileSelector.h>
 #include <ModuleBase_Tools.h>
 

@@ -18,6 +18,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Session.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -310,9 +311,7 @@ void PartSet_Module::onRestartOperation(std::string theName, ObjectPtr theObject
     }
     ModuleBase_ISelection* aSelection = workshop()->selection();
     // Initialise operation with preliminary selection
-    QList<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-    QList<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-    aSketchOp->initSelection(aSelected, aHighlighted);
+    aSketchOp->initSelection(aSelection);
   } //else if (aFeature) {
     //anOperation->setFeature(aFeature);
     ////Deactivate result of current feature in order to avoid its selection
@@ -367,13 +366,14 @@ void PartSet_Module::setSketchingMode(const gp_Pln& thePln)
   // Clear standard selection modes
   aDisplayer->setSelectionModes(aModes);
   aDisplayer->openLocalContext();
-  // Get default selection modes
-  aModes = sketchSelectionModes(ObjectPtr());
-  aDisplayer->activateObjectsOutOfContext(aModes);
 
   // Set filter
   mySketchFilter = new ModuleBase_ShapeInPlaneFilter(thePln);
   aDisplayer->addSelectionFilter(mySketchFilter);
+
+  // Get default selection modes
+  aModes = sketchSelectionModes(ObjectPtr());
+  aDisplayer->activateObjectsOutOfContext(aModes);
 }
 
 void PartSet_Module::onFeatureConstructed(ObjectPtr theFeature, int theMode)

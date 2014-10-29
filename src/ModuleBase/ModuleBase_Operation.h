@@ -17,11 +17,11 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
-#include <List>
 
 class ModuleBase_ModelWidget;
 class ModuleBase_OperationDescription;
 class ModuleBase_IPropertyPanel;
+class ModuleBase_ISelection;
 
 class QKeyEvent;
 
@@ -117,12 +117,14 @@ Q_OBJECT
   /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void initSelection(const QList<ModuleBase_ViewerPrs>& theSelected,
-                             const QList<ModuleBase_ViewerPrs>& theHighlighted);
+  virtual void initSelection(ModuleBase_ISelection* theSelection);
 
   virtual void setPropertyPanel(ModuleBase_IPropertyPanel* theProp);
 
   ModuleBase_IPropertyPanel* propertyPanel() const { return myPropertyPanel; }
+
+  /// Activates widgets by preselection if it is accepted
+  virtual bool activateByPreselection();
 
 signals:
   void started();  /// the operation is started
@@ -204,9 +206,6 @@ signals:
 
   /// Returns pointer to the root document.
   boost::shared_ptr<ModelAPI_Document> document() const;
-
-  /// Activates widgets by preselection if it is accepted
-  virtual void activateByPreselection();
 
   /// Set value to the active widget
   /// \param theFeature the feature

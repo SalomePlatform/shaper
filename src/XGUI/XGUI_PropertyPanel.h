@@ -28,11 +28,14 @@ Q_OBJECT
   /// Returns main widget of the property panel, which children will be created
   /// by WidgetFactory using the XML definition
   QWidget* contentWidget();
+
   /// Brings back all widget created by widget factory for signal/slot
   /// connections and further processing
   void setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets);
+
   /// Returns all property panel's widget created by WidgetFactory
-  const QList<ModuleBase_ModelWidget*>& modelWidgets() const;
+  virtual const QList<ModuleBase_ModelWidget*>& modelWidgets() const;
+
   /// Removes all widgets in the widget area of the property panel
   void cleanContent();
 
