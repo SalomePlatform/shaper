@@ -17,7 +17,7 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
-#include <List>
+#include <list>
 
 class ModuleBase_ModelWidget;
 class ModuleBase_OperationDescription;
