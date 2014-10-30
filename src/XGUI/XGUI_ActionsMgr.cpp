@@ -115,9 +115,11 @@ void XGUI_ActionsMgr::setNestedCommandsEnabled(bool theEnabled, const QString& t
 
 void XGUI_ActionsMgr::setActionChecked(const QString& theId, const bool theChecked)
 {
-  QAction* anAction = myActions[theId];
-  if (anAction && anAction->isCheckable()) {
-    anAction->setChecked(theChecked);
+  if (myActions.contains(theId)) {
+    QAction* anAction = myActions[theId];
+    if (anAction->isCheckable()) {
+      anAction->setChecked(theChecked);
+    }
   }
 }
 
@@ -135,7 +137,7 @@ void XGUI_ActionsMgr::updateByDocumentKind()
     QString aCmdDocKind;
     if(aCmd) {
       aCmdDocKind = aCmd->documentKind();
-    } else if (eachAction) {
+    } else {
       QString aId = eachAction->data().toString();
       if (!aId.isEmpty()) {
         aCmdDocKind = aWorkshop->salomeConnector()->documentKind(aId);
@@ -149,9 +151,8 @@ void XGUI_ActionsMgr::updateByDocumentKind()
 
 void XGUI_ActionsMgr::setActionEnabled(const QString& theId, const bool theEnabled)
 {
-  QAction* anAction = myActions[theId];
-  if (anAction) {
-    anAction->setEnabled(theEnabled);
+  if (myActions.contains(theId)) {
+    myActions[theId]->setEnabled(theEnabled);
   }
 }
 

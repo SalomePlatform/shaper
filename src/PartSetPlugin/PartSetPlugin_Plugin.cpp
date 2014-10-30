@@ -21,10 +21,10 @@ FeaturePtr PartSetPlugin_Plugin::createFeature(string theFeatureID)
   if (theFeatureID == PartSetPlugin_Part::ID()) {
     return FeaturePtr(new PartSetPlugin_Part);
   }
-  if (theFeatureID == "duplicate") {
+  if (theFeatureID == PartSetPlugin_Duplicate::ID()) {
     return FeaturePtr(new PartSetPlugin_Duplicate);
   }
-  if (theFeatureID == "remove") {
+  if (theFeatureID == PartSetPlugin_Remove::ID()) {
     return FeaturePtr(new PartSetPlugin_Remove);
   }
   // feature of such kind is not found

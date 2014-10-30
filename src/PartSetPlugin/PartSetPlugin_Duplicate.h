@@ -14,6 +14,19 @@
 class PartSetPlugin_Duplicate : public PartSetPlugin_Part
 {
  public:
+    /// Duplicate kind
+  inline static const std::string& ID()
+  {
+    static const std::string MY_DUPLICATE_KIND("Duplicate");
+    return MY_DUPLICATE_KIND;
+  }
+  /// Returns the kind of a feature
+  PARTSETPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    static std::string MY_KIND = PartSetPlugin_Duplicate::ID();
+    return MY_KIND;
+  }
+
   /// the reference to copy: reference to the attribute
   inline static const std::string& ORIGIN_REF()
   {
