@@ -69,6 +69,11 @@ void SketchPlugin_Sketch::execute()
   for (; anIt != aLast; anIt++) {
     aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
     if (aFeature) {
+      // do not include the external edges into the result
+      if (aFeature->data()->attribute(SketchPlugin_Feature::EXTERNAL_ID())) {
+        if (aFeature->data()->selection(SketchPlugin_Feature::EXTERNAL_ID())->value())
+          continue;
+      }
 
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aRes = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = aRes.cbegin();
