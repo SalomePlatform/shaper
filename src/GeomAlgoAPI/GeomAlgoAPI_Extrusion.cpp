@@ -38,7 +38,6 @@ void GeomAlgoAPI_Extrusion::build(const boost::shared_ptr<GeomAPI_Shape>& theBas
 {
   bool isFirstNorm = true;
   gp_Dir aShapeNormal;
-
   TopoDS_Face aBasis = TopoDS::Face(theBasis->impl<TopoDS_Shape>());
   Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(
     BRep_Tool::Surface(aBasis));
@@ -53,29 +52,24 @@ void GeomAlgoAPI_Extrusion::build(const boost::shared_ptr<GeomAPI_Shape>& theBas
   if(aBuilder) {
     setImpl(aBuilder);
     myDone = aBuilder->IsDone() == Standard_True;
-    if (myDone) {
-      BRepCheck_Analyzer aChecker(aBuilder->Shape());
-      myDone = aChecker.IsValid() == Standard_True;
-    }
-    if(myDone) {
+    if (myDone) {       
       TopoDS_Shape aResult;
       if(aBuilder->Shape().ShapeType() == TopAbs_COMPOUND) 
         aResult = GeomAlgoAPI_DFLoader::refineResult(aBuilder->Shape());
       else
         aResult = aBuilder->Shape();
-	
-	for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
-	   boost::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
-       aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
-	   myMap.bind(aCurrentShape, aCurrentShape);
-	}   
- 
+	  // fill data map to keep correct orientation of sub-shapes 
+	  for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
+	    boost::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+        aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
+	    myMap.bind(aCurrentShape, aCurrentShape);
+	  }   
       myShape->setImpl(new TopoDS_Shape(aResult));
       myFirst->setImpl(new TopoDS_Shape(aBuilder->FirstShape()));
       myLast->setImpl(new TopoDS_Shape(aBuilder-> LastShape()));
 	  myMkShape = new GeomAlgoAPI_MakeShape (aBuilder);
-    }
-  }	
+	}  
+  }
 }
 
 //============================================================================
@@ -85,7 +79,8 @@ const bool GeomAlgoAPI_Extrusion::isDone() const
 //============================================================================
 const bool GeomAlgoAPI_Extrusion::isValid() const
 {
-  return myDone;
+	BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
+    return (aChecker.IsValid() == Standard_True);
 }
 
 //============================================================================
@@ -104,25 +99,10 @@ const bool GeomAlgoAPI_Extrusion::hasVolume() const
 
 //============================================================================
 const boost::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::shape () const 
-{return myShape;}
-
-//============================================================================
-/*void GeomAlgoAPI_Extrusion::generated(
-  const boost::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory)
 {
-  theHistory.clear();
-  if(myDone) {
-    const TopTools_ListOfShape& aList = implPtr<BRepPrimAPI_MakePrism>()
-      ->Generated(theShape->impl<TopoDS_Shape>());
-    TopTools_ListIteratorOfListOfShape it(aList);
-    for(;it.More();it.Next()) {
-      boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
-      aShape->setImpl(&(it.Value()));
-      theHistory.push_back(aShape);
-    }
-  }
+  return myShape;
 }
-*/
+
 //============================================================================
 const boost::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::firstShape()
 {
@@ -152,6 +132,5 @@ GeomAlgoAPI_Extrusion::~GeomAlgoAPI_Extrusion()
 {
   if (myImpl) {    
 	myMap.clear();
-	//delete myImpl;
   }
 }
