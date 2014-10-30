@@ -29,6 +29,9 @@
 
 #include <Events_Loop.h>
 
+#include <TopoDS.hxx>
+#include <TopoDS_Vertex.hxx>
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -256,6 +259,9 @@ bool ModuleBase_Operation::activateByPreselection()
     aPrs = (*aPIt);
     ModuleBase_WidgetValueFeature aValue;
     aValue.setObject(aPrs.object());
+    // Check if the selection has a selected point
+    // for today it is impossible to do because
+    // the selected point demands convertation to Sketch plane 2d
     if (!aWgt->setValue(&aValue))
       break;
   }
