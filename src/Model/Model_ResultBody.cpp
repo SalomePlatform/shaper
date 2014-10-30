@@ -111,6 +111,7 @@ void Model_ResultBody::clean()
   std::vector<TNaming_Builder*>::iterator aBuilder = myBuilders.begin();
   for(; aBuilder != myBuilders.end(); aBuilder++)
     delete *aBuilder;
+  myBuilders.clear();
 }
 
 Model_ResultBody::~Model_ResultBody()
