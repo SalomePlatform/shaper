@@ -78,6 +78,10 @@ Q_OBJECT
 
   void rebuildDataTree();
 
+  //! Clear internal data
+  void clear();
+
+
  private:
 
   enum
@@ -97,6 +101,9 @@ Q_OBJECT
 
   //! Deletes all saved pointers on QModelIndex objects.
   void clearModelIndexes();
+
+  //! Deletes all saved pointers on QModelIndex objects.
+  void clearSubModels();
 
   //! Removes sub-model on removing a part object. Also it removes QModelIndex-es which refer to this model
   void removeSubModel(int theModelId);

@@ -36,6 +36,9 @@ signals:
   //! Emited on context menu request
   void contextMenuRequested(QContextMenuEvent* theEvent);
 
+public slots:
+  virtual void clear();
+
  protected slots:
   virtual void commitData(QWidget* theEditor);
 
@@ -95,6 +98,9 @@ Q_OBJECT
   void rebuildDataTree();
 
   void processEvent(const boost::shared_ptr<Events_Message>& theMessage);
+
+  // Resets the object browser into initial state
+  void clearContent();
 
 signals:
   //! Emited when selection is changed
