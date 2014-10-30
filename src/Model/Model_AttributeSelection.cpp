@@ -91,8 +91,8 @@ bool Model_AttributeSelection::update()
     // body: just a named shape, use selection mechanism from OCCT
     TNaming_Selector aSelector(selectionLabel());
     TDF_LabelMap aScope; // empty means the whole document
+    owner()->data()->sendAttributeUpdated(this);
     return aSelector.Solve(aScope) == Standard_True;
-   
   } else if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
     // construction: identification by the results indexes, recompute faces and
     // take the face that more close by the indexes
@@ -171,6 +171,7 @@ bool Model_AttributeSelection::update()
       }
       if (aNewSelected) { // store this new selection
         selectConstruction(aContext, aNewSelected);
+        owner()->data()->sendAttributeUpdated(this);
         return true;
       }
     }

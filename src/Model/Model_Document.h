@@ -121,6 +121,9 @@ class Model_Document : public ModelAPI_Document
   /// Creates a part results
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultPart> createPart(
       const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+  /// Creates a group results
+  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultGroup> createGroup(
+      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
 
   //! Returns a feature by result (owner of result)
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature>
