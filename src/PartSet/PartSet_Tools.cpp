@@ -178,16 +178,24 @@ boost::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
   return ModelAPI_Session::get()->moduleDocument();
 }
 
-void PartSet_Tools::setFeaturePoint(FeaturePtr theFeature, double theX, double theY,
-                                    const std::string& theAttribute)
+boost::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::getFeaturePoint(FeaturePtr theFeature,
+                                                                      double theX, double theY)
 {
-  if (!theFeature)
-    return;
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(theAttribute));
-  if (aPoint)
-    aPoint->setValue(theX, theY);
+  boost::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = boost::shared_ptr<GeomAPI_Pnt2d>(
+                                                                 new GeomAPI_Pnt2d(theX, theY));
+  std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes =
+                                    theFeature->data()->attributes(GeomDataAPI_Point2D::type());
+  std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
+                                                                    aLast = anAttiributes.end();
+  boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;
+  for (; anIt != aLast && !aFPoint; anIt++) {
+    boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint = boost::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(*anIt);
+    if (aCurPoint && aCurPoint->pnt()->distance(aClickedPoint) < Precision::Confusion())
+      aFPoint = aCurPoint;
+  }
+
+  return aFPoint;
 }
 
 void PartSet_Tools::setFeatureValue(FeaturePtr theFeature, double theValue,
@@ -409,4 +417,14 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
     }
   }
   return ResultPtr();
+}
+
+bool PartSet_Tools::isContainPresentation(const QList<ModuleBase_ViewerPrs>& theSelected,
+                                          const ModuleBase_ViewerPrs& thePrs)
+{
+  foreach (ModuleBase_ViewerPrs aPrs, theSelected) {
+    if (aPrs.object() == thePrs.object())
+      return true;
+  }
+  return false;
 }

@@ -22,6 +22,7 @@ class ModuleBase_ModelWidget;
 class ModuleBase_OperationDescription;
 class ModuleBase_IPropertyPanel;
 class ModuleBase_ISelection;
+class ModuleBase_IViewer;
 
 class QKeyEvent;
 
@@ -117,7 +118,9 @@ Q_OBJECT
   /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void initSelection(ModuleBase_ISelection* theSelection);
+  /// \param theViewer a viewer to have the viewer the eye position
+  virtual void initSelection(ModuleBase_ISelection* theSelection,
+                             ModuleBase_IViewer* /* theViewer*/);
 
   virtual void setPropertyPanel(ModuleBase_IPropertyPanel* theProp);
 

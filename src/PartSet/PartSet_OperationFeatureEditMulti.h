@@ -12,6 +12,7 @@
 #include <QList>
 
 #include <list>
+#include <map>
 
 class QMouseEvent;
 
@@ -76,7 +77,9 @@ Q_OBJECT
   /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
   /// \param theHighlighted the list of highlighted presentations
-  virtual void initSelection(ModuleBase_ISelection* theSelection);
+  /// \param theViewer a viewer to have the viewer the eye position
+  virtual void initSelection(ModuleBase_ISelection* theSelection,
+                             ModuleBase_IViewer* theViewer);
 
   /// Returns the operation sketch feature
   /// \returns the sketch instance
@@ -123,9 +126,11 @@ Q_OBJECT
   /// Sends the features
   void sendFeatures();
 
- private:
+private:
+  // the next map should be removed when selection is processed in the move function
+  std::map<FeaturePtr, std::list<std::string> > myFeature2Attribute; /// a map of a feature to attributes
+
   CompositeFeaturePtr mySketch;  ///< the sketch feature
-  QList<ModuleBase_ViewerPrs> myFeatures;  ///< the features to apply the edit operation
   Point myCurPoint;  ///< the current 3D point clicked or moved
   bool myIsBlockedSelection;  ///< the state of the last state of selection blocked signal
 };

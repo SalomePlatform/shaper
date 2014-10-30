@@ -25,6 +25,9 @@
 #include <SketchPlugin_Line.h>
 
 #include <V3d_View.hxx>
+#include <TopoDS_Vertex.hxx>
+#include <TopoDS.hxx>
+#include <BRep_Tool.hxx>
 
 #include <QMouseEvent>
 #ifdef _DEBUG
@@ -47,48 +50,77 @@ PartSet_OperationFeatureEditMulti::~PartSet_OperationFeatureEditMulti()
 {
 }
 
-
-bool isContains(const QList<ModuleBase_ViewerPrs>& theSelected, const ModuleBase_ViewerPrs& thePrs)
+void PartSet_OperationFeatureEditMulti::initSelection(ModuleBase_ISelection* theSelection,
+                                                      ModuleBase_IViewer* theViewer)
 {
-  foreach (ModuleBase_ViewerPrs aPrs, theSelected) {
-    if (aPrs.object() == thePrs.object())
-      return true;
-  }
-  return false;
-}
-
-
-void PartSet_OperationFeatureEditMulti::initSelection(ModuleBase_ISelection* theSelection)
-{
-  //if (!theHighlighted.empty()) {
-  //  // if there is highlighted object, we check whether it is in the list of selected objects
-  //  // in that case this object is a handle of the moved lines. If there no such object in the selection,
-  //  // the hightlighted object should moved and the selection is skipped. The skipped selection will be
-  //  // deselected in the viewer by blockSelection signal in the startOperation method.
-  //  bool isSelected = false;
-  //  std::list<ModuleBase_ViewerPrs>::const_iterator anIt = theSelected.begin(), 
-  //    aLast = theSelected.end();
-  //  for (; anIt != aLast && !isSelected; anIt++) {
-  //    isSelected = ModelAPI_Feature::feature((*anIt).object()) == feature();
-  //  }
-  //  if (!isSelected)
-  //    myFeatures = theHighlighted;
-  //  else
-  //    myFeatures = theSelected;
-  //} else
-  myFeatures = theSelection->getSelected();
+  // 1. unite selected and hightlighted objects in order to have an opportunity to drag
+  // by the highlighted object
+  QList<ModuleBase_ViewerPrs> aFeatures;
+  aFeatures = theSelection->getSelected();
   QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
   // add highlighted elements if they are not selected
   foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
-    if (!isContains(myFeatures, aPrs))
-      myFeatures.append(aPrs);
+    if (!PartSet_Tools::isContainPresentation(aFeatures, aPrs))
+      aFeatures.append(aPrs);
   }
-  // Remove current feature if it is in the list (it will be moved as main feature)
-  foreach (ModuleBase_ViewerPrs aPrs, myFeatures) {
-    FeaturePtr aF = ModelAPI_Feature::feature(aPrs.object());
-    if (ModelAPI_Feature::feature(aPrs.object()) == feature()) {
-      myFeatures.removeOne(aPrs);
-      break;
+
+  // 1. find all features with skipping features with selected vertex shapes
+  myFeature2Attribute.clear();
+  // firstly, collect the features without local selection
+  foreach (ModuleBase_ViewerPrs aPrs, aFeatures) {
+    const TopoDS_Shape& aShape = aPrs.shape();
+    if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
+      const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
+      if (!aVertex.IsNull()) {
+        continue;
+      }
+    }
+    else {
+      ObjectPtr aObject = aPrs.object();
+      if (!aObject)
+        continue;
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
+      if (aFeature && myFeature2Attribute.find(aFeature) == myFeature2Attribute.end()) {
+        std::list<std::string> aList;
+        // using an empty list as a sign, that this feature should be moved itself
+        myFeature2Attribute[aFeature] = aList;
+      }
+    }
+  }
+  // 2. collect the features with a local selection on them.
+  // if the list already has this feature, the local selection is skipped
+  // that means that if the selection contains a feature and a feature with local selected point,
+  // the edit is performed for a full feature
+  Handle(V3d_View) aView = theViewer->activeView();
+  foreach (ModuleBase_ViewerPrs aPrs, aFeatures) {
+    const TopoDS_Shape& aShape = aPrs.shape();
+    if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
+      const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
+      if (aVertex.IsNull())
+        continue;
+      ObjectPtr aObject = aPrs.object();
+      if (!aObject)
+        continue;
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
+      if (!aFeature)
+        continue;
+      // if the feature is already moved, do nothing for this feature local selection
+      if (myFeature2Attribute.find(aFeature) != myFeature2Attribute.end())
+        continue;
+
+      // append the attribute of the vertex if it is found on the current feature
+      gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
+      double aVX, aVY;
+      PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aVX, aVY);
+      boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D = PartSet_Tools::getFeaturePoint(
+                                                                    aFeature, aVX, aVY);
+      std::string anAttribute = aFeature->data()->id(aPoint2D);
+      std::list<std::string> aList;
+      if (myFeature2Attribute.find(aFeature) != myFeature2Attribute.end())
+        aList = myFeature2Attribute[aFeature];
+
+      aList.push_back(anAttribute);
+      myFeature2Attribute[aFeature] = aList;
     }
   }
 }
@@ -124,20 +156,31 @@ void PartSet_OperationFeatureEditMulti::mouseMoved(QMouseEvent* theEvent, Module
     double aDeltaX = aX - aCurX;
     double aDeltaY = anY - aCurY;
 
-    boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
-        SketchPlugin_Feature>(feature());
-    aSketchFeature->move(aDeltaX, aDeltaY);
-
-    foreach (ModuleBase_ViewerPrs aPrs, myFeatures) {
-      ObjectPtr aObject = aPrs.object();
-      if (!aObject || aObject == feature())
-        continue;
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-      if (aFeature) {
-        aSketchFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-        if (aSketchFeature)
+    std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
+    while (aFeatIter != myFeature2Attribute.end()) {
+      FeaturePtr aFeature = aFeatIter->first;
+      std::list<std::string> anAttributes = aFeatIter->second;
+      // perform edit for the feature
+      if (anAttributes.empty()) {
+        boost::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+                                       boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+        if (aSketchFeature) {
           aSketchFeature->move(aDeltaX, aDeltaY);
+        }
       }
+      // perform edit for the feature's attribute
+      else {
+        std::list<std::string>::const_iterator anAttrIter = anAttributes.begin(),
+                                               anAttrEnd = anAttributes.end();
+        for (; anAttrIter != anAttrEnd; anAttrIter++) {
+          boost::shared_ptr<GeomDataAPI_Point2D> aPointAttr = boost::dynamic_pointer_cast<
+                           GeomDataAPI_Point2D>(aFeature->data()->attribute(*anAttrIter));
+          if (aPointAttr) {
+            aPointAttr->move(aDeltaX, aDeltaY);
+          }
+        }      
+      }
+      aFeatIter++;
     }
   }
   sendFeatures();
@@ -151,11 +194,13 @@ void PartSet_OperationFeatureEditMulti::mouseReleased(
 {
   theViewer->enableSelection(true);
   if (commit()) {
-    foreach (ModuleBase_ViewerPrs aPrs, myFeatures) {
-      ObjectPtr aFeature = aPrs.object();
+    std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
+    while (aFeatIter != myFeature2Attribute.end()) {
+      FeaturePtr aFeature = aFeatIter->first;
       if (aFeature) {
         emit featureConstructed(aFeature, FM_Deactivation);
       }
+      aFeatIter++;
     }
   }
 }
@@ -176,7 +221,7 @@ void PartSet_OperationFeatureEditMulti::stopOperation()
 
   //blockSelection(false, true);
 
-  myFeatures.clear();
+  myFeature2Attribute.clear();
 }
 
 //void PartSet_OperationFeatureEditMulti::blockSelection(bool isBlocked,
@@ -206,13 +251,15 @@ void PartSet_OperationFeatureEditMulti::sendFeatures()
 {
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
 
-  foreach (ModuleBase_ViewerPrs aPrs, myFeatures) {
-    ObjectPtr aFeature = aPrs.object();
-    if (!aFeature)
-      continue;
-
-    ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
+  std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
+  while (aFeatIter != myFeature2Attribute.end()) {
+    FeaturePtr aFeature = aFeatIter->first;
+    if (aFeature) {
+      ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
+    }
+    aFeatIter++;
   }
+
   Events_Loop::loop()->flush(anEvent);
   flushUpdated();
 }

@@ -30,6 +30,9 @@
 #include <SketchPlugin_Line.h>
 
 #include <V3d_View.hxx>
+#include <TopoDS_Vertex.hxx>
+#include <TopoDS.hxx>
+#include <BRep_Tool.hxx>
 #include <AIS_DimensionOwner.hxx>
 #include <AIS_DimensionSelectionMode.hxx>
 
@@ -54,6 +57,80 @@ PartSet_OperationFeatureEdit::~PartSet_OperationFeatureEdit()
 {
 }
 
+void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelection,
+                                                      ModuleBase_IViewer* theViewer)
+{
+  PartSet_OperationFeatureBase::initSelection(theSelection, theViewer);
+  // 1. unite selected and hightlighted objects in order to have an opportunity to drag
+  // by the highlighted object
+  QList<ModuleBase_ViewerPrs> aFeatures = theSelection->getSelected();
+  QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
+  // add highlighted elements if they are not selected
+  foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
+    if (!PartSet_Tools::isContainPresentation(aFeatures, aPrs))
+      aFeatures.append(aPrs);
+  }
+
+  // 1. find all features with skipping features with selected vertex shapes
+  myFeature2Attribute.clear();
+  // firstly, collect the features without local selection
+  /*foreach (ModuleBase_ViewerPrs aPrs, aFeatures) {
+    const TopoDS_Shape& aShape = aPrs.shape();
+    if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
+      const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
+      if (!aVertex.IsNull()) {
+        continue;
+      }
+    }
+    else {
+      ObjectPtr aObject = aPrs.object();
+      if (!aObject)
+        continue;
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
+      if (aFeature && myFeature2Attribute.find(aFeature) == myFeature2Attribute.end()) {
+        std::list<std::string> aList;
+        // using an empty list as a sign, that this feature should be moved itself
+        myFeature2Attribute[aFeature] = aList;
+      }
+    }
+  }*/
+  // 2. collect the features with a local selection on them.
+  // if the list already has this feature, the local selection is skipped
+  // that means that if the selection contains a feature and a feature with local selected point,
+  // the edit is performed for a full feature
+  Handle(V3d_View) aView = theViewer->activeView();
+  foreach (ModuleBase_ViewerPrs aPrs, aFeatures) {
+    const TopoDS_Shape& aShape = aPrs.shape();
+    if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
+      const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
+      if (aVertex.IsNull())
+        continue;
+      ObjectPtr aObject = aPrs.object();
+      if (!aObject)
+        continue;
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
+      if (!aFeature)
+        continue;
+      // if the feature is already moved, do nothing for this feature local selection
+      if (myFeature2Attribute.find(aFeature) != myFeature2Attribute.end())
+        continue;
+
+      // append the attribute of the vertex if it is found on the current feature
+      gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
+      double aVX, aVY;
+      PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aVX, aVY);
+      boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D = PartSet_Tools::getFeaturePoint(
+                                                                    aFeature, aVX, aVY);
+      std::string anAttribute = aFeature->data()->id(aPoint2D);
+      std::list<std::string> aList;
+      if (myFeature2Attribute.find(aFeature) != myFeature2Attribute.end())
+        aList = myFeature2Attribute[aFeature];
+
+      aList.push_back(anAttribute);
+      myFeature2Attribute[aFeature] = aList;
+    }
+  }
+}
 
 void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection)
 {
@@ -137,11 +214,46 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
 
     boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
         SketchPlugin_Feature>(feature());
-    // MPV: added condition because it could be external edge of some object, not sketch
-    if (aSketchFeature && aSketchFeature->sketch() == sketch().get()) {
-      aSketchFeature->move(aDeltaX, aDeltaY);
-      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
-      ModelAPI_EventCreator::get()->sendUpdated(feature(), anEvent);
+
+    bool isMoved = false;
+    // the functionality to move the feature attribute if it exists in the internal map
+    std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
+    while (aFeatIter != myFeature2Attribute.end()) {
+      FeaturePtr aFeature = aFeatIter->first;
+      std::list<std::string> anAttributes = aFeatIter->second;
+      // perform edit for the feature
+      /*if (anAttributes.empty()) {
+        boost::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+                                       boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+        if (aSketchFeature) {
+          aSketchFeature->move(aDeltaX, aDeltaY);
+        }
+      }*/
+      // perform edit for the feature's attribute
+      //else {
+      if (!anAttributes.empty()) {
+        std::list<std::string>::const_iterator anAttrIter = anAttributes.begin(),
+                                               anAttrEnd = anAttributes.end();
+        for (; anAttrIter != anAttrEnd; anAttrIter++) {
+          boost::shared_ptr<GeomDataAPI_Point2D> aPointAttr = boost::dynamic_pointer_cast<
+                           GeomDataAPI_Point2D>(aFeature->data()->attribute(*anAttrIter));
+          if (aPointAttr) {
+            aPointAttr->move(aDeltaX, aDeltaY);
+            isMoved = true;
+          }
+        }      
+      }
+      aFeatIter++;
+    }
+
+    // the feature is moved only if there is no a local selection on this feature
+    if (!isMoved) {
+      // MPV: added condition because it could be external edge of some object, not sketch
+      if (aSketchFeature && aSketchFeature->sketch() == sketch().get()) {
+        aSketchFeature->move(aDeltaX, aDeltaY);
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+        ModelAPI_EventCreator::get()->sendUpdated(feature(), anEvent);
+      }
     }
   }
   sendFeatures();

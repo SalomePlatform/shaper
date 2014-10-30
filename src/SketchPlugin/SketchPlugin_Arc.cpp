@@ -109,15 +109,15 @@ void SketchPlugin_Arc::move(double theDeltaX, double theDeltaY)
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(SketchPlugin_Arc::CENTER_ID()));
-  aPoint1->setValue(aPoint1->x() + theDeltaX, aPoint1->y() + theDeltaY);
+  aPoint1->move(theDeltaX, theDeltaY);
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(SketchPlugin_Arc::START_ID()));
-  aPoint2->setValue(aPoint2->x() + theDeltaX, aPoint2->y() + theDeltaY);
+  aPoint2->move(theDeltaX, theDeltaY);
 
   boost::shared_ptr<GeomDataAPI_Point2D> aPoint3 = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(SketchPlugin_Arc::END_ID()));
-  aPoint3->setValue(aPoint3->x() + theDeltaX, aPoint3->y() + theDeltaY);
+  aPoint3->move(theDeltaX, theDeltaY);
 }
 
 double SketchPlugin_Arc::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
