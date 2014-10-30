@@ -65,6 +65,8 @@ bool NewGeom_DataModel::saveAs(const QString& thePath, CAM_Study* theStudy, QStr
 
 bool NewGeom_DataModel::close()
 {
+  SessionPtr aMgr = ModelAPI_Session::get();
+  aMgr->moduleDocument()->close();
   return LightApp_DataModel::close();
 }
 
