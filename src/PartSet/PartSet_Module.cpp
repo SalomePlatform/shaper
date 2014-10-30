@@ -295,16 +295,16 @@ void PartSet_Module::onRestartOperation(std::string theName, ObjectPtr theObject
     ModuleBase_ISelection* aSelection = workshop()->selection();
     // Initialise operation with preliminary selection
     aSketchOp->initSelection(aSelection, myWorkshop->viewer());
-  } //else if (aFeature) {
-    //anOperation->setFeature(aFeature);
+  } else if (aFeature) { // In case of edit operation: set the previously created feature to the operation
+    anOperation->setFeature(aFeature);
     ////Deactivate result of current feature in order to avoid its selection
-    //XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
-    //std::list<ResultPtr> aResults = aFeature->results();
-    //std::list<ResultPtr>::const_iterator aIt;
-    //for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-    //  aDisplayer->deactivate(*aIt);
-    //}
-  //}
+    XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
+    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+      aDisplayer->deactivate(*aIt);
+    }
+  }
   sendOperation(anOperation);
   xWorkshop()->actionsMgr()->updateCheckState();
 }
