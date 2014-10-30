@@ -8,6 +8,7 @@
 #include "ModelAPI.h"
 #include <string>
 #include <list>
+#include <set>
 #include <boost/shared_ptr.hpp>
 
 class ModelAPI_AttributeDocRef;
@@ -108,6 +109,9 @@ class MODELAPI_EXPORT ModelAPI_Data
 
   /// Returns the identifier of feature-owner, unique in this document
   virtual int featureId() const = 0;
+
+ // returns all objects referenced to this
+  virtual const std::set<boost::shared_ptr<ModelAPI_Attribute> >& refsToMe() = 0;
 
  protected:
   /// Objects are created for features automatically
