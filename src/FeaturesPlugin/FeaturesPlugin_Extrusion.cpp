@@ -65,6 +65,7 @@ void FeaturesPlugin_Extrusion::execute()
   if (data()->boolean(FeaturesPlugin_Extrusion::REVERSE_ID())->value())
     aSize = -aSize;
 
+  eraseResults(); // to erase the previously stored naming structures
   boost::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
   GeomAlgoAPI_Extrusion aFeature(aFace, aSize);
   if(!aFeature.isDone()) {

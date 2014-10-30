@@ -54,6 +54,10 @@ class ModelAPI_Object
   /// Returns the group identifier of this object
   virtual std::string groupName() = 0;
 
+  /// Called on change of any argument-attribute of this object
+  MODELAPI_EXPORT virtual void attributeChanged() 
+  {}
+
   /// To use virtuality for destructors
   virtual ~ModelAPI_Object() {}
 

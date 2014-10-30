@@ -328,6 +328,9 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
   if (theAttr->isArgument()) {
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
     ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
+    if (myObject) {
+      myObject->attributeChanged();
+    }
   }
 }
 

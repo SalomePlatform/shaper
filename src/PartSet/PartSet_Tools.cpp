@@ -364,13 +364,13 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
 
   Standard_Real aStart, aEnd;
   Handle(V3d_View) aNullView;
-  FeaturePtr myFeature;
+  FeaturePtr aMyFeature;
 
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(aShape), aStart, aEnd);
   GeomAdaptor_Curve aAdaptor(aCurve);
   if (aAdaptor.GetType() == GeomAbs_Line) {
     // Create line
-    myFeature = theSketch->addFeature(SketchPlugin_Line::ID());
+    aMyFeature = theSketch->addFeature(SketchPlugin_Line::ID());
 
     //DataPtr aData = myFeature->data();
     //boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
@@ -387,7 +387,7 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
   } else if (aAdaptor.GetType() == GeomAbs_Circle) {
     if (aAdaptor.IsClosed()) {
       // Create circle
-      myFeature = theSketch->addFeature(SketchPlugin_Circle::ID());
+      aMyFeature = theSketch->addFeature(SketchPlugin_Circle::ID());
       //gp_Circ aCirc = aAdaptor.Circle();
       //gp_Pnt aCenter = aCirc.Location();
 
@@ -397,11 +397,11 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
       //setFeatureValue(myFeature, aCirc.Radius(), SketchPlugin_Circle::RADIUS_ID());
     } else {
       // Create arc
-      myFeature = theSketch->addFeature(SketchPlugin_Arc::ID());
+      aMyFeature = theSketch->addFeature(SketchPlugin_Arc::ID());
     }
   }
-  if (myFeature) {
-    DataPtr aData = myFeature->data();
+  if (aMyFeature) {
+    DataPtr aData = aMyFeature->data();
     AttributeSelectionPtr anAttr = 
       boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>
       (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
@@ -412,8 +412,8 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
       anEdge->setImpl(new TopoDS_Shape(aShape));
 
       anAttr->setValue(aRes, anEdge);
-      myFeature->execute();
-      return myFeature->firstResult();
+      aMyFeature->execute();
+      return aMyFeature->lastResult();
     }
   }
   return ResultPtr();
