@@ -25,10 +25,7 @@ void FeaturesPlugin_Group::initAttributes()
 
 void FeaturesPlugin_Group::execute()
 {
-  //AttributeStringPtr aNameAttr = boost::dynamic_pointer_cast<ModelAPI_AttributeString>(
-  //    data()->attribute(FeaturesPlugin_Group::NAME_ID()));
-  //if (!aNameAttr)
-  //  return;
-  //std::string aName = aNameAttr->value();
-  //data()->setName(aName);
+  if (results().empty()) { // just create result if not exists
+    document()->createGroup(data());
+  }
 }
