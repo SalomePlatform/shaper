@@ -186,6 +186,7 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
           aDisplayer->activate(*anIt, aModes);
         }
         aDisplayer->activate(aFeature, aModes);
+        aDisplayer->clearSelected();
       }
     }
   }// else {
@@ -217,24 +218,6 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
     dynamic_cast<PartSet_OperationSketchBase*>(workshop()->currentOperation());
   if (aPreviewOp) {
     ModuleBase_ISelection* aSelection = workshop()->selection();
-    // Initialise operation with preliminary selection
-    //QList<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-    //QList<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-    //QList<ObjectPtr> aObjList;
-    //bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
-    //if (aHasShift) {
-    //  foreach(ModuleBase_ViewerPrs aPrs, aSelected)
-    //    aObjList.append(aPrs.object());
-
-    //  foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
-    //    if (!aObjList.contains(aPrs.object()))
-    //      aObjList.append(aPrs.object());
-    //  }
-    //} else {
-    //  foreach(ModuleBase_ViewerPrs aPrs, aHighlighted)
-    //    aObjList.append(aPrs.object());
-    //}
-    //onSetSelection(aObjList);
     aPreviewOp->mousePressed(theEvent, myWorkshop->viewer(), aSelection);
   }
 }
