@@ -210,12 +210,12 @@ void Model_Document::close()
   for (; aSubIter != mySubs.end(); aSubIter++)
     subDoc(*aSubIter)->close();
   mySubs.clear();
-  // close this
-  /* do not close because it can be undoed
-   if (myDoc->CanClose() == CDM_CCS_OK)
-   myDoc->Close();
-   Model_Application::getApplication()->deleteDocument(myID);
-   */
+  // close this only if it is module document, otherwise it can be undoed
+  if (this == aPM->moduleDocument().get()) {
+    if (myDoc->CanClose() == CDM_CCS_OK)
+      myDoc->Close();
+    Model_Application::getApplication()->deleteDocument(myID);
+  }
 }
 
 void Model_Document::startOperation()
