@@ -165,6 +165,19 @@ boost::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, cons
   return boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
 }
 
+boost::shared_ptr<GeomAPI_Pnt2d> SketchPlugin_Sketch::to2D(
+  const boost::shared_ptr<GeomAPI_Pnt>& thePnt)
+{
+  boost::shared_ptr<GeomDataAPI_Point> aC = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+      data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  boost::shared_ptr<GeomDataAPI_Dir> aX = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
+  boost::shared_ptr<GeomDataAPI_Dir> aY = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      data()->attribute(SketchPlugin_Sketch::DIRY_ID()));
+  return thePnt->to2D(aC->pnt(), aX->dir(), aY->dir());
+}
+
+
 bool SketchPlugin_Sketch::isPlaneSet()
 {
   boost::shared_ptr<GeomDataAPI_Dir> aNormal = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(

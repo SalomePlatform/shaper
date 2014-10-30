@@ -4,6 +4,8 @@
 
 #include<GeomAPI_Pnt.h>
 #include<GeomAPI_XYZ.h>
+#include<GeomAPI_Pnt2d.h>
+#include<GeomAPI_Dir.h>
 
 #include<gp_Pnt.hxx>
 
@@ -57,4 +59,15 @@ const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_Pnt::xyz()
 double GeomAPI_Pnt::distance(const boost::shared_ptr<GeomAPI_Pnt>& theOther) const
 {
   return MY_PNT->Distance(theOther->impl<gp_Pnt>());
+}
+
+boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Pnt::to2D(const boost::shared_ptr<GeomAPI_Pnt>& theOrigin,
+  const boost::shared_ptr<GeomAPI_Dir>& theDirX, const boost::shared_ptr<GeomAPI_Dir>& theDirY)
+{
+  gp_Pnt anOriginPnt(theOrigin->x(), theOrigin->y(), theOrigin->z());
+  gp_Vec aVec(anOriginPnt, impl<gp_Pnt>());
+
+  double aX = aVec.X() * theDirX->x() + aVec.Y() * theDirX->y() + aVec.Z() * theDirX->z();
+  double aY = aVec.X() * theDirY->x() + aVec.Y() * theDirY->y() + aVec.Z() * theDirY->z();
+  return boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, aY));
 }

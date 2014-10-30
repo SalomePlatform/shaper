@@ -72,6 +72,8 @@ class ModelAPI_Feature : public ModelAPI_Object
   MODELAPI_EXPORT const std::list<boost::shared_ptr<ModelAPI_Result> >& results();
   /// returns the first result in the list or NULL reference
   MODELAPI_EXPORT boost::shared_ptr<ModelAPI_Result> firstResult();
+  /// returns the last result in the list or NULL reference
+  MODELAPI_EXPORT boost::shared_ptr<ModelAPI_Result> lastResult();
   /// sets the alone result
   MODELAPI_EXPORT void setResult(const boost::shared_ptr<ModelAPI_Result>& theResult);
   /// sets the result by index (zero based), results before this must be set before

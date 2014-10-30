@@ -9,6 +9,8 @@
 #include <boost/shared_ptr.hpp>
 
 class GeomAPI_XYZ;
+class GeomAPI_Pnt2d;
+class GeomAPI_Dir;
 
 /**\class GeomAPI_Pnt
  * \ingroup DataModel
@@ -42,7 +44,11 @@ class GEOMAPI_EXPORT GeomAPI_Pnt : public GeomAPI_Interface
 
   /// Distance between two points
   double distance(const boost::shared_ptr<GeomAPI_Pnt>& theOther) const;
+
+  /// Projects a point to the plane defined by the origin and 2 axes vectors in this plane
+  boost::shared_ptr<GeomAPI_Pnt2d> to2D(const boost::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                                        const boost::shared_ptr<GeomAPI_Dir>& theDirX,
+                                        const boost::shared_ptr<GeomAPI_Dir>& theDirY);
 };
 
 #endif
-
