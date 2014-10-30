@@ -135,8 +135,7 @@ void XGUI_ActionsMgr::updateByDocumentKind()
     QString aCmdDocKind;
     if(aCmd) {
       aCmdDocKind = aCmd->documentKind();
-    }
-    else {
+    } else if (eachAction) {
       QString aId = eachAction->data().toString();
       if (!aId.isEmpty()) {
         aCmdDocKind = aWorkshop->salomeConnector()->documentKind(aId);
