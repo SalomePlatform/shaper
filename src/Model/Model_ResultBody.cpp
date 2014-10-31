@@ -238,3 +238,18 @@ void Model_ResultBody::loadAndOrientGeneratedShapes (
     }
   }
 }
+
+void Model_ResultBody::loadFirstLevel(boost::shared_ptr<GeomAPI_Shape> theShapeIn,int&  theTag)
+{
+
+}
+
+void Model_ResultBody::loadDisconnectedEdges(boost::shared_ptr<GeomAPI_Shape> theShapeIn,int&  theTag)
+{
+
+}
+
+void Model_ResultBody::loadDisconnectedVertexes(boost::shared_ptr<GeomAPI_Shape> theShapeIn,int&  theTag)
+{
+
+}

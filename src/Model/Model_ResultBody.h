@@ -82,6 +82,15 @@ public:
                                                const int  theKindOfShape,
                                                const int  theTag,
                                                GeomAPI_DataMapOfShapeShape& theSubShapes);
+  
+  /// load shapes of the first level (to be used during shape import)
+  MODEL_EXPORT virtual void loadFirstLevel(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
+  
+  /// load disconnected edges
+  MODEL_EXPORT virtual void loadDisconnectedEdges(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
+
+  /// load disconnected vetexes
+  MODEL_EXPORT virtual void loadDisconnectedVertexes(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
 
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultBody();
