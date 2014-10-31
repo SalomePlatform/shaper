@@ -412,7 +412,14 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
       anEdge->setImpl(new TopoDS_Shape(aShape));
 
       anAttr->setValue(aRes, anEdge);
+
       aMyFeature->execute();
+
+      // fix this edge
+      FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
+      aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
+        setObject(aMyFeature->lastResult());
+
       return aMyFeature->lastResult();
     }
   }

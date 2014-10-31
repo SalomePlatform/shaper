@@ -84,6 +84,14 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
   }
 }
 
+void XGUI_DataTree::clear() 
+{
+  mySelectedData.clear();
+  XGUI_DocumentDataModel* aModel = dataModel();
+  aModel->clear();
+  reset();
+}
+
 //********************************************************************
 //********************************************************************
 //********************************************************************
@@ -347,4 +355,12 @@ void XGUI_ObjectsBrowser::setObjectsSelected(const QList<ObjectPtr>& theObjects)
 void XGUI_ObjectsBrowser::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
 { 
   myDocModel->processEvent(theMessage); 
+}
+
+
+//***************************************************
+void XGUI_ObjectsBrowser::clearContent()  
+{ 
+  myObjectsList.clear();
+  myTreeView->clear(); 
 }

@@ -23,7 +23,6 @@ class TNaming_Builder;
  */
 class Model_ResultBody : public ModelAPI_ResultBody
 {
-  boost::shared_ptr<ModelAPI_Feature> myOwner;  ///< owner of this result
   /// builders that tores the naming history: one per label to allow store several shapes to one 
   /// label; index in vector corresponds to the label tag
   std::vector<TNaming_Builder*> myBuilders;
@@ -41,8 +40,6 @@ public:
 
   /// Returns the shape-result produced by this feature
   MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape> shape();
-  /// Returns the source feature of this result
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> owner();
 
   /// Records the subshape newShape which was generated during a topological construction.
   /// As an example, consider the case of a face generated in construction of a box.

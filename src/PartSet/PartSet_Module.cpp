@@ -186,6 +186,7 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
           aDisplayer->activate(*anIt, aModes);
         }
         aDisplayer->activate(aFeature, aModes);
+        aDisplayer->clearSelected();
       }
     }
   }// else {
@@ -217,24 +218,6 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
     dynamic_cast<PartSet_OperationSketchBase*>(workshop()->currentOperation());
   if (aPreviewOp) {
     ModuleBase_ISelection* aSelection = workshop()->selection();
-    // Initialise operation with preliminary selection
-    //QList<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-    //QList<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-    //QList<ObjectPtr> aObjList;
-    //bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
-    //if (aHasShift) {
-    //  foreach(ModuleBase_ViewerPrs aPrs, aSelected)
-    //    aObjList.append(aPrs.object());
-
-    //  foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
-    //    if (!aObjList.contains(aPrs.object()))
-    //      aObjList.append(aPrs.object());
-    //  }
-    //} else {
-    //  foreach(ModuleBase_ViewerPrs aPrs, aHighlighted)
-    //    aObjList.append(aPrs.object());
-    //}
-    //onSetSelection(aObjList);
     aPreviewOp->mousePressed(theEvent, myWorkshop->viewer(), aSelection);
   }
 }
@@ -312,16 +295,16 @@ void PartSet_Module::onRestartOperation(std::string theName, ObjectPtr theObject
     ModuleBase_ISelection* aSelection = workshop()->selection();
     // Initialise operation with preliminary selection
     aSketchOp->initSelection(aSelection, myWorkshop->viewer());
-  } //else if (aFeature) {
-    //anOperation->setFeature(aFeature);
+  } else if (aFeature) { // In case of edit operation: set the previously created feature to the operation
+    anOperation->setFeature(aFeature);
     ////Deactivate result of current feature in order to avoid its selection
-    //XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
-    //std::list<ResultPtr> aResults = aFeature->results();
-    //std::list<ResultPtr>::const_iterator aIt;
-    //for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-    //  aDisplayer->deactivate(*aIt);
-    //}
-  //}
+    XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
+    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+      aDisplayer->deactivate(*aIt);
+    }
+  }
   sendOperation(anOperation);
   xWorkshop()->actionsMgr()->updateCheckState();
 }

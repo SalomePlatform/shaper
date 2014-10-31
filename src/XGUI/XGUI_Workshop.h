@@ -214,6 +214,8 @@ signals:
 
   void activateLastPart();
 
+  void closeDocument();
+
  protected:
   bool event(QEvent * theEvent);
   //Event-loop processing methods:

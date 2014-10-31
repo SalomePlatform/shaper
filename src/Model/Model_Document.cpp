@@ -10,6 +10,7 @@
 #include <Model_ResultPart.h>
 #include <Model_ResultConstruction.h>
 #include <Model_ResultBody.h>
+#include <Model_ResultGroup.h>
 #include <ModelAPI_Validator.h>
 #include <Events_Loop.h>
 #include <Events_Error.h>
@@ -210,12 +211,12 @@ void Model_Document::close()
   for (; aSubIter != mySubs.end(); aSubIter++)
     subDoc(*aSubIter)->close();
   mySubs.clear();
-  // close this
-  /* do not close because it can be undoed
-   if (myDoc->CanClose() == CDM_CCS_OK)
-   myDoc->Close();
-   Model_Application::getApplication()->deleteDocument(myID);
-   */
+  // close this only if it is module document, otherwise it can be undoed
+  if (this == aPM->moduleDocument().get()) {
+    if (myDoc->CanClose() == CDM_CCS_OK)
+      myDoc->Close();
+    Model_Application::getApplication()->deleteDocument(myID);
+  }
 }
 
 void Model_Document::startOperation()
@@ -912,6 +913,23 @@ boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
   return aResult;
 }
 
+boost::shared_ptr<ModelAPI_ResultGroup> Model_Document::createGroup(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
+{
+  TDF_Label aLab = resultLabel(theFeatureData, theIndex);
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultGroup::group().c_str());
+  ObjectPtr anOldObject = object(aLab);
+  boost::shared_ptr<ModelAPI_ResultGroup> aResult;
+  if (anOldObject) {
+    aResult = boost::dynamic_pointer_cast<ModelAPI_ResultGroup>(anOldObject);
+  }
+  if (!aResult) {
+    aResult = boost::shared_ptr<ModelAPI_ResultGroup>(new Model_ResultGroup(theFeatureData));
+    storeResult(theFeatureData, aResult, theIndex);
+  }
+  return aResult;
+}
+
 boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
     const boost::shared_ptr<ModelAPI_Result>& theResult)
 {
@@ -957,7 +975,8 @@ void Model_Document::updateResults(FeaturePtr theFeature)
           aNewBody = createBody(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultPart::group().c_str()) {
           aNewBody = createPart(theFeature->data(), aResIndex);
-        } else if (aGroup->Get() != ModelAPI_ResultConstruction::group().c_str()) {
+        } else if (aGroup->Get() != ModelAPI_ResultConstruction::group().c_str() &&
+          aGroup->Get() != ModelAPI_ResultGroup::group().c_str()) {
           Events_Error::send(std::string("Unknown type of result is found in the document:") +
             TCollection_AsciiString(aGroup->Get()).ToCString());
         }

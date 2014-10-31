@@ -21,8 +21,7 @@ using namespace std;
 
 SketchPlugin_Line::SketchPlugin_Line()
     : SketchPlugin_Feature()
-{
-}
+{}
 
 void SketchPlugin_Line::initAttributes()
 {
