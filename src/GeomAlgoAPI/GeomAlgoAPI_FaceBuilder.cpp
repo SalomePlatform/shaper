@@ -34,6 +34,8 @@ boost::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(
   TopoDS_Shape aShape = theFace->impl<TopoDS_Shape>();
   if (aShape.IsNull())
     return aResult;  // null shape
+  if (aShape.ShapeType() != TopAbs_FACE)
+    return aResult;  // not face
   TopoDS_Face aFace = TopoDS::Face(aShape);
   if (aFace.IsNull())
     return aResult;  // not face
