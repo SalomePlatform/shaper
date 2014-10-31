@@ -94,9 +94,28 @@ void PartSet_OperationSketch::selectionChanged(ModuleBase_ISelection* theSelecti
   if (!aSelected.empty()) {
     ModuleBase_ViewerPrs aPrs = aSelected.first();
     // We have to select a plane before any operation
-    const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull())
+    TopoDS_Shape aShape = aPrs.shape();
+    if (!aShape.IsNull()) {
       setSketchPlane(aShape);
+      // If selection is not a sketcher presentation then it has to be stored as 
+      // External shape
+      if (feature() != aPrs.object()) {
+        boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
+          boost::dynamic_pointer_cast<SketchPlugin_Sketch>(feature());
+        DataPtr aData = aSketch->data();
+        AttributeSelectionPtr aSelAttr = 
+          boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+          (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
+        if (aSelAttr) {
+          ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
+          if (aRes) {
+            GeomShapePtr aShapePtr(new GeomAPI_Shape());
+            aShapePtr->setImpl(new TopoDS_Shape(aShape));
+            aSelAttr->setValue(aRes, aShapePtr);
+          }
+        }
+      }
+    }
   }
 }
 
