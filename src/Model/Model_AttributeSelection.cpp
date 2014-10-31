@@ -104,7 +104,6 @@ bool Model_AttributeSelection::update()
     // body: just a named shape, use selection mechanism from OCCT
     TNaming_Selector aSelector(selectionLabel());
     TDF_LabelMap aScope; // empty means the whole document
-    owner()->data()->sendAttributeUpdated(this);
     bool aResult = aSelector.Solve(aScope) == Standard_True;
     owner()->data()->sendAttributeUpdated(this);
     return aResult;
