@@ -94,11 +94,11 @@
       </feature>
 
       <feature id="SketchConstraintRigid" title="Fixed" tooltip="Create constraint defining fixed object" icon=":icons/fixed.png">
-        <feature_selector id="ConstraintEntityA" label="Object" tooltip="Select any object in the viewer">
+        <feature_or_attribute_selector id="ConstraintEntityA" label="Object" tooltip="Select any object in the viewer">
           <validator id="SketchPlugin_ResultPoint"/>
           <validator id="SketchPlugin_ResultLine"/>
           <validator id="SketchPlugin_ResultArc"/>
-        </feature_selector>
+        </feature_or_attribute_selector>
       </feature>
     </group>
   </workbench>
