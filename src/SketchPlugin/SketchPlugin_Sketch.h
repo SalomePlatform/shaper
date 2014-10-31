@@ -135,6 +135,7 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_IPr
   /// Returns the point projected into the sketch plane
   boost::shared_ptr<GeomAPI_Pnt2d> to2D(const boost::shared_ptr<GeomAPI_Pnt>& thePnt);
 
+  SKETCHPLUGIN_EXPORT virtual void attributeChanged();
 protected:
   /// Creates a plane and append it to the list
   /// \param theX the X normal value

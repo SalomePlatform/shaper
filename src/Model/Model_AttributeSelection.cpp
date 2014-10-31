@@ -21,6 +21,7 @@
 #include <TNaming_Builder.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TDataStd_IntPackedMap.hxx>
+#include <TDataStd_Integer.hxx>
 #include <TopTools_MapOfShape.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TDF_LabelMap.hxx>
@@ -28,8 +29,20 @@
 #include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
 #include <TColStd_MapOfTransient.hxx>
+#include <gp_Pnt.hxx>
+#include <Precision.hxx>
 
 using namespace std;
+/// adeed to the index in the packed map to signalize that the vertex of edge is seleted
+/// (multiplied by the index of the edge)
+static const int kSTART_VERTEX_DELTA = 1000000;
+
+// on this label is stored:
+// TNaming_NamedShape - selected shape
+// TNaming_Naming - topological selection information (for the body)
+// TDataStd_IntPackedMap - indexes of edges in composite element (for construction)
+// TDataStd_Integer - type of the selected shape (for construction)
+// TDF_Reference - from ReferenceAttribute, the context
 
 void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   const boost::shared_ptr<GeomAPI_Shape>& theSubShape)
@@ -96,83 +109,161 @@ bool Model_AttributeSelection::update()
   } else if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
     // construction: identification by the results indexes, recompute faces and
     // take the face that more close by the indexes
-    boost::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = boost::dynamic_pointer_cast<GeomAPI_PlanarEdges>(
+    boost::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 
+      boost::dynamic_pointer_cast<GeomAPI_PlanarEdges>(
       boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext)->shape());
     if (aWirePtr && aWirePtr->hasPlane()) {
-        // If this is a wire with plane defined thin it is a sketch-like object
-      std::list<boost::shared_ptr<GeomAPI_Shape> > aFaces;
-      GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
-        aWirePtr->dirY(), aWirePtr->norm(), aWirePtr, aFaces);
-      if (aFaces.empty()) // no faces, update can not work correctly
-        return false;
-      // if there is no edges indexes, any face can be used: take the first
       boost::shared_ptr<Model_Data> aData = 
         boost::dynamic_pointer_cast<Model_Data>(owner()->data());
       TDF_Label aLab = aData->label();
+      // getting a type of selected shape
+      Handle(TDataStd_Integer) aTypeAttr;
+      if (!aLab.FindAttribute(TDataStd_Integer::GetID(), aTypeAttr)) {
+        return false;
+      }
+      TopAbs_ShapeEnum aShapeType = (TopAbs_ShapeEnum)(aTypeAttr->Get());
+      // selected indexes will be needed in each "if"
       Handle(TDataStd_IntPackedMap) aSubIds;
       boost::shared_ptr<GeomAPI_Shape> aNewSelected;
-      if (!aLab.FindAttribute(TDataStd_IntPackedMap::GetID(), aSubIds) || aSubIds->Extent() == 0) {
-        aNewSelected = *(aFaces.begin());
-      } else { // searching for most looks-like initial face by the indexes
-        // prepare edges of the current resut for the fast searching
-        TColStd_MapOfTransient allCurves;
-        FeaturePtr aContextFeature = owner()->document()->feature(aContext);
-        CompositeFeaturePtr aComposite = 
-          boost::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature);
-        if (!aComposite) // must be composite at least for the current implementation
+      bool aNoIndexes = 
+        !aLab.FindAttribute(TDataStd_IntPackedMap::GetID(), aSubIds) || aSubIds->Extent() == 0;
+      // for now working only with composite features
+      FeaturePtr aContextFeature = owner()->document()->feature(aContext);
+      CompositeFeaturePtr aComposite = 
+        boost::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature);
+      if (!aComposite || aComposite->numberOfSubs() == 0) {
+        return false;
+      }
+
+      if (aShapeType == TopAbs_FACE) {
+        // If this is a wire with plane defined thin it is a sketch-like object
+        std::list<boost::shared_ptr<GeomAPI_Shape> > aFaces;
+        GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
+          aWirePtr->dirY(), aWirePtr->norm(), aWirePtr, aFaces);
+        if (aFaces.empty()) // no faces, update can not work correctly
           return false;
+        // if there is no edges indexes, any face can be used: take the first
+        boost::shared_ptr<GeomAPI_Shape> aNewSelected;
+        if (aNoIndexes) {
+          aNewSelected = *(aFaces.begin());
+        } else { // searching for most looks-like initial face by the indexes
+          // prepare edges of the current resut for the fast searching
+          TColStd_MapOfTransient allCurves;
+          const int aSubNum = aComposite->numberOfSubs();
+          for(int a = 0; a < aSubNum; a++) {
+            if (aSubIds->Contains(aComposite->subFeatureId(a))) {
+              FeaturePtr aSub = aComposite->subFeature(a);
+              const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
+              std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRes;
+              for(aRes = aResults.cbegin(); aRes != aResults.cend(); aRes++) {
+                ResultConstructionPtr aConstr = 
+                  boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
+                if (aConstr->shape() && aConstr->shape()->isEdge()) {
+                  const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
+                  TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
+                  if (!anEdge.IsNull()) {
+                    Standard_Real aFirst, aLast;
+                    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+                    allCurves.Add(aCurve);
+                  }
+                }
+              }
+            }
+          }
+          // iterate new result faces and searching for these edges
+          std::list<boost::shared_ptr<GeomAPI_Shape> >::iterator aFacesIter = aFaces.begin();
+          double aBestFound = 0; // best percentage of found edges
+          for(; aFacesIter != aFaces.end(); aFacesIter++) {
+            int aFound = 0, aNotFound = 0;
+            TopExp_Explorer anEdgesExp((*aFacesIter)->impl<TopoDS_Shape>(), TopAbs_EDGE);
+            for(; anEdgesExp.More(); anEdgesExp.Next()) {
+              TopoDS_Edge anEdge = TopoDS::Edge(anEdgesExp.Current());
+              if (!anEdge.IsNull()) {
+                Standard_Real aFirst, aLast;
+                Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+                if (allCurves.Contains(aCurve)) {
+                  aFound++;
+                } else {
+                  aNotFound++;
+                }
+              }
+            }
+            if (aFound + aNotFound != 0) {
+              double aPercentage = double(aFound) / double(aFound + aNotFound);
+              if (aPercentage > aBestFound) {
+                aBestFound = aPercentage;
+                aNewSelected = *aFacesIter;
+              }
+            }
+          }
+        }
+        if (aNewSelected) { // store this new selection
+          selectConstruction(aContext, aNewSelected);
+          owner()->data()->sendAttributeUpdated(this);
+          return true;
+        }
+      } else if (aShapeType == TopAbs_EDGE) {
+        // just reselect the edge by the id
         const int aSubNum = aComposite->numberOfSubs();
         for(int a = 0; a < aSubNum; a++) {
-          if (aSubIds->Contains(aComposite->subFeatureId(a))) {
-            FeaturePtr aSub = aComposite->subFeature(a);
-            const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
-            std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
-            for(; aRes != aResults.cend(); aRes++) {
-              ResultConstructionPtr aConstr = 
-                boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-              if (aConstr->shape() && aConstr->shape()->isEdge()) {
-                const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
-                TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
-                if (!anEdge.IsNull()) {
-                  Standard_Real aFirst, aLast;
-                  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-                  allCurves.Add(aCurve);
+          // if aSubIds take any, the first appropriate
+          if (aSubIds->IsEmpty() || aSubIds->Contains(aComposite->subFeatureId(a))) {
+            // found the appropriate feature
+            FeaturePtr aFeature = aComposite->subFeature(a);
+            std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aResIter =
+              aFeature->results().cbegin();
+            for(;aResIter != aFeature->results().cend(); aResIter++) {
+              ResultConstructionPtr aRes = 
+                boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aResIter);
+              if (aRes && aRes->shape() && aRes->shape()->isEdge()) { // found!
+                selectConstruction(aContext, aRes->shape());
+                owner()->data()->sendAttributeUpdated(this);
+                return true;
+              }
+            }
+          }
+        }
+      } else if (aShapeType == TopAbs_VERTEX) {
+        // just reselect the vertex by the id of edge
+        const int aSubNum = aComposite->numberOfSubs();
+        for(int a = 0; a < aSubNum; a++) {
+          // if aSubIds take any, the first appropriate
+          int aFeatureID = aComposite->subFeatureId(a);
+          if (aSubIds->IsEmpty() || aSubIds->Contains(aFeatureID)) {
+            // searching for deltas
+            int aVertexNum = 0;
+            if (aSubIds->Contains(aFeatureID + kSTART_VERTEX_DELTA)) aVertexNum = 1;
+            else if (aSubIds->Contains(aFeatureID + kSTART_VERTEX_DELTA)) aVertexNum = 2;
+            // found the feature with appropriate edge
+            FeaturePtr aFeature = aComposite->subFeature(a);
+            std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aResIter =
+              aFeature->results().cbegin();
+            for(;aResIter != aFeature->results().cend(); aResIter++) {
+              ResultConstructionPtr aRes = 
+                boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aResIter);
+              if (aRes && aRes->shape()) {
+                if (aRes->shape()->isVertex() && aVertexNum == 0) { // found!
+                  selectConstruction(aContext, aRes->shape());
+                  owner()->data()->sendAttributeUpdated(this);
+                  return true;
+                } else if (aRes->shape()->isEdge() && aVertexNum > 0) {
+                  const TopoDS_Shape& anEdge = aRes->shape()->impl<TopoDS_Shape>();
+                  int aVIndex = 1;
+                  for(TopExp_Explorer aVExp(anEdge, TopAbs_VERTEX); aVExp.More(); aVExp.Next()) {
+                    if (aVIndex == aVertexNum) { // found!
+                      boost::shared_ptr<GeomAPI_Shape> aVertex(new GeomAPI_Shape);
+                      aVertex->setImpl(new TopoDS_Shape(aVExp.Current()));
+                      selectConstruction(aContext, aVertex);
+                      owner()->data()->sendAttributeUpdated(this);
+                      return true;
+                    }
+                    aVIndex++;
+                  }
                 }
               }
             }
           }
         }
-        // iterate new result faces and searching for these edges
-        std::list<boost::shared_ptr<GeomAPI_Shape> >::iterator aFacesIter = aFaces.begin();
-        double aBestFound = 0; // best percentage of found edges
-        for(; aFacesIter != aFaces.end(); aFacesIter++) {
-          int aFound = 0, aNotFound = 0;
-          TopExp_Explorer anEdgesExp((*aFacesIter)->impl<TopoDS_Shape>(), TopAbs_EDGE);
-          for(; anEdgesExp.More(); anEdgesExp.Next()) {
-            TopoDS_Edge anEdge = TopoDS::Edge(anEdgesExp.Current());
-            if (!anEdge.IsNull()) {
-              Standard_Real aFirst, aLast;
-              Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-              if (allCurves.Contains(aCurve)) {
-                aFound++;
-              } else {
-                aNotFound++;
-              }
-            }
-          }
-          if (aFound + aNotFound != 0) {
-            double aPercentage = double(aFound) / double(aFound + aNotFound);
-            if (aPercentage > aBestFound) {
-              aBestFound = aPercentage;
-              aNewSelected = *aFacesIter;
-            }
-          }
-        }
-      }
-      if (aNewSelected) { // store this new selection
-        selectConstruction(aContext, aNewSelected);
-        owner()->data()->sendAttributeUpdated(this);
-        return true;
       }
     }
   }
@@ -216,12 +307,20 @@ void Model_AttributeSelection::selectConstruction(
   TDF_Label aLab = aData->label();
   // identify the reuslts of sub-object of the composite by edges
   const TopoDS_Shape& aSubShape = theSubShape->impl<TopoDS_Shape>();
+  // save type of the selected shape in integer attribute
+  TopAbs_ShapeEnum aShapeType = aSubShape.ShapeType();
+  TDataStd_Integer::Set(aLab, (int)aShapeType);
+  gp_Pnt aVertexPos;
   TColStd_MapOfTransient allCurves;
-  for(TopExp_Explorer anEdgeExp(aSubShape, TopAbs_EDGE); anEdgeExp.More(); anEdgeExp.Next()) {
-    TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExp.Current());
-    Standard_Real aFirst, aLast;
-    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-    allCurves.Add(aCurve);
+  if (aShapeType == TopAbs_VERTEX) { // compare positions
+    aVertexPos = BRep_Tool::Pnt(TopoDS::Vertex(aSubShape));
+  } else { 
+    for(TopExp_Explorer anEdgeExp(aSubShape, TopAbs_EDGE); anEdgeExp.More(); anEdgeExp.Next()) {
+      TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExp.Current());
+      Standard_Real aFirst, aLast;
+      Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+      allCurves.Add(aCurve);
+    }
   }
   // iterate and store the result ids of sub-elements
   Handle(TDataStd_IntPackedMap) aRefs = TDataStd_IntPackedMap::Set(aLab);
@@ -234,16 +333,39 @@ void Model_AttributeSelection::selectConstruction(
     for(; aRes != aResults.cend(); aRes++) {
       ResultConstructionPtr aConstr = 
         boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-      if (aConstr->shape() && aConstr->shape()->isEdge()) {
-        const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
-        TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
-        if (!anEdge.IsNull()) {
-          Standard_Real aFirst, aLast;
-          Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-          if (allCurves.Contains(aCurve)) {
-            boost::shared_ptr<Model_Data> aSubData = boost::dynamic_pointer_cast<Model_Data>(aSub->data());
-            TDF_Label aSubLab = aSubData->label();
+      if (!aConstr->shape()) {
+        continue;
+      }
+      if (aShapeType == TopAbs_VERTEX) {
+        if (aConstr->shape()->isVertex()) { // compare vertices positions
+          const TopoDS_Shape& aVertex = aConstr->shape()->impl<TopoDS_Shape>();
+          gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVertex));
+          if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
             aRefs->Add(aComposite->subFeatureId(a));
+          }
+        } else { // get first or last vertex of the edge: last is stored with negative sign
+          const TopoDS_Shape& anEdge = aConstr->shape()->impl<TopoDS_Shape>();
+          int aDelta = kSTART_VERTEX_DELTA;
+          for(TopExp_Explorer aVExp(anEdge, TopAbs_VERTEX); aVExp.More(); aVExp.Next()) {
+            gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVExp.Current()));
+            if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
+              aRefs->Add(aComposite->subFeatureId(a));
+              aRefs->Add(aDelta + aComposite->subFeatureId(a));
+              break;
+            }
+            aDelta += kSTART_VERTEX_DELTA;
+          }
+        }
+      } else {
+        if (aConstr->shape()->isEdge()) {
+          const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
+          TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
+          if (!anEdge.IsNull()) {
+            Standard_Real aFirst, aLast;
+            Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+            if (allCurves.Contains(aCurve)) {
+              aRefs->Add(aComposite->subFeatureId(a));
+            }
           }
         }
       }
