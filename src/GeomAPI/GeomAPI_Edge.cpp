@@ -9,10 +9,12 @@
 
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Edge.hxx>
+#include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
 #include <Geom_Curve.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Circle.hxx>
+#include <GeomAdaptor_Curve.hxx>
 #include <gp_Ax1.hxx>
 
 GeomAPI_Edge::GeomAPI_Edge()
@@ -93,4 +95,38 @@ boost::shared_ptr<GeomAPI_Circ> GeomAPI_Edge::circle()
     }
   }
   return boost::shared_ptr<GeomAPI_Circ>(); // not circle
+}
+
+
+bool GeomAPI_Edge::isEqual(boost::shared_ptr<GeomAPI_Shape> theEdge)
+{
+  const TopoDS_Shape& aMyShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aInShape = theEdge->impl<TopoDS_Shape>();
+  
+  double aMyStart, aMyEnd;
+  Handle(Geom_Curve) aMyCurve = BRep_Tool::Curve(TopoDS::Edge(aMyShape), aMyStart, aMyEnd);
+  double aInStart, aInEnd;
+  Handle(Geom_Curve) aInCurve = BRep_Tool::Curve(TopoDS::Edge(aInShape), aInStart, aInEnd);
+
+  // Check that curves a the same type
+  GeomAdaptor_Curve aMyAdaptor(aMyCurve);
+  GeomAdaptor_Curve aInAdaptor(aInCurve);
+  if (aMyAdaptor.GetType() != aInAdaptor.GetType())
+    return false;
+
+  // Check that end point parameters are the same
+  if ((aMyStart != aInStart) || (aMyEnd != aInEnd))
+    return false;
+
+  // Check that end points are equal
+  gp_Pnt aMyPnt1 = aMyAdaptor.Value(aMyStart);
+  gp_Pnt aMyPnt2 = aMyAdaptor.Value(aMyEnd);
+  gp_Pnt aInPnt1 = aInAdaptor.Value(aInStart);
+  gp_Pnt aInPnt2 = aInAdaptor.Value(aInEnd);
+
+  if ((!aMyPnt1.IsEqual(aInPnt1, Precision::Confusion())) || 
+    (!aMyPnt2.IsEqual(aInPnt2, Precision::Confusion())))
+    return false;
+
+  return true;
 }

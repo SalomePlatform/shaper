@@ -9,6 +9,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
@@ -16,6 +17,7 @@
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_Edge.h>
 
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
@@ -43,6 +45,7 @@
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <BRep_Tool.hxx>
 #include <TopoDS.hxx>
+#include <TopoDS_Edge.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -362,6 +365,14 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
   if (aShape.ShapeType() != TopAbs_EDGE)
     return ResultPtr();
 
+  // Check that we already have such external edge
+  boost::shared_ptr<GeomAPI_Edge> aInEdge = boost::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge());
+  aInEdge->setImpl(new TopoDS_Shape(aShape));
+  ResultPtr aResult = findExternalEdge(theSketch, aInEdge);
+  if (aResult)
+    return aResult;
+
+  // If not found then we have to create new
   Standard_Real aStart, aEnd;
   Handle(V3d_View) aNullView;
   FeaturePtr aMyFeature;
@@ -434,4 +445,31 @@ bool PartSet_Tools::isContainPresentation(const QList<ModuleBase_ViewerPrs>& the
       return true;
   }
   return false;
+}
+
+ResultPtr PartSet_Tools::findExternalEdge(CompositeFeaturePtr theSketch, boost::shared_ptr<GeomAPI_Edge> theEdge)
+{
+  for (int i = 0; i < theSketch->numberOfSubs(); i++) {
+    FeaturePtr aFeature = theSketch->subFeature(i);
+    boost::shared_ptr<SketchPlugin_Feature> aSketchFea = 
+      boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    if (aSketchFea) {
+      if (aSketchFea->isExternal()) {
+        std::list<ResultPtr> aResults = aSketchFea->results();
+        std::list<ResultPtr>::const_iterator aIt;
+        for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+          ResultConstructionPtr aRes = 
+            boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aIt);
+          if (aRes) {
+            boost::shared_ptr<GeomAPI_Shape> aShape = aRes->shape();
+            if (aShape) {
+              if (theEdge->isEqual(aShape))
+                return aRes;
+            }
+          }
+        }
+      }
+    }
+  }
+  return ResultPtr();
 }

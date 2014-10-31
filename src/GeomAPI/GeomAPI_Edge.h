@@ -41,6 +41,9 @@ public:
 
   /// Returns a circle if edge is based on the cirsle curve
   boost::shared_ptr<GeomAPI_Circ> circle();
+
+  /// Returns true if the current edge is geometrically equal to the given edge
+  bool isEqual(boost::shared_ptr<GeomAPI_Shape> theEdge);
 };
 
 #endif

@@ -14,7 +14,6 @@
 #include <QList>
 
 #include <ModelAPI_CompositeFeature.h>
-#include <TopoDS_Edge.hxx>
 
 #include <boost/shared_ptr.hpp>
 
@@ -24,6 +23,7 @@ class GeomDataAPI_Point2D;
 class GeomAPI_Pln;
 class GeomAPI_Pnt2d;
 class GeomAPI_Pnt;
+class GeomAPI_Edge;
 
 /*!
  \class PartSet_Tools
@@ -141,6 +141,11 @@ class PARTSET_EXPORT PartSet_Tools
   static bool isContainPresentation(const QList<ModuleBase_ViewerPrs>& theSelected,
                                     const ModuleBase_ViewerPrs& thePrs);
 
+  /// Returns Result object if the given skietch contains external edge equal to the given
+  /// \param theSketch - the sketch feature
+  /// \param theEdge - the edge
+  /// \return result object with external edge if it is found
+  static ResultPtr findExternalEdge(CompositeFeaturePtr theSketch, boost::shared_ptr<GeomAPI_Edge> theEdge);
 };
 
 #endif

@@ -55,6 +55,14 @@ class SketchPlugin_Feature : public ModelAPI_Feature
   /// Returns true is sketch element is under the rigid constraint
   SKETCHPLUGIN_EXPORT virtual bool isFixed() {return false;}
 
+  bool isExternal() const
+  {
+    AttributeSelectionPtr aAttr = data()->selection(EXTERNAL_ID());
+    if (aAttr)
+      return aAttr->context();
+    return false;
+  }
+
   /// Returns the sketch of this feature
   SketchPlugin_Sketch* sketch();
 protected:
