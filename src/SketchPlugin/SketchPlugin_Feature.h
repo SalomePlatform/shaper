@@ -56,7 +56,7 @@ class SketchPlugin_Feature : public ModelAPI_Feature
   SKETCHPLUGIN_EXPORT virtual bool isFixed() {return false;}
 
   /// Returns the sketch of this feature
-  inline SketchPlugin_Sketch* sketch() {return mySketch;}
+  SketchPlugin_Sketch* sketch();
 protected:
   /// Sets the higher-level feature for the sub-feature (sketch for line)
   void setSketch(SketchPlugin_Sketch* theSketch)

@@ -44,6 +44,9 @@ class FeaturesPlugin_Group : public ModelAPI_Feature
   /// Request for initialization of data model of the feature: adding all attributes
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 
+  /// Result of groups is created on the fly and don't stored to the document
+  FEATURESPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
+
   /// Use plugin manager for features creation
   FeaturesPlugin_Group();
 

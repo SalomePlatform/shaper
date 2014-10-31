@@ -22,6 +22,8 @@
 #include <TopoDS.hxx>
 #include <Visual3d_View.hxx>
 
+#include <math.h>
+
 #define BORDER_SIZE 2
 
 const char* imageZoomCursor[] = { "32 32 3 1", ". c None", "a c #000000", "# c #ffffff",

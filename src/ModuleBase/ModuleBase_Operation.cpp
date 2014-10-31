@@ -29,6 +29,9 @@
 
 #include <Events_Loop.h>
 
+#include <TopoDS.hxx>
+#include <TopoDS_Vertex.hxx>
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -249,6 +252,7 @@ bool ModuleBase_Operation::activateByPreselection()
   ModuleBase_ViewerPrs aPrs;
   QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
   QList<ModuleBase_ViewerPrs>::const_iterator aPIt;
+  bool isSet = false;
   for (aWIt = aWidgets.constBegin(), aPIt = myPreSelection.constBegin();
        (aWIt != aWidgets.constEnd()) && (aPIt != myPreSelection.constEnd());
        ++aWIt, ++aPIt) {
@@ -256,10 +260,16 @@ bool ModuleBase_Operation::activateByPreselection()
     aPrs = (*aPIt);
     ModuleBase_WidgetValueFeature aValue;
     aValue.setObject(aPrs.object());
-    if (!aWgt->setValue(&aValue))
+    // Check if the selection has a selected point
+    // for today it is impossible to do because
+    // the selected point demands convertation to Sketch plane 2d
+    if (!aWgt->setValue(&aValue)) {
+      isSet = false;
       break;
+    } else 
+      isSet = true;
   }
-  if (canBeCommitted()) {
+  if (isSet && canBeCommitted()) {
     // if all widgets are filled with selection
     commit();
     return true;

@@ -101,16 +101,12 @@ boost::shared_ptr<GeomAPI_Shape> Model_ResultBody::shape()
   return boost::shared_ptr<GeomAPI_Shape>();
 }
 
-boost::shared_ptr<ModelAPI_Feature> Model_ResultBody::owner()
-{
-  return myOwner;
-}
-
 void Model_ResultBody::clean()
 {
   std::vector<TNaming_Builder*>::iterator aBuilder = myBuilders.begin();
   for(; aBuilder != myBuilders.end(); aBuilder++)
     delete *aBuilder;
+  myBuilders.clear();
 }
 
 Model_ResultBody::~Model_ResultBody()

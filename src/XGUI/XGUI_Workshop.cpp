@@ -1306,3 +1306,15 @@ void XGUI_Workshop::setDisplayMode(const QList<ObjectPtr>& theList, int theMode)
   if (theList.size() > 0)
     myDisplayer->updateViewer();
 }
+
+//**************************************************************
+void XGUI_Workshop::closeDocument()
+{
+  myDisplayer->closeLocalContexts();
+  myDisplayer->eraseAll();
+  objectBrowser()->clearContent();
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  aMgr->moduleDocument()->close();
+  objectBrowser()->clearContent();
+}

@@ -270,7 +270,7 @@ void XGUI_PreferencesDlg::modified(XGUI_Prefs& theModified) const
 void XGUI_PreferencesDlg::onDefault()
 {
   // reset main resources
-#ifdef WIN32
+#ifdef SALOME_750 // until SALOME 7.5.0 is released
   QtxResourceMgr::WorkingMode aPrev =
       myPreferences->resourceMgr()->setWorkingMode(QtxResourceMgr::IgnoreUserValues);
   myPreferences->retrieve();

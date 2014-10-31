@@ -10,6 +10,7 @@
 #include <Model_ResultPart.h>
 #include <Model_ResultConstruction.h>
 #include <Model_ResultBody.h>
+#include <Model_ResultGroup.h>
 #include <ModelAPI_Validator.h>
 #include <Events_Loop.h>
 #include <Events_Error.h>
@@ -210,12 +211,12 @@ void Model_Document::close()
   for (; aSubIter != mySubs.end(); aSubIter++)
     subDoc(*aSubIter)->close();
   mySubs.clear();
-  // close this
-  /* do not close because it can be undoed
-   if (myDoc->CanClose() == CDM_CCS_OK)
-   myDoc->Close();
-   Model_Application::getApplication()->deleteDocument(myID);
-   */
+  // close this only if it is module document, otherwise it can be undoed
+  if (this == aPM->moduleDocument().get()) {
+    if (myDoc->CanClose() == CDM_CCS_OK)
+      myDoc->Close();
+    Model_Application::getApplication()->deleteDocument(myID);
+  }
 }
 
 void Model_Document::startOperation()
@@ -702,29 +703,30 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
   TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
   for (; aLabIter.More(); aLabIter.Next()) {
     TDF_Label aFeatureLabel = aLabIter.Value()->Label();
+    FeaturePtr aFeature;
     if (!myObjs.IsBound(aFeatureLabel)) {  // a new feature is inserted
       // create a feature
-      FeaturePtr aNewObj = ModelAPI_Session::get()->createFeature(
+      aFeature = ModelAPI_Session::get()->createFeature(
           TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
               .ToCString());
-      if (!aNewObj) {  // somethig is wrong, most probably, the opened document has invalid structure
+      if (!aFeature) {  // somethig is wrong, most probably, the opened document has invalid structure
         Events_Error::send("Invalid type of object in the document");
         aLabIter.Value()->Label().ForgetAllAttributes();
         continue;
       }
       // this must be before "setData" to redo the sketch line correctly
-      myObjs.Bind(aFeatureLabel, aNewObj);
-      aNewFeatures.insert(aNewObj);
-      initData(aNewObj, aFeatureLabel, TAG_FEATURE_ARGUMENTS);
+      myObjs.Bind(aFeatureLabel, aFeature);
+      aNewFeatures.insert(aFeature);
+      initData(aFeature, aFeatureLabel, TAG_FEATURE_ARGUMENTS);
 
       // event: model is updated
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-      ModelAPI_EventCreator::get()->sendUpdated(aNewObj, anEvent);
+      ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
 
       // update results of the appeared feature
-      updateResults(aNewObj);
+      updateResults(aFeature);
     } else {  // nothing is changed, both iterators are incremented
-      FeaturePtr aFeature = myObjs.Find(aFeatureLabel);
+      aFeature = myObjs.Find(aFeatureLabel);
       aKeptFeatures.insert(aFeature);
       if (theMarkUpdated) {
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
@@ -733,11 +735,6 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
       updateResults(aFeature);
     }
   }
-  // execute new features to restore results: after features creation to make all references valid
-  /*std::set<FeaturePtr>::iterator aNewIter = aNewFeatures.begin();
-   for(; aNewIter != aNewFeatures.end(); aNewIter++) {
-   (*aNewIter)->execute();
-   }*/
   // check all features are checked: if not => it was removed
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myObjs);
   while (aFIter.More()) {
@@ -752,14 +749,6 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
       static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      /*
-      for (; aRIter != aResults.cend(); aRIter++) {
-        boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-        //aRes->setData(boost::shared_ptr<ModelAPI_Data>()); // deleted flag
-        ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
-        ModelAPI_EventCreator::get()->sendDeleted(aThis, aRes->groupName());
-      }
-      */
       // redisplay also removed feature (used for sketch and AISObject)
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
       aFeature->erase();
@@ -924,6 +913,23 @@ boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
   return aResult;
 }
 
+boost::shared_ptr<ModelAPI_ResultGroup> Model_Document::createGroup(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
+{
+  TDF_Label aLab = resultLabel(theFeatureData, theIndex);
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultGroup::group().c_str());
+  ObjectPtr anOldObject = object(aLab);
+  boost::shared_ptr<ModelAPI_ResultGroup> aResult;
+  if (anOldObject) {
+    aResult = boost::dynamic_pointer_cast<ModelAPI_ResultGroup>(anOldObject);
+  }
+  if (!aResult) {
+    aResult = boost::shared_ptr<ModelAPI_ResultGroup>(new Model_ResultGroup(theFeatureData));
+    storeResult(theFeatureData, aResult, theIndex);
+  }
+  return aResult;
+}
+
 boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
     const boost::shared_ptr<ModelAPI_Result>& theResult)
 {
@@ -969,7 +975,8 @@ void Model_Document::updateResults(FeaturePtr theFeature)
           aNewBody = createBody(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultPart::group().c_str()) {
           aNewBody = createPart(theFeature->data(), aResIndex);
-        } else if (aGroup->Get() != ModelAPI_ResultConstruction::group().c_str()) {
+        } else if (aGroup->Get() != ModelAPI_ResultConstruction::group().c_str() &&
+          aGroup->Get() != ModelAPI_ResultGroup::group().c_str()) {
           Events_Error::send(std::string("Unknown type of result is found in the document:") +
             TCollection_AsciiString(aGroup->Get()).ToCString());
         }

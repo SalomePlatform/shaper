@@ -249,7 +249,7 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
     // the feature is moved only if there is no a local selection on this feature
     if (!isMoved) {
       // MPV: added condition because it could be external edge of some object, not sketch
-      if (aSketchFeature && aSketchFeature->sketch() == sketch().get()) {
+      if (aSketchFeature && sketch()->isSub(aSketchFeature)) {
         aSketchFeature->move(aDeltaX, aDeltaY);
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
         ModelAPI_EventCreator::get()->sendUpdated(feature(), anEvent);

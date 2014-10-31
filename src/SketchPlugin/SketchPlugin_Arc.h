@@ -13,8 +13,11 @@
 /**\class SketchPlugin_Arc
  * \ingroup DataModel
  * \brief Feature for creation of the new arc of circle in PartSet.
+ * The visualization of this object is separated in two parts. The first one is an AIS object
+ * calculated when there is non-initialized attributes of the arc. The second is a result and
+ * it is calculated if all attributes are initialized.
  */
-class SketchPlugin_Arc : public SketchPlugin_Feature  //, public GeomAPI_IPresentable
+class SketchPlugin_Arc : public SketchPlugin_Feature, public GeomAPI_IPresentable
 {
  public:
   /// Arc feature kind
@@ -60,10 +63,7 @@ class SketchPlugin_Arc : public SketchPlugin_Feature  //, public GeomAPI_IPresen
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
   /// Returns the AIS preview
-  virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious)
-  {
-    return simpleAISObject(firstResult(), thePrevious);
-  }
+  virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved
@@ -76,6 +76,10 @@ class SketchPlugin_Arc : public SketchPlugin_Feature  //, public GeomAPI_IPresen
 
   /// Use plugin manager for features creation
   SketchPlugin_Arc();
+
+private:
+  /// Returns true if all obligatory attributes are initialized
+  bool isFeatureValid();
 };
 
 #endif

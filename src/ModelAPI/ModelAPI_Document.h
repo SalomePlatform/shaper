@@ -17,6 +17,7 @@ class ModelAPI_Result;
 class ModelAPI_ResultConstruction;
 class ModelAPI_ResultBody;
 class ModelAPI_ResultPart;
+class ModelAPI_ResultGroup;
 class ModelAPI_Data;
 
 /**\class Model_Document
@@ -75,6 +76,9 @@ public:
       const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   /// Creates a part results
   virtual boost::shared_ptr<ModelAPI_ResultPart> createPart(
+      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+  /// Creates a group results
+  virtual boost::shared_ptr<ModelAPI_ResultGroup> createGroup(
       const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
 
   //! Returns a feature by result (owner of result)

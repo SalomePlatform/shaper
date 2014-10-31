@@ -11,31 +11,23 @@ SketchPlugin_Feature::SketchPlugin_Feature()
   mySketch = 0;
 }
 
-/*
 SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
 {
   if (!mySketch) {
     // find sketch that references to this feature
-    int aSketches = document()->size(ModelAPI_Feature::group());
-    for (int a = 0; a < aSketches && !mySketch; a++) {
-      ObjectPtr anObj = document()->object(ModelAPI_Feature::group(), a);
+    const std::set<AttributePtr>& aBackRefs = data()->refsToMe();
+    std::set<AttributePtr>::const_iterator aBackRef = aBackRefs.begin();
+    for(; aBackRef != aBackRefs.end(); aBackRef++) {
       boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
-        boost::dynamic_pointer_cast<SketchPlugin_Sketch>(anObj);
+        boost::dynamic_pointer_cast<SketchPlugin_Sketch>((*aBackRef)->owner());
       if (aSketch) {
-        std::list<ObjectPtr> aList = aSketch->data()->reflist(SketchPlugin_Sketch::FEATURES_ID())
-            ->list();
-        std::list<ObjectPtr>::iterator aSub = aList.begin();
-        for (; aSub != aList.end(); aSub++) {
-          if ((*aSub)->data()->isEqual(data())) {
-            mySketch = aSketch.get();
-            break;
-          }
-        }
+        mySketch = aSketch.get();
+        break;
       }
     }
   }
   return mySketch;
-}*/
+}
 
 AISObjectPtr SketchPlugin_Feature::simpleAISObject(boost::shared_ptr<ModelAPI_Result> theRes,
                                                    AISObjectPtr thePrevious)
