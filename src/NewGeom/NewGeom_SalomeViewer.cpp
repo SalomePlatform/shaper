@@ -48,6 +48,9 @@ void NewGeom_SalomeViewer::setSelector(NewGeom_OCCSelector* theSel)
       return;
     else {
       mySelector->viewer()->getViewManager()->disconnect(this);
+      OCCViewer_Viewer* aViewer = mySelector->viewer();
+      if (aViewer)
+        aViewer->disconnect(this);
     }
   }
   mySelector = theSel;
