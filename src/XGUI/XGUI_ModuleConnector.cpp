@@ -59,6 +59,8 @@ ModuleBase_Operation* XGUI_ModuleConnector::currentOperation() const
 void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
+  // Close context if it was opened in order to clear stsndard selection modes
+  aDisp->closeLocalContexts(false);
   aDisp->openLocalContext();
   // Convert shape types to selection types
   QIntList aModes;
