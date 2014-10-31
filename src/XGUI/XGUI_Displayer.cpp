@@ -316,20 +316,6 @@ void XGUI_Displayer::openLocalContext()
     //aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
     aContext->OpenLocalContext();
     aContext->NotUseDisplayedObjects();
-
-    // Deactivate trihedron which can be activated in local selector
-    //AIS_ListOfInteractive aPrsList;
-    //aContext->DisplayedObjects(aPrsList, true);
-
-    //Handle(AIS_Trihedron) aTrihedron;
-    //AIS_ListIteratorOfListOfInteractive aIt(aPrsList);
-    //for(; aIt.More(); aIt.Next()){
-    //  aTrihedron = Handle(AIS_Trihedron)::DownCast(aIt.Value());
-    //  if (!aTrihedron.IsNull()) {
-    //    aContext->Deactivate(aTrihedron);
-    //    break;
-    //  }
-    //}
   }
 }
 
@@ -417,6 +403,21 @@ void XGUI_Displayer::activateObjectsOutOfContext(const QIntList& theModes)
     return;
 
   aContext->UseDisplayedObjects();
+
+  //Deactivate trihedron which can be activated in local selector
+  AIS_ListOfInteractive aPrsList;
+  aContext->DisplayedObjects(aPrsList, true);
+
+  Handle(AIS_Trihedron) aTrihedron;
+  AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
+  for(; aLIt.More(); aLIt.Next()){
+    aTrihedron = Handle(AIS_Trihedron)::DownCast(aLIt.Value());
+    if (!aTrihedron.IsNull()) {
+      aContext->Deactivate(aTrihedron);
+      break;
+    }
+  }
+
   ResultToAISMap::iterator aIt;
   Handle(AIS_InteractiveObject) anAISIO;
   for (aIt = myResult2AISObjectMap.begin(); aIt != myResult2AISObjectMap.end(); aIt++) {
