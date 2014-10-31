@@ -25,6 +25,8 @@
 #include <AIS_Shape.hxx>
 #include <AIS_Dimension.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
+#include <SelectMgr_ListOfFilter.hxx>
+#include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
 #include <set>
 
@@ -401,10 +403,25 @@ void XGUI_Displayer::activateObjectsOutOfContext(const QIntList& theModes)
     return;
 
   aContext->UseDisplayedObjects();
+
+  //Deactivate trihedron which can be activated in local selector
+  AIS_ListOfInteractive aPrsList;
+  aContext->DisplayedObjects(aPrsList, true);
+
+  Handle(AIS_Trihedron) aTrihedron;
+  AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
+  for(; aLIt.More(); aLIt.Next()){
+    aTrihedron = Handle(AIS_Trihedron)::DownCast(aLIt.Value());
+    if (!aTrihedron.IsNull()) {
+      aContext->Deactivate(aTrihedron);
+      break;
+    }
+  }
+
   ResultToAISMap::iterator aIt;
   Handle(AIS_InteractiveObject) anAISIO;
   for (aIt = myResult2AISObjectMap.begin(); aIt != myResult2AISObjectMap.end(); aIt++) {
-    anAISIO = (*aIt).second->impl<Handle(AIS_InteractiveObject)>();
+  anAISIO = (*aIt).second->impl<Handle(AIS_InteractiveObject)>();
     aContext->Load(anAISIO, -1, true);
     if (theModes.size() == 0)
       aContext->Activate(anAISIO);
@@ -486,6 +503,12 @@ void XGUI_Displayer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilte
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext.IsNull())
     return;
+  const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
+  SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
+  for (; aIt.More(); aIt.Next()) {
+    if (theFilter.Access() == aIt.Value().Access())
+      return;
+  }
   aContext->AddFilter(theFilter);
 }
 

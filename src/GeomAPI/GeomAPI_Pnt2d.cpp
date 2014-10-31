@@ -10,6 +10,8 @@
 
 #include<gp_Pnt2d.hxx>
 
+#include <Precision.hxx>
+
 #define MY_PNT2D static_cast<gp_Pnt2d*>(myImpl)
 
 GeomAPI_Pnt2d::GeomAPI_Pnt2d(const double theX, const double theY)
@@ -60,4 +62,9 @@ const boost::shared_ptr<GeomAPI_XY> GeomAPI_Pnt2d::xy()
 double GeomAPI_Pnt2d::distance(const boost::shared_ptr<GeomAPI_Pnt2d>& theOther) const
 {
   return MY_PNT2D->Distance(theOther->impl<gp_Pnt2d>());
+}
+
+bool GeomAPI_Pnt2d::isEqual(const boost::shared_ptr<GeomAPI_Pnt2d>& theOther) const
+{
+  return distance(theOther) < Precision::Confusion();
 }

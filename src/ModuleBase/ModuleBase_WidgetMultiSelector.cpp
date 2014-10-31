@@ -131,7 +131,7 @@ QWidget* ModuleBase_WidgetMultiSelector::getControl() const
 QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 {
   QList<QWidget*> result;
-  result << myTypeCombo;
+  //result << myTypeCombo;
   result << myListControl;
   return result;
 }

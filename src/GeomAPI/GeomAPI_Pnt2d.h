@@ -45,6 +45,9 @@ class GEOMAPI_EXPORT GeomAPI_Pnt2d : public GeomAPI_Interface
 
   /// Distance between two points
   double distance(const boost::shared_ptr<GeomAPI_Pnt2d>& theOther) const;
+
+  /// Returns whether the distance between two points is less then precision confusion
+  bool isEqual(const boost::shared_ptr<GeomAPI_Pnt2d>& theOther) const;
 };
 
 #endif
