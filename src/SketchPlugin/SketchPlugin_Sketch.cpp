@@ -14,6 +14,7 @@
 
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
+#include <GeomAlgoAPI_FaceBuilder.h>
 
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Data.h>
@@ -21,8 +22,11 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 
 #include <SketchPlugin_Sketch.h>
+#include <SketchPlugin_Feature.h>
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
@@ -41,6 +45,10 @@ void SketchPlugin_Sketch::initAttributes()
   data()->addAttribute(SketchPlugin_Sketch::DIRY_ID(), GeomDataAPI_Dir::type());
   data()->addAttribute(SketchPlugin_Sketch::NORM_ID(), GeomDataAPI_Dir::type());
   data()->addAttribute(SketchPlugin_Sketch::FEATURES_ID(), ModelAPI_AttributeRefList::type());
+  // the selected face, base for the sketcher plane, not obligatory
+  data()->addAttribute(SketchPlugin_Feature::EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+    getKind(), SketchPlugin_Feature::EXTERNAL_ID());
 }
 
 void SketchPlugin_Sketch::execute()
@@ -258,4 +266,48 @@ void SketchPlugin_Sketch::erase()
     }
   }
   ModelAPI_CompositeFeature::erase();
+}
+
+void SketchPlugin_Sketch::attributeChanged() {
+  static bool myIsUpdated = false; // to avoid infinitive cycle on attrubtes change
+  boost::shared_ptr<GeomAPI_Shape> aSelection = 
+    data()->selection(SketchPlugin_Feature::EXTERNAL_ID())->value();
+  if (aSelection && !myIsUpdated) { // update arguments due to the selection value
+    myIsUpdated = true;
+    // update the sketch plane
+    boost::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aSelection);
+    if (aPlane) {
+      double anA, aB, aC, aD;
+      aPlane->coefficients(anA, aB, aC, aD);
+
+      // calculate attributes of the sketch
+      boost::shared_ptr<GeomAPI_Dir> aNormDir(new GeomAPI_Dir(anA, aB, aC));
+      boost::shared_ptr<GeomAPI_XYZ> aCoords = aNormDir->xyz();
+      boost::shared_ptr<GeomAPI_XYZ> aZero(new GeomAPI_XYZ(0, 0, 0));
+      aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
+      boost::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
+      // X axis is preferable to be dirX on the sketch
+      static const double tol = 1.e-7;
+      bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
+      boost::shared_ptr<GeomAPI_Dir> aTempDir(
+        isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
+      boost::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
+      boost::shared_ptr<GeomAPI_Dir> aXDir(new GeomAPI_Dir(aYDir->cross(aNormDir)));
+
+      boost::shared_ptr<GeomDataAPI_Point> anOrigin = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+        data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+      anOrigin->setValue(anOrigPnt);
+      boost::shared_ptr<GeomDataAPI_Dir> aNormal = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+      aNormal->setValue(aNormDir);
+      boost::shared_ptr<GeomDataAPI_Dir> aDirX = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
+      aDirX->setValue(aXDir);
+      boost::shared_ptr<GeomDataAPI_Dir> aDirY = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        data()->attribute(SketchPlugin_Sketch::DIRY_ID()));
+      aDirY->setValue(aYDir);
+      boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+    }
+    myIsUpdated = false;
+  }
 }
