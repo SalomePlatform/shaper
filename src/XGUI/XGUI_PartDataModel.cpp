@@ -12,6 +12,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultParameters.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultGroup.h>
 
 #include <QIcon>
 #include <QBrush>
@@ -58,6 +59,16 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
             return aObject->data()->name().c_str();
         }
           break;
+        //case GroupsFolder:
+        //  return tr("Groups") + QString(" (%1)").arg(rowCount(theIndex));
+        //case GroupObject: {
+        //  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+        //  ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultGroup::group(),
+        //                                       theIndex.row());
+        //  if (aObject)
+        //    return aObject->data()->name().c_str();
+        //}
+        //  break;
       }
       break;
 
@@ -71,6 +82,8 @@ QVariant XGUI_TopDataModel::data(const QModelIndex& theIndex, int theRole) const
           return QIcon(":pictures/constr_folder.png");
         case ConstructObject:
           return QIcon(":pictures/constr_object.png");
+        //case GroupsFolder:
+        //  return QIcon(":pictures/constr_folder.png");
         }
       }
       break;
@@ -93,7 +106,7 @@ QVariant XGUI_TopDataModel::headerData(int section, Qt::Orientation orientation,
 int XGUI_TopDataModel::rowCount(const QModelIndex& theParent) const
 {
   if (!theParent.isValid())
-    return 2;
+    return 2;  // In case of groups using it has to be +1
 
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   if (theParent.internalId() == ParamsFolder)
@@ -101,6 +114,9 @@ int XGUI_TopDataModel::rowCount(const QModelIndex& theParent) const
 
   if (theParent.internalId() == ConstructFolder)
     return aRootDoc->size(ModelAPI_ResultConstruction::group());
+
+  //if (theParent.internalId() == GroupsFolder)
+  //  return aRootDoc->size(ModelAPI_ResultGroup::group());
 
   return 0;
 }
@@ -118,6 +134,8 @@ QModelIndex XGUI_TopDataModel::index(int theRow, int theColumn, const QModelInde
         return createIndex(theRow, theColumn, (qint32) ParamsFolder);
       case 1:
         return createIndex(theRow, theColumn, (qint32) ConstructFolder);
+      //case 2:
+      //  return createIndex(theRow, theColumn, (qint32) GroupsFolder);
     }
   } else {
     if (theParent.internalId() == ParamsFolder)
@@ -125,6 +143,9 @@ QModelIndex XGUI_TopDataModel::index(int theRow, int theColumn, const QModelInde
 
     if (theParent.internalId() == ConstructFolder)
       return createIndex(theRow, theColumn, (qint32) ConstructObject);
+
+    //if (theParent.internalId() == GroupsFolder)
+    //  return createIndex(theRow, theColumn, (qint32) GroupObject);
   }
   return QModelIndex();
 }
@@ -135,11 +156,14 @@ QModelIndex XGUI_TopDataModel::parent(const QModelIndex& theIndex) const
   switch (aId) {
     case ParamsFolder:
     case ConstructFolder:
+    //case GroupsFolder:
       return QModelIndex();
     case ParamObject:
       return createIndex(0, 0, (qint32) ParamsFolder);
     case ConstructObject:
       return createIndex(1, 0, (qint32) ConstructFolder);
+    //case GroupObject:
+    //  return createIndex(2, 0, (qint32) GroupsFolder);
   }
   return QModelIndex();
 }
@@ -163,6 +187,10 @@ ObjectPtr XGUI_TopDataModel::object(const QModelIndex& theIndex) const
       DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
       return aRootDoc->object(ModelAPI_ResultConstruction::group(), theIndex.row());
     }
+    //case GroupObject: {
+    //  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    //  return aRootDoc->object(ModelAPI_ResultGroup::group(), theIndex.row());
+    //}
   }
   return ObjectPtr();
 }
@@ -178,6 +206,8 @@ QModelIndex XGUI_TopDataModel::findGroup(const std::string& theGroup) const
     return createIndex(0, 0, (qint32) ParamsFolder);
   if (theGroup == ModelAPI_ResultConstruction::group())
     return createIndex(1, 0, (qint32) ConstructFolder);
+  //if (theGroup == ModelAPI_ResultGroup::group())
+  //  return createIndex(2, 0, (qint32) ConstructFolder);
   return QModelIndex();
 }
 
@@ -200,6 +230,8 @@ QModelIndex XGUI_TopDataModel::objectIndex(const ObjectPtr& theObject) const
         return createIndex(aRow, 0, (qint32) ParamObject);
       if (aGroup == ModelAPI_ResultConstruction::group())
         return createIndex(aRow, 0, (qint32) ConstructObject);
+      //if (aGroup == ModelAPI_ResultGroup::group())
+      //  return createIndex(aRow, 0, (qint32) GroupObject);
     }
   }
   return aIndex;
@@ -235,25 +267,35 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
           return tr("Constructions") + QString(" (%1)").arg(rowCount(theIndex));
         case BodiesFolder:
           return tr("Bodies") + QString(" (%1)").arg(rowCount(theIndex));
+        case GroupsFolder:
+          return tr("Groups") + QString(" (%1)").arg(rowCount(theIndex));
         case ParamObject: {
           ObjectPtr aObject = partDocument()->object(ModelAPI_ResultParameters::group(),
                                                      theIndex.row());
           if (aObject)
             return boost::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
         }
+          break;
         case ConstructObject: {
           ObjectPtr aObject = partDocument()->object(ModelAPI_ResultConstruction::group(),
                                                      theIndex.row());
           if (aObject)
             return boost::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
         }
+          break;
         case BodiesObject: {
           ObjectPtr aObject = partDocument()->object(ModelAPI_ResultBody::group(), theIndex.row());
           if (aObject)
             return aObject->data()->name().c_str();
         }
+          break;
+        case GroupObject: {
+          ObjectPtr aObject = partDocument()->object(ModelAPI_ResultGroup::group(), theIndex.row());
+          if (aObject)
+            return aObject->data()->name().c_str();
+        }
         case HistoryObject: {
-          ObjectPtr aObject = partDocument()->object(ModelAPI_Feature::group(), theIndex.row() - 3);
+          ObjectPtr aObject = partDocument()->object(ModelAPI_Feature::group(), theIndex.row() - 4);
           if (aObject)
             return aObject->data()->name().c_str();
         }
@@ -269,7 +311,10 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
         case ConstructFolder:
         case BodiesFolder:
           return QIcon(":pictures/constr_folder.png");
+        case GroupsFolder:
+          return QIcon(":pictures/constr_folder.png");
         case ConstructObject:
+        case GroupObject:
         case BodiesObject: {
           std::string aGroup = theIndex.internalId() == ConstructObject ?
             ModelAPI_ResultConstruction::group() : ModelAPI_ResultBody::group();
@@ -280,7 +325,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
           return QIcon(":pictures/constr_object.png");
         }
         case HistoryObject: {
-          ObjectPtr aObject = partDocument()->object(ModelAPI_Feature::group(), theIndex.row() - 3);
+          ObjectPtr aObject = partDocument()->object(ModelAPI_Feature::group(), theIndex.row() - 4);
           FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
           if (aFeature)
             return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
@@ -316,7 +361,7 @@ int XGUI_PartDataModel::rowCount(const QModelIndex& parent) const
       {
         DocumentPtr aDoc = partDocument();
         if (aDoc)
-          return 3 + aDoc->size(ModelAPI_Feature::group());
+          return 4 + aDoc->size(ModelAPI_Feature::group());
         else 
           return 0;
       }
@@ -326,6 +371,8 @@ int XGUI_PartDataModel::rowCount(const QModelIndex& parent) const
       return partDocument()->size(ModelAPI_ResultConstruction::group());
     case BodiesFolder:
       return partDocument()->size(ModelAPI_ResultBody::group());
+    case GroupsFolder:
+      return partDocument()->size(ModelAPI_ResultGroup::group());
   }
   return 0;
 }
@@ -345,11 +392,13 @@ QModelIndex XGUI_PartDataModel::index(int theRow, int theColumn, const QModelInd
     case MyRoot:
       switch (theRow) {
         case 0:
-          return createIndex(0, 0, (qint32) ParamsFolder);
+          return createIndex(theRow, 0, (qint32) ParamsFolder);
         case 1:
-          return createIndex(1, 0, (qint32) ConstructFolder);
+          return createIndex(theRow, 0, (qint32) ConstructFolder);
         case 2:
-          return createIndex(2, 0, (qint32) BodiesFolder);
+          return createIndex(theRow, 0, (qint32) BodiesFolder);
+        case 3:
+          return createIndex(theRow, 0, (qint32) GroupsFolder);
         default:
           return createIndex(theRow, theColumn, (qint32) HistoryObject);
       }
@@ -359,6 +408,8 @@ QModelIndex XGUI_PartDataModel::index(int theRow, int theColumn, const QModelInd
       return createIndex(theRow, 0, (qint32) ConstructObject);
     case BodiesFolder:
       return createIndex(theRow, 0, (qint32) BodiesObject);
+    case GroupsFolder:
+      return createIndex(theRow, 0, (qint32) GroupObject);
   }
   return QModelIndex();
 }
@@ -371,14 +422,18 @@ QModelIndex XGUI_PartDataModel::parent(const QModelIndex& theIndex) const
     case ParamsFolder:
     case ConstructFolder:
     case BodiesFolder:
+    case GroupsFolder:
     case HistoryObject:
       return createIndex(0, 0, (qint32) MyRoot);
+
     case ParamObject:
       return createIndex(0, 0, (qint32) ParamsFolder);
     case ConstructObject:
       return createIndex(1, 0, (qint32) ConstructFolder);
     case BodiesObject:
       return createIndex(2, 0, (qint32) BodiesFolder);
+    case GroupObject:
+      return createIndex(3, 0, (qint32) GroupsFolder);
   }
   return QModelIndex();
 }
@@ -406,15 +461,19 @@ ObjectPtr XGUI_PartDataModel::object(const QModelIndex& theIndex) const
     case ParamsFolder:
     case ConstructFolder:
     case BodiesFolder:
+    case GroupsFolder:
       return ObjectPtr();
+
     case ParamObject:
       return partDocument()->object(ModelAPI_ResultParameters::group(), theIndex.row());
     case ConstructObject:
       return partDocument()->object(ModelAPI_ResultConstruction::group(), theIndex.row());
     case BodiesObject:
       return partDocument()->object(ModelAPI_ResultBody::group(), theIndex.row());
+    case GroupObject:
+      return partDocument()->object(ModelAPI_ResultGroup::group(), theIndex.row());
     case HistoryObject:
-      return partDocument()->object(ModelAPI_Feature::group(), theIndex.row() - 3);
+      return partDocument()->object(ModelAPI_Feature::group(), theIndex.row() - 4);
   }
   return ObjectPtr();
 }
@@ -437,6 +496,8 @@ QModelIndex XGUI_PartDataModel::findGroup(const std::string& theGroup) const
     return createIndex(1, 0, (qint32) ConstructFolder);
   if (theGroup.compare(ModelAPI_ResultBody::group()) == 0)
     return createIndex(2, 0, (qint32) BodiesFolder);
+  if (theGroup.compare(ModelAPI_ResultGroup::group()) == 0)
+    return createIndex(3, 0, (qint32) GroupsFolder);
   return QModelIndex();
 }
 
@@ -472,8 +533,10 @@ QModelIndex XGUI_PartDataModel::objectIndex(const ObjectPtr& theObject) const
       return createIndex(aRow, 0, (qint32) ConstructObject);
     else if (aGroup == ModelAPI_ResultBody::group())
       return createIndex(aRow, 0, (qint32) BodiesObject);
+    else if (aGroup == ModelAPI_ResultGroup::group())
+      return createIndex(aRow, 0, (qint32) GroupObject);
     else
-      return createIndex(aRow + 3, 0, (qint32) HistoryObject);
+      return createIndex(aRow + 4, 0, (qint32) HistoryObject);
   }
   return aIndex;
 }

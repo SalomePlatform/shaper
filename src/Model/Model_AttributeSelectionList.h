@@ -9,6 +9,7 @@
 #include "Model_AttributeSelection.h"
 #include <ModelAPI_AttributeSelectionList.h>
 #include <TDataStd_Integer.hxx>
+#include <TDataStd_Real.hxx>
 #include <vector>
 
 /**\class Model_AttributeSelectionList
@@ -20,6 +21,7 @@
 class Model_AttributeSelectionList : public ModelAPI_AttributeSelectionList
 {
   Handle(TDataStd_Integer) mySize;  ///< Contains size of this list
+  Handle(TDataStd_Real) mySelectionType;  ///< Contains current index, TODO: make it integer, not real
   std::vector<boost::shared_ptr<Model_AttributeSelection> > mySubs; /// the selection attributes
 public:
   /// Adds the new reference to the end of the list
@@ -28,6 +30,10 @@ public:
 
   /// Returns the number ofselection attributes in the list
   MODEL_EXPORT virtual int size();
+
+  MODEL_EXPORT virtual int selectionType();
+
+  MODEL_EXPORT virtual void setSelectionType(int);
 
   /// Returns the attribute selection by the index (zero based)
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeSelection> value(const int theIndex);

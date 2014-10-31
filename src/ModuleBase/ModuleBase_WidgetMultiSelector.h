@@ -61,6 +61,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
  protected:
   void filterShapes(const NCollection_List<TopoDS_Shape>& theShapesToFilter,
                     NCollection_List<TopoDS_Shape>& theResult);
+  void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);
 
  private:
    void updateSelectionList();
@@ -73,7 +74,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
   ModuleBase_IWorkshop* myWorkshop;
 
   /// If true then local selector has to be activated in context
-  QStringList myShapeTypes;
   bool myUseSubShapes;
   bool myIsActive;
 

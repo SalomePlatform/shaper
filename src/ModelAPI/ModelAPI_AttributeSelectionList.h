@@ -24,6 +24,10 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// Returns the number ofselection attributes in the list
   virtual int size() = 0;
 
+  virtual int selectionType() = 0;
+
+  virtual void setSelectionType(int) = 0;
+
   /// Returns the attribute selection by the index (zero based)
   virtual boost::shared_ptr<ModelAPI_AttributeSelection> value(const int theIndex) = 0;
 
