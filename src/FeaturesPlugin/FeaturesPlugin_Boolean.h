@@ -39,8 +39,8 @@ class FeaturesPlugin_Boolean : public ModelAPI_Feature
   }
 
   enum {
-    BOOL_FUSE,
 	BOOL_CUT,
+	BOOL_FUSE,
     BOOL_COMMON
   };
 

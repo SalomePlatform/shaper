@@ -195,7 +195,7 @@ void Model_ResultBody::loadAndOrientModifiedShapes (
 	ListOfShape aList;
 	boost::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
 	aRShape->setImpl((new TopoDS_Shape(aRoot)));
-	theMS->generated(aRShape, aList);
+	theMS->modified(aRShape, aList);
 	std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aList.begin(), aLast = aList.end();
     for (; anIt != aLast; anIt++) {
       TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>(); 	  

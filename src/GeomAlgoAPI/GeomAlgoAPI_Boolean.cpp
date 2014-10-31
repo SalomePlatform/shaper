@@ -11,9 +11,6 @@
 #include <TopExp_Explorer.hxx>
 #include <GeomAlgoAPI_DFLoader.h>
 
-#define  FUSE   0
-#define  CUT    1
-#define  COMMON 2
 boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCut(
   boost::shared_ptr<GeomAPI_Shape> theShape,
   boost::shared_ptr<GeomAPI_Shape> theTool)
@@ -91,6 +88,7 @@ void GeomAlgoAPI_Boolean::build(boost::shared_ptr<GeomAPI_Shape> theObject,
 		myMkShape = new GeomAlgoAPI_MakeShape (mkFuse);
 		aResult = mkFuse->Shape();//GeomAlgoAPI_DFLoader::refineResult(aFuse->Shape());      
 	  }
+	  break;
 	}
   case BOOL_CUT:
 	{
@@ -101,6 +99,7 @@ void GeomAlgoAPI_Boolean::build(boost::shared_ptr<GeomAPI_Shape> theObject,
 		myMkShape = new GeomAlgoAPI_MakeShape (mkCut);
 		aResult = mkCut->Shape();    
 	  }
+	  break;
 	}
   case BOOL_COMMON:
 	{
@@ -111,6 +110,7 @@ void GeomAlgoAPI_Boolean::build(boost::shared_ptr<GeomAPI_Shape> theObject,
 		myMkShape = new GeomAlgoAPI_MakeShape (mkCom);
 		aResult = mkCom->Shape(); 
 	  }
+	  break;
 	}	
   }
   if(myDone) {

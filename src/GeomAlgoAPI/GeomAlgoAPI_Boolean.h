@@ -47,8 +47,8 @@ class GeomAlgoAPI_Boolean : public GeomAPI_Interface
                                               boost::shared_ptr<GeomAPI_Shape> theTool);
 
    enum {
-    BOOL_FUSE,
 	BOOL_CUT,
+    BOOL_FUSE,
     BOOL_COMMON
   };
   /// Constructor

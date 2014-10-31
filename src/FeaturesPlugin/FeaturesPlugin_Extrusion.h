@@ -53,7 +53,7 @@ class FeaturesPlugin_Extrusion : public ModelAPI_Feature
 
   /// Use plugin manager for features creation
   FeaturesPlugin_Extrusion();
-
+private:
   /// Load Naming data structure of the feature to the document
   void LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature, boost::shared_ptr<ModelAPI_ResultBody> theResultBody,
 	                boost::shared_ptr<GeomAPI_Shape> theBasis,
