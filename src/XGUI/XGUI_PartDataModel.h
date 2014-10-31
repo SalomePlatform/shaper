@@ -53,6 +53,8 @@ Q_OBJECT
     ParamObject,
     ConstructFolder,
     ConstructObject
+    //GroupsFolder,
+    //GroupObject
   };
 
 };
@@ -119,6 +121,8 @@ Q_OBJECT
     ConstructObject,
     BodiesFolder,
     BodiesObject,
+    GroupsFolder,
+    GroupObject,
     HistoryObject
   };
 

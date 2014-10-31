@@ -248,7 +248,7 @@ bool ModuleBase_Operation::activateByPreselection()
   if (aWidgets.empty())
     return false;
   
-  ModuleBase_ModelWidget* aWgt;
+  ModuleBase_ModelWidget* aWgt, *aFilledWgt = 0;
   ModuleBase_ViewerPrs aPrs;
   QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
   QList<ModuleBase_ViewerPrs>::const_iterator aPIt;
@@ -266,13 +266,22 @@ bool ModuleBase_Operation::activateByPreselection()
     if (!aWgt->setValue(&aValue)) {
       isSet = false;
       break;
-    } else 
+    } else {
       isSet = true;
+      aFilledWgt = aWgt;
+    }
   }
   if (isSet && canBeCommitted()) {
     // if all widgets are filled with selection
     commit();
     return true;
+  }
+  else {
+    //activate next widget
+    if (aFilledWgt) {
+      myPropertyPanel->activateNextWidget(aFilledWgt);
+      return true;
+    }
   }
 
   //ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
