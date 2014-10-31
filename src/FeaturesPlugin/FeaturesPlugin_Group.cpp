@@ -9,6 +9,7 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_ResultGroup.h>
 
 
 using namespace std;
@@ -26,6 +27,7 @@ void FeaturesPlugin_Group::initAttributes()
 void FeaturesPlugin_Group::execute()
 {
   if (results().empty()) { // just create result if not exists
-    document()->createGroup(data());
+    ResultPtr aGroup = document()->createGroup(data());
+    setResult(aGroup);
   }
 }
