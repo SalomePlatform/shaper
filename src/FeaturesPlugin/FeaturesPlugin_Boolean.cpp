@@ -10,9 +10,16 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_ResultBody.h>
 #include <GeomAlgoAPI_Boolean.h>
-
+#include <Events_Error.h>
 using namespace std;
+#ifdef _DEBUG
+#include <iostream>
+#include <ostream>
+#endif
 
+#define FACE 4
+#define _MODIFY_TAG 1
+#define _DELETED_TAG 2
 FeaturesPlugin_Boolean::FeaturesPlugin_Boolean()
 {
 }
@@ -46,25 +53,61 @@ void FeaturesPlugin_Boolean::execute()
     return;
   int aType = aTypeAttr->value();
 
-  boost::shared_ptr<GeomAPI_Shape> aObject = this->getShape(FeaturesPlugin_Boolean::OBJECT_ID());
-  if (!aObject)
+  boost::shared_ptr<GeomAPI_Shape> anObject = this->getShape(FeaturesPlugin_Boolean::OBJECT_ID());
+  if (!anObject)
     return;
 
   boost::shared_ptr<GeomAPI_Shape> aTool = this->getShape(FeaturesPlugin_Boolean::TOOL_ID());
   if (!aTool)
     return;
 
-  boost::shared_ptr<ModelAPI_ResultBody> aResult = document()->createBody(data());
-  switch (aType) {
-  case BOOL_CUT:
-    aResult->store(GeomAlgoAPI_Boolean::makeCut(aObject, aTool));
-    break;
-  case BOOL_FUSE:
-    aResult->store(GeomAlgoAPI_Boolean::makeFuse(aObject, aTool));
-    break;
-  case BOOL_COMMON:
-    aResult->store(GeomAlgoAPI_Boolean::makeCommon(aObject, aTool));
-    break;
+  boost::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
+
+  GeomAlgoAPI_Boolean* aFeature = new GeomAlgoAPI_Boolean(anObject, aTool, aType);
+  if(aFeature && !aFeature->isDone()) {
+    std::string aFeatureError = "Boolean feature: algorithm failed";  
+    Events_Error::send(aFeatureError, this);
+    return;
   }
-  setResult(aResult);
+   // Check if shape is valid
+  if (aFeature->shape()->isNull()) {
+    std::string aShapeError = "Boolean feature: resulting shape is Null";     
+    Events_Error::send(aShapeError, this);
+#ifdef _DEBUG
+    std::cerr << aShapeError << std::endl;
+#endif
+    return;
+  }
+  if(!aFeature->isValid()) {
+    std::string aFeatureError = "Boolean feature: resulting shape is not valid";  
+    Events_Error::send(aFeatureError, this);
+    return;
+  }  
+  //LoadNamingDS
+  LoadNamingDS(aFeature, aResultBody, anObject, aTool, aType);
+
+  setResult(aResultBody);
+}
+
+//============================================================================
+void FeaturesPlugin_Boolean::LoadNamingDS(GeomAlgoAPI_Boolean* theFeature, 
+						boost::shared_ptr<ModelAPI_ResultBody> theResultBody, 
+						boost::shared_ptr<GeomAPI_Shape> theObject,
+						boost::shared_ptr<GeomAPI_Shape> theTool,
+						int theType)
+{  
+
+  //load result
+  theResultBody->storeModified(theObject, theFeature->shape()); 
+
+  GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
+  theFeature->mapOfShapes(*aSubShapes);
+
+  // Put in DF modified faces
+  theResultBody->loadAndOrientModifiedShapes(theFeature->makeShape(), theObject, FACE, _MODIFY_TAG, *aSubShapes);
+  theResultBody->loadAndOrientModifiedShapes(theFeature->makeShape(), theTool,   FACE, _MODIFY_TAG, *aSubShapes);
+
+  //Put in DF deleted faces
+  theResultBody->loadDeletedShapes(theFeature->makeShape(), theObject, FACE, _DELETED_TAG);
+  theResultBody->loadDeletedShapes(theFeature->makeShape(), theTool,   FACE, _DELETED_TAG);  
 }

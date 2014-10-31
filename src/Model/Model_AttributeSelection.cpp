@@ -105,7 +105,9 @@ bool Model_AttributeSelection::update()
     TNaming_Selector aSelector(selectionLabel());
     TDF_LabelMap aScope; // empty means the whole document
     owner()->data()->sendAttributeUpdated(this);
-    return aSelector.Solve(aScope) == Standard_True;
+    bool aResult = aSelector.Solve(aScope) == Standard_True;
+    owner()->data()->sendAttributeUpdated(this);
+    return aResult;
   } else if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
     // construction: identification by the results indexes, recompute faces and
     // take the face that more close by the indexes
@@ -364,7 +366,18 @@ void Model_AttributeSelection::selectConstruction(
             Standard_Real aFirst, aLast;
             Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
             if (allCurves.Contains(aCurve)) {
-              aRefs->Add(aComposite->subFeatureId(a));
+              int anID = aComposite->subFeatureId(a);
+              aRefs->Add(anID);
+              // add edges to sub-label to support naming for edges selection
+              for(TopExp_Explorer anEdgeExp(aSubShape, TopAbs_EDGE); anEdgeExp.More(); anEdgeExp.Next()) {
+                TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExp.Current());
+                Standard_Real aFirst, aLast;
+                Handle(Geom_Curve) aFaceCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+                if (aFaceCurve == aCurve) {
+                  TNaming_Builder anEdgeBuilder(selectionLabel().FindChild(anID));
+                  anEdgeBuilder.Generated(anEdge);
+                }
+              }
             }
           }
         }

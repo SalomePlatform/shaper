@@ -90,6 +90,16 @@ public:
                                                const int  theKindOfShape,
                                                const int  theTag,
                                                GeomAPI_DataMapOfShapeShape& theSubShapes) = 0;
+
+  /// load shapes of the first level (to be used during shape import)
+  virtual void loadFirstLevel(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag) = 0;
+  
+  /// load disconnected edges
+  virtual void loadDisconnectedEdges(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag) = 0;
+
+  /// load disconnected vetexes
+  virtual void loadDisconnectedVertexes(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag) = 0;
+
 protected:
 };
 

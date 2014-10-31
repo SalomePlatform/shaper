@@ -10,6 +10,11 @@
 #include <TDF_ChildIterator.hxx>
 #include <TopTools_MapOfShape.hxx>
 #include <TopExp_Explorer.hxx>
+#include <TopTools_ListOfShape.hxx>
+#include <TopTools_ListIteratorOfListOfShape.hxx>
+#include <TopTools_DataMapOfShapeListOfShape.hxx>
+#include <TopTools_DataMapIteratorOfDataMapOfShapeListOfShape.hxx>
+#include <TopTools_MapIteratorOfMapOfShape.hxx>
 #include <GeomAPI_Shape.h>
 #include <GeomAlgoAPI_MakeShape.h>
 // DEB
@@ -40,7 +45,7 @@ void Model_ResultBody::store(const boost::shared_ptr<GeomAPI_Shape>& theShape)
 }
 
 void Model_ResultBody::storeGenerated(const boost::shared_ptr<GeomAPI_Shape>& theFromShape,
-	                                  const boost::shared_ptr<GeomAPI_Shape>& theToShape)
+  const boost::shared_ptr<GeomAPI_Shape>& theToShape)
 {
   boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
@@ -54,7 +59,7 @@ void Model_ResultBody::storeGenerated(const boost::shared_ptr<GeomAPI_Shape>& th
     TopoDS_Shape aShapeBasis = theFromShape->impl<TopoDS_Shape>();
     if (aShapeBasis.IsNull())
       return;  // null shape inside
-	TopoDS_Shape aShapeNew = theToShape->impl<TopoDS_Shape>();
+    TopoDS_Shape aShapeNew = theToShape->impl<TopoDS_Shape>();
     if (aShapeNew.IsNull())
       return;  // null shape inside
     aBuilder.Generated(aShapeBasis, aShapeNew);
@@ -62,7 +67,7 @@ void Model_ResultBody::storeGenerated(const boost::shared_ptr<GeomAPI_Shape>& th
 }
 
 void Model_ResultBody::storeModified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
-	                                  const boost::shared_ptr<GeomAPI_Shape>& theNewShape)
+  const boost::shared_ptr<GeomAPI_Shape>& theNewShape)
 {
   boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
@@ -76,7 +81,7 @@ void Model_ResultBody::storeModified(const boost::shared_ptr<GeomAPI_Shape>& the
     TopoDS_Shape aShapeOld = theOldShape->impl<TopoDS_Shape>();
     if (aShapeOld.IsNull())
       return;  // null shape inside
-	TopoDS_Shape aShapeNew = theNewShape->impl<TopoDS_Shape>();
+    TopoDS_Shape aShapeNew = theNewShape->impl<TopoDS_Shape>();
     if (aShapeNew.IsNull())
       return;  // null shape inside
     aBuilder.Generated(aShapeOld, aShapeNew);
@@ -122,9 +127,9 @@ TNaming_Builder* Model_ResultBody::builder(const int theTag)
   if (!myBuilders[theTag]) {
     boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(data());
     myBuilders[theTag] = new TNaming_Builder(aData->shapeLab().FindChild(theTag));
-	//TCollection_AsciiString entry;//
-	//TDF_Tool::Entry(aData->shapeLab().FindChild(theTag), entry);
-	//cout << "Label = " <<entry.ToCString() <<endl;
+    //TCollection_AsciiString entry;//
+    //TDF_Tool::Entry(aData->shapeLab().FindChild(theTag), entry);
+    //cout << "Label = " <<entry.ToCString() <<endl;
   }
   return myBuilders[theTag];
 }
@@ -137,7 +142,7 @@ void Model_ResultBody::generated(
 }
 
 void Model_ResultBody::generated(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag)
+  const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag)
 {
   TopoDS_Shape anOldShape = theOldShape->impl<TopoDS_Shape>();
   TopoDS_Shape aNewShape = theNewShape->impl<TopoDS_Shape>();
@@ -146,7 +151,7 @@ void Model_ResultBody::generated(const boost::shared_ptr<GeomAPI_Shape>& theOldS
 
 
 void Model_ResultBody::modified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag)
+  const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag)
 {
   TopoDS_Shape anOldShape = theOldShape->impl<TopoDS_Shape>();
   TopoDS_Shape aNewShape = theNewShape->impl<TopoDS_Shape>();
@@ -154,16 +159,16 @@ void Model_ResultBody::modified(const boost::shared_ptr<GeomAPI_Shape>& theOldSh
 }
 
 void Model_ResultBody::deleted(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const int theTag)
+  const int theTag)
 {
   TopoDS_Shape aShape = theOldShape->impl<TopoDS_Shape>();
   builder(theTag)->Delete(aShape);
 }
 
 void Model_ResultBody::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
-                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
-                                               const int  theKindOfShape,
-                                               const int  theTag)
+  boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+  const int  theKindOfShape,
+  const int  theTag)
 {
   TopoDS_Shape aShapeIn = theShapeIn->impl<TopoDS_Shape>();
   TopTools_MapOfShape aView;
@@ -171,20 +176,20 @@ void Model_ResultBody::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
   for (; ShapeExplorer.More(); ShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = ShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
-	boost::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
-	aRShape->setImpl((new TopoDS_Shape(aRoot)));
+    boost::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
+    aRShape->setImpl((new TopoDS_Shape(aRoot)));
     if (theMS->isDeleted (aRShape)) {
-		builder(theTag)->Delete(aRoot);
+      builder(theTag)->Delete(aRoot);
     }
   }
 }
 
 void Model_ResultBody::loadAndOrientModifiedShapes (
-	                                           GeomAlgoAPI_MakeShape* theMS,
-                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
-                                               const int  theKindOfShape,
-                                               const int  theTag,
-                                               GeomAPI_DataMapOfShapeShape& theSubShapes)
+  GeomAlgoAPI_MakeShape* theMS,
+  boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+  const int  theKindOfShape,
+  const int  theTag,
+  GeomAPI_DataMapOfShapeShape& theSubShapes)
 {
   TopoDS_Shape aShapeIn = theShapeIn->impl<TopoDS_Shape>();
   TopTools_MapOfShape aView;
@@ -192,29 +197,29 @@ void Model_ResultBody::loadAndOrientModifiedShapes (
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
-	ListOfShape aList;
-	boost::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
-	aRShape->setImpl((new TopoDS_Shape(aRoot)));
-	theMS->generated(aRShape, aList);
-	std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aList.begin(), aLast = aList.end();
+    ListOfShape aList;
+    boost::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
+    aRShape->setImpl((new TopoDS_Shape(aRoot)));
+	theMS->modified(aRShape, aList);
+    std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aList.begin(), aLast = aList.end();
     for (; anIt != aLast; anIt++) {
       TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>(); 	  
-	  if (theSubShapes.isBound(*anIt)) {
-		boost::shared_ptr<GeomAPI_Shape> aMapShape(theSubShapes.find(*anIt));
-		aNewShape.Orientation(aMapShape->impl<TopoDS_Shape>().Orientation());
+      if (theSubShapes.isBound(*anIt)) {
+        boost::shared_ptr<GeomAPI_Shape> aMapShape(theSubShapes.find(*anIt));
+        aNewShape.Orientation(aMapShape->impl<TopoDS_Shape>().Orientation());
       }
       if (!aRoot.IsSame (aNewShape)) 
-		  builder(theTag)->Modify(aRoot,aNewShape);
+        builder(theTag)->Modify(aRoot,aNewShape);
     }
   }
 }
 
 void Model_ResultBody::loadAndOrientGeneratedShapes (
-	                                           GeomAlgoAPI_MakeShape* theMS,
-                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
-                                               const int  theKindOfShape,
-                                               const int  theTag,
-                                               GeomAPI_DataMapOfShapeShape& theSubShapes)
+  GeomAlgoAPI_MakeShape* theMS,
+  boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+  const int  theKindOfShape,
+  const int  theTag,
+  GeomAPI_DataMapOfShapeShape& theSubShapes)
 {
   TopoDS_Shape aShapeIn = theShapeIn->impl<TopoDS_Shape>();
   TopTools_MapOfShape aView;
@@ -222,19 +227,122 @@ void Model_ResultBody::loadAndOrientGeneratedShapes (
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
-	ListOfShape aList;
-	boost::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
-	aRShape->setImpl((new TopoDS_Shape(aRoot)));
-	theMS->generated(aRShape, aList);
-	std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aList.begin(), aLast = aList.end();
+    ListOfShape aList;
+    boost::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
+    aRShape->setImpl((new TopoDS_Shape(aRoot)));
+    theMS->generated(aRShape, aList);
+    std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aList.begin(), aLast = aList.end();
     for (; anIt != aLast; anIt++) {
       TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>(); 	  
-	  if (theSubShapes.isBound(*anIt)) {
-		boost::shared_ptr<GeomAPI_Shape> aMapShape(theSubShapes.find(*anIt));
-		aNewShape.Orientation(aMapShape->impl<TopoDS_Shape>().Orientation());
+      if (theSubShapes.isBound(*anIt)) {
+        boost::shared_ptr<GeomAPI_Shape> aMapShape(theSubShapes.find(*anIt));
+        aNewShape.Orientation(aMapShape->impl<TopoDS_Shape>().Orientation());
       }
       if (!aRoot.IsSame (aNewShape)) 
-		  builder(theTag)->Generated(aRoot,aNewShape);
+        builder(theTag)->Generated(aRoot,aNewShape);
     }
+  }
+}
+
+void Model_ResultBody::loadFirstLevel(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag)
+{
+
+}
+
+void Model_ResultBody::loadDisconnectedEdges(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag)
+{
+  if(theShape->isNull()) return;
+  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();  
+  TopTools_DataMapOfShapeListOfShape edgeNaborFaces;
+  TopTools_ListOfShape empty;
+  TopExp_Explorer explF(aShape, TopAbs_FACE);
+  for (; explF.More(); explF.Next()) {
+    const TopoDS_Shape& aFace = explF.Current();
+    TopExp_Explorer explV(aFace, TopAbs_EDGE);
+    for (; explV.More(); explV.Next()) {
+      const TopoDS_Shape& anEdge = explV.Current();
+      if (!edgeNaborFaces.IsBound(anEdge)) edgeNaborFaces.Bind(anEdge, empty);
+      Standard_Boolean faceIsNew = Standard_True;
+      TopTools_ListIteratorOfListOfShape itrF(edgeNaborFaces.Find(anEdge));
+      for (; itrF.More(); itrF.Next()) {
+	    if (itrF.Value().IsSame(aFace)) {
+	    faceIsNew = Standard_False;
+	    break;
+		}
+	  }
+      if (faceIsNew) 
+	    edgeNaborFaces.ChangeFind(anEdge).Append(aFace);      
+	}
+  }
+  
+  TopTools_MapOfShape anEdgesToDelete;
+  TopExp_Explorer anEx(aShape,TopAbs_EDGE); 
+  for(;anEx.More();anEx.Next()) {
+    Standard_Boolean aC0 = Standard_False;
+    TopoDS_Shape anEdge1 = anEx.Current();
+    if (edgeNaborFaces.IsBound(anEdge1)) {
+      const TopTools_ListOfShape& aList1 = edgeNaborFaces.Find(anEdge1);
+      if (aList1.Extent()<2) continue;
+      TopTools_DataMapIteratorOfDataMapOfShapeListOfShape itr(edgeNaborFaces);
+      for (; itr.More(); itr.Next()) {
+	    TopoDS_Shape anEdge2 = itr.Key();
+	    if(anEdgesToDelete.Contains(anEdge2)) continue;
+	    if (anEdge1.IsSame(anEdge2)) continue;
+	    const TopTools_ListOfShape& aList2 = itr.Value();
+	    // compare lists of the neighbour faces of edge1 and edge2
+	    if (aList1.Extent() == aList2.Extent()) {
+	    Standard_Integer aMatches = 0;
+	    for(TopTools_ListIteratorOfListOfShape aLIter1(aList1);aLIter1.More();aLIter1.Next())
+	      for(TopTools_ListIteratorOfListOfShape aLIter2(aList2);aLIter2.More();aLIter2.Next())
+	        if (aLIter1.Value().IsSame(aLIter2.Value())) aMatches++;
+	        if (aMatches == aList1.Extent()) {
+	          aC0=Standard_True;
+			  builder(++theTag)->Generated(anEdge2);       	      
+	          anEdgesToDelete.Add(anEdge2);
+			}
+		}
+	  }      
+      TopTools_MapIteratorOfMapOfShape itDelete(anEdgesToDelete);
+      for(;itDelete.More();itDelete.Next()) 
+	    edgeNaborFaces.UnBind(itDelete.Key());      
+      edgeNaborFaces.UnBind(anEdge1);
+	}
+    if (aC0) 
+	  builder(++theTag)->Generated(anEdge1);       	          
+  }
+}
+
+void Model_ResultBody::loadDisconnectedVertexes(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag)
+{
+  if(theShape->isNull()) return;
+  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();  
+  TopTools_DataMapOfShapeListOfShape vertexNaborFaces;
+  TopTools_ListOfShape empty;
+  TopExp_Explorer explF(aShape, TopAbs_FACE);
+  for (; explF.More(); explF.Next()) {
+    const TopoDS_Shape& aFace = explF.Current();
+    TopExp_Explorer explV(aFace, TopAbs_VERTEX);
+    for (; explV.More(); explV.Next()) {
+      const TopoDS_Shape& aVertex = explV.Current();
+      if (!vertexNaborFaces.IsBound(aVertex)) vertexNaborFaces.Bind(aVertex, empty);
+      Standard_Boolean faceIsNew = Standard_True;
+      TopTools_ListIteratorOfListOfShape itrF(vertexNaborFaces.Find(aVertex));
+      for (; itrF.More(); itrF.Next()) {
+        if (itrF.Value().IsSame(aFace)) {
+          faceIsNew = Standard_False;
+          break;
+        }
+      }
+      if (faceIsNew) {
+        vertexNaborFaces.ChangeFind(aVertex).Append(aFace);
+      }
+    }
+  }
+
+  TopTools_DataMapIteratorOfDataMapOfShapeListOfShape itr(vertexNaborFaces);
+  for (; itr.More(); itr.Next()) {
+    const TopTools_ListOfShape& naborFaces = itr.Value();
+    if (naborFaces.Extent() < 3) 
+		builder(++theTag)->Generated(itr.Key());         
   }
 }
