@@ -242,6 +242,7 @@ void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
+  myListControl->clear();
   QString aNewType = myTypeCombo->currentText();
   QIntList aList;
   aList.append(ModuleBase_WidgetShapeSelector::shapeType(aNewType));
