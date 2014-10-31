@@ -62,6 +62,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
   void filterShapes(const NCollection_List<TopoDS_Shape>& theShapesToFilter,
                     NCollection_List<TopoDS_Shape>& theResult);
   void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);
+  void activateShapeSelection();
 
  private:
    void updateSelectionList();
