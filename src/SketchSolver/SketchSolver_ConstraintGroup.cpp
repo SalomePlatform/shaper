@@ -547,6 +547,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
     aParamIter = myParams.begin() + aParamPos;
   }
   const bool isEntExists = (aEntIter != myEntityAttrMap.end());  // defines that the entity already exists
+  bool isFixed = false; // identify the entity is used in "Rigid" constraint
   const bool isNeedToSolve = myNeedToSolve;
   myNeedToSolve = false;
 
@@ -567,22 +568,36 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
     for (; aConstrIter != myConstraints.end(); aConstrIter++)
       if (aConstrIter->type == SLVS_C_WHERE_DRAGGED &&
           aCoincident.find(aConstrIter->ptA) != aCoincident.end()) {
-        myNeedToSolve = true;
-        return aEntIter->second;
+        isFixed = true;
+        break;
       }
   }
 
   // Look over supported types of entities
   Slvs_Entity aNewEntity;
   aNewEntity.h = SLVS_E_UNKNOWN;
+  double anOldValues[3];
 
   // Point in 3D
   boost::shared_ptr<GeomDataAPI_Point> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
       theEntity);
   if (aPoint) {
+    if (isFixed)
+    {
+      anOldValues[0] = aParamIter->val;
+      anOldValues[1] = (aParamIter+1)->val;
+      anOldValues[2] = (aParamIter+2)->val;
+    }
     Slvs_hParam aX = changeParameter(aPoint->x(), aParamIter);
     Slvs_hParam aY = changeParameter(aPoint->y(), aParamIter);
     Slvs_hParam aZ = changeParameter(aPoint->z(), aParamIter);
+    if (isFixed && myNeedToSolve)
+    { // the entity is fixed, but its parameters are changed, we need to revert them and recalculate current sketch
+      aParamIter -= 3;
+      changeParameter(anOldValues[0], aParamIter);
+      changeParameter(anOldValues[1], aParamIter);
+      changeParameter(anOldValues[2], aParamIter);
+    }
     if (!isEntExists) // New entity
       aNewEntity = Slvs_MakePoint3d(++myEntityMaxID, myID, aX, aY, aZ);
   } else {
@@ -594,15 +609,33 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
     boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
         boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEntity);
     if (aPoint2D) {
+      if (isFixed)
+      {
+        anOldValues[0] = aParamIter->val;
+        anOldValues[1] = (aParamIter+1)->val;
+      }
       Slvs_hParam aU = changeParameter(aPoint2D->x(), aParamIter);
       Slvs_hParam aV = changeParameter(aPoint2D->y(), aParamIter);
+      if (isFixed && myNeedToSolve)
+      { // the entity is fixed, but its parameters are changed, we need to revert them and recalculate current sketch
+        aParamIter -= 2;
+        changeParameter(anOldValues[0], aParamIter);
+        changeParameter(anOldValues[1], aParamIter);
+      }
       if (!isEntExists) // New entity
         aNewEntity = Slvs_MakePoint2d(++myEntityMaxID, myID, myWorkplane.h, aU, aV);
     } else {
       // Scalar value (used for the distance entities)
       AttributeDoublePtr aScalar = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theEntity);
       if (aScalar) {
+        if (isFixed)
+          anOldValues[0] = aParamIter->val;
         Slvs_hParam aValue = changeParameter(aScalar->value(), aParamIter);
+        if (isFixed && myNeedToSolve)
+        { // the entity is fixed, but its parameters are changed, we need to revert them and recalculate current sketch
+          aParamIter--;
+          changeParameter(anOldValues[0], aParamIter);
+        }
         if (!isEntExists) // New entity
           aNewEntity = Slvs_MakeDistance(++myEntityMaxID, myID, myWorkplane.h, aValue);
       }
@@ -613,10 +646,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
   Slvs_hEntity aResult = SLVS_E_UNKNOWN; // Unsupported or wrong entity type
 
   if (isEntExists) {
-    if (!myEntOfConstr[aEntPos]) // the entity is not used by constraints, no need to resolve them
-      myNeedToSolve = isNeedToSolve;
-    else
-      myNeedToSolve = myNeedToSolve || isNeedToSolve;
+    myNeedToSolve = myNeedToSolve || isNeedToSolve;
     aResult = aEntIter->second;
   } else if (aNewEntity.h != SLVS_E_UNKNOWN) {
     myEntities.push_back(aNewEntity);
