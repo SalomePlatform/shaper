@@ -22,6 +22,8 @@
 #include <TopoDS.hxx>
 #include <Visual3d_View.hxx>
 
+#include <math.h>
+
 #define BORDER_SIZE 2
 
 const char* imageZoomCursor[] = { "32 32 3 1", ". c None", "a c #000000", "# c #ffffff",
@@ -871,6 +873,16 @@ void XGUI_ViewWindow::vpMouseMoveEvent(QMouseEvent* theEvent)
  */
 void XGUI_ViewWindow::drawRect()
 {
+  // there is a fix for a black-colored window 
+  // the rubber band is valid if the values delta is less than 1
+  // TODO: move this fix to the RectRubberBand according to SALOME 7.5
+  double aDeltaX = fabs((float)(myStartX-myCurrX));
+  double aDeltaY = fabs((float)(myStartY-myCurrY));
+  if (aDeltaX <= 1 || aDeltaY == 1) {
+    endDrawRect();
+    return;
+  }
+
   if (!myRectBand) {
     myRectBand = new XGUI_RectRubberBand(myViewPort);
   }
