@@ -137,7 +137,8 @@ void XGUI_AbstractRubberBand::updateMask()
   if (isClosed())
     r += createRegion(myPoints.last(), myPoints.first());
 
-  setMask(r);
+  if (!r.isEmpty())
+    setMask(r);
 }
 
 //**********************************************************
