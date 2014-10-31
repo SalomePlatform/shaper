@@ -34,6 +34,16 @@ int Model_AttributeSelectionList::size()
   return mySize->Get();
 }
 
+int Model_AttributeSelectionList::selectionType()
+{
+  return (int) mySelectionType->Get();
+}
+
+void Model_AttributeSelectionList::setSelectionType(int theType)
+{
+  mySelectionType->Set((double) theType);
+}
+
 boost::shared_ptr<ModelAPI_AttributeSelection> 
   Model_AttributeSelectionList::value(const int theIndex)
 {
@@ -58,6 +68,7 @@ Model_AttributeSelectionList::Model_AttributeSelectionList(TDF_Label& theLabel)
   myIsInitialized = theLabel.FindAttribute(TDataStd_Integer::GetID(), mySize) == Standard_True;
   if (!myIsInitialized) {
     mySize = TDataStd_Integer::Set(theLabel, 0);
+    mySelectionType = TDataStd_Real::Set(theLabel, 0);
   } else { // recollect mySubs
     int aNum = mySize->Get();
     TDF_ChildIterator aSubIter(theLabel);
