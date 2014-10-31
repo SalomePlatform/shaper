@@ -217,7 +217,7 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
 {
   QString aShapeTypeName;
   for (int idx = 0; idx < myTypeCombo->count(); ++idx) {
-    aShapeTypeName = myTypeCombo->currentText();
+    aShapeTypeName = myTypeCombo->itemText(idx);
     TopAbs_ShapeEnum aRefType = ModuleBase_WidgetShapeSelector::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
       myTypeCombo->setCurrentIndex(idx);
