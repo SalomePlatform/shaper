@@ -567,7 +567,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
     for (; aConstrIter != myConstraints.end(); aConstrIter++)
       if (aConstrIter->type == SLVS_C_WHERE_DRAGGED &&
           aCoincident.find(aConstrIter->ptA) != aCoincident.end()) {
-        //myNeedToSolve = true;
+        myNeedToSolve = true;
         return aEntIter->second;
       }
   }
