@@ -10,7 +10,6 @@ SET(PROJECT_HEADERS
 	PartSet_Module.h
 	PartSet_OperationFeatureCreate.h
 	PartSet_OperationFeatureEdit.h
-	PartSet_OperationFeatureEditMulti.h
 	PartSet_OperationSketchBase.h
 	PartSet_OperationSketch.h
 	PartSet_OperationFeatureBase.h
@@ -25,7 +24,6 @@ SET(PROJECT_SOURCES
 	PartSet_Module.cpp
 	PartSet_OperationFeatureCreate.cpp
 	PartSet_OperationFeatureEdit.cpp
-	PartSet_OperationFeatureEditMulti.cpp
 	PartSet_OperationSketchBase.cpp
 	PartSet_OperationSketch.cpp
 	PartSet_OperationFeatureBase.cpp

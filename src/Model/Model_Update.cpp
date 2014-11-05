@@ -69,6 +69,9 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
   } else if (theMessage->eventID() == kCreatedEvent || theMessage->eventID() == kUpdatedEvent) {
     boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
         boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    if (theMessage->eventID() == kCreatedEvent) {
+      myJustCreatedOrUpdated.clear();
+    }
     const std::set<ObjectPtr>& anObjs = aMsg->objects();
     std::set<ObjectPtr>::const_iterator anObjIter = anObjs.cbegin();
     for(; anObjIter != anObjs.cend(); anObjIter++)
@@ -111,7 +114,11 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
     }
   }
   myUpdated.clear();
-  // flush
+  if (theMessage->eventID() == kUpdatedEvent) {
+    // flush updates without execution now (updates are caused by this process)
+    aLoop->flush(kUpdatedEvent);
+  }
+  // flush to update display
   static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   aLoop->flush(EVENT_DISP);
   //Events_LongOp::end(this);

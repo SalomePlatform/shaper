@@ -5,7 +5,6 @@
 #include <PartSet_OperationSketch.h>
 
 #include <PartSet_OperationFeatureEdit.h>
-#include <PartSet_OperationFeatureEditMulti.h>
 #include <PartSet_Tools.h>
 
 #include <SketchPlugin_Sketch.h>
@@ -70,15 +69,19 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, ModuleBase_IVi
     //if (aHasShift && aSelected.size() > 0)
     //  return;
 
-    if (aSelected.size() > 0) {
+    // there should be a start of operation, which uses the pre-highlighted objects,
+    // the selected ones are collected here and are processed by a mouse move
+    if (aHighlighted.size() == 1) {
+    //if (aSelected.size() > 0) {
       ObjectPtr aFeature = aSelected.first().object();
       if (aFeature) {
-        std::string anOperationType =
-            (aSelected.size() > 1) ?
-                PartSet_OperationFeatureEditMulti::Type() : PartSet_OperationFeatureEdit::Type();
+        std::string anOperationType = PartSet_OperationFeatureEdit::Type();
         restartOperation(anOperationType, aFeature);
       }
-    } //else
+    }
+    else
+      myFeatures = aHighlighted;
+    //else
     //myFeatures = aSelected;
 
   } 
@@ -148,7 +151,7 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, ModuleBase_IView
     FeaturePtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), aView, feature(),
                                                         myFeatures);
     if (aFeature)
-      restartOperation(PartSet_OperationFeatureEditMulti::Type(), aFeature);
+      restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
   }
 }
 

@@ -5,8 +5,6 @@
 #include <PartSet_OperationFeatureEdit.h>
 #include <PartSet_Tools.h>
 #include <PartSet_OperationSketch.h>
-#include <PartSet_OperationFeatureEditMulti.h>
-
 #include <SketchPlugin_Constraint.h>
 
 #include <ModuleBase_OperationDescription.h>
@@ -48,7 +46,7 @@ PartSet_OperationFeatureEdit::PartSet_OperationFeatureEdit(const QString& theId,
                                                            QObject* theParent,
                                                            CompositeFeaturePtr theFeature)
     : PartSet_OperationFeatureBase(theId, theParent, theFeature),
-      myIsBlockedSelection(false)
+      myIsBlockedSelection(false), myIsMultiOperation(false)
 {
   myIsEditing = true;
 }
@@ -70,11 +68,12 @@ void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelec
     if (!PartSet_Tools::isContainPresentation(aFeatures, aPrs))
       aFeatures.append(aPrs);
   }
+  myIsMultiOperation = aFeatures.size() > 1; 
 
   // 1. find all features with skipping features with selected vertex shapes
   myFeature2Attribute.clear();
   // firstly, collect the features without local selection
-  /*foreach (ModuleBase_ViewerPrs aPrs, aFeatures) {
+  foreach (ModuleBase_ViewerPrs aPrs, aFeatures) {
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
       const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
@@ -93,7 +92,7 @@ void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelec
         myFeature2Attribute[aFeature] = aList;
       }
     }
-  }*/
+  }
   // 2. collect the features with a local selection on them.
   // if the list already has this feature, the local selection is skipped
   // that means that if the selection contains a feature and a feature with local selected point,
@@ -134,6 +133,9 @@ void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelec
 
 void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection)
 {
+  if (myIsMultiOperation)
+    return;
+
   ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
   if(aActiveWgt && aActiveWgt->isViewerSelector()) {
     // Almost do nothing, all stuff in on PartSet_OperationFeatureBase::mouseReleased
@@ -149,16 +151,20 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, ModuleBas
     }
   }
   ObjectPtr aObject;
-  if (!aSelected.empty()) {
+  /*if (!aSelected.empty()) {
     aObject = aSelected.first().object();
   } else {   
     if (!aHighlighted.empty())
       aObject = aHighlighted.first().object();
+  }*/
+  // the priority to a highlighted object in order to edit it, even if the selected object is
+  // the feature of this operation. Otherwise, the highlighting is ignored and the selected
+  // object is moved
+  if (!aHighlighted.empty()) {
+    aObject = aHighlighted.front().object();
   }
-  //if (!theHighlighted.empty())
-  //  aObject = theHighlighted.front().object();
-  //if (!aObject && !theSelected.empty())  // changed for a constrain
-  //  aObject = theSelected.front().object();
+  if (!aObject && !aSelected.empty())  // changed for a constrain
+    aObject = aSelected.front().object();
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
   if (!aFeature || aFeature != feature() || (aSelected.size() > 1)) {
@@ -182,9 +188,7 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, ModuleBas
       //  emit setSelection(aSelected);
       //} else 
       if (aFeature) {
-        std::string anOperationType =
-            (aSelected.size() > 1) ?
-                PartSet_OperationFeatureEditMulti::Type() : PartSet_OperationFeatureEdit::Type();
+        std::string anOperationType = PartSet_OperationFeatureEdit::Type();
         restartOperation(anOperationType, aFeature);
       }
       //}
@@ -211,6 +215,36 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
 
     double aDeltaX = aX - aCurX;
     double aDeltaY = anY - aCurY;
+
+    if (myIsMultiOperation) {
+      std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
+      while (aFeatIter != myFeature2Attribute.end()) {
+        FeaturePtr aFeature = aFeatIter->first;
+        std::list<std::string> anAttributes = aFeatIter->second;
+        // perform edit for the feature
+        if (anAttributes.empty()) {
+          boost::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+                                         boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+          if (aSketchFeature) {
+            aSketchFeature->move(aDeltaX, aDeltaY);
+          }
+        }
+        // perform edit for the feature's attribute
+        else {
+          std::list<std::string>::const_iterator anAttrIter = anAttributes.begin(),
+                                                 anAttrEnd = anAttributes.end();
+          for (; anAttrIter != anAttrEnd; anAttrIter++) {
+            boost::shared_ptr<GeomDataAPI_Point2D> aPointAttr = boost::dynamic_pointer_cast<
+                             GeomDataAPI_Point2D>(aFeature->data()->attribute(*anAttrIter));
+            if (aPointAttr) {
+              aPointAttr->move(aDeltaX, aDeltaY);
+            }
+          }      
+        }
+        aFeatIter++;
+      }
+    }
+    else { // multieditoperation
 
     boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
         SketchPlugin_Feature>(feature());
@@ -255,6 +289,7 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
         ModelAPI_EventCreator::get()->sendUpdated(feature(), anEvent);
       }
     }
+    } // multieditoperation
   }
   sendFeatures();
 
@@ -266,6 +301,19 @@ void PartSet_OperationFeatureEdit::mouseReleased(
     ModuleBase_ISelection* theSelection)
 {
   theViewer->enableSelection(true);
+  if (myIsMultiOperation) {
+    if (commit()) {
+      std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
+      while (aFeatIter != myFeature2Attribute.end()) {
+        FeaturePtr aFeature = aFeatIter->first;
+        if (aFeature) {
+          emit featureConstructed(aFeature, FM_Deactivation);
+        }
+        aFeatIter++;
+      }
+    }
+  }
+  else { // multieditoperation
   ModuleBase_ModelWidget* aActiveWgt = 0;
   if (myPropertyPanel)
     aActiveWgt = myPropertyPanel->activeWidget();
@@ -275,6 +323,7 @@ void PartSet_OperationFeatureEdit::mouseReleased(
   }// else {
     //blockSelection(false);
   //}
+  } // multieditoperation
 }
 
 void PartSet_OperationFeatureEdit::mouseDoubleClick(
@@ -314,6 +363,8 @@ void PartSet_OperationFeatureEdit::stopOperation()
   //emit multiSelectionEnabled(true);
 
   //blockSelection(false, false);
+
+  myFeature2Attribute.clear();
 }
 
 //void PartSet_OperationFeatureEdit::blockSelection(bool isBlocked, const bool isRestoreSelection)
@@ -346,8 +397,14 @@ void PartSet_OperationFeatureEdit::sendFeatures()
 {
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
 
-  FeaturePtr aFeature = feature();
-  ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
+  std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
+  while (aFeatIter != myFeature2Attribute.end()) {
+    FeaturePtr aFeature = aFeatIter->first;
+    if (aFeature) {
+      ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
+    }
+    aFeatIter++;
+  }
 
   Events_Loop::loop()->flush(anEvent);
   flushUpdated();
