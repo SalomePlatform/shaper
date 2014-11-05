@@ -33,8 +33,8 @@
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse selection sensitivity
 
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
+  : myUseExternalObjects(false), myWorkshop(theWorkshop)
 {
-  myWorkshop = theWorkshop;
 }
 
 XGUI_Displayer::~XGUI_Displayer()
@@ -86,6 +86,17 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     myResult2AISObjectMap[theObject] = theAIS;
     aContext->Display(anAISIO, false);
     aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, isUpdateViewer);
+    if (aContext->HasOpenedContext()) {
+      if (myUseExternalObjects) {
+        if (myActiveSelectionModes.size() == 0)
+          aContext->Activate(anAISIO);
+        else {
+          foreach(int aMode, myActiveSelectionModes) {
+            aContext->Activate(anAISIO, aMode);
+          }
+        }
+      }
+    }
   }
 }
 
@@ -316,6 +327,9 @@ void XGUI_Displayer::openLocalContext()
     //aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
     aContext->OpenLocalContext();
     aContext->NotUseDisplayedObjects();
+
+    myUseExternalObjects = false;
+    myActiveSelectionModes.clear();
   }
 }
 
@@ -363,6 +377,8 @@ void XGUI_Displayer::closeAllContexts(const bool isUpdateViewer)
     ic->CloseAllContexts(false);
     if (isUpdateViewer)
       updateViewer();
+    myUseExternalObjects = false;
+    myActiveSelectionModes.clear();
   }
 }
 
@@ -382,8 +398,20 @@ void XGUI_Displayer::display(AISObjectPtr theAIS, bool isUpdate)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
-  if (!anAISIO.IsNull())
+  if (!anAISIO.IsNull()) {
     aContext->Display(anAISIO, isUpdate);
+    if (aContext->HasOpenedContext()) {
+      if (myUseExternalObjects) {
+        if (myActiveSelectionModes.size() == 0)
+          aContext->Activate(anAISIO);
+        else {
+          foreach(int aMode, myActiveSelectionModes) {
+            aContext->Activate(anAISIO, aMode);
+          }
+        }
+      }
+    }
+  }
 }
 
 void XGUI_Displayer::erase(AISObjectPtr theAIS, const bool isUpdate)
@@ -403,6 +431,8 @@ void XGUI_Displayer::activateObjectsOutOfContext(const QIntList& theModes)
     return;
 
   aContext->UseDisplayedObjects();
+  myUseExternalObjects = true;
+  myActiveSelectionModes = theModes;
 
   //Deactivate trihedron which can be activated in local selector
   AIS_ListOfInteractive aPrsList;

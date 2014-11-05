@@ -187,6 +187,11 @@ class XGUI_EXPORT XGUI_Displayer
 
   typedef std::map<ObjectPtr, AISObjectPtr> ResultToAISMap;
   ResultToAISMap myResult2AISObjectMap;
+
+  // A flag of initialization of external objects selection
+  bool myUseExternalObjects;
+  // Selection modes installed for external objects in local context
+  QIntList myActiveSelectionModes;
 };
 
 #endif
