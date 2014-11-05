@@ -70,7 +70,10 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, ModuleBase_IVi
     //if (aHasShift && aSelected.size() > 0)
     //  return;
 
-    if (aSelected.size() > 0) {
+    // there should be a start of operation, which uses the pre-highlighted objects,
+    // the selected ones are collected here and are processed by a mouse move
+    if (aHighlighted.size() == 1) {
+    //if (aSelected.size() > 0) {
       ObjectPtr aFeature = aSelected.first().object();
       if (aFeature) {
         std::string anOperationType =
@@ -78,7 +81,10 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, ModuleBase_IVi
                 PartSet_OperationFeatureEditMulti::Type() : PartSet_OperationFeatureEdit::Type();
         restartOperation(anOperationType, aFeature);
       }
-    } //else
+    }
+    else
+      myFeatures = aHighlighted;
+    //else
     //myFeatures = aSelected;
 
   } 

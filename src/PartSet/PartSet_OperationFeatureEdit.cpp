@@ -149,16 +149,20 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, ModuleBas
     }
   }
   ObjectPtr aObject;
-  if (!aSelected.empty()) {
+  /*if (!aSelected.empty()) {
     aObject = aSelected.first().object();
   } else {   
     if (!aHighlighted.empty())
       aObject = aHighlighted.first().object();
+  }*/
+  // the priority to a highlighted object in order to edit it, even if the selected object is
+  // the feature of this operation. Otherwise, the highlighting is ignored and the selected
+  // object is moved
+  if (!aHighlighted.empty()) {
+    aObject = aHighlighted.front().object();
   }
-  //if (!theHighlighted.empty())
-  //  aObject = theHighlighted.front().object();
-  //if (!aObject && !theSelected.empty())  // changed for a constrain
-  //  aObject = theSelected.front().object();
+  if (!aObject && !aSelected.empty())  // changed for a constrain
+    aObject = aSelected.front().object();
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
   if (!aFeature || aFeature != feature() || (aSelected.size() > 1)) {
