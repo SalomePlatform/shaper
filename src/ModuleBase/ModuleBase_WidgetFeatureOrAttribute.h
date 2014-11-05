@@ -44,6 +44,11 @@ Q_OBJECT
   virtual bool isViewerSelector() { return true; }
 
  protected:
+   /// Returns the feature attribute if it can be found by the given value
+   /// \param theValue the widget value
+   /// \return an attribute or null
+   boost::shared_ptr<ModelAPI_Attribute> findAttribute(ModuleBase_WidgetValue* theValue);
+
   /// Set the attribute
   /// \param theAttribute value
   /// \return the boolean result of the attribute set

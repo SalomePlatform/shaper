@@ -20,6 +20,9 @@ class SketchPlugin_DistanceAttrValidator : public ModelAPI_RefAttrValidator
   virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
                        const ObjectPtr& theObject) const;
 
+  //! Returns true if the attribute is good for the feature attribute
+  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
+                       const AttributePtr& theAttribute) const { return true; };
 };
 
 /**
@@ -37,7 +40,9 @@ class SketchPlugin_DifferentObjectsValidator : public ModelAPI_RefAttrValidator
   //! Returns true if object is good for the feature attribute
   virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
                        const ObjectPtr& theObject) const;
-
+  //! Returns true if the attribute is good for the feature attribute
+  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
+                       const AttributePtr& theAttribute) const;
 };
 
 #endif

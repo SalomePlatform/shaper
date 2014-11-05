@@ -101,8 +101,8 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
       aPnt_B = getProjectionPoint(aLine, aPnt_A);
     }
   }
-  if (!aPnt_A || !aPnt_B || aPnt_A->isEqual(aPnt_B))
-    return thePrevious;
+  if (!aPnt_A || !aPnt_B)
+    return AISObjectPtr();
 
   boost::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = boost::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
