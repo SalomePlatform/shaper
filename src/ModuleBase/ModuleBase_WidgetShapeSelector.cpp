@@ -187,9 +187,7 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
     ObjectPtr aObject = aObjects.first();
     if ((!mySelectedObject) && (!aObject))
       return;
-    // Check that object is not already selected
-    if (mySelectedObject && aObject && mySelectedObject->isSame(aObject))
-      return;
+
     // Check that the selected object is result (others can not be accepted)
     ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
     if (!aRes)
@@ -243,8 +241,6 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, boost::shared_ptr<GeomAPI_Shape> theShape)
 {
-  if (mySelectedObject == theObj)
-    return;
   mySelectedObject = theObj;
   myShape = theShape;
   if (mySelectedObject) {
