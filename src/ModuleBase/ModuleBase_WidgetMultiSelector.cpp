@@ -79,7 +79,7 @@ bool ModuleBase_WidgetMultiSelector::storeValue() const
   AttributeSelectionListPtr aSelectionListAttr = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
 
-  if (aSelectionListAttr && (mySelection.size() > 0)) {
+  if (aSelectionListAttr) {
     aSelectionListAttr->clear();
     // Store shapes type
     TopAbs_ShapeEnum aCurrentType =
@@ -131,7 +131,7 @@ QWidget* ModuleBase_WidgetMultiSelector::getControl() const
 QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 {
   QList<QWidget*> result;
-  result << myTypeCombo;
+  //result << myTypeCombo;
   result << myListControl;
   return result;
 }
@@ -165,7 +165,6 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
     mySelection.append(GeomSelection(aResult, aShape));
   }
   updateSelectionList();
-  storeValue();
   emit valuesChanged();
 }
 
@@ -232,18 +231,26 @@ void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
   myIsActive = toActivate;
   if (myIsActive) {
     connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-    onSelectionTypeChanged();
+    //onSelectionTypeChanged();
   } else {
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
     myWorkshop->deactivateSubShapesSelection();
   }
 }
 
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
+void ModuleBase_WidgetMultiSelector::activateShapeSelection()
 {
   QString aNewType = myTypeCombo->currentText();
   QIntList aList;
   aList.append(ModuleBase_WidgetShapeSelector::shapeType(aNewType));
   myWorkshop->activateSubShapesSelection(aList);
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
+{
+  QList<ObjectPtr> anEmptyList;
+  myWorkshop->setSelected(anEmptyList);
+  activateShapeSelection();
+  onSelectionChanged();
 }

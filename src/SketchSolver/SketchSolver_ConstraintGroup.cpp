@@ -802,6 +802,8 @@ bool SketchSolver_ConstraintGroup::addWorkplane(boost::shared_ptr<ModelAPI_Compo
 // ============================================================================
 bool SketchSolver_ConstraintGroup::updateWorkplane()
 {
+  if (!mySketch->data())
+    return false; // case sketch is deleted
   // Get parameters of workplane
   boost::shared_ptr<ModelAPI_Attribute> aDirX = mySketch->data()->attribute(
       SketchPlugin_Sketch::DIRX_ID());

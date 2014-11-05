@@ -769,9 +769,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
 
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
-  if (theMarkUpdated) {
-    aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  }
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   boost::static_pointer_cast<Model_Session>(Model_Session::get())
