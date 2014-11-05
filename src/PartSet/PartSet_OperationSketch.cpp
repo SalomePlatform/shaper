@@ -105,9 +105,9 @@ void PartSet_OperationSketch::selectionChanged(ModuleBase_ISelection* theSelecti
       // If selection is not a sketcher presentation then it has to be stored as 
       // External shape
       if (feature() != aPrs.object()) {
-        boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
-          boost::dynamic_pointer_cast<SketchPlugin_Sketch>(feature());
-        DataPtr aData = aSketch->data();
+        //boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
+        //  boost::dynamic_pointer_cast<SketchPlugin_Sketch>(feature());
+        DataPtr aData = feature()->data();
         AttributeSelectionPtr aSelAttr = 
           boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>
           (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
