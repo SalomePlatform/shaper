@@ -264,6 +264,10 @@ void PartSet_Module::onMouseDoubleClick(QMouseEvent* theEvent)
 void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
 {
   myWorkshop->viewer()->setViewProjection(theX, theY, theZ);
+}
+
+void PartSet_Module::onSketchLaunched()
+{
   xWorkshop()->actionsMgr()->update();
   // Set working plane
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
@@ -444,6 +448,7 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
       connect(aSketchOp, SIGNAL(planeSelected(double, double, double)), this,
               SLOT(onPlaneSelected(double, double, double)));
       connect(aSketchOp, SIGNAL(fitAllView()), this, SLOT(onFitAllView()));
+      connect(aSketchOp, SIGNAL(launchSketch()), this, SLOT(onSketchLaunched()));
     }
   }
 
