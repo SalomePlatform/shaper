@@ -54,13 +54,18 @@ class PARTSET_EXPORT PartSet_Tools
   static void convertTo3D(const double theX, const double theY, FeaturePtr theSketch,
                           gp_Pnt& thePoint);
 
-  /// Returns a feature that is under the mouse point
+  /// Returns an object that is under the mouse point. Firstly it checks the highlighting,
+  /// if it exists, the first object is returned. Secondly, there is an iteration on
+  /// the selected list to find the point. Thirdly, if the object is not found under the
+  /// the point, the first selected object is returned.
   /// \param thePoint a screen point
   /// \param theView a 3D view
   /// \param theSketch the sketch feature
-  /// \param theFeatures the list of selected presentations
-  static FeaturePtr nearestFeature(QPoint thePoint, Handle_V3d_View theView, FeaturePtr theSketch,
-                                   const QList<ModuleBase_ViewerPrs>& theFeatures);
+  /// \param theSelected the list of selected presentations
+  /// \param theHighlighted the list of highlighted presentations
+  static ObjectPtr nearestFeature(QPoint thePoint, Handle_V3d_View theView, FeaturePtr theSketch,
+                                  const QList<ModuleBase_ViewerPrs>& theSelected,
+                                  const QList<ModuleBase_ViewerPrs>& theHighlighted);
 
   /// Returns pointer to the root document.
   static boost::shared_ptr<ModelAPI_Document> document();

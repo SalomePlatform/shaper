@@ -62,28 +62,33 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, ModuleBase_IVi
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
     QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
     QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
+    // commented: the next code is commented because the nearestFeature check the highlighting
+    // and selection inside
     //if (aHasShift && (aSelected.size() > 0)) {
-      foreach(ModuleBase_ViewerPrs aPrs, aHighlighted)
-        aSelected.append(aPrs);
+    //  foreach(ModuleBase_ViewerPrs aPrs, aHighlighted)
+    //    aSelected.append(aPrs);
     //}
     //if (aHasShift && aSelected.size() > 0)
     //  return;
 
     // there should be a start of operation, which uses the pre-highlighted objects,
     // the selected ones are collected here and are processed by a mouse move
-    if (aHighlighted.size() == 1) {
+    //if (aHighlighted.size() == 1) {
     //if (aSelected.size() > 0) {
-      ObjectPtr aFeature = aSelected.first().object();
-      if (aFeature) {
-        std::string anOperationType = PartSet_OperationFeatureEdit::Type();
-        restartOperation(anOperationType, aFeature);
-      }
-    }
-    else
-      myFeatures = aHighlighted;
+    //  ObjectPtr aFeature = aSelected.first().object();
+    //  if (aFeature) {
+    // commented: end
+        Handle(V3d_View) aView = theViewer->activeView();
+        ObjectPtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), aView, feature(),
+                                                           aSelected, aHighlighted);
+        if (aFeature)
+          restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+      //}
+    //}
+    //else
+    //  myFeatures = aHighlighted;
     //else
     //myFeatures = aSelected;
-
   } 
 }
 
@@ -146,13 +151,15 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, ModuleBase_IView
   if (!hasSketchPlane() || !(theEvent->buttons() & Qt::LeftButton) || myFeatures.empty())
     return;
 
-  if (myFeatures.size() != 1) {
+  // myFeatures are not filled in the previous realization, so, this code is just commented
+  // because has no effect
+  /*if (myFeatures.size() != 1) {
     Handle(V3d_View) aView = theViewer->activeView();
-    FeaturePtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), aView, feature(),
-                                                        myFeatures);
+    ObjectPtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), aView, feature(),
+                                                       myFeatures);
     if (aFeature)
       restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
-  }
+  }*/
 }
 
 std::list<FeaturePtr> PartSet_OperationSketch::subFeatures() const

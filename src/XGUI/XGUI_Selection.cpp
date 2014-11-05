@@ -21,7 +21,7 @@ XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
 
 QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) const
 {
-  std::set<ObjectPtr> aPrsFeatures;
+  //std::set<ObjectPtr> aPrsFeatures;
   QList<ModuleBase_ViewerPrs> aPresentations;
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
 
@@ -33,10 +33,12 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) 
     aPrs.setInteractive(anIO);
 
     ObjectPtr aFeature = aDisplayer->getObject(anIO);
-    if (aPrsFeatures.find(aFeature) == aPrsFeatures.end()) {
+    // we should not check the appearance of this feature because there can be some selected shapes
+    // for one feature
+    //if (aPrsFeatures.find(aFeature) == aPrsFeatures.end()) {
       aPrs.setFeature(aFeature);
-      aPrsFeatures.insert(aFeature);
-    }
+      //aPrsFeatures.insert(aFeature);
+    //}
     if (aContext->HasOpenedContext()) {
       TopoDS_Shape aShape = aContext->SelectedShape();
       if (!aShape.IsNull() && (aShape.ShapeType() != theShapeTypeToSkip))

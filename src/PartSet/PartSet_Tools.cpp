@@ -147,33 +147,47 @@ void PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr
   thePoint = gp_Pnt(aPoint->x(), aPoint->y(), aPoint->z());
 }
 
-FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
-                                         FeaturePtr theSketch,
-                                         const QList<ModuleBase_ViewerPrs>& theFeatures)
+ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
+                                        FeaturePtr theSketch,
+                                        const QList<ModuleBase_ViewerPrs>& theSelected,
+                                        const QList<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  double aX, anY;
-  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(thePoint, theView);
-  PartSet_Tools::convertTo2D(aPoint, theSketch, theView, aX, anY);
+  ObjectPtr aDeltaObject;
+  // 1. find the object in the highlighted list
+  if (theHighlighted.size() > 0) {
+    aDeltaObject = theHighlighted.first().object();
+  }
+  // 2. find it in the selected list by the selected point
+  if (!aDeltaObject) {
+    double aX, anY;
+    gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(thePoint, theView);
+    PartSet_Tools::convertTo2D(aPoint, theSketch, theView, aX, anY);
 
-  FeaturePtr aFeature;
-  FeaturePtr aDeltaFeature;
-  double aMinDelta = -1;
-  ModuleBase_ViewerPrs aPrs;
-  foreach (ModuleBase_ViewerPrs aPrs, theFeatures) {
-    if (!aPrs.object())
-      continue;
-    boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
-        SketchPlugin_Feature>(aPrs.object());
-    if (!aSketchFeature)
-      continue;
-    double aDelta = aSketchFeature->distanceToPoint(
-        boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
-    if (aMinDelta < 0 || aMinDelta > aDelta) {
-      aMinDelta = aDelta;
-      // TODO aDeltaFeature = aPrs.result();
+    FeaturePtr aFeature;
+    double aMinDelta = -1;
+    ModuleBase_ViewerPrs aPrs;
+    foreach (ModuleBase_ViewerPrs aPrs, theSelected) {
+      if (!aPrs.object())
+        continue;
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aPrs.object());
+      boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
+          SketchPlugin_Feature>(aFeature);
+      if (!aSketchFeature)
+        continue;
+
+      double aDelta = aSketchFeature->distanceToPoint(
+          boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
+      if (aMinDelta < 0 || aMinDelta > aDelta) {
+        aMinDelta = aDelta;
+        // TODO aDeltaObject = aPrs.result();
+      }
     }
   }
-  return aDeltaFeature;
+  // 3. if the object is not found, returns the first selected one
+  if (!aDeltaObject && theSelected.size() > 0)
+    aDeltaObject = theSelected.first().object();
+
+  return aDeltaObject;
 }
 
 boost::shared_ptr<ModelAPI_Document> PartSet_Tools::document()

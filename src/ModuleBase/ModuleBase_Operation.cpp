@@ -221,7 +221,13 @@ bool ModuleBase_Operation::commit()
     disconnect(myPropertyPanel, 0, this, 0);
 
     stopOperation();
-    ModelAPI_Session::get()->finishOperation();
+    // check whether there are modifications performed during the current operation
+    // in the model
+    // in case if there are no modifications, do not increase the undo/redo stack
+    if (ModelAPI_Session::get()->isModified())
+      ModelAPI_Session::get()->finishOperation();
+    else
+      ModelAPI_Session::get()->abortOperation();
 
     emit stopped();
 

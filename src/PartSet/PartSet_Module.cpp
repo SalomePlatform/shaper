@@ -590,11 +590,13 @@ void PartSet_Module::onSelectionChanged()
   QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
   // We need to stop edit operation if selection is cleared
   if (aSelected.size() == 0) {
-    PartSet_OperationFeatureEdit* anEditOp = 
+    // do not perform commit of the current edit operation here, because
+    // this functionality is realized inside this operation
+    /*PartSet_OperationFeatureEdit* anEditOp = 
       dynamic_cast<PartSet_OperationFeatureEdit*>(myWorkshop->currentOperation());
     if (!anEditOp)
       return;
-    anEditOp->commit();
+    anEditOp->commit();*/
   } else {
     PartSet_OperationSketchBase* aSketchOp = 
       dynamic_cast<PartSet_OperationSketchBase*>(myWorkshop->currentOperation());

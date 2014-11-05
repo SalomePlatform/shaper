@@ -134,13 +134,15 @@ Q_OBJECT
   /// Sends the features
   void sendFeatures();
 
+  /// Sends signal about the current features are to be deactivated
+  void emitFeaturesDeactivation();
+
  private:
   // the next map should be removed when selection is processed in the move function
   std::map<FeaturePtr, std::list<std::string> > myFeature2Attribute; /// a map of a feature to attributes
 
   Point myCurPoint;  ///< the current 3D point clicked or moved
   bool myIsBlockedSelection;  ///< the state of the last state of selection blocked signal
-  bool myIsMultiOperation; // the state whether the operation is used for some features
 };
 
 #endif
