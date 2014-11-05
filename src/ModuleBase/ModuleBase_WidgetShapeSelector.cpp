@@ -235,7 +235,7 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
         return;
     }
     setObject(aObject, aShape);
-    activateSelection(false);
+    //activateSelection(false);
     emit focusOutWidget(this);
   }
 }

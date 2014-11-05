@@ -15,6 +15,7 @@
 #include <Geom_Plane.hxx>
 #include <TopoDS_Shape.hxx>
 #include <Quantity_NameOfColor.hxx>
+#include <BRepBndLib.hxx>
 
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_LengthDimension.hxx>
@@ -226,18 +227,30 @@ void GeomAPI_AISObject::createFixed(boost::shared_ptr<GeomAPI_Shape> theShape,
 {
   Handle(Geom_Plane) aPlane = new Geom_Plane(thePlane->impl<gp_Pln>());
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+  Handle(AIS_FixRelation) aFixPrs;
   if (anAIS.IsNull()) {
-    Handle(AIS_FixRelation) aFixPrs = 
-      new AIS_FixRelation(theShape->impl<TopoDS_Shape>(), aPlane);
+    aFixPrs = new AIS_FixRelation(aShape, aPlane);
 
     setImpl(new Handle(AIS_InteractiveObject)(aFixPrs));
   } else {
-    Handle(AIS_PerpendicularRelation) aFixPrs = 
-      Handle(AIS_PerpendicularRelation)::DownCast(anAIS);
+    aFixPrs = Handle(AIS_FixRelation)::DownCast(anAIS);
     if (!aFixPrs.IsNull()) {
-      aFixPrs->SetFirstShape(theShape->impl<TopoDS_Shape>());
+      aFixPrs->SetFirstShape(aShape);
       aFixPrs->SetPlane(aPlane);
       aFixPrs->Redisplay(Standard_True);
+    }
+  }
+  if (!aFixPrs.IsNull()) {
+    Bnd_Box aBox;
+    BRepBndLib::Add(aShape, aBox);
+    double aXmin, aXmax, aYmin, aYmax, aZmin, aZmax;
+    aBox.Get(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+    gp_Pnt aXYZ1(aXmin, aXmax, aYmin);
+    gp_Pnt aXYZ2(aXmax, aYmax, aZmax);
+    double aDist = aXYZ1.Distance(aXYZ2);
+    if (aDist > Precision::Confusion()) {
+      aFixPrs->SetArrowSize(aDist/8.);
     }
   }
 }
