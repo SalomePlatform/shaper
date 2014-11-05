@@ -10,6 +10,8 @@
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
+#define FIXING_COLOR "#ffff00"
+
 /** \class SketchPlugin_ConstraintRigid
  *  \ingroup DataModel
  *  \brief Feature for creation of a new constraint which defines immovable object

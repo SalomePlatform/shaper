@@ -187,12 +187,27 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
     ObjectPtr aObject = aObjects.first();
     if ((!mySelectedObject) && (!aObject))
       return;
-    if (mySelectedObject && aObject && mySelectedObject->isSame(aObject))
-      return;
+
     // Check that the selected object is result (others can not be accepted)
     ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
     if (!aRes)
       return;
+
+    if (myFeature) {
+      // We can not select a result of our feature
+      const std::list<boost::shared_ptr<ModelAPI_Result>>& aResList = myFeature->results();
+      std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
+      for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
+        if ((*aIt) == aRes)
+          return;
+      }
+    }
+    // Check that object belongs to active document or PartSet
+    DocumentPtr aDoc = aRes->document();
+    SessionPtr aMgr = ModelAPI_Session::get();
+    if (!(aDoc == aMgr->activeDocument()) || (aDoc == aMgr->moduleDocument()))
+      return;
+
     // Check that the result has a shape
     GeomShapePtr aShape = ModelAPI_Tools::shape(aRes);
     if (!aShape)
@@ -218,6 +233,7 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
         return;
     }
     setObject(aObject, aShape);
+    //activateSelection(false);
     emit focusOutWidget(this);
   }
 }
@@ -225,8 +241,6 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, boost::shared_ptr<GeomAPI_Shape> theShape)
 {
-  if (mySelectedObject == theObj)
-    return;
   mySelectedObject = theObj;
   myShape = theShape;
   if (mySelectedObject) {
@@ -245,20 +259,6 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, boost::shared_p
 bool ModuleBase_WidgetShapeSelector::isAccepted(const ObjectPtr theResult) const
 {
   ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theResult);
-  if (myFeature) {
-    // We can not select a result of our feature
-    const std::list<boost::shared_ptr<ModelAPI_Result>>& aRes = myFeature->results();
-    std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
-    for (aIt = aRes.cbegin(); aIt != aRes.cend(); ++aIt) {
-      if ((*aIt) == aResult)
-        return false;
-    }
-  }
-  // Check that object belongs to active document or PartSet
-  DocumentPtr aDoc = aResult->document();
-  SessionPtr aMgr = ModelAPI_Session::get();
-  if (!(aDoc == aMgr->activeDocument()) || (aDoc == aMgr->moduleDocument()))
-    return false;
 
   // Check that the shape of necessary type
   boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);

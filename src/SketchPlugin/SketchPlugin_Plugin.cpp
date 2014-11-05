@@ -58,6 +58,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                                    Config_Prop::Color, LENGTH_COLOR);
   Config_PropManager::registerProp("Visualization", "radius_color", "Radius color",
                                    Config_Prop::Color, RADIUS_COLOR);
+  Config_PropManager::registerProp("Visualization", "fixing_color", "Fixing color",
+                                   Config_Prop::Color, FIXING_COLOR);
 }
 
 FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)

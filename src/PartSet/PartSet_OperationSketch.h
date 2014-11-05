@@ -86,7 +86,8 @@ Q_OBJECT
 
   /// Set the plane to the current sketch
   /// \param theShape the shape
-  void setSketchPlane(const TopoDS_Shape& theShape);
+  /// \return selected direction
+  boost::shared_ptr<GeomAPI_Dir> setSketchPlane(const TopoDS_Shape& theShape);
   
   /// Called on selection changed when the operation is active
   virtual void selectionChanged(ModuleBase_ISelection* theSelection);
@@ -103,6 +104,9 @@ signals:
   void planeSelected(double theX, double theY, double theZ);
   // signal about the viewer fit all perform
   void fitAllView();
+
+  /// Signal to define sketch mode
+  void launchSketch();
 
  protected:
   /// Virtual method called when operation started (see start() method for more description)

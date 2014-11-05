@@ -104,13 +104,15 @@ void PartSet_OperationSketch::selectionChanged(ModuleBase_ISelection* theSelecti
     // We have to select a plane before any operation
     TopoDS_Shape aShape = aPrs.shape();
     if (!aShape.IsNull()) {
-      setSketchPlane(aShape);
+      boost::shared_ptr<GeomAPI_Dir> aDir = setSketchPlane(aShape);
+      flushUpdated();
+      emit featureConstructed(feature(), FM_Hide);
       // If selection is not a sketcher presentation then it has to be stored as 
       // External shape
       if (feature() != aPrs.object()) {
-        boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
-          boost::dynamic_pointer_cast<SketchPlugin_Sketch>(feature());
-        DataPtr aData = aSketch->data();
+        //boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
+        //  boost::dynamic_pointer_cast<SketchPlugin_Sketch>(feature());
+        DataPtr aData = feature()->data();
         AttributeSelectionPtr aSelAttr = 
           boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>
           (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
@@ -122,7 +124,11 @@ void PartSet_OperationSketch::selectionChanged(ModuleBase_ISelection* theSelecti
             aSelAttr->setValue(aRes, aShapePtr);
           }
         }
+      } else {
+        // Turn viewer to the plane
+        emit planeSelected(aDir->x(), aDir->y(), aDir->z());
       }
+      emit launchSketch();
     }
   }
 }
@@ -229,10 +235,10 @@ bool PartSet_OperationSketch::hasSketchPlane() const
   return aHasPlane;
 }
 
-void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
+boost::shared_ptr<GeomAPI_Dir> PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
 {
   if (theShape.IsNull())
-    return;
+    return boost::shared_ptr<GeomAPI_Dir>();
 
   // get selected shape
   boost::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
@@ -273,11 +279,7 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
       aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
   aDirY->setValue(aYDir);
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
-
-  flushUpdated();
-
-  emit featureConstructed(feature(), FM_Hide);
-  emit planeSelected(aDir->x(), aDir->y(), aDir->z());
+  return aDir;
 }
 
 
