@@ -5,7 +5,6 @@
 #include <PartSet_OperationSketch.h>
 
 #include <PartSet_OperationFeatureEdit.h>
-#include <PartSet_OperationFeatureEditMulti.h>
 #include <PartSet_Tools.h>
 
 #include <SketchPlugin_Sketch.h>
@@ -76,9 +75,7 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, ModuleBase_IVi
     //if (aSelected.size() > 0) {
       ObjectPtr aFeature = aSelected.first().object();
       if (aFeature) {
-        std::string anOperationType =
-            (aSelected.size() > 1) ?
-                PartSet_OperationFeatureEditMulti::Type() : PartSet_OperationFeatureEdit::Type();
+        std::string anOperationType = PartSet_OperationFeatureEdit::Type();
         restartOperation(anOperationType, aFeature);
       }
     }
@@ -154,7 +151,7 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, ModuleBase_IView
     FeaturePtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), aView, feature(),
                                                         myFeatures);
     if (aFeature)
-      restartOperation(PartSet_OperationFeatureEditMulti::Type(), aFeature);
+      restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
   }
 }
 

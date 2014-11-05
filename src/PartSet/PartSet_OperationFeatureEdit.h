@@ -140,6 +140,7 @@ Q_OBJECT
 
   Point myCurPoint;  ///< the current 3D point clicked or moved
   bool myIsBlockedSelection;  ///< the state of the last state of selection blocked signal
+  bool myIsMultiOperation; // the state whether the operation is used for some features
 };
 
 #endif
