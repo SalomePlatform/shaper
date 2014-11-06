@@ -41,14 +41,14 @@ bool Model_Session::save(const char* theFileName, std::list<std::string>& theRes
 void Model_Session::startOperation()
 {
   ROOT_DOC->startOperation();
+  static boost::shared_ptr<Events_Message> aStartedMsg
+    (new Events_Message(Events_Loop::eventByName("StartOperation")));
+  Events_Loop::loop()->send(aStartedMsg);
 }
 
 void Model_Session::finishOperation()
 {
   ROOT_DOC->finishOperation();
-  static boost::shared_ptr<Events_Message> aFinishMsg
-    (new Events_Message(Events_Loop::eventByName("FinishOperation")));
-  Events_Loop::loop()->send(aFinishMsg);
 }
 
 void Model_Session::abortOperation()

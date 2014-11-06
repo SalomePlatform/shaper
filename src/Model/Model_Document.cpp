@@ -257,11 +257,6 @@ bool Model_Document::compactNested()
 
 void Model_Document::finishOperation()
 {
-  // finish for all subs first: to avoid nested finishing and "isOperation" calls problems inside
-  std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for (; aSubIter != mySubs.end(); aSubIter++)
-    subDoc(*aSubIter)->finishOperation();
-
   // just to be sure that everybody knows that changes were performed
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_Session>(Model_Session::get())
@@ -273,9 +268,27 @@ void Model_Document::finishOperation()
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  // this must be here just after everything is finished but before real transaction stop
+  // to avoid messages about modifications outside of the transaction
+  // and to rebuild everything after all updates and creates
+  if (Model_Session::get()->moduleDocument().get() == this) { // once for root document
+    Events_Loop::loop()->autoFlush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+    static boost::shared_ptr<Events_Message> aFinishMsg
+      (new Events_Message(Events_Loop::eventByName("FinishOperation")));
+    Events_Loop::loop()->send(aFinishMsg);
+    Events_Loop::loop()->autoFlush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED), false);
+  }
+  // to avoid "updated" message appearance by updater
+  //aLoop->clear(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_Session>(Model_Session::get())
         ->setCheckTransactions(true);  // for nested transaction commit
+
+  // finish for all subs first: to avoid nested finishing and "isOperation" calls problems inside
+  std::set<std::string>::iterator aSubIter = mySubs.begin();
+  for (; aSubIter != mySubs.end(); aSubIter++)
+    subDoc(*aSubIter)->finishOperation();
 
   if (myNestedNum != -1)  // this nested transaction is owervritten
     myNestedNum++;

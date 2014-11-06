@@ -42,6 +42,8 @@ Model_Update::Model_Update()
   aLoop->registerListener(this, kOpFinishEvent);
   static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
   aLoop->registerListener(this, kOpAbortEvent);
+  static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
+  aLoop->registerListener(this, kOpStartEvent);
 
   Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild automatically",
                                    Config_Prop::Bool, "false");
@@ -57,6 +59,7 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
   static const Events_ID kUpdatedEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
   static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
   static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
+  static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
   bool isAutomaticChanged = false;
   if (theMessage->eventID() == kChangedEvent) { // automatic and manual rebuild flag is changed
     isAutomatic = 
@@ -69,16 +72,19 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
   } else if (theMessage->eventID() == kCreatedEvent || theMessage->eventID() == kUpdatedEvent) {
     boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
         boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
-    if (theMessage->eventID() == kCreatedEvent) {
-      myJustCreatedOrUpdated.clear();
-    }
     const std::set<ObjectPtr>& anObjs = aMsg->objects();
     std::set<ObjectPtr>::const_iterator anObjIter = anObjs.cbegin();
-    for(; anObjIter != anObjs.cend(); anObjIter++)
+    for(; anObjIter != anObjs.cend(); anObjIter++) {
       myJustCreatedOrUpdated.insert(*anObjIter);
-  } else if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent) {
+    }
+  } else if (theMessage->eventID() == kOpStartEvent) {
     myJustCreatedOrUpdated.clear();
-    return;
+    return; // we don't need the update only on operation start (caused problems in PartSet_Listener::processEvent)
+  } else if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent) {
+    if (isAutomatic == false) { // Apply button now works as "Rebuild"
+      isAutomaticChanged = true;
+      isAutomatic = true;
+    }
   }
 
   if (isExecuted)
@@ -86,7 +92,7 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
 
   //Events_LongOp::start(this);
   isExecuted = true;
-  list<boost::shared_ptr<ModelAPI_Document> > aDocs;
+  std::list<boost::shared_ptr<ModelAPI_Document> > aDocs;
   boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
       boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
   if (aMsg) myInitial = aMsg->objects();
@@ -103,8 +109,12 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
     aDocs.push_back((*aFIter)->document());
   }
   // iterate all features of features-documents to update them (including hidden)
+  std::set<boost::shared_ptr<ModelAPI_Document> > alreadyUsed;
   list<boost::shared_ptr<ModelAPI_Document> >::iterator aDIter = aDocs.begin();
   for (; aDIter != aDocs.end(); aDIter++) {
+    if (alreadyUsed.find(*aDIter) != alreadyUsed.end())
+      continue;
+    alreadyUsed.insert(*aDIter);
     int aNbFeatures = (*aDIter)->size(ModelAPI_Feature::group(), true);
     for (int aFIndex = 0; aFIndex < aNbFeatures; aFIndex++) {
       FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(
@@ -114,16 +124,33 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
     }
   }
   myUpdated.clear();
-  if (theMessage->eventID() == kUpdatedEvent) {
-    // flush updates without execution now (updates are caused by this process)
-    aLoop->flush(kUpdatedEvent);
-  }
   // flush to update display
   static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   aLoop->flush(EVENT_DISP);
   //Events_LongOp::end(this);
   if (isAutomaticChanged) isAutomatic = false;
+
+  if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent) {
+    myJustCreatedOrUpdated.clear();
+  }
+
   isExecuted = false;
+}
+
+void Model_Update::redisplayWithResults(FeaturePtr theFeature) {
+  // maske updated and redisplay all results
+  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
+  std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+  for (; aRIter != aResults.cend(); aRIter++) {
+    boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
+    aRes->data()->mustBeUpdated(false);
+    myUpdated[aRes] = true;
+    ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
+  }
+  // to redisplay "presentable" feature (for ex. distance constraint)
+  ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
+  theFeature->data()->mustBeUpdated(false);
 }
 
 bool Model_Update::updateFeature(FeaturePtr theFeature)
@@ -163,7 +190,6 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
 
     // execute feature if it must be updated
     if (aMustbeUpdated) {
-
       if (boost::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
           !theFeature->isPersistentResult()) {
         ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
@@ -185,7 +211,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
               boost::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
                 boost::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
               for(int a = aSel->size() - 1; a >= 0; a--) {
-                aSel->value(a)->update();
+                  aSel->value(a)->update();
               }
             }
             // execute in try-catch to avoid internal problems of the feature
@@ -196,14 +222,8 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
                 "Feature " + theFeature->getKind() + " has failed during the execution");
               theFeature->eraseResults();
             }
-            theFeature->data()->mustBeUpdated(false);
-            const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
-            std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-            for (; aRIter != aResults.cend(); aRIter++) {
-              boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-              aRes->data()->mustBeUpdated(false);
-            }
-          } else {
+            redisplayWithResults(theFeature);
+          } else { // must be updatet, but not updated yet
             theFeature->data()->mustBeUpdated(true);
             const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
             std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
@@ -211,23 +231,14 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
               boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
               aRes->data()->mustBeUpdated(true);
             }
-            aMustbeUpdated = false;
           }
         } else {
           theFeature->eraseResults();
+          redisplayWithResults(theFeature); // result also must be updated
         }
+      } else { // for automatically updated features (on abort, etc) it is necessary to redisplay anyway
+        redisplayWithResults(theFeature);
       }
-      // redisplay all results
-      static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-      const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
-      std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      for (; aRIter != aResults.cend(); aRIter++) {
-        boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-        myUpdated[aRes] = true;
-        ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
-      }
-      // to redisplay "presentable" feature (for ex. distance constraint)
-      ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
     } else {  // returns also true is results were updated: for sketch that refers to sub-features but results of sub-features were changed
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();

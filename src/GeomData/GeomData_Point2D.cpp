@@ -21,7 +21,6 @@ void GeomData_Point2D::setValue(const double theX, const double theY)
 void GeomData_Point2D::setValue(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   setValue(thePoint->x(), thePoint->y());
-  owner()->data()->sendAttributeUpdated(this);
 }
 
 double GeomData_Point2D::x() const

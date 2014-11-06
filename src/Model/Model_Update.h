@@ -47,6 +47,8 @@ class Model_Update : public Events_Listener
   /// Recoursively checks and updates the object (result or feature) if needed (calls updateFeature)
   /// Returns true if object was updated.
   bool updateObject(boost::shared_ptr<ModelAPI_Object> theObject);
+  /// Sends the redisplay events for feature and results, updates the updated status
+  void redisplayWithResults(boost::shared_ptr<ModelAPI_Feature> theFeature);
 };
 
 #endif

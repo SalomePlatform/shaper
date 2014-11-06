@@ -270,11 +270,12 @@ void SketchPlugin_Sketch::erase()
 }
 
 void SketchPlugin_Sketch::attributeChanged() {
-  static bool myIsUpdated = false; // to avoid infinitive cycle on attrubtes change
+  static bool kIsUpdated = false; // to avoid infinitive cycle on attrubtes change
+  static bool kIsAttrChanged = false;
   boost::shared_ptr<GeomAPI_Shape> aSelection = 
     data()->selection(SketchPlugin_Feature::EXTERNAL_ID())->value();
-  if (aSelection && !myIsUpdated) { // update arguments due to the selection value
-    myIsUpdated = true;
+  if (aSelection && !kIsUpdated) { // update arguments due to the selection value
+    kIsUpdated = true;
     // update the sketch plane
     boost::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aSelection);
     if (aPlane) {
@@ -295,8 +296,9 @@ void SketchPlugin_Sketch::attributeChanged() {
       boost::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
       boost::shared_ptr<GeomAPI_Dir> aXDir(new GeomAPI_Dir(aYDir->cross(aNormDir)));
 
-      boost::shared_ptr<GeomDataAPI_Point> anOrigin = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
-        data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+      kIsAttrChanged = false; // track the attributes were really changed during the plane update
+      boost::shared_ptr<GeomDataAPI_Point> anOrigin = boost::dynamic_pointer_cast
+        <GeomDataAPI_Point>(data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
       anOrigin->setValue(anOrigPnt);
       boost::shared_ptr<GeomDataAPI_Dir> aNormal = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
         data()->attribute(SketchPlugin_Sketch::NORM_ID()));
@@ -308,7 +310,23 @@ void SketchPlugin_Sketch::attributeChanged() {
         data()->attribute(SketchPlugin_Sketch::DIRY_ID()));
       aDirY->setValue(aYDir);
       boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+
+      if (kIsAttrChanged) {
+        // the plane was changed, so reexecute sub-elements to update shapes (located in new plane)
+        ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+        list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
+        for(list<ObjectPtr>::iterator aSubIt = aSubs.begin(); aSubIt != aSubs.end(); aSubIt++) {
+          boost::shared_ptr<SketchPlugin_Feature> aFeature = 
+            boost::dynamic_pointer_cast<SketchPlugin_Feature>(*aSubIt);
+          if (aFeature && aFactory->validate(aFeature)) {
+            aFeature->execute();
+          }
+        }
+        kIsAttrChanged = false;
+      }
     }
-    myIsUpdated = false;
+    kIsUpdated = false;
+  } else if (kIsUpdated) { // other attributes are updated during the selection comupation
+    kIsAttrChanged = true;
   }
 }
