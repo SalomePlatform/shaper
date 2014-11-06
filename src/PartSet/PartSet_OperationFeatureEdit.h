@@ -143,6 +143,8 @@ Q_OBJECT
 
   Point myCurPoint;  ///< the current 3D point clicked or moved
   bool myIsBlockedSelection;  ///< the state of the last state of selection blocked signal
+  bool myIsBlockedByDoubleClick;  ///< the block value by double click is processed to avoid
+  ///< the mouse button release processing before the double click is finished
 };
 
 #endif

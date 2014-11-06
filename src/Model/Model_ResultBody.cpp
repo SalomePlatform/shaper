@@ -6,7 +6,9 @@
 #include <Model_Data.h>
 #include <TNaming_Builder.hxx>
 #include <TNaming_NamedShape.hxx>
+#include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
+#include <TopoDS_Face.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TopTools_MapOfShape.hxx>
 #include <TopExp_Explorer.hxx>
@@ -14,7 +16,13 @@
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 #include <TopTools_DataMapOfShapeListOfShape.hxx>
 #include <TopTools_DataMapIteratorOfDataMapOfShapeListOfShape.hxx>
+#include <TopTools_DataMapIteratorOfDataMapOfShapeShape.hxx>
 #include <TopTools_MapIteratorOfMapOfShape.hxx>
+#include <TopTools_IndexedDataMapOfShapeListOfShape.hxx>
+#include <TopTools_IndexedMapOfShape.hxx>
+#include <TopTools_DataMapOfShapeShape.hxx>
+#include <TopExp.hxx>
+#include <BRepTools.hxx>
 #include <GeomAPI_Shape.h>
 #include <GeomAlgoAPI_MakeShape.h>
 // DEB
@@ -244,12 +252,136 @@ void Model_ResultBody::loadAndOrientGeneratedShapes (
   }
 }
 
-void Model_ResultBody::loadFirstLevel(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag)
+//=======================================================================
+int getDangleShapes(const TopoDS_Shape&           theShapeIn, 
+					const TopAbs_ShapeEnum        theGeneratedFrom,
+				    TopTools_DataMapOfShapeShape& theDangles) 
 {
-
+  theDangles.Clear();
+  TopTools_IndexedDataMapOfShapeListOfShape subShapeAndAncestors;
+  TopAbs_ShapeEnum GeneratedTo;
+  if (theGeneratedFrom == TopAbs_FACE) GeneratedTo = TopAbs_EDGE;
+  else if (theGeneratedFrom == TopAbs_EDGE) GeneratedTo = TopAbs_VERTEX;
+  else return Standard_False;
+  TopExp::MapShapesAndAncestors(theShapeIn, GeneratedTo, theGeneratedFrom, subShapeAndAncestors);
+  for (Standard_Integer i = 1; i <= subShapeAndAncestors.Extent(); i++) {
+    const TopoDS_Shape& mayBeDangle = subShapeAndAncestors.FindKey(i);
+    const TopTools_ListOfShape& ancestors = subShapeAndAncestors.FindFromIndex(i);
+    if (ancestors.Extent() == 1) theDangles.Bind(ancestors.First(), mayBeDangle);
+  }
+  return theDangles.Extent();
 }
 
-void Model_ResultBody::loadDisconnectedEdges(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag)
+//=======================================================================
+void loadGeneratedDangleShapes(
+							   const TopoDS_Shape&      theShapeIn,
+				               const TopAbs_ShapeEnum   theGeneratedFrom,
+				               TNaming_Builder *        theBuilder)
+{
+  TopTools_DataMapOfShapeShape dangles;
+  if (!getDangleShapes(theShapeIn, theGeneratedFrom, dangles)) return;
+  TopTools_DataMapIteratorOfDataMapOfShapeShape itr(dangles);
+  for (; itr.More(); itr.Next()) 
+	theBuilder->Generated(itr.Key(), itr.Value());
+}
+
+//=======================================================================
+void Model_ResultBody::loadNextLevels(boost::shared_ptr<GeomAPI_Shape> theShape, 
+	                                  int&  theTag)
+{
+  if(theShape->isNull()) return;
+  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();    
+  if (aShape.ShapeType() == TopAbs_SOLID) {		    
+    TopExp_Explorer expl(aShape, TopAbs_FACE);
+    for (; expl.More(); expl.Next())      
+	  builder(++theTag)->Generated(expl.Current());     
+  }
+  else if (aShape.ShapeType() == TopAbs_SHELL || aShape.ShapeType() == TopAbs_FACE) {
+    // load faces and all the free edges
+    TopTools_IndexedMapOfShape Faces;
+    TopExp::MapShapes(aShape, TopAbs_FACE, Faces);
+    if (Faces.Extent() > 1 || (aShape.ShapeType() == TopAbs_SHELL && Faces.Extent() == 1)) {
+      TopExp_Explorer expl(aShape, TopAbs_FACE);
+      for (; expl.More(); expl.Next()) 
+		  builder(++theTag)->Generated(expl.Current());          
+	}
+    TopTools_IndexedDataMapOfShapeListOfShape anEdgeAndNeighbourFaces;
+    TopExp::MapShapesAndAncestors(aShape, TopAbs_EDGE, TopAbs_FACE, anEdgeAndNeighbourFaces);
+    for (Standard_Integer i = 1; i <= anEdgeAndNeighbourFaces.Extent(); i++) 
+	{
+      const TopTools_ListOfShape& aLL = anEdgeAndNeighbourFaces.FindFromIndex(i);
+      if (aLL.Extent() < 2) {
+	    builder(++theTag)->Generated(anEdgeAndNeighbourFaces.FindKey(i));    
+      } else {
+	  TopTools_ListIteratorOfListOfShape anIter(aLL);
+	  const TopoDS_Face& aFace = TopoDS::Face(anIter.Value());
+	  anIter.Next();
+	  if(aFace.IsEqual(anIter.Value())) {
+		builder(++theTag)->Generated(anEdgeAndNeighbourFaces.FindKey(i));
+	  }
+	  }
+	}
+  } else if (aShape.ShapeType() == TopAbs_WIRE) {
+    TopTools_IndexedMapOfShape Edges;
+    BRepTools::Map3DEdges(aShape, Edges);
+    if (Edges.Extent() == 1) {
+	  builder(++theTag)->Generated(Edges.FindKey(1));
+      TopExp_Explorer expl(aShape, TopAbs_VERTEX);
+      for (; expl.More(); expl.Next()) {
+	    builder(++theTag)->Generated(expl.Current());
+	  }
+	} else {
+      TopExp_Explorer expl(aShape, TopAbs_EDGE); 
+      for (; expl.More(); expl.Next()) {	
+		builder(++theTag)->Generated(expl.Current());
+	  }   
+      // and load generated vertices.
+      TopTools_DataMapOfShapeShape generated;
+      if (getDangleShapes(aShape, TopAbs_EDGE, generated)) 
+	  {
+		TNaming_Builder* pBuilder = builder(++theTag);
+		loadGeneratedDangleShapes(aShape, TopAbs_EDGE, pBuilder);  
+	  }
+	}
+  } else if (aShape.ShapeType() == TopAbs_EDGE) {
+    TopExp_Explorer expl(aShape, TopAbs_VERTEX);
+    for (; expl.More(); expl.Next()) {      
+		builder(++theTag)->Generated(expl.Current());
+	}
+  }
+}
+//=======================================================================
+void Model_ResultBody::loadFirstLevel(
+	             boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag)
+{
+ if(theShape->isNull()) return;
+ TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();    
+  if (aShape.ShapeType() == TopAbs_COMPOUND || aShape.ShapeType() == TopAbs_COMPSOLID) {
+    TopoDS_Iterator itr(aShape);
+    for (; itr.More(); itr.Next()) {
+	  builder(++theTag)->Generated(itr.Value());     
+      if (itr.Value().ShapeType() == TopAbs_COMPOUND || 
+		  itr.Value().ShapeType() == TopAbs_COMPSOLID) 
+	  {
+		boost::shared_ptr<GeomAPI_Shape> itrShape(new GeomAPI_Shape());
+        itrShape->setImpl(new TopoDS_Shape(itr.Value()));
+	    loadFirstLevel(itrShape, theTag);
+      } else {
+		boost::shared_ptr<GeomAPI_Shape> itrShape(new GeomAPI_Shape());
+        itrShape->setImpl(new TopoDS_Shape(itr.Value()));
+		loadNextLevels(itrShape, theTag);
+	  }
+    }
+  } else {
+    boost::shared_ptr<GeomAPI_Shape> itrShape(new GeomAPI_Shape());
+    itrShape->setImpl(new TopoDS_Shape(aShape));
+	loadNextLevels(itrShape, theTag); 
+  }
+}
+
+//=======================================================================
+void Model_ResultBody::loadDisconnectedEdges(
+	             boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag)
 {
   if(theShape->isNull()) return;
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();  
