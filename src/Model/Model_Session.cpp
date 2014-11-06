@@ -13,6 +13,7 @@
 #include <Events_Loop.h>
 #include <Events_Error.h>
 #include <Config_FeatureMessage.h>
+#include <Config_AttributeMessage.h>
 #include <Config_ValidatorMessage.h>
 #include <Config_ModuleReader.h>
 
@@ -94,7 +95,6 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
   if (this != myImpl)
     return myImpl->createFeature(theFeatureID);
 
-  LoadPluginsInfo();
   if (myPlugins.find(theFeatureID) != myPlugins.end()) {
     std::pair<std::string, std::string>& aPlugin = myPlugins[theFeatureID]; // plugin and doc kind
     if (!aPlugin.second.empty() && aPlugin.second != activeDocument()->kind()) {
@@ -211,6 +211,9 @@ Model_Session::Model_Session()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_VALIDATOR_LOADED));
+  
+  // load all information about plugins, features and attributes
+  LoadPluginsInfo();
 }
 
 void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
@@ -225,6 +228,18 @@ void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMes
       if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
         myPlugins[aMsg->id()] = std::pair<std::string, std::string>(
           aMsg->pluginLibrary(), aMsg->documentKind());
+      }
+    } else {
+      const boost::shared_ptr<Config_AttributeMessage> aMsgAttr = 
+        boost::dynamic_pointer_cast<Config_AttributeMessage>(theMessage);
+      if (aMsgAttr) {
+        if (!aMsgAttr->isObligatory()) {
+          validators()->registerNotObligatory(aMsgAttr->featureId(), aMsgAttr->attributeId());
+        }
+        if(aMsgAttr->isConcealment()) {
+          validators()->registerConcealment(aMsgAttr->featureId(), aMsgAttr->attributeId());
+        }
+        
       }
     }
     // plugins information was started to load, so, it will be loaded

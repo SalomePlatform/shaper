@@ -62,10 +62,13 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
   } else if (myIsProcessWidgets && isWidgetNode(theNode)) {
     boost::shared_ptr<Config_AttributeMessage> aMessage(new Config_AttributeMessage(aMenuItemEvent, this));
     aMessage->setFeatureId(restoreAttribute(NODE_FEATURE, _ID));
-    aMessage->setAttributeId(getProperty(theNode, _ID));
-    aMessage->setObligatory(getBooleanAttribute(theNode, ATTRIBUTE_OBLIGATORY, true));
-    aMessage->setConcealment(getBooleanAttribute(theNode, ATTRIBUTE_CONCEALMENT, false));
-    Events_Loop::loop()->send(aMessage);
+    std::string anAttributeID = getProperty(theNode, _ID);
+    if (!anAttributeID.empty()) {
+      aMessage->setAttributeId(anAttributeID);
+      aMessage->setObligatory(getBooleanAttribute(theNode, ATTRIBUTE_OBLIGATORY, true));
+      aMessage->setConcealment(getBooleanAttribute(theNode, ATTRIBUTE_CONCEALMENT, false));
+      Events_Loop::loop()->send(aMessage);
+    }
   }
   //Process SOURCE, VALIDATOR nodes.
   Config_XMLReader::processNode(theNode);
