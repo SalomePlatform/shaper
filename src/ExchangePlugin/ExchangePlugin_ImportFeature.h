@@ -63,7 +63,11 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
  protected:
   EXCHANGEPLUGIN_EXPORT bool importFile(const std::string& theFileName);
   EXCHANGEPLUGIN_EXPORT LibHandle loadImportPlugin(const std::string& theFormatName);
-  
+
+private:
+  /// Loads Naming data structure to the document
+  void loadNamingDS(boost::shared_ptr<GeomAPI_Shape> theGeomShape, 
+					boost::shared_ptr<ModelAPI_ResultBody> theResultBody);
 };
 
 #endif /* IMPORT_IMPORTFEATURE_H_ */

@@ -15,7 +15,6 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultBody.h>
-
 #include <TCollection_AsciiString.hxx>
 #include <TDF_Label.hxx>
 #include <TopoDS_Shape.hxx>
@@ -109,16 +108,33 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
  #endif
      return false;
    }
+  //
    // Pass the results into the model
    std::string anObjectName = aPath.Name().ToCString();
    data()->setName(anObjectName);
-   boost::shared_ptr<ModelAPI_ResultBody> aResult = document()->createBody(data());
+   boost::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
    boost::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
    aGeomShape->setImpl(new TopoDS_Shape(aShape));
-   aResult->store(aGeomShape);
-   setResult(aResult);
+
+   //LoadNamingDS of the imported shape
+   loadNamingDS(aGeomShape, aResultBody);
+
+   setResult(aResultBody);
 
    return true;
+}
+
+//============================================================================
+void ExchangePlugin_ImportFeature::loadNamingDS(
+	                            boost::shared_ptr<GeomAPI_Shape> theGeomShape, 
+					     boost::shared_ptr<ModelAPI_ResultBody> theResultBody)
+{  
+  //load result
+  theResultBody->store(theGeomShape);
+  int aTag(1);
+  theResultBody->loadFirstLevel(theGeomShape, aTag);
+  theResultBody->loadDisconnectedEdges(theGeomShape, aTag);
+  theResultBody->loadDisconnectedVertexes(theGeomShape, aTag); 
 }
 
 LibHandle ExchangePlugin_ImportFeature::loadImportPlugin(const std::string& theFormatName)
