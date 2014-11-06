@@ -269,8 +269,10 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
     while (aFeatIter != myFeature2Attribute.end()) {
       FeaturePtr aFeature = aFeatIter->first;
       // MPV: added condition because it could be external edge of some object, not sketch
-      if (aFeature && !sketch()->isSub(aFeature))
+      if (aFeature && !sketch()->isSub(aFeature)) {
+        aFeatIter++;
         continue;
+      }
 
       std::list<std::string> anAttributes = aFeatIter->second;
       // perform edit for the feature
