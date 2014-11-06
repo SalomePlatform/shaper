@@ -83,13 +83,13 @@ public:
                                                const int  theTag,
                                                GeomAPI_DataMapOfShapeShape& theSubShapes);
   
-  /// load shapes of the first level (to be used during shape import)
+  /// Loads shapes of the first level (to be used during shape import)
   MODEL_EXPORT virtual void loadFirstLevel(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
   
-  /// load disconnected edges
+  /// Loads disconnected edges
   MODEL_EXPORT virtual void loadDisconnectedEdges(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
 
-  /// load disconnected vetexes
+  /// Loads disconnected vetexes
   MODEL_EXPORT virtual void loadDisconnectedVertexes(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
 
   /// Removes the stored builders
@@ -104,6 +104,10 @@ protected:
 
   /// Returns (creates if necessary) the builder created on the needed tag of sub-label
   TNaming_Builder* builder(const int theTag);
+
+private:
+  /// Loads shapes of the next level (to be used during shape import)
+  void loadNextLevels(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
 
   friend class Model_Document;
 };
