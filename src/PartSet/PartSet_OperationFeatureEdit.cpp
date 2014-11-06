@@ -136,7 +136,10 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, ModuleBas
   if(aActiveWgt && aActiveWgt->isViewerSelector()) {
     // Almost do nothing, all stuff in on PartSet_OperationFeatureBase::mouseReleased
     PartSet_OperationFeatureBase::mousePressed(theEvent, theViewer, theSelection);
-    return;
+    // the current point should be cleared because it is saved from the previous move and 
+    // should be reinitialized after the start moving. It is important for example for the lenght
+    // constraint where the first widget is a viewer selector.
+    myCurPoint.clear();
   }
   else {
     // commit always until the selection restore is realized (for feature and local selection)
@@ -362,6 +365,19 @@ void PartSet_OperationFeatureEdit::mouseReleased(
     if (aSelected.empty() && aHighlighted.empty()) {
       commit();
       emitFeaturesDeactivation();
+    }
+    else {
+      /// TODO: OCC bug: 25034 - the highlighted list should be filled not only for AIS_Shape
+      /// but for other IO, for example constraint dimensions.
+      /// It is empty and we have to use the process mouse release to start edition operation
+      /// for these objects
+      /*QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+      if (aSelected.size() == 1) {
+        ObjectPtr anObject = aSelected.first().object();
+        if (anObject && ModelAPI_Feature::feature(anObject) != feature()) {
+          restartOperation(PartSet_OperationFeatureEdit::Type(), anObject);
+        }
+      }*/
     }
   }
 }
