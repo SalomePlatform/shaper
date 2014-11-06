@@ -231,7 +231,7 @@ double PartSet_Tools::featureValue(FeaturePtr theFeature, const std::string& the
                                    bool& isValid)
 {
   isValid = false;
-  double aValue;
+  double aValue = 0;
   if (theFeature) {
     boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
     AttributeDoublePtr anAttribute = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
