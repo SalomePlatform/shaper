@@ -73,7 +73,8 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> activeDocument();
 
   /// Defines the current document that used for current work in the application
-  MODEL_EXPORT virtual void setActiveDocument(boost::shared_ptr<ModelAPI_Document> theDoc);
+  MODEL_EXPORT virtual void setActiveDocument(
+    boost::shared_ptr<ModelAPI_Document> theDoc, bool theSendSignal = true);
 
   /// Returns all the opened documents of the session (without postponed)
   MODEL_EXPORT virtual std::list<boost::shared_ptr<ModelAPI_Document> > allOpenedDocuments();
