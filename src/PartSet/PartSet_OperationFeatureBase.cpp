@@ -101,6 +101,11 @@ void PartSet_OperationFeatureBase::mouseReleased(QMouseEvent* theEvent, ModuleBa
     flushUpdated();
     myPropertyPanel->activateNextWidget();
   }
+  // the operation can be committed only when there is no an active widget anymore
+  // if this check is absent, the edit operation for constraint perpendicular is stopped
+  // after the first object selection in the viewer(there are two objects to be selected)
+  // the second case is the constraint distance, the edit is stopped after any mouse click
+  // in the viewer whenever it is applyed or not to the selection control
   if (!myPropertyPanel->activeWidget())
     commit();
 }
