@@ -46,7 +46,7 @@ PartSet_OperationFeatureEdit::PartSet_OperationFeatureEdit(const QString& theId,
                                                            QObject* theParent,
                                                            CompositeFeaturePtr theFeature)
     : PartSet_OperationFeatureBase(theId, theParent, theFeature),
-      myIsBlockedSelection(false)
+      myIsBlockedSelection(false), myIsBlockedByDoubleClick(false)
 {
   myIsEditing = true;
 }
@@ -320,6 +320,11 @@ void PartSet_OperationFeatureEdit::mouseReleased(
     QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
     ModuleBase_ISelection* theSelection)
 {
+  // the block is processed in order to do not commit the transaction until the started
+  // double click functionality is performed. It is reproduced on Linux only
+  if (myIsBlockedByDoubleClick)
+    return;
+
   theViewer->enableSelection(true);
   // the next code is commented because it is obsolete by the multi edit operation realization here
   //if (myIsMultiOperation) {
@@ -365,6 +370,7 @@ void PartSet_OperationFeatureEdit::mouseDoubleClick(
     QMouseEvent* theEvent, Handle_V3d_View theView,
     ModuleBase_ISelection* theSelection)
 {
+  myIsBlockedByDoubleClick = true;
   // TODO the functionality is important only for constraint feature. Should be moved in another place
   QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
   if (!aSelected.empty()) {
@@ -383,6 +389,7 @@ void PartSet_OperationFeatureEdit::mouseDoubleClick(
       }
     }
   }
+  myIsBlockedByDoubleClick  = false;
 }
 
 void PartSet_OperationFeatureEdit::startOperation()

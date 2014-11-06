@@ -144,12 +144,15 @@ boost::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
   return myCurrentDoc;
 }
 
-void Model_Session::setActiveDocument(boost::shared_ptr<ModelAPI_Document> theDoc)
+void Model_Session::setActiveDocument(
+  boost::shared_ptr<ModelAPI_Document> theDoc, bool theSendSignal)
 {
   if (myCurrentDoc != theDoc) {
     myCurrentDoc = theDoc;
-    static boost::shared_ptr<Events_Message> aMsg(new Events_Message(Events_Loop::eventByName("CurrentDocumentChanged")));
-    Events_Loop::loop()->send(aMsg);
+    if (theSendSignal) {
+      static boost::shared_ptr<Events_Message> aMsg(new Events_Message(Events_Loop::eventByName("CurrentDocumentChanged")));
+      Events_Loop::loop()->send(aMsg);
+    }
   }
 }
 
