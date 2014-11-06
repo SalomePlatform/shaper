@@ -100,9 +100,6 @@ AISObjectPtr SketchPlugin_Arc::getAISObject(AISObjectPtr thePrevious)
           GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Arc::CENTER_ID()));
       if (aCenterAttr->isInitialized()) {
         boost::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
-        // make a visible point
-        boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
-        aShapes.push_back(aCenterPointShape);
 
         boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = boost::dynamic_pointer_cast<
             GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Arc::START_ID()));
@@ -117,6 +114,10 @@ AISObjectPtr SketchPlugin_Arc::getAISObject(AISObjectPtr thePrevious)
             boost::shared_ptr<GeomAPI_Shape> aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircleArc(
                                                             aCenter, aStartPoint, aStartPoint, aNormal);
             if (aCircleShape) {
+              // make a visible point
+              boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
+              aShapes.push_back(aCenterPointShape);
+
               aShapes.push_back(aCircleShape);
             }
           }
