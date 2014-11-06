@@ -148,19 +148,6 @@ std::string Config_XMLReader::getNodeName(xmlNodePtr theNode)
   return result;
 }
 
-/*
- * Returns named property for a given node as std::string.
- */
-std::string Config_XMLReader::getProperty(xmlNodePtr theNode, const char* theName)
-{
-  std::string result = "";
-  char* aPropChars = (char*) xmlGetProp(theNode, BAD_CAST theName);
-  if (!aPropChars || aPropChars[0] == 0)
-    return result;
-  result = std::string(aPropChars);
-  return result;
-}
-
 void Config_XMLReader::processValidator(xmlNodePtr theNode)
 {
   Events_ID aValidatoEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);

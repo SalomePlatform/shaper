@@ -11,7 +11,10 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include <sstream> //for stringstream
+#include <sstream> // for stringstream
+
+#include <string>
+#include <algorithm> // for std::transform
 bool isElementNode(xmlNodePtr theNode)
 {
   return theNode->type == XML_ELEMENT_NODE;
@@ -40,6 +43,19 @@ bool isNode(xmlNodePtr theNode, const char* theNodeName, ...)
   }
   va_end(args);  // cleanup the system stack
   return false;
+}
+
+bool isWidgetNode(xmlNodePtr theNode)
+{
+  if(!isElementNode(theNode))
+    return false;
+  // it's parent is "feature" or "source"
+  xmlNodePtr aParentNode = theNode->parent;
+  if(!isNode(aParentNode, NODE_FEATURE, NODE_SOURCE, NULL))
+    return false;
+
+  //it should not be a "source" or a "validator" node
+  return !isNode(theNode, NODE_SOURCE, NODE_VALIDATOR, NULL);
 }
 
 bool hasChild(xmlNodePtr theNode)
@@ -93,4 +109,27 @@ std::string library(const std::string& theLibName)
     aLibName += aLibExt;
 
   return aLibName;
+}
+
+std::string getProperty(xmlNodePtr theNode, const char* thePropName)
+{
+  std::string result = "";
+  char* aPropChars = (char*) xmlGetProp(theNode, BAD_CAST thePropName);
+  if (!aPropChars || aPropChars[0] == 0)
+    return result;
+  result = std::string(aPropChars);
+  return result;
+}
+
+bool getBooleanAttribute(xmlNodePtr theNode, const char* theAttributeName, bool theDefault)
+{
+  std::string prop = getProperty(theNode, theAttributeName);
+  std::transform(prop.begin(), prop.end(), prop.begin(), ::tolower);
+  bool result = theDefault;
+  if (prop == "true" || prop == "1") {
+    result = true;
+  } else if (prop == "false" || prop == "0") {
+    result = false;
+  }
+  return result;
 }

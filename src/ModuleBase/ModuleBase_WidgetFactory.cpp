@@ -123,25 +123,6 @@ QWidget* ModuleBase_WidgetFactory::labelControl(QWidget* theParent)
   return result;
 }
 
-void ModuleBase_WidgetFactory::processAttributes()
-{
-  // register that this attribute in feature is not obligatory for the feature execution
-  // so, it is not needed for the standard validation mechanism
-  bool isObligatory = true;
-  bool isConcealment = false;
-  if( myWidgetApi ){
-    isObligatory = myWidgetApi->getBooleanAttribute(ATTRIBUTE_OBLIGATORY, true);
-    isConcealment = myWidgetApi->getBooleanAttribute(ATTRIBUTE_CONCEALMENT, false);
-  }
-  boost::shared_ptr<ModelAPI_Session> aSession = ModelAPI_Session::get();
-  if (!isObligatory) {
-    aSession->validators()->registerNotObligatory(myParentId, myWidgetApi->widgetId());
-  }
-  if(isConcealment) {
-    aSession->validators()->registerConcealment(myParentId, myWidgetApi->widgetId());
-  }
-}
-
 QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType,
                                                       QWidget* theParent)
 {
@@ -194,10 +175,6 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
     if (!result) {qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type");}
 #endif
   }
-  if (result) {
-    processAttributes();
-  }
-
   return result;
 }
 

@@ -138,9 +138,7 @@ void XGUI_Workshop::startApplication()
   //Initialize event listening
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Error::errorID());  //!< Listening application errors.
-  //TODO(sbh): Implement static method to extract event id [SEID]
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_FEATURE_LOADED));
-  // TODO Is it good to use non standard event within workshop?
+  aLoop->registerListener(this, Events_Loop::eventByName(Config_FeatureMessage::GUI_EVENT()));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OPERATION_LAUNCHED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
@@ -257,7 +255,7 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
   }
 
   //A message to start feature creation received.
-  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURE_LOADED)) {
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(Config_FeatureMessage::GUI_EVENT())) {
     boost::shared_ptr<Config_FeatureMessage> aFeatureMsg =
        boost::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
     if (!aFeatureMsg->isInternal()) {

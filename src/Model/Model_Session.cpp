@@ -205,7 +205,7 @@ Model_Session::Model_Session()
   ModelAPI_Session::setSession(boost::shared_ptr<ModelAPI_Session>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
-  static const Events_ID kFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
+  static const Events_ID kFeatureEvent = Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
   aLoop->registerListener(this, kFeatureEvent);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED), 0, true);
@@ -215,7 +215,7 @@ Model_Session::Model_Session()
 
 void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
 {
-  static const Events_ID kFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
+  static const Events_ID kFeatureEvent = Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
   static const Events_ID kValidatorEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
   if (theMessage->eventID() == kFeatureEvent) {
     const boost::shared_ptr<Config_FeatureMessage> aMsg = 
@@ -252,7 +252,7 @@ void Model_Session::LoadPluginsInfo()
     return;
 
   // Read plugins information from XML files
-  Config_ModuleReader aXMLReader("FeatureRegisterEvent");
+  Config_ModuleReader aXMLReader(Config_FeatureMessage::MODEL_EVENT());
   aXMLReader.readAll();
 }
 
