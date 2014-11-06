@@ -41,6 +41,7 @@ SketchSolver_ConstraintManager* SketchSolver_ConstraintManager::Instance()
 SketchSolver_ConstraintManager::SketchSolver_ConstraintManager()
 {
   myGroups.clear();
+  myIsComputed = false;
 
   // Register in event loop
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
@@ -62,6 +63,8 @@ SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
 void SketchSolver_ConstraintManager::processEvent(
   const boost::shared_ptr<Events_Message>& theMessage)
 {
+  if (myIsComputed)
+    return;
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
@@ -363,6 +366,7 @@ boost::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_ConstraintManager::fin
 // ============================================================================
 void SketchSolver_ConstraintManager::resolveConstraints()
 {
+  myIsComputed = true;
   bool needToUpdate = false;
   std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
@@ -372,5 +376,6 @@ void SketchSolver_ConstraintManager::resolveConstraints()
   // Features may be updated => send events
   if (needToUpdate)
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  myIsComputed = false;
 }
 
