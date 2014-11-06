@@ -32,7 +32,6 @@ class MODELAPI_EXPORT ModelAPI_Plugin
   ModelAPI_Plugin()
   {
   }
-  ;
 };
 
 #endif

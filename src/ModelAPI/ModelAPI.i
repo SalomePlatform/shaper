@@ -45,6 +45,12 @@
 %include "std_string.i"
 %include "std_list.i"
 
+// directors
+%feature("director") ModelAPI_Plugin;
+// %feature("director") ModelAPI_Object;
+// %feature("director") ModelAPI_Feature;
+// %feature("director") ModelAPI_CompositeFeature;
+
 // boost pointers
 %include <boost_shared_ptr.i>
 // For ModelAPI_ResultConstruction.shape()
@@ -72,7 +78,6 @@
 %shared_ptr(ModelAPI_ResultConstruction)
 %shared_ptr(ModelAPI_ResultBody)
 %shared_ptr(ModelAPI_ResultPart)
-%feature("director") ModelAPI_Plugin;
 
 // all supported interfaces
 %include "GeomAPI_Interface.h"
@@ -80,6 +85,7 @@
 %include "ModelAPI_Document.h"
 %include "ModelAPI_Session.h"
 %include "ModelAPI_Object.h"
+// %nodefaultctor ModelAPI_Plugin;
 %include "ModelAPI_Plugin.h"
 %include "ModelAPI_Feature.h"
 %include "ModelAPI_CompositeFeature.h"

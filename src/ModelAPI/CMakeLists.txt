@@ -59,7 +59,7 @@ INCLUDE_DIRECTORIES(
   ../GeomAlgoAPI
 )
 
-SET(CMAKE_SWIG_FLAGS "")
+SET(CMAKE_SWIG_FLAGS "-Wall")
 
 SET_SOURCE_FILES_PROPERTIES(ModelAPI.i PROPERTIES CPLUSPLUS ON)
 # "-includeall" is not needed: it starts to follow the standard inludes (like "string") without success

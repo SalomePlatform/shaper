@@ -21,9 +21,6 @@
 #include <TDF_RelocationTable.hxx>
 #include <TDF_ClosureTool.hxx>
 
-// TEST
-#include <Python.h>
-
 using namespace std;
 
 static Model_Session* myImpl = new Model_Session();
@@ -110,14 +107,7 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
     myCurrentPluginName = aPlugin.first;
     if (myPluginObjs.find(myCurrentPluginName) == myPluginObjs.end()) {
       // load plugin library if not yet done
-      //TODO: Get info from Config about python libraries
-      if (myCurrentPluginName.compare(string("PythonFeaturesPlugin")) == 0) {
-        Py_Initialize();
-        PyObject* module = PyImport_ImportModule(myCurrentPluginName.c_str());
-        assert(module != NULL);
-      } else {
-        Config_ModuleReader::loadLibrary(myCurrentPluginName);
-      }
+      Config_ModuleReader::loadPlugin(myCurrentPluginName);
     }
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
       FeaturePtr aCreated = myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);

@@ -14,6 +14,8 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+#include <Python.h>
+
 //Necessary for cerr
 #include <iostream>
 
@@ -23,8 +25,10 @@
 #include <dlfcn.h>
 #endif
 
+std::map<std::string, Config_ModuleReader::PluginType> Config_ModuleReader::myPluginTypes;
+
 Config_ModuleReader::Config_ModuleReader(const char* theEventGenerated)
-    : Config_XMLReader("plugins.xml"),
+    : Config_XMLReader(PLUGIN_FILE),
       myEventGenerated(theEventGenerated)
 {
 }
@@ -56,7 +60,10 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
   if (isNode(theNode, NODE_PLUGIN, NULL)) {
     std::string aPluginConf = getProperty(theNode, PLUGIN_CONFIG);
     std::string aPluginLibrary = getProperty(theNode, PLUGIN_LIBRARY);
-    std::list<std::string> aFeatures = importPlugin(aPluginLibrary, aPluginConf);
+    std::string aPluginScript = getProperty(theNode, PLUGIN_SCRIPT);
+    std::string aPluginName = addPlugin(aPluginLibrary, aPluginScript, aPluginConf);
+
+    std::list<std::string> aFeatures = importPlugin(aPluginName, aPluginConf);
     std::list<std::string>::iterator it = aFeatures.begin();
     for (; it != aFeatures.end(); it++) {
       myFeaturesInFiles[*it] = aPluginConf;
@@ -70,17 +77,72 @@ bool Config_ModuleReader::processChildren(xmlNodePtr theNode)
 }
 
 std::list<std::string> Config_ModuleReader::importPlugin(const std::string& thePluginLibrary,
-                                                         const std::string& thePluginFile)
+                                                         const std::string& thePluginXmlConf)
 {
-  if (thePluginFile.empty()) {  //probably a third party library
+  if (thePluginXmlConf.empty()) {  //probably a third party library
     loadLibrary(thePluginLibrary);
     return std::list<std::string>();
   }
 
-  Config_FeatureReader aReader = Config_FeatureReader(thePluginFile, thePluginLibrary,
+  Config_FeatureReader aReader = Config_FeatureReader(thePluginXmlConf,
+                                                      thePluginLibrary,
                                                       myEventGenerated);
   aReader.readAll();
   return aReader.features();
+}
+
+std::string Config_ModuleReader::addPlugin(const std::string& aPluginLibrary,
+                                           const std::string& aPluginScript,
+                                           const std::string& aPluginConf)
+{
+  PluginType aType = PluginType::Binary;
+  std::string aPluginName;
+  if (!aPluginLibrary.empty()) {
+    aPluginName = aPluginLibrary;
+    if (aPluginConf.empty()) {
+      aType = PluginType::Intrenal;
+    }
+  } else if (!aPluginScript.empty()) {
+    aPluginName = aPluginScript;
+    aType = PluginType::Python;
+  }
+  if(!aPluginName.empty()) {
+    myPluginTypes[aPluginName] = aType;
+
+  }
+  return aPluginName;
+}
+
+void Config_ModuleReader::loadPlugin(const std::string thePluginName)
+{
+  PluginType aType = PluginType::Binary;
+  if(myPluginTypes.find(thePluginName) != myPluginTypes.end()) {
+    aType = myPluginTypes.at(thePluginName);
+  }
+  switch (aType) {
+    case PluginType::Python:
+      loadScript(thePluginName);
+      break;
+    case PluginType::Binary:
+    case PluginType::Intrenal:
+    default:
+      loadLibrary(thePluginName);
+      break;
+  }
+}
+
+void Config_ModuleReader::loadScript(const std::string theFileName)
+{
+  std::string aPythonFile = theFileName + ".py";
+  PyGILState_STATE gstate;
+
+  /* aquire python thread */
+  gstate = PyGILState_Ensure();
+
+  PyObject* module = PyImport_ImportModule(aPythonFile.c_str());
+
+  /* release python thread */
+  PyGILState_Release(gstate);
 }
 
 void Config_ModuleReader::loadLibrary(const std::string theLibName)
@@ -91,16 +153,15 @@ void Config_ModuleReader::loadLibrary(const std::string theLibName)
 
 #ifdef WIN32
   HINSTANCE aModLib = ::LoadLibrary(aFileName.c_str());
-  if (!aModLib && theLibName != "DFBrowser") {  // don't shor error for internal debugging tool
-    std::string errorMsg = "Failed to load " + aFileName;
-    std::cerr << errorMsg << std::endl;
-    Events_Error::send(errorMsg);
-  }
 #else
   void* aModLib = dlopen( aFileName.c_str(), RTLD_LAZY | RTLD_GLOBAL );
-  if ( !aModLib && theLibName != "DFBrowser") {  // don't shor error for internal debugging tool
-    std::cerr << "Failed to load " << aFileName.c_str() << std::endl;
-  }
 #endif
+  if(!aModLib && theLibName != "DFBrowser") { // don't show error for internal debugging tool
+    std::string anErrorMsg = "Failed to load " + aFileName;
+    #ifndef WIN32
+    anErrorMsg += ": " + std::string(dlerror());
+    #endif
+    Events_Error::send(anErrorMsg);
+  }
 }
 

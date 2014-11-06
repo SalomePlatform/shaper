@@ -1,9 +1,10 @@
-from ModelAPI import *
-import PythonFeaturesPlugin_Box
+import ModelAPI
+from PythonFeaturesPlugin_Box import PythonFeaturesPlugin_Box
 
-class PythonFeaturesPlugin(ModelAPI_Plugin):
+class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
+  
   def __init__(self):
-    ModelAPI_Plugin.__init__(self)
+    ModelAPI.ModelAPI_Plugin.__init__(self)
     pass
 
   def createFeature(self, theFeatureID):
@@ -13,5 +14,6 @@ class PythonFeaturesPlugin(ModelAPI_Plugin):
       raise StandardError("No such feature %s"%theFeatureID)
 
 plugin = PythonFeaturesPlugin()
-ModelAPI_Session_get().registerPlugin(plugin)
-
+aSession = ModelAPI.ModelAPI_Session.get()
+print "Module loaded. Session", aSession
+aSession.registerPlugin(plugin)

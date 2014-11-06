@@ -78,11 +78,14 @@ const static char* CONTAINER_PAGE_NAME = "title";
 /*
  * Hardcoded xml entities of plugins.xml
  */
+
+const static char* PLUGIN_FILE = "plugins.xml";
 const static char* NODE_PLUGIN = "plugin";
 const static char* NODE_PLUGINS = "plugins";
 
 const static char* PLUGINS_MODULE = "module";
 const static char* PLUGIN_CONFIG = "configuration";
 const static char* PLUGIN_LIBRARY = "library";
+const static char* PLUGIN_SCRIPT = "script";
 
 #endif /* CONFIG_KEYWORDS_H_ */
