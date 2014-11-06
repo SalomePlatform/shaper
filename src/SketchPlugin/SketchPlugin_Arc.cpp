@@ -93,8 +93,6 @@ AISObjectPtr SketchPlugin_Arc::getAISObject(AISObjectPtr thePrevious)
   if (aSketch) {
     // if the feature is valid, the execute() method should be performed, AIS object is empty
     if (!isFeatureValid()) {
-      std::list<boost::shared_ptr<GeomAPI_Shape> > aShapes;
-
       // compute a circle point in 3D view
       boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = boost::dynamic_pointer_cast<
           GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Arc::CENTER_ID()));
@@ -114,21 +112,25 @@ AISObjectPtr SketchPlugin_Arc::getAISObject(AISObjectPtr thePrevious)
             boost::shared_ptr<GeomAPI_Shape> aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircleArc(
                                                             aCenter, aStartPoint, aStartPoint, aNormal);
             if (aCircleShape) {
+              std::list<boost::shared_ptr<GeomAPI_Shape> > aShapes;
               // make a visible point
               boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
               aShapes.push_back(aCenterPointShape);
 
               aShapes.push_back(aCircleShape);
+              if (!aShapes.empty())
+              {
+                boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+                AISObjectPtr anAIS = thePrevious;
+                if (!anAIS)
+                  anAIS = AISObjectPtr(new GeomAPI_AISObject);
+                anAIS->createShape(aCompound);
+                return anAIS;
+              }
             }
           }
         }
       }
-      boost::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
-      AISObjectPtr anAIS = thePrevious;
-      if (!anAIS)
-        anAIS = AISObjectPtr(new GeomAPI_AISObject);
-      anAIS->createShape(aCompound);
-      return anAIS;
     }
   }
   return AISObjectPtr();
