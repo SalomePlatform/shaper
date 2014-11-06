@@ -176,7 +176,7 @@ bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>
   }
   // check all attributes for validity
   boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  if (!aData->isValid())
+  if (!aData || !aData->isValid())
     return false;
   static const std::string kAllTypes = "";
   std::map<std::string, std::map<std::string, AttrValidators> >::const_iterator aFeatureIter = 
