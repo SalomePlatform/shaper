@@ -159,6 +159,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
   if (myUpdated.find(theFeature) != myUpdated.end())
     return myUpdated[theFeature];
   // check all features this feature depended on (recursive call of updateFeature)
+  ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
   bool aMustbeUpdated = myInitial.find(theFeature) != myInitial.end();
   if (theFeature) {  // only real feature contains references to other objects
     if (theFeature->data()->mustBeUpdated()) aMustbeUpdated = true;
@@ -171,6 +172,12 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
       for(int a = 0; a < aSubsNum; a++) {
         if (updateFeature(aComposite->subFeature(a)))
           aMustbeUpdated = true;
+      }
+      if (aMustbeUpdated) {
+        for(int a = 0; a < aSubsNum; a++) {
+          if (aComposite->subFeature(a) && aFactory->validate(aComposite->subFeature(a)))
+            aComposite->subFeature(a)->execute();
+        }
       }
     }
     // check all references: if referenced objects are updated, this object also must be updated
@@ -192,7 +199,6 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
     if (aMustbeUpdated) {
       if (boost::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
           !theFeature->isPersistentResult()) {
-        ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
         if (aFactory->validate(theFeature)) {
           if (isAutomatic || (myJustCreatedOrUpdated.find(theFeature) != myJustCreatedOrUpdated.end()) ||
             !theFeature->isPersistentResult() /* execute quick, not persistent results */) 
@@ -254,32 +260,31 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
   return aMustbeUpdated;
 }
 
-bool Model_Update::updateObject(boost::shared_ptr<ModelAPI_Object> theObject)
+bool Model_Update::updateObject(boost::shared_ptr<ModelAPI_Object> theObject, const bool theCyclic)
 {
   if (myUpdated.find(theObject) != myUpdated.end())
     return myUpdated[theObject];  // already processed
-  return myInitial.find(theObject) != myInitial.end();
 
-  /* remove algorithm for update of all features by dependencies tree
-  if (!theObject)
-    return false;
-  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
-  if (aFeature) {  // for feature just call update Feature
-    return updateFeature(aFeature);
-  }
-  // check general object, possible just a result
-  if (myUpdated.find(theObject) != myUpdated.end())
-    return myUpdated[theObject];  // already processed
-  // check the feature of this object must be executed
-  ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-  if (aResult) {
-    FeaturePtr aResFeature = aResult->document()->feature(aResult);
-    if (aResFeature) {
-      return updateFeature(aResFeature);
+  /*
+  if (theCyclic) { // algorithm for update of all features by dependencies tree
+    if (!theObject)
+      return false;
+    FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+    if (aFeature) {  // for feature just call update Feature
+      return updateFeature(aFeature);
+    }
+    // check general object, possible just a result
+    if (myUpdated.find(theObject) != myUpdated.end())
+      return myUpdated[theObject];  // already processed
+    // check the feature of this object must be executed
+    ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aResult) {
+      FeaturePtr aResFeature = aResult->document()->feature(aResult);
+      if (aResFeature) {
+        return updateFeature(aResFeature);
+      }
     }
   }
-  if (myInitial.find(theObject) != myInitial.end())
-    return true;
-  return false;  // nothing is known
   */
+  return myInitial.find(theObject) != myInitial.end();
 }
