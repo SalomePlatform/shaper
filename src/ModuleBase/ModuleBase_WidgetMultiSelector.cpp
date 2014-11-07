@@ -219,7 +219,9 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
     aShapeTypeName = myTypeCombo->itemText(idx);
     TopAbs_ShapeEnum aRefType = ModuleBase_WidgetShapeSelector::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
+      bool isBlocked = myTypeCombo->blockSignals(true);
       myTypeCombo->setCurrentIndex(idx);
+      myTypeCombo->blockSignals(isBlocked);
       break;
     }
   }
