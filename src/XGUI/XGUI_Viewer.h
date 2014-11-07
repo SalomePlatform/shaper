@@ -182,6 +182,8 @@ signals:
   void onMousePressed(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent);
   //void onContextMenuRequested(QContextMenuEvent* theEvent);
 
+  void onKeyRelease(XGUI_ViewWindow* theView, QKeyEvent* theKey);
+
  private:
   void addView(QMdiSubWindow* theView);
 
@@ -193,7 +195,9 @@ signals:
  private:
   XGUI_MainWindow* myMainWindow;
 
-  Handle(V3d_Viewer) myV3dViewer;Handle(AIS_Trihedron) myTrihedron;Handle(AIS_InteractiveContext) myAISContext;
+  Handle(V3d_Viewer) myV3dViewer;
+  Handle(AIS_Trihedron) myTrihedron;
+  Handle(AIS_InteractiveContext) myAISContext;
 
   XGUI::InteractionStyle myInteractionStyle;
 
