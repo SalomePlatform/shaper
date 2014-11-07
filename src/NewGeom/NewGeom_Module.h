@@ -97,6 +97,7 @@ Q_OBJECT
 
  protected:
   CAM_DataModel* createDataModel();
+  virtual QtxPopupMgr* popupMgr();
 
  private:
   NewGeom_OCCSelector* createSelector(SUIT_ViewManager* theMgr);
@@ -115,6 +116,7 @@ Q_OBJECT
   bool myIsOpened;
   bool myIsStorePositions;
 
+  QtxPopupMgr* myPopupMgr;
 };
 
 #endif

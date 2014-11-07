@@ -47,7 +47,8 @@ public:
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelectionList(TDF_Label& theLabel);
-    /// Performs the selection for the body result (TNaming Selection)
+  /// Updates the mySubs if needed since it is not persistent value
+  void updateSubs();
 
   friend class Model_Data;
 };

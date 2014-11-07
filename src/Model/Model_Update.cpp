@@ -47,7 +47,7 @@ Model_Update::Model_Update()
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
   aLoop->registerListener(this, kOpStartEvent);
 
-  Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild automatically",
+  Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild immediately",
                                    Config_Prop::Bool, "false");
   isAutomatic = Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
 }

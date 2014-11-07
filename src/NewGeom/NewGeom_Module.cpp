@@ -70,7 +70,7 @@ private:
 //******************************************************
 NewGeom_Module::NewGeom_Module()
     : LightApp_Module("NewGeom"),
-      mySelector(0), myIsOpened(0)
+      mySelector(0), myIsOpened(0), myPopupMgr(0)
 {
   myWorkshop = new XGUI_Workshop(this);
   myProxyViewer = new NewGeom_SalomeViewer(this);
@@ -131,8 +131,7 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
         mySelector = createSelector(OCCViewManagers.first());
       }
     }
-    QtxPopupMgr* aMgr = popupMgr();  // Create popup manager
-    action(myEraseAll)->setEnabled(false);
+    //action(myEraseAll)->setEnabled(false);
 
     if (myIsOpened) {
       myWorkshop->objectBrowser()->rebuildDataTree();
@@ -200,6 +199,14 @@ void NewGeom_Module::onViewManagerAdded(SUIT_ViewManager* theMgr)
   if ((!mySelector)) {
     mySelector = createSelector(theMgr);
   }
+}
+
+//******************************************************
+QtxPopupMgr* NewGeom_Module::popupMgr()
+{
+  if (!myPopupMgr)
+    myPopupMgr = new QtxPopupMgr( 0, this );
+  return myPopupMgr;
 }
 
 //******************************************************

@@ -53,6 +53,14 @@ Q_OBJECT
   /// \param theZ the Z projection value
   virtual void setViewProjection(double theX, double theY, double theZ) = 0;
 
+  /// Add selection filter to the viewer
+  virtual void addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter) = 0;
+
+  /// Remove selection filter from the viewer
+  virtual void removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter) = 0;
+
+  /// Remove all selection filters from the viewer
+  virtual void clearSelectionFilters() = 0;
 
 signals:
   void lastViewClosed();

@@ -19,7 +19,7 @@ boost::shared_ptr<GeomAPI_Shape> Model_ResultGroup::shape() const
     AttributeSelectionListPtr aList = myOwnerData->selectionList("group_list");
     if (aList) {
       std::list<boost::shared_ptr<GeomAPI_Shape> > aSubs;
-      for(int a = aList->size(); a >= 0; a--) {
+      for(int a = aList->size() - 1; a >= 0; a--) {
         boost::shared_ptr<GeomAPI_Shape> aSelection = aList->value(a)->value();
         if (aSelection && !aSelection->isNull()) {
           aSubs.push_back(aSelection);

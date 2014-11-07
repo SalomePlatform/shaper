@@ -52,6 +52,15 @@ Q_OBJECT
   /// Connects to a viewer according to current environment
   void connectToViewer();
 
+  /// Add selection filter to the viewer
+  virtual void addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
+
+  /// Remove selection filter from the viewer
+  virtual void removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
+
+  /// Remove all selection filters from the viewer
+  virtual void clearSelectionFilters();
+
  private slots:
   void onMousePress(XGUI_ViewWindow*, QMouseEvent*);
   void onMouseRelease(XGUI_ViewWindow*, QMouseEvent*);
