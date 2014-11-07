@@ -109,10 +109,10 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   aLayout->addWidget(myTextLine, 1);
 
   std::string aTypes = theData->getProperty("shape_types");
-  myShapeTypes = QString(aTypes.c_str()).split(' ');
+  myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
 
   std::string aObjTypes = theData->getProperty("object_types");
-  myObjectTypes = QString(aObjTypes.c_str()).split(' ');
+  myObjectTypes = QString(aObjTypes.c_str()).split(' ', QString::SkipEmptyParts);
 
   myUseSubShapes = theData->getBooleanAttribute("use_subshapes", false); 
 }
