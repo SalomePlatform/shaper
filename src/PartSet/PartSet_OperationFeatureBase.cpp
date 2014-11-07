@@ -31,8 +31,6 @@
 #include <XGUI_Constants.h>
 
 #include <V3d_View.hxx>
-#include <TopoDS_Vertex.hxx>
-#include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
 
 #ifdef _DEBUG

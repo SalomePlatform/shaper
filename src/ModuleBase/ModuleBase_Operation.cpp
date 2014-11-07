@@ -30,9 +30,6 @@
 
 #include <Events_Loop.h>
 
-#include <TopoDS.hxx>
-#include <TopoDS_Vertex.hxx>
-
 #ifdef _DEBUG
 #include <QDebug>
 #endif
