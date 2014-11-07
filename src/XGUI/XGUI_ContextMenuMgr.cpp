@@ -170,9 +170,9 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
         aMenu->addAction(action("SHADING_CMD"));
         aMenu->addAction(action("WIREFRAME_CMD"));
       }
-      if (hasFeature)
-        aMenu->addAction(action("DELETE_CMD"));
     }
+    if (hasFeature)
+      aMenu->addAction(action("DELETE_CMD"));
   }
   aMenu->addSeparator();
   aMenu->addActions(myWorkshop->objectBrowser()->actions());
