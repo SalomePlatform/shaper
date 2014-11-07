@@ -39,7 +39,7 @@ boost::shared_ptr<ModelAPI_Attribute> Model_AttributeRefAttr::attr()
 
 void Model_AttributeRefAttr::setObject(ObjectPtr theObject)
 {
-  if (!myIsInitialized || myID->Get().Length() != 0 || object() != theObject) {
+  if (theObject && (!myIsInitialized || myID->Get().Length() != 0 || object() != theObject)) {
     boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(
         theObject->data());
     myRef->Set(aData->label().Father());
