@@ -458,7 +458,7 @@ void XGUI_Viewer::addView(QMdiSubWindow* theView)
           SIGNAL(keyPress(XGUI_ViewWindow*, QKeyEvent*)));
 
   connect(aWindow, SIGNAL(keyReleased(XGUI_ViewWindow*, QKeyEvent*)), this,
-          SIGNAL(keyRelease(XGUI_ViewWindow*, QKeyEvent*)));
+          SLOT(onKeyRelease(XGUI_ViewWindow*, QKeyEvent*)));
 
   //connect(aWindow, SIGNAL(contextMenuRequested( QContextMenuEvent* )),
   //        this,    SLOT  (onContextMenuRequested( QContextMenuEvent* )));
@@ -529,6 +529,8 @@ void XGUI_Viewer::onMouseMove(XGUI_ViewWindow* theWindow, QMouseEvent* theEvent)
   Handle(V3d_View) aView3d = theWindow->viewPort()->getView();
   if (!aView3d.IsNull()) {
     myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView3d);
+    if (myAISContext->HasDetected())
+      theWindow->viewPort()->setFocus(Qt::MouseFocusReason);
   }
 }
 
@@ -604,6 +606,20 @@ void XGUI_Viewer::updateViewsDrawMode() const
   {
     XGUI_ViewWindow* aView = static_cast<XGUI_ViewWindow*>(aWnd->widget());
     aView->updateEnabledDrawMode();
+  }
+}
+
+//******************************************************
+void XGUI_Viewer::onKeyRelease(XGUI_ViewWindow* theView, QKeyEvent* theKey)
+{
+  Handle(V3d_View) aView = theView->viewPort()->getView();
+  bool noModifiers = (theKey->modifiers() == Qt::NoModifier);
+  if ((theKey->key() == Qt::Key_N) && noModifiers) {
+    myAISContext->HilightNextDetected(aView);
+  } else if ((theKey->key() == Qt::Key_P) && noModifiers) {
+    myAISContext->HilightPreviousDetected(aView);
+  } else {
+    emit keyRelease(theView, theKey);
   }
 }
 
