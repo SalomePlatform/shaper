@@ -63,8 +63,8 @@ SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
 void SketchSolver_ConstraintManager::processEvent(
   const boost::shared_ptr<Events_Message>& theMessage)
 {
-  if (myIsComputed)
-    return;
+  //if (myIsComputed)
+  //  return;
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
@@ -84,24 +84,25 @@ void SketchSolver_ConstraintManager::processEvent(
       }
     } else {
       std::set<ObjectPtr>::iterator aFeatIter;
+      // iterate sketchers fisrt to create all sketches before (on load may exist several sketches)
       for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
         FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFeatIter);
         if (!aFeature)
           continue;
-        // Only sketches and constraints can be added by Create event
         const std::string& aFeatureKind = aFeature->getKind();
         if (aFeatureKind.compare(SketchPlugin_Sketch::ID()) == 0) {
           boost::shared_ptr<ModelAPI_CompositeFeature> aSketch = boost::dynamic_pointer_cast<
               ModelAPI_CompositeFeature>(aFeature);
-          if (aSketch)
-            changeWorkplane(aSketch);
-          continue;
+          changeWorkplane(aSketch);
         }
-        // Sketch plugin features can be only updated
-        boost::shared_ptr<SketchPlugin_Feature> aSFeature = boost::dynamic_pointer_cast<
-            SketchPlugin_Feature>(aFeature);
-        if (aSFeature)
-          changeConstraintOrEntity(aSFeature);
+      }
+      // then get anything but not the sketch
+      for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
+        boost::shared_ptr<SketchPlugin_Feature> aFeature = 
+          boost::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
+        if (!aFeature)
+          continue;
+          changeConstraintOrEntity(aFeature);
       }
     }
 

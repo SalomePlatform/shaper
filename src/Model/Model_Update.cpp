@@ -38,6 +38,8 @@ Model_Update::Model_Update()
   aLoop->registerListener(this, kCreatedEvent);
   static const Events_ID kUpdatedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
   aLoop->registerListener(this, kUpdatedEvent);
+  static const Events_ID kMovedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
+  aLoop->registerListener(this, kMovedEvent);
   static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
   aLoop->registerListener(this, kOpFinishEvent);
   static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
@@ -57,6 +59,7 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
   static const Events_ID kRebuildEvent = aLoop->eventByName("Rebuild");
   static const Events_ID kCreatedEvent = aLoop->eventByName(EVENT_OBJECT_CREATED);
   static const Events_ID kUpdatedEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
+  static const Events_ID kMovedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
   static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
   static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
@@ -69,7 +72,8 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
       isAutomaticChanged = true;
       isAutomatic = true;
     }
-  } else if (theMessage->eventID() == kCreatedEvent || theMessage->eventID() == kUpdatedEvent) {
+  } else if (theMessage->eventID() == kCreatedEvent || theMessage->eventID() == kUpdatedEvent ||
+    theMessage->eventID() == kMovedEvent) {
     boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
         boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     const std::set<ObjectPtr>& anObjs = aMsg->objects();
@@ -77,6 +81,8 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
     for(; anObjIter != anObjs.cend(); anObjIter++) {
       myJustCreatedOrUpdated.insert(*anObjIter);
     }
+    if (theMessage->eventID() == kMovedEvent)
+      return; // this event is for solver update, not here
   } else if (theMessage->eventID() == kOpStartEvent) {
     myJustCreatedOrUpdated.clear();
     return; // we don't need the update only on operation start (caused problems in PartSet_Listener::processEvent)

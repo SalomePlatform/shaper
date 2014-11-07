@@ -101,7 +101,7 @@ void SketchPlugin_Line::attributeChanged() {
   static bool myIsUpdated = false; // to avoid infinitive cycle on attrubtes change
   boost::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
    // update arguments due to the selection value
-  if (aSelection && !aSelection->isNull() && !myIsUpdated) {
+  if (aSelection && !aSelection->isNull() && aSelection->isEdge() && !myIsUpdated) {
     myIsUpdated = true;
     boost::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
     boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 

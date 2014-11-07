@@ -78,6 +78,8 @@ void SketchPlugin_Sketch::execute()
   for (; anIt != aLast; anIt++) {
     aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
     if (aFeature) {
+      if (!aFeature->sketch()) // on load document the back references are missed
+        aFeature->setSketch(this);
       // do not include the external edges into the result
       if (aFeature->data()->attribute(SketchPlugin_Feature::EXTERNAL_ID())) {
         if (aFeature->data()->selection(SketchPlugin_Feature::EXTERNAL_ID())->value())
