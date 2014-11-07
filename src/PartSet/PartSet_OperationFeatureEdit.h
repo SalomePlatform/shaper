@@ -124,6 +124,10 @@ Q_OBJECT
     CompositeFeaturePtr theCompositeFeature = CompositeFeaturePtr());
 
  protected:
+   void fillFeature2Attribute(const QList<ModuleBase_ViewerPrs>& thePresentations,
+                              ModuleBase_IViewer* theViewer,
+                              std::map<FeaturePtr, std::list<std::string> >& theFeature2Attribute);
+
   /// Emits a signal about the selection blocking. Emits a signal to change the selection.
   /// If the block is true, the signal clear selection, otherwise if restore selection flag allows,
   /// the internal operation features are to be selected
@@ -139,7 +143,8 @@ Q_OBJECT
 
  private:
   // the next map should be removed when selection is processed in the move function
-  std::map<FeaturePtr, std::list<std::string> > myFeature2Attribute; /// a map of a feature to attributes
+  std::map<FeaturePtr, std::list<std::string> > myHighlightedFeature2Attribute; /// a map of a feature to attributes
+  std::map<FeaturePtr, std::list<std::string> > myAllFeature2Attribute; /// a map of a feature to attributes
 
   Point myCurPoint;  ///< the current 3D point clicked or moved
   bool myIsBlockedSelection;  ///< the state of the last state of selection blocked signal

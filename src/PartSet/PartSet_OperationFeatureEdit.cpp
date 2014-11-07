@@ -56,7 +56,7 @@ PartSet_OperationFeatureEdit::~PartSet_OperationFeatureEdit()
 }
 
 void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelection,
-                                                      ModuleBase_IViewer* theViewer)
+                                                 ModuleBase_IViewer* theViewer)
 {
   // the method of the parent should is useless here because it processes the given
   // selection in different way
@@ -64,18 +64,32 @@ void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelec
 
   // 1. unite selected and hightlighted objects in order to have an opportunity to drag
   // by the highlighted object
-  QList<ModuleBase_ViewerPrs> aFeatures = theSelection->getSelected();
+  QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
   QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
   // add highlighted elements if they are not selected
-  foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
-    if (!PartSet_Tools::isContainPresentation(aFeatures, aPrs))
-      aFeatures.append(aPrs);
-  }
+  //foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
+  //  if (!PartSet_Tools::isContainPresentation(aFeatures, aPrs))
+  //    aFeatures.append(aPrs);
+  //}
 
+  fillFeature2Attribute(aHighlighted, theViewer, myHighlightedFeature2Attribute);
+
+  foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
+    if (!PartSet_Tools::isContainPresentation(aSelected, aPrs))
+      aSelected.append(aPrs);
+  }
+  fillFeature2Attribute(aSelected, theViewer, myAllFeature2Attribute);
+}
+
+void PartSet_OperationFeatureEdit::fillFeature2Attribute(
+                                    const QList<ModuleBase_ViewerPrs>& thePresentations,
+                                    ModuleBase_IViewer* theViewer,
+                                    std::map<FeaturePtr, std::list<std::string> >& theFeature2Attribute)
+{
   // 1. find all features with skipping features with selected vertex shapes
-  myFeature2Attribute.clear();
+  theFeature2Attribute.clear();
   // firstly, collect the features without local selection
-  foreach (ModuleBase_ViewerPrs aPrs, aFeatures) {
+  foreach (ModuleBase_ViewerPrs aPrs, thePresentations) {
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
       const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
@@ -88,10 +102,10 @@ void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelec
       if (!aObject)
         continue;
       FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-      if (aFeature && myFeature2Attribute.find(aFeature) == myFeature2Attribute.end()) {
+      if (aFeature && theFeature2Attribute.find(aFeature) == theFeature2Attribute.end()) {
         std::list<std::string> aList;
         // using an empty list as a sign, that this feature should be moved itself
-        myFeature2Attribute[aFeature] = aList;
+        theFeature2Attribute[aFeature] = aList;
       }
     }
   }
@@ -100,7 +114,7 @@ void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelec
   // that means that if the selection contains a feature and a feature with local selected point,
   // the edit is performed for a full feature
   Handle(V3d_View) aView = theViewer->activeView();
-  foreach (ModuleBase_ViewerPrs aPrs, aFeatures) {
+  foreach (ModuleBase_ViewerPrs aPrs, thePresentations) {
     const TopoDS_Shape& aShape = aPrs.shape();
     if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
       const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
@@ -121,11 +135,11 @@ void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelec
                                                                     aFeature, aVX, aVY);
       std::string anAttribute = aFeature->data()->id(aPoint2D);
       std::list<std::string> aList;
-      if (myFeature2Attribute.find(aFeature) != myFeature2Attribute.end())
-        aList = myFeature2Attribute[aFeature];
+      if (theFeature2Attribute.find(aFeature) != theFeature2Attribute.end())
+        aList = theFeature2Attribute[aFeature];
 
       aList.push_back(anAttribute);
-      myFeature2Attribute[aFeature] = aList;
+      theFeature2Attribute[aFeature] = aList;
     }
   }
 }
@@ -267,9 +281,20 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
     //    SketchPlugin_Feature>(feature());
 
     bool isMoved = false;
+    bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+
     // the functionality to move the feature attribute if it exists in the internal map
-    std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
-    while (aFeatIter != myFeature2Attribute.end()) {
+    std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter, aFeatLast;
+    if (aHasShift) {
+      aFeatIter = myAllFeature2Attribute.begin();
+      aFeatLast = myAllFeature2Attribute.end();
+    }
+    else {
+      aFeatIter = myHighlightedFeature2Attribute.begin();
+      aFeatLast = myHighlightedFeature2Attribute.end();
+    }
+
+    while (aFeatIter != aFeatLast) {
       FeaturePtr aFeature = aFeatIter->first;
       // MPV: added condition because it could be external edge of some object, not sketch
       if (aFeature && !sketch()->isSub(aFeature)) {
@@ -374,9 +399,18 @@ void PartSet_OperationFeatureEdit::mouseReleased(
       /*QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
       if (aSelected.size() == 1) {
         ObjectPtr anObject = aSelected.first().object();
-        if (anObject && ModelAPI_Feature::feature(anObject) != feature()) {
-          restartOperation(PartSet_OperationFeatureEdit::Type(), anObject);
+        FeaturePtr aSelFeature = ModelAPI_Feature::feature(anObject);
+        FeaturePtr aCurFeature = feature();
+        QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
+        //QList<ModuleBase_ViewerPrs> anEmpty;
+        //aSelected.push_back(aHighlighted);
+        ObjectPtr aNFeature = PartSet_Tools::nearestFeature(theEvent->pos(), aView, sketch(),
+                                                            aSelected, aHighlighted);
+        int aSizeS = aSelected.size();
+        if (anObject && aNFeature != feature()) {
+          restartOperation(PartSet_OperationFeatureEdit::Type(), aNFeature);
         }
+        //bool aValue  = 9;
       }*/
     }
   }
@@ -422,7 +456,9 @@ void PartSet_OperationFeatureEdit::stopOperation()
 
   //blockSelection(false, false);
 
-  myFeature2Attribute.clear();
+  //myFeature2Attribute.clear();
+  myHighlightedFeature2Attribute.clear();
+  myAllFeature2Attribute.clear();
 }
 
 //void PartSet_OperationFeatureEdit::blockSelection(bool isBlocked, const bool isRestoreSelection)
@@ -455,8 +491,8 @@ void PartSet_OperationFeatureEdit::sendFeatures()
 {
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
 
-  std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
-  while (aFeatIter != myFeature2Attribute.end()) {
+  std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myAllFeature2Attribute.begin();
+  while (aFeatIter != myAllFeature2Attribute.end()) {
     FeaturePtr aFeature = aFeatIter->first;
     if (aFeature) {
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
@@ -470,8 +506,8 @@ void PartSet_OperationFeatureEdit::sendFeatures()
 
 void PartSet_OperationFeatureEdit::emitFeaturesDeactivation()
 {
-  std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
-  while (aFeatIter != myFeature2Attribute.end()) {
+  std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myAllFeature2Attribute.begin();
+  while (aFeatIter != myAllFeature2Attribute.end()) {
     FeaturePtr aFeature = aFeatIter->first;
     if (aFeature) {
       emit featureConstructed(aFeature, FM_Deactivation);
