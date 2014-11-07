@@ -121,18 +121,14 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     bool hasResult = false;
     bool hasFeature = false;
-    bool hasGroup = false;
     foreach(ObjectPtr aObj, aObjects)
     {
       FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
       ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-      //ResultGroupPtr aGroupRes = boost::dynamic_pointer_cast<ModelAPI_ResultGroup>(aObj);
       if (aResult)
         hasResult = true;
       if (aFeature)
         hasFeature = true;
-      //if (aGroupRes)
-      //  hasGroup = true;
       if (hasFeature && hasResult) // && hasGroup)
         break;
     }
@@ -165,7 +161,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
         if (aMgr->activeDocument() != aMgr->moduleDocument())
           aMenu->addAction(action("ACTIVATE_PART_CMD"));
       }
-
+    } else {
       if (hasResult) {
         aMenu->addAction(action("SHOW_CMD"));
         aMenu->addAction(action("HIDE_CMD"));
