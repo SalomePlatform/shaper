@@ -45,6 +45,16 @@ Q_OBJECT
   virtual void mouseReleased(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer,
                              ModuleBase_ISelection* theSelection);
 
+ protected:
+  /// Return a widget value point by the selection and the viewer position
+  /// \param thePrs the presentation
+  /// \param theViewer a viewer to have the viewer the eye position
+  /// \param theX the horizontal coordinate
+  /// \param theY the vertical coordinate
+  /// \return true if the point exits in the selection
+  virtual bool getViewerPoint(ModuleBase_ViewerPrs thePrs,
+                                   ModuleBase_IViewer* theViewer,
+                                   double& theX, double& theY);
 
  protected:
   CompositeFeaturePtr mySketch;  ///< the sketch of the feature

@@ -28,9 +28,6 @@
 #include <SketchPlugin_Line.h>
 
 #include <V3d_View.hxx>
-#include <TopoDS_Vertex.hxx>
-#include <TopoDS.hxx>
-#include <BRep_Tool.hxx>
 #include <AIS_DimensionOwner.hxx>
 #include <AIS_DimensionSelectionMode.hxx>
 
@@ -89,14 +86,10 @@ void PartSet_OperationFeatureEdit::fillFeature2Attribute(
   // 1. find all features with skipping features with selected vertex shapes
   theFeature2Attribute.clear();
   // firstly, collect the features without local selection
+  double aX, anY;
   foreach (ModuleBase_ViewerPrs aPrs, thePresentations) {
-    const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
-      const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
-      if (!aVertex.IsNull()) {
-        continue;
-      }
-    }
+    if (getViewerPoint(aPrs, theViewer, aX, anY))
+      continue;
     else {
       ObjectPtr aObject = aPrs.object();
       if (!aObject)
@@ -113,13 +106,8 @@ void PartSet_OperationFeatureEdit::fillFeature2Attribute(
   // if the list already has this feature, the local selection is skipped
   // that means that if the selection contains a feature and a feature with local selected point,
   // the edit is performed for a full feature
-  Handle(V3d_View) aView = theViewer->activeView();
   foreach (ModuleBase_ViewerPrs aPrs, thePresentations) {
-    const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
-      const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
-      if (aVertex.IsNull())
-        continue;
+    if (getViewerPoint(aPrs, theViewer, aX, anY)) {
       ObjectPtr aObject = aPrs.object();
       if (!aObject)
         continue;
@@ -128,11 +116,8 @@ void PartSet_OperationFeatureEdit::fillFeature2Attribute(
         continue;
 
       // append the attribute of the vertex if it is found on the current feature
-      gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
-      double aVX, aVY;
-      PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aVX, aVY);
       boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D = PartSet_Tools::getFeaturePoint(
-                                                                    aFeature, aVX, aVY);
+                                                                    aFeature, aX, anY);
       std::string anAttribute = aFeature->data()->id(aPoint2D);
       std::list<std::string> aList;
       if (theFeature2Attribute.find(aFeature) != theFeature2Attribute.end())

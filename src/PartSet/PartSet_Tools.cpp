@@ -46,6 +46,7 @@
 #include <BRep_Tool.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
+#include <TopoDS_Vertex.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -486,4 +487,24 @@ ResultPtr PartSet_Tools::findExternalEdge(CompositeFeaturePtr theSketch, boost::
     }
   }
   return ResultPtr();
+}
+
+bool PartSet_Tools::hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePtr theSketch,
+                                   Handle_V3d_View theView, double& theX, double& theY)
+{
+  bool aHasVertex = false;
+
+  const TopoDS_Shape& aShape = thePrs.shape();
+  if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX)
+  {
+    const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
+    if (!aVertex.IsNull())
+    {
+      gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
+      PartSet_Tools::convertTo2D(aPoint, theSketch, theView, theX, theY);
+      aHasVertex = true;
+    }
+  }
+
+  return aHasVertex;
 }

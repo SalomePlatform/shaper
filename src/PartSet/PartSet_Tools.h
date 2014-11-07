@@ -151,6 +151,15 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theEdge - the edge
   /// \return result object with external edge if it is found
   static ResultPtr findExternalEdge(CompositeFeaturePtr theSketch, boost::shared_ptr<GeomAPI_Edge> theEdge);
+
+  /// Returns whether the selected presentation has a shape with the vertex type
+  /// \param thePrs a selected presentation
+  /// \param theSketch the sketch feature
+  /// \param theView a 3D view
+  /// \param theX the output horizontal coordinate of the point
+  /// \param theY the output vertical coordinate of the point
+  static bool hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePtr theSketch,
+                             Handle_V3d_View theView, double& theX, double& theY);
 };
 
 #endif
