@@ -7,6 +7,7 @@
 
 #include "ModuleBase.h"
 #include "ModuleBase_ModelWidget.h"
+#include "ModuleBase_ViewerFilters.h"
 
 #include <ModelAPI_Object.h>
 #include <GeomAPI_Shape.h>
@@ -74,19 +75,29 @@ private slots:
 protected:
   bool eventFilter(QObject* theObj, QEvent* theEvent);
 
-private:
   void updateSelectionName();
   void raisePanel() const;
-  bool isAccepted(const ObjectPtr theObject) const;
-  bool isAccepted(boost::shared_ptr<GeomAPI_Shape> theShape) const;
+
+  /// Returns true if Sape of given object corresponds to requested shape type
+  /// This method is called only in non sub-shapes selection mode
+  virtual bool acceptObjectShape(const ObjectPtr theObject) const;
+
+  /// Returns true if selected shape corresponds to requested shape types
+  /// This method is called only in sub-shapes selection mode
+  virtual bool acceptSubShape(boost::shared_ptr<GeomAPI_Shape> theShape) const;
+
+  /// Returns true if selected object corresponds to requested Object type
+  /// Thid method is used in any selection mode
+  virtual bool acceptObjectType(const ObjectPtr theObject) const;
+
 
   // Set the given object as a value of the widget
   void setObject(ObjectPtr theObj, boost::shared_ptr<GeomAPI_Shape> theShape = boost::shared_ptr<GeomAPI_Shape>());
 
+  //----------- Class members -------------
   QWidget* myContainer;
   QLabel* myLabel;
   QLineEdit* myTextLine;
-  //QToolButton* myActivateBtn;
 
   ModuleBase_IWorkshop* myWorkshop;
 
@@ -94,6 +105,7 @@ private:
   boost::shared_ptr<GeomAPI_Shape> myShape;
 
   QStringList myShapeTypes;
+  QStringList myObjectTypes;
 
   /// If true then local selector has to be activated in context
   bool myUseSubShapes;
@@ -102,6 +114,8 @@ private:
   QPalette myInactivePalet;
 
   bool myIsActive;
+
+  Handle(ModuleBase_ObjectTypesFilter) myObjTypeFilter;
 };
 
 #endif

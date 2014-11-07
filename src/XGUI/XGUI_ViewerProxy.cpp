@@ -187,3 +187,30 @@ bool XGUI_ViewerProxy::isMultiSelectionEnabled() const
     return myWorkshop->mainWindow()->viewer()->isMultiSelectionEnabled();
   }
 }
+
+//***************************************
+void XGUI_ViewerProxy::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    aContext->AddFilter(theFilter);
+  }
+}
+
+//***************************************
+void XGUI_ViewerProxy::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    aContext->RemoveFilter(theFilter);
+  }
+}
+
+//***************************************
+void XGUI_ViewerProxy::clearSelectionFilters()
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    aContext->RemoveFilters();
+  }
+}

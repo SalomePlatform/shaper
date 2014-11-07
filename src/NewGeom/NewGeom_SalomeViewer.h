@@ -50,6 +50,15 @@ Q_OBJECT
 
   void setSelector(NewGeom_OCCSelector* theSel);
 
+  /// Add selection filter to the viewer
+  virtual void addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
+
+  /// Remove selection filter from the viewer
+  virtual void removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
+
+  /// Remove all selection filters from the viewer
+  virtual void clearSelectionFilters();
+
   NewGeom_OCCSelector* selector() const
   {
     return mySelector;
