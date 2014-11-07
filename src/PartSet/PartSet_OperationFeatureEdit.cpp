@@ -62,19 +62,19 @@ void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelec
   // selection in different way
   //PartSet_OperationFeatureBase::initSelection(theSelection, theViewer);
 
-  // 1. unite selected and hightlighted objects in order to have an opportunity to drag
-  // by the highlighted object
   QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
   QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
-  // add highlighted elements if they are not selected
-  //foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
-  //  if (!PartSet_Tools::isContainPresentation(aFeatures, aPrs))
-  //    aFeatures.append(aPrs);
-  //}
 
-  fillFeature2Attribute(aHighlighted, theViewer, myHighlightedFeature2Attribute);
-
+  // there is a bug in OCC, where the highlighted objects are repeated and should be
+  // filtered on the unique state here
+  QList<ModuleBase_ViewerPrs> anUniqueHighlighted;
   foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
+    if (!PartSet_Tools::isContainPresentation(anUniqueHighlighted, aPrs))
+      anUniqueHighlighted.append(aPrs);
+  }
+  fillFeature2Attribute(anUniqueHighlighted, theViewer, myHighlightedFeature2Attribute);
+
+  foreach (ModuleBase_ViewerPrs aPrs, anUniqueHighlighted) {
     if (!PartSet_Tools::isContainPresentation(aSelected, aPrs))
       aSelected.append(aPrs);
   }
@@ -338,8 +338,8 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
     //  }
     // }
     //} // multieditoperation
+    sendFeatures(aHasShift);
   }
-  sendFeatures();
 
   myCurPoint.setPoint(aPoint);
 }
@@ -391,28 +391,6 @@ void PartSet_OperationFeatureEdit::mouseReleased(
       commit();
       emitFeaturesDeactivation();
     }
-    else {
-      /// TODO: OCC bug: 25034 - the highlighted list should be filled not only for AIS_Shape
-      /// but for other IO, for example constraint dimensions.
-      /// It is empty and we have to use the process mouse release to start edition operation
-      /// for these objects
-      /*QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
-      if (aSelected.size() == 1) {
-        ObjectPtr anObject = aSelected.first().object();
-        FeaturePtr aSelFeature = ModelAPI_Feature::feature(anObject);
-        FeaturePtr aCurFeature = feature();
-        QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
-        //QList<ModuleBase_ViewerPrs> anEmpty;
-        //aSelected.push_back(aHighlighted);
-        ObjectPtr aNFeature = PartSet_Tools::nearestFeature(theEvent->pos(), aView, sketch(),
-                                                            aSelected, aHighlighted);
-        int aSizeS = aSelected.size();
-        if (anObject && aNFeature != feature()) {
-          restartOperation(PartSet_OperationFeatureEdit::Type(), aNFeature);
-        }
-        //bool aValue  = 9;
-      }*/
-    }
   }
 }
 
@@ -456,7 +434,6 @@ void PartSet_OperationFeatureEdit::stopOperation()
 
   //blockSelection(false, false);
 
-  //myFeature2Attribute.clear();
   myHighlightedFeature2Attribute.clear();
   myAllFeature2Attribute.clear();
 }
@@ -487,12 +464,20 @@ FeaturePtr PartSet_OperationFeatureEdit::createFeature(const bool theFlushMessag
   return FeaturePtr();
 }
 
-void PartSet_OperationFeatureEdit::sendFeatures()
+void PartSet_OperationFeatureEdit::sendFeatures(const bool theIsAllFeatures)
 {
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
 
-  std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myAllFeature2Attribute.begin();
-  while (aFeatIter != myAllFeature2Attribute.end()) {
+  std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter, aFeatLast;
+  if (theIsAllFeatures) {
+    aFeatIter = myAllFeature2Attribute.begin();
+    aFeatLast = myAllFeature2Attribute.end();
+  }
+  else {
+    aFeatIter = myHighlightedFeature2Attribute.begin();
+    aFeatLast = myHighlightedFeature2Attribute.end();
+  }
+  while (aFeatIter != aFeatLast) {
     FeaturePtr aFeature = aFeatIter->first;
     if (aFeature) {
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);

@@ -136,7 +136,8 @@ Q_OBJECT
   //void blockSelection(bool isBlocked, const bool isRestoreSelection = true);
 
   /// Sends the features
-  void sendFeatures();
+  /// \param theIsAllFeatures a boolean value whether all features should be send or only the highlighted ones
+  void sendFeatures(const bool theIsAllFeatures);
 
   /// Sends signal about the current features are to be deactivated
   void emitFeaturesDeactivation();
