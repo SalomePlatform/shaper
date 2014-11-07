@@ -63,8 +63,8 @@ SketchSolver_ConstraintManager::~SketchSolver_ConstraintManager()
 void SketchSolver_ConstraintManager::processEvent(
   const boost::shared_ptr<Events_Message>& theMessage)
 {
-  //if (myIsComputed)
-  //  return;
+  if (myIsComputed)
+    return;
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)
       || theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
