@@ -233,7 +233,7 @@ void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
   myIsActive = toActivate;
   if (myIsActive) {
     connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-    //onSelectionTypeChanged();
+    activateShapeSelection();
   } else {
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
     myWorkshop->deactivateSubShapesSelection();
