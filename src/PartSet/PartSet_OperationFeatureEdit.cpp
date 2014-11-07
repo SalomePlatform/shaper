@@ -285,7 +285,7 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
 
     // the functionality to move the feature attribute if it exists in the internal map
     std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter, aFeatLast;
-    if (aHasShift) {
+    if (aHasShift || myHighlightedFeature2Attribute.empty()) {
       aFeatIter = myAllFeature2Attribute.begin();
       aFeatLast = myAllFeature2Attribute.end();
     }
@@ -391,6 +391,18 @@ void PartSet_OperationFeatureEdit::mouseReleased(
       commit();
       emitFeaturesDeactivation();
     }
+    else if (aSelected.size() == 1) {
+     /// TODO: OCC bug: 25034 - the highlighted list should be filled not only for AIS_Shape
+     /// but for other IO, for example constraint dimensions.
+     /// It is empty and we have to use the process mouse release to start edition operation
+     /// for these objects
+      ObjectPtr anObject = aSelected.first().object();
+      FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+      if (aFeature && PartSet_Tools::isConstraintFeature(aFeature->getKind()) &&
+          aFeature != feature()) {
+        restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+      }
+    }
   }
 }
 
@@ -398,9 +410,30 @@ void PartSet_OperationFeatureEdit::mouseDoubleClick(
     QMouseEvent* theEvent, Handle_V3d_View theView,
     ModuleBase_ISelection* theSelection)
 {
-  myIsBlockedByDoubleClick = true;
   // TODO the functionality is important only for constraint feature. Should be moved in another place
   QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+  // in case when the double click happens on another constraint feature when selection control is active
+  // we should not perform the double click functionality
+  // if there is no the viewer selector widget active, the operation is restarted with a correct feature
+  ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+  if(aActiveWgt && aActiveWgt->isViewerSelector()) {
+    if (!aSelected.empty()) {
+      if (aSelected.size() == 1) {
+       /// TODO: OCC bug: 25034 - the highlighted list should be filled not only for AIS_Shape
+       /// but for other IO, for example constraint dimensions.
+       /// It is empty and we have to use the process mouse release to start edition operation
+       /// for these objects
+        ObjectPtr anObject = aSelected.first().object();
+        FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+        if (aFeature && PartSet_Tools::isConstraintFeature(aFeature->getKind()) &&
+            aFeature != feature()) {
+          return;
+        }
+      }
+    }
+  }
+
+  myIsBlockedByDoubleClick = true;
   if (!aSelected.empty()) {
     ModuleBase_ViewerPrs aFeaturePrs = aSelected.first();
     if (!aFeaturePrs.owner().IsNull()) {
@@ -469,7 +502,7 @@ void PartSet_OperationFeatureEdit::sendFeatures(const bool theIsAllFeatures)
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
 
   std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter, aFeatLast;
-  if (theIsAllFeatures) {
+  if (theIsAllFeatures || myHighlightedFeature2Attribute.empty()) {
     aFeatIter = myAllFeature2Attribute.begin();
     aFeatLast = myAllFeature2Attribute.end();
   }
