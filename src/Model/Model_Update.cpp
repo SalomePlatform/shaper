@@ -179,12 +179,6 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
         if (updateFeature(aComposite->subFeature(a)))
           aMustbeUpdated = true;
       }
-      if (aMustbeUpdated) {
-        for(int a = 0; a < aSubsNum; a++) {
-          if (aComposite->subFeature(a) && aFactory->validate(aComposite->subFeature(a)))
-            aComposite->subFeature(a)->execute();
-        }
-      }
     }
     // check all references: if referenced objects are updated, this object also must be updated
     std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
@@ -201,6 +195,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
       }
     }
 
+    //std::cout<<"Update feature "<<theFeature->getKind()<<" must be updated = "<<aMustbeUpdated<<std::endl;
     // execute feature if it must be updated
     if (aMustbeUpdated) {
       if (boost::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
@@ -209,6 +204,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
           if (isAutomatic || (myJustCreatedOrUpdated.find(theFeature) != myJustCreatedOrUpdated.end()) ||
             !theFeature->isPersistentResult() /* execute quick, not persistent results */) 
           {
+            //std::cout<<"Execute feature "<<theFeature->getKind()<<std::endl;
             // before execution update the selection attributes if any
             list<AttributePtr> aRefs = 
               theFeature->data()->attributes(ModelAPI_AttributeSelection::type());
@@ -226,6 +222,26 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
                   aSel->value(a)->update();
               }
             }
+            // for sketch after update of plane (by update of selection attribute)
+            // but before execute, all sub-elements also must be updated (due to the plane changes)
+            if (aComposite) {
+              int aSubsNum = aComposite->numberOfSubs();
+              for(int a = 0; a < aSubsNum; a++) {
+                FeaturePtr aSub = aComposite->subFeature(a);
+                bool aWasModified = myUpdated[aSub];
+                myUpdated.erase(myUpdated.find(aSub)); // erase to update for sure (plane may be changed)
+                myInitial.insert(aSub);
+                updateFeature(aSub);
+                myUpdated[aSub] = aWasModified; // restore value
+              }
+              // re-execute after update: solver may update the previous values, so, shapes must be
+              // updated
+              for(int a = 0; a < aSubsNum; a++) {
+                if (aComposite->subFeature(a) && aFactory->validate(aComposite->subFeature(a)))
+                  aComposite->subFeature(a)->execute();
+              }
+            }
+
             // execute in try-catch to avoid internal problems of the feature
             try {
               theFeature->execute();
