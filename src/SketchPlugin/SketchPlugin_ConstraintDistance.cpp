@@ -132,7 +132,7 @@ void SketchPlugin_ConstraintDistance::move(double theDeltaX, double theDeltaY)
   aPoint->move(theDeltaX, theDeltaY);
 }
 
-double SketchPlugin_ConstraintDistance::calculateCurrentDistance()
+double SketchPlugin_ConstraintDistance::calculateCurrentDistance() const
 {
   double aDistance = -1.;
 
