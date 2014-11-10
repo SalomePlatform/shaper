@@ -241,6 +241,10 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
       theConstraint->data()->attribute(SketchPlugin_Constraint::VALUE()));
   if (aDistAttr) {
     aDistance = aDistAttr->value();
+    // Issue #196: checking the positivity of the distance constraint
+    if (aDistance < tolerance &&
+       (aConstrType == SLVS_C_PT_PT_DISTANCE || aConstrType == SLVS_C_PT_LINE_DISTANCE))
+      return false;
     // SketchPlugin circle defined by its radius, but SolveSpace uses constraint for diameter
     if (aConstrType == SLVS_C_DIAMETER)
       aDistance *= 2.0;
