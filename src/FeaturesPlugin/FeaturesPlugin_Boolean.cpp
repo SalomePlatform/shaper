@@ -83,6 +83,13 @@ void FeaturesPlugin_Boolean::execute()
     Events_Error::send(aFeatureError, this);
     return;
   }  
+  // if result of Boolean operation is same as was before it means that Boolean operation has no sence
+  // and naming provides no result, so, generate an error in this case
+  if (anObject->isEqual(aFeature->shape())) {
+    std::string aFeatureError = "Boolean feature: operation was not performed";  
+    Events_Error::send(aFeatureError, this);
+    return;
+  }
   //LoadNamingDS
   LoadNamingDS(aFeature, aResultBody, anObject, aTool, aType);
 
