@@ -123,6 +123,10 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
   boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = boost::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
   double aValue = aValueAttr->value();
+  // Issue #196: checking the positivity of the distance constraint
+  // there is a validator for a distance constraint, that the value should be positive
+  if (aValue <= 0)
+    return AISObjectPtr();
 
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS)
