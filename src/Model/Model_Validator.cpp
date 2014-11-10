@@ -10,8 +10,6 @@
 #include <ModelAPI_AttributeValidator.h>
 #include <Events_Error.h>
 
-const static std::string kDefaultId = "Model_FeatureValidator";
-
 void Model_ValidatorsFactory::registerValidator(const std::string& theID,
   ModelAPI_Validator* theValidator)
 {
@@ -121,6 +119,7 @@ void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
 Model_ValidatorsFactory::Model_ValidatorsFactory()
   : ModelAPI_ValidatorsFactory()
 {
+  const static std::string kDefaultId = "Model_FeatureValidator";
   registerValidator(kDefaultId, new Model_FeatureValidator);
 }
 
@@ -135,6 +134,7 @@ const ModelAPI_Validator* Model_ValidatorsFactory::validator(const std::string& 
 
 void Model_ValidatorsFactory::addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators) const
 {
+  const static std::string kDefaultId = "Model_FeatureValidator";
   std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(kDefaultId);
   if(it == myIDs.end())
     return;
@@ -143,6 +143,7 @@ void Model_ValidatorsFactory::addDefaultValidators(std::list<ModelAPI_Validator*
 
 bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const
 {
+  const static std::string kDefaultId = "Model_FeatureValidator";
   // check feature validators first
   std::map<std::string, AttrValidators>::const_iterator aFeature = 
     myFeatures.find(theFeature->getKind());
@@ -213,6 +214,7 @@ bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>
 
 void Model_ValidatorsFactory::registerNotObligatory(std::string theFeature, std::string theAttribute)
 {
+  const static std::string kDefaultId = "Model_FeatureValidator";
   std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(kDefaultId);
   if (it != myIDs.end()) {
     Model_FeatureValidator* aValidator = dynamic_cast<Model_FeatureValidator*>(it->second);

@@ -253,7 +253,13 @@ bool Model_Document::compactNested()
   }
   myIsEmptyTr[myTransactionsAfterSave] = allWasEmpty;
   myTransactionsAfterSave++;
-  myDoc->PerformDeltaCompaction();
+  if (allWasEmpty) {
+    // if everything is empty, it is a problem for OCCT to work with it, 
+    // just commit the empty that returns nothing
+    myDoc->CommitCommand();
+  } else {
+    myDoc->PerformDeltaCompaction();
+  }
   return !allWasEmpty;
 }
 
