@@ -23,7 +23,6 @@ Q_OBJECT
   virtual ~PartSet_WidgetSketchLabel()
   {
   }
-  ;
 
   /// Saves the internal parameters to the given feature
   /// \param theFeature a model feature to be changed

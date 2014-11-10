@@ -155,7 +155,6 @@ QWidget* ModuleBase_WidgetFeature::getControl() const
 QList<QWidget*> ModuleBase_WidgetFeature::getControls() const
 {
   QList<QWidget*> aList;
-  aList.append(myLabel);
   aList.append(myEditor);
   return aList;
 }

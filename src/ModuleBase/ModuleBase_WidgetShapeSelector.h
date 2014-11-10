@@ -15,7 +15,6 @@
 #include <TopAbs_ShapeEnum.hxx>
 
 #include <QStringList>
-#include <QPalette>
 
 class Config_WidgetAPI;
 class QWidget;
@@ -110,9 +109,6 @@ Q_OBJECT
 
   /// If true then local selector has to be activated in context
   bool myUseSubShapes;
-
-  QPalette myBasePalet;
-  QPalette myInactivePalet;
 
   bool myIsActive;
 
