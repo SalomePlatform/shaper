@@ -15,8 +15,6 @@ using namespace std;
 void Model_AttributeSelectionList::append(
     const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
-  updateSubs();
-
   int aNewTag = mySize->Get() + 1;
   TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
 
@@ -25,7 +23,6 @@ void Model_AttributeSelectionList::append(
   if (owner()) {
     aNewAttr->setObject(owner());
   }
-  mySubs.push_back(aNewAttr);
   mySize->Set(aNewTag);
   aNewAttr->setValue(theContext, theSubShape);
   owner()->data()->sendAttributeUpdated(this);
@@ -49,15 +46,22 @@ void Model_AttributeSelectionList::setSelectionType(int theType)
 boost::shared_ptr<ModelAPI_AttributeSelection> 
   Model_AttributeSelectionList::value(const int theIndex)
 {
-  updateSubs();
-  return mySubs[theIndex];
+  TDF_Label aLabel = mySize->Label().FindChild(theIndex + 1);
+  // create a new attribute each time, by demand
+  // supporting of old attributes is too slow (synch each time) and buggy on redo
+  // (if attribute is deleted and created, the abort updates attriute and makes the Attr invalid)
+  boost::shared_ptr<Model_AttributeSelection> aNewAttr = 
+    boost::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLabel));
+  if (owner()) {
+    aNewAttr->setObject(owner());
+  }
+  return aNewAttr;
 }
 
 void Model_AttributeSelectionList::clear()
 {
   if (mySize->Get() != 0) {
     mySize->Set(0);
-    mySubs.clear();
     TDF_ChildIterator aSubIter(mySize->Label());
     for(; aSubIter.More(); aSubIter.Next()) {
       aSubIter.Value().ForgetAllAttributes(Standard_True);
@@ -74,40 +78,5 @@ Model_AttributeSelectionList::Model_AttributeSelectionList(TDF_Label& theLabel)
     mySelectionType = TDataStd_Real::Set(theLabel, 0);
   } else { // recollect mySubs
     theLabel.FindAttribute(TDataStd_Real::GetID(), mySelectionType);
-    updateSubs();
-  }
-}
-
-void Model_AttributeSelectionList::setObject(const boost::shared_ptr<ModelAPI_Object>& theObject)
-{
-  ModelAPI_AttributeSelectionList::setObject(theObject);
-  std::vector<boost::shared_ptr<Model_AttributeSelection> >::iterator aSubIter = mySubs.begin();
-  for(; aSubIter != mySubs.end(); aSubIter++) {
-    (*aSubIter)->setObject(theObject);
-  }
-}
-
-void Model_AttributeSelectionList::updateSubs()
-{
-  unsigned int aNum = mySize->Get();
-  if (aNum > mySubs.size()) { // add subs what are not yet created
-    TDF_ChildIterator aSubIter(mySize->Label());
-    for(int aExisting = mySubs.size(); aExisting > 0; aSubIter.Next()) aExisting--;
-    for(; aSubIter.More(); aSubIter.Next()) {
-      TDF_Label aChildLab = aSubIter.Value();
-      boost::shared_ptr<Model_AttributeSelection> aNewAttr = 
-        boost::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aChildLab));
-      if (owner())
-        aNewAttr->setObject(owner());
-      mySubs.push_back(aNewAttr);
-    }
-  } else if (aNum < mySubs.size()) { // remove excess subs from the end
-    if (aNum == 0) {
-      mySubs.clear();
-    } else {
-      std::vector<boost::shared_ptr<Model_AttributeSelection> >::iterator aSubIter = mySubs.begin();
-      for(int aExisting = aNum; aExisting != 0; aSubIter++) aExisting--;
-      mySubs.erase(aSubIter, mySubs.end());
-    }
   }
 }
