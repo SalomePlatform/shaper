@@ -160,6 +160,18 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theY the output vertical coordinate of the point
   static bool hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePtr theSketch,
                              Handle_V3d_View theView, double& theX, double& theY);
+protected:
+  /// Returns an object that is under the mouse point. Firstly it checks the highlighting,
+  /// if it exists, the first object is returned. Secondly, there is an iteration on
+  /// the selected list to find the point. Thirdly, if the object is not found under the
+  /// the point, the first selected object is returned.
+  /// \param thePoint a screen point
+  /// \param theView a 3D view
+  /// \param theSketch the sketch feature
+  /// \param thePresentations the list of presentations
+  static ObjectPtr nearestFeature(QPoint thePoint, Handle_V3d_View theView, FeaturePtr theSketch,
+                                  const QList<ModuleBase_ViewerPrs>& thePresentations);
+
 };
 
 #endif

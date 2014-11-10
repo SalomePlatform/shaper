@@ -314,6 +314,7 @@ void SketchPlugin_Sketch::attributeChanged() {
       boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
 
       if (kIsAttrChanged) {
+        /* now it is in updater
         // the plane was changed, so reexecute sub-elements to update shapes (located in new plane)
         ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
         list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
@@ -324,6 +325,7 @@ void SketchPlugin_Sketch::attributeChanged() {
             aFeature->execute();
           }
         }
+        */
         kIsAttrChanged = false;
       }
     }

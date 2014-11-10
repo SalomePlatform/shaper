@@ -45,6 +45,7 @@ void SketchPlugin_Circle::execute()
       boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(RADIUS_ID()));
     if (aCenterAttr->isInitialized() && aRadiusAttr->isInitialized()) {
       boost::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
+      //std::cout<<"Execute circle "<<aCenter->x()<<" "<<aCenter->y()<<" "<<aCenter->z()<<std::endl;
       // make a visible point
       boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
       boost::shared_ptr<ModelAPI_ResultConstruction> aConstr1 = document()->createConstruction(
