@@ -64,21 +64,21 @@ Q_OBJECT
   /// \param theValue the wrapped widget value
   virtual bool setValue(ModuleBase_WidgetValue* theValue);
 
-public slots:
+ public slots:
 
   /// Activate or deactivate selection
   void activateSelection(bool toActivate);
 
-private slots:
+ private slots:
   void onSelectionChanged();
 
-protected:
+ protected:
   bool eventFilter(QObject* theObj, QEvent* theEvent);
 
   void updateSelectionName();
   void raisePanel() const;
 
-  /// Returns true if Sape of given object corresponds to requested shape type
+  /// Returns true if shape of given object corresponds to requested shape type
   /// This method is called only in non sub-shapes selection mode
   virtual bool acceptObjectShape(const ObjectPtr theObject) const;
 
@@ -95,6 +95,7 @@ protected:
   void setObject(ObjectPtr theObj, boost::shared_ptr<GeomAPI_Shape> theShape = boost::shared_ptr<GeomAPI_Shape>());
 
   //----------- Class members -------------
+ private:
   QWidget* myContainer;
   QLabel* myLabel;
   QLineEdit* myTextLine;

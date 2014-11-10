@@ -61,6 +61,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myUseSubShapes = theData->getBooleanAttribute("use_subshapes", false);
   //TODO_END
   connect(myTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectionTypeChanged()));
+
   activateSelection(true);
 }
 
@@ -139,11 +140,33 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::eventFilter(QObject* theObj, QEvent* theEvent)
 {
-  if (theObj == myListControl) {
-    if (theEvent->type() == QEvent::FocusIn)
-      activateSelection(true);
-  }
+  //TODO: Remove maybe?
   return ModuleBase_ModelWidget::eventFilter(theObj, theEvent);
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
+{
+  myIsActive = toActivate;
+  if (myIsActive) {
+    connect(myWorkshop, SIGNAL(selectionChanged()), 
+            this,       SLOT(onSelectionChanged()), 
+            Qt::UniqueConnection);
+    activateShapeSelection();
+  } else {
+    disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+    myWorkshop->deactivateSubShapesSelection();
+  }
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
+{
+  activateShapeSelection();
+  QList<ObjectPtr> anEmptyList;
+  myWorkshop->setSelected(anEmptyList);
+  // Clear mySelection, myListControl and storeValue()
+  onSelectionChanged();
 }
 
 //********************************************************************
@@ -168,6 +191,49 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
   emit valuesChanged();
 }
 
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::filterShapes(const NCollection_List<TopoDS_Shape>& theShapesToFilter,
+                                                  NCollection_List<TopoDS_Shape>& theResult)
+{
+  if(myTypeCombo->count() == 0 || theShapesToFilter.IsEmpty())
+    return;
+  TopAbs_ShapeEnum aReferenceType =
+      ModuleBase_WidgetShapeSelector::shapeType(myTypeCombo->currentText());
+  NCollection_List<TopoDS_Shape>::Iterator anIter(theShapesToFilter);
+  for (; anIter.More(); anIter.Next()) {
+    TopoDS_Shape aShape = anIter.Value();
+    if (aShape.IsNull() || aShape.ShapeType() != aReferenceType)
+      continue;
+    theResult.Append(aShape);
+  }
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum theShapeType)
+{
+  QString aShapeTypeName;
+  
+  for (int idx = 0; idx < myTypeCombo->count(); ++idx) {
+    aShapeTypeName = myTypeCombo->itemText(idx);
+    TopAbs_ShapeEnum aRefType = ModuleBase_WidgetShapeSelector::shapeType(aShapeTypeName);
+    if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
+      activateSelection(false);
+      bool isBlocked = myTypeCombo->blockSignals(true);
+      myTypeCombo->setCurrentIndex(idx);
+      myTypeCombo->blockSignals(isBlocked);
+      activateSelection(true);
+      break;
+    }
+  }
+}
+
+void ModuleBase_WidgetMultiSelector::activateShapeSelection()
+{
+  QString aNewType = myTypeCombo->currentText();
+  QIntList aList;
+  aList.append(ModuleBase_WidgetShapeSelector::shapeType(aNewType));
+  myWorkshop->activateSubShapesSelection(aList);
+}
 
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::updateSelectionList()
@@ -190,69 +256,4 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
     myListControl->addItem(aName);
     i++;
   }
-}
-
-
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::filterShapes(const NCollection_List<TopoDS_Shape>& theShapesToFilter,
-                                                  NCollection_List<TopoDS_Shape>& theResult)
-{
-  if(myTypeCombo->count() == 0 || theShapesToFilter.IsEmpty())
-    return;
-  TopAbs_ShapeEnum aReferenceType =
-      ModuleBase_WidgetShapeSelector::shapeType(myTypeCombo->currentText());
-  NCollection_List<TopoDS_Shape>::Iterator anIter(theShapesToFilter);
-  for (; anIter.More(); anIter.Next()) {
-    TopoDS_Shape aShape = anIter.Value();
-    if (aShape.IsNull() || aShape.ShapeType() != aReferenceType)
-      continue;
-    theResult.Append(aShape);
-  }
-}
-
-
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum theShapeType)
-{
-  QString aShapeTypeName;
-  for (int idx = 0; idx < myTypeCombo->count(); ++idx) {
-    aShapeTypeName = myTypeCombo->itemText(idx);
-    TopAbs_ShapeEnum aRefType = ModuleBase_WidgetShapeSelector::shapeType(aShapeTypeName);
-    if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
-      bool isBlocked = myTypeCombo->blockSignals(true);
-      myTypeCombo->setCurrentIndex(idx);
-      myTypeCombo->blockSignals(isBlocked);
-      break;
-    }
-  }
-}
-
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
-{
-  myIsActive = toActivate;
-  if (myIsActive) {
-    connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-    activateShapeSelection();
-  } else {
-    disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-    myWorkshop->deactivateSubShapesSelection();
-  }
-}
-
-void ModuleBase_WidgetMultiSelector::activateShapeSelection()
-{
-  QString aNewType = myTypeCombo->currentText();
-  QIntList aList;
-  aList.append(ModuleBase_WidgetShapeSelector::shapeType(aNewType));
-  myWorkshop->activateSubShapesSelection(aList);
-}
-
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
-{
-  QList<ObjectPtr> anEmptyList;
-  myWorkshop->setSelected(anEmptyList);
-  activateShapeSelection();
-  onSelectionChanged();
 }

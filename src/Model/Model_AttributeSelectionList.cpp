@@ -105,7 +105,7 @@ void Model_AttributeSelectionList::updateSubs()
     if (aNum == 0) {
       mySubs.clear();
     } else {
-      std::vector<boost::shared_ptr<Model_AttributeSelection> >::iterator aSubIter;
+      std::vector<boost::shared_ptr<Model_AttributeSelection> >::iterator aSubIter = mySubs.begin();
       for(int aExisting = aNum; aExisting != 0; aSubIter++) aExisting--;
       mySubs.erase(aSubIter, mySubs.end());
     }
