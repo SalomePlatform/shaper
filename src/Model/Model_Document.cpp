@@ -522,18 +522,20 @@ void Model_Document::removeFeature(FeaturePtr theFeature, const bool theCheck)
   }
 
   boost::shared_ptr<Model_Data> aData = boost::static_pointer_cast<Model_Data>(theFeature->data());
-  TDF_Label aFeatureLabel = aData->label().Father();
-  if (myObjs.IsBound(aFeatureLabel))
-    myObjs.UnBind(aFeatureLabel);
-  else
-    return;  // not found feature => do not remove
-  // erase fields
-  theFeature->erase();
-  // erase all attributes under the label of feature
-  aFeatureLabel.ForgetAllAttributes();
-  // remove it from the references array
-  if (theFeature->isInHistory()) {
-    RemoveFromRefArray(featuresLabel(), aFeatureLabel);
+  if (aData) {
+    TDF_Label aFeatureLabel = aData->label().Father();
+    if (myObjs.IsBound(aFeatureLabel))
+      myObjs.UnBind(aFeatureLabel);
+    else
+      return;  // not found feature => do not remove
+    // erase fields
+    theFeature->erase();
+    // erase all attributes under the label of feature
+    aFeatureLabel.ForgetAllAttributes();
+    // remove it from the references array
+    if (theFeature->isInHistory()) {
+      RemoveFromRefArray(featuresLabel(), aFeatureLabel);
+    }
   }
   // event: feature is deleted
   ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
