@@ -88,10 +88,6 @@ Q_OBJECT
   virtual FeaturePtr createFeature(const bool theFlushMessage = true,
     CompositeFeaturePtr theCompositeFeature = CompositeFeaturePtr());
 
-  /// Verifies whether this operator can be commited.
-  /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
-  virtual bool canBeCommitted() const;
-
 protected:
   /// Feature of previous operation (for sequintal operations)
   FeaturePtr myInitFeature;

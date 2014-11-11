@@ -113,7 +113,7 @@ void ModuleBase_Operation::afterCommitOperation()
 
 bool ModuleBase_Operation::canBeCommitted() const
 {
-  return true;
+  return isValid();
 }
 
 void ModuleBase_Operation::flushUpdated()

@@ -67,15 +67,6 @@ bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
       || theId == SketchPlugin_ConstraintRigid::ID();
 }
 
-bool PartSet_OperationFeatureCreate::canBeCommitted() const
-{
-  if (PartSet_OperationSketchBase::canBeCommitted()) {
-    //if(myActiveWidget && !myActiveWidget->isComputedDefault()) {
-    return isValid();
-  }
-  return false;
-}
-
 void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer)
 {
     double aX, anY;
