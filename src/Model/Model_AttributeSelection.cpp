@@ -114,9 +114,7 @@ bool Model_AttributeSelection::update()
       boost::dynamic_pointer_cast<GeomAPI_PlanarEdges>(
       boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext)->shape());
     if (aWirePtr && aWirePtr->hasPlane()) {
-      boost::shared_ptr<Model_Data> aData = 
-        boost::dynamic_pointer_cast<Model_Data>(owner()->data());
-      TDF_Label aLab = aData->label();
+      TDF_Label aLab = myRef.myRef->Label();
       // getting a type of selected shape
       Handle(TDataStd_Integer) aTypeAttr;
       if (!aLab.FindAttribute(TDataStd_Integer::GetID(), aTypeAttr)) {
@@ -305,7 +303,7 @@ void Model_AttributeSelection::selectConstruction(
     return; // saving of context is enough: result construction contains exactly the needed shape
   }
   boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(owner()->data());
-  TDF_Label aLab = aData->label();
+  TDF_Label aLab = myRef.myRef->Label();
   // identify the reuslts of sub-object of the composite by edges
   const TopoDS_Shape& aSubShape = theSubShape->impl<TopoDS_Shape>();
   // save type of the selected shape in integer attribute
@@ -325,6 +323,7 @@ void Model_AttributeSelection::selectConstruction(
   }
   // iterate and store the result ids of sub-elements
   Handle(TDataStd_IntPackedMap) aRefs = TDataStd_IntPackedMap::Set(aLab);
+  aRefs->Clear();
   const int aSubNum = aComposite->numberOfSubs();
   for(int a = 0; a < aSubNum; a++) {
     FeaturePtr aSub = aComposite->subFeature(a);

@@ -101,11 +101,6 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   myTextLine->setToolTip(aToolTip);
   myTextLine->installEventFilter(this);
 
-  myBasePalet = myTextLine->palette();
-  myInactivePalet = myBasePalet;
-  myInactivePalet.setBrush(QPalette::Base, QBrush(Qt::gray, Qt::Dense6Pattern));
-  myTextLine->setPalette(myInactivePalet);
-
   aLayout->addWidget(myTextLine, 1);
 
   std::string aTypes = theData->getProperty("shape_types");
@@ -180,7 +175,6 @@ bool ModuleBase_WidgetShapeSelector::restoreValue()
 QList<QWidget*> ModuleBase_WidgetShapeSelector::getControls() const
 {
   QList<QWidget*> aControls;
-  aControls.append(myLabel);
   aControls.append(myTextLine);
   return aControls;
 }
@@ -333,17 +327,8 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
     myTextLine->setText(QString::fromStdString(aName));
   } else {
     if (myIsActive) {
-      QString aMsg = tr("Select a ");
-      int i = 0;
-      foreach (QString aType, myShapeTypes) {
-        if (i > 0)
-          aMsg += " or ";
-        aMsg += aType;
-        i++;
-      }
-      myTextLine->setText(aMsg);
-    } else
-      myTextLine->setText(tr("No object selected"));
+      myTextLine->setText("");
+    }
   }
 }
 
@@ -352,10 +337,6 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
 void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
 {
   myIsActive = toActivate;
-  if (myIsActive)
-    myTextLine->setPalette(myBasePalet);
-  else
-    myTextLine->setPalette(myInactivePalet);
   updateSelectionName();
 
   if (myIsActive) {
@@ -405,7 +386,7 @@ void ModuleBase_WidgetShapeSelector::raisePanel() const
 bool ModuleBase_WidgetShapeSelector::focusTo()
 {
   activateSelection(true);
-  return true;
+  return ModuleBase_ModelWidget::focusTo();
 }
 
 //********************************************************************

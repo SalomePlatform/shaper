@@ -122,7 +122,6 @@ bool ModuleBase_WidgetDoubleValue::restoreValue()
 QList<QWidget*> ModuleBase_WidgetDoubleValue::getControls() const
 {
   QList<QWidget*> aList;
-  aList.append(myLabel);
   aList.append(mySpinBox);
   return aList;
 }
