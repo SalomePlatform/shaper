@@ -183,6 +183,20 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
   GeomShapePtr aShape;
   for (aIt = aOwnersList.cbegin(); aIt != aOwnersList.cend(); aShpIt.Next(), aIt++) {
     ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(*aIt);
+    if (myFeature) {
+      // We can not select a result of our feature
+      const std::list<ResultPtr>& aResList = myFeature->results();
+      std::list<ResultPtr>::const_iterator aIt;
+      bool isSkipSelf = false;
+      for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
+        if ((*aIt) == aResult) {
+          isSkipSelf = true;
+          break;
+        }
+      }
+      if(isSkipSelf)
+        continue;
+    }
     aShape = boost::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
     aShape->setImpl(new TopoDS_Shape(aShpIt.Value()));
     mySelection.append(GeomSelection(aResult, aShape));
@@ -256,4 +270,5 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
     myListControl->addItem(aName);
     i++;
   }
+  myListControl->repaint();
 }
