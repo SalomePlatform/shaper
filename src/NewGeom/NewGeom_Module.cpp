@@ -269,11 +269,12 @@ QAction* NewGeom_Module::addFeature(const QString& theWBName, const QString& the
 }
 
 //******************************************************
-QAction* NewGeom_Module::addEditCommand(const QString& theId, const QString& theTitle,
-                                        const QString& theTip, const QIcon& theIcon,
-                                        const QKeySequence& theKeys, bool isCheckable)
+QAction* NewGeom_Module::addDesktopCommand(const QString& theId, const QString& theTitle,
+                                           const QString& theTip, const QIcon& theIcon,
+                                           const QKeySequence& theKeys, bool isCheckable,
+                                           const char* theMenuSourceText, const int theMenuPosition)
 {
-  int aMenu = createMenu(tr("MEN_DESK_EDIT"), -1, -1);
+  int aMenu = createMenu(tr(theMenuSourceText), -1, -1);
 
   int aId = myActionsList.size();
   myActionsList.append(theId);
@@ -284,15 +285,15 @@ QAction* NewGeom_Module::addEditCommand(const QString& theId, const QString& the
   QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
                                   isCheckable);
   aAction->setData(theId);
-  createMenu(aId, aMenu, 10);
+  createMenu(aId, aMenu, theMenuPosition);
   return aAction;
 }
 
 //******************************************************
-void NewGeom_Module::addEditMenuSeparator()
+void NewGeom_Module::addDesktopMenuSeparator(const char* theMenuSourceText, const int theMenuPosition)
 {
-  int aMenu = createMenu(tr("MEN_DESK_EDIT"), -1, -1);
-  createMenu(separator(), aMenu, -1, 10);
+  int aMenu = createMenu(tr(theMenuSourceText), -1, -1);
+  createMenu(separator(), aMenu, -1, theMenuPosition);
 }
 
 //******************************************************

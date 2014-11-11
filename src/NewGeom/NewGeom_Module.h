@@ -38,11 +38,14 @@ Q_OBJECT
                               const QKeySequence& theKeys = QKeySequence(),
                               bool isCheckable = false);
 
-  virtual QAction* addEditCommand(const QString& theId, const QString& theTitle,
-                                  const QString& theTip, const QIcon& theIcon,
-                                  const QKeySequence& theKeys, bool isCheckable);
+  virtual QAction* addDesktopCommand(const QString& theId, const QString& theTitle,
+                                     const QString& theTip, const QIcon& theIcon,
+                                     const QKeySequence& theKeys, bool isCheckable,
+                                     const char* theMenuSourceText,
+                                     const int theMenuPosition = 10);
 
-  virtual void addEditMenuSeparator();
+  virtual void addDesktopMenuSeparator(const char* theMenuSourceText,
+                                       const int theMenuPosition = 10);
 
   virtual QMainWindow* desktop() const;
 
