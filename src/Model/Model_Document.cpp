@@ -254,7 +254,7 @@ bool Model_Document::compactNested()
   myIsEmptyTr[myTransactionsAfterSave] = allWasEmpty;
   myTransactionsAfterSave++;
   if (allWasEmpty) {
-    // if everything is empty, it is a problem for OCCT to work with it, 
+    // Issue 151: if everything is empty, it is a problem for OCCT to work with it, 
     // just commit the empty that returns nothing
     myDoc->CommitCommand();
   } else {
