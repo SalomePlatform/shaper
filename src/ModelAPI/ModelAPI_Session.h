@@ -40,6 +40,9 @@ class MODELAPI_EXPORT ModelAPI_Session
   //! \returns true if file was stored successfully
   virtual bool save(const char* theFileName, std::list<std::string>& theResults) = 0;
 
+  //! Closes all documents
+  virtual void closeAll() = 0;
+
   //! Starts a new operation (opens a tansaction)
   virtual void startOperation() = 0;
   //! Finishes the previously started operation (closes the transaction)

@@ -202,7 +202,7 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
   return isDone;
 }
 
-void Model_Document::close()
+void Model_Document::close(const bool theForever)
 {
   boost::shared_ptr<ModelAPI_Session> aPM = Model_Session::get();
   if (this != aPM->moduleDocument().get() && this == aPM->activeDocument().get()) {
@@ -211,14 +211,36 @@ void Model_Document::close()
   // close all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
-    subDoc(*aSubIter)->close();
+    subDoc(*aSubIter)->close(theForever);
   mySubs.clear();
-  // close this only if it is module document, otherwise it can be undoed
-  if (this == aPM->moduleDocument().get()) {
+
+  // close for thid document needs no transaction in this document
+  boost::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(false);
+
+  // delete all features of this document
+  boost::shared_ptr<ModelAPI_Document> aThis = 
+    Model_Application::getApplication()->getDocument(myID);
+  Events_Loop* aLoop = Events_Loop::loop();
+  NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFeaturesIter(myObjs);
+  for(; aFeaturesIter.More(); aFeaturesIter.Next()) {
+    FeaturePtr aFeature = aFeaturesIter.Value();
+    static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_Feature::group());
+    ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
+    aFeature->eraseResults();
+    aFeature->erase();
+  }
+  myObjs.Clear();
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+
+  // close all only if it is really asked, otherwise it can be undoed/redoed
+  if (theForever) {
     if (myDoc->CanClose() == CDM_CCS_OK)
       myDoc->Close();
-    Model_Application::getApplication()->deleteDocument(myID);
   }
+
+  boost::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(true);
 }
 
 void Model_Document::startOperation()
@@ -629,6 +651,8 @@ int Model_Document::size(const std::string& theGroupID, const bool theHidden)
     for (; aLabIter.More(); aLabIter.Next()) {
       TDF_Label aFLabel = aLabIter.Value()->Label();
       FeaturePtr aFeature = feature(aFLabel);
+      if (!aFeature) // may be on close
+        continue;
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
       for (; aRIter != aResults.cend(); aRIter++) {

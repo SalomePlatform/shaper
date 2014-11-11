@@ -49,7 +49,8 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual bool save(const char* theFileName, std::list<std::string>& theResults);
 
   //! Removes document data
-  MODEL_EXPORT virtual void close();
+  //! \param theForever if it is false, document is just hiden (to keep possibility make it back on Undo/Redo)
+  MODEL_EXPORT virtual void close(const bool theForever = false);
 
   //! Starts a new operation (opens a tansaction)
   MODEL_EXPORT virtual void startOperation();

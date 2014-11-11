@@ -726,7 +726,7 @@ void XGUI_Workshop::onOpen()
     } else if (anAnswer == QMessageBox::Cancel) {
       return;
     }
-    aSession->moduleDocument()->close();
+    aSession->closeAll();
     myCurrentDir = "";
   }
 
@@ -1327,6 +1327,6 @@ void XGUI_Workshop::closeDocument()
   objectBrowser()->clearContent();
 
   SessionPtr aMgr = ModelAPI_Session::get();
-  aMgr->moduleDocument()->close();
+  aMgr->closeAll();
   objectBrowser()->clearContent();
 }

@@ -43,6 +43,9 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   //! \returns true if file was stored successfully
   MODEL_EXPORT virtual bool save(const char* theFileName, std::list<std::string>& theResults);
 
+  //! Closes all documents
+  MODEL_EXPORT virtual void closeAll();
+
   //! Starts a new operation (opens a tansaction)
   MODEL_EXPORT virtual void startOperation();
   //! Finishes the previously started operation (closes the transaction)

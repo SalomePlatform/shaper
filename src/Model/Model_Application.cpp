@@ -40,7 +40,17 @@ const boost::shared_ptr<Model_Document>& Model_Application::getDocument(string t
 
 void Model_Application::deleteDocument(string theDocID)
 {
-  myDocs.erase(theDocID);
+  if (myDocs.find(theDocID) != myDocs.end()) {
+    myDocs[theDocID]->close(true);
+    myDocs.erase(theDocID);
+  }
+  myLoadedByDemand.clear();
+}
+
+void Model_Application::deleteAllDocuments()
+{
+  myDocs.clear();
+  myLoadedByDemand.clear();
 }
 
 //=======================================================================
