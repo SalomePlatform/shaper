@@ -37,7 +37,7 @@ Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(const Handle(SelectMgr_Ent
       if (aObj) {
         DocumentPtr aDoc = aObj->document();
         SessionPtr aMgr = ModelAPI_Session::get();
-        return (aDoc == aMgr->activeDocument()) || (aDoc == aMgr->moduleDocument());
+        return (aDoc == aMgr->activeDocument() /* MPV: for the current moment selection in other document is not possible || (aDoc == aMgr->moduleDocument()*/);
       }
     }
   }
