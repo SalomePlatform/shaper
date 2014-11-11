@@ -27,9 +27,7 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
 
 QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
 {
-  QList<QWidget*> aLst;
-  aLst << myLabel;
-  return aLst;
+  return QList<QWidget*>();
 }
 
 QWidget* PartSet_WidgetSketchLabel::getControl() const

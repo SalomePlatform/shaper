@@ -74,7 +74,6 @@ bool ModuleBase_WidgetChoice::focusTo()
 QList<QWidget*> ModuleBase_WidgetChoice::getControls() const
 {
   QList<QWidget*> aControls;
-  aControls.append(myLabel);
   aControls.append(myCombo);
   return aControls;
 }
