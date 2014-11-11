@@ -185,7 +185,7 @@ void XGUI_Workshop::initMenu()
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
     salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
 
-    aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export NewGeom..."), tr("Export the current NewGeom document into a file"),
+    aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export NewGeom..."), tr("Export the current document into a NewGeom file"),
                                                 QIcon(), QKeySequence(),
                                                 false, "MEN_DESK_FILE");
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSaveAs()));
