@@ -36,13 +36,18 @@ class XGUI_EXPORT XGUI_SalomeConnector
   //! \param theIcon - icon
   //! \param isCheckable - is checkable or not
   //! \param theKeys - hot keys
+  //! \param theMenuSourceText - a source text of the desktop menu
+  //! \param theMenuPosition - a position of the command in the desktop menu
   //! returns created action
-  virtual QAction* addEditCommand(const QString& theId, const QString& theTitle,
-                                  const QString& theTip, const QIcon& theIcon,
-                                  const QKeySequence& theKeys, bool isCheckable) = 0;
+  virtual QAction* addDesktopCommand(const QString& theId, const QString& theTitle,
+                                     const QString& theTip, const QIcon& theIcon,
+                                     const QKeySequence& theKeys, bool isCheckable,
+                                     const char* theMenuSourceText,
+                                     const int theMenuPosition = 10) = 0;
 
   //! Insert separator into Edit menu of SALOME desktop
-  virtual void addEditMenuSeparator() = 0;
+  virtual void addDesktopMenuSeparator(const char* theMenuSourceText,
+                                       const int theMenuPosition = 10) = 0;
 
   //! Returns desktop window of SALOME
   virtual QMainWindow* desktop() const = 0;

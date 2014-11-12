@@ -133,6 +133,14 @@ bool SketchSolver_ConstraintGroup::isInteract(
   if (isEmpty())
     return true;
 
+  // Check if the feature is already in the group
+  if (myEntityFeatMap.find(theFeature) != myEntityFeatMap.end())
+    return true;
+  boost::shared_ptr<SketchPlugin_Constraint> aConstr =
+      boost::dynamic_pointer_cast<SketchPlugin_Constraint>(theFeature);
+  if (aConstr && myConstraintMap.find(aConstr) != myConstraintMap.end())
+    return true;
+
   // Go through the attributes and verify if some of them already in the group
   std::list<boost::shared_ptr<ModelAPI_Attribute>> 
       anAttrList = theFeature->data()->attributes(std::string());

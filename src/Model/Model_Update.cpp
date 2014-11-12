@@ -91,6 +91,23 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
       isAutomaticChanged = true;
       isAutomatic = true;
     }
+    // the hardcode (DBC asked): hide the sketch referenced by extrusion on apply
+    if (theMessage->eventID() == kOpFinishEvent) {
+      std::set<boost::shared_ptr<ModelAPI_Object> >::iterator aFIter;
+      for(aFIter = myJustCreatedOrUpdated.begin(); aFIter != myJustCreatedOrUpdated.end(); aFIter++)
+      {
+        FeaturePtr aF = boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter);
+        if (aF && aF->getKind() == "Extrusion") {
+          if (aF->selection("extrusion_face")) {
+            ResultPtr aSketchRes = aF->selection("extrusion_face")->context();
+            if (aSketchRes) {
+              static Events_ID HIDE_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TOHIDE);
+              ModelAPI_EventCreator::get()->sendUpdated(aSketchRes, HIDE_DISP);
+            }
+          }
+        }
+      }
+    }
   }
 
   if (isExecuted)

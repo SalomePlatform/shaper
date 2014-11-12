@@ -36,6 +36,8 @@ class Model_Application : public TDocStd_Application
   MODEL_EXPORT bool hasDocument(std::string theDocID);
   //! Deletes the document from the application
   MODEL_EXPORT void deleteDocument(std::string theDocID);
+  //! Deletes all documents existing in the application
+  MODEL_EXPORT void deleteAllDocuments();
 
   //! Set path for the loaded by demand documents
   void setLoadPath(std::string thePath);

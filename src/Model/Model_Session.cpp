@@ -39,6 +39,12 @@ bool Model_Session::save(const char* theFileName, std::list<std::string>& theRes
   return ROOT_DOC->save(theFileName, theResults);
 }
 
+void Model_Session::closeAll()
+{
+  ROOT_DOC->close(true);
+  Model_Application::getApplication()->deleteAllDocuments();
+}
+
 void Model_Session::startOperation()
 {
   ROOT_DOC->startOperation();
