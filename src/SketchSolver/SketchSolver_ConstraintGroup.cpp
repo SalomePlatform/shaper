@@ -975,9 +975,11 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
           isFound = (aGrEntIter->find(aConstrEnt[i]) != aGrEntIter->end());
           // Also we need to check sub-entities
           int aEntPos = Search(aConstrEnt[i], myEntities);
-          Slvs_hEntity* aSub = myEntities[aEntPos].point;
-          for (int j = 0; *aSub != 0 && j < 4 && !isFound; aSub++, j++)
-            isFound = (aGrEntIter->find(*aSub) != aGrEntIter->end());
+          if (aEntPos != myEntities.size()) { // MPV: to fix the crash on close
+            Slvs_hEntity* aSub = myEntities[aEntPos].point;
+            for (int j = 0; *aSub != 0 && j < 4 && !isFound; aSub++, j++)
+              isFound = (aGrEntIter->find(*aSub) != aGrEntIter->end());
+          }
         }
       if (isFound)
         anIndexes.push_back(aGrEntIter - aGroupsEntities.begin());
@@ -989,9 +991,11 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
         if (aConstrEnt[i] != 0) {
           aNewGrEnt.insert(aConstrEnt[i]);
           int aEntPos = Search(aConstrEnt[i], myEntities);
-          Slvs_hEntity* aSub = myEntities[aEntPos].point;
-          for (int j = 0; *aSub != 0 && j < 4; aSub++, j++)
-            aNewGrEnt.insert(*aSub);
+          if (aEntPos != myEntities.size()) { // MPV: to fix the crash on close
+            Slvs_hEntity* aSub = myEntities[aEntPos].point;
+            for (int j = 0; *aSub != 0 && j < 4; aSub++, j++)
+              aNewGrEnt.insert(*aSub);
+          }
         }
       std::set<Slvs_hConstraint> aNewGrConstr;
       aNewGrConstr.insert(aConstrIter->h);
@@ -1006,9 +1010,11 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
         if (aConstrEnt[i] != 0) {
           aGrEntIter->insert(aConstrEnt[i]);
           int aEntPos = Search(aConstrEnt[i], myEntities);
-          Slvs_hEntity* aSub = myEntities[aEntPos].point;
-          for (int j = 0; *aSub != 0 && j < 4; aSub++, j++)
-            aGrEntIter->insert(*aSub);
+          if (aEntPos != myEntities.size()) { // MPV: to fix the crash on close
+            Slvs_hEntity* aSub = myEntities[aEntPos].point;
+            for (int j = 0; *aSub != 0 && j < 4; aSub++, j++)
+              aGrEntIter->insert(*aSub);
+          }
         }
       aGroupsConstr[anIndexes.front()].insert(aConstrIter->h);
       if (aGrEntIter->size() > aGroupsEntities[aMaxNbEntities].size())
