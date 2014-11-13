@@ -101,6 +101,9 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
   if (this != myImpl)
     return myImpl->createFeature(theFeatureID);
 
+  // load all information about plugins, features and attributes
+  LoadPluginsInfo();
+
   if (myPlugins.find(theFeatureID) != myPlugins.end()) {
     std::pair<std::string, std::string>& aPlugin = myPlugins[theFeatureID]; // plugin and doc kind
     if (!aPlugin.second.empty() && aPlugin.second != activeDocument()->kind()) {
@@ -217,9 +220,6 @@ Model_Session::Model_Session()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_VALIDATOR_LOADED));
-  
-  // load all information about plugins, features and attributes
-  LoadPluginsInfo();
 }
 
 void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMessage)

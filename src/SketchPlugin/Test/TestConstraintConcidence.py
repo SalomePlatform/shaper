@@ -84,9 +84,9 @@ assert (aLineStartPoint.y() == 0)
 deltaX = deltaY = 40.
 #  move line
 aSession.startOperation()
-aLineStartPoint.setValue(aLineStartPoint.x() + deltaX,
+anArcStartPoint.setValue(aLineStartPoint.x() + deltaX,
                          aLineStartPoint.y() + deltaY)
-aLineEndPoint.setValue(aLineEndPoint.x() + deltaX,
+anArcEndPoint.setValue(aLineEndPoint.x() + deltaX,
                        aLineEndPoint.y() + deltaY)
 aSession.finishOperation()
 # check that arc's points are moved also
