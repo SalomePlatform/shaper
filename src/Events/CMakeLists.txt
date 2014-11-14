@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
     Events_Message.cpp
+    Events_MessageGroup.cpp
     Events_Listener.cpp
     Events_Loop.cpp
     Events_Error.cpp
