@@ -16,7 +16,6 @@ class PARTSETPLUGIN_EXPORT PartSetPlugin_Plugin : public ModelAPI_Plugin
   virtual FeaturePtr createFeature(std::string theFeatureID);
 
  public:
-  /// Is needed for python wrapping by swig
   PartSetPlugin_Plugin();
 };
 

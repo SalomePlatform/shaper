@@ -1,9 +1,9 @@
-from ModelAPI import *
+import ModelAPI
 
-class PythonFeaturesPlugin_Box(ModelAPI_Feature):
+class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
   "Feature to create a box by drawing a sketch and extruding it"
   def __init__(self):
-    pass
+    ModelAPI.ModelAPI_Feature.__init__(self)
 
   @staticmethod
   def ID():
@@ -21,20 +21,24 @@ class PythonFeaturesPlugin_Box(ModelAPI_Feature):
   def HEIGHT_ID():
     return "box_height"
 
+  def getKind(self):
+    return PythonFeaturesPlugin_Box.ID()
+
   def initAttributes(self):
-    self.data().addAttribute(PythonFeaturesPlugin_Box.WIDTH_ID(), ModelAPI_AttributeDouble.type())
-    self.data().addAttribute(PythonFeaturesPlugin_Box.LENGTH_ID(), ModelAPI_AttributeDouble.type())
-    self.data().addAttribute(PythonFeaturesPlugin_Box.HEIGHT_ID(), ModelAPI_AttributeDouble.type())
+    # C++ static methods (in example Type() of ModelAPI_AttributeDouble
+    # should be called like this: moduleName.ClassName_StaticMethod()
+    self.data().addAttribute(PythonFeaturesPlugin_Box.WIDTH_ID(), ModelAPI.ModelAPI_AttributeDouble_type())
+    self.data().addAttribute(PythonFeaturesPlugin_Box.LENGTH_ID(), ModelAPI.ModelAPI_AttributeDouble_type())
+    self.data().addAttribute(PythonFeaturesPlugin_Box.HEIGHT_ID(), ModelAPI.ModelAPI_AttributeDouble_type())
 
   def execute(self):
-    aWidth  = self.attribute(PythonFeaturesPlugin_Box.WIDTH_ID()).value()
-    aLength = self.attribute(PythonFeaturesPlugin_Box.LENGTH_ID()).value()
-    aHeight = self.attribute(PythonFeaturesPlugin_Box.HEIGHT_ID()).value()
-
-    aResult = document().createBody(data())
-    #aResult.store(UserPackage.makeBox(aLength, aWidth, aHeight)
-
-    #self.setResult(aResult)
+    aWidth  = self.real(PythonFeaturesPlugin_Box.WIDTH_ID()).value()
+    aLength = self.real(PythonFeaturesPlugin_Box.LENGTH_ID()).value()
+    aHeight = self.real(PythonFeaturesPlugin_Box.HEIGHT_ID()).value()
+    print ("Box W:{0} L:{1} H:{2}".format(aWidth, aLength, aHeight))
+    # aResult = document().createBody(data())
+    # aResult.store(UserPackage.makeBox(aLength, aWidth, aHeight)
+    # self.setResult(aResult)
 
 
     

@@ -16,7 +16,6 @@ class CONSTRUCTIONPLUGIN_EXPORT ConstructionPlugin_Plugin : public ModelAPI_Plug
   virtual FeaturePtr createFeature(std::string theFeatureID);
 
  public:
-  /// Is needed for python wrapping by swig
   ConstructionPlugin_Plugin();
 };
 

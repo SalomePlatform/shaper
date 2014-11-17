@@ -9,7 +9,7 @@ class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
 
   def createFeature(self, theFeatureID):
     if theFeatureID == PythonFeaturesPlugin_Box.ID():
-      return PythonFeaturesPlugin_Box()
+      return PythonFeaturesPlugin_Box().__disown__()
     else:
       raise StandardError("No such feature %s"%theFeatureID)
 

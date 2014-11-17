@@ -1,5 +1,13 @@
 /* ModelAPI.i */
 %module(directors="1") ModelAPI
+%feature("director:except") {
+    if ($error != NULL) {
+      PyErr_Print();
+      std::cerr << std::endl;
+      throw Swig::DirectorMethodException();
+    }
+}
+
 %{
   #include "GeomAPI_Interface.h"
   #include "GeomAPI_Shape.h"
@@ -47,19 +55,18 @@
 
 // directors
 %feature("director") ModelAPI_Plugin;
-// %feature("director") ModelAPI_Object;
-// %feature("director") ModelAPI_Feature;
-// %feature("director") ModelAPI_CompositeFeature;
+%feature("director") ModelAPI_Object;
+%feature("director") ModelAPI_Feature;
 
 // boost pointers
-%include <boost_shared_ptr.i>
+%include "boost_shared_ptr.i"
 // For ModelAPI_ResultConstruction.shape()
 %shared_ptr(GeomAPI_Interface)
 %shared_ptr(GeomAPI_Shape)
 %shared_ptr(ModelAPI_Document)
 %shared_ptr(ModelAPI_Session)
+%shared_ptr(ModelAPI_Plugin)
 %shared_ptr(ModelAPI_Object)
-// %shared_ptr(ModelAPI_Plugin)
 %shared_ptr(ModelAPI_Feature)
 %shared_ptr(ModelAPI_CompositeFeature)
 %shared_ptr(ModelAPI_Data)
@@ -79,14 +86,17 @@
 %shared_ptr(ModelAPI_ResultBody)
 %shared_ptr(ModelAPI_ResultPart)
 
+// Don't create default constructors
+// %nodefaultctor ModelAPI_Plugin;
+// %nodefaultctor ModelAPI_Session;
+
 // all supported interfaces
 %include "GeomAPI_Interface.h"
 %include "GeomAPI_Shape.h"
 %include "ModelAPI_Document.h"
 %include "ModelAPI_Session.h"
-%include "ModelAPI_Object.h"
-// %nodefaultctor ModelAPI_Plugin;
 %include "ModelAPI_Plugin.h"
+%include "ModelAPI_Object.h"
 %include "ModelAPI_Feature.h"
 %include "ModelAPI_CompositeFeature.h"
 %include "ModelAPI_Data.h"
@@ -111,9 +121,24 @@
 %template(ResultList) std::list<boost::shared_ptr<ModelAPI_Result> >;
 
 template<class T1, class T2> boost::shared_ptr<T1> boost_cast(boost::shared_ptr<T2> theObject);
+
+// Feature casts
+%template(modelAPI_Feature)          boost_cast<ModelAPI_Feature, ModelAPI_Object>;
 %template(modelAPI_CompositeFeature) boost_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
+
+// Result casts
 %template(modelAPI_ResultConstruction) boost_cast<ModelAPI_ResultConstruction, ModelAPI_Result>;
-%template(modelAPI_ResultBody) boost_cast<ModelAPI_ResultBody, ModelAPI_Result>;
-%template(modelAPI_ResultPart) boost_cast<ModelAPI_ResultPart, ModelAPI_Result>;
+%template(modelAPI_ResultBody)         boost_cast<ModelAPI_ResultBody, ModelAPI_Result>;
+%template(modelAPI_ResultPart)         boost_cast<ModelAPI_ResultPart, ModelAPI_Result>;
 
-
+// Attribute casts
+%template(modelAPI_AttributeDocRef)        boost_cast<ModelAPI_AttributeDocRef, ModelAPI_Attribute>;
+%template(modelAPI_AttributeDouble)        boost_cast<ModelAPI_AttributeDouble, ModelAPI_Attribute>;
+%template(modelAPI_AttributeInteger)       boost_cast<ModelAPI_AttributeInteger, ModelAPI_Attribute>;
+%template(modelAPI_AttributeString)        boost_cast<ModelAPI_AttributeString, ModelAPI_Attribute>;
+%template(modelAPI_AttributeReference)     boost_cast<ModelAPI_AttributeReference, ModelAPI_Attribute>;
+%template(modelAPI_AttributeRefAttr)       boost_cast<ModelAPI_AttributeRefAttr, ModelAPI_Attribute>;
+%template(modelAPI_AttributeBoolean)       boost_cast<ModelAPI_AttributeBoolean, ModelAPI_Attribute>;
+%template(modelAPI_AttributeSelection)     boost_cast<ModelAPI_AttributeSelection, ModelAPI_Attribute>;
+%template(modelAPI_AttributeSelectionList) boost_cast<ModelAPI_AttributeSelectionList, ModelAPI_Attribute>;
+%template(modelAPI_AttributeRefList)       boost_cast<ModelAPI_AttributeRefList, ModelAPI_Attribute>;

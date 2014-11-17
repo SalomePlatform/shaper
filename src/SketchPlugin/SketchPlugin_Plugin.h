@@ -16,7 +16,6 @@ class SKETCHPLUGIN_EXPORT SketchPlugin_Plugin : public ModelAPI_Plugin
   virtual FeaturePtr createFeature(std::string theFeatureID);
 
  public:
-  /// Is needed for python wrapping by swig
   SketchPlugin_Plugin();
 };
 
