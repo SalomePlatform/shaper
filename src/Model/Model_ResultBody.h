@@ -23,7 +23,6 @@ class TNaming_Builder;
  */
 class Model_ResultBody : public ModelAPI_ResultBody
 {
-  boost::shared_ptr<ModelAPI_Feature> myOwner;  ///< owner of this result
   /// builders that tores the naming history: one per label to allow store several shapes to one 
   /// label; index in vector corresponds to the label tag
   std::vector<TNaming_Builder*> myBuilders;
@@ -41,8 +40,6 @@ public:
 
   /// Returns the shape-result produced by this feature
   MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape> shape();
-  /// Returns the source feature of this result
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> owner();
 
   /// Records the subshape newShape which was generated during a topological construction.
   /// As an example, consider the case of a face generated in construction of a box.
@@ -85,6 +82,15 @@ public:
                                                const int  theKindOfShape,
                                                const int  theTag,
                                                GeomAPI_DataMapOfShapeShape& theSubShapes);
+  
+  /// Loads shapes of the first level (to be used during shape import)
+  MODEL_EXPORT virtual void loadFirstLevel(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
+  
+  /// Loads disconnected edges
+  MODEL_EXPORT virtual void loadDisconnectedEdges(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
+
+  /// Loads disconnected vetexes
+  MODEL_EXPORT virtual void loadDisconnectedVertexes(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
 
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultBody();
@@ -98,6 +104,10 @@ protected:
 
   /// Returns (creates if necessary) the builder created on the needed tag of sub-label
   TNaming_Builder* builder(const int theTag);
+
+private:
+  /// Loads shapes of the next level (to be used during shape import)
+  void loadNextLevels(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
 
   friend class Model_Document;
 };

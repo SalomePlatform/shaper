@@ -24,7 +24,6 @@ void GeomData_Dir::setValue(const double theX, const double theY, const double t
 void GeomData_Dir::setValue(const boost::shared_ptr<GeomAPI_Dir>& theDir)
 {
   setValue(theDir->x(), theDir->y(), theDir->z());
-  owner()->data()->sendAttributeUpdated(this);
 }
 
 double GeomData_Dir::x() const

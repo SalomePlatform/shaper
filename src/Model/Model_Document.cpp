@@ -10,6 +10,7 @@
 #include <Model_ResultPart.h>
 #include <Model_ResultConstruction.h>
 #include <Model_ResultBody.h>
+#include <Model_ResultGroup.h>
 #include <ModelAPI_Validator.h>
 #include <Events_Loop.h>
 #include <Events_Error.h>
@@ -146,8 +147,10 @@ bool Model_Document::load(const char* theFileName)
   if (!isError) {
     myDoc->SetUndoLimit(UNDO_LIMIT);
     // to avoid the problem that feature is created in the current, not this, document
-    Model_Session::get()->setActiveDocument(anApp->getDocument(myID));
+    Model_Session::get()->setActiveDocument(anApp->getDocument(myID), false);
     synchronizeFeatures(false, true);
+    Model_Session::get()->setActiveDocument(Model_Session::get()->moduleDocument(), false);
+    Model_Session::get()->setActiveDocument(anApp->getDocument(myID), true);
   }
   return !isError;
 }
@@ -210,12 +213,12 @@ void Model_Document::close()
   for (; aSubIter != mySubs.end(); aSubIter++)
     subDoc(*aSubIter)->close();
   mySubs.clear();
-  // close this
-  /* do not close because it can be undoed
-   if (myDoc->CanClose() == CDM_CCS_OK)
-   myDoc->Close();
-   Model_Application::getApplication()->deleteDocument(myID);
-   */
+  // close this only if it is module document, otherwise it can be undoed
+  if (this == aPM->moduleDocument().get()) {
+    if (myDoc->CanClose() == CDM_CCS_OK)
+      myDoc->Close();
+    Model_Application::getApplication()->deleteDocument(myID);
+  }
 }
 
 void Model_Document::startOperation()
@@ -256,11 +259,6 @@ bool Model_Document::compactNested()
 
 void Model_Document::finishOperation()
 {
-  // finish for all subs first: to avoid nested finishing and "isOperation" calls problems inside
-  std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for (; aSubIter != mySubs.end(); aSubIter++)
-    subDoc(*aSubIter)->finishOperation();
-
   // just to be sure that everybody knows that changes were performed
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_Session>(Model_Session::get())
@@ -272,9 +270,27 @@ void Model_Document::finishOperation()
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  // this must be here just after everything is finished but before real transaction stop
+  // to avoid messages about modifications outside of the transaction
+  // and to rebuild everything after all updates and creates
+  if (Model_Session::get()->moduleDocument().get() == this) { // once for root document
+    Events_Loop::loop()->autoFlush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+    static boost::shared_ptr<Events_Message> aFinishMsg
+      (new Events_Message(Events_Loop::eventByName("FinishOperation")));
+    Events_Loop::loop()->send(aFinishMsg);
+    Events_Loop::loop()->autoFlush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED), false);
+  }
+  // to avoid "updated" message appearance by updater
+  //aLoop->clear(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+
   if (!myDoc->HasOpenCommand() && myNestedNum != -1)
     boost::static_pointer_cast<Model_Session>(Model_Session::get())
         ->setCheckTransactions(true);  // for nested transaction commit
+
+  // finish for all subs first: to avoid nested finishing and "isOperation" calls problems inside
+  std::set<std::string>::iterator aSubIter = mySubs.begin();
+  for (; aSubIter != mySubs.end(); aSubIter++)
+    subDoc(*aSubIter)->finishOperation();
 
   if (myNestedNum != -1)  // this nested transaction is owervritten
     myNestedNum++;
@@ -702,29 +718,30 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
   TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
   for (; aLabIter.More(); aLabIter.Next()) {
     TDF_Label aFeatureLabel = aLabIter.Value()->Label();
+    FeaturePtr aFeature;
     if (!myObjs.IsBound(aFeatureLabel)) {  // a new feature is inserted
       // create a feature
-      FeaturePtr aNewObj = ModelAPI_Session::get()->createFeature(
+      aFeature = ModelAPI_Session::get()->createFeature(
           TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
               .ToCString());
-      if (!aNewObj) {  // somethig is wrong, most probably, the opened document has invalid structure
+      if (!aFeature) {  // somethig is wrong, most probably, the opened document has invalid structure
         Events_Error::send("Invalid type of object in the document");
         aLabIter.Value()->Label().ForgetAllAttributes();
         continue;
       }
       // this must be before "setData" to redo the sketch line correctly
-      myObjs.Bind(aFeatureLabel, aNewObj);
-      aNewFeatures.insert(aNewObj);
-      initData(aNewObj, aFeatureLabel, TAG_FEATURE_ARGUMENTS);
+      myObjs.Bind(aFeatureLabel, aFeature);
+      aNewFeatures.insert(aFeature);
+      initData(aFeature, aFeatureLabel, TAG_FEATURE_ARGUMENTS);
 
       // event: model is updated
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-      ModelAPI_EventCreator::get()->sendUpdated(aNewObj, anEvent);
+      ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
 
       // update results of the appeared feature
-      updateResults(aNewObj);
+      updateResults(aFeature);
     } else {  // nothing is changed, both iterators are incremented
-      FeaturePtr aFeature = myObjs.Find(aFeatureLabel);
+      aFeature = myObjs.Find(aFeatureLabel);
       aKeptFeatures.insert(aFeature);
       if (theMarkUpdated) {
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
@@ -733,11 +750,6 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
       updateResults(aFeature);
     }
   }
-  // execute new features to restore results: after features creation to make all references valid
-  /*std::set<FeaturePtr>::iterator aNewIter = aNewFeatures.begin();
-   for(; aNewIter != aNewFeatures.end(); aNewIter++) {
-   (*aNewIter)->execute();
-   }*/
   // check all features are checked: if not => it was removed
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myObjs);
   while (aFIter.More()) {
@@ -752,14 +764,6 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
       static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      /*
-      for (; aRIter != aResults.cend(); aRIter++) {
-        boost::shared_ptr<ModelAPI_Result> aRes = *aRIter;
-        //aRes->setData(boost::shared_ptr<ModelAPI_Data>()); // deleted flag
-        ModelAPI_EventCreator::get()->sendUpdated(aRes, EVENT_DISP);
-        ModelAPI_EventCreator::get()->sendDeleted(aThis, aRes->groupName());
-      }
-      */
       // redisplay also removed feature (used for sketch and AISObject)
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
       aFeature->erase();
@@ -780,9 +784,7 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
 
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
-  if (theMarkUpdated) {
-    aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  }
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   boost::static_pointer_cast<Model_Session>(Model_Session::get())
@@ -924,6 +926,23 @@ boost::shared_ptr<ModelAPI_ResultPart> Model_Document::createPart(
   return aResult;
 }
 
+boost::shared_ptr<ModelAPI_ResultGroup> Model_Document::createGroup(
+    const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
+{
+  TDF_Label aLab = resultLabel(theFeatureData, theIndex);
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultGroup::group().c_str());
+  ObjectPtr anOldObject = object(aLab);
+  boost::shared_ptr<ModelAPI_ResultGroup> aResult;
+  if (anOldObject) {
+    aResult = boost::dynamic_pointer_cast<ModelAPI_ResultGroup>(anOldObject);
+  }
+  if (!aResult) {
+    aResult = boost::shared_ptr<ModelAPI_ResultGroup>(new Model_ResultGroup(theFeatureData));
+    storeResult(theFeatureData, aResult, theIndex);
+  }
+  return aResult;
+}
+
 boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
     const boost::shared_ptr<ModelAPI_Result>& theResult)
 {
@@ -969,7 +988,8 @@ void Model_Document::updateResults(FeaturePtr theFeature)
           aNewBody = createBody(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultPart::group().c_str()) {
           aNewBody = createPart(theFeature->data(), aResIndex);
-        } else if (aGroup->Get() != ModelAPI_ResultConstruction::group().c_str()) {
+        } else if (aGroup->Get() != ModelAPI_ResultConstruction::group().c_str() &&
+          aGroup->Get() != ModelAPI_ResultGroup::group().c_str()) {
           Events_Error::send(std::string("Unknown type of result is found in the document:") +
             TCollection_AsciiString(aGroup->Get()).ToCString());
         }

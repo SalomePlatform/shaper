@@ -65,6 +65,7 @@ bool NewGeom_DataModel::saveAs(const QString& thePath, CAM_Study* theStudy, QStr
 
 bool NewGeom_DataModel::close()
 {
+  myModule->workshop()->closeDocument();
   return LightApp_DataModel::close();
 }
 

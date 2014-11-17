@@ -14,6 +14,7 @@
 
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
+#include <GeomAlgoAPI_FaceBuilder.h>
 
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Data.h>
@@ -21,11 +22,15 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_Session.h>
 
 #include <SketchPlugin_Sketch.h>
+#include <SketchPlugin_Feature.h>
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
+#include <math.h>
 #include <vector>
 
 using namespace std;
@@ -41,6 +46,10 @@ void SketchPlugin_Sketch::initAttributes()
   data()->addAttribute(SketchPlugin_Sketch::DIRY_ID(), GeomDataAPI_Dir::type());
   data()->addAttribute(SketchPlugin_Sketch::NORM_ID(), GeomDataAPI_Dir::type());
   data()->addAttribute(SketchPlugin_Sketch::FEATURES_ID(), ModelAPI_AttributeRefList::type());
+  // the selected face, base for the sketcher plane, not obligatory
+  data()->addAttribute(SketchPlugin_Feature::EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+    getKind(), SketchPlugin_Feature::EXTERNAL_ID());
 }
 
 void SketchPlugin_Sketch::execute()
@@ -69,6 +78,11 @@ void SketchPlugin_Sketch::execute()
   for (; anIt != aLast; anIt++) {
     aFeature = boost::dynamic_pointer_cast<SketchPlugin_Feature>(*anIt);
     if (aFeature) {
+      // do not include the external edges into the result
+      if (aFeature->data()->attribute(SketchPlugin_Feature::EXTERNAL_ID())) {
+        if (aFeature->data()->selection(SketchPlugin_Feature::EXTERNAL_ID())->value())
+          continue;
+      }
 
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aRes = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = aRes.cbegin();
@@ -165,6 +179,19 @@ boost::shared_ptr<GeomAPI_Pnt> SketchPlugin_Sketch::to3D(const double theX, cons
   return boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
 }
 
+boost::shared_ptr<GeomAPI_Pnt2d> SketchPlugin_Sketch::to2D(
+  const boost::shared_ptr<GeomAPI_Pnt>& thePnt)
+{
+  boost::shared_ptr<GeomDataAPI_Point> aC = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+      data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  boost::shared_ptr<GeomDataAPI_Dir> aX = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
+  boost::shared_ptr<GeomDataAPI_Dir> aY = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      data()->attribute(SketchPlugin_Sketch::DIRY_ID()));
+  return thePnt->to2D(aC->pnt(), aX->dir(), aY->dir());
+}
+
+
 bool SketchPlugin_Sketch::isPlaneSet()
 {
   boost::shared_ptr<GeomDataAPI_Dir> aNormal = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
@@ -240,4 +267,66 @@ void SketchPlugin_Sketch::erase()
     }
   }
   ModelAPI_CompositeFeature::erase();
+}
+
+void SketchPlugin_Sketch::attributeChanged() {
+  static bool kIsUpdated = false; // to avoid infinitive cycle on attrubtes change
+  static bool kIsAttrChanged = false;
+  boost::shared_ptr<GeomAPI_Shape> aSelection = 
+    data()->selection(SketchPlugin_Feature::EXTERNAL_ID())->value();
+  if (aSelection && !kIsUpdated) { // update arguments due to the selection value
+    kIsUpdated = true;
+    // update the sketch plane
+    boost::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aSelection);
+    if (aPlane) {
+      double anA, aB, aC, aD;
+      aPlane->coefficients(anA, aB, aC, aD);
+
+      // calculate attributes of the sketch
+      boost::shared_ptr<GeomAPI_Dir> aNormDir(new GeomAPI_Dir(anA, aB, aC));
+      boost::shared_ptr<GeomAPI_XYZ> aCoords = aNormDir->xyz();
+      boost::shared_ptr<GeomAPI_XYZ> aZero(new GeomAPI_XYZ(0, 0, 0));
+      aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
+      boost::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
+      // X axis is preferable to be dirX on the sketch
+      static const double tol = 1.e-7;
+      bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
+      boost::shared_ptr<GeomAPI_Dir> aTempDir(
+        isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
+      boost::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
+      boost::shared_ptr<GeomAPI_Dir> aXDir(new GeomAPI_Dir(aYDir->cross(aNormDir)));
+
+      kIsAttrChanged = false; // track the attributes were really changed during the plane update
+      boost::shared_ptr<GeomDataAPI_Point> anOrigin = boost::dynamic_pointer_cast
+        <GeomDataAPI_Point>(data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+      anOrigin->setValue(anOrigPnt);
+      boost::shared_ptr<GeomDataAPI_Dir> aNormal = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+      aNormal->setValue(aNormDir);
+      boost::shared_ptr<GeomDataAPI_Dir> aDirX = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
+      aDirX->setValue(aXDir);
+      boost::shared_ptr<GeomDataAPI_Dir> aDirY = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        data()->attribute(SketchPlugin_Sketch::DIRY_ID()));
+      aDirY->setValue(aYDir);
+      boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+
+      if (kIsAttrChanged) {
+        // the plane was changed, so reexecute sub-elements to update shapes (located in new plane)
+        ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+        list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
+        for(list<ObjectPtr>::iterator aSubIt = aSubs.begin(); aSubIt != aSubs.end(); aSubIt++) {
+          boost::shared_ptr<SketchPlugin_Feature> aFeature = 
+            boost::dynamic_pointer_cast<SketchPlugin_Feature>(*aSubIt);
+          if (aFeature && aFactory->validate(aFeature)) {
+            aFeature->execute();
+          }
+        }
+        kIsAttrChanged = false;
+      }
+    }
+    kIsUpdated = false;
+  } else if (kIsUpdated) { // other attributes are updated during the selection comupation
+    kIsAttrChanged = true;
+  }
 }

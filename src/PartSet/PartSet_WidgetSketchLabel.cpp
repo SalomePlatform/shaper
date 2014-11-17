@@ -18,10 +18,10 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
     : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   myText = QString::fromStdString(theData->getProperty("title"));
-  myLabel = new QLabel(myText, theParent);
+  myLabel = new QLabel("", theParent);
   myLabel->setWordWrap(true);
   myTooltip = QString::fromStdString(theData->getProperty("tooltip"));
-  myLabel->setToolTip(myTooltip);
+  myLabel->setToolTip("");
   myLabel->setIndent(5);
 }
 

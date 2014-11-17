@@ -13,7 +13,6 @@
 #include <libxml/tree.h>
 
 #include <string>
-#include <algorithm>
 
 Config_WidgetAPI::Config_WidgetAPI(std::string theRawXml)
 {
@@ -85,25 +84,12 @@ bool Config_WidgetAPI::isPagedWidget() const
 
 std::string Config_WidgetAPI::getProperty(const char* thePropName) const
 {
-  std::string result = "";
-  char* aPropChars = (char*) xmlGetProp(myCurrentNode, BAD_CAST thePropName);
-  if (!aPropChars || aPropChars[0] == 0)
-    return result;
-  result = std::string(aPropChars);
-  return result;
+  return ::getProperty(myCurrentNode, thePropName);
 }
 
 bool Config_WidgetAPI::getBooleanAttribute(const char* theAttributeName, bool theDefault) const
 {
-  std::string prop = getProperty(theAttributeName);
-  std::transform(prop.begin(), prop.end(), prop.begin(), ::tolower);
-  bool result = theDefault;
-  if (prop == "true" || prop == "1") {
-    result = true;
-  } else if (prop == "false" || prop == "0") {
-    result = false;
-  }
-  return result;
+  return ::getBooleanAttribute(myCurrentNode, theAttributeName, theDefault);
 }
 
 std::string Config_WidgetAPI::widgetId() const

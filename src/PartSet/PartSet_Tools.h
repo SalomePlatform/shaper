@@ -7,6 +7,7 @@
 
 #include "PartSet.h"
 
+#include <ModuleBase_ViewerPrs.h>
 #include <gp_Pnt.hxx>
 
 #include <QPoint>
@@ -22,6 +23,7 @@ class GeomDataAPI_Point2D;
 class GeomAPI_Pln;
 class GeomAPI_Pnt2d;
 class GeomAPI_Pnt;
+class GeomAPI_Edge;
 
 /*!
  \class PartSet_Tools
@@ -52,24 +54,29 @@ class PARTSET_EXPORT PartSet_Tools
   static void convertTo3D(const double theX, const double theY, FeaturePtr theSketch,
                           gp_Pnt& thePoint);
 
-  /// Returns a feature that is under the mouse point
+  /// Returns an object that is under the mouse point. Firstly it checks the highlighting,
+  /// if it exists, the first object is returned. Secondly, there is an iteration on
+  /// the selected list to find the point. Thirdly, if the object is not found under the
+  /// the point, the first selected object is returned.
   /// \param thePoint a screen point
   /// \param theView a 3D view
   /// \param theSketch the sketch feature
-  /// \param theFeatures the list of selected presentations
-  static FeaturePtr nearestFeature(QPoint thePoint, Handle_V3d_View theView, FeaturePtr theSketch,
-                                   const QList<ModuleBase_ViewerPrs>& theFeatures);
+  /// \param theSelected the list of selected presentations
+  /// \param theHighlighted the list of highlighted presentations
+  static ObjectPtr nearestFeature(QPoint thePoint, Handle_V3d_View theView, FeaturePtr theSketch,
+                                  const QList<ModuleBase_ViewerPrs>& theSelected,
+                                  const QList<ModuleBase_ViewerPrs>& theHighlighted);
 
   /// Returns pointer to the root document.
   static boost::shared_ptr<ModelAPI_Document> document();
 
-  /// \brief Save the point to the feature. If the attribute is 2D geometry point, it is filled.
+
+  /// Returns a point attribute of the feature by the coordinates if it is
   /// \param theFeature the feature
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
-  /// \param theAttribute the feature attribute
-  static void setFeaturePoint(FeaturePtr theFeature, double theX, double theY,
-                              const std::string& theAttribute);
+  static boost::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(FeaturePtr theFeature,
+                                                                double theX, double theY);
 
   /// \brief Save the double to the feature. If the attribute is double, it is filled.
   /// \param theFeature the feature
@@ -125,6 +132,25 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theKind a feature kind
   /// \return the boolean value
   static bool isConstraintFeature(const std::string& theKind);
+
+  /// Creates a line (arc or circle) by given edge
+  /// Created line will have fixed constraint
+  /// \param theEdge - an edge
+  /// \return - result of created feature
+  static ResultPtr createFixedObjectByEdge(const ModuleBase_ViewerPrs& thePrs, CompositeFeaturePtr theSketch);
+
+  /// Checks whether the list of selected presentations contains the given one
+  /// \param theSelected a list of presentations
+  /// \param thePrs a presentation to be found
+  /// \return - result of check, true if the list contains the prs
+  static bool isContainPresentation(const QList<ModuleBase_ViewerPrs>& theSelected,
+                                    const ModuleBase_ViewerPrs& thePrs);
+
+  /// Returns Result object if the given skietch contains external edge equal to the given
+  /// \param theSketch - the sketch feature
+  /// \param theEdge - the edge
+  /// \return result object with external edge if it is found
+  static ResultPtr findExternalEdge(CompositeFeaturePtr theSketch, boost::shared_ptr<GeomAPI_Edge> theEdge);
 };
 
 #endif

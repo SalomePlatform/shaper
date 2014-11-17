@@ -77,7 +77,7 @@ void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& the
       FeaturePtr aFeature = aCreationOp->feature();
       const std::list<ResultPtr>& aResults = aFeature->results();
       boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
-          boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
 
       std::set<ObjectPtr> aFeatures = aUpdMsg->objects();
       std::set<ObjectPtr>::const_iterator aObjIt, aNoObj = aFeatures.cend();

@@ -98,8 +98,8 @@ QWidget* ModuleBase_WidgetFileSelector::getControl() const
 QList<QWidget*> ModuleBase_WidgetFileSelector::getControls() const
 {
   QList<QWidget*> result;
-  QPushButton * aButton = myMainWidget->findChild<QPushButton *>();
-  result << aButton;
+  //QPushButton * aButton = myMainWidget->findChild<QPushButton *>();
+  //result << aButton;
   result << myPathField;
   return result;
 }

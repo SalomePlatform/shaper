@@ -558,18 +558,18 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
       if (aCoincIter->find(aEntIter->second) != aCoincIter->end())
         break;
     std::set<Slvs_hEntity> aCoincident;
-    if (aCoincIter != myCoincidentPoints.end())
+    if (aCoincIter != myCoincidentPoints.end()) {
       aCoincident = *aCoincIter;
-    else
-      aCoincident.insert(aEntIter->second);
+      aCoincident.erase(aEntIter->second);
 
-    std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
-    for (; aConstrIter != myConstraints.end(); aConstrIter++)
-      if (aConstrIter->type == SLVS_C_WHERE_DRAGGED &&
-          aCoincident.find(aConstrIter->ptA) != aCoincident.end()) {
-        myNeedToSolve = true;
-        return aEntIter->second;
-      }
+      std::vector<Slvs_Constraint>::const_iterator aConstrIter = myConstraints.begin();
+      for (; aConstrIter != myConstraints.end(); aConstrIter++)
+        if (aConstrIter->type == SLVS_C_WHERE_DRAGGED &&
+            aCoincident.find(aConstrIter->ptA) != aCoincident.end()) {
+          myNeedToSolve = true;
+          return aEntIter->second;
+        }
+    }
   }
 
   // Look over supported types of entities
@@ -613,10 +613,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
   Slvs_hEntity aResult = SLVS_E_UNKNOWN; // Unsupported or wrong entity type
 
   if (isEntExists) {
-    if (!myEntOfConstr[aEntPos]) // the entity is not used by constraints, no need to resolve them
-      myNeedToSolve = isNeedToSolve;
-    else
-      myNeedToSolve = myNeedToSolve || isNeedToSolve;
+    myNeedToSolve = myNeedToSolve || isNeedToSolve;
     aResult = aEntIter->second;
   } else if (aNewEntity.h != SLVS_E_UNKNOWN) {
     myEntities.push_back(aNewEntity);
@@ -805,6 +802,8 @@ bool SketchSolver_ConstraintGroup::addWorkplane(boost::shared_ptr<ModelAPI_Compo
 // ============================================================================
 bool SketchSolver_ConstraintGroup::updateWorkplane()
 {
+  if (!mySketch->data())
+    return false; // case sketch is deleted
   // Get parameters of workplane
   boost::shared_ptr<ModelAPI_Attribute> aDirX = mySketch->data()->attribute(
       SketchPlugin_Sketch::DIRX_ID());

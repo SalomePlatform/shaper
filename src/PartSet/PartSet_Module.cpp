@@ -1,7 +1,6 @@
 #include <PartSet_Module.h>
 #include <PartSet_OperationSketch.h>
 #include <PartSet_OperationFeatureCreate.h>
-#include <PartSet_OperationFeatureEditMulti.h>
 #include <PartSet_OperationFeatureEdit.h>
 #include <PartSet_Listener.h>
 #include <PartSet_TestOCC.h>
@@ -186,6 +185,7 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
           aDisplayer->activate(*anIt, aModes);
         }
         aDisplayer->activate(aFeature, aModes);
+        aDisplayer->clearSelected();
       }
     }
   }// else {
@@ -217,24 +217,6 @@ void PartSet_Module::onMousePressed(QMouseEvent* theEvent)
     dynamic_cast<PartSet_OperationSketchBase*>(workshop()->currentOperation());
   if (aPreviewOp) {
     ModuleBase_ISelection* aSelection = workshop()->selection();
-    // Initialise operation with preliminary selection
-    //QList<ModuleBase_ViewerPrs> aSelected = aSelection->getSelected();
-    //QList<ModuleBase_ViewerPrs> aHighlighted = aSelection->getHighlighted();
-    //QList<ObjectPtr> aObjList;
-    //bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
-    //if (aHasShift) {
-    //  foreach(ModuleBase_ViewerPrs aPrs, aSelected)
-    //    aObjList.append(aPrs.object());
-
-    //  foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
-    //    if (!aObjList.contains(aPrs.object()))
-    //      aObjList.append(aPrs.object());
-    //  }
-    //} else {
-    //  foreach(ModuleBase_ViewerPrs aPrs, aHighlighted)
-    //    aObjList.append(aPrs.object());
-    //}
-    //onSetSelection(aObjList);
     aPreviewOp->mousePressed(theEvent, myWorkshop->viewer(), aSelection);
   }
 }
@@ -282,6 +264,10 @@ void PartSet_Module::onMouseDoubleClick(QMouseEvent* theEvent)
 void PartSet_Module::onPlaneSelected(double theX, double theY, double theZ)
 {
   myWorkshop->viewer()->setViewProjection(theX, theY, theZ);
+}
+
+void PartSet_Module::onSketchLaunched()
+{
   xWorkshop()->actionsMgr()->update();
   // Set working plane
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
@@ -311,17 +297,17 @@ void PartSet_Module::onRestartOperation(std::string theName, ObjectPtr theObject
     }
     ModuleBase_ISelection* aSelection = workshop()->selection();
     // Initialise operation with preliminary selection
-    aSketchOp->initSelection(aSelection);
-  } //else if (aFeature) {
-    //anOperation->setFeature(aFeature);
+    aSketchOp->initSelection(aSelection, myWorkshop->viewer());
+  } else if (aFeature) { // In case of edit operation: set the previously created feature to the operation
+    anOperation->setFeature(aFeature);
     ////Deactivate result of current feature in order to avoid its selection
-    //XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
-    //std::list<ResultPtr> aResults = aFeature->results();
-    //std::list<ResultPtr>::const_iterator aIt;
-    //for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-    //  aDisplayer->deactivate(*aIt);
-    //}
-  //}
+    XGUI_Displayer* aDisplayer = xWorkshop()->displayer();
+    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+      aDisplayer->deactivate(*aIt);
+    }
+  }
   sendOperation(anOperation);
   xWorkshop()->actionsMgr()->updateCheckState();
 }
@@ -419,8 +405,6 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
     }
     if (PartSet_OperationFeatureCreate::canProcessKind(theCmdId)) {
       anOperation = new PartSet_OperationFeatureCreate(theCmdId.c_str(), this, aSketch);
-    } else if (theCmdId == PartSet_OperationFeatureEditMulti::Type()) {
-      anOperation = new PartSet_OperationFeatureEditMulti(theCmdId.c_str(), this, aSketch);
     } else if (theCmdId == PartSet_OperationFeatureEdit::Type()) {
       anOperation = new PartSet_OperationFeatureEdit(theCmdId.c_str(), this, aSketch);
     }
@@ -464,6 +448,7 @@ ModuleBase_Operation* PartSet_Module::createOperation(const std::string& theCmdI
       connect(aSketchOp, SIGNAL(planeSelected(double, double, double)), this,
               SLOT(onPlaneSelected(double, double, double)));
       connect(aSketchOp, SIGNAL(fitAllView()), this, SLOT(onFitAllView()));
+      connect(aSketchOp, SIGNAL(launchSketch()), this, SLOT(onSketchLaunched()));
     }
   }
 
@@ -610,11 +595,13 @@ void PartSet_Module::onSelectionChanged()
   QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
   // We need to stop edit operation if selection is cleared
   if (aSelected.size() == 0) {
-    PartSet_OperationFeatureEdit* anEditOp = 
+    // do not perform commit of the current edit operation here, because
+    // this functionality is realized inside this operation
+    /*PartSet_OperationFeatureEdit* anEditOp = 
       dynamic_cast<PartSet_OperationFeatureEdit*>(myWorkshop->currentOperation());
     if (!anEditOp)
       return;
-    anEditOp->commit();
+    anEditOp->commit();*/
   } else {
     PartSet_OperationSketchBase* aSketchOp = 
       dynamic_cast<PartSet_OperationSketchBase*>(myWorkshop->currentOperation());

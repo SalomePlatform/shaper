@@ -9,6 +9,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
@@ -16,6 +17,7 @@
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_Edge.h>
 
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
@@ -28,15 +30,22 @@
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Arc.h>
+#include <SketchPlugin_Line.h>
 
 #include <ModuleBase_ViewerPrs.h>
 
 #include <V3d_View.hxx>
 #include <gp_Pln.hxx>
+#include <gp_Circ.hxx>
 #include <ProjLib.hxx>
 #include <ElSLib.hxx>
 #include <Geom_Line.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
+#include <BRep_Tool.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Edge.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -138,33 +147,47 @@ void PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr
   thePoint = gp_Pnt(aPoint->x(), aPoint->y(), aPoint->z());
 }
 
-FeaturePtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
-                                         FeaturePtr theSketch,
-                                         const QList<ModuleBase_ViewerPrs>& theFeatures)
+ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
+                                        FeaturePtr theSketch,
+                                        const QList<ModuleBase_ViewerPrs>& theSelected,
+                                        const QList<ModuleBase_ViewerPrs>& theHighlighted)
 {
-  double aX, anY;
-  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(thePoint, theView);
-  PartSet_Tools::convertTo2D(aPoint, theSketch, theView, aX, anY);
+  ObjectPtr aDeltaObject;
+  // 1. find the object in the highlighted list
+  if (theHighlighted.size() > 0) {
+    aDeltaObject = theHighlighted.first().object();
+  }
+  // 2. find it in the selected list by the selected point
+  if (!aDeltaObject) {
+    double aX, anY;
+    gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(thePoint, theView);
+    PartSet_Tools::convertTo2D(aPoint, theSketch, theView, aX, anY);
 
-  FeaturePtr aFeature;
-  FeaturePtr aDeltaFeature;
-  double aMinDelta = -1;
-  ModuleBase_ViewerPrs aPrs;
-  foreach (ModuleBase_ViewerPrs aPrs, theFeatures) {
-    if (!aPrs.object())
-      continue;
-    boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
-        SketchPlugin_Feature>(aPrs.object());
-    if (!aSketchFeature)
-      continue;
-    double aDelta = aSketchFeature->distanceToPoint(
-        boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
-    if (aMinDelta < 0 || aMinDelta > aDelta) {
-      aMinDelta = aDelta;
-      // TODO aDeltaFeature = aPrs.result();
+    FeaturePtr aFeature;
+    double aMinDelta = -1;
+    ModuleBase_ViewerPrs aPrs;
+    foreach (ModuleBase_ViewerPrs aPrs, theSelected) {
+      if (!aPrs.object())
+        continue;
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aPrs.object());
+      boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
+          SketchPlugin_Feature>(aFeature);
+      if (!aSketchFeature)
+        continue;
+
+      double aDelta = aSketchFeature->distanceToPoint(
+          boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
+      if (aMinDelta < 0 || aMinDelta > aDelta) {
+        aMinDelta = aDelta;
+        // TODO aDeltaObject = aPrs.result();
+      }
     }
   }
-  return aDeltaFeature;
+  // 3. if the object is not found, returns the first selected one
+  if (!aDeltaObject && theSelected.size() > 0)
+    aDeltaObject = theSelected.first().object();
+
+  return aDeltaObject;
 }
 
 boost::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
@@ -172,16 +195,24 @@ boost::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
   return ModelAPI_Session::get()->moduleDocument();
 }
 
-void PartSet_Tools::setFeaturePoint(FeaturePtr theFeature, double theX, double theY,
-                                    const std::string& theAttribute)
+boost::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::getFeaturePoint(FeaturePtr theFeature,
+                                                                      double theX, double theY)
 {
-  if (!theFeature)
-    return;
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aData->attribute(theAttribute));
-  if (aPoint)
-    aPoint->setValue(theX, theY);
+  boost::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = boost::shared_ptr<GeomAPI_Pnt2d>(
+                                                                 new GeomAPI_Pnt2d(theX, theY));
+  std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes =
+                                    theFeature->data()->attributes(GeomDataAPI_Point2D::type());
+  std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
+                                                                    aLast = anAttiributes.end();
+  boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;
+  for (; anIt != aLast && !aFPoint; anIt++) {
+    boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint = boost::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(*anIt);
+    if (aCurPoint && aCurPoint->pnt()->distance(aClickedPoint) < Precision::Confusion())
+      aFPoint = aCurPoint;
+  }
+
+  return aFPoint;
 }
 
 void PartSet_Tools::setFeatureValue(FeaturePtr theFeature, double theValue,
@@ -200,7 +231,7 @@ double PartSet_Tools::featureValue(FeaturePtr theFeature, const std::string& the
                                    bool& isValid)
 {
   isValid = false;
-  double aValue;
+  double aValue = 0;
   if (theFeature) {
     boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
     AttributeDoublePtr anAttribute = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
@@ -340,4 +371,119 @@ bool PartSet_Tools::isConstraintFeature(const std::string& theKind)
       || theKind == SketchPlugin_ConstraintLength::ID()
       || theKind == SketchPlugin_ConstraintRadius::ID()
       || theKind == SketchPlugin_ConstraintRigid::ID();
+}
+
+ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& thePrs, CompositeFeaturePtr theSketch)
+{
+  TopoDS_Shape aShape = thePrs.shape();
+  if (aShape.ShapeType() != TopAbs_EDGE)
+    return ResultPtr();
+
+  // Check that we already have such external edge
+  boost::shared_ptr<GeomAPI_Edge> aInEdge = boost::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge());
+  aInEdge->setImpl(new TopoDS_Shape(aShape));
+  ResultPtr aResult = findExternalEdge(theSketch, aInEdge);
+  if (aResult)
+    return aResult;
+
+  // If not found then we have to create new
+  Standard_Real aStart, aEnd;
+  Handle(V3d_View) aNullView;
+  FeaturePtr aMyFeature;
+
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(aShape), aStart, aEnd);
+  GeomAdaptor_Curve aAdaptor(aCurve);
+  if (aAdaptor.GetType() == GeomAbs_Line) {
+    // Create line
+    aMyFeature = theSketch->addFeature(SketchPlugin_Line::ID());
+
+    //DataPtr aData = myFeature->data();
+    //boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
+    //  boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
+
+    //double aX, aY;
+    //gp_Pnt Pnt1 = aAdaptor.Value(aStart);
+    //convertTo2D(Pnt1, theSketch, aNullView, aX, aY);
+    //setFeaturePoint(myFeature, aX, aY, SketchPlugin_Line::START_ID());
+
+    //gp_Pnt Pnt2 = aAdaptor.Value(aEnd);
+    //convertTo2D(Pnt2, theSketch, aNullView, aX, aY);
+    //setFeaturePoint(myFeature, aX, aY, SketchPlugin_Line::END_ID());
+  } else if (aAdaptor.GetType() == GeomAbs_Circle) {
+    if (aAdaptor.IsClosed()) {
+      // Create circle
+      aMyFeature = theSketch->addFeature(SketchPlugin_Circle::ID());
+      //gp_Circ aCirc = aAdaptor.Circle();
+      //gp_Pnt aCenter = aCirc.Location();
+
+      //double aX, aY;
+      //convertTo2D(aCenter, theSketch, aNullView, aX, aY);
+      //setFeaturePoint(myFeature, aX, aY, SketchPlugin_Circle::CENTER_ID());
+      //setFeatureValue(myFeature, aCirc.Radius(), SketchPlugin_Circle::RADIUS_ID());
+    } else {
+      // Create arc
+      aMyFeature = theSketch->addFeature(SketchPlugin_Arc::ID());
+    }
+  }
+  if (aMyFeature) {
+    DataPtr aData = aMyFeature->data();
+    AttributeSelectionPtr anAttr = 
+      boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+      (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
+
+    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
+    if (anAttr && aRes) {
+      boost::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
+      anEdge->setImpl(new TopoDS_Shape(aShape));
+
+      anAttr->setValue(aRes, anEdge);
+
+      aMyFeature->execute();
+
+      // fix this edge
+      FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
+      aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
+        setObject(aMyFeature->lastResult());
+
+      return aMyFeature->lastResult();
+    }
+  }
+  return ResultPtr();
+}
+
+bool PartSet_Tools::isContainPresentation(const QList<ModuleBase_ViewerPrs>& theSelected,
+                                          const ModuleBase_ViewerPrs& thePrs)
+{
+  foreach (ModuleBase_ViewerPrs aPrs, theSelected) {
+    if (aPrs.object() == thePrs.object())
+      return true;
+  }
+  return false;
+}
+
+ResultPtr PartSet_Tools::findExternalEdge(CompositeFeaturePtr theSketch, boost::shared_ptr<GeomAPI_Edge> theEdge)
+{
+  for (int i = 0; i < theSketch->numberOfSubs(); i++) {
+    FeaturePtr aFeature = theSketch->subFeature(i);
+    boost::shared_ptr<SketchPlugin_Feature> aSketchFea = 
+      boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    if (aSketchFea) {
+      if (aSketchFea->isExternal()) {
+        std::list<ResultPtr> aResults = aSketchFea->results();
+        std::list<ResultPtr>::const_iterator aIt;
+        for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+          ResultConstructionPtr aRes = 
+            boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aIt);
+          if (aRes) {
+            boost::shared_ptr<GeomAPI_Shape> aShape = aRes->shape();
+            if (aShape) {
+              if (theEdge->isEqual(aShape))
+                return aRes;
+            }
+          }
+        }
+      }
+    }
+  }
+  return ResultPtr();
 }

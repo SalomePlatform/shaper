@@ -20,6 +20,11 @@ boost::shared_ptr<ModelAPI_Result> ModelAPI_Feature::firstResult()
   return myResults.empty() ? boost::shared_ptr<ModelAPI_Result>() : *(myResults.begin());
 }
 
+boost::shared_ptr<ModelAPI_Result> ModelAPI_Feature::lastResult()
+{
+  return myResults.empty() ? boost::shared_ptr<ModelAPI_Result>() : *(myResults.rbegin());
+}
+
 void ModelAPI_Feature::setResult(const boost::shared_ptr<ModelAPI_Result>& theResult)
 {
   if (firstResult() == theResult) {  // just updated

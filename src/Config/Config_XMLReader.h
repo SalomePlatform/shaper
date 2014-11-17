@@ -48,7 +48,6 @@ class Config_XMLReader
 
   xmlNodePtr node(void* theNode);
   std::string getNodeName(xmlNodePtr theNode);
-  std::string getProperty(xmlNodePtr theNode, const char* property);
   void processValidator(xmlNodePtr theNode);
 
  protected:

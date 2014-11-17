@@ -43,7 +43,7 @@ void Events_Loop::send(const boost::shared_ptr<Events_Message>& theMessage, bool
     myImmediateListeners[theMessage->eventID().eventText()]->processEvent(theMessage);
   }
   // if it is grouped message, just accumulate it
-  if (isGroup) {
+  if (isGroup && myFlushed.find(theMessage->eventID().myID) == myFlushed.end()) {
     boost::shared_ptr<Events_MessageGroup> aGroup = 
       boost::dynamic_pointer_cast<Events_MessageGroup>(theMessage);
     if (aGroup) {
@@ -118,13 +118,32 @@ void Events_Loop::flush(const Events_ID& theID)
   std::map<char*, boost::shared_ptr<Events_Message>>::iterator aMyGroup =
     myGroups.find(theID.eventText());
   if (aMyGroup != myGroups.end()) {  // really sends
+    myFlushed.insert(theID.myID);
     boost::shared_ptr<Events_Message> aGroup = aMyGroup->second;
     myGroups.erase(aMyGroup);
     send(aGroup, false);
+    myFlushed.erase(myFlushed.find(theID.myID));
   }
 }
 
 void Events_Loop::activateFlushes(const bool theActivate)
 {
   myFlushActive = theActivate;
+}
+
+void Events_Loop::clear(const Events_ID& theID)
+{
+  std::map<char*, boost::shared_ptr<Events_Message>>::iterator aMyGroup =
+    myGroups.find(theID.eventText());
+  if (aMyGroup != myGroups.end()) {  // really sends
+    myGroups.erase(aMyGroup);
+  }
+}
+
+void Events_Loop::autoFlush(const Events_ID& theID, const bool theAuto)
+{
+  if (theAuto)
+    myFlushed.insert(theID.myID);
+  else
+    myFlushed.erase(myFlushed.find(theID.myID));
 }

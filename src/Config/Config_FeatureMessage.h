@@ -6,9 +6,6 @@
 
 #include <string>
 
-/// Event ID that feature is loaded (comes with Config_FeatureMessage)
-static const char * EVENT_FEATURE_LOADED = "FeatureLoaded";
-
 /*
  * Class to pass a feature entry extracted from xml file.
  * Example of the feature entry:
@@ -32,6 +29,18 @@ class Config_FeatureMessage : public Events_Message
   std::string myNestedFeatures;
 
  public:
+  /// Event ID that feature is loaded in workbench (GUI)
+  inline static const char* GUI_EVENT()
+  {
+    static const char * MY_GUI_EVENT_ID("WorkshopFeatureLoaded");
+    return MY_GUI_EVENT_ID;
+  }
+  inline static const char* MODEL_EVENT()
+  {
+    static const char * MY_MODEL_EVENT_ID("ModelFeatureLoaded");
+    return MY_MODEL_EVENT_ID;
+  }
+
   //const Events_ID theID, const void* theSender = 0
   CONFIG_EXPORT Config_FeatureMessage(const Events_ID theId, const void* theParent = 0);
   CONFIG_EXPORT virtual ~Config_FeatureMessage();

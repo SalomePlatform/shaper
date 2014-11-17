@@ -5,7 +5,6 @@
 #include <PartSet_OperationSketch.h>
 
 #include <PartSet_OperationFeatureEdit.h>
-#include <PartSet_OperationFeatureEditMulti.h>
 #include <PartSet_Tools.h>
 
 #include <SketchPlugin_Sketch.h>
@@ -63,24 +62,33 @@ void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, ModuleBase_IVi
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
     QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
     QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
+    // commented: the next code is commented because the nearestFeature check the highlighting
+    // and selection inside
     //if (aHasShift && (aSelected.size() > 0)) {
-      foreach(ModuleBase_ViewerPrs aPrs, aHighlighted)
-        aSelected.append(aPrs);
+    //  foreach(ModuleBase_ViewerPrs aPrs, aHighlighted)
+    //    aSelected.append(aPrs);
     //}
     //if (aHasShift && aSelected.size() > 0)
     //  return;
 
-    if (aSelected.size() > 0) {
-      ObjectPtr aFeature = aSelected.first().object();
-      if (aFeature) {
-        std::string anOperationType =
-            (aSelected.size() > 1) ?
-                PartSet_OperationFeatureEditMulti::Type() : PartSet_OperationFeatureEdit::Type();
-        restartOperation(anOperationType, aFeature);
-      }
-    } //else
+    // there should be a start of operation, which uses the pre-highlighted objects,
+    // the selected ones are collected here and are processed by a mouse move
+    //if (aHighlighted.size() == 1) {
+    //if (aSelected.size() > 0) {
+    //  ObjectPtr aFeature = aSelected.first().object();
+    //  if (aFeature) {
+    // commented: end
+        Handle(V3d_View) aView = theViewer->activeView();
+        ObjectPtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), aView, feature(),
+                                                           aSelected, aHighlighted);
+        if (aFeature)
+          restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+      //}
+    //}
+    //else
+    //  myFeatures = aHighlighted;
+    //else
     //myFeatures = aSelected;
-
   } 
 }
 
@@ -94,9 +102,34 @@ void PartSet_OperationSketch::selectionChanged(ModuleBase_ISelection* theSelecti
   if (!aSelected.empty()) {
     ModuleBase_ViewerPrs aPrs = aSelected.first();
     // We have to select a plane before any operation
-    const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull())
-      setSketchPlane(aShape);
+    TopoDS_Shape aShape = aPrs.shape();
+    if (!aShape.IsNull()) {
+      boost::shared_ptr<GeomAPI_Dir> aDir = setSketchPlane(aShape);
+      flushUpdated();
+      emit featureConstructed(feature(), FM_Hide);
+      // If selection is not a sketcher presentation then it has to be stored as 
+      // External shape
+      if (feature() != aPrs.object()) {
+        //boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
+        //  boost::dynamic_pointer_cast<SketchPlugin_Sketch>(feature());
+        DataPtr aData = feature()->data();
+        AttributeSelectionPtr aSelAttr = 
+          boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+          (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
+        if (aSelAttr) {
+          ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
+          if (aRes) {
+            GeomShapePtr aShapePtr(new GeomAPI_Shape());
+            aShapePtr->setImpl(new TopoDS_Shape(aShape));
+            aSelAttr->setValue(aRes, aShapePtr);
+          }
+        }
+      } else {
+        // Turn viewer to the plane
+        emit planeSelected(aDir->x(), aDir->y(), aDir->z());
+      }
+      emit launchSketch();
+    }
   }
 }
 
@@ -124,13 +157,15 @@ void PartSet_OperationSketch::mouseMoved(QMouseEvent* theEvent, ModuleBase_IView
   if (!hasSketchPlane() || !(theEvent->buttons() & Qt::LeftButton) || myFeatures.empty())
     return;
 
-  if (myFeatures.size() != 1) {
+  // myFeatures are not filled in the previous realization, so, this code is just commented
+  // because has no effect
+  /*if (myFeatures.size() != 1) {
     Handle(V3d_View) aView = theViewer->activeView();
-    FeaturePtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), aView, feature(),
-                                                        myFeatures);
+    ObjectPtr aFeature = PartSet_Tools::nearestFeature(theEvent->pos(), aView, feature(),
+                                                       myFeatures);
     if (aFeature)
-      restartOperation(PartSet_OperationFeatureEditMulti::Type(), aFeature);
-  }
+      restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+  }*/
 }
 
 std::list<FeaturePtr> PartSet_OperationSketch::subFeatures() const
@@ -200,10 +235,10 @@ bool PartSet_OperationSketch::hasSketchPlane() const
   return aHasPlane;
 }
 
-void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
+boost::shared_ptr<GeomAPI_Dir> PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
 {
   if (theShape.IsNull())
-    return;
+    return boost::shared_ptr<GeomAPI_Dir>();
 
   // get selected shape
   boost::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
@@ -244,11 +279,7 @@ void PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
       aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
   aDirY->setValue(aYDir);
   boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
-
-  flushUpdated();
-
-  emit featureConstructed(feature(), FM_Hide);
-  emit planeSelected(aDir->x(), aDir->y(), aDir->z());
+  return aDir;
 }
 
 

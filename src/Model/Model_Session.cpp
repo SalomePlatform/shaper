@@ -13,6 +13,7 @@
 #include <Events_Loop.h>
 #include <Events_Error.h>
 #include <Config_FeatureMessage.h>
+#include <Config_AttributeMessage.h>
 #include <Config_ValidatorMessage.h>
 #include <Config_ModuleReader.h>
 
@@ -41,14 +42,14 @@ bool Model_Session::save(const char* theFileName, std::list<std::string>& theRes
 void Model_Session::startOperation()
 {
   ROOT_DOC->startOperation();
+  static boost::shared_ptr<Events_Message> aStartedMsg
+    (new Events_Message(Events_Loop::eventByName("StartOperation")));
+  Events_Loop::loop()->send(aStartedMsg);
 }
 
 void Model_Session::finishOperation()
 {
   ROOT_DOC->finishOperation();
-  static boost::shared_ptr<Events_Message> aFinishMsg
-    (new Events_Message(Events_Loop::eventByName("FinishOperation")));
-  Events_Loop::loop()->send(aFinishMsg);
 }
 
 void Model_Session::abortOperation()
@@ -95,7 +96,6 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
     return myImpl->createFeature(theFeatureID);
   }
 
-  LoadPluginsInfo();
   if (myPlugins.find(theFeatureID) != myPlugins.end()) {
     std::pair<std::string, std::string>& aPlugin = myPlugins[theFeatureID]; // plugin and doc kind
     if (!aPlugin.second.empty() && aPlugin.second != activeDocument()->kind()) {
@@ -145,12 +145,15 @@ boost::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
   return myCurrentDoc;
 }
 
-void Model_Session::setActiveDocument(boost::shared_ptr<ModelAPI_Document> theDoc)
+void Model_Session::setActiveDocument(
+  boost::shared_ptr<ModelAPI_Document> theDoc, bool theSendSignal)
 {
   if (myCurrentDoc != theDoc) {
     myCurrentDoc = theDoc;
-    static boost::shared_ptr<Events_Message> aMsg(new Events_Message(Events_Loop::eventByName("CurrentDocumentChanged")));
-    Events_Loop::loop()->send(aMsg);
+    if (theSendSignal) {
+      static boost::shared_ptr<Events_Message> aMsg(new Events_Message(Events_Loop::eventByName("CurrentDocumentChanged")));
+      Events_Loop::loop()->send(aMsg);
+    }
   }
 }
 
@@ -203,17 +206,20 @@ Model_Session::Model_Session()
   ModelAPI_Session::setSession(boost::shared_ptr<ModelAPI_Session>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
-  static const Events_ID kFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
+  static const Events_ID kFeatureEvent = Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
   aLoop->registerListener(this, kFeatureEvent);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_VALIDATOR_LOADED));
+  
+  // load all information about plugins, features and attributes
+  LoadPluginsInfo();
 }
 
 void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
 {
-  static const Events_ID kFeatureEvent = Events_Loop::eventByName("FeatureRegisterEvent");
+  static const Events_ID kFeatureEvent = Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
   static const Events_ID kValidatorEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
   if (theMessage->eventID() == kFeatureEvent) {
     const boost::shared_ptr<Config_FeatureMessage> aMsg = 
@@ -223,6 +229,18 @@ void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMes
       if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
         myPlugins[aMsg->id()] = std::pair<std::string, std::string>(
           aMsg->pluginLibrary(), aMsg->documentKind());
+      }
+    } else {
+      const boost::shared_ptr<Config_AttributeMessage> aMsgAttr = 
+        boost::dynamic_pointer_cast<Config_AttributeMessage>(theMessage);
+      if (aMsgAttr) {
+        if (!aMsgAttr->isObligatory()) {
+          validators()->registerNotObligatory(aMsgAttr->featureId(), aMsgAttr->attributeId());
+        }
+        if(aMsgAttr->isConcealment()) {
+          validators()->registerConcealment(aMsgAttr->featureId(), aMsgAttr->attributeId());
+        }
+        
       }
     }
     // plugins information was started to load, so, it will be loaded
@@ -250,7 +268,7 @@ void Model_Session::LoadPluginsInfo()
     return;
 
   // Read plugins information from XML files
-  Config_ModuleReader aXMLReader("FeatureRegisterEvent");
+  Config_ModuleReader aXMLReader(Config_FeatureMessage::MODEL_EVENT());
   aXMLReader.readAll();
 }
 

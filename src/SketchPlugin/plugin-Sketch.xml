@@ -33,14 +33,16 @@
         <feature_or_attribute_selector id="ConstraintEntityA" label="First object" tooltip="Select point, line end point, line, center of circle or arc.">
           <validator id="SketchPlugin_ResultPoint"/>
           <validator id="SketchPlugin_ResultLine"/>
+          <validator id="SketchPlugin_DifferentObjects"/>
         </feature_or_attribute_selector>
         <feature_or_attribute_selector id="ConstraintEntityB" label="Last object" tooltip="Select point, line end point, line, center of circle or arc.">
           <validator id="SketchPlugin_ResultPoint"/>
           <validator id="SketchPlugin_ResultLine"/>
           <validator id="SketchPlugin_DistanceAttr" parameters="ConstraintEntityA"/>
+          <validator id="SketchPlugin_DifferentObjects"/>
         </feature_or_attribute_selector>
         <point_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
-        <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue" default="computed">
+        <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue" default="computed" min="0">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
         <validator id="PartSet_DistanceValidator"/>
@@ -94,11 +96,11 @@
       </feature>
 
       <feature id="SketchConstraintRigid" title="Fixed" tooltip="Create constraint defining fixed object" icon=":icons/fixed.png">
-        <feature_selector id="ConstraintEntityA" label="Object" tooltip="Select any object in the viewer">
+        <feature_or_attribute_selector id="ConstraintEntityA" label="Object" tooltip="Select any object in the viewer">
           <validator id="SketchPlugin_ResultPoint"/>
           <validator id="SketchPlugin_ResultLine"/>
           <validator id="SketchPlugin_ResultArc"/>
-        </feature_selector>
+        </feature_or_attribute_selector>
       </feature>
     </group>
   </workbench>

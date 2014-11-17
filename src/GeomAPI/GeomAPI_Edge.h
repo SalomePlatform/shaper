@@ -7,28 +7,22 @@
 
 #include <GeomAPI_Shape.h>
 
+class GeomAPI_Pnt;
+class GeomAPI_Circ;
+
 /**\class GeomAPI_Edge
- * \ingroup DataModel
+* \ingroup DataModel
  * \brief Interface to the edge object
  */
 
 class GEOMAPI_EXPORT GeomAPI_Edge : public GeomAPI_Shape
 {
- public:
-  /// Creation of empty (null) shape
-  GeomAPI_Edge();
+public:
+   /// Creation of empty (null) shape
+   GeomAPI_Edge();
 
-  /// Returns whether the shape is a vertex
-  virtual bool isVertex() const
-  {
-    return false;
-  }
-
-  /// Returns whether the shape is an edge
-  virtual bool isEdge() const
-  {
-    return true;
-  }
+   /// Creation of edge by the edge-shape
+   GeomAPI_Edge(const boost::shared_ptr<GeomAPI_Shape>& theShape);
 
   /// Verifies that the edge is a line
   bool isLine() const;
@@ -38,6 +32,18 @@ class GEOMAPI_EXPORT GeomAPI_Edge : public GeomAPI_Shape
 
   /// Verifies that the edge is an arc of circle
   bool isArc() const;
+
+  /// Returns the first vertex coordinates of the edge 
+  boost::shared_ptr<GeomAPI_Pnt> firstPoint();
+
+  /// Returns the Last vertex coordinates of the edge 
+  boost::shared_ptr<GeomAPI_Pnt> lastPoint();
+
+  /// Returns a circle if edge is based on the cirsle curve
+  boost::shared_ptr<GeomAPI_Circ> circle();
+
+  /// Returns true if the current edge is geometrically equal to the given edge
+  bool isEqual(boost::shared_ptr<GeomAPI_Shape> theEdge);
 };
 
 #endif

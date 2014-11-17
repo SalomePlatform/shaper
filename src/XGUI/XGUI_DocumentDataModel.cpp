@@ -42,6 +42,7 @@ XGUI_DocumentDataModel::XGUI_DocumentDataModel(QObject* theParent)
 XGUI_DocumentDataModel::~XGUI_DocumentDataModel()
 {
   clearModelIndexes();
+  clearSubModels();
 }
 
 void XGUI_DocumentDataModel::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
@@ -80,10 +81,9 @@ void XGUI_DocumentDataModel::processEvent(const boost::shared_ptr<Events_Message
         }
       } else {  // if sub-objects of first level nodes
         XGUI_PartModel* aPartModel = 0;
-        QList<XGUI_PartModel*>::const_iterator aIt;
-        for (aIt = myPartModels.constBegin(); aIt != myPartModels.constEnd(); ++aIt) {
-          if ((*aIt)->hasDocument(aDoc)) {
-            aPartModel = (*aIt);
+        foreach (XGUI_PartModel* aPart, myPartModels) {
+          if (aPart->hasDocument(aDoc)) {
+            aPartModel = aPart;
             break;
           }
         }
@@ -123,10 +123,9 @@ void XGUI_DocumentDataModel::processEvent(const boost::shared_ptr<Events_Message
         }
       } else {
         XGUI_PartModel* aPartModel = 0;
-        QList<XGUI_PartModel*>::const_iterator aIt;
-        for (aIt = myPartModels.constBegin(); aIt != myPartModels.constEnd(); ++aIt) {
-          if ((*aIt)->hasDocument(aDoc)) {
-            aPartModel = (*aIt);
+        foreach (XGUI_PartModel* aPart, myPartModels) {
+          if (aPart->hasDocument(aDoc)) {
+            aPartModel = aPart;
             break;
           }
         }
@@ -361,10 +360,16 @@ QModelIndex* XGUI_DocumentDataModel::getModelIndex(const QModelIndex& theIndex) 
 
 void XGUI_DocumentDataModel::clearModelIndexes()
 {
-  QList<QModelIndex*>::const_iterator aIt;
-  for (aIt = myIndexes.constBegin(); aIt != myIndexes.constEnd(); ++aIt)
-    delete (*aIt);
+  foreach (QModelIndex* aIndex, myIndexes) 
+    delete aIndex;
   myIndexes.clear();
+}
+
+void XGUI_DocumentDataModel::clearSubModels()
+{
+  foreach (XGUI_PartModel* aPart, myPartModels) 
+    delete aPart;
+  myPartModels.clear();
 }
 
 ObjectPtr XGUI_DocumentDataModel::object(const QModelIndex& theIndex) const
@@ -569,4 +574,14 @@ QModelIndex XGUI_DocumentDataModel::objectIndex(const ObjectPtr theObject) const
     }
   }
   return QModelIndex();
+}
+
+
+void XGUI_DocumentDataModel::clear()
+{
+  clearModelIndexes();
+  clearSubModels();
+  myActivePart = 0;
+  myActivePartIndex = QModelIndex();
+  myModel->setItemsColor(ACTIVE_COLOR);
 }

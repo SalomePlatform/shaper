@@ -328,6 +328,9 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
   if (theAttr->isArgument()) {
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
     ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
+    if (myObject) {
+      myObject->attributeChanged();
+    }
   }
 }
 
@@ -401,7 +404,6 @@ void Model_Data::referencesToObjects(
       boost::shared_ptr<ModelAPI_AttributeSelection> aRef = boost::dynamic_pointer_cast<
           ModelAPI_AttributeSelection>(anAttr->second);
       aReferenced.push_back(aRef->context());
-      theRefs.push_back(std::pair<std::string, std::list<ObjectPtr> >(anAttr->first, aReferenced));
     } else if (aType == ModelAPI_AttributeSelectionList::type()) { // list of selection attributes
       boost::shared_ptr<ModelAPI_AttributeSelectionList> aRef = boost::dynamic_pointer_cast<
           ModelAPI_AttributeSelectionList>(anAttr->second);

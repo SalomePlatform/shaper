@@ -8,6 +8,7 @@
 #include "FeaturesPlugin.h"
 #include <ModelAPI_Feature.h>
 #include <GeomAPI_Shape.h>
+#include <GeomAlgoAPI_Boolean.h>
 
 class FeaturesPlugin_Boolean : public ModelAPI_Feature
 {
@@ -38,8 +39,8 @@ class FeaturesPlugin_Boolean : public ModelAPI_Feature
   }
 
   enum {
-    BOOL_CUT,
-    BOOL_FUSE,
+	BOOL_CUT,
+	BOOL_FUSE,
     BOOL_COMMON
   };
 
@@ -62,7 +63,13 @@ class FeaturesPlugin_Boolean : public ModelAPI_Feature
 
 private:
   boost::shared_ptr<GeomAPI_Shape> getShape(const std::string& theAttrName);
-
+  
+  /// Load Naming data structure of the feature to the document
+  void LoadNamingDS(GeomAlgoAPI_Boolean* theFeature, 
+					boost::shared_ptr<ModelAPI_ResultBody> theResultBody,
+	                boost::shared_ptr<GeomAPI_Shape> theObject,
+	                boost::shared_ptr<GeomAPI_Shape> theTool,
+					int theType);
 };
 
 #endif

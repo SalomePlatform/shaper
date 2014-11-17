@@ -9,6 +9,7 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_ResultGroup.h>
 
 
 using namespace std;
@@ -25,10 +26,8 @@ void FeaturesPlugin_Group::initAttributes()
 
 void FeaturesPlugin_Group::execute()
 {
-  //AttributeStringPtr aNameAttr = boost::dynamic_pointer_cast<ModelAPI_AttributeString>(
-  //    data()->attribute(FeaturesPlugin_Group::NAME_ID()));
-  //if (!aNameAttr)
-  //  return;
-  //std::string aName = aNameAttr->value();
-  //data()->setName(aName);
+  if (results().empty()) { // just create result if not exists
+    ResultPtr aGroup = document()->createGroup(data());
+    setResult(aGroup);
+  }
 }

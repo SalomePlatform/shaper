@@ -32,8 +32,7 @@ class Config_FeatureReader : public Config_XMLReader
   bool processChildren(xmlNodePtr aNode);
 
   void fillFeature(xmlNodePtr theRoot, 
-    const boost::shared_ptr<Config_FeatureMessage>& outFeatureMessage);
-  bool isInternalFeature(xmlNodePtr theRoot);
+                   const boost::shared_ptr<Config_FeatureMessage>& outFeatureMessage);
 
   void storeAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
   std::string restoreAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
@@ -43,13 +42,12 @@ class Config_FeatureReader : public Config_XMLReader
   /// A map to store all parent's attributes.
   /// The key has from "Node_Name:Node_Attribute"
   std::map<std::string, std::string> myParentAttributes;
-  //std::string myLastWorkbench;
-  //std::string myLastGroup;
   std::string myLibraryName;
 
   std::list<std::string> myFeatures;
-  /// event generated on feature data sending, by default it is EVENT_FEATURE_LOADED
+  /// event generated on feature data sending, by default it is Config_FeatureMessage::GUI_EVENT()
   const char* myEventGenerated;
+  bool myIsProcessWidgets;
 };
 
 #endif /* CONFIG_FEATUREREADER_H_ */

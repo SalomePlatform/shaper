@@ -8,6 +8,7 @@
 #include <Config_Keywords.h>
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
+#include <Config_AttributeMessage.h>
 #include <Config_FeatureReader.h>
 #include <Events_Message.h>
 #include <Events_Loop.h>
@@ -29,7 +30,8 @@ Config_FeatureReader::Config_FeatureReader(const std::string& theXmlFile,
                                            const char* theEventGenerated)
     : Config_XMLReader(theXmlFile),
       myLibraryName(theLibraryName),
-      myEventGenerated(theEventGenerated ? theEventGenerated : EVENT_FEATURE_LOADED)
+      myEventGenerated(theEventGenerated ? theEventGenerated : Config_FeatureMessage::GUI_EVENT()),
+      myIsProcessWidgets(theEventGenerated != NULL)
 {
 }
 
@@ -46,18 +48,27 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
 {
   Events_ID aMenuItemEvent = Events_Loop::eventByName(myEventGenerated);
   if (isNode(theNode, NODE_FEATURE, NULL)) {
-    Events_Loop* aEvLoop = Events_Loop::loop();
-    boost::shared_ptr<Config_FeatureMessage> aMessage(
-      new Config_FeatureMessage(aMenuItemEvent, this));
+    storeAttribute(theNode, _ID);
+    boost::shared_ptr<Config_FeatureMessage> aMessage(new Config_FeatureMessage(aMenuItemEvent, this));
     fillFeature(theNode, aMessage);
     myFeatures.push_back(getProperty(theNode, _ID));
     //If a feature has xml definition for it's widget:
     aMessage->setUseInput(hasChild(theNode));
-    aEvLoop->send(aMessage);
+    Events_Loop::loop()->send(aMessage);
     //The m_last* variables always defined before fillFeature() call. XML is a tree.
   } else if (isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL)) {
     storeAttribute(theNode, _ID);
     storeAttribute(theNode, WORKBENCH_DOC);
+  } else if (myIsProcessWidgets && isWidgetNode(theNode)) {
+    boost::shared_ptr<Config_AttributeMessage> aMessage(new Config_AttributeMessage(aMenuItemEvent, this));
+    aMessage->setFeatureId(restoreAttribute(NODE_FEATURE, _ID));
+    std::string anAttributeID = getProperty(theNode, _ID);
+    if (!anAttributeID.empty()) {
+      aMessage->setAttributeId(anAttributeID);
+      aMessage->setObligatory(getBooleanAttribute(theNode, ATTRIBUTE_OBLIGATORY, true));
+      aMessage->setConcealment(getBooleanAttribute(theNode, ATTRIBUTE_CONCEALMENT, false));
+      Events_Loop::loop()->send(aMessage);
+    }
   }
   //Process SOURCE, VALIDATOR nodes.
   Config_XMLReader::processNode(theNode);
@@ -65,7 +76,11 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
 
 bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
 {
-  return isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NODE_FEATURE, NULL);
+  bool result = isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL);
+  if(!result && myIsProcessWidgets) {
+    result = isNode(theNode, NODE_FEATURE, NULL);
+  }
+  return result;
 }
 
 void Config_FeatureReader::fillFeature(xmlNodePtr theNode, 
@@ -75,7 +90,7 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theNode,
   outFeatureMessage->setPluginLibrary(myLibraryName);
   outFeatureMessage->setNestedFeatures(getProperty(theNode, FEATURE_NESTED));
 
-  bool isInternal = isInternalFeature(theNode);
+  bool isInternal = getBooleanAttribute(theNode, ATTRIBUTE_INTERNAL, false);
   outFeatureMessage->setInternal(isInternal);
   if (isInternal) {
     //Internal feature has no visual representation.
@@ -88,16 +103,6 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theNode,
   outFeatureMessage->setGroupId(restoreAttribute(NODE_GROUP, _ID));
   outFeatureMessage->setWorkbenchId(restoreAttribute(NODE_WORKBENCH, _ID));
   outFeatureMessage->setDocumentKind(restoreAttribute(NODE_WORKBENCH, WORKBENCH_DOC));
-}
-
-bool Config_FeatureReader::isInternalFeature(xmlNodePtr theNode)
-{
-  std::string prop = getProperty(theNode, ATTRIBUTE_INTERNAL);
-  std::transform(prop.begin(), prop.end(), prop.begin(), ::tolower);
-  if (prop.empty() || prop == "false" || prop == "0") {
-    return false;
-  }
-  return true;
 }
 
 void Config_FeatureReader::storeAttribute(xmlNodePtr theNode,

@@ -45,8 +45,8 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myTypeCombo = new QComboBox(myMainWidget);
   // There is no sence to paramerize list of types while we can not parametrize selection mode
   QString aTypesStr("Vertices Edges Faces Solids");
-  myShapeTypes = aTypesStr.split(' ');
-  myTypeCombo->addItems(myShapeTypes);
+  QStringList aShapeTypes = aTypesStr.split(' ');
+  myTypeCombo->addItems(aShapeTypes);
   aMainLay->addWidget(myTypeCombo, 0, 1);
 
   QLabel* aListLabel = new QLabel(tr("Selected objects:"), myMainWidget);
@@ -79,8 +79,13 @@ bool ModuleBase_WidgetMultiSelector::storeValue() const
   AttributeSelectionListPtr aSelectionListAttr = 
     boost::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
 
-  if (aSelectionListAttr && (mySelection.size() > 0)) {
+  if (aSelectionListAttr) {
     aSelectionListAttr->clear();
+    // Store shapes type
+    TopAbs_ShapeEnum aCurrentType =
+          ModuleBase_WidgetShapeSelector::shapeType(myTypeCombo->currentText());
+    aSelectionListAttr->setSelectionType((int) aCurrentType);
+    // Store selection in the attribute
     foreach (GeomSelection aSelec, mySelection) {
       aSelectionListAttr->append(aSelec.first, aSelec.second);
     }
@@ -102,6 +107,10 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
 
   if (aSelectionListAttr) {
     mySelection.clear();
+    // Restore shape type
+    TopAbs_ShapeEnum aShapeType = (TopAbs_ShapeEnum) aSelectionListAttr->selectionType();
+    setCurrentShapeType(aShapeType);
+    // Restore selection in the list
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
       mySelection.append(GeomSelection(aSelectAttr->context(), aSelectAttr->value()));
@@ -122,7 +131,7 @@ QWidget* ModuleBase_WidgetMultiSelector::getControl() const
 QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 {
   QList<QWidget*> result;
-  result << myTypeCombo;
+  //result << myTypeCombo;
   result << myListControl;
   return result;
 }
@@ -156,7 +165,6 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
     mySelection.append(GeomSelection(aResult, aShape));
   }
   updateSelectionList();
-  storeValue();
   emit valuesChanged();
 }
 
@@ -202,24 +210,47 @@ void ModuleBase_WidgetMultiSelector::filterShapes(const NCollection_List<TopoDS_
   }
 }
 
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum theShapeType)
+{
+  QString aShapeTypeName;
+  for (int idx = 0; idx < myTypeCombo->count(); ++idx) {
+    aShapeTypeName = myTypeCombo->itemText(idx);
+    TopAbs_ShapeEnum aRefType = ModuleBase_WidgetShapeSelector::shapeType(aShapeTypeName);
+    if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
+      myTypeCombo->setCurrentIndex(idx);
+      break;
+    }
+  }
+}
+
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
 {
   myIsActive = toActivate;
   if (myIsActive) {
     connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-    onSelectionTypeChanged();
+    //onSelectionTypeChanged();
   } else {
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
     myWorkshop->deactivateSubShapesSelection();
   }
 }
 
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
+void ModuleBase_WidgetMultiSelector::activateShapeSelection()
 {
   QString aNewType = myTypeCombo->currentText();
   QIntList aList;
   aList.append(ModuleBase_WidgetShapeSelector::shapeType(aNewType));
   myWorkshop->activateSubShapesSelection(aList);
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
+{
+  QList<ObjectPtr> anEmptyList;
+  myWorkshop->setSelected(anEmptyList);
+  activateShapeSelection();
+  onSelectionChanged();
 }

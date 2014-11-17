@@ -7,6 +7,9 @@
 #include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_WidgetValue.h>
 
+#include <ModelAPI_RefAttrValidator.h>
+#include <ModelAPI_Session.h>
+
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
 
@@ -49,30 +52,16 @@ bool ModuleBase_WidgetFeatureOrAttribute::setValue(ModuleBase_WidgetValue* theVa
     ModuleBase_WidgetValueFeature* aFeatureValue =
         dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue) {
-      boost::shared_ptr<GeomAPI_Pnt2d> aValuePoint = aFeatureValue->point();
       ObjectPtr aObject = aFeatureValue->object();
-      if (aObject) {
+
+      boost::shared_ptr<ModelAPI_Attribute> anAttribute = findAttribute(aFeatureValue);
+      if (anAttribute) {
+        isDone = setAttribute(anAttribute, false);
+      }
+      else if (aObject) {
         isDone = setObject(aObject, false);
       }
-      if (aValuePoint) {
-        FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-        if (aFeature) {
-          // find the given point in the feature attributes
-          std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes = aFeature->data()
-              ->attributes(GeomDataAPI_Point2D::type());
-          std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes
-              .begin(), aLast = anAttiributes.end();
-          boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;
-          for (; anIt != aLast && !aFPoint; anIt++) {
-            boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint = boost::dynamic_pointer_cast<
-                GeomDataAPI_Point2D>(*anIt);
-            if (aCurPoint && aCurPoint->pnt()->distance(aValuePoint) < Precision::Confusion())
-              aFPoint = aCurPoint;
-          }
-          if (aFPoint)
-            isDone = setAttribute(aFPoint, false);
-        }
-      }
+
       if (isDone)
         emit valuesChanged();
     }
@@ -125,11 +114,61 @@ bool ModuleBase_WidgetFeatureOrAttribute::restoreValue()
   return false;
 }
 
+boost::shared_ptr<ModelAPI_Attribute> ModuleBase_WidgetFeatureOrAttribute::findAttribute(
+                                                        ModuleBase_WidgetValue* theValue)
+{
+  boost::shared_ptr<ModelAPI_Attribute> anAttribute;
+  ModuleBase_WidgetValueFeature* aFeatureValue =
+                                  dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
+  if (!aFeatureValue)
+    return anAttribute;
+
+  boost::shared_ptr<GeomAPI_Pnt2d> aValuePoint = aFeatureValue->point();
+  if (aValuePoint) {
+    ObjectPtr aObject = aFeatureValue->object();
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
+    if (aFeature) {
+      // find the given point in the feature attributes
+      std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes = aFeature->data()
+          ->attributes(GeomDataAPI_Point2D::type());
+      std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes
+          .begin(), aLast = anAttiributes.end();
+      for (; anIt != aLast && !anAttribute; anIt++) {
+        boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint = boost::dynamic_pointer_cast<
+            GeomDataAPI_Point2D>(*anIt);
+        if (aCurPoint && aCurPoint->pnt()->distance(aValuePoint) < Precision::Confusion())
+          anAttribute = aCurPoint;
+      }
+    }
+  }
+  return anAttribute;
+}
+
 bool ModuleBase_WidgetFeatureOrAttribute::setAttribute(
     const boost::shared_ptr<ModelAPI_Attribute>& theAttribute, bool theSendEvent)
 {
   if (!theAttribute)  // || !featureKinds().contains(theAttribute->attributeType().c_str()))
     return false;
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  std::list<ModelAPI_Validator*> aValidators;
+  std::list<std::list<std::string> > anArguments;
+  aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
+
+  // Check the acceptability of the attribute
+  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
+  int aSize = aValidators.size();
+  std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
+  for (; aValidator != aValidators.end(); aValidator++, aArgs++) {
+    const ModelAPI_RefAttrValidator* aAttrValidator =
+        dynamic_cast<const ModelAPI_RefAttrValidator*>(*aValidator);
+    if (aAttrValidator) {
+      if (!aAttrValidator->isValid(myFeature, *aArgs, theAttribute)) {
+        return false;
+      }
+    }
+  }
 
   myAttribute = theAttribute;
   editor()->setText(theAttribute ? theAttribute->attributeType().c_str() : "");

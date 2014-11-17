@@ -111,7 +111,7 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature,
   theFeature.mapOfShapes(*aSubShapes);
 
     //Insert lateral face : Face from Edge
-  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theFeature.shape(), EDGE,_LATERAL_TAG, *aSubShapes);
+  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theBasis, EDGE,_LATERAL_TAG, *aSubShapes);
 
   //Insert bottom face
   boost::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();  

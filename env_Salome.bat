@@ -75,6 +75,7 @@ rem @SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
 
 @SET PATH=%GEOM_ROOT_DIR%\lib\salome;%PATH%
 
+@SET _NO_DEBUG_HEAP=1
 
 IF "%ARCH%" == "Win64" (
   call "%VS100COMNTOOLS%..\..\VC\vcvarsall.bat" x64

@@ -89,3 +89,21 @@ bool SketchPlugin_DifferentObjectsValidator::isValid(
   }
   return true;
 }
+
+bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
+  const std::list<std::string>& theArguments, const AttributePtr& theAttribute) const
+{
+  std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttrs = 
+    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::type());
+  std::list<boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+  for(; anAttr != anAttrs.end(); anAttr++) {
+    if (*anAttr) {
+      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
+        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
+      // check the object is already presented
+      if (!aRef->isObject() && aRef->attr() == theAttribute)
+        return false;
+    }
+  }
+  return true;
+}

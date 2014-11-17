@@ -27,16 +27,6 @@ void PartSetPlugin_Part::execute()
     setResult(aResult);
     aResult->activate();
   }
-  /*
-  boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = aResult->data()->docRef(
-      ModelAPI_ResultPart::DOC_REF());
-  
-  if (!aDocRef->value()) {  // create a document if not yet created
-    boost::shared_ptr<ModelAPI_Document> aPartSetDoc =
-        ModelAPI_Session::get()->moduleDocument();
-    aDocRef->setValue(aPartSetDoc->subDocument(data()->name()));
-  }
-  */
 }
 
 boost::shared_ptr<ModelAPI_Document> PartSetPlugin_Part::documentToAdd()

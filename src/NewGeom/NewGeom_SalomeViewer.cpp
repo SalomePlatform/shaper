@@ -48,6 +48,9 @@ void NewGeom_SalomeViewer::setSelector(NewGeom_OCCSelector* theSel)
       return;
     else {
       mySelector->viewer()->getViewManager()->disconnect(this);
+      OCCViewer_Viewer* aViewer = mySelector->viewer();
+      if (aViewer)
+        aViewer->disconnect(this);
     }
   }
   mySelector = theSel;
@@ -123,6 +126,11 @@ void NewGeom_SalomeViewer::onKeyRelease(SUIT_ViewWindow*, QKeyEvent* theEvent)
 void NewGeom_SalomeViewer::enableSelection(bool isEnabled)
 {
   mySelector->viewer()->enableSelection(isEnabled);
+  // there is a fix for a black-colored window 
+  // the viewer rubber band is valid if the values delta is less than 1
+  // TODO: remove this row after moving to SALOME 7.5
+  mySelector->viewer()->setInteractionStyle(isEnabled ? SUIT_ViewModel::STANDARD
+                                                      : SUIT_ViewModel::KEY_FREE);
 }
 
 //**********************************************

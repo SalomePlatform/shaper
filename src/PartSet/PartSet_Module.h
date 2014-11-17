@@ -107,6 +107,9 @@ Q_OBJECT
   /// \param the attribute of the feature
   void onStorePoint2D(ObjectPtr theFeature, const std::string& theAttribute);
 
+  /// Called when sketch is launched
+  void onSketchLaunched();
+
 protected slots:
   /// Called on selection changed event
   virtual void onSelectionChanged();

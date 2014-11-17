@@ -47,14 +47,6 @@ Q_OBJECT
 
 
  protected:
-  /// Set value to the active widget
-  /// \param theFeature the feature
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  /// \return true if the point is set
-  //bool setWidgetValue(ObjectPtr theFeature, double theX, double theY);
-
- protected:
   CompositeFeaturePtr mySketch;  ///< the sketch of the feature
 };
 

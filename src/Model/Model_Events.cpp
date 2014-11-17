@@ -35,8 +35,9 @@ Model_ObjectUpdatedMessage::Model_ObjectUpdatedMessage(const ObjectPtr& theObjec
                                                        const Events_ID& theEvent)
     : ModelAPI_ObjectUpdatedMessage(theEvent, 0)
 {
-  if (theObject)
+  if (theObject) {
     myObjects.insert(theObject);
+  }
 }
 
 const std::set<ObjectPtr>& Model_ObjectUpdatedMessage::objects() const

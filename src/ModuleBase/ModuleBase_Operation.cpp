@@ -29,6 +29,9 @@
 
 #include <Events_Loop.h>
 
+#include <TopoDS.hxx>
+#include <TopoDS_Vertex.hxx>
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -218,7 +221,13 @@ bool ModuleBase_Operation::commit()
     disconnect(myPropertyPanel, 0, this, 0);
 
     stopOperation();
-    ModelAPI_Session::get()->finishOperation();
+    // check whether there are modifications performed during the current operation
+    // in the model
+    // in case if there are no modifications, do not increase the undo/redo stack
+    if (ModelAPI_Session::get()->isModified())
+      ModelAPI_Session::get()->finishOperation();
+    else
+      ModelAPI_Session::get()->abortOperation();
 
     emit stopped();
 
@@ -245,10 +254,11 @@ bool ModuleBase_Operation::activateByPreselection()
   if (aWidgets.empty())
     return false;
   
-  ModuleBase_ModelWidget* aWgt;
+  ModuleBase_ModelWidget* aWgt, *aFilledWgt = 0;
   ModuleBase_ViewerPrs aPrs;
   QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
   QList<ModuleBase_ViewerPrs>::const_iterator aPIt;
+  bool isSet = false;
   for (aWIt = aWidgets.constBegin(), aPIt = myPreSelection.constBegin();
        (aWIt != aWidgets.constEnd()) && (aPIt != myPreSelection.constEnd());
        ++aWIt, ++aPIt) {
@@ -256,13 +266,28 @@ bool ModuleBase_Operation::activateByPreselection()
     aPrs = (*aPIt);
     ModuleBase_WidgetValueFeature aValue;
     aValue.setObject(aPrs.object());
-    if (!aWgt->setValue(&aValue))
+    // Check if the selection has a selected point
+    // for today it is impossible to do because
+    // the selected point demands convertation to Sketch plane 2d
+    if (!aWgt->setValue(&aValue)) {
+      isSet = false;
       break;
+    } else {
+      isSet = true;
+      aFilledWgt = aWgt;
+    }
   }
-  if (canBeCommitted()) {
+  if (isSet && canBeCommitted()) {
     // if all widgets are filled with selection
     commit();
     return true;
+  }
+  else {
+    //activate next widget
+    if (aFilledWgt) {
+      myPropertyPanel->activateNextWidget(aFilledWgt);
+      return true;
+    }
   }
 
   //ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
@@ -279,7 +304,8 @@ bool ModuleBase_Operation::activateByPreselection()
   return false;
 }
 
-void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection)
+void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,
+                                         ModuleBase_IViewer* /*theViewer*/)
 {
   myPreSelection.clear();
 

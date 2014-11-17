@@ -5,8 +5,8 @@
  *      Author: sbh
  */
 
-#ifndef Config_Common_H_
-#define Config_Common_H_
+#ifndef CONFIG_COMMON_H_
+#define CONFIG_COMMON_H_
 
 #include "Config_def.h"
 
@@ -42,6 +42,11 @@ CONFIG_EXPORT bool isElementNode(xmlNodePtr theNode);
 CONFIG_EXPORT bool isNode(xmlNodePtr theNode, const char* theNodeName, ...);
 
 /*
+ * Checks is the given node is attribute (widget) node.
+ */
+CONFIG_EXPORT bool isWidgetNode(xmlNodePtr theNode);
+
+/*
  * Every xml node has child. Even if there is no explicit
  * child nodes libxml gives the "Text node" as child.
  *
@@ -68,5 +73,22 @@ CONFIG_EXPORT bool getValidatorInfo(xmlNodePtr theNode, std::string& outValidato
  \return full library name
  */
 CONFIG_EXPORT std::string library(const std::string& theLibName);
+
+/*
+ * Returns named property for a given node as std::string.
+ */
+CONFIG_EXPORT std::string getProperty(xmlNodePtr theNode, const char* thePropName);
+
+/*
+ * Checks if the given XML node has the given attribute,
+ * if yes - returns it's bool value, if no, or if the value can not
+ * be converted to bool - returns theDefault value.
+ * \param theAttributeName attribute to check
+ * \param theDefault default value on bad data
+ * \return the boolean result
+ */
+CONFIG_EXPORT bool getBooleanAttribute(xmlNodePtr theNode,
+                                       const char* theAttributeName,
+                                       bool theDefault);
 
 #endif
