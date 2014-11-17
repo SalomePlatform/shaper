@@ -25,8 +25,8 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
     return PythonFeaturesPlugin_Box.ID()
 
   def initAttributes(self):
-    # C++ static methods (in example Type() of ModelAPI_AttributeDouble
-    # should be called like this: moduleName.ClassName_StaticMethod()
+    # C++ static methods (in example "type()" of the ModelAPI_AttributeDouble
+    # should be called like this: moduleName.ClassName_staticMethod()
     self.data().addAttribute(PythonFeaturesPlugin_Box.WIDTH_ID(), ModelAPI.ModelAPI_AttributeDouble_type())
     self.data().addAttribute(PythonFeaturesPlugin_Box.LENGTH_ID(), ModelAPI.ModelAPI_AttributeDouble_type())
     self.data().addAttribute(PythonFeaturesPlugin_Box.HEIGHT_ID(), ModelAPI.ModelAPI_AttributeDouble_type())
@@ -35,7 +35,7 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
     aWidth  = self.real(PythonFeaturesPlugin_Box.WIDTH_ID()).value()
     aLength = self.real(PythonFeaturesPlugin_Box.LENGTH_ID()).value()
     aHeight = self.real(PythonFeaturesPlugin_Box.HEIGHT_ID()).value()
-    print ("Box W:{0} L:{1} H:{2}".format(aWidth, aLength, aHeight))
+    # print ("Box W:{0} L:{1} H:{2}".format(aWidth, aLength, aHeight))
     # aResult = document().createBody(data())
     # aResult.store(UserPackage.makeBox(aLength, aWidth, aHeight)
     # self.setResult(aResult)

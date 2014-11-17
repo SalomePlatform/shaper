@@ -1,7 +1,7 @@
 <plugin>
   <workbench id="Features" document="Part">
     <group id="Basic">
-      <feature id="Box" title="Box" tooltip="Create a box" icon="">
+      <feature id="Box" title="Box" tooltip="Create a box" icon=":pictures/part_ico.png">
           <source path="box_widget.xml"/>
       </feature>
     </group>
