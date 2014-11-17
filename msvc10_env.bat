@@ -116,8 +116,8 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @REM -------------------------
 
 @REM BOOST
-@SET BOOST_ROOT_DIR=%PDIR%\boost-1.52.0
-@SET PATH=%BOOST_ROOT_DIR%\lib;%PATH%
+@REM @SET BOOST_ROOT_DIR=%PDIR%\boost-1.52.0
+@REM @SET PATH=%BOOST_ROOT_DIR%\lib;%PATH%
 @REM -------------------------
 
 @REM -------------------------
