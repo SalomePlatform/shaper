@@ -14,6 +14,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+// Have to be included before std headers
 #include <Python.h>
 
 //Necessary for cerr
@@ -134,13 +135,9 @@ void Config_ModuleReader::loadPlugin(const std::string thePluginName)
 void Config_ModuleReader::loadScript(const std::string theFileName)
 {
   std::string aPythonFile = theFileName + ".py";
-  PyGILState_STATE gstate;
-
   /* aquire python thread */
-  gstate = PyGILState_Ensure();
-
+  PyGILState_STATE gstate = PyGILState_Ensure();
   PyObject* module = PyImport_ImportModule(aPythonFile.c_str());
-
   /* release python thread */
   PyGILState_Release(gstate);
 }
