@@ -23,6 +23,7 @@ class ModuleBase_OperationDescription;
 class ModuleBase_IPropertyPanel;
 class ModuleBase_ISelection;
 class ModuleBase_IViewer;
+class ModuleBase_WidgetValueFeature;
 
 class QKeyEvent;
 
@@ -217,6 +218,20 @@ signals:
   /// \return true if the point is set
   virtual bool setWidgetValue(ObjectPtr theFeature, double theX, double theY);
 
+  /// Return a widget value point by the selection and the viewer position
+  /// The default realization returns false
+  /// \param thePrs the presentation
+  /// \param theViewer a viewer to have the viewer the eye position
+  /// \param theX the horizontal coordinate
+  /// \param theY the vertical coordinate
+  /// \return true if the point exits in the selection
+  virtual bool getViewerPoint(ModuleBase_ViewerPrs thePrs,
+                                   ModuleBase_IViewer* theViewer,
+                                   double& theX, double& theY);
+
+  // Removes the preselection information and clears the map of preselection
+  void clearPreselection();
+
  protected:
   FeaturePtr myFeature;  /// the operation feature to be handled
 
@@ -233,7 +248,7 @@ signals:
   QStringList myNestedFeatures;
 
   /// List of pre-selected object 
-  QList<ModuleBase_ViewerPrs> myPreSelection;
+  QList<ModuleBase_WidgetValueFeature*> myPreSelection;
 
   /// Access to property panel
   ModuleBase_IPropertyPanel* myPropertyPanel;

@@ -202,7 +202,7 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
   return isDone;
 }
 
-void Model_Document::close()
+void Model_Document::close(const bool theForever)
 {
   boost::shared_ptr<ModelAPI_Session> aPM = Model_Session::get();
   if (this != aPM->moduleDocument().get() && this == aPM->activeDocument().get()) {
@@ -211,14 +211,36 @@ void Model_Document::close()
   // close all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
   for (; aSubIter != mySubs.end(); aSubIter++)
-    subDoc(*aSubIter)->close();
+    subDoc(*aSubIter)->close(theForever);
   mySubs.clear();
-  // close this only if it is module document, otherwise it can be undoed
-  if (this == aPM->moduleDocument().get()) {
+
+  // close for thid document needs no transaction in this document
+  boost::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(false);
+
+  // delete all features of this document
+  boost::shared_ptr<ModelAPI_Document> aThis = 
+    Model_Application::getApplication()->getDocument(myID);
+  Events_Loop* aLoop = Events_Loop::loop();
+  NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFeaturesIter(myObjs);
+  for(; aFeaturesIter.More(); aFeaturesIter.Next()) {
+    FeaturePtr aFeature = aFeaturesIter.Value();
+    static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_Feature::group());
+    ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
+    aFeature->eraseResults();
+    aFeature->erase();
+  }
+  myObjs.Clear();
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+
+  // close all only if it is really asked, otherwise it can be undoed/redoed
+  if (theForever) {
     if (myDoc->CanClose() == CDM_CCS_OK)
       myDoc->Close();
-    Model_Application::getApplication()->deleteDocument(myID);
   }
+
+  boost::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(true);
 }
 
 void Model_Document::startOperation()
@@ -253,7 +275,13 @@ bool Model_Document::compactNested()
   }
   myIsEmptyTr[myTransactionsAfterSave] = allWasEmpty;
   myTransactionsAfterSave++;
-  myDoc->PerformDeltaCompaction();
+  if (allWasEmpty) {
+    // Issue 151: if everything is empty, it is a problem for OCCT to work with it, 
+    // just commit the empty that returns nothing
+    myDoc->CommitCommand();
+  } else {
+    myDoc->PerformDeltaCompaction();
+  }
   return !allWasEmpty;
 }
 
@@ -310,10 +338,8 @@ void Model_Document::abortOperation()
 {
   if (myNestedNum > 0 && !myDoc->HasOpenCommand()) {  // abort all what was done in nested
       // first compact all nested
-    if (compactNested()) {
-      // for nested it is undo and clear redos
-      myDoc->Undo();
-    }
+    compactNested();
+    myDoc->Undo();
     myDoc->ClearRedos();
     myTransactionsAfterSave--;
     myIsEmptyTr.erase(myTransactionsAfterSave);
@@ -496,18 +522,20 @@ void Model_Document::removeFeature(FeaturePtr theFeature, const bool theCheck)
   }
 
   boost::shared_ptr<Model_Data> aData = boost::static_pointer_cast<Model_Data>(theFeature->data());
-  TDF_Label aFeatureLabel = aData->label().Father();
-  if (myObjs.IsBound(aFeatureLabel))
-    myObjs.UnBind(aFeatureLabel);
-  else
-    return;  // not found feature => do not remove
-  // erase fields
-  theFeature->erase();
-  // erase all attributes under the label of feature
-  aFeatureLabel.ForgetAllAttributes();
-  // remove it from the references array
-  if (theFeature->isInHistory()) {
-    RemoveFromRefArray(featuresLabel(), aFeatureLabel);
+  if (aData) {
+    TDF_Label aFeatureLabel = aData->label().Father();
+    if (myObjs.IsBound(aFeatureLabel))
+      myObjs.UnBind(aFeatureLabel);
+    else
+      return;  // not found feature => do not remove
+    // erase fields
+    theFeature->erase();
+    // erase all attributes under the label of feature
+    aFeatureLabel.ForgetAllAttributes();
+    // remove it from the references array
+    if (theFeature->isInHistory()) {
+      RemoveFromRefArray(featuresLabel(), aFeatureLabel);
+    }
   }
   // event: feature is deleted
   ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
@@ -625,6 +653,8 @@ int Model_Document::size(const std::string& theGroupID, const bool theHidden)
     for (; aLabIter.More(); aLabIter.Next()) {
       TDF_Label aFLabel = aLabIter.Value()->Label();
       FeaturePtr aFeature = feature(aFLabel);
+      if (!aFeature) // may be on close
+        continue;
       const std::list<boost::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
       std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
       for (; aRIter != aResults.cend(); aRIter++) {
@@ -737,9 +767,6 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
       // event: model is updated
       static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
-
-      // update results of the appeared feature
-      updateResults(aFeature);
     } else {  // nothing is changed, both iterators are incremented
       aFeature = myObjs.Find(aFeatureLabel);
       aKeptFeatures.insert(aFeature);
@@ -747,9 +774,18 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
         ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
       }
+    }
+  }
+  // update results of thefeatures (after features created because they may be connected, like sketch and sub elements)
+  TDF_ChildIDIterator aLabIter2(featuresLabel(), TDataStd_Comment::GetID());
+  for (; aLabIter2.More(); aLabIter2.Next()) {
+    TDF_Label aFeatureLabel = aLabIter2.Value()->Label();
+    if (myObjs.IsBound(aFeatureLabel)) {  // a new feature is inserted
+      FeaturePtr aFeature = myObjs.Find(aFeatureLabel);
       updateResults(aFeature);
     }
   }
+
   // check all features are checked: if not => it was removed
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myObjs);
   while (aFIter.More()) {
@@ -957,11 +993,11 @@ boost::shared_ptr<ModelAPI_Feature> Model_Document::feature(
 void Model_Document::updateResults(FeaturePtr theFeature)
 {
   // for not persistent is will be done by parametric updater automatically
-  if (!theFeature->isPersistentResult()) return;
+  //if (!theFeature->isPersistentResult()) return;
   // check the existing results and remove them if there is nothing on the label
   std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
   while(aResIter != theFeature->results().cend()) {
-    ResultBodyPtr aBody = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(*aResIter);
+    ResultPtr aBody = boost::dynamic_pointer_cast<ModelAPI_Result>(*aResIter);
     if (aBody) {
       if (!aBody->data()->isValid()) { 
         // found a disappeared result => remove it
@@ -988,8 +1024,12 @@ void Model_Document::updateResults(FeaturePtr theFeature)
           aNewBody = createBody(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultPart::group().c_str()) {
           aNewBody = createPart(theFeature->data(), aResIndex);
-        } else if (aGroup->Get() != ModelAPI_ResultConstruction::group().c_str() &&
-          aGroup->Get() != ModelAPI_ResultGroup::group().c_str()) {
+        } else if (aGroup->Get() == ModelAPI_ResultConstruction::group().c_str()) {
+          theFeature->execute(); // construction shapes are needed for sketch solver
+          break;
+        } else if (aGroup->Get() == ModelAPI_ResultGroup::group().c_str()) {
+          aNewBody = createGroup(theFeature->data(), aResIndex);
+        } else {
           Events_Error::send(std::string("Unknown type of result is found in the document:") +
             TCollection_AsciiString(aGroup->Get()).ToCString());
         }

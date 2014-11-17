@@ -13,6 +13,7 @@
 #include "ModuleBase_ViewerPrs.h"
 #include "ModuleBase_IPropertyPanel.h"
 #include "ModuleBase_ISelection.h"
+#include "ModuleBase_IViewer.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Document.h>
@@ -28,9 +29,6 @@
 #include <GeomAPI_Pnt2d.h>
 
 #include <Events_Loop.h>
-
-#include <TopoDS.hxx>
-#include <TopoDS_Vertex.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -48,6 +46,7 @@ ModuleBase_Operation::ModuleBase_Operation(const QString& theId, QObject* thePar
 ModuleBase_Operation::~ModuleBase_Operation()
 {
   delete myDescription;
+  clearPreselection();
 }
 
 QString ModuleBase_Operation::id() const
@@ -114,7 +113,7 @@ void ModuleBase_Operation::afterCommitOperation()
 
 bool ModuleBase_Operation::canBeCommitted() const
 {
-  return true;
+  return isValid();
 }
 
 void ModuleBase_Operation::flushUpdated()
@@ -255,21 +254,15 @@ bool ModuleBase_Operation::activateByPreselection()
     return false;
   
   ModuleBase_ModelWidget* aWgt, *aFilledWgt = 0;
-  ModuleBase_ViewerPrs aPrs;
   QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
-  QList<ModuleBase_ViewerPrs>::const_iterator aPIt;
+  QList<ModuleBase_WidgetValueFeature*>::const_iterator aPIt;
   bool isSet = false;
   for (aWIt = aWidgets.constBegin(), aPIt = myPreSelection.constBegin();
        (aWIt != aWidgets.constEnd()) && (aPIt != myPreSelection.constEnd());
        ++aWIt, ++aPIt) {
     aWgt = (*aWIt);
-    aPrs = (*aPIt);
-    ModuleBase_WidgetValueFeature aValue;
-    aValue.setObject(aPrs.object());
-    // Check if the selection has a selected point
-    // for today it is impossible to do because
-    // the selected point demands convertation to Sketch plane 2d
-    if (!aWgt->setValue(&aValue)) {
+    ModuleBase_WidgetValueFeature* aValue = (*aPIt);
+    if (!aWgt->setValue(aValue)) {
       isSet = false;
       break;
     } else {
@@ -305,14 +298,16 @@ bool ModuleBase_Operation::activateByPreselection()
 }
 
 void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,
-                                         ModuleBase_IViewer* /*theViewer*/)
+                                         ModuleBase_IViewer* theViewer)
 {
-  myPreSelection.clear();
+  clearPreselection();
 
+  QList<ModuleBase_ViewerPrs> aPreSelected;
   // Check that the selected result are not results of operation feature
-  QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
   FeaturePtr aFeature = feature();
   if (aFeature) {
+    QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+
     std::list<ResultPtr> aResults = aFeature->results();
     QList<ObjectPtr> aResList;
     std::list<ResultPtr>::const_iterator aIt;
@@ -321,10 +316,23 @@ void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,
 
     foreach (ModuleBase_ViewerPrs aPrs, aSelected) {
       if ((!aResList.contains(aPrs.object())) && (aPrs.object() != aFeature))
-        myPreSelection.append(aPrs);
+        aPreSelected.append(aPrs);
     }
   } else
-    myPreSelection = aSelected;
+    aPreSelected = theSelection->getSelected();
+
+  // convert the selection values to the values, which are set to the operation widgets
+
+  Handle(V3d_View) aView = theViewer->activeView();
+  foreach (ModuleBase_ViewerPrs aPrs, aPreSelected) {
+    ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
+    aValue->setObject(aPrs.object());
+
+    double aX, anY;
+    if (getViewerPoint(aPrs, theViewer, aX, anY))
+      aValue->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
+    myPreSelection.append(aValue);
+  }
 }
 
 void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
@@ -351,6 +359,19 @@ bool ModuleBase_Operation::setWidgetValue(ObjectPtr theFeature, double theX, dou
   return isApplyed;
 }
 
+bool ModuleBase_Operation::getViewerPoint(ModuleBase_ViewerPrs thePrs,
+                                               ModuleBase_IViewer* theViewer,
+                                               double& theX, double& theY)
+{
+  return false;
+}
+
+void ModuleBase_Operation::clearPreselection()
+{
+  while (!myPreSelection.isEmpty()) {
+    delete myPreSelection.takeFirst();
+  }
+}
 
 void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp) 
 { 

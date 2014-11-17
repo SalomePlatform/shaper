@@ -33,10 +33,6 @@
 #include <XGUI_Constants.h>
 
 #include <V3d_View.hxx>
-#include <TopoDS_Vertex.hxx>
-#include <TopoDS.hxx>
-#include <BRep_Tool.hxx>
-#include <TopoDS.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -69,15 +65,6 @@ bool PartSet_OperationFeatureCreate::canProcessKind(const std::string& theId)
       || theId == SketchPlugin_ConstraintPerpendicular::ID()
       || theId == SketchPlugin_ConstraintCoincidence::ID()
       || theId == SketchPlugin_ConstraintRigid::ID();
-}
-
-bool PartSet_OperationFeatureCreate::canBeCommitted() const
-{
-  if (PartSet_OperationSketchBase::canBeCommitted()) {
-    //if(myActiveWidget && !myActiveWidget->isComputedDefault()) {
-    return isValid();
-  }
-  return false;
 }
 
 void PartSet_OperationFeatureCreate::mouseMoved(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer)
@@ -119,26 +106,20 @@ void PartSet_OperationFeatureCreate::mouseReleased(QMouseEvent* theEvent, Module
     PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
   } else {
     ModuleBase_ViewerPrs aPrs = aSelected.first();
+    if (getViewerPoint(aPrs, theViewer, aX, anY)) {
+      ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+      PartSet_Tools::setConstraints(sketch(), feature(), aActiveWgt->attributeID(), aX, anY);
+      isClosedContour = true;
+    }
     const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull()) {
-      if (aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
-        const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
-        if (!aVertex.IsNull()) {
-          aPoint = BRep_Tool::Pnt(aVertex);
-          PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
-          ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
-          PartSet_Tools::setConstraints(sketch(), feature(), aActiveWgt->attributeID(), aX, anY);
-          isClosedContour = true;
-        }
-      } else if (aShape.ShapeType() == TopAbs_EDGE) { // a line is selected
-        ObjectPtr aObject = aPrs.object();
-        if (sketch()->isSub(aObject))
-          PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
-        else {
-          // we have to create the selected edge for the current sketch
-          ResultPtr aRes = PartSet_Tools::createFixedObjectByEdge(aPrs, sketch());
-          aSelected.first().setFeature(aRes);
-        }
+    if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_EDGE) { // a line is selected
+      ObjectPtr aObject = aPrs.object();
+      if (sketch()->isSub(aObject))
+        PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aX, anY);
+      else {
+        // we have to create the selected edge for the current sketch
+        ResultPtr aRes = PartSet_Tools::createFixedObjectByEdge(aPrs, sketch());
+        aSelected.first().setFeature(aRes);
       }
     }
   }

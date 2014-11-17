@@ -108,6 +108,9 @@ signals:
   /// Signal to define sketch mode
   void launchSketch();
 
+  /// Signal to update property panel
+  void updatePropPanel();
+
  protected:
   /// Virtual method called when operation started (see start() method for more description)
   /// Default impl calls corresponding slot and commits immediately.

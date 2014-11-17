@@ -44,6 +44,8 @@ void SketchPlugin_Line::execute()
     if (aStartAttr->isInitialized() && anEndAttr->isInitialized()) {
       boost::shared_ptr<GeomAPI_Pnt> aStart(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
       boost::shared_ptr<GeomAPI_Pnt> anEnd(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
+      //std::cout<<"Execute line "<<aStart->x()<<" "<<aStart->y()<<" "<<aStart->z()<<" - "
+      //  <<anEnd->x()<<" "<<anEnd->y()<<" "<<anEnd->z()<<std::endl;
       // make linear edge
       boost::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
       // store the result
@@ -101,7 +103,7 @@ void SketchPlugin_Line::attributeChanged() {
   static bool myIsUpdated = false; // to avoid infinitive cycle on attrubtes change
   boost::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
    // update arguments due to the selection value
-  if (aSelection && !aSelection->isNull() && !myIsUpdated) {
+  if (aSelection && !aSelection->isNull() && aSelection->isEdge() && !myIsUpdated) {
     myIsUpdated = true;
     boost::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
     boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 

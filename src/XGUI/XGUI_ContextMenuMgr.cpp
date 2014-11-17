@@ -121,64 +121,58 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     bool hasResult = false;
     bool hasFeature = false;
-    bool hasGroup = false;
     foreach(ObjectPtr aObj, aObjects)
     {
       FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
       ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-      ResultGroupPtr aGroupRes = boost::dynamic_pointer_cast<ModelAPI_ResultGroup>(aObj);
       if (aResult)
         hasResult = true;
       if (aFeature)
         hasFeature = true;
-      if (aGroupRes)
-        hasGroup = true;
-      if (hasFeature && hasResult && hasGroup)
+      if (hasFeature && hasResult) // && hasGroup)
         break;
     }
     //Process Feature
-    if (!hasGroup) {
-      if (aSelected == 1) {
-        ObjectPtr aObject = aObjects.first();
-        if (aObject) {
-          ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-          if (aPart) {
-            if (aMgr->activeDocument() == aPart->partDoc())
-              aMenu->addAction(action("DEACTIVATE_PART_CMD"));
-            else
-              aMenu->addAction(action("ACTIVATE_PART_CMD"));
-          } else if (hasFeature) {
-            aMenu->addAction(action("EDIT_CMD"));
-          } else {
-            if (aDisplayer->isVisible(aObject)) {
-              if (aDisplayer->displayMode(aObject) == XGUI_Displayer::Shading)
-                aMenu->addAction(action("WIREFRAME_CMD"));
-              else
-                aMenu->addAction(action("SHADING_CMD"));
-              aMenu->addSeparator();
-              aMenu->addAction(action("HIDE_CMD"));
-            } else {
-              aMenu->addAction(action("SHOW_CMD"));
-            }
-            aMenu->addAction(action("SHOW_ONLY_CMD"));
-          }
-        } else {  // If feature is 0 the it means that selected root object (document)
-          if (aMgr->activeDocument() != aMgr->moduleDocument())
+    if (aSelected == 1) {
+      ObjectPtr aObject = aObjects.first();
+      if (aObject) {
+        ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+        if (aPart) {
+          if (aMgr->activeDocument() == aPart->partDoc())
+            aMenu->addAction(action("DEACTIVATE_PART_CMD"));
+          else
             aMenu->addAction(action("ACTIVATE_PART_CMD"));
-        }
-      } else {
-        if (hasResult) {
-          aMenu->addAction(action("SHOW_CMD"));
-          aMenu->addAction(action("HIDE_CMD"));
+        } else if (hasFeature) {
+          aMenu->addAction(action("EDIT_CMD"));
+        } else {
+          if (aDisplayer->isVisible(aObject)) {
+            if (aDisplayer->displayMode(aObject) == XGUI_Displayer::Shading)
+              aMenu->addAction(action("WIREFRAME_CMD"));
+            else
+              aMenu->addAction(action("SHADING_CMD"));
+            aMenu->addSeparator();
+            aMenu->addAction(action("HIDE_CMD"));
+          } else {
+            aMenu->addAction(action("SHOW_CMD"));
+          }
           aMenu->addAction(action("SHOW_ONLY_CMD"));
-          aMenu->addSeparator();
-          aMenu->addAction(action("SHADING_CMD"));
-          aMenu->addAction(action("WIREFRAME_CMD"));
         }
+      } else {  // If feature is 0 the it means that selected root object (document)
+        if (aMgr->activeDocument() != aMgr->moduleDocument())
+          aMenu->addAction(action("ACTIVATE_PART_CMD"));
       }
-      if (hasFeature)
-        aMenu->addAction(action("DELETE_CMD"));
+    } else {
+      if (hasResult) {
+        aMenu->addAction(action("SHOW_CMD"));
+        aMenu->addAction(action("HIDE_CMD"));
+        aMenu->addAction(action("SHOW_ONLY_CMD"));
+        aMenu->addSeparator();
+        aMenu->addAction(action("SHADING_CMD"));
+        aMenu->addAction(action("WIREFRAME_CMD"));
+      }
     }
+    if (hasFeature)
+      aMenu->addAction(action("DELETE_CMD"));
   }
   aMenu->addSeparator();
   aMenu->addActions(myWorkshop->objectBrowser()->actions());

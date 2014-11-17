@@ -28,9 +28,6 @@
 #include <SketchPlugin_Line.h>
 
 #include <V3d_View.hxx>
-#include <TopoDS_Vertex.hxx>
-#include <TopoDS.hxx>
-#include <BRep_Tool.hxx>
 #include <AIS_DimensionOwner.hxx>
 #include <AIS_DimensionSelectionMode.hxx>
 
@@ -56,42 +53,52 @@ PartSet_OperationFeatureEdit::~PartSet_OperationFeatureEdit()
 }
 
 void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelection,
-                                                      ModuleBase_IViewer* theViewer)
+                                                 ModuleBase_IViewer* theViewer)
 {
   // the method of the parent should is useless here because it processes the given
   // selection in different way
   //PartSet_OperationFeatureBase::initSelection(theSelection, theViewer);
 
-  // 1. unite selected and hightlighted objects in order to have an opportunity to drag
-  // by the highlighted object
-  QList<ModuleBase_ViewerPrs> aFeatures = theSelection->getSelected();
+  QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
   QList<ModuleBase_ViewerPrs> aHighlighted = theSelection->getHighlighted();
-  // add highlighted elements if they are not selected
-  foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
-    if (!PartSet_Tools::isContainPresentation(aFeatures, aPrs))
-      aFeatures.append(aPrs);
-  }
 
+  // there is a bug in OCC, where the highlighted objects are repeated and should be
+  // filtered on the unique state here
+  QList<ModuleBase_ViewerPrs> anUniqueHighlighted;
+  foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
+    if (!PartSet_Tools::isContainPresentation(anUniqueHighlighted, aPrs))
+      anUniqueHighlighted.append(aPrs);
+  }
+  fillFeature2Attribute(anUniqueHighlighted, theViewer, myHighlightedFeature2Attribute);
+
+  foreach (ModuleBase_ViewerPrs aPrs, anUniqueHighlighted) {
+    if (!PartSet_Tools::isContainPresentation(aSelected, aPrs))
+      aSelected.append(aPrs);
+  }
+  fillFeature2Attribute(aSelected, theViewer, myAllFeature2Attribute);
+}
+
+void PartSet_OperationFeatureEdit::fillFeature2Attribute(
+                                    const QList<ModuleBase_ViewerPrs>& thePresentations,
+                                    ModuleBase_IViewer* theViewer,
+                                    std::map<FeaturePtr, std::list<std::string> >& theFeature2Attribute)
+{
   // 1. find all features with skipping features with selected vertex shapes
-  myFeature2Attribute.clear();
+  theFeature2Attribute.clear();
   // firstly, collect the features without local selection
-  foreach (ModuleBase_ViewerPrs aPrs, aFeatures) {
-    const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
-      const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
-      if (!aVertex.IsNull()) {
-        continue;
-      }
-    }
+  double aX, anY;
+  foreach (ModuleBase_ViewerPrs aPrs, thePresentations) {
+    if (getViewerPoint(aPrs, theViewer, aX, anY))
+      continue;
     else {
       ObjectPtr aObject = aPrs.object();
       if (!aObject)
         continue;
       FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-      if (aFeature && myFeature2Attribute.find(aFeature) == myFeature2Attribute.end()) {
+      if (aFeature && theFeature2Attribute.find(aFeature) == theFeature2Attribute.end()) {
         std::list<std::string> aList;
         // using an empty list as a sign, that this feature should be moved itself
-        myFeature2Attribute[aFeature] = aList;
+        theFeature2Attribute[aFeature] = aList;
       }
     }
   }
@@ -99,13 +106,8 @@ void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelec
   // if the list already has this feature, the local selection is skipped
   // that means that if the selection contains a feature and a feature with local selected point,
   // the edit is performed for a full feature
-  Handle(V3d_View) aView = theViewer->activeView();
-  foreach (ModuleBase_ViewerPrs aPrs, aFeatures) {
-    const TopoDS_Shape& aShape = aPrs.shape();
-    if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX) { // a point is selected
-      const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
-      if (aVertex.IsNull())
-        continue;
+  foreach (ModuleBase_ViewerPrs aPrs, thePresentations) {
+    if (getViewerPoint(aPrs, theViewer, aX, anY)) {
       ObjectPtr aObject = aPrs.object();
       if (!aObject)
         continue;
@@ -114,18 +116,15 @@ void PartSet_OperationFeatureEdit::initSelection(ModuleBase_ISelection* theSelec
         continue;
 
       // append the attribute of the vertex if it is found on the current feature
-      gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
-      double aVX, aVY;
-      PartSet_Tools::convertTo2D(aPoint, sketch(), aView, aVX, aVY);
       boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D = PartSet_Tools::getFeaturePoint(
-                                                                    aFeature, aVX, aVY);
+                                                                    aFeature, aX, anY);
       std::string anAttribute = aFeature->data()->id(aPoint2D);
       std::list<std::string> aList;
-      if (myFeature2Attribute.find(aFeature) != myFeature2Attribute.end())
-        aList = myFeature2Attribute[aFeature];
+      if (theFeature2Attribute.find(aFeature) != theFeature2Attribute.end())
+        aList = theFeature2Attribute[aFeature];
 
       aList.push_back(anAttribute);
-      myFeature2Attribute[aFeature] = aList;
+      theFeature2Attribute[aFeature] = aList;
     }
   }
 }
@@ -136,7 +135,10 @@ void PartSet_OperationFeatureEdit::mousePressed(QMouseEvent* theEvent, ModuleBas
   if(aActiveWgt && aActiveWgt->isViewerSelector()) {
     // Almost do nothing, all stuff in on PartSet_OperationFeatureBase::mouseReleased
     PartSet_OperationFeatureBase::mousePressed(theEvent, theViewer, theSelection);
-    return;
+    // the current point should be cleared because it is saved from the previous move and 
+    // should be reinitialized after the start moving. It is important for example for the lenght
+    // constraint where the first widget is a viewer selector.
+    myCurPoint.clear();
   }
   else {
     // commit always until the selection restore is realized (for feature and local selection)
@@ -264,9 +266,20 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
     //    SketchPlugin_Feature>(feature());
 
     bool isMoved = false;
+    bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+
     // the functionality to move the feature attribute if it exists in the internal map
-    std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
-    while (aFeatIter != myFeature2Attribute.end()) {
+    std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter, aFeatLast;
+    if (aHasShift || myHighlightedFeature2Attribute.empty()) {
+      aFeatIter = myAllFeature2Attribute.begin();
+      aFeatLast = myAllFeature2Attribute.end();
+    }
+    else {
+      aFeatIter = myHighlightedFeature2Attribute.begin();
+      aFeatLast = myHighlightedFeature2Attribute.end();
+    }
+
+    while (aFeatIter != aFeatLast) {
       FeaturePtr aFeature = aFeatIter->first;
       // MPV: added condition because it could be external edge of some object, not sketch
       if (aFeature && !sketch()->isSub(aFeature)) {
@@ -310,8 +323,8 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
     //  }
     // }
     //} // multieditoperation
+    sendFeatures(aHasShift);
   }
-  sendFeatures();
 
   myCurPoint.setPoint(aPoint);
 }
@@ -363,6 +376,18 @@ void PartSet_OperationFeatureEdit::mouseReleased(
       commit();
       emitFeaturesDeactivation();
     }
+    else if (aSelected.size() == 1) {
+     /// TODO: OCC bug: 25034 - the highlighted list should be filled not only for AIS_Shape
+     /// but for other IO, for example constraint dimensions.
+     /// It is empty and we have to use the process mouse release to start edition operation
+     /// for these objects
+      ObjectPtr anObject = aSelected.first().object();
+      FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+      if (aFeature && PartSet_Tools::isConstraintFeature(aFeature->getKind()) &&
+          aFeature != feature()) {
+        restartOperation(PartSet_OperationFeatureEdit::Type(), aFeature);
+      }
+    }
   }
 }
 
@@ -370,9 +395,30 @@ void PartSet_OperationFeatureEdit::mouseDoubleClick(
     QMouseEvent* theEvent, Handle_V3d_View theView,
     ModuleBase_ISelection* theSelection)
 {
-  myIsBlockedByDoubleClick = true;
   // TODO the functionality is important only for constraint feature. Should be moved in another place
   QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
+  // in case when the double click happens on another constraint feature when selection control is active
+  // we should not perform the double click functionality
+  // if there is no the viewer selector widget active, the operation is restarted with a correct feature
+  ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+  if(aActiveWgt && aActiveWgt->isViewerSelector()) {
+    if (!aSelected.empty()) {
+      if (aSelected.size() == 1) {
+       /// TODO: OCC bug: 25034 - the highlighted list should be filled not only for AIS_Shape
+       /// but for other IO, for example constraint dimensions.
+       /// It is empty and we have to use the process mouse release to start edition operation
+       /// for these objects
+        ObjectPtr anObject = aSelected.first().object();
+        FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
+        if (aFeature && PartSet_Tools::isConstraintFeature(aFeature->getKind()) &&
+            aFeature != feature()) {
+          return;
+        }
+      }
+    }
+  }
+
+  myIsBlockedByDoubleClick = true;
   if (!aSelected.empty()) {
     ModuleBase_ViewerPrs aFeaturePrs = aSelected.first();
     if (!aFeaturePrs.owner().IsNull()) {
@@ -406,7 +452,8 @@ void PartSet_OperationFeatureEdit::stopOperation()
 
   //blockSelection(false, false);
 
-  myFeature2Attribute.clear();
+  myHighlightedFeature2Attribute.clear();
+  myAllFeature2Attribute.clear();
 }
 
 //void PartSet_OperationFeatureEdit::blockSelection(bool isBlocked, const bool isRestoreSelection)
@@ -435,12 +482,20 @@ FeaturePtr PartSet_OperationFeatureEdit::createFeature(const bool theFlushMessag
   return FeaturePtr();
 }
 
-void PartSet_OperationFeatureEdit::sendFeatures()
+void PartSet_OperationFeatureEdit::sendFeatures(const bool theIsAllFeatures)
 {
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
 
-  std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
-  while (aFeatIter != myFeature2Attribute.end()) {
+  std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter, aFeatLast;
+  if (theIsAllFeatures || myHighlightedFeature2Attribute.empty()) {
+    aFeatIter = myAllFeature2Attribute.begin();
+    aFeatLast = myAllFeature2Attribute.end();
+  }
+  else {
+    aFeatIter = myHighlightedFeature2Attribute.begin();
+    aFeatLast = myHighlightedFeature2Attribute.end();
+  }
+  while (aFeatIter != aFeatLast) {
     FeaturePtr aFeature = aFeatIter->first;
     if (aFeature) {
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, anEvent);
@@ -454,8 +509,8 @@ void PartSet_OperationFeatureEdit::sendFeatures()
 
 void PartSet_OperationFeatureEdit::emitFeaturesDeactivation()
 {
-  std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myFeature2Attribute.begin();
-  while (aFeatIter != myFeature2Attribute.end()) {
+  std::map<FeaturePtr, std::list<std::string>>::iterator aFeatIter = myAllFeature2Attribute.begin();
+  while (aFeatIter != myAllFeature2Attribute.end()) {
     FeaturePtr aFeature = aFeatIter->first;
     if (aFeature) {
       emit featureConstructed(aFeature, FM_Deactivation);

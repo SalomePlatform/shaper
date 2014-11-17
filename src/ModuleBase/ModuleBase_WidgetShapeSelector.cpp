@@ -6,8 +6,10 @@
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetValueFeature.h>
+
 #include <Config_WidgetAPI.h>
 #include <Events_Loop.h>
 #include <Events_Message.h>
@@ -19,6 +21,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_Session.h>
@@ -98,15 +101,13 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   myTextLine->setToolTip(aToolTip);
   myTextLine->installEventFilter(this);
 
-  myBasePalet = myTextLine->palette();
-  myInactivePalet = myBasePalet;
-  myInactivePalet.setBrush(QPalette::Base, QBrush(Qt::gray, Qt::Dense6Pattern));
-  myTextLine->setPalette(myInactivePalet);
-
   aLayout->addWidget(myTextLine, 1);
 
   std::string aTypes = theData->getProperty("shape_types");
-  myShapeTypes = QString(aTypes.c_str()).split(' ');
+  myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
+
+  std::string aObjTypes = theData->getProperty("object_types");
+  myObjectTypes = QString(aObjTypes.c_str()).split(' ', QString::SkipEmptyParts);
 
   myUseSubShapes = theData->getBooleanAttribute("use_subshapes", false); 
 }
@@ -174,7 +175,6 @@ bool ModuleBase_WidgetShapeSelector::restoreValue()
 QList<QWidget*> ModuleBase_WidgetShapeSelector::getControls() const
 {
   QList<QWidget*> aControls;
-  aControls.append(myLabel);
   aControls.append(myTextLine);
   return aControls;
 }
@@ -213,6 +213,10 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
     if (!aShape)
       return;
 
+    /// Check that object has acceptable type
+    if (!acceptObjectType(aObject)) 
+      return;
+
     // Get sub-shapes from local selection
     if (myUseSubShapes) {
       NCollection_List<TopoDS_Shape> aShapeList;
@@ -226,10 +230,10 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 
     // Check that the selection corresponds to selection type
     if (myUseSubShapes) {
-      if (!isAccepted(aShape))
+      if (!acceptSubShape(aShape))
         return;
     } else {
-      if (!isAccepted(aObject))
+      if (!acceptObjectShape(aObject))
         return;
     }
     setObject(aObject, aShape);
@@ -256,7 +260,7 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, boost::shared_p
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::isAccepted(const ObjectPtr theResult) const
+bool ModuleBase_WidgetShapeSelector::acceptObjectShape(const ObjectPtr theResult) const
 {
   ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theResult);
 
@@ -285,7 +289,7 @@ bool ModuleBase_WidgetShapeSelector::isAccepted(const ObjectPtr theResult) const
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::isAccepted(boost::shared_ptr<GeomAPI_Shape> theShape) const
+bool ModuleBase_WidgetShapeSelector::acceptSubShape(boost::shared_ptr<GeomAPI_Shape> theShape) const
 {
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
   foreach (QString aType, myShapeTypes) {
@@ -296,6 +300,26 @@ bool ModuleBase_WidgetShapeSelector::isAccepted(boost::shared_ptr<GeomAPI_Shape>
 }
 
 //********************************************************************
+bool ModuleBase_WidgetShapeSelector::acceptObjectType(const ObjectPtr theObject) const
+{
+  // Definition of types is not obligatory. If types are not defined then
+  // it means that accepted any type
+  if (myObjectTypes.isEmpty())
+    return true;
+
+  foreach (QString aType, myObjectTypes) {
+    if (aType.toLower() == "construction") {
+      ResultConstructionPtr aConstr = 
+        boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
+      return (aConstr != NULL);
+    } // ToDo: Process other types of objects
+  }
+  // Object type is defined but not found
+  return false;
+}
+
+
+//********************************************************************
 void ModuleBase_WidgetShapeSelector::updateSelectionName()
 {
   if (mySelectedObject) {
@@ -303,17 +327,8 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
     myTextLine->setText(QString::fromStdString(aName));
   } else {
     if (myIsActive) {
-      QString aMsg = tr("Select a ");
-      int i = 0;
-      foreach (QString aType, myShapeTypes) {
-        if (i > 0)
-          aMsg += " or ";
-        aMsg += aType;
-        i++;
-      }
-      myTextLine->setText(aMsg);
-    } else
-      myTextLine->setText(tr("No object selected"));
+      myTextLine->setText("");
+    }
   }
 }
 
@@ -322,24 +337,31 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
 void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
 {
   myIsActive = toActivate;
-  if (myIsActive)
-    myTextLine->setPalette(myBasePalet);
-  else
-    myTextLine->setPalette(myInactivePalet);
   updateSelectionName();
 
   if (myIsActive) {
     connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
     if (myUseSubShapes) {
+
       QIntList aList;
       foreach (QString aType, myShapeTypes)
         aList.append(shapeType(aType));
       myWorkshop->activateSubShapesSelection(aList);
+      if (!myObjectTypes.isEmpty()) {
+        myObjTypeFilter = new ModuleBase_ObjectTypesFilter(myWorkshop, myObjectTypes);
+        myWorkshop->viewer()->clearSelectionFilters();
+        myWorkshop->viewer()->addSelectionFilter(myObjTypeFilter);
+      }
     }
   } else {
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-    if (myUseSubShapes) 
+    if (myUseSubShapes) {
+      if (!myObjTypeFilter.IsNull()) {
+        myWorkshop->viewer()->removeSelectionFilter(myObjTypeFilter);
+        myObjTypeFilter.Nullify();
+      }
       myWorkshop->deactivateSubShapesSelection();
+    }
   }
 }
 
@@ -364,7 +386,7 @@ void ModuleBase_WidgetShapeSelector::raisePanel() const
 bool ModuleBase_WidgetShapeSelector::focusTo()
 {
   activateSelection(true);
-  return true;
+  return ModuleBase_ModelWidget::focusTo();
 }
 
 //********************************************************************
@@ -385,7 +407,7 @@ bool ModuleBase_WidgetShapeSelector::setValue(ModuleBase_WidgetValue* theValue)
         dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue && aFeatureValue->object()) {
       ObjectPtr aObject = aFeatureValue->object();
-      if (isAccepted(aObject)) {
+      if (acceptObjectShape(aObject)) {
         setObject(aObject);
         return true;
       }

@@ -119,9 +119,11 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           SLOT(onOperationStopped(ModuleBase_Operation*)));
   connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
-  connect(myOperationMgr, SIGNAL(operationStarted()), myActionsMgr, SLOT(update()));
-  connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)), myActionsMgr,
-          SLOT(update()));
+  // TODO(sbh): It seems that application works properly without update on operationStarted
+  connect(myOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)),
+          myActionsMgr,   SLOT(update()));
+  connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
+          myActionsMgr,   SLOT(update()));
   connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
 }
 
@@ -167,21 +169,33 @@ void XGUI_Workshop::initMenu()
 
   if (isSalomeMode()) {
     // Create only Undo, Redo commands
-    QAction* aAction = salomeConnector()->addEditCommand("UNDO_CMD", tr("Undo"),
+    QAction* aAction = salomeConnector()->addDesktopCommand("UNDO_CMD", tr("Undo"),
                                                          tr("Undo last command"),
                                                          QIcon(":pictures/undo.png"),
-                                                         QKeySequence::Undo, false);
+                                                         QKeySequence::Undo, false, "MEN_DESK_EDIT");
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onUndo()));
-    aAction = salomeConnector()->addEditCommand("REDO_CMD", tr("Redo"), tr("Redo last command"),
+    aAction = salomeConnector()->addDesktopCommand("REDO_CMD", tr("Redo"), tr("Redo last command"),
                                                 QIcon(":pictures/redo.png"), QKeySequence::Redo,
-                                                false);
+                                                false, "MEN_DESK_EDIT");
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRedo()));
-    salomeConnector()->addEditMenuSeparator();
-    aAction = salomeConnector()->addEditCommand("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
+    salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
+    aAction = salomeConnector()->addDesktopCommand("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
                                                 QIcon(":pictures/rebuild.png"), QKeySequence(),
-                                                false);
+                                                false, "MEN_DESK_EDIT");
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
-    salomeConnector()->addEditMenuSeparator();
+    salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
+
+    aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export NewGeom..."), tr("Export the current document into a NewGeom file"),
+                                                QIcon(), QKeySequence(),
+                                                false, "MEN_DESK_FILE");
+    connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onSaveAs()));
+
+    aAction = salomeConnector()->addDesktopCommand("OPEN_CMD", tr("Import NewGeom..."), tr("Import a NewGeom file"),
+                                                QIcon(), QKeySequence(),
+                                                false, "MEN_DESK_FILE");
+    connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onOpen()));
+    salomeConnector()->addDesktopMenuSeparator("MEN_DESK_FILE");
+
     return;
   }
   // File commands group
@@ -712,7 +726,7 @@ void XGUI_Workshop::onOpen()
     } else if (anAnswer == QMessageBox::Cancel) {
       return;
     }
-    aSession->moduleDocument()->close();
+    aSession->closeAll();
     myCurrentDir = "";
   }
 
@@ -745,7 +759,8 @@ bool XGUI_Workshop::onSave()
   std::list<std::string> aFiles;
   saveDocument(myCurrentDir, aFiles);
   updateCommandStatus();
-  myMainWindow->setModifiedState(false);
+  if (!isSalomeMode())
+    myMainWindow->setModifiedState(false);
   return true;
 }
 
@@ -929,8 +944,7 @@ void XGUI_Workshop::updateCommandStatus()
   }
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->hasModuleDocument()) {
-    QAction* aUndoCmd;
-    QAction* aRedoCmd;
+    QAction *aUndoCmd, *aRedoCmd;
     foreach(QAction* aCmd, aCommands) {
       QString aId = aCmd->data().toString();
       if (aId == "UNDO_CMD")
@@ -941,8 +955,8 @@ void XGUI_Workshop::updateCommandStatus()
         // Enable all commands
         aCmd->setEnabled(true);
     }
-    aUndoCmd->setEnabled(aMgr->canUndo());
-    aRedoCmd->setEnabled(aMgr->canRedo());
+    aUndoCmd->setEnabled(aMgr->canUndo() && !aMgr->isOperation());
+    aRedoCmd->setEnabled(aMgr->canRedo() && !aMgr->isOperation());
   } else {
     foreach(QAction* aCmd, aCommands) {
       QString aId = aCmd->data().toString();
@@ -1313,6 +1327,6 @@ void XGUI_Workshop::closeDocument()
   objectBrowser()->clearContent();
 
   SessionPtr aMgr = ModelAPI_Session::get();
-  aMgr->moduleDocument()->close();
+  aMgr->closeAll();
   objectBrowser()->clearContent();
 }

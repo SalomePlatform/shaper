@@ -45,6 +45,7 @@ void SketchPlugin_Circle::execute()
       boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(RADIUS_ID()));
     if (aCenterAttr->isInitialized() && aRadiusAttr->isInitialized()) {
       boost::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
+      //std::cout<<"Execute circle "<<aCenter->x()<<" "<<aCenter->y()<<" "<<aCenter->z()<<std::endl;
       // make a visible point
       boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
       boost::shared_ptr<ModelAPI_ResultConstruction> aConstr1 = document()->createConstruction(
@@ -102,7 +103,8 @@ bool SketchPlugin_Circle::isFixed() {
 void SketchPlugin_Circle::attributeChanged() {
   static bool myIsUpdated = false; // to avoid infinitive cycle on attrubtes change
   boost::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
-  if (aSelection && !myIsUpdated) { // update arguments due to the selection value
+  // update arguments due to the selection value
+  if (aSelection && !aSelection->isNull() && aSelection->isEdge() && !myIsUpdated) {
     myIsUpdated = true;
     boost::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
     boost::shared_ptr<GeomAPI_Circ> aCirc = anEdge->circle();

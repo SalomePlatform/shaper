@@ -6,6 +6,8 @@
 #ifndef ModuleBase_ViewerFilters_H
 #define ModuleBase_ViewerFilters_H
 
+#include <QStringList>
+
 #include <SelectMgr_Filter.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <gp_Pln.hxx>
@@ -30,7 +32,7 @@ public:
 
   DEFINE_STANDARD_RTTI(ModuleBase_ShapeDocumentFilter)
 
-private:
+protected:
   ModuleBase_IWorkshop* myWorkshop;
 };
 
@@ -50,6 +52,25 @@ public:
   DEFINE_STANDARD_RTTI(ModuleBase_ShapeInPlaneFilter)
 private:
   gp_Pln myPlane;
+};
+
+
+/**
+* A filter which provides filtering of selection in 3d viewer.
+* Installing of this filter lets to select only object of requested type
+*/
+DEFINE_STANDARD_HANDLE(ModuleBase_ObjectTypesFilter, SelectMgr_Filter);
+class ModuleBase_ObjectTypesFilter: public ModuleBase_ShapeDocumentFilter
+{
+public:
+  Standard_EXPORT ModuleBase_ObjectTypesFilter(ModuleBase_IWorkshop* theWorkshop, const QStringList& theTypes): 
+      ModuleBase_ShapeDocumentFilter(theWorkshop), myTypes(theTypes) {}
+
+  Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
+
+  DEFINE_STANDARD_RTTI(ModuleBase_ObjectTypesFilter)
+private:
+  QStringList myTypes;
 };
 
 #endif

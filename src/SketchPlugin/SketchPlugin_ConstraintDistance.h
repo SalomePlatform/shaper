@@ -56,6 +56,9 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
   /// \param theDeltaY the delta for Y coordinate is moved
   SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
 
+  /// Returns the current distance between the feature attributes
+  double calculateCurrentDistance() const;
+
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintDistance();
 };

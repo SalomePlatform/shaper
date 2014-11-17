@@ -133,6 +133,14 @@ bool SketchSolver_ConstraintGroup::isInteract(
   if (isEmpty())
     return true;
 
+  // Check if the feature is already in the group
+  if (myEntityFeatMap.find(theFeature) != myEntityFeatMap.end())
+    return true;
+  boost::shared_ptr<SketchPlugin_Constraint> aConstr =
+      boost::dynamic_pointer_cast<SketchPlugin_Constraint>(theFeature);
+  if (aConstr && myConstraintMap.find(aConstr) != myConstraintMap.end())
+    return true;
+
   // Go through the attributes and verify if some of them already in the group
   std::list<boost::shared_ptr<ModelAPI_Attribute>> 
       anAttrList = theFeature->data()->attributes(std::string());
@@ -241,6 +249,10 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
       theConstraint->data()->attribute(SketchPlugin_Constraint::VALUE()));
   if (aDistAttr) {
     aDistance = aDistAttr->value();
+    // Issue #196: checking the positivity of the distance constraint
+    if (aDistance < tolerance &&
+       (aConstrType == SLVS_C_PT_PT_DISTANCE || aConstrType == SLVS_C_PT_LINE_DISTANCE))
+      return false;
     // SketchPlugin circle defined by its radius, but SolveSpace uses constraint for diameter
     if (aConstrType == SLVS_C_DIAMETER)
       aDistance *= 2.0;
@@ -963,9 +975,11 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
           isFound = (aGrEntIter->find(aConstrEnt[i]) != aGrEntIter->end());
           // Also we need to check sub-entities
           int aEntPos = Search(aConstrEnt[i], myEntities);
-          Slvs_hEntity* aSub = myEntities[aEntPos].point;
-          for (int j = 0; *aSub != 0 && j < 4 && !isFound; aSub++, j++)
-            isFound = (aGrEntIter->find(*aSub) != aGrEntIter->end());
+          if (aEntPos != myEntities.size()) { // MPV: to fix the crash on close
+            Slvs_hEntity* aSub = myEntities[aEntPos].point;
+            for (int j = 0; *aSub != 0 && j < 4 && !isFound; aSub++, j++)
+              isFound = (aGrEntIter->find(*aSub) != aGrEntIter->end());
+          }
         }
       if (isFound)
         anIndexes.push_back(aGrEntIter - aGroupsEntities.begin());
@@ -977,9 +991,11 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
         if (aConstrEnt[i] != 0) {
           aNewGrEnt.insert(aConstrEnt[i]);
           int aEntPos = Search(aConstrEnt[i], myEntities);
-          Slvs_hEntity* aSub = myEntities[aEntPos].point;
-          for (int j = 0; *aSub != 0 && j < 4; aSub++, j++)
-            aNewGrEnt.insert(*aSub);
+          if (aEntPos != myEntities.size()) { // MPV: to fix the crash on close
+            Slvs_hEntity* aSub = myEntities[aEntPos].point;
+            for (int j = 0; *aSub != 0 && j < 4; aSub++, j++)
+              aNewGrEnt.insert(*aSub);
+          }
         }
       std::set<Slvs_hConstraint> aNewGrConstr;
       aNewGrConstr.insert(aConstrIter->h);
@@ -994,9 +1010,11 @@ void SketchSolver_ConstraintGroup::splitGroup(std::vector<SketchSolver_Constrain
         if (aConstrEnt[i] != 0) {
           aGrEntIter->insert(aConstrEnt[i]);
           int aEntPos = Search(aConstrEnt[i], myEntities);
-          Slvs_hEntity* aSub = myEntities[aEntPos].point;
-          for (int j = 0; *aSub != 0 && j < 4; aSub++, j++)
-            aGrEntIter->insert(*aSub);
+          if (aEntPos != myEntities.size()) { // MPV: to fix the crash on close
+            Slvs_hEntity* aSub = myEntities[aEntPos].point;
+            for (int j = 0; *aSub != 0 && j < 4; aSub++, j++)
+              aGrEntIter->insert(*aSub);
+          }
         }
       aGroupsConstr[anIndexes.front()].insert(aConstrIter->h);
       if (aGrEntIter->size() > aGroupsEntities[aMaxNbEntities].size())

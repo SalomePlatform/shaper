@@ -27,9 +27,7 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
 
 QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
 {
-  QList<QWidget*> aLst;
-  aLst << myLabel;
-  return aLst;
+  return QList<QWidget*>();
 }
 
 QWidget* PartSet_WidgetSketchLabel::getControl() const
@@ -43,7 +41,7 @@ void PartSet_WidgetSketchLabel::setOperationsMgr(XGUI_OperationMgr* theMgr)
   if (aOperation->inherits("PartSet_OperationSketch")) {
     PartSet_OperationSketch* aSketchOpe = static_cast<PartSet_OperationSketch*>(aOperation);
     updateLabel(aSketchOpe);
-    connect(aSketchOpe, SIGNAL(planeSelected(double, double, double)), this,
+    connect(aSketchOpe, SIGNAL(updatePropPanel()), this,
             SLOT(onPlaneSelected()));
   }
 }

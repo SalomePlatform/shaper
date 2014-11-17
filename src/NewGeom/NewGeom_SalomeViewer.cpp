@@ -175,3 +175,30 @@ void NewGeom_SalomeViewer::setViewProjection(double theX, double theY, double th
     }
   }
 }
+
+//***************************************
+void NewGeom_SalomeViewer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    aContext->AddFilter(theFilter);
+  }
+}
+
+//***************************************
+void NewGeom_SalomeViewer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    aContext->RemoveFilter(theFilter);
+  }
+}
+
+//***************************************
+void NewGeom_SalomeViewer::clearSelectionFilters()
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    aContext->RemoveFilters();
+  }
+}

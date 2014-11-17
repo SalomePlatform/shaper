@@ -22,7 +22,6 @@ class Model_AttributeSelectionList : public ModelAPI_AttributeSelectionList
 {
   Handle(TDataStd_Integer) mySize;  ///< Contains size of this list
   Handle(TDataStd_Real) mySelectionType;  ///< Contains current index, TODO: make it integer, not real
-  std::vector<boost::shared_ptr<Model_AttributeSelection> > mySubs; /// the selection attributes
 public:
   /// Adds the new reference to the end of the list
   MODEL_EXPORT virtual void append(
@@ -41,13 +40,9 @@ public:
   /// Returns all attributes
   MODEL_EXPORT virtual void clear();
 
-  /// Sets the feature object
-  MODEL_EXPORT virtual void setObject(const boost::shared_ptr<ModelAPI_Object>& theObject);
-
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelectionList(TDF_Label& theLabel);
-    /// Performs the selection for the body result (TNaming Selection)
 
   friend class Model_Data;
 };

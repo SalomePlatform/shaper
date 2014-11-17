@@ -38,29 +38,8 @@ void SketchPlugin_ConstraintDistance::execute()
 
   if(anAttrValue->isInitialized())
     return;
-  boost::shared_ptr<GeomDataAPI_Point2D> aPointA =
-      getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_A());
-  boost::shared_ptr<GeomDataAPI_Point2D> aPointB =
-      getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_B());
 
-  double aDistance = -1.;
-  if (aPointA && aPointB) {  // both points
-    aDistance = aPointA->pnt()->distance(aPointB->pnt());
-  } else {
-    if (!aPointA && aPointB) {  //Line and point
-      boost::shared_ptr<SketchPlugin_Line> aLine =
-          getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-      if (aLine) {
-        aDistance = aLine->distanceToPoint(aPointB->pnt());
-      }
-    } else if (aPointA && !aPointB) {  // Point and line
-      boost::shared_ptr<SketchPlugin_Line> aLine =
-          getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
-      if (aLine) {
-        aDistance = aLine->distanceToPoint(aPointA->pnt());
-      }
-    }
-  }
+  double aDistance = calculateCurrentDistance();
   if(aDistance >= 0) {
     anAttrValue->setValue(aDistance);
   }
@@ -123,6 +102,11 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
   boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = boost::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
   double aValue = aValueAttr->value();
+  // Issue #196: checking the positivity of the distance constraint
+  // there is a validator for a distance constraint, that the value should be positive
+  // in case if an invalid value is set, the current distance value is shown
+  if (aValue <= 0)
+    aValue = calculateCurrentDistance();
 
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS)
@@ -147,6 +131,37 @@ void SketchPlugin_ConstraintDistance::move(double theDeltaX, double theDeltaY)
       aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   aPoint->move(theDeltaX, theDeltaY);
 }
+
+double SketchPlugin_ConstraintDistance::calculateCurrentDistance() const
+{
+  double aDistance = -1.;
+
+  boost::shared_ptr<ModelAPI_Data> aData = data();
+  boost::shared_ptr<GeomDataAPI_Point2D> aPointA =
+    getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_A());
+  boost::shared_ptr<GeomDataAPI_Point2D> aPointB =
+      getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_B());
+
+  if (aPointA && aPointB) {  // both points
+    aDistance = aPointA->pnt()->distance(aPointB->pnt());
+  } else {
+    if (!aPointA && aPointB) {  //Line and point
+      boost::shared_ptr<SketchPlugin_Line> aLine =
+          getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
+      if (aLine) {
+        aDistance = aLine->distanceToPoint(aPointB->pnt());
+      }
+    } else if (aPointA && !aPointB) {  // Point and line
+      boost::shared_ptr<SketchPlugin_Line> aLine =
+          getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+      if (aLine) {
+        aDistance = aLine->distanceToPoint(aPointA->pnt());
+      }
+    }
+  }
+  return aDistance;
+}
+
 
 //*************************************************************************************
 boost::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,

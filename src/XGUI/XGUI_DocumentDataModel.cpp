@@ -108,12 +108,14 @@ void XGUI_DocumentDataModel::processEvent(const boost::shared_ptr<Events_Message
       if (aDoc == aRootDoc) {  // If root objects
         if (aGroup == ModelAPI_ResultPart::group()) {  // Update only Parts group
           int aStart = myPartModels.size() - 1;
-          removeSubModel(aStart);
-          removeRow(aStart, partFolderNode());
-          if (myActivePart && (!isPartSubModel(myActivePart))) {
-            myActivePart = 0;
-            myActivePartIndex = QModelIndex();
-            myModel->setItemsColor(ACTIVE_COLOR);
+          if (aStart >= 0) {// MPV: this could be reproduced on close
+            removeSubModel(aStart);
+            removeRow(aStart, partFolderNode());
+            if (myActivePart && (!isPartSubModel(myActivePart))) {
+              myActivePart = 0;
+              myActivePartIndex = QModelIndex();
+              myModel->setItemsColor(ACTIVE_COLOR);
+            }
           }
         } else {  // Update top groups (other except parts
           QModelIndex aIndex = myModel->findGroup(aGroup);

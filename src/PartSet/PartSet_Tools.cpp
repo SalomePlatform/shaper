@@ -46,6 +46,7 @@
 #include <BRep_Tool.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
+#include <TopoDS_Vertex.hxx>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -152,12 +153,24 @@ ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView
                                         const QList<ModuleBase_ViewerPrs>& theSelected,
                                         const QList<ModuleBase_ViewerPrs>& theHighlighted)
 {
+  // firstly it finds the feature in the list of highlight
+  ObjectPtr aDeltaObject  = nearestFeature(thePoint, theView, theSketch, theHighlighted);
+  if (!aDeltaObject)
+    // secondly it finds the feature in the list of selected objects
+    aDeltaObject  = nearestFeature(thePoint, theView, theSketch, theSelected);
+
+  return aDeltaObject;
+}
+
+ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
+                                        FeaturePtr theSketch,
+                                        const QList<ModuleBase_ViewerPrs>& thePresentations)
+{
   ObjectPtr aDeltaObject;
-  // 1. find the object in the highlighted list
-  if (theHighlighted.size() > 0) {
-    aDeltaObject = theHighlighted.first().object();
-  }
-  // 2. find it in the selected list by the selected point
+
+  CompositeFeaturePtr aSketch = 
+      boost::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theSketch);
+  // 1. find it in the selected list by the selected point
   if (!aDeltaObject) {
     double aX, anY;
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(thePoint, theView);
@@ -166,13 +179,13 @@ ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView
     FeaturePtr aFeature;
     double aMinDelta = -1;
     ModuleBase_ViewerPrs aPrs;
-    foreach (ModuleBase_ViewerPrs aPrs, theSelected) {
+    foreach (ModuleBase_ViewerPrs aPrs, thePresentations) {
       if (!aPrs.object())
         continue;
       FeaturePtr aFeature = ModelAPI_Feature::feature(aPrs.object());
       boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
           SketchPlugin_Feature>(aFeature);
-      if (!aSketchFeature)
+      if (!aSketchFeature || !aSketch->isSub(aSketchFeature))
         continue;
 
       double aDelta = aSketchFeature->distanceToPoint(
@@ -183,10 +196,17 @@ ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView
       }
     }
   }
-  // 3. if the object is not found, returns the first selected one
-  if (!aDeltaObject && theSelected.size() > 0)
-    aDeltaObject = theSelected.first().object();
-
+  // 2. if the object is not found, returns the first selected sketch feature
+  if (!aDeltaObject && thePresentations.size() > 0) {
+    // there can be some highlighted objects, e.g. a result of boolean operation and a sketch point
+    foreach (ModuleBase_ViewerPrs aPrs, thePresentations) {
+      if (!aPrs.object())
+        continue;
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aPrs.object());
+      if (aFeature && aSketch->isSub(aFeature))
+        aDeltaObject = aPrs.object();
+    }
+  }
   return aDeltaObject;
 }
 
@@ -486,4 +506,24 @@ ResultPtr PartSet_Tools::findExternalEdge(CompositeFeaturePtr theSketch, boost::
     }
   }
   return ResultPtr();
+}
+
+bool PartSet_Tools::hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePtr theSketch,
+                                   Handle_V3d_View theView, double& theX, double& theY)
+{
+  bool aHasVertex = false;
+
+  const TopoDS_Shape& aShape = thePrs.shape();
+  if (!aShape.IsNull() && aShape.ShapeType() == TopAbs_VERTEX)
+  {
+    const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
+    if (!aVertex.IsNull())
+    {
+      gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
+      PartSet_Tools::convertTo2D(aPoint, theSketch, theView, theX, theY);
+      aHasVertex = true;
+    }
+  }
+
+  return aHasVertex;
 }

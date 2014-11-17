@@ -39,6 +39,12 @@ bool Model_Session::save(const char* theFileName, std::list<std::string>& theRes
   return ROOT_DOC->save(theFileName, theResults);
 }
 
+void Model_Session::closeAll()
+{
+  ROOT_DOC->close(true);
+  Model_Application::getApplication()->deleteAllDocuments();
+}
+
 void Model_Session::startOperation()
 {
   ROOT_DOC->startOperation();
@@ -95,6 +101,9 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
   if (this != myImpl) {
     return myImpl->createFeature(theFeatureID);
   }
+
+  // load all information about plugins, features and attributes
+  LoadPluginsInfo();
 
   if (myPlugins.find(theFeatureID) != myPlugins.end()) {
     std::pair<std::string, std::string>& aPlugin = myPlugins[theFeatureID]; // plugin and doc kind
@@ -212,9 +221,6 @@ Model_Session::Model_Session()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_VALIDATOR_LOADED));
-  
-  // load all information about plugins, features and attributes
-  LoadPluginsInfo();
 }
 
 void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMessage)

@@ -70,7 +70,7 @@ private:
 //******************************************************
 NewGeom_Module::NewGeom_Module()
     : LightApp_Module("NewGeom"),
-      mySelector(0), myIsOpened(0)
+      mySelector(0), myIsOpened(0), myPopupMgr(0)
 {
   myWorkshop = new XGUI_Workshop(this);
   myProxyViewer = new NewGeom_SalomeViewer(this);
@@ -131,8 +131,7 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
         mySelector = createSelector(OCCViewManagers.first());
       }
     }
-    QtxPopupMgr* aMgr = popupMgr();  // Create popup manager
-    action(myEraseAll)->setEnabled(false);
+    //action(myEraseAll)->setEnabled(false);
 
     if (myIsOpened) {
       myWorkshop->objectBrowser()->rebuildDataTree();
@@ -203,6 +202,14 @@ void NewGeom_Module::onViewManagerAdded(SUIT_ViewManager* theMgr)
 }
 
 //******************************************************
+QtxPopupMgr* NewGeom_Module::popupMgr()
+{
+  if (!myPopupMgr)
+    myPopupMgr = new QtxPopupMgr( 0, this );
+  return myPopupMgr;
+}
+
+//******************************************************
 void NewGeom_Module::onDefaultPreferences()
 {
   XGUI_Preferences::resetConfig();
@@ -262,11 +269,12 @@ QAction* NewGeom_Module::addFeature(const QString& theWBName, const QString& the
 }
 
 //******************************************************
-QAction* NewGeom_Module::addEditCommand(const QString& theId, const QString& theTitle,
-                                        const QString& theTip, const QIcon& theIcon,
-                                        const QKeySequence& theKeys, bool isCheckable)
+QAction* NewGeom_Module::addDesktopCommand(const QString& theId, const QString& theTitle,
+                                           const QString& theTip, const QIcon& theIcon,
+                                           const QKeySequence& theKeys, bool isCheckable,
+                                           const char* theMenuSourceText, const int theMenuPosition)
 {
-  int aMenu = createMenu(tr("MEN_DESK_EDIT"), -1, -1);
+  int aMenu = createMenu(tr(theMenuSourceText), -1, -1);
 
   int aId = myActionsList.size();
   myActionsList.append(theId);
@@ -277,15 +285,15 @@ QAction* NewGeom_Module::addEditCommand(const QString& theId, const QString& the
   QAction* aAction = createAction(aId, theTip, theIcon, theTitle, theTip, aKeys, aDesk,
                                   isCheckable);
   aAction->setData(theId);
-  createMenu(aId, aMenu, 10);
+  createMenu(aId, aMenu, theMenuPosition);
   return aAction;
 }
 
 //******************************************************
-void NewGeom_Module::addEditMenuSeparator()
+void NewGeom_Module::addDesktopMenuSeparator(const char* theMenuSourceText, const int theMenuPosition)
 {
-  int aMenu = createMenu(tr("MEN_DESK_EDIT"), -1, -1);
-  createMenu(separator(), aMenu, -1, 10);
+  int aMenu = createMenu(tr(theMenuSourceText), -1, -1);
+  createMenu(separator(), aMenu, -1, theMenuPosition);
 }
 
 //******************************************************

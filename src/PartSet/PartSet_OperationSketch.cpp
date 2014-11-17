@@ -128,6 +128,7 @@ void PartSet_OperationSketch::selectionChanged(ModuleBase_ISelection* theSelecti
         // Turn viewer to the plane
         emit planeSelected(aDir->x(), aDir->y(), aDir->z());
       }
+      emit updatePropPanel();
       emit launchSketch();
     }
   }

@@ -38,6 +38,8 @@ Model_Update::Model_Update()
   aLoop->registerListener(this, kCreatedEvent);
   static const Events_ID kUpdatedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
   aLoop->registerListener(this, kUpdatedEvent);
+  static const Events_ID kMovedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
+  aLoop->registerListener(this, kMovedEvent);
   static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
   aLoop->registerListener(this, kOpFinishEvent);
   static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
@@ -45,7 +47,7 @@ Model_Update::Model_Update()
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
   aLoop->registerListener(this, kOpStartEvent);
 
-  Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild automatically",
+  Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild immediately",
                                    Config_Prop::Bool, "false");
   isAutomatic = Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
 }
@@ -57,6 +59,7 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
   static const Events_ID kRebuildEvent = aLoop->eventByName("Rebuild");
   static const Events_ID kCreatedEvent = aLoop->eventByName(EVENT_OBJECT_CREATED);
   static const Events_ID kUpdatedEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
+  static const Events_ID kMovedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED);
   static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
   static const Events_ID kOpAbortEvent = aLoop->eventByName("AbortOperation");
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
@@ -69,7 +72,8 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
       isAutomaticChanged = true;
       isAutomatic = true;
     }
-  } else if (theMessage->eventID() == kCreatedEvent || theMessage->eventID() == kUpdatedEvent) {
+  } else if (theMessage->eventID() == kCreatedEvent || theMessage->eventID() == kUpdatedEvent ||
+    theMessage->eventID() == kMovedEvent) {
     boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
         boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     const std::set<ObjectPtr>& anObjs = aMsg->objects();
@@ -77,6 +81,8 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
     for(; anObjIter != anObjs.cend(); anObjIter++) {
       myJustCreatedOrUpdated.insert(*anObjIter);
     }
+    if (theMessage->eventID() == kMovedEvent)
+      return; // this event is for solver update, not here
   } else if (theMessage->eventID() == kOpStartEvent) {
     myJustCreatedOrUpdated.clear();
     return; // we don't need the update only on operation start (caused problems in PartSet_Listener::processEvent)
@@ -84,6 +90,23 @@ void Model_Update::processEvent(const boost::shared_ptr<Events_Message>& theMess
     if (isAutomatic == false) { // Apply button now works as "Rebuild"
       isAutomaticChanged = true;
       isAutomatic = true;
+    }
+    // the hardcode (DBC asked): hide the sketch referenced by extrusion on apply
+    if (theMessage->eventID() == kOpFinishEvent) {
+      std::set<boost::shared_ptr<ModelAPI_Object> >::iterator aFIter;
+      for(aFIter = myJustCreatedOrUpdated.begin(); aFIter != myJustCreatedOrUpdated.end(); aFIter++)
+      {
+        FeaturePtr aF = boost::dynamic_pointer_cast<ModelAPI_Feature>(*aFIter);
+        if (aF && aF->getKind() == "Extrusion") {
+          if (aF->selection("extrusion_face")) {
+            ResultPtr aSketchRes = aF->selection("extrusion_face")->context();
+            if (aSketchRes) {
+              static Events_ID HIDE_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TOHIDE);
+              ModelAPI_EventCreator::get()->sendUpdated(aSketchRes, HIDE_DISP);
+            }
+          }
+        }
+      }
     }
   }
 
@@ -173,12 +196,6 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
         if (updateFeature(aComposite->subFeature(a)))
           aMustbeUpdated = true;
       }
-      if (aMustbeUpdated) {
-        for(int a = 0; a < aSubsNum; a++) {
-          if (aComposite->subFeature(a) && aFactory->validate(aComposite->subFeature(a)))
-            aComposite->subFeature(a)->execute();
-        }
-      }
     }
     // check all references: if referenced objects are updated, this object also must be updated
     std::list<std::pair<std::string, std::list<ObjectPtr> > > aRefs;
@@ -195,6 +212,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
       }
     }
 
+    //std::cout<<"Update feature "<<theFeature->getKind()<<" must be updated = "<<aMustbeUpdated<<std::endl;
     // execute feature if it must be updated
     if (aMustbeUpdated) {
       if (boost::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
@@ -203,6 +221,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
           if (isAutomatic || (myJustCreatedOrUpdated.find(theFeature) != myJustCreatedOrUpdated.end()) ||
             !theFeature->isPersistentResult() /* execute quick, not persistent results */) 
           {
+            //std::cout<<"Execute feature "<<theFeature->getKind()<<std::endl;
             // before execution update the selection attributes if any
             list<AttributePtr> aRefs = 
               theFeature->data()->attributes(ModelAPI_AttributeSelection::type());
@@ -220,6 +239,26 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
                   aSel->value(a)->update();
               }
             }
+            // for sketch after update of plane (by update of selection attribute)
+            // but before execute, all sub-elements also must be updated (due to the plane changes)
+            if (aComposite) {
+              int aSubsNum = aComposite->numberOfSubs();
+              for(int a = 0; a < aSubsNum; a++) {
+                FeaturePtr aSub = aComposite->subFeature(a);
+                bool aWasModified = myUpdated[aSub];
+                myUpdated.erase(myUpdated.find(aSub)); // erase to update for sure (plane may be changed)
+                myInitial.insert(aSub);
+                updateFeature(aSub);
+                myUpdated[aSub] = aWasModified; // restore value
+              }
+              // re-execute after update: solver may update the previous values, so, shapes must be
+              // updated
+              for(int a = 0; a < aSubsNum; a++) {
+                if (aComposite->subFeature(a) && aFactory->validate(aComposite->subFeature(a)))
+                  aComposite->subFeature(a)->execute();
+              }
+            }
+
             // execute in try-catch to avoid internal problems of the feature
             try {
               theFeature->execute();

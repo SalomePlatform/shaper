@@ -448,7 +448,9 @@ DocumentPtr XGUI_PartDataModel::partDocument() const
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
   ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
-  return aPart->partDoc();
+  if (aPart)
+    return aPart->partDoc();
+  return DocumentPtr(); // null if not found
 }
 
 ObjectPtr XGUI_PartDataModel::object(const QModelIndex& theIndex) const

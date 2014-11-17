@@ -125,10 +125,12 @@ void XGUI_Selection::selectedShapes(NCollection_List<TopoDS_Shape>& theList,
     if (!aShape.IsNull()) {
       theList.Append(aShape);
       Handle(SelectMgr_EntityOwner) aEO = aContext->SelectedOwner();
-      Handle(AIS_InteractiveObject) anObj = 
-        Handle(AIS_InteractiveObject)::DownCast(aEO->Selectable());
-      ObjectPtr anObject = myWorkshop->displayer()->getObject(anObj);
-      theOwners.push_back(anObject);
+      if (!aEO.IsNull()) {
+        Handle(AIS_InteractiveObject) anObj = 
+          Handle(AIS_InteractiveObject)::DownCast(aEO->Selectable());
+        ObjectPtr anObject = myWorkshop->displayer()->getObject(anObj);
+        theOwners.push_back(anObject);
+      }
     }
   }
 }
