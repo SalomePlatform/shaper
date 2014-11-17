@@ -16,17 +16,17 @@
  */
 class Model_ResultGroup : public ModelAPI_ResultGroup
 {
-  boost::shared_ptr<ModelAPI_Data> myOwnerData;  ///< data of owner of this result
+  std::shared_ptr<ModelAPI_Data> myOwnerData;  ///< data of owner of this result
 public:
   /// Returns the compound of selected entities
-  MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape> shape() const;
+  MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape() const;
 
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultGroup() {}
 
 protected:
   /// Makes a body on the given feature data
-  Model_ResultGroup(boost::shared_ptr<ModelAPI_Data> theOwnerData);
+  Model_ResultGroup(std::shared_ptr<ModelAPI_Data> theOwnerData);
 
   friend class Model_Document;
 };

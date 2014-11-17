@@ -16,7 +16,7 @@ GeomAPI_Pnt::GeomAPI_Pnt(const double theX, const double theY, const double theZ
 {
 }
 
-GeomAPI_Pnt::GeomAPI_Pnt(const boost::shared_ptr<GeomAPI_XYZ>& theCoords)
+GeomAPI_Pnt::GeomAPI_Pnt(const std::shared_ptr<GeomAPI_XYZ>& theCoords)
     : GeomAPI_Interface(new gp_Pnt(theCoords->x(), theCoords->y(), theCoords->z()))
 {
 }
@@ -51,23 +51,23 @@ void GeomAPI_Pnt::setZ(const double theZ)
   return MY_PNT->SetZ(theZ);
 }
 
-const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_Pnt::xyz()
+const std::shared_ptr<GeomAPI_XYZ> GeomAPI_Pnt::xyz()
 {
-  return boost::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(MY_PNT->X(), MY_PNT->Y(), MY_PNT->Z()));
+  return std::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(MY_PNT->X(), MY_PNT->Y(), MY_PNT->Z()));
 }
 
-double GeomAPI_Pnt::distance(const boost::shared_ptr<GeomAPI_Pnt>& theOther) const
+double GeomAPI_Pnt::distance(const std::shared_ptr<GeomAPI_Pnt>& theOther) const
 {
   return MY_PNT->Distance(theOther->impl<gp_Pnt>());
 }
 
-boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Pnt::to2D(const boost::shared_ptr<GeomAPI_Pnt>& theOrigin,
-  const boost::shared_ptr<GeomAPI_Dir>& theDirX, const boost::shared_ptr<GeomAPI_Dir>& theDirY)
+std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Pnt::to2D(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+  const std::shared_ptr<GeomAPI_Dir>& theDirX, const std::shared_ptr<GeomAPI_Dir>& theDirY)
 {
   gp_Pnt anOriginPnt(theOrigin->x(), theOrigin->y(), theOrigin->z());
   gp_Vec aVec(anOriginPnt, impl<gp_Pnt>());
 
   double aX = aVec.X() * theDirX->x() + aVec.Y() * theDirX->y() + aVec.Z() * theDirX->z();
   double aY = aVec.X() * theDirY->x() + aVec.Y() * theDirY->y() + aVec.Z() * theDirY->z();
-  return boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, aY));
+  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, aY));
 }

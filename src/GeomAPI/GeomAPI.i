@@ -1,7 +1,6 @@
 /* GeomAPI.i */
 %module GeomAPI
 %{
-  #include "boost/shared_ptr.hpp"
   #include "GeomAPI.h"
   #include "GeomAPI_Interface.h"
   #include "GeomAPI_Pnt.h"
@@ -16,11 +15,9 @@
 // standard definitions
 %include "typemaps.i"
 %include "std_string.i"
-//%include <std_shared_ptr.i>
-%include <boost_shared_ptr.i>
+%include "std_shared_ptr.i"
 
-// boost pointers
-// %include <boost_shared_ptr.i>
+// shared pointers
 %shared_ptr(GeomAPI_Interface)
 %shared_ptr(GeomAPI_Pnt)
 %shared_ptr(GeomAPI_Dir)

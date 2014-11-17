@@ -51,7 +51,7 @@ class SketchPlugin_ConstraintBase : public SketchPlugin_Constraint, public GeomA
 
   /// Return the distance between the feature and the point
   /// \param thePoint the point
-  virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+  virtual double distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
  protected:
   /// \brief Use plugin manager for features creation

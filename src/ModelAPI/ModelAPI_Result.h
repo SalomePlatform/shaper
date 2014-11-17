@@ -33,6 +33,6 @@ class ModelAPI_Result : public ModelAPI_Object
 };
 
 //! Pointer on feature object
-typedef boost::shared_ptr<ModelAPI_Result> ResultPtr;
+typedef std::shared_ptr<ModelAPI_Result> ResultPtr;
 
 #endif

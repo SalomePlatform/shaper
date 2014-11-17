@@ -116,7 +116,7 @@ void PartSet_OperationFeatureEdit::fillFeature2Attribute(
         continue;
 
       // append the attribute of the vertex if it is found on the current feature
-      boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D = PartSet_Tools::getFeaturePoint(
+      std::shared_ptr<GeomDataAPI_Point2D> aPoint2D = PartSet_Tools::getFeaturePoint(
                                                                     aFeature, aX, anY);
       std::string anAttribute = aFeature->data()->id(aPoint2D);
       std::list<std::string> aList;
@@ -239,8 +239,8 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
     //    std::list<std::string> anAttributes = aFeatIter->second;
     //    // perform edit for the feature
     //    if (anAttributes.empty()) {
-    //      boost::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-    //                                     boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    //      std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+    //                                     std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
     //      if (aSketchFeature) {
     //        aSketchFeature->move(aDeltaX, aDeltaY);
     //      }
@@ -250,7 +250,7 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
     //      std::list<std::string>::const_iterator anAttrIter = anAttributes.begin(),
     //                                             anAttrEnd = anAttributes.end();
     //      for (; anAttrIter != anAttrEnd; anAttrIter++) {
-    //        boost::shared_ptr<GeomDataAPI_Point2D> aPointAttr = boost::dynamic_pointer_cast<
+    //        std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = std::dynamic_pointer_cast<
     //                         GeomDataAPI_Point2D>(aFeature->data()->attribute(*anAttrIter));
     //        if (aPointAttr) {
     //          aPointAttr->move(aDeltaX, aDeltaY);
@@ -262,7 +262,7 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
     //}
     //else { // multieditoperation
 
-    //boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
+    //std::shared_ptr<SketchPlugin_Feature> aSketchFeature = std::dynamic_pointer_cast<
     //    SketchPlugin_Feature>(feature());
 
     bool isMoved = false;
@@ -290,8 +290,8 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
       std::list<std::string> anAttributes = aFeatIter->second;
       // perform edit for the feature
       if (anAttributes.empty()) {
-        boost::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-                                       boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+        std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+                                       std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature) {
           aSketchFeature->move(aDeltaX, aDeltaY);
           isMoved = true;
@@ -302,7 +302,7 @@ void PartSet_OperationFeatureEdit::mouseMoved(QMouseEvent* theEvent, ModuleBase_
         std::list<std::string>::const_iterator anAttrIter = anAttributes.begin(),
                                                anAttrEnd = anAttributes.end();
         for (; anAttrIter != anAttrEnd; anAttrIter++) {
-          boost::shared_ptr<GeomDataAPI_Point2D> aPointAttr = boost::dynamic_pointer_cast<
+          std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = std::dynamic_pointer_cast<
                            GeomDataAPI_Point2D>(aFeature->data()->attribute(*anAttrIter));
           if (aPointAttr) {
             aPointAttr->move(aDeltaX, aDeltaY);

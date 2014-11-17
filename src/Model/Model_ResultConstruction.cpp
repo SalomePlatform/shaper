@@ -4,12 +4,12 @@
 
 #include <Model_ResultConstruction.h>
 
-void Model_ResultConstruction::setShape(boost::shared_ptr<GeomAPI_Shape> theShape)
+void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)
 {
   myShape = theShape;
 }
 
-boost::shared_ptr<GeomAPI_Shape>& Model_ResultConstruction::shape()
+std::shared_ptr<GeomAPI_Shape>& Model_ResultConstruction::shape()
 {
   return myShape;
 }

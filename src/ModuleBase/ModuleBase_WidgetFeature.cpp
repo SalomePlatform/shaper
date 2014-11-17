@@ -117,12 +117,12 @@ bool ModuleBase_WidgetFeature::setObject(const ObjectPtr& theObject, bool theSen
 
 bool ModuleBase_WidgetFeature::storeValue() const
 {
-  //FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+  //FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
   if (!myObject)
     return false;
 
-  boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
+  std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
   ModuleBase_WidgetFeature* that = (ModuleBase_WidgetFeature*) this;
@@ -134,8 +134,8 @@ bool ModuleBase_WidgetFeature::storeValue() const
 
 bool ModuleBase_WidgetFeature::restoreValue()
 {
-  boost::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
+  std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(aData->attribute(attributeID()));
 
   ObjectPtr anObjPtr = aRef->object();

@@ -19,7 +19,7 @@ GeomAPI_Curve::GeomAPI_Curve()
 {
 }
 
-GeomAPI_Curve::GeomAPI_Curve(const boost::shared_ptr<GeomAPI_Shape>& theShape)
+GeomAPI_Curve::GeomAPI_Curve(const std::shared_ptr<GeomAPI_Shape>& theShape)
   : GeomAPI_Interface(new Handle_Geom_Curve()) // initially it is null
 {
   const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();

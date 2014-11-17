@@ -56,7 +56,7 @@ Q_OBJECT
 
   /// Returns the feature preview shape
   /// \param theFeature the feature object to obtain the preview
-  static boost::shared_ptr<GeomAPI_Shape> preview(FeaturePtr theFeature);
+  static std::shared_ptr<GeomAPI_Shape> preview(FeaturePtr theFeature);
 
   /// Returns the list of the nested features
   /// \return the list of subfeatures

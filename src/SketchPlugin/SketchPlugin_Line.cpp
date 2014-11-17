@@ -36,20 +36,20 @@ void SketchPlugin_Line::execute()
   SketchPlugin_Sketch* aSketch = sketch();
   if (aSketch) {
     // compute a start point in 3D view
-    boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = boost::dynamic_pointer_cast<
+    std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(data()->attribute(START_ID()));
     // compute an end point in 3D view
-    boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = boost::dynamic_pointer_cast<
+    std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = std::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(data()->attribute(END_ID()));
     if (aStartAttr->isInitialized() && anEndAttr->isInitialized()) {
-      boost::shared_ptr<GeomAPI_Pnt> aStart(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
-      boost::shared_ptr<GeomAPI_Pnt> anEnd(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
+      std::shared_ptr<GeomAPI_Pnt> aStart(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
+      std::shared_ptr<GeomAPI_Pnt> anEnd(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
       //std::cout<<"Execute line "<<aStart->x()<<" "<<aStart->y()<<" "<<aStart->z()<<" - "
       //  <<anEnd->x()<<" "<<anEnd->y()<<" "<<anEnd->z()<<std::endl;
       // make linear edge
-      boost::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
+      std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
       // store the result
-      boost::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(
+      std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(
           data());
       aConstr->setShape(anEdge);
       aConstr->setIsInHistory(false);
@@ -60,33 +60,33 @@ void SketchPlugin_Line::execute()
 
 void SketchPlugin_Line::move(double theDeltaX, double theDeltaY)
 {
-  boost::shared_ptr<ModelAPI_Data> aData = data();
+  std::shared_ptr<ModelAPI_Data> aData = data();
   if (!aData->isValid())
     return;
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>
     (aData->attribute(START_ID()));
   aPoint1->move(theDeltaX, theDeltaY);
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>
     (aData->attribute(END_ID()));
   aPoint2->move(theDeltaX, theDeltaY);
 }
 
-double SketchPlugin_Line::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+double SketchPlugin_Line::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   double aDelta = 0;
 
-  boost::shared_ptr<ModelAPI_Data> aData = data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(START_ID()));
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(END_ID()));
+  std::shared_ptr<ModelAPI_Data> aData = data();
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = 
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(START_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = 
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(END_ID()));
 
   GeomAPI_Lin2d aLin2d(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y());
 
   if (false/*projection*/) {  // TODO: if it has not been necessary, remove this block
-    boost::shared_ptr<GeomAPI_Pnt2d> aResult = aLin2d.project(thePoint);
+    std::shared_ptr<GeomAPI_Pnt2d> aResult = aLin2d.project(thePoint);
     aDelta = aResult->distance(thePoint);
   } else {  // distance
     aDelta = aLin2d.distance(thePoint);
@@ -101,16 +101,16 @@ bool SketchPlugin_Line::isFixed() {
 
 void SketchPlugin_Line::attributeChanged() {
   static bool myIsUpdated = false; // to avoid infinitive cycle on attrubtes change
-  boost::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
+  std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
    // update arguments due to the selection value
   if (aSelection && !aSelection->isNull() && aSelection->isEdge() && !myIsUpdated) {
     myIsUpdated = true;
-    boost::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
-    boost::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_ID()));
+    std::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
+    std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = 
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(START_ID()));
     aStartAttr->setValue(sketch()->to2D(anEdge->firstPoint()));
-    boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(END_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(END_ID()));
     anEndAttr->setValue(sketch()->to2D(anEdge->lastPoint()));
     myIsUpdated = false;
   }

@@ -97,7 +97,7 @@ Q_OBJECT
 
   void rebuildDataTree();
 
-  void processEvent(const boost::shared_ptr<Events_Message>& theMessage);
+  void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   // Resets the object browser into initial state
   void clearContent();

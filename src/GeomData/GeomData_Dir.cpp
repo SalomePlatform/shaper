@@ -21,7 +21,7 @@ void GeomData_Dir::setValue(const double theX, const double theY, const double t
   }
 }
 
-void GeomData_Dir::setValue(const boost::shared_ptr<GeomAPI_Dir>& theDir)
+void GeomData_Dir::setValue(const std::shared_ptr<GeomAPI_Dir>& theDir)
 {
   setValue(theDir->x(), theDir->y(), theDir->z());
 }
@@ -41,9 +41,9 @@ double GeomData_Dir::z() const
   return myCoords->Value(2);
 }
 
-boost::shared_ptr<GeomAPI_Dir> GeomData_Dir::dir()
+std::shared_ptr<GeomAPI_Dir> GeomData_Dir::dir()
 {
-  return boost::shared_ptr<GeomAPI_Dir>(
+  return std::shared_ptr<GeomAPI_Dir>(
       new GeomAPI_Dir(myCoords->Value(0), myCoords->Value(1), myCoords->Value(2)));
 }
 

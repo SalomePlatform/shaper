@@ -47,16 +47,16 @@ Q_OBJECT
    /// Returns the feature attribute if it can be found by the given value
    /// \param theValue the widget value
    /// \return an attribute or null
-   boost::shared_ptr<ModelAPI_Attribute> findAttribute(ModuleBase_WidgetValue* theValue);
+   std::shared_ptr<ModelAPI_Attribute> findAttribute(ModuleBase_WidgetValue* theValue);
 
   /// Set the attribute
   /// \param theAttribute value
   /// \return the boolean result of the attribute set
-  bool setAttribute(const boost::shared_ptr<ModelAPI_Attribute>& theAttribute, bool theSendEvent =
+  bool setAttribute(const std::shared_ptr<ModelAPI_Attribute>& theAttribute, bool theSendEvent =
                         true);
 
  protected:
-  boost::shared_ptr<ModelAPI_Attribute> myAttribute;  /// < the attribute
+  std::shared_ptr<ModelAPI_Attribute> myAttribute;  /// < the attribute
 };
 
 #endif

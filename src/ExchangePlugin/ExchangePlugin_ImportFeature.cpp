@@ -68,7 +68,7 @@ void ExchangePlugin_ImportFeature::initAttributes()
  */
 void ExchangePlugin_ImportFeature::execute()
 {
-  AttributeStringPtr aFilePathAttr = boost::dynamic_pointer_cast<ModelAPI_AttributeString>(
+  AttributeStringPtr aFilePathAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(
       data()->attribute(ExchangePlugin_ImportFeature::FILE_PATH_ID()));
   std::string aFilePath = aFilePathAttr->value();
   if(aFilePath.empty())
@@ -112,8 +112,8 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
    // Pass the results into the model
    std::string anObjectName = aPath.Name().ToCString();
    data()->setName(anObjectName);
-   boost::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
-   boost::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
+   std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
    aGeomShape->setImpl(new TopoDS_Shape(aShape));
 
    //LoadNamingDS of the imported shape
@@ -126,8 +126,8 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
 
 //============================================================================
 void ExchangePlugin_ImportFeature::loadNamingDS(
-	                            boost::shared_ptr<GeomAPI_Shape> theGeomShape, 
-					     boost::shared_ptr<ModelAPI_ResultBody> theResultBody)
+	                            std::shared_ptr<GeomAPI_Shape> theGeomShape, 
+					     std::shared_ptr<ModelAPI_ResultBody> theResultBody)
 {  
   //load result
   theResultBody->store(theGeomShape);

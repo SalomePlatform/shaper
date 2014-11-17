@@ -42,7 +42,7 @@ class SketchSolver_ConstraintManager : public Events_Listener
   /** \brief Implementation of Event Listener method
    *  \param[in] theMessage the data of the event
    */
-  virtual void processEvent(const boost::shared_ptr<Events_Message>& theMessage);
+  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
  protected:
   SketchSolver_ConstraintManager();
@@ -52,32 +52,32 @@ class SketchSolver_ConstraintManager : public Events_Listener
    *  \param[in] theFeature sketch feature to be changed
    *  \return \c true if the feature changed successfully
    */
-  bool changeConstraintOrEntity(boost::shared_ptr<SketchPlugin_Feature> theFeature);
+  bool changeConstraintOrEntity(std::shared_ptr<SketchPlugin_Feature> theFeature);
 
   /** \brief Removes a constraint from the manager
    *  \param[in] theConstraint constraint to be removed
    *  \return \c true if the constraint removed successfully
    */
-  bool removeConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
+  bool removeConstraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
   /** \brief Adds or updates a workplane in the manager
    *  \param[in] theSketch the feature to create or update workplane
    *  \return \c true if the workplane changed successfully
    *  \remark Type of theSketch is not verified inside
    */
-  bool changeWorkplane(boost::shared_ptr<ModelAPI_CompositeFeature> theSketch);
+  bool changeWorkplane(std::shared_ptr<ModelAPI_CompositeFeature> theSketch);
 
   /** \brief Removes a workplane from the manager.
    *         All groups based on such workplane will be removed too.
    *  \param[in] theSketch the feature to be removed
    *  \return \c true if the workplane removed successfully
    */
-  bool removeWorkplane(boost::shared_ptr<SketchPlugin_Sketch> theSketch);
+  bool removeWorkplane(std::shared_ptr<SketchPlugin_Sketch> theSketch);
 
   /** \brief Updates entity which is neither workplane nor constraint
    *  \param[in] theFeature entity to be updated
    */
-  void updateEntity(boost::shared_ptr<SketchPlugin_Feature> theFeature);
+  void updateEntity(std::shared_ptr<SketchPlugin_Feature> theFeature);
 
   /** \brief Goes through the list of groups and solve the constraints
    */
@@ -88,15 +88,15 @@ class SketchSolver_ConstraintManager : public Events_Listener
    *  \param[in]  theFeature  object to be found
    *  \param[out] theGroups   list of group indexes interacted with the feature
    */
-  void findGroups(boost::shared_ptr<SketchPlugin_Feature> theFeature,
+  void findGroups(std::shared_ptr<SketchPlugin_Feature> theFeature,
                   std::set<Slvs_hGroup>& theGroupIDs) const;
 
   /** \brief Searches in the list of groups the workplane which constains specified feature
    *  \param[in] theFeature object to be found
    *  \return workplane containing the feature
    */
-  boost::shared_ptr<ModelAPI_CompositeFeature> findWorkplane(
-      boost::shared_ptr<SketchPlugin_Feature> theFeature) const;
+  std::shared_ptr<ModelAPI_CompositeFeature> findWorkplane(
+      std::shared_ptr<SketchPlugin_Feature> theFeature) const;
 
  private:
   static SketchSolver_ConstraintManager* _self;  ///< Self pointer to implement singleton functionality

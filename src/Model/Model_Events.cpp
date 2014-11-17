@@ -12,15 +12,15 @@ Model_EventCreator MY_CREATOR;
 void Model_EventCreator::sendUpdated(const ObjectPtr& theObject, const Events_ID& theEvent,
                                      const bool isGroupped) const
 {
-  boost::shared_ptr<Model_ObjectUpdatedMessage> aMsg(
+  std::shared_ptr<Model_ObjectUpdatedMessage> aMsg(
     new Model_ObjectUpdatedMessage(theObject, theEvent));
   Events_Loop::loop()->send(aMsg, isGroupped);
 }
 
-void Model_EventCreator::sendDeleted(const boost::shared_ptr<ModelAPI_Document>& theDoc,
+void Model_EventCreator::sendDeleted(const std::shared_ptr<ModelAPI_Document>& theDoc,
                                      const std::string& theGroup) const
 {
-  boost::shared_ptr<Model_ObjectDeletedMessage> aMsg(
+  std::shared_ptr<Model_ObjectDeletedMessage> aMsg(
     new Model_ObjectDeletedMessage(theDoc, theGroup));
   Events_Loop::loop()->send(aMsg, true);
 }
@@ -45,17 +45,17 @@ const std::set<ObjectPtr>& Model_ObjectUpdatedMessage::objects() const
   return myObjects;
 }
 
-boost::shared_ptr<Events_MessageGroup> Model_ObjectUpdatedMessage::newEmpty()
+std::shared_ptr<Events_MessageGroup> Model_ObjectUpdatedMessage::newEmpty()
 {
   ObjectPtr anEmptyObject;
-  return boost::shared_ptr<Model_ObjectUpdatedMessage>(
+  return std::shared_ptr<Model_ObjectUpdatedMessage>(
     new Model_ObjectUpdatedMessage(anEmptyObject, eventID()));
 }
 
-void Model_ObjectUpdatedMessage::Join(const boost::shared_ptr<Events_MessageGroup>& theJoined)
+void Model_ObjectUpdatedMessage::Join(const std::shared_ptr<Events_MessageGroup>& theJoined)
 {
-  boost::shared_ptr<Model_ObjectUpdatedMessage> aJoined = 
-    boost::dynamic_pointer_cast<Model_ObjectUpdatedMessage>(theJoined);
+  std::shared_ptr<Model_ObjectUpdatedMessage> aJoined = 
+    std::dynamic_pointer_cast<Model_ObjectUpdatedMessage>(theJoined);
   std::set<ObjectPtr>::iterator aFIter = aJoined->myObjects.begin();
   for (; aFIter != aJoined->myObjects.end(); aFIter++) {
     myObjects.insert(*aFIter);
@@ -64,7 +64,7 @@ void Model_ObjectUpdatedMessage::Join(const boost::shared_ptr<Events_MessageGrou
 
 /////////////////////// DELETED MESSAGE /////////////////////////////
 Model_ObjectDeletedMessage::Model_ObjectDeletedMessage(
-    const boost::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theGroup)
+    const std::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theGroup)
     : ModelAPI_ObjectDeletedMessage(messageId(), 0),
       myDoc(theDoc)
 {
@@ -72,9 +72,9 @@ Model_ObjectDeletedMessage::Model_ObjectDeletedMessage(
     myGroups.insert(theGroup);
 }
 
-boost::shared_ptr<Events_MessageGroup> Model_ObjectDeletedMessage::newEmpty()
+std::shared_ptr<Events_MessageGroup> Model_ObjectDeletedMessage::newEmpty()
 {
-  return boost::shared_ptr<Model_ObjectDeletedMessage>(new Model_ObjectDeletedMessage(myDoc, ""));
+  return std::shared_ptr<Model_ObjectDeletedMessage>(new Model_ObjectDeletedMessage(myDoc, ""));
 }
 
 const Events_ID Model_ObjectDeletedMessage::messageId()
@@ -83,10 +83,10 @@ const Events_ID Model_ObjectDeletedMessage::messageId()
   return MY_ID;
 }
 
-void Model_ObjectDeletedMessage::Join(const boost::shared_ptr<Events_MessageGroup>& theJoined)
+void Model_ObjectDeletedMessage::Join(const std::shared_ptr<Events_MessageGroup>& theJoined)
 {
-  boost::shared_ptr<Model_ObjectDeletedMessage> aJoined = 
-    boost::dynamic_pointer_cast<Model_ObjectDeletedMessage>(theJoined);
+  std::shared_ptr<Model_ObjectDeletedMessage> aJoined = 
+    std::dynamic_pointer_cast<Model_ObjectDeletedMessage>(theJoined);
   std::set<std::string>::iterator aGIter = aJoined->myGroups.begin();
   for (; aGIter != aJoined->myGroups.end(); aGIter++) {
     myGroups.insert(*aGIter);

@@ -123,8 +123,8 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     bool hasFeature = false;
     foreach(ObjectPtr aObj, aObjects)
     {
-      FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-      ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
       if (aResult)
         hasResult = true;
       if (aFeature)
@@ -136,7 +136,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     if (aSelected == 1) {
       ObjectPtr aObject = aObjects.first();
       if (aObject) {
-        ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
         if (aPart) {
           if (aMgr->activeDocument() == aPart->partDoc())
             aMenu->addAction(action("DEACTIVATE_PART_CMD"));
@@ -205,7 +205,7 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
     bool isShading = false;
     foreach(ObjectPtr aObject, aObjects)
     {
-      ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
       if (aRes && myWorkshop->displayer()->isVisible(aRes)) {
         isVisible = true;
         isShading = (myWorkshop->displayer()->displayMode(aObject) == XGUI_Displayer::Shading);      

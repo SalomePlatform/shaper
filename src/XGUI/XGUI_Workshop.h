@@ -105,7 +105,7 @@ Q_OBJECT
   XGUI_Workbench* addWorkbench(const QString& theName);
 
   //! Redefinition of Events_Listener method
-  virtual void processEvent(const boost::shared_ptr<Events_Message>& theMessage);
+  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   //! Returns an object which provides interface to Salome Module (LightApp_Module)
   XGUI_SalomeConnector* salomeConnector() const
@@ -219,13 +219,13 @@ signals:
  protected:
   bool event(QEvent * theEvent);
   //Event-loop processing methods:
-  void addFeature(const boost::shared_ptr<Config_FeatureMessage>&);
+  void addFeature(const std::shared_ptr<Config_FeatureMessage>&);
   void connectWithOperation(ModuleBase_Operation* theOperation);
 
-  void onFeatureUpdatedMsg(const boost::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
-  void onFeatureCreatedMsg(const boost::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
-  void onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
-  void onObjectDeletedMsg(const boost::shared_ptr<ModelAPI_ObjectDeletedMessage>& theMsg);
+  void onFeatureUpdatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
+  void onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
+  void onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
+  void onObjectDeletedMsg(const std::shared_ptr<ModelAPI_ObjectDeletedMessage>& theMsg);
 
   void validateOperation(const QString& theOperationId);
 

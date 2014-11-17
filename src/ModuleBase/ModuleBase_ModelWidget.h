@@ -11,7 +11,7 @@
 
 #include <QObject>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class Config_WidgetAPI;
 class ModuleBase_WidgetValue;

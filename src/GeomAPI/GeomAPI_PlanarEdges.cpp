@@ -25,7 +25,7 @@ GeomAPI_PlanarEdges::GeomAPI_PlanarEdges() : GeomAPI_Shape()
   this->setImpl(new TopoDS_Shape(aBigWireImpl));
 }
 
-void GeomAPI_PlanarEdges::addEdge(boost::shared_ptr<GeomAPI_Shape> theEdge)
+void GeomAPI_PlanarEdges::addEdge(std::shared_ptr<GeomAPI_Shape> theEdge)
 {
   const TopoDS_Edge& anEdge = theEdge->impl<TopoDS_Edge>();
   if (anEdge.ShapeType() != TopAbs_EDGE)
@@ -35,14 +35,14 @@ void GeomAPI_PlanarEdges::addEdge(boost::shared_ptr<GeomAPI_Shape> theEdge)
   aBuilder.Add(aWire, anEdge);
 }
 
-std::list<boost::shared_ptr<GeomAPI_Shape> > GeomAPI_PlanarEdges::getEdges()
+std::list<std::shared_ptr<GeomAPI_Shape> > GeomAPI_PlanarEdges::getEdges()
 {
   TopoDS_Shape& aShape = const_cast<TopoDS_Shape&>(impl<TopoDS_Shape>());
   //BRepTools_WireExplorer aWireExp(TopoDS::Wire(aShape));
   TopExp_Explorer aWireExp(aShape, TopAbs_EDGE);
-  std::list<boost::shared_ptr<GeomAPI_Shape> > aResult;
+  std::list<std::shared_ptr<GeomAPI_Shape> > aResult;
   for (; aWireExp.More(); aWireExp.Next()) {
-    boost::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
+    std::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
     anEdge->setImpl(new TopoDS_Shape(aWireExp.Current()));
     aResult.push_back(anEdge);
   }

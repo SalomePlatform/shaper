@@ -24,7 +24,7 @@
 #include <QString>
 #include <QLabel>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 #include <string>
 
 ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,

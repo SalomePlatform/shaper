@@ -74,7 +74,7 @@ class SketchPlugin_Circle : public SketchPlugin_Feature  //, public GeomAPI_IPre
 
   /// Return the distance between the feature and the point
   /// \param thePoint the point
-  virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+  virtual double distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
   /// Called on change of any argument-attribute of this object
   SKETCHPLUGIN_EXPORT virtual void attributeChanged();

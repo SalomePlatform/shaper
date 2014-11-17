@@ -9,7 +9,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_FeatureValidator.h>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <set>
 #include <map>
 
@@ -20,7 +20,7 @@ class Model_FeatureValidator : public ModelAPI_FeatureValidator
  public:
   /// Returns true if feature and/or attributes are valid
   /// \param theFeature the validated feature
-  MODEL_EXPORT virtual bool isValid(const boost::shared_ptr<ModelAPI_Feature>& theFeature,
+  MODEL_EXPORT virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
     const std::list<std::string>& theArguments) const;
 
   // sets not obligatory attributes, not checked for initialization

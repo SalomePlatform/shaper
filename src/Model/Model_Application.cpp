@@ -19,14 +19,14 @@ Handle(Model_Application) Model_Application::getApplication()
 }
 
 //=======================================================================
-const boost::shared_ptr<Model_Document>& Model_Application::getDocument(string theDocID)
+const std::shared_ptr<Model_Document>& Model_Application::getDocument(string theDocID)
 {
   if (myDocs.find(theDocID) != myDocs.end())
     return myDocs[theDocID];
 
   static const std::string thePartSetKind("PartSet");
   static const std::string thePartKind("Part");
-  boost::shared_ptr<Model_Document> aNew(
+  std::shared_ptr<Model_Document> aNew(
     new Model_Document(theDocID, theDocID == "root" ? thePartSetKind : thePartKind));
   myDocs[theDocID] = aNew;
   // load it if it must be loaded by demand

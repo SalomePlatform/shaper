@@ -58,7 +58,7 @@ void XGUI_DataTree::mouseDoubleClickEvent(QMouseEvent* theEvent)
     QModelIndex aIndex = currentIndex();
     XGUI_DocumentDataModel* aModel = dataModel();
     ObjectPtr aObject = aModel->object(aIndex);
-    ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
     if (aPart) {
       aPart->activate();
     }
@@ -352,7 +352,7 @@ void XGUI_ObjectsBrowser::setObjectsSelected(const QList<ObjectPtr>& theObjects)
 }
 
 //***************************************************
-void XGUI_ObjectsBrowser::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
+void XGUI_ObjectsBrowser::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 { 
   myDocModel->processEvent(theMessage); 
 }

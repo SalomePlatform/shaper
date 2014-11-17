@@ -93,22 +93,22 @@ void Model_Data::addAttribute(const std::string& theID, const std::string theAtt
     anAttr = new GeomData_Point2D(anAttrLab);
   }
   if (anAttr) {
-    myAttrs[theID] = boost::shared_ptr<ModelAPI_Attribute>(anAttr);
+    myAttrs[theID] = std::shared_ptr<ModelAPI_Attribute>(anAttr);
     anAttr->setObject(myObject);
   } else {
     Events_Error::send("Can not create unknown type of attribute " + theAttrType);
   }
 }
 
-boost::shared_ptr<ModelAPI_AttributeDocRef> Model_Data::document(const std::string& theID)
+std::shared_ptr<ModelAPI_AttributeDocRef> Model_Data::document(const std::string& theID)
 {
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
     myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
     // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return boost::shared_ptr<ModelAPI_AttributeDocRef>();
+    return std::shared_ptr<ModelAPI_AttributeDocRef>();
   }
-  boost::shared_ptr<ModelAPI_AttributeDocRef> aRes = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeDocRef> aRes = std::dynamic_pointer_cast<
       ModelAPI_AttributeDocRef>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
@@ -116,15 +116,15 @@ boost::shared_ptr<ModelAPI_AttributeDocRef> Model_Data::document(const std::stri
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeDouble> Model_Data::real(const std::string& theID)
+std::shared_ptr<ModelAPI_AttributeDouble> Model_Data::real(const std::string& theID)
 {
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
     myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
     // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return boost::shared_ptr<ModelAPI_AttributeDouble>();
+    return std::shared_ptr<ModelAPI_AttributeDouble>();
   }
-  boost::shared_ptr<ModelAPI_AttributeDouble> aRes = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeDouble> aRes = std::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
@@ -132,15 +132,15 @@ boost::shared_ptr<ModelAPI_AttributeDouble> Model_Data::real(const std::string& 
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeInteger> Model_Data::integer(const std::string& theID)
+std::shared_ptr<ModelAPI_AttributeInteger> Model_Data::integer(const std::string& theID)
 {
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
     myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
     // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return boost::shared_ptr<ModelAPI_AttributeInteger>();
+    return std::shared_ptr<ModelAPI_AttributeInteger>();
   }
-  boost::shared_ptr<ModelAPI_AttributeInteger> aRes = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeInteger> aRes = std::dynamic_pointer_cast<
       ModelAPI_AttributeInteger>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
@@ -148,15 +148,15 @@ boost::shared_ptr<ModelAPI_AttributeInteger> Model_Data::integer(const std::stri
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeBoolean> Model_Data::boolean(const std::string& theID)
+std::shared_ptr<ModelAPI_AttributeBoolean> Model_Data::boolean(const std::string& theID)
 {
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
     myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
     // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return boost::shared_ptr<ModelAPI_AttributeBoolean>();
+    return std::shared_ptr<ModelAPI_AttributeBoolean>();
   }
-  boost::shared_ptr<ModelAPI_AttributeBoolean> aRes = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeBoolean> aRes = std::dynamic_pointer_cast<
       ModelAPI_AttributeBoolean>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
@@ -164,16 +164,16 @@ boost::shared_ptr<ModelAPI_AttributeBoolean> Model_Data::boolean(const std::stri
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeString> Model_Data::string(const std::string& theID)
+std::shared_ptr<ModelAPI_AttributeString> Model_Data::string(const std::string& theID)
 {
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
     myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
     // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return boost::shared_ptr<ModelAPI_AttributeString>();
+    return std::shared_ptr<ModelAPI_AttributeString>();
   }
-  boost::shared_ptr<ModelAPI_AttributeString> aRes =
-      boost::dynamic_pointer_cast<ModelAPI_AttributeString>(aFound->second);
+  std::shared_ptr<ModelAPI_AttributeString> aRes =
+      std::dynamic_pointer_cast<ModelAPI_AttributeString>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
   }
@@ -181,15 +181,15 @@ boost::shared_ptr<ModelAPI_AttributeString> Model_Data::string(const std::string
 
 }
 
-boost::shared_ptr<ModelAPI_AttributeReference> Model_Data::reference(const std::string& theID)
+std::shared_ptr<ModelAPI_AttributeReference> Model_Data::reference(const std::string& theID)
 {
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
     myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
     // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return boost::shared_ptr<ModelAPI_AttributeReference>();
+    return std::shared_ptr<ModelAPI_AttributeReference>();
   }
-  boost::shared_ptr<ModelAPI_AttributeReference> aRes = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeReference> aRes = std::dynamic_pointer_cast<
       ModelAPI_AttributeReference>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
@@ -197,48 +197,48 @@ boost::shared_ptr<ModelAPI_AttributeReference> Model_Data::reference(const std::
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeSelection> Model_Data::selection(const std::string& theID)
+std::shared_ptr<ModelAPI_AttributeSelection> Model_Data::selection(const std::string& theID)
 {
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
     myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
     // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return boost::shared_ptr<ModelAPI_AttributeSelection>();
+    return std::shared_ptr<ModelAPI_AttributeSelection>();
   }
-  boost::shared_ptr<ModelAPI_AttributeSelection> aRes = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aFound->second);
+  std::shared_ptr<ModelAPI_AttributeSelection> aRes = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
   }
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeSelectionList> 
+std::shared_ptr<ModelAPI_AttributeSelectionList> 
   Model_Data::selectionList(const std::string& theID)
 {
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
     myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
     // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return boost::shared_ptr<ModelAPI_AttributeSelectionList>();
+    return std::shared_ptr<ModelAPI_AttributeSelectionList>();
   }
-  boost::shared_ptr<ModelAPI_AttributeSelectionList> aRes = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aFound->second);
+  std::shared_ptr<ModelAPI_AttributeSelectionList> aRes = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
   }
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeRefAttr> Model_Data::refattr(const std::string& theID)
+std::shared_ptr<ModelAPI_AttributeRefAttr> Model_Data::refattr(const std::string& theID)
 {
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
     myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
     // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return boost::shared_ptr<ModelAPI_AttributeRefAttr>();
+    return std::shared_ptr<ModelAPI_AttributeRefAttr>();
   }
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRes = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeRefAttr> aRes = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
@@ -246,15 +246,15 @@ boost::shared_ptr<ModelAPI_AttributeRefAttr> Model_Data::refattr(const std::stri
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_AttributeRefList> Model_Data::reflist(const std::string& theID)
+std::shared_ptr<ModelAPI_AttributeRefList> Model_Data::reflist(const std::string& theID)
 {
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
     myAttrs.find(theID);
   if (aFound == myAttrs.end()) {
     // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return boost::shared_ptr<ModelAPI_AttributeRefList>();
+    return std::shared_ptr<ModelAPI_AttributeRefList>();
   }
-  boost::shared_ptr<ModelAPI_AttributeRefList> aRes = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeRefList> aRes = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefList>(aFound->second);
   if (!aRes) {
     // TODO: generate error on invalid attribute type request
@@ -262,17 +262,17 @@ boost::shared_ptr<ModelAPI_AttributeRefList> Model_Data::reflist(const std::stri
   return aRes;
 }
 
-boost::shared_ptr<ModelAPI_Attribute> Model_Data::attribute(const std::string& theID)
+std::shared_ptr<ModelAPI_Attribute> Model_Data::attribute(const std::string& theID)
 {
-  boost::shared_ptr<ModelAPI_Attribute> aResult;
+  std::shared_ptr<ModelAPI_Attribute> aResult;
   if (myAttrs.find(theID) == myAttrs.end())  // no such attribute
     return aResult;
   return myAttrs[theID];
 }
 
-const std::string& Model_Data::id(const boost::shared_ptr<ModelAPI_Attribute>& theAttr)
+const std::string& Model_Data::id(const std::shared_ptr<ModelAPI_Attribute>& theAttr)
 {
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = 
     myAttrs.begin();
   for (; anAttr != myAttrs.end(); anAttr++) {
     if (anAttr->second == theAttr)
@@ -283,9 +283,9 @@ const std::string& Model_Data::id(const boost::shared_ptr<ModelAPI_Attribute>& t
   return anEmpty;
 }
 
-bool Model_Data::isEqual(const boost::shared_ptr<ModelAPI_Data>& theData)
+bool Model_Data::isEqual(const std::shared_ptr<ModelAPI_Data>& theData)
 {
-  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theData);
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theData);
   if (aData)
     return myLab.IsEqual(aData->myLab) == Standard_True ;
   return false;
@@ -296,10 +296,10 @@ bool Model_Data::isValid()
   return !myLab.IsNull() && myLab.HasAttribute();
 }
 
-std::list<boost::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const std::string& theType)
+std::list<std::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const std::string& theType)
 {
-  std::list<boost::shared_ptr<ModelAPI_Attribute> > aResult;
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = 
+  std::list<std::shared_ptr<ModelAPI_Attribute> > aResult;
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = 
     myAttrs.begin();
   for (; anAttrsIter != myAttrs.end(); anAttrsIter++) {
     if (theType.empty() || anAttrsIter->second->attributeType() == theType) {
@@ -312,7 +312,7 @@ std::list<boost::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const s
 std::list<std::string> Model_Data::attributesIDs(const std::string& theType) 
 {
   std::list<std::string> aResult;
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = 
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter = 
     myAttrs.begin();
   for (; anAttrsIter != myAttrs.end(); anAttrsIter++) {
     if (theType.empty() || anAttrsIter->second->attributeType() == theType) {
@@ -364,8 +364,8 @@ int Model_Data::featureId() const
 void Model_Data::eraseBackReferences()
 {
   myRefsToMe.clear();
-  boost::shared_ptr<ModelAPI_Result> aRes = 
-    boost::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+  std::shared_ptr<ModelAPI_Result> aRes = 
+    std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
   if (aRes)
     aRes->setIsConcealed(false);
 }
@@ -374,8 +374,8 @@ void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID)
 {
   myRefsToMe.insert(theFeature->data()->attribute(theAttrID));
   if (ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
-    boost::shared_ptr<ModelAPI_Result> aRes = 
-      boost::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+    std::shared_ptr<ModelAPI_Result> aRes = 
+      std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
     if (aRes) {
       aRes->setIsConcealed(true);
     }
@@ -385,27 +385,27 @@ void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID)
 void Model_Data::referencesToObjects(
   std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs)
 {
-  std::map<std::string, boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = myAttrs.begin();
+  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = myAttrs.begin();
   std::list<ObjectPtr> aReferenced; // not inside of cycle to avoid excess memory menagement
   for(; anAttr != myAttrs.end(); anAttr++) {
     std::string aType = anAttr->second->attributeType();
     if (aType == ModelAPI_AttributeReference::type()) { // reference to object
-      boost::shared_ptr<ModelAPI_AttributeReference> aRef = boost::dynamic_pointer_cast<
+      std::shared_ptr<ModelAPI_AttributeReference> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeReference>(anAttr->second);
       aReferenced.push_back(aRef->value());
       theRefs.push_back(std::pair<std::string, std::list<ObjectPtr> >(anAttr->first, aReferenced));
     } else if (aType == ModelAPI_AttributeRefAttr::type()) { // reference to attribute or object
-      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+      std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeRefAttr>(anAttr->second);
       aReferenced.push_back(aRef->isObject() ? aRef->object() : aRef->attr()->owner());
     } else if (aType == ModelAPI_AttributeRefList::type()) { // list of references
-      aReferenced = boost::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttr->second)->list();
+      aReferenced = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttr->second)->list();
     } else if (aType == ModelAPI_AttributeSelection::type()) { // selection attribute
-      boost::shared_ptr<ModelAPI_AttributeSelection> aRef = boost::dynamic_pointer_cast<
+      std::shared_ptr<ModelAPI_AttributeSelection> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeSelection>(anAttr->second);
       aReferenced.push_back(aRef->context());
     } else if (aType == ModelAPI_AttributeSelectionList::type()) { // list of selection attributes
-      boost::shared_ptr<ModelAPI_AttributeSelectionList> aRef = boost::dynamic_pointer_cast<
+      std::shared_ptr<ModelAPI_AttributeSelectionList> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeSelectionList>(anAttr->second);
       for(int a = aRef->size() - 1; a >= 0; a--) {
         aReferenced.push_back(aRef->value(a)->context());

@@ -13,13 +13,13 @@
 using namespace std;
 
 void Model_AttributeSelectionList::append(
-    const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape)
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
   int aNewTag = mySize->Get() + 1;
   TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
 
-  boost::shared_ptr<Model_AttributeSelection> aNewAttr = 
-    boost::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aNewLab));
+  std::shared_ptr<Model_AttributeSelection> aNewAttr = 
+    std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aNewLab));
   if (owner()) {
     aNewAttr->setObject(owner());
   }
@@ -43,15 +43,15 @@ void Model_AttributeSelectionList::setSelectionType(int theType)
   mySelectionType->Set((double) theType);
 }
 
-boost::shared_ptr<ModelAPI_AttributeSelection> 
+std::shared_ptr<ModelAPI_AttributeSelection> 
   Model_AttributeSelectionList::value(const int theIndex)
 {
   TDF_Label aLabel = mySize->Label().FindChild(theIndex + 1);
   // create a new attribute each time, by demand
   // supporting of old attributes is too slow (synch each time) and buggy on redo
   // (if attribute is deleted and created, the abort updates attriute and makes the Attr invalid)
-  boost::shared_ptr<Model_AttributeSelection> aNewAttr = 
-    boost::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLabel));
+  std::shared_ptr<Model_AttributeSelection> aNewAttr = 
+    std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLabel));
   if (owner()) {
     aNewAttr->setObject(owner());
   }

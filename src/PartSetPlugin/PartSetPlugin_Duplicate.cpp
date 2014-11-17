@@ -21,11 +21,11 @@ void PartSetPlugin_Duplicate::initAttributes()
   PartSetPlugin_Part::initAttributes();
   data()->addAttribute(ORIGIN_REF(), ModelAPI_AttributeRefAttr::type());
 
-  boost::shared_ptr<ModelAPI_Session> aPManager = ModelAPI_Session::get();
-  boost::shared_ptr<ModelAPI_Document> aRoot = aPManager->moduleDocument();
-  boost::shared_ptr<ModelAPI_ResultPart> aSource;  // searching for source document attribute
+  std::shared_ptr<ModelAPI_Session> aPManager = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aRoot = aPManager->moduleDocument();
+  std::shared_ptr<ModelAPI_ResultPart> aSource;  // searching for source document attribute
   for (int a = aRoot->size(getGroup()) - 1; a >= 0; a--) {
-    aSource = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aRoot->object(getGroup(), a));
+    aSource = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aRoot->object(getGroup(), a));
     if (aSource && aSource->data()
         && aSource->data()->document(ModelAPI_ResultPart::DOC_REF())->value()
             == aPManager->activeDocument())
@@ -33,7 +33,7 @@ void PartSetPlugin_Duplicate::initAttributes()
     aSource.reset();
   }
   if (aSource) {
-    boost::shared_ptr<ModelAPI_Document> aCopy = aPManager->copy(
+    std::shared_ptr<ModelAPI_Document> aCopy = aPManager->copy(
         aSource->data()->document(ModelAPI_ResultPart::DOC_REF())->value(), data()->name());
     data()->refattr(ORIGIN_REF())->setObject(aSource);
   }

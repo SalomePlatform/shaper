@@ -48,6 +48,6 @@ class ModelAPI_AttributeString : public ModelAPI_Attribute
 };
 
 //! Pointer on double attribute
-typedef boost::shared_ptr<ModelAPI_AttributeString> AttributeStringPtr;
+typedef std::shared_ptr<ModelAPI_AttributeString> AttributeStringPtr;
 
 #endif

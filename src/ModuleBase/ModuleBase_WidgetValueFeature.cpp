@@ -24,12 +24,12 @@ const ObjectPtr& ModuleBase_WidgetValueFeature::object() const
   return myResult;
 }
 
-void ModuleBase_WidgetValueFeature::setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+void ModuleBase_WidgetValueFeature::setPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   myPoint = thePoint;
 }
 
-const boost::shared_ptr<GeomAPI_Pnt2d>& ModuleBase_WidgetValueFeature::point() const
+const std::shared_ptr<GeomAPI_Pnt2d>& ModuleBase_WidgetValueFeature::point() const
 {
   return myPoint;
 }

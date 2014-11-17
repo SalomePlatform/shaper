@@ -16,7 +16,7 @@
 #include <vector>
 #include <set>
 
-typedef std::map< boost::shared_ptr<SketchPlugin_Constraint>, std::vector<Slvs_hConstraint> >
+typedef std::map< std::shared_ptr<SketchPlugin_Constraint>, std::vector<Slvs_hConstraint> >
   ConstraintMap;
 
 /** \class   SketchSolver_ConstraintGroup
@@ -30,7 +30,7 @@ class SketchSolver_ConstraintGroup
    *         Throws an exception if theWorkplane is not an object of SketchPlugin_Sketch type
    *  \remark Type of theSketch is not verified inside
    */
-  SketchSolver_ConstraintGroup(boost::shared_ptr<ModelAPI_CompositeFeature> theWorkplane);
+  SketchSolver_ConstraintGroup(std::shared_ptr<ModelAPI_CompositeFeature> theWorkplane);
 
   ~SketchSolver_ConstraintGroup();
 
@@ -56,22 +56,22 @@ class SketchSolver_ConstraintGroup
    *  \param[in] theConstraint constraint to be changed
    *  \return \c true if the constraint added or updated successfully
    */
-  bool changeConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
-  bool changeRigidConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
+  bool changeConstraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
+  bool changeRigidConstraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
   /** \brief Verifies the feature attributes are used in this group
    *  \param[in] theFeature constraint or any other object for verification of interaction
    *  \return \c true if some of attributes are used in current group
    */
-  bool isInteract(boost::shared_ptr<SketchPlugin_Feature> theFeature) const;
+  bool isInteract(std::shared_ptr<SketchPlugin_Feature> theFeature) const;
 
   /** \brief Verifies the specified feature is equal to the base workplane for this group
    *  \param[in] theWorkplane the feature to be compared with base workplane
    *  \return \c true if workplanes are the same
    */
-  bool isBaseWorkplane(boost::shared_ptr<ModelAPI_CompositeFeature> theWorkplane) const;
+  bool isBaseWorkplane(std::shared_ptr<ModelAPI_CompositeFeature> theWorkplane) const;
 
-  boost::shared_ptr<ModelAPI_CompositeFeature> getWorkplane() const
+  std::shared_ptr<ModelAPI_CompositeFeature> getWorkplane() const
   {
     return mySketch;
   }
@@ -84,7 +84,7 @@ class SketchSolver_ConstraintGroup
   /** \brief If the entity is in this group it will updated
    *  \param[in] theEntity attribute, which values should update SolveSpace entity
    */
-  void updateEntityIfPossible(boost::shared_ptr<ModelAPI_Attribute> theEntity);
+  void updateEntityIfPossible(std::shared_ptr<ModelAPI_Attribute> theEntity);
 
   /** \brief Searches invalid features and constraints in the group and avoids them
    *  \return \c true if the group several constraints were removed
@@ -109,8 +109,8 @@ class SketchSolver_ConstraintGroup
   /** \brief Searches the constraints built on the entity and emit the signal to update them
    *  \param[in] theEntity attribute of the constraint
    */
-  void updateRelatedConstraints(boost::shared_ptr<ModelAPI_Attribute> theEntity) const;
-  void updateRelatedConstraints(boost::shared_ptr<ModelAPI_Feature> theFeature) const;
+  void updateRelatedConstraints(std::shared_ptr<ModelAPI_Attribute> theEntity) const;
+  void updateRelatedConstraints(std::shared_ptr<ModelAPI_Feature> theFeature) const;
 
   /** \brief Adds or updates an entity in the group
    *
@@ -120,7 +120,7 @@ class SketchSolver_ConstraintGroup
    *  \param[in] theEntity the object of constraint
    *  \return identifier of changed entity or 0 if entity could not be changed
    */
-  Slvs_hEntity changeEntity(boost::shared_ptr<ModelAPI_Attribute> theEntity);
+  Slvs_hEntity changeEntity(std::shared_ptr<ModelAPI_Attribute> theEntity);
   Slvs_hEntity changeEntity(FeaturePtr theEntity);
 
 protected:
@@ -137,9 +137,9 @@ protected:
    *  \param[in] theNorm attribute for the normal (used to identify newly created entity)
    *  \return identifier of created or updated normal
    */
-  Slvs_hEntity changeNormal(boost::shared_ptr<ModelAPI_Attribute> theDirX,
-                            boost::shared_ptr<ModelAPI_Attribute> theDirY,
-                            boost::shared_ptr<ModelAPI_Attribute> theNorm);
+  Slvs_hEntity changeNormal(std::shared_ptr<ModelAPI_Attribute> theDirX,
+                            std::shared_ptr<ModelAPI_Attribute> theDirY,
+                            std::shared_ptr<ModelAPI_Attribute> theNorm);
 
   /** \brief Adds or updates a parameter in the group
    *  \param[in] theParam   the value of parameter
@@ -158,14 +158,14 @@ protected:
   /** \brief Removes constraints from the group
    *  \param[in] theConstraint constraint to be removed
    */
-  void removeConstraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
+  void removeConstraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
   /** \brief Change values of attribute by parameters received from SolveSpace solver
    *  \param[in,out] theAttribute pointer to the attribute to be changed
    *  \param[in]     theEntityID  identifier of SolveSpace entity, which contains updated data
    *  \return \c true if the attribute's value has changed
    */
-  bool updateAttribute(boost::shared_ptr<ModelAPI_Attribute> theAttribute,
+  bool updateAttribute(std::shared_ptr<ModelAPI_Attribute> theAttribute,
                        const Slvs_hEntity& theEntityID);
 
   /** \brief Adds a constraint for a point which should not be changed during computations
@@ -174,7 +174,7 @@ protected:
    *                           the 'dragged' field of SolveSpace solver, so this entity 
    *                           may be changed a little during solution
    */
-  void addTemporaryConstraintWhereDragged(boost::shared_ptr<ModelAPI_Attribute> theEntity,
+  void addTemporaryConstraintWhereDragged(std::shared_ptr<ModelAPI_Attribute> theEntity,
                                           bool theAllowToFit = true);
 
   /** \brief Remove all temporary constraint after computation finished
@@ -188,7 +188,7 @@ protected:
    *  \param[in] theSketch parameters of workplane are the attributes of this sketch
    *  \return \c true if success, \c false if workplane parameters are not consistent
    */
-  bool addWorkplane(boost::shared_ptr<ModelAPI_CompositeFeature> theSketch);
+  bool addWorkplane(std::shared_ptr<ModelAPI_CompositeFeature> theSketch);
 
   /** \brief Add the entities of constraint for points coincidence into the appropriate list
    *  \param[in] thePoint1 identifier of the first point
@@ -224,14 +224,14 @@ protected:
   std::list<Slvs_hConstraint> myTempConstraints;  ///< The list of identifiers of temporary constraints (SLVS_C_WHERE_DRAGGED) applied for all other points moved by user
 
   // SketchPlugin entities
-  boost::shared_ptr<ModelAPI_CompositeFeature> mySketch;        ///< Equivalent to workplane
+  std::shared_ptr<ModelAPI_CompositeFeature> mySketch;        ///< Equivalent to workplane
   ConstraintMap myConstraintMap;  ///< The map between SketchPlugin and SolveSpace constraints
-  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity> myEntityAttrMap;  ///< The map between "attribute" parameters of constraints and their equivalent SolveSpace entities
+  std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity> myEntityAttrMap;  ///< The map between "attribute" parameters of constraints and their equivalent SolveSpace entities
   std::map<FeaturePtr, Slvs_hEntity> myEntityFeatMap;  ///< The map between "feature" parameters of constraints and their equivalent SolveSpace entities
 
   // Conincident items
   std::vector<std::set<Slvs_hEntity> > myCoincidentPoints;  ///< Stores the lists of identifiers of coincident points (to avoid unnecessary coincidence constraints)
-  std::set<boost::shared_ptr<SketchPlugin_Constraint> > myExtraCoincidence;  ///< Additional coincidence constraints which are not necessary (coincidence between points already done
+  std::set<std::shared_ptr<SketchPlugin_Constraint> > myExtraCoincidence;  ///< Additional coincidence constraints which are not necessary (coincidence between points already done
                                                                              ///< by other constraints) but created by GUI tools. Useful when some coincidence constraints were removed
 };
 

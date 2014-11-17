@@ -53,14 +53,14 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
   } else {
     AISObjectPtr anAIS;
 
-    GeomPresentablePtr aPrs = boost::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
+    GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
     bool isShading = false;
     if (aPrs) {
       anAIS = aPrs->getAISObject(AISObjectPtr());
     } else {
-      ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
       if (aResult) {
-        boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
+        std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
         if (aShapePtr) {
           anAIS = AISObjectPtr(new GeomAPI_AISObject());
           anAIS->setImpl(new Handle(AIS_InteractiveObject)(new ModuleBase_ResultPrs(aResult)));
@@ -126,7 +126,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
   AISObjectPtr aAISObj = getAISObject(theObject);
   Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
 
-  GeomPresentablePtr aPrs = boost::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
+  GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
   if (aPrs) {
     AISObjectPtr aAIS_Obj = aPrs->getAISObject(aAISObj);
     if (!aAIS_Obj) {

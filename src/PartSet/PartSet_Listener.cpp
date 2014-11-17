@@ -39,7 +39,7 @@ PartSet_Listener::~PartSet_Listener()
 }
 
 //******************************************************
-void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
+void PartSet_Listener::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   ModuleBase_Operation* anOperation = myModule->xWorkshop()->operationMgr()->currentOperation();
   PartSet_OperationSketchBase* aSketchOp = dynamic_cast<PartSet_OperationSketchBase*>(anOperation);
@@ -49,8 +49,8 @@ void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& the
   XGUI_Displayer* aDisplayer = myModule->xWorkshop()->displayer();
   QString aType = QString(theMessage->eventID().eventText());
   if (aType == EVENT_OBJECT_CREATED) {
-    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
-        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aFeatures = aUpdMsg->objects();
 
     PartSet_OperationSketch* aSketchOp = 
@@ -76,8 +76,8 @@ void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& the
       XGUI_Displayer* aDisplayer = myModule->xWorkshop()->displayer();
       FeaturePtr aFeature = aCreationOp->feature();
       const std::list<ResultPtr>& aResults = aFeature->results();
-      boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
-        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+      std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
 
       std::set<ObjectPtr> aFeatures = aUpdMsg->objects();
       std::set<ObjectPtr>::const_iterator aObjIt, aNoObj = aFeatures.cend();
@@ -90,9 +90,9 @@ void PartSet_Listener::processEvent(const boost::shared_ptr<Events_Message>& the
       }
     }
   } else if (aType == EVENT_OBJECT_DELETED) {
-    boost::shared_ptr<ModelAPI_ObjectDeletedMessage> aDelMsg =
-        boost::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
-    boost::shared_ptr<ModelAPI_Document> aDoc = aDelMsg->document();
+    std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDelMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
+    std::shared_ptr<ModelAPI_Document> aDoc = aDelMsg->document();
 
     std::set<std::string> aGroups = aDelMsg->groups();
     std::set<std::string>::const_iterator anIt = aGroups.begin(), aLast = aGroups.end();

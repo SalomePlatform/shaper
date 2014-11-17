@@ -33,9 +33,9 @@ bool ModuleBase_WidgetPoint2dDistance::setValue(ModuleBase_WidgetValue* theValue
     ModuleBase_WidgetValueFeature* aFeatureValue =
         dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
     if (aFeatureValue) {
-      boost::shared_ptr<GeomAPI_Pnt2d> aPnt = aFeatureValue->point();
+      std::shared_ptr<GeomAPI_Pnt2d> aPnt = aFeatureValue->point();
       ObjectPtr aObject = aFeatureValue->object();
-      FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
       if (aFeature && aPnt) {
         setPoint(aFeature, aPnt);
         isDone = true;
@@ -46,10 +46,10 @@ bool ModuleBase_WidgetPoint2dDistance::setValue(ModuleBase_WidgetValue* theValue
 }
 
 void ModuleBase_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
-                                                const boost::shared_ptr<GeomAPI_Pnt2d>& thePnt)
+                                                const std::shared_ptr<GeomAPI_Pnt2d>& thePnt)
 {
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(myFirstPntName));
   if (!aPoint)
     return;

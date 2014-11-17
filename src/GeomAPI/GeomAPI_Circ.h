@@ -6,7 +6,7 @@
 #define GeomAPI_Circ_H_
 
 #include <GeomAPI_Interface.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class GeomAPI_Pnt;
 class GeomAPI_Dir;
@@ -20,18 +20,18 @@ class GEOMAPI_EXPORT GeomAPI_Circ : public GeomAPI_Interface
 {
  public:
   /// Creation of circle defined by center point, direction and circle radius
-  GeomAPI_Circ(const boost::shared_ptr<GeomAPI_Pnt>& theCenter,
-               const boost::shared_ptr<GeomAPI_Dir>& theDir, double theRadius);
+  GeomAPI_Circ(const std::shared_ptr<GeomAPI_Pnt>& theCenter,
+               const std::shared_ptr<GeomAPI_Dir>& theDir, double theRadius);
 
   /// Return center of the circle
-  const boost::shared_ptr<GeomAPI_Pnt> center() const;
+  const std::shared_ptr<GeomAPI_Pnt> center() const;
 
   /// Return radius of the circle
   double radius() const;
 
   /// Project point on circle
-  const boost::shared_ptr<GeomAPI_Pnt> project(
-      const boost::shared_ptr<GeomAPI_Pnt>& thePoint) const;
+  const std::shared_ptr<GeomAPI_Pnt> project(
+      const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
 };
 
 #endif

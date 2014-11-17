@@ -7,7 +7,7 @@
 
 #include <ModelAPI.h>
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
 #include <list>
 
@@ -40,14 +40,14 @@ public:
 
   //! Adds to the document the new feature of the given feature id
   //! \param creates feature and puts it in the document (if it is not action)
-  virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
 
   //! Removes the feature from the document
-  virtual void removeFeature(boost::shared_ptr<ModelAPI_Feature> theFeature,
+  virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature,
                              const bool theCheck = true) = 0;
 
   ///! Adds a new sub-document by the identifier, or returns existing one if it is already exist
-  virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID) = 0;
+  virtual std::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID) = 0;
 
   ///! Returns the id of the document
   virtual const std::string& id() const = 0;
@@ -56,7 +56,7 @@ public:
   //! \param theGroupID group that contains an object
   //! \param theIndex zero-based index of feature in the group
   //! \param theHidden if it is true, it counts also the features that are not in tree
-  virtual boost::shared_ptr<ModelAPI_Object> object(const std::string& theGroupID,
+  virtual std::shared_ptr<ModelAPI_Object> object(const std::string& theGroupID,
                                                     const int theIndex,
                                                     const bool theHidden = false) = 0;
 
@@ -70,21 +70,21 @@ public:
   }
 
   /// Creates a construction cresults
-  virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
-      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+  virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   /// Creates a body results
-  virtual boost::shared_ptr<ModelAPI_ResultBody> createBody(
-      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+  virtual std::shared_ptr<ModelAPI_ResultBody> createBody(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   /// Creates a part results
-  virtual boost::shared_ptr<ModelAPI_ResultPart> createPart(
-      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+  virtual std::shared_ptr<ModelAPI_ResultPart> createPart(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
   /// Creates a group results
-  virtual boost::shared_ptr<ModelAPI_ResultGroup> createGroup(
-      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
+  virtual std::shared_ptr<ModelAPI_ResultGroup> createGroup(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0) = 0;
 
   //! Returns a feature by result (owner of result)
-  virtual boost::shared_ptr<ModelAPI_Feature> feature(
-      const boost::shared_ptr<ModelAPI_Result>& theResult) = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> feature(
+      const std::shared_ptr<ModelAPI_Result>& theResult) = 0;
 
 protected:
   /// Only for SWIG wrapping it is here
@@ -94,6 +94,6 @@ protected:
 };
 
 //! Pointer on document object
-typedef boost::shared_ptr<ModelAPI_Document> DocumentPtr;
+typedef std::shared_ptr<ModelAPI_Document> DocumentPtr;
 
 #endif

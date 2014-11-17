@@ -27,7 +27,7 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   std::map<std::string, std::pair<std::string, std::string> > myPlugins; 
   std::map<std::string, ModelAPI_Plugin*> myPluginObjs;  ///< instances of the already plugins
   std::string myCurrentPluginName;  ///< name of the plugin that must be loaded currently
-  boost::shared_ptr<ModelAPI_Document> myCurrentDoc;  ///< current working document
+  std::shared_ptr<ModelAPI_Document> myCurrentDoc;  ///< current working document
   bool myCheckTransactions;  ///< if true, generates error if document is updated outside of transaction
  public:
 
@@ -67,20 +67,20 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   MODEL_EXPORT virtual void redo();
 
   /// Returns the root document of the application (that may contains sub-documents)
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> moduleDocument();
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> moduleDocument();
 
   /// Return true if root document has been already created
   MODEL_EXPORT virtual bool hasModuleDocument();
 
   /// Returns the current document that used for current work in the application
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> activeDocument();
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> activeDocument();
 
   /// Defines the current document that used for current work in the application
   MODEL_EXPORT virtual void setActiveDocument(
-    boost::shared_ptr<ModelAPI_Document> theDoc, bool theSendSignal = true);
+    std::shared_ptr<ModelAPI_Document> theDoc, bool theSendSignal = true);
 
   /// Returns all the opened documents of the session (without postponed)
-  MODEL_EXPORT virtual std::list<boost::shared_ptr<ModelAPI_Document> > allOpenedDocuments();
+  MODEL_EXPORT virtual std::list<std::shared_ptr<ModelAPI_Document> > allOpenedDocuments();
 
   /// Registers the plugin that creates features.
   /// It is obligatory for each plugin to call this function on loading to be found by 
@@ -88,11 +88,11 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   MODEL_EXPORT virtual void registerPlugin(ModelAPI_Plugin* thePlugin);
 
   /// Processes the configuration file reading
-  MODEL_EXPORT virtual void processEvent(const boost::shared_ptr<Events_Message>& theMessage);
+  MODEL_EXPORT virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   /// Copies the document to the new one wit hthe given id
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> copy(
-      boost::shared_ptr<ModelAPI_Document> theSource, std::string theID);
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> copy(
+      std::shared_ptr<ModelAPI_Document> theSource, std::string theID);
 
   /// Returns the validators factory: the only one instance per application
   MODEL_EXPORT virtual ModelAPI_ValidatorsFactory* validators();

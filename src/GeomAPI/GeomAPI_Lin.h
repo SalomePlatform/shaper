@@ -6,7 +6,7 @@
 #define GeomAPI_Lin_H_
 
 #include <GeomAPI_Interface.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class GeomAPI_Pnt;
 
@@ -22,17 +22,17 @@ class GEOMAPI_EXPORT GeomAPI_Lin : public GeomAPI_Interface
   GeomAPI_Lin(const double theStartX, const double theStartY, const double theStartZ,
               const double theEndX, const double theEndY, const double theEndZ);
   /// Creation of line defined by start and end points
-  GeomAPI_Lin(const boost::shared_ptr<GeomAPI_Pnt>& theStart,
-              const boost::shared_ptr<GeomAPI_Pnt>& theEnd);
+  GeomAPI_Lin(const std::shared_ptr<GeomAPI_Pnt>& theStart,
+              const std::shared_ptr<GeomAPI_Pnt>& theEnd);
 
   /// Distance between two points
-  double distance(const boost::shared_ptr<GeomAPI_Pnt>& thePoint) const;
+  double distance(const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
   /// Intersection of two lines
-  const boost::shared_ptr<GeomAPI_Pnt> intersect(
-      const boost::shared_ptr<GeomAPI_Lin>& theLine) const;
+  const std::shared_ptr<GeomAPI_Pnt> intersect(
+      const std::shared_ptr<GeomAPI_Lin>& theLine) const;
   /// Project point on line
-  const boost::shared_ptr<GeomAPI_Pnt> project(
-      const boost::shared_ptr<GeomAPI_Pnt>& thePoint) const;
+  const std::shared_ptr<GeomAPI_Pnt> project(
+      const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
 };
 
 #endif

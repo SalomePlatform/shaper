@@ -5,7 +5,7 @@
 #ifndef GeomAPI_Pln_H_
 #define GeomAPI_Pln_H_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <GeomAPI_Interface.h>
 
 class GeomAPI_Pnt;
@@ -20,17 +20,17 @@ class GEOMAPI_EXPORT GeomAPI_Pln : public GeomAPI_Interface
 {
  public:
   /// Creation of plane by the point and normal
-  GeomAPI_Pln(const boost::shared_ptr<GeomAPI_Pnt>& thePoint,
-              const boost::shared_ptr<GeomAPI_Dir>& theNormal);
+  GeomAPI_Pln(const std::shared_ptr<GeomAPI_Pnt>& thePoint,
+              const std::shared_ptr<GeomAPI_Dir>& theNormal);
 
   /// Creation of plane by coefficients (Ax+By+Cz+D=0)
   GeomAPI_Pln(const double theA, const double theB, const double theC, const double theD);
 
   /// Returns a point of this plane
-  boost::shared_ptr<GeomAPI_Pnt> location();
+  std::shared_ptr<GeomAPI_Pnt> location();
 
   /// Returns a plane normal
-  boost::shared_ptr<GeomAPI_Dir> direction();
+  std::shared_ptr<GeomAPI_Dir> direction();
 
   /// Returns the plane coefficients (Ax+By+Cz+D=0)
   void coefficients(double& theA, double& theB, double& theC, double& theD);

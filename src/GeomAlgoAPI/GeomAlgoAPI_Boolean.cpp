@@ -11,59 +11,59 @@
 #include <TopExp_Explorer.hxx>
 #include <GeomAlgoAPI_DFLoader.h>
 
-boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCut(
-  boost::shared_ptr<GeomAPI_Shape> theShape,
-  boost::shared_ptr<GeomAPI_Shape> theTool)
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCut(
+  std::shared_ptr<GeomAPI_Shape> theShape,
+  std::shared_ptr<GeomAPI_Shape> theTool)
 {
   const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
   const TopoDS_Shape& aTool = theTool->impl<TopoDS_Shape>();
 
   BRepAlgoAPI_Cut aCut(aShape, aTool);
   if (aCut.IsDone()) {
-    boost::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape());
+    std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape());
     aResult->setImpl(new TopoDS_Shape(aCut.Shape()));
     return aResult;
   }
-  return boost::shared_ptr<GeomAPI_Shape>();
+  return std::shared_ptr<GeomAPI_Shape>();
 }
 
 
-boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeFuse(
-  boost::shared_ptr<GeomAPI_Shape> theShape,
-  boost::shared_ptr<GeomAPI_Shape> theTool)
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeFuse(
+  std::shared_ptr<GeomAPI_Shape> theShape,
+  std::shared_ptr<GeomAPI_Shape> theTool)
 {
   const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
   const TopoDS_Shape& aTool = theTool->impl<TopoDS_Shape>();
 
   BRepAlgoAPI_Fuse aFuse(aShape, aTool);
   if (aFuse.IsDone()) {
-    boost::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape());
+    std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape());
     aResult->setImpl(new TopoDS_Shape(aFuse.Shape()));
     return aResult;
   }
-  return boost::shared_ptr<GeomAPI_Shape>();
+  return std::shared_ptr<GeomAPI_Shape>();
 }
 
 
-boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCommon(
-  boost::shared_ptr<GeomAPI_Shape> theShape,
-  boost::shared_ptr<GeomAPI_Shape> theTool)
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Boolean::makeCommon(
+  std::shared_ptr<GeomAPI_Shape> theShape,
+  std::shared_ptr<GeomAPI_Shape> theTool)
 {
   const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
   const TopoDS_Shape& aTool = theTool->impl<TopoDS_Shape>();
 
   BRepAlgoAPI_Common aCommon(aShape, aTool);
   if (aCommon.IsDone()) {
-    boost::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape());
+    std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape());
     aResult->setImpl(new TopoDS_Shape(aCommon.Shape()));
     return aResult;
   }
-  return boost::shared_ptr<GeomAPI_Shape>();
+  return std::shared_ptr<GeomAPI_Shape>();
 }
 
 //============================================================================
-GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(boost::shared_ptr<GeomAPI_Shape> theObject,
-                                         boost::shared_ptr<GeomAPI_Shape> theTool,
+GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(std::shared_ptr<GeomAPI_Shape> theObject,
+                                         std::shared_ptr<GeomAPI_Shape> theTool,
                                          int theType)
 : myOperation(theType), myDone(false), myShape(new GeomAPI_Shape())
 {
@@ -72,8 +72,8 @@ GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(boost::shared_ptr<GeomAPI_Shape> theObj
 
 
 //============================================================================
-void GeomAlgoAPI_Boolean::build(boost::shared_ptr<GeomAPI_Shape> theObject,
-                                boost::shared_ptr<GeomAPI_Shape> theTool)
+void GeomAlgoAPI_Boolean::build(std::shared_ptr<GeomAPI_Shape> theObject,
+                                std::shared_ptr<GeomAPI_Shape> theTool)
 {
   const TopoDS_Shape& anObject = theObject->impl<TopoDS_Shape>();
   const TopoDS_Shape& aTool    = theTool->impl<TopoDS_Shape>();
@@ -117,12 +117,12 @@ void GeomAlgoAPI_Boolean::build(boost::shared_ptr<GeomAPI_Shape> theObject,
 	if(aResult.ShapeType() == TopAbs_COMPOUND) 
       aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
 	myShape->setImpl(new TopoDS_Shape(aResult));
-	boost::shared_ptr<GeomAPI_Shape> aGeomResult(new GeomAPI_Shape());
+	std::shared_ptr<GeomAPI_Shape> aGeomResult(new GeomAPI_Shape());
 	aGeomResult->setImpl(new TopoDS_Shape(aResult)); 
 
 	// fill data map to keep correct orientation of sub-shapes 
 	for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
-	  boost::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+	  std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
       aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
 	  myMap.bind(aCurrentShape, aCurrentShape);
 	}
@@ -142,7 +142,7 @@ const bool GeomAlgoAPI_Boolean::isValid() const
 }
 
 //============================================================================
-const boost::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Boolean::shape () const 
+const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Boolean::shape () const 
 {
   return myShape;
 }

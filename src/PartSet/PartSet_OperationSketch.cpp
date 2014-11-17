@@ -51,7 +51,7 @@ PartSet_OperationSketch::~PartSet_OperationSketch()
 
 CompositeFeaturePtr PartSet_OperationSketch::sketch() const
 {
-  return boost::dynamic_pointer_cast<ModelAPI_CompositeFeature>(feature());
+  return std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(feature());
 }
 
 void PartSet_OperationSketch::mousePressed(QMouseEvent* theEvent, ModuleBase_IViewer* theViewer, ModuleBase_ISelection* theSelection)
@@ -104,20 +104,20 @@ void PartSet_OperationSketch::selectionChanged(ModuleBase_ISelection* theSelecti
     // We have to select a plane before any operation
     TopoDS_Shape aShape = aPrs.shape();
     if (!aShape.IsNull()) {
-      boost::shared_ptr<GeomAPI_Dir> aDir = setSketchPlane(aShape);
+      std::shared_ptr<GeomAPI_Dir> aDir = setSketchPlane(aShape);
       flushUpdated();
       emit featureConstructed(feature(), FM_Hide);
       // If selection is not a sketcher presentation then it has to be stored as 
       // External shape
       if (feature() != aPrs.object()) {
-        //boost::shared_ptr<SketchPlugin_Sketch> aSketch = 
-        //  boost::dynamic_pointer_cast<SketchPlugin_Sketch>(feature());
+        //std::shared_ptr<SketchPlugin_Sketch> aSketch = 
+        //  std::dynamic_pointer_cast<SketchPlugin_Sketch>(feature());
         DataPtr aData = feature()->data();
         AttributeSelectionPtr aSelAttr = 
-          boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+          std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
           (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
         if (aSelAttr) {
-          ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
+          ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
           if (aRes) {
             GeomShapePtr aShapePtr(new GeomAPI_Shape());
             aShapePtr->setImpl(new TopoDS_Shape(aShape));
@@ -176,16 +176,16 @@ std::list<FeaturePtr> PartSet_OperationSketch::subFeatures() const
   if (!aFeature)
     return aFeaList;
 
-  boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
+  std::shared_ptr<ModelAPI_Data> aData = aFeature->data();
   if (!aData->isValid())
     return std::list<FeaturePtr>();
-  boost::shared_ptr<ModelAPI_AttributeRefList> aRefList = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeRefList> aRefList = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefList>(aData->attribute(SketchPlugin_Sketch::FEATURES_ID()));
 
   std::list<ObjectPtr> aList = aRefList->list();
   std::list<ObjectPtr>::iterator aIt;
   for (aIt = aList.begin(); aIt != aList.end(); ++aIt) {
-    FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*aIt);
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*aIt);
     if (aFeature)
       aFeaList.push_back(aFeature);
   }
@@ -227,59 +227,59 @@ bool PartSet_OperationSketch::hasSketchPlane() const
   bool aHasPlane = false;
 
   if (feature()) {
-    boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+    std::shared_ptr<ModelAPI_Data> aData = feature()->data();
     AttributeDoublePtr anAttr;
-    boost::shared_ptr<GeomDataAPI_Dir> aNormal = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+    std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
         aData->attribute(SketchPlugin_Sketch::NORM_ID()));
     aHasPlane = aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
   }
   return aHasPlane;
 }
 
-boost::shared_ptr<GeomAPI_Dir> PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
+std::shared_ptr<GeomAPI_Dir> PartSet_OperationSketch::setSketchPlane(const TopoDS_Shape& theShape)
 {
   if (theShape.IsNull())
-    return boost::shared_ptr<GeomAPI_Dir>();
+    return std::shared_ptr<GeomAPI_Dir>();
 
   // get selected shape
-  boost::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
+  std::shared_ptr<GeomAPI_Shape> aGShape(new GeomAPI_Shape);
   aGShape->setImpl(new TopoDS_Shape(theShape));
 
   // get plane parameters
-  boost::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
+  std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aGShape);
 
   // set plane parameters to feature
-  boost::shared_ptr<ModelAPI_Data> aData = feature()->data();
+  std::shared_ptr<ModelAPI_Data> aData = feature()->data();
   double anA, aB, aC, aD;
   aPlane->coefficients(anA, aB, aC, aD);
 
   // calculate attributes of the sketch
-  boost::shared_ptr<GeomAPI_Dir> aNormDir(new GeomAPI_Dir(anA, aB, aC));
-  boost::shared_ptr<GeomAPI_XYZ> aCoords = aNormDir->xyz();
-  boost::shared_ptr<GeomAPI_XYZ> aZero(new GeomAPI_XYZ(0, 0, 0));
+  std::shared_ptr<GeomAPI_Dir> aNormDir(new GeomAPI_Dir(anA, aB, aC));
+  std::shared_ptr<GeomAPI_XYZ> aCoords = aNormDir->xyz();
+  std::shared_ptr<GeomAPI_XYZ> aZero(new GeomAPI_XYZ(0, 0, 0));
   aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
-  boost::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
+  std::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
   // X axis is preferable to be dirX on the sketch
   const double tol = Precision::Confusion();
   bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
-  boost::shared_ptr<GeomAPI_Dir> aTempDir(
+  std::shared_ptr<GeomAPI_Dir> aTempDir(
       isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
-  boost::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
-  boost::shared_ptr<GeomAPI_Dir> aXDir(new GeomAPI_Dir(aYDir->cross(aNormDir)));
+  std::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
+  std::shared_ptr<GeomAPI_Dir> aXDir(new GeomAPI_Dir(aYDir->cross(aNormDir)));
 
-  boost::shared_ptr<GeomDataAPI_Point> anOrigin = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+  std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
       aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
   anOrigin->setValue(anOrigPnt);
-  boost::shared_ptr<GeomDataAPI_Dir> aNormal = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+  std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::NORM_ID()));
   aNormal->setValue(aNormDir);
-  boost::shared_ptr<GeomDataAPI_Dir> aDirX = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+  std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
   aDirX->setValue(aXDir);
-  boost::shared_ptr<GeomDataAPI_Dir> aDirY = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+  std::shared_ptr<GeomDataAPI_Dir> aDirY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
   aDirY->setValue(aYDir);
-  boost::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+  std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
   return aDir;
 }
 

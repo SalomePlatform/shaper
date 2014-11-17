@@ -6,7 +6,7 @@
 #define ModelAPI_Validator_H_
 
 #include <ModelAPI.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <list>
 
 class ModelAPI_Feature;
@@ -31,7 +31,7 @@ class MODELAPI_EXPORT ModelAPI_Validator
   }
 };
 
-typedef boost::shared_ptr<ModelAPI_Validator> ValidatorPtr;
+typedef std::shared_ptr<ModelAPI_Validator> ValidatorPtr;
 
 /**\class ModelAPI_ValidatorsFactory
  * \ingroup DataModel
@@ -77,7 +77,7 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
   virtual const ModelAPI_Validator* validator(const std::string& theID) const = 0;
 
   /// Returns true if feature and all its attributes are valid.
-  virtual bool validate(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const = 0;
+  virtual bool validate(const std::shared_ptr<ModelAPI_Feature>& theFeature) const = 0;
 
   /// register that this attribute in feature is not obligatory for the feature execution
   /// so, it is not needed for the standard validation mechanism

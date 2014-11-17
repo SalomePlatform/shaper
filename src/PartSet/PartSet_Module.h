@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class PartSet_Listener;
 class ModelAPI_Feature;

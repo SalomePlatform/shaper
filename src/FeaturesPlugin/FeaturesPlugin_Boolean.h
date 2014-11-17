@@ -62,13 +62,13 @@ class FeaturesPlugin_Boolean : public ModelAPI_Feature
   FeaturesPlugin_Boolean();
 
 private:
-  boost::shared_ptr<GeomAPI_Shape> getShape(const std::string& theAttrName);
+  std::shared_ptr<GeomAPI_Shape> getShape(const std::string& theAttrName);
   
   /// Load Naming data structure of the feature to the document
   void LoadNamingDS(GeomAlgoAPI_Boolean* theFeature, 
-					boost::shared_ptr<ModelAPI_ResultBody> theResultBody,
-	                boost::shared_ptr<GeomAPI_Shape> theObject,
-	                boost::shared_ptr<GeomAPI_Shape> theTool,
+					std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+	                std::shared_ptr<GeomAPI_Shape> theObject,
+	                std::shared_ptr<GeomAPI_Shape> theTool,
 					int theType);
 };
 

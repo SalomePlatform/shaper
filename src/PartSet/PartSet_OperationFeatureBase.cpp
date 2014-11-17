@@ -117,7 +117,7 @@ bool PartSet_OperationFeatureBase::getViewerPoint(ModuleBase_ViewerPrs thePrs,
     return false;
   ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
   aValue->setObject(theFeature);
-  aValue->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
+  aValue->setPoint(std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
   bool isApplyed = aActiveWgt->setValue(aValue);
 
   delete aValue;

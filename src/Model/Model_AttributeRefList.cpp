@@ -12,7 +12,7 @@ using namespace std;
 
 void Model_AttributeRefList::append(ObjectPtr theObject)
 {
-  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theObject->data());
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObject->data());
   myRef->Append(aData->label().Father());  // store label of the object
 
   owner()->data()->sendAttributeUpdated(this);
@@ -20,7 +20,7 @@ void Model_AttributeRefList::append(ObjectPtr theObject)
 
 void Model_AttributeRefList::remove(ObjectPtr theObject)
 {
-  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(theObject->data());
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObject->data());
   myRef->Remove(aData->label().Father());
 
   owner()->data()->sendAttributeUpdated(this);
@@ -34,7 +34,7 @@ int Model_AttributeRefList::size() const
 list<ObjectPtr> Model_AttributeRefList::list()
 {
   std::list<ObjectPtr> aResult;
-  boost::shared_ptr<Model_Document> aDoc = boost::dynamic_pointer_cast<Model_Document>(
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
       owner()->document());
   if (aDoc) {
     const TDF_LabelList& aList = myRef->List();
@@ -48,7 +48,7 @@ list<ObjectPtr> Model_AttributeRefList::list()
 
 ObjectPtr Model_AttributeRefList::object(const int theIndex) const
 {
-  boost::shared_ptr<Model_Document> aDoc = boost::dynamic_pointer_cast<Model_Document>(
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
       owner()->document());
   if (aDoc) {
     const TDF_LabelList& aList = myRef->List();

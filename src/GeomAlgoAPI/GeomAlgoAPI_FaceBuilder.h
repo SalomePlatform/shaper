@@ -10,7 +10,7 @@
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Dir.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 /**\class GeomAlgoAPI_FaceBuilder
  * \ingroup DataAlgo
@@ -22,12 +22,12 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_FaceBuilder
  public:
   /// Creates square planar face by given point of the center,
   /// normal to the plane and size of square
-  static boost::shared_ptr<GeomAPI_Shape> square(boost::shared_ptr<GeomAPI_Pnt> theCenter,
-                                                 boost::shared_ptr<GeomAPI_Dir> theNormal,
+  static std::shared_ptr<GeomAPI_Shape> square(std::shared_ptr<GeomAPI_Pnt> theCenter,
+                                                 std::shared_ptr<GeomAPI_Dir> theNormal,
                                                  const double theSize);
 
   /// Returns the plane of the planar face. If it is not planar, returns empty ptr.
-  static boost::shared_ptr<GeomAPI_Pln> plane(boost::shared_ptr<GeomAPI_Shape> theFace);
+  static std::shared_ptr<GeomAPI_Pln> plane(std::shared_ptr<GeomAPI_Shape> theFace);
 };
 
 #endif

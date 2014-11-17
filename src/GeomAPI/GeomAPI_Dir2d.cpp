@@ -14,7 +14,7 @@ GeomAPI_Dir2d::GeomAPI_Dir2d(const double theX, const double theY)
 {
 }
 
-GeomAPI_Dir2d::GeomAPI_Dir2d(const boost::shared_ptr<GeomAPI_XY>& theCoords)
+GeomAPI_Dir2d::GeomAPI_Dir2d(const std::shared_ptr<GeomAPI_XY>& theCoords)
     : GeomAPI_Interface(new gp_Dir2d(theCoords->x(), theCoords->y()))
 {
 }
@@ -29,17 +29,17 @@ double GeomAPI_Dir2d::y() const
   return MY_DIR->Y();
 }
 
-const boost::shared_ptr<GeomAPI_XY> GeomAPI_Dir2d::xy()
+const std::shared_ptr<GeomAPI_XY> GeomAPI_Dir2d::xy()
 {
-  return boost::shared_ptr<GeomAPI_XY>(new GeomAPI_XY(MY_DIR->X(), MY_DIR->Y()));
+  return std::shared_ptr<GeomAPI_XY>(new GeomAPI_XY(MY_DIR->X(), MY_DIR->Y()));
 }
 
-double GeomAPI_Dir2d::dot(const boost::shared_ptr<GeomAPI_Dir2d>& theArg) const
+double GeomAPI_Dir2d::dot(const std::shared_ptr<GeomAPI_Dir2d>& theArg) const
 {
   return MY_DIR->Dot(theArg->impl<gp_Dir2d>());
 }
 
-double GeomAPI_Dir2d::cross(const boost::shared_ptr<GeomAPI_Dir2d>& theArg) const
+double GeomAPI_Dir2d::cross(const std::shared_ptr<GeomAPI_Dir2d>& theArg) const
 {
   return MY_DIR->XY().Crossed(theArg->impl<gp_Dir2d>().XY());
 }

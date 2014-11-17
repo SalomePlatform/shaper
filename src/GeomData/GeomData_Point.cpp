@@ -20,7 +20,7 @@ void GeomData_Point::setValue(const double theX, const double theY, const double
   }
 }
 
-void GeomData_Point::setValue(const boost::shared_ptr<GeomAPI_Pnt>& thePoint)
+void GeomData_Point::setValue(const std::shared_ptr<GeomAPI_Pnt>& thePoint)
 {
   setValue(thePoint->x(), thePoint->y(), thePoint->z());
 }
@@ -40,9 +40,9 @@ double GeomData_Point::z() const
   return myCoords->Value(2);
 }
 
-boost::shared_ptr<GeomAPI_Pnt> GeomData_Point::pnt()
+std::shared_ptr<GeomAPI_Pnt> GeomData_Point::pnt()
 {
-  boost::shared_ptr<GeomAPI_Pnt> aResult(
+  std::shared_ptr<GeomAPI_Pnt> aResult(
       new GeomAPI_Pnt(myCoords->Value(0), myCoords->Value(1), myCoords->Value(2)));
   return aResult;
 }

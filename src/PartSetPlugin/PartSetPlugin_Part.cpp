@@ -21,7 +21,7 @@ void PartSetPlugin_Part::initAttributes()
 
 void PartSetPlugin_Part::execute()
 {
-  ResultPartPtr aResult = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
+  ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
   if (!aResult) {
     aResult = document()->createPart(data());
     setResult(aResult);
@@ -29,7 +29,7 @@ void PartSetPlugin_Part::execute()
   }
 }
 
-boost::shared_ptr<ModelAPI_Document> PartSetPlugin_Part::documentToAdd()
+std::shared_ptr<ModelAPI_Document> PartSetPlugin_Part::documentToAdd()
 {
   return ModelAPI_Session::get()->moduleDocument();
 }
