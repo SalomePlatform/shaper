@@ -86,10 +86,6 @@
 %shared_ptr(ModelAPI_ResultBody)
 %shared_ptr(ModelAPI_ResultPart)
 
-// Don't create default constructors
-// %nodefaultctor ModelAPI_Plugin;
-// %nodefaultctor ModelAPI_Session;
-
 // all supported interfaces
 %include "GeomAPI_Interface.h"
 %include "GeomAPI_Shape.h"

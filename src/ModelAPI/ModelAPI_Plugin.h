@@ -26,12 +26,6 @@ class MODELAPI_EXPORT ModelAPI_Plugin
   virtual ~ModelAPI_Plugin()
   {
   }
-
- protected:
-  /// Is needed for python wrapping by swig
-  ModelAPI_Plugin()
-  {
-  }
 };
 
 #endif

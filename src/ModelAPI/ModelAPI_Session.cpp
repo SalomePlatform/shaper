@@ -44,10 +44,6 @@ using namespace std;
 /// Manager that will be initialized from Model package, one per application
 boost::shared_ptr<ModelAPI_Session> MY_MANAGER;
 
-ModelAPI_Session::ModelAPI_Session()
-{
-}
-
 void ModelAPI_Session::setSession(boost::shared_ptr<ModelAPI_Session> theManager)
 {
   MY_MANAGER = theManager;
