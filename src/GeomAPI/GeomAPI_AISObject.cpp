@@ -30,12 +30,6 @@ const double tolerance = 1e-7;
 const int CONSTRAINT_TEXT_HEIGHT = 28;  /// the text height of the constraint
 const int CONSTRAINT_TEXT_SELECTION_TOLERANCE = 20;  /// the text selection tolerance
 
-// Initialization of color constants
-int Colors::COLOR_BROWN = Quantity_NOC_BROWN;
-int Colors::COLOR_RED = Quantity_NOC_RED;
-int Colors::COLOR_GREEN = Quantity_NOC_GREEN;
-int Colors::COLOR_BLUE = Quantity_NOC_BLUE1;
-
 GeomAPI_AISObject::GeomAPI_AISObject()
     : GeomAPI_Interface(new Handle(AIS_InteractiveObject)())
 {

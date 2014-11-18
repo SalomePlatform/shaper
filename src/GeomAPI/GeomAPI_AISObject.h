@@ -15,14 +15,6 @@ class GeomAPI_Pln;
 class GeomAPI_Pnt;
 class GeomAPI_Shape;
 
-struct GEOMAPI_EXPORT Colors
-{
-  static int COLOR_BROWN;
-  static int COLOR_RED;
-  static int COLOR_GREEN;
-  static int COLOR_BLUE;
-};
-
 /** \class GeomAPI_AISObject
  *  \ingroup DataModel
  *  \brief Interface for AIS_InteractiveObject
