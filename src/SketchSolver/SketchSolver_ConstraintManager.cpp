@@ -3,6 +3,7 @@
 // Author:  Artem ZHIDKOV
 
 #include "SketchSolver_ConstraintManager.h"
+#include <SketchSolver_ConstraintGroup.h>
 
 #include <Events_Loop.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -11,6 +12,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_Attribute.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -19,8 +21,11 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Sketch.h>
+#include <SketchPlugin_Feature.h>
 
 #include <list>
+#include <set>
+#include <memory>
 
 // Initialization of constraint manager self pointer
 SketchSolver_ConstraintManager* SketchSolver_ConstraintManager::_self = 0;
@@ -210,7 +215,7 @@ bool SketchSolver_ConstraintManager::changeConstraintOrEntity(
       if ((*aGroupIter)->getId() == aGroupId) {
         // If the group is empty, the feature is not added (the constraint only)
         if (!aConstraint && !(*aGroupIter)->isEmpty())
-          return (*aGroupIter)->changeEntity(theFeature) != SLVS_E_UNKNOWN;
+          return (*aGroupIter)->changeEntityFeature(theFeature) != SLVS_E_UNKNOWN;
         return (*aGroupIter)->changeConstraint(aConstraint);
       }
   } else if (aGroups.size() > 1) {  // Several groups applicable for this feature => need to merge them
@@ -246,7 +251,7 @@ bool SketchSolver_ConstraintManager::changeConstraintOrEntity(
 
     if (aConstraint)
       return (*aFirstGroupIter)->changeConstraint(aConstraint);
-    return (*aFirstGroupIter)->changeEntity(theFeature) != SLVS_E_UNKNOWN;
+    return (*aFirstGroupIter)->changeEntityFeature(theFeature) != SLVS_E_UNKNOWN;
   }
 
   // Something goes wrong
@@ -301,7 +306,7 @@ void SketchSolver_ConstraintManager::updateEntity(
   std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
     if (!(*aGroupIter)->isEmpty())
-      (*aGroupIter)->updateRelatedConstraints(theFeature);
+      (*aGroupIter)->updateRelatedConstraintsFeature(theFeature);
 }
 
 // ============================================================================
@@ -335,8 +340,8 @@ void SketchSolver_ConstraintManager::findGroups(
 //  Class:    SketchSolver_Session
 //  Purpose:  search workplane containing given feature
 // ============================================================================
-std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_ConstraintManager::findWorkplane(
-    std::shared_ptr<SketchPlugin_Feature> theFeature) const
+std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_ConstraintManager
+::findWorkplane(std::shared_ptr<SketchPlugin_Feature> theFeature) const
 {
   // Already verified workplanes
   std::set<std::shared_ptr<ModelAPI_CompositeFeature> > aVerified;

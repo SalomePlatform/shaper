@@ -394,7 +394,7 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
   return myWorkshop->viewer()->AISContext();
 }
 
-void XGUI_Displayer::display(AISObjectPtr theAIS, bool isUpdate)
+void XGUI_Displayer::displayAIS(AISObjectPtr theAIS, bool isUpdate)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
@@ -414,7 +414,7 @@ void XGUI_Displayer::display(AISObjectPtr theAIS, bool isUpdate)
   }
 }
 
-void XGUI_Displayer::erase(AISObjectPtr theAIS, const bool isUpdate)
+void XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool isUpdate)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();

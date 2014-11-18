@@ -10,7 +10,10 @@
 
 #include <SketchPlugin_Constraint.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_Feature.h>
 
+
+#include <memory>
 #include <list>
 #include <map>
 #include <vector>
@@ -110,7 +113,7 @@ class SketchSolver_ConstraintGroup
    *  \param[in] theEntity attribute of the constraint
    */
   void updateRelatedConstraints(std::shared_ptr<ModelAPI_Attribute> theEntity) const;
-  void updateRelatedConstraints(std::shared_ptr<ModelAPI_Feature> theFeature) const;
+  void updateRelatedConstraintsFeature(std::shared_ptr<ModelAPI_Feature> theFeature) const;
 
   /** \brief Adds or updates an entity in the group
    *
@@ -121,7 +124,7 @@ class SketchSolver_ConstraintGroup
    *  \return identifier of changed entity or 0 if entity could not be changed
    */
   Slvs_hEntity changeEntity(std::shared_ptr<ModelAPI_Attribute> theEntity);
-  Slvs_hEntity changeEntity(FeaturePtr theEntity);
+  Slvs_hEntity changeEntityFeature(std::shared_ptr<ModelAPI_Feature> theEntity);
 
 protected:
   /** \brief Adds or updates a normal in the group

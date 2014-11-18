@@ -287,7 +287,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
     // For the length constraint the start and end points of the line should be added to the entities list instead of line
     if (aConstrType == SLVS_C_PT_PT_DISTANCE
         && theConstraint->getKind().compare(SketchPlugin_ConstraintLength::ID()) == 0) {
-      Slvs_hEntity aLineEnt = changeEntity(aFeature);
+      Slvs_hEntity aLineEnt = changeEntityFeature(aFeature);
       int aEntPos = Search(aLineEnt, myEntities);
       aConstrEnt[indAttr++] = myEntities[aEntPos].point[0];
       aConstrEnt[indAttr++] = myEntities[aEntPos].point[1];
@@ -295,7 +295,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
         aConstrEnt[indAttr++] = 0;
       break;  // there should be no other entities
     } else if (aConstrAttr->isObject())
-      aConstrEnt[indAttr] = changeEntity(aFeature);
+      aConstrEnt[indAttr] = changeEntityFeature(aFeature);
     else
       aConstrEnt[indAttr] = changeEntity(aConstrAttr->attr());
   }
@@ -432,7 +432,7 @@ bool SketchSolver_ConstraintGroup::changeRigidConstraint(
     aFeature = aDoc->feature(aRC);
   }
 
-  aConstrEnt = aConstrAttr->isObject() ? changeEntity(aFeature) : changeEntity(aConstrAttr->attr());
+  aConstrEnt = aConstrAttr->isObject() ? changeEntityFeature(aFeature) : changeEntity(aConstrAttr->attr());
 
   if (aConstrMapIter == myConstraintMap.end()) { // Add new constraint
     // Check the fixed entity is not a point.
@@ -646,7 +646,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
 //  Class:    SketchSolver_ConstraintGroup
 //  Purpose:  create/update the element defined by the feature affected by any constraint
 // ============================================================================
-Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
+Slvs_hEntity SketchSolver_ConstraintGroup::changeEntityFeature(FeaturePtr theEntity)
 {
   if (!theEntity->data()->isValid())
     return SLVS_E_UNKNOWN;
@@ -1527,7 +1527,7 @@ void SketchSolver_ConstraintGroup::updateRelatedConstraints(
   }
 }
 
-void SketchSolver_ConstraintGroup::updateRelatedConstraints(
+void SketchSolver_ConstraintGroup::updateRelatedConstraintsFeature(
     std::shared_ptr<ModelAPI_Feature> theFeature) const
 {
   ConstraintMap::const_iterator aConstrIter = myConstraintMap.begin();

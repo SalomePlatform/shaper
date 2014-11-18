@@ -56,7 +56,7 @@ class XGUI_EXPORT XGUI_Displayer
   void display(ObjectPtr theObject, bool isUpdateViewer = true);
 
   /// Display the given AIS object. To hide this object use corresponde erase method
-  void display(AISObjectPtr theAIS, bool isUpdate = true);
+  void displayAIS(AISObjectPtr theAIS, bool isUpdate = true);
 
   /// Stop the current selection and color the given features to the selection color
   /// \param theFeatures a list of features to be disabled
@@ -82,7 +82,7 @@ class XGUI_EXPORT XGUI_Displayer
   void erase(ObjectPtr theObject, const bool isUpdateViewer = true);
 
   /// Erase the given AIS object displayed by corresponded display method
-  void erase(AISObjectPtr theAIS, const bool isUpdate = true);
+  void eraseAIS(AISObjectPtr theAIS, const bool isUpdate = true);
 
   /// Erase all presentations
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
