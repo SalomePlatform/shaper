@@ -19,13 +19,18 @@
   #include "ModelAPI_AttributeRefAttr.h"
   #include "ModelAPI_AttributeSelection.h"
   #include "ModelAPI_AttributeSelectionList.h"
+  #include "ModelAPI_AttributeValidator.h"
   #include "ModelAPI_Validator.h"
+  #include "ModelAPI_FeatureValidator.h"
   #include "ModelAPI_AttributeRefList.h"
   #include "ModelAPI_AttributeBoolean.h"
   #include "ModelAPI_Result.h"
   #include "ModelAPI_ResultConstruction.h"
   #include "ModelAPI_ResultBody.h"
   #include "ModelAPI_ResultPart.h"
+  #include "ModelAPI_ResultParameters.h"
+  #include "ModelAPI_ResultGroup.h"
+  #include "ModelAPI_Tools.h"
   
   template<class T1, class T2> 
   std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject)
@@ -66,10 +71,15 @@
 %shared_ptr(ModelAPI_AttributeBoolean)
 %shared_ptr(ModelAPI_AttributeSelection)
 %shared_ptr(ModelAPI_AttributeSelectionList)
+%shared_ptr(ModelAPI_Validator)
+%shared_ptr(ModelAPI_AttributeValidator)
+%shared_ptr(ModelAPI_FeatureValidator)
 %shared_ptr(ModelAPI_Result)
 %shared_ptr(ModelAPI_ResultConstruction)
 %shared_ptr(ModelAPI_ResultBody)
 %shared_ptr(ModelAPI_ResultPart)
+%shared_ptr(ModelAPI_ResultGroup)
+%shared_ptr(ModelAPI_ResultParameters)
 
 // all supported interfaces
 %include "GeomAPI_Interface.h"
@@ -92,10 +102,15 @@
 %include "ModelAPI_AttributeSelectionList.h"
 %include "ModelAPI_AttributeRefList.h"
 %include "ModelAPI_Validator.h"
+%include "ModelAPI_AttributeValidator.h"
+%include "ModelAPI_FeatureValidator.h"
 %include "ModelAPI_Result.h"
 %include "ModelAPI_ResultConstruction.h"
 %include "ModelAPI_ResultBody.h"
 %include "ModelAPI_ResultPart.h"
+%include "ModelAPI_ResultGroup.h"
+%include "ModelAPI_ResultParameters.h"
+%include "ModelAPI_Tools.h"
 
 %template(ObjectList) std::list<std::shared_ptr<ModelAPI_Object> >;
 %template(ResultList) std::list<std::shared_ptr<ModelAPI_Result> >;
