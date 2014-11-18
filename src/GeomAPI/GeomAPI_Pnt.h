@@ -6,7 +6,7 @@
 #define GeomAPI_Pnt_H_
 
 #include <GeomAPI_Interface.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class GeomAPI_XYZ;
 class GeomAPI_Pnt2d;
@@ -23,7 +23,7 @@ class GEOMAPI_EXPORT GeomAPI_Pnt : public GeomAPI_Interface
   /// Creation of point by coordinates
   GeomAPI_Pnt(const double theX, const double theY, const double theZ);
   /// Creation of point by coordinates
-  GeomAPI_Pnt(const boost::shared_ptr<GeomAPI_XYZ>& theCoords);
+  GeomAPI_Pnt(const std::shared_ptr<GeomAPI_XYZ>& theCoords);
 
   /// returns X coordinate
   double x() const;
@@ -40,15 +40,15 @@ class GEOMAPI_EXPORT GeomAPI_Pnt : public GeomAPI_Interface
   void setZ(const double theZ);
 
   /// returns coordinates of the point
-  const boost::shared_ptr<GeomAPI_XYZ> xyz();
+  const std::shared_ptr<GeomAPI_XYZ> xyz();
 
   /// Distance between two points
-  double distance(const boost::shared_ptr<GeomAPI_Pnt>& theOther) const;
+  double distance(const std::shared_ptr<GeomAPI_Pnt>& theOther) const;
 
   /// Projects a point to the plane defined by the origin and 2 axes vectors in this plane
-  boost::shared_ptr<GeomAPI_Pnt2d> to2D(const boost::shared_ptr<GeomAPI_Pnt>& theOrigin,
-                                        const boost::shared_ptr<GeomAPI_Dir>& theDirX,
-                                        const boost::shared_ptr<GeomAPI_Dir>& theDirY);
+  std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                                        const std::shared_ptr<GeomAPI_Dir>& theDirX,
+                                        const std::shared_ptr<GeomAPI_Dir>& theDirY);
 };
 
 #endif

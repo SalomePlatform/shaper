@@ -21,14 +21,14 @@ class GeomDataAPI_Point2D : public ModelAPI_Attribute
   /// Defines the double value
   virtual void setValue(const double theX, const double theY) = 0;
   /// Defines the point
-  virtual void setValue(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) = 0;
+  virtual void setValue(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint) = 0;
 
   /// Returns the X double value
   virtual double x() const = 0;
   /// Returns the Y double value
   virtual double y() const = 0;
   /// Returns the 2D point
-  virtual boost::shared_ptr<GeomAPI_Pnt2d> pnt() = 0;
+  virtual std::shared_ptr<GeomAPI_Pnt2d> pnt() = 0;
 
   /// Appends the delta values to point
   void move(const double theDeltaX, const double theDeltaY)

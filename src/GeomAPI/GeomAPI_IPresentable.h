@@ -19,6 +19,6 @@ class GeomAPI_IPresentable
   virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious) = 0;
 };
 
-typedef boost::shared_ptr<GeomAPI_IPresentable> GeomPresentablePtr;
+typedef std::shared_ptr<GeomAPI_IPresentable> GeomPresentablePtr;
 
 #endif

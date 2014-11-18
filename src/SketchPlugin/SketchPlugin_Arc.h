@@ -72,7 +72,7 @@ class SketchPlugin_Arc : public SketchPlugin_Feature, public GeomAPI_IPresentabl
 
   /// Return the distance between the feature and the point
   /// \param thePoint the point
-  virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+  virtual double distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
   /// Use plugin manager for features creation
   SketchPlugin_Arc();

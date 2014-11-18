@@ -25,7 +25,7 @@
 #include <QComboBox>
 #include <QEvent>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 #include <string>
 
 ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParent,
@@ -78,7 +78,7 @@ bool ModuleBase_WidgetMultiSelector::storeValue() const
     return false;
   DataPtr aData = myFeature->data();
   AttributeSelectionListPtr aSelectionListAttr = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
 
   if (aSelectionListAttr) {
     aSelectionListAttr->clear();
@@ -104,7 +104,7 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
     return false;
   DataPtr aData = myFeature->data();
   AttributeSelectionListPtr aSelectionListAttr = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aData->attribute(attributeID()));
 
   if (aSelectionListAttr) {
     mySelection.clear();
@@ -182,7 +182,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
   NCollection_List<TopoDS_Shape>::Iterator aShpIt(aSelectedShapes);
   GeomShapePtr aShape;
   for (aIt = aOwnersList.cbegin(); aIt != aOwnersList.cend(); aShpIt.Next(), aIt++) {
-    ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(*aIt);
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(*aIt);
     if (myFeature) {
       // We can not select a result of our feature
       const std::list<ResultPtr>& aResList = myFeature->results();
@@ -197,7 +197,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
       if(isSkipSelf)
         continue;
     }
-    aShape = boost::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+    aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
     aShape->setImpl(new TopoDS_Shape(aShpIt.Value()));
     mySelection.append(GeomSelection(aResult, aShape));
   }

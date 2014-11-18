@@ -7,7 +7,7 @@
 
 #include "ModelAPI_Result.h"
 #include <GeomAPI_Shape.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <string>
 
 /**\class ModelAPI_ResultGroup
@@ -35,6 +35,6 @@ public:
 };
 
 //! Pointer on feature object
-typedef boost::shared_ptr<ModelAPI_ResultGroup> ResultGroupPtr;
+typedef std::shared_ptr<ModelAPI_ResultGroup> ResultGroupPtr;
 
 #endif

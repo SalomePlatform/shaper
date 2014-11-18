@@ -28,29 +28,29 @@ GeomAPI_Lin2d::GeomAPI_Lin2d(const double theStartX, const double theStartY, con
 {
 }
 
-GeomAPI_Lin2d::GeomAPI_Lin2d(const boost::shared_ptr<GeomAPI_Pnt2d>& theStart,
-                             const boost::shared_ptr<GeomAPI_Pnt2d>& theEnd)
+GeomAPI_Lin2d::GeomAPI_Lin2d(const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
+                             const std::shared_ptr<GeomAPI_Pnt2d>& theEnd)
     : GeomAPI_Interface(newLine2d(theStart->x(), theStart->y(), theEnd->x(), theEnd->y()))
 {
 }
 
-double GeomAPI_Lin2d::distance(const boost::shared_ptr<GeomAPI_Pnt2d>& theOther) const
+double GeomAPI_Lin2d::distance(const std::shared_ptr<GeomAPI_Pnt2d>& theOther) const
 {
   return MY_LIN2D->Distance(theOther->impl<gp_Pnt2d>());
 }
 
-const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::intersect(
-    const boost::shared_ptr<GeomAPI_Lin2d>& theLine) const
+const std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::intersect(
+    const std::shared_ptr<GeomAPI_Lin2d>& theLine) const
 {
   IntAna2d_AnaIntersection anInter(*MY_LIN2D, theLine->impl<gp_Lin2d>());
   if (!anInter.IsDone() || anInter.IsEmpty())
-  return boost::shared_ptr<GeomAPI_Pnt2d>();
+  return std::shared_ptr<GeomAPI_Pnt2d>();
   const gp_Pnt2d& aResult = anInter.Point(1).Value();
-  return boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aResult.X(), aResult.Y()));
+  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aResult.X(), aResult.Y()));
 }
 
-const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::project(
-    const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) const
+const std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::project(
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint) const
 {
   const gp_XY& aDir = MY_LIN2D->Direction().XY();
   const gp_XY& aLoc = MY_LIN2D->Location().XY();
@@ -58,10 +58,10 @@ const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::project(
   double aParam = aDir.Dot(aPnt - aLoc);
 
   gp_XY aResult = aLoc + aDir * aParam;
-  return boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aResult.X(), aResult.Y()));
+  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aResult.X(), aResult.Y()));
 }
 
-bool GeomAPI_Lin2d::isRight(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) const
+bool GeomAPI_Lin2d::isRight(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint) const
 {
   const gp_XY& aDir = MY_LIN2D->Direction().XY();
   const gp_XY& aLoc = MY_LIN2D->Location().XY();
@@ -71,7 +71,7 @@ bool GeomAPI_Lin2d::isRight(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) co
 }
 
 
-boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::shiftedLocation(double theShift) const
+std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::shiftedLocation(double theShift) const
 {
   gp_Vec2d aVec = MY_LIN2D->Direction();
   aVec = aVec.GetNormal();
@@ -79,5 +79,5 @@ boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Lin2d::shiftedLocation(double theShift)
   aVec.Reverse();
   aVec.Scale(theShift);
   gp_Lin2d aLin = MY_LIN2D->Translated(aVec);
-  return boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aLin.Location().X(), aLin.Location().Y()));
+  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aLin.Location().X(), aLin.Location().Y()));
 }

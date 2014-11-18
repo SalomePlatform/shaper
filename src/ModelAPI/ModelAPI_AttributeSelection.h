@@ -18,10 +18,10 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
  public:
   /// Defines the result and its selected sub-shape
   virtual void setValue(
-    const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape) = 0;
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape) = 0;
 
   /// Returns the selected subshape
-  virtual boost::shared_ptr<GeomAPI_Shape> value() = 0;
+  virtual std::shared_ptr<GeomAPI_Shape> value() = 0;
 
   /// Returns the context of the selection (the whole shape owner)
   virtual ResultPtr context() = 0;
@@ -55,6 +55,6 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
 };
 
 //! Pointer on double attribute
-typedef boost::shared_ptr<ModelAPI_AttributeSelection> AttributeSelectionPtr;
+typedef std::shared_ptr<ModelAPI_AttributeSelection> AttributeSelectionPtr;
 
 #endif

@@ -5,7 +5,7 @@
 #define GeomAlgoAPI_MakeShape_H_
 
 #include <GeomAPI_Shape.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <GeomAlgoAPI.h>
 //#include <BRepBuilderAPI_MakeShape.hxx>
 /**\class GeomAlgoAPI_MakeShape
@@ -21,23 +21,23 @@ class GeomAlgoAPI_MakeShape : public GeomAPI_Interface
   GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape(void* theBuilder);
 
   /// Returns a shape built by the shape construction algorithm
-  GEOMALGOAPI_EXPORT const boost::shared_ptr<GeomAPI_Shape>  shape() const;
+  GEOMALGOAPI_EXPORT const std::shared_ptr<GeomAPI_Shape>  shape() const;
 
   /// Returns the  list   of shapes generated   from the shape <theShape>
   GEOMALGOAPI_EXPORT virtual void generated(
-    const boost::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory);
+    const std::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory);
 
   /// Returns the  list   of shapes modified   from the shape <theShape>
   GEOMALGOAPI_EXPORT virtual void modified(
-    const boost::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory);
+    const std::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory);
 
   /// Returns whether the shape is an edge
-  GEOMALGOAPI_EXPORT virtual bool isDeleted(const boost::shared_ptr<GeomAPI_Shape> theShape);
+  GEOMALGOAPI_EXPORT virtual bool isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape);
 
   GEOMALGOAPI_EXPORT void init(void* theMkShape);
 
   protected:
-	boost::shared_ptr<GeomAPI_Shape> myShape;
+	std::shared_ptr<GeomAPI_Shape> myShape;
 };
 
 #endif

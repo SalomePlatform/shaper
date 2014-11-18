@@ -28,7 +28,7 @@ Q_OBJECT
   virtual ~XGUI_DocumentDataModel();
 
   // Event Listener method
-  virtual void processEvent(const boost::shared_ptr<Events_Message>& theMessage);
+  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   virtual QVariant data(const QModelIndex& theIndex, int theRole) const;
   virtual QVariant headerData(int theSection, Qt::Orientation theOrient, int theRole =

@@ -6,7 +6,7 @@
 #define GeomAPI_Dir_H_
 
 #include <GeomAPI_Interface.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class GeomAPI_XYZ;
 
@@ -21,7 +21,7 @@ class GEOMAPI_EXPORT GeomAPI_Dir : public GeomAPI_Interface
   /// Creation of direction by coordinates
   GeomAPI_Dir(const double theX, const double theY, const double theZ);
   /// Creation of direction by coordinates
-  GeomAPI_Dir(const boost::shared_ptr<GeomAPI_XYZ>& theCoords);
+  GeomAPI_Dir(const std::shared_ptr<GeomAPI_XYZ>& theCoords);
 
   /// returns X coordinate
   double x() const;
@@ -31,12 +31,12 @@ class GEOMAPI_EXPORT GeomAPI_Dir : public GeomAPI_Interface
   double z() const;
 
   /// returns coordinates of the direction
-  const boost::shared_ptr<GeomAPI_XYZ> xyz();
+  const std::shared_ptr<GeomAPI_XYZ> xyz();
 
   /// result is a scalar product of directions
-  double dot(const boost::shared_ptr<GeomAPI_Dir>& theArg) const;
+  double dot(const std::shared_ptr<GeomAPI_Dir>& theArg) const;
   /// result is a cross product of two directions
-  const boost::shared_ptr<GeomAPI_XYZ> cross(const boost::shared_ptr<GeomAPI_Dir>& theArg) const;
+  const std::shared_ptr<GeomAPI_XYZ> cross(const std::shared_ptr<GeomAPI_Dir>& theArg) const;
 };
 
 #endif

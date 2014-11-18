@@ -21,7 +21,7 @@ GeomValidators_Positive::GeomValidators_Positive()
 bool GeomValidators_Positive::isValid(
     const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const
 {
-  boost::shared_ptr<ModelAPI_AttributeDouble> aDouble = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
+  std::shared_ptr<ModelAPI_AttributeDouble> aDouble = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
   return aDouble->isInitialized() && aDouble->value() > 1.e-5;
 }

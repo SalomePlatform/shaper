@@ -28,9 +28,9 @@
   #include "ModelAPI_ResultPart.h"
   
   template<class T1, class T2> 
-  boost::shared_ptr<T1> boost_cast(boost::shared_ptr<T2> theObject)
+  std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject)
   { 
-    return boost::dynamic_pointer_cast<T1>(theObject); 
+    return std::dynamic_pointer_cast<T1>(theObject); 
   }
   
 %}
@@ -43,9 +43,9 @@
 %include "typemaps.i"
 %include "std_string.i"
 %include "std_list.i"
+%include "std_shared_ptr.i"
 
-// boost pointers
-%include <boost_shared_ptr.i>
+// shared pointers
 // For ModelAPI_ResultConstruction.shape()
 %shared_ptr(GeomAPI_Interface)
 %shared_ptr(GeomAPI_Shape)
@@ -97,13 +97,13 @@
 %include "ModelAPI_ResultBody.h"
 %include "ModelAPI_ResultPart.h"
 
-%template(ObjectList) std::list<boost::shared_ptr<ModelAPI_Object> >;
-%template(ResultList) std::list<boost::shared_ptr<ModelAPI_Result> >;
+%template(ObjectList) std::list<std::shared_ptr<ModelAPI_Object> >;
+%template(ResultList) std::list<std::shared_ptr<ModelAPI_Result> >;
 
-template<class T1, class T2> boost::shared_ptr<T1> boost_cast(boost::shared_ptr<T2> theObject);
-%template(modelAPI_CompositeFeature) boost_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
-%template(modelAPI_ResultConstruction) boost_cast<ModelAPI_ResultConstruction, ModelAPI_Result>;
-%template(modelAPI_ResultBody) boost_cast<ModelAPI_ResultBody, ModelAPI_Result>;
-%template(modelAPI_ResultPart) boost_cast<ModelAPI_ResultPart, ModelAPI_Result>;
+template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject);
+%template(modelAPI_CompositeFeature) shared_ptr_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
+%template(modelAPI_ResultConstruction) shared_ptr_cast<ModelAPI_ResultConstruction, ModelAPI_Result>;
+%template(modelAPI_ResultBody) shared_ptr_cast<ModelAPI_ResultBody, ModelAPI_Result>;
+%template(modelAPI_ResultPart) shared_ptr_cast<ModelAPI_ResultPart, ModelAPI_Result>;
 
 

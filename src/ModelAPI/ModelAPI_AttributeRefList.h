@@ -51,6 +51,6 @@ class ModelAPI_AttributeRefList : public ModelAPI_Attribute
   }
 };
 
-typedef boost::shared_ptr<ModelAPI_AttributeRefList> AttributeRefListPtr;
+typedef std::shared_ptr<ModelAPI_AttributeRefList> AttributeRefListPtr;
 
 #endif

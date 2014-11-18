@@ -42,8 +42,8 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId)
 void ModuleBase_IModule::sendOperation(ModuleBase_Operation* theOperation)
 {
   static Events_ID aModuleEvent = Events_Loop::eventByName(EVENT_OPERATION_LAUNCHED);
-  boost::shared_ptr<Config_PointerMessage> aMessage =
-      boost::shared_ptr<Config_PointerMessage>(new Config_PointerMessage(aModuleEvent, this));
+  std::shared_ptr<Config_PointerMessage> aMessage =
+      std::shared_ptr<Config_PointerMessage>(new Config_PointerMessage(aModuleEvent, this));
   aMessage->setPointer(theOperation);
   Events_Loop::loop()->send(aMessage);
 }

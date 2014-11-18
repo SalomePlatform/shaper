@@ -18,13 +18,13 @@
 class Model_AttributeDocRef : public ModelAPI_AttributeDocRef
 {
   Handle_TDataStd_Comment myComment;  ///< reference to document is identified as string-id
-  boost::shared_ptr<ModelAPI_Document> myDoc; ///< document referenced by this attribute (if already loaded)
+  std::shared_ptr<ModelAPI_Document> myDoc; ///< document referenced by this attribute (if already loaded)
  public:
   /// Defines the document referenced from this attribute
-  MODEL_EXPORT virtual void setValue(boost::shared_ptr<ModelAPI_Document> theDoc);
+  MODEL_EXPORT virtual void setValue(std::shared_ptr<ModelAPI_Document> theDoc);
 
   /// Returns document referenced from this attribute
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> value();
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> value();
 
  protected:
   /// Initializes attibutes

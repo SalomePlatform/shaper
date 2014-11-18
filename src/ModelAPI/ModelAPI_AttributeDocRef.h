@@ -17,10 +17,10 @@ class ModelAPI_AttributeDocRef : public ModelAPI_Attribute
 {
  public:
   /// Defines the document referenced from this attribute
-  MODELAPI_EXPORT virtual void setValue(boost::shared_ptr<ModelAPI_Document> theDoc) = 0;
+  MODELAPI_EXPORT virtual void setValue(std::shared_ptr<ModelAPI_Document> theDoc) = 0;
 
   /// Returns document referenced from this attribute
-  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Document> value() = 0;
+  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Document> value() = 0;
 
   /// Returns the type of this class of attributes
   MODELAPI_EXPORT static std::string type()
@@ -46,6 +46,6 @@ class ModelAPI_AttributeDocRef : public ModelAPI_Attribute
   }
 };
 
-typedef boost::shared_ptr<ModelAPI_AttributeDocRef> AttributeDocRefPtr;
+typedef std::shared_ptr<ModelAPI_AttributeDocRef> AttributeDocRefPtr;
 
 #endif

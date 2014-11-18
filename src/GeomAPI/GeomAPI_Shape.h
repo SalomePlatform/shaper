@@ -6,7 +6,7 @@
 #define GeomAPI_Shape_H_
 
 #include <GeomAPI_Interface.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <list>
 
 /**\class GeomAPI_Shape
@@ -22,7 +22,7 @@ class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
   bool isNull() const;
 
   /// Returns whether the shapes are equal
-  virtual bool isEqual(const boost::shared_ptr<GeomAPI_Shape> theShape) const;
+  virtual bool isEqual(const std::shared_ptr<GeomAPI_Shape> theShape) const;
 
   /// Returns whether the shape is a vertex
   virtual bool isVertex() const;
@@ -33,9 +33,9 @@ class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
 };
 
 //! Pointer on list of shapes
-typedef std::list<boost::shared_ptr<GeomAPI_Shape> > ListOfShape;
+typedef std::list<std::shared_ptr<GeomAPI_Shape> > ListOfShape;
 
 //! Pointer on attribute object
-typedef boost::shared_ptr<GeomAPI_Shape> GeomShapePtr;
+typedef std::shared_ptr<GeomAPI_Shape> GeomShapePtr;
 
 #endif

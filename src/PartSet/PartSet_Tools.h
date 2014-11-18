@@ -15,7 +15,7 @@
 
 #include <ModelAPI_CompositeFeature.h>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class Handle_V3d_View;
 class ModuleBase_ViewerPrs;
@@ -68,14 +68,14 @@ class PARTSET_EXPORT PartSet_Tools
                                   const QList<ModuleBase_ViewerPrs>& theHighlighted);
 
   /// Returns pointer to the root document.
-  static boost::shared_ptr<ModelAPI_Document> document();
+  static std::shared_ptr<ModelAPI_Document> document();
 
 
   /// Returns a point attribute of the feature by the coordinates if it is
   /// \param theFeature the feature
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
-  static boost::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(FeaturePtr theFeature,
+  static std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(FeaturePtr theFeature,
                                                                 double theX, double theY);
 
   /// \brief Save the double to the feature. If the attribute is double, it is filled.
@@ -104,8 +104,8 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param thePoint1 the first point
   /// \param thePoint1 the second point
   static void createConstraint(CompositeFeaturePtr theSketch,
-                               boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
-                               boost::shared_ptr<GeomDataAPI_Point2D> thePoint2);
+                               std::shared_ptr<GeomDataAPI_Point2D> thePoint1,
+                               std::shared_ptr<GeomDataAPI_Point2D> thePoint2);
 
   /// Creates constrains of the current 
   /// \param theSketch a sketch feature
@@ -120,13 +120,13 @@ class PARTSET_EXPORT PartSet_Tools
   /// Create a sketch plane instance
   /// \param theSketch a sketch feature
   /// \return API object of geom plane
-  static boost::shared_ptr<GeomAPI_Pln> sketchPlane(CompositeFeaturePtr theSketch);
+  static std::shared_ptr<GeomAPI_Pln> sketchPlane(CompositeFeaturePtr theSketch);
 
   /// Create a point 3D on a basis of point 2D and sketch feature
   /// \param thePoint2D a point on a sketch
   /// \param theSketch a sketch feature
   /// \return API object of point 3D
-  static boost::shared_ptr<GeomAPI_Pnt> point3D(boost::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
+  static std::shared_ptr<GeomAPI_Pnt> point3D(std::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
                                                 CompositeFeaturePtr theSketch);
   /// Check whether there is a constraint with the feature kind given
   /// \param theKind a feature kind
@@ -150,7 +150,7 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theSketch - the sketch feature
   /// \param theEdge - the edge
   /// \return result object with external edge if it is found
-  static ResultPtr findExternalEdge(CompositeFeaturePtr theSketch, boost::shared_ptr<GeomAPI_Edge> theEdge);
+  static ResultPtr findExternalEdge(CompositeFeaturePtr theSketch, std::shared_ptr<GeomAPI_Edge> theEdge);
 
   /// Returns whether the selected presentation has a shape with the vertex type
   /// \param thePrs a selected presentation

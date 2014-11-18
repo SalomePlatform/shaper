@@ -12,7 +12,7 @@ void Config_Prop::setValue(const std::string& theValue)
   if (theValue != myValue) {
     myValue = theValue;
     static const Events_ID aChangedEvent = Events_Loop::loop()->eventByName("PreferenceChanged");
-    Events_Loop::loop()->send(boost::shared_ptr<Events_Message>(
+    Events_Loop::loop()->send(std::shared_ptr<Events_Message>(
       new Events_Message(aChangedEvent, this)));
   }
 }

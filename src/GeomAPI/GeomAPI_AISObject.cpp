@@ -41,7 +41,7 @@ GeomAPI_AISObject::GeomAPI_AISObject()
 {
 }
 
-void GeomAPI_AISObject::createShape(boost::shared_ptr<GeomAPI_Shape> theShape)
+void GeomAPI_AISObject::createShape(std::shared_ptr<GeomAPI_Shape> theShape)
 {
   const TopoDS_Shape& aTDS =
       (theShape && theShape->implPtr<TopoDS_Shape>()) ?
@@ -64,10 +64,10 @@ void GeomAPI_AISObject::createShape(boost::shared_ptr<GeomAPI_Shape> theShape)
     setImpl(new Handle(AIS_InteractiveObject)(new AIS_Shape(aTDS)));
 }
 
-void GeomAPI_AISObject::createDistance(boost::shared_ptr<GeomAPI_Pnt> theStartPoint,
-                                       boost::shared_ptr<GeomAPI_Pnt> theEndPoint,
-                                       boost::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
-                                       boost::shared_ptr<GeomAPI_Pln> thePlane, double theDistance)
+void GeomAPI_AISObject::createDistance(std::shared_ptr<GeomAPI_Pnt> theStartPoint,
+                                       std::shared_ptr<GeomAPI_Pnt> theEndPoint,
+                                       std::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
+                                       std::shared_ptr<GeomAPI_Pln> thePlane, double theDistance)
 {
   double aFlyout = 0;
   if (theFlyoutPoint) {
@@ -75,15 +75,15 @@ void GeomAPI_AISObject::createDistance(boost::shared_ptr<GeomAPI_Pnt> theStartPo
     if (theStartPoint->distance(theEndPoint) < tolerance)
       aDist = theStartPoint->distance(theFlyoutPoint);
     else {
-      boost::shared_ptr<GeomAPI_Lin> aLine = boost::shared_ptr<GeomAPI_Lin>(
+      std::shared_ptr<GeomAPI_Lin> aLine = std::shared_ptr<GeomAPI_Lin>(
           new GeomAPI_Lin(theStartPoint, theEndPoint));
       aDist = aLine->distance(theFlyoutPoint);
     }
 
-    boost::shared_ptr<GeomAPI_XYZ> aLineDir = theEndPoint->xyz()->decreased(theStartPoint->xyz());
-    boost::shared_ptr<GeomAPI_XYZ> aFOutDir = theFlyoutPoint->xyz()->decreased(
+    std::shared_ptr<GeomAPI_XYZ> aLineDir = theEndPoint->xyz()->decreased(theStartPoint->xyz());
+    std::shared_ptr<GeomAPI_XYZ> aFOutDir = theFlyoutPoint->xyz()->decreased(
         theStartPoint->xyz());
-    boost::shared_ptr<GeomAPI_XYZ> aNorm = thePlane->direction()->xyz();
+    std::shared_ptr<GeomAPI_XYZ> aNorm = thePlane->direction()->xyz();
     if (aLineDir->cross(aFOutDir)->dot(aNorm) < 0)
       aDist = -aDist;
     aFlyout = aDist;
@@ -122,11 +122,11 @@ void GeomAPI_AISObject::createDistance(boost::shared_ptr<GeomAPI_Pnt> theStartPo
   }
 }
 
-void GeomAPI_AISObject::createRadius(boost::shared_ptr<GeomAPI_Circ> theCircle,
-                                     boost::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
+void GeomAPI_AISObject::createRadius(std::shared_ptr<GeomAPI_Circ> theCircle,
+                                     std::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
                                      double theRadius)
 {
-  boost::shared_ptr<GeomAPI_Pnt> aCenter = theCircle->center();
+  std::shared_ptr<GeomAPI_Pnt> aCenter = theCircle->center();
 
   // TODO: a bug in AIS_RadiusDimension:
   // The anchor point can't be myCirc.Location() - an exception is raised.
@@ -134,10 +134,10 @@ void GeomAPI_AISObject::createRadius(boost::shared_ptr<GeomAPI_Circ> theCircle,
   // We want to show a radius dimension starting from the circle centre and 
   // ending at the user-defined point.
   // Also, if anchor point coincides with myP2, the radius dimension is not displayed at all.
-  boost::shared_ptr<GeomAPI_Pnt> anAnchor = theCircle->project(theFlyoutPoint);
-  boost::shared_ptr<GeomAPI_XYZ> anAnchorXYZ = anAnchor->xyz();
+  std::shared_ptr<GeomAPI_Pnt> anAnchor = theCircle->project(theFlyoutPoint);
+  std::shared_ptr<GeomAPI_XYZ> anAnchorXYZ = anAnchor->xyz();
   anAnchorXYZ = anAnchorXYZ->decreased(aCenter->xyz());
-  boost::shared_ptr<GeomAPI_Dir> aDeltaDir(new GeomAPI_Dir(anAnchorXYZ));
+  std::shared_ptr<GeomAPI_Dir> aDeltaDir(new GeomAPI_Dir(anAnchorXYZ));
   const double aDelta = 1e-3;
   anAnchor->setX(anAnchor->x() + aDelta * aDeltaDir->x());
   anAnchor->setY(anAnchor->y() + aDelta * aDeltaDir->y());
@@ -171,10 +171,10 @@ void GeomAPI_AISObject::createRadius(boost::shared_ptr<GeomAPI_Circ> theCircle,
   }
 }
 
-void GeomAPI_AISObject::createParallel(boost::shared_ptr<GeomAPI_Shape> theLine1,
-                                       boost::shared_ptr<GeomAPI_Shape> theLine2,
-                                       boost::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
-                                       boost::shared_ptr<GeomAPI_Pln> thePlane)
+void GeomAPI_AISObject::createParallel(std::shared_ptr<GeomAPI_Shape> theLine1,
+                                       std::shared_ptr<GeomAPI_Shape> theLine2,
+                                       std::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
+                                       std::shared_ptr<GeomAPI_Pln> thePlane)
 {
   Handle(Geom_Plane) aPlane = new Geom_Plane(thePlane->impl<gp_Pln>());
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
@@ -198,9 +198,9 @@ void GeomAPI_AISObject::createParallel(boost::shared_ptr<GeomAPI_Shape> theLine1
   }
 }
 
-void GeomAPI_AISObject::createPerpendicular(boost::shared_ptr<GeomAPI_Shape> theLine1,
-                                            boost::shared_ptr<GeomAPI_Shape> theLine2,
-                                            boost::shared_ptr<GeomAPI_Pln> thePlane)
+void GeomAPI_AISObject::createPerpendicular(std::shared_ptr<GeomAPI_Shape> theLine1,
+                                            std::shared_ptr<GeomAPI_Shape> theLine2,
+                                            std::shared_ptr<GeomAPI_Pln> thePlane)
 {
   Handle(Geom_Plane) aPlane = new Geom_Plane(thePlane->impl<gp_Pln>());
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
@@ -222,8 +222,8 @@ void GeomAPI_AISObject::createPerpendicular(boost::shared_ptr<GeomAPI_Shape> the
 }
 
 
-void GeomAPI_AISObject::createFixed(boost::shared_ptr<GeomAPI_Shape> theShape,
-                                    boost::shared_ptr<GeomAPI_Pln> thePlane)
+void GeomAPI_AISObject::createFixed(std::shared_ptr<GeomAPI_Shape> theShape,
+                                    std::shared_ptr<GeomAPI_Pln> thePlane)
 {
   Handle(Geom_Plane) aPlane = new Geom_Plane(thePlane->impl<gp_Pln>());
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();

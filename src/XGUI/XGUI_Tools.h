@@ -7,7 +7,7 @@
 
 #include <ModelAPI_Feature.h>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 /*!
  \brief Return directory part of the file path.

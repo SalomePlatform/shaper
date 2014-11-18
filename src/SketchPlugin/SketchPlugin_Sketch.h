@@ -88,14 +88,14 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_IPr
 
   /// Return the distance between the feature and the point
   /// \param thePoint the point
-  virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+  virtual double distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
   {
     return 0;
   }
   ;
 
   /// Converts a 2D sketch space point into point in 3D space
-  SKETCHPLUGIN_EXPORT boost::shared_ptr<GeomAPI_Pnt> to3D(const double theX, const double theY);
+  SKETCHPLUGIN_EXPORT std::shared_ptr<GeomAPI_Pnt> to3D(const double theX, const double theY);
 
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
   SKETCHPLUGIN_EXPORT virtual bool isInHistory()
@@ -107,20 +107,20 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_IPr
   SketchPlugin_Sketch();
 
   /// Returns the basis plane for the sketch
-  boost::shared_ptr<GeomAPI_Pln> plane();
+  std::shared_ptr<GeomAPI_Pln> plane();
 
   virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
   /// removes also all sub-sketch elements
   SKETCHPLUGIN_EXPORT virtual void erase();
 
-  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
+  SKETCHPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
 
   /// Returns the number of sub-elements
   SKETCHPLUGIN_EXPORT virtual int numberOfSubs() const;
 
   /// Returns the sub-feature by zero-base index
-  SKETCHPLUGIN_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> 
+  SKETCHPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature> 
     subFeature(const int theIndex) const;
 
   /// Returns the sub-feature unique identifier in this composite feature by zero-base index
@@ -133,7 +133,7 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_IPr
   SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
 
   /// Returns the point projected into the sketch plane
-  boost::shared_ptr<GeomAPI_Pnt2d> to2D(const boost::shared_ptr<GeomAPI_Pnt>& thePnt);
+  std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& thePnt);
 
   SKETCHPLUGIN_EXPORT virtual void attributeChanged();
 protected:
@@ -143,7 +143,7 @@ protected:
   /// \param theZ the Z normal value
   /// \param theShapes the list of result shapes
   //void addPlane(double theX, double theY, double theZ,
-  //              std::list<boost::shared_ptr<GeomAPI_Shape> >& theShapes) const;
+  //              std::list<std::shared_ptr<GeomAPI_Shape> >& theShapes) const;
 
   /// Checks whether the plane is set in the sketch.
   /// \returns the boolean state

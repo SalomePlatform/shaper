@@ -20,14 +20,14 @@ class SketchSolver_Constraint
 {
  public:
   SketchSolver_Constraint();
-  SketchSolver_Constraint(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
+  SketchSolver_Constraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
   /** \brief Compute constraint type according to SolveSpace identifiers
    *         and verify that constraint parameters are correct
    *  \param[in]  theConstraint constraint which type should be determined
    *  \return identifier of constraint type or SLVS_C_UNKNOWN if the type is wrong
    */
-  const int& getType(boost::shared_ptr<SketchPlugin_Constraint> theConstraint);
+  const int& getType(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
   /// \brief Returns the type of myConstraint member
   inline const int& getType() const
   {
@@ -41,7 +41,7 @@ class SketchSolver_Constraint
   }
 
  private:
-  boost::shared_ptr<SketchPlugin_Constraint> myConstraint;
+  std::shared_ptr<SketchPlugin_Constraint> myConstraint;
   int myType;
   std::vector<std::string> myAttributesList;
 };

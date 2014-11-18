@@ -68,7 +68,7 @@ static int Search(const uint32_t& theEntityID, const std::vector<T>& theEntities
 // ========================================================
 
 SketchSolver_ConstraintGroup::SketchSolver_ConstraintGroup(
-    boost::shared_ptr<ModelAPI_CompositeFeature> theWorkplane)
+    std::shared_ptr<ModelAPI_CompositeFeature> theWorkplane)
     : myID(++myGroupIndexer),
       myParamMaxID(0),
       myEntityMaxID(0),
@@ -116,7 +116,7 @@ SketchSolver_ConstraintGroup::~SketchSolver_ConstraintGroup()
 //  Purpose:  verify the group is based on the given workplane
 // ============================================================================
 bool SketchSolver_ConstraintGroup::isBaseWorkplane(
-    boost::shared_ptr<ModelAPI_CompositeFeature> theWorkplane) const
+    std::shared_ptr<ModelAPI_CompositeFeature> theWorkplane) const
 {
   return theWorkplane == mySketch;
 }
@@ -127,7 +127,7 @@ bool SketchSolver_ConstraintGroup::isBaseWorkplane(
 //  Purpose:  verify are there any entities in the group used by given constraint
 // ============================================================================
 bool SketchSolver_ConstraintGroup::isInteract(
-    boost::shared_ptr<SketchPlugin_Feature> theFeature) const
+    std::shared_ptr<SketchPlugin_Feature> theFeature) const
 {
   // Check the group is empty
   if (isEmpty())
@@ -136,37 +136,37 @@ bool SketchSolver_ConstraintGroup::isInteract(
   // Check if the feature is already in the group
   if (myEntityFeatMap.find(theFeature) != myEntityFeatMap.end())
     return true;
-  boost::shared_ptr<SketchPlugin_Constraint> aConstr =
-      boost::dynamic_pointer_cast<SketchPlugin_Constraint>(theFeature);
+  std::shared_ptr<SketchPlugin_Constraint> aConstr =
+      std::dynamic_pointer_cast<SketchPlugin_Constraint>(theFeature);
   if (aConstr && myConstraintMap.find(aConstr) != myConstraintMap.end())
     return true;
 
   // Go through the attributes and verify if some of them already in the group
-  std::list<boost::shared_ptr<ModelAPI_Attribute>> 
+  std::list<std::shared_ptr<ModelAPI_Attribute>> 
       anAttrList = theFeature->data()->attributes(std::string());
-  std::list<boost::shared_ptr<ModelAPI_Attribute>>::const_iterator
+  std::list<std::shared_ptr<ModelAPI_Attribute>>::const_iterator
       anAttrIter = anAttrList.begin();
   for ( ; anAttrIter != anAttrList.end(); anAttrIter++) {
-    boost::shared_ptr<ModelAPI_AttributeRefAttr> aCAttrRef =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
+    std::shared_ptr<ModelAPI_AttributeRefAttr> aCAttrRef =
+        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttrIter);
     if (!aCAttrRef || !aCAttrRef->isObject()) {
-      boost::shared_ptr<ModelAPI_Attribute> anAttr = 
+      std::shared_ptr<ModelAPI_Attribute> anAttr = 
           aCAttrRef ? aCAttrRef->attr() : *anAttrIter;
       if (myEntityAttrMap.find(anAttr) != myEntityAttrMap.end())
         return true;
     } else {
-      ResultConstructionPtr aRC = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
+      ResultConstructionPtr aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
           aCAttrRef->object());
       if (!aRC)
         continue;
-      boost::shared_ptr<ModelAPI_Document> aDoc = aRC->document();
+      std::shared_ptr<ModelAPI_Document> aDoc = aRC->document();
       FeaturePtr aFeature = aDoc->feature(aRC);
       if (myEntityFeatMap.find(aFeature) != myEntityFeatMap.end())
         return true;
       // search attributes of a feature to be parameters of constraint
-      std::list<boost::shared_ptr<ModelAPI_Attribute> > aFeatAttrList =
+      std::list<std::shared_ptr<ModelAPI_Attribute> > aFeatAttrList =
           aFeature->data()->attributes(std::string());
-      std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator aFAIter = aFeatAttrList
+      std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aFAIter = aFeatAttrList
           .begin();
       for (; aFAIter != aFeatAttrList.end(); aFAIter++)
         if (myEntityAttrMap.find(*aFAIter) != myEntityAttrMap.end())
@@ -191,18 +191,18 @@ void SketchSolver_ConstraintGroup::checkConstraintConsistence(Slvs_Constraint& t
     // point coordinates
     int aPtPos = Search(theConstraint.ptA, myEntities);
     int aPtParamPos = Search(myEntities[aPtPos].param[0], myParams);
-    boost::shared_ptr<GeomAPI_XY> aPoint(
+    std::shared_ptr<GeomAPI_XY> aPoint(
         new GeomAPI_XY(myParams[aPtParamPos].val, myParams[aPtParamPos + 1].val));
 
     // line coordinates
     int aLnPos = Search(theConstraint.entityA, myEntities);
     aPtPos = Search(myEntities[aLnPos].point[0], myEntities);
     aPtParamPos = Search(myEntities[aPtPos].param[0], myParams);
-    boost::shared_ptr<GeomAPI_XY> aStart(
+    std::shared_ptr<GeomAPI_XY> aStart(
         new GeomAPI_XY(-myParams[aPtParamPos].val, -myParams[aPtParamPos + 1].val));
     aPtPos = Search(myEntities[aLnPos].point[1], myEntities);
     aPtParamPos = Search(myEntities[aPtPos].param[0], myParams);
-    boost::shared_ptr<GeomAPI_XY> aEnd(
+    std::shared_ptr<GeomAPI_XY> aEnd(
         new GeomAPI_XY(myParams[aPtParamPos].val, myParams[aPtParamPos + 1].val));
 
     aEnd = aEnd->added(aStart);
@@ -218,7 +218,7 @@ void SketchSolver_ConstraintGroup::checkConstraintConsistence(Slvs_Constraint& t
 //  Purpose:  create/update the constraint in the group
 // ============================================================================
 bool SketchSolver_ConstraintGroup::changeConstraint(
-    boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
+    std::shared_ptr<SketchPlugin_Constraint> theConstraint)
 {
   // There is no workplane yet, something wrong
   if (myWorkplane.h == SLVS_E_UNKNOWN)
@@ -245,7 +245,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
 
   // Create constraint parameters
   double aDistance = 0.0;  // scalar value of the constraint
-  AttributeDoublePtr aDistAttr = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+  AttributeDoublePtr aDistAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
       theConstraint->data()->attribute(SketchPlugin_Constraint::VALUE()));
   if (aDistAttr) {
     aDistance = aDistAttr->value();
@@ -267,7 +267,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
   Slvs_hEntity aConstrEnt[CONSTRAINT_ATTR_SIZE];  // parameters of the constraint
   for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
     aConstrEnt[indAttr] = SLVS_E_UNKNOWN;
-    boost::shared_ptr<ModelAPI_AttributeRefAttr> aConstrAttr = boost::dynamic_pointer_cast<
+    std::shared_ptr<ModelAPI_AttributeRefAttr> aConstrAttr = std::dynamic_pointer_cast<
         ModelAPI_AttributeRefAttr>(
         theConstraint->data()->attribute(aConstraintAttributes[indAttr]));
     if (!aConstrAttr)
@@ -276,11 +276,11 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
     // Convert the object of the attribute to the feature
     FeaturePtr aFeature;
     if (aConstrAttr->isObject() && aConstrAttr->object()) {
-      ResultConstructionPtr aRC = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
+      ResultConstructionPtr aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
           aConstrAttr->object());
       if (!aRC)
         continue;
-      boost::shared_ptr<ModelAPI_Document> aDoc = aRC->document();
+      std::shared_ptr<ModelAPI_Document> aDoc = aRC->document();
       aFeature = aDoc->feature(aRC);
     }
 
@@ -396,7 +396,7 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
 //  Purpose:  create/update the "Rigid" constraint in the group
 // ============================================================================
 bool SketchSolver_ConstraintGroup::changeRigidConstraint(
-    boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
+    std::shared_ptr<SketchPlugin_Constraint> theConstraint)
 {
   // Search this constraint in the current group to update it
   ConstraintMap::const_iterator aConstrMapIter = myConstraintMap.find(theConstraint);
@@ -415,7 +415,7 @@ bool SketchSolver_ConstraintGroup::changeRigidConstraint(
   const std::vector<std::string>& aConstraintAttributes = aConstraint.getAttributes();
 
   Slvs_hEntity aConstrEnt = SLVS_E_UNKNOWN;
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aConstrAttr = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeRefAttr> aConstrAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(
       theConstraint->data()->attribute(aConstraintAttributes[0]));
   if (!aConstrAttr)
@@ -424,11 +424,11 @@ bool SketchSolver_ConstraintGroup::changeRigidConstraint(
   // Convert the object of the attribute to the feature
   FeaturePtr aFeature;
   if (aConstrAttr->isObject() && aConstrAttr->object()) {
-    ResultConstructionPtr aRC = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
+    ResultConstructionPtr aRC = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
         aConstrAttr->object());
     if (!aRC)
       return false;
-    boost::shared_ptr<ModelAPI_Document> aDoc = aRC->document();
+    std::shared_ptr<ModelAPI_Document> aDoc = aRC->document();
     aFeature = aDoc->feature(aRC);
   }
 
@@ -436,12 +436,12 @@ bool SketchSolver_ConstraintGroup::changeRigidConstraint(
 
   if (aConstrMapIter == myConstraintMap.end()) { // Add new constraint
     // Check the fixed entity is not a point.
-    boost::shared_ptr<ModelAPI_AttributeRefAttr> aConstrAttr = boost::dynamic_pointer_cast<
+    std::shared_ptr<ModelAPI_AttributeRefAttr> aConstrAttr = std::dynamic_pointer_cast<
         ModelAPI_AttributeRefAttr>(theConstraint->data()->attribute(aConstraintAttributes[0]));
-    boost::shared_ptr<GeomDataAPI_Point> aPoint =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point>(aConstrAttr->attr());
-    boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aConstrAttr->attr());
+    std::shared_ptr<GeomDataAPI_Point> aPoint =
+        std::dynamic_pointer_cast<GeomDataAPI_Point>(aConstrAttr->attr());
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aConstrAttr->attr());
     if (aPoint || aPoint2D) {
       // Create SolveSpace constraint structure
       Slvs_Constraint aConstraint = Slvs_MakeConstraint(
@@ -463,16 +463,16 @@ bool SketchSolver_ConstraintGroup::changeRigidConstraint(
       bool isCircle = false;
       if (aFeature) {
         if (aFeature->getKind() == SketchPlugin_Arc::ID()) {
-          boost::shared_ptr<GeomDataAPI_Point2D> aCenter =
-              boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          std::shared_ptr<GeomDataAPI_Point2D> aCenter =
+              std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
               aFeature->data()->attribute(SketchPlugin_Arc::CENTER_ID()));
-          boost::shared_ptr<GeomDataAPI_Point2D> aStart =
-              boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          std::shared_ptr<GeomDataAPI_Point2D> aStart =
+              std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
               aFeature->data()->attribute(SketchPlugin_Arc::START_ID()));
           aRadius = aStart->pnt()->distance(aCenter->pnt());
           isArc = true;
         } else if (aFeature->getKind() == SketchPlugin_Circle::ID()) {
-          aRadius = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+          aRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
               aFeature->data()->attribute(SketchPlugin_Circle::RADIUS_ID()))->value();
           isCircle = true;
         }
@@ -544,10 +544,10 @@ bool SketchSolver_ConstraintGroup::changeRigidConstraint(
 //  Purpose:  create/update the element affected by any constraint
 // ============================================================================
 Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
-    boost::shared_ptr<ModelAPI_Attribute> theEntity)
+    std::shared_ptr<ModelAPI_Attribute> theEntity)
 {
   // If the entity is already in the group, try to find it
-  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator aEntIter =
+  std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator aEntIter =
       myEntityAttrMap.find(theEntity);
   int aEntPos;
   std::vector<Slvs_Param>::const_iterator aParamIter;  // looks at first parameter of already existent entity or at the end of vector otherwise
@@ -589,7 +589,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
   aNewEntity.h = SLVS_E_UNKNOWN;
 
   // Point in 3D
-  boost::shared_ptr<GeomDataAPI_Point> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+  std::shared_ptr<GeomDataAPI_Point> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point>(
       theEntity);
   if (aPoint) {
     Slvs_hParam aX = changeParameter(aPoint->x(), aParamIter);
@@ -603,8 +603,8 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
       return SLVS_E_UNKNOWN;
 
     // Point in 2D
-    boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
-        boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEntity);
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEntity);
     if (aPoint2D) {
       Slvs_hParam aU = changeParameter(aPoint2D->x(), aParamIter);
       Slvs_hParam aV = changeParameter(aPoint2D->y(), aParamIter);
@@ -612,7 +612,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(
         aNewEntity = Slvs_MakePoint2d(++myEntityMaxID, myID, myWorkplane.h, aU, aV);
     } else {
       // Scalar value (used for the distance entities)
-      AttributeDoublePtr aScalar = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theEntity);
+      AttributeDoublePtr aScalar = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theEntity);
       if (aScalar) {
         Slvs_hParam aValue = changeParameter(aScalar->value(), aParamIter);
         if (!isEntExists) // New entity
@@ -659,7 +659,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
   aNewEntity.h = SLVS_E_UNKNOWN;
 
   // SketchPlugin features
-  boost::shared_ptr<SketchPlugin_Feature> aFeature = boost::dynamic_pointer_cast<
+  std::shared_ptr<SketchPlugin_Feature> aFeature = std::dynamic_pointer_cast<
       SketchPlugin_Feature>(theEntity);
   if (aFeature) {  // Verify the feature by its kind
     const std::string& aFeatureKind = aFeature->getKind();
@@ -748,11 +748,11 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeEntity(FeaturePtr theEntity)
 //  Purpose:  create/update the normal of workplane
 // ============================================================================
 Slvs_hEntity SketchSolver_ConstraintGroup::changeNormal(
-    boost::shared_ptr<ModelAPI_Attribute> theDirX, boost::shared_ptr<ModelAPI_Attribute> theDirY,
-    boost::shared_ptr<ModelAPI_Attribute> theNorm)
+    std::shared_ptr<ModelAPI_Attribute> theDirX, std::shared_ptr<ModelAPI_Attribute> theDirY,
+    std::shared_ptr<ModelAPI_Attribute> theNorm)
 {
-  boost::shared_ptr<GeomDataAPI_Dir> aDirX = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theDirX);
-  boost::shared_ptr<GeomDataAPI_Dir> aDirY = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(theDirY);
+  std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(theDirX);
+  std::shared_ptr<GeomDataAPI_Dir> aDirY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(theDirY);
   if (!aDirX || !aDirY || (fabs(aDirX->x()) + fabs(aDirX->y()) + fabs(aDirX->z()) < tolerance)
       || (fabs(aDirY->x()) + fabs(aDirY->y()) + fabs(aDirY->z()) < tolerance))
     return SLVS_E_UNKNOWN;
@@ -764,7 +764,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeNormal(
   double aNormCoord[4] = { qw, qx, qy, qz };
 
   // Try to find existent normal
-  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator aEntIter =
+  std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator aEntIter =
       myEntityAttrMap.find(theNorm);
   std::vector<Slvs_Param>::const_iterator aParamIter;  // looks to the first parameter of already existent entity or to the end of vector otherwise
   if (aEntIter == myEntityAttrMap.end())  // no such entity => should be created
@@ -797,7 +797,7 @@ Slvs_hEntity SketchSolver_ConstraintGroup::changeNormal(
 //  Class:    SketchSolver_ConstraintGroup
 //  Purpose:  create workplane for the group
 // ============================================================================
-bool SketchSolver_ConstraintGroup::addWorkplane(boost::shared_ptr<ModelAPI_CompositeFeature> theSketch)
+bool SketchSolver_ConstraintGroup::addWorkplane(std::shared_ptr<ModelAPI_CompositeFeature> theSketch)
 {
   if (myWorkplane.h || theSketch->getKind().compare(SketchPlugin_Sketch::ID()) != 0)
     return false;  // the workplane already exists or the function parameter is not Sketch
@@ -817,13 +817,13 @@ bool SketchSolver_ConstraintGroup::updateWorkplane()
   if (!mySketch->data())
     return false; // case sketch is deleted
   // Get parameters of workplane
-  boost::shared_ptr<ModelAPI_Attribute> aDirX = mySketch->data()->attribute(
+  std::shared_ptr<ModelAPI_Attribute> aDirX = mySketch->data()->attribute(
       SketchPlugin_Sketch::DIRX_ID());
-  boost::shared_ptr<ModelAPI_Attribute> aDirY = mySketch->data()->attribute(
+  std::shared_ptr<ModelAPI_Attribute> aDirY = mySketch->data()->attribute(
       SketchPlugin_Sketch::DIRY_ID());
-  boost::shared_ptr<ModelAPI_Attribute> aNorm = mySketch->data()->attribute(
+  std::shared_ptr<ModelAPI_Attribute> aNorm = mySketch->data()->attribute(
       SketchPlugin_Sketch::NORM_ID());
-  boost::shared_ptr<ModelAPI_Attribute> anOrigin = mySketch->data()->attribute(
+  std::shared_ptr<ModelAPI_Attribute> anOrigin = mySketch->data()->attribute(
       SketchPlugin_Sketch::ORIGIN_ID());
   // Transform them into SolveSpace format
   Slvs_hEntity aNormalWP = changeNormal(aDirX, aDirY, aNorm);
@@ -893,7 +893,7 @@ bool SketchSolver_ConstraintGroup::resolveConstraints()
       return true;
 
     // We should go through the attributes map, because only attributes have valued parameters
-    std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator anEntIter =
+    std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator anEntIter =
         myEntityAttrMap.begin();
     for (; anEntIter != myEntityAttrMap.end(); anEntIter++)
       if (updateAttribute(anEntIter->first, anEntIter->second))
@@ -938,7 +938,7 @@ void SketchSolver_ConstraintGroup::mergeGroups(const SketchSolver_ConstraintGrou
   if (myTempPointWhereDragged.empty())
     myTempPointWhereDragged = theGroup.myTempPointWhereDragged;
   else if (!theGroup.myTempPointWhereDragged.empty()) {  // Need to create additional transient constraint
-    std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator aFeatureIter =
+    std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator aFeatureIter =
         theGroup.myEntityAttrMap.begin();
     for (; aFeatureIter != theGroup.myEntityAttrMap.end(); aFeatureIter++)
       if (aFeatureIter->second == myTempPointWDrgdID) {
@@ -1106,13 +1106,13 @@ bool SketchSolver_ConstraintGroup::updateGroup()
 
   // Check if some entities are invalid too
   std::set<Slvs_hEntity> anEntToRemove;
-  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator
+  std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator
       anAttrIter = myEntityAttrMap.begin();
   while (anAttrIter != myEntityAttrMap.end()) {
     if (!anAttrIter->first->owner() || !anAttrIter->first->owner()->data() ||
         !anAttrIter->first->owner()->data()->isValid()) {
       anEntToRemove.insert(anAttrIter->second);
-      std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator
+      std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator
           aRemovedIter = anAttrIter;
       anAttrIter++;
       myEntityAttrMap.erase(aRemovedIter);
@@ -1135,10 +1135,10 @@ bool SketchSolver_ConstraintGroup::updateGroup()
   // Probably, need to update coincidence constraints
   if (isCCRemoved && !myExtraCoincidence.empty()) {
     // Make a copy, because the new list of unused constrtaints will be generated
-    std::set<boost::shared_ptr<SketchPlugin_Constraint> > anExtraCopy = myExtraCoincidence;
+    std::set<std::shared_ptr<SketchPlugin_Constraint> > anExtraCopy = myExtraCoincidence;
     myExtraCoincidence.clear();
 
-    std::set<boost::shared_ptr<SketchPlugin_Constraint> >::iterator aCIter = anExtraCopy.begin();
+    std::set<std::shared_ptr<SketchPlugin_Constraint> >::iterator aCIter = anExtraCopy.begin();
     for (; aCIter != anExtraCopy.end(); aCIter++)
       if ((*aCIter)->data() && (*aCIter)->data()->isValid())
         changeConstraint(*aCIter);
@@ -1153,7 +1153,7 @@ bool SketchSolver_ConstraintGroup::updateGroup()
 //  Purpose:  update features of sketch after resolving constraints
 // ============================================================================
 bool SketchSolver_ConstraintGroup::updateAttribute(
-    boost::shared_ptr<ModelAPI_Attribute> theAttribute, const Slvs_hEntity& theEntityID)
+    std::shared_ptr<ModelAPI_Attribute> theAttribute, const Slvs_hEntity& theEntityID)
 {
   // Search the position of the first parameter of the entity
   int anEntPos = Search(theEntityID, myEntities);
@@ -1162,7 +1162,7 @@ bool SketchSolver_ConstraintGroup::updateAttribute(
   // Look over supported types of entities
 
   // Point in 3D
-  boost::shared_ptr<GeomDataAPI_Point> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+  std::shared_ptr<GeomDataAPI_Point> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point>(
       theAttribute);
   if (aPoint) {
     if (fabs(aPoint->x() - myParams[aFirstParamPos].val) > tolerance
@@ -1176,8 +1176,8 @@ bool SketchSolver_ConstraintGroup::updateAttribute(
   }
 
   // Point in 2D
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
   if (aPoint2D) {
     if (fabs(aPoint2D->x() - myParams[aFirstParamPos].val) > tolerance
         || fabs(aPoint2D->y() - myParams[aFirstParamPos + 1].val) > tolerance) {
@@ -1188,7 +1188,7 @@ bool SketchSolver_ConstraintGroup::updateAttribute(
   }
 
   // Scalar value
-  AttributeDoublePtr aScalar = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
+  AttributeDoublePtr aScalar = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
   if (aScalar) {
     if (fabs(aScalar->value() - myParams[aFirstParamPos].val) > tolerance) {
       aScalar->setValue(myParams[aFirstParamPos].val);
@@ -1207,7 +1207,7 @@ bool SketchSolver_ConstraintGroup::updateAttribute(
 //  Purpose:  search the entity in this group and update it
 // ============================================================================
 void SketchSolver_ConstraintGroup::updateEntityIfPossible(
-    boost::shared_ptr<ModelAPI_Attribute> theEntity)
+    std::shared_ptr<ModelAPI_Attribute> theEntity)
 {
   if (myEntityAttrMap.find(theEntity) != myEntityAttrMap.end()) {
     // If the attribute is a point and it is changed (the group needs to rebuild),
@@ -1223,9 +1223,9 @@ void SketchSolver_ConstraintGroup::updateEntityIfPossible(
     if (myNeedToSolve)  // the entity is changed
     {
       // Verify the entity is a point and add temporary constraint of permanency
-      boost::shared_ptr<GeomDataAPI_Point> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+      std::shared_ptr<GeomDataAPI_Point> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point>(
           theEntity);
-      boost::shared_ptr<GeomDataAPI_Point2D> aPoint2D = boost::dynamic_pointer_cast<
+      std::shared_ptr<GeomDataAPI_Point2D> aPoint2D = std::dynamic_pointer_cast<
           GeomDataAPI_Point2D>(theEntity);
       if (aPoint || aPoint2D)
         addTemporaryConstraintWhereDragged(theEntity);
@@ -1246,11 +1246,11 @@ void SketchSolver_ConstraintGroup::updateEntityIfPossible(
 //            which was moved by user
 // ============================================================================
 void SketchSolver_ConstraintGroup::addTemporaryConstraintWhereDragged(
-    boost::shared_ptr<ModelAPI_Attribute> theEntity,
+    std::shared_ptr<ModelAPI_Attribute> theEntity,
     bool theAllowToFit)
 {
   // Find identifier of the entity
-  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator anEntIter =
+  std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::const_iterator anEntIter =
       myEntityAttrMap.find(theEntity);
   if (anEntIter == myEntityAttrMap.end())
     return;
@@ -1338,7 +1338,7 @@ void SketchSolver_ConstraintGroup::removeTemporaryConstraints(
 //  Purpose:  remove constraint and all unused entities
 // ============================================================================
 void SketchSolver_ConstraintGroup::removeConstraint(
-    boost::shared_ptr<SketchPlugin_Constraint> theConstraint)
+    std::shared_ptr<SketchPlugin_Constraint> theConstraint)
 {
   ConstraintMap::iterator anIterToRemove = myConstraintMap.find(theConstraint);
   if (anIterToRemove == myConstraintMap.end())
@@ -1392,11 +1392,11 @@ void SketchSolver_ConstraintGroup::removeConstraint(
     return;
 
   // Remove unused entities
-  std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator anEntAttrIter =
+  std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator anEntAttrIter =
       myEntityAttrMap.begin();
   while (anEntAttrIter != myEntityAttrMap.end()) {
     if (anEntToRemove.find(anEntAttrIter->second) != anEntToRemove.end()) {
-      std::map<boost::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator aRemovedIter =
+      std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator aRemovedIter =
           anEntAttrIter;
       anEntAttrIter++;
       myEntityAttrMap.erase(aRemovedIter);
@@ -1503,17 +1503,17 @@ bool SketchSolver_ConstraintGroup::addCoincidentPoints(const Slvs_hEntity& thePo
 //  Purpose:  emit the signal to update constraints
 // ============================================================================
 void SketchSolver_ConstraintGroup::updateRelatedConstraints(
-    boost::shared_ptr<ModelAPI_Attribute> theEntity) const
+    std::shared_ptr<ModelAPI_Attribute> theEntity) const
 {
   ConstraintMap::const_iterator aConstrIter = myConstraintMap.begin();
   for (; aConstrIter != myConstraintMap.end(); aConstrIter++) {
-    std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttributes = aConstrIter->first->data()
+    std::list<std::shared_ptr<ModelAPI_Attribute> > anAttributes = aConstrIter->first->data()
         ->attributes(std::string());
 
-    std::list<boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttrIter = anAttributes.begin();
+    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttrIter = anAttributes.begin();
     for (; anAttrIter != anAttributes.end(); anAttrIter++) {
       bool isUpd = (*anAttrIter == theEntity);
-      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRefAttr = boost::dynamic_pointer_cast<
+      std::shared_ptr<ModelAPI_AttributeRefAttr> aRefAttr = std::dynamic_pointer_cast<
           ModelAPI_AttributeRefAttr>(*anAttrIter);
       if (aRefAttr && !aRefAttr->isObject() && aRefAttr->attr() == theEntity)
         isUpd = true;
@@ -1528,16 +1528,16 @@ void SketchSolver_ConstraintGroup::updateRelatedConstraints(
 }
 
 void SketchSolver_ConstraintGroup::updateRelatedConstraints(
-    boost::shared_ptr<ModelAPI_Feature> theFeature) const
+    std::shared_ptr<ModelAPI_Feature> theFeature) const
 {
   ConstraintMap::const_iterator aConstrIter = myConstraintMap.begin();
   for (; aConstrIter != myConstraintMap.end(); aConstrIter++) {
-    std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttributes = aConstrIter->first->data()
+    std::list<std::shared_ptr<ModelAPI_Attribute> > anAttributes = aConstrIter->first->data()
         ->attributes(std::string());
 
-    std::list<boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttrIter = anAttributes.begin();
+    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttrIter = anAttributes.begin();
     for (; anAttrIter != anAttributes.end(); anAttrIter++) {
-      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRefAttr = boost::dynamic_pointer_cast<
+      std::shared_ptr<ModelAPI_AttributeRefAttr> aRefAttr = std::dynamic_pointer_cast<
           ModelAPI_AttributeRefAttr>(*anAttrIter);
       if (aRefAttr && aRefAttr->isObject() && aRefAttr->object() == theFeature) {
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);

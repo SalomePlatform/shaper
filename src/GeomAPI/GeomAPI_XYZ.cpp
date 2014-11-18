@@ -43,42 +43,42 @@ void GeomAPI_XYZ::setZ(const double theZ)
   return MY_XYZ->SetZ(theZ);
 }
 
-const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::added(
-    const boost::shared_ptr<GeomAPI_XYZ>& theArg)
+const std::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::added(
+    const std::shared_ptr<GeomAPI_XYZ>& theArg)
 {
-  boost::shared_ptr<GeomAPI_XYZ> aResult(new GeomAPI_XYZ(MY_XYZ->X() + theArg->x(),
+  std::shared_ptr<GeomAPI_XYZ> aResult(new GeomAPI_XYZ(MY_XYZ->X() + theArg->x(),
   MY_XYZ->Y() + theArg->y(), MY_XYZ->Z() + theArg->z()));
   return aResult;
 }
 
-const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::decreased(
-    const boost::shared_ptr<GeomAPI_XYZ>& theArg)
+const std::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::decreased(
+    const std::shared_ptr<GeomAPI_XYZ>& theArg)
 {
-  boost::shared_ptr<GeomAPI_XYZ> aResult(new GeomAPI_XYZ(MY_XYZ->X() - theArg->x(),
+  std::shared_ptr<GeomAPI_XYZ> aResult(new GeomAPI_XYZ(MY_XYZ->X() - theArg->x(),
   MY_XYZ->Y() - theArg->y(), MY_XYZ->Z() - theArg->z()));
   return aResult;
 }
 
-const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::multiplied(const double theArg)
+const std::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::multiplied(const double theArg)
 {
-  boost::shared_ptr<GeomAPI_XYZ> aResult(new GeomAPI_XYZ(MY_XYZ->X() * theArg,
+  std::shared_ptr<GeomAPI_XYZ> aResult(new GeomAPI_XYZ(MY_XYZ->X() * theArg,
   MY_XYZ->Y() * theArg, MY_XYZ->Z() * theArg));
   return aResult;
 }
 
-double GeomAPI_XYZ::dot(const boost::shared_ptr<GeomAPI_XYZ>& theArg) const
+double GeomAPI_XYZ::dot(const std::shared_ptr<GeomAPI_XYZ>& theArg) const
 {
   return MY_XYZ->Dot(theArg->impl<gp_XYZ>());
 }
 
-const boost::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::cross(
-    const boost::shared_ptr<GeomAPI_XYZ>& theArg) const
+const std::shared_ptr<GeomAPI_XYZ> GeomAPI_XYZ::cross(
+    const std::shared_ptr<GeomAPI_XYZ>& theArg) const
 {
   gp_XYZ aResult = MY_XYZ->Crossed(theArg->impl<gp_XYZ>());
-  return boost::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(aResult.X(), aResult.Y(), aResult.Z()));
+  return std::shared_ptr<GeomAPI_XYZ>(new GeomAPI_XYZ(aResult.X(), aResult.Y(), aResult.Z()));
 }
 
-double GeomAPI_XYZ::distance(const boost::shared_ptr<GeomAPI_XYZ>& theOther) const
+double GeomAPI_XYZ::distance(const std::shared_ptr<GeomAPI_XYZ>& theOther) const
 {
   gp_XYZ aResult(theOther->x() - x(), theOther->y() - y(), theOther->z() - z());
   return aResult.Modulus();

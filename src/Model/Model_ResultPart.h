@@ -19,9 +19,9 @@ class Model_ResultPart : public ModelAPI_ResultPart
 {
  public:
   /// Returns the part-document of this result
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> partDoc();
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> partDoc();
   /// Part has no stored feature: this method returns NULL
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature> owner();
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> owner();
 
   /// Sets this document as current and if it is not loaded yet, loads it
   MODEL_EXPORT virtual void activate();
@@ -31,7 +31,7 @@ protected:
   Model_ResultPart();
 
   /// Sets the data manager of an object (document does), here also attributes are initialized
-  virtual void setData(boost::shared_ptr<ModelAPI_Data> theData);
+  virtual void setData(std::shared_ptr<ModelAPI_Data> theData);
 
   friend class Model_Document;
 };

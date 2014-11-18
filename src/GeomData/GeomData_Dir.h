@@ -9,7 +9,7 @@
 #include "GeomDataAPI_Dir.h"
 #include <TDataStd_RealArray.hxx>
 #include <TDF_Label.hxx>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class GeomAPI_Dir;
 
@@ -24,7 +24,7 @@ class GeomData_Dir : public GeomDataAPI_Dir
   /// Defines the double value
   GEOMDATA_EXPORT virtual void setValue(const double theX, const double theY, const double theZ);
   /// Defines the direction
-  GEOMDATA_EXPORT virtual void setValue(const boost::shared_ptr<GeomAPI_Dir>& theDir);
+  GEOMDATA_EXPORT virtual void setValue(const std::shared_ptr<GeomAPI_Dir>& theDir);
 
   /// Returns the X double value
   GEOMDATA_EXPORT virtual double x() const;
@@ -33,7 +33,7 @@ class GeomData_Dir : public GeomDataAPI_Dir
   /// Returns the Z double value
   GEOMDATA_EXPORT virtual double z() const;
   /// Returns the direction of this attribute
-  GEOMDATA_EXPORT virtual boost::shared_ptr<GeomAPI_Dir> dir();
+  GEOMDATA_EXPORT virtual std::shared_ptr<GeomAPI_Dir> dir();
 
  protected:
   /// Initializes attributes

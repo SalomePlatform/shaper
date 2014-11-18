@@ -47,7 +47,7 @@
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Shape.hxx>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 #include <list>
 #include <string>
@@ -127,18 +127,18 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
 
   DataPtr aData = myFeature->data();
   if (myUseSubShapes) {
-    boost::shared_ptr<ModelAPI_AttributeSelection> aSelect = 
-      boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aData->attribute(attributeID()));
+    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aData->attribute(attributeID()));
 
-    ResultPtr aBody = boost::dynamic_pointer_cast<ModelAPI_Result>(mySelectedObject);
+    ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(mySelectedObject);
     if (aBody) {
       aSelect->setValue(aBody, myShape);
       updateObject(myFeature);
       return true;
     }
   } else {
-    boost::shared_ptr<ModelAPI_AttributeReference> aRef = 
-      boost::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
+    std::shared_ptr<ModelAPI_AttributeReference> aRef = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
 
     ObjectPtr aObject = aRef->value();
     if (!(aObject && aObject->isSame(mySelectedObject))) {
@@ -156,13 +156,13 @@ bool ModuleBase_WidgetShapeSelector::restoreValue()
   DataPtr aData = myFeature->data();
   bool isBlocked = this->blockSignals(true);
   if (myUseSubShapes) {
-    boost::shared_ptr<ModelAPI_AttributeSelection> aSelect = aData->selection(attributeID());
+    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = aData->selection(attributeID());
     if (aSelect) {
       mySelectedObject = aSelect->context();
       myShape = aSelect->value();
     }
   } else {
-    boost::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(attributeID());
+    std::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(attributeID());
     mySelectedObject = aRef->value();
   }
   updateSelectionName();
@@ -189,14 +189,14 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
       return;
 
     // Check that the selected object is result (others can not be accepted)
-    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
     if (!aRes)
       return;
 
     if (myFeature) {
       // We can not select a result of our feature
-      const std::list<boost::shared_ptr<ModelAPI_Result>>& aResList = myFeature->results();
-      std::list<boost::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
+      const std::list<std::shared_ptr<ModelAPI_Result>>& aResList = myFeature->results();
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
       for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
         if ((*aIt) == aRes)
           return;
@@ -223,7 +223,7 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
       std::list<ObjectPtr> aOwners;
       myWorkshop->selection()->selectedShapes(aShapeList, aOwners);
       if (aShapeList.Extent() > 0) {
-        aShape = boost::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+        aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
         aShape->setImpl(new TopoDS_Shape(aShapeList.First()));
       }
     }
@@ -243,7 +243,7 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 }
 
 //********************************************************************
-void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, boost::shared_ptr<GeomAPI_Shape> theShape)
+void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape)
 {
   mySelectedObject = theObj;
   myShape = theShape;
@@ -262,10 +262,10 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, boost::shared_p
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::acceptObjectShape(const ObjectPtr theResult) const
 {
-  ResultPtr aResult = boost::dynamic_pointer_cast<ModelAPI_Result>(theResult);
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theResult);
 
   // Check that the shape of necessary type
-  boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
+  std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
   if (!aShapePtr)
     return false;
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
@@ -289,7 +289,7 @@ bool ModuleBase_WidgetShapeSelector::acceptObjectShape(const ObjectPtr theResult
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::acceptSubShape(boost::shared_ptr<GeomAPI_Shape> theShape) const
+bool ModuleBase_WidgetShapeSelector::acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const
 {
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
   foreach (QString aType, myShapeTypes) {
@@ -310,7 +310,7 @@ bool ModuleBase_WidgetShapeSelector::acceptObjectType(const ObjectPtr theObject)
   foreach (QString aType, myObjectTypes) {
     if (aType.toLower() == "construction") {
       ResultConstructionPtr aConstr = 
-        boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
       return (aConstr != NULL);
     } // ToDo: Process other types of objects
   }

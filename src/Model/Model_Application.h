@@ -31,7 +31,7 @@ class Model_Application : public TDocStd_Application
   //! Retuns the application: one per process    
   MODEL_EXPORT static Handle_Model_Application getApplication();
   //! Returns the main document (on first call creates it) by the string identifier
-  MODEL_EXPORT const boost::shared_ptr<Model_Document>& getDocument(std::string theDocID);
+  MODEL_EXPORT const std::shared_ptr<Model_Document>& getDocument(std::string theDocID);
   //! Returns true if document has been created
   MODEL_EXPORT bool hasDocument(std::string theDocID);
   //! Deletes the document from the application
@@ -60,7 +60,7 @@ class Model_Application : public TDocStd_Application
 
  private:
   /// Map from string identifiers to created documents of an application
-  std::map<std::string, boost::shared_ptr<Model_Document> > myDocs;
+  std::map<std::string, std::shared_ptr<Model_Document> > myDocs;
   /// Path for the loaded by demand documents
   std::string myPath;
   /// Path for the loaded by demand documents

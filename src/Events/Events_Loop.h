@@ -33,7 +33,7 @@ class Events_Loop
   std::map<char*, Events_Listener*> myImmediateListeners;
 
   /// map from event ID to groupped messages (accumulated on flush)
-  std::map<char*, boost::shared_ptr<Events_Message> > myGroups;
+  std::map<char*, std::shared_ptr<Events_Message> > myGroups;
 
   ///< set of messages that are flushed right now, so they are not grouped
   std::set<char*> myFlushed;
@@ -53,7 +53,7 @@ class Events_Loop
 
   //! Allows to send an event
   //! \param isGroup is true for grouping messages if possible
-  EVENTS_EXPORT void send(const boost::shared_ptr<Events_Message>& theMessage, bool isGroup = true);
+  EVENTS_EXPORT void send(const std::shared_ptr<Events_Message>& theMessage, bool isGroup = true);
 
   //! Registers (or adds if such listener is already registered) a listener 
   //! that will be called on the event and from the defined sender

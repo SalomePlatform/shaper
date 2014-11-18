@@ -87,7 +87,7 @@ Q_OBJECT
   /// Set the plane to the current sketch
   /// \param theShape the shape
   /// \return selected direction
-  boost::shared_ptr<GeomAPI_Dir> setSketchPlane(const TopoDS_Shape& theShape);
+  std::shared_ptr<GeomAPI_Dir> setSketchPlane(const TopoDS_Shape& theShape);
   
   /// Called on selection changed when the operation is active
   virtual void selectionChanged(ModuleBase_ISelection* theSelection);

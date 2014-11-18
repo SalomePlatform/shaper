@@ -9,7 +9,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 using namespace std;
 

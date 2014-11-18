@@ -49,7 +49,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
   Events_ID aMenuItemEvent = Events_Loop::eventByName(myEventGenerated);
   if (isNode(theNode, NODE_FEATURE, NULL)) {
     storeAttribute(theNode, _ID);
-    boost::shared_ptr<Config_FeatureMessage> aMessage(new Config_FeatureMessage(aMenuItemEvent, this));
+    std::shared_ptr<Config_FeatureMessage> aMessage(new Config_FeatureMessage(aMenuItemEvent, this));
     fillFeature(theNode, aMessage);
     myFeatures.push_back(getProperty(theNode, _ID));
     //If a feature has xml definition for it's widget:
@@ -60,7 +60,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
     storeAttribute(theNode, _ID);
     storeAttribute(theNode, WORKBENCH_DOC);
   } else if (myIsProcessWidgets && isWidgetNode(theNode)) {
-    boost::shared_ptr<Config_AttributeMessage> aMessage(new Config_AttributeMessage(aMenuItemEvent, this));
+    std::shared_ptr<Config_AttributeMessage> aMessage(new Config_AttributeMessage(aMenuItemEvent, this));
     aMessage->setFeatureId(restoreAttribute(NODE_FEATURE, _ID));
     std::string anAttributeID = getProperty(theNode, _ID);
     if (!anAttributeID.empty()) {
@@ -84,7 +84,7 @@ bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
 }
 
 void Config_FeatureReader::fillFeature(xmlNodePtr theNode, 
-  const boost::shared_ptr<Config_FeatureMessage>& outFeatureMessage)
+  const std::shared_ptr<Config_FeatureMessage>& outFeatureMessage)
 {
   outFeatureMessage->setId(getProperty(theNode, _ID));
   outFeatureMessage->setPluginLibrary(myLibraryName);

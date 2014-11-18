@@ -21,7 +21,7 @@
 #include <QObject>
 #include <QString>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 #include <string>
 
 ModuleBase_WidgetLineEdit::ModuleBase_WidgetLineEdit(QWidget* theParent,

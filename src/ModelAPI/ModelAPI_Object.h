@@ -8,7 +8,7 @@
 #include "ModelAPI.h"
 #include "ModelAPI_Data.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class ModelAPI_Data;
 class ModelAPI_Document;
@@ -24,8 +24,8 @@ class ModelAPI_Document;
  */
 class ModelAPI_Object
 {
-  boost::shared_ptr<ModelAPI_Data> myData;  ///< manager of the data model of a feature
-  boost::shared_ptr<ModelAPI_Document> myDoc;  ///< document this object belongs to
+  std::shared_ptr<ModelAPI_Data> myData;  ///< manager of the data model of a feature
+  std::shared_ptr<ModelAPI_Document> myDoc;  ///< document this object belongs to
  public:
   /// By default object is displayed in the object browser.
   virtual bool isInHistory()
@@ -34,19 +34,19 @@ class ModelAPI_Object
   }
 
   /// Returns the data manager of this object: attributes
-  virtual boost::shared_ptr<ModelAPI_Data> data() const
+  virtual std::shared_ptr<ModelAPI_Data> data() const
   {
     return myData;
   }
 
   /// Returns true if object refers to the same data model instance
-  virtual bool isSame(const boost::shared_ptr<ModelAPI_Object>& theObject)
+  virtual bool isSame(const std::shared_ptr<ModelAPI_Object>& theObject)
   {
     return theObject.get() == this;
   }
 
   /// Returns document this feature belongs to
-  virtual boost::shared_ptr<ModelAPI_Document> document() const
+  virtual std::shared_ptr<ModelAPI_Document> document() const
   {
     return myDoc;
   }
@@ -63,13 +63,13 @@ class ModelAPI_Object
 
  protected:
   /// Sets the data manager of an object (document does)
-  virtual void setData(boost::shared_ptr<ModelAPI_Data> theData)
+  virtual void setData(std::shared_ptr<ModelAPI_Data> theData)
   {
     myData = theData;
   }
 
   /// Sets the data manager of an object (document does)
-  virtual void setDoc(boost::shared_ptr<ModelAPI_Document> theDoc)
+  virtual void setDoc(std::shared_ptr<ModelAPI_Document> theDoc)
   {
     myDoc = theDoc;
   }
@@ -84,6 +84,6 @@ class ModelAPI_Object
 
 };
 
-typedef boost::shared_ptr<ModelAPI_Object> ObjectPtr;
+typedef std::shared_ptr<ModelAPI_Object> ObjectPtr;
 
 #endif

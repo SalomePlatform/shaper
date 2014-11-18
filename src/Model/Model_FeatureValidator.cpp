@@ -9,12 +9,12 @@
 #include <ModelAPI_Object.h>
 
 #include <list>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
-bool Model_FeatureValidator::isValid(const boost::shared_ptr<ModelAPI_Feature>& theFeature,
+bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<std::string>& theArguments) const
 {
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   if (!aData)
     return false;
   if (!aData->isValid())

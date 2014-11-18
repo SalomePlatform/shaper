@@ -6,7 +6,7 @@
 #define GeomAPI_XYZ_H_
 
 #include <GeomAPI_Interface.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 /**\class GeomAPI_XYZ
  * \ingroup DataModel
@@ -34,19 +34,19 @@ class GEOMAPI_EXPORT GeomAPI_XYZ : public GeomAPI_Interface
   void setZ(const double theZ);
 
   /// result is sum of coordinates of this and the given argument
-  const boost::shared_ptr<GeomAPI_XYZ> added(const boost::shared_ptr<GeomAPI_XYZ>& theArg);
+  const std::shared_ptr<GeomAPI_XYZ> added(const std::shared_ptr<GeomAPI_XYZ>& theArg);
   /// result is difference between coordinates of this and the given argument
-  const boost::shared_ptr<GeomAPI_XYZ> decreased(const boost::shared_ptr<GeomAPI_XYZ>& theArg);
+  const std::shared_ptr<GeomAPI_XYZ> decreased(const std::shared_ptr<GeomAPI_XYZ>& theArg);
   /// result is coordinates multiplied by the argument
-  const boost::shared_ptr<GeomAPI_XYZ> multiplied(const double theArg);
+  const std::shared_ptr<GeomAPI_XYZ> multiplied(const double theArg);
 
   /// result is a scalar product of two triplets
-  double dot(const boost::shared_ptr<GeomAPI_XYZ>& theArg) const;
+  double dot(const std::shared_ptr<GeomAPI_XYZ>& theArg) const;
   /// result is a cross product of two triplets
-  const boost::shared_ptr<GeomAPI_XYZ> cross(const boost::shared_ptr<GeomAPI_XYZ>& theArg) const;
+  const std::shared_ptr<GeomAPI_XYZ> cross(const std::shared_ptr<GeomAPI_XYZ>& theArg) const;
 
   /// Distance between two triplets
-  double distance(const boost::shared_ptr<GeomAPI_XYZ>& theOther) const;
+  double distance(const std::shared_ptr<GeomAPI_XYZ>& theOther) const;
 };
 
 #endif

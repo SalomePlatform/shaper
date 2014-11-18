@@ -83,7 +83,7 @@ Q_OBJECT
 
   /// Returns true if selected shape corresponds to requested shape types
   /// This method is called only in sub-shapes selection mode
-  virtual bool acceptSubShape(boost::shared_ptr<GeomAPI_Shape> theShape) const;
+  virtual bool acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const;
 
   /// Returns true if selected object corresponds to requested Object type
   /// Thid method is used in any selection mode
@@ -91,7 +91,7 @@ Q_OBJECT
 
 
   // Set the given object as a value of the widget
-  void setObject(ObjectPtr theObj, boost::shared_ptr<GeomAPI_Shape> theShape = boost::shared_ptr<GeomAPI_Shape>());
+  void setObject(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape = std::shared_ptr<GeomAPI_Shape>());
 
   //----------- Class members -------------
  private:
@@ -102,7 +102,7 @@ Q_OBJECT
   ModuleBase_IWorkshop* myWorkshop;
 
   ObjectPtr mySelectedObject;
-  boost::shared_ptr<GeomAPI_Shape> myShape;
+  std::shared_ptr<GeomAPI_Shape> myShape;
 
   QStringList myShapeTypes;
   QStringList myObjectTypes;

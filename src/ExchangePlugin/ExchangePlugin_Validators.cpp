@@ -55,7 +55,7 @@ bool ExchangePlugin_ImportFormatValidator::isValid(const AttributePtr& theAttrib
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   if (theAttribute->isInitialized()) {
     const AttributeStringPtr aStrAttr =
-        boost::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
+        std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
     if(!aStrAttr)
       return false;
     std::string aFileName = aStrAttr->value();

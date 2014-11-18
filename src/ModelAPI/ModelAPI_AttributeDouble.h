@@ -46,6 +46,6 @@ class ModelAPI_AttributeDouble : public ModelAPI_Attribute
 };
 
 //! Pointer on double attribute
-typedef boost::shared_ptr<ModelAPI_AttributeDouble> AttributeDoublePtr;
+typedef std::shared_ptr<ModelAPI_AttributeDouble> AttributeDoublePtr;
 
 #endif

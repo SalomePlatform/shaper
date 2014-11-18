@@ -12,12 +12,12 @@
 
 void PartSetPlugin_Remove::execute()
 {
-  boost::shared_ptr<ModelAPI_Session> aPManager = ModelAPI_Session::get();
-  boost::shared_ptr<ModelAPI_Document> aRoot = aPManager->moduleDocument();
-  boost::shared_ptr<ModelAPI_Document> aCurrent;
-  boost::shared_ptr<PartSetPlugin_Part> a;
+  std::shared_ptr<ModelAPI_Session> aPManager = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aRoot = aPManager->moduleDocument();
+  std::shared_ptr<ModelAPI_Document> aCurrent;
+  std::shared_ptr<PartSetPlugin_Part> a;
   for (int a = aRoot->size(ModelAPI_ResultPart::group()) - 1; a >= 0; a--) {
-    ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(
         aRoot->object(ModelAPI_ResultPart::group(), a));
     if (aPart
         && aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->value()

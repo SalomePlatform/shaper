@@ -9,7 +9,7 @@
 #include <string>
 #include <list>
 #include <set>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class ModelAPI_AttributeDocRef;
 class ModelAPI_AttributeInteger;
@@ -43,42 +43,42 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual void setName(const std::string& theName) = 0;
 
   /// Returns the attribute that references to another document
-  virtual boost::shared_ptr<ModelAPI_AttributeDocRef> document(const std::string& theID) = 0;
+  virtual std::shared_ptr<ModelAPI_AttributeDocRef> document(const std::string& theID) = 0;
   /// Returns the attribute that contains real value with double precision
-  virtual boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID) = 0;
+  virtual std::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID) = 0;
   /// Returns the attribute that contains integer value
-  virtual boost::shared_ptr<ModelAPI_AttributeInteger> integer(const std::string& theID) = 0;
+  virtual std::shared_ptr<ModelAPI_AttributeInteger> integer(const std::string& theID) = 0;
   /// Returns the attribute that contains reference to a feature
-  virtual boost::shared_ptr<ModelAPI_AttributeReference> reference(const std::string& theID) = 0;
+  virtual std::shared_ptr<ModelAPI_AttributeReference> reference(const std::string& theID) = 0;
   /// Returns the attribute that contains selection to a shape
-  virtual boost::shared_ptr<ModelAPI_AttributeSelection> selection(const std::string& theID) = 0;
+  virtual std::shared_ptr<ModelAPI_AttributeSelection> selection(const std::string& theID) = 0;
   /// Returns the attribute that contains selection to a shape
-  virtual boost::shared_ptr<ModelAPI_AttributeSelectionList> 
+  virtual std::shared_ptr<ModelAPI_AttributeSelectionList> 
     selectionList(const std::string& theID) = 0;
   /// Returns the attribute that contains reference to an attribute of a feature
-  virtual boost::shared_ptr<ModelAPI_AttributeRefAttr> refattr(const std::string& theID) = 0;
+  virtual std::shared_ptr<ModelAPI_AttributeRefAttr> refattr(const std::string& theID) = 0;
   /// Returns the attribute that contains list of references to features
-  virtual boost::shared_ptr<ModelAPI_AttributeRefList> reflist(const std::string& theID) = 0;
+  virtual std::shared_ptr<ModelAPI_AttributeRefList> reflist(const std::string& theID) = 0;
   /// Returns the attribute that contains boolean value
-  virtual boost::shared_ptr<ModelAPI_AttributeBoolean> boolean(const std::string& theID) = 0;
+  virtual std::shared_ptr<ModelAPI_AttributeBoolean> boolean(const std::string& theID) = 0;
   /// Returns the attribute that contains boolean value
-  virtual boost::shared_ptr<ModelAPI_AttributeString> string(const std::string& theID) = 0;
+  virtual std::shared_ptr<ModelAPI_AttributeString> string(const std::string& theID) = 0;
 
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
-  virtual boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string& theID) = 0;
+  virtual std::shared_ptr<ModelAPI_Attribute> attribute(const std::string& theID) = 0;
   /// Returns all attributes of the feature of the given type
   /// or all attributes if "theType" is empty
-  virtual std::list<boost::shared_ptr<ModelAPI_Attribute> >
+  virtual std::list<std::shared_ptr<ModelAPI_Attribute> >
   attributes(const std::string& theType) = 0;
   /// Returns all attributes ids of the feature of the given type
   /// or all attributes if "theType" is empty
   virtual std::list<std::string> attributesIDs(const std::string& theType) = 0;
   /// Identifier by the id (not fast, iteration by map)
   /// \param theAttr attribute already created in this data
-  virtual const std::string& id(const boost::shared_ptr<ModelAPI_Attribute>& theAttr) = 0;
+  virtual const std::string& id(const std::shared_ptr<ModelAPI_Attribute>& theAttr) = 0;
   /// Returns true if data belongs to same features
-  virtual bool isEqual(const boost::shared_ptr<ModelAPI_Data>& theData) = 0;
+  virtual bool isEqual(const std::shared_ptr<ModelAPI_Data>& theData) = 0;
   /// Returns true if it is correctly connected to the data model
   virtual bool isValid() = 0;
 
@@ -111,7 +111,7 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual int featureId() const = 0;
 
  // returns all objects referenced to this
-  virtual const std::set<boost::shared_ptr<ModelAPI_Attribute> >& refsToMe() = 0;
+  virtual const std::set<std::shared_ptr<ModelAPI_Attribute> >& refsToMe() = 0;
 
  protected:
   /// Objects are created for features automatically
@@ -120,6 +120,6 @@ class MODELAPI_EXPORT ModelAPI_Data
   }
 };
 
-typedef boost::shared_ptr<ModelAPI_Data> DataPtr;
+typedef std::shared_ptr<ModelAPI_Data> DataPtr;
 
 #endif

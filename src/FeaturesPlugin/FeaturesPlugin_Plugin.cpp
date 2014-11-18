@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 using namespace std;
 

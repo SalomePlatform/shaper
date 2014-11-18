@@ -31,19 +31,19 @@ void SketchPlugin_ConstraintLength::initAttributes()
 
 void SketchPlugin_ConstraintLength::execute()
 {
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
   FeaturePtr aFeature = ModelAPI_Feature::feature(aRef->object());
   if (aFeature) {
     // set length value
-    boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 = boost::dynamic_pointer_cast<
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = std::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(aFeature->data()->attribute(SketchPlugin_Line::START_ID()));
-    boost::shared_ptr<GeomDataAPI_Point2D> aPoint2 = boost::dynamic_pointer_cast<
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = std::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(aFeature->data()->attribute(SketchPlugin_Line::END_ID()));
 
     double aLenght = aPoint1->pnt()->distance(aPoint2->pnt());
 
-    boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = boost::dynamic_pointer_cast<
+    std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
         ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
     if(!aValueAttr->isInitialized()) {
       aValueAttr->setValue(aLenght);
@@ -56,9 +56,9 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
   if (!sketch())
     return thePrevious;
 
-  boost::shared_ptr<GeomAPI_Pln> aPlane = sketch()->plane();
+  std::shared_ptr<GeomAPI_Pln> aPlane = sketch()->plane();
 
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
   if (!anAttr)
     return thePrevious;
@@ -66,30 +66,30 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
   if (!aFeature || aFeature->getKind() != SketchPlugin_Line::ID())
     return thePrevious;
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = boost::dynamic_pointer_cast<
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
 
   DataPtr aData = aFeature->data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aStartPoint = boost::dynamic_pointer_cast<
+  std::shared_ptr<GeomDataAPI_Point2D> aStartPoint = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::START_ID()));
-  boost::shared_ptr<GeomDataAPI_Point2D> anEndPoint = boost::dynamic_pointer_cast<
+  std::shared_ptr<GeomDataAPI_Point2D> anEndPoint = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
 
-  boost::shared_ptr<GeomAPI_Pnt> aPoint1 = sketch()->to3D(aStartPoint->x(), aStartPoint->y());
-  boost::shared_ptr<GeomAPI_Pnt> aPoint2 = sketch()->to3D(anEndPoint->x(), anEndPoint->y());
-  boost::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = boost::shared_ptr<GeomAPI_Pnt>();
+  std::shared_ptr<GeomAPI_Pnt> aPoint1 = sketch()->to3D(aStartPoint->x(), aStartPoint->y());
+  std::shared_ptr<GeomAPI_Pnt> aPoint2 = sketch()->to3D(anEndPoint->x(), anEndPoint->y());
+  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = std::shared_ptr<GeomAPI_Pnt>();
   if (aFlyOutAttr->isInitialized()) {
     aFlyoutPnt = sketch()->to3D(aFlyOutAttr->x(), aFlyOutAttr->y());
   } else {
-    boost::shared_ptr<GeomAPI_Lin2d> aLine = 
-      boost::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aStartPoint->pnt(), anEndPoint->pnt()));
+    std::shared_ptr<GeomAPI_Lin2d> aLine = 
+      std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aStartPoint->pnt(), anEndPoint->pnt()));
     double aDist = aPoint1->distance(aPoint2)/5.;
-    boost::shared_ptr<GeomAPI_Pnt2d> aFPnt = aLine->shiftedLocation(aDist);
+    std::shared_ptr<GeomAPI_Pnt2d> aFPnt = aLine->shiftedLocation(aDist);
     aFlyOutAttr->setValue(aFPnt);
     aFlyoutPnt = sketch()->to3D(aFPnt->x(), aFPnt->y());
   }
   // value calculation
-  boost::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
   double aValue = aValueAttr->value();
 
@@ -106,11 +106,11 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
 
 void SketchPlugin_ConstraintLength::move(double theDeltaX, double theDeltaY)
 {
-  boost::shared_ptr<ModelAPI_Data> aData = data();
+  std::shared_ptr<ModelAPI_Data> aData = data();
   if (!aData->isValid())
     return;
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   aPoint->move(theDeltaX, theDeltaY);
 }

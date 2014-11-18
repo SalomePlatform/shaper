@@ -10,8 +10,8 @@
 #include <BRep_Tool.hxx>
 #include <Geom_Plane.hxx>
 
-boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::square(
-    boost::shared_ptr<GeomAPI_Pnt> theCenter, boost::shared_ptr<GeomAPI_Dir> theNormal,
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::square(
+    std::shared_ptr<GeomAPI_Pnt> theCenter, std::shared_ptr<GeomAPI_Dir> theNormal,
     const double theSize)
 {
   const gp_Pnt& aCenter = theCenter->impl<gp_Pnt>();
@@ -20,15 +20,15 @@ boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::square(
   // half of the size in each direction from the center
   BRepBuilderAPI_MakeFace aFaceBuilder(aPlane, -theSize / 2., theSize / 2., -theSize / 2.,
                                        theSize / 2.);
-  boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
+  std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
   aRes->setImpl(new TopoDS_Shape(aFaceBuilder.Face()));
   return aRes;
 }
 
-boost::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(
-    boost::shared_ptr<GeomAPI_Shape> theFace)
+std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(
+    std::shared_ptr<GeomAPI_Shape> theFace)
 {
-  boost::shared_ptr<GeomAPI_Pln> aResult;
+  std::shared_ptr<GeomAPI_Pln> aResult;
   if (!theFace)
     return aResult;  // bad shape
   TopoDS_Shape aShape = theFace->impl<TopoDS_Shape>();
@@ -47,6 +47,6 @@ boost::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(
     return aResult;  // not planar
   double aA, aB, aC, aD;
   aPlane->Coefficients(aA, aB, aC, aD);
-  aResult = boost::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
+  aResult = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
   return aResult;
 }

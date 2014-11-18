@@ -10,7 +10,7 @@
 
 #include <ModelAPI_Result.h>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class GeomAPI_Pnt2d;
 
@@ -36,15 +36,15 @@ class ModuleBase_WidgetValueFeature : public ModuleBase_WidgetValue
 
   /// Fill the widget values by given point
   /// \param thePoint the point
-  MODULEBASE_EXPORT void setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+  MODULEBASE_EXPORT void setPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
   /// Returns the widget point
   /// \return the current point
-  MODULEBASE_EXPORT const boost::shared_ptr<GeomAPI_Pnt2d>& point() const;
+  MODULEBASE_EXPORT const std::shared_ptr<GeomAPI_Pnt2d>& point() const;
 
  private:
   ObjectPtr myResult;
-  boost::shared_ptr<GeomAPI_Pnt2d> myPoint;
+  std::shared_ptr<GeomAPI_Pnt2d> myPoint;
 };
 
 #endif

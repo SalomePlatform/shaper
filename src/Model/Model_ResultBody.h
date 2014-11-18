@@ -28,69 +28,69 @@ class Model_ResultBody : public ModelAPI_ResultBody
   std::vector<TNaming_Builder*> myBuilders;
 public:
   /// Stores the shape (called by the execution method).
-  MODEL_EXPORT virtual void store(const boost::shared_ptr<GeomAPI_Shape>& theShape);
+  MODEL_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape);
 
   /// Stores the generated shape (called by the execution method).
-  MODEL_EXPORT virtual void storeGenerated(const boost::shared_ptr<GeomAPI_Shape>& theFromShape,
-	                                       const boost::shared_ptr<GeomAPI_Shape>& theToShape);
+  MODEL_EXPORT virtual void storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,
+	                                       const std::shared_ptr<GeomAPI_Shape>& theToShape);
 
   /// Stores the modified shape (called by the execution method).
-  MODEL_EXPORT virtual void storeModified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
-	                                       const boost::shared_ptr<GeomAPI_Shape>& theNewShape);
+  MODEL_EXPORT virtual void storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
+	                                       const std::shared_ptr<GeomAPI_Shape>& theNewShape);
 
   /// Returns the shape-result produced by this feature
-  MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape> shape();
+  MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
 
   /// Records the subshape newShape which was generated during a topological construction.
   /// As an example, consider the case of a face generated in construction of a box.
-  MODEL_EXPORT virtual void generated(const boost::shared_ptr<GeomAPI_Shape>& theNewShape, 
+  MODEL_EXPORT virtual void generated(const std::shared_ptr<GeomAPI_Shape>& theNewShape, 
     const int theTag = 1);
 
   /// Records the shape newShape which was generated from the shape oldShape during a topological 
   /// construction. As an example, consider the case of a face generated from an edge in 
   /// construction of a prism.
-  MODEL_EXPORT virtual void generated(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag = 1);
+  MODEL_EXPORT virtual void generated(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
+    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag = 1);
 
 
   /// Records the shape newShape which is a modification of the shape oldShape.
   /// As an example, consider the case of a face split or merged in a Boolean operation.
-  MODEL_EXPORT virtual void modified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const boost::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag = 1);
+  MODEL_EXPORT virtual void modified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
+    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const int theTag = 1);
 
   /// Records the shape oldShape which was deleted from the current label.
   /// As an example, consider the case of a face removed by a Boolean operation.
-  MODEL_EXPORT virtual void deleted(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
+  MODEL_EXPORT virtual void deleted(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
     const int theTag = 1);
 
   /// load deleted shapes
   MODEL_EXPORT virtual void loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
-                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                               std::shared_ptr<GeomAPI_Shape>  theShapeIn,
                                                const int  theKindOfShape,
                                                const int  theTag);
   /// load and orient modified shapes
   MODEL_EXPORT virtual void loadAndOrientModifiedShapes (
 	                                           GeomAlgoAPI_MakeShape* theMS,
-                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                               std::shared_ptr<GeomAPI_Shape>  theShapeIn,
                                                const int  theKindOfShape,
                                                const int  theTag,
                                                GeomAPI_DataMapOfShapeShape& theSubShapes);
    /// load and orient generated shapes
   MODEL_EXPORT virtual void loadAndOrientGeneratedShapes (
 	                                           GeomAlgoAPI_MakeShape* theMS,
-                                               boost::shared_ptr<GeomAPI_Shape>  theShapeIn,
+                                               std::shared_ptr<GeomAPI_Shape>  theShapeIn,
                                                const int  theKindOfShape,
                                                const int  theTag,
                                                GeomAPI_DataMapOfShapeShape& theSubShapes);
   
   /// Loads shapes of the first level (to be used during shape import)
-  MODEL_EXPORT virtual void loadFirstLevel(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
+  MODEL_EXPORT virtual void loadFirstLevel(std::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
   
   /// Loads disconnected edges
-  MODEL_EXPORT virtual void loadDisconnectedEdges(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
+  MODEL_EXPORT virtual void loadDisconnectedEdges(std::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
 
   /// Loads disconnected vetexes
-  MODEL_EXPORT virtual void loadDisconnectedVertexes(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
+  MODEL_EXPORT virtual void loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
 
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultBody();
@@ -107,7 +107,7 @@ protected:
 
 private:
   /// Loads shapes of the next level (to be used during shape import)
-  void loadNextLevels(boost::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
+  void loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape, int&  theTag);
 
   friend class Model_Document;
 };

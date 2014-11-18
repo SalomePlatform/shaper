@@ -8,7 +8,7 @@
 #include "XGUI.h"
 
 #include <QString>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <GeomAPI_AISObject.h>
 

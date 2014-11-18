@@ -7,7 +7,7 @@
 
 #include "ModuleBase.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <TopoDS_Shape.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <AIS_InteractiveObject.hxx>

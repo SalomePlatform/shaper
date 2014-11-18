@@ -7,14 +7,14 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Session.h>
 
-boost::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
+std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
 {
   return data()->document("PartDocument")->value();
 }
 
-boost::shared_ptr<ModelAPI_Feature> Model_ResultPart::owner()
+std::shared_ptr<ModelAPI_Feature> Model_ResultPart::owner()
 {
-  return boost::shared_ptr<ModelAPI_Feature>();  // return empty pointer
+  return std::shared_ptr<ModelAPI_Feature>();  // return empty pointer
 }
 
 Model_ResultPart::Model_ResultPart()
@@ -22,7 +22,7 @@ Model_ResultPart::Model_ResultPart()
   setIsConcealed(false);
 }
 
-void Model_ResultPart::setData(boost::shared_ptr<ModelAPI_Data> theData)
+void Model_ResultPart::setData(std::shared_ptr<ModelAPI_Data> theData)
 {
   ModelAPI_Result::setData(theData);
   if (theData) {
@@ -32,10 +32,10 @@ void Model_ResultPart::setData(boost::shared_ptr<ModelAPI_Data> theData)
 
 void Model_ResultPart::activate()
 {
-  boost::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->document(DOC_REF());
+  std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->document(DOC_REF());
   
   if (!aDocRef->value()) {  // create (or open) a document if it is not yet created
-    boost::shared_ptr<ModelAPI_Document> aDoc = document()->subDocument(data()->name());
+    std::shared_ptr<ModelAPI_Document> aDoc = document()->subDocument(data()->name());
     if (aDoc) {
       aDocRef->setValue(aDoc);
     }

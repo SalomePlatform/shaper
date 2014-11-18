@@ -18,7 +18,7 @@ bool GeomAPI_Shape::isNull() const
   return MY_SHAPE->IsNull() == Standard_True;
 }
 
-bool GeomAPI_Shape::isEqual(const boost::shared_ptr<GeomAPI_Shape> theShape) const
+bool GeomAPI_Shape::isEqual(const std::shared_ptr<GeomAPI_Shape> theShape) const
 {
   if (isNull())
     return theShape->isNull();

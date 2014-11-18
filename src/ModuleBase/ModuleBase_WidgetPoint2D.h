@@ -64,7 +64,7 @@ signals:
  protected:
   /// Fill the widget values by given point
   /// \param thePoint the point
-  void setPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint);
+  void setPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
  private:
   QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets

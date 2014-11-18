@@ -10,7 +10,7 @@
 
 #include <Config_def.h>
 #include <Config_XMLReader.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <string>
 #include <list>
@@ -32,7 +32,7 @@ class Config_FeatureReader : public Config_XMLReader
   bool processChildren(xmlNodePtr aNode);
 
   void fillFeature(xmlNodePtr theRoot, 
-                   const boost::shared_ptr<Config_FeatureMessage>& outFeatureMessage);
+                   const std::shared_ptr<Config_FeatureMessage>& outFeatureMessage);
 
   void storeAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
   std::string restoreAttribute(xmlNodePtr theNode, const char* theNodeAttribute);

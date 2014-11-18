@@ -47,7 +47,7 @@ ModuleBase_WidgetChoice::~ModuleBase_WidgetChoice()
 bool ModuleBase_WidgetChoice::storeValue() const
 {
   DataPtr aData = myFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeInteger> aIntAttr = aData->integer(attributeID());
+  std::shared_ptr<ModelAPI_AttributeInteger> aIntAttr = aData->integer(attributeID());
 
   aIntAttr->setValue(myCombo->currentIndex());
   updateObject(myFeature);
@@ -57,7 +57,7 @@ bool ModuleBase_WidgetChoice::storeValue() const
 bool ModuleBase_WidgetChoice::restoreValue()
 {
   DataPtr aData = myFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeInteger> aIntAttr = aData->integer(attributeID());
+  std::shared_ptr<ModelAPI_AttributeInteger> aIntAttr = aData->integer(attributeID());
 
   bool isBlocked = myCombo->blockSignals(true);
   myCombo->setCurrentIndex(aIntAttr->value());

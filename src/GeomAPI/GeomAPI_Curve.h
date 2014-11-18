@@ -6,7 +6,7 @@
 #define GeomAPI_Curve_H_
 
 #include <GeomAPI_Shape.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 /**\class GeomAPI_Curve
  * \ingroup DataModel
@@ -20,7 +20,7 @@ class GEOMAPI_EXPORT GeomAPI_Curve : public GeomAPI_Interface
   GeomAPI_Curve();
 
   /// Creates a curve from the shape (edge)
-  GeomAPI_Curve(const boost::shared_ptr<GeomAPI_Shape>& theShape);
+  GeomAPI_Curve(const std::shared_ptr<GeomAPI_Shape>& theShape);
 
   /// Returns true if curve is not initialized
   bool isNull() const;

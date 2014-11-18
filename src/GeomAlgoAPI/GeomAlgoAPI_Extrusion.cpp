@@ -19,14 +19,14 @@
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 #include <Precision.hxx>
 #include <TDF_TagSource.hxx>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <BRepPrimAPI_MakePrism.hxx>
 #include <TopoDS_Shape.hxx>
 
 const double tolerance = Precision::Angular();
 // Constructor
 GeomAlgoAPI_Extrusion::GeomAlgoAPI_Extrusion(
-  boost::shared_ptr<GeomAPI_Shape> theBasis, double theSize)
+  std::shared_ptr<GeomAPI_Shape> theBasis, double theSize)
 : mySize(theSize), myDone(false), myShape(new GeomAPI_Shape()),
   myFirst(new GeomAPI_Shape()), myLast(new GeomAPI_Shape())
 {
@@ -34,7 +34,7 @@ GeomAlgoAPI_Extrusion::GeomAlgoAPI_Extrusion(
 }
 
 //============================================================================
-void GeomAlgoAPI_Extrusion::build(const boost::shared_ptr<GeomAPI_Shape>& theBasis)
+void GeomAlgoAPI_Extrusion::build(const std::shared_ptr<GeomAPI_Shape>& theBasis)
 {
   bool isFirstNorm = true;
   gp_Dir aShapeNormal;
@@ -60,7 +60,7 @@ void GeomAlgoAPI_Extrusion::build(const boost::shared_ptr<GeomAPI_Shape>& theBas
         aResult = aBuilder->Shape();
 	  // fill data map to keep correct orientation of sub-shapes 
 	  for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
-	    boost::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+	    std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
         aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
 	    myMap.bind(aCurrentShape, aCurrentShape);
 	  }   
@@ -98,19 +98,19 @@ const bool GeomAlgoAPI_Extrusion::hasVolume() const
 }
 
 //============================================================================
-const boost::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::shape () const 
+const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::shape () const 
 {
   return myShape;
 }
 
 //============================================================================
-const boost::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::firstShape()
+const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::firstShape()
 {
   return myFirst;
 }
 
 //============================================================================
-const boost::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::lastShape()
+const std::shared_ptr<GeomAPI_Shape>& GeomAlgoAPI_Extrusion::lastShape()
 {
   return myLast;
 }

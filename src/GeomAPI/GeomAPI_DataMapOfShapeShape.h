@@ -5,7 +5,7 @@
 #ifndef GeomAPI_DataMapOfShapeShape_H_
 #define GeomAPI_DataMapOfShapeShape_H_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <GeomAPI_Interface.h>
 
 class GeomAPI_Pnt;
@@ -26,16 +26,16 @@ class GEOMAPI_EXPORT GeomAPI_DataMapOfShapeShape : public GeomAPI_Interface
   void clear();
 
   /// Adds the Key <K> to  the Map <me>  with  the  Item. Returns True  if the Key  was not already in the map
-  bool bind (boost::shared_ptr<GeomAPI_Shape> theKey, boost::shared_ptr<GeomAPI_Shape> theItem);
+  bool bind (std::shared_ptr<GeomAPI_Shape> theKey, std::shared_ptr<GeomAPI_Shape> theItem);
 
   /// Returns true if theKey is stored  in the map.
-  bool isBound (boost::shared_ptr<GeomAPI_Shape> theKey);
+  bool isBound (std::shared_ptr<GeomAPI_Shape> theKey);
 
   /// Returns  the Item stored  with the Key in the Map.
-  const boost::shared_ptr<GeomAPI_Shape> find(boost::shared_ptr<GeomAPI_Shape> theKey);  
+  const std::shared_ptr<GeomAPI_Shape> find(std::shared_ptr<GeomAPI_Shape> theKey);  
   
   /// Removes the Key from the  map. Returns true if the Key was in the Map
-  bool unBind(boost::shared_ptr<GeomAPI_Shape> theKey);
+  bool unBind(std::shared_ptr<GeomAPI_Shape> theKey);
 
   /// Destructor
   ~GeomAPI_DataMapOfShapeShape();

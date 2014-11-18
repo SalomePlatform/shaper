@@ -37,23 +37,23 @@ void FeaturesPlugin_Extrusion::initAttributes()
 
 void FeaturesPlugin_Extrusion::execute()
 {
-  boost::shared_ptr<ModelAPI_AttributeSelection> aFaceRef = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeSelection> aFaceRef = std::dynamic_pointer_cast<
     ModelAPI_AttributeSelection>(data()->attribute(FeaturesPlugin_Extrusion::FACE_ID()));
   if (!aFaceRef)
     return;
 
-  boost::shared_ptr<GeomAPI_Shape> aFace = 
-    boost::dynamic_pointer_cast<GeomAPI_Shape>(aFaceRef->value());
+  std::shared_ptr<GeomAPI_Shape> aFace = 
+    std::dynamic_pointer_cast<GeomAPI_Shape>(aFaceRef->value());
   if (!aFace)
     return;
 
-  boost::shared_ptr<GeomAPI_Shape> aContext;
+  std::shared_ptr<GeomAPI_Shape> aContext;
   ResultPtr aContextRes = aFaceRef->context();
   if (aContextRes) {
     if (aContextRes->groupName() == ModelAPI_ResultBody::group())
-      aContext = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(aContextRes)->shape();
+      aContext = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContextRes)->shape();
     else if (aContextRes->groupName() == ModelAPI_ResultConstruction::group())
-      aContext = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes)->shape();
+      aContext = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes)->shape();
   }
   if (!aContext) {
     std::string aContextError = "The selection context is bad";
@@ -65,7 +65,7 @@ void FeaturesPlugin_Extrusion::execute()
   if (data()->boolean(FeaturesPlugin_Extrusion::REVERSE_ID())->value())
     aSize = -aSize;
 
-  boost::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
+  std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
   GeomAlgoAPI_Extrusion aFeature(aFace, aSize);
   if(!aFeature.isDone()) {
     std::string aFeatureError = "Extrusion algorithm failed";  
@@ -95,9 +95,9 @@ void FeaturesPlugin_Extrusion::execute()
 
 //============================================================================
 void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature, 
-  boost::shared_ptr<ModelAPI_ResultBody> theResultBody, 
-  boost::shared_ptr<GeomAPI_Shape> theBasis,
-  boost::shared_ptr<GeomAPI_Shape> theContext)
+  std::shared_ptr<ModelAPI_ResultBody> theResultBody, 
+  std::shared_ptr<GeomAPI_Shape> theBasis,
+  std::shared_ptr<GeomAPI_Shape> theContext)
 {  
 
 
@@ -114,7 +114,7 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature,
   theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theBasis, EDGE,_LATERAL_TAG, *aSubShapes);
 
   //Insert bottom face
-  boost::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();  
+  std::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();  
   if (!aBottomFace->isNull()) {
 	if (aSubShapes->isBound(aBottomFace)) {	 
 		aBottomFace = aSubShapes->find(aBottomFace);		
@@ -125,7 +125,7 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature,
 
 
   //Insert top face
-  boost::shared_ptr<GeomAPI_Shape> aTopFace = theFeature.lastShape();
+  std::shared_ptr<GeomAPI_Shape> aTopFace = theFeature.lastShape();
   if (!aTopFace->isNull()) {
     if (aSubShapes->isBound(aTopFace)) {	 
       aTopFace = aSubShapes->find(aTopFace);	

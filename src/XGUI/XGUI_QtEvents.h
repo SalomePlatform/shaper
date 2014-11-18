@@ -21,7 +21,7 @@ class XGUI_EXPORT PostponeMessageQtEvent : public QEvent
  public:
   static QEvent::Type PostponeMessageQtEventType;
 
-  PostponeMessageQtEvent(const boost::shared_ptr<Events_Message>& theMessage)
+  PostponeMessageQtEvent(const std::shared_ptr<Events_Message>& theMessage)
       : QEvent(PostponeMessageQtEventType),
       myMessage(theMessage)
   {
@@ -31,10 +31,10 @@ class XGUI_EXPORT PostponeMessageQtEvent : public QEvent
     return PostponeMessageQtEventType;
   }
 
-  boost::shared_ptr<Events_Message> postponedMessage();
+  std::shared_ptr<Events_Message> postponedMessage();
 
  private:
-  boost::shared_ptr<Events_Message> myMessage;
+  std::shared_ptr<Events_Message> myMessage;
 };
 
 #endif /* XGUI_QEVENTS_H_ */
