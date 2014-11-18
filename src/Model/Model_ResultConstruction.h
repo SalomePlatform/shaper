@@ -30,7 +30,7 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   /// Sets the result
   MODEL_EXPORT virtual void setShape(boost::shared_ptr<GeomAPI_Shape> theShape);
   /// Returns the shape-result produced by this feature
-  MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape>& shape();
+  MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape> shape();
 
   /// Sets the flag that it must be displayed in history (default is true)
   MODEL_EXPORT virtual void setIsInHistory(const bool myIsInHistory);

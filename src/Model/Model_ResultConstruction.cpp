@@ -9,7 +9,7 @@ void Model_ResultConstruction::setShape(boost::shared_ptr<GeomAPI_Shape> theShap
   myShape = theShape;
 }
 
-boost::shared_ptr<GeomAPI_Shape>& Model_ResultConstruction::shape()
+boost::shared_ptr<GeomAPI_Shape> Model_ResultConstruction::shape()
 {
   return myShape;
 }

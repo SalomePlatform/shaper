@@ -5,7 +5,6 @@
 #include "XGUI_Constants.h"
 #include <Events_Listener.h>
 #include <ModuleBase_Definitions.h>
-#include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Document.h>
 
 #include <QObject>
@@ -41,6 +40,7 @@ class QDockWidget;
 
 class ModelAPI_ObjectUpdatedMessage;
 class ModelAPI_ObjectDeletedMessage;
+class ModelAPI_ResultPart;
 class QAction;
 
 /**\class XGUI_Workshop
@@ -147,7 +147,7 @@ Q_OBJECT
 
   //! Activates or deactivates a part
   //! If PartPtr is Null pointer then PartSet will be activated
-  void activatePart(ResultPartPtr theFeature);
+  void activatePart(boost::shared_ptr<ModelAPI_ResultPart> theFeature);
 
   //! Delete features
   void deleteObjects(const QList<ObjectPtr>& theList);

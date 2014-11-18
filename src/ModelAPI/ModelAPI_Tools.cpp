@@ -11,7 +11,7 @@ namespace ModelAPI_Tools {
 
   boost::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
   {
-
+/*
     ResultBodyPtr aBody = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(theResult);
     if (aBody)
       return aBody->shape();
@@ -25,5 +25,7 @@ namespace ModelAPI_Tools {
     if (aGroup)
       return aGroup->shape();
     return boost::shared_ptr<GeomAPI_Shape>();
+    */
+    return theResult->shape();
   }
 }

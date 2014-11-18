@@ -47,9 +47,6 @@ public:
   virtual void storeModified(const boost::shared_ptr<GeomAPI_Shape>& theOldShape,
 	                          const boost::shared_ptr<GeomAPI_Shape>& theNewShape) = 0;
 
-  /// Returns the shape-result produced by this feature
-  virtual boost::shared_ptr<GeomAPI_Shape> shape() = 0;
-
   /// Records the subshape newShape which was generated during a topological construction.
   /// As an example, consider the case of a face generated in construction of a box.
   virtual void generated(

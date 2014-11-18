@@ -33,9 +33,6 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
     return MY_GROUP;
   }
 
-  /// Returns the shape-result produced by this feature
-  virtual boost::shared_ptr<GeomAPI_Shape>& shape() = 0;
-
   /// Sets the result
   virtual void setShape(boost::shared_ptr<GeomAPI_Shape> theShape) = 0;
 

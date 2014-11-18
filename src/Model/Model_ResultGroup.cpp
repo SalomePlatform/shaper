@@ -12,7 +12,7 @@ Model_ResultGroup::Model_ResultGroup(boost::shared_ptr<ModelAPI_Data> theOwnerDa
   myOwnerData = theOwnerData;
 }
 
-boost::shared_ptr<GeomAPI_Shape> Model_ResultGroup::shape() const
+boost::shared_ptr<GeomAPI_Shape> Model_ResultGroup::shape()
 {
   boost::shared_ptr<GeomAPI_Shape> aResult;
   if (myOwnerData) {

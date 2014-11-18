@@ -32,8 +32,6 @@ public:
     return MY_GROUP;
   }
 
-  /// Returns the compound of selected entities
-  virtual boost::shared_ptr<GeomAPI_Shape> shape() const = 0;
 };
 
 //! Pointer on feature object
