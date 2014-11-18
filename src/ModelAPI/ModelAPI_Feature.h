@@ -7,28 +7,13 @@
 
 #include <ModelAPI.h>
 #include <ModelAPI_Object.h>
-#include <ModelAPI_AttributeBoolean.h>
-#include <ModelAPI_AttributeDocRef.h>
-#include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_AttributeInteger.h>
-#include <ModelAPI_AttributeRefAttr.h>
-#include <ModelAPI_AttributeReference.h>
-#include <ModelAPI_AttributeSelection.h>
-#include <ModelAPI_AttributeSelectionList.h>
-#include <ModelAPI_AttributeString.h>
-#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
-#include <ModelAPI_Result.h>
 
 #include <memory>
 
 #include <list>
 #include <string>
-
-class ModelAPI_Data;
-class ModelAPI_Document;
-class ModelAPI_Result;
 
 /**\class ModelAPI_Feature
  * \ingroup DataModel

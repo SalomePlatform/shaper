@@ -19,7 +19,7 @@ class Model_ResultGroup : public ModelAPI_ResultGroup
   std::shared_ptr<ModelAPI_Data> myOwnerData;  ///< data of owner of this result
 public:
   /// Returns the compound of selected entities
-  MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape() const;
+  MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
 
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultGroup() {}

@@ -48,3 +48,41 @@ std::list<std::shared_ptr<GeomAPI_Shape> > GeomAPI_PlanarEdges::getEdges()
   }
   return aResult;
 }
+
+bool GeomAPI_PlanarEdges::hasPlane() const {
+  return myOrigin && myNorm && myDirX && myDirY;
+}
+
+bool GeomAPI_PlanarEdges::isVertex() const {
+  return false;
+}
+
+bool GeomAPI_PlanarEdges::isEdge() const {
+  return false;
+}
+
+void GeomAPI_PlanarEdges::setOrigin(const std::shared_ptr<GeomAPI_Pnt>& theOrigin)
+{
+  myOrigin = theOrigin;
+}
+std::shared_ptr<GeomAPI_Pnt> GeomAPI_PlanarEdges::origin() const {
+  return myOrigin;
+}
+void GeomAPI_PlanarEdges::setDirX(const std::shared_ptr<GeomAPI_Dir>& theDirX) {
+  myDirX = theDirX;
+}
+std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirX() const {
+  return myDirX;
+}
+void GeomAPI_PlanarEdges::setDirY(const std::shared_ptr<GeomAPI_Dir>& theDirY) {
+  myDirY = theDirY;
+}
+std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirY() const {
+  return myDirY;
+}
+void GeomAPI_PlanarEdges::setNorm(const std::shared_ptr<GeomAPI_Dir>& theNorm) {
+  myNorm = theNorm;
+}
+std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::norm() const {
+  return myNorm;
+}

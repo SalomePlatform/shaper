@@ -12,7 +12,7 @@ Model_ResultGroup::Model_ResultGroup(std::shared_ptr<ModelAPI_Data> theOwnerData
   myOwnerData = theOwnerData;
 }
 
-std::shared_ptr<GeomAPI_Shape> Model_ResultGroup::shape() const
+std::shared_ptr<GeomAPI_Shape> Model_ResultGroup::shape()
 {
   std::shared_ptr<GeomAPI_Shape> aResult;
   if (myOwnerData) {

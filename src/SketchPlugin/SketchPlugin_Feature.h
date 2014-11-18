@@ -10,6 +10,7 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_AISObject.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_AttributeSelection.h>
 
 class SketchPlugin_Sketch;
 class GeomAPI_Pnt2d;
@@ -55,7 +56,7 @@ class SketchPlugin_Feature : public ModelAPI_Feature
   /// Returns true is sketch element is under the rigid constraint
   SKETCHPLUGIN_EXPORT virtual bool isFixed() {return false;}
 
-  bool isExternal() const
+  inline bool isExternal() const
   {
     AttributeSelectionPtr aAttr = data()->selection(EXTERNAL_ID());
     if (aAttr)

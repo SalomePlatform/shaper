@@ -9,7 +9,7 @@ void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)
   myShape = theShape;
 }
 
-std::shared_ptr<GeomAPI_Shape>& Model_ResultConstruction::shape()
+std::shared_ptr<GeomAPI_Shape> Model_ResultConstruction::shape()
 {
   return myShape;
 }
