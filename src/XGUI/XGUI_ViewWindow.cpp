@@ -672,7 +672,7 @@ void XGUI_ViewWindow::vpMousePressEvent(QMouseEvent* theEvent)
               if (ic->NbSelected() == 0)
                 myCurrPointType = myPrevPointType;
               //if ( mySetRotationPointDlg ) mySetRotationPointDlg->toggleChange();
-              ic->CloseAllContexts();
+              //ic->CloseAllContexts();
               myOperation = NOTHING;
               myViewPort->setCursor(myCursor);
               myCursorIsHand = false;

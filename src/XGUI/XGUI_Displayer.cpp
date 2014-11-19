@@ -43,7 +43,7 @@ XGUI_Displayer::~XGUI_Displayer()
 
 bool XGUI_Displayer::isVisible(ObjectPtr theObject) const
 {
-  return myResult2AISObjectMap.find(theObject) != myResult2AISObjectMap.end();
+  return myResult2AISObjectMap.contains(theObject);
 }
 
 void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
@@ -115,7 +115,7 @@ void XGUI_Displayer::erase(ObjectPtr theObject, const bool isUpdateViewer)
       aContext->Remove(anAIS, isUpdateViewer);
     }
   }
-  myResult2AISObjectMap.erase(theObject);
+  myResult2AISObjectMap.remove(theObject);
 }
 
 void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
@@ -189,7 +189,7 @@ bool XGUI_Displayer::isActive(ObjectPtr theObject) const
   if (!isVisible(theObject))
     return false;
     
-  AISObjectPtr anObj = myResult2AISObjectMap.at(theObject);
+  AISObjectPtr anObj = myResult2AISObjectMap[theObject];
   Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
 
   TColStd_ListOfInteger aModes;
@@ -272,13 +272,11 @@ void XGUI_Displayer::eraseAll(const bool isUpdateViewer)
   if (ic.IsNull())
     return;
 
-   ResultToAISMap::iterator aIt;
-   for (aIt = myResult2AISObjectMap.begin(); aIt != myResult2AISObjectMap.end(); aIt++) {
+   foreach (AISObjectPtr aAISObj, myResult2AISObjectMap) {
      // erase an object
-     AISObjectPtr aAISObj = (*aIt).second;
      Handle(AIS_InteractiveObject) anIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
      if (!anIO.IsNull())
-      ic->Remove(anIO, false);
+       ic->Remove(anIO, false);
    }
    myResult2AISObjectMap.clear();
    if (isUpdateViewer)
@@ -291,25 +289,21 @@ void XGUI_Displayer::eraseDeletedResults(const bool isUpdateViewer)
   if (aContext.IsNull())
     return;
 
-  ResultToAISMap::const_iterator aFIt = myResult2AISObjectMap.begin(), aFLast =
-      myResult2AISObjectMap.end();
-  std::list<ObjectPtr> aRemoved;
-  for (; aFIt != aFLast; aFIt++) {
-    ObjectPtr aFeature = (*aFIt).first;
+  QList<ObjectPtr> aRemoved;
+  foreach (ObjectPtr aFeature, myResult2AISObjectMap.keys()) {
     if (!aFeature || !aFeature->data() || !aFeature->data()->isValid()) {
-      AISObjectPtr anObj = (*aFIt).second;
+      AISObjectPtr anObj = myResult2AISObjectMap[aFeature];
       if (!anObj)
         continue;
       Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anAIS.IsNull()) {
         aContext->Remove(anAIS, false);
-        aRemoved.push_back(aFeature);
+        aRemoved.append(aFeature);
       }
     }
   }
-  std::list<ObjectPtr>::const_iterator anIt = aRemoved.begin(), aLast = aRemoved.end();
-  for (; anIt != aLast; anIt++) {
-    myResult2AISObjectMap.erase(myResult2AISObjectMap.find(*anIt));
+  foreach(ObjectPtr aObj, aRemoved) {
+    myResult2AISObjectMap.remove(aObj);
   }
 
   if (isUpdateViewer)
@@ -335,15 +329,32 @@ void XGUI_Displayer::openLocalContext()
 
 void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
 {
-  AISContext()->ClearSelected(false);
-  closeAllContexts(true);
+  Handle(AIS_InteractiveContext) ic = AISContext();
+  if ( (!ic.IsNull()) && (ic->HasOpenedContext()) ) {
+    ic->ClearSelected(false);
+    ic->CloseAllContexts(false);
+
+    // Redisplay all object if they were displayed in localContext
+    Handle(AIS_InteractiveObject) aAISIO;
+    foreach (AISObjectPtr aAIS, myResult2AISObjectMap) {
+      aAISIO = aAIS->impl<Handle(AIS_InteractiveObject)>();
+      if (ic->DisplayStatus(aAISIO) != AIS_DS_Displayed) {
+        ic->Display(aAISIO, false);
+        ic->SetDisplayMode(aAISIO, Shading, false);
+      }
+    }
+    if (isUpdateViewer)
+      updateViewer();
+    myUseExternalObjects = false;
+    myActiveSelectionModes.clear();
+  }
 }
 
 AISObjectPtr XGUI_Displayer::getAISObject(ObjectPtr theObject) const
 {
   AISObjectPtr anIO;
-  if (myResult2AISObjectMap.find(theObject) != myResult2AISObjectMap.end())
-    anIO = (myResult2AISObjectMap.find(theObject))->second;
+  if (myResult2AISObjectMap.contains(theObject))
+    anIO = myResult2AISObjectMap[theObject];
   return anIO;
 }
 
@@ -356,30 +367,13 @@ ObjectPtr XGUI_Displayer::getObject(const AISObjectPtr& theIO) const
 ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) const
 {
   ObjectPtr aFeature;
-  ResultToAISMap::const_iterator aFIt = myResult2AISObjectMap.begin(), aFLast =
-      myResult2AISObjectMap.end();
-  for (; aFIt != aFLast && !aFeature; aFIt++) {
-    AISObjectPtr anObj = (*aFIt).second;
-    if (!anObj)
-      continue;
-    Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-    if (anAIS != theIO)
-      continue;
-    aFeature = (*aFIt).first;
+  foreach (ObjectPtr anObj, myResult2AISObjectMap.keys()) {
+    AISObjectPtr aAIS = myResult2AISObjectMap[anObj];
+    Handle(AIS_InteractiveObject) anAIS = aAIS->impl<Handle(AIS_InteractiveObject)>();
+    if (anAIS == theIO)
+      return anObj;
   }
   return aFeature;
-}
-
-void XGUI_Displayer::closeAllContexts(const bool isUpdateViewer)
-{
-  Handle(AIS_InteractiveContext) ic = AISContext();
-  if (!ic.IsNull()) {
-    ic->CloseAllContexts(false);
-    if (isUpdateViewer)
-      updateViewer();
-    myUseExternalObjects = false;
-    myActiveSelectionModes.clear();
-  }
 }
 
 void XGUI_Displayer::updateViewer()
@@ -448,10 +442,9 @@ void XGUI_Displayer::activateObjectsOutOfContext(const QIntList& theModes)
     }
   }
 
-  ResultToAISMap::iterator aIt;
   Handle(AIS_InteractiveObject) anAISIO;
-  for (aIt = myResult2AISObjectMap.begin(); aIt != myResult2AISObjectMap.end(); aIt++) {
-  anAISIO = (*aIt).second->impl<Handle(AIS_InteractiveObject)>();
+  foreach (AISObjectPtr aAIS, myResult2AISObjectMap) {
+  anAISIO = aAIS->impl<Handle(AIS_InteractiveObject)>();
     aContext->Load(anAISIO, -1, true);
     if (theModes.size() == 0)
       aContext->Activate(anAISIO);

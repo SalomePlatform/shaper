@@ -70,6 +70,12 @@ Q_OBJECT
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
 
+  /// The methiod called when widget is activated
+  virtual void activate() {}
+
+  /// The methiod called when widget is deactivated
+  virtual void deactivate() {}
+
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
   virtual QWidget* getControl() const = 0;

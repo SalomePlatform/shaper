@@ -255,7 +255,7 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, std::shared_ptr
     }
   } 
   updateSelectionName();
-  activateSelection(false);
+  //activateSelection(false);
   emit valuesChanged();
 }
 
@@ -336,6 +336,8 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
 {
+  if (myIsActive == toActivate)
+    return;
   myIsActive = toActivate;
   updateSelectionName();
 
@@ -385,17 +387,17 @@ void ModuleBase_WidgetShapeSelector::raisePanel() const
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::focusTo()
 {
-  activateSelection(true);
+  //activateSelection(true);
   return ModuleBase_ModelWidget::focusTo();
 }
 
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::eventFilter(QObject* theObj, QEvent* theEvent)
 {
-  if (theObj == myTextLine) {
-    if (theEvent->type() == QEvent::FocusIn)
-      activateSelection(true);
-  }
+  //if (theObj == myTextLine) {
+  //  if (theEvent->type() == QEvent::FocusIn)
+  //    activateSelection(true);
+  //}
   return ModuleBase_ModelWidget::eventFilter(theObj, theEvent);
 }
 
@@ -416,3 +418,14 @@ bool ModuleBase_WidgetShapeSelector::setValue(ModuleBase_WidgetValue* theValue)
   return false;
 }
 
+//********************************************************************
+void ModuleBase_WidgetShapeSelector::activate()
+{
+  activateSelection(true);
+}
+
+//********************************************************************
+void ModuleBase_WidgetShapeSelector::deactivate()
+{
+  activateSelection(false);
+}

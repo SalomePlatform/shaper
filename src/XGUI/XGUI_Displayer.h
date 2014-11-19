@@ -7,11 +7,7 @@
 
 #include "XGUI.h"
 
-#include <QString>
-#include <memory>
-
 #include <GeomAPI_AISObject.h>
-
 #include <TopoDS_Shape.hxx>
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_InteractiveContext.hxx>
@@ -22,9 +18,8 @@
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ViewerPrs.h>
 
-#include <map>
-#include <vector>
-#include <list>
+#include <QString>
+#include <QMap>
 
 class XGUI_Viewer;
 class ModelAPI_Feature;
@@ -152,10 +147,6 @@ class XGUI_EXPORT XGUI_Displayer
   int objectsCount() const { return myResult2AISObjectMap.size(); }
 
  protected:
-  /// Deactivate local selection
-  /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
-  void closeAllContexts(const bool isUpdateViewer);
-
   /// Returns currently installed AIS_InteractiveContext
   Handle(AIS_InteractiveContext) AISContext() const;
 
@@ -185,7 +176,7 @@ class XGUI_EXPORT XGUI_Displayer
  protected:
   XGUI_Workshop* myWorkshop;
 
-  typedef std::map<ObjectPtr, AISObjectPtr> ResultToAISMap;
+  typedef QMap<ObjectPtr, AISObjectPtr> ResultToAISMap;
   ResultToAISMap myResult2AISObjectMap;
 
   // A flag of initialization of external objects selection

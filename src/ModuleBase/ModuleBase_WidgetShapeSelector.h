@@ -63,6 +63,14 @@ Q_OBJECT
   /// \param theValue the wrapped widget value
   virtual bool setValue(ModuleBase_WidgetValue* theValue);
 
+
+  /// The methiod called when widget is activated
+  virtual void activate();
+
+  /// The methiod called when widget is deactivated
+  virtual void deactivate();
+
+
  public slots:
 
   /// Activate or deactivate selection

@@ -151,9 +151,9 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
   }
   // Normaly focusTo is enough to activate widget
   // here is a special case on mouse click in the viewer
-  if(aNextWidget == NULL) {
-    activateWidget(NULL);
-  }
+  //if(aNextWidget == NULL) {
+    activateWidget(aNextWidget);
+  //}
 }
 
 void XGUI_PropertyPanel::activateNextWidget()
@@ -169,10 +169,15 @@ void XGUI_PropertyPanel::setAcceptEnabled(bool isEnabled)
 
 void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
 {
+  // Avoid activation of already actve widget. It could happen on focusIn event many times
+  if (theWidget == myActiveWidget)
+    return;
   if(myActiveWidget) {
+    myActiveWidget->deactivate();
     myActiveWidget->setHighlighted(false);
   }
   if(theWidget) {
+    theWidget->activate();
     theWidget->setHighlighted(true);
   }
   myActiveWidget = theWidget;
