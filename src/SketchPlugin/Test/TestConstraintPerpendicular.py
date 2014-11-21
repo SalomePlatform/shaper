@@ -49,10 +49,10 @@ aSession.startOperation()
 aSketchLineA = aSketchFeature.addFeature("SketchLine")
 aLineAStartPoint = geomDataAPI_Point2D(aSketchLineA.attribute("StartPoint"))
 aLineAEndPoint = geomDataAPI_Point2D(aSketchLineA.attribute("EndPoint"))
-# line B
-aSketchLineB = aSketchFeature.addFeature("SketchLine")
 aLineAStartPoint.setValue(0., 25)
 aLineAEndPoint.setValue(85., 25)
+# line B
+aSketchLineB = aSketchFeature.addFeature("SketchLine")
 aLineBStartPoint = geomDataAPI_Point2D(aSketchLineB.attribute("StartPoint"))
 aLineBEndPoint = geomDataAPI_Point2D(aSketchLineB.attribute("EndPoint"))
 aLineBStartPoint.setValue(25., 40.)
@@ -62,16 +62,15 @@ aSession.finishOperation()
 # Make a constraint to keep the length of the line constant
 # to prevent perpendicular constraint collapsing line to point
 #=========================================================================
-
+aSession.startOperation()
 for eachFeature in [aSketchLineA, aSketchLineB]:
-    aSession.startOperation()
     aLengthConstraint = aSketchFeature.addFeature("SketchConstraintLength")
-    refattrA = aLengthConstraint.refattr("ConstraintEntityA")
-    aResultA = modelAPI_ResultConstruction(eachFeature.firstResult())
-    assert (aResultA is not None)
-    refattrA.setObject(aResultA)
+    eachRefattr = aLengthConstraint.refattr("ConstraintEntityA")
+    eachResult = modelAPI_ResultConstruction(eachFeature.firstResult())
+    assert (eachResult is not None)
+    eachRefattr.setObject(eachResult)
     aLengthConstraint.execute()
-    aSession.finishOperation()
+aSession.finishOperation()
 
 # Coordinates of lines should not be changed after this constraint
 assert (aLineAStartPoint.x() == 0)
@@ -86,12 +85,12 @@ assert (aLineBEndPoint.y() == 125)
 # Link lines with perpendicular constraint
 #=========================================================================
 aSession.startOperation()
-aPerpendicularConstraint = aSketchFeature.addFeature(
-    "SketchConstraintPerpendicular")
+aPerpendicularConstraint = aSketchFeature.addFeature("SketchConstraintPerpendicular")
 refattrA = aPerpendicularConstraint.refattr("ConstraintEntityA")
 refattrB = aPerpendicularConstraint.refattr("ConstraintEntityB")
-# aResultA is already defined for the length constraint
+aResultA = modelAPI_ResultConstruction(aSketchLineA.firstResult())
 aResultB = modelAPI_ResultConstruction(aSketchLineB.firstResult())
+assert (aResultA is not None)
 assert (aResultB is not None)
 refattrA.setObject(aResultA)
 refattrB.setObject(aResultB)
@@ -100,46 +99,27 @@ aSession.finishOperation()
 #=========================================================================
 # Check values and move one constrainted object
 #=========================================================================
-# print "Check values and move one constrainted object"
-# print "assert (aLineAStartPoint.x() == %d)" % aLineAStartPoint.x()
-# print "assert (aLineAStartPoint.y() == %d)" % aLineAStartPoint.y()
-# print "assert (aLineAEndPoint.x() == %d)" % aLineAEndPoint.x()
-# print "assert (aLineAEndPoint.y() == %d)" % aLineAEndPoint.y()
-# print "assert (aLineBStartPoint.x() == %d)" % aLineBStartPoint.x()
-# print "assert (aLineBStartPoint.y() == %d)" % aLineBStartPoint.y()
-# print "assert (aLineBEndPoint.x() == %d)" % aLineBEndPoint.x()
-# print "assert (aLineBEndPoint.y() == %d)" % aLineBEndPoint.y()
+aLineBStartPointPrev = (aLineBStartPoint.x(),aLineBStartPoint.y())
+aLineBEndPointPrev = (aLineBEndPoint.x(),aLineBEndPoint.y())
 deltaX = deltaY = 5.
 # move line without rotation,
 # check that reference's line points are not changed also
-aLineAStartPoint.setValue(aLineAStartPoint.x() + deltaX,
-                          aLineAStartPoint.y() + deltaY)
-aLineAEndPoint.setValue(aLineAEndPoint.x() + deltaX,
-                        aLineAEndPoint.y() + deltaY)
-# print "move line without rotation"
-# print "assert (aLineAStartPoint.x() == %d)" % aLineAStartPoint.x()
-# print "assert (aLineAStartPoint.y() == %d)" % aLineAStartPoint.y()
-# print "assert (aLineAEndPoint.x() == %d)" % aLineAEndPoint.x()
-# print "assert (aLineAEndPoint.y() == %d)" % aLineAEndPoint.y()
-# print "assert (aLineBStartPoint.x() == %d)" % aLineBStartPoint.x()
-# print "assert (aLineBStartPoint.y() == %d)" % aLineBStartPoint.y()
-# print "assert (aLineBEndPoint.x() == %d)" % aLineBEndPoint.x()
-# print "assert (aLineBEndPoint.y() == %d)" % aLineBEndPoint.y()
-
-# rotate line, check that reference's line points are moved also
-aLineAStartPoint.setValue(aLineAStartPoint.x() + deltaX,
-                          aLineAStartPoint.y() + deltaY)
-aLineAEndPoint.setValue(aLineAEndPoint.x() - deltaX,
-                        aLineAEndPoint.y() - deltaY)
-# print "Rotate line, check that reference's line points are moved also"
-# print "assert (aLineAStartPoint.x() == %d)" % aLineAStartPoint.x()
-# print "assert (aLineAStartPoint.y() == %d)" % aLineAStartPoint.y()
-# print "assert (aLineAEndPoint.x() == %d)" % aLineAEndPoint.x()
-# print "assert (aLineAEndPoint.y() == %d)" % aLineAEndPoint.y()
-# print "assert (aLineBStartPoint.x() == %d)" % aLineBStartPoint.x()
-# print "assert (aLineBStartPoint.y() == %d)" % aLineBStartPoint.y()
-# print "assert (aLineBEndPoint.x() == %d)" % aLineBEndPoint.x()
-# print "assert (aLineBEndPoint.y() == %d)" % aLineBEndPoint.y()
+aSession.startOperation()
+aLineAStartPoint.setValue(aLineAStartPoint.x() + deltaX, aLineAStartPoint.y() + deltaY)
+aLineAEndPoint.setValue(aLineAEndPoint.x() + deltaX, aLineAEndPoint.y() + deltaY)
+aSession.finishOperation()
+assert (aLineBStartPointPrev == (aLineBStartPoint.x(), aLineBStartPoint.y()))
+assert (aLineBEndPointPrev   == (aLineBEndPoint.x(),   aLineBEndPoint.y()))
+aLineBStartPointPrev = (aLineBStartPoint.x(),aLineBStartPoint.y())
+aLineBEndPointPrev = (aLineBEndPoint.x(),aLineBEndPoint.y())
+# rotate line, 
+# check that reference's line points are moved also
+aSession.startOperation()
+aLineAStartPoint.setValue(aLineAStartPoint.x() + deltaX, aLineAStartPoint.y() + deltaY)
+aLineAEndPoint.setValue(aLineAEndPoint.x() - deltaX, aLineAEndPoint.y() - deltaY)
+aSession.finishOperation()
+assert (aLineBStartPointPrev != (aLineBStartPoint.x(), aLineBStartPoint.y()))
+assert (aLineBEndPointPrev   != (aLineBEndPoint.x(),   aLineBEndPoint.y()))
 #=========================================================================
 # End of test
 #=========================================================================

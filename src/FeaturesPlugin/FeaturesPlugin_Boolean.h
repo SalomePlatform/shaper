@@ -16,8 +16,8 @@ class FeaturesPlugin_Boolean : public ModelAPI_Feature
   /// Extrusion kind
   inline static const std::string& ID()
   {
-    static const std::string MY_CUT_ID("Boolean");
-    return MY_CUT_ID;
+    static const std::string MY_ID("Boolean");
+    return MY_ID;
   }
   /// attribute name of referenced object
   inline static const std::string& OBJECT_ID()
@@ -34,8 +34,8 @@ class FeaturesPlugin_Boolean : public ModelAPI_Feature
   /// attribute name of operation type
   inline static const std::string& TYPE_ID()
   {
-    static const std::string MY_TOOL_ID("bool_type");
-    return MY_TOOL_ID;
+    static const std::string MY_TYPE_ID("bool_type");
+    return MY_TYPE_ID;
   }
 
   enum {

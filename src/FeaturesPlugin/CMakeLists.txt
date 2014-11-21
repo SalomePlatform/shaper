@@ -1,4 +1,5 @@
 INCLUDE(Common)
+INCLUDE(UnitTest)
 
 SET(PROJECT_HEADERS
     FeaturesPlugin.h
@@ -42,3 +43,6 @@ TARGET_LINK_LIBRARIES(FeaturesPlugin ${PROJECT_LIBRARIES})
 
 INSTALL(TARGETS FeaturesPlugin DESTINATION plugins)
 INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
+
+ADD_UNIT_TESTS(TestExtrusion.py
+               TestBoolean.py)
