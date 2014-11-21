@@ -53,6 +53,11 @@ class ModelAPI_Feature : public ModelAPI_Object
   /// Computes or recomputes the results
   virtual void execute() = 0;
 
+  /// Registers error during the execution, causes the ExecutionFailed state
+  virtual void setError(const std::string& theError) {
+    data()->setError(theError);
+  }
+
   /// returns the current results of the feature
   MODELAPI_EXPORT const std::list<std::shared_ptr<ModelAPI_Result> >& results();
   /// returns the first result in the list or NULL reference
