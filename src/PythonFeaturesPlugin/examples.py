@@ -1,35 +1,28 @@
 from ModelAPI import *
+from SketchResult import *
 import sketch
 import extrusion
-from SketchResult import *
 #reload(sketch) # Pour tester plus facilement
 #reload(extrusion) # Pour tester plus facilement
 
 def makeBox(aLength, aWidth, aHeight):
-  print "makeBox"
   # Getting the active document
-
   session = ModelAPI_Session.get()
   part = session.activeDocument()
 
-
   # Starting the Sketch
-
-  session.startOperation()
   base = sketch.addTo(part)
   sketch.setXOYPlane(base)
 
-
   # Creating the lines
-
-  l1  = sketch.addLine(10, 10, 10, 50, base)
-  l2  = sketch.addLine(10, 50, 60, 60, base)
-  l3  = sketch.addLine(60, 60, 50, 10, base)
-  l4  = sketch.addLine(50, 10, 10, 10, base)
+  l1 = sketch.addLine(10, 10, 10, 50, base)
+  l2 = sketch.addLine(10, 50, 60, 60, base)
+  l3 = sketch.addLine(60, 60, 50, 10, base)
+  l4 = sketch.addLine(50, 10, 10, 10, base)
+  base.execute()
 
 
   # Creating the constraints
-  
   # NOTE : the following lines are currently not working in BR_PYTHON_PLUGIN branch
   """
   sketch.makeCoincident(sketch.getEndPoint(l1), sketch.getStartPoint(l2), base)
@@ -44,12 +37,10 @@ def makeBox(aLength, aWidth, aHeight):
   """
 
   # Finalisation of the operation
-  
   builder = SketchResult(base)
 
   # Creating a feature Extrusion
   box = extrusion.addNew(builder, 50, part)
-  session.finishOperation()
 
   #return base.lastResult()
   return extrusion.getBody(box)

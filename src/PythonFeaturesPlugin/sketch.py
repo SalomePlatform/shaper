@@ -82,7 +82,7 @@ def addLine(x1, y1, x2, y2, sketch):
 
 
 def getGeometry(line):
-  return line.firstResult()
+  return modelAPI_ResultConstruction(line.firstResult())
 
 
 def getStartPoint(line):
@@ -112,3 +112,8 @@ def makePerpendicular(l1, l2, sketch):
   constraint  = sketch.addFeature("SketchConstraintPerpendicular")
   constraint.refattr("ConstraintEntityA").setObject(l1)
   constraint.refattr("ConstraintEntityB").setObject(l2)
+
+def makeConstantLength(line, length, sketch):
+  constraint = sketch.addFeature("SketchConstraintLength")
+  constraint.refattr("ConstraintEntityA").setObject(line)
+  constraint.real("ConstraintValue").setValue(length)

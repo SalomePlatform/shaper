@@ -122,7 +122,9 @@ void Events_Loop::flush(const Events_ID& theID)
     boost::shared_ptr<Events_Message> aGroup = aMyGroup->second;
     myGroups.erase(aMyGroup);
     send(aGroup, false);
-    myFlushed.erase(myFlushed.find(theID.myID));
+    std::set<char*>::iterator anIt = myFlushed.find(theID.myID);
+    if (anIt != myFlushed.end())
+      myFlushed.erase(myFlushed.find(theID.myID));
   }
 }
 
