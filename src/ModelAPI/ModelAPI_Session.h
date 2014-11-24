@@ -71,6 +71,9 @@ class MODELAPI_EXPORT ModelAPI_Session
   /// Returns the root document of the application (that may contains sub-documents)
   virtual std::shared_ptr<ModelAPI_Document> moduleDocument() = 0;
 
+  /// Returns the document by ID, loads if not loaded yet. Returns null if no such document.
+  virtual std::shared_ptr<ModelAPI_Document> document(std::string theDocID) = 0;
+
   /// Return true if root document has been already created
   virtual bool hasModuleDocument() = 0;
 
