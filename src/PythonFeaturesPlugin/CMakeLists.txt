@@ -3,6 +3,10 @@ INCLUDE(Common)
 SET(PYTHON_FILES
   PythonFeaturesPlugin_Box.py
   PythonFeaturesPlugin.py
+  sketch.py
+  extrusion.py
+  examples.py
+  SketchResult.py
 )
 
 SET(XML_RESSOURCES

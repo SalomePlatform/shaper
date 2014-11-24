@@ -1,4 +1,5 @@
 import ModelAPI
+import examples
 
 class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
   "Feature to create a box by drawing a sketch and extruding it"
@@ -35,12 +36,26 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
     aWidth  = self.real(PythonFeaturesPlugin_Box.WIDTH_ID()).value()
     aLength = self.real(PythonFeaturesPlugin_Box.LENGTH_ID()).value()
     aHeight = self.real(PythonFeaturesPlugin_Box.HEIGHT_ID()).value()
-    # print ("Box W:{0} L:{1} H:{2}".format(aWidth, aLength, aHeight))
-    # aResult = document().createBody(data())
-    # aResult.store(UserPackage.makeBox(aLength, aWidth, aHeight)
-    # self.setResult(aResult)
+    print ("Box W:{0} L:{1} H:{2}".format(aWidth, aLength, aHeight))
+    aResultBody = self.document().createBody(self.data())
+    aResult = examples.makeBox(aLength, aWidth, aHeight)
+    #aShape = modelAPI_ResultConstruction(aResult).shape()
+    #aResultBody.store(aShape)
+    self.setResult(aResultBody)
 
-
-    
+# TEST
+"""
+if __name__=='__main__':
+  session = ModelAPI.ModelAPI_Session.get()
+  part = session.activeDocument()
+  session.startOperation()
+  feature = part.addFeature('Box')
+  feature.real('box_width').setValue(10)
+  feature.real('box_length').setValue(10)
+  feature.real('box_height').setValue(10)
+  feature.execute()
+  session.finishOperation()
+"""
+  
 
 
