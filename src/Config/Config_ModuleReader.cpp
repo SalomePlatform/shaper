@@ -96,16 +96,16 @@ std::string Config_ModuleReader::addPlugin(const std::string& aPluginLibrary,
                                            const std::string& aPluginScript,
                                            const std::string& aPluginConf)
 {
-  PluginType aType = PluginType::Binary;
+  PluginType aType = Config_ModuleReader::Binary;
   std::string aPluginName;
   if (!aPluginLibrary.empty()) {
     aPluginName = aPluginLibrary;
     if (aPluginConf.empty()) {
-      aType = PluginType::Intrenal;
+      aType = Config_ModuleReader::Intrenal;
     }
   } else if (!aPluginScript.empty()) {
     aPluginName = aPluginScript;
-    aType = PluginType::Python;
+    aType = Config_ModuleReader::Python;
   }
   if(!aPluginName.empty()) {
     myPluginTypes[aPluginName] = aType;
@@ -116,16 +116,16 @@ std::string Config_ModuleReader::addPlugin(const std::string& aPluginLibrary,
 
 void Config_ModuleReader::loadPlugin(const std::string thePluginName)
 {
-  PluginType aType = PluginType::Binary;
+  PluginType aType = Config_ModuleReader::Binary;
   if(myPluginTypes.find(thePluginName) != myPluginTypes.end()) {
     aType = myPluginTypes.at(thePluginName);
   }
   switch (aType) {
-    case PluginType::Python:
+    case Config_ModuleReader::Python:
       loadScript(thePluginName);
       break;
-    case PluginType::Binary:
-    case PluginType::Intrenal:
+    case Config_ModuleReader::Binary:
+    case Config_ModuleReader::Intrenal:
     default:
       loadLibrary(thePluginName);
       break;

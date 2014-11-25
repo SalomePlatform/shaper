@@ -123,8 +123,9 @@ void Events_Loop::flush(const Events_ID& theID)
     myGroups.erase(aMyGroup);
     send(aGroup, false);
     std::set<char*>::iterator anIt = myFlushed.find(theID.myID);
-    if (anIt != myFlushed.end())
-      myFlushed.erase(myFlushed.find(theID.myID));
+    if (anIt != myFlushed.end()) {
+      myFlushed.erase(anIt);
+    }
   }
 }
 
