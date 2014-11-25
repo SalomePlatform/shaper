@@ -131,30 +131,22 @@
 %template(ObjectList) std::list<std::shared_ptr<ModelAPI_Object> >;
 %template(ResultList) std::list<std::shared_ptr<ModelAPI_Result> >;
 
-template<class T1, class T2> boost::shared_ptr<T1> boost_cast(boost::shared_ptr<T2> theObject);
-
-// Feature casts
-%template(modelAPI_Feature)          shared_ptr_cast<ModelAPI_Feature, ModelAPI_Object>;
-%template(modelAPI_CompositeFeature) shared_ptr_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
 template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject);
 %template(modelAPI_CompositeFeature) shared_ptr_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
+%template(modelAPI_Feature) shared_ptr_cast<ModelAPI_Feature, ModelAPI_Object>;
+// Result casts
 %template(modelAPI_ResultConstruction) shared_ptr_cast<ModelAPI_ResultConstruction, ModelAPI_Result>;
 %template(modelAPI_ResultBody) shared_ptr_cast<ModelAPI_ResultBody, ModelAPI_Result>;
 %template(modelAPI_ResultPart) shared_ptr_cast<ModelAPI_ResultPart, ModelAPI_Result>;
 
-// Result casts
-%template(modelAPI_ResultConstruction) boost_cast<ModelAPI_ResultConstruction, ModelAPI_Result>;
-%template(modelAPI_ResultBody)         boost_cast<ModelAPI_ResultBody, ModelAPI_Result>;
-%template(modelAPI_ResultPart)         boost_cast<ModelAPI_ResultPart, ModelAPI_Result>;
-
 // Attribute casts
-%template(modelAPI_AttributeDocRef)        boost_cast<ModelAPI_AttributeDocRef, ModelAPI_Attribute>;
-%template(modelAPI_AttributeDouble)        boost_cast<ModelAPI_AttributeDouble, ModelAPI_Attribute>;
-%template(modelAPI_AttributeInteger)       boost_cast<ModelAPI_AttributeInteger, ModelAPI_Attribute>;
-%template(modelAPI_AttributeString)        boost_cast<ModelAPI_AttributeString, ModelAPI_Attribute>;
-%template(modelAPI_AttributeReference)     boost_cast<ModelAPI_AttributeReference, ModelAPI_Attribute>;
-%template(modelAPI_AttributeRefAttr)       boost_cast<ModelAPI_AttributeRefAttr, ModelAPI_Attribute>;
-%template(modelAPI_AttributeBoolean)       boost_cast<ModelAPI_AttributeBoolean, ModelAPI_Attribute>;
-%template(modelAPI_AttributeSelection)     boost_cast<ModelAPI_AttributeSelection, ModelAPI_Attribute>;
-%template(modelAPI_AttributeSelectionList) boost_cast<ModelAPI_AttributeSelectionList, ModelAPI_Attribute>;
-%template(modelAPI_AttributeRefList)       boost_cast<ModelAPI_AttributeRefList, ModelAPI_Attribute>;
+%template(modelAPI_AttributeDocRef)        shared_ptr_cast<ModelAPI_AttributeDocRef, ModelAPI_Attribute>;
+%template(modelAPI_AttributeDouble)        shared_ptr_cast<ModelAPI_AttributeDouble, ModelAPI_Attribute>;
+%template(modelAPI_AttributeInteger)       shared_ptr_cast<ModelAPI_AttributeInteger, ModelAPI_Attribute>;
+%template(modelAPI_AttributeString)        shared_ptr_cast<ModelAPI_AttributeString, ModelAPI_Attribute>;
+%template(modelAPI_AttributeReference)     shared_ptr_cast<ModelAPI_AttributeReference, ModelAPI_Attribute>;
+%template(modelAPI_AttributeRefAttr)       shared_ptr_cast<ModelAPI_AttributeRefAttr, ModelAPI_Attribute>;
+%template(modelAPI_AttributeBoolean)       shared_ptr_cast<ModelAPI_AttributeBoolean, ModelAPI_Attribute>;
+%template(modelAPI_AttributeSelection)     shared_ptr_cast<ModelAPI_AttributeSelection, ModelAPI_Attribute>;
+%template(modelAPI_AttributeSelectionList) shared_ptr_cast<ModelAPI_AttributeSelectionList, ModelAPI_Attribute>;
+%template(modelAPI_AttributeRefList)       shared_ptr_cast<ModelAPI_AttributeRefList, ModelAPI_Attribute>;

@@ -21,10 +21,10 @@ class ModelAPI_AttributeRefAttr : public ModelAPI_Attribute
   MODELAPI_EXPORT virtual bool isObject() = 0;
 
   /// Defines the reference to the attribute
-  MODELAPI_EXPORT virtual void setAttr(std::shared_ptr<ModelAPI_Attribute> theAttr) = 0;
+  MODELAPI_EXPORT virtual void setAttr(AttributePtr theAttr) = 0;
 
   /// Returns attribute referenced from this attribute
-  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Attribute> attr() = 0;
+  MODELAPI_EXPORT virtual AttributePtr attr() = 0;
 
   /// Defines the reference to the object
   MODELAPI_EXPORT virtual void setObject(ObjectPtr theFeature) = 0;

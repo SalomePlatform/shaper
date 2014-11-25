@@ -23,23 +23,29 @@ def makeBox(aLength, aWidth, aHeight):
     base.execute()
 
     # Creating the constraints
-    # NOTE : the following lines are currently not working in BR_PYTHON_PLUGIN
-    # branch
-    # sketch.makeCoincident(sketch.getEndPoint(l1), sketch.getStartPoint(l2), base)
-    # sketch.makeCoincident(sketch.getEndPoint(l2), sketch.getStartPoint(l3), base)
-    # sketch.makeCoincident(sketch.getEndPoint(l3), sketch.getStartPoint(l4), base)
-    # sketch.makeCoincident(sketch.getEndPoint(l4), sketch.getStartPoint(l1), base)
-    #
-    # sketch.makeParallel(sketch.getGeometry(l1), sketch.getGeometry(l3))
-    # sketch.makeParallel(sketch.getGeometry(l2), sketch.getGeometry(l4))
-    #
-    # sketch.makePerpendicular(sketch.getGeometry(l1), sketch.getGeometry(l4))
+    sketch.makeCoincident(sketch.getEndPoint(l1),
+                          sketch.getStartPoint(l2), base)
+    sketch.makeCoincident(sketch.getEndPoint(l2),
+                          sketch.getStartPoint(l3), base)
+    sketch.makeCoincident(sketch.getEndPoint(l3),
+                          sketch.getStartPoint(l4), base)
+    sketch.makeCoincident(sketch.getEndPoint(l4),
+                          sketch.getStartPoint(l1), base)
+
+    sketch.makeParallel(sketch.getGeometry(l1), sketch.getGeometry(l3), base)
+    sketch.makeParallel(sketch.getGeometry(l2), sketch.getGeometry(l4), base)
+
+    sketch.makePerpendicular(sketch.getGeometry(l1),
+                             sketch.getGeometry(l4), base)
+    # Set to 0X and 0Y lines defined length
+    sketch.makeConstantLength(sketch.getGeometry(l1), aLength, base)
+    sketch.makeConstantLength(sketch.getGeometry(l4), aWidth, base)
 
     # Finalisation of the operation
     builder = SketchResult(base)
 
     # Creating a feature Extrusion
-    box = extrusion.addNew(builder, 50, part)
+    box = extrusion.addNew(builder, aHeight, part)
 
     # return base.lastResult()
     return extrusion.getBody(box)

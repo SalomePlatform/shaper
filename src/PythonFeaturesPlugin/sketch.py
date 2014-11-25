@@ -110,21 +110,25 @@ def makeCoincident(p1, p2, sketch):
     constraint = sketch.addFeature("SketchConstraintCoincidence")
     constraint.refattr("ConstraintEntityA").setAttr(p1)
     constraint.refattr("ConstraintEntityB").setAttr(p2)
+    return constraint
 
 
 def makeParallel(l1, l2, sketch):
     constraint = sketch.addFeature("SketchConstraintParallel")
     constraint.refattr("ConstraintEntityA").setObject(l1)
     constraint.refattr("ConstraintEntityB").setObject(l2)
+    return constraint
 
 
 def makePerpendicular(l1, l2, sketch):
     constraint = sketch.addFeature("SketchConstraintPerpendicular")
     constraint.refattr("ConstraintEntityA").setObject(l1)
     constraint.refattr("ConstraintEntityB").setObject(l2)
+    return constraint
 
 
 def makeConstantLength(line, length, sketch):
     constraint = sketch.addFeature("SketchConstraintLength")
     constraint.refattr("ConstraintEntityA").setObject(line)
     constraint.real("ConstraintValue").setValue(length)
+    return constraint

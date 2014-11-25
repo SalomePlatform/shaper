@@ -12,4 +12,4 @@ def addNew(builder, length, part, edges=None, reverse=False):
 
 
 def getBody(extrusion):
-    return extrusion.firstResult()
+    return modelAPI_ResultBody(extrusion.firstResult())
