@@ -20,21 +20,21 @@ void GeomAlgoAPI_MakeShape::init(void* theMkShape)
   setImpl((void *)implPtr<BRepBuilderAPI_MakeShape>());
 }
 
-const boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShape::shape() const
+const std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShape::shape() const
 {
   return myShape;
 }
 
 /// Returns the  list   of shapes generated   from the shape <theShape>
 void GeomAlgoAPI_MakeShape::generated(
-  const boost::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory)
+  const std::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory)
 {
   BRepBuilderAPI_MakeShape* aBuilder = implPtr<BRepBuilderAPI_MakeShape>();
   if(aBuilder) {
     const TopTools_ListOfShape& aList =  aBuilder->Generated(theShape->impl<TopoDS_Shape>());
     TopTools_ListIteratorOfListOfShape it(aList);
     for(;it.More();it.Next()) {
-      boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+      std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
       aShape->setImpl(new TopoDS_Shape(it.Value()));
       theHistory.push_back(aShape);
     }
@@ -43,14 +43,14 @@ void GeomAlgoAPI_MakeShape::generated(
 
 /// Returns the  list   of shapes modified   from the shape <theShape>
 void GeomAlgoAPI_MakeShape::modified(
-  const boost::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory)
+  const std::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory)
 {
   BRepBuilderAPI_MakeShape* aBuilder = implPtr<BRepBuilderAPI_MakeShape>();
   if(aBuilder) {
     const TopTools_ListOfShape& aList =  aBuilder->Modified(theShape->impl<TopoDS_Shape>());
     TopTools_ListIteratorOfListOfShape it(aList);
     for(;it.More();it.Next()) {
-      boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+      std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
       aShape->setImpl(new TopoDS_Shape(it.Value()));
       theHistory.push_back(aShape);
     }
@@ -58,7 +58,7 @@ void GeomAlgoAPI_MakeShape::modified(
 }
 
 /// Returns whether the shape is an edge
-bool GeomAlgoAPI_MakeShape::isDeleted(const boost::shared_ptr<GeomAPI_Shape> theShape)
+bool GeomAlgoAPI_MakeShape::isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
   bool isDeleted(false);
   BRepBuilderAPI_MakeShape* aBuilder = implPtr<BRepBuilderAPI_MakeShape>();

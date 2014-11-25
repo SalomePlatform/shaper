@@ -76,7 +76,7 @@ std::string featureInfo(FeaturePtr theFeature)
  if (theFeature->data()) {
  return theFeature;
  } else {
- ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
+ ObjectPtr aObject = std::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
  return aObject->featureRef();
  }
  }*/

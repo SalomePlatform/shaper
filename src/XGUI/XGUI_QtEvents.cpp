@@ -10,7 +10,7 @@
 QEvent::Type PostponeMessageQtEvent::PostponeMessageQtEventType = QEvent::Type(QEvent::registerEventType());
 
 
-boost::shared_ptr<Events_Message> PostponeMessageQtEvent::postponedMessage()
+std::shared_ptr<Events_Message> PostponeMessageQtEvent::postponedMessage()
 {
   return myMessage;
 }

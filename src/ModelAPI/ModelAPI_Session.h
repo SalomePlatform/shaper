@@ -8,7 +8,7 @@
 #include "ModelAPI.h"
 #include <string>
 #include <list>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class ModelAPI_Feature;
 class ModelAPI_Plugin;
@@ -26,7 +26,7 @@ class MODELAPI_EXPORT ModelAPI_Session
 {
  public:
   /// Returns the real implementation (the alone instance per application) of the plugin manager
-  static boost::shared_ptr<ModelAPI_Session> get();
+  static std::shared_ptr<ModelAPI_Session> get();
 
   //! Loads the OCAF document from the file.
   //! \param theFileName full name of the file to load
@@ -69,23 +69,23 @@ class MODELAPI_EXPORT ModelAPI_Session
   virtual void registerPlugin(ModelAPI_Plugin* thePlugin) = 0;
 
   /// Returns the root document of the application (that may contains sub-documents)
-  virtual boost::shared_ptr<ModelAPI_Document> moduleDocument() = 0;
+  virtual std::shared_ptr<ModelAPI_Document> moduleDocument() = 0;
 
   /// Return true if root document has been already created
   virtual bool hasModuleDocument() = 0;
 
   /// Returns the current document that used for current work in the application
-  virtual boost::shared_ptr<ModelAPI_Document> activeDocument() = 0;
+  virtual std::shared_ptr<ModelAPI_Document> activeDocument() = 0;
 
   /// Defines the current document that used for current work in the application
   virtual void setActiveDocument(
-    boost::shared_ptr<ModelAPI_Document> theDoc, bool theSendSignal = true) = 0;
+    std::shared_ptr<ModelAPI_Document> theDoc, bool theSendSignal = true) = 0;
 
   /// Returns all the opened documents of the session (without postponed)
-  virtual std::list<boost::shared_ptr<ModelAPI_Document> > allOpenedDocuments() = 0;
+  virtual std::list<std::shared_ptr<ModelAPI_Document> > allOpenedDocuments() = 0;
 
   /// Copies the document to the new one with the given id
-  virtual boost::shared_ptr<ModelAPI_Document> copy(boost::shared_ptr<ModelAPI_Document> theSource,
+  virtual std::shared_ptr<ModelAPI_Document> copy(std::shared_ptr<ModelAPI_Document> theSource,
                                                     std::string theID) = 0;
 
   /// Returns the validators factory: the only one instance per application
@@ -98,13 +98,13 @@ class MODELAPI_EXPORT ModelAPI_Session
 
  protected:
   /// Creates the feature object using plugins functionality
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
 
-  static void setSession(boost::shared_ptr<ModelAPI_Session> theManager);
+  static void setSession(std::shared_ptr<ModelAPI_Session> theManager);
 
   friend class Model_Document;
 };
 
-typedef boost::shared_ptr<ModelAPI_Session> SessionPtr;
+typedef std::shared_ptr<ModelAPI_Session> SessionPtr;
 
 #endif

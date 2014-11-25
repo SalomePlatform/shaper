@@ -42,14 +42,14 @@ using namespace std;
 #endif
 
 /// Manager that will be initialized from Model package, one per application
-boost::shared_ptr<ModelAPI_Session> MY_MANAGER;
+std::shared_ptr<ModelAPI_Session> MY_MANAGER;
 
-void ModelAPI_Session::setSession(boost::shared_ptr<ModelAPI_Session> theManager)
+void ModelAPI_Session::setSession(std::shared_ptr<ModelAPI_Session> theManager)
 {
   MY_MANAGER = theManager;
 }
 
-boost::shared_ptr<ModelAPI_Session> ModelAPI_Session::get()
+std::shared_ptr<ModelAPI_Session> ModelAPI_Session::get()
 {
   if (!MY_MANAGER) {  // import Model library that implements this interface of ModelAPI
     Config_ModuleReader::loadLibrary("Model");

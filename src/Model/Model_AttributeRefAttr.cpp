@@ -14,9 +14,9 @@ bool Model_AttributeRefAttr::isObject()
   return myID->Get().Length() == 0;
 }
 
-void Model_AttributeRefAttr::setAttr(boost::shared_ptr<ModelAPI_Attribute> theAttr)
+void Model_AttributeRefAttr::setAttr(std::shared_ptr<ModelAPI_Attribute> theAttr)
 {
-  boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(
       theAttr->owner()->data());
   string anID = aData->id(theAttr);
   if (myIsInitialized && object() == theAttr->owner() && myID->Get().IsEqual(anID.c_str()))
@@ -26,21 +26,21 @@ void Model_AttributeRefAttr::setAttr(boost::shared_ptr<ModelAPI_Attribute> theAt
   owner()->data()->sendAttributeUpdated(this);
 }
 
-boost::shared_ptr<ModelAPI_Attribute> Model_AttributeRefAttr::attr()
+std::shared_ptr<ModelAPI_Attribute> Model_AttributeRefAttr::attr()
 {
   ObjectPtr anObj = object();
   if (anObj) {
-    boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(anObj->data());
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(anObj->data());
     return aData->attribute(TCollection_AsciiString(myID->Get()).ToCString());
   }
   // not initialized
-  return boost::shared_ptr<ModelAPI_Attribute>();
+  return std::shared_ptr<ModelAPI_Attribute>();
 }
 
 void Model_AttributeRefAttr::setObject(ObjectPtr theObject)
 {
   if (theObject && (!myIsInitialized || myID->Get().Length() != 0 || object() != theObject)) {
-    boost::shared_ptr<Model_Data> aData = boost::dynamic_pointer_cast<Model_Data>(
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(
         theObject->data());
     myRef->Set(aData->label().Father());
     myID->Set("");  // feature is identified by the empty ID
@@ -51,7 +51,7 @@ void Model_AttributeRefAttr::setObject(ObjectPtr theObject)
 ObjectPtr Model_AttributeRefAttr::object()
 {
   if (myRef->Get() != myRef->Label()) {  // initialized
-    boost::shared_ptr<Model_Document> aDoc = boost::dynamic_pointer_cast<Model_Document>(
+    std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
         owner()->document());
     if (aDoc) {
       TDF_Label aRefLab = myRef->Get();

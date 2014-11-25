@@ -132,7 +132,7 @@ FeaturePtr ModuleBase_Operation::createFeature(
   if (theCompositeFeature) {
     myFeature = theCompositeFeature->addFeature(getDescription()->operationId().toStdString());
   } else {
-    boost::shared_ptr<ModelAPI_Document> aDoc = document();
+    std::shared_ptr<ModelAPI_Document> aDoc = document();
     myFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
   }
   if (myFeature) {  // TODO: generate an error if feature was not created
@@ -175,7 +175,7 @@ bool ModuleBase_Operation::hasObject(ObjectPtr theObj) const
 }
 
 
-boost::shared_ptr<ModelAPI_Document> ModuleBase_Operation::document() const
+std::shared_ptr<ModelAPI_Document> ModuleBase_Operation::document() const
 {
   return ModelAPI_Session::get()->moduleDocument();
 }
@@ -330,7 +330,7 @@ void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,
 
     double aX, anY;
     if (getViewerPoint(aPrs, theViewer, aX, anY))
-      aValue->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
+      aValue->setPoint(std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
     myPreSelection.append(aValue);
   }
 }
@@ -351,7 +351,7 @@ bool ModuleBase_Operation::setWidgetValue(ObjectPtr theFeature, double theX, dou
     return false;
   ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
   aValue->setObject(theFeature);
-  aValue->setPoint(boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
+  aValue->setPoint(std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
   bool isApplyed = aActiveWgt->setValue(aValue);
 
   delete aValue;

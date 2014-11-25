@@ -204,7 +204,7 @@ void PartSet_Module::onContextMenuCommand(const QString& theId, bool isChecked)
 {
   QList<ObjectPtr> aFeatures = workshop()->selection()->selectedObjects();
   if (theId == "EDIT_CMD" && (aFeatures.size() > 0)) {
-    FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aFeatures.first());
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aFeatures.first());
     if (aFeature)
       editFeature(aFeature);
   }
@@ -481,7 +481,7 @@ void PartSet_Module::updateCurrentPreview(const std::string& theCmdId)
 
   std::list<FeaturePtr>::const_iterator anIt = aList.begin(), aLast = aList.end();
   for (; anIt != aLast; anIt++) {
-    boost::shared_ptr<SketchPlugin_Feature> aSPFeature = boost::dynamic_pointer_cast<
+    std::shared_ptr<SketchPlugin_Feature> aSPFeature = std::dynamic_pointer_cast<
         SketchPlugin_Feature>(*anIt);
     if (!aSPFeature)
       continue;
@@ -505,7 +505,7 @@ void PartSet_Module::editFeature(FeaturePtr theFeature)
 //  if (theFeature->getKind() == SKETCH_KIND) {
   //FeaturePtr aFeature = theFeature;
   //if (XGUI_Tools::isModelObject(aFeature)) {
-  //  ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
+  //  ObjectPtr aObject = std::dynamic_pointer_cast<ModelAPI_Object>(aFeature);
   //  aFeature = aObject->featureRef();
   //}
 
@@ -518,14 +518,14 @@ void PartSet_Module::editFeature(FeaturePtr theFeature)
 
 void PartSet_Module::onStorePoint2D(ObjectPtr theFeature, const std::string& theAttribute)
 {
-  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
 
   PartSet_OperationSketchBase* aPreviewOp = 
     dynamic_cast<PartSet_OperationSketchBase*>(myWorkshop->currentOperation());
   if (!aPreviewOp)
     return;
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aFeature->data()->attribute(theAttribute));
 
   PartSet_Tools::setConstraints(aPreviewOp->sketch(), aFeature, theAttribute, aPoint->x(),
@@ -559,7 +559,7 @@ XGUI_Workshop* PartSet_Module::xWorkshop() const
 QIntList PartSet_Module::sketchSelectionModes(ObjectPtr theFeature)
 {
   QIntList aModes;
-  FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theFeature);
   if (aFeature) {
     if (aFeature->getKind() == SketchPlugin_Sketch::ID()) {
       aModes.append(TopAbs_FACE);
@@ -579,9 +579,9 @@ QIntList PartSet_Module::sketchSelectionModes(ObjectPtr theFeature)
 gp_Pln PartSet_Module::getSketchPlane(FeaturePtr theSketch) const
 {
   DataPtr aData = theSketch->data();
-  boost::shared_ptr<GeomDataAPI_Point> anOrigin = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+  std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
       aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-  boost::shared_ptr<GeomDataAPI_Dir> aNorm = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::NORM_ID()));
   gp_Pnt aOrig(anOrigin->x(), anOrigin->y(), anOrigin->z());
   gp_Dir aDir(aNorm->x(), aNorm->y(), aNorm->z());

@@ -209,7 +209,7 @@ signals:
   virtual bool canBeCommitted() const;
 
   /// Returns pointer to the root document.
-  boost::shared_ptr<ModelAPI_Document> document() const;
+  std::shared_ptr<ModelAPI_Document> document() const;
 
   /// Set value to the active widget
   /// \param theFeature the feature

@@ -18,7 +18,7 @@ void GeomData_Point2D::setValue(const double theX, const double theY)
   }
 }
 
-void GeomData_Point2D::setValue(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+void GeomData_Point2D::setValue(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   setValue(thePoint->x(), thePoint->y());
 }
@@ -33,9 +33,9 @@ double GeomData_Point2D::y() const
   return myCoords->Value(1);
 }
 
-boost::shared_ptr<GeomAPI_Pnt2d> GeomData_Point2D::pnt()
+std::shared_ptr<GeomAPI_Pnt2d> GeomData_Point2D::pnt()
 {
-  boost::shared_ptr<GeomAPI_Pnt2d> aResult(
+  std::shared_ptr<GeomAPI_Pnt2d> aResult(
       new GeomAPI_Pnt2d(myCoords->Value(0), myCoords->Value(1)));
   return aResult;
 }

@@ -88,14 +88,14 @@ Handle(V3d_View) theView,
     return;
 
   AttributeDoublePtr anAttr;
-  boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
+  std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
 
-  boost::shared_ptr<GeomDataAPI_Point> anOrigin = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+  std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
       aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
 
-  boost::shared_ptr<GeomDataAPI_Dir> aX = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+  std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
-  boost::shared_ptr<GeomDataAPI_Dir> anY = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+  std::shared_ptr<GeomDataAPI_Dir> anY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
 
   gp_Pnt anOriginPnt(anOrigin->x(), anOrigin->y(), anOrigin->z());
@@ -112,7 +112,7 @@ Handle(V3d_View) theView,
     gp_Vec anEyeVec(EyePoint, AtPoint);
     anEyeVec.Normalize();
 
-    boost::shared_ptr<GeomDataAPI_Dir> aNormal = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+    std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
         aData->attribute(SketchPlugin_Sketch::NORM_ID()));
     gp_Vec aNormalVec(aNormal->x(), aNormal->y(), aNormal->z());
 
@@ -132,19 +132,19 @@ void PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr
   if (!theSketch)
     return;
 
-  boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
+  std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
 
-  boost::shared_ptr<GeomDataAPI_Point> aC = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+  std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
       aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-  boost::shared_ptr<GeomDataAPI_Dir> aX = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+  std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
-  boost::shared_ptr<GeomDataAPI_Dir> aY = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+  std::shared_ptr<GeomDataAPI_Dir> aY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
 
-  boost::shared_ptr<GeomAPI_XYZ> aSum = aC->pnt()->xyz()->added(aX->dir()->xyz()->multiplied(theX))
+  std::shared_ptr<GeomAPI_XYZ> aSum = aC->pnt()->xyz()->added(aX->dir()->xyz()->multiplied(theX))
       ->added(aY->dir()->xyz()->multiplied(theY));
 
-  boost::shared_ptr<GeomAPI_Pnt> aPoint = boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
+  std::shared_ptr<GeomAPI_Pnt> aPoint = std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
   thePoint = gp_Pnt(aPoint->x(), aPoint->y(), aPoint->z());
 }
 
@@ -169,7 +169,7 @@ ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView
   ObjectPtr aDeltaObject;
 
   CompositeFeaturePtr aSketch = 
-      boost::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theSketch);
+      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theSketch);
   // 1. find it in the selected list by the selected point
   if (!aDeltaObject) {
     double aX, anY;
@@ -183,13 +183,13 @@ ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView
       if (!aPrs.object())
         continue;
       FeaturePtr aFeature = ModelAPI_Feature::feature(aPrs.object());
-      boost::shared_ptr<SketchPlugin_Feature> aSketchFeature = boost::dynamic_pointer_cast<
+      std::shared_ptr<SketchPlugin_Feature> aSketchFeature = std::dynamic_pointer_cast<
           SketchPlugin_Feature>(aFeature);
       if (!aSketchFeature || !aSketch->isSub(aSketchFeature))
         continue;
 
       double aDelta = aSketchFeature->distanceToPoint(
-          boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
+          std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
       if (aMinDelta < 0 || aMinDelta > aDelta) {
         aMinDelta = aDelta;
         // TODO aDeltaObject = aPrs.result();
@@ -210,23 +210,23 @@ ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView
   return aDeltaObject;
 }
 
-boost::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
+std::shared_ptr<ModelAPI_Document> PartSet_Tools::document()
 {
   return ModelAPI_Session::get()->moduleDocument();
 }
 
-boost::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::getFeaturePoint(FeaturePtr theFeature,
+std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::getFeaturePoint(FeaturePtr theFeature,
                                                                       double theX, double theY)
 {
-  boost::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = boost::shared_ptr<GeomAPI_Pnt2d>(
+  std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
                                                                  new GeomAPI_Pnt2d(theX, theY));
-  std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes =
+  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttiributes =
                                     theFeature->data()->attributes(GeomDataAPI_Point2D::type());
-  std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
+  std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
                                                                     aLast = anAttiributes.end();
-  boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;
+  std::shared_ptr<GeomDataAPI_Point2D> aFPoint;
   for (; anIt != aLast && !aFPoint; anIt++) {
-    boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint = boost::dynamic_pointer_cast<
+    std::shared_ptr<GeomDataAPI_Point2D> aCurPoint = std::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(*anIt);
     if (aCurPoint && aCurPoint->pnt()->distance(aClickedPoint) < Precision::Confusion())
       aFPoint = aCurPoint;
@@ -240,8 +240,8 @@ void PartSet_Tools::setFeatureValue(FeaturePtr theFeature, double theValue,
 {
   if (!theFeature)
     return;
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  AttributeDoublePtr anAttribute = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+  std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  AttributeDoublePtr anAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
       aData->attribute(theAttribute));
   if (anAttribute)
     anAttribute->setValue(theValue);
@@ -253,8 +253,8 @@ double PartSet_Tools::featureValue(FeaturePtr theFeature, const std::string& the
   isValid = false;
   double aValue = 0;
   if (theFeature) {
-    boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-    AttributeDoublePtr anAttribute = boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
+    std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+    AttributeDoublePtr anAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
         aData->attribute(theAttribute));
     if (anAttribute) {
       aValue = anAttribute->value();
@@ -271,11 +271,11 @@ FeaturePtr PartSet_Tools::feature(FeaturePtr theFeature, const std::string& theA
   if (!theFeature)
     return aFeature;
 
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(aData->attribute(theAttribute));
   if (anAttr) {
-    aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->object());
+    aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->object());
     if (!theKind.empty() && aFeature && aFeature->getKind() != theKind) {
       aFeature = FeaturePtr();
     }
@@ -284,24 +284,24 @@ FeaturePtr PartSet_Tools::feature(FeaturePtr theFeature, const std::string& theA
 }
 
 void PartSet_Tools::createConstraint(CompositeFeaturePtr theSketch,
-                                     boost::shared_ptr<GeomDataAPI_Point2D> thePoint1,
-                                     boost::shared_ptr<GeomDataAPI_Point2D> thePoint2)
+                                     std::shared_ptr<GeomDataAPI_Point2D> thePoint1,
+                                     std::shared_ptr<GeomDataAPI_Point2D> thePoint2)
 {
   FeaturePtr aFeature;
   if (theSketch) {
     aFeature = theSketch->addFeature(SketchPlugin_ConstraintCoincidence::ID());
   } else {
-    boost::shared_ptr<ModelAPI_Document> aDoc = document();
+    std::shared_ptr<ModelAPI_Document> aDoc = document();
     aFeature = aDoc->addFeature(SketchPlugin_ConstraintCoincidence::ID());
   }
 
-  boost::shared_ptr<ModelAPI_Data> aData = aFeature->data();
+  std::shared_ptr<ModelAPI_Data> aData = aFeature->data();
 
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef1 = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeRefAttr> aRef1 = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
   aRef1->setAttr(thePoint1);
 
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef2 = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeRefAttr> aRef2 = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefAttr>(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
   aRef2->setAttr(thePoint2);
 
@@ -314,32 +314,32 @@ void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr the
                                    double theClickedY)
 {
   // find a feature point by the selection mode
-  //boost::shared_ptr<GeomDataAPI_Point2D> aPoint = featurePoint(theMode);
-  boost::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint = boost::dynamic_pointer_cast<
+  //std::shared_ptr<GeomDataAPI_Point2D> aPoint = featurePoint(theMode);
+  std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(theFeature->data()->attribute(theAttribute));
   if (!aFeaturePoint)
     return;
 
   // get all sketch features. If the point with the given coordinates belong to any sketch feature,
   // the constraint is created between the feature point and the found sketch point
-  boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
-  boost::shared_ptr<ModelAPI_AttributeRefList> aRefList = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
+  std::shared_ptr<ModelAPI_AttributeRefList> aRefList = std::dynamic_pointer_cast<
       ModelAPI_AttributeRefList>(aData->attribute(SketchPlugin_Sketch::FEATURES_ID()));
 
   std::list<ObjectPtr> aFeatures = aRefList->list();
   std::list<ObjectPtr>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
-  std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttiributes;
-  boost::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = boost::shared_ptr<GeomAPI_Pnt2d>(
+  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttiributes;
+  std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
       new GeomAPI_Pnt2d(theClickedX, theClickedY));
   for (; anIt != aLast; anIt++) {
-    FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
     // find the given point in the feature attributes
     anAttiributes = aFeature->data()->attributes(GeomDataAPI_Point2D::type());
-    std::list<boost::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
+    std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
         aLast = anAttiributes.end();
-    boost::shared_ptr<GeomDataAPI_Point2D> aFPoint;
+    std::shared_ptr<GeomDataAPI_Point2D> aFPoint;
     for (; anIt != aLast && !aFPoint; anIt++) {
-      boost::shared_ptr<GeomDataAPI_Point2D> aCurPoint = boost::dynamic_pointer_cast<
+      std::shared_ptr<GeomDataAPI_Point2D> aCurPoint = std::dynamic_pointer_cast<
           GeomDataAPI_Point2D>(*anIt);
       if (aCurPoint && aCurPoint->pnt()->distance(aClickedPoint) < Precision::Confusion())
         aFPoint = aCurPoint;
@@ -349,37 +349,37 @@ void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr the
   }
 }
 
-boost::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(CompositeFeaturePtr theSketch)
+std::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(CompositeFeaturePtr theSketch)
 {
-  boost::shared_ptr<GeomAPI_Pln> aPlane;
+  std::shared_ptr<GeomAPI_Pln> aPlane;
   double aA, aB, aC, aD;
 
-  boost::shared_ptr<ModelAPI_Data> aData = theSketch->data();
-  boost::shared_ptr<GeomDataAPI_Point> anOrigin = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+  std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
+  std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
       aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-  boost::shared_ptr<GeomDataAPI_Dir> aNormal = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+  std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::NORM_ID()));
   aA = aNormal->x();
   aB = aNormal->y();
   aC = aNormal->z();
   aD = 0;
 
-  aPlane = boost::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
+  aPlane = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
   return aPlane;
 }
 
-boost::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(boost::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
+std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(std::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
                                                       CompositeFeaturePtr theSketch)
 {
-  boost::shared_ptr<GeomAPI_Pnt> aPoint;
+  std::shared_ptr<GeomAPI_Pnt> aPoint;
   if (!theSketch || !thePoint2D)
     return aPoint;
 
-  boost::shared_ptr<GeomDataAPI_Point> aC = boost::dynamic_pointer_cast<GeomDataAPI_Point>(
+  std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
       theSketch->data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-  boost::shared_ptr<GeomDataAPI_Dir> aX = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+  std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       theSketch->data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
-  boost::shared_ptr<GeomDataAPI_Dir> aY = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+  std::shared_ptr<GeomDataAPI_Dir> aY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       theSketch->data()->attribute(SketchPlugin_Sketch::DIRY_ID()));
 
   return thePoint2D->to3D(aC->pnt(), aX->dir(), aY->dir());
@@ -400,7 +400,7 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
     return ResultPtr();
 
   // Check that we already have such external edge
-  boost::shared_ptr<GeomAPI_Edge> aInEdge = boost::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge());
+  std::shared_ptr<GeomAPI_Edge> aInEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge());
   aInEdge->setImpl(new TopoDS_Shape(aShape));
   ResultPtr aResult = findExternalEdge(theSketch, aInEdge);
   if (aResult)
@@ -418,8 +418,8 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
     aMyFeature = theSketch->addFeature(SketchPlugin_Line::ID());
 
     //DataPtr aData = myFeature->data();
-    //boost::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
-    //  boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
+    //std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
+    //  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
 
     //double aX, aY;
     //gp_Pnt Pnt1 = aAdaptor.Value(aStart);
@@ -448,12 +448,12 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
   if (aMyFeature) {
     DataPtr aData = aMyFeature->data();
     AttributeSelectionPtr anAttr = 
-      boost::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
       (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
 
-    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
     if (anAttr && aRes) {
-      boost::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
+      std::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
       anEdge->setImpl(new TopoDS_Shape(aShape));
 
       anAttr->setValue(aRes, anEdge);
@@ -481,21 +481,21 @@ bool PartSet_Tools::isContainPresentation(const QList<ModuleBase_ViewerPrs>& the
   return false;
 }
 
-ResultPtr PartSet_Tools::findExternalEdge(CompositeFeaturePtr theSketch, boost::shared_ptr<GeomAPI_Edge> theEdge)
+ResultPtr PartSet_Tools::findExternalEdge(CompositeFeaturePtr theSketch, std::shared_ptr<GeomAPI_Edge> theEdge)
 {
   for (int i = 0; i < theSketch->numberOfSubs(); i++) {
     FeaturePtr aFeature = theSketch->subFeature(i);
-    boost::shared_ptr<SketchPlugin_Feature> aSketchFea = 
-      boost::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    std::shared_ptr<SketchPlugin_Feature> aSketchFea = 
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
     if (aSketchFea) {
       if (aSketchFea->isExternal()) {
         std::list<ResultPtr> aResults = aSketchFea->results();
         std::list<ResultPtr>::const_iterator aIt;
         for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
           ResultConstructionPtr aRes = 
-            boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aIt);
+            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aIt);
           if (aRes) {
-            boost::shared_ptr<GeomAPI_Shape> aShape = aRes->shape();
+            std::shared_ptr<GeomAPI_Shape> aShape = aRes->shape();
             if (aShape) {
               if (theEdge->isEqual(aShape))
                 return aRes;

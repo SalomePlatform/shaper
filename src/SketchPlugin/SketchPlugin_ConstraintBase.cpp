@@ -20,7 +20,7 @@ void SketchPlugin_ConstraintBase::move(const double theDeltaX, const double theD
 }
 
 double SketchPlugin_ConstraintBase::distanceToPoint(
-    const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
   return 0;
 }

@@ -22,7 +22,7 @@ public:
    GeomAPI_Edge();
 
    /// Creation of edge by the edge-shape
-   GeomAPI_Edge(const boost::shared_ptr<GeomAPI_Shape>& theShape);
+   GeomAPI_Edge(const std::shared_ptr<GeomAPI_Shape>& theShape);
 
   /// Verifies that the edge is a line
   bool isLine() const;
@@ -34,16 +34,16 @@ public:
   bool isArc() const;
 
   /// Returns the first vertex coordinates of the edge 
-  boost::shared_ptr<GeomAPI_Pnt> firstPoint();
+  std::shared_ptr<GeomAPI_Pnt> firstPoint();
 
   /// Returns the Last vertex coordinates of the edge 
-  boost::shared_ptr<GeomAPI_Pnt> lastPoint();
+  std::shared_ptr<GeomAPI_Pnt> lastPoint();
 
   /// Returns a circle if edge is based on the cirsle curve
-  boost::shared_ptr<GeomAPI_Circ> circle();
+  std::shared_ptr<GeomAPI_Circ> circle();
 
   /// Returns true if the current edge is geometrically equal to the given edge
-  bool isEqual(boost::shared_ptr<GeomAPI_Shape> theEdge);
+  bool isEqual(std::shared_ptr<GeomAPI_Shape> theEdge);
 };
 
 #endif

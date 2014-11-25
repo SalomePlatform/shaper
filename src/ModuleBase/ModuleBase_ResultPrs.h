@@ -35,7 +35,7 @@ private:
   bool myIsSketchMode;
 
   TopoDS_Shape myOriginalShape;
-  std::list<boost::shared_ptr<GeomAPI_Shape> > myFacesList;
+  std::list<std::shared_ptr<GeomAPI_Shape> > myFacesList;
 };
 
 

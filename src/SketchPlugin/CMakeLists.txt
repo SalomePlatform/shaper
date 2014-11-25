@@ -56,7 +56,7 @@ SET(XML_RESOURCES
   plugin-Sketch.xml
 )
 
-ADD_DEFINITIONS(-DSKETCHPLUGIN_EXPORTS ${BOOST_DEFINITIONS})
+ADD_DEFINITIONS(-DSKETCHPLUGIN_EXPORTS)
 ADD_LIBRARY(SketchPlugin MODULE ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES})
 TARGET_LINK_LIBRARIES(SketchPlugin ${PROJECT_LIBRARIES})
 
@@ -78,4 +78,5 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintDistance.py
                TestConstraintParallel.py
                TestConstraintPerpendicular.py
-               TestConstraintRadius.py)
+               TestConstraintRadius.py
+               TestConstraintRigid.py)

@@ -16,7 +16,7 @@ class Model_EventCreator : public ModelAPI_EventCreator
   virtual void sendUpdated(const ObjectPtr& theObject, const Events_ID& theEvent,
                            const bool isGroupped = true) const;
   /// creates deleted message and sends to the loop
-  virtual void sendDeleted(const boost::shared_ptr<ModelAPI_Document>& theDoc,
+  virtual void sendDeleted(const std::shared_ptr<ModelAPI_Document>& theDoc,
                            const std::string& theGroup) const;
 
   /// must be one per application, the constructor for internal usage only
@@ -39,26 +39,26 @@ class Model_ObjectUpdatedMessage : public ModelAPI_ObjectUpdatedMessage
   virtual const std::set<ObjectPtr>& objects() const;
 
   //! Creates a new empty group (to store it in the loop before flush)
-  virtual boost::shared_ptr<Events_MessageGroup> newEmpty();
+  virtual std::shared_ptr<Events_MessageGroup> newEmpty();
 
   //! Allows to join the given message with the current one
-  virtual void Join(const boost::shared_ptr<Events_MessageGroup>& theJoined);
+  virtual void Join(const std::shared_ptr<Events_MessageGroup>& theJoined);
 };
 
 /// Message that feature was deleted (used for Object Browser update)
 class Model_ObjectDeletedMessage : public ModelAPI_ObjectDeletedMessage
 {
-  boost::shared_ptr<ModelAPI_Document> myDoc;  ///< document owner of the feature
+  std::shared_ptr<ModelAPI_Document> myDoc;  ///< document owner of the feature
   std::set<std::string> myGroups;  ///< group identifiers that contained the deleted feature
 
   /// Use ModelAPI for creation of this event.
-  Model_ObjectDeletedMessage(const boost::shared_ptr<ModelAPI_Document>& theDoc,
+  Model_ObjectDeletedMessage(const std::shared_ptr<ModelAPI_Document>& theDoc,
                              const std::string& theGroup);
 
   friend class Model_EventCreator;
  public:
   /// Returns the feature that has been updated
-  virtual boost::shared_ptr<ModelAPI_Document> document() const
+  virtual std::shared_ptr<ModelAPI_Document> document() const
   {
     return myDoc;
   }
@@ -69,11 +69,11 @@ class Model_ObjectDeletedMessage : public ModelAPI_ObjectDeletedMessage
     return myGroups;
   }
 
-  virtual boost::shared_ptr<Events_MessageGroup> newEmpty();
+  virtual std::shared_ptr<Events_MessageGroup> newEmpty();
 
   virtual const Events_ID messageId();
 
-  virtual void Join(const boost::shared_ptr<Events_MessageGroup>& theJoined);
+  virtual void Join(const std::shared_ptr<Events_MessageGroup>& theJoined);
 };
 
 #endif

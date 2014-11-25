@@ -45,6 +45,6 @@ class ModelAPI_AttributeBoolean : public ModelAPI_Attribute
   }
 };
 
-typedef boost::shared_ptr<ModelAPI_AttributeBoolean> AttributeBooleanPtr;
+typedef std::shared_ptr<ModelAPI_AttributeBoolean> AttributeBooleanPtr;
 
 #endif

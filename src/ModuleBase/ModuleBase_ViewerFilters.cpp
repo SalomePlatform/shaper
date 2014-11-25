@@ -31,7 +31,7 @@ Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(const Handle(SelectMgr_Ent
     Handle(AIS_InteractiveObject) aAisObj = 
       Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
     if (!aAisObj.IsNull()) {
-      boost::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
+      std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
       aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aAisObj));
       ObjectPtr aObj = myWorkshop->findPresentedObject(aAISObj);
       if (aObj) {
@@ -96,14 +96,14 @@ Standard_Boolean ModuleBase_ObjectTypesFilter::IsOk(const Handle(SelectMgr_Entit
     Handle(AIS_InteractiveObject) aAisObj = 
       Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
     if (!aAisObj.IsNull()) {
-      boost::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
+      std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
       aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aAisObj));
       ObjectPtr aObj = myWorkshop->findPresentedObject(aAISObj);
 
       foreach (QString aType, myTypes) {
         if (aType.toLower() == "construction") {
           ResultConstructionPtr aConstr = 
-            boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObj);
+            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObj);
           return (aConstr != NULL);
         } // ToDo: Process other types of objects
       }

@@ -6,6 +6,7 @@
 #define ModelAPI_Result_H_
 
 #include "ModelAPI_Object.h"
+#include "GeomAPI_Shape.h"
 
 class ModelAPI_Feature;
 
@@ -30,9 +31,11 @@ class ModelAPI_Result : public ModelAPI_Object
   {
   }
 
+  /// Returns the shape-result produced by this feature (or null if no shapes)
+  virtual std::shared_ptr<GeomAPI_Shape> shape() {return std::shared_ptr<GeomAPI_Shape>();}
 };
 
 //! Pointer on feature object
-typedef boost::shared_ptr<ModelAPI_Result> ResultPtr;
+typedef std::shared_ptr<ModelAPI_Result> ResultPtr;
 
 #endif

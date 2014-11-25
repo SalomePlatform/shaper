@@ -25,7 +25,7 @@ class Model_AttributeSelectionList : public ModelAPI_AttributeSelectionList
 public:
   /// Adds the new reference to the end of the list
   MODEL_EXPORT virtual void append(
-    const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape);
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);
 
   /// Returns the number ofselection attributes in the list
   MODEL_EXPORT virtual int size();
@@ -35,7 +35,7 @@ public:
   MODEL_EXPORT virtual void setSelectionType(int);
 
   /// Returns the attribute selection by the index (zero based)
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_AttributeSelection> value(const int theIndex);
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeSelection> value(const int theIndex);
 
   /// Returns all attributes
   MODEL_EXPORT virtual void clear();

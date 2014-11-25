@@ -9,7 +9,7 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Dir.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <list>
 
@@ -23,8 +23,8 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_CompoundBuilder
  public:
   /// Creates compund of the given shapes
   /// \param theShapes a list of shapes
-  static boost::shared_ptr<GeomAPI_Shape> compound(
-      std::list<boost::shared_ptr<GeomAPI_Shape> > theShapes);
+  static std::shared_ptr<GeomAPI_Shape> compound(
+      std::list<std::shared_ptr<GeomAPI_Shape> > theShapes);
 };
 
 #endif

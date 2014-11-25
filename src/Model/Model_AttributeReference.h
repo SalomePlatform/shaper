@@ -28,7 +28,7 @@ class Model_AttributeReference : public ModelAPI_AttributeReference
 
   MODEL_EXPORT ~Model_AttributeReference();
 
-  MODEL_EXPORT virtual void setObject(const boost::shared_ptr<ModelAPI_Object>& theObject);
+  MODEL_EXPORT virtual void setObject(const std::shared_ptr<ModelAPI_Object>& theObject);
 
 protected:
   /// Objects are created for features automatically

@@ -27,7 +27,7 @@ using namespace std;
 static Model_Session* myImpl = new Model_Session();
 
 // t oredirect all calls to the root document
-#define ROOT_DOC boost::dynamic_pointer_cast<Model_Document>(moduleDocument())
+#define ROOT_DOC std::dynamic_pointer_cast<Model_Document>(moduleDocument())
 
 bool Model_Session::load(const char* theFileName)
 {
@@ -48,7 +48,7 @@ void Model_Session::closeAll()
 void Model_Session::startOperation()
 {
   ROOT_DOC->startOperation();
-  static boost::shared_ptr<Events_Message> aStartedMsg
+  static std::shared_ptr<Events_Message> aStartedMsg
     (new Events_Message(Events_Loop::eventByName("StartOperation")));
   Events_Loop::loop()->send(aStartedMsg);
 }
@@ -61,7 +61,7 @@ void Model_Session::finishOperation()
 void Model_Session::abortOperation()
 {
   ROOT_DOC->abortOperation();
-  static boost::shared_ptr<Events_Message> anAbortMsg
+  static std::shared_ptr<Events_Message> anAbortMsg
     (new Events_Message(Events_Loop::eventByName("AbortOperation")));
   Events_Loop::loop()->send(anAbortMsg);
 }
@@ -136,9 +136,9 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
   return FeaturePtr();  // return nothing
 }
 
-boost::shared_ptr<ModelAPI_Document> Model_Session::moduleDocument()
+std::shared_ptr<ModelAPI_Document> Model_Session::moduleDocument()
 {
-  return boost::shared_ptr<ModelAPI_Document>(
+  return std::shared_ptr<ModelAPI_Document>(
       Model_Application::getApplication()->getDocument("root"));
 }
 
@@ -147,7 +147,7 @@ bool Model_Session::hasModuleDocument()
   return Model_Application::getApplication()->hasDocument("root");
 }
 
-boost::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
+std::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
 {
   if (!myCurrentDoc || !Model_Application::getApplication()->hasDocument(myCurrentDoc->id()))
     myCurrentDoc = moduleDocument();
@@ -155,26 +155,26 @@ boost::shared_ptr<ModelAPI_Document> Model_Session::activeDocument()
 }
 
 void Model_Session::setActiveDocument(
-  boost::shared_ptr<ModelAPI_Document> theDoc, bool theSendSignal)
+  std::shared_ptr<ModelAPI_Document> theDoc, bool theSendSignal)
 {
   if (myCurrentDoc != theDoc) {
     myCurrentDoc = theDoc;
     if (theSendSignal) {
-      static boost::shared_ptr<Events_Message> aMsg(new Events_Message(Events_Loop::eventByName("CurrentDocumentChanged")));
+      static std::shared_ptr<Events_Message> aMsg(new Events_Message(Events_Loop::eventByName("CurrentDocumentChanged")));
       Events_Loop::loop()->send(aMsg);
     }
   }
 }
 
-std::list<boost::shared_ptr<ModelAPI_Document> > Model_Session::allOpenedDocuments()
+std::list<std::shared_ptr<ModelAPI_Document> > Model_Session::allOpenedDocuments()
 {
-  list<boost::shared_ptr<ModelAPI_Document> > aResult;
+  list<std::shared_ptr<ModelAPI_Document> > aResult;
   aResult.push_back(moduleDocument());
   // add subs recursively
-  list<boost::shared_ptr<ModelAPI_Document> >::iterator aDoc = aResult.begin();
+  list<std::shared_ptr<ModelAPI_Document> >::iterator aDoc = aResult.begin();
   for(; aDoc != aResult.end(); aDoc++) {
     DocumentPtr anAPIDoc = *aDoc;
-    boost::shared_ptr<Model_Document> aDoc = boost::dynamic_pointer_cast<Model_Document>(anAPIDoc);
+    std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(anAPIDoc);
     if (aDoc) {
       std::set<std::string>::const_iterator aSubIter = aDoc->subDocuments().cbegin();
       for(; aSubIter != aDoc->subDocuments().cend(); aSubIter++) {
@@ -187,14 +187,14 @@ std::list<boost::shared_ptr<ModelAPI_Document> > Model_Session::allOpenedDocumen
   return aResult;
 }
 
-boost::shared_ptr<ModelAPI_Document> Model_Session::copy(
-    boost::shared_ptr<ModelAPI_Document> theSource, std::string theID)
+std::shared_ptr<ModelAPI_Document> Model_Session::copy(
+    std::shared_ptr<ModelAPI_Document> theSource, std::string theID)
 {
   // create a new document
-  boost::shared_ptr<Model_Document> aNew = boost::dynamic_pointer_cast<Model_Document>(
+  std::shared_ptr<Model_Document> aNew = std::dynamic_pointer_cast<Model_Document>(
       Model_Application::getApplication()->getDocument(theID));
   // make a copy of all labels
-  TDF_Label aSourceRoot = boost::dynamic_pointer_cast<Model_Document>(theSource)->document()->Main()
+  TDF_Label aSourceRoot = std::dynamic_pointer_cast<Model_Document>(theSource)->document()->Main()
       .Father();
   TDF_Label aTargetRoot = aNew->document()->Main().Father();
   Handle(TDF_DataSet) aDS = new TDF_DataSet;
@@ -212,7 +212,7 @@ Model_Session::Model_Session()
 {
   myPluginsInfoLoaded = false;
   myCheckTransactions = true;
-  ModelAPI_Session::setSession(boost::shared_ptr<ModelAPI_Session>(this));
+  ModelAPI_Session::setSession(std::shared_ptr<ModelAPI_Session>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
   static const Events_ID kFeatureEvent = Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
@@ -223,13 +223,13 @@ Model_Session::Model_Session()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_VALIDATOR_LOADED));
 }
 
-void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
+void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   static const Events_ID kFeatureEvent = Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
   static const Events_ID kValidatorEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
   if (theMessage->eventID() == kFeatureEvent) {
-    const boost::shared_ptr<Config_FeatureMessage> aMsg = 
-      boost::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
+    const std::shared_ptr<Config_FeatureMessage> aMsg = 
+      std::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
     if (aMsg) {
       // proccess the plugin info, load plugin
       if (myPlugins.find(aMsg->id()) == myPlugins.end()) {
@@ -237,8 +237,8 @@ void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMes
           aMsg->pluginLibrary(), aMsg->documentKind());
       }
     } else {
-      const boost::shared_ptr<Config_AttributeMessage> aMsgAttr = 
-        boost::dynamic_pointer_cast<Config_AttributeMessage>(theMessage);
+      const std::shared_ptr<Config_AttributeMessage> aMsgAttr = 
+        std::dynamic_pointer_cast<Config_AttributeMessage>(theMessage);
       if (aMsgAttr) {
         if (!aMsgAttr->isObligatory()) {
           validators()->registerNotObligatory(aMsgAttr->featureId(), aMsgAttr->attributeId());
@@ -252,8 +252,8 @@ void Model_Session::processEvent(const boost::shared_ptr<Events_Message>& theMes
     // plugins information was started to load, so, it will be loaded
     myPluginsInfoLoaded = true;
   } else if (theMessage->eventID() == kValidatorEvent) {
-    boost::shared_ptr<Config_ValidatorMessage> aMsg = 
-      boost::dynamic_pointer_cast<Config_ValidatorMessage>(theMessage);
+    std::shared_ptr<Config_ValidatorMessage> aMsg = 
+      std::dynamic_pointer_cast<Config_ValidatorMessage>(theMessage);
     if (aMsg) {
       if (aMsg->attributeId().empty()) {  // feature validator
         validators()->assignValidator(aMsg->validatorId(), aMsg->featureId(), aMsg->parameters());

@@ -31,37 +31,37 @@ void FeaturesPlugin_Boolean::initAttributes()
   data()->addAttribute(FeaturesPlugin_Boolean::TOOL_ID(), ModelAPI_AttributeReference::type());
 }
 
-boost::shared_ptr<GeomAPI_Shape> FeaturesPlugin_Boolean::getShape(const std::string& theAttrName)
+std::shared_ptr<GeomAPI_Shape> FeaturesPlugin_Boolean::getShape(const std::string& theAttrName)
 {
-  boost::shared_ptr<ModelAPI_AttributeReference> aObjRef = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeReference> aObjRef = std::dynamic_pointer_cast<
       ModelAPI_AttributeReference>(data()->attribute(theAttrName));
   if (aObjRef) {
-    boost::shared_ptr<ModelAPI_ResultBody> aConstr = boost::dynamic_pointer_cast<
+    std::shared_ptr<ModelAPI_ResultBody> aConstr = std::dynamic_pointer_cast<
         ModelAPI_ResultBody>(aObjRef->value());
     if (aConstr)
       return aConstr->shape();
   }
-  return boost::shared_ptr<GeomAPI_Shape>();
+  return std::shared_ptr<GeomAPI_Shape>();
 }
 
 
 void FeaturesPlugin_Boolean::execute()
 {
-  boost::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = boost::dynamic_pointer_cast<
+  std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeInteger>(data()->attribute(FeaturesPlugin_Boolean::TYPE_ID()));
   if (!aTypeAttr)
     return;
   int aType = aTypeAttr->value();
 
-  boost::shared_ptr<GeomAPI_Shape> anObject = this->getShape(FeaturesPlugin_Boolean::OBJECT_ID());
+  std::shared_ptr<GeomAPI_Shape> anObject = this->getShape(FeaturesPlugin_Boolean::OBJECT_ID());
   if (!anObject)
     return;
 
-  boost::shared_ptr<GeomAPI_Shape> aTool = this->getShape(FeaturesPlugin_Boolean::TOOL_ID());
+  std::shared_ptr<GeomAPI_Shape> aTool = this->getShape(FeaturesPlugin_Boolean::TOOL_ID());
   if (!aTool)
     return;
 
-  boost::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
+  std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
 
   GeomAlgoAPI_Boolean* aFeature = new GeomAlgoAPI_Boolean(anObject, aTool, aType);
   if(aFeature && !aFeature->isDone()) {
@@ -98,9 +98,9 @@ void FeaturesPlugin_Boolean::execute()
 
 //============================================================================
 void FeaturesPlugin_Boolean::LoadNamingDS(GeomAlgoAPI_Boolean* theFeature, 
-						boost::shared_ptr<ModelAPI_ResultBody> theResultBody, 
-						boost::shared_ptr<GeomAPI_Shape> theObject,
-						boost::shared_ptr<GeomAPI_Shape> theTool,
+						std::shared_ptr<ModelAPI_ResultBody> theResultBody, 
+						std::shared_ptr<GeomAPI_Shape> theObject,
+						std::shared_ptr<GeomAPI_Shape> theTool,
 						int theType)
 {  
 

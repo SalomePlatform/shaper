@@ -6,7 +6,7 @@
 #define GeomAPI_Pnt2d_H_
 
 #include <GeomAPI_Interface.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class GeomAPI_XY;
 class GeomAPI_Pnt;
@@ -23,7 +23,7 @@ class GEOMAPI_EXPORT GeomAPI_Pnt2d : public GeomAPI_Interface
   /// Creation of point by coordinates
   GeomAPI_Pnt2d(const double theX, const double theY);
   /// Creation of point by coordinates
-  GeomAPI_Pnt2d(const boost::shared_ptr<GeomAPI_XY>& theCoords);
+  GeomAPI_Pnt2d(const std::shared_ptr<GeomAPI_XY>& theCoords);
 
   /// returns X coordinate
   double x() const;
@@ -36,18 +36,18 @@ class GEOMAPI_EXPORT GeomAPI_Pnt2d : public GeomAPI_Interface
   void setY(const double theY);
 
   /// Returns the 3D point
-  boost::shared_ptr<GeomAPI_Pnt> to3D(const boost::shared_ptr<GeomAPI_Pnt>& theOrigin,
-                                      const boost::shared_ptr<GeomAPI_Dir>& theDirX,
-                                      const boost::shared_ptr<GeomAPI_Dir>& theDirY);
+  std::shared_ptr<GeomAPI_Pnt> to3D(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                                      const std::shared_ptr<GeomAPI_Dir>& theDirX,
+                                      const std::shared_ptr<GeomAPI_Dir>& theDirY);
 
   /// returns coordinates of the point
-  const boost::shared_ptr<GeomAPI_XY> xy();
+  const std::shared_ptr<GeomAPI_XY> xy();
 
   /// Distance between two points
-  double distance(const boost::shared_ptr<GeomAPI_Pnt2d>& theOther) const;
+  double distance(const std::shared_ptr<GeomAPI_Pnt2d>& theOther) const;
 
   /// Returns whether the distance between two points is less then precision confusion
-  bool isEqual(const boost::shared_ptr<GeomAPI_Pnt2d>& theOther) const;
+  bool isEqual(const std::shared_ptr<GeomAPI_Pnt2d>& theOther) const;
 };
 
 #endif

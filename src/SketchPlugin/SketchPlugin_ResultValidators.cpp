@@ -10,7 +10,7 @@
 
 ResultPtr result(const ObjectPtr theObject)
 {
-  return boost::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+  return std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
 }
 
 bool SketchPlugin_ResultPointValidator::isValid(const ObjectPtr theObject) const
@@ -18,7 +18,7 @@ bool SketchPlugin_ResultPointValidator::isValid(const ObjectPtr theObject) const
   ResultPtr aResult = result(theObject);
   if (!aResult)
     return false;
-  boost::shared_ptr<GeomAPI_Shape> aShape = ModelAPI_Tools::shape(aResult);
+  std::shared_ptr<GeomAPI_Shape> aShape = ModelAPI_Tools::shape(aResult);
   return aShape && aShape->isVertex();
 }
 
@@ -27,7 +27,7 @@ bool SketchPlugin_ResultLineValidator::isValid(const ObjectPtr theObject) const
   ResultPtr aResult = result(theObject);
   if (!aResult)
     return false;
-  boost::shared_ptr<GeomAPI_Shape> aShape = ModelAPI_Tools::shape(aResult);
+  std::shared_ptr<GeomAPI_Shape> aShape = ModelAPI_Tools::shape(aResult);
   return aShape && aShape->isEdge() && GeomAPI_Curve(aShape).isLine();
 }
 
@@ -36,6 +36,6 @@ bool SketchPlugin_ResultArcValidator::isValid(const ObjectPtr theObject) const
   ResultPtr aResult = result(theObject);
   if (!aResult)
     return false;
-  boost::shared_ptr<GeomAPI_Shape> aShape = ModelAPI_Tools::shape(aResult);
+  std::shared_ptr<GeomAPI_Shape> aShape = ModelAPI_Tools::shape(aResult);
   return aShape && aShape->isEdge() && GeomAPI_Curve(aShape).isCircle();
 }

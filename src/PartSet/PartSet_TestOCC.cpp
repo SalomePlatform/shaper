@@ -37,7 +37,7 @@ void PartSet_TestOCC::testSelection(XGUI_Workshop* theWorkshop)
                                theWorkshop->viewer()->activeView());
     PartSet_TestOCC::changeTestLine(theWorkshop);
   }
-  boost::shared_ptr<GeomAPI_AISObject> anIO = theWorkshop->displayer()->getAISObject(myTestObject);
+  std::shared_ptr<GeomAPI_AISObject> anIO = theWorkshop->displayer()->getAISObject(myTestObject);
   if (!anIO->empty()) {
     theWorkshop->viewer()->AISContext()->MoveTo(0, 0, theWorkshop->viewer()->activeView());
     theWorkshop->viewer()->AISContext()->Select(0, 0, 2500, 2500,
@@ -132,26 +132,26 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
 
   if (aPreviewOp) {
     // create a line
-    boost::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_Session::get()->moduleDocument();
+    std::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_Session::get()->moduleDocument();
     FeaturePtr aFeature = aDoc->addFeature(SketchPlugin_Line::ID());
     if (aFeature)  // TODO: generate an error if feature was not created
       aFeature->execute();
 
-    boost::shared_ptr<SketchPlugin_Feature> aSketch = boost::dynamic_pointer_cast<
+    std::shared_ptr<SketchPlugin_Feature> aSketch = std::dynamic_pointer_cast<
         SketchPlugin_Feature>(aPreviewOp->sketch());
     aSketch->addSub(aFeature);
 
     PartSet_Tools::setFeaturePoint(aFeature, 100, 100, SketchPlugin_Line::START_ID());
     PartSet_Tools::setFeaturePoint(aFeature, 150, 300, SketchPlugin_Line::END_ID());
 
-    boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
+    std::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
 
     XGUI_Displayer* aDisplayer = theWorkshop->displayer();
 
-    boost::shared_ptr<GeomAPI_AISObject> aPrevAIS;
-    boost::shared_ptr<SketchPlugin_Feature> aSPFeature = boost::dynamic_pointer_cast<
+    std::shared_ptr<GeomAPI_AISObject> aPrevAIS;
+    std::shared_ptr<SketchPlugin_Feature> aSPFeature = std::dynamic_pointer_cast<
         SketchPlugin_Feature>(aFeature);
-    //boost::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
+    //std::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
     //if (!anAIS->empty())
     aDisplayer->display(aFeature, false);
     //aDisplayer->redisplay(aFeature->firstResult(), anAIS, false);
@@ -168,7 +168,7 @@ void PartSet_TestOCC::createTestLine(XGUI_Workshop* theWorkshop)
      PartSet_Tools::setFeaturePoint(aFeature, 100+aDelta, 200+aDelta, SketchPlugin_Line::START_ID());
      PartSet_Tools::setFeaturePoint(aFeature, 300+aDelta, 500+aDelta, SketchPlugin_Line::END_ID());
 
-     boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
+     std::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
      Handle(AIS_InteractiveObject) anAIS = PartSet_Presentation::createPresentation(
      aFeature, aSketch,
      aPreview ? aPreview->impl<TopoDS_Shape>() : TopoDS_Shape(), NULL);
@@ -204,12 +204,12 @@ void PartSet_TestOCC::changeTestLine(XGUI_Workshop* theWorkshop)
   // TODO
   //PartSet_Tools::setFeaturePoint(aFeature, -100/*aDelta*/, -100/*aDelta*/, LINE_ATTR_START);
   //PartSet_Tools::setFeaturePoint(aFeature, 200/*aDelta*2*/, 200/*aDelta*2*/, LINE_ATTR_END);
-  //boost::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
+  //std::shared_ptr<GeomAPI_Shape> aPreview = PartSet_OperationSketchBase::preview(aFeature);
 
-  boost::shared_ptr<GeomAPI_AISObject> aPrevAIS;
-  boost::shared_ptr<SketchPlugin_Feature> aSPFeature = boost::dynamic_pointer_cast<
+  std::shared_ptr<GeomAPI_AISObject> aPrevAIS;
+  std::shared_ptr<SketchPlugin_Feature> aSPFeature = std::dynamic_pointer_cast<
       SketchPlugin_Feature>(aFeature);
-  //boost::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
+  //std::shared_ptr<GeomAPI_AISObject> anAIS = aSPFeature->getAISObject(aPrevAIS);
   //if (!anAIS->empty())
   theWorkshop->displayer()->display(aFeature, true);
   //  theWorkshop->displayer()->redisplay(aFeature, anAIS, true);

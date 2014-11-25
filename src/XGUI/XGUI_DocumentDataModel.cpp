@@ -45,20 +45,20 @@ XGUI_DocumentDataModel::~XGUI_DocumentDataModel()
   clearSubModels();
 }
 
-void XGUI_DocumentDataModel::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
+void XGUI_DocumentDataModel::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
 
   // Created object event *******************
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
-    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
-        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aObjects = aUpdMsg->objects();
 
     std::set<ObjectPtr>::const_iterator aIt;
     for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
       ObjectPtr aObject = (*aIt);
-      FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
       if (aFeature && (!aFeature->isInHistory()))
         continue;
 
@@ -97,8 +97,8 @@ void XGUI_DocumentDataModel::processEvent(const boost::shared_ptr<Events_Message
     }
     // Deleted object event ***********************
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
-    boost::shared_ptr<ModelAPI_ObjectDeletedMessage> aUpdMsg =
-        boost::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
+    std::shared_ptr<ModelAPI_ObjectDeletedMessage> aUpdMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
     DocumentPtr aDoc = aUpdMsg->document();
     std::set<std::string> aGroups = aUpdMsg->groups();
 
@@ -141,7 +141,7 @@ void XGUI_DocumentDataModel::processEvent(const boost::shared_ptr<Events_Message
     }
     // Deleted object event ***********************
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
-    //boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg = boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    //std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg = std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     //ObjectPtr aFeature = aUpdMsg->feature();
     //DocumentPtr aDoc = aFeature->document();
 
@@ -204,7 +204,7 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
             int aOffset = historyOffset();
             DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
             ObjectPtr aObj = aRootDoc->object(ModelAPI_Feature::group(), theIndex.row() - aOffset);
-            FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+            FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
             if (!aFeature)
             return QVariant();
             switch (theRole) {
@@ -541,7 +541,7 @@ QModelIndex XGUI_DocumentDataModel::objectIndex(const ObjectPtr theObject) const
   DocumentPtr aDoc = theObject->document();
   if (aDoc == aRootDoc) {
     // This feature belongs to histrory or top model
-    FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
     if (aFeature) {
       int aId;
       int aNb = aRootDoc->size(ModelAPI_Feature::group());

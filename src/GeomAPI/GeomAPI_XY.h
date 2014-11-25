@@ -6,7 +6,7 @@
 #define GeomAPI_XY_H_
 
 #include <GeomAPI_Interface.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 /**\class GeomAPI_XY
  * \ingroup DataModel
@@ -30,17 +30,17 @@ class GEOMAPI_EXPORT GeomAPI_XY : public GeomAPI_Interface
   void setY(const double theY);
 
   /// result is sum of coordinates of this and the given argument
-  const boost::shared_ptr<GeomAPI_XY> added(const boost::shared_ptr<GeomAPI_XY>& theArg);
+  const std::shared_ptr<GeomAPI_XY> added(const std::shared_ptr<GeomAPI_XY>& theArg);
   /// result is coordinates multiplied by the argument
-  const boost::shared_ptr<GeomAPI_XY> multiplied(const double theArg);
+  const std::shared_ptr<GeomAPI_XY> multiplied(const double theArg);
 
   /// result is a scalar product of two triplets
-  double dot(const boost::shared_ptr<GeomAPI_XY>& theArg) const;
+  double dot(const std::shared_ptr<GeomAPI_XY>& theArg) const;
   /// result is a cross product of two triplets
-  double cross(const boost::shared_ptr<GeomAPI_XY>& theArg) const;
+  double cross(const std::shared_ptr<GeomAPI_XY>& theArg) const;
 
   /// Distance between two pairs
-  double distance(const boost::shared_ptr<GeomAPI_XY>& theOther) const;
+  double distance(const std::shared_ptr<GeomAPI_XY>& theOther) const;
 };
 
 #endif

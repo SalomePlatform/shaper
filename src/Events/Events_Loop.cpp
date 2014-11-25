@@ -37,24 +37,24 @@ Events_ID Events_Loop::eventByName(const char* theName)
   return Events_ID(aResult);
 }
 
-void Events_Loop::send(const boost::shared_ptr<Events_Message>& theMessage, bool isGroup)
+void Events_Loop::send(const std::shared_ptr<Events_Message>& theMessage, bool isGroup)
 {
   if (myImmediateListeners.find(theMessage->eventID().eventText()) != myImmediateListeners.end()) {
     myImmediateListeners[theMessage->eventID().eventText()]->processEvent(theMessage);
   }
   // if it is grouped message, just accumulate it
   if (isGroup && myFlushed.find(theMessage->eventID().myID) == myFlushed.end()) {
-    boost::shared_ptr<Events_MessageGroup> aGroup = 
-      boost::dynamic_pointer_cast<Events_MessageGroup>(theMessage);
+    std::shared_ptr<Events_MessageGroup> aGroup = 
+      std::dynamic_pointer_cast<Events_MessageGroup>(theMessage);
     if (aGroup) {
-      std::map<char*, boost::shared_ptr<Events_Message> >::iterator aMyGroup = myGroups.find(
+      std::map<char*, std::shared_ptr<Events_Message> >::iterator aMyGroup = myGroups.find(
           aGroup->eventID().eventText());
       if (aMyGroup == myGroups.end()) {  // create a new group of messages for accumulation
         myGroups[aGroup->eventID().eventText()] = aGroup->newEmpty();
         aMyGroup = myGroups.find(aGroup->eventID().eventText());
       }
-      boost::shared_ptr<Events_MessageGroup> aStored =
-        boost::dynamic_pointer_cast<Events_MessageGroup>(aMyGroup->second);
+      std::shared_ptr<Events_MessageGroup> aStored =
+        std::dynamic_pointer_cast<Events_MessageGroup>(aMyGroup->second);
       aStored->Join(aGroup);
       return;
     }
@@ -115,11 +115,11 @@ void Events_Loop::flush(const Events_ID& theID)
 {
   if (!myFlushActive)
     return;
-  std::map<char*, boost::shared_ptr<Events_Message>>::iterator aMyGroup =
+  std::map<char*, std::shared_ptr<Events_Message>>::iterator aMyGroup =
     myGroups.find(theID.eventText());
   if (aMyGroup != myGroups.end()) {  // really sends
     myFlushed.insert(theID.myID);
-    boost::shared_ptr<Events_Message> aGroup = aMyGroup->second;
+    std::shared_ptr<Events_Message> aGroup = aMyGroup->second;
     myGroups.erase(aMyGroup);
     send(aGroup, false);
     std::set<char*>::iterator anIt = myFlushed.find(theID.myID);
@@ -135,7 +135,7 @@ void Events_Loop::activateFlushes(const bool theActivate)
 
 void Events_Loop::clear(const Events_ID& theID)
 {
-  std::map<char*, boost::shared_ptr<Events_Message>>::iterator aMyGroup =
+  std::map<char*, std::shared_ptr<Events_Message>>::iterator aMyGroup =
     myGroups.find(theID.eventText());
   if (aMyGroup != myGroups.end()) {  // really sends
     myGroups.erase(aMyGroup);

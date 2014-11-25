@@ -50,6 +50,6 @@ class ModelAPI_AttributeInteger : public ModelAPI_Attribute
 };
 
 //! Pointer on double attribute
-typedef boost::shared_ptr<ModelAPI_AttributeInteger> AttributeIntegerPtr;
+typedef std::shared_ptr<ModelAPI_AttributeInteger> AttributeIntegerPtr;
 
 #endif

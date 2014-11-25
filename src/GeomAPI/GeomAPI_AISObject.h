@@ -7,21 +7,13 @@
 
 #include <GeomAPI_Interface.h>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class GeomAPI_Circ;
 class GeomAPI_Lin;
 class GeomAPI_Pln;
 class GeomAPI_Pnt;
 class GeomAPI_Shape;
-
-struct GEOMAPI_EXPORT Colors
-{
-  static int COLOR_BROWN;
-  static int COLOR_RED;
-  static int COLOR_GREEN;
-  static int COLOR_BLUE;
-};
 
 /** \class GeomAPI_AISObject
  *  \ingroup DataModel
@@ -35,7 +27,7 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
   GeomAPI_AISObject();
 
   /// \brief Creates AIS_Shape object using specified shape
-  void createShape(boost::shared_ptr<GeomAPI_Shape> theShape);
+  void createShape(std::shared_ptr<GeomAPI_Shape> theShape);
 
   /** \brief Creates AIS_LengthDimension object
    *  \param[in] theStartPoint  first point for dimension
@@ -44,18 +36,18 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
    *  \param[in] thePlane       the plane which contains all points above
    *  \param[in] theDistance    value of the distance to be shown
    */
-  void createDistance(boost::shared_ptr<GeomAPI_Pnt> theStartPoint,
-                      boost::shared_ptr<GeomAPI_Pnt> theEndPoint,
-                      boost::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
-                      boost::shared_ptr<GeomAPI_Pln> thePlane, double theDistance);
+  void createDistance(std::shared_ptr<GeomAPI_Pnt> theStartPoint,
+                      std::shared_ptr<GeomAPI_Pnt> theEndPoint,
+                      std::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
+                      std::shared_ptr<GeomAPI_Pln> thePlane, double theDistance);
 
   /** \brief Creates AIS_RadiusDimension object
    *  \param[in] theCircle      the radius is created for this circle
    *  \param[in] theFlyoutPoint the flyout of dimension
    *  \param[in] theRadius      value of the radius to be shown
    */
-  void createRadius(boost::shared_ptr<GeomAPI_Circ> theCircle,
-                    boost::shared_ptr<GeomAPI_Pnt> theFlyoutPoint, double theRadius);
+  void createRadius(std::shared_ptr<GeomAPI_Circ> theCircle,
+                    std::shared_ptr<GeomAPI_Pnt> theFlyoutPoint, double theRadius);
 
   /** \brief Creates AIS_ParallelRelation object for two lines
    *  \param[in] theLine1       first parallel line
@@ -63,26 +55,26 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
    *  \param[in] theFlyoutPoint the flyout point for relation
    *  \param[in] thePlane       the plane which contains the lines
    */
-  void createParallel(boost::shared_ptr<GeomAPI_Shape> theLine1,
-                      boost::shared_ptr<GeomAPI_Shape> theLine2,
-                      boost::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
-                      boost::shared_ptr<GeomAPI_Pln> thePlane);
+  void createParallel(std::shared_ptr<GeomAPI_Shape> theLine1,
+                      std::shared_ptr<GeomAPI_Shape> theLine2,
+                      std::shared_ptr<GeomAPI_Pnt> theFlyoutPoint,
+                      std::shared_ptr<GeomAPI_Pln> thePlane);
 
   /** \brief Creates AIS_PerpendicularRelation object for two lines
    *  \param[in] theLine1       first parallel line
    *  \param[in] theLine2       second parallel line
    *  \param[in] thePlane       the plane which contains the lines
    */
-  void createPerpendicular(boost::shared_ptr<GeomAPI_Shape> theLine1,
-                           boost::shared_ptr<GeomAPI_Shape> theLine2,
-                           boost::shared_ptr<GeomAPI_Pln> thePlane);
+  void createPerpendicular(std::shared_ptr<GeomAPI_Shape> theLine1,
+                           std::shared_ptr<GeomAPI_Shape> theLine2,
+                           std::shared_ptr<GeomAPI_Pln> thePlane);
 
   /** \brief Creates AIS_FixedRelation object for an object
    *  \param[in] theShape       the object
    *  \param[in] thePlane       the plane which contains the lines
    */
-  void createFixed(boost::shared_ptr<GeomAPI_Shape> theShape,
-                   boost::shared_ptr<GeomAPI_Pln> thePlane);
+  void createFixed(std::shared_ptr<GeomAPI_Shape> theShape,
+                   std::shared_ptr<GeomAPI_Pln> thePlane);
 
   /** \brief Assigns the color for the shape
    *  \param[in] theColor index of the color
@@ -104,7 +96,7 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
 };
 
 //! Pointer on attribute object
-typedef boost::shared_ptr<GeomAPI_AISObject> AISObjectPtr;
+typedef std::shared_ptr<GeomAPI_AISObject> AISObjectPtr;
 
 #endif
 

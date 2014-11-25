@@ -55,15 +55,15 @@ aSession.finishOperation()
 # Make a constraint to keep the length of the line constant
 # to parallel perpendicular constraint collapsing line to point
 #=========================================================================
+aSession.startOperation()
 for eachFeature in [aSketchLineA, aSketchLineB]:
-    aSession.startOperation()
     aLengthConstraint = aSketchFeature.addFeature("SketchConstraintLength")
     refattrA = aLengthConstraint.refattr("ConstraintEntityA")
     aResultA = modelAPI_ResultConstruction(eachFeature.firstResult())
     assert (aResultA is not None)
     refattrA.setObject(aResultA)
     aLengthConstraint.execute()
-    aSession.finishOperation()
+aSession.finishOperation()
 # Coordinates of lines should not be changed after this constraint
 assert (aLineAStartPoint.x() == 0)
 assert (aLineAStartPoint.y() == 25)
@@ -81,8 +81,9 @@ aParallelConstraint = aSketchFeature.addFeature("SketchConstraintParallel")
 refattrA = aParallelConstraint.refattr("ConstraintEntityA")
 refattrB = aParallelConstraint.refattr("ConstraintEntityB")
 # aResultA is already defined for the length constraint
-aResultA = modelAPI_ResultConstruction(eachFeature.firstResult())
+aResultA = modelAPI_ResultConstruction(aSketchLineA.firstResult())
 aResultB = modelAPI_ResultConstruction(aSketchLineB.firstResult())
+assert (aResultA is not None)
 assert (aResultB is not None)
 refattrA.setObject(aResultA)
 refattrB.setObject(aResultB)
@@ -93,34 +94,19 @@ aSession.finishOperation()
 #=========================================================================
 deltaX = deltaY = 10.
 # rotate line, check that reference's line points are moved also
-# print "Rotate line, check that reference's line points are moved also"
-# print "assert (aLineAStartPoint.x() == %d)" % aLineAStartPoint.x()
-# print "assert (aLineAStartPoint.y() == %d)" % aLineAStartPoint.y()
-# print "assert (aLineAEndPoint.x() == %d)" % aLineAEndPoint.x()
-# print "assert (aLineAEndPoint.y() == %d)" % aLineAEndPoint.y()
-# print "assert (aLineBStartPoint.x() == %d)" % aLineBStartPoint.x()
-# print "assert (aLineBStartPoint.y() == %d)" % aLineBStartPoint.y()
-# print "assert (aLineBEndPoint.x() == %d)" % aLineBEndPoint.x()
-# print "assert (aLineBEndPoint.y() == %d)" % aLineBEndPoint.y()
-aLineBStartPointXPrev = aLineBStartPoint.x()
-aLineBStartPointYPrev = aLineBStartPoint.y()
-aLineBEndPointXPrev = aLineBEndPoint.x()
-aLineBEndPointYPrev = aLineBEndPoint.y()
+aLineBStartPointPrev = (aLineBStartPoint.x(), aLineBStartPoint.y())
+aLineBEndPointPrev = (aLineBEndPoint.x(), aLineBEndPoint.y())
 aSession.startOperation()
 aLineAStartPoint.setValue(aLineAStartPoint.x() + deltaX,
                           aLineAStartPoint.y() + deltaY)
 aLineAEndPoint.setValue(aLineAEndPoint.x() - deltaX,
                         aLineAEndPoint.y() - deltaY)
 aSession.finishOperation()
-# print "After transformation:"
-# print "assert (aLineAStartPoint.x() == %d)" % aLineAStartPoint.x()
-# print "assert (aLineAStartPoint.y() == %d)" % aLineAStartPoint.y()
-# print "assert (aLineAEndPoint.x() == %d)" % aLineAEndPoint.x()
-# print "assert (aLineAEndPoint.y() == %d)" % aLineAEndPoint.y()
-# print "assert (aLineBStartPoint.x() == %d)" % aLineBStartPoint.x()
-# print "assert (aLineBStartPoint.y() == %d)" % aLineBStartPoint.y()
-# print "assert (aLineBEndPoint.x() == %d)" % aLineBEndPoint.x()
-# print "assert (aLineBEndPoint.y() == %d)" % aLineBEndPoint.y()
+aLineBStartPointNew = (aLineBStartPoint.x(), aLineBStartPoint.y())
+aLineBEndPointNew = (aLineBEndPoint.x(), aLineBEndPoint.y())
+
+assert (aLineBStartPointPrev != aLineBStartPointNew)
+assert (aLineBEndPointPrev != aLineBEndPointNew)
 #=========================================================================
 # End of test
 #=========================================================================

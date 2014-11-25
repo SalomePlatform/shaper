@@ -141,7 +141,7 @@ void Model_ValidatorsFactory::addDefaultValidators(std::list<ModelAPI_Validator*
   theValidators.push_back(it->second);
 }
 
-bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>& theFeature) const
+bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& theFeature) const
 {
   const static std::string kDefaultId = "Model_FeatureValidator";
   // check feature validators first
@@ -176,7 +176,7 @@ bool Model_ValidatorsFactory::validate(const boost::shared_ptr<ModelAPI_Feature>
     }
   }
   // check all attributes for validity
-  boost::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   if (!aData || !aData->isValid())
     return false;
   static const std::string kAllTypes = "";

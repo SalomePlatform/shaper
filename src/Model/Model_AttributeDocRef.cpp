@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void Model_AttributeDocRef::setValue(boost::shared_ptr<ModelAPI_Document> theDoc)
+void Model_AttributeDocRef::setValue(std::shared_ptr<ModelAPI_Document> theDoc)
 {
   myDoc = theDoc;
   TCollection_ExtendedString aNewID(theDoc->id().c_str());
@@ -19,7 +19,7 @@ void Model_AttributeDocRef::setValue(boost::shared_ptr<ModelAPI_Document> theDoc
   }
 }
 
-boost::shared_ptr<ModelAPI_Document> Model_AttributeDocRef::value()
+std::shared_ptr<ModelAPI_Document> Model_AttributeDocRef::value()
 {
   return myDoc;
 }

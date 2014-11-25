@@ -9,21 +9,23 @@
 
 namespace ModelAPI_Tools {
 
-  boost::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
+  std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
   {
-
-    ResultBodyPtr aBody = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(theResult);
+/*
+    ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theResult);
     if (aBody)
       return aBody->shape();
 
-    ResultConstructionPtr aConstruct = boost::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
+    ResultConstructionPtr aConstruct = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(
       theResult);
     if (aConstruct)
       return aConstruct->shape();
 
-    ResultGroupPtr aGroup = boost::dynamic_pointer_cast<ModelAPI_ResultGroup>(theResult);
+    ResultGroupPtr aGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(theResult);
     if (aGroup)
       return aGroup->shape();
-    return boost::shared_ptr<GeomAPI_Shape>();
+    return std::shared_ptr<GeomAPI_Shape>();
+    */
+    return theResult->shape();
   }
 }

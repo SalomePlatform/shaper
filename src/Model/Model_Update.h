@@ -7,7 +7,7 @@
 
 #include "Model.h"
 #include "Events_Listener.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <set>
 #include <map>
 
@@ -21,34 +21,34 @@ class ModelAPI_Feature;
 class Model_Update : public Events_Listener
 {
   /// initial set of updated features that must be processed
-  std::set<boost::shared_ptr<ModelAPI_Object> > myInitial;
+  std::set<std::shared_ptr<ModelAPI_Object> > myInitial;
   /// already updated and processed features and modificated feature flag
-  std::map<boost::shared_ptr<ModelAPI_Object>, bool> myUpdated;
+  std::map<std::shared_ptr<ModelAPI_Object>, bool> myUpdated;
   /// to know that all next updates are caused by this execution
   bool isExecuted;
   /// to know execute or not automatically all update
   bool isAutomatic;
   /// just created features: they must be updated immideately even in not-automatic mode for 
   /// preview; cleared on commit operations
-  std::set<boost::shared_ptr<ModelAPI_Object> > myJustCreatedOrUpdated;
+  std::set<std::shared_ptr<ModelAPI_Object> > myJustCreatedOrUpdated;
 
  public:
   /// Is called only once, on startup of the application
   Model_Update();
 
   /// Processes the feature argument update: executes the results
-  MODEL_EXPORT virtual void processEvent(const boost::shared_ptr<Events_Message>& theMessage);
+  MODEL_EXPORT virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
  protected:
   /// Recoursively checks and updates the feature if needed (calls the execute method)
   /// Returns true if feature was updated.
-  bool updateFeature(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  bool updateFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
 
   /// Recoursively checks and updates the object (result or feature) if needed (calls updateFeature)
   /// Returns true if object was updated.
-  bool updateObject(boost::shared_ptr<ModelAPI_Object> theObject, const bool theCyclic = true);
+  bool updateObject(std::shared_ptr<ModelAPI_Object> theObject, const bool theCyclic = true);
   /// Sends the redisplay events for feature and results, updates the updated status
-  void redisplayWithResults(boost::shared_ptr<ModelAPI_Feature> theFeature);
+  void redisplayWithResults(std::shared_ptr<ModelAPI_Feature> theFeature);
 };
 
 #endif

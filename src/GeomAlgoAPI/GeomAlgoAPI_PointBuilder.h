@@ -6,7 +6,7 @@
 #define GeomAlgoAPI_PointBuilder_H_
 
 #include <GeomAlgoAPI.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class GeomAPI_Shape;
 class GeomAPI_Pnt;
@@ -20,7 +20,7 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_PointBuilder
 {
  public:
   /// Creates linear edge by two points
-  static boost::shared_ptr<GeomAPI_Shape> point(boost::shared_ptr<GeomAPI_Pnt> thePoint);
+  static std::shared_ptr<GeomAPI_Shape> point(std::shared_ptr<GeomAPI_Pnt> thePoint);
 };
 
 #endif

@@ -8,13 +8,13 @@
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <TopoDS_Vertex.hxx>
 
-boost::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_PointBuilder::point(
-    boost::shared_ptr<GeomAPI_Pnt> thePoint)
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_PointBuilder::point(
+    std::shared_ptr<GeomAPI_Pnt> thePoint)
 {
   const gp_Pnt& aPnt = thePoint->impl<gp_Pnt>();
   BRepBuilderAPI_MakeVertex aMaker(aPnt);
   TopoDS_Vertex aVertex = aMaker.Vertex();
-  boost::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
+  std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
   aRes->setImpl(new TopoDS_Shape(aVertex));
   return aRes;
 }

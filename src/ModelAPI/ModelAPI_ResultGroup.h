@@ -7,7 +7,7 @@
 
 #include "ModelAPI_Result.h"
 #include <GeomAPI_Shape.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <string>
 
 /**\class ModelAPI_ResultGroup
@@ -32,11 +32,9 @@ public:
     return MY_GROUP;
   }
 
-  /// Returns the compound of selected entities
-  virtual boost::shared_ptr<GeomAPI_Shape> shape() const = 0;
 };
 
 //! Pointer on feature object
-typedef boost::shared_ptr<ModelAPI_ResultGroup> ResultGroupPtr;
+typedef std::shared_ptr<ModelAPI_ResultGroup> ResultGroupPtr;
 
 #endif

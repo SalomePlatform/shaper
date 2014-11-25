@@ -7,7 +7,7 @@
 
 #include "ModelAPI.h"
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class ModelAPI_Feature;
 
@@ -20,7 +20,7 @@ class MODELAPI_EXPORT ModelAPI_Plugin
 {
  public:
   /// Creates the feature object of this plugin by the feature string ID
-  virtual boost::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
 
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Plugin()

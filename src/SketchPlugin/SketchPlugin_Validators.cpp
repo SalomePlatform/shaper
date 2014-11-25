@@ -27,7 +27,7 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
     return true;
 
   // If it is a line then we have to check that first attribute id not a line
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = getFeaturePoint(theFeature->data(), aParamA);
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint = getFeaturePoint(theFeature->data(), aParamA);
   if (aPoint)
     return true;
   return false;
@@ -36,11 +36,11 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
 bool SketchPlugin_DistanceAttrValidator::isValid(
   const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
 {
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
   if (anAttr) {
     const ObjectPtr& anObj = theAttribute->owner();
-    const FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
+    const FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
     return isValid(aFeature, theArguments, anAttr->object());
   }
   return true; // it may be not reference attribute, in this case, it is OK
@@ -50,13 +50,13 @@ bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeatur
                                                  const std::list<std::string>& theArguments,
                                                  const ObjectPtr& theObject) const
 {
-  std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttrs = 
+  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
     theFeature->data()->attributes(ModelAPI_AttributeRefAttr::type());
-  std::list<boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+  std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
   for(; anAttr != anAttrs.end(); anAttr++) {
     if (*anAttr) {
-      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
+      std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
       // check the object is already presented
       if (aRef->isObject() && aRef->object() == theObject)
         return false;
@@ -68,19 +68,19 @@ bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeatur
 bool SketchPlugin_DifferentObjectsValidator::isValid(
   const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
 {
-  boost::shared_ptr<ModelAPI_AttributeRefAttr> anOrigAttr = 
-    boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  std::shared_ptr<ModelAPI_AttributeRefAttr> anOrigAttr = 
+    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
   if (anOrigAttr && anOrigAttr->isObject()) {
     const ObjectPtr& anObj = theAttribute->owner();
-    const FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
+    const FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
 
-    std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttrs = 
+    std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
       aFeature->data()->attributes(ModelAPI_AttributeRefAttr::type());
-    std::list<boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
     for(; anAttr != anAttrs.end(); anAttr++) {
       if (*anAttr && *anAttr != theAttribute) {
-        boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-          boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
+        std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
+          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
         // check the object is already presented
         if (aRef->isObject() && aRef->object() == anOrigAttr->object())
           return false;
@@ -93,13 +93,13 @@ bool SketchPlugin_DifferentObjectsValidator::isValid(
 bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
   const std::list<std::string>& theArguments, const AttributePtr& theAttribute) const
 {
-  std::list<boost::shared_ptr<ModelAPI_Attribute> > anAttrs = 
+  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
     theFeature->data()->attributes(ModelAPI_AttributeRefAttr::type());
-  std::list<boost::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+  std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
   for(; anAttr != anAttrs.end(); anAttr++) {
     if (*anAttr) {
-      boost::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-        boost::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
+      std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
       // check the object is already presented
       if (!aRef->isObject() && aRef->attr() == theAttribute)
         return false;

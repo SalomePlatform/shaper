@@ -25,7 +25,7 @@ GeomAPI_PlanarEdges::GeomAPI_PlanarEdges() : GeomAPI_Shape()
   this->setImpl(new TopoDS_Shape(aBigWireImpl));
 }
 
-void GeomAPI_PlanarEdges::addEdge(boost::shared_ptr<GeomAPI_Shape> theEdge)
+void GeomAPI_PlanarEdges::addEdge(std::shared_ptr<GeomAPI_Shape> theEdge)
 {
   const TopoDS_Edge& anEdge = theEdge->impl<TopoDS_Edge>();
   if (anEdge.ShapeType() != TopAbs_EDGE)
@@ -35,16 +35,54 @@ void GeomAPI_PlanarEdges::addEdge(boost::shared_ptr<GeomAPI_Shape> theEdge)
   aBuilder.Add(aWire, anEdge);
 }
 
-std::list<boost::shared_ptr<GeomAPI_Shape> > GeomAPI_PlanarEdges::getEdges()
+std::list<std::shared_ptr<GeomAPI_Shape> > GeomAPI_PlanarEdges::getEdges()
 {
   TopoDS_Shape& aShape = const_cast<TopoDS_Shape&>(impl<TopoDS_Shape>());
   //BRepTools_WireExplorer aWireExp(TopoDS::Wire(aShape));
   TopExp_Explorer aWireExp(aShape, TopAbs_EDGE);
-  std::list<boost::shared_ptr<GeomAPI_Shape> > aResult;
+  std::list<std::shared_ptr<GeomAPI_Shape> > aResult;
   for (; aWireExp.More(); aWireExp.Next()) {
-    boost::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
+    std::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
     anEdge->setImpl(new TopoDS_Shape(aWireExp.Current()));
     aResult.push_back(anEdge);
   }
   return aResult;
+}
+
+bool GeomAPI_PlanarEdges::hasPlane() const {
+  return myOrigin && myNorm && myDirX && myDirY;
+}
+
+bool GeomAPI_PlanarEdges::isVertex() const {
+  return false;
+}
+
+bool GeomAPI_PlanarEdges::isEdge() const {
+  return false;
+}
+
+void GeomAPI_PlanarEdges::setOrigin(const std::shared_ptr<GeomAPI_Pnt>& theOrigin)
+{
+  myOrigin = theOrigin;
+}
+std::shared_ptr<GeomAPI_Pnt> GeomAPI_PlanarEdges::origin() const {
+  return myOrigin;
+}
+void GeomAPI_PlanarEdges::setDirX(const std::shared_ptr<GeomAPI_Dir>& theDirX) {
+  myDirX = theDirX;
+}
+std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirX() const {
+  return myDirX;
+}
+void GeomAPI_PlanarEdges::setDirY(const std::shared_ptr<GeomAPI_Dir>& theDirY) {
+  myDirY = theDirY;
+}
+std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirY() const {
+  return myDirY;
+}
+void GeomAPI_PlanarEdges::setNorm(const std::shared_ptr<GeomAPI_Dir>& theNorm) {
+  myNorm = theNorm;
+}
+std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::norm() const {
+  return myNorm;
 }

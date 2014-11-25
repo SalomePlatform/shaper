@@ -6,7 +6,7 @@
 #define Events_Listener_H_
 
 #include <Events.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class Events_Message;
 
@@ -22,7 +22,7 @@ class EVENTS_EXPORT Events_Listener
 
  public:
   //! This method is called by loop when the event is started to process.
-  virtual void processEvent(const boost::shared_ptr<Events_Message>& theMessage) = 0;
+  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage) = 0;
 };
 
 #endif

@@ -36,37 +36,37 @@ void SketchPlugin_Circle::execute()
 {
   SketchPlugin_Sketch* aSketch = sketch();
   if (aSketch) {
-    std::list<boost::shared_ptr<GeomAPI_Shape> > aShapes;
+    std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
 
     // compute a circle point in 3D view
-    boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = boost::dynamic_pointer_cast<
+    std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
     AttributeDoublePtr aRadiusAttr = 
-      boost::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(RADIUS_ID()));
+      std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(data()->attribute(RADIUS_ID()));
     if (aCenterAttr->isInitialized() && aRadiusAttr->isInitialized()) {
-      boost::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
+      std::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
       //std::cout<<"Execute circle "<<aCenter->x()<<" "<<aCenter->y()<<" "<<aCenter->z()<<std::endl;
       // make a visible point
-      boost::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
-      boost::shared_ptr<ModelAPI_ResultConstruction> aConstr1 = document()->createConstruction(
+      std::shared_ptr<GeomAPI_Shape> aCenterPointShape = GeomAlgoAPI_PointBuilder::point(aCenter);
+      std::shared_ptr<ModelAPI_ResultConstruction> aConstr1 = document()->createConstruction(
           data(), 0);
       aConstr1->setShape(aCenterPointShape);
       aConstr1->setIsInHistory(false);
       setResult(aConstr1, 0);
 
       // make a visible circle
-      boost::shared_ptr<GeomDataAPI_Dir> aNDir = boost::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      std::shared_ptr<GeomDataAPI_Dir> aNDir = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
           aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
       bool aHasPlane = aNDir && !(aNDir->x() == 0 && aNDir->y() == 0 && aNDir->z() == 0);
       if (aHasPlane) {
-        boost::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
+        std::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(aNDir->x(), aNDir->y(), aNDir->z()));
         // compute the circle radius
         double aRadius = aRadiusAttr->value();
 
-        boost::shared_ptr<GeomAPI_Shape> aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircle(
+        std::shared_ptr<GeomAPI_Shape> aCircleShape = GeomAlgoAPI_EdgeBuilder::lineCircle(
             aCenter, aNormal, aRadius);
         aShapes.push_back(aCircleShape);
-        boost::shared_ptr<ModelAPI_ResultConstruction> aConstr2 = document()->createConstruction(
+        std::shared_ptr<ModelAPI_ResultConstruction> aConstr2 = document()->createConstruction(
             data(), 1);
         aConstr2->setShape(aCircleShape);
         aConstr2->setIsInHistory(false);
@@ -78,20 +78,20 @@ void SketchPlugin_Circle::execute()
 
 void SketchPlugin_Circle::move(double theDeltaX, double theDeltaY)
 {
-  boost::shared_ptr<ModelAPI_Data> aData = data();
+  std::shared_ptr<ModelAPI_Data> aData = data();
   if (!aData->isValid())
     return;
 
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint1 = boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(CENTER_ID()));
   aPoint1->move(theDeltaX, theDeltaY);
 }
 
-double SketchPlugin_Circle::distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint)
+double SketchPlugin_Circle::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {
-  boost::shared_ptr<ModelAPI_Data> aData = data();
-  boost::shared_ptr<GeomDataAPI_Point2D> aPoint = 
-    boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CENTER_ID()));
+  std::shared_ptr<ModelAPI_Data> aData = data();
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(CENTER_ID()));
 
   return aPoint->pnt()->distance(thePoint);
 }
@@ -102,14 +102,14 @@ bool SketchPlugin_Circle::isFixed() {
 
 void SketchPlugin_Circle::attributeChanged() {
   static bool myIsUpdated = false; // to avoid infinitive cycle on attrubtes change
-  boost::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
+  std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
   // update arguments due to the selection value
   if (aSelection && !aSelection->isNull() && aSelection->isEdge() && !myIsUpdated) {
     myIsUpdated = true;
-    boost::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
-    boost::shared_ptr<GeomAPI_Circ> aCirc = anEdge->circle();
-    boost::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
-      boost::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
+    std::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
+    std::shared_ptr<GeomAPI_Circ> aCirc = anEdge->circle();
+    std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
     aCenterAttr->setValue(sketch()->to2D(aCirc->center()));
     real(RADIUS_ID())->setValue(aCirc->radius());
     myIsUpdated = false;

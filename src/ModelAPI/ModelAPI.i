@@ -28,18 +28,23 @@
   #include "ModelAPI_AttributeRefAttr.h"
   #include "ModelAPI_AttributeSelection.h"
   #include "ModelAPI_AttributeSelectionList.h"
+  #include "ModelAPI_AttributeValidator.h"
   #include "ModelAPI_Validator.h"
+  #include "ModelAPI_FeatureValidator.h"
   #include "ModelAPI_AttributeRefList.h"
   #include "ModelAPI_AttributeBoolean.h"
   #include "ModelAPI_Result.h"
   #include "ModelAPI_ResultConstruction.h"
   #include "ModelAPI_ResultBody.h"
   #include "ModelAPI_ResultPart.h"
+  #include "ModelAPI_ResultParameters.h"
+  #include "ModelAPI_ResultGroup.h"
+  #include "ModelAPI_Tools.h"
   
   template<class T1, class T2> 
-  boost::shared_ptr<T1> boost_cast(boost::shared_ptr<T2> theObject)
+  std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject)
   { 
-    return boost::dynamic_pointer_cast<T1>(theObject); 
+    return std::dynamic_pointer_cast<T1>(theObject); 
   }
   
 %}
@@ -52,14 +57,14 @@
 %include "typemaps.i"
 %include "std_string.i"
 %include "std_list.i"
+%include "std_shared_ptr.i"
 
 // directors
 %feature("director") ModelAPI_Plugin;
 %feature("director") ModelAPI_Object;
 %feature("director") ModelAPI_Feature;
 
-// boost pointers
-%include "boost_shared_ptr.i"
+// shared pointers
 // For ModelAPI_ResultConstruction.shape()
 %shared_ptr(GeomAPI_Interface)
 %shared_ptr(GeomAPI_Shape)
@@ -81,10 +86,15 @@
 %shared_ptr(ModelAPI_AttributeBoolean)
 %shared_ptr(ModelAPI_AttributeSelection)
 %shared_ptr(ModelAPI_AttributeSelectionList)
+%shared_ptr(ModelAPI_Validator)
+%shared_ptr(ModelAPI_AttributeValidator)
+%shared_ptr(ModelAPI_FeatureValidator)
 %shared_ptr(ModelAPI_Result)
 %shared_ptr(ModelAPI_ResultConstruction)
 %shared_ptr(ModelAPI_ResultBody)
 %shared_ptr(ModelAPI_ResultPart)
+%shared_ptr(ModelAPI_ResultGroup)
+%shared_ptr(ModelAPI_ResultParameters)
 
 // all supported interfaces
 %include "GeomAPI_Interface.h"
@@ -108,19 +118,29 @@
 %include "ModelAPI_AttributeSelectionList.h"
 %include "ModelAPI_AttributeRefList.h"
 %include "ModelAPI_Validator.h"
+%include "ModelAPI_AttributeValidator.h"
+%include "ModelAPI_FeatureValidator.h"
 %include "ModelAPI_Result.h"
 %include "ModelAPI_ResultConstruction.h"
 %include "ModelAPI_ResultBody.h"
 %include "ModelAPI_ResultPart.h"
+%include "ModelAPI_ResultGroup.h"
+%include "ModelAPI_ResultParameters.h"
+%include "ModelAPI_Tools.h"
 
-%template(ObjectList) std::list<boost::shared_ptr<ModelAPI_Object> >;
-%template(ResultList) std::list<boost::shared_ptr<ModelAPI_Result> >;
+%template(ObjectList) std::list<std::shared_ptr<ModelAPI_Object> >;
+%template(ResultList) std::list<std::shared_ptr<ModelAPI_Result> >;
 
 template<class T1, class T2> boost::shared_ptr<T1> boost_cast(boost::shared_ptr<T2> theObject);
 
 // Feature casts
-%template(modelAPI_Feature)          boost_cast<ModelAPI_Feature, ModelAPI_Object>;
-%template(modelAPI_CompositeFeature) boost_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
+%template(modelAPI_Feature)          shared_ptr_cast<ModelAPI_Feature, ModelAPI_Object>;
+%template(modelAPI_CompositeFeature) shared_ptr_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
+template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject);
+%template(modelAPI_CompositeFeature) shared_ptr_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
+%template(modelAPI_ResultConstruction) shared_ptr_cast<ModelAPI_ResultConstruction, ModelAPI_Result>;
+%template(modelAPI_ResultBody) shared_ptr_cast<ModelAPI_ResultBody, ModelAPI_Result>;
+%template(modelAPI_ResultPart) shared_ptr_cast<ModelAPI_ResultPart, ModelAPI_Result>;
 
 // Result casts
 %template(modelAPI_ResultConstruction) boost_cast<ModelAPI_ResultConstruction, ModelAPI_Result>;

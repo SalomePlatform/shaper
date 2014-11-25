@@ -41,25 +41,25 @@ static gp_Circ2d* newCirc2d(const double theCenterX, const double theCenterY,
   return newCirc2d(theCenterX, theCenterY, aDir, aRadius);
 }
 
-GeomAPI_Circ2d::GeomAPI_Circ2d(const boost::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-                               const boost::shared_ptr<GeomAPI_Pnt2d>& theCirclePoint)
+GeomAPI_Circ2d::GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+                               const std::shared_ptr<GeomAPI_Pnt2d>& theCirclePoint)
     : GeomAPI_Interface(
         newCirc2d(theCenter->x(), theCenter->y(), theCirclePoint->x(), theCirclePoint->y()))
 {
 }
 
-GeomAPI_Circ2d::GeomAPI_Circ2d(const boost::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-                               const boost::shared_ptr<GeomAPI_Dir2d>& theDir, double theRadius)
+GeomAPI_Circ2d::GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+                               const std::shared_ptr<GeomAPI_Dir2d>& theDir, double theRadius)
     : GeomAPI_Interface(
         newCirc2d(theCenter->x(), theCenter->y(), theDir->impl<gp_Dir2d>(), theRadius))
 {
 
 }
 
-const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::project(
-    const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) const
+const std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::project(
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint) const
 {
-  boost::shared_ptr<GeomAPI_Pnt2d> aResult;
+  std::shared_ptr<GeomAPI_Pnt2d> aResult;
   if (!MY_CIRC2D)
     return aResult;
 
@@ -72,22 +72,22 @@ const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::project(
 
   if (Abs(aDist - MY_CIRC2D->Radius()) < Precision::Confusion()) {
     // Point on the circle
-    aResult = boost::shared_ptr<GeomAPI_Pnt2d>(
+    aResult = std::shared_ptr<GeomAPI_Pnt2d>(
         new GeomAPI_Pnt2d(thePoint->x(), thePoint->y()));
   } else {
     gp_Dir2d aDir(aPoint.XY() - aCenter.XY());
     gp_XY aNewPoint = aCenter.XY() + aDir.XY() * MY_CIRC2D->Radius();
-    aResult = boost::shared_ptr<GeomAPI_Pnt2d>(
+    aResult = std::shared_ptr<GeomAPI_Pnt2d>(
         new GeomAPI_Pnt2d(aNewPoint.X(), aNewPoint.Y()));
   }
 
   return aResult;
 }
 
-const boost::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::center() const
+const std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Circ2d::center() const
 {
   const gp_Pnt2d& aCenter = MY_CIRC2D->Location();
-  return boost::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aCenter.X(), aCenter.Y()));
+  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aCenter.X(), aCenter.Y()));
 }
 
 double GeomAPI_Circ2d::radius() const

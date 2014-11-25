@@ -17,8 +17,8 @@
  */
 class Model_ResultConstruction : public ModelAPI_ResultConstruction
 {
-  boost::shared_ptr<ModelAPI_Feature> myOwner;  ///< owner of this result
-  boost::shared_ptr<GeomAPI_Shape> myShape;  ///< shape of this result created "on the fly"
+  std::shared_ptr<ModelAPI_Feature> myOwner;  ///< owner of this result
+  std::shared_ptr<GeomAPI_Shape> myShape;  ///< shape of this result created "on the fly"
   bool myIsInHistory;
  public:
   /// By default object is displayed in the object browser.
@@ -28,9 +28,9 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   }
 
   /// Sets the result
-  MODEL_EXPORT virtual void setShape(boost::shared_ptr<GeomAPI_Shape> theShape);
+  MODEL_EXPORT virtual void setShape(std::shared_ptr<GeomAPI_Shape> theShape);
   /// Returns the shape-result produced by this feature
-  MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape>& shape();
+  MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
 
   /// Sets the flag that it must be displayed in history (default is true)
   MODEL_EXPORT virtual void setIsInHistory(const bool myIsInHistory);

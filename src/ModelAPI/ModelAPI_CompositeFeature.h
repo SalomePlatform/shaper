@@ -17,13 +17,13 @@ class ModelAPI_CompositeFeature : public ModelAPI_Feature
 {
 public:
   /// Adds feature to the sketch and to its document
-  virtual boost::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
 
   /// Returns the number of sub-elements
   virtual int numberOfSubs() const = 0;
 
   /// Returns the sub-feature by zero-base index
-  virtual boost::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex) const = 0;
+  virtual std::shared_ptr<ModelAPI_Feature> subFeature(const int theIndex) const = 0;
 
   /// Returns the sub-feature unique identifier in this composite feature by zero-base index
   virtual int subFeatureId(const int theIndex) const = 0;
@@ -33,6 +33,6 @@ public:
 };
 
 //! Pointer on the composite feature object
-typedef boost::shared_ptr<ModelAPI_CompositeFeature> CompositeFeaturePtr;
+typedef std::shared_ptr<ModelAPI_CompositeFeature> CompositeFeaturePtr;
 
 #endif

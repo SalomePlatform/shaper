@@ -80,11 +80,11 @@ static void removeWasteEdges(std::list<TopoDS_Vertex>::iterator& theStartVertex,
 
 
 void GeomAlgoAPI_SketchBuilder::createFaces(
-    const boost::shared_ptr<GeomAPI_Pnt>& theOrigin, const boost::shared_ptr<GeomAPI_Dir>& theDirX,
-    const boost::shared_ptr<GeomAPI_Dir>& theDirY, const boost::shared_ptr<GeomAPI_Dir>& theNorm,
-    const std::list<boost::shared_ptr<GeomAPI_Shape> >& theFeatures,
-    std::list<boost::shared_ptr<GeomAPI_Shape> >& theResultFaces,
-    std::list<boost::shared_ptr<GeomAPI_Shape> >& theResultWires)
+    const std::shared_ptr<GeomAPI_Pnt>& theOrigin, const std::shared_ptr<GeomAPI_Dir>& theDirX,
+    const std::shared_ptr<GeomAPI_Dir>& theDirY, const std::shared_ptr<GeomAPI_Dir>& theNorm,
+    const std::list<std::shared_ptr<GeomAPI_Shape> >& theFeatures,
+    std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces,
+    std::list<std::shared_ptr<GeomAPI_Shape> >& theResultWires)
 {
   if (theFeatures.empty())
     return;
@@ -95,10 +95,10 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   TopoDS_Shape aFeaturesCompound;
 
   // Obtain only edges from the features list
-  std::list<boost::shared_ptr<GeomAPI_Shape> > anEdges;
-  std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator aFeatIt = theFeatures.begin();
+  std::list<std::shared_ptr<GeomAPI_Shape> > anEdges;
+  std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator aFeatIt = theFeatures.begin();
   for (; aFeatIt != theFeatures.end(); aFeatIt++) {
-    boost::shared_ptr<GeomAPI_Shape> aShape(*aFeatIt);
+    std::shared_ptr<GeomAPI_Shape> aShape(*aFeatIt);
     const TopoDS_Edge& anEdge = aShape->impl<TopoDS_Edge>();
     if (anEdge.ShapeType() == TopAbs_EDGE)
       anEdges.push_back(aShape);
@@ -107,9 +107,9 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   if (anEdges.size() == 1) {  // If there is only one feature, BOPAlgo_Builder will decline to work. Need to process it anyway
     aFeaturesCompound = anEdges.front()->impl<TopoDS_Shape>();
   } else {
-    std::list<boost::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = anEdges.begin();
+    std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = anEdges.begin();
     for (; anIt != anEdges.end(); anIt++) {
-      boost::shared_ptr<GeomAPI_Shape> aPreview(*anIt);
+      std::shared_ptr<GeomAPI_Shape> aPreview(*anIt);
       aBuilder.AddArgument(aPreview->impl<TopoDS_Edge>());
     }
     aPF.SetArguments(aBuilder.Arguments());
@@ -219,7 +219,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
       TopoDS_Face aPatch;
       createFace(*aVertIter, anEdgeIter, aProcEdges.end(), aPlane, aPatch);
       if (!aPatch.IsNull()) {
-        boost::shared_ptr<GeomAPI_Shape> aFace(new GeomAPI_Shape);
+        std::shared_ptr<GeomAPI_Shape> aFace(new GeomAPI_Shape);
         aFace->setImpl(new TopoDS_Face(aPatch));
         theResultFaces.push_back(aFace);
       }
@@ -323,7 +323,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
         std::list<TopoDS_Wire>::const_iterator aTailIter = aTail.begin();
         for (; aTailIter != aTail.end(); aTailIter++)
           if (!aTailIter->IsNull()) {
-            boost::shared_ptr<GeomAPI_Shape> aWire(new GeomAPI_Shape);
+            std::shared_ptr<GeomAPI_Shape> aWire(new GeomAPI_Shape);
             aWire->setImpl(new TopoDS_Shape(*aTailIter));
             theResultWires.push_back(aWire);
           }
@@ -371,30 +371,30 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
     fixIntersections(theResultFaces);
 }
 
-void GeomAlgoAPI_SketchBuilder::createFaces(const boost::shared_ptr<GeomAPI_Pnt>& theOrigin,
-                                            const boost::shared_ptr<GeomAPI_Dir>& theDirX,
-                                            const boost::shared_ptr<GeomAPI_Dir>& theDirY,
-                                            const boost::shared_ptr<GeomAPI_Dir>& theNorm,
-                                            const boost::shared_ptr<GeomAPI_Shape>& theWire,
-                                            std::list<boost::shared_ptr<GeomAPI_Shape> >& theResultFaces)
+void GeomAlgoAPI_SketchBuilder::createFaces(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                                            const std::shared_ptr<GeomAPI_Dir>& theDirX,
+                                            const std::shared_ptr<GeomAPI_Dir>& theDirY,
+                                            const std::shared_ptr<GeomAPI_Dir>& theNorm,
+                                            const std::shared_ptr<GeomAPI_Shape>& theWire,
+                                            std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces)
 {
-  boost::shared_ptr<GeomAPI_PlanarEdges> aWire = boost::dynamic_pointer_cast<GeomAPI_PlanarEdges>(theWire);
+  std::shared_ptr<GeomAPI_PlanarEdges> aWire = std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(theWire);
   if(!aWire)
     return;
   // Filter wires, return only faces.
-  std::list<boost::shared_ptr<GeomAPI_Shape> > aFilteredWires;
+  std::list<std::shared_ptr<GeomAPI_Shape> > aFilteredWires;
   createFaces(theOrigin, theDirX, theDirY, theNorm,
               aWire->getEdges(), theResultFaces, aFilteredWires);
 }
 
 
 void GeomAlgoAPI_SketchBuilder::fixIntersections(
-    std::list<boost::shared_ptr<GeomAPI_Shape> >& theFaces)
+    std::list<std::shared_ptr<GeomAPI_Shape> >& theFaces)
 {
   BRepClass_FaceClassifier aClassifier;
 
-  std::list<boost::shared_ptr<GeomAPI_Shape> >::iterator anIter1 = theFaces.begin();
-  std::list<boost::shared_ptr<GeomAPI_Shape> >::iterator anIter2;
+  std::list<std::shared_ptr<GeomAPI_Shape> >::iterator anIter1 = theFaces.begin();
+  std::list<std::shared_ptr<GeomAPI_Shape> >::iterator anIter2;
   for (; anIter1 != theFaces.end(); anIter1++) {
     anIter2 = anIter1;
     for (++anIter2; anIter2 != theFaces.end(); anIter2++) {
@@ -430,7 +430,7 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
               (*anIter2)->setImpl(new TopoDS_Shape(anExp.Current()));
               isFirstFace = false;
             } else {
-              boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
+              std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
               aShape->setImpl(new TopoDS_Shape(anExp.Current()));
               theFaces.push_back(aShape);
             }
@@ -447,7 +447,7 @@ void GeomAlgoAPI_SketchBuilder::fixIntersections(
             (*anIter1)->setImpl(new TopoDS_Shape(anExp.Current()));
             isFirstFace = false;
           } else {
-            boost::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
+            std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
             aShape->setImpl(new TopoDS_Shape(anExp.Current()));
             theFaces.push_back(aShape);
           }

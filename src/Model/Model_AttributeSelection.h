@@ -20,16 +20,16 @@ class Model_AttributeSelection : public ModelAPI_AttributeSelection
 public:
   /// Defines the result and its selected sub-shape
   MODEL_EXPORT virtual void setValue(
-    const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape);
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);
 
   /// Returns the selected subshape
-  MODEL_EXPORT virtual boost::shared_ptr<GeomAPI_Shape> value();
+  MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> value();
 
   /// Returns the context of the selection (the whole shape owner)
   MODEL_EXPORT virtual ResultPtr context();
 
   /// Sets the feature object
-  MODEL_EXPORT virtual void setObject(const boost::shared_ptr<ModelAPI_Object>& theObject);
+  MODEL_EXPORT virtual void setObject(const std::shared_ptr<ModelAPI_Object>& theObject);
 
   /// Updates the underlied selection due to the changes in the referenced objects
   /// \returns false if update is failed
@@ -42,10 +42,10 @@ protected:
 
   /// Performs the selection for the body result (TNaming selection)
   virtual void selectBody(
-    const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape);
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);
   /// Performs the selection for the construction result (selection by index)
   virtual void selectConstruction(
-    const ResultPtr& theContext, const boost::shared_ptr<GeomAPI_Shape>& theSubShape);
+    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);
 
   /// Returns the label where TNaming_Selection results are stored
   /// Note: there must be no attributes stored at the same label because Selector clears this lab

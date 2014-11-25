@@ -10,6 +10,7 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_AISObject.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_AttributeSelection.h>
 
 class SketchPlugin_Sketch;
 class GeomAPI_Pnt2d;
@@ -24,7 +25,7 @@ class SketchPlugin_Feature : public ModelAPI_Feature
 {
  public:
   /// Simple creation of interactive object by the result of the object
-  static AISObjectPtr simpleAISObject(boost::shared_ptr<ModelAPI_Result> theRes,
+  static AISObjectPtr simpleAISObject(std::shared_ptr<ModelAPI_Result> theRes,
                                       AISObjectPtr thePrevious);
 
   /// Reference to the external edge or vertex as a AttributeSelection
@@ -47,7 +48,7 @@ class SketchPlugin_Feature : public ModelAPI_Feature
 
   /// Return the distance between the feature and the point
   /// \param thePoint the point
-  virtual double distanceToPoint(const boost::shared_ptr<GeomAPI_Pnt2d>& thePoint) = 0;
+  virtual double distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint) = 0;
 
   /// Construction result is allways recomuted on the fly
   SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
@@ -55,7 +56,7 @@ class SketchPlugin_Feature : public ModelAPI_Feature
   /// Returns true is sketch element is under the rigid constraint
   SKETCHPLUGIN_EXPORT virtual bool isFixed() {return false;}
 
-  bool isExternal() const
+  inline bool isExternal() const
   {
     AttributeSelectionPtr aAttr = data()->selection(EXTERNAL_ID());
     if (aAttr)
@@ -77,7 +78,7 @@ protected:
   friend class SketchPlugin_Sketch;
 
  private:
-  boost::shared_ptr<GeomAPI_Shape> myPreview;  ///< the preview shape
+  std::shared_ptr<GeomAPI_Shape> myPreview;  ///< the preview shape
   SketchPlugin_Sketch* mySketch;  /// sketch that contains this feature
 };
 

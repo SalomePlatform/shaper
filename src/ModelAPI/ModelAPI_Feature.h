@@ -7,28 +7,13 @@
 
 #include <ModelAPI.h>
 #include <ModelAPI_Object.h>
-#include <ModelAPI_AttributeBoolean.h>
-#include <ModelAPI_AttributeDocRef.h>
-#include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_AttributeInteger.h>
-#include <ModelAPI_AttributeRefAttr.h>
-#include <ModelAPI_AttributeReference.h>
-#include <ModelAPI_AttributeSelection.h>
-#include <ModelAPI_AttributeSelectionList.h>
-#include <ModelAPI_AttributeString.h>
-#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
-#include <ModelAPI_Result.h>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include <list>
 #include <string>
-
-class ModelAPI_Data;
-class ModelAPI_Document;
-class ModelAPI_Result;
 
 /**\class ModelAPI_Feature
  * \ingroup DataModel
@@ -38,7 +23,7 @@ class ModelAPI_Result;
 class ModelAPI_Feature : public ModelAPI_Object
 {
   ///< list of current results of this feature
-  std::list<boost::shared_ptr<ModelAPI_Result> > myResults;
+  std::list<std::shared_ptr<ModelAPI_Result> > myResults;
  public:
   /// Returns the unique kind of a feature (like "Point")
   virtual const std::string& getKind() = 0;
@@ -51,7 +36,7 @@ class ModelAPI_Feature : public ModelAPI_Object
   }
 
   /// Returns document this feature belongs to
-  virtual boost::shared_ptr<ModelAPI_Document> document() const
+  virtual std::shared_ptr<ModelAPI_Document> document() const
   {
     return ModelAPI_Object::document();
   }
@@ -69,18 +54,18 @@ class ModelAPI_Feature : public ModelAPI_Object
   virtual void execute() = 0;
 
   /// returns the current results of the feature
-  MODELAPI_EXPORT const std::list<boost::shared_ptr<ModelAPI_Result> >& results();
+  MODELAPI_EXPORT const std::list<std::shared_ptr<ModelAPI_Result> >& results();
   /// returns the first result in the list or NULL reference
-  MODELAPI_EXPORT boost::shared_ptr<ModelAPI_Result> firstResult();
+  MODELAPI_EXPORT std::shared_ptr<ModelAPI_Result> firstResult();
   /// returns the last result in the list or NULL reference
-  MODELAPI_EXPORT boost::shared_ptr<ModelAPI_Result> lastResult();
+  MODELAPI_EXPORT std::shared_ptr<ModelAPI_Result> lastResult();
   /// sets the alone result
-  MODELAPI_EXPORT void setResult(const boost::shared_ptr<ModelAPI_Result>& theResult);
+  MODELAPI_EXPORT void setResult(const std::shared_ptr<ModelAPI_Result>& theResult);
   /// sets the result by index (zero based), results before this must be set before
-  MODELAPI_EXPORT void setResult(const boost::shared_ptr<ModelAPI_Result>& theResult,
+  MODELAPI_EXPORT void setResult(const std::shared_ptr<ModelAPI_Result>& theResult,
                                  const int theIndex);
   /// removes the result from the feature
-  MODELAPI_EXPORT void removeResult(const boost::shared_ptr<ModelAPI_Result>& theResult);
+  MODELAPI_EXPORT void removeResult(const std::shared_ptr<ModelAPI_Result>& theResult);
   /// removes all results from the feature
   MODELAPI_EXPORT void eraseResults();
   /// removes all fields from this feature: results, data, etc
@@ -99,12 +84,12 @@ class ModelAPI_Feature : public ModelAPI_Object
 
   /// Must return document where the new feature must be added to
   /// By default it is current document
-  MODELAPI_EXPORT virtual boost::shared_ptr<ModelAPI_Document> documentToAdd();
+  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Document> documentToAdd();
 
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Feature();
 
-  MODELAPI_EXPORT static boost::shared_ptr<ModelAPI_Feature> feature(ObjectPtr theObject);
+  MODELAPI_EXPORT static std::shared_ptr<ModelAPI_Feature> feature(ObjectPtr theObject);
 
  //
  // Helper methods, aliases for data()->method()
@@ -114,57 +99,57 @@ class ModelAPI_Feature : public ModelAPI_Object
     return data()->name();
   }
 
-  inline boost::shared_ptr<ModelAPI_AttributeBoolean> boolean(const std::string& theID)
+  inline std::shared_ptr<ModelAPI_AttributeBoolean> boolean(const std::string& theID)
   {
     return data()->boolean(theID);
   }
 
-  inline boost::shared_ptr<ModelAPI_AttributeDocRef> document(const std::string& theID)
+  inline std::shared_ptr<ModelAPI_AttributeDocRef> document(const std::string& theID)
   {
     return data()->document(theID);
   }
 
-  inline boost::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID)
+  inline std::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID)
   {
     return data()->real(theID);
   }
 
-  inline boost::shared_ptr<ModelAPI_AttributeInteger> integer(const std::string& theID)
+  inline std::shared_ptr<ModelAPI_AttributeInteger> integer(const std::string& theID)
   {
     return data()->integer(theID);
   }
 
-  inline boost::shared_ptr<ModelAPI_AttributeRefAttr> refattr(const std::string& theID)
+  inline std::shared_ptr<ModelAPI_AttributeRefAttr> refattr(const std::string& theID)
   {
     return data()->refattr(theID);
   }
 
-  inline boost::shared_ptr<ModelAPI_AttributeReference> reference(const std::string& theID)
+  inline std::shared_ptr<ModelAPI_AttributeReference> reference(const std::string& theID)
   {
     return data()->reference(theID);
   }
 
-  inline boost::shared_ptr<ModelAPI_AttributeRefList> reflist(const std::string& theID)
+  inline std::shared_ptr<ModelAPI_AttributeRefList> reflist(const std::string& theID)
   {
     return data()->reflist(theID);
   }
 
-  inline boost::shared_ptr<ModelAPI_AttributeSelection> selection(const std::string& theID)
+  inline std::shared_ptr<ModelAPI_AttributeSelection> selection(const std::string& theID)
   {
     return data()->selection(theID);
   }
 
-  inline boost::shared_ptr<ModelAPI_AttributeSelectionList> selectionList(const std::string& theID)
+  inline std::shared_ptr<ModelAPI_AttributeSelectionList> selectionList(const std::string& theID)
   {
     return data()->selectionList(theID);
   }
 
-  inline boost::shared_ptr<ModelAPI_AttributeString> string(const std::string& theID)
+  inline std::shared_ptr<ModelAPI_AttributeString> string(const std::string& theID)
   {
     return data()->string(theID);
   }
 
-  inline boost::shared_ptr<ModelAPI_Attribute> attribute(const std::string& theID)
+  inline std::shared_ptr<ModelAPI_Attribute> attribute(const std::string& theID)
   {
     return data()->attribute(theID);
   }
@@ -172,7 +157,7 @@ class ModelAPI_Feature : public ModelAPI_Object
 };
 
 //! Pointer on feature object
-typedef boost::shared_ptr<ModelAPI_Feature> FeaturePtr;
+typedef std::shared_ptr<ModelAPI_Feature> FeaturePtr;
 
 #endif
 

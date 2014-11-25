@@ -19,7 +19,7 @@
 
 //ObjectPtr featureObj(const ObjectPtr& theFeature)
 //{
-//  ObjectPtr aObject = boost::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
+//  ObjectPtr aObject = std::dynamic_pointer_cast<ModelAPI_Object>(theFeature);
 //  if (aObject)
 //    return aObject->featureRef();
 //  return theFeature;
@@ -259,7 +259,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
           DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
           ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
           if (aObject)
-            return boost::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
+            return std::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
         }
         case ParamsFolder:
           return tr("Parameters") + QString(" (%1)").arg(rowCount(theIndex));
@@ -273,14 +273,14 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
           ObjectPtr aObject = partDocument()->object(ModelAPI_ResultParameters::group(),
                                                      theIndex.row());
           if (aObject)
-            return boost::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
+            return std::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
         }
           break;
         case ConstructObject: {
           ObjectPtr aObject = partDocument()->object(ModelAPI_ResultConstruction::group(),
                                                      theIndex.row());
           if (aObject)
-            return boost::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
+            return std::dynamic_pointer_cast<ModelAPI_Object>(aObject)->data()->name().c_str();
         }
           break;
         case BodiesObject: {
@@ -326,7 +326,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
         }
         case HistoryObject: {
           ObjectPtr aObject = partDocument()->object(ModelAPI_Feature::group(), theIndex.row() - 4);
-          FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+          FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
           if (aFeature)
             return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
         }
@@ -447,7 +447,7 @@ DocumentPtr XGUI_PartDataModel::partDocument() const
 {
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
-  ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+  ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
   if (aPart)
     return aPart->partDoc();
   return DocumentPtr(); // null if not found
@@ -507,7 +507,7 @@ ResultPartPtr XGUI_PartDataModel::part() const
 {
   DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
   ObjectPtr aObj = aRootDoc->object(ModelAPI_ResultPart::group(), myId);
-  return boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+  return std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
 }
 
 QModelIndex XGUI_PartDataModel::objectIndex(const ObjectPtr& theObject) const

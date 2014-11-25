@@ -256,7 +256,7 @@ XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 }
 
 //******************************************************
-void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMessage)
+void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   if (QApplication::instance()->thread() != QThread::currentThread()) {
     #ifdef _DEBUG
@@ -270,8 +270,8 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
 
   //A message to start feature creation received.
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(Config_FeatureMessage::GUI_EVENT())) {
-    boost::shared_ptr<Config_FeatureMessage> aFeatureMsg =
-       boost::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
+    std::shared_ptr<Config_FeatureMessage> aFeatureMsg =
+       std::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
     if (!aFeatureMsg->isInternal()) {
       addFeature(aFeatureMsg);
     }
@@ -279,8 +279,8 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
 
   // Process creation of Part
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
-    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
-        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     onFeatureCreatedMsg(aUpdMsg);
     if (myUpdatePrefs) {
       if (mySalomeConnector)
@@ -294,22 +294,22 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
 
   // Redisplay feature
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
-    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
-        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     onFeatureRedisplayMsg(aUpdMsg);
   }
 
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
-    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
-        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     onFeatureUpdatedMsg(anUpdateMsg);
   }
 
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
-    boost::shared_ptr<ModelAPI_ObjectDeletedMessage> aDelMsg =
-        boost::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
+    std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDelMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
     onObjectDeletedMsg(aDelMsg);
   }
 
@@ -321,8 +321,8 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
   }
 
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TOSHOW)) {
-    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
-        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     const std::set<ObjectPtr>& aObjList = anUpdateMsg->objects();
     QList<ObjectPtr> aList;
     std::set<ObjectPtr>::const_iterator aIt;
@@ -332,8 +332,8 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
   }
 
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TOHIDE)) {
-    boost::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
-        boost::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     const std::set<ObjectPtr>& aObjList = anUpdateMsg->objects();
     QList<ObjectPtr> aList;
     std::set<ObjectPtr>::const_iterator aIt;
@@ -344,8 +344,8 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
 
   //An operation passed by message. Start it, process and commit.
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OPERATION_LAUNCHED)) {
-    boost::shared_ptr<Config_PointerMessage> aPartSetMsg =
-        boost::dynamic_pointer_cast<Config_PointerMessage>(theMessage);
+    std::shared_ptr<Config_PointerMessage> aPartSetMsg =
+        std::dynamic_pointer_cast<Config_PointerMessage>(theMessage);
     //myPropertyPanel->cleanContent();
     ModuleBase_Operation* anOperation = (ModuleBase_Operation*) aPartSetMsg->pointer();
 
@@ -371,7 +371,7 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
     }
     std::string aGrpName = ModelAPI_ResultPart::group();
     for (int i = 0; i < aDoc->size(aGrpName); i++) {
-      ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aDoc->object(aGrpName, i));
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aDoc->object(aGrpName, i));
       if (aPart->partDoc() == aActiveDoc) {
         activatePart(aPart); // Activate a part which corresponds to active Doc
         return;
@@ -382,7 +382,7 @@ void XGUI_Workshop::processEvent(const boost::shared_ptr<Events_Message>& theMes
 
   } else {
     //Show error dialog if error message received.
-    boost::shared_ptr<Events_Error> anAppError = boost::dynamic_pointer_cast<Events_Error>(theMessage);
+    std::shared_ptr<Events_Error> anAppError = std::dynamic_pointer_cast<Events_Error>(theMessage);
     if (anAppError) {
       emit errorOccurred(QString::fromLatin1(anAppError->description()));
     }
@@ -404,7 +404,7 @@ void XGUI_Workshop::onStartWaiting()
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureUpdatedMsg(const boost::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
+void XGUI_Workshop::onFeatureUpdatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
   std::set<ObjectPtr> aFeatures = theMsg->objects();
   if (myOperationMgr->hasOperation()) {
@@ -424,7 +424,7 @@ void XGUI_Workshop::onFeatureUpdatedMsg(const boost::shared_ptr<ModelAPI_ObjectU
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
+void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
@@ -433,7 +433,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_Objec
     ObjectPtr aObj = (*aIt);
     bool aHide = !aObj->data() || !aObj->data()->isValid();
     if (!aHide) { // check that this is not hidden result
-      ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
       aHide = aRes && aRes->isConcealed();
     }
     if (aHide)
@@ -465,7 +465,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const boost::shared_ptr<ModelAPI_Objec
 }
 
 //******************************************************
-void XGUI_Workshop::onFeatureCreatedMsg(const boost::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
+void XGUI_Workshop::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg)
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
 
@@ -473,7 +473,7 @@ void XGUI_Workshop::onFeatureCreatedMsg(const boost::shared_ptr<ModelAPI_ObjectU
   bool aHasPart = false;
   bool isDisplayed = false;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
-    ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
     if (aPart) {
       aHasPart = true;
       // If a feature is created from the aplication's python console  
@@ -496,7 +496,7 @@ void XGUI_Workshop::onFeatureCreatedMsg(const boost::shared_ptr<ModelAPI_ObjectU
 }
 
 //******************************************************
-void XGUI_Workshop::onObjectDeletedMsg(const boost::shared_ptr<ModelAPI_ObjectDeletedMessage>& theMsg)
+void XGUI_Workshop::onObjectDeletedMsg(const std::shared_ptr<ModelAPI_ObjectDeletedMessage>& theMsg)
 {
   if (myObjectBrowser)
     myObjectBrowser->processEvent(theMsg);
@@ -561,7 +561,7 @@ bool XGUI_Workshop::event(QEvent * theEvent)
 {
   PostponeMessageQtEvent* aPostponedEv = dynamic_cast<PostponeMessageQtEvent*>(theEvent);
   if (aPostponedEv) {
-    boost::shared_ptr<Events_Message> aEventPtr = aPostponedEv->postponedMessage();
+    std::shared_ptr<Events_Message> aEventPtr = aPostponedEv->postponedMessage();
     processEvent(aEventPtr);
     return true;
   }
@@ -571,7 +571,7 @@ bool XGUI_Workshop::event(QEvent * theEvent)
 /*
  *
  */
-void XGUI_Workshop::addFeature(const boost::shared_ptr<Config_FeatureMessage>& theMessage)
+void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& theMessage)
 {
   if (!theMessage) {
 #ifdef _DEBUG
@@ -831,7 +831,7 @@ void XGUI_Workshop::onRebuild()
     aMgr->startOperation();
   }
   static const Events_ID aRebuildEvent = Events_Loop::loop()->eventByName("Rebuild");
-  Events_Loop::loop()->send(boost::shared_ptr<Events_Message>(
+  Events_Loop::loop()->send(std::shared_ptr<Events_Message>(
     new Events_Message(aRebuildEvent, this)));
   if (!aWasOperation) {
     aMgr->finishOperation();
@@ -1080,7 +1080,7 @@ void XGUI_Workshop::changeCurrentDocument(ObjectPtr theObj)
 {
   SessionPtr aMgr = ModelAPI_Session::get();
   if (theObj) {
-    ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(theObj);
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(theObj);
     if (aPart) {
       DocumentPtr aPartDoc = aPart->partDoc();
       if (aPartDoc) {
@@ -1109,7 +1109,7 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
 {
   QList<ObjectPtr> aObjects = mySelector->selection()->selectedObjects();
   if ((theId == "ACTIVATE_PART_CMD") && (aObjects.size() > 0)) {
-    ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObjects.first());
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObjects.first());
     activatePart(aPart);
   } else if (theId == "DEACTIVATE_PART_CMD")
     activatePart(ResultPartPtr());
@@ -1170,7 +1170,7 @@ void XGUI_Workshop::activateLastPart()
   DocumentPtr aDoc = aMgr->moduleDocument();
   std::string aGrpName = ModelAPI_ResultPart::group();
   ObjectPtr aLastPart = aDoc->object(aGrpName, aDoc->size(aGrpName) - 1);
-  ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aLastPart);
+  ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aLastPart);
   if (aPart) {
     activatePart(aPart);
   }
@@ -1189,7 +1189,7 @@ void XGUI_Workshop::deleteObjects(const QList<ObjectPtr>& theList)
     aMgr->startOperation();
     foreach (ObjectPtr aObj, theList)
     {
-      ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
       if (aPart) {
         DocumentPtr aDoc = aPart->document();
         if (aDoc == aMgr->activeDocument()) {
@@ -1197,7 +1197,7 @@ void XGUI_Workshop::deleteObjects(const QList<ObjectPtr>& theList)
         }
         //aMgr->moduleDocument()->removeFeature(aPart->owner());
       } else {
-        FeaturePtr aFeature = boost::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
         if (aFeature)
           aObj->document()->removeFeature(aFeature);
       }
@@ -1212,7 +1212,7 @@ void XGUI_Workshop::showObjects(const QList<ObjectPtr>& theList, bool isVisible)
 {
   foreach (ObjectPtr aObj, theList)
   {
-    ResultPtr aRes = boost::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
     if (aRes) {
       if (isVisible) {
         myDisplayer->display(aRes, false);
@@ -1287,7 +1287,7 @@ void XGUI_Workshop::displayAllResults()
   displayDocumentResults(aRootDoc);
   for (int i = 0; i < aRootDoc->size(ModelAPI_ResultPart::group()); i++) {
     ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), i);
-    ResultPartPtr aPart = boost::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
     displayDocumentResults(aPart->partDoc());
   }
   myDisplayer->updateViewer();

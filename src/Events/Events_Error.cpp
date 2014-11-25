@@ -31,8 +31,8 @@ char* Events_Error::description() const
 
 void Events_Error::send(char* theDescription, const void* theSender)
 {
-  boost::shared_ptr<Events_Message> aNewOne = 
-    boost::shared_ptr<Events_Message>(new Events_Error(theDescription, theSender));
+  std::shared_ptr<Events_Message> aNewOne = 
+    std::shared_ptr<Events_Message>(new Events_Error(theDescription, theSender));
   Events_Loop::loop()->send(aNewOne);
 }
 

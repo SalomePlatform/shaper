@@ -35,17 +35,17 @@ PartSet_OperationSketchBase::~PartSet_OperationSketchBase()
 {
 }
 
-boost::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview(FeaturePtr theFeature)
+std::shared_ptr<GeomAPI_Shape> PartSet_OperationSketchBase::preview(FeaturePtr theFeature)
 {
-  boost::shared_ptr<SketchPlugin_Feature> aFeature = boost::dynamic_pointer_cast<
+  std::shared_ptr<SketchPlugin_Feature> aFeature = std::dynamic_pointer_cast<
       SketchPlugin_Feature>(theFeature);
   if (aFeature) {
     ResultPtr aRes = aFeature->firstResult();
-    ResultBodyPtr aBody = boost::dynamic_pointer_cast<ModelAPI_ResultBody>(aRes);
+    ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aRes);
     if (aBody)
       return aBody->shape();
   }
-  return boost::shared_ptr<GeomAPI_Shape>();
+  return std::shared_ptr<GeomAPI_Shape>();
 }
 
 std::list<FeaturePtr> PartSet_OperationSketchBase::subFeatures() const

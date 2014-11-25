@@ -21,16 +21,16 @@ static gp_Circ* newCirc(const gp_Pnt& theCenter, const gp_Dir& theDir, const dou
   return new gp_Circ(gp_Ax2(theCenter, theDir), theRadius);
 }
 
-GeomAPI_Circ::GeomAPI_Circ(const boost::shared_ptr<GeomAPI_Pnt>& theCenter,
-                           const boost::shared_ptr<GeomAPI_Dir>& theDir, double theRadius)
+GeomAPI_Circ::GeomAPI_Circ(const std::shared_ptr<GeomAPI_Pnt>& theCenter,
+                           const std::shared_ptr<GeomAPI_Dir>& theDir, double theRadius)
     : GeomAPI_Interface(newCirc(theCenter->impl<gp_Pnt>(), theDir->impl<gp_Dir>(), theRadius))
 {
 }
 
-const boost::shared_ptr<GeomAPI_Pnt> GeomAPI_Circ::project(
-    const boost::shared_ptr<GeomAPI_Pnt>& thePoint) const
+const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Circ::project(
+    const std::shared_ptr<GeomAPI_Pnt>& thePoint) const
 {
-  boost::shared_ptr<GeomAPI_Pnt> aResult;
+  std::shared_ptr<GeomAPI_Pnt> aResult;
   if (!MY_CIRC)
   return aResult;
 
@@ -47,7 +47,7 @@ const boost::shared_ptr<GeomAPI_Pnt> GeomAPI_Circ::project(
       aDistance = aNewPoint.Distance(aPoint);
       if (!aMinDistance || aDistance < aMinDistance) {
         aMinDistance = aDistance;
-        aResult = boost::shared_ptr<GeomAPI_Pnt>(
+        aResult = std::shared_ptr<GeomAPI_Pnt>(
             new GeomAPI_Pnt(aNewPoint.X(), aNewPoint.Y(), aNewPoint.Z()));
       }
     }
@@ -55,10 +55,10 @@ const boost::shared_ptr<GeomAPI_Pnt> GeomAPI_Circ::project(
   return aResult;
 }
 
-const boost::shared_ptr<GeomAPI_Pnt> GeomAPI_Circ::center() const
+const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Circ::center() const
 {
   const gp_Pnt& aCenter = MY_CIRC->Location();
-  return boost::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aCenter.X(), aCenter.Y(), aCenter.Z()));
+  return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aCenter.X(), aCenter.Y(), aCenter.Z()));
 }
 
 double GeomAPI_Circ::radius() const

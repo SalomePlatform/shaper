@@ -90,10 +90,10 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual ObjectPtr object(TDF_Label theLabel);
 
   //! Adds a new sub-document by the identifier, or returns existing one if it is already exist
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID);
 
   //! Internal sub-document by ID
-  MODEL_EXPORT virtual boost::shared_ptr<Model_Document> subDoc(std::string theDocID);
+  MODEL_EXPORT virtual std::shared_ptr<Model_Document> subDoc(std::string theDocID);
 
   ///! Returns the id of hte document
   MODEL_EXPORT virtual const std::string& id() const
@@ -114,21 +114,21 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual int size(const std::string& theGroupID, const bool theHidden = false);
 
   /// Creates a construction cresults
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
-      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a body results
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultBody> createBody(
-      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultBody> createBody(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a part results
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultPart> createPart(
-      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultPart> createPart(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a group results
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_ResultGroup> createGroup(
-      const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultGroup> createGroup(
+      const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
 
   //! Returns a feature by result (owner of result)
-  MODEL_EXPORT virtual boost::shared_ptr<ModelAPI_Feature>
-    feature(const boost::shared_ptr<ModelAPI_Result>& theResult);
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature>
+    feature(const std::shared_ptr<ModelAPI_Result>& theResult);
 
   ///! Returns true if parametric updater need to execute feature on recomputartion
   ///! On abort, undo or redo it is not necessary: results in document are updated automatically
@@ -166,12 +166,12 @@ class Model_Document : public ModelAPI_Document
   void initData(ObjectPtr theObj, TDF_Label theLab, const int theTag);
 
   //! Allows to store the result in the data tree of the document (attaches 'data' of result to tree)
-  MODEL_EXPORT virtual void storeResult(boost::shared_ptr<ModelAPI_Data> theFeatureData,
-                                        boost::shared_ptr<ModelAPI_Result> theResult,
+  MODEL_EXPORT virtual void storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
+                                        std::shared_ptr<ModelAPI_Result> theResult,
                                         const int theResultIndex = 0);
 
   //! returns the label of result by index; creates this label if it was not created before
-  TDF_Label resultLabel(const boost::shared_ptr<ModelAPI_Data>& theFeatureData, const int theResultIndex);
+  TDF_Label resultLabel(const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theResultIndex);
 
   //! Updates the results list of the feature basing on the current data tree
   void updateResults(FeaturePtr theFeature);

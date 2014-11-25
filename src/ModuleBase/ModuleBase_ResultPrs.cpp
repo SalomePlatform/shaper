@@ -19,9 +19,9 @@ IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ResultPrs, AIS_Shape);
 ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   : AIS_Shape(TopoDS_Shape()), myResult(theResult), myIsSketchMode(false)
 {
-  boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
-  boost::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 
-    boost::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aShapePtr);
+  std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
+  std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 
+    std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aShapePtr);
   if (aWirePtr) {
     if (aWirePtr->hasPlane() ) {
       // If this is a wire with plane defined thin it is a sketch-like object
@@ -45,7 +45,7 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
-  boost::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
+  std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
   if (!aShapePtr)
     return;
   myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
@@ -63,7 +63,7 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
       TopoDS_Compound aComp;
       aBuilder.MakeCompound(aComp);
       aBuilder.Add(aComp, myOriginalShape);
-      std::list<boost::shared_ptr<GeomAPI_Shape>>::const_iterator aIt;
+      std::list<std::shared_ptr<GeomAPI_Shape>>::const_iterator aIt;
       for (aIt = myFacesList.cbegin(); aIt != myFacesList.cend(); ++aIt) {
         TopoDS_Shape aFace = (*aIt)->impl<TopoDS_Shape>();
         aBuilder.Add(aComp, aFace);

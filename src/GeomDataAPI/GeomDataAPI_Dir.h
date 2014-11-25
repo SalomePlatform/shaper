@@ -21,7 +21,7 @@ class GeomDataAPI_Dir : public ModelAPI_Attribute
   /// Defines the double value
   virtual void setValue(const double theX, const double theY, const double theZ) = 0;
   /// Defines the direction
-  virtual void setValue(const boost::shared_ptr<GeomAPI_Dir>& theDir) = 0;
+  virtual void setValue(const std::shared_ptr<GeomAPI_Dir>& theDir) = 0;
 
   /// Returns the X double value
   virtual double x() const = 0;
@@ -30,7 +30,7 @@ class GeomDataAPI_Dir : public ModelAPI_Attribute
   /// Returns the Z double value
   virtual double z() const = 0;
   /// Returns the direction of this attribute
-  virtual boost::shared_ptr<GeomAPI_Dir> dir() = 0;
+  virtual std::shared_ptr<GeomAPI_Dir> dir() = 0;
 
   /// Returns the type of this class of attributes
   static inline std::string type()
