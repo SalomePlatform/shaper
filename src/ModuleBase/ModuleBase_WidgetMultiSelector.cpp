@@ -54,9 +54,10 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 
   myListControl = new QListWidget(myMainWidget);
   aMainLay->addWidget(myListControl, 2, 0, 2, -1);
-  aMainLay->setColumnStretch(1, 1);
+  aMainLay->setRowStretch(2, 1);
+  aMainLay->addWidget(new QLabel(myMainWidget));
+  aMainLay->setRowMinimumHeight(3, 20);
   myMainWidget->setLayout(aMainLay);
-
   //TODO: Move into the base class
   myUseSubShapes = theData->getBooleanAttribute("use_subshapes", false);
   //TODO_END
