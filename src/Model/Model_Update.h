@@ -6,6 +6,7 @@
 #define Model_Update_H_
 
 #include "Model.h"
+#include <ModelAPI_Data.h>
 #include "Events_Listener.h"
 #include <memory>
 #include <set>
@@ -48,7 +49,8 @@ class Model_Update : public Events_Listener
   /// Returns true if object was updated.
   bool updateObject(std::shared_ptr<ModelAPI_Object> theObject, const bool theCyclic = true);
   /// Sends the redisplay events for feature and results, updates the updated status
-  void redisplayWithResults(std::shared_ptr<ModelAPI_Feature> theFeature);
+  void redisplayWithResults(std::shared_ptr<ModelAPI_Feature> theFeature, 
+    const ModelAPI_ExecState theState);
 };
 
 #endif

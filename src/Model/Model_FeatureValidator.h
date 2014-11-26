@@ -24,7 +24,10 @@ class Model_FeatureValidator : public ModelAPI_FeatureValidator
     const std::list<std::string>& theArguments) const;
 
   // sets not obligatory attributes, not checked for initialization
-  void registerNotObligatory(std::string theFeature, std::string theAttribute);
+  virtual void registerNotObligatory(std::string theFeature, std::string theAttribute);
+
+  /// Returns true if the attribute in feature is not obligatory for the feature execution
+  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 #endif

@@ -140,14 +140,17 @@ class Model_Data : public ModelAPI_Data
     myObject = theObject;
   }
 
+  /// Erases all the data from the data model
   MODEL_EXPORT virtual void erase();
 
-  /// Makes feature must be updated later (on rebuild). Normally the Updater must call it
-  /// in case of not-automatic update to true
-  MODEL_EXPORT virtual void mustBeUpdated(const bool theFlag);
+  /// Stores the state of the object to execute it later accordingly
+  MODEL_EXPORT virtual void execState(const ModelAPI_ExecState theState);
 
-  /// Returns true if feature must be updated (re-executed) on rebuild
-  MODEL_EXPORT virtual bool mustBeUpdated();
+  /// Returns the state of the latest execution of the feature
+  MODEL_EXPORT virtual ModelAPI_ExecState execState();
+
+  /// Registers error during the execution, causes the ExecutionFailed state
+  MODEL_EXPORT virtual void setError(const std::string& theError);
 
   /// Returns the identifier of feature-owner, unique in this document
   MODEL_EXPORT virtual int featureId() const;

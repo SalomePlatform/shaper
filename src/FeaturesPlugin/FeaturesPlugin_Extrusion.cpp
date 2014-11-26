@@ -11,7 +11,6 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeBoolean.h>
-#include <Events_Error.h>
 #include <GeomAlgoAPI_Extrusion.h>
 
 using namespace std;
@@ -19,10 +18,6 @@ using namespace std;
 #define _FIRST_TAG 2
 #define _LAST_TAG 3
 #define EDGE 6
-#ifdef _DEBUG
-#include <iostream>
-#include <ostream>
-#endif
 
 FeaturesPlugin_Extrusion::FeaturesPlugin_Extrusion()
 {
@@ -56,8 +51,8 @@ void FeaturesPlugin_Extrusion::execute()
       aContext = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes)->shape();
   }
   if (!aContext) {
-    std::string aContextError = "The selection context is bad";
-    Events_Error::send(aContextError, this);
+    static const std::string aContextError = "The selection context is bad";
+    setError(aContextError);
     return;
   }
 
@@ -68,23 +63,20 @@ void FeaturesPlugin_Extrusion::execute()
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
   GeomAlgoAPI_Extrusion aFeature(aFace, aSize);
   if(!aFeature.isDone()) {
-    std::string aFeatureError = "Extrusion algorithm failed";  
-    Events_Error::send(aFeatureError, this);
+    static const std::string aFeatureError = "Extrusion algorithm failed";  
+    setError(aFeatureError);
     return;
   }
 
   // Check if shape is valid
   if (aFeature.shape()->isNull()) {
-    std::string aShapeError = "Resulting shape is Null";     
-    Events_Error::send(aShapeError, this);
-#ifdef _DEBUG
-    std::cerr << aShapeError << std::endl;
-#endif
+    static const std::string aShapeError = "Resulting shape is Null";     
+    setError(aShapeError);
     return;
   }
   if(!aFeature.isValid()) {
     std::string aFeatureError = "Warning: resulting shape is not valid";  
-    Events_Error::send(aFeatureError, this);
+    setError(aFeatureError);
     return;
   }  
   //LoadNamingDS

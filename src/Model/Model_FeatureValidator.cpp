@@ -41,3 +41,9 @@ void Model_FeatureValidator::registerNotObligatory(std::string theFeature, std::
   std::set<std::string>& anAttrs = myNotObligatory[theFeature];
   anAttrs.insert(theAttribute);
 }
+
+bool Model_FeatureValidator::isNotObligatory(std::string theFeature, std::string theAttribute)
+{
+  std::set<std::string>& anAttrs = myNotObligatory[theFeature];
+  return anAttrs.find(theAttribute) != anAttrs.end();
+}

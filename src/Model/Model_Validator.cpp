@@ -224,6 +224,19 @@ void Model_ValidatorsFactory::registerNotObligatory(std::string theFeature, std:
   }
 }
 
+bool Model_ValidatorsFactory::isNotObligatory(std::string theFeature, std::string theAttribute)
+{
+  const static std::string kDefaultId = "Model_FeatureValidator";
+  std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(kDefaultId);
+  if (it != myIDs.end()) {
+    Model_FeatureValidator* aValidator = dynamic_cast<Model_FeatureValidator*>(it->second);
+    if (aValidator) {
+      return aValidator->isNotObligatory(theFeature, theAttribute);
+    }
+  }
+  return false; // default
+}
+
 void Model_ValidatorsFactory::registerConcealment(std::string theFeature, std::string theAttribute)
 {
   std::map<std::string, std::set<std::string> >::iterator aFind = myConcealed.find(theFeature);

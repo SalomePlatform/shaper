@@ -141,6 +141,12 @@ std::shared_ptr<ModelAPI_Document> Model_Session::moduleDocument()
       Model_Application::getApplication()->getDocument("root"));
 }
 
+std::shared_ptr<ModelAPI_Document> Model_Session::document(std::string theDocID)
+{
+  return std::shared_ptr<ModelAPI_Document>(
+      Model_Application::getApplication()->getDocument(theDocID));
+}
+
 bool Model_Session::hasModuleDocument()
 {
   return Model_Application::getApplication()->hasDocument("root");

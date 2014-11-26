@@ -226,7 +226,7 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
     // Check that object belongs to active document or PartSet
     DocumentPtr aDoc = aRes->document();
     SessionPtr aMgr = ModelAPI_Session::get();
-    if (!(aDoc == aMgr->activeDocument()) || (aDoc == aMgr->moduleDocument()))
+    if (!(aDoc == aMgr->activeDocument()) && !(aDoc == aMgr->moduleDocument()))
       return;
 
     // Check that the result has a shape
