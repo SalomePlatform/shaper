@@ -3,9 +3,8 @@
 // Author:      Vitaly Smetannikov
 
 #include "ModuleBase_Tools.h"
-#include <ModelAPI_ResultBody.h>
-#include <ModelAPI_ResultConstruction.h>
-#include <ModelAPI_Document.h>
+#include <QWidget>
+#include <QLayout>
 
 namespace ModuleBase_Tools {
 
@@ -43,4 +42,8 @@ void zeroMargins(QLayout* theLayout)
   theLayout->setSpacing(5);
 }
 
+
+
 }
+
+

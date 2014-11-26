@@ -31,14 +31,14 @@ class ModuleBase_ISelection
   virtual QList<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const = 0;
 
   /**
-   * Returns list of features currently selected in 3d viewer
+   * Returns list of features currently selected in object browser
    */
-  virtual QList<ObjectPtr> selectedObjects() const = 0;
+  virtual QObjectPtrList selectedObjects() const = 0;
 
   /**
    * Returns list of currently selected results
    */
-  virtual QList<ObjectPtr> selectedPresentations() const = 0;
+  virtual QObjectPtrList selectedPresentations() const = 0;
 
   //! Returns list of currently selected QModelIndexes
   virtual QModelIndexList selectedIndexes() const = 0;

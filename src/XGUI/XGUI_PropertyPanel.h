@@ -64,7 +64,7 @@ Q_OBJECT
   /// Signal about the point 2d set to the feature
   /// \param the feature
   /// \param the attribute of the feature
-  void storedPoint2D(ObjectPtr theFeature, const std::string& theAttribute);
+  //void storedPoint2D(ObjectPtr theFeature, const std::string& theAttribute);
 
 
  private:

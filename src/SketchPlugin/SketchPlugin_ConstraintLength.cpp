@@ -43,11 +43,11 @@ void SketchPlugin_ConstraintLength::execute()
 
     double aLenght = aPoint1->pnt()->distance(aPoint2->pnt());
 
-    std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-        ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-    if(!aValueAttr->isInitialized()) {
-      aValueAttr->setValue(aLenght);
-    }
+    //std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
+    //    ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
+    //if(!aValueAttr->isInitialized()) {
+    //  aValueAttr->setValue(aLenght);
+    //}
   }
 }
 
@@ -89,9 +89,16 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
     aFlyoutPnt = sketch()->to3D(aFPnt->x(), aFPnt->y());
   }
   // value calculation
+  // TODO: has to be calculated on definition of reference object
+  double aDistance = aPoint1->distance(aPoint2);
   std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-  double aValue = aValueAttr->value();
+  double aValue = aDistance;
+  if (aValueAttr->isInitialized())
+    aValue = aValueAttr->value();
+  else 
+    aValueAttr->setValue(aValue);
+  // End TODO
 
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS)

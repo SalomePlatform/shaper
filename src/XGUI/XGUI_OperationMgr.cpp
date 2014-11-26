@@ -36,6 +36,25 @@ bool XGUI_OperationMgr::hasOperation() const
   return !myOperations.isEmpty() && (myOperations.last() != NULL);
 }
 
+bool XGUI_OperationMgr::hasOperation(const QString& theId) const
+{
+  foreach(ModuleBase_Operation* aOp, myOperations) {
+    if (aOp->id() == theId)
+      return true;
+  }
+  return false;
+}
+
+ModuleBase_Operation* XGUI_OperationMgr::findOperation(const QString& theId) const
+{
+  foreach(ModuleBase_Operation* aOp, myOperations) {
+    if (aOp->id() == theId)
+      return aOp;
+  }
+  return 0;
+}
+
+
 int XGUI_OperationMgr::operationsCount() const
 {
   return myOperations.count();
@@ -75,14 +94,15 @@ bool XGUI_OperationMgr::eventFilter(QObject *theObject, QEvent *theEvent)
 
 bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
 {
-  if (!canStartOperation(theOperation))
-    return false;
-
+  if (hasOperation())
+    currentOperation()->postpone();
   myOperations.append(theOperation);
 
-  connect(theOperation, SIGNAL(stopped()), this, SLOT(onOperationStopped()));
-  connect(theOperation, SIGNAL(started()), this, SLOT(onOperationStarted()));
-  connect(theOperation, SIGNAL(resumed()), this, SIGNAL(operationResumed()));
+  connect(theOperation, SIGNAL(started()), SLOT(onOperationStarted()));
+  connect(theOperation, SIGNAL(aborted()), SLOT(onOperationAborted()));
+  connect(theOperation, SIGNAL(committed()), SLOT(onOperationComitted()));
+  connect(theOperation, SIGNAL(stopped()), SLOT(onOperationStopped()));
+  connect(theOperation, SIGNAL(resumed()), SLOT(onOperationResumed()));
 
   theOperation->start();
   onValidateOperation();
@@ -135,12 +155,12 @@ void XGUI_OperationMgr::resumeOperation(ModuleBase_Operation* theOperation)
   theOperation->resume();
 }
 
-bool XGUI_OperationMgr::canStartOperation(ModuleBase_Operation* theOperation)
+bool XGUI_OperationMgr::canStartOperation(QString theId)
 {
   bool aCanStart = true;
   ModuleBase_Operation* aCurrentOp = currentOperation();
   if (aCurrentOp) {
-    if (!aCurrentOp->isGranted(theOperation)) {
+    if (!aCurrentOp->isGranted(theId)) {
       if (canAbortOperation()) {
         aCurrentOp->abort();
       } else {
@@ -189,6 +209,24 @@ void XGUI_OperationMgr::onOperationStarted()
   emit operationStarted(aSenderOperation);
 }
 
+void XGUI_OperationMgr::onOperationAborted()
+{
+  ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  emit operationAborted(aSenderOperation);
+}
+
+void XGUI_OperationMgr::onOperationComitted()
+{
+  ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  emit operationComitted(aSenderOperation);
+}
+
+void XGUI_OperationMgr::onOperationResumed()
+{
+  ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  emit operationResumed(aSenderOperation);
+}
+
 void XGUI_OperationMgr::onOperationStopped()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
@@ -233,9 +271,9 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
       isAccepted = false;
       break;
   }
-  if(anOperation) {
-    anOperation->keyReleased(theEvent->key());
-  }
+  //if(anOperation) {
+  //  anOperation->keyReleased(theEvent->key());
+  //}
   return isAccepted;
 }
 

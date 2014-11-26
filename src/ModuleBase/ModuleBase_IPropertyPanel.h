@@ -31,9 +31,13 @@ signals:
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theEvent key release event
   void keyReleased(QKeyEvent* theEvent);
+
   /// The signal about the widget activation
   /// \param theWidget the activated widget
   void widgetActivated(ModuleBase_ModelWidget* theWidget);
+
+  /// Emited when there is no next widget
+  void noMoreWidgets();
 
 public slots:
   /// Activate the next widget in the property panel

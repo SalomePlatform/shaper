@@ -24,6 +24,7 @@
 #include <QTimer>
 #include <QDialog>
 #include <QLayout>
+#include <QApplication>
 
 ModuleBase_WidgetEditor::ModuleBase_WidgetEditor(QWidget* theParent,
                                                  const Config_WidgetAPI* theData,
@@ -60,6 +61,16 @@ double editedValue(double theValue, bool& isDone)
 
 bool ModuleBase_WidgetEditor::focusTo()
 {
+  // We can not launch here modal process for value editing because 
+  // it can be called on other focusOutWidget event and will block it
+  QTimer::singleShot(1, this, SLOT(showPopupEditor()));
+  return true;
+}
+
+void ModuleBase_WidgetEditor::showPopupEditor()
+{
+  // White while all events will be processed
+  QApplication::processEvents();
   double aValue = mySpinBox->value();
   bool isDone;
   aValue = editedValue(aValue, isDone);
@@ -71,8 +82,6 @@ bool ModuleBase_WidgetEditor::focusTo()
   }
   emit valuesChanged();
   emit focusOutWidget(this);
-
-  return false;
 }
 
 void ModuleBase_WidgetEditor::editFeatureValue(FeaturePtr theFeature,

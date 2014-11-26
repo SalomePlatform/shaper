@@ -47,6 +47,10 @@ Q_OBJECT
   /// \param theAttribute the feature attribute
   static void editFeatureValue(FeaturePtr theFeature, const std::string theAttribute);
 
+ private slots:
+   /// Shous popup window under cursor for data editing
+   void showPopupEditor();
+
  private:
   FeaturePtr myFeature;  ///< the current widget feature
   QStringList myFeatureKinds;  ///< the kinds of possible features

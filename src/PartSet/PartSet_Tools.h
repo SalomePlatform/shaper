@@ -35,6 +35,7 @@ class PARTSET_EXPORT PartSet_Tools
   /// Converts the 2D screen point to the 3D point on the view according to the point of view
   /// \param thePoint a screen point
   /// \param theView a 3D view
+  // Transferred to ModuleBase
   static gp_Pnt convertClickToPoint(QPoint thePoint, Handle_V3d_View theView);
 
   /// \brief Converts the 3D point to the projected coodinates on the sketch plane.
@@ -43,7 +44,7 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
   static void convertTo2D(const gp_Pnt& thePoint, FeaturePtr theSketch,
-  Handle(V3d_View) theView,
+                          Handle(V3d_View) theView,
                           double& theX, double& theY);
 
   /// \brief Converts the 2D projected coodinates on the sketch plane to the 3D point.

@@ -4,33 +4,58 @@
 #include "ModuleBase_ViewerPrs.h"
 #include "ModuleBase_Operation.h"
 #include "ModuleBase_ISelection.h"
+#include "ModuleBase_OperationDescription.h"
 
 #include <Events_Loop.h>
 
 #include <ModelAPI_Events.h>
+#include <ModelAPI_CompositeFeature.h>
 
 #include <Config_PointerMessage.h>
+#include <Config_WidgetReader.h>
+#include <Config_ModuleReader.h>
 
+#include <QAction>
 
 ModuleBase_IModule::ModuleBase_IModule(ModuleBase_IWorkshop* theParent)
   : QObject(theParent), myWorkshop(theParent) 
 {
+  connect(myWorkshop, SIGNAL(operationStarted(ModuleBase_Operation*)), 
+          SLOT(onOperationStarted(ModuleBase_Operation*)));
+
+  connect(myWorkshop, SIGNAL(operationStopped(ModuleBase_Operation*)), 
+          SLOT(onOperationStopped(ModuleBase_Operation*)));
+
+  connect(myWorkshop, SIGNAL(operationResumed(ModuleBase_Operation*)), 
+          SLOT(onOperationResumed(ModuleBase_Operation*)));
+
+  connect(myWorkshop, SIGNAL(operationComitted(ModuleBase_Operation*)), 
+          SLOT(onOperationComitted(ModuleBase_Operation*)));
+
+  connect(myWorkshop, SIGNAL(operationAborted(ModuleBase_Operation*)), 
+          SLOT(onOperationAborted(ModuleBase_Operation*)));
+
   connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-  connect(myWorkshop->viewer(), SIGNAL(mousePress(QMouseEvent*)), this,
-          SLOT(onMousePressed(QMouseEvent*)));
-  connect(myWorkshop->viewer(), SIGNAL(mouseRelease(QMouseEvent*)), this,
-          SLOT(onMouseReleased(QMouseEvent*)));
-  connect(myWorkshop->viewer(), SIGNAL(mouseMove(QMouseEvent*)), this,
-          SLOT(onMouseMoved(QMouseEvent*)));
-  connect(myWorkshop->viewer(), SIGNAL(keyRelease(QKeyEvent*)), this,
-          SLOT(onKeyRelease(QKeyEvent*)));
-  connect(myWorkshop->viewer(), SIGNAL(mouseDoubleClick(QMouseEvent*)), this,
-          SLOT(onMouseDoubleClick(QMouseEvent*)));
+
+
+  //connect(myWorkshop->viewer(), SIGNAL(mousePress(QMouseEvent*)), this,
+  //        SLOT(onMousePressed(QMouseEvent*)));
+  //connect(myWorkshop->viewer(), SIGNAL(mouseRelease(QMouseEvent*)), this,
+  //        SLOT(onMouseReleased(QMouseEvent*)));
+  //connect(myWorkshop->viewer(), SIGNAL(mouseMove(QMouseEvent*)), this,
+  //        SLOT(onMouseMoved(QMouseEvent*)));
+  //connect(myWorkshop->viewer(), SIGNAL(keyRelease(QKeyEvent*)), this,
+  //        SLOT(onKeyRelease(QKeyEvent*)));
+  //connect(myWorkshop->viewer(), SIGNAL(mouseDoubleClick(QMouseEvent*)), this,
+  //        SLOT(onMouseDoubleClick(QMouseEvent*)));
 }
 
 
 void ModuleBase_IModule::launchOperation(const QString& theCmdId)
 {
+  if (!myWorkshop->canStartOperation(theCmdId))
+    return;
+
   ModuleBase_Operation* anOperation = createOperation(theCmdId.toStdString());
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
   // Initialise operation with preliminary selection
@@ -46,4 +71,68 @@ void ModuleBase_IModule::sendOperation(ModuleBase_Operation* theOperation)
       std::shared_ptr<Config_PointerMessage>(new Config_PointerMessage(aModuleEvent, this));
   aMessage->setPointer(theOperation);
   Events_Loop::loop()->send(aMessage);
+}
+
+ModuleBase_Operation* ModuleBase_IModule::getNewOperation(const std::string& theFeatureId)
+{
+  return new ModuleBase_Operation(theFeatureId.c_str(), this);
+}
+
+ModuleBase_Operation* ModuleBase_IModule::createOperation(const std::string& theFeatureId)
+{
+  ModuleBase_Operation* anOperation = getNewOperation(theFeatureId);
+
+  // If the operation is launched as sub-operation of another then we have to initialise
+  // parent feature
+  ModuleBase_Operation* aCurOperation = myWorkshop->currentOperation();
+  if (aCurOperation) {
+    FeaturePtr aFeature = aCurOperation->feature();
+    CompositeFeaturePtr aCompFea = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+    if (aCompFea)
+      anOperation->setParentFeature(aCompFea);
+  }
+
+  std::string aPluginFileName = myFeaturesInFiles[theFeatureId];
+  Config_WidgetReader aWdgReader = Config_WidgetReader(aPluginFileName);
+  aWdgReader.readAll();
+  std::string aXmlCfg = aWdgReader.featureWidgetCfg(theFeatureId);
+  std::string aDescription = aWdgReader.featureDescription(theFeatureId);
+
+  anOperation->getDescription()->setDescription(QString::fromStdString(aDescription));
+  anOperation->getDescription()->setXmlRepresentation(QString::fromStdString(aXmlCfg));
+
+  return anOperation;
+}
+
+void ModuleBase_IModule::createFeatures()
+{
+  registerValidators();
+
+  Config_ModuleReader aXMLReader = Config_ModuleReader();
+  aXMLReader.readAll();
+  myFeaturesInFiles = aXMLReader.featuresInFiles();
+}
+
+
+void ModuleBase_IModule::actionCreated(QAction* theFeature)
+{
+  connect(theFeature, SIGNAL(triggered(bool)), this, SLOT(onFeatureTriggered()));
+}
+
+
+void ModuleBase_IModule::onFeatureTriggered()
+{
+  QAction* aCmd = dynamic_cast<QAction*>(sender());
+  //Do nothing on uncheck
+  if (aCmd->isCheckable() && !aCmd->isChecked())
+    return;
+  launchOperation(aCmd->data().toString());
+}
+
+
+void ModuleBase_IModule::editFeature(FeaturePtr theFeature)
+{
+  ModuleBase_Operation* anOperation = createOperation(theFeature->getKind());
+  anOperation->setFeature(theFeature);
+  sendOperation(anOperation);
 }

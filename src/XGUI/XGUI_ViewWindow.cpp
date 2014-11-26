@@ -1215,3 +1215,8 @@ void XGUI_ViewWindow::updateEnabledDrawMode()
 {
   myEnableDrawMode = myViewer->isSelectionEnabled() && myViewer->isMultiSelectionEnabled();
 }
+
+Handle(V3d_View) XGUI_ViewWindow::v3dView() const
+{
+  return myViewPort->getView();
+}

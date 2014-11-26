@@ -8,7 +8,10 @@
 #include <ModuleBase_ViewerFilters.h>
 #include <XGUI_Command.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_CompositeFeature.h>
+
 #include <StdSelect_FaceFilter.hxx>
+#include <TopoDS_Shape.hxx>
 
 #include <QMap>
 #include <QObject>
@@ -17,12 +20,8 @@
 
 #include <memory>
 
-class PartSet_Listener;
-class ModelAPI_Feature;
-class XGUI_ViewerPrs;
-class XGUI_Workshop;
 class ModuleBase_Operation;
-class GeomAPI_AISObject;
+class ModuleBase_IViewWindow;
 
 class PARTSET_EXPORT PartSet_Module : public ModuleBase_IModule
 {
@@ -33,12 +32,12 @@ Q_OBJECT
   virtual ~PartSet_Module();
 
   /// Reads description of features from XML file 
-  virtual void createFeatures();
+  //virtual void createFeatures();
 
   /// Called on creation of menu item in desktop
-  virtual void featureCreated(QAction* theFeature);
+  //virtual void featureCreated(QAction* theFeature);
 
-  std::string featureFile(const std::string&);
+  //std::string featureFile(const std::string&);
 
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
@@ -46,119 +45,160 @@ Q_OBJECT
 
   /// Updates current operation preview, if it has it.
   /// \param theCmdId the operation name
-  void updateCurrentPreview(const std::string& theCmdId);
+  //void updateCurrentPreview(const std::string& theCmdId);
 
   /// Creates custom widgets for property panel
   virtual QWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
-                                      Config_WidgetAPI* theWidgetApi,
+                                      Config_WidgetAPI* theWidgetApi, std::string theParentId,
                                       QList<ModuleBase_ModelWidget*>& theModelWidgets);
 
-  XGUI_Workshop* xWorkshop() const;
+  //XGUI_Workshop* xWorkshop() const;
 
 
   /// Returns list of selection modes for the given object for sketch operation
-  static QIntList sketchSelectionModes(ObjectPtr theFeature);
+  //static QIntList sketchSelectionModes(ObjectPtr theFeature);
+
+  /// Call back forlast tuning of property panel before operation performance
+  virtual void propertyPanelDefined(ModuleBase_Operation* theOperation);
+
+  QStringList sketchOperationIdList() const;
 
  public slots:
-  void onFeatureTriggered();
+  //void onFeatureTriggered();
   /// SLOT, that is called after the operation is started. Connect on the focus activated signal
-  void onOperationStarted(ModuleBase_Operation* theOperation);
+  //void onOperationStarted(ModuleBase_Operation* theOperation);
   /// SLOT, that is called after the operation is stopped. Switched off the modfications performed
   /// by the operation start
-  void onOperationStopped(ModuleBase_Operation* theOperation);
+  //void onOperationStopped(ModuleBase_Operation* theOperation);
   /// SLOT, that is called afetr the popup menu action clicked.
-  void onContextMenuCommand(const QString& theId, bool isChecked);
+  //void onContextMenuCommand(const QString& theId, bool isChecked);
 
   /// SLOT, to apply to the current viewer the operation
   /// \param theX the X projection value
   /// \param theY the Y projection value
   /// \param theZ the Z projection value
-  void onPlaneSelected(double theX, double theY, double theZ);
+  //void onPlaneSelected(double theX, double theY, double theZ);
 
   /// SLOT, to fit all current viewer
-  void onFitAllView();
+  //void onFitAllView();
 
-  void onRestartOperation(std::string theName, ObjectPtr theFeature);
+  //void onRestartOperation(std::string theName, ObjectPtr theFeature);
 
   /// SLOT, to switch on/off the multi selection in the viewer
   /// \param theEnabled the enabled state
-  void onMultiSelectionEnabled(bool theEnabled);
+  //void onMultiSelectionEnabled(bool theEnabled);
 
   /// SLOT, to stop or start selection mode for the features
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
-  void onStopSelection(const QList<ObjectPtr>& theFeatures, const bool isStop);
+  //void onStopSelection(const QList<ObjectPtr>& theFeatures, const bool isStop);
 
   /// SLOT, to set selection
   /// \param theFeatures a list of features to be selected
-  void onSetSelection(const QList<ObjectPtr>& theFeatures);
+  //void onSetSelection(const QList<ObjectPtr>& theFeatures);
 
   /// SLOT, Defines Sketch editing mode
   /// \param thePln - plane of current sketch
-  void setSketchingMode(const gp_Pln& thePln);
+  //void setSketchingMode(const gp_Pln& thePln);
 
   /// SLOT, to visualize the feature in another local context mode
   /// \param theFeature the feature to be put in another local context mode
   /// \param theMode the mode appeared on the feature
-  void onFeatureConstructed(ObjectPtr theFeature, int theMode);
+  //void onFeatureConstructed(ObjectPtr theFeature, int theMode);
 
   /// Slot which reacts to the point 2d set to the feature. Creates a constraint
   /// \param the feature
   /// \param the attribute of the feature
-  void onStorePoint2D(ObjectPtr theFeature, const std::string& theAttribute);
+  //void onStorePoint2D(ObjectPtr theFeature, const std::string& theAttribute);
 
   /// Called when sketch is launched
-  void onSketchLaunched();
+  //void onSketchLaunched();
 
 protected slots:
-  /// Called on selection changed event
+  /// Called when previous operation is finished
+  virtual void onOperationComitted(ModuleBase_Operation* theOperation);
+
+  virtual void onOperationAborted(ModuleBase_Operation* theOperation);
+
+  virtual void onOperationStarted(ModuleBase_Operation* theOperation);
+
+  virtual void onOperationStopped(ModuleBase_Operation* theOperation);
+
+  /// Called when previous operation is finished
   virtual void onSelectionChanged();
+
+  /// Called on selection changed event
+  //virtual void onSelectionChanged();
 
   /// SLOT, that is called by mouse press in the viewer.
   /// The mouse released point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
-  virtual void onMousePressed(QMouseEvent* theEvent);
+  void onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
   /// SLOT, that is called by mouse release in the viewer.
   /// The mouse released point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
-  virtual void onMouseReleased(QMouseEvent* theEvent);
+  virtual void onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
   
   /// SLOT, that is called by mouse move in the viewer.
   /// The mouse moved point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
-  virtual void onMouseMoved(QMouseEvent* theEvent);
+  virtual void onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
   /// SLOT, that is called by the mouse double click in the viewer.
   /// \param theEvent the mouse event
-  virtual void onMouseDoubleClick(QMouseEvent* theEvent);
+  //virtual void onMouseDoubleClick(QMouseEvent* theEvent);
 
   /// SLOT, that is called by the key in the viewer is clicked.
   /// \param theEvent the mouse event
-  virtual void onKeyRelease(QKeyEvent* theEvent);
+  //virtual void onKeyRelease(QKeyEvent* theEvent);
+
+  /// Launches the operation from current highlighting
+  void launchEditing();
 
  protected:
-  /// Creates a new operation
-  /// \param theCmdId the operation name
-  /// \param theFeatureKind a kind of feature to get the feature xml description
-  ModuleBase_Operation* createOperation(const std::string& theCmdId,
-                                        const std::string& theFeatureKind = "");
+  /// Register validators for this module
+  virtual void registerValidators();
 
+  /// Returns new instance of operation object (used in createOperation for customization)
+  //virtual ModuleBase_Operation* getNewOperation(const std::string& theFeatureId);
 
- protected:
   //! Edits the feature
-  void editFeature(FeaturePtr theFeature);
+  //void editFeature(FeaturePtr theFeature);
 
-  gp_Pln getSketchPlane(FeaturePtr theSketch) const;
+  //gp_Pln getSketchPlane(FeaturePtr theSketch) const;
+
+ private slots:
+   void onVertexSelected(ObjectPtr theObject, const TopoDS_Shape& theShape);
 
  private:
+   /// Converts mouse position to 2d coordinates. 
+   /// Member myCurrentSketch has to be correctly defined
+  void get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent, 
+                  double& theX, double& theY);
+
+  /// Breaks sequense of automatically resterted operations
+  void breakOperationSequence();
+
   //XGUI_Workshop* myWorkshop;
-  PartSet_Listener* myListener;
+  //PartSet_Listener* myListener;
 
-  std::map<std::string, std::string> myFeaturesInFiles;
+  //std::map<std::string, std::string> myFeaturesInFiles;
 
-  Handle(StdSelect_FaceFilter) myPlaneFilter;
-  Handle(ModuleBase_ShapeInPlaneFilter) mySketchFilter;
+  //Handle(StdSelect_FaceFilter) myPlaneFilter;
+  //Handle(ModuleBase_ShapeInPlaneFilter) mySketchFilter;
+   QString myLastOperationId;
+   FeaturePtr myLastFeature;
+
+   bool myIsDragging;
+   bool myDragDone;
+
+   // Automatical restarting mode flag
+   bool myRestartingMode;
+
+   double myCurX, myCurY;
+   CompositeFeaturePtr myCurrentSketch;
+   QList<FeaturePtr> myEditingFeatures;
 };
 
 #endif

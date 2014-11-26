@@ -6,22 +6,22 @@
       <!--icon=":pictures/x_point.png"-->
       </feature>
       <feature id="SketchPoint" title="Point" tooltip="Create a new point" icon=":icons/point.png">
-        <point_selector id="PointCoordindates" title="Point" tooltip="Point"/>
+        <sketch-2dpoint_selector id="PointCoordindates" title="Point" tooltip="Point"/>
       </feature>
       <feature id="SketchLine" title="Line" tooltip="Create a new line" icon=":icons/line.png">
-        <point_selector id="StartPoint" title="Start point" tooltip="Start point of the line" previous_feature_param="EndPoint"/>
-        <point_selector id="EndPoint" title="End point" tooltip="End point of the line"/>
+        <sketch-2dpoint_selector id="StartPoint" title="Start point" tooltip="Start point of the line" previous_feature_param="EndPoint"/>
+        <sketch-2dpoint_selector id="EndPoint" title="End point" tooltip="End point of the line"/>
       </feature>
       <feature id="SketchCircle" title="Circle" tooltip="Create a new circle" icon=":icons/circle.png">
-        <point_selector id="CircleCenter" title="Center" tooltip="Center of the circle"/>
+        <sketch-2dpoint_selector id="CircleCenter" title="Center" tooltip="Center of the circle"/>
         <point2ddistance id="CircleRadius" first_point="CircleCenter" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set Radius">
           <validator id="GeomValidators_Positive"/>
         </point2ddistance>
       </feature>
       <feature id="SketchArc" title="Arc" tooltip="Create a new arc of a circle" icon=":icons/arc.png">
-        <point_selector id="ArcCenter" title="Center" tooltip="Center of the arc"/>
-        <point_selector id="ArcStartPoint" title="Start point" tooltip="Start point of the arc"/>
-        <point_selector id="ArcEndPoint" title="End point" tooltip="End point of the arc"/>
+        <sketch-2dpoint_selector id="ArcCenter" title="Center" tooltip="Center of the arc"/>
+        <sketch-2dpoint_selector id="ArcStartPoint" title="Start point" tooltip="Start point of the arc"/>
+        <sketch-2dpoint_selector id="ArcEndPoint" title="End point" tooltip="End point of the arc"/>
       </feature>
     </group>
 	  
@@ -30,18 +30,11 @@
 
       <feature id="SketchConstraintDistance" title="Distance" tooltip="Create constraint for the distance from a point to an object" icon=":icons/distance.png">
         <label title="Select objects for distance definition. Following objects can be accepted: point, line or arc end point, center of circle or arc."/>
-        <feature_or_attribute_selector id="ConstraintEntityA" label="First object" tooltip="Select point, line end point, line, center of circle or arc.">
-          <validator id="SketchPlugin_ResultPoint"/>
-          <validator id="SketchPlugin_ResultLine"/>
-          <validator id="SketchPlugin_DifferentObjects"/>
-        </feature_or_attribute_selector>
-        <feature_or_attribute_selector id="ConstraintEntityB" label="Last object" tooltip="Select point, line end point, line, center of circle or arc.">
-          <validator id="SketchPlugin_ResultPoint"/>
-          <validator id="SketchPlugin_ResultLine"/>
-          <validator id="SketchPlugin_DistanceAttr" parameters="ConstraintEntityA"/>
-          <validator id="SketchPlugin_DifferentObjects"/>
-        </feature_or_attribute_selector>
-        <point_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
+		<shape_selector id="ConstraintEntityA" label="First object" tooltip="Select point, line end point, line, center of circle or arc." 
+			shape_types="edge vertex"/>
+		<shape_selector id="ConstraintEntityB" label="Last object" tooltip="Select point, line end point, line, center of circle or arc." 
+			shape_types="edge vertex"/>
+        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue" default="computed" min="0">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
@@ -50,10 +43,9 @@
       
       <feature id="SketchConstraintLength" title="Length" tooltip="Create constraint for the given length of a line segment" icon=":icons/length.png">
         <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
-        <feature_selector id="ConstraintEntityA" label="Line" tooltip="Select an line in the viewer">
-          <validator id="SketchPlugin_ResultLine"/>
-        </feature_selector>
-        <point_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
+		<shape_selector id="ConstraintEntityA" label="Line" tooltip="Select an line in the viewer" 
+			shape_types="edge" />
+        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue" default="computed">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
@@ -62,45 +54,33 @@
       
       <feature id="SketchConstraintRadius" title="Radius" tooltip="Create constraint for the given radius of a circle or an arc" icon=":icons/radius_constr.png">
         <label title="Select a circle or an arc on which to calculate radius" tooltip="Select a circle or an arc on which to calculate radius"/>
-        <feature_selector id="ConstraintEntityA" label="Circle or Arc" tooltip="Select a circle or an arc in the viewer">
-          <validator id="SketchPlugin_ResultArc"/>
-        </feature_selector>
-        <point_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
+		<shape_selector id="ConstraintEntityA" label="Circle or Arc" tooltip="Select a circle or an arc in the viewer" 
+			shape_types="edge"/>
+        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue" default="computed"/>
         <validator id="PartSet_RadiusValidator"/>
       </feature>
       
       <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines" icon=":icons/parallel.png">
-        <feature_selector id="ConstraintEntityA" label="First line" tooltip="Select an line in the viewer">
-          <validator id="SketchPlugin_ResultLine"/>
-          <validator id="SketchPlugin_DifferentObjects"/>
-        </feature_selector>
-        <feature_selector id="ConstraintEntityB" label="Last line" tooltip="Select an line in the viewer">
-          <validator id="SketchPlugin_ResultLine"/>
-          <validator id="SketchPlugin_DifferentObjects"/>
-        </feature_selector>
-        <point_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
+		<shape_selector id="ConstraintEntityA" label="First line" tooltip="Select an line in the viewer" 
+			shape_types="edge" use_subshapes="true"/>
+		<shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select an line in the viewer" 
+			shape_types="edge" use_subshapes="true"/>
+        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
         <validator id="PartSet_ParallelValidator"/>
       </feature>
       
       <feature id="SketchConstraintPerpendicular" title="Perpendicular" tooltip="Create constraint defining two perpendicular lines" icon=":icons/perpendicular.png">
-        <feature_selector id="ConstraintEntityA" label="First line" tooltip="Select an line in the viewer">
-          <validator id="SketchPlugin_ResultLine"/>
-          <validator id="SketchPlugin_DifferentObjects"/>
-        </feature_selector>
-        <feature_selector id="ConstraintEntityB" label="Last line" tooltip="Select an line in the viewer">
-          <validator id="SketchPlugin_ResultLine"/>
-          <validator id="SketchPlugin_DifferentObjects"/>
-        </feature_selector>
+		<shape_selector id="ConstraintEntityA" label="First line" tooltip="Select an line in the viewer" 
+			shape_types="edge" use_subshapes="true"/>
+		<shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select an line in the viewer" 
+			shape_types="edge" use_subshapes="true"/>
         <validator id="PartSet_PerpendicularValidator"/>
       </feature>
 
       <feature id="SketchConstraintRigid" title="Fixed" tooltip="Create constraint defining fixed object" icon=":icons/fixed.png">
-        <feature_or_attribute_selector id="ConstraintEntityA" label="Object" tooltip="Select any object in the viewer">
-          <validator id="SketchPlugin_ResultPoint"/>
-          <validator id="SketchPlugin_ResultLine"/>
-          <validator id="SketchPlugin_ResultArc"/>
-        </feature_or_attribute_selector>
+	      <shape_selector id="ConstraintEntityA" label="Object" tooltip="Select any object in the viewer" 
+			shape_types="edge vertex"/>
       </feature>
     </group>
   </workbench>

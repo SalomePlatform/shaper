@@ -15,6 +15,7 @@
 #include <Events_Message.h>
 #include <GeomAPI_Interface.h>
 #include <GeomAPI_Shape.h>
+
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -27,6 +28,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeRefAttr.h>
+
 #include <Config_WidgetAPI.h>
 #include <Events_Error.h>
 
@@ -127,24 +130,36 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
 
   DataPtr aData = myFeature->data();
   if (myUseSubShapes) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = 
-      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aData->attribute(attributeID()));
-
     ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(mySelectedObject);
     if (aBody) {
-      aSelect->setValue(aBody, myShape);
+      AttributePtr aAttr = aData->attribute(attributeID());
+      std::shared_ptr<ModelAPI_AttributeSelection> aSelectAttr = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aAttr);
+
+      if (aSelectAttr)
+        aSelectAttr->setValue(aBody, myShape);
       updateObject(myFeature);
       return true;
     }
   } else {
-    std::shared_ptr<ModelAPI_AttributeReference> aRef = 
-      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
-
-    ObjectPtr aObject = aRef->value();
-    if (!(aObject && aObject->isSame(mySelectedObject))) {
-      aRef->setValue(mySelectedObject);
-      updateObject(myFeature);
-      return true;
+    AttributeReferencePtr aRef = aData->reference(attributeID());
+    if (aRef) {
+      ObjectPtr aObject = aRef->value();
+      if (!(aObject && aObject->isSame(mySelectedObject))) {
+        aRef->setValue(mySelectedObject);
+        updateObject(myFeature);
+        return true;
+      }
+    } else {
+      AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+      if (aRefAttr) {
+        ObjectPtr aObject = aRefAttr->object();
+        if (!(aObject && aObject->isSame(mySelectedObject))) {
+          aRefAttr->setObject(mySelectedObject);
+          updateObject(myFeature);
+          return true;
+        }
+      }
     }
   }
   return false;
@@ -162,8 +177,14 @@ bool ModuleBase_WidgetShapeSelector::restoreValue()
       myShape = aSelect->value();
     }
   } else {
-    std::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(attributeID());
-    mySelectedObject = aRef->value();
+    AttributeReferencePtr aRef = aData->reference(attributeID());
+    if (aRef)
+      mySelectedObject = aRef->value();
+    else {
+      AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+      if (aRefAttr)
+        mySelectedObject = aRefAttr->object();
+    }
   }
   updateSelectionName();
 
@@ -182,7 +203,7 @@ QList<QWidget*> ModuleBase_WidgetShapeSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 {
-  QList<ObjectPtr> aObjects = myWorkshop->selection()->selectedObjects();
+  QObjectPtrList aObjects = myWorkshop->selection()->selectedPresentations();
   if (aObjects.size() > 0) {
     ObjectPtr aObject = aObjects.first();
     if ((!mySelectedObject) && (!aObject))
@@ -249,10 +270,6 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, std::shared_ptr
   myShape = theShape;
   if (mySelectedObject) {
     raisePanel();
-    if (!myUseSubShapes) {
-      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TOHIDE);
-      ModelAPI_EventCreator::get()->sendUpdated(mySelectedObject, anEvent);
-    }
   } 
   updateSelectionName();
   //activateSelection(false);
@@ -382,23 +399,6 @@ void ModuleBase_WidgetShapeSelector::raisePanel() const
     QDockWidget* aTabWgt = (QDockWidget*) aParent;
     aTabWgt->raise();
   }
-}
-
-//********************************************************************
-bool ModuleBase_WidgetShapeSelector::focusTo()
-{
-  //activateSelection(true);
-  return ModuleBase_ModelWidget::focusTo();
-}
-
-//********************************************************************
-bool ModuleBase_WidgetShapeSelector::eventFilter(QObject* theObj, QEvent* theEvent)
-{
-  //if (theObj == myTextLine) {
-  //  if (theEvent->type() == QEvent::FocusIn)
-  //    activateSelection(true);
-  //}
-  return ModuleBase_ModelWidget::eventFilter(theObj, theEvent);
 }
 
 //********************************************************************

@@ -101,12 +101,18 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
   // value calculation
   std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
-  double aValue = aValueAttr->value();
+  // TODO: has to be calculated on definition of reference object
+  double aValue;
   // Issue #196: checking the positivity of the distance constraint
   // there is a validator for a distance constraint, that the value should be positive
   // in case if an invalid value is set, the current distance value is shown
-  if (aValue <= 0)
+  if (aValueAttr->isInitialized())
+    aValue = aValueAttr->value();
+  else {
     aValue = calculateCurrentDistance();
+    aValueAttr->setValue(aValue);
+  }
+  // End TODO
 
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS)

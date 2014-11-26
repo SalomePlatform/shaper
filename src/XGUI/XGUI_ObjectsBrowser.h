@@ -21,7 +21,7 @@ Q_OBJECT
   virtual ~XGUI_DataTree();
 
   //! Returns list of currently selected objects
-  QList<ObjectPtr> selectedObjects() const
+  QObjectPtrList selectedObjects() const
   {
     return mySelectedData;
   }
@@ -52,7 +52,7 @@ public slots:
 
  private:
   //! List of currently selected data
-  QList<ObjectPtr> mySelectedData;
+  QObjectPtrList mySelectedData;
 };
 
 /**\class XGUI_ObjectsBrowser
@@ -73,12 +73,12 @@ Q_OBJECT
   }
 
   //! Returns list of currently selected objects
-  QList<ObjectPtr> selectedObjects() const
+  QObjectPtrList selectedObjects() const
   {
     return myObjectsList;
   }
 
-  void setObjectsSelected(const QList<ObjectPtr>& theObjects);
+  void setObjectsSelected(const QObjectPtrList& theObjects);
 
   //! Returns currently selected indexes
   QModelIndexList selectedIndexes() const
@@ -134,7 +134,7 @@ signals:
   QLineEdit* myActiveDocLbl;
   XGUI_DataTree* myTreeView;
 
-  QList<ObjectPtr> myObjectsList;
+  QObjectPtrList myObjectsList;
 };
 
 #endif

@@ -7,7 +7,6 @@
 
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_Constants.h>
-#include <ModuleBase_WidgetPoint2D.h>
 
 #include <QWidget>
 #include <QVBoxLayout>
@@ -71,6 +70,8 @@ XGUI_PropertyPanel::~XGUI_PropertyPanel()
 
 void XGUI_PropertyPanel::cleanContent()
 {
+  if (myActiveWidget)
+    myActiveWidget->deactivate();
   myWidgets.clear();
   qDeleteAll(myCustomWidget->children());
   myActiveWidget = NULL;
@@ -79,7 +80,6 @@ void XGUI_PropertyPanel::cleanContent()
 void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets)
 {
   myWidgets = theWidgets;
-  int aS = myWidgets.size();
   if (theWidgets.empty()) return;
 
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast =
@@ -92,10 +92,10 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
     connect(*anIt, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)),
             this, SLOT(activateWidget(ModuleBase_ModelWidget*)));
 
-    ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
-    if (aPointWidget)
-      connect(aPointWidget, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)), this,
-              SIGNAL(storedPoint2D(ObjectPtr, const std::string&)));
+    //ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
+    //if (aPointWidget)
+    //  connect(aPointWidget, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)), this,
+    //          SIGNAL(storedPoint2D(ObjectPtr, const std::string&)));
   }
   ModuleBase_ModelWidget* aLastWidget = theWidgets.last();
   if (aLastWidget) {
@@ -181,5 +181,8 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
     theWidget->setHighlighted(true);
   }
   myActiveWidget = theWidget;
-  emit widgetActivated(theWidget);
+  if (myActiveWidget)
+    emit widgetActivated(theWidget);
+  else
+    emit noMoreWidgets();
 }

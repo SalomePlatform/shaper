@@ -336,7 +336,7 @@ void XGUI_ObjectsBrowser::rebuildDataTree()
 }
 
 //***************************************************
-void XGUI_ObjectsBrowser::setObjectsSelected(const QList<ObjectPtr>& theObjects)
+void XGUI_ObjectsBrowser::setObjectsSelected(const QObjectPtrList& theObjects)
 {
   QList<QModelIndex> theIndexes;
   QItemSelectionModel* aSelectModel = myTreeView->selectionModel();

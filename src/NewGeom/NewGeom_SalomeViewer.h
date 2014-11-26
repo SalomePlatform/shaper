@@ -65,12 +65,13 @@ Q_OBJECT
   }
 
  private slots:
-  void onMousePress(SUIT_ViewWindow*, QMouseEvent*);
-  void onMouseRelease(SUIT_ViewWindow*, QMouseEvent*);
-  void onMouseDoubleClick(SUIT_ViewWindow*, QMouseEvent*);
-  void onMouseMove(SUIT_ViewWindow*, QMouseEvent*);
-  void onKeyPress(SUIT_ViewWindow*, QKeyEvent*);
-  void onKeyRelease(SUIT_ViewWindow*, QKeyEvent*);
+  // TODO: Provide ModuleBase_IViewWindow interface
+  //void onMousePress(SUIT_ViewWindow*, QMouseEvent*);
+  //void onMouseRelease(SUIT_ViewWindow*, QMouseEvent*);
+  //void onMouseDoubleClick(SUIT_ViewWindow*, QMouseEvent*);
+  //void onMouseMove(SUIT_ViewWindow*, QMouseEvent*);
+  //void onKeyPress(SUIT_ViewWindow*, QKeyEvent*);
+  //void onKeyRelease(SUIT_ViewWindow*, QKeyEvent*);
 
  private:
   NewGeom_OCCSelector* mySelector;

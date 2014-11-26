@@ -53,11 +53,11 @@ void SketchPlugin_ConstraintRadius::execute()
       if (aCenterAttr && aStartAttr)
         aRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
     }
-    std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-        ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-    if(!aValueAttr->isInitialized()) {
-      aValueAttr->setValue(aRadius);
-    }
+    //std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
+    //    ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
+    //if(!aValueAttr->isInitialized()) {
+    //  aValueAttr->setValue(aRadius);
+    //}
   }
 }
 
@@ -85,14 +85,14 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
   } 
 
   // Prepare a circle
-  aData = aFeature->data();
+  std::shared_ptr<ModelAPI_Data> aCyrcData = aFeature->data();
   std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr;
   double aRadius;
   if (aKind == SketchPlugin_Circle::ID()) {
     aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aData->attribute(SketchPlugin_Circle::CENTER_ID()));
+        aCyrcData->attribute(SketchPlugin_Circle::CENTER_ID()));
     AttributeDoublePtr aCircRadius = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-        aData->attribute(SketchPlugin_Circle::RADIUS_ID()));
+        aCyrcData->attribute(SketchPlugin_Circle::RADIUS_ID()));
     aRadius = aCircRadius->value();
     if (!aFlyoutPnt) {
       double aShift = aRadius * 1.1;
@@ -104,13 +104,13 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
     }
   } else if (aKind == SketchPlugin_Arc::ID()) {
     aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aData->attribute(SketchPlugin_Arc::CENTER_ID()));
+        aCyrcData->attribute(SketchPlugin_Arc::CENTER_ID()));
     std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
-        GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));
+        GeomDataAPI_Point2D>(aCyrcData->attribute(SketchPlugin_Arc::START_ID()));
     aRadius = aCenterAttr->pnt()->distance(aStartAttr->pnt());
     if (!aFlyoutPnt) {
       std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
-        GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Arc::START_ID()));      
+        GeomDataAPI_Point2D>(aCyrcData->attribute(SketchPlugin_Arc::START_ID()));      
       aFlyoutAttr->setValue(aStartAttr->pnt());
       aFlyoutPnt = sketch()->to3D(aStartAttr->pnt()->x(), aStartAttr->pnt()->y());
     }
@@ -123,12 +123,16 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
   std::shared_ptr<GeomAPI_Circ> aCircle(new GeomAPI_Circ(aCenter, aNormal, aRadius));
 
   // Value
+  // TODO: has to be calculated on definition of reference object
   std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
   double aValue = aRadius;
-  if (aValueAttr && aValueAttr->isInitialized())
+  if (aValueAttr->isInitialized())
     aValue = aValueAttr->value();
-
+  else {
+    aValueAttr->setValue(aValue);
+  }
+  // End TODO
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS)
     anAIS = AISObjectPtr(new GeomAPI_AISObject);

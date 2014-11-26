@@ -74,63 +74,41 @@ bool ModuleBase_Operation::isNestedOperationsEnabled() const
   return true;
 }
 
-void ModuleBase_Operation::storeCustomValue()
-{
-  if (!myFeature) {
-#ifdef _DEBUG
-    qDebug() << "ModuleBase_Operation::storeCustom: " <<
-    "trying to store value without opening a transaction.";
-#endif
-    return;
-  }
+//void ModuleBase_Operation::storeCustomValue()
+//{
+//  if (!myFeature) {
+//#ifdef _DEBUG
+//    qDebug() << "ModuleBase_Operation::storeCustom: " <<
+//    "trying to store value without opening a transaction.";
+//#endif
+//    return;
+//  }
+//
+//  ModuleBase_ModelWidget* aCustom = dynamic_cast<ModuleBase_ModelWidget*>(sender());
+//  if (aCustom)
+//    aCustom->storeValue();
+//}
 
-  ModuleBase_ModelWidget* aCustom = dynamic_cast<ModuleBase_ModelWidget*>(sender());
-  if (aCustom)
-    aCustom->storeValue();
-}
-
-void ModuleBase_Operation::startOperation()
-{
-  if (!myIsEditing)
-    createFeature();
-}
-
-void ModuleBase_Operation::stopOperation()
-{
-}
-
-void ModuleBase_Operation::abortOperation()
-{
-}
-
-void ModuleBase_Operation::commitOperation()
-{
-}
-
-void ModuleBase_Operation::afterCommitOperation()
-{
-}
 
 bool ModuleBase_Operation::canBeCommitted() const
 {
   return isValid();
 }
-
-void ModuleBase_Operation::flushUpdated()
-{
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-}
+//
+//void ModuleBase_Operation::flushUpdated()
+//{
+//  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+//}
 
 void ModuleBase_Operation::flushCreated()
 {
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
 }
 
-FeaturePtr ModuleBase_Operation::createFeature(
-  const bool theFlushMessage, CompositeFeaturePtr theCompositeFeature)
+FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
 {
-  if (theCompositeFeature) {
-    myFeature = theCompositeFeature->addFeature(getDescription()->operationId().toStdString());
+  if (myParentFeature) {
+    myFeature = myParentFeature->addFeature(getDescription()->operationId().toStdString());
   } else {
     std::shared_ptr<ModelAPI_Document> aDoc = document();
     myFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
@@ -167,7 +145,7 @@ bool ModuleBase_Operation::hasObject(ObjectPtr theObj) const
     std::list<ResultPtr> aResults = aFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-      if ((*aIt) == theObj)
+      if (theObj == (*aIt))
         return true;
     }
   }
@@ -185,15 +163,26 @@ void ModuleBase_Operation::start()
 {
   ModelAPI_Session::get()->startOperation();
 
+  if (!myIsEditing)
+    createFeature();
+
   startOperation();
   emit started();
+}
+
+void ModuleBase_Operation::postpone()
+{
+  if (myPropertyPanel)
+    disconnect(myPropertyPanel, 0, this, 0);
+  emit postponed();
 }
 
 void ModuleBase_Operation::resume()
 {
   if (myPropertyPanel)
-    connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
-            this,            SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
+    connect(myPropertyPanel, SIGNAL(noMoreWidgets()), SLOT(commit()));
+  //  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
+  //          this,            SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
   emit resumed();
 }
 
@@ -213,13 +202,10 @@ void ModuleBase_Operation::abort()
 bool ModuleBase_Operation::commit()
 {
   if (canBeCommitted()) {
+    if (myPropertyPanel)
+      disconnect(myPropertyPanel, 0, this, 0);
+
     commitOperation();
-    emit committed();
-
-  if (myPropertyPanel)
-    disconnect(myPropertyPanel, 0, this, 0);
-
-    stopOperation();
     // check whether there are modifications performed during the current operation
     // in the model
     // in case if there are no modifications, do not increase the undo/redo stack
@@ -228,7 +214,9 @@ bool ModuleBase_Operation::commit()
     else
       ModelAPI_Session::get()->abortOperation();
 
+    stopOperation();
     emit stopped();
+    emit committed();
 
     afterCommitOperation();
     return true;
@@ -309,7 +297,7 @@ void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,
     QList<ModuleBase_ViewerPrs> aSelected = theSelection->getSelected();
 
     std::list<ResultPtr> aResults = aFeature->results();
-    QList<ObjectPtr> aResList;
+    QObjectPtrList aResList;
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
       aResList.append(*aIt);
@@ -335,29 +323,29 @@ void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,
   }
 }
 
-void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
-{
-  //activateByPreselection();
-  //if (theWidget && myPropertyPanel) {
-  //  myPropertyPanel->activateNextWidget();
-  ////  //emit activateNextWidget(myActiveWidget);
-  //}
-}
+//void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
+//{
+//  //activateByPreselection();
+//  //if (theWidget && myPropertyPanel) {
+//  //  myPropertyPanel->activateNextWidget();
+//  ////  //emit activateNextWidget(myActiveWidget);
+//  //}
+//}
 
-bool ModuleBase_Operation::setWidgetValue(ObjectPtr theFeature, double theX, double theY)
-{
-  ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
-  if (!aActiveWgt)
-    return false;
-  ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
-  aValue->setObject(theFeature);
-  aValue->setPoint(std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
-  bool isApplyed = aActiveWgt->setValue(aValue);
-
-  delete aValue;
-  myIsModified = (myIsModified || isApplyed);
-  return isApplyed;
-}
+//bool ModuleBase_Operation::setWidgetValue(ObjectPtr theFeature, double theX, double theY)
+//{
+//  ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
+//  if (!aActiveWgt)
+//    return false;
+//  ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
+//  aValue->setObject(theFeature);
+//  aValue->setPoint(std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY)));
+//  bool isApplyed = aActiveWgt->setValue(aValue);
+//
+//  delete aValue;
+//  myIsModified = (myIsModified || isApplyed);
+//  return isApplyed;
+//}
 
 bool ModuleBase_Operation::getViewerPoint(ModuleBase_ViewerPrs thePrs,
                                                ModuleBase_IViewer* theViewer,
@@ -376,6 +364,14 @@ void ModuleBase_Operation::clearPreselection()
 void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp) 
 { 
   myPropertyPanel = theProp; 
-  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), this,
-          SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
+  //connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), this,
+  //        SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
+  if (myPropertyPanel) {
+    connect(myPropertyPanel, SIGNAL(noMoreWidgets()), SLOT(commit()));
+  }
+}
+
+bool ModuleBase_Operation::isGranted(QString theId) const
+{
+  return myNestedFeatures.contains(theId);
 }

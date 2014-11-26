@@ -50,6 +50,9 @@ Q_OBJECT
   //! Returns currently active operation
   virtual ModuleBase_Operation* currentOperation() const = 0;
 
+  //! Returns true if the operation with id theId can be started
+  virtual bool canStartOperation(QString theId) = 0;
+
   //! Returns AIS opbject by data object
   virtual AISObjectPtr findPresentation(const ObjectPtr& theObject) const = 0;
 
@@ -58,13 +61,30 @@ Q_OBJECT
 
   //! Select features clearing previous selection. 
   //! If the list is empty then selection will be cleared
-  virtual void setSelected(const QList<ObjectPtr>& theFeatures) = 0;
+  virtual void setSelected(const QObjectPtrList& theFeatures) = 0;
 
 signals:
   void selectionChanged();
 
-  void operationStarted(ModuleBase_Operation*);
-  void operationStopped(ModuleBase_Operation*);
+  /// Signal about an operation is started. It is emitted after the start() of operation is done.
+  void operationStarted(ModuleBase_Operation* theOperation);
+
+  /// Signal about an operation is stopped. It is emitted after the stop() of operation is done.
+  /// \param theOperation a stopped operation
+  void operationStopped(ModuleBase_Operation* theOperation);
+
+  /// Signal about an operation is resumed. It is emitted after the resume() of operation is done.
+  void operationResumed(ModuleBase_Operation* theOperation);
+
+  /// Emitted when current operation is comitted
+  void operationComitted(ModuleBase_Operation* theOperation);
+
+  /// Emitted when current operation is aborted
+  void operationAborted(ModuleBase_Operation* theOperation);
+
+  /// Signal which is emited after activation of property panel
+  void propertyPanelActivated();
+
 };
 
 #endif

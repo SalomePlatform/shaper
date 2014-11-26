@@ -59,68 +59,64 @@ void NewGeom_SalomeViewer::setSelector(NewGeom_OCCSelector* theSel)
   OCCViewer_Viewer* aViewer = mySelector->viewer();
   SUIT_ViewManager* aMgr = aViewer->getViewManager();
 
-  connect(aMgr, SIGNAL(lastViewClosed(SUIT_ViewManager*)), this, SIGNAL(lastViewClosed()));
-  connect(aMgr, SIGNAL(tryCloseView(SUIT_ViewManager*)), this, SIGNAL(tryCloseView()));
-  connect(aMgr, SIGNAL(deleteView(SUIT_ViewManager*)), this, SIGNAL(deleteView()));
-  connect(aMgr, SIGNAL(viewCreated(SUIT_ViewManager*)), this, SIGNAL(viewCreated()));
-  connect(aMgr, SIGNAL(activated(SUIT_ViewManager*)), this, SIGNAL(activated()));
+  // TODO: Provide ModuleBase_IViewWindow interface
+  //connect(aMgr, SIGNAL(lastViewClosed(SUIT_ViewManager*)), this, SIGNAL(lastViewClosed()));
+  //connect(aMgr, SIGNAL(tryCloseView(SUIT_ViewManager*)), this, SIGNAL(tryCloseView()));
+  //connect(aMgr, SIGNAL(deleteView(SUIT_ViewManager*)), this, SIGNAL(deleteView()));
+  //connect(aMgr, SIGNAL(viewCreated(SUIT_ViewManager*)), this, SIGNAL(viewCreated()));
+  //connect(aMgr, SIGNAL(activated(SUIT_ViewManager*)), this, SIGNAL(activated()));
 
-  connect(aMgr, SIGNAL(mousePress(SUIT_ViewWindow*, QMouseEvent*)), this,
-          SLOT(onMousePress(SUIT_ViewWindow*, QMouseEvent*)));
-  connect(aMgr, SIGNAL(mouseRelease(SUIT_ViewWindow*, QMouseEvent*)), this,
-          SLOT(onMouseRelease(SUIT_ViewWindow*, QMouseEvent*)));
-  connect(aMgr, SIGNAL(mouseDoubleClick(SUIT_ViewWindow*, QMouseEvent*)), this,
-          SLOT(onMouseDoubleClick(SUIT_ViewWindow*, QMouseEvent*)));
-  connect(aMgr, SIGNAL(mouseMove(SUIT_ViewWindow*, QMouseEvent*)), this,
-          SLOT(onMouseMove(SUIT_ViewWindow*, QMouseEvent*)));
-  connect(aMgr, SIGNAL(keyPress(SUIT_ViewWindow*, QKeyEvent*)), this,
-          SLOT(onKeyPress(SUIT_ViewWindow*, QKeyEvent*)));
-  connect(aMgr, SIGNAL(keyRelease(SUIT_ViewWindow*, QKeyEvent*)), this,
-          SLOT(onKeyRelease(SUIT_ViewWindow*, QKeyEvent*)));
+  //connect(aMgr, SIGNAL(mousePress(SUIT_ViewWindow*, QMouseEvent*)), this,
+  //        SLOT(onMousePress(SUIT_ViewWindow*, QMouseEvent*)));
+  //connect(aMgr, SIGNAL(mouseRelease(SUIT_ViewWindow*, QMouseEvent*)), this,
+  //        SLOT(onMouseRelease(SUIT_ViewWindow*, QMouseEvent*)));
+  //connect(aMgr, SIGNAL(mouseDoubleClick(SUIT_ViewWindow*, QMouseEvent*)), this,
+  //        SLOT(onMouseDoubleClick(SUIT_ViewWindow*, QMouseEvent*)));
+  //connect(aMgr, SIGNAL(mouseMove(SUIT_ViewWindow*, QMouseEvent*)), this,
+  //        SLOT(onMouseMove(SUIT_ViewWindow*, QMouseEvent*)));
+  //connect(aMgr, SIGNAL(keyPress(SUIT_ViewWindow*, QKeyEvent*)), this,
+  //        SLOT(onKeyPress(SUIT_ViewWindow*, QKeyEvent*)));
+  //connect(aMgr, SIGNAL(keyRelease(SUIT_ViewWindow*, QKeyEvent*)), this,
+  //        SLOT(onKeyRelease(SUIT_ViewWindow*, QKeyEvent*)));
 
-  connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
+  //connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onMousePress(SUIT_ViewWindow*, QMouseEvent* theEvent)
-{
-  emit mousePress(theEvent);
-}
-
-//**********************************************
-void NewGeom_SalomeViewer::onMouseRelease(SUIT_ViewWindow*, QMouseEvent* theEvent)
-{
-  emit mouseRelease(theEvent);
-  //if ((theEvent->button() == Qt::RightButton) && 
-  //  (theEvent->modifiers() == Qt::NoModifier)) {
-  //  QContextMenuEvent aEvent(QContextMenuEvent::Mouse, theEvent->pos(), theEvent->globalPos());
-  //  emit contextMenuRequested(&aEvent);
-  //}
-}
-
-//**********************************************
-void NewGeom_SalomeViewer::onMouseDoubleClick(SUIT_ViewWindow*, QMouseEvent* theEvent)
-{
-  emit mouseDoubleClick(theEvent);
-}
-
-//**********************************************
-void NewGeom_SalomeViewer::onMouseMove(SUIT_ViewWindow*, QMouseEvent* theEvent)
-{
-  emit mouseMove(theEvent);
-}
-
-//**********************************************
-void NewGeom_SalomeViewer::onKeyPress(SUIT_ViewWindow*, QKeyEvent* theEvent)
-{
-  emit keyPress(theEvent);
-}
-
-//**********************************************
-void NewGeom_SalomeViewer::onKeyRelease(SUIT_ViewWindow*, QKeyEvent* theEvent)
-{
-  emit keyRelease(theEvent);
-}
+//void NewGeom_SalomeViewer::onMousePress(SUIT_ViewWindow*, QMouseEvent* theEvent)
+//{
+//  emit mousePress(theEvent);
+//}
+//
+////**********************************************
+//void NewGeom_SalomeViewer::onMouseRelease(SUIT_ViewWindow*, QMouseEvent* theEvent)
+//{
+//  emit mouseRelease(theEvent);
+//}
+//
+////**********************************************
+//void NewGeom_SalomeViewer::onMouseDoubleClick(SUIT_ViewWindow*, QMouseEvent* theEvent)
+//{
+//  emit mouseDoubleClick(theEvent);
+//}
+//
+////**********************************************
+//void NewGeom_SalomeViewer::onMouseMove(SUIT_ViewWindow*, QMouseEvent* theEvent)
+//{
+//  emit mouseMove(theEvent);
+//}
+//
+////**********************************************
+//void NewGeom_SalomeViewer::onKeyPress(SUIT_ViewWindow*, QKeyEvent* theEvent)
+//{
+//  emit keyPress(theEvent);
+//}
+//
+////**********************************************
+//void NewGeom_SalomeViewer::onKeyRelease(SUIT_ViewWindow*, QKeyEvent* theEvent)
+//{
+//  emit keyRelease(theEvent);
+//}
 
 //**********************************************
 void NewGeom_SalomeViewer::enableSelection(bool isEnabled)

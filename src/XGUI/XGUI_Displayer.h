@@ -57,7 +57,7 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void stopSelection(const QList<ObjectPtr>& theFeatures, const bool isStop,
+  void stopSelection(const QObjectPtrList& theFeatures, const bool isStop,
                      const bool isUpdateViewer);
 
   /**
@@ -65,7 +65,7 @@ class XGUI_EXPORT XGUI_Displayer
    * \param theFeatures a list of features to be selected
    * isUpdateViewer the parameter whether the viewer should be update immediatelly
    */
-  void setSelected(const QList<ObjectPtr>& theFeatures, bool isUpdateViewer = true);
+  void setSelected(const QObjectPtrList& theFeatures, bool isUpdateViewer = true);
 
 
   /// Un select all objects
@@ -125,6 +125,9 @@ class XGUI_EXPORT XGUI_Displayer
   /// Activates the given object (it can be selected)
   /// \param theModes - modes on which it has to be activated (can be empty)
   void activate(ObjectPtr theFeature, const QIntList& theModes);
+
+  /// Activates the given object with default modes
+  void activate(ObjectPtr theFeature);
 
   /// Returns true if the given object can be selected
   bool isActive(ObjectPtr theObject) const;

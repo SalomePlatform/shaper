@@ -7,10 +7,8 @@
 
 #include "ModuleBase.h"
 
-#include <QWidget>
-#include <QLayout>
-
-class GeomAPI_Shape;
+class QWidget;
+class QLayout;
 
 namespace ModuleBase_Tools {
 
@@ -22,6 +20,7 @@ MODULEBASE_EXPORT void adjustMargins(QLayout* theLayout);
 
 MODULEBASE_EXPORT void zeroMargins(QWidget* theWidget);
 MODULEBASE_EXPORT void zeroMargins(QLayout* theLayout);
+
 
 }
 

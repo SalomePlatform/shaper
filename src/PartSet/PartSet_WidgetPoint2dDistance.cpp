@@ -1,0 +1,114 @@
+// File:        PartSet_WidgetPoint2dDistance.h
+// Created:     23 June 2014
+// Author:      Vitaly Smetannikov
+
+#include "PartSet_WidgetPoint2dDistance.h"
+#include "PartSet_Tools.h"
+
+#include <ModuleBase_WidgetValueFeature.h>
+#include <ModuleBase_DoubleSpinBox.h>
+#include <ModuleBase_IViewWindow.h>
+
+#include <XGUI_ViewerProxy.h>
+#include <XGUI_Workshop.h>
+
+#include <GeomAPI_Pnt2d.h>
+#include <Config_WidgetAPI.h>
+#include <GeomDataAPI_Point2D.h>
+
+#include <ModelAPI_Data.h>
+#include <ModelAPI_AttributeDouble.h>
+
+#include <QMouseEvent>
+
+PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
+                                                                   const Config_WidgetAPI* theData,
+                                                                   const std::string& theParentId)
+    : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId)
+{
+  myFirstPntName = theData->getProperty("first_point");
+}
+
+PartSet_WidgetPoint2dDistance::~PartSet_WidgetPoint2dDistance()
+{
+}
+
+//bool PartSet_WidgetPoint2dDistance::setValue(ModuleBase_WidgetValue* theValue)
+//{
+//  bool isDone = false;
+//
+//  if (theValue) {
+//    ModuleBase_WidgetValueFeature* aFeatureValue =
+//        dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
+//    if (aFeatureValue) {
+//      std::shared_ptr<GeomAPI_Pnt2d> aPnt = aFeatureValue->point();
+//      ObjectPtr aObject = aFeatureValue->object();
+//      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+//      if (aFeature && aPnt) {
+//        setPoint(aFeature, aPnt);
+//        isDone = true;
+//      }
+//    }
+//  }
+//  return isDone;
+//}
+
+void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
+                                             const std::shared_ptr<GeomAPI_Pnt2d>& thePnt)
+{
+  std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aData->attribute(myFirstPntName));
+  if (!aPoint)
+    return;
+
+  double aRadius = thePnt->distance(aPoint->pnt());
+  AttributeDoublePtr aReal = aData->real(attributeID());
+  if (aReal && (aReal->value() != aRadius)) {
+    aReal->setValue(aRadius);
+    mySpinBox->setValue(aRadius);
+  }
+}
+
+void PartSet_WidgetPoint2dDistance::activate()
+{
+  XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
+  connect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)), 
+          this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
+  connect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
+          this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
+}
+
+void PartSet_WidgetPoint2dDistance::deactivate()
+{
+  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
+  disconnect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)), 
+             this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
+  disconnect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
+             this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
+}
+
+void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
+{
+  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
+
+  double aX, aY;
+  PartSet_Tools::convertTo2D(aPoint, mySketch, theWnd->v3dView(), aX, aY);
+
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, aY));
+  setPoint(feature(), aPnt);
+  emit focusOutWidget(this);
+}
+
+void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
+{
+  gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
+
+  double aX, aY;
+  PartSet_Tools::convertTo2D(aPoint, mySketch, theWnd->v3dView(), aX, aY);
+
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt = std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, aY));
+  setPoint(feature(), aPnt);
+}
+
+

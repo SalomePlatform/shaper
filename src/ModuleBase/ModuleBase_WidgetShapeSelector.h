@@ -40,8 +40,6 @@ Q_OBJECT
 
   virtual bool restoreValue();
 
-  virtual bool focusTo();
-
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
   QWidget* getControl() const
@@ -80,8 +78,6 @@ Q_OBJECT
   void onSelectionChanged();
 
  protected:
-  bool eventFilter(QObject* theObj, QEvent* theEvent);
-
   void updateSelectionName();
   void raisePanel() const;
 

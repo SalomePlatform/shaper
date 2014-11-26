@@ -9,6 +9,7 @@
 class QMouseEvent;
 class QKeyEvent;
 class QContextMenuEvent;
+class ModuleBase_IViewWindow;
 
 /**
  * A Base object for definition of connector object to
@@ -64,16 +65,18 @@ Q_OBJECT
 
 signals:
   void lastViewClosed();
-  void tryCloseView();
-  void deleteView();
-  void viewCreated();
-  void mousePress(QMouseEvent* theEvent);
-  void mouseRelease(QMouseEvent* theEvent);
-  void mouseDoubleClick(QMouseEvent* theEvent);
-  void mouseMove(QMouseEvent* theEvent);
-  void keyPress(QKeyEvent* theEvent);
-  void keyRelease(QKeyEvent* theEvent);
-  void activated();
+  void tryCloseView(ModuleBase_IViewWindow* theWnd);
+  void deleteView(ModuleBase_IViewWindow* theWnd);
+  void viewCreated(ModuleBase_IViewWindow* theWnd);
+  void activated(ModuleBase_IViewWindow* theWnd);
+
+  void mousePress(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+  void mouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+  void mouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+  void mouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+
+  void keyPress(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent);
+  void keyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent);
 
   void selectionChanged();
   void contextMenuRequested(QContextMenuEvent*);

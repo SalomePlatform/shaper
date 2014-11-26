@@ -160,6 +160,12 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject)
   }
 }
 
+void XGUI_Displayer::activate(ObjectPtr theFeature)
+{
+  QIntList aModes;
+  activate(theFeature, aModes);
+}
+
 void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
 {
   if (isVisible(theObject)) {
@@ -197,7 +203,7 @@ bool XGUI_Displayer::isActive(ObjectPtr theObject) const
   return aModes.Extent() > 0;
 }
 
-void XGUI_Displayer::stopSelection(const QList<ObjectPtr>& theResults, const bool isStop,
+void XGUI_Displayer::stopSelection(const QObjectPtrList& theResults, const bool isStop,
                                    const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -205,7 +211,7 @@ void XGUI_Displayer::stopSelection(const QList<ObjectPtr>& theResults, const boo
     return;
 
   Handle(AIS_Shape) anAIS;
-  QList<ObjectPtr>::const_iterator anIt = theResults.begin(), aLast = theResults.end();
+  QObjectPtrList::const_iterator anIt = theResults.begin(), aLast = theResults.end();
   ObjectPtr aFeature;
   for (; anIt != aLast; anIt++) {
     aFeature = *anIt;
@@ -233,7 +239,7 @@ void XGUI_Displayer::stopSelection(const QList<ObjectPtr>& theResults, const boo
     updateViewer();
 }
 
-void XGUI_Displayer::setSelected(const QList<ObjectPtr>& theResults, const bool isUpdateViewer)
+void XGUI_Displayer::setSelected(const QObjectPtrList& theResults, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   // we need to unhighligth objects manually in the current local context
@@ -289,7 +295,7 @@ void XGUI_Displayer::eraseDeletedResults(const bool isUpdateViewer)
   if (aContext.IsNull())
     return;
 
-  QList<ObjectPtr> aRemoved;
+  QObjectPtrList aRemoved;
   foreach (ObjectPtr aFeature, myResult2AISObjectMap.keys()) {
     if (!aFeature || !aFeature->data() || !aFeature->data()->isValid()) {
       AISObjectPtr anObj = myResult2AISObjectMap[aFeature];
@@ -317,13 +323,24 @@ void XGUI_Displayer::openLocalContext()
     return;
   // Open local context if there is no one
   if (!aContext->HasOpenedContext()) {
-    aContext->ClearCurrents(false);
-    //aContext->OpenLocalContext(false/*use displayed objects*/, true/*allow shape decomposition*/);
+    // Preserve selected objects
+    //AIS_ListOfInteractive aAisList;
+    //for (aContext->InitCurrent(); aContext->MoreCurrent(); aContext->NextCurrent())
+    //  aAisList.Append(aContext->Current());
+
+    aContext->ClearCurrents();
     aContext->OpenLocalContext();
     aContext->NotUseDisplayedObjects();
 
     myUseExternalObjects = false;
     myActiveSelectionModes.clear();
+
+    // Restore selection
+    //AIS_ListIteratorOfListOfInteractive aIt(aAisList);
+    //for(; aIt.More(); aIt.Next()) {
+    //  if (aContext->IsDisplayed(aIt.Value()))
+    //    aContext->SetSelected(aIt.Value(), false);
+    //}
   }
 }
 
@@ -331,7 +348,12 @@ void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) ic = AISContext();
   if ( (!ic.IsNull()) && (ic->HasOpenedContext()) ) {
-    ic->ClearSelected(false);
+    // Preserve selected objects
+    //AIS_ListOfInteractive aAisList;
+    //for (ic->InitSelected(); ic->MoreSelected(); ic->NextSelected())
+    //  aAisList.Append(ic->SelectedInteractive());
+
+    ic->ClearSelected();
     ic->CloseAllContexts(false);
 
     // Redisplay all object if they were displayed in localContext
@@ -347,6 +369,13 @@ void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
       updateViewer();
     myUseExternalObjects = false;
     myActiveSelectionModes.clear();
+
+    // Restore selection
+    //AIS_ListIteratorOfListOfInteractive aIt(aAisList);
+    //for(; aIt.More(); aIt.Next()) {
+    //  if (ic->IsDisplayed(aIt.Value()))
+    //    ic->SetCurrentObject(aIt.Value(), false);
+    //}
   }
 }
 

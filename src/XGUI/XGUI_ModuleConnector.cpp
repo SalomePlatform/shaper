@@ -23,9 +23,15 @@ XGUI_ModuleConnector::XGUI_ModuleConnector(XGUI_Workshop* theWorkshop)
   XGUI_OperationMgr* anOperationMgr = myWorkshop->operationMgr();
 
   connect(anOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)), 
-    this, SIGNAL(operationStarted(ModuleBase_Operation*)));
+          SIGNAL(operationStarted(ModuleBase_Operation*)));
   connect(anOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)), 
-    this, SIGNAL(operationStopped(ModuleBase_Operation*)));
+          SIGNAL(operationStopped(ModuleBase_Operation*)));
+  connect(anOperationMgr, SIGNAL(operationResumed(ModuleBase_Operation*)), 
+          SIGNAL(operationResumed(ModuleBase_Operation*)));
+  connect(anOperationMgr, SIGNAL(operationComitted(ModuleBase_Operation*)), 
+          SIGNAL(operationComitted(ModuleBase_Operation*)));
+  connect(anOperationMgr, SIGNAL(operationAborted(ModuleBase_Operation*)), 
+          SIGNAL(operationAborted(ModuleBase_Operation*)));
 
   myDocumentShapeFilter = new ModuleBase_ShapeDocumentFilter(this);
 }
@@ -92,8 +98,13 @@ ObjectPtr XGUI_ModuleConnector::findPresentedObject(const AISObjectPtr& theAIS) 
   return aDisp->getObject(theAIS);
 }
 
-void XGUI_ModuleConnector::setSelected(const QList<ObjectPtr>& theFeatures)
+void XGUI_ModuleConnector::setSelected(const QObjectPtrList& theFeatures)
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   aDisp->setSelected(theFeatures);
+}
+
+bool XGUI_ModuleConnector::canStartOperation(QString theId)
+{
+  return myWorkshop->operationMgr()->canStartOperation(theId);
 }

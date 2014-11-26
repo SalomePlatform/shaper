@@ -163,7 +163,7 @@ void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   activateShapeSelection();
-  QList<ObjectPtr> anEmptyList;
+  QObjectPtrList anEmptyList;
   myWorkshop->setSelected(anEmptyList);
   // Clear mySelection, myListControl and storeValue()
   onSelectionChanged();
