@@ -134,13 +134,12 @@ void Config_ModuleReader::loadPlugin(const std::string thePluginName)
 
 void Config_ModuleReader::loadScript(const std::string theFileName)
 {
-  std::string aPythonFile = theFileName + ".py";
   /* aquire python thread */
   PyGILState_STATE gstate = PyGILState_Ensure();
-  PyObject* module = PyImport_ImportModule(aPythonFile.c_str());
+  PyObject* module = PyImport_ImportModule(theFileName.c_str());
 
   if (!module) {
-    std::string anErrorMsg = "An error occured while loading " + aPythonFile;
+    std::string anErrorMsg = "An error occured while importing " + theFileName;
     //Get detailed error message:
     if (PyErr_Occurred()) {
       PyObject *ptype, *pvalue, *ptraceback;

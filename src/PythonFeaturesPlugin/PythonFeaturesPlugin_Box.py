@@ -62,20 +62,23 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
         aWidth = self.real(self.WIDTH_ID()).value()
         aLength = self.real(self.LENGTH_ID()).value()
         aHeight = self.real(self.HEIGHT_ID()).value()
-        aHeightFeature = None
-        aHeightFeatureResult = ModelAPI.modelAPI_ResultBody(self.reference(self.HEIGHT_REF_ID()).value())
-        if aHeightFeatureResult is not None:
-            aHeightFeature = aHeightFeatureResult.document().feature(aHeightFeatureResult)
-        aWidthFeature = ModelAPI.modelAPI_Feature(self.reference(self.WIDTH_REF_ID()).value())
-        aLengthFeature = ModelAPI.modelAPI_Feature(self.reference(self.LENGTH_REF_ID()).value())
+        aWidthRefValue = self.reference(self.WIDTH_REF_ID()).value()
+        aLengthRefValue = self.reference(self.LENGTH_REF_ID()).value()
+        aHeightRefValue = self.reference(self.HEIGHT_REF_ID()).value()
         aResult = None
-        if not all((aWidthFeature, aLengthFeature, aLengthFeature)):
+        if not all((aWidthRefValue, aLengthRefValue, aHeightRefValue)):
             aResult = extrusion.getBody(self.makeBox(aLength, aWidth, aHeight))
         else:
+            aHeightProxyResult = ModelAPI.modelAPI_Result(aHeightRefValue)
+            aWidthFeature = ModelAPI.modelAPI_Feature(aWidthRefValue)
+            aLengthFeature = ModelAPI.modelAPI_Feature(aLengthRefValue)
+            aHeightResult = ModelAPI.modelAPI_ResultBody(aHeightProxyResult)
             aWidthFeature.real("ConstraintValue").setValue(aWidth)
             aLengthFeature.real("ConstraintValue").setValue(aLength)
-            aHeightFeature.real("extrusion_size").setValue(aHeight)
-            aResult = extrusion.getBody(aHeightFeature)
+            if aHeightResult is not None:
+                aHeightFeature = aHeightResult.document().feature(aHeightResult)
+                aHeightFeature.real("extrusion_size").setValue(aHeight)
+                aResult = extrusion.getBody(aHeightFeature)
         self.setResult(aResult)
 
     def makeBox(self, aWidth, aLength, aHeight):
