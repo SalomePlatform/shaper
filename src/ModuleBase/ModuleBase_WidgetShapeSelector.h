@@ -35,7 +35,6 @@ Q_OBJECT
   virtual ~ModuleBase_WidgetShapeSelector();
 
   /// Saves the internal parameters to the given feature
-  /// \param theObject a model feature to be changed
   virtual bool storeValue() const;
 
   virtual bool restoreValue();
@@ -98,7 +97,7 @@ Q_OBJECT
   void setObject(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape = std::shared_ptr<GeomAPI_Shape>());
 
   //----------- Class members -------------
- private:
+ protected:
   QWidget* myContainer;
   QLabel* myLabel;
   QLineEdit* myTextLine;

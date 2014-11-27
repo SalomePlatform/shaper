@@ -10,6 +10,8 @@
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
+class GeomDataAPI_Point2D;
+
 #define LENGTH_COLOR "#ff00ff"
 
 /** \class SketchPlugin_ConstraintLength
@@ -50,8 +52,19 @@ class SketchPlugin_ConstraintLength : public SketchPlugin_ConstraintBase
   /// \param theDeltaY the delta for Y coordinate is moved
   SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
 
+  /// Called on change of any argument-attribute of this object
+  /// \param theID identifier of changed attribute
+  SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
+
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintLength();
+
+private:
+  // retrns the points-base of length, returns false if it is not possible
+  bool getPoints(
+    std::shared_ptr<GeomAPI_Pnt>& thePoint1, std::shared_ptr<GeomAPI_Pnt>& thePoint2,
+    std::shared_ptr<GeomDataAPI_Point2D>& theStartPoint,
+    std::shared_ptr<GeomDataAPI_Point2D>& theEndPoint);
 };
 
 #endif

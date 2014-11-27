@@ -6,36 +6,24 @@ SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Constants.h
 	PartSet_EditLine.h
-#	PartSet_Listener.h
 	PartSet_Module.h
-#	PartSet_OperationFeatureCreate.h
-#	PartSet_OperationFeatureEdit.h
-#	PartSet_OperationSketchBase.h
-#	PartSet_OperationSketch.h
-#	PartSet_OperationFeatureBase.h
 	PartSet_Tools.h
 	PartSet_WidgetSketchLabel.h
 	PartSet_Validators.h
 	PartSet_WidgetPoint2d.h
 	PartSet_WidgetPoint2dDistance.h
-#	PartSet_Operation.h
+	PartSet_WidgetShapeSelector.h
 )
 
 SET(PROJECT_SOURCES
 	PartSet_EditLine.cpp
-#	PartSet_Listener.cpp
 	PartSet_Module.cpp
-#	PartSet_OperationFeatureCreate.cpp
-#	PartSet_OperationFeatureEdit.cpp
-#	PartSet_OperationSketchBase.cpp
-#	PartSet_OperationSketch.cpp
-#	PartSet_OperationFeatureBase.cpp
 	PartSet_Tools.cpp
 	PartSet_WidgetSketchLabel.cpp
 	PartSet_Validators.cpp
 	PartSet_WidgetPoint2d.cpp
 	PartSet_WidgetPoint2dDistance.cpp
-#	PartSet_Operation.cpp
+	PartSet_WidgetShapeSelector.cpp
 )
 
 SET(PROJECT_RESOURCES 

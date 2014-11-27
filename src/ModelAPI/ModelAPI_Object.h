@@ -55,7 +55,8 @@ class ModelAPI_Object
   virtual std::string groupName() = 0;
 
   /// Called on change of any argument-attribute of this object
-  MODELAPI_EXPORT virtual void attributeChanged() 
+  /// \param theID identifier of changed attribute
+  MODELAPI_EXPORT virtual void attributeChanged(const std::string& theID) 
   {}
 
   /// To use virtuality for destructors

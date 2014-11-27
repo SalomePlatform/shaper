@@ -14,6 +14,10 @@
 #include <QList>
 
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Object.h>
+#include <ModelAPI_Attribute.h>
+
+#include <TopoDS_Shape.hxx>
 
 #include <memory>
 
@@ -52,8 +56,7 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theY the Y coordinate
   /// \param theSketch the sketch feature
   /// \param thePoint the 3D point in the viewer
-  static void convertTo3D(const double theX, const double theY, FeaturePtr theSketch,
-                          gp_Pnt& thePoint);
+  static std::shared_ptr<GeomAPI_Pnt> convertTo3D(const double theX, const double theY, FeaturePtr theSketch);
 
   /// Returns an object that is under the mouse point. Firstly it checks the highlighting,
   /// if it exists, the first object is returned. Secondly, there is an iteration on
@@ -161,6 +164,16 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theY the output vertical coordinate of the point
   static bool hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePtr theSketch,
                              Handle_V3d_View theView, double& theX, double& theY);
+
+
+  /**
+  * Find attribute of object which corresponds to the given shape
+  * \param theObj - an object
+  * \param theShape - a Shape
+  * \param theSketch - a Sketch to get a plane of converting to 2d
+  */
+  static AttributePtr findAttributeBy2dPoint(ObjectPtr theObj, const TopoDS_Shape theShape, FeaturePtr theSketch);
+
 protected:
   /// Returns an object that is under the mouse point. Firstly it checks the highlighting,
   /// if it exists, the first object is returned. Secondly, there is an iteration on

@@ -97,6 +97,7 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
     //if (aPointWidget)
     //  connect(aPointWidget, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)), this,
     //          SIGNAL(storedPoint2D(ObjectPtr, const std::string&)))
+    //}
 
     if (!isEnableStretch) continue;
     foreach(QWidget* eachWidget, (*anIt)->getControls()) {

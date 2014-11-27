@@ -19,11 +19,12 @@ class ModelAPI_Attribute
 {
   ///< needed here to emit signal that feature changed on change of the attribute
   std::shared_ptr<ModelAPI_Object> myObject;
+  std::string myID; ///< identifier of this attribute in Data class
  protected:
   // accessible from the attributes
-  bool myIsInitialized;
-  bool myIsArgument;
-  bool myIsImmutable;
+  bool myIsInitialized; ///< is some value assigned to this attribute
+  bool myIsArgument;    ///< is this attribute used as an argument for execution
+  bool myIsImmutable;   ///< is this attribute can be changed programmatically (e.g. by constraint)
 
  public:
 
@@ -88,6 +89,12 @@ class ModelAPI_Attribute
     return myIsImmutable;
   }
 
+  /// ID of the attribute in Data
+  MODELAPI_EXPORT const std::string& id() const
+  {
+    return myID;
+  }
+
  protected:
   /// Objects are created for features automatically
   ModelAPI_Attribute()
@@ -97,6 +104,13 @@ class ModelAPI_Attribute
     myIsImmutable = false;
   }
 
+  /// Sets the ID of the attribute in Data (called from Data)
+  MODELAPI_EXPORT void setID(const std::string theID)
+  {
+    myID = theID;
+  }
+
+  friend class Model_Data;
 };
 
 //! Pointer on attribute object

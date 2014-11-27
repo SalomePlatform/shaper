@@ -77,7 +77,7 @@ class SketchPlugin_Circle : public SketchPlugin_Feature  //, public GeomAPI_IPre
   virtual double distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
   /// Called on change of any argument-attribute of this object
-  SKETCHPLUGIN_EXPORT virtual void attributeChanged();
+  SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// Use plugin manager for features creation
   SketchPlugin_Circle();

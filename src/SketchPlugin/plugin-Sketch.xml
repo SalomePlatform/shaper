@@ -30,10 +30,10 @@
 
       <feature id="SketchConstraintDistance" title="Distance" tooltip="Create constraint for the distance from a point to an object" icon=":icons/distance.png">
         <label title="Select objects for distance definition. Following objects can be accepted: point, line or arc end point, center of circle or arc."/>
-		<shape_selector id="ConstraintEntityA" label="First object" tooltip="Select point, line end point, line, center of circle or arc." 
-			shape_types="edge vertex"/>
-		<shape_selector id="ConstraintEntityB" label="Last object" tooltip="Select point, line end point, line, center of circle or arc." 
-			shape_types="edge vertex"/>
+		<sketch_shape_selector id="ConstraintEntityA" label="First object" tooltip="Select point, line end point, line, center of circle or arc." 
+			shape_types="edge vertex"  use_subshapes="true"/>
+		<sketch_shape_selector id="ConstraintEntityB" label="Last object" tooltip="Select point, line end point, line, center of circle or arc." 
+			shape_types="edge vertex"  use_subshapes="true"/>
         <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Constraint value" id="ConstraintValue" default="computed" min="0">
           <validator id="GeomValidators_Positive"/>

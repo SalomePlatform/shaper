@@ -9,7 +9,7 @@
 #include "PartSet_Tools.h"
 #include "PartSet_WidgetPoint2D.h"
 #include "PartSet_WidgetPoint2dDistance.h"
-//#include "PartSet_Operation.h"
+#include "PartSet_WidgetShapeSelector.h"
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_IViewer.h>
@@ -46,6 +46,12 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_ConstraintLength.h>
+#include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintParallel.h>
+#include <SketchPlugin_ConstraintPerpendicular.h>
+#include <SketchPlugin_ConstraintRadius.h>
+#include <SketchPlugin_ConstraintRigid.h>
 
 //#include <Config_PointerMessage.h>
 //#include <Config_ModuleReader.h>
@@ -399,11 +405,16 @@ void PartSet_Module::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* t
 QStringList PartSet_Module::sketchOperationIdList() const
 {
   QStringList aIds;
-  aIds << SketchPlugin_Sketch::ID().c_str();
   aIds << SketchPlugin_Line::ID().c_str();
   aIds << SketchPlugin_Point::ID().c_str();
   aIds << SketchPlugin_Arc::ID().c_str();
   aIds << SketchPlugin_Circle::ID().c_str();
+  aIds << SketchPlugin_ConstraintLength::ID().c_str();
+  aIds << SketchPlugin_ConstraintDistance::ID().c_str();
+  aIds << SketchPlugin_ConstraintRigid::ID().c_str();
+  aIds << SketchPlugin_ConstraintRadius::ID().c_str();
+  aIds << SketchPlugin_ConstraintPerpendicular::ID().c_str();
+  aIds << SketchPlugin_ConstraintParallel::ID().c_str();
   return aIds;
 }
 
@@ -858,6 +869,7 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
     aWgt->setWorkshop(aWorkshop);
     theModelWidgets.append(aWgt);
     return aWgt->getControl();
+
   } else if (theType == "sketch-2dpoint_selector") {
     PartSet_WidgetPoint2D* aWgt = new PartSet_WidgetPoint2D(theParent, theWidgetApi, theParentId);
     aWgt->setWorkshop(aWorkshop);
@@ -868,6 +880,7 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
 
     theModelWidgets.append(aWgt);
     return aWgt->getControl();
+
   } if (theType == "point2ddistance") {
     PartSet_WidgetPoint2dDistance* aWgt = new PartSet_WidgetPoint2dDistance(theParent, theWidgetApi, theParentId);
     aWgt->setWorkshop(aWorkshop);
@@ -875,6 +888,15 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
 
     theModelWidgets.append(aWgt);
     return aWgt->getControl();
+
+  } if (theType == "sketch_shape_selector") {
+    PartSet_WidgetShapeSelector* aWgt = 
+      new PartSet_WidgetShapeSelector(theParent, workshop(), theWidgetApi, theParentId);
+    aWgt->setSketcher(myCurrentSketch);
+
+    theModelWidgets.append(aWgt);
+    return aWgt->getControl();
+
   }else
     return 0;
 }
