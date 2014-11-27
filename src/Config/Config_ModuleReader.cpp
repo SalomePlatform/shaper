@@ -138,6 +138,24 @@ void Config_ModuleReader::loadScript(const std::string theFileName)
   /* aquire python thread */
   PyGILState_STATE gstate = PyGILState_Ensure();
   PyObject* module = PyImport_ImportModule(aPythonFile.c_str());
+
+  if (!module) {
+    std::string anErrorMsg = "An error occured while loading " + aPythonFile;
+    //Get detailed error message:
+    if (PyErr_Occurred()) {
+      PyObject *ptype, *pvalue, *ptraceback;
+      PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+      std::string aPyError = std::string(PyString_AsString(pvalue));
+      if (!aPyError.empty()) {
+        anErrorMsg += ":\n" + aPyError;
+      }
+      Py_XDECREF(ptype);
+      Py_XDECREF(pvalue);
+      Py_XDECREF(ptraceback);
+    }
+    Events_Error::send(anErrorMsg);
+  }
+
   /* release python thread */
   PyGILState_Release(gstate);
 }
