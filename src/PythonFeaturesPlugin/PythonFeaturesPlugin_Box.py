@@ -1,7 +1,8 @@
 import ModelAPI
-import sketch
-import extrusion
+
 from SketchResult import SketchResult
+import extrusion
+import sketch
 
 
 class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
@@ -52,17 +53,21 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
         self.data().addAttribute(self.LENGTH_REF_ID(), ModelAPI.ModelAPI_AttributeReference_type())
         self.data().addAttribute(self.HEIGHT_REF_ID(), ModelAPI.ModelAPI_AttributeReference_type())
         aSession = ModelAPI.ModelAPI_Session.get()
-        aSession.validators().registerNotObligatory(self.getKind(), self.WIDTH_REF_ID());
-        aSession.validators().registerNotObligatory(self.getKind(), self.LENGTH_REF_ID());
-        aSession.validators().registerNotObligatory(self.getKind(), self.HEIGHT_REF_ID());
+        aSession.validators().registerNotObligatory(self.getKind(), self.WIDTH_REF_ID())
+        aSession.validators().registerNotObligatory(self.getKind(), self.LENGTH_REF_ID())
+        aSession.validators().registerNotObligatory(self.getKind(), self.HEIGHT_REF_ID())
+        aSession.validators().registerConcealment(self.getKind(), self.HEIGHT_REF_ID())
 
     def execute(self):
         aWidth = self.real(self.WIDTH_ID()).value()
         aLength = self.real(self.LENGTH_ID()).value()
         aHeight = self.real(self.HEIGHT_ID()).value()
+        aHeightFeature = None
+        aHeightFeatureResult = ModelAPI.modelAPI_ResultBody(self.reference(self.HEIGHT_REF_ID()).value())
+        if aHeightFeatureResult is not None:
+            aHeightFeature = aHeightFeatureResult.document().feature(aHeightFeatureResult)
         aWidthFeature = ModelAPI.modelAPI_Feature(self.reference(self.WIDTH_REF_ID()).value())
         aLengthFeature = ModelAPI.modelAPI_Feature(self.reference(self.LENGTH_REF_ID()).value())
-        aHeightFeature = ModelAPI.modelAPI_Feature(self.reference(self.HEIGHT_REF_ID()).value())
         aResult = None
         if not all((aWidthFeature, aLengthFeature, aLengthFeature)):
             aResult = extrusion.getBody(self.makeBox(aLength, aWidth, aHeight))
@@ -103,7 +108,7 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
         # Store features...
         self.reference(self.WIDTH_REF_ID()).setValue(aWidthFeature)
         self.reference(self.LENGTH_REF_ID()).setValue(aLengthFeature)
-        self.reference(self.HEIGHT_REF_ID()).setValue(aHeightFeature)
+        self.reference(self.HEIGHT_REF_ID()).setValue(aHeightFeature.firstResult())
         return aHeightFeature
 
 
