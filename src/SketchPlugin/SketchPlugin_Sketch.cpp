@@ -271,66 +271,46 @@ void SketchPlugin_Sketch::erase()
   ModelAPI_CompositeFeature::erase();
 }
 
-void SketchPlugin_Sketch::attributeChanged() {
-  static bool kIsUpdated = false; // to avoid infinitive cycle on attrubtes change
-  static bool kIsAttrChanged = false;
-  std::shared_ptr<GeomAPI_Shape> aSelection = 
-    data()->selection(SketchPlugin_Feature::EXTERNAL_ID())->value();
-  if (aSelection && !kIsUpdated) { // update arguments due to the selection value
-    kIsUpdated = true;
-    // update the sketch plane
-    std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aSelection);
-    if (aPlane) {
-      double anA, aB, aC, aD;
-      aPlane->coefficients(anA, aB, aC, aD);
+void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
+  if (theID == SketchPlugin_Feature::EXTERNAL_ID()) {
+    std::shared_ptr<GeomAPI_Shape> aSelection = 
+      data()->selection(SketchPlugin_Feature::EXTERNAL_ID())->value();
+    if (aSelection) { // update arguments due to the selection value
+      // update the sketch plane
+      std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aSelection);
+      if (aPlane) {
+        double anA, aB, aC, aD;
+        aPlane->coefficients(anA, aB, aC, aD);
 
-      // calculate attributes of the sketch
-      std::shared_ptr<GeomAPI_Dir> aNormDir(new GeomAPI_Dir(anA, aB, aC));
-      std::shared_ptr<GeomAPI_XYZ> aCoords = aNormDir->xyz();
-      std::shared_ptr<GeomAPI_XYZ> aZero(new GeomAPI_XYZ(0, 0, 0));
-      aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
-      std::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
-      // X axis is preferable to be dirX on the sketch
-      static const double tol = 1.e-7;
-      bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
-      std::shared_ptr<GeomAPI_Dir> aTempDir(
-        isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
-      std::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
-      std::shared_ptr<GeomAPI_Dir> aXDir(new GeomAPI_Dir(aYDir->cross(aNormDir)));
+        // calculate attributes of the sketch
+        std::shared_ptr<GeomAPI_Dir> aNormDir(new GeomAPI_Dir(anA, aB, aC));
+        std::shared_ptr<GeomAPI_XYZ> aCoords = aNormDir->xyz();
+        std::shared_ptr<GeomAPI_XYZ> aZero(new GeomAPI_XYZ(0, 0, 0));
+        aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
+        std::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
+        // X axis is preferable to be dirX on the sketch
+        static const double tol = 1.e-7;
+        bool isX = fabs(anA - 1.0) < tol && fabs(aB) < tol && fabs(aC) < tol;
+        std::shared_ptr<GeomAPI_Dir> aTempDir(
+          isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
+        std::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
+        std::shared_ptr<GeomAPI_Dir> aXDir(new GeomAPI_Dir(aYDir->cross(aNormDir)));
 
-      kIsAttrChanged = false; // track the attributes were really changed during the plane update
-      std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast
-        <GeomDataAPI_Point>(data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-      anOrigin->setValue(anOrigPnt);
-      std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-        data()->attribute(SketchPlugin_Sketch::NORM_ID()));
-      aNormal->setValue(aNormDir);
-      std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-        data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
-      aDirX->setValue(aXDir);
-      std::shared_ptr<GeomDataAPI_Dir> aDirY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-        data()->attribute(SketchPlugin_Sketch::DIRY_ID()));
-      aDirY->setValue(aYDir);
-      std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
-
-      if (kIsAttrChanged) {
-        /* now it is in updater
-        // the plane was changed, so reexecute sub-elements to update shapes (located in new plane)
-        ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
-        list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
-        for(list<ObjectPtr>::iterator aSubIt = aSubs.begin(); aSubIt != aSubs.end(); aSubIt++) {
-          std::shared_ptr<SketchPlugin_Feature> aFeature = 
-            std::dynamic_pointer_cast<SketchPlugin_Feature>(*aSubIt);
-          if (aFeature && aFactory->validate(aFeature)) {
-            aFeature->execute();
-          }
-        }
-        */
-        kIsAttrChanged = false;
+        // update position of the sketch
+        std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast
+          <GeomDataAPI_Point>(data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+        anOrigin->setValue(anOrigPnt);
+        std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+          data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+        aNormal->setValue(aNormDir);
+        std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+          data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
+        aDirX->setValue(aXDir);
+        std::shared_ptr<GeomDataAPI_Dir> aDirY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+          data()->attribute(SketchPlugin_Sketch::DIRY_ID()));
+        aDirY->setValue(aYDir);
+        std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
       }
     }
-    kIsUpdated = false;
-  } else if (kIsUpdated) { // other attributes are updated during the selection comupation
-    kIsAttrChanged = true;
   }
 }

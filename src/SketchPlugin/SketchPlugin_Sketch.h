@@ -135,7 +135,7 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
   /// Returns the point projected into the sketch plane
   std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& thePnt);
 
-  SKETCHPLUGIN_EXPORT virtual void attributeChanged();
+  SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 protected:
   /// Creates a plane and append it to the list
   /// \param theX the X normal value
