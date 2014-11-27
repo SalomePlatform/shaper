@@ -175,10 +175,12 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
         return false;
     }
   }
+  
   // check all attributes for validity
   std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  if (!aData || !aData->isValid())
-    return false;
+  // Validity of data is checked by "Model_FeatureValidator" (kDefaultId)
+  // if (!aData || !aData->isValid())
+  //   return false;
   static const std::string kAllTypes = "";
   std::map<std::string, std::map<std::string, AttrValidators> >::const_iterator aFeatureIter = 
     myAttrs.find(theFeature->getKind());

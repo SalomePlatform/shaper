@@ -100,18 +100,17 @@ bool SketchPlugin_Circle::isFixed() {
   return data()->selection(EXTERNAL_ID())->context();
 }
 
-void SketchPlugin_Circle::attributeChanged() {
-  static bool myIsUpdated = false; // to avoid infinitive cycle on attrubtes change
-  std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
-  // update arguments due to the selection value
-  if (aSelection && !aSelection->isNull() && aSelection->isEdge() && !myIsUpdated) {
-    myIsUpdated = true;
-    std::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
-    std::shared_ptr<GeomAPI_Circ> aCirc = anEdge->circle();
-    std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
-    aCenterAttr->setValue(sketch()->to2D(aCirc->center()));
-    real(RADIUS_ID())->setValue(aCirc->radius());
-    myIsUpdated = false;
+void SketchPlugin_Circle::attributeChanged(const std::string& theID) {
+  if (theID == EXTERNAL_ID()) {
+    std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
+    // update arguments due to the selection value
+    if (aSelection && !aSelection->isNull() && aSelection->isEdge()) {
+      std::shared_ptr<GeomAPI_Edge> anEdge( new GeomAPI_Edge(aSelection));
+      std::shared_ptr<GeomAPI_Circ> aCirc = anEdge->circle();
+      std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
+      aCenterAttr->setValue(sketch()->to2D(aCirc->center()));
+      real(RADIUS_ID())->setValue(aCirc->radius());
+    }
   }
 }

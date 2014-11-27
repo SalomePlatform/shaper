@@ -49,8 +49,17 @@ class SketchPlugin_ConstraintRadius : public SketchPlugin_ConstraintBase
   /// \param theDeltaY the delta for Y coordinate is moved
   SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY);
 
+  /// Called on change of any argument-attribute of this object
+  /// \param theID identifier of changed attribute
+  SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
+
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintRadius();
+
+private:
+  /// Checks and gets the radius of referenced circle (or arc) otherwise returns -1.
+  /// \param theCircData the found referenced circle returned by this method
+  double circleRadius(std::shared_ptr<ModelAPI_Feature>& theCirc);
 };
 
 #endif
