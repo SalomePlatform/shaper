@@ -49,6 +49,8 @@ Q_OBJECT
   /// Activate the next from current widget in the property panel
   virtual void activateNextWidget();
 
+  void setStretchEnabled(bool isEnabled);
+
  public slots:
   void updateContentWidget(FeaturePtr theFeature);
   // Enables / disables "ok" ("accept") button
