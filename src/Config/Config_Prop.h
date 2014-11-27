@@ -37,7 +37,8 @@ class Config_Prop
     Shortcut,
     ShortcutTree,
     BiColor,
-    Background
+    Background,
+    Directory
   };
 
   /** 

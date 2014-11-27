@@ -17,6 +17,7 @@
 class XGUI_IPrefMgr
 {
 public:
+
   /** 
   * Add preference item into preference dialog box
   * \param theLbl - label of the item
@@ -29,6 +30,10 @@ public:
   virtual int addPreference(const QString& theLbl, int pId, 
                             SUIT_PreferenceMgr::PrefItemType theType,
                             const QString& theSection, const QString& theName ) = 0;
+
+  virtual void setItemProperty(const QString& thePropName,
+                               const QVariant& theValue,
+                               const int theId = -1) = 0;
 
   /// Returns incapsulated preference manager
   virtual SUIT_PreferenceMgr* prefMgr() const = 0;

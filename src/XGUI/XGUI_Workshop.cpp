@@ -51,6 +51,7 @@
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
+#include <Config_PropManager.h>
 
 #include <QApplication>
 #include <QFileDialog>
@@ -137,6 +138,10 @@ XGUI_Workshop::~XGUI_Workshop(void)
 void XGUI_Workshop::startApplication()
 {
   initMenu();
+
+  Config_PropManager::registerProp("Plugins", "default_path", "Default Path",
+                                   Config_Prop::Directory, "");
+
   //Initialize event listening
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Error::errorID());  //!< Listening application errors.
@@ -153,12 +158,15 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
 
   registerValidators();
+  // Calling of  loadCustomProps before activating module is required
+  // by Config_PropManger to restore user-defined path to plugins
+  XGUI_Preferences::loadCustomProps();
   activateModule();
   if (myMainWindow) {
     myMainWindow->show();
     updateCommandStatus();
   }
-  XGUI_Preferences::loadCustomProps();
+  
   onNew();
 }
 

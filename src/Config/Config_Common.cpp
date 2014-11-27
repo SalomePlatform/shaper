@@ -14,7 +14,8 @@
 #include <sstream> // for stringstream
 
 #include <string>
-#include <algorithm> // for std::transform
+#include <algorithm> // for std::transform
+
 bool isElementNode(xmlNodePtr theNode)
 {
   return theNode->type == XML_ELEMENT_NODE;
@@ -95,6 +96,8 @@ bool getValidatorInfo(xmlNodePtr theNode, std::string& outValidatorId,
 
 std::string library(const std::string& theLibName)
 {
+  if(theLibName.empty())
+    return std::string();
   std::string aLibName = theLibName;
 #ifndef WIN32
   static std::string aLibExt( ".so" );

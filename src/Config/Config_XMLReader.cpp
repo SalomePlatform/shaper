@@ -9,10 +9,14 @@
 #include <Config_Keywords.h>
 #include <Config_Common.h>
 #include <Config_ValidatorMessage.h>
+#include <Config_PropManager.h>
 
 #include <Events_Loop.h>
+#include <Events_Error.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+
+#include <fstream>
 
 #ifdef WIN32
 #pragma warning(disable : 4996) // for getenv
@@ -25,19 +29,31 @@
 Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
     : myXmlDoc(NULL)
 {
-  std::string prefix = "";
+  std::string prefix = ""; 
+  Config_Prop* aProp = Config_PropManager::findProp("Plugins", "default_path");
+  if (aProp)
+    prefix = aProp->value();
   /*
    * Get path to *.xml files (typically ./bin/../plugins/)
 
    * the problem: application may be launched using python executable,
    * to use environment variable (at least for the current moment)
    */
-  char* anEnv = getenv("NEW_GEOM_CONFIG_FILE");
-  if (anEnv) {
-    prefix = std::string(anEnv) + "/";
+  if (prefix.empty()) {
+    char* anEnv = getenv("NEW_GEOM_CONFIG_FILE");
+    if (anEnv) {
+      prefix = std::string(anEnv);
+    }
   }
-
+#ifdef WIN32
+    prefix += "\\";
+#else
+    prefix += "/";
+#endif
   myDocumentPath = prefix + theXmlFileName;
+  std::ifstream aTestFile(myDocumentPath);
+  if (!aTestFile) Events_Error::send("Unable to open " + myDocumentPath);
+  aTestFile.close();
 }
 
 Config_XMLReader::~Config_XMLReader()
