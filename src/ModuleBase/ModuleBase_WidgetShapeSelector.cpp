@@ -133,9 +133,9 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
     ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(mySelectedObject);
     if (aBody) {
       AttributePtr aAttr = aData->attribute(attributeID());
-      std::shared_ptr<ModelAPI_AttributeSelection> aSelectAttr = 
-        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aAttr);
 
+      AttributeSelectionPtr aSelectAttr = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aAttr);
       if (aSelectAttr)
         aSelectAttr->setValue(aBody, myShape);
       updateObject(myFeature);
@@ -171,7 +171,7 @@ bool ModuleBase_WidgetShapeSelector::restoreValue()
   DataPtr aData = myFeature->data();
   bool isBlocked = this->blockSignals(true);
   if (myUseSubShapes) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = aData->selection(attributeID());
+    AttributeSelectionPtr aSelect = aData->selection(attributeID());
     if (aSelect) {
       mySelectedObject = aSelect->context();
       myShape = aSelect->value();

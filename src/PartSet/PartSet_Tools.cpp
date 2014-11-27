@@ -126,12 +126,8 @@ Handle(V3d_View) theView,
   theY = aVec.X() * anY->x() + aVec.Y() * anY->y() + aVec.Z() * anY->z();
 }
 
-void PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr theSketch,
-                                gp_Pnt& thePoint)
+std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr theSketch)
 {
-  if (!theSketch)
-    return;
-
   std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
 
   std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
@@ -141,11 +137,10 @@ void PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr
   std::shared_ptr<GeomDataAPI_Dir> aY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
 
-  std::shared_ptr<GeomAPI_XYZ> aSum = aC->pnt()->xyz()->added(aX->dir()->xyz()->multiplied(theX))
-      ->added(aY->dir()->xyz()->multiplied(theY));
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = 
+    std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
 
-  std::shared_ptr<GeomAPI_Pnt> aPoint = std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
-  thePoint = gp_Pnt(aPoint->x(), aPoint->y(), aPoint->z());
+  return aPnt2d->to3D(aC->pnt(), aX->dir(), aY->dir());
 }
 
 ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
@@ -534,4 +529,40 @@ bool PartSet_Tools::hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePt
   }
 
   return aHasVertex;
+}
+
+AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj, 
+                                                   const TopoDS_Shape theShape, 
+                                                   FeaturePtr theSketch)
+{
+
+  AttributePtr anAttribute;
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObj);
+  if (aFeature) {
+    if (theShape.ShapeType() == TopAbs_VERTEX) {
+      const TopoDS_Vertex& aVertex = TopoDS::Vertex(theShape);
+      if (!aVertex.IsNull())  {
+        gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
+        std::shared_ptr<GeomAPI_Pnt> aValue = std::shared_ptr<GeomAPI_Pnt>(
+            new GeomAPI_Pnt(aPoint.X(), aPoint.Y(), aPoint.Z()));
+
+        // find the given point in the feature attributes
+        std::list<AttributePtr> anAttiributes = 
+          aFeature->data()->attributes(GeomDataAPI_Point2D::type());
+        std::list<AttributePtr>::const_iterator anIt = anAttiributes.begin(), 
+                                                aLast = anAttiributes.end();
+        for (; anIt != aLast && !anAttribute; anIt++) {
+          std::shared_ptr<GeomDataAPI_Point2D> aCurPoint = 
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+
+          std::shared_ptr<GeomAPI_Pnt> aPnt = convertTo3D(aCurPoint->x(), aCurPoint->y(), theSketch);
+          if (aPnt && (aPnt->distance(aValue) < Precision::Confusion())) {
+            anAttribute = aCurPoint;
+            break;
+          }
+        }
+      }
+    }
+  }
+  return anAttribute;
 }
