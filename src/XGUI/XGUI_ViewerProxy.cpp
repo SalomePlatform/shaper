@@ -68,23 +68,35 @@ void XGUI_ViewerProxy::connectToViewer()
     ModuleBase_IViewer* aViewer = myWorkshop->salomeConnector()->viewer();
 
     connect(aViewer, SIGNAL(lastViewClosed()), this, SIGNAL(lastViewClosed()));
-    connect(aViewer, SIGNAL(tryCloseView()), this, SIGNAL(tryCloseView()));
-    connect(aViewer, SIGNAL(deleteView()), this, SIGNAL(deleteView()));
-    connect(aViewer, SIGNAL(viewCreated()), this, SIGNAL(viewCreated()));
-    connect(aViewer, SIGNAL(activated()), this, SIGNAL(activated()));
+    connect(aViewer, SIGNAL(tryCloseView(ModuleBase_IViewWindow*)), 
+      this, SIGNAL(tryCloseView(ModuleBase_IViewWindow*)));
 
-    connect(aViewer, SIGNAL(mousePress(QMouseEvent*)), this, SIGNAL(mousePress(QMouseEvent*)));
+    connect(aViewer, SIGNAL(deleteView(ModuleBase_IViewWindow*)), 
+      this, SIGNAL(deleteView(ModuleBase_IViewWindow*)));
 
-    connect(aViewer, SIGNAL(mouseRelease(QMouseEvent*)), this, SIGNAL(mouseRelease(QMouseEvent*)));
+    connect(aViewer, SIGNAL(viewCreated(ModuleBase_IViewWindow*)), 
+      this, SIGNAL(viewCreated(ModuleBase_IViewWindow*)));
 
-    connect(aViewer, SIGNAL(mouseDoubleClick(QMouseEvent*)), this,
-            SIGNAL(mouseDoubleClick(QMouseEvent*)));
+    connect(aViewer, SIGNAL(activated(ModuleBase_IViewWindow*)), 
+      this, SIGNAL(activated(ModuleBase_IViewWindow*)));
 
-    connect(aViewer, SIGNAL(mouseMove(QMouseEvent*)), this, SIGNAL(mouseMove(QMouseEvent*)));
+    connect(aViewer, SIGNAL(mousePress(ModuleBase_IViewWindow*, QMouseEvent*)), 
+      this, SIGNAL(mousePress(ModuleBase_IViewWindow*, QMouseEvent*)));
 
-    connect(aViewer, SIGNAL(keyPress(QKeyEvent*)), this, SIGNAL(keyPress(QKeyEvent*)));
+    connect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
+      this, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
 
-    connect(aViewer, SIGNAL(keyRelease(QKeyEvent*)), this, SIGNAL(keyRelease(QKeyEvent*)));
+    connect(aViewer, SIGNAL(mouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*)), this,
+            SIGNAL(mouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*)));
+
+    connect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)), 
+      this, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
+
+    connect(aViewer, SIGNAL(keyPress(ModuleBase_IViewWindow*, QKeyEvent*)), 
+      this, SIGNAL(keyPress(ModuleBase_IViewWindow*, QKeyEvent*)));
+
+    connect(aViewer, SIGNAL(keyRelease(ModuleBase_IViewWindow*, QKeyEvent*)), 
+      this, SIGNAL(keyRelease(ModuleBase_IViewWindow*, QKeyEvent*)));
 
     connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
     connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,

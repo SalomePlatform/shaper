@@ -46,6 +46,7 @@
 #include <QString>
 #include <QEvent>
 #include <QDockWidget>
+#include <QApplication>
 
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Shape.hxx>
@@ -258,7 +259,6 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
         return;
     }
     setObject(aObject, aShape);
-    //activateSelection(false);
     emit focusOutWidget(this);
   }
 }
@@ -272,7 +272,6 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, std::shared_ptr
     raisePanel();
   } 
   updateSelectionName();
-  //activateSelection(false);
   emit valuesChanged();
 }
 

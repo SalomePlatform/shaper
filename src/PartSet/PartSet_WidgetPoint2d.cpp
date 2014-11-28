@@ -33,6 +33,7 @@
 #include <QLabel>
 #include <QEvent>
 #include <QMouseEvent>
+#include <QApplication>
 
 #include <TopoDS.hxx>
 #include <TopoDS_Vertex.hxx>
@@ -231,6 +232,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
           PartSet_Tools::convertTo2D(aPoint, mySketch, theWnd->v3dView(), aX, aY);
           setPoint(aX, aY);
           emit vertexSelected(aObjects.front(), aShape);
+          QApplication::processEvents();
           emit focusOutWidget(this);
           return;
         }
