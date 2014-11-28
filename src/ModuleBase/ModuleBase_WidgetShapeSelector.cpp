@@ -139,6 +139,11 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
         std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aAttr);
       if (aSelectAttr)
         aSelectAttr->setValue(aBody, myShape);
+      else {
+        AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+        if (aRefAttr) 
+          aRefAttr->setObject(mySelectedObject);
+      }
       updateObject(myFeature);
       return true;
     }

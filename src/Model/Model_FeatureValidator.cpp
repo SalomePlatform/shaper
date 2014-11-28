@@ -26,10 +26,10 @@ bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& th
   std::list<std::string>::iterator it = aLtAttributes.begin();
   for (; it != aLtAttributes.end(); it++) {
     AttributePtr anAttr = aData->attribute(*it);
-    if (!anAttr->isInitialized()) {
+    if (!anAttr->isInitialized()) { // attribute is not initialized
       std::map<std::string, std::set<std::string> >::const_iterator aFeatureFind = 
         myNotObligatory.find(theFeature->getKind());
-      if (aFeatureFind == myNotObligatory.end() ||
+      if (aFeatureFind == myNotObligatory.end() || // and it is obligatory for filling
           aFeatureFind->second.find(*it) == aFeatureFind->second.end()) {
         return false;
       }
