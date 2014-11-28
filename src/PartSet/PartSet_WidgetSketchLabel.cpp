@@ -104,7 +104,10 @@ void PartSet_WidgetSketchLabel::onPlaneSelected()
         XGUI_Displayer* aDisp = myWorkshop->displayer();
         aDisp->removeSelectionFilter(myPlaneFilter);
         aDisp->closeLocalContexts();
+        emit planeSelected(plane());
         setSketchingMode();
+
+        // Update sketcher actions
         XGUI_ActionsMgr* anActMgr = myWorkshop->actionsMgr();
         anActMgr->update();
       }

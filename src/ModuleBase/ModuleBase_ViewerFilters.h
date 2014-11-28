@@ -44,8 +44,10 @@ DEFINE_STANDARD_HANDLE(ModuleBase_ShapeInPlaneFilter, SelectMgr_Filter);
 class ModuleBase_ShapeInPlaneFilter: public SelectMgr_Filter
 {
 public:
-  Standard_EXPORT ModuleBase_ShapeInPlaneFilter(const gp_Pln& thePane): 
-      SelectMgr_Filter(), myPlane(thePane) {}
+  Standard_EXPORT ModuleBase_ShapeInPlaneFilter(): SelectMgr_Filter() {}
+
+  void setPlane(const gp_Pln& thePane) { myPlane = thePane; }
+  gp_Pln plane() const { return myPlane; }
 
   Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 

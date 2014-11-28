@@ -328,6 +328,9 @@ void XGUI_Displayer::openLocalContext()
     //for (aContext->InitCurrent(); aContext->MoreCurrent(); aContext->NextCurrent())
     //  aAisList.Append(aContext->Current());
 
+    SelectMgr_ListOfFilter aFilters;
+    aFilters.Assign(aContext->Filters());
+
     aContext->ClearCurrents();
     aContext->OpenLocalContext();
     aContext->NotUseDisplayedObjects();
@@ -335,6 +338,10 @@ void XGUI_Displayer::openLocalContext()
     myUseExternalObjects = false;
     myActiveSelectionModes.clear();
 
+    SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
+    for (;aIt.More(); aIt.Next()) {
+      aContext->AddFilter(aIt.Value());
+    }
     // Restore selection
     //AIS_ListIteratorOfListOfInteractive aIt(aAisList);
     //for(; aIt.More(); aIt.Next()) {

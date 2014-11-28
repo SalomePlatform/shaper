@@ -82,6 +82,8 @@ protected slots:
  private slots:
    void onVertexSelected(ObjectPtr theObject, const TopoDS_Shape& theShape);
 
+   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
+
  private:
    /// Converts mouse position to 2d coordinates. 
    /// Member myCurrentSketch has to be correctly defined
@@ -104,6 +106,8 @@ protected slots:
    double myCurX, myCurY;
    CompositeFeaturePtr myCurrentSketch;
    QList<FeaturePtr> myEditingFeatures;
+
+   Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;
 };
 
 #endif

@@ -159,6 +159,16 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
       aDisplayer->erase((*aIt), false);
     }
     aDisplayer->erase(myCurrentSketch);
+
+
+    if (myPlaneFilter.IsNull()) 
+      myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
+    myWorkshop->viewer()->addSelectionFilter(myPlaneFilter);
+    if (theOperation->isEditOperation()) {
+      // If it is editing of sketch then it means that plane is already defined
+      std::shared_ptr<GeomAPI_Pln> aPln = PartSet_Tools::sketchPlane(myCurrentSketch);
+      myPlaneFilter->setPlane(aPln->impl<gp_Pln>());
+    }
   }
 }
 
@@ -192,9 +202,14 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
     aDisplayer->display(myCurrentSketch);
     
     myCurrentSketch = CompositeFeaturePtr();
+    myWorkshop->viewer()->removeSelectionFilter(myPlaneFilter);
   }
 }
 
+void PartSet_Module::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
+{
+  myPlaneFilter->setPlane(thePln->impl<gp_Pln>());
+}
 
 
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
@@ -409,6 +424,8 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
   if (theType == "sketch-start-label") {
     PartSet_WidgetSketchLabel* aWgt = new PartSet_WidgetSketchLabel(theParent, theWidgetApi, theParentId);
     aWgt->setWorkshop(aWorkshop);
+    connect(aWgt, SIGNAL(planeSelected(const std::shared_ptr<GeomAPI_Pln>&)), 
+      this, SLOT(onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>&)));
     theModelWidgets.append(aWgt);
     return aWgt->getControl();
 

@@ -61,6 +61,9 @@ Q_OBJECT
 
   std::shared_ptr<GeomAPI_Pln> plane() const;
 
+signals:
+  void planeSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
+
  private slots:
   void onPlaneSelected();
 
