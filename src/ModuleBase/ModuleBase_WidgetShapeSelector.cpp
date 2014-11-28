@@ -135,17 +135,21 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
     if (aBody) {
       AttributePtr aAttr = aData->attribute(attributeID());
 
+      // We have to check several attributes types
       AttributeSelectionPtr aSelectAttr = 
         std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aAttr);
-      if (aSelectAttr)
+      if (aSelectAttr) {
         aSelectAttr->setValue(aBody, myShape);
-      else {
+        updateObject(myFeature);
+        return true;
+      } else {
         AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-        if (aRefAttr) 
+        if (aRefAttr) {
           aRefAttr->setObject(mySelectedObject);
+          updateObject(myFeature);
+          return true;
+        }
       }
-      updateObject(myFeature);
-      return true;
     }
   } else {
     AttributeReferencePtr aRef = aData->reference(attributeID());
@@ -181,6 +185,11 @@ bool ModuleBase_WidgetShapeSelector::restoreValue()
     if (aSelect) {
       mySelectedObject = aSelect->context();
       myShape = aSelect->value();
+    } else {
+      AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+      if (aRefAttr) {
+        mySelectedObject = aRefAttr->object();
+      }
     }
   } else {
     AttributeReferencePtr aRef = aData->reference(attributeID());
