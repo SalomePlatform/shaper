@@ -46,6 +46,7 @@
 #include <QString>
 #include <QEvent>
 #include <QDockWidget>
+#include <QApplication>
 
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Shape.hxx>
@@ -134,12 +135,21 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
     if (aBody) {
       AttributePtr aAttr = aData->attribute(attributeID());
 
+      // We have to check several attributes types
       AttributeSelectionPtr aSelectAttr = 
         std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aAttr);
-      if (aSelectAttr)
+      if (aSelectAttr) {
         aSelectAttr->setValue(aBody, myShape);
-      updateObject(myFeature);
-      return true;
+        updateObject(myFeature);
+        return true;
+      } else {
+        AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+        if (aRefAttr) {
+          aRefAttr->setObject(mySelectedObject);
+          updateObject(myFeature);
+          return true;
+        }
+      }
     }
   } else {
     AttributeReferencePtr aRef = aData->reference(attributeID());
@@ -175,6 +185,11 @@ bool ModuleBase_WidgetShapeSelector::restoreValue()
     if (aSelect) {
       mySelectedObject = aSelect->context();
       myShape = aSelect->value();
+    } else {
+      AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+      if (aRefAttr) {
+        mySelectedObject = aRefAttr->object();
+      }
     }
   } else {
     AttributeReferencePtr aRef = aData->reference(attributeID());
@@ -258,7 +273,6 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
         return;
     }
     setObject(aObject, aShape);
-    //activateSelection(false);
     emit focusOutWidget(this);
   }
 }
@@ -272,7 +286,6 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, std::shared_ptr
     raisePanel();
   } 
   updateSelectionName();
-  //activateSelection(false);
   emit valuesChanged();
 }
 

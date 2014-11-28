@@ -53,6 +53,7 @@
 #include <QMouseEvent>
 #include <QString>
 #include <QTimer>
+#include <QApplication>
 
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomDataAPI_Dir.h>
@@ -230,7 +231,7 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
     bool isSketchOpe = sketchOperationIdList().contains(aOperation->id());
 
     // Avoid non-sketch operations
-    if (!isSketchOpe)
+    if ((!isSketchOpe) && (!isSketcher))
       return;
 
     bool isEditing = aOperation->isEditOperation();
@@ -271,13 +272,15 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
     } else if (isSketchOpe && isEditing) {
       aOperation->abort();
 
-      //myCurrentSketch = aOperation->parentFeature();
       myIsDragging = true;
       get2dPoint(theWnd, theEvent, myCurX, myCurY);
       myDragDone = false;
       myWorkshop->viewer()->enableSelection(false);
 
-      QTimer::singleShot(10, this, SLOT(launchEditing()));
+      // This is necessary in order to finalize previous operation
+      QApplication::processEvents();
+      launchEditing();
+      //QTimer::singleShot(10, this, SLOT(launchEditing()));
     }
   }
 }
