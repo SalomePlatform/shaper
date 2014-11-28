@@ -10,6 +10,7 @@
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_Selection.h>
 #include <XGUI_ViewerProxy.h>
+#include <XGUI_ActionsMgr.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -104,6 +105,8 @@ void PartSet_WidgetSketchLabel::onPlaneSelected()
         aDisp->removeSelectionFilter(myPlaneFilter);
         aDisp->closeLocalContexts();
         setSketchingMode();
+        XGUI_ActionsMgr* anActMgr = myWorkshop->actionsMgr();
+        anActMgr->update();
       }
     }
   }
