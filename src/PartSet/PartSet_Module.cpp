@@ -56,7 +56,7 @@
 //#include <Config_PointerMessage.h>
 //#include <Config_ModuleReader.h>
 //#include <Config_WidgetReader.h>
-//#include <Events_Loop.h>
+#include <Events_Loop.h>
 //#include <Events_Message.h>
 //#include <Events_Error.h>
 
@@ -195,10 +195,15 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
 {
   if (theOperation->id().toStdString() == SketchPlugin_Sketch::ID()) {
+    DataPtr aData = myCurrentSketch->data();
+    if ((!aData) || (!aData->isValid())) {
+      // The sketch was aborted
+      myCurrentSketch = CompositeFeaturePtr();
+      return; 
+    }
     // Hide all sketcher sub-Objects
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
     XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
-
     for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
       FeaturePtr aFeature = myCurrentSketch->subFeature(i);
       std::list<ResultPtr> aResults = aFeature->results();
@@ -235,7 +240,7 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
         if (aPoint) {
           aPnt2dWgt->setPoint(aPoint->x(), aPoint->y());
           PartSet_Tools::setConstraints(myCurrentSketch, theOperation->feature(), 
-            SketchPlugin_Line::START_ID(), aPoint->x(), aPoint->y());
+            aWgt->attributeID(), aPoint->x(), aPoint->y());
           theOperation->propertyPanel()->activateNextWidget(aPnt2dWgt);
         }
       }
@@ -341,7 +346,6 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
       // This is necessary in order to finalize previous operation
       QApplication::processEvents();
       launchEditing();
-      //QTimer::singleShot(10, this, SLOT(launchEditing()));
     }
   }
 }
@@ -382,22 +386,34 @@ void PartSet_Module::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent
 void PartSet_Module::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   if (myIsDragging) {
+    ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+    if (aOperation->id().toStdString() == SketchPlugin_Sketch::ID())
+      return; // No edit operation activated
+
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
     Handle(V3d_View) aView = theWnd->v3dView();
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
     double aX, aY;
     PartSet_Tools::convertTo2D(aPoint, myCurrentSketch, aView, aX, aY);
-    double dX = myCurX - aX;
-    double dY = myCurY - aY;
+    double dX =  aX - myCurX;
+    double dY =  aY - myCurY;
 
-    ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-    QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-    foreach(ModuleBase_ModelWidget* aWgt, aWidgets) {
-      PartSet_WidgetPoint2D* aWgt2d = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
-      if (aWgt2d) {
-        aWgt2d->setPoint(aWgt2d->x() - dX, aWgt2d->y() - dY);
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(aOperation->feature());
+    if (aSketchFeature) { 
+      aSketchFeature->move(dX, dY);
+      ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent);
+      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+    }/* else { // Alternative case for moving
+      ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+      QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
+      foreach(ModuleBase_ModelWidget* aWgt, aWidgets) {
+        PartSet_WidgetPoint2D* aWgt2d = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
+        if (aWgt2d) {
+          aWgt2d->setPoint(aWgt2d->x() + dX, aWgt2d->y() + dY);
+        }
       }
-    }
+    }*/
     myDragDone = true;
     myCurX = aX;
     myCurY = aY;
@@ -430,9 +446,6 @@ void PartSet_Module::onVertexSelected(ObjectPtr theObject, const TopoDS_Shape& t
     const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
     if (aWidgets.last() == aPanel->activeWidget()) {
       breakOperationSequence();
-      PartSet_WidgetPoint2D* aPnt2dWgt = dynamic_cast<PartSet_WidgetPoint2D*>(aPanel->activeWidget());
-      PartSet_Tools::setConstraints(myCurrentSketch, aOperation->feature(), 
-        SketchPlugin_Line::END_ID(), aPnt2dWgt->x(), aPnt2dWgt->y());
     }
   }
 }
