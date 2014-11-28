@@ -291,7 +291,7 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
     bool isSketchOpe = sketchOperationIdList().contains(aOperation->id());
 
     // Avoid non-sketch operations
-    if (!isSketchOpe)
+    if ((!isSketchOpe) && (!isSketcher))
       return;
 
     bool isEditing = aOperation->isEditOperation();
