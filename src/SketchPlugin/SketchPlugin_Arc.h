@@ -19,6 +19,10 @@
  */
 class SketchPlugin_Arc : public SketchPlugin_Feature, public GeomAPI_IPresentable
 {
+  /// to avoid cyclic dependencies in automatic updates: they mean that 
+  /// update is performed right now and automatic updates are not needed
+  bool myStartUpdate, myEndUpdate;
+
  public:
   /// Arc feature kind
   inline static const std::string& ID()
@@ -61,6 +65,10 @@ class SketchPlugin_Arc : public SketchPlugin_Feature, public GeomAPI_IPresentabl
 
   /// Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
+
+  /// Called on change of any argument-attribute of this object
+  /// \param theID identifier of changed attribute
+  SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// Returns the AIS preview
   virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);

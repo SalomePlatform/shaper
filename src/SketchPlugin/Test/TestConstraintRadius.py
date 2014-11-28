@@ -107,12 +107,13 @@ assert (anArcPrevEndPointX == 50.)
 assert (anArcPrevEndPointY == 0.)
 # Move one point of the arc
 aSession.startOperation()
-anArcStartPoint.setValue(0., 60)
+anArcStartPoint.setValue(0, 60)
 aSession.finishOperation()
 assert (anArcCentr.x() == 10.)
 assert (anArcCentr.y() == 10.)
-assert (anArcEndPoint.x() != anArcPrevEndPointX)
-assert (anArcEndPoint.y() != anArcPrevEndPointY)
+# MPV: it just projects back to the circle the moved start point
+#assert (anArcEndPoint.x() != anArcPrevEndPointX)
+#assert (anArcEndPoint.y() != anArcPrevEndPointY)
 #=========================================================================
 # 4. Move the centr or the point of the arc
 # 5. Check radius is the same
