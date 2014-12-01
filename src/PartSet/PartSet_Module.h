@@ -8,6 +8,7 @@
 #include <ModuleBase_ViewerFilters.h>
 #include <XGUI_Command.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Attribute.h>
 #include <ModelAPI_CompositeFeature.h>
 
 #include <StdSelect_FaceFilter.hxx>
@@ -106,6 +107,7 @@ protected slots:
    double myCurX, myCurY;
    CompositeFeaturePtr myCurrentSketch;
    QList<FeaturePtr> myEditingFeatures;
+   QList<AttributePtr> myEditingAttr;
 
    Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;
 };

@@ -21,7 +21,8 @@ XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
 
 QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) const
 {
-  //std::set<ObjectPtr> aPrsFeatures;
+  QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
+
   QList<ModuleBase_ViewerPrs> aPresentations;
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
 
@@ -29,17 +30,16 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) 
   if (aContext->HasOpenedContext()) {
     for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
       ModuleBase_ViewerPrs aPrs;
-
       Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
+      if (aSelectedIds.contains((long)anIO.Access()))
+        continue;
+    
+      aSelectedIds.append((long)anIO.Access());
       aPrs.setInteractive(anIO);
 
       ObjectPtr aFeature = aDisplayer->getObject(anIO);
       // we should not check the appearance of this feature because there can be some selected shapes
       // for one feature
-      //if (aPrsFeatures.find(aFeature) == aPrsFeatures.end()) {
-      aPrs.setFeature(aFeature);
-        //aPrsFeatures.insert(aFeature);
-      //}
       TopoDS_Shape aShape = aContext->SelectedShape();
       if (!aShape.IsNull() && (aShape.ShapeType() != theShapeTypeToSkip))
         aPrs.setShape(aShape);
@@ -50,17 +50,15 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) 
   } else {
     for (aContext->InitCurrent(); aContext->MoreCurrent(); aContext->NextCurrent()) {
       ModuleBase_ViewerPrs aPrs;
-
       Handle(AIS_InteractiveObject) anIO = aContext->Current();
+      if (aSelectedIds.contains((long)anIO.Access()))
+        continue;
+    
+      aSelectedIds.append((long)anIO.Access());
       aPrs.setInteractive(anIO);
 
       ObjectPtr aFeature = aDisplayer->getObject(anIO);
-      // we should not check the appearance of this feature because there can be some selected shapes
-      // for one feature
-      //if (aPrsFeatures.find(aFeature) == aPrsFeatures.end()) {
       aPrs.setFeature(aFeature);
-        //aPrsFeatures.insert(aFeature);
-      //}
       aPresentations.append(aPrs);
     }
   }
@@ -69,7 +67,7 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) 
 
 QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeToSkip) const
 {
-  //std::set<ObjectPtr> aPrsFeatures;
+  QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
   QList<ModuleBase_ViewerPrs> aPresentations;
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
 
@@ -77,15 +75,16 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getHighlighted(int theShapeTypeToSki
   for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
     ModuleBase_ViewerPrs aPrs;
     Handle(AIS_InteractiveObject) anIO = aContext->DetectedInteractive();
+    if (aSelectedIds.contains((long)anIO.Access()))
+      continue;
+    
+    aSelectedIds.append((long)anIO.Access());
     aPrs.setInteractive(anIO);
 
     ObjectPtr aResult = aDisplayer->getObject(anIO);
     // we should not check the appearance of this feature because there can be some selected shapes
     // for one feature
-    //if (aPrsFeatures.find(aResult) == aPrsFeatures.end()) {
-      aPrs.setFeature(aResult);
-      //aPrsFeatures.insert(aResult);
-    //}
+    aPrs.setFeature(aResult);
     if (aContext->HasOpenedContext()) {
       TopoDS_Shape aShape = aContext->DetectedShape();
       if (!aShape.IsNull() && aShape.ShapeType() != theShapeTypeToSkip)

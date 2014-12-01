@@ -48,7 +48,12 @@
 #include <SketchPlugin_ConstraintRigid.h>
 
 #include <Events_Loop.h>
+
 #include <StdSelect_TypeOfFace.hxx>
+#include <TopoDS_Vertex.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Shape.hxx>
+#include <BRep_Tool.hxx>
 
 #include <QObject>
 #include <QMouseEvent>
@@ -214,9 +219,10 @@ void PartSet_Module::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
+  ModuleBase_IPropertyPanel* aPanel = theOperation->propertyPanel();
   // Restart last operation type 
   if ((theOperation->id() == myLastOperationId) && myLastFeature) {
-    ModuleBase_ModelWidget* aWgt = theOperation->propertyPanel()->activeWidget();
+    ModuleBase_ModelWidget* aWgt = aPanel->activeWidget();
     if (theOperation->id().toStdString() == SketchPlugin_Line::ID()) {
       // Initialise new line with first point equal to end of previous
       PartSet_WidgetPoint2D* aPnt2dWgt = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
@@ -236,19 +242,20 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
     // Start editing constraint
     if (theOperation->isEditOperation()) {
       std::string aId = theOperation->id().toStdString();
-      if ((aId == SketchPlugin_ConstraintRadius::ID()) ||
-          (aId == SketchPlugin_ConstraintLength::ID()) || 
-          (aId == SketchPlugin_ConstraintDistance::ID())) {
-        ModuleBase_IPropertyPanel* aPanel = theOperation->propertyPanel();
-        // Find and activate widget for management of point for dimension line position
-        QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-        foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
-          PartSet_WidgetPoint2D* aPntWgt = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
-          if (aPntWgt) {
-            aPanel->activateWidget(aPntWgt);
-            return;
+      if (sketchOperationIdList().contains(QString(aId.c_str()))) {
+        if ((aId == SketchPlugin_ConstraintRadius::ID()) ||
+            (aId == SketchPlugin_ConstraintLength::ID()) || 
+            (aId == SketchPlugin_ConstraintDistance::ID())) {
+          // Find and activate widget for management of point for dimension line position
+          QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
+          foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
+            PartSet_WidgetPoint2D* aPntWgt = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
+            if (aPntWgt) {
+              aPanel->activateWidget(aPntWgt);
+              return;
+            }
           }
-        }
+        } 
       }
     }
   }
@@ -275,7 +282,7 @@ void PartSet_Module::onSelectionChanged()
   }
 }
 
-void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
+void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent) 
 {
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
@@ -301,12 +308,23 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
     // Remember highlighted objects for editing
     ModuleBase_ISelection* aSelect = myWorkshop->selection();
     QList<ModuleBase_ViewerPrs> aObjects = aSelect->getHighlighted();
-     myEditingFeatures.clear();
+    myEditingFeatures.clear();
+    myEditingAttr.clear();
     if (aObjects.size() > 0) {
       foreach(ModuleBase_ViewerPrs aPrs, aObjects) {
         FeaturePtr aFeature = ModelAPI_Feature::feature(aObjects.first().object());
-        if (aFeature)
+        if (aFeature) {
           myEditingFeatures.append(aFeature);
+          TopoDS_Shape aShape = aPrs.shape();
+          if (!aShape.IsNull()) {
+            if (aShape.ShapeType() == TopAbs_VERTEX) {
+              AttributePtr aAttr = PartSet_Tools::findAttributeBy2dPoint(myEditingFeatures.first(), 
+                                                                         aShape, myCurrentSketch);
+              if (aAttr)
+                myEditingAttr.append(aAttr);
+            }
+          }
+        }
       }
     } 
     // If nothing highlighted - return
@@ -314,12 +332,6 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
       return;
 
     if (isSketcher) {
-      CompositeFeaturePtr aSketch = 
-        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aOperation->feature());
-      if (!PartSet_Tools::sketchPlane(aSketch))
-        return;
-      
-      //myCurrentSketch = aOperation->feature();
       myIsDragging = true;
       get2dPoint(theWnd, theEvent, myCurX, myCurY);
       myDragDone = false;
@@ -328,6 +340,7 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
       launchEditing();
 
     } else if (isSketchOpe && isEditing) {
+      // If selected another object
       aOperation->abort();
 
       myIsDragging = true;
@@ -376,9 +389,9 @@ ModuleBase_Operation* PartSet_Module::getNewOperation(const std::string& theFeat
 
 void PartSet_Module::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  myWorkshop->viewer()->enableSelection(true);
   if (myIsDragging) {
     myIsDragging = false;
-    myWorkshop->viewer()->enableSelection(true);
     if (myDragDone)
       myWorkshop->currentOperation()->commit();
   }
@@ -400,22 +413,33 @@ void PartSet_Module::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* t
     double dX =  aX - myCurX;
     double dY =  aY - myCurY;
 
-    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-      std::dynamic_pointer_cast<SketchPlugin_Feature>(aOperation->feature());
-    if (aSketchFeature) { 
-      aSketchFeature->move(dX, dY);
-      ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent);
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-    }/* else { // Alternative case for moving
+    if ((aOperation->id().toStdString() == SketchPlugin_Line::ID()) &&
+        (myEditingAttr.size() > 0) && 
+        myEditingAttr.first()) {
+      // probably we have prehighlighted point
+      AttributePtr aAttr = myEditingAttr.first();
+      std::string aAttrId = aAttr->id();
       ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
       QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-      foreach(ModuleBase_ModelWidget* aWgt, aWidgets) {
-        PartSet_WidgetPoint2D* aWgt2d = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
-        if (aWgt2d) {
-          aWgt2d->setPoint(aWgt2d->x() + dX, aWgt2d->y() + dY);
+      // Find corresponded widget to provide dragging
+      foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
+        if (aWgt->attributeID() == aAttrId) {
+          PartSet_WidgetPoint2D* aWgt2d = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
+          if (aWgt2d) {
+            aWgt2d->setPoint(aWgt2d->x() + dX, aWgt2d->y() + dY);
+            break;
+          }
         }
       }
-    }*/
+    } else {
+      std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(aOperation->feature());
+      if (aSketchFeature) { 
+        aSketchFeature->move(dX, dY);
+        ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent);
+        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+      }
+    }
     myDragDone = true;
     myCurX = aX;
     myCurY = aY;

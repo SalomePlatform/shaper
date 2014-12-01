@@ -150,6 +150,11 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
 
 void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
 {
+  // TO CHECK: Editing operation does not have automatical activation of widgets
+  if (isEditingMode()) {
+    activateWidget(NULL);
+    return;
+  }
   ModuleBase_ModelWidget* aNextWidget = 0;
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;
@@ -210,6 +215,6 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
   myActiveWidget = theWidget;
   if (myActiveWidget)
     emit widgetActivated(theWidget);
-  else
+  else if (!isEditingMode())
     emit noMoreWidgets();
 }

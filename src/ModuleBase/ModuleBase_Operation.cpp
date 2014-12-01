@@ -270,18 +270,6 @@ bool ModuleBase_Operation::activateByPreselection()
       return true;
     }
   }
-
-  //ModuleBase_ModelWidget* aActiveWgt = myPropertyPanel->activeWidget();
-  //if ((myPreSelection.size() > 0) && aActiveWgt) {
-  //  const ModuleBase_ViewerPrs& aPrs = myPreSelection.first();
-  //  ModuleBase_WidgetValueFeature aValue;
-  //  aValue.setObject(aPrs.object());
-  //  if (aActiveWgt->setValue(&aValue)) {
-  //    myPreSelection.removeOne(aPrs);
-  //    myPropertyPanel->activateNextWidget();
-  //  }
-  //  // If preselection is enough to make a valid feature - apply it immediately
-  //}
   return false;
 }
 
@@ -364,6 +352,7 @@ void ModuleBase_Operation::clearPreselection()
 void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp) 
 { 
   myPropertyPanel = theProp; 
+  myPropertyPanel->setEditingMode(isEditOperation());
   //connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), this,
   //        SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
   if (myPropertyPanel) {

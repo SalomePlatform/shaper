@@ -19,13 +19,17 @@ class MODULEBASE_EXPORT ModuleBase_IPropertyPanel : public QDockWidget
 {
 Q_OBJECT
 public:
-  ModuleBase_IPropertyPanel(QWidget* theParent) : QDockWidget(theParent) {}
+  ModuleBase_IPropertyPanel(QWidget* theParent) : QDockWidget(theParent), myIsEditing(false) {}
 
   /// Returns currently active widget
   virtual ModuleBase_ModelWidget* activeWidget() const = 0;
 
   /// Returns all property panel's widget created by WidgetFactory
   virtual const QList<ModuleBase_ModelWidget*>& modelWidgets() const = 0;
+
+  /// Editing mode depends on mode of current operation. This value is defined by it.
+  void setEditingMode(bool isEditing) { myIsEditing = isEditing; }
+  bool isEditingMode() const { return myIsEditing; }
 
 signals:
   /// The signal about key release on the control, that corresponds to the attribute
@@ -51,6 +55,9 @@ public slots:
   // highlighting from the previous active widget
   // emits widgetActivated(theWidget) signal
   virtual void activateWidget(ModuleBase_ModelWidget* theWidget) = 0;
+
+protected:
+  bool myIsEditing;
 };
 
 #endif
