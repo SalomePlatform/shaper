@@ -45,6 +45,7 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) 
         aPrs.setShape(aShape);
       Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
       aPrs.setOwner(anOwner);
+      aPrs.setFeature(aFeature);
       aPresentations.append(aPrs);
     }
   } else {
