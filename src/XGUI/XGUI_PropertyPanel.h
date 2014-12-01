@@ -56,11 +56,10 @@ Q_OBJECT
   // Enables / disables "ok" ("accept") button
   void setAcceptEnabled(bool);
 
- protected slots:
   // Makes the given widget active, highlights it and removes
   // highlighting from the previous active widget
   // emits widgetActivated(theWidget) signal
-  void activateWidget(ModuleBase_ModelWidget* theWidget);
+  virtual void activateWidget(ModuleBase_ModelWidget* theWidget);
 
  signals:
   /// Signal about the point 2d set to the feature

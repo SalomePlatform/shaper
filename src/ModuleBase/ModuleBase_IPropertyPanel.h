@@ -46,6 +46,11 @@ public slots:
 
   /// Activate the next from current widget in the property panel
   virtual void activateNextWidget() = 0;
+
+  // Makes the given widget active, highlights it and removes
+  // highlighting from the previous active widget
+  // emits widgetActivated(theWidget) signal
+  virtual void activateWidget(ModuleBase_ModelWidget* theWidget) = 0;
 };
 
 #endif

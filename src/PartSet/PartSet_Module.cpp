@@ -214,9 +214,11 @@ void PartSet_Module::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
+  // Restart last operation type 
   if ((theOperation->id() == myLastOperationId) && myLastFeature) {
     ModuleBase_ModelWidget* aWgt = theOperation->propertyPanel()->activeWidget();
     if (theOperation->id().toStdString() == SketchPlugin_Line::ID()) {
+      // Initialise new line with first point equal to end of previous
       PartSet_WidgetPoint2D* aPnt2dWgt = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
       if (aPnt2dWgt) {
         std::shared_ptr<ModelAPI_Data> aData = myLastFeature->data();
@@ -230,12 +232,47 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
         }
       }
     }
+  } else {
+    // Start editing constraint
+    if (theOperation->isEditOperation()) {
+      std::string aId = theOperation->id().toStdString();
+      if ((aId == SketchPlugin_ConstraintRadius::ID()) ||
+          (aId == SketchPlugin_ConstraintLength::ID()) || 
+          (aId == SketchPlugin_ConstraintDistance::ID())) {
+        ModuleBase_IPropertyPanel* aPanel = theOperation->propertyPanel();
+        // Find and activate widget for management of point for dimension line position
+        QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
+        foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
+          PartSet_WidgetPoint2D* aPntWgt = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
+          if (aPntWgt) {
+            aPanel->activateWidget(aPntWgt);
+            return;
+          }
+        }
+      }
+    }
   }
 }
 
 
 void PartSet_Module::onSelectionChanged()
 {
+  // Editing of constraints can be done on selection
+  ModuleBase_ISelection* aSelect = myWorkshop->selection();
+  QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
+  if (aSelected.size() == 1) {
+    ModuleBase_ViewerPrs aPrs = aSelected.first();
+    ObjectPtr aObject = aPrs.object();
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
+    if (aFeature) {
+      std::string aId = aFeature->getKind();
+      if ((aId == SketchPlugin_ConstraintRadius::ID()) ||
+          (aId == SketchPlugin_ConstraintLength::ID()) || 
+          (aId == SketchPlugin_ConstraintDistance::ID())) {
+        editFeature(aFeature);
+      }
+    }
+  }
 }
 
 void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
