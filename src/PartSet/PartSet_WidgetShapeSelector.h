@@ -32,4 +32,25 @@ private:
   CompositeFeaturePtr mySketch;
 };
 
+
+class PARTSET_EXPORT PartSet_WidgetConstraintShapeSelector: public ModuleBase_WidgetShapeSelector
+{
+Q_OBJECT
+ public:
+  PartSet_WidgetConstraintShapeSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
+    const Config_WidgetAPI* theData, const std::string& theParentId)
+    : ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData, theParentId) {}
+
+  virtual ~PartSet_WidgetConstraintShapeSelector() {}
+
+  /// Saves the internal parameters to the given feature
+  virtual bool storeValue() const;
+
+  void setSketcher(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
+  CompositeFeaturePtr sketch() const { return mySketch; }
+
+private:
+  CompositeFeaturePtr mySketch;
+};
+
 #endif

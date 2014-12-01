@@ -5,6 +5,7 @@
 #include "XGUI_ViewWindow.h"
 #include "XGUI_Viewer.h"
 #include "XGUI_SalomeConnector.h"
+#include "XGUI_Displayer.h"
 
 XGUI_ViewerProxy::XGUI_ViewerProxy(XGUI_Workshop* theParent)
     : ModuleBase_IViewer(theParent),
@@ -239,26 +240,17 @@ bool XGUI_ViewerProxy::isMultiSelectionEnabled() const
 //***************************************
 void XGUI_ViewerProxy::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
 {
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull()) {
-    aContext->AddFilter(theFilter);
-  }
+  myWorkshop->displayer()->addSelectionFilter(theFilter);
 }
 
 //***************************************
 void XGUI_ViewerProxy::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
 {
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull()) {
-    aContext->RemoveFilter(theFilter);
-  }
+  myWorkshop->displayer()->removeSelectionFilter(theFilter);
 }
 
 //***************************************
 void XGUI_ViewerProxy::clearSelectionFilters()
 {
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull()) {
-    aContext->RemoveFilters();
-  }
+  myWorkshop->displayer()->removeFilters();
 }

@@ -6,6 +6,7 @@
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <PartSet_Tools.h>
+#include <SketchPlugin_Feature.h>
 
 
 bool PartSet_WidgetShapeSelector::storeValue() const
@@ -36,3 +37,23 @@ bool PartSet_WidgetShapeSelector::storeValue() const
   }
   return ModuleBase_WidgetShapeSelector::storeValue();
 }
+
+//*********************************************
+bool PartSet_WidgetConstraintShapeSelector::storeValue() const
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(mySelectedObject);
+  if (aFeature) {
+    std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    if ((!aSPFeature) && (!myShape->isNull())) {
+      ObjectPtr aObj = PartSet_Tools::createFixedObjectByEdge(myShape->impl<TopoDS_Shape>(),
+                                                              mySelectedObject, mySketch);
+      if (aObj) {
+        PartSet_WidgetConstraintShapeSelector* that = (PartSet_WidgetConstraintShapeSelector*) this;
+        that->mySelectedObject = aObj;
+      }
+    }
+  }
+  return ModuleBase_WidgetShapeSelector::storeValue();
+}
+

@@ -62,18 +62,18 @@
       </feature>
       
       <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines" icon=":icons/parallel.png">
-		<shape_selector id="ConstraintEntityA" label="First line" tooltip="Select an line in the viewer" 
+		<sketch_constraint_shape_selector id="ConstraintEntityA" label="First line" tooltip="Select an line in the viewer" 
 			shape_types="edge" use_subshapes="true"/>
-		<shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select an line in the viewer" 
+		<sketch_constraint_shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select an line in the viewer" 
 			shape_types="edge" use_subshapes="true"/>
         <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
         <validator id="PartSet_ParallelValidator"/>
       </feature>
       
       <feature id="SketchConstraintPerpendicular" title="Perpendicular" tooltip="Create constraint defining two perpendicular lines" icon=":icons/perpendicular.png">
-		<shape_selector id="ConstraintEntityA" label="First line" tooltip="Select an line in the viewer" 
+		<sketch_constraint_shape_selector id="ConstraintEntityA" label="First line" tooltip="Select an line in the viewer" 
 			shape_types="edge" use_subshapes="true"/>
-		<shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select an line in the viewer" 
+		<sketch_constraint_shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select an line in the viewer" 
 			shape_types="edge" use_subshapes="true"/>
         <validator id="PartSet_PerpendicularValidator"/>
       </feature>

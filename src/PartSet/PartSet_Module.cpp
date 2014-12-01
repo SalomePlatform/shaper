@@ -456,6 +456,14 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
     theModelWidgets.append(aWgt);
     return aWgt->getControl();
 
+  } if (theType == "sketch_constraint_shape_selector") {
+    PartSet_WidgetConstraintShapeSelector* aWgt = 
+      new PartSet_WidgetConstraintShapeSelector(theParent, workshop(), theWidgetApi, theParentId);
+    aWgt->setSketcher(myCurrentSketch);
+
+    theModelWidgets.append(aWgt);
+    return aWgt->getControl();
+
   }else
     return 0;
 }

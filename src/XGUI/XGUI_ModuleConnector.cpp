@@ -33,12 +33,12 @@ XGUI_ModuleConnector::XGUI_ModuleConnector(XGUI_Workshop* theWorkshop)
   connect(anOperationMgr, SIGNAL(operationAborted(ModuleBase_Operation*)), 
           SIGNAL(operationAborted(ModuleBase_Operation*)));
 
-  myDocumentShapeFilter = new ModuleBase_ShapeDocumentFilter(this);
+  //myDocumentShapeFilter = new ModuleBase_ShapeDocumentFilter(this);
 }
 
 XGUI_ModuleConnector::~XGUI_ModuleConnector()
 {
-  myDocumentShapeFilter.Nullify();
+  //myDocumentShapeFilter.Nullify();
 }
 
 ModuleBase_ISelection* XGUI_ModuleConnector::selection() const
@@ -75,14 +75,14 @@ void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
   }
   aDisp->activateObjectsOutOfContext(aModes);
   //TODO: We have to open Local context because at neutral point filters don't work (bug 25340)
-  aDisp->addSelectionFilter(myDocumentShapeFilter);
+  //aDisp->addSelectionFilter(myDocumentShapeFilter);
 }
 
 void XGUI_ModuleConnector::deactivateSubShapesSelection()
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   // The document limitation selection has to be only during operation
-  aDisp->removeSelectionFilter(myDocumentShapeFilter);
+  //aDisp->removeSelectionFilter(myDocumentShapeFilter);
   aDisp->closeLocalContexts(false);
 }
 

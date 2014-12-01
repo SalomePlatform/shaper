@@ -578,3 +578,11 @@ void XGUI_Displayer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFi
     return;
   aContext->RemoveFilter(theFilter);
 }
+
+void XGUI_Displayer::removeFilters()
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
+  aContext->RemoveFilters();
+}

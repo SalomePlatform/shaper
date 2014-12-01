@@ -141,7 +141,9 @@ class PARTSET_EXPORT PartSet_Tools
   /// Created line will have fixed constraint
   /// \param theEdge - an edge
   /// \return - result of created feature
-  static ResultPtr createFixedObjectByEdge(const ModuleBase_ViewerPrs& thePrs, CompositeFeaturePtr theSketch);
+  static ResultPtr createFixedObjectByEdge(const TopoDS_Shape& theShape, 
+                                           const ObjectPtr& theObject, 
+                                           CompositeFeaturePtr theSketch);
 
   /// Checks whether the list of selected presentations contains the given one
   /// \param theSelected a list of presentations

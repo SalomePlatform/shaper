@@ -105,6 +105,8 @@ class XGUI_EXPORT XGUI_Displayer
 
   void removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
 
+  void removeFilters();
+
   /// Updates the viewer
   void updateViewer();
 
