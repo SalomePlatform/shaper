@@ -30,6 +30,9 @@ class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
   /// Returns whether the shape is an edge
   virtual bool isEdge() const;
 
+  /// Returns whether the shape is a face
+  virtual bool isFace() const;
+
 };
 
 //! Pointer on list of shapes

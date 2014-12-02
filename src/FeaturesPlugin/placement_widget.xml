@@ -1,0 +1,16 @@
+<source>
+  <shape_selector id="placement_base_face" 
+    label="Select a face" 
+    icon=":icons/cut_shape.png" 
+    tooltip="Select a face a one object"
+    shape_types="face"
+    use_subshapes="true"
+  />
+  <shape_selector id="placement_attractable_face" 
+    label="Select a face" 
+    icon=":icons/cut_shape.png" 
+    tooltip="Select a face of another object"
+    shape_types="face"
+    use_subshapes="true"
+  />
+</source>
