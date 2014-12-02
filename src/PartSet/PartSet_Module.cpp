@@ -310,7 +310,7 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
     QList<ModuleBase_ViewerPrs> aObjects = aSelect->getHighlighted();
     myEditingFeatures.clear();
     myEditingAttr.clear();
-    if (aObjects.size() > 0) {
+    if (aObjects.size() == 1) {
       foreach(ModuleBase_ViewerPrs aPrs, aObjects) {
         FeaturePtr aFeature = ModelAPI_Feature::feature(aObjects.first().object());
         if (aFeature) {

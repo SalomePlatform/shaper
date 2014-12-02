@@ -7,7 +7,7 @@
       <feature id="Boolean" title="Boolean" tooltip="Perform boolean operations with shapes" icon=":icons/cut.png">
           <source path="boolean_widget.xml"/>
       </feature>
-      <feature id="Placement" title="Placement" tooltip="Perform moving an object to specified position" icon="">
+      <feature id="Placement" title="Placement" tooltip="Perform moving an object to specified position" icon=":icons/placement.png">
           <source path="placement_widget.xml"/>
       </feature>
     </group>
