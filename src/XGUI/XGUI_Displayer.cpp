@@ -332,6 +332,9 @@ void XGUI_Displayer::openLocalContext()
     // a list of filters in the global context is not cleared and should be cleared here
     SelectMgr_ListOfFilter aFilters;
     aFilters.Assign(aContext->Filters());
+    // it is important to remove the filters in the global context, because there is a code
+    // in the closeLocalContex, which restore the global context filters
+    aContext->RemoveFilters();
 
     //aContext->ClearCurrents();
     aContext->OpenLocalContext();
