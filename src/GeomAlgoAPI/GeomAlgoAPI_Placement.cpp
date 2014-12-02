@@ -42,9 +42,12 @@ void GeomAlgoAPI_Placement::build(
   gp_Vec aSrcDir(aSourceDir->x(), aSourceDir->y(), aSourceDir->z());
   gp_Vec aDstDir(aDestDir->x(), aDestDir->y(), aDestDir->z());
   gp_Quaternion aRot(aSrcDir, aDstDir);
-  gp_Vec aTrans(aDestLoc->x() - aSourceLoc->x(),
-                aDestLoc->y() - aSourceLoc->y(),
-                aDestLoc->z() - aSourceLoc->z());
+  aTrsf.SetRotation(aRot);
+  gp_Vec aSrcCenter(aSourceLoc->x(), aSourceLoc->y(), aSourceLoc->z());
+  aSrcCenter.Transform(aTrsf);
+  gp_Vec aTrans(aDestLoc->x() - aSrcCenter.X(),
+                aDestLoc->y() - aSrcCenter.Y(),
+                aDestLoc->z() - aSrcCenter.Z());
   aTrsf.SetTransformation(aRot, aTrans);
 
   // Transform the shape with copying it

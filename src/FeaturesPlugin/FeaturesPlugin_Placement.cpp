@@ -116,6 +116,7 @@ void FeaturesPlugin_Placement::LoadNamingDS(
     std::shared_ptr<GeomAPI_Shape> theBasis,
     std::shared_ptr<GeomAPI_Shape> theContext)
 {
+  theResultBody->store(theFeature.shape());
   /// TODO: SZY
 /*
 

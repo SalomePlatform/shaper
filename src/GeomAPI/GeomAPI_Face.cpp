@@ -11,6 +11,7 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
+#include <BRepAdaptor_Surface.hxx>
 #include <Geom_Surface.hxx>
 #include <Geom_Plane.hxx>
 
@@ -69,17 +70,20 @@ bool GeomAPI_Face::isPlanar() const
 std::shared_ptr<GeomAPI_Pln> GeomAPI_Face::getPlane() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Face*>(this)->impl<TopoDS_Shape>();
-  Handle(Geom_Surface) aSurf = BRep_Tool::Surface(TopoDS::Face(aShape));
+  BRepAdaptor_Surface aSurfAdapt(TopoDS::Face(aShape));
 
-  if (!aSurf->IsKind(STANDARD_TYPE(Geom_Plane)))
+  if (aSurfAdapt.GetType() != GeomAbs_Plane)
     return std::shared_ptr<GeomAPI_Pln>();
 
   // Obtain central point
   double aUMin, aUMax, aVMin, aVMax;
-  aSurf->Bounds(aUMin, aUMax, aVMin, aVMax);
+  aUMin = aSurfAdapt.FirstUParameter();
+  aUMax = aSurfAdapt.LastUParameter();
+  aVMin = aSurfAdapt.FirstVParameter();
+  aVMax = aSurfAdapt.LastVParameter();
   gp_Pnt aCentralPnt;
   gp_Vec aDU, aDV;
-  aSurf->D1((aUMin+aUMax)*0.5, (aVMin+aVMax)*0.5, aCentralPnt, aDU, aDV);
+  aSurfAdapt.D1((aUMin+aUMax)*0.5, (aVMin+aVMax)*0.5, aCentralPnt, aDU, aDV);
   std::shared_ptr<GeomAPI_Pnt> aCenter(
       new GeomAPI_Pnt(aCentralPnt.X(), aCentralPnt.Y(), aCentralPnt.Z()));
 
