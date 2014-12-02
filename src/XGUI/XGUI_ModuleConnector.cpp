@@ -73,7 +73,7 @@ void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
   foreach(int aType, theTypes) {
     aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum)aType));
   }
-  aDisp->activateObjectsOutOfContext(aModes);
+  aDisp->activateObjects(aModes);
   //TODO: We have to open Local context because at neutral point filters don't work (bug 25340)
   //aDisp->addSelectionFilter(myDocumentShapeFilter);
 }

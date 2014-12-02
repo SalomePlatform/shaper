@@ -57,17 +57,13 @@ void GeomAlgoAPI_Placement::build(
     setImpl(aBuilder);
     myDone = aBuilder->IsDone() == Standard_True;
     if (myDone) {
-      TopoDS_Shape aResult;
-      if(aBuilder->Shape().ShapeType() == TopAbs_COMPOUND) 
-        aResult = GeomAlgoAPI_DFLoader::refineResult(aBuilder->Shape());
-      else
-        aResult = aBuilder->Shape();
+      TopoDS_Shape aResult = aBuilder->Shape();
       // fill data map to keep correct orientation of sub-shapes 
       for (TopExp_Explorer Exp(aResult,TopAbs_FACE); Exp.More(); Exp.Next()) {
         std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
         aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
         myMap.bind(aCurrentShape, aCurrentShape);
-      }   
+      }
       myShape->setImpl(new TopoDS_Shape(aResult));
       myMkShape = new GeomAlgoAPI_MakeShape (aBuilder);
     }

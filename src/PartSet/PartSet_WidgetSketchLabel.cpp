@@ -102,7 +102,7 @@ void PartSet_WidgetSketchLabel::onPlaneSelected()
 
         // Clear selection mode and define sketching mode
         XGUI_Displayer* aDisp = myWorkshop->displayer();
-        aDisp->removeSelectionFilter(myPlaneFilter);
+        aDisp->removeSelectionFilter(myFaceFilter);
         aDisp->closeLocalContexts();
         emit planeSelected(plane());
         setSketchingMode();
@@ -133,13 +133,13 @@ void PartSet_WidgetSketchLabel::activate()
 
     XGUI_Displayer* aDisp = myWorkshop->displayer();
     aDisp->openLocalContext();
-    aDisp->activateObjectsOutOfContext(QIntList());
-    if (myPlaneFilter.IsNull())
-      myPlaneFilter = new StdSelect_FaceFilter(StdSelect_Plane);
-    aDisp->addSelectionFilter(myPlaneFilter);
+    aDisp->activateObjects(QIntList());
+    if (myFaceFilter.IsNull())
+      myFaceFilter = new StdSelect_FaceFilter(StdSelect_Plane);
+    aDisp->addSelectionFilter(myFaceFilter);
     QIntList aModes;
     aModes << TopAbs_FACE;
-    aDisp->setSelectionModes(aModes);
+    aDisp->activateObjects(aModes);
 
     myLabel->setText(myText);
     myLabel->setToolTip(myTooltip);
@@ -153,7 +153,7 @@ void PartSet_WidgetSketchLabel::deactivate()
 {
 
   XGUI_Displayer* aDisp = myWorkshop->displayer();
-  aDisp->removeSelectionFilter(myPlaneFilter);
+  aDisp->removeSelectionFilter(myFaceFilter);
   //aDisp->removeSelectionFilter(mySketchFilter);
   aDisp->closeLocalContexts();
   erasePreviewPlanes();
@@ -265,7 +265,7 @@ void PartSet_WidgetSketchLabel::setSketchingMode()
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   QIntList aModes;
   // Clear standard selection modes if they are defined
-  aDisp->setSelectionModes(aModes);
+  aDisp->activateObjects(aModes);
   aDisp->openLocalContext();
 
   // Set filter
@@ -283,5 +283,5 @@ void PartSet_WidgetSketchLabel::setSketchingMode()
   aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
   aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
 
-  aDisp->activateObjectsOutOfContext(aModes);
+  aDisp->activateObjects(aModes);
 }
