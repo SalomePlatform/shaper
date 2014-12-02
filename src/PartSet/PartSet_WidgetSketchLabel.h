@@ -90,7 +90,7 @@ signals:
   AISObjectPtr myXYPlane;
   bool myPreviewDisplayed;
 
-  Handle(StdSelect_FaceFilter) myPlaneFilter;
+  Handle(StdSelect_FaceFilter) myFaceFilter;
   //Handle(ModuleBase_ShapeInPlaneFilter) mySketchFilter;
 };
 
