@@ -39,6 +39,10 @@ Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(const Handle(SelectMgr_Ent
         SessionPtr aMgr = ModelAPI_Session::get();
         return (aDoc == aMgr->activeDocument() || aDoc == aMgr->moduleDocument());
       }
+      else {
+        // This is not object controlled by the filter
+        return Standard_True;
+      }
     }
   }
   return Standard_False;
@@ -74,6 +78,10 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(const Handle(SelectMgr_Enti
           bool aD3 = myPlane.Distance(aLastPnt) < Precision::Confusion();
           return aD1 && aD2 && aD3;
         }
+      default:
+        // This is not object controlled by the filter
+        return Standard_True;
+      break;
       }
     } else {
       // This is not object controlled by the filter

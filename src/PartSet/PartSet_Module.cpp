@@ -94,6 +94,10 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
 PartSet_Module::~PartSet_Module()
 {
+  if (!myDocumentShapeFilter.IsNull())
+    myDocumentShapeFilter.Nullify();
+  if (!myPlaneFilter.IsNull())
+    myPlaneFilter.Nullify();
 }
 
 void PartSet_Module::registerValidators()
@@ -175,6 +179,9 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
       myPlaneFilter->setPlane(aPln->impl<gp_Pln>());
     }
   }
+  if (myDocumentShapeFilter.IsNull())
+    myDocumentShapeFilter = new ModuleBase_ShapeDocumentFilter(myWorkshop);
+  myWorkshop->viewer()->addSelectionFilter(myDocumentShapeFilter);
 }
 
 void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
@@ -209,6 +216,7 @@ void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
     myCurrentSketch = CompositeFeaturePtr();
     myWorkshop->viewer()->removeSelectionFilter(myPlaneFilter);
   }
+  myWorkshop->viewer()->removeSelectionFilter(myDocumentShapeFilter);
 }
 
 void PartSet_Module::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)

@@ -18,6 +18,8 @@
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ViewerPrs.h>
 
+#include <SelectMgr_AndFilter.hxx>
+
 #include <QString>
 #include <QMap>
 
@@ -94,13 +96,6 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void closeLocalContexts(const bool isUpdateViewer = true);
 
-  /*
-  * Set modes of selections. Selection mode has to be defined by TopAbs_ShapeEnum.
-  * It doesn't manages a local context
-  * \param theModes - list of selection modes. If the list is empty then all selectoin modes will be cleared.
-  */
-  void setSelectionModes(const QIntList& theModes);
-
   void addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
 
   void removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
@@ -136,10 +131,10 @@ class XGUI_EXPORT XGUI_Displayer
 
   /// Activates in local context displayed outside of the context.
   /// \param theModes - modes on which it has to be activated (can be empty)
-  void activateObjectsOutOfContext(const QIntList& theModes);
+  void activateObjects(const QIntList& theModes);
 
   /// Activates in local context displayed outside of the context.
-  void deactivateObjectsOutOfContext();
+  void deactivateObjects();
 
   /// Sets display mode for the given object if this object is displayed
   void setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bool toUpdate = true);
@@ -154,6 +149,10 @@ class XGUI_EXPORT XGUI_Displayer
  protected:
   /// Returns currently installed AIS_InteractiveContext
   Handle(AIS_InteractiveContext) AISContext() const;
+
+  /// Returns the viewer context top filter. If there is no a filter, it is created and set into
+  /// The context should have only this filter inside. Other filters should be add to the filter
+  Handle(SelectMgr_AndFilter) GetFilter();
 
   /// Display the feature and a shape. This shape would be associated to the given feature
   /// \param theFeature a feature instance
@@ -180,6 +179,8 @@ class XGUI_EXPORT XGUI_Displayer
 
  protected:
   XGUI_Workshop* myWorkshop;
+
+  Handle(SelectMgr_AndFilter) myAndFilter;
 
   typedef QMap<ObjectPtr, AISObjectPtr> ResultToAISMap;
   ResultToAISMap myResult2AISObjectMap;

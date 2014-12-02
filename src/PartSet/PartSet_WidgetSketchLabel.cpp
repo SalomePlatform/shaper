@@ -133,13 +133,13 @@ void PartSet_WidgetSketchLabel::activate()
 
     XGUI_Displayer* aDisp = myWorkshop->displayer();
     aDisp->openLocalContext();
-    aDisp->activateObjectsOutOfContext(QIntList());
+    aDisp->activateObjects(QIntList());
     if (myPlaneFilter.IsNull())
       myPlaneFilter = new StdSelect_FaceFilter(StdSelect_Plane);
     aDisp->addSelectionFilter(myPlaneFilter);
     QIntList aModes;
     aModes << TopAbs_FACE;
-    aDisp->setSelectionModes(aModes);
+    aDisp->activateObjects(aModes);
 
     myLabel->setText(myText);
     myLabel->setToolTip(myTooltip);
@@ -265,7 +265,7 @@ void PartSet_WidgetSketchLabel::setSketchingMode()
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   QIntList aModes;
   // Clear standard selection modes if they are defined
-  aDisp->setSelectionModes(aModes);
+  aDisp->activateObjects(aModes);
   aDisp->openLocalContext();
 
   // Set filter
@@ -283,5 +283,5 @@ void PartSet_WidgetSketchLabel::setSketchingMode()
   aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
   aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));
 
-  aDisp->activateObjectsOutOfContext(aModes);
+  aDisp->activateObjects(aModes);
 }

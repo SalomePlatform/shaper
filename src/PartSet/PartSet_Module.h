@@ -110,6 +110,8 @@ protected slots:
    QList<AttributePtr> myEditingAttr;
 
    Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;
+  /// A filter which provides selection within a current document or whole PartSet
+  Handle(ModuleBase_ShapeDocumentFilter) myDocumentShapeFilter;
 };
 
 #endif
