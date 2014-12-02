@@ -437,6 +437,7 @@ void PartSet_Module::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* t
       if (aSketchFeature) { 
         aSketchFeature->move(dX, dY);
         ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent);
+        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
         Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
       }
     }
