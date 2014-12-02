@@ -209,7 +209,7 @@ signals:
   virtual void afterCommitOperation() {}
 
   /// Send update message by loop
-  //void flushUpdated();
+  void flushUpdated();
 
   /// Send created message by loop
   void flushCreated();

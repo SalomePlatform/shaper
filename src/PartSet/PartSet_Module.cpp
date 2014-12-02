@@ -69,6 +69,22 @@
 #endif
 
 
+/// Returns list of unique objects by sum of objects from List1 and List2
+QList<ObjectPtr> getSumList(const QList<ModuleBase_ViewerPrs>& theList1,
+                                       const QList<ModuleBase_ViewerPrs>& theList2)
+{
+  QList<ObjectPtr> aRes;
+  foreach (ModuleBase_ViewerPrs aPrs, theList1) {
+    if (!aRes.contains(aPrs.object()))
+      aRes.append(aPrs.object());
+  }
+  foreach (ModuleBase_ViewerPrs aPrs, theList2) {
+    if (!aRes.contains(aPrs.object()))
+      aRes.append(aPrs.object());
+  }
+  return aRes;
+}
+
 /*!Create and return new instance of XGUI_Module*/
 extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop* theWshop)
 {
@@ -286,6 +302,7 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
 {
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
+
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
   // Use only for sketch operations
   if (aOperation && myCurrentSketch) {
@@ -305,14 +322,31 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
     if ((!isSketcher) && (!isEditing))
       return;
 
+    if (theEvent->modifiers()) {
+      // If user performs multiselection
+      if (isSketchOpe && (!isSketcher))
+        if (!aOperation->commit())
+          aOperation->abort();
+      return;
+    }
     // Remember highlighted objects for editing
     ModuleBase_ISelection* aSelect = myWorkshop->selection();
-    QList<ModuleBase_ViewerPrs> aObjects = aSelect->getHighlighted();
+    QList<ModuleBase_ViewerPrs> aHighlighted = aSelect->getHighlighted();
+    QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
     myEditingFeatures.clear();
     myEditingAttr.clear();
-    if (aObjects.size() == 1) {
-      foreach(ModuleBase_ViewerPrs aPrs, aObjects) {
-        FeaturePtr aFeature = ModelAPI_Feature::feature(aObjects.first().object());
+    if ((aHighlighted.size() == 0) && (aSelected.size() == 0)) {
+      if (isSketchOpe && (!isSketcher))
+        // commit previous operation
+        if (!aOperation->commit())
+          aOperation->abort();
+      return;
+    }
+
+    if ((aHighlighted.size() == 1) && (aSelected.size() == 0)) {
+      // Move by selected shape (vertex). Can be used only for single selection
+      foreach(ModuleBase_ViewerPrs aPrs, aHighlighted) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aHighlighted.first().object());
         if (aFeature) {
           myEditingFeatures.append(aFeature);
           TopoDS_Shape aShape = aPrs.shape();
@@ -326,7 +360,16 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
           }
         }
       }
-    } 
+    } else {
+      // Provide multi-selection. Can be used only for features
+      QList<ObjectPtr> aObjects = getSumList(aHighlighted, aSelected);
+      foreach (ObjectPtr aObj, aObjects) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+        if (aFeature && (!myEditingFeatures.contains(aFeature)))
+          myEditingFeatures.append(aFeature);
+      }
+
+    }
     // If nothing highlighted - return
     if (myEditingFeatures.size() == 0)
       return;
@@ -367,7 +410,7 @@ void PartSet_Module::get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* the
 
 void PartSet_Module::launchEditing()
 {
-  if (myEditingFeatures.size() == 1) {
+  if (myEditingFeatures.size() > 0) {
     FeaturePtr aFeature = myEditingFeatures.first();
     std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
               std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
@@ -392,8 +435,11 @@ void PartSet_Module::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent
   myWorkshop->viewer()->enableSelection(true);
   if (myIsDragging) {
     myIsDragging = false;
-    if (myDragDone)
+    if (myDragDone) {
       myWorkshop->currentOperation()->commit();
+      myEditingFeatures.clear();
+      myEditingAttr.clear();
+    }
   }
 }
 
@@ -414,7 +460,7 @@ void PartSet_Module::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* t
     double dY =  aY - myCurY;
 
     if ((aOperation->id().toStdString() == SketchPlugin_Line::ID()) &&
-        (myEditingAttr.size() > 0) && 
+        (myEditingAttr.size() == 1) && 
         myEditingAttr.first()) {
       // probably we have prehighlighted point
       AttributePtr aAttr = myEditingAttr.first();
@@ -432,14 +478,16 @@ void PartSet_Module::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* t
         }
       }
     } else {
-      std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-        std::dynamic_pointer_cast<SketchPlugin_Feature>(aOperation->feature());
-      if (aSketchFeature) { 
-        aSketchFeature->move(dX, dY);
-        ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent);
-        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
-        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+      foreach(FeaturePtr aFeature, myEditingFeatures) {
+        std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+        if (aSketchFeature) { 
+          aSketchFeature->move(dX, dY);
+          ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent);
+        }
       }
+      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
+      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
     }
     myDragDone = true;
     myCurX = aX;

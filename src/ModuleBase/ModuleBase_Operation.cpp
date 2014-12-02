@@ -30,6 +30,8 @@
 
 #include <Events_Loop.h>
 
+#include <QApplication>
+
 #ifdef _DEBUG
 #include <QDebug>
 #endif
@@ -94,11 +96,11 @@ bool ModuleBase_Operation::canBeCommitted() const
 {
   return isValid();
 }
-//
-//void ModuleBase_Operation::flushUpdated()
-//{
-//  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-//}
+
+void ModuleBase_Operation::flushUpdated()
+{
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+}
 
 void ModuleBase_Operation::flushCreated()
 {
@@ -260,8 +262,9 @@ bool ModuleBase_Operation::activateByPreselection()
   }
   if (isSet && canBeCommitted()) {
     // if all widgets are filled with selection
-    commit();
-    return true;
+    bool aIsDone = commit();
+    QApplication::processEvents();
+    return aIsDone;
   }
   else {
     //activate next widget
