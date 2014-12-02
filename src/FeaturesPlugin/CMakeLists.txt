@@ -22,6 +22,7 @@ SET(XML_RESOURCES
   extrusion_widget.xml
   boolean_widget.xml
   group_widget.xml
+  placement_widget.xml
 )
 
 INCLUDE_DIRECTORIES(

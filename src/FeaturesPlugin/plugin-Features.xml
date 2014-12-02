@@ -8,7 +8,7 @@
           <source path="boolean_widget.xml"/>
       </feature>
       <feature id="Placement" title="Placement" tooltip="Perform moving an object to specified position" icon="">
-<!--          <source path="extrusion_widget.xml"/>-->
+          <source path="placement_widget.xml"/>
       </feature>
     </group>
     <group id="Collections">
