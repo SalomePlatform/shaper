@@ -14,6 +14,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Boolean.h
     GeomAlgoAPI_MakeShape.h
     GeomAlgoAPI_DFLoader.h
+    GeomAlgoAPI_Placement.h
 )
 
 SET(PROJECT_SOURCES
@@ -26,6 +27,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Boolean.cpp
     GeomAlgoAPI_MakeShape.cpp
     GeomAlgoAPI_DFLoader.cpp
+    GeomAlgoAPI_Placement.cpp
 )
 
 SET(PROJECT_LIBRARIES

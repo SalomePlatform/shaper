@@ -4,8 +4,9 @@ SET(PROJECT_HEADERS
     FeaturesPlugin.h
     FeaturesPlugin_Plugin.h
     FeaturesPlugin_Extrusion.h
-	FeaturesPlugin_Boolean.h
-	FeaturesPlugin_Group.h
+    FeaturesPlugin_Boolean.h
+    FeaturesPlugin_Group.h
+    FeaturesPlugin_Placement.h
 )
 
 SET(PROJECT_SOURCES
@@ -13,6 +14,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Extrusion.cpp
     FeaturesPlugin_Boolean.cpp
     FeaturesPlugin_Group.cpp
+    FeaturesPlugin_Placement.cpp
 )
 
 SET(XML_RESOURCES
