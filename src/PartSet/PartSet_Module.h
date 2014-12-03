@@ -28,7 +28,14 @@ class PARTSET_EXPORT PartSet_Module : public ModuleBase_IModule
 {
 Q_OBJECT
 
- public:
+/// Enumeration to specify the restart operation properties.
+enum RestartingMode {
+  None, /// the operation should not be restarted
+  LastFeatureUse, /// the operation is restarted and use the previous feature for own initialization
+  LastFeatureEmpty /// the operation is restarted and does not use the previous feature
+};
+
+public:
   PartSet_Module(ModuleBase_IWorkshop* theWshop);
   virtual ~PartSet_Module();
 
@@ -70,6 +77,10 @@ protected slots:
   /// \param theEvent the mouse event
   virtual void onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
+  /// SLOT, that is called by enter key released
+  /// Set a specific type of restarting the current operation
+  void onEnterReleased();
+
   /// Launches the operation from current highlighting
   void launchEditing();
 
@@ -102,7 +113,7 @@ protected slots:
    bool myDragDone;
 
    // Automatical restarting mode flag
-   bool myRestartingMode;
+   RestartingMode myRestartingMode;
 
    double myCurX, myCurY;
    CompositeFeaturePtr myCurrentSketch;

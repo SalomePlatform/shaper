@@ -108,6 +108,9 @@ signals:
   /// Signal is emitted after the validate methods calls.
   void operationValidated(bool);
 
+  /// Signal is emitted after the key released click.
+  void keyEnterReleased();
+
  protected:
 
   /// Commits the current operatin if it is valid
