@@ -30,7 +30,7 @@
 
 #include <Events_Loop.h>
 
-#include <QApplication>
+#include <QTimer>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -261,10 +261,10 @@ bool ModuleBase_Operation::activateByPreselection()
     }
   }
   if (isSet && canBeCommitted()) {
-    // if all widgets are filled with selection
-    bool aIsDone = commit();
-    QApplication::processEvents();
-    return aIsDone;
+    // if all widgets are filled with selection - commit
+    // in order to commit the operation outside of starting procedure - use timer event
+    QTimer::singleShot(50, this, SLOT(commit()));
+    return true;
   }
   else {
     //activate next widget
