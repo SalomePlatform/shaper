@@ -107,7 +107,7 @@ void SketchSolver_ConstraintManager::processEvent(
           std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
         if (!aFeature)
           continue;
-          changeConstraintOrEntity(aFeature);
+        changeConstraintOrEntity(aFeature);
       }
     }
 
@@ -169,7 +169,7 @@ bool SketchSolver_ConstraintManager::changeWorkplane(
   if (!isUpdated) {
     SketchSolver_ConstraintGroup* aNewGroup = new SketchSolver_ConstraintGroup(theSketch);
     // Verify that the group is created successfully
-    if (!aNewGroup->isBaseWorkplane(theSketch)) {
+    if (!aNewGroup->isBaseWorkplane(theSketch) || !aNewGroup->isWorkplaneValid()) {
       delete aNewGroup;
       return false;
     }
