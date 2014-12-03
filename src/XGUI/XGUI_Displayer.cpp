@@ -242,20 +242,29 @@ void XGUI_Displayer::stopSelection(const QObjectPtrList& theResults, const bool 
 void XGUI_Displayer::setSelected(const QObjectPtrList& theResults, const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  // we need to unhighligth objects manually in the current local context
-  // in couple with the selection clear (TODO)
-  Handle(AIS_LocalContext) aLocalContext = aContext->LocalContext();
-  if (!aLocalContext.IsNull())
-    aLocalContext->UnhilightLastDetected(myWorkshop->viewer()->activeView());
-
-  aContext->ClearSelected();
-  foreach(ObjectPtr aResult, theResults)
-  {
-    if (isVisible(aResult)) {
-      AISObjectPtr anObj = myResult2AISObjectMap[aResult];
-      Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-      if (!anAIS.IsNull())
-        aContext->SetSelected(anAIS, false);
+  if (aContext.IsNull())
+    return;
+  if (aContext->HasOpenedContext()) {
+    aContext->UnhilightSelected();
+    aContext->ClearSelected();
+    foreach(ObjectPtr aResult, theResults) {
+      if (isVisible(aResult)) {
+        AISObjectPtr anObj = myResult2AISObjectMap[aResult];
+        Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
+        if (!anAIS.IsNull())
+          aContext->SetSelected(anAIS, false);
+      }
+    }
+  } else {
+    aContext->UnhilightCurrents();
+    aContext->ClearCurrents();
+    foreach(ObjectPtr aResult, theResults) {
+      if (isVisible(aResult)) {
+        AISObjectPtr anObj = myResult2AISObjectMap[aResult];
+        Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
+        if (!anAIS.IsNull())
+          aContext->SetCurrentObject(anAIS, false);
+      }
     }
   }
   if (isUpdateViewer)
@@ -348,10 +357,9 @@ void XGUI_Displayer::openLocalContext()
       aContext->AddFilter(aIt.Value());
     }
     // Restore selection
-    //AIS_ListIteratorOfListOfInteractive aIt(aAisList);
-    //for(; aIt.More(); aIt.Next()) {
-    //  if (aContext->IsDisplayed(aIt.Value()))
-    //    aContext->SetSelected(aIt.Value(), false);
+    //AIS_ListIteratorOfListOfInteractive aIt2(aAisList);
+    //for(; aIt2.More(); aIt2.Next()) {
+    //  aContext->SetSelected(aIt2.Value(), false);
     //}
   }
 }
@@ -396,10 +404,10 @@ void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
     myActiveSelectionModes.clear();
 
     // Restore selection
-    //AIS_ListIteratorOfListOfInteractive aIt(aAisList);
-    //for(; aIt.More(); aIt.Next()) {
-    //  if (aContext->IsDisplayed(aIt.Value()))
-    //    aContext->SetCurrentObject(aIt.Value(), false);
+    //AIS_ListIteratorOfListOfInteractive aIt2(aAisList);
+    //for(; aIt2.More(); aIt2.Next()) {
+    //  if (aContext->IsDisplayed(aIt2.Value()))
+    //    aContext->SetCurrentObject(aIt2.Value(), false);
     //}
   }
 }

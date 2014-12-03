@@ -351,6 +351,7 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
       return;
     }
 
+    QObjectPtrList aSelObjects = getSumList(aHighlighted, aSelected);
     if ((aHighlighted.size() == 1) && (aSelected.size() == 0)) {
       // Move by selected shape (vertex). Can be used only for single selection
       foreach(ModuleBase_ViewerPrs aPrs, aHighlighted) {
@@ -370,8 +371,7 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
       }
     } else {
       // Provide multi-selection. Can be used only for features
-      QList<ObjectPtr> aObjects = getSumList(aHighlighted, aSelected);
-      foreach (ObjectPtr aObj, aObjects) {
+      foreach (ObjectPtr aObj, aSelObjects) {
         FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
         if (aFeature && (!myEditingFeatures.contains(aFeature)))
           myEditingFeatures.append(aFeature);
@@ -387,7 +387,6 @@ void PartSet_Module::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent*
       get2dPoint(theWnd, theEvent, myCurX, myCurY);
       myDragDone = false;
       myWorkshop->viewer()->enableSelection(false);
-
       launchEditing();
 
     } else if (isSketchOpe && isEditing) {
