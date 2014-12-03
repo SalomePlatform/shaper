@@ -12,6 +12,10 @@
 #include <GeomAPI_Pln.h>
 #include <GeomAlgoAPI_Placement.h>
 
+#define _MODIFIEDF_TAG 1
+#define _MODIFIEDE_TAG 2
+#define _MODIFIEDV_TAG 3
+#define _FACE 4
 FeaturesPlugin_Placement::FeaturesPlugin_Placement()
 {
 }
@@ -53,20 +57,20 @@ void FeaturesPlugin_Placement::execute()
   aFaceRef = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(
       data()->attribute(FeaturesPlugin_Placement::ATTRACT_FACE_ID()));
 
-  std::shared_ptr<GeomAPI_Shape> anAttractiveFace = 
+  std::shared_ptr<GeomAPI_Shape> aSlaveObjectFace = 
     std::dynamic_pointer_cast<GeomAPI_Shape>(aFaceRef->value());
-  if (!anAttractiveFace)
+  if (!aSlaveObjectFace)
     return;
 
-  std::shared_ptr<GeomAPI_Shape> anAttractiveFaceContext;
+  std::shared_ptr<GeomAPI_Shape> aSlaveObject;
   aContextRes = aFaceRef->context();
   if (aContextRes) {
     if (aContextRes->groupName() == ModelAPI_ResultBody::group())
-      anAttractiveFaceContext = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContextRes)->shape();
+      aSlaveObject = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContextRes)->shape();
     else if (aContextRes->groupName() == ModelAPI_ResultConstruction::group())
-      anAttractiveFaceContext = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes)->shape();
+      aSlaveObject = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes)->shape();
   }
-  if (!anAttractiveFaceContext) {
+  if (!aSlaveObject) {
     static const std::string aContextError = "The selection context is bad";
     setError(aContextError);
     return;
@@ -74,18 +78,18 @@ void FeaturesPlugin_Placement::execute()
 
   // Verify faces planarity
   std::shared_ptr<GeomAPI_Face> aBaseFace1(new GeomAPI_Face(aBaseFace));
-  std::shared_ptr<GeomAPI_Face> anAttractFace1(new GeomAPI_Face(anAttractiveFace));
-  if (!aBaseFace1->isPlanar() || !anAttractFace1->isPlanar()) {
+  std::shared_ptr<GeomAPI_Face> aSlaveFace1(new GeomAPI_Face(aSlaveObjectFace));
+  if (!aBaseFace1->isPlanar() || !aSlaveFace1->isPlanar()) {
     static const std::string aPlanarityError = "One of selected face is not planar";
     setError(aPlanarityError);
     return;
   }
 
   std::shared_ptr<GeomAPI_Pln> aBasePlane = aBaseFace1->getPlane();
-  std::shared_ptr<GeomAPI_Pln> anAttractivePlane = anAttractFace1->getPlane();
+  std::shared_ptr<GeomAPI_Pln> aSlavePlane = aSlaveFace1->getPlane();
 
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
-  GeomAlgoAPI_Placement aFeature(anAttractiveFaceContext, anAttractivePlane, aBasePlane);
+  GeomAlgoAPI_Placement aFeature(aSlaveObject, aSlavePlane, aBasePlane);
   if(!aFeature.isDone()) {
     static const std::string aFeatureError = "Placement algorithm failed";
     setError(aFeatureError);
@@ -104,7 +108,7 @@ void FeaturesPlugin_Placement::execute()
     return;
   }  
   //LoadNamingDS
-  LoadNamingDS(aFeature, aResultBody, anAttractiveFace, anAttractiveFaceContext);
+  LoadNamingDS(aFeature, aResultBody, aSlaveObject);
 
   setResult(aResultBody);
 }
@@ -113,44 +117,15 @@ void FeaturesPlugin_Placement::execute()
 void FeaturesPlugin_Placement::LoadNamingDS(
     GeomAlgoAPI_Placement& theFeature,
     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-    std::shared_ptr<GeomAPI_Shape> theBasis,
-    std::shared_ptr<GeomAPI_Shape> theContext)
+    std::shared_ptr<GeomAPI_Shape> theSlaveObject)
 {
-  theResultBody->store(theFeature.shape());
-  /// TODO: SZY
-/*
-
   //load result
-  if(theBasis->isEqual(theContext))
-    theResultBody->store(theFeature.shape());
-  else
-    theResultBody->storeGenerated(theContext, theFeature.shape()); 
+  theResultBody->storeModified(theSlaveObject, theFeature.shape()); // the initial Slave, the resulting Slave
 
   GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
   theFeature.mapOfShapes(*aSubShapes);
 
-    //Insert lateral face : Face from Edge
-  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theBasis, EDGE,_LATERAL_TAG, *aSubShapes);
+    // put modifed faces in DF
+  theResultBody->loadAndOrientModifiedShapes(theFeature.makeShape(), theSlaveObject, _FACE, _MODIFIEDF_TAG, *aSubShapes); 
 
-  //Insert bottom face
-  std::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();  
-  if (!aBottomFace->isNull()) {
-	if (aSubShapes->isBound(aBottomFace)) {	 
-		aBottomFace = aSubShapes->find(aBottomFace);		
-    }    
-    theResultBody->generated(aBottomFace, _FIRST_TAG);
-  }
-
-
-
-  //Insert top face
-  std::shared_ptr<GeomAPI_Shape> aTopFace = theFeature.lastShape();
-  if (!aTopFace->isNull()) {
-    if (aSubShapes->isBound(aTopFace)) {	 
-      aTopFace = aSubShapes->find(aTopFace);	
-    }
-    theResultBody->generated(aTopFace, _LAST_TAG);
-  }
-
-*/
 }

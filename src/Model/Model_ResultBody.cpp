@@ -92,7 +92,7 @@ void Model_ResultBody::storeModified(const std::shared_ptr<GeomAPI_Shape>& theOl
     TopoDS_Shape aShapeNew = theNewShape->impl<TopoDS_Shape>();
     if (aShapeNew.IsNull())
       return;  // null shape inside
-    aBuilder.Generated(aShapeOld, aShapeNew);
+	aBuilder.Modify(aShapeOld, aShapeNew);
   }
 }
 

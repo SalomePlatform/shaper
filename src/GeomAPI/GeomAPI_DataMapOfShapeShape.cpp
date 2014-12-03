@@ -18,6 +18,12 @@ void GeomAPI_DataMapOfShapeShape::clear()
   implPtr<TopTools_DataMapOfShapeShape>()->Clear();
 }
 
+/// Size 
+int GeomAPI_DataMapOfShapeShape::size()
+{
+  return implPtr<TopTools_DataMapOfShapeShape>()->Extent();
+}
+
 /// Adds the Key <K> to  the Map <me>  with  the  Item. Returns True  if the Key  was not already in the map
 bool GeomAPI_DataMapOfShapeShape::bind (std::shared_ptr<GeomAPI_Shape> theKey, std::shared_ptr<GeomAPI_Shape> theItem)
 {

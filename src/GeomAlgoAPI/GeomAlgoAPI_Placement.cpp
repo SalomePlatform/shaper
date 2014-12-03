@@ -15,8 +15,7 @@
 #include <GProp_GProps.hxx>
 #include <BRepGProp.hxx>
 #include <Precision.hxx>
-
-
+#define DEB_PLACEMENT 1
 GeomAlgoAPI_Placement::GeomAlgoAPI_Placement(
     std::shared_ptr<GeomAPI_Shape> theAttractiveFace,
     std::shared_ptr<GeomAPI_Pln> theSourcePlane,
@@ -64,6 +63,12 @@ void GeomAlgoAPI_Placement::build(
         aCurrentShape->setImpl(new TopoDS_Shape(Exp.Current()));
         myMap.bind(aCurrentShape, aCurrentShape);
       }
+#ifdef DEB_PLACEMENT
+	  int aNum = myMap.size();
+	  cout << "MAP of Oriented shapes =" << aNum <<endl;
+
+#endif
+
       myShape->setImpl(new TopoDS_Shape(aResult));
       myMkShape = new GeomAlgoAPI_MakeShape (aBuilder);
     }

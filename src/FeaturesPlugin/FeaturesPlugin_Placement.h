@@ -53,8 +53,7 @@ private:
   /// Load Naming data structure of the feature to the document
   void LoadNamingDS(GeomAlgoAPI_Placement& theFeature,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    std::shared_ptr<GeomAPI_Shape> theBasis,
-                    std::shared_ptr<GeomAPI_Shape> theContext);
+                    std::shared_ptr<GeomAPI_Shape> theSlaveObject);
 };
 
 #endif
