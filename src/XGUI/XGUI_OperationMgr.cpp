@@ -264,6 +264,7 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
   switch (theEvent->key()) {
     case Qt::Key_Return:
     case Qt::Key_Enter: {
+      emit keyEnterReleased();
       commitOperation();
     }
       break;

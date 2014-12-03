@@ -93,7 +93,7 @@ extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop*
 
 PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   : ModuleBase_IModule(theWshop), 
-  myIsDragging(false), myRestartingMode(true), myDragDone(false)
+  myIsDragging(false), myRestartingMode(LastFeatureUse), myDragDone(false)
 {
   //myWorkshop = dynamic_cast<XGUI_Workshop*>(theWshop);
   ModuleBase_IViewer* aViewer = aViewer = theWshop->viewer();
@@ -106,6 +106,11 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   connect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)),
           this, SLOT(onMouseMoved(ModuleBase_IViewWindow*, QMouseEvent*)));
 
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+
+  XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
+  connect(anOpMgr, SIGNAL(keyEnterReleased()), this, SLOT(onEnterReleased()));
 }
 
 PartSet_Module::~PartSet_Module()
@@ -137,9 +142,9 @@ void PartSet_Module::onOperationComitted(ModuleBase_Operation* theOperation)
   FeaturePtr aFeature = theOperation->feature();
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
             std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-  if (aSPFeature && myRestartingMode) {
+  if (aSPFeature && (myRestartingMode != None)) {
     myLastOperationId = theOperation->id();
-    myLastFeature = theOperation->feature();
+    myLastFeature = myRestartingMode == LastFeatureUse ? theOperation->feature() : FeaturePtr();
     launchOperation(myLastOperationId);
   } else {
     breakOperationSequence();
@@ -150,7 +155,7 @@ void PartSet_Module::breakOperationSequence()
 {
   myLastOperationId = "";
   myLastFeature = FeaturePtr();
-  myRestartingMode = false;
+  myRestartingMode = None;
 
 }
 
@@ -161,7 +166,7 @@ void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
 {
-  myRestartingMode = true;
+  myRestartingMode = LastFeatureUse;
   if (theOperation->id().toStdString() == SketchPlugin_Sketch::ID()) {
     // Display all sketcher sub-Objects
     myCurrentSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theOperation->feature());
@@ -502,6 +507,10 @@ void PartSet_Module::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* t
   }
 }
 
+void PartSet_Module::onEnterReleased()
+{
+  myRestartingMode = LastFeatureEmpty;
+}
 
 QStringList PartSet_Module::sketchOperationIdList() const
 {
