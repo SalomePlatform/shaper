@@ -111,6 +111,8 @@ Q_OBJECT
   //! Returns document of the current part
   DocumentPtr partDocument() const;
 
+  int getRowsNumber() const;
+
   //! Types of QModelIndexes
   enum DataIds
   {
