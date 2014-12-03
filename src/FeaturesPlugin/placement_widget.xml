@@ -12,5 +12,8 @@
     tooltip="Select a face of another object"
     shape_types="face"
     use_subshapes="true"
+	concealment="true"
   />
+  <!-- In order to avoid automatic closing of operation -->
+  <label id="" label="" internal="1"/>
 </source>

@@ -24,6 +24,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetLineEdit.h>
 #include <ModuleBase_WidgetMultiSelector.h>
+#include <ModuleBase_WidgetLabel.h>
 
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
@@ -108,19 +109,15 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
   theParent->setLayout(aWidgetLay);
 }
 
+
 QWidget* ModuleBase_WidgetFactory::labelControl(QWidget* theParent)
 {
-  QWidget* result = new QWidget(theParent);
-  QVBoxLayout* aLabelLay = new QVBoxLayout(result);
-  QLabel* aLabel = new QLabel(result);
-  aLabel->setWordWrap(true);
-  aLabel->setText(qs(myWidgetApi->getProperty(INFO_WDG_TEXT)));
-  aLabel->setToolTip(qs(myWidgetApi->getProperty(INFO_WDG_TOOLTIP)));
-  aLabelLay->addWidget(aLabel);
-  aLabelLay->addStretch(1);
-  result->setLayout(aLabelLay);
-  return result;
+  ModuleBase_WidgetLabel* aWgt =
+      new ModuleBase_WidgetLabel(theParent, myWidgetApi, myParentId);
+  myModelWidgets.append(aWgt);
+  return aWgt->getControl();
 }
+
 
 QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType,
                                                       QWidget* theParent)
@@ -199,22 +196,6 @@ QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
   return aDblWgt->getControl();
 }
 
-//QWidget* ModuleBase_WidgetFactory::featureSelectorControl(QWidget* theParent)
-//{
-//  ModuleBase_WidgetFeature* aWidget =
-//      new ModuleBase_WidgetFeature(theParent, myWidgetApi,myParentId);
-//  myModelWidgets.append(aWidget);
-//  return aWidget->getControl();
-//}
-
-//QWidget* ModuleBase_WidgetFactory::featureOrAttributeSelectorControl(QWidget* theParent)
-//{
-//  ModuleBase_WidgetFeatureOrAttribute* aWidget =
-//      new ModuleBase_WidgetFeatureOrAttribute(theParent, myWidgetApi, myParentId);
-//  myModelWidgets.append(aWidget);
-//  return aWidget->getControl();
-//}
-
 QWidget* ModuleBase_WidgetFactory::doubleValueEditor(QWidget* theParent)
 {
   ModuleBase_WidgetEditor* aWidget =
@@ -275,3 +256,4 @@ QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const
 {
   return QString::fromStdString(theStdString);
 }
+

@@ -12,8 +12,6 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetDoubleValue.h
 	ModuleBase_WidgetEditor.h
 	ModuleBase_WidgetFactory.h
-#	ModuleBase_WidgetFeature.h
-#	ModuleBase_WidgetFeatureOrAttribute.h
 	ModuleBase_WidgetSwitch.h
 	ModuleBase_WidgetShapeSelector.h
 	ModuleBase_IWorkshop.h
@@ -33,6 +31,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_ViewerFilters.h
 	ModuleBase_ResultPrs.h
 	ModuleBase_IViewWindow.h
+	ModuleBase_WidgetLabel.h
 )
 
 SET(PROJECT_SOURCES
@@ -45,8 +44,6 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetDoubleValue.cpp
 	ModuleBase_WidgetEditor.cpp
 	ModuleBase_WidgetFactory.cpp
-#	ModuleBase_WidgetFeature.cpp
-#	ModuleBase_WidgetFeatureOrAttribute.cpp
 	ModuleBase_WidgetSwitch.cpp
 	ModuleBase_WidgetShapeSelector.cpp
 	ModuleBase_WidgetValue.cpp
@@ -58,6 +55,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetMultiSelector.cpp
 	ModuleBase_ViewerFilters.cpp
 	ModuleBase_ResultPrs.cpp
+	ModuleBase_WidgetLabel.cpp
 )
 
 SET(PROJECT_LIBRARIES
