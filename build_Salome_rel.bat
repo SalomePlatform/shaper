@@ -13,6 +13,6 @@ call %SRC_DIR%\env_Salome.bat
 mkdir %ROOT_DIR%\build
 cd %ROOT_DIR%\build
 
-cmake %SRC_DIR% -G "Visual Studio 10" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX:PATH=%ROOT_DIR%\install
+cmake %SRC_DIR% -G "Visual Studio 10" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=%ROOT_DIR%\install
 
 start "" %MSVC_EXE% NewGEOM.sln
