@@ -81,5 +81,6 @@ QList<QWidget*> ModuleBase_WidgetChoice::getControls() const
 void ModuleBase_WidgetChoice::onCurrentIndexChanged(int theIndex)
 {
   emit valuesChanged();
-  emit focusOutWidget(this);
+  // Don't transfer focus
+  // emit focusOutWidget(this);
 }
