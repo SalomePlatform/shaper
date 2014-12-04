@@ -1038,6 +1038,9 @@ void XGUI_Workshop::createDockWidgets()
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
   myPropertyPanel = new XGUI_PropertyPanel(aDesktop);
   myPropertyPanel->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
+
+  connect(myPropertyPanel, SIGNAL(noMoreWidgets()), myModule, SLOT(onNoMoreWidgets()));
+
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanel);
   hidePropertyPanel();  //<! Invisible by default
   hideObjectBrowser();

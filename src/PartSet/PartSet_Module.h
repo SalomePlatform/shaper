@@ -49,6 +49,11 @@ public:
 
   QStringList sketchOperationIdList() const;
 
+public slots:
+  /// SLOT, that is called by no more widget signal emitted by property panel
+  /// Set a specific flag to restart the sketcher operation
+  void onNoMoreWidgets();
+
 protected slots:
   /// Called when previous operation is finished
   virtual void onOperationComitted(ModuleBase_Operation* theOperation);

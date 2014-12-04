@@ -181,8 +181,6 @@ void ModuleBase_Operation::postpone()
 
 void ModuleBase_Operation::resume()
 {
-  if (myPropertyPanel)
-    connect(myPropertyPanel, SIGNAL(noMoreWidgets()), SLOT(commit()));
   //  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
   //          this,            SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
   emit resumed();
@@ -358,9 +356,6 @@ void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp)
   myPropertyPanel->setEditingMode(isEditOperation());
   //connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), this,
   //        SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
-  if (myPropertyPanel) {
-    connect(myPropertyPanel, SIGNAL(noMoreWidgets()), SLOT(commit()));
-  }
 }
 
 bool ModuleBase_Operation::isGranted(QString theId) const

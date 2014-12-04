@@ -522,6 +522,20 @@ void PartSet_Module::onEnterReleased()
   myRestartingMode = RM_LastFeatureEmpty;
 }
 
+void PartSet_Module::onNoMoreWidgets()
+{
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  if (aOperation) {
+    /// Restart sketcher operations automatically
+    FeaturePtr aFeature = aOperation->feature();
+    std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+              std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    if (aSPFeature) {
+      aOperation->commit();
+    }
+  }
+}
+
 QStringList PartSet_Module::sketchOperationIdList() const
 {
   QStringList aIds;
