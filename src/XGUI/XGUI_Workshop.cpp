@@ -1239,13 +1239,10 @@ void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
 {
   foreach (ObjectPtr aObj, theList)
   {
-    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-    if (aRes) {
-      if (isVisible) {
-        myDisplayer->display(aRes, false);
-      } else {
-        myDisplayer->erase(aRes, false);
-      }
+    if (isVisible) {
+      myDisplayer->display(aObj, false);
+    } else {
+      myDisplayer->erase(aObj, false);
     }
   }
   myDisplayer->updateViewer();
@@ -1254,8 +1251,7 @@ void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
 //**************************************************************
 void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 {
-  myDisplayer->eraseAll(false);
-  showObjects(theList, true);
+  myDisplayer->showOnly(theList);
 }
 
 

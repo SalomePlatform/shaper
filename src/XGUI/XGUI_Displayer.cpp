@@ -609,3 +609,17 @@ void XGUI_Displayer::removeFilters()
     return;
   GetFilter()->Clear();
 }
+
+void XGUI_Displayer::showOnly(const QObjectPtrList& theList)
+{
+  QObjectPtrList aDispList = myResult2AISObjectMap.keys();
+  foreach(ObjectPtr aObj, aDispList) {
+    if (!theList.contains(aObj))
+      erase(aObj, false);
+  }
+  foreach(ObjectPtr aObj, theList) {
+    if (!isVisible(aObj))
+      display(aObj, false);
+  }
+  updateViewer();
+}

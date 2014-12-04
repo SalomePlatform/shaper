@@ -144,6 +144,10 @@ class XGUI_EXPORT XGUI_Displayer
   DisplayMode displayMode(ObjectPtr theObject) const;
 
 
+  /// Displays only objects listed in the list
+  void showOnly(const QObjectPtrList& theList);
+
+  /// Returns number of displayed objects
   int objectsCount() const { return myResult2AISObjectMap.size(); }
 
  protected:
