@@ -30,9 +30,9 @@ Q_OBJECT
 
 /// Enumeration to specify the restart operation properties.
 enum RestartingMode {
-  None, /// the operation should not be restarted
-  LastFeatureUse, /// the operation is restarted and use the previous feature for own initialization
-  LastFeatureEmpty /// the operation is restarted and does not use the previous feature
+  RM_None, /// the operation should not be restarted
+  RM_LastFeatureUse, /// the operation is restarted and use the previous feature for own initialization
+  RM_LastFeatureEmpty /// the operation is restarted and does not use the previous feature
 };
 
 public:
@@ -76,6 +76,11 @@ protected slots:
   /// The mouse moved point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
   virtual void onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+
+  /// SLOT, that is called by key release in the viewer.
+  /// The mouse moved point is sent to the current operation to be processed.
+  /// \param theEvent the key event
+  void onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent);
 
   /// SLOT, that is called by enter key released
   /// Set a specific type of restarting the current operation
