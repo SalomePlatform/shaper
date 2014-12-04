@@ -33,6 +33,9 @@ Q_OBJECT
 
   QWidget* getControl() const;
 
+  /// This control doesn't accept focus
+  virtual bool focusTo() { return false; }
+
 private:
   QLabel* myLabel;
 };
