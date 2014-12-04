@@ -140,7 +140,7 @@ class XGUI_EXPORT XGUI_Displayer
   void setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bool toUpdate = true);
 
   /// Returns current display mode for the given object.
-  /// If object is not displayed then returns NoMode.
+  /// If object is not dis played then returns NoMode.
   DisplayMode displayMode(ObjectPtr theObject) const;
 
 
