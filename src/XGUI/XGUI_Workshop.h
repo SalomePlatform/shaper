@@ -6,11 +6,12 @@
 #include <Events_Listener.h>
 #include <ModuleBase_Definitions.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Feature.h>
 
 #include <QObject>
 #include <QMap>
-#include <QIcon>
 #include <QKeySequence>
+#include <QPixmap>
 
 class XGUI_MainWindow;
 class XGUI_Command;
@@ -143,7 +144,7 @@ Q_OBJECT
   }
 
   //! Returns icon name according to feature Id
-  static QString featureIcon(const std::string& theId);
+  static QPixmap featureIcon(const FeaturePtr& theFeature);
 
   //! Activates or deactivates a part
   //! If PartPtr is Null pointer then PartSet will be activated

@@ -76,12 +76,41 @@
 
 QMap<QString, QString> XGUI_Workshop::myIcons;
 
-QString XGUI_Workshop::featureIcon(const std::string& theId)
+QPixmap XGUI_Workshop::featureIcon(const FeaturePtr& theFeature)
 {
-  QString aId(theId.c_str());
-  if (myIcons.contains(aId))
-    return myIcons[aId];
-  return QString();
+  QPixmap aPixmap;
+
+  std::string aKind = theFeature->getKind();
+  QString aId(aKind.c_str());
+  if (!myIcons.contains(aId))
+    return aPixmap;
+
+  QString anIconString = myIcons[aId];
+
+  ModelAPI_ExecState aState = theFeature->data()->execState();
+  switch(aState) {
+    case ModelAPI_StateDone:
+    case ModelAPI_StateNothing:
+      aPixmap = QPixmap(anIconString);
+    break;
+    case ModelAPI_StateMustBeUpdated: {
+      aPixmap = ModuleBase_Tools::lighter(anIconString);
+    }
+    break;
+    case ModelAPI_StateExecFailed: {
+      aPixmap = ModuleBase_Tools::composite(":pictures/exec_state_failed.png",
+                                           12, 12, anIconString);
+    }
+    break;
+    case ModelAPI_StateInvalidArgument: {
+      aPixmap = ModuleBase_Tools::composite(":pictures/exec_state_invalid_parameters.png",
+                                           12, 12, anIconString);
+    }
+    break;
+    default: break;  
+  }
+
+  return aPixmap;
 }
 
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)

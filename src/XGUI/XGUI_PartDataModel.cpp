@@ -329,7 +329,7 @@ QVariant XGUI_PartDataModel::data(const QModelIndex& theIndex, int theRole) cons
           ObjectPtr aObject = partDocument()->object(ModelAPI_Feature::group(), theIndex.row() - getRowsNumber());
           FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
           if (aFeature)
-            return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
+            return XGUI_Workshop::featureIcon(aFeature);
         }
       }
       break;
