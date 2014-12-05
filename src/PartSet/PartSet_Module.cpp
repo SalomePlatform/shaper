@@ -251,6 +251,13 @@ void PartSet_Module::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
   ModuleBase_IPropertyPanel* aPanel = theOperation->propertyPanel();
+  if ((theOperation->id().toStdString() == SketchPlugin_Sketch::ID()) && 
+    (theOperation->isEditOperation())) {
+    // we have to manually activate the sketch label in edit mode
+      aPanel->activateWidget(aPanel->modelWidgets().first());
+      return;
+  }
+
   // Restart last operation type 
   if ((theOperation->id() == myLastOperationId) && myLastFeature) {
     ModuleBase_ModelWidget* aWgt = aPanel->activeWidget();
