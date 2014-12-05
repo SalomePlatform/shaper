@@ -13,6 +13,7 @@
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeReference.h>
 
 #include <list>
 
@@ -126,6 +127,20 @@ bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
           std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*anAttr);
         // check the object is already presented
         if (aRef->isInitialized() && aRef->context() == theObject)
+          return false;
+      }
+    }
+  }
+  // Check selection attributes
+  anAttrs = theFeature->data()->attributes(ModelAPI_AttributeReference::type());
+  if (anAttrs.size() > 0) {
+    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+    for(; anAttr != anAttrs.end(); anAttr++) {
+      if (*anAttr) {
+        std::shared_ptr<ModelAPI_AttributeReference> aRef = 
+          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(*anAttr);
+        // check the object is already presented
+        if (aRef->isInitialized() && aRef->value() == theObject)
           return false;
       }
     }
