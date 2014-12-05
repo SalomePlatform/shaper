@@ -145,10 +145,10 @@ void PartSet_Module::onOperationComitted(ModuleBase_Operation* theOperation)
   FeaturePtr aFeature = theOperation->feature();
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
             std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-  if (aSPFeature && (myRestartingMode == RM_LastFeatureUse ||
-                     myRestartingMode == RM_LastFeatureUse)) {
+  if (aSPFeature && (myRestartingMode == RM_LastFeatureUsed ||
+                     myRestartingMode == RM_EmptyFeatureUsed)) {
     myLastOperationId = theOperation->id();
-    myLastFeature = myRestartingMode == RM_LastFeatureUse ? theOperation->feature() : FeaturePtr();
+    myLastFeature = myRestartingMode == RM_LastFeatureUsed ? theOperation->feature() : FeaturePtr();
     launchOperation(myLastOperationId);
   }
   breakOperationSequence();
@@ -517,7 +517,7 @@ void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* the
 
 void PartSet_Module::onEnterReleased()
 {
-  myRestartingMode = RM_LastFeatureEmpty;
+  myRestartingMode = RM_EmptyFeatureUsed;
 }
 
 void PartSet_Module::onNoMoreWidgets()
@@ -529,8 +529,8 @@ void PartSet_Module::onNoMoreWidgets()
     std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
               std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
     if (aSPFeature) {
-      if (myRestartingMode != RM_ForbidRestarting)
-        myRestartingMode = RM_LastFeatureUse;
+      if (myRestartingMode != RM_Forbided)
+        myRestartingMode = RM_LastFeatureUsed;
       aOperation->commit();
     }
   }
@@ -560,7 +560,7 @@ void PartSet_Module::onVertexSelected(ObjectPtr theObject, const TopoDS_Shape& t
     ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
     const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
     if (aWidgets.last() == aPanel->activeWidget()) {
-      myRestartingMode = RM_ForbidRestarting;
+      myRestartingMode = RM_Forbided;
     }
   }
 }

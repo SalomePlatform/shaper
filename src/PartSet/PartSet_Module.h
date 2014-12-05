@@ -31,9 +31,9 @@ Q_OBJECT
 /// Enumeration to specify the restart operation properties.
 enum RestartingMode {
   RM_None, /// the operation should not be restarted
-  RM_ForbidRestarting, /// the operation should not be restarted after there is no active widget
-  RM_LastFeatureUse, /// the operation is restarted and use the previous feature for own initialization
-  RM_LastFeatureEmpty /// the operation is restarted and does not use the previous feature
+  RM_Forbided, /// the operation should not be restarted after there is no active widget
+  RM_LastFeatureUsed, /// the operation is restarted and use the previous feature for own initialization
+  RM_EmptyFeatureUsed /// the operation is restarted and does not use the previous feature
 };
 
 public:
