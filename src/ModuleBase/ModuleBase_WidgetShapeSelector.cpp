@@ -29,6 +29,9 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_ResultValidator.h>
+#include <ModelAPI_RefAttrValidator.h>
 
 #include <Config_WidgetAPI.h>
 #include <Events_Error.h>
@@ -176,6 +179,26 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
 }
 
 //********************************************************************
+void ModuleBase_WidgetShapeSelector::clearAttribute()
+{
+  DataPtr aData = myFeature->data();
+  AttributeSelectionPtr aSelect = aData->selection(attributeID());
+  if (aSelect) {
+    aSelect->setValue(ResultPtr(), std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape()));
+    return;
+  }
+  AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+  if (aRefAttr) {
+    aRefAttr->setObject(ObjectPtr());
+    return;
+  }
+  AttributeReferencePtr aRef = aData->reference(attributeID());
+  if (aRef) {
+    aRef->setObject(ObjectPtr());
+  }
+}
+
+//********************************************************************
 bool ModuleBase_WidgetShapeSelector::restoreValue()
 {
   DataPtr aData = myFeature->data();
@@ -218,6 +241,9 @@ QList<QWidget*> ModuleBase_WidgetShapeSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 {
+  // In order to make reselection possible
+  // TODO: check with MPV clearAttribute();
+
   QObjectPtrList aObjects = myWorkshop->selection()->selectedPresentations();
   if (aObjects.size() > 0) {
     ObjectPtr aObject = aObjects.first();
@@ -272,8 +298,10 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
       if (!acceptObjectShape(aObject))
         return;
     }
-    setObject(aObject, aShape);
-    emit focusOutWidget(this);
+    if (isValid(aObject, aShape)) {
+      setObject(aObject, aShape);
+      emit focusOutWidget(this);
+    }
   }
 }
 
@@ -441,4 +469,45 @@ void ModuleBase_WidgetShapeSelector::activate()
 void ModuleBase_WidgetShapeSelector::deactivate()
 {
   activateSelection(false);
+}
+
+//********************************************************************
+bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape)
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  std::list<ModelAPI_Validator*> aValidators;
+  std::list<std::list<std::string> > anArguments;
+  aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
+
+  // Check the type of selected object
+  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
+  bool isValid = true;
+  for (; aValidator != aValidators.end(); aValidator++) {
+    const ModelAPI_ResultValidator* aResValidator =
+        dynamic_cast<const ModelAPI_ResultValidator*>(*aValidator);
+    if (aResValidator) {
+      isValid = false;
+      if (aResValidator->isValid(theObj)) {
+        isValid = true;
+        break;
+      }
+    }
+  }
+  if (!isValid)
+    return false;
+
+  // Check the acceptability of the object as attribute
+  aValidator = aValidators.begin();
+  std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
+  for (; aValidator != aValidators.end(); aValidator++, aArgs++) {
+    const ModelAPI_RefAttrValidator* aAttrValidator =
+        dynamic_cast<const ModelAPI_RefAttrValidator*>(*aValidator);
+    if (aAttrValidator) {
+      if (!aAttrValidator->isValid(myFeature, *aArgs, theObj)) {
+        return false;
+      }
+    }
+  }
+  return true;
 }

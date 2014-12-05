@@ -96,6 +96,12 @@ Q_OBJECT
   // Set the given object as a value of the widget
   void setObject(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape = std::shared_ptr<GeomAPI_Shape>());
 
+  /// Check the selected with validators if installed
+  virtual bool isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape);
+
+  /// Clear attribute
+  void clearAttribute();
+
   //----------- Class members -------------
  protected:
   QWidget* myContainer;

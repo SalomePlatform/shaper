@@ -134,6 +134,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_PerpendicularValidator", new PartSet_PerpendicularValidator);
   aFactory->registerValidator("PartSet_ParallelValidator", new PartSet_ParallelValidator);
   aFactory->registerValidator("PartSet_RadiusValidator", new PartSet_RadiusValidator);
+  aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
 }
 
 
