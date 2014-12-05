@@ -345,7 +345,7 @@ void XGUI_Displayer::openLocalContext()
     // in the closeLocalContex, which restore the global context filters
     aContext->RemoveFilters();
 
-    //aContext->ClearCurrents();
+    aContext->ClearCurrents();
     aContext->OpenLocalContext();
     aContext->NotUseDisplayedObjects();
 
@@ -378,7 +378,7 @@ void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
     SelectMgr_ListOfFilter aFilters;
     aFilters.Assign(aContext->Filters());
 
-    //aContext->ClearSelected();
+    aContext->ClearSelected();
     aContext->CloseAllContexts(false);
 
     // Redisplay all object if they were displayed in localContext
