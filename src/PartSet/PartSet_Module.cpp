@@ -302,6 +302,16 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::onSelectionChanged()
 {
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  bool isSketcherOp = false;
+  // An edit operation is enable only if the current opeation is the sketch operation
+  if (aOperation && myCurrentSketch) {
+    if (PartSet_Tools::sketchPlane(myCurrentSketch))
+      isSketcherOp = (aOperation->id().toStdString() == SketchPlugin_Sketch::ID());
+  }
+  if (!isSketcherOp)
+    return;
+
   // Editing of constraints can be done on selection
   ModuleBase_ISelection* aSelect = myWorkshop->selection();
   QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
