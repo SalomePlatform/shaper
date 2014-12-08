@@ -8,6 +8,8 @@
 #include <Model.h>
 #include <ModelAPI_Events.h>
 
+#include <memory>
+
 /// Allovs to create ModelAPI messages
 class Model_EventCreator : public ModelAPI_EventCreator
 {

@@ -2,16 +2,17 @@
 // Created:     10 Apr 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ModelAPI_Events_H_
-#define ModelAPI_Events_H_
+#ifndef MODELAPI_EVENTS_H_
+#define MODELAPI_EVENTS_H_
 
 #include <ModelAPI.h>
+#include <ModelAPI_Object.h>
 #include <Events_MessageGroup.h>
+
 #include <memory>
 #include <string>
 #include <set>
 
-#include "ModelAPI_Object.h"
 
 class ModelAPI_Document;
 
@@ -38,10 +39,8 @@ static const char * EVENT_OBJECT_TOHIDE = "ObjectHide";
 class ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 {
  protected:
-  ModelAPI_ObjectUpdatedMessage(const Events_ID theID, const void* theSender = 0)
-      : Events_MessageGroup(theID, theSender)
-  {
-  }
+  ModelAPI_ObjectUpdatedMessage(const Events_ID theID, const void* theSender = 0);
+  virtual ~ModelAPI_ObjectUpdatedMessage();
 
  public:
   /// Returns the feature that has been updated
@@ -58,10 +57,8 @@ class ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 class ModelAPI_ObjectDeletedMessage : public Events_MessageGroup
 {
  protected:
-  ModelAPI_ObjectDeletedMessage(const Events_ID theID, const void* theSender = 0)
-      : Events_MessageGroup(theID, theSender)
-  {
-  }
+  ModelAPI_ObjectDeletedMessage(const Events_ID theID, const void* theSender = 0);
+  virtual ~ModelAPI_ObjectDeletedMessage();
 
  public:
   /// Returns the feature that has been updated

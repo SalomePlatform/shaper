@@ -39,6 +39,7 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
+    ModelAPI_Events.cpp
     ModelAPI_Feature.cpp
     ModelAPI_Session.cpp
     ModelAPI_Tools.cpp
