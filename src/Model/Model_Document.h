@@ -181,6 +181,7 @@ class Model_Document : public ModelAPI_Document
 
   friend class Model_Application;
   friend class Model_Session;
+  friend class Model_Update;
   friend class Model_AttributeReference;
   friend class DFBrowser;
 

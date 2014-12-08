@@ -115,37 +115,15 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
 
   //Events_LongOp::start(this);
   isExecuted = true;
-  std::list<std::shared_ptr<ModelAPI_Document> > aDocs;
   std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
       std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
   if (aMsg) myInitial = aMsg->objects();
   else {
     myInitial.clear();
-    // on change flag all documents must be updated
-    if (isAutomatic) {
-      aDocs = ModelAPI_Session::get()->allOpenedDocuments();
-    }
   }
-  // collect all documents involved into the update process
-  set<std::shared_ptr<ModelAPI_Object> >::iterator aFIter = myInitial.begin();
-  for (; aFIter != myInitial.end(); aFIter++) {
-    aDocs.push_back((*aFIter)->document());
-  }
-  // iterate all features of features-documents to update them (including hidden)
-  std::set<std::shared_ptr<ModelAPI_Document> > alreadyUsed;
-  list<std::shared_ptr<ModelAPI_Document> >::iterator aDIter = aDocs.begin();
-  for (; aDIter != aDocs.end(); aDIter++) {
-    if (alreadyUsed.find(*aDIter) != alreadyUsed.end())
-      continue;
-    alreadyUsed.insert(*aDIter);
-    int aNbFeatures = (*aDIter)->size(ModelAPI_Feature::group(), true);
-    for (int aFIndex = 0; aFIndex < aNbFeatures; aFIndex++) {
-      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
-          (*aDIter)->object(ModelAPI_Feature::group(), aFIndex, true));
-      if (aFeature)
-        updateFeature(aFeature);
-    }
-  }
+  // iterate all documents: features in Root first, then - subs
+  updateInDoc(ModelAPI_Session::get()->moduleDocument());
+
   myUpdated.clear();
   // flush to update display
   static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
@@ -158,6 +136,29 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   }
 
   isExecuted = false;
+}
+
+void Model_Update::updateInDoc(std::shared_ptr<ModelAPI_Document> theDoc)
+{
+  // all features one by one
+  int aNbFeatures = theDoc->size(ModelAPI_Feature::group(), true);
+  for (int aFIndex = 0; aFIndex < aNbFeatures; aFIndex++) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
+        theDoc->object(ModelAPI_Feature::group(), aFIndex, true));
+    if (aFeature)
+      updateFeature(aFeature);
+  }
+  // all sub-documents one by one
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(theDoc);
+  if (aDoc) {
+    const std::set<std::string>& aSubs = aDoc->subDocuments();
+    for(std::set<std::string>::iterator aSub = aSubs.begin(); aSub != aSubs.end(); aSub++) {
+      DocumentPtr aSubDoc = theDoc->subDocument(*aSub);
+      if (aSubDoc) {
+        updateInDoc(aSubDoc);
+      }
+    }
+  }
 }
 
 void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_ExecState theState) 
