@@ -241,7 +241,6 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
 
       PartSet_Tools::setConstraints(mySketch, feature(), attributeID(),aX, aY);
       emit vertexSelected(aObjects.front(), aShape);
-      QApplication::processEvents();
       emit focusOutWidget(this);
       return;
     }
