@@ -885,6 +885,10 @@ void Model_Document::synchronizeBackRefs()
         ModelAPI_EventCreator::get()->sendUpdated(aCIter->first, anEvent);
       } else { // was not concealed become concealed => delete event
         ModelAPI_EventCreator::get()->sendDeleted(aThis, aCIter->first->groupName());
+        // redisplay for the viewer (it must be disappeared also)
+        static Events_ID EVENT_DISP = 
+          Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+        ModelAPI_EventCreator::get()->sendUpdated(aCIter->first, EVENT_DISP);
       }
     }
   }

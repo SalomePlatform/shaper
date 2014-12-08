@@ -265,7 +265,6 @@ void Model_Data::referencesToObjects(
       std::shared_ptr<ModelAPI_AttributeReference> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeReference>(anAttr->second);
       aReferenced.push_back(aRef->value());
-      theRefs.push_back(std::pair<std::string, std::list<ObjectPtr> >(anAttr->first, aReferenced));
     } else if (aType == ModelAPI_AttributeRefAttr::type()) { // reference to attribute or object
       std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeRefAttr>(anAttr->second);
