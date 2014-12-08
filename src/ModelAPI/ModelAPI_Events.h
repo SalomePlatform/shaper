@@ -36,7 +36,7 @@ static const char * EVENT_OBJECT_TOSHOW = "ObjectShow";
 static const char * EVENT_OBJECT_TOHIDE = "ObjectHide";
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
-class ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
+class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 {
  protected:
   ModelAPI_ObjectUpdatedMessage(const Events_ID theID, const void* theSender = 0);
@@ -54,7 +54,7 @@ class ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 };
 
 /// Message that feature was deleted (used for Object Browser update)
-class ModelAPI_ObjectDeletedMessage : public Events_MessageGroup
+class MODELAPI_EXPORT ModelAPI_ObjectDeletedMessage : public Events_MessageGroup
 {
  protected:
   ModelAPI_ObjectDeletedMessage(const Events_ID theID, const void* theSender = 0);
