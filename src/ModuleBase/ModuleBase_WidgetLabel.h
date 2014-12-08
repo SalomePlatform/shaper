@@ -19,6 +19,10 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetLabel();
 
+  /// Defines if it is supported to set the value in this widget
+  /// It returns false because this is an info widget
+  virtual bool canSetValue() const { return false; };
+
   virtual bool storeValue() const
   {
     return true;

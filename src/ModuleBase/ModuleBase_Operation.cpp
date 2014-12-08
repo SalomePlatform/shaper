@@ -247,9 +247,13 @@ bool ModuleBase_Operation::activateByPreselection()
   bool isSet = false;
   for (aWIt = aWidgets.constBegin(), aPIt = myPreSelection.constBegin();
        (aWIt != aWidgets.constEnd()) && (aPIt != myPreSelection.constEnd());
-       ++aWIt, ++aPIt) {
+       ++aWIt) {
     aWgt = (*aWIt);
     ModuleBase_WidgetValueFeature* aValue = (*aPIt);
+    if (!aWgt->canSetValue())
+      continue;
+
+    ++aPIt;
     if (!aWgt->setValue(aValue)) {
       isSet = false;
       break;
