@@ -15,8 +15,6 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetSwitch.h
 	ModuleBase_WidgetShapeSelector.h
 	ModuleBase_IWorkshop.h
-	ModuleBase_WidgetValue.h
-	ModuleBase_WidgetValueFeature.h
 	ModuleBase_Definitions.h
 	ModuleBase_SelectionValidator.h
 	ModuleBase_ISelection.h
@@ -46,8 +44,6 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetFactory.cpp
 	ModuleBase_WidgetSwitch.cpp
 	ModuleBase_WidgetShapeSelector.cpp
-	ModuleBase_WidgetValue.cpp
-	ModuleBase_WidgetValueFeature.cpp	
 	ModuleBase_WidgetChoice.cpp
 	ModuleBase_WidgetFileSelector.cpp
 	ModuleBase_DoubleSpinBox.cpp

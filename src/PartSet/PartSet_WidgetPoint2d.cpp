@@ -11,7 +11,6 @@
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_Selection.h>
 
-#include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_DoubleSpinBox.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IViewWindow.h>
@@ -89,19 +88,15 @@ PartSet_WidgetPoint2D::~PartSet_WidgetPoint2D()
 {
 }
 
-bool PartSet_WidgetPoint2D::setValue(ModuleBase_WidgetValue* theValue)
+bool PartSet_WidgetPoint2D::setSelection(ModuleBase_ViewerPrs theValue)
 {
+  Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
   bool isDone = false;
-  if (theValue) {
-    ModuleBase_WidgetValueFeature* aFeatureValue =
-        dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
-    if (aFeatureValue) {
-      std::shared_ptr<GeomAPI_Pnt2d> aPoint = aFeatureValue->point();
-      if (aPoint) {
-        setPoint(aPoint->x(), aPoint->y());
-        isDone = true;
-      }
-    }
+  TopoDS_Shape aShape = theValue.shape();
+  double aX, aY;
+  if (getPoint2d(aView, aShape, aX, aY)) {
+    setPoint(aX, aY);
+    isDone = true;
   }
   return isDone;
 }
@@ -213,6 +208,24 @@ void PartSet_WidgetPoint2D::deactivate()
   myWorkshop->moduleConnector()->deactivateSubShapesSelection();
 }
 
+bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView, 
+                                       const TopoDS_Shape& theShape, 
+                                       double& theX, double& theY) const
+{
+  if (!theShape.IsNull()) {
+    if (theShape.ShapeType() == TopAbs_VERTEX) {
+      const TopoDS_Vertex& aVertex = TopoDS::Vertex(theShape);
+      if (!aVertex.IsNull()) {
+        // A case when point is taken from existing vertex
+        gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
+        PartSet_Tools::convertTo2D(aPoint, mySketch, theView, theX, theY);
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 
 void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
@@ -222,23 +235,15 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
   aSelection->selectedShapes(aShapes, aObjects);
   if (aShapes.Extent() > 0) {
     TopoDS_Shape aShape = aShapes.First();
-    if (!aShape.IsNull()) {
-      if (aShape.ShapeType() == TopAbs_VERTEX) {
-        const TopoDS_Vertex& aVertex = TopoDS::Vertex(aShape);
-        if (!aVertex.IsNull()) {
-          // A case when point is taken from existing vertex
-          gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
-          double aX, aY;
-          PartSet_Tools::convertTo2D(aPoint, mySketch, theWnd->v3dView(), aX, aY);
-          setPoint(aX, aY);
+    double aX, aY;
+    if (getPoint2d(theWnd->v3dView(), aShape, aX, aY)) {
+      setPoint(aX, aY);
 
-          PartSet_Tools::setConstraints(mySketch, feature(), attributeID(),aX, aY);
-          emit vertexSelected(aObjects.front(), aShape);
-          QApplication::processEvents();
-          emit focusOutWidget(this);
-          return;
-        }
-      }
+      PartSet_Tools::setConstraints(mySketch, feature(), attributeID(),aX, aY);
+      emit vertexSelected(aObjects.front(), aShape);
+      QApplication::processEvents();
+      emit focusOutWidget(this);
+      return;
     }
   }
   // A case when point is taken from mouse event
