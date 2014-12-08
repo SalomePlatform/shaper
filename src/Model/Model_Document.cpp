@@ -51,7 +51,8 @@ Model_Document::Model_Document(const std::string theID, const std::string theKin
       myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
 {
   myDoc->SetUndoLimit(UNDO_LIMIT);  
-  myTransactionsAfterSave = 0;
+  myTransactionsCounter = 0;
+  myTransactionSave = 0;
   myNestedNum = -1;
   myExecuteFeatures = true;
   // to have something in the document and avoid empty doc open/save problem
@@ -191,7 +192,7 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
         break;
     }
   }
-  myTransactionsAfterSave = 0;
+  myTransactionSave = myTransactionsCounter;
   if (isDone) {  // save also sub-documents if any
     theResults.push_back(TCollection_AsciiString(aPath).ToCString());
     std::set<std::string>::iterator aSubIter = mySubs.begin();
@@ -250,8 +251,8 @@ void Model_Document::startOperation()
       myNestedNum = 0;
       myDoc->InitDeltaCompaction();
     }
-    myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();
-    myTransactionsAfterSave++;
+    myIsEmptyTr[myTransactionsCounter] = !myDoc->CommitCommand();
+    myTransactionsCounter++;
     myDoc->OpenCommand();
   } else {  // start the simple command
     myDoc->NewCommand();
@@ -266,15 +267,15 @@ bool Model_Document::compactNested()
 {
   bool allWasEmpty = true;
   while (myNestedNum != -1) {
-    myTransactionsAfterSave--;
-    if (!myIsEmptyTr[myTransactionsAfterSave]) {
+    myTransactionsCounter--;
+    if (!myIsEmptyTr[myTransactionsCounter]) {
       allWasEmpty = false;
     }
-    myIsEmptyTr.erase(myTransactionsAfterSave);
+    myIsEmptyTr.erase(myTransactionsCounter);
     myNestedNum--;
   }
-  myIsEmptyTr[myTransactionsAfterSave] = allWasEmpty;
-  myTransactionsAfterSave++;
+  myIsEmptyTr[myTransactionsCounter] = allWasEmpty;
+  myTransactionsCounter++;
   if (allWasEmpty) {
     // Issue 151: if everything is empty, it is a problem for OCCT to work with it, 
     // just commit the empty that returns nothing
@@ -329,8 +330,8 @@ void Model_Document::finishOperation()
     }
   } else {
     // returns false if delta is empty and no transaction was made
-    myIsEmptyTr[myTransactionsAfterSave] = !myDoc->CommitCommand();  // && (myNestedNum == -1);
-    myTransactionsAfterSave++;
+    myIsEmptyTr[myTransactionsCounter] = !myDoc->CommitCommand();  // && (myNestedNum == -1);
+    myTransactionsCounter++;
   }
 }
 
@@ -338,11 +339,12 @@ void Model_Document::abortOperation()
 {
   if (myNestedNum > 0 && !myDoc->HasOpenCommand()) {  // abort all what was done in nested
       // first compact all nested
-    compactNested();
-    myDoc->Undo();
+    if (compactNested()) {
+      myDoc->Undo(); // undo only compacted, if not: do not undo the empty transaction
+    }
     myDoc->ClearRedos();
-    myTransactionsAfterSave--;
-    myIsEmptyTr.erase(myTransactionsAfterSave);
+    myTransactionsCounter--;
+    myIsEmptyTr.erase(myTransactionsCounter);
   } else {
     if (myNestedNum == 0)  // abort only high-level
       myNestedNum = -1;
@@ -364,13 +366,13 @@ bool Model_Document::isOperation()
 bool Model_Document::isModified()
 {
   // is modified if at least one operation was commited and not undoed
-  return myTransactionsAfterSave > 0 || isOperation();
+  return myTransactionsCounter != myTransactionSave || isOperation();
 }
 
 bool Model_Document::canUndo()
 {
   if (myDoc->GetAvailableUndos() > 0 && myNestedNum != 0
-      && myTransactionsAfterSave != 0 /* for omitting the first useless transaction */)
+      && myTransactionsCounter != 0 /* for omitting the first useless transaction */)
     return true;
   // check other subs contains operation that can be undoed
   std::set<std::string>::iterator aSubIter = mySubs.begin();
@@ -382,10 +384,10 @@ bool Model_Document::canUndo()
 
 void Model_Document::undo()
 {
-  myTransactionsAfterSave--;
+  myTransactionsCounter--;
   if (myNestedNum > 0)
     myNestedNum--;
-  if (!myIsEmptyTr[myTransactionsAfterSave])
+  if (!myIsEmptyTr[myTransactionsCounter])
     myDoc->Undo();
   synchronizeFeatures(true, true);
   // undo for all subs
@@ -410,9 +412,9 @@ void Model_Document::redo()
 {
   if (myNestedNum != -1)
     myNestedNum++;
-  if (!myIsEmptyTr[myTransactionsAfterSave])
+  if (!myIsEmptyTr[myTransactionsCounter])
     myDoc->Redo();
-  myTransactionsAfterSave++;
+  myTransactionsCounter++;
   synchronizeFeatures(true, true);
   // redo for all subs
   std::set<std::string>::iterator aSubIter = mySubs.begin();
@@ -1013,6 +1015,9 @@ void Model_Document::updateResults(FeaturePtr theFeature)
     }
     aResIter++;
   }
+  // it may be on undo
+  if (!theFeature->data() || !theFeature->data()->isValid())
+    return;
   // check that results are presented on all labels
   int aResSize = theFeature->results().size();
   TDF_ChildIterator aLabIter(resultLabel(theFeature->data(), 0).Father());
