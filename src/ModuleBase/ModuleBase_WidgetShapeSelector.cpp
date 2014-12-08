@@ -304,8 +304,9 @@ bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
   if (isValid(aObject, aShape)) {
     setObject(aObject, aShape);
     emit focusOutWidget(this);
+    return true;
   }
-  return true;
+  return false;
 }
 
 //********************************************************************

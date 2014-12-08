@@ -69,19 +69,24 @@ protected slots:
   virtual void onSelectionChanged();
 
   /// SLOT, that is called by mouse press in the viewer.
-  /// The mouse released point is sent to the current operation to be processed.
+  /// \param theWnd - the window where the event happens
   /// \param theEvent the mouse event
   void onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
   /// SLOT, that is called by mouse release in the viewer.
-  /// The mouse released point is sent to the current operation to be processed.
+  /// \param theWnd - the window where the event happens
   /// \param theEvent the mouse event
-  virtual void onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+  void onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
   
   /// SLOT, that is called by mouse move in the viewer.
-  /// The mouse moved point is sent to the current operation to be processed.
+  /// \param theWnd - the window where the event happens
   /// \param theEvent the mouse event
-  virtual void onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+  void onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+
+  /// SLOT, that is called by mouse double click in the viewer.
+  /// \param theWnd - the window where the event happens
+  /// \param theEvent the mouse event
+  void onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
   /// SLOT, that is called by key release in the viewer.
   /// The mouse moved point is sent to the current operation to be processed.
