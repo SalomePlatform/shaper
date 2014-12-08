@@ -51,6 +51,10 @@ Q_OBJECT
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
 
+  /// Defines if it is supported to set the value in this widget
+  /// By default it returns true
+  virtual bool canSetValue() const { return true; };
+
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValue the wrapped widget value
