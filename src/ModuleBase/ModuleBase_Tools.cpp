@@ -53,12 +53,21 @@ QPixmap composite(const QString& theAdditionalIcon, const int theXShift,
   if (anIcon.isNull())
     return QPixmap();
 
-  for (int i = theXShift; i < anAditional.width() + theXShift && i < anIcon.width(); i++)
+  int anAddWidth = anAditional.width();
+  int anAddHeight = anAditional.height();
+
+  int aWidth = anIcon.width();
+  int aHeight = anIcon.height();
+
+  int aStartWidthPos = aWidth-anAddWidth-1;
+  int aStartHeightPos = aHeight-anAddHeight-1;
+
+  for (int i = 0; i < anAddWidth; i++)
   {
-    for (int j = theYShift; j < anAditional.height() + theYShift && j < anIcon.height(); j++)
+    for (int j = 0; j < anAddHeight; j++)
     {
-      if (qAlpha(anAditional.pixel(i - theXShift, j - theYShift)) > 0)
-        anIcon.setPixel(i, j, anAditional.pixel(i - theXShift, j - theYShift));
+      if (qAlpha(anAditional.pixel(i, j)) > 0)
+        anIcon.setPixel(i + aStartWidthPos, j + aStartHeightPos, anAditional.pixel(i, j));
     }
   }
   return QPixmap::fromImage(anIcon);

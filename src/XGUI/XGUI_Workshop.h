@@ -11,7 +11,7 @@
 #include <QObject>
 #include <QMap>
 #include <QKeySequence>
-#include <QPixmap>
+#include <QIcon>
 
 class XGUI_MainWindow;
 class XGUI_Command;
@@ -143,8 +143,11 @@ Q_OBJECT
     return myModuleConnector;
   }
 
-  //! Returns icon name according to feature Id
-  static QPixmap featureIcon(const FeaturePtr& theFeature);
+  //! Returns icon name according to feature
+  static QIcon featureIcon(const FeaturePtr& theFeature);
+
+  //! Returns icon name according to feature
+  static std::string featureIconStr(const FeaturePtr& theFeature);
 
   //! Activates or deactivates a part
   //! If PartPtr is Null pointer then PartSet will be activated

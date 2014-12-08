@@ -76,41 +76,44 @@
 
 QMap<QString, QString> XGUI_Workshop::myIcons;
 
-QPixmap XGUI_Workshop::featureIcon(const FeaturePtr& theFeature)
+std::string XGUI_Workshop::featureIconStr(const FeaturePtr& theFeature)
 {
-  QPixmap aPixmap;
-
   std::string aKind = theFeature->getKind();
   QString aId(aKind.c_str());
   if (!myIcons.contains(aId))
-    return aPixmap;
+    return std::string();
 
-  QString anIconString = myIcons[aId];
+  return myIcons[aId].toStdString();
+}
+
+QIcon XGUI_Workshop::featureIcon(const FeaturePtr& theFeature)
+{
+  QIcon anIcon;
+
+  QString anIconString = featureIconStr(theFeature).c_str();
 
   ModelAPI_ExecState aState = theFeature->data()->execState();
   switch(aState) {
     case ModelAPI_StateDone:
     case ModelAPI_StateNothing:
-      aPixmap = QPixmap(anIconString);
-    break;
+      anIcon = QIcon(anIconString);
     case ModelAPI_StateMustBeUpdated: {
-      aPixmap = ModuleBase_Tools::lighter(anIconString);
+      anIcon = ModuleBase_Tools::lighter(anIconString);
     }
     break;
     case ModelAPI_StateExecFailed: {
-      aPixmap = ModuleBase_Tools::composite(":pictures/exec_state_failed.png",
+      anIcon = ModuleBase_Tools::composite(":pictures/exec_state_failed.png",
                                            12, 12, anIconString);
     }
     break;
     case ModelAPI_StateInvalidArgument: {
-      aPixmap = ModuleBase_Tools::composite(":pictures/exec_state_invalid_parameters.png",
+      anIcon = ModuleBase_Tools::composite(":pictures/exec_state_invalid_parameters.png",
                                            12, 12, anIconString);
     }
     break;
     default: break;  
   }
-
-  return aPixmap;
+  return anIcon;  
 }
 
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
