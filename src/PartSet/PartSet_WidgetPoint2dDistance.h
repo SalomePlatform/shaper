@@ -10,7 +10,6 @@
 
 #include <ModelAPI_CompositeFeature.h>
 
-//class ModuleBase_WidgetValue;
 class GeomAPI_Pnt2d;
 class XGUI_Workshop;
 class ModuleBase_IViewWindow;

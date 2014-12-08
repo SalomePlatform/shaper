@@ -58,7 +58,7 @@ Q_OBJECT
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValue the wrapped widget value
-  virtual bool setValue(ModuleBase_WidgetValue* theValue);
+  virtual bool setSelection(ModuleBase_ViewerPrs theValue);
 
 
   /// The methiod called when widget is activated

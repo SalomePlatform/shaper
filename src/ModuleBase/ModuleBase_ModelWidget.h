@@ -6,6 +6,7 @@
 #define MODULEBASE_MODELWIDGET_H
 
 #include <ModuleBase.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Feature.h>
 
@@ -14,7 +15,6 @@
 #include <memory>
 
 class Config_WidgetAPI;
-class ModuleBase_WidgetValue;
 class QKeyEvent;
 
 /**\class ModuleBase_ModelWidget
@@ -58,7 +58,7 @@ Q_OBJECT
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValue the wrapped widget value
-  virtual bool setValue(ModuleBase_WidgetValue* theValue)
+  virtual bool setSelection(ModuleBase_ViewerPrs theValue)
   {
     return false;
   }
