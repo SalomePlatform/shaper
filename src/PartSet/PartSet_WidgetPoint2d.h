@@ -1,4 +1,4 @@
-// File:        PartSet_WidgetPoint2D.h
+// File:        PartSet_WidgetPoint2d.h
 // Created:     25 Apr 2014
 // Author:      Natalia ERMOLAEVA
 

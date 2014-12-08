@@ -3,7 +3,7 @@
 #include <PartSet_WidgetSketchLabel.h>
 #include <PartSet_Validators.h>
 #include <PartSet_Tools.h>
-#include <PartSet_WidgetPoint2D.h>
+#include <PartSet_WidgetPoint2d.h>
 #include <PartSet_WidgetPoint2dDistance.h>
 #include <PartSet_WidgetShapeSelector.h>
 

@@ -2,8 +2,8 @@
 // Created:     25 Apr 2014
 // Author:      Natalia ERMOLAEVA
 
-#include "PartSet_WidgetPoint2D.h"
-#include "PartSet_Tools.h"
+#include "PartSet_WidgetPoint2d.h"
+#include <PartSet_Tools.h>
 
 #include <XGUI_Workshop.h>
 #include <XGUI_ViewerProxy.h>
