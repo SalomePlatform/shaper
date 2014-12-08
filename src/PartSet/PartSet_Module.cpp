@@ -11,6 +11,7 @@
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_WidgetEditor.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
@@ -105,6 +106,9 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   connect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)),
           this, SLOT(onMouseMoved(ModuleBase_IViewWindow*, QMouseEvent*)));
+
+  connect(aViewer, SIGNAL(mouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*)),
+          this, SLOT(onMouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*)));
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
@@ -526,6 +530,29 @@ void PartSet_Module::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* t
   }
 }
 
+void PartSet_Module::onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
+{
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  if (aOperation->isEditOperation()) {
+    std::string aId = aOperation->id().toStdString();
+    if ((aId == SketchPlugin_ConstraintLength::ID()) ||
+      (aId == SketchPlugin_ConstraintDistance::ID()) ||
+      (aId == SketchPlugin_ConstraintRadius::ID())) 
+    {
+      // Activate dimension value editing on double click
+      ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+      QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
+      // Find corresponded widget to activate value editing
+      foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
+        if (aWgt->attributeID() == "ConstraintValue") {
+          aWgt->focusTo();
+          return;
+        }
+      }
+    }
+  }
+}
+
 void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent)
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
@@ -635,3 +662,4 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
   }else
     return 0;
 }
+

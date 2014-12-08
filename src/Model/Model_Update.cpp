@@ -163,7 +163,7 @@ void Model_Update::updateInDoc(std::shared_ptr<ModelAPI_Document> theDoc)
 
 void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_ExecState theState) 
 {
-  // maske updated and redisplay all results
+  // make updated and redisplay all results
   static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
   std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
