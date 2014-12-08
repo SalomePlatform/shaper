@@ -374,14 +374,24 @@ void SketchSolver_ConstraintManager::resolveConstraints()
 {
   myIsComputed = true;
   bool needToUpdate = false;
+  static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  // to avoid redisplay of each segment on update by solver one by one in the viewer
+  bool isUpdateFlushed = Events_Loop::loop()->isFlushed(anUpdateEvent);
+  if (isUpdateFlushed) {
+    Events_Loop::loop()->setFlushed(anUpdateEvent, false);
+  }
+
   std::vector<SketchSolver_ConstraintGroup*>::iterator aGroupIter;
   for (aGroupIter = myGroups.begin(); aGroupIter != myGroups.end(); aGroupIter++)
     if ((*aGroupIter)->resolveConstraints())
       needToUpdate = true;
 
-  // Features may be updated => send events
+  // Features may be updated => now send events, btu for all changed at once
+  if (isUpdateFlushed) {
+    Events_Loop::loop()->setFlushed(anUpdateEvent, true);
+  }
   if (needToUpdate)
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+    Events_Loop::loop()->flush(anUpdateEvent);
   myIsComputed = false;
 }
 
