@@ -26,9 +26,12 @@
 #include <Events_Error.h>
 
 #include <TDataStd_Name.hxx>
-#include <TDataStd_UAttribute.hxx>
 
 #include <string>
+
+// myLab contains:
+// TDataStd_Name - name of the object
+// TDataStd_Integer - state of the object execution
 
 Model_Data::Model_Data()
 {
@@ -85,7 +88,9 @@ void Model_Data::addAttribute(const std::string& theID, const std::string theAtt
     anAttr = new Model_AttributeRefAttr(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeRefList::type()) {
     anAttr = new Model_AttributeRefList(anAttrLab);
-  } else if (theAttrType == GeomData_Point::type()) {
+  } 
+  // create also GeomData attributes here because only here the OCAF strucure is known
+  else if (theAttrType == GeomData_Point::type()) {
     anAttr = new GeomData_Point(anAttrLab);
   } else if (theAttrType == GeomData_Dir::type()) {
     anAttr = new GeomData_Dir(anAttrLab);
@@ -95,172 +100,34 @@ void Model_Data::addAttribute(const std::string& theID, const std::string theAtt
   if (anAttr) {
     myAttrs[theID] = std::shared_ptr<ModelAPI_Attribute>(anAttr);
     anAttr->setObject(myObject);
+    anAttr->setID(theID);
   } else {
     Events_Error::send("Can not create unknown type of attribute " + theAttrType);
   }
 }
 
-std::shared_ptr<ModelAPI_AttributeDocRef> Model_Data::document(const std::string& theID)
-{
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
-    myAttrs.find(theID);
-  if (aFound == myAttrs.end()) {
-    // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return std::shared_ptr<ModelAPI_AttributeDocRef>();
+// macro for gthe generic returning of the attribute by the ID
+#define GET_ATTRIBUTE_BY_ID(ATTR_TYPE, METHOD_NAME) \
+  std::shared_ptr<ATTR_TYPE> Model_Data::METHOD_NAME(const std::string& theID) { \
+    std::shared_ptr<ATTR_TYPE> aRes; \
+    std::map<std::string, AttributePtr >::iterator aFound = \
+      myAttrs.find(theID); \
+    if (aFound != myAttrs.end()) { \
+      aRes = std::dynamic_pointer_cast<ATTR_TYPE>(aFound->second); \
+    } \
+    return aRes; \
   }
-  std::shared_ptr<ModelAPI_AttributeDocRef> aRes = std::dynamic_pointer_cast<
-      ModelAPI_AttributeDocRef>(aFound->second);
-  if (!aRes) {
-    // TODO: generate error on invalid attribute type request
-  }
-  return aRes;
-}
-
-std::shared_ptr<ModelAPI_AttributeDouble> Model_Data::real(const std::string& theID)
-{
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
-    myAttrs.find(theID);
-  if (aFound == myAttrs.end()) {
-    // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return std::shared_ptr<ModelAPI_AttributeDouble>();
-  }
-  std::shared_ptr<ModelAPI_AttributeDouble> aRes = std::dynamic_pointer_cast<
-      ModelAPI_AttributeDouble>(aFound->second);
-  if (!aRes) {
-    // TODO: generate error on invalid attribute type request
-  }
-  return aRes;
-}
-
-std::shared_ptr<ModelAPI_AttributeInteger> Model_Data::integer(const std::string& theID)
-{
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
-    myAttrs.find(theID);
-  if (aFound == myAttrs.end()) {
-    // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return std::shared_ptr<ModelAPI_AttributeInteger>();
-  }
-  std::shared_ptr<ModelAPI_AttributeInteger> aRes = std::dynamic_pointer_cast<
-      ModelAPI_AttributeInteger>(aFound->second);
-  if (!aRes) {
-    // TODO: generate error on invalid attribute type request
-  }
-  return aRes;
-}
-
-std::shared_ptr<ModelAPI_AttributeBoolean> Model_Data::boolean(const std::string& theID)
-{
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
-    myAttrs.find(theID);
-  if (aFound == myAttrs.end()) {
-    // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return std::shared_ptr<ModelAPI_AttributeBoolean>();
-  }
-  std::shared_ptr<ModelAPI_AttributeBoolean> aRes = std::dynamic_pointer_cast<
-      ModelAPI_AttributeBoolean>(aFound->second);
-  if (!aRes) {
-    // TODO: generate error on invalid attribute type request
-  }
-  return aRes;
-}
-
-std::shared_ptr<ModelAPI_AttributeString> Model_Data::string(const std::string& theID)
-{
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
-    myAttrs.find(theID);
-  if (aFound == myAttrs.end()) {
-    // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return std::shared_ptr<ModelAPI_AttributeString>();
-  }
-  std::shared_ptr<ModelAPI_AttributeString> aRes =
-      std::dynamic_pointer_cast<ModelAPI_AttributeString>(aFound->second);
-  if (!aRes) {
-    // TODO: generate error on invalid attribute type request
-  }
-  return aRes;
-
-}
-
-std::shared_ptr<ModelAPI_AttributeReference> Model_Data::reference(const std::string& theID)
-{
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
-    myAttrs.find(theID);
-  if (aFound == myAttrs.end()) {
-    // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return std::shared_ptr<ModelAPI_AttributeReference>();
-  }
-  std::shared_ptr<ModelAPI_AttributeReference> aRes = std::dynamic_pointer_cast<
-      ModelAPI_AttributeReference>(aFound->second);
-  if (!aRes) {
-    // TODO: generate error on invalid attribute type request
-  }
-  return aRes;
-}
-
-std::shared_ptr<ModelAPI_AttributeSelection> Model_Data::selection(const std::string& theID)
-{
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
-    myAttrs.find(theID);
-  if (aFound == myAttrs.end()) {
-    // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return std::shared_ptr<ModelAPI_AttributeSelection>();
-  }
-  std::shared_ptr<ModelAPI_AttributeSelection> aRes = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aFound->second);
-  if (!aRes) {
-    // TODO: generate error on invalid attribute type request
-  }
-  return aRes;
-}
-
-std::shared_ptr<ModelAPI_AttributeSelectionList> 
-  Model_Data::selectionList(const std::string& theID)
-{
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
-    myAttrs.find(theID);
-  if (aFound == myAttrs.end()) {
-    // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return std::shared_ptr<ModelAPI_AttributeSelectionList>();
-  }
-  std::shared_ptr<ModelAPI_AttributeSelectionList> aRes = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aFound->second);
-  if (!aRes) {
-    // TODO: generate error on invalid attribute type request
-  }
-  return aRes;
-}
-
-std::shared_ptr<ModelAPI_AttributeRefAttr> Model_Data::refattr(const std::string& theID)
-{
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
-    myAttrs.find(theID);
-  if (aFound == myAttrs.end()) {
-    // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return std::shared_ptr<ModelAPI_AttributeRefAttr>();
-  }
-  std::shared_ptr<ModelAPI_AttributeRefAttr> aRes = std::dynamic_pointer_cast<
-      ModelAPI_AttributeRefAttr>(aFound->second);
-  if (!aRes) {
-    // TODO: generate error on invalid attribute type request
-  }
-  return aRes;
-}
-
-std::shared_ptr<ModelAPI_AttributeRefList> Model_Data::reflist(const std::string& theID)
-{
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator aFound = 
-    myAttrs.find(theID);
-  if (aFound == myAttrs.end()) {
-    // TODO: generate error on unknown attribute request and/or add mechanism for customization
-    return std::shared_ptr<ModelAPI_AttributeRefList>();
-  }
-  std::shared_ptr<ModelAPI_AttributeRefList> aRes = std::dynamic_pointer_cast<
-      ModelAPI_AttributeRefList>(aFound->second);
-  if (!aRes) {
-    // TODO: generate error on invalid attribute type request
-  }
-  return aRes;
-}
+// implement nice getting methods for all ModelAPI attributes
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeDocRef, document);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeDouble, real);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeInteger, integer);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeBoolean, boolean);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeString, string);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeReference, reference);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeSelection, selection);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeSelectionList, selectionList);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeRefAttr, refattr);
+GET_ATTRIBUTE_BY_ID(ModelAPI_AttributeRefList, reflist);
 
 std::shared_ptr<ModelAPI_Attribute> Model_Data::attribute(const std::string& theID)
 {
@@ -329,7 +196,7 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
     ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
     if (myObject) {
-      myObject->attributeChanged();
+      myObject->attributeChanged(theAttr->id());
     }
   }
 }
@@ -340,20 +207,25 @@ void Model_Data::erase()
     myLab.ForgetAllAttributes();
 }
 
-/// identifeir of the "must be updated" flag in the data tree
-Standard_GUID kMustBeUpdatedGUID("baede74c-31a6-4416-9c4d-e48ce65f2005");
-
-void Model_Data::mustBeUpdated(const bool theFlag)
+void Model_Data::execState(const ModelAPI_ExecState theState)
 {
-  if (theFlag)
-    TDataStd_UAttribute::Set(myLab, kMustBeUpdatedGUID);
-  else
-    myLab.ForgetAttribute(kMustBeUpdatedGUID);
+  if (theState != ModelAPI_StateNothing)
+    TDataStd_Integer::Set(myLab, (int)theState);
 }
 
-bool Model_Data::mustBeUpdated()
+ModelAPI_ExecState Model_Data::execState()
 {
-  return myLab.IsAttribute(kMustBeUpdatedGUID) == Standard_True;
+  Handle(TDataStd_Integer) aStateAttr;
+  if (myLab.FindAttribute(TDataStd_Integer::GetID(), aStateAttr)) {
+    return ModelAPI_ExecState(aStateAttr->Get());
+  }
+  return ModelAPI_StateMustBeUpdated; // default value
+}
+
+void Model_Data::setError(const std::string& theError)
+{
+  execState(ModelAPI_StateExecFailed);
+  Events_Error::send(theError);
 }
 
 int Model_Data::featureId() const
@@ -393,7 +265,6 @@ void Model_Data::referencesToObjects(
       std::shared_ptr<ModelAPI_AttributeReference> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeReference>(anAttr->second);
       aReferenced.push_back(aRef->value());
-      theRefs.push_back(std::pair<std::string, std::list<ObjectPtr> >(anAttr->first, aReferenced));
     } else if (aType == ModelAPI_AttributeRefAttr::type()) { // reference to attribute or object
       std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeRefAttr>(anAttr->second);

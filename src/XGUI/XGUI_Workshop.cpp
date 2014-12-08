@@ -51,6 +51,7 @@
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
+#include <Config_PropManager.h>
 
 #include <QApplication>
 #include <QFileDialog>
@@ -75,12 +76,44 @@
 
 QMap<QString, QString> XGUI_Workshop::myIcons;
 
-QString XGUI_Workshop::featureIcon(const std::string& theId)
+std::string XGUI_Workshop::featureIconStr(const FeaturePtr& theFeature)
 {
-  QString aId(theId.c_str());
-  if (myIcons.contains(aId))
-    return myIcons[aId];
-  return QString();
+  std::string aKind = theFeature->getKind();
+  QString aId(aKind.c_str());
+  if (!myIcons.contains(aId))
+    return std::string();
+
+  return myIcons[aId].toStdString();
+}
+
+QIcon XGUI_Workshop::featureIcon(const FeaturePtr& theFeature)
+{
+  QIcon anIcon;
+
+  QString anIconString = featureIconStr(theFeature).c_str();
+
+  ModelAPI_ExecState aState = theFeature->data()->execState();
+  switch(aState) {
+    case ModelAPI_StateDone:
+    case ModelAPI_StateNothing:
+      anIcon = QIcon(anIconString);
+    case ModelAPI_StateMustBeUpdated: {
+      anIcon = ModuleBase_Tools::lighter(anIconString);
+    }
+    break;
+    case ModelAPI_StateExecFailed: {
+      anIcon = ModuleBase_Tools::composite(":pictures/exec_state_failed.png",
+                                           12, 12, anIconString);
+    }
+    break;
+    case ModelAPI_StateInvalidArgument: {
+      anIcon = ModuleBase_Tools::composite(":pictures/exec_state_invalid_parameters.png",
+                                           12, 12, anIconString);
+    }
+    break;
+    default: break;  
+  }
+  return anIcon;  
 }
 
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
@@ -115,7 +148,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
   connect(myOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)), 
           SLOT(onOperationStarted()));
-  connect(myOperationMgr, SIGNAL(operationResumed()), SLOT(onOperationStarted()));
+  connect(myOperationMgr, SIGNAL(operationResumed(ModuleBase_Operation*)), SLOT(onOperationStarted()));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           SLOT(onOperationStopped(ModuleBase_Operation*)));
   connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
@@ -137,6 +170,10 @@ XGUI_Workshop::~XGUI_Workshop(void)
 void XGUI_Workshop::startApplication()
 {
   initMenu();
+
+  Config_PropManager::registerProp("Plugins", "default_path", "Default Path",
+                                   Config_Prop::Directory, "");
+
   //Initialize event listening
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Error::errorID());  //!< Listening application errors.
@@ -153,12 +190,15 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
 
   registerValidators();
+  // Calling of  loadCustomProps before activating module is required
+  // by Config_PropManger to restore user-defined path to plugins
+  XGUI_Preferences::loadCustomProps();
   activateModule();
   if (myMainWindow) {
     myMainWindow->show();
     updateCommandStatus();
   }
-  XGUI_Preferences::loadCustomProps();
+  
   onNew();
 }
 
@@ -324,7 +364,7 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     const std::set<ObjectPtr>& aObjList = anUpdateMsg->objects();
-    QList<ObjectPtr> aList;
+    QObjectPtrList aList;
     std::set<ObjectPtr>::const_iterator aIt;
     for (aIt = aObjList.cbegin(); aIt != aObjList.cend(); ++aIt)
       aList.append(*aIt);
@@ -335,7 +375,7 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     const std::set<ObjectPtr>& aObjList = anUpdateMsg->objects();
-    QList<ObjectPtr> aList;
+    QObjectPtrList aList;
     std::set<ObjectPtr>::const_iterator aIt;
     for (aIt = aObjList.cbegin(); aIt != aObjList.cend(); ++aIt)
       aList.append(*aIt);
@@ -428,7 +468,6 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
 {
   std::set<ObjectPtr> aObjects = theMsg->objects();
   std::set<ObjectPtr>::const_iterator aIt;
-  QIntList aModes;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
     bool aHide = !aObj->data() || !aObj->data()->isValid();
@@ -443,15 +482,14 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
         myDisplayer->display(aObj, false);  // In order to update presentation
         if (myOperationMgr->hasOperation()) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-          if (!aOperation->hasObject(aObj))
-            if (!myDisplayer->isActive(aObj))
-              myDisplayer->activate(aObj, aModes);
+          if (aOperation->hasObject(aObj) && myDisplayer->isActive(aObj))
+            myDisplayer->deactivate(aObj);
         }
       } else {
         if (myOperationMgr->hasOperation()) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
           // Display only current operation results if operation has preview
-          if (aOperation->hasObject(aObj) && aOperation->hasPreview()) {
+          if (aOperation->hasObject(aObj)/* && aOperation->hasPreview()*/) {
             myDisplayer->display(aObj, false);
             // Deactivate object of current operation from selection
             if (myDisplayer->isActive(aObj))
@@ -535,10 +573,17 @@ void XGUI_Workshop::onOperationStarted()
       }
     }
 
-    aOperation->setPropertyPanel(myPropertyPanel);
     myPropertyPanel->setModelWidgets(aWidgets);
-    if (!aOperation->activateByPreselection())
-      myPropertyPanel->activateNextWidget(NULL);
+    aOperation->setPropertyPanel(myPropertyPanel);
+    // Do not activate widgets by default if the current operation is editing operation
+    // Because we don't know which widget is going to be edited. 
+    if ((!aOperation->isEditOperation())) {
+      if (!aOperation->activateByPreselection())
+        myPropertyPanel->activateNextWidget(NULL);
+    }
+    // Set final definitions if they are necessary
+    myModule->propertyPanelDefined(aOperation);
+
     // Widget activation (from the previous method) may commit the current operation
     // if pre-selection is enougth for it. So we shouldn't update prop panel's title
     if(myOperationMgr->isCurrentOperation(aOperation)) {
@@ -555,6 +600,15 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   updateCommandStatus();
   hidePropertyPanel();
   myPropertyPanel->cleanContent();
+
+  // Activate objects created by current operation
+  FeaturePtr aFeature = theOperation->feature();
+  myDisplayer->activate(aFeature);
+  const std::list<ResultPtr>& aResults = aFeature->results();
+  std::list<ResultPtr>::const_iterator aIt;
+  for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+    myDisplayer->activate(*aIt);
+  }
 }
 
 bool XGUI_Workshop::event(QEvent * theEvent)
@@ -598,7 +652,7 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
     salomeConnector()->setDocumentKind(aFeatureId, QString::fromStdString(theMessage->documentKind()));
 
     myActionsMgr->addCommand(aAction);
-    myModule->featureCreated(aAction);
+    myModule->actionCreated(aAction);
   } else {
 
     XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
@@ -626,7 +680,7 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
                                                 isUsePropPanel);
     aCommand->setNestedCommands(aNestedFeatures.split(" ", QString::SkipEmptyParts));
     myActionsMgr->addCommand(aCommand);
-    myModule->featureCreated(aCommand);
+    myModule->actionCreated(aCommand);
   }
 }
 
@@ -1016,6 +1070,9 @@ void XGUI_Workshop::createDockWidgets()
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
   myPropertyPanel = new XGUI_PropertyPanel(aDesktop);
   myPropertyPanel->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
+
+  connect(myPropertyPanel, SIGNAL(noMoreWidgets()), myModule, SLOT(onNoMoreWidgets()));
+
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanel);
   hidePropertyPanel();  //<! Invisible by default
   hideObjectBrowser();
@@ -1107,7 +1164,7 @@ ModuleBase_IViewer* XGUI_Workshop::salomeViewer() const
 //**************************************************************
 void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
 {
-  QList<ObjectPtr> aObjects = mySelector->selection()->selectedObjects();
+  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
   if ((theId == "ACTIVATE_PART_CMD") && (aObjects.size() > 0)) {
     ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObjects.first());
     activatePart(aPart);
@@ -1127,6 +1184,11 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setDisplayMode(aObjects, XGUI_Displayer::Wireframe);
   else if (theId == "HIDEALL_CMD")
     myDisplayer->eraseAll();
+  else if (theId == "EDIT_CMD") {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObjects.first());
+    if (aFeature)
+      myModule->editFeature(aFeature);
+  }
 }
 
 //**************************************************************
@@ -1177,7 +1239,7 @@ void XGUI_Workshop::activateLastPart()
 }
 
 //**************************************************************
-void XGUI_Workshop::deleteObjects(const QList<ObjectPtr>& theList)
+void XGUI_Workshop::deleteObjects(const QObjectPtrList& theList)
 {
   QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
   QMessageBox::StandardButton aRes = QMessageBox::warning(
@@ -1208,27 +1270,23 @@ void XGUI_Workshop::deleteObjects(const QList<ObjectPtr>& theList)
 }
 
 //**************************************************************
-void XGUI_Workshop::showObjects(const QList<ObjectPtr>& theList, bool isVisible)
+void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
 {
   foreach (ObjectPtr aObj, theList)
   {
-    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-    if (aRes) {
-      if (isVisible) {
-        myDisplayer->display(aRes, false);
-      } else {
-        myDisplayer->erase(aRes, false);
-      }
+    if (isVisible) {
+      myDisplayer->display(aObj, false);
+    } else {
+      myDisplayer->erase(aObj, false);
     }
   }
   myDisplayer->updateViewer();
 }
 
 //**************************************************************
-void XGUI_Workshop::showOnlyObjects(const QList<ObjectPtr>& theList)
+void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 {
-  myDisplayer->eraseAll(false);
-  showObjects(theList, true);
+  myDisplayer->showOnly(theList);
 }
 
 
@@ -1310,7 +1368,7 @@ void XGUI_Workshop::displayGroupResults(DocumentPtr theDoc, std::string theGroup
 }
 
 //**************************************************************
-void XGUI_Workshop::setDisplayMode(const QList<ObjectPtr>& theList, int theMode)
+void XGUI_Workshop::setDisplayMode(const QObjectPtrList& theList, int theMode)
 {
   foreach(ObjectPtr aObj, theList) {
     myDisplayer->setDisplayMode(aObj, (XGUI_Displayer::DisplayMode)theMode, false);

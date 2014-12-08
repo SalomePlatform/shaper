@@ -4,6 +4,8 @@
 #include "XGUI.h"
 #include "XGUI_Constants.h"
 
+#include <ModuleBase_IViewWindow.h>
+
 #include <Qtx.h>
 
 #include <QFrame>
@@ -12,8 +14,8 @@
 #include <QLabel>
 #include <QMap>
 
-#include <V3d_View.hxx>
-#include <V3d_Viewer.hxx>
+//#include <V3d_View.hxx>
+//#include <V3d_Viewer.hxx>
 
 class XGUI_ViewPort;
 class XGUI_Viewer;
@@ -29,7 +31,7 @@ class QMdiSubWindow;
  It contains a view port object (drawing area) and toolbars for view camera and window management.
  Also it managements events in view port
  */
-class XGUI_EXPORT XGUI_ViewWindow : public QFrame
+class XGUI_EXPORT XGUI_ViewWindow : public QFrame, public ModuleBase_IViewWindow
 {
 Q_OBJECT
  public:
@@ -108,6 +110,9 @@ Q_OBJECT
 
   //! Updates drawing mode in the view window
   void updateEnabledDrawMode();
+
+  /// Returns OCCT object which contains 3d view object
+  virtual Handle(V3d_View) v3dView() const;
 
 signals:
   //! Emited whien view transformation operation is started

@@ -114,7 +114,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
 {
   QMenu* aMenu = new QMenu();
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QList<ObjectPtr> aObjects = aSelMgr->selection()->selectedObjects();
+  QObjectPtrList aObjects = aSelMgr->selection()->selectedObjects();
   int aSelected = aObjects.size();
   if (aSelected > 0) {
     SessionPtr aMgr = ModelAPI_Session::get();
@@ -197,7 +197,7 @@ QMenu* XGUI_ContextMenuMgr::viewerMenu() const
 void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
 {
   XGUI_SelectionMgr* aSelMgr = myWorkshop->selector();
-  QList<ObjectPtr> aObjects = aSelMgr->selection()->selectedObjects();
+  QObjectPtrList aObjects = aSelMgr->selection()->selectedObjects();
   if (aObjects.size() > 0) {
     //if (aObjects.size() == 1)
     //  theMenu->addAction(action("EDIT_CMD"));

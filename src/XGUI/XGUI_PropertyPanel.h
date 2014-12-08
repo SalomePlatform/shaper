@@ -49,22 +49,23 @@ Q_OBJECT
   /// Activate the next from current widget in the property panel
   virtual void activateNextWidget();
 
+  void setStretchEnabled(bool isEnabled);
+
  public slots:
   void updateContentWidget(FeaturePtr theFeature);
   // Enables / disables "ok" ("accept") button
   void setAcceptEnabled(bool);
 
- protected slots:
   // Makes the given widget active, highlights it and removes
   // highlighting from the previous active widget
   // emits widgetActivated(theWidget) signal
-  void activateWidget(ModuleBase_ModelWidget* theWidget);
+  virtual void activateWidget(ModuleBase_ModelWidget* theWidget);
 
  signals:
   /// Signal about the point 2d set to the feature
   /// \param the feature
   /// \param the attribute of the feature
-  void storedPoint2D(ObjectPtr theFeature, const std::string& theAttribute);
+  //void storedPoint2D(ObjectPtr theFeature, const std::string& theAttribute);
 
 
  private:

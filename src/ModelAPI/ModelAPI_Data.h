@@ -26,6 +26,15 @@ class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeSelectionList;
 class GeomAPI_Shape;
 
+/// Enumeration that contains the execution status of the Object
+enum ModelAPI_ExecState {
+  ModelAPI_StateDone, ///< execution was performed and result is up to date
+  ModelAPI_StateMustBeUpdated, ///< execution must be performed to obtain the up to date result
+  ModelAPI_StateExecFailed, ///< execution was failed (results are deleted in this case)
+  ModelAPI_StateInvalidArgument, ///< execution was not performed (results are deleted in this case)
+  ModelAPI_StateNothing ///< internal state that actually means that nothing must be changed
+};
+
 /**\class ModelAPI_Data
  * \ingroup DataModel
  * \brief General object of the application that allows
@@ -100,12 +109,14 @@ class MODELAPI_EXPORT ModelAPI_Data
   {
   }
 
-  /// Makes feature must be updated later (on rebuild). Normally the Updater must call it
-  /// in case of not-automatic update to true
-  virtual void mustBeUpdated(const bool theFlag) = 0;
+  /// Stores the state of the object to execute it later accordingly
+  virtual void execState(const ModelAPI_ExecState theState) = 0;
 
-  /// Returns true if feature must be updated (re-executed) on rebuild
-  virtual bool mustBeUpdated() = 0;
+  /// Returns the state of the latest execution of the feature
+  virtual ModelAPI_ExecState execState() = 0;
+
+  /// Registers error during the execution, causes the ExecutionFailed state
+  virtual void setError(const std::string& theError) = 0;
 
   /// Returns the identifier of feature-owner, unique in this document
   virtual int featureId() const = 0;

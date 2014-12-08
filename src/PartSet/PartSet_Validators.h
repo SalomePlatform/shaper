@@ -9,6 +9,7 @@
 
 #include <ModuleBase_SelectionValidator.h>
 #include <ModuleBase_ISelection.h>
+#include <ModelAPI_RefAttrValidator.h>
 
 /*
  * Selector validators
@@ -48,5 +49,19 @@ class PartSet_RadiusValidator : public ModuleBase_SelectionValidator
  public:
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
+
+class PartSet_DifferentObjectsValidator : public ModelAPI_RefAttrValidator
+{
+ public:
+  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
+                       const ObjectPtr& theObject) const;
+  //! Returns true if the attribute is good for the feature attribute
+  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
+                       const AttributePtr& theAttribute) const;
+
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments) const;
+};
+
 
 #endif

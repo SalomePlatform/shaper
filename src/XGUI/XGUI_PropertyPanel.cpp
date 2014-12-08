@@ -7,7 +7,7 @@
 
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_Constants.h>
-#include <ModuleBase_WidgetPoint2D.h>
+#include <ModuleBase_WidgetMultiSelector.h>
 
 #include <QWidget>
 #include <QVBoxLayout>
@@ -17,6 +17,7 @@
 #include <QVBoxLayout>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QLayoutItem>
 
 #ifdef _DEBUG
 #include <iostream>
@@ -62,7 +63,7 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
 
   myCustomWidget = new QWidget(aContent);
   myMainLayout->addWidget(myCustomWidget);
-  myMainLayout->addStretch(1);
+  setStretchEnabled(true);
 }
 
 XGUI_PropertyPanel::~XGUI_PropertyPanel()
@@ -71,6 +72,8 @@ XGUI_PropertyPanel::~XGUI_PropertyPanel()
 
 void XGUI_PropertyPanel::cleanContent()
 {
+  if (myActiveWidget)
+    myActiveWidget->deactivate();
   myWidgets.clear();
   qDeleteAll(myCustomWidget->children());
   myActiveWidget = NULL;
@@ -79,24 +82,33 @@ void XGUI_PropertyPanel::cleanContent()
 void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets)
 {
   myWidgets = theWidgets;
-  int aS = myWidgets.size();
   if (theWidgets.empty()) return;
-
+  bool isEnableStretch = true;
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast =
       theWidgets.end();
   for (; anIt != aLast; anIt++) {
     connect(*anIt, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
-
-    connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)), this,
-            SLOT(activateNextWidget(ModuleBase_ModelWidget*)));
+    connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
+            this,  SLOT(activateNextWidget(ModuleBase_ModelWidget*)));
     connect(*anIt, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)),
-            this, SLOT(activateWidget(ModuleBase_ModelWidget*)));
+            this,  SLOT(activateWidget(ModuleBase_ModelWidget*)));
 
-    ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
-    if (aPointWidget)
-      connect(aPointWidget, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)), this,
-              SIGNAL(storedPoint2D(ObjectPtr, const std::string&)));
+    //ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
+    //if (aPointWidget)
+    //  connect(aPointWidget, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)), this,
+    //          SIGNAL(storedPoint2D(ObjectPtr, const std::string&)))
+    //}
+
+    if (!isEnableStretch) continue;
+    foreach(QWidget* eachWidget, (*anIt)->getControls()) {
+      QSizePolicy::Policy aVPolicy = eachWidget->sizePolicy().verticalPolicy();
+      if(aVPolicy == QSizePolicy::Expanding ||
+         aVPolicy == QSizePolicy::MinimumExpanding) {
+        isEnableStretch = false;
+      }
+    }
   }
+  setStretchEnabled(isEnableStretch);
   ModuleBase_ModelWidget* aLastWidget = theWidgets.last();
   if (aLastWidget) {
     QList<QWidget*> aControls = aLastWidget->getControls();
@@ -138,6 +150,11 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
 
 void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
 {
+  // TO CHECK: Editing operation does not have automatical activation of widgets
+  if (isEditingMode()) {
+    activateWidget(NULL);
+    return;
+  }
   ModuleBase_ModelWidget* aNextWidget = 0;
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;
@@ -151,8 +168,23 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
   }
   // Normaly focusTo is enough to activate widget
   // here is a special case on mouse click in the viewer
-  if(aNextWidget == NULL) {
-    activateWidget(NULL);
+  //if(aNextWidget == NULL) {
+    activateWidget(aNextWidget);
+  //}
+}
+
+void XGUI_PropertyPanel::setStretchEnabled(bool isEnabled)
+{
+  if (myMainLayout->count() == 0)
+    return;
+  int aStretchIdx = myMainLayout->count() - 1;
+  bool hasStretch = myMainLayout->itemAt(aStretchIdx)->spacerItem() != NULL;
+  QLayoutItem* aChild;
+  if (isEnabled) {
+    if (!hasStretch) myMainLayout->addStretch(1);
+  } else if (hasStretch) {
+    aChild = myMainLayout->takeAt(aStretchIdx);
+    delete aChild;
   }
 }
 
@@ -169,12 +201,20 @@ void XGUI_PropertyPanel::setAcceptEnabled(bool isEnabled)
 
 void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
 {
+  // Avoid activation of already actve widget. It could happen on focusIn event many times
+  if (theWidget == myActiveWidget)
+    return;
   if(myActiveWidget) {
+    myActiveWidget->deactivate();
     myActiveWidget->setHighlighted(false);
   }
   if(theWidget) {
+    theWidget->activate();
     theWidget->setHighlighted(true);
   }
   myActiveWidget = theWidget;
-  emit widgetActivated(theWidget);
+  if (myActiveWidget)
+    emit widgetActivated(theWidget);
+  else if (!isEditingMode())
+    emit noMoreWidgets();
 }

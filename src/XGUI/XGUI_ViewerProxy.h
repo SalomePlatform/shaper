@@ -61,11 +61,17 @@ Q_OBJECT
   /// Remove all selection filters from the viewer
   virtual void clearSelectionFilters();
 
- private slots:
+private slots:
+  void onTryCloseView(XGUI_ViewWindow*);
+  void onDeleteView(XGUI_ViewWindow*);
+  void onViewCreated(XGUI_ViewWindow*);
+  void onActivated(XGUI_ViewWindow*);
+
   void onMousePress(XGUI_ViewWindow*, QMouseEvent*);
   void onMouseRelease(XGUI_ViewWindow*, QMouseEvent*);
   void onMouseDoubleClick(XGUI_ViewWindow*, QMouseEvent*);
   void onMouseMove(XGUI_ViewWindow*, QMouseEvent*);
+
   void onKeyPress(XGUI_ViewWindow*, QKeyEvent*);
   void onKeyRelease(XGUI_ViewWindow*, QKeyEvent*);
 

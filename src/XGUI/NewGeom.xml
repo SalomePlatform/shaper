@@ -10,4 +10,9 @@
     <parameter name="item_size" value="25" />
     <parameter name="rows_number" value="3" />
   </section>
+  <section name="Plugins" >
+    <!-- Plugins preferences -->
+    <parameter name="default_path" value="" />
+  </section>
+
 </document>

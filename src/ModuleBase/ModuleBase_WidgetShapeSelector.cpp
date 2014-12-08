@@ -8,13 +8,13 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
-#include <ModuleBase_WidgetValueFeature.h>
 
 #include <Config_WidgetAPI.h>
 #include <Events_Loop.h>
 #include <Events_Message.h>
 #include <GeomAPI_Interface.h>
 #include <GeomAPI_Shape.h>
+
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -27,6 +27,11 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_Validator.h>
+#include <ModelAPI_ResultValidator.h>
+#include <ModelAPI_RefAttrValidator.h>
+
 #include <Config_WidgetAPI.h>
 #include <Events_Error.h>
 
@@ -43,6 +48,7 @@
 #include <QString>
 #include <QEvent>
 #include <QDockWidget>
+#include <QApplication>
 
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Shape.hxx>
@@ -127,27 +133,68 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
 
   DataPtr aData = myFeature->data();
   if (myUseSubShapes) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = 
-      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aData->attribute(attributeID()));
-
     ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(mySelectedObject);
     if (aBody) {
-      aSelect->setValue(aBody, myShape);
-      updateObject(myFeature);
-      return true;
+      AttributePtr aAttr = aData->attribute(attributeID());
+
+      // We have to check several attributes types
+      AttributeSelectionPtr aSelectAttr = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aAttr);
+      if (aSelectAttr) {
+        aSelectAttr->setValue(aBody, myShape);
+        updateObject(myFeature);
+        return true;
+      } else {
+        AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+        if (aRefAttr) {
+          aRefAttr->setObject(mySelectedObject);
+          updateObject(myFeature);
+          return true;
+        }
+      }
     }
   } else {
-    std::shared_ptr<ModelAPI_AttributeReference> aRef = 
-      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(aData->attribute(attributeID()));
-
-    ObjectPtr aObject = aRef->value();
-    if (!(aObject && aObject->isSame(mySelectedObject))) {
-      aRef->setValue(mySelectedObject);
-      updateObject(myFeature);
-      return true;
+    AttributeReferencePtr aRef = aData->reference(attributeID());
+    if (aRef) {
+      ObjectPtr aObject = aRef->value();
+      if (!(aObject && aObject->isSame(mySelectedObject))) {
+        aRef->setValue(mySelectedObject);
+        updateObject(myFeature);
+        return true;
+      }
+    } else {
+      AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+      if (aRefAttr) {
+        ObjectPtr aObject = aRefAttr->object();
+        if (!(aObject && aObject->isSame(mySelectedObject))) {
+          aRefAttr->setObject(mySelectedObject);
+          updateObject(myFeature);
+          return true;
+        }
+      }
     }
   }
   return false;
+}
+
+//********************************************************************
+void ModuleBase_WidgetShapeSelector::clearAttribute()
+{
+  DataPtr aData = myFeature->data();
+  AttributeSelectionPtr aSelect = aData->selection(attributeID());
+  if (aSelect) {
+    aSelect->setValue(ResultPtr(), std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape()));
+    return;
+  }
+  AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+  if (aRefAttr) {
+    aRefAttr->setObject(ObjectPtr());
+    return;
+  }
+  AttributeReferencePtr aRef = aData->reference(attributeID());
+  if (aRef) {
+    aRef->setObject(ObjectPtr());
+  }
 }
 
 //********************************************************************
@@ -156,14 +203,25 @@ bool ModuleBase_WidgetShapeSelector::restoreValue()
   DataPtr aData = myFeature->data();
   bool isBlocked = this->blockSignals(true);
   if (myUseSubShapes) {
-    std::shared_ptr<ModelAPI_AttributeSelection> aSelect = aData->selection(attributeID());
+    AttributeSelectionPtr aSelect = aData->selection(attributeID());
     if (aSelect) {
       mySelectedObject = aSelect->context();
       myShape = aSelect->value();
+    } else {
+      AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+      if (aRefAttr) {
+        mySelectedObject = aRefAttr->object();
+      }
     }
   } else {
-    std::shared_ptr<ModelAPI_AttributeReference> aRef = aData->reference(attributeID());
-    mySelectedObject = aRef->value();
+    AttributeReferencePtr aRef = aData->reference(attributeID());
+    if (aRef)
+      mySelectedObject = aRef->value();
+    else {
+      AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+      if (aRefAttr)
+        mySelectedObject = aRefAttr->object();
+    }
   }
   updateSelectionName();
 
@@ -182,64 +240,73 @@ QList<QWidget*> ModuleBase_WidgetShapeSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 {
-  QList<ObjectPtr> aObjects = myWorkshop->selection()->selectedObjects();
-  if (aObjects.size() > 0) {
-    ObjectPtr aObject = aObjects.first();
-    if ((!mySelectedObject) && (!aObject))
-      return;
+  // In order to make reselection possible
+  // TODO: check with MPV clearAttribute();
 
-    // Check that the selected object is result (others can not be accepted)
-    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
-    if (!aRes)
-      return;
+  //QObjectPtrList aObjects = myWorkshop->selection()->selectedPresentations();
+  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected();
+  if (aSelected.size() > 0)
+    setSelection(aSelected.first());
+}
 
-    if (myFeature) {
-      // We can not select a result of our feature
-      const std::list<std::shared_ptr<ModelAPI_Result>>& aResList = myFeature->results();
-      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
-      for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-        if ((*aIt) == aRes)
-          return;
-      }
+//********************************************************************
+bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
+{
+  ObjectPtr aObject = theValue.object();
+  if ((!mySelectedObject) && (!aObject))
+    return false;
+
+  // Check that the selected object is result (others can not be accepted)
+  ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+  if (!aRes)
+    return false;
+
+  if (myFeature) {
+    // We can not select a result of our feature
+    const std::list<std::shared_ptr<ModelAPI_Result>>& aResList = myFeature->results();
+    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
+    for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
+      if ((*aIt) == aRes)
+        return false;
     }
-    // Check that object belongs to active document or PartSet
-    DocumentPtr aDoc = aRes->document();
-    SessionPtr aMgr = ModelAPI_Session::get();
-    if (!(aDoc == aMgr->activeDocument()) || (aDoc == aMgr->moduleDocument()))
-      return;
-
-    // Check that the result has a shape
-    GeomShapePtr aShape = ModelAPI_Tools::shape(aRes);
-    if (!aShape)
-      return;
-
-    /// Check that object has acceptable type
-    if (!acceptObjectType(aObject)) 
-      return;
-
-    // Get sub-shapes from local selection
-    if (myUseSubShapes) {
-      NCollection_List<TopoDS_Shape> aShapeList;
-      std::list<ObjectPtr> aOwners;
-      myWorkshop->selection()->selectedShapes(aShapeList, aOwners);
-      if (aShapeList.Extent() > 0) {
-        aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-        aShape->setImpl(new TopoDS_Shape(aShapeList.First()));
-      }
-    }
-
-    // Check that the selection corresponds to selection type
-    if (myUseSubShapes) {
-      if (!acceptSubShape(aShape))
-        return;
-    } else {
-      if (!acceptObjectShape(aObject))
-        return;
-    }
-    setObject(aObject, aShape);
-    //activateSelection(false);
-    emit focusOutWidget(this);
   }
+  // Check that object belongs to active document or PartSet
+  DocumentPtr aDoc = aRes->document();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (!(aDoc == aMgr->activeDocument()) && !(aDoc == aMgr->moduleDocument()))
+    return false;
+
+  // Check that the result has a shape
+  GeomShapePtr aShape = ModelAPI_Tools::shape(aRes);
+  if (!aShape)
+    return false;
+
+  /// Check that object has acceptable type
+  if (!acceptObjectType(aObject)) 
+    return false;
+
+  // Get sub-shapes from local selection
+  if (myUseSubShapes) {
+    if (!theValue.shape().IsNull()) {
+      aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+      aShape->setImpl(new TopoDS_Shape(theValue.shape()));
+    }
+  }
+
+  // Check that the selection corresponds to selection type
+  if (myUseSubShapes) {
+    if (!acceptSubShape(aShape))
+      return false;
+  } else {
+    if (!acceptObjectShape(aObject))
+      return false;
+  }
+  if (isValid(aObject, aShape)) {
+    setObject(aObject, aShape);
+    emit focusOutWidget(this);
+    return true;
+  }
+  return false;
 }
 
 //********************************************************************
@@ -249,13 +316,8 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, std::shared_ptr
   myShape = theShape;
   if (mySelectedObject) {
     raisePanel();
-    if (!myUseSubShapes) {
-      static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TOHIDE);
-      ModelAPI_EventCreator::get()->sendUpdated(mySelectedObject, anEvent);
-    }
   } 
   updateSelectionName();
-  activateSelection(false);
   emit valuesChanged();
 }
 
@@ -336,6 +398,8 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
 {
+  if (myIsActive == toActivate)
+    return;
   myIsActive = toActivate;
   updateSelectionName();
 
@@ -383,36 +447,67 @@ void ModuleBase_WidgetShapeSelector::raisePanel() const
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::focusTo()
+//bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
+//{
+//  if (theValue.object()) {
+//    ObjectPtr aObject = theValue.object();
+//    if (acceptObjectShape(aObject)) {
+//      setObject(aObject);
+//      return true;
+//    }
+//  }
+//  return false;
+//}
+
+//********************************************************************
+void ModuleBase_WidgetShapeSelector::activate()
 {
   activateSelection(true);
-  return ModuleBase_ModelWidget::focusTo();
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::eventFilter(QObject* theObj, QEvent* theEvent)
+void ModuleBase_WidgetShapeSelector::deactivate()
 {
-  if (theObj == myTextLine) {
-    if (theEvent->type() == QEvent::FocusIn)
-      activateSelection(true);
-  }
-  return ModuleBase_ModelWidget::eventFilter(theObj, theEvent);
+  activateSelection(false);
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::setValue(ModuleBase_WidgetValue* theValue)
+bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape)
 {
-  if (theValue) {
-    ModuleBase_WidgetValueFeature* aFeatureValue =
-        dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
-    if (aFeatureValue && aFeatureValue->object()) {
-      ObjectPtr aObject = aFeatureValue->object();
-      if (acceptObjectShape(aObject)) {
-        setObject(aObject);
-        return true;
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  std::list<ModelAPI_Validator*> aValidators;
+  std::list<std::list<std::string> > anArguments;
+  aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
+
+  // Check the type of selected object
+  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
+  bool isValid = true;
+  for (; aValidator != aValidators.end(); aValidator++) {
+    const ModelAPI_ResultValidator* aResValidator =
+        dynamic_cast<const ModelAPI_ResultValidator*>(*aValidator);
+    if (aResValidator) {
+      isValid = false;
+      if (aResValidator->isValid(theObj)) {
+        isValid = true;
+        break;
       }
     }
   }
-  return false;
-}
+  if (!isValid)
+    return false;
 
+  // Check the acceptability of the object as attribute
+  aValidator = aValidators.begin();
+  std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
+  for (; aValidator != aValidators.end(); aValidator++, aArgs++) {
+    const ModelAPI_RefAttrValidator* aAttrValidator =
+        dynamic_cast<const ModelAPI_RefAttrValidator*>(*aValidator);
+    if (aAttrValidator) {
+      if (!aAttrValidator->isValid(myFeature, *aArgs, theObj)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}

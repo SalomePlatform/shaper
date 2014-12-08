@@ -101,12 +101,12 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
   // value calculation
   std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));
-  double aValue = aValueAttr->value();
+  double aValue = 0;
   // Issue #196: checking the positivity of the distance constraint
   // there is a validator for a distance constraint, that the value should be positive
   // in case if an invalid value is set, the current distance value is shown
-  if (aValue <= 0)
-    aValue = calculateCurrentDistance();
+  if (aValueAttr->isInitialized())
+    aValue = aValueAttr->value();
 
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS)
@@ -162,6 +162,20 @@ double SketchPlugin_ConstraintDistance::calculateCurrentDistance() const
   return aDistance;
 }
 
+void SketchPlugin_ConstraintDistance::attributeChanged(const std::string& theID) {
+  if (theID == SketchPlugin_Constraint::ENTITY_A() || 
+      theID == SketchPlugin_Constraint::ENTITY_B()) 
+  {
+    std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
+        ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
+    if (!aValueAttr->isInitialized()) { // only if it is not initialized, try to compute the current value
+      double aDistance = calculateCurrentDistance();
+      if (aDistance > 0) { // set as value the length of updated references
+        aValueAttr->setValue(aDistance);
+      }
+    }
+  }
+}
 
 //*************************************************************************************
 std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,

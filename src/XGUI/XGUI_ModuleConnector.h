@@ -44,6 +44,9 @@ Q_OBJECT
   //! Returns currently active operation
   virtual ModuleBase_Operation* currentOperation() const;
 
+  //! Returns true if the operation with id theId can be started
+  virtual bool canStartOperation(QString theId);
+
   //! Returns AIS opbject by data object
   virtual AISObjectPtr findPresentation(const ObjectPtr& theObject) const;
 
@@ -52,7 +55,7 @@ Q_OBJECT
 
   //! Select features clearing previous selection. 
   //! If the list is empty then selection will be cleared
-  virtual void setSelected(const QList<ObjectPtr>& theFeatures);
+  virtual void setSelected(const QObjectPtrList& theFeatures);
 
   XGUI_Workshop* workshop() const { return myWorkshop; }
 

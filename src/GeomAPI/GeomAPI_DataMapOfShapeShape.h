@@ -25,6 +25,9 @@ class GEOMAPI_EXPORT GeomAPI_DataMapOfShapeShape : public GeomAPI_Interface
   /// Clear 
   void clear();
 
+  /// Size of the map
+  int size();
+
   /// Adds the Key <K> to  the Map <me>  with  the  Item. Returns True  if the Key  was not already in the map
   bool bind (std::shared_ptr<GeomAPI_Shape> theKey, std::shared_ptr<GeomAPI_Shape> theItem);
 

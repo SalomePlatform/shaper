@@ -57,6 +57,14 @@ public:
     return myMgr->addPreference(myModName, theLbl, pId, theType, theSection, theName);
   }
 
+  virtual void setItemProperty(const QString& thePropName,
+                               const QVariant& theValue,
+                               const int theId = -1)
+  {
+    myMgr->setItemProperty(thePropName, theValue, theId);
+  }
+
+
   virtual SUIT_PreferenceMgr* prefMgr() const { return myMgr; }
 
 private:

@@ -35,12 +35,9 @@ Q_OBJECT
   virtual ~ModuleBase_WidgetShapeSelector();
 
   /// Saves the internal parameters to the given feature
-  /// \param theObject a model feature to be changed
   virtual bool storeValue() const;
 
   virtual bool restoreValue();
-
-  virtual bool focusTo();
 
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
@@ -61,7 +58,15 @@ Q_OBJECT
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValue the wrapped widget value
-  virtual bool setValue(ModuleBase_WidgetValue* theValue);
+  virtual bool setSelection(ModuleBase_ViewerPrs theValue);
+
+
+  /// The methiod called when widget is activated
+  virtual void activate();
+
+  /// The methiod called when widget is deactivated
+  virtual void deactivate();
+
 
  public slots:
 
@@ -72,8 +77,6 @@ Q_OBJECT
   void onSelectionChanged();
 
  protected:
-  bool eventFilter(QObject* theObj, QEvent* theEvent);
-
   void updateSelectionName();
   void raisePanel() const;
 
@@ -93,8 +96,14 @@ Q_OBJECT
   // Set the given object as a value of the widget
   void setObject(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape = std::shared_ptr<GeomAPI_Shape>());
 
+  /// Check the selected with validators if installed
+  virtual bool isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape);
+
+  /// Clear attribute
+  void clearAttribute();
+
   //----------- Class members -------------
- private:
+ protected:
   QWidget* myContainer;
   QLabel* myLabel;
   QLineEdit* myTextLine;

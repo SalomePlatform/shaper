@@ -40,7 +40,7 @@ void XGUI_SelectionMgr::connectViewers()
 //**************************************************************
 void XGUI_SelectionMgr::onObjectBrowserSelection()
 {
-  QList<ObjectPtr> aObjects = myWorkshop->objectBrowser()->selectedObjects();
+  QObjectPtrList aObjects = myWorkshop->objectBrowser()->selectedObjects();
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   aDisplayer->setSelected(aObjects);
   emit selectionChanged();
@@ -49,7 +49,7 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
 //**************************************************************
 void XGUI_SelectionMgr::onViewerSelection()
 {
-  QList<ObjectPtr> aFeatures;
+  QObjectPtrList aFeatures;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
     Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();

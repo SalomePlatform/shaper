@@ -9,15 +9,14 @@
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
-#include <ModuleBase_WidgetPoint2D.h>
-#include <ModuleBase_WidgetFeatureOrAttribute.h>
-#include <ModuleBase_WidgetFeature.h>
+//#include <ModuleBase_WidgetFeatureOrAttribute.h>
+//#include <ModuleBase_WidgetFeature.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_WidgetSwitch.h>
 #include <ModuleBase_WidgetShapeSelector.h>
 #include <ModuleBase_WidgetDoubleValue.h>
 #include <ModuleBase_WidgetBoolValue.h>
-#include <ModuleBase_WidgetPoint2dDistance.h>
+//#include <ModuleBase_WidgetPoint2dDistance.h>
 #include <ModuleBase_WidgetFileSelector.h>
 #include <ModuleBase_WidgetChoice.h>
 #include <ModuleBase_IWorkshop.h>
@@ -25,6 +24,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetLineEdit.h>
 #include <ModuleBase_WidgetMultiSelector.h>
+#include <ModuleBase_WidgetLabel.h>
 
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
@@ -109,19 +109,15 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
   theParent->setLayout(aWidgetLay);
 }
 
+
 QWidget* ModuleBase_WidgetFactory::labelControl(QWidget* theParent)
 {
-  QWidget* result = new QWidget(theParent);
-  QVBoxLayout* aLabelLay = new QVBoxLayout(result);
-  QLabel* aLabel = new QLabel(result);
-  aLabel->setWordWrap(true);
-  aLabel->setText(qs(myWidgetApi->getProperty(INFO_WDG_TEXT)));
-  aLabel->setToolTip(qs(myWidgetApi->getProperty(INFO_WDG_TOOLTIP)));
-  aLabelLay->addWidget(aLabel);
-  aLabelLay->addStretch(1);
-  result->setLayout(aLabelLay);
-  return result;
+  ModuleBase_WidgetLabel* aWgt =
+      new ModuleBase_WidgetLabel(theParent, myWidgetApi, myParentId);
+  myModelWidgets.append(aWgt);
+  return aWgt->getControl();
 }
+
 
 QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType,
                                                       QWidget* theParent)
@@ -139,20 +135,14 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
   } else if (theType == WDG_BOOLVALUE) {
     result = booleanControl(theParent);
 
-  } else if (theType == WDG_POINT_SELECTOR) {
-    result = pointSelectorControl(theParent);
+  //} else if (theType == WDG_FEATURE_SELECTOR) {
+  //  result = featureSelectorControl(theParent);
 
-  } else if (theType == WDG_FEATURE_SELECTOR) {
-    result = featureSelectorControl(theParent);
-
-  } else if (theType == WDG_FEATURE_OR_ATTRIBUTE_SELECTOR) {
-    result = featureOrAttributeSelectorControl(theParent);
+  //} else if (theType == WDG_FEATURE_OR_ATTRIBUTE_SELECTOR) {
+  //  result = featureOrAttributeSelectorControl(theParent);
 
   } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
     result = doubleValueEditor(theParent);
-
-  } else if (theType == WDG_POINT2D_DISTANCE) {
-    result = point2dDistanceControl(theParent);
 
   } else if (theType == WDG_FILE_SELECTOR) {
     result = fileSelectorControl(theParent);
@@ -170,7 +160,7 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
     result = createContainer(theType, theParent);
   } else {
     result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi,
-                                                      myModelWidgets);
+                                                      myParentId, myModelWidgets);
 #ifdef _DEBUG
     if (!result) {qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type");}
 #endif
@@ -206,30 +196,6 @@ QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
   return aDblWgt->getControl();
 }
 
-QWidget* ModuleBase_WidgetFactory::pointSelectorControl(QWidget* theParent)
-{
-  ModuleBase_WidgetPoint2D* aWidget =
-      new ModuleBase_WidgetPoint2D(theParent, myWidgetApi,myParentId);
-  myModelWidgets.append(aWidget);
-  return aWidget->getControl();
-}
-
-QWidget* ModuleBase_WidgetFactory::featureSelectorControl(QWidget* theParent)
-{
-  ModuleBase_WidgetFeature* aWidget =
-      new ModuleBase_WidgetFeature(theParent, myWidgetApi,myParentId);
-  myModelWidgets.append(aWidget);
-  return aWidget->getControl();
-}
-
-QWidget* ModuleBase_WidgetFactory::featureOrAttributeSelectorControl(QWidget* theParent)
-{
-  ModuleBase_WidgetFeatureOrAttribute* aWidget =
-      new ModuleBase_WidgetFeatureOrAttribute(theParent, myWidgetApi, myParentId);
-  myModelWidgets.append(aWidget);
-  return aWidget->getControl();
-}
-
 QWidget* ModuleBase_WidgetFactory::doubleValueEditor(QWidget* theParent)
 {
   ModuleBase_WidgetEditor* aWidget =
@@ -252,14 +218,6 @@ QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
       new ModuleBase_WidgetBoolValue(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aBoolWgt);
   return aBoolWgt->getControl();
-}
-
-QWidget* ModuleBase_WidgetFactory::point2dDistanceControl(QWidget* theParent)
-{
-  ModuleBase_WidgetPoint2dDistance* aDistWgt =
-      new ModuleBase_WidgetPoint2dDistance(theParent, myWidgetApi, myParentId);
-  myModelWidgets.append(aDistWgt);
-  return aDistWgt->getControl();
 }
 
 QWidget* ModuleBase_WidgetFactory::fileSelectorControl(QWidget* theParent)
@@ -298,3 +256,4 @@ QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const
 {
   return QString::fromStdString(theStdString);
 }
+

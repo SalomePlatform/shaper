@@ -69,6 +69,9 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   /// Returns the root document of the application (that may contains sub-documents)
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> moduleDocument();
 
+  /// Returns the document by ID, loads if not loaded yet. Returns null if no such document.
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Document> document(std::string theDocID);
+
   /// Return true if root document has been already created
   MODEL_EXPORT virtual bool hasModuleDocument();
 

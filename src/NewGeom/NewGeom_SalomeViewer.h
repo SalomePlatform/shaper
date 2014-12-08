@@ -5,18 +5,41 @@
 #include "NewGeom.h"
 
 #include <ModuleBase_IViewer.h>
+#include <ModuleBase_IViewWindow.h>
+
+#include <V3d_View.hxx>
 
 class SUIT_ViewWindow;
 class QMouseEvent;
 class QKeyEvent;
 
 class NewGeom_OCCSelector;
+class OCCViewer_Viewer;
+class SUIT_ViewManager;
+
+
+class NewGeom_SalomeView: public ModuleBase_IViewWindow
+{
+public:
+  NewGeom_SalomeView(OCCViewer_Viewer* theViewer) { myViewer = theViewer; }
+
+  virtual Handle(V3d_View) v3dView() const;
+
+  void setViewer(OCCViewer_Viewer* theViewer) { myViewer = theViewer; }
+  OCCViewer_Viewer* viewer() const { return myViewer; }
+
+private:
+  OCCViewer_Viewer* myViewer;
+};
+
 
 class NewGeom_SalomeViewer : public ModuleBase_IViewer
 {
 Q_OBJECT
  public:
   NewGeom_SalomeViewer(QObject* theParent);
+
+  ~NewGeom_SalomeViewer();
 
   //! Returns AIS_InteractiveContext from current OCCViewer
   virtual Handle(AIS_InteractiveContext) AISContext() const;
@@ -72,9 +95,18 @@ Q_OBJECT
   void onKeyPress(SUIT_ViewWindow*, QKeyEvent*);
   void onKeyRelease(SUIT_ViewWindow*, QKeyEvent*);
 
+  void onTryCloseView(SUIT_ViewWindow*);
+  void onDeleteView(SUIT_ViewWindow*);
+  void onViewCreated(SUIT_ViewWindow*);
+  void onActivated(SUIT_ViewWindow*);
+
+  void onSelectionChanged();
+
  private:
   NewGeom_OCCSelector* mySelector;
-
+  NewGeom_SalomeView* myView;
+  bool myIsSelectionChanged;
 };
+
 
 #endif

@@ -34,14 +34,14 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   virtual QList<ModuleBase_ViewerPrs> getHighlighted(int theShapeTypeToSkip = -1) const;
 
   /**
-   * Returns list of currently selected objects
+   * Returns list of currently selected objects in object browser
    */
-  virtual QList<ObjectPtr> selectedObjects() const;
+  virtual QObjectPtrList selectedObjects() const;
 
   /**
    * Returns list of currently selected results
    */
-  virtual QList<ObjectPtr> selectedPresentations() const;
+  virtual QObjectPtrList selectedPresentations() const;
 
   //! Returns list of currently selected QModelIndexes
   virtual QModelIndexList selectedIndexes() const;

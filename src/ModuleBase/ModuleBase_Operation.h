@@ -23,7 +23,6 @@ class ModuleBase_OperationDescription;
 class ModuleBase_IPropertyPanel;
 class ModuleBase_ISelection;
 class ModuleBase_IViewer;
-class ModuleBase_WidgetValueFeature;
 
 class QKeyEvent;
 
@@ -65,7 +64,7 @@ Q_OBJECT
   * the operation is not granted.
   * The method has to be redefined for granted operations.
   */
-  virtual bool isGranted(ModuleBase_Operation* theOperation) const  { return false; }
+  virtual bool isGranted(QString theId) const;
 
   /// Sets a list of model widgets, according to the operation feature xml definition
   /// \param theXmlRepresentation an xml feature definition
@@ -110,11 +109,11 @@ Q_OBJECT
   /// Returns True if the current operation works with the given object (feature or result)
   virtual bool hasObject(ObjectPtr theObj) const;
 
-  virtual void keyReleased(const int theKey) {};
+  //virtual void keyReleased(const int theKey) {};
 
   /// If operation needs to redisplay its result during operation
   /// then this method has to return True
-  virtual bool hasPreview() const { return false; }
+  //virtual bool hasPreview() const { return false; }
 
   /// Initialisation of operation with preliminary selection
   /// \param theSelected the list of selected presentations
@@ -130,12 +129,19 @@ Q_OBJECT
   /// Activates widgets by preselection if it is accepted
   virtual bool activateByPreselection();
 
+  /// If the operation works with feature which is sub-feature of another one
+  /// then this variable has to be initialised by parent feature 
+  /// before operation feature creating
+  void setParentFeature(CompositeFeaturePtr theParent) { myParentFeature = theParent; }
+  CompositeFeaturePtr parentFeature() const { return myParentFeature; }
+
 signals:
   void started();  /// the operation is started
   void aborted();  /// the operation is aborted
   void committed();  /// the operation is committed
   void stopped();  /// the operation is aborted or committed
   void resumed();  /// the operation is resumed
+  void postponed();  /// the operation is postponed
 
  public slots:
   /// Starts operation
@@ -145,6 +151,10 @@ signals:
   /// be better to inherit own operator from base one and redefine startOperation method
   /// instead.
   void start();
+
+  /// Deactivates current operation which can be resumed later.
+  void postpone();
+
   /// Resumes operation
   /// Public slot. Verifies whether operation can be started and starts operation.
   /// This slot is not virtual and cannot be redefined. Redefine startOperation method
@@ -152,10 +162,12 @@ signals:
   /// be better to inherit own operator from base one and redefine startOperation method
   /// instead.
   void resume();
+
   /// Aborts operation
   /// Public slot. Aborts operation. This slot is not virtual and cannot be redefined.
   /// Redefine abortOperation method to change behavior of operation instead
   void abort();
+
   /// Commits operation
   /// Public slot. Commits operation. This slot is not virtual and cannot be redefined.
   /// Redefine commitOperation method to change behavior of operation instead
@@ -169,31 +181,35 @@ signals:
 
   // Data model methods.
   /// Stores a custom value in model.
-  virtual void storeCustomValue();
+  //virtual void storeCustomValue();
 
   /// Slots which listen the mode widget activation
   /// \param theWidget the model widget
-  virtual void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
+  //virtual void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
  protected:
   /// Virtual method called when operation started (see start() method for more description)
   /// Default impl calls corresponding slot and commits immediately.
-  virtual void startOperation();
+   virtual void startOperation() {}
+
+  /// Implementation of specific steps on postpone operation
+  virtual void postponeOperation() {}
 
   /// Virtual method called when operation stopped - committed or aborted.
-  virtual void stopOperation();
+  virtual void stopOperation() {}
 
   /// Virtual method called when operation aborted (see abort() method for more description)
-  virtual void abortOperation();
+  virtual void abortOperation() {}
 
   /// Virtual method called when operation committed (see commit() method for more description)
-  virtual void commitOperation();
+  virtual void commitOperation() {}
 
   /// Virtual method called after operation committed (see commit() method for more description)
-  virtual void afterCommitOperation();
+  virtual void afterCommitOperation() {}
 
   /// Send update message by loop
   void flushUpdated();
+
   /// Send created message by loop
   void flushCreated();
 
@@ -201,8 +217,7 @@ signals:
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \param theCompositeFeature the feature that must be used for adding the created object or null
   /// \returns the created 
-  virtual FeaturePtr createFeature(const bool theFlushMessage = true, 
-    CompositeFeaturePtr theCompositeFeature = CompositeFeaturePtr());
+  virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
   /// Verifies whether this operator can be commited.
   /// \return Returns TRUE if current operation can be committed, e.g. all parameters are filled
@@ -216,7 +231,7 @@ signals:
   /// \param theX the horizontal coordinate
   /// \param theY the vertical coordinate
   /// \return true if the point is set
-  virtual bool setWidgetValue(ObjectPtr theFeature, double theX, double theY);
+  //virtual bool setWidgetValue(ObjectPtr theFeature, double theX, double theY);
 
   /// Return a widget value point by the selection and the viewer position
   /// The default realization returns false
@@ -248,10 +263,16 @@ signals:
   QStringList myNestedFeatures;
 
   /// List of pre-selected object 
-  QList<ModuleBase_WidgetValueFeature*> myPreSelection;
+  QList<ModuleBase_ViewerPrs> myPreSelection;
 
   /// Access to property panel
   ModuleBase_IPropertyPanel* myPropertyPanel;
+
+  /// If the operation works with feature which is sub-feature of another one
+  /// then this variable has to be initialised by parent feature 
+  /// before operation feature creating
+  CompositeFeaturePtr myParentFeature;  
+
 };
 
 #endif

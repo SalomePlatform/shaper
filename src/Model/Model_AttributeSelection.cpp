@@ -127,7 +127,7 @@ bool Model_AttributeSelection::update()
       bool aNoIndexes = 
         !aLab.FindAttribute(TDataStd_IntPackedMap::GetID(), aSubIds) || aSubIds->Extent() == 0;
       // for now working only with composite features
-      FeaturePtr aContextFeature = owner()->document()->feature(aContext);
+      FeaturePtr aContextFeature = aContext->document()->feature(aContext);
       CompositeFeaturePtr aComposite = 
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature);
       if (!aComposite || aComposite->numberOfSubs() == 0) {
@@ -296,7 +296,7 @@ void Model_AttributeSelection::selectBody(
 void Model_AttributeSelection::selectConstruction(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
-  FeaturePtr aContextFeature = owner()->document()->feature(theContext);
+  FeaturePtr aContextFeature = theContext->document()->feature(theContext);
   CompositeFeaturePtr aComposite = 
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature);
   if (!aComposite || aComposite->numberOfSubs() == 0) {

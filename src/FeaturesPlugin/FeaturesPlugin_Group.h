@@ -45,7 +45,7 @@ class FeaturesPlugin_Group : public ModelAPI_Feature
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 
   /// Result of groups is created on the fly and don't stored to the document
-  FEATURESPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
+  FEATURESPLUGIN_EXPORT virtual bool isPersistentResult() {return true;}
 
   /// Use plugin manager for features creation
   FeaturesPlugin_Group();

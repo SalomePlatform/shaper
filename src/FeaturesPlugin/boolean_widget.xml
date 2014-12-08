@@ -11,8 +11,9 @@
     icon=":icons/cut_tool.png" 
     tooltip="Select a tool"
     shape_types="solid"
-    concealment="true"
-  />
+    concealment="true" >
+	<validator id="PartSet_DifferentObjects"/>
+  </shape_selector>
   <choice id="bool_type" 
     label="Type" 
     tooltip="Type of boolean operation"

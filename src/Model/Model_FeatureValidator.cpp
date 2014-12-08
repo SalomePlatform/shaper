@@ -15,8 +15,10 @@ bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& th
   const std::list<std::string>& theArguments) const
 {
   std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  if (!aData)
-    return false;
+  // "Action" features has no data, but still valid. e.g "Remove Part"  
+  if (!aData) {
+    return theFeature->isAction();
+  }
   if (!aData->isValid())
     return false;
   const std::string kAllTypes = "";
@@ -24,10 +26,10 @@ bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& th
   std::list<std::string>::iterator it = aLtAttributes.begin();
   for (; it != aLtAttributes.end(); it++) {
     AttributePtr anAttr = aData->attribute(*it);
-    if (!anAttr->isInitialized()) {
+    if (!anAttr->isInitialized()) { // attribute is not initialized
       std::map<std::string, std::set<std::string> >::const_iterator aFeatureFind = 
         myNotObligatory.find(theFeature->getKind());
-      if (aFeatureFind == myNotObligatory.end() ||
+      if (aFeatureFind == myNotObligatory.end() || // and it is obligatory for filling
           aFeatureFind->second.find(*it) == aFeatureFind->second.end()) {
         return false;
       }
@@ -40,4 +42,10 @@ void Model_FeatureValidator::registerNotObligatory(std::string theFeature, std::
 {
   std::set<std::string>& anAttrs = myNotObligatory[theFeature];
   anAttrs.insert(theAttribute);
+}
+
+bool Model_FeatureValidator::isNotObligatory(std::string theFeature, std::string theAttribute)
+{
+  std::set<std::string>& anAttrs = myNotObligatory[theFeature];
+  return anAttrs.find(theAttribute) != anAttrs.end();
 }

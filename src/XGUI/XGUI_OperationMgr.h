@@ -37,13 +37,23 @@ Q_OBJECT
   /// Returns the current operation or NULL
   /// \return the current operation
   ModuleBase_Operation* currentOperation() const;
+
   /// Check if the given operation is active operation.
   /// Also, returns false is ther is no active operation.
   bool isCurrentOperation(ModuleBase_Operation* theOperation);
+
   /// Returns true is operation manager has at least one non-null operation.
   bool hasOperation() const;
+
+  /// Returns true is operation manager has an operation with given Id.
+  bool hasOperation(const QString& theId) const;
+
+  /// Find and return operation by its Id.
+  ModuleBase_Operation* findOperation(const QString& theId) const;
+
   /// Returns number of operations in the stack
   int operationsCount() const;
+
   /// Returns list of all operations IDs
   QStringList operationList() const;
 
@@ -60,6 +70,16 @@ Q_OBJECT
 
   bool abortAllOperations();
 
+  /// Returns whether the operation can be started. Check if there is already started operation and
+  /// the granted parameter of the launched operation
+  /// \param theId id of the operation which is going to start
+  bool canStartOperation(QString theId);
+
+  bool canStopOperation();
+
+  /// Returns true if the operation can be aborted
+  bool canAbortOperation();
+
  public slots:
   /// Slot that commits the current operation.
   void onCommitOperation();
@@ -71,13 +91,25 @@ Q_OBJECT
 signals:
   /// Signal about an operation is started. It is emitted after the start() of operation is done.
   void operationStarted(ModuleBase_Operation* theOperation);
+
   /// Signal about an operation is stopped. It is emitted after the stop() of operation is done.
   /// \param theOperation a stopped operation
   void operationStopped(ModuleBase_Operation* theOperation);
+
   /// Signal about an operation is resumed. It is emitted after the resume() of operation is done.
-  void operationResumed();
+  void operationResumed(ModuleBase_Operation* theOperation);
+
+  /// Emitted when current operation is comitted
+  void operationComitted(ModuleBase_Operation* theOperation);
+
+  /// Emitted when current operation is aborted
+  void operationAborted(ModuleBase_Operation* theOperation);
+
   /// Signal is emitted after the validate methods calls.
   void operationValidated(bool);
+
+  /// Signal is emitted after the key released click.
+  void keyEnterReleased();
 
  protected:
 
@@ -88,16 +120,6 @@ signals:
   /// \param isCheckBeforeStart the flag whether to check whether the operation can be started
   /// \return the state whether the operation is resumed
   void resumeOperation(ModuleBase_Operation* theOperation);
-
-  /// Returns whether the operation can be started. Check if there is already started operation and
-  /// the granted parameter of the launched operation
-  /// \param theOperation an operation to check
-  bool canStartOperation(ModuleBase_Operation* theOperation);
-
-  bool canStopOperation();
-
-  /// Returns true if the operation can be aborted
-  bool canAbortOperation();
 
  public slots:
   /// SLOT, that is called by the key in the property panel is clicked.
@@ -110,6 +132,9 @@ signals:
   /// If there is a suspended operation, restart it.
   void onOperationStopped();
   void onOperationStarted();
+  void onOperationAborted();
+  void onOperationComitted();
+  void onOperationResumed();
 
  private:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations

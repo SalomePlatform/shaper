@@ -5,6 +5,7 @@
 #include "XGUI_ViewWindow.h"
 #include "XGUI_Viewer.h"
 #include "XGUI_SalomeConnector.h"
+#include "XGUI_Displayer.h"
 
 XGUI_ViewerProxy::XGUI_ViewerProxy(XGUI_Workshop* theParent)
     : ModuleBase_IViewer(theParent),
@@ -68,23 +69,35 @@ void XGUI_ViewerProxy::connectToViewer()
     ModuleBase_IViewer* aViewer = myWorkshop->salomeConnector()->viewer();
 
     connect(aViewer, SIGNAL(lastViewClosed()), this, SIGNAL(lastViewClosed()));
-    connect(aViewer, SIGNAL(tryCloseView()), this, SIGNAL(tryCloseView()));
-    connect(aViewer, SIGNAL(deleteView()), this, SIGNAL(deleteView()));
-    connect(aViewer, SIGNAL(viewCreated()), this, SIGNAL(viewCreated()));
-    connect(aViewer, SIGNAL(activated()), this, SIGNAL(activated()));
+    connect(aViewer, SIGNAL(tryCloseView(ModuleBase_IViewWindow*)), 
+      this, SIGNAL(tryCloseView(ModuleBase_IViewWindow*)));
 
-    connect(aViewer, SIGNAL(mousePress(QMouseEvent*)), this, SIGNAL(mousePress(QMouseEvent*)));
+    connect(aViewer, SIGNAL(deleteView(ModuleBase_IViewWindow*)), 
+      this, SIGNAL(deleteView(ModuleBase_IViewWindow*)));
 
-    connect(aViewer, SIGNAL(mouseRelease(QMouseEvent*)), this, SIGNAL(mouseRelease(QMouseEvent*)));
+    connect(aViewer, SIGNAL(viewCreated(ModuleBase_IViewWindow*)), 
+      this, SIGNAL(viewCreated(ModuleBase_IViewWindow*)));
 
-    connect(aViewer, SIGNAL(mouseDoubleClick(QMouseEvent*)), this,
-            SIGNAL(mouseDoubleClick(QMouseEvent*)));
+    connect(aViewer, SIGNAL(activated(ModuleBase_IViewWindow*)), 
+      this, SIGNAL(activated(ModuleBase_IViewWindow*)));
 
-    connect(aViewer, SIGNAL(mouseMove(QMouseEvent*)), this, SIGNAL(mouseMove(QMouseEvent*)));
+    connect(aViewer, SIGNAL(mousePress(ModuleBase_IViewWindow*, QMouseEvent*)), 
+      this, SIGNAL(mousePress(ModuleBase_IViewWindow*, QMouseEvent*)));
 
-    connect(aViewer, SIGNAL(keyPress(QKeyEvent*)), this, SIGNAL(keyPress(QKeyEvent*)));
+    connect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
+      this, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
 
-    connect(aViewer, SIGNAL(keyRelease(QKeyEvent*)), this, SIGNAL(keyRelease(QKeyEvent*)));
+    connect(aViewer, SIGNAL(mouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*)), this,
+            SIGNAL(mouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*)));
+
+    connect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)), 
+      this, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
+
+    connect(aViewer, SIGNAL(keyPress(ModuleBase_IViewWindow*, QKeyEvent*)), 
+      this, SIGNAL(keyPress(ModuleBase_IViewWindow*, QKeyEvent*)));
+
+    connect(aViewer, SIGNAL(keyRelease(ModuleBase_IViewWindow*, QKeyEvent*)), 
+      this, SIGNAL(keyRelease(ModuleBase_IViewWindow*, QKeyEvent*)));
 
     connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
     connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
@@ -94,21 +107,34 @@ void XGUI_ViewerProxy::connectToViewer()
     XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
 
     connect(aViewer, SIGNAL(lastViewClosed()), this, SIGNAL(lastViewClosed()));
-    connect(aViewer, SIGNAL(tryCloseView(XGUI_ViewWindow*)), this, SIGNAL(tryCloseView()));
-    connect(aViewer, SIGNAL(deleteView(XGUI_ViewWindow*)), this, SIGNAL(deleteView()));
-    connect(aViewer, SIGNAL(viewCreated(XGUI_ViewWindow*)), this, SIGNAL(viewCreated()));
-    connect(aViewer, SIGNAL(activated(XGUI_ViewWindow*)), this, SIGNAL(activated()));
+
+    connect(aViewer, SIGNAL(tryCloseView(XGUI_ViewWindow*)), 
+            this, SLOT(onTryCloseView(XGUI_ViewWindow*)));
+
+    connect(aViewer, SIGNAL(deleteView(XGUI_ViewWindow*)), 
+            this, SLOT(onDeleteView(XGUI_ViewWindow*)));
+
+    connect(aViewer, SIGNAL(viewCreated(XGUI_ViewWindow*)), 
+            this, SLOT(onViewCreated(XGUI_ViewWindow*)));
+
+    connect(aViewer, SIGNAL(activated(XGUI_ViewWindow*)), 
+            this, SLOT(onActivated(XGUI_ViewWindow*)));
 
     connect(aViewer, SIGNAL(mousePress(XGUI_ViewWindow*, QMouseEvent*)), this,
             SLOT(onMousePress(XGUI_ViewWindow*, QMouseEvent*)));
+
     connect(aViewer, SIGNAL(mouseRelease(XGUI_ViewWindow*, QMouseEvent*)), this,
             SLOT(onMouseRelease(XGUI_ViewWindow*, QMouseEvent*)));
+
     connect(aViewer, SIGNAL(mouseDoubleClick(XGUI_ViewWindow*, QMouseEvent*)), this,
             SLOT(onMouseDoubleClick(XGUI_ViewWindow*, QMouseEvent*)));
+
     connect(aViewer, SIGNAL(mouseMove(XGUI_ViewWindow*, QMouseEvent*)), this,
             SLOT(onMouseMove(XGUI_ViewWindow*, QMouseEvent*)));
+
     connect(aViewer, SIGNAL(keyPress(XGUI_ViewWindow*, QKeyEvent*)), this,
             SLOT(onKeyPress(XGUI_ViewWindow*, QKeyEvent*)));
+
     connect(aViewer, SIGNAL(keyRelease(XGUI_ViewWindow*, QKeyEvent*)), this,
             SLOT(onKeyRelease(XGUI_ViewWindow*, QKeyEvent*)));
 
@@ -118,35 +144,58 @@ void XGUI_ViewerProxy::connectToViewer()
   }
 }
 
-void XGUI_ViewerProxy::onMousePress(XGUI_ViewWindow*, QMouseEvent* theEvent)
+
+void XGUI_ViewerProxy::onTryCloseView(XGUI_ViewWindow* theWnd)
 {
-  emit mousePress(theEvent);
+  emit tryCloseView(theWnd);
 }
 
-void XGUI_ViewerProxy::onMouseRelease(XGUI_ViewWindow*, QMouseEvent* theEvent)
+void XGUI_ViewerProxy::onDeleteView(XGUI_ViewWindow* theWnd)
 {
-  emit mouseRelease(theEvent);
+  emit deleteView(theWnd);
 }
 
-void XGUI_ViewerProxy::onMouseDoubleClick(XGUI_ViewWindow*, QMouseEvent* theEvent)
+void XGUI_ViewerProxy::onViewCreated(XGUI_ViewWindow* theWnd)
 {
-  emit mouseDoubleClick(theEvent);
+  emit viewCreated(theWnd);
 }
 
-void XGUI_ViewerProxy::onMouseMove(XGUI_ViewWindow*, QMouseEvent* theEvent)
+void XGUI_ViewerProxy::onActivated(XGUI_ViewWindow* theWnd)
 {
-  emit mouseMove(theEvent);
+  emit activated(theWnd);
 }
 
-void XGUI_ViewerProxy::onKeyPress(XGUI_ViewWindow*, QKeyEvent* theEvent)
+void XGUI_ViewerProxy::onMousePress(XGUI_ViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  emit keyPress(theEvent);
+  emit mousePress(theWnd, theEvent);
 }
 
-void XGUI_ViewerProxy::onKeyRelease(XGUI_ViewWindow*, QKeyEvent* theEvent)
+void XGUI_ViewerProxy::onMouseRelease(XGUI_ViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  emit keyRelease(theEvent);
+  emit mouseRelease(theWnd, theEvent);
 }
+
+void XGUI_ViewerProxy::onMouseDoubleClick(XGUI_ViewWindow* theWnd, QMouseEvent* theEvent)
+{
+  emit mouseDoubleClick(theWnd, theEvent);
+}
+
+void XGUI_ViewerProxy::onMouseMove(XGUI_ViewWindow* theWnd, QMouseEvent* theEvent)
+{
+  emit mouseMove(theWnd, theEvent);
+}
+
+void XGUI_ViewerProxy::onKeyPress(XGUI_ViewWindow* theWnd, QKeyEvent* theEvent)
+{
+  emit keyPress(theWnd, theEvent);
+}
+
+void XGUI_ViewerProxy::onKeyRelease(XGUI_ViewWindow* theWnd, QKeyEvent* theEvent)
+{
+  emit keyRelease(theWnd, theEvent);
+}
+
+
 
 //***************************************
 void XGUI_ViewerProxy::enableSelection(bool isEnabled)
@@ -191,26 +240,17 @@ bool XGUI_ViewerProxy::isMultiSelectionEnabled() const
 //***************************************
 void XGUI_ViewerProxy::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
 {
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull()) {
-    aContext->AddFilter(theFilter);
-  }
+  myWorkshop->displayer()->addSelectionFilter(theFilter);
 }
 
 //***************************************
 void XGUI_ViewerProxy::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
 {
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull()) {
-    aContext->RemoveFilter(theFilter);
-  }
+  myWorkshop->displayer()->removeSelectionFilter(theFilter);
 }
 
 //***************************************
 void XGUI_ViewerProxy::clearSelectionFilters()
 {
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull()) {
-    aContext->RemoveFilters();
-  }
+  myWorkshop->displayer()->removeFilters();
 }

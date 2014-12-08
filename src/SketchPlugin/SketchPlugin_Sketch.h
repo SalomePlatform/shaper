@@ -25,7 +25,7 @@
  * \ingroup DataModel
  * \brief Feature for creation of the new part in PartSet.
  */
-class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_IPresentable
+class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_IPresentable
 {
  public:
   /// Sketch feature kind
@@ -109,7 +109,7 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_IPr
   /// Returns the basis plane for the sketch
   std::shared_ptr<GeomAPI_Pln> plane();
 
-  virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
+  //virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
   /// removes also all sub-sketch elements
   SKETCHPLUGIN_EXPORT virtual void erase();
@@ -135,7 +135,7 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_IPr
   /// Returns the point projected into the sketch plane
   std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& thePnt);
 
-  SKETCHPLUGIN_EXPORT virtual void attributeChanged();
+  SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 protected:
   /// Creates a plane and append it to the list
   /// \param theX the X normal value

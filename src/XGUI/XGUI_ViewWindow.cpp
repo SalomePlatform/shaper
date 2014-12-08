@@ -672,7 +672,7 @@ void XGUI_ViewWindow::vpMousePressEvent(QMouseEvent* theEvent)
               if (ic->NbSelected() == 0)
                 myCurrPointType = myPrevPointType;
               //if ( mySetRotationPointDlg ) mySetRotationPointDlg->toggleChange();
-              ic->CloseAllContexts();
+              //ic->CloseAllContexts();
               myOperation = NOTHING;
               myViewPort->setCursor(myCursor);
               myCursorIsHand = false;
@@ -1214,4 +1214,9 @@ void XGUI_ViewWindow::updateToolBar()
 void XGUI_ViewWindow::updateEnabledDrawMode()
 {
   myEnableDrawMode = myViewer->isSelectionEnabled() && myViewer->isMultiSelectionEnabled();
+}
+
+Handle(V3d_View) XGUI_ViewWindow::v3dView() const
+{
+  return myViewPort->getView();
 }

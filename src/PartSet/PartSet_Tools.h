@@ -14,6 +14,10 @@
 #include <QList>
 
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Object.h>
+#include <ModelAPI_Attribute.h>
+
+#include <TopoDS_Shape.hxx>
 
 #include <memory>
 
@@ -35,6 +39,7 @@ class PARTSET_EXPORT PartSet_Tools
   /// Converts the 2D screen point to the 3D point on the view according to the point of view
   /// \param thePoint a screen point
   /// \param theView a 3D view
+  // Transferred to ModuleBase
   static gp_Pnt convertClickToPoint(QPoint thePoint, Handle_V3d_View theView);
 
   /// \brief Converts the 3D point to the projected coodinates on the sketch plane.
@@ -43,7 +48,7 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
   static void convertTo2D(const gp_Pnt& thePoint, FeaturePtr theSketch,
-  Handle(V3d_View) theView,
+                          Handle(V3d_View) theView,
                           double& theX, double& theY);
 
   /// \brief Converts the 2D projected coodinates on the sketch plane to the 3D point.
@@ -51,8 +56,7 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theY the Y coordinate
   /// \param theSketch the sketch feature
   /// \param thePoint the 3D point in the viewer
-  static void convertTo3D(const double theX, const double theY, FeaturePtr theSketch,
-                          gp_Pnt& thePoint);
+  static std::shared_ptr<GeomAPI_Pnt> convertTo3D(const double theX, const double theY, FeaturePtr theSketch);
 
   /// Returns an object that is under the mouse point. Firstly it checks the highlighting,
   /// if it exists, the first object is returned. Secondly, there is an iteration on
@@ -137,7 +141,9 @@ class PARTSET_EXPORT PartSet_Tools
   /// Created line will have fixed constraint
   /// \param theEdge - an edge
   /// \return - result of created feature
-  static ResultPtr createFixedObjectByEdge(const ModuleBase_ViewerPrs& thePrs, CompositeFeaturePtr theSketch);
+  static ResultPtr createFixedObjectByEdge(const TopoDS_Shape& theShape, 
+                                           const ObjectPtr& theObject, 
+                                           CompositeFeaturePtr theSketch);
 
   /// Checks whether the list of selected presentations contains the given one
   /// \param theSelected a list of presentations
@@ -160,6 +166,16 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theY the output vertical coordinate of the point
   static bool hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePtr theSketch,
                              Handle_V3d_View theView, double& theX, double& theY);
+
+
+  /**
+  * Find attribute of object which corresponds to the given shape
+  * \param theObj - an object
+  * \param theShape - a Shape
+  * \param theSketch - a Sketch to get a plane of converting to 2d
+  */
+  static AttributePtr findAttributeBy2dPoint(ObjectPtr theObj, const TopoDS_Shape theShape, FeaturePtr theSketch);
+
 protected:
   /// Returns an object that is under the mouse point. Firstly it checks the highlighting,
   /// if it exists, the first object is returned. Secondly, there is an iteration on

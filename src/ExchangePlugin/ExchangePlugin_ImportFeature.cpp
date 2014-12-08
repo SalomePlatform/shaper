@@ -9,7 +9,6 @@
 
 #include <GeomAPI_Shape.h>
 #include <Config_Common.h>
-#include <Events_Error.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Document.h>
@@ -100,12 +99,9 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
                             anUnknownLabel);
    // Check if shape is valid
    if ( aShape.IsNull() ) {
-     std::string aShapeError = "An error occurred while importing " + theFileName + ": ";
-     aShapeError = aShapeError + std::string(anError.ToCString());
-     Events_Error::send(aShapeError, this);
- #ifdef _DEBUG
-     std::cerr << aShapeError << std::endl;
- #endif
+     const static std::string aShapeError = 
+       "An error occurred while importing " + theFileName + ": " + anError.ToCString();
+     setError(aShapeError);
      return false;
    }
   //
@@ -154,20 +150,15 @@ LibHandle ExchangePlugin_ImportFeature::loadImportPlugin(const std::string& theF
 #else
     anImportError = anImportError + std::string(dlerror());
 #endif
-    Events_Error::send(anImportError, this);
-#ifdef _DEBUG
-    std::cerr << anImportError << std::endl;
-#endif
+    setError(anImportError);
     return false;
   }
   // Test loaded plugin for existence of valid "Import" function:
   importFunctionPointer fp = (importFunctionPointer) GetProc(anImportLib, "Import");
   if (!fp) {
-    std::string aFunctionError = "No valid \"Import\" function was found in the " + aLibName;
-    Events_Error::send(aFunctionError, this);
-#ifdef _DEBUG
-    std::cerr << aFunctionError << std::endl;
-#endif
+    const static std::string aFunctionError = 
+      "No valid \"Import\" function was found in the " + aLibName;
+    setError(aFunctionError);
     UnLoadLib(anImportLib)
     return NULL;
   }

@@ -126,12 +126,8 @@ Handle(V3d_View) theView,
   theY = aVec.X() * anY->x() + aVec.Y() * anY->y() + aVec.Z() * anY->z();
 }
 
-void PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr theSketch,
-                                gp_Pnt& thePoint)
+std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr theSketch)
 {
-  if (!theSketch)
-    return;
-
   std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
 
   std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
@@ -141,11 +137,10 @@ void PartSet_Tools::convertTo3D(const double theX, const double theY, FeaturePtr
   std::shared_ptr<GeomDataAPI_Dir> aY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
 
-  std::shared_ptr<GeomAPI_XYZ> aSum = aC->pnt()->xyz()->added(aX->dir()->xyz()->multiplied(theX))
-      ->added(aY->dir()->xyz()->multiplied(theY));
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = 
+    std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(theX, theY));
 
-  std::shared_ptr<GeomAPI_Pnt> aPoint = std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSum));
-  thePoint = gp_Pnt(aPoint->x(), aPoint->y(), aPoint->z());
+  return aPnt2d->to3D(aC->pnt(), aX->dir(), aY->dir());
 }
 
 ObjectPtr PartSet_Tools::nearestFeature(QPoint thePoint, Handle_V3d_View theView,
@@ -352,19 +347,27 @@ void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr the
 std::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(CompositeFeaturePtr theSketch)
 {
   std::shared_ptr<GeomAPI_Pln> aPlane;
-  double aA, aB, aC, aD;
 
   std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
   std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
       aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
   std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(SketchPlugin_Sketch::NORM_ID()));
-  aA = aNormal->x();
-  aB = aNormal->y();
-  aC = aNormal->z();
-  aD = 0;
+  if (aNormal && anOrigin) {
+    double adX = aNormal->x();
+    double adY = aNormal->y();
+    double adZ = aNormal->z();
 
-  aPlane = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
+    if ( (adX != 0) || (adY != 0) || (adZ != 0) ) { // Plane is valid
+      double aX = anOrigin->x();
+      double aY = anOrigin->y();
+      double aZ = anOrigin->z();
+      gp_Pln aPln(gp_Pnt(aX, aY, aZ), gp_Dir(adX, adY, adZ));
+      double aA, aB, aC, aD;
+      aPln.Coefficients(aA, aB, aC, aD);
+      aPlane = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
+    }
+  }
   return aPlane;
 }
 
@@ -393,15 +396,16 @@ bool PartSet_Tools::isConstraintFeature(const std::string& theKind)
       || theKind == SketchPlugin_ConstraintRigid::ID();
 }
 
-ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& thePrs, CompositeFeaturePtr theSketch)
+ResultPtr PartSet_Tools::createFixedObjectByEdge(const TopoDS_Shape& theShape, 
+                                                 const ObjectPtr& theObject, 
+                                                 CompositeFeaturePtr theSketch)
 {
-  TopoDS_Shape aShape = thePrs.shape();
-  if (aShape.ShapeType() != TopAbs_EDGE)
+  if (theShape.ShapeType() != TopAbs_EDGE)
     return ResultPtr();
 
   // Check that we already have such external edge
   std::shared_ptr<GeomAPI_Edge> aInEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge());
-  aInEdge->setImpl(new TopoDS_Shape(aShape));
+  aInEdge->setImpl(new TopoDS_Shape(theShape));
   ResultPtr aResult = findExternalEdge(theSketch, aInEdge);
   if (aResult)
     return aResult;
@@ -411,35 +415,15 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
   Handle(V3d_View) aNullView;
   FeaturePtr aMyFeature;
 
-  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(aShape), aStart, aEnd);
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(theShape), aStart, aEnd);
   GeomAdaptor_Curve aAdaptor(aCurve);
   if (aAdaptor.GetType() == GeomAbs_Line) {
     // Create line
     aMyFeature = theSketch->addFeature(SketchPlugin_Line::ID());
-
-    //DataPtr aData = myFeature->data();
-    //std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = 
-    //  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
-
-    //double aX, aY;
-    //gp_Pnt Pnt1 = aAdaptor.Value(aStart);
-    //convertTo2D(Pnt1, theSketch, aNullView, aX, aY);
-    //setFeaturePoint(myFeature, aX, aY, SketchPlugin_Line::START_ID());
-
-    //gp_Pnt Pnt2 = aAdaptor.Value(aEnd);
-    //convertTo2D(Pnt2, theSketch, aNullView, aX, aY);
-    //setFeaturePoint(myFeature, aX, aY, SketchPlugin_Line::END_ID());
   } else if (aAdaptor.GetType() == GeomAbs_Circle) {
     if (aAdaptor.IsClosed()) {
       // Create circle
       aMyFeature = theSketch->addFeature(SketchPlugin_Circle::ID());
-      //gp_Circ aCirc = aAdaptor.Circle();
-      //gp_Pnt aCenter = aCirc.Location();
-
-      //double aX, aY;
-      //convertTo2D(aCenter, theSketch, aNullView, aX, aY);
-      //setFeaturePoint(myFeature, aX, aY, SketchPlugin_Circle::CENTER_ID());
-      //setFeatureValue(myFeature, aCirc.Radius(), SketchPlugin_Circle::RADIUS_ID());
     } else {
       // Create arc
       aMyFeature = theSketch->addFeature(SketchPlugin_Arc::ID());
@@ -451,10 +435,10 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const ModuleBase_ViewerPrs& the
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
       (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
 
-    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs.object());
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if (anAttr && aRes) {
       std::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
-      anEdge->setImpl(new TopoDS_Shape(aShape));
+      anEdge->setImpl(new TopoDS_Shape(theShape));
 
       anAttr->setValue(aRes, anEdge);
 
@@ -526,4 +510,40 @@ bool PartSet_Tools::hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePt
   }
 
   return aHasVertex;
+}
+
+AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj, 
+                                                   const TopoDS_Shape theShape, 
+                                                   FeaturePtr theSketch)
+{
+
+  AttributePtr anAttribute;
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObj);
+  if (aFeature) {
+    if (theShape.ShapeType() == TopAbs_VERTEX) {
+      const TopoDS_Vertex& aVertex = TopoDS::Vertex(theShape);
+      if (!aVertex.IsNull())  {
+        gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
+        std::shared_ptr<GeomAPI_Pnt> aValue = std::shared_ptr<GeomAPI_Pnt>(
+            new GeomAPI_Pnt(aPoint.X(), aPoint.Y(), aPoint.Z()));
+
+        // find the given point in the feature attributes
+        std::list<AttributePtr> anAttiributes = 
+          aFeature->data()->attributes(GeomDataAPI_Point2D::type());
+        std::list<AttributePtr>::const_iterator anIt = anAttiributes.begin(), 
+                                                aLast = anAttiributes.end();
+        for (; anIt != aLast && !anAttribute; anIt++) {
+          std::shared_ptr<GeomDataAPI_Point2D> aCurPoint = 
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+
+          std::shared_ptr<GeomAPI_Pnt> aPnt = convertTo3D(aCurPoint->x(), aCurPoint->y(), theSketch);
+          if (aPnt && (aPnt->distance(aValue) < Precision::Confusion())) {
+            anAttribute = aCurPoint;
+            break;
+          }
+        }
+      }
+    }
+  }
+  return anAttribute;
 }

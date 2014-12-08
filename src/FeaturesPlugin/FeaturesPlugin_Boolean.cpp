@@ -10,12 +10,7 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_ResultBody.h>
 #include <GeomAlgoAPI_Boolean.h>
-#include <Events_Error.h>
 using namespace std;
-#ifdef _DEBUG
-#include <iostream>
-#include <ostream>
-#endif
 
 #define FACE 4
 #define _MODIFY_TAG 1
@@ -65,29 +60,26 @@ void FeaturesPlugin_Boolean::execute()
 
   GeomAlgoAPI_Boolean* aFeature = new GeomAlgoAPI_Boolean(anObject, aTool, aType);
   if(aFeature && !aFeature->isDone()) {
-    std::string aFeatureError = "Boolean feature: algorithm failed";  
-    Events_Error::send(aFeatureError, this);
+    static const std::string aFeatureError = "Boolean feature: algorithm failed";  
+    setError(aFeatureError);
     return;
   }
    // Check if shape is valid
   if (aFeature->shape()->isNull()) {
-    std::string aShapeError = "Boolean feature: resulting shape is Null";     
-    Events_Error::send(aShapeError, this);
-#ifdef _DEBUG
-    std::cerr << aShapeError << std::endl;
-#endif
+    static const std::string aShapeError = "Boolean feature: resulting shape is Null";     
+    setError(aShapeError);
     return;
   }
   if(!aFeature->isValid()) {
-    std::string aFeatureError = "Boolean feature: resulting shape is not valid";  
-    Events_Error::send(aFeatureError, this);
+    static const std::string aFeatureError = "Boolean feature: resulting shape is not valid";  
+    setError(aFeatureError);
     return;
   }  
   // if result of Boolean operation is same as was before it means that Boolean operation has no sence
   // and naming provides no result, so, generate an error in this case
   if (anObject->isEqual(aFeature->shape())) {
-    std::string aFeatureError = "Boolean feature: operation was not performed";  
-    Events_Error::send(aFeatureError, this);
+    static const std::string aFeatureError = "Boolean feature: operation was not performed";  
+    setError(aFeatureError);
     return;
   }
   //LoadNamingDS

@@ -12,15 +12,9 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetDoubleValue.h
 	ModuleBase_WidgetEditor.h
 	ModuleBase_WidgetFactory.h
-	ModuleBase_WidgetFeature.h
-	ModuleBase_WidgetFeatureOrAttribute.h
-	ModuleBase_WidgetPoint2D.h
 	ModuleBase_WidgetSwitch.h
 	ModuleBase_WidgetShapeSelector.h
 	ModuleBase_IWorkshop.h
-	ModuleBase_WidgetPoint2dDistance.h
-	ModuleBase_WidgetValue.h
-	ModuleBase_WidgetValueFeature.h
 	ModuleBase_Definitions.h
 	ModuleBase_SelectionValidator.h
 	ModuleBase_ISelection.h
@@ -34,6 +28,8 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetMultiSelector.h
 	ModuleBase_ViewerFilters.h
 	ModuleBase_ResultPrs.h
+	ModuleBase_IViewWindow.h
+	ModuleBase_WidgetLabel.h
 )
 
 SET(PROJECT_SOURCES
@@ -46,14 +42,8 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetDoubleValue.cpp
 	ModuleBase_WidgetEditor.cpp
 	ModuleBase_WidgetFactory.cpp
-	ModuleBase_WidgetFeature.cpp
-	ModuleBase_WidgetFeatureOrAttribute.cpp
-	ModuleBase_WidgetPoint2D.cpp
 	ModuleBase_WidgetSwitch.cpp
 	ModuleBase_WidgetShapeSelector.cpp
-	ModuleBase_WidgetPoint2dDistance.cpp
-	ModuleBase_WidgetValue.cpp
-	ModuleBase_WidgetValueFeature.cpp	
 	ModuleBase_WidgetChoice.cpp
 	ModuleBase_WidgetFileSelector.cpp
 	ModuleBase_DoubleSpinBox.cpp
@@ -61,6 +51,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetMultiSelector.cpp
 	ModuleBase_ViewerFilters.cpp
 	ModuleBase_ResultPrs.cpp
+	ModuleBase_WidgetLabel.cpp
 )
 
 SET(PROJECT_LIBRARIES

@@ -102,7 +102,12 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theNode,
   outFeatureMessage->setKeysequence(getProperty(theNode, FEATURE_KEYSEQUENCE));
   outFeatureMessage->setGroupId(restoreAttribute(NODE_GROUP, _ID));
   outFeatureMessage->setWorkbenchId(restoreAttribute(NODE_WORKBENCH, _ID));
-  outFeatureMessage->setDocumentKind(restoreAttribute(NODE_WORKBENCH, WORKBENCH_DOC));
+  // Get document kind of a feature, if empty set workbench's kind (might be empty too)
+  std::string aDocKind = getProperty(theNode, WORKBENCH_DOC);
+  if(aDocKind.empty()) {
+    aDocKind = restoreAttribute(NODE_WORKBENCH, WORKBENCH_DOC);
+  }
+  outFeatureMessage->setDocumentKind(aDocKind);
 }
 
 void Config_FeatureReader::storeAttribute(xmlNodePtr theNode,

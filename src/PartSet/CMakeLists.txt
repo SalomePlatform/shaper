@@ -6,30 +6,28 @@ SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Constants.h
 	PartSet_EditLine.h
-	PartSet_Listener.h
 	PartSet_Module.h
-	PartSet_OperationFeatureCreate.h
-	PartSet_OperationFeatureEdit.h
-	PartSet_OperationSketchBase.h
-	PartSet_OperationSketch.h
-	PartSet_OperationFeatureBase.h
 	PartSet_Tools.h
 	PartSet_WidgetSketchLabel.h
 	PartSet_Validators.h
+	PartSet_WidgetPoint2d.h
+	PartSet_WidgetPoint2dDistance.h
+	PartSet_WidgetShapeSelector.h
+	PartSet_OperationSketch.h
+	PartSet_Filters.h
 )
 
 SET(PROJECT_SOURCES
 	PartSet_EditLine.cpp
-	PartSet_Listener.cpp
 	PartSet_Module.cpp
-	PartSet_OperationFeatureCreate.cpp
-	PartSet_OperationFeatureEdit.cpp
-	PartSet_OperationSketchBase.cpp
-	PartSet_OperationSketch.cpp
-	PartSet_OperationFeatureBase.cpp
 	PartSet_Tools.cpp
 	PartSet_WidgetSketchLabel.cpp
 	PartSet_Validators.cpp
+	PartSet_WidgetPoint2d.cpp
+	PartSet_WidgetPoint2dDistance.cpp
+	PartSet_WidgetShapeSelector.cpp
+	PartSet_OperationSketch.cpp
+	PartSet_Filters.cpp
 )
 
 SET(PROJECT_RESOURCES 
@@ -74,6 +72,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI
                     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
                     ${CMAKE_SOURCE_DIR}/src/GeomAlgoAPI
                     ${CMAKE_SOURCE_DIR}/src/SketchPlugin
+                    ${CMAKE_SOURCE_DIR}/src/FeaturesPlugin
                     ${CMAKE_SOURCE_DIR}/src/GeomAPI
                     ${CAS_INCLUDE_DIRS}
 					${SUIT_INCLUDE}

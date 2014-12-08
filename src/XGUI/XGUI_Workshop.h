@@ -6,11 +6,12 @@
 #include <Events_Listener.h>
 #include <ModuleBase_Definitions.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Feature.h>
 
 #include <QObject>
 #include <QMap>
-#include <QIcon>
 #include <QKeySequence>
+#include <QIcon>
 
 class XGUI_MainWindow;
 class XGUI_Command;
@@ -142,23 +143,26 @@ Q_OBJECT
     return myModuleConnector;
   }
 
-  //! Returns icon name according to feature Id
-  static QString featureIcon(const std::string& theId);
+  //! Returns icon name according to feature
+  static QIcon featureIcon(const FeaturePtr& theFeature);
+
+  //! Returns icon name according to feature
+  static std::string featureIconStr(const FeaturePtr& theFeature);
 
   //! Activates or deactivates a part
   //! If PartPtr is Null pointer then PartSet will be activated
   void activatePart(std::shared_ptr<ModelAPI_ResultPart> theFeature);
 
   //! Delete features
-  void deleteObjects(const QList<ObjectPtr>& theList);
+  void deleteObjects(const QObjectPtrList& theList);
 
   //! Show the given features in 3d Viewer
-  void showObjects(const QList<ObjectPtr>& theList, bool isVisible);
+  void showObjects(const QObjectPtrList& theList, bool isVisible);
 
   //! Show the given features in 3d Viewer
-  void showOnlyObjects(const QList<ObjectPtr>& theList);
+  void showOnlyObjects(const QObjectPtrList& theList);
 
-  void setDisplayMode(const QList<ObjectPtr>& theList, int theMode);
+  void setDisplayMode(const QObjectPtrList& theList, int theMode);
 
   ModuleBase_IModule* module() const
   {
@@ -239,6 +243,7 @@ signals:
   /// SLOT, that is called after the operation is started. Update workshop state according to
   /// the started operation, e.g. visualizes the property panel and connect to it.
   void onOperationStarted();
+
   /// SLOT, that is called after the operation is stopped. Update workshop state, e.g.
   /// hides the property panel and udpate the command status.
   /// \param theOpertion a stopped operation

@@ -6,6 +6,7 @@
 #define MODULEBASE_MODELWIDGET_H
 
 #include <ModuleBase.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Feature.h>
 
@@ -14,7 +15,6 @@
 #include <memory>
 
 class Config_WidgetAPI;
-class ModuleBase_WidgetValue;
 class QKeyEvent;
 
 /**\class ModuleBase_ModelWidget
@@ -51,10 +51,14 @@ Q_OBJECT
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
 
+  /// Defines if it is supported to set the value in this widget
+  /// By default it returns true
+  virtual bool canSetValue() const { return true; };
+
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValue the wrapped widget value
-  virtual bool setValue(ModuleBase_WidgetValue* theValue)
+  virtual bool setSelection(ModuleBase_ViewerPrs theValue)
   {
     return false;
   }
@@ -69,6 +73,12 @@ Q_OBJECT
   /// If the widget has the NonFocus focus policy, it is skipped.
   /// \return the state whether the widget can accept the focus
   virtual bool focusTo();
+
+  /// The methiod called when widget is activated
+  virtual void activate() {}
+
+  /// The methiod called when widget is deactivated
+  virtual void deactivate() {}
 
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget

@@ -181,6 +181,7 @@ class Model_Document : public ModelAPI_Document
 
   friend class Model_Application;
   friend class Model_Session;
+  friend class Model_Update;
   friend class Model_AttributeReference;
   friend class DFBrowser;
 
@@ -188,8 +189,10 @@ class Model_Document : public ModelAPI_Document
   std::string myID;  ///< identifier of the document in the application
   std::string myKind;  ///< kind of the document in the application
   Handle_TDocStd_Document myDoc;  ///< OCAF document
-  /// number of transactions after the last "save" call, used for "IsModified" method
-  int myTransactionsAfterSave;
+  /// counter of transactions
+  int myTransactionsCounter;
+  /// counter value of transaction on the last "save" call, used for "IsModified" method
+  int myTransactionSave;
   /// number of nested transactions performed (or -1 if not nested)
   int myNestedNum;
   /// All features managed by this document (not only in history of OB)

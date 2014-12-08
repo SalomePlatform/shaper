@@ -39,13 +39,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
   QWidget* createContainer(const std::string& theType, QWidget* theParent = NULL);
   QWidget* labelControl(QWidget* theParent);
   QWidget* doubleSpinBoxControl(QWidget* theParent);
-  QWidget* pointSelectorControl(QWidget* theParent);
-  QWidget* featureSelectorControl(QWidget* theParent);
-  QWidget* featureOrAttributeSelectorControl(QWidget* theParent);
   QWidget* doubleValueEditor(QWidget* theParent);
   QWidget* shapeSelectorControl(QWidget* theParent);
   QWidget* booleanControl(QWidget* theParent);
-  QWidget* point2dDistanceControl(QWidget* theParent);
   QWidget* fileSelectorControl(QWidget* theParent);
   QWidget* choiceControl(QWidget* theParent);
   QWidget* lineEditControl(QWidget* theParent);

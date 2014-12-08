@@ -26,10 +26,9 @@ const static char* WDG_MULTISELECTOR = "multi_selector";
 const static char* WDG_SHAPE_SELECTOR = "shape_selector";
 const static char* WDG_CHOICE = "choice";
 //Specific widgets
-const static char* WDG_POINT_SELECTOR = "point_selector";
-const static char* WDG_POINT2D_DISTANCE = "point2ddistance";
-const static char* WDG_FEATURE_SELECTOR = "feature_selector";
-const static char* WDG_FEATURE_OR_ATTRIBUTE_SELECTOR = "feature_or_attribute_selector";
+//const static char* WDG_POINT2D_DISTANCE = "point2ddistance";
+//const static char* WDG_FEATURE_SELECTOR = "feature_selector";
+//const static char* WDG_FEATURE_OR_ATTRIBUTE_SELECTOR = "feature_or_attribute_selector";
 const static char* WDG_DOUBLEVALUE_EDITOR = "doublevalue_editor";
 const static char* WDG_FILE_SELECTOR= "file_selector";
 
@@ -54,7 +53,7 @@ const static char* ATTRIBUTE_INTERNAL = "internal";
 const static char* ATTRIBUTE_OBLIGATORY = "obligatory";
 const static char* ATTRIBUTE_CONCEALMENT = "concealment";
 // TODO: Rename
-const static char* PREVIOUS_FEATURE_PARAM = "previous_feature_param";
+//const static char* PREVIOUS_FEATURE_PARAM = "previous_feature_param";
 const static char* ANY_WDG_TOOLTIP = FEATURE_TOOLTIP;
 const static char* ANY_WDG_ICON = FEATURE_ICON;
 const static char* ANY_WDG_LABEL = "label";

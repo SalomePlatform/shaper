@@ -4,9 +4,13 @@
 #include "ModuleBase.h"
 #include "ModuleBase_IWorkshop.h"
 
+#include <ModelAPI_Feature.h>
+
 #include <QString>
 #include <QObject>
 
+#include <string>
+#include <map>
 
 class QAction;
 class QMouseEvent;
@@ -29,10 +33,13 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   virtual ~ModuleBase_IModule() {}
 
   /// Reads description of features from XML file 
-  virtual void createFeatures() = 0;
+  virtual void createFeatures();
 
   /// Called on creation of menu item in desktop
-  virtual void featureCreated(QAction*) = 0;
+  virtual void actionCreated(QAction*);
+
+  /// Called when user selects feature for editing
+  virtual void editFeature(FeaturePtr theFeature);
 
   /// Creates an operation and send it to loop
   /// \param theCmdId the operation name
@@ -43,7 +50,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Creates custom widgets for property panel
   virtual QWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
-                                      Config_WidgetAPI* theWidgetApi,
+                                      Config_WidgetAPI* theWidgetApi, std::string theParentId,
                                       QList<ModuleBase_ModelWidget*>& theModelWidgets)
   {
     return 0;
@@ -51,7 +58,27 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   ModuleBase_IWorkshop* workshop() const { return myWorkshop; }
 
+  /// Call back forlast tuning of property panel before operation performance
+  /// It is called as on clearing of property panel as on filling with new widgets
+  virtual void propertyPanelDefined(ModuleBase_Operation* theOperation) {}
+
+public slots:
+  void onFeatureTriggered();
+
 protected slots:
+  /// SLOT, that is called after the operation is started. Connect on the focus activated signal
+  virtual void onOperationStarted(ModuleBase_Operation* theOperation) {}
+  
+  /// SLOT, that is called after the operation is stopped. Switched off the modfications performed
+  /// by the operation start
+  virtual void onOperationStopped(ModuleBase_Operation* theOperation) {}
+
+  virtual void onOperationResumed(ModuleBase_Operation* theOperation) {}
+
+  virtual void onOperationComitted(ModuleBase_Operation* theOperation) {}
+
+  virtual void onOperationAborted(ModuleBase_Operation* theOperation) {}
+
 
   /// Called on selection changed event
   virtual void onSelectionChanged() {}
@@ -59,25 +86,25 @@ protected slots:
   /// SLOT, that is called by mouse press in the viewer.
   /// The mouse released point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
-  virtual void onMousePressed(QMouseEvent* theEvent) {}
+  //virtual void onMousePressed(QMouseEvent* theEvent) {}
 
   /// SLOT, that is called by mouse release in the viewer.
   /// The mouse released point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
-  virtual void onMouseReleased(QMouseEvent* theEvent) {}
+  //virtual void onMouseReleased(QMouseEvent* theEvent) {}
   
   /// SLOT, that is called by mouse move in the viewer.
   /// The mouse moved point is sent to the current operation to be processed.
   /// \param theEvent the mouse event
-  virtual void onMouseMoved(QMouseEvent* theEvent) {}
+  //virtual void onMouseMoved(QMouseEvent* theEvent) {}
 
   /// SLOT, that is called by the mouse double click in the viewer.
   /// \param theEvent the mouse event
-  virtual void onMouseDoubleClick(QMouseEvent* theEvent) {}
+  //virtual void onMouseDoubleClick(QMouseEvent* theEvent) {}
 
   /// SLOT, that is called by the key in the viewer is clicked.
   /// \param theEvent the mouse event
-  virtual void onKeyRelease(QKeyEvent* theEvent) {}
+  //virtual void onKeyRelease(QKeyEvent* theEvent) {}
 
  protected:
   /// Sends the operation for launching
@@ -87,15 +114,21 @@ protected slots:
   /// Creates a new operation
   /// \param theCmdId the operation name
   /// \param theFeatureKind a kind of feature to get the feature xml description
-  virtual ModuleBase_Operation* createOperation(const std::string& theCmdId,
-                                        const std::string& theFeatureKind = "") = 0;
+  virtual ModuleBase_Operation* createOperation(const std::string& theFeatureId);
 
+  /// Register validators for this module
+  virtual void registerValidators() {}
+
+  /// Returns new instance of operation object (used in createOperation for customization)
+  virtual ModuleBase_Operation* getNewOperation(const std::string& theFeatureId);
 
 protected:
 
   ModuleBase_IWorkshop* myWorkshop;
-
+  std::map<std::string, std::string> myFeaturesInFiles;
 };
+
+
 
 //! This function must return a new module instance.
 extern "C" {

@@ -7,11 +7,7 @@
 
 #include "XGUI.h"
 
-#include <QString>
-#include <memory>
-
 #include <GeomAPI_AISObject.h>
-
 #include <TopoDS_Shape.hxx>
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_InteractiveContext.hxx>
@@ -22,9 +18,10 @@
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ViewerPrs.h>
 
-#include <map>
-#include <vector>
-#include <list>
+#include <SelectMgr_AndFilter.hxx>
+
+#include <QString>
+#include <QMap>
 
 class XGUI_Viewer;
 class ModelAPI_Feature;
@@ -62,7 +59,7 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param theFeatures a list of features to be disabled
   /// \param theToStop the boolean state whether it it stopped or non stopped
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void stopSelection(const QList<ObjectPtr>& theFeatures, const bool isStop,
+  void stopSelection(const QObjectPtrList& theFeatures, const bool isStop,
                      const bool isUpdateViewer);
 
   /**
@@ -70,7 +67,7 @@ class XGUI_EXPORT XGUI_Displayer
    * \param theFeatures a list of features to be selected
    * isUpdateViewer the parameter whether the viewer should be update immediatelly
    */
-  void setSelected(const QList<ObjectPtr>& theFeatures, bool isUpdateViewer = true);
+  void setSelected(const QObjectPtrList& theFeatures, bool isUpdateViewer = true);
 
 
   /// Un select all objects
@@ -99,16 +96,11 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void closeLocalContexts(const bool isUpdateViewer = true);
 
-  /*
-  * Set modes of selections. Selection mode has to be defined by TopAbs_ShapeEnum.
-  * It doesn't manages a local context
-  * \param theModes - list of selection modes. If the list is empty then all selectoin modes will be cleared.
-  */
-  void setSelectionModes(const QIntList& theModes);
-
   void addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
 
   void removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
+
+  void removeFilters();
 
   /// Updates the viewer
   void updateViewer();
@@ -131,33 +123,40 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param theModes - modes on which it has to be activated (can be empty)
   void activate(ObjectPtr theFeature, const QIntList& theModes);
 
+  /// Activates the given object with default modes
+  void activate(ObjectPtr theFeature);
+
   /// Returns true if the given object can be selected
   bool isActive(ObjectPtr theObject) const;
 
   /// Activates in local context displayed outside of the context.
   /// \param theModes - modes on which it has to be activated (can be empty)
-  void activateObjectsOutOfContext(const QIntList& theModes);
+  void activateObjects(const QIntList& theModes);
 
   /// Activates in local context displayed outside of the context.
-  void deactivateObjectsOutOfContext();
+  void deactivateObjects();
 
   /// Sets display mode for the given object if this object is displayed
   void setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bool toUpdate = true);
 
   /// Returns current display mode for the given object.
-  /// If object is not displayed then returns NoMode.
+  /// If object is not dis played then returns NoMode.
   DisplayMode displayMode(ObjectPtr theObject) const;
 
 
+  /// Displays only objects listed in the list
+  void showOnly(const QObjectPtrList& theList);
+
+  /// Returns number of displayed objects
   int objectsCount() const { return myResult2AISObjectMap.size(); }
 
  protected:
-  /// Deactivate local selection
-  /// \param isUpdateViewer the state wether the viewer should be updated immediatelly
-  void closeAllContexts(const bool isUpdateViewer);
-
   /// Returns currently installed AIS_InteractiveContext
   Handle(AIS_InteractiveContext) AISContext() const;
+
+  /// Returns the viewer context top filter. If there is no a filter, it is created and set into
+  /// The context should have only this filter inside. Other filters should be add to the filter
+  Handle(SelectMgr_AndFilter) GetFilter();
 
   /// Display the feature and a shape. This shape would be associated to the given feature
   /// \param theFeature a feature instance
@@ -185,7 +184,9 @@ class XGUI_EXPORT XGUI_Displayer
  protected:
   XGUI_Workshop* myWorkshop;
 
-  typedef std::map<ObjectPtr, AISObjectPtr> ResultToAISMap;
+  Handle(SelectMgr_AndFilter) myAndFilter;
+
+  typedef QMap<ObjectPtr, AISObjectPtr> ResultToAISMap;
   ResultToAISMap myResult2AISObjectMap;
 
   // A flag of initialization of external objects selection

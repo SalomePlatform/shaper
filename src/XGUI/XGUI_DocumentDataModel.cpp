@@ -214,7 +214,7 @@ QVariant XGUI_DocumentDataModel::data(const QModelIndex& theIndex, int theRole) 
               else
               return QVariant();
               case Qt::DecorationRole:
-              return QIcon(XGUI_Workshop::featureIcon(aFeature->getKind()));
+              return XGUI_Workshop::featureIcon(aFeature);
               case Qt::ToolTipRole:
               return tr("Feature object");
               case Qt::ForegroundRole:

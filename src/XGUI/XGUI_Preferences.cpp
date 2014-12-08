@@ -9,6 +9,7 @@
 
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_PreferenceMgr.h>
+#include <Qtx.h>
 
 #include <QLayout>
 #include <QApplication>
@@ -125,10 +126,20 @@ void XGUI_Preferences::createCustomPage(XGUI_IPrefMgr* thePref, int thePageId)
         isResModified = true;
       }
       // Add item
-      if (aProp->type() != Config_Prop::Disabled)
-        thePref->addPreference(QObject::tr(aProp->title().c_str()), aTab,
-                               (SUIT_PreferenceMgr::PrefItemType) aProp->type(),
-                               QString(aProp->section().c_str()), QString(aProp->name().c_str()));
+      if (aProp->type() != Config_Prop::Disabled) {
+        SUIT_PreferenceMgr::PrefItemType aPrefType = SUIT_PreferenceMgr::Auto;
+        if (aProp->type() == Config_Prop::Directory) {
+          aPrefType = SUIT_PreferenceMgr::File;
+        } else {
+          aPrefType = (SUIT_PreferenceMgr::PrefItemType) aProp->type();
+        }
+        int anId = thePref->addPreference(QObject::tr(aProp->title().c_str()), aTab, aPrefType,
+                                          QString::fromStdString(aProp->section()),
+                                          QString::fromStdString(aProp->name()));
+        if(aProp->type() == Config_Prop::Directory) {
+          thePref->setItemProperty("path_type", Qtx::PT_Directory, anId);
+        }
+      }
     }
   }
 }
@@ -146,6 +157,11 @@ public:
                             const QString& theSection, const QString& theName )
   {
     return myMgr->addItem(theLbl, pId, theType, theSection, theName);
+  }
+
+  virtual void setItemProperty( const QString& thePropName, const QVariant& theValue,
+                               const int theId = -1) {
+    myMgr->setItemProperty(thePropName, theValue, theId);
   }
 
   virtual SUIT_PreferenceMgr* prefMgr() const { return myMgr; }

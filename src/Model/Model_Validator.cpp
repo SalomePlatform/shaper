@@ -175,10 +175,12 @@ bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& 
         return false;
     }
   }
+  
   // check all attributes for validity
   std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-  if (!aData || !aData->isValid())
-    return false;
+  // Validity of data is checked by "Model_FeatureValidator" (kDefaultId)
+  // if (!aData || !aData->isValid())
+  //   return false;
   static const std::string kAllTypes = "";
   std::map<std::string, std::map<std::string, AttrValidators> >::const_iterator aFeatureIter = 
     myAttrs.find(theFeature->getKind());
@@ -222,6 +224,19 @@ void Model_ValidatorsFactory::registerNotObligatory(std::string theFeature, std:
       aValidator->registerNotObligatory(theFeature, theAttribute);
     }
   }
+}
+
+bool Model_ValidatorsFactory::isNotObligatory(std::string theFeature, std::string theAttribute)
+{
+  const static std::string kDefaultId = "Model_FeatureValidator";
+  std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(kDefaultId);
+  if (it != myIDs.end()) {
+    Model_FeatureValidator* aValidator = dynamic_cast<Model_FeatureValidator*>(it->second);
+    if (aValidator) {
+      return aValidator->isNotObligatory(theFeature, theAttribute);
+    }
+  }
+  return false; // default
 }
 
 void Model_ValidatorsFactory::registerConcealment(std::string theFeature, std::string theAttribute)

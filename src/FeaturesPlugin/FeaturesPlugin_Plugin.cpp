@@ -3,6 +3,7 @@
 #include <FeaturesPlugin_Boolean.h>
 #include <FeaturesPlugin_Extrusion.h>
 #include <FeaturesPlugin_Group.h>
+#include <FeaturesPlugin_Placement.h>
 
 #include <ModelAPI_Session.h>
 
@@ -29,6 +30,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Boolean);
   } else if (theFeatureID == FeaturesPlugin_Group::ID()) {
     return FeaturePtr(new FeaturesPlugin_Group);
+  } else if (theFeatureID == FeaturesPlugin_Placement::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Placement);
   }
   // feature of such kind is not found
   return FeaturePtr();
