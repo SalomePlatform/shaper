@@ -132,7 +132,11 @@ void ModuleBase_IModule::onFeatureTriggered()
 
 void ModuleBase_IModule::editFeature(FeaturePtr theFeature)
 {
-  ModuleBase_Operation* anOperation = createOperation(theFeature->getKind());
+  std::string aFeatureId = theFeature->getKind();
+  if (!myWorkshop->canStartOperation(aFeatureId.c_str()))
+    return;
+
+  ModuleBase_Operation* anOperation = createOperation(aFeatureId);
   anOperation->setFeature(theFeature);
   sendOperation(anOperation);
 }
