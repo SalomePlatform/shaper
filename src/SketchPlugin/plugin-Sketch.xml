@@ -76,12 +76,10 @@
 		<sketch_constraint_shape_selector id="ConstraintEntityA" 
 			label="First line" tooltip="Select an line in the viewer" 
 			shape_types="edge" use_subshapes="true">
-			<validator id="SketchPlugin_ResultLine"/>
 		</sketch_constraint_shape_selector>
 		
 		<sketch_constraint_shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select an line in the viewer" 
 			shape_types="edge" use_subshapes="true">
-			<validator id="SketchPlugin_ResultLine"/>
 			<validator id="SketchPlugin_DifferentObjects"/>
 		</sketch_constraint_shape_selector>
 		
@@ -93,13 +91,11 @@
 		<sketch_constraint_shape_selector id="ConstraintEntityA" 
 			label="First line" tooltip="Select an line in the viewer" 
 			shape_types="edge" use_subshapes="true">
-			<validator id="SketchPlugin_ResultLine"/>
 		</sketch_constraint_shape_selector>
 		
 		<sketch_constraint_shape_selector id="ConstraintEntityB" 
 			label="Last line" tooltip="Select an line in the viewer" 
 			shape_types="edge" use_subshapes="true">
-			<validator id="SketchPlugin_ResultLine"/>
 			<validator id="SketchPlugin_DifferentObjects"/>
 		</sketch_constraint_shape_selector>
         <validator id="PartSet_PerpendicularValidator"/>
