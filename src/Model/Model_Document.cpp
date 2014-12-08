@@ -338,8 +338,9 @@ void Model_Document::abortOperation()
 {
   if (myNestedNum > 0 && !myDoc->HasOpenCommand()) {  // abort all what was done in nested
       // first compact all nested
-    compactNested();
-    myDoc->Undo();
+    if (compactNested()) {
+      myDoc->Undo(); // undo only compacted, if not: do not undo the empty transaction
+    }
     myDoc->ClearRedos();
     myTransactionsAfterSave--;
     myIsEmptyTr.erase(myTransactionsAfterSave);
