@@ -2,10 +2,10 @@
 #define PartSet_Module_H
 
 #include "PartSet.h"
+#include <PartSet_Filters.h>
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
-#include <ModuleBase_ViewerFilters.h>
 #include <XGUI_Command.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
@@ -133,7 +133,7 @@ protected slots:
 
    Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;
   /// A filter which provides selection within a current document or whole PartSet
-  Handle(ModuleBase_ShapeDocumentFilter) myDocumentShapeFilter;
+  Handle(PartSet_GlobalFilter) myDocumentShapeFilter;
 };
 
 #endif

@@ -203,7 +203,7 @@ void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
     }
   }
   if (myDocumentShapeFilter.IsNull())
-    myDocumentShapeFilter = new ModuleBase_ShapeDocumentFilter(myWorkshop);
+    myDocumentShapeFilter = new PartSet_GlobalFilter(myWorkshop);
   myWorkshop->viewer()->addSelectionFilter(myDocumentShapeFilter);
 }
 

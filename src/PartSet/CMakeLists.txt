@@ -14,6 +14,7 @@ SET(PROJECT_HEADERS
 	PartSet_WidgetPoint2dDistance.h
 	PartSet_WidgetShapeSelector.h
 	PartSet_OperationSketch.h
+	PartSet_Filters.h
 )
 
 SET(PROJECT_SOURCES
@@ -26,6 +27,7 @@ SET(PROJECT_SOURCES
 	PartSet_WidgetPoint2dDistance.cpp
 	PartSet_WidgetShapeSelector.cpp
 	PartSet_OperationSketch.cpp
+	PartSet_Filters.cpp
 )
 
 SET(PROJECT_RESOURCES 
@@ -70,6 +72,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI
                     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
                     ${CMAKE_SOURCE_DIR}/src/GeomAlgoAPI
                     ${CMAKE_SOURCE_DIR}/src/SketchPlugin
+                    ${CMAKE_SOURCE_DIR}/src/FeaturesPlugin
                     ${CMAKE_SOURCE_DIR}/src/GeomAPI
                     ${CAS_INCLUDE_DIRS}
 					${SUIT_INCLUDE}
