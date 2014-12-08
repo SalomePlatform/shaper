@@ -23,7 +23,6 @@ class ModuleBase_OperationDescription;
 class ModuleBase_IPropertyPanel;
 class ModuleBase_ISelection;
 class ModuleBase_IViewer;
-class ModuleBase_WidgetValueFeature;
 
 class QKeyEvent;
 
@@ -264,7 +263,7 @@ signals:
   QStringList myNestedFeatures;
 
   /// List of pre-selected object 
-  QList<ModuleBase_WidgetValueFeature*> myPreSelection;
+  QList<ModuleBase_ViewerPrs> myPreSelection;
 
   /// Access to property panel
   ModuleBase_IPropertyPanel* myPropertyPanel;

@@ -5,7 +5,6 @@
 #include "PartSet_WidgetPoint2dDistance.h"
 #include "PartSet_Tools.h"
 
-#include <ModuleBase_WidgetValueFeature.h>
 #include <ModuleBase_DoubleSpinBox.h>
 #include <ModuleBase_IViewWindow.h>
 

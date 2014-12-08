@@ -8,7 +8,6 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
-#include <ModuleBase_WidgetValueFeature.h>
 
 #include <Config_WidgetAPI.h>
 #include <Events_Loop.h>
@@ -244,65 +243,69 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
   // In order to make reselection possible
   // TODO: check with MPV clearAttribute();
 
-  QObjectPtrList aObjects = myWorkshop->selection()->selectedPresentations();
-  if (aObjects.size() > 0) {
-    ObjectPtr aObject = aObjects.first();
-    if ((!mySelectedObject) && (!aObject))
-      return;
+  //QObjectPtrList aObjects = myWorkshop->selection()->selectedPresentations();
+  QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected();
+  if (aSelected.size() > 0)
+    setSelection(aSelected.first());
+}
 
-    // Check that the selected object is result (others can not be accepted)
-    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
-    if (!aRes)
-      return;
+//********************************************************************
+bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
+{
+  ObjectPtr aObject = theValue.object();
+  if ((!mySelectedObject) && (!aObject))
+    return false;
 
-    if (myFeature) {
-      // We can not select a result of our feature
-      const std::list<std::shared_ptr<ModelAPI_Result>>& aResList = myFeature->results();
-      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
-      for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-        if ((*aIt) == aRes)
-          return;
-      }
-    }
-    // Check that object belongs to active document or PartSet
-    DocumentPtr aDoc = aRes->document();
-    SessionPtr aMgr = ModelAPI_Session::get();
-    if (!(aDoc == aMgr->activeDocument()) && !(aDoc == aMgr->moduleDocument()))
-      return;
+  // Check that the selected object is result (others can not be accepted)
+  ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+  if (!aRes)
+    return false;
 
-    // Check that the result has a shape
-    GeomShapePtr aShape = ModelAPI_Tools::shape(aRes);
-    if (!aShape)
-      return;
-
-    /// Check that object has acceptable type
-    if (!acceptObjectType(aObject)) 
-      return;
-
-    // Get sub-shapes from local selection
-    if (myUseSubShapes) {
-      NCollection_List<TopoDS_Shape> aShapeList;
-      std::list<ObjectPtr> aOwners;
-      myWorkshop->selection()->selectedShapes(aShapeList, aOwners);
-      if (aShapeList.Extent() > 0) {
-        aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-        aShape->setImpl(new TopoDS_Shape(aShapeList.First()));
-      }
-    }
-
-    // Check that the selection corresponds to selection type
-    if (myUseSubShapes) {
-      if (!acceptSubShape(aShape))
-        return;
-    } else {
-      if (!acceptObjectShape(aObject))
-        return;
-    }
-    if (isValid(aObject, aShape)) {
-      setObject(aObject, aShape);
-      emit focusOutWidget(this);
+  if (myFeature) {
+    // We can not select a result of our feature
+    const std::list<std::shared_ptr<ModelAPI_Result>>& aResList = myFeature->results();
+    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aIt;
+    for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
+      if ((*aIt) == aRes)
+        return false;
     }
   }
+  // Check that object belongs to active document or PartSet
+  DocumentPtr aDoc = aRes->document();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (!(aDoc == aMgr->activeDocument()) && !(aDoc == aMgr->moduleDocument()))
+    return false;
+
+  // Check that the result has a shape
+  GeomShapePtr aShape = ModelAPI_Tools::shape(aRes);
+  if (!aShape)
+    return false;
+
+  /// Check that object has acceptable type
+  if (!acceptObjectType(aObject)) 
+    return false;
+
+  // Get sub-shapes from local selection
+  if (myUseSubShapes) {
+    if (!theValue.shape().IsNull()) {
+      aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+      aShape->setImpl(new TopoDS_Shape(theValue.shape()));
+    }
+  }
+
+  // Check that the selection corresponds to selection type
+  if (myUseSubShapes) {
+    if (!acceptSubShape(aShape))
+      return false;
+  } else {
+    if (!acceptObjectShape(aObject))
+      return false;
+  }
+  if (isValid(aObject, aShape)) {
+    setObject(aObject, aShape);
+    emit focusOutWidget(this);
+  }
+  return true;
 }
 
 //********************************************************************
@@ -443,21 +446,17 @@ void ModuleBase_WidgetShapeSelector::raisePanel() const
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::setValue(ModuleBase_WidgetValue* theValue)
-{
-  if (theValue) {
-    ModuleBase_WidgetValueFeature* aFeatureValue =
-        dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
-    if (aFeatureValue && aFeatureValue->object()) {
-      ObjectPtr aObject = aFeatureValue->object();
-      if (acceptObjectShape(aObject)) {
-        setObject(aObject);
-        return true;
-      }
-    }
-  }
-  return false;
-}
+//bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
+//{
+//  if (theValue.object()) {
+//    ObjectPtr aObject = theValue.object();
+//    if (acceptObjectShape(aObject)) {
+//      setObject(aObject);
+//      return true;
+//    }
+//  }
+//  return false;
+//}
 
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::activate()

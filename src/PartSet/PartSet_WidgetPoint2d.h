@@ -12,9 +12,9 @@
 #include <QObject>
 
 #include <TopoDS_Shape.hxx>
+#include <V3d_View.hxx>
 
 class ModelAPI_Feature;
-class ModuleBase_WidgetValue;
 class ModuleBase_IWorkshop;
 class ModuleBase_DoubleSpinBox;
 class ModuleBase_IViewWindow;
@@ -44,7 +44,7 @@ Q_OBJECT
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValue the wrapped widget value
-  virtual bool setValue(ModuleBase_WidgetValue* theValue);
+  virtual bool setSelection(ModuleBase_ViewerPrs theValue);
 
   /// Saves the internal parameters to the given feature
   /// \param theObject a model feature to be changed
@@ -97,6 +97,9 @@ protected slots:
   void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
  private:
+   bool getPoint2d(const Handle(V3d_View)& theView, const TopoDS_Shape& theShape, 
+                   double& theX, double& theY) const;
+
   XGUI_Workshop* myWorkshop;
 
   QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets

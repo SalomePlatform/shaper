@@ -9,7 +9,6 @@
 
 #include "ModuleBase_OperationDescription.h"
 #include "ModuleBase_ModelWidget.h"
-#include "ModuleBase_WidgetValueFeature.h"
 #include "ModuleBase_ViewerPrs.h"
 #include "ModuleBase_IPropertyPanel.h"
 #include "ModuleBase_ISelection.h"
@@ -243,18 +242,18 @@ bool ModuleBase_Operation::activateByPreselection()
   
   ModuleBase_ModelWidget* aWgt, *aFilledWgt = 0;
   QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
-  QList<ModuleBase_WidgetValueFeature*>::const_iterator aPIt;
+  QList<ModuleBase_ViewerPrs>::const_iterator aPIt;
   bool isSet = false;
   for (aWIt = aWidgets.constBegin(), aPIt = myPreSelection.constBegin();
        (aWIt != aWidgets.constEnd()) && (aPIt != myPreSelection.constEnd());
        ++aWIt) {
     aWgt = (*aWIt);
-    ModuleBase_WidgetValueFeature* aValue = (*aPIt);
+    ModuleBase_ViewerPrs aValue = (*aPIt);
     if (!aWgt->canSetValue())
       continue;
 
     ++aPIt;
-    if (!aWgt->setValue(aValue)) {
+    if (!aWgt->setSelection(aValue)) {
       isSet = false;
       break;
     } else {
@@ -304,16 +303,17 @@ void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,
 
   // convert the selection values to the values, which are set to the operation widgets
 
-  Handle(V3d_View) aView = theViewer->activeView();
-  foreach (ModuleBase_ViewerPrs aPrs, aPreSelected) {
-    ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
-    aValue->setObject(aPrs.object());
+  //Handle(V3d_View) aView = theViewer->activeView();
+  //foreach (ModuleBase_ViewerPrs aPrs, aPreSelected) {
+  //  ModuleBase_WidgetValueFeature* aValue = new ModuleBase_WidgetValueFeature();
+  //  aValue->setObject(aPrs.object());
 
-    double aX, anY;
-    if (getViewerPoint(aPrs, theViewer, aX, anY))
-      aValue->setPoint(std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
-    myPreSelection.append(aValue);
-  }
+  //  double aX, anY;
+  //  if (getViewerPoint(aPrs, theViewer, aX, anY))
+  //    aValue->setPoint(std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY)));
+  //  myPreSelection.append(aValue);
+  //}
+  myPreSelection = aPreSelected;
 }
 
 //void ModuleBase_Operation::onWidgetActivated(ModuleBase_ModelWidget* theWidget)
@@ -349,9 +349,7 @@ bool ModuleBase_Operation::getViewerPoint(ModuleBase_ViewerPrs thePrs,
 
 void ModuleBase_Operation::clearPreselection()
 {
-  while (!myPreSelection.isEmpty()) {
-    delete myPreSelection.takeFirst();
-  }
+  myPreSelection.clear();
 }
 
 void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp) 
