@@ -147,9 +147,13 @@ bool NewGeom_Module::activateModule(SUIT_Study* theStudy)
       myIsOpened = false;
       QTimer::singleShot(1000, myWorkshop, SLOT(displayAllResults()));
     }
+    else
+      myWorkshop->updateCommandStatus();
   }
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
   myIsStorePositions = aResMgr->booleanValue("Study", "store_positions", true);
+  myIsEditEnabled = getApp()->isEditEnabled();
+  getApp()->setEditEnabled(false);
 
   // this following row is caused by #187 bug.
   // SALOME saves the dock widget positions before deactivateModule() and
@@ -197,6 +201,7 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
 
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
   aResMgr->setValue("Study", "store_positions", myIsStorePositions);
+  getApp()->setEditEnabled(myIsEditEnabled);
 
   return LightApp_Module::deactivateModule(theStudy);
 }

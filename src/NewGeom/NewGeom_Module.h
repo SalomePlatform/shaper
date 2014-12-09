@@ -117,7 +117,9 @@ Q_OBJECT
   QMap<QString, QString> myDocumentType;
 
   bool myIsOpened;
-  bool myIsStorePositions;
+  // the next parameters should be restored after this module deactivation
+  bool myIsStorePositions; // the application value of the preferences parameter
+  bool myIsEditEnabled;    // the application value
 
   QtxPopupMgr* myPopupMgr;
 };
