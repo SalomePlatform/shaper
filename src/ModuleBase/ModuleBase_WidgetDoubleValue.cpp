@@ -77,7 +77,7 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
     mySpinBox->setSingleStep(aStepVal);
   }
 
-  aProp = theData->getProperty(ANY_WDG_DEFAULT);
+  aProp = theData->getProperty(ATTR_DEFAULT);
   double aDefVal = QString::fromStdString(aProp).toDouble(&isOk);
   if (isOk) {
     mySpinBox->setValue(aDefVal);

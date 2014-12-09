@@ -1,7 +1,7 @@
 /*
  * Config_ValidatorMessage.cpp
  *
- *  Created on: 08 Jul 2014 ã.
+ *  Created on: 08 Jul 2014 ï¿½.
  *      Author: sbh
  */
 
@@ -18,11 +18,6 @@ Config_ValidatorMessage::Config_ValidatorMessage(const Events_ID theId, const vo
 Config_ValidatorMessage::~Config_ValidatorMessage()
 {
 }
-
-//static const const char* Config_ValidatorMessage::UID() const
-//{
-//  return "ValidatorMessage";
-//}
 
 const std::string& Config_ValidatorMessage::validatorId() const
 {

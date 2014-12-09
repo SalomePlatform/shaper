@@ -73,7 +73,7 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
     //Create a widget (doublevalue, groupbox, toolbox, etc.
     QWidget* aWidget = createWidgetByType(aWdgType, theParent);
     if (aWidget) {
-      if (!myWidgetApi->getBooleanAttribute(ATTRIBUTE_INTERNAL, false)) {
+      if (!myWidgetApi->getBooleanAttribute(ATTR_INTERNAL, false)) {
         aWidgetLay->addWidget(aWidget);
       } else {
         aWidget->setVisible(false);

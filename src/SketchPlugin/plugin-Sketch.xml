@@ -76,6 +76,7 @@
 		<sketch_constraint_shape_selector id="ConstraintEntityA" 
 			label="First line" tooltip="Select an line in the viewer" 
 			shape_types="edge" use_subshapes="true">
+			<selection_filter id="LinearEdgeFilter"/>
 		</sketch_constraint_shape_selector>
 		
 		<sketch_constraint_shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select an line in the viewer" 

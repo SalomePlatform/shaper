@@ -65,8 +65,8 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
     std::string anAttributeID = getProperty(theNode, _ID);
     if (!anAttributeID.empty()) {
       aMessage->setAttributeId(anAttributeID);
-      aMessage->setObligatory(getBooleanAttribute(theNode, ATTRIBUTE_OBLIGATORY, true));
-      aMessage->setConcealment(getBooleanAttribute(theNode, ATTRIBUTE_CONCEALMENT, false));
+      aMessage->setObligatory(getBooleanAttribute(theNode, ATTR_OBLIGATORY, true));
+      aMessage->setConcealment(getBooleanAttribute(theNode, ATTR_CONCEALMENT, false));
       Events_Loop::loop()->send(aMessage);
     }
   }
@@ -83,27 +83,27 @@ bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
   return result;
 }
 
-void Config_FeatureReader::fillFeature(xmlNodePtr theNode, 
+void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   const std::shared_ptr<Config_FeatureMessage>& outFeatureMessage)
 {
-  outFeatureMessage->setId(getProperty(theNode, _ID));
+  outFeatureMessage->setId(getProperty(theFeatureNode, _ID));
   outFeatureMessage->setPluginLibrary(myLibraryName);
-  outFeatureMessage->setNestedFeatures(getProperty(theNode, FEATURE_NESTED));
+  outFeatureMessage->setNestedFeatures(getProperty(theFeatureNode, FEATURE_NESTED));
 
-  bool isInternal = getBooleanAttribute(theNode, ATTRIBUTE_INTERNAL, false);
+  bool isInternal = getBooleanAttribute(theFeatureNode, ATTR_INTERNAL, false);
   outFeatureMessage->setInternal(isInternal);
   if (isInternal) {
     //Internal feature has no visual representation.
     return;
   }
-  outFeatureMessage->setText(getProperty(theNode, FEATURE_TEXT));
-  outFeatureMessage->setTooltip(getProperty(theNode, FEATURE_TOOLTIP));
-  outFeatureMessage->setIcon(getProperty(theNode, FEATURE_ICON));
-  outFeatureMessage->setKeysequence(getProperty(theNode, FEATURE_KEYSEQUENCE));
+  outFeatureMessage->setText(getProperty(theFeatureNode, FEATURE_TEXT));
+  outFeatureMessage->setTooltip(getProperty(theFeatureNode, FEATURE_TOOLTIP));
+  outFeatureMessage->setIcon(getProperty(theFeatureNode, FEATURE_ICON));
+  outFeatureMessage->setKeysequence(getProperty(theFeatureNode, FEATURE_KEYSEQUENCE));
   outFeatureMessage->setGroupId(restoreAttribute(NODE_GROUP, _ID));
   outFeatureMessage->setWorkbenchId(restoreAttribute(NODE_WORKBENCH, _ID));
   // Get document kind of a feature, if empty set workbench's kind (might be empty too)
-  std::string aDocKind = getProperty(theNode, WORKBENCH_DOC);
+  std::string aDocKind = getProperty(theFeatureNode, FEATURE_DOC);
   if(aDocKind.empty()) {
     aDocKind = restoreAttribute(NODE_WORKBENCH, WORKBENCH_DOC);
   }

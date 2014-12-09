@@ -56,7 +56,7 @@ bool isWidgetNode(xmlNodePtr theNode)
     return false;
 
   //it should not be a "source" or a "validator" node
-  return !isNode(theNode, NODE_SOURCE, NODE_VALIDATOR, NULL);
+  return !isNode(theNode, NODE_SOURCE, NODE_VALIDATOR, NODE_SELFILTER, NULL);
 }
 
 bool hasChild(xmlNodePtr theNode)

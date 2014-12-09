@@ -16,8 +16,9 @@ const static char* NODE_GROUP = "group";
 const static char* NODE_FEATURE = "feature";
 const static char* NODE_SOURCE = "source";
 const static char* NODE_VALIDATOR = "validator";
+const static char* NODE_SELFILTER = "selection_filter";
 
-//Widgets
+// Widgets
 const static char* WDG_INFO = "label";
 const static char* WDG_DOUBLEVALUE = "doublevalue";
 const static char* WDG_BOOLVALUE = "boolvalue";
@@ -25,52 +26,47 @@ const static char* WDG_STRINGVALUE = "stringvalue";
 const static char* WDG_MULTISELECTOR = "multi_selector";
 const static char* WDG_SHAPE_SELECTOR = "shape_selector";
 const static char* WDG_CHOICE = "choice";
-//Specific widgets
-//const static char* WDG_POINT2D_DISTANCE = "point2ddistance";
-//const static char* WDG_FEATURE_SELECTOR = "feature_selector";
-//const static char* WDG_FEATURE_OR_ATTRIBUTE_SELECTOR = "feature_or_attribute_selector";
 const static char* WDG_DOUBLEVALUE_EDITOR = "doublevalue_editor";
 const static char* WDG_FILE_SELECTOR= "file_selector";
-
-//Widget containers
+// Containers
 const static char* WDG_GROUP = "groupbox";
 const static char* WDG_CHECK_GROUP = "check_groupbox";
 const static char* WDG_TOOLBOX = "toolbox";
 const static char* WDG_TOOLBOX_BOX = "box";
 const static char* WDG_SWITCH = "switch";
 const static char* WDG_SWITCH_CASE = "case";
-
-const static char* WORKBENCH_DOC = "document";
-//Common Widget's or Feature's Properties
+// Common properties (xml attributes of nodes)
 const static char* _ID = "id";
+// NODE_WORKBENCH properties
+const static char* WORKBENCH_DOC = "document";
+// NODE_SOURCE properties
+const static char* SOURCE_FILE = "path";
+// NODE_FEATURE properties
 const static char* FEATURE_TOOLTIP = "tooltip";
 const static char* FEATURE_ICON = "icon";
 const static char* FEATURE_TEXT = "title";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
 const static char* FEATURE_NESTED = "nested";
-
-const static char* ATTRIBUTE_INTERNAL = "internal";
-const static char* ATTRIBUTE_OBLIGATORY = "obligatory";
-const static char* ATTRIBUTE_CONCEALMENT = "concealment";
-// TODO: Rename
-//const static char* PREVIOUS_FEATURE_PARAM = "previous_feature_param";
-const static char* ANY_WDG_TOOLTIP = FEATURE_TOOLTIP;
-const static char* ANY_WDG_ICON = FEATURE_ICON;
-const static char* ANY_WDG_LABEL = "label";
-const static char* ANY_WDG_DEFAULT = "default";
-
-const static char* SOURCE_FILE = "path";
+const static char* FEATURE_DOC = WORKBENCH_DOC;
+// NODE_VALIDATOR properties
 const static char* VALIDATOR_PARAMETERS = "parameters";
-
-// doublevalue properties:
+// Widget (attribute) properties
+const static char* ATTR_TOOLTIP = FEATURE_TOOLTIP;
+const static char* ATTR_ICON = FEATURE_ICON;
+const static char* ATTR_LABEL = "label";
+const static char* ATTR_DEFAULT = "default";
+const static char* ATTR_INTERNAL = "internal";
+const static char* ATTR_OBLIGATORY = "obligatory";
+const static char* ATTR_CONCEALMENT = "concealment";
+// WDG_INFO properties
 const static char* INFO_WDG_TEXT = FEATURE_TEXT;
 const static char* INFO_WDG_TOOLTIP = FEATURE_TOOLTIP;
+// WDG_DOUBLEVALUE properties:
 const static char* DOUBLE_WDG_MIN = "min";
 const static char* DOUBLE_WDG_MAX = "max";
 const static char* DOUBLE_WDG_STEP = "step";
 const static char* DOUBLE_WDG_DEFAULT_COMPUTED = "computed";
-
-//toolbox/switch properties
+// WDG_TOOLBOX/WDG_SWITCH properties
 const static char* CONTAINER_PAGE_NAME = "title";
 
 /*

@@ -1,7 +1,7 @@
 /*
  * Config_ValidatorMessage.h
  *
- *  Created on: 08 Jul 2014 ã.
+ *  Created on: 08 Jul 2014 ï¿½.
  *      Author: sbh
  */
 
@@ -14,7 +14,7 @@
 #include <list>
 #include <string>
 
-/// Event ID that feature is loaded (comes with Config_FeatureMessage)
+/// Event ID that Validator is loaded (comes with Config_ValidatorMessage)
 static const char * EVENT_VALIDATOR_LOADED = "ValidatorLoaded";
 
 class Config_ValidatorMessage : public Events_Message

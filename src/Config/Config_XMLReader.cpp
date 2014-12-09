@@ -9,6 +9,7 @@
 #include <Config_Keywords.h>
 #include <Config_Common.h>
 #include <Config_ValidatorMessage.h>
+#include <Config_SelectionFilterMessage.h>
 #include <Config_PropManager.h>
 
 #include <Events_Loop.h>
@@ -88,6 +89,8 @@ void Config_XMLReader::processNode(xmlNodePtr theNode)
 #endif
   } else if (isNode(theNode, NODE_VALIDATOR, NULL)) {
     processValidator(theNode);
+  } else if (isNode(theNode, NODE_SELFILTER, NULL)) {
+    processSelectionFilter(theNode);
   }
 }
 
@@ -175,6 +178,24 @@ void Config_XMLReader::processValidator(xmlNodePtr theNode)
   getValidatorInfo(theNode, aValidatorId, aValidatorParameters);
   aMessage->setValidatorId(aValidatorId);
   aMessage->setValidatorParameters(aValidatorParameters);
+  xmlNodePtr aFeatureOrWdgNode = theNode->parent;
+  if (isNode(aFeatureOrWdgNode, NODE_FEATURE, NULL)) {
+    aMessage->setFeatureId(getProperty(aFeatureOrWdgNode, _ID));
+  } else {
+    aMessage->setAttributeId(getProperty(aFeatureOrWdgNode, _ID));
+    aMessage->setFeatureId(myCurrentFeature);
+  }
+  aEvLoop->send(aMessage);
+}
+
+void Config_XMLReader::processSelectionFilter(xmlNodePtr theNode)
+{
+  Events_ID aFilterEvent = Events_Loop::eventByName(EVENT_SELFILTER_LOADED);
+  Events_Loop* aEvLoop = Events_Loop::loop();
+  std::shared_ptr<Config_SelectionFilterMessage> aMessage =
+      std::make_shared<Config_SelectionFilterMessage>(aFilterEvent, this);
+  std::string aSelectionFilterId = getProperty(theNode, _ID);
+  aMessage->setSelectionFilterId(aSelectionFilterId);
   xmlNodePtr aFeatureOrWdgNode = theNode->parent;
   if (isNode(aFeatureOrWdgNode, NODE_FEATURE, NULL)) {
     aMessage->setFeatureId(getProperty(aFeatureOrWdgNode, _ID));

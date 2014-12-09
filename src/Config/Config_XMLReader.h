@@ -49,6 +49,7 @@ class Config_XMLReader
   xmlNodePtr node(void* theNode);
   std::string getNodeName(xmlNodePtr theNode);
   void processValidator(xmlNodePtr theNode);
+  void processSelectionFilter(xmlNodePtr theNode);
 
  protected:
   std::string myCurrentFeature;

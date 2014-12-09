@@ -24,7 +24,7 @@ ModuleBase_WidgetBoolValue::ModuleBase_WidgetBoolValue(QWidget* theParent,
 {
   QString aText = QString::fromStdString(theData->widgetLabel());
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());
-  bool isChecked = theData->getBooleanAttribute(ANY_WDG_DEFAULT, false);
+  bool isChecked = theData->getBooleanAttribute(ATTR_DEFAULT, false);
 
   myCheckBox = new QCheckBox(aText, theParent);
   myCheckBox->setToolTip(aToolTip);

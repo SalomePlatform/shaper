@@ -99,15 +99,15 @@ std::string Config_WidgetAPI::widgetId() const
 
 std::string Config_WidgetAPI::widgetIcon() const
 {
-  return getProperty(ANY_WDG_ICON);
+  return getProperty(ATTR_ICON);
 }
 
 std::string Config_WidgetAPI::widgetLabel() const
 {
-  return getProperty(ANY_WDG_LABEL);
+  return getProperty(ATTR_LABEL);
 }
 
 std::string Config_WidgetAPI::widgetTooltip() const
 {
-  return getProperty(ANY_WDG_TOOLTIP);
+  return getProperty(ATTR_TOOLTIP);
 }

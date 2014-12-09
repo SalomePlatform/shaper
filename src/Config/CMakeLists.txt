@@ -18,6 +18,7 @@ SET(PROJECT_HEADERS
   Config_Prop.h
   Config_PropManager.h
   Config_AttributeMessage.h
+  Config_SelectionFilterMessage.h
  )
  
 SET(PROJECT_SOURCES
@@ -33,6 +34,7 @@ SET(PROJECT_SOURCES
   Config_Prop.cpp
   Config_PropManager.cpp
   Config_AttributeMessage.cpp
+  Config_SelectionFilterMessage.cpp
 )
 
 SET(XML_RESOURCES
