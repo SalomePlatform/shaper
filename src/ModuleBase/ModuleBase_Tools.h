@@ -32,12 +32,9 @@ MODULEBASE_EXPORT void zeroMargins(QLayout* theLayout);
 //! specified relatively to the upper left corner of \a theIcon.
 
 //! \param theAdditionalIcon resource text of the additional pixmap
-//! \param theXShift horizontal shift
-//! \param theYShift vertical shift
 //! \param theIcon resource text of the background pixmap
 //! \return resulting pixmap
-MODULEBASE_EXPORT QPixmap composite(const QString& theAdditionalIcon, const int theXShift,
-                                    const int theYShift, const QString& theIcon);
+MODULEBASE_EXPORT QPixmap composite(const QString& theAdditionalIcon, const QString& theIcon);
 
 //! Generates the pixmap lighter than the resources pixmap. 
 //! Pixmap \a theIcon is lighted according to the given value.

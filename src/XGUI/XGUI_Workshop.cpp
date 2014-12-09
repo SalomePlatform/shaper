@@ -76,21 +76,17 @@
 
 QMap<QString, QString> XGUI_Workshop::myIcons;
 
-std::string XGUI_Workshop::featureIconStr(const FeaturePtr& theFeature)
-{
-  std::string aKind = theFeature->getKind();
-  QString aId(aKind.c_str());
-  if (!myIcons.contains(aId))
-    return std::string();
-
-  return myIcons[aId].toStdString();
-}
 
 QIcon XGUI_Workshop::featureIcon(const FeaturePtr& theFeature)
 {
   QIcon anIcon;
 
-  QString anIconString = featureIconStr(theFeature).c_str();
+  std::string aKind = theFeature->getKind();
+  QString aId(aKind.c_str());
+  if (!myIcons.contains(aId))
+    return anIcon;
+
+  QString anIconString = myIcons[aId];
 
   ModelAPI_ExecState aState = theFeature->data()->execState();
   switch(aState) {
@@ -102,13 +98,12 @@ QIcon XGUI_Workshop::featureIcon(const FeaturePtr& theFeature)
     }
     break;
     case ModelAPI_StateExecFailed: {
-      anIcon = ModuleBase_Tools::composite(":pictures/exec_state_failed.png",
-                                           12, 12, anIconString);
+      anIcon = ModuleBase_Tools::composite(":pictures/exec_state_failed.png", anIconString);
     }
     break;
     case ModelAPI_StateInvalidArgument: {
       anIcon = ModuleBase_Tools::composite(":pictures/exec_state_invalid_parameters.png",
-                                           12, 12, anIconString);
+                                           anIconString);
     }
     break;
     default: break;  

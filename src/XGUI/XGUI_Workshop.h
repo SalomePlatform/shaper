@@ -146,9 +146,6 @@ Q_OBJECT
   //! Returns icon name according to feature
   static QIcon featureIcon(const FeaturePtr& theFeature);
 
-  //! Returns icon name according to feature
-  static std::string featureIconStr(const FeaturePtr& theFeature);
-
   //! Activates or deactivates a part
   //! If PartPtr is Null pointer then PartSet will be activated
   void activatePart(std::shared_ptr<ModelAPI_ResultPart> theFeature);

@@ -44,8 +44,7 @@ void zeroMargins(QLayout* theLayout)
   theLayout->setSpacing(5);
 }
 
-QPixmap composite(const QString& theAdditionalIcon, const int theXShift,
-                  const int theYShift, const QString& theIcon)
+QPixmap composite(const QString& theAdditionalIcon, const QString& theIcon)
 {
   QImage anIcon(theIcon);
   QImage anAditional(theAdditionalIcon);
@@ -59,12 +58,12 @@ QPixmap composite(const QString& theAdditionalIcon, const int theXShift,
   int aWidth = anIcon.width();
   int aHeight = anIcon.height();
 
-  int aStartWidthPos = aWidth-anAddWidth-1;
-  int aStartHeightPos = aHeight-anAddHeight-1;
+  int aStartWidthPos = aWidth - anAddWidth - 1;
+  int aStartHeightPos = aHeight - anAddHeight - 1;
 
-  for (int i = 0; i < anAddWidth; i++)
+  for (int i = 0; i < anAddWidth && i + aStartWidthPos < aWidth; i++)
   {
-    for (int j = 0; j < anAddHeight; j++)
+    for (int j = 0; j < anAddHeight && j + aStartHeightPos < aHeight; j++)
     {
       if (qAlpha(anAditional.pixel(i, j)) > 0)
         anIcon.setPixel(i + aStartWidthPos, j + aStartHeightPos, anAditional.pixel(i, j));
