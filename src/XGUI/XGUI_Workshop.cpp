@@ -46,12 +46,14 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IViewer.h>
+#include<ModuleBase_FilterFactory.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
 #include <Config_PointerMessage.h>
 #include <Config_ModuleReader.h>
 #include <Config_PropManager.h>
+#include <Config_SelectionFilterMessage.h>
 
 #include <QApplication>
 #include <QFileDialog>
@@ -183,8 +185,10 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName("CurrentDocumentChanged"));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOSHOW));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SELFILTER_LOADED));
 
   registerValidators();
+
   // Calling of  loadCustomProps before activating module is required
   // by Config_PropManger to restore user-defined path to plugins
   XGUI_Preferences::loadCustomProps();
@@ -415,7 +419,21 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
     // If not found then activate global document
     activatePart(ResultPartPtr()); 
 
-  } else {
+  }
+  else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_SELFILTER_LOADED)) {
+    std::shared_ptr<Config_SelectionFilterMessage> aMsg = 
+      std::dynamic_pointer_cast<Config_SelectionFilterMessage>(theMessage);
+    if (aMsg) {
+      if (aMsg->attributeId().empty()) {  // feature validator
+        moduleConnector()->selectionFilters()->assignFilter(aMsg->selectionFilterId(), aMsg->featureId(), aMsg->attributeId());
+      } else {  // attribute validator
+        moduleConnector()->selectionFilters()->assignFilter(aMsg->selectionFilterId(), aMsg->featureId(), aMsg->attributeId());
+      }
+    }
+  }
+
+  
+  else {
     //Show error dialog if error message received.
     std::shared_ptr<Events_Error> anAppError = std::dynamic_pointer_cast<Events_Error>(theMessage);
     if (anAppError) {

@@ -119,6 +119,9 @@ protected slots:
   /// Register validators for this module
   virtual void registerValidators() {}
 
+  /// Register selection filters for this module
+  virtual void registerFilters() {}
+
   /// Returns new instance of operation object (used in createOperation for customization)
   virtual ModuleBase_Operation* getNewOperation(const std::string& theFeatureId);
 

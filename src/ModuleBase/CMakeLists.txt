@@ -3,6 +3,9 @@ SET(CMAKE_AUTOMOC ON)
 
 SET(PROJECT_HEADERS
 	ModuleBase.h
+	ModuleBase_Filter.h
+	ModuleBase_FilterFactory.h
+	ModuleBase_FilterLinearEdge.h
 	ModuleBase_Tools.h
 	ModuleBase_IModule.h
 	ModuleBase_Operation.h
@@ -33,8 +36,12 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
+	ModuleBase_Filter.cpp
+	ModuleBase_FilterFactory.cpp
+	ModuleBase_FilterLinearEdge.cpp
 	ModuleBase_Tools.cpp
 	ModuleBase_IModule.cpp
+	ModuleBase_IWorkshop.cpp
 	ModuleBase_Operation.cpp
 	ModuleBase_OperationDescription.cpp
 	ModuleBase_ModelWidget.cpp
@@ -47,7 +54,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetChoice.cpp
 	ModuleBase_WidgetFileSelector.cpp
 	ModuleBase_DoubleSpinBox.cpp
-    ModuleBase_WidgetLineEdit.cpp
+	ModuleBase_WidgetLineEdit.cpp
 	ModuleBase_WidgetMultiSelector.cpp
 	ModuleBase_ViewerFilters.cpp
 	ModuleBase_ResultPrs.cpp
