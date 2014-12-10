@@ -15,6 +15,8 @@
 
 #include <StdSelect_BRepOwner.hxx>
 
+#include <GeomAPI_Edge.h>
+
 #include <BRep_Tool.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
@@ -29,21 +31,19 @@ Standard_Boolean ModuleBase_FilterLinearEdge::IsOk(const Handle(SelectMgr_Entity
 {
   Standard_Boolean isOk = ModuleBase_Filter::IsOk(theOwner);
   if (isOk && theOwner->HasSelectable()) {
-    Handle(AIS_InteractiveObject) aAisObj = 
+    Handle(AIS_InteractiveObject) anAIS = 
       Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
-    if (!aAisObj.IsNull()) {
-      std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
-      aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aAisObj));
-      //ObjectPtr aObj = myWorkshop->findPresentedObject(aAISObj);
+    if (!anAIS.IsNull()) {
+      Handle(AIS_Shape) aShapeAIS = Handle(AIS_Shape)::DownCast(anAIS);
+      if (aShapeAIS) {
+        const TopoDS_Shape& aShape = aShapeAIS->Shape();
+        if (aShape.ShapeType()  == TopAbs_EDGE) {
+          std::shared_ptr<GeomAPI_Edge> anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge());
+          anEdge->setImpl(new TopoDS_Shape(aShape));
 
-
-      /*foreach (QString aType, myTypes) {
-        if (aType.toLower() == "construction") {
-          ResultConstructionPtr aConstr = 
-            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObj);
-          return (aConstr != NULL);
-        } // ToDo: Process other types of objects
-      }*/
+          isOk = anEdge->isLine();
+        }
+      }
     }
   }
   return Standard_False;
