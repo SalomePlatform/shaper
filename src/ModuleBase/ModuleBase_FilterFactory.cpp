@@ -43,33 +43,14 @@ void ModuleBase_FilterFactory::assignFilter(const std::string& theID,
   */
 }
 
-void ModuleBase_FilterFactory::validators(const std::string& theFeatureID,
-  std::list<ModuleBase_Filter*>& theResult,
-  std::list<std::list<std::string> >& theArguments) const
+const SelectMgr_ListOfFilter& ModuleBase_FilterFactory::filters(const std::string& theFeatureID,
+  const std::string& theAttrID/*,
+  std::list<ModuleBase_Filter*>& theFilters/*,
+  std::list<std::list<std::string> >& theArguments*/) const
 {
-/*  std::map<std::string, AttrValidators>::const_iterator aFeature = myFeatures.find(theFeatureID);
-  if (aFeature != myFeatures.cend()) {
-    AttrValidators::const_iterator aValIter = aFeature->second.cbegin();
-    for (; aValIter != aFeature->second.cend(); aValIter++) {
-      std::map<std::string, ModuleBase_Filter*>::const_iterator aFound = 
-        myIDs.find(aValIter->first);
-      if (aFound == myIDs.end()) {
-        Events_Error::send(std::string("Validator ") + aValIter->first + " was not registered");
-      } else {
-        theResult.push_back(aFound->second);
-        theArguments.push_back(aValIter->second);
-      }
-    }
-  }
-  addDefaultValidators(theResult);*/
-}
-
-void ModuleBase_FilterFactory::validators(const std::string& theFeatureID,
-  const std::string& theAttrID,
-  std::list<ModuleBase_Filter*>& theValidators,
-  std::list<std::list<std::string> >& theArguments) const
-{
-/*  std::map<std::string, std::map<std::string, AttrValidators> >::const_iterator aFeature = 
+  SelectMgr_ListOfFilter aFilters;
+  return aFilters;
+  /*  std::map<std::string, std::map<std::string, AttrValidators> >::const_iterator aFeature = 
     myAttrs.find(theFeatureID);
   if (aFeature != myAttrs.cend()) {
     std::map<std::string, AttrValidators>::const_iterator anAttr = aFeature->second.find(theAttrID);

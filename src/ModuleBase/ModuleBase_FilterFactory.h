@@ -8,6 +8,8 @@
 #include "ModuleBase.h"
 #include "ModuleBase_IWorkshop.h"
 
+#include <SelectMgr_ListOfFilter.hxx>
+
 #include <map>
 #include <set>
 
@@ -52,15 +54,9 @@ class ModuleBase_FilterFactory : public QObject
                                             const std::string& theFeatureID,
                                             const std::string& theAttrID);
 
-  /// Provides a validator for the feature, returns NULL if no validator
-  MODULEBASE_EXPORT virtual void validators(const std::string& theFeatureID,
-                                       std::list<ModuleBase_Filter*>& theResult,
-                                       std::list<std::list<std::string> >& theArguments) const;
   /// Provides a validator for the attribute, returns NULL if no validator
-  MODULEBASE_EXPORT virtual void validators(const std::string& theFeatureID,
-                                       const std::string& theAttrID,
-                                       std::list<ModuleBase_Filter*>& theValidators,
-                                       std::list<std::list<std::string> >& theArguments) const;
+  MODULEBASE_EXPORT const SelectMgr_ListOfFilter& filters(const std::string& theFeatureID,
+                                       const std::string& theAttrID) const;
 
   /// Returns registered validator by its Id
   MODULEBASE_EXPORT virtual const ModuleBase_Filter* validator(const std::string& theID) const;
