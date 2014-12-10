@@ -13,14 +13,11 @@
 
 class ModuleBase_Filter;
 
-/**\class ModuleBase_FilterFactory
- * \ingroup ModelBase
- * \breif Manages the registered selection filters
- *
+/**
  * Allows to get a selection filter by the feature identifier and 
  * the attribute identifier (if attribute is validated).
  * All accessible filters must be registered by the ID string first.
- * The instance of this factory can be get in the Workshop.
+ * The instance of this factory can be get in the Workshop interface.
  * Keeps the validator objects alive and just returns one of it by request.
  * All the needed information is provided to the validator as an argument,
  * this allows to work with them independently from the feature specific object.
