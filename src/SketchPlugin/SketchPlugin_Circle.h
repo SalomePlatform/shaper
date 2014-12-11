@@ -16,7 +16,7 @@
  * \ingroup DataModel
  * \brief Feature for creation of the new circle in PartSet.
  */
-class SketchPlugin_Circle : public SketchPlugin_Feature  //, public GeomAPI_IPresentable
+class SketchPlugin_Circle : public SketchPlugin_Feature 
 {
  public:
   /// Circle feature kind
@@ -55,12 +55,6 @@ class SketchPlugin_Circle : public SketchPlugin_Feature  //, public GeomAPI_IPre
 
   /// Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
-
-  /// Returns the AIS preview
-  virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious)
-  {
-    return simpleAISObject(firstResult(), thePrevious);
-  }
 
   /// Adds sub-feature of the higher level feature (sub-element of the sketch)
   /// \param theFeature sub-feature

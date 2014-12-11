@@ -95,6 +95,14 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
 
   /// \brief Checks if the object is empty
   bool empty() const;
+
+  /// Return shape type according to TopAbs_ShapeEnum if the AIS is AIS_Shape
+  /// Otherwise returns -1
+  int getShapeType() const;
+
+  /// Sets marker type for vertex.
+  /// The type has to be defined according to Acpect_TypeOfMarker
+  void setPointMarker(int theType, double theScale);
 };
 
 //! Pointer on attribute object
