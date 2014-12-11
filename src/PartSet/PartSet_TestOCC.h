@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        PartSet_TestOCC.h
 // Created:     28 Apr 2014
 // Author:      Natalia ERMOLAEVA

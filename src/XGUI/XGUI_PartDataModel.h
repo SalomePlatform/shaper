@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 #ifndef XGUI_PartDataModel_H
 #define XGUI_PartDataModel_H
 

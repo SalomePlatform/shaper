@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #ifndef CONFIG_MESSAGE_H
 #define CONFIG_MESSAGE_H
 

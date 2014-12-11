@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        GeomAlgoAPI_DFLoader.h
 // Created:     23 October 2014
 // Author:      Sergey Zaritchny

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        Model_AttributeInteger.h
 // Created:     03 sep 2014
 // Author:      sbh

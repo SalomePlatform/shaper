@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        ModuleBase_ViewerFilters.h
 // Created:     07 Okt 2014
 // Author:      Vitaly SMETANNIKOV

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        Model_FeatureValidator.cpp
 // Created:     8 Jul 2014
 // Author:      Vitaly SMETANNIKOV

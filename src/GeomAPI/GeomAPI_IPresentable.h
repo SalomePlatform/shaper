@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        GeomAPI_IPresentable.hxx
 // Created:     17 July 2014
 // Author:      Vitaly SMETANNIKOV

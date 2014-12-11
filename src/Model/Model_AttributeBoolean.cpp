@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        Model_AttributeBoolean.cpp
 // Created:     2 june 2014
 // Author:      Vitaly Smetannikov

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 
 #ifndef NEWGEOM_DATAMODEL_H
 #define NEWGEOM_DATAMODEL_H

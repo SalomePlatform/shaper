@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 // File:        FeaturesPlugin_Group.h
 // Created:     08 Oct 2014
 // Author:      Sergey BELASH

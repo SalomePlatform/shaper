@@ -1,3 +1,5 @@
+## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 
 IF(WIN32)
     FILE(TO_CMAKE_PATH $ENV{LIBXML2_ROOT_DIR}/lib/libxml2.lib LIBXML2_LIBRARIES)

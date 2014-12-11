@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #include "NewGeom_SalomeViewer.h"
 #include "NewGeom_OCCSelector.h"
 

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 // File:    SketchPlugin_Point.cpp
 // Created: 07 May 2014
 // Author:  Artem ZHIDKOV

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 //#include "XGUI_Constants.h"
 #include "XGUI_Tools.h"
 #include "XGUI_Workshop.h"

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        PartSet_Filters.cpp
 // Created:     08 Nov 2014
 // Author:      Vitaly SMETANNIKOV

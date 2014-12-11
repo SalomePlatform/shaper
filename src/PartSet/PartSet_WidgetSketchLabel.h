@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        PartSet_WidgetSketchLabel.h
 // Created:     07 July 2014
 // Author:      Vitaly SMETANNIKOV

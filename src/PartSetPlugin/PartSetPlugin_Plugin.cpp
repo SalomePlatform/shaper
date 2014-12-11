@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #include "PartSetPlugin_Plugin.h"
 #include "PartSetPlugin_Part.h"
 #include "PartSetPlugin_Duplicate.h"

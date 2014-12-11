@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        PartSet_Tools.h
 // Created:     04 Jun 2014
 // Author:      Natalia ERMOLAEVA

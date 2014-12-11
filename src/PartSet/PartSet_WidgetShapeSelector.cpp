@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        PartSet_WidgetShapeSelector.cpp
 // Created:     27 Nov 2014
 // Author:      Vitaly Smetannikov

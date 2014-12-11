@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        GeomAPI_Curve.cpp
 // Created:     04 Sep 2014
 // Author:      Mikhail PONIKAROV

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #include "PartSet_Module.h"
 #include <PartSet_OperationSketch.h>
 #include <PartSet_WidgetSketchLabel.h>

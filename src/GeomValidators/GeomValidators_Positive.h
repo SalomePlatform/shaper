@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        GeomValidators_ValidatorPositive.h
 // Created:     16 Sep 2014
 // Author:      Mikhail PONIKAROV

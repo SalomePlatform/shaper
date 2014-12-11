@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #include "NewGeom_OCCSelector.h"
 
 NewGeom_OCCSelector::NewGeom_OCCSelector(OCCViewer_Viewer* theViewer, SUIT_SelectionMgr* theMgr)

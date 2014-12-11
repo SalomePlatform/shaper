@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        PartSet_OperationSketch.h
 // Created:     20 Apr 2014
 // Author:      Natalia ERMOLAEVA

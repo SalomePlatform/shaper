@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 
 #include "ModuleBase_IModule.h"
 #include "ModuleBase_IViewer.h"

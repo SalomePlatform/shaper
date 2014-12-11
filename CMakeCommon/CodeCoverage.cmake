@@ -1,3 +1,5 @@
+## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #
 # 2012-01-31, Lars Bilke
 # - Enable Code Coverage

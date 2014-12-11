@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        GeomAPI_DataMapOfShapeShape.h
 // Created:     28 Oct 2014
 // Author:      Sergey Zaritchny

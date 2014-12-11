@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 // File:    SketchPlugin_ConstraintDistance.cpp
 // Created: 23 May 2014
 // Author:  Artem ZHIDKOV

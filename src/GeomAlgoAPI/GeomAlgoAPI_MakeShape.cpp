@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        GeomAlgoAPI_MakeShape.cpp
 // Created:     20 Oct 2014
 // Author:      Sergey ZARITCHNY

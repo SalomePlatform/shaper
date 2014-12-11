@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        ModelAPI_Object.hxx
 // Created:     19 May 2014
 // Author:      Mikhail PONIKAROV
