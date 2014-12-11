@@ -3,6 +3,7 @@
 // Author:      Natalia ERMOLAEVA
 
 #include "ModuleBase_FilterFactory.h"
+#include <ModuleBase_Filter.h>
 
 #include <Model_FeatureValidator.h>
 #include <ModelAPI_Feature.h>
@@ -13,7 +14,7 @@
 
 
 void ModuleBase_FilterFactory::registerFilter(const std::string& theID,
-                                                        ModuleBase_Filter* theValidator)
+                                              Handle(ModuleBase_Filter) theFilter)
 {
   /*if (myIDs.find(theID) != myIDs.end()) {
     Events_Error::send(std::string("Validator ") + theID + " is already registered");
@@ -45,7 +46,7 @@ void ModuleBase_FilterFactory::assignFilter(const std::string& theID,
 
 const SelectMgr_ListOfFilter& ModuleBase_FilterFactory::filters(const std::string& theFeatureID,
   const std::string& theAttrID/*,
-  std::list<ModuleBase_Filter*>& theFilters/*,
+  std::list<Handle(ModuleBase_Filter)>& theFilters/*,
   std::list<std::list<std::string> >& theArguments*/) const
 {
   SelectMgr_ListOfFilter aFilters;
@@ -57,7 +58,7 @@ const SelectMgr_ListOfFilter& ModuleBase_FilterFactory::filters(const std::strin
     if (anAttr != aFeature->second.end()) {
       AttrValidators::const_iterator aValIter = anAttr->second.cbegin();
       for (; aValIter != anAttr->second.cend(); aValIter++) {
-        std::map<std::string, ModuleBase_Filter*>::const_iterator aFound = myIDs.find(
+        std::map<std::string, Handle(ModuleBase_Filter)>::const_iterator aFound = myIDs.find(
           aValIter->first);
         if (aFound == myIDs.end()) {
           Events_Error::send(std::string("Validator ") + aValIter->first + " was not registered");
@@ -76,19 +77,19 @@ ModuleBase_FilterFactory::ModuleBase_FilterFactory()
   //registerValidator(kDefaultId, new Model_FeatureValidator);
 }
 
-const ModuleBase_Filter* ModuleBase_FilterFactory::validator(const std::string& theID) const
+const Handle(ModuleBase_Filter) ModuleBase_FilterFactory::validator(const std::string& theID) const
 {
-/*  std::map<std::string, ModuleBase_Filter*>::const_iterator aIt = myIDs.find(theID);
+/*  std::map<std::string, Handle(ModuleBase_Filter)>::const_iterator aIt = myIDs.find(theID);
   if (aIt != myIDs.end()) {
     return aIt->second;
   }*/
   return NULL;
 }
 
-void ModuleBase_FilterFactory::addDefaultValidators(std::list<ModuleBase_Filter*>& theValidators) const
+void ModuleBase_FilterFactory::addDefaultValidators(std::list<Handle(ModuleBase_Filter)>& theValidators) const
 {
 /*  const static std::string kDefaultId = "Model_FeatureValidator";
-  std::map<std::string, ModuleBase_Filter*>::const_iterator it = myIDs.find(kDefaultId);
+  std::map<std::string, Handle(ModuleBase_Filter)>::const_iterator it = myIDs.find(kDefaultId);
   if(it == myIDs.end())
     return;
   theValidators.push_back(it->second);*/
@@ -103,7 +104,7 @@ bool ModuleBase_FilterFactory::validate(const std::shared_ptr<ModelAPI_Feature>&
   if (aFeature != myFeatures.end()) {
     AttrValidators::const_iterator aValidator = aFeature->second.begin();
     for(; aValidator != aFeature->second.end(); aValidator++) {
-      std::map<std::string, ModuleBase_Filter*>::const_iterator aValFind = 
+      std::map<std::string, Handle(ModuleBase_Filter)>::const_iterator aValFind = 
         myIDs.find(aValidator->first);
       if (aValFind == myIDs.end()) {
         Events_Error::send(std::string("Validator ") + aValidator->first + " was not registered");
@@ -118,7 +119,7 @@ bool ModuleBase_FilterFactory::validate(const std::shared_ptr<ModelAPI_Feature>&
     }
   }
   // check default validator
-  std::map<std::string, ModuleBase_Filter*>::const_iterator aDefaultVal = myIDs.find(kDefaultId);
+  std::map<std::string, Handle(ModuleBase_Filter)>::const_iterator aDefaultVal = myIDs.find(kDefaultId);
   if(aDefaultVal != myIDs.end()) {
     static const std::list<std::string> anEmptyArgList;
     const ModelAPI_FeatureValidator* aFValidator = 
@@ -146,7 +147,7 @@ bool ModuleBase_FilterFactory::validate(const std::shared_ptr<ModelAPI_Feature>&
       if (anAttr != aFeatureIter->second.end()) {
         AttrValidators::const_iterator aValIter = anAttr->second.cbegin();
         for (; aValIter != anAttr->second.cend(); aValIter++) {
-          std::map<std::string, ModuleBase_Filter*>::const_iterator aFound = myIDs.find(
+          std::map<std::string, Handle(ModuleBase_Filter)>::const_iterator aFound = myIDs.find(
             aValIter->first);
           if (aFound == myIDs.end()) {
             Events_Error::send(std::string("Validator ") + aValIter->first + " was not registered");
@@ -171,7 +172,7 @@ bool ModuleBase_FilterFactory::validate(const std::shared_ptr<ModelAPI_Feature>&
 void ModuleBase_FilterFactory::registerNotObligatory(std::string theFeature, std::string theAttribute)
 {
 /*  const static std::string kDefaultId = "Model_FeatureValidator";
-  std::map<std::string, ModuleBase_Filter*>::const_iterator it = myIDs.find(kDefaultId);
+  std::map<std::string, Handle(ModuleBase_Filter)>::const_iterator it = myIDs.find(kDefaultId);
   if (it != myIDs.end()) {
     Model_FeatureValidator* aValidator = dynamic_cast<Model_FeatureValidator*>(it->second);
     if (aValidator) {
@@ -183,7 +184,7 @@ void ModuleBase_FilterFactory::registerNotObligatory(std::string theFeature, std
 bool ModuleBase_FilterFactory::isNotObligatory(std::string theFeature, std::string theAttribute)
 {
 /*  const static std::string kDefaultId = "Model_FeatureValidator";
-  std::map<std::string, ModuleBase_Filter*>::const_iterator it = myIDs.find(kDefaultId);
+  std::map<std::string, Handle(ModuleBase_Filter)>::const_iterator it = myIDs.find(kDefaultId);
   if (it != myIDs.end()) {
     Model_FeatureValidator* aValidator = dynamic_cast<Model_FeatureValidator*>(it->second);
     if (aValidator) {

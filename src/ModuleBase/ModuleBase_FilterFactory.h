@@ -7,13 +7,12 @@
 
 #include "ModuleBase.h"
 #include "ModuleBase_IWorkshop.h"
+#include "ModuleBase_Filter.h"
 
 #include <SelectMgr_ListOfFilter.hxx>
 
 #include <map>
 #include <set>
-
-class ModuleBase_Filter;
 
 /**
  * Allows to get a selection filter by the feature identifier and 
@@ -33,7 +32,7 @@ class ModuleBase_FilterFactory : public QObject
 
 
  private:
-  std::map<std::string, ModuleBase_Filter*> myIDs;  ///< map from ID to registered validator
+  std::map<std::string, Handle_ModuleBase_Filter> myIDs;  ///< map from ID to registered validator
   /// validators IDs to list of arguments
   typedef std::map<std::string, std::list<std::string> > AttrValidators;
   /// validators IDs by feature ID
@@ -47,7 +46,7 @@ class ModuleBase_FilterFactory : public QObject
  public:
   /// Registers the instance of the validator by the ID
   MODULEBASE_EXPORT virtual void registerFilter(const std::string& theID,
-                                                ModuleBase_Filter* theValidator);
+                                                Handle_ModuleBase_Filter theValidator);
 
   /// Assigns validator to the attribute of the feature
   MODULEBASE_EXPORT virtual void assignFilter(const std::string& theID,
@@ -59,7 +58,7 @@ class ModuleBase_FilterFactory : public QObject
                                        const std::string& theAttrID) const;
 
   /// Returns registered validator by its Id
-  MODULEBASE_EXPORT virtual const ModuleBase_Filter* validator(const std::string& theID) const;
+  MODULEBASE_EXPORT virtual const Handle_ModuleBase_Filter validator(const std::string& theID) const;
 
   /// Returns true if feature and all its attributes are valid.
   MODULEBASE_EXPORT virtual bool validate(const std::shared_ptr<ModelAPI_Feature>& theFeature) const;
@@ -79,7 +78,7 @@ class ModuleBase_FilterFactory : public QObject
   virtual bool isConcealed(std::string theFeature, std::string theAttribute);
 
 protected:
-  void addDefaultValidators(std::list<ModuleBase_Filter*>& theValidators) const;
+  void addDefaultValidators(std::list<Handle_ModuleBase_Filter>& theValidators) const;
   /// Get instance from workshop
 
   ModuleBase_FilterFactory();
