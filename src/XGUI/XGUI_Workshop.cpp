@@ -146,8 +146,9 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myModuleConnector = new XGUI_ModuleConnector(this);
 
   connect(myOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)), 
-          SLOT(onOperationStarted()));
-  connect(myOperationMgr, SIGNAL(operationResumed(ModuleBase_Operation*)), SLOT(onOperationStarted()));
+          SLOT(onOperationStarted(ModuleBase_Operation*)));
+  connect(myOperationMgr, SIGNAL(operationResumed(ModuleBase_Operation*)),
+          SLOT(onOperationResumed(ModuleBase_Operation*)));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           SLOT(onOperationStopped(ModuleBase_Operation*)));
   connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
@@ -557,55 +558,33 @@ void XGUI_Workshop::onObjectDeletedMsg(const std::shared_ptr<ModelAPI_ObjectDele
 }
 
 //******************************************************
-void XGUI_Workshop::onOperationStarted()
+void XGUI_Workshop::onOperationStarted(ModuleBase_Operation* theOperation)
 {
-  ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-  if (this->isSalomeMode()) 
-    aOperation->setNestedFeatures(mySalomeConnector->nestedActions(aOperation->id()));
-  else 
-    aOperation->setNestedFeatures(myActionsMgr->nestedCommands(aOperation->id()));
-  
-  if (aOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
-    connectWithOperation(aOperation);
+  setNestedFeatures(theOperation);
 
-    showPropertyPanel();
-    QString aXmlRepr = aOperation->getDescription()->xmlRepresentation();
-    ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(),
-                                                                 myModuleConnector);
-
-    myPropertyPanel->cleanContent();
-    aFactory.createWidget(myPropertyPanel->contentWidget());
-    ModuleBase_Tools::zeroMargins(myPropertyPanel->contentWidget());
-
-    QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
-    foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
-      aWidget->setFeature(aOperation->feature());
-      aWidget->enableFocusProcessing();
-      QObject::connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
-      // Init default values
-      if (!aOperation->isEditOperation() && !aWidget->isComputedDefault()) {
-        aWidget->storeValue();
-      }
-    }
-
-    myPropertyPanel->setModelWidgets(aWidgets);
-    aOperation->setPropertyPanel(myPropertyPanel);
-    // Do not activate widgets by default if the current operation is editing operation
-    // Because we don't know which widget is going to be edited. 
-    if ((!aOperation->isEditOperation())) {
-      aOperation->activateByPreselection();
-    }
-    // Set final definitions if they are necessary
-    myModule->propertyPanelDefined(aOperation);
-
-    // Widget activation (from the previous method) may commit the current operation
-    // if pre-selection is enougth for it. So we shouldn't update prop panel's title
-    if(myOperationMgr->isCurrentOperation(aOperation)) {
-      myPropertyPanel->setWindowTitle(aOperation->getDescription()->description());
-    }
+  if (theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
+    connectWithOperation(theOperation);
+    setPropertyPanel(theOperation);
   }
   updateCommandStatus();
+
+  myModule->operationStarted(theOperation);
 }
+
+//******************************************************
+void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
+{
+  setNestedFeatures(theOperation);
+
+  if (theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
+    connectWithOperation(theOperation);
+    setPropertyPanel(theOperation);
+  }
+  updateCommandStatus();
+
+  myModule->operationResumed(theOperation);
+}
+
 
 //******************************************************
 void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
@@ -623,6 +602,44 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
     myDisplayer->activate(*aIt);
   }
+}
+
+void XGUI_Workshop::setNestedFeatures(ModuleBase_Operation* theOperation)
+{
+  if (this->isSalomeMode()) 
+    theOperation->setNestedFeatures(mySalomeConnector->nestedActions(theOperation->id()));
+  else 
+    theOperation->setNestedFeatures(myActionsMgr->nestedCommands(theOperation->id()));
+}
+
+void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
+{
+  showPropertyPanel();
+  QString aXmlRepr = theOperation->getDescription()->xmlRepresentation();
+  ModuleBase_WidgetFactory aFactory = ModuleBase_WidgetFactory(aXmlRepr.toStdString(),
+                                                                myModuleConnector);
+
+  myPropertyPanel->cleanContent();
+  aFactory.createWidget(myPropertyPanel->contentWidget());
+  ModuleBase_Tools::zeroMargins(myPropertyPanel->contentWidget());
+
+  QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
+  foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
+    aWidget->setFeature(theOperation->feature());
+    aWidget->enableFocusProcessing();
+    QObject::connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
+    // Init default values
+    if (!theOperation->isEditOperation() && !aWidget->isComputedDefault()) {
+      aWidget->storeValue();
+    }
+  }
+  
+  myPropertyPanel->setModelWidgets(aWidgets);
+  theOperation->setPropertyPanel(myPropertyPanel);
+
+  myModule->propertyPanelDefined(theOperation);
+
+  myPropertyPanel->setWindowTitle(theOperation->getDescription()->description());
 }
 
 bool XGUI_Workshop::event(QEvent * theEvent)

@@ -169,6 +169,7 @@ void ModuleBase_Operation::start()
 
   startOperation();
   emit started();
+
 }
 
 void ModuleBase_Operation::postpone()
@@ -230,16 +231,16 @@ void ModuleBase_Operation::setRunning(bool theState)
   }
 }
 
-bool ModuleBase_Operation::activateByPreselection()
+void ModuleBase_Operation::activateByPreselection()
 {
   if (!myPropertyPanel || myPreSelection.empty()) {
     myPropertyPanel->activateNextWidget(NULL);
-    return false;
+    return;
   }
   const QList<ModuleBase_ModelWidget*>& aWidgets = myPropertyPanel->modelWidgets();
   if (aWidgets.empty()) {
     myPropertyPanel->activateNextWidget(NULL);
-    return false;
+    return;
   }
   
   ModuleBase_ModelWidget* aWgt, *aFilledWgt = 0;
@@ -264,14 +265,10 @@ bool ModuleBase_Operation::activateByPreselection()
     }
   }
 
-  if (aFilledWgt) {
-    myPropertyPanel->activateNextWidget(aFilledWgt);
+  myPropertyPanel->activateNextWidget(aFilledWgt);
+  if (aFilledWgt)
     emit activatedByPreselection();
-    return true;
-  }
-  else
-    myPropertyPanel->activateNextWidget(NULL);
-  return false;
+
 }
 
 void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,
@@ -355,6 +352,11 @@ void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp)
   myPropertyPanel->setEditingMode(isEditOperation());
   //connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), this,
   //        SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
+
+  // Do not activate widgets by default if the current operation is editing operation
+  // Because we don't know which widget is going to be edited. 
+  if (!isEditOperation())
+    activateByPreselection();
 }
 
 bool ModuleBase_Operation::isGranted(QString theId) const

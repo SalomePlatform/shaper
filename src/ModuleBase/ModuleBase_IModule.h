@@ -45,6 +45,14 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theCmdId the operation name
   virtual void launchOperation(const QString& theCmdId);
 
+  /// Realizes some functionality by an operation start
+  /// \param theOperation a started operation
+  virtual void operationStarted(ModuleBase_Operation* theOperation) {}
+
+  /// Realizes some functionality by an operation resume
+  /// \param theOperation a resumed operation
+  virtual void operationResumed(ModuleBase_Operation* theOperation) {}
+
   /// Called when it is necessary to update a command state (enable or disable it)
   //virtual bool isFeatureEnabled(const QString& theCmdId) const = 0;
 
@@ -66,14 +74,10 @@ public slots:
   void onFeatureTriggered();
 
 protected slots:
-  /// SLOT, that is called after the operation is started. Connect on the focus activated signal
-  virtual void onOperationStarted(ModuleBase_Operation* theOperation) {}
-  
   /// SLOT, that is called after the operation is stopped. Switched off the modfications performed
   /// by the operation start
   virtual void onOperationStopped(ModuleBase_Operation* theOperation) {}
 
-  virtual void onOperationResumed(ModuleBase_Operation* theOperation) {}
 
   virtual void onOperationComitted(ModuleBase_Operation* theOperation) {}
 

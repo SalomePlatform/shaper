@@ -219,6 +219,14 @@ signals:
   void closeDocument();
 
  protected:
+  // Find the nested features and set them into the operation
+  // \param theOperation an operation
+  void setNestedFeatures(ModuleBase_Operation* theOperation);
+  // Update the property panel content by the XML description of the operation and set the panel
+  // into the operation
+  // \param theOperation an operation
+  void setPropertyPanel(ModuleBase_Operation* theOperation);
+
   bool event(QEvent * theEvent);
   //Event-loop processing methods:
   void addFeature(const std::shared_ptr<Config_FeatureMessage>&);
@@ -240,7 +248,13 @@ signals:
  private slots:
   /// SLOT, that is called after the operation is started. Update workshop state according to
   /// the started operation, e.g. visualizes the property panel and connect to it.
-  void onOperationStarted();
+  /// \param theOpertion a started operation
+  void onOperationStarted(ModuleBase_Operation* theOperation);
+
+  /// SLOT, that is called after the operation is resumed. Update workshop state according to
+  /// the started operation, e.g. visualizes the property panel and connect to it.
+  /// \param theOpertion a resumed operation
+  virtual void onOperationResumed(ModuleBase_Operation* theOperation);
 
   /// SLOT, that is called after the operation is stopped. Update workshop state, e.g.
   /// hides the property panel and udpate the command status.

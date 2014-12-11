@@ -126,8 +126,8 @@ Q_OBJECT
 
   ModuleBase_IPropertyPanel* propertyPanel() const { return myPropertyPanel; }
 
-  /// Activates widgets by preselection if it is accepted
-  virtual bool activateByPreselection();
+  /// Activates widgets by preselection if it is accepted. Emits signal if the activation is correct
+  virtual void activateByPreselection();
 
   /// If the operation works with feature which is sub-feature of another one
   /// then this variable has to be initialised by parent feature 

@@ -20,14 +20,8 @@
 ModuleBase_IModule::ModuleBase_IModule(ModuleBase_IWorkshop* theParent)
   : QObject(theParent), myWorkshop(theParent) 
 {
-  connect(myWorkshop, SIGNAL(operationStarted(ModuleBase_Operation*)), 
-          SLOT(onOperationStarted(ModuleBase_Operation*)));
-
   connect(myWorkshop, SIGNAL(operationStopped(ModuleBase_Operation*)), 
           SLOT(onOperationStopped(ModuleBase_Operation*)));
-
-  connect(myWorkshop, SIGNAL(operationResumed(ModuleBase_Operation*)), 
-          SLOT(onOperationResumed(ModuleBase_Operation*)));
 
   connect(myWorkshop, SIGNAL(operationComitted(ModuleBase_Operation*)), 
           SLOT(onOperationComitted(ModuleBase_Operation*)));
