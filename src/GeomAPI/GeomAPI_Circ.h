@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        GeomAPI_Circ.h
 // Created:     24 Jun 2014
 // Author:      Artem ZHIDKOV

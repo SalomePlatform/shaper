@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 // File:        XGUI_ModuleConnector.h
 // Created:     3 June 2014
 // Author:      Vitaly Smetannikov

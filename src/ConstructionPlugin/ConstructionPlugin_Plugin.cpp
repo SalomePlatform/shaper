@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #include "ConstructionPlugin_Plugin.h"
 #include "ConstructionPlugin_Point.h"
 

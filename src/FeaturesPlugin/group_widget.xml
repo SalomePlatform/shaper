@@ -1,3 +1,5 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 <source>
   <multi_selector id="group_list" 
     tooltip="List of selected objects" 

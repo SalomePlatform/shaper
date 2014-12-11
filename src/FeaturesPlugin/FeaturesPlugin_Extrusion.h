@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 // File:        FeaturesPlugin_Extrusion.h
 // Created:     30 May 2014
 // Author:      Vitaly SMETANNIKOV

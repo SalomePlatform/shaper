@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        ModuleBase_Tools.h
 // Created:     11 July 2014
 // Author:      Vitaly Smetannikov

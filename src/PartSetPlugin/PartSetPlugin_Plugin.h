@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        PartSetPlugin_Plugin.hxx
 // Created:     31 Mar 2014
 // Author:      Mikhail PONIKAROV

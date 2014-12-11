@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #ifndef SKETCHSOLVER_H
 #define SKETCHSOLVER_H
 

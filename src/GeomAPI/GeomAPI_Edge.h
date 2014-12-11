@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        GeomAPI_Edge.hxx
 // Created:     24 Jul 2014
 // Author:      Artem ZHIDKOV

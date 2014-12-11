@@ -1,3 +1,5 @@
+## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 cmake_minimum_required (VERSION 2.6)
 cmake_policy(SET CMP0011 NEW)
 

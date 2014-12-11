@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        Events_LongOp.h
 // Created:     29 Jul 2014
 // Author:      Mikhail PONIKAROV

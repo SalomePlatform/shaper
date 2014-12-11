@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        Config_Prop.h
 // Created:     12 Aug 2014
 // Author:      Vitaly SMETANNIKOV

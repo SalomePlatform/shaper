@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        Config_Prop.cpp
 // Created:     18 Sep 2014
 // Author:      Mikhail PONIKAROV

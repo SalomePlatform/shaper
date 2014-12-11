@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 #include "SketchPlugin_Plugin.h"
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_Line.h"

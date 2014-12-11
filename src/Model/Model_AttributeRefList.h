@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        Model_AttributeRefList.h
 // Created:     8 May 2014
 // Author:      Mikhail PONIKAROV

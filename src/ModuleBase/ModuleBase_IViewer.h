@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #ifndef ModuleBase_IViewer_H
 #define ModuleBase_IViewer_H
 

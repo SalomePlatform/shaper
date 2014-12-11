@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #ifndef GEOMDATA_H
 #define GEOMDATA_H
 

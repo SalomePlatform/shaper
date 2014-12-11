@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 // File:        SketchPlugin_Line.h
 // Created:     24 Apr 2014
 // Author:      Mikhail PONIKAROV

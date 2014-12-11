@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        GeomAPI_Lin2d.cpp
 // Created:     29 May 2014
 // Author:      Artem ZHIDKOV

@@ -1,3 +1,5 @@
+## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 
 IF(WIN32)
     IF(CMAKE_BUILD_TYPE STREQUAL "Debug")

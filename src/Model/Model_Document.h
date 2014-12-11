@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        Model_Document.h
 // Created:     28 Feb 2014
 // Author:      Mikhail PONIKAROV

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        ConstructionPlugin_Point.h
 // Created:     3 Apr 2014
 // Author:      Mikhail PONIKAROV

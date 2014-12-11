@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        PartSet_EditLine.h
 // Created:     02 June 2014
 // Author:      Natalia ERMOLAEVA

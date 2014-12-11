@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        GeomAPI_PlanarEdges.cpp
 // Created:     06 Oct 2014
 // Author:      Sergey BELASH

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 #ifndef FEATURESPLUGIN_H
 #define FEATURESPLUGIN_H
 

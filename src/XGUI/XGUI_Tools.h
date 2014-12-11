@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 #ifndef XGUI_Tools_H
 #define XGUI_Tools_H
 

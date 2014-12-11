@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 #ifndef ATTRIBUTE_MESSAGE_H
 #define ATTRIBUTE_MESSAGE_H
 

@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_DocumentDataModel.h"
 #include "XGUI_Tools.h"

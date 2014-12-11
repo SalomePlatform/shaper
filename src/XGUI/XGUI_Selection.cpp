@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 // File:        XGUI_Selection.cpp
 // Created:     8 July 2014
 // Author:      Vitaly SMETANNIKOV

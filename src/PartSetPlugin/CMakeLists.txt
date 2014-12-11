@@ -1,3 +1,5 @@
+## Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 INCLUDE(Common)
 
 SET(PROJECT_HEADERS

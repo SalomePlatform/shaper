@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        ModuleBase_WidgetLabel.cpp
 // Created:     03 Dec 2014
 // Author:      Vitaly SMETANNIKOV

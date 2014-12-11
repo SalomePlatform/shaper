@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 #ifndef XGUI_ContextMenuMgr_H
 #define XGUI_ContextMenuMgr_H
 

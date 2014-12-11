@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        ModelAPI_Tools.cpp
 // Created:     06 Aug 2014
 // Author:      Vitaly Smetannikov

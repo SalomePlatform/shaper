@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        ModuleBase_WidgetChoice.cpp
 // Created:     03 Sept 2014
 // Author:      Vitaly Smetannikov

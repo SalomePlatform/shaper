@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        GeomAPI_Face.cpp
 // Created:     2 Dec 2014
 // Author:      Artem ZHIDKOV

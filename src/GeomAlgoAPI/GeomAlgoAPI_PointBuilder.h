@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        GeomAlgoAPI_PointBuilder.h
 // Created:     02 Jun 2014
 // Author:      Mikhail PONIKAROV

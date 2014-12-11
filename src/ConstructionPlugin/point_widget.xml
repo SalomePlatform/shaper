@@ -1,3 +1,5 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 <source>
   <doublevalue id="x" label="X:" icon=":pictures/x_point.png" tooltip="Set X"/>
   <doublevalue id="y" label="Y:" icon=":pictures/y_point.png" tooltip="Set Y"/>

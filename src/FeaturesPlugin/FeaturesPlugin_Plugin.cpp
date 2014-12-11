@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 #include <FeaturesPlugin_Plugin.h>
 
 #include <FeaturesPlugin_Boolean.h>

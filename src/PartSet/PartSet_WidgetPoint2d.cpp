@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        PartSet_WidgetPoint2D.cpp
 // Created:     25 Apr 2014
 // Author:      Natalia ERMOLAEVA

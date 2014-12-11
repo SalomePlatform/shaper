@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        SketchPlugin_Validators.h
 // Created:     01 Aug 2014
 // Author:      Vitaly SMETANNIKOV

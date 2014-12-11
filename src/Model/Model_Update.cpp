@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        Model_Update.cxx
 // Created:     25 Jun 2014
 // Author:      Mikhail PONIKAROV

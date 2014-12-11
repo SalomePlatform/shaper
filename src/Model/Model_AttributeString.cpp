@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
 // File:        Model_AttributeString.cpp
 // Created:     25 august 2014
 // Author:      sbh

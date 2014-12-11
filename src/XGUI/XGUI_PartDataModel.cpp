@@ -1,3 +1,5 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
 #include "XGUI_PartDataModel.h"
 #include "XGUI_Workshop.h"
 
