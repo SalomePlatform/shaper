@@ -26,15 +26,9 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
 
-#include <XGUI_MainWindow.h>
 #include <XGUI_Displayer.h>
-#include <XGUI_Viewer.h>
 #include <XGUI_Workshop.h>
 #include <XGUI_OperationMgr.h>
-#include <XGUI_ViewPort.h>
-#include <XGUI_ActionsMgr.h>
-#include <XGUI_ViewerProxy.h>
-#include <XGUI_ContextMenuMgr.h>
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Tools.h>

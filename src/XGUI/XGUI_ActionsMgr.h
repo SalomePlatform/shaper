@@ -27,7 +27,7 @@ Q_OBJECT
   virtual ~XGUI_ActionsMgr();
 
   //! Add a command in the manager.
-  //! Please note that nested commands in the Salome mode (No XGUI_Command, pure QActions)
+  //! Please note that nested commands in the Salome mode (No AppElements_Command, pure QActions)
   //! won't be extracted and should be added manually using the addNestedCommands method.
   void addCommand(QAction* theCmd);
   //! Sets relation between the command (with given Id) and it's nested actions.

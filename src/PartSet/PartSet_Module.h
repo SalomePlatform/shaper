@@ -6,7 +6,6 @@
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
-#include <XGUI_Command.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_CompositeFeature.h>
