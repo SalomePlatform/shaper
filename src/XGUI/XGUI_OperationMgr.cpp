@@ -102,7 +102,7 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
 
   connect(theOperation, SIGNAL(started()), SLOT(onOperationStarted()));
   connect(theOperation, SIGNAL(aborted()), SLOT(onOperationAborted()));
-  connect(theOperation, SIGNAL(committed()), SLOT(onOperationComitted()));
+  connect(theOperation, SIGNAL(committed()), SLOT(onOperationCommitted()));
   connect(theOperation, SIGNAL(stopped()), SLOT(onOperationStopped()));
   connect(theOperation, SIGNAL(resumed()), SLOT(onOperationResumed()));
   connect(theOperation, SIGNAL(activatedByPreselection()),
@@ -219,10 +219,10 @@ void XGUI_OperationMgr::onOperationAborted()
   emit operationAborted(aSenderOperation);
 }
 
-void XGUI_OperationMgr::onOperationComitted()
+void XGUI_OperationMgr::onOperationCommitted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
-  emit operationComitted(aSenderOperation);
+  emit operationCommitted(aSenderOperation);
 }
 
 void XGUI_OperationMgr::onOperationResumed()

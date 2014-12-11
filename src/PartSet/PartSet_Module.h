@@ -52,8 +52,24 @@ public:
   QStringList sketchOperationIdList() const;
 
   /// Realizes some functionality by an operation start
+  /// Displays all sketcher sub-Objects, hides sketcher result, appends selection filters
   /// \param theOperation a started operation
   virtual void operationStarted(ModuleBase_Operation* theOperation);
+
+  /// Realizes some functionality by an operation commit
+  /// Restarts sketcher operation automatically of it is necessary
+  /// \param theOperation a committed operation
+  virtual void operationCommitted(ModuleBase_Operation* theOperation);
+
+  /// Realizes some functionality by an operation abort
+  /// Hides all sketcher sub-Objects, displays sketcher result and removes selection filters
+  /// \param theOperation an aborted operation
+  virtual void operationAborted(ModuleBase_Operation* theOperation);
+
+  /// Realizes some functionality by an operation stop
+  /// Hides all sketcher sub-Objects, displays sketcher result and removes selection filters
+  /// \param theOperation a stopped operation
+  virtual void operationStopped(ModuleBase_Operation* theOperation);
 
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
@@ -61,13 +77,6 @@ public slots:
   void onNoMoreWidgets();
 
 protected slots:
-  /// Called when previous operation is finished
-  virtual void onOperationComitted(ModuleBase_Operation* theOperation);
-
-  virtual void onOperationAborted(ModuleBase_Operation* theOperation);
-
-  virtual void onOperationStopped(ModuleBase_Operation* theOperation);
-
   /// Called when previous operation is finished
   virtual void onSelectionChanged();
 

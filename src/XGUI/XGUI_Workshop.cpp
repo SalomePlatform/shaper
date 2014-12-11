@@ -153,6 +153,10 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           SLOT(onOperationResumed(ModuleBase_Operation*)));
   connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
           SLOT(onOperationStopped(ModuleBase_Operation*)));
+  connect(myOperationMgr, SIGNAL(operationCommitted(ModuleBase_Operation*)), 
+          SLOT(onOperationCommitted(ModuleBase_Operation*)));
+  connect(myOperationMgr, SIGNAL(operationAborted(ModuleBase_Operation*)), 
+          SLOT(onOperationAborted(ModuleBase_Operation*)));
   connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
   // TODO(sbh): It seems that application works properly without update on operationStarted
   connect(myOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)),
@@ -604,6 +608,18 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
     myDisplayer->activate(*aIt);
   }
+  myModule->operationStopped(theOperation);
+}
+
+
+void XGUI_Workshop::onOperationCommitted(ModuleBase_Operation* theOperation)
+{
+  myModule->operationCommitted(theOperation);
+}
+
+void XGUI_Workshop::onOperationAborted(ModuleBase_Operation* theOperation)
+{
+  myModule->operationAborted(theOperation);
 }
 
 void XGUI_Workshop::setNestedFeatures(ModuleBase_Operation* theOperation)

@@ -72,22 +72,6 @@ Q_OBJECT
 signals:
   void selectionChanged();
 
-  /// Signal about an operation is started. It is emitted after the start() of operation is done.
-  void operationStarted(ModuleBase_Operation* theOperation);
-
-  /// Signal about an operation is stopped. It is emitted after the stop() of operation is done.
-  /// \param theOperation a stopped operation
-  void operationStopped(ModuleBase_Operation* theOperation);
-
-  /// Signal about an operation is resumed. It is emitted after the resume() of operation is done.
-  void operationResumed(ModuleBase_Operation* theOperation);
-
-  /// Emitted when current operation is comitted
-  void operationComitted(ModuleBase_Operation* theOperation);
-
-  /// Emitted when current operation is aborted
-  void operationAborted(ModuleBase_Operation* theOperation);
-
   /// Signal which is emited after activation of property panel
   void propertyPanelActivated();
 
