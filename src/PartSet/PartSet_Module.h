@@ -51,6 +51,10 @@ public:
 
   QStringList sketchOperationIdList() const;
 
+  /// Realizes some functionality by an operation start
+  /// \param theOperation a started operation
+  virtual void operationStarted(ModuleBase_Operation* theOperation);
+
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation
@@ -61,8 +65,6 @@ protected slots:
   virtual void onOperationComitted(ModuleBase_Operation* theOperation);
 
   virtual void onOperationAborted(ModuleBase_Operation* theOperation);
-
-  virtual void onOperationStarted(ModuleBase_Operation* theOperation);
 
   virtual void onOperationStopped(ModuleBase_Operation* theOperation);
 

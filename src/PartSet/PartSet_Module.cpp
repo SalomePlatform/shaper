@@ -180,7 +180,7 @@ void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
   breakOperationSequence();
 }
 
-void PartSet_Module::onOperationStarted(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
 {
   if (theOperation->id().toStdString() == SketchPlugin_Sketch::ID()) {
     // Display all sketcher sub-Objects

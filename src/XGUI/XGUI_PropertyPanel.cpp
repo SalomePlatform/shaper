@@ -79,6 +79,7 @@ void XGUI_PropertyPanel::cleanContent()
   myWidgets.clear();
   qDeleteAll(myCustomWidget->children());
   myActiveWidget = NULL;
+  setWindowTitle(tr("Property Panel"));
 }
 
 void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets)
