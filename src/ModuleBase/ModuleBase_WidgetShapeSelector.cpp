@@ -8,6 +8,8 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_FilterFactory.h>
+#include <ModuleBase_Filter.h>
 
 #include <Config_WidgetAPI.h>
 #include <Events_Loop.h>
@@ -37,6 +39,7 @@
 
 #include <GeomAPI_Shape.h>
 
+#include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopExp_Explorer.hxx>
 
@@ -402,6 +405,7 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
     return;
   myIsActive = toActivate;
   updateSelectionName();
+  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
 
   if (myIsActive) {
     connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
@@ -413,20 +417,31 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
       myWorkshop->activateSubShapesSelection(aList);
       if (!myObjectTypes.isEmpty()) {
         myObjTypeFilter = new ModuleBase_ObjectTypesFilter(myWorkshop, myObjectTypes);
-        myWorkshop->viewer()->clearSelectionFilters();
-        myWorkshop->viewer()->addSelectionFilter(myObjTypeFilter);
+        aViewer->clearSelectionFilters();
+        aViewer->addSelectionFilter(myObjTypeFilter);
       }
     }
   } else {
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
     if (myUseSubShapes) {
       if (!myObjTypeFilter.IsNull()) {
-        myWorkshop->viewer()->removeSelectionFilter(myObjTypeFilter);
+        aViewer->removeSelectionFilter(myObjTypeFilter);
         myObjTypeFilter.Nullify();
       }
       myWorkshop->deactivateSubShapesSelection();
     }
   }
+
+  /*ModuleBase_FilterFactory* aFactory = myWorkshop->selectionFilters();
+  const SelectMgr_ListOfFilter& aFilters = aFactory->filters(parentID(), attributeID());
+  SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
+  for (; aIt.More(); aIt.Next()) {
+    Handle(ModuleBase_Filter) aFilter = Handle(ModuleBase_Filter)::DownCast(aIt.Value());
+    if (myIsActive)
+      aViewer->addSelectionFilter(aFilter);
+    else
+      aViewer->removeSelectionFilter(aFilter);
+  }*/
 }
 
 //********************************************************************

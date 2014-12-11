@@ -17,6 +17,7 @@ class ModuleBase_IModule;
 class ModuleBase_ISelection;
 class ModuleBase_IViewer;
 class ModuleBase_Operation;
+class ModuleBase_FilterFactory;
 
 /**
  * Class which provides access to Workshop object serveces
@@ -47,6 +48,9 @@ Q_OBJECT
   //! Returns current viewer
   virtual ModuleBase_IViewer* viewer() const = 0;
 
+  //! Returns the factory of selection filters : the only one instance per application
+  ModuleBase_FilterFactory* selectionFilters() const;
+  
   //! Returns currently active operation
   virtual ModuleBase_Operation* currentOperation() const = 0;
 

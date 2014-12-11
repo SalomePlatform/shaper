@@ -107,6 +107,9 @@ protected slots:
   /// Register validators for this module
   virtual void registerValidators();
 
+  /// Register selection filters for this module
+  virtual void registerFilters();
+
  private slots:
    void onVertexSelected(ObjectPtr theObject, const TopoDS_Shape& theShape);
 

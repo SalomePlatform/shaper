@@ -12,6 +12,9 @@
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_WidgetEditor.h>
+#include <ModuleBase_FilterFactory.h>
+#include <ModuleBase_FilterLinearEdge.h>
+
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
@@ -141,6 +144,14 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
 }
 
+void PartSet_Module::registerFilters()
+{
+  //Registering of selection filters
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+  ModuleBase_FilterFactory* aFactory = aConnector->selectionFilters();
+
+  aFactory->registerFilter("LinearEdgeFilter", new ModuleBase_FilterLinearEdge);
+}
 
 void PartSet_Module::onOperationComitted(ModuleBase_Operation* theOperation) 
 {
