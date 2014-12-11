@@ -96,6 +96,10 @@ protected slots:
   /// Set a specific type of restarting the current operation
   void onEnterReleased();
 
+  /// SLOT, that is called by the current operation filling with the preselection.
+  /// It commits the operation of it is can be committed
+  void onOperationActivatedByPreselection();
+
   /// Launches the operation from current highlighting
   void launchEditing();
 

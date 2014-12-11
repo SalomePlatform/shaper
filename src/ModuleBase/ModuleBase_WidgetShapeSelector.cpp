@@ -248,8 +248,10 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 
   //QObjectPtrList aObjects = myWorkshop->selection()->selectedPresentations();
   QList<ModuleBase_ViewerPrs> aSelected = myWorkshop->selection()->getSelected();
-  if (aSelected.size() > 0)
-    setSelection(aSelected.first());
+  if (aSelected.size() > 0) {
+    if (setSelection(aSelected.first()))
+      emit focusOutWidget(this);
+  }
 }
 
 //********************************************************************
@@ -306,7 +308,6 @@ bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
   }
   if (isValid(aObject, aShape)) {
     setObject(aObject, aShape);
-    emit focusOutWidget(this);
     return true;
   }
   return false;

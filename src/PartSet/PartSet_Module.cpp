@@ -112,6 +112,8 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
   connect(anOpMgr, SIGNAL(keyEnterReleased()), this, SLOT(onEnterReleased()));
+  connect(anOpMgr, SIGNAL(operationActivatedByPreselection()),
+          this, SLOT(onOperationActivatedByPreselection()));
 
   connect(aViewer, SIGNAL(keyRelease(ModuleBase_IViewWindow*, QKeyEvent*)),
           this, SLOT(onKeyRelease(ModuleBase_IViewWindow*, QKeyEvent*)));
@@ -568,6 +570,24 @@ void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* the
 void PartSet_Module::onEnterReleased()
 {
   myRestartingMode = RM_EmptyFeatureUsed;
+}
+
+void PartSet_Module::onOperationActivatedByPreselection()
+{
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  if (!aOperation)
+    return;
+
+  // Set final definitions if they are necessary
+  //propertyPanelDefined(aOperation);
+
+  /// Commit sketcher operations automatically
+  FeaturePtr aFeature = aOperation->feature();
+  std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+  if (aSPFeature) {
+    aOperation->commit();
+  }
 }
 
 void PartSet_Module::onNoMoreWidgets()

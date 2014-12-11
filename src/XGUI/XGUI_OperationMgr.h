@@ -108,8 +108,12 @@ signals:
   /// Signal is emitted after the validate methods calls.
   void operationValidated(bool);
 
+  /// Signal is emitted after the current operation is filled with existing preselection.
+  void operationActivatedByPreselection();
+
   /// Signal is emitted after the key released click.
   void keyEnterReleased();
+
 
  protected:
 

@@ -142,6 +142,7 @@ signals:
   void stopped();  /// the operation is aborted or committed
   void resumed();  /// the operation is resumed
   void postponed();  /// the operation is postponed
+  void activatedByPreselection(); /// the operation is filled with existing preselection
 
  public slots:
   /// Starts operation

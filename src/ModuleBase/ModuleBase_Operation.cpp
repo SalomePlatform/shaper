@@ -232,13 +232,15 @@ void ModuleBase_Operation::setRunning(bool theState)
 
 bool ModuleBase_Operation::activateByPreselection()
 {
-  if (!myPropertyPanel)
+  if (!myPropertyPanel || myPreSelection.empty()) {
+    myPropertyPanel->activateNextWidget(NULL);
     return false;
-  if (myPreSelection.empty())
-    return false;
+  }
   const QList<ModuleBase_ModelWidget*>& aWidgets = myPropertyPanel->modelWidgets();
-  if (aWidgets.empty())
+  if (aWidgets.empty()) {
+    myPropertyPanel->activateNextWidget(NULL);
     return false;
+  }
   
   ModuleBase_ModelWidget* aWgt, *aFilledWgt = 0;
   QList<ModuleBase_ModelWidget*>::const_iterator aWIt;
@@ -261,19 +263,14 @@ bool ModuleBase_Operation::activateByPreselection()
       aFilledWgt = aWgt;
     }
   }
-  if (isSet && canBeCommitted()) {
-    // if all widgets are filled with selection - commit
-    // in order to commit the operation outside of starting procedure - use timer event
-    QTimer::singleShot(50, this, SLOT(commit()));
+
+  if (aFilledWgt) {
+    myPropertyPanel->activateNextWidget(aFilledWgt);
+    emit activatedByPreselection();
     return true;
   }
-  else {
-    //activate next widget
-    if (aFilledWgt) {
-      myPropertyPanel->activateNextWidget(aFilledWgt);
-      return true;
-    }
-  }
+  else
+    myPropertyPanel->activateNextWidget(NULL);
   return false;
 }
 

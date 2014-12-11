@@ -103,6 +103,8 @@ bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
   connect(theOperation, SIGNAL(committed()), SLOT(onOperationComitted()));
   connect(theOperation, SIGNAL(stopped()), SLOT(onOperationStopped()));
   connect(theOperation, SIGNAL(resumed()), SLOT(onOperationResumed()));
+  connect(theOperation, SIGNAL(activatedByPreselection()),
+          SIGNAL(operationActivatedByPreselection()));
 
   theOperation->start();
   onValidateOperation();

@@ -593,8 +593,7 @@ void XGUI_Workshop::onOperationStarted()
     // Do not activate widgets by default if the current operation is editing operation
     // Because we don't know which widget is going to be edited. 
     if ((!aOperation->isEditOperation())) {
-      if (!aOperation->activateByPreselection())
-        myPropertyPanel->activateNextWidget(NULL);
+      aOperation->activateByPreselection();
     }
     // Set final definitions if they are necessary
     myModule->propertyPanelDefined(aOperation);
