@@ -6,7 +6,7 @@
  */
 
 #include <XGUI_PropertyPanel.h>
-#include <XGUI_Constants.h>
+//#include <AppElements_Constants.h>
 #include <ModuleBase_WidgetMultiSelector.h>
 
 #include <QWidget>
@@ -29,7 +29,7 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
 {
   this->setWindowTitle(tr("Property Panel"));
   QAction* aViewAct = this->toggleViewAction();
-  this->setObjectName(XGUI::PROP_PANEL);
+  this->setObjectName(PROP_PANEL);
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
   QWidget* aContent = new QWidget(this);
@@ -49,14 +49,14 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   aBtnLay->addWidget(aBtn);
   aBtnLay->addStretch(1);
   aBtn = new QPushButton(QIcon(":pictures/button_ok.png"), "", aFrm);
-  aBtn->setObjectName(XGUI::PROP_PANEL_OK);
+  aBtn->setObjectName(PROP_PANEL_OK);
   aBtn->setToolTip(tr("Ok"));
   aBtn->setFlat(true);
   aBtnLay->addWidget(aBtn);
 
   aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
   aBtn->setToolTip(tr("Cancel"));
-  aBtn->setObjectName(XGUI::PROP_PANEL_CANCEL);
+  aBtn->setObjectName(PROP_PANEL_CANCEL);
   aBtn->setFlat(true);
   aBtn->setShortcut(QKeySequence(Qt::Key_Escape));
   aBtnLay->addWidget(aBtn);
@@ -115,8 +115,8 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
     if (!aControls.empty()) {
       QWidget* aLastControl = aControls.last();
 
-      QPushButton* anOkBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
-      QPushButton* aCancelBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
+      QPushButton* anOkBtn = findChild<QPushButton*>(PROP_PANEL_OK);
+      QPushButton* aCancelBtn = findChild<QPushButton*>(PROP_PANEL_CANCEL);
 
       setTabOrder(aLastControl, anOkBtn);
       setTabOrder(anOkBtn, aCancelBtn);
@@ -195,7 +195,7 @@ void XGUI_PropertyPanel::activateNextWidget()
 
 void XGUI_PropertyPanel::setAcceptEnabled(bool isEnabled)
 {
-  QPushButton* anOkBtn = findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
+  QPushButton* anOkBtn = findChild<QPushButton*>(PROP_PANEL_OK);
   anOkBtn->setEnabled(isEnabled);
 }
 

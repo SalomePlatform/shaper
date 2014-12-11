@@ -1,10 +1,10 @@
-// File:        XGUI_IPrefMgr.h
+// File:        ModuleBase_IPrefMgr.h
 // Created:     10 Sept 2014
 // Author:      Vitaly SMETANNIKOV
 
 
-#ifndef XGUI_IPrefMgr_H
-#define XGUI_IPrefMgr_H
+#ifndef ModuleBase_IPrefMgr_H
+#define ModuleBase_IPrefMgr_H
 
 #include <QString>
 #include <SUIT_PreferenceMgr.h>
@@ -14,7 +14,7 @@
 * It is used in order to make common interface to Preference manager in Salome 
 * and this application
 */
-class XGUI_IPrefMgr
+class ModuleBase_IPrefMgr
 {
 public:
 

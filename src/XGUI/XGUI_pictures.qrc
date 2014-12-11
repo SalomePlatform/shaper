@@ -8,28 +8,6 @@
      <file>pictures/undo.png</file>
      <file>pictures/rebuild.png</file>
      <file>pictures/preferences.png</file>
-
-     <file>pictures/occ_view_back.png</file>
-     <file>pictures/occ_view_bottom.png</file>
-     <file>pictures/occ_view_camera_dump.png</file>
-     <file>pictures/occ_view_clone.png</file>
-     <file>pictures/occ_view_fitall.png</file>
-     <file>pictures/occ_view_fitarea.png</file>
-     <file>pictures/occ_view_front.png</file>
-     <file>pictures/occ_view_left.png</file>
-     <file>pictures/occ_view_pan.png</file>
-     <file>pictures/occ_view_glpan.png</file>
-     <file>pictures/occ_view_reset.png</file>
-     <file>pictures/occ_view_right.png</file>
-     <file>pictures/occ_view_rotate.png</file>
-     <file>pictures/occ_view_top.png</file>
-     <file>pictures/occ_view_zoom.png</file>
-     
-     <file>pictures/wnd_close.png</file>
-     <file>pictures/wnd_minimize.png</file>
-     <file>pictures/wnd_maximize.png</file>
-     <file>pictures/wnd_restore.png</file>
-     <file>pictures/wnd_grip.png</file>
      
      <file>pictures/params_folder.png</file>
      <file>pictures/constr_folder.png</file>
@@ -51,14 +29,9 @@
      <file>pictures/button_help.png</file>
      <file>pictures/button_ok.png</file>
    
-     <file>pictures/cascade_views.png</file>
-     <file>pictures/tile_views.png</file>
-     <file>pictures/new_view.png</file>
      <file>pictures/edit.png</file>
-
      <file>pictures/exec_state_failed.png</file>
      <file>pictures/exec_state_invalid_parameters.png</file>
-
      <file>pictures/assembly.png</file>
      <file>pictures/activate.png</file>
      <file>pictures/delete.png</file>

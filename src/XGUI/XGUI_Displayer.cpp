@@ -3,9 +3,10 @@
 // Author:      Natalia ERMOLAEVA
 
 #include "XGUI_Displayer.h"
-#include "XGUI_Viewer.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_ViewerProxy.h"
+
+#include <AppElements_Viewer.h>
 
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Data.h>

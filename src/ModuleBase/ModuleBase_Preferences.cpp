@@ -1,9 +1,9 @@
-// File:        XGUI_Preferences.cpp
+// File:        ModuleBase_Preferences.cpp
 // Created:     07 Aug 2014
 // Author:      Vitaly SMETANNIKOV
 
-#include "XGUI_Preferences.h"
-#include "XGUI_Constants.h"
+#include "ModuleBase_Preferences.h"
+//#include "ModuleBase_Constants.h"
 
 #include <Config_PropManager.h>
 
@@ -16,12 +16,12 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 
-const QString XGUI_Preferences::VIEWER_SECTION = "Viewer";
-const QString XGUI_Preferences::MENU_SECTION = "Menu";
+const QString ModuleBase_Preferences::VIEWER_SECTION = "Viewer";
+const QString ModuleBase_Preferences::MENU_SECTION = "Menu";
 
-SUIT_ResourceMgr* XGUI_Preferences::myResourceMgr = 0;
+SUIT_ResourceMgr* ModuleBase_Preferences::myResourceMgr = 0;
 
-SUIT_ResourceMgr* XGUI_Preferences::resourceMgr()
+SUIT_ResourceMgr* ModuleBase_Preferences::resourceMgr()
 {
   if (!myResourceMgr) {
     myResourceMgr = new SUIT_ResourceMgr("NewGeom");
@@ -30,9 +30,9 @@ SUIT_ResourceMgr* XGUI_Preferences::resourceMgr()
   return myResourceMgr;
 }
 
-bool XGUI_Preferences::editPreferences(XGUI_Prefs& theModified)
+bool ModuleBase_Preferences::editPreferences(ModuleBase_Prefs& theModified)
 {
-  XGUI_PreferencesDlg aDlg(resourceMgr(), QApplication::activeWindow());
+  ModuleBase_PreferencesDlg aDlg(resourceMgr(), QApplication::activeWindow());
   aDlg.exec();
   if (aDlg.isChanged()) {
     aDlg.modified(theModified);
@@ -42,7 +42,7 @@ bool XGUI_Preferences::editPreferences(XGUI_Prefs& theModified)
   return false;
 }
 
-void XGUI_Preferences::updateConfigByResources()
+void ModuleBase_Preferences::updateConfigByResources()
 {
   Config_Properties aProps = Config_PropManager::getProperties();
   Config_Properties::iterator aIt;
@@ -56,7 +56,7 @@ void XGUI_Preferences::updateConfigByResources()
   }
 }
 
-void XGUI_Preferences::updateResourcesByConfig()
+void ModuleBase_Preferences::updateResourcesByConfig()
 {
   Config_Properties aProps = Config_PropManager::getProperties();
   Config_Properties::iterator aIt;
@@ -67,7 +67,7 @@ void XGUI_Preferences::updateResourcesByConfig()
   }
 }
 
-void XGUI_Preferences::resetConfig()
+void ModuleBase_Preferences::resetConfig()
 {
   Config_Properties aProps = Config_PropManager::getProperties();
   Config_Properties::iterator aIt;
@@ -77,7 +77,7 @@ void XGUI_Preferences::resetConfig()
   }
 }
 
-void XGUI_Preferences::loadCustomProps()
+void ModuleBase_Preferences::loadCustomProps()
 {
   if(!myResourceMgr)
     return;
@@ -95,16 +95,16 @@ void XGUI_Preferences::loadCustomProps()
 }
 
 
-void XGUI_Preferences::createEditContent(XGUI_IPrefMgr* thePref, int thePage)
+void ModuleBase_Preferences::createEditContent(ModuleBase_IPrefMgr* thePref, int thePage)
 {
   thePref->prefMgr()->setItemIcon(thePage, QIcon(":pictures/module.png"));
   createCustomPage(thePref, thePage);
 }
 
 
-void XGUI_Preferences::createCustomPage(XGUI_IPrefMgr* thePref, int thePageId)
+void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int thePageId)
 {
-  SUIT_ResourceMgr* aResMgr = XGUI_Preferences::resourceMgr();
+  SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
   bool isResModified = false;
 
   // Make a Tab from each section
@@ -147,10 +147,10 @@ void XGUI_Preferences::createCustomPage(XGUI_IPrefMgr* thePref, int thePageId)
 //**********************************************************
 //**********************************************************
 //**********************************************************
-class XGUI_PrefMgr: public XGUI_IPrefMgr
+class ModuleBase_PrefMgr: public ModuleBase_IPrefMgr
 {
 public:
-  XGUI_PrefMgr(XGUI_PreferencesMgr* theMgr):myMgr(theMgr) {}
+  ModuleBase_PrefMgr(ModuleBase_PreferencesMgr* theMgr):myMgr(theMgr) {}
 
   virtual int addPreference(const QString& theLbl, int pId, 
                             SUIT_PreferenceMgr::PrefItemType theType,
@@ -167,13 +167,13 @@ public:
   virtual SUIT_PreferenceMgr* prefMgr() const { return myMgr; }
 
 private:
-  XGUI_PreferencesMgr* myMgr;
+  ModuleBase_PreferencesMgr* myMgr;
 };
 
 //**********************************************************
 //**********************************************************
 //**********************************************************
-XGUI_PreferencesDlg::XGUI_PreferencesDlg(SUIT_ResourceMgr* theResurces, QWidget* theParent)
+ModuleBase_PreferencesDlg::ModuleBase_PreferencesDlg(SUIT_ResourceMgr* theResurces, QWidget* theParent)
     : QDialog(theParent),
       myIsChanged(false)
 {
@@ -183,7 +183,7 @@ XGUI_PreferencesDlg::XGUI_PreferencesDlg(SUIT_ResourceMgr* theResurces, QWidget*
   main->setMargin(5);
   main->setSpacing(5);
 
-  myPreferences = new XGUI_PreferencesMgr(theResurces, this);
+  myPreferences = new ModuleBase_PreferencesMgr(theResurces, this);
   main->addWidget(myPreferences);
 
   setFocusProxy(myPreferences);
@@ -205,11 +205,11 @@ XGUI_PreferencesDlg::XGUI_PreferencesDlg(SUIT_ResourceMgr* theResurces, QWidget*
   setMinimumSize(800, 200);
 }
 
-XGUI_PreferencesDlg::~XGUI_PreferencesDlg()
+ModuleBase_PreferencesDlg::~ModuleBase_PreferencesDlg()
 {
 }
 
-void XGUI_PreferencesDlg::createEditors()
+void ModuleBase_PreferencesDlg::createEditors()
 {
   int aPage = myPreferences->addItem(tr("Desktop"));
   myPreferences->setItemIcon(aPage, QIcon(":pictures/view_prefs.png"));
@@ -220,11 +220,11 @@ void XGUI_PreferencesDlg::createEditors()
   aPage = myPreferences->addItem(tr("Module"));
   myPreferences->setItemIcon(aPage, QIcon(":pictures/module.png"));
 
-  XGUI_PrefMgr aMgr(myPreferences);
-  XGUI_Preferences::createEditContent(&aMgr, aPage);
+  ModuleBase_PrefMgr aMgr(myPreferences);
+  ModuleBase_Preferences::createEditContent(&aMgr, aPage);
 }
 
-void XGUI_PreferencesDlg::createViewerPage(int thePageId)
+void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
 {
   int viewTab = myPreferences->addItem(tr("Viewer"), thePageId);
 
@@ -243,7 +243,7 @@ void XGUI_PreferencesDlg::createViewerPage(int thePageId)
   QString aImgFiles("Image files (*.bmp *.gif *.pix *.xwd *.rgb *.rs)");
 
   int bgId = myPreferences->addItem(tr("Viewer 3d"), bgGroup, SUIT_PreferenceMgr::Background,
-                                    XGUI_Preferences::VIEWER_SECTION, "background");
+                                    ModuleBase_Preferences::VIEWER_SECTION, "background");
   myPreferences->setItemProperty("gradient_names", gradList, bgId);
   myPreferences->setItemProperty("gradient_ids", idList, bgId);
   myPreferences->setItemProperty("texture_enabled", true, bgId);
@@ -254,7 +254,7 @@ void XGUI_PreferencesDlg::createViewerPage(int thePageId)
   myPreferences->setItemProperty("image_formats", aImgFiles, bgId);
 }
 
-void XGUI_PreferencesDlg::createMenuPage(int thePageId)
+void ModuleBase_PreferencesDlg::createMenuPage(int thePageId)
 {
   int aMenuTab = myPreferences->addItem(tr("Main menu"), thePageId);
 
@@ -262,28 +262,28 @@ void XGUI_PreferencesDlg::createMenuPage(int thePageId)
   myPreferences->setItemProperty("columns", 1, aSizeGroup);
 
   int aRowsNb = myPreferences->addItem(tr("Number of rows"), aSizeGroup,
-                                       SUIT_PreferenceMgr::IntSpin, XGUI_Preferences::MENU_SECTION,
+                                       SUIT_PreferenceMgr::IntSpin, ModuleBase_Preferences::MENU_SECTION,
                                        "rows_number");
   myPreferences->setItemProperty("min", 1, aRowsNb);
   myPreferences->setItemProperty("max", 6, aRowsNb);
 }
 
-void XGUI_PreferencesDlg::accept()
+void ModuleBase_PreferencesDlg::accept()
 {
   myPreferences->store();
   myIsChanged = true;
 
   // Save custom properties
-  XGUI_Preferences::updateConfigByResources();
+  ModuleBase_Preferences::updateConfigByResources();
   QDialog::accept();
 }
 
-void XGUI_PreferencesDlg::modified(XGUI_Prefs& theModified) const
+void ModuleBase_PreferencesDlg::modified(ModuleBase_Prefs& theModified) const
 {
   theModified = myPreferences->modified();
 }
 
-void XGUI_PreferencesDlg::onDefault()
+void ModuleBase_PreferencesDlg::onDefault()
 {
   // reset main resources
 #ifdef SALOME_750 // until SALOME 7.5.0 is released
@@ -293,8 +293,8 @@ void XGUI_PreferencesDlg::onDefault()
   myPreferences->resourceMgr()->setWorkingMode(aPrev);
 #endif
   // reset plugin's resources
-  XGUI_Preferences::resetConfig();
-  XGUI_Preferences::updateResourcesByConfig();
+  ModuleBase_Preferences::resetConfig();
+  ModuleBase_Preferences::updateResourcesByConfig();
 
   myPreferences->retrieve();
 }
@@ -302,13 +302,13 @@ void XGUI_PreferencesDlg::onDefault()
 //**********************************************************
 //**********************************************************
 //**********************************************************
-void XGUI_PreferencesMgr::changedResources(const ResourceMap& theMap)
+void ModuleBase_PreferencesMgr::changedResources(const ResourceMap& theMap)
 {
   myModified.clear();
   ResourceMap::ConstIterator it;
   QString sec, param;
   for (it = theMap.begin(); it != theMap.end(); ++it) {
-    XGUI_Pref aPref;
+    ModuleBase_Pref aPref;
     it.key()->resource(aPref.first, aPref.second);
     myModified.append(aPref);
   }

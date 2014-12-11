@@ -1,12 +1,13 @@
 #include "XGUI_SelectionMgr.h"
 
 #include "XGUI_Workshop.h"
-#include "XGUI_MainWindow.h"
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_Selection.h"
+
+#include <AppElements_MainWindow.h>
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Session.h>

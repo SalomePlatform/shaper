@@ -3,10 +3,11 @@
  */
 
 #include "XGUI_ActionsMgr.h"
-#include "XGUI_Command.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_SalomeConnector.h"
+
+#include <AppElements_Command.h>
 
 #include <ModelAPI_Session.h>
 
@@ -44,7 +45,7 @@ void XGUI_ActionsMgr::addCommand(QAction* theCmd)
     return;
   }
   myActions.insert(aId, theCmd);
-  XGUI_Command* aXCmd = dynamic_cast<XGUI_Command*>(theCmd);
+  AppElements_Command* aXCmd = dynamic_cast<AppElements_Command*>(theCmd);
   if (aXCmd) {
     myNestedActions[aId] = aXCmd->nestedCommands();
   } else {
@@ -133,7 +134,7 @@ void XGUI_ActionsMgr::updateByDocumentKind()
   QString aDocKind = QString::fromStdString(aStdDocKind);
   XGUI_Workshop* aWorkshop = static_cast<XGUI_Workshop*>(parent());
   foreach(QAction* eachAction, myActions.values()) {
-    XGUI_Command* aCmd = dynamic_cast<XGUI_Command*>(eachAction);
+    AppElements_Command* aCmd = dynamic_cast<AppElements_Command*>(eachAction);
     QString aCmdDocKind;
     if(aCmd) {
       aCmdDocKind = aCmd->documentKind();

@@ -1,11 +1,12 @@
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_Workshop.h"
-#include "XGUI_MainWindow.h"
-#include "XGUI_ViewPort.h"
-#include "XGUI_ViewWindow.h"
-#include "XGUI_Viewer.h"
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_Displayer.h"
+
+#include <AppElements_MainWindow.h>
+#include <AppElements_ViewPort.h>
+#include <AppElements_ViewWindow.h>
+#include <AppElements_Viewer.h>
 
 XGUI_ViewerProxy::XGUI_ViewerProxy(XGUI_Workshop* theParent)
     : ModuleBase_IViewer(theParent),
@@ -36,7 +37,7 @@ Handle(V3d_View) XGUI_ViewerProxy::activeView() const
   if (myWorkshop->isSalomeMode()) {
     return myWorkshop->salomeConnector()->viewer()->activeView();
   } else {
-    XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+    AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
     return (aViewer->activeViewWindow()) ? aViewer->activeViewWindow()->viewPort()->getView() :
     Handle(V3d_View)();
   }
@@ -57,7 +58,7 @@ void XGUI_ViewerProxy::fitAll()
   if (myWorkshop->isSalomeMode()) {
     myWorkshop->salomeConnector()->viewer()->fitAll();
   } else {
-    XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+    AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
     if (aViewer->activeViewWindow())
       aViewer->activeViewWindow()->viewPort()->fitAll();
   }
@@ -104,39 +105,39 @@ void XGUI_ViewerProxy::connectToViewer()
             SIGNAL(contextMenuRequested(QContextMenuEvent*)));
 
   } else {
-    XGUI_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+    AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
 
     connect(aViewer, SIGNAL(lastViewClosed()), this, SIGNAL(lastViewClosed()));
 
-    connect(aViewer, SIGNAL(tryCloseView(XGUI_ViewWindow*)), 
-            this, SLOT(onTryCloseView(XGUI_ViewWindow*)));
+    connect(aViewer, SIGNAL(tryCloseView(AppElements_ViewWindow*)), 
+            this, SLOT(onTryCloseView(AppElements_ViewWindow*)));
 
-    connect(aViewer, SIGNAL(deleteView(XGUI_ViewWindow*)), 
-            this, SLOT(onDeleteView(XGUI_ViewWindow*)));
+    connect(aViewer, SIGNAL(deleteView(AppElements_ViewWindow*)), 
+            this, SLOT(onDeleteView(AppElements_ViewWindow*)));
 
-    connect(aViewer, SIGNAL(viewCreated(XGUI_ViewWindow*)), 
-            this, SLOT(onViewCreated(XGUI_ViewWindow*)));
+    connect(aViewer, SIGNAL(viewCreated(AppElements_ViewWindow*)), 
+            this, SLOT(onViewCreated(AppElements_ViewWindow*)));
 
-    connect(aViewer, SIGNAL(activated(XGUI_ViewWindow*)), 
-            this, SLOT(onActivated(XGUI_ViewWindow*)));
+    connect(aViewer, SIGNAL(activated(AppElements_ViewWindow*)), 
+            this, SLOT(onActivated(AppElements_ViewWindow*)));
 
-    connect(aViewer, SIGNAL(mousePress(XGUI_ViewWindow*, QMouseEvent*)), this,
-            SLOT(onMousePress(XGUI_ViewWindow*, QMouseEvent*)));
+    connect(aViewer, SIGNAL(mousePress(AppElements_ViewWindow*, QMouseEvent*)), this,
+            SLOT(onMousePress(AppElements_ViewWindow*, QMouseEvent*)));
 
-    connect(aViewer, SIGNAL(mouseRelease(XGUI_ViewWindow*, QMouseEvent*)), this,
-            SLOT(onMouseRelease(XGUI_ViewWindow*, QMouseEvent*)));
+    connect(aViewer, SIGNAL(mouseRelease(AppElements_ViewWindow*, QMouseEvent*)), this,
+            SLOT(onMouseRelease(AppElements_ViewWindow*, QMouseEvent*)));
 
-    connect(aViewer, SIGNAL(mouseDoubleClick(XGUI_ViewWindow*, QMouseEvent*)), this,
-            SLOT(onMouseDoubleClick(XGUI_ViewWindow*, QMouseEvent*)));
+    connect(aViewer, SIGNAL(mouseDoubleClick(AppElements_ViewWindow*, QMouseEvent*)), this,
+            SLOT(onMouseDoubleClick(AppElements_ViewWindow*, QMouseEvent*)));
 
-    connect(aViewer, SIGNAL(mouseMove(XGUI_ViewWindow*, QMouseEvent*)), this,
-            SLOT(onMouseMove(XGUI_ViewWindow*, QMouseEvent*)));
+    connect(aViewer, SIGNAL(mouseMove(AppElements_ViewWindow*, QMouseEvent*)), this,
+            SLOT(onMouseMove(AppElements_ViewWindow*, QMouseEvent*)));
 
-    connect(aViewer, SIGNAL(keyPress(XGUI_ViewWindow*, QKeyEvent*)), this,
-            SLOT(onKeyPress(XGUI_ViewWindow*, QKeyEvent*)));
+    connect(aViewer, SIGNAL(keyPress(AppElements_ViewWindow*, QKeyEvent*)), this,
+            SLOT(onKeyPress(AppElements_ViewWindow*, QKeyEvent*)));
 
-    connect(aViewer, SIGNAL(keyRelease(XGUI_ViewWindow*, QKeyEvent*)), this,
-            SLOT(onKeyRelease(XGUI_ViewWindow*, QKeyEvent*)));
+    connect(aViewer, SIGNAL(keyRelease(AppElements_ViewWindow*, QKeyEvent*)), this,
+            SLOT(onKeyRelease(AppElements_ViewWindow*, QKeyEvent*)));
 
     connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
     connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
@@ -145,52 +146,52 @@ void XGUI_ViewerProxy::connectToViewer()
 }
 
 
-void XGUI_ViewerProxy::onTryCloseView(XGUI_ViewWindow* theWnd)
+void XGUI_ViewerProxy::onTryCloseView(AppElements_ViewWindow* theWnd)
 {
   emit tryCloseView(theWnd);
 }
 
-void XGUI_ViewerProxy::onDeleteView(XGUI_ViewWindow* theWnd)
+void XGUI_ViewerProxy::onDeleteView(AppElements_ViewWindow* theWnd)
 {
   emit deleteView(theWnd);
 }
 
-void XGUI_ViewerProxy::onViewCreated(XGUI_ViewWindow* theWnd)
+void XGUI_ViewerProxy::onViewCreated(AppElements_ViewWindow* theWnd)
 {
   emit viewCreated(theWnd);
 }
 
-void XGUI_ViewerProxy::onActivated(XGUI_ViewWindow* theWnd)
+void XGUI_ViewerProxy::onActivated(AppElements_ViewWindow* theWnd)
 {
   emit activated(theWnd);
 }
 
-void XGUI_ViewerProxy::onMousePress(XGUI_ViewWindow* theWnd, QMouseEvent* theEvent)
+void XGUI_ViewerProxy::onMousePress(AppElements_ViewWindow* theWnd, QMouseEvent* theEvent)
 {
   emit mousePress(theWnd, theEvent);
 }
 
-void XGUI_ViewerProxy::onMouseRelease(XGUI_ViewWindow* theWnd, QMouseEvent* theEvent)
+void XGUI_ViewerProxy::onMouseRelease(AppElements_ViewWindow* theWnd, QMouseEvent* theEvent)
 {
   emit mouseRelease(theWnd, theEvent);
 }
 
-void XGUI_ViewerProxy::onMouseDoubleClick(XGUI_ViewWindow* theWnd, QMouseEvent* theEvent)
+void XGUI_ViewerProxy::onMouseDoubleClick(AppElements_ViewWindow* theWnd, QMouseEvent* theEvent)
 {
   emit mouseDoubleClick(theWnd, theEvent);
 }
 
-void XGUI_ViewerProxy::onMouseMove(XGUI_ViewWindow* theWnd, QMouseEvent* theEvent)
+void XGUI_ViewerProxy::onMouseMove(AppElements_ViewWindow* theWnd, QMouseEvent* theEvent)
 {
   emit mouseMove(theWnd, theEvent);
 }
 
-void XGUI_ViewerProxy::onKeyPress(XGUI_ViewWindow* theWnd, QKeyEvent* theEvent)
+void XGUI_ViewerProxy::onKeyPress(AppElements_ViewWindow* theWnd, QKeyEvent* theEvent)
 {
   emit keyPress(theWnd, theEvent);
 }
 
-void XGUI_ViewerProxy::onKeyRelease(XGUI_ViewWindow* theWnd, QKeyEvent* theEvent)
+void XGUI_ViewerProxy::onKeyRelease(AppElements_ViewWindow* theWnd, QKeyEvent* theEvent)
 {
   emit keyRelease(theWnd, theEvent);
 }

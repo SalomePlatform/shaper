@@ -2,7 +2,7 @@
 #define XGUI_WORKSHOP_H
 
 #include "XGUI.h"
-#include "XGUI_Constants.h"
+//#include "XGUI_Constants.h"
 #include <Events_Listener.h>
 #include <ModuleBase_Definitions.h>
 #include <ModelAPI_Document.h>
@@ -13,9 +13,10 @@
 #include <QKeySequence>
 #include <QIcon>
 
-class XGUI_MainWindow;
-class XGUI_Command;
-class XGUI_Workbench;
+class AppElements_MainWindow;
+class AppElements_Command;
+class AppElements_Workbench;
+
 class XGUI_SelectionMgr;
 class XGUI_Displayer;
 class XGUI_OperationMgr;
@@ -60,7 +61,7 @@ Q_OBJECT
   void startApplication();
 
   //! Returns main window (Desktop) of the application
-  XGUI_MainWindow* mainWindow() const
+  AppElements_MainWindow* mainWindow() const
   {
     return myMainWindow;
   }
@@ -103,7 +104,7 @@ Q_OBJECT
   }
 
   //! Creates and adds a new workbench (menu group) with the given name and returns it
-  XGUI_Workbench* addWorkbench(const QString& theName);
+  AppElements_Workbench* addWorkbench(const QString& theName);
 
   //! Redefinition of Events_Listener method
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
@@ -266,7 +267,7 @@ signals:
   // Creates Dock widgets: Object browser and Property panel
   void createDockWidgets();
 
-  XGUI_MainWindow* myMainWindow;
+  AppElements_MainWindow* myMainWindow;
   ModuleBase_IModule* myModule;
   XGUI_ObjectsBrowser* myObjectBrowser;
   XGUI_PropertyPanel* myPropertyPanel;

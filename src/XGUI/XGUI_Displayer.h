@@ -23,7 +23,6 @@
 #include <QString>
 #include <QMap>
 
-class XGUI_Viewer;
 class ModelAPI_Feature;
 class XGUI_Workshop;
 

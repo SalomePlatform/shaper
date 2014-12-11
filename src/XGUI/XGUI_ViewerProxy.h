@@ -5,7 +5,7 @@
 #include <ModuleBase_IViewer.h>
 
 class XGUI_Workshop;
-class XGUI_ViewWindow;
+class AppElements_ViewWindow;
 
 /**
  * Proxy class which repersents or XGUI_Viewer or Salome Viewer
@@ -62,18 +62,18 @@ Q_OBJECT
   virtual void clearSelectionFilters();
 
 private slots:
-  void onTryCloseView(XGUI_ViewWindow*);
-  void onDeleteView(XGUI_ViewWindow*);
-  void onViewCreated(XGUI_ViewWindow*);
-  void onActivated(XGUI_ViewWindow*);
+  void onTryCloseView(AppElements_ViewWindow*);
+  void onDeleteView(AppElements_ViewWindow*);
+  void onViewCreated(AppElements_ViewWindow*);
+  void onActivated(AppElements_ViewWindow*);
 
-  void onMousePress(XGUI_ViewWindow*, QMouseEvent*);
-  void onMouseRelease(XGUI_ViewWindow*, QMouseEvent*);
-  void onMouseDoubleClick(XGUI_ViewWindow*, QMouseEvent*);
-  void onMouseMove(XGUI_ViewWindow*, QMouseEvent*);
+  void onMousePress(AppElements_ViewWindow*, QMouseEvent*);
+  void onMouseRelease(AppElements_ViewWindow*, QMouseEvent*);
+  void onMouseDoubleClick(AppElements_ViewWindow*, QMouseEvent*);
+  void onMouseMove(AppElements_ViewWindow*, QMouseEvent*);
 
-  void onKeyPress(XGUI_ViewWindow*, QKeyEvent*);
-  void onKeyRelease(XGUI_ViewWindow*, QKeyEvent*);
+  void onKeyPress(AppElements_ViewWindow*, QKeyEvent*);
+  void onKeyRelease(AppElements_ViewWindow*, QKeyEvent*);
 
  private:
   XGUI_Workshop* myWorkshop;

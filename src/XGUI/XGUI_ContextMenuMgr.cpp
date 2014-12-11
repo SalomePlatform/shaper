@@ -3,11 +3,12 @@
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_Displayer.h"
-#include "XGUI_MainWindow.h"
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_Selection.h"
 
-#include "PartSetPlugin_Part.h"
+#include <AppElements_MainWindow.h>
+
+//#include "PartSetPlugin_Part.h"
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeDocRef.h>

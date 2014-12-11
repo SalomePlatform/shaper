@@ -2,7 +2,6 @@
 #define XGUI_DataTreeModel_H
 
 #include "XGUI.h"
-#include "XGUI_Constants.h"
 
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>

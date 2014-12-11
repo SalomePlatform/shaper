@@ -30,6 +30,8 @@ SET(PROJECT_HEADERS
 	ModuleBase_ResultPrs.h
 	ModuleBase_IViewWindow.h
 	ModuleBase_WidgetLabel.h
+	ModuleBase_IPrefMgr.h
+	ModuleBase_Preferences.h
 )
 
 SET(PROJECT_SOURCES
@@ -52,6 +54,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_ViewerFilters.cpp
 	ModuleBase_ResultPrs.cpp
 	ModuleBase_WidgetLabel.cpp
+	ModuleBase_Preferences.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -63,6 +66,8 @@ SET(PROJECT_LIBRARIES
 	${CAS_VIEWER}
 	${CAS_KERNEL}
 	${CAS_SHAPE}
+	${suit}
+	${qtx}
 )
 
 SET(PROJECT_AUTOMOC 
@@ -84,6 +89,7 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_SOURCE_DIR}/src/GeomDataAPI
     ${CMAKE_SOURCE_DIR}/src/GeomAPI
     ${CMAKE_SOURCE_DIR}/src/GeomAlgoAPI
+    ${SUIT_INCLUDE}
 )
 
 ADD_DEFINITIONS(-DMODULEBASE_EXPORTS ${CAS_DEFINITIONS})

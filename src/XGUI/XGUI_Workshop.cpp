@@ -1,13 +1,6 @@
-#include "ModuleBase_IModule.h"
-#include "XGUI_Constants.h"
-#include "XGUI_Command.h"
-#include "XGUI_MainMenu.h"
-#include "XGUI_MainWindow.h"
-#include "XGUI_MenuGroupPanel.h"
+//#include "XGUI_Constants.h"
 #include "XGUI_Tools.h"
-#include "XGUI_Workbench.h"
 #include "XGUI_Workshop.h"
-#include "XGUI_Viewer.h"
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_Selection.h"
 #include "XGUI_ObjectsBrowser.h"
@@ -20,8 +13,17 @@
 #include "XGUI_PropertyPanel.h"
 #include "XGUI_ContextMenuMgr.h"
 #include "XGUI_ModuleConnector.h"
-#include "XGUI_Preferences.h"
 #include <XGUI_QtEvents.h>
+
+#include <AppElements_Workbench.h>
+#include <AppElements_Viewer.h>
+#include <AppElements_Command.h>
+#include <AppElements_MainMenu.h>
+#include <AppElements_MainWindow.h>
+#include <AppElements_MenuGroupPanel.h>
+
+#include <ModuleBase_IModule.h>
+#include <ModuleBase_Preferences.h>
 
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
@@ -33,7 +35,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
 
-#include <PartSetPlugin_Part.h>
+//#include <PartSetPlugin_Part.h>
 
 #include <Events_Loop.h>
 #include <Events_Error.h>
@@ -122,7 +124,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
       myUpdatePrefs(false),
       myPartActivating(false)
 {
-  myMainWindow = mySalomeConnector ? 0 : new XGUI_MainWindow();
+  myMainWindow = mySalomeConnector ? 0 : new AppElements_MainWindow();
 
   myDisplayer = new XGUI_Displayer(this);
 
@@ -187,7 +189,7 @@ void XGUI_Workshop::startApplication()
   registerValidators();
   // Calling of  loadCustomProps before activating module is required
   // by Config_PropManger to restore user-defined path to plugins
-  XGUI_Preferences::loadCustomProps();
+  ModuleBase_Preferences::loadCustomProps();
   activateModule();
   if (myMainWindow) {
     myMainWindow->show();
@@ -234,9 +236,9 @@ void XGUI_Workshop::initMenu()
     return;
   }
   // File commands group
-  XGUI_MenuGroupPanel* aGroup = myMainWindow->menuObject()->generalPage();
+  AppElements_MenuGroupPanel* aGroup = myMainWindow->menuObject()->generalPage();
 
-  XGUI_Command* aCommand;
+  AppElements_Command* aCommand;
 
   aCommand = aGroup->addFeature("SAVE_CMD", tr("Save..."), tr("Save the document"),
                                 QIcon(":pictures/save.png"), QKeySequence::Save);
@@ -284,9 +286,9 @@ void XGUI_Workshop::initMenu()
 }
 
 //******************************************************
-XGUI_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
+AppElements_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 {
-  XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
+  AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
   return aMenuBar->addWorkbench(theName);
 }
 
@@ -650,14 +652,14 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
     myModule->actionCreated(aAction);
   } else {
 
-    XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
-    XGUI_Workbench* aPage = aMenuBar->findWorkbench(aWchName);
+    AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
+    AppElements_Workbench* aPage = aMenuBar->findWorkbench(aWchName);
     if (!aPage) {
       aPage = addWorkbench(aWchName);
     }
     //Find or create Group
     QString aGroupName = QString::fromStdString(theMessage->groupId());
-    XGUI_MenuGroupPanel* aGroup = aPage->findGroup(aGroupName);
+    AppElements_MenuGroupPanel* aGroup = aPage->findGroup(aGroupName);
     if (!aGroup) {
       aGroup = aPage->addGroup(aGroupName);
     }
@@ -666,7 +668,7 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
     QKeySequence aHotKey = myActionsMgr->registerShortcut(
         QString::fromStdString(theMessage->keysequence()));
     // Create feature...
-    XGUI_Command* aCommand = aGroup->addFeature(aFeatureId,
+    AppElements_Command* aCommand = aGroup->addFeature(aFeatureId,
                                                 QString::fromStdString(theMessage->text()),
                                                 QString::fromStdString(theMessage->tooltip()),
                                                 QIcon(theMessage->icon().c_str()),
@@ -690,7 +692,7 @@ void XGUI_Workshop::connectWithOperation(ModuleBase_Operation* theOperation)
   if (isSalomeMode()) {
     aCommand = salomeConnector()->command(theOperation->getDescription()->operationId());
   } else {
-    XGUI_MainMenu* aMenu = myMainWindow->menuObject();
+    AppElements_MainMenu* aMenu = myMainWindow->menuObject();
     FeaturePtr aFeature = theOperation->feature();
     if(aFeature)
       aCommand = aMenu->feature(QString::fromStdString(aFeature->getKind()));
@@ -890,17 +892,17 @@ void XGUI_Workshop::onRebuild()
 //******************************************************
 void XGUI_Workshop::onPreferences()
 {
-  XGUI_Prefs aModif;
-  XGUI_Preferences::editPreferences(aModif);
+  ModuleBase_Prefs aModif;
+  ModuleBase_Preferences::editPreferences(aModif);
   if (aModif.size() > 0) {
     QString aSection;
-    foreach (XGUI_Pref aPref, aModif)
+    foreach (ModuleBase_Pref aPref, aModif)
     {
       aSection = aPref.first;
-      if (aSection == XGUI_Preferences::VIEWER_SECTION) {
+      if (aSection == ModuleBase_Preferences::VIEWER_SECTION) {
         if (!isSalomeMode())
           myMainWindow->viewer()->updateFromResources();
-      } else if (aSection == XGUI_Preferences::MENU_SECTION) {
+      } else if (aSection == ModuleBase_Preferences::MENU_SECTION) {
         if (!isSalomeMode())
           myMainWindow->menuObject()->updateFromResources();
       }
@@ -987,8 +989,8 @@ void XGUI_Workshop::updateCommandStatus()
   if (isSalomeMode()) {  // update commands in SALOME mode
     aCommands = salomeConnector()->commandList();
   } else {
-    XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
-    foreach (XGUI_Command* aCmd, aMenuBar->features())
+    AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
+    foreach (AppElements_Command* aCmd, aMenuBar->features())
       aCommands.append(aCmd);
   }
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -1027,8 +1029,8 @@ QList<QAction*> XGUI_Workshop::getModuleCommands() const
   if (isSalomeMode()) {  // update commands in SALOME mode
     aCommands = salomeConnector()->commandList();
   } else {
-    XGUI_MainMenu* aMenuBar = myMainWindow->menuObject();
-    foreach(XGUI_Command* aCmd, aMenuBar->features())
+    AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
+    foreach(AppElements_Command* aCmd, aMenuBar->features())
     {
       aCommands.append(aCmd);
     }
@@ -1074,9 +1076,9 @@ void XGUI_Workshop::createDockWidgets()
   aDesktop->tabifyDockWidget(aObjDock, myPropertyPanel);
   myPropertyPanel->installEventFilter(myOperationMgr);
 
-  QPushButton* aOkBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_OK);
+  QPushButton* aOkBtn = myPropertyPanel->findChild<QPushButton*>(PROP_PANEL_OK);
   connect(aOkBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onCommitOperation()));
-  QPushButton* aCancelBtn = myPropertyPanel->findChild<QPushButton*>(XGUI::PROP_PANEL_CANCEL);
+  QPushButton* aCancelBtn = myPropertyPanel->findChild<QPushButton*>(PROP_PANEL_CANCEL);
   connect(aCancelBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onAbortOperation()));
   connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)), myOperationMgr,
           SLOT(onKeyReleased(QKeyEvent*)));

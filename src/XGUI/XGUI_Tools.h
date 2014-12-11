@@ -34,28 +34,12 @@ QString XGUI_EXPORT dir(const QString& path, bool isAbs = true);
 QString XGUI_EXPORT file(const QString& path, bool withExt = true);
 
 /*!
- \brief Return extension part of the file path.
-
- \param path file path
- \param full if true complete extension (all extensions, dot separated)
- is returned, otherwise (default) only last extension is returned
- \return extension part of the file path 
- */
-QString XGUI_EXPORT extension(const QString& path, bool full = false);
-
-/*!
  \brief Add a slash (platform-specific) to the end of \a path
  if it is not already there.
  \param path directory path
  \return modified path (with slash added to the end)
  */
 QString XGUI_EXPORT addSlash(const QString& path);
-
-/*! 
- Creates a rect with TopLeft = ( min(x1,x2), min(y1,y2) )
- and BottomRight = ( TopLeft + (x2-x1)(y2-y1) )    
- */
-QRect XGUI_EXPORT makeRect(const int x1, const int y1, const int x2, const int y2);
 
 /// The model concerning tools
 

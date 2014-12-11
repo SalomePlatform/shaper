@@ -34,12 +34,6 @@ QString file(const QString& path, bool withExt)
 }
 
 //******************************************************************
-QString extension(const QString& path, bool full)
-{
-  return full ? QFileInfo(path).completeSuffix() : QFileInfo(path).suffix();
-}
-
-//******************************************************************
 QString addSlash(const QString& path)
 {
   QString res = path;
@@ -47,12 +41,6 @@ QString addSlash(const QString& path)
       && res.at(res.length() - 1) != QChar('\\'))
     res += QDir::separator();
   return res;
-}
-
-//******************************************************************
-QRect makeRect(const int x1, const int y1, const int x2, const int y2)
-{
-  return QRect(qMin(x1, x2), qMin(y1, y2), qAbs(x2 - x1), qAbs(y2 - y1));
 }
 
 //******************************************************************

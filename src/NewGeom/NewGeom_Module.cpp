@@ -6,11 +6,11 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ContextMenuMgr.h>
-#include <XGUI_Preferences.h>
 #include <XGUI_ObjectsBrowser.h>
 #include <XGUI_OperationMgr.h>
 
 #include <ModuleBase_Operation.h>
+#include <ModuleBase_Preferences.h>
 
 #include <LightApp_Application.h>
 #include <LightApp_SelectionMgr.h>
@@ -45,7 +45,7 @@ NewGeom_EXPORT char* getModuleVersion()
 }
 }
 
-class NewGeom_PrefMgr: public XGUI_IPrefMgr
+class NewGeom_PrefMgr: public ModuleBase_IPrefMgr
 {
 public:
   NewGeom_PrefMgr(LightApp_Preferences* theMgr, const QString& theModName):myMgr(theMgr), myModName(theModName) {}
@@ -83,8 +83,8 @@ NewGeom_Module::NewGeom_Module()
   myWorkshop = new XGUI_Workshop(this);
   myProxyViewer = new NewGeom_SalomeViewer(this);
 
-  XGUI_Preferences::setResourceMgr(application()->resourceMgr());
-  XGUI_Preferences::loadCustomProps();
+  ModuleBase_Preferences::setResourceMgr(application()->resourceMgr());
+  ModuleBase_Preferences::loadCustomProps();
 }
 
 //******************************************************
@@ -225,8 +225,8 @@ QtxPopupMgr* NewGeom_Module::popupMgr()
 //******************************************************
 void NewGeom_Module::onDefaultPreferences()
 {
-  XGUI_Preferences::resetConfig();
-  XGUI_Preferences::updateResourcesByConfig();
+  ModuleBase_Preferences::resetConfig();
+  ModuleBase_Preferences::updateResourcesByConfig();
 
   LightApp_Preferences* pref = preferences();
   if (pref)
@@ -399,7 +399,7 @@ void NewGeom_Module::createPreferences()
   LightApp_Preferences* pref = preferences();
   if (!pref)
     return;
-  XGUI_Preferences::updateConfigByResources();
+  ModuleBase_Preferences::updateConfigByResources();
   QString aModName = moduleName();
 
   QtxPreferenceItem* item = pref->findItem(aModName, true );
@@ -412,7 +412,7 @@ void NewGeom_Module::createPreferences()
   if ( catId == -1 )
     return;
   NewGeom_PrefMgr aMgr(pref, aModName);
-  XGUI_Preferences::createEditContent(&aMgr, catId);
+  ModuleBase_Preferences::createEditContent(&aMgr, catId);
   pref->retrieve();
 }
 

@@ -13,7 +13,6 @@
 #include <QStringList>
 #include <QKeySequence>
 
-class XGUI_Command;
 class XGUI_Workshop;
 class XGUI_OperationMgr;
 class ModuleBase_Operation;
