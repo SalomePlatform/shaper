@@ -259,7 +259,15 @@ signals:
   /// SLOT, that is called after the operation is stopped. Update workshop state, e.g.
   /// hides the property panel and udpate the command status.
   /// \param theOpertion a stopped operation
-  void onOperationStopped(ModuleBase_Operation* theOperation);
+  virtual void onOperationStopped(ModuleBase_Operation* theOperation);
+
+  /// SLOT, that is called after the operation is committed.
+  /// \param theOpertion a commmitted operation
+  virtual void onOperationCommitted(ModuleBase_Operation* theOperation);
+
+  /// SLOT, that is called after the operation is aborted.
+  /// \param theOpertion an aborted operation
+  void onOperationAborted(ModuleBase_Operation* theOperation);
 
   void onContextMenuCommand(const QString& theId, bool isChecked);
 

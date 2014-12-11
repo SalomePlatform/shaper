@@ -149,7 +149,7 @@ void PartSet_Module::registerFilters()
   aFactory->registerFilter("LinearEdgeFilter", new ModuleBase_FilterLinearEdge);
 }
 
-void PartSet_Module::onOperationComitted(ModuleBase_Operation* theOperation) 
+void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 
 {
   if (theOperation->isEditOperation())
     return;
@@ -173,7 +173,7 @@ void PartSet_Module::breakOperationSequence()
   myRestartingMode = RM_None;
 }
 
-void PartSet_Module::onOperationAborted(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
 {
   breakOperationSequence();
 }
@@ -218,7 +218,7 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
   myWorkshop->viewer()->addSelectionFilter(myDocumentShapeFilter);
 }
 
-void PartSet_Module::onOperationStopped(ModuleBase_Operation* theOperation)
+void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 {
   if (theOperation->id().toStdString() == SketchPlugin_Sketch::ID()) {
     DataPtr aData = myCurrentSketch->data();

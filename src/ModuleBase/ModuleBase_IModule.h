@@ -53,6 +53,15 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theOperation a resumed operation
   virtual void operationResumed(ModuleBase_Operation* theOperation) {}
 
+  /// Realizes some functionality by an operation stop
+  virtual void operationStopped(ModuleBase_Operation* theOperation) {}
+
+  /// Realizes some functionality by an operation commit
+  virtual void operationCommitted(ModuleBase_Operation* theOperation) {}
+
+  /// Realizes some functionality by an operation abort
+  virtual void operationAborted(ModuleBase_Operation* theOperation) {}
+
   /// Called when it is necessary to update a command state (enable or disable it)
   //virtual bool isFeatureEnabled(const QString& theCmdId) const = 0;
 
@@ -74,16 +83,6 @@ public slots:
   void onFeatureTriggered();
 
 protected slots:
-  /// SLOT, that is called after the operation is stopped. Switched off the modfications performed
-  /// by the operation start
-  virtual void onOperationStopped(ModuleBase_Operation* theOperation) {}
-
-
-  virtual void onOperationComitted(ModuleBase_Operation* theOperation) {}
-
-  virtual void onOperationAborted(ModuleBase_Operation* theOperation) {}
-
-
   /// Called on selection changed event
   virtual void onSelectionChanged() {}
 

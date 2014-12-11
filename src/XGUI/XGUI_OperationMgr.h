@@ -99,8 +99,8 @@ signals:
   /// Signal about an operation is resumed. It is emitted after the resume() of operation is done.
   void operationResumed(ModuleBase_Operation* theOperation);
 
-  /// Emitted when current operation is comitted
-  void operationComitted(ModuleBase_Operation* theOperation);
+  /// Emitted when current operation is Committed
+  void operationCommitted(ModuleBase_Operation* theOperation);
 
   /// Emitted when current operation is aborted
   void operationAborted(ModuleBase_Operation* theOperation);
@@ -137,7 +137,7 @@ signals:
   void onOperationStopped();
   void onOperationStarted();
   void onOperationAborted();
-  void onOperationComitted();
+  void onOperationCommitted();
   void onOperationResumed();
 
  private:
