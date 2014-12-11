@@ -432,7 +432,7 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
     }
   }
 
-  ModuleBase_FilterFactory* aFactory = myWorkshop->selectionFilters();
+  /*ModuleBase_FilterFactory* aFactory = myWorkshop->selectionFilters();
   const SelectMgr_ListOfFilter& aFilters = aFactory->filters(parentID(), attributeID());
   SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
   for (; aIt.More(); aIt.Next()) {
@@ -441,7 +441,7 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
       aViewer->addSelectionFilter(aFilter);
     else
       aViewer->removeSelectionFilter(aFilter);
-  }
+  }*/
 }
 
 //********************************************************************
