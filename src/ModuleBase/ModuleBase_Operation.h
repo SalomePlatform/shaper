@@ -100,11 +100,6 @@ Q_OBJECT
   */
   virtual bool isValid() const;
 
-  /// Returns whether the nested operations are enabled.
-  /// The state can depend on the operation current state.
-  /// \return enabled state
-  virtual bool isNestedOperationsEnabled() const;
-
   /// Sets the operation feature
   void setFeature(FeaturePtr theFeature);
 

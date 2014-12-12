@@ -18,6 +18,9 @@
 #include <ModelAPI_AttributeReference.h>
 
 #include <list>
+#ifdef _DEBUG
+#include <iostream>
+#endif
 
 int shapesNbPoints(const ModuleBase_ISelection* theSelection)
 {
@@ -55,7 +58,7 @@ int shapesNbLines(const ModuleBase_ISelection* theSelection)
 
 bool PartSet_DistanceValidator::isValid(const ModuleBase_ISelection* theSelection) const
 {
-  int aCount = shapesNbPoints(theSelection);
+  int aCount = shapesNbPoints(theSelection) + shapesNbLines(theSelection);
   return (aCount > 0) && (aCount < 3);
 }
 
@@ -98,7 +101,11 @@ bool PartSet_RadiusValidator::isValid(const ModuleBase_ISelection* theSelection)
   return (aCount > 0) && (aCount < 2);
 }
 
-
+bool PartSet_RigidValidator::isValid(const ModuleBase_ISelection* theSelection) const
+{
+  int aCount = shapesNbLines(theSelection);
+  return (aCount > 0) && (aCount < 2);
+}
 
 bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature, 
                                                 const std::list<std::string>& theArguments,

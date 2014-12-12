@@ -15,7 +15,6 @@ SET(PROJECT_HEADERS
 	PartSet_WidgetPoint2d.h
 	PartSet_WidgetPoint2dDistance.h
 	PartSet_WidgetShapeSelector.h
-	PartSet_OperationSketch.h
 	PartSet_Filters.h
 )
 
@@ -28,7 +27,6 @@ SET(PROJECT_SOURCES
 	PartSet_WidgetPoint2d.cpp
 	PartSet_WidgetPoint2dDistance.cpp
 	PartSet_WidgetShapeSelector.cpp
-	PartSet_OperationSketch.cpp
 	PartSet_Filters.cpp
 )
 

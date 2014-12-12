@@ -9,11 +9,13 @@
 
 #include <ModelAPI.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Feature.h>
 #include <Events_MessageGroup.h>
 
 #include <memory>
 #include <string>
 #include <set>
+#include <map>
 
 
 class ModelAPI_Document;
@@ -36,6 +38,9 @@ static const char * EVENT_PLUGIN_LOADED = "PliginLoaded";
 static const char * EVENT_OBJECT_TOSHOW = "ObjectShow";
 /// Event ID that data of feature has to be shown (comes with ModelAPI_ObjectUpdatedMessage)
 static const char * EVENT_OBJECT_TOHIDE = "ObjectHide";
+
+static const char * EVENT_FEATURE_STATE_REQUEST = "FeatureStateRequest";
+static const char * EVENT_FEATURE_STATE_RESPONSE = "FeatureStateResponse";
 
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
@@ -92,6 +97,29 @@ class MODELAPI_EXPORT ModelAPI_EventCreator
 
   /// sets the creator instance
   static void set(const ModelAPI_EventCreator* theCreator);
+};
+
+// TODO(sbh): Move this message into a separate package, like "GuiAPI"
+class ModelAPI_FeatureStateMessage : public Events_Message
+{
+ public:
+  MODELAPI_EXPORT ModelAPI_FeatureStateMessage(const Events_ID theID, const void* theSender = 0);
+  MODELAPI_EXPORT virtual ~ModelAPI_FeatureStateMessage();
+
+  // For request
+  MODELAPI_EXPORT std::shared_ptr<ModelAPI_Feature> feature() const;
+  MODELAPI_EXPORT void setFeature(std::shared_ptr<ModelAPI_Feature>& theFeature);
+  // For response
+  MODELAPI_EXPORT bool hasState(const std::string& theFeatureId) const;
+  MODELAPI_EXPORT bool state(const  std::string& theFeatureId, bool theDefault = false) const;
+  MODELAPI_EXPORT void setState(const std::string& theFeatureId, bool theValue);
+  MODELAPI_EXPORT std::list<std::string> features() const;
+
+ private:
+  // For Request
+  std::shared_ptr<ModelAPI_Feature> myCurrentFeature;
+  // For response
+  std::map<std::string, bool> myFeatureState;
 };
 
 #endif

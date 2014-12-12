@@ -89,7 +89,8 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   virtual bool isConcealed(std::string theFeature, std::string theAttribute);
 
 protected:
-  void addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators) const;
+  void addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators,
+                            std::list<std::list<std::string> >& theArguments) const;
   /// Get instance from Session
   Model_ValidatorsFactory();
 
