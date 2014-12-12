@@ -107,6 +107,9 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
   /// Set line type of edges
   /// Has to be defined according to Aspect_TypeOfLine
   void setLineStyle(int theStyle);
+
+  /// Set transparency of the presentation (theVal = 0 ... 1)
+  void setTransparensy(double theVal);
 };
 
 //! Pointer on attribute object

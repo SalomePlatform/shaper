@@ -51,6 +51,9 @@ class GEOMAPI_EXPORT GeomAPI_Pnt : public GeomAPI_Interface
   std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
                                         const std::shared_ptr<GeomAPI_Dir>& theDirX,
                                         const std::shared_ptr<GeomAPI_Dir>& theDirY);
+
+  /// Translates the point along direction theDir on distance theDist
+  void translate(const std::shared_ptr<GeomAPI_Dir>& theDir, double theDist);
 };
 
 #endif

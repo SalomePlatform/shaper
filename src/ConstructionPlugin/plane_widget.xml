@@ -1,0 +1,13 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <shape_selector id="planeFace" 
+                  label="Plane face" 
+                  tooltip="Select a planar face for plane definition"
+                  shape_types="face"
+                  use_subshapes="true" />
+  <doublevalue id="distance" 
+               label="Distance" 
+               tooltip="Distance from selected face to plane" 
+               default="0" />
+</source>

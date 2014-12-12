@@ -73,3 +73,12 @@ std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Pnt::to2D(const std::shared_ptr<GeomAPI_P
   double aY = aVec.X() * theDirY->x() + aVec.Y() * theDirY->y() + aVec.Z() * theDirY->z();
   return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, aY));
 }
+
+
+void GeomAPI_Pnt::translate(const std::shared_ptr<GeomAPI_Dir>& theDir, double theDist)
+{
+  gp_Vec aVec(theDir->impl<gp_Dir>());
+  aVec.Normalize();
+  aVec.Multiply(theDist);
+  MY_PNT->Translate(aVec);
+}

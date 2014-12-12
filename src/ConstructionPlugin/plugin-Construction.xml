@@ -21,9 +21,9 @@
         id="Plane"
         title="Plane"
         tooltip="Create a new plane"
-        icon=":icons/plane.png"
-        keysequence=""
-        internal="true" />
+        icon=":icons/plane.png">
+        <source path="plane_widget.xml" />
+      </feature>
     </group>
   </workbench>
 </plugin>

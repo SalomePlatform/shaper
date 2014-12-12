@@ -88,14 +88,15 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
     myResult2AISObjectMap[theObject] = theAIS;
+    aContext->Display(anAISIO, false);
+    aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, false);
+
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     if (aFeature.get() != NULL) {
       GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
       if (aCustPrs.get() != NULL)
         aCustPrs->customisePresentation(theAIS);
     }
-    aContext->Display(anAISIO, false);
-    aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, isUpdateViewer);
     if (aContext->HasOpenedContext()) {
       if (myUseExternalObjects) {
         if (myActiveSelectionModes.size() == 0)
@@ -108,6 +109,8 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
       }
     }
   }
+  if (isUpdateViewer)
+    updateViewer();
 }
 
 void XGUI_Displayer::erase(ObjectPtr theObject, const bool isUpdateViewer)

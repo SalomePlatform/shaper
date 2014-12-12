@@ -15,7 +15,7 @@
 
 using namespace std;
 
-static const double MINIMAL_LENGTH      = 1.e-5;
+static const double MINIMAL_LENGTH = 1.e-5;
 
 ConstructionPlugin_Axis::ConstructionPlugin_Axis()
 {

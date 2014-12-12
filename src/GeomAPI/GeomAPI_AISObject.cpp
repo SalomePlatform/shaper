@@ -20,6 +20,7 @@
 #include <BRepBndLib.hxx>
 
 #include <AIS_InteractiveObject.hxx>
+#include <AIS_InteractiveContext.hxx>
 #include <AIS_LengthDimension.hxx>
 #include <AIS_ParallelRelation.hxx>
 #include <AIS_PerpendicularRelation.hxx>
@@ -336,9 +337,16 @@ void GeomAPI_AISObject::setLineStyle(int theStyle)
       aDrawer->LineAspect()->SetTypeOfLine((Aspect_TypeOfLine)theStyle);
     if (aDrawer->HasWireAspect())
       aDrawer->WireAspect()->SetTypeOfLine((Aspect_TypeOfLine)theStyle);
-    //else {
-    //  Quantity_NameOfColor aCol = Quantity_NOC_RED;
-    //  aDrawer->SetLineAspect(new Prs3d_LineAspect(aCol, (Aspect_TypeOfLine)theStyle, 1));
-    //}
+  }
+}
+
+
+void GeomAPI_AISObject::setTransparensy(double theVal)
+{
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
+    if (!aContext.IsNull())
+      aContext->SetTransparency(anAIS, theVal, false);
   }
 }
