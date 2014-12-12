@@ -1,0 +1,17 @@
+<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
+
+<source>
+  <shape_selector id="firstPoint" 
+    label="First point" 
+    icon=":icons/point.png" 
+    tooltip="Select a first point for the axis"
+    shape_types="vertex"
+  />
+  <shape_selector id="secondPoint"
+    label="Second point"
+    icon=":icons/point.png"
+    tooltip="Select a second point for the axis"
+    shape_types="vertex">
+    <validator id="PartSet_DifferentObjects"/>
+  </shape_selector>
+</source>

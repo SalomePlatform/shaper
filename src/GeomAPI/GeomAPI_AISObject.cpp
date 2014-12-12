@@ -325,3 +325,20 @@ void GeomAPI_AISObject::setPointMarker(int theType, double theScale)
     }
   }
 }
+
+
+void GeomAPI_AISObject::setLineStyle(int theStyle)
+{
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    Handle(AIS_Drawer) aDrawer = anAIS->Attributes();
+    if (aDrawer->HasLineAspect())
+      aDrawer->LineAspect()->SetTypeOfLine((Aspect_TypeOfLine)theStyle);
+    if (aDrawer->HasWireAspect())
+      aDrawer->WireAspect()->SetTypeOfLine((Aspect_TypeOfLine)theStyle);
+    //else {
+    //  Quantity_NameOfColor aCol = Quantity_NOC_RED;
+    //  aDrawer->SetLineAspect(new Prs3d_LineAspect(aCol, (Aspect_TypeOfLine)theStyle, 1));
+    //}
+  }
+}

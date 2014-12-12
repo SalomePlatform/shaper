@@ -34,13 +34,6 @@ class ConstructionPlugin_Point : public ModelAPI_Feature
     return MY_KIND;
   }
 
-  /// Returns to which group in the document must be added feature
-  CONSTRUCTIONPLUGIN_EXPORT virtual const std::string& getGroup()
-  {
-    static std::string MY_GROUP = "Construction";
-    return MY_GROUP;
-  }
-
   /// Creates a new part document if needed
   CONSTRUCTIONPLUGIN_EXPORT virtual void execute();
 

@@ -103,6 +103,10 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
   /// Sets marker type for vertex.
   /// The type has to be defined according to Acpect_TypeOfMarker
   void setPointMarker(int theType, double theScale);
+
+  /// Set line type of edges
+  /// Has to be defined according to Aspect_TypeOfLine
+  void setLineStyle(int theStyle);
 };
 
 //! Pointer on attribute object

@@ -14,9 +14,9 @@
         id="Axis"
         title="Axis"
         tooltip="Create a new axis"
-        icon=":icons/axis.png"
-        keysequence=""
-        internal="true" />
+        icon=":icons/axis.png">
+        <source path="axis_widget.xml" />
+      </feature>
       <feature
         id="Plane"
         title="Plane"

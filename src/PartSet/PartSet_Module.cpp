@@ -542,7 +542,7 @@ void PartSet_Module::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* t
 void PartSet_Module::onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if (aOperation->isEditOperation()) {
+  if (aOperation && aOperation->isEditOperation()) {
     std::string aId = aOperation->id().toStdString();
     if ((aId == SketchPlugin_ConstraintLength::ID()) ||
       (aId == SketchPlugin_ConstraintDistance::ID()) ||
