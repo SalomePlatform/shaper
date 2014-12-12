@@ -90,7 +90,7 @@ void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
       }
     }
   }
-  addDefaultValidators(theResult);
+  addDefaultValidators(theResult, theArguments);
 }
 
 void Model_ValidatorsFactory::validators(const std::string& theFeatureID,
@@ -134,13 +134,15 @@ const ModelAPI_Validator* Model_ValidatorsFactory::validator(const std::string& 
   return NULL;
 }
 
-void Model_ValidatorsFactory::addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators) const
+void Model_ValidatorsFactory::addDefaultValidators(std::list<ModelAPI_Validator*>& theValidators,
+  std::list<std::list<std::string> >& theArguments) const
 {
   const static std::string kDefaultId = "Model_FeatureValidator";
   std::map<std::string, ModelAPI_Validator*>::const_iterator it = myIDs.find(kDefaultId);
   if(it == myIDs.end())
     return;
   theValidators.push_back(it->second);
+  theArguments.push_back(std::list<std::string>());
 }
 
 bool Model_ValidatorsFactory::validate(const std::shared_ptr<ModelAPI_Feature>& theFeature) const

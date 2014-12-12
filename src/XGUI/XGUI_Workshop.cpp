@@ -97,8 +97,10 @@ QIcon XGUI_Workshop::featureIcon(const FeaturePtr& theFeature)
   ModelAPI_ExecState aState = theFeature->data()->execState();
   switch(aState) {
     case ModelAPI_StateDone:
-    case ModelAPI_StateNothing:
+    case ModelAPI_StateNothing: {
       anIcon = QIcon(anIconString);
+    }
+    break;
     case ModelAPI_StateMustBeUpdated: {
       anIcon = ModuleBase_Tools::lighter(anIconString);
     }
@@ -143,7 +145,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
           SLOT(onContextMenuCommand(const QString&, bool)));
 
   myViewerProxy = new XGUI_ViewerProxy(this);
-  connect(myViewerProxy, SIGNAL(selectionChanged()), this, SLOT(updateCommandsOnViewSelection()));
+  connect(myViewerProxy, SIGNAL(selectionChanged()),
+          myActionsMgr,  SLOT(updateOnViewSelection()));
 
   myModuleConnector = new XGUI_ModuleConnector(this);
 
@@ -158,11 +161,6 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   connect(myOperationMgr, SIGNAL(operationAborted(ModuleBase_Operation*)), 
           SLOT(onOperationAborted(ModuleBase_Operation*)));
   connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
-  // TODO(sbh): It seems that application works properly without update on operationStarted
-  connect(myOperationMgr, SIGNAL(operationStarted(ModuleBase_Operation*)),
-          myActionsMgr,   SLOT(update()));
-  connect(myOperationMgr, SIGNAL(operationStopped(ModuleBase_Operation*)),
-          myActionsMgr,   SLOT(update()));
   connect(this, SIGNAL(errorOccurred(const QString&)), myErrorDlg, SLOT(addError(const QString&)));
 }
 
@@ -1075,22 +1073,6 @@ void XGUI_Workshop::updateCommandStatus()
 }
 
 //******************************************************
-QList<QAction*> XGUI_Workshop::getModuleCommands() const
-{
-  QList<QAction*> aCommands;
-  if (isSalomeMode()) {  // update commands in SALOME mode
-    aCommands = salomeConnector()->commandList();
-  } else {
-    AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
-    foreach(AppElements_Command* aCmd, aMenuBar->features())
-    {
-      aCommands.append(aCmd);
-    }
-  }
-  return aCommands;
-}
-
-//******************************************************
 QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
 {
   QDockWidget* aObjDock = new QDockWidget(theParent);
@@ -1338,46 +1320,6 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
   myDisplayer->showOnly(theList);
 }
 
-
-//**************************************************************
-void XGUI_Workshop::updateCommandsOnViewSelection()
-{
-  XGUI_Selection* aSelection = mySelector->selection();
-  if (aSelection->getSelected().size() == 0)
-    return;
-
-  // Restrict validators to manage only nested (child) features
-  // of the current feature i.e. if current feature is Sketch -
-  // Sketch Features & Constraints can be validated.
-  QStringList aNestedIds;
-  if(myOperationMgr->hasOperation()) {
-    FeaturePtr aFeature = myOperationMgr->currentOperation()->feature();
-    if(aFeature) {
-      aNestedIds << myActionsMgr->nestedCommands(QString::fromStdString(aFeature->getKind()));
-    }
-  }
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  QList<QAction*> aActions = getModuleCommands();
-  foreach(QAction* aAction, aActions) {
-    QString aId = aAction->data().toString();
-    if(!aNestedIds.contains(aId))
-      continue;
-    std::list<ModelAPI_Validator*> aValidators;
-    std::list<std::list<std::string> > anArguments;
-    aFactory->validators(aId.toStdString(), aValidators, anArguments);
-    std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
-    for (; aValidator != aValidators.end(); aValidator++) {
-      if (*aValidator) {
-        const ModuleBase_SelectionValidator* aSelValidator =
-            dynamic_cast<const ModuleBase_SelectionValidator*>(*aValidator);
-        if (aSelValidator) {
-          aAction->setEnabled(aSelValidator->isValid(aSelection));
-        }
-      }
-    }
-  }
-}
 
 //**************************************************************
 void XGUI_Workshop::registerValidators() const

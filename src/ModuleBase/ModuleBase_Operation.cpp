@@ -72,11 +72,6 @@ bool ModuleBase_Operation::isValid() const
   return aFactory->validate(myFeature);
 }
 
-bool ModuleBase_Operation::isNestedOperationsEnabled() const
-{
-  return true;
-}
-
 //void ModuleBase_Operation::storeCustomValue()
 //{
 //  if (!myFeature) {

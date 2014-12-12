@@ -4,17 +4,24 @@
  * XGUI_ActionsMgr.cpp
  */
 
-#include "XGUI_ActionsMgr.h"
-#include "XGUI_Workshop.h"
-#include "XGUI_OperationMgr.h"
-#include "XGUI_SalomeConnector.h"
-
 #include <AppElements_Command.h>
 
-#include <ModelAPI_Session.h>
+#include <XGUI_ActionsMgr.h>
+#include <XGUI_Workshop.h>
+#include <XGUI_OperationMgr.h>
+#include <XGUI_SalomeConnector.h>
+#include <XGUI_Selection.h>
+#include <XGUI_SelectionMgr.h>
 
-#include <ModuleBase_Operation.h>
+#include <Events_Loop.h>
 #include <Events_Error.h>
+
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Events.h>
+#include <ModelAPI_Validator.h>
+#include <ModuleBase_Operation.h>
+#include <ModuleBase_SelectionValidator.h>
+
 
 #include <QAction>
 
@@ -34,6 +41,12 @@ XGUI_ActionsMgr::XGUI_ActionsMgr(XGUI_Workshop* theParent)
   myShortcuts << QKeySequence::Redo;
   myShortcuts << QKeySequence::Open;
   myShortcuts << QKeySequence::Close;
+
+  //Initialize event listening
+  Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID aStateResponseEventId =
+      Events_Loop::loop()->eventByName(EVENT_FEATURE_STATE_RESPONSE);
+  aLoop->registerListener(this, aStateResponseEventId, NULL, true);
 }
 
 XGUI_ActionsMgr::~XGUI_ActionsMgr()
@@ -61,23 +74,133 @@ void XGUI_ActionsMgr::addNestedCommands(const QString& theId, const QStringList&
   myNestedActions[theId] = theCommands;
 }
 
+QStringList XGUI_ActionsMgr::nestedCommands(const QString& theId) const
+{
+  if (myNestedActions.contains(theId))
+    return myNestedActions[theId];
+  return QStringList();
+}
+
+bool XGUI_ActionsMgr::isNested(const QString& theId) const
+{
+  foreach(QString aId, myNestedActions.keys())
+  {
+    QStringList aList = myNestedActions[aId];
+    if (aList.contains(theId))
+      return true;
+  }
+  return false;
+}
+
 void XGUI_ActionsMgr::update()
 {
+  FeaturePtr anActiveFeature = FeaturePtr();
   if (myOperationMgr->hasOperation()) {
     ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
-    FeaturePtr aFeature = anOperation->feature();
-    if(aFeature) {
+    anActiveFeature = anOperation->feature();
+    if(anActiveFeature.get()) {
       setAllEnabled(false);
-      QString aFeatureId = QString::fromStdString(aFeature->getKind());
+      QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
       setActionEnabled(aFeatureId, true);
-      setNestedStackEnabled(anOperation);
     }
+    setNestedStackEnabled(anOperation);
   } else {
     setAllEnabled(true);
     setNestedCommandsEnabled(false);
   }
+  // TODO(SBH): Get defaults state of actions from XML and remove the following method
   updateByDocumentKind();
   updateCheckState();
+  updateByPlugins(anActiveFeature);
+}
+
+void XGUI_ActionsMgr::updateCheckState()
+{
+  QString eachCommand = QString();
+  foreach(eachCommand, myActions.keys()) {
+    setActionChecked(eachCommand, false);
+  }
+  QStringList ltActiveCommands = myOperationMgr->operationList();
+  foreach(eachCommand, ltActiveCommands) {
+    setActionChecked(eachCommand, true);
+  }
+}
+
+void XGUI_ActionsMgr::updateOnViewSelection()
+{
+  XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+  if (aSelection->getSelected().size() == 0 || !myOperationMgr->hasOperation())
+    return;
+  ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
+  FeaturePtr anActiveFeature = anOperation->feature();
+  if(!anActiveFeature.get())
+    return;
+  QString aFeatureId = QString::fromStdString(anActiveFeature->getKind());
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  foreach(QString aId, nestedCommands(aFeatureId)) {
+    std::list<ModelAPI_Validator*> aValidators;
+    std::list<std::list<std::string> > anArguments;
+    if (!anArguments.empty()) {
+      std::list<std::string> firstArg = anArguments.front();
+    }
+    aFactory->validators(aId.toStdString(), aValidators, anArguments);
+    std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
+    std::list<std::list<std::string> >::iterator aValidatorArgs = anArguments.begin();
+    for (; aValidator != aValidators.end(); aValidator++, aValidatorArgs++) {
+      if (!(*aValidator))
+        continue;
+      const ModuleBase_SelectionValidator* aSelValidator =
+          dynamic_cast<const ModuleBase_SelectionValidator*>(*aValidator);
+      if (!aSelValidator)
+        continue;
+      setActionEnabled(aId, aSelValidator->isValid(aSelection, *aValidatorArgs));
+
+    }
+  }
+}
+
+QKeySequence XGUI_ActionsMgr::registerShortcut(const QString& theKeySequence)
+{
+  if (theKeySequence.isEmpty()) {
+    return QKeySequence();
+  }
+  QKeySequence aResult(theKeySequence);
+  if (myShortcuts.contains(aResult)) {
+    QString aMessage = tr("Shortcut %1 is already defined. Ignore.").arg(theKeySequence);
+    Events_Error::send(aMessage.toStdString());
+    return QKeySequence();
+  }
+  myShortcuts.append(aResult);
+  return aResult;
+}
+
+void XGUI_ActionsMgr::processEvent(const std::shared_ptr<Events_Message>& theMessage)
+{
+  const Events_ID kResponseEvent =
+      Events_Loop::loop()->eventByName(EVENT_FEATURE_STATE_RESPONSE);
+  if (theMessage->eventID() == kResponseEvent) {
+    std::shared_ptr<ModelAPI_FeatureStateMessage> aStateMessage =
+        std::dynamic_pointer_cast<ModelAPI_FeatureStateMessage>(theMessage);
+    if (!aStateMessage.get())
+      return;
+    std::list<std::string> aFeaturesList = aStateMessage->features();
+    std::list<std::string>::iterator it = aFeaturesList.begin();
+    for( ; it != aFeaturesList.end(); ++it) {
+      QString anActionId = QString::fromStdString(*it);
+      bool theDefaultState = false;
+      if (myActions.contains(anActionId)) {
+        theDefaultState = myActions[anActionId]->isEnabled();
+      }
+      setActionEnabled(anActionId, aStateMessage->state(*it, theDefaultState));
+    }
+  } else if (theMessage.get()) {
+    #ifdef _DEBUG
+    std::cout << "XGUI_ActionsMgr::processEvent: unhandled message caught: " << std::endl
+              << theMessage->eventID().eventText() << std::endl;
+    #endif
+  }
 }
 
 void XGUI_ActionsMgr::setAllEnabled(bool isEnabled)
@@ -88,17 +211,6 @@ void XGUI_ActionsMgr::setAllEnabled(bool isEnabled)
   }
 }
 
-void XGUI_ActionsMgr::setNestedStackEnabled(ModuleBase_Operation* theOperation)
-{
-  if(!theOperation || !theOperation->feature())
-    return;
-  FeaturePtr aFeature = theOperation->feature();
-  QString aFeatureId = QString::fromStdString(aFeature->getKind());
-  bool isNestedEnabled = theOperation->isNestedOperationsEnabled();
-  setNestedCommandsEnabled(isNestedEnabled, aFeatureId);
-
-  setNestedStackEnabled(myOperationMgr->previousOperation(theOperation));
-}
 
 //!
 void XGUI_ActionsMgr::setNestedCommandsEnabled(bool theEnabled, const QString& theParent)
@@ -116,6 +228,17 @@ void XGUI_ActionsMgr::setNestedCommandsEnabled(bool theEnabled, const QString& t
   }
 }
 
+void XGUI_ActionsMgr::setNestedStackEnabled(ModuleBase_Operation* theOperation)
+{
+  if(!theOperation || !theOperation->feature())
+    return;
+  FeaturePtr aFeature = theOperation->feature();
+  QString aFeatureId = QString::fromStdString(aFeature->getKind());
+  setNestedCommandsEnabled(true, aFeatureId);
+
+  setNestedStackEnabled(myOperationMgr->previousOperation(theOperation));
+}
+
 void XGUI_ActionsMgr::setActionChecked(const QString& theId, const bool theChecked)
 {
   if (myActions.contains(theId)) {
@@ -123,6 +246,13 @@ void XGUI_ActionsMgr::setActionChecked(const QString& theId, const bool theCheck
     if (anAction->isCheckable()) {
       anAction->setChecked(theChecked);
     }
+  }
+}
+
+void XGUI_ActionsMgr::setActionEnabled(const QString& theId, const bool theEnabled)
+{
+  if (myActions.contains(theId)) {
+    myActions[theId]->setEnabled(theEnabled);
   }
 }
 
@@ -152,54 +282,12 @@ void XGUI_ActionsMgr::updateByDocumentKind()
   }
 }
 
-void XGUI_ActionsMgr::setActionEnabled(const QString& theId, const bool theEnabled)
+void XGUI_ActionsMgr::updateByPlugins(FeaturePtr anActiveFeature)
 {
-  if (myActions.contains(theId)) {
-    myActions[theId]->setEnabled(theEnabled);
-  }
-}
-
-void XGUI_ActionsMgr::updateCheckState()
-{
-  QString eachCommand = QString();
-  foreach(eachCommand, myActions.keys()) {
-    setActionChecked(eachCommand, false);
-  }
-  QStringList ltActiveCommands = myOperationMgr->operationList();
-  foreach(eachCommand, ltActiveCommands) {
-    setActionChecked(eachCommand, true);
-  }
-}
-
-QStringList XGUI_ActionsMgr::nestedCommands(const QString& theId) const
-{
-  if (myNestedActions.contains(theId))
-    return myNestedActions[theId];
-  return QStringList();
-}
-
-bool XGUI_ActionsMgr::isNested(const QString& theId) const
-{
-  foreach(QString aId, myNestedActions.keys())
-  {
-    QStringList aList = myNestedActions[aId];
-    if (aList.contains(theId))
-      return true;
-  }
-  return false;
-}
-
-QKeySequence XGUI_ActionsMgr::registerShortcut(const QString& theKeySequence)
-{
-  if (theKeySequence.isEmpty()) {
-    return QKeySequence();
-  }
-  QKeySequence aResult(theKeySequence);
-  if (myShortcuts.contains(aResult)) {
-    QString aMessage = tr("Shortcut %1 is already defined. Ignore.").arg(theKeySequence);
-    Events_Error::send(aMessage.toStdString());
-    return QKeySequence();
-  }
-  myShortcuts.append(aResult);
-  return aResult;
+  static Events_ID aStateRequestEventId = Events_Loop::loop()->eventByName(
+      EVENT_FEATURE_STATE_REQUEST);
+  std::shared_ptr<ModelAPI_FeatureStateMessage> aMsg =
+      std::make_shared<ModelAPI_FeatureStateMessage>(aStateRequestEventId, this);
+  aMsg->setFeature(anActiveFeature);
+  Events_Loop::loop()->send(aMsg, false);
 }

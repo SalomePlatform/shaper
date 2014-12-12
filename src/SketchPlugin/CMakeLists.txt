@@ -64,6 +64,7 @@ TARGET_LINK_LIBRARIES(SketchPlugin ${PROJECT_LIBRARIES})
 
 INCLUDE_DIRECTORIES(
   ../Config
+  ../Events
   ../ModelAPI
   ../GeomAPI
   ../GeomAlgoAPI

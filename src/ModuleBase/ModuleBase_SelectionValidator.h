@@ -12,10 +12,18 @@
 
 #include <ModelAPI_Validator.h>
 
+#include <list>
+#include <string>
+
 class ModuleBase_SelectionValidator : public ModelAPI_Validator
 {
  public:
   virtual bool isValid(const ModuleBase_ISelection* theSelection) const = 0;
+  virtual bool isValid(const ModuleBase_ISelection* theSelection,
+                       const std::list<std::string>& theArguments) const
+  {
+    return isValid(theSelection);
+  }
 };
 
 #endif

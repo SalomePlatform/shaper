@@ -9,6 +9,9 @@
 
 #include "XGUI.h"
 
+#include <Events_Listener.h>
+#include <ModelAPI_Feature.h>
+
 #include <QObject>
 #include <QMap>
 #include <QList>
@@ -20,7 +23,7 @@ class XGUI_OperationMgr;
 class ModuleBase_Operation;
 class QAction;
 
-class XGUI_EXPORT XGUI_ActionsMgr : public QObject
+class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
 {
 Q_OBJECT
 
@@ -41,7 +44,8 @@ Q_OBJECT
 
   QKeySequence registerShortcut(const QString& theKeySequence);
 
-  void updateByDocumentKind();
+  //! Redefinition of Events_Listener method
+  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
  public slots:
   //! Update workbench actions according to OperationMgr state:
@@ -51,19 +55,25 @@ Q_OBJECT
   void update();
   //! Sets all commands checked if it's operation is active.
   void updateCheckState();
+  //! Updates actions according to current selection in the viewer
+  void updateOnViewSelection();
 
  protected:
   //! Sets all actions to isEnabled state.
   void setAllEnabled(bool isEnabled);
-  //! Sets to isEnabled state all siblings of the given operation and it's parents recursively
-  void setNestedStackEnabled(ModuleBase_Operation* theOperation);
   //! Sets all nested actions to isEnabled state for the command with given ID.
   //! If ID is empty - all nested actions will be affected.
   void setNestedCommandsEnabled(bool isEnabled, const QString& theParent = QString());
+  //! Sets to enabled state all siblings of the given operation and it's parents recursively
+  void setNestedStackEnabled(ModuleBase_Operation* theOperation);
   //! Sets the action with theId to theChecked state.
   void setActionChecked(const QString& theId, const bool theChecked);
   //! Sets the action with theId to theEnabled state.
   void setActionEnabled(const QString& theId, const bool theEnabled);
+  //! Updates actions according to their "document" tag
+  void updateByDocumentKind();
+  //! Asks plugins about their features state, using the Events system
+  void updateByPlugins(FeaturePtr theActiveFeature);
 
  private:
   QMap<QString, QAction*> myActions;
