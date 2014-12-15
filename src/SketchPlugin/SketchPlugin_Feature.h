@@ -64,7 +64,15 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
   }
 
   /// Customize presentation of the feature
-  virtual void customisePresentation(AISObjectPtr thePrs);
+  virtual void customisePresentation(AISObjectPtr thePrs)
+  {
+    // if this is an edge
+    if (thePrs->getShapeType() == 6)
+      thePrs->setWidth(3);
+    // if this is a vertex
+    else if (thePrs->getShapeType() == 7)
+      thePrs->setPointMarker(6, 2.);
+  }
 
   /// Returns the sketch of this feature
   SketchPlugin_Sketch* sketch();

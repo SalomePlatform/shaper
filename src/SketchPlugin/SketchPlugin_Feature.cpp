@@ -31,13 +31,3 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
   return mySketch;
 }
 
-
-void SketchPlugin_Feature::customisePresentation(AISObjectPtr thePrs)
-{
-  // if this is an edge
-  if (thePrs->getShapeType() == 6)
-    thePrs->setWidth(3);
-  // if this is a vertex
-  else if (thePrs->getShapeType() == 7)
-    thePrs->setPointMarker(6, 2.);
-}
