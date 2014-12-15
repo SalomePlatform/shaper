@@ -176,10 +176,10 @@ void Config_XMLReader::processValidator(xmlNodePtr theNode)
   std::shared_ptr<Config_ValidatorMessage> 
     aMessage(new Config_ValidatorMessage(aValidatoEvent, this));
   std::string aValidatorId;
-  std::list<std::string> aValidatorParameters;
-  getValidatorInfo(theNode, aValidatorId, aValidatorParameters);
+  std::list<std::string> aParameters;
+  getParametersInfo(theNode, aValidatorId, aParameters);
   aMessage->setValidatorId(aValidatorId);
-  aMessage->setValidatorParameters(aValidatorParameters);
+  aMessage->setValidatorParameters(aParameters);
   xmlNodePtr aFeatureOrWdgNode = theNode->parent;
   if (isNode(aFeatureOrWdgNode, NODE_FEATURE, NULL)) {
     aMessage->setFeatureId(getProperty(aFeatureOrWdgNode, _ID));
@@ -196,8 +196,12 @@ void Config_XMLReader::processSelectionFilter(xmlNodePtr theNode)
   Events_Loop* aEvLoop = Events_Loop::loop();
   std::shared_ptr<Config_SelectionFilterMessage> aMessage =
       std::make_shared<Config_SelectionFilterMessage>(aFilterEvent, this);
-  std::string aSelectionFilterId = getProperty(theNode, _ID);
+  std::string aSelectionFilterId;
+  std::list<std::string> aParameters;
+  getParametersInfo(theNode, aSelectionFilterId, aParameters);
   aMessage->setSelectionFilterId(aSelectionFilterId);
+  aMessage->setFilterParameters(aParameters);
+
   xmlNodePtr aFeatureOrWdgNode = theNode->parent;
   if (isNode(aFeatureOrWdgNode, NODE_FEATURE, NULL)) {
     aMessage->setFeatureId(getProperty(aFeatureOrWdgNode, _ID));

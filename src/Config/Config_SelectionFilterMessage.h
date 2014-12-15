@@ -24,6 +24,7 @@ class Config_SelectionFilterMessage : public Events_Message
   std::string mySelectionFilterId;
   std::string myFeatureId;
   std::string myAttributeId;
+  std::list<std::string> myFilterParameters;
 
  public:
   CONFIG_EXPORT Config_SelectionFilterMessage(const Events_ID theId, const void* theParent = 0);
@@ -32,10 +33,12 @@ class Config_SelectionFilterMessage : public Events_Message
   CONFIG_EXPORT const std::string& selectionFilterId() const;
   CONFIG_EXPORT const std::string& featureId() const;
   CONFIG_EXPORT const std::string& attributeId() const;
+  CONFIG_EXPORT const std::list<std::string>& parameters() const;
 
   CONFIG_EXPORT void setSelectionFilterId(const std::string& theId);
   CONFIG_EXPORT void setFeatureId(const std::string& theId);
   CONFIG_EXPORT void setAttributeId(const std::string& theId);
+  CONFIG_EXPORT void setFilterParameters(const std::list<std::string>& parameters);
 };
 
 #endif /* CONFIG_SELECTIONFILTERMESSAGE_H_ */

@@ -72,7 +72,7 @@ bool hasChild(xmlNodePtr theNode)
   return false;
 }
 
-bool getValidatorInfo(xmlNodePtr theNode, std::string& outValidatorId,
+bool getParametersInfo(xmlNodePtr theNode, std::string& outValidatorId,
                       std::list<std::string>& outValidatorParameters)
 {
   //Validator id:
@@ -83,7 +83,7 @@ bool getValidatorInfo(xmlNodePtr theNode, std::string& outValidatorId,
   outValidatorId = std::string(anIdProp);
 
   //Validator parameters:
-  char* aParamProp = (char*) xmlGetProp(theNode, BAD_CAST VALIDATOR_PARAMETERS);
+  char* aParamProp = (char*) xmlGetProp(theNode, BAD_CAST _PARAMETERS);
   if (aParamProp && aParamProp[0] != 0) {
     std::string aPropString = std::string(aParamProp);
     std::stringstream aPropStringStream(aPropString);

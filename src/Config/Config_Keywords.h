@@ -50,8 +50,9 @@ const static char* FEATURE_TEXT = "title";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
 const static char* FEATURE_NESTED = "nested";
 const static char* FEATURE_DOC = WORKBENCH_DOC;
-// NODE_VALIDATOR properties
-const static char* VALIDATOR_PARAMETERS = "parameters";
+// NODE_VALIDATOR properties, NODE_SELFILTER properties
+const static char* _PARAMETERS = "parameters";
+
 // Widget (attribute) properties
 const static char* ATTR_TOOLTIP = FEATURE_TOOLTIP;
 const static char* ATTR_ICON = FEATURE_ICON;

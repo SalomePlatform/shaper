@@ -27,7 +27,8 @@ void ModuleBase_FilterFactory::registerFilter(const std::string& theID,
 
 void ModuleBase_FilterFactory::assignFilter(const std::string& theID,
                                             const std::string& theFeatureID,
-                                            const std::string& theAttrID)
+                                            const std::string& theAttrID,
+                                            const std::list<std::string>& theArguments)
 {
   // create feature-structures if not exist
   std::map<std::string, std::map<std::string, AttrFilters> >::iterator aFeature = myAttrs.find(
@@ -41,7 +42,7 @@ void ModuleBase_FilterFactory::assignFilter(const std::string& theID,
   if (anAttr == aFeature->second.end()) {
     aFeature->second[theAttrID] = AttrFilters();
   }
-  aFeature->second[theAttrID][theID] = std::list<std::string>();
+  aFeature->second[theAttrID][theID] = theArguments;
 }
 
 void ModuleBase_FilterFactory::filters(const std::string& theFeatureID,

@@ -44,7 +44,8 @@ class ModuleBase_FilterFactory : public QObject
   /// Assigns filter to the attribute of the feature
   MODULEBASE_EXPORT virtual void assignFilter(const std::string& theID,
                                               const std::string& theFeatureID,
-                                              const std::string& theAttrID);
+                                              const std::string& theAttrID,
+                                              const std::list<std::string>& theArguments);
 
   /// Provides a filter for the attribute, returns NULL if no filter
   MODULEBASE_EXPORT void filters(const std::string& theFeatureID,
