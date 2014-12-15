@@ -82,6 +82,13 @@ Q_OBJECT
   /// Returns true if the operation can be aborted
   bool canAbortOperation();
 
+  /// Blocking/unblocking enabling of Ok button in property panel.
+  /// It is used when operation can not be validated even all attributes are valid
+  void setLockValidating(bool toLock) { myIsValidationLock = toLock; }
+
+  /// Returns state of validation locking
+  bool isValidationLocked() const { return myIsValidationLock; }
+
  public slots:
   /// Slot that commits the current operation.
   void onCommitOperation();
@@ -146,6 +153,9 @@ signals:
   typedef QList<ModuleBase_Operation*> Operations;  ///< definition for a list of operations
   Operations myOperations;  ///< a stack of started operations. The active operation is on top,
                             // others are suspended and started by the active is finished
+
+  /// Lock/Unlock access to Ok button in property panel
+  bool myIsValidationLock;
 };
 
 #endif

@@ -59,6 +59,18 @@ Q_OBJECT
 
   void setStretchEnabled(bool isEnabled);
 
+  /// Set Enable/Disable state of Ok button
+  virtual void setOkEnabled(bool theEnabled);
+
+  /// Returns state of Ok button
+  virtual bool isOkEnabled() const;
+
+  /// Set Enable/Disable state of Ok button
+  virtual void setCancelEnabled(bool theEnabled);
+
+  /// Returns state of Ok button
+  virtual bool isCancelEnabled() const;
+
  public slots:
   void updateContentWidget(FeaturePtr theFeature);
   // Enables / disables "ok" ("accept") button

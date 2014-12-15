@@ -12,6 +12,8 @@
 
 #include <XGUI_ViewerProxy.h>
 #include <XGUI_Workshop.h>
+#include <XGUI_PropertyPanel.h>
+#include <XGUI_OperationMgr.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <Config_WidgetAPI.h>
@@ -28,31 +30,15 @@ PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
     : ModuleBase_WidgetDoubleValue(theParent, theData, theParentId)
 {
   myFirstPntName = theData->getProperty("first_point");
+
+  // Reconnect to local slot
+  disconnect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
+  connect(mySpinBox, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
 }
 
 PartSet_WidgetPoint2dDistance::~PartSet_WidgetPoint2dDistance()
 {
 }
-
-//bool PartSet_WidgetPoint2dDistance::setValue(ModuleBase_WidgetValue* theValue)
-//{
-//  bool isDone = false;
-//
-//  if (theValue) {
-//    ModuleBase_WidgetValueFeature* aFeatureValue =
-//        dynamic_cast<ModuleBase_WidgetValueFeature*>(theValue);
-//    if (aFeatureValue) {
-//      std::shared_ptr<GeomAPI_Pnt2d> aPnt = aFeatureValue->point();
-//      ObjectPtr aObject = aFeatureValue->object();
-//      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
-//      if (aFeature && aPnt) {
-//        setPoint(aFeature, aPnt);
-//        isDone = true;
-//      }
-//    }
-//  }
-//  return isDone;
-//}
 
 void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePnt)
@@ -67,7 +53,10 @@ void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
   AttributeDoublePtr aReal = aData->real(attributeID());
   if (aReal && (aReal->value() != aRadius)) {
     aReal->setValue(aRadius);
+    mySpinBox->blockSignals(true);
     mySpinBox->setValue(aRadius);
+    mySpinBox->blockSignals(false);
+    emit valuesChanged();
   }
 }
 
@@ -103,6 +92,9 @@ void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWn
 
 void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  myWorkshop->operationMgr()->setLockValidating(true);
+  myWorkshop->propertyPanel()->setOkEnabled(false);
+
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
 
   double aX, aY;
@@ -112,4 +104,9 @@ void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, 
   setPoint(feature(), aPnt);
 }
 
+void PartSet_WidgetPoint2dDistance::onValuesChanged()
+{
+  myWorkshop->operationMgr()->setLockValidating(false);
+  emit valuesChanged();
+}
 

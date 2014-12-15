@@ -12,6 +12,8 @@
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_Selection.h>
+#include <XGUI_PropertyPanel.h>
+#include <XGUI_OperationMgr.h>
 
 #include <ModuleBase_DoubleSpinBox.h>
 #include <ModuleBase_Tools.h>
@@ -68,7 +70,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     myXSpin->setToolTip("X");
     aGroupLay->addWidget(myXSpin, 0, 1);
 
-    connect(myXSpin, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
+    connect(myXSpin, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
   }
   {
     QLabel* aLabel = new QLabel(myGroupBox);
@@ -82,7 +84,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
     myYSpin->setToolTip("X");
     aGroupLay->addWidget(myYSpin, 1, 1);
 
-    connect(myYSpin, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
+    connect(myYSpin, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
   }
 }
 
@@ -107,8 +109,13 @@ void PartSet_WidgetPoint2D::setPoint(double theX, double theY)
 {
 
   bool isBlocked = this->blockSignals(true);
+  myXSpin->blockSignals(true);
   myXSpin->setValue(theX);
+  myXSpin->blockSignals(false);
+
+  myYSpin->blockSignals(true);
   myYSpin->setValue(theY);
+  myYSpin->blockSignals(false);
   this->blockSignals(isBlocked);
 
   emit valuesChanged();
@@ -148,8 +155,13 @@ bool PartSet_WidgetPoint2D::restoreValue()
   double _Y = aPoint->y();
 #endif
   bool isBlocked = this->blockSignals(true);
+  myXSpin->blockSignals(true);
   myXSpin->setValue(aPoint->x());
+  myXSpin->blockSignals(false);
+
+  myYSpin->blockSignals(true);
   myYSpin->setValue(aPoint->y());
+  myYSpin->blockSignals(false);
   this->blockSignals(isBlocked);
   return true;
 }
@@ -167,25 +179,6 @@ QList<QWidget*> PartSet_WidgetPoint2D::getControls() const
   return aControls;
 }
 
-//bool PartSet_WidgetPoint2D::initFromPrevious(ObjectPtr theObject)
-//{
-//  if (myOptionParam.length() == 0)
-//    return false;
-//  std::shared_ptr<ModelAPI_Data> aData = theObject->data();
-//  std::shared_ptr<GeomDataAPI_Point2D> aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-//      aData->attribute(myOptionParam));
-//  if (aPoint) {
-//    bool isBlocked = this->blockSignals(true);
-//    myXSpin->setValue(aPoint->x());
-//    myYSpin->setValue(aPoint->y());
-//    this->blockSignals(isBlocked);
-//
-//    emit valuesChanged();
-//    emit storedPoint2D(theObject, myOptionParam);
-//    return true;
-//  }
-//  return false;
-//}
 
 void PartSet_WidgetPoint2D::activate()
 {
@@ -259,6 +252,9 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
 
 void PartSet_WidgetPoint2D::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  myWorkshop->operationMgr()->setLockValidating(true);
+  myWorkshop->propertyPanel()->setOkEnabled(false);
+
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
 
   double aX, anY;
@@ -276,3 +272,8 @@ double PartSet_WidgetPoint2D::y() const
   return myYSpin->value();
 }
 
+void PartSet_WidgetPoint2D::onValuesChanged()
+{
+  myWorkshop->operationMgr()->setLockValidating(false);
+  emit valuesChanged();
+}
