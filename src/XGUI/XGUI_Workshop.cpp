@@ -431,10 +431,11 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
     std::shared_ptr<Config_SelectionFilterMessage> aMsg = 
       std::dynamic_pointer_cast<Config_SelectionFilterMessage>(theMessage);
     if (aMsg) {
+      ModuleBase_FilterFactory* aFactory = moduleConnector()->selectionFilters();
       if (aMsg->attributeId().empty()) {  // feature validator
-        moduleConnector()->selectionFilters()->assignFilter(aMsg->selectionFilterId(), aMsg->featureId(), aMsg->attributeId());
+        //aFactory->assignFilter(aMsg->selectionFilterId(), aMsg->featureId());
       } else {  // attribute validator
-        moduleConnector()->selectionFilters()->assignFilter(aMsg->selectionFilterId(), aMsg->featureId(), aMsg->attributeId());
+        aFactory->assignFilter(aMsg->selectionFilterId(), aMsg->featureId(), aMsg->attributeId());
       }
     }
   }

@@ -15,7 +15,7 @@
 * A filter which provides filtering of selection in 3d viewer.
 * Installing of this filter lets to select only object of requested type
 */
-DEFINE_STANDARD_HANDLE(ModuleBase_FilterLinearEdge, SelectMgr_Filter);
+DEFINE_STANDARD_HANDLE(ModuleBase_FilterLinearEdge, ModuleBase_Filter);
 class ModuleBase_FilterLinearEdge: public ModuleBase_Filter
 {
 public:

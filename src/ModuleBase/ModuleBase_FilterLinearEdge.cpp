@@ -25,8 +25,8 @@
 #include <Geom_Curve.hxx>
 
 
-IMPLEMENT_STANDARD_HANDLE(ModuleBase_FilterLinearEdge, SelectMgr_Filter);
-IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_FilterLinearEdge, SelectMgr_Filter);
+IMPLEMENT_STANDARD_HANDLE(ModuleBase_FilterLinearEdge, ModuleBase_Filter);
+IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_FilterLinearEdge, ModuleBase_Filter);
 
 
 Standard_Boolean ModuleBase_FilterLinearEdge::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
@@ -48,5 +48,5 @@ Standard_Boolean ModuleBase_FilterLinearEdge::IsOk(const Handle(SelectMgr_Entity
       }
     }
   }
-  return Standard_False;
+  return isOk;
 }
