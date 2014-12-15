@@ -70,8 +70,8 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
     if (thePrs->getShapeType() == 6)
       thePrs->setWidth(3);
     // if this is a vertex
-    else if (thePrs->getShapeType() == 7)
-      thePrs->setPointMarker(6, 2.);
+    //else if (thePrs->getShapeType() == 7)
+    //  thePrs->setPointMarker(6, 2.);
   }
 
   /// Returns the sketch of this feature
