@@ -233,7 +233,7 @@ void NewGeom_SalomeViewer::setViewProjection(double theX, double theY, double th
     Handle(V3d_View) aView3d = aVFrame->getViewPort()->getView();
     if (!aView3d.IsNull()) {
       aView3d->SetProj(theX, theY, theZ);
-      aView3d->FitAll(0.01, true, true);
+      aView3d->FitAll(0.01, true);
       aView3d->SetZSize(0.);
     }
   }
