@@ -27,6 +27,7 @@ SET(PROJECT_HEADERS
     GeomAPI_IPresentable.h
     GeomAPI_Curve.h 
     GeomAPI_DataMapOfShapeShape.h
+	GeomAPI_ICustomPrs.h
 )
 
 SET(PROJECT_SOURCES

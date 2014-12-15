@@ -54,12 +54,6 @@ class SketchPlugin_Line : public SketchPlugin_Feature
   /// Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
-  /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious)
-  {
-    return simpleAISObject(firstResult(), thePrevious);
-  }
-
   /// Moves the feature
   /// \param theDeltaX the delta for X coordinate is moved
   /// \param theDeltaY the delta for Y coordinate is moved

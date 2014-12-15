@@ -52,6 +52,13 @@ class PartSet_RadiusValidator : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
+//! A class to validate a selection for Perpendicular constraint operation
+class PartSet_RigidValidator : public ModuleBase_SelectionValidator
+{
+ public:
+  PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
+};
+
 class PartSet_DifferentObjectsValidator : public ModelAPI_RefAttrValidator
 {
  public:

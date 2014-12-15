@@ -2,6 +2,8 @@
 
 #include "ConstructionPlugin_Plugin.h"
 #include "ConstructionPlugin_Point.h"
+#include "ConstructionPlugin_Axis.h"
+#include "ConstructionPlugin_Plane.h"
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
@@ -21,6 +23,12 @@ FeaturePtr ConstructionPlugin_Plugin::createFeature(string theFeatureID)
 {
   if (theFeatureID == CONSTRUCTION_POINT_KIND) {
     return FeaturePtr(new ConstructionPlugin_Point);
+  }
+  else if (theFeatureID == CONSTRUCTION_AXIS_KIND) {
+    return FeaturePtr(new ConstructionPlugin_Axis);
+  }
+  else if (theFeatureID == CONSTRUCTION_PLANE_KIND) {
+    return FeaturePtr(new ConstructionPlugin_Plane);
   }
   // feature of such kind is not found
   return FeaturePtr();

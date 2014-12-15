@@ -7,16 +7,22 @@ SET(PROJECT_HEADERS
     ConstructionPlugin.h
     ConstructionPlugin_Plugin.h
     ConstructionPlugin_Point.h
+	ConstructionPlugin_Axis.h
+	ConstructionPlugin_Plane.h
 )
 
 SET(PROJECT_SOURCES
     ConstructionPlugin_Plugin.cpp
     ConstructionPlugin_Point.cpp
+	ConstructionPlugin_Axis.cpp
+	ConstructionPlugin_Plane.cpp
 )
 
 SET(XML_RESOURCES
   plugin-Construction.xml
   point_widget.xml
+  axis_widget.xml
+  plane_widget.xml
 )
 
 SET(PROJECT_LIBRARIES

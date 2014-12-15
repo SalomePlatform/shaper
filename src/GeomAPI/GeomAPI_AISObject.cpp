@@ -20,12 +20,14 @@
 #include <BRepBndLib.hxx>
 
 #include <AIS_InteractiveObject.hxx>
+#include <AIS_InteractiveContext.hxx>
 #include <AIS_LengthDimension.hxx>
 #include <AIS_ParallelRelation.hxx>
 #include <AIS_PerpendicularRelation.hxx>
 #include <AIS_RadiusDimension.hxx>
 #include <AIS_Shape.hxx>
 #include <AIS_FixRelation.hxx>
+#include <Prs3d_PointAspect.hxx>
 
 const double tolerance = 1e-7;
 
@@ -296,3 +298,55 @@ bool GeomAPI_AISObject::empty() const
   return false;
 }
 
+int GeomAPI_AISObject::getShapeType() const
+{
+  Handle(AIS_InteractiveObject) anAIS = const_cast<GeomAPI_AISObject*>(this)
+      ->impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    Handle(AIS_Shape) aAISShape = Handle(AIS_Shape)::DownCast(anAIS);
+    if (!aAISShape.IsNull()) {
+      return aAISShape->Shape().ShapeType();
+    }
+  }
+  return -1;
+}
+
+void GeomAPI_AISObject::setPointMarker(int theType, double theScale)
+{
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    Handle(AIS_Drawer) aDrawer = anAIS->Attributes();
+    if (aDrawer->HasPointAspect()) {
+      Handle(Prs3d_PointAspect) aPA = aDrawer->PointAspect();
+      aPA->SetTypeOfMarker((Aspect_TypeOfMarker)theType);
+      aPA->SetScale(theScale);
+    } else {
+      Quantity_NameOfColor aCol = Quantity_NOC_YELLOW;
+      aDrawer->SetPointAspect(new Prs3d_PointAspect((Aspect_TypeOfMarker)theType, aCol, theScale));
+    }
+  }
+}
+
+
+void GeomAPI_AISObject::setLineStyle(int theStyle)
+{
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    Handle(AIS_Drawer) aDrawer = anAIS->Attributes();
+    if (aDrawer->HasLineAspect())
+      aDrawer->LineAspect()->SetTypeOfLine((Aspect_TypeOfLine)theStyle);
+    if (aDrawer->HasWireAspect())
+      aDrawer->WireAspect()->SetTypeOfLine((Aspect_TypeOfLine)theStyle);
+  }
+}
+
+
+void GeomAPI_AISObject::setTransparensy(double theVal)
+{
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
+    if (!aContext.IsNull())
+      aContext->SetTransparency(anAIS, theVal, false);
+  }
+}

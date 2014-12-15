@@ -14,16 +14,16 @@
         id="Axis"
         title="Axis"
         tooltip="Create a new axis"
-        icon=":icons/axis.png"
-        keysequence=""
-        internal="true" />
+        icon=":icons/axis.png">
+        <source path="axis_widget.xml" />
+      </feature>
       <feature
         id="Plane"
         title="Plane"
         tooltip="Create a new plane"
-        icon=":icons/plane.png"
-        keysequence=""
-        internal="true" />
+        icon=":icons/plane.png">
+        <source path="plane_widget.xml" />
+      </feature>
     </group>
   </workbench>
 </plugin>

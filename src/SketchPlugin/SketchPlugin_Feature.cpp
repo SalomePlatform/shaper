@@ -31,19 +31,13 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
   return mySketch;
 }
 
-AISObjectPtr SketchPlugin_Feature::simpleAISObject(std::shared_ptr<ModelAPI_Result> theRes,
-                                                   AISObjectPtr thePrevious)
+
+void SketchPlugin_Feature::customisePresentation(AISObjectPtr thePrs)
 {
-  std::shared_ptr<ModelAPI_ResultConstruction> aConstr = std::dynamic_pointer_cast<
-      ModelAPI_ResultConstruction>(theRes);
-
-  std::shared_ptr<GeomAPI_Shape> aPreview;
-  if (aConstr)
-    aPreview = aConstr->shape();
-
-  AISObjectPtr aResult = thePrevious;
-  if (!aResult)
-    aResult = AISObjectPtr(new GeomAPI_AISObject());
-  aResult->createShape(aPreview);
-  return aResult;
+  // if this is an edge
+  if (thePrs->getShapeType() == 6)
+    thePrs->setWidth(3);
+  // if this is a vertex
+  else if (thePrs->getShapeType() == 7)
+    thePrs->setPointMarker(6, 2.);
 }

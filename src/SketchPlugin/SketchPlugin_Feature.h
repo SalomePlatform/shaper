@@ -13,6 +13,7 @@
 #include <GeomAPI_AISObject.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeSelection.h>
+#include <GeomAPI_ICustomPrs.h>
 
 class SketchPlugin_Sketch;
 class GeomAPI_Pnt2d;
@@ -23,13 +24,9 @@ class Handle_AIS_InteractiveObject;
  * \brief Feature for creation of the new feature in PartSet. This is an abstract class to give
  * an interface to create the sketch feature preview.
  */
-class SketchPlugin_Feature : public ModelAPI_Feature
+class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
 {
  public:
-  /// Simple creation of interactive object by the result of the object
-  static AISObjectPtr simpleAISObject(std::shared_ptr<ModelAPI_Result> theRes,
-                                      AISObjectPtr thePrevious);
-
   /// Reference to the external edge or vertex as a AttributeSelection
   inline static const std::string& EXTERNAL_ID()
   {
@@ -65,6 +62,9 @@ class SketchPlugin_Feature : public ModelAPI_Feature
       return aAttr->context();
     return false;
   }
+
+  /// Customize presentation of the feature
+  virtual void customisePresentation(AISObjectPtr thePrs);
 
   /// Returns the sketch of this feature
   SketchPlugin_Sketch* sketch();

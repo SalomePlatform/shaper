@@ -105,12 +105,13 @@
       </feature>
 	<!--  SketchConstraintRigid  -->
       <feature id="SketchConstraintRigid" title="Fixed" tooltip="Create constraint defining fixed object" icon=":icons/fixed.png">
-	    <shape_selector id="ConstraintEntityA" label="Object" tooltip="Select any object in the viewer" 
+        <shape_selector id="ConstraintEntityA" label="Object" tooltip="Select any object in the viewer" 
 			shape_types="edge vertex">
    		    <validator id="SketchPlugin_ResultPoint"/>
 			<validator id="SketchPlugin_ResultLine"/>
 			<validator id="SketchPlugin_ResultArc"/>
 		</shape_selector>
+	    <validator id="PartSet_RigidValidator"/>
       </feature>
     </group>
   </workbench>

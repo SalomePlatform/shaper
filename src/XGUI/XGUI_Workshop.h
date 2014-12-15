@@ -91,7 +91,6 @@ Q_OBJECT
   {
     return myActionsMgr;
   }
-  ;
 
   //! Returns property panel widget
   XGUI_PropertyPanel* propertyPanel() const
@@ -196,7 +195,6 @@ signals:
 
  public slots:
   void updateCommandStatus();
-  void updateCommandsOnViewSelection();
 
   void onNew();
   void onOpen();
@@ -240,8 +238,6 @@ signals:
   void onObjectDeletedMsg(const std::shared_ptr<ModelAPI_ObjectDeletedMessage>& theMsg);
 
   void validateOperation(const QString& theOperationId);
-
-  QList<QAction*> getModuleCommands() const;
 
   void displayAllResults();
   void displayDocumentResults(DocumentPtr theDoc);

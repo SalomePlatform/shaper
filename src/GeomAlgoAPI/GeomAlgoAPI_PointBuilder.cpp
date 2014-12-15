@@ -8,7 +8,10 @@
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Shape.h>
 #include <BRepBuilderAPI_MakeVertex.hxx>
+#include <BRep_Tool.hxx>
 #include <TopoDS_Vertex.hxx>
+#include <TopoDS.hxx>
+#include <gp_Pnt.hxx>
 
 std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_PointBuilder::point(
     std::shared_ptr<GeomAPI_Pnt> thePoint)
@@ -19,4 +22,17 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_PointBuilder::point(
   std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
   aRes->setImpl(new TopoDS_Shape(aVertex));
   return aRes;
+}
+
+
+std::shared_ptr<GeomAPI_Pnt> GeomAlgoAPI_PointBuilder::point(std::shared_ptr<GeomAPI_Shape> theVertex)
+{
+  TopoDS_Shape aShape = theVertex->impl<TopoDS_Shape>();
+  if ((!aShape.IsNull()) && (aShape.ShapeType() == TopAbs_VERTEX)) {
+    TopoDS_Vertex aVertex = TopoDS::Vertex(aShape);
+    gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
+    std::shared_ptr<GeomAPI_Pnt> aPnt(new GeomAPI_Pnt(aPoint.X(), aPoint.Y(), aPoint.Z()));
+    return aPnt;
+  }
+  return std::shared_ptr<GeomAPI_Pnt>();
 }

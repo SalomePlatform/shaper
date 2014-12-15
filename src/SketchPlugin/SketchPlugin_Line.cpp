@@ -116,3 +116,4 @@ void SketchPlugin_Line::attributeChanged(const std::string& theID) {
     }
   }
 }
+

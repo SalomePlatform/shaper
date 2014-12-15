@@ -19,6 +19,7 @@
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_IPresentable.h>
+#include <GeomAPI_ICustomPrs.h>
 
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_LocalContext.hxx>
@@ -58,13 +59,13 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
 
     GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
     bool isShading = false;
-    if (aPrs) {
+    if (aPrs.get() != NULL) {
       anAIS = aPrs->getAISObject(AISObjectPtr());
     } else {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-      if (aResult) {
+      if (aResult.get() != NULL) {
         std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
-        if (aShapePtr) {
+        if (aShapePtr.get() != NULL) {
           anAIS = AISObjectPtr(new GeomAPI_AISObject());
           anAIS->setImpl(new Handle(AIS_InteractiveObject)(new ModuleBase_ResultPrs(aResult)));
           //anAIS->createShape(aShapePtr);
@@ -88,7 +89,14 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   if (!anAISIO.IsNull()) {
     myResult2AISObjectMap[theObject] = theAIS;
     aContext->Display(anAISIO, false);
-    aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, isUpdateViewer);
+    aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, false);
+
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    if (aFeature.get() != NULL) {
+      GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
+      if (aCustPrs.get() != NULL)
+        aCustPrs->customisePresentation(theAIS);
+    }
     if (aContext->HasOpenedContext()) {
       if (myUseExternalObjects) {
         if (myActiveSelectionModes.size() == 0)
@@ -101,6 +109,8 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
       }
     }
   }
+  if (isUpdateViewer)
+    updateViewer();
 }
 
 void XGUI_Displayer::erase(ObjectPtr theObject, const bool isUpdateViewer)

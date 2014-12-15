@@ -21,8 +21,11 @@ class GeomAPI_Pnt;
 class GEOMALGOAPI_EXPORT GeomAlgoAPI_PointBuilder
 {
  public:
-  /// Creates linear edge by two points
+  /// Creates a shape by point
   static std::shared_ptr<GeomAPI_Shape> point(std::shared_ptr<GeomAPI_Pnt> thePoint);
+
+  /// Return point by shape vertex
+  static std::shared_ptr<GeomAPI_Pnt> point(std::shared_ptr<GeomAPI_Shape> theVertex);
 };
 
 #endif

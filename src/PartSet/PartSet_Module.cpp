@@ -1,7 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #include "PartSet_Module.h"
-#include <PartSet_OperationSketch.h>
 #include <PartSet_WidgetSketchLabel.h>
 #include <PartSet_Validators.h>
 #include <PartSet_Tools.h>
@@ -139,6 +138,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_PerpendicularValidator", new PartSet_PerpendicularValidator);
   aFactory->registerValidator("PartSet_ParallelValidator", new PartSet_ParallelValidator);
   aFactory->registerValidator("PartSet_RadiusValidator", new PartSet_RadiusValidator);
+  aFactory->registerValidator("PartSet_RigidValidator", new PartSet_RigidValidator);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
 }
 
@@ -464,16 +464,6 @@ void PartSet_Module::launchEditing()
   }
 }
 
-/// Returns new instance of operation object (used in createOperation for customization)
-ModuleBase_Operation* PartSet_Module::getNewOperation(const std::string& theFeatureId)
-{
-  if (theFeatureId == PartSet_OperationSketch::Type()) {
-    return new PartSet_OperationSketch(theFeatureId.c_str(), this);
-  }
-  return ModuleBase_IModule::getNewOperation(theFeatureId);
-}
-
-
 void PartSet_Module::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   myWorkshop->viewer()->enableSelection(true);
@@ -542,7 +532,7 @@ void PartSet_Module::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* t
 void PartSet_Module::onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if (aOperation->isEditOperation()) {
+  if (aOperation && aOperation->isEditOperation()) {
     std::string aId = aOperation->id().toStdString();
     if ((aId == SketchPlugin_ConstraintLength::ID()) ||
       (aId == SketchPlugin_ConstraintDistance::ID()) ||
