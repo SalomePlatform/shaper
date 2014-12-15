@@ -50,7 +50,7 @@ void XGUI_ViewerProxy::setViewProjection(double theX, double theY, double theZ)
   Handle(V3d_View) aView3d = activeView();
   if (!aView3d.IsNull()) {
     aView3d->SetProj(theX, theY, theZ);
-    aView3d->FitAll(0.01, true, true);
+    aView3d->FitAll(0.01, true);
     aView3d->SetZSize(0.);
   }
 }
