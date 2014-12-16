@@ -444,13 +444,13 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
     if (aSelFilter.IsNull())
       continue;
 
-    Handle(ModuleBase_Filter) aFilter = Handle(ModuleBase_Filter)::DownCast(aIt.Value());
-    if (aFilter.IsNull())
-      continue;
+    //Handle(ModuleBase_Filter) aFilter = Handle(ModuleBase_Filter)::DownCast(aIt.Value());
+    //if (aFilter.IsNull())
+    //  continue;
     if (myIsActive)
-      aViewer->addSelectionFilter(aFilter);
+      aViewer->addSelectionFilter(aSelFilter);
     else
-      aViewer->removeSelectionFilter(aFilter);
+      aViewer->removeSelectionFilter(aSelFilter);
   }
 }
 

@@ -1,24 +1,24 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModuleBase_FilterLinearEdge.h
+// File:        ModuleBase_FilterFace.h
 // Created:     10 Dec 2014
 // Author:      Natalia ERMOLAEVA
 
-#ifndef ModuleBase_FilterLinearEdge_H
-#define ModuleBase_FilterLinearEdge_H
+#ifndef ModuleBase_FilterFace_H
+#define ModuleBase_FilterFace_H
 
 #include "ModuleBase.h"
 
 #include "ModuleBase_Filter.h"
 
-#include <StdSelect_TypeOfEdge.hxx>
+#include <StdSelect_TypeOfFace.hxx>
 
-class ModuleBase_FilterLinearEdge: public ModuleBase_Filter
+class ModuleBase_FilterFace: public ModuleBase_Filter
 {
 public:
-  static MODULEBASE_EXPORT StdSelect_TypeOfEdge edgeType(const std::string& theType);
+  static MODULEBASE_EXPORT StdSelect_TypeOfFace faceType(const std::string& theType);
 
-  MODULEBASE_EXPORT ModuleBase_FilterLinearEdge(): 
+  MODULEBASE_EXPORT ModuleBase_FilterFace(): 
       ModuleBase_Filter() {}
 
   /**
@@ -29,10 +29,10 @@ public:
 
 protected:
   /**
-   * It creates an OCC edge filter
+   * It creates an OCC face filter
    */
   virtual void createFilter();
 
 };
 
-#endif //ModuleBase_FilterLinearEdge
+#endif //ModuleBase_FilterFace

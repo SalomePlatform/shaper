@@ -28,7 +28,7 @@
 class ModuleBase_FilterFactory : public QObject
 {
  private:
-  std::map<std::string, Handle_ModuleBase_Filter> myIDs;  ///< map from ID to registered filter
+  std::map<std::string, ModuleBase_Filter*> myIDs;  ///< map from ID to registered filter
   /// filters IDs to list of arguments
   typedef std::map<std::string, std::list<std::string> > AttrFilters;
   /// filters IDs by feature ID
@@ -39,7 +39,7 @@ class ModuleBase_FilterFactory : public QObject
  public:
   /// Registers the instance of the filter by the ID
   MODULEBASE_EXPORT virtual void registerFilter(const std::string& theID,
-                                                Handle_ModuleBase_Filter theFilter);
+                                                ModuleBase_Filter* theFilter);
 
   /// Assigns filter to the attribute of the feature
   MODULEBASE_EXPORT virtual void assignFilter(const std::string& theID,
@@ -53,7 +53,7 @@ class ModuleBase_FilterFactory : public QObject
                                  SelectMgr_ListOfFilter& theFilters) const;
 
   /// Returns registered filter by its Id
-  MODULEBASE_EXPORT virtual const Handle_ModuleBase_Filter filter(const std::string& theID) const;
+  MODULEBASE_EXPORT virtual const ModuleBase_Filter* filter(const std::string& theID) const;
 
 protected:
   ModuleBase_FilterFactory();

@@ -16,7 +16,7 @@
 
 
 void ModuleBase_FilterFactory::registerFilter(const std::string& theID,
-                                              Handle(ModuleBase_Filter) theFilter)
+                                              ModuleBase_Filter* theFilter)
 {
   if (myIDs.find(theID) != myIDs.end()) {
     Events_Error::send(std::string("Filter ") + theID + " is already registered");
@@ -48,7 +48,7 @@ void ModuleBase_FilterFactory::assignFilter(const std::string& theID,
 void ModuleBase_FilterFactory::filters(const std::string& theFeatureID,
                                        const std::string& theAttrID,
                                        SelectMgr_ListOfFilter& theFilters/*,
-                                        std::list<Handle(ModuleBase_Filter)>& theFilters/*,
+                                        std::list<ModuleBase_Filter*>& theFilters/*,
                                         std::list<std::list<std::string> >& theArguments*/) const
 {
   SelectMgr_ListOfFilter aFilters;
@@ -60,16 +60,17 @@ void ModuleBase_FilterFactory::filters(const std::string& theFeatureID,
     if (anAttr != aFeature->second.end()) {
       AttrFilters::const_iterator aValIter = anAttr->second.cbegin();
       for (; aValIter != anAttr->second.cend(); aValIter++) {
-        std::map<std::string, Handle(ModuleBase_Filter)>::const_iterator aFound = myIDs.find(
+        std::map<std::string, ModuleBase_Filter*>::const_iterator aFound = myIDs.find(
           aValIter->first);
         if (aFound == myIDs.end()) {
           Events_Error::send(std::string("Filter ") + aValIter->first + " was not registered");
         } else {
-          Handle(ModuleBase_Filter) aFilter = aFound->second;
-          if (aFilter.IsNull())
-            continue;
+          ModuleBase_Filter* aFilter = aFound->second;
+          aFilter->setArguments(aValIter->second);
+          //if (aFilter.IsNull())
+          //  continue;
 
-          theFilters.Append(aFilter);//aFound->second);
+          theFilters.Append(aFilter->getFilter());//aFound->second);
           //theArguments.push_back(aValIter->second);
         }
       }
@@ -83,9 +84,9 @@ ModuleBase_FilterFactory::ModuleBase_FilterFactory()
   //registerFilter(kDefaultId, new Model_FeatureFilter);
 }
 
-const Handle(ModuleBase_Filter) ModuleBase_FilterFactory::filter(const std::string& theID) const
+const ModuleBase_Filter* ModuleBase_FilterFactory::filter(const std::string& theID) const
 {
-  std::map<std::string, Handle(ModuleBase_Filter)>::const_iterator aIt = myIDs.find(theID);
+  std::map<std::string, ModuleBase_Filter*>::const_iterator aIt = myIDs.find(theID);
   if (aIt != myIDs.end()) {
     return aIt->second;
   }

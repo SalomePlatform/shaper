@@ -6,47 +6,43 @@
 
 
 #include "ModuleBase_FilterLinearEdge.h"
-#include "ModuleBase_IWorkshop.h"
 
-#include <ModelAPI_Session.h>
-#include <ModelAPI_Document.h>
-#include <ModelAPI_ResultConstruction.h>
+#include <StdSelect_EdgeFilter.hxx>
+#include <StdSelect_TypeOfEdge.hxx>
 
-#include <AIS_InteractiveObject.hxx>
-#include <AIS_Shape.hxx>
+#include <Events_Error.h>
 
-#include <StdSelect_BRepOwner.hxx>
+#include <QString>
+#include <QMap>
 
-#include <GeomAPI_Edge.h>
+typedef QMap<QString, StdSelect_TypeOfEdge> EdgeTypes;
+static EdgeTypes MyEdgeTypes;
 
-#include <BRep_Tool.hxx>
-#include <TopoDS.hxx>
-#include <TopoDS_Edge.hxx>
-#include <Geom_Curve.hxx>
-
-
-IMPLEMENT_STANDARD_HANDLE(ModuleBase_FilterLinearEdge, ModuleBase_Filter);
-IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_FilterLinearEdge, ModuleBase_Filter);
-
-
-Standard_Boolean ModuleBase_FilterLinearEdge::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
+StdSelect_TypeOfEdge ModuleBase_FilterLinearEdge::edgeType(const std::string& theType)
 {
-  Standard_Boolean isOk = ModuleBase_Filter::IsOk(theOwner);
-  if (isOk && theOwner->HasSelectable()) {
-    Handle(AIS_InteractiveObject) anAIS = 
-      Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
-    if (!anAIS.IsNull()) {
-      Handle(AIS_Shape) aShapeAIS = Handle(AIS_Shape)::DownCast(anAIS);
-      if (aShapeAIS) {
-        const TopoDS_Shape& aShape = aShapeAIS->Shape();
-        if (aShape.ShapeType()  == TopAbs_EDGE) {
-          std::shared_ptr<GeomAPI_Edge> anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge());
-          anEdge->setImpl(new TopoDS_Shape(aShape));
-
-          isOk = anEdge->isLine();
-        }
-      }
-    }
+  if (MyEdgeTypes.count() == 0) {
+    MyEdgeTypes["line"] = StdSelect_Line;
+    MyEdgeTypes["circle"] = StdSelect_Circle;
   }
-  return isOk;
+  QString aType = QString(theType.c_str()).toLower();
+  if (MyEdgeTypes.contains(aType))
+    return MyEdgeTypes[aType];
+  Events_Error::send("Edge type defined in XML is not implemented!");
+  return StdSelect_AnyEdge;
+}
+
+void ModuleBase_FilterLinearEdge::createFilter()
+{
+  myFilter = new StdSelect_EdgeFilter(StdSelect_AnyEdge);
+}
+
+void ModuleBase_FilterLinearEdge::setArguments(const std::list<std::string>& theArguments)
+{
+  if (theArguments.size()!= 1)
+    return;
+
+  std::string anArgument = theArguments.front();
+  Handle(StdSelect_EdgeFilter) aFilter = Handle(StdSelect_EdgeFilter)::DownCast(getFilter());
+  if (!aFilter.IsNull())
+    aFilter->SetType(edgeType(anArgument));
 }
