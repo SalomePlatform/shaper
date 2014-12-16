@@ -68,6 +68,12 @@ void Model_Application::setLoadPath(std::string thePath)
 }
 
 //=======================================================================
+const std::string& Model_Application::loadPath() const
+{
+  return myPath;
+}
+
+//=======================================================================
 void Model_Application::setLoadByDemand(std::string theID)
 {
   myLoadedByDemand.insert(theID);

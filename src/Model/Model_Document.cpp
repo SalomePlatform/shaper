@@ -26,6 +26,8 @@
 #include <TDF_Reference.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TDF_LabelMapHasher.hxx>
+#include <OSD_File.hxx>
+#include <OSD_Path.hxx>
 
 #include <climits>
 #ifndef WIN32
@@ -161,6 +163,7 @@ bool Model_Document::load(const char* theFileName)
 bool Model_Document::save(const char* theFileName, std::list<std::string>& theResults)
 {
   // create a directory in the root document if it is not yet exist
+  Handle(Model_Application) anApp = Model_Application::getApplication();
   if (this == Model_Session::get()->moduleDocument().get()) {
 #ifdef WIN32
     CreateDirectory(theFileName, NULL);
@@ -172,7 +175,7 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
   TCollection_ExtendedString aPath(DocFileName(theFileName, myID));
   PCDM_StoreStatus aStatus;
   try {
-    aStatus = Model_Application::getApplication()->SaveAs(myDoc, aPath);
+    aStatus = anApp->SaveAs(myDoc, aPath);
   } catch (Standard_Failure) {
     Handle(Standard_Failure) aFail = Standard_Failure::Caught();
     Events_Error::send(
@@ -200,6 +203,31 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
     std::set<std::string>::iterator aSubIter = mySubs.begin();
     for (; aSubIter != mySubs.end() && isDone; aSubIter++) {
       isDone = subDoc(*aSubIter)->save(theFileName, theResults);
+    }
+    if (isDone) { // also try to copy the not-activated sub-documents
+      // they are not in mySubs but as ResultParts
+      int aPartsNum = size(ModelAPI_ResultPart::group());
+      for(int aPart = 0; aPart < aPartsNum; aPart++) {
+        ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>
+          (object(ModelAPI_ResultPart::group(), aPart));
+        if (aPartRes) {
+          std::string aDocName = aPartRes->data()->name();
+          if (!aDocName.empty() && mySubs.find(aDocName) == mySubs.end()) {
+            // just copy file
+            TCollection_AsciiString aSubPath(DocFileName(anApp->loadPath().c_str(), aDocName));
+            OSD_Path aPath(aSubPath);
+            OSD_File aFile(aPath);
+            if (aFile.Exists()) {
+              TCollection_AsciiString aDestinationDir(DocFileName(theFileName, aDocName));
+              OSD_Path aDestination(aDestinationDir);
+              aFile.Copy(aDestination);
+            } else {
+              Events_Error::send(
+                std::string("Can not open file ") + aSubPath.ToCString() + " for saving");
+            }
+          }
+        }
+      }
     }
   }
   return isDone;
