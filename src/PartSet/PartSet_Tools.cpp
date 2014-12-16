@@ -20,6 +20,7 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Edge.h>
+#include <GeomAPI_Vertex.h>
 
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
@@ -35,6 +36,7 @@
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Point.h>
 
 #include <ModuleBase_ViewerPrs.h>
 
@@ -402,56 +404,87 @@ ResultPtr PartSet_Tools::createFixedObjectByEdge(const TopoDS_Shape& theShape,
                                                  const ObjectPtr& theObject, 
                                                  CompositeFeaturePtr theSketch)
 {
-  if (theShape.ShapeType() != TopAbs_EDGE)
-    return ResultPtr();
+  if (theShape.ShapeType() == TopAbs_EDGE) {
+    // Check that we already have such external edge
+    std::shared_ptr<GeomAPI_Edge> aInEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge());
+    aInEdge->setImpl(new TopoDS_Shape(theShape));
+    ResultPtr aResult = findExternalEdge(theSketch, aInEdge);
+    if (aResult)
+      return aResult;
 
-  // Check that we already have such external edge
-  std::shared_ptr<GeomAPI_Edge> aInEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge());
-  aInEdge->setImpl(new TopoDS_Shape(theShape));
-  ResultPtr aResult = findExternalEdge(theSketch, aInEdge);
-  if (aResult)
-    return aResult;
+    // If not found then we have to create new
+    Standard_Real aStart, aEnd;
+    Handle(V3d_View) aNullView;
+    FeaturePtr aMyFeature;
 
-  // If not found then we have to create new
-  Standard_Real aStart, aEnd;
-  Handle(V3d_View) aNullView;
-  FeaturePtr aMyFeature;
+    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(theShape), aStart, aEnd);
+    GeomAdaptor_Curve aAdaptor(aCurve);
+    if (aAdaptor.GetType() == GeomAbs_Line) {
+      // Create line
+      aMyFeature = theSketch->addFeature(SketchPlugin_Line::ID());
+    } else if (aAdaptor.GetType() == GeomAbs_Circle) {
+      if (aAdaptor.IsClosed()) {
+        // Create circle
+        aMyFeature = theSketch->addFeature(SketchPlugin_Circle::ID());
+      } else {
+        // Create arc
+        aMyFeature = theSketch->addFeature(SketchPlugin_Arc::ID());
+      }
+    }
+    if (aMyFeature) {
+      DataPtr aData = aMyFeature->data();
+      AttributeSelectionPtr anAttr = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+        (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
 
-  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(TopoDS::Edge(theShape), aStart, aEnd);
-  GeomAdaptor_Curve aAdaptor(aCurve);
-  if (aAdaptor.GetType() == GeomAbs_Line) {
-    // Create line
-    aMyFeature = theSketch->addFeature(SketchPlugin_Line::ID());
-  } else if (aAdaptor.GetType() == GeomAbs_Circle) {
-    if (aAdaptor.IsClosed()) {
-      // Create circle
-      aMyFeature = theSketch->addFeature(SketchPlugin_Circle::ID());
-    } else {
-      // Create arc
-      aMyFeature = theSketch->addFeature(SketchPlugin_Arc::ID());
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+      if (anAttr && aRes) {
+        std::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
+        anEdge->setImpl(new TopoDS_Shape(theShape));
+
+        anAttr->setValue(aRes, anEdge);
+
+        aMyFeature->execute();
+
+        // fix this edge
+        FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
+        aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
+          setObject(aMyFeature->lastResult());
+
+        return aMyFeature->lastResult();
+      }
     }
   }
-  if (aMyFeature) {
-    DataPtr aData = aMyFeature->data();
-    AttributeSelectionPtr anAttr = 
-      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-      (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
+  if (theShape.ShapeType() == TopAbs_VERTEX) {
+    std::shared_ptr<GeomAPI_Vertex> aInVert = std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex());
+    aInVert->setImpl(new TopoDS_Shape(theShape));
+    ResultPtr aResult = findExternalVertex(theSketch, aInVert);
+    if (aResult)
+      return aResult;
 
-    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-    if (anAttr && aRes) {
-      std::shared_ptr<GeomAPI_Shape> anEdge(new GeomAPI_Shape);
-      anEdge->setImpl(new TopoDS_Shape(theShape));
+    FeaturePtr aMyFeature = theSketch->addFeature(SketchPlugin_Point::ID());
 
-      anAttr->setValue(aRes, anEdge);
+    if (aMyFeature) {
+      DataPtr aData = aMyFeature->data();
+      AttributeSelectionPtr anAttr = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+        (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
 
-      aMyFeature->execute();
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+      if (anAttr && aRes) {
+        std::shared_ptr<GeomAPI_Shape> aVert(new GeomAPI_Shape);
+        aVert->setImpl(new TopoDS_Shape(theShape));
 
-      // fix this edge
-      FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
-      aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
-        setObject(aMyFeature->lastResult());
+        anAttr->setValue(aRes, aVert);
+        aMyFeature->execute();
 
-      return aMyFeature->lastResult();
+        // fix this edge
+        FeaturePtr aFix = theSketch->addFeature(SketchPlugin_ConstraintRigid::ID());
+        aFix->data()->refattr(SketchPlugin_Constraint::ENTITY_A())->
+          setObject(aMyFeature->lastResult());
+
+        return aMyFeature->lastResult();
+      }
     }
   }
   return ResultPtr();
@@ -493,6 +526,35 @@ ResultPtr PartSet_Tools::findExternalEdge(CompositeFeaturePtr theSketch, std::sh
   }
   return ResultPtr();
 }
+
+
+ResultPtr PartSet_Tools::findExternalVertex(CompositeFeaturePtr theSketch, std::shared_ptr<GeomAPI_Vertex> theVert)
+{
+  for (int i = 0; i < theSketch->numberOfSubs(); i++) {
+    FeaturePtr aFeature = theSketch->subFeature(i);
+    std::shared_ptr<SketchPlugin_Feature> aSketchFea = 
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    if (aSketchFea) {
+      if (aSketchFea->isExternal()) {
+        std::list<ResultPtr> aResults = aSketchFea->results();
+        std::list<ResultPtr>::const_iterator aIt;
+        for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+          ResultConstructionPtr aRes = 
+            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aIt);
+          if (aRes) {
+            std::shared_ptr<GeomAPI_Shape> aShape = aRes->shape();
+            if (aShape) {
+              if (theVert->isEqual(aShape))
+                return aRes;
+            }
+          }
+        }
+      }
+    }
+  }
+  return ResultPtr();
+}
+
 
 bool PartSet_Tools::hasVertexShape(const ModuleBase_ViewerPrs& thePrs, FeaturePtr theSketch,
                                    Handle_V3d_View theView, double& theX, double& theY)

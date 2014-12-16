@@ -30,6 +30,7 @@ class GeomAPI_Pln;
 class GeomAPI_Pnt2d;
 class GeomAPI_Pnt;
 class GeomAPI_Edge;
+class GeomAPI_Vertex;
 
 /*!
  \class PartSet_Tools
@@ -159,6 +160,12 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theEdge - the edge
   /// \return result object with external edge if it is found
   static ResultPtr findExternalEdge(CompositeFeaturePtr theSketch, std::shared_ptr<GeomAPI_Edge> theEdge);
+
+  /// Returns Result object if the given sketch contains external vertex equal to the given
+  /// \param theSketch - the sketch feature
+  /// \param theVert - the vertex
+  /// \return result object with external vertex if it is found
+  static ResultPtr findExternalVertex(CompositeFeaturePtr theSketch, std::shared_ptr<GeomAPI_Vertex> theVert);
 
   /// Returns whether the selected presentation has a shape with the vertex type
   /// \param thePrs a selected presentation

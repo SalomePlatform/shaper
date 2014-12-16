@@ -27,7 +27,8 @@ SET(PROJECT_HEADERS
     GeomAPI_IPresentable.h
     GeomAPI_Curve.h 
     GeomAPI_DataMapOfShapeShape.h
-	GeomAPI_ICustomPrs.h
+    GeomAPI_ICustomPrs.h
+    GeomAPI_Vertex.h
 )
 
 SET(PROJECT_SOURCES
@@ -50,6 +51,7 @@ SET(PROJECT_SOURCES
     GeomAPI_AISObject.cpp
     GeomAPI_Curve.cpp
     GeomAPI_DataMapOfShapeShape.cpp
+    GeomAPI_Vertex.cpp
 )
 
 SET(PROJECT_LIBRARIES
