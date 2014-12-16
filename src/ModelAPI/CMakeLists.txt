@@ -93,4 +93,5 @@ INSTALL(TARGETS ModelAPI DESTINATION bin)
 INSTALL(FILES ${SWIG_SCRIPTS} DESTINATION swig)
 
 ADD_UNIT_TESTS(TestConstants.py
-               TestUndoRedo.py)
+               TestUndoRedo.py
+               TestDocument.py)
