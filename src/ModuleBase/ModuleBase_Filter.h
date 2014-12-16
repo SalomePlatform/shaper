@@ -11,6 +11,8 @@
 
 #include <SelectMgr_Filter.hxx>
 
+#include <list>
+
 /**
  * This object is assigned by the name
  * in the XML file to the specific attribute or to the whole feature.
@@ -19,15 +21,31 @@
  * Filterss must be registered in the filters factory to be
  * correctly identified by the XML string-ID.
  */
-DEFINE_STANDARD_HANDLE(ModuleBase_Filter, SelectMgr_Filter);
-class ModuleBase_Filter: public SelectMgr_Filter
+class ModuleBase_Filter
 {
 public:
-  Standard_EXPORT ModuleBase_Filter(): SelectMgr_Filter() {}
+  MODULEBASE_EXPORT ModuleBase_Filter() {}
 
-  Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
+  /**
+   * Returns an OCC selection filter. It can be appended into the context of a viewer
+   * It creates a filter if it has not be created yet.
+   * \return the selection filter
+   */
+  MODULEBASE_EXPORT Handle(SelectMgr_Filter) getFilter();
 
-  DEFINE_STANDARD_RTTI(ModuleBase_Filter)
+  /**
+   * Sets the arguments to the filter.
+   * \param theArguments a list of arguments
+   */
+  MODULEBASE_EXPORT virtual void setArguments(const std::list<std::string>& theArguments) = 0;
+protected:
+  /**
+   * It creates an internal instance of the OCC filter
+   */
+  virtual void createFilter() = 0;
+
+protected:
+  Handle(SelectMgr_Filter) myFilter; // current instance of the OCC selection filter
 };
 
 #endif //ModuleBase_Filter

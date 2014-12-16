@@ -42,6 +42,11 @@ const std::string& Config_SelectionFilterMessage::attributeId() const
   return myAttributeId;
 }
 
+const std::list<std::string>& Config_SelectionFilterMessage::parameters() const
+{
+  return myFilterParameters;
+}
+
 void Config_SelectionFilterMessage::setFeatureId(const std::string& theId)
 {
   myFeatureId = theId;
@@ -50,5 +55,10 @@ void Config_SelectionFilterMessage::setFeatureId(const std::string& theId)
 void Config_SelectionFilterMessage::setAttributeId(const std::string& theId)
 {
   myAttributeId = theId;
+}
+
+void Config_SelectionFilterMessage::setFilterParameters(const std::list<std::string>& parameters)
+{
+  myFilterParameters = parameters;
 }
 

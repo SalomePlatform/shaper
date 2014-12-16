@@ -58,10 +58,10 @@ CONFIG_EXPORT bool isWidgetNode(xmlNodePtr theNode);
 CONFIG_EXPORT bool hasChild(xmlNodePtr theNode);
 
 /*
- *
+ * Returns named property for an id node as std::string and the parameters of the node.
  */
-CONFIG_EXPORT bool getValidatorInfo(xmlNodePtr theNode, std::string& outValidatorId,
-                                    std::list<std::string>& outValidatorParameters);
+CONFIG_EXPORT bool getParametersInfo(xmlNodePtr theNode, std::string& outPropertyId,
+                                     std::list<std::string>& outValidatorParameters);
 
 /*!
  \brief Convert the given parameter to the platform-specific library name.

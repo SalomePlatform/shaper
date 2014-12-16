@@ -56,6 +56,9 @@ protected:
   /// Set the second point which defines a value in the widget as a distance with a first point defined by feature
   void setPoint(FeaturePtr theFeature, const std::shared_ptr<GeomAPI_Pnt2d>& thePnt);
 
+private slots:
+  void onValuesChanged();
+
  private:
   XGUI_Workshop* myWorkshop;
   std::string myFirstPntName;

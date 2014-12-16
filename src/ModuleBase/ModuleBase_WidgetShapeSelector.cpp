@@ -434,17 +434,24 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
       myWorkshop->deactivateSubShapesSelection();
     }
   }
-
-  /*ModuleBase_FilterFactory* aFactory = myWorkshop->selectionFilters();
-  const SelectMgr_ListOfFilter& aFilters = aFactory->filters(parentID(), attributeID());
+  // apply filters loaded from the XML definition of the widget
+  ModuleBase_FilterFactory* aFactory = myWorkshop->selectionFilters();
+  SelectMgr_ListOfFilter aFilters;
+  aFactory->filters(parentID(), attributeID(), aFilters);
   SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
   for (; aIt.More(); aIt.Next()) {
-    Handle(ModuleBase_Filter) aFilter = Handle(ModuleBase_Filter)::DownCast(aIt.Value());
+    Handle(SelectMgr_Filter) aSelFilter = aIt.Value();
+    if (aSelFilter.IsNull())
+      continue;
+
+    //Handle(ModuleBase_Filter) aFilter = Handle(ModuleBase_Filter)::DownCast(aIt.Value());
+    //if (aFilter.IsNull())
+    //  continue;
     if (myIsActive)
-      aViewer->addSelectionFilter(aFilter);
+      aViewer->addSelectionFilter(aSelFilter);
     else
-      aViewer->removeSelectionFilter(aFilter);
-  }*/
+      aViewer->removeSelectionFilter(aSelFilter);
+  }
 }
 
 //********************************************************************

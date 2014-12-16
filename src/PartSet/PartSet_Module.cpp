@@ -15,6 +15,7 @@
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_FilterLinearEdge.h>
+#include <ModuleBase_FilterFace.h>
 
 
 #include <ModelAPI_Object.h>
@@ -148,7 +149,8 @@ void PartSet_Module::registerFilters()
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   ModuleBase_FilterFactory* aFactory = aConnector->selectionFilters();
 
-  aFactory->registerFilter("LinearEdgeFilter", new ModuleBase_FilterLinearEdge);
+  aFactory->registerFilter("EdgeFilter", new ModuleBase_FilterLinearEdge);
+  aFactory->registerFilter("FaceFilter", new ModuleBase_FilterFace);
 }
 
 void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 

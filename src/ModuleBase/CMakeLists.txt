@@ -6,6 +6,7 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	ModuleBase.h
 	ModuleBase_Filter.h
+	ModuleBase_FilterFace.h
 	ModuleBase_FilterFactory.h
 	ModuleBase_FilterLinearEdge.h
 	ModuleBase_Tools.h
@@ -41,6 +42,7 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
 	ModuleBase_Filter.cpp
+	ModuleBase_FilterFace.cpp
 	ModuleBase_FilterFactory.cpp
 	ModuleBase_FilterLinearEdge.cpp
 	ModuleBase_Tools.cpp

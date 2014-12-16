@@ -13,7 +13,7 @@
 #include <QKeyEvent>
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent)
-    : QObject(theParent)
+    : QObject(theParent), myIsValidationLock(false)
 {
 }
 
@@ -139,7 +139,7 @@ void XGUI_OperationMgr::onValidateOperation()
   if (!hasOperation())
     return;
   ModuleBase_Operation* anOperation = currentOperation();
-  if(anOperation) {
+  if(anOperation && (!myIsValidationLock)) {
     bool isValid = anOperation->isValid();
     emit operationValidated(isValid);
   }

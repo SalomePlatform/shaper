@@ -199,7 +199,7 @@ void XGUI_PropertyPanel::activateNextWidget()
 void XGUI_PropertyPanel::setAcceptEnabled(bool isEnabled)
 {
   QPushButton* anOkBtn = findChild<QPushButton*>(PROP_PANEL_OK);
-  anOkBtn->setEnabled(isEnabled);
+  anOkBtn->setEnabled(true);//isEnabled);
 }
 
 void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
@@ -221,3 +221,29 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
   else if (!isEditingMode())
     emit noMoreWidgets();
 }
+
+void XGUI_PropertyPanel::setOkEnabled(bool theEnabled)
+{
+  QPushButton* anOkBtn = findChild<QPushButton*>(PROP_PANEL_OK);
+  anOkBtn->setEnabled(true);//theEnabled);
+}
+
+bool XGUI_PropertyPanel::isOkEnabled() const
+{
+  QPushButton* anOkBtn = findChild<QPushButton*>(PROP_PANEL_OK);
+  return anOkBtn->isEnabled();
+}
+
+void XGUI_PropertyPanel::setCancelEnabled(bool theEnabled)
+{
+  QPushButton* anCancelBtn = findChild<QPushButton*>(PROP_PANEL_CANCEL);
+  anCancelBtn->setEnabled(theEnabled);
+}
+
+bool XGUI_PropertyPanel::isCancelEnabled() const
+{
+  QPushButton* anCancelBtn = findChild<QPushButton*>(PROP_PANEL_CANCEL);
+  return anCancelBtn->isEnabled();
+}
+
+

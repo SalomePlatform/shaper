@@ -98,6 +98,9 @@ protected slots:
   void onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
   void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
+private slots:
+  void onValuesChanged();
+
  private:
    bool getPoint2d(const Handle(V3d_View)& theView, const TopoDS_Shape& theShape, 
                    double& theX, double& theY) const;

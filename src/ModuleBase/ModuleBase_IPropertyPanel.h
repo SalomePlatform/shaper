@@ -33,6 +33,18 @@ public:
   void setEditingMode(bool isEditing) { myIsEditing = isEditing; }
   bool isEditingMode() const { return myIsEditing; }
 
+  /// Set Enable/Disable state of Ok button
+  virtual void setOkEnabled(bool theEnabled) = 0;
+
+  /// Returns state of Ok button
+  virtual bool isOkEnabled() const = 0;
+
+  /// Set Enable/Disable state of Ok button
+  virtual void setCancelEnabled(bool theEnabled) = 0;
+
+  /// Returns state of Ok button
+  virtual bool isCancelEnabled() const = 0;
+
 signals:
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theEvent key release event

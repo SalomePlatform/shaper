@@ -431,10 +431,10 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
     std::shared_ptr<Config_SelectionFilterMessage> aMsg = 
       std::dynamic_pointer_cast<Config_SelectionFilterMessage>(theMessage);
     if (aMsg) {
-      if (aMsg->attributeId().empty()) {  // feature validator
-        moduleConnector()->selectionFilters()->assignFilter(aMsg->selectionFilterId(), aMsg->featureId(), aMsg->attributeId());
-      } else {  // attribute validator
-        moduleConnector()->selectionFilters()->assignFilter(aMsg->selectionFilterId(), aMsg->featureId(), aMsg->attributeId());
+      ModuleBase_FilterFactory* aFactory = moduleConnector()->selectionFilters();
+      if (!aMsg->attributeId().empty()) {
+        aFactory->assignFilter(aMsg->selectionFilterId(), aMsg->featureId(), aMsg->attributeId(),
+                               aMsg->parameters());
       }
     }
   }
@@ -1229,15 +1229,12 @@ void XGUI_Workshop::onWidgetValuesChanged()
   FeaturePtr aFeature = anOperation->feature();
 
   ModuleBase_ModelWidget* aSenderWidget = dynamic_cast<ModuleBase_ModelWidget*>(sender());
-  //if (aCustom)
-  //  aCustom->storeValue(aFeature);
 
   const QList<ModuleBase_ModelWidget*>& aWidgets = myPropertyPanel->modelWidgets();
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
   for (; anIt != aLast; anIt++) {
     ModuleBase_ModelWidget* aCustom = *anIt;
-    if (aCustom && (/*!aCustom->isInitialized(aFeature) ||*/aCustom == aSenderWidget)) {
-      //aCustom->storeValue(aFeature);
+    if (aCustom && (aCustom == aSenderWidget)) {
       aCustom->storeValue();
     }
   }
