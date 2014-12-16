@@ -43,6 +43,8 @@ class Model_Application : public TDocStd_Application
 
   //! Set path for the loaded by demand documents
   void setLoadPath(std::string thePath);
+  //! Returns the path for the loaded by demand documents
+  const std::string& loadPath() const;
   //! Defines that specified document must be loaded by demand
   void setLoadByDemand(std::string theID);
   //! Returns true if specified document must be loaded by demand

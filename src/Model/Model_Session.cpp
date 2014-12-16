@@ -63,9 +63,15 @@ void Model_Session::finishOperation()
 void Model_Session::abortOperation()
 {
   ROOT_DOC->abortOperation();
+  // here the update mechanism may work after abort, so, supress the warnings about
+  // modifications outside of the transactions
+  bool aWasCheck = myCheckTransactions;
+  myCheckTransactions = false;
   static std::shared_ptr<Events_Message> anAbortMsg
     (new Events_Message(Events_Loop::eventByName("AbortOperation")));
   Events_Loop::loop()->send(anAbortMsg);
+  myCheckTransactions = true;
+  myCheckTransactions = aWasCheck;
 }
 
 bool Model_Session::isOperation()
