@@ -50,4 +50,5 @@ INSTALL(TARGETS FeaturesPlugin DESTINATION plugins)
 INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
 
 ADD_UNIT_TESTS(TestExtrusion.py
-               TestBoolean.py)
+               TestBoolean.py
+               TestGroup.py)

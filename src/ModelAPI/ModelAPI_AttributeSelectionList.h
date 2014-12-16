@@ -20,8 +20,8 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
 {
  public:
   /// Adds the new reference to the end of the list
-  virtual void append(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape) = 0;
+  virtual void append(const ResultPtr& theContext,
+                      const GeomShapePtr& theSubShape) = 0;
 
   /// Returns the number ofselection attributes in the list
   virtual int size() = 0;
