@@ -13,6 +13,7 @@
 class GeomAPI_XYZ;
 class GeomAPI_Pnt2d;
 class GeomAPI_Dir;
+class GeomAPI_Pln;
 
 /**\class GeomAPI_Pnt
  * \ingroup DataModel
@@ -51,6 +52,9 @@ class GEOMAPI_EXPORT GeomAPI_Pnt : public GeomAPI_Interface
   std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
                                         const std::shared_ptr<GeomAPI_Dir>& theDirX,
                                         const std::shared_ptr<GeomAPI_Dir>& theDirY);
+
+  /// Projects a point to the plane defined by the origin and 2 axes vectors in this plane
+  std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pln>& thePln) const;
 
   /// Translates the point along direction theDir on distance theDist
   void translate(const std::shared_ptr<GeomAPI_Dir>& theDir, double theDist);

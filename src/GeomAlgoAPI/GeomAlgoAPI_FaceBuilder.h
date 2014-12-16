@@ -30,6 +30,11 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_FaceBuilder
 
   /// Returns the plane of the planar face. If it is not planar, returns empty ptr.
   static std::shared_ptr<GeomAPI_Pln> plane(std::shared_ptr<GeomAPI_Shape> theFace);
+
+  /// Creates a planar face by given plane, left lower point and size.
+  static std::shared_ptr<GeomAPI_Shape> planarFace(std::shared_ptr<GeomAPI_Pln> thePlane,
+                                                   double theX, double theY,
+                                                   double theWidth, double theHeight);
 };
 
 #endif

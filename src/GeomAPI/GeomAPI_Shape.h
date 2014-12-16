@@ -35,6 +35,11 @@ class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
   /// Returns whether the shape is a face
   virtual bool isFace() const;
 
+  /// Computes boundary dimensions of the shape
+  /// Returns False if it is not possible
+  bool computeSize(double& theXmin, double& theYmin, double& theZmin,
+                   double& theXmax, double& theYmax, double& theZmax) const;
+
 };
 
 //! Pointer on list of shapes

@@ -11,6 +11,8 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
 
+#include <GeomAPI_Pnt2d.h>
+
 
 #define PLANE_SIZE 300
 
@@ -39,8 +41,29 @@ void ConstructionPlugin_Plane::execute()
       std::shared_ptr<GeomAPI_Dir> aDir = aPln->direction();
 
       aOrig->translate(aDir, aDist);
+      std::shared_ptr<GeomAPI_Pln> aNewPln = 
+        std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aOrig, aDir));
+
+      // Create rectangular face close to the selected
+      double aXmin, aYmin, Zmin, aXmax, aYmax, Zmax;
+      aShape->computeSize(aXmin, aYmin, Zmin, aXmax, aYmax, Zmax);
+
+      std::shared_ptr<GeomAPI_Pnt> aPnt1 = 
+        std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aXmin, aYmin, Zmin));
+      std::shared_ptr<GeomAPI_Pnt> aPnt2 = 
+        std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aXmax, aYmax, Zmax));
+
+      std::shared_ptr<GeomAPI_Pnt2d> aPnt2d1 = aPnt1->to2D(aNewPln);
+      std::shared_ptr<GeomAPI_Pnt2d> aPnt2d2 = aPnt2->to2D(aNewPln);
+
+      double aWidth = aPnt2d2->x() - aPnt2d1->x();
+      double aHeight = aPnt2d2->y() - aPnt2d1->y();
+      double aWgap = aWidth * 0.1;
+      double aHgap = aHeight * 0.1;
+
       std::shared_ptr<GeomAPI_Shape> aPlane = 
-        GeomAlgoAPI_FaceBuilder::square(aOrig, aDir, PLANE_SIZE);
+        GeomAlgoAPI_FaceBuilder::planarFace(aNewPln, aPnt2d1->x() - aWgap, aPnt2d1->y() - aHgap, 
+                                            aWidth + 2 * aWgap, aHeight + 2 * aHgap);
       ResultConstructionPtr aConstr = document()->createConstruction(data());
       aConstr->setShape(aPlane);
       setResult(aConstr);

@@ -7,6 +7,8 @@
 #include<GeomAPI_Shape.h>
 
 #include <TopoDS_Shape.hxx>
+#include <BRepBndLib.hxx>
+#include <Bnd_Box.hxx>
 
 #define MY_SHAPE static_cast<TopoDS_Shape*>(myImpl)
 
@@ -46,4 +48,16 @@ bool GeomAPI_Shape::isFace() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
   return aShape.ShapeType() == TopAbs_FACE;
+}
+
+bool GeomAPI_Shape::computeSize(double& theXmin, double& theYmin, double& theZmin,
+                                double& theXmax, double& theYmax, double& theZmax) const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  if (aShape.IsNull())
+    return false;
+  Bnd_Box aBndBox;
+  BRepBndLib::Add(aShape, aBndBox);
+  aBndBox.Get(theXmin, theYmin, theZmin, theXmax, theYmax, theZmax);
+  return true;
 }

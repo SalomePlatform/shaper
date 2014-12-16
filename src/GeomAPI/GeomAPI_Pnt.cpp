@@ -8,8 +8,11 @@
 #include<GeomAPI_XYZ.h>
 #include<GeomAPI_Pnt2d.h>
 #include<GeomAPI_Dir.h>
+#include<GeomAPI_Pln.h>
 
 #include<gp_Pnt.hxx>
+#include<gp_Pln.hxx>
+#include<ProjLib.hxx>
 
 #define MY_PNT static_cast<gp_Pnt*>(myImpl)
 
@@ -81,4 +84,14 @@ void GeomAPI_Pnt::translate(const std::shared_ptr<GeomAPI_Dir>& theDir, double t
   aVec.Normalize();
   aVec.Multiply(theDist);
   MY_PNT->Translate(aVec);
+}
+
+std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Pnt::to2D(const std::shared_ptr<GeomAPI_Pln>& thePln) const
+{
+  double aA, aB, aC, aD;
+  thePln->coefficients(aA, aB, aC, aD);
+  gp_Pln aPln(aA, aB, aC, aD);
+
+  gp_Pnt2d aRes = ProjLib::Project(aPln, *MY_PNT);
+  return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aRes.X(), aRes.Y()));
 }

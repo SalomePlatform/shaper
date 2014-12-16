@@ -52,3 +52,21 @@ std::shared_ptr<GeomAPI_Pln> GeomAlgoAPI_FaceBuilder::plane(
   aResult = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
   return aResult;
 }
+
+
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_FaceBuilder::
+  planarFace(std::shared_ptr<GeomAPI_Pln> thePlane,
+             double theX, double theY,
+             double theWidth, double theHeight)
+{
+  double aA, aB, aC, aD;
+  thePlane->coefficients(aA, aB, aC, aD);
+  gp_Pln aPlane(aA, aB, aC, aD);
+
+  // half of the size in each direction from the center
+  BRepBuilderAPI_MakeFace aFaceBuilder(aPlane, theX, theX + theWidth, 
+                                       theY, theY + theHeight);
+  std::shared_ptr<GeomAPI_Shape> aRes(new GeomAPI_Shape);
+  aRes->setImpl(new TopoDS_Shape(aFaceBuilder.Face()));
+  return aRes;
+}
