@@ -128,6 +128,7 @@ AISObjectPtr SketchPlugin_Arc::getAISObject(AISObjectPtr thePrevious)
                 if (!anAIS)
                   anAIS = AISObjectPtr(new GeomAPI_AISObject);
                 anAIS->createShape(aCompound);
+                anAIS->setWidth(3);
                 return anAIS;
               }
             }
