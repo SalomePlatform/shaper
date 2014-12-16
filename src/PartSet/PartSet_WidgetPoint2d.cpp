@@ -201,6 +201,7 @@ void PartSet_WidgetPoint2D::deactivate()
   disconnect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
              this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
   myWorkshop->moduleConnector()->deactivateSubShapesSelection();
+  myWorkshop->operationMgr()->setLockValidating(false);
 }
 
 bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView, 

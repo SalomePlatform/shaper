@@ -76,6 +76,7 @@ void PartSet_WidgetPoint2dDistance::deactivate()
              this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
   disconnect(aViewer, SIGNAL(mouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)), 
              this, SLOT(onMouseRelease(ModuleBase_IViewWindow*, QMouseEvent*)));
+  myWorkshop->operationMgr()->setLockValidating(false);
 }
 
 void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)

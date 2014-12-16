@@ -199,7 +199,7 @@ void XGUI_PropertyPanel::activateNextWidget()
 void XGUI_PropertyPanel::setAcceptEnabled(bool isEnabled)
 {
   QPushButton* anOkBtn = findChild<QPushButton*>(PROP_PANEL_OK);
-  anOkBtn->setEnabled(true);//isEnabled);
+  anOkBtn->setEnabled(isEnabled);
 }
 
 void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
@@ -225,7 +225,7 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
 void XGUI_PropertyPanel::setOkEnabled(bool theEnabled)
 {
   QPushButton* anOkBtn = findChild<QPushButton*>(PROP_PANEL_OK);
-  anOkBtn->setEnabled(true);//theEnabled);
+  anOkBtn->setEnabled(theEnabled);
 }
 
 bool XGUI_PropertyPanel::isOkEnabled() const
