@@ -76,6 +76,12 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
       TopoDS_Shape aSelShape = aSelection->Get();
       aResult = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
       aResult->setImpl(new TopoDS_Shape(aSelShape));
+    } else { // for simple construction element: just shape of this construction element
+      ResultConstructionPtr aConstr = 
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(context());
+      if (aConstr) {
+        return aConstr->shape();
+      }
     }
   }
   return aResult;
@@ -115,7 +121,7 @@ bool Model_AttributeSelection::update()
     std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 
       std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext)->shape());
-    if (aWirePtr && aWirePtr->hasPlane()) {
+    if (aWirePtr && aWirePtr->hasPlane()) { // sketch sub-element
       TDF_Label aLab = myRef.myRef->Label();
       // getting a type of selected shape
       Handle(TDataStd_Integer) aTypeAttr;
@@ -266,6 +272,9 @@ bool Model_AttributeSelection::update()
           }
         }
       }
+    } else { // simple construction element: the selected is that needed
+      owner()->data()->sendAttributeUpdated(this);
+      return true;
     }
   }
   return false; // unknown case
