@@ -40,6 +40,7 @@ class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
   bool computeSize(double& theXmin, double& theYmin, double& theZmin,
                    double& theXmax, double& theYmax, double& theZmax) const;
 
+  std::string getShapeStream() const;
 };
 
 //! Pointer on list of shapes

@@ -9,6 +9,9 @@
 #include <TopoDS_Shape.hxx>
 #include <BRepBndLib.hxx>
 #include <Bnd_Box.hxx>
+#include <BRepTools.hxx>
+
+#include <sstream>
 
 #define MY_SHAPE static_cast<TopoDS_Shape*>(myImpl)
 
@@ -60,4 +63,12 @@ bool GeomAPI_Shape::computeSize(double& theXmin, double& theYmin, double& theZmi
   BRepBndLib::Add(aShape, aBndBox);
   aBndBox.Get(theXmin, theYmin, theZmin, theXmax, theYmax, theZmax);
   return true;
+}
+
+std::string GeomAPI_Shape::getShapeStream() const
+{
+  std::ostringstream aStream;
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  BRepTools::Write(aShape, aStream);
+  return aStream.str();
 }
