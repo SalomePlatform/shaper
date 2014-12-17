@@ -50,6 +50,11 @@ static const int TAG_HISTORY = 3;  // tag of the history sub-tree (python dump)
 static const int TAG_FEATURE_ARGUMENTS = 1;  ///< where the arguments are located
 static const int TAG_FEATURE_RESULTS = 2;  ///< where the results are located
 
+///
+/// 0:1:2 - where features are located
+/// 0:1:2:N:1 - data of the feature N
+/// 0:1:2:N:2:K:1 - data of the K result of the feature N
+
 Model_Document::Model_Document(const std::string theID, const std::string theKind)
     : myID(theID), myKind(theKind),
       myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format

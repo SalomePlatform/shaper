@@ -32,8 +32,8 @@ void Model_AttributeReference::setValue(ObjectPtr theObject)
         std::dynamic_pointer_cast<Model_Document>(owner()->document());
       myRef->Set(anObjLab);  // references to the object label
        // remove external link attributes (if any)
-      anObjLab.ForgetAttribute(TDataStd_Comment::GetID());
-      anObjLab.ForgetAttribute(TDataStd_AsciiString::GetID());
+      myRef->Label().ForgetAttribute(TDataStd_Comment::GetID());
+      myRef->Label().ForgetAttribute(TDataStd_AsciiString::GetID());
     } else { // different document: store the document name (comment) and entry (string): external
       // if these attributes exist, the link is external: keep reference to access the label
       TDataStd_Comment::Set(myRef->Label(), theObject->document()->id().c_str());
