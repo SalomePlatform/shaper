@@ -17,6 +17,7 @@
 #include <LightApp_Application.h>
 #include <LightApp_SelectionMgr.h>
 #include <LightApp_OCCSelector.h>
+#include <LightApp_Study.h>
 #include <OCCViewer_ViewModel.h>
 
 #include <SUIT_Selector.h>
@@ -257,7 +258,13 @@ NewGeom_OCCSelector* NewGeom_Module::createSelector(SUIT_ViewManager* theMgr)
 //******************************************************
 CAM_DataModel* NewGeom_Module::createDataModel()
 {
-  return new NewGeom_DataModel(this);
+  NewGeom_DataModel* aDataModel = new NewGeom_DataModel(this);
+
+  // Calling addComponent() for persistent functionality work in the SalomeApp_Study
+  LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(application()->activeStudy() );
+  aStudy->addComponent(aDataModel);
+
+  return aDataModel;
 }
 
 //******************************************************

@@ -18,8 +18,9 @@
 from ModelAPI import *
 from GeomDataAPI import *
 from GeomAlgoAPI import *
+from GeomAPI import *
 
-__updated__ = "2014-11-21"
+__updated__ = "2014-12-16"
 
 aSession = ModelAPI_Session.get()
 # Create a part for extrusions & boolean
