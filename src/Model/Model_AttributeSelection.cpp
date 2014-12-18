@@ -33,6 +33,8 @@
 #include <TColStd_MapOfTransient.hxx>
 #include <gp_Pnt.hxx>
 #include <Precision.hxx>
+#include <TDF_ChildIterator.hxx>
+#include <TDF_ChildIDIterator.hxx>
 
 using namespace std;
 /// adeed to the index in the packed map to signalize that the vertex of edge is seleted
@@ -104,6 +106,29 @@ void Model_AttributeSelection::setObject(const std::shared_ptr<ModelAPI_Object>&
   myRef.setObject(theObject);
 }
 
+TDF_LabelMap& Model_AttributeSelection::scope()
+{
+  if (myScope.IsEmpty()) { // create a new scope if not yet done
+    // gets all labels with named shapes that are bofore this feature label (before in history)
+    TDF_Label aFeatureLab = std::dynamic_pointer_cast<Model_Data>(
+      owner()->data())->label().Father();
+    int aFeatureID = aFeatureLab.Tag();
+    TDF_ChildIterator aFeaturesIter(aFeatureLab.Father());
+    for(; aFeaturesIter.More(); aFeaturesIter.Next()) {
+      if (aFeaturesIter.Value().Tag() >= aFeatureID) // the left labels are created later
+        break;
+      TDF_ChildIDIterator aNSIter(aFeaturesIter.Value(), TNaming_NamedShape::GetID(), 1);
+      for(; aNSIter.More(); aNSIter.Next()) {
+        Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(aNSIter.Value());
+        if (!aNS.IsNull() && aNS->Evolution() != TNaming_SELECTED) {
+          myScope.Add(aNS->Label());
+        }
+      }
+    }
+  }
+  return myScope;
+}
+
 bool Model_AttributeSelection::update()
 {
   ResultPtr aContext = context();
@@ -111,8 +136,7 @@ bool Model_AttributeSelection::update()
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {
     // body: just a named shape, use selection mechanism from OCCT
     TNaming_Selector aSelector(selectionLabel());
-    TDF_LabelMap aScope; // empty means the whole document
-    bool aResult = aSelector.Solve(aScope) == Standard_True;
+    bool aResult = aSelector.Solve(scope()) == Standard_True;
     owner()->data()->sendAttributeUpdated(this);
     return aResult;
   } else if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
