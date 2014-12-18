@@ -1094,3 +1094,16 @@ Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2)
 {
   return TDF_LabelMapHasher::IsEqual(theLab1, theLab2);
 }
+
+void Model_Document::addNamingName(const TDF_Label theLabel, std::string theName)
+{
+  myNamingNames[theName] = theLabel;
+}
+
+TDF_Label Model_Document::findNamingName(std::string theName)
+{
+  std::map<std::string, TDF_Label>::iterator aFind = myNamingNames.find(theName);
+  if (aFind == myNamingNames.end())
+    return TDF_Label(); // not found
+  return aFind->second;
+}

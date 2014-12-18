@@ -118,8 +118,8 @@
 
 template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject);
 %template(modelAPI_CompositeFeature) shared_ptr_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
+%template(modelAPI_Feature) shared_ptr_cast<ModelAPI_Feature, ModelAPI_Object>;
 %template(modelAPI_ResultConstruction) shared_ptr_cast<ModelAPI_ResultConstruction, ModelAPI_Result>;
 %template(modelAPI_ResultBody) shared_ptr_cast<ModelAPI_ResultBody, ModelAPI_Result>;
 %template(modelAPI_ResultPart) shared_ptr_cast<ModelAPI_ResultPart, ModelAPI_Result>;
-
-
+%template(modelAPI_ResultGroup) shared_ptr_cast<ModelAPI_ResultPart, ModelAPI_ResultGroup>;
