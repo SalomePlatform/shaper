@@ -264,7 +264,7 @@ bool Model_AttributeSelection::update()
             // searching for deltas
             int aVertexNum = 0;
             if (aSubIds->Contains(aFeatureID + kSTART_VERTEX_DELTA)) aVertexNum = 1;
-            else if (aSubIds->Contains(aFeatureID + kSTART_VERTEX_DELTA)) aVertexNum = 2;
+            else if (aSubIds->Contains(aFeatureID + kSTART_VERTEX_DELTA * 2)) aVertexNum = 2;
             // found the feature with appropriate edge
             FeaturePtr aFeature = aComposite->subFeature(a);
             std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter =
