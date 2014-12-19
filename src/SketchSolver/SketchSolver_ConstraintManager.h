@@ -82,8 +82,9 @@ class SketchSolver_ConstraintManager : public Events_Listener
   void updateEntity(std::shared_ptr<SketchPlugin_Feature> theFeature);
 
   /** \brief Goes through the list of groups and solve the constraints
+   *  \param theForceUpdate flushes the update event in any case: something changed or not
    */
-  void resolveConstraints();
+  void resolveConstraints(const bool theForceUpdate);
 
  private:
   /** \brief Searches list of groups which interact with specified feature
