@@ -46,5 +46,5 @@ bool GeomAPI_Vertex::isEqual(std::shared_ptr<GeomAPI_Shape> theVert)
   TopoDS_Vertex aVertex2 = TopoDS::Vertex(aInShape);
   gp_Pnt aPoint2 = BRep_Tool::Pnt(aVertex2);
 
-  return aPoint1.IsEqual(aPoint2, Precision::Confusion());
+  return aPoint1.IsEqual(aPoint2, Precision::Confusion()) == Standard_True;
 }

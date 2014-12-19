@@ -522,8 +522,8 @@ void PartSet_Module::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* t
           ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent);
         }
       }
+      // after movement the solver will call the update event: optimization
       Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
     }
     myDragDone = true;
     myCurX = aX;

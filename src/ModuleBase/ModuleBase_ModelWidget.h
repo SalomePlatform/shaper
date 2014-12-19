@@ -146,6 +146,7 @@ signals:
   }
 
   void updateObject(ObjectPtr theObj) const;
+  void moveObject(ObjectPtr theObj) const;
 
  protected:
   std::string myAttributeID; /// the attribute name of the model feature

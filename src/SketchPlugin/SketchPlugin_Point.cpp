@@ -14,7 +14,7 @@
 #include <ModelAPI_Session.h>
 
 #include <GeomAPI_Pnt2d.h>
-
+#include <GeomAPI_Vertex.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 
@@ -71,4 +71,17 @@ double SketchPlugin_Point::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>&
 
 bool SketchPlugin_Point::isFixed() {
   return data()->selection(EXTERNAL_ID())->context();
+}
+
+void SketchPlugin_Point::attributeChanged(const std::string& theID) {
+  if (theID == EXTERNAL_ID()) {
+    std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
+     // update arguments due to the selection value
+    if (aSelection && !aSelection->isNull() && aSelection->isVertex()) {
+      std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aSelection));
+      std::shared_ptr<GeomDataAPI_Point2D> aCoordAttr = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(COORD_ID()));
+      aCoordAttr->setValue(sketch()->to2D(aVertex->point()));
+    }
+  }
 }
