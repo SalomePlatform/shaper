@@ -99,6 +99,8 @@ Q_OBJECT
  protected slots:
   virtual void onViewManagerAdded(SUIT_ViewManager* theMgr);
   void onDefaultPreferences();
+  // Obtains the current application and updates its actions
+  void onUpdateCommandStatus();
 
  protected:
   CAM_DataModel* createDataModel();

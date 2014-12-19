@@ -1070,6 +1070,7 @@ void XGUI_Workshop::updateCommandStatus()
     }
   }
   myActionsMgr->update();
+  emit commandStatusUpdated();
 }
 
 //******************************************************

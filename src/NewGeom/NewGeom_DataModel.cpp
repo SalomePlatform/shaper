@@ -40,8 +40,6 @@ bool NewGeom_DataModel::open(const QString& thePath, CAM_Study* theStudy, QStrin
   // The following code creates a new tmp directory with a copy of files.
   QString aTmpDir = theFiles.first();
 
-  //LightApp_Driver aDriver;
-  //QString aNewTmpDir = QString(aDriver.GetTmpDir("", false).c_str());
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( myModule->application()->activeStudy() );
   QString aNewTmpDir = aStudy->GetTmpDir("", false).c_str();
 
@@ -56,6 +54,13 @@ bool NewGeom_DataModel::open(const QString& thePath, CAM_Study* theStudy, QStrin
     QString aNewFile = SUIT_Tools::addSlash(aNewTmpDir) + aFileName;
     if (!QFile::copy(aCurrentFile, aNewFile))
       isDone = false;
+  }
+  if (isDone) {
+    myTmpDirectory = aNewTmpDir;
+  }
+  else {
+    removeDirectory(aNewTmpDir);
+    myTmpDirectory = "";
   }
 
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -103,6 +108,8 @@ bool NewGeom_DataModel::saveAs(const QString& thePath, CAM_Study* theStudy, QStr
 bool NewGeom_DataModel::close()
 {
   myModule->workshop()->closeDocument();
+  removeDirectory(myTmpDirectory);
+  myTmpDirectory = "";
   return LightApp_DataModel::close();
 }
 
@@ -125,3 +132,9 @@ bool NewGeom_DataModel::isSaved() const
 void NewGeom_DataModel::update(LightApp_DataObject* theObj, LightApp_Study* theStudy)
 {
 }
+
+void NewGeom_DataModel::removeDirectory(const QString& theDirectoryName)
+{
+  Qtx::rmDir(theDirectoryName);
+}
+

@@ -226,6 +226,7 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
               TCollection_AsciiString aDestinationDir(DocFileName(theFileName, aDocName));
               OSD_Path aDestination(aDestinationDir);
               aFile.Copy(aDestination);
+              theResults.push_back(aDestinationDir.ToCString());
             } else {
               Events_Error::send(
                 std::string("Can not open file ") + aSubPath.ToCString() + " for saving");

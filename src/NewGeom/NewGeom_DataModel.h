@@ -27,8 +27,18 @@ class NewGeom_EXPORT NewGeom_DataModel : public LightApp_DataModel
 
   virtual void update(LightApp_DataObject* theObj = 0, LightApp_Study* theStudy = 0);
 
+protected:
+  /**
+   * Removes the directory with content if it exists
+   * \param theDirectoryName a directory name
+   */
+  static void removeDirectory(const QString& theDirectoryName);
+
  private:
   QString myStudyPath;
+  QString myTmpDirectory; /// a path to the temporary directory, created by opening a document file
+  /// it should be created because the files reading is postponed in the module. The directory
+  // should be removed after the model document is closed.
   NewGeom_Module* myModule;
 };
 
