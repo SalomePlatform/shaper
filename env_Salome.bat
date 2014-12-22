@@ -90,7 +90,7 @@ IF "%ARCH%" == "Win64" (
 
 @SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
 @SET PATH=%ROOT_DIR%\install\plugins;%ROOT_DIR%\install\bin;%PATH%
-@SET PYTHONPATH=%ROOT_DIR%\install\swig;%PYTHONPATH%
+@SET PYTHONPATH=%ROOT_DIR%\install\swig;%ROOT_DIR%\install\plugins;%PYTHONPATH%
 
 @SET LightAppConfig=%ROOT_DIR%\install\share\salome\resources\newgeom;%GUI_ROOT_DIR%\share\salome\resources\gui
 @SET NewGeomResources=%ROOT_DIR%\install\resources

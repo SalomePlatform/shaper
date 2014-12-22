@@ -81,7 +81,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @REM -------------------------
 @REM QT
 @SET QTDIR=%PDIR%\qt-4.8.4
-@ECHO -- Creating qt.conf... 
+@ECHO -- Creating qt.conf... in %QTDIR%
 @ECHO [Paths] > %QTDIR%/bin/qt.conf
 @ECHO Prefix = %QTDIR:\=/% >> %QTDIR%/bin/qt.conf
 @SET PATH=%QTDIR%\bin;%PATH%
@@ -127,7 +127,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
 @SET PATH=%ROOT_DIR%\install\plugins;%ROOT_DIR%\install\bin;%PATH%
-@SET PYTHONPATH=%ROOT_DIR%\install\swig;%PYTHONPATH%
+@SET PYTHONPATH=%ROOT_DIR%\install\swig;%ROOT_DIR%\install\plugins;%PYTHONPATH%
 
 @REM -------------------------
 @REM PTHREAD
