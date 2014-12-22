@@ -84,7 +84,7 @@ Q_OBJECT
 
   /// Returns true if shape of given object corresponds to requested shape type
   /// This method is called only in non sub-shapes selection mode
-  virtual bool acceptObjectShape(const ObjectPtr theObject) const;
+  //virtual bool acceptObjectShape(const ObjectPtr theObject) const;
 
   /// Returns true if selected shape corresponds to requested shape types
   /// This method is called only in sub-shapes selection mode
@@ -117,9 +117,6 @@ Q_OBJECT
 
   QStringList myShapeTypes;
   QStringList myObjectTypes;
-
-  /// If true then local selector has to be activated in context
-  bool myUseSubShapes;
 
   bool myIsActive;
 
