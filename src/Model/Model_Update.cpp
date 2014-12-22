@@ -82,7 +82,8 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     std::set<ObjectPtr>::const_iterator anObjIter = anObjs.cbegin();
     for(; anObjIter != anObjs.cend(); anObjIter++) {
       myJustCreatedOrUpdated.insert(*anObjIter);
-      (*anObjIter)->data()->mustBeUpdated(true); // object must be updated because it was changed
+      // TODO(mpv): check the next line. Came into dev 0.6.1 from BR_PYTHON_PLUGIN
+      // (*anObjIter)->data()->mustBeUpdated(true); // object must be updated because it was changed
     }
     if (theMessage->eventID() == kMovedEvent)
       return; // this event is for solver update, not here
