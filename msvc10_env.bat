@@ -127,7 +127,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 
 @SET NEW_GEOM_CONFIG_FILE=%ROOT_DIR%\install\plugins
 @SET PATH=%ROOT_DIR%\install\plugins;%ROOT_DIR%\install\bin;%PATH%
-@SET PYTHONPATH=%ROOT_DIR%\install\swig;%PYTHONPATH%
+@SET PYTHONPATH=%ROOT_DIR%\install\swig;%ROOT_DIR%\install\plugins;%PYTHONPATH%
 
 @REM -------------------------
 @REM PTHREAD

@@ -127,6 +127,7 @@ void Events_Loop::flush(const Events_ID& theID)
     std::shared_ptr<Events_Message> aGroup = aMyGroup->second;
     myGroups.erase(aMyGroup);
     send(aGroup, false);
+
     if (!aWasFlushed)
       myFlushed.erase(myFlushed.find(theID.myID));
   }

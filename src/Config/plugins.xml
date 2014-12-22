@@ -6,7 +6,8 @@
   <plugin library="ConstructionPlugin" configuration="plugin-Construction.xml"/>
   <plugin library="FeaturesPlugin" configuration="plugin-Features.xml"/>
   <plugin library="ExchangePlugin" configuration="plugin-Exchange.xml"/>
+  <plugin script="PythonFeaturesPlugin" configuration="plugin-PythonFeatures.xml"/>
   <plugin library="SketchSolver"/>
   <plugin library="GeomValidators"/>
-  <plugin library="DFBrowser"/>
+  <plugin library="DFBrowser" internal="true"/>
 </plugins>
