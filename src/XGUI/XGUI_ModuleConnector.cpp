@@ -57,8 +57,8 @@ void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   // Close context if it was opened in order to clear stsndard selection modes
-  aDisp->closeLocalContexts(false);
-  aDisp->openLocalContext();
+  //aDisp->closeLocalContexts(false);
+  //aDisp->openLocalContext();
   // Convert shape types to selection types
   QIntList aModes;
   foreach(int aType, theTypes) {
@@ -74,7 +74,7 @@ void XGUI_ModuleConnector::deactivateSubShapesSelection()
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   // The document limitation selection has to be only during operation
   //aDisp->removeSelectionFilter(myDocumentShapeFilter);
-  aDisp->closeLocalContexts(false);
+  //aDisp->closeLocalContexts(false);
 }
 
 AISObjectPtr XGUI_ModuleConnector::findPresentation(const ObjectPtr& theObject) const

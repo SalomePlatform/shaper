@@ -32,12 +32,15 @@
 #include <SelectMgr_ListOfFilter.hxx>
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
+#include <TColStd_MapOfTransient.hxx>
+#include <TColStd_MapIteratorOfMapOfTransient.hxx>
+
 #include <set>
 
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse selection sensitivity
 
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
-  : myUseExternalObjects(false), myWorkshop(theWorkshop)
+  : myWorkshop(theWorkshop)
 {
 }
 
@@ -88,26 +91,31 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
     myResult2AISObjectMap[theObject] = theAIS;
+
+    closeLocalContexts(false);
     aContext->Display(anAISIO, false);
     aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, false);
-
+    // Customization of presentation
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     if (aFeature.get() != NULL) {
       GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
       if (aCustPrs.get() != NULL)
         aCustPrs->customisePresentation(theAIS);
     }
-    if (aContext->HasOpenedContext()) {
-      if (myUseExternalObjects) {
-        if (myActiveSelectionModes.size() == 0)
-          aContext->Activate(anAISIO);
-        else {
-          foreach(int aMode, myActiveSelectionModes) {
-            aContext->Activate(anAISIO, aMode);
-          }
-        }
-      }
-    }
+    openLocalContext();
+    aContext->Load(anAISIO, -1, true);
+    activate(theObject);
+    //if (aContext->HasOpenedContext()) {
+      //if (myUseExternalObjects) {
+        //if (myActiveSelectionModes.size() == 0)
+        //  aContext->Activate(anAISIO);
+        //else {
+        //  foreach(int aMode, myActiveSelectionModes) {
+        //    aContext->Activate(anAISIO, aMode);
+        //  }
+        //}
+      //}
+    //}
   }
   if (isUpdateViewer)
     updateViewer();
@@ -175,8 +183,7 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject)
 
 void XGUI_Displayer::activate(ObjectPtr theFeature)
 {
-  QIntList aModes;
-  activate(theFeature, aModes);
+  activate(theFeature, myActiveSelectionModes);
 }
 
 void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
@@ -188,15 +195,89 @@ void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
 
     AISObjectPtr anObj = myResult2AISObjectMap[theObject];
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-    if (aContext->HasOpenedContext()) {
-      aContext->Load(anAIS, -1, true);
-    }
+    aContext->Deactivate(anAIS);
+    //if (aContext->HasOpenedContext()) {
+    //  aContext->Load(anAIS, -1, true);
+    //}
+    // In order to clear active modes list
     if (theModes.size() > 0) {
       foreach(int aMode, theModes) {
         aContext->Activate(anAIS, aMode);
       }
     } else 
       aContext->Activate(anAIS);
+  }
+}
+
+void XGUI_Displayer::activateObjects(const QIntList& theModes)
+{
+  // In order to avoid doblications of selection modes
+  myActiveSelectionModes.clear();
+  foreach (int aMode, theModes) {
+    if (!myActiveSelectionModes.contains(aMode))
+      myActiveSelectionModes.append(aMode);
+  }
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  // Open local context if there is no one
+  if (!aContext->HasOpenedContext()) 
+    return;
+
+  //aContext->UseDisplayedObjects();
+  //myUseExternalObjects = true;
+
+  AIS_ListOfInteractive aPrsList;
+  aContext->DisplayedObjects(aPrsList, true);
+  //Deactivate trihedron which can be activated in local selector
+
+  Handle(AIS_Trihedron) aTrihedron;
+  AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
+  Handle(AIS_InteractiveObject) anAISIO;
+  for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
+    anAISIO = aLIt.Value();
+    aTrihedron = Handle(AIS_Trihedron)::DownCast(anAISIO);
+    if (!aTrihedron.IsNull()) {
+      aContext->Deactivate(aTrihedron);
+    } else {
+      //aContext->Load(anAISIO, -1, true);
+      // In order to clear active modes list
+      aContext->Deactivate(anAISIO);
+      if (myActiveSelectionModes.size() == 0)
+        aContext->Activate(anAISIO);
+      else {
+        foreach(int aMode, myActiveSelectionModes) {
+          aContext->Activate(anAISIO, aMode);
+        }
+      }
+    }
+  }
+}
+
+
+void XGUI_Displayer::deactivateObjects()
+{
+  myActiveSelectionModes.clear();
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  // Open local context if there is no one
+  if (!aContext->HasOpenedContext()) 
+    return;
+
+  aContext->NotUseDisplayedObjects();
+  AIS_ListOfInteractive aPrsList;
+  aContext->DisplayedObjects(aPrsList);
+
+  AIS_ListIteratorOfListOfInteractive aLIt;
+  Handle(AIS_Trihedron) aTrihedron;
+  Handle(AIS_InteractiveObject) anAISIO;
+  for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
+    anAISIO = aLIt.Value();
+    aTrihedron = Handle(AIS_Trihedron)::DownCast(anAISIO);
+    if (!aTrihedron.IsNull()) {
+      aContext->Deactivate(aTrihedron);
+    } else {
+      //aContext->Load(anAISIO, -1, true);
+      aContext->Deactivate(anAISIO);
+      //aContext->Activate(anAISIO);
+    }
   }
 }
 
@@ -311,32 +392,32 @@ void XGUI_Displayer::eraseAll(const bool isUpdateViewer)
      updateViewer();
  }
 
-void XGUI_Displayer::eraseDeletedResults(const bool isUpdateViewer)
-{
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext.IsNull())
-    return;
-
-  QObjectPtrList aRemoved;
-  foreach (ObjectPtr aFeature, myResult2AISObjectMap.keys()) {
-    if (!aFeature || !aFeature->data() || !aFeature->data()->isValid()) {
-      AISObjectPtr anObj = myResult2AISObjectMap[aFeature];
-      if (!anObj)
-        continue;
-      Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-      if (!anAIS.IsNull()) {
-        aContext->Remove(anAIS, false);
-        aRemoved.append(aFeature);
-      }
-    }
-  }
-  foreach(ObjectPtr aObj, aRemoved) {
-    myResult2AISObjectMap.remove(aObj);
-  }
-
-  if (isUpdateViewer)
-    updateViewer();
-}
+//void XGUI_Displayer::eraseDeletedResults(const bool isUpdateViewer)
+//{
+//  Handle(AIS_InteractiveContext) aContext = AISContext();
+//  if (aContext.IsNull())
+//    return;
+//
+//  QObjectPtrList aRemoved;
+//  foreach (ObjectPtr aFeature, myResult2AISObjectMap.keys()) {
+//    if (!aFeature || !aFeature->data() || !aFeature->data()->isValid()) {
+//      AISObjectPtr anObj = myResult2AISObjectMap[aFeature];
+//      if (!anObj)
+//        continue;
+//      Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
+//      if (!anAIS.IsNull()) {
+//        aContext->Remove(anAIS, false);
+//        aRemoved.append(aFeature);
+//      }
+//    }
+//  }
+//  foreach(ObjectPtr aObj, aRemoved) {
+//    myResult2AISObjectMap.remove(aObj);
+//  }
+//
+//  if (isUpdateViewer)
+//    updateViewer();
+//}
 
 void XGUI_Displayer::openLocalContext()
 {
@@ -360,9 +441,9 @@ void XGUI_Displayer::openLocalContext()
 
     aContext->ClearCurrents();
     aContext->OpenLocalContext();
-    aContext->NotUseDisplayedObjects();
+    //aContext->NotUseDisplayedObjects();
 
-    myUseExternalObjects = false;
+    //myUseExternalObjects = false;
     myActiveSelectionModes.clear();
 
     SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
@@ -413,7 +494,7 @@ void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
 
     if (isUpdateViewer)
       updateViewer();
-    myUseExternalObjects = false;
+    //myUseExternalObjects = false;
     myActiveSelectionModes.clear();
 
     // Restore selection
@@ -460,7 +541,11 @@ void XGUI_Displayer::updateViewer()
 
 Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
 {
-  return myWorkshop->viewer()->AISContext();
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  if ((!aContext.IsNull()) && (!aContext->HasOpenedContext())) {
+    aContext->OpenLocalContext();
+  }
+  return aContext;
 }
 
 Handle(SelectMgr_AndFilter) XGUI_Displayer::GetFilter()
@@ -480,7 +565,7 @@ void XGUI_Displayer::displayAIS(AISObjectPtr theAIS, bool isUpdate)
   if (!anAISIO.IsNull()) {
     aContext->Display(anAISIO, isUpdate);
     if (aContext->HasOpenedContext()) {
-      if (myUseExternalObjects) {
+      //if (myUseExternalObjects) {
         if (myActiveSelectionModes.size() == 0)
           aContext->Activate(anAISIO);
         else {
@@ -488,7 +573,7 @@ void XGUI_Displayer::displayAIS(AISObjectPtr theAIS, bool isUpdate)
             aContext->Activate(anAISIO, aMode);
           }
         }
-      }
+      //}
     }
   }
 }
@@ -500,65 +585,6 @@ void XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool isUpdate)
   if (!anAISIO.IsNull()) {
     aContext->Remove(anAISIO, isUpdate);
   }
-}
-
-void XGUI_Displayer::activateObjects(const QIntList& theModes)
-{
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  // Open local context if there is no one
-  if (!aContext->HasOpenedContext()) 
-    return;
-
-  aContext->UseDisplayedObjects();
-  myUseExternalObjects = true;
-  myActiveSelectionModes = theModes;
-
-  //Deactivate trihedron which can be activated in local selector
-  AIS_ListOfInteractive aPrsList;
-  aContext->DisplayedObjects(aPrsList, true);
-
-  Handle(AIS_Trihedron) aTrihedron;
-  AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
-  for(; aLIt.More(); aLIt.Next()){
-    aTrihedron = Handle(AIS_Trihedron)::DownCast(aLIt.Value());
-    if (!aTrihedron.IsNull()) {
-      aContext->Deactivate(aTrihedron);
-      break;
-    }
-  }
-
-  //Activate all displayed objects with the module modes
-  //AIS_ListOfInteractive aPrsList;
-  //aContext->DisplayedObjects(aPrsList, true);
-
-  //AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
-  Handle(AIS_InteractiveObject) anAISIO;
-  for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
-    anAISIO = aLIt.Value();
-    aTrihedron = Handle(AIS_Trihedron)::DownCast(anAISIO);
-    if (!aTrihedron.IsNull())
-      continue;
-
-    aContext->Load(anAISIO, -1, true);
-    if (theModes.size() == 0)
-      aContext->Activate(anAISIO);
-    else {
-      foreach(int aMode, theModes) {
-        aContext->Activate(anAISIO, aMode);
-      }
-    }
-  }
-}
-
-
-void XGUI_Displayer::deactivateObjects()
-{
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  // Open local context if there is no one
-  if (!aContext->HasOpenedContext()) 
-    return;
-
-  aContext->NotUseDisplayedObjects();
 }
 
 
