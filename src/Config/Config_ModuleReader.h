@@ -21,7 +21,8 @@ class Config_ModuleReader : public Config_XMLReader
 {
 
  public:
-  CONFIG_EXPORT Config_ModuleReader(const char* theEventGenerated = 0);CONFIG_EXPORT virtual ~Config_ModuleReader();
+  CONFIG_EXPORT Config_ModuleReader(const char* theEventGenerated = 0);
+  CONFIG_EXPORT virtual ~Config_ModuleReader();
 
   CONFIG_EXPORT const std::map<std::string, std::string>& featuresInFiles() const;
 
