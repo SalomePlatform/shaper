@@ -62,7 +62,17 @@ const std::string& Config_AttributeMessage::caseId() const
   return myCaseId;
 }
 
+const std::string& Config_AttributeMessage::switchId() const
+{
+  return mySwitchId;
+}
+
 void Config_AttributeMessage::setCaseId(const std::string& theId)
 {
   this->myCaseId = theId;
+}
+
+void Config_AttributeMessage::setSwitchId(const std::string& theId)
+{
+  this->mySwitchId = theId;
 }
