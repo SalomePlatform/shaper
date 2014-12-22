@@ -104,7 +104,7 @@ bool Model_Document::load(const char* theFileName)
   if (isError) {
     switch (aStatus) {
       case PCDM_RS_UnknownDocument:
-        Events_Error::send(std::string("Can not open document: unknown format"));
+        Events_Error::send(std::string("Can not open document"));
         break;
       case PCDM_RS_AlreadyRetrieved:
         Events_Error::send(std::string("Can not open document: already opened"));
