@@ -47,10 +47,10 @@ bool Config_WidgetAPI::toChildWidget()
 {
   if (myCurrentNode && hasChild(myCurrentNode)) {
     myCurrentNode = myCurrentNode->children;
-    while (!isElementNode(myCurrentNode)) {
+    while (myCurrentNode && !isElementNode(myCurrentNode)) {
       myCurrentNode = myCurrentNode->next;
     }
-    return true;
+    return myCurrentNode != NULL;
   }
   return false;
 }

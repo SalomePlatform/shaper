@@ -106,8 +106,9 @@ void Model_Session::redo()
 
 FeaturePtr Model_Session::createFeature(string theFeatureID)
 {
-  if (this != myImpl)
+  if (this != myImpl) {
     return myImpl->createFeature(theFeatureID);
+  }
 
   // load all information about plugins, features and attributes
   LoadPluginsInfo();
@@ -123,7 +124,7 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
     myCurrentPluginName = aPlugin.first;
     if (myPluginObjs.find(myCurrentPluginName) == myPluginObjs.end()) {
       // load plugin library if not yet done
-      Config_ModuleReader::loadLibrary(myCurrentPluginName);
+      Config_ModuleReader::loadPlugin(myCurrentPluginName);
     }
     if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
       FeaturePtr aCreated = myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);

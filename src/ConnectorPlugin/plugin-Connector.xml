@@ -1,0 +1,12 @@
+<plugin>
+  <workbench id="Features" document="Part">
+    <group id="Exchange">
+      <feature
+        id="ExportToGEOM"
+        title="Export to GEOM"
+        tooltip="Exports all data in GEOM compatible format"
+        icon=":pictures/part_ico.png">
+      </feature>
+    </group>
+  </workbench>
+</plugin>
