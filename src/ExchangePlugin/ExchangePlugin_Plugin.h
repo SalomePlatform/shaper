@@ -18,7 +18,6 @@ class EXCHANGEPLUGIN_EXPORT ExchangePlugin_Plugin : public ModelAPI_Plugin
   virtual FeaturePtr createFeature(std::string theFeatureID);
 
  public:
-  /// Is needed for python wrapping by swig
   ExchangePlugin_Plugin();
 };
 

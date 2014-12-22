@@ -82,6 +82,8 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     std::set<ObjectPtr>::const_iterator anObjIter = anObjs.cbegin();
     for(; anObjIter != anObjs.cend(); anObjIter++) {
       myJustCreatedOrUpdated.insert(*anObjIter);
+      // TODO(mpv): check the next line. Came into dev 0.6.1 from BR_PYTHON_PLUGIN
+      // (*anObjIter)->data()->mustBeUpdated(true); // object must be updated because it was changed
     }
     if (theMessage->eventID() == kMovedEvent)
       return; // this event is for solver update, not here
@@ -329,7 +331,9 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
       } else { // for automatically updated features (on abort, etc) it is necessary to redisplay anyway
         redisplayWithResults(theFeature, ModelAPI_StateNothing);
       }
-    } else {  // returns also true is results were updated: for sketch that refers to sub-features but results of sub-features were changed
+    } else {
+      // returns also true is results were updated: for sketch that 
+      // refers to sub-features but results of sub-features were changed
       const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
       std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
       for (; aRIter != aResults.cend(); aRIter++) {

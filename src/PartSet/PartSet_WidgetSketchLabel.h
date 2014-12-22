@@ -20,9 +20,9 @@
 #include <TopoDS_Shape.hxx>
 
 class QLabel;
+class QTimer;
 class XGUI_OperationMgr;
 class XGUI_Workshop;
-//class PartSet_OperationSketch;
 
 class PARTSET_EXPORT PartSet_WidgetSketchLabel : public ModuleBase_ModelWidget
 {
@@ -68,6 +68,7 @@ signals:
 
  private slots:
   void onPlaneSelected();
+  void setSketchingMode();
 
  private:
   AISObjectPtr createPreviewPlane(std::shared_ptr<GeomAPI_Pnt> theOrigin, 
@@ -79,7 +80,6 @@ signals:
   void erasePreviewPlanes();
   void showPreviewPlanes();
 
-  void setSketchingMode();
 
   QLabel* myLabel;
   QString myText;
@@ -93,7 +93,8 @@ signals:
   bool myPreviewDisplayed;
 
   Handle(StdSelect_FaceFilter) myFaceFilter;
-  //Handle(ModuleBase_ShapeInPlaneFilter) mySketchFilter;
+
+  QTimer* mySelectionTimer;
 };
 
 #endif

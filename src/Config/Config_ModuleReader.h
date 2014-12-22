@@ -19,6 +19,11 @@
 
 class Config_ModuleReader : public Config_XMLReader
 {
+  enum PluginType {
+    Binary = 0,
+    Intrenal = 1,
+    Python = 2
+  };
 
  public:
   CONFIG_EXPORT Config_ModuleReader(const char* theEventGenerated = 0);
@@ -28,8 +33,11 @@ class Config_ModuleReader : public Config_XMLReader
 
   CONFIG_EXPORT std::string getModuleName();
 
+  CONFIG_EXPORT static void loadPlugin(const std::string thePluginName);
   /// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
   CONFIG_EXPORT static void loadLibrary(const std::string theLibName);
+  /// loads the python module with specified name
+  CONFIG_EXPORT static void loadScript(const std::string theFileName);
 
  protected:
   void processNode(xmlNodePtr aNode);
@@ -37,9 +45,13 @@ class Config_ModuleReader : public Config_XMLReader
 
   std::list<std::string> importPlugin(const std::string& thePluginLibrary,
                                       const std::string& thePluginFile);
+  std::string addPlugin(const std::string& aPluginLibrary,
+                        const std::string& aPluginScript,
+                        const std::string& aPluginConf);
 
  private:
   std::map<std::string, std::string> myFeaturesInFiles;
+  static std::map<std::string, PluginType> myPluginTypes;
   const char* myEventGenerated;
 
 };

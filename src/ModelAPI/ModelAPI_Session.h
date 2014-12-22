@@ -96,9 +96,6 @@ class MODELAPI_EXPORT ModelAPI_Session
   /// Returns the validators factory: the only one instance per application
   virtual ModelAPI_ValidatorsFactory* validators() = 0;
 
-  /// Is needed for python wrapping by swig, call Get to get an instance
-  ModelAPI_Session();
-
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Session()
   {
