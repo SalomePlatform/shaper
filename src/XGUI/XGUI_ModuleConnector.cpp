@@ -72,6 +72,9 @@ void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
 void XGUI_ModuleConnector::deactivateSubShapesSelection()
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
+  // Clear selection modes
+  QIntList aModes;
+  aDisp->activateObjects(aModes);
   // The document limitation selection has to be only during operation
   //aDisp->removeSelectionFilter(myDocumentShapeFilter);
   //aDisp->closeLocalContexts(false);
