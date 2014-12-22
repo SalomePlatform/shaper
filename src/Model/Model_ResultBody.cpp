@@ -6,6 +6,7 @@
 
 #include <Model_ResultBody.h>
 #include <Model_Data.h>
+#include <Model_Document.h>
 #include <TNaming_Builder.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TDataStd_Name.hxx>
@@ -147,7 +148,9 @@ TNaming_Builder* Model_ResultBody::builder(const int theTag)
 
 void Model_ResultBody::buildName(const int theTag, const std::string& theName)
 {
-  std::string aName = data()->name() + "/" + theName;
+  std::string aName = data()->name() + "/" + theName; 
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+  aDoc->addNamingName(builder(theTag)->NamedShape()->Label(), aName);
   TDataStd_Name::Set(builder(theTag)->NamedShape()->Label(),aName.c_str());
 }
 void Model_ResultBody::generated(

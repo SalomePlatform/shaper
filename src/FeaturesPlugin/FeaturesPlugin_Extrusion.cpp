@@ -103,29 +103,31 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature,
 
   GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
   theFeature.mapOfShapes(*aSubShapes);
-  std::string aPrefix =  data()->name() + "/";
-    //Insert lateral face : Face from Edge
-  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theBasis, EDGE,_LATERAL_TAG, aPrefix, *aSubShapes);
+
+  //Insert lateral face : Face from Edge
+  std::string aLatName = "LateralFace";
+  theResultBody->loadAndOrientGeneratedShapes(theFeature.makeShape(), theBasis, EDGE,_LATERAL_TAG, aLatName, *aSubShapes);
 
   //Insert bottom face
+  std::string aBotName = "BottomFace";
   std::shared_ptr<GeomAPI_Shape> aBottomFace = theFeature.firstShape();  
   if (!aBottomFace->isNull()) {
 	if (aSubShapes->isBound(aBottomFace)) {	 
 		aBottomFace = aSubShapes->find(aBottomFace);		
     }     
-    theResultBody->generated(aBottomFace, aPrefix, _FIRST_TAG);
+    theResultBody->generated(aBottomFace, aBotName, _FIRST_TAG);
   }
 
 
 
   //Insert top face
+  std::string aTopName = "TopFace";
   std::shared_ptr<GeomAPI_Shape> aTopFace = theFeature.lastShape();
   if (!aTopFace->isNull()) {
     if (aSubShapes->isBound(aTopFace)) {	 
       aTopFace = aSubShapes->find(aTopFace);	
     }
-    theResultBody->generated(aTopFace, aPrefix, _LAST_TAG);
+    theResultBody->generated(aTopFace, aTopName, _LAST_TAG);
   }
-
   
 }
