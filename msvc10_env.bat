@@ -81,7 +81,7 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @REM -------------------------
 @REM QT
 @SET QTDIR=%PDIR%\qt-4.8.4
-@ECHO -- Creating qt.conf... 
+@ECHO -- Creating qt.conf... in %QTDIR%
 @ECHO [Paths] > %QTDIR%/bin/qt.conf
 @ECHO Prefix = %QTDIR:\=/% >> %QTDIR%/bin/qt.conf
 @SET PATH=%QTDIR%\bin;%PATH%

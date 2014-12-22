@@ -20,6 +20,8 @@
 
 bool isElementNode(xmlNodePtr theNode)
 {
+  if (!theNode)
+    return false;
   return theNode->type == XML_ELEMENT_NODE;
 }
 
