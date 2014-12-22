@@ -88,10 +88,7 @@ class XGUI_EXPORT XGUI_Displayer
 
   /// Erase AIS interactive objects, which has an empty feature in the internal map
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void eraseDeletedResults(const bool isUpdateViewer = true);
-
-  /// Opens local context. Does nothing if it is already opened.
-  void openLocalContext();
+  //void eraseDeletedResults(const bool isUpdateViewer = true);
 
   /// Deactivates selection of sub-shapes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -182,6 +179,9 @@ class XGUI_EXPORT XGUI_Displayer
    */
   void redisplay(ObjectPtr theObject, bool isUpdateViewer = true);
 
+  /// Opens local context. Does nothing if it is already opened.
+  void openLocalContext();
+
  protected:
   XGUI_Workshop* myWorkshop;
 
@@ -191,7 +191,7 @@ class XGUI_EXPORT XGUI_Displayer
   ResultToAISMap myResult2AISObjectMap;
 
   // A flag of initialization of external objects selection
-  bool myUseExternalObjects;
+  //bool myUseExternalObjects;
   // Selection modes installed for external objects in local context
   QIntList myActiveSelectionModes;
 };

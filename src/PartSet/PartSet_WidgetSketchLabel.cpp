@@ -110,7 +110,7 @@ void PartSet_WidgetSketchLabel::onPlaneSelected()
         // Clear selection mode and define sketching mode
         XGUI_Displayer* aDisp = myWorkshop->displayer();
         aDisp->removeSelectionFilter(myFaceFilter);
-        aDisp->closeLocalContexts();
+        //aDisp->closeLocalContexts();
         emit planeSelected(plane());
         setSketchingMode();
 
@@ -141,8 +141,8 @@ void PartSet_WidgetSketchLabel::activate()
     showPreviewPlanes();
 
     XGUI_Displayer* aDisp = myWorkshop->displayer();
-    aDisp->openLocalContext();
-    aDisp->activateObjects(QIntList());
+    //aDisp->openLocalContext();
+    //aDisp->activateObjects(QIntList());
     if (myFaceFilter.IsNull())
       myFaceFilter = new StdSelect_FaceFilter(StdSelect_Plane);
     aDisp->addSelectionFilter(myFaceFilter);
@@ -165,7 +165,7 @@ void PartSet_WidgetSketchLabel::deactivate()
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   aDisp->removeSelectionFilter(myFaceFilter);
   //aDisp->removeSelectionFilter(mySketchFilter);
-  aDisp->closeLocalContexts();
+  //aDisp->closeLocalContexts();
   erasePreviewPlanes();
 }
 
@@ -275,21 +275,12 @@ void PartSet_WidgetSketchLabel::setSketchingMode()
   qDebug("### Set sketching mode");
 
   XGUI_Displayer* aDisp = myWorkshop->displayer();
-  QIntList aModes;
   // Clear standard selection modes if they are defined
-  aDisp->activateObjects(aModes);
-  aDisp->openLocalContext();
-
-  // Set filter
-  std::shared_ptr<GeomAPI_Pln> aPlane = plane();
-  double aA, aB, aC, aD;
-  aPlane->coefficients(aA, aB, aC, aD);
-  gp_Pln aPln(aA, aB, aC, aD);
-  // No selection of external objects
-  //mySketchFilter = new ModuleBase_ShapeInPlaneFilter(aPln);
-  //aDisp->addSelectionFilter(mySketchFilter);
+  //aDisp->activateObjects(aModes);
+  //aDisp->openLocalContext();
 
   // Get default selection modes
+  QIntList aModes;
   aModes.append(AIS_DSM_Text);
   aModes.append(AIS_DSM_Line);
   aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
