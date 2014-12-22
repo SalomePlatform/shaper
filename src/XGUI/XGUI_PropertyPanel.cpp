@@ -246,4 +246,10 @@ bool XGUI_PropertyPanel::isCancelEnabled() const
   return anCancelBtn->isEnabled();
 }
 
-
+void XGUI_PropertyPanel::setEditingMode(bool isEditing)
+{
+  ModuleBase_IPropertyPanel::setEditingMode(isEditing);
+  foreach(ModuleBase_ModelWidget* aWgt, myWidgets) {
+    aWgt->setEditingMode(isEditing);
+  }
+}

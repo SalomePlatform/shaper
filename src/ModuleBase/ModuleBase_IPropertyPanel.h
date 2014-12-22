@@ -30,7 +30,7 @@ public:
   virtual const QList<ModuleBase_ModelWidget*>& modelWidgets() const = 0;
 
   /// Editing mode depends on mode of current operation. This value is defined by it.
-  void setEditingMode(bool isEditing) { myIsEditing = isEditing; }
+  virtual void setEditingMode(bool isEditing) { myIsEditing = isEditing; }
   bool isEditingMode() const { return myIsEditing; }
 
   /// Set Enable/Disable state of Ok button

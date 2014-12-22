@@ -445,19 +445,6 @@ void ModuleBase_WidgetShapeSelector::raisePanel() const
 }
 
 //********************************************************************
-//bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
-//{
-//  if (theValue.object()) {
-//    ObjectPtr aObject = theValue.object();
-//    if (acceptObjectShape(aObject)) {
-//      setObject(aObject);
-//      return true;
-//    }
-//  }
-//  return false;
-//}
-
-//********************************************************************
 void ModuleBase_WidgetShapeSelector::activate()
 {
   activateSelection(true);
