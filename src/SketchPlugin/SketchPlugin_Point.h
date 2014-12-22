@@ -56,6 +56,9 @@ class SketchPlugin_Point : public SketchPlugin_Feature
   /// \param thePoint the point
   virtual double distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
+  /// Called on change of any argument-attribute of this object: for external point
+  SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
+
   /// Use plugin manager for features creation
   SketchPlugin_Point();
 };

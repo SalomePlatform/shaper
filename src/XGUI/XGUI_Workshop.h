@@ -192,6 +192,8 @@ Q_OBJECT
 signals:
   void salomeViewerSelection();
   void errorOccurred(const QString&);
+  //! the signal about the workshop actions states are updated.
+  void commandStatusUpdated();
 
  public slots:
   void updateCommandStatus();

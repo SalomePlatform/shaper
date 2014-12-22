@@ -136,6 +136,11 @@ class Model_Document : public ModelAPI_Document
   ///! On abort, undo or redo it is not necessary: results in document are updated automatically
   bool executeFeatures() {return myExecuteFeatures;}
 
+  //! Registers the name of the shape for the topological naming needs
+  void addNamingName(const TDF_Label theLabel, std::string theName);
+  //! Returns the label, keeper of the name  for the topological naming needs
+  TDF_Label findNamingName(std::string theName);
+
  protected:
 
   //! Returns (creates if needed) the features label
@@ -200,6 +205,8 @@ class Model_Document : public ModelAPI_Document
   /// All features managed by this document (not only in history of OB)
   /// For optimization mapped by labels
   NCollection_DataMap<TDF_Label, FeaturePtr> myObjs;
+  /// Optimization for finding the shape-label by topological naming names
+  std::map<std::string, TDF_Label> myNamingNames;
 
   ///< set of identifiers of sub-documents of this document
   std::set<std::string> mySubs;

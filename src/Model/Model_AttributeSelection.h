@@ -10,6 +10,7 @@
 #include "Model.h"
 #include "Model_AttributeReference.h"
 #include <ModelAPI_AttributeSelection.h>
+#include <TDF_LabelMap.hxx>
 
 /**\class Model_AttributeSelection
  * \ingroup DataModel
@@ -19,6 +20,7 @@
 class Model_AttributeSelection : public ModelAPI_AttributeSelection
 {
   Model_AttributeReference myRef;  ///< The reference functionality reusage
+  TDF_LabelMap myScope; ///< the map of valid labels for naming selection solving
 public:
   /// Defines the result and its selected sub-shape
   MODEL_EXPORT virtual void setValue(
@@ -52,6 +54,9 @@ protected:
   /// Returns the label where TNaming_Selection results are stored
   /// Note: there must be no attributes stored at the same label because Selector clears this lab
   TDF_Label selectionLabel();
+
+  /// Returns the prepared map of valid labels for naming selection solving (creates if not exists)
+  TDF_LabelMap& scope();
 
   friend class Model_Data;
   friend class Model_AttributeSelectionList;

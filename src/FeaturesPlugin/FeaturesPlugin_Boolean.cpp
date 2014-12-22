@@ -103,10 +103,10 @@ void FeaturesPlugin_Boolean::LoadNamingDS(GeomAlgoAPI_Boolean* theFeature,
 
   GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
   theFeature->mapOfShapes(*aSubShapes);
-
+  std::string aPrefix =  data()->name() + "/";
   // Put in DF modified faces
-  theResultBody->loadAndOrientModifiedShapes(theFeature->makeShape(), theObject, FACE, _MODIFY_TAG, *aSubShapes);
-  theResultBody->loadAndOrientModifiedShapes(theFeature->makeShape(), theTool,   FACE, _MODIFY_TAG, *aSubShapes);
+  theResultBody->loadAndOrientModifiedShapes(theFeature->makeShape(), theObject, FACE, _MODIFY_TAG, aPrefix, *aSubShapes);
+  theResultBody->loadAndOrientModifiedShapes(theFeature->makeShape(), theTool,   FACE, _MODIFY_TAG, aPrefix, *aSubShapes);
 
   //Put in DF deleted faces
   theResultBody->loadDeletedShapes(theFeature->makeShape(), theObject, FACE, _DELETED_TAG);

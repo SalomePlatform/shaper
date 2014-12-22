@@ -138,7 +138,8 @@ bool PartSet_WidgetPoint2D::storeValue() const
   double _Y = myYSpin->value();
 #endif
   aPoint->setValue(myXSpin->value(), myYSpin->value());
-  updateObject(myFeature);
+  // after movement the solver will call the update event: optimization
+  moveObject(myFeature);
   aPoint->setImmutable(isImmutable);
   that->blockSignals(isBlocked);
 

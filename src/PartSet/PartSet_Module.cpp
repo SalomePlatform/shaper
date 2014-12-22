@@ -255,6 +255,7 @@ void PartSet_Module::onSelectionChanged()
   }
 }
 
+      // after movement the solver will call the update event: optimization
 
 void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent)
 {

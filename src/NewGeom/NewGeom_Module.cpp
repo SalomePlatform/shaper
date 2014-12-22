@@ -84,6 +84,9 @@ NewGeom_Module::NewGeom_Module()
       mySelector(0), myIsOpened(0), myPopupMgr(0)
 {
   myWorkshop = new XGUI_Workshop(this);
+  connect(myWorkshop, SIGNAL(commandStatusUpdated()),
+          this, SLOT(onUpdateCommandStatus()));
+
   myProxyViewer = new NewGeom_SalomeViewer(this);
 
   ModuleBase_Preferences::setResourceMgr(application()->resourceMgr());
@@ -234,6 +237,12 @@ void NewGeom_Module::onDefaultPreferences()
   LightApp_Preferences* pref = preferences();
   if (pref)
     pref->retrieve();
+}
+
+//******************************************************
+void NewGeom_Module::onUpdateCommandStatus()
+{
+  getApp()->updateActions();
 }
 
 //******************************************************

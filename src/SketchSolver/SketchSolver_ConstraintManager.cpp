@@ -114,7 +114,7 @@ void SketchSolver_ConstraintManager::processEvent(
     }
 
     // Solve the set of constraints
-    resolveConstraints();
+    resolveConstraints(isMovedEvt); // send update for movement in any case
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleteMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
@@ -372,7 +372,7 @@ std::shared_ptr<ModelAPI_CompositeFeature> SketchSolver_ConstraintManager
 //  Class:    SketchSolver_Session
 //  Purpose:  change entities according to available constraints
 // ============================================================================
-void SketchSolver_ConstraintManager::resolveConstraints()
+void SketchSolver_ConstraintManager::resolveConstraints(const bool theForceUpdate)
 {
   myIsComputed = true;
   bool needToUpdate = false;
@@ -388,12 +388,15 @@ void SketchSolver_ConstraintManager::resolveConstraints()
     if ((*aGroupIter)->resolveConstraints())
       needToUpdate = true;
 
-  // Features may be updated => now send events, btu for all changed at once
+  // Features may be updated => now send events, but for all changed at once
   if (isUpdateFlushed) {
     Events_Loop::loop()->setFlushed(anUpdateEvent, true);
   }
-  if (needToUpdate)
-    Events_Loop::loop()->flush(anUpdateEvent);
+  // Must be before flush because on "Updated" flush the results may be produced
+  // and the creation event is appeared with many new objects. If myIsComputed these
+  // events are missed in processEvents and some elements are not added.
   myIsComputed = false;
+  if (needToUpdate || theForceUpdate)
+    Events_Loop::loop()->flush(anUpdateEvent);
 }
 

@@ -84,12 +84,18 @@ bool ModuleBase_ModelWidget::focusTo()
   return true;
 }
 
-
 void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj) const
 {
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
   ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
+}
+
+void ModuleBase_ModelWidget::moveObject(ObjectPtr theObj) const
+{
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
+  ModelAPI_EventCreator::get()->sendUpdated(theObj, anEvent);
+  Events_Loop::loop()->flush(anEvent);
 }
 
 bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
