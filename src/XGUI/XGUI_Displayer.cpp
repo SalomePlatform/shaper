@@ -191,6 +191,7 @@ void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
     if (aContext->HasOpenedContext()) {
       aContext->Load(anAIS, -1, true);
     }
+    aContext->Deactivate(anAIS);
     if (theModes.size() > 0) {
       foreach(int aMode, theModes) {
         aContext->Activate(anAIS, aMode);
@@ -358,8 +359,11 @@ void XGUI_Displayer::openLocalContext()
     // in the closeLocalContex, which restore the global context filters
     aContext->RemoveFilters();
 
-    aContext->ClearCurrents();
+    //aContext->ClearCurrents();
     aContext->OpenLocalContext();
+
+    qDebug("### Open Local context");
+
     aContext->NotUseDisplayedObjects();
 
     myUseExternalObjects = false;
@@ -391,8 +395,10 @@ void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
     SelectMgr_ListOfFilter aFilters;
     aFilters.Assign(aContext->Filters());
 
-    aContext->ClearSelected();
+    //aContext->ClearSelected();
     aContext->CloseAllContexts(false);
+
+    qDebug("### Close Local context");
 
     // Redisplay all object if they were displayed in localContext
     Handle(AIS_InteractiveObject) aAISIO;
@@ -481,6 +487,7 @@ void XGUI_Displayer::displayAIS(AISObjectPtr theAIS, bool isUpdate)
     aContext->Display(anAISIO, isUpdate);
     if (aContext->HasOpenedContext()) {
       if (myUseExternalObjects) {
+        aContext->Deactivate(anAISIO);
         if (myActiveSelectionModes.size() == 0)
           aContext->Activate(anAISIO);
         else {
@@ -517,34 +524,21 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes)
   AIS_ListOfInteractive aPrsList;
   aContext->DisplayedObjects(aPrsList, true);
 
-  Handle(AIS_Trihedron) aTrihedron;
   AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
-  for(; aLIt.More(); aLIt.Next()){
-    aTrihedron = Handle(AIS_Trihedron)::DownCast(aLIt.Value());
-    if (!aTrihedron.IsNull()) {
-      aContext->Deactivate(aTrihedron);
-      break;
-    }
-  }
-
-  //Activate all displayed objects with the module modes
-  //AIS_ListOfInteractive aPrsList;
-  //aContext->DisplayedObjects(aPrsList, true);
-
-  //AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
   Handle(AIS_InteractiveObject) anAISIO;
+  Handle(AIS_Trihedron) aTrihedron;
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
     anAISIO = aLIt.Value();
     aTrihedron = Handle(AIS_Trihedron)::DownCast(anAISIO);
-    if (!aTrihedron.IsNull())
-      continue;
-
-    aContext->Load(anAISIO, -1, true);
-    if (theModes.size() == 0)
-      aContext->Activate(anAISIO);
-    else {
-      foreach(int aMode, theModes) {
-        aContext->Activate(anAISIO, aMode);
+    aContext->Deactivate(anAISIO);
+    if (aTrihedron.IsNull())  {
+      aContext->Load(anAISIO, -1, true);
+      if (theModes.size() == 0)
+        aContext->Activate(anAISIO);
+      else {
+        foreach(int aMode, theModes) {
+          aContext->Activate(anAISIO, aMode);
+        }
       }
     }
   }

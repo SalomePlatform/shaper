@@ -35,6 +35,7 @@
 #include <Config_PropManager.h>
 
 #include <QLabel>
+#include <QTimer>
 
 #define PLANE_SIZE          "200"     
 #define SKETCH_WIDTH        "4"
@@ -51,6 +52,10 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   myTooltip = QString::fromStdString(theData->getProperty("tooltip"));
   myLabel->setToolTip("");
   myLabel->setIndent(5);
+
+  mySelectionTimer = new QTimer(this);
+  connect(mySelectionTimer, SIGNAL(timeout()), SLOT(setSketchingMode()));
+  mySelectionTimer->setSingleShot(true);
 }
 
 PartSet_WidgetSketchLabel::~PartSet_WidgetSketchLabel()
@@ -128,7 +133,9 @@ void PartSet_WidgetSketchLabel::activate()
 {
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
   if (aPlane) {
-    setSketchingMode();
+    //setSketchingMode();
+    // In order to avoid Opening/Closing of context too often
+    mySelectionTimer->start(20);
   } else {
     // We have to select a plane before any operation
     showPreviewPlanes();
@@ -153,7 +160,8 @@ void PartSet_WidgetSketchLabel::activate()
 
 void PartSet_WidgetSketchLabel::deactivate()
 {
-
+  // Do not set selection mode if the widget was activated for a small moment 
+  mySelectionTimer->stop();
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   aDisp->removeSelectionFilter(myFaceFilter);
   //aDisp->removeSelectionFilter(mySketchFilter);
@@ -264,6 +272,8 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Top
 
 void PartSet_WidgetSketchLabel::setSketchingMode()
 {
+  qDebug("### Set sketching mode");
+
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   QIntList aModes;
   // Clear standard selection modes if they are defined

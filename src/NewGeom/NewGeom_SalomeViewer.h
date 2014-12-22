@@ -89,6 +89,10 @@ Q_OBJECT
     return mySelector;
   }
 
+  /// Update current viewer
+  virtual void update();
+
+
  private slots:
   void onMousePress(SUIT_ViewWindow*, QMouseEvent*);
   void onMouseRelease(SUIT_ViewWindow*, QMouseEvent*);

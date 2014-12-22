@@ -65,6 +65,9 @@ Q_OBJECT
   /// Remove all selection filters from the viewer
   virtual void clearSelectionFilters() = 0;
 
+  /// Update current viewer
+  virtual void update() = 0;
+
 signals:
   void lastViewClosed();
   void tryCloseView(ModuleBase_IViewWindow* theWnd);

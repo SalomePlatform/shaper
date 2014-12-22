@@ -4,7 +4,8 @@
 #define PartSet_Module_H
 
 #include "PartSet.h"
-#include <PartSet_Filters.h>
+#include "PartSet_Filters.h"
+#include "PartSet_SketcherMgr.h"
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Definitions.h>
@@ -12,7 +13,7 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_CompositeFeature.h>
 
-#include <StdSelect_FaceFilter.hxx>
+//#include <StdSelect_FaceFilter.hxx>
 #include <TopoDS_Shape.hxx>
 
 #include <QMap>
@@ -49,7 +50,6 @@ public:
   /// Call back forlast tuning of property panel before operation performance
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation);
 
-  QStringList sketchOperationIdList() const;
 
   /// Realizes some functionality by an operation start
   /// Displays all sketcher sub-Objects, hides sketcher result, appends selection filters
@@ -83,22 +83,22 @@ protected slots:
   /// SLOT, that is called by mouse press in the viewer.
   /// \param theWnd - the window where the event happens
   /// \param theEvent the mouse event
-  void onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+  //void onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
   /// SLOT, that is called by mouse release in the viewer.
   /// \param theWnd - the window where the event happens
   /// \param theEvent the mouse event
-  void onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+  //void onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
   
   /// SLOT, that is called by mouse move in the viewer.
   /// \param theWnd - the window where the event happens
   /// \param theEvent the mouse event
-  void onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+  //void onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
   /// SLOT, that is called by mouse double click in the viewer.
   /// \param theWnd - the window where the event happens
   /// \param theEvent the mouse event
-  void onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+  //void onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
   /// SLOT, that is called by key release in the viewer.
   /// The mouse moved point is sent to the current operation to be processed.
@@ -113,8 +113,6 @@ protected slots:
   /// It commits the operation of it is can be committed
   void onOperationActivatedByPreselection();
 
-  /// Launches the operation from current highlighting
-  void launchEditing();
 
  protected:
   /// Register validators for this module
@@ -126,13 +124,8 @@ protected slots:
  private slots:
    void onVertexSelected(ObjectPtr theObject, const TopoDS_Shape& theShape);
 
-   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
  private:
-   /// Converts mouse position to 2d coordinates. 
-   /// Member myCurrentSketch has to be correctly defined
-  void get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent, 
-                  double& theX, double& theY);
 
   /// Breaks sequense of automatically resterted operations
   void breakOperationSequence();
@@ -141,20 +134,13 @@ protected slots:
    QString myLastOperationId;
    FeaturePtr myLastFeature;
 
-   bool myIsDragging;
-   bool myDragDone;
-
    // Automatical restarting mode flag
    RestartingMode myRestartingMode;
 
-   double myCurX, myCurY;
-   CompositeFeaturePtr myCurrentSketch;
-   QList<FeaturePtr> myEditingFeatures;
-   QList<AttributePtr> myEditingAttr;
-
-   Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;
   /// A filter which provides selection within a current document or whole PartSet
   Handle(PartSet_GlobalFilter) myDocumentShapeFilter;
+
+  PartSet_SketcherMgr* mySketchMgr;
 };
 
 #endif
