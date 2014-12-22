@@ -265,3 +265,12 @@ void NewGeom_SalomeViewer::clearSelectionFilters()
     aContext->RemoveFilters();
   }
 }
+
+//***************************************
+void NewGeom_SalomeViewer::update()
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    aContext->UpdateCurrentViewer();
+  }
+}

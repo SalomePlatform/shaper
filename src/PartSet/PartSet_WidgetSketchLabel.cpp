@@ -35,6 +35,7 @@
 #include <Config_PropManager.h>
 
 #include <QLabel>
+#include <QTimer>
 
 #define PLANE_SIZE          "200"     
 #define SKETCH_WIDTH        "4"
@@ -51,6 +52,10 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   myTooltip = QString::fromStdString(theData->getProperty("tooltip"));
   myLabel->setToolTip("");
   myLabel->setIndent(5);
+
+  mySelectionTimer = new QTimer(this);
+  connect(mySelectionTimer, SIGNAL(timeout()), SLOT(setSketchingMode()));
+  mySelectionTimer->setSingleShot(true);
 }
 
 PartSet_WidgetSketchLabel::~PartSet_WidgetSketchLabel()
@@ -105,7 +110,7 @@ void PartSet_WidgetSketchLabel::onPlaneSelected()
         // Clear selection mode and define sketching mode
         XGUI_Displayer* aDisp = myWorkshop->displayer();
         aDisp->removeSelectionFilter(myFaceFilter);
-        aDisp->closeLocalContexts();
+        //aDisp->closeLocalContexts();
         emit planeSelected(plane());
         setSketchingMode();
 
@@ -128,14 +133,16 @@ void PartSet_WidgetSketchLabel::activate()
 {
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
   if (aPlane) {
-    setSketchingMode();
+    //setSketchingMode();
+    // In order to avoid Opening/Closing of context too often
+    mySelectionTimer->start(20);
   } else {
     // We have to select a plane before any operation
     showPreviewPlanes();
 
     XGUI_Displayer* aDisp = myWorkshop->displayer();
-    aDisp->openLocalContext();
-    aDisp->activateObjects(QIntList());
+    //aDisp->openLocalContext();
+    //aDisp->activateObjects(QIntList());
     if (myFaceFilter.IsNull())
       myFaceFilter = new StdSelect_FaceFilter(StdSelect_Plane);
     aDisp->addSelectionFilter(myFaceFilter);
@@ -153,11 +160,12 @@ void PartSet_WidgetSketchLabel::activate()
 
 void PartSet_WidgetSketchLabel::deactivate()
 {
-
+  // Do not set selection mode if the widget was activated for a small moment 
+  mySelectionTimer->stop();
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   aDisp->removeSelectionFilter(myFaceFilter);
   //aDisp->removeSelectionFilter(mySketchFilter);
-  aDisp->closeLocalContexts();
+  //aDisp->closeLocalContexts();
   erasePreviewPlanes();
 }
 
@@ -264,22 +272,15 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Top
 
 void PartSet_WidgetSketchLabel::setSketchingMode()
 {
-  XGUI_Displayer* aDisp = myWorkshop->displayer();
-  QIntList aModes;
-  // Clear standard selection modes if they are defined
-  aDisp->activateObjects(aModes);
-  aDisp->openLocalContext();
+  qDebug("### Set sketching mode");
 
-  // Set filter
-  std::shared_ptr<GeomAPI_Pln> aPlane = plane();
-  double aA, aB, aC, aD;
-  aPlane->coefficients(aA, aB, aC, aD);
-  gp_Pln aPln(aA, aB, aC, aD);
-  // No selection of external objects
-  //mySketchFilter = new ModuleBase_ShapeInPlaneFilter(aPln);
-  //aDisp->addSelectionFilter(mySketchFilter);
+  XGUI_Displayer* aDisp = myWorkshop->displayer();
+  // Clear standard selection modes if they are defined
+  //aDisp->activateObjects(aModes);
+  //aDisp->openLocalContext();
 
   // Get default selection modes
+  QIntList aModes;
   aModes.append(AIS_DSM_Text);
   aModes.append(AIS_DSM_Line);
   aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));

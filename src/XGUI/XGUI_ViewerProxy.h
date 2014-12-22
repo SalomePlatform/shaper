@@ -63,6 +63,9 @@ Q_OBJECT
   /// Remove all selection filters from the viewer
   virtual void clearSelectionFilters();
 
+  /// Update current viewer
+  virtual void update();
+
 private slots:
   void onTryCloseView(AppElements_ViewWindow*);
   void onDeleteView(AppElements_ViewWindow*);

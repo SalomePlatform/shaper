@@ -126,8 +126,8 @@ void FeaturesPlugin_Placement::LoadNamingDS(
 
   GeomAPI_DataMapOfShapeShape* aSubShapes = new GeomAPI_DataMapOfShapeShape();
   theFeature.mapOfShapes(*aSubShapes);
-
+   std::string aPrefix =  data()->name() + "/";
     // put modifed faces in DF
-  theResultBody->loadAndOrientModifiedShapes(theFeature.makeShape(), theSlaveObject, _FACE, _MODIFIEDF_TAG, *aSubShapes); 
+  theResultBody->loadAndOrientModifiedShapes(theFeature.makeShape(), theSlaveObject, _FACE, _MODIFIEDF_TAG, aPrefix, *aSubShapes); 
 
 }

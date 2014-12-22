@@ -257,3 +257,9 @@ void XGUI_ViewerProxy::clearSelectionFilters()
 {
   myWorkshop->displayer()->removeFilters();
 }
+
+//***************************************
+void XGUI_ViewerProxy::update()
+{
+  myWorkshop->displayer()->updateViewer();
+}
