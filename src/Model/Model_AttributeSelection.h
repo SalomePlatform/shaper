@@ -39,6 +39,10 @@ public:
   /// \returns false if update is failed
   MODEL_EXPORT virtual bool update();
 
+  /// builds name of the SubShape 
+  MODEL_EXPORT virtual std::string buildSubShapeName(std::shared_ptr<GeomAPI_Shape> theSubShape, 
+	                                                 const ResultPtr& theContext);
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);

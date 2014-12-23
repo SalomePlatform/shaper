@@ -35,7 +35,9 @@
 #include <Precision.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_ChildIDIterator.hxx>
-
+#include <TDataStd_Name.hxx>
+#include <TopAbs_ShapeEnum.hxx>
+#include <TopoDS_Iterator.hxx>
 using namespace std;
 /// adeed to the index in the packed map to signalize that the vertex of edge is seleted
 /// (multiplied by the index of the edge)
@@ -64,6 +66,10 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
     selectBody(theContext, theSubShape);
   else if (theContext->groupName() == ModelAPI_ResultConstruction::group())
     selectConstruction(theContext, theSubShape);
+
+  std::string aSelName = buildSubShapeName(theSubShape, theContext);
+  if(!aSelName.empty())
+	  TDataStd_Name::Set(selectionLabel(), aSelName.c_str()); //set name
 
   myIsInitialized = true;
   owner()->data()->sendAttributeUpdated(this);
@@ -425,4 +431,57 @@ void Model_AttributeSelection::selectConstruction(
 TDF_Label Model_AttributeSelection::selectionLabel()
 {
   return myRef.myRef->Label().FindChild(1);
+}
+
+std::string Model_AttributeSelection::buildSubShapeName(std::shared_ptr<GeomAPI_Shape> theSubShape, 
+	                                                    const ResultPtr& theContext)
+{
+  std::string aName;
+  if(theSubShape->isNull() || theContext->shape()->isNull()) return aName;  
+  TopoDS_Shape aSubShape = theSubShape->impl<TopoDS_Shape>();
+  TopoDS_Shape aContext  = theContext->shape()->impl<TopoDS_Shape>();
+
+  // check if the subShape is already in DF
+  Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aSubShape, selectionLabel());
+  Handle(TDataStd_Name) anAttr;
+  if(!aNS.IsNull()) { // in the document    
+	if(aNS->Label().FindAttribute(TDataStd_Name::GetID(), anAttr)) {
+	  aName = TCollection_AsciiString(anAttr->Get()).ToCString();
+	  if(!aName.empty()) {
+	    std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(theContext->document());
+	    const TDF_Label& aLabel = aDoc->findNamingName(aName);
+		if(!aLabel.IsEqual(aNS->Label())) {
+			aName.erase(); //something is wrong, to be checked!
+		}
+		const TopoDS_Shape& aShape = aNS->Get();
+		if(aShape.ShapeType() == TopAbs_COMPOUND) {
+		  std::string aFullName = aName + "_";
+		  TopoDS_Iterator it(aShape);
+			int i(1);
+			for (;it.More();it.Next(), i++) {
+			  if(it.Value() != aSubShape) continue;
+			  else {
+				aName = aFullName + TCollection_AsciiString (i).ToCString();
+				break;
+			  }
+			}
+		}
+	  }	
+	}
+  }
+  if(aName.empty() ) { // not in the document!
+    TopAbs_ShapeEnum aType = aSubShape.ShapeType();
+	switch (aType) {
+	  case TopAbs_FACE:
+      // the Face should be in DF. If it is not a case it is an error ==> to be dbugged
+		
+		break;
+	  case TopAbs_EDGE:
+		  break;
+	  case TopAbs_VERTEX:
+		  break;
+
+	}
+  }
+  return aName;
 }

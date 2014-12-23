@@ -44,6 +44,9 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
     return type();
   }
 
+  /// builds name of the SubShape 
+  virtual std::string buildSubShapeName(std::shared_ptr<GeomAPI_Shape> theSubShape, 
+	                                    const ResultPtr& theContext) = 0;
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_AttributeSelection()
   {
