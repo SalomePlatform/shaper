@@ -69,7 +69,9 @@ ObjectPtr Model_AttributeReference::value()
           owner()->document());
       if (aDoc) {
         TDF_Label aRefLab = myRef->Get();
-        return aDoc->object(aRefLab);
+        if (!aRefLab.IsNull()) {  // it may happen with old document, issue #285
+          return aDoc->object(aRefLab);
+        }
       }
     }
   }

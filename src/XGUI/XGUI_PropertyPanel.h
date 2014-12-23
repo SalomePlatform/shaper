@@ -71,6 +71,9 @@ Q_OBJECT
   /// Returns state of Ok button
   virtual bool isCancelEnabled() const;
 
+  /// Editing mode depends on mode of current operation. This value is defined by it.
+  virtual void setEditingMode(bool isEditing);
+
  public slots:
   void updateContentWidget(FeaturePtr theFeature);
   // Enables / disables "ok" ("accept") button
@@ -80,13 +83,6 @@ Q_OBJECT
   // highlighting from the previous active widget
   // emits widgetActivated(theWidget) signal
   virtual void activateWidget(ModuleBase_ModelWidget* theWidget);
-
- signals:
-  /// Signal about the point 2d set to the feature
-  /// \param the feature
-  /// \param the attribute of the feature
-  //void storedPoint2D(ObjectPtr theFeature, const std::string& theAttribute);
-
 
  private:
   QWidget* myCustomWidget;

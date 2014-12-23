@@ -92,7 +92,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
                                                      const Config_WidgetAPI* theData,
                                                      const std::string& theParentId)
     : ModuleBase_ModelWidget(theParent, theData, theParentId),
-      myWorkshop(theWorkshop), myIsActive(false), myUseSubShapes(false)
+      myWorkshop(theWorkshop), myIsActive(false)
 {
   myContainer = new QWidget(theParent);
   QHBoxLayout* aLayout = new QHBoxLayout(myContainer);
@@ -120,7 +120,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
   std::string aObjTypes = theData->getProperty("object_types");
   myObjectTypes = QString(aObjTypes.c_str()).split(' ', QString::SkipEmptyParts);
 
-  myUseSubShapes = theData->getBooleanAttribute("use_subshapes", false); 
+  //myUseSubShapes = theData->getBooleanAttribute("use_subshapes", false); 
 }
 
 //********************************************************************
@@ -137,45 +137,30 @@ bool ModuleBase_WidgetShapeSelector::storeValue() const
     return false;
 
   DataPtr aData = myFeature->data();
-  if (myUseSubShapes) {
-    ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(mySelectedObject);
-    if (aBody) {
-      AttributePtr aAttr = aData->attribute(attributeID());
-
-      // We have to check several attributes types
-      AttributeSelectionPtr aSelectAttr = 
-        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(aAttr);
-      if (aSelectAttr) {
-        aSelectAttr->setValue(aBody, myShape);
-        updateObject(myFeature);
-        return true;
-      } else {
-        AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-        if (aRefAttr) {
-          aRefAttr->setObject(mySelectedObject);
-          updateObject(myFeature);
-          return true;
-        }
-      }
+  AttributeReferencePtr aRef = aData->reference(attributeID());
+  if (aRef) {
+    ObjectPtr aObject = aRef->value();
+    if (!(aObject && aObject->isSame(mySelectedObject))) {
+      aRef->setValue(mySelectedObject);
+      updateObject(myFeature);
+      return true;
     }
   } else {
-    AttributeReferencePtr aRef = aData->reference(attributeID());
-    if (aRef) {
-      ObjectPtr aObject = aRef->value();
+    AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+    if (aRefAttr) {
+      ObjectPtr aObject = aRefAttr->object();
       if (!(aObject && aObject->isSame(mySelectedObject))) {
-        aRef->setValue(mySelectedObject);
+        aRefAttr->setObject(mySelectedObject);
         updateObject(myFeature);
         return true;
       }
     } else {
-      AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-      if (aRefAttr) {
-        ObjectPtr aObject = aRefAttr->object();
-        if (!(aObject && aObject->isSame(mySelectedObject))) {
-          aRefAttr->setObject(mySelectedObject);
-          updateObject(myFeature);
-          return true;
-        }
+      AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
+      ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(mySelectedObject);
+      if (aSelectAttr && aBody && (myShape.get() != NULL)) {
+        aSelectAttr->setValue(aBody, myShape);
+        updateObject(myFeature);
+        return true;
       }
     }
   }
@@ -207,25 +192,20 @@ bool ModuleBase_WidgetShapeSelector::restoreValue()
 {
   DataPtr aData = myFeature->data();
   bool isBlocked = this->blockSignals(true);
-  if (myUseSubShapes) {
-    AttributeSelectionPtr aSelect = aData->selection(attributeID());
-    if (aSelect) {
-      mySelectedObject = aSelect->context();
-      myShape = aSelect->value();
-    } else {
-      AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-      if (aRefAttr) {
-        mySelectedObject = aRefAttr->object();
-      }
-    }
+
+  AttributeSelectionPtr aSelect = aData->selection(attributeID());
+  if (aSelect) {
+    mySelectedObject = aSelect->context();
+    myShape = aSelect->value();
   } else {
-    AttributeReferencePtr aRef = aData->reference(attributeID());
-    if (aRef)
-      mySelectedObject = aRef->value();
-    else {
-      AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-      if (aRefAttr)
-        mySelectedObject = aRefAttr->object();
+    AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+    if (aRefAttr) {
+      mySelectedObject = aRefAttr->object();
+    } else {
+      AttributeReferencePtr aRef = aData->reference(attributeID());
+      if (aRef) {
+        mySelectedObject = aRef->value();
+      }
     }
   }
   updateSelectionName();
@@ -293,21 +273,17 @@ bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
     return false;
 
   // Get sub-shapes from local selection
-  if (myUseSubShapes) {
-    if (!theValue.shape().IsNull()) {
-      aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
-      aShape->setImpl(new TopoDS_Shape(theValue.shape()));
-    }
+  if (!theValue.shape().IsNull()) {
+    aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
+    aShape->setImpl(new TopoDS_Shape(theValue.shape()));
   }
 
   // Check that the selection corresponds to selection type
-  if (myUseSubShapes) {
-    if (!acceptSubShape(aShape))
-      return false;
-  } else {
-    if (!acceptObjectShape(aObject))
-      return false;
-  }
+  if (!acceptSubShape(aShape))
+    return false;
+//  if (!acceptObjectShape(aObject))
+//      return false;
+
   if (isValid(aObject, aShape)) {
     setObject(aObject, aShape);
     return true;
@@ -328,33 +304,34 @@ void ModuleBase_WidgetShapeSelector::setObject(ObjectPtr theObj, std::shared_ptr
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::acceptObjectShape(const ObjectPtr theResult) const
-{
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theResult);
-
-  // Check that the shape of necessary type
-  std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
-  if (!aShapePtr)
-    return false;
-  TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
-  if (aShape.IsNull())
-    return false;
-
-  TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
-  if (aShapeType == TopAbs_COMPOUND) {
-    foreach (QString aType, myShapeTypes) {
-      TopExp_Explorer aEx(aShape, shapeType(aType));
-      if (aEx.More())
-        return true;
-    }
-  } else {
-    foreach (QString aType, myShapeTypes) {
-      if (shapeType(aType) == aShapeType)
-        return true;
-    }
-  }
-  return false;
-}
+//bool ModuleBase_WidgetShapeSelector::acceptObjectShape(const ObjectPtr theResult) const
+//{
+//  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theResult);
+//
+//  // Check that the shape of necessary type
+//  std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
+//  if (!aShapePtr)
+//    return false;
+//  TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+//  if (aShape.IsNull())
+//    return false;
+//
+//  TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
+//  if (aShapeType == TopAbs_COMPOUND) {
+//    foreach (QString aType,
+//      myShapeTypes) {
+//      TopExp_Explorer aEx(aShape, shapeType(aType));
+//      if (aEx.More())
+//        return true;
+//    }
+//  } else {
+//    foreach (QString aType, myShapeTypes) {
+//      if (shapeType(aType) == aShapeType)
+//        return true;
+//    }
+//  }
+//  return false;
+//}
 
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const
@@ -412,27 +389,23 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
 
   if (myIsActive) {
     connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-    if (myUseSubShapes) {
-
-      QIntList aList;
-      foreach (QString aType, myShapeTypes)
-        aList.append(shapeType(aType));
-      myWorkshop->activateSubShapesSelection(aList);
-      if (!myObjectTypes.isEmpty()) {
-        myObjTypeFilter = new ModuleBase_ObjectTypesFilter(myWorkshop, myObjectTypes);
-        aViewer->clearSelectionFilters();
-        aViewer->addSelectionFilter(myObjTypeFilter);
-      }
+    QIntList aList;
+    foreach (QString aType, myShapeTypes) {
+      aList.append(shapeType(aType));
+    }
+    myWorkshop->activateSubShapesSelection(aList);
+    if (!myObjectTypes.isEmpty()) {
+      myObjTypeFilter = new ModuleBase_ObjectTypesFilter(myWorkshop, myObjectTypes);
+      aViewer->clearSelectionFilters();
+      aViewer->addSelectionFilter(myObjTypeFilter);
     }
   } else {
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-    if (myUseSubShapes) {
-      if (!myObjTypeFilter.IsNull()) {
-        aViewer->removeSelectionFilter(myObjTypeFilter);
-        myObjTypeFilter.Nullify();
-      }
-      myWorkshop->deactivateSubShapesSelection();
+    if (!myObjTypeFilter.IsNull()) {
+      aViewer->removeSelectionFilter(myObjTypeFilter);
+      myObjTypeFilter.Nullify();
     }
+    myWorkshop->deactivateSubShapesSelection();
   }
   // apply filters loaded from the XML definition of the widget
   ModuleBase_FilterFactory* aFactory = myWorkshop->selectionFilters();
@@ -470,19 +443,6 @@ void ModuleBase_WidgetShapeSelector::raisePanel() const
     aTabWgt->raise();
   }
 }
-
-//********************************************************************
-//bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
-//{
-//  if (theValue.object()) {
-//    ObjectPtr aObject = theValue.object();
-//    if (acceptObjectShape(aObject)) {
-//      setObject(aObject);
-//      return true;
-//    }
-//  }
-//  return false;
-//}
 
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::activate()

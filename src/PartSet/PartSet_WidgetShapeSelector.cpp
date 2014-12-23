@@ -33,7 +33,7 @@ bool PartSet_WidgetShapeSelector::storeValue() const
   } else {
     // Processing of sketch object
     DataPtr aData = myFeature->data();
-    if (myUseSubShapes && myShape) {
+    if (myShape) {
       AttributePtr aAttr = aData->attribute(attributeID());
       AttributeRefAttrPtr aRefAttr = 
         std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aAttr);

@@ -21,7 +21,6 @@ PartSetPlugin_Duplicate::PartSetPlugin_Duplicate()
 void PartSetPlugin_Duplicate::initAttributes()
 {
   PartSetPlugin_Part::initAttributes();
-  data()->addAttribute(ORIGIN_REF(), ModelAPI_AttributeRefAttr::type());
 
   std::shared_ptr<ModelAPI_Session> aPManager = ModelAPI_Session::get();
   std::shared_ptr<ModelAPI_Document> aRoot = aPManager->moduleDocument();
@@ -37,12 +36,13 @@ void PartSetPlugin_Duplicate::initAttributes()
   if (aSource) {
     std::shared_ptr<ModelAPI_Document> aCopy = aPManager->copy(
         aSource->data()->document(ModelAPI_ResultPart::DOC_REF())->value(), data()->name());
-    data()->refattr(ORIGIN_REF())->setObject(aSource);
+  } else { // invalid part copy: do nothing, keep this in empty name
+    data()->setName("");
   }
 }
 
 void PartSetPlugin_Duplicate::execute()
 {
-  if (data()->refattr(ORIGIN_REF())->object())
+  if (!data()->name().empty())
     PartSetPlugin_Part::execute();
 }

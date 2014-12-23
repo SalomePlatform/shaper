@@ -256,6 +256,8 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
 
 void PartSet_WidgetPoint2D::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  if (isEditingMode())
+    return;
   myWorkshop->operationMgr()->setLockValidating(true);
   myWorkshop->propertyPanel()->setOkEnabled(false);
 

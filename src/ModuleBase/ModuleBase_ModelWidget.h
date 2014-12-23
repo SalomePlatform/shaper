@@ -123,6 +123,10 @@ Q_OBJECT
     myFeature = theFeature;
   }
 
+  /// Editing mode depends on mode of current operation. This value is defined by it.
+  void setEditingMode(bool isEditing) { myIsEditing = isEditing; }
+  bool isEditingMode() const { return myIsEditing; }
+
 signals:
   /// The signal about widget values changed
   void valuesChanged();
@@ -155,6 +159,8 @@ signals:
 
   bool myIsComputedDefault; /// Value should be computed on execute,
                             /// like radius for circle's constraint (can not be zero)
+
+  bool myIsEditing;
 };
 
 #endif

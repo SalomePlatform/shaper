@@ -23,12 +23,6 @@ class PartSetPlugin_Duplicate : public PartSetPlugin_Part
     return MY_DUPLICATE_KIND;
   }
 
-  /// the reference to copy: reference to the attribute
-  inline static const std::string& ORIGIN_REF()
-  {
-    static const std::string MY_DUPLICATE_ID("Origin");
-    return MY_DUPLICATE_ID;
-  }
   /// Makes a new part, copy of active
   PartSetPlugin_Duplicate();
 
