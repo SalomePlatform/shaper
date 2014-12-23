@@ -35,6 +35,9 @@ protected:
   /// Sets the data manager of an object (document does), here also attributes are initialized
   virtual void setData(std::shared_ptr<ModelAPI_Data> theData);
 
+  /// Returns true if document is activated (loaded into the memory)
+  virtual bool isActivated();
+
   friend class Model_Document;
 };
 

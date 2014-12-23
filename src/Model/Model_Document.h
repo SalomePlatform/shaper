@@ -85,7 +85,7 @@ class Model_Document : public ModelAPI_Document
 
   //! Returns the existing feature by the label
   //! \param theLabel base label of the feature
-  MODEL_EXPORT virtual FeaturePtr feature(TDF_Label& theLabel);
+  MODEL_EXPORT virtual FeaturePtr feature(TDF_Label& theLabel) const;
 
   //! Returns the existing object: result or feature
   //! \param theLabel base label of the object
@@ -144,7 +144,7 @@ class Model_Document : public ModelAPI_Document
  protected:
 
   //! Returns (creates if needed) the features label
-  TDF_Label featuresLabel();
+  TDF_Label featuresLabel() const;
 
   //! Initializes feature with a unique name in this group (unique name is generated as 
   //! feature type + "_" + index
@@ -184,7 +184,7 @@ class Model_Document : public ModelAPI_Document
   void updateResults(FeaturePtr theFeature);
 
   //! Returns all sub documents
-  const std::set<std::string>& subDocuments() const {return mySubs;}
+  const std::set<std::string> subDocuments(const bool theActivatedOnly) const;
 
   friend class Model_Application;
   friend class Model_Session;
@@ -208,8 +208,6 @@ class Model_Document : public ModelAPI_Document
   /// Optimization for finding the shape-label by topological naming names
   std::map<std::string, TDF_Label> myNamingNames;
 
-  ///< set of identifiers of sub-documents of this document
-  std::set<std::string> mySubs;
   /// transaction indexes (related to myTransactionsAfterSave) which were empty in this doc
   std::map<int, bool> myIsEmptyTr;
   /// If it is true, features are not executed on update (on abort, undo, redo)

@@ -205,19 +205,17 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
   myTransactionSave = myTransactionsCounter;
   if (isDone) {  // save also sub-documents if any
     theResults.push_back(TCollection_AsciiString(aPath).ToCString());
-    std::set<std::string>::iterator aSubIter = mySubs.begin();
-    for (; aSubIter != mySubs.end() && isDone; aSubIter++) {
+    const std::set<std::string> aSubs = subDocuments(true);
+    std::set<std::string>::iterator aSubIter = aSubs.begin();
+    for (; aSubIter != aSubs.end() && isDone; aSubIter++) {
       isDone = subDoc(*aSubIter)->save(theFileName, theResults);
     }
+    const std::set<std::string> allSubs = subDocuments(false);
     if (isDone) { // also try to copy the not-activated sub-documents
-      // they are not in mySubs but as ResultParts
-      int aPartsNum = size(ModelAPI_ResultPart::group());
-      for(int aPart = 0; aPart < aPartsNum; aPart++) {
-        ResultPartPtr aPartRes = std::dynamic_pointer_cast<ModelAPI_ResultPart>
-          (object(ModelAPI_ResultPart::group(), aPart));
-        if (aPartRes) {
-          std::string aDocName = aPartRes->data()->name();
-          if (!aDocName.empty() && mySubs.find(aDocName) == mySubs.end()) {
+      for(aSubIter = allSubs.begin(); aSubIter != allSubs.end(); aSubIter++) {
+        if (aSubs.find(*aSubIter) == aSubs.end()) { // filter out the active subs
+          std::string aDocName = *aSubIter;
+          if (!aDocName.empty() && aSubs.find(aDocName) == aSubs.end()) {
             // just copy file
             TCollection_AsciiString aSubPath(DocFileName(anApp->loadPath().c_str(), aDocName));
             OSD_Path aPath(aSubPath);
@@ -246,10 +244,10 @@ void Model_Document::close(const bool theForever)
     aPM->setActiveDocument(aPM->moduleDocument());
   }
   // close all subs
-  std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for (; aSubIter != mySubs.end(); aSubIter++)
+  const std::set<std::string> aSubs = subDocuments(true);
+  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->close(theForever);
-  mySubs.clear();
 
   // close for thid document needs no transaction in this document
   std::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(false);
@@ -294,8 +292,9 @@ void Model_Document::startOperation()
     myDoc->NewCommand();
   }
   // new command for all subs
-  std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for (; aSubIter != mySubs.end(); aSubIter++)
+  const std::set<std::string> aSubs = subDocuments(true);
+  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->startOperation();
 }
 
@@ -353,8 +352,9 @@ void Model_Document::finishOperation()
         ->setCheckTransactions(true);  // for nested transaction commit
 
   // finish for all subs first: to avoid nested finishing and "isOperation" calls problems inside
-  std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for (; aSubIter != mySubs.end(); aSubIter++)
+  const std::set<std::string> aSubs = subDocuments(true);
+  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->finishOperation();
 
   if (myNestedNum != -1)  // this nested transaction is owervritten
@@ -388,8 +388,9 @@ void Model_Document::abortOperation()
   }
   synchronizeFeatures(true, false); // references were not changed since transaction start
   // abort for all subs
-  std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for (; aSubIter != mySubs.end(); aSubIter++)
+  const std::set<std::string> aSubs = subDocuments(true);
+  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->abortOperation();
 }
 
@@ -411,8 +412,9 @@ bool Model_Document::canUndo()
       && myTransactionsCounter != 0 /* for omitting the first useless transaction */)
     return true;
   // check other subs contains operation that can be undoed
-  std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for (; aSubIter != mySubs.end(); aSubIter++)
+  const std::set<std::string> aSubs = subDocuments(true);
+  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  for (; aSubIter != aSubs.end(); aSubIter++)
     if (subDoc(*aSubIter)->canUndo())
       return true;
   return false;
@@ -427,8 +429,9 @@ void Model_Document::undo()
     myDoc->Undo();
   synchronizeFeatures(true, true);
   // undo for all subs
-  std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for (; aSubIter != mySubs.end(); aSubIter++)
+  const std::set<std::string> aSubs = subDocuments(true);
+  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->undo();
 }
 
@@ -437,8 +440,9 @@ bool Model_Document::canRedo()
   if (myDoc->GetAvailableRedos() > 0)
     return true;
   // check other subs contains operation that can be redoed
-  std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for (; aSubIter != mySubs.end(); aSubIter++)
+  const std::set<std::string> aSubs = subDocuments(true);
+  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  for (; aSubIter != aSubs.end(); aSubIter++)
     if (subDoc(*aSubIter)->canRedo())
       return true;
   return false;
@@ -453,8 +457,9 @@ void Model_Document::redo()
   myTransactionsCounter++;
   synchronizeFeatures(true, true);
   // redo for all subs
-  std::set<std::string>::iterator aSubIter = mySubs.begin();
-  for (; aSubIter != mySubs.end(); aSubIter++)
+  const std::set<std::string> aSubs = subDocuments(true);
+  std::set<std::string>::iterator aSubIter = aSubs.begin();
+  for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->redo();
 }
 
@@ -579,7 +584,7 @@ void Model_Document::removeFeature(FeaturePtr theFeature, const bool theCheck)
   ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
 }
 
-FeaturePtr Model_Document::feature(TDF_Label& theLabel)
+FeaturePtr Model_Document::feature(TDF_Label& theLabel) const
 {
   if (myObjs.IsBound(theLabel))
     return myObjs.Find(theLabel);
@@ -609,17 +614,35 @@ ObjectPtr Model_Document::object(TDF_Label theLabel)
 
 std::shared_ptr<ModelAPI_Document> Model_Document::subDocument(std::string theDocID)
 {
-  // just store sub-document identifier here to manage it later
-  if (mySubs.find(theDocID) == mySubs.end())
-    mySubs.insert(theDocID);
   return Model_Application::getApplication()->getDocument(theDocID);
+}
+
+const std::set<std::string> Model_Document::subDocuments(const bool theActivatedOnly) const
+{
+  std::set<std::string> aResult;
+  // comment must be in any feature: it is kind
+  int anIndex = 0;
+  TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
+  for (; aLabIter.More(); aLabIter.Next()) {
+    TDF_Label aFLabel = aLabIter.Value()->Label();
+    FeaturePtr aFeature = feature(aFLabel);
+    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+    for (; aRIter != aResults.cend(); aRIter++) {
+      if ((*aRIter)->groupName() != ModelAPI_ResultPart::group()) continue;
+      if ((*aRIter)->isInHistory()) {
+        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRIter);
+        if (aPart && (!theActivatedOnly || aPart->isActivated()))
+          aResult.insert(aPart->data()->name());
+      }
+    }
+  }
+  return aResult;
 }
 
 std::shared_ptr<Model_Document> Model_Document::subDoc(std::string theDocID)
 {
   // just store sub-document identifier here to manage it later
-  if (mySubs.find(theDocID) == mySubs.end())
-    mySubs.insert(theDocID);
   return std::dynamic_pointer_cast<Model_Document>(
     Model_Application::getApplication()->getDocument(theDocID));
 }
@@ -710,7 +733,7 @@ int Model_Document::size(const std::string& theGroupID, const bool theHidden)
   return aResult;
 }
 
-TDF_Label Model_Document::featuresLabel()
+TDF_Label Model_Document::featuresLabel() const
 {
   return myDoc->Main().FindChild(TAG_OBJECTS);
 }

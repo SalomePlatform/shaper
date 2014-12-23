@@ -155,7 +155,7 @@ void Model_Update::updateInDoc(std::shared_ptr<ModelAPI_Document> theDoc)
   // all sub-documents one by one
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(theDoc);
   if (aDoc) {
-    const std::set<std::string>& aSubs = aDoc->subDocuments();
+    const std::set<std::string> aSubs = aDoc->subDocuments(true);
     for(std::set<std::string>::iterator aSub = aSubs.begin(); aSub != aSubs.end(); aSub++) {
       DocumentPtr aSubDoc = theDoc->subDocument(*aSub);
       if (aSubDoc) {
