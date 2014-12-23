@@ -104,7 +104,10 @@ bool GeomAPI_Edge::isEqual(std::shared_ptr<GeomAPI_Shape> theEdge)
 {
   const TopoDS_Shape& aMyShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   const TopoDS_Shape& aInShape = theEdge->impl<TopoDS_Shape>();
-  
+
+  if (aMyShape.ShapeType() != aInShape.ShapeType())
+    return false;
+
   double aMyStart, aMyEnd;
   Handle(Geom_Curve) aMyCurve = BRep_Tool::Curve(TopoDS::Edge(aMyShape), aMyStart, aMyEnd);
   double aInStart, aInEnd;
