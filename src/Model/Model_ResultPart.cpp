@@ -36,7 +36,7 @@ void Model_ResultPart::activate()
 {
   std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->document(DOC_REF());
   
-  if (!aDocRef->value()) {  // create (or open) a document if it is not yet created
+  if (!aDocRef->value().get()) {  // create (or open) a document if it is not yet created
     std::shared_ptr<ModelAPI_Document> aDoc = document()->subDocument(data()->name());
     if (aDoc) {
       aDocRef->setValue(aDoc);
@@ -44,4 +44,10 @@ void Model_ResultPart::activate()
   }
   if (aDocRef->value())
     ModelAPI_Session::get()->setActiveDocument(aDocRef->value());
+}
+
+bool Model_ResultPart::isActivated() 
+{
+  std::shared_ptr<ModelAPI_AttributeDocRef> aDocRef = data()->document(DOC_REF());
+  return aDocRef->value().get();
 }

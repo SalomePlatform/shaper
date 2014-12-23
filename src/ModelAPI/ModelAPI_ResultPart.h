@@ -46,6 +46,9 @@ class ModelAPI_ResultPart : public ModelAPI_Result
 
   /// Sets this document as current and if it is not loaded yet, loads it
   virtual void activate() = 0;
+
+  /// Returns true if document is activated (loaded into the memory)
+  virtual bool isActivated() = 0;
 };
 
 //! Pointer on feature object

@@ -40,6 +40,9 @@ bool GeomAPI_Vertex::isEqual(std::shared_ptr<GeomAPI_Shape> theVert)
   const TopoDS_Shape& aMyShape = const_cast<GeomAPI_Vertex*>(this)->impl<TopoDS_Shape>();
   const TopoDS_Shape& aInShape = theVert->impl<TopoDS_Shape>();
 
+  if (aMyShape.ShapeType() != aInShape.ShapeType())
+    return false;
+
   TopoDS_Vertex aVertex1 = TopoDS::Vertex(aMyShape);
   gp_Pnt aPoint1 = BRep_Tool::Pnt(aVertex1);
 

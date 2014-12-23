@@ -190,8 +190,9 @@ std::list<std::shared_ptr<ModelAPI_Document> > Model_Session::allOpenedDocuments
     DocumentPtr anAPIDoc = *aDoc;
     std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(anAPIDoc);
     if (aDoc) {
-      std::set<std::string>::const_iterator aSubIter = aDoc->subDocuments().cbegin();
-      for(; aSubIter != aDoc->subDocuments().cend(); aSubIter++) {
+      const std::set<std::string> aSubs = aDoc->subDocuments(true);
+      std::set<std::string>::const_iterator aSubIter = aSubs.cbegin();
+      for(; aSubIter != aSubs.cend(); aSubIter++) {
         if (!Model_Application::getApplication()->isLoadByDemand(*aSubIter)) {
           aResult.push_back(Model_Application::getApplication()->getDocument(*aSubIter));
         }
