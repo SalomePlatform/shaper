@@ -380,6 +380,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   if ((!aData) || (!aData->isValid())) {
     // The sketch was aborted
     myCurrentSketch = CompositeFeaturePtr();
+    myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
     return; 
   }
   // Hide all sketcher sub-Objects
