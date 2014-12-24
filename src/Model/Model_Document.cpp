@@ -40,7 +40,7 @@
 # define _separator_ '/'
 #endif
 
-static const int UNDO_LIMIT = 10;  // number of possible undo operations
+static const int UNDO_LIMIT = 1000;  // number of possible undo operations (big for sketcher)
 
 static const int TAG_GENERAL = 1;  // general properties tag
 static const int TAG_OBJECTS = 2;  // tag of the objects sub-tree (features, results)
