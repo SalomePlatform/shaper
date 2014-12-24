@@ -86,6 +86,26 @@ bool Model_Application::isLoadByDemand(std::string theID)
 }
 
 //=======================================================================
+void Model_Application::removeUselessDocuments(
+  std::list<std::shared_ptr<ModelAPI_Document> > theUsedDocs)
+{
+  std::map<std::string, std::shared_ptr<Model_Document> >::iterator aDoc = myDocs.begin();
+  while(aDoc != myDocs.end()) {
+    bool aFound = false;
+    std::list<std::shared_ptr<ModelAPI_Document> >::iterator aUsed = theUsedDocs.begin();
+    for(; !aFound && aUsed != theUsedDocs.end(); aUsed++) {
+      aFound = aDoc->second == *aUsed;
+    }
+    if (!aFound) { // remove the useless
+      aDoc->second->close();
+      aDoc = myDocs.erase(aDoc);
+    } else {
+      aDoc++;
+    }
+  }
+}
+
+//=======================================================================
 Model_Application::Model_Application()
 {
   // store handle to the application to avoid nullification

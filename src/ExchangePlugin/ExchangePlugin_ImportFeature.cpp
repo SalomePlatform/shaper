@@ -8,6 +8,8 @@
  */
 
 #include <ExchangePlugin_ImportFeature.h>
+#include <ExchangePlugin_BREPImport.h>
+#include <ExchangePlugin_STEPImport.h>
 
 #include <GeomAPI_Shape.h>
 #include <Config_Common.h>
@@ -27,17 +29,6 @@
 #include <iostream>
 #include <ostream>
 #endif
-
-#ifdef WIN32
-# define _separator_ '\\'
-#else
-# define _separator_ '/'
-#endif
-
-typedef TopoDS_Shape (*importFunctionPointer)(const TCollection_AsciiString&,
-                                              const TCollection_AsciiString&,
-                                              TCollection_AsciiString&,
-                                              const TDF_Label&);
 
 ExchangePlugin_ImportFeature::ExchangePlugin_ImportFeature()
 {
@@ -83,43 +74,41 @@ bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
   TCollection_AsciiString aFileName (theFileName.c_str());
   OSD_Path aPath(aFileName);
   TCollection_AsciiString aFormatName = aPath.Extension();
-  // ".brep" -> "BREP". TCollection_AsciiString are numbered from 1
+  // ".brep" -> "BREP", TCollection_AsciiString are numbered from 1
   aFormatName = aFormatName.SubString(2, aFormatName.Length());
   aFormatName.UpperCase();
 
-  // Load plugin library and get the "Import" method
-  LibHandle anImportLib = loadImportPlugin(std::string(aFormatName.ToCString()));
-  if(!anImportLib)
-    return false;
-  importFunctionPointer fp = (importFunctionPointer) GetProc(anImportLib, "Import");
-   // Perform the import
-   TCollection_AsciiString anError;
-   TDF_Label anUnknownLabel = TDF_Label();
-   TopoDS_Shape aShape = fp(aFileName,
-                            aFormatName,
-                            anError,
-                            anUnknownLabel);
+  // Perform the import
+  TCollection_AsciiString anError;
+  TDF_Label anUnknownLabel = TDF_Label();
+
+  TopoDS_Shape aShape;
+  if (aFormatName == "BREP") {
+    aShape = BREPImport::Import(aFileName, aFormatName, anError, anUnknownLabel);
+  } else if (aFormatName == "STEP") {
+    aShape = STEPImport::Import(aFileName, aFormatName, anError, anUnknownLabel);
+  }
    // Check if shape is valid
-   if ( aShape.IsNull() ) {
+  if ( aShape.IsNull() ) {
      const static std::string aShapeError = 
        "An error occurred while importing " + theFileName + ": " + anError.ToCString();
      setError(aShapeError);
      return false;
    }
-  //
-   // Pass the results into the model
-   std::string anObjectName = aPath.Name().ToCString();
-   data()->setName(anObjectName);
-   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
-   std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
-   aGeomShape->setImpl(new TopoDS_Shape(aShape));
 
-   //LoadNamingDS of the imported shape
-   loadNamingDS(aGeomShape, aResultBody);
+  // Pass the results into the model
+  std::string anObjectName = aPath.Name().ToCString();
+  data()->setName(anObjectName);
+  std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
+  std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+  aGeomShape->setImpl(new TopoDS_Shape(aShape));
 
-   setResult(aResultBody);
+  //LoadNamingDS of the imported shape
+  loadNamingDS(aGeomShape, aResultBody);
 
-   return true;
+  setResult(aResultBody);
+
+  return true;
 }
 
 //============================================================================
@@ -137,36 +126,4 @@ void ExchangePlugin_ImportFeature::loadNamingDS(
   theResultBody->loadDisconnectedEdges(theGeomShape, aNameDE, aTag);
   std::string aNameDV = "DiscVertexes";
   theResultBody->loadDisconnectedVertexes(theGeomShape, aNameDV, aTag); 
-}
-
-LibHandle ExchangePlugin_ImportFeature::loadImportPlugin(const std::string& theFormatName)
-{
-  std::string aLibName = library(theFormatName + ID());
-  LibHandle anImportLib = LoadLib(aLibName.c_str());
-  std::string anImportError = "Failed to load " + aLibName + ": ";
-  if(!anImportLib) {
-#ifdef WIN32
-    LPVOID lpMsgBuf;
-    ::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                    FORMAT_MESSAGE_FROM_SYSTEM |
-                    FORMAT_MESSAGE_IGNORE_INSERTS,
-                    0, ::GetLastError(), 0, (LPTSTR) &lpMsgBuf, 0, 0);
-    anImportError = anImportError + std::string((char*) lpMsgBuf);
-    ::LocalFree(lpMsgBuf);
-#else
-    anImportError = anImportError + std::string(dlerror());
-#endif
-    setError(anImportError);
-    return false;
-  }
-  // Test loaded plugin for existence of valid "Import" function:
-  importFunctionPointer fp = (importFunctionPointer) GetProc(anImportLib, "Import");
-  if (!fp) {
-    const static std::string aFunctionError = 
-      "No valid \"Import\" function was found in the " + aLibName;
-    setError(aFunctionError);
-    UnLoadLib(anImportLib)
-    return NULL;
-  }
-  return anImportLib;
 }

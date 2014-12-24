@@ -40,7 +40,7 @@
 # define _separator_ '/'
 #endif
 
-static const int UNDO_LIMIT = 10;  // number of possible undo operations
+static const int UNDO_LIMIT = 1000;  // number of possible undo operations (big for sketcher)
 
 static const int TAG_GENERAL = 1;  // general properties tag
 static const int TAG_OBJECTS = 2;  // tag of the objects sub-tree (features, results)
@@ -623,14 +623,16 @@ const std::set<std::string> Model_Document::subDocuments(const bool theActivated
   for (; aLabIter.More(); aLabIter.Next()) {
     TDF_Label aFLabel = aLabIter.Value()->Label();
     FeaturePtr aFeature = feature(aFLabel);
-    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
-    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-    for (; aRIter != aResults.cend(); aRIter++) {
-      if ((*aRIter)->groupName() != ModelAPI_ResultPart::group()) continue;
-      if ((*aRIter)->isInHistory()) {
-        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRIter);
-        if (aPart && (!theActivatedOnly || aPart->isActivated()))
-          aResult.insert(aPart->data()->name());
+    if (aFeature.get()) { // if document is closed the feature may be not in myObjs map
+      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+      for (; aRIter != aResults.cend(); aRIter++) {
+        if ((*aRIter)->groupName() != ModelAPI_ResultPart::group()) continue;
+        if ((*aRIter)->isInHistory()) {
+          ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRIter);
+          if (aPart && (!theActivatedOnly || aPart->isActivated()))
+            aResult.insert(aPart->data()->name());
+        }
       }
     }
   }
