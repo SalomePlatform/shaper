@@ -21,16 +21,25 @@
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Tool.hxx>
 #include <TNaming_Builder.hxx>
+#include <TNaming_Localizer.hxx>
 #include <TopoDS_Shape.hxx>
+#include <TopoDS_Compound.hxx>
 #include <TDataStd_IntPackedMap.hxx>
 #include <TDataStd_Integer.hxx>
 #include <TopTools_MapOfShape.hxx>
+#include <TopTools_IndexedMapOfShape.hxx>
+#include <TopTools_MapIteratorOfMapOfShape.hxx>
+#include <TopTools_ListOfShape.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TDF_LabelMap.hxx>
 #include <BRep_Tool.hxx>
+#include <BRep_Builder.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
+#include <TopExp.hxx>
 #include <TColStd_MapOfTransient.hxx>
+#include <TopTools_IndexedDataMapOfShapeListOfShape.hxx>
+#include <TopTools_ListIteratorOfListOfShape.hxx>
 #include <gp_Pnt.hxx>
 #include <Precision.hxx>
 #include <TDF_ChildIterator.hxx>
@@ -433,6 +442,65 @@ TDF_Label Model_AttributeSelection::selectionLabel()
   return myRef.myRef->Label().FindChild(1);
 }
 
+#define DEB_NAME 1
+std::string GetShapeName(std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape, 
+					     const TDF_Label& theLabel)
+{
+  std::string aName;
+  // check if the subShape is already in DF
+  Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(theShape, theLabel);
+  Handle(TDataStd_Name) anAttr;
+  if(!aNS.IsNull() && !aNS->IsEmpty()) { // in the document    
+	if(aNS->Label().FindAttribute(TDataStd_Name::GetID(), anAttr)) {
+	  aName = TCollection_AsciiString(anAttr->Get()).ToCString();
+	  if(!aName.empty()) {	    
+	    const TDF_Label& aLabel = theDoc->findNamingName(aName);
+		if(!aLabel.IsEqual(aNS->Label())) {
+		  //aName.erase(); //something is wrong, to be checked!!!
+		  aName += "_SomethingWrong";
+		  return aName;
+		}
+		const TopoDS_Shape& aShape = aNS->Get();
+		if(aShape.ShapeType() == TopAbs_COMPOUND) {
+		  std::string aPostFix("_");
+		  TopoDS_Iterator it(aShape);			
+		  for (int i = 1;it.More();it.Next(), i++) {
+		    if(it.Value() == theShape) {
+			  aPostFix += TCollection_AsciiString (i).ToCString();
+			  aName    += aPostFix;
+			  break;
+			}
+			else continue;			  			
+		  }
+		}
+	  }	
+	}
+  }
+  return aName;
+}
+
+bool isTrivial (const TopTools_ListOfShape& theAncestors, TopTools_IndexedMapOfShape& theSMap)
+{
+// a trivial case: F1 & F2,  aNumber = 1, i.e. intersection gives 1 edge.
+  TopoDS_Compound aCmp;
+  BRep_Builder BB;
+  BB.MakeCompound(aCmp);
+  TopTools_ListIteratorOfListOfShape it(theAncestors);
+  for(;it.More();it.Next()) {
+	BB.Add(aCmp, it.Value());
+	theSMap.Add(it.Value());
+  }
+  int aNumber(0);
+  TopTools_IndexedDataMapOfShapeListOfShape aMap2;
+  TopExp::MapShapesAndAncestors(aCmp, TopAbs_EDGE, TopAbs_FACE, aMap2);
+  for (int i = 1; i <= aMap2.Extent(); i++) {
+	const TopoDS_Shape& aKey = aMap2.FindKey(i);
+	const TopTools_ListOfShape& anAncestors = aMap2.FindFromIndex(i);
+	if(anAncestors.Extent() > 1) aNumber++;
+  }
+  if(aNumber > 1) return false;
+  return true;
+}
 std::string Model_AttributeSelection::buildSubShapeName(std::shared_ptr<GeomAPI_Shape> theSubShape, 
 	                                                    const ResultPtr& theContext)
 {
@@ -440,47 +508,98 @@ std::string Model_AttributeSelection::buildSubShapeName(std::shared_ptr<GeomAPI_
   if(theSubShape->isNull() || theContext->shape()->isNull()) return aName;  
   TopoDS_Shape aSubShape = theSubShape->impl<TopoDS_Shape>();
   TopoDS_Shape aContext  = theContext->shape()->impl<TopoDS_Shape>();
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(theContext->document());
 
   // check if the subShape is already in DF
-  Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aSubShape, selectionLabel());
-  Handle(TDataStd_Name) anAttr;
-  if(!aNS.IsNull()) { // in the document    
-	if(aNS->Label().FindAttribute(TDataStd_Name::GetID(), anAttr)) {
-	  aName = TCollection_AsciiString(anAttr->Get()).ToCString();
-	  if(!aName.empty()) {
-	    std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(theContext->document());
-	    const TDF_Label& aLabel = aDoc->findNamingName(aName);
-		if(!aLabel.IsEqual(aNS->Label())) {
-			aName.erase(); //something is wrong, to be checked!
-		}
-		const TopoDS_Shape& aShape = aNS->Get();
-		if(aShape.ShapeType() == TopAbs_COMPOUND) {
-		  std::string aFullName = aName + "_";
-		  TopoDS_Iterator it(aShape);
-			int i(1);
-			for (;it.More();it.Next(), i++) {
-			  if(it.Value() != aSubShape) continue;
-			  else {
-				aName = aFullName + TCollection_AsciiString (i).ToCString();
-				break;
-			  }
-			}
-		}
-	  }	
-	}
-  }
+  aName = GetShapeName(aDoc, aSubShape, selectionLabel());
   if(aName.empty() ) { // not in the document!
     TopAbs_ShapeEnum aType = aSubShape.ShapeType();
 	switch (aType) {
 	  case TopAbs_FACE:
-      // the Face should be in DF. If it is not a case it is an error ==> to be dbugged
-		
+      // the Face should be in DF. If it is not a case, it is an error ==> to be dbugged		
 		break;
 	  case TopAbs_EDGE:
-		  break;
-	  case TopAbs_VERTEX:
+		  {
+		  // name structure: F1 | F2 [| F3 | F4], where F1 & F2 the faces which gives the Edge in trivial case
+		  // if it is not atrivial case we use localization by neighbours. F3 & F4 - neighbour faces
+		  TopTools_IndexedMapOfShape aSMap; // map for ancestors of the sub-shape
+		  TopTools_IndexedDataMapOfShapeListOfShape aMap;
+		  TopExp::MapShapesAndAncestors(aContext, TopAbs_EDGE, TopAbs_FACE, aMap);
+		  bool isTrivialCase(true);
+		  for (int i = 1; i <= aMap.Extent(); i++) {
+			const TopoDS_Shape& aKey = aMap.FindKey(i);
+			if (aKey.IsNotEqual(aSubShape)) continue; // find exactly the selected key
+
+            const TopTools_ListOfShape& anAncestors = aMap.FindFromIndex(i);
+			// check that it is not a trivial case (F1 & F2: aNumber = 1)
+			isTrivialCase = isTrivial(anAncestors, aSMap);			
+			break;
+		  }
+
+		  TopTools_ListOfShape aListOfNbs;
+		  if(!isTrivialCase) { // find Neighbors
+			TNaming_Localizer aLocalizer;
+			TopTools_MapOfShape aMap3;
+			aLocalizer.FindNeighbourg(aContext, aSubShape, aMap3);
+			//int n = aMap3.Extent();
+			TopTools_MapIteratorOfMapOfShape it(aMap3);
+			for(;it.More();it.Next()) {
+			  const TopoDS_Shape& aNbShape = it.Key(); // neighbor edge
+			  //TopAbs_ShapeEnum aType = aNbShape.ShapeType();
+			  const TopTools_ListOfShape& aList  = aMap.FindFromKey(aNbShape);
+			  TopTools_ListIteratorOfListOfShape it2(aList);
+			  for(;it2.More();it2.Next()) {
+				if(aSMap.Contains(it2.Value())) continue; // skip this Face
+				aListOfNbs.Append(it2.Value());
+			  }
+			}
+		  }  // else a trivial case
+		  
+		  // build name of the sub-shape Edge
+		  for(int i=1; i <= aSMap.Extent(); i++) {
+			const TopoDS_Shape& aFace = aSMap.FindKey(i);
+			std::string aFaceName = GetShapeName(aDoc, aFace, selectionLabel());
+			if(i == 1)
+			  aName = aFaceName;
+			else 
+			  aName += "|" + aFaceName;
+		  }
+		  TopTools_ListIteratorOfListOfShape itl(aListOfNbs);
+		  for (;itl.More();itl.Next()) {
+			std::string aFaceName = GetShapeName(aDoc, itl.Value(), selectionLabel());
+			aName += "|" + aFaceName;
+		  }		  
+		  }
 		  break;
 
+	  case TopAbs_VERTEX:
+		  // name structure (Monifold Topology): F1 | F2 | F3; intersection of 3 faces defines a vertex.
+		  {
+			TopTools_IndexedDataMapOfShapeListOfShape aMap;
+		    TopExp::MapShapesAndAncestors(aContext, TopAbs_VERTEX, TopAbs_FACE, aMap);
+			const TopTools_ListOfShape& aList2  = aMap.FindFromKey(aSubShape);
+			TopTools_ListOfShape aList;
+			TopTools_MapOfShape aFMap;
+#ifdef DEB_NAME
+			int n = aList2.Extent(); //bug!
+			TopTools_ListIteratorOfListOfShape itl2(aList2);
+		    for (int i = 1;itl2.More();itl2.Next(),i++) {
+			  if(aFMap.Add(itl2.Value()))
+				aList.Append(itl2.Value());
+			}
+			n = aList.Extent();
+#endif
+			TopTools_ListIteratorOfListOfShape itl(aList);
+		    for (int i = 1;itl.More();itl.Next(),i++) {
+			  const TopoDS_Shape& aFace = itl.Value();
+			  std::string aFaceName = GetShapeName(aDoc, aFace, selectionLabel());
+			  if(i == 1)
+			    aName = aFaceName;
+			  else 
+			    aName += "|" + aFaceName;
+			}
+		  }
+		  break;
 	}
   }
   return aName;
