@@ -593,19 +593,21 @@ void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
 //******************************************************
 void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 {
+  ModuleBase_ISelection* aSel = mySelector->selection();
+  QObjectPtrList aObj = aSel->selectedPresentations();
   //!< No need for property panel
   updateCommandStatus();
   hidePropertyPanel();
   myPropertyPanel->cleanContent();
 
   // Activate objects created by current operation
-  FeaturePtr aFeature = theOperation->feature();
-  myDisplayer->activate(aFeature);
-  const std::list<ResultPtr>& aResults = aFeature->results();
-  std::list<ResultPtr>::const_iterator aIt;
-  for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-    myDisplayer->activate(*aIt);
-  }
+  //FeaturePtr aFeature = theOperation->feature();
+  //myDisplayer->activate(aFeature);
+  //const std::list<ResultPtr>& aResults = aFeature->results();
+  //std::list<ResultPtr>::const_iterator aIt;
+  //for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
+  //  myDisplayer->activate(*aIt);
+  //}
   myModule->operationStopped(theOperation);
 }
 

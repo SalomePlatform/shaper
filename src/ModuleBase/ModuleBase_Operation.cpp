@@ -72,21 +72,6 @@ bool ModuleBase_Operation::isValid() const
   return aFactory->validate(myFeature);
 }
 
-//void ModuleBase_Operation::storeCustomValue()
-//{
-//  if (!myFeature) {
-//#ifdef _DEBUG
-//    qDebug() << "ModuleBase_Operation::storeCustom: " <<
-//    "trying to store value without opening a transaction.";
-//#endif
-//    return;
-//  }
-//
-//  ModuleBase_ModelWidget* aCustom = dynamic_cast<ModuleBase_ModelWidget*>(sender());
-//  if (aCustom)
-//    aCustom->storeValue();
-//}
-
 
 bool ModuleBase_Operation::canBeCommitted() const
 {
@@ -171,15 +156,13 @@ void ModuleBase_Operation::start()
 
 void ModuleBase_Operation::postpone()
 {
-  if (myPropertyPanel)
-    disconnect(myPropertyPanel, 0, this, 0);
+  postponeOperation();
   emit postponed();
 }
 
 void ModuleBase_Operation::resume()
 {
-  //  connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)),
-  //          this,            SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
+  resumeOperation();
   emit resumed();
 }
 
@@ -187,8 +170,6 @@ void ModuleBase_Operation::abort()
 {
   abortOperation();
   emit aborted();
-  if (myPropertyPanel)
-    disconnect(myPropertyPanel, 0, this, 0);
 
   stopOperation();
 
@@ -199,9 +180,6 @@ void ModuleBase_Operation::abort()
 bool ModuleBase_Operation::commit()
 {
   if (canBeCommitted()) {
-    if (myPropertyPanel)
-      disconnect(myPropertyPanel, 0, this, 0);
-
     commitOperation();
     // check whether there are modifications performed during the current operation
     // in the model
@@ -347,8 +325,6 @@ void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp)
 { 
   myPropertyPanel = theProp; 
   myPropertyPanel->setEditingMode(isEditOperation());
-  //connect(myPropertyPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), this,
-  //        SLOT(onWidgetActivated(ModuleBase_ModelWidget*)));
 
   // Do not activate widgets by default if the current operation is editing operation
   // Because we don't know which widget is going to be edited. 

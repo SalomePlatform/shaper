@@ -205,6 +205,9 @@ signals:
   /// Virtual method called after operation committed (see commit() method for more description)
   virtual void afterCommitOperation() {}
 
+  /// Virtual method called after operation resume (see resume() method for more description)
+  virtual void resumeOperation() {}
+
   /// Send update message by loop
   void flushUpdated();
 

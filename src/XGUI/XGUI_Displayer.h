@@ -56,13 +56,6 @@ class XGUI_EXPORT XGUI_Displayer
   /// Display the given AIS object. To hide this object use corresponde erase method
   void displayAIS(AISObjectPtr theAIS, bool isUpdate = true);
 
-  /// Stop the current selection and color the given features to the selection color
-  /// \param theFeatures a list of features to be disabled
-  /// \param theToStop the boolean state whether it it stopped or non stopped
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  void stopSelection(const QObjectPtrList& theFeatures, const bool isStop,
-                     const bool isUpdateViewer);
-
   /**
    * Add presentations which corresponds to the given features to current selection
    * \param theFeatures a list of features to be selected
@@ -85,10 +78,6 @@ class XGUI_EXPORT XGUI_Displayer
   /// Erase all presentations
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void eraseAll(const bool isUpdateViewer = true);
-
-  /// Erase AIS interactive objects, which has an empty feature in the internal map
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  //void eraseDeletedResults(const bool isUpdateViewer = true);
 
   /// Deactivates selection of sub-shapes
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
