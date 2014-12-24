@@ -1,16 +1,16 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 /*
- * ExchangePlugin_BREPImport.h
+ * GEOMALGOAPI_BREPImport.h
  *
  *  Created on: Dec 24, 2014
  *      Author: sbh
  */
 
-#ifndef EXCHANGEPLUGIN_BREPIMPORT_H_
-#define EXCHANGEPLUGIN_BREPIMPORT_H_
+#ifndef GEOMALGOAPI_BREPIMPORT_H_
+#define GEOMALGOAPI_BREPIMPORT_H_
 
-#include <ExchangePlugin.h>
+#include <GeomAlgoAPI.h>
 
 #include <TCollection_AsciiString.hxx>
 #include <TopoDS_Shape.hxx>
@@ -18,11 +18,11 @@
 
 namespace BREPImport {
 
-EXCHANGEPLUGIN_EXPORT
+GEOMALGOAPI_EXPORT
 TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
                     const TCollection_AsciiString& theFormatName,
                     TCollection_AsciiString& theError, const TDF_Label&);
 
 }
 
-#endif /* EXCHANGEPLUGIN_BREPIMPORT_H_ */
+#endif /* GEOMALGOAPI_BREPIMPORT_H_ */

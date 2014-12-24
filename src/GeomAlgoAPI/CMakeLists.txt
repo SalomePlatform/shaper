@@ -17,6 +17,8 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_MakeShape.h
     GeomAlgoAPI_DFLoader.h
     GeomAlgoAPI_Placement.h
+    GeomAlgoAPI_BREPImport.h
+    GeomAlgoAPI_STEPImport.h
 )
 
 SET(PROJECT_SOURCES
@@ -30,16 +32,26 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_MakeShape.cpp
     GeomAlgoAPI_DFLoader.cpp
     GeomAlgoAPI_Placement.cpp
+    GeomAlgoAPI_BREPImport.cpp
+    GeomAlgoAPI_STEPImport.cpp
 )
 
 SET(PROJECT_LIBRARIES
     GeomAPI
-    ModelAPI 
-    ${CAS_TKBool} 
-    ${CAS_TKBO} 
-    ${CAS_TKPrim}
+    ModelAPI
+    ${CAS_OCAF}
     ${CAS_SHAPE}
+    ${CAS_TKBO} 
+    ${CAS_TKBool} 
+    ${CAS_TKBRep}
+    ${CAS_TKCAF}
+    ${CAS_TKCAF}
+    ${CAS_TKLCAF}
+    ${CAS_TKPrim}
+    ${CAS_TKSTEP}
+    ${CAS_TKSTEPBase}
     ${CAS_TKTopAlgo}
+    ${CAS_TKXSBase} 
 )
 
 ADD_DEFINITIONS(-DGEOMALGOAPI_EXPORTS ${CAS_DEFINITIONS})
