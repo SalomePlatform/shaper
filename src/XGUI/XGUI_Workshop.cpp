@@ -499,7 +499,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
       myDisplayer->erase(aObj, false);
     else {
       if (myDisplayer->isVisible(aObj))  {
-        myDisplayer->display(aObj, false);  // In order to update presentation
+        displayObject(aObj);  // In order to update presentation
         if (myOperationMgr->hasOperation()) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
           if (aOperation->hasObject(aObj) && myDisplayer->isActive(aObj))
@@ -510,7 +510,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
           // Display only current operation results if operation has preview
           if (aOperation->hasObject(aObj)/* && aOperation->hasPreview()*/) {
-            myDisplayer->display(aObj, false);
+            displayObject(aObj);
             // Deactivate object of current operation from selection
             if (myDisplayer->isActive(aObj))
               myDisplayer->deactivate(aObj);
@@ -539,7 +539,7 @@ void XGUI_Workshop::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpd
     } else if (myOperationMgr->hasOperation()) {
       ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
       if (aOperation->hasObject(*aIt)) {  // Display only current operation results
-        myDisplayer->display(*aIt, false);
+        displayObject(*aIt);
         isDisplayed = true;
       }
     }
@@ -600,14 +600,10 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   hidePropertyPanel();
   myPropertyPanel->cleanContent();
 
-  // Activate objects created by current operation
-  //FeaturePtr aFeature = theOperation->feature();
-  //myDisplayer->activate(aFeature);
-  //const std::list<ResultPtr>& aResults = aFeature->results();
-  //std::list<ResultPtr>::const_iterator aIt;
-  //for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-  //  myDisplayer->activate(*aIt);
-  //}
+  // Activate objects created by current operation 
+  // in order to clean selection modes
+  QIntList aModes;
+  myDisplayer->activateObjects(aModes);
   myModule->operationStopped(theOperation);
 }
 
@@ -1306,7 +1302,7 @@ void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
   foreach (ObjectPtr aObj, theList)
   {
     if (isVisible) {
-      myDisplayer->display(aObj, false);
+      displayObject(aObj);
     } else {
       myDisplayer->erase(aObj, false);
     }
@@ -1355,7 +1351,7 @@ void XGUI_Workshop::displayDocumentResults(DocumentPtr theDoc)
 void XGUI_Workshop::displayGroupResults(DocumentPtr theDoc, std::string theGroup)
 {
   for (int i = 0; i < theDoc->size(theGroup); i++)
-    myDisplayer->display(theDoc->object(theGroup, i), false);
+    displayObject(theDoc->object(theGroup, i));
 }
 
 //**************************************************************
@@ -1378,4 +1374,17 @@ void XGUI_Workshop::closeDocument()
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->closeAll();
   objectBrowser()->clearContent();
+}
+
+//**************************************************************
+void XGUI_Workshop::displayObject(ObjectPtr theObj)
+{
+  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theObj);
+  if (aBody.get() != NULL) {
+    int aNb = myDisplayer->objectsCount();
+    myDisplayer->display(theObj, false);
+    if (aNb == 0)
+      viewer()->fitAll();
+  } else 
+    myDisplayer->display(theObj, false);
 }

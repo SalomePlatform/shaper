@@ -289,6 +289,10 @@ signals:
   // Creates Dock widgets: Object browser and Property panel
   void createDockWidgets();
 
+  /// Displaus object and fit all viewer if the object is first (update viewer will not be called)
+  void displayObject(ObjectPtr theObj);
+
+private:
   AppElements_MainWindow* myMainWindow;
   ModuleBase_IModule* myModule;
   XGUI_ObjectsBrowser* myObjectBrowser;
