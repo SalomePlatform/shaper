@@ -623,14 +623,16 @@ const std::set<std::string> Model_Document::subDocuments(const bool theActivated
   for (; aLabIter.More(); aLabIter.Next()) {
     TDF_Label aFLabel = aLabIter.Value()->Label();
     FeaturePtr aFeature = feature(aFLabel);
-    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
-    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-    for (; aRIter != aResults.cend(); aRIter++) {
-      if ((*aRIter)->groupName() != ModelAPI_ResultPart::group()) continue;
-      if ((*aRIter)->isInHistory()) {
-        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRIter);
-        if (aPart && (!theActivatedOnly || aPart->isActivated()))
-          aResult.insert(aPart->data()->name());
+    if (aFeature.get()) { // if document is closed the feature may be not in myObjs map
+      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+      for (; aRIter != aResults.cend(); aRIter++) {
+        if ((*aRIter)->groupName() != ModelAPI_ResultPart::group()) continue;
+        if ((*aRIter)->isInHistory()) {
+          ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRIter);
+          if (aPart && (!theActivatedOnly || aPart->isActivated()))
+            aResult.insert(aPart->data()->name());
+        }
       }
     }
   }

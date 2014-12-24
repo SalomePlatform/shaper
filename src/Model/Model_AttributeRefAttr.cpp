@@ -31,7 +31,7 @@ void Model_AttributeRefAttr::setAttr(std::shared_ptr<ModelAPI_Attribute> theAttr
 std::shared_ptr<ModelAPI_Attribute> Model_AttributeRefAttr::attr()
 {
   ObjectPtr anObj = object();
-  if (anObj) {
+  if (anObj && anObj->data()) {
     std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(anObj->data());
     return aData->attribute(TCollection_AsciiString(myID->Get()).ToCString());
   }

@@ -53,6 +53,9 @@ void Model_Session::startOperation()
   static std::shared_ptr<Events_Message> aStartedMsg
     (new Events_Message(Events_Loop::eventByName("StartOperation")));
   Events_Loop::loop()->send(aStartedMsg);
+  // remove all useless documents that has been closed: on start of operation undo/redo is cleared
+  std::list<std::shared_ptr<ModelAPI_Document> > aUsedDocs = allOpenedDocuments();
+  Model_Application::getApplication()->removeUselessDocuments(aUsedDocs);
 }
 
 void Model_Session::finishOperation()
