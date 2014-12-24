@@ -1,12 +1,5 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-/*
- * ExchangePlugin_ImportFeature.h
- *
- *  Created on: Aug 28, 2014
- *      Author: sbh
- */
-
 #ifndef EXCHANGEPLUGIN_IMPORTFEATURE_H_
 #define EXCHANGEPLUGIN_IMPORTFEATURE_H_
 
@@ -14,20 +7,6 @@
 #include <ModelAPI_Feature.h>
 
 #include <map>
-
-#ifdef WIN32
-#include <windows.h>
-#define LibHandle HMODULE
-#define LoadLib( name ) LoadLibrary( name )
-#define GetProc GetProcAddress
-#define UnLoadLib( handle ) FreeLibrary( handle );
-#else
-#include <dlfcn.h>
-#define LibHandle void*
-#define LoadLib( name ) dlopen( name, RTLD_LAZY | RTLD_GLOBAL)
-#define GetProc dlsym
-#define UnLoadLib( handle ) dlclose( handle );
-#endif
 
 class ExchangePlugin_ImportFeature : public ModelAPI_Feature
 {
@@ -64,7 +43,6 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
 
  protected:
   EXCHANGEPLUGIN_EXPORT bool importFile(const std::string& theFileName);
-  EXCHANGEPLUGIN_EXPORT LibHandle loadImportPlugin(const std::string& theFormatName);
 
 private:
   /// Loads Naming data structure to the document
