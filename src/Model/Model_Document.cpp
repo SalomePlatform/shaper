@@ -205,32 +205,29 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
   myTransactionSave = myTransactionsCounter;
   if (isDone) {  // save also sub-documents if any
     theResults.push_back(TCollection_AsciiString(aPath).ToCString());
-    const std::set<std::string> aSubs = subDocuments(true);
+    const std::set<std::string> aSubs = subDocuments(false);
     std::set<std::string>::iterator aSubIter = aSubs.begin();
     for (; aSubIter != aSubs.end() && isDone; aSubIter++) {
-      isDone = subDoc(*aSubIter)->save(theFileName, theResults);
-    }
-    const std::set<std::string> allSubs = subDocuments(false);
-    if (isDone) { // also try to copy the not-activated sub-documents
-      for(aSubIter = allSubs.begin(); aSubIter != allSubs.end(); aSubIter++) {
-        if (aSubs.find(*aSubIter) == aSubs.end()) { // filter out the active subs
-          std::string aDocName = *aSubIter;
-          if (!aDocName.empty() && aSubs.find(aDocName) == aSubs.end()) {
-            // just copy file
-            TCollection_AsciiString aSubPath(DocFileName(anApp->loadPath().c_str(), aDocName));
-            OSD_Path aPath(aSubPath);
-            OSD_File aFile(aPath);
-            if (aFile.Exists()) {
-              TCollection_AsciiString aDestinationDir(DocFileName(theFileName, aDocName));
-              OSD_Path aDestination(aDestinationDir);
-              aFile.Copy(aDestination);
-              theResults.push_back(aDestinationDir.ToCString());
-            } else {
-              Events_Error::send(
-                std::string("Can not open file ") + aSubPath.ToCString() + " for saving");
-            }
+      if (anApp->isLoadByDemand(*aSubIter)) { 
+        // copy not-activated document that is not in the memory
+        std::string aDocName = *aSubIter;
+        if (!aDocName.empty()) {
+          // just copy file
+          TCollection_AsciiString aSubPath(DocFileName(anApp->loadPath().c_str(), aDocName));
+          OSD_Path aPath(aSubPath);
+          OSD_File aFile(aPath);
+          if (aFile.Exists()) {
+            TCollection_AsciiString aDestinationDir(DocFileName(theFileName, aDocName));
+            OSD_Path aDestination(aDestinationDir);
+            aFile.Copy(aDestination);
+            theResults.push_back(aDestinationDir.ToCString());
+          } else {
+            Events_Error::send(
+              std::string("Can not open file ") + aSubPath.ToCString() + " for saving");
           }
         }
+      } else { // simply save opened document
+        isDone = subDoc(*aSubIter)->save(theFileName, theResults);
       }
     }
   }
