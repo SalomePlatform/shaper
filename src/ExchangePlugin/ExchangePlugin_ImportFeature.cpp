@@ -8,8 +8,8 @@
  */
 
 #include <ExchangePlugin_ImportFeature.h>
-#include <ExchangePlugin_BREPImport.h>
-#include <ExchangePlugin_STEPImport.h>
+#include <GeomAlgoAPI_BREPImport.h>
+#include <GeomAlgoAPI_STEPImport.h>
 
 #include <GeomAPI_Shape.h>
 #include <Config_Common.h>

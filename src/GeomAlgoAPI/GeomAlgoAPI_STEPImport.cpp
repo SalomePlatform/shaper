@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-#include <ExchangePlugin_STEPImport.h>
+#include <GEOMALGOAPI_STEPImport.h>
 
 #include <TDF_ChildIDIterator.hxx>
 #include <TDF_Label.hxx>
@@ -482,47 +482,7 @@ TopoDS_Shape Import (const TCollection_AsciiString& theFileName,
         theError = "No geometrical data in the imported file.";
         return TopoDS_Shape();
       }
-
-      // BEGIN: Store names and materials of sub-shapes from file
-      TopTools_IndexedMapOfShape anIndices;
-      TopExp::MapShapes(aResShape, anIndices);
-
-      Handle(Interface_InterfaceModel) Model = aReader.WS()->Model();
-      Handle(XSControl_TransferReader) TR = aReader.WS()->TransferReader();
-      if (!TR.IsNull()) {
-        Handle(Transfer_TransientProcess) TP = TR->TransientProcess();
-
-        Standard_Integer nb = Model->NbEntities();
-
-        for (Standard_Integer ie = 1; ie <= nb; ie++) {
-          Handle(Standard_Transient) enti = Model->Value(ie);
-
-          // Store names.
-          StoreName(enti, anIndices, TP, theShapeLabel);
-
-          // Store materials.
-          StoreMaterial(enti, anIndices, TP, theShapeLabel);
-        }
-      }
-      // END: Store names and materials
-    }
-    else {
-//        switch (status) {
-//        case IFSelect_RetVoid:
-//          theError = "Nothing created or No data to process";
-//          break;
-//        case IFSelect_RetError:
-//          theError = "Error in command or input data";
-//          break;
-//        case IFSelect_RetFail:
-//          theError = "Execution was run, but has failed";
-//          break;
-//        case IFSelect_RetStop:
-//          theError = "Execution has been stopped. Quite possible, an exception was raised";
-//          break;
-//        default:
-//          break;
-//        }
+    } else {
       theError = "Wrong format of the imported file. Can't import file.";
       aResShape.Nullify();
     }

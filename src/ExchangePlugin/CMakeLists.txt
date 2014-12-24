@@ -15,16 +15,12 @@ SET(PROJECT_HEADERS
     ExchangePlugin_Plugin.h
     ExchangePlugin_ImportFeature.h
     ExchangePlugin_Validators.h
-    ExchangePlugin_BREPImport.h
-    ExchangePlugin_STEPImport.h
 )
  
 SET(PROJECT_SOURCES
     ExchangePlugin_Plugin.cpp
     ExchangePlugin_ImportFeature.cpp
     ExchangePlugin_Validators.cpp
-    ExchangePlugin_BREPImport.cpp
-    ExchangePlugin_STEPImport.cpp
 )
 
 SET(XML_RESOURCES
@@ -33,19 +29,10 @@ SET(XML_RESOURCES
 
 SET(PROJECT_LIBRARIES
     Events
-    ModelAPI
     Config
+    ModelAPI
     GeomAPI
-    ${CAS_TKBRep}
-    ${CAS_TKSTEP}
-    ${CAS_TKSTEPBase}
-    ${CAS_TKXSBase}
-    ${CAS_TKCAF}
-    ${CAS_TKLCAF}
-    ${CAS_OCAF}
-    ${CAS_TKCAF}
-    ${CAS_SHAPE}
-    ${CAS_TKBO}
+    GeomAlgoAPI
 )
 
 ADD_DEFINITIONS(-DEXCHANGEPLUGIN_EXPORTS ${CAS_DEFINITIONS})

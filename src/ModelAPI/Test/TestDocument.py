@@ -10,7 +10,7 @@ from ModelAPI import *
 # from GeomDataAPI import *
 # from GeomAlgoAPI import *
 
-__updated__ = "2014-12-16"
+__updated__ = "2014-12-24"
 
 #=========================================================================
 # Creation and activation of documents
