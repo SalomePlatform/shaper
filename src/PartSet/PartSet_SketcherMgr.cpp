@@ -216,11 +216,11 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   if (!aViewer->isMultiSelectionEnabled()) {
     aViewer->enableMultiselection(true);
   }
-  aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
-  if (theEvent->modifiers() & Qt::ShiftModifier)
-    aViewer->AISContext()->ShiftSelect();
-  else
-    aViewer->AISContext()->Select();
+  //aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
+  //if (theEvent->modifiers() & Qt::ShiftModifier)
+  //  aViewer->AISContext()->ShiftSelect();
+  //else
+  //  aViewer->AISContext()->Select();
 }
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
