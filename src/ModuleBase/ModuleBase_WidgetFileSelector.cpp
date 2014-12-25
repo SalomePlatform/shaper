@@ -46,6 +46,7 @@ ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
   myPathField = new QLineEdit(myMainWidget);
   aMainLay->addWidget(myPathField, 1, 0);
   QPushButton* aSelectPathBtn = new QPushButton("...", myMainWidget);
+  aSelectPathBtn->setToolTip(tr("Select file..."));
   aSelectPathBtn->setMaximumWidth(20);
   aSelectPathBtn->setMaximumHeight(20);
   aMainLay->addWidget(aSelectPathBtn, 1, 1);

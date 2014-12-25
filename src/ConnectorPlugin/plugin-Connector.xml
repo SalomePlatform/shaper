@@ -4,7 +4,7 @@
       <feature
         id="ExportToGEOM"
         title="Export to GEOM"
-        tooltip="Exports all data in GEOM compatible format"
+        tooltip="Exports all bodies into GEOM module"
         icon=":pictures/part_ico.png">
       </feature>
     </group>

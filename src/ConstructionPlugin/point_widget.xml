@@ -1,7 +1,7 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <doublevalue id="x" label="X:" icon=":pictures/x_point.png" tooltip="Set X"/>
-  <doublevalue id="y" label="Y:" icon=":pictures/y_point.png" tooltip="Set Y"/>
-  <doublevalue id="z" label="Z:" icon=":pictures/z_point.png" tooltip="Set Z"/>
+  <doublevalue id="x" label="X:" icon=":pictures/x_point.png" tooltip="X coordinate"/>
+  <doublevalue id="y" label="Y:" icon=":pictures/y_point.png" tooltip="Y coordinate"/>
+  <doublevalue id="z" label="Z:" icon=":pictures/z_point.png" tooltip="Z coordinate"/>
 </source>

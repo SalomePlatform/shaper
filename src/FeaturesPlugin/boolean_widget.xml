@@ -4,14 +4,14 @@
   <shape_selector id="main_object" 
     label="Main object" 
     icon=":icons/cut_shape.png" 
-    tooltip="Select an object to cut"
+    tooltip="Select an object solid"
     shape_types="solid shell"
     concealment="true"
   />
   <shape_selector id="tool_object" 
     label="Tool object" 
     icon=":icons/cut_tool.png" 
-    tooltip="Select a tool"
+    tooltip="Select a tool solid"
     shape_types="solid"
     concealment="true" >
 	<validator id="PartSet_DifferentObjects"/>
