@@ -60,28 +60,28 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
   aGroupLay->setColumnStretch(1, 1);
   {
     QLabel* aLabel = new QLabel(myGroupBox);
-    aLabel->setText("X");
+    aLabel->setText(tr("X"));
     aLabel->setPixmap(QPixmap(":pictures/x_point.png"));
     aGroupLay->addWidget(aLabel, 0, 0);
 
     myXSpin = new ModuleBase_DoubleSpinBox(myGroupBox);
     myXSpin->setMinimum(-DBL_MAX);
     myXSpin->setMaximum(DBL_MAX);
-    myXSpin->setToolTip("X");
+    myXSpin->setToolTip(tr("X"));
     aGroupLay->addWidget(myXSpin, 0, 1);
 
     connect(myXSpin, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
   }
   {
     QLabel* aLabel = new QLabel(myGroupBox);
-    aLabel->setText("Y");
+    aLabel->setText(tr("Y"));
     aLabel->setPixmap(QPixmap(":pictures/y_point.png"));
     aGroupLay->addWidget(aLabel, 1, 0);
 
     myYSpin = new ModuleBase_DoubleSpinBox(myGroupBox);
     myYSpin->setMinimum(-DBL_MAX);
     myYSpin->setMaximum(DBL_MAX);
-    myYSpin->setToolTip("X");
+    myYSpin->setToolTip(tr("Y"));
     aGroupLay->addWidget(myYSpin, 1, 1);
 
     connect(myYSpin, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));

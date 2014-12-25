@@ -4,14 +4,14 @@
   <shape_selector id="firstPoint" 
     label="First point" 
     icon=":icons/point.png" 
-    tooltip="Select a first point for the axis"
+    tooltip="Select a first point"
     shape_types="vertex"
 	use_subshapes="true"
   />
   <shape_selector id="secondPoint"
     label="Second point"
     icon=":icons/point.png"
-    tooltip="Select a second point for the axis"
+    tooltip="Select a second point"
     shape_types="vertex"
 	use_subshapes="true">
   </shape_selector>

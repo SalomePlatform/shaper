@@ -5,7 +5,7 @@
     <group id="Operations">
       <feature id="Part" title="New part" tooltip="Create a new part" icon=":pictures/part_ico.png"/>
       <feature id="Duplicate" title="Duplicate"
-               tooltip="Duplicate selected part"
+               tooltip="Duplicate active part"
                icon=":icons/duplicate.png"
                document="Part"/>
       <feature id="Remove"

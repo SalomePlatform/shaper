@@ -53,6 +53,17 @@ void Model_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
       return;  // null shape inside
 
     aBuilder.Generated(aShape);	
+	// register name
+	if(!aBuilder.NamedShape()->IsEmpty()) {
+	  Handle(TDataStd_Name) anAttr;
+	  if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
+		std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
+		if(!aName.empty()) {
+          std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+          aDoc->addNamingName(aBuilder.NamedShape()->Label(), aName);
+		}
+	  }
+	}
   }
 }
 
@@ -75,6 +86,17 @@ void Model_ResultBody::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theF
     if (aShapeNew.IsNull())
       return;  // null shape inside
     aBuilder.Generated(aShapeBasis, aShapeNew);
+		// register name
+	if(!aBuilder.NamedShape()->IsEmpty()) {
+	  Handle(TDataStd_Name) anAttr;
+	  if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
+		std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
+		if(!aName.empty()) {
+          std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+          aDoc->addNamingName(aBuilder.NamedShape()->Label(), aName);
+		}
+	  }
+	}
   }
 }
 
@@ -321,11 +343,13 @@ void Model_ResultBody::loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape,
   std::string aName;
   if (aShape.ShapeType() == TopAbs_SOLID) {		    
     TopExp_Explorer expl(aShape, TopAbs_FACE);
-    for (; expl.More(); expl.Next())      
-	  builder(++theTag)->Generated(expl.Current()); 
+    for (; expl.More(); expl.Next()) {  
+	  builder(theTag)->Generated(expl.Current()); 
 	  TCollection_AsciiString aStr(theTag);
 	  aName = theName + aStr.ToCString();
 	  buildName(theTag, aName);
+	  theTag++;
+	}
   }
   else if (aShape.ShapeType() == TopAbs_SHELL || aShape.ShapeType() == TopAbs_FACE) {
     // load faces and all the free edges
@@ -334,10 +358,11 @@ void Model_ResultBody::loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape,
     if (Faces.Extent() > 1 || (aShape.ShapeType() == TopAbs_SHELL && Faces.Extent() == 1)) {
       TopExp_Explorer expl(aShape, TopAbs_FACE);
       for (; expl.More(); expl.Next()) {
-		  builder(++theTag)->Generated(expl.Current());          
+		  builder(theTag)->Generated(expl.Current());          
 		  TCollection_AsciiString aStr(theTag);
 	      aName = theName + aStr.ToCString();
 	      buildName(theTag, aName);
+		  theTag++;
 	  }
 	}
     TopTools_IndexedDataMapOfShapeListOfShape anEdgeAndNeighbourFaces;
@@ -346,19 +371,21 @@ void Model_ResultBody::loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape,
 	{
       const TopTools_ListOfShape& aLL = anEdgeAndNeighbourFaces.FindFromIndex(i);
       if (aLL.Extent() < 2) {
-	    builder(++theTag)->Generated(anEdgeAndNeighbourFaces.FindKey(i));
+	    builder(theTag)->Generated(anEdgeAndNeighbourFaces.FindKey(i));
 		TCollection_AsciiString aStr(theTag);
 	    aName = theName + aStr.ToCString();
 	    buildName(theTag, aName);
+		theTag++;
       } else {
 	  TopTools_ListIteratorOfListOfShape anIter(aLL);
 	  const TopoDS_Face& aFace = TopoDS::Face(anIter.Value());
 	  anIter.Next();
 	  if(aFace.IsEqual(anIter.Value())) {
-		builder(++theTag)->Generated(anEdgeAndNeighbourFaces.FindKey(i));
+		builder(theTag)->Generated(anEdgeAndNeighbourFaces.FindKey(i));
 		TCollection_AsciiString aStr(theTag);
 	    aName = theName + aStr.ToCString();
 	    buildName(theTag, aName);
+	    theTag++;
 	  }
 	  }
 	}
@@ -369,34 +396,37 @@ void Model_ResultBody::loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape,
 	  builder(++theTag)->Generated(Edges.FindKey(1));
       TopExp_Explorer expl(aShape, TopAbs_VERTEX);
       for (; expl.More(); expl.Next()) {
-	    builder(++theTag)->Generated(expl.Current());
+	    builder(theTag)->Generated(expl.Current());
 		TCollection_AsciiString aStr(theTag);
 	    aName = theName + aStr.ToCString();
 	    buildName(theTag, aName);
+	    theTag++;
 	  }
 	} else {
       TopExp_Explorer expl(aShape, TopAbs_EDGE); 
       for (; expl.More(); expl.Next()) {	
-		builder(++theTag)->Generated(expl.Current());
+		builder(theTag)->Generated(expl.Current());
 		TCollection_AsciiString aStr(theTag);
 	    aName = theName + aStr.ToCString();
 	    buildName(theTag, aName);
+		theTag++;
 	  }   
       // and load generated vertices.
       TopTools_DataMapOfShapeShape generated;
       if (getDangleShapes(aShape, TopAbs_EDGE, generated)) 
 	  {
-		TNaming_Builder* pBuilder = builder(++theTag);
+		TNaming_Builder* pBuilder = builder(theTag++);
 		loadGeneratedDangleShapes(aShape, TopAbs_EDGE, pBuilder);  
 	  }
 	}
   } else if (aShape.ShapeType() == TopAbs_EDGE) {
     TopExp_Explorer expl(aShape, TopAbs_VERTEX);
     for (; expl.More(); expl.Next()) {      
-		builder(++theTag)->Generated(expl.Current());
+		builder(theTag)->Generated(expl.Current());
 		TCollection_AsciiString aStr(theTag);
 	    aName = theName + aStr.ToCString();
 	    buildName(theTag, aName);
+		theTag++;
 	}
   }
 }
@@ -409,8 +439,8 @@ void Model_ResultBody::loadFirstLevel(
   std::string aName;
   if (aShape.ShapeType() == TopAbs_COMPOUND || aShape.ShapeType() == TopAbs_COMPSOLID) {
     TopoDS_Iterator itr(aShape);
-    for (; itr.More(); itr.Next()) {
-	  builder(++theTag)->Generated(itr.Value());
+    for (; itr.More(); itr.Next(),theTag++) {
+	  builder(theTag)->Generated(itr.Value());
 	  TCollection_AsciiString aStr(theTag);
 	  aName = theName + aStr.ToCString();
 	  buildName(theTag, aName);
@@ -485,11 +515,12 @@ void Model_ResultBody::loadDisconnectedEdges(
 	        if (aLIter1.Value().IsSame(aLIter2.Value())) aMatches++;
 	        if (aMatches == aList1.Extent()) {
 	          aC0=Standard_True;
-			  builder(++theTag)->Generated(anEdge2);
+			  builder(theTag)->Generated(anEdge2);
 	          anEdgesToDelete.Add(anEdge2);
 			  TCollection_AsciiString aStr(theTag);
 			  aName = theName + aStr.ToCString();
 	          buildName(theTag, aName);
+			  theTag++;
 			}
 		}
 	  }      
@@ -499,10 +530,11 @@ void Model_ResultBody::loadDisconnectedEdges(
       edgeNaborFaces.UnBind(anEdge1);
 	}
     if (aC0) {
-	  builder(++theTag)->Generated(anEdge1);
+	  builder(theTag)->Generated(anEdge1);
 	  TCollection_AsciiString aStr(theTag);
 	  aName = theName + aStr.ToCString();
 	  buildName(theTag, aName);	 
+	  theTag++;
 	}
   }
 }
@@ -537,11 +569,12 @@ void Model_ResultBody::loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> t
   TopTools_DataMapIteratorOfDataMapOfShapeListOfShape itr(vertexNaborFaces);
   for (; itr.More(); itr.Next()) {
     const TopTools_ListOfShape& naborFaces = itr.Value();
-    if (naborFaces.Extent() < 3) {
-		builder(++theTag)->Generated(itr.Key());
+    if (naborFaces.Extent() < 1) {		
+		builder(theTag)->Generated(itr.Key());
 		TCollection_AsciiString aStr(theTag);
 	    aName = theName + aStr.ToCString();
 	    buildName(theTag, aName);	 
+		theTag++;
 	}
   }
 }

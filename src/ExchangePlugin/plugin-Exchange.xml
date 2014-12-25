@@ -3,7 +3,7 @@
 <plugin>
   <workbench id="Features" document="Part">
     <group id="Exchange">
-      <feature id="Import" title="Import" tooltip="Import shape" icon=":icons/import.png">
+      <feature id="Import" title="Import" tooltip="Path to file" icon=":icons/import.png">
         <file_selector
           id="import_file_selector"
           title="Import file"
