@@ -53,6 +53,17 @@ void Model_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
       return;  // null shape inside
 
     aBuilder.Generated(aShape);	
+	// register name
+	if(!aBuilder.NamedShape()->IsEmpty()) {
+	  Handle(TDataStd_Name) anAttr;
+	  if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
+		std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
+		if(!aName.empty()) {
+          std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+          aDoc->addNamingName(aBuilder.NamedShape()->Label(), aName);
+		}
+	  }
+	}
   }
 }
 
@@ -75,6 +86,17 @@ void Model_ResultBody::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theF
     if (aShapeNew.IsNull())
       return;  // null shape inside
     aBuilder.Generated(aShapeBasis, aShapeNew);
+		// register name
+	if(!aBuilder.NamedShape()->IsEmpty()) {
+	  Handle(TDataStd_Name) anAttr;
+	  if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
+		std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
+		if(!aName.empty()) {
+          std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+          aDoc->addNamingName(aBuilder.NamedShape()->Label(), aName);
+		}
+	  }
+	}
   }
 }
 
