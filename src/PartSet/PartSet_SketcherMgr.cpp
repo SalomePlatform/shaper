@@ -126,19 +126,23 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
     myEditingFeatures.clear();
     myEditingAttr.clear();
-    if ((aHighlighted.size() == 0) && (aSelected.size() == 0)) {
+
+    bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
+    QObjectPtrList aSelObjects;
+    if (aHasShift)
+      aSelObjects = getSumList(aHighlighted, aSelected);
+    else {
+      foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
+        aSelObjects.append(aPrs.object());
+      }
+    }
+    if ((aSelObjects.size() == 0)) {
       if (isSketchOpe && (!isSketcher))
         // commit previous operation
         if (!aOperation->commit())
           aOperation->abort();
       return;
     }
-
-    QObjectPtrList aSelObjects = getSumList(aHighlighted, aSelected);
-    //foreach (ModuleBase_ViewerPrs aPrs, aHighlighted) {
-    //  aSelObjects.append(aPrs.object());
-    //}
-
     if ((aHighlighted.size() == 1) && (aSelected.size() == 0)) {
       // Move by selected shape (vertex). Can be used only for single selection
       foreach(ModuleBase_ViewerPrs aPrs, aHighlighted) {

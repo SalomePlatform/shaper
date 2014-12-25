@@ -53,6 +53,17 @@ void Model_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape)
       return;  // null shape inside
 
     aBuilder.Generated(aShape);	
+	// register name
+	if(!aBuilder.NamedShape()->IsEmpty()) {
+	  Handle(TDataStd_Name) anAttr;
+	  if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
+		std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
+		if(!aName.empty()) {
+          std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+          aDoc->addNamingName(aBuilder.NamedShape()->Label(), aName);
+		}
+	  }
+	}
   }
 }
 
@@ -75,6 +86,17 @@ void Model_ResultBody::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theF
     if (aShapeNew.IsNull())
       return;  // null shape inside
     aBuilder.Generated(aShapeBasis, aShapeNew);
+		// register name
+	if(!aBuilder.NamedShape()->IsEmpty()) {
+	  Handle(TDataStd_Name) anAttr;
+	  if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
+		std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
+		if(!aName.empty()) {
+          std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
+          aDoc->addNamingName(aBuilder.NamedShape()->Label(), aName);
+		}
+	  }
+	}
   }
 }
 
@@ -521,33 +543,33 @@ void Model_ResultBody::loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> t
 {
   if(theShape->isNull()) return;
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();  
-  TopTools_DataMapOfShapeListOfShape vertexNaborFaces;
+  TopTools_DataMapOfShapeListOfShape vertexNaborEdges;
   TopTools_ListOfShape empty;
-  TopExp_Explorer explF(aShape, TopAbs_FACE);
+  TopExp_Explorer explF(aShape, TopAbs_EDGE);
   for (; explF.More(); explF.Next()) {
-    const TopoDS_Shape& aFace = explF.Current();
-    TopExp_Explorer explV(aFace, TopAbs_VERTEX);
+    const TopoDS_Shape& anEdge = explF.Current();
+    TopExp_Explorer explV(anEdge, TopAbs_VERTEX);
     for (; explV.More(); explV.Next()) {
       const TopoDS_Shape& aVertex = explV.Current();
-      if (!vertexNaborFaces.IsBound(aVertex)) vertexNaborFaces.Bind(aVertex, empty);
+      if (!vertexNaborEdges.IsBound(aVertex)) vertexNaborEdges.Bind(aVertex, empty);
       Standard_Boolean faceIsNew = Standard_True;
-      TopTools_ListIteratorOfListOfShape itrF(vertexNaborFaces.Find(aVertex));
+      TopTools_ListIteratorOfListOfShape itrF(vertexNaborEdges.Find(aVertex));
       for (; itrF.More(); itrF.Next()) {
-        if (itrF.Value().IsSame(aFace)) {
+        if (itrF.Value().IsSame(anEdge)) {
           faceIsNew = Standard_False;
           break;
         }
       }
       if (faceIsNew) {
-        vertexNaborFaces.ChangeFind(aVertex).Append(aFace);
+        vertexNaborEdges.ChangeFind(aVertex).Append(anEdge);
       }
     }
   }
   std::string aName;
-  TopTools_DataMapIteratorOfDataMapOfShapeListOfShape itr(vertexNaborFaces);
+  TopTools_DataMapIteratorOfDataMapOfShapeListOfShape itr(vertexNaborEdges);
   for (; itr.More(); itr.Next()) {
-    const TopTools_ListOfShape& naborFaces = itr.Value();
-    if (naborFaces.Extent() < 1) {		
+    const TopTools_ListOfShape& naborEdges = itr.Value();
+    if (naborEdges.Extent() < 2) {		
 		builder(theTag)->Generated(itr.Key());
 		TCollection_AsciiString aStr(theTag);
 	    aName = theName + aStr.ToCString();
