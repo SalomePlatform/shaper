@@ -68,3 +68,12 @@ IF(${HAVE_SALOME})
 ENDIF(${HAVE_SALOME})
 
 ENABLE_TESTING()
+
+# Add the uninstall target for eclipse IDE
+if (CMAKE_GENERATOR MATCHES "NMake Makefiles")
+configure_file("${CMAKE_SOURCE_DIR}/CMakeCommon/cmake_uninstall.cmake.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+               IMMEDIATE @ONLY)
+add_custom_target(uninstall
+                  COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+endif (CMAKE_GENERATOR MATCHES "NMake Makefiles")
