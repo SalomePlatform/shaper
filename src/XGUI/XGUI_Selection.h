@@ -18,6 +18,8 @@
 #include <NCollection_List.hxx>
 #include <TopoDS_Shape.hxx>
 
+#include <SelectMgr_IndexedMapOfOwner.hxx>
+
 class XGUI_Workshop;
 
 class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
@@ -54,6 +56,15 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   //! Returns list of currently selected shapes
   virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theShapes, 
     std::list<ObjectPtr>& theOwners) const;
+
+  //! Returns a list of selection entity owners of the interactive object
+  /// It depends on the modes, in which the object is activated in the context
+  /// \param theObject an object
+  /// \param theContext a viewer interactive context
+  /// \param theOwners a map of entity owners
+  static void entityOwners(const Handle_AIS_InteractiveObject& theObject,
+                           const Handle_AIS_InteractiveContext& theContext,
+                           SelectMgr_IndexedMapOfOwner& theOwners);
 
  private:
   XGUI_Workshop* myWorkshop;

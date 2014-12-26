@@ -12,6 +12,7 @@
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_Workshop.h>
+#include <XGUI_Selection.h>
 
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
@@ -34,6 +35,9 @@
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintRigid.h>
+
+#include <SelectMgr_IndexedMapOfOwner.hxx>
+#include <StdSelect_BRepOwner.hxx>
 
 #include <ModelAPI_Events.h>
 
@@ -265,10 +269,46 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature) { 
+          // save the previous selection
+          /*ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+          XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+          XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+          QIntList anActivatedModes;
+
+          ResultPtr aResult = aSketchFeature->firstResult();
+
+          aDisplayer->getModesOfActivation(aResult, anActivatedModes);
+
+          std::list<AttributePtr> aSelectedAttributes;
+          getCurrentSelection(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes);*/
+          // save the previous selection: end
+
+
           aSketchFeature->move(dX, dY);
           ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent);
+          /*
+          // TODO: the selection restore should be after the AIS presentation is rebuilt
+          Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
+          Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+
+          // restore the previous selection
+          aResult = aSketchFeature->firstResult();
+            aDisplayer->activate(aResult, anActivatedModes);
+
+          SelectMgr_IndexedMapOfOwner anOwnersToSelect;
+          getSelectionOwners(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes,
+                             anOwnersToSelect);
+          
+          ModuleBase_IViewer* aViewer = aWorkshop->viewer();
+          Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
+          for (Standard_Integer i = 1, n = anOwnersToSelect.Extent(); i <= n; i++)
+            aContext->AddOrRemoveSelected(anOwnersToSelect(i), false); // SetSelected()
+
+          aContext->UpdateCurrentViewer();
+          // restore the previous selection*/
         }
       }
+      // TODO: set here
       Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
       Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
     }
@@ -416,4 +456,100 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 {
   myPlaneFilter->setPlane(thePln->impl<gp_Pln>());
+}
+
+void PartSet_SketcherMgr::getCurrentSelection(const ObjectPtr& theObject,
+                                              const FeaturePtr& theSketch,
+                                              ModuleBase_IWorkshop* theWorkshop,
+                                              std::list<AttributePtr>& theSelectedAttributes)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (aFeature.get() == NULL)
+    return;
+
+  ModuleBase_IViewer* aViewer = theWorkshop->viewer();
+  Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+
+  // TODO: check all results and IPresentable feature
+  ResultPtr aResult = aFeature->firstResult();
+
+  bool isVisibleSketch = aDisplayer->isVisible(aResult);
+  AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
+
+  if (aAISObj.get() != NULL) {
+    Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+    for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
+    {
+      Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(
+                                                                      aContext->SelectedOwner());
+      if (aBRepOwner.IsNull()) continue;
+
+      Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast(
+                                                                       aBRepOwner->Selectable());
+      if (anIO != anAISIO) continue;
+
+      if (aBRepOwner->HasShape()) {
+        const TopoDS_Shape& aShape = aBRepOwner->Shape();
+        TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
+        if (aShapeType == TopAbs_VERTEX) {
+          AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theObject,
+                                                                        aShape, theSketch);
+          if (aPntAttr.get() != NULL)
+            theSelectedAttributes.push_back(aPntAttr);
+        }
+      }
+    }
+  }
+}
+
+void PartSet_SketcherMgr::getSelectionOwners(const ObjectPtr& theObject,
+                                             const FeaturePtr& theSketch,
+                                             ModuleBase_IWorkshop* theWorkshop,
+                                             const std::list<AttributePtr>& theSelectedAttributes,
+                                             SelectMgr_IndexedMapOfOwner& anOwnersToSelect)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (aFeature.get() == NULL)
+    return;
+
+  ModuleBase_IViewer* aViewer = theWorkshop->viewer();
+  Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+
+  // TODO: check all results and IPresentable feature
+  ResultPtr aResult = aFeature->firstResult();
+
+  bool isVisibleSketch = aDisplayer->isVisible(aResult);
+  AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
+
+  if (aAISObj.get() != NULL) {
+    Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+
+    SelectMgr_IndexedMapOfOwner aSelectedOwners;
+
+    XGUI_Selection::entityOwners(anAISIO, aContext, aSelectedOwners);
+    for  ( Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++ ) {
+      Handle(StdSelect_BRepOwner) anOwner = Handle(StdSelect_BRepOwner)::DownCast(aSelectedOwners(i));
+      if ( anOwner.IsNull() || !anOwner->HasShape() )
+        continue;
+      const TopoDS_Shape& aShape = anOwner->Shape();
+      TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
+      if (aShapeType == TopAbs_VERTEX) {
+        AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(aFeature, aShape, theSketch);
+        if (aPntAttr.get() != NULL) {
+          std::list<AttributePtr>::const_iterator anIt = theSelectedAttributes.begin(),
+                                                  aLast = theSelectedAttributes.end();
+          for (; anIt != aLast; anIt++) {
+            AttributePtr anAttrIt = *anIt;
+            if (anAttrIt.get() == aPntAttr.get()) {
+              anOwnersToSelect.Add(anOwner);
+            }
+          }
+        }
+      }
+    }
+  }
 }

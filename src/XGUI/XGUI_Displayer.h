@@ -93,7 +93,7 @@ class XGUI_EXPORT XGUI_Displayer
   void updateViewer();
 
   /// Searches the interactive object by feature
-  /// \param theFeature the feature or NULL if it not visualized
+  /// \param theFeature the object or presentable feature
   /// \return theIO an interactive object
   AISObjectPtr getAISObject(ObjectPtr theFeature) const;
 
@@ -109,6 +109,11 @@ class XGUI_EXPORT XGUI_Displayer
   /// Activates the given object (it can be selected)
   /// \param theModes - modes on which it has to be activated (can be empty)
   void activate(ObjectPtr theFeature, const QIntList& theModes);
+
+  /// Returns the modes of activation
+  /// \param theFeature the feature or NULL if it not visualized
+  /// \param theModes - modes on which it is activated (can be empty)
+  void getModesOfActivation(ObjectPtr theObject, QIntList& theModes);
 
   /// Activates the given object with default modes
   void activate(ObjectPtr theFeature);
