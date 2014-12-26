@@ -48,8 +48,9 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   virtual std::string namingName() = 0;
 
 
-  /// Selects sub-shape by Name
-  //virtual selectSubShape(const std::string& theSubShapeName, const std::string& theContextShapeName)
+  /// Selects sub-shape by the textual Name
+  virtual void selectSubShape(const std::string& theType, const std::string& theSubShapeName) = 0;
+
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_AttributeSelection()
   {
