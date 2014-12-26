@@ -14,6 +14,10 @@
 
 #include <AIS_InteractiveContext.hxx>
 
+#include <SelectMgr_Selection.hxx>
+#include <SelectBasics_SensitiveEntity.hxx>
+#include <TColStd_ListIteratorOfListOfInteger.hxx>
+
 #include <set>
 
 XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
@@ -149,6 +153,36 @@ void XGUI_Selection::selectedShapes(NCollection_List<TopoDS_Shape>& theList,
         ObjectPtr anObject = myWorkshop->displayer()->getObject(anObj);
         theOwners.push_back(anObject);
       }
+    }
+  }
+}
+
+//**************************************************************
+void XGUI_Selection::entityOwners(const Handle(AIS_InteractiveObject)& theObject,
+                                  const Handle(AIS_InteractiveContext)& theContext,
+                                  SelectMgr_IndexedMapOfOwner& theOwners)
+{
+    if (theObject.IsNull() || theContext.IsNull())
+    return;
+
+  TColStd_ListOfInteger aModes;
+  theContext->ActivatedModes(theObject, aModes);
+
+  TColStd_ListIteratorOfListOfInteger anIt(aModes);
+  for (; anIt.More(); anIt.Next()) {
+    int aMode = anIt.Value();
+    if (!theObject->HasSelection(aMode))
+      continue;
+
+    Handle(SelectMgr_Selection) aSelection = theObject->Selection(aMode);
+    for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
+      Handle(SelectBasics_SensitiveEntity) anEntity = aSelection->Sensitive();
+      if (anEntity.IsNull())
+        continue;
+      Handle(SelectMgr_EntityOwner) anOwner =
+        Handle(SelectMgr_EntityOwner)::DownCast(anEntity->OwnerId());
+      if (!anOwner.IsNull())
+        theOwners.Add(anOwner);
     }
   }
 }

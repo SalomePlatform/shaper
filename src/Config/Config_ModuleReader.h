@@ -24,6 +24,11 @@ class Config_ModuleReader : public Config_XMLReader
     Intrenal = 1,
     Python = 2
   };
+  enum PluginPlatform {
+    All = 0,
+    OpenParts = 1,
+    Salome = 2
+  };
 
  public:
   CONFIG_EXPORT Config_ModuleReader(const char* theEventGenerated = 0);
@@ -43,6 +48,7 @@ class Config_ModuleReader : public Config_XMLReader
   void processNode(xmlNodePtr aNode);
   bool processChildren(xmlNodePtr aNode);
 
+  bool isAvaliableOnThisPlatform(const std::string& thePluginPlatform);
   std::list<std::string> importPlugin(const std::string& thePluginLibrary,
                                       const std::string& thePluginFile);
   std::string addPlugin(const std::string& aPluginLibrary,
@@ -53,6 +59,7 @@ class Config_ModuleReader : public Config_XMLReader
   std::map<std::string, std::string> myFeaturesInFiles;
   static std::map<std::string, PluginType> myPluginTypes;
   const char* myEventGenerated;
+  bool myHaveSalome;
 
 };
 

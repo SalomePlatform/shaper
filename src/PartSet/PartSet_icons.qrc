@@ -28,5 +28,6 @@
      <file>icons/shape_group.png</file>
      <file>icons/fixed.png</file>
      <file>icons/placement.png</file>
+     <file>icons/geom_export.png</file>
  </qresource>
  </RCC>

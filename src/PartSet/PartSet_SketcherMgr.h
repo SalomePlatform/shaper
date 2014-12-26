@@ -14,8 +14,10 @@
 #include <ModelAPI_CompositeFeature.h>
 
 #include <ModuleBase_ViewerFilters.h>
+#include <ModuleBase_Definitions.h>
 
 #include <GeomAPI_Pln.h>
+#include <SelectMgr_IndexedMapOfOwner.hxx>
 
 #include <QObject>
 #include <QList>
@@ -67,6 +69,32 @@ private:
   void get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent, 
                   double& theX, double& theY);
 
+  /// Obtains the current selection of the object in the workshop viewer 
+  /// It includes the selection in all modes of activation, even local context - vertexes, edges
+  /// The result is a list of attributes of the feature of the object
+  /// In addition, it retuns a list of selection modes, where the object is activated
+  /// \param theObject a feature or result object
+  /// \param theSketch a current sketch feature
+  /// \param theWorkshop a workshop to have an access to AIS context and displayer
+  /// \param theSelectedAttributes an out list of selected attributes
+  static void getCurrentSelection(const ObjectPtr& theObject,
+                                  const FeaturePtr& theSketch,
+                                  ModuleBase_IWorkshop* theWorkshop,
+                                  std::list<AttributePtr>& theSelectedAttributes);
+
+  /// Applyes the current selection to the object in the workshop viewer 
+  /// It includes the selection in all modes of activation, even local context - vertexes, edges
+  /// The result is a list of attributes of the feature of the object
+  /// In addition, it retuns a list of selection modes, where the object is activated
+  /// \param theObject a feature or result object
+  /// \param theSketch a current sketch feature
+  /// \param theWorkshop a workshop to have an access to AIS context and displayer
+  /// \param theSelectedAttributes an out list of selected attributes
+  static void getSelectionOwners(const ObjectPtr& theObject,
+                                  const FeaturePtr& theSketch,
+                                  ModuleBase_IWorkshop* theWorkshop,
+                                  const std::list<AttributePtr>& theSelectedAttributes,
+                                  SelectMgr_IndexedMapOfOwner& anOwnersToSelect);
 
 private:
   PartSet_Module* myModule;
