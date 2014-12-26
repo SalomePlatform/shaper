@@ -611,7 +611,8 @@ std::string Model_AttributeSelection::buildSubShapeName(std::shared_ptr<GeomAPI_
 		  break;
 	}
     // register name			
-    aDoc->addNamingName(selectionLabel(), aName);
+    // aDoc->addNamingName(selectionLabel(), aName);
+	// the selected sub-shape will not be shared and as result it will not require registration
   }
   return aName;
 }
