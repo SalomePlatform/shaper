@@ -149,10 +149,12 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
           aMenu->addAction(action("EDIT_CMD"));
         } else {
           if (aDisplayer->isVisible(aObject)) {
-            if (aDisplayer->displayMode(aObject) == XGUI_Displayer::Shading)
-              aMenu->addAction(action("WIREFRAME_CMD"));
-            else
-              aMenu->addAction(action("SHADING_CMD"));
+            if (aDisplayer->canBeShaded(aObject)) {
+              if (aDisplayer->displayMode(aObject) == XGUI_Displayer::Shading)
+                aMenu->addAction(action("WIREFRAME_CMD"));
+              else
+                aMenu->addAction(action("SHADING_CMD"));
+            }
             aMenu->addSeparator();
             aMenu->addAction(action("HIDE_CMD"));
           } else {
@@ -206,20 +208,24 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
     //  theMenu->addAction(action("EDIT_CMD"));
     bool isVisible = false;
     bool isShading = false;
+    bool canBeShaded = false;
     foreach(ObjectPtr aObject, aObjects)
     {
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
       if (aRes && myWorkshop->displayer()->isVisible(aRes)) {
         isVisible = true;
+        canBeShaded = myWorkshop->displayer()->canBeShaded(aObject);
         isShading = (myWorkshop->displayer()->displayMode(aObject) == XGUI_Displayer::Shading);      
         break;
       }
     }
     if (isVisible) {
-      if (isShading)
-        theMenu->addAction(action("WIREFRAME_CMD"));
-      else
-        theMenu->addAction(action("SHADING_CMD"));
+      if (canBeShaded) {
+        if (isShading)
+          theMenu->addAction(action("WIREFRAME_CMD"));
+        else
+          theMenu->addAction(action("SHADING_CMD"));
+      }
       theMenu->addSeparator();
       theMenu->addAction(action("SHOW_ONLY_CMD"));
       theMenu->addAction(action("HIDE_CMD"));

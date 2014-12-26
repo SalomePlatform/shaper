@@ -129,7 +129,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
     myResult2AISObjectMap[theObject] = theAIS;
-    bool aCanBeShaded = canBeShaded(anAISIO);
+    bool aCanBeShaded = ::canBeShaded(anAISIO);
     // In order to avoid extra closing/opening context
     if (aCanBeShaded)
       closeLocalContexts(false);
@@ -606,7 +606,15 @@ void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bo
     return;
 
   Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+  bool aCanBeShaded = ::canBeShaded(aAISIO);
+  // In order to avoid extra closing/opening context
+  if (aCanBeShaded)
+    closeLocalContexts(false);
   aContext->SetDisplayMode(aAISIO, theMode, toUpdate);
+  if (aCanBeShaded) {
+    openLocalContext();
+    activateObjects(myActiveSelectionModes);
+  }
 }
 
 XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) const
@@ -665,4 +673,17 @@ void XGUI_Displayer::showOnly(const QObjectPtrList& theList)
       display(aObj, false);
   }
   updateViewer();
+}
+
+bool XGUI_Displayer::canBeShaded(ObjectPtr theObject) const
+{ 
+  if (!isVisible(theObject))
+    return false;
+
+  AISObjectPtr aAISObj = getAISObject(theObject);
+  if (aAISObj.get() == NULL)
+    return false;
+
+  Handle(AIS_InteractiveObject) anAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+  return ::canBeShaded(anAIS);
 }

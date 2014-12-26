@@ -228,30 +228,38 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 void PartSet_Module::onSelectionChanged()
 {
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  if (!aOperation)
+    return;
+
   bool isSketcherOp = false;
   // An edit operation is enable only if the current opeation is the sketch operation
-  if (aOperation && mySketchMgr->activeSketch()) {
+  if (mySketchMgr->activeSketch()) {
     if (PartSet_Tools::sketchPlane(mySketchMgr->activeSketch()))
       isSketcherOp = (aOperation->id().toStdString() == SketchPlugin_Sketch::ID());
   }
-  if (!isSketcherOp)
-    return;
-
-  // Editing of constraints can be done on selection
-  ModuleBase_ISelection* aSelect = myWorkshop->selection();
-  QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
-  if (aSelected.size() == 1) {
-    ModuleBase_ViewerPrs aPrs = aSelected.first();
-    ObjectPtr aObject = aPrs.object();
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-    if (aFeature) {
-      std::string aId = aFeature->getKind();
-      if ((aId == SketchPlugin_ConstraintRadius::ID()) ||
-          (aId == SketchPlugin_ConstraintLength::ID()) || 
-          (aId == SketchPlugin_ConstraintDistance::ID())) {
-        editFeature(aFeature);
+  if (isSketcherOp) {
+    // Editing of constraints can be done on selection
+    ModuleBase_ISelection* aSelect = myWorkshop->selection();
+    QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
+    if (aSelected.size() == 1) {
+      ModuleBase_ViewerPrs aPrs = aSelected.first();
+      ObjectPtr aObject = aPrs.object();
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
+      if (aFeature) {
+        std::string aId = aFeature->getKind();
+        if ((aId == SketchPlugin_ConstraintRadius::ID()) ||
+            (aId == SketchPlugin_ConstraintLength::ID()) || 
+            (aId == SketchPlugin_ConstraintDistance::ID())) {
+          editFeature(aFeature);
+        }
       }
     }
+  } else if (mySketchMgr->sketchOperationIdList().contains(aOperation->id()) && 
+    aOperation->isEditOperation()) {
+    // if this is sketch operation in edit mode
+
+      ModuleBase_ISelection* aSelect = myWorkshop->selection();
+      //aSelect->selectedShapes();
   }
 }
 
