@@ -21,9 +21,11 @@
 
 //Necessary for cerr
 #include <iostream>
+#include <algorithm>
 
 #ifdef WIN32
 #include <windows.h>
+#pragma warning(disable : 4996) // for getenv
 #else
 #include <dlfcn.h>
 #endif
@@ -34,6 +36,13 @@ Config_ModuleReader::Config_ModuleReader(const char* theEventGenerated)
     : Config_XMLReader(PLUGIN_FILE),
       myEventGenerated(theEventGenerated)
 {
+  myHaveSalome = false;
+  char* anEnv = getenv("SALOME_ROOT_DIR");
+  std::string value = normalize(anEnv);
+  if (!value.empty()) {
+    myHaveSalome = true;
+  }
+
 }
 
 Config_ModuleReader::~Config_ModuleReader()
@@ -61,6 +70,9 @@ std::string Config_ModuleReader::getModuleName()
 void Config_ModuleReader::processNode(xmlNodePtr theNode)
 {
   if (isNode(theNode, NODE_PLUGIN, NULL)) {
+    bool isAvailable = isAvaliableOnThisPlatform(getProperty(theNode, PLUGIN_PLATFORM));
+    if (!isAvailable)
+      return;
     std::string aPluginConf = getProperty(theNode, PLUGIN_CONFIG);
     std::string aPluginLibrary = getProperty(theNode, PLUGIN_LIBRARY);
     std::string aPluginScript = getProperty(theNode, PLUGIN_SCRIPT);
@@ -111,8 +123,8 @@ std::string Config_ModuleReader::addPlugin(const std::string& aPluginLibrary,
   }
   if(!aPluginName.empty()) {
     myPluginTypes[aPluginName] = aType;
-
   }
+
   return aPluginName;
 }
 
@@ -132,6 +144,29 @@ void Config_ModuleReader::loadPlugin(const std::string thePluginName)
       loadLibrary(thePluginName);
       break;
   }
+}
+
+bool Config_ModuleReader::isAvaliableOnThisPlatform(const std::string& thePluginPlatform)
+{
+  bool result = true;
+  PluginPlatform aPlatform = All;
+  std::string aPlatformName = normalize(thePluginPlatform) ;
+  if (aPlatformName == PLUGIN_PLATFORM_SALOME) {
+    aPlatform = Salome;
+  } else if (aPlatformName == PLUGIN_PLATFORM_NEWGEOM) {
+    aPlatform = OpenParts;
+  } else if (!thePluginPlatform.empty()) {
+    Events_Error::send("Unknown platform: " + thePluginPlatform);
+  }
+  if (aPlatform == All) {
+    result = true;
+  } else if (myHaveSalome) {
+    result = aPlatform == Salome;
+  } else {
+    result = aPlatform == OpenParts;
+  }
+  return result;
+
 }
 
 void Config_ModuleReader::loadScript(const std::string theFileName)

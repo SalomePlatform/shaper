@@ -5,7 +5,7 @@
         id="ExportToGEOM"
         title="Export to GEOM"
         tooltip="Exports all bodies into GEOM module"
-        icon=":pictures/part_ico.png"/>
+        icon=":icons/geom_export.png"/>
     </group>
   </workbench>
 </plugin>
