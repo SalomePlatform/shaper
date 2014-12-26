@@ -10,7 +10,7 @@ from ModelAPI import *
 # from GeomDataAPI import *
 # from GeomAlgoAPI import *
 
-__updated__ = "2014-12-24"
+__updated__ = "2014-12-26"
 
 #=========================================================================
 # Creation and activation of documents
@@ -38,8 +38,8 @@ aSession.finishOperation()
 assert(aSession.activeDocument())
 assert(aSession.activeDocument().id() == "root")
 # check all opened docs
-for aDoc in aSession.allOpenedDocuments():
-    assert(aDoc)
+allDocsList = aSession.allOpenedDocuments()
+assert(len(allDocsList) != 0)
 # Activate Part_1 doc back for further testing
 aSession.startOperation()
 aSession.setActiveDocument(aSession.document("Part_1"), False)
