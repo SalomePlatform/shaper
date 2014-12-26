@@ -251,6 +251,28 @@ void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
   }
 }
 
+void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theModes)
+{
+  if (!isVisible(theObject))
+    return;
+
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
+
+  AISObjectPtr aAISObj = getAISObject(theObject);
+
+  if (aAISObj.get() != NULL) {
+    Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+    TColStd_ListOfInteger aTColModes;
+    aContext->ActivatedModes(anAISIO, aTColModes);
+    TColStd_ListIteratorOfListOfInteger itr( aTColModes );
+    for (; itr.More(); itr.Next() ) {
+      theModes.append(itr.Value());
+    }
+  }
+}
+
 void XGUI_Displayer::activateObjects(const QIntList& theModes)
 {
   // In order to avoid doblications of selection modes
