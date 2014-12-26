@@ -158,15 +158,26 @@ void XGUI_Selection::selectedShapes(NCollection_List<TopoDS_Shape>& theList,
 }
 
 //**************************************************************
-void XGUI_Selection::entityOwners(const Handle(AIS_InteractiveObject)& theObject,
-                                  const Handle(AIS_InteractiveContext)& theContext,
-                                  SelectMgr_IndexedMapOfOwner& theOwners)
+void XGUI_Selection::selectedOwners(SelectMgr_IndexedMapOfOwner& theSelectedOwners) const
 {
-    if (theObject.IsNull() || theContext.IsNull())
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+
+  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
+    theSelectedOwners.Add(aContext->SelectedOwner());
+  }
+}
+
+//**************************************************************
+void XGUI_Selection::entityOwners(const Handle(AIS_InteractiveObject)& theObject,
+                                  SelectMgr_IndexedMapOfOwner& theOwners) const
+{
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+
+  if (theObject.IsNull() || aContext.IsNull())
     return;
 
   TColStd_ListOfInteger aModes;
-  theContext->ActivatedModes(theObject, aModes);
+  aContext->ActivatedModes(theObject, aModes);
 
   TColStd_ListIteratorOfListOfInteger anIt(aModes);
   for (; anIt.More(); anIt.Next()) {

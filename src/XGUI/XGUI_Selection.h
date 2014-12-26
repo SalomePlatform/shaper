@@ -57,14 +57,16 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theShapes, 
     std::list<ObjectPtr>& theOwners) const;
 
+  //! Returns list of currently selected owners
+  /// \return list of owners
+  void selectedOwners(SelectMgr_IndexedMapOfOwner& theSelectedOwners) const;
+
   //! Returns a list of selection entity owners of the interactive object
   /// It depends on the modes, in which the object is activated in the context
   /// \param theObject an object
-  /// \param theContext a viewer interactive context
   /// \param theOwners a map of entity owners
-  static void entityOwners(const Handle_AIS_InteractiveObject& theObject,
-                           const Handle_AIS_InteractiveContext& theContext,
-                           SelectMgr_IndexedMapOfOwner& theOwners);
+  void entityOwners(const Handle_AIS_InteractiveObject& theObject,
+                    SelectMgr_IndexedMapOfOwner& theOwners) const;
 
  private:
   XGUI_Workshop* myWorkshop;
