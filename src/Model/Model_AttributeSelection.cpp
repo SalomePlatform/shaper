@@ -76,7 +76,7 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   else if (theContext->groupName() == ModelAPI_ResultConstruction::group())
     selectConstruction(theContext, theSubShape);
 
-  std::string aSelName = buildSubShapeName(theSubShape, theContext);
+  std::string aSelName = namingName();
   if(!aSelName.empty())
 	  TDataStd_Name::Set(selectionLabel(), aSelName.c_str()); //set name
 
@@ -442,7 +442,7 @@ TDF_Label Model_AttributeSelection::selectionLabel()
   return myRef.myRef->Label().FindChild(1);
 }
 
-#define DEB_NAME 1
+#define FIX_BUG1 1
 std::string GetShapeName(std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape, 
 					     const TDF_Label& theLabel)
 {
@@ -501,14 +501,18 @@ bool isTrivial (const TopTools_ListOfShape& theAncestors, TopTools_IndexedMapOfS
   if(aNumber > 1) return false;
   return true;
 }
-std::string Model_AttributeSelection::buildSubShapeName(std::shared_ptr<GeomAPI_Shape> theSubShape, 
-	                                                    const ResultPtr& theContext)
+std::string Model_AttributeSelection::namingName()//std::shared_ptr<GeomAPI_Shape> theSubShape, 
+	                                                // const ResultPtr& theContext)
 {
+  std::shared_ptr<GeomAPI_Shape> aSubSh = value();
+  ResultPtr aCont = context();
   std::string aName;
-  if(theSubShape->isNull() || theContext->shape()->isNull()) return aName;  
-  TopoDS_Shape aSubShape = theSubShape->impl<TopoDS_Shape>();
-  TopoDS_Shape aContext  = theContext->shape()->impl<TopoDS_Shape>();
-  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(theContext->document());
+  if(!aSubSh.get() || aSubSh->isNull() || !aCont.get() || aCont->shape()->isNull()) 
+    return aName;
+  TopoDS_Shape aSubShape = aSubSh->impl<TopoDS_Shape>();
+  TopoDS_Shape aContext  = aCont->shape()->impl<TopoDS_Shape>();
+  std::shared_ptr<Model_Document> aDoc = 
+    std::dynamic_pointer_cast<Model_Document>(aCont->document());
 
   // check if the subShape is already in DF
   aName = GetShapeName(aDoc, aSubShape, selectionLabel());
@@ -573,21 +577,30 @@ std::string Model_AttributeSelection::buildSubShapeName(std::shared_ptr<GeomAPI_
 		  break;
 
 	  case TopAbs_VERTEX:
-		  // name structure (Monifold Topology): F1 | F2 | F3; intersection of 3 faces defines a vertex.
+		  // name structure (Monifold Topology): 
+		  // 1) F1 | F2 | F3 - intersection of 3 faces defines a vertex - trivial case.
+		  // 2) F1 | F2      - intersection of 2 faces definses a vertex - applicable for case
+		  //                   when 1 faces is cylindrical, conical, spherical or revolution and etc.
+		  // 3) E1 | E2 | E3 - intersection of 3 edges defines a vertex - when we have case of a shell
+		  //                   or compound of 2 open faces.
+		  // 4) E1 | E2      - intesection of 2 edges defines a vertex - when we have a case of 
+		  //                   two independent edges (wire or compound)
+		  // implemented 2 first cases
 		  {
 			TopTools_IndexedDataMapOfShapeListOfShape aMap;
 		    TopExp::MapShapesAndAncestors(aContext, TopAbs_VERTEX, TopAbs_FACE, aMap);
 			const TopTools_ListOfShape& aList2  = aMap.FindFromKey(aSubShape);
 			TopTools_ListOfShape aList;
 			TopTools_MapOfShape aFMap;
-#ifdef DEB_NAME
-			int n = aList2.Extent(); //bug!
+#ifdef FIX_BUG1
+			//int n = aList2.Extent(); //bug!
+			// fix is below
 			TopTools_ListIteratorOfListOfShape itl2(aList2);
 		    for (int i = 1;itl2.More();itl2.Next(),i++) {
 			  if(aFMap.Add(itl2.Value()))
 				aList.Append(itl2.Value());
 			}
-			n = aList.Extent();
+			//n = aList.Extent();
 #endif
 			TopTools_ListIteratorOfListOfShape itl(aList);
 		    for (int i = 1;itl.More();itl.Next(),i++) {
@@ -601,6 +614,9 @@ std::string Model_AttributeSelection::buildSubShapeName(std::shared_ptr<GeomAPI_
 		  }
 		  break;
 	}
+    // register name			
+    // aDoc->addNamingName(selectionLabel(), aName);
+	// the selected sub-shape will not be shared and as result it will not require registration
   }
   return aName;
 }

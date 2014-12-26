@@ -39,9 +39,8 @@ public:
   /// \returns false if update is failed
   MODEL_EXPORT virtual bool update();
 
-  /// builds name of the SubShape 
-  MODEL_EXPORT virtual std::string buildSubShapeName(std::shared_ptr<GeomAPI_Shape> theSubShape, 
-	                                                 const ResultPtr& theContext);
+  /// Returns a textual string of the selection
+  MODEL_EXPORT virtual std::string namingName();
 
 protected:
   /// Objects are created for features automatically
