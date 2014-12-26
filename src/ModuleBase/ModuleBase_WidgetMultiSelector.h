@@ -15,6 +15,7 @@
 
 #include <GeomAPI_Shape.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_AttributeSelectionList.h>
 
 #include <NCollection_List.hxx>
 #include <TopoDS_Shape.hxx>
@@ -67,7 +68,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
   void activateShapeSelection();
 
  private:
-   void updateSelectionList();
+   void updateSelectionList(AttributeSelectionListPtr);
 
   QListWidget* myListControl;
   QComboBox* myTypeCombo;
