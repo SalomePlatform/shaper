@@ -11,6 +11,7 @@
 #include <AIS_ListOfInteractive.hxx>
 #include <NCollection_List.hxx>
 #include <TopoDS_Shape.hxx>
+#include <SelectMgr_IndexedMapOfOwner.hxx>
 
 class XGUI_Workshop;
 class XGUI_ObjectsBrowser;
@@ -35,6 +36,10 @@ Q_OBJECT
 
   //! Connects the manager to all viewers accessible by Workshop
   void connectViewers();
+
+  //! Selects the owners in the context.
+  //! \param theSelectedOwners a container of owners
+  void setSelectedOwners(const SelectMgr_IndexedMapOfOwner& theSelectedOwners);
 
 signals:
   //! Emited when selection in a one of viewers was changed

@@ -41,6 +41,15 @@ void XGUI_SelectionMgr::connectViewers()
 }
 
 //**************************************************************
+void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& theSelectedOwners)
+{
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  for  (Standard_Integer i = 1, n = theSelectedOwners.Extent(); i <= n; i++)  {
+    aContext->AddOrRemoveSelected(theSelectedOwners(i), false);
+  }
+}
+
+//**************************************************************
 void XGUI_SelectionMgr::onObjectBrowserSelection()
 {
   QObjectPtrList aObjects = myWorkshop->objectBrowser()->selectedObjects();

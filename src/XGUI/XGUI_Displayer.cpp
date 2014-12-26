@@ -7,6 +7,8 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_ViewerProxy.h"
+#include "XGUI_SelectionMgr.h"
+#include "XGUI_Selection.h"
 
 #include <AppElements_Viewer.h>
 
@@ -131,8 +133,11 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     myResult2AISObjectMap[theObject] = theAIS;
     bool aCanBeShaded = ::canBeShaded(anAISIO);
     // In order to avoid extra closing/opening context
-    if (aCanBeShaded)
+    SelectMgr_IndexedMapOfOwner aSelectedOwners;
+    if (aCanBeShaded) {
+      myWorkshop->selector()->selection()->selectedOwners(aSelectedOwners);
       closeLocalContexts(false);
+    }
     aContext->Display(anAISIO, false);
     qDebug("### Display %i", (long)anAISIO.Access());
 
@@ -147,6 +152,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     if (aCanBeShaded) {
       openLocalContext();
       activateObjects(myActiveSelectionModes);
+      myWorkshop->selector()->setSelectedOwners(aSelectedOwners);
     }
   }
   if (isUpdateViewer)

@@ -13,6 +13,7 @@
 #include <XGUI_Displayer.h>
 #include <XGUI_Workshop.h>
 #include <XGUI_Selection.h>
+#include <XGUI_SelectionMgr.h>
 
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
@@ -530,7 +531,7 @@ void PartSet_SketcherMgr::getSelectionOwners(const ObjectPtr& theObject,
 
     SelectMgr_IndexedMapOfOwner aSelectedOwners;
 
-    XGUI_Selection::entityOwners(anAISIO, aContext, aSelectedOwners);
+    aConnector->workshop()->selector()->selection()->entityOwners(anAISIO, aSelectedOwners);
     for  ( Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++ ) {
       Handle(StdSelect_BRepOwner) anOwner = Handle(StdSelect_BRepOwner)::DownCast(aSelectedOwners(i));
       if ( anOwner.IsNull() || !anOwner->HasShape() )
