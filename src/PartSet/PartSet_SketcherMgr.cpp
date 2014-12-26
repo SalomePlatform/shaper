@@ -270,7 +270,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature) { 
           // save the previous selection
-          ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+          /*ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
           XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
           XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
           QIntList anActivatedModes;
@@ -280,13 +280,13 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
           aDisplayer->getModesOfActivation(aResult, anActivatedModes);
 
           std::list<AttributePtr> aSelectedAttributes;
-          getCurrentSelection(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes);
+          getCurrentSelection(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes);*/
           // save the previous selection: end
 
 
           aSketchFeature->move(dX, dY);
           ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent);
-
+          /*
           // TODO: the selection restore should be after the AIS presentation is rebuilt
           Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
           Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
@@ -305,12 +305,12 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
             aContext->AddOrRemoveSelected(anOwnersToSelect(i), false); // SetSelected()
 
           aContext->UpdateCurrentViewer();
-          // restore the previous selection
+          // restore the previous selection*/
         }
       }
       // TODO: set here
-      //Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
-      //Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
+      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
     }
     myDragDone = true;
     myCurX = aX;
