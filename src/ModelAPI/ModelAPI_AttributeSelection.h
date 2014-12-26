@@ -44,9 +44,9 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
     return type();
   }
 
-  /// Builds name of the SubShape 
-  virtual std::string buildSubShapeName(std::shared_ptr<GeomAPI_Shape> theSubShape, 
-	                                    const ResultPtr& theContext) = 0;
+  /// Returns a textual string of the selection
+  virtual std::string namingName() = 0;
+
 
   /// Selects sub-shape by Name
   //virtual selectSubShape(const std::string& theSubShapeName, const std::string& theContextShapeName)

@@ -76,7 +76,7 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   else if (theContext->groupName() == ModelAPI_ResultConstruction::group())
     selectConstruction(theContext, theSubShape);
 
-  std::string aSelName = buildSubShapeName(theSubShape, theContext);
+  std::string aSelName = namingName();
   if(!aSelName.empty())
 	  TDataStd_Name::Set(selectionLabel(), aSelName.c_str()); //set name
 
@@ -501,14 +501,18 @@ bool isTrivial (const TopTools_ListOfShape& theAncestors, TopTools_IndexedMapOfS
   if(aNumber > 1) return false;
   return true;
 }
-std::string Model_AttributeSelection::buildSubShapeName(std::shared_ptr<GeomAPI_Shape> theSubShape, 
-	                                                    const ResultPtr& theContext)
+std::string Model_AttributeSelection::namingName()//std::shared_ptr<GeomAPI_Shape> theSubShape, 
+	                                                // const ResultPtr& theContext)
 {
+  std::shared_ptr<GeomAPI_Shape> aSubSh = value();
+  ResultPtr aCont = context();
   std::string aName;
-  if(theSubShape->isNull() || theContext->shape()->isNull()) return aName;  
-  TopoDS_Shape aSubShape = theSubShape->impl<TopoDS_Shape>();
-  TopoDS_Shape aContext  = theContext->shape()->impl<TopoDS_Shape>();
-  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(theContext->document());
+  if(!aSubSh.get() || aSubSh->isNull() || !aCont.get() || aCont->shape()->isNull()) 
+    return aName;
+  TopoDS_Shape aSubShape = aSubSh->impl<TopoDS_Shape>();
+  TopoDS_Shape aContext  = aCont->shape()->impl<TopoDS_Shape>();
+  std::shared_ptr<Model_Document> aDoc = 
+    std::dynamic_pointer_cast<Model_Document>(aCont->document());
 
   // check if the subShape is already in DF
   aName = GetShapeName(aDoc, aSubShape, selectionLabel());
