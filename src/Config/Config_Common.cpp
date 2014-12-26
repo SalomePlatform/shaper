@@ -130,13 +130,26 @@ std::string getProperty(xmlNodePtr theNode, const char* thePropName)
 
 bool getBooleanAttribute(xmlNodePtr theNode, const char* theAttributeName, bool theDefault)
 {
-  std::string prop = getProperty(theNode, theAttributeName);
-  std::transform(prop.begin(), prop.end(), prop.begin(), ::tolower);
+  std::string prop = normalize(getProperty(theNode, theAttributeName));
   bool result = theDefault;
   if (prop == "true" || prop == "1") {
     result = true;
   } else if (prop == "false" || prop == "0") {
     result = false;
   }
+  return result;
+}
+
+CONFIG_EXPORT std::string normalize(const char* theString)
+{
+  if (!theString)
+    return std::string();
+  return normalize(std::string(theString));
+}
+
+CONFIG_EXPORT std::string normalize(const std::string& theString)
+{
+  std::string result = theString;
+  std::transform(result.begin(), result.end(), result.begin(), ::tolower);
   return result;
 }

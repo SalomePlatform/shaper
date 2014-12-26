@@ -84,5 +84,11 @@ const static char* PLUGINS_MODULE = "module";
 const static char* PLUGIN_CONFIG = "configuration";
 const static char* PLUGIN_LIBRARY = "library";
 const static char* PLUGIN_SCRIPT = "script";
+const static char* PLUGIN_PLATFORM = "platform";
+
+const static char* PLUGIN_PLATFORM_SALOME = "salome";
+const static char* PLUGIN_PLATFORM_NEWGEOM = "openparts";
+
+
 
 #endif /* CONFIG_KEYWORDS_H_ */

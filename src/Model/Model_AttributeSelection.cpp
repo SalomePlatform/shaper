@@ -26,6 +26,7 @@
 #include <TopoDS_Compound.hxx>
 #include <TDataStd_IntPackedMap.hxx>
 #include <TDataStd_Integer.hxx>
+#include <TDataStd_UAttribute.hxx>
 #include <TopTools_MapOfShape.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopTools_MapIteratorOfMapOfShape.hxx>
@@ -51,6 +52,8 @@ using namespace std;
 /// adeed to the index in the packed map to signalize that the vertex of edge is seleted
 /// (multiplied by the index of the edge)
 static const int kSTART_VERTEX_DELTA = 1000000;
+// identifier that there is simple reference: selection equals to context
+Standard_GUID kSIMPLE_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb29");
 
 // on this label is stored:
 // TNaming_NamedShape - selected shape
@@ -68,13 +71,23 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   if (isOldShape) return; // shape is the same, so context is also unchanged
   // update the referenced object if needed
   bool isOldContext = theContext == myRef.value();
+
+
   if (!isOldContext)
     myRef.setValue(theContext);
 
-  if (theContext->groupName() == ModelAPI_ResultBody::group())
-    selectBody(theContext, theSubShape);
-  else if (theContext->groupName() == ModelAPI_ResultConstruction::group())
-    selectConstruction(theContext, theSubShape);
+  // do noth use naming if selected shape is result shape itself, but not sub-shape
+  TDF_Label aSelLab = selectionLabel();
+  if (theContext->shape().get() && theContext->shape()->isEqual(theSubShape)) {
+    aSelLab.ForgetAllAttributes(true);
+    TDataStd_UAttribute::Set(aSelLab, kSIMPLE_REF_ID);
+  } else {
+    aSelLab.ForgetAttribute(kSIMPLE_REF_ID);
+    if (theContext->groupName() == ModelAPI_ResultBody::group())
+      selectBody(theContext, theSubShape);
+    else if (theContext->groupName() == ModelAPI_ResultConstruction::group())
+      selectConstruction(theContext, theSubShape);
+  }
 
   std::string aSelName = namingName();
   if(!aSelName.empty())
@@ -88,6 +101,14 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
 {
   std::shared_ptr<GeomAPI_Shape> aResult;
   if (myIsInitialized) {
+    TDF_Label aSelLab = selectionLabel();
+    if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
+      ResultPtr aContext = context();
+      if (!aContext.get()) 
+        return aResult; // empty result
+      return aContext->shape();
+    }
+
     Handle(TNaming_NamedShape) aSelection;
     if (selectionLabel().FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
       TopoDS_Shape aSelShape = aSelection->Get();
@@ -147,10 +168,15 @@ TDF_LabelMap& Model_AttributeSelection::scope()
 bool Model_AttributeSelection::update()
 {
   ResultPtr aContext = context();
-  if (!aContext) return false;
+  if (!aContext.get()) return false;
+  TDF_Label aSelLab = selectionLabel();
+  if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
+    return aContext->shape() && !aContext->shape()->isNull();
+  }
+
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {
     // body: just a named shape, use selection mechanism from OCCT
-    TNaming_Selector aSelector(selectionLabel());
+    TNaming_Selector aSelector(aSelLab);
     bool aResult = aSelector.Solve(scope()) == Standard_True;
     owner()->data()->sendAttributeUpdated(this);
     return aResult;
@@ -417,7 +443,8 @@ void Model_AttributeSelection::selectConstruction(
               int anID = aComposite->subFeatureId(a);
               aRefs->Add(anID);
               // add edges to sub-label to support naming for edges selection
-              for(TopExp_Explorer anEdgeExp(aSubShape, TopAbs_EDGE); anEdgeExp.More(); anEdgeExp.Next()) {
+              TopExp_Explorer anEdgeExp(aSubShape, TopAbs_EDGE);
+              for(; anEdgeExp.More(); anEdgeExp.Next()) {
                 TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExp.Current());
                 Standard_Real aFirst, aLast;
                 Handle(Geom_Curve) aFaceCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
