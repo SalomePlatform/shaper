@@ -15,7 +15,6 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
-#include <ModelAPI_AttributeSelectionList.h>
 
 #include <Config_WidgetAPI.h>
 
@@ -93,6 +92,7 @@ bool ModuleBase_WidgetMultiSelector::storeValue() const
     foreach (GeomSelection aSelec, mySelection) {
       aSelectionListAttr->append(aSelec.first, aSelec.second);
     }
+    //updateSelectionList(aSelectionListAttr);
     updateObject(myFeature);
     return true;
   }
@@ -119,7 +119,7 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
       AttributeSelectionPtr aSelectAttr = aSelectionListAttr->value(i);
       mySelection.append(GeomSelection(aSelectAttr->context(), aSelectAttr->value()));
     }
-    updateSelectionList();
+    updateSelectionList(aSelectionListAttr);
     return true;
   }
   return false;
@@ -204,7 +204,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
     aShape->setImpl(new TopoDS_Shape(aShpIt.Value()));
     mySelection.append(GeomSelection(aResult, aShape));
   }
-  updateSelectionList();
+  //updateSelectionList();
   emit valuesChanged();
 }
 
@@ -253,25 +253,30 @@ void ModuleBase_WidgetMultiSelector::activateShapeSelection()
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::updateSelectionList()
+void ModuleBase_WidgetMultiSelector::updateSelectionList(AttributeSelectionListPtr theList)
 {
-  QString aType;
-  if (myTypeCombo->currentText().toLower() == "vertices")
-    aType = "vertex";
-  else if (myTypeCombo->currentText().toLower() == "edges")
-    aType = "edge";
-  else if (myTypeCombo->currentText().toLower() == "faces")
-    aType = "face";
-  else if (myTypeCombo->currentText().toLower() == "solids")
-    aType = "solid";
- 
   myListControl->clear();
-  int i = 1;
-  foreach (GeomSelection aSel, mySelection) {
-    QString aName(aSel.first->data()->name().c_str());
-    aName += ":" + aType + QString("_%1").arg(i);
-    myListControl->addItem(aName);
-    i++;
+  for (int i = 0; i < theList->size(); i++) {
+    AttributeSelectionPtr aAttr = theList->value(i);
+    myListControl->addItem(aAttr->namingName().c_str());
   }
-  myListControl->repaint();
+  //QString aType;
+  //if (myTypeCombo->currentText().toLower() == "vertices")
+  //  aType = "vertex";
+  //else if (myTypeCombo->currentText().toLower() == "edges")
+  //  aType = "edge";
+  //else if (myTypeCombo->currentText().toLower() == "faces")
+  //  aType = "face";
+  //else if (myTypeCombo->currentText().toLower() == "solids")
+  //  aType = "solid";
+ 
+  //myListControl->clear();
+  //int i = 1;
+  //foreach (GeomSelection aSel, mySelection) {
+  //  QString aName(aSel.first->data()->name().c_str());
+  //  aName += ":" + aType + QString("_%1").arg(i);
+  //  myListControl->addItem(aName);
+  //  i++;
+  //}
+  //myListControl->repaint();
 }
