@@ -125,6 +125,11 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
           aOperation->abort();
       return;
     }
+
+    // MoveTo in order to highlight current object
+    ModuleBase_IViewer* aViewer = aWorkshop->viewer();
+    aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
+
     // Remember highlighted objects for editing
     ModuleBase_ISelection* aSelect = aWorkshop->selection();
     QList<ModuleBase_ViewerPrs> aHighlighted = aSelect->getHighlighted();
@@ -186,8 +191,8 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       launchEditing();
 
     } else if (isSketchOpe && isEditing) {
-      // If selected another object
-      aOperation->abort();
+      // If selected another object commit current result
+      aOperation->commit();
 
       myIsDragging = true;
       get2dPoint(theWnd, theEvent, myCurX, myCurY);
@@ -216,7 +221,7 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
     myIsDragging = false;
     if (myDragDone) {
       aViewer->enableMultiselection(true);
-      aOp->commit();
+      //aOp->commit();
       myEditingFeatures.clear();
       myEditingAttr.clear();
 
@@ -250,9 +255,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     double dX =  aX - myCurX;
     double dY =  aY - myCurY;
 
-    if ((aOperation->id().toStdString() == SketchPlugin_Line::ID()) &&
-        (myEditingAttr.size() == 1) && 
-        myEditingAttr.first()) {
+    if ((myEditingAttr.size() == 1) && myEditingAttr.first()) {
       // probably we have prehighlighted point
       AttributePtr aAttr = myEditingAttr.first();
       std::string aAttrId = aAttr->id();
