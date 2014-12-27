@@ -277,30 +277,22 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
       foreach(FeaturePtr aFeature, myEditingFeatures) {
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-        if (aSketchFeature) { 
+        if (aSketchFeature) {
           // save the previous selection
-          QIntList anActivatedModes;
-          ResultPtr aResult = aSketchFeature->firstResult();
 
-          aDisplayer->getModesOfActivation(aResult, anActivatedModes);
-          
           std::list<AttributePtr> aSelectedAttributes;
           getCurrentSelection(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes);
           // save the previous selection: end
 
           aSketchFeature->move(dX, dY);
-
           // TODO: the selection restore should be after the AIS presentation is rebuilt
           Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
           Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-          // restore the previous selection
-          //aResult = aSketchFeature->firstResult();
-          //  aDisplayer->activate(aResult, anActivatedModes);
 
+          // restore the previous selection
           SelectMgr_IndexedMapOfOwner anOwnersToSelect;
           getSelectionOwners(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes,
                              anOwnersToSelect);
-          
           aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
           // restore the previous selection
         }
