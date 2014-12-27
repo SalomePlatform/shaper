@@ -44,9 +44,16 @@ void XGUI_SelectionMgr::connectViewers()
 void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& theSelectedOwners,
                                           bool isUpdateViewer)
 {
+  SelectMgr_IndexedMapOfOwner aSelectedOwners;
+  selection()->selectedOwners(aSelectedOwners);
+
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   for  (Standard_Integer i = 1, n = theSelectedOwners.Extent(); i <= n; i++)  {
-    aContext->AddOrRemoveSelected(theSelectedOwners(i), isUpdateViewer);
+    Handle(SelectMgr_EntityOwner) anOwner = theSelectedOwners(i);
+    if (aSelectedOwners.FindIndex(anOwner) > 0)
+      continue;
+
+    aContext->AddOrRemoveSelected(anOwner, isUpdateViewer);
   }
 }
 
