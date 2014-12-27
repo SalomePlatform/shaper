@@ -614,12 +614,16 @@ void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bo
   Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
   bool aCanBeShaded = ::canBeShaded(aAISIO);
   // In order to avoid extra closing/opening context
-  if (aCanBeShaded)
+  SelectMgr_IndexedMapOfOwner aSelectedOwners;
+  if (aCanBeShaded) {
+    myWorkshop->selector()->selection()->selectedOwners(aSelectedOwners);
     closeLocalContexts(false);
+  }
   aContext->SetDisplayMode(aAISIO, theMode, toUpdate);
   if (aCanBeShaded) {
     openLocalContext();
     activateObjects(myActiveSelectionModes);
+    myWorkshop->selector()->setSelectedOwners(aSelectedOwners);
   }
 }
 
