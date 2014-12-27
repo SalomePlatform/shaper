@@ -629,12 +629,14 @@ void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bo
     myWorkshop->selector()->selection()->selectedOwners(aSelectedOwners);
     closeLocalContexts(false);
   }
-  aContext->SetDisplayMode(aAISIO, theMode, toUpdate);
+  aContext->SetDisplayMode(aAISIO, theMode, false);
   if (aCanBeShaded) {
     openLocalContext();
     activateObjects(myActiveSelectionModes);
-    myWorkshop->selector()->setSelectedOwners(aSelectedOwners);
+    myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
   }
+  if (toUpdate)
+    updateViewer();
 }
 
 XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) const
