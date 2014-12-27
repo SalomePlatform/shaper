@@ -281,7 +281,9 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
           // save the previous selection
 
           std::list<AttributePtr> aSelectedAttributes;
-          getCurrentSelection(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes);
+          std::list<ResultPtr> aSelectedResults;
+          getCurrentSelection(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes,
+                              aSelectedResults);
           // save the previous selection: end
 
           aSketchFeature->move(dX, dY);
@@ -292,7 +294,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
           // restore the previous selection
           SelectMgr_IndexedMapOfOwner anOwnersToSelect;
           getSelectionOwners(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes,
-                             anOwnersToSelect);
+                             aSelectedResults, anOwnersToSelect);
           aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
           // restore the previous selection
         }
@@ -456,7 +458,8 @@ void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& th
 void PartSet_SketcherMgr::getCurrentSelection(const ObjectPtr& theObject,
                                               const FeaturePtr& theSketch,
                                               ModuleBase_IWorkshop* theWorkshop,
-                                              std::list<AttributePtr>& theSelectedAttributes)
+                                              std::list<AttributePtr>& theSelectedAttributes,
+                                              std::list<ResultPtr>& theSelectedResults)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
   if (aFeature.get() == NULL)
@@ -468,22 +471,27 @@ void PartSet_SketcherMgr::getCurrentSelection(const ObjectPtr& theObject,
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
   // TODO: check all results and IPresentable feature
-  ResultPtr aResult = aFeature->firstResult();
+  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr>::const_iterator aIt;
+  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
+  {
+    ResultPtr aResult = *aIt;
 
-  bool isVisibleSketch = aDisplayer->isVisible(aResult);
-  AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
-
-  if (aAISObj.get() != NULL) {
+    AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
+    if (aAISObj.get() == NULL)
+      continue;
     Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
     for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
     {
       Handle(StdSelect_BRepOwner) aBRepOwner = Handle(StdSelect_BRepOwner)::DownCast(
                                                                       aContext->SelectedOwner());
-      if (aBRepOwner.IsNull()) continue;
+      if (aBRepOwner.IsNull())
+        continue;
 
       Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast(
-                                                                       aBRepOwner->Selectable());
-      if (anIO != anAISIO) continue;
+                                                                        aBRepOwner->Selectable());
+      if (anIO != anAISIO)
+        continue;
 
       if (aBRepOwner->HasShape()) {
         const TopoDS_Shape& aShape = aBRepOwner->Shape();
@@ -494,6 +502,9 @@ void PartSet_SketcherMgr::getCurrentSelection(const ObjectPtr& theObject,
           if (aPntAttr.get() != NULL)
             theSelectedAttributes.push_back(aPntAttr);
         }
+        else if (aShapeType == TopAbs_EDGE) {
+          theSelectedResults.push_back(aResult);
+        }
       }
     }
   }
@@ -503,6 +514,7 @@ void PartSet_SketcherMgr::getSelectionOwners(const ObjectPtr& theObject,
                                              const FeaturePtr& theSketch,
                                              ModuleBase_IWorkshop* theWorkshop,
                                              const std::list<AttributePtr>& theSelectedAttributes,
+                                             const std::list<ResultPtr>& theSelectedResults,
                                              SelectMgr_IndexedMapOfOwner& anOwnersToSelect)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
@@ -517,7 +529,6 @@ void PartSet_SketcherMgr::getSelectionOwners(const ObjectPtr& theObject,
   // TODO: check all results and IPresentable feature
   ResultPtr aResult = aFeature->firstResult();
 
-  bool isVisibleSketch = aDisplayer->isVisible(aResult);
   AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
 
   if (aAISObj.get() != NULL) {

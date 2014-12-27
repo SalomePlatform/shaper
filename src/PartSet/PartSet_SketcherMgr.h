@@ -12,6 +12,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Result.h>
 
 #include <ModuleBase_ViewerFilters.h>
 #include <ModuleBase_Definitions.h>
@@ -77,10 +78,12 @@ private:
   /// \param theSketch a current sketch feature
   /// \param theWorkshop a workshop to have an access to AIS context and displayer
   /// \param theSelectedAttributes an out list of selected attributes
+  /// \param theSelectedAttributes an out list of selected results
   static void getCurrentSelection(const ObjectPtr& theObject,
                                   const FeaturePtr& theSketch,
                                   ModuleBase_IWorkshop* theWorkshop,
-                                  std::list<AttributePtr>& theSelectedAttributes);
+                                  std::list<AttributePtr>& theSelectedAttributes,
+                                  std::list<ResultPtr>& theSelectedResults);
 
   /// Applyes the current selection to the object in the workshop viewer 
   /// It includes the selection in all modes of activation, even local context - vertexes, edges
@@ -94,6 +97,7 @@ private:
                                   const FeaturePtr& theSketch,
                                   ModuleBase_IWorkshop* theWorkshop,
                                   const std::list<AttributePtr>& theSelectedAttributes,
+                                  const std::list<ResultPtr>& theSelectedResults,
                                   SelectMgr_IndexedMapOfOwner& anOwnersToSelect);
 
 private:
