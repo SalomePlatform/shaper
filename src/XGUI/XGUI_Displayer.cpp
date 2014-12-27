@@ -68,6 +68,7 @@ void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfIn
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
   : myWorkshop(theWorkshop)
 {
+  enableUpdateViewer(true);
 }
 
 XGUI_Displayer::~XGUI_Displayer()
@@ -152,7 +153,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     if (aCanBeShaded) {
       openLocalContext();
       activateObjects(myActiveSelectionModes);
-      myWorkshop->selector()->setSelectedOwners(aSelectedOwners);
+      myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
     }
   }
   if (isUpdateViewer)
@@ -206,7 +207,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
     aContext->Redisplay(aAISIO, false);
     // Restore selection state after redisplay
     if (aToSelect) 
-      aContext->SetSelected(aAISIO);
+      aContext->SetSelected(aAISIO, false);
     if (isUpdateViewer)
       updateViewer();
   }
@@ -541,10 +542,19 @@ ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) 
   return aFeature;
 }
 
+bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
+{
+  bool aWasEnabled = myEnableUpdateViewer;
+
+  myEnableUpdateViewer = isEnabled;
+
+  return aWasEnabled;
+}
+
 void XGUI_Displayer::updateViewer()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull())
+  if (!aContext.IsNull() && myEnableUpdateViewer)
     aContext->UpdateCurrentViewer();
 }
 

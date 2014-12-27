@@ -89,6 +89,13 @@ class XGUI_EXPORT XGUI_Displayer
 
   void removeFilters();
 
+  /**
+   * Sets a flag to the displayer whether the internal viewer can be updated by 
+   * the updateViewer method call. If it is not enabled, this method do nothing
+   * \param isEnabled a boolean value
+   */
+  bool enableUpdateViewer(const bool isEnabled);
+
   /// Updates the viewer
   void updateViewer();
 
@@ -190,6 +197,8 @@ class XGUI_EXPORT XGUI_Displayer
   //bool myUseExternalObjects;
   // Selection modes installed for external objects in local context
   QIntList myActiveSelectionModes;
+
+  bool myEnableUpdateViewer;  /// the enable update viewer flag
 };
 
 #endif
