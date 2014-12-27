@@ -203,11 +203,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
     Handle(AIS_InteractiveContext) aContext = AISContext();
     if (aContext.IsNull())
       return;
-    bool aToSelect = aContext->IsSelected(aAISIO);
     aContext->Redisplay(aAISIO, false);
-    // Restore selection state after redisplay
-    if (aToSelect) 
-      aContext->SetSelected(aAISIO, false);
     if (isUpdateViewer)
       updateViewer();
   }
