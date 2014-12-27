@@ -427,7 +427,7 @@ void XGUI_Displayer::eraseAll(const bool isUpdateViewer)
 
 void XGUI_Displayer::openLocalContext()
 {
-  Handle(AIS_InteractiveContext) aContext = AISContext();
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (aContext.IsNull())
     return;
   // Open local context if there is no one
