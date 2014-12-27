@@ -283,8 +283,8 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
         if (aSketchFeature) {
           // save the previous selection
 
-          std::list<AttributePtr> aSelectedAttributes;
-          std::list<ResultPtr> aSelectedResults;
+          std::set<AttributePtr> aSelectedAttributes;
+          std::set<ResultPtr> aSelectedResults;
           getCurrentSelection(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes,
                               aSelectedResults);
           // save the previous selection: end
@@ -461,8 +461,8 @@ void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& th
 void PartSet_SketcherMgr::getCurrentSelection(const ObjectPtr& theObject,
                                               const FeaturePtr& theSketch,
                                               ModuleBase_IWorkshop* theWorkshop,
-                                              std::list<AttributePtr>& theSelectedAttributes,
-                                              std::list<ResultPtr>& theSelectedResults)
+                                              std::set<AttributePtr>& theSelectedAttributes,
+                                              std::set<ResultPtr>& theSelectedResults)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
   if (aFeature.get() == NULL)
@@ -473,13 +473,11 @@ void PartSet_SketcherMgr::getCurrentSelection(const ObjectPtr& theObject,
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
-  // TODO: check all results and IPresentable feature
   std::list<ResultPtr> aResults = aFeature->results();
   std::list<ResultPtr>::const_iterator aIt;
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
   {
     ResultPtr aResult = *aIt;
-
     AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
     if (aAISObj.get() == NULL)
       continue;
@@ -490,12 +488,8 @@ void PartSet_SketcherMgr::getCurrentSelection(const ObjectPtr& theObject,
                                                                       aContext->SelectedOwner());
       if (aBRepOwner.IsNull())
         continue;
-
       Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast(
                                                                         aBRepOwner->Selectable());
-      if (anIO != anAISIO)
-        continue;
-
       if (aBRepOwner->HasShape()) {
         const TopoDS_Shape& aShape = aBRepOwner->Shape();
         TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
@@ -503,10 +497,11 @@ void PartSet_SketcherMgr::getCurrentSelection(const ObjectPtr& theObject,
           AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theObject,
                                                                         aShape, theSketch);
           if (aPntAttr.get() != NULL)
-            theSelectedAttributes.push_back(aPntAttr);
+            theSelectedAttributes.insert(aPntAttr);
         }
-        else if (aShapeType == TopAbs_EDGE) {
-          theSelectedResults.push_back(aResult);
+        else if (aShapeType == TopAbs_EDGE &&
+                 theSelectedResults.find(aResult) == theSelectedResults.end()) {
+          theSelectedResults.insert(aResult);
         }
       }
     }
@@ -516,8 +511,8 @@ void PartSet_SketcherMgr::getCurrentSelection(const ObjectPtr& theObject,
 void PartSet_SketcherMgr::getSelectionOwners(const ObjectPtr& theObject,
                                              const FeaturePtr& theSketch,
                                              ModuleBase_IWorkshop* theWorkshop,
-                                             const std::list<AttributePtr>& theSelectedAttributes,
-                                             const std::list<ResultPtr>& theSelectedResults,
+                                             const std::set<AttributePtr>& theSelectedAttributes,
+                                             const std::set<ResultPtr>& theSelectedResults,
                                              SelectMgr_IndexedMapOfOwner& anOwnersToSelect)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
@@ -529,16 +524,17 @@ void PartSet_SketcherMgr::getSelectionOwners(const ObjectPtr& theObject,
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
-  // TODO: check all results and IPresentable feature
-  ResultPtr aResult = aFeature->firstResult();
-
-  AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
-
-  if (aAISObj.get() != NULL) {
+  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr>::const_iterator aIt;
+  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
+  {
+    ResultPtr aResult = *aIt;
+    AISObjectPtr aAISObj = aDisplayer->getAISObject(aResult);
+    if (aAISObj.get() == NULL)
+      continue; 
     Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
 
-    SelectMgr_IndexedMapOfOwner aSelectedOwners;
-
+    SelectMgr_IndexedMapOfOwner aSelectedOwners;  
     aConnector->workshop()->selector()->selection()->entityOwners(anAISIO, aSelectedOwners);
     for  ( Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++ ) {
       Handle(StdSelect_BRepOwner) anOwner = Handle(StdSelect_BRepOwner)::DownCast(aSelectedOwners(i));
@@ -548,16 +544,17 @@ void PartSet_SketcherMgr::getSelectionOwners(const ObjectPtr& theObject,
       TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
       if (aShapeType == TopAbs_VERTEX) {
         AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(aFeature, aShape, theSketch);
-        if (aPntAttr.get() != NULL) {
-          std::list<AttributePtr>::const_iterator anIt = theSelectedAttributes.begin(),
-                                                  aLast = theSelectedAttributes.end();
-          for (; anIt != aLast; anIt++) {
-            AttributePtr anAttrIt = *anIt;
-            if (anAttrIt.get() == aPntAttr.get()) {
-              anOwnersToSelect.Add(anOwner);
-            }
-          }
+        if (aPntAttr.get() != NULL &&
+            theSelectedAttributes.find(aPntAttr) != theSelectedAttributes.end()) {
+          anOwnersToSelect.Add(anOwner);
         }
+      }
+      else if (aShapeType == TopAbs_EDGE) {
+        bool aFound = theSelectedResults.find(aResult) != theSelectedResults.end();
+        int anIndex = anOwnersToSelect.FindIndex(anOwner);
+        if (theSelectedResults.find(aResult) != theSelectedResults.end()/* &&
+            anOwnersToSelect.FindIndex(anOwner) < 0*/)
+          anOwnersToSelect.Add(anOwner);
       }
     }
   }
