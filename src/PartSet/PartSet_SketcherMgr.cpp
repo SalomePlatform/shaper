@@ -255,9 +255,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     double dX =  aX - myCurX;
     double dY =  aY - myCurY;
 
-    if ((aOperation->id().toStdString() == SketchPlugin_Line::ID()) &&
-        (myEditingAttr.size() == 1) && 
-        myEditingAttr.first()) {
+    if ((myEditingAttr.size() == 1) && myEditingAttr.first()) {
       // probably we have prehighlighted point
       AttributePtr aAttr = myEditingAttr.first();
       std::string aAttrId = aAttr->id();
