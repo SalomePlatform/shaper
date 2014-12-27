@@ -148,7 +148,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
           aOperation->abort();
       return;
     }
-    if ((aHighlighted.size() == 1) && (aSelected.size() == 0)) {
+    if (aSelObjects.size() == 1) {
       // Move by selected shape (vertex). Can be used only for single selection
       foreach(ModuleBase_ViewerPrs aPrs, aHighlighted) {
         FeaturePtr aFeature = ModelAPI_Feature::feature(aHighlighted.first().object());
@@ -219,17 +219,19 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
       aOp->commit();
       myEditingFeatures.clear();
       myEditingAttr.clear();
+
+      // Reselect edited object
+      aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
+      if (theEvent->modifiers() & Qt::ShiftModifier)
+        aViewer->AISContext()->ShiftSelect();
+      else
+        aViewer->AISContext()->Select();
       return;
     }
   }
   if (!aViewer->isMultiSelectionEnabled()) {
     aViewer->enableMultiselection(true);
   }
-  //aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
-  //if (theEvent->modifiers() & Qt::ShiftModifier)
-  //  aViewer->AISContext()->ShiftSelect();
-  //else
-  //  aViewer->AISContext()->Select();
 }
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)

@@ -254,16 +254,8 @@ void PartSet_Module::onSelectionChanged()
         }
       }
     }
-  } else if (mySketchMgr->sketchOperationIdList().contains(aOperation->id()) && 
-    aOperation->isEditOperation()) {
-    // if this is sketch operation in edit mode
-
-      ModuleBase_ISelection* aSelect = myWorkshop->selection();
-      //aSelect->selectedShapes();
-  }
+  } 
 }
-
-      // after movement the solver will call the update event: optimization
 
 void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent)
 {
