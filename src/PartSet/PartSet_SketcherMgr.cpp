@@ -240,6 +240,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
       return; // No edit operation activated
 
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
+
     Handle(V3d_View) aView = theWnd->v3dView();
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
     double aX, aY;
@@ -266,52 +267,51 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
         }
       }
     } else {
+      ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+      XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+      XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+      bool isEnableUpdateViewer = aDisplayer->enableUpdateViewer(false);
+
       foreach(FeaturePtr aFeature, myEditingFeatures) {
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature) { 
           // save the previous selection
-          /*ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-          XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-          XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
           QIntList anActivatedModes;
-
           ResultPtr aResult = aSketchFeature->firstResult();
 
           aDisplayer->getModesOfActivation(aResult, anActivatedModes);
-
+          
           std::list<AttributePtr> aSelectedAttributes;
-          getCurrentSelection(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes);*/
+          getCurrentSelection(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes);
           // save the previous selection: end
 
-
           aSketchFeature->move(dX, dY);
-          ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent);
-          /*
+
           // TODO: the selection restore should be after the AIS presentation is rebuilt
           Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
           Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-
           // restore the previous selection
-          aResult = aSketchFeature->firstResult();
-            aDisplayer->activate(aResult, anActivatedModes);
+          //aResult = aSketchFeature->firstResult();
+          //  aDisplayer->activate(aResult, anActivatedModes);
 
           SelectMgr_IndexedMapOfOwner anOwnersToSelect;
           getSelectionOwners(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes,
                              anOwnersToSelect);
           
-          ModuleBase_IViewer* aViewer = aWorkshop->viewer();
-          Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
-          for (Standard_Integer i = 1, n = anOwnersToSelect.Extent(); i <= n; i++)
-            aContext->AddOrRemoveSelected(anOwnersToSelect(i), false); // SetSelected()
-
-          aContext->UpdateCurrentViewer();
-          // restore the previous selection*/
+          aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
+          // restore the previous selection
         }
+        ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent, true);
+        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
       }
       // TODO: set here
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+      //Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
+      //Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+
+      //Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+      aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
+      aDisplayer->updateViewer();
     }
     myDragDone = true;
     myCurX = aX;
