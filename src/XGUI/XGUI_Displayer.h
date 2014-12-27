@@ -149,6 +149,8 @@ class XGUI_EXPORT XGUI_Displayer
   /// Returns number of displayed objects
   int objectsCount() const { return myResult2AISObjectMap.size(); }
 
+  bool canBeShaded(ObjectPtr theObject) const;
+
  protected:
   /// Returns currently installed AIS_InteractiveContext
   Handle(AIS_InteractiveContext) AISContext() const;
