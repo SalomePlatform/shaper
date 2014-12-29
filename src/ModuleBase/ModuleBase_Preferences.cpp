@@ -288,12 +288,12 @@ void ModuleBase_PreferencesDlg::modified(ModuleBase_Prefs& theModified) const
 void ModuleBase_PreferencesDlg::onDefault()
 {
   // reset main resources
-#ifdef SALOME_750 // until SALOME 7.5.0 is released
+//#ifdef SALOME_750 // until SALOME 7.5.0 is released
   QtxResourceMgr::WorkingMode aPrev =
       myPreferences->resourceMgr()->setWorkingMode(QtxResourceMgr::IgnoreUserValues);
   myPreferences->retrieve();
   myPreferences->resourceMgr()->setWorkingMode(aPrev);
-#endif
+//#endif
   // reset plugin's resources
   ModuleBase_Preferences::resetConfig();
   ModuleBase_Preferences::updateResourcesByConfig();

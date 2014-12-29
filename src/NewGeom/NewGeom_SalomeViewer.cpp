@@ -192,8 +192,8 @@ void NewGeom_SalomeViewer::enableSelection(bool isEnabled)
   // there is a fix for a black-colored window 
   // the viewer rubber band is valid if the values delta is less than 1
   // TODO: remove this row after moving to SALOME 7.5
-  mySelector->viewer()->setInteractionStyle(isEnabled ? SUIT_ViewModel::STANDARD
-                                                      : SUIT_ViewModel::KEY_FREE);
+  //mySelector->viewer()->setInteractionStyle(isEnabled ? SUIT_ViewModel::STANDARD
+  //                                                    : SUIT_ViewModel::KEY_FREE);
 }
 
 //**********************************************

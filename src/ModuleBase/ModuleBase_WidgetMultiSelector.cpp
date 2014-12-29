@@ -260,23 +260,4 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList(AttributeSelectionListP
     AttributeSelectionPtr aAttr = theList->value(i);
     myListControl->addItem(aAttr->namingName().c_str());
   }
-  //QString aType;
-  //if (myTypeCombo->currentText().toLower() == "vertices")
-  //  aType = "vertex";
-  //else if (myTypeCombo->currentText().toLower() == "edges")
-  //  aType = "edge";
-  //else if (myTypeCombo->currentText().toLower() == "faces")
-  //  aType = "face";
-  //else if (myTypeCombo->currentText().toLower() == "solids")
-  //  aType = "solid";
- 
-  //myListControl->clear();
-  //int i = 1;
-  //foreach (GeomSelection aSel, mySelection) {
-  //  QString aName(aSel.first->data()->name().c_str());
-  //  aName += ":" + aType + QString("_%1").arg(i);
-  //  myListControl->addItem(aName);
-  //  i++;
-  //}
-  //myListControl->repaint();
 }

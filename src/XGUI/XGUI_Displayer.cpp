@@ -68,6 +68,7 @@ void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfIn
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
   : myWorkshop(theWorkshop)
 {
+  enableUpdateViewer(true);
 }
 
 XGUI_Displayer::~XGUI_Displayer()
@@ -131,7 +132,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
     myResult2AISObjectMap[theObject] = theAIS;
-    bool aCanBeShaded = canBeShaded(anAISIO);
+    bool aCanBeShaded = ::canBeShaded(anAISIO);
     // In order to avoid extra closing/opening context
     SelectMgr_IndexedMapOfOwner aSelectedOwners;
     if (aCanBeShaded) {
@@ -152,7 +153,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     if (aCanBeShaded) {
       openLocalContext();
       activateObjects(myActiveSelectionModes);
-      myWorkshop->selector()->setSelectedOwners(aSelectedOwners);
+      myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
     }
   }
   if (isUpdateViewer)
@@ -202,11 +203,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
     Handle(AIS_InteractiveContext) aContext = AISContext();
     if (aContext.IsNull())
       return;
-    bool aToSelect = aContext->IsSelected(aAISIO);
     aContext->Redisplay(aAISIO, false);
-    // Restore selection state after redisplay
-    if (aToSelect) 
-      aContext->SetSelected(aAISIO);
     if (isUpdateViewer)
       updateViewer();
   }
@@ -430,7 +427,7 @@ void XGUI_Displayer::eraseAll(const bool isUpdateViewer)
 
 void XGUI_Displayer::openLocalContext()
 {
-  Handle(AIS_InteractiveContext) aContext = AISContext();
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (aContext.IsNull())
     return;
   // Open local context if there is no one
@@ -541,10 +538,19 @@ ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) 
   return aFeature;
 }
 
+bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
+{
+  bool aWasEnabled = myEnableUpdateViewer;
+
+  myEnableUpdateViewer = isEnabled;
+
+  return aWasEnabled;
+}
+
 void XGUI_Displayer::updateViewer()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull())
+  if (!aContext.IsNull() && myEnableUpdateViewer)
     aContext->UpdateCurrentViewer();
 }
 
@@ -612,7 +618,21 @@ void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bo
     return;
 
   Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-  aContext->SetDisplayMode(aAISIO, theMode, toUpdate);
+  bool aCanBeShaded = ::canBeShaded(aAISIO);
+  // In order to avoid extra closing/opening context
+  SelectMgr_IndexedMapOfOwner aSelectedOwners;
+  if (aCanBeShaded) {
+    myWorkshop->selector()->selection()->selectedOwners(aSelectedOwners);
+    closeLocalContexts(false);
+  }
+  aContext->SetDisplayMode(aAISIO, theMode, false);
+  if (aCanBeShaded) {
+    openLocalContext();
+    activateObjects(myActiveSelectionModes);
+    myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
+  }
+  if (toUpdate)
+    updateViewer();
 }
 
 XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) const
@@ -671,4 +691,17 @@ void XGUI_Displayer::showOnly(const QObjectPtrList& theList)
       display(aObj, false);
   }
   updateViewer();
+}
+
+bool XGUI_Displayer::canBeShaded(ObjectPtr theObject) const
+{ 
+  if (!isVisible(theObject))
+    return false;
+
+  AISObjectPtr aAISObj = getAISObject(theObject);
+  if (aAISObj.get() == NULL)
+    return false;
+
+  Handle(AIS_InteractiveObject) anAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+  return ::canBeShaded(anAIS);
 }

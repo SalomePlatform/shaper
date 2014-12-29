@@ -502,7 +502,8 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
         displayObject(aObj);  // In order to update presentation
         if (myOperationMgr->hasOperation()) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-          if (aOperation->hasObject(aObj) && myDisplayer->isActive(aObj))
+          if (!aOperation->isEditOperation() &&
+              aOperation->hasObject(aObj) && myDisplayer->isActive(aObj))
             myDisplayer->deactivate(aObj);
         }
       } else {

@@ -12,6 +12,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Result.h>
 
 #include <ModuleBase_ViewerFilters.h>
 #include <ModuleBase_Definitions.h>
@@ -70,30 +71,39 @@ private:
                   double& theX, double& theY);
 
   /// Obtains the current selection of the object in the workshop viewer 
-  /// It includes the selection in all modes of activation, even local context - vertexes, edges
-  /// The result is a list of attributes of the feature of the object
-  /// In addition, it retuns a list of selection modes, where the object is activated
+  /// It includes the selection in all modes of activation, even local context - vertices, edges
+  /// It gets all results of the feature, find an AIS object in the viewer and takes all BRep
+  /// selection owners. If the owner is vertex, the corresponded attribute is seached in
+  /// the feature, if the owner is edge, the current result is added to the container of results.
   /// \param theObject a feature or result object
   /// \param theSketch a current sketch feature
   /// \param theWorkshop a workshop to have an access to AIS context and displayer
   /// \param theSelectedAttributes an out list of selected attributes
+  /// \param theSelectedResults an out list of selected results
   static void getCurrentSelection(const ObjectPtr& theObject,
                                   const FeaturePtr& theSketch,
                                   ModuleBase_IWorkshop* theWorkshop,
-                                  std::list<AttributePtr>& theSelectedAttributes);
+                                  std::set<AttributePtr>& theSelectedAttributes,
+                                  std::set<ResultPtr>& theSelectedResults);
 
   /// Applyes the current selection to the object in the workshop viewer 
   /// It includes the selection in all modes of activation, even local context - vertexes, edges
-  /// The result is a list of attributes of the feature of the object
-  /// In addition, it retuns a list of selection modes, where the object is activated
+  /// It gets all results of the feature, find an AIS object in the viewer and takes all BRep
+  /// selection owners. If the owner is vertex, the corresponded attribute is seached in
+  /// the feature and if it is in the container of selected attributes, the owner is put in the
+  /// out container. If the owner is edge and the current result is in the container of selected
+  /// results, the owner is put in the out container.
   /// \param theObject a feature or result object
   /// \param theSketch a current sketch feature
   /// \param theWorkshop a workshop to have an access to AIS context and displayer
-  /// \param theSelectedAttributes an out list of selected attributes
+  /// \param theSelectedAttributes an list of selected attributes
+  /// \param theSelectedResults an list of selected results
+  /// \param theOwnersToSelect an out container of found owners
   static void getSelectionOwners(const ObjectPtr& theObject,
                                   const FeaturePtr& theSketch,
                                   ModuleBase_IWorkshop* theWorkshop,
-                                  const std::list<AttributePtr>& theSelectedAttributes,
+                                  const std::set<AttributePtr>& theSelectedAttributes,
+                                  const std::set<ResultPtr>& theSelectedResults,
                                   SelectMgr_IndexedMapOfOwner& anOwnersToSelect);
 
 private:

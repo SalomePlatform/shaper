@@ -39,7 +39,9 @@ Q_OBJECT
 
   //! Selects the owners in the context.
   //! \param theSelectedOwners a container of owners
-  void setSelectedOwners(const SelectMgr_IndexedMapOfOwner& theSelectedOwners);
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  void setSelectedOwners(const SelectMgr_IndexedMapOfOwner& theSelectedOwners,
+                         bool isUpdateViewer);
 
 signals:
   //! Emited when selection in a one of viewers was changed
