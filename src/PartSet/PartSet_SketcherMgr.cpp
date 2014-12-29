@@ -388,6 +388,13 @@ void PartSet_SketcherMgr::get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent
 
 void PartSet_SketcherMgr::launchEditing()
 {
+  // there should be activate the vertex selection mode because the edit can happens by the selected
+  // point
+  QIntList aModes;
+  aModes << TopAbs_VERTEX;
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
+  aConnector->activateSubShapesSelection(aModes);
+
   if (myEditingFeatures.size() > 0) {
     FeaturePtr aFeature = myEditingFeatures.first();
     std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
