@@ -1,11 +1,11 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <shape_selector id="planeFace" 
-                  label="Plane face" 
+  <shape_selector id="planeFace"
+                  label="Plane face"
                   tooltip="Select a planar face"
-                  shape_types="face"
-		  <selection_filter id="FaceFilter" parameters="plane"/>
+                  shape_types="face">
+    <selection_filter id="FaceFilter" parameters="plane"/>
   </shape_selector>
   <doublevalue id="distance" 
                label="Distance" 

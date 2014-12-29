@@ -51,8 +51,10 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   if (!aShapePtr)
     return;
   myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
-  Set(aShapePtr->impl<TopoDS_Shape>());
-  AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
+  if (!myOriginalShape.IsNull()) {
+    Set(aShapePtr->impl<TopoDS_Shape>());
+    AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
+  }
 }
 
 
