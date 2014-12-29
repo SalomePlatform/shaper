@@ -184,7 +184,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
       get2dPoint(theWnd, theEvent, myCurX, myCurY);
       myDragDone = false;
-      aWorkshop->viewer()->enableMultiselection(false);
       launchEditing();
 
     } else if (isSketchOpe && isEditing) {
@@ -194,7 +193,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       myIsDragging = true;
       get2dPoint(theWnd, theEvent, myCurX, myCurY);
       myDragDone = false;
-      aWorkshop->viewer()->enableMultiselection(false);
 
       // This is necessary in order to finalize previous operation
       QApplication::processEvents();
@@ -218,7 +216,6 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
     aWorkshop->viewer()->enableSelection(myPreviousSelectionEnabled);
     myIsDragging = false;
     if (myDragDone) {
-      aViewer->enableMultiselection(true);
       //aOp->commit();
       myFeature2AttributeMap.clear();
 
@@ -231,9 +228,6 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
         */
       return;
     }
-  }
-  if (!aViewer->isMultiSelectionEnabled()) {
-    aViewer->enableMultiselection(true);
   }
 }
 
