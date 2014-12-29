@@ -94,7 +94,8 @@ void XGUI_DocumentDataModel::processEvent(const std::shared_ptr<Events_Message>&
           int aStart = aPartModel->rowCount(aIndex);  // check this index
           aIndex = createIndex(aIndex.row(), aIndex.column(), (void*) getModelIndex(aIndex));
           insertRow(aStart, aIndex);
-        }
+        } else
+          reset();
       }
     }
     // Deleted object event ***********************

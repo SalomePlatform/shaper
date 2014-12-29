@@ -36,6 +36,7 @@
 
 #include <QLabel>
 #include <QTimer>
+#include <QApplication>
 
 #define PLANE_SIZE          "200"     
 #define SKETCH_WIDTH        "4"
@@ -117,6 +118,7 @@ void PartSet_WidgetSketchLabel::onPlaneSelected()
         // Update sketcher actions
         XGUI_ActionsMgr* anActMgr = myWorkshop->actionsMgr();
         anActMgr->update();
+        myWorkshop->viewer()->update();
       }
     }
   }
