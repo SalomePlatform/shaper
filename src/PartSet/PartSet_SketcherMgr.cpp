@@ -105,6 +105,8 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
 
+  myPreviousSelectionEnabled = aViewer->isSelectionEnabled();
+
   connect(aViewer, SIGNAL(mousePress(ModuleBase_IViewWindow*, QMouseEvent*)),
           this, SLOT(onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*)));
 
@@ -179,6 +181,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
     if (isSketcher) {
       myIsDragging = true;
+
       get2dPoint(theWnd, theEvent, myCurX, myCurY);
       myDragDone = false;
       aWorkshop->viewer()->enableMultiselection(false);
@@ -212,18 +215,12 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   // Only for sketcher operations
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   if (myIsDragging) {
+    aWorkshop->viewer()->enableSelection(myPreviousSelectionEnabled);
     myIsDragging = false;
     if (myDragDone) {
       aViewer->enableMultiselection(true);
       //aOp->commit();
       myFeature2AttributeMap.clear();
-
-      // Reselect edited object
-      aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
-      if (theEvent->modifiers() & Qt::ShiftModifier)
-        aViewer->AISContext()->ShiftSelect();
-      else
-        aViewer->AISContext()->Select();
       return;
     }
   }
@@ -235,6 +232,11 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   if (myIsDragging) {
+    // the selection should be switched off in order to do not deselect moved objects by the 
+    // mouse release
+    ModuleBase_IViewer* aViewer = myModule->workshop()->viewer();
+    aViewer->enableSelection(false);
+
     ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
     if (aOperation->id().toStdString() == SketchPlugin_Sketch::ID())
       return; // No edit operation activated

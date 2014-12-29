@@ -65,8 +65,8 @@ private slots:
   void onMouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*);
 
 private:
-   /// Converts mouse position to 2d coordinates. 
-   /// Member myCurrentSketch has to be correctly defined
+  /// Converts mouse position to 2d coordinates. 
+  /// Member myCurrentSketch has to be correctly defined
   void get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent, 
                   double& theX, double& theY);
 
@@ -108,6 +108,7 @@ private:
 private:
   PartSet_Module* myModule;
 
+  bool myPreviousSelectionEnabled; // the previous selection enabled state in the viewer
   bool myIsDragging;
   bool myDragDone;
   double myCurX, myCurY;
