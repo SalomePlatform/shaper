@@ -98,6 +98,8 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   //####
   //selectSubShape("FACE",  "Extrusion_1/LateralFace_3");
   //selectSubShape("FACE",  "Extrusion_1/TopFace");
+  //selectSubShape("EDGE", "Extrusion_1/TopFace|Extrusion_1/LateralFace_1");
+  //selectSubShape("EDGE", "Sketch_1/Edge_6");
 #endif
   myIsInitialized = true;
   owner()->data()->sendAttributeUpdated(this);
@@ -775,13 +777,56 @@ const TopoDS_Shape findFaceByName(const std::string& theSubShapeName, std::share
   return aFace;
 }
 
-int ParseEdgeName(const std::string& theSubShapeName)
+int ParseEdgeName(const std::string& theSubShapeName,   std::list<std::string>& theList)
 {
-  int n = theSubShapeName.find('|');
-  if (n == std::string::npos) return 0;
-  std::string aName = theSubShapeName.substr(0, n); //name of face
-  std::string aSubString = theSubShapeName.substr(n + 1);
-  //...
+  std::string aName = theSubShapeName;
+  std::string aLastName;
+  int n1(0), n2(0); // n1 - start position, n2 - position of the delimiter
+  while ((n2 = aName.find('|', n1)) != std::string::npos) {
+    const std::string aName1 = aName.substr(n1, n2); //name of face
+	theList.push_back(aName1);	
+	n1 = n2 + 1;
+	aLastName = aName.substr(n1);
+  }
+  if(!aLastName.empty())
+	theList.push_back(aLastName);
+  return theList.size();
+}
+
+const TopoDS_Shape findCommonShape(const TopAbs_ShapeEnum theType, const TopTools_ListOfShape& theList)
+{
+  TopoDS_Shape aShape;
+  std::vector<TopTools_MapOfShape> aVec;
+  TopTools_MapOfShape aMap1, aMap2, aMap3, aMap4;
+  if(theList.Extent() > 1) {
+	aVec.push_back(aMap1);
+	aVec.push_back(aMap2);
+  }
+  if(theList.Extent() > 2)
+    aVec.push_back(aMap3);
+  if(theList.Extent() == 4)
+    aVec.push_back(aMap4);
+
+  //fill maps
+  TopTools_ListIteratorOfListOfShape it(theList);
+  for(int i = 0;it.More();it.Next(),i++) {
+	const TopoDS_Shape& aFace = it.Value();
+	TopExp_Explorer anExp (aFace, theType);
+	for(;anExp.More();anExp.Next()) {
+	  const TopoDS_Shape& anEdge = anExp.Current();
+	  if (!anEdge.IsNull())
+		aVec[i].Add(anExp.Current());
+	}
+  }
+  //trivial case: 2 faces
+  TopTools_MapIteratorOfMapOfShape it2(aVec[0]);
+  for(;it2.More();it2.Next()) {
+	  if(aVec[1].Contains(it2.Key())) {
+	    aShape = it2.Key();
+		break;
+	  }
+  }
+  return aShape;
 }
 // type ::= COMP | COMS | SOLD | SHEL | FACE | WIRE | EDGE | VERT
 void Model_AttributeSelection::selectSubShape(const std::string& theType, const std::string& theSubShapeName)
@@ -819,11 +864,38 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType, const 
   case TopAbs_WIRE:
 	break;
   case TopAbs_EDGE:
-	{
-      TopTools_ListOfShape aList;
+	{  
+	  TopoDS_Shape aSelection;// = findFaceByName(theSubShapeName, aDoc);
+	  const TDF_Label& aLabel = aDoc->findNamingName(theSubShapeName);
+      if(!aLabel.IsNull()) {
+        Handle(TNaming_NamedShape) aNS;
+        if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+	      const TopoDS_Shape& aShape = aNS->Get();
+	      if(!aShape.IsNull()) {
+	        if(aShape.ShapeType() == TopAbs_COMPOUND) 
+	          aSelection = getShapeFromCompound(theSubShapeName, aShape);
+			else 
+		    aSelection = aShape;	  
+		  }
+		}
+	  }
+	  if(aSelection.IsNull()) {
 	  std::list<std::string> aListofNames;
-	  //ParseEdgeName();
-
+	  int n = ParseEdgeName(theSubShapeName, aListofNames);
+	  if(n > 1 && n < 5) {
+		TopTools_ListOfShape aList;
+        for(std::list<std::string>::iterator it =aListofNames.begin();it != aListofNames.end();it++){
+		  const TopoDS_Shape aFace = findFaceByName(*it, aDoc);
+		  aList.Append(aFace);		
+		}
+		aSelection = findCommonShape(TopAbs_EDGE, aList);
+	  }
+	  }
+	  if(!aSelection.IsNull()) {// Select it
+		std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
+        aShapeToBeSelected->setImpl(new TopoDS_Shape(aSelection));
+		setValue(aCont, aShapeToBeSelected);
+	  }
 	}
     break;
   case TopAbs_VERTEX:
