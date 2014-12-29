@@ -105,7 +105,7 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
 
-  myPreviousSelectionEnabled = aViewer->isSelectionEnabled();
+  myPreviousSelectionEnabled = true;//aViewer->isSelectionEnabled();
 
   connect(aViewer, SIGNAL(mousePress(ModuleBase_IViewWindow*, QMouseEvent*)),
           this, SLOT(onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*)));
@@ -221,6 +221,14 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
       aViewer->enableMultiselection(true);
       //aOp->commit();
       myFeature2AttributeMap.clear();
+
+      // Reselect edited object
+      /*aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
+      if (theEvent->modifiers() & Qt::ShiftModifier)
+        aViewer->AISContext()->ShiftSelect();
+      else
+        aViewer->AISContext()->Select();
+        */
       return;
     }
   }
