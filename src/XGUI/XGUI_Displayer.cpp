@@ -116,8 +116,13 @@ bool canBeShaded(Handle(AIS_InteractiveObject) theAIS)
     TopAbs_ShapeEnum aType = aShape.ShapeType();
     if ((aType == TopAbs_VERTEX) || (aType == TopAbs_EDGE) || (aType == TopAbs_WIRE))
       return false;
-    else
+    else {
+      // Check that the presentation is not a sketch
+      Handle(ModuleBase_ResultPrs) aPrs = Handle(ModuleBase_ResultPrs)::DownCast(theAIS);
+      if (!aPrs.IsNull()) 
+        return !aPrs->isSketchMode();
       return true;
+    }
   }
   return false;
 }

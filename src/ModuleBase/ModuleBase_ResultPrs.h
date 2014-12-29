@@ -23,6 +23,8 @@ public:
 
   Standard_EXPORT ResultPtr getResult() const { return myResult; }
 
+  Standard_EXPORT bool isSketchMode() const { return myIsSketchMode; }
+
   DEFINE_STANDARD_RTTI(ModuleBase_ResultPrs)
 protected:
   Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
