@@ -49,13 +49,12 @@
           id="ConstraintEntityA" 
           label="First object" 
           tooltip="Select point, line end point, line, center of circle or arc."
-          shape_types="edge vertex"  
-          use_subshapes="true"/>
+          shape_types="edge vertex"/>
 		<sketch_shape_selector 
           id="ConstraintEntityB" 
           label="Last object" 
           tooltip="Select point, line end point, line, center of circle or arc." 
-			shape_types="edge vertex"  use_subshapes="true">
+			    shape_types="edge vertex">
 			<validator id="SketchPlugin_DifferentObjects"/>
 		</sketch_shape_selector>
 		
@@ -96,13 +95,12 @@
 	<!--  SketchConstraintParallel  -->
       <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines" icon=":icons/parallel.png">
 		<sketch_constraint_shape_selector id="ConstraintEntityA" 
-			label="First line" tooltip="Select a line" 
-			shape_types="edge" use_subshapes="true">
+			label="First line" tooltip="Select a line" shape_types="edge">
 			<selection_filter id="EdgeFilter" parameters="line"/>
 		</sketch_constraint_shape_selector>
 		
 		<sketch_constraint_shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select a line" 
-			shape_types="edge" use_subshapes="true">
+			shape_types="edge">
 			<selection_filter id="EdgeFilter" parameters="line"/>
 			<validator id="SketchPlugin_DifferentObjects"/>
 		</sketch_constraint_shape_selector>
@@ -114,13 +112,13 @@
       <feature id="SketchConstraintPerpendicular" title="Perpendicular" tooltip="Create constraint defining two perpendicular lines" icon=":icons/perpendicular.png">
 		<sketch_constraint_shape_selector id="ConstraintEntityA" 
 			label="First line" tooltip="Select an line" 
-			shape_types="edge" use_subshapes="true">
+			shape_types="edge">
       <selection_filter id="EdgeFilter" parameters="line"/>
     </sketch_constraint_shape_selector>
 		
 		<sketch_constraint_shape_selector id="ConstraintEntityB" 
 			label="Last line" tooltip="Select an line" 
-			shape_types="edge" use_subshapes="true">
+			shape_types="edge">
 			<validator id="SketchPlugin_DifferentObjects"/>
       <selection_filter id="EdgeFilter" parameters="line"/>
     </sketch_constraint_shape_selector>

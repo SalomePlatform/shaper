@@ -62,9 +62,6 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   aMainLay->addWidget(new QLabel(myMainWidget));
   aMainLay->setRowMinimumHeight(3, 20);
   myMainWidget->setLayout(aMainLay);
-  //TODO: Move into the base class
-  myUseSubShapes = theData->getBooleanAttribute("use_subshapes", false);
-  //TODO_END
   connect(myTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectionTypeChanged()));
 
   myCopyAction = new QAction(QIcon(":pictures/copy.png"), tr("Copy"), this);
