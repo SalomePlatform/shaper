@@ -71,8 +71,21 @@ private:
                   double& theX, double& theY);
 
 
+  typedef QList<AttributePtr> AttributeList;
+  typedef QMap<FeaturePtr, AttributeList> FeatureToAttributesMap;
   typedef std::map<FeaturePtr, std::pair<std::set<AttributePtr>, std::set<ResultPtr> > >
                                                                        FeatureToSelectionMap;
+  /// Obtains the current selection of the object in the workshop viewer by a map of feature to attributes
+  /// It calls the next method for each feature
+  /// \param theFeatureToAttributes a map of feature to attributes
+  /// \param theSketch a current sketch feature
+  /// \param theWorkshop a workshop to have an access to AIS context and displayer
+  /// \param theSelection a container for the selection, to save results and attributres for a feature
+  static void getCurrentSelection(const FeatureToAttributesMap& theFeatureToAttributes,
+                                  const FeaturePtr& theSketch,
+                                  ModuleBase_IWorkshop* theWorkshop,
+                                  FeatureToSelectionMap& theSelection);
+
   /// Obtains the current selection of the object in the workshop viewer 
   /// It includes the selection in all modes of activation, even local context - vertices, edges
   /// It gets all results of the feature, find an AIS object in the viewer and takes all BRep
@@ -115,8 +128,6 @@ private:
 
   CompositeFeaturePtr myCurrentSketch;
 
-  typedef QList<AttributePtr> AttributeList;
-  typedef QMap<FeaturePtr, AttributeList> FeatureToAttributesMap;
   FeatureToAttributesMap myFeature2AttributeMap; /// a map of a feature to attributes
 
   Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;

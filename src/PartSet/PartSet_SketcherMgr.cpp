@@ -240,8 +240,14 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   if (myIsDragging) {
-    // the selection should be switched off in order to do not deselect moved objects by the 
-    // mouse release
+    ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+    // 1. it is necessary to save current selection in order to restore it after the features moving
+    FeatureToSelectionMap aCurrentSelection;
+    getCurrentSelection(myFeature2AttributeMap, myCurrentSketch, aWorkshop, aCurrentSelection);
+
+    // 2. the enable selection in the viewer should be temporary switched off in order to ignore
+    // mouse press signal in the viewer(it call Select for AIS context and the dragged objects are
+    // deselected). This flag should be restored in the slot, processed the mouse release signal.
     ModuleBase_IViewer* aViewer = myModule->workshop()->viewer();
     aViewer->enableSelection(false);
 
@@ -256,9 +262,11 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     double dX =  aX - myCurX;
     double dY =  aY - myCurY;
 
-    ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
     XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+    // 3. the flag to disable the update viewer should be set in order to avoid blinking in the 
+    // viewer happens by deselect/select the modified objects. The flag should be restored after
+    // the selection processing. The update viewer should be also called.
     bool isEnableUpdateViewer = aDisplayer->enableUpdateViewer(false);
 
     static Events_ID aMoveEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
@@ -266,7 +274,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
 
     FeatureToAttributesMap::const_iterator anIt = myFeature2AttributeMap.begin(),
                                            aLast = myFeature2AttributeMap.end();
-    FeatureToSelectionMap aCurrentSelection;
+    // 4. the features and attributes modification(move)
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = anIt.key();
       AttributePtr anAttr;
@@ -275,11 +283,6 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
       if (!anAttributes.empty()) {
         anAttr = anAttributes.first();
       }
-
-      // save the previous selection
-      getCurrentSelection(aFeature, myCurrentSketch, aWorkshop, aCurrentSelection);
-      // save the previous selection: end
-
       // Process selection by attribute: the priority to the attribute
       if (anAttr.get() != NULL) {
         std::string aAttrId = anAttr->id();
@@ -307,7 +310,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     Events_Loop::loop()->flush(aMoveEvent); // up all move events - to be processed in the solver
     //Events_Loop::loop()->flush(aUpdateEvent); // up update events - to redisplay presentations
 
-    // restore the previous selection
+    // 5. it is necessary to save current selection in order to restore it after the features moving
     FeatureToSelectionMap::const_iterator aSIt = aCurrentSelection.begin(),
                                           aSLast = aCurrentSelection.end();
     SelectMgr_IndexedMapOfOwner anOwnersToSelect;
@@ -317,8 +320,8 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
                          anOwnersToSelect);
       aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
     }
-    // restore the previous selection: end
 
+    // 6. restore the update viewer flag and call this update
     aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
     aDisplayer->updateViewer();
     myDragDone = true;
@@ -475,12 +478,23 @@ void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& th
   myPlaneFilter->setPlane(thePln->impl<gp_Pln>());
 }
 
+void PartSet_SketcherMgr::getCurrentSelection(const FeatureToAttributesMap& theFeatureToAttributes,
+                                              const FeaturePtr& theSketch,
+                                              ModuleBase_IWorkshop* theWorkshop,
+                                              FeatureToSelectionMap& theSelection)
+{
+  FeatureToAttributesMap::const_iterator anIt = theFeatureToAttributes.begin(),
+                                         aLast = theFeatureToAttributes.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aFeature = anIt.key();
+    getCurrentSelection(aFeature, theSketch, theWorkshop, theSelection);
+  }
+}
+
 void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
                                               const FeaturePtr& theSketch,
                                               ModuleBase_IWorkshop* theWorkshop,
                                               FeatureToSelectionMap& theSelection)
-                                              //std::set<AttributePtr>& theSelectedAttributes,
-                                              //std::set<ResultPtr>& theSelectedResults)
 {
   if (theFeature.get() == NULL)
     return;
