@@ -63,7 +63,7 @@ Standard_GUID kSIMPLE_REF_ID("635eacb2-a1d6-4dec-8348-471fae17cb29");
 // TDataStd_IntPackedMap - indexes of edges in composite element (for construction)
 // TDataStd_Integer - type of the selected shape (for construction)
 // TDF_Reference - from ReferenceAttribute, the context
-
+#define DDDD 1
 void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   const std::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
@@ -94,7 +94,11 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   std::string aSelName = namingName();
   if(!aSelName.empty())
 	  TDataStd_Name::Set(selectionLabel(), aSelName.c_str()); //set name
-
+#ifdef DDDD
+  //####
+  //selectSubShape("FACE",  "Extrusion_1/LateralFace_3");
+  //selectSubShape("FACE",  "Extrusion_1/TopFace");
+#endif
   myIsInitialized = true;
   owner()->data()->sendAttributeUpdated(this);
 }
@@ -695,4 +699,137 @@ std::string Model_AttributeSelection::namingName()
 	// the selected sub-shape will not be shared and as result it will not require registration
   }
   return aName;
+}
+
+TopAbs_ShapeEnum translateType (const std::string& theType)
+{
+  TCollection_AsciiString aStr(theType.c_str());
+  aStr.UpperCase();
+  if(aStr.IsEqual("COMP"))
+	return TopAbs_COMPOUND;
+  else if(aStr.IsEqual("COMS"))
+	return TopAbs_COMPSOLID;
+  else if(aStr.IsEqual("SOLD"))
+	return TopAbs_SOLID;
+  else if(aStr.IsEqual("SHEL"))
+	return TopAbs_SHELL;
+  else if(aStr.IsEqual("FACE"))
+	return TopAbs_FACE;
+  else if(aStr.IsEqual("WIRE"))
+	return TopAbs_WIRE;
+  else if(aStr.IsEqual("EDGE"))
+	return TopAbs_EDGE;
+  else if(aStr.IsEqual("VERT"))
+	return TopAbs_VERTEX;  
+
+  return TopAbs_SHAPE;
+}
+
+const TopoDS_Shape getShapeFromCompound(const std::string& theSubShapeName, const TopoDS_Shape& theCompound)
+{
+  TopoDS_Shape aSelection;
+  std::string::size_type n = theSubShapeName.rfind('/');			
+  if (n == std::string::npos) n = 0;
+	std::string aSubString = theSubShapeName.substr(n + 1);
+	n = aSubString.rfind('_');
+	if (n == std::string::npos) return aSelection;
+	aSubString = aSubString.substr(n+1);
+	int indx = atoi(aSubString.c_str());
+	TopoDS_Iterator it(theCompound);			
+	for (int i = 1;it.More();it.Next(), i++) {
+	  if(i == indx) {			  
+	    aSelection = it.Value();			  
+	    break;
+	  }
+	  else continue;			  			
+	}
+  return aSelection;	
+}
+
+const TopoDS_Shape findFaceByName(const std::string& theSubShapeName, std::shared_ptr<Model_Document> theDoc)
+{
+  TopoDS_Shape aFace;
+  std::string::size_type n, nb = theSubShapeName.rfind('/');			
+  if (nb == std::string::npos) nb = 0;
+  std::string aSubString = theSubShapeName.substr(nb + 1);
+  n = aSubString.rfind('_');
+  if (n != std::string::npos) {
+	  std::string aSubStr2 = aSubString.substr(0, n);
+	aSubString  = theSubShapeName.substr(0, nb + 1);
+	aSubString = aSubString + aSubStr2;	
+  } else
+	aSubString = theSubShapeName;
+ 	  			
+  const TDF_Label& aLabel = theDoc->findNamingName(aSubString);
+  if(aLabel.IsNull()) return aFace;
+  Handle(TNaming_NamedShape) aNS;
+  if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+	const TopoDS_Shape& aShape = aNS->Get();
+	if(!aShape.IsNull()) {
+	  if(aShape.ShapeType() == TopAbs_COMPOUND) 
+	    aFace = getShapeFromCompound(theSubShapeName, aShape);
+	  else 
+		aFace = aShape;	  
+	}
+  }
+  return aFace;
+}
+
+int ParseEdgeName(const std::string& theSubShapeName)
+{
+  int n = theSubShapeName.find('|');
+  if (n == std::string::npos) return 0;
+  std::string aName = theSubShapeName.substr(0, n); //name of face
+  std::string aSubString = theSubShapeName.substr(n + 1);
+  //...
+}
+// type ::= COMP | COMS | SOLD | SHEL | FACE | WIRE | EDGE | VERT
+void Model_AttributeSelection::selectSubShape(const std::string& theType, const std::string& theSubShapeName)
+{
+  if(theSubShapeName.empty() || theType.empty()) return;
+  TopAbs_ShapeEnum aType = translateType(theType);
+  ResultPtr aCont = context();
+  if(!aCont.get() || aCont->shape()->isNull()) return;
+  TopoDS_Shape aContext  = aCont->shape()->impl<TopoDS_Shape>();
+  TopAbs_ShapeEnum aContType = aContext.ShapeType();
+  if(aType <= aContType) return; // not applicable
+
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(aCont->document());
+  TopoDS_Shape aSelection;
+  switch (aType) 
+  {
+  case TopAbs_COMPOUND:
+    break;
+  case TopAbs_COMPSOLID:
+    break;
+  case TopAbs_SOLID:
+    break;
+  case TopAbs_SHELL:
+    break;
+  case TopAbs_FACE:
+    {
+	  const TopoDS_Shape aSelection = findFaceByName(theSubShapeName, aDoc);
+	  if(!aSelection.IsNull()) {// Select it
+		std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected(new GeomAPI_Shape());
+        aShapeToBeSelected->setImpl(new TopoDS_Shape(aSelection));
+		setValue(aCont, aShapeToBeSelected);
+	  }
+	}
+    break;
+  case TopAbs_WIRE:
+	break;
+  case TopAbs_EDGE:
+	{
+      TopTools_ListOfShape aList;
+	  std::list<std::string> aListofNames;
+	  //ParseEdgeName();
+
+	}
+    break;
+  case TopAbs_VERTEX:
+	break;
+  default: //TopAbs_SHAPE
+	return;
+  }
+
 }

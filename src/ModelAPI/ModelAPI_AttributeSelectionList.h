@@ -23,6 +23,10 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   virtual void append(const ResultPtr& theContext,
                       const GeomShapePtr& theSubShape) = 0;
 
+  /// Adds the new reference to the end of the list by the naming name of the selected shape
+  /// The type of shape is taken from the current selection type
+  virtual void append(std::string theNamingName) = 0;
+
   /// Returns the number ofselection attributes in the list
   virtual int size() = 0;
 

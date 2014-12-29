@@ -274,6 +274,7 @@ void GeomAPI_AISObject::setWidth(const double& theWidth)
   if (anAIS.IsNull())
     return;
   anAIS->SetWidth(theWidth);
+  anAIS->Redisplay();
 }
 
 void GeomAPI_AISObject::setColor(int theR, int theG, int theB)

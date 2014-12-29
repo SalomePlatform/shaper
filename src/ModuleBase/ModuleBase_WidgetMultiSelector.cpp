@@ -25,6 +25,9 @@
 #include <QString>
 #include <QComboBox>
 #include <QEvent>
+#include <QAction>
+#include <QApplication>
+#include <QClipboard>
 
 #include <memory>
 #include <string>
@@ -63,6 +66,14 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myUseSubShapes = theData->getBooleanAttribute("use_subshapes", false);
   //TODO_END
   connect(myTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectionTypeChanged()));
+
+  myCopyAction = new QAction(QIcon(":pictures/copy.png"), tr("Copy"), this);
+  myCopyAction->setShortcut(QKeySequence::Copy);
+  myCopyAction->setEnabled(false);
+  connect(myCopyAction, SIGNAL(triggered(bool)), SLOT(onCopyItem()));
+  myListControl->addAction(myCopyAction);
+  myListControl->setContextMenuPolicy(Qt::ActionsContextMenu);
+  connect(myListControl, SIGNAL(itemSelectionChanged()), SLOT(onListSelection()));
 
   activateSelection(true);
 }
@@ -261,3 +272,27 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList(AttributeSelectionListP
     myListControl->addItem(aAttr->namingName().c_str());
   }
 }
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::onCopyItem()
+{
+  QList<QListWidgetItem*> aItems = myListControl->selectedItems();
+  QString aRes;
+  foreach(QListWidgetItem* aItem, aItems) {
+    if (!aRes.isEmpty())
+      aRes += "\n";
+    aRes += aItem->text();
+  }
+  if (!aRes.isEmpty()) {
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(aRes);
+  }
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::onListSelection()
+{
+  QList<QListWidgetItem*> aItems = myListControl->selectedItems();
+  myCopyAction->setEnabled(!aItems.isEmpty());
+}
+
