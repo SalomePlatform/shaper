@@ -237,5 +237,14 @@ void SketchPlugin_Arc::attributeChanged(const std::string& theID)
     if (aProjection && aStartAttr->pnt()->distance(aProjection) > tolerance)
       aStartAttr->setValue(aProjection);
     myStartUpdate = false;
+  } else if (theID == CENTER_ID() && !myEndUpdate) {
+    myEndUpdate = true;
+    // compute and change the arc end point
+    std::shared_ptr<GeomAPI_Circ2d> aCircleForArc(
+        new GeomAPI_Circ2d(aCenterAttr->pnt(), aStartAttr->pnt()));
+    std::shared_ptr<GeomAPI_Pnt2d> aProjection = aCircleForArc->project(anEndAttr->pnt());
+    if (aProjection && anEndAttr->pnt()->distance(aProjection) > tolerance)
+      anEndAttr->setValue(aProjection);
+    myEndUpdate = false;
   }
 }
