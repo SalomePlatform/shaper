@@ -105,6 +105,8 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
 
+  myPreviousSelectionEnabled = aViewer->isSelectionEnabled();
+
   connect(aViewer, SIGNAL(mousePress(ModuleBase_IViewWindow*, QMouseEvent*)),
           this, SLOT(onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*)));
 
@@ -179,6 +181,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
     if (isSketcher) {
       myIsDragging = true;
+
       get2dPoint(theWnd, theEvent, myCurX, myCurY);
       myDragDone = false;
       aWorkshop->viewer()->enableMultiselection(false);
@@ -212,18 +215,12 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   // Only for sketcher operations
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   if (myIsDragging) {
+    aWorkshop->viewer()->enableSelection(myPreviousSelectionEnabled);
     myIsDragging = false;
     if (myDragDone) {
       aViewer->enableMultiselection(true);
       //aOp->commit();
       myFeature2AttributeMap.clear();
-
-      // Reselect edited object
-      aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
-      if (theEvent->modifiers() & Qt::ShiftModifier)
-        aViewer->AISContext()->ShiftSelect();
-      else
-        aViewer->AISContext()->Select();
       return;
     }
   }
@@ -235,6 +232,11 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   if (myIsDragging) {
+    // the selection should be switched off in order to do not deselect moved objects by the 
+    // mouse release
+    ModuleBase_IViewer* aViewer = myModule->workshop()->viewer();
+    aViewer->enableSelection(false);
+
     ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
     if (aOperation->id().toStdString() == SketchPlugin_Sketch::ID())
       return; // No edit operation activated
@@ -252,10 +254,11 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     bool isEnableUpdateViewer = aDisplayer->enableUpdateViewer(false);
 
     static Events_ID aMoveEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
-    static Events_ID aUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+    //static Events_ID aUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
 
     FeatureToAttributesMap::const_iterator anIt = myFeature2AttributeMap.begin(),
                                            aLast = myFeature2AttributeMap.end();
+    FeatureToSelectionMap aCurrentSelection;
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = anIt.key();
       AttributePtr anAttr;
@@ -266,13 +269,10 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
       }
 
       // save the previous selection
-      std::set<AttributePtr> aSelectedAttributes;
-      std::set<ResultPtr> aSelectedResults;
-      getCurrentSelection(aFeature, myCurrentSketch, aWorkshop, aSelectedAttributes,
-                          aSelectedResults);
+      getCurrentSelection(aFeature, myCurrentSketch, aWorkshop, aCurrentSelection);
       // save the previous selection: end
 
-      // Process selection by attribute
+      // Process selection by attribute: the priority to the attribute
       if (anAttr.get() != NULL) {
         std::string aAttrId = anAttr->id();
         DataPtr aData = aFeature->data();
@@ -293,24 +293,23 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
         if (aSketchFeature) {
           aSketchFeature->move(dX, dY);
           ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, aMoveEvent);
-          // TODO: the selection restore should be after the AIS presentation is rebuilt
         }
       }
-      //Events_Loop::loop()->flush(aMoveEvent);
-      //Events_Loop::loop()->flush(aUpdateEvent);
-      // restore the previous selection
-      //TODO: after the last flush
-      //SelectMgr_IndexedMapOfOwner anOwnersToSelect;
-      //getSelectionOwners(aFeature, myCurrentSketch, aWorkshop, aSelectedAttributes,
-      //                   aSelectedResults, anOwnersToSelect);
-      //TODO: after the last flush
-      //aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
-      // restore the previous selection
-      ModelAPI_EventCreator::get()->sendUpdated(aFeature, aMoveEvent, true);
-      Events_Loop::loop()->flush(aUpdateEvent);
     }
-    Events_Loop::loop()->flush(aMoveEvent);
-    Events_Loop::loop()->flush(aUpdateEvent);
+    Events_Loop::loop()->flush(aMoveEvent); // up all move events - to be processed in the solver
+    //Events_Loop::loop()->flush(aUpdateEvent); // up update events - to redisplay presentations
+
+    // restore the previous selection
+    FeatureToSelectionMap::const_iterator aSIt = aCurrentSelection.begin(),
+                                          aSLast = aCurrentSelection.end();
+    SelectMgr_IndexedMapOfOwner anOwnersToSelect;
+    for (; aSIt != aSLast; aSIt++) {
+      anOwnersToSelect.Clear();
+      getSelectionOwners(aSIt->first, myCurrentSketch, aWorkshop, aCurrentSelection,
+                         anOwnersToSelect);
+      aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
+    }
+    // restore the previous selection: end
 
     aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
     aDisplayer->updateViewer();
@@ -319,63 +318,6 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     myCurY = aY;
   }
 }
-    //if ((myEditingAttr.size() == 1) && myEditingAttr.first()) {
-    //  // probably we have prehighlighted point
-    //  AttributePtr aAttr = myEditingAttr.first();
-    //  std::string aAttrId = aAttr->id();
-    //  ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-    //  QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-    //  // Find corresponded widget to provide dragging
-    //  foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
-    //    if (aWgt->attributeID() == aAttrId) {
-    //      PartSet_WidgetPoint2D* aWgt2d = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
-    //      if (aWgt2d) {
-    //        aWgt2d->setPoint(aWgt2d->x() + dX, aWgt2d->y() + dY);
-    //        break;
-    //      }
-    //    }
-    //  }
-    //} else {
-    //  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-    //  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-    //  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
-    //  bool isEnableUpdateViewer = aDisplayer->enableUpdateViewer(false);
-
-    //  foreach(FeaturePtr aFeature, myEditingFeatures) {
-    //    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-    //      std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    //    if (aSketchFeature) {
-    //      // save the previous selection
-
-    //      std::set<AttributePtr> aSelectedAttributes;
-    //      std::set<ResultPtr> aSelectedResults;
-    //      getCurrentSelection(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes,
-    //                          aSelectedResults);
-    //      // save the previous selection: end
-
-    //      aSketchFeature->move(dX, dY);
-    //      // TODO: the selection restore should be after the AIS presentation is rebuilt
-    //      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
-    //      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-
-    //      // restore the previous selection
-    //      SelectMgr_IndexedMapOfOwner anOwnersToSelect;
-    //      getSelectionOwners(aSketchFeature, myCurrentSketch, aWorkshop, aSelectedAttributes,
-    //                         aSelectedResults, anOwnersToSelect);
-    //      aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
-    //      // restore the previous selection
-    //    }
-    //    ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent, true);
-    //    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-    //  }
-    //  // TODO: set here
-    //  //Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_MOVED));
-    //  //Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-
-    //  //Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-    //  aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
-    //  aDisplayer->updateViewer();
-    //}
 
 void PartSet_SketcherMgr::onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
@@ -413,7 +355,7 @@ void PartSet_SketcherMgr::launchEditing()
   // there should be activate the vertex selection mode because the edit can happens by the selected
   // point
   QIntList aModes;
-  aModes << TopAbs_VERTEX;
+  aModes << TopAbs_VERTEX << TopAbs_EDGE;
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
   aConnector->activateSubShapesSelection(aModes);
 
@@ -525,22 +467,25 @@ void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& th
   myPlaneFilter->setPlane(thePln->impl<gp_Pln>());
 }
 
-void PartSet_SketcherMgr::getCurrentSelection(const ObjectPtr& theObject,
+void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
                                               const FeaturePtr& theSketch,
                                               ModuleBase_IWorkshop* theWorkshop,
-                                              std::set<AttributePtr>& theSelectedAttributes,
-                                              std::set<ResultPtr>& theSelectedResults)
+                                              FeatureToSelectionMap& theSelection)
+                                              //std::set<AttributePtr>& theSelectedAttributes,
+                                              //std::set<ResultPtr>& theSelectedResults)
 {
-  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  if (aFeature.get() == NULL)
+  if (theFeature.get() == NULL)
     return;
+
+  std::set<AttributePtr> aSelectedAttributes;
+  std::set<ResultPtr> aSelectedResults;
 
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
   Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
-  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr> aResults = theFeature->results();
   std::list<ResultPtr>::const_iterator aIt;
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
   {
@@ -561,37 +506,42 @@ void PartSet_SketcherMgr::getCurrentSelection(const ObjectPtr& theObject,
         const TopoDS_Shape& aShape = aBRepOwner->Shape();
         TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
         if (aShapeType == TopAbs_VERTEX) {
-          AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theObject,
+          AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theFeature,
                                                                         aShape, theSketch);
           if (aPntAttr.get() != NULL)
-            theSelectedAttributes.insert(aPntAttr);
+            aSelectedAttributes.insert(aPntAttr);
         }
         else if (aShapeType == TopAbs_EDGE &&
-                 theSelectedResults.find(aResult) == theSelectedResults.end()) {
-          theSelectedResults.insert(aResult);
+                 aSelectedResults.find(aResult) == aSelectedResults.end()) {
+          aSelectedResults.insert(aResult);
         }
       }
     }
   }
+  theSelection[theFeature] = std::make_pair(aSelectedAttributes, aSelectedResults);
 }
 
-void PartSet_SketcherMgr::getSelectionOwners(const ObjectPtr& theObject,
+void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
                                              const FeaturePtr& theSketch,
                                              ModuleBase_IWorkshop* theWorkshop,
-                                             const std::set<AttributePtr>& theSelectedAttributes,
-                                             const std::set<ResultPtr>& theSelectedResults,
+                                             //const std::set<AttributePtr>& theSelectedAttributes,
+                                             //const std::set<ResultPtr>& theSelectedResults,
+                                             const FeatureToSelectionMap& theSelection,
                                              SelectMgr_IndexedMapOfOwner& anOwnersToSelect)
 {
-  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  if (aFeature.get() == NULL)
+  if (theFeature.get() == NULL)
     return;
+
+  FeatureToSelectionMap::const_iterator anIt = theSelection.find(theFeature);
+  std::set<AttributePtr> aSelectedAttributes = anIt->second.first;
+  std::set<ResultPtr> aSelectedResults = anIt->second.second;
 
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
   Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
-  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr> aResults = theFeature->results();
   std::list<ResultPtr>::const_iterator aIt;
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
   {
@@ -610,17 +560,16 @@ void PartSet_SketcherMgr::getSelectionOwners(const ObjectPtr& theObject,
       const TopoDS_Shape& aShape = anOwner->Shape();
       TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
       if (aShapeType == TopAbs_VERTEX) {
-        AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(aFeature, aShape, theSketch);
+        AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theFeature, aShape, theSketch);
         if (aPntAttr.get() != NULL &&
-            theSelectedAttributes.find(aPntAttr) != theSelectedAttributes.end()) {
+            aSelectedAttributes.find(aPntAttr) != aSelectedAttributes.end()) {
           anOwnersToSelect.Add(anOwner);
         }
       }
       else if (aShapeType == TopAbs_EDGE) {
-        bool aFound = theSelectedResults.find(aResult) != theSelectedResults.end();
-        int anIndex = anOwnersToSelect.FindIndex(anOwner);
-        if (theSelectedResults.find(aResult) != theSelectedResults.end()/* &&
-            anOwnersToSelect.FindIndex(anOwner) < 0*/)
+        bool aFound = aSelectedResults.find(aResult) != aSelectedResults.end();
+        if (aSelectedResults.find(aResult) != aSelectedResults.end() &&
+            anOwnersToSelect.FindIndex(anOwner) <= 0)
           anOwnersToSelect.Add(anOwner);
       }
     }
