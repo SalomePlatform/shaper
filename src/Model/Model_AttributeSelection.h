@@ -42,6 +42,9 @@ public:
   /// Returns a textual string of the selection
   MODEL_EXPORT virtual std::string namingName();
 
+  /// Selects (i.e. creates Naming data structure) of sub-shape specifed by textual name
+  MODEL_EXPORT virtual void selectSubShape(const std::string& theType, const std::string& theSubShapeName);
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);
@@ -50,6 +53,7 @@ protected:
   /// Performs the selection for the body result (TNaming selection)
   virtual void selectBody(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);
+
   /// Performs the selection for the construction result (selection by index)
   virtual void selectConstruction(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);

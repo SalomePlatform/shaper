@@ -29,6 +29,10 @@ public:
   MODEL_EXPORT virtual void append(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape);
 
+  /// Adds the new reference to the end of the list by the naming name of the selected shape
+  /// The type of shape is taken from the current selection type
+  MODEL_EXPORT virtual void append(std::string theNamingName);
+
   /// Returns the number ofselection attributes in the list
   MODEL_EXPORT virtual int size();
 

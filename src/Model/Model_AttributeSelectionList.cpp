@@ -11,6 +11,7 @@
 #include "Model_Data.h"
 
 #include <TDF_ChildIterator.hxx>
+#include <TopAbs_ShapeEnum.hxx>
 
 using namespace std;
 
@@ -27,6 +28,35 @@ void Model_AttributeSelectionList::append(
   }
   mySize->Set(aNewTag);
   aNewAttr->setValue(theContext, theSubShape);
+  owner()->data()->sendAttributeUpdated(this);
+}
+
+void Model_AttributeSelectionList::append(std::string theNamingName)
+{
+  int aNewTag = mySize->Get() + 1;
+  TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
+
+  std::shared_ptr<Model_AttributeSelection> aNewAttr = 
+    std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aNewLab));
+  if (owner()) {
+    aNewAttr->setObject(owner());
+  }
+  mySize->Set(aNewTag);
+  TopAbs_ShapeEnum aType = (TopAbs_ShapeEnum)selectionType();
+  string aTypeName;
+  switch(aType) {
+  case TopAbs_VERTEX: aTypeName = "VERT"; break;
+  case TopAbs_EDGE: aTypeName = "EDGE"; break;
+  case TopAbs_WIRE: aTypeName = "WIRE"; break;
+  case TopAbs_FACE: aTypeName = "FACE"; break;
+  case TopAbs_SHELL: aTypeName = "SHEL"; break;
+  case TopAbs_SOLID: aTypeName = "SOLD"; break;
+  case TopAbs_COMPOUND: aTypeName = "COMP"; break;
+  case TopAbs_COMPSOLID: aTypeName = "COMS"; break;
+  default: 
+    return; // invalid case => empty new attribute
+  };
+  aNewAttr->selectSubShape(aTypeName, theNamingName);
   owner()->data()->sendAttributeUpdated(this);
 }
 
