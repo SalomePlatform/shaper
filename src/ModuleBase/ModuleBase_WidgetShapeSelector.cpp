@@ -119,8 +119,6 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
 
   std::string aObjTypes = theData->getProperty("object_types");
   myObjectTypes = QString(aObjTypes.c_str()).split(' ', QString::SkipEmptyParts);
-
-  //myUseSubShapes = theData->getBooleanAttribute("use_subshapes", false); 
 }
 
 //********************************************************************

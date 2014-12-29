@@ -8,7 +8,6 @@
     activate="true"
     shape_types="face"
 	object_types="construction"
-    use_subshapes="true"
   />
   <doublevalue
     id="extrusion_size"

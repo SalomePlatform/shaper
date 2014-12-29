@@ -5,7 +5,6 @@
                   label="Plane face" 
                   tooltip="Select a planar face"
                   shape_types="face"
-                  use_subshapes="true">
 		  <selection_filter id="FaceFilter" parameters="plane"/>
   </shape_selector>
   <doublevalue id="distance" 
