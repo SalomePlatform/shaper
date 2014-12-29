@@ -29,6 +29,7 @@ class QWidget;
 class QListWidget;
 class QComboBox;
 class ModuleBase_IWorkshop;
+class QAction;
 
 class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_ModelWidget
 {
@@ -61,6 +62,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
   void onSelectionTypeChanged();
   void onSelectionChanged();
 
+protected slots:
+  void onCopyItem();
+  void onListSelection();
+
  protected:
   void filterShapes(const NCollection_List<TopoDS_Shape>& theShapesToFilter,
                     NCollection_List<TopoDS_Shape>& theResult);
@@ -83,6 +88,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
 
   typedef QPair<ResultPtr, GeomShapePtr> GeomSelection;
   QList<GeomSelection> mySelection;
+
+  QAction* myCopyAction;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */
