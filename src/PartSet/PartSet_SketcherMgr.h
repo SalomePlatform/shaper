@@ -22,6 +22,7 @@
 
 #include <QObject>
 #include <QList>
+#include <QMap>
 
 class PartSet_Module;
 class ModuleBase_IViewWindow;
@@ -114,8 +115,10 @@ private:
   double myCurX, myCurY;
 
   CompositeFeaturePtr myCurrentSketch;
-  QList<FeaturePtr> myEditingFeatures;
-  QList<AttributePtr> myEditingAttr;
+
+  typedef QList<AttributePtr> AttributeList;
+  typedef QMap<FeaturePtr, AttributeList> FeatureToAttributesMap;
+  FeatureToAttributesMap myFeature2AttributeMap; /// a map of a feature to attributes
 
   Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;
 };
