@@ -81,21 +81,15 @@ anExtrusionBody = modelAPI_ResultBody(anExtrusionFt.firstResult())
 aSession.startOperation()
 aGroupFeature = aSession.activeDocument().addFeature("Group")
 aSelectionListAttr = aGroupFeature.selectionList("group_list")
-aSelectionListAttr.clear()
 topAbs_EdgeType = 6
 aSelectionListAttr.setSelectionType(topAbs_EdgeType)
-
-for anEdge in [aSketchLineA, aSketchLineB, aSketchLineC]:
-    anEdgeResult = anEdge.firstResult()
-    assert(anEdgeResult)
-    assert(anEdgeResult.shape())
-    aSelectionListAttr.append(anEdgeResult, anEdgeResult.shape())
+aSelectionListAttr.append("Extrusion_1/LateralFace_3|Extrusion_1/LateralFace_1")
 aSession.finishOperation()
 #=========================================================================
 # Check results
 #=========================================================================
 aGroupResult = aGroupFeature.firstResult()
-# assert(aGroupResult)
+assert(aGroupResult)
 #=========================================================================
 # End of test
 #=========================================================================
