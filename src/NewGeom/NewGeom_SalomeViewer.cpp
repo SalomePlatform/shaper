@@ -144,19 +144,33 @@ void NewGeom_SalomeViewer::onMouseDoubleClick(SUIT_ViewWindow*, QMouseEvent* the
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onMouseMove(SUIT_ViewWindow*, QMouseEvent* theEvent)
+void NewGeom_SalomeViewer::onMouseMove(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
 {
+  OCCViewer_ViewWindow* aViewWnd = dynamic_cast<OCCViewer_ViewWindow*>(theView);
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext->HasDetected())
+    aViewWnd->getViewPort()->setFocus(Qt::MouseFocusReason);
   emit mouseMove(myView, theEvent);
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onKeyPress(SUIT_ViewWindow*, QKeyEvent* theEvent)
+void NewGeom_SalomeViewer::onKeyPress(SUIT_ViewWindow* theView, QKeyEvent* theEvent)
 {
+  OCCViewer_ViewWindow* aViewWnd = dynamic_cast<OCCViewer_ViewWindow*>(theView);
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  Handle(V3d_View) aView = aViewWnd->getViewPort()->getView();
+
+  bool noModifiers = (theEvent->modifiers() == Qt::NoModifier);
+  if ((theEvent->key() == Qt::Key_N) && noModifiers) {
+    aContext->HilightNextDetected(aView);
+  } else if ((theEvent->key() == Qt::Key_P) && noModifiers) {
+    aContext->HilightPreviousDetected(aView);
+  }
   emit keyPress(myView, theEvent);
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onKeyRelease(SUIT_ViewWindow*, QKeyEvent* theEvent)
+void NewGeom_SalomeViewer::onKeyRelease(SUIT_ViewWindow* theView, QKeyEvent* theEvent)
 {
   emit keyRelease(myView, theEvent);
 }
