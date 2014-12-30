@@ -308,6 +308,35 @@ void PartSet_Tools::createConstraint(CompositeFeaturePtr theSketch,
     aFeature->execute();
 }
 
+std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::
+  findAttributePoint(CompositeFeaturePtr theSketch, double theX, double theY,
+  double theTolerance, const QList<FeaturePtr>& theIgnore)
+{
+  std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
+      new GeomAPI_Pnt2d(theX, theY));
+
+  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttiributes;
+  for (int i = 0; i < theSketch->numberOfSubs(); i++) {
+    FeaturePtr aFeature = theSketch->subFeature(i);
+    if (!theIgnore.contains(aFeature)) {
+      anAttiributes = aFeature->data()->attributes(GeomDataAPI_Point2D::type());
+
+      std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt;
+      for (anIt = anAttiributes.cbegin(); anIt != anAttiributes.cend(); ++anIt) {
+        std::shared_ptr<GeomDataAPI_Point2D> aCurPoint = 
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+        double x = aCurPoint->x();
+        double y = aCurPoint->y();
+        if (aCurPoint && (aCurPoint->pnt()->distance(aClickedPoint) < theTolerance)) {
+          return aCurPoint;
+        }
+      }
+    }
+  }
+  return std::shared_ptr<GeomDataAPI_Point2D>();
+}
+
+
 void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr theFeature,
                                    const std::string& theAttribute, double theClickedX,
                                    double theClickedY)
@@ -338,10 +367,12 @@ void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr the
         aLast = anAttiributes.end();
     std::shared_ptr<GeomDataAPI_Point2D> aFPoint;
     for (; anIt != aLast && !aFPoint; anIt++) {
-      std::shared_ptr<GeomDataAPI_Point2D> aCurPoint = std::dynamic_pointer_cast<
-          GeomDataAPI_Point2D>(*anIt);
-      if (aCurPoint && aCurPoint->pnt()->distance(aClickedPoint) < Precision::Confusion())
+      std::shared_ptr<GeomDataAPI_Point2D> aCurPoint = 
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
+      if (aCurPoint && (aCurPoint->pnt()->distance(aClickedPoint) < Precision::Confusion())) {
         aFPoint = aCurPoint;
+        break;
+      }
     }
     if (aFPoint)
       PartSet_Tools::createConstraint(theSketch, aFPoint, aFeaturePoint);

@@ -122,7 +122,7 @@ protected slots:
   virtual void registerFilters();
 
  private slots:
-   void onVertexSelected(ObjectPtr theObject, const TopoDS_Shape& theShape);
+   void onVertexSelected();
 
 
  private:

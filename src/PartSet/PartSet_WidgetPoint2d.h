@@ -92,7 +92,7 @@ signals:
   /// Signal about selection of an existing vertex from an object
   /// \param theObject - the selected object
   /// \param theShape - the selected shape
-  void vertexSelected(ObjectPtr theObject, const TopoDS_Shape& theShape);
+  void vertexSelected();
 
 protected slots:
   void onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
