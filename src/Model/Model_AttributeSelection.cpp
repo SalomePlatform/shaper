@@ -385,7 +385,7 @@ void Model_AttributeSelection::selectBody(
 
 /// registers the name of the shape in the label (theID == 0) of sub label (theID is a tag)
 /// if theID is zero, 
-static void registerSubShape(TDF_Label& theMainLabel, TopoDS_Shape theShape,
+static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape,
   const int theID, const FeaturePtr& theContextFeature, std::shared_ptr<Model_Document> theDoc,
   std::string theAdditionalName,
   Handle(TDataStd_IntPackedMap) theRefs = Handle(TDataStd_IntPackedMap)())

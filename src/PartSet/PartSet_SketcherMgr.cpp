@@ -6,7 +6,7 @@
 
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_Module.h"
-#include "PartSet_WidgetPoint2D.h"
+#include "PartSet_WidgetPoint2d.h"
 #include "PartSet_Tools.h"
 
 #include <XGUI_ModuleConnector.h>
@@ -436,16 +436,26 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+
   DataPtr aData = myCurrentSketch->data();
   if ((!aData) || (!aData->isValid())) {
     // The sketch was aborted
     myCurrentSketch = CompositeFeaturePtr();
     myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
+
+    // Erase all sketcher objects
+    QStringList aSketchIds = sketchOperationIdList();
+    QObjectPtrList aObjects = aDisplayer->displayedObjects();
+    foreach (ObjectPtr aObj, aObjects) {
+      DataPtr aObjData = aObj->data();
+      if ((!aObjData) || (!aObjData->isValid()))
+        aDisplayer->erase(aObj);
+    }
     return; 
   }
   // Hide all sketcher sub-Objects
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
-  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
   for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
     FeaturePtr aFeature = myCurrentSketch->subFeature(i);
     std::list<ResultPtr> aResults = aFeature->results();

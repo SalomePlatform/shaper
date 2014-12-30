@@ -27,7 +27,7 @@
     <!-- Major module parameters -->
     <parameter name="name" value="NewGeom"/>
     <parameter name="icon" value="newgeom.png"/>
-    <parameter name="version" value="0.6.1"/>
+    <parameter name="version" value="0.7.0"/>
   </section>
   <section name="resources">
     <!-- Module resources -->
