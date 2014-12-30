@@ -29,7 +29,7 @@ public:
   std::shared_ptr<GeomAPI_Pnt> point();
 
   /// Returns true if the current edge is geometrically equal to the given edge
-  bool isEqual(std::shared_ptr<GeomAPI_Shape> theVert);
+  bool isEqual(const std::shared_ptr<GeomAPI_Shape> theVert) const;
 };
 
 #endif

@@ -45,7 +45,7 @@ public:
   std::shared_ptr<GeomAPI_Circ> circle();
 
   /// Returns true if the current edge is geometrically equal to the given edge
-  bool isEqual(std::shared_ptr<GeomAPI_Shape> theEdge);
+  bool isEqual(const std::shared_ptr<GeomAPI_Shape> theEdge) const;
 };
 
 #endif
