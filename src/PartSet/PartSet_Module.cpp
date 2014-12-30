@@ -130,6 +130,11 @@ void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
 {
   if (theOperation->isEditOperation())
     return;
+  // the selection is cleared after commit the create operation
+  // in order to do not use the same selected objects in the restarted operation
+  // for common behaviour, the selection is cleared even if the operation is not restarted
+  myWorkshop->viewer()->AISContext()->ClearSelected();
+
   /// Restart sketcher operations automatically
   FeaturePtr aFeature = theOperation->feature();
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
@@ -138,6 +143,7 @@ void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
                      myRestartingMode == RM_EmptyFeatureUsed)) {
     myLastOperationId = theOperation->id();
     myLastFeature = myRestartingMode == RM_LastFeatureUsed ? theOperation->feature() : FeaturePtr();
+    
     launchOperation(myLastOperationId);
   }
   breakOperationSequence();
