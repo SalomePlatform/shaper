@@ -81,16 +81,19 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
 
   // do noth use naming if selected shape is result shape itself, but not sub-shape
   TDF_Label aSelLab = selectionLabel();
-  if (theContext->shape().get() && theContext->shape()->isEqual(theSubShape)) {
-    aSelLab.ForgetAllAttributes(true);
-    TDataStd_UAttribute::Set(aSelLab, kSIMPLE_REF_ID);
-  } else {
-    aSelLab.ForgetAttribute(kSIMPLE_REF_ID);
-    if (theContext->groupName() == ModelAPI_ResultBody::group())
+  aSelLab.ForgetAttribute(kSIMPLE_REF_ID);
+  if (theContext->groupName() == ModelAPI_ResultBody::group()) {
+    // do not select the whole shape for body:it is already must be in the data framework
+    if (theContext->shape().get() && theContext->shape()->isEqual(theSubShape)) {
+      aSelLab.ForgetAllAttributes(true);
+      TDataStd_UAttribute::Set(aSelLab, kSIMPLE_REF_ID);
+    } else {
       selectBody(theContext, theSubShape);
-    else if (theContext->groupName() == ModelAPI_ResultConstruction::group())
-      selectConstruction(theContext, theSubShape);
+    }
+  } else if (theContext->groupName() == ModelAPI_ResultConstruction::group()) {
+    selectConstruction(theContext, theSubShape);
   }
+  myIsInitialized = true;
 
   std::string aSelName = namingName();
   if(!aSelName.empty())
@@ -102,7 +105,6 @@ void Model_AttributeSelection::setValue(const ResultPtr& theContext,
   //selectSubShape("EDGE", "Extrusion_1/TopFace|Extrusion_1/LateralFace_1");
   //selectSubShape("EDGE", "Sketch_1/Edge_6");
 #endif
-  myIsInitialized = true;
   owner()->data()->sendAttributeUpdated(this);
 }
 
@@ -349,6 +351,7 @@ bool Model_AttributeSelection::update()
         }
       }
     } else { // simple construction element: the selected is that needed
+      selectConstruction(aContext, aContext->shape());
       owner()->data()->sendAttributeUpdated(this);
       return true;
     }
@@ -399,11 +402,11 @@ static void registerSubShape(TDF_Label& theMainLabel, TopoDS_Shape theShape,
   else if (theShape.ShapeType() == TopAbs_VERTEX) aName<<"Vertex";
 
   if (theRefs.IsNull()) {
-    aName<<"_"<<theID;
+    aName<<theID;
   } else { // make a compisite name from all sub-elements indexes: "1_2_3_4"
     TColStd_MapIteratorOfPackedMapOfInteger aRef(theRefs->GetMap());
     for(; aRef.More(); aRef.Next()) {
-      aName<<"_"<<aRef.Key();
+      aName<<"-"<<aRef.Key();
     }
   }
 
@@ -419,13 +422,18 @@ void Model_AttributeSelection::selectConstruction(
   FeaturePtr aContextFeature = theContext->document()->feature(theContext);
   CompositeFeaturePtr aComposite = 
     std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature);
+  const TopoDS_Shape& aSubShape = theSubShape->impl<TopoDS_Shape>();
   if (!aComposite || aComposite->numberOfSubs() == 0) {
-    return; // saving of context is enough: result construction contains exactly the needed shape
+    // saving of context is enough: result construction contains exactly the needed shape
+    TNaming_Builder aBuilder(selectionLabel());
+    aBuilder.Generated(aSubShape);
+    aMyDoc->addNamingName(selectionLabel(), theContext->data()->name());
+    TDataStd_Name::Set(selectionLabel(), theContext->data()->name().c_str());
+    return;
   }
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(owner()->data());
   TDF_Label aLab = myRef.myRef->Label();
   // identify the reuslts of sub-object of the composite by edges
-  const TopoDS_Shape& aSubShape = theSubShape->impl<TopoDS_Shape>();
   // save type of the selected shape in integer attribute
   TopAbs_ShapeEnum aShapeType = aSubShape.ShapeType();
   TDataStd_Integer::Set(aLab, (int)aShapeType);
