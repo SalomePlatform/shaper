@@ -252,7 +252,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
   double aX, anY;
   Handle(V3d_View) aView = theWnd->v3dView();
   PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, anY);
-  setPoint(aX, anY);
+  //setPoint(aX, anY);
 
   std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(feature()->data()->attribute(attributeID()));
