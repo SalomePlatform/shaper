@@ -113,6 +113,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_RadiusValidator", new PartSet_RadiusValidator);
   aFactory->registerValidator("PartSet_RigidValidator", new PartSet_RigidValidator);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
+  aFactory->registerValidator("PartSet_SketchValidator", new PartSet_SketchValidator);
 }
 
 void PartSet_Module::registerFilters()
@@ -303,7 +304,7 @@ void PartSet_Module::onNoMoreWidgets()
   }
 }
 
-void PartSet_Module::onVertexSelected(ObjectPtr theObject, const TopoDS_Shape& theShape)
+void PartSet_Module::onVertexSelected()
 {
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
   if (aOperation->id().toStdString() == SketchPlugin_Line::ID()) {
@@ -335,8 +336,7 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
     aWgt->setWorkshop(aWorkshop);
     aWgt->setSketch(mySketchMgr->activeSketch());
 
-    connect(aWgt, SIGNAL(vertexSelected(ObjectPtr, const TopoDS_Shape&)), 
-      this, SLOT(onVertexSelected(ObjectPtr, const TopoDS_Shape&)));
+    connect(aWgt, SIGNAL(vertexSelected()), this, SLOT(onVertexSelected()));
 
     theModelWidgets.append(aWgt);
     return aWgt->getControl();

@@ -78,6 +78,9 @@ class PARTSET_EXPORT PartSet_Tools
   static std::shared_ptr<ModelAPI_Document> document();
 
 
+  static std::shared_ptr<GeomDataAPI_Point2D> findAttributePoint(CompositeFeaturePtr theSketch, 
+    double theX, double theY, double theTolerance, const QList<FeaturePtr>& theIgnore = QList<FeaturePtr>());
+
   /// Returns a point attribute of the feature by the coordinates if it is
   /// \param theFeature the feature
   /// \param theX the horizontal coordinate

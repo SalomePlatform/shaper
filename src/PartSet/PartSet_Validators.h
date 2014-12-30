@@ -12,6 +12,7 @@
 #include <ModuleBase_SelectionValidator.h>
 #include <ModuleBase_ISelection.h>
 #include <ModelAPI_RefAttrValidator.h>
+#include <ModelAPI_ResultValidator.h>
 
 /*
  * Selector validators
@@ -70,6 +71,15 @@ class PartSet_DifferentObjectsValidator : public ModelAPI_RefAttrValidator
 
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments) const;
+};
+
+/**
+* aValidator which validates tha selected object is a Sketch
+*/
+class PartSet_SketchValidator : public ModelAPI_ResultValidator
+{
+ public:
+  virtual bool isValid(const ObjectPtr theObject) const;
 };
 
 

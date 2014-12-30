@@ -17,6 +17,8 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeReference.h>
 
+#include <SketchPlugin_Sketch.h>
+
 #include <list>
 #ifdef _DEBUG
 #include <iostream>
@@ -170,4 +172,10 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
 {
   // not implemented
   return true;
+}
+
+bool PartSet_SketchValidator::isValid(const ObjectPtr theObject) const
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  return aFeature->getKind() == SketchPlugin_Sketch::ID();
 }
