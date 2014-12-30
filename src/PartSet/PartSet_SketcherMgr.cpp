@@ -271,24 +271,26 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     // 4. the features and attributes modification(move)
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = anIt.key();
-      AttributePtr anAttr;
 
       AttributeList anAttributes = anIt.value();
-      if (!anAttributes.empty()) {
-        anAttr = anAttributes.first();
-      }
       // Process selection by attribute: the priority to the attribute
-      if (anAttr.get() != NULL) {
-        std::string aAttrId = anAttr->id();
-        DataPtr aData = aFeature->data();
-        if (aData.get() != NULL) {
-          std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
-            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(aAttrId));
-          if (aPoint.get() != NULL) {
-            bool isImmutable = aPoint->setImmutable(true);
-            aPoint->move(dX, dY);
-            ModelAPI_EventCreator::get()->sendUpdated(aFeature, aMoveEvent);
-            aPoint->setImmutable(isImmutable);
+      if (!anAttributes.empty()) {
+        AttributeList::const_iterator anAttIt = anAttributes.begin(), anAttLast = anAttributes.end();
+        for (; anAttIt != anAttLast; anAttIt++) {
+          AttributePtr anAttr = *anAttIt;
+          if (anAttr.get() == NULL)
+            continue;
+          std::string aAttrId = anAttr->id();
+          DataPtr aData = aFeature->data();
+          if (aData.get() != NULL) {
+            std::shared_ptr<GeomDataAPI_Point2D> aPoint = 
+              std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(aAttrId));
+            if (aPoint.get() != NULL) {
+              bool isImmutable = aPoint->setImmutable(true);
+              aPoint->move(dX, dY);
+              ModelAPI_EventCreator::get()->sendUpdated(aFeature, aMoveEvent);
+              aPoint->setImmutable(isImmutable);
+            }
           }
         }
       } else {
