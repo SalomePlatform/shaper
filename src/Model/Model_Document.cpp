@@ -1130,3 +1130,23 @@ TDF_Label Model_Document::findNamingName(std::string theName)
     return TDF_Label(); // not found
   return aFind->second;
 }
+
+ResultPtr Model_Document::findByName(const std::string theName)
+{
+  NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator anObjIter(myObjs);
+  for(; anObjIter.More(); anObjIter.Next()) {
+    FeaturePtr& aFeature = anObjIter.ChangeValue();
+    if (!aFeature) // may be on close
+      continue;
+    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
+    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+    for (; aRIter != aResults.cend(); aRIter++) {
+      if (aRIter->get() && (*aRIter)->data() && (*aRIter)->data()->isValid() &&
+          (*aRIter)->data()->name() == theName) {
+        return *aRIter;
+      }
+    }
+  }
+  // not found
+  return ResultPtr();
+}
