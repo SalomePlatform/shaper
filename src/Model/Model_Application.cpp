@@ -98,7 +98,8 @@ void Model_Application::removeUselessDocuments(
     }
     if (!aFound) { // remove the useless
       aDoc->second->close();
-      aDoc = myDocs.erase(aDoc);
+      myDocs.erase(aDoc);
+      aDoc = myDocs.begin();
     } else {
       aDoc++;
     }

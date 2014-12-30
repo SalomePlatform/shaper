@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-#include <GEOMALGOAPI_STEPImport.h>
+#include <GeomAlgoAPI_STEPImport.h>
 
 #include <TDF_ChildIDIterator.hxx>
 #include <TDF_Label.hxx>

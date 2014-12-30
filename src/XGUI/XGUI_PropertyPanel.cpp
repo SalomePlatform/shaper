@@ -140,6 +140,8 @@ QWidget* XGUI_PropertyPanel::contentWidget()
 void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
 {
   // Invalid feature case on abort of the operation
+  if (theFeature.get() == NULL)
+    return;
   if(!theFeature->data())
     return;
   foreach(ModuleBase_ModelWidget* eachWidget, myWidgets)
