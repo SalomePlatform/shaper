@@ -384,23 +384,25 @@ std::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(CompositeFeaturePtr theS
   std::shared_ptr<GeomAPI_Pln> aPlane;
 
   std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
-  std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
-      aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-  std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      aData->attribute(SketchPlugin_Sketch::NORM_ID()));
-  if (aNormal && anOrigin) {
-    double adX = aNormal->x();
-    double adY = aNormal->y();
-    double adZ = aNormal->z();
+  if (aData) {
+    std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+        aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+    std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+    if (aNormal && anOrigin) {
+      double adX = aNormal->x();
+      double adY = aNormal->y();
+      double adZ = aNormal->z();
 
-    if ( (adX != 0) || (adY != 0) || (adZ != 0) ) { // Plane is valid
-      double aX = anOrigin->x();
-      double aY = anOrigin->y();
-      double aZ = anOrigin->z();
-      gp_Pln aPln(gp_Pnt(aX, aY, aZ), gp_Dir(adX, adY, adZ));
-      double aA, aB, aC, aD;
-      aPln.Coefficients(aA, aB, aC, aD);
-      aPlane = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
+      if ( (adX != 0) || (adY != 0) || (adZ != 0) ) { // Plane is valid
+        double aX = anOrigin->x();
+        double aY = anOrigin->y();
+        double aZ = anOrigin->z();
+        gp_Pln aPln(gp_Pnt(aX, aY, aZ), gp_Dir(adX, adY, adZ));
+        double aA, aB, aC, aD;
+        aPln.Coefficients(aA, aB, aC, aD);
+        aPlane = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
+      }
     }
   }
   return aPlane;

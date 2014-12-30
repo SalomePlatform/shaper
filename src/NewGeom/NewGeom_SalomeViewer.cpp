@@ -188,12 +188,11 @@ void NewGeom_SalomeViewer::onActivated(SUIT_ViewWindow*)
 //**********************************************
 void NewGeom_SalomeViewer::enableSelection(bool isEnabled)
 {
-  mySelector->viewer()->enableSelection(isEnabled);
-  // there is a fix for a black-colored window 
-  // the viewer rubber band is valid if the values delta is less than 1
-  // TODO: remove this row after moving to SALOME 7.5
-  //mySelector->viewer()->setInteractionStyle(isEnabled ? SUIT_ViewModel::STANDARD
-  //                                                    : SUIT_ViewModel::KEY_FREE);
+  //mySelector->viewer()->enableSelection(isEnabled);
+  // The enableSelection() in SALOME 7.5 cause of forced Viewer update(we have blinking)
+  // After this is corrected, the first row should be recommented, the last - removed
+  mySelector->viewer()->setInteractionStyle(isEnabled ? SUIT_ViewModel::STANDARD
+                                                      : SUIT_ViewModel::KEY_FREE);
 }
 
 //**********************************************

@@ -129,21 +129,23 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       std::dynamic_pointer_cast<SketchPlugin_Sketch>(theFeature);
   if (aSketchFeature.get()) {
     std::shared_ptr<ModelAPI_Data> aData = aSketchFeature->data();
-    std::shared_ptr<GeomDataAPI_Dir> aNormal =
-      std::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::NORM_ID()));
-    aHasSketchPlane = aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
+    if (aData) {
+      std::shared_ptr<GeomDataAPI_Dir> aNormal =
+        std::dynamic_pointer_cast<GeomDataAPI_Dir>(aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+      aHasSketchPlane = aNormal && !(aNormal->x() == 0 && aNormal->y() == 0 && aNormal->z() == 0);
 
-    aMsg->setState(SketchPlugin_Point::ID(), aHasSketchPlane);
-    aMsg->setState(SketchPlugin_Line::ID(), aHasSketchPlane);
-    aMsg->setState(SketchPlugin_Circle::ID(), aHasSketchPlane);
-    aMsg->setState(SketchPlugin_Arc::ID(), aHasSketchPlane);
-    aMsg->setState(SketchPlugin_ConstraintCoincidence::ID(), aHasSketchPlane);
-    aMsg->setState(SketchPlugin_ConstraintDistance::ID(), aHasSketchPlane);
-    aMsg->setState(SketchPlugin_ConstraintLength::ID(), aHasSketchPlane);
-    aMsg->setState(SketchPlugin_ConstraintParallel::ID(), aHasSketchPlane);
-    aMsg->setState(SketchPlugin_ConstraintPerpendicular::ID(), aHasSketchPlane);
-    aMsg->setState(SketchPlugin_ConstraintRadius::ID(), aHasSketchPlane);
-    aMsg->setState(SketchPlugin_ConstraintRigid::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_Point::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_Line::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_Circle::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_Arc::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintCoincidence::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintDistance::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintLength::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintParallel::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintPerpendicular::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintRadius::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintRigid::ID(), aHasSketchPlane);
+    }
   }
   return aMsg;
 }

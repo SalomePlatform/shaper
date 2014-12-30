@@ -140,6 +140,9 @@ class Model_Document : public ModelAPI_Document
   void addNamingName(const TDF_Label theLabel, std::string theName);
   //! Returns the label, keeper of the name  for the topological naming needs
   TDF_Label findNamingName(std::string theName);
+  //! Returns the result by name of the result (names of results must be unique, used for naming
+  //! selection by name.
+  ResultPtr findByName(const std::string theName);
 
  protected:
 
