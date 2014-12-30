@@ -299,7 +299,7 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes)
   //myUseExternalObjects = true;
 
   AIS_ListOfInteractive aPrsList;
-  displayedObjects(aContext, aPrsList);
+  ::displayedObjects(aContext, aPrsList);
 
   Handle(AIS_Trihedron) aTrihedron;
   AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
@@ -339,7 +339,7 @@ void XGUI_Displayer::deactivateObjects()
 
   //aContext->NotUseDisplayedObjects();
   AIS_ListOfInteractive aPrsList;
-  displayedObjects(aContext, aPrsList);
+  ::displayedObjects(aContext, aPrsList);
 
   AIS_ListIteratorOfListOfInteractive aLIt;
   //Handle(AIS_Trihedron) aTrihedron;

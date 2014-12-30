@@ -149,6 +149,9 @@ class XGUI_EXPORT XGUI_Displayer
   /// Returns number of displayed objects
   int objectsCount() const { return myResult2AISObjectMap.size(); }
 
+  QObjectPtrList displayedObjects() const { return myResult2AISObjectMap.keys(); }
+
+  /// Returns true if the given object can be shown in shaded mode
   bool canBeShaded(ObjectPtr theObject) const;
 
  protected:
