@@ -35,7 +35,7 @@ std::shared_ptr<GeomAPI_Pnt> GeomAPI_Vertex::point()
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aPoint.X(), aPoint.Y(), aPoint.Z()));
 }
 
-bool GeomAPI_Vertex::isEqual(std::shared_ptr<GeomAPI_Shape> theVert)
+bool GeomAPI_Vertex::isEqual(const std::shared_ptr<GeomAPI_Shape> theVert) const
 {
   const TopoDS_Shape& aMyShape = const_cast<GeomAPI_Vertex*>(this)->impl<TopoDS_Shape>();
   const TopoDS_Shape& aInShape = theVert->impl<TopoDS_Shape>();
