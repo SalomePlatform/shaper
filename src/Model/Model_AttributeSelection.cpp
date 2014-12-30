@@ -819,12 +819,21 @@ const TopoDS_Shape findCommonShape(const TopAbs_ShapeEnum theType, const TopTool
   //fill maps
   TopTools_ListIteratorOfListOfShape it(theList);
   for(int i = 0;it.More();it.Next(),i++) {
-	const TopoDS_Shape& aFace = it.Value();
-	TopExp_Explorer anExp (aFace, theType);
-	for(;anExp.More();anExp.Next()) {
-	  const TopoDS_Shape& anEdge = anExp.Current();
-	  if (!anEdge.IsNull())
-		aVec[i].Add(anExp.Current());
+	const TopoDS_Shape& aFace = it.Value();		
+	if(i < 2) {
+	  TopExp_Explorer anExp (aFace, theType);
+	  for(;anExp.More();anExp.Next()) {
+	    const TopoDS_Shape& anEdge = anExp.Current();
+	    if (!anEdge.IsNull())
+		  aVec[i].Add(anExp.Current());
+	  }
+	} else {
+	  TopExp_Explorer anExp (aFace, TopAbs_VERTEX);
+	  for(;anExp.More();anExp.Next()) {
+	    const TopoDS_Shape& aVertex = anExp.Current();
+	    if (!aVertex.IsNull())
+		  aVec[i].Add(anExp.Current());
+	  }
 	}
   }
   //trivial case: 2 faces
@@ -844,8 +853,18 @@ const TopoDS_Shape findCommonShape(const TopAbs_ShapeEnum theType, const TopTool
 	  TopTools_ListIteratorOfListOfShape it(aList);
 	  for(;it.More();it.Next()) {
 		const TopoDS_Shape& aCand = it.Value();
-		// not yet implemented
-
+		// not yet completelly implemented, to be rechecked
+		TopoDS_Vertex aV1, aV2;
+		TopExp::Vertices(TopoDS::Edge(aCand), aV1, aV2);
+		int aNum(0);
+		if(aVec[2].Contains(aV1)) aNum++;
+		else if(aVec[2].Contains(aV2)) aNum++;
+		if(aVec[3].Contains(aV1)) aNum++;
+		else if(aVec[3].Contains(aV2)) aNum++;
+		if(aNum == 2) {
+		  aShape = aCand;
+		  break;
+		}
 	  }
 	}
   }
