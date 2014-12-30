@@ -100,7 +100,7 @@ std::shared_ptr<GeomAPI_Circ> GeomAPI_Edge::circle()
 }
 
 
-bool GeomAPI_Edge::isEqual(std::shared_ptr<GeomAPI_Shape> theEdge)
+bool GeomAPI_Edge::isEqual(const std::shared_ptr<GeomAPI_Shape> theEdge) const
 {
   const TopoDS_Shape& aMyShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   const TopoDS_Shape& aInShape = theEdge->impl<TopoDS_Shape>();

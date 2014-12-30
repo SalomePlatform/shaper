@@ -208,6 +208,23 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
     Handle(AIS_InteractiveContext) aContext = AISContext();
     if (aContext.IsNull())
       return;
+    // Check that the visualized shape is the same and the redisplay is not necessary
+    // Redisplay of AIS object leads to this object selection compute and the selection 
+    // in the browser is lost
+    // become
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aResult.get() != NULL) {
+      Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(aAISIO);
+      if (!aShapePrs.IsNull()) {
+        std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
+        const TopoDS_Shape& aShape = aShapePrs->Shape();
+        std::shared_ptr<GeomAPI_Shape> anAISShapePtr(new GeomAPI_Shape());
+        anAISShapePtr->setImpl(new TopoDS_Shape(aShape));
+
+        if (aShapePtr->isEqual(anAISShapePtr))
+          return;
+      }
+    }
     aContext->Redisplay(aAISIO, false);
     if (isUpdateViewer)
       updateViewer();
@@ -299,7 +316,7 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes)
   //myUseExternalObjects = true;
 
   AIS_ListOfInteractive aPrsList;
-  displayedObjects(aContext, aPrsList);
+  ::displayedObjects(aContext, aPrsList);
 
   Handle(AIS_Trihedron) aTrihedron;
   AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
@@ -339,7 +356,7 @@ void XGUI_Displayer::deactivateObjects()
 
   //aContext->NotUseDisplayedObjects();
   AIS_ListOfInteractive aPrsList;
-  displayedObjects(aContext, aPrsList);
+  ::displayedObjects(aContext, aPrsList);
 
   AIS_ListIteratorOfListOfInteractive aLIt;
   //Handle(AIS_Trihedron) aTrihedron;
