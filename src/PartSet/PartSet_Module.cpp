@@ -113,6 +113,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_RadiusValidator", new PartSet_RadiusValidator);
   aFactory->registerValidator("PartSet_RigidValidator", new PartSet_RigidValidator);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
+  aFactory->registerValidator("PartSet_SketchValidator", new PartSet_SketchValidator);
 }
 
 void PartSet_Module::registerFilters()
