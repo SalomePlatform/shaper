@@ -6,7 +6,7 @@
 
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_Module.h"
-#include "PartSet_WidgetPoint2D.h"
+#include "PartSet_WidgetPoint2d.h"
 #include "PartSet_Tools.h"
 
 #include <XGUI_ModuleConnector.h>

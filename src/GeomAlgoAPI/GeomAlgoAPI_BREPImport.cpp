@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-#include <GEOMALGOAPI_BREPImport.h>
+#include <GeomAlgoAPI_BREPImport.h>
 
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
