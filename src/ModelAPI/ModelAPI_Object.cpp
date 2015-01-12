@@ -7,37 +7,46 @@
 #include "ModelAPI_Object.h"
 
 
-bool ModelAPI_Object::isInHistory() {
+bool ModelAPI_Object::isInHistory()
+{
   return true;
 }
 
-boost::shared_ptr<ModelAPI_Data> ModelAPI_Object::data() const {
+std::shared_ptr<ModelAPI_Data> ModelAPI_Object::data() const
+{
   return myData;
 }
 
-bool ModelAPI_Object::isSame(const boost::shared_ptr<ModelAPI_Object>& theObject) {
+bool ModelAPI_Object::isSame(const std::shared_ptr<ModelAPI_Object>& theObject)
+{
   return theObject.get() == this;
 }
 
-boost::shared_ptr<ModelAPI_Document> ModelAPI_Object::document() const {
+std::shared_ptr<ModelAPI_Document> ModelAPI_Object::document() const
+{
   return myDoc;
 }
 
-void ModelAPI_Object::attributeChanged() {
+void ModelAPI_Object::attributeChanged(const std::string& theID)
+{
 }
 
-ModelAPI_Object::~ModelAPI_Object() {
+ModelAPI_Object::~ModelAPI_Object()
+{
 }
 
-void ModelAPI_Object::setData(boost::shared_ptr<ModelAPI_Data> theData) {
+void ModelAPI_Object::setData(std::shared_ptr<ModelAPI_Data> theData)
+{
   myData = theData;
 }
 
-void ModelAPI_Object::setDoc(boost::shared_ptr<ModelAPI_Document> theDoc) {
+void ModelAPI_Object::setDoc(std::shared_ptr<ModelAPI_Document> theDoc)
+{
   myDoc = theDoc;
 }
 
-void ModelAPI_Object::erase() {
+void ModelAPI_Object::erase()
+{
   if (myData) myData->erase();
   setData(DataPtr());
 }

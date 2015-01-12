@@ -23,13 +23,10 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
 {
  public:
   /// Returns the group identifier of this result
-  virtual std::string groupName()
-  {
-    return group();
-  }
+  MODELAPI_EXPORT virtual std::string groupName();
 
   /// Returns the group identifier of this result
-  static std::string group()
+  inline static std::string group()
   {
     static std::string MY_GROUP = "Construction";
     return MY_GROUP;

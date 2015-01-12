@@ -42,8 +42,9 @@ void Model_ResultPart::activate()
       aDocRef->setValue(aDoc);
     }
   }
-  if (aDocRef->value())
+  if (aDocRef->value().get()) {
     ModelAPI_Session::get()->setActiveDocument(aDocRef->value());
+  }
 }
 
 bool Model_ResultPart::isActivated() 

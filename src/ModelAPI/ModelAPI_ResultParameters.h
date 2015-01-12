@@ -26,7 +26,7 @@ class ModelAPI_ResultParameters : public ModelAPI_Result
   }
 
   /// Returns the group identifier of this result
-  static std::string group()
+  inline static std::string group()
   {
     static std::string MY_GROUP = "Parameters";
     return MY_GROUP;

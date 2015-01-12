@@ -45,6 +45,10 @@ SET(PROJECT_SOURCES
     ModelAPI_Feature.cpp
     ModelAPI_Session.cpp
     ModelAPI_Tools.cpp
+    ModelAPI_Object.cpp
+    ModelAPI_Result.cpp
+    ModelAPI_ResultPart.cpp
+    ModelAPI_ResultConstruction.cpp
 )
 
 SET(PROJECT_LIBRARIES

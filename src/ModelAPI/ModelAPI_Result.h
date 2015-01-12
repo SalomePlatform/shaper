@@ -23,18 +23,22 @@ class ModelAPI_Result : public ModelAPI_Object
   bool myIsConcealed; ///< the result is concealed from the data tree (referenced by other objects)
  public:
    /// Returns true if the result is concealed from the data tree (referenced by other objects)
-  inline bool isConcealed() {return myIsConcealed;}
-
-  /// Returns true if the result is concealed from the data tree (referenced by other objects)
-  inline void setIsConcealed(const bool theValue) {myIsConcealed = theValue;}
-
-  /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_Result()
+  inline bool isConcealed()
   {
+    return myIsConcealed;
   }
 
+  /// Returns true if the result is concealed from the data tree (referenced by other objects)
+  inline void setIsConcealed(const bool theValue)
+  {
+    myIsConcealed = theValue;
+  }
+
+  /// To virtually destroy the fields of successors
+  MODELAPI_EXPORT virtual ~ModelAPI_Result();
+
   /// Returns the shape-result produced by this feature (or null if no shapes)
-  virtual std::shared_ptr<GeomAPI_Shape> shape() {return std::shared_ptr<GeomAPI_Shape>();}
+  MODELAPI_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
 };
 
 //! Pointer on feature object

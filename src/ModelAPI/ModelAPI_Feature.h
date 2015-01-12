@@ -31,7 +31,7 @@ class ModelAPI_Feature : public ModelAPI_Object
   virtual const std::string& getKind() = 0;
 
   /// Returns the group identifier of all features
-  static std::string group()
+  inline static std::string group()
   {
     static std::string MY_GROUP = "Features";
     return MY_GROUP;

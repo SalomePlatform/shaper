@@ -6,16 +6,12 @@
 
 #include "ModelAPI_Result.h"
 
-bool ModelAPI_Result::isConcealed() {
-  return myIsConcealed;
+ModelAPI_Result::~ModelAPI_Result()
+{
+
 }
 
-void ModelAPI_Result::setIsConcealed(const bool theValue) {
-  myIsConcealed = theValue;
-}
-
-ModelAPI_Result::ModelAPI_Result() {
-}
-
-ModelAPI_Result::~ModelAPI_Result() {
+std::shared_ptr<GeomAPI_Shape> ModelAPI_Result::shape()
+{
+  return std::shared_ptr<GeomAPI_Shape>();
 }

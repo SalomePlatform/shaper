@@ -32,7 +32,7 @@ public:
   }
 
   /// Returns the group identifier of this result
-  static std::string group()
+  inline static std::string group()
   {
     static std::string MY_GROUP = "Bodies";
     return MY_GROUP;

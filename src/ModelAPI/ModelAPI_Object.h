@@ -30,58 +30,37 @@ class ModelAPI_Object
   std::shared_ptr<ModelAPI_Document> myDoc;  ///< document this object belongs to
  public:
   /// By default object is displayed in the object browser.
-  virtual bool isInHistory()
-  {
-    return true;
-  }
+  MODELAPI_EXPORT virtual bool isInHistory();
 
   /// Returns the data manager of this object: attributes
-  virtual std::shared_ptr<ModelAPI_Data> data() const
-  {
-    return myData;
-  }
+  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Data> data() const;
 
   /// Returns true if object refers to the same data model instance
-  virtual bool isSame(const std::shared_ptr<ModelAPI_Object>& theObject)
-  {
-    return theObject.get() == this;
-  }
+  MODELAPI_EXPORT virtual bool isSame(const std::shared_ptr<ModelAPI_Object>& theObject);
 
   /// Returns document this feature belongs to
-  virtual std::shared_ptr<ModelAPI_Document> document() const
-  {
-    return myDoc;
-  }
+  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Document> document() const;
 
   /// Returns the group identifier of this object
   virtual std::string groupName() = 0;
 
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute
-  MODELAPI_EXPORT virtual void attributeChanged(const std::string& theID) 
-  {}
+  // MODELAPI_EXPORT
+  MODELAPI_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// To use virtuality for destructors
-  virtual ~ModelAPI_Object() {}
+  MODELAPI_EXPORT virtual ~ModelAPI_Object();
 
  protected:
   /// Sets the data manager of an object (document does)
-  virtual void setData(std::shared_ptr<ModelAPI_Data> theData)
-  {
-    myData = theData;
-  }
+  MODELAPI_EXPORT virtual void setData(std::shared_ptr<ModelAPI_Data> theData);
 
   /// Sets the data manager of an object (document does)
-  virtual void setDoc(std::shared_ptr<ModelAPI_Document> theDoc)
-  {
-    myDoc = theDoc;
-  }
+  MODELAPI_EXPORT virtual void setDoc(std::shared_ptr<ModelAPI_Document> theDoc);
 
   /// removes all fields from this feature
-  MODELAPI_EXPORT virtual void erase() {
-    if (myData) myData->erase();
-    setData(DataPtr());
-  }
+  MODELAPI_EXPORT virtual void erase();
 
   friend class Model_Document;
 
