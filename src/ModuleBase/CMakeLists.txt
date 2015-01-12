@@ -9,6 +9,8 @@ SET(PROJECT_HEADERS
 	ModuleBase_FilterFace.h
 	ModuleBase_FilterFactory.h
 	ModuleBase_FilterLinearEdge.h
+    ModuleBase_FilterMulti.h
+    ModuleBase_FilterShapeType.h
 	ModuleBase_Tools.h
 	ModuleBase_IModule.h
 	ModuleBase_Operation.h
@@ -45,6 +47,8 @@ SET(PROJECT_SOURCES
 	ModuleBase_FilterFace.cpp
 	ModuleBase_FilterFactory.cpp
 	ModuleBase_FilterLinearEdge.cpp
+    ModuleBase_FilterMulti.cpp
+    ModuleBase_FilterShapeType.cpp
 	ModuleBase_Tools.cpp
 	ModuleBase_IModule.cpp
 	ModuleBase_IWorkshop.cpp

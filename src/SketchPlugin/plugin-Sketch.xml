@@ -45,18 +45,21 @@
         tooltip="Set fixed distance from a point to an object"
         icon=":icons/distance.png">
         <label title="Select objects for distance definition. Following objects can be accepted: point, line or arc end point, center of circle or arc."/>
-		<sketch_shape_selector 
-          id="ConstraintEntityA" 
-          label="First object" 
-          tooltip="Select point, line end point, line, center of circle or arc."
-          shape_types="edge vertex"/>
+        <sketch_shape_selector
+              id="ConstraintEntityA"
+              label="First object"
+              tooltip="Select point, line end point, line, center of circle or arc."
+              shape_types="edge vertex">
+          <selection_filter id="MultiFilter" parameters="line,vertex"/>
+        </sketch_shape_selector>/>
 		<sketch_shape_selector 
           id="ConstraintEntityB" 
           label="Last object" 
           tooltip="Select point, line end point, line, center of circle or arc." 
 			    shape_types="edge vertex">
 			<validator id="SketchPlugin_DifferentObjects"/>
-		</sketch_shape_selector>
+      <selection_filter id="MultiFilter" parameters="line,vertex"/>
+    </sketch_shape_selector>
 		
         <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
         

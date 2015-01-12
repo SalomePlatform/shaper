@@ -17,6 +17,7 @@
 #include <ModuleBase_FilterFactory.h>
 #include <ModuleBase_FilterLinearEdge.h>
 #include <ModuleBase_FilterFace.h>
+#include <ModuleBase_FilterMulti.h>
 
 
 #include <ModelAPI_Object.h>
@@ -124,6 +125,7 @@ void PartSet_Module::registerFilters()
 
   aFactory->registerFilter("EdgeFilter", new ModuleBase_FilterLinearEdge);
   aFactory->registerFilter("FaceFilter", new ModuleBase_FilterFace);
+  aFactory->registerFilter("MultiFilter", new ModuleBase_FilterMulti);
 }
 
 void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 

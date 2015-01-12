@@ -530,6 +530,9 @@ void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
         continue;
       Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast(
                                                                         aBRepOwner->Selectable());
+      if (anIO != anAISIO)
+        continue;
+
       if (aBRepOwner->HasShape()) {
         const TopoDS_Shape& aShape = aBRepOwner->Shape();
         TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
@@ -552,8 +555,6 @@ void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
 void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
                                              const FeaturePtr& theSketch,
                                              ModuleBase_IWorkshop* theWorkshop,
-                                             //const std::set<AttributePtr>& theSelectedAttributes,
-                                             //const std::set<ResultPtr>& theSelectedResults,
                                              const FeatureToSelectionMap& theSelection,
                                              SelectMgr_IndexedMapOfOwner& anOwnersToSelect)
 {
