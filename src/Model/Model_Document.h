@@ -170,7 +170,7 @@ class Model_Document : public ModelAPI_Document
 
   //! performs compactification of all nested operations into one
   //! \returns true if resulting transaction is not empty and can be undoed
-  bool compactNested();
+  void compactNested();
 
   //! Initializes the data fields of the feature
   void initData(ObjectPtr theObj, TDF_Label theLab, const int theTag);
@@ -199,20 +199,23 @@ class Model_Document : public ModelAPI_Document
   std::string myID;  ///< identifier of the document in the application
   std::string myKind;  ///< kind of the document in the application
   Handle_TDocStd_Document myDoc;  ///< OCAF document
-  /// counter of transactions
-  int myTransactionsCounter;
+
   /// counter value of transaction on the last "save" call, used for "IsModified" method
   int myTransactionSave;
-  /// number of nested transactions performed (or -1 if not nested)
-  int myNestedNum;
+  /// number of nested transactions performed (list becasue may be nested inside of nested)
+  /// the list is empty if not nested transaction is performed
+  std::list<int> myNestedNum;
+
+  /// transaction indexes (related to myTransactionsAfterSave) and number of real transactions 
+  /// in myDocument connected to this operation (may be zero for empty transaction)
+  std::list<int> myTransactions;
+  /// list of numbers of real document transactions undone (first is oldest undone)
+  std::list<int> myRedos;
   /// All features managed by this document (not only in history of OB)
   /// For optimization mapped by labels
   NCollection_DataMap<TDF_Label, FeaturePtr> myObjs;
   /// Optimization for finding the shape-label by topological naming names
   std::map<std::string, TDF_Label> myNamingNames;
-
-  /// transaction indexes (related to myTransactionsAfterSave) which were empty in this doc
-  std::map<int, bool> myIsEmptyTr;
   /// If it is true, features are not executed on update (on abort, undo, redo)
   bool myExecuteFeatures;
 };
