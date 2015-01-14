@@ -60,9 +60,7 @@ Model_Document::Model_Document(const std::string theID, const std::string theKin
       myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
 {
   myDoc->SetUndoLimit(UNDO_LIMIT);  
-  myTransactionsCounter = 0;
   myTransactionSave = 0;
-  myNestedNum = -1;
   myExecuteFeatures = true;
   // to have something in the document and avoid empty doc open/save problem
   // in transaction for nesting correct working
@@ -202,7 +200,7 @@ bool Model_Document::save(const char* theFileName, std::list<std::string>& theRe
         break;
     }
   }
-  myTransactionSave = myTransactionsCounter;
+  myTransactionSave = myTransactions.size();
   if (isDone) {  // save also sub-documents if any
     theResults.push_back(TCollection_AsciiString(aPath).ToCString());
     const std::set<std::string> aSubs = subDocuments(false);
@@ -278,16 +276,19 @@ void Model_Document::close(const bool theForever)
 void Model_Document::startOperation()
 {
   if (myDoc->HasOpenCommand()) {  // start of nested command
-    if (myNestedNum == -1) {
-      myNestedNum = 0;
-      myDoc->InitDeltaCompaction();
+    if (myDoc->CommitCommand()) { // commit the current: it will contain all nested after compactification
+      (*myTransactions.rbegin())++; // if has open command, the list is not empty
     }
-    myIsEmptyTr[myTransactionsCounter] = !myDoc->CommitCommand();
-    myTransactionsCounter++;
+    myNestedNum.push_back(0); // start of nested operation with zero transactions inside yet
     myDoc->OpenCommand();
   } else {  // start the simple command
     myDoc->NewCommand();
   }
+  // starts a new operation
+  myTransactions.push_back(0);
+  if (!myNestedNum.empty())
+    (*myNestedNum.rbegin())++;
+  myRedos.clear();
   // new command for all subs
   const std::set<std::string> aSubs = subDocuments(true);
   std::set<std::string>::iterator aSubIter = aSubs.begin();
@@ -295,35 +296,30 @@ void Model_Document::startOperation()
     subDoc(*aSubIter)->startOperation();
 }
 
-bool Model_Document::compactNested()
+void Model_Document::compactNested()
 {
-  bool allWasEmpty = true;
-  while (myNestedNum != -1) {
-    myTransactionsCounter--;
-    if (!myIsEmptyTr[myTransactionsCounter]) {
-      allWasEmpty = false;
+  if (!myNestedNum.empty()) {
+    int aNumToCompact = *(myNestedNum.rbegin());
+    int aSumOfTransaction = 0;
+    for(int a = 0; a < aNumToCompact; a++) {
+      aSumOfTransaction += *(myTransactions.rbegin());
+      myTransactions.pop_back();
     }
-    myIsEmptyTr.erase(myTransactionsCounter);
-    myNestedNum--;
+    // the latest transaction is the start of lower-level operation which startes the nested
+    *(myTransactions.rbegin()) += aSumOfTransaction;
+    myNestedNum.pop_back();
   }
-  myIsEmptyTr[myTransactionsCounter] = allWasEmpty;
-  myTransactionsCounter++;
-  if (allWasEmpty) {
-    // Issue 151: if everything is empty, it is a problem for OCCT to work with it, 
-    // just commit the empty that returns nothing
-    myDoc->CommitCommand();
-  } else {
-    myDoc->PerformDeltaCompaction();
-  }
-  return !allWasEmpty;
 }
 
 void Model_Document::finishOperation()
 {
+  bool isNestedClosed = !myDoc->HasOpenCommand() && !myNestedNum.empty();
+  static std::shared_ptr<Model_Session> aSession = 
+    std::static_pointer_cast<Model_Session>(Model_Session::get());
   // just to be sure that everybody knows that changes were performed
-  if (!myDoc->HasOpenCommand() && myNestedNum != -1)
-    std::static_pointer_cast<Model_Session>(Model_Session::get())
-        ->setCheckTransactions(false);  // for nested transaction commit
+  if (isNestedClosed) {
+    aSession->setCheckTransactions(false);  // for nested transaction commit
+  }
   synchronizeBackRefs();
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
@@ -344,9 +340,9 @@ void Model_Document::finishOperation()
   // to avoid "updated" message appearance by updater
   //aLoop->clear(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
-  if (!myDoc->HasOpenCommand() && myNestedNum != -1)
-    std::static_pointer_cast<Model_Session>(Model_Session::get())
-        ->setCheckTransactions(true);  // for nested transaction commit
+  if (isNestedClosed) {
+    aSession->setCheckTransactions(true);  // for nested transaction commit
+  }
 
   // finish for all subs first: to avoid nested finishing and "isOperation" calls problems inside
   const std::set<std::string> aSubs = subDocuments(true);
@@ -354,34 +350,32 @@ void Model_Document::finishOperation()
   for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->finishOperation();
 
-  if (myNestedNum != -1)  // this nested transaction is owervritten
-    myNestedNum++;
-  if (!myDoc->HasOpenCommand()) {
-    if (myNestedNum != -1) {
-      myNestedNum--;
-      compactNested();
-    }
-  } else {
-    // returns false if delta is empty and no transaction was made
-    myIsEmptyTr[myTransactionsCounter] = !myDoc->CommitCommand();  // && (myNestedNum == -1);
-    myTransactionsCounter++;
+  if (myDoc->CommitCommand()) { // if commit is successfull, just increment counters
+    (*myTransactions.rbegin())++;
+  }
+
+  if (isNestedClosed) {
+    compactNested();
   }
 }
 
 void Model_Document::abortOperation()
 {
-  if (myNestedNum > 0 && !myDoc->HasOpenCommand()) {  // abort all what was done in nested
-      // first compact all nested
-    if (compactNested()) {
-      myDoc->Undo(); // undo only compacted, if not: do not undo the empty transaction
-    }
+  if (!myNestedNum.empty() && !myDoc->HasOpenCommand()) {  // abort all what was done in nested
+    compactNested();
+    undo();
     myDoc->ClearRedos();
-    myTransactionsCounter--;
-    myIsEmptyTr.erase(myTransactionsCounter);
-  } else {
-    if (myNestedNum == 0)  // abort only high-level
-      myNestedNum = -1;
+    myRedos.clear();
+  } else { // abort the current
+    int aNumTransactions = *myTransactions.rbegin();
+    myTransactions.pop_back();
+    if (!myNestedNum.empty())
+      (*myNestedNum.rbegin())--;
+    // roll back the needed number of transactions
     myDoc->AbortCommand();
+    for(int a = 0; a < aNumTransactions; a++)
+      myDoc->Undo();
+    myDoc->ClearRedos();
   }
   synchronizeFeatures(true, false); // references were not changed since transaction start
   // abort for all subs
@@ -400,13 +394,13 @@ bool Model_Document::isOperation()
 bool Model_Document::isModified()
 {
   // is modified if at least one operation was commited and not undoed
-  return myTransactionsCounter != myTransactionSave || isOperation();
+  return myTransactions.size() != myTransactionSave || isOperation();
 }
 
 bool Model_Document::canUndo()
 {
-  if (myDoc->GetAvailableUndos() > 0 && myNestedNum != 0
-      && myTransactionsCounter != 0 /* for omitting the first useless transaction */)
+  if (myDoc->GetAvailableUndos() > 0 && (myNestedNum.empty() || *myNestedNum.rbegin() != 0) &&
+      !myTransactions.empty() /* for omitting the first useless transaction */)
     return true;
   // check other subs contains operation that can be undoed
   const std::set<std::string> aSubs = subDocuments(true);
@@ -419,11 +413,15 @@ bool Model_Document::canUndo()
 
 void Model_Document::undo()
 {
-  myTransactionsCounter--;
-  if (myNestedNum > 0)
-    myNestedNum--;
-  if (!myIsEmptyTr[myTransactionsCounter])
+  int aNumTransactions = *myTransactions.rbegin();
+  myTransactions.pop_back();
+  myRedos.push_back(aNumTransactions);
+  if (!myNestedNum.empty())
+    (*myNestedNum.rbegin())--;
+  // roll back the needed number of transactions
+  for(int a = 0; a < aNumTransactions; a++)
     myDoc->Undo();
+
   synchronizeFeatures(true, true);
   // undo for all subs
   const std::set<std::string> aSubs = subDocuments(true);
@@ -447,11 +445,14 @@ bool Model_Document::canRedo()
 
 void Model_Document::redo()
 {
-  if (myNestedNum != -1)
-    myNestedNum++;
-  if (!myIsEmptyTr[myTransactionsCounter])
+  if (!myNestedNum.empty())
+    (*myNestedNum.rbegin())++;
+  int aNumRedos = *myRedos.rbegin();
+  myRedos.pop_back();
+  myTransactions.push_back(aNumRedos);
+  for(int a = 0; a < aNumRedos; a++)
     myDoc->Redo();
-  myTransactionsCounter++;
+
   synchronizeFeatures(true, true);
   // redo for all subs
   const std::set<std::string> aSubs = subDocuments(true);
