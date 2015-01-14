@@ -243,6 +243,24 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
       aSubMenu->addActions(aMDI->actions());
     }
   }
+
+  aObjects.clear();
+  aObjects = aSelMgr->selection()->selectedPresentations();
+  if (aObjects.size() > 0) {
+    bool hasFeature = true;//false;
+    foreach(ObjectPtr aObject, aObjects)
+    {
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+      if (aRes) {
+        hasFeature = true;
+      }
+      //FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+      //if (aFeature)
+      //  hasFeature = true;
+    }
+    if (hasFeature)
+      theMenu->addAction(action("DELETE_CMD"));
+  }
 }
 
 void XGUI_ContextMenuMgr::connectObjectBrowser() const
