@@ -69,17 +69,16 @@ void Config_WidgetReader::resolveSourceNodes(xmlNodePtr theNode)
     if (isNode(aNode, NODE_SOURCE, NULL)) {
       Config_XMLReader aSourceReader = Config_XMLReader(getProperty(aNode, SOURCE_FILE));
       xmlNodePtr aSourceRoot = aSourceReader.findRoot();
-      if (!aSourceRoot) {
-        continue;
+      if (aSourceRoot) {
+        xmlNodePtr aSourceNode = xmlFirstElementChild(aSourceRoot);
+        xmlNodePtr aTargetNode = xmlDocCopyNodeList(aNode->doc, aSourceNode);
+        while (aTargetNode != NULL) {
+          xmlNodePtr aNextNode = xmlNextElementSibling(aTargetNode);
+          xmlAddPrevSibling(aNode, aTargetNode);
+          aTargetNode = aNextNode;
+        }
+        aSourceNodes.push_back(aNode);
       }
-      xmlNodePtr aSourceNode = xmlFirstElementChild(aSourceRoot);
-      xmlNodePtr aTargetNode = xmlDocCopyNodeList(aNode->doc, aSourceNode);
-      while (aTargetNode != NULL) {
-        xmlNodePtr aNextNode = xmlNextElementSibling(aTargetNode);
-        xmlAddPrevSibling(aNode, aTargetNode);
-        aTargetNode = aNextNode;
-      }
-      aSourceNodes.push_back(aNode);
     }
     aNode = xmlNextElementSibling(aNode);
   }
