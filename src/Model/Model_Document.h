@@ -78,10 +78,17 @@ class Model_Document : public ModelAPI_Document
   //! \param theID creates feature and puts it in the document
   MODEL_EXPORT virtual FeaturePtr addFeature(std::string theID);
 
+  //! Return a list of features, which refers to the feature
+  //! \param theFeature a feature
+  //! \param theRefs a list of reference features
+  //! \param isSendError a flag whether the error message should be send
+  MODEL_EXPORT virtual void refsToFeature(FeaturePtr theFeature,
+                                          std::set<FeaturePtr>& theRefs,
+                                          const bool isSendError = true);
+
   //! Removes the feature from the document (with result)
-  //! \param theFeature the feature to be removed
-  //! \param theCheck if it is false, do not check the references
-  MODEL_EXPORT virtual void removeFeature(FeaturePtr theFeature, const bool theCheck = true);
+  //! \param theFeature a removed feature
+  MODEL_EXPORT virtual void removeFeature(FeaturePtr theFeature);
 
   //! Returns the existing feature by the label
   //! \param theLabel base label of the feature

@@ -574,22 +574,30 @@ static int RemoveFromRefArray(TDF_Label theArrayLab, TDF_Label theReferenced, co
   return aResult;
 }
 
-void Model_Document::removeFeature(FeaturePtr theFeature, const bool theCheck)
+void Model_Document::refsToFeature(FeaturePtr theFeature,
+                                   std::set<std::shared_ptr<ModelAPI_Feature> >& theRefs,
+                                   const bool isSendError)
 {
-  if (theCheck) {
-    // check the feature: it must have no depended objects on it
-    std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
-    for(; aResIter != theFeature->results().cend(); aResIter++) {
-      std::shared_ptr<Model_Data> aData = 
-        std::dynamic_pointer_cast<Model_Data>((*aResIter)->data());
-      if (aData && !aData->refsToMe().empty()) {
-        Events_Error::send(
-          "Feature '" + theFeature->data()->name() + "' is used and can not be deleted");
-        return;
-      }
+  // check the feature: it must have no depended objects on it
+  std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
+  for(; aResIter != theFeature->results().cend(); aResIter++) {
+    ResultPtr aResult = (*aResIter);
+    std::shared_ptr<Model_Data> aData = 
+      std::dynamic_pointer_cast<Model_Data>(aResult->data());
+    if (aData && !aData->refsToMe().empty()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aResult);
+      if (aFeature.get() != NULL)
+        theRefs.insert(aFeature);
     }
   }
+  if (!theRefs.empty() && isSendError) {
+    Events_Error::send(
+      "Feature '" + theFeature->data()->name() + "' is used and can not be deleted");
+  }
+}
 
+void Model_Document::removeFeature(FeaturePtr theFeature/*, const bool theCheck*/)
+{
   std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theFeature->data());
   if (aData) {
     TDF_Label aFeatureLabel = aData->label().Father();

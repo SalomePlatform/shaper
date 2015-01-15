@@ -1259,31 +1259,62 @@ void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
 void XGUI_Workshop::deleteObjects(const QObjectPtrList& theList)
 {
   QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
-  QMessageBox::StandardButton aRes = QMessageBox::warning(
-      aDesktop, tr("Delete features"), tr("Seleted features will be deleted. Continue?"),
-      QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
-  // ToDo: definbe deleting method
-  if (aRes == QMessageBox::Yes) {
-    SessionPtr aMgr = ModelAPI_Session::get();
-    aMgr->startOperation();
-    foreach (ObjectPtr aObj, theList)
-    {
-      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
-      if (aPart) {
-        DocumentPtr aDoc = aPart->document();
-        if (aDoc == aMgr->activeDocument()) {
-          aDoc->close();
-        }
-        //aMgr->moduleDocument()->removeFeature(aPart->owner());
-      } else {
-        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-        if (aFeature)
-          aObj->document()->removeFeature(aFeature);
+
+  std::set<FeaturePtr> aRefFeatures;
+  foreach (ObjectPtr aObj, theList)
+  {
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+    if (aPart) {
+      // TODO: check for what there is this condition. It is placed here historicaly because
+      // ther is this condition during remove features.
+    } else {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+      if (aFeature) {
+        aObj->document()->refsToFeature(aFeature, aRefFeatures, false);
       }
     }
-    myDisplayer->updateViewer();
-    aMgr->finishOperation();
   }
+
+  if (!aRefFeatures.empty()) {
+    QStringList aRefNames;
+    std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
+                                         aLast = aRefFeatures.end();
+    for (; anIt != aLast; anIt++) {
+      FeaturePtr aFeature = (*anIt);
+      std::string aFName = aFeature->data()->name().c_str();
+      std::string aName = (*anIt)->name().c_str();
+      aRefNames.append((*anIt)->name().c_str());
+    }
+    QString aNames = aRefNames.join(", ");
+
+    QMessageBox::StandardButton aRes = QMessageBox::warning(
+        aDesktop, tr("Delete features"),
+        QString(tr("Selected features are used in the following features: %1.\
+These features will be deleted also. Would you like to continue?")).arg(aNames),
+        QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
+    if (aRes != QMessageBox::Yes)
+      return;
+  }
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  aMgr->startOperation();
+  foreach (ObjectPtr aObj, theList)
+  {
+    DocumentPtr aDoc = aObj->document();
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+    if (aPart) {
+      if (aDoc == aMgr->activeDocument()) {
+        aDoc->close();
+      }
+    } else {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+      if (aFeature) {
+        aDoc->removeFeature(aFeature);
+      }
+    }
+  }
+  myDisplayer->updateViewer();
+  aMgr->finishOperation();
 }
 
 //**************************************************************

@@ -266,8 +266,8 @@ void SketchPlugin_Sketch::erase()
   for (; anIt != aFeatures.end(); anIt++) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
     if (aFeature) {
-       // subs are referenced from sketch, but must be removed for sure, so not checkings
-      document()->removeFeature(aFeature, false);
+      // subs are referenced from sketch, but must be removed for sure, so not checkings
+      document()->removeFeature(aFeature);
     }
   }
   ModelAPI_CompositeFeature::erase();

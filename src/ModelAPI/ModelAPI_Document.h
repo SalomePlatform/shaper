@@ -12,6 +12,7 @@
 #include <memory>
 #include <vector>
 #include <list>
+#include <set>
 
 class ModelAPI_Feature;
 class ModelAPI_Object;
@@ -44,9 +45,17 @@ public:
   //! \param theID creates feature and puts it in the document (if it is not action)
   virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
 
+  //! Return a list of features, which refers to the feature
+  //! \param theFeature a feature
+  //! \param theRefs a list of features
+  //! \param isSendError a flag whether the error message should be send
+  virtual void refsToFeature(std::shared_ptr<ModelAPI_Feature> theFeature,
+                             std::set<std::shared_ptr<ModelAPI_Feature> >& theRefs,
+                             const bool isSendError = true) = 0;
+
   //! Removes the feature from the document
-  virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature,
-                             const bool theCheck = true) = 0;
+  //! \param theFeature a feature to be removed
+  virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature) = 0;
 
   ///! Adds a new sub-document by the identifier, or returns existing one if it is already exist
   virtual std::shared_ptr<ModelAPI_Document> subDocument(std::string theDocID) = 0;

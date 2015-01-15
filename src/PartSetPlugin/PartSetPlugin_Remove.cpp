@@ -11,6 +11,7 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Feature.h>
 
 void PartSetPlugin_Remove::execute()
 {
@@ -28,7 +29,10 @@ void PartSetPlugin_Remove::execute()
       if (aFeature) {
         // do remove
         aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->value()->close();
-        aRoot->removeFeature(aFeature);
+        std::set<std::shared_ptr<ModelAPI_Feature> > aRefFeatures;
+        aRoot->refsToFeature(aFeature, aRefFeatures);
+        if (aRefFeatures.empty())
+          aRoot->removeFeature(aFeature);
       }
     }
   }
