@@ -30,6 +30,7 @@
 #include <QtxResourceMgr.h>
 
 #include <Config_PropManager.h>
+#include <Config_ModuleReader.h>
 
 #include <QDockWidget>
 #include <QAction>
@@ -102,6 +103,7 @@ NewGeom_Module::~NewGeom_Module()
 void NewGeom_Module::initialize(CAM_Application* theApp)
 {
   LightApp_Module::initialize(theApp);
+  inspectSalomeModules();
 
   myWorkshop->startApplication();
   LightApp_Application* anApp = dynamic_cast<LightApp_Application*>(theApp);
@@ -451,4 +453,13 @@ void NewGeom_Module::preferencesChanged(const QString& theSection, const QString
   }
   aProp->setValue(aValue);
 
+}
+
+void NewGeom_Module::inspectSalomeModules()
+{
+  QStringList aModuleNames;
+  getApp()->modules(aModuleNames, false);
+  foreach(QString eachModule, aModuleNames) {
+    Config_ModuleReader::addDependencyModule(eachModule.toStdString());
+  }
 }

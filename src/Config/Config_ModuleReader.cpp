@@ -31,18 +31,12 @@
 #endif
 
 std::map<std::string, Config_ModuleReader::PluginType> Config_ModuleReader::myPluginTypes;
+std::set<std::string> Config_ModuleReader::myDependencyModules;
 
 Config_ModuleReader::Config_ModuleReader(const char* theEventGenerated)
     : Config_XMLReader(PLUGIN_FILE),
       myEventGenerated(theEventGenerated)
 {
-  myHaveSalome = false;
-  char* anEnv = getenv("SALOME_ROOT_DIR");
-  std::string value = normalize(anEnv);
-  if (!value.empty()) {
-    myHaveSalome = true;
-  }
-
 }
 
 Config_ModuleReader::~Config_ModuleReader()
@@ -70,8 +64,7 @@ std::string Config_ModuleReader::getModuleName()
 void Config_ModuleReader::processNode(xmlNodePtr theNode)
 {
   if (isNode(theNode, NODE_PLUGIN, NULL)) {
-    bool isAvailable = isAvaliableOnThisPlatform(getProperty(theNode, PLUGIN_PLATFORM));
-    if (!isAvailable)
+    if (!hasRequiredModules(theNode))
       return;
     std::string aPluginConf = getProperty(theNode, PLUGIN_CONFIG);
     std::string aPluginLibrary = getProperty(theNode, PLUGIN_LIBRARY);
@@ -89,6 +82,18 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
 bool Config_ModuleReader::processChildren(xmlNodePtr theNode)
 {
   return isNode(theNode, NODE_PLUGINS, NULL);
+}
+
+bool Config_ModuleReader::hasRequiredModules(xmlNodePtr theNode) const
+{
+  std::string aRequiredModule = normalize(getProperty(theNode, PLUGIN_DEPENDENCY));
+  if(aRequiredModule.empty())
+    return true;
+  std::set<std::string>::iterator it = myDependencyModules.begin();
+  for ( ; it != myDependencyModules.end(); it++ ) {
+    if (*it == aRequiredModule) return true;
+  }
+  return false;
 }
 
 std::list<std::string> Config_ModuleReader::importPlugin(const std::string& thePluginLibrary,
@@ -124,11 +129,11 @@ std::string Config_ModuleReader::addPlugin(const std::string& aPluginLibrary,
   if(!aPluginName.empty()) {
     myPluginTypes[aPluginName] = aType;
   }
-
+  addDependencyModule(aPluginName);
   return aPluginName;
 }
 
-void Config_ModuleReader::loadPlugin(const std::string thePluginName)
+void Config_ModuleReader::loadPlugin(const std::string& thePluginName)
 {
   PluginType aType = Config_ModuleReader::Binary;
   if(myPluginTypes.find(thePluginName) != myPluginTypes.end()) {
@@ -146,30 +151,7 @@ void Config_ModuleReader::loadPlugin(const std::string thePluginName)
   }
 }
 
-bool Config_ModuleReader::isAvaliableOnThisPlatform(const std::string& thePluginPlatform)
-{
-  bool result = true;
-  PluginPlatform aPlatform = All;
-  std::string aPlatformName = normalize(thePluginPlatform) ;
-  if (aPlatformName == PLUGIN_PLATFORM_SALOME) {
-    aPlatform = Salome;
-  } else if (aPlatformName == PLUGIN_PLATFORM_NEWGEOM) {
-    aPlatform = OpenParts;
-  } else if (!thePluginPlatform.empty()) {
-    Events_Error::send("Unknown platform: " + thePluginPlatform);
-  }
-  if (aPlatform == All) {
-    result = true;
-  } else if (myHaveSalome) {
-    result = aPlatform == Salome;
-  } else {
-    result = aPlatform == OpenParts;
-  }
-  return result;
-
-}
-
-void Config_ModuleReader::loadScript(const std::string theFileName)
+void Config_ModuleReader::loadScript(const std::string& theFileName)
 {
   /* aquire python thread */
   PyGILState_STATE gstate = PyGILState_Ensure();
@@ -199,7 +181,7 @@ void Config_ModuleReader::loadScript(const std::string theFileName)
   PyGILState_Release(gstate);
 }
 
-void Config_ModuleReader::loadLibrary(const std::string theLibName)
+void Config_ModuleReader::loadLibrary(const std::string& theLibName)
 {
   std::string aFileName = library(theLibName);
   if (aFileName.empty())
@@ -217,5 +199,10 @@ void Config_ModuleReader::loadLibrary(const std::string theLibName)
     #endif
     Events_Error::send(anErrorMsg);
   }
+}
+
+void Config_ModuleReader::addDependencyModule(const std::string& theModuleName)
+{
+  myDependencyModules.insert(normalize(theModuleName));
 }
 

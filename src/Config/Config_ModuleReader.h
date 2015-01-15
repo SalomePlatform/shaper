@@ -15,6 +15,7 @@
 
 #include <map>
 #include <list>
+#include <set>
 #include <string>
 
 class Config_ModuleReader : public Config_XMLReader
@@ -23,11 +24,6 @@ class Config_ModuleReader : public Config_XMLReader
     Binary = 0,
     Intrenal = 1,
     Python = 2
-  };
-  enum PluginPlatform {
-    All = 0,
-    OpenParts = 1,
-    Salome = 2
   };
 
  public:
@@ -38,17 +34,20 @@ class Config_ModuleReader : public Config_XMLReader
 
   CONFIG_EXPORT std::string getModuleName();
 
-  CONFIG_EXPORT static void loadPlugin(const std::string thePluginName);
+  CONFIG_EXPORT static void loadPlugin(const std::string& thePluginName);
   /// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
-  CONFIG_EXPORT static void loadLibrary(const std::string theLibName);
+  CONFIG_EXPORT static void loadLibrary(const std::string& theLibName);
   /// loads the python module with specified name
-  CONFIG_EXPORT static void loadScript(const std::string theFileName);
+  CONFIG_EXPORT static void loadScript(const std::string& theFileName);
+  // extends set of modules, which will be used for dependency 
+  // checking (if there is no required module in the set, a plugin will not be loaded)
+  CONFIG_EXPORT static void addDependencyModule(const std::string& theModuleName);
 
  protected:
   void processNode(xmlNodePtr aNode);
   bool processChildren(xmlNodePtr aNode);
 
-  bool isAvaliableOnThisPlatform(const std::string& thePluginPlatform);
+  bool hasRequiredModules(xmlNodePtr aNode) const;
   std::list<std::string> importPlugin(const std::string& thePluginLibrary,
                                       const std::string& thePluginFile);
   std::string addPlugin(const std::string& aPluginLibrary,
@@ -58,9 +57,8 @@ class Config_ModuleReader : public Config_XMLReader
  private:
   std::map<std::string, std::string> myFeaturesInFiles;
   static std::map<std::string, PluginType> myPluginTypes;
+  static std::set<std::string> myDependencyModules;
   const char* myEventGenerated;
-  bool myHaveSalome;
-
 };
 
 #endif /* CONFIG_XMLMODULEREADER_H_ */

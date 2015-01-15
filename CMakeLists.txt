@@ -60,11 +60,11 @@ ADD_SUBDIRECTORY (src/XGUI)
 ADD_SUBDIRECTORY (src/GeomApp)
 ADD_SUBDIRECTORY (src/ExchangePlugin)
 ADD_SUBDIRECTORY (src/GeomValidators)
-ADD_SUBDIRECTORY (src/ConnectorPlugin)
 
 
 IF(${HAVE_SALOME})
 	ADD_SUBDIRECTORY (src/NewGeom)
+    ADD_SUBDIRECTORY (src/ConnectorPlugin)
 ENDIF(${HAVE_SALOME})
 
 ENABLE_TESTING()
