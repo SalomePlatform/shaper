@@ -258,9 +258,15 @@ void Model_Document::close(const bool theForever)
     ModelAPI_EventCreator::get()->sendDeleted(aThis, ModelAPI_Feature::group());
     ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
     aFeature->eraseResults();
-    aFeature->erase();
+    if (theForever) { // issue #294: do not delete content of the document until it can be redone
+      aFeature->erase();
+    } else {
+      aFeature->data()->execState(ModelAPI_StateMustBeUpdated);
+    }
   }
-  myObjs.Clear();
+  if (theForever) {
+    myObjs.Clear();
+  }
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
@@ -461,7 +467,7 @@ void Model_Document::redo()
     subDoc(*aSubIter)->redo();
 }
 
-/// Appenad to the array of references a new referenced label
+/// Append to the array of references a new referenced label
 static void AddToRefArray(TDF_Label& theArrayLab, TDF_Label& theReferenced)
 {
   Handle(TDataStd_ReferenceArray) aRefs;
