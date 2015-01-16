@@ -70,7 +70,7 @@ double SketchPlugin_Point::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>&
 }
 
 bool SketchPlugin_Point::isFixed() {
-  return data()->selection(EXTERNAL_ID())->context();
+  return data()->selection(EXTERNAL_ID())->context().get();
 }
 
 void SketchPlugin_Point::attributeChanged(const std::string& theID) {

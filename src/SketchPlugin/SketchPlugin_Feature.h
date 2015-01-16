@@ -59,7 +59,7 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
   {
     AttributeSelectionPtr aAttr = data()->selection(EXTERNAL_ID());
     if (aAttr)
-      return aAttr->context();
+      return aAttr->context().get();
     return false;
   }
 
