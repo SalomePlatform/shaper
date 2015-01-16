@@ -188,7 +188,7 @@ double SketchPlugin_Arc::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& t
 }
 
 bool SketchPlugin_Arc::isFixed() {
-  return data()->selection(EXTERNAL_ID())->context();
+  return data()->selection(EXTERNAL_ID())->context().get();
 }
 
 bool SketchPlugin_Arc::isFeatureValid()

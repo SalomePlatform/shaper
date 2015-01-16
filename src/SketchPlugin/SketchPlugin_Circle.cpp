@@ -99,7 +99,7 @@ double SketchPlugin_Circle::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>
 }
 
 bool SketchPlugin_Circle::isFixed() {
-  return data()->selection(EXTERNAL_ID())->context();
+  return data()->selection(EXTERNAL_ID())->context().get();
 }
 
 void SketchPlugin_Circle::attributeChanged(const std::string& theID) {

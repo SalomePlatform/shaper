@@ -98,7 +98,7 @@ double SketchPlugin_Line::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& 
 }
 
 bool SketchPlugin_Line::isFixed() {
-  return data()->selection(EXTERNAL_ID())->context();
+  return data()->selection(EXTERNAL_ID())->context().get();
 }
 
 void SketchPlugin_Line::attributeChanged(const std::string& theID) {
