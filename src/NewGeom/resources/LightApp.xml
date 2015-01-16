@@ -24,6 +24,11 @@
     <parameter name="name" value="NewGeom"/>
     <parameter name="icon" value="newgeom.png"/>
     <parameter name="version" value="0.7.0"/>
+    <parameter name="documentation" value="newgeom_help"/>
+  </section>
+  <section name="newgeom_help" >
+    <parameter name="sub_menu"          value="%1 module"/>
+    <parameter name="Developer's Guide" value="%${NEWGEOM_ROOT_DIR}/doc/tui/index.html"/>
   </section>
   <section name="resources">
     <!-- Module resources -->

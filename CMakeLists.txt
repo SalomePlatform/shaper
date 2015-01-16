@@ -29,8 +29,8 @@ IF(UNIX)
       SET(CMAKE_SHARED_LINKER_FLAGS "-lgcov")
       
       SETUP_TARGET_FOR_COVERAGE(test_coverage  # Name for custom target.
-				                ctest          # Name of the test driver executable that runs the tests.
-				                coverage)      # Name of output directory.
+                                ctest          # Name of the test driver executable that runs the tests.
+                                coverage)      # Name of output directory.
     ENDIF(USE_TEST_COVERAGE)
     
     #SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -E")
@@ -39,7 +39,9 @@ IF(UNIX)
   ENDIF(CMAKE_COMPILER_IS_GNUCC)
 ENDIF(UNIX)
 
-
+IF(CMAKE_BUILD_TYPE MATCHES RELEASE)
+  ADD_SUBDIRECTORY (doc)
+ENDIF(CMAKE_BUILD_TYPE MATCHES RELEASE)
 ADD_SUBDIRECTORY (src/Config)
 ADD_SUBDIRECTORY (src/Events)
 ADD_SUBDIRECTORY (src/Model)
@@ -61,9 +63,8 @@ ADD_SUBDIRECTORY (src/GeomApp)
 ADD_SUBDIRECTORY (src/ExchangePlugin)
 ADD_SUBDIRECTORY (src/GeomValidators)
 
-
 IF(${HAVE_SALOME})
-	ADD_SUBDIRECTORY (src/NewGeom)
+    ADD_SUBDIRECTORY (src/NewGeom)
     ADD_SUBDIRECTORY (src/ConnectorPlugin)
 ENDIF(${HAVE_SALOME})
 
