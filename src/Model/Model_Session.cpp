@@ -18,6 +18,7 @@
 #include <Config_AttributeMessage.h>
 #include <Config_ValidatorMessage.h>
 #include <Config_ModuleReader.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <TDF_CopyTool.hxx>
 #include <TDF_DataSet.hxx>
@@ -233,7 +234,8 @@ Model_Session::Model_Session()
   ModelAPI_Session::setSession(std::shared_ptr<ModelAPI_Session>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
-  static const Events_ID kFeatureEvent = Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
+  static const Events_ID kFeatureEvent = 
+    Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
   aLoop->registerListener(this, kFeatureEvent);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED), 0, true);
@@ -243,7 +245,8 @@ Model_Session::Model_Session()
 
 void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
-  static const Events_ID kFeatureEvent = Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
+  static const Events_ID kFeatureEvent = 
+    Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
   static const Events_ID kValidatorEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
   if (theMessage->eventID() == kFeatureEvent) {
     const std::shared_ptr<Config_FeatureMessage> aMsg = 
@@ -283,6 +286,17 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
   } else {  // create/update/delete
     if (myCheckTransactions && !isOperation())
       Events_Error::send("Modification of data structure outside of the transaction");
+    // if part is deleted, make the root as the current document (on undo of Parts creations)
+    static const Events_ID kDeletedEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+    if (theMessage->eventID() == kDeletedEvent) {
+      std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleted =
+        std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
+      if (aDeleted && 
+          aDeleted->groups().find(ModelAPI_ResultPart::group()) != aDeleted->groups().end()) 
+      {
+        setActiveDocument(moduleDocument());
+      }
+    }
   }
 }
 
