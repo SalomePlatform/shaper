@@ -217,12 +217,14 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
       Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(aAISIO);
       if (!aShapePrs.IsNull()) {
         std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
-        const TopoDS_Shape& aShape = aShapePrs->Shape();
-        std::shared_ptr<GeomAPI_Shape> anAISShapePtr(new GeomAPI_Shape());
-        anAISShapePtr->setImpl(new TopoDS_Shape(aShape));
+        if (aShapePtr.get()) {
+          const TopoDS_Shape& aShape = aShapePrs->Shape();
+          std::shared_ptr<GeomAPI_Shape> anAISShapePtr(new GeomAPI_Shape());
+          anAISShapePtr->setImpl(new TopoDS_Shape(aShape));
 
-        if (aShapePtr->isEqual(anAISShapePtr))
-          return;
+          if (aShapePtr->isEqual(anAISShapePtr))
+            return;
+        }
       }
     }
     aContext->Redisplay(aAISIO, false);
