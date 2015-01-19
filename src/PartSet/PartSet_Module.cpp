@@ -213,7 +213,7 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 
 void PartSet_Module::addViewerItems(QMenu* theMenu) const
 {
-  if (isSketchOperationActive()) {
+  if (isSketchOperationActive() || isSketchFeatureOperationActive()) {
     ModuleBase_ISelection* aSelection = myWorkshop->selection();
     QObjectPtrList aObjects = aSelection->selectedPresentations();
     if (aObjects.size() > 0) {
@@ -331,7 +331,7 @@ void PartSet_Module::onEnterReleased()
 void PartSet_Module::onOperationActivatedByPreselection()
 {
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if(aOperation && isSketchOperationActive()) {
+  if(aOperation && isSketchFeatureOperationActive()) {
     // Set final definitions if they are necessary
     //propertyPanelDefined(aOperation);
 
@@ -342,7 +342,7 @@ void PartSet_Module::onOperationActivatedByPreselection()
 
 void PartSet_Module::onNoMoreWidgets()
 {
-  if (isSketchOperationActive()) {
+  if (isSketchFeatureOperationActive()) {
     ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
     if (aOperation) {
       if (myRestartingMode != RM_Forbided)
@@ -419,6 +419,14 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
 
 bool PartSet_Module::isSketchOperationActive() const
 {
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+
+  bool isSketchOp = aOperation && aOperation->id().toStdString() == SketchPlugin_Sketch::ID();
+  return isSketchOp;
+}
+
+bool PartSet_Module::isSketchFeatureOperationActive() const
+{
   bool isCurrentSketchOp = false;
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
   if (aOperation) {
@@ -464,7 +472,7 @@ void PartSet_Module::onAction(bool isChecked)
 
 void PartSet_Module::deleteObjects()
 {
-  if (!isSketchOperationActive())
+  if (isSketchOperationActive() || isSketchFeatureOperationActive())
     return;
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
