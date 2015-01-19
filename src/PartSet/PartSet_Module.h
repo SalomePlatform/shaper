@@ -17,6 +17,7 @@
 #include <TopoDS_Shape.hxx>
 
 #include <QMap>
+#include <QMenu>
 #include <QObject>
 
 #include <string>
@@ -25,6 +26,8 @@
 
 class ModuleBase_Operation;
 class ModuleBase_IViewWindow;
+
+class QAction;
 
 /**
 * \ingroup Modules
@@ -82,11 +85,18 @@ public:
   /// if it is a sketch operation
   /// \param theObject a model object
   virtual bool canDisplayObject(const ObjectPtr& theObject) const;
+  /// Add menu atems for viewer into the given menu
+  /// \param theMenu a popup menu to be shown in the viewer
+  virtual void addViewerItems(QMenu* theMenu) const;
 
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation
   void onNoMoreWidgets();
+
+  /// Processes the context menu action click
+  /// \param isChecked a state of toggle if the action is checkable
+  void onAction(bool isChecked);
 
 protected slots:
   /// Called when previous operation is finished
@@ -121,6 +131,26 @@ protected slots:
   /// Breaks sequense of automatically resterted operations
   void breakOperationSequence();
 
+  /// Check whether there is active opeation and it is the sketch one
+  /// \return boolean result
+  bool isSketchOperationActive() const;
+
+  /// Create all actions for context menus. It is called on creation of module
+  /// Put the created actions into an internal map
+  void createActions();
+
+  /// Returns action according to the given ID
+  /// \param theId an action identifier, it should be uniqued in the bounds of the module
+  QAction* action(const QString& theId) const;
+
+  /// Add action to the internal map
+  /// \param theId - string ID of the item
+  /// \param theAction - action to add
+  void addAction(const QString& theId, QAction* theAction);
+
+  //! Delete features
+  void deleteObjects();
+
  private:
    QString myLastOperationId;
    FeaturePtr myLastFeature;
@@ -132,6 +162,8 @@ protected slots:
   Handle(PartSet_GlobalFilter) myDocumentShapeFilter;
 
   PartSet_SketcherMgr* mySketchMgr;
+
+  QMap<QString, QAction*> myActions; // the popup menu actions
 };
 
 #endif

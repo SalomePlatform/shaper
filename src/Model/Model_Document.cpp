@@ -579,17 +579,35 @@ void Model_Document::refsToFeature(FeaturePtr theFeature,
                                    const bool isSendError)
 {
   // check the feature: it must have no depended objects on it
+  // the dependencies can be in the feature results
   std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
   for(; aResIter != theFeature->results().cend(); aResIter++) {
     ResultPtr aResult = (*aResIter);
     std::shared_ptr<Model_Data> aData = 
       std::dynamic_pointer_cast<Model_Data>(aResult->data());
-    if (aData && !aData->refsToMe().empty()) {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(aResult);
-      if (aFeature.get() != NULL)
-        theRefs.insert(aFeature);
+    if (aData.get() != NULL) {
+      const std::set<AttributePtr>& aRefs = aData->refsToMe();
+      std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin(), aRefLast = aRefs.end();
+      for(; aRefIt != aRefLast; aRefIt++) {
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIt)->owner());
+        if (aFeature.get() != NULL)
+          theRefs.insert(aFeature);
+      }
+
+      if (!aRefs.empty()) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aResult);
+        if (aFeature.get() != NULL)
+          theRefs.insert(aFeature);
+      }
     }
   }
+  // the dependencies can be in the feature itself
+  std::shared_ptr<Model_Data> aData = 
+      std::dynamic_pointer_cast<Model_Data>(theFeature->data());
+  if (aData && !aData->refsToMe().empty()) {
+    theRefs.insert(theFeature);
+  }
+
   if (!theRefs.empty() && isSendError) {
     Events_Error::send(
       "Feature '" + theFeature->data()->name() + "' is used and can not be deleted");

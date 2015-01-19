@@ -444,6 +444,11 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
   }
 }
 
+//******************************************************
+QMainWindow* XGUI_Workshop::desktop() const
+{
+  return isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
+}
 
 //******************************************************
 void XGUI_Workshop::onStartWaiting()
@@ -1269,7 +1274,7 @@ void XGUI_Workshop::deleteObjects(const QObjectPtrList& theList)
       // ther is this condition during remove features.
     } else {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-      if (aFeature) {
+      if (aFeature.get() != NULL) {
         aObj->document()->refsToFeature(aFeature, aRefFeatures, false);
       }
     }
@@ -1298,6 +1303,15 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
 
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->startOperation();
+  std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
+                                       aLast = aRefFeatures.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aRefFeature = (*anIt);
+    DocumentPtr aDoc = aRefFeature->document();
+    aDoc->removeFeature(aRefFeature);
+   }
+
+
   foreach (ObjectPtr aObj, theList)
   {
     DocumentPtr aDoc = aObj->document();
@@ -1313,6 +1327,7 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
       }
     }
   }
+
   myDisplayer->updateViewer();
   aMgr->finishOperation();
 }

@@ -63,6 +63,8 @@
 #include <QString>
 #include <QTimer>
 #include <QApplication>
+#include <QMessageBox>
+#include <QMainWindow>
 
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomDataAPI_Dir.h>
@@ -95,6 +97,8 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   ModuleBase_IViewer* aViewer = theWshop->viewer();
   connect(aViewer, SIGNAL(keyRelease(ModuleBase_IViewWindow*, QKeyEvent*)),
           this, SLOT(onKeyRelease(ModuleBase_IViewWindow*, QKeyEvent*)));
+
+  createActions();
 }
 
 PartSet_Module::~PartSet_Module()
@@ -206,6 +210,25 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
     aCanDisplay = ModuleBase_IModule::canDisplayObject(theObject);
   }
   return aCanDisplay;
+
+void PartSet_Module::addViewerItems(QMenu* theMenu) const
+{
+  if (isSketchOperationActive()) {
+    ModuleBase_ISelection* aSelection = myWorkshop->selection();
+    QObjectPtrList aObjects = aSelection->selectedPresentations();
+    if (aObjects.size() > 0) {
+      bool hasFeature = false;
+      foreach(ObjectPtr aObject, aObjects)
+      {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
+        if (aFeature.get() != NULL) {
+          hasFeature = true;
+        }
+      }
+      if (hasFeature)
+        theMenu->addAction(action("DELETE_PARTSET_CMD"));
+    }
+  }
 }
 
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
@@ -308,30 +331,20 @@ void PartSet_Module::onEnterReleased()
 void PartSet_Module::onOperationActivatedByPreselection()
 {
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if (!aOperation)
-    return;
+  if(aOperation && isSketchOperationActive()) {
+    // Set final definitions if they are necessary
+    //propertyPanelDefined(aOperation);
 
-  // Set final definitions if they are necessary
-  //propertyPanelDefined(aOperation);
-
-  /// Commit sketcher operations automatically
-  FeaturePtr aFeature = aOperation->feature();
-  std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
-            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-  if (aSPFeature) {
+    /// Commit sketcher operations automatically
     aOperation->commit();
   }
 }
 
 void PartSet_Module::onNoMoreWidgets()
 {
-  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if (aOperation) {
-    /// Restart sketcher operations automatically
-    FeaturePtr aFeature = aOperation->feature();
-    std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
-              std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    if (aSPFeature) {
+  if (isSketchOperationActive()) {
+    ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+    if (aOperation) {
       if (myRestartingMode != RM_Forbided)
         myRestartingMode = RM_LastFeatureUsed;
       aOperation->commit();
@@ -404,3 +417,136 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
     return 0;
 }
 
+bool PartSet_Module::isSketchOperationActive() const
+{
+  bool isCurrentSketchOp = false;
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  if (aOperation) {
+    FeaturePtr aFeature = aOperation->feature();
+    std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+              std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+    isCurrentSketchOp = aSPFeature.get() != NULL;
+  }
+  return isCurrentSketchOp;
+}
+
+void PartSet_Module::createActions()
+{
+  QAction* aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
+  addAction("DELETE_PARTSET_CMD", aAction);
+}
+
+QAction* PartSet_Module::action(const QString& theId) const
+{
+  if (myActions.contains(theId))
+    return myActions[theId];
+  return 0;
+}
+
+void PartSet_Module::addAction(const QString& theId, QAction* theAction)
+{
+  if (myActions.contains(theId))
+    qCritical("A command with Id = '%s' already defined!", qPrintable(theId));
+  theAction->setData(theId);
+  connect(theAction, SIGNAL(triggered(bool)), this, SLOT(onAction(bool)));
+  myActions[theId] = theAction;
+}
+
+void PartSet_Module::onAction(bool isChecked)
+{
+  QAction* aAction = static_cast<QAction*>(sender());
+  QString anId = aAction->data().toString();
+
+  if (anId == "DELETE_PARTSET_CMD") {
+    deleteObjects();
+  }
+}
+
+void PartSet_Module::deleteObjects()
+{
+  if (!isSketchOperationActive())
+    return;
+
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+
+  XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
+  if(anOpMgr->canAbortOperation()) {
+    ModuleBase_Operation* aCurrentOp = anOpMgr->currentOperation();
+    if (aCurrentOp) {
+      bool isSketchOp = aCurrentOp->id().toStdString() == SketchPlugin_Sketch::ID();
+      if (!isSketchOp)
+        aCurrentOp->abort();
+    }
+  }
+
+  ModuleBase_ISelection* aSel = aConnector->selection();
+  QObjectPtrList aSelectedObj = aSel->selectedPresentations();
+
+  std::set<FeaturePtr> aRefFeatures;
+  foreach (ObjectPtr aObj, aSelectedObj)
+  {
+    //ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+    //if (aPart) {
+      // TODO: check for what there is this condition. It is placed here historicaly because
+      // ther is this condition during remove features.
+    //} else {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+    if (aFeature.get() != NULL) {
+      aObj->document()->refsToFeature(aFeature, aRefFeatures, false);
+    }
+    //}
+  }
+
+  if (!aRefFeatures.empty()) {
+    QStringList aRefNames;
+    std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
+                                         aLast = aRefFeatures.end();
+    for (; anIt != aLast; anIt++) {
+      FeaturePtr aFeature = (*anIt);
+      std::string aFName = aFeature->data()->name().c_str();
+      std::string aName = (*anIt)->name().c_str();
+      aRefNames.append((*anIt)->name().c_str());
+    }
+    QString aNames = aRefNames.join(", ");
+
+    QMainWindow* aDesktop = aWorkshop->desktop();
+    QMessageBox::StandardButton aRes = QMessageBox::warning(
+        aDesktop, tr("Delete features"),
+        QString(tr("Selected features are used in the following features: %1.\
+These features will be deleted also. Would you like to continue?")).arg(aNames),
+        QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
+    if (aRes != QMessageBox::Yes)
+      return;
+  }
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  aMgr->startOperation();
+  std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
+                                       aLast = aRefFeatures.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aRefFeature = (*anIt);
+    DocumentPtr aDoc = aRefFeature->document();
+    aDoc->removeFeature(aRefFeature);
+   }
+
+  foreach (ObjectPtr aObj, aSelectedObj)
+  {
+    DocumentPtr aDoc = aObj->document();
+    //ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObj);
+    //if (aPart) {
+    //  if (aDoc == aMgr->activeDocument()) {
+    //    aDoc->close();
+    //  }
+    //} else {
+      //FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+    if (aFeature.get() != NULL) {
+      aDoc->removeFeature(aFeature);
+    }
+    //}
+  }
+  aWorkshop->displayer()->updateViewer();
+  //myDisplayer->updateViewer();
+  aMgr->finishOperation();
+}

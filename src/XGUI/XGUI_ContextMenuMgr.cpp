@@ -19,6 +19,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultGroup.h>
 
+#include <ModuleBase_IModule.h>
+
 #include <QAction>
 #include <QContextMenuEvent>
 #include <QMenu>
@@ -181,6 +183,11 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
   }
   aMenu->addSeparator();
   aMenu->addActions(myWorkshop->objectBrowser()->actions());
+
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  if (aModule)
+    aModule->addObjectBrowserItems(aMenu);
+
   if (aMenu->actions().size() > 0) {
     return aMenu;
   }
@@ -244,23 +251,9 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
     }
   }
 
-  aObjects.clear();
-  aObjects = aSelMgr->selection()->selectedPresentations();
-  if (aObjects.size() > 0) {
-    bool hasFeature = true;//false;
-    foreach(ObjectPtr aObject, aObjects)
-    {
-      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
-      if (aRes) {
-        hasFeature = true;
-      }
-      //FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
-      //if (aFeature)
-      //  hasFeature = true;
-    }
-    if (hasFeature)
-      theMenu->addAction(action("DELETE_CMD"));
-  }
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  if (aModule)
+    aModule->addViewerItems(theMenu);
 }
 
 void XGUI_ContextMenuMgr::connectObjectBrowser() const

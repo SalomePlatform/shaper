@@ -41,6 +41,7 @@ class Config_PointerMessage;
 
 class QWidget;
 class QDockWidget;
+class QMainWindow;
 
 class ModelAPI_ObjectUpdatedMessage;
 class ModelAPI_ObjectDeletedMessage;
@@ -148,6 +149,10 @@ Q_OBJECT
   {
     return myModuleConnector;
   }
+
+  /// Returns a desktop
+  /// \return a desktop instance
+  QMainWindow* desktop() const;
 
   //! Returns icon name according to feature
   static QIcon featureIcon(const FeaturePtr& theFeature);
@@ -333,9 +338,9 @@ signals:
   /// \param theOpertion an aborted operation
   void onOperationAborted(ModuleBase_Operation* theOperation);
 
-  /// Process context menu command
-  /// \param theId id of the command
-  /// \param isChecked is checked flag
+  /// Slot, which reacts to the context popup menu call
+  /// \param theId the data value of the clicked action
+  /// \param isChecked a state of toggle if the action is checkable
   void onContextMenuCommand(const QString& theId, bool isChecked);
 
   /// Processing of values changed in model widget

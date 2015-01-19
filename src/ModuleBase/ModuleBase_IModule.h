@@ -17,6 +17,7 @@
 class QAction;
 class QMouseEvent;
 class QKeyEvent;
+class QMenu;
 class Config_WidgetAPI;
 class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
@@ -67,6 +68,17 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Realizes some functionality by an operation abort
   virtual void operationAborted(ModuleBase_Operation* theOperation) {}
+
+  /// Add menu atems for viewer into the given menu
+  /// \param theMenu a popup menu to be shown in the viewer
+  virtual void addViewerItems(QMenu* theMenu) const {}
+
+  /// Add menu atems for object browser into the given menu
+  /// \param theMenu a popup menu to be shown in the object browser
+  virtual void addObjectBrowserItems(QMenu* theMenu) const {};
+
+  /// Called when it is necessary to update a command state (enable or disable it)
+  //virtual bool isFeatureEnabled(const QString& theCmdId) const = 0;
 
   /// Creates custom widgets for property panel
   /// \param theType a type of widget

@@ -46,7 +46,7 @@ Q_OBJECT
   void connectViewer() const;
 
   /// Add menu atems for viewer into the given menu (used in SALOME mode)
-  /// \param theMenu a menu instance
+  /// \param a popup menu to be shown in the viewer
   void addViewerItems(QMenu* theMenu) const;
 
 signals:
