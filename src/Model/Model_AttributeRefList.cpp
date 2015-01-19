@@ -22,9 +22,25 @@ void Model_AttributeRefList::append(ObjectPtr theObject)
 
 void Model_AttributeRefList::remove(ObjectPtr theObject)
 {
-  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObject->data());
-  myRef->Remove(aData->label().Father());
-
+  std::shared_ptr<Model_Data> aData;
+  if (theObject.get() != NULL) {
+    aData = std::dynamic_pointer_cast<Model_Data>(theObject->data());
+    myRef->Remove(aData->label().Father());
+  }
+  else { // in case of empty object remove, the first empty object is removed from the list
+    std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
+        owner()->document());
+    if (aDoc) {
+      const TDF_LabelList& aList = myRef->List();
+      for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
+        ObjectPtr anObj = aDoc->object(aLIter.Value());
+        if (anObj.get() == NULL) {
+          myRef->Remove(aLIter.Value());
+          break;
+        }
+      }
+    }
+  }
   owner()->data()->sendAttributeUpdated(this);
 }
 

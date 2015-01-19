@@ -13,6 +13,15 @@ SketchPlugin_Feature::SketchPlugin_Feature()
   mySketch = 0;
 }
 
+void SketchPlugin_Feature::erase()
+{
+  SketchPlugin_Sketch* aSketch = sketch();
+  if (aSketch)
+    aSketch->removeFeature(this);
+
+  ModelAPI_Feature::erase();
+}
+
 SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
 {
   if (!mySketch) {

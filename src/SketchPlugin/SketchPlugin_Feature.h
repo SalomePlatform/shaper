@@ -75,6 +75,9 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
     //  thePrs->setPointMarker(6, 2.);
   }
 
+  /// removes also all sub-sketch elements
+  SKETCHPLUGIN_EXPORT virtual void erase();
+
   /// Returns the sketch of this feature
   SketchPlugin_Sketch* sketch();
 protected:

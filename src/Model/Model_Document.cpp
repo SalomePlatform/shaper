@@ -605,7 +605,13 @@ void Model_Document::refsToFeature(FeaturePtr theFeature,
   std::shared_ptr<Model_Data> aData = 
       std::dynamic_pointer_cast<Model_Data>(theFeature->data());
   if (aData && !aData->refsToMe().empty()) {
-    theRefs.insert(theFeature);
+    const std::set<AttributePtr>& aRefs = aData->refsToMe();
+    std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin(), aRefLast = aRefs.end();
+    for(; aRefIt != aRefLast; aRefIt++) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIt)->owner());
+      if (aFeature.get() != NULL)
+        theRefs.insert(aFeature);
+    }
   }
 
   if (!theRefs.empty() && isSendError) {

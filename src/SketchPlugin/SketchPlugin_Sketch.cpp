@@ -133,6 +133,24 @@ std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::addFeature(std::string th
   return aNew;
 }
 
+void SketchPlugin_Sketch::removeFeature(ModelAPI_Feature* theFeature)
+{
+  list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
+  list<ObjectPtr>::iterator aSubIt = aSubs.begin(), aLastIt = aSubs.end();
+  bool isRemoved = false;
+  for(; aSubIt != aLastIt && !isRemoved; aSubIt++) {
+    std::shared_ptr<ModelAPI_Feature> aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*aSubIt);
+    if (aFeature.get() != NULL || aFeature.get() == theFeature) {
+      data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->remove(aFeature);
+      isRemoved = true;
+    }
+  }
+  // if the object is not found in the sketch sub-elements, that means that the object is removed already.
+  // Find the first empty element and remove it
+  if (!isRemoved)
+    data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->remove(NULL);
+}
+
 int SketchPlugin_Sketch::numberOfSubs() const
 {
   return data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->size();

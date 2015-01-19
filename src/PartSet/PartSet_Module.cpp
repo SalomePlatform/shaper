@@ -479,6 +479,9 @@ void PartSet_Module::deleteObjects()
         aCurrentOp->abort();
     }
   }
+  // sketch feature should be skipped, only sub-features can be removed
+  // when sketch operation is active
+  CompositeFeaturePtr aSketch = mySketchMgr->activeSketch();
 
   ModuleBase_ISelection* aSel = aConnector->selection();
   QObjectPtrList aSelectedObj = aSel->selectedPresentations();
@@ -504,20 +507,22 @@ void PartSet_Module::deleteObjects()
                                          aLast = aRefFeatures.end();
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = (*anIt);
-      std::string aFName = aFeature->data()->name().c_str();
-      std::string aName = (*anIt)->name().c_str();
+      if (aFeature == aSketch)
+        continue;
       aRefNames.append((*anIt)->name().c_str());
     }
-    QString aNames = aRefNames.join(", ");
+    if (!aRefNames.empty()) {
+      QString aNames = aRefNames.join(", ");
 
-    QMainWindow* aDesktop = aWorkshop->desktop();
-    QMessageBox::StandardButton aRes = QMessageBox::warning(
-        aDesktop, tr("Delete features"),
-        QString(tr("Selected features are used in the following features: %1.\
-These features will be deleted also. Would you like to continue?")).arg(aNames),
-        QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
-    if (aRes != QMessageBox::Yes)
-      return;
+      QMainWindow* aDesktop = aWorkshop->desktop();
+      QMessageBox::StandardButton aRes = QMessageBox::warning(
+          aDesktop, tr("Delete features"),
+          QString(tr("Selected features are used in the following features: %1.\
+  These features will be deleted also. Would you like to continue?")).arg(aNames),
+          QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
+      if (aRes != QMessageBox::Yes)
+        return;
+    }
   }
 
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -526,9 +531,10 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
                                        aLast = aRefFeatures.end();
   for (; anIt != aLast; anIt++) {
     FeaturePtr aRefFeature = (*anIt);
-    DocumentPtr aDoc = aRefFeature->document();
-    aDoc->removeFeature(aRefFeature);
-   }
+    if (aRefFeature == aSketch)
+      continue;
+    aRefFeature->document()->removeFeature(aRefFeature);
+  }
 
   foreach (ObjectPtr aObj, aSelectedObj)
   {
