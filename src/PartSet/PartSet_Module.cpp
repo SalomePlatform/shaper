@@ -213,21 +213,21 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 
 void PartSet_Module::addViewerItems(QMenu* theMenu) const
 {
-  if (isSketchOperationActive() || isSketchFeatureOperationActive()) {
-    ModuleBase_ISelection* aSelection = myWorkshop->selection();
-    QObjectPtrList aObjects = aSelection->selectedPresentations();
-    if (aObjects.size() > 0) {
-      bool hasFeature = false;
-      foreach(ObjectPtr aObject, aObjects)
-      {
-        FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-        if (aFeature.get() != NULL) {
-          hasFeature = true;
-        }
+  if (!isSketchOperationActive() && !isSketchFeatureOperationActive())
+    return;
+  ModuleBase_ISelection* aSelection = myWorkshop->selection();
+  QObjectPtrList aObjects = aSelection->selectedPresentations();
+  if (aObjects.size() > 0) {
+    bool hasFeature = false;
+    foreach(ObjectPtr aObject, aObjects)
+    {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
+      if (aFeature.get() != NULL) {
+        hasFeature = true;
       }
-      if (hasFeature)
-        theMenu->addAction(action("DELETE_PARTSET_CMD"));
     }
+    if (hasFeature)
+      theMenu->addAction(action("DELETE_PARTSET_CMD"));
   }
 }
 
@@ -472,19 +472,18 @@ void PartSet_Module::onAction(bool isChecked)
 
 void PartSet_Module::deleteObjects()
 {
-  if (isSketchOperationActive() || isSketchFeatureOperationActive())
+  bool isSketchOp = isSketchOperationActive();
+  if (!isSketchOp && !isSketchFeatureOperationActive())
     return;
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   XGUI_Workshop* aWorkshop = aConnector->workshop();
 
   XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
-  if(anOpMgr->canAbortOperation()) {
+  if (!isSketchOp && anOpMgr->canAbortOperation()) {
     ModuleBase_Operation* aCurrentOp = anOpMgr->currentOperation();
     if (aCurrentOp) {
-      bool isSketchOp = aCurrentOp->id().toStdString() == SketchPlugin_Sketch::ID();
-      if (!isSketchOp)
-        aCurrentOp->abort();
+      aCurrentOp->abort();
     }
   }
   // sketch feature should be skipped, only sub-features can be removed

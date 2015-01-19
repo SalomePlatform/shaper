@@ -593,12 +593,6 @@ void Model_Document::refsToFeature(FeaturePtr theFeature,
         if (aFeature.get() != NULL)
           theRefs.insert(aFeature);
       }
-
-      if (!aRefs.empty()) {
-        FeaturePtr aFeature = ModelAPI_Feature::feature(aResult);
-        if (aFeature.get() != NULL)
-          theRefs.insert(aFeature);
-      }
     }
   }
   // the dependencies can be in the feature itself
