@@ -138,16 +138,19 @@ void SketchPlugin_Sketch::removeFeature(ModelAPI_Feature* theFeature)
   list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
   list<ObjectPtr>::iterator aSubIt = aSubs.begin(), aLastIt = aSubs.end();
   bool isRemoved = false;
+  bool aHasEmtpyFeature = false;
   for(; aSubIt != aLastIt && !isRemoved; aSubIt++) {
     std::shared_ptr<ModelAPI_Feature> aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*aSubIt);
-    if (aFeature.get() != NULL || aFeature.get() == theFeature) {
+    if (aFeature.get() != NULL && aFeature.get() == theFeature) {
       data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->remove(aFeature);
       isRemoved = true;
     }
+    else if (aFeature.get() == NULL)
+      aHasEmtpyFeature = true;
   }
   // if the object is not found in the sketch sub-elements, that means that the object is removed already.
   // Find the first empty element and remove it
-  if (!isRemoved)
+  if (!isRemoved && aHasEmtpyFeature)
     data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->remove(NULL);
 }
 
