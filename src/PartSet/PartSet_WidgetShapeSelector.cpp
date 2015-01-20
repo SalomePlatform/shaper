@@ -40,11 +40,10 @@ bool PartSet_WidgetShapeSelector::storeValue() const
       if (aRefAttr) {
         TopoDS_Shape aShape = myShape->impl<TopoDS_Shape>();
         AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(mySelectedObject, aShape, mySketch);
-        if (mySelectedObject)
-          aRefAttr->setObject(mySelectedObject);
         if (aPntAttr)
           aRefAttr->setAttr(aPntAttr);
-
+        else if (mySelectedObject)
+          aRefAttr->setObject(mySelectedObject);
         updateObject(myFeature);
         return true;
       }
