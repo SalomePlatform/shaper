@@ -18,7 +18,8 @@
 #include <ModuleBase_FilterLinearEdge.h>
 #include <ModuleBase_FilterFace.h>
 #include <ModuleBase_FilterMulti.h>
-
+#include <ModuleBase_FilterCustom.h>
+#include <ModuleBase_FilterNoConsructionSubShapes.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
@@ -126,6 +127,9 @@ void PartSet_Module::registerFilters()
   aFactory->registerFilter("EdgeFilter", new ModuleBase_FilterLinearEdge);
   aFactory->registerFilter("FaceFilter", new ModuleBase_FilterFace);
   aFactory->registerFilter("MultiFilter", new ModuleBase_FilterMulti);
+  Handle(SelectMgr_Filter) aSelectFilter = new ModuleBase_FilterNoConsructionSubShapes(workshop());
+  aFactory->registerFilter("NoConstructionSubShapesFilter",
+            new ModuleBase_FilterCustom(aSelectFilter));
 }
 
 void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 

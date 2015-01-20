@@ -6,11 +6,13 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	ModuleBase.h
 	ModuleBase_Filter.h
+	ModuleBase_FilterCustom.h
 	ModuleBase_FilterFace.h
 	ModuleBase_FilterFactory.h
 	ModuleBase_FilterLinearEdge.h
-    ModuleBase_FilterMulti.h
-    ModuleBase_FilterShapeType.h
+	ModuleBase_FilterMulti.h
+	ModuleBase_FilterNoConsructionSubShapes.h
+	ModuleBase_FilterShapeType.h
 	ModuleBase_Tools.h
 	ModuleBase_IModule.h
 	ModuleBase_Operation.h
@@ -44,11 +46,13 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
 	ModuleBase_Filter.cpp
+	ModuleBase_FilterCustom.cpp
 	ModuleBase_FilterFace.cpp
 	ModuleBase_FilterFactory.cpp
 	ModuleBase_FilterLinearEdge.cpp
-    ModuleBase_FilterMulti.cpp
-    ModuleBase_FilterShapeType.cpp
+	ModuleBase_FilterMulti.cpp
+	ModuleBase_FilterNoConsructionSubShapes.cpp
+	ModuleBase_FilterShapeType.cpp
 	ModuleBase_Tools.cpp
 	ModuleBase_IModule.cpp
 	ModuleBase_IWorkshop.cpp
@@ -73,11 +77,11 @@ SET(PROJECT_SOURCES
 )
 
 SET(PROJECT_LIBRARIES
-    Config
-    ModelAPI
+	Config
+	ModelAPI
 	GeomAPI
 	GeomAlgoAPI
-    ${QT_LIBRARIES}
+	${QT_LIBRARIES}
 	${CAS_VIEWER}
 	${CAS_KERNEL}
 	${CAS_SHAPE}

@@ -6,11 +6,13 @@
     icon=":icons/point.png"
     tooltip="Select a first point"
     shape_types="vertex">
+    <selection_filter id="NoConstructionSubShapesFilter"/>
   </shape_selector>
   <shape_selector id="secondPoint"
     label="Second point"
     icon=":icons/point.png"
     tooltip="Select a second point"
     shape_types="vertex">
+    <selection_filter id="NoConstructionSubShapesFilter"/>
   </shape_selector>
 </source>
