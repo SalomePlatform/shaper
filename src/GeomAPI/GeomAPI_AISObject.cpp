@@ -253,6 +253,14 @@ void GeomAPI_AISObject::createFixed(std::shared_ptr<GeomAPI_Shape> theShape,
   }
 }
 
+void GeomAPI_AISObject::redisplay()
+{
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
+    aContext->Redisplay(anAIS, false);
+  }
+}
 
 
 void GeomAPI_AISObject::setColor(const int& theColor)
