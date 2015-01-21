@@ -259,7 +259,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
   QList<FeaturePtr> aIgnore;
   aIgnore.append(feature());
 
-  double aTolerance = aView->Convert(4);
+  double aTolerance = aView->Convert(7);
   std::shared_ptr<GeomDataAPI_Point2D> aAttrPnt = 
     PartSet_Tools::findAttributePoint(mySketch, aX, anY, aTolerance, aIgnore);
   if (aAttrPnt.get() != NULL) {
