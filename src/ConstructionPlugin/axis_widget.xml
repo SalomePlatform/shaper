@@ -14,5 +14,6 @@
     tooltip="Select a second point"
     shape_types="vertex">
     <selection_filter id="NoConstructionSubShapesFilter"/>
+    <validator id="PartSet_DifferentObjects"/>
   </shape_selector>
 </source>

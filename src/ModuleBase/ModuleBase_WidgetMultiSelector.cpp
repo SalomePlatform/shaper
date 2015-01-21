@@ -37,7 +37,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
                                                                const Config_WidgetAPI* theData,
                                                                const std::string& theParentId)
     : ModuleBase_ModelWidget(theParent, theData, theParentId),
-      myWorkshop(theWorkshop), myIsActive(false), myUseSubShapes(false)
+      myWorkshop(theWorkshop), myIsActive(false)
 {
   myMainWidget = new QWidget(theParent);
   QGridLayout* aMainLay = new QGridLayout(myMainWidget);
