@@ -14,6 +14,7 @@
 #include <Model_ResultBody.h>
 #include <Model_ResultGroup.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_CompositeFeature.h>
 #include <Events_Loop.h>
 #include <Events_Error.h>
 
@@ -844,13 +845,20 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
     }
   }
   // update results of thefeatures (after features created because they may be connected, like sketch and sub elements)
+  std::list<FeaturePtr> aComposites; // composites must be updated after their subs (issue 360)
   TDF_ChildIDIterator aLabIter2(featuresLabel(), TDataStd_Comment::GetID());
   for (; aLabIter2.More(); aLabIter2.Next()) {
     TDF_Label aFeatureLabel = aLabIter2.Value()->Label();
     if (myObjs.IsBound(aFeatureLabel)) {  // a new feature is inserted
       FeaturePtr aFeature = myObjs.Find(aFeatureLabel);
+      if (std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature).get())
+        aComposites.push_back(aFeature);
       updateResults(aFeature);
     }
+  }
+  std::list<FeaturePtr>::iterator aComposite = aComposites.begin();
+  for(; aComposite != aComposites.end(); aComposite++) {
+    updateResults(*aComposite);
   }
 
   // check all features are checked: if not => it was removed
