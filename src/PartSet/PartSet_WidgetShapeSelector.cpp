@@ -40,11 +40,14 @@ bool PartSet_WidgetShapeSelector::storeValue() const
       if (aRefAttr) {
         TopoDS_Shape aShape = myShape->impl<TopoDS_Shape>();
         AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(mySelectedObject, aShape, mySketch);
-        if (mySelectedObject)
-          aRefAttr->setObject(mySelectedObject);
+        // this is an alternative, whether the attribute should be set or object in the attribute
+        // the first check is the attribute because the object already exist
+        // the object is set only if there is no selected attribute
+        // test case is - preselection for distance operation, which contains two points selected on lines
         if (aPntAttr)
           aRefAttr->setAttr(aPntAttr);
-
+        else if (mySelectedObject)
+          aRefAttr->setObject(mySelectedObject);
         updateObject(myFeature);
         return true;
       }

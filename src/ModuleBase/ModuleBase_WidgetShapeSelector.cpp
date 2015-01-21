@@ -365,12 +365,23 @@ bool ModuleBase_WidgetShapeSelector::acceptObjectType(const ObjectPtr theObject)
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::updateSelectionName()
 {
-  if (mySelectedObject) {
-    std::string aName = mySelectedObject->data()->name();
-    myTextLine->setText(QString::fromStdString(aName));
-  } else {
-    if (myIsActive) {
-      myTextLine->setText("");
+  DataPtr aData = myFeature->data();
+  bool isNameUpdated = false;
+  if (aData.get() != NULL) {
+    AttributeSelectionPtr aSelect = aData->selection(attributeID());
+    if (aSelect) {
+      myTextLine->setText(QString::fromStdString(aSelect->namingName()));
+      isNameUpdated = true;
+    }
+  }
+  if (!isNameUpdated) {
+    if (mySelectedObject) {
+      std::string aName = mySelectedObject->data()->name();
+      myTextLine->setText(QString::fromStdString(aName));
+    } else {
+      if (myIsActive) {
+        myTextLine->setText("");
+      }
     }
   }
 }

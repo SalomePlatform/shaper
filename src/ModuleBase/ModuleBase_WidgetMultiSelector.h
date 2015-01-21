@@ -83,7 +83,6 @@ protected slots:
   ModuleBase_IWorkshop* myWorkshop;
 
   /// If true then local selector has to be activated in context
-  bool myUseSubShapes;
   bool myIsActive;
 
   typedef QPair<ResultPtr, GeomShapePtr> GeomSelection;

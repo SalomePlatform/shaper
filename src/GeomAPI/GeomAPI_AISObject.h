@@ -78,6 +78,10 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
   void createFixed(std::shared_ptr<GeomAPI_Shape> theShape,
                    std::shared_ptr<GeomAPI_Pln> thePlane);
 
+  /** \brief Redisplays the current AIS object in the context
+   */
+  void redisplay();
+
   /** \brief Assigns the color for the shape
    *  \param[in] theColor index of the color
    */

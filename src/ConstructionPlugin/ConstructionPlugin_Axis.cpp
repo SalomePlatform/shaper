@@ -52,4 +52,5 @@ void ConstructionPlugin_Axis::customisePresentation(AISObjectPtr thePrs)
 {
   thePrs->setColor(0, 0, 0);
   thePrs->setLineStyle(3);
+  thePrs->redisplay();
 }
