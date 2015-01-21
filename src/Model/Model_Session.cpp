@@ -12,6 +12,7 @@
 #include <Model_Application.h>
 #include <Model_Events.h>
 #include <Model_Validator.h>
+#include <ModelAPI_Events.h>
 #include <Events_Loop.h>
 #include <Events_Error.h>
 #include <Config_FeatureMessage.h>
@@ -177,7 +178,8 @@ void Model_Session::setActiveDocument(
   if (myCurrentDoc != theDoc) {
     myCurrentDoc = theDoc;
     if (theSendSignal) {
-      static std::shared_ptr<Events_Message> aMsg(new Events_Message(Events_Loop::eventByName("CurrentDocumentChanged")));
+      static std::shared_ptr<Events_Message> aMsg(
+          new Events_Message(Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED)));
       Events_Loop::loop()->send(aMsg);
     }
   }
