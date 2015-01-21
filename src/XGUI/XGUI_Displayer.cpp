@@ -310,6 +310,8 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes)
   }
   myActiveSelectionModes = aNewModes;
   Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
   // Open local context if there is no one
   if (!aContext->HasOpenedContext()) 
     return;
@@ -435,19 +437,18 @@ void XGUI_Displayer::clearSelected()
 void XGUI_Displayer::eraseAll(const bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext.IsNull())
-    return;
-
+  if (!aContext.IsNull()) {
    foreach (AISObjectPtr aAISObj, myResult2AISObjectMap) {
      // erase an object
      Handle(AIS_InteractiveObject) anIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
      if (!anIO.IsNull())
        aContext->Remove(anIO, false);
    }
-   myResult2AISObjectMap.clear();
    if (isUpdateViewer)
      updateViewer();
- }
+  }
+  myResult2AISObjectMap.clear();
+}
 
 void XGUI_Displayer::openLocalContext()
 {
@@ -601,6 +602,8 @@ Handle(SelectMgr_AndFilter) XGUI_Displayer::GetFilter()
 void XGUI_Displayer::displayAIS(AISObjectPtr theAIS, bool isUpdate)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
     aContext->Display(anAISIO, isUpdate);
@@ -621,6 +624,8 @@ void XGUI_Displayer::displayAIS(AISObjectPtr theAIS, bool isUpdate)
 void XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool isUpdate)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
   Handle(AIS_InteractiveObject) anAISIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAISIO.IsNull()) {
     aContext->Remove(anAISIO, isUpdate);
