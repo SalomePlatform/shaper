@@ -1239,6 +1239,7 @@ void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
     myObjectBrowser->activatePart(theFeature);
     myPartActivating = false;
   }
+  updateCommandStatus();
 }
 
 //**************************************************************
