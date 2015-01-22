@@ -274,8 +274,6 @@ std::shared_ptr<GeomAPI_Dir> PartSet_WidgetSketchLabel::setSketchPlane(const Top
 
 void PartSet_WidgetSketchLabel::setSketchingMode()
 {
-  qDebug("### Set sketching mode");
-
   XGUI_Displayer* aDisp = myWorkshop->displayer();
   // Clear standard selection modes if they are defined
   //aDisp->activateObjects(aModes);
