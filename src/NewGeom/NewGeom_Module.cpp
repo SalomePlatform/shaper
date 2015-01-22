@@ -10,6 +10,7 @@
 #include <XGUI_ContextMenuMgr.h>
 #include <XGUI_ObjectsBrowser.h>
 #include <XGUI_OperationMgr.h>
+#include <XGUI_Displayer.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Preferences.h>
@@ -217,8 +218,24 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
 //******************************************************
 void NewGeom_Module::onViewManagerAdded(SUIT_ViewManager* theMgr)
 {
-  if ((!mySelector)) {
+  if (!mySelector) {
     mySelector = createSelector(theMgr);
+  }
+}
+
+//******************************************************
+void NewGeom_Module::onViewManagerRemoved(SUIT_ViewManager* theMgr)
+{
+  if (mySelector) {
+    if (theMgr->getType() == OCCViewer_Viewer::Type()) {
+      OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(theMgr->getViewModel());
+      if (mySelector->viewer() == aViewer) {
+        myWorkshop->displayer()->eraseAll(false);
+        myProxyViewer->setSelector(0);
+        delete mySelector;
+        mySelector = 0;
+      }
+    }
   }
 }
 

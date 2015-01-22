@@ -139,7 +139,9 @@ void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
   // the selection is cleared after commit the create operation
   // in order to do not use the same selected objects in the restarted operation
   // for common behaviour, the selection is cleared even if the operation is not restarted
-  myWorkshop->viewer()->AISContext()->ClearSelected();
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  if (!aContext.IsNull())
+    aContext->ClearSelected();
 
   /// Restart sketcher operations automatically
   FeaturePtr aFeature = theOperation->feature();

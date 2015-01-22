@@ -1006,3 +1006,20 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType, const 
   }
 
 }
+
+int Model_AttributeSelection::Id()
+{
+  std::shared_ptr<GeomAPI_Shape> aSelection = value();
+  std::shared_ptr<GeomAPI_Shape> aContext = context()->shape();
+  const TopoDS_Shape& aMainShape = aContext->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aSubShape = aSelection->impl<TopoDS_Shape>();
+  int anID = 0;
+  if (aSelection && !aSelection->isNull() &&
+      aContext   && !aContext->isNull())
+  {
+    TopTools_IndexedMapOfShape aSubShapesMap;
+    TopExp::MapShapes(aMainShape, aSubShapesMap);
+    anID = aSubShapesMap.FindIndex(aSubShape);
+  }
+  return anID;
+}

@@ -46,6 +46,9 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
 
   /// Returns a textual string of the selection
   virtual std::string namingName() = 0;
+  
+  /// Returns an id of the selection
+  virtual int Id() = 0;
 
 
   /// Selects sub-shape by the textual Name

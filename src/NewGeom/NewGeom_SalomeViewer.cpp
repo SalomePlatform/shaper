@@ -52,16 +52,21 @@ Handle(AIS_InteractiveContext) NewGeom_SalomeViewer::AISContext() const
 //**********************************************
 Handle(V3d_Viewer) NewGeom_SalomeViewer::v3dViewer() const
 {
-  return mySelector->viewer()->getViewer3d();
+  if (mySelector)
+    return mySelector->viewer()->getViewer3d();
+  return Handle(V3d_Viewer)();
 }
 
 //**********************************************
 Handle(V3d_View) NewGeom_SalomeViewer::activeView() const
 {
-  OCCViewer_Viewer* aViewer = mySelector->viewer();
-  SUIT_ViewManager* aMgr = aViewer->getViewManager();
-  OCCViewer_ViewWindow* aWnd = static_cast<OCCViewer_ViewWindow*>(aMgr->getActiveView());
-  return aWnd->getViewPort()->getView();
+  if (mySelector) {
+    OCCViewer_Viewer* aViewer = mySelector->viewer();
+    SUIT_ViewManager* aMgr = aViewer->getViewManager();
+    OCCViewer_ViewWindow* aWnd = static_cast<OCCViewer_ViewWindow*>(aMgr->getActiveView());
+    return aWnd->getViewPort()->getView();
+  }
+  return Handle(V3d_View)();
 }
 
 //**********************************************
@@ -205,41 +210,51 @@ void NewGeom_SalomeViewer::enableSelection(bool isEnabled)
   //mySelector->viewer()->enableSelection(isEnabled);
   // The enableSelection() in SALOME 7.5 cause of forced Viewer update(we have blinking)
   // After this is corrected, the first row should be recommented, the last - removed
-  mySelector->viewer()->setInteractionStyle(isEnabled ? SUIT_ViewModel::STANDARD
-                                                      : SUIT_ViewModel::KEY_FREE);
+  if (mySelector)
+    mySelector->viewer()->setInteractionStyle(isEnabled ? SUIT_ViewModel::STANDARD
+                                                        : SUIT_ViewModel::KEY_FREE);
 }
 
 //**********************************************
 bool NewGeom_SalomeViewer::isSelectionEnabled() const
 {
-  return mySelector->viewer()->isSelectionEnabled();
+  if (mySelector)
+    return mySelector->viewer()->isSelectionEnabled();
 }
 
 //**********************************************
 void NewGeom_SalomeViewer::enableMultiselection(bool isEnable)
 {
-  mySelector->viewer()->enableMultiselection(isEnable);
+  if (mySelector)
+    mySelector->viewer()->enableMultiselection(isEnable);
 }
 
 //**********************************************
 bool NewGeom_SalomeViewer::isMultiSelectionEnabled() const
 {
-  return mySelector->viewer()->isMultiSelectionEnabled();
+  if (mySelector)
+    return mySelector->viewer()->isMultiSelectionEnabled();
+  return false;
 }
 
 //**********************************************
 void NewGeom_SalomeViewer::fitAll()
 {
-  SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
-  OCCViewer_ViewFrame* aVFrame = dynamic_cast<OCCViewer_ViewFrame*>(aMgr->getActiveView());
-  if (aVFrame) {
-    aVFrame->onFitAll();
+  if (mySelector) {
+    SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
+    OCCViewer_ViewFrame* aVFrame = dynamic_cast<OCCViewer_ViewFrame*>(aMgr->getActiveView());
+    if (aVFrame) {
+      aVFrame->onFitAll();
+    }
   }
 }
 
 //**********************************************
 void NewGeom_SalomeViewer::setViewProjection(double theX, double theY, double theZ)
 {
+  if (!mySelector) 
+    return;
+
   SUIT_ViewManager* aMgr = mySelector->viewer()->getViewManager();
   OCCViewer_ViewFrame* aVFrame = dynamic_cast<OCCViewer_ViewFrame*>(aMgr->getActiveView());
   if (aVFrame) {
