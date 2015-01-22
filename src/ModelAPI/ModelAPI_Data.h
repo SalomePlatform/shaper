@@ -26,6 +26,7 @@ class ModelAPI_Attribute;
 class ModelAPI_Feature;
 class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeSelectionList;
+class ModelAPI_Object;
 class GeomAPI_Shape;
 
 /// Enumeration that contains the execution status of the Object
@@ -126,6 +127,10 @@ class MODELAPI_EXPORT ModelAPI_Data
  // returns all objects referenced to this
   virtual const std::set<std::shared_ptr<ModelAPI_Attribute> >& refsToMe() = 0;
 
+  // returns all references by attributes of this data
+  // \param theRefs returned list of pairs: id of referenced attribute and list of referenced objects
+  virtual void referencesToObjects(
+    std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > >& theRefs) = 0;
  protected:
   /// Objects are created for features automatically
   ModelAPI_Data()
