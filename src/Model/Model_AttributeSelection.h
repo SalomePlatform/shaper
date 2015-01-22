@@ -41,6 +41,12 @@ public:
 
   /// Returns a textual string of the selection
   MODEL_EXPORT virtual std::string namingName();
+  
+  /// Returns an Id of the selection
+  /// NOTE: This method has been added for temporary export of groups towards old GEOM
+  /// It should then be removed when a direct use of objects from NewGeom
+  /// will be possible from SMESH module of SALOME.
+  MODEL_EXPORT virtual int Id();
 
   /// Selects (i.e. creates Naming data structure) of sub-shape specifed by textual name
   MODEL_EXPORT virtual void selectSubShape(const std::string& theType, const std::string& theSubShapeName);
