@@ -263,7 +263,7 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
   std::shared_ptr<GeomDataAPI_Point2D> aAttrPnt = 
     PartSet_Tools::findAttributePoint(mySketch, aX, anY, aTolerance, aIgnore);
   if (aAttrPnt.get() != NULL) {
-
+    aFeaturePoint->setValue(aAttrPnt->pnt());
     PartSet_Tools::createConstraint(mySketch, aAttrPnt, aFeaturePoint);
     emit vertexSelected();
   }
