@@ -370,7 +370,7 @@ void Model_Document::abortOperation()
 {
   if (!myNestedNum.empty() && !myDoc->HasOpenCommand()) {  // abort all what was done in nested
     compactNested();
-    undo();
+    undoInternal(false);
     myDoc->ClearRedos();
     myRedos.clear();
   } else { // abort the current
@@ -418,7 +418,7 @@ bool Model_Document::canUndo()
   return false;
 }
 
-void Model_Document::undo()
+void Model_Document::undoInternal(const bool theWithSubs)
 {
   int aNumTransactions = *myTransactions.rbegin();
   myTransactions.pop_back();
@@ -429,12 +429,19 @@ void Model_Document::undo()
   for(int a = 0; a < aNumTransactions; a++)
     myDoc->Undo();
 
-  synchronizeFeatures(true, true);
-  // undo for all subs
-  const std::set<std::string> aSubs = subDocuments(true);
-  std::set<std::string>::iterator aSubIter = aSubs.begin();
-  for (; aSubIter != aSubs.end(); aSubIter++)
-    subDoc(*aSubIter)->undo();
+  if (theWithSubs) {
+    synchronizeFeatures(true, true);
+    // undo for all subs
+    const std::set<std::string> aSubs = subDocuments(true);
+    std::set<std::string>::iterator aSubIter = aSubs.begin();
+    for (; aSubIter != aSubs.end(); aSubIter++)
+      subDoc(*aSubIter)->undo();
+  }
+}
+
+void Model_Document::undo()
+{
+  undoInternal(true);
 }
 
 bool Model_Document::canRedo()
