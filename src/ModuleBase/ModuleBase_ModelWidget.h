@@ -50,6 +50,11 @@ Q_OBJECT
   /// on operation's execute, like radius for circle's constraint (can not be zero)
   bool isComputedDefault() { return myIsComputedDefault; }
 
+  /// Returns true, if default value of the widget is defined in the XML and it is not the
+  /// computed value
+  /// \return the boolean result
+  bool isValueDefault() { return myIsValueDefault; }
+
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
 
@@ -160,6 +165,7 @@ signals:
   bool myIsComputedDefault; /// Value should be computed on execute,
                             /// like radius for circle's constraint (can not be zero)
 
+  bool myIsValueDefault; /// the default value is defined in the XML for this attribute
   bool myIsEditing;
 };
 

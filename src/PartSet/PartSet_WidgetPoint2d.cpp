@@ -194,6 +194,9 @@ void PartSet_WidgetPoint2D::activate()
   QIntList aModes;
   aModes << TopAbs_VERTEX;
   myWorkshop->moduleConnector()->activateSubShapesSelection(aModes);
+  // the control value is stored to the mode by the focus in on the widget
+  // we need the value is initialized in order to enable the apply button in the property panel
+  storeValue();
 }
 
 void PartSet_WidgetPoint2D::deactivate()
@@ -276,6 +279,9 @@ void PartSet_WidgetPoint2D::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEv
   if (isEditingMode())
     return;
   myWorkshop->operationMgr()->setLockValidating(true);
+  // the Ok button should be disabled in the property panel by moving the mouse point in the viewer
+  // this leads that the user does not try to click Ok and it avoids an incorrect situation that the 
+  // line is moved to the cursor to the Ok button
   myWorkshop->propertyPanel()->setOkEnabled(false);
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());

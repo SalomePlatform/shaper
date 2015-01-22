@@ -13,7 +13,7 @@ using namespace std;
 
 void GeomData_Point2D::setValue(const double theX, const double theY)
 {
-  if (myCoords->Value(0) != theX || myCoords->Value(1) != theY) {
+  if (!myIsInitialized || myCoords->Value(0) != theX || myCoords->Value(1) != theY) {
     myCoords->SetValue(0, theX);
     myCoords->SetValue(1, theY);
     owner()->data()->sendAttributeUpdated(this);
