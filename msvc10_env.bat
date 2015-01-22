@@ -115,11 +115,6 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @SET PATH=%PDIR%\swig-2.0.9\bin;%PATH%
 @REM -------------------------
 
-@REM BOOST
-@REM @SET BOOST_ROOT_DIR=%PDIR%\boost-1.52.0
-@REM @SET PATH=%BOOST_ROOT_DIR%\lib;%PATH%
-@REM -------------------------
-
 @REM -------------------------
 @SET SOLVESPACE_ROOT_DIR=%PDIR%\solvespace-2.0
 @SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
@@ -134,6 +129,11 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @SET PATH=%PDIR%\pthreads-2.9.1\lib;%PATH%
 @REM -------------------------
 
+@REM -------------------------
+@REM DOXYGEN 
+@SET DOXYGEN_ROOT_DIR=%PDIR%\doxygen-1.8.3.1
+@SET PATH=%DOXYGEN_ROOT_DIR%\bin;%PATH%
+@REM -------------------------
 
 @REM -------------------------
 @REM SUIT

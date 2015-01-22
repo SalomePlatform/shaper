@@ -160,14 +160,16 @@ class Model_Data : public ModelAPI_Data
   // returns all objects referenced to this
   MODEL_EXPORT virtual const std::set<AttributePtr>& refsToMe() {return myRefsToMe;}
 
+  // returns all references by attributes of this data
+  // \param theRefs returned list of pairs: id of referenced attribute and list of referenced objects
+  MODEL_EXPORT virtual void referencesToObjects(
+    std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs);
+
 private:
   // removes all information about back references
   void eraseBackReferences();
   // adds a back reference (with identifier which attribute references to this object
   void addBackReference(FeaturePtr theFeature, std::string theAttrID);
-  // returns all references by attributes of this data
-  // \param the returned list of pairs: id of referenced attribute and list of referenced objects
-  void referencesToObjects(std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs);
 };
 
 #endif

@@ -187,9 +187,9 @@ void XGUI_Workshop::startApplication()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
-  aLoop->registerListener(this, Events_Loop::eventByName("LongOperation"));
+  aLoop->registerListener(this, Events_LongOp::eventID());
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_PLUGIN_LOADED));
-  aLoop->registerListener(this, Events_Loop::eventByName("CurrentDocumentChanged"));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOSHOW));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_SELFILTER_LOADED));
@@ -322,7 +322,6 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
       addFeature(aFeatureMsg);
     }
   }
-
   // Process creation of Part
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
@@ -337,36 +336,29 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_PLUGIN_LOADED)) {
     myUpdatePrefs = true;
   }
-
   // Redisplay feature
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     onFeatureRedisplayMsg(aUpdMsg);
   }
-
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     onFeatureUpdatedMsg(anUpdateMsg);
-  }
-
-  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDelMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
     onObjectDeletedMsg(aDelMsg);
-  }
-
-  else if (theMessage->eventID() == Events_LongOp::eventID()) {
-    if (Events_LongOp::isPerformed())
+  } else if (theMessage->eventID() == Events_LongOp::eventID()) {
+    if (Events_LongOp::isPerformed()) {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    else
+    } else {
       QApplication::restoreOverrideCursor();
-  }
-
-  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TOSHOW)) {
+    }
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TOSHOW)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     const std::set<ObjectPtr>& aObjList = anUpdateMsg->objects();
@@ -375,9 +367,7 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
     for (aIt = aObjList.cbegin(); aIt != aObjList.cend(); ++aIt)
       aList.append(*aIt);
     showObjects(aList, true);
-  }
-
-  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TOHIDE)) {
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TOHIDE)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     const std::set<ObjectPtr>& aObjList = anUpdateMsg->objects();
@@ -387,7 +377,6 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
       aList.append(*aIt);
     showObjects(aList, false);
   }
-
   //An operation passed by message. Start it, process and commit.
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OPERATION_LAUNCHED)) {
     std::shared_ptr<Config_PointerMessage> aPartSetMsg =
@@ -402,8 +391,7 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
           updateCommandStatus();
       }
     }
-  }
-  else if (theMessage->eventID() == Events_Loop::loop()->eventByName("CurrentDocumentChanged")) {
+  } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
     myActionsMgr->update();
     // Find and Activate active part
     if (myPartActivating)

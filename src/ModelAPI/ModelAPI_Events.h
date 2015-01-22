@@ -38,6 +38,8 @@ static const char * EVENT_PLUGIN_LOADED = "PliginLoaded";
 static const char * EVENT_OBJECT_TOSHOW = "ObjectShow";
 /// Event ID that data of feature has to be shown (comes with ModelAPI_ObjectUpdatedMessage)
 static const char * EVENT_OBJECT_TOHIDE = "ObjectHide";
+//
+static const char * EVENT_DOCUMENT_CHANGED = "CurrentDocumentChanged";
 
 static const char * EVENT_FEATURE_STATE_REQUEST = "FeatureStateRequest";
 static const char * EVENT_FEATURE_STATE_RESPONSE = "FeatureStateResponse";

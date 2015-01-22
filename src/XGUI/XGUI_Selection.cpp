@@ -33,6 +33,9 @@ QList<ModuleBase_ViewerPrs> XGUI_Selection::getSelected(int theShapeTypeToSkip) 
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  if (aContext.IsNull())
+    return aPresentations;
+
   if (aContext->HasOpenedContext()) {
     for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
       ModuleBase_ViewerPrs aPrs;
@@ -112,11 +115,13 @@ QObjectPtrList XGUI_Selection::selectedPresentations() const
   QObjectPtrList aSelectedList;
 
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
-    Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
-    ObjectPtr aResult = myWorkshop->displayer()->getObject(anIO);
-    if (aResult)
-      aSelectedList.append(aResult);
+  if (!aContext.IsNull()) {
+    for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
+      Handle(AIS_InteractiveObject) anIO = aContext->SelectedInteractive();
+      ObjectPtr aResult = myWorkshop->displayer()->getObject(anIO);
+      if (aResult)
+        aSelectedList.append(aResult);
+    }
   }
   return aSelectedList;
 }
