@@ -28,18 +28,10 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
     if (aWirePtr->hasPlane() ) {
       // If this is a wire with plane defined thin it is a sketch-like object
       // It must have invisible faces
-      GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
-        aWirePtr->dirY(), aWirePtr->norm(), aWirePtr, myFacesList);
-
-      myOriginalShape = aWirePtr->impl<TopoDS_Shape>();
-      Set(myOriginalShape);
       myIsSketchMode = true;
-    } else {
-      Set(aWirePtr->impl<TopoDS_Shape>());
     }
-  } else {
-    Set(aShapePtr->impl<TopoDS_Shape>());
   }
+  Set(aShapePtr->impl<TopoDS_Shape>());
 }
 
 
@@ -50,6 +42,13 @@ void ModuleBase_ResultPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
   if (!aShapePtr)
     return;
+  if (myIsSketchMode) {
+    std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr = 
+      std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aShapePtr);
+    myFacesList.clear();
+    GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
+      aWirePtr->dirY(), aWirePtr->norm(), aWirePtr, myFacesList);
+  }
   myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
   if (!myOriginalShape.IsNull()) {
     Set(aShapePtr->impl<TopoDS_Shape>());
