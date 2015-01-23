@@ -50,9 +50,15 @@ NewGeom_EXPORT char* getModuleVersion()
 }
 }
 
+/** 
+* Class for preferences management
+*/
 class NewGeom_PrefMgr: public ModuleBase_IPrefMgr
 {
 public:
+  /// Constructor
+  /// \param theMgr preferences manager of SALOME
+  /// \param theModName name of the module
   NewGeom_PrefMgr(LightApp_Preferences* theMgr, const QString& theModName):myMgr(theMgr), myModName(theModName) {}
 
   virtual int addPreference(const QString& theLbl, int pId, 

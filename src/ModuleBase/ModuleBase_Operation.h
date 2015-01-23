@@ -68,11 +68,6 @@ Q_OBJECT
   */
   virtual bool isGranted(QString theId) const;
 
-  /// Sets a list of model widgets, according to the operation feature xml definition
-  /// \param theXmlRepresentation an xml feature definition
-  /// \param theWidgets a list of widgets
-  //void setModelWidgets(const std::string& theXmlRepresentation,
-  //                     QList<ModuleBase_ModelWidget*> theWidgets);
 
   /// Returns True if data of its feature was modified during operation
   virtual bool isModified() const { return myIsModified; }
@@ -87,7 +82,7 @@ Q_OBJECT
   void setNestedFeatures(const QStringList& theList) { myNestedFeatures = theList; }
 
 
-  // Returns operations Id from it's description
+  /// Returns operations Id from it's description
   QString id() const;
 
   /// Returns the operation feature
@@ -106,21 +101,17 @@ Q_OBJECT
   /// Returns True if the current operation works with the given object (feature or result)
   virtual bool hasObject(ObjectPtr theObj) const;
 
-  //virtual void keyReleased(const int theKey) {};
-
-  /// If operation needs to redisplay its result during operation
-  /// then this method has to return True
-  //virtual bool hasPreview() const { return false; }
-
   /// Initialisation of operation with preliminary selection
-  /// \param theSelected the list of selected presentations
-  /// \param theHighlighted the list of highlighted presentations
+  /// \param theSelection an instance of Selection class
   /// \param theViewer a viewer to have the viewer the eye position
   virtual void initSelection(ModuleBase_ISelection* theSelection,
-                             ModuleBase_IViewer* /* theViewer*/);
+                             ModuleBase_IViewer* theViewer);
 
+  /// \brief Set property pane to the operation
+  /// \param theProp a property panel instance
   virtual void setPropertyPanel(ModuleBase_IPropertyPanel* theProp);
 
+  /// \return Currently installed property panel
   ModuleBase_IPropertyPanel* propertyPanel() const { return myPropertyPanel; }
 
   /// Activates widgets by preselection if it is accepted. Emits signal if the activation is correct
@@ -130,16 +121,31 @@ Q_OBJECT
   /// then this variable has to be initialised by parent feature 
   /// before operation feature creating
   void setParentFeature(CompositeFeaturePtr theParent) { myParentFeature = theParent; }
+
+  /// \return Installed parent feature (can be NULL)
   CompositeFeaturePtr parentFeature() const { return myParentFeature; }
 
 signals:
-  void started();  /// the operation is started
-  void aborted();  /// the operation is aborted
-  void committed();  /// the operation is committed
-  void stopped();  /// the operation is aborted or committed
-  void resumed();  /// the operation is resumed
-  void postponed();  /// the operation is postponed
-  void activatedByPreselection(); /// the operation is filled with existing preselection
+  /// The operation is started
+  void started();  
+
+  /// The operation is aborted
+  void aborted();  
+
+  /// The operation is committed
+  void committed();  
+
+  /// The operation is aborted or committed
+  void stopped();  
+
+  /// The operation is resumed
+  void resumed();  
+
+  /// The operation is postponed
+  void postponed();  
+
+  /// The operation is filled with existing preselection
+  void activatedByPreselection(); 
 
  public slots:
   /// Starts operation
@@ -177,14 +183,6 @@ signals:
   /// \param theState th flag to abort, if it is true, do nothing, overwise abort
   void setRunning(bool theState);
 
-  // Data model methods.
-  /// Stores a custom value in model.
-  //virtual void storeCustomValue();
-
-  /// Slots which listen the mode widget activation
-  /// \param theWidget the model widget
-  //virtual void onWidgetActivated(ModuleBase_ModelWidget* theWidget);
-
  protected:
   /// Virtual method called when operation started (see start() method for more description)
   /// Default impl calls corresponding slot and commits immediately.
@@ -216,8 +214,7 @@ signals:
 
   /// Creates an operation new feature
   /// \param theFlushMessage the flag whether the create message should be flushed
-  /// \param theCompositeFeature the feature that must be used for adding the created object or null
-  /// \returns the created 
+  /// \returns the created feature
   virtual FeaturePtr createFeature(const bool theFlushMessage = true);
 
   /// Verifies whether this operator can be commited.
@@ -226,13 +223,6 @@ signals:
 
   /// Returns pointer to the root document.
   std::shared_ptr<ModelAPI_Document> document() const;
-
-  /// Set value to the active widget
-  /// \param theFeature the feature
-  /// \param theX the horizontal coordinate
-  /// \param theY the vertical coordinate
-  /// \return true if the point is set
-  //virtual bool setWidgetValue(ObjectPtr theFeature, double theX, double theY);
 
   /// Return a widget value point by the selection and the viewer position
   /// The default realization returns false
@@ -245,11 +235,12 @@ signals:
                                    ModuleBase_IViewer* theViewer,
                                    double& theX, double& theY);
 
-  // Removes the preselection information and clears the map of preselection
+  /// Removes the preselection information and clears the map of preselection
   void clearPreselection();
 
  protected:
-  FeaturePtr myFeature;  /// the operation feature to be handled
+   /// The operation feature to be handled
+  FeaturePtr myFeature;  
 
   /// the container to have the operation description
   ModuleBase_OperationDescription* myDescription;  

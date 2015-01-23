@@ -37,7 +37,7 @@ typedef std::shared_ptr<ModelAPI_Validator> ValidatorPtr;
 
 /**\class ModelAPI_ValidatorsFactory
  * \ingroup DataModel
- * \breif Manages the registered validators
+ * \brief Manages the registered validators
  *
  * Allows to get a validator by the feature identifier and 
  * the attribute identifier (if attribute is validated).

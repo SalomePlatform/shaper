@@ -33,6 +33,12 @@ public:
                             SUIT_PreferenceMgr::PrefItemType theType,
                             const QString& theSection, const QString& theName ) = 0;
 
+  /**
+  * \brief Set property of an item
+  * \param thePropName the property name
+  * \param theValue the value of the property
+  * \param theId id of the property
+  */
   virtual void setItemProperty(const QString& thePropName,
                                const QVariant& theValue,
                                const int theId = -1) = 0;

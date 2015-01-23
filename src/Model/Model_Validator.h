@@ -14,7 +14,7 @@
 
 /**\class Model_ValidatorsFactory
  * \ingroup DataModel
- * \breif Manages the registered validators
+ * \brief Manages the registered validators
  *
  * Allows to get a validator by the feature identifier and 
  * the attribute identifier (if attribute is validated).

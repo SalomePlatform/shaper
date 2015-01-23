@@ -12,7 +12,7 @@
 //#include <BRepBuilderAPI_MakeShape.hxx>
 /**\class GeomAlgoAPI_MakeShape
  * \ingroup DataModel
- * \Interface to the root class of all topological shapes constructions
+ * \brief Interface to the root class of all topological shapes constructions
  */
 class GeomAlgoAPI_MakeShape : public GeomAPI_Interface
 {
