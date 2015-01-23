@@ -20,24 +20,36 @@
 
 class Config_FeatureMessage;
 
+/*!
+ * \class Config_FeatureReader
+ * \brief Class to process feature's xml definition.
+ */
 class Config_FeatureReader : public Config_XMLReader
 {
  public:
-  Config_FeatureReader(const std::string& theXmlFile, const std::string& theLibraryName,
+  Config_FeatureReader(const std::string& theXmlFile,
+                       const std::string& theLibraryName,
                        const char* theEventGenerated = 0);
   virtual ~Config_FeatureReader();
-
+  /// Returns list of all features defined in reader's file
   std::list<std::string> features() const;
 
  protected:
-  void processNode(xmlNodePtr aNode);
-  bool processChildren(xmlNodePtr aNode);
+  /// Overloaded method. Defines how to process each node
+  virtual void processNode(xmlNodePtr aNode);
+  /// Overloaded method. Defines if the given node should be parsed recursively
+  virtual bool processChildren(xmlNodePtr aNode);
 
+  /// Fills feature message
   void fillFeature(xmlNodePtr theRoot, 
                    const std::shared_ptr<Config_FeatureMessage>& outFeatureMessage);
 
+  /// Stores an attribute in internal map for later use.
+  /// Key is "Node_Name:Node_Attribute" and value is getProperty(theNodeAttribute)
   void storeAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
+  /// Restores an attribute from internal map.
   std::string restoreAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
+  /// Restores an attribute from internal map.
   std::string restoreAttribute(const char* theNodeName, const char* theNodeAttribute);
 
  private:

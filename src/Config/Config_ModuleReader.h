@@ -18,6 +18,10 @@
 #include <set>
 #include <string>
 
+/*!
+ * \class Config_ModuleReader
+ * \brief Class to process plugins.xml - definition of plugins (scripts, libraries).
+ */
 class Config_ModuleReader : public Config_XMLReader
 {
   enum PluginType {

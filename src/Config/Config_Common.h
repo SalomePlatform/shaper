@@ -28,12 +28,12 @@ typedef xmlDoc *xmlDocPtr;
 struct _xmlDoc;
 //<<
 
-/*
+/*!
  * Returns true if theNode is XML ELEMENT node (not a "text" node ie).
  */
 CONFIG_EXPORT bool isElementNode(xmlNodePtr theNode);
 
-/*
+/*!
  * Returns true if theNode is XML node with a given name.
 
  * Please note that this function should be called with NULL last argument.
@@ -43,12 +43,12 @@ CONFIG_EXPORT bool isElementNode(xmlNodePtr theNode);
  */
 CONFIG_EXPORT bool isNode(xmlNodePtr theNode, const char* theNodeName, ...);
 
-/*
+/*!
  * Checks is the given node is attribute (widget) node.
  */
 CONFIG_EXPORT bool isWidgetNode(xmlNodePtr theNode);
 
-/*
+/*!
  * Every xml node has child. Even if there is no explicit
  * child nodes libxml gives the "Text node" as child.
  *
@@ -57,7 +57,7 @@ CONFIG_EXPORT bool isWidgetNode(xmlNodePtr theNode);
  */
 CONFIG_EXPORT bool hasChild(xmlNodePtr theNode);
 
-/*
+/*!
  * Returns named property for an id node as std::string and the parameters of the node.
  */
 CONFIG_EXPORT bool getParametersInfo(xmlNodePtr theNode, std::string& outPropertyId,
@@ -76,12 +76,12 @@ CONFIG_EXPORT bool getParametersInfo(xmlNodePtr theNode, std::string& outPropert
  */
 CONFIG_EXPORT std::string library(const std::string& theLibName);
 
-/*
+/*!
  * Returns named property for a given node as std::string.
  */
 CONFIG_EXPORT std::string getProperty(xmlNodePtr theNode, const char* thePropName);
 
-/*
+/*!
  * Checks if the given XML node has the given attribute,
  * if yes - returns it's bool value, if no, or if the value can not
  * be converted to bool - returns theDefault value.
@@ -93,7 +93,7 @@ CONFIG_EXPORT bool getBooleanAttribute(xmlNodePtr theNode,
                                        const char* theAttributeName,
                                        bool theDefault);
 
-/*
+/*!
  * Returns normalized (lower case) version of string.
  * Should be used for case insensitive string matching.
  */

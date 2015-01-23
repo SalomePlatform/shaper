@@ -189,6 +189,9 @@ class Model_Document : public ModelAPI_Document
   //! Returns all sub documents
   const std::set<std::string> subDocuments(const bool theActivatedOnly) const;
 
+  //! The implementation of undo: with or without recoursive calls in the sub-documents
+  void undoInternal(const bool theWithSubs);
+
   friend class Model_Application;
   friend class Model_Session;
   friend class Model_Update;

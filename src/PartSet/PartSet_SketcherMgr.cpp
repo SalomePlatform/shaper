@@ -132,6 +132,9 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
 
+  // Clear dragging mode
+  myIsDragging = false;
+
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_Operation* aOperation = aWorkshop->currentOperation();
   // Use only for sketch operations
@@ -181,7 +184,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
     if (isSketcher) {
       myIsDragging = true;
-
       get2dPoint(theWnd, theEvent, myCurX, myCurY);
       myDragDone = false;
       launchEditing();
@@ -205,30 +207,28 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 {
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_Operation* aOp = aWorkshop->currentOperation();
-  if (!aOp)
-    return;
-  if (!sketchOperationIdList().contains(aOp->id()))
-    return;
+  if (aOp) {
+    if (sketchOperationIdList().contains(aOp->id())) {
+      // Only for sketcher operations
+      ModuleBase_IViewer* aViewer = aWorkshop->viewer();
+      if (myIsDragging) {
+        if (myDragDone) {
+          //aOp->commit();
+          myFeature2AttributeMap.clear();
 
-  // Only for sketcher operations
-  ModuleBase_IViewer* aViewer = aWorkshop->viewer();
-  if (myIsDragging) {
-    aWorkshop->viewer()->enableSelection(myPreviousSelectionEnabled);
-    myIsDragging = false;
-    if (myDragDone) {
-      //aOp->commit();
-      myFeature2AttributeMap.clear();
-
-      // Reselect edited object
-      /*aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
-      if (theEvent->modifiers() & Qt::ShiftModifier)
-        aViewer->AISContext()->ShiftSelect();
-      else
-        aViewer->AISContext()->Select();
-        */
-      return;
+          // Reselect edited object
+          /*aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
+          if (theEvent->modifiers() & Qt::ShiftModifier)
+            aViewer->AISContext()->ShiftSelect();
+          else
+            aViewer->AISContext()->Select();
+            */
+        }
+      }
     }
   }
+  aWorkshop->viewer()->enableSelection(myPreviousSelectionEnabled);
+  myIsDragging = false;
 }
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
@@ -246,6 +246,8 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     aViewer->enableSelection(false);
 
     ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+    if (!aOperation)
+      return;
     if (aOperation->id().toStdString() == SketchPlugin_Sketch::ID())
       return; // No edit operation activated
 
