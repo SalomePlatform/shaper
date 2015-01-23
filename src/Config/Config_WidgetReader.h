@@ -16,13 +16,19 @@
 #include <map>
 #include <string>
 
+/*!
+ * \class Config_WidgetReader
+ * \brief Class that dumps xml definitions of widgets for
+ * further processing in the WidgetFactory
+ */
 class Config_WidgetReader : public Config_XMLReader
 {
  public:
-  CONFIG_EXPORT Config_WidgetReader(const std::string& theXmlFile);CONFIG_EXPORT virtual ~Config_WidgetReader();
+  CONFIG_EXPORT Config_WidgetReader(const std::string& theXmlFile);
+  CONFIG_EXPORT virtual ~Config_WidgetReader();
 
-  CONFIG_EXPORT std::string featureWidgetCfg(const std::string& theFeatureName);CONFIG_EXPORT std::string featureDescription(
-      const std::string& theFeatureName);
+  CONFIG_EXPORT std::string featureWidgetCfg(const std::string& theFeatureName);
+  CONFIG_EXPORT std::string featureDescription(const std::string& theFeatureName);
 
  protected:
   void processNode(xmlNodePtr theNode);

@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-//! Class wihich let to register properties
+//! Class which let to register properties
 class Config_PropManager
 {
  public:

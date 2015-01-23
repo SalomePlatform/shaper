@@ -19,6 +19,10 @@
 /// Event ID that Validator is loaded (comes with Config_ValidatorMessage)
 static const char * EVENT_VALIDATOR_LOADED = "ValidatorLoaded";
 
+/*!
+ * \class Config_ValidatorMessage
+ * \brief Transmits info about created validator on "ValidatorLoaded" event
+ */
 class Config_ValidatorMessage : public Events_Message
 {
   std::string myValidatorId;

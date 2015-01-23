@@ -9,8 +9,9 @@
 
 #include <string>
 
-/*
- * Class to pass an attribute's (widget's) entry info extracted from xml file.
+/*!
+ * \class Config_AttributeMessage
+ * \brief Class to pass an attribute's (widget's) entry info extracted from xml file.
  * <widget id="tool_object" concealment="true" obligatory="0"/>
  */
 class Config_AttributeMessage : public Events_Message

@@ -19,6 +19,10 @@
 /// Event ID that Selection Filter is loaded (comes with Config_SelectionFilterMessage)
 static const char * EVENT_SELFILTER_LOADED = "SelectionFilterLoaded";
 
+/*!
+ * \class Config_SelectionFilterMessage
+ * \brief Transmits info about selection filters on "SelectionFilterLoaded" event
+ */
 class Config_SelectionFilterMessage : public Events_Message
 {
   std::string mySelectionFilterId;
