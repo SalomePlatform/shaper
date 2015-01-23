@@ -27,11 +27,14 @@
 #include <TopTools_DataMapOfShapeShape.hxx>
 #include <TopExp.hxx>
 #include <BRepTools.hxx>
+#include <BRep_Tool.hxx>
 #include <GeomAPI_Shape.h>
 #include <GeomAlgoAPI_MakeShape.h>
 // DEB
 //#include <TCollection_AsciiString.hxx>
 //#include <TDF_Tool.hxx>
+#define DEB_IMPORT 1
+
 Model_ResultBody::Model_ResultBody()
 {
   setIsConcealed(false);
@@ -371,6 +374,8 @@ void Model_ResultBody::loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape,
 	{
       const TopTools_ListOfShape& aLL = anEdgeAndNeighbourFaces.FindFromIndex(i);
       if (aLL.Extent() < 2) {
+		  if (BRep_Tool::Degenerated(TopoDS::Edge(anEdgeAndNeighbourFaces.FindKey(i))))
+          continue;
 	    builder(theTag)->Generated(anEdgeAndNeighbourFaces.FindKey(i));
 		TCollection_AsciiString aStr(theTag);
 	    aName = theName + aStr.ToCString();
@@ -491,7 +496,24 @@ void Model_ResultBody::loadDisconnectedEdges(
 	    edgeNaborFaces.ChangeFind(anEdge).Append(aFace);      
 	}
   }
-  
+
+/*  TopTools_IndexedDataMapOfShapeListOfShape aDM;
+  TopExp::MapShapesAndAncestors(aShape, TopAbs_EDGE, TopAbs_FACE, aDM);
+  for(int i=1; i <= aDM.Extent(); i++) {
+	if(aDM.FindFromIndex(i).Extent() > 1) continue;
+	if (BRep_Tool::Degenerated(TopoDS::Edge(aDM.FindKey(i))))
+     continue;
+	builder(theTag)->Generated(aDM.FindKey(i));
+    TCollection_AsciiString aStr(theTag);
+	std::string aName = theName + aStr.ToCString();
+	buildName(theTag, aName);
+#ifdef DEB_IMPORT
+	aName +=  + ".brep";
+	BRepTools::Write(aDM.FindKey(i), aName.c_str());
+#endif
+	theTag++;
+  }
+*/
   TopTools_MapOfShape anEdgesToDelete;
   TopExp_Explorer anEx(aShape,TopAbs_EDGE); 
   std::string aName;
@@ -536,7 +558,7 @@ void Model_ResultBody::loadDisconnectedEdges(
 	  buildName(theTag, aName);	 
 	  theTag++;
 	}
-  }
+  }  
 }
 
 void Model_ResultBody::loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag)

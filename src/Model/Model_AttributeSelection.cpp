@@ -52,6 +52,10 @@
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Iterator.hxx>
 using namespace std;
+//#define DEB_NAMING 1
+#ifdef DEB_NAMING
+#include <BRepTools.hxx>
+#endif
 /// adeed to the index in the packed map to signalize that the vertex of edge is seleted
 /// (multiplied by the index of the edge)
 static const int kSTART_VERTEX_DELTA = 1000000;
@@ -601,6 +605,9 @@ std::string Model_AttributeSelection::namingName()
   if(!aSubSh.get() || aSubSh->isNull() || !aCont.get() || aCont->shape()->isNull()) 
     return aName;
   TopoDS_Shape aSubShape = aSubSh->impl<TopoDS_Shape>();
+#ifdef DEB_NAMING
+  BRepTools::Write(aSubShape, "Selection.brep");
+#endif
   TopoDS_Shape aContext  = aCont->shape()->impl<TopoDS_Shape>();
   std::shared_ptr<Model_Document> aDoc = 
     std::dynamic_pointer_cast<Model_Document>(aCont->document());
