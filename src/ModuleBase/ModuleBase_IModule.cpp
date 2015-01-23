@@ -74,9 +74,11 @@ ModuleBase_Operation* ModuleBase_IModule::createOperation(const std::string& the
   ModuleBase_Operation* aCurOperation = myWorkshop->currentOperation();
   if (aCurOperation) {
     FeaturePtr aFeature = aCurOperation->feature();
-    CompositeFeaturePtr aCompFea = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
-    if (aCompFea)
-      anOperation->setParentFeature(aCompFea);
+    CompositeFeaturePtr aCompFeature =
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+    if (aCompFeature) {
+      anOperation->setParentFeature(aCompFeature);
+    }
   }
 
   std::string aPluginFileName = myFeaturesInFiles[theFeatureId];

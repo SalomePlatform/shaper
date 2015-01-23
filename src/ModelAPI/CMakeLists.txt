@@ -49,6 +49,7 @@ SET(PROJECT_SOURCES
     ModelAPI_Result.cpp
     ModelAPI_ResultPart.cpp
     ModelAPI_ResultConstruction.cpp
+    ModelAPI_CompositeFeature.cpp
 )
 
 SET(PROJECT_LIBRARIES

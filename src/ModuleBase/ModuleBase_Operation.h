@@ -120,10 +120,10 @@ Q_OBJECT
   /// If the operation works with feature which is sub-feature of another one
   /// then this variable has to be initialised by parent feature 
   /// before operation feature creating
-  void setParentFeature(CompositeFeaturePtr theParent) { myParentFeature = theParent; }
+  void setParentFeature(CompositeFeaturePtr theParent);
 
   /// \return Installed parent feature (can be NULL)
-  CompositeFeaturePtr parentFeature() const { return myParentFeature; }
+  CompositeFeaturePtr parentFeature() const;
 
 signals:
   /// The operation is started
