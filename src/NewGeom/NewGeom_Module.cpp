@@ -196,9 +196,10 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
   // because the displayed objects should be removed from the viewer, but
   // the AIS context is obtained from the selector.
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
-  if (anOperation)
+  while (anOperation) {
     anOperation->abort();
-
+    anOperation = myWorkshop->operationMgr()->currentOperation();
+  }
   // Delete selector because it has to be redefined on next activation
   if (mySelector) {
     myProxyViewer->setSelector(0);

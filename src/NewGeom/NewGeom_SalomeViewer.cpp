@@ -207,12 +207,12 @@ void NewGeom_SalomeViewer::onActivated(SUIT_ViewWindow*)
 //**********************************************
 void NewGeom_SalomeViewer::enableSelection(bool isEnabled)
 {
-  //mySelector->viewer()->enableSelection(isEnabled);
+  if (mySelector)
+    mySelector->viewer()->enableSelection(isEnabled);
   // The enableSelection() in SALOME 7.5 cause of forced Viewer update(we have blinking)
   // After this is corrected, the first row should be recommented, the last - removed
-  if (mySelector)
-    mySelector->viewer()->setInteractionStyle(isEnabled ? SUIT_ViewModel::STANDARD
-                                                        : SUIT_ViewModel::KEY_FREE);
+    //mySelector->viewer()->setInteractionStyle(isEnabled ? SUIT_ViewModel::STANDARD
+    //                                                    : SUIT_ViewModel::KEY_FREE);
 }
 
 //**********************************************

@@ -145,7 +145,6 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
       closeLocalContexts(false);
     }
     aContext->Display(anAISIO, false);
-    qDebug("### Display %i", (long)anAISIO.Access());
 
     aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, false);
     // Customization of presentation
@@ -243,7 +242,6 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject)
     AISObjectPtr anObj = myResult2AISObjectMap[theObject];
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
     aContext->Deactivate(anAIS);
-    qDebug("### Deactivate obj %i", (long)anAIS.Access());
   }
 }
 
@@ -268,12 +266,10 @@ void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
       foreach(int aMode, theModes) {
         //aContext->Load(anAIS, aMode, true);
         aContext->Activate(anAIS, aMode);
-        qDebug("### 1. Activate obj %i, %i", (long)anAIS.Access(), aMode);
       }
     } else {
       //aContext->Load(anAIS, 0, true);
       aContext->Activate(anAIS);
-      qDebug("### 2. Activate obj %i", (long)anAIS.Access());
     }
   }
 }
@@ -337,12 +333,10 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes)
       if (myActiveSelectionModes.size() == 0) {
         //aContext->Load(anAISIO, 0, true);
         aContext->Activate(anAISIO);
-        qDebug("### 2. Activate all %i", (long)anAISIO.Access());
       } else {
         foreach(int aMode, myActiveSelectionModes) {
           //aContext->Load(anAISIO, aMode, true);
           aContext->Activate(anAISIO, aMode);
-          qDebug("### 1. Activate all %i, %i", (long)anAISIO.Access(), aMode);
         }
       }
     }
@@ -368,11 +362,6 @@ void XGUI_Displayer::deactivateObjects()
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
     anAISIO = aLIt.Value();
     aContext->Deactivate(anAISIO);
-    //aTrihedron = Handle(AIS_Trihedron)::DownCast(anAISIO);
-    //if (aTrihedron.IsNull()) {
-    //  qDebug("### Deactivate all %i", (long)anAISIO.Access());
-    //  //aContext->Activate(anAISIO);
-    //}
   }
 }
 
@@ -472,7 +461,6 @@ void XGUI_Displayer::openLocalContext()
 
     //aContext->ClearCurrents();
     aContext->OpenLocalContext();
-    qDebug("### Open context");
     //aContext->NotUseDisplayedObjects();
 
     //myUseExternalObjects = false;
@@ -505,7 +493,6 @@ void XGUI_Displayer::closeLocalContexts(const bool isUpdateViewer)
 
     //aContext->ClearSelected();
     aContext->CloseAllContexts(false);
-    qDebug("### Close context");
 
     // Redisplay all object if they were displayed in localContext
     Handle(AIS_InteractiveObject) aAISIO;
@@ -584,7 +571,6 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if ((!aContext.IsNull()) && (!aContext->HasOpenedContext())) {
     aContext->OpenLocalContext();
-    qDebug("### Open context");
   }
   return aContext;
 }
