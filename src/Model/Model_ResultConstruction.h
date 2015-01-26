@@ -10,7 +10,7 @@
 #include "Model.h"
 #include <ModelAPI_ResultConstruction.h>
 
-/**\class ModelAPI_ResultConstruction
+/**\class Model_ResultConstruction
  * \ingroup DataModel
  * \brief The construction element result of a feature.
  *

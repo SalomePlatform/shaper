@@ -16,7 +16,7 @@
 
 class Events_MessageGroup;
 
-/**\class Events_Lopp
+/**\class Events_Loop
  * \ingroup EventsLoop
  * \brief Base class that manages the receiving and sending of all
  * not Qt-events in the application.

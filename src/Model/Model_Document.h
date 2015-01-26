@@ -40,7 +40,6 @@ class Model_Document : public ModelAPI_Document
 
   //! Loads the OCAF document from the file.
   //! \param theFileName full name of the file to load
-  //! \param theStudyID identifier of the SALOME study to associate with loaded file
   //! \returns true if file was loaded successfully
   MODEL_EXPORT virtual bool load(const char* theFileName);
 
@@ -76,10 +75,11 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual void redo();
 
   //! Adds to the document the new feature of the given feature id
-  //! \param creates feature and puts it in the document
+  //! \param theID creates feature and puts it in the document
   MODEL_EXPORT virtual FeaturePtr addFeature(std::string theID);
 
   //! Removes the feature from the document (with result)
+  //! \param theFeature the feature to be removed
   //! \param theCheck if it is false, do not check the references
   MODEL_EXPORT virtual void removeFeature(FeaturePtr theFeature, const bool theCheck = true);
 
@@ -106,7 +106,6 @@ class Model_Document : public ModelAPI_Document
   //! Returns the feature in the group by the index (started from zero)
   //! \param theGroupID group that contains a feature
   //! \param theIndex zero-based index of feature in the group
-  //! \param isOperation if it is true, returns feature (not Object)
   //! \param theHidden if it is true, it counts also the features that are not in tree
   MODEL_EXPORT virtual ObjectPtr object(const std::string& theGroupID, const int theIndex,
                                         const bool theHidden = false);
@@ -163,6 +162,7 @@ class Model_Document : public ModelAPI_Document
   //! Creates new document with binary file format
   Model_Document(const std::string theID, const std::string theKind);
 
+  //! Returns the internal OCCT document of this interface
   Handle_TDocStd_Document document()
   {
     return myDoc;

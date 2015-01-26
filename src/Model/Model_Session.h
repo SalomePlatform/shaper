@@ -35,7 +35,6 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
 
   //! Loads the OCAF document from the file.
   //! \param theFileName full name of the file to load
-  //! \param theStudyID identifier of the SALOME study to associate with loaded file
   //! \returns true if file was loaded successfully
   MODEL_EXPORT virtual bool load(const char* theFileName);
 
@@ -102,6 +101,7 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   /// Returns the validators factory: the only one instance per application
   MODEL_EXPORT virtual ModelAPI_ValidatorsFactory* validators();
 
+  /// Sets the flag to check modifications outside the transaction or not
   void setCheckTransactions(const bool theCheck)
   {
     myCheckTransactions = theCheck;

@@ -18,17 +18,19 @@ DEFINE_STANDARD_HANDLE(Model_Application, TDocStd_Application)
 /**\class Model_Application
  * \ingroup DataModel
  * \brief Realization of Open CASCADE application abstraction. Class for internal use only.
+ *
  * Application supports the formats and document management. It is uses OCAF-lke
  * architecture and just implements specific features of the module.
  */
 class Model_Application : public TDocStd_Application
 {
- public:
+public:
   // useful methods inside of the module
 
   // CASCADE RTTI
-  DEFINE_STANDARD_RTTI(Model_Application)
-  ;
+  /// Definition of "Handles" usage
+  /// \param Model_Application is the class name that is covered by the OCCT Handle
+  DEFINE_STANDARD_RTTI(Model_Application);
 
   //! Retuns the application: one per process    
   MODEL_EXPORT static Handle_Model_Application getApplication();

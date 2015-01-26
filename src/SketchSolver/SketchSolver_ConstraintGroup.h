@@ -115,6 +115,9 @@ class SketchSolver_ConstraintGroup
    *  \param[in] theEntity attribute of the constraint
    */
   void updateRelatedConstraints(std::shared_ptr<ModelAPI_Attribute> theEntity) const;
+  /** \brief Searches the constraints built on the entity and emit the signal to update them
+   *  \param[in] theFeature feature of the constraint
+   */
   void updateRelatedConstraintsFeature(std::shared_ptr<ModelAPI_Feature> theFeature) const;
 
   /** \brief Adds or updates an entity in the group

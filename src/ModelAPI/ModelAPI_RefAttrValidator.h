@@ -12,7 +12,8 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeValidator.h>
 
-/*
+/**\class ModelAPI_RefAttrValidator
+ * \ingroup DataModel
  * Used for filtering out the object that can be used for reference attribute value
  */
 class ModelAPI_RefAttrValidator : public ModelAPI_AttributeValidator
