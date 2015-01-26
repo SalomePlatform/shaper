@@ -156,10 +156,14 @@ bool Model_Document::load(const char* theFileName)
   if (!isError) {
     myDoc->SetUndoLimit(UNDO_LIMIT);
     // to avoid the problem that feature is created in the current, not this, document
-    Model_Session::get()->setActiveDocument(anApp->getDocument(myID), false);
+    std::shared_ptr<Model_Session> aSession = 
+      std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
+    aSession->setActiveDocument(anApp->getDocument(myID), false);
+    aSession->setCheckTransactions(false);
     synchronizeFeatures(false, true);
-    Model_Session::get()->setActiveDocument(Model_Session::get()->moduleDocument(), false);
-    Model_Session::get()->setActiveDocument(anApp->getDocument(myID), true);
+    aSession->setCheckTransactions(true);
+    aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
+    aSession->setActiveDocument(anApp->getDocument(myID), true);
   }
   return !isError;
 }
@@ -246,7 +250,8 @@ void Model_Document::close(const bool theForever)
     subDoc(*aSubIter)->close(theForever);
 
   // close for thid document needs no transaction in this document
-  std::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(false);
+  if (this == aPM->moduleDocument().get())
+    std::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(false);
 
   // delete all features of this document
   std::shared_ptr<ModelAPI_Document> aThis = 
@@ -277,7 +282,8 @@ void Model_Document::close(const bool theForever)
       myDoc->Close();
   }
 
-  std::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(true);
+  if (this == aPM->moduleDocument().get())
+    std::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(true);
 }
 
 void Model_Document::startOperation()
@@ -323,10 +329,6 @@ void Model_Document::finishOperation()
   bool isNestedClosed = !myDoc->HasOpenCommand() && !myNestedNum.empty();
   static std::shared_ptr<Model_Session> aSession = 
     std::static_pointer_cast<Model_Session>(Model_Session::get());
-  // just to be sure that everybody knows that changes were performed
-  if (isNestedClosed) {
-    aSession->setCheckTransactions(false);  // for nested transaction commit
-  }
   synchronizeBackRefs();
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
@@ -346,10 +348,6 @@ void Model_Document::finishOperation()
   }
   // to avoid "updated" message appearance by updater
   //aLoop->clear(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-
-  if (isNestedClosed) {
-    aSession->setCheckTransactions(true);  // for nested transaction commit
-  }
 
   // finish for all subs first: to avoid nested finishing and "isOperation" calls problems inside
   const std::set<std::string> aSubs = subDocuments(true);
@@ -813,8 +811,6 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
   std::shared_ptr<ModelAPI_Document> aThis = 
     Model_Application::getApplication()->getDocument(myID);
   // after all updates, sends a message that groups of features were created or updated
-  std::static_pointer_cast<Model_Session>(Model_Session::get())
-    ->setCheckTransactions(false);
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->activateFlushes(false);
 
@@ -886,9 +882,9 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, EVENT_DISP);
       aFeature->erase();
       // unbind after the "erase" call: on abort sketch is removes sub-objects that corrupts aFIter
-      TDF_Label aLab = aFIter.Key();
-      aFIter.Next();
-      myObjs.UnBind(aLab);
+      myObjs.UnBind(aFIter.Key());
+      // reinitialize iterator because unbind may corrupt the previous order in the map
+      aFIter.Initialize(myObjs);
     } else
       aFIter.Next();
   }
@@ -905,8 +901,6 @@ void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool t
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aLoop->flush(Events_Loop::eventByName(EVENT_OBJECT_TOHIDE));
-  std::static_pointer_cast<Model_Session>(Model_Session::get())
-    ->setCheckTransactions(true);
   myExecuteFeatures = true;
 }
 
