@@ -214,6 +214,8 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
     myActiveWidget->setHighlighted(false);
   }
   if(theWidget) {
+    if (theWidget)
+      emit beforeWidgetActivated(theWidget);
     theWidget->activate();
     theWidget->setHighlighted(true);
   }

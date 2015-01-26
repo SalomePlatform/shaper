@@ -26,6 +26,7 @@
 
 class PartSet_Module;
 class ModuleBase_IViewWindow;
+class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
 class QMouseEvent;
 
@@ -35,6 +36,36 @@ class QMouseEvent;
 class PARTSET_EXPORT PartSet_SketcherMgr : public QObject
 {
   Q_OBJECT
+  /// Struct to define gp point, with the state is the point is initialized
+  struct Point
+  {
+    /// Constructor
+    Point()
+    {
+      myIsInitialized = false;
+    }
+    /// Destructor
+    ~Point()
+    {
+    }
+
+    /// clear the initialized flag.
+    void clear()
+    {
+      myIsInitialized = false;
+    }
+    /// set the point and switch on the initialized flag
+    /// \param thePoint the point
+    void setValue(const double theX, const double theY)
+    {
+      myIsInitialized = true;
+      myCurX = theX;
+      myCurY = theY;
+    }
+
+    bool myIsInitialized;  /// the state whether the point is set
+    double myCurX, myCurY; /// the point coordinates
+  };
 public:
   PartSet_SketcherMgr(PartSet_Module* theModule);
 
@@ -63,13 +94,19 @@ private slots:
   void onMouseReleased(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseMoved(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*);
+  void onApplicationStarted();
+  void onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
 private:
+  /// Returns whethe the current operation is a sketch distance - lenght, distance or radius
+  /// \param the operation
+  /// \return a boolean value
+  bool isDistanceOperation(ModuleBase_Operation* theOperation) const;
+
   /// Converts mouse position to 2d coordinates. 
   /// Member myCurrentSketch has to be correctly defined
   void get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent, 
-                  double& theX, double& theY);
-
+                  Point& thePoint);
 
   typedef QList<AttributePtr> AttributeList;
   typedef QMap<FeaturePtr, AttributeList> FeatureToAttributesMap;
@@ -124,7 +161,8 @@ private:
   bool myPreviousSelectionEnabled; // the previous selection enabled state in the viewer
   bool myIsDragging;
   bool myDragDone;
-  double myCurX, myCurY;
+  Point myCurrentPoint;
+  Point myClickedPoint;
 
   CompositeFeaturePtr myCurrentSketch;
 

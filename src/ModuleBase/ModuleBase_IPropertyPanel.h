@@ -62,6 +62,10 @@ signals:
 
   /// The signal about the widget activation
   /// \param theWidget the activated widget
+  void beforeWidgetActivated(ModuleBase_ModelWidget* theWidget);
+
+  /// The signal about the widget activation
+  /// \param theWidget the activated widget
   void widgetActivated(ModuleBase_ModelWidget* theWidget);
 
   /// Emited when there is no next widget

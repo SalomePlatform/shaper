@@ -14,6 +14,9 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_Selection.h>
 #include <XGUI_SelectionMgr.h>
+#include <ModuleBase_ModelWidget.h>
+#include <XGUI_ModuleConnector.h>
+#include <XGUI_PropertyPanel.h>
 
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
@@ -102,8 +105,8 @@ void fillFeature2Attribute(const QList<ModuleBase_ViewerPrs>& theList,
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false)
 {
-  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-  ModuleBase_IViewer* aViewer = aWorkshop->viewer();
+  ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
+  ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
 
   myPreviousSelectionEnabled = true;//aViewer->isSelectionEnabled();
 
@@ -118,6 +121,10 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
 
   connect(aViewer, SIGNAL(mouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*)),
           this, SLOT(onMouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*)));
+
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  connect(aWorkshop, SIGNAL(applicationStarted()), this, SLOT(onApplicationStarted()));
 }
 
 PartSet_SketcherMgr::~PartSet_SketcherMgr()
@@ -128,6 +135,8 @@ PartSet_SketcherMgr::~PartSet_SketcherMgr()
 
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  get2dPoint(theWnd, theEvent, myClickedPoint);
+
   // 
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
@@ -184,7 +193,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
     if (isSketcher) {
       myIsDragging = true;
-      get2dPoint(theWnd, theEvent, myCurX, myCurY);
+      get2dPoint(theWnd, theEvent, myCurrentPoint);
       myDragDone = false;
       launchEditing();
 
@@ -193,7 +202,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       aOperation->commit();
 
       myIsDragging = true;
-      get2dPoint(theWnd, theEvent, myCurX, myCurY);
+      get2dPoint(theWnd, theEvent, myCurrentPoint);
       myDragDone = false;
 
       // This is necessary in order to finalize previous operation
@@ -209,6 +218,8 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   ModuleBase_Operation* aOp = aWorkshop->currentOperation();
   if (aOp) {
     if (sketchOperationIdList().contains(aOp->id())) {
+  get2dPoint(theWnd, theEvent, myClickedPoint);
+
       // Only for sketcher operations
       ModuleBase_IViewer* aViewer = aWorkshop->viewer();
       if (myIsDragging) {
@@ -233,6 +244,8 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  myClickedPoint.clear();
+
   if (myIsDragging) {
     ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
     // 1. it is necessary to save current selection in order to restore it after the features moving
@@ -255,8 +268,8 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
     double aX, aY;
     PartSet_Tools::convertTo2D(aPoint, myCurrentSketch, aView, aX, aY);
-    double dX =  aX - myCurX;
-    double dY =  aY - myCurY;
+    double dX =  aX - myCurrentPoint.myCurX;
+    double dY =  aY - myCurrentPoint.myCurY;
 
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
     XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
@@ -323,8 +336,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
     aDisplayer->updateViewer();
     myDragDone = true;
-    myCurX = aX;
-    myCurY = aY;
+    myCurrentPoint.setValue(aX, aY);
   }
 }
 
@@ -333,9 +345,7 @@ void PartSet_SketcherMgr::onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMo
   ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
   if (aOperation && aOperation->isEditOperation()) {
     std::string aId = aOperation->id().toStdString();
-    if ((aId == SketchPlugin_ConstraintLength::ID()) ||
-      (aId == SketchPlugin_ConstraintDistance::ID()) ||
-      (aId == SketchPlugin_ConstraintRadius::ID())) 
+    if (isDistanceOperation(aOperation))
     {
       // Activate dimension value editing on double click
       ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
@@ -351,12 +361,53 @@ void PartSet_SketcherMgr::onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMo
   }
 }
 
+void PartSet_SketcherMgr::onApplicationStarted()
+{
+  ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
+  if (aPropertyPanel) {
+    connect(aPropertyPanel, SIGNAL(beforeWidgetActivated(ModuleBase_ModelWidget*)),
+            this, SLOT(onBeforeWidgetActivated(ModuleBase_ModelWidget*)));
+  }
+}
+
+void PartSet_SketcherMgr::onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget)
+{
+  if (!myClickedPoint.myIsInitialized)
+    return;
+
+  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+  // the distance constraint feature should not use the clickedd point
+  // this is workaround in order to don't throw down the flyout point value,
+  // set by execute() method of these type of features
+  if (isDistanceOperation(aOperation))
+    return;
+
+  PartSet_WidgetPoint2D* aPnt2dWgt = dynamic_cast<PartSet_WidgetPoint2D*>(theWidget);
+  if (aPnt2dWgt) {
+    aPnt2dWgt->setPoint(myClickedPoint.myCurX, myClickedPoint.myCurY);
+  }
+}
+
+bool PartSet_SketcherMgr::isDistanceOperation(ModuleBase_Operation* theOperation) const
+{
+  std::string aId = theOperation ? theOperation->id().toStdString() : "";
+
+  return (aId == SketchPlugin_ConstraintLength::ID()) ||
+         (aId == SketchPlugin_ConstraintDistance::ID()) ||
+         (aId == SketchPlugin_ConstraintRadius::ID());
+}
+
 void PartSet_SketcherMgr::get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent, 
-                                double& theX, double& theY)
+                                     Point& thePoint)
 {
   Handle(V3d_View) aView = theWnd->v3dView();
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
-  PartSet_Tools::convertTo2D(aPoint, myCurrentSketch, aView, theX, theY);
+  double aX, anY;
+  PartSet_Tools::convertTo2D(aPoint, myCurrentSketch, aView, aX, anY);
+  thePoint.setValue(aX, anY);
 }
 
 void PartSet_SketcherMgr::launchEditing()

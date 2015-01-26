@@ -195,6 +195,9 @@ signals:
   //! the signal about the workshop actions states are updated.
   void commandStatusUpdated();
 
+  //! the application is started
+  void applicationStarted();
+
  public slots:
   void updateCommandStatus();
 

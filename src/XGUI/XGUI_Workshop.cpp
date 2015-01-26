@@ -206,6 +206,8 @@ void XGUI_Workshop::startApplication()
   }
   
   onNew();
+
+  emit applicationStarted();
 }
 
 //******************************************************
@@ -632,7 +634,7 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
     aWidget->enableFocusProcessing();
     QObject::connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
     // Init default values
-    if (!theOperation->isEditOperation() && !aWidget->isComputedDefault()) {
+    if (!theOperation->isEditOperation() && aWidget->isValueDefault() && !aWidget->isComputedDefault()) {
       aWidget->storeValue();
     }
   }
