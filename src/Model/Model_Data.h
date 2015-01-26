@@ -49,6 +49,8 @@ class Model_Data : public ModelAPI_Data
 
   /// List of attributes referenced to owner (updated only during the transaction change)
   std::set<AttributePtr> myRefsToMe;
+  /// flag that may block the "attribute updated" sending
+  bool mySendAttributeUpdated;
 
   Model_Data();
 
@@ -132,6 +134,8 @@ class Model_Data : public ModelAPI_Data
   /// Useful method for "set" methods of the attributes: sends an UPDATE event and
   /// makes attribute initialized
   MODEL_EXPORT virtual void sendAttributeUpdated(ModelAPI_Attribute* theAttr);
+  /// Blocks sending "attribute updated" if theBlock is true
+  MODEL_EXPORT virtual void blockSendAttributeUpdated(const bool theBlock);
 
   /// Puts feature to the document data sub-structure
   MODEL_EXPORT void setLabel(TDF_Label theLab);

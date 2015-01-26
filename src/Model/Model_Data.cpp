@@ -35,7 +35,7 @@
 // TDataStd_Name - name of the object
 // TDataStd_Integer - state of the object execution
 
-Model_Data::Model_Data()
+Model_Data::Model_Data() : mySendAttributeUpdated(true)
 {
 }
 
@@ -197,10 +197,15 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
   if (theAttr->isArgument()) {
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
     ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
-    if (myObject) {
+    if (mySendAttributeUpdated && myObject) {
       myObject->attributeChanged(theAttr->id());
     }
   }
+}
+
+void Model_Data::blockSendAttributeUpdated(const bool theBlock)
+{
+  mySendAttributeUpdated = !theBlock;
 }
 
 void Model_Data::erase()
