@@ -35,44 +35,54 @@ class XGUI_Workshop;
 class XGUI_EXPORT XGUI_Displayer
 {
  public:
-   enum DisplayMode { NoMode = -1, Wireframe, Shading };
+   /// Enumeration of possible display mode
+   enum DisplayMode { 
+     NoMode = -1, /// Mode is not defined
+     Wireframe,   /// Wireframe display mode
+     Shading      /// Shading display mode
+   };
 
   /// Constructor
-  /// \param theViewer the viewer
+  /// \param theWorkshop a workshop instance
   XGUI_Displayer(XGUI_Workshop* theWorkshop);
+
   /// Destructor
   virtual ~XGUI_Displayer();
 
   /// Returns the feature visibility state.
-  /// \param theFeature a feature instance
+  /// \param theObject an object instance
   bool isVisible(ObjectPtr theObject) const;
 
   /// Display the feature. Obtain the visualized object from the feature.
-  /// \param theFeature a feature instance
+  /// \param theObject an object to display
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   /// Returns true if the Feature succesfully displayed
   void display(ObjectPtr theObject, bool isUpdateViewer = true);
 
   /// Display the given AIS object. To hide this object use corresponde erase method
+  /// \param theAIS AIOS object to display
+  /// \param isUpdate the parameter whether the viewer should be update immediatelly
   void displayAIS(AISObjectPtr theAIS, bool isUpdate = true);
 
   /**
    * Add presentations which corresponds to the given features to current selection
    * \param theFeatures a list of features to be selected
-   * isUpdateViewer the parameter whether the viewer should be update immediatelly
+   * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
    */
   void setSelected(const QObjectPtrList& theFeatures, bool isUpdateViewer = true);
 
 
-  /// Un select all objects
+  /// Unselect all objects
   void clearSelected();
 
   /// Erase the feature and a shape.
-  /// \param theFeature a feature instance
+  /// \param theObject an object instance
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void erase(ObjectPtr theObject, const bool isUpdateViewer = true);
 
   /// Erase the given AIS object displayed by corresponded display method
+  /// \param theAIS instance of AIS object
+  /// \param isUpdate the parameter whether the viewer should be update immediatelly
   void eraseAIS(AISObjectPtr theAIS, const bool isUpdate = true);
 
   /// Erase all presentations
@@ -83,10 +93,15 @@ class XGUI_EXPORT XGUI_Displayer
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
   void closeLocalContexts(const bool isUpdateViewer = true);
 
+  /// \brief Add selection filter
+  /// \param theFilter a filter instance
   void addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
 
+  /// \brief Remove selection filter
+  /// \param theFilter a filter instance
   void removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter);
 
+  /// Remove all selection filters
   void removeFilters();
 
   /**
@@ -100,32 +115,40 @@ class XGUI_EXPORT XGUI_Displayer
   void updateViewer();
 
   /// Searches the interactive object by feature
-  /// \param theFeature the object or presentable feature
+  /// \param theObject the object or presentable feature
   /// \return theIO an interactive object
-  AISObjectPtr getAISObject(ObjectPtr theFeature) const;
+  AISObjectPtr getAISObject(ObjectPtr theObject) const;
 
   /// Searches the feature by interactive object
   /// \param theIO an interactive object
   /// \return feature the feature or NULL if it not visualized
   ObjectPtr getObject(const AISObjectPtr& theIO) const;
+
+  /// Searches the feature by interactive object
+  /// \param theIO an interactive object
+  /// \return corresponded object or NULL if it not found
   ObjectPtr getObject(const Handle(AIS_InteractiveObject)& theIO) const;
 
   /// Deactivates the given object (not allow selection)
-  void deactivate(ObjectPtr theFeature);
+  /// \param theObject object to deactivate
+  void deactivate(ObjectPtr theObject);
 
   /// Activates the given object (it can be selected)
+  /// \param theObject object to activate
   /// \param theModes - modes on which it has to be activated (can be empty)
-  void activate(ObjectPtr theFeature, const QIntList& theModes);
+  void activate(ObjectPtr theObject, const QIntList& theModes);
 
   /// Returns the modes of activation
-  /// \param theFeature the feature or NULL if it not visualized
+  /// \param theObject the feature or NULL if it not visualized
   /// \param theModes - modes on which it is activated (can be empty)
   void getModesOfActivation(ObjectPtr theObject, QIntList& theModes);
 
   /// Activates the given object with default modes
-  void activate(ObjectPtr theFeature);
+  /// \param theObject object to activate
+  void activate(ObjectPtr theObject);
 
   /// Returns true if the given object can be selected
+  /// \param theObject object to check
   bool isActive(ObjectPtr theObject) const;
 
   /// Activates in local context displayed outside of the context.
@@ -140,18 +163,21 @@ class XGUI_EXPORT XGUI_Displayer
 
   /// Returns current display mode for the given object.
   /// If object is not dis played then returns NoMode.
+  /// \param theObject object to check
   DisplayMode displayMode(ObjectPtr theObject) const;
 
-
   /// Displays only objects listed in the list
+  /// \param theList list of objects
   void showOnly(const QObjectPtrList& theList);
 
   /// Returns number of displayed objects
   int objectsCount() const { return myResult2AISObjectMap.size(); }
 
+  /// Returns list of displayed objects
   QObjectPtrList displayedObjects() const { return myResult2AISObjectMap.keys(); }
 
   /// Returns true if the given object can be shown in shaded mode
+  /// \param theObject object to check
   bool canBeShaded(ObjectPtr theObject) const;
 
  protected:
@@ -163,24 +189,16 @@ class XGUI_EXPORT XGUI_Displayer
   Handle(SelectMgr_AndFilter) GetFilter();
 
   /// Display the feature and a shape. This shape would be associated to the given feature
-  /// \param theFeature a feature instance
+  /// \param theObject an object instance
   /// \param theAIS AIS presentation
+  /// \param isShading flag to show in shading mode
   /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  /// Returns true if the Feature succesfully displayed
+  /// \return true if the object is succesfully displayed
   void display(ObjectPtr theObject, AISObjectPtr theAIS, bool isShading,
                bool isUpdateViewer = true);
 
-  /// Display the shape and activate selection of sub-shapes
-  /// \param theFeature a feature instance
-  /// \param theAIS an AIS object
-  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
-  /// \returns true if the presentation is created
-  //bool redisplay(ObjectPtr theObject,
-  //               AISObjectPtr theAIS, 
-  //               const bool isUpdateViewer = true);
-
   /** Redisplay the shape if it was displayed
-   * \param theFeature a feature instance
+   * \param theObject an object instance
    * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
    */
   void redisplay(ObjectPtr theObject, bool isUpdateViewer = true);
@@ -189,19 +207,23 @@ class XGUI_EXPORT XGUI_Displayer
   void openLocalContext();
 
  protected:
+   /// Reference to workshop
   XGUI_Workshop* myWorkshop;
 
+  /// A container for selection filters
   Handle(SelectMgr_AndFilter) myAndFilter;
 
+  /// Definition of a type of map which defines correspondance between objects and presentations
   typedef QMap<ObjectPtr, AISObjectPtr> ResultToAISMap;
+
+  /// A map of displayed objects
   ResultToAISMap myResult2AISObjectMap;
 
-  // A flag of initialization of external objects selection
-  //bool myUseExternalObjects;
-  // Selection modes installed for external objects in local context
+  /// Selection modes installed for external objects in local context
   QIntList myActiveSelectionModes;
 
-  bool myEnableUpdateViewer;  /// the enable update viewer flag
+  /// the enable update viewer flag
+  bool myEnableUpdateViewer;  
 };
 
 #endif

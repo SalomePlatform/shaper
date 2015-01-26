@@ -8,8 +8,9 @@
 
 #include <string>
 
-/*
- * Class to pass a feature entry extracted from xml file.
+/*!
+ * \class Config_FeatureMessage
+ * \brief Class to pass a feature entry extracted from xml file.
  * Example of the feature entry:
  * <feature id="Part" text="New part" tooltip="Creates a new part" icon=":pictures/part_ico.png"/>
  */

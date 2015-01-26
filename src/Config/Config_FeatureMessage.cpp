@@ -1,8 +1,5 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-/*
- *
- */
 #include "Config_FeatureMessage.h"
 
 Config_FeatureMessage::Config_FeatureMessage(const Events_ID theId, const void* theParent)

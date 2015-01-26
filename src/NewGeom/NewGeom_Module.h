@@ -29,12 +29,22 @@ Q_OBJECT
   virtual ~NewGeom_Module();
 
   //----- LightAPP_Module interface ---------------
+
+  /// \brief Initializing of the module
+  /// \param theApp application instance
   virtual void initialize(CAM_Application* theApp);
+
+  /// \brief Definition of module standard windows
   virtual void windows(QMap<int, int>& theWndMap) const;
+
+  /// \brief Definition of module viewer 
   virtual void viewManagers(QStringList& theList) const;
+
+  /// \brief The method is called on selection changed event
   virtual void selectionChanged();
 
   //--- XGUI connector interface -----
+
   virtual QAction* addFeature(const QString& theWBName, const QString& theId,
                               const QString& theTitle, const QString& theTip, const QIcon& theIcon,
                               const QKeySequence& theKeys = QKeySequence(),
@@ -83,52 +93,93 @@ Q_OBJECT
   //! Returns list of Ids of defined actions (just by NewGeom module)
   virtual QStringList commandIdList() const;
 
+  /// Redefinition of virtual function. 
+  /// \param theClient name of pop-up client
+  /// \param theMenu popup menu instance
+  /// \param theTitle menu title.
   virtual void contextMenuPopup(const QString& theClient, QMenu* theMenu, QString& theTitle);
 
+  /// Redefinition of virtual function for preferences creation. 
   virtual void createPreferences();
-  virtual void preferencesChanged(const QString& theSection, const QString& theParam);
 
+  /// Redefinition of virtual function for preferences changed event. 
+  virtual void preferencesChanged(const QString& theSection, const QString& theParam);
+  
+  /// \return Workshop class instance
   XGUI_Workshop* workshop() const { return myWorkshop; }
 
+  /// \brief Set flag about opened document state
   void setIsOpened(bool theOpened) { myIsOpened = theOpened; }
 
+  /// Register current modules of SALOME
   void inspectSalomeModules();
 
  public slots:
+   /// \brief The method is called on the module activation
+   /// \param theStudy current study
   virtual bool activateModule(SUIT_Study* theStudy);
+
+   /// \brief The method is called on the module activation
+   /// \param theStudy current study
   virtual bool deactivateModule(SUIT_Study* theStudy);
 
  protected slots:
+   /// Redefinition of virtual function
+   /// \param theMgr view manager
   virtual void onViewManagerAdded(SUIT_ViewManager* theMgr);
+
+   /// Redefinition of virtual function
+   /// \param theMgr view manager
   virtual void onViewManagerRemoved(SUIT_ViewManager* theMgr);
 
+  /// Set preferences to default
   void onDefaultPreferences();
-  // Obtains the current application and updates its actions
+
+  /// Obtains the current application and updates its actions
   void onUpdateCommandStatus();
 
  protected:
+   /// Create data model
   CAM_DataModel* createDataModel();
+
+  /// Create popup menu manager
   virtual QtxPopupMgr* popupMgr();
 
  private:
+   /// Create selector for OCC Viewer
+   /// \param theMgr view manager
   NewGeom_OCCSelector* createSelector(SUIT_ViewManager* theMgr);
 
+  /// List of registered actions
   QStringList myActionsList;
 
+  /// Reference to workshop
   XGUI_Workshop* myWorkshop;
 
+  /// OCC viewer selector instance
   NewGeom_OCCSelector* mySelector;
 
+  /// Proxy viewer for connection to OCC Viewer in SALOME
   NewGeom_SalomeViewer* myProxyViewer;
 
+  /// Map of nested actions [ActionID: list of nested actions Id]
   QMap<QString, QStringList> myNestedActions;
+
+  /// Map of document types
   QMap<QString, QString> myDocumentType;
 
+  /// Flag of opened document state
   bool myIsOpened;
-  // the next parameters should be restored after this module deactivation
-  bool myIsStorePositions; // the application value of the preferences parameter
-  bool myIsEditEnabled;    // the application value
 
+  // the next parameters should be restored after this module deactivation
+
+  /// The application value of the preferences parameter
+  bool myIsStorePositions; 
+
+  /// The application value
+  bool myIsEditEnabled;    
+
+  /// Popup manager
   QtxPopupMgr* myPopupMgr;
 };
 

@@ -1,23 +1,26 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModelAPI_CompositeFeature.hxx
+// File:        ModelAPI_CompositeFeature.h
 // Created:     20 Oct 2014
 // Author:      Mikhail PONIKAROV
 
-#ifndef ModelAPI_CompositeFeature_H_
-#define ModelAPI_CompositeFeature_H_
+#ifndef MODELAPI_COMPOSITEFEATURE_H_
+#define MODELAPI_COMPOSITEFEATURE_H_
 
+#include "ModelAPI.h"
 #include "ModelAPI_Feature.h"
 
 /**\class ModelAPI_CompositeFeature
  * \ingroup DataModel
  * \brief Feature that consists of other features: like sketcher
- * with edges inside. It just allows t oadd a feature to this feature only
+ * with edges inside. It just allows to add a feature to this feature only
  * instead of adding in both document and this feature.
  */
 class ModelAPI_CompositeFeature : public ModelAPI_Feature
 {
 public:
+  MODELAPI_EXPORT virtual ~ModelAPI_CompositeFeature();
+
   /// Adds feature to the sketch and to its document
   virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
 

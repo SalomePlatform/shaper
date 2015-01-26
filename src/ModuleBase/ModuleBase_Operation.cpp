@@ -90,7 +90,7 @@ void ModuleBase_Operation::flushCreated()
 
 FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
 {
-  if (myParentFeature) {
+  if (myParentFeature.get()) {
     myFeature = myParentFeature->addFeature(getDescription()->operationId().toStdString());
   } else {
     std::shared_ptr<ModelAPI_Document> aDoc = document();
@@ -244,6 +244,16 @@ void ModuleBase_Operation::activateByPreselection()
   if (aFilledWgt)
     emit activatedByPreselection();
 
+}
+
+void ModuleBase_Operation::setParentFeature(CompositeFeaturePtr theParent)
+{
+  myParentFeature = theParent;
+}
+
+CompositeFeaturePtr ModuleBase_Operation::parentFeature() const
+{
+  return myParentFeature;
 }
 
 void ModuleBase_Operation::initSelection(ModuleBase_ISelection* theSelection,

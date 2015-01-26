@@ -64,7 +64,7 @@ Config_XMLReader::~Config_XMLReader()
   xmlFreeDoc(myXmlDoc);
 }
 
-/*
+/*!
  * Read all nodes in associated xml file,
  * recursively if processChildren(xmlNode) is true for the xmlNode.
  * For each read node the processNode will be called.
@@ -75,7 +75,7 @@ void Config_XMLReader::readAll()
   readRecursively(aRoot);
 }
 
-/*
+/*!
  * Allows to customize reader's behavior for a node. Virtual.
  * The default impl does nothing. (In debug mode prints
  * some info)
@@ -96,7 +96,7 @@ void Config_XMLReader::processNode(xmlNodePtr theNode)
   }
 }
 
-/*
+/*!
  * Defines which nodes should be processed recursively. Virtual.
  * The default impl is to read all nodes.
  */
@@ -105,8 +105,9 @@ bool Config_XMLReader::processChildren(xmlNodePtr aNode)
   return true;
 }
 
-/*
- *
+/*!
+ * Returns xmlNodePtr to the root of reader's document
+ * or NULL if not found
  */
 xmlNodePtr Config_XMLReader::findRoot()
 {
@@ -129,7 +130,7 @@ xmlNodePtr Config_XMLReader::findRoot()
   return aRoot;
 }
 
-/*
+/*!
  * Calls processNode() for each child (for some - recursively)
  * of the given node.
  * \sa ReadAll()
@@ -151,7 +152,7 @@ void Config_XMLReader::readRecursively(xmlNodePtr theParent)
   }
 }
 
-/*
+/*!
  * void* -> xmlNodePtr
  */
 xmlNodePtr Config_XMLReader::node(void* theNode)
@@ -159,6 +160,9 @@ xmlNodePtr Config_XMLReader::node(void* theNode)
   return static_cast<xmlNodePtr>(theNode);
 }
 
+/*!
+ * Gets xml node name
+ */
 std::string Config_XMLReader::getNodeName(xmlNodePtr theNode)
 {
   std::string result = "";
@@ -169,6 +173,10 @@ std::string Config_XMLReader::getNodeName(xmlNodePtr theNode)
   return result;
 }
 
+/*!
+ * Retrieves all the necessary info from the validator node.
+ * Sends ValidatorLoaded event
+ */
 void Config_XMLReader::processValidator(xmlNodePtr theNode)
 {
   Events_ID aValidatoEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
@@ -190,6 +198,10 @@ void Config_XMLReader::processValidator(xmlNodePtr theNode)
   aEvLoop->send(aMessage);
 }
 
+/*!
+ * Retrieves all the necessary info from the SelectionFilter node.
+ * Sends SelectionFilterLoaded event
+ */
 void Config_XMLReader::processSelectionFilter(xmlNodePtr theNode)
 {
   Events_ID aFilterEvent = Events_Loop::eventByName(EVENT_SELFILTER_LOADED);

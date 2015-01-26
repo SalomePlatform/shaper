@@ -1241,6 +1241,7 @@ void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
     myObjectBrowser->activatePart(theFeature);
     myPartActivating = false;
   }
+  updateCommandStatus();
 }
 
 //**************************************************************
@@ -1358,6 +1359,11 @@ void XGUI_Workshop::setDisplayMode(const QObjectPtrList& theList, int theMode)
 //**************************************************************
 void XGUI_Workshop::closeDocument()
 {
+  ModuleBase_Operation* anOperation = operationMgr()->currentOperation();
+  while (anOperation) {
+    anOperation->abort();
+    anOperation = operationMgr()->currentOperation();
+  }
   myDisplayer->closeLocalContexts();
   myDisplayer->eraseAll();
   objectBrowser()->clearContent();

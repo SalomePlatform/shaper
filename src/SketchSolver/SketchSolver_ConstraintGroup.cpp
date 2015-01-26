@@ -897,9 +897,17 @@ bool SketchSolver_ConstraintGroup::resolveConstraints()
     // We should go through the attributes map, because only attributes have valued parameters
     std::map<std::shared_ptr<ModelAPI_Attribute>, Slvs_hEntity>::iterator anEntIter =
         myEntityAttrMap.begin();
-    for (; anEntIter != myEntityAttrMap.end(); anEntIter++)
+    for (; anEntIter != myEntityAttrMap.end(); anEntIter++) {
+      if (anEntIter->first->owner().get() && anEntIter->first->owner()->data().get())
+        anEntIter->first->owner()->data()->blockSendAttributeUpdated(true);
       if (updateAttribute(anEntIter->first, anEntIter->second))
         updateRelatedConstraints(anEntIter->first);
+    }
+    // unblock all features then
+    for (; anEntIter != myEntityAttrMap.end(); anEntIter++) {
+      if (anEntIter->first->owner().get() && anEntIter->first->owner()->data().get())
+        anEntIter->first->owner()->data()->blockSendAttributeUpdated(false);
+    }
   } else if (!myConstraints.empty())
     Events_Error::send(SketchSolver_Error::CONSTRAINTS(), this);
 

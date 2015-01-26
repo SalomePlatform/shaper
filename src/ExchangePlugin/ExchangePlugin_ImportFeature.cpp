@@ -122,8 +122,8 @@ void ExchangePlugin_ImportFeature::loadNamingDS(
   int aTag(1);
   std::string aNameMS = "Shape";
   theResultBody->loadFirstLevel(theGeomShape, aNameMS, aTag);
-  std::string aNameDE = "DiscEdges";
-  theResultBody->loadDisconnectedEdges(theGeomShape, aNameDE, aTag);
-  std::string aNameDV = "DiscVertexes";
-  theResultBody->loadDisconnectedVertexes(theGeomShape, aNameDV, aTag); 
+  //std::string aNameDE = "DiscEdges";
+  //theResultBody->loadDisconnectedEdges(theGeomShape, aNameDE, aTag);
+  //std::string aNameDV = "DiscVertexes";
+  //theResultBody->loadDisconnectedVertexes(theGeomShape, aNameDV, aTag); 
 }

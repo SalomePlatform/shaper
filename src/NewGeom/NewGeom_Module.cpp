@@ -50,9 +50,15 @@ NewGeom_EXPORT char* getModuleVersion()
 }
 }
 
+/** 
+* Class for preferences management
+*/
 class NewGeom_PrefMgr: public ModuleBase_IPrefMgr
 {
 public:
+  /// Constructor
+  /// \param theMgr preferences manager of SALOME
+  /// \param theModName name of the module
   NewGeom_PrefMgr(LightApp_Preferences* theMgr, const QString& theModName):myMgr(theMgr), myModName(theModName) {}
 
   virtual int addPreference(const QString& theLbl, int pId, 
@@ -196,9 +202,10 @@ bool NewGeom_Module::deactivateModule(SUIT_Study* theStudy)
   // because the displayed objects should be removed from the viewer, but
   // the AIS context is obtained from the selector.
   ModuleBase_Operation* anOperation = myWorkshop->operationMgr()->currentOperation();
-  if (anOperation)
+  while (anOperation) {
     anOperation->abort();
-
+    anOperation = myWorkshop->operationMgr()->currentOperation();
+  }
   // Delete selector because it has to be redefined on next activation
   if (mySelector) {
     myProxyViewer->setSelector(0);

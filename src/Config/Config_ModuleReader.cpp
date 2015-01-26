@@ -48,7 +48,7 @@ const std::map<std::string, std::string>& Config_ModuleReader::featuresInFiles()
   return myFeaturesInFiles;
 }
 
-/*
+/*!
  * Get module name from plugins.xml
  * (property "module")
  */
@@ -58,9 +58,6 @@ std::string Config_ModuleReader::getModuleName()
   return getProperty(aRoot, PLUGINS_MODULE);
 }
 
-/*
- *
- */
 void Config_ModuleReader::processNode(xmlNodePtr theNode)
 {
   if (isNode(theNode, NODE_PLUGIN, NULL)) {

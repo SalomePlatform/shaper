@@ -17,10 +17,15 @@
 
 class ModuleBase_ModelWidget;
 
+/**
+* A class for Property panel object definition
+*/
 class MODULEBASE_EXPORT ModuleBase_IPropertyPanel : public QDockWidget
 {
 Q_OBJECT
 public:
+  /// Constructor
+  /// \param theParent is a parent of the property panel
   ModuleBase_IPropertyPanel(QWidget* theParent) : QDockWidget(theParent), myIsEditing(false) {}
 
   /// Returns currently active widget
@@ -30,19 +35,24 @@ public:
   virtual const QList<ModuleBase_ModelWidget*>& modelWidgets() const = 0;
 
   /// Editing mode depends on mode of current operation. This value is defined by it.
+  /// \param isEditing state of editing mode flag
   virtual void setEditingMode(bool isEditing) { myIsEditing = isEditing; }
+
+  /// \return State of editing mode flag
   bool isEditingMode() const { return myIsEditing; }
 
   /// Set Enable/Disable state of Ok button
+  /// \param theEnabled Enable/Disable state of Ok button
   virtual void setOkEnabled(bool theEnabled) = 0;
 
-  /// Returns state of Ok button
+  /// \return Enable/disable state of Ok button
   virtual bool isOkEnabled() const = 0;
 
-  /// Set Enable/Disable state of Ok button
+  /// Set Enable/Disable state of Cancel button
+  /// \param theEnabled Enable/Disable state of Cancel button
   virtual void setCancelEnabled(bool theEnabled) = 0;
 
-  /// Returns state of Ok button
+  /// \return Enable/Disable state of Cancel button
   virtual bool isCancelEnabled() const = 0;
 
 signals:
@@ -69,12 +79,17 @@ public slots:
   /// Activate the next from current widget in the property panel
   virtual void activateNextWidget() = 0;
 
-  // Makes the given widget active, highlights it and removes
-  // highlighting from the previous active widget
-  // emits widgetActivated(theWidget) signal
+  /**
+  * Makes the given widget active, highlights it and removes
+  * highlighting from the previous active widget
+  * emits widgetActivated(theWidget) signal
+  * \param theWidget which has to be activated
+  */
   virtual void activateWidget(ModuleBase_ModelWidget* theWidget) = 0;
 
 protected:
+
+  /// Flag which shows that current operation is in editing mode
   bool myIsEditing;
 };
 

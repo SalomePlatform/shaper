@@ -27,15 +27,16 @@ typedef xmlDoc *xmlDocPtr;
 struct _xmlDoc;
 //<<
 
-/*
- * Base class for all libxml readers. Provides high-level API
+/*!
+ * \class Config_XMLReader
+ * \brief Base class for all libxml readers. Provides high-level API
  * for all xml operations.
- *
- */
+*/
 class Config_XMLReader
 {
  public:
-  CONFIG_EXPORT Config_XMLReader(const std::string& theXmlFile);CONFIG_EXPORT virtual ~Config_XMLReader();
+  CONFIG_EXPORT Config_XMLReader(const std::string& theXmlFile);
+  CONFIG_EXPORT virtual ~Config_XMLReader();
 
   CONFIG_EXPORT void readAll();
 

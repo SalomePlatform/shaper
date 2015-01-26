@@ -20,17 +20,27 @@
 class QKeyEvent;
 class QVBoxLayout;
 
+/// Internal name of property panel widget
 const static char* PROP_PANEL = "property_panel_dock";
+
+/// Internal name of Ok button
 const static char* PROP_PANEL_OK = "property_panel_ok";
+
+/// Internal name of Cancel button
 const static char* PROP_PANEL_CANCEL = "property_panel_cancel";
 
+/**
+* Realization of Property panel object.
+*/
 class XGUI_EXPORT XGUI_PropertyPanel : public ModuleBase_IPropertyPanel
 {
 Q_OBJECT
  public:
 
-
+  /// Constructor
+  /// \param theParent is a parent of the property panel
   XGUI_PropertyPanel(QWidget* theParent);
+
   virtual ~XGUI_PropertyPanel();
 
   /// Returns main widget of the property panel, which children will be created
@@ -57,37 +67,51 @@ Q_OBJECT
   /// Activate the next from current widget in the property panel
   virtual void activateNextWidget();
 
+  /// \brief Enable/Disable stretch area in the panel
   void setStretchEnabled(bool isEnabled);
 
   /// Set Enable/Disable state of Ok button
+  /// \param theEnabled Enable/Disable state of Ok button
   virtual void setOkEnabled(bool theEnabled);
 
-  /// Returns state of Ok button
+  /// \return Enable/disable state of Ok button
   virtual bool isOkEnabled() const;
 
-  /// Set Enable/Disable state of Ok button
+  /// Set Enable/Disable state of Cancel button
+  /// \param theEnabled Enable/Disable state of Cancel button
   virtual void setCancelEnabled(bool theEnabled);
 
-  /// Returns state of Ok button
+  /// \return Enable/Disable state of Cancel button
   virtual bool isCancelEnabled() const;
 
   /// Editing mode depends on mode of current operation. This value is defined by it.
+  /// \param isEditing state of editing mode flag
   virtual void setEditingMode(bool isEditing);
 
  public slots:
-  void updateContentWidget(FeaturePtr theFeature);
-  // Enables / disables "ok" ("accept") button
-  void setAcceptEnabled(bool);
 
-  // Makes the given widget active, highlights it and removes
-  // highlighting from the previous active widget
-  // emits widgetActivated(theWidget) signal
+   /// \brief Update all widgets in property panel with values from the given feature
+   /// \param theFeature a Feature to update values in widgets
+  void updateContentWidget(FeaturePtr theFeature);
+
+  /// Enables / disables "ok" ("accept") button
+  /// \param toEnable enable/disable state of button
+  void setAcceptEnabled(bool toEnable);
+
+  /**
+  * Makes the given widget active, highlights it and removes
+  * highlighting from the previous active widget
+  * emits widgetActivated(theWidget) signal
+  * \param theWidget which has to be activated
+  */
   virtual void activateWidget(ModuleBase_ModelWidget* theWidget);
 
  private:
   QWidget* myCustomWidget;
   QList<ModuleBase_ModelWidget*> myWidgets;
   QVBoxLayout* myMainLayout;
+
+  /// Currently active widget
   ModuleBase_ModelWidget* myActiveWidget;
 };
 

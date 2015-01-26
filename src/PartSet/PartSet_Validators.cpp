@@ -164,8 +164,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
                                                 const std::list<std::string>& theArguments,
                                                 const AttributePtr& theAttribute) const
 {
-  // not implemented
-  return true;
+  return PartSet_DifferentObjectsValidator::isValid(theAttribute, theArguments);
 }
 
 bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute, 

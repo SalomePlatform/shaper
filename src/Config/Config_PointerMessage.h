@@ -13,8 +13,9 @@
 #include <Config_def.h>
 #include <Events_Message.h>
 
-/*
- * A general class to pass pointers over the event loop.
+/*!
+ * \class Config_PointerMessage
+ * \brief A general class to pass pointers over the event loop.
  */
 class CONFIG_EXPORT Config_PointerMessage : public Events_Message
 {

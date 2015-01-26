@@ -103,6 +103,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// Useful method for "set" methods of the attributes: sends an UPDATE event and
   /// makes attribute initialized
   virtual void sendAttributeUpdated(ModelAPI_Attribute* theAttr) = 0;
+  /// Blocks sending "attribute updated" if theBlock is true
+  virtual void blockSendAttributeUpdated(const bool theBlock) = 0;
 
   /// Erases all the data from the data model
   virtual void erase() = 0;

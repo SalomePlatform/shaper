@@ -32,8 +32,9 @@ class MODULEBASE_EXPORT ModuleBase_ModelWidget : public QObject
 Q_OBJECT
  public:
   /// Constructor
-  /// \theParent the parent object
-  /// \theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParent the parent object
+  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_ModelWidget(QWidget* theParent, const Config_WidgetAPI* theData,
                          const std::string& theParentId);
   /// Destructor
@@ -71,9 +72,9 @@ Q_OBJECT
   }
 
   /// Saves the internal parameters to the given feature
-  /// \param theObject a model feature to be changed
   virtual bool storeValue() const = 0;
 
+  /// Restore value from attribute data to the widget's control
   virtual bool restoreValue() = 0;
 
   /// Set focus to the first control of the current widget. The focus policy of the control is checked.
@@ -95,13 +96,13 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const = 0;
 
-
   /// FocusIn events processing
   virtual bool eventFilter(QObject* theObject, QEvent *theEvent);
 
-
+  //! \brief Enables processing of focus event on all controls by the widget
   void enableFocusProcessing();
 
+  //! Switch On/Off highlighting of the widget
   void setHighlighted(bool isHighlighted);
 
   /// Returns the attribute name
@@ -118,11 +119,13 @@ Q_OBJECT
     return myParentId;
   }
 
+  /// \return Current feature
   FeaturePtr feature() const
   {
     return myFeature;
   }
 
+  /// Set feature which is processing by active operation
   void setFeature(const FeaturePtr& theFeature)
   {
     myFeature = theFeature;
@@ -130,43 +133,60 @@ Q_OBJECT
 
   /// Editing mode depends on mode of current operation. This value is defined by it.
   void setEditingMode(bool isEditing) { myIsEditing = isEditing; }
+
+  /// \return Current Editing mode
   bool isEditingMode() const { return myIsEditing; }
 
 signals:
   /// The signal about widget values changed
   void valuesChanged();
+
   /// The signal about key release on the control, that corresponds to the attribute
-  /// \param theAttributeName a name of the attribute
   /// \param theEvent key release event
   void keyReleased(QKeyEvent* theEvent);
+
   /// The signal about the widget is get focus
   /// \param theWidget the model base widget
   void focusInWidget(ModuleBase_ModelWidget* theWidget);
+
   /// The signal about the widget is lost focus
   /// \param theWidget the model base widget
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
 
  protected:
-  /// Returns the attribute name
-  /// \returns the string value
+  /// \brief Set the attribute name
+  /// \param theAttribute the string value with attribute name
   void setAttributeID(const std::string& theAttribute)
   {
     myAttributeID = theAttribute;
   }
 
+  /// Sends Update and Redisplay for the given object
+  /// \param theObj is updating object
   void updateObject(ObjectPtr theObj) const;
+
+  /// Sends Move event for the given object
+  /// \param theObj is object for moving
   void moveObject(ObjectPtr theObj) const;
 
  protected:
-  std::string myAttributeID; /// the attribute name of the model feature
-  std::string myParentId;    /// name of parent
-  FeaturePtr myFeature;
 
-  bool myIsComputedDefault; /// Value should be computed on execute,
-                            /// like radius for circle's constraint (can not be zero)
+  /// The attribute name of the model feature
+  std::string myAttributeID; 
 
-  bool myIsValueDefault; /// the default value is defined in the XML for this attribute
-  bool myIsEditing;
+  /// Name of parent
+  std::string myParentId;    
+
+  /// A feature which is processing by active operation
+  FeaturePtr myFeature;      
+
+  /// Value should be computed on execute, like radius for circle's constraint (can not be zero)
+  bool myIsComputedDefault; 
+                        
+  /// the default value is defined in the XML for this attribute    
+  bool myIsValueDefault;
+  /// Flag which shows that current operation is in editing mode
+  bool myIsEditing; 
 };
 
 #endif

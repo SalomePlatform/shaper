@@ -52,6 +52,10 @@
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Iterator.hxx>
 using namespace std;
+//#define DEB_NAMING 1
+#ifdef DEB_NAMING
+#include <BRepTools.hxx>
+#endif
 /// adeed to the index in the packed map to signalize that the vertex of edge is seleted
 /// (multiplied by the index of the edge)
 static const int kSTART_VERTEX_DELTA = 1000000;
@@ -601,6 +605,9 @@ std::string Model_AttributeSelection::namingName()
   if(!aSubSh.get() || aSubSh->isNull() || !aCont.get() || aCont->shape()->isNull()) 
     return aName;
   TopoDS_Shape aSubShape = aSubSh->impl<TopoDS_Shape>();
+#ifdef DEB_NAMING
+  BRepTools::Write(aSubShape, "Selection.brep");
+#endif
   TopoDS_Shape aContext  = aCont->shape()->impl<TopoDS_Shape>();
   std::shared_ptr<Model_Document> aDoc = 
     std::dynamic_pointer_cast<Model_Document>(aCont->document());
@@ -611,7 +618,7 @@ std::string Model_AttributeSelection::namingName()
     TopAbs_ShapeEnum aType = aSubShape.ShapeType();
 	switch (aType) {
 	  case TopAbs_FACE:
-      // the Face should be in DF. If it is not a case, it is an error ==> to be dbugged		
+      // the Face should be in DF. If it is not the case, it is an error ==> to be debugged		
 		break;
 	  case TopAbs_EDGE:
 		  {
@@ -670,6 +677,7 @@ std::string Model_AttributeSelection::namingName()
 	  case TopAbs_VERTEX:
 		  // name structure (Monifold Topology): 
 		  // 1) F1 | F2 | F3 - intersection of 3 faces defines a vertex - trivial case.
+		  // 2) F1 | F2 | F3 [|F4 [|Fn]] - redundant definition, but it should be kept as is to obtain safe recomputation
 		  // 2) F1 | F2      - intersection of 2 faces definses a vertex - applicable for case
 		  //                   when 1 faces is cylindrical, conical, spherical or revolution and etc.
 		  // 3) E1 | E2 | E3 - intersection of 3 edges defines a vertex - when we have case of a shell
@@ -684,7 +692,7 @@ std::string Model_AttributeSelection::namingName()
 			TopTools_ListOfShape aList;
 			TopTools_MapOfShape aFMap;
 #ifdef FIX_BUG1
-			//int n = aList2.Extent(); //bug!
+			//int n = aList2.Extent(); //bug! duplication
 			// fix is below
 			TopTools_ListIteratorOfListOfShape itl2(aList2);
 		    for (int i = 1;itl2.More();itl2.Next(),i++) {
@@ -693,14 +701,33 @@ std::string Model_AttributeSelection::namingName()
 			}
 			//n = aList.Extent();
 #endif
-			TopTools_ListIteratorOfListOfShape itl(aList);
-		    for (int i = 1;itl.More();itl.Next(),i++) {
-			  const TopoDS_Shape& aFace = itl.Value();
-			  std::string aFaceName = GetShapeName(aDoc, aFace, selectionLabel());
-			  if(i == 1)
-			    aName = aFaceName;
-			  else 
-			    aName += "|" + aFaceName;
+			int n = aList.Extent();
+			if(n < 3) { // open topology case => via edges
+			  TopTools_IndexedDataMapOfShapeListOfShape aMap;
+		      TopExp::MapShapesAndAncestors(aContext, TopAbs_VERTEX, TopAbs_EDGE, aMap);
+			  const TopTools_ListOfShape& aList2  = aMap.FindFromKey(aSubShape);
+			  if(aList2.Extent() >= 2)  { // regular solution
+				TopTools_ListIteratorOfListOfShape itl(aList2);
+		        for (int i = 1;itl.More();itl.Next(),i++) {
+			      const TopoDS_Shape& anEdge = itl.Value();
+			      std::string anEdgeName = GetShapeName(aDoc, anEdge, selectionLabel());
+			      if(i == 1)
+			        aName = anEdgeName;
+			      else 
+			        aName += "|" + anEdgeName;
+				}
+			  }
+			} 
+			else {
+			  TopTools_ListIteratorOfListOfShape itl(aList);
+		      for (int i = 1;itl.More();itl.Next(),i++) {
+			    const TopoDS_Shape& aFace = itl.Value();
+			    std::string aFaceName = GetShapeName(aDoc, aFace, selectionLabel());
+			    if(i == 1)
+			      aName = aFaceName;
+			    else 
+			      aName += "|" + aFaceName;
+			  }
 			}
 		  }
 		  break;
@@ -1005,4 +1032,21 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType, const 
 	return;
   }
 
+}
+
+int Model_AttributeSelection::Id()
+{
+  std::shared_ptr<GeomAPI_Shape> aSelection = value();
+  std::shared_ptr<GeomAPI_Shape> aContext = context()->shape();
+  const TopoDS_Shape& aMainShape = aContext->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aSubShape = aSelection->impl<TopoDS_Shape>();
+  int anID = 0;
+  if (aSelection && !aSelection->isNull() &&
+      aContext   && !aContext->isNull())
+  {
+    TopTools_IndexedMapOfShape aSubShapesMap;
+    TopExp::MapShapes(aMainShape, aSubShapesMap);
+    anID = aSubShapesMap.FindIndex(aSubShape);
+  }
+  return anID;
 }
