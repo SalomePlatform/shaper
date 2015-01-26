@@ -68,7 +68,7 @@ class ModelAPI_Attribute
 
  protected:
   /// Objects are created for features automatically
-  ModelAPI_Attribute();
+  MODELAPI_EXPORT ModelAPI_Attribute();
 
   /// Sets the ID of the attribute in Data (called from Data)
   MODELAPI_EXPORT void setID(const std::string theID);
