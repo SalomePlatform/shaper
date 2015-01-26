@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModelAPI_Plugin.hxx
+// File:        ModelAPI_Plugin.h
 // Created:     31 Mar 2014
 // Author:      Mikhail PONIKAROV
 
@@ -25,9 +25,7 @@ class MODELAPI_EXPORT ModelAPI_Plugin
   virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_Plugin()
-  {
-  }
+  virtual ~ModelAPI_Plugin();
 };
 
 #endif

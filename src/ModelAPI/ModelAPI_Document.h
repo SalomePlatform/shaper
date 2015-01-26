@@ -67,9 +67,7 @@ public:
   virtual int size(const std::string& theGroupID, const bool theHidden = false) = 0;
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_Document()
-  {
-  }
+  MODELAPI_EXPORT virtual ~ModelAPI_Document();
 
   /// Creates a construction cresults
   virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
@@ -90,9 +88,7 @@ public:
 
 protected:
   /// Only for SWIG wrapping it is here
-  MODELAPI_EXPORT ModelAPI_Document()
-  {
-  }
+  MODELAPI_EXPORT ModelAPI_Document();
 };
 
 //! Pointer on document object

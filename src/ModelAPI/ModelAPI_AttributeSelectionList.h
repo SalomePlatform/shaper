@@ -47,21 +47,14 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   }
 
   /// Returns the type of this class of attributes, not static method
-  virtual std::string attributeType()
-  {
-    return type();
-  }
+  virtual std::string attributeType();
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_AttributeSelectionList()
-  {
-  }
+  virtual ~ModelAPI_AttributeSelectionList();
 
  protected:
   /// Objects are created for features automatically
-  MODELAPI_EXPORT ModelAPI_AttributeSelectionList()
-  {
-  }
+  MODELAPI_EXPORT ModelAPI_AttributeSelectionList();
 };
 
 //! Pointer on double attribute

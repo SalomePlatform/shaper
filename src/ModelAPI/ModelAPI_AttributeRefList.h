@@ -26,10 +26,7 @@ class ModelAPI_AttributeRefList : public ModelAPI_Attribute
   }
 
   /// Returns the type of this class of attributes, not static method
-  MODELAPI_EXPORT virtual std::string attributeType()
-  {
-    return type();
-  }
+  MODELAPI_EXPORT virtual std::string attributeType();
 
   /// Appends the feature to the end of a list
   MODELAPI_EXPORT virtual void append(ObjectPtr theObject) = 0;
@@ -46,11 +43,11 @@ class ModelAPI_AttributeRefList : public ModelAPI_Attribute
  /// Returns the referenced object by the zero-based index
   MODELAPI_EXPORT virtual ObjectPtr object(const int theIndex) const = 0;
 
+  MODELAPI_EXPORT virtual ~ModelAPI_AttributeRefList();
  protected:
   /// Objects are created for features automatically
-  MODELAPI_EXPORT ModelAPI_AttributeRefList()
-  {
-  }
+  MODELAPI_EXPORT ModelAPI_AttributeRefList();
+
 };
 
 typedef std::shared_ptr<ModelAPI_AttributeRefList> AttributeRefListPtr;

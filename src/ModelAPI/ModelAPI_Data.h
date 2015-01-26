@@ -108,9 +108,7 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual void erase() = 0;
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_Data()
-  {
-  }
+  virtual ~ModelAPI_Data();
 
   /// Stores the state of the object to execute it later accordingly
   virtual void execState(const ModelAPI_ExecState theState) = 0;
@@ -133,9 +131,7 @@ class MODELAPI_EXPORT ModelAPI_Data
     std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > >& theRefs) = 0;
  protected:
   /// Objects are created for features automatically
-  ModelAPI_Data()
-  {
-  }
+  ModelAPI_Data();
 };
 
 typedef std::shared_ptr<ModelAPI_Data> DataPtr;

@@ -39,10 +39,7 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   }
 
   /// Returns the type of this class of attributes, not static method
-  virtual std::string attributeType()
-  {
-    return type();
-  }
+  virtual std::string attributeType();
 
   /// Returns a textual string of the selection
   virtual std::string namingName() = 0;
@@ -55,15 +52,11 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   virtual void selectSubShape(const std::string& theType, const std::string& theSubShapeName) = 0;
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_AttributeSelection()
-  {
-  }
+  virtual ~ModelAPI_AttributeSelection();
 
  protected:
   /// Objects are created for features automatically
-  MODELAPI_EXPORT ModelAPI_AttributeSelection()
-  {
-  }
+  MODELAPI_EXPORT ModelAPI_AttributeSelection();
 };
 
 //! Pointer on double attribute

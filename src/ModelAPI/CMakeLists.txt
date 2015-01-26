@@ -7,49 +7,65 @@ INCLUDE(UnitTest)
 
 SET(PROJECT_HEADERS
     ModelAPI.h
-    ModelAPI_Session.h
-    ModelAPI_Plugin.h
-    ModelAPI_Feature.h
-    ModelAPI_CompositeFeature.h
-    ModelAPI_Data.h
-    ModelAPI_Object.h
-    ModelAPI_Document.h
     ModelAPI_Attribute.h
-    ModelAPI_AttributeInteger.h
-    ModelAPI_AttributeDouble.h
-    ModelAPI_AttributeDocRef.h
-    ModelAPI_AttributeReference.h
-    ModelAPI_AttributeRefAttr.h
-    ModelAPI_AttributeRefList.h
     ModelAPI_AttributeBoolean.h
-    ModelAPI_AttributeString.h
+    ModelAPI_AttributeDocRef.h
+    ModelAPI_AttributeDouble.h
+    ModelAPI_AttributeInteger.h
+    ModelAPI_AttributeRefAttr.h
+    ModelAPI_AttributeReference.h
+    ModelAPI_AttributeRefList.h
     ModelAPI_AttributeSelection.h
     ModelAPI_AttributeSelectionList.h
+    ModelAPI_AttributeString.h
+    ModelAPI_AttributeValidator.h
+    ModelAPI_CompositeFeature.h
+    ModelAPI_Data.h
+    ModelAPI_Document.h
     ModelAPI_Events.h
-    ModelAPI_Validator.h
+    ModelAPI_Feature.h
     ModelAPI_FeatureValidator.h
+    ModelAPI_Object.h
+    ModelAPI_Plugin.h
+    ModelAPI_RefAttrValidator.h 
     ModelAPI_Result.h
     ModelAPI_ResultBody.h
     ModelAPI_ResultConstruction.h
-    ModelAPI_ResultPart.h
-    ModelAPI_ResultParameters.h
     ModelAPI_ResultGroup.h
+    ModelAPI_ResultParameters.h
+    ModelAPI_ResultPart.h
     ModelAPI_ResultValidator.h
-    ModelAPI_AttributeValidator.h
+    ModelAPI_Session.h
     ModelAPI_Tools.h
-    ModelAPI_RefAttrValidator.h 
+    ModelAPI_Validator.h
 )
 
 SET(PROJECT_SOURCES
+    ModelAPI_Attribute.cpp
+    ModelAPI_AttributeBoolean.cpp
+    ModelAPI_AttributeDocRef.cpp
+    ModelAPI_AttributeDouble.cpp
+    ModelAPI_AttributeInteger.cpp
+    ModelAPI_AttributeRefAttr.cpp
+    ModelAPI_AttributeReference.cpp
+    ModelAPI_AttributeRefList.cpp
+    ModelAPI_AttributeSelection.cpp
+    ModelAPI_AttributeSelectionList.cpp
+    ModelAPI_AttributeString.cpp
+    ModelAPI_CompositeFeature.cpp
+    ModelAPI_Data.cpp
+    ModelAPI_Document.cpp
     ModelAPI_Events.cpp
     ModelAPI_Feature.cpp
+    ModelAPI_Object.cpp
+    ModelAPI_Plugin.cpp
+    ModelAPI_Result.cpp
+    ModelAPI_ResultBody.cpp
+    ModelAPI_ResultConstruction.cpp
+    ModelAPI_ResultGroup.cpp
+    ModelAPI_ResultPart.cpp
     ModelAPI_Session.cpp
     ModelAPI_Tools.cpp
-    ModelAPI_Object.cpp
-    ModelAPI_Result.cpp
-    ModelAPI_ResultPart.cpp
-    ModelAPI_ResultConstruction.cpp
-    ModelAPI_CompositeFeature.cpp
 )
 
 SET(PROJECT_LIBRARIES
