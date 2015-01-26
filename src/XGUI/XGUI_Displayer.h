@@ -35,11 +35,14 @@ class XGUI_Workshop;
 class XGUI_EXPORT XGUI_Displayer
 {
  public:
-   /// Enumeration of possible display mode
+   /// \enum display mode
    enum DisplayMode { 
-     NoMode = -1, /// Mode is not defined
-     Wireframe,   /// Wireframe display mode
-     Shading      /// Shading display mode
+     /// Mode is not defined
+     NoMode = -1, 
+     /// Wireframe display mode
+     Wireframe, 
+     /// Shading display mode
+     Shading      
    };
 
   /// Constructor
