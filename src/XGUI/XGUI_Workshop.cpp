@@ -206,6 +206,8 @@ void XGUI_Workshop::startApplication()
   }
   
   onNew();
+
+  emit applicationStarted();
 }
 
 //******************************************************
