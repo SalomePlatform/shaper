@@ -28,8 +28,39 @@
  * 
  * The C++ and Python features implementations are located in plugins: specially organized libraries
  * and configuration files that allows to define the user interface and specific algorithms.
- * There are many plugins that should be extended wit hthe development of the application. The names
+ * There are many plugins that should be extended with the development of the application. The names
  * of plugin-packages are ended with "Plugin" string:
  * <b>PartSetPlugin</b>, <b>ConstructionPlugin</b>, <b>SketchPlugin</b>, <b>FeaturesPlugins</b>, etc.
  *
+ */
+
+/**
+ * \defgroup GUI GUI of the application
+ *
+ * \brief Classes for griphic user interface definition
+ * 
+ * Classes of application windows definition, operations launching, 
+ * and objects presentations. It consists of two packages:
+ * - ModuleBase - level for modules definition
+ * - XGUI - implementation of Application GUI.
+ */
+
+/**
+ * \defgroup Salome A Salome connector
+ * 
+ * \brief A set of classes which provide wrapping of 
+ * OpenParts application as SALOME module
+ */
+
+/** 
+ * \defgroup Desktop Classes for standalone application
+ * 
+ * \brief This group contains classes for launching the application 
+ * in standalone desktop (without SALOME)
+ */
+
+/** 
+ * \defgroup Modules Modules
+ * 
+ * \brief Definition of a module as a set of classes for plugins management
  */

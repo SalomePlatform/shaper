@@ -23,11 +23,17 @@ class XGUI_OperationMgr;
 class ModuleBase_Operation;
 class QAction;
 
+/**
+* \ingroup GUI
+* A class for management of actions (features) activation/deactivation
+*/
 class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
 {
 Q_OBJECT
 
  public:
+   /// Constructor
+   /// \param theWorkshop an instance of workshop
   XGUI_ActionsMgr(XGUI_Workshop* theWorkshop);
   virtual ~XGUI_ActionsMgr();
 
@@ -35,13 +41,20 @@ Q_OBJECT
   //! Please note that nested commands in the Salome mode (No AppElements_Command, pure QActions)
   //! won't be extracted and should be added manually using the addNestedCommands method.
   void addCommand(QAction* theCmd);
+
   //! Sets relation between the command (with given Id) and it's nested actions.
   void addNestedCommands(const QString& theId, const QStringList& theCommands);
 
+  //! Returns list of nested commands by parent command Id
+  //! \param theId a parent command Id
   QStringList nestedCommands(const QString& theId) const;
 
+  /// Returns True if the given Id is an Id of nested command
+  /// \param theId an Id to check
   bool isNested(const QString& theId) const;
 
+  /// Registers shortcut (key sequence) for the command triggering
+  /// \param theKeySequence a key sequence to register
   QKeySequence registerShortcut(const QString& theKeySequence);
 
   //! Redefinition of Events_Listener method
