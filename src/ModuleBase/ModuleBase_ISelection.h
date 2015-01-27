@@ -18,6 +18,10 @@
 
 #include <QList>
 
+/**
+* A class which provides access to selection.
+* A selection can be obtained as from a viewer as from Object browser in various forms
+*/
 class ModuleBase_ISelection
 {
  public:
@@ -46,9 +50,13 @@ class ModuleBase_ISelection
   virtual QModelIndexList selectedIndexes() const = 0;
 
   //! Returns list of currently selected AIS objects
+  //! \param theList returning list of selected AIS objects
   virtual void selectedAISObjects(AIS_ListOfInteractive& theList) const = 0;
 
-  //! Returns list of currently selected shapes
+  //! Returns list of currently selected shapes and their owners (objects).
+  //! Both lists are synchronized
+  //! \param theList returning list of selected AIS objects
+  //! \param theOwners list of objects
   virtual void selectedShapes(NCollection_List<TopoDS_Shape>& theList, 
     std::list<ObjectPtr>& theOwners) const = 0;
 

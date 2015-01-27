@@ -18,24 +18,33 @@
 #include <QEvent>
 #include <QString>
 
+/**
+* Class of event to send application events in multi thread environment
+*/
 class XGUI_EXPORT PostponeMessageQtEvent : public QEvent
 {
  public:
   static QEvent::Type PostponeMessageQtEventType;
 
+  /// Constructor
+  /// \param theMessage an event message to send
   PostponeMessageQtEvent(const std::shared_ptr<Events_Message>& theMessage)
       : QEvent(PostponeMessageQtEventType),
       myMessage(theMessage)
   {
   }
+
+  /// Returns type of the event
   static QEvent::Type type()
   {
     return PostponeMessageQtEventType;
   }
 
+  /// Returns current messasge
   std::shared_ptr<Events_Message> postponedMessage();
 
  private:
+   /// Message
   std::shared_ptr<Events_Message> myMessage;
 };
 

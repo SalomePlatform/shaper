@@ -14,33 +14,32 @@ class Config_WidgetAPI;
 class QWidget;
 class QCheckBox;
 
+/**
+* Implementation of widget for boolean input (check box)
+*/ 
 class MODULEBASE_EXPORT ModuleBase_WidgetBoolValue : public ModuleBase_ModelWidget
 {
 Q_OBJECT
  public:
   /// Constructor
-  /// \theParent the parent object
-  /// \theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParent the parent object
+  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetBoolValue(QWidget* theParent, const Config_WidgetAPI* theData,
                              const std::string& theParentId);
 
   virtual ~ModuleBase_WidgetBoolValue();
 
-  /// Saves the internal parameters to the given feature
-  /// \param theObject a model feature to be changed
   virtual bool storeValue() const;
 
   virtual bool restoreValue();
 
-  /// Returns list of widget controls
-  /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-  /// Returns the internal parent wiget control, that can be shown anywhere
-  /// \returns the widget
   QWidget* getControl() const;
 
  private:
+   /// The check box
   QCheckBox* myCheckBox;
 };
 
