@@ -30,6 +30,10 @@ Q_OBJECT
   void setSketcher(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
   CompositeFeaturePtr sketch() const { return mySketch; }
 
+protected:
+  /// Check the selected with validators if installed
+  virtual bool isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape);
+
 private:
   CompositeFeaturePtr mySketch;
 };

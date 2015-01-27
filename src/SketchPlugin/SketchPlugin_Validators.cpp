@@ -38,14 +38,15 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
 bool SketchPlugin_DistanceAttrValidator::isValid(
   const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
 {
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (anAttr) {
-    const ObjectPtr& anObj = theAttribute->owner();
-    const FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
-    return isValid(aFeature, theArguments, anAttr->object());
-  }
-  return true; // it may be not reference attribute, in this case, it is OK
+  // any point attribute is acceptable for the distance operation
+  return true;
+}
+
+bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
+                                                 const std::list<std::string>& theArguments,
+                                                 const AttributePtr& theAttribute) const
+{
+  return isValid(theAttribute, theArguments);
 }
 
 bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
