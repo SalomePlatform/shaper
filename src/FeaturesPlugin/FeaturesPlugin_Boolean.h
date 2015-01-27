@@ -12,9 +12,16 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAlgoAPI_Boolean.h>
 
+/**\class FeaturesPlugin_Boolean
+ * \ingroup Plugins
+ * \brief Feature for applying of Boolean operations on Solids.
+ *
+ * Supports three kinds of Boolean operations: Cut, Fuse and Common.
+ * For all of them requires two Solids: object and tool.
+ */
 class FeaturesPlugin_Boolean : public ModelAPI_Feature
 {
- public:
+public:
   /// Extrusion kind
   inline static const std::string& ID()
   {
@@ -45,7 +52,6 @@ class FeaturesPlugin_Boolean : public ModelAPI_Feature
 	BOOL_FUSE,
     BOOL_COMMON
   };
-
 
   /// Returns the kind of a feature
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()

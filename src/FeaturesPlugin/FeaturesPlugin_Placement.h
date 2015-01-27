@@ -14,6 +14,14 @@
 class ModelAPI_ResultBody;
 class GeomAPI_Shape;
 
+/**\class FeaturesPlugin_Placement
+ * \ingroup Plugins
+ * \brief Feature for applying of placement operation: relative movement of Solid.
+ *
+ * Locates the selected attractable_face of the solid in the middle of the selected
+ * placement_base face. Faces must be planar. Orientation of the placed solid is
+ * depended on the underlied planes of both faces.
+ */
 class FeaturesPlugin_Placement : public ModelAPI_Feature
 {
  public:

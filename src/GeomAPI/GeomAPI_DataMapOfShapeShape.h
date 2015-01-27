@@ -17,7 +17,6 @@ class GeomAPI_Dir;
  * \ingroup DataModel
  * \brief DataMap of Shape - Shape defined by TopoDS_Shapes
  */
-
 class GEOMAPI_EXPORT GeomAPI_DataMapOfShapeShape : public GeomAPI_Interface
 {
  public:
@@ -30,7 +29,7 @@ class GEOMAPI_EXPORT GeomAPI_DataMapOfShapeShape : public GeomAPI_Interface
   /// Size of the map
   int size();
 
-  /// Adds the Key <K> to  the Map <me>  with  the  Item. Returns True  if the Key  was not already in the map
+  /// Adds \a theKey to me with \a theItem. Returns True if the Key  was not already in the map
   bool bind (std::shared_ptr<GeomAPI_Shape> theKey, std::shared_ptr<GeomAPI_Shape> theItem);
 
   /// Returns true if theKey is stored  in the map.

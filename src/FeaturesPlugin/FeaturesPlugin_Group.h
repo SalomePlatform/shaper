@@ -11,6 +11,13 @@
 #include <ModelAPI_Feature.h>
 #include <GeomAPI_Shape.h>
 
+/**\class FeaturesPlugin_Group
+ * \ingroup Plugins
+ * \brief Feature for selection of sub-shapes of some shapes.
+ *
+ * All selected sub-shapes must be of equal type (vertex, edge, face, etc) but may
+ * be selected on different objects.
+ */
 class FeaturesPlugin_Group : public ModelAPI_Feature
 {
  public:
@@ -20,12 +27,6 @@ class FeaturesPlugin_Group : public ModelAPI_Feature
     static const std::string MY_GROUP_ID("Group");
     return MY_GROUP_ID;
   }
-  /// attribute name of group name
-  //inline static const std::string& NAME_ID()
-  //{
-  //  static const std::string MY_GROUP_NAME_ID("group_name");
-  //  return MY_GROUP_NAME_ID;
-  //}
   /// attribute name of selected entities list
   inline static const std::string& LIST_ID()
   {

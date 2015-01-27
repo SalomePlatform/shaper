@@ -139,14 +139,6 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
 
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 protected:
-  /// Creates a plane and append it to the list
-  /// \param theX the X normal value
-  /// \param theY the Y normal value
-  /// \param theZ the Z normal value
-  /// \param theShapes the list of result shapes
-  //void addPlane(double theX, double theY, double theZ,
-  //              std::list<std::shared_ptr<GeomAPI_Shape> >& theShapes) const;
-
   /// Checks whether the plane is set in the sketch.
   /// \returns the boolean state
   bool isPlaneSet();

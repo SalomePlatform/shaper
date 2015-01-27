@@ -16,6 +16,10 @@
 
 #include <memory>
 
+/**\class FeaturesPlugin_Plugin
+ * \ingroup Plugins
+ * \brief The main class for management the part set operations as plugin.
+ */
 class PARTSETPLUGIN_EXPORT PartSetPlugin_Plugin : public ModelAPI_Plugin,
                                                   public Events_Listener
 {

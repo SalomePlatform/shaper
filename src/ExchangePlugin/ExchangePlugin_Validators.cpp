@@ -33,23 +33,6 @@ bool ExchangePlugin_ImportFormatValidator::parseFormats(const std::list<std::str
   return result;
 }
 
-bool ExchangePlugin_ImportFormatValidator::parsePlugins(const std::list<std::string>& theArguments,
-                                                        std::list<std::string>& outPlugins)
-{
-  std::list<std::string>::const_iterator it = theArguments.begin();
-  bool result = true;
-  for (; it != theArguments.end(); ++it) {
-    std::string anArg = *it;
-    int aSepPos = anArg.find(":");
-    if (aSepPos == std::string::npos) {
-      result = false;
-      continue;
-    }
-    outPlugins.push_back(anArg.substr(aSepPos + 1));
-  }
-  return result;
-}
-
 bool ExchangePlugin_ImportFormatValidator::isValid(const AttributePtr& theAttribute,
                                                    const std::list<std::string>& theArguments) const
 {

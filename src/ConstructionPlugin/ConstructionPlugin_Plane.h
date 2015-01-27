@@ -20,9 +20,9 @@ const std::string FACE_ATTR = "planeFace";
 /// attribute name for distance
 const std::string DISTANCE_ATTR = "distance";
 
-/**\class ConstructionPlugin_Axis
+/**\class ConstructionPlugin_Plane
  * \ingroup DataModel
- * \brief Feature for creation of the new axis in PartSet.
+ * \brief Feature for creation of the new planar surface in PartSet.
  */
 class ConstructionPlugin_Plane : public ModelAPI_Feature, public GeomAPI_ICustomPrs
 {

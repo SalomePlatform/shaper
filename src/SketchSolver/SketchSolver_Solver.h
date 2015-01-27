@@ -27,6 +27,9 @@ typedef unsigned int UINT32;
 // Unknown entity
 #define SLVS_E_UNKNOWN 0
 
+/**
+ * The main class that performs the high-level operations for connection to the SolveSpace.
+ */
 class SketchSolver_Solver
 {
  public:

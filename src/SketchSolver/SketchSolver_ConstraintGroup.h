@@ -62,6 +62,10 @@ class SketchSolver_ConstraintGroup
    *  \return \c true if the constraint added or updated successfully
    */
   bool changeConstraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
+  /** \brief Adds or updates a rigid constraint in the group
+   *  \param[in] theConstraint constraint to be changed
+   *  \return \c true if the constraint added or updated successfully
+   */
   bool changeRigidConstraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
   /** \brief Verifies the feature attributes are used in this group
@@ -76,6 +80,7 @@ class SketchSolver_ConstraintGroup
    */
   bool isBaseWorkplane(std::shared_ptr<ModelAPI_CompositeFeature> theWorkplane) const;
 
+  /// Returns the current workplane
   std::shared_ptr<ModelAPI_CompositeFeature> getWorkplane() const
   {
     return mySketch;

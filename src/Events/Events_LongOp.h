@@ -16,7 +16,8 @@
  */
 class EVENTS_EXPORT Events_LongOp : public Events_Message
 {
- public:
+public:
+  /// Default destructor
   virtual ~Events_LongOp();
   /// Returns the identifier of this event
   static Events_ID eventID();
@@ -27,7 +28,8 @@ class EVENTS_EXPORT Events_LongOp : public Events_Message
   /// Returns true if the long operation is performed
   static bool isPerformed();
 
- protected:
+protected:
+  /// Default constructor. Use "start" and "end" for generation.
   Events_LongOp(void* theSender = 0);
 };
 

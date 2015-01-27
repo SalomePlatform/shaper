@@ -16,6 +16,7 @@
 class GeomAPI_ICustomPrs
 {
 public:
+  /// Modifies the given presentation in the custom way.
   virtual void customisePresentation(AISObjectPtr thePrs) = 0;
 };
 
