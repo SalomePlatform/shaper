@@ -194,9 +194,12 @@ void PartSet_WidgetPoint2D::activate()
   QIntList aModes;
   aModes << TopAbs_VERTEX;
   myWorkshop->moduleConnector()->activateSubShapesSelection(aModes);
-  // the control value is stored to the mode by the focus in on the widget
-  // we need the value is initialized in order to enable the apply button in the property panel
-  storeValue();
+  if (!isEditingMode()) {
+    // the control value is stored to the mode by the focus in on the widget
+    // we need the value is initialized in order to enable the apply button in the property panel
+    // it should happens only in the creation mode because during edition all fields are filled
+    storeValue();
+  }
 }
 
 void PartSet_WidgetPoint2D::deactivate()
