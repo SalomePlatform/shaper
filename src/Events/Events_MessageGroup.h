@@ -10,7 +10,7 @@
 #include <Events_Message.h>
 #include <memory>
 
-/**\class Events_Message
+/**\class Events_MessageGroup
  * \ingroup EventsLoop
  * \brief Message that allows to group messages and send them later as a group of messages.
  *

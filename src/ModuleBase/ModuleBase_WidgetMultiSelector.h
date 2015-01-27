@@ -31,10 +31,29 @@ class QComboBox;
 class ModuleBase_IWorkshop;
 class QAction;
 
+
+/**
+* Implementation of widget for shapes selection. This widget provides selection of several shapes.
+* It can be defined in XML file as following:
+* \code
+* <multi_selector id="group_list" 
+*    tooltip="Select a set of objects" 
+*    type_choice="Vertices Edges Faces Solids" /> 
+* \endcode
+* It uses folloing parameters:
+* - id - is a name of corresponded attribute
+* - tooltip - a tooltip for the widget
+* - type_choice - list of expected shape types.
+*/
 class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_ModelWidget
 {
   Q_OBJECT
  public:
+  /// Constructor
+  /// \param theParent the parent object
+  /// \param theWorkshop instance of workshop interface
+  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetMultiSelector(QWidget* theParent,
                                  ModuleBase_IWorkshop* theWorkshop,
                                  const Config_WidgetAPI* theData,
@@ -42,7 +61,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
   virtual ~ModuleBase_WidgetMultiSelector();
 
   /// Saves the internal parameters to the given feature
-  /// \param theObject a model feature to be changed
   virtual bool storeValue() const;
 
   virtual bool restoreValue();
@@ -55,28 +73,49 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-  virtual bool eventFilter(QObject* theObj, QEvent* theEvent);
+  virtual bool eventFilter(QObject* , QEvent* );
 
  public slots:
+  /// Activate or deactivate selection
   void activateSelection(bool toActivate);
+
+  /// Slot is called on selection type changed
   void onSelectionTypeChanged();
+
+  /// Slot is called on selection changed
   void onSelectionChanged();
 
 protected slots:
+  /// Slot for copy command in a list pop-up menu
   void onCopyItem();
+
+  /// Slot is called on selection of list of selected items
   void onListSelection();
 
  protected:
+   /// Provide filtering of selected shapes
+   /// \param theShapesToFilter source list of shapes
+   /// \param theResult result list of shapes
   void filterShapes(const NCollection_List<TopoDS_Shape>& theShapesToFilter,
                     NCollection_List<TopoDS_Shape>& theResult);
+
+  /// Set current shape type for selection
   void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);
+
+  /// Start shape selection
   void activateShapeSelection();
 
  private:
+   /// Update selection list
    void updateSelectionList(AttributeSelectionListPtr);
 
+   /// List control
   QListWidget* myListControl;
+
+  /// Combobox of types
   QComboBox* myTypeCombo;
+
+  /// Container
   QWidget* myMainWidget;
 
   //TODO: Move into the base of selectors
@@ -85,9 +124,13 @@ protected slots:
   /// If true then local selector has to be activated in context
   bool myIsActive;
 
+  /// \typedef GeomSelection provides correspondance between Result object and its shape
   typedef QPair<ResultPtr, GeomShapePtr> GeomSelection;
+
+  /// Variable of GeomSelection type
   QList<GeomSelection> mySelection;
 
+  /// An action for pop-up menu in a list control
   QAction* myCopyAction;
 };
 

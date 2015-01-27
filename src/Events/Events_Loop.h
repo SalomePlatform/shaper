@@ -16,7 +16,7 @@
 
 class Events_MessageGroup;
 
-/**\class Events_Lopp
+/**\class Events_Loop
  * \ingroup EventsLoop
  * \brief Base class that manages the receiving and sending of all
  * not Qt-events in the application.
@@ -54,6 +54,7 @@ class Events_Loop
   EVENTS_EXPORT static Events_ID eventByName(const char* theName);
 
   //! Allows to send an event
+  //! \param theMessage the enevt message to send
   //! \param isGroup is true for grouping messages if possible
   EVENTS_EXPORT void send(const std::shared_ptr<Events_Message>& theMessage, bool isGroup = true);
 

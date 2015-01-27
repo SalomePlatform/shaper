@@ -96,66 +96,68 @@ class ModelAPI_Feature : public ModelAPI_Object
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Feature();
 
+  /// Returns the feature by the object (result).
   MODELAPI_EXPORT static std::shared_ptr<ModelAPI_Feature> feature(ObjectPtr theObject);
 
  //
  // Helper methods, aliases for data()->method()
  // -----------------------------------------------------------------------------------------------
+  /// Returns the name stored in the attribute
   inline std::string name()
   {
     return data()->name();
   }
-
+  /// Returns the Boolean attribute by the identifier
   inline std::shared_ptr<ModelAPI_AttributeBoolean> boolean(const std::string& theID)
   {
     return data()->boolean(theID);
   }
-
+  /// Returns the document reference attribute
   inline std::shared_ptr<ModelAPI_AttributeDocRef> document(const std::string& theID)
   {
     return data()->document(theID);
   }
-
+  /// Returns the real attribute by the identifier
   inline std::shared_ptr<ModelAPI_AttributeDouble> real(const std::string& theID)
   {
     return data()->real(theID);
   }
-
+  /// Returns the integer attribute by the identifier
   inline std::shared_ptr<ModelAPI_AttributeInteger> integer(const std::string& theID)
   {
     return data()->integer(theID);
   }
-
+  /// Returns the reference attribute by the identifier
   inline std::shared_ptr<ModelAPI_AttributeRefAttr> refattr(const std::string& theID)
   {
     return data()->refattr(theID);
   }
-
+  /// Returns the reference attribute by the identifier
   inline std::shared_ptr<ModelAPI_AttributeReference> reference(const std::string& theID)
   {
     return data()->reference(theID);
   }
-
+  /// Returns the list of references attribute by the identifier
   inline std::shared_ptr<ModelAPI_AttributeRefList> reflist(const std::string& theID)
   {
     return data()->reflist(theID);
   }
-
+  /// Returns the shape selection attribute by the identifier
   inline std::shared_ptr<ModelAPI_AttributeSelection> selection(const std::string& theID)
   {
     return data()->selection(theID);
   }
-
+  /// Returns the list of shape selections attribute by the identifier
   inline std::shared_ptr<ModelAPI_AttributeSelectionList> selectionList(const std::string& theID)
   {
     return data()->selectionList(theID);
   }
-
+  /// Returns the string attribute by the identifier
   inline std::shared_ptr<ModelAPI_AttributeString> string(const std::string& theID)
   {
     return data()->string(theID);
   }
-
+  /// Returns the attribute by the identifier
   inline std::shared_ptr<ModelAPI_Attribute> attribute(const std::string& theID)
   {
     return data()->attribute(theID);

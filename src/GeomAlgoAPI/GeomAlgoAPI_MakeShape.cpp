@@ -27,7 +27,6 @@ const std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShape::shape() const
   return myShape;
 }
 
-/// Returns the  list   of shapes generated   from the shape <theShape>
 void GeomAlgoAPI_MakeShape::generated(
   const std::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory)
 {
@@ -43,7 +42,6 @@ void GeomAlgoAPI_MakeShape::generated(
   }
 }
 
-/// Returns the  list   of shapes modified   from the shape <theShape>
 void GeomAlgoAPI_MakeShape::modified(
   const std::shared_ptr<GeomAPI_Shape> theShape, ListOfShape& theHistory)
 {
@@ -59,7 +57,6 @@ void GeomAlgoAPI_MakeShape::modified(
   }
 }
 
-/// Returns whether the shape is an edge
 bool GeomAlgoAPI_MakeShape::isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
   bool isDeleted(false);

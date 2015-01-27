@@ -19,7 +19,9 @@ class QTimer;
 /**
 * A class of property panel widget for double value input
 * It can be defined with "doublevalue" keyword. For example:
-* "<doublevalue id="x" label="X:" icon=":pictures/x_point.png" tooltip="X coordinate"/>"
+* \code
+* <doublevalue id="x" label="X:" icon=":pictures/x_point.png" tooltip="X coordinate"/>
+* \endcode
 */
 class MODULEBASE_EXPORT ModuleBase_WidgetDoubleValue : public ModuleBase_ModelWidget
 {

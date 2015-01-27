@@ -12,6 +12,15 @@
 #include <ModelAPI_ResultBody.h>
 #include <GeomAlgoAPI_Extrusion.h>
 #include <GeomAPI_Shape.h>
+
+/**\class FeaturesPlugin_Extrusion
+ * \ingroup Plugins
+ * \brief Feature for creation of extrusion from the planar face.
+ *
+ * Extrusion creates the lateral faces based on edges of the base face and
+ * the top face equal to the base face. Direction of extrusion is taken from the face
+ * plane, but can be corrected by the "reverse" flag.
+ */
 class FeaturesPlugin_Extrusion : public ModelAPI_Feature
 {
  public:

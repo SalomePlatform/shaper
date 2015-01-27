@@ -14,19 +14,16 @@ using namespace std;
 GeomAPI_DataMapOfShapeShape::GeomAPI_DataMapOfShapeShape()
 	:GeomAPI_Interface((void *)new TopTools_DataMapOfShapeShape){}
 
-/// Clear 
 void GeomAPI_DataMapOfShapeShape::clear()
 {
   implPtr<TopTools_DataMapOfShapeShape>()->Clear();
 }
 
-/// Size 
 int GeomAPI_DataMapOfShapeShape::size()
 {
   return implPtr<TopTools_DataMapOfShapeShape>()->Extent();
 }
 
-/// Adds the Key <K> to  the Map <me>  with  the  Item. Returns True  if the Key  was not already in the map
 bool GeomAPI_DataMapOfShapeShape::bind (std::shared_ptr<GeomAPI_Shape> theKey, std::shared_ptr<GeomAPI_Shape> theItem)
 {
   bool flag(false);
@@ -35,7 +32,6 @@ bool GeomAPI_DataMapOfShapeShape::bind (std::shared_ptr<GeomAPI_Shape> theKey, s
   return flag;
 }
 
-/// Returns true if theKey is stored  in the map.
 bool GeomAPI_DataMapOfShapeShape::isBound (std::shared_ptr<GeomAPI_Shape> theKey)
 {
   bool flag(false);
@@ -44,7 +40,6 @@ bool GeomAPI_DataMapOfShapeShape::isBound (std::shared_ptr<GeomAPI_Shape> theKey
   return flag;
 }
 
-/// Returns  the Item stored  with the Key in the Map. To be checked before with isBound()
 const std::shared_ptr<GeomAPI_Shape> GeomAPI_DataMapOfShapeShape::find(std::shared_ptr<GeomAPI_Shape> theKey)
 {
   std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());  
@@ -52,7 +47,6 @@ const std::shared_ptr<GeomAPI_Shape> GeomAPI_DataMapOfShapeShape::find(std::shar
   return aShape;
 }  
   
-/// Removes the Key from the  map. Returns true if the Key was in the Map
 bool GeomAPI_DataMapOfShapeShape::unBind(std::shared_ptr<GeomAPI_Shape> theKey)
 {
   bool flag(false);

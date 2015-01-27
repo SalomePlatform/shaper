@@ -28,6 +28,8 @@ class MODULEBASE_EXPORT ModuleBase_IWorkshop : public QObject
 {
 Q_OBJECT
  public:
+   /// Constructor
+   /// \param theParent parent object
   ModuleBase_IWorkshop(QObject* theParent)
       : QObject(theParent)
   {}
@@ -35,6 +37,7 @@ Q_OBJECT
   virtual ~ModuleBase_IWorkshop()
   {}
 
+  /// Return current selection instance
   virtual ModuleBase_ISelection* selection() const = 0;
 
   /// Activate sub-shapes selection (opens local context)
@@ -70,6 +73,7 @@ Q_OBJECT
   virtual void setSelected(const QObjectPtrList& theFeatures) = 0;
 
 signals:
+  /// Signal selection chaged.
   void selectionChanged();
 
   /// Signal which is emited after activation of property panel

@@ -17,7 +17,6 @@ class ModelAPI_Feature;
  * \ingroup DataModel
  * \brief Interface common for any plugin: allows to use plugin by the plugins manager.
  */
-
 class MODELAPI_EXPORT ModelAPI_Plugin
 {
  public:

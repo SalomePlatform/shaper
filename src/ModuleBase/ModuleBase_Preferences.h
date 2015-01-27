@@ -16,8 +16,10 @@
 class SUIT_ResourceMgr;
 class QWidget;
 
-// Pair of values: section name, value name
+/// \typedef ModuleBase_Pref Pair of values: section name, value name
 typedef QPair<QString, QString> ModuleBase_Pref;
+
+/// \typedef ModuleBase_Prefs list of preferences
 typedef QList<ModuleBase_Pref> ModuleBase_Prefs;
 
 //***********************************************************************
@@ -35,6 +37,7 @@ class MODULEBASE_EXPORT ModuleBase_Preferences
 
   /// Sets a resource manager
   /// It is used in case of necessity to define external resource manager (not NewGeom)
+  /// \param theMgr resource manager
   static void setResourceMgr(SUIT_ResourceMgr* theMgr) { myResourceMgr = theMgr; }
 
   /// Updates Config_PropManager properties by module from SUIT_ResourceMgr
@@ -50,7 +53,9 @@ class MODULEBASE_EXPORT ModuleBase_Preferences
   /// Loads properties defined by module to Config_PropManager
   static void loadCustomProps();
 
-  /// 
+  /// Create editable content
+  /// \param thePref interface to preference manager
+  /// \param thePage an id of a page
   static void createEditContent(ModuleBase_IPrefMgr* thePref, int thePage);
 
 private:
@@ -66,6 +71,9 @@ class MODULEBASE_EXPORT ModuleBase_PreferencesMgr : public SUIT_PreferenceMgr
 {
 Q_OBJECT
  public:
+   /// Constructor
+   /// \param theResource resource manager
+   /// \param theParent a paren widget
   ModuleBase_PreferencesMgr(QtxResourceMgr* theResource, QWidget* theParent)
       : SUIT_PreferenceMgr(theResource, theParent)
   {

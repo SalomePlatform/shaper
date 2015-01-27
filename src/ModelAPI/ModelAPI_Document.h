@@ -22,7 +22,7 @@ class ModelAPI_ResultPart;
 class ModelAPI_ResultGroup;
 class ModelAPI_Data;
 
-/**\class Model_Document
+/**\class ModelAPI_Document
  * \ingroup DataModel
  * \brief Document for internal data structure of any object storage.
  * Document contains all data that must be stored/retrived in the file.
@@ -41,7 +41,7 @@ public:
   virtual void close(const bool theForever = false) = 0;
 
   //! Adds to the document the new feature of the given feature id
-  //! \param creates feature and puts it in the document (if it is not action)
+  //! \param theID creates feature and puts it in the document (if it is not action)
   virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID) = 0;
 
   //! Removes the feature from the document

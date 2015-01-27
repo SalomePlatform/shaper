@@ -13,11 +13,17 @@
 
 #include <StdSelect_TypeOfFace.hxx>
 
+/**
+* A class of a viewer filter by faces
+*/
 class ModuleBase_FilterFace: public ModuleBase_Filter
 {
 public:
+  /// Convert string to StdSelect_TypeOfFace value
+  /// \param theType a string value
   static MODULEBASE_EXPORT StdSelect_TypeOfFace faceType(const std::string& theType);
 
+  /// Constructor
   MODULEBASE_EXPORT ModuleBase_FilterFace(): 
       ModuleBase_Filter() {}
 

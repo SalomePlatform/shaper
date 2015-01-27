@@ -48,7 +48,9 @@ static const char * EVENT_FEATURE_STATE_RESPONSE = "FeatureStateResponse";
 class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 {
  protected:
+  /// Creates an empty message
   ModelAPI_ObjectUpdatedMessage(const Events_ID theID, const void* theSender = 0);
+  /// The virtual destructor
   virtual ~ModelAPI_ObjectUpdatedMessage();
 
  public:
@@ -65,28 +67,33 @@ class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 /// Message that feature was deleted (used for Object Browser update)
 class MODELAPI_EXPORT ModelAPI_ObjectDeletedMessage : public Events_MessageGroup
 {
- protected:
+protected:
+  /// Creates an empty message
   ModelAPI_ObjectDeletedMessage(const Events_ID theID, const void* theSender = 0);
+  /// The virtual destructor
   virtual ~ModelAPI_ObjectDeletedMessage();
 
- public:
+public:
   /// Returns the feature that has been updated
   virtual std::shared_ptr<ModelAPI_Document> document() const = 0;
 
   /// Returns the group where the feature was deleted
   virtual const std::set<std::string>& groups() const = 0;
 
+  /// Creates the new empty message of this kind
   virtual std::shared_ptr<Events_MessageGroup> newEmpty() = 0;
 
+  /// Returns the identifier of the kind of a message
   virtual const Events_ID messageId() = 0;
 
+  /// Appenad to this message the given one.
   virtual void Join(const std::shared_ptr<Events_MessageGroup>& theJoined) = 0;
 };
 
 /// Allows to create ModelAPI messages
 class MODELAPI_EXPORT ModelAPI_EventCreator
 {
- public:
+public:
   /// creates created, updated or moved messages and sends to the loop
   virtual void sendUpdated(const ObjectPtr& theObject, const Events_ID& theEvent,
                            const bool isGroupped = true) const = 0;
@@ -102,25 +109,33 @@ class MODELAPI_EXPORT ModelAPI_EventCreator
 };
 
 // TODO(sbh): Move this message into a separate package, like "GuiAPI"
+/// Contains the state information about the feature: is it enabled or disabled.
 class ModelAPI_FeatureStateMessage : public Events_Message
 {
- public:
+public:
+  /// Creates an empty message
   MODELAPI_EXPORT ModelAPI_FeatureStateMessage(const Events_ID theID, const void* theSender = 0);
+  /// The virtual destructor
   MODELAPI_EXPORT virtual ~ModelAPI_FeatureStateMessage();
 
-  // For request
+  /// Returns the feature this message is related to
   MODELAPI_EXPORT std::shared_ptr<ModelAPI_Feature> feature() const;
+  /// Stores the feature this message is related to
   MODELAPI_EXPORT void setFeature(std::shared_ptr<ModelAPI_Feature>& theFeature);
   // For response
+  /// Returns true if feature has specific state
   MODELAPI_EXPORT bool hasState(const std::string& theFeatureId) const;
+  /// Returns true if feature is enabled
   MODELAPI_EXPORT bool state(const  std::string& theFeatureId, bool theDefault = false) const;
+  /// Stores the feature state
   MODELAPI_EXPORT void setState(const std::string& theFeatureId, bool theValue);
+  /// Returns all feature IDs with states
   MODELAPI_EXPORT std::list<std::string> features() const;
 
  private:
-  // For Request
+  /// For Request
   std::shared_ptr<ModelAPI_Feature> myCurrentFeature;
-  // For response
+  /// For response
   std::map<std::string, bool> myFeatureState;
 };
 

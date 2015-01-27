@@ -250,8 +250,7 @@ void Model_Document::close(const bool theForever)
     subDoc(*aSubIter)->close(theForever);
 
   // close for thid document needs no transaction in this document
-  if (this == aPM->moduleDocument().get())
-    std::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(false);
+  std::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(false);
 
   // delete all features of this document
   std::shared_ptr<ModelAPI_Document> aThis = 
@@ -282,8 +281,7 @@ void Model_Document::close(const bool theForever)
       myDoc->Close();
   }
 
-  if (this == aPM->moduleDocument().get())
-    std::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(true);
+  std::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(true);
 }
 
 void Model_Document::startOperation()

@@ -10,6 +10,12 @@
 #include "SketchPlugin.h"
 #include <ModelAPI_RefAttrValidator.h>
 
+/**\class SketchPlugin_DistanceAttrValidator
+ * \ingroup Validators
+ * \brief Validator for the distance input.
+ *
+ * It just checks that distance is greater than zero.
+ */
 class SketchPlugin_DistanceAttrValidator : public ModelAPI_RefAttrValidator
 {
  public:
@@ -27,7 +33,9 @@ class SketchPlugin_DistanceAttrValidator : public ModelAPI_RefAttrValidator
                        const AttributePtr& theAttribute) const { return true; };
 };
 
-/**
+/**\class SketchPlugin_DifferentObjectsValidator
+ * \ingroup Validators
+ *
  * Check that there is no same object was already selected in the feature.
  * For an example: to avoid perpendicularity on line and the same line.
  */

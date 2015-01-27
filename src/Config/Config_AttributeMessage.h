@@ -12,7 +12,9 @@
 /*!
  * \class Config_AttributeMessage
  * \brief Class to pass an attribute's (widget's) entry info extracted from xml file.
+ * \code
  * <widget id="tool_object" concealment="true" obligatory="0"/>
+ * \endcode
  */
 class Config_AttributeMessage : public Events_Message
 {

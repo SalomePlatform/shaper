@@ -10,7 +10,7 @@
 #include "Model.h"
 #include <ModelAPI_ResultPart.h>
 
-/**\class ModelAPI_ResultPart
+/**\class Model_ResultPart
  * \ingroup DataModel
  * \brief The Part document, result of a creation of new part feature.
  *

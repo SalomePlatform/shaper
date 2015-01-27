@@ -15,7 +15,7 @@
 
 class TNaming_Builder;
 
-/**\class ModelAPI_ResultBody
+/**\class Model_ResultBody
  * \ingroup DataModel
  * \brief The body (shape) result of a feature.
  *
