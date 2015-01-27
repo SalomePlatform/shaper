@@ -33,3 +33,16 @@
  * <b>PartSetPlugin</b>, <b>ConstructionPlugin</b>, <b>SketchPlugin</b>, <b>FeaturesPlugins</b>, etc.
  *
  */
+
+/**
+ * \defgroup Validators Validators
+ *
+ * \brief Implementation of internal logic of the feature
+ * 
+ * Validators are used for checking validity of the feature: each argument, 
+ * dependencies between the arguments. Validators are defined in the 
+ * configuration files and may be also used for selection filters (ModuleBase_SelectionValidator),
+ * passing configurable parameters from XML file to the feature implementation 
+ * (like in ExchangePlugin_ImportFormatValidator).
+ *
+ */
