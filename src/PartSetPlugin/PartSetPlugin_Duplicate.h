@@ -10,7 +10,7 @@
 #include "PartSetPlugin_Part.h"
 
 /**\class PartSetPlugin_Duplicate
- * \ingroup DataModel
+ * \ingroup Plugins
  * \brief Duplicates the active part (not root). Creates a new "part" feature.
  */
 class PartSetPlugin_Duplicate : public PartSetPlugin_Part

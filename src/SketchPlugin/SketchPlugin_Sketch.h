@@ -24,7 +24,7 @@
 #define PLANE_SIZE          "200"     
 
 /**\class SketchPlugin_Sketch
- * \ingroup DataModel
+ * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.
  */
 class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_IPresentable

@@ -13,7 +13,7 @@
 #include <GeomAPI_IPresentable.h>
 
 /**\class SketchPlugin_Circle
- * \ingroup DataModel
+ * \ingroup Plugins
  * \brief Feature for creation of the new circle in PartSet.
  */
 class SketchPlugin_Circle : public SketchPlugin_Feature 

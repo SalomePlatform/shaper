@@ -14,7 +14,7 @@
 #define PARALLEL_COLOR "#ffff00"
 
 /** \class SketchPlugin_ConstraintParallel
- *  \ingroup DataModel
+ *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint parallelism of two lines
  *
  *  This constraint has two attributes:

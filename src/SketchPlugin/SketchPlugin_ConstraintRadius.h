@@ -14,7 +14,7 @@
 #define RADIUS_COLOR "#ff00ff"
 
 /** \class SketchPlugin_ConstraintRadius
- *  \ingroup DataModel
+ *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint which defines 
  *         a radius of a circle or an arc of circle
  *

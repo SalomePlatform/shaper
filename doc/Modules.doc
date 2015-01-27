@@ -1,0 +1,35 @@
+// Special file to define and describe the modules (goups)
+
+/**
+ * \defgroup DataModel Data model
+ *
+ * \brief Structures for storage and management the application data.
+ * 
+ * Data structures are unified and splitted in universal <b>ModelAPI</b> package.
+ * The OCCT specialized implementation of ModelAPI interfaces is located in the <b>Model</b>.
+ * The geometrical primitives interfaces in <b>GeomAPI</b> package are supported by geometrical 
+ * persistence elements in <b>GeomDatAPI</b> interface and has OCCT-specific implementation in GeomData package.
+ *
+ */
+
+/**
+ * \defgroup DataAlgo Algorithms
+ *
+ * \brief Different algorithm used in the application
+ * 
+ * The geometrical algorithms implementation (basing on OCCT libraries) are located in <b>GeomAlgoAPI</b>.
+ *
+ */
+
+/**
+ * \defgroup Plugins Plugins
+ *
+ * \brief Implementation of specific features of the application is concentrated in plugins.
+ * 
+ * The C++ and Python features implementations are located in plugins: specially organized libraries
+ * and configuration files that allows to define the user interface and specific algorithms.
+ * There are many plugins that should be extended wit hthe development of the application. The names
+ * of plugin-packages are ended with "Plugin" string:
+ * <b>PartSetPlugin</b>, <b>ConstructionPlugin</b>, <b>SketchPlugin</b>, <b>FeaturesPlugins</b>, etc.
+ *
+ */

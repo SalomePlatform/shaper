@@ -18,6 +18,7 @@
 
 namespace BREPImport {
 
+/// Implementation of the import BREP files algorithms
 GEOMALGOAPI_EXPORT
 TopoDS_Shape Import(const TCollection_AsciiString& theFileName,
                     const TCollection_AsciiString& theFormatName,

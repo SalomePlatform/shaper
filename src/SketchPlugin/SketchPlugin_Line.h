@@ -13,7 +13,7 @@
 #include <list>
 
 /**\class SketchPlugin_Line
- * \ingroup DataModel
+ * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.
  */
 class SketchPlugin_Line : public SketchPlugin_Feature

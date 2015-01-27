@@ -13,7 +13,7 @@
 #include <GeomAPI_IPresentable.h>
 
 /**\class SketchPlugin_Arc
- * \ingroup DataModel
+ * \ingroup Plugins
  * \brief Feature for creation of the new arc of circle in PartSet.
  * The visualization of this object is separated in two parts. The first one is an AIS object
  * calculated when there is non-initialized attributes of the arc. The second is a result and

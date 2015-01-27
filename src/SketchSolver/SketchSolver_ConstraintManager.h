@@ -23,7 +23,7 @@
 #include <set>
 
 /** \class   SketchSolver_ConstraintManager
- *  \ingroup DataModel
+ *  \ingroup Plugins
  *  \brief   Listens the changes of SketchPlugin features and transforms the Constraint
  *           feature into the format understandable by SolveSpace library.
  *

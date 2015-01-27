@@ -20,7 +20,7 @@ class GeomDataAPI_Point2D;
 #define DISTANCE_COLOR "#ff00ff"
 
 /** \class SketchPlugin_ConstraintDistance
- *  \ingroup DataModel
+ *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint which defines a distance
  *         between a point and another feature (point, line, plane or face)
  *

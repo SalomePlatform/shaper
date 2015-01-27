@@ -13,7 +13,7 @@
 #include <list>
 
 /**\class SketchPlugin_Point
- * \ingroup DataModel
+ * \ingroup Plugins
  * \brief Feature for creation of a new point.
  */
 class SketchPlugin_Point : public SketchPlugin_Feature

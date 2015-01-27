@@ -21,7 +21,7 @@ const std::string POINT_ATTR_Y = "y";
 const std::string POINT_ATTR_Z = "z";
 
 /**\class ConstructionPlugin_Point
- * \ingroup DataModel
+ * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.
  */
 class ConstructionPlugin_Point : public ModelAPI_Feature

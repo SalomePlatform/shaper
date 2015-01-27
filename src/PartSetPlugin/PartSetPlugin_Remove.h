@@ -11,7 +11,7 @@
 #include <ModelAPI_Feature.h>
 
 /**\class PartSetPlugin_Remove
- * \ingroup DataModel
+ * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.
  */
 class PartSetPlugin_Remove : public ModelAPI_Feature
