@@ -20,27 +20,37 @@
 class QWidget;
 class QLineEdit;
 
+/**
+*  Implementation of model widget for open file widget.
+*  It can be defined as following:
+*  \code
+*      <file_selector
+*          id="import_file_selector"
+*          title="Import file"
+*          path="">
+*          <validator id="ExchangePlugin_ImportFormat" parameters="BREP:BREPImport,STEP:STEPImport" />
+*      </file_selector>
+*  \endcode
+*/
 class MODULEBASE_EXPORT ModuleBase_WidgetFileSelector : public ModuleBase_ModelWidget
 {
   Q_OBJECT
  public:
+  /// Constructor
+  /// \param theParent the parent object
+  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetFileSelector(QWidget* theParent,
                                 const Config_WidgetAPI* theData,
                                 const std::string& theParentId);
   virtual ~ModuleBase_WidgetFileSelector();
 
-  /// Saves the internal parameters to the given feature
-  /// \param theObject a model feature to be changed
   virtual bool storeValue() const;
 
   virtual bool restoreValue();
 
-  /// Returns the internal parent wiget control, that can be shown anywhere
-  /// \returns the widget
   QWidget* getControl() const;
 
-  /// Returns list of widget controls
-  /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
   /// Returns true if a file on the current path in the line edit
@@ -48,18 +58,30 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFileSelector : public ModuleBase_ModelW
   bool isCurrentPathValid();
 
  public slots:
+   /// Processing of path selection button press
   void onPathSelectionBtn();
+
+  /// Processing of path changing
   void onPathChanged();
 
  protected:
+   /// Returns string containing formats
   QString formatsString() const;
+
+  /// Return list of validator formats
   QStringList getValidatorFormats() const;
 
  private:
+   /// A control for path input
   QLineEdit* myPathField;
+
+  /// Container
   QWidget* myMainWidget;
 
+  /// A title of open file dialog box
   QString myTitle;
+
+  /// Default path
   QString myDefaultPath;
 };
 

@@ -16,29 +16,44 @@
 
 DEFINE_STANDARD_HANDLE(ModuleBase_ResultPrs, AIS_Shape)
 
+/**
+* A redefinition of standard AIS Interactive Object in order to provide specific behaviour 
+* for wire presentations based in a one plane
+*/
 class ModuleBase_ResultPrs: public AIS_Shape
 {
 public:
+  /// Constructor
+  /// \param theResult a result object
   Standard_EXPORT ModuleBase_ResultPrs(ResultPtr theResult);
 
+  /// Returns result object
   Standard_EXPORT ResultPtr getResult() const { return myResult; }
 
+  /// Returns True if the presentation is in sketch mode
   Standard_EXPORT bool isSketchMode() const { return myIsSketchMode; }
 
   DEFINE_STANDARD_RTTI(ModuleBase_ResultPrs)
 protected:
+  /// Redefinition of virtual function
   Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
     const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
 
+  /// Redefinition of virtual function
   Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
     const Standard_Integer aMode) ;
 
 private:
+  /// Reference to result object
   ResultPtr myResult;
 
+  /// A sketch mode flag
   bool myIsSketchMode;
 
+  /// Original shape of the result object
   TopoDS_Shape myOriginalShape;
+
+  /// List of faces
   std::list<std::shared_ptr<GeomAPI_Shape> > myFacesList;
 };
 

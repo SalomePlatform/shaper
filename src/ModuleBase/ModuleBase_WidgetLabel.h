@@ -12,10 +12,17 @@
 
 class QLabel;
 
+/**
+* Implementation of model widget for a label control
+*/
 class MODULEBASE_EXPORT ModuleBase_WidgetLabel : public ModuleBase_ModelWidget
 {
 Q_OBJECT
  public:
+  /// Constructor
+  /// \param theParent the parent object
+  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetLabel(QWidget* theParent, const Config_WidgetAPI* theData,
                             const std::string& theParentId);
 
@@ -43,6 +50,7 @@ Q_OBJECT
   virtual bool focusTo() { return false; }
 
 private:
+  /// A label control
   QLabel* myLabel;
 };
 

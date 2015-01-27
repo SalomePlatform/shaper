@@ -19,10 +19,15 @@ class NewGeom_OCCSelector;
 class OCCViewer_Viewer;
 class SUIT_ViewManager;
 
-
+/**
+* A class for providing access of NewGeom functionality to 
+* SALOME view window functionality
+*/
 class NewGeom_SalomeView: public ModuleBase_IViewWindow
 {
 public:
+  /// Constructor
+  /// \param theViewer a reference to a viewer
   NewGeom_SalomeView(OCCViewer_Viewer* theViewer) { myViewer = theViewer; }
 
   virtual Handle(V3d_View) v3dView() const;
@@ -31,14 +36,21 @@ public:
   OCCViewer_Viewer* viewer() const { return myViewer; }
 
 private:
+  /// A reference to a viewer
   OCCViewer_Viewer* myViewer;
 };
 
 
+/**
+* A class for providing access of NewGeom functionality to 
+* SALOME viewer functionality
+*/
 class NewGeom_SalomeViewer : public ModuleBase_IViewer
 {
 Q_OBJECT
  public:
+   /// Constructor
+   /// \param theParent a parent object
   NewGeom_SalomeViewer(QObject* theParent);
 
   ~NewGeom_SalomeViewer();

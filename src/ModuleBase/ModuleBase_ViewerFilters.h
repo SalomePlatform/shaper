@@ -19,6 +19,7 @@ class ModuleBase_IWorkshop;
 
 
 /**
+* \class ModuleBase_ShapeDocumentFilter
 * A filter which provides filtering of selection in 3d viewer.
 * Installing of this filter lets to select objects which belong to 
 * currently active document or to global document
@@ -44,6 +45,7 @@ protected:
 };
 
 /**
+* \class ModuleBase_ShapeInPlaneFilter
 * A filter which provides filtering of selection in 3d viewer.
 * Installing of this filter lets to select of Vertexes and Edges which belongs to the given plane
 */
@@ -73,6 +75,7 @@ private:
 
 
 /**
+* \class ModuleBase_ObjectTypesFilter
 * A filter which provides filtering of selection in 3d viewer.
 * Installing of this filter lets to select only object of requested type
 * Accepts following objects types:
