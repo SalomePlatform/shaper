@@ -35,7 +35,7 @@ class XGUI_Workshop;
 class XGUI_EXPORT XGUI_Displayer
 {
  public:
-   /// \enum display mode
+   /// \enum DisplayMode display mode
    enum DisplayMode { 
      /// Mode is not defined
      NoMode = -1, 

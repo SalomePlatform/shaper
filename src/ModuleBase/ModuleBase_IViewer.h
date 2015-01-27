@@ -21,6 +21,8 @@ class MODULEBASE_EXPORT ModuleBase_IViewer : public QObject
 {
 Q_OBJECT
  public:
+   /// Constructor
+   /// \param theParent a parent object
   ModuleBase_IViewer(QObject* theParent)
       : QObject(theParent)
   {
@@ -36,12 +38,14 @@ Q_OBJECT
   virtual Handle(V3d_View) activeView() const = 0;
 
   //! Enable or disable selection in the viewer
+  //! \param isEnabled is enable or disable flag
   virtual void enableSelection(bool isEnabled) = 0;
 
   //! Returns true if selection is enabled
   virtual bool isSelectionEnabled() const = 0;
 
   //! Enable or disable multiselection in the viewer
+  //! \param isEnable is enable or disable flag
   virtual void enableMultiselection(bool isEnable) = 0;
 
   //! Returns true if multiselection is enabled
@@ -57,9 +61,11 @@ Q_OBJECT
   virtual void setViewProjection(double theX, double theY, double theZ) = 0;
 
   /// Add selection filter to the viewer
+  /// \param theFilter a selection filter
   virtual void addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter) = 0;
 
   /// Remove selection filter from the viewer
+  /// \param theFilter a selection filter
   virtual void removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter) = 0;
 
   /// Remove all selection filters from the viewer
@@ -69,21 +75,43 @@ Q_OBJECT
   virtual void update() = 0;
 
 signals:
+  /// Signal emited when last view window is closed
   void lastViewClosed();
+
+  /// Signal emited before view window is closed
   void tryCloseView(ModuleBase_IViewWindow* theWnd);
+
+  /// Signal emited on delete view window
   void deleteView(ModuleBase_IViewWindow* theWnd);
+
+  /// Signal emited on creation of view window
   void viewCreated(ModuleBase_IViewWindow* theWnd);
+
+  /// Signal emited on key release
   void activated(ModuleBase_IViewWindow* theWnd);
 
+  /// Signal emited on mouse press
   void mousePress(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+
+  /// Signal emited on mouse release
   void mouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+
+  /// Signal emited on mouse double click
   void mouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+
+  /// Signal emited on mouse move
   void mouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
+  /// Signal emited on key press
   void keyPress(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent);
+
+  /// Signal emited on key release
   void keyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent);
 
+  /// Signal emited on selection changed
   void selectionChanged();
+
+  /// Signal emited on selection changed
   void contextMenuRequested(QContextMenuEvent*);
 };
 

@@ -43,7 +43,8 @@ protected:
   virtual void createFilter();
 
 protected:
-  std::list<std::string> myArguments; /// the filter arguments
+  /// the filter arguments
+  std::list<std::string> myArguments; 
 };
 
 #endif //ModuleBase_FilterMulti

@@ -30,6 +30,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   Q_OBJECT
  public:
 
+   /// Constructor
+   /// \param theParent instance of workshop intrface
    ModuleBase_IModule(ModuleBase_IWorkshop* theParent);
 
   virtual ~ModuleBase_IModule() {}
@@ -40,7 +42,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Called on creation of menu item in desktop
   virtual void actionCreated(QAction*);
 
-  /// Called when user selects feature for editing
+  /// Launching of a edit operation on the feature 
+  /// \param theFeature feature for editing
   virtual void editFeature(FeaturePtr theFeature);
 
   /// Creates an operation and send it to loop
@@ -64,10 +67,12 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Realizes some functionality by an operation abort
   virtual void operationAborted(ModuleBase_Operation* theOperation) {}
 
-  /// Called when it is necessary to update a command state (enable or disable it)
-  //virtual bool isFeatureEnabled(const QString& theCmdId) const = 0;
-
   /// Creates custom widgets for property panel
+  /// \param theType a type of widget
+  /// \param theParent the parent object
+  /// \param theWidgetApi the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
+  /// \param theModelWidgets list of widget objects
   virtual QWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
                                       Config_WidgetAPI* theWidgetApi, std::string theParentId,
                                       QList<ModuleBase_ModelWidget*>& theModelWidgets)
@@ -75,6 +80,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
     return 0;
   }
 
+  /// Returns current workshop
   ModuleBase_IWorkshop* workshop() const { return myWorkshop; }
 
   /// Call back forlast tuning of property panel before operation performance
@@ -82,34 +88,12 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation) {}
 
 public slots:
+  /// Called on call of command corresponded to a feature
   void onFeatureTriggered();
 
 protected slots:
   /// Called on selection changed event
   virtual void onSelectionChanged() {}
-
-  /// SLOT, that is called by mouse press in the viewer.
-  /// The mouse released point is sent to the current operation to be processed.
-  /// \param theEvent the mouse event
-  //virtual void onMousePressed(QMouseEvent* theEvent) {}
-
-  /// SLOT, that is called by mouse release in the viewer.
-  /// The mouse released point is sent to the current operation to be processed.
-  /// \param theEvent the mouse event
-  //virtual void onMouseReleased(QMouseEvent* theEvent) {}
-  
-  /// SLOT, that is called by mouse move in the viewer.
-  /// The mouse moved point is sent to the current operation to be processed.
-  /// \param theEvent the mouse event
-  //virtual void onMouseMoved(QMouseEvent* theEvent) {}
-
-  /// SLOT, that is called by the mouse double click in the viewer.
-  /// \param theEvent the mouse event
-  //virtual void onMouseDoubleClick(QMouseEvent* theEvent) {}
-
-  /// SLOT, that is called by the key in the viewer is clicked.
-  /// \param theEvent the mouse event
-  //virtual void onKeyRelease(QKeyEvent* theEvent) {}
 
  protected:
   /// Sends the operation for launching
@@ -118,8 +102,7 @@ protected slots:
 
   /// Creates a new operation
   /// \param theCmdId the operation name
-  /// \param theFeatureKind a kind of feature to get the feature xml description
-  virtual ModuleBase_Operation* createOperation(const std::string& theFeatureId);
+  virtual ModuleBase_Operation* createOperation(const std::string& theCmdId);
 
   /// Register validators for this module
   virtual void registerValidators() {}
@@ -132,7 +115,10 @@ protected slots:
 
 protected:
 
+  /// Reference to workshop
   ModuleBase_IWorkshop* myWorkshop;
+
+  /// Map of features in XML
   std::map<std::string, std::string> myFeaturesInFiles;
 };
 

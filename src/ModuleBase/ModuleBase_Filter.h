@@ -24,6 +24,7 @@
 class ModuleBase_Filter
 {
 public:
+  /// Constructor
   MODULEBASE_EXPORT ModuleBase_Filter() {}
 
   /**
@@ -45,7 +46,8 @@ protected:
   virtual void createFilter() = 0;
 
 protected:
-  Handle(SelectMgr_Filter) myFilter; // current instance of the OCC selection filter
+  /// current instance of the OCC selection filter
+  Handle(SelectMgr_Filter) myFilter; 
 };
 
 #endif //ModuleBase_Filter

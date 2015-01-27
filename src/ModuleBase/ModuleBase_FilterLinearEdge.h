@@ -13,11 +13,17 @@
 
 #include <StdSelect_TypeOfEdge.hxx>
 
+/**
+* A class of a viewer filter by linear edges
+*/
 class ModuleBase_FilterLinearEdge: public ModuleBase_Filter
 {
 public:
+  /// Convert string to StdSelect_TypeOfFace value
+  /// \param theType a string value
   static MODULEBASE_EXPORT StdSelect_TypeOfEdge edgeType(const std::string& theType);
 
+  /// Constructor
   MODULEBASE_EXPORT ModuleBase_FilterLinearEdge(): 
       ModuleBase_Filter() {}
 

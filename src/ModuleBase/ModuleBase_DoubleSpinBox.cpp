@@ -52,10 +52,11 @@ const double PSEUDO_ZERO = 1.e-20;
  a step value of 1.0 and a precision of 2 decimal places.
  The value is initially set to 0.00.
 
- \param parent parent object
+ \param theParent parent object
+ \param thePrecision precision of values input
  */
-ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* parent, int thePrecision)
-    : QDoubleSpinBox(parent),
+ModuleBase_DoubleSpinBox::ModuleBase_DoubleSpinBox(QWidget* theParent, int thePrecision)
+    : QDoubleSpinBox(theParent),
       myCleared(false)
 {
   // VSR 01/07/2010: Disable thousands separator for spin box
@@ -165,7 +166,7 @@ QString ModuleBase_DoubleSpinBox::textFromValue(double val) const
 
 /*!
  \brief Return source string with removed leading and trailing zeros.
- \param str source string
+ \param src source string
  \return resulting string
  */
 QString ModuleBase_DoubleSpinBox::removeTrailingZeroes(const QString& src) const
@@ -300,9 +301,8 @@ QValidator::State ModuleBase_DoubleSpinBox::validate(QString& str, int& pos) con
 
 /*!
  \brief Called when user enters the text in the spin box.
- \param txt current spin box text (not used)
  */
-void ModuleBase_DoubleSpinBox::onTextChanged(const QString& /*txt*/)
+void ModuleBase_DoubleSpinBox::onTextChanged(const QString& )
 {
   myCleared = false;
 }
