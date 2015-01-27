@@ -13,9 +13,14 @@
 
 #include <StdSelect_TypeOfFace.hxx>
 
+/**
+* A class of a viewer filter by shape type
+*/
 class ModuleBase_FilterShapeType: public ModuleBase_Filter
 {
 public:
+  /// Constructor 
+  /// \param theType type of shape
   static MODULEBASE_EXPORT TopAbs_ShapeEnum shapeType(const std::string& theType);
 
   MODULEBASE_EXPORT ModuleBase_FilterShapeType();
@@ -33,7 +38,8 @@ protected:
   virtual void createFilter();
 
 private:
-  TopAbs_ShapeEnum myShapeType; /// the shape type of the filter
+  /// the shape type of the filter
+  TopAbs_ShapeEnum myShapeType; 
 };
 
 #endif //ModuleBase_FilterShapeType

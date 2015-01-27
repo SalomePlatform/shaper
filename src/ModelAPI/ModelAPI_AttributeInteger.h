@@ -34,21 +34,14 @@ class ModelAPI_AttributeInteger : public ModelAPI_Attribute
   }
 
   /// Returns the type of this class of attributes, not static method
-  MODELAPI_EXPORT virtual std::string attributeType()
-  {
-    return type();
-  }
+  MODELAPI_EXPORT virtual std::string attributeType();
 
   /// To virtually destroy the fields of successors
-  MODELAPI_EXPORT virtual ~ModelAPI_AttributeInteger()
-  {
-  }
+  MODELAPI_EXPORT virtual ~ModelAPI_AttributeInteger();
 
  protected:
   /// Objects are created for features automatically
-  MODELAPI_EXPORT ModelAPI_AttributeInteger()
-  {
-  }
+  MODELAPI_EXPORT ModelAPI_AttributeInteger();
 };
 
 //! Pointer on double attribute

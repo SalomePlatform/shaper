@@ -8,6 +8,12 @@
 
 #include <map>
 
+/**\class ExchangePlugin_ImportFeature
+ * \ingroup Plugins
+ * \brief Feature for import shapes from the external files in CAD formats.
+ *
+ * The set of supported formats is defined in the configuration file.
+ */
 class ExchangePlugin_ImportFeature : public ModelAPI_Feature
 {
  public:
@@ -23,8 +29,9 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
     static const std::string MY_FILE_PATH_ID("import_file_selector");
     return MY_FILE_PATH_ID;
   }
-
+  /// default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_ImportFeature();
+  /// default destructor
   EXCHANGEPLUGIN_EXPORT virtual ~ExchangePlugin_ImportFeature();
 
   /// Returns the unique kind of a feature
@@ -42,6 +49,7 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
   }
 
  protected:
+  /// POerforms the import of the file
   EXCHANGEPLUGIN_EXPORT bool importFile(const std::string& theFileName);
 
 private:

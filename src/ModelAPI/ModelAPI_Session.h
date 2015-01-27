@@ -32,7 +32,6 @@ class MODELAPI_EXPORT ModelAPI_Session
 
   //! Loads the OCAF document from the file.
   //! \param theFileName full name of the file to load
-  //! \param theStudyID identifier of the SALOME study to associate with loaded file
   //! \returns true if file was loaded successfully
   virtual bool load(const char* theFileName) = 0;
 
@@ -104,7 +103,7 @@ class MODELAPI_EXPORT ModelAPI_Session
  protected:
   /// Creates the feature object using plugins functionality
   virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
-
+  /// Sets the session interface implementation (once per application launch)
   static void setSession(std::shared_ptr<ModelAPI_Session> theManager);
 
   friend class Model_Document;

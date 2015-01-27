@@ -21,11 +21,9 @@
 class ModelAPI_ResultGroup : public ModelAPI_Result
 {
 public:
+  MODELAPI_EXPORT virtual ~ModelAPI_ResultGroup();
   /// Returns the group identifier of this result
-  virtual std::string groupName()
-  {
-    return group();
-  }
+  MODELAPI_EXPORT virtual std::string groupName();
 
   /// Returns the group identifier of this result
   inline static std::string group()

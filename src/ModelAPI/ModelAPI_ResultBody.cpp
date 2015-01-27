@@ -1,0 +1,18 @@
+// Copyright (C) 2014-20xx CEA/DEN, EDF R&D
+
+// File:        ModelAPI_ResultBody.cpp
+// Created:     07 Jul 2014
+// Author:      Mikhail PONIKAROV
+
+#include "ModelAPI_ResultBody.h"
+
+ModelAPI_ResultBody::~ModelAPI_ResultBody()
+{
+  
+}
+
+std::string ModelAPI_ResultBody::groupName()
+{
+  return group();
+}
+

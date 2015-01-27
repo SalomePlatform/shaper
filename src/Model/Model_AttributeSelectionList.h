@@ -36,9 +36,13 @@ public:
   /// Returns the number ofselection attributes in the list
   MODEL_EXPORT virtual int size();
 
+  /// The type of all elements selection
+  /// \returns the index of the OCCT enumeration of the type of shape
   MODEL_EXPORT virtual int selectionType();
 
-  MODEL_EXPORT virtual void setSelectionType(int);
+  /// Sets the type of all elements selection
+  /// \param theType the index of the OCCT enumeration of the type of shape
+  MODEL_EXPORT virtual void setSelectionType(int theType);
 
   /// Returns the attribute selection by the index (zero based)
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeSelection> value(const int theIndex);

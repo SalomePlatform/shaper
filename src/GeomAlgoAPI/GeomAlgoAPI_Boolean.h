@@ -20,16 +20,16 @@
 class GeomAlgoAPI_Boolean : public GeomAPI_Interface
 {
  public:
-  /* \brief Creates cut boolean operation
+  /**\brief Creates cut boolean operation
    * \param[in] theShape the main shape
    * \param[in] theTool  toole shape for boolean
    * \return a solid as result of operation
    */
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> makeCut(
 	                                          std::shared_ptr<GeomAPI_Shape> theShape,
-                                              std::shared_ptr<GeomAPI_Shape> theTool);
+                                            std::shared_ptr<GeomAPI_Shape> theTool);
 
-  /* \brief Creates fuse boolean operation
+  /**\brief Creates fuse boolean operation
    * \param[in] theShape the main shape
    * \param[in] theTool  second shape
    * \return a solid as result of operation
@@ -38,10 +38,9 @@ class GeomAlgoAPI_Boolean : public GeomAPI_Interface
 	                                          std::shared_ptr<GeomAPI_Shape> theShape,
                                               std::shared_ptr<GeomAPI_Shape> theTool);
 
-  /* \brief Creates common boolean operation
+  /**\brief Creates common boolean operation
    * \param[in] theObject the main shape
    * \param[in] theTool  second shape
-   * \param[in] theType  type of the operation: Fuse, Cut, Common
    * \return a solid as result of operation
    */
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> makeCommon(

@@ -10,7 +10,7 @@
 #include "Model.h"
 #include <ModelAPI_ResultGroup.h>
 
-/**\class ModelAPI_ResultGroup
+/**\class Model_ResultGroup
  * \ingroup DataModel
  * \brief The groups result.
  *

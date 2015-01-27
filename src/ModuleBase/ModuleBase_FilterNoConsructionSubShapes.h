@@ -24,6 +24,8 @@ DEFINE_STANDARD_HANDLE(ModuleBase_FilterNoConsructionSubShapes, SelectMgr_Filter
 class ModuleBase_FilterNoConsructionSubShapes: public SelectMgr_Filter
 {
 public:
+  /// Constructor
+  /// \param theWorkshop instance of workshop interface
   Standard_EXPORT ModuleBase_FilterNoConsructionSubShapes(ModuleBase_IWorkshop* theWorkshop):
       SelectMgr_Filter(), myWorkshop(theWorkshop) {}
 
@@ -38,6 +40,7 @@ public:
   DEFINE_STANDARD_RTTI(ModuleBase_FilterNoConsructionSubShapes)
 
 protected:
+  /// Instance of workshop interface
   ModuleBase_IWorkshop* myWorkshop;
 };
 

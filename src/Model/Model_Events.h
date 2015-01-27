@@ -73,10 +73,13 @@ class Model_ObjectDeletedMessage : public ModelAPI_ObjectDeletedMessage
     return myGroups;
   }
 
+  /// Returns the new empty message of this type
   virtual std::shared_ptr<Events_MessageGroup> newEmpty();
 
+  /// Returns the identifier of this message
   virtual const Events_ID messageId();
 
+  /// Appends to this message the given one
   virtual void Join(const std::shared_ptr<Events_MessageGroup>& theJoined);
 };
 

@@ -1,6 +1,6 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        ModelAPI_Plugin.hxx
+// File:        ModelAPI_Plugin.h
 // Created:     31 Mar 2014
 // Author:      Mikhail PONIKAROV
 
@@ -17,7 +17,6 @@ class ModelAPI_Feature;
  * \ingroup DataModel
  * \brief Interface common for any plugin: allows to use plugin by the plugins manager.
  */
-
 class MODELAPI_EXPORT ModelAPI_Plugin
 {
  public:
@@ -25,9 +24,7 @@ class MODELAPI_EXPORT ModelAPI_Plugin
   virtual std::shared_ptr<ModelAPI_Feature> createFeature(std::string theFeatureID) = 0;
 
   /// To virtually destroy the fields of successors
-  virtual ~ModelAPI_Plugin()
-  {
-  }
+  virtual ~ModelAPI_Plugin();
 };
 
 #endif

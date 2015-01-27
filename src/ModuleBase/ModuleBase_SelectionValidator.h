@@ -15,10 +15,19 @@
 #include <list>
 #include <string>
 
+/**
+* A validator of selection
+*/
 class ModuleBase_SelectionValidator : public ModelAPI_Validator
 {
  public:
+   /// Returns True if selection is valid
+   /// \param theSelection selection instance
   virtual bool isValid(const ModuleBase_ISelection* theSelection) const = 0;
+
+   /// Returns True if selection is valid
+   /// \param theSelection selection instance
+   /// \param theArguments list of arguments
   virtual bool isValid(const ModuleBase_ISelection* theSelection,
                        const std::list<std::string>& theArguments) const
   {

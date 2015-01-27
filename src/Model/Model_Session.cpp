@@ -35,7 +35,8 @@ static Model_Session* myImpl = new Model_Session();
 
 bool Model_Session::load(const char* theFileName)
 {
-  return ROOT_DOC->load(theFileName);
+  bool aRes = ROOT_DOC->load(theFileName);
+  return aRes;
 }
 
 bool Model_Session::save(const char* theFileName, std::list<std::string>& theResults)
@@ -62,12 +63,16 @@ void Model_Session::startOperation()
 
 void Model_Session::finishOperation()
 {
+  setCheckTransactions(false);
   ROOT_DOC->finishOperation();
+  setCheckTransactions(true);
 }
 
 void Model_Session::abortOperation()
 {
+  setCheckTransactions(false);
   ROOT_DOC->abortOperation();
+  setCheckTransactions(true);
   // here the update mechanism may work after abort, so, supress the warnings about
   // modifications outside of the transactions
   bool aWasCheck = myCheckTransactions;
@@ -96,7 +101,9 @@ bool Model_Session::canUndo()
 
 void Model_Session::undo()
 {
+  setCheckTransactions(false);
   ROOT_DOC->undo();
+  setCheckTransactions(true);
 }
 
 bool Model_Session::canRedo()
@@ -106,7 +113,9 @@ bool Model_Session::canRedo()
 
 void Model_Session::redo()
 {
+  setCheckTransactions(false);
   ROOT_DOC->redo();
+  setCheckTransactions(true);
 }
 
 FeaturePtr Model_Session::createFeature(string theFeatureID)
@@ -179,6 +188,15 @@ void Model_Session::setActiveDocument(
   if (myCurrentDoc != theDoc) {
     myCurrentDoc = theDoc;
     if (theSendSignal) {
+      // syncronize the document: it may be just opened or opened but removed before
+      std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(theDoc);
+      if (aDoc) {
+        bool aWasChecked = myCheckTransactions;
+        setCheckTransactions(false);
+        aDoc->synchronizeFeatures(false, true);
+        if (aWasChecked)
+            setCheckTransactions(true);
+      }
       static std::shared_ptr<Events_Message> aMsg(
           new Events_Message(Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED)));
       Events_Loop::loop()->send(aMsg);

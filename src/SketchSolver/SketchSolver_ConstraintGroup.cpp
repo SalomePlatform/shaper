@@ -38,11 +38,11 @@
 /// Tolerance for value of parameters
 const double tolerance = 1.e-10;
 
-/*
+/**
  * Collects all sketch solver error' codes
  * as inline static functions
- * TODO: Move this class into a separate file
  */
+ // TODO: Move this class into a separate file
 class SketchSolver_Error
 {
  public:

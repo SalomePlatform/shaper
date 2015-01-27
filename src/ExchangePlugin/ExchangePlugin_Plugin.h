@@ -11,6 +11,10 @@
 #include <ModelAPI_Plugin.h>
 #include <ModelAPI_Feature.h>
 
+/**\class ExchangePlugin_Plugin
+ * \ingroup Plugins
+ * \brief The main class for management the import and export operations as plugin.
+ */
 class EXCHANGEPLUGIN_EXPORT ExchangePlugin_Plugin : public ModelAPI_Plugin
 {
  public:

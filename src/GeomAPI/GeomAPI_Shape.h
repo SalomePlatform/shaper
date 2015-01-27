@@ -21,6 +21,7 @@ class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
   /// Creation of empty (null) shape
   GeomAPI_Shape();
 
+  /// Returns true if the underlied shape is null
   bool isNull() const;
 
   /// Returns whether the shapes are equal
@@ -40,6 +41,7 @@ class GEOMAPI_EXPORT GeomAPI_Shape : public GeomAPI_Interface
   bool computeSize(double& theXmin, double& theYmin, double& theZmin,
                    double& theXmax, double& theYmax, double& theZmax) const;
 
+  /// Returns the shape as BRep stream
   std::string getShapeStream() const;
 };
 

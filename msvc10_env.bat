@@ -136,6 +136,13 @@ set PATH=%CMAKEDIR%\bin;%PATH%
 @REM -------------------------
 
 @REM -------------------------
+@REM GRAPHVIZ 
+@SET GRAPHVIZ_ROOT_DIR=%PDIR%\graphviz-2.38.0
+@SET GRAPHVIZHOME=%GRAPHVIZ_ROOT_DIR%
+@SET PATH=%GRAPHVIZ_ROOT_DIR%\bin;%PATH%
+@REM -------------------------
+
+@REM -------------------------
 @REM SUIT
 @SET SUIT_DIR=%PDIR%\suit
 @SET PATH=%SUIT_DIR%\bin;%PATH%

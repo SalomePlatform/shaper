@@ -20,8 +20,10 @@
  */
 class SketchSolver_Constraint
 {
- public:
+public:
+  /// Default constructor
   SketchSolver_Constraint();
+  /// Creates constraint to manage the given constraint from plugin
   SketchSolver_Constraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
 
   /** \brief Compute constraint type according to SolveSpace identifiers

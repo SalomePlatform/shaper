@@ -55,6 +55,7 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
   /// Returns true is sketch element is under the rigid constraint
   SKETCHPLUGIN_EXPORT virtual bool isFixed() {return false;}
 
+  /// Returns true of the feature is created basing on the external shape of not-this-sketch object
   inline bool isExternal() const
   {
     AttributeSelectionPtr aAttr = data()->selection(EXTERNAL_ID());

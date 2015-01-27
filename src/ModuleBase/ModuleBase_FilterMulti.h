@@ -13,6 +13,9 @@
 
 #include <StdSelect_TypeOfFace.hxx>
 
+/**
+* An implementation of filter which support using of several filters according to OR statement
+*/
 class ModuleBase_FilterMulti: public ModuleBase_Filter
 {
   /**
@@ -40,7 +43,8 @@ protected:
   virtual void createFilter();
 
 protected:
-  std::list<std::string> myArguments; /// the filter arguments
+  /// the filter arguments
+  std::list<std::string> myArguments; 
 };
 
 #endif //ModuleBase_FilterMulti

@@ -25,12 +25,46 @@ class QLineEdit;
 class QToolButton;
 class ModuleBase_IWorkshop;
 
+/**
+* Implementation of widget for shapes selection.
+* This type of widget can be defined in XML file with 'shape_selector' keyword.
+* For example:
+* \code
+*   <shape_selector id="main_object" 
+*    label="Main object" 
+*    icon=":icons/cut_shape.png" 
+*    tooltip="Select an object solid"
+*    shape_types="solid shell"
+*    concealment="true"
+*  />
+* \endcode
+* It can use following parameters:
+* - id - name of object attribute
+* - label - content of widget's label
+* - icon - icon which can be used instead label
+* - tooltip - the witget's tooltip text
+* - shape_types - list of shape types for selection. 
+*       Possible values: face, vertex, wire, edge, shell, solid
+* - object_types - types of selectable objects. 
+*       For today it supports only one type "construction" 
+*        which corresponds to ModelAPI_ResultConstruction object type
+* - concealment - hide or not hide selected object after operation
+*/
 class MODULEBASE_EXPORT ModuleBase_WidgetShapeSelector : public ModuleBase_ModelWidget
 {
 Q_OBJECT
  public:
+
+   /// Converts string value (name of shape type) to shape enum value
+   /// \param theType - string with shape type name
+   /// \return TopAbs_ShapeEnum value
   static TopAbs_ShapeEnum shapeType(const QString& theType);
 
+  /// Constructor
+  /// \param theParent the parent object
+  /// \param theWorkshop instance of workshop interface
+  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetShapeSelector(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
                             const Config_WidgetAPI* theData, const std::string& theParentId);
 
@@ -52,6 +86,7 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
+  /// Returns currently selected data object
   ObjectPtr selectedFeature() const
   {
     return mySelectedObject;
@@ -76,29 +111,34 @@ Q_OBJECT
   void activateSelection(bool toActivate);
 
  private slots:
+   /// Slot which is called on selection event
   void onSelectionChanged();
 
  protected:
+   /// Computes and updates name of selected object in the widget
   void updateSelectionName();
+
+  /// Raise panel which contains this widget
   void raisePanel() const;
 
-  /// Returns true if shape of given object corresponds to requested shape type
-  /// This method is called only in non sub-shapes selection mode
-  //virtual bool acceptObjectShape(const ObjectPtr theObject) const;
-
   /// Returns true if selected shape corresponds to requested shape types
-  /// This method is called only in sub-shapes selection mode
+  /// \param theShape a shape
   virtual bool acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const;
 
   /// Returns true if selected object corresponds to requested Object type
   /// Thid method is used in any selection mode
+  /// \param theObject an object 
   virtual bool acceptObjectType(const ObjectPtr theObject) const;
 
 
   // Set the given object as a value of the widget
+  /// \param theObj an object 
+  /// \param theShape a shape
   void setObject(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape = std::shared_ptr<GeomAPI_Shape>());
 
   /// Check the selected with validators if installed
+  /// \param theObj the object for checking
+  /// \param theShape the shape for checking
   virtual bool isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape);
 
   /// Clear attribute
@@ -106,20 +146,35 @@ Q_OBJECT
 
   //----------- Class members -------------
  protected:
+
+   /// Container of the widget's control
   QWidget* myContainer;
+
+  /// Label of the widget
   QLabel* myLabel;
+
+  /// Input control of the widget
   QLineEdit* myTextLine;
 
+  /// Reference to workshop
   ModuleBase_IWorkshop* myWorkshop;
 
+  /// Pointer to selected object
   ObjectPtr mySelectedObject;
-  std::shared_ptr<GeomAPI_Shape> myShape;
 
+  /// Pointer to selected shape
+  GeomShapePtr myShape;
+
+  /// List of accepting shapes types
   QStringList myShapeTypes;
+
+  /// List of accepting object types
   QStringList myObjectTypes;
 
+  /// Active/inactive flag
   bool myIsActive;
 
+  /// Filter by objects types
   Handle(ModuleBase_ObjectTypesFilter) myObjTypeFilter;
 };
 

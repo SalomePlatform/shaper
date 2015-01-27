@@ -23,7 +23,7 @@
 
 /*!
  * \class ModuleBase_OperationDescription
- *
+ * Description of operation from XML
  */
 class MODULEBASE_EXPORT ModuleBase_OperationDescription
 {
@@ -38,10 +38,6 @@ class MODULEBASE_EXPORT ModuleBase_OperationDescription
   /// \return string name of the operation.
   const QString& operationId() const;
 
-  /// Returns XML representation of the operation's widget.
-  /// \return XML QString
-  //const QString& xmlRepresentation() const;
-
   /// Returns a short description of operation (will be
   /// inserted in title of property panel)
   const QString& description() const;
@@ -49,15 +45,6 @@ class MODULEBASE_EXPORT ModuleBase_OperationDescription
   /// Sets a short description of operation (will be
   /// inserted in title of property panel)
   void setDescription(const QString& theDescription);
-
-  /// Sets a list of model widgets, according to the operation feature xml definition
-  /// \param theWidgets a list of widgets
-  //void setModelWidgets(const std::string& theXmlRepresentation,
-  //                     const QList<ModuleBase_ModelWidget*>& theWidgets);
-
-  /// Sets a list of model widgets, according to the operation feature xml definition
-  /// \param theWidgets a list of widgets
-  //const QList<ModuleBase_ModelWidget*>& modelWidgets() const;
 
   /// Returns XML representation of the operation's widget.
   /// \return XML QString
@@ -73,10 +60,14 @@ class MODULEBASE_EXPORT ModuleBase_OperationDescription
 
  private:
   //!< Next fields could be extracted into a subclass;
-  QString myOperationId;  /// the operation identifier
-  QString myDescription;  /// the short description of the opertaion
-  QString myXmlRepresentation;  /// the xml definition
-  //QList<ModuleBase_ModelWidget*> myWidgets; /// the list of operation widgets
+   /// the operation identifier
+  QString myOperationId;  
+
+  /// the short description of the opertaion
+  QString myDescription;  
+
+  /// the xml definition
+  QString myXmlRepresentation;  
 };
 
-#endif //ModuleBase_OperationDescription_H
+#endif //ModuleBase_OperationDescription_H

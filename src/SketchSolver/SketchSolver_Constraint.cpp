@@ -229,11 +229,13 @@ AttrType typeOfAttribute(std::shared_ptr<ModelAPI_Attribute> theAttribute)
         return ARC;
     }
   } else {
-    const std::string aType = anAttrRef->attr()->attributeType();
-    if (aType == GeomDataAPI_Point2D::type())
-      return POINT2D;
-    if (aType == GeomDataAPI_Point2D::type())
-      return POINT2D;
+    if (anAttrRef->attr().get() != NULL) {
+      const std::string aType = anAttrRef->attr()->attributeType();
+      if (aType == GeomDataAPI_Point2D::type())
+        return POINT2D;
+      if (aType == GeomDataAPI_Point2D::type())
+        return POINT2D;
+    }
   }
 
   return UNKNOWN;

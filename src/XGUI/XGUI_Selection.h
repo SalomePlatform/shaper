@@ -22,9 +22,14 @@
 
 class XGUI_Workshop;
 
+/**
+* Implementation of \ref ModuleBase_ISelection interface.
+*/
 class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
 {
  public:
+   /// Constructor
+   /// \param theWorkshop reference to workshop instance
   XGUI_Selection(XGUI_Workshop* theWorkshop);
 
   /// Returns a list of viewer selected presentations

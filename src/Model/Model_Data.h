@@ -161,16 +161,16 @@ class Model_Data : public ModelAPI_Data
   /// Returns the identifier of feature-owner, unique in this document
   MODEL_EXPORT virtual int featureId() const;
 
-  // returns all objects referenced to this
+  /// returns all objects referenced to this
   MODEL_EXPORT virtual const std::set<AttributePtr>& refsToMe() {return myRefsToMe;}
 
-  // returns all references by attributes of this data
-  // \param theRefs returned list of pairs: id of referenced attribute and list of referenced objects
+  /// returns all references by attributes of this data
+  /// \param theRefs returned list of pairs: id of referenced attribute and list of referenced objects
   MODEL_EXPORT virtual void referencesToObjects(
     std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs);
 
 private:
-  // removes all information about back references
+  /// removes all information about back references
   void eraseBackReferences();
   // adds a back reference (with identifier which attribute references to this object
   void addBackReference(FeaturePtr theFeature, std::string theAttrID);

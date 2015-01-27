@@ -11,6 +11,10 @@
 #include <ModelAPI_Plugin.h>
 #include <ModelAPI_Feature.h>
 
+/**\class FeaturesPlugin_Plugin
+ * \ingroup Plugins
+ * \brief The main class for management the 3D features as plugin.
+ */
 class FEATURESPLUGIN_EXPORT FeaturesPlugin_Plugin : public ModelAPI_Plugin
 {
  public:
@@ -18,6 +22,7 @@ class FEATURESPLUGIN_EXPORT FeaturesPlugin_Plugin : public ModelAPI_Plugin
   virtual FeaturePtr createFeature(std::string theFeatureID);
 
  public:
+  /// Default constructor
   FeaturesPlugin_Plugin();
 };
 
