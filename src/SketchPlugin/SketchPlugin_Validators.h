@@ -24,7 +24,7 @@ class SketchPlugin_DistanceAttrValidator : public ModelAPI_RefAttrValidator
 
   //! Returns true if the attribute is good for the feature attribute
   virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
-                       const AttributePtr& theAttribute) const { return true; };
+                       const AttributePtr& theAttribute) const;
 };
 
 /**
