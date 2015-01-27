@@ -60,7 +60,6 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
 }
 
 //**************************************************************
-#include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 void XGUI_SelectionMgr::updateSelectedOwners(bool isUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
