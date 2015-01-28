@@ -16,10 +16,10 @@
 class SUIT_ResourceMgr;
 class QWidget;
 
-/// \typedef ModuleBase_Pref Pair of values: section name, value name
+/// Pair of values: section name, value name
 typedef QPair<QString, QString> ModuleBase_Pref;
 
-/// \typedef ModuleBase_Prefs list of preferences
+/// List of preferences
 typedef QList<ModuleBase_Pref> ModuleBase_Prefs;
 
 //***********************************************************************
@@ -27,9 +27,14 @@ typedef QList<ModuleBase_Pref> ModuleBase_Prefs;
 class MODULEBASE_EXPORT ModuleBase_Preferences
 {
  public:
+   /// Name of preferences of viewer section
   static const QString VIEWER_SECTION;
+
+   /// Name of preferences of menu section
   static const QString MENU_SECTION;
 
+  /// Shows a dialog box to edit preferences
+  /// \param theModified a list of modified preferences
   static bool editPreferences(ModuleBase_Prefs& theModified);
 
   /// Returns currently installed resource manager
@@ -44,7 +49,6 @@ class MODULEBASE_EXPORT ModuleBase_Preferences
   static void updateConfigByResources();
 
   /// Updates SUIT_ResourceMgr values by Config_PropManager properties
-  /// \param theUpdateOnlyInvalid flag to update only invalid values, if it is false, all are updated
   static void updateResourcesByConfig();
 
   /// Set default values to the Config_PropManager properties
@@ -83,12 +87,14 @@ Q_OBJECT
   {
   }
 
+  /// Returns True if preferences were modified
   ModuleBase_Prefs modified() const
   {
     return myModified;
   }
 
  protected:
+   /// Store changed resource
   virtual void changedResources(const ResourceMap& theMap);
 
  private:
@@ -101,20 +107,28 @@ class MODULEBASE_EXPORT ModuleBase_PreferencesDlg : public QDialog
 {
 Q_OBJECT
  public:
+   /// Constructor
+   /// \param theResurces resources manager
+   /// \param theParent a parent widget
   ModuleBase_PreferencesDlg(SUIT_ResourceMgr* theResurces, QWidget* theParent = 0);
   virtual ~ModuleBase_PreferencesDlg();
 
+  /// Returns True if preferences were changed
   bool isChanged() const
   {
     return myIsChanged;
   }
 
+  /// Returns list of modified preferences
+  /// \param theModified output list of modified preferences
   void modified(ModuleBase_Prefs& theModified) const;
 
  public slots:
+   /// A slot called on Ok button press
   virtual void accept();
 
 protected slots:
+  /// A slot called on Default button press
   void onDefault();
 
  private:
