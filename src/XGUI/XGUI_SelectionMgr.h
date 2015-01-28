@@ -43,6 +43,10 @@ Q_OBJECT
   void setSelectedOwners(const SelectMgr_IndexedMapOfOwner& theSelectedOwners,
                          bool isUpdateViewer);
 
+  //! Check that the selected owners are valid for the current filters
+  /// \param isUpdateViewer the parameter whether the viewer should be update immediatelly
+  void updateSelectedOwners(bool isUpdateViewer);
+
 signals:
   //! Emited when selection in a one of viewers was changed
   void selectionChanged();

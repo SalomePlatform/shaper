@@ -14,7 +14,7 @@
 #include <ModelAPI_Events.h>
 
 /**\class SketchPlugin_Plugin
- * \ingroup DataModel
+ * \ingroup Plugins
  * \brief Interface common for any plugin: allows to use plugin by the plugins manager.
  */
 class SKETCHPLUGIN_EXPORT SketchPlugin_Plugin : public ModelAPI_Plugin, public Events_Listener

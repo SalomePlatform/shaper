@@ -18,6 +18,8 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Object.h>
 
+#include <SelectMgr_ListIteratorOfListOfFilter.hxx>
+
 XGUI_SelectionMgr::XGUI_SelectionMgr(XGUI_Workshop* theParent)
     : QObject(theParent),
       myWorkshop(theParent)
@@ -55,6 +57,30 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
 
     aContext->AddOrRemoveSelected(anOwner, isUpdateViewer);
   }
+}
+
+//**************************************************************
+void XGUI_SelectionMgr::updateSelectedOwners(bool isUpdateViewer)
+{
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
+
+  SelectMgr_IndexedMapOfOwner anOwnersToDeselect;
+
+  SelectMgr_ListIteratorOfListOfFilter anIt(aFilters);
+  for (; anIt.More(); anIt.Next()) {
+    Handle(SelectMgr_Filter) aFilter = anIt.Value();
+    for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
+      Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
+      if (!aFilter->IsOk(anOwner))
+        anOwnersToDeselect.Add(aContext->SelectedOwner());
+    }
+  }
+
+  setSelectedOwners(anOwnersToDeselect, false);
+
+  if (isUpdateViewer)
+    aContext->UpdateCurrentViewer();
 }
 
 //**************************************************************

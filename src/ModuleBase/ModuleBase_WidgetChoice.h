@@ -14,17 +14,30 @@ class QWidget;
 class QLabel;
 class QComboBox;
 
+/**
+* Implementation of model widget for choice widget definition (combo box)
+* It can be defined as following:
+* \code
+*   <choice id="bool_type" 
+*     label="Type" 
+*     tooltip="Type of boolean operation"
+*     string_list="Cut Fuse Common"
+*   />
+* \endcode
+*/
 class MODULEBASE_EXPORT ModuleBase_WidgetChoice : public ModuleBase_ModelWidget
 {
 Q_OBJECT
  public:
+  /// Constructor
+  /// \param theParent the parent object
+  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetChoice(QWidget* theParent, const Config_WidgetAPI* theData, 
                           const std::string& theParentId);
 
   virtual ~ModuleBase_WidgetChoice();
   
-  /// Saves the internal parameters to the given feature
-  /// \param theObject a model feature to be changed
   virtual bool storeValue() const;
 
   virtual bool restoreValue();
@@ -39,15 +52,21 @@ Q_OBJECT
   }
 
   /// Returns list of widget controls
-  /// \return a control list
+  /// \return a controls list
   virtual QList<QWidget*> getControls() const;
 
 private slots:
+  /// Slot called on combo box index change
   void onCurrentIndexChanged(int theIndex);
 
 private:
+  /// Container widget
   QWidget* myContainer;
+
+  /// The label
   QLabel* myLabel;
+
+  /// The control
   QComboBox* myCombo;
 };
 

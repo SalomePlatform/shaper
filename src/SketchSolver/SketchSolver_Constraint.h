@@ -15,7 +15,7 @@
 #include <vector>
 
 /** \class   SketchSolver_Constraint
- *  \ingroup DataModel
+ *  \ingroup Plugins
  *  \brief   Obtain information about SketchPlugin's constraint
  */
 class SketchSolver_Constraint

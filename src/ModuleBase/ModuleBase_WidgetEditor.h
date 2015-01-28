@@ -25,15 +25,14 @@ class MODULEBASE_EXPORT ModuleBase_WidgetEditor : public ModuleBase_WidgetDouble
 Q_OBJECT
  public:
   /// Constructor
-  /// \theParent the parent object
-  /// \theParent the parent object
-  /// \theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParent the parent object
+  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetEditor(QWidget* theParent, const Config_WidgetAPI* theData,
                           const std::string& theParentId);
   /// Constructor
-  /// \theParent the parent object
-  /// \theParent the parent object
-  /// \theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParent the parent object
+  /// \param theAttribute The attribute of the model widget
   ModuleBase_WidgetEditor(QWidget* theParent, const std::string& theAttribute);
 
   /// Destructor
@@ -54,8 +53,11 @@ Q_OBJECT
    void showPopupEditor();
 
  private:
-  FeaturePtr myFeature;  ///< the current widget feature
-  QStringList myFeatureKinds;  ///< the kinds of possible features
+   ///< the current widget feature
+   FeaturePtr myFeature;  
+
+   ///< the kinds of possible features
+   QStringList myFeatureKinds;  
 };
 
 #endif

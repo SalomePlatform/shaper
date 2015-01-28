@@ -1106,7 +1106,7 @@ void XGUI_Workshop::createDockWidgets()
   connect(aCancelBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onAbortOperation()));
   connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)), myOperationMgr,
           SLOT(onKeyReleased(QKeyEvent*)));
-  connect(myOperationMgr, SIGNAL(operationValidated(bool)), myPropertyPanel,
+  connect(myOperationMgr, SIGNAL(applyEnableChanged(bool)), myPropertyPanel,
           SLOT(setAcceptEnabled(bool)));
 
 }

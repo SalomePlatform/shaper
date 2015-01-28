@@ -17,7 +17,7 @@
 
 #include <list>
 
-/*  Description: 
+/** Description: 
  *    Each constraint uses a set of parameters. In the SolveSpace library 
  *    these parameters are named "valA", "ptA", "ptB", "entityA", "entityB". 
  *    The "ptA" and "ptB" parameters represents a point in the constraint.
@@ -31,7 +31,7 @@
  */
 
 /** \class SketchPlugin_ConstraintBase
- *  \ingroup DataModel
+ *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint between other features.
  *         Some feature's methods implemented here as dummy to
  *         Base class for all constraints.

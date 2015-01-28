@@ -22,7 +22,7 @@ const std::string POINT_ATTR_FIRST = "firstPoint";
 const std::string POINT_ATTR_SECOND = "secondPoint";
 
 /**\class ConstructionPlugin_Axis
- * \ingroup DataModel
+ * \ingroup Plugins
  * \brief Feature for creation of the new axis in PartSet.
  */
 class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomPrs

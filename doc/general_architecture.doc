@@ -1,0 +1,86 @@
+/*!
+\page general_architecture General Architecture
+
+New GEOM is used either as a stand-alone application or as a Module integrated to the SALOME environment in order to, ultimately, replace the old GEOM.
+
+<h2>Stand-alone New GEOM</h2>
+
+When used outside SALOME, New GEOM must be hosted by an application window implementing the general ergonomics of New GEOM (the GUI), including the layout of the user interface, organization of menus, runtime help, etc.
+\n
+It is proposed that this application window can host several so-called Modules. Below, this main application window is named the Workshop.
+\n\n
+Each Module hosted by the Workshop deals with one type of document (ModelAPI_Document) only, saved in a format supported by the Module. One document type per Module. Also, in a Workshop window, only one document of a given type can be newed. So, when launching the Workshop, the user selects a type of document to be created. Then, from the application session, creating a new document will launch a new instance of the Workshop.
+\n\n
+The geometric model (i.e. the whole geometry produce by New GEOM) is created through operations, or features (ModelAPI_Feature), which define a meaningful piece of design (e.g. PartSetPlugin_Part, FeaturesPlugin_Extrusion, FeaturesPlugin_Placement, etc.). In order to easily create dedicated variants of the modeler, also to gradually develop New GEOM, each feature is implemented in a <i>Plug-in</i> (ModelAPI_Plugin, a piece of application including its own GUI, built separately from the application. It is loaded dynamically to the application). In other words, a Module is made of a collection of Plug-ins.
+\n\n
+The Workshop structures the features by related functionality presented in a tabbed interface. Each tab displays a set of available actions. These sets of features are called below <i>Workbenches</i>.
+\n\n
+Additionally, a Module can either reference or include other Modules:
+<ul>
+<li>
+A Module references another one when the document it produces references a document created by the other Module.
+In this case, each document is edited from the corresponding Module running in separate instances of the Workshop. The Workbenches of each Module are presented into distinct windows.
+</li>
+<li>
+A Module include another Module when additionally, the Module of referenced document runs into the same Workshop.
+In this context, both documents can be edited from a single instance of the Workshop. The Workbenches of both Modules are presented into the same window.
+</li>
+</ul>
+
+
+
+<h2>Application to New GEOM</h2>
+
+New GEOM is made of one Module, Set of Parts (a Set of Parts is a flat list of Parts, on the contrary of an Assembly in which the Parts are structured), including two other Modules, <i>Part</i> and <i>Properties</i>. The Set of Parts Module produces a <i>PartSet</i> document which references a list of Parts (one document per Part), the PartSet document being referenced by a Properties document (one document per PartSet).
+\n\n
+The Set of Parts, its Properties and the Parts it references are all edited from the same Workshop window. The Properties and Part documents cannot be open independently of PartSet (the corresponding Modules being available only as included in Set of Parts).
+\n
+When creating a new PartSet, a Property document is automatically created. The Workbench of the Set of Parts Module includes a feature for creating a new Part. Once the first Part is created, the Workbenches of Part Module are activated. One Part of the ParSet being always active, the features of Part Module apply to this Part.
+\n
+When the user saves its session, all documents are saved: the PartSet, its Properties and each Part.
+\n\n
+\image html general_architecture_1.png
+\n
+
+<b>Summary of the general architecture of New GEOM:</b>
+<ul>
+<li> New GEOM consists of several Modules running within a Workshop.</li>
+<li> Each Module produces one type of Document only.</li>
+<li> A Module is made of Plug-in implementing the Features supported by the Module.</li>
+<li> These Features are structured by Workbenches.</li>
+<li> A Module can provide access to the Workbenches of other Modules by including these Modules.</li>
+<li> The Modules communicate with the Workshop through Interfaces.</li>
+<li> The API of New GEOM consists of the Interface of the Workshop and of Modules.</li>
+<li> A configuration file describes the composition of the Workshop where the Modules and the Plug-in are referenced by their Global Unique Identifier (GUID).</li>
+</ul>
+
+
+
+<h2>New GEOM as SALOME module</h2>
+
+The NewGeom package allows to launch the application as one of the module of SALOME platform. In that case all user interface elements are integrated into SALOME platform: the \b NewGeom package is used for this connection.
+
+Initially the New GEOM application is defined as a Light SALOME module, later it may be changed in order to manage the communication with other SALOME modules correctly.
+\n
+To integrate New GEOM into SALOME the next steps are done:
+<ol>
+<li> LightApp_Module class from SALOME GUI LightApp package is redefined. This redefined class provides a connection between LightApp_Module interface and Workshop object of the application.</li>
+<li>Provide Workshop with a <i>module</i> mode of launching in SALOME environment. In this case it is launched without its own main window, 3d viewer and main menu.</li>
+<li>In <i>module</i> mode workshop uses:
+  <ol>
+  <li>SALOME desktop as a main window.</li>
+  <li>OCC viewer from SALOME platform instead of its own 3d viewer.</li>
+  <li>SALOME main menu and toolbars for creation of workbenches commands.</li>
+  <li>Object Browser of New GEOM application is used instead of SALOME Object Browser.</li>
+  <li>Creation of a New GEOM property panel as a docking window of SALOME desktop.</li>
+  <li>Use SALOME Python console instead of console in main window. Since 3 packages from SALOME GUI module become shared between this project and SALOME mod-ules and they are independed from other SALOME parts, it is proposed in the future to detach it from SALOME platform into separated prerequisite product to avoid code duplication.</li>
+  </ol>
+</li>
+<li>Each workbench will be defined as a menu in main menu bar of SALOME desktop and as a toolbar with corresponded title.</li>
+<li>Each feature in the workbench will be defined as a menu item in the corresponded menu and a button in the corresponded toolbar.</li>
+<li>Object Browser of SALOME is hidden on activation of NewGEOM and restored on its deactivation.</li>
+<li>Object Browser and Property panel of NewGEOM is shown on activation of the module and hidden on its deactivation.</li>
+<li>Persistent of NewGEOM is compatible with persistent of SALOME. On saving of SALOME study the content of NewGEOM data structure is saved into study also and restored on restoring of study.</li>
+</ol>
+
+*/

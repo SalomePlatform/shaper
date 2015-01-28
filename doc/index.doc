@@ -1,0 +1,16 @@
+/*! \mainpage
+
+To browse the New GEOM module Developer Documentation, follow the links below or use navigation menu at the top and left of the page:
+<ul>
+<li> <a href="modules.html">Modules</a> - documentation of functionality splitted into groups.</li>
+<li> <a href="hierarchy.html">Class hierarchy</a></li> - graphical representation of classes hierarchy.</li>
+<li> <a href="annotated.html">Data Structures</a> - list of all data structures and classes with brief descriptions.</li>
+<li> <a href="files.html">Files</a> - list of all files with brief descriptions.</li>
+</ul>
+
+Also you may see \subpage general_architecture document that describes 
+the main principles and terms of the development.
+
+The creation of new feature in C++ or python can be done with help of \subpage first_feature_help .
+
+*/

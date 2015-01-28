@@ -254,7 +254,7 @@ QWidget* ModuleBase_WidgetFactory::multiSelectorControl(QWidget* theParent)
   return aMultiselectorWgt->getControl();
 }
 
-QString ModuleBase_WidgetFactory::qs(const std::string& theStdString) const
+QString ModuleBase_WidgetFactory::qs(const std::string& theStdString)
 {
   return QString::fromStdString(theStdString);
 }

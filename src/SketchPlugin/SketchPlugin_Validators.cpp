@@ -25,7 +25,13 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
   // If the object is not a line then it is accepted
   const ModelAPI_ResultValidator* aLineValidator =
       dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultLine"));
-  if (!aLineValidator->isValid(theObject))
+  bool aLineValid = aLineValidator->isValid(theObject);
+
+  const ModelAPI_ResultValidator* anArcValidator =
+      dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultArc"));
+  bool anArcValid = anArcValidator->isValid(theObject);
+
+  if (!aLineValid && !anArcValid)
     return true;
 
   // If it is a line then we have to check that first attribute id not a line
@@ -38,14 +44,15 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
 bool SketchPlugin_DistanceAttrValidator::isValid(
   const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
 {
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
-    std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-  if (anAttr) {
-    const ObjectPtr& anObj = theAttribute->owner();
-    const FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
-    return isValid(aFeature, theArguments, anAttr->object());
-  }
-  return true; // it may be not reference attribute, in this case, it is OK
+  // any point attribute is acceptable for the distance operation
+  return true;
+}
+
+bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
+                                                 const std::list<std::string>& theArguments,
+                                                 const AttributePtr& theAttribute) const
+{
+  return isValid(theAttribute, theArguments);
 }
 
 bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,

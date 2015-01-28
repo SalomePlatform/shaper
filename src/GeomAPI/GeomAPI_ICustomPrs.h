@@ -7,6 +7,7 @@
 #ifndef GeomAPI_ICustomPrs_H
 #define GeomAPI_ICustomPrs_H
 
+#include "GeomAPI.h"
 #include "GeomAPI_AISObject.h"
 
 /**
@@ -16,6 +17,8 @@
 class GeomAPI_ICustomPrs
 {
 public:
+  GEOMAPI_EXPORT virtual ~GeomAPI_ICustomPrs();
+
   /// Modifies the given presentation in the custom way.
   virtual void customisePresentation(AISObjectPtr thePrs) = 0;
 };

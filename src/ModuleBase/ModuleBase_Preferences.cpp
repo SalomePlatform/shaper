@@ -146,12 +146,14 @@ void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int 
   }
 }
 
-//**********************************************************
-//**********************************************************
-//**********************************************************
+/**
+* Implementation of preferences manager interface
+*/
 class ModuleBase_PrefMgr: public ModuleBase_IPrefMgr
 {
 public:
+  /// Constructor
+  /// \param theMgr a preferences manager
   ModuleBase_PrefMgr(ModuleBase_PreferencesMgr* theMgr):myMgr(theMgr) {}
 
   virtual int addPreference(const QString& theLbl, int pId, 

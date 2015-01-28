@@ -25,7 +25,7 @@ typedef std::map< std::shared_ptr<SketchPlugin_Constraint>, std::vector<Slvs_hCo
   ConstraintMap;
 
 /** \class   SketchSolver_ConstraintGroup
- *  \ingroup DataModel
+ *  \ingroup Plugins
  *  \brief   Keeps the group of constraints which based on the same entities
  */
 class SketchSolver_ConstraintGroup

@@ -52,6 +52,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Curve.cpp
     GeomAPI_DataMapOfShapeShape.cpp
     GeomAPI_Vertex.cpp
+    GeomAPI_ICustomPrs.cpp
 )
 
 SET(PROJECT_LIBRARIES

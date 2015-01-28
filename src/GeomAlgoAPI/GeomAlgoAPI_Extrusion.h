@@ -13,6 +13,7 @@
 #include <GeomAlgoAPI_MakeShape.h>
 #include <GeomAPI_DataMapOfShapeShape.h>
 #include <memory>
+
 /**\class GeomAlgoAPI_Extrusion
  * \ingroup DataAlgo
  * \brief Allows to create the prism based on a given face and a direction

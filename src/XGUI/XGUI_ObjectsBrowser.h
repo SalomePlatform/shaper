@@ -15,10 +15,16 @@
 class XGUI_DocumentDataModel;
 class QLineEdit;
 
+/**
+* \ingroup GUI
+* Implementation of Data Tree object for Object Browser
+*/
 class XGUI_DataTree : public QTreeView
 {
 Q_OBJECT
  public:
+   /// Constructor
+   /// \param theParent a parent widget
   XGUI_DataTree(QWidget* theParent);
   virtual ~XGUI_DataTree();
 
@@ -28,24 +34,32 @@ Q_OBJECT
     return mySelectedData;
   }
 
+  /// Returns current data model
   XGUI_DocumentDataModel* dataModel() const;
 
 signals:
   //! Emited when selection is changed
   void selectionChanged();
+
+  //! Emited when active part changed
   void activePartChanged(ObjectPtr thePart);
 
   //! Emited on context menu request
   void contextMenuRequested(QContextMenuEvent* theEvent);
 
 public slots:
+  /// Clear content of data tree
   virtual void clear();
 
  protected slots:
+   /// Commit modified data (used for renaming of objects)
   virtual void commitData(QWidget* theEditor);
 
  protected:
+   /// Redefinition of virtual method
   virtual void mouseDoubleClickEvent(QMouseEvent* theEvent);
+
+   /// Redefinition of virtual method
   virtual void contextMenuEvent(QContextMenuEvent* theEvent);
 
  private slots:
@@ -65,6 +79,8 @@ class XGUI_EXPORT XGUI_ObjectsBrowser : public QWidget
 {
 Q_OBJECT
  public:
+   /// Constructor
+   /// \param theParent a parent widget
   XGUI_ObjectsBrowser(QWidget* theParent);
   virtual ~XGUI_ObjectsBrowser();
 
@@ -80,6 +96,8 @@ Q_OBJECT
     return myObjectsList;
   }
 
+  /// Set selected list of objects
+  /// \param theObjects list of objects to select
   void setObjectsSelected(const QObjectPtrList& theObjects);
 
   //! Returns currently selected indexes
@@ -97,11 +115,14 @@ Q_OBJECT
   //! Activates currently selected part. Signal activePartChanged will not be sent
   void activatePart(const ResultPartPtr& thePart);
 
+  /// Rebuild data tree
   void rebuildDataTree();
 
+  /// Process application event
+  /// \param theMessage an event message
   void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
-  // Resets the object browser into initial state
+  /// Resets the object browser into initial state
   void clearContent();
 
 signals:
@@ -115,16 +136,26 @@ signals:
   void contextMenuRequested(QContextMenuEvent* theEvent);
 
  protected:
+   /// Redefinition of virtual method
   virtual bool eventFilter(QObject* obj, QEvent* theEvent);
 
  private slots:
+   /// Activate part
+   /// \param thePart a part to activate
   void onActivePartChanged(ObjectPtr thePart);
+
+  /// Show context menu
+  /// \param theEvent a context menu event
   void onContextMenuRequested(QContextMenuEvent* theEvent);
+
+  /// Show context menu on upper label
+  /// \param thePnt a position of context menu
   void onLabelContextMenuRequested(const QPoint& thePnt);
 
   //! Called on Edit command request
   void onEditItem();
 
+  /// Process selection changed event
   void onSelectionChanged();
 
  private:

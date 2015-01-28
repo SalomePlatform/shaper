@@ -141,11 +141,20 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
 
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  ModuleBase_Operation* aOperation = aWorkshop->currentOperation();
+  if (aOperation && aOperation->isEditOperation()) {
+    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+    ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
+    // If the current widget is a selector, do do nothing, it processes the mouse press
+    if(aActiveWgt && aActiveWgt->isViewerSelector()) {
+      return;
+    }
+  }
+
   // Clear dragging mode
   myIsDragging = false;
 
-  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-  ModuleBase_Operation* aOperation = aWorkshop->currentOperation();
   // Use only for sketch operations
   if (aOperation && myCurrentSketch) {
     if (!PartSet_Tools::sketchPlane(myCurrentSketch))

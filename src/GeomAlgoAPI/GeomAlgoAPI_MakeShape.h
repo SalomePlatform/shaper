@@ -11,7 +11,7 @@
 #include <GeomAlgoAPI.h>
 
 /**\class GeomAlgoAPI_MakeShape
- * \ingroup DataModel
+ * \ingroup DataAlgo
  * \brief Interface to the root class of all topological shapes constructions
  */
 class GeomAlgoAPI_MakeShape : public GeomAPI_Interface

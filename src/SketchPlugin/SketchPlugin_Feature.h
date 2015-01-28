@@ -20,7 +20,7 @@ class GeomAPI_Pnt2d;
 class Handle_AIS_InteractiveObject;
 
 /**\class SketchPlugin_Feature
- * \ingroup DataModel
+ * \ingroup Plugins
  * \brief Feature for creation of the new feature in PartSet. This is an abstract class to give
  * an interface to create the sketch feature preview.
  */

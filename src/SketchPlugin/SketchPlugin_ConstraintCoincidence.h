@@ -13,7 +13,7 @@
 #include <list>
 
 /** \class SketchPlugin_ConstraintCoincidence
- *  \ingroup DataModel
+ *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint which defines equivalence of two points
  *
  *  This constraint has two attributes:

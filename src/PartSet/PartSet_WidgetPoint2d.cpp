@@ -12,7 +12,6 @@
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_Selection.h>
-#include <XGUI_PropertyPanel.h>
 #include <XGUI_OperationMgr.h>
 
 #include <ModuleBase_DoubleSpinBox.h>
@@ -194,9 +193,12 @@ void PartSet_WidgetPoint2D::activate()
   QIntList aModes;
   aModes << TopAbs_VERTEX;
   myWorkshop->moduleConnector()->activateSubShapesSelection(aModes);
-  // the control value is stored to the mode by the focus in on the widget
-  // we need the value is initialized in order to enable the apply button in the property panel
-  storeValue();
+  if (!isEditingMode()) {
+    // the control value is stored to the mode by the focus in on the widget
+    // we need the value is initialized in order to enable the apply button in the property panel
+    // it should happens only in the creation mode because during edition all fields are filled
+    storeValue();
+  }
 }
 
 void PartSet_WidgetPoint2D::deactivate()
@@ -282,7 +284,7 @@ void PartSet_WidgetPoint2D::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEv
   // the Ok button should be disabled in the property panel by moving the mouse point in the viewer
   // this leads that the user does not try to click Ok and it avoids an incorrect situation that the 
   // line is moved to the cursor to the Ok button
-  myWorkshop->propertyPanel()->setOkEnabled(false);
+  myWorkshop->operationMgr()->setApplyEnabled(false);
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
 

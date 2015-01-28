@@ -20,34 +20,40 @@
 class QWidget;
 class QLineEdit;
 
+/**
+* Implementation of model widget for line edit widget.
+* It can be defined with "stringvalue" keyword.
+*/
 class MODULEBASE_EXPORT ModuleBase_WidgetLineEdit : public ModuleBase_ModelWidget
 {
   Q_OBJECT
  public:
+  /// Constructor
+  /// \param theParent the parent object
+  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
   ModuleBase_WidgetLineEdit(QWidget* theParent,
                                 const Config_WidgetAPI* theData,
                                 const std::string& theParentId);
   virtual ~ModuleBase_WidgetLineEdit();
 
-  /// Saves the internal parameters to the given feature
-  /// \param theObject a model feature to be changed
   virtual bool storeValue() const;
 
   virtual bool restoreValue();
 
-  /// Returns the internal parent wiget control, that can be shown anywhere
-  /// \returns the widget
   QWidget* getControl() const;
 
-  /// Returns list of widget controls
-  /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
  public slots:
+   /// A slot for processing text changed event
   void onTextChanged();
 
  private:
+   /// A line edit control
   QLineEdit* myLineEdit;
+
+  /// A container widget
   QWidget* myMainWidget;
 };
 

@@ -75,6 +75,9 @@ Q_OBJECT
 
   virtual bool restoreValue();
 
+  /// Defines if it is supposed that the widget should interact with the viewer.
+  virtual bool isViewerSelector() { return true; }
+
   /// Returns the internal parent wiget control, that can be shown anywhere
   /// \returns the widget
   QWidget* getControl() const

@@ -124,7 +124,7 @@ protected slots:
   /// If true then local selector has to be activated in context
   bool myIsActive;
 
-  /// \typedef GeomSelection provides correspondance between Result object and its shape
+  /// Provides correspondance between Result object and its shape
   typedef QPair<ResultPtr, GeomShapePtr> GeomSelection;
 
   /// Variable of GeomSelection type

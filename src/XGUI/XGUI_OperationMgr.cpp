@@ -140,9 +140,36 @@ void XGUI_OperationMgr::onValidateOperation()
     return;
   ModuleBase_Operation* anOperation = currentOperation();
   if(anOperation && (!myIsValidationLock)) {
-    bool isValid = anOperation->isValid();
-    emit operationValidated(isValid);
+    setApplyEnabled(anOperation->isValid());
   }
+}
+
+void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)
+{
+  myIsApplyEnabled = theEnabled;
+  emit applyEnableChanged(theEnabled);
+}
+
+bool XGUI_OperationMgr::isApplyEnabled() const
+{
+  return myIsApplyEnabled;
+}
+
+bool XGUI_OperationMgr::canStopOperation()
+{
+  ModuleBase_Operation* anOperation = currentOperation();
+  if(operationsCount() > 1) //in case of nested (sketch) operation no confirmation needed
+    return true;
+  if (anOperation && anOperation->isModified()) {
+    QString aMessage = tr("%1 operation will be aborted.").arg(anOperation->id());
+    int anAnswer = QMessageBox::question(qApp->activeWindow(),
+                                         tr("Abort operation"),
+                                         aMessage,
+                                         QMessageBox::Ok | QMessageBox::Cancel,
+                                         QMessageBox::Cancel);
+    return anAnswer == QMessageBox::Ok;
+  }
+  return true;
 }
 
 bool XGUI_OperationMgr::commitOperation()
@@ -165,8 +192,11 @@ bool XGUI_OperationMgr::canStartOperation(QString theId)
   ModuleBase_Operation* aCurrentOp = currentOperation();
   if (aCurrentOp) {
     if (!aCurrentOp->isGranted(theId)) {
-      if (canAbortOperation()) {
-        aCurrentOp->abort();
+      if (canStopOperation()) {
+        if (myIsApplyEnabled)
+          aCurrentOp->commit();
+        else
+          aCurrentOp->abort();
       } else {
         aCanStart = false;
       }
@@ -185,26 +215,9 @@ void XGUI_OperationMgr::onCommitOperation()
 
 void XGUI_OperationMgr::onAbortOperation()
 {
-  if (hasOperation() && canAbortOperation()) {
+  if (hasOperation() && canStopOperation()) {
     currentOperation()->abort();
   }
-}
-
-bool XGUI_OperationMgr::canAbortOperation()
-{
-  ModuleBase_Operation* anOperation = currentOperation();
-  if(operationsCount() > 1) //in case of nested (sketch) operation no confirmation needed
-    return true;
-  if (anOperation && anOperation->isModified()) {
-    QString aMessage = tr("%1 operation will be aborted.").arg(anOperation->id());
-    int anAnswer = QMessageBox::question(qApp->activeWindow(),
-                                         tr("Abort operation"),
-                                         aMessage,
-                                         QMessageBox::Ok | QMessageBox::Cancel,
-                                         QMessageBox::Cancel);
-    return anAnswer == QMessageBox::Ok;
-  }
-  return true;
 }
 
 void XGUI_OperationMgr::onOperationStarted()

@@ -21,7 +21,7 @@ const std::string FACE_ATTR = "planeFace";
 const std::string DISTANCE_ATTR = "distance";
 
 /**\class ConstructionPlugin_Plane
- * \ingroup DataModel
+ * \ingroup Plugins
  * \brief Feature for creation of the new planar surface in PartSet.
  */
 class ConstructionPlugin_Plane : public ModelAPI_Feature, public GeomAPI_ICustomPrs
