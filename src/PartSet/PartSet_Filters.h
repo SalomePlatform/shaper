@@ -11,15 +11,21 @@
 
 
 /**
+* \class PartSet_GlobalFilter
+* \ingroup Module
 * A class which filters groups object in addition to documents (see issue #310)
 */
 DEFINE_STANDARD_HANDLE(PartSet_GlobalFilter, ModuleBase_ShapeDocumentFilter);
 class PartSet_GlobalFilter: public ModuleBase_ShapeDocumentFilter
 {
 public:
+  /// Constructor
+  /// \param theWorkshop a pointer to workshop
   PartSet_GlobalFilter(ModuleBase_IWorkshop* theWorkshop)
     : ModuleBase_ShapeDocumentFilter(theWorkshop) {}
 
+  /// Returns True if selected presentation can be selected
+  /// \param theOwner an owner of the persentation
   Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
   DEFINE_STANDARD_RTTI(PartSet_GlobalFilter)

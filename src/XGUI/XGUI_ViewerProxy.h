@@ -19,6 +19,8 @@ class XGUI_EXPORT XGUI_ViewerProxy : public ModuleBase_IViewer
 {
 Q_OBJECT
  public:
+   /// Constructor
+   /// \param theParent a parent object
   XGUI_ViewerProxy(XGUI_Workshop* theParent);
 
   //! Returns AIS_InteractiveContext from current OCCViewer

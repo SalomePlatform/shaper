@@ -29,7 +29,7 @@ class ModuleBase_ViewerPrs
   }
 
   /// Constructor
-  /// \param theFeature a model feature
+  /// \param theResult an object
   /// \param theShape a viewer shape
   /// \param theOwner a selection owner
   ModuleBase_ViewerPrs(ObjectPtr theResult, const TopoDS_Shape& theShape,
@@ -45,8 +45,8 @@ class ModuleBase_ViewerPrs
   {
   }
 
-  /// Sets the feature.
-  /// \param theFeature a feature instance
+  /// Sets the object.
+  /// \param theResult an object instance
   void setFeature(ObjectPtr theResult)
   {
     myResult = theResult;
@@ -59,8 +59,8 @@ class ModuleBase_ViewerPrs
     return myResult;
   }
 
-  /// Returns the presentation owner
-  /// \param the owner
+  /// Set the presentation owner
+  /// \param theOwner an owner to set
   void setOwner(Handle_SelectMgr_EntityOwner theOwner)
   {
     myOwner = theOwner;
@@ -87,16 +87,21 @@ class ModuleBase_ViewerPrs
     return myShape;
   }
 
+  /// Set interactive object
+  /// \param theIO an interactive object
   void setInteractive(const Handle(AIS_InteractiveObject)& theIO)
   {
     myInteractive = theIO;
   }
 
+  /// Returns interactive object if it is installed
   Handle(AIS_InteractiveObject) interactive() const
   {
     return myInteractive;
   }
 
+  /// Returns True if the current object is equal to the given one
+  /// \param thePrs an object to compare
   bool operator==(const ModuleBase_ViewerPrs& thePrs)
   {
     bool aResult = (myResult.get() == thePrs.object().get());
@@ -110,7 +115,7 @@ class ModuleBase_ViewerPrs
   ObjectPtr myResult;  /// the feature
   Handle(SelectMgr_EntityOwner) myOwner;  /// the selection owner
   TopoDS_Shape myShape;  /// the shape
-  Handle(AIS_InteractiveObject) myInteractive;
+  Handle(AIS_InteractiveObject) myInteractive;  /// interactive object
 };
 
 #endif

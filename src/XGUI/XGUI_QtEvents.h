@@ -24,6 +24,7 @@
 class XGUI_EXPORT PostponeMessageQtEvent : public QEvent
 {
  public:
+   /// An event type
   static QEvent::Type PostponeMessageQtEventType;
 
   /// Constructor

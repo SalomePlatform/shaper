@@ -26,6 +26,10 @@
 class ModuleBase_Operation;
 class ModuleBase_IViewWindow;
 
+/**
+* \ingroup Module
+* Implementation of Partset module
+*/
 class PARTSET_EXPORT PartSet_Module : public ModuleBase_IModule
 {
 Q_OBJECT
@@ -39,6 +43,8 @@ enum RestartingMode {
 };
 
 public:
+  /// Constructor
+  /// \param theWshop a pointer to a workshop
   PartSet_Module(ModuleBase_IWorkshop* theWshop);
   virtual ~PartSet_Module();
 
@@ -80,28 +86,8 @@ protected slots:
   /// Called when previous operation is finished
   virtual void onSelectionChanged();
 
-  /// SLOT, that is called by mouse press in the viewer.
-  /// \param theWnd - the window where the event happens
-  /// \param theEvent the mouse event
-  //void onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
-
-  /// SLOT, that is called by mouse release in the viewer.
-  /// \param theWnd - the window where the event happens
-  /// \param theEvent the mouse event
-  //void onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
-  
-  /// SLOT, that is called by mouse move in the viewer.
-  /// \param theWnd - the window where the event happens
-  /// \param theEvent the mouse event
-  //void onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
-
-  /// SLOT, that is called by mouse double click in the viewer.
-  /// \param theWnd - the window where the event happens
-  /// \param theEvent the mouse event
-  //void onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
-
   /// SLOT, that is called by key release in the viewer.
-  /// The mouse moved point is sent to the current operation to be processed.
+  /// \param theWnd a view window
   /// \param theEvent the key event
   void onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent);
 
@@ -122,11 +108,10 @@ protected slots:
   virtual void registerFilters();
 
  private slots:
+   /// Processing of vertex selected
    void onVertexSelected();
 
-
  private:
-
   /// Breaks sequense of automatically resterted operations
   void breakOperationSequence();
 

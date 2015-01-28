@@ -63,6 +63,7 @@ Q_OBJECT
   /// else, or if there is no parent - returns NULL
   ModuleBase_Operation* previousOperation(ModuleBase_Operation* theOperation) const;
 
+  /// Redefinition of virtual function
   virtual bool eventFilter(QObject *theObject, QEvent *theEvent);
 
   /// Start the operation and append it to the stack of operations
@@ -70,6 +71,7 @@ Q_OBJECT
   /// \return the state whether the current operation is started
   bool startOperation(ModuleBase_Operation* theOperation);
 
+  /// Abort all operations
   bool abortAllOperations();
 
   /// Returns whether the operation can be started. Check if there is already started operation and
@@ -133,15 +135,13 @@ signals:
 
   /// Commits the current operatin if it is valid
   bool commitOperation();
+
   /// Sets the current operation or NULL
   /// \param theOperation the started operation
-  /// \param isCheckBeforeStart the flag whether to check whether the operation can be started
-  /// \return the state whether the operation is resumed
   void resumeOperation(ModuleBase_Operation* theOperation);
 
  public slots:
   /// SLOT, that is called by the key in the property panel is clicked.
-  /// \param theName the attribute name
   /// \param theEvent the mouse event
   bool onKeyReleased(QKeyEvent* theEvent);
 
@@ -149,9 +149,17 @@ signals:
   /// Slot that is called by an operation stop. Removes the stopped operation form the stack.
   /// If there is a suspended operation, restart it.
   void onOperationStopped();
+
+  /// Slot called on operation start
   void onOperationStarted();
+
+  /// Slot called on operation abort
   void onOperationAborted();
+
+  /// Slot called on operation commit
   void onOperationCommitted();
+
+  /// Slot called on operation resume
   void onOperationResumed();
 
  private:

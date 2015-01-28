@@ -26,9 +26,12 @@ class XGUI_EXPORT XGUI_SelectionMgr : public QObject
 {
 Q_OBJECT
  public:
+   /// Constructor
+   /// \param theParent a parent workshop
   XGUI_SelectionMgr(XGUI_Workshop* theParent);
   virtual ~XGUI_SelectionMgr();
 
+  /// Returns current selection
   XGUI_Selection* selection() const
   {
     return mySelection;
@@ -52,11 +55,17 @@ signals:
   void selectionChanged();
 
  private slots:
+   /// Reaction on selectio0n in Object browser
   void onObjectBrowserSelection();
+
+   /// Reaction on selectio0n in Viewer
   void onViewerSelection();
 
  private:
+   /// Reference to workshop
   XGUI_Workshop* myWorkshop;
+
+  /// Current selection object
   XGUI_Selection* mySelection;
 };
 

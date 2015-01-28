@@ -85,6 +85,7 @@ class XGUI_EXPORT XGUI_SalomeConnector
   //! Returns interface to Salome viewer
   virtual ModuleBase_IViewer* viewer() const = 0;
 
+  //! Create preferences
   virtual void createPreferences() = 0;
 };
 

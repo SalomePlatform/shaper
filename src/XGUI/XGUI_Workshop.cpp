@@ -1245,17 +1245,17 @@ void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
 }
 
 //**************************************************************
-void XGUI_Workshop::activateLastPart()
-{
-  SessionPtr aMgr = ModelAPI_Session::get();
-  DocumentPtr aDoc = aMgr->moduleDocument();
-  std::string aGrpName = ModelAPI_ResultPart::group();
-  ObjectPtr aLastPart = aDoc->object(aGrpName, aDoc->size(aGrpName) - 1);
-  ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aLastPart);
-  if (aPart) {
-    activatePart(aPart);
-  }
-}
+//void XGUI_Workshop::activateLastPart()
+//{
+//  SessionPtr aMgr = ModelAPI_Session::get();
+//  DocumentPtr aDoc = aMgr->moduleDocument();
+//  std::string aGrpName = ModelAPI_ResultPart::group();
+//  ObjectPtr aLastPart = aDoc->object(aGrpName, aDoc->size(aGrpName) - 1);
+//  ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aLastPart);
+//  if (aPart) {
+//    activatePart(aPart);
+//  }
+//}
 
 //**************************************************************
 void XGUI_Workshop::deleteObjects(const QObjectPtrList& theList)

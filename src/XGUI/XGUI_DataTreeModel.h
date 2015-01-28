@@ -19,6 +19,8 @@
 class XGUI_EXPORT XGUI_FeaturesModel : public QAbstractItemModel
 {
  public:
+   /// Constructor
+   /// \param theParent a parent object
   XGUI_FeaturesModel(QObject* theParent)
       : QAbstractItemModel(theParent),
         myItemsColor(Qt::black)
@@ -27,6 +29,7 @@ class XGUI_EXPORT XGUI_FeaturesModel : public QAbstractItemModel
 
   //! Returns Feature object by the given Model index.
   //! Returns 0 if the given index is not index of a feature
+  /// \param theIndex a model index
   virtual ObjectPtr object(const QModelIndex& theIndex) const = 0;
 
   //! Returns QModelIndex which corresponds to the given feature
@@ -37,19 +40,23 @@ class XGUI_EXPORT XGUI_FeaturesModel : public QAbstractItemModel
   virtual QModelIndex findParent(const ObjectPtr& theObject) const = 0;
 
   //! Returns index corresponded to the group
+  //! \param theGroup a group name
   virtual QModelIndex findGroup(const std::string& theGroup) const = 0;
 
+  //! Set color of items
   void setItemsColor(const QColor& theColor)
   {
     myItemsColor = theColor;
   }
 
+  //! Returns color of items
   QColor itemsColor() const
   {
     return myItemsColor;
   }
 
  protected:
+   /// Color of items
   QColor myItemsColor;
 };
 
@@ -60,17 +67,22 @@ class XGUI_EXPORT XGUI_FeaturesModel : public QAbstractItemModel
 class XGUI_PartModel : public XGUI_FeaturesModel
 {
  public:
+   /// Constructor
+   /// \param theParent a parent object
   XGUI_PartModel(QObject* theParent)
       : XGUI_FeaturesModel(theParent)
   {
   }
 
+  /// Set part id
+  /// \param theId a new id
   void setPartId(int theId)
   {
     myId = theId;
   }
 
   //! Returns true if the given document is a sub-document of this tree
+  //! \param theDoc a document to check
   virtual bool hasDocument(const DocumentPtr& theDoc) const = 0;
 
   //! Return a Part object

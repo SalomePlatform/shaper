@@ -32,7 +32,11 @@ public:
 
   virtual Handle(V3d_View) v3dView() const;
 
+  /// Set the current viewer
+  /// \param theViewer a viewer instance
   void setViewer(OCCViewer_Viewer* theViewer) { myViewer = theViewer; }
+
+  /// Returns current viewer
   OCCViewer_Viewer* viewer() const { return myViewer; }
 
 private:
@@ -85,6 +89,8 @@ Q_OBJECT
   /// \param theZ the Z projection value
   virtual void setViewProjection(double theX, double theY, double theZ);
 
+  /// Set selector
+  /// \param theSel a selector instance
   void setSelector(NewGeom_OCCSelector* theSel);
 
   /// Add selection filter to the viewer
@@ -96,6 +102,7 @@ Q_OBJECT
   /// Remove all selection filters from the viewer
   virtual void clearSelectionFilters();
 
+  /// Returns current selector
   NewGeom_OCCSelector* selector() const
   {
     return mySelector;
