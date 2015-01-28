@@ -41,13 +41,6 @@ public:
   /// \return State of editing mode flag
   bool isEditingMode() const { return myIsEditing; }
 
-  /// Set Enable/Disable state of Ok button
-  /// \param theEnabled Enable/Disable state of Ok button
-  virtual void setOkEnabled(bool theEnabled) = 0;
-
-  /// \return Enable/disable state of Ok button
-  virtual bool isOkEnabled() const = 0;
-
   /// Set Enable/Disable state of Cancel button
   /// \param theEnabled Enable/Disable state of Cancel button
   virtual void setCancelEnabled(bool theEnabled) = 0;

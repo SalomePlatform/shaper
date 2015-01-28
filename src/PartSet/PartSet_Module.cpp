@@ -212,7 +212,7 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
           aPnt2dWgt->setPoint(aPoint->x(), aPoint->y());
           PartSet_Tools::setConstraints(mySketchMgr->activeSketch(), theOperation->feature(), 
             aWgt->attributeID(), aPoint->x(), aPoint->y());
-          theOperation->propertyPanel()->activateNextWidget(aPnt2dWgt);
+          aPanel->activateNextWidget(aPnt2dWgt);
         }
       }
     }

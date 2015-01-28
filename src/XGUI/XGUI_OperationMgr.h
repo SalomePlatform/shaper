@@ -77,11 +77,6 @@ Q_OBJECT
   /// \param theId id of the operation which is going to start
   bool canStartOperation(QString theId);
 
-  bool canStopOperation();
-
-  /// Returns true if the operation can be aborted
-  bool canAbortOperation();
-
   /// Blocking/unblocking enabling of Ok button in property panel.
   /// It is used when operation can not be validated even all attributes are valid
   void setLockValidating(bool toLock) { myIsValidationLock = toLock; }
@@ -89,7 +84,15 @@ Q_OBJECT
   /// Returns state of validation locking
   bool isValidationLocked() const { return myIsValidationLock; }
 
- public slots:
+  /// Sets apply state to the value and emit signal about this state is changed
+  /// \param theEnabled the state value
+  void setApplyEnabled(const bool theEnabled);
+
+  /// Returns enable apply state 
+  /// \return theEnabled a boolean value
+  bool isApplyEnabled() const;
+
+  public slots:
   /// Slot that commits the current operation.
   void onCommitOperation();
   /// Slot that aborts the current operation.
@@ -114,8 +117,8 @@ signals:
   /// Emitted when current operation is aborted
   void operationAborted(ModuleBase_Operation* theOperation);
 
-  /// Signal is emitted after the validate methods calls.
-  void operationValidated(bool);
+  /// Signal is emitted after the apply enable state changed.
+  void applyEnableChanged(bool);
 
   /// Signal is emitted after the current operation is filled with existing preselection.
   void operationActivatedByPreselection();
@@ -125,6 +128,8 @@ signals:
 
 
  protected:
+  /// Returns true if the operation can be aborted
+  bool canStopOperation();
 
   /// Commits the current operatin if it is valid
   bool commitOperation();
@@ -156,6 +161,8 @@ signals:
 
   /// Lock/Unlock access to Ok button in property panel
   bool myIsValidationLock;
+  /// Lock/Unlock access to Ok button in property panel
+  bool myIsApplyEnabled;
 };
 
 #endif

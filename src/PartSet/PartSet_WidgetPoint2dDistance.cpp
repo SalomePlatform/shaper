@@ -94,7 +94,7 @@ void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWn
 void PartSet_WidgetPoint2dDistance::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   myWorkshop->operationMgr()->setLockValidating(true);
-  myWorkshop->propertyPanel()->setOkEnabled(false);
+  myWorkshop->operationMgr()->setApplyEnabled(false);
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
 

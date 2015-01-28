@@ -226,18 +226,6 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
     emit noMoreWidgets();
 }
 
-void XGUI_PropertyPanel::setOkEnabled(bool theEnabled)
-{
-  QPushButton* anOkBtn = findChild<QPushButton*>(PROP_PANEL_OK);
-  anOkBtn->setEnabled(theEnabled);
-}
-
-bool XGUI_PropertyPanel::isOkEnabled() const
-{
-  QPushButton* anOkBtn = findChild<QPushButton*>(PROP_PANEL_OK);
-  return anOkBtn->isEnabled();
-}
-
 void XGUI_PropertyPanel::setCancelEnabled(bool theEnabled)
 {
   QPushButton* anCancelBtn = findChild<QPushButton*>(PROP_PANEL_CANCEL);

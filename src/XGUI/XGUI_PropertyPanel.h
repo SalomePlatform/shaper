@@ -70,13 +70,6 @@ Q_OBJECT
   /// \brief Enable/Disable stretch area in the panel
   void setStretchEnabled(bool isEnabled);
 
-  /// Set Enable/Disable state of Ok button
-  /// \param theEnabled Enable/Disable state of Ok button
-  virtual void setOkEnabled(bool theEnabled);
-
-  /// \return Enable/disable state of Ok button
-  virtual bool isOkEnabled() const;
-
   /// Set Enable/Disable state of Cancel button
   /// \param theEnabled Enable/Disable state of Cancel button
   virtual void setCancelEnabled(bool theEnabled);
