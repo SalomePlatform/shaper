@@ -24,22 +24,16 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         return ExportFeature.ID()
 
     # This feature is action: has no property pannel and executes immideately
-    # def isAction(self):
-    #    return True
+    def isAction(self):
+        return True
 
-    def isInHistory(self):
-        return False
+    # The action is not placed into the histiry anyway
+    #def isInHistory(self):
+    #    return False
 
     def initAttributes(self):
-        # This feature has no attributes, but should perform some actions on initialization
-        aSession = ModelAPI.ModelAPI_Session.get()
-        self.Part = aSession.activeDocument()
-        self.geomObjects = []
-        self.geompy = geomBuilder.New(salome.myStudy)
-       
-        # Export bodies and groups
-        self.exportBodies()
-        self.exportGroups()
+      # This feature has no attributes, it is action
+      pass
         
     def exportBodies(self):
         # Get all bodies
@@ -102,5 +96,12 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
                 self.geompy.addToStudyInFather(obj[1], aGroup, theGroupName)
           
     def execute(self):
-        # Nothing to execute: all logic would be in the initAttributes
+        aSession = ModelAPI.ModelAPI_Session.get()
+        self.Part = aSession.activeDocument()
+        self.geomObjects = []
+        self.geompy = geomBuilder.New(salome.myStudy)
+       
+        # Export bodies and groups
+        self.exportBodies()
+        #self.exportGroups()
         pass
