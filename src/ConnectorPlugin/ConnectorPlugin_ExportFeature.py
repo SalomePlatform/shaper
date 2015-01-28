@@ -103,5 +103,5 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
        
         # Export bodies and groups
         self.exportBodies()
-        #self.exportGroups()
+        self.exportGroups()
         pass
