@@ -18,31 +18,41 @@
  */
 class Config_AttributeMessage : public Events_Message
 {
-  std::string myAttributeId;  //Feature unique id
-  std::string myFeatureId;  //Feature unique id
-  bool myIsObligatory;
-  bool myIsConcealment;
+  std::string myAttributeId; ///< Attribute's unique id
+  std::string myFeatureId; ///< Attribute's feature's unique id
+  bool myIsObligatory; ///< Required to be set by user, else it's feature is invalid.
+  bool myIsConcealment; ///< If true, conceals features used as input
 
  public:
-  // Same event as Config_FeatureMessage::MODEL_EVENT()
+  /// Same event as Config_FeatureMessage::MODEL_EVENT()
   inline static const char* MODEL_EVENT()
   {
     return Config_FeatureMessage::MODEL_EVENT();
   }
 
-  //const Events_ID theID, const void* theSender = 0
+  /// Constructor
   CONFIG_EXPORT Config_AttributeMessage(const Events_ID theId, const void* theParent = 0);
+  /// Destructor
   CONFIG_EXPORT virtual ~Config_AttributeMessage();
 
   //Auto-generated getters/setters
+  /// Returns attribute's unique id
   CONFIG_EXPORT const std::string& attributeId() const;
+  /// Returns attribute's feature's unique id
   CONFIG_EXPORT const std::string& featureId() const;
+  /// Returns true if attribute is obligatory:
+  /// Required to be set by user, else it's feature is invalid.
   CONFIG_EXPORT bool isObligatory() const;
+  /// Returns true if attribute should conceal input features
   CONFIG_EXPORT bool isConcealment() const;
 
+  /// Set attribute's unique id
   CONFIG_EXPORT void setAttributeId(const std::string& theId);
+  /// Set attribute's feature's unique id
   CONFIG_EXPORT void setFeatureId(const std::string& id);
+  /// Returns attribute's concealment state
   CONFIG_EXPORT void setConcealment(bool isConcealment);
+  /// Returns attribute's obligatory state
   CONFIG_EXPORT void setObligatory(bool isObligatory);
 };
 

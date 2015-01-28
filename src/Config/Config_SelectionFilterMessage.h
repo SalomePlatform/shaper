@@ -34,14 +34,22 @@ class Config_SelectionFilterMessage : public Events_Message
   CONFIG_EXPORT Config_SelectionFilterMessage(const Events_ID theId, const void* theParent = 0);
   CONFIG_EXPORT virtual ~Config_SelectionFilterMessage();
 
+  //! Get id of the filter
   CONFIG_EXPORT const std::string& selectionFilterId() const;
+  //! Get id of a feature to which the filter belongs to
   CONFIG_EXPORT const std::string& featureId() const;
+  //! Get id of an attribute to which the filter belongs to
   CONFIG_EXPORT const std::string& attributeId() const;
+  //! Get filter parameters
   CONFIG_EXPORT const std::list<std::string>& parameters() const;
 
+  //! Set id of the filter
   CONFIG_EXPORT void setSelectionFilterId(const std::string& theId);
+  //! Set id of a feature to which the filter belongs to
   CONFIG_EXPORT void setFeatureId(const std::string& theId);
+  //! Set id of an attribute to which the filter belongs to
   CONFIG_EXPORT void setAttributeId(const std::string& theId);
+  //! Get filter parameters
   CONFIG_EXPORT void setFilterParameters(const std::list<std::string>& parameters);
 };
 

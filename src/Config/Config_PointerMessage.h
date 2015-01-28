@@ -20,14 +20,17 @@
 class CONFIG_EXPORT Config_PointerMessage : public Events_Message
 {
  public:
+  /// Constructor
   Config_PointerMessage(const Events_ID theId, const void* theParent = 0);
   virtual ~Config_PointerMessage();
 
+  /// Returns pointer to an object
   void* pointer() const;
+  /// Sets pointer to an object
   void setPointer(void* pointer);
 
  private:
-  void* myPointer;
+  void* myPointer; ///< Pointer to an object
 };
 
 #endif /* PARTSET_MESSAGE_H_ */

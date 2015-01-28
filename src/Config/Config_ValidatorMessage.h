@@ -34,17 +34,24 @@ class Config_ValidatorMessage : public Events_Message
   CONFIG_EXPORT Config_ValidatorMessage(const Events_ID theId, const void* theParent = 0);
   CONFIG_EXPORT virtual ~Config_ValidatorMessage();
 
-  //CONFIG_EXPORT static const char* UID() const;
-
+  //! Get id of the filter
   CONFIG_EXPORT const std::string& validatorId() const;
+  //! Get id of a feature to which the filter belongs to
   CONFIG_EXPORT const std::string& featureId() const;
+  //! Get id of an attribute to which the filter belongs to
   CONFIG_EXPORT const std::string& attributeId() const;
+  //! Get filter parameters
   CONFIG_EXPORT const std::list<std::string>& parameters() const;
+  //! Returns true if validator id is not empty
   CONFIG_EXPORT bool isValid() const;
 
+  //! Set id of the filter
   CONFIG_EXPORT void setValidatorId(const std::string& theId);
+  //! Set id of a feature to which the filter belongs to
   CONFIG_EXPORT void setFeatureId(const std::string& theId);
+  //! Set id of an attribute to which the filter belongs to
   CONFIG_EXPORT void setAttributeId(const std::string& theId);
+  //! Get filter parameters
   CONFIG_EXPORT void setValidatorParameters(const std::list<std::string>& parameters);
 };
 

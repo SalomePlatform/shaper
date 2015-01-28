@@ -31,38 +31,47 @@ class Config_ModuleReader : public Config_XMLReader
   };
 
  public:
+  /// Constructor
   CONFIG_EXPORT Config_ModuleReader(const char* theEventGenerated = 0);
+  /// Destructor
   CONFIG_EXPORT virtual ~Config_ModuleReader();
-
+  /// Returns map that describes which file contains a feature (the feature is key, the file is value)
   CONFIG_EXPORT const std::map<std::string, std::string>& featuresInFiles() const;
-
+  /// Returns module name: an xml attribute from the root of the plugins.xml:
+  /// e.g <plugins module="PartSet">
   CONFIG_EXPORT std::string getModuleName();
-
+  /// Detects type of the given plugin and loads it using loadLibrary or loadScript.
   CONFIG_EXPORT static void loadPlugin(const std::string& thePluginName);
   /// loads the library with specific name, appends "lib*.dll" or "*.so" depending on the platform
   CONFIG_EXPORT static void loadLibrary(const std::string& theLibName);
   /// loads the python module with specified name
   CONFIG_EXPORT static void loadScript(const std::string& theFileName);
-  // extends set of modules, which will be used for dependency 
-  // checking (if there is no required module in the set, a plugin will not be loaded)
+  /*!
+   * Extends set of modules,  used for dependency checking (if there is no
+   * required module in the set, a plugin will not be loaded)
+   */
   CONFIG_EXPORT static void addDependencyModule(const std::string& theModuleName);
 
  protected:
-  void processNode(xmlNodePtr aNode);
-  bool processChildren(xmlNodePtr aNode);
-
+  /// Recursively process the given xmlNode
+  virtual void processNode(xmlNodePtr aNode);
+  /// Defines if the reader should process children of the given node
+  virtual bool processChildren(xmlNodePtr aNode);
+  /// check if dependencies of the given node are in the list of loaded modules
   bool hasRequiredModules(xmlNodePtr aNode) const;
+  /// reads info about plugin's features from plugin xml description
   std::list<std::string> importPlugin(const std::string& thePluginLibrary,
                                       const std::string& thePluginFile);
+  /// stores information about plugin in the internal cache
   std::string addPlugin(const std::string& aPluginLibrary,
                         const std::string& aPluginScript,
                         const std::string& aPluginConf);
 
  private:
-  std::map<std::string, std::string> myFeaturesInFiles;
-  static std::map<std::string, PluginType> myPluginTypes;
-  static std::set<std::string> myDependencyModules;
-  const char* myEventGenerated;
+  std::map<std::string, std::string> myFeaturesInFiles; ///< a feature name is key, a file is value
+  static std::map<std::string, PluginType> myPluginTypes; ///< a plugin name is key, a plugin type is value
+  static std::set<std::string> myDependencyModules; ///< set of loaded modules
+  const char* myEventGenerated; ///< gives ability to send Feature_Messages to various listeners
 };
 
 #endif /* CONFIG_XMLMODULEREADER_H_ */

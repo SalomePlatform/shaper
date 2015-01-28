@@ -29,6 +29,7 @@ struct _xmlDoc;
 
 /*!
  * \class Config_XMLReader
+ * \ingroup Config
  * \brief Base class for all libxml readers. Provides high-level API
  * for all xml operations.
 */
@@ -37,29 +38,57 @@ class Config_XMLReader
  public:
   CONFIG_EXPORT Config_XMLReader(const std::string& theXmlFile);
   CONFIG_EXPORT virtual ~Config_XMLReader();
-
+  /*!
+   * Read all nodes in associated xml file,
+   * recursively if processChildren(xmlNode) is true for the xmlNode.
+   * For each read node the processNode will be called.
+   */
   CONFIG_EXPORT void readAll();
-
- public:
+  /*!
+   * Returns xmlNodePtr to the root of reader's document
+   * or NULL if not found
+   */
   CONFIG_EXPORT xmlNodePtr findRoot();
 
  protected:
+  /*!
+   * \brief Allows to customize reader's behavior for a node. Virtual.
+   * The default implementation process "source", "validator" and
+   * "selection_filter" nodes.
+   */
   virtual void processNode(xmlNodePtr aNode);
+  /*!
+   * \brief Defines which nodes should be processed recursively. Virtual.
+   * The default impl is to read all nodes.
+   */
   virtual bool processChildren(xmlNodePtr aNode);
-
+  /*!
+   * Calls processNode() for each child (for some - recursively)
+   * of the given node.
+   * \sa ReadAll()
+   */
   void readRecursively(xmlNodePtr theParent);
-
+  /*!
+   * \brief void* -> xmlNodePtr
+   */
   xmlNodePtr node(void* theNode);
+  /// Gets xml node name
   std::string getNodeName(xmlNodePtr theNode);
+  /*!
+   * \brief Retrieves all the necessary info from the validator node.
+   * Sends ValidatorLoaded event
+   */
   void processValidator(xmlNodePtr theNode);
+  /*!
+   * \brief Retrieves all the necessary info from the SelectionFilter node.
+   * Sends SelectionFilterLoaded event
+   */
   void processSelectionFilter(xmlNodePtr theNode);
 
  protected:
-  std::string myCurrentFeature;
-
- protected:
-  std::string myDocumentPath;
-  xmlDocPtr myXmlDoc;
+  std::string myCurrentFeature; ///< Name of currently processed feature
+  std::string myDocumentPath; ///< Path to the xml document
+  xmlDocPtr myXmlDoc; ///< Root of the xml document
 };
 
 #endif /* CONFIG_XMLREADER_H_ */
