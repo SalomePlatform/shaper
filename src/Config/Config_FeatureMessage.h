@@ -10,6 +10,7 @@
 
 /*!
  * \class Config_FeatureMessage
+ * \ingroup Config
  * \brief Class to pass a feature entry extracted from xml file.
  * Example of the feature entry:
  * \code

@@ -29,6 +29,7 @@ struct _xmlDoc;
 
 /*!
  * \class Config_WidgetAPI
+ * \ingroup Config
  * \brief Provides low-level API for WidgetFactory for reading xml definitions of widgets
  */
 class CONFIG_EXPORT Config_WidgetAPI

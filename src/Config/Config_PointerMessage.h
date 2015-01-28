@@ -15,6 +15,7 @@
 
 /*!
  * \class Config_PointerMessage
+ * \ingroup Config
  * \brief A general class to pass pointers over the event loop.
  */
 class CONFIG_EXPORT Config_PointerMessage : public Events_Message

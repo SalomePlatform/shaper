@@ -22,6 +22,7 @@ class Config_FeatureMessage;
 
 /*!
  * \class Config_FeatureReader
+ * \ingroup Config
  * \brief Class to process feature's xml definition.
  */
 class Config_FeatureReader : public Config_XMLReader

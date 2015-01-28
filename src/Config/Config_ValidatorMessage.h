@@ -21,6 +21,7 @@ static const char * EVENT_VALIDATOR_LOADED = "ValidatorLoaded";
 
 /*!
  * \class Config_ValidatorMessage
+ * \ingroup Config
  * \brief Transmits info about created validator on "ValidatorLoaded" event
  */
 class Config_ValidatorMessage : public Events_Message

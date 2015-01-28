@@ -14,7 +14,11 @@
 #include <string>
 #include <vector>
 
-//! Class which let to register properties
+/*
+ * \class Config_PropManager
+ * \ingroup Config
+ * \brief Class which let to register properties
+ */
 class Config_PropManager
 {
  public:

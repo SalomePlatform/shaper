@@ -12,7 +12,11 @@
 #include <string>
 #include <list>
 
-/// Class which describes a one property
+/*!
+ * \class Config_Prop
+ * \brief Class which describes a one property
+ * \ingroup Config
+ */
 class Config_Prop
 {
  public:

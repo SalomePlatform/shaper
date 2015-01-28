@@ -20,6 +20,7 @@
 
 /*!
  * \class Config_ModuleReader
+ * \ingroup Config
  * \brief Class to process plugins.xml - definition of plugins (scripts, libraries).
  */
 class Config_ModuleReader : public Config_XMLReader

@@ -18,6 +18,7 @@
 
 /*!
  * \class Config_WidgetReader
+ * \ingroup Config
  * \brief Class that dumps xml definitions of widgets for
  * further processing in the WidgetFactory
  */

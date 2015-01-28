@@ -21,6 +21,7 @@ static const char * EVENT_SELFILTER_LOADED = "SelectionFilterLoaded";
 
 /*!
  * \class Config_SelectionFilterMessage
+ * \ingroup Config
  * \brief Transmits info about selection filters on "SelectionFilterLoaded" event
  */
 class Config_SelectionFilterMessage : public Events_Message
