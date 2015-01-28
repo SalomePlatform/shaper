@@ -219,6 +219,7 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
   } else {
     // Start editing constraint
     if (theOperation->isEditOperation()) {
+      // TODO: #391 - to be removed
       std::string aId = theOperation->id().toStdString();
       if (PartSet_SketcherMgr::sketchOperationIdList().contains(QString(aId.c_str()))) {
         if ((aId == SketchPlugin_ConstraintRadius::ID()) ||
