@@ -98,6 +98,10 @@ CONFIG_EXPORT bool getBooleanAttribute(xmlNodePtr theNode,
  * Should be used for case insensitive string matching.
  */
 CONFIG_EXPORT std::string normalize(const char* theString);
+/*!
+ * Returns normalized (lower case) version of string.
+ * Should be used for case insensitive string matching.
+ */
 CONFIG_EXPORT std::string normalize(const std::string& theString);
 
 #endif

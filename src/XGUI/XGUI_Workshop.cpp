@@ -1095,7 +1095,7 @@ void XGUI_Workshop::createDockWidgets()
   connect(myPropertyPanel, SIGNAL(noMoreWidgets()), myModule, SLOT(onNoMoreWidgets()));
 
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanel);
-  hidePropertyPanel();  //<! Invisible by default
+  hidePropertyPanel();  ///<! Invisible by default
   hideObjectBrowser();
   aDesktop->tabifyDockWidget(aObjDock, myPropertyPanel);
   myPropertyPanel->installEventFilter(myOperationMgr);
@@ -1115,7 +1115,7 @@ void XGUI_Workshop::createDockWidgets()
 void XGUI_Workshop::showPropertyPanel()
 {
   QAction* aViewAct = myPropertyPanel->toggleViewAction();
-  //<! Restore ability to close panel from the window's menu
+  ///<! Restore ability to close panel from the window's menu
   aViewAct->setEnabled(true);
   myPropertyPanel->show();
   myPropertyPanel->raise();
@@ -1125,7 +1125,7 @@ void XGUI_Workshop::showPropertyPanel()
 void XGUI_Workshop::hidePropertyPanel()
 {
   QAction* aViewAct = myPropertyPanel->toggleViewAction();
-  //<! Do not allow to show empty property panel
+  ///<! Do not allow to show empty property panel
   aViewAct->setEnabled(false);
   myPropertyPanel->hide();
 }
