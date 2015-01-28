@@ -22,16 +22,18 @@ bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
+  const ModelAPI_ResultValidator* anArcValidator =
+      dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultArc"));
+  bool anArcValid = anArcValidator->isValid(theObject);
+  if (anArcValid)
+    return false;
+
+
   // If the object is not a line then it is accepted
   const ModelAPI_ResultValidator* aLineValidator =
       dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultLine"));
   bool aLineValid = aLineValidator->isValid(theObject);
-
-  const ModelAPI_ResultValidator* anArcValidator =
-      dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultArc"));
-  bool anArcValid = anArcValidator->isValid(theObject);
-
-  if (!aLineValid && !anArcValid)
+  if (!aLineValid)
     return true;
 
   // If it is a line then we have to check that first attribute id not a line
