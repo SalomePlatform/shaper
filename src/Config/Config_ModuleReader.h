@@ -39,7 +39,7 @@ class Config_ModuleReader : public Config_XMLReader
   /// Returns map that describes which file contains a feature (the feature is key, the file is value)
   CONFIG_EXPORT const std::map<std::string, std::string>& featuresInFiles() const;
   /// Returns module name: an xml attribute from the root of the plugins.xml:
-  /// e.g <plugins module="PartSet">
+  /// e.g \code <plugins module="PartSet"> \endcode 
   CONFIG_EXPORT std::string getModuleName();
   /// Detects type of the given plugin and loads it using loadLibrary or loadScript.
   CONFIG_EXPORT static void loadPlugin(const std::string& thePluginName);

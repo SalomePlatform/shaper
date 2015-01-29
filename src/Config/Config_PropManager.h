@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-/*
+/**
  * \class Config_PropManager
  * \ingroup Config
  * \brief Class which let to register properties
