@@ -170,7 +170,7 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
       myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
     }
     else
-      activateObjects(myActiveSelectionModes);
+      activate(anAISIO, myActiveSelectionModes);
  }
   if (isUpdateViewer)
     updateViewer();
@@ -280,7 +280,6 @@ void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
     }
 #endif
 
-
   if (isVisible(theObject)) {
     Handle(AIS_InteractiveContext) aContext = AISContext();
     if (aContext.IsNull())
@@ -288,18 +287,8 @@ void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
 
     AISObjectPtr anObj = myResult2AISObjectMap[theObject];
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-    aContext->Deactivate(anAIS);
-    aContext->Load(anAIS, -1, true);
-    // In order to clear active modes list
-    if (theModes.size() > 0) {
-      foreach(int aMode, theModes) {
-        //aContext->Load(anAIS, aMode, true);
-        aContext->Activate(anAIS, aMode);
-      }
-    } else {
-      //aContext->Load(anAIS, 0, true);
-      aContext->Activate(anAIS);
-    }
+
+    activate(anAIS, theModes);
   }
 }*/
 
@@ -358,23 +347,7 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes)
   Handle(AIS_InteractiveObject) anAISIO;
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
     anAISIO = aLIt.Value();
-    aContext->Load(anAISIO, -1, true);
-    aContext->Deactivate(anAISIO);
-    aTrihedron = Handle(AIS_Trihedron)::DownCast(anAISIO);
-    //Deactivate trihedron which can be activated in local selector
-    if (aTrihedron.IsNull()) {
-      //aContext->Load(anAISIO, -1, true);
-      // In order to clear active modes list
-      if (myActiveSelectionModes.size() == 0) {
-        //aContext->Load(anAISIO, 0, true);
-        aContext->Activate(anAISIO);
-      } else {
-        foreach(int aMode, myActiveSelectionModes) {
-          //aContext->Load(anAISIO, aMode, true);
-          aContext->Activate(anAISIO, aMode);
-        }
-      }
-    }
+    activate(anAISIO, myActiveSelectionModes);
   }
 }
 
@@ -754,4 +727,30 @@ bool XGUI_Displayer::canBeShaded(ObjectPtr theObject) const
 
   Handle(AIS_InteractiveObject) anAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
   return ::canBeShaded(anAIS);
+}
+
+void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
+                              const QIntList& theModes) const
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull() || theIO.IsNull())
+    return;
+
+  aContext->Load(theIO, -1, true);
+  aContext->Deactivate(theIO);
+  Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
+  //Deactivate trihedron which can be activated in local selector
+  if (aTrihedron.IsNull()) {
+    //aContext->Load(anAISIO, -1, true);
+    // In order to clear active modes list
+    if (theModes.size() == 0) {
+      //aContext->Load(anAISIO, 0, true);
+      aContext->Activate(theIO);
+    } else {
+      foreach(int aMode, theModes) {
+        //aContext->Load(anAISIO, aMode, true);
+        aContext->Activate(theIO, aMode);
+      }
+    }
+  }
 }
