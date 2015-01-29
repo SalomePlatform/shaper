@@ -23,6 +23,7 @@
 
 /*!
  * \class ModuleBase_OperationDescription
+ * \ingroup GUI
  * Description of operation from XML
  */
 class MODULEBASE_EXPORT ModuleBase_OperationDescription

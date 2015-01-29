@@ -17,6 +17,7 @@
 #include <set>
 
 /**
+ * \ingroup GUI
  * Allows to get a selection filter by the feature identifier and 
  * the attribute identifier (if attribute is validated).
  * All accessible filters must be registered by the ID string first.

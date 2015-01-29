@@ -18,6 +18,7 @@ class NewGeom_OCCSelector;
 class OCCViewer_Viewer;
 
 /** 
+ * \ingroup Salome
  * An implementation of SALOME connector class for implementation of
  * XGUI functionality as a module of SALOME
  */

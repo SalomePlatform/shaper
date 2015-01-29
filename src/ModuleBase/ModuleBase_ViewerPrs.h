@@ -17,7 +17,7 @@
 #include <ModelAPI_Result.h>
 
 /**\class ModuleBase_ViewerPrs
- * \ingroup Module base
+ * \ingroup GUI
  * \brief Presentation. Provides container to have feature, shape and/or selection owner.
  */
 class ModuleBase_ViewerPrs

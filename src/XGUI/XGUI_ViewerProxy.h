@@ -10,6 +10,7 @@ class XGUI_Workshop;
 class AppElements_ViewWindow;
 
 /**
+ * \ingroup GUI
  * Proxy class which repersents or AppElements_Viewer or Salome Viewer
  * dependently on current launching environment.
  * It is reccomennded to use this class in operation for accessing to viewer 

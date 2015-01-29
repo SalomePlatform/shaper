@@ -30,6 +30,7 @@ const static char* PROP_PANEL_OK = "property_panel_ok";
 const static char* PROP_PANEL_CANCEL = "property_panel_cancel";
 
 /**
+* \ingroup GUI
 * Realization of Property panel object.
 */
 class XGUI_EXPORT XGUI_PropertyPanel : public ModuleBase_IPropertyPanel

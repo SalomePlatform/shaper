@@ -14,6 +14,7 @@ class QContextMenuEvent;
 class QMenu;
 
 /**
+ * \ingroup GUI
  * A claas wihich provides manement of context menu
  */
 class XGUI_EXPORT XGUI_ContextMenuMgr : public QObject

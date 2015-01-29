@@ -16,6 +16,7 @@
 #include <string>
 
 /**
+* \ingroup GUI
 * A validator of selection
 */
 class ModuleBase_SelectionValidator : public ModelAPI_Validator

@@ -14,6 +14,7 @@ class QContextMenuEvent;
 class ModuleBase_IViewWindow;
 
 /**
+ * \ingroup GUI
  * A Base object for definition of connector object to
  * Salome Viewer. Reimplemented in NewGeom_SalomeViewer class
  */

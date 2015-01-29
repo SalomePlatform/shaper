@@ -20,6 +20,7 @@ class OCCViewer_Viewer;
 class SUIT_ViewManager;
 
 /**
+* \ingroup Salome
 * A class for providing access of NewGeom functionality to 
 * SALOME view window functionality
 */
@@ -46,6 +47,7 @@ private:
 
 
 /**
+* \ingroup Salome
 * A class for providing access of NewGeom functionality to 
 * SALOME viewer functionality
 */

@@ -15,6 +15,7 @@ class QLabel;
 class QComboBox;
 
 /**
+* \ingroup GUI
 * Implementation of model widget for choice widget definition (combo box)
 * It can be defined as following:
 * \code

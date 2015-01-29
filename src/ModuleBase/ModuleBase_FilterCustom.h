@@ -12,6 +12,7 @@
 #include "ModuleBase_Filter.h"
 
 /**
+* \ingroup GUI
 * This is a child of ModuleBase_Filter to be used in the factory of filters. Despite of other
 * child it does not create the internal filter itself, it get it from the constructor argument.
 * This is useful for custom filters, which are not the standard OCC filters. It is not necessary

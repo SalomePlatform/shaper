@@ -22,6 +22,7 @@ class Config_WidgetAPI;
 class ModuleBase_IWorkshop;
 
 /**
+* \ingroup GUI
 * A class for creation of widgets instances in for property panel using XML deskription of 
 * a feature
 */

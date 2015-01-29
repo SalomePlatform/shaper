@@ -12,6 +12,7 @@
 #include <memory>
 
 /*!
+ \ingroup GUI
  \brief Return directory part of the file path.
 
  If the file path does not include directory part (the file is in the

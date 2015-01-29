@@ -12,6 +12,7 @@ class QMainWindow;
 class ModuleBase_IViewer;
 
 /**
+ * \ingroup GUI
  * An interface which provides a connection of XGUI functionality 
  * with functionality of SALOME module interface.
  */

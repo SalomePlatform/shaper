@@ -18,6 +18,7 @@
  * Selector validators
  */
 
+//! \ingroup Module
 //! A class to validate a selection for Distance constraint operation
 class PartSet_DistanceValidator : public ModuleBase_SelectionValidator
 {
@@ -25,6 +26,7 @@ class PartSet_DistanceValidator : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
+//! \ingroup Module
 //! A class to validate a selection for Length constraint operation
 class PartSet_LengthValidator : public ModuleBase_SelectionValidator
 {
@@ -32,6 +34,7 @@ class PartSet_LengthValidator : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
+//! \ingroup Module
 //! A class to validate a selection for Perpendicular constraint operation
 class PartSet_PerpendicularValidator : public ModuleBase_SelectionValidator
 {
@@ -39,6 +42,7 @@ class PartSet_PerpendicularValidator : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
+//! \ingroup Module
 //! A class to validate a selection for Perpendicular constraint operation
 class PartSet_ParallelValidator : public ModuleBase_SelectionValidator
 {
@@ -46,6 +50,7 @@ class PartSet_ParallelValidator : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
+//! \ingroup Module
 //! A class to validate a selection for Perpendicular constraint operation
 class PartSet_RadiusValidator : public ModuleBase_SelectionValidator
 {
@@ -53,6 +58,7 @@ class PartSet_RadiusValidator : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
+//! \ingroup Module
 //! A class to validate a selection for Perpendicular constraint operation
 class PartSet_RigidValidator : public ModuleBase_SelectionValidator
 {

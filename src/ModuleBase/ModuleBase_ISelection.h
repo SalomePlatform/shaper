@@ -19,6 +19,7 @@
 #include <QList>
 
 /**
+* \ingroup GUI
 * A class which provides access to selection.
 * A selection can be obtained as from a viewer as from Object browser in various forms
 */

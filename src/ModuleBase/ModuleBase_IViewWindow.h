@@ -9,6 +9,7 @@
 
 
 /** 
+* \ingroup GUI
 * Interface to ViewWindow object which contains 3d scene
 */
 class ModuleBase_IViewWindow
