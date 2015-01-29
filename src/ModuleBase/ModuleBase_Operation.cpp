@@ -66,6 +66,8 @@ bool ModuleBase_Operation::isValid() const
 {
   if (!myFeature)
     return true; // rename operation
+  if (myFeature->isAction())
+    return true;
   //Get validators for the Id
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
