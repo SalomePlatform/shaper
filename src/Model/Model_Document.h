@@ -56,8 +56,8 @@ class Model_Document : public ModelAPI_Document
   //! Starts a new operation (opens a tansaction)
   MODEL_EXPORT virtual void startOperation();
   //! Finishes the previously started operation (closes the transaction)
-  //! Returns true if transaction in this document is not empty and really was performed
-  MODEL_EXPORT virtual void finishOperation();
+  //! \returns true if transaction in this document is not empty and really was performed
+  MODEL_EXPORT virtual bool finishOperation();
   //! Aborts the operation 
   MODEL_EXPORT virtual void abortOperation();
   //! Returns true if operation has been started, but not yet finished or aborted
@@ -190,7 +190,7 @@ class Model_Document : public ModelAPI_Document
   const std::set<std::string> subDocuments(const bool theActivatedOnly) const;
 
   //! The implementation of undo: with or without recoursive calls in the sub-documents
-  void undoInternal(const bool theWithSubs);
+  void undoInternal(const bool theWithSubs, const bool theSynchronize);
 
   friend class Model_Application;
   friend class Model_Session;
