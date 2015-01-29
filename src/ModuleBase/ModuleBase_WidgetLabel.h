@@ -13,6 +13,7 @@
 class QLabel;
 
 /**
+* \ingroup GUI
 * Implementation of model widget for a label control
 */
 class MODULEBASE_EXPORT ModuleBase_WidgetLabel : public ModuleBase_ModelWidget

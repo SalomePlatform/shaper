@@ -454,7 +454,7 @@ void ModuleBase_WidgetShapeSelector::raisePanel() const
 }
 
 //********************************************************************
-void ModuleBase_WidgetShapeSelector::activate()
+void ModuleBase_WidgetShapeSelector::activateCustom()
 {
   activateSelection(true);
 }

@@ -8,6 +8,7 @@
 #include <LightApp_OCCSelector.h>
 
 /**
+* \ingroup Salome
 * Redefinition of standard OCC selector in order to adapt it to NewGeom needs
 */
 class NewGeom_EXPORT NewGeom_OCCSelector : public LightApp_OCCSelector

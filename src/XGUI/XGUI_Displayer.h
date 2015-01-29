@@ -139,7 +139,7 @@ class XGUI_EXPORT XGUI_Displayer
   /// Activates the given object (it can be selected)
   /// \param theObject object to activate
   /// \param theModes - modes on which it has to be activated (can be empty)
-  void activate(ObjectPtr theObject, const QIntList& theModes);
+  //void activate(ObjectPtr theObject, const QIntList& theModes);
 
   /// Returns the modes of activation
   /// \param theObject the feature or NULL if it not visualized
@@ -148,7 +148,7 @@ class XGUI_EXPORT XGUI_Displayer
 
   /// Activates the given object with default modes
   /// \param theObject object to activate
-  void activate(ObjectPtr theObject);
+  //void activate(ObjectPtr theObject);
 
   /// Returns true if the given object can be selected
   /// \param theObject object to check
@@ -205,6 +205,11 @@ class XGUI_EXPORT XGUI_Displayer
    * \param isUpdateViewer the parameter whether the viewer should be update immediatelly
    */
   void redisplay(ObjectPtr theObject, bool isUpdateViewer = true);
+
+  /// Activates the interactive object in the local context.
+  /// \param theIO an interactive object
+  /// \param theModes - modes on which it has to be activated (can be empty)
+  void activate(const Handle(AIS_InteractiveObject)& theIO, const QIntList& theModes) const;
 
   /// Opens local context. Does nothing if it is already opened.
   void openLocalContext();

@@ -45,6 +45,9 @@
 #include <SelectMgr_IndexedMapOfOwner.hxx>
 #include <StdSelect_BRepOwner.hxx>
 
+//#include <AIS_DimensionSelectionMode.hxx>
+//#include <AIS_Shape.hxx>
+
 #include <ModelAPI_Events.h>
 
 #include <QMouseEvent>
@@ -137,7 +140,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 {
   get2dPoint(theWnd, theEvent, myClickedPoint);
 
-  // 
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
 
@@ -425,6 +427,12 @@ void PartSet_SketcherMgr::launchEditing()
   // point
   QIntList aModes;
   aModes << TopAbs_VERTEX << TopAbs_EDGE;
+  // TODO: #391 - to be uncommented
+  /*aModes.append(AIS_DSM_Text);
+  aModes.append(AIS_DSM_Line);
+  aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_VERTEX));
+  aModes.append(AIS_Shape::SelectionMode((TopAbs_ShapeEnum) TopAbs_EDGE));*/
+
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
   aConnector->activateSubShapesSelection(aModes);
 

@@ -26,6 +26,7 @@ class QToolButton;
 class ModuleBase_IWorkshop;
 
 /**
+* \ingroup GUI
 * Implementation of widget for shapes selection.
 * This type of widget can be defined in XML file with 'shape_selector' keyword.
 * For example:
@@ -101,9 +102,6 @@ Q_OBJECT
   virtual bool setSelection(ModuleBase_ViewerPrs theValue);
 
 
-  /// The methiod called when widget is activated
-  virtual void activate();
-
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
@@ -118,7 +116,10 @@ Q_OBJECT
   void onSelectionChanged();
 
  protected:
-   /// Computes and updates name of selected object in the widget
+  /// The methiod called when widget is activated
+  virtual void activateCustom();
+
+  /// Computes and updates name of selected object in the widget
   void updateSelectionName();
 
   /// Raise panel which contains this widget

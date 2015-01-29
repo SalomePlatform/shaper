@@ -14,6 +14,7 @@
 #include <list>
 
 /**
+ * \ingroup GUI
  * This object is assigned by the name
  * in the XML file to the specific attribute or to the whole feature.
  * If isOK method of the filter returns "false", it is signalized in user interface

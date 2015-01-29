@@ -22,6 +22,7 @@ class ModuleBase_Operation;
 class ModuleBase_FilterFactory;
 
 /**
+ * \ingroup GUI
  * Class which provides access to Workshop object serveces
  */
 class MODULEBASE_EXPORT ModuleBase_IWorkshop : public QObject

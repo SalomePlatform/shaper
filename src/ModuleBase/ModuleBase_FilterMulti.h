@@ -14,6 +14,7 @@
 #include <StdSelect_TypeOfFace.hxx>
 
 /**
+* \ingroup GUI
 * An implementation of filter which support using of several filters according to OR statement
 */
 class ModuleBase_FilterMulti: public ModuleBase_Filter

@@ -23,6 +23,7 @@ class ModuleBase_Operation;
 class ModuleBase_IWorkshop;
 
 /**
+ * \ingroup GUI
  * Interface to a module
  */
 class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
@@ -86,6 +87,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Call back forlast tuning of property panel before operation performance
   /// It is called as on clearing of property panel as on filling with new widgets
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation) {}
+
+  /// Returns whether the object can be displayed at the bounds of the active operation.
+  /// Display only current operation results
+  /// \param theObject a model object
+  virtual bool canDisplayObject(const ObjectPtr& theObject) const;
 
 public slots:
   /// Called on call of command corresponded to a feature

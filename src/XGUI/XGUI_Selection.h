@@ -23,6 +23,7 @@
 class XGUI_Workshop;
 
 /**
+* \ingroup GUI
 * Implementation of \ref ModuleBase_ISelection interface.
 */
 class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection

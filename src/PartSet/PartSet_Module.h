@@ -26,6 +26,10 @@
 class ModuleBase_Operation;
 class ModuleBase_IViewWindow;
 
+/**
+* \ingroup Modules
+* Implementation of Partset module
+*/
 class PARTSET_EXPORT PartSet_Module : public ModuleBase_IModule
 {
 Q_OBJECT
@@ -39,6 +43,8 @@ enum RestartingMode {
 };
 
 public:
+  /// Constructor
+  /// \param theWshop a pointer to a workshop
   PartSet_Module(ModuleBase_IWorkshop* theWshop);
   virtual ~PartSet_Module();
 
@@ -71,6 +77,12 @@ public:
   /// \param theOperation a stopped operation
   virtual void operationStopped(ModuleBase_Operation* theOperation);
 
+  /// Returns whether the object can be displayed at the bounds of the active operation.
+  /// Display only current operation results for usual operation and ask the sketcher manager
+  /// if it is a sketch operation
+  /// \param theObject a model object
+  virtual bool canDisplayObject(const ObjectPtr& theObject) const;
+
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation
@@ -80,28 +92,8 @@ protected slots:
   /// Called when previous operation is finished
   virtual void onSelectionChanged();
 
-  /// SLOT, that is called by mouse press in the viewer.
-  /// \param theWnd - the window where the event happens
-  /// \param theEvent the mouse event
-  //void onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
-
-  /// SLOT, that is called by mouse release in the viewer.
-  /// \param theWnd - the window where the event happens
-  /// \param theEvent the mouse event
-  //void onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
-  
-  /// SLOT, that is called by mouse move in the viewer.
-  /// \param theWnd - the window where the event happens
-  /// \param theEvent the mouse event
-  //void onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
-
-  /// SLOT, that is called by mouse double click in the viewer.
-  /// \param theWnd - the window where the event happens
-  /// \param theEvent the mouse event
-  //void onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
-
   /// SLOT, that is called by key release in the viewer.
-  /// The mouse moved point is sent to the current operation to be processed.
+  /// \param theWnd a view window
   /// \param theEvent the key event
   void onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent);
 
@@ -122,11 +114,10 @@ protected slots:
   virtual void registerFilters();
 
  private slots:
+   /// Processing of vertex selected
    void onVertexSelected();
 
-
  private:
-
   /// Breaks sequense of automatically resterted operations
   void breakOperationSequence();
 

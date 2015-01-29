@@ -17,12 +17,15 @@ class XGUI_Workshop;
 class XGUI_Displayer;
 
 /**
+ * \ingroup GUI
  * Implementation of IWorkshop interface which provides access to Workshop sevices at module level
  */
 class XGUI_EXPORT XGUI_ModuleConnector : public ModuleBase_IWorkshop
 {
 Q_OBJECT
  public:
+   /// Constructor
+   /// \param theWorkshop a workshop
   XGUI_ModuleConnector(XGUI_Workshop* theWorkshop);
 
   virtual ~XGUI_ModuleConnector();
@@ -59,9 +62,11 @@ Q_OBJECT
   //! If the list is empty then selection will be cleared
   virtual void setSelected(const QObjectPtrList& theFeatures);
 
+  //! Returns workshop
   XGUI_Workshop* workshop() const { return myWorkshop; }
 
 private:
+  /// Reference to workshop
   XGUI_Workshop* myWorkshop;
 
   /// A filter which provides selection within a current document or whole PartSet

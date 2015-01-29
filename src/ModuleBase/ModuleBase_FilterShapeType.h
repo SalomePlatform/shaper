@@ -14,6 +14,7 @@
 #include <StdSelect_TypeOfFace.hxx>
 
 /**
+* \ingroup GUI
 * A class of a viewer filter by shape type
 */
 class ModuleBase_FilterShapeType: public ModuleBase_Filter

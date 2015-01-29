@@ -41,6 +41,8 @@
 
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse selection sensitivity
 
+//#define DEBUG_DISPLAY
+//#define DEBUG_ACTIVATE
 
 // Workaround for bug #25637
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
@@ -85,6 +87,14 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
   if (isVisible(theObject)) {
     redisplay(theObject, isUpdateViewer);
   } else {
+#ifdef DEBUG_DISPLAY
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    if (aFeature.get() != NULL) {
+      qDebug(QString("display feature: %1, displayed: %2").
+        arg(aFeature->data()->name().c_str()).
+        arg(displayedObjects().size()).toStdString().c_str());
+    }
+#endif
     AISObjectPtr anAIS;
 
     GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
@@ -159,7 +169,9 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
       activateObjects(myActiveSelectionModes);
       myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
     }
-  }
+    else
+      activate(anAISIO, myActiveSelectionModes);
+ }
   if (isUpdateViewer)
     updateViewer();
 }
@@ -245,13 +257,29 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject)
   }
 }
 
-void XGUI_Displayer::activate(ObjectPtr theFeature)
+/*void XGUI_Displayer::activate(ObjectPtr theFeature)
 {
   activate(theFeature, myActiveSelectionModes);
 }
 
 void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
 {
+#ifdef DEBUG_ACTIVATE
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+
+    if (aFeature.get() != NULL) {
+      QIntList aModes;
+      getModesOfActivation(theObject, aModes);
+
+
+      qDebug(QString("activate feature: %1, theModes: %2, myActiveSelectionModes: %3, getModesOf: %4").
+        arg(aFeature->data()->name().c_str()).
+        arg(theModes.size()).
+        arg(myActiveSelectionModes.size()).
+        arg(aModes.size()).toStdString().c_str());
+    }
+#endif
+
   if (isVisible(theObject)) {
     Handle(AIS_InteractiveContext) aContext = AISContext();
     if (aContext.IsNull())
@@ -259,20 +287,10 @@ void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
 
     AISObjectPtr anObj = myResult2AISObjectMap[theObject];
     Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-    aContext->Deactivate(anAIS);
-    aContext->Load(anAIS, -1, true);
-    // In order to clear active modes list
-    if (theModes.size() > 0) {
-      foreach(int aMode, theModes) {
-        //aContext->Load(anAIS, aMode, true);
-        aContext->Activate(anAIS, aMode);
-      }
-    } else {
-      //aContext->Load(anAIS, 0, true);
-      aContext->Activate(anAIS);
-    }
+
+    activate(anAIS, theModes);
   }
-}
+}*/
 
 void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theModes)
 {
@@ -298,6 +316,12 @@ void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theMode
 
 void XGUI_Displayer::activateObjects(const QIntList& theModes)
 {
+#ifdef DEBUG_ACTIVATE
+  qDebug(QString("activate all features: theModes: %2, myActiveSelectionModes: %3").
+    arg(theModes.size()).
+    arg(myActiveSelectionModes.size()).
+    toStdString().c_str());
+#endif
   // In order to avoid doblications of selection modes
   QIntList aNewModes;
   foreach (int aMode, theModes) {
@@ -323,23 +347,7 @@ void XGUI_Displayer::activateObjects(const QIntList& theModes)
   Handle(AIS_InteractiveObject) anAISIO;
   for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
     anAISIO = aLIt.Value();
-    aContext->Load(anAISIO, -1, true);
-    aContext->Deactivate(anAISIO);
-    aTrihedron = Handle(AIS_Trihedron)::DownCast(anAISIO);
-    //Deactivate trihedron which can be activated in local selector
-    if (aTrihedron.IsNull()) {
-      //aContext->Load(anAISIO, -1, true);
-      // In order to clear active modes list
-      if (myActiveSelectionModes.size() == 0) {
-        //aContext->Load(anAISIO, 0, true);
-        aContext->Activate(anAISIO);
-      } else {
-        foreach(int aMode, myActiveSelectionModes) {
-          //aContext->Load(anAISIO, aMode, true);
-          aContext->Activate(anAISIO, aMode);
-        }
-      }
-    }
+    activate(anAISIO, myActiveSelectionModes);
   }
 }
 
@@ -719,4 +727,30 @@ bool XGUI_Displayer::canBeShaded(ObjectPtr theObject) const
 
   Handle(AIS_InteractiveObject) anAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
   return ::canBeShaded(anAIS);
+}
+
+void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
+                              const QIntList& theModes) const
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull() || theIO.IsNull())
+    return;
+
+  aContext->Load(theIO, -1, true);
+  aContext->Deactivate(theIO);
+  Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
+  //Deactivate trihedron which can be activated in local selector
+  if (aTrihedron.IsNull()) {
+    //aContext->Load(anAISIO, -1, true);
+    // In order to clear active modes list
+    if (theModes.size() == 0) {
+      //aContext->Load(anAISIO, 0, true);
+      aContext->Activate(theIO);
+    } else {
+      foreach(int aMode, theModes) {
+        //aContext->Load(anAISIO, aMode, true);
+        aContext->Activate(theIO, aMode);
+      }
+    }
+  }
 }

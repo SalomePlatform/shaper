@@ -15,6 +15,7 @@ class QWidget;
 class QCheckBox;
 
 /**
+* \ingroup GUI
 * Implementation of widget for boolean input (check box)
 */ 
 class MODULEBASE_EXPORT ModuleBase_WidgetBoolValue : public ModuleBase_ModelWidget

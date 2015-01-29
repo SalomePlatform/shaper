@@ -14,6 +14,7 @@
 #include <StdSelect_TypeOfEdge.hxx>
 
 /**
+* \ingroup GUI
 * A class of a viewer filter by linear edges
 */
 class ModuleBase_FilterLinearEdge: public ModuleBase_Filter

@@ -21,6 +21,7 @@ class QWidget;
 class QLineEdit;
 
 /**
+* \ingroup GUI
 * Implementation of model widget for line edit widget.
 * It can be defined with "stringvalue" keyword.
 */

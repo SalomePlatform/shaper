@@ -17,6 +17,7 @@ class QLabel;
 class QTimer;
 
 /**
+* \ingroup GUI
 * A class of property panel widget for double value input
 * It can be defined with "doublevalue" keyword. For example:
 * \code

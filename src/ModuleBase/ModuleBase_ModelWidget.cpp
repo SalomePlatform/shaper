@@ -85,6 +85,17 @@ bool ModuleBase_ModelWidget::focusTo()
   return true;
 }
 
+void ModuleBase_ModelWidget::activate()
+{
+  if (!isEditingMode()) {
+    // the control value is stored to the mode by the focus in on the widget
+    // we need the value is initialized in order to enable the apply button in the property panel
+    // it should happens only in the creation mode because during edition all fields are filled
+    storeValue();
+  }
+  activateCustom();
+}
+
 void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj) const
 {
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));

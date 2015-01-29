@@ -7,7 +7,6 @@ SET(CMAKE_AUTOMOC ON)
 SET(PROJECT_HEADERS
 	PartSet.h
 	PartSet_Constants.h
-	PartSet_EditLine.h
 	PartSet_Module.h
 	PartSet_Tools.h
 	PartSet_WidgetSketchLabel.h
@@ -20,7 +19,6 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
-	PartSet_EditLine.cpp
 	PartSet_Module.cpp
 	PartSet_Tools.cpp
 	PartSet_WidgetSketchLabel.cpp

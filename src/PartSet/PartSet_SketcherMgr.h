@@ -31,7 +31,11 @@ class ModuleBase_Operation;
 class QMouseEvent;
 
 /**
+* \ingroup Modules
 * A class for management of sketch operations
+  At the time of the sketcher operation active, only the sketch sub-feature results are
+  displayed in the viewer. After the sketch create/edit operation is finished, the sub-feature
+  are hidden, the sketch feature result is displayed
 */
 class PARTSET_EXPORT PartSet_SketcherMgr : public QObject
 {
@@ -67,25 +71,29 @@ class PARTSET_EXPORT PartSet_SketcherMgr : public QObject
     double myCurX, myCurY; /// the point coordinates
   };
 public:
+  /// Constructor
+  /// \param theModule a pointer to PartSet module
   PartSet_SketcherMgr(PartSet_Module* theModule);
 
   virtual ~PartSet_SketcherMgr();
 
+  /// Returns list of strings which contains id's of sketch operations
   static QStringList sketchOperationIdList();
 
   /// Launches the operation from current highlighting
   void launchEditing();
 
-  // Returns current Sketch feature/ Returns NULL if there is no launched sketch operation
+  /// Returns current Sketch feature/ Returns NULL if there is no launched sketch operation
   CompositeFeaturePtr activeSketch() const { return myCurrentSketch; }
 
   /// Starts sketch operation
-  void startSketch(ModuleBase_Operation* theOperation);
+  void startSketch(ModuleBase_Operation* );
 
   /// Stops sketch operation
-  void stopSketch(ModuleBase_Operation* theOperation);
+  void stopSketch(ModuleBase_Operation* );
 
 public slots:
+  /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
 

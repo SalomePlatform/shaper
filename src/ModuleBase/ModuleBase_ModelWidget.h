@@ -20,6 +20,7 @@ class Config_WidgetAPI;
 class QKeyEvent;
 
 /**\class ModuleBase_ModelWidget
+ * \ingroup GUI
  * \brief An abstract custom widget class. This class realization is assumed to create some controls.
  * The controls values modification should send signal about values change.
  *
@@ -83,7 +84,7 @@ Q_OBJECT
   virtual bool focusTo();
 
   /// The methiod called when widget is activated
-  virtual void activate() {}
+  void activate();
 
   /// The methiod called when widget is deactivated
   virtual void deactivate() {}
@@ -160,6 +161,9 @@ signals:
   {
     myAttributeID = theAttribute;
   }
+
+  /// The methiod called when widget is activated
+  virtual void activateCustom() {};
 
   /// Sends Update and Redisplay for the given object
   /// \param theObj is updating object

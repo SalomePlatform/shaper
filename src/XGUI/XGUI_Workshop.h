@@ -55,7 +55,9 @@ class XGUI_EXPORT XGUI_Workshop : public QObject, public Events_Listener
 {
 Q_OBJECT
  public:
-
+  /// Constructor
+  /// \param theConnector a Salome connector object. 
+  /// Used only if the workshop is launched in Salome environment
   XGUI_Workshop(XGUI_SalomeConnector* theConnector = 0);
   virtual ~XGUI_Workshop();
 
@@ -131,8 +133,10 @@ Q_OBJECT
     return myObjectBrowser;
   }
 
+  /// This method is called by Salome module when selection is changed
   void salomeViewerSelectionChanged();
 
+  /// Returns viewer which unifies access as to Salome viewer as to standalone viewer
   XGUI_ViewerProxy* viewer() const
   {
     return myViewerProxy;
@@ -161,8 +165,12 @@ Q_OBJECT
   //! Show the given features in 3d Viewer
   void showOnlyObjects(const QObjectPtrList& theList);
 
+  /// Set display mode for the given onjects
+  /// \param theList a list of displayed objects
+  /// \param theMode a mode to set (see \ref XGUI_Displayer)
   void setDisplayMode(const QObjectPtrList& theList, int theMode);
 
+  /// Returns current module
   ModuleBase_IModule* module() const
   {
     return myModule;
@@ -181,7 +189,7 @@ Q_OBJECT
   */
   void saveDocument(const QString& theName, std::list<std::string>& theFileNames);
 
-  /*
+  /**
    * If there is an active (uncommited) operation shows a prompt to abort it
    * and performs abortion if user agreed. Returns true if
    * - operation aborted successfully
@@ -190,8 +198,12 @@ Q_OBJECT
   bool isActiveOperationAborted();
 
 signals:
+  /// Emitted when selection happens in Salome viewer
   void salomeViewerSelection();
+
+  /// Emitted when error in applivation happens
   void errorOccurred(const QString&);
+
   //! the signal about the workshop actions states are updated.
   void commandStatusUpdated();
 
@@ -199,53 +211,102 @@ signals:
   void applicationStarted();
 
  public slots:
+   /// Update of commands status
   void updateCommandStatus();
 
+  /// Create a new dokument
   void onNew();
+
+  /// Open document from file
   void onOpen();
+
+  /// Save current document
   bool onSave();
+
+  /// Save current document to a file selected by user
   bool onSaveAs();
+
+  /// Exit application
   void onExit();
+
+  /// Undo last command
   void onUndo();
+
+  /// Redo previous command
   void onRedo();
+
+  /// Rebuild data tree
   void onRebuild();
+
+  /// Open preferences dialog box
   void onPreferences();
 
+  /// Show property panel
   void showPropertyPanel();
+
+  /// Hide property panel
   void hidePropertyPanel();
+
+  /// Show object Browser
   void showObjectBrowser();
+
+  /// Hide object Browser
   void hideObjectBrowser();
 
+  /// Reaction on command call
   void onFeatureTriggered();
+
+  /// Change active document
+  /// \param theObj a part object. If it is NULL then active document is a main document
   void changeCurrentDocument(ObjectPtr theObj);
 
-  void activateLastPart();
+  //void activateLastPart();
 
+  /// Close document
   void closeDocument();
 
  protected:
-  // Find the nested features and set them into the operation
-  // \param theOperation an operation
+  /// Find the nested features and set them into the operation
+  /// \param theOperation an operation
   void setNestedFeatures(ModuleBase_Operation* theOperation);
-  // Update the property panel content by the XML description of the operation and set the panel
-  // into the operation
-  // \param theOperation an operation
+
+  /// Update the property panel content by the XML description of the operation and set the panel
+  /// into the operation
+  /// \param theOperation an operation
   void setPropertyPanel(ModuleBase_Operation* theOperation);
 
+  /// Procedure to process postponed events
   bool event(QEvent * theEvent);
+
   //Event-loop processing methods:
+
+  /// Process event "Add a feature"
   void addFeature(const std::shared_ptr<Config_FeatureMessage>&);
+
+  /// Connect to operation signals
+  /// \param theOperation an operation
   void connectWithOperation(ModuleBase_Operation* theOperation);
 
-  void onFeatureUpdatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
-  void onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
-  void onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& theMsg);
-  void onObjectDeletedMsg(const std::shared_ptr<ModelAPI_ObjectDeletedMessage>& theMsg);
+  /// Process feature update message
+  void onFeatureUpdatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
 
-  void validateOperation(const QString& theOperationId);
+  ///Process feature created message
+  void onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
 
+  /// Process feature redisplay message
+  void onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectUpdatedMessage>& );
+
+  /// Process feature delete message
+  void onObjectDeletedMsg(const std::shared_ptr<ModelAPI_ObjectDeletedMessage>& );
+
+  /// Display all results
   void displayAllResults();
+
+  /// Displau results from document
+  /// \param theDoc a document
   void displayDocumentResults(DocumentPtr theDoc);
+
+  /// Display results from a group
   void displayGroupResults(DocumentPtr theDoc, std::string theGroup);
 
  private slots:
@@ -272,21 +333,37 @@ signals:
   /// \param theOpertion an aborted operation
   void onOperationAborted(ModuleBase_Operation* theOperation);
 
+  /// Process context menu command
+  /// \param theId id of the command
+  /// \param isChecked is checked flag
   void onContextMenuCommand(const QString& theId, bool isChecked);
 
+  /// Processing of values changed in model widget
   void onWidgetValuesChanged();
 
+  /// Set waiting cursor
   void onStartWaiting();
 
  private:
+   /// Init menu
   void initMenu();
 
+  /// Register validators
   void registerValidators() const;
 
+  /// Load module from external library
+  /// \param theModule name of the module
   ModuleBase_IModule* loadModule(const QString& theModule);
+
+  /// Activate module
   bool activateModule();
 
+  /// Create object browser widget
+  /// \param theParent a parent of widget
   QDockWidget* createObjectBrowser(QWidget* theParent);
+
+  /// Create property panel widget
+  /// \param theParent a parent of widget
   QDockWidget* createPropertyPanel(QWidget* theParent);
 
   // Creates Dock widgets: Object browser and Property panel
