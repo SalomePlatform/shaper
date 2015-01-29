@@ -1,6 +1,6 @@
-"""
-Copyright (C) 2014-20xx CEA/DEN, EDF R&D
-"""
+## @package Plugins
+#  ExportFeature class definition
+#  Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 import EventsAPI
 import ModelAPI
@@ -9,34 +9,37 @@ import salome
 from salome.geom import geomBuilder
 
 
+## @ingroup Plugins
+#  Feature to export all shapes and groups into the GEOM module
 class ExportFeature(ModelAPI.ModelAPI_Feature):
 
-    "Feature to create a box by drawing a sketch and extruding it"
-
+    ## The constructor.
     def __init__(self):
         ModelAPI.ModelAPI_Feature.__init__(self)
 
     @staticmethod
+    ## Export kind. Static.
     def ID():
         return "ExportToGEOM"
 
+    ## Returns the kind of a feature.
     def getKind(self):
         return ExportFeature.ID()
 
-    # This feature is action: has no property pannel and executes immideately
+    ## This feature is action: has no property pannel and executes immideately.
     def isAction(self):
         return True
 
-    # The action is not placed into the histiry anyway
+    # The action is not placed into the history anyway
     #def isInHistory(self):
     #    return False
 
+    ## This feature has no attributes, as it is action.
     def initAttributes(self):
-      # This feature has no attributes, it is action
       pass
-        
+
+    ## Exports all bodies
     def exportBodies(self):
-        # Get all bodies
         kResultBodyType = "Bodies"
         aPartSize = self.Part.size(kResultBodyType)
         if aPartSize == 0:
@@ -56,6 +59,7 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
             self.geompy.addToStudy(aBrep, "NewGeomShape_{0}".format(idx + 1))
             self.geomObjects.append([aShape, aBrep])
 
+    ## Exports all groups
     def exportGroups(self):
         # iterate all features to find groups
         aFeaturesNum = self.Part.size("Features")
@@ -68,7 +72,10 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
                 groupIndex = groupIndex + 1
                 self.createGroupFromList(aSelectionList, "NewGeomGroup_{0}".format(groupIndex))
                      
-    def createGroupFromList(self, theSelectionList, theGroupName):     
+    ## Creates a group by given list of selected objects and the name
+    #  @param theSelectionList: list of selected objects
+    #  @param theGroupName: name of the group to create
+    def createGroupFromList(self, theSelectionList, theGroupName):
         # iterate on all selected entities of the group
         # and get the corresponding ID
         aSelectionNum = theSelectionList.size()
@@ -95,10 +102,14 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
                 self.geompy.UnionIDs(aGroup,Ids)
                 self.geompy.addToStudyInFather(obj[1], aGroup, theGroupName)
           
+    ## Exports all shapes and groups into the GEOM module.
     def execute(self):
         aSession = ModelAPI.ModelAPI_Session.get()
+        ## Get active document
         self.Part = aSession.activeDocument()
+        ## List of objects created in the old geom for later use
         self.geomObjects = []
+        ## geomBuilder tool
         self.geompy = geomBuilder.New(salome.myStudy)
        
         # Export bodies and groups

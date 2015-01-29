@@ -52,6 +52,7 @@ class Config_Prop
    * Creates a one property
    * \param theSection - name of section (domain of using) of the property.
    * \param theName - name (title) of the value.
+   * \param theTitle - title of the value
    * \param theType - type of the value.
    * \param theDefaultValue - default value of the property. This is an initial property value
    */

@@ -25,6 +25,10 @@
 class Config_WidgetReader : public Config_XMLReader
 {
  public:
+  /*!
+   * Constructor
+   * \param theXmlFile - full path to the xml file which will be processed by the reader
+   */
   CONFIG_EXPORT Config_WidgetReader(const std::string& theXmlFile);
   CONFIG_EXPORT virtual ~Config_WidgetReader();
 

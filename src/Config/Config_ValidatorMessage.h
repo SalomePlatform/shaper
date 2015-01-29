@@ -32,6 +32,11 @@ class Config_ValidatorMessage : public Events_Message
   std::list<std::string> myVaidatorParameters;
 
  public:
+  /*!
+   * Constructor.
+   * \param theId - Events_ID of the message
+   * \param theParent - pointer to the sender
+   */
   CONFIG_EXPORT Config_ValidatorMessage(const Events_ID theId, const void* theParent = 0);
   CONFIG_EXPORT virtual ~Config_ValidatorMessage();
 

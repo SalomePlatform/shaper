@@ -27,6 +27,7 @@ class Config_PropManager
    * Registers property parameters
    * \param theSection - name of section (domain of using) of the property.
    * \param theName - name (title) of the value.
+   * \param theTitle - title of the value.
    * \param theType - type of the value.
    * \param theDefValue - default and initial value of the property
    * Returns True if the property succesfully registered

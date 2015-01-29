@@ -36,6 +36,10 @@ struct _xmlDoc;
 class Config_XMLReader
 {
  public:
+  /*!
+   * Constructor
+   * \param theXmlFile - full path to the xml file which will be processed by the reader
+   */
   CONFIG_EXPORT Config_XMLReader(const std::string& theXmlFile);
   CONFIG_EXPORT virtual ~Config_XMLReader();
   /*!
