@@ -18,7 +18,7 @@
  * Selector validators
  */
 
-//! \ingroup Module
+//! \ingroup Validators
 //! A class to validate a selection for Distance constraint operation
 class PartSet_DistanceValidator : public ModuleBase_SelectionValidator
 {
@@ -26,7 +26,7 @@ class PartSet_DistanceValidator : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
-//! \ingroup Module
+//! \ingroup Validators
 //! A class to validate a selection for Length constraint operation
 class PartSet_LengthValidator : public ModuleBase_SelectionValidator
 {
@@ -34,7 +34,7 @@ class PartSet_LengthValidator : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
-//! \ingroup Module
+//! \ingroup Validators
 //! A class to validate a selection for Perpendicular constraint operation
 class PartSet_PerpendicularValidator : public ModuleBase_SelectionValidator
 {
@@ -42,7 +42,7 @@ class PartSet_PerpendicularValidator : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
-//! \ingroup Module
+//! \ingroup Validators
 //! A class to validate a selection for Perpendicular constraint operation
 class PartSet_ParallelValidator : public ModuleBase_SelectionValidator
 {
@@ -50,7 +50,7 @@ class PartSet_ParallelValidator : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
-//! \ingroup Module
+//! \ingroup Validators
 //! A class to validate a selection for Perpendicular constraint operation
 class PartSet_RadiusValidator : public ModuleBase_SelectionValidator
 {
@@ -58,7 +58,7 @@ class PartSet_RadiusValidator : public ModuleBase_SelectionValidator
   PARTSET_EXPORT virtual bool isValid(const ModuleBase_ISelection* theSelection) const;
 };
 
-//! \ingroup Module
+//! \ingroup Validators
 //! A class to validate a selection for Perpendicular constraint operation
 class PartSet_RigidValidator : public ModuleBase_SelectionValidator
 {
@@ -67,7 +67,7 @@ class PartSet_RigidValidator : public ModuleBase_SelectionValidator
 };
 
 /**
-* \ingroup Module
+* \ingroup Validators
 * A validator which checks that objects selected for feature attributes are different (not the same)
 */
 class PartSet_DifferentObjectsValidator : public ModelAPI_RefAttrValidator
@@ -95,7 +95,7 @@ class PartSet_DifferentObjectsValidator : public ModelAPI_RefAttrValidator
 };
 
 /**
-* \ingroup Module
+* \ingroup Validators
 * A Validator which validates tha selected object is a Sketch
 */
 class PartSet_SketchValidator : public ModelAPI_ResultValidator

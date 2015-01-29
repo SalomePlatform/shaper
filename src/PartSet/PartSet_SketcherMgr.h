@@ -31,7 +31,7 @@ class ModuleBase_Operation;
 class QMouseEvent;
 
 /**
-* \ingroup Module
+* \ingroup Modules
 * A class for management of sketch operations
 */
 class PARTSET_EXPORT PartSet_SketcherMgr : public QObject

@@ -16,7 +16,7 @@
 
 
 /**
-* \ingroup Module
+* \ingroup Modules
 * Customosation of ModuleBase_WidgetShapeSelector in order to provide 
 * working with sketch specific objects.
 */
@@ -54,7 +54,7 @@ private:
 };
 
 /**
-* \ingroup Module
+* \ingroup Modules
 * Customosation of ModuleBase_WidgetShapeSelector in order to provide 
 * working with constraints.
 */

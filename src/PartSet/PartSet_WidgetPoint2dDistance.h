@@ -18,7 +18,7 @@ class ModuleBase_IViewWindow;
 class QMouseEvent;
 
 /**
-* \ingroup Module
+* \ingroup Modules
 * Implementation of model widget for widget which provides input of a distance between two points
 * In XML file can be defined as following:
 * \code

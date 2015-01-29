@@ -25,7 +25,7 @@ class XGUI_OperationMgr;
 class XGUI_Workshop;
 
 /**
-* \ingroup Module
+* \ingroup Modules
 * A model widget implementation for a label which provides specific behaviour 
 * for sketcher starting and launching operations
 */

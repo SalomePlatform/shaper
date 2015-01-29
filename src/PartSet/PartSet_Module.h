@@ -27,7 +27,7 @@ class ModuleBase_Operation;
 class ModuleBase_IViewWindow;
 
 /**
-* \ingroup Module
+* \ingroup Modules
 * Implementation of Partset module
 */
 class PARTSET_EXPORT PartSet_Module : public ModuleBase_IModule

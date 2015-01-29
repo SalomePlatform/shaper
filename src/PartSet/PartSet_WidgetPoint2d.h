@@ -27,7 +27,7 @@ class QGroupBox;
 class QMouseEvent;
 
 /**\class PartSet_WidgetPoint2D
- * \ingroup Module
+ * \ingroup Modules
  * \brief Implementation of model widget to provide widget to input point 2d
  * In XML can be defined as folloung:
  * \code

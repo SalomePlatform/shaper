@@ -34,7 +34,7 @@ class GeomAPI_Vertex;
 
 /*!
  * \class PartSet_Tools
- * \ingroup Module
+ * \ingroup Modules
  * \brief The operation for the sketch feature creation
  */
 class PARTSET_EXPORT PartSet_Tools

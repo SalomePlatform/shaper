@@ -12,7 +12,7 @@
 
 /**
 * \class PartSet_GlobalFilter
-* \ingroup Module
+* \ingroup Modules
 * A class which filters groups object in addition to documents (see issue #310)
 */
 DEFINE_STANDARD_HANDLE(PartSet_GlobalFilter, ModuleBase_ShapeDocumentFilter);
