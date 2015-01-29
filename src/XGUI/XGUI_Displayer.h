@@ -206,6 +206,11 @@ class XGUI_EXPORT XGUI_Displayer
    */
   void redisplay(ObjectPtr theObject, bool isUpdateViewer = true);
 
+  /// Activates the interactive object in the local context.
+  /// \param theIO an interactive object
+  /// \param theModes - modes on which it has to be activated (can be empty)
+  void activate(const Handle(AIS_InteractiveObject)& theIO, const QIntList& theModes) const;
+
   /// Opens local context. Does nothing if it is already opened.
   void openLocalContext();
 
