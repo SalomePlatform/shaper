@@ -52,7 +52,7 @@
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Iterator.hxx>
 using namespace std;
-//#define DEB_NAMING 1
+#define DEB_NAMING 1
 #ifdef DEB_NAMING
 #include <BRepTools.hxx>
 #endif
@@ -384,7 +384,7 @@ void Model_AttributeSelection::selectBody(
       return;
     }
   }
-  aSel.Select(aNewShape, aContext);
+  aSel.Select(aNewShape, aContext); 
 }
 
 /// registers the name of the shape in the label (theID == 0) of sub label (theID is a tag)
@@ -601,14 +601,15 @@ std::string Model_AttributeSelection::namingName()
 {
   std::shared_ptr<GeomAPI_Shape> aSubSh = value();
   ResultPtr aCont = context();
-  std::string aName;
+  std::string aName("Undefined name");
   if(!aSubSh.get() || aSubSh->isNull() || !aCont.get() || aCont->shape()->isNull()) 
     return aName;
   TopoDS_Shape aSubShape = aSubSh->impl<TopoDS_Shape>();
+  TopoDS_Shape aContext  = aCont->shape()->impl<TopoDS_Shape>();
 #ifdef DEB_NAMING
   BRepTools::Write(aSubShape, "Selection.brep");
+  BRepTools::Write(aContext, "Context.brep");
 #endif
-  TopoDS_Shape aContext  = aCont->shape()->impl<TopoDS_Shape>();
   std::shared_ptr<Model_Document> aDoc = 
     std::dynamic_pointer_cast<Model_Document>(aCont->document());
 
@@ -616,6 +617,7 @@ std::string Model_AttributeSelection::namingName()
   aName = GetShapeName(aDoc, aSubShape, selectionLabel());
   if(aName.empty() ) { // not in the document!
     TopAbs_ShapeEnum aType = aSubShape.ShapeType();
+	aName = "Undefined name";
 	switch (aType) {
 	  case TopAbs_FACE:
       // the Face should be in DF. If it is not the case, it is an error ==> to be debugged		
@@ -623,21 +625,26 @@ std::string Model_AttributeSelection::namingName()
 	  case TopAbs_EDGE:
 		  {
 		  // name structure: F1 | F2 [| F3 | F4], where F1 & F2 the faces which gives the Edge in trivial case
-		  // if it is not atrivial case we use localization by neighbours. F3 & F4 - neighbour faces
-		  TopTools_IndexedMapOfShape aSMap; // map for ancestors of the sub-shape
+		  // if it is not atrivial case we use localization by neighbours. F3 & F4 - neighbour faces		 
 		  TopTools_IndexedDataMapOfShapeListOfShape aMap;
 		  TopExp::MapShapesAndAncestors(aContext, TopAbs_EDGE, TopAbs_FACE, aMap);
+		  TopTools_IndexedMapOfShape aSMap; // map for ancestors of the sub-shape
 		  bool isTrivialCase(true);
-		  for (int i = 1; i <= aMap.Extent(); i++) {
+/*		  for (int i = 1; i <= aMap.Extent(); i++) {
 			const TopoDS_Shape& aKey = aMap.FindKey(i);
-			if (aKey.IsNotEqual(aSubShape)) continue; // find exactly the selected key
-
+			//if (aKey.IsNotEqual(aSubShape)) continue; // find exactly the selected key
+			if (aKey.IsSame(aSubShape)) continue;
             const TopTools_ListOfShape& anAncestors = aMap.FindFromIndex(i);
 			// check that it is not a trivial case (F1 & F2: aNumber = 1)
 			isTrivialCase = isTrivial(anAncestors, aSMap);			
 			break;
-		  }
-
+		  }*/
+		  if(aMap.Contains(aSubShape)) {
+			const TopTools_ListOfShape& anAncestors = aMap.FindFromKey(aSubShape);
+			// check that it is not a trivial case (F1 & F2: aNumber = 1)
+			isTrivialCase = isTrivial(anAncestors, aSMap);		
+		  } else 
+			  break;
 		  TopTools_ListOfShape aListOfNbs;
 		  if(!isTrivialCase) { // find Neighbors
 			TNaming_Localizer aLocalizer;
