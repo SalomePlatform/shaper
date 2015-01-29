@@ -131,20 +131,6 @@ bool ModuleBase_Operation::hasObject(ObjectPtr theObj) const
       if (theObj == (*aIt))
         return true;
     }
-    CompositeFeaturePtr aCompFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
-    if (aCompFeature.get() != NULL) {
-      for (int i = 0; i < aCompFeature->numberOfSubs(); i++) {
-        FeaturePtr aSubFeature = aCompFeature->subFeature(i);
-        std::list<ResultPtr> aResults = aSubFeature->results();
-        std::list<ResultPtr>::const_iterator aIt;
-        for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-          if (theObj == (*aIt))
-            return true;
-        }
-        if (aSubFeature == theObj)
-          return true;
-      }
-    }
   }
   return false;
 }
