@@ -44,6 +44,9 @@
 #include <cfloat>
 #include <climits>
 
+const double MaxCoordinate = 1e12;
+
+
 PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent, 
                                               const Config_WidgetAPI* theData,
                                               const std::string& theParentId)
@@ -98,15 +101,17 @@ bool PartSet_WidgetPoint2D::setSelection(ModuleBase_ViewerPrs theValue)
   TopoDS_Shape aShape = theValue.shape();
   double aX, aY;
   if (getPoint2d(aView, aShape, aX, aY)) {
-    setPoint(aX, aY);
-    isDone = true;
+    isDone = setPoint(aX, aY);
   }
   return isDone;
 }
 
-void PartSet_WidgetPoint2D::setPoint(double theX, double theY)
+bool PartSet_WidgetPoint2D::setPoint(double theX, double theY)
 {
-
+  if (fabs(theX) >= MaxCoordinate)
+    return false;
+  if (fabs(theY) >= MaxCoordinate)
+    return false;
   bool isBlocked = this->blockSignals(true);
   myXSpin->blockSignals(true);
   myXSpin->setValue(theX);
@@ -118,6 +123,7 @@ void PartSet_WidgetPoint2D::setPoint(double theX, double theY)
   this->blockSignals(isBlocked);
 
   emit valuesChanged();
+  return true;
 }
 
 bool PartSet_WidgetPoint2D::storeValue() const
@@ -257,7 +263,8 @@ void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMous
   double aX, anY;
   Handle(V3d_View) aView = theWnd->v3dView();
   PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, anY);
-  //setPoint(aX, anY);
+  if (!setPoint(aX, anY))
+    return;
 
   std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(feature()->data()->attribute(attributeID()));

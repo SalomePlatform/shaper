@@ -87,7 +87,8 @@ Q_OBJECT
   /// Fill the widget values by given point
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
-  void setPoint(double theX, double theY);
+  /// \returns True in case of success
+  bool setPoint(double theX, double theY);
 
   /// Returns coordinate X currently defined in the control
   double x() const;
