@@ -41,6 +41,7 @@
 
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse selection sensitivity
 
+//#ifdef DEBUG_DISPLAY
 
 // Workaround for bug #25637
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
@@ -85,6 +86,14 @@ void XGUI_Displayer::display(ObjectPtr theObject, bool isUpdateViewer)
   if (isVisible(theObject)) {
     redisplay(theObject, isUpdateViewer);
   } else {
+#ifdef DEBUG_DISPLAY
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    if (aFeature.get() != NULL) {
+      qDebug(QString("display feature: %1, displayed: %2").
+        arg(aFeature->data()->name().c_str()).
+        arg(displayedObjects().size()).toStdString().c_str());
+    }
+#endif
     AISObjectPtr anAIS;
 
     GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);

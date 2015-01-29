@@ -87,6 +87,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// It is called as on clearing of property panel as on filling with new widgets
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation) {}
 
+  /// Returns whether the object can be displayed at the bounds of the active operation.
+  /// Display only current operation results
+  /// \param theObject a model object
+  virtual bool canDisplayObject(const ObjectPtr& theObject) const;
+
 public slots:
   /// Called on call of command corresponded to a feature
   void onFeatureTriggered();

@@ -71,6 +71,12 @@ public:
   /// \param theOperation a stopped operation
   virtual void operationStopped(ModuleBase_Operation* theOperation);
 
+  /// Returns whether the object can be displayed at the bounds of the active operation.
+  /// Display only current operation results for usual operation and ask the sketcher manager
+  /// if it is a sketch operation
+  /// \param theObject a model object
+  virtual bool canDisplayObject(const ObjectPtr& theObject) const;
+
 public slots:
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Set a specific flag to restart the sketcher operation

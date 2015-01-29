@@ -480,6 +480,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
   std::set<ObjectPtr>::const_iterator aIt;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
     ObjectPtr aObj = (*aIt);
+
     bool aHide = !aObj->data() || !aObj->data()->isValid();
     if (!aHide) { // check that this is not hidden result
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
@@ -499,8 +500,7 @@ void XGUI_Workshop::onFeatureRedisplayMsg(const std::shared_ptr<ModelAPI_ObjectU
       } else {
         if (myOperationMgr->hasOperation()) {
           ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-          // Display only current operation results if operation has preview
-          if (aOperation->hasObject(aObj)/* && aOperation->hasPreview()*/) {
+          if (myModule->canDisplayObject(aObj)) {
             displayObject(aObj);
             // Deactivate object of current operation from selection
             if (myDisplayer->isActive(aObj))
@@ -522,17 +522,15 @@ void XGUI_Workshop::onFeatureCreatedMsg(const std::shared_ptr<ModelAPI_ObjectUpd
   bool aHasPart = false;
   bool isDisplayed = false;
   for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
+
     ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aIt);
     if (aPart) {
       aHasPart = true;
       // If a feature is created from the aplication's python console  
       // it doesn't stored in the operation mgr and doesn't displayed
-    } else if (myOperationMgr->hasOperation()) {
-      ModuleBase_Operation* aOperation = myOperationMgr->currentOperation();
-      if (aOperation->hasObject(*aIt)) {  // Display only current operation results
-        displayObject(*aIt);
-        isDisplayed = true;
-      }
+    } else if (myModule->canDisplayObject(*aIt)) {
+      displayObject(*aIt);
+      isDisplayed = true;
     }
   }
   if (myObjectBrowser)

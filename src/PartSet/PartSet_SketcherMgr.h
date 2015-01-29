@@ -32,6 +32,9 @@ class QMouseEvent;
 
 /**
 * A class for management of sketch operations
+  At the time of the sketcher operation active, only the sketch sub-feature results are
+  displayed in the viewer. After the sketch create/edit operation is finished, the sub-feature
+  are hidden, the sketch feature result is displayed
 */
 class PARTSET_EXPORT PartSet_SketcherMgr : public QObject
 {

@@ -109,6 +109,11 @@ void ModuleBase_IModule::actionCreated(QAction* theFeature)
   connect(theFeature, SIGNAL(triggered(bool)), this, SLOT(onFeatureTriggered()));
 }
 
+bool ModuleBase_IModule::canDisplayObject(const ObjectPtr& theObject) const
+{
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  return anOperation && anOperation->hasObject(theObject);
+}
 
 void ModuleBase_IModule::onFeatureTriggered()
 {

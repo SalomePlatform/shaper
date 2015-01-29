@@ -187,6 +187,26 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
   myWorkshop->viewer()->removeSelectionFilter(myDocumentShapeFilter);
 }
 
+bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
+{
+  bool aCanDisplay = false;
+  if (mySketchMgr->activeSketch()) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+
+    if (aFeature.get() != NULL) {
+      if (aFeature == mySketchMgr->activeSketch()) {
+        aCanDisplay = false;
+      }
+      else {
+        aCanDisplay = mySketchMgr->sketchOperationIdList().contains(aFeature->getKind().c_str());
+      }
+    }
+  }
+  else {
+    aCanDisplay = ModuleBase_IModule::canDisplayObject(theObject);
+  }
+  return aCanDisplay;
+}
 
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
