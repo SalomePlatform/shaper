@@ -41,7 +41,8 @@
 
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;  ///< defines the local context mouse selection sensitivity
 
-//#ifdef DEBUG_DISPLAY
+//#define DEBUG_DISPLAY
+//#define DEBUG_ACTIVATE
 
 // Workaround for bug #25637
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
@@ -168,7 +169,9 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
       activateObjects(myActiveSelectionModes);
       myWorkshop->selector()->setSelectedOwners(aSelectedOwners, false);
     }
-  }
+    else
+      activateObjects(myActiveSelectionModes);
+ }
   if (isUpdateViewer)
     updateViewer();
 }
@@ -254,13 +257,30 @@ void XGUI_Displayer::deactivate(ObjectPtr theObject)
   }
 }
 
-void XGUI_Displayer::activate(ObjectPtr theFeature)
+/*void XGUI_Displayer::activate(ObjectPtr theFeature)
 {
   activate(theFeature, myActiveSelectionModes);
 }
 
 void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
 {
+#ifdef DEBUG_ACTIVATE
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+
+    if (aFeature.get() != NULL) {
+      QIntList aModes;
+      getModesOfActivation(theObject, aModes);
+
+
+      qDebug(QString("activate feature: %1, theModes: %2, myActiveSelectionModes: %3, getModesOf: %4").
+        arg(aFeature->data()->name().c_str()).
+        arg(theModes.size()).
+        arg(myActiveSelectionModes.size()).
+        arg(aModes.size()).toStdString().c_str());
+    }
+#endif
+
+
   if (isVisible(theObject)) {
     Handle(AIS_InteractiveContext) aContext = AISContext();
     if (aContext.IsNull())
@@ -281,7 +301,7 @@ void XGUI_Displayer::activate(ObjectPtr theObject, const QIntList& theModes)
       aContext->Activate(anAIS);
     }
   }
-}
+}*/
 
 void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theModes)
 {
@@ -307,6 +327,12 @@ void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theMode
 
 void XGUI_Displayer::activateObjects(const QIntList& theModes)
 {
+#ifdef DEBUG_ACTIVATE
+  qDebug(QString("activate all features: theModes: %2, myActiveSelectionModes: %3").
+    arg(theModes.size()).
+    arg(myActiveSelectionModes.size()).
+    toStdString().c_str());
+#endif
   // In order to avoid doblications of selection modes
   QIntList aNewModes;
   foreach (int aMode, theModes) {

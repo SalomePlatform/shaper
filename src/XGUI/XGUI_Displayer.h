@@ -139,7 +139,7 @@ class XGUI_EXPORT XGUI_Displayer
   /// Activates the given object (it can be selected)
   /// \param theObject object to activate
   /// \param theModes - modes on which it has to be activated (can be empty)
-  void activate(ObjectPtr theObject, const QIntList& theModes);
+  //void activate(ObjectPtr theObject, const QIntList& theModes);
 
   /// Returns the modes of activation
   /// \param theObject the feature or NULL if it not visualized
@@ -148,7 +148,7 @@ class XGUI_EXPORT XGUI_Displayer
 
   /// Activates the given object with default modes
   /// \param theObject object to activate
-  void activate(ObjectPtr theObject);
+  //void activate(ObjectPtr theObject);
 
   /// Returns true if the given object can be selected
   /// \param theObject object to check
