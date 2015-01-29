@@ -47,7 +47,7 @@
 /**
  * \defgroup GUI GUI of the application
  *
- * \brief Classes for griphic user interface definition
+ * \brief Classes for graphic user interface definition
  * 
  * Classes of application windows definition, operations launching, 
  * and objects presentations. It consists of two packages:
