@@ -52,7 +52,7 @@
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Iterator.hxx>
 using namespace std;
-#define DEB_NAMING 1
+//#define DEB_NAMING 1
 #ifdef DEB_NAMING
 #include <BRepTools.hxx>
 #endif
@@ -599,9 +599,17 @@ bool isTrivial (const TopTools_ListOfShape& theAncestors, TopTools_IndexedMapOfS
 }
 std::string Model_AttributeSelection::namingName()
 {
+  std::string aName("");
+  if(!this->isInitialized()) return aName;
+  Handle(TDataStd_Name) anAtt;
+  if(selectionLabel().FindAttribute(TDataStd_Name::GetID(), anAtt)) {
+	aName = TCollection_AsciiString(anAtt->Get()).ToCString();
+	return aName;
+  }
+
   std::shared_ptr<GeomAPI_Shape> aSubSh = value();
   ResultPtr aCont = context();
-  std::string aName("Undefined name");
+  aName = "Undefined name";
   if(!aSubSh.get() || aSubSh->isNull() || !aCont.get() || aCont->shape()->isNull()) 
     return aName;
   TopoDS_Shape aSubShape = aSubSh->impl<TopoDS_Shape>();
@@ -617,7 +625,6 @@ std::string Model_AttributeSelection::namingName()
   aName = GetShapeName(aDoc, aSubShape, selectionLabel());
   if(aName.empty() ) { // not in the document!
     TopAbs_ShapeEnum aType = aSubShape.ShapeType();
-	aName = "Undefined name";
 	switch (aType) {
 	  case TopAbs_FACE:
       // the Face should be in DF. If it is not the case, it is an error ==> to be debugged		

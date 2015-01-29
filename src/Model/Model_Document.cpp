@@ -325,7 +325,7 @@ void Model_Document::compactNested()
   }
 }
 
-void Model_Document::finishOperation()
+bool Model_Document::finishOperation()
 {
   bool isNestedClosed = !myDoc->HasOpenCommand() && !myNestedNum.empty();
   static std::shared_ptr<Model_Session> aSession = 
@@ -351,25 +351,39 @@ void Model_Document::finishOperation()
   //aLoop->clear(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
   // finish for all subs first: to avoid nested finishing and "isOperation" calls problems inside
+  bool aResult = false;
   const std::set<std::string> aSubs = subDocuments(true);
   std::set<std::string>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++)
-    subDoc(*aSubIter)->finishOperation();
+    if (subDoc(*aSubIter)->finishOperation())
+      aResult = true;
 
-  if (myDoc->CommitCommand()) { // if commit is successfull, just increment counters
+  // transaction may be empty if this document was created during this transaction (create part)
+  if (!myTransactions.empty() && myDoc->CommitCommand()) { // if commit is successfull, just increment counters
     (*myTransactions.rbegin())++;
+    aResult = true;
   }
 
   if (isNestedClosed) {
     compactNested();
   }
+  if (!aResult && !myTransactions.empty() /* it can be for just created part document */)
+    aResult = *(myTransactions.rbegin()) != 0;
+
+  if (!aResult && Model_Session::get()->moduleDocument().get() == this) {
+    // nothing inside in all documents, so remove this transaction from the transactions list
+    undoInternal(true, false);
+    myDoc->ClearRedos();
+    myRedos.clear();
+  }
+  return aResult;
 }
 
 void Model_Document::abortOperation()
 {
   if (!myNestedNum.empty() && !myDoc->HasOpenCommand()) {  // abort all what was done in nested
     compactNested();
-    undoInternal(false);
+    undoInternal(false, false);
     myDoc->ClearRedos();
     myRedos.clear();
   } else { // abort the current
@@ -417,7 +431,7 @@ bool Model_Document::canUndo()
   return false;
 }
 
-void Model_Document::undoInternal(const bool theWithSubs)
+void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchronize)
 {
   int aNumTransactions = *myTransactions.rbegin();
   myTransactions.pop_back();
@@ -428,19 +442,20 @@ void Model_Document::undoInternal(const bool theWithSubs)
   for(int a = 0; a < aNumTransactions; a++)
     myDoc->Undo();
 
-  if (theWithSubs) {
+  if (theSynchronize)
     synchronizeFeatures(true, true);
+  if (theWithSubs) {
     // undo for all subs
     const std::set<std::string> aSubs = subDocuments(true);
     std::set<std::string>::iterator aSubIter = aSubs.begin();
     for (; aSubIter != aSubs.end(); aSubIter++)
-      subDoc(*aSubIter)->undo();
+      subDoc(*aSubIter)->undoInternal(theWithSubs, theSynchronize);
   }
 }
 
 void Model_Document::undo()
 {
-  undoInternal(true);
+  undoInternal(true, true);
 }
 
 bool Model_Document::canRedo()
