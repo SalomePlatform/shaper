@@ -16,6 +16,7 @@
 class QTextEdit;
 
 /**
+* \ingroup GUI
 * A class of dialog to show error message
 */
 class XGUI_ErrorDialog : public QDialog

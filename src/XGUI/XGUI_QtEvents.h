@@ -19,11 +19,13 @@
 #include <QString>
 
 /**
+* \ingroup GUI
 * Class of event to send application events in multi thread environment
 */
 class XGUI_EXPORT PostponeMessageQtEvent : public QEvent
 {
  public:
+   /// An event type
   static QEvent::Type PostponeMessageQtEventType;
 
   /// Constructor

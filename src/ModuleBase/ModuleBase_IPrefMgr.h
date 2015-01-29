@@ -12,6 +12,7 @@
 #include <SUIT_PreferenceMgr.h>
 
 /** 
+* \ingroup GUI
 * An interface class which provides incapsulation of SUIT_PreferenceMgr class instance 
 * It is used in order to make common interface to Preference manager in Salome 
 * and this application

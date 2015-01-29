@@ -25,45 +25,86 @@ class XGUI_EXPORT XGUI_DocumentDataModel : public QAbstractItemModel, public Eve
 {
 Q_OBJECT
  public:
-
+   /// Constructor
+   /// \param theParent a parent object
   XGUI_DocumentDataModel(QObject* theParent);
   virtual ~XGUI_DocumentDataModel();
 
-  // Event Listener method
+  /// Event Listener method
+  /// \param theMessage an event message
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
+  /// Returns the data stored under the given role for the item referred to by the index.
+  /// \param theIndex a model index
+  /// \param theRole a data role (see Qt::ItemDataRole)
   virtual QVariant data(const QModelIndex& theIndex, int theRole) const;
+
+  /// Returns the data for the given role and section in the header with the specified orientation.
+  /// \param theSection a section
+  /// \param theOrient an orientation
+  /// \param theRole a data role (see Qt::ItemDataRole)
   virtual QVariant headerData(int theSection, Qt::Orientation theOrient, int theRole =
                                   Qt::DisplayRole) const;
 
+  /// Returns the number of rows under the given parent. When the parent is valid it means that 
+  /// rowCount is returning the number of children of parent.
+  /// \param theParent a parent model index
   virtual int rowCount(const QModelIndex& theParent = QModelIndex()) const;
+
+  /// Returns the number of columns for the children of the given parent.
+  /// It has a one column
+  /// \param theParent a parent model index
   virtual int columnCount(const QModelIndex& theParent = QModelIndex()) const;
 
-  virtual QModelIndex index(int theRow, int theColumn, const QModelIndex &parent =
+  /// Returns the index of the item in the model specified by the given row, column and parent index.
+  /// \param theRow a row
+  /// \param theColumn a column
+  /// \param theParent a parent model index
+  virtual QModelIndex index(int theRow, int theColumn, const QModelIndex &theParent =
                                 QModelIndex()) const;
 
+  /// Returns the parent of the model item with the given index. 
+  /// If the item has no parent, an invalid QModelIndex is returned.
+  /// \param theIndex a model index
   virtual QModelIndex parent(const QModelIndex& theIndex) const;
 
+  /// Returns true if parent has any children; otherwise returns false.
+  /// \param theParent a parent model index
   virtual bool hasChildren(const QModelIndex& theParent = QModelIndex()) const;
 
+  /// Inserts count rows into the model before the given row. 
+  /// Items in the new row will be children of the item represented by the parent model index.
+  /// \param theRow a start row
+  /// \param theCount a nember of rows to insert
+  /// \param theParent a parent model index
   bool insertRows(int theRow, int theCount, const QModelIndex& theParent = QModelIndex());
 
+  /// Removes count rows starting with the given row under parent parent from the model.
+  /// \param theRow a start row
+  /// \param theCount a nember of rows to remove
+  /// \param theParent a parent model index
   bool removeRows(int theRow, int theCount, const QModelIndex& theParent = QModelIndex());
 
+  /// Returns the item flags for the given index.
+  /// \param theIndex a model index
   Qt::ItemFlags flags(const QModelIndex& theIndex) const;
 
   //! Returns an object by the given Model index.
   //! Returns 0 if the given index is not index of an object
   ObjectPtr object(const QModelIndex& theIndex) const;
 
+  //! Returns index of the object
+  //! \param theObject object to find
   QModelIndex objectIndex(const ObjectPtr theObject) const;
 
   //! Returns QModelIndex which corresponds to the given part
   //! If the object is not found then index is not valid
+  //! \param thePart a part for analysis
   QModelIndex partIndex(const ResultPartPtr& thePart) const;
 
   //! Activates a part data model if the index is a Part node index. 
   //! Returns true if active part changed.
+  //! \param theIndex a model index
   bool activatedIndex(const QModelIndex& theIndex);
 
   //! Retrurns active part
@@ -78,6 +119,7 @@ Q_OBJECT
   //! Deactivates a Part
   void deactivatePart();
 
+  //! Rebuild data tree
   void rebuildDataTree();
 
   //! Clear internal data

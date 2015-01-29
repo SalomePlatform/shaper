@@ -13,6 +13,7 @@
 
 
 /**
+* \ingroup GUI
 * An extension and customozation of QDoubleSpinBox class
 */
 class MODULEBASE_EXPORT ModuleBase_DoubleSpinBox : public QDoubleSpinBox

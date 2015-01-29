@@ -10,6 +10,7 @@ class XGUI_Workshop;
 class AppElements_ViewWindow;
 
 /**
+ * \ingroup GUI
  * Proxy class which repersents or AppElements_Viewer or Salome Viewer
  * dependently on current launching environment.
  * It is reccomennded to use this class in operation for accessing to viewer 
@@ -19,6 +20,8 @@ class XGUI_EXPORT XGUI_ViewerProxy : public ModuleBase_IViewer
 {
 Q_OBJECT
  public:
+   /// Constructor
+   /// \param theParent a parent object
   XGUI_ViewerProxy(XGUI_Workshop* theParent);
 
   //! Returns AIS_InteractiveContext from current OCCViewer

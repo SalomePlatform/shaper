@@ -33,7 +33,8 @@ class GeomAPI_Edge;
 class GeomAPI_Vertex;
 
 /*!
- \class PartSet_Tools
+ * \class PartSet_Tools
+ * \ingroup Modules
  * \brief The operation for the sketch feature creation
  */
 class PARTSET_EXPORT PartSet_Tools
@@ -42,12 +43,12 @@ class PARTSET_EXPORT PartSet_Tools
   /// Converts the 2D screen point to the 3D point on the view according to the point of view
   /// \param thePoint a screen point
   /// \param theView a 3D view
-  // Transferred to ModuleBase
   static gp_Pnt convertClickToPoint(QPoint thePoint, Handle_V3d_View theView);
 
   /// \brief Converts the 3D point to the projected coodinates on the sketch plane.
   /// \param thePoint the 3D point in the viewer
   /// \param theSketch the sketch feature
+  /// \param theView a view 3d object
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
   static void convertTo2D(const gp_Pnt& thePoint, FeaturePtr theSketch,
@@ -58,7 +59,6 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theX the X coordinate
   /// \param theY the Y coordinate
   /// \param theSketch the sketch feature
-  /// \param thePoint the 3D point in the viewer
   static std::shared_ptr<GeomAPI_Pnt> convertTo3D(const double theX, const double theY, FeaturePtr theSketch);
 
   /// Returns an object that is under the mouse point. Firstly it checks the highlighting,
@@ -77,7 +77,12 @@ class PARTSET_EXPORT PartSet_Tools
   /// Returns pointer to the root document.
   static std::shared_ptr<ModelAPI_Document> document();
 
-
+  /// Find an attribute which corresponds to a given pont coordinates
+  /// \param theSketch the sketch feature
+  /// \param theX X coordinate
+  /// \param theY Y coordinate
+  /// \param theTolerance tolerance
+  /// \param theIgnore list of features which has to be ignored
   static std::shared_ptr<GeomDataAPI_Point2D> findAttributePoint(CompositeFeaturePtr theSketch, 
     double theX, double theY, double theTolerance, const QList<FeaturePtr>& theIgnore = QList<FeaturePtr>());
 
@@ -90,7 +95,7 @@ class PARTSET_EXPORT PartSet_Tools
 
   /// \brief Save the double to the feature. If the attribute is double, it is filled.
   /// \param theFeature the feature
-  /// \param theValue the horizontal coordinate
+  /// \param theX the horizontal coordinate
   /// \param theAttribute the feature attribute
   static void setFeatureValue(FeaturePtr theFeature, double theX, const std::string& theAttribute);
 
@@ -111,8 +116,9 @@ class PARTSET_EXPORT PartSet_Tools
                             const std::string& theKind);
 
   /// Creates a constraint on two points
+  /// \param theSketch a sketch feature
   /// \param thePoint1 the first point
-  /// \param thePoint1 the second point
+  /// \param thePoint2 the second point
   static void createConstraint(CompositeFeaturePtr theSketch,
                                std::shared_ptr<GeomDataAPI_Point2D> thePoint1,
                                std::shared_ptr<GeomDataAPI_Point2D> thePoint2);
@@ -145,8 +151,10 @@ class PARTSET_EXPORT PartSet_Tools
 
   /// Creates a line (arc or circle) by given edge
   /// Created line will have fixed constraint
-  /// \param theEdge - an edge
-  /// \return - result of created feature
+  /// \param theShape an edge
+  /// \param theObject a selected result object
+  /// \param theSketch a sketch feature
+  /// \return result of created feature
   static ResultPtr createFixedObjectByEdge(const TopoDS_Shape& theShape, 
                                            const ObjectPtr& theObject, 
                                            CompositeFeaturePtr theSketch);

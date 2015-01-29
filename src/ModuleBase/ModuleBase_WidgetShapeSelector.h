@@ -26,6 +26,7 @@ class QToolButton;
 class ModuleBase_IWorkshop;
 
 /**
+* \ingroup GUI
 * Implementation of widget for shapes selection.
 * This type of widget can be defined in XML file with 'shape_selector' keyword.
 * For example:

@@ -20,6 +20,7 @@ class Config_WidgetAPI;
 class QKeyEvent;
 
 /**\class ModuleBase_ModelWidget
+ * \ingroup GUI
  * \brief An abstract custom widget class. This class realization is assumed to create some controls.
  * The controls values modification should send signal about values change.
  *

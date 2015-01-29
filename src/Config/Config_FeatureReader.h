@@ -22,11 +22,13 @@ class Config_FeatureMessage;
 
 /*!
  * \class Config_FeatureReader
+ * \ingroup Config
  * \brief Class to process feature's xml definition.
  */
 class Config_FeatureReader : public Config_XMLReader
 {
  public:
+  /// Constructor
   Config_FeatureReader(const std::string& theXmlFile,
                        const std::string& theLibraryName,
                        const char* theEventGenerated = 0);

@@ -18,6 +18,7 @@
 class ModuleBase_ModelWidget;
 
 /**
+* \ingroup GUI
 * A class for Property panel object definition
 */
 class MODULEBASE_EXPORT ModuleBase_IPropertyPanel : public QDockWidget

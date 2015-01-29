@@ -16,6 +16,7 @@
 class ModuleBase_IWorkshop;
 
 /**
+* \ingroup GUI
 * \class ModuleBase_FilterNoConsructionSubShapes
 * A filter which provides filtering of selection in 3d viewer.
 * Installing of this filter lets to select objects which belong to 

@@ -29,7 +29,8 @@ class ModuleBase_IViewer;
 class QKeyEvent;
 
 /*!
- \class ModuleBase_Operation
+ * \class ModuleBase_Operation
+ * \ingroup GUI
  * \brief Base class for all operations
  *
  *  Base class for all operations. If you perform an action it is reasonable to create

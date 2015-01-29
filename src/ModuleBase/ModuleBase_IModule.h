@@ -23,6 +23,7 @@ class ModuleBase_Operation;
 class ModuleBase_IWorkshop;
 
 /**
+ * \ingroup GUI
  * Interface to a module
  */
 class MODULEBASE_EXPORT ModuleBase_IModule : public QObject

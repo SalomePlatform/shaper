@@ -17,6 +17,7 @@
 DEFINE_STANDARD_HANDLE(ModuleBase_ResultPrs, AIS_Shape)
 
 /**
+* \ingroup GUI
 * A redefinition of standard AIS Interactive Object in order to provide specific behaviour 
 * for wire presentations based in a one plane
 */

@@ -21,6 +21,7 @@ class QWidget;
 class QLineEdit;
 
 /**
+* \ingroup GUI
 *  Implementation of model widget for open file widget.
 *  It can be defined as following:
 *  \code

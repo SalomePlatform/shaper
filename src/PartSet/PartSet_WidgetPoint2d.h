@@ -27,17 +27,21 @@ class QGroupBox;
 class QMouseEvent;
 
 /**\class PartSet_WidgetPoint2D
- * \ingroup GUI
- * \brief Custom widget. An abstract class to be redefined to fill with some GUI controls
+ * \ingroup Modules
+ * \brief Implementation of model widget to provide widget to input point 2d
+ * In XML can be defined as folloung:
+ * \code
+ * <sketch-2dpoint_selector id="CircleCenter" title="Center" tooltip="Center coordinates"/>
+ * \endcode
  */
 class PARTSET_EXPORT PartSet_WidgetPoint2D : public ModuleBase_ModelWidget
 {
 Q_OBJECT
  public:
   /// Constructor
-  /// \theParent the parent object
-  /// \theParent the parent object
-  /// \theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParent the parent object
+  /// \param theData the widget configuation. The attribute of the model widget is obtained from
+  /// \param theParentId is Id of a parent of the current attribute
   PartSet_WidgetPoint2D(QWidget* theParent, const Config_WidgetAPI* theData, 
                         const std::string& theParentId);
   /// Destructor
@@ -48,8 +52,6 @@ Q_OBJECT
   /// \param theValue the wrapped widget value
   virtual bool setSelection(ModuleBase_ViewerPrs theValue);
 
-  /// Saves the internal parameters to the given feature
-  /// \param theObject a model feature to be changed
   virtual bool storeValue() const;
 
   virtual bool restoreValue();
@@ -70,16 +72,21 @@ Q_OBJECT
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
+  /// Return workshop
   XGUI_Workshop* workshop() const { return myWorkshop; }
 
+  /// Set workshop
   void setWorkshop(XGUI_Workshop* theWork) { myWorkshop = theWork; }
 
   /// \returns the sketch instance
   CompositeFeaturePtr sketch() const { return mySketch; }
+
+  /// Set sketch instance
   void setSketch(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
 
   /// Fill the widget values by given point
-  /// \param thePoint the point
+  /// \param theX the X coordinate
+  /// \param theY the Y coordinate
   void setPoint(double theX, double theY);
 
   /// Returns coordinate X currently defined in the control
@@ -90,18 +97,29 @@ Q_OBJECT
 
 signals:
   /// Signal about selection of an existing vertex from an object
-  /// \param theObject - the selected object
-  /// \param theShape - the selected shape
   void vertexSelected();
 
 protected slots:
+  /// Process mouse release event
+  /// \param theWnd a view window
+  /// \param theEvent a mouse event
   void onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+
+  /// Process mouse move event
+  /// \param theWnd a view window
+  /// \param theEvent a mouse event
   void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
 private slots:
+  /// Process value changed event
   void onValuesChanged();
 
  private:
+   /// Returns point 2d from selected vertex
+   /// \param theView a view window
+   /// \param theShape a vertex shape
+   /// \param theX an output value of X coordinate
+   /// \param theY an output value of Y coordinate
    bool getPoint2d(const Handle(V3d_View)& theView, const TopoDS_Shape& theShape, 
                    double& theX, double& theY) const;
 

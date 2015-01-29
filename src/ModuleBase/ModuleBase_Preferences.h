@@ -23,6 +23,7 @@ typedef QPair<QString, QString> ModuleBase_Pref;
 typedef QList<ModuleBase_Pref> ModuleBase_Prefs;
 
 //***********************************************************************
+/// \ingroup GUI
 /// Class for manipulation  with preferences in the application
 class MODULEBASE_EXPORT ModuleBase_Preferences
 {
@@ -70,6 +71,7 @@ private:
 };
 
 //***********************************************************************
+/// \ingroup GUI
 /// Manager of preferences
 class MODULEBASE_EXPORT ModuleBase_PreferencesMgr : public SUIT_PreferenceMgr
 {
@@ -102,6 +104,7 @@ Q_OBJECT
 };
 
 //***********************************************************************
+/// \ingroup GUI
 /// Dialog box for preferences editing
 class MODULEBASE_EXPORT ModuleBase_PreferencesDlg : public QDialog
 {

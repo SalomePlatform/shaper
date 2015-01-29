@@ -27,8 +27,10 @@ MODULEBASE_EXPORT void zeroMargins(QLayout* theLayout);
 
 
 /**
+ * \ingroup GUI
  * Methods to modify a resource pixmap
  */
+
 //! Create composite pixmap. 
 //! Pixmap \a theAdditionalIcon is drawn over pixmap \a dest with coordinates
 //! specified relatively to the upper left corner of \a theIcon.

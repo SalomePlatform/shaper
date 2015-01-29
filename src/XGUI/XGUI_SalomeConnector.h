@@ -12,6 +12,7 @@ class QMainWindow;
 class ModuleBase_IViewer;
 
 /**
+ * \ingroup GUI
  * An interface which provides a connection of XGUI functionality 
  * with functionality of SALOME module interface.
  */
@@ -85,6 +86,7 @@ class XGUI_EXPORT XGUI_SalomeConnector
   //! Returns interface to Salome viewer
   virtual ModuleBase_IViewer* viewer() const = 0;
 
+  //! Create preferences
   virtual void createPreferences() = 0;
 };
 

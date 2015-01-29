@@ -33,6 +33,7 @@ class QAction;
 
 
 /**
+* \ingroup GUI
 * Implementation of widget for shapes selection. This widget provides selection of several shapes.
 * It can be defined in XML file as following:
 * \code

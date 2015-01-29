@@ -20,6 +20,7 @@
  * The geometrical algorithms implementation (basing on OCCT libraries) are located in <b>GeomAlgoAPI</b>.
  *
  */
+ 
 
 /**
  * \defgroup Plugins Plugins
@@ -31,6 +32,15 @@
  * There are many plugins that should be extended with the development of the application. The names
  * of plugin-packages are ended with "Plugin" string:
  * <b>PartSetPlugin</b>, <b>ConstructionPlugin</b>, <b>SketchPlugin</b>, <b>FeaturesPlugins</b>, etc.
+ *
+ */
+ 
+ /**
+ * \defgroup Config Config 
+ *
+ * \brief XML processing tools used in the application
+ * 
+ * The tools for reading definitions of plugins, features and widgets.  
  *
  */
 
