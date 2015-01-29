@@ -60,7 +60,7 @@ void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
   }
 }
 
-void PartSet_WidgetPoint2dDistance::activate()
+void PartSet_WidgetPoint2dDistance::activateCustom()
 {
   XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
   connect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)), 

@@ -58,9 +58,6 @@ Q_OBJECT
 
   QWidget* getControl() const;
 
-  /// The methiod called when widget is activated
-  virtual void activate();
-
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
@@ -77,6 +74,10 @@ Q_OBJECT
 signals:
   /// Signal on plane selection
   void planeSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
+
+protected:
+  /// The methiod called when widget is activated
+  virtual void activateCustom();
 
  private slots:
    /// Slot on plane selection

@@ -84,7 +84,7 @@ Q_OBJECT
   virtual bool focusTo();
 
   /// The methiod called when widget is activated
-  virtual void activate() {}
+  void activate();
 
   /// The methiod called when widget is deactivated
   virtual void deactivate() {}
@@ -161,6 +161,9 @@ signals:
   {
     myAttributeID = theAttribute;
   }
+
+  /// The methiod called when widget is activated
+  virtual void activateCustom() {};
 
   /// Sends Update and Redisplay for the given object
   /// \param theObj is updating object

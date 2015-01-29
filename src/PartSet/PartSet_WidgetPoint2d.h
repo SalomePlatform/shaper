@@ -66,9 +66,6 @@ Q_OBJECT
 
   //bool initFromPrevious(ObjectPtr theObject);
 
-  /// The methiod called when widget is activated
-  virtual void activate();
-
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
@@ -110,6 +107,10 @@ protected slots:
   /// \param theWnd a view window
   /// \param theEvent a mouse event
   void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+
+protected:
+  /// The methiod called when widget is activated
+  virtual void activateCustom();
 
 private slots:
   /// Process value changed event

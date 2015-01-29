@@ -131,7 +131,7 @@ std::shared_ptr<GeomAPI_Pln> PartSet_WidgetSketchLabel::plane() const
 
 }
 
-void PartSet_WidgetSketchLabel::activate()
+void PartSet_WidgetSketchLabel::activateCustom()
 {
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
   if (aPlane) {

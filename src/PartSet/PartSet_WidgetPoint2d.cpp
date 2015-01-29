@@ -188,7 +188,7 @@ QList<QWidget*> PartSet_WidgetPoint2D::getControls() const
 }
 
 
-void PartSet_WidgetPoint2D::activate()
+void PartSet_WidgetPoint2D::activateCustom()
 {
   XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
   connect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)), 
@@ -199,12 +199,6 @@ void PartSet_WidgetPoint2D::activate()
   QIntList aModes;
   aModes << TopAbs_VERTEX;
   myWorkshop->moduleConnector()->activateSubShapesSelection(aModes);
-  if (!isEditingMode()) {
-    // the control value is stored to the mode by the focus in on the widget
-    // we need the value is initialized in order to enable the apply button in the property panel
-    // it should happens only in the creation mode because during edition all fields are filled
-    storeValue();
-  }
 }
 
 void PartSet_WidgetPoint2D::deactivate()

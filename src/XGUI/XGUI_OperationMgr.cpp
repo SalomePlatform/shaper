@@ -13,7 +13,7 @@
 #include <QKeyEvent>
 
 XGUI_OperationMgr::XGUI_OperationMgr(QObject* theParent)
-    : QObject(theParent), myIsValidationLock(false)
+    : QObject(theParent), myIsValidationLock(false), myIsApplyEnabled(false)
 {
 }
 

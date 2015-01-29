@@ -47,9 +47,6 @@ Q_OBJECT
 
   virtual ~PartSet_WidgetPoint2dDistance();
 
-  /// The methiod called when widget is activated
-  virtual void activate();
-
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
@@ -78,6 +75,9 @@ Q_OBJECT
   void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
 protected:
+  /// The methiod called when widget is activated
+  virtual void activateCustom();
+
   /// Set the second point which defines a value in the widget as a distance with a first point defined by feature
   void setPoint(FeaturePtr theFeature, const std::shared_ptr<GeomAPI_Pnt2d>& thePnt);
 
