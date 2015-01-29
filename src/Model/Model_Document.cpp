@@ -242,6 +242,9 @@ void Model_Document::close(const bool theForever)
   std::shared_ptr<ModelAPI_Session> aPM = Model_Session::get();
   if (this != aPM->moduleDocument().get() && this == aPM->activeDocument().get()) {
     aPM->setActiveDocument(aPM->moduleDocument());
+  } else if (this == aPM->moduleDocument().get()) {
+    // erase the active document if root is closed
+    aPM->setActiveDocument(DocumentPtr());
   }
   // close all subs
   const std::set<std::string> aSubs = subDocuments(true);

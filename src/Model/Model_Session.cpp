@@ -187,10 +187,10 @@ void Model_Session::setActiveDocument(
 {
   if (myCurrentDoc != theDoc) {
     myCurrentDoc = theDoc;
-    if (theSendSignal) {
+    if (theDoc.get() && theSendSignal) {
       // syncronize the document: it may be just opened or opened but removed before
       std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(theDoc);
-      if (aDoc) {
+      if (aDoc.get()) {
         bool aWasChecked = myCheckTransactions;
         setCheckTransactions(false);
         aDoc->synchronizeFeatures(false, true);
