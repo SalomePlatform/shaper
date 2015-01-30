@@ -210,6 +210,7 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
     aCanDisplay = ModuleBase_IModule::canDisplayObject(theObject);
   }
   return aCanDisplay;
+}
 
 void PartSet_Module::addViewerItems(QMenu* theMenu) const
 {
