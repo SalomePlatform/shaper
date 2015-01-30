@@ -480,7 +480,7 @@ void PartSet_Module::deleteObjects()
   XGUI_Workshop* aWorkshop = aConnector->workshop();
 
   XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
-  if (!isSketchOp && anOpMgr->canAbortOperation()) {
+  if (!isSketchOp && anOpMgr->canStopOperation()) {
     ModuleBase_Operation* aCurrentOp = anOpMgr->currentOperation();
     if (aCurrentOp) {
       aCurrentOp->abort();

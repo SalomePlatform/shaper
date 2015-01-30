@@ -50,6 +50,9 @@ Q_OBJECT
   /// Returns true is operation manager has an operation with given Id.
   bool hasOperation(const QString& theId) const;
 
+  /// Returns true if the operation can be aborted
+  bool canStopOperation();
+
   /// Find and return operation by its Id.
   ModuleBase_Operation* findOperation(const QString& theId) const;
 
@@ -130,9 +133,6 @@ signals:
 
 
  protected:
-  /// Returns true if the operation can be aborted
-  bool canStopOperation();
-
   /// Commits the current operatin if it is valid
   bool commitOperation();
 
