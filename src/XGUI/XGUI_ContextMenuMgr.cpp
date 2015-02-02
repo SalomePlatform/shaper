@@ -145,7 +145,7 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
             aMenu->addAction(action("DEACTIVATE_PART_CMD"));
           else
             aMenu->addAction(action("ACTIVATE_PART_CMD"));
-        } else if (hasFeature) {
+        } else if (hasFeature && aObject->document() == aMgr->activeDocument()) {
           aMenu->addAction(action("EDIT_CMD"));
         } else {
           if (aDisplayer->isVisible(aObject)) {
