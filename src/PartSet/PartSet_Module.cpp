@@ -26,6 +26,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ShapeValidator.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -115,6 +116,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_RadiusValidator", new PartSet_RadiusValidator);
   aFactory->registerValidator("PartSet_RigidValidator", new PartSet_RigidValidator);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
+  aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
   aFactory->registerValidator("PartSet_SketchValidator", new PartSet_SketchValidator);
 }
 
