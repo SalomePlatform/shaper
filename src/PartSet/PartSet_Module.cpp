@@ -190,15 +190,26 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
   bool aCanDisplay = false;
-  if (mySketchMgr->activeSketch()) {
+  CompositeFeaturePtr aSketchFeature = mySketchMgr->activeSketch();
+  if (aSketchFeature.get() != NULL) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
 
     if (aFeature.get() != NULL) {
-      if (aFeature == mySketchMgr->activeSketch()) {
+      if (aFeature == aSketchFeature) {
         aCanDisplay = false;
       }
       else {
-        aCanDisplay = mySketchMgr->sketchOperationIdList().contains(aFeature->getKind().c_str());
+        for (int i = 0; i < aSketchFeature->numberOfSubs() && !aCanDisplay; i++) {
+          FeaturePtr aSubFeature = aSketchFeature->subFeature(i);
+          std::list<ResultPtr> aResults = aSubFeature->results();
+          std::list<ResultPtr>::const_iterator aIt;
+          for (aIt = aResults.begin(); aIt != aResults.end() && !aCanDisplay; ++aIt) {
+            if (theObject == (*aIt))
+              aCanDisplay = true;
+          }
+          if (aSubFeature == theObject)
+            aCanDisplay = true;
+        }
       }
     }
   }
