@@ -146,7 +146,8 @@ std::shared_ptr<ModelAPI_Document> ModuleBase_Operation::document() const
 
 void ModuleBase_Operation::start()
 {
-  ModelAPI_Session::get()->startOperation();
+  QString anId = getDescription()->operationId();
+  ModelAPI_Session::get()->startOperation(anId.toStdString());
 
   if (!myIsEditing)
     createFeature();

@@ -80,7 +80,7 @@ void XGUI_DataTree::commitData(QWidget* theEditor)
     QString aRes = aEditor->text();
     ObjectPtr aFeature = mySelectedData.first();
     SessionPtr aMgr = ModelAPI_Session::get();
-    aMgr->startOperation();
+    aMgr->startOperation("RenameFeature");
     aFeature->data()->setName(qPrintable(aRes));
     aMgr->finishOperation();
   }

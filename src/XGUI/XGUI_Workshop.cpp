@@ -16,6 +16,7 @@
 #include "XGUI_ContextMenuMgr.h"
 #include "XGUI_ModuleConnector.h"
 #include <XGUI_QtEvents.h>
+#include <XGUI_HistoryMenu.h>
 
 #include <AppElements_Workbench.h>
 #include <AppElements_Viewer.h>
@@ -68,6 +69,9 @@
 #include <QLayout>
 #include <QThread>
 #include <QObject>
+#include <QMenu>
+#include <QToolButton>
+#include <QAction>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -256,13 +260,29 @@ void XGUI_Workshop::initMenu()
   aCommand->connectTo(this, SLOT(onSave()));
   //aCommand->disable();
 
-  aCommand = aGroup->addFeature("UNDO_CMD", tr("Undo"), tr("Undo last command"),
+  QString aUndoId = "UNDO_CMD";
+  aCommand = aGroup->addFeature(aUndoId, tr("Undo"), tr("Undo last command"),
                                 QIcon(":pictures/undo.png"), QKeySequence::Undo);
   aCommand->connectTo(this, SLOT(onUndo()));
 
-  aCommand = aGroup->addFeature("REDO_CMD", tr("Redo"), tr("Redo last command"),
+  QToolButton* aToolBtn = qobject_cast<QToolButton*>(aGroup->widget(aUndoId));
+  XGUI_HistoryMenu* aUndoMenu = new XGUI_HistoryMenu(aToolBtn);
+  connect(this,  SIGNAL(updateUndoHistory(const QList<QAction*>&)),
+          aUndoMenu, SLOT(setHistory(const QList<QAction*>&)));
+  connect(aUndoMenu, SIGNAL(actionsSelected(int)),
+          this,  SLOT(onUndo(int)));
+
+  QString aRedoId = "REDO_CMD";
+  aCommand = aGroup->addFeature(aRedoId, tr("Redo"), tr("Redo last command"),
                                 QIcon(":pictures/redo.png"), QKeySequence::Redo);
   aCommand->connectTo(this, SLOT(onRedo()));
+
+  aToolBtn = qobject_cast<QToolButton*>(aGroup->widget(aRedoId));
+  XGUI_HistoryMenu* aRedoMenu = new XGUI_HistoryMenu(aToolBtn);
+  connect(this,  SIGNAL(updateUndoHistory(const QList<QAction*>&)),
+          aRedoMenu, SLOT(setHistory(const QList<QAction*>&)));
+  connect(aRedoMenu, SIGNAL(actionsSelected(int)),
+          this,  SLOT(onUndo(int)));
 
   aCommand = aGroup->addFeature("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
     QIcon(":pictures/rebuild.png"), QKeySequence());
@@ -675,7 +695,6 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
   // Remember features icons
   myIcons[QString::fromStdString(theMessage->id())] = QString::fromStdString(theMessage->icon());
 
-  //Find or create Workbench
   QString aWchName = QString::fromStdString(theMessage->workbenchId());
   QString aNestedFeatures = QString::fromStdString(theMessage->nestedFeatures());
   bool isUsePropPanel = theMessage->isUseInput();
@@ -684,7 +703,7 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
     QAction* aAction = salomeConnector()->addFeature(aWchName, aFeatureId,
                                                      QString::fromStdString(theMessage->text()),
                                                      QString::fromStdString(theMessage->tooltip()),
-                                                     QIcon(theMessage->icon().c_str()),
+                                                     QIcon(QString::fromStdString(theMessage->icon())),
                                                      QKeySequence(),
                                                      isUsePropPanel);
     salomeConnector()->setNestedActions(aFeatureId, aNestedFeatures.split(" ", QString::SkipEmptyParts));
@@ -693,7 +712,7 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
     myActionsMgr->addCommand(aAction);
     myModule->actionCreated(aAction);
   } else {
-
+    //Find or create Workbench
     AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
     AppElements_Workbench* aPage = aMenuBar->findWorkbench(aWchName);
     if (!aPage) {
@@ -894,24 +913,28 @@ bool XGUI_Workshop::onSaveAs()
 }
 
 //******************************************************
-void XGUI_Workshop::onUndo()
+void XGUI_Workshop::onUndo(int theTimes)
 {
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->isOperation())
     operationMgr()->onAbortOperation();
-  aMgr->undo();
+  for (int i = 0; i < theTimes; ++i) {
+    aMgr->undo();
+  }
   updateCommandStatus();
 }
 
 //******************************************************
-void XGUI_Workshop::onRedo()
+void XGUI_Workshop::onRedo(int theTimes)
 {
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->isOperation())
     operationMgr()->onAbortOperation();
-  aMgr->redo();
+  for (int i = 0; i < theTimes; ++i) {
+    aMgr->redo();
+  }
   updateCommandStatus();
 }
 
@@ -921,7 +944,7 @@ void XGUI_Workshop::onRebuild()
   SessionPtr aMgr = ModelAPI_Session::get();
   bool aWasOperation = aMgr->isOperation(); // keep this value
   if (!aWasOperation) {
-    aMgr->startOperation();
+    aMgr->startOperation("Rebuild");
   }
   static const Events_ID aRebuildEvent = Events_Loop::loop()->eventByName("Rebuild");
   Events_Loop::loop()->send(std::shared_ptr<Events_Message>(
@@ -1050,6 +1073,9 @@ void XGUI_Workshop::updateCommandStatus()
     }
     aUndoCmd->setEnabled(aMgr->canUndo() && !aMgr->isOperation());
     aRedoCmd->setEnabled(aMgr->canRedo() && !aMgr->isOperation());
+
+    updateHistory();
+
   } else {
     foreach(QAction* aCmd, aCommands) {
       QString aId = aCmd->data().toString();
@@ -1063,6 +1089,33 @@ void XGUI_Workshop::updateCommandStatus()
   }
   myActionsMgr->update();
   emit commandStatusUpdated();
+}
+
+void XGUI_Workshop::updateHistory()
+{
+  std::list<std::string> aUndoList = ModelAPI_Session::get()->undoList();
+  std::list<std::string>::iterator it = aUndoList.begin();
+  QList<QAction*> aUndoRes;
+  for ( ; it != aUndoList.end(); it++) {
+    QString anId = QString::fromStdString(*it);
+    QIcon aIcon;
+    if (myIcons.contains(anId))
+      aIcon = QIcon(myIcons[anId]);
+    aUndoRes << new QAction(aIcon, anId, NULL);
+  }
+  emit updateUndoHistory(aUndoRes);
+
+  std::list<std::string> aRedoList = ModelAPI_Session::get()->redoList();
+  it = aRedoList.begin();
+  QList<QAction*> aRedoRes;
+  for ( ; it != aRedoList.end(); it++) {
+    QString anId = QString::fromStdString(*it);
+    QIcon aIcon;
+    if (myIcons.contains(anId))
+      aIcon = QIcon(myIcons[anId]);
+    aRedoRes << new QAction(aIcon, anId, NULL);
+  }
+  emit updateRedoHistory(aUndoRes);
 }
 
 //******************************************************
@@ -1302,7 +1355,7 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
   }
 
   SessionPtr aMgr = ModelAPI_Session::get();
-  aMgr->startOperation();
+  aMgr->startOperation("DeleteObjects");
   std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
                                        aLast = aRefFeatures.end();
   for (; anIt != aLast; anIt++) {
