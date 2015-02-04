@@ -215,9 +215,15 @@ signals:
   //! the application is started
   void applicationStarted();
 
+  void updateUndoHistory(const QList<QAction*>&);
+  void updateRedoHistory(const QList<QAction*>&);
+
  public slots:
    /// Update of commands status
   void updateCommandStatus();
+
+  /// update history list (undo/redo commands)
+  void updateHistory();
 
   /// Create a new dokument
   void onNew();
@@ -235,10 +241,10 @@ signals:
   void onExit();
 
   /// Undo last command
-  void onUndo();
+  void onUndo(int times = 1);
 
   /// Redo previous command
-  void onRedo();
+  void onRedo(int times = 1);
 
   /// Rebuild data tree
   void onRebuild();

@@ -534,7 +534,7 @@ void PartSet_Module::deleteObjects()
   }
 
   SessionPtr aMgr = ModelAPI_Session::get();
-  aMgr->startOperation();
+  aMgr->startOperation("DeletePartSet");
   std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
                                        aLast = aRefFeatures.end();
   for (; anIt != aLast; anIt++) {

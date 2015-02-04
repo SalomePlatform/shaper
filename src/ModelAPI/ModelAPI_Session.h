@@ -45,7 +45,8 @@ class MODELAPI_EXPORT ModelAPI_Session
   virtual void closeAll() = 0;
 
   //! Starts a new operation (opens a tansaction)
-  virtual void startOperation() = 0;
+  //! \param theId of operation for history (optional)
+  virtual void startOperation(const std::string& theId) = 0;
   //! Finishes the previously started operation (closes the transaction)
   virtual void finishOperation() = 0;
   //! Aborts the operation 
@@ -63,6 +64,10 @@ class MODELAPI_EXPORT ModelAPI_Session
   virtual bool canRedo() = 0;
   //! Redoes last operation
   virtual void redo() = 0;
+  //! Returns stack of performed operations (from last to first)
+  virtual std::list<std::string> undoList() = 0;
+  //! Returns stack of rolled back operations (from last rolled back to first)
+  virtual std::list<std::string> redoList() = 0;
 
   /// Registers the plugin that creates features.
   /// It is obligatory for each plugin to call this function on loading to be found by 
