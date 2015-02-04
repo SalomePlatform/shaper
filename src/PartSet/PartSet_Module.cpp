@@ -196,11 +196,13 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
   if (aSketchFeature.get() != NULL) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
 
-    if (aFeature.get() != NULL) {
+    // MPV: the second and third conditions to avoid crash on exit for application
+    if (aFeature.get() != NULL && aFeature->data().get() && aFeature->data()->isValid()) {
       if (aFeature == aSketchFeature) {
         aCanDisplay = false;
       }
-      else {
+      else if (aSketchFeature.get() && aSketchFeature->data().get() &&
+               aSketchFeature->data()->isValid()) {
         for (int i = 0; i < aSketchFeature->numberOfSubs() && !aCanDisplay; i++) {
           FeaturePtr aSubFeature = aSketchFeature->subFeature(i);
           std::list<ResultPtr> aResults = aSubFeature->results();
