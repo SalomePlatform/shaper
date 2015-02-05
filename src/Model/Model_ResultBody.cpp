@@ -435,6 +435,49 @@ void Model_ResultBody::loadNextLevels(std::shared_ptr<GeomAPI_Shape> theShape,
 	}
   }
 }
+
+//=======================================================================
+int findAmbiguities(const TopoDS_Shape&           theShapeIn, 					
+				          TopTools_ListOfShape&   theList) 
+{
+  int aNumEdges(0);
+  theList.Clear();
+  TopTools_IndexedDataMapOfShapeListOfShape subShapeAndAncestors;
+  TopAbs_ShapeEnum aTS(TopAbs_EDGE);
+  TopAbs_ShapeEnum aTA(TopAbs_FACE);
+  TopTools_MapOfShape aMap1, aMap2; // map1 - for edge ancestors; map2 - for keys => edges
+  TopTools_ListOfShape aKeyList;
+  TopExp::MapShapesAndAncestors(theShapeIn, aTS, aTA, subShapeAndAncestors);
+  for (Standard_Integer i = 1; i <= subShapeAndAncestors.Extent(); i++) {
+    const TopoDS_Shape& aKeyEdge1 = subShapeAndAncestors.FindKey(i);
+    const TopTools_ListOfShape& ancestors1 = subShapeAndAncestors.FindFromIndex(i);
+	aMap1.Clear();
+    TopTools_ListIteratorOfListOfShape it(ancestors1);
+	for(;it.More();it.Next()) aMap1.Add(it.Value()); // fill map with key ancestors => aKey1
+	for (Standard_Integer j = 1; j <= subShapeAndAncestors.Extent(); j++) {
+	  if (i == j) continue;
+      const TopoDS_Shape& aKeyEdge2 = subShapeAndAncestors.FindKey(j);
+      const TopTools_ListOfShape& ancestors2 = subShapeAndAncestors.FindFromIndex(j);
+	  if(ancestors1.Extent() == ancestors2.Extent() && ancestors1.Extent() > 1) {
+		int aNum (ancestors2.Extent());
+	    TopTools_ListIteratorOfListOfShape it(ancestors2);
+	    for(;it.More();it.Next()) 
+			if(aMap1.Contains(it.Value())) aNum--;
+		if(aNum == 0) {
+		  if(aMap2.Add(aKeyEdge1)) 
+			aKeyList.Append(aKeyEdge1);
+		  if(aMap2.Add(aKeyEdge2))
+			aKeyList.Append(aKeyEdge2);
+		}
+	  }
+	} // at the end ==> List of edges to be named in addition	
+  }
+  aNumEdges = aKeyList.Extent();
+  if(aNumEdges)
+	theList.Assign(aKeyList);	
+  return aNumEdges; 
+}
+
 //=======================================================================
 void Model_ResultBody::loadFirstLevel(
 	             std::shared_ptr<GeomAPI_Shape> theShape, const std::string& theName, int&  theTag)
@@ -466,6 +509,16 @@ void Model_ResultBody::loadFirstLevel(
     std::shared_ptr<GeomAPI_Shape> itrShape(new GeomAPI_Shape());
     itrShape->setImpl(new TopoDS_Shape(aShape));
 	loadNextLevels(itrShape, theName, theTag); 
+  }
+  TopTools_ListOfShape   aList;
+  if(findAmbiguities(aShape, aList)) {
+	TopTools_ListIteratorOfListOfShape it(aList);
+    for (; it.More(); it.Next(),theTag++) {
+	  builder(theTag)->Generated(it.Value());
+	  TCollection_AsciiString aStr(theTag);
+	  aName = theName + aStr.ToCString();
+	  buildName(theTag, aName);
+	}
   }
 }
 
