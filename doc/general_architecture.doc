@@ -1,7 +1,7 @@
 /*!
 \page general_architecture General Architecture
 
-NewGeom is made of Workshop (see XGUI_Workshop) which loads a Module, connecting its features with GUI, providing it with services for launching of operations, tools for user inputs and visualisation of results. The Module can consist of a one or several plug-ins which provide implementation of Module features. Each plug-in can implement one or several features. These features can be structured by Workbenches within Workshop. Workshop provides introducing of these Workbenches within main window in form of menus or/and tool bars.
+NewGeom is made of Workshop (see XGUI_Workshop) which loads a Module, connecting its features with GUI, providing it with services for launching of operations, tools for user inputs and visualisation of results. The Module can consist of one or several plug-ins which provide implementation of Module features. Each plug-in can implement one or several features. These features can be structured by Workbenches within Workshop. Workshop provides introducing of these Workbenches within main window in form of menus or/and tool bars.
 \n
 Workshop interacts with a Module with help of specific interface defined in ModuleBase package. Each module for NewGeom application has to implement ModuleBase_IModile interface.
 \n
