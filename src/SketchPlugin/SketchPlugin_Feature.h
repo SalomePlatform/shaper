@@ -60,7 +60,7 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
   {
     AttributeSelectionPtr aAttr = data()->selection(EXTERNAL_ID());
     if (aAttr)
-      return aAttr->context().get() == NULL;
+      return aAttr->context().get() != NULL;
     return false;
   }
 
@@ -68,8 +68,11 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
   virtual void customisePresentation(AISObjectPtr thePrs)
   {
     // if this is an edge
-    if (thePrs->getShapeType() == 6)
+    if (thePrs->getShapeType() == 6) {
       thePrs->setWidth(3);
+      if (isExternal())
+        thePrs->setColor(0,255,0);
+    }
     // if this is a vertex
     //else if (thePrs->getShapeType() == 7)
     //  thePrs->setPointMarker(6, 2.);
