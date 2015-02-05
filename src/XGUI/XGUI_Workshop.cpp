@@ -570,7 +570,7 @@ void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
   setNestedFeatures(theOperation);
 
   if (theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
-    connectWithOperation(theOperation);
+    // connectWithOperation(theOperation); already connected
     setPropertyPanel(theOperation);
   }
   updateCommandStatus();
