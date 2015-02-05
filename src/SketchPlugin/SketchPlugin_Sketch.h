@@ -14,15 +14,6 @@
 #include <GeomAPI_IPresentable.h>
 #include <list>
 
-/// the plane edge color
-#define SKETCH_PLANE_COLOR "#700000" 
-
-/// the plane edge width
-#define SKETCH_WIDTH        "4"
-
-/// face of the square-face displayed for selection of general plane
-#define PLANE_SIZE          "200"     
-
 /**\class SketchPlugin_Sketch
  * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.

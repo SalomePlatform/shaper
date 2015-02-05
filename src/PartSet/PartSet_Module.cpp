@@ -52,6 +52,7 @@
 //#include <SketchPlugin_ConstraintRigid.h>
 
 #include <Events_Loop.h>
+#include <Config_PropManager.h>
 
 #include <StdSelect_TypeOfFace.hxx>
 #include <TopoDS_Vertex.hxx>
@@ -132,6 +133,14 @@ void PartSet_Module::registerFilters()
   Handle(SelectMgr_Filter) aSelectFilter = new ModuleBase_FilterNoConsructionSubShapes(workshop());
   aFactory->registerFilter("NoConstructionSubShapesFilter",
             new ModuleBase_FilterCustom(aSelectFilter));
+}
+
+void PartSet_Module::registerProperties()
+{
+  Config_PropManager::registerProp("Sketch planes", "planes_size", "Size", Config_Prop::Double,
+                                   PLANE_SIZE);
+  Config_PropManager::registerProp("Sketch planes", "planes_thickness", "Thickness",
+                                   Config_Prop::Integer, SKETCH_WIDTH);
 }
 
 void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 
