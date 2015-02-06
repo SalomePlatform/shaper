@@ -10,6 +10,8 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 
+#include <ModuleBase_ActionInfo.h>
+
 #include <QObject>
 #include <QMap>
 #include <QKeySequence>
@@ -215,8 +217,8 @@ signals:
   //! the application is started
   void applicationStarted();
 
-  void updateUndoHistory(const QList<QAction*>&);
-  void updateRedoHistory(const QList<QAction*>&);
+  void updateUndoHistory(const QList<ActionInfo>&);
+  void updateRedoHistory(const QList<ActionInfo>&);
 
  public slots:
    /// Update of commands status

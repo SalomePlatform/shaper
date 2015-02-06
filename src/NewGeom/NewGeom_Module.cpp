@@ -325,6 +325,17 @@ QAction* NewGeom_Module::addFeature(const QString& theWBName, const QString& the
   return aAction;
 }
 
+QAction* NewGeom_Module::addFeature(const QString& theWBName, const ActionInfo& theInfo)
+{
+  return addFeature(theWBName,
+                    theInfo.id,
+                    theInfo.text,
+                    theInfo.toolTip,
+                    theInfo.icon,
+                    theInfo.shortcut);
+}
+
+
 //******************************************************
 QAction* NewGeom_Module::addDesktopCommand(const QString& theId, const QString& theTitle,
                                            const QString& theTip, const QIcon& theIcon,

@@ -55,6 +55,11 @@ Q_OBJECT
 
   /// Registers shortcut (key sequence) for the command triggering
   /// \param theKeySequence a key sequence to register
+  QKeySequence registerShortcut(const QKeySequence& theKeySequence);
+
+  /// This is an overloaded function.
+  /// Registers shortcut (key sequence) for the command triggering
+  /// \param theKeySequence - string that contain a key sequence to register
   QKeySequence registerShortcut(const QString& theKeySequence);
 
   //! Redefinition of Events_Listener method

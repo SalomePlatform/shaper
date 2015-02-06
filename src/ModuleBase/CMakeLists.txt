@@ -42,6 +42,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetLabel.h
 	ModuleBase_IPrefMgr.h
 	ModuleBase_Preferences.h
+	ModuleBase_ActionInfo.h
 )
 
 SET(PROJECT_SOURCES
@@ -74,10 +75,12 @@ SET(PROJECT_SOURCES
 	ModuleBase_ResultPrs.cpp
 	ModuleBase_WidgetLabel.cpp
 	ModuleBase_Preferences.cpp
+	ModuleBase_ActionInfo.cpp
 )
 
 SET(PROJECT_LIBRARIES
 	Config
+	Events
 	ModelAPI
 	GeomAPI
 	GeomAlgoAPI

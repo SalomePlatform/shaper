@@ -11,6 +11,8 @@
 #include <XGUI.h>
 #include <QMenu>
 
+#include <ModuleBase_ActionInfo.h>
+
 class QListWidget;
 class QToolButton;
 class QListWidgetItem;
@@ -26,7 +28,7 @@ class XGUI_EXPORT XGUI_HistoryMenu : public QMenu
   void actionsSelected(int);
 
  public slots:
-  void setHistory(const QList<QAction*>&);
+  void setHistory(const QList<ActionInfo>&);
 
  protected slots:
   void setStackSelectedTo(QListWidgetItem *);

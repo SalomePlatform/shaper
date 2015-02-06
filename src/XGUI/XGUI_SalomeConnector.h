@@ -8,6 +8,8 @@
 #include <QString>
 #include <QStringList>
 
+#include <ModuleBase_ActionInfo.h>
+
 class QMainWindow;
 class ModuleBase_IViewer;
 
@@ -31,6 +33,9 @@ class XGUI_EXPORT XGUI_SalomeConnector
   virtual QAction* addFeature(const QString& theWBName, const QString& theId,
                               const QString& theTitle, const QString& theTip, const QIcon& theIcon,
                               const QKeySequence& theKeys, bool isCheckable) = 0;
+
+  virtual QAction* addFeature(const QString& theWBName,
+                              const ActionInfo& theInfo) = 0;
 
   //! Creates a command in Edit menu of SALOME desktop
   //! \param theId - an id of the feature

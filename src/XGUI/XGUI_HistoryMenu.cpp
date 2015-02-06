@@ -39,14 +39,11 @@ XGUI_HistoryMenu::~XGUI_HistoryMenu()
 {
 }
 
-void XGUI_HistoryMenu::setHistory(const QList<QAction*>& theActions)
+void XGUI_HistoryMenu::setHistory(const QList<ActionInfo>& theActions)
 {
   myHistoryList->clear();
-  foreach(QAction* anAct, theActions) {
-    QListWidgetItem* anItem = new QListWidgetItem(anAct->icon(),
-                                                  anAct->text(),
-                                                  myHistoryList);
-    anAct->deleteLater();
+  foreach(ActionInfo anAct, theActions) {
+    QListWidgetItem* anItem = new QListWidgetItem(anAct.icon, anAct.text, myHistoryList);
   }
 }
 

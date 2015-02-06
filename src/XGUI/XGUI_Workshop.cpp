@@ -267,8 +267,8 @@ void XGUI_Workshop::initMenu()
 
   QToolButton* aToolBtn = qobject_cast<QToolButton*>(aGroup->widget(aUndoId));
   XGUI_HistoryMenu* aUndoMenu = new XGUI_HistoryMenu(aToolBtn);
-  connect(this,  SIGNAL(updateUndoHistory(const QList<QAction*>&)),
-          aUndoMenu, SLOT(setHistory(const QList<QAction*>&)));
+  connect(this,  SIGNAL(updateUndoHistory(const QList<ActionInfo>&)),
+          aUndoMenu, SLOT(setHistory(const QList<ActionInfo>&)));
   connect(aUndoMenu, SIGNAL(actionsSelected(int)),
           this,  SLOT(onUndo(int)));
 
@@ -279,7 +279,7 @@ void XGUI_Workshop::initMenu()
 
   aToolBtn = qobject_cast<QToolButton*>(aGroup->widget(aRedoId));
   XGUI_HistoryMenu* aRedoMenu = new XGUI_HistoryMenu(aToolBtn);
-  connect(this,  SIGNAL(updateUndoHistory(const QList<QAction*>&)),
+  connect(this,  SIGNAL(updateUndoHistory(const QList<ActionInfo>&)),
           aRedoMenu, SLOT(setHistory(const QList<QAction*>&)));
   connect(aRedoMenu, SIGNAL(actionsSelected(int)),
           this,  SLOT(onUndo(int)));
@@ -692,22 +692,19 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
 #endif
     return;
   }
+  ActionInfo aFeatureInfo;
+  aFeatureInfo.initFrom(theMessage);
   // Remember features icons
-  myIcons[QString::fromStdString(theMessage->id())] = QString::fromStdString(theMessage->icon());
+  myIcons[QString::fromStdString(theMessage->id())] = aFeatureInfo.iconFile;
 
   QString aWchName = QString::fromStdString(theMessage->workbenchId());
-  QString aNestedFeatures = QString::fromStdString(theMessage->nestedFeatures());
-  bool isUsePropPanel = theMessage->isUseInput();
-  QString aFeatureId = QString::fromStdString(theMessage->id());
+  QStringList aNestedFeatures =
+      QString::fromStdString(theMessage->nestedFeatures()).split(" ", QString::SkipEmptyParts);
+  QString aDocKind = QString::fromStdString(theMessage->documentKind());
   if (isSalomeMode()) {
-    QAction* aAction = salomeConnector()->addFeature(aWchName, aFeatureId,
-                                                     QString::fromStdString(theMessage->text()),
-                                                     QString::fromStdString(theMessage->tooltip()),
-                                                     QIcon(QString::fromStdString(theMessage->icon())),
-                                                     QKeySequence(),
-                                                     isUsePropPanel);
-    salomeConnector()->setNestedActions(aFeatureId, aNestedFeatures.split(" ", QString::SkipEmptyParts));
-    salomeConnector()->setDocumentKind(aFeatureId, QString::fromStdString(theMessage->documentKind()));
+    QAction* aAction = salomeConnector()->addFeature(aWchName, aFeatureInfo);
+    salomeConnector()->setNestedActions(aFeatureInfo.id, aNestedFeatures);
+    salomeConnector()->setDocumentKind(aFeatureInfo.id, aDocKind);
 
     myActionsMgr->addCommand(aAction);
     myModule->actionCreated(aAction);
@@ -724,19 +721,14 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
     if (!aGroup) {
       aGroup = aPage->addGroup(aGroupName);
     }
-    QString aDocKind = QString::fromStdString(theMessage->documentKind());
     // Check if hotkey sequence is already defined:
-    QKeySequence aHotKey = myActionsMgr->registerShortcut(
-        QString::fromStdString(theMessage->keysequence()));
+    QKeySequence aHotKey = myActionsMgr->registerShortcut(aFeatureInfo.shortcut);
+    if(aHotKey != aFeatureInfo.shortcut) {
+      aFeatureInfo.shortcut = aHotKey;
+    }
     // Create feature...
-    AppElements_Command* aCommand = aGroup->addFeature(aFeatureId,
-                                                QString::fromStdString(theMessage->text()),
-                                                QString::fromStdString(theMessage->tooltip()),
-                                                QIcon(theMessage->icon().c_str()),
-                                                aDocKind,
-                                                aHotKey,
-                                                isUsePropPanel);
-    aCommand->setNestedCommands(aNestedFeatures.split(" ", QString::SkipEmptyParts));
+    AppElements_Command* aCommand = aGroup->addFeature(aFeatureInfo, aDocKind);
+    aCommand->setNestedCommands(aNestedFeatures);
     myActionsMgr->addCommand(aCommand);
     myModule->actionCreated(aCommand);
   }
@@ -1095,25 +1087,25 @@ void XGUI_Workshop::updateHistory()
 {
   std::list<std::string> aUndoList = ModelAPI_Session::get()->undoList();
   std::list<std::string>::iterator it = aUndoList.begin();
-  QList<QAction*> aUndoRes;
+  QList<ActionInfo> aUndoRes;
   for ( ; it != aUndoList.end(); it++) {
     QString anId = QString::fromStdString(*it);
     QIcon aIcon;
     if (myIcons.contains(anId))
       aIcon = QIcon(myIcons[anId]);
-    aUndoRes << new QAction(aIcon, anId, NULL);
+    aUndoRes << ActionInfo(aIcon, anId);
   }
   emit updateUndoHistory(aUndoRes);
 
   std::list<std::string> aRedoList = ModelAPI_Session::get()->redoList();
   it = aRedoList.begin();
-  QList<QAction*> aRedoRes;
+  QList<ActionInfo> aRedoRes;
   for ( ; it != aRedoList.end(); it++) {
     QString anId = QString::fromStdString(*it);
     QIcon aIcon;
     if (myIcons.contains(anId))
       aIcon = QIcon(myIcons[anId]);
-    aRedoRes << new QAction(aIcon, anId, NULL);
+    aRedoRes << ActionInfo(aIcon, anId);
   }
   emit updateRedoHistory(aUndoRes);
 }

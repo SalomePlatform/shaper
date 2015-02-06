@@ -10,6 +10,8 @@
 #include <LightApp_Module.h>
 #include <XGUI_SalomeConnector.h>
 
+#include <ModuleBase_ActionInfo.h>
+
 #include <QStringList>
 #include <QMap>
 
@@ -50,6 +52,10 @@ Q_OBJECT
                               const QString& theTitle, const QString& theTip, const QIcon& theIcon,
                               const QKeySequence& theKeys = QKeySequence(),
                               bool isCheckable = false);
+
+  virtual QAction* addFeature(const QString& theWBName,
+                                const ActionInfo& theInfo);
+
 
   virtual QAction* addDesktopCommand(const QString& theId, const QString& theTitle,
                                      const QString& theTip, const QIcon& theIcon,

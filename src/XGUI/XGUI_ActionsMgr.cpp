@@ -161,18 +161,25 @@ void XGUI_ActionsMgr::updateOnViewSelection()
   }
 }
 
+QKeySequence XGUI_ActionsMgr::registerShortcut(const QKeySequence& theKeySequence)
+{
+  if (myShortcuts.contains(theKeySequence)) {
+    QString aMessage = tr("Shortcut %1 is already defined. Ignore.");
+    aMessage = aMessage.arg(theKeySequence.toString());
+    Events_Error::send(aMessage.toStdString());
+    return QKeySequence();
+  }
+  myShortcuts.append(theKeySequence);
+  return theKeySequence;
+}
+
 QKeySequence XGUI_ActionsMgr::registerShortcut(const QString& theKeySequence)
 {
   if (theKeySequence.isEmpty()) {
     return QKeySequence();
   }
   QKeySequence aResult(theKeySequence);
-  if (myShortcuts.contains(aResult)) {
-    QString aMessage = tr("Shortcut %1 is already defined. Ignore.").arg(theKeySequence);
-    Events_Error::send(aMessage.toStdString());
-    return QKeySequence();
-  }
-  myShortcuts.append(aResult);
+  registerShortcut(aResult);
   return aResult;
 }
 
