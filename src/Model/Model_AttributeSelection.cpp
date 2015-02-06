@@ -384,6 +384,7 @@ void Model_AttributeSelection::selectBody(
       return;
     }
   }
+  //BRepTools::Write(aNewShape, "Selection0.brep");
   aSel.Select(aNewShape, aContext); 
 }
 
@@ -615,8 +616,10 @@ std::string Model_AttributeSelection::namingName()
   TopoDS_Shape aSubShape = aSubSh->impl<TopoDS_Shape>();
   TopoDS_Shape aContext  = aCont->shape()->impl<TopoDS_Shape>();
 #ifdef DEB_NAMING
+  if(aSubShape.ShapeType() == TopAbs_COMPOUND) {
   BRepTools::Write(aSubShape, "Selection.brep");
   BRepTools::Write(aContext, "Context.brep");
+  }
 #endif
   std::shared_ptr<Model_Document> aDoc = 
     std::dynamic_pointer_cast<Model_Document>(aCont->document());
@@ -632,7 +635,11 @@ std::string Model_AttributeSelection::namingName()
 	  case TopAbs_EDGE:
 		  {
 		  // name structure: F1 | F2 [| F3 | F4], where F1 & F2 the faces which gives the Edge in trivial case
-		  // if it is not atrivial case we use localization by neighbours. F3 & F4 - neighbour faces		 
+		  // if it is not atrivial case we use localization by neighbours. F3 & F4 - neighbour faces	
+		  if (BRep_Tool::Degenerated(TopoDS::Edge(aSubShape))) {
+			  aName = "Degenerated_Edge";
+			  break;
+		  }    
 		  TopTools_IndexedDataMapOfShapeListOfShape aMap;
 		  TopExp::MapShapesAndAncestors(aContext, TopAbs_EDGE, TopAbs_FACE, aMap);
 		  TopTools_IndexedMapOfShape aSMap; // map for ancestors of the sub-shape
@@ -716,12 +723,24 @@ std::string Model_AttributeSelection::namingName()
 			//n = aList.Extent();
 #endif
 			int n = aList.Extent();
-			if(n < 3) { // open topology case => via edges
+			if(n < 3) { // open topology case or Compound case => via edges
 			  TopTools_IndexedDataMapOfShapeListOfShape aMap;
 		      TopExp::MapShapesAndAncestors(aContext, TopAbs_VERTEX, TopAbs_EDGE, aMap);
-			  const TopTools_ListOfShape& aList2  = aMap.FindFromKey(aSubShape);
-			  if(aList2.Extent() >= 2)  { // regular solution
-				TopTools_ListIteratorOfListOfShape itl(aList2);
+			  const TopTools_ListOfShape& aList22  = aMap.FindFromKey(aSubShape);
+			  if(aList22.Extent() >= 2)  { // regular solution
+#ifdef FIX_BUG1
+			
+			    // bug! duplication; fix is below
+			    aFMap.Clear();
+			    TopTools_ListOfShape aListE;
+			    TopTools_ListIteratorOfListOfShape itl2(aList22);
+		        for (int i = 1;itl2.More();itl2.Next(),i++) {
+			    if(aFMap.Add(itl2.Value()))
+				  aListE.Append(itl2.Value());
+				}
+			    n = aListE.Extent();
+#endif
+				TopTools_ListIteratorOfListOfShape itl(aListE);
 		        for (int i = 1;itl.More();itl.Next(),i++) {
 			      const TopoDS_Shape& anEdge = itl.Value();
 			      std::string anEdgeName = GetShapeName(aDoc, anEdge, selectionLabel());
@@ -730,6 +749,9 @@ std::string Model_AttributeSelection::namingName()
 			      else 
 			        aName += "|" + anEdgeName;
 				}
+			  }//reg
+			  else { // dangle vertex: if(aList22.Extent() == 1)
+				  //it should be already in DF
 			  }
 			} 
 			else {

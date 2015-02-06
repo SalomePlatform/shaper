@@ -33,7 +33,7 @@
 // DEB
 //#include <TCollection_AsciiString.hxx>
 //#include <TDF_Tool.hxx>
-#define DEB_IMPORT 1
+//#define DEB_IMPORT 1
 
 Model_ResultBody::Model_ResultBody()
 {
