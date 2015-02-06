@@ -153,10 +153,18 @@ void NewGeom_SalomeViewer::onMouseMove(SUIT_ViewWindow* theView, QMouseEvent* th
 {
   OCCViewer_ViewWindow* aViewWnd = dynamic_cast<OCCViewer_ViewWindow*>(theView);
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext->HasDetected())
+  if (aContext->HasDetected()) // Set focus to provide key events in the view
     aViewWnd->getViewPort()->setFocus(Qt::MouseFocusReason);
   emit mouseMove(myView, theEvent);
 }
+
+//**********************************************
+bool NewGeom_SalomeViewer::canDragByMouse() const
+{
+  OCCViewer_Viewer* aViewer = mySelector->viewer();
+  return (aViewer->interactionStyle() != 0);
+}
+
 
 //**********************************************
 void NewGeom_SalomeViewer::onKeyPress(SUIT_ViewWindow* theView, QKeyEvent* theEvent)

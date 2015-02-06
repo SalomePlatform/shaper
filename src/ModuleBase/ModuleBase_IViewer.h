@@ -75,6 +75,10 @@ Q_OBJECT
   /// Update current viewer
   virtual void update() = 0;
 
+  /// Method returns True if the viewer can process editing objects 
+  /// by mouse drugging. If this is impossible thet it has to return False.
+  virtual bool canDragByMouse() const { return true; }
+
 signals:
   /// Signal emited when last view window is closed
   void lastViewClosed();

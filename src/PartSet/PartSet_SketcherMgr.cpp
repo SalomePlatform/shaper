@@ -143,7 +143,14 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
 
+  // Clear dragging mode
+  myIsDragging = false;
+
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  ModuleBase_IViewer* aViewer = aWorkshop->viewer();
+  if (!aViewer->canDragByMouse())
+    return;
+
   ModuleBase_Operation* aOperation = aWorkshop->currentOperation();
   if (aOperation && aOperation->isEditOperation()) {
     ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
@@ -153,9 +160,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       return;
     }
   }
-
-  // Clear dragging mode
-  myIsDragging = false;
 
   // Use only for sketch operations
   if (aOperation && myCurrentSketch) {
@@ -176,7 +180,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       return;
 
     // MoveTo in order to highlight current object
-    ModuleBase_IViewer* aViewer = aWorkshop->viewer();
     aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
 
     // Remember highlighted objects for editing
@@ -226,13 +229,15 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  ModuleBase_IViewer* aViewer = aWorkshop->viewer();
+  if (!aViewer->canDragByMouse())
+    return;
   ModuleBase_Operation* aOp = aWorkshop->currentOperation();
   if (aOp) {
     if (sketchOperationIdList().contains(aOp->id())) {
   get2dPoint(theWnd, theEvent, myClickedPoint);
 
       // Only for sketcher operations
-      ModuleBase_IViewer* aViewer = aWorkshop->viewer();
       if (myIsDragging) {
         if (myDragDone) {
           //aOp->commit();
