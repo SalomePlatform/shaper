@@ -263,3 +263,14 @@ void XGUI_ViewerProxy::update()
 {
   myWorkshop->displayer()->updateViewer();
 }
+
+//***************************************
+bool XGUI_ViewerProxy::canDragByMouse() const
+{
+  if (myWorkshop->isSalomeMode()) {
+    ModuleBase_IViewer* aViewer = myWorkshop->salomeConnector()->viewer();
+    return aViewer->canDragByMouse();
+  } else {
+    return true;
+  }
+}

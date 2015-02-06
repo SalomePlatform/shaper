@@ -44,6 +44,13 @@ AISObjectPtr SketchPlugin_ConstraintRigid::getAISObject(AISObjectPtr thePrevious
 
     if (!aConst) 
       return thePrevious;
+
+    std::shared_ptr<SketchPlugin_Feature> aSketchFea = 
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(ModelAPI_Feature::feature(aConst));
+    if (aSketchFea.get() != NULL) {
+      if (aSketchFea->isExternal())
+        return thePrevious;
+    }
     aShape = aConst->shape();
   }
   else {

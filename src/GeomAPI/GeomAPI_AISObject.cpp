@@ -274,6 +274,8 @@ void GeomAPI_AISObject::setColor(const int& theColor)
   if (!aDimAIS.IsNull()) {
     aDimAIS->DimensionAspect()->SetCommonColor(aColor);
   }
+  Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
+  aContext->SetColor(anAIS, aColor, false);
 }
 
 void GeomAPI_AISObject::setWidth(const double& theWidth)
@@ -296,6 +298,8 @@ void GeomAPI_AISObject::setColor(int theR, int theG, int theB)
   if (!aDimAIS.IsNull()) {
     aDimAIS->DimensionAspect()->SetCommonColor(aColor);
   }
+  Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
+  aContext->SetColor(anAIS, aColor, false);
 }
 
 bool GeomAPI_AISObject::empty() const

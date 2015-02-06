@@ -40,6 +40,7 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
 
     ## Exports all bodies
     def exportBodies(self):
+        global ShapeIndex
         kResultBodyType = "Bodies"
         aPartSize = self.Part.size(kResultBodyType)
         if aPartSize == 0:
@@ -56,7 +57,7 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
             aDump = aShape.getShapeStream()
             # Load shape to SALOME Geom
             aBrep = self.geompy.RestoreShape(aDump)
-            self.geompy.addToStudy(aBrep, "NewGeomShape_{0}".format(idx + 1))
+            self.geompy.addToStudy(aBrep, aBodyResult.data().name())
             self.geomObjects.append([aShape, aBrep])
 
     ## Exports all groups
