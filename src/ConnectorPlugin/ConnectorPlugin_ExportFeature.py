@@ -8,6 +8,15 @@ import ModelAPI
 import salome
 from salome.geom import geomBuilder
 
+def getObjectIndex(theName):
+    aStudy = salome.myStudy
+    aId = 0
+    aObj = aStudy.FindObjectByName(theName, "GEOM")
+    while len(aObj) != 0:
+        aId = aId + 1
+        aName = theName + '_' + str(aId)
+        aObj = aStudy.FindObjectByName(aName, "GEOM")
+    return aId
 
 ## @ingroup Plugins
 #  Feature to export all shapes and groups into the GEOM module
@@ -57,7 +66,14 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
             aDump = aShape.getShapeStream()
             # Load shape to SALOME Geom
             aBrep = self.geompy.RestoreShape(aDump)
-            self.geompy.addToStudy(aBrep, aBodyResult.data().name())
+            aName = aBodyResult.data().name()
+            
+            # Make unique name
+            aId = getObjectIndex(aName)
+            if aId != 0:
+                aName = aName + '_' + str(aId)
+            
+            self.geompy.addToStudy(aBrep, aName)
             self.geomObjects.append([aShape, aBrep])
 
     ## Exports all groups
