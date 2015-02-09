@@ -131,9 +131,6 @@ protected slots:
   /// Register properties of this module
   virtual void registerProperties() {}
 
-  /// Register properties of this module
-  virtual void registerProperties() {}
-
   /// Returns new instance of operation object (used in createOperation for customization)
   virtual ModuleBase_Operation* getNewOperation(const std::string& theFeatureId);
 
