@@ -163,6 +163,9 @@ void XGUI_ActionsMgr::updateOnViewSelection()
 
 QKeySequence XGUI_ActionsMgr::registerShortcut(const QKeySequence& theKeySequence)
 {
+  if (theKeySequence.isEmpty()) {
+    return QKeySequence();
+  }
   if (myShortcuts.contains(theKeySequence)) {
     QString aMessage = tr("Shortcut %1 is already defined. Ignore.");
     aMessage = aMessage.arg(theKeySequence.toString());
