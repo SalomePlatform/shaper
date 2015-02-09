@@ -199,6 +199,15 @@ class Model_Document : public ModelAPI_Document
   //! The implementation of undo: with or without recoursive calls in the sub-documents
   void undoInternal(const bool theWithSubs, const bool theSynchronize);
 
+  //! Stores the Id of the current operation (normally is called for the root document)
+  void operationId(const std::string& theId);
+
+  //! Returns the list of Ids of the operations that can be undoed (called for the root document)
+  std::list<std::string> undoList() const;
+
+  //! Returns the list of Ids of the operations that can be redoed (called for the root document)
+  std::list<std::string> redoList() const;
+
   friend class Model_Application;
   friend class Model_Session;
   friend class Model_Update;
@@ -216,11 +225,19 @@ class Model_Document : public ModelAPI_Document
   /// the list is empty if not nested transaction is performed
   std::list<int> myNestedNum;
 
-  /// transaction indexes (related to myTransactionsAfterSave) and number of real transactions 
+  /// Information related to the every user-transaction
+  struct Transaction {
+    int myOCAFNum; ///< number of OCAF transactions related to each "this" transaction, may be 0
+    std::string myId; ///< user-identifier string of transaction
+    /// default constructor with default Id
+    Transaction(): myOCAFNum(0), myId("") {}
+  };
+
+  /// transaction indexes (related to myTransactionsAfterSave) and info about the real transactions
   /// in myDocument connected to this operation (may be zero for empty transaction)
-  std::list<int> myTransactions;
-  /// list of numbers of real document transactions undone (first is oldest undone)
-  std::list<int> myRedos;
+  std::list<Transaction> myTransactions;
+  /// list of info about transactions undone (first is oldest undone)
+  std::list<Transaction> myRedos;
   /// All features managed by this document (not only in history of OB)
   /// For optimization mapped by labels
   NCollection_DataMap<TDF_Label, FeaturePtr> myObjs;

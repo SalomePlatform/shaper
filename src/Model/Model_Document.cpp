@@ -291,7 +291,7 @@ void Model_Document::startOperation()
 {
   if (myDoc->HasOpenCommand()) {  // start of nested command
     if (myDoc->CommitCommand()) { // commit the current: it will contain all nested after compactification
-      (*myTransactions.rbegin())++; // if has open command, the list is not empty
+      myTransactions.rbegin()->myOCAFNum++; // if has open command, the list is not empty
     }
     myNestedNum.push_back(0); // start of nested operation with zero transactions inside yet
     myDoc->OpenCommand();
@@ -299,7 +299,7 @@ void Model_Document::startOperation()
     myDoc->NewCommand();
   }
   // starts a new operation
-  myTransactions.push_back(0);
+  myTransactions.push_back(Transaction());
   if (!myNestedNum.empty())
     (*myNestedNum.rbegin())++;
   myRedos.clear();
@@ -316,11 +316,11 @@ void Model_Document::compactNested()
     int aNumToCompact = *(myNestedNum.rbegin());
     int aSumOfTransaction = 0;
     for(int a = 0; a < aNumToCompact; a++) {
-      aSumOfTransaction += *(myTransactions.rbegin());
+      aSumOfTransaction += myTransactions.rbegin()->myOCAFNum;
       myTransactions.pop_back();
     }
     // the latest transaction is the start of lower-level operation which startes the nested
-    *(myTransactions.rbegin()) += aSumOfTransaction;
+    myTransactions.rbegin()->myOCAFNum += aSumOfTransaction;
     myNestedNum.pop_back();
   }
 }
@@ -360,7 +360,7 @@ bool Model_Document::finishOperation()
 
   // transaction may be empty if this document was created during this transaction (create part)
   if (!myTransactions.empty() && myDoc->CommitCommand()) { // if commit is successfull, just increment counters
-    (*myTransactions.rbegin())++;
+    myTransactions.rbegin()->myOCAFNum++;
     aResult = true;
   }
 
@@ -368,7 +368,7 @@ bool Model_Document::finishOperation()
     compactNested();
   }
   if (!aResult && !myTransactions.empty() /* it can be for just created part document */)
-    aResult = *(myTransactions.rbegin()) != 0;
+    aResult = myTransactions.rbegin()->myOCAFNum != 0;
 
   if (!aResult && Model_Session::get()->moduleDocument().get() == this) {
     // nothing inside in all documents, so remove this transaction from the transactions list
@@ -387,7 +387,7 @@ void Model_Document::abortOperation()
     myDoc->ClearRedos();
     myRedos.clear();
   } else { // abort the current
-    int aNumTransactions = *myTransactions.rbegin();
+    int aNumTransactions = myTransactions.rbegin()->myOCAFNum;
     myTransactions.pop_back();
     if (!myNestedNum.empty())
       (*myNestedNum.rbegin())--;
@@ -433,9 +433,9 @@ bool Model_Document::canUndo()
 
 void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchronize)
 {
-  int aNumTransactions = *myTransactions.rbegin();
+  int aNumTransactions = myTransactions.rbegin()->myOCAFNum;
+  myRedos.push_back(*myTransactions.rbegin());
   myTransactions.pop_back();
-  myRedos.push_back(aNumTransactions);
   if (!myNestedNum.empty())
     (*myNestedNum.rbegin())--;
   // roll back the needed number of transactions
@@ -475,9 +475,9 @@ void Model_Document::redo()
 {
   if (!myNestedNum.empty())
     (*myNestedNum.rbegin())++;
-  int aNumRedos = *myRedos.rbegin();
+  int aNumRedos = myRedos.rbegin()->myOCAFNum;
+  myTransactions.push_back(*myRedos.rbegin());
   myRedos.pop_back();
-  myTransactions.push_back(aNumRedos);
   for(int a = 0; a < aNumRedos; a++)
     myDoc->Redo();
 
@@ -487,6 +487,34 @@ void Model_Document::redo()
   std::set<std::string>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++)
     subDoc(*aSubIter)->redo();
+}
+
+std::list<std::string> Model_Document::undoList() const
+{
+  std::list<std::string> aResult;
+  std::list<Transaction>::const_reverse_iterator aTrIter = myTransactions.crbegin();
+  int aNumUndo = myTransactions.size();
+  if (!myNestedNum.empty())
+    aNumUndo = *myNestedNum.rbegin();
+  for( ; aNumUndo > 0; aTrIter++, aNumUndo--) {
+    aResult.push_back(aTrIter->myId);
+  }
+  return aResult;
+}
+
+std::list<std::string> Model_Document::redoList() const
+{
+  std::list<std::string> aResult;
+  std::list<Transaction>::const_reverse_iterator aTrIter = myRedos.crbegin();
+  for( ; aTrIter != myRedos.crend(); aTrIter++) {
+    aResult.push_back(aTrIter->myId);
+  }
+  return aResult;
+}
+
+void Model_Document::operationId(const std::string& theId)
+{
+  myTransactions.rbegin()->myId = theId;
 }
 
 /// Append to the array of references a new referenced label
