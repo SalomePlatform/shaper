@@ -151,7 +151,7 @@ void SketchPlugin_Sketch::removeFeature(ModelAPI_Feature* theFeature)
   // if the object is not found in the sketch sub-elements, that means that the object is removed already.
   // Find the first empty element and remove it
   if (!isRemoved && aHasEmtpyFeature)
-    data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->remove(NULL);
+    data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->remove(ObjectPtr());
 }
 
 int SketchPlugin_Sketch::numberOfSubs() const
