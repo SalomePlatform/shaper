@@ -67,8 +67,8 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
   /// Customize presentation of the feature
   virtual void customisePresentation(AISObjectPtr thePrs)
   {
-    // if this is an edge
-    if (thePrs->getShapeType() == 6) {
+    // if this is an edge or vertex
+    if ((thePrs->getShapeType() == 6) || (thePrs->getShapeType() == 7)) {
       thePrs->setWidth(3);
       if (isExternal())
         thePrs->setColor(0,255,0);

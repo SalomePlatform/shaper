@@ -30,6 +30,8 @@
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAPI_Pnt2d.h>
 
+#include <SketchPlugin_Feature.h>
+
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QLabel>
@@ -234,45 +236,56 @@ bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView,
 void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+  Handle(V3d_View) aView = theWnd->v3dView();
   // TODO: This fragment doesn't work because bug in OCC Viewer. It can be used after fixing.
-  //NCollection_List<TopoDS_Shape> aShapes;
-  //std::list<ObjectPtr> aObjects;
-  //aSelection->selectedShapes(aShapes, aObjects);
-  //if (aShapes.Extent() > 0) {
-  //  TopoDS_Shape aShape = aShapes.First();
-  //  double aX, aY;
-  //  if (getPoint2d(theWnd->v3dView(), aShape, aX, aY)) {
-  //    setPoint(aX, aY);
+  NCollection_List<TopoDS_Shape> aShapes;
+  std::list<ObjectPtr> aObjects;
+  aSelection->selectedShapes(aShapes, aObjects);
+  // if we have selection
+  if (aShapes.Extent() > 0) {
+    TopoDS_Shape aShape = aShapes.First();
+    ObjectPtr aObject = aObjects.front();
+    FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aObject);
+    if (aSelectedFeature.get() != NULL) {
+      std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
+              std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
+      if ((!aSPFeature) && (!aShape.IsNull()))
+        PartSet_Tools::createFixedObjectByExternal(aShape, aObject, mySketch);
+    }
+    double aX, aY;
+    if (getPoint2d(aView, aShape, aX, aY)) {
+      setPoint(aX, aY);
 
-  //    PartSet_Tools::setConstraints(mySketch, feature(), attributeID(),aX, aY);
-  //    emit vertexSelected(aObjects.front(), aShape);
-  //    emit focusOutWidget(this);
-  //    return;
-  //  }
-  //}
+      PartSet_Tools::setConstraints(mySketch, feature(), attributeID(),aX, aY);
+      emit vertexSelected();
+      emit focusOutWidget(this);
+      return;
+    }
+  }
   // End of Bug dependent fragment
 
   // A case when point is taken from mouse event
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
   double aX, anY;
-  Handle(V3d_View) aView = theWnd->v3dView();
   PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, anY);
   if (!setPoint(aX, anY))
     return;
 
-  std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(feature()->data()->attribute(attributeID()));
-  QList<FeaturePtr> aIgnore;
-  aIgnore.append(feature());
+  /// Start alternative code
+  //std::shared_ptr<GeomDataAPI_Point2D> aFeaturePoint = std::dynamic_pointer_cast<
+  //    GeomDataAPI_Point2D>(feature()->data()->attribute(attributeID()));
+  //QList<FeaturePtr> aIgnore;
+  //aIgnore.append(feature());
 
-  double aTolerance = aView->Convert(7);
-  std::shared_ptr<GeomDataAPI_Point2D> aAttrPnt = 
-    PartSet_Tools::findAttributePoint(mySketch, aX, anY, aTolerance, aIgnore);
-  if (aAttrPnt.get() != NULL) {
-    aFeaturePoint->setValue(aAttrPnt->pnt());
-    PartSet_Tools::createConstraint(mySketch, aAttrPnt, aFeaturePoint);
-    emit vertexSelected();
-  }
+  //double aTolerance = aView->Convert(7);
+  //std::shared_ptr<GeomDataAPI_Point2D> aAttrPnt = 
+  //  PartSet_Tools::findAttributePoint(mySketch, aX, anY, aTolerance, aIgnore);
+  //if (aAttrPnt.get() != NULL) {
+  //  aFeaturePoint->setValue(aAttrPnt->pnt());
+  //  PartSet_Tools::createConstraint(mySketch, aAttrPnt, aFeaturePoint);
+  //  emit vertexSelected();
+  //}
+  /// End alternative code
   emit focusOutWidget(this);
 }
 

@@ -433,7 +433,7 @@ bool PartSet_Tools::isConstraintFeature(const std::string& theKind)
       || theKind == SketchPlugin_ConstraintRigid::ID();
 }
 
-ResultPtr PartSet_Tools::createFixedObjectByEdge(const TopoDS_Shape& theShape, 
+ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShape, 
                                                  const ObjectPtr& theObject, 
                                                  CompositeFeaturePtr theSketch)
 {

@@ -28,8 +28,8 @@ bool PartSet_WidgetShapeSelector::storeValue() const
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
   if ((!aSPFeature) && (!myShape->isNull())) {
     // Processing of external (non-sketch) object
-    ObjectPtr aObj = PartSet_Tools::createFixedObjectByEdge(myShape->impl<TopoDS_Shape>(),
-                                                            mySelectedObject, mySketch);
+    ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(myShape->impl<TopoDS_Shape>(),
+                                                                mySelectedObject, mySketch);
     if (aObj) {
       PartSet_WidgetShapeSelector* that = (PartSet_WidgetShapeSelector*) this;
       that->mySelectedObject = aObj;
@@ -133,8 +133,8 @@ bool PartSet_WidgetConstraintShapeSelector::storeValue() const
     std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
             std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
     if ((!aSPFeature) && (!myShape->isNull())) {
-      ObjectPtr aObj = PartSet_Tools::createFixedObjectByEdge(myShape->impl<TopoDS_Shape>(),
-                                                              mySelectedObject, mySketch);
+      ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(myShape->impl<TopoDS_Shape>(),
+                                                                  mySelectedObject, mySketch);
       if (aObj) {
         PartSet_WidgetConstraintShapeSelector* that = (PartSet_WidgetConstraintShapeSelector*) this;
         that->mySelectedObject = aObj;
