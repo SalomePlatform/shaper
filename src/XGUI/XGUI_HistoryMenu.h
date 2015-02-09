@@ -22,10 +22,11 @@ class XGUI_EXPORT XGUI_HistoryMenu : public QMenu
   Q_OBJECT
  public:
   explicit XGUI_HistoryMenu(QToolButton* theParent);
+  explicit XGUI_HistoryMenu(QAction* theParent);
   virtual ~XGUI_HistoryMenu();
 
  signals:
-  void actionsSelected(int);
+  void actionSelected(int);
 
  public slots:
   void setHistory(const QList<ActionInfo>&);
@@ -33,6 +34,7 @@ class XGUI_EXPORT XGUI_HistoryMenu : public QMenu
  protected slots:
   void setStackSelectedTo(QListWidgetItem *);
   void onItemPressed(QListWidgetItem *);
+  void initMenu();
 
  private:
   QListWidget* myHistoryList;

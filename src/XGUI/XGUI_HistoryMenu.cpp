@@ -12,27 +12,46 @@
 #include <QListWidget>
 #include <QWidgetAction>
 #include <QToolButton>
+#include <QAction>
+
+//! Extends given feature with previously created context menu.
+//! \param theId - Id of the feature to add \a theMenu
+//! \param theMenu - Enables or disables menu feature
+XGUI_HistoryMenu::XGUI_HistoryMenu(QAction* theParent)
+ : QMenu(NULL),
+   myHistoryList(NULL)
+{
+  theParent->setMenu(this);
+  initMenu();
+
+  connect(theParent, SIGNAL(destroyed()), this, SLOT(deleteLater()));
+}
 
 //! Extends given feature with previously created context menu.
 //! \param theId - Id of the feature to add \a theMenu
 //! \param theMenu - Enables or disables menu feature
 XGUI_HistoryMenu::XGUI_HistoryMenu(QToolButton* theParent)
  : QMenu(theParent),
-   myHistoryList(new QListWidget(this))
+   myHistoryList(NULL)
 {
   theParent->setMenu(this);
   theParent->setPopupMode(QToolButton::MenuButtonPopup);
 
+  initMenu();
+}
+
+void XGUI_HistoryMenu::initMenu()
+{
+  myHistoryList = new QListWidget(this);
   QWidgetAction* aListAction = new QWidgetAction(this);
   aListAction->setDefaultWidget(myHistoryList);
   this->addAction(aListAction);
-
-  myHistoryList->setMouseTracking(true); // track mouse hover
+  myHistoryList->setMouseTracking(true);  // track mouse hover
   myHistoryList->setSelectionMode(QAbstractItemView::ExtendedSelection);
-  connect(myHistoryList, SIGNAL(itemEntered(QListWidgetItem *)),
-          this,          SLOT(setStackSelectedTo(QListWidgetItem *)));
-  connect(myHistoryList, SIGNAL(itemClicked(QListWidgetItem *)),
-          this,          SLOT(onItemPressed(QListWidgetItem *)));
+  connect(myHistoryList, SIGNAL(itemEntered(QListWidgetItem *)), this,
+          SLOT(setStackSelectedTo(QListWidgetItem *)));
+  connect(myHistoryList, SIGNAL(itemClicked(QListWidgetItem *)), this,
+          SLOT(onItemPressed(QListWidgetItem *)));
 }
 
 XGUI_HistoryMenu::~XGUI_HistoryMenu()
@@ -68,7 +87,7 @@ void XGUI_HistoryMenu::setStackSelectedTo(QListWidgetItem * theItem)
 void XGUI_HistoryMenu::onItemPressed(QListWidgetItem * theItem)
 {
   int selectedSize = myHistoryList->row(theItem) + 1;
-  emit actionsSelected(selectedSize);
+  emit actionSelected(selectedSize);
   hide();
   myHistoryList->clear();
 }

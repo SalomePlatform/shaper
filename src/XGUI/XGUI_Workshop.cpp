@@ -226,10 +226,14 @@ void XGUI_Workshop::initMenu()
                                                          QIcon(":pictures/undo.png"),
                                                          QKeySequence::Undo, false, "MEN_DESK_EDIT");
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onUndo()));
+    addHistoryMenu(aAction, SIGNAL(updateUndoHistory(const QList<ActionInfo>&)), SLOT(onUndo(int)));
+
     aAction = salomeConnector()->addDesktopCommand("REDO_CMD", tr("Redo"), tr("Redo last command"),
                                                 QIcon(":pictures/redo.png"), QKeySequence::Redo,
                                                 false, "MEN_DESK_EDIT");
     connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRedo()));
+    addHistoryMenu(aAction, SIGNAL(updateRedoHistory(const QList<ActionInfo>&)), SLOT(onRedo(int)));
+
     salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
     aAction = salomeConnector()->addDesktopCommand("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
                                                 QIcon(":pictures/rebuild.png"), QKeySequence(),
@@ -264,25 +268,19 @@ void XGUI_Workshop::initMenu()
   aCommand = aGroup->addFeature(aUndoId, tr("Undo"), tr("Undo last command"),
                                 QIcon(":pictures/undo.png"), QKeySequence::Undo);
   aCommand->connectTo(this, SLOT(onUndo()));
-
-  QToolButton* aToolBtn = qobject_cast<QToolButton*>(aGroup->widget(aUndoId));
-  XGUI_HistoryMenu* aUndoMenu = new XGUI_HistoryMenu(aToolBtn);
-  connect(this,  SIGNAL(updateUndoHistory(const QList<ActionInfo>&)),
-          aUndoMenu, SLOT(setHistory(const QList<ActionInfo>&)));
-  connect(aUndoMenu, SIGNAL(actionsSelected(int)),
-          this,  SLOT(onUndo(int)));
+  QToolButton* aUndoButton = qobject_cast<QToolButton*>(aGroup->widget(aUndoId));
+  addHistoryMenu(aUndoButton,
+                 SIGNAL(updateUndoHistory(const QList<ActionInfo>&)),
+                 SLOT(onUndo(int)));
 
   QString aRedoId = "REDO_CMD";
   aCommand = aGroup->addFeature(aRedoId, tr("Redo"), tr("Redo last command"),
                                 QIcon(":pictures/redo.png"), QKeySequence::Redo);
   aCommand->connectTo(this, SLOT(onRedo()));
-
-  aToolBtn = qobject_cast<QToolButton*>(aGroup->widget(aRedoId));
-  XGUI_HistoryMenu* aRedoMenu = new XGUI_HistoryMenu(aToolBtn);
-  connect(this,  SIGNAL(updateUndoHistory(const QList<ActionInfo>&)),
-          aRedoMenu, SLOT(setHistory(const QList<QAction*>&)));
-  connect(aRedoMenu, SIGNAL(actionsSelected(int)),
-          this,  SLOT(onUndo(int)));
+  QToolButton* aRedoButton = qobject_cast<QToolButton*>(aGroup->widget(aRedoId));
+  addHistoryMenu(aRedoButton,
+                 SIGNAL(updateRedoHistory(const QList<ActionInfo>&)),
+                 SLOT(onRedo(int)));
 
   aCommand = aGroup->addFeature("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
     QIcon(":pictures/rebuild.png"), QKeySequence());
@@ -1473,4 +1471,21 @@ void XGUI_Workshop::displayObject(ObjectPtr theObj)
       viewer()->fitAll();
   } else 
     myDisplayer->display(theObj, false);
+}
+
+void XGUI_Workshop::addHistoryMenu(QObject* theObject, const char* theSignal, const char* theSlot)
+{
+  XGUI_HistoryMenu* aMenu = NULL;
+  if (isSalomeMode()) {
+    QAction* anAction = qobject_cast<QAction*>(theObject);
+    if (!anAction)
+      return;
+    aMenu = new XGUI_HistoryMenu(anAction);
+  } else {
+    QToolButton* aButton =  qobject_cast<QToolButton*>(theObject);
+    aMenu = new XGUI_HistoryMenu(aButton);
+  }
+  connect(this, theSignal, aMenu, SLOT(setHistory(const QList<ActionInfo>&)));
+  connect(aMenu, SIGNAL(actionSelected(int)), this, theSlot);
+
 }

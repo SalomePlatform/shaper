@@ -385,6 +385,13 @@ signals:
   /// Displaus object and fit all viewer if the object is first (update viewer will not be called)
   void displayObject(ObjectPtr theObj);
 
+  //! Extends undo/redo toolbutton's with history menu
+  //! \param theObject - in the OpenParts it is a QToolButton by itself,
+  //! in salome mode - QAction that creates a button.
+  //! \param theSignal - void "updateUndoHistory" or "updateRedoHistory" SIGNAL;
+  //! \param theSlot - onUndo(int) or onRedo(int) SLOT
+  void addHistoryMenu(QObject* theObject, const char* theSignal, const char* theSlot);
+
 private:
   AppElements_MainWindow* myMainWindow;
   ModuleBase_IModule* myModule;
