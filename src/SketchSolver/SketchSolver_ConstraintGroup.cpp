@@ -904,7 +904,7 @@ bool SketchSolver_ConstraintGroup::resolveConstraints()
         updateRelatedConstraints(anEntIter->first);
     }
     // unblock all features then
-    for (; anEntIter != myEntityAttrMap.end(); anEntIter++) {
+    for (anEntIter = myEntityAttrMap.begin(); anEntIter != myEntityAttrMap.end(); anEntIter++) {
       if (anEntIter->first->owner().get() && anEntIter->first->owner()->data().get())
         anEntIter->first->owner()->data()->blockSendAttributeUpdated(false);
     }

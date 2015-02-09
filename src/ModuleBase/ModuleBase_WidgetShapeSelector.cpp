@@ -35,6 +35,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_ResultValidator.h>
 #include <ModelAPI_RefAttrValidator.h>
+#include <ModelAPI_ShapeValidator.h>
 
 #include <Config_WidgetAPI.h>
 #include <Events_Error.h>
@@ -500,6 +501,17 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
     if (aAttrValidator) {
       if (!aAttrValidator->isValid(myFeature, *aArgs, theObj)) {
         return false;
+      }
+    }
+    else {
+      const ModelAPI_ShapeValidator* aShapeValidator = 
+                               dynamic_cast<const ModelAPI_ShapeValidator*>(*aValidator);
+      if (aShapeValidator) {
+        DataPtr aData = myFeature->data();
+        AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
+        if (!aShapeValidator->isValid(myFeature, aSelectAttr, theShape)) {
+          return false;
+        }
       }
     }
   }

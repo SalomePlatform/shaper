@@ -26,6 +26,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ShapeValidator.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -120,6 +121,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_RadiusValidator", new PartSet_RadiusValidator);
   aFactory->registerValidator("PartSet_RigidValidator", new PartSet_RigidValidator);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
+  aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
   aFactory->registerValidator("PartSet_SketchValidator", new PartSet_SketchValidator);
 }
 
@@ -203,15 +205,28 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
   bool aCanDisplay = false;
-  if (mySketchMgr->activeSketch()) {
+  CompositeFeaturePtr aSketchFeature = mySketchMgr->activeSketch();
+  if (aSketchFeature.get() != NULL) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
 
-    if (aFeature.get() != NULL) {
-      if (aFeature == mySketchMgr->activeSketch()) {
+    // MPV: the second and third conditions to avoid crash on exit for application
+    if (aFeature.get() != NULL && aFeature->data().get() && aFeature->data()->isValid()) {
+      if (aFeature == aSketchFeature) {
         aCanDisplay = false;
       }
-      else {
-        aCanDisplay = mySketchMgr->sketchOperationIdList().contains(aFeature->getKind().c_str());
+      else if (aSketchFeature.get() && aSketchFeature->data().get() &&
+               aSketchFeature->data()->isValid()) {
+        for (int i = 0; i < aSketchFeature->numberOfSubs() && !aCanDisplay; i++) {
+          FeaturePtr aSubFeature = aSketchFeature->subFeature(i);
+          std::list<ResultPtr> aResults = aSubFeature->results();
+          std::list<ResultPtr>::const_iterator aIt;
+          for (aIt = aResults.begin(); aIt != aResults.end() && !aCanDisplay; ++aIt) {
+            if (theObject == (*aIt))
+              aCanDisplay = true;
+          }
+          if (aSubFeature == theObject)
+            aCanDisplay = true;
+        }
       }
     }
   }
