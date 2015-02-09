@@ -24,6 +24,12 @@ class QTimer;
 class XGUI_OperationMgr;
 class XGUI_Workshop;
 
+/// the plane edge width
+#define SKETCH_WIDTH        "4"
+
+/// face of the square-face displayed for selection of general plane
+#define PLANE_SIZE          "200"
+
 /**
 * \ingroup Modules
 * A model widget implementation for a label which provides specific behaviour 

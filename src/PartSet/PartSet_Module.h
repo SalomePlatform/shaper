@@ -123,6 +123,9 @@ protected slots:
   /// Register selection filters for this module
   virtual void registerFilters();
 
+  /// Register properties of this module
+  virtual void registerProperties();
+
  private slots:
    /// Processing of vertex selected
    void onVertexSelected();

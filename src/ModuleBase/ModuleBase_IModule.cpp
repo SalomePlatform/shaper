@@ -97,6 +97,7 @@ void ModuleBase_IModule::createFeatures()
 {
   registerValidators();
   registerFilters();
+  registerProperties();
 
   Config_ModuleReader aXMLReader = Config_ModuleReader();
   aXMLReader.readAll();

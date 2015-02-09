@@ -26,6 +26,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ShapeValidator.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -51,6 +52,7 @@
 //#include <SketchPlugin_ConstraintRigid.h>
 
 #include <Events_Loop.h>
+#include <Config_PropManager.h>
 
 #include <StdSelect_TypeOfFace.hxx>
 #include <TopoDS_Vertex.hxx>
@@ -119,6 +121,7 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_RadiusValidator", new PartSet_RadiusValidator);
   aFactory->registerValidator("PartSet_RigidValidator", new PartSet_RigidValidator);
   aFactory->registerValidator("PartSet_DifferentObjects", new PartSet_DifferentObjectsValidator);
+  aFactory->registerValidator("PartSet_DifferentShapes", new ModelAPI_ShapeValidator);
   aFactory->registerValidator("PartSet_SketchValidator", new PartSet_SketchValidator);
 }
 
@@ -134,6 +137,14 @@ void PartSet_Module::registerFilters()
   Handle(SelectMgr_Filter) aSelectFilter = new ModuleBase_FilterNoConsructionSubShapes(workshop());
   aFactory->registerFilter("NoConstructionSubShapesFilter",
             new ModuleBase_FilterCustom(aSelectFilter));
+}
+
+void PartSet_Module::registerProperties()
+{
+  Config_PropManager::registerProp("Sketch planes", "planes_size", "Size", Config_Prop::Double,
+                                   PLANE_SIZE);
+  Config_PropManager::registerProp("Sketch planes", "planes_thickness", "Thickness",
+                                   Config_Prop::Integer, SKETCH_WIDTH);
 }
 
 void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 
@@ -194,15 +205,28 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
   bool aCanDisplay = false;
-  if (mySketchMgr->activeSketch()) {
+  CompositeFeaturePtr aSketchFeature = mySketchMgr->activeSketch();
+  if (aSketchFeature.get() != NULL) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
 
-    if (aFeature.get() != NULL) {
-      if (aFeature == mySketchMgr->activeSketch()) {
+    // MPV: the second and third conditions to avoid crash on exit for application
+    if (aFeature.get() != NULL && aFeature->data().get() && aFeature->data()->isValid()) {
+      if (aFeature == aSketchFeature) {
         aCanDisplay = false;
       }
-      else {
-        aCanDisplay = mySketchMgr->sketchOperationIdList().contains(aFeature->getKind().c_str());
+      else if (aSketchFeature.get() && aSketchFeature->data().get() &&
+               aSketchFeature->data()->isValid()) {
+        for (int i = 0; i < aSketchFeature->numberOfSubs() && !aCanDisplay; i++) {
+          FeaturePtr aSubFeature = aSketchFeature->subFeature(i);
+          std::list<ResultPtr> aResults = aSubFeature->results();
+          std::list<ResultPtr>::const_iterator aIt;
+          for (aIt = aResults.begin(); aIt != aResults.end() && !aCanDisplay; ++aIt) {
+            if (theObject == (*aIt))
+              aCanDisplay = true;
+          }
+          if (aSubFeature == theObject)
+            aCanDisplay = true;
+        }
       }
     }
   }

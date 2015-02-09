@@ -53,12 +53,6 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   ModelAPI_Session::get()->registerPlugin(this);
 
   // register sketcher properties
-  Config_PropManager::registerProp("Sketch planes", "planes_color", "Color", Config_Prop::Color,
-                                   SKETCH_PLANE_COLOR);
-  Config_PropManager::registerProp("Sketch planes", "planes_size", "Size", Config_Prop::Double,
-                                   PLANE_SIZE);
-  Config_PropManager::registerProp("Sketch planes", "planes_thickness", "Thickness",
-                                   Config_Prop::Integer, SKETCH_WIDTH);
 
   Config_PropManager::registerProp("Visualization", "parallel_color", "Parallel constraint color",
                                    Config_Prop::Color, PARALLEL_COLOR);

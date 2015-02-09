@@ -38,9 +38,6 @@
 #include <QTimer>
 #include <QApplication>
 
-#define PLANE_SIZE          "200"     
-#define SKETCH_WIDTH        "4"
-
 
 PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
                                                      const Config_WidgetAPI* theData,
@@ -214,7 +211,7 @@ AISObjectPtr PartSet_WidgetSketchLabel::createPreviewPlane(std::shared_ptr<GeomA
                                                            std::shared_ptr<GeomAPI_Dir> theNorm, 
                                                            const int theRGB[3])
 {
-  double aSize = Config_PropManager::integer("Sketch planes", "Size of planes", PLANE_SIZE);
+  double aSize = Config_PropManager::integer("Sketch planes", "planes_size", PLANE_SIZE);
   std::shared_ptr<GeomAPI_Shape> aFace = GeomAlgoAPI_FaceBuilder::square(theOrigin, theNorm, aSize);
   AISObjectPtr aAIS = AISObjectPtr(new GeomAPI_AISObject());
   aAIS->createShape(aFace);
