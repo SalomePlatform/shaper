@@ -39,7 +39,6 @@
 #include <QApplication>
 
 
-
 PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
                                                      const Config_WidgetAPI* theData,
                                                      const std::string& theParentId)

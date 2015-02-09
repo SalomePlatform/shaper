@@ -1,0 +1,182 @@
+/*!
+\page first_feature_help How to create custom features or plugins
+
+A NewGeom module consists of one or several plug-ins which provide implementation of Module features. To extend the application functionality, developers are able to add their own features into existent plugins. Also, it is possible to create a custom plugin, if necessary. 
+\n
+This document describes the basic principles of plugin/feature system and shows how to use the API for writing a feature or plugin. Currently, the API is available for C++ and Python languages. Plugin, written in C++ is a shared object (dll); For Python, it is regular python module, with *.py extension. 
+\n
+<h3>XML configuration of the module</h3>
+By default, all application's plugins are stored in the `/plugins` folder. However, it is possible to change this path in preferences: "Preferences >> Module|Plugins >> Default Path".
+\n
+The plugins directory have to contain `plugins.xml` file, which declares plugins included in the module and describes their parameters, like this:
+\code
+<plugin library="FooPlugin" configuration="plugin-Foo.xml"/>
+\endcode
+or, for python plugin:
+\code
+<plugin script="PythonicPlugin" configuration="plugin-Pythonic.xml"/>
+\endcode
+First example declares FooPlugin, which is library (`FooPlugin.dll` or `FooPlugin.so`) with "plugin-Foo.xml" configuration file. The second - a Python module, `PythonicPlugin.py`. All the declared libraries, scripts and configuration files should be placed in the same directory as the `plugins.xml`. Note also, that `library` and `script` attributes should not contain any extensions (*.py, *.dll); However, the `configuration` attribute doesn't have any pattern and just have to match name of the plugin configuration file.
+\n
+<h3>XML configuration of a plugin</h3>
+The plugin configuration files contains description of features: 
+<ol>
+<li>Position in the main menu: workbench and group.</li>
+<li>Visual representation of feature's button: text, icon, tooltip</li>
+<li>Representation feature's in the property panel (widgets)</li>
+</ol>
+Here is example configuration for a feature for storing and editing a double value:
+\code
+<plugin>
+  <workbench id="FooTab">
+    <group "Counters">
+      <feature id="CppDoubleCounter" title="Counter">
+        <doublevalue id="DoubleCounterData" label="Value" default="0"/>
+      </feature>
+    </group>
+  </workbench>
+</plugin>
+\endcode
+Now we will show how to implement a plugin with this feature using the C++ and Python APIs.
+\n
+<h3>Creating a plugin</h3>
+First of all, you should create/modify all configuration files (*.xml) in your `plugin` directory, as shown in examples before. For `plugin-Pythonic.xml` you may use the same content as in the `plugin-Foo.xml`, just change the name of the feature, in example, to `PythonDoubleCounter`. In this case you will get two features in one workbench and group, despite the fact that they are from different plugins.
+\n
+Secondly, you should create a subclass of ModelAPI_Plugin. Constructor on the subclass should register itself in the application. In C++ it is:
+\code
+#include <ModelAPI_Plugin.h>
+//...
+class FooPlugin : public ModelAPI_Plugin {
+  
+  FooPlugin() // Constructor
+  {
+    ModelAPI_Session::get()->registerPlugin(this);
+  }
+  //...
+\endcode
+And in Python:
+\code
+import ModelAPI
+#...
+class PythonicPlugin(ModelAPI.ModelAPI_Plugin)
+  
+  def __init__(self): #constructor
+    ModelAPI.ModelAPI_Plugin.__init__(self) # call ancestor's constructor
+    aSession = ModelAPI.ModelAPI_Session.get()
+    aSession.registerPlugin(self) # register itself
+  #...
+\endcode
+Furthermore, your class must have implementation of the `createFeature(...)` method, which should create corresponding feature object by the given id:
+\code
+FeaturePtr FooPlugin::createFeature(std::string theFeatureID)
+{
+  if (theFeatureID == "CppDoubleCounter") {
+    return FeaturePtr(new CppDoubleCounter);
+  } else {
+    return FeaturePtr()
+  }
+}
+\endcode
+It is a bit more tricky for Python - you should pass the ownership of created object from Python to the application by calling the \_\_disown\_\_() method:
+\code
+    def createFeature(self, theFeatureID):
+      if theFeatureID == "PythonDoubleCounter":
+        return PythonDoubleCounter().__disown__() # passing the ownership
+      else:
+	    return None
+\endcode
+Now your plugin is able to create features, declared in its configuration file. However, to register the plugin properly, its constructor must be called on loading of the library (script), like this:
+\code
+static FooPlugin* MY_FOOPLUGIN_INSTANCE = new FooPlugin();
+\endcode
+Please note, that some linux platforms required unique names for static variables.
+\n
+For Python, note that this code should be in the module's namespace (has no leading spaces):
+\code
+plugin = PythonicPlugin()
+plugin.__disown__()
+\endcode
+Plugin is created, lets pass over to the feature's implementation.
+\n
+<h3>Creating a feature</h3>
+Like a plugin, feature has its own base class - ModelAPI_Feature. 
+\code
+#include <ModelAPI_Feature.h>
+//...
+class CppDoubleCounter : public ModelAPI_Feature { //...
+\endcode
+Python:
+\code
+import ModelAPI
+#...
+class PythonDoubleCounter(ModelAPI.ModelAPI_Feature):
+
+  def __init__(self):
+    ModelAPI.ModelAPI_Feature.__init__(self) # default constructor;
+\endcode
+And like a plugin implements a functionality to create 'feature' objects by string id, feature defines which type of data should be stored in model and how this data should be processed. The `initAttributes(...)` method links feature's widget with data model:
+\code
+void ConstructionPlugin_Point::initAttributes()
+{
+  data()->addAttribute("DoubleCounterData", ModelAPI_AttributeDouble::type());
+}
+\endcode
+Python:
+\code
+  def initAttributes(self):
+    self.data().addAttribute("DoubleCounterData", ModelAPI.ModelAPI_AttributeDouble.type())
+\endcode
+As you may notice, this method defines that feature has a widget with "DoubleCounterData" id, which has Double type. Therefore, if your feature uses, in example, three widgets, the `initAttributes()` method should 'init' three attributes.
+\n
+Sometimes, it is not enough just to get data (ModelAPI_Data) from user input, and an internal logic (how to process the data) is required. The `execute()` method gives ability to implement it. In our example, we will just print the data from the input to console:
+\code
+void CppDoubleCounter::execute()
+{
+  double d = data()->real("DoubleCounterData")->value();
+  std::cout << "User input: " << d << std::endl;
+}
+\endcode
+Python:
+\code
+  def execute(self):
+    d = data().real("DoubleCounterData").value()
+	print "User input: ", d
+\endcode
+To sum everything up, we:
+<ol>
+<li>Declared two custom plugins in the plugins.xml</li>
+<li>Declared a feature for each plugin</li>
+<li>Created a custom plugin, by subclassing from ModelAPI_Plugin and implementation of `createFeature(...)` method</li>
+<li>Created a custom feature, by subclassing from ModelAPI_Feature and implementation of `initAttributes()` and `execute()` methods</li>
+</ol>
+If you writing a C++ plugin you should compile and link all sources in a dynamic link library (shared object). In Windows, do not forget to <a href="https://msdn.microsoft.com/en-us/library/3y1sfaz2.aspx">export</a> symbols.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/

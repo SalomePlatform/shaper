@@ -192,7 +192,7 @@ bool Model_AttributeSelection::update()
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {
     // body: just a named shape, use selection mechanism from OCCT
     TNaming_Selector aSelector(aSelLab);
-    bool aResult = true;//aSelector.Solve(scope()) == Standard_True;
+    bool aResult = aSelector.Solve(scope()) == Standard_True;
     owner()->data()->sendAttributeUpdated(this);
     return aResult;
   } else if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {

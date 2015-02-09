@@ -37,6 +37,7 @@ SET(PROJECT_HEADERS
     ModelAPI_ResultValidator.h
     ModelAPI_Session.h
     ModelAPI_Tools.h
+    ModelAPI_ShapeValidator.h
     ModelAPI_Validator.h
 )
 
@@ -65,6 +66,7 @@ SET(PROJECT_SOURCES
     ModelAPI_ResultGroup.cpp
     ModelAPI_ResultPart.cpp
     ModelAPI_Session.cpp
+    ModelAPI_ShapeValidator.cpp
     ModelAPI_Tools.cpp
 )
 
