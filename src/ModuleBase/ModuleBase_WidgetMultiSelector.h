@@ -12,6 +12,7 @@
 
 #include <ModuleBase.h>
 #include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_FilterNoDegeneratedEdge.h>
 
 #include <GeomAPI_Shape.h>
 #include <ModelAPI_Result.h>
@@ -133,6 +134,9 @@ protected slots:
 
   /// An action for pop-up menu in a list control
   QAction* myCopyAction;
+
+  /// A filter for the Edges type, which avoid the generated edges selection
+  Handle(ModuleBase_FilterNoDegeneratedEdge) myEdgesTypeFilter;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */
