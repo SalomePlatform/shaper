@@ -135,6 +135,8 @@ std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::addFeature(std::string th
 
 void SketchPlugin_Sketch::removeFeature(ModelAPI_Feature* theFeature)
 {
+  if (!data().get()) // sketch is already removed (case on undo of sketch), sync is not needed
+    return;
   list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
   list<ObjectPtr>::iterator aSubIt = aSubs.begin(), aLastIt = aSubs.end();
   bool isRemoved = false;
@@ -237,46 +239,6 @@ std::shared_ptr<GeomAPI_Pln> SketchPlugin_Sketch::plane()
 
   return std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(anOrigin->pnt(), aNorm->dir()));
 }
-
-//void addPlane(double theX, double theY, double theZ,
-//              std::list<std::shared_ptr<GeomAPI_Shape> >& theShapes)
-//{
-//  std::shared_ptr<GeomAPI_Pnt> anOrigin(new GeomAPI_Pnt(0, 0, 0));
-//  std::shared_ptr<GeomAPI_Dir> aNormal(new GeomAPI_Dir(theX, theY, theZ));
-//  double aSize = Config_PropManager::integer("Sketch planes", "Size of planes", PLANE_SIZE);
-//  std::shared_ptr<GeomAPI_Shape> aFace = GeomAlgoAPI_FaceBuilder::square(anOrigin, aNormal,
-//                                                                           aSize);
-//  theShapes.push_back(aFace);
-//}
-
-//AISObjectPtr SketchPlugin_Sketch::getAISObject(AISObjectPtr thePrevious)
-//{
-//  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-//      data()->attribute(SketchPlugin_Sketch::NORM_ID()));
-//
-//  if (!aNorm || (aNorm->x() == 0 && aNorm->y() == 0 && aNorm->z() == 0)) {
-//    AISObjectPtr aAIS = thePrevious;
-//    if (!aAIS) {
-//      std::list<std::shared_ptr<GeomAPI_Shape> > aFaces;
-//
-//      addPlane(1, 0, 0, aFaces);  // YZ plane
-//      addPlane(0, 1, 0, aFaces);  // XZ plane
-//      addPlane(0, 0, 1, aFaces);  // XY plane
-//      std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aFaces);
-//      aAIS = AISObjectPtr(new GeomAPI_AISObject());
-//      aAIS->createShape(aCompound);
-//
-//      std::vector<int> aRGB = Config_PropManager::color("Sketch planes", "planes_color",
-//      SKETCH_PLANE_COLOR);
-//      aAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
-//
-//      aAIS->setWidth(Config_PropManager::integer("Sketch planes", "planes_thickness",
-//      SKETCH_WIDTH));
-//    }
-//    return aAIS;
-//  }
-//  return AISObjectPtr();
-//}
 
 void SketchPlugin_Sketch::erase()
 {
