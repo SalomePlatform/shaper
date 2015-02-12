@@ -18,6 +18,8 @@
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_PropertyPanel.h>
 
+#include <AppElements_MainWindow.h>
+
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewWindow.h>
@@ -106,7 +108,8 @@ void fillFeature2Attribute(const QList<ModuleBase_ViewerPrs>& theList,
 
 
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
-  : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false)
+  : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
+     myIsMouseOverWindow(false), myIsPropertyPanelValueChanged(false)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -134,6 +137,22 @@ PartSet_SketcherMgr::~PartSet_SketcherMgr()
 {
   if (!myPlaneFilter.IsNull())
     myPlaneFilter.Nullify();
+}
+
+void PartSet_SketcherMgr::onMouseMoveOverWindow(bool theOverWindow)
+{
+  myIsMouseOverWindow = theOverWindow;
+  if (theOverWindow)
+    myIsPropertyPanelValueChanged = false;
+
+  updateVisibilityOfCreatedFeature();
+}
+
+void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
+{
+  myIsPropertyPanelValueChanged = true;
+
+  updateVisibilityOfCreatedFeature();
 }
 
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
@@ -166,8 +185,8 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     if (!PartSet_Tools::sketchPlane(myCurrentSketch))
       return;
 
-    bool isSketcher = (aOperation->id().toStdString() == SketchPlugin_Sketch::ID());
-    bool isSketchOpe = sketchOperationIdList().contains(aOperation->id());
+    bool isSketcher = isSketchOperation(aOperation);
+    bool isSketchOpe = isNestedSketchOperation(aOperation);
 
     // Avoid non-sketch operations
     if ((!isSketchOpe) && (!isSketcher))
@@ -234,8 +253,8 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
     return;
   ModuleBase_Operation* aOp = aWorkshop->currentOperation();
   if (aOp) {
-    if (sketchOperationIdList().contains(aOp->id())) {
-  get2dPoint(theWnd, theEvent, myClickedPoint);
+    if (isNestedSketchOperation(aOp)) {
+      get2dPoint(theWnd, theEvent, myClickedPoint);
 
       // Only for sketcher operations
       if (myIsDragging) {
@@ -277,7 +296,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
     if (!aOperation)
       return;
-    if (aOperation->id().toStdString() == SketchPlugin_Sketch::ID())
+    if (isSketchOperation(aOperation))
       return; // No edit operation activated
 
     Handle(V3d_View) aView = theWnd->v3dView();
@@ -387,6 +406,9 @@ void PartSet_SketcherMgr::onApplicationStarted()
     connect(aPropertyPanel, SIGNAL(beforeWidgetActivated(ModuleBase_ModelWidget*)),
             this, SLOT(onBeforeWidgetActivated(ModuleBase_ModelWidget*)));
   }
+
+  AppElements_MainWindow* aMainWindow = aWorkshop->mainWindow();
+  connect(aMainWindow, SIGNAL(mouseMoveOverWindow(bool)), this, SLOT(onMouseMoveOverWindow(bool)));
 }
 
 void PartSet_SketcherMgr::onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget)
@@ -405,15 +427,6 @@ void PartSet_SketcherMgr::onBeforeWidgetActivated(ModuleBase_ModelWidget* theWid
   if (aPnt2dWgt) {
     aPnt2dWgt->setPoint(myClickedPoint.myCurX, myClickedPoint.myCurY);
   }
-}
-
-bool PartSet_SketcherMgr::isDistanceOperation(ModuleBase_Operation* theOperation) const
-{
-  std::string aId = theOperation ? theOperation->id().toStdString() : "";
-
-  return (aId == SketchPlugin_ConstraintLength::ID()) ||
-         (aId == SketchPlugin_ConstraintDistance::ID()) ||
-         (aId == SketchPlugin_ConstraintRadius::ID());
 }
 
 void PartSet_SketcherMgr::get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent, 
@@ -469,6 +482,26 @@ QStringList PartSet_SketcherMgr::sketchOperationIdList()
     aIds << SketchPlugin_ConstraintParallel::ID().c_str();
   }
   return aIds;
+}
+
+bool PartSet_SketcherMgr::isSketchOperation(ModuleBase_Operation* theOperation)
+{
+  return theOperation && theOperation->id().toStdString() == SketchPlugin_Sketch::ID();
+}
+
+bool PartSet_SketcherMgr::isNestedSketchOperation(ModuleBase_Operation* theOperation)
+{
+  return theOperation &&
+         PartSet_SketcherMgr::sketchOperationIdList().contains(theOperation->id());
+}
+
+bool PartSet_SketcherMgr::isDistanceOperation(ModuleBase_Operation* theOperation)
+{
+  std::string aId = theOperation ? theOperation->id().toStdString() : "";
+
+  return (aId == SketchPlugin_ConstraintLength::ID()) ||
+         (aId == SketchPlugin_ConstraintDistance::ID()) ||
+         (aId == SketchPlugin_ConstraintRadius::ID());
 }
 
 void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
@@ -553,6 +586,20 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   aDisplayer->updateViewer();
 }
 
+void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* )
+{
+  connectToPropertyPanel(true);
+}
+
+void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* )
+{
+  connectToPropertyPanel(false);
+}
+
+bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
+{
+  return myIsMouseOverWindow || myIsPropertyPanelValueChanged;
+}
 
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 {
@@ -678,4 +725,44 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
       }
     }
   }
+}
+
+void PartSet_SketcherMgr::connectToPropertyPanel(const bool isToConnect)
+{
+  ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
+  if (aPropertyPanel) {
+    const QList<ModuleBase_ModelWidget*>& aWidgets = aPropertyPanel->modelWidgets();
+    foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
+      if (isToConnect)
+        connect(aWidget, SIGNAL(controlValuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
+      else
+        disconnect(aWidget, SIGNAL(controlValuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
+    }
+  }
+}
+
+void PartSet_SketcherMgr::updateVisibilityOfCreatedFeature()
+{
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  ModuleBase_Operation* aOperation = aWorkshop->currentOperation();
+  if (!aOperation || aOperation->isEditOperation())
+    return;
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+
+  FeaturePtr aFeature = aOperation->feature();
+  std::list<ResultPtr> aResults = aFeature->results();
+  std::list<ResultPtr>::const_iterator aIt;
+  for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+    if (canDisplayObject(aFeature)) {
+      aDisplayer->display(*aIt, false);
+    }
+    else {
+      aDisplayer->erase(*aIt, false);
+    }
+  }
+  aDisplayer->updateViewer();
 }

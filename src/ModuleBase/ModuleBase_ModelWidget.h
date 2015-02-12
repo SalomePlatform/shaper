@@ -142,6 +142,9 @@ signals:
   /// The signal about widget values changed
   void valuesChanged();
 
+  /// The signal about widget values changed
+  void controlValuesChanged();
+
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theEvent key release event
   void keyReleased(QKeyEvent* theEvent);

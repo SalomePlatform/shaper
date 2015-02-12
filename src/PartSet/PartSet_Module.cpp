@@ -186,9 +186,13 @@ void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
 {
-  if (theOperation->id().toStdString() == SketchPlugin_Sketch::ID()) {
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     mySketchMgr->startSketch(theOperation);
   }
+  else if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
+    mySketchMgr->startNestedSketch(theOperation);
+  }
+
   if (myDocumentShapeFilter.IsNull())
     myDocumentShapeFilter = new PartSet_GlobalFilter(myWorkshop);
   myWorkshop->viewer()->addSelectionFilter(myDocumentShapeFilter);
@@ -196,8 +200,12 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 {
-  if (theOperation->id().toStdString() == SketchPlugin_Sketch::ID()) {
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation) ||
+      PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
     mySketchMgr->stopSketch(theOperation);
+  }
+  else if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
+    mySketchMgr->stopNestedSketch(theOperation);
   }
   myWorkshop->viewer()->removeSelectionFilter(myDocumentShapeFilter);
 }
@@ -205,6 +213,8 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
   bool aCanDisplay = false;
+  if (!mySketchMgr->canDisplayObject(theObject))
+    return aCanDisplay;
   CompositeFeaturePtr aSketchFeature = mySketchMgr->activeSketch();
   if (aSketchFeature.get() != NULL) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
@@ -238,7 +248,8 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 
 void PartSet_Module::addViewerItems(QMenu* theMenu) const
 {
-  if (!isSketchOperationActive() && !isSketchFeatureOperationActive())
+  if (!PartSet_SketcherMgr::isSketchOperation(myWorkshop->currentOperation()) &&
+      !isSketchFeatureOperationActive())
     return;
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
   QObjectPtrList aObjects = aSelection->selectedPresentations();
@@ -259,8 +270,7 @@ void PartSet_Module::addViewerItems(QMenu* theMenu) const
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
   ModuleBase_IPropertyPanel* aPanel = theOperation->propertyPanel();
-  if ((theOperation->id().toStdString() == SketchPlugin_Sketch::ID()) && 
-    (theOperation->isEditOperation())) {
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation) &&  (theOperation->isEditOperation())) {
     // we have to manually activate the sketch label in edit mode
       aPanel->activateWidget(aPanel->modelWidgets().first());
       return;
@@ -289,20 +299,17 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
     if (theOperation->isEditOperation()) {
       // TODO: #391 - to be removed
       std::string aId = theOperation->id().toStdString();
-      if (PartSet_SketcherMgr::sketchOperationIdList().contains(QString(aId.c_str()))) {
-        if ((aId == SketchPlugin_ConstraintRadius::ID()) ||
-            (aId == SketchPlugin_ConstraintLength::ID()) || 
-            (aId == SketchPlugin_ConstraintDistance::ID())) {
-          // Find and activate widget for management of point for dimension line position
-          QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
-          foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
-            PartSet_WidgetPoint2D* aPntWgt = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
-            if (aPntWgt) {
-              aPanel->activateWidget(aPntWgt);
-              return;
-            }
+      if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation) &&
+          PartSet_SketcherMgr::isDistanceOperation(theOperation)) {
+        // Find and activate widget for management of point for dimension line position
+        QList<ModuleBase_ModelWidget*> aWidgets = aPanel->modelWidgets();
+        foreach (ModuleBase_ModelWidget* aWgt, aWidgets) {
+          PartSet_WidgetPoint2D* aPntWgt = dynamic_cast<PartSet_WidgetPoint2D*>(aWgt);
+          if (aPntWgt) {
+            aPanel->activateWidget(aPntWgt);
+            return;
           }
-        } 
+        }
       }
     }
   }
@@ -319,7 +326,7 @@ void PartSet_Module::onSelectionChanged()
   // An edit operation is enable only if the current opeation is the sketch operation
   if (mySketchMgr->activeSketch()) {
     if (PartSet_Tools::sketchPlane(mySketchMgr->activeSketch()))
-      isSketcherOp = (aOperation->id().toStdString() == SketchPlugin_Sketch::ID());
+      isSketcherOp = PartSet_SketcherMgr::isSketchOperation(aOperation);
   }
   if (isSketcherOp) {
     // Editing of constraints can be done on selection
@@ -442,14 +449,6 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
     return 0;
 }
 
-bool PartSet_Module::isSketchOperationActive() const
-{
-  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-
-  bool isSketchOp = aOperation && aOperation->id().toStdString() == SketchPlugin_Sketch::ID();
-  return isSketchOp;
-}
-
 bool PartSet_Module::isSketchFeatureOperationActive() const
 {
   bool isCurrentSketchOp = false;
@@ -497,7 +496,7 @@ void PartSet_Module::onAction(bool isChecked)
 
 void PartSet_Module::deleteObjects()
 {
-  bool isSketchOp = isSketchOperationActive();
+  bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(myWorkshop->currentOperation());
   if (!isSketchOp && !isSketchFeatureOperationActive())
     return;
 

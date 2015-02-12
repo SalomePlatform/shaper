@@ -425,14 +425,6 @@ std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(std::shared_ptr<GeomAPI_Pnt2
   return thePoint2D->to3D(aC->pnt(), aX->dir(), aY->dir());
 }
 
-bool PartSet_Tools::isConstraintFeature(const std::string& theKind)
-{
-  return theKind == SketchPlugin_ConstraintDistance::ID()
-      || theKind == SketchPlugin_ConstraintLength::ID()
-      || theKind == SketchPlugin_ConstraintRadius::ID()
-      || theKind == SketchPlugin_ConstraintRigid::ID();
-}
-
 ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShape, 
                                                  const ObjectPtr& theObject, 
                                                  CompositeFeaturePtr theSketch)
