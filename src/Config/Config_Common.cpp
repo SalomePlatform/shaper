@@ -128,6 +128,11 @@ std::string getProperty(xmlNodePtr theNode, const char* thePropName)
   return result;
 }
 
+std::string getNormalizedProperty(xmlNodePtr theNode, const char* thePropName)
+{
+  return normalize(getProperty(theNode, thePropName));
+}
+
 bool getBooleanAttribute(xmlNodePtr theNode, const char* theAttributeName, bool theDefault)
 {
   std::string prop = normalize(getProperty(theNode, theAttributeName));

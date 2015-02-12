@@ -91,6 +91,7 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   outFeatureMessage->setId(getProperty(theFeatureNode, _ID));
   outFeatureMessage->setPluginLibrary(myLibraryName);
   outFeatureMessage->setNestedFeatures(getProperty(theFeatureNode, FEATURE_NESTED));
+  outFeatureMessage->setActionsWhenNested(getNormalizedProperty(theFeatureNode, FEATURE_WHEN_NESTED));
 
   bool isInternal = getBooleanAttribute(theFeatureNode, ATTR_INTERNAL, false);
   outFeatureMessage->setInternal(isInternal);

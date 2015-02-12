@@ -74,9 +74,6 @@ Q_OBJECT
   /// \return the state whether the current operation is started
   bool startOperation(ModuleBase_Operation* theOperation);
 
-  /// Abort all operations
-  bool abortAllOperations();
-
   /// Returns whether the operation can be started. Check if there is already started operation and
   /// the granted parameter of the launched operation
   /// \param theId id of the operation which is going to start
@@ -104,6 +101,10 @@ Q_OBJECT
   void onAbortOperation();
   /// Slot that validates the current operation using the validateOperation method.
   void onValidateOperation();
+  /// Commit all operations
+  bool commitAllOperations();
+  /// Abort all operations
+  bool abortAllOperations();
 
 signals:
   /// Signal about an operation is started. It is emitted after the start() of operation is done.
@@ -123,7 +124,10 @@ signals:
   void operationAborted(ModuleBase_Operation* theOperation);
 
   /// Signal is emitted after the apply enable state changed.
-  void applyEnableChanged(bool);
+  void validationStateChanged(bool);
+
+  /// Signal is emitted after the apply enable state changed.
+  void nestedStateChanged(bool);
 
   /// Signal is emitted after the current operation is filled with existing preselection.
   void operationActivatedByPreselection();

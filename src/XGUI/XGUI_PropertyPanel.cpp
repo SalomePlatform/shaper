@@ -8,18 +8,21 @@
  */
 
 #include <XGUI_PropertyPanel.h>
+#include <XGUI_ActionsMgr.h>
 //#include <AppElements_Constants.h>
 #include <ModuleBase_WidgetMultiSelector.h>
 
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QFrame>
-#include <QPushButton>
-#include <QIcon>
-#include <QVBoxLayout>
 #include <QEvent>
+#include <QFrame>
+#include <QIcon>
 #include <QKeyEvent>
 #include <QLayoutItem>
+#include <QToolButton>
+#include <QVBoxLayout>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <QToolButton>
+#include <QAction>
 
 #ifdef _DEBUG
 #include <iostream>
@@ -46,22 +49,18 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   aBtnLay->setContentsMargins(0, 0, 0, 0);
   myMainLayout->addWidget(aFrm);
 
-  QPushButton* aBtn = new QPushButton(QIcon(":pictures/button_help.png"), "", aFrm);
-  aBtn->setFlat(true);
-  aBtnLay->addWidget(aBtn);
-  aBtnLay->addStretch(1);
-  aBtn = new QPushButton(QIcon(":pictures/button_ok.png"), "", aFrm);
-  aBtn->setObjectName(PROP_PANEL_OK);
-  aBtn->setToolTip(tr("Ok"));
-  aBtn->setFlat(true);
-  aBtnLay->addWidget(aBtn);
-
-  aBtn = new QPushButton(QIcon(":pictures/button_cancel.png"), "", aFrm);
-  aBtn->setToolTip(tr("Cancel"));
-  aBtn->setObjectName(PROP_PANEL_CANCEL);
-  aBtn->setFlat(true);
-  aBtn->setShortcut(QKeySequence(Qt::Key_Escape));
-  aBtnLay->addWidget(aBtn);
+  QStringList aBtnNames;
+  aBtnNames << QString(PROP_PANEL_HELP)
+            << QString(PROP_PANEL_OK)
+            << QString(PROP_PANEL_CANCEL);
+  foreach(QString eachBtnName, aBtnNames) {
+    QToolButton* aBtn = new QToolButton(aFrm);
+    aBtn->setObjectName(eachBtnName);
+    aBtn->setAutoRaise(true);
+    aBtnLay->addWidget(aBtn);
+  }
+  aBtnLay->insertStretch(1, 1);
+  // aBtn->setShortcut(QKeySequence(Qt::Key_Escape));
 
   myCustomWidget = new QWidget(aContent);
   myMainLayout->addWidget(myCustomWidget);
@@ -118,8 +117,8 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
     if (!aControls.empty()) {
       QWidget* aLastControl = aControls.last();
 
-      QPushButton* anOkBtn = findChild<QPushButton*>(PROP_PANEL_OK);
-      QPushButton* aCancelBtn = findChild<QPushButton*>(PROP_PANEL_CANCEL);
+      QToolButton* anOkBtn = findChild<QToolButton*>(PROP_PANEL_OK);
+      QToolButton* aCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
 
       setTabOrder(aLastControl, anOkBtn);
       setTabOrder(anOkBtn, aCancelBtn);
@@ -198,12 +197,6 @@ void XGUI_PropertyPanel::activateNextWidget()
   activateNextWidget(myActiveWidget);
 }
 
-void XGUI_PropertyPanel::setAcceptEnabled(bool isEnabled)
-{
-  QPushButton* anOkBtn = findChild<QPushButton*>(PROP_PANEL_OK);
-  anOkBtn->setEnabled(isEnabled);
-}
-
 void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
 {
   // Avoid activation of already actve widget. It could happen on focusIn event many times
@@ -228,13 +221,13 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
 
 void XGUI_PropertyPanel::setCancelEnabled(bool theEnabled)
 {
-  QPushButton* anCancelBtn = findChild<QPushButton*>(PROP_PANEL_CANCEL);
+  QToolButton* anCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
   anCancelBtn->setEnabled(theEnabled);
 }
 
 bool XGUI_PropertyPanel::isCancelEnabled() const
 {
-  QPushButton* anCancelBtn = findChild<QPushButton*>(PROP_PANEL_CANCEL);
+  QToolButton* anCancelBtn = findChild<QToolButton*>(PROP_PANEL_CANCEL);
   return anCancelBtn->isEnabled();
 }
 
@@ -243,5 +236,18 @@ void XGUI_PropertyPanel::setEditingMode(bool isEditing)
   ModuleBase_IPropertyPanel::setEditingMode(isEditing);
   foreach(ModuleBase_ModelWidget* aWgt, myWidgets) {
     aWgt->setEditingMode(isEditing);
+  }
+}
+
+void XGUI_PropertyPanel::setupActions(XGUI_ActionsMgr* theMgr)
+{
+  QStringList aButtonNames;
+  aButtonNames << PROP_PANEL_OK << PROP_PANEL_CANCEL << PROP_PANEL_HELP;
+  QList<XGUI_ActionsMgr::OperationStateActionId> aActionIds;
+  aActionIds << XGUI_ActionsMgr::Accept << XGUI_ActionsMgr::Abort << XGUI_ActionsMgr::Help;
+  for (int i = 0; i < aButtonNames.size(); ++i) {
+    QToolButton* aBtn = findChild<QToolButton*>(aButtonNames.at(i));
+    QAction* anAct = theMgr->operationStateAction(aActionIds.at(i));
+    aBtn->setDefaultAction(anAct);
   }
 }

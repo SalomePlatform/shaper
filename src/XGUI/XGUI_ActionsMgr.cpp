@@ -213,6 +213,35 @@ void XGUI_ActionsMgr::processEvent(const std::shared_ptr<Events_Message>& theMes
   }
 }
 
+QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QObject* theParent)
+{
+  QAction* aResult = NULL;
+  if (myOperationActions.contains(theId)) {
+    aResult = myOperationActions.value(theId);
+    if (theParent && aResult->parent() != theParent) {
+      aResult->setParent(theParent);
+    }
+  } else {
+    switch (theId) {
+      case Accept:
+      case AcceptAll:
+        aResult = new QAction(QIcon(":pictures/button_ok.png"), "", theParent);
+        break;
+      case Abort:
+      case AbortAll:
+        aResult = new QAction(QIcon(":pictures/button_cancel.png"), "", theParent);
+        break;
+      case Help:
+        aResult = new QAction(QIcon(":pictures/button_help.png"), "", theParent);
+        break;
+      default:
+        break;
+    }
+    myOperationActions.insert(theId, aResult);
+  }
+  return aResult;
+}
+
 void XGUI_ActionsMgr::setAllEnabled(bool isEnabled)
 {
   foreach(QString eachAction, myActions.keys())
