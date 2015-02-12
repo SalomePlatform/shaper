@@ -8,18 +8,19 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_ResultConstruction.h>
 
+/// It is important.
+///
+/// Before writing a new method implementation in this file, please check the next rule:
+/// exported public methods must not be implemented in this source file. They should be inline and
+/// placed in the header file.
+/// Because it leads to the runtime problem on the Linux OS.
+///
+/// The reason is that this is an abstract interface. An interface of this class can be used in
+/// outside libraries through casting without a link to the current library.
+
 SketchPlugin_Feature::SketchPlugin_Feature()
 {
   mySketch = 0;
-}
-
-void SketchPlugin_Feature::erase()
-{
-  SketchPlugin_Sketch* aSketch = sketch();
-  if (aSketch)
-    aSketch->removeFeature(this);
-
-  ModelAPI_Feature::erase();
 }
 
 SketchPlugin_Sketch* SketchPlugin_Feature::sketch()

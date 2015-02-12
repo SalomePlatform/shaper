@@ -9,8 +9,10 @@
 
 #include <ModuleBase_WidgetMultiSelector.h>
 #include <ModuleBase_WidgetShapeSelector.h>
+#include <ModuleBase_FilterNoDegeneratedEdge.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
 
 #include <ModelAPI_Data.h>
@@ -167,6 +169,8 @@ void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
   } else {
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
     myWorkshop->deactivateSubShapesSelection();
+
+    myWorkshop->viewer()->removeSelectionFilter(myEdgesTypeFilter);
   }
 }
 
@@ -258,6 +262,17 @@ void ModuleBase_WidgetMultiSelector::activateShapeSelection()
   QIntList aList;
   aList.append(ModuleBase_WidgetShapeSelector::shapeType(aNewType));
   myWorkshop->activateSubShapesSelection(aList);
+
+  // it is necessary to filter the selected edges to be non-degenerated
+  // it is not possible to build naming name for such edges
+  if (aNewType == "Edges") {
+    myEdgesTypeFilter = new ModuleBase_FilterNoDegeneratedEdge();
+    ModuleBase_IViewer* aViewer = myWorkshop->viewer();
+    aViewer->addSelectionFilter(myEdgesTypeFilter);
+  }
+  else {
+    myWorkshop->viewer()->removeSelectionFilter(myEdgesTypeFilter);
+  }
 }
 
 //********************************************************************

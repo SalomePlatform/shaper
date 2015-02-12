@@ -351,9 +351,6 @@ signals:
   /// \param isChecked a state of toggle if the action is checkable
   void onContextMenuCommand(const QString& theId, bool isChecked);
 
-  /// Processing of values changed in model widget
-  void onWidgetValuesChanged();
-
   /// Set waiting cursor
   void onStartWaiting();
 

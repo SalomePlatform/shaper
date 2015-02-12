@@ -84,10 +84,11 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         for anIndex in range(0, aFeaturesNum):
             aFeature = self.Part.object("Features", anIndex)
             aSelectionList = aFeature.data().selectionList("group_list")
+            aName = aFeature.data().name()
             # if a group has been found
             if aSelectionList:
                 groupIndex = groupIndex + 1
-                self.createGroupFromList(aSelectionList, "NewGeomGroup_{0}".format(groupIndex))
+                self.createGroupFromList(aSelectionList, aName)
                      
     ## Creates a group by given list of selected objects and the name
     #  @param theSelectionList: list of selected objects

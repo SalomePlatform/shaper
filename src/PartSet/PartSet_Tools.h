@@ -144,10 +144,6 @@ class PARTSET_EXPORT PartSet_Tools
   /// \return API object of point 3D
   static std::shared_ptr<GeomAPI_Pnt> point3D(std::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
                                                 CompositeFeaturePtr theSketch);
-  /// Check whether there is a constraint with the feature kind given
-  /// \param theKind a feature kind
-  /// \return the boolean value
-  static bool isConstraintFeature(const std::string& theKind);
 
   /// Creates a line (arc or circle) by given edge
   /// Created line will have fixed constraint
@@ -155,9 +151,9 @@ class PARTSET_EXPORT PartSet_Tools
   /// \param theObject a selected result object
   /// \param theSketch a sketch feature
   /// \return result of created feature
-  static ResultPtr createFixedObjectByEdge(const TopoDS_Shape& theShape, 
-                                           const ObjectPtr& theObject, 
-                                           CompositeFeaturePtr theSketch);
+  static ResultPtr createFixedObjectByExternal(const TopoDS_Shape& theShape, 
+                                               const ObjectPtr& theObject, 
+                                               CompositeFeaturePtr theSketch);
 
   /// Checks whether the list of selected presentations contains the given one
   /// \param theSelected a list of presentations

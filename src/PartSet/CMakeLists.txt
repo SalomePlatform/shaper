@@ -74,6 +74,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/XGUI
                     ${CMAKE_SOURCE_DIR}/src/SketchPlugin
                     ${CMAKE_SOURCE_DIR}/src/FeaturesPlugin
                     ${CMAKE_SOURCE_DIR}/src/GeomAPI
+                    ${CMAKE_SOURCE_DIR}/src/AppElements
                     ${CAS_INCLUDE_DIRS}
 					${SUIT_INCLUDE}
 )

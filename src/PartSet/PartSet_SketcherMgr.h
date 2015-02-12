@@ -77,8 +77,20 @@ public:
 
   virtual ~PartSet_SketcherMgr();
 
-  /// Returns list of strings which contains id's of sketch operations
-  static QStringList sketchOperationIdList();
+  /// Returns true if the operation is the sketch
+  /// \param theOperation an operation
+  /// \return the boolean result
+  static bool isSketchOperation(ModuleBase_Operation* theOperation);
+
+  /// Returns true if the operation id is in the sketch operation id list
+  /// \param theOperation an operation
+  /// \return the boolean result
+  static bool isNestedSketchOperation(ModuleBase_Operation* theOperation);
+
+  /// Returns whethe the current operation is a sketch distance - lenght, distance or radius
+  /// \param the operation
+  /// \return a boolean value
+  static bool isDistanceOperation(ModuleBase_Operation* theOperation);
 
   /// Launches the operation from current highlighting
   void launchEditing();
@@ -92,12 +104,28 @@ public:
   /// Stops sketch operation
   void stopSketch(ModuleBase_Operation* );
 
+  /// Starts sketch operation
+  void startNestedSketch(ModuleBase_Operation* );
+
+  /// Stops sketch operation
+  void stopNestedSketch(ModuleBase_Operation* );
+
+  /// Returns whether the object can be displayed at the bounds of the active operation.
+  /// Display only current operation results for usual operation and ask the sketcher manager
+  /// if it is a sketch operation
+  /// \param theObject a model object
+  bool canDisplayObject(const ObjectPtr& theObject) const;
+
 public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
 
 private slots:
+  /// Process the signal about mouse moving into or out of the window
+  /// \param heOverWindow true, if the moving happens to window
+  void onMouseMoveOverWindow(bool theOverWindow);
+  void onValuesChangedInPropertyPanel();
   void onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseReleased(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseMoved(ModuleBase_IViewWindow*, QMouseEvent*);
@@ -106,10 +134,8 @@ private slots:
   void onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
 private:
-  /// Returns whethe the current operation is a sketch distance - lenght, distance or radius
-  /// \param the operation
-  /// \return a boolean value
-  bool isDistanceOperation(ModuleBase_Operation* theOperation) const;
+  /// Returns list of strings which contains id's of sketch operations
+  static QStringList sketchOperationIdList();
 
   /// Converts mouse position to 2d coordinates. 
   /// Member myCurrentSketch has to be correctly defined
@@ -163,12 +189,20 @@ private:
                                   const FeatureToSelectionMap& theSelection,
                                   SelectMgr_IndexedMapOfOwner& anOwnersToSelect);
 
+  /// Connects or disconnects to the value changed signal of the property panel widgets
+  /// \param isToConnect a boolean value whether connect or disconnect
+  void connectToPropertyPanel(const bool isToConnect);
+
+  void updateVisibilityOfCreatedFeature();
+
 private:
   PartSet_Module* myModule;
 
   bool myPreviousSelectionEnabled; // the previous selection enabled state in the viewer
   bool myIsDragging;
   bool myDragDone;
+  bool myIsMouseOverWindow; /// the state that mouse is over view
+  bool myIsPropertyPanelValueChanged; /// the state that value in the property panel is changed
   Point myCurrentPoint;
   Point myClickedPoint;
 

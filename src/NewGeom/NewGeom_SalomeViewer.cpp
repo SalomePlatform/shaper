@@ -162,7 +162,12 @@ void NewGeom_SalomeViewer::onMouseMove(SUIT_ViewWindow* theView, QMouseEvent* th
 bool NewGeom_SalomeViewer::canDragByMouse() const
 {
   OCCViewer_Viewer* aViewer = mySelector->viewer();
-  return (aViewer->interactionStyle() != 0);
+  SUIT_ViewWindow* aWnd = aViewer->getViewManager()->getActiveView();
+  OCCViewer_ViewWindow* aViewWnd = dynamic_cast<OCCViewer_ViewWindow*>(aWnd);
+  if (aViewWnd) {
+    return (aViewWnd->interactionStyle() == 0);
+  }
+  return true;
 }
 
 

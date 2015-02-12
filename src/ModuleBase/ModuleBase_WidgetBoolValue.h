@@ -31,13 +31,16 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetBoolValue();
 
-  virtual bool storeValue() const;
-
   virtual bool restoreValue();
 
   virtual QList<QWidget*> getControls() const;
 
   QWidget* getControl() const;
+
+protected:
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const;
 
  private:
    /// The check box

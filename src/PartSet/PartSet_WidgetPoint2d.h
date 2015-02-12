@@ -52,8 +52,6 @@ Q_OBJECT
   /// \param theValue the wrapped widget value
   virtual bool setSelection(ModuleBase_ViewerPrs theValue);
 
-  virtual bool storeValue() const;
-
   virtual bool restoreValue();
 
   /// Returns the internal parent wiget control, that can be shown anywhere
@@ -109,6 +107,10 @@ protected slots:
   void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
 protected:
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const;
+
   /// The methiod called when widget is activated
   virtual void activateCustom();
 

@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_FilterLinearEdge.h
 	ModuleBase_FilterMulti.h
 	ModuleBase_FilterNoConsructionSubShapes.h
+	ModuleBase_FilterNoDegeneratedEdge.h
 	ModuleBase_FilterShapeType.h
 	ModuleBase_Tools.h
 	ModuleBase_IModule.h
@@ -53,6 +54,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_FilterLinearEdge.cpp
 	ModuleBase_FilterMulti.cpp
 	ModuleBase_FilterNoConsructionSubShapes.cpp
+	ModuleBase_FilterNoDegeneratedEdge.cpp
 	ModuleBase_FilterShapeType.cpp
 	ModuleBase_Tools.cpp
 	ModuleBase_IModule.cpp

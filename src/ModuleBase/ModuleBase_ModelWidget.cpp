@@ -30,6 +30,8 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent, const Config_
   myIsValueDefault = !theData->getProperty(ATTR_DEFAULT).empty();
   myIsComputedDefault = false;
   myAttributeID = theData ? theData->widgetId() : "";
+
+  connect(this, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
 }
 
 bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
@@ -69,6 +71,13 @@ void ModuleBase_ModelWidget::setHighlighted(bool isHighlighted)
       aWidget->setGraphicsEffect(NULL);
     }
   }
+}
+
+void ModuleBase_ModelWidget::setFeature(const FeaturePtr& theFeature, const bool theToStoreValue)
+{
+  myFeature = theFeature;
+  if (theToStoreValue)
+    storeValue();
 }
 
 bool ModuleBase_ModelWidget::focusTo()
@@ -121,4 +130,10 @@ bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
   // pass the event on to the parent class
 
   return QObject::eventFilter(theObject, theEvent);
+}
+
+//**************************************************************
+void ModuleBase_ModelWidget::onWidgetValuesChanged()
+{
+  storeValue();
 }

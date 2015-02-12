@@ -79,7 +79,14 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
   }
 
   /// removes also all sub-sketch elements
-  SKETCHPLUGIN_EXPORT virtual void erase();
+  SKETCHPLUGIN_EXPORT virtual void erase()
+  {
+    /*SketchPlugin_Sketch* aSketch = sketch();
+    if (aSketch)
+      aSketch->removeFeature(this);
+      */
+    ModelAPI_Feature::erase();
+  }
 
   /// Returns the sketch of this feature
   SketchPlugin_Sketch* sketch();

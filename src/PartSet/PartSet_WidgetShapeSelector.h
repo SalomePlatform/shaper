@@ -35,8 +35,6 @@ Q_OBJECT
 
   virtual ~PartSet_WidgetShapeSelector() {}
 
-  virtual bool storeValue() const;
-
   /// Set sketcher
   /// \param theSketch a sketcher object
   void setSketcher(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
@@ -45,6 +43,10 @@ Q_OBJECT
   CompositeFeaturePtr sketch() const { return mySketch; }
 
 protected:
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const;
+
   /// Check the selected with validators if installed
   virtual bool isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape);
 
@@ -73,15 +75,17 @@ Q_OBJECT
 
   virtual ~PartSet_WidgetConstraintShapeSelector() {}
 
-  /// Saves the internal parameters to the given feature
-  virtual bool storeValue() const;
-
   /// Set sketcher
   /// \param theSketch a sketcher object
   void setSketcher(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
 
   /// Retrurns installed sketcher
   CompositeFeaturePtr sketch() const { return mySketch; }
+
+protected:
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const;
 
 private:
   /// Pointer to a sketch 

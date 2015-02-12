@@ -37,10 +37,6 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetDoubleValue();
 
-  //! Saves the internal parameters to the given feature
-  // \return True in success
-  virtual bool storeValue() const;
-
   //! Read value of corresponded attribute from data model to the input control
   // \return True in success
   virtual bool restoreValue();
@@ -61,7 +57,12 @@ Q_OBJECT
  // it gives him a 0,5 second to finish typing, when sends valueChnaged() signal
 //  void onValueChanged();
 
- protected:
+protected:
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const;
+
+protected:
    /// Container for thw widget controls
   QWidget* myContainer;
 

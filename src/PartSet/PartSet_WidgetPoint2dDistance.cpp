@@ -56,7 +56,7 @@ void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
     mySpinBox->blockSignals(true);
     mySpinBox->setValue(aRadius);
     mySpinBox->blockSignals(false);
-    emit valuesChanged();
+    storeValue();
   }
 }
 

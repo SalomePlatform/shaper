@@ -53,6 +53,7 @@ void Model_Session::closeAll()
 void Model_Session::startOperation(const std::string& theId)
 {
   ROOT_DOC->startOperation();
+  ROOT_DOC->operationId(theId);
   static std::shared_ptr<Events_Message> aStartedMsg
     (new Events_Message(Events_Loop::eventByName("StartOperation")));
   Events_Loop::loop()->send(aStartedMsg);
@@ -121,17 +122,12 @@ void Model_Session::redo()
 //! Returns stack of performed operations
 std::list<std::string> Model_Session::undoList()
 {
-  std::list<std::string> temp;
-  temp.push_front("Part");
-  temp.push_front("Sketch");
-  temp.push_front("Extrusion");
-  return temp;
+  return ROOT_DOC->undoList();
 }
 //! Returns stack of rolled back operations
 std::list<std::string> Model_Session::redoList()
 {
-  std::list<std::string> temp;
-  return temp;
+  return ROOT_DOC->redoList();
 }
 
 FeaturePtr Model_Session::createFeature(string theFeatureID)

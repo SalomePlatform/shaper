@@ -39,8 +39,6 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetChoice();
   
-  virtual bool storeValue() const;
-
   virtual bool restoreValue();
 
   virtual bool focusTo();
@@ -55,6 +53,11 @@ Q_OBJECT
   /// Returns list of widget controls
   /// \return a controls list
   virtual QList<QWidget*> getControls() const;
+
+protected:
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const;
 
 private slots:
   /// Slot called on combo box index change

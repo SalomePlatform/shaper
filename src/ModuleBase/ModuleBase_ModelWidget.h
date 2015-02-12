@@ -72,9 +72,6 @@ Q_OBJECT
     return false;
   }
 
-  /// Saves the internal parameters to the given feature
-  virtual bool storeValue() const = 0;
-
   /// Restore value from attribute data to the widget's control
   virtual bool restoreValue() = 0;
 
@@ -127,10 +124,8 @@ Q_OBJECT
   }
 
   /// Set feature which is processing by active operation
-  void setFeature(const FeaturePtr& theFeature)
-  {
-    myFeature = theFeature;
-  }
+  /// \param theToStoreValue a value about necessity to store the widget value to the feature
+  void setFeature(const FeaturePtr& theFeature, const bool theToStoreValue = false);
 
   /// Editing mode depends on mode of current operation. This value is defined by it.
   void setEditingMode(bool isEditing) { myIsEditing = isEditing; }
@@ -155,6 +150,10 @@ signals:
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
 
  protected:
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const = 0;
+
   /// \brief Set the attribute name
   /// \param theAttribute the string value with attribute name
   void setAttributeID(const std::string& theAttribute)
@@ -172,6 +171,10 @@ signals:
   /// Sends Move event for the given object
   /// \param theObj is object for moving
   void moveObject(ObjectPtr theObj) const;
+
+protected slots:
+  /// Processing of values changed in model widget by store the current value to the feature
+  void onWidgetValuesChanged();
 
  protected:
 

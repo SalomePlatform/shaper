@@ -46,8 +46,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFileSelector : public ModuleBase_ModelW
                                 const std::string& theParentId);
   virtual ~ModuleBase_WidgetFileSelector();
 
-  virtual bool storeValue() const;
-
   virtual bool restoreValue();
 
   QWidget* getControl() const;
@@ -64,6 +62,11 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFileSelector : public ModuleBase_ModelW
 
   /// Processing of path changing
   void onPathChanged();
+
+protected:
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const;
 
  protected:
    /// Returns string containing formats
