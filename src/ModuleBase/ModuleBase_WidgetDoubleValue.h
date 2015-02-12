@@ -37,6 +37,9 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetDoubleValue();
 
+  /// Fills the widget with default values
+  virtual void reset();
+
   //! Read value of corresponded attribute from data model to the input control
   // \return True in success
   virtual bool restoreValue();

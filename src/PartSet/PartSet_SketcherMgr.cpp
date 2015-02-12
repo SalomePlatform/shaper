@@ -141,15 +141,29 @@ PartSet_SketcherMgr::~PartSet_SketcherMgr()
 
 void PartSet_SketcherMgr::onMouseMoveOverWindow(bool theOverWindow)
 {
+  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+  if (!aOperation || aOperation->isEditOperation())
+    return;
+
   myIsMouseOverWindow = theOverWindow;
   if (theOverWindow)
     myIsPropertyPanelValueChanged = false;
-
+  else {
+    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+    ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
+    if(aActiveWgt) {
+      aActiveWgt->reset();
+    }
+  }  
   updateVisibilityOfCreatedFeature();
 }
 
 void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
 {
+  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+  if (!aOperation || aOperation->isEditOperation())
+    return;
+
   myIsPropertyPanelValueChanged = true;
 
   updateVisibilityOfCreatedFeature();

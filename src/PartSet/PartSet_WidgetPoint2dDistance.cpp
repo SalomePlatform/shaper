@@ -40,6 +40,13 @@ PartSet_WidgetPoint2dDistance::~PartSet_WidgetPoint2dDistance()
 {
 }
 
+void PartSet_WidgetPoint2dDistance::reset()
+{
+  bool isOk;
+  double aDefValue = QString::fromStdString(myDefaultValue).toDouble(&isOk);
+  mySpinBox->setValue(isOk ? aDefValue : 0.0);
+}
+
 void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePnt)
 {

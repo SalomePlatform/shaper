@@ -43,6 +43,9 @@ Q_OBJECT
   {
   }
 
+  /// Fills the widget with default values
+  virtual void reset() {};
+
   /// Returns the state whether the attribute of the feature is initialized
   /// \param theObject a model feature to be checked
   /// \return the boolean result
@@ -55,7 +58,7 @@ Q_OBJECT
   /// Returns true, if default value of the widget is defined in the XML and it is not the
   /// computed value
   /// \return the boolean result
-  bool isValueDefault() { return myIsValueDefault; }
+  bool isValueDefault() { return !myDefaultValue.empty(); }
 
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
@@ -190,8 +193,9 @@ protected slots:
   /// Value should be computed on execute, like radius for circle's constraint (can not be zero)
   bool myIsComputedDefault; 
                         
-  /// the default value is defined in the XML for this attribute    
-  bool myIsValueDefault;
+  /// the default value, which is defined in the XML for this attribute    
+  std::string myDefaultValue; 
+
   /// Flag which shows that current operation is in editing mode
   bool myIsEditing; 
 };

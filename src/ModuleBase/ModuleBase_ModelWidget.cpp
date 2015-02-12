@@ -27,7 +27,7 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent, const Config_
     : QObject(theParent),
       myParentId(theParentId)
 {
-  myIsValueDefault = !theData->getProperty(ATTR_DEFAULT).empty();
+  myDefaultValue = theData->getProperty(ATTR_DEFAULT);
   myIsComputedDefault = false;
   myAttributeID = theData ? theData->widgetId() : "";
 

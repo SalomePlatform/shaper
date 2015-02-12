@@ -92,6 +92,15 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
   }
 }
 
+void PartSet_WidgetPoint2D::reset()
+{
+  bool isOk;
+  double aDefValue = QString::fromStdString(myDefaultValue).toDouble(&isOk);
+
+  myXSpin->setValue(isOk ? aDefValue : 0.0);
+  myYSpin->setValue(isOk ? aDefValue : 0.0);
+}
+
 PartSet_WidgetPoint2D::~PartSet_WidgetPoint2D()
 {
 }
