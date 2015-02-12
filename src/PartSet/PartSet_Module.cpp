@@ -200,8 +200,7 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
 
 void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 {
-  if (PartSet_SketcherMgr::isSketchOperation(theOperation) ||
-      PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
+  if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     mySketchMgr->stopSketch(theOperation);
   }
   else if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {

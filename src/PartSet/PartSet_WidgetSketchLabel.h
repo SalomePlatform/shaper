@@ -48,11 +48,6 @@ Q_OBJECT
 
   virtual ~PartSet_WidgetSketchLabel();
 
-  virtual bool storeValue() const
-  {
-    return true;
-  }
-
   virtual bool restoreValue()
   {
     return true;
@@ -82,6 +77,13 @@ signals:
   void planeSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
 protected:
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const
+  {
+    return true;
+  }
+
   /// The methiod called when widget is activated
   virtual void activateCustom();
 

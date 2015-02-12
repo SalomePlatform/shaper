@@ -33,11 +33,6 @@ Q_OBJECT
   /// It returns false because this is an info widget
   virtual bool canSetValue() const { return false; };
 
-  virtual bool storeValue() const
-  {
-    return true;
-  }
-
   virtual bool restoreValue()
   {
     return true;
@@ -49,6 +44,14 @@ Q_OBJECT
 
   /// This control doesn't accept focus
   virtual bool focusTo() { return false; }
+
+protected:
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const
+  {
+    return true;
+  }
 
 private:
   /// A label control

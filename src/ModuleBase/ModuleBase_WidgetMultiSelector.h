@@ -62,9 +62,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
                                  const std::string& theParentId);
   virtual ~ModuleBase_WidgetMultiSelector();
 
-  /// Saves the internal parameters to the given feature
-  virtual bool storeValue() const;
-
   virtual bool restoreValue();
 
   /// Returns the internal parent wiget control, that can be shown anywhere
@@ -95,7 +92,11 @@ protected slots:
   void onListSelection();
 
  protected:
-   /// Provide filtering of selected shapes
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const;
+
+  /// Provide filtering of selected shapes
    /// \param theShapesToFilter source list of shapes
    /// \param theResult result list of shapes
   void filterShapes(const NCollection_List<TopoDS_Shape>& theShapesToFilter,

@@ -651,13 +651,10 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
 
   QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
-    aWidget->setFeature(theOperation->feature());
+    bool isStoreValue = !theOperation->isEditOperation() &&
+                        aWidget->isValueDefault() && !aWidget->isComputedDefault();
+    aWidget->setFeature(theOperation->feature(), isStoreValue);
     aWidget->enableFocusProcessing();
-    QObject::connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
-    // Init default values
-    if (!theOperation->isEditOperation() && aWidget->isValueDefault() && !aWidget->isComputedDefault()) {
-      aWidget->storeValue();
-    }
   }
   
   myPropertyPanel->setModelWidgets(aWidgets);
@@ -1255,24 +1252,6 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObjects.first());
     if (aFeature)
       myModule->editFeature(aFeature);
-  }
-}
-
-//**************************************************************
-void XGUI_Workshop::onWidgetValuesChanged()
-{
-  ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
-  FeaturePtr aFeature = anOperation->feature();
-
-  ModuleBase_ModelWidget* aSenderWidget = dynamic_cast<ModuleBase_ModelWidget*>(sender());
-
-  const QList<ModuleBase_ModelWidget*>& aWidgets = myPropertyPanel->modelWidgets();
-  QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
-  for (; anIt != aLast; anIt++) {
-    ModuleBase_ModelWidget* aCustom = *anIt;
-    if (aCustom && (aCustom == aSenderWidget)) {
-      aCustom->storeValue();
-    }
   }
 }
 

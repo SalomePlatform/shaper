@@ -737,9 +737,9 @@ void PartSet_SketcherMgr::connectToPropertyPanel(const bool isToConnect)
     const QList<ModuleBase_ModelWidget*>& aWidgets = aPropertyPanel->modelWidgets();
     foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
       if (isToConnect)
-        connect(aWidget, SIGNAL(controlValuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
+        connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
       else
-        disconnect(aWidget, SIGNAL(controlValuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
+        disconnect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
     }
   }
 }

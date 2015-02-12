@@ -38,8 +38,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetLineEdit : public ModuleBase_ModelWidge
                                 const std::string& theParentId);
   virtual ~ModuleBase_WidgetLineEdit();
 
-  virtual bool storeValue() const;
-
   virtual bool restoreValue();
 
   QWidget* getControl() const;
@@ -50,7 +48,12 @@ class MODULEBASE_EXPORT ModuleBase_WidgetLineEdit : public ModuleBase_ModelWidge
    /// A slot for processing text changed event
   void onTextChanged();
 
- private:
+protected:
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const;
+
+private:
    /// A line edit control
   QLineEdit* myLineEdit;
 

@@ -71,9 +71,6 @@ Q_OBJECT
 
   virtual ~ModuleBase_WidgetShapeSelector();
 
-  /// Saves the internal parameters to the given feature
-  virtual bool storeValue() const;
-
   virtual bool restoreValue();
 
   /// Defines if it is supposed that the widget should interact with the viewer.
@@ -116,6 +113,10 @@ Q_OBJECT
   void onSelectionChanged();
 
  protected:
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValue() const;
+
   /// The methiod called when widget is activated
   virtual void activateCustom();
 

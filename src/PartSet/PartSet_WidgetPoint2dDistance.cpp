@@ -34,7 +34,6 @@ PartSet_WidgetPoint2dDistance::PartSet_WidgetPoint2dDistance(QWidget* theParent,
   // Reconnect to local slot
   disconnect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
   connect(mySpinBox, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
-  connect(mySpinBox, SIGNAL(valueChanged(double)), this, SLOT(controlValuesChanged()));
 }
 
 PartSet_WidgetPoint2dDistance::~PartSet_WidgetPoint2dDistance()
@@ -57,7 +56,7 @@ void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
     mySpinBox->blockSignals(true);
     mySpinBox->setValue(aRadius);
     mySpinBox->blockSignals(false);
-    emit valuesChanged();
+    storeValue();
   }
 }
 
