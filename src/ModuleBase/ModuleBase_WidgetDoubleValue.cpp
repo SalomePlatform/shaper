@@ -82,7 +82,7 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
   double aDefVal = QString::fromStdString(myDefaultValue).toDouble(&isOk);
   if (isOk) {
     mySpinBox->setValue(aDefVal);
-  } else if (aProp == DOUBLE_WDG_DEFAULT_COMPUTED){
+  } else if (theData->getProperty(ATTR_DEFAULT) == DOUBLE_WDG_DEFAULT_COMPUTED){
     myIsComputedDefault = true;
   }
 
@@ -101,6 +101,9 @@ ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 
 void ModuleBase_WidgetDoubleValue::reset()
 {
+  if (myIsComputedDefault)
+    return;
+
   bool isOk;
   double aDefValue = QString::fromStdString(myDefaultValue).toDouble(&isOk);
   mySpinBox->setValue(isOk ? aDefValue : 0.0);

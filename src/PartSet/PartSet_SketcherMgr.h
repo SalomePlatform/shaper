@@ -122,12 +122,14 @@ public:
   /// Display only current operation results for usual operation and ask the sketcher manager
   /// if it is a sketch operation
   /// \param theObject a model object
-  bool canDisplayObject(const ObjectPtr& theObject) const;
+  bool canDisplayObject() const;
 
 public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
+  /// Listens the value changed signal and display the current operation feature
+  void onValuesChangedInPropertyPanel();
 
 private slots:
   /// Process the enter mouse to the view port. If the current operation is a create of
@@ -137,7 +139,6 @@ private slots:
   /// a nested sketch feature, it hides the feature in the viewer
   void onLeaveViewPort();
 
-  void onValuesChangedInPropertyPanel();
   void onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseReleased(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseMoved(ModuleBase_IViewWindow*, QMouseEvent*);
