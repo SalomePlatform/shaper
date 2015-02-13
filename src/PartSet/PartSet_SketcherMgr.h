@@ -130,9 +130,13 @@ public slots:
 
 
 private slots:
-  /// Process the signal about mouse moving into or out of the window
-  /// \param heOverWindow true, if the moving happens to window
-  void onMouseMoveOverWindow(bool theOverWindow);
+  /// Process the enter mouse to the view port. If the current operation is a create of
+  /// a nested sketch feature, it updates internal flags to display the feature on mouse move
+  void onEnterViewPort();
+  /// Process the leave mouse of the view port. If the current operation is a create of
+  /// a nested sketch feature, it hides the feature in the viewer
+  void onLeaveViewPort();
+
   void onValuesChangedInPropertyPanel();
   void onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseReleased(ModuleBase_IViewWindow*, QMouseEvent*);
@@ -220,6 +224,7 @@ private:
   bool myIsDragging;
   bool myDragDone;
   bool myIsPropertyPanelValueChanged; /// the state that value in the property panel is changed
+  bool myIsMouseOverWindow; /// the state that the mouse over the view
   bool myIsMouseOverViewProcessed; /// the state whether the over view state is processed by mouseMove method
   Point myCurrentPoint;
   Point myClickedPoint;

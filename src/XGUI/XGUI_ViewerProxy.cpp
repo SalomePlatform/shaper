@@ -10,6 +10,8 @@
 #include <AppElements_ViewWindow.h>
 #include <AppElements_Viewer.h>
 
+#include <QEvent>
+
 XGUI_ViewerProxy::XGUI_ViewerProxy(XGUI_Workshop* theParent)
     : ModuleBase_IViewer(theParent),
       myWorkshop(theParent)
@@ -105,7 +107,6 @@ void XGUI_ViewerProxy::connectToViewer()
     connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
     connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
             SIGNAL(contextMenuRequested(QContextMenuEvent*)));
-
   } else {
     AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
 
@@ -147,6 +148,21 @@ void XGUI_ViewerProxy::connectToViewer()
   }
 }
 
+bool XGUI_ViewerProxy::eventFilter(QObject *theObject, QEvent *theEvent)
+{
+  AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
+  bool isViewPort = theObject == aViewer->activeViewWindow()->viewPort();
+  if (isViewPort)
+  {
+    if (theEvent->type() == QEvent::Enter) {
+      emit enterViewPort();
+    }
+    else if (theEvent->type() == QEvent::Leave) {
+      emit leaveViewPort();
+    }
+  }
+  return ModuleBase_IViewer::eventFilter(theObject, theEvent);
+}
 
 void XGUI_ViewerProxy::onTryCloseView(AppElements_ViewWindow* theWnd)
 {
@@ -160,6 +176,8 @@ void XGUI_ViewerProxy::onDeleteView(AppElements_ViewWindow* theWnd)
 
 void XGUI_ViewerProxy::onViewCreated(AppElements_ViewWindow* theWnd)
 {
+  theWnd->viewPort()->installEventFilter(this);
+
   emit viewCreated(theWnd);
 }
 

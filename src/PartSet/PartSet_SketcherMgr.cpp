@@ -18,6 +18,7 @@
 #include <ModuleBase_ModelWidget.h>
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_PropertyPanel.h>
+#include <XGUI_ViewerProxy.h>
 
 #include <AppElements_MainWindow.h>
 
@@ -110,7 +111,8 @@ void fillFeature2Attribute(const QList<ModuleBase_ViewerPrs>& theList,
 
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
-    myIsPropertyPanelValueChanged(false), myIsMouseOverViewProcessed(true)
+    myIsPropertyPanelValueChanged(false), myIsMouseOverWindow(false),
+    myIsMouseOverViewProcessed(true)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -140,19 +142,25 @@ PartSet_SketcherMgr::~PartSet_SketcherMgr()
     myPlaneFilter.Nullify();
 }
 
-void PartSet_SketcherMgr::onMouseMoveOverWindow(bool theOverWindow)
+void PartSet_SketcherMgr::onEnterViewPort()
 {
-  if (!isNestedCreateOperation() || theOverWindow)
+  if (!isNestedCreateOperation())
     return;
   // 1. if the mouse over window, update the next flag. Do not perform update visibility of
   // created feature because it should be done in onMouseMove(). Some widgets watch
   // the mouse move and use the cursor position to update own values. If the presentaion is
   // redisplayed before this update, the feature presentation jumps from reset value to current.
-  if (theOverWindow) {
-    myIsPropertyPanelValueChanged = false;
+  myIsMouseOverWindow = true;
+  myIsPropertyPanelValueChanged = false;
+}
+
+void PartSet_SketcherMgr::onLeaveViewPort()
+{
+  if (!isNestedCreateOperation())
     return;
-  }
+
   myIsMouseOverViewProcessed = false;
+  myIsMouseOverWindow = false;
 
   // 2. if the mouse IS NOT over window, reset the active widget value and hide the presentation
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
@@ -456,8 +464,9 @@ void PartSet_SketcherMgr::onApplicationStarted()
             this, SLOT(onBeforeWidgetActivated(ModuleBase_ModelWidget*)));
   }
 
-  AppElements_MainWindow* aMainWindow = aWorkshop->mainWindow();
-  connect(aMainWindow, SIGNAL(mouseMoveOverWindow(bool)), this, SLOT(onMouseMoveOverWindow(bool)));
+  XGUI_ViewerProxy* aViewerProxy = aWorkshop->viewer();
+  connect(aViewerProxy, SIGNAL(enterViewPort()), this, SLOT(onEnterViewPort()));
+  connect(aViewerProxy, SIGNAL(leaveViewPort()), this, SLOT(onLeaveViewPort()));
 }
 
 void PartSet_SketcherMgr::onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget)
@@ -644,6 +653,7 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* )
 {
   connectToPropertyPanel(false);
   myIsPropertyPanelValueChanged = false;
+  myIsMouseOverWindow = false;
   myIsMouseOverViewProcessed = true;
 }
 
@@ -665,15 +675,15 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
 
   // during a nested create operation, the feature is redisplayed only if the mouse over view
   // of there was a value modified in the property panel after the mouse left the view
-  aCanDisplay = myIsPropertyPanelValueChanged;
-  if (!aCanDisplay) {
+  aCanDisplay = myIsPropertyPanelValueChanged || myIsMouseOverWindow;
+  /*if (!aCanDisplay) {
     ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
     XGUI_Workshop* aWorkshop = aConnector->workshop();
     AppElements_MainWindow* aMainWindow = aWorkshop->mainWindow();
 
-    aCanDisplay = aMainWindow->isMouseOverWindow();
-  }
+    //aCanDisplay = aMainWindow->isMouseOverWindow();
+  }*/
   return aCanDisplay;
 }
 

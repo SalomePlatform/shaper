@@ -73,6 +73,19 @@ Q_OBJECT
   /// by mouse drugging. If this is impossible thet it has to return False.
   virtual bool canDragByMouse() const;
 
+signals:
+  /// Emits by mouse entering the view port
+  void enterViewPort();
+
+  /// Emits by mouse leaving of the view port
+  void leaveViewPort();
+
+protected:
+  /// processes the application signals to catch the mouse leaving state of the main window
+  /// \param theObject
+  /// \param theEvent
+  bool eventFilter(QObject *theObject, QEvent *theEvent);
+
 private slots:
   void onTryCloseView(AppElements_ViewWindow*);
   void onDeleteView(AppElements_ViewWindow*);
