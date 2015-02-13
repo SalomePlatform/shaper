@@ -668,7 +668,7 @@ bool PartSet_SketcherMgr::canRedo() const
   return isNestedCreateOperation();
 }
 
-bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
+bool PartSet_SketcherMgr::canDisplayObject() const
 {
   bool aCanDisplay = true;
   if (!isNestedCreateOperation())
@@ -677,14 +677,6 @@ bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
   // during a nested create operation, the feature is redisplayed only if the mouse over view
   // of there was a value modified in the property panel after the mouse left the view
   aCanDisplay = myIsPropertyPanelValueChanged || myIsMouseOverWindow;
-  /*if (!aCanDisplay) {
-    ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
-    XGUI_Workshop* aWorkshop = aConnector->workshop();
-    AppElements_MainWindow* aMainWindow = aWorkshop->mainWindow();
-
-    //aCanDisplay = aMainWindow->isMouseOverWindow();
-  }*/
   return aCanDisplay;
 }
 
@@ -846,11 +838,20 @@ void PartSet_SketcherMgr::updateVisibilityOfCreatedFeature()
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
+  bool aToDisplay = canDisplayObject();
+  // 1. change visibility of the object itself, here the presentable object is processed,
+  // e.g. constraints features
   FeaturePtr aFeature = aOperation->feature();
   std::list<ResultPtr> aResults = aFeature->results();
+  if (aToDisplay)
+    aDisplayer->display(aFeature, false);
+  else
+    aDisplayer->erase(aFeature, false);
+
+  // change visibility of the object results, e.g. non-constraint features
   std::list<ResultPtr>::const_iterator aIt;
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-    if (canDisplayObject(aFeature)) {
+    if (aToDisplay) {
       aDisplayer->display(*aIt, false);
     }
     else {

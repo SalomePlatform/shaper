@@ -122,7 +122,7 @@ public:
   /// Display only current operation results for usual operation and ask the sketcher manager
   /// if it is a sketch operation
   /// \param theObject a model object
-  bool canDisplayObject(const ObjectPtr& theObject) const;
+  bool canDisplayObject() const;
 
 public slots:
   /// Process sketch plane selected event

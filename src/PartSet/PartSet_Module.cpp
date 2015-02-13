@@ -236,7 +236,7 @@ bool PartSet_Module::canRedo() const
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
   bool aCanDisplay = false;
-  if (!mySketchMgr->canDisplayObject(theObject))
+  if (!mySketchMgr->canDisplayObject())
     return aCanDisplay;
   CompositeFeaturePtr aSketchFeature = mySketchMgr->activeSketch();
   if (aSketchFeature.get() != NULL) {
