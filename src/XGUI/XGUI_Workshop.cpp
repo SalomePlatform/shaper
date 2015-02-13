@@ -1077,11 +1077,10 @@ void XGUI_Workshop::updateCommandStatus()
         // Enable all commands
         aCmd->setEnabled(true);
     }
+
     aUndoCmd->setEnabled(myModule->canUndo());
     aRedoCmd->setEnabled(myModule->canRedo());
-
     updateHistory();
-
   } else {
     foreach(QAction* aCmd, aCommands) {
       QString aId = aCmd->data().toString();
@@ -1100,28 +1099,12 @@ void XGUI_Workshop::updateCommandStatus()
 void XGUI_Workshop::updateHistory()
 {
   std::list<std::string> aUndoList = ModelAPI_Session::get()->undoList();
-  std::list<std::string>::iterator it = aUndoList.begin();
-  QList<ActionInfo> aUndoRes;
-  for ( ; it != aUndoList.end(); it++) {
-    QString anId = QString::fromStdString(*it);
-    QIcon aIcon;
-    if (myIcons.contains(anId))
-      aIcon = QIcon(myIcons[anId]);
-    aUndoRes << ActionInfo(aIcon, anId);
-  }
+  QList<ActionInfo> aUndoRes = processHistoryList(aUndoList);
   emit updateUndoHistory(aUndoRes);
 
   std::list<std::string> aRedoList = ModelAPI_Session::get()->redoList();
-  it = aRedoList.begin();
-  QList<ActionInfo> aRedoRes;
-  for ( ; it != aRedoList.end(); it++) {
-    QString anId = QString::fromStdString(*it);
-    QIcon aIcon;
-    if (myIcons.contains(anId))
-      aIcon = QIcon(myIcons[anId]);
-    aRedoRes << ActionInfo(aIcon, anId);
-  }
-  emit updateRedoHistory(aUndoRes);
+  QList<ActionInfo> aRedoRes = processHistoryList(aRedoList);
+  emit updateRedoHistory(aRedoRes);
 }
 
 //******************************************************
@@ -1345,7 +1328,15 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
   }
 
   SessionPtr aMgr = ModelAPI_Session::get();
-  aMgr->startOperation("DeleteObjects");
+  QString aDescription = tr("Delete %1");
+  QStringList aObjectNames;
+  foreach (ObjectPtr aObj, theList) {
+    if (!aObj->data().get())
+      continue;
+    aObjectNames << QString::fromStdString(aObj->data()->name());
+  }
+  aDescription = aDescription.arg(aObjectNames.join(", "));
+  aMgr->startOperation(aDescription.toStdString());
   std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
                                        aLast = aRefFeatures.end();
   for (; anIt != aLast; anIt++) {
@@ -1373,6 +1364,7 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
 
   myDisplayer->updateViewer();
   aMgr->finishOperation();
+  updateCommandStatus();
 }
 
 //**************************************************************
@@ -1487,5 +1479,23 @@ void XGUI_Workshop::addHistoryMenu(QObject* theObject, const char* theSignal, co
   }
   connect(this, theSignal, aMenu, SLOT(setHistory(const QList<ActionInfo>&)));
   connect(aMenu, SIGNAL(actionSelected(int)), this, theSlot);
+}
 
+QList<ActionInfo> XGUI_Workshop::processHistoryList(const std::list<std::string>& theList) const
+{
+  QList<ActionInfo> aResult;
+  std::list<std::string>::const_iterator it = theList.cbegin();
+  for (; it != theList.cend(); it++) {
+    QString anId = QString::fromStdString(*it);
+    bool isEditing = anId.endsWith(ModuleBase_Operation::EditSuffix());
+    if (isEditing) {
+      anId.chop(ModuleBase_Operation::EditSuffix().size());
+    }
+    ActionInfo anInfo = myActionsMgr->actionInfoById(anId);
+    if (isEditing) {
+      anInfo.text = anInfo.text.prepend("Modify ");
+    }
+    aResult << anInfo;
+  }
+  return aResult;
 }
