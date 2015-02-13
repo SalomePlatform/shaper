@@ -390,6 +390,9 @@ void PartSet_Module::onOperationActivatedByPreselection()
     // Set final definitions if they are necessary
     //propertyPanelDefined(aOperation);
 
+    // the sketch manager should return the true state in canBeDisplayed, so it is correct
+    // to switch the property panel value changed flag for this
+    mySketchMgr->onValuesChangedInPropertyPanel();
     /// Commit sketcher operations automatically
     aOperation->commit();
   }
