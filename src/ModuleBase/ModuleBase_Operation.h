@@ -50,6 +50,9 @@ class MODULEBASE_EXPORT ModuleBase_Operation : public QObject
 Q_OBJECT
 
  public:
+
+  /// Appends to operation's history id, if it is an "edit" operation (myIsEditing == true)
+  static QString EditSuffix() { return "_E"; }
   /// Constructor
   /// \param theId the operation identifier
   /// \param theParent the QObject parent

@@ -48,7 +48,7 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   MODEL_EXPORT virtual void closeAll();
 
   //! Starts a new operation (opens a tansaction)
-  MODEL_EXPORT virtual void startOperation(const std::string& theId);
+  MODEL_EXPORT virtual void startOperation(const std::string& theId = "");
   //! Finishes the previously started operation (closes the transaction)
   MODEL_EXPORT virtual void finishOperation();
   //! Aborts the operation 

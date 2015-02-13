@@ -31,10 +31,14 @@ class XGUI_EXPORT XGUI_HistoryMenu : public QMenu
  public slots:
   void setHistory(const QList<ActionInfo>&);
 
+ protected:
+  virtual void leaveEvent(QEvent *);
+
  protected slots:
   void setStackSelectedTo(QListWidgetItem *);
   void onItemPressed(QListWidgetItem *);
   void initMenu();
+
 
  private:
   QListWidget* myHistoryList;

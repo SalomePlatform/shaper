@@ -555,6 +555,7 @@ void PartSet_Module::deleteObjects()
     //}
   }
 
+  QString aDescription = tr("Delete");
   if (!aRefFeatures.empty()) {
     QStringList aRefNames;
     std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
@@ -567,6 +568,7 @@ void PartSet_Module::deleteObjects()
     }
     if (!aRefNames.empty()) {
       QString aNames = aRefNames.join(", ");
+      aDescription += aNames.prepend(" ");
 
       QMainWindow* aDesktop = aWorkshop->desktop();
       QMessageBox::StandardButton aRes = QMessageBox::warning(
@@ -580,7 +582,7 @@ void PartSet_Module::deleteObjects()
   }
 
   SessionPtr aMgr = ModelAPI_Session::get();
-  aMgr->startOperation("DeletePartSet");
+  aMgr->startOperation(aDescription.toStdString());
   std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
                                        aLast = aRefFeatures.end();
   for (; anIt != aLast; anIt++) {

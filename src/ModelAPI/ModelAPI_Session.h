@@ -46,7 +46,7 @@ class MODELAPI_EXPORT ModelAPI_Session
 
   //! Starts a new operation (opens a tansaction)
   //! \param theId of operation for history (optional)
-  virtual void startOperation(const std::string& theId) = 0;
+  virtual void startOperation(const std::string& theId = "") = 0;
   //! Finishes the previously started operation (closes the transaction)
   virtual void finishOperation() = 0;
   //! Aborts the operation 

@@ -389,6 +389,9 @@ signals:
   //! \param theSlot - onUndo(int) or onRedo(int) SLOT
   void addHistoryMenu(QObject* theObject, const char* theSignal, const char* theSlot);
 
+  //! Creates list of actions (commands) by given history list from session
+  QList<ActionInfo> processHistoryList(const std::list<std::string>&) const;
+
 private:
   AppElements_MainWindow* myMainWindow;
   ModuleBase_IModule* myModule;

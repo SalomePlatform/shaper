@@ -12,6 +12,8 @@
 #include <Events_Listener.h>
 #include <ModelAPI_Feature.h>
 
+#include <ModuleBase_ActionInfo.h>
+
 #include <QObject>
 #include <QMap>
 #include <QList>
@@ -76,6 +78,8 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
   //! Return property panel's action like ok, cancel, help.
   //! If there is no such action, it will be created.
   QAction* operationStateAction(OperationStateActionId theId, QObject* theParent = 0);
+
+  ActionInfo actionInfoById(const QString& theId);
 
  public slots:
   //! Update workbench actions according to OperationMgr state:

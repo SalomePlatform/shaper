@@ -147,6 +147,9 @@ std::shared_ptr<ModelAPI_Document> ModuleBase_Operation::document() const
 void ModuleBase_Operation::start()
 {
   QString anId = getDescription()->operationId();
+  if (myIsEditing) {
+      anId = anId.append(EditSuffix());
+  }
   ModelAPI_Session::get()->startOperation(anId.toStdString());
 
   if (!myIsEditing)

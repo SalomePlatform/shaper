@@ -66,14 +66,16 @@ void XGUI_HistoryMenu::setHistory(const QList<ActionInfo>& theActions)
   }
 }
 
+void XGUI_HistoryMenu::leaveEvent(QEvent* theEvent)
+{
+  setStackSelectedTo(NULL);
+  QMenu::leaveEvent(theEvent);
+}
 
 void XGUI_HistoryMenu::setStackSelectedTo(QListWidgetItem * theItem)
 {
-  if (!theItem)
-    return;
-
   QListWidgetItem* eachItem = NULL;
-  bool isSelect = true;
+  bool isSelect = theItem != NULL;
   for(int aRow = 0; aRow < myHistoryList->count(); ++aRow) {
     eachItem = myHistoryList->item(aRow);
     myHistoryList->setItemSelected(eachItem, isSelect);
@@ -82,6 +84,8 @@ void XGUI_HistoryMenu::setStackSelectedTo(QListWidgetItem * theItem)
       isSelect = false;
     }
   }
+  // to avoid blinking caused by QMenu paint event (paints on top of the list)
+  myHistoryList->repaint();
 }
 
 void XGUI_HistoryMenu::onItemPressed(QListWidgetItem * theItem)
@@ -89,5 +93,4 @@ void XGUI_HistoryMenu::onItemPressed(QListWidgetItem * theItem)
   int selectedSize = myHistoryList->row(theItem) + 1;
   emit actionSelected(selectedSize);
   hide();
-  myHistoryList->clear();
 }

@@ -228,9 +228,13 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QOb
         aResult = new QAction(QIcon(":pictures/button_ok.png"), "", theParent);
         break;
       case Abort:
-      case AbortAll:
+      case AbortAll: {
         aResult = new QAction(QIcon(":pictures/button_cancel.png"), "", theParent);
-        break;
+        if(theId == Abort) {
+          aResult->setShortcut(QKeySequence(Qt::Key_Escape));
+        }
+      }
+      break;
       case Help:
         aResult = new QAction(QIcon(":pictures/button_help.png"), "", theParent);
         break;
@@ -238,6 +242,18 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId, QOb
         break;
     }
     myOperationActions.insert(theId, aResult);
+  }
+  return aResult;
+}
+
+ActionInfo XGUI_ActionsMgr::actionInfoById(const QString& theId)
+{
+  ActionInfo aResult;
+  if(myActions.contains(theId)) {
+    aResult.initFrom(myActions.value(theId));
+  } else {
+   aResult.id = theId;
+   aResult.text = theId;
   }
   return aResult;
 }
