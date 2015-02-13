@@ -29,7 +29,7 @@ class NewGeom_SalomeView: public ModuleBase_IViewWindow
 public:
   /// Constructor
   /// \param theViewer a reference to a viewer
-  NewGeom_SalomeView(OCCViewer_Viewer* theViewer) { myViewer = theViewer; }
+  NewGeom_SalomeView(OCCViewer_Viewer* theViewer);
 
   virtual Handle(V3d_View) v3dView() const;
 
@@ -43,9 +43,13 @@ public:
   /// Returns current viewer
   OCCViewer_Viewer* viewer() const { return myViewer; }
 
+  /// Sets the current view
+  void setCurrentView(SUIT_ViewWindow* theView) { myCurrentView = theView; }
+
 private:
   /// A reference to a viewer
   OCCViewer_Viewer* myViewer;
+  SUIT_ViewWindow* myCurrentView;
 };
 
 

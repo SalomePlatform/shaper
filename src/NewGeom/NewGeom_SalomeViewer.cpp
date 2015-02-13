@@ -12,20 +12,31 @@
 #include <QMouseEvent>
 #include <QContextMenuEvent>
 
+NewGeom_SalomeView::NewGeom_SalomeView(OCCViewer_Viewer* theViewer)
+: ModuleBase_IViewWindow(), myCurrentView(0)
+{
+  myViewer = theViewer;
+}
+
 
 Handle(V3d_View) NewGeom_SalomeView::v3dView() const
 {
-  SUIT_ViewManager* aMgr = myViewer->getViewManager();
-  OCCViewer_ViewWindow* aWnd = static_cast<OCCViewer_ViewWindow*>(aMgr->getActiveView());
-  Handle(V3d_View) aView = aWnd->getViewPort()->getView();
+  Handle(V3d_View) aView;
+  if (myCurrentView) {
+    OCCViewer_ViewWindow* aWnd = static_cast<OCCViewer_ViewWindow*>(myCurrentView);
+    aView = aWnd->getViewPort()->getView();
+  }
   return aView;
 }
 
 QWidget* NewGeom_SalomeView::viewPort() const
 {
-  SUIT_ViewManager* aMgr = myViewer->getViewManager();
-  OCCViewer_ViewWindow* aWnd = static_cast<OCCViewer_ViewWindow*>(aMgr->getActiveView());
-  return aWnd->getViewPort();
+  QWidget* aViewPort = 0;
+  if (myCurrentView) {
+    OCCViewer_ViewWindow* aWnd = static_cast<OCCViewer_ViewWindow*>(myCurrentView);
+    aViewPort = aWnd->getViewPort();
+  }
+  return aViewPort;
 }
 
 //**********************************************
@@ -134,14 +145,16 @@ void NewGeom_SalomeViewer::onSelectionChanged()
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onMousePress(SUIT_ViewWindow*, QMouseEvent* theEvent)
+void NewGeom_SalomeViewer::onMousePress(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
 {
+  myView->setCurrentView(theView);
   emit mousePress(myView, theEvent);
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onMouseRelease(SUIT_ViewWindow*, QMouseEvent* theEvent)
+void NewGeom_SalomeViewer::onMouseRelease(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
 {
+  myView->setCurrentView(theView);
   emit mouseRelease(myView, theEvent);
   if (myIsSelectionChanged) {
     emit selectionChanged();
@@ -150,14 +163,16 @@ void NewGeom_SalomeViewer::onMouseRelease(SUIT_ViewWindow*, QMouseEvent* theEven
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onMouseDoubleClick(SUIT_ViewWindow*, QMouseEvent* theEvent)
+void NewGeom_SalomeViewer::onMouseDoubleClick(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
 {
+  myView->setCurrentView(theView);
   emit mouseDoubleClick(myView, theEvent);
 }
 
 //**********************************************
 void NewGeom_SalomeViewer::onMouseMove(SUIT_ViewWindow* theView, QMouseEvent* theEvent)
 {
+  myView->setCurrentView(theView);
   OCCViewer_ViewWindow* aViewWnd = dynamic_cast<OCCViewer_ViewWindow*>(theView);
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (aContext->HasDetected()) // Set focus to provide key events in the view
@@ -213,8 +228,9 @@ void NewGeom_SalomeViewer::onDeleteView(SUIT_ViewWindow*)
 }
 
 //**********************************************
-void NewGeom_SalomeViewer::onViewCreated(SUIT_ViewWindow*)
+void NewGeom_SalomeViewer::onViewCreated(SUIT_ViewWindow* theView)
 {
+  myView->setCurrentView(theView);
   emit viewCreated(myView);
 }
 
