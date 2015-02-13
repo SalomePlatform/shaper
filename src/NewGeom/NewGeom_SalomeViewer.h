@@ -33,6 +33,9 @@ public:
 
   virtual Handle(V3d_View) v3dView() const;
 
+  /// Returns the view window view port
+  virtual QWidget* viewPort() const;
+
   /// Set the current viewer
   /// \param theViewer a viewer instance
   void setViewer(OCCViewer_Viewer* theViewer) { myViewer = theViewer; }

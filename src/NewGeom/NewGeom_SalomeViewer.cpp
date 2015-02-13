@@ -21,6 +21,13 @@ Handle(V3d_View) NewGeom_SalomeView::v3dView() const
   return aView;
 }
 
+QWidget* NewGeom_SalomeView::viewPort() const
+{
+  SUIT_ViewManager* aMgr = myViewer->getViewManager();
+  OCCViewer_ViewWindow* aWnd = static_cast<OCCViewer_ViewWindow*>(aMgr->getActiveView());
+  return aWnd->getViewPort();
+}
+
 //**********************************************
 //**********************************************
 //**********************************************

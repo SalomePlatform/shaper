@@ -42,7 +42,7 @@ Handle(V3d_View) XGUI_ViewerProxy::activeView() const
     return myWorkshop->salomeConnector()->viewer()->activeView();
   } else {
     AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-    return (aViewer->activeViewWindow()) ? aViewer->activeViewWindow()->viewPort()->getView() :
+    return (aViewer->activeViewWindow()) ? aViewer->activeViewWindow()->viewPortApp()->getView() :
     Handle(V3d_View)();
   }
 }
@@ -64,7 +64,7 @@ void XGUI_ViewerProxy::fitAll()
   } else {
     AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
     if (aViewer->activeViewWindow())
-      aViewer->activeViewWindow()->viewPort()->fitAll();
+      aViewer->activeViewWindow()->viewPortApp()->fitAll();
   }
 }
 
@@ -81,7 +81,7 @@ void XGUI_ViewerProxy::connectToViewer()
       this, SIGNAL(deleteView(ModuleBase_IViewWindow*)));
 
     connect(aViewer, SIGNAL(viewCreated(ModuleBase_IViewWindow*)), 
-      this, SIGNAL(viewCreated(ModuleBase_IViewWindow*)));
+      this, SLOT(onViewCreated(ModuleBase_IViewWindow*)));
 
     connect(aViewer, SIGNAL(activated(ModuleBase_IViewWindow*)), 
       this, SIGNAL(activated(ModuleBase_IViewWindow*)));
@@ -150,16 +150,11 @@ void XGUI_ViewerProxy::connectToViewer()
 
 bool XGUI_ViewerProxy::eventFilter(QObject *theObject, QEvent *theEvent)
 {
-  AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
-  bool isViewPort = theObject == aViewer->activeViewWindow()->viewPort();
-  if (isViewPort)
-  {
-    if (theEvent->type() == QEvent::Enter) {
-      emit enterViewPort();
-    }
-    else if (theEvent->type() == QEvent::Leave) {
-      emit leaveViewPort();
-    }
+  if (theEvent->type() == QEvent::Enter) {
+    emit enterViewPort();
+  }
+  else if (theEvent->type() == QEvent::Leave) {
+    emit leaveViewPort();
   }
   return ModuleBase_IViewer::eventFilter(theObject, theEvent);
 }
@@ -172,6 +167,13 @@ void XGUI_ViewerProxy::onTryCloseView(AppElements_ViewWindow* theWnd)
 void XGUI_ViewerProxy::onDeleteView(AppElements_ViewWindow* theWnd)
 {
   emit deleteView(theWnd);
+}
+
+void XGUI_ViewerProxy::onViewCreated(ModuleBase_IViewWindow* theWnd)
+{
+  theWnd->viewPort()->installEventFilter(this);
+
+  emit viewCreated(theWnd);
 }
 
 void XGUI_ViewerProxy::onViewCreated(AppElements_ViewWindow* theWnd)

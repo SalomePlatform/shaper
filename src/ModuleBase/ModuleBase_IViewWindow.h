@@ -17,6 +17,9 @@ class ModuleBase_IViewWindow
 public:
   /// Returns OCCT object which contains 3d view object
   virtual Handle(V3d_View) v3dView() const = 0;
+
+  /// Returns the view window view port
+  virtual QWidget* viewPort() const = 0;
 };
 
 

@@ -89,6 +89,7 @@ protected:
 private slots:
   void onTryCloseView(AppElements_ViewWindow*);
   void onDeleteView(AppElements_ViewWindow*);
+  void onViewCreated(ModuleBase_IViewWindow* theWnd);
   void onViewCreated(AppElements_ViewWindow*);
   void onActivated(AppElements_ViewWindow*);
 
