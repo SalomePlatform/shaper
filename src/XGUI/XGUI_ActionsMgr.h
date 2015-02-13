@@ -39,6 +39,7 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
   XGUI_ActionsMgr(XGUI_Workshop* theWorkshop);
   virtual ~XGUI_ActionsMgr();
 
+  /// Actions on operations
   enum OperationStateActionId {
     Abort = 0,
     Accept = 1,
@@ -79,6 +80,7 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
   //! If there is no such action, it will be created.
   QAction* operationStateAction(OperationStateActionId theId, QObject* theParent = 0);
 
+  /// Return info (icon, text, etc) about the action by the given id, if it was registered in the manager
   ActionInfo actionInfoById(const QString& theId);
 
  public slots:

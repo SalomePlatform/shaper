@@ -14,9 +14,6 @@
 #include <QToolButton>
 #include <QAction>
 
-//! Extends given feature with previously created context menu.
-//! \param theId - Id of the feature to add \a theMenu
-//! \param theMenu - Enables or disables menu feature
 XGUI_HistoryMenu::XGUI_HistoryMenu(QAction* theParent)
  : QMenu(NULL),
    myHistoryList(NULL)
@@ -27,9 +24,6 @@ XGUI_HistoryMenu::XGUI_HistoryMenu(QAction* theParent)
   connect(theParent, SIGNAL(destroyed()), this, SLOT(deleteLater()));
 }
 
-//! Extends given feature with previously created context menu.
-//! \param theId - Id of the feature to add \a theMenu
-//! \param theMenu - Enables or disables menu feature
 XGUI_HistoryMenu::XGUI_HistoryMenu(QToolButton* theParent)
  : QMenu(theParent),
    myHistoryList(NULL)

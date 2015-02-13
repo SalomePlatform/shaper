@@ -53,9 +53,9 @@ Q_OBJECT
                               const QKeySequence& theKeys = QKeySequence(),
                               bool isCheckable = false);
 
+  //! Add feature (QAction) in the \a theWBName toolbar with given \a theInfo about action
   virtual QAction* addFeature(const QString& theWBName,
-                                const ActionInfo& theInfo);
-
+                              const ActionInfo& theInfo);
 
   virtual QAction* addDesktopCommand(const QString& theId, const QString& theTitle,
                                      const QString& theTip, const QIcon& theIcon,

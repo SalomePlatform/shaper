@@ -217,7 +217,9 @@ signals:
   //! the application is started
   void applicationStarted();
 
+  //! Signal to update Undo history list
   void updateUndoHistory(const QList<ActionInfo>&);
+  //! Signal to update Redo history list
   void updateRedoHistory(const QList<ActionInfo>&);
 
  public slots:

@@ -34,6 +34,9 @@ class XGUI_EXPORT XGUI_SalomeConnector
                               const QString& theTitle, const QString& theTip, const QIcon& theIcon,
                               const QKeySequence& theKeys, bool isCheckable) = 0;
 
+  //! Creates a feature (command) in SALOME desktop
+  //! \param theWBName - name of toolbar (workbench)
+  //! \param theInfo - information about action (icon, text, etc)
   virtual QAction* addFeature(const QString& theWBName,
                               const ActionInfo& theInfo) = 0;
 

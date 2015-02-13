@@ -23,8 +23,7 @@
  */
 struct MODULEBASE_EXPORT ModuleBase_ActionInfo
 {
-  QString id;
-
+  QString id; //!< action's (command) id
   bool checkable; //!< action's checkable state
   bool checked; //!< action's checked state
   bool enabled; //!< action's enabled state
