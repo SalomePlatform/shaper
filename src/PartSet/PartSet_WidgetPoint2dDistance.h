@@ -66,16 +66,17 @@ Q_OBJECT
   /// Set sketch instance
   void setSketch(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
 
- protected slots:
-   /// Process of mouse release
-   /// \param theWnd a pointer to a window
-   /// \param theEvent a mouse event
-  void onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
-
+public slots:
    /// Process of mouse move
    /// \param theWnd a pointer to a window
    /// \param theEvent a mouse event
   void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+
+  protected slots:
+   /// Process of mouse release
+   /// \param theWnd a pointer to a window
+   /// \param theEvent a mouse event
+  void onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
 protected:
   /// The methiod called when widget is activated

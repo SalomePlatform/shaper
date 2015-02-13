@@ -12,6 +12,7 @@
 
 #include <ModelAPI_Events.h>
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Session.h>
 
 #include <Config_PointerMessage.h>
 #include <Config_WidgetReader.h>
@@ -114,6 +115,18 @@ bool ModuleBase_IModule::canDisplayObject(const ObjectPtr& theObject) const
 {
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   return anOperation && anOperation->hasObject(theObject);
+}
+
+bool ModuleBase_IModule::canUndo() const
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  return aMgr->hasModuleDocument() && aMgr->canUndo() && !aMgr->isOperation();
+}
+
+bool ModuleBase_IModule::canRedo() const
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  return aMgr->hasModuleDocument() && aMgr->canRedo() && !aMgr->isOperation();
 }
 
 void ModuleBase_IModule::onFeatureTriggered()

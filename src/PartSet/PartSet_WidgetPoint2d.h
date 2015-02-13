@@ -98,16 +98,17 @@ signals:
   /// Signal about selection of an existing vertex from an object
   void vertexSelected();
 
+public slots:
+  /// Process mouse move event
+  /// \param theWnd a view window
+  /// \param theEvent a mouse event
+  void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
+
 protected slots:
   /// Process mouse release event
   /// \param theWnd a view window
   /// \param theEvent a mouse event
   void onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
-
-  /// Process mouse move event
-  /// \param theWnd a view window
-  /// \param theEvent a mouse event
-  void onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent);
 
 protected:
   /// Saves the internal parameters to the given feature

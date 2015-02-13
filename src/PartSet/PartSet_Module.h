@@ -80,6 +80,14 @@ public:
   /// \param theOperation a stopped operation
   virtual void operationStopped(ModuleBase_Operation* theOperation);
 
+  /// Returns True if there are available Undos and the sketch manager allows undo
+  /// \return the boolean result
+  virtual bool canUndo() const;
+
+  //! Returns True if there are available Redos and the sketch manager allows redo
+  /// \return the boolean result
+  virtual bool canRedo() const;
+
   /// Returns whether the object can be displayed at the bounds of the active operation.
   /// Display only current operation results for usual operation and ask the sketcher manager
   /// if it is a sketch operation

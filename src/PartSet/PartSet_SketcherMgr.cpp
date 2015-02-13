@@ -7,6 +7,7 @@
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_Module.h"
 #include "PartSet_WidgetPoint2d.h"
+#include "PartSet_WidgetPoint2dDistance.h"
 #include "PartSet_Tools.h"
 
 #include <XGUI_ModuleConnector.h>
@@ -109,7 +110,7 @@ void fillFeature2Attribute(const QList<ModuleBase_ViewerPrs>& theList,
 
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
-     myIsMouseOverWindow(false), myIsPropertyPanelValueChanged(false)
+    myIsPropertyPanelValueChanged(false), myIsMouseOverViewProcessed(true)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -141,31 +142,45 @@ PartSet_SketcherMgr::~PartSet_SketcherMgr()
 
 void PartSet_SketcherMgr::onMouseMoveOverWindow(bool theOverWindow)
 {
-  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
-  if (!aOperation || aOperation->isEditOperation())
+  if (!isNestedCreateOperation() || theOverWindow)
     return;
-
-  myIsMouseOverWindow = theOverWindow;
-  if (theOverWindow)
+  // 1. if the mouse over window, update the next flag. Do not perform update visibility of
+  // created feature because it should be done in onMouseMove(). Some widgets watch
+  // the mouse move and use the cursor position to update own values. If the presentaion is
+  // redisplayed before this update, the feature presentation jumps from reset value to current.
+  if (theOverWindow) {
     myIsPropertyPanelValueChanged = false;
-  else {
-    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-    ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
-    if(aActiveWgt) {
-      aActiveWgt->reset();
-    }
-  }  
+    return;
+  }
+  myIsMouseOverViewProcessed = false;
+
+  // 2. if the mouse IS NOT over window, reset the active widget value and hide the presentation
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+  // disable the viewer update in order to avoid visualization of redisplayed feature in viewer
+  // obtained after reset value
+  bool isEnableUpdateViewer = aDisplayer->enableUpdateViewer(false);
+  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+  ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+  ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
+  if (aActiveWgt) {
+    aActiveWgt->reset();
+  }
+  aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
+
+  // hides the presentation of the current operation feature
+  myIsPropertyPanelValueChanged = false;
   updateVisibilityOfCreatedFeature();
 }
 
 void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
 {
-  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
-  if (!aOperation || aOperation->isEditOperation())
+  if (!isNestedCreateOperation())
     return;
 
+  // visualize the current operation feature
   myIsPropertyPanelValueChanged = true;
-
   updateVisibilityOfCreatedFeature();
 }
 
@@ -293,6 +308,26 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  if (isNestedCreateOperation() && !myIsMouseOverViewProcessed) {
+    myIsMouseOverViewProcessed = true;
+    // 1. perform the widget mouse move functionality and display the presentation
+    ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+    ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+    ModuleBase_ModelWidget* anActiveWdg = aPanel->activeWidget();
+    // the mouse move should be processed in the widget, if it can in order to visualize correct
+    // presentation. These widgets correct the feature attribute according to the mouse position
+    PartSet_WidgetPoint2D* aPoint2DWdg = dynamic_cast<PartSet_WidgetPoint2D*>(anActiveWdg);
+    if (aPoint2DWdg) {
+      aPoint2DWdg->onMouseMove(theWnd, theEvent);
+    }
+    PartSet_WidgetPoint2dDistance* aDistanceWdg = dynamic_cast<PartSet_WidgetPoint2dDistance*>
+                                                                (anActiveWdg);
+    if (aDistanceWdg) {
+      aDistanceWdg->onMouseMove(theWnd, theEvent);
+    }
+    updateVisibilityOfCreatedFeature();
+  }
+
   myClickedPoint.clear();
 
   if (myIsDragging) {
@@ -608,11 +643,38 @@ void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* )
 void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* )
 {
   connectToPropertyPanel(false);
+  myIsPropertyPanelValueChanged = false;
+  myIsMouseOverViewProcessed = true;
+}
+
+bool PartSet_SketcherMgr::canUndo() const
+{
+  return isNestedCreateOperation();
+}
+
+bool PartSet_SketcherMgr::canRedo() const
+{
+  return isNestedCreateOperation();
 }
 
 bool PartSet_SketcherMgr::canDisplayObject(const ObjectPtr& theObject) const
 {
-  return myIsMouseOverWindow || myIsPropertyPanelValueChanged;
+  bool aCanDisplay = true;
+  if (!isNestedCreateOperation())
+    return aCanDisplay;
+
+  // during a nested create operation, the feature is redisplayed only if the mouse over view
+  // of there was a value modified in the property panel after the mouse left the view
+  aCanDisplay = myIsPropertyPanelValueChanged;
+  if (!aCanDisplay) {
+    ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
+    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(anIWorkshop);
+    XGUI_Workshop* aWorkshop = aConnector->workshop();
+    AppElements_MainWindow* aMainWindow = aWorkshop->mainWindow();
+
+    aCanDisplay = aMainWindow->isMouseOverWindow();
+  }
+  return aCanDisplay;
 }
 
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
@@ -756,6 +818,12 @@ void PartSet_SketcherMgr::connectToPropertyPanel(const bool isToConnect)
         disconnect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
     }
   }
+}
+
+bool PartSet_SketcherMgr::isNestedCreateOperation() const
+{
+  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+  return aOperation && !aOperation->isEditOperation() && isNestedSketchOperation(aOperation);
 }
 
 void PartSet_SketcherMgr::updateVisibilityOfCreatedFeature()

@@ -100,6 +100,12 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// It is called as on clearing of property panel as on filling with new widgets
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation) {}
 
+  //! Returns True if there are available Undos and there is not an active operation
+  virtual bool canUndo() const;
+
+  //! Returns True if there are available Redos and there is not an active operation
+  virtual bool canRedo() const;
+
   /// Returns whether the object can be displayed at the bounds of the active operation.
   /// Display only current operation results
   /// \param theObject a model object

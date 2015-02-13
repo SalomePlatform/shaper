@@ -110,6 +110,14 @@ public:
   /// Stops sketch operation
   void stopNestedSketch(ModuleBase_Operation* );
 
+  /// Returns True if there are available Undos and the sketch manager allows undo
+  /// \return the boolean result
+  bool canUndo() const;
+
+  //! Returns True if there are available Redos and the sketch manager allows redo
+  /// \return the boolean result
+  bool canRedo() const;
+
   /// Returns whether the object can be displayed at the bounds of the active operation.
   /// Display only current operation results for usual operation and ask the sketcher manager
   /// if it is a sketch operation
@@ -193,6 +201,16 @@ private:
   /// \param isToConnect a boolean value whether connect or disconnect
   void connectToPropertyPanel(const bool isToConnect);
 
+  /// Returns true if the created feature is visible
+  /// \param 
+  bool isVisibleCreatedFeature() const;
+
+  /// Returns true if the current operation is create a nested feature
+  //// \return boolean value
+  bool isNestedCreateOperation() const;
+
+  /// Erase or display the feature of the current operation. If the mouse over the active view or
+  /// a current value is changed by property panel, the feature is displayed otherwise it is hidden
   void updateVisibilityOfCreatedFeature();
 
 private:
@@ -201,8 +219,8 @@ private:
   bool myPreviousSelectionEnabled; // the previous selection enabled state in the viewer
   bool myIsDragging;
   bool myDragDone;
-  bool myIsMouseOverWindow; /// the state that mouse is over view
   bool myIsPropertyPanelValueChanged; /// the state that value in the property panel is changed
+  bool myIsMouseOverViewProcessed; /// the state whether the over view state is processed by mouseMove method
   Point myCurrentPoint;
   Point myClickedPoint;
 

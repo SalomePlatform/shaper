@@ -209,6 +209,30 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
   myWorkshop->viewer()->removeSelectionFilter(myDocumentShapeFilter);
 }
 
+bool PartSet_Module::canUndo() const
+{
+  bool aCanUndo = false;
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->hasModuleDocument() && aMgr->canUndo()) {
+    aCanUndo = !aMgr->isOperation();
+    if (!aCanUndo) // check the enable state additionally by sketch manager
+      aCanUndo = aMgr->canUndo();
+  }
+  return aCanUndo;
+}
+
+bool PartSet_Module::canRedo() const
+{
+  bool aCanRedo = false;
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->hasModuleDocument() && aMgr->canRedo()) {
+    aCanRedo = !aMgr->isOperation();
+    if (!aCanRedo) // check the enable state additionally by sketch manager
+      aCanRedo = aMgr->canRedo();
+  }
+  return aCanRedo;
+}
+
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
   bool aCanDisplay = false;

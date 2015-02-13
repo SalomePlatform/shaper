@@ -1058,8 +1058,8 @@ void XGUI_Workshop::updateCommandStatus()
         // Enable all commands
         aCmd->setEnabled(true);
     }
-    aUndoCmd->setEnabled(aMgr->canUndo() && !aMgr->isOperation());
-    aRedoCmd->setEnabled(aMgr->canRedo() && !aMgr->isOperation());
+    aUndoCmd->setEnabled(myModule->canUndo());
+    aRedoCmd->setEnabled(myModule->canRedo());
 
     updateHistory();
 
