@@ -49,6 +49,7 @@ const static char* FEATURE_ICON = "icon";
 const static char* FEATURE_TEXT = "title";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
 const static char* FEATURE_NESTED = "nested";
+const static char* FEATURE_WHEN_NESTED = "when_nested";
 const static char* FEATURE_DOC = WORKBENCH_DOC;
 // NODE_VALIDATOR properties, NODE_SELFILTER properties
 const static char* _PARAMETERS = "parameters";

@@ -82,6 +82,11 @@ CONFIG_EXPORT std::string library(const std::string& theLibName);
 CONFIG_EXPORT std::string getProperty(xmlNodePtr theNode, const char* thePropName);
 
 /*!
+ * Returns normalized (lower case) named property for a given node as std::string.
+ */
+std::string getNormalizedProperty(xmlNodePtr theNode, const char* thePropName);
+
+/*!
  * Checks if the given XML node has the given attribute,
  * if yes - returns it's bool value, if no, or if the value can not
  * be converted to bool - returns theDefault value.

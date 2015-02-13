@@ -140,7 +140,17 @@ const std::string& Config_FeatureMessage::nestedFeatures() const
   return myNestedFeatures;
 }
 
+const std::string& Config_FeatureMessage::actionsWhenNested() const
+{
+  return myActionsWhenNested;
+}
+
 void Config_FeatureMessage::setNestedFeatures(const std::string& theNestedFeatures)
 {
   myNestedFeatures = theNestedFeatures;
+}
+
+void Config_FeatureMessage::setActionsWhenNested(const std::string& theActions)
+{
+  myActionsWhenNested = theActions;
 }

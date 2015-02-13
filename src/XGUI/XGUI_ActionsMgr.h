@@ -29,13 +29,21 @@ class QAction;
 */
 class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
 {
-Q_OBJECT
+  Q_OBJECT
 
  public:
-   /// Constructor
-   /// \param theWorkshop an instance of workshop
+  /// Constructor
+  /// \param theWorkshop an instance of workshop
   XGUI_ActionsMgr(XGUI_Workshop* theWorkshop);
   virtual ~XGUI_ActionsMgr();
+
+  enum OperationStateActionId {
+    Abort = 0,
+    Accept = 1,
+    Help = 2,
+    AbortAll = 3,
+    AcceptAll = 4
+  };
 
   //! Add a command in the manager.
   //! Please note that nested commands in the Salome mode (No AppElements_Command, pure QActions)
@@ -64,6 +72,10 @@ Q_OBJECT
 
   //! Redefinition of Events_Listener method
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
+
+  //! Return property panel's action like ok, cancel, help.
+  //! If there is no such action, it will be created.
+  QAction* operationStateAction(OperationStateActionId theId, QObject* theParent = 0);
 
  public slots:
   //! Update workbench actions according to OperationMgr state:
@@ -94,8 +106,10 @@ Q_OBJECT
   void updateByPlugins(FeaturePtr theActiveFeature);
 
  private:
+
   QMap<QString, QAction*> myActions;
   QMap<QString, QStringList> myNestedActions;
+  QMap<OperationStateActionId, QAction*> myOperationActions;
   QList<QKeySequence> myShortcuts;
 
   XGUI_Workshop* myWorkshop;

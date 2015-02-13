@@ -134,6 +134,18 @@ bool XGUI_OperationMgr::abortAllOperations()
   return result;
 }
 
+bool XGUI_OperationMgr::commitAllOperations()
+{
+  while (hasOperation()) {
+    if (isApplyEnabled()) {
+      onCommitOperation();
+    } else {
+      currentOperation()->abort();
+    }
+  }
+  return true;
+}
+
 void XGUI_OperationMgr::onValidateOperation()
 {
   if (!hasOperation())
@@ -147,7 +159,7 @@ void XGUI_OperationMgr::onValidateOperation()
 void XGUI_OperationMgr::setApplyEnabled(const bool theEnabled)
 {
   myIsApplyEnabled = theEnabled;
-  emit applyEnableChanged(theEnabled);
+  emit validationStateChanged(theEnabled);
 }
 
 bool XGUI_OperationMgr::isApplyEnabled() const
@@ -223,6 +235,9 @@ void XGUI_OperationMgr::onAbortOperation()
 void XGUI_OperationMgr::onOperationStarted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  if (myOperations.count() == 1) {
+    emit nestedStateChanged(false);
+  }
   emit operationStarted(aSenderOperation);
 }
 
@@ -235,6 +250,7 @@ void XGUI_OperationMgr::onOperationAborted()
 void XGUI_OperationMgr::onOperationCommitted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  emit nestedStateChanged(true);
   emit operationCommitted(aSenderOperation);
 }
 

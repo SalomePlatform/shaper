@@ -17,6 +17,7 @@
 
 #include <QList>
 
+class XGUI_ActionsMgr;
 class QKeyEvent;
 class QVBoxLayout;
 
@@ -28,6 +29,9 @@ const static char* PROP_PANEL_OK = "property_panel_ok";
 
 /// Internal name of Cancel button
 const static char* PROP_PANEL_CANCEL = "property_panel_cancel";
+
+/// Internal name of Help button
+const static char* PROP_PANEL_HELP = "property_panel_help";
 
 /**
 * \ingroup GUI
@@ -82,15 +86,14 @@ Q_OBJECT
   /// \param isEditing state of editing mode flag
   virtual void setEditingMode(bool isEditing);
 
+  //! Allows to set predefined actions for the property panel fetched from the ActionsMgr
+  void setupActions(XGUI_ActionsMgr* theMgr);
+
  public slots:
 
    /// \brief Update all widgets in property panel with values from the given feature
    /// \param theFeature a Feature to update values in widgets
   void updateContentWidget(FeaturePtr theFeature);
-
-  /// Enables / disables "ok" ("accept") button
-  /// \param toEnable enable/disable state of button
-  void setAcceptEnabled(bool toEnable);
 
   /**
   * Makes the given widget active, highlights it and removes

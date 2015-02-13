@@ -24,6 +24,7 @@
 #include <AppElements_MainMenu.h>
 #include <AppElements_MainWindow.h>
 #include <AppElements_MenuGroupPanel.h>
+#include <AppElements_Button.h>
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Preferences.h>
@@ -268,7 +269,7 @@ void XGUI_Workshop::initMenu()
   aCommand = aGroup->addFeature(aUndoId, tr("Undo"), tr("Undo last command"),
                                 QIcon(":pictures/undo.png"), QKeySequence::Undo);
   aCommand->connectTo(this, SLOT(onUndo()));
-  QToolButton* aUndoButton = qobject_cast<QToolButton*>(aGroup->widget(aUndoId));
+  AppElements_Button* aUndoButton = qobject_cast<AppElements_Button*>(aGroup->widget(aUndoId));
   addHistoryMenu(aUndoButton,
                  SIGNAL(updateUndoHistory(const QList<ActionInfo>&)),
                  SLOT(onUndo(int)));
@@ -277,7 +278,7 @@ void XGUI_Workshop::initMenu()
   aCommand = aGroup->addFeature(aRedoId, tr("Redo"), tr("Redo last command"),
                                 QIcon(":pictures/redo.png"), QKeySequence::Redo);
   aCommand->connectTo(this, SLOT(onRedo()));
-  QToolButton* aRedoButton = qobject_cast<QToolButton*>(aGroup->widget(aRedoId));
+  AppElements_Button* aRedoButton = qobject_cast<AppElements_Button*>(aGroup->widget(aRedoId));
   addHistoryMenu(aRedoButton,
                  SIGNAL(updateRedoHistory(const QList<ActionInfo>&)),
                  SLOT(onRedo(int)));
@@ -722,8 +723,26 @@ void XGUI_Workshop::addFeature(const std::shared_ptr<Config_FeatureMessage>& the
       aFeatureInfo.shortcut = aHotKey;
     }
     // Create feature...
-    AppElements_Command* aCommand = aGroup->addFeature(aFeatureInfo, aDocKind);
-    aCommand->setNestedCommands(aNestedFeatures);
+    AppElements_Command* aCommand = aGroup->addFeature(aFeatureInfo,
+                                                       aDocKind,
+                                                       aNestedFeatures);
+    // Enrich created button with accept/abort buttons if necessary
+    AppElements_Button* aButton = aCommand->button();
+    if (aButton->isColumnButton()) {
+      QString aNestedActions = QString::fromStdString(theMessage->actionsWhenNested());
+      QList<QAction*> anActList;
+      if (aNestedActions.contains("accept")) {
+        QAction* anAction = myActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll, aButton);
+        connect(anAction, SIGNAL(triggered()), myOperationMgr, SLOT(commitAllOperations()));
+        anActList << anAction;
+      }
+      if (aNestedActions.contains("abort")) {
+        QAction* anAction = myActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll, aButton);
+        connect(anAction, SIGNAL(triggered()), myOperationMgr, SLOT(abortAllOperations()));
+        anActList << anAction;
+      }
+      aButton->setAdditionalButtons(anActList);
+    }
     myActionsMgr->addCommand(aCommand);
     myModule->actionCreated(aCommand);
   }
@@ -1133,24 +1152,26 @@ void XGUI_Workshop::createDockWidgets()
   QDockWidget* aObjDock = createObjectBrowser(aDesktop);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
   myPropertyPanel = new XGUI_PropertyPanel(aDesktop);
+  myPropertyPanel->setupActions(myActionsMgr);
   myPropertyPanel->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
-
-  connect(myPropertyPanel, SIGNAL(noMoreWidgets()), myModule, SLOT(onNoMoreWidgets()));
-
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanel);
   hidePropertyPanel();  ///<! Invisible by default
   hideObjectBrowser();
   aDesktop->tabifyDockWidget(aObjDock, myPropertyPanel);
   myPropertyPanel->installEventFilter(myOperationMgr);
 
-  QPushButton* aOkBtn = myPropertyPanel->findChild<QPushButton*>(PROP_PANEL_OK);
-  connect(aOkBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onCommitOperation()));
-  QPushButton* aCancelBtn = myPropertyPanel->findChild<QPushButton*>(PROP_PANEL_CANCEL);
-  connect(aCancelBtn, SIGNAL(clicked()), myOperationMgr, SLOT(onAbortOperation()));
-  connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)), myOperationMgr,
-          SLOT(onKeyReleased(QKeyEvent*)));
-  connect(myOperationMgr, SIGNAL(applyEnableChanged(bool)), myPropertyPanel,
-          SLOT(setAcceptEnabled(bool)));
+  QAction* aOkAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
+  connect(aOkAct, SIGNAL(triggered()), myOperationMgr, SLOT(onCommitOperation()));
+  QAction* aCancelAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Abort);
+  connect(aCancelAct, SIGNAL(triggered()), myOperationMgr, SLOT(onAbortOperation()));
+  connect(myPropertyPanel, SIGNAL(noMoreWidgets()), myModule, SLOT(onNoMoreWidgets()));
+  connect(myPropertyPanel, SIGNAL(keyReleased(QKeyEvent*)),
+          myOperationMgr,  SLOT(onKeyReleased(QKeyEvent*)));
+  connect(myOperationMgr,  SIGNAL(validationStateChanged(bool)),
+          aOkAct,          SLOT(setEnabled(bool)));
+  QAction* aAcceptAllAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptAll);
+  connect(myOperationMgr,  SIGNAL(nestedStateChanged(bool)),
+          aAcceptAllAct,   SLOT(setEnabled(bool)));
 
 }
 

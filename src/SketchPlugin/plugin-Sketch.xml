@@ -6,6 +6,7 @@
       <feature
         id="Sketch"
         nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid"
+        when_nested="accept abort"
         title="Sketch"
         tooltip="Create a new sketch"
         icon=":icons/sketch.png">

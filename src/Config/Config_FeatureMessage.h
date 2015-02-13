@@ -32,7 +32,8 @@ class Config_FeatureMessage : public Events_Message
 
   bool myUseInput;  ///<Action is being checked until user commit the operation
   bool myInternal;  ///<Internal feature without GUI representation
-  std::string myNestedFeatures; ///<Comma separated list of child features
+  std::string myNestedFeatures; ///<Space separated list of child features
+  std::string myActionsWhenNested; ///<Space separated list of actions
 
  public:
   /// Event ID that feature is loaded in workbench (GUI)
@@ -72,8 +73,10 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT const std::string& documentKind() const;
   /// Name of a library which contains the feature
   CONFIG_EXPORT const std::string& pluginLibrary() const;
-  /// Comma separated list of nested features
+  /// Space separated list of nested features
   CONFIG_EXPORT const std::string& nestedFeatures() const;
+  /// Space separated list of actions
+  CONFIG_EXPORT const std::string& actionsWhenNested() const;
   /// If false - feature has no Property panel representation
   CONFIG_EXPORT bool isUseInput() const;
   /// If true - feature will not be added into the workbench
@@ -97,8 +100,10 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT void setDocumentKind(const std::string& documentKind);
   ///Set name of a library which contains the feature
   CONFIG_EXPORT void setPluginLibrary(const std::string& thePluginLibrary);
-  ///Set comma separated list of nested features
+  ///Set space separated list of nested features
   CONFIG_EXPORT void setNestedFeatures(const std::string& theNestedFeatures);
+  ///Set space separated list of nested features
+  CONFIG_EXPORT void setActionsWhenNested(const std::string& theActions);
   ///Set use input state; If false - feature has no Property panel representation
   CONFIG_EXPORT void setUseInput(bool isUseInput);
   ///Set internal state; If true - feature will not be added into the workbench
