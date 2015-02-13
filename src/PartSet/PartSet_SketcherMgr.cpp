@@ -602,6 +602,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
+  myIsMouseOverWindow = false;
+
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
@@ -653,7 +655,6 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* )
 {
   connectToPropertyPanel(false);
   myIsPropertyPanelValueChanged = false;
-  myIsMouseOverWindow = false;
   myIsMouseOverViewProcessed = true;
 }
 
