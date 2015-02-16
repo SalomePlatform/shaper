@@ -9,6 +9,7 @@
 #include <QLayout>
 #include <QPainter>
 #include <QBitmap>
+#include <QDoubleSpinBox>
 
 namespace ModuleBase_Tools {
 
@@ -95,6 +96,13 @@ QPixmap lighter(const QString& theIcon, const int theLighterValue)
     }
   }
   return QPixmap::fromImage(aResult);
+}
+
+void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
+{
+  bool isBlocked = theSpin->blockSignals(true);
+  theSpin->setValue(theValue);
+  theSpin->blockSignals(isBlocked);
 }
 
 }

@@ -131,11 +131,6 @@ private slots:
    bool getPoint2d(const Handle(V3d_View)& theView, const TopoDS_Shape& theShape, 
                    double& theX, double& theY) const;
 
-   /// Sets programmatically the value to the spin box without emitting any signals(e.g. valueChanged)
-   /// \param theSpin an X or Y coordinate widget
-   /// \param theValue a new value
-   static void setSpinValue(ModuleBase_DoubleSpinBox* theSpin, double theValue);
-
   XGUI_Workshop* myWorkshop;
 
   QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets

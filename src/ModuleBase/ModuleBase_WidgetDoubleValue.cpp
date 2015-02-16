@@ -106,7 +106,7 @@ void ModuleBase_WidgetDoubleValue::reset()
 
   bool isOk;
   double aDefValue = QString::fromStdString(myDefaultValue).toDouble(&isOk);
-  mySpinBox->setValue(isOk ? aDefValue : 0.0);
+  ModuleBase_Tools::setSpinValue(mySpinBox, isOk ? aDefValue : 0.0);
 }
 
 bool ModuleBase_WidgetDoubleValue::storeValue() const
@@ -123,9 +123,7 @@ bool ModuleBase_WidgetDoubleValue::restoreValue()
   DataPtr aData = myFeature->data();
   AttributeDoublePtr aRef = aData->real(attributeID());
 
-  bool isBlocked = mySpinBox->blockSignals(true);
-  mySpinBox->setValue(aRef->value());
-  mySpinBox->blockSignals(isBlocked);
+  ModuleBase_Tools::setSpinValue(mySpinBox, aRef->value());
 
   return true;
 }

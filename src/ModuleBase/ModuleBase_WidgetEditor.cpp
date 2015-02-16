@@ -78,9 +78,7 @@ void ModuleBase_WidgetEditor::showPopupEditor()
   aValue = editedValue(aValue, isDone);
 
   if (isDone) {
-    bool isBlocked = mySpinBox->blockSignals(true);
-    mySpinBox->setValue(aValue);
-    mySpinBox->blockSignals(isBlocked);
+    ModuleBase_Tools::setSpinValue(mySpinBox, aValue);
   }
   emit valuesChanged();
   emit focusOutWidget(this);

@@ -9,6 +9,7 @@
 
 #include <ModuleBase_DoubleSpinBox.h>
 #include <ModuleBase_IViewWindow.h>
+#include <ModuleBase_Tools.h>
 
 #include <XGUI_ViewerProxy.h>
 #include <XGUI_Workshop.h>
@@ -44,7 +45,8 @@ void PartSet_WidgetPoint2dDistance::reset()
 {
   bool isOk;
   double aDefValue = QString::fromStdString(myDefaultValue).toDouble(&isOk);
-  mySpinBox->setValue(isOk ? aDefValue : 0.0);
+
+  ModuleBase_Tools::setSpinValue(mySpinBox, isOk ? aDefValue : 0.0);
 }
 
 void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
@@ -60,9 +62,8 @@ void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
   AttributeDoublePtr aReal = aData->real(attributeID());
   if (aReal && (aReal->value() != aRadius)) {
     aReal->setValue(aRadius);
-    mySpinBox->blockSignals(true);
-    mySpinBox->setValue(aRadius);
-    mySpinBox->blockSignals(false);
+    
+    ModuleBase_Tools::setSpinValue(mySpinBox, aRadius);
     storeValue();
   }
 }

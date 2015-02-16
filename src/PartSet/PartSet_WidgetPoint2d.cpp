@@ -98,8 +98,8 @@ void PartSet_WidgetPoint2D::reset()
   double aDefValue = QString::fromStdString(myDefaultValue).toDouble(&isOk);
   // it is important to block the spin box control in order to do not through out the
   // locking of the validating state.
-  setSpinValue(myXSpin, isOk ? aDefValue : 0.0);
-  setSpinValue(myYSpin, isOk ? aDefValue : 0.0);
+  ModuleBase_Tools::setSpinValue(myXSpin, isOk ? aDefValue : 0.0);
+  ModuleBase_Tools::setSpinValue(myYSpin, isOk ? aDefValue : 0.0);
 }
 
 PartSet_WidgetPoint2D::~PartSet_WidgetPoint2D()
@@ -125,8 +125,8 @@ bool PartSet_WidgetPoint2D::setPoint(double theX, double theY)
   if (fabs(theY) >= MaxCoordinate)
     return false;
 
-  setSpinValue(myXSpin, theX);
-  setSpinValue(myYSpin, theY);
+  ModuleBase_Tools::setSpinValue(myXSpin, theX);
+  ModuleBase_Tools::setSpinValue(myYSpin, theY);
 
   storeValue();
   return true;
@@ -169,8 +169,8 @@ bool PartSet_WidgetPoint2D::restoreValue()
   double _Y = aPoint->y();
 #endif
 
-  setSpinValue(myXSpin, aPoint->x());
-  setSpinValue(myYSpin, aPoint->y());
+  ModuleBase_Tools::setSpinValue(myXSpin, aPoint->x());
+  ModuleBase_Tools::setSpinValue(myYSpin, aPoint->y());
   return true;
 }
 
@@ -319,11 +319,4 @@ void PartSet_WidgetPoint2D::onValuesChanged()
 {
   myWorkshop->operationMgr()->setLockValidating(false);
   emit valuesChanged();
-}
-
-void PartSet_WidgetPoint2D::setSpinValue(ModuleBase_DoubleSpinBox* theSpin, double theValue)
-{
-  bool isBlocked = theSpin->blockSignals(true);
-  theSpin->setValue(theValue);
-  theSpin->blockSignals(isBlocked);
 }
