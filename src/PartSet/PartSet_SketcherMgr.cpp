@@ -144,7 +144,7 @@ PartSet_SketcherMgr::~PartSet_SketcherMgr()
 
 void PartSet_SketcherMgr::onEnterViewPort()
 {
-  if (!isNestedCreateOperation())
+  if (!isNestedCreateOperation(getCurrentOperation()))
     return;
   // 1. if the mouse over window, update the next flag. Do not perform update visibility of
   // created feature because it should be done in onMouseMove(). Some widgets watch
@@ -156,7 +156,7 @@ void PartSet_SketcherMgr::onEnterViewPort()
 
 void PartSet_SketcherMgr::onLeaveViewPort()
 {
-  if (!isNestedCreateOperation())
+  if (!isNestedCreateOperation(getCurrentOperation()))
     return;
 
   myIsMouseOverViewProcessed = false;
@@ -169,7 +169,7 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   // disable the viewer update in order to avoid visualization of redisplayed feature in viewer
   // obtained after reset value
   bool isEnableUpdateViewer = aDisplayer->enableUpdateViewer(false);
-  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+  ModuleBase_Operation* aOperation = getCurrentOperation();
   ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
   ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
   if (aActiveWgt) {
@@ -184,12 +184,12 @@ void PartSet_SketcherMgr::onLeaveViewPort()
 
 void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
 {
-  if (!isNestedCreateOperation())
+  if (!isNestedCreateOperation(getCurrentOperation()))
     return;
 
   // visualize the current operation feature
   myIsPropertyPanelValueChanged = true;
-  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+  ModuleBase_Operation* aOperation = getCurrentOperation();
   visualizeFeature(aOperation, true);
 }
 
@@ -208,7 +208,7 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
   if (!aViewer->canDragByMouse())
     return;
 
-  ModuleBase_Operation* aOperation = aWorkshop->currentOperation();
+  ModuleBase_Operation* aOperation = getCurrentOperation();
   if (aOperation && aOperation->isEditOperation()) {
     ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
     ModuleBase_ModelWidget* aActiveWgt = aPanel->activeWidget();
@@ -289,7 +289,7 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   if (!aViewer->canDragByMouse())
     return;
-  ModuleBase_Operation* aOp = aWorkshop->currentOperation();
+  ModuleBase_Operation* aOp = getCurrentOperation();
   if (aOp) {
     if (isNestedSketchOperation(aOp)) {
       get2dPoint(theWnd, theEvent, myClickedPoint);
@@ -317,10 +317,10 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
 
 void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  if (isNestedCreateOperation() && !myIsMouseOverViewProcessed) {
+  if (isNestedCreateOperation(getCurrentOperation()) && !myIsMouseOverViewProcessed) {
     myIsMouseOverViewProcessed = true;
     // 1. perform the widget mouse move functionality and display the presentation
-    ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+    ModuleBase_Operation* aOperation = getCurrentOperation();
     ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
     ModuleBase_ModelWidget* anActiveWdg = aPanel->activeWidget();
     // the mouse move should be processed in the widget, if it can in order to visualize correct
@@ -351,7 +351,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     ModuleBase_IViewer* aViewer = myModule->workshop()->viewer();
     aViewer->enableSelection(false);
 
-    ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+    ModuleBase_Operation* aOperation = getCurrentOperation();
     if (!aOperation)
       return;
     if (isSketchOperation(aOperation))
@@ -435,7 +435,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
 
 void PartSet_SketcherMgr::onMouseDoubleClick(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+  ModuleBase_Operation* aOperation = getCurrentOperation();
   if (aOperation && aOperation->isEditOperation()) {
     std::string aId = aOperation->id().toStdString();
     if (isDistanceOperation(aOperation))
@@ -475,7 +475,7 @@ void PartSet_SketcherMgr::onBeforeWidgetActivated(ModuleBase_ModelWidget* theWid
   if (!myClickedPoint.myIsInitialized)
     return;
 
-  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+  ModuleBase_Operation* aOperation = getCurrentOperation();
   // the distance constraint feature should not use the clickedd point
   // this is workaround in order to don't throw down the flyout point value,
   // set by execute() method of these type of features
@@ -657,23 +657,28 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
   connectToPropertyPanel(false);
   myIsPropertyPanelValueChanged = false;
   myIsMouseOverViewProcessed = true;
-  visualizeFeature(theOperation, true);
+}
+
+void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
+{
+  if (isNestedCreateOperation(theOperation))
+    visualizeFeature(theOperation, true);
 }
 
 bool PartSet_SketcherMgr::canUndo() const
 {
-  return isNestedCreateOperation();
+  return isNestedCreateOperation(getCurrentOperation());
 }
 
 bool PartSet_SketcherMgr::canRedo() const
 {
-  return isNestedCreateOperation();
+  return isNestedCreateOperation(getCurrentOperation());
 }
 
 bool PartSet_SketcherMgr::canDisplayObject() const
 {
   bool aCanDisplay = true;
-  if (!isNestedCreateOperation())
+  if (!isNestedCreateOperation(getCurrentOperation()))
     return aCanDisplay;
 
   // during a nested create operation, the feature is redisplayed only if the mouse over view
@@ -825,10 +830,14 @@ void PartSet_SketcherMgr::connectToPropertyPanel(const bool isToConnect)
   }
 }
 
-bool PartSet_SketcherMgr::isNestedCreateOperation() const
+ModuleBase_Operation* PartSet_SketcherMgr::getCurrentOperation() const
 {
-  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
-  return aOperation && !aOperation->isEditOperation() && isNestedSketchOperation(aOperation);
+  return myModule->workshop()->currentOperation();
+}
+
+bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOperation) const
+{
+  return theOperation && !theOperation->isEditOperation() && isNestedSketchOperation(theOperation);
 }
 
 void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,

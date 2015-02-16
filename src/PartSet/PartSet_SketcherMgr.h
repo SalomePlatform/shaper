@@ -104,11 +104,17 @@ public:
   /// Stops sketch operation
   void stopSketch(ModuleBase_Operation* );
 
-  /// Starts sketch operation
-  void startNestedSketch(ModuleBase_Operation* );
+  /// Starts sketch operation, connects to the opeation property panel
+  /// \param theOperation a committed operation
+  void startNestedSketch(ModuleBase_Operation* theOperation);
 
-  /// Stops sketch operation
-  void stopNestedSketch(ModuleBase_Operation* );
+  /// Stop sketch operation, disconnects from the opeation property panel
+  /// \param theOperation a stopped operation
+  void stopNestedSketch(ModuleBase_Operation* theOperation);
+
+  /// Visualizes the operation feature if it is a creation nested feature operation
+  /// \param theOperation a committed operation
+  void commitNestedSketch(ModuleBase_Operation* theOperation);
 
   /// Returns True if there are available Undos and the sketch manager allows undo
   /// \return the boolean result
@@ -209,9 +215,14 @@ private:
   /// \param 
   bool isVisibleCreatedFeature() const;
 
-  /// Returns true if the current operation is create a nested feature
+  /// Returns a current operation
+  /// \return an operation
+  ModuleBase_Operation* getCurrentOperation() const;
+
+  /// Returns true if the operation is a create nested feature one
+  /// \param theOperation a checked operation
   //// \return boolean value
-  bool isNestedCreateOperation() const;
+  bool isNestedCreateOperation(ModuleBase_Operation* theOperation) const;
 
   /// Erase or display the feature of the current operation. If the mouse over the active view or
   /// a current value is changed by property panel, the feature is displayed otherwise it is hidden

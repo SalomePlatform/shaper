@@ -149,6 +149,10 @@ void PartSet_Module::registerProperties()
 
 void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation) 
 {
+  if (PartSet_SketcherMgr::isNestedSketchOperation(theOperation)) {
+    mySketchMgr->commitNestedSketch(theOperation);
+  }
+
   if (theOperation->isEditOperation())
     return;
   // the selection is cleared after commit the create operation
