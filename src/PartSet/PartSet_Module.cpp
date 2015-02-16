@@ -527,9 +527,17 @@ void PartSet_Module::deleteObjects()
   if (!isSketchOp && !isSketchFeatureOperationActive())
     return;
 
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  // sketch feature should be skipped, only sub-features can be removed
+  // when sketch operation is active
+  CompositeFeaturePtr aSketch = mySketchMgr->activeSketch();
 
+  // selected objects should be collected before the current operation abort because
+  // the abort leads to selection lost on constraint objects. It can be corrected after #386 issue
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+  ModuleBase_ISelection* aSel = aConnector->selection();
+  QObjectPtrList aSelectedObj = aSel->selectedPresentations();
+
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
   XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
   if (!isSketchOp && anOpMgr->canStopOperation()) {
     ModuleBase_Operation* aCurrentOp = anOpMgr->currentOperation();
@@ -537,13 +545,6 @@ void PartSet_Module::deleteObjects()
       aCurrentOp->abort();
     }
   }
-  // sketch feature should be skipped, only sub-features can be removed
-  // when sketch operation is active
-  CompositeFeaturePtr aSketch = mySketchMgr->activeSketch();
-
-  ModuleBase_ISelection* aSel = aConnector->selection();
-  QObjectPtrList aSelectedObj = aSel->selectedPresentations();
-
   std::set<FeaturePtr> aRefFeatures;
   foreach (ObjectPtr aObj, aSelectedObj)
   {
