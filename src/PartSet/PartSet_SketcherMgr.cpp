@@ -179,7 +179,7 @@ void PartSet_SketcherMgr::onLeaveViewPort()
 
   // hides the presentation of the current operation feature
   myIsPropertyPanelValueChanged = false;
-  updateVisibilityOfCreatedFeature();
+  visualizeFeature(aOperation, false);
 }
 
 void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
@@ -189,7 +189,8 @@ void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
 
   // visualize the current operation feature
   myIsPropertyPanelValueChanged = true;
-  updateVisibilityOfCreatedFeature();
+  ModuleBase_Operation* aOperation = myModule->workshop()->currentOperation();
+  visualizeFeature(aOperation, true);
 }
 
 void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
@@ -333,7 +334,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     if (aDistanceWdg) {
       aDistanceWdg->onMouseMove(theWnd, theEvent);
     }
-    updateVisibilityOfCreatedFeature();
+    visualizeFeature(aOperation, true);
   }
 
   myClickedPoint.clear();
@@ -651,11 +652,12 @@ void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* )
   connectToPropertyPanel(true);
 }
 
-void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* )
+void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
 {
   connectToPropertyPanel(false);
   myIsPropertyPanelValueChanged = false;
   myIsMouseOverViewProcessed = true;
+  visualizeFeature(theOperation, true);
 }
 
 bool PartSet_SketcherMgr::canUndo() const
@@ -829,21 +831,21 @@ bool PartSet_SketcherMgr::isNestedCreateOperation() const
   return aOperation && !aOperation->isEditOperation() && isNestedSketchOperation(aOperation);
 }
 
-void PartSet_SketcherMgr::updateVisibilityOfCreatedFeature()
+void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
+                                                  const bool isToDisplay)
 {
-  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-  ModuleBase_Operation* aOperation = aWorkshop->currentOperation();
-  if (!aOperation || aOperation->isEditOperation())
+  if (!theOperation || theOperation->isEditOperation())
     return;
+
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
-  bool aToDisplay = canDisplayObject();
   // 1. change visibility of the object itself, here the presentable object is processed,
   // e.g. constraints features
-  FeaturePtr aFeature = aOperation->feature();
+  FeaturePtr aFeature = theOperation->feature();
   std::list<ResultPtr> aResults = aFeature->results();
-  if (aToDisplay)
+  if (isToDisplay)
     aDisplayer->display(aFeature, false);
   else
     aDisplayer->erase(aFeature, false);
@@ -851,7 +853,7 @@ void PartSet_SketcherMgr::updateVisibilityOfCreatedFeature()
   // change visibility of the object results, e.g. non-constraint features
   std::list<ResultPtr>::const_iterator aIt;
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-    if (aToDisplay) {
+    if (isToDisplay) {
       aDisplayer->display(*aIt, false);
     }
     else {

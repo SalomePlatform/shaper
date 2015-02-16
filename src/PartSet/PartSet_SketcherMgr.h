@@ -128,9 +128,6 @@ public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
-  /// Listens the value changed signal and display the current operation feature
-  void onValuesChangedInPropertyPanel();
-
 private slots:
   /// Process the enter mouse to the view port. If the current operation is a create of
   /// a nested sketch feature, it updates internal flags to display the feature on mouse move
@@ -138,6 +135,8 @@ private slots:
   /// Process the leave mouse of the view port. If the current operation is a create of
   /// a nested sketch feature, it hides the feature in the viewer
   void onLeaveViewPort();
+  /// Listens the value changed signal and display the current operation feature
+  void onValuesChangedInPropertyPanel();
 
   void onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseReleased(ModuleBase_IViewWindow*, QMouseEvent*);
@@ -216,7 +215,9 @@ private:
 
   /// Erase or display the feature of the current operation. If the mouse over the active view or
   /// a current value is changed by property panel, the feature is displayed otherwise it is hidden
-  void updateVisibilityOfCreatedFeature();
+  /// \param theOperation an operation which feature is to be displayed, it is nested create operation
+  /// \param isToDisplay a flag about the display or erase the feature
+  void visualizeFeature(ModuleBase_Operation* theOperation, const bool isToDisplay);
 
 private:
   PartSet_Module* myModule;
