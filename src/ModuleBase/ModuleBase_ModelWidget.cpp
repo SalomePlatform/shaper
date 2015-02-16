@@ -28,7 +28,7 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent, const Config_
       myParentId(theParentId)
 {
   myDefaultValue = theData->getProperty(ATTR_DEFAULT);
-  myIsComputedDefault = false;
+  myIsComputedDefault = theData->getProperty(ATTR_DEFAULT) == DOUBLE_WDG_DEFAULT_COMPUTED;
   myAttributeID = theData ? theData->widgetId() : "";
 
   connect(this, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
@@ -96,11 +96,18 @@ bool ModuleBase_ModelWidget::focusTo()
 
 void ModuleBase_ModelWidget::activate()
 {
-  if (!isEditingMode()) {
-    // the control value is stored to the mode by the focus in on the widget
-    // we need the value is initialized in order to enable the apply button in the property panel
-    // it should happens only in the creation mode because during edition all fields are filled
-    storeValue();
+  // the control value is stored to the mode by the focus in on the widget
+  // we need the value is initialized in order to enable the apply button in the property panel.
+  // It should happens in the creation mode only because all fields are filled in the edition mode
+  if (!isEditingMode()/* && !myFeature->data()->attribute(myAttributeID)->isInitialized()*/) {
+    if (isComputedDefault()) {
+      if (myFeature->compute(myAttributeID)) {
+        restoreValue();
+      }      
+    }
+    else {
+      storeValue();
+    }
   }
   activateCustom();
 }

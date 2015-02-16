@@ -94,12 +94,19 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
 
 void PartSet_WidgetPoint2D::reset()
 {
-  bool isOk;
-  double aDefValue = QString::fromStdString(myDefaultValue).toDouble(&isOk);
-  // it is important to block the spin box control in order to do not through out the
-  // locking of the validating state.
-  ModuleBase_Tools::setSpinValue(myXSpin, isOk ? aDefValue : 0.0);
-  ModuleBase_Tools::setSpinValue(myYSpin, isOk ? aDefValue : 0.0);
+  if (isComputedDefault()) {
+    //return;
+    if (myFeature->compute(myAttributeID))
+      restoreValue();
+  }
+  else {
+    bool isOk;
+    double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
+    // it is important to block the spin box control in order to do not through out the
+    // locking of the validating state.
+    ModuleBase_Tools::setSpinValue(myXSpin, isOk ? aDefValue : 0.0);
+    ModuleBase_Tools::setSpinValue(myYSpin, isOk ? aDefValue : 0.0);
+  }
 }
 
 PartSet_WidgetPoint2D::~PartSet_WidgetPoint2D()

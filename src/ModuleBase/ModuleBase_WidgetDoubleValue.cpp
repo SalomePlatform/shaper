@@ -79,11 +79,9 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
     mySpinBox->setSingleStep(aStepVal);
   }
 
-  double aDefVal = QString::fromStdString(myDefaultValue).toDouble(&isOk);
+  double aDefVal = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
   if (isOk) {
     mySpinBox->setValue(aDefVal);
-  } else if (theData->getProperty(ATTR_DEFAULT) == DOUBLE_WDG_DEFAULT_COMPUTED){
-    myIsComputedDefault = true;
   }
 
   QString aTTip = QString::fromStdString(theData->widgetTooltip());
@@ -101,12 +99,16 @@ ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 
 void ModuleBase_WidgetDoubleValue::reset()
 {
-  if (myIsComputedDefault)
+  if (isComputedDefault()) {
     return;
-
-  bool isOk;
-  double aDefValue = QString::fromStdString(myDefaultValue).toDouble(&isOk);
-  ModuleBase_Tools::setSpinValue(mySpinBox, isOk ? aDefValue : 0.0);
+    //if (myFeature->compute(myAttributeID))
+    //  restoreValue();
+  }
+  else {
+    bool isOk;
+    double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
+    ModuleBase_Tools::setSpinValue(mySpinBox, isOk ? aDefValue : 0.0);
+  }
 }
 
 bool ModuleBase_WidgetDoubleValue::storeValue() const

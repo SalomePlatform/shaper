@@ -47,6 +47,57 @@ void SketchPlugin_ConstraintDistance::execute()
   }
 }
 
+bool SketchPlugin_ConstraintDistance::compute(const std::string& theAttributeId)
+{
+  if (theAttributeId != SketchPlugin_Constraint::FLYOUT_VALUE_PNT())
+    return false;
+
+  if (!sketch())
+    return false;
+
+  DataPtr aData = data();
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint_A = getFeaturePoint(
+      aData, SketchPlugin_Constraint::ENTITY_A());
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint_B = getFeaturePoint(
+      aData, SketchPlugin_Constraint::ENTITY_B());
+
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt_A;
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt_B;
+
+  if (aPoint_A && aPoint_B) {
+    aPnt_A = aPoint_A->pnt();
+    aPnt_B = aPoint_B->pnt();
+  } else if (!aPoint_A && aPoint_B) {
+    std::shared_ptr<SketchPlugin_Line> aLine = getFeatureLine(
+        aData, SketchPlugin_Constraint::ENTITY_A());
+    if (aLine) {
+      aPnt_B = aPoint_B->pnt();
+      aPnt_A = getProjectionPoint(aLine, aPnt_B);
+    }
+  } else if (aPoint_A && !aPoint_B) {
+    std::shared_ptr<SketchPlugin_Line> aLine = getFeatureLine(
+        aData, SketchPlugin_Constraint::ENTITY_B());
+    if (aLine) {
+      aPnt_A = aPoint_A->pnt();
+      aPnt_B = getProjectionPoint(aLine, aPnt_A);
+    }
+  }
+  if (!aPnt_A || !aPnt_B)
+    return false;
+
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
+                           GeomDataAPI_Point2D>(aData->attribute(theAttributeId));
+
+  std::shared_ptr<GeomAPI_Pnt> aPoint1 = sketch()->to3D(aPnt_A->x(), aPnt_A->y());
+  std::shared_ptr<GeomAPI_Pnt> aPoint2 = sketch()->to3D(aPnt_B->x(), aPnt_B->y());
+  std::shared_ptr<GeomAPI_Lin2d> aLine = std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPnt_A, aPnt_B));
+  double aDist = aPoint1->distance(aPoint2)/5.;
+  std::shared_ptr<GeomAPI_Pnt2d> aFPnt = aLine->shiftedLocation(aDist);
+  aFlyOutAttr->setValue(aFPnt);
+
+  return true;
+}
+
 //*************************************************************************************
 AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevious)
 {
@@ -90,16 +141,10 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
 
   std::shared_ptr<GeomAPI_Pnt> aPoint1 = sketch()->to3D(aPnt_A->x(), aPnt_A->y());
   std::shared_ptr<GeomAPI_Pnt> aPoint2 = sketch()->to3D(aPnt_B->x(), aPnt_B->y());
-  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = std::shared_ptr<GeomAPI_Pnt>();
-  if(aFlyOutAttr->isInitialized()) {
-    aFlyoutPnt = sketch()->to3D(aFlyOutAttr->x(), aFlyOutAttr->y());
-  } else {
-    std::shared_ptr<GeomAPI_Lin2d> aLine = std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPnt_A, aPnt_B));
-    double aDist = aPoint1->distance(aPoint2)/5.;
-    std::shared_ptr<GeomAPI_Pnt2d> aFPnt = aLine->shiftedLocation(aDist);
-    aFlyOutAttr->setValue(aFPnt);
-    aFlyoutPnt = sketch()->to3D(aFPnt->x(), aFPnt->y());
-  }
+  if(!aFlyOutAttr->isInitialized())
+    compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
+  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyOutAttr->x(), aFlyOutAttr->y()/*aFPnt->x(), aFPnt->y()*/);
+
   // value calculation
   std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeDouble>(aData->attribute(SketchPlugin_Constraint::VALUE()));

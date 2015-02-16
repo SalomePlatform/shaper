@@ -53,12 +53,12 @@ Q_OBJECT
 
   /// Returns true, if default value of the widget should be computed
   /// on operation's execute, like radius for circle's constraint (can not be zero)
-  bool isComputedDefault() { return myIsComputedDefault; }
+  bool isComputedDefault() const { return myIsComputedDefault; }
 
   /// Returns true, if default value of the widget is defined in the XML and it is not the
   /// computed value
   /// \return the boolean result
-  bool isValueDefault() { return !myDefaultValue.empty(); }
+  std::string getDefaultValue() const { return myDefaultValue; }
 
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
@@ -190,14 +190,15 @@ protected slots:
   /// A feature which is processing by active operation
   FeaturePtr myFeature;      
 
+  /// Flag which shows that current operation is in editing mode
+  bool myIsEditing; 
+
+private:
   /// Value should be computed on execute, like radius for circle's constraint (can not be zero)
   bool myIsComputedDefault; 
                         
   /// the default value, which is defined in the XML for this attribute    
   std::string myDefaultValue; 
-
-  /// Flag which shows that current operation is in editing mode
-  bool myIsEditing; 
 };
 
 #endif

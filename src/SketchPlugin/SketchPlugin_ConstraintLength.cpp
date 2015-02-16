@@ -53,6 +53,28 @@ void SketchPlugin_ConstraintLength::execute()
   }
 }
 
+bool SketchPlugin_ConstraintLength::compute(const std::string& theAttributeId)
+{
+  if (theAttributeId != SketchPlugin_Constraint::FLYOUT_VALUE_PNT())
+    return false;
+
+  std::shared_ptr<GeomAPI_Pnt> aPoint1, aPoint2;
+  std::shared_ptr<GeomDataAPI_Point2D> aStartPoint, anEndPoint;
+  if (!getPoints(aPoint1, aPoint2, aStartPoint, anEndPoint))
+    return false;
+
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
+      GeomDataAPI_Point2D>(data()->attribute(theAttributeId));
+
+  std::shared_ptr<GeomAPI_Lin2d> aLine = 
+    std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aStartPoint->pnt(), anEndPoint->pnt()));
+  double aDist = aPoint1->distance(aPoint2)/5.;
+  std::shared_ptr<GeomAPI_Pnt2d> aFPnt = aLine->shiftedLocation(aDist);
+  aFlyOutAttr->setValue(aFPnt);
+
+  return true;
+}
+
 bool SketchPlugin_ConstraintLength::getPoints(
   std::shared_ptr<GeomAPI_Pnt>& thePoint1, std::shared_ptr<GeomAPI_Pnt>& thePoint2,
   std::shared_ptr<GeomDataAPI_Point2D>& theStartPoint,
@@ -85,20 +107,14 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
   if (!getPoints(aPoint1, aPoint2, aStartPoint, anEndPoint))
     return thePrevious; // not possible to show length because points are not defined
 
-  std::shared_ptr<GeomAPI_Pln> aPlane = sketch()->plane();
-  std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
-      GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = std::shared_ptr<GeomAPI_Pnt>();
-  if (aFlyOutAttr->isInitialized()) {
-    aFlyoutPnt = sketch()->to3D(aFlyOutAttr->x(), aFlyOutAttr->y());
-  } else {
-    std::shared_ptr<GeomAPI_Lin2d> aLine = 
-      std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aStartPoint->pnt(), anEndPoint->pnt()));
-    double aDist = aPoint1->distance(aPoint2)/5.;
-    std::shared_ptr<GeomAPI_Pnt2d> aFPnt = aLine->shiftedLocation(aDist);
-    aFlyOutAttr->setValue(aFPnt);
-    aFlyoutPnt = sketch()->to3D(aFPnt->x(), aFPnt->y());
+  AttributePtr aFlyOutAttribute = data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
+  if (!aFlyOutAttribute->isInitialized()) {
+    if (!compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()))
+      return thePrevious; // not possible to show length because points are not defined
   }
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
+                                                          GeomDataAPI_Point2D>(aFlyOutAttribute);
+  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyOutAttr->x(), aFlyOutAttr->y());
   // value calculation
   // TODO: has to be calculated on definition of reference object
   double aDistance = aPoint1->distance(aPoint2);
@@ -114,6 +130,7 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
   AISObjectPtr anAIS = thePrevious;
   if (!anAIS)
     anAIS = AISObjectPtr(new GeomAPI_AISObject);
+  std::shared_ptr<GeomAPI_Pln> aPlane = sketch()->plane();
   anAIS->createDistance(aPoint1, aPoint2, aFlyoutPnt, aPlane, aValue);
 
   // Set color from preferences

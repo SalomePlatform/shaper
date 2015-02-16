@@ -653,7 +653,7 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
   QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
     bool isStoreValue = !theOperation->isEditOperation() &&
-                        aWidget->isValueDefault() && !aWidget->isComputedDefault();
+                        !aWidget->getDefaultValue().empty() && !aWidget->isComputedDefault();
     aWidget->setFeature(theOperation->feature(), isStoreValue);
     aWidget->enableFocusProcessing();
   }

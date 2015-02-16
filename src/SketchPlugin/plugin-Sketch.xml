@@ -63,7 +63,7 @@
       <selection_filter id="MultiFilter" parameters="line,vertex"/>
     </sketch_shape_selector>
 		
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
+        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         
 		<doublevalue_editor label="Value" tooltip="Distance" id="ConstraintValue" default="computed" min="0">
           <validator id="GeomValidators_Positive"/>
@@ -79,7 +79,7 @@
 			<validator id="SketchPlugin_ResultLine"/>
       <selection_filter id="EdgeFilter" parameters="line"/>
     </shape_selector>
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
+        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Length" id="ConstraintValue" default="computed">
           <validator id="GeomValidators_Positive"/>
         </doublevalue_editor>
@@ -93,7 +93,7 @@
 			<validator id="SketchPlugin_ResultArc"/>
 			<selection_filter id="EdgeFilter" parameters="circle"/>
 		</shape_selector>
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
+        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt"  default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Radius" id="ConstraintValue" default="computed"/>
         <validator id="PartSet_RadiusValidator"/>
       </feature>

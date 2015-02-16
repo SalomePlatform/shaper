@@ -40,6 +40,11 @@ class SketchPlugin_ConstraintRadius : public SketchPlugin_ConstraintBase
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
+  /// Computes the attribute value on the base of other attributes if the value can be computed
+  /// \param theAttributeId an attribute index to be computed
+  /// \return a boolean value about it is computed
+  SKETCHPLUGIN_EXPORT virtual bool compute(const std::string& theAttributeId);
+
   /// \brief Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 

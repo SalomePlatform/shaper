@@ -55,6 +55,11 @@ class ModelAPI_Feature : public ModelAPI_Object
   /// Computes or recomputes the results
   virtual void execute() = 0;
 
+  /// Computes the attribute value on the base of other attributes if the value can be computed
+  /// \param theAttributeId an attribute index to be computed
+  /// \return a boolean value about it is computed
+  virtual bool compute(const std::string& theAttributeId) { return false; };
+
   /// Registers error during the execution, causes the ExecutionFailed state
   virtual void setError(const std::string& theError) {
     data()->setError(theError);

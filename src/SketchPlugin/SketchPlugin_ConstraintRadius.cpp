@@ -63,6 +63,36 @@ void SketchPlugin_ConstraintRadius::execute()
   }
 }
 
+bool SketchPlugin_ConstraintRadius::compute(const std::string& theAttributeId)
+{
+  if (theAttributeId != SketchPlugin_Constraint::FLYOUT_VALUE_PNT())
+    return false;
+
+  std::shared_ptr<ModelAPI_Feature> aCyrcFeature;
+  double aRadius = circleRadius(aCyrcFeature);
+  if (aRadius < 0)
+    return false;
+
+  // Flyout point
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
+      GeomDataAPI_Point2D>(data()->attribute(theAttributeId));
+  // Prepare a circle
+  if (aCyrcFeature->getKind() == SketchPlugin_Circle::ID()) { // circle
+    std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aCyrcFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
+    double aShift = aRadius * 1.1;
+    std::shared_ptr<GeomAPI_Pnt2d> aPnt = aCenterAttr->pnt();
+    std::shared_ptr<GeomAPI_Pnt2d> aFPnt = 
+      std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aPnt->x() + aShift, aPnt->y() + aShift));
+    aFlyoutAttr->setValue(aFPnt);
+  } else { // arc
+    std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
+      GeomDataAPI_Point2D>(aCyrcFeature->data()->attribute(SketchPlugin_Arc::START_ID()));      
+    aFlyoutAttr->setValue(aStartAttr->pnt());
+  }
+  return true;
+}
+
 double SketchPlugin_ConstraintRadius::circleRadius(std::shared_ptr<ModelAPI_Feature>& theCirc)
 {
   static const double kErrorResult = -1.;
@@ -105,35 +135,19 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
   // Flyout point
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt;
-  if (aFlyoutAttr->isInitialized()) {
-    aFlyoutPnt = sketch()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
-  } 
+  if (!aFlyoutAttr->isInitialized() && !compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()))
+    return thePrevious; // can not create a good presentation
+  std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
 
   // Prepare a circle
   std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr;
   if (aCyrcFeature->getKind() == SketchPlugin_Circle::ID()) { // circle
     aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aCyrcFeature->data()->attribute(SketchPlugin_Circle::CENTER_ID()));
-    if (!aFlyoutPnt) {
-      double aShift = aRadius * 1.1;
-      std::shared_ptr<GeomAPI_Pnt2d> aPnt = aCenterAttr->pnt();
-      std::shared_ptr<GeomAPI_Pnt2d> aFPnt = 
-        std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aPnt->x() + aShift, aPnt->y() + aShift));
-      aFlyoutAttr->setValue(aFPnt);
-      aFlyoutPnt = sketch()->to3D(aFPnt->x(), aFPnt->y());
-    }
   } else { // arc
     aCenterAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
         aCyrcFeature->data()->attribute(SketchPlugin_Arc::CENTER_ID()));
-    if (!aFlyoutPnt) {
-      std::shared_ptr<GeomDataAPI_Point2D> aStartAttr = std::dynamic_pointer_cast<
-        GeomDataAPI_Point2D>(aCyrcFeature->data()->attribute(SketchPlugin_Arc::START_ID()));      
-      aFlyoutAttr->setValue(aStartAttr->pnt());
-      aFlyoutPnt = sketch()->to3D(aStartAttr->pnt()->x(), aStartAttr->pnt()->y());
-    }
   }
-
   std::shared_ptr<GeomAPI_Pnt> aCenter = sketch()->to3D(aCenterAttr->x(), aCenterAttr->y());
   std::shared_ptr<GeomDataAPI_Dir> aNDir = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       sketch()->data()->attribute(SketchPlugin_Sketch::NORM_ID()));

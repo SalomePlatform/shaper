@@ -44,7 +44,7 @@ PartSet_WidgetPoint2dDistance::~PartSet_WidgetPoint2dDistance()
 void PartSet_WidgetPoint2dDistance::reset()
 {
   bool isOk;
-  double aDefValue = QString::fromStdString(myDefaultValue).toDouble(&isOk);
+  double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
 
   ModuleBase_Tools::setSpinValue(mySpinBox, isOk ? aDefValue : 0.0);
 }
