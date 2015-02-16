@@ -99,14 +99,17 @@ void ModuleBase_ModelWidget::activate()
   // the control value is stored to the mode by the focus in on the widget
   // we need the value is initialized in order to enable the apply button in the property panel.
   // It should happens in the creation mode only because all fields are filled in the edition mode
-  if (!isEditingMode()/* && !myFeature->data()->attribute(myAttributeID)->isInitialized()*/) {
-    if (isComputedDefault()) {
-      if (myFeature->compute(myAttributeID)) {
-        restoreValue();
-      }      
-    }
-    else {
-      storeValue();
+  if (!isEditingMode()) {
+    AttributePtr anAttribute = myFeature->data()->attribute(myAttributeID);
+    if (anAttribute.get() != NULL && !anAttribute->isInitialized()) {
+      if (isComputedDefault()) {
+        if (myFeature->compute(myAttributeID)) {
+          restoreValue();
+        }      
+      }
+      else {
+        storeValue();
+      }
     }
   }
   activateCustom();
