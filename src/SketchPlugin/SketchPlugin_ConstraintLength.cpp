@@ -50,6 +50,14 @@ void SketchPlugin_ConstraintLength::execute()
     //if(!aValueAttr->isInitialized()) {
     //  aValueAttr->setValue(aLenght);
     //}
+
+    // the value should to be computed here, not in the getAISObject in order to change the model value
+    // inside the object transaction. This is important for creating a constraint by preselection.
+    // The display of the presentation in this case happens after the transaction commit
+    AttributePtr aFlyOutAttribute = data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
+    if (!aFlyOutAttribute->isInitialized()) {
+      compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
+    }
   }
 }
 
@@ -109,8 +117,7 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
 
   AttributePtr aFlyOutAttribute = data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
   if (!aFlyOutAttribute->isInitialized()) {
-    if (!compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()))
-      return thePrevious; // not possible to show length because points are not defined
+    return thePrevious; // not possible to show length because points are not defined
   }
   std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
                                                           GeomDataAPI_Point2D>(aFlyOutAttribute);

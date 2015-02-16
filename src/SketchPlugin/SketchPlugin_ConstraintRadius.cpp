@@ -60,6 +60,14 @@ void SketchPlugin_ConstraintRadius::execute()
     //if(!aValueAttr->isInitialized()) {
     //  aValueAttr->setValue(aRadius);
     //}
+
+    // the value should to be computed here, not in the getAISObject in order to change the model value
+    // inside the object transaction. This is important for creating a constraint by preselection.
+    // The display of the presentation in this case happens after the transaction commit
+    std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
+        GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+    if (!aFlyoutAttr->isInitialized())
+      compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
   }
 }
 
@@ -135,7 +143,7 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
   // Flyout point
   std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr = std::dynamic_pointer_cast<
       GeomDataAPI_Point2D>(data()->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
-  if (!aFlyoutAttr->isInitialized() && !compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()))
+  if (!aFlyoutAttr->isInitialized())
     return thePrevious; // can not create a good presentation
   std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
 

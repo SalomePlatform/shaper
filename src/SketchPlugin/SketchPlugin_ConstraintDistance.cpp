@@ -45,6 +45,14 @@ void SketchPlugin_ConstraintDistance::execute()
   if(aDistance >= 0) {
     anAttrValue->setValue(aDistance);
   }
+
+  // the value should to be computed here, not in the getAISObject in order to change the model value
+  // inside the object transaction. This is important for creating a constraint by preselection.
+  // The display of the presentation in this case happens after the transaction commit
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
+      GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+  if(!aFlyOutAttr->isInitialized())
+    compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
 }
 
 bool SketchPlugin_ConstraintDistance::compute(const std::string& theAttributeId)
@@ -142,7 +150,7 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
   std::shared_ptr<GeomAPI_Pnt> aPoint1 = sketch()->to3D(aPnt_A->x(), aPnt_A->y());
   std::shared_ptr<GeomAPI_Pnt> aPoint2 = sketch()->to3D(aPnt_B->x(), aPnt_B->y());
   if(!aFlyOutAttr->isInitialized())
-    compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
+    return AISObjectPtr();
   std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt = sketch()->to3D(aFlyOutAttr->x(), aFlyOutAttr->y()/*aFPnt->x(), aFPnt->y()*/);
 
   // value calculation
