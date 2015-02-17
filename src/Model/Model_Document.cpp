@@ -419,8 +419,11 @@ bool Model_Document::isModified()
 
 bool Model_Document::canUndo()
 {
-  if (myDoc->GetAvailableUndos() > 0 && (myNestedNum.empty() || *myNestedNum.rbegin() != 0) &&
-      !myTransactions.empty() /* for omitting the first useless transaction */)
+  // issue 406 : if transaction is opened, but nothing to undo behind, can not undo
+  int aCurrentNum = isOperation() ? 1 : 0;
+  if (myDoc->GetAvailableUndos() > 0 && 
+      (myNestedNum.empty() || *myNestedNum.rbegin() - aCurrentNum > 0) && // there is something to undo in nested
+      myTransactions.size() - aCurrentNum > 0 /* for omitting the first useless transaction */)
     return true;
   // check other subs contains operation that can be undoed
   const std::set<std::string> aSubs = subDocuments(true);
