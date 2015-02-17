@@ -42,6 +42,7 @@ SET(PROJECT_LIBRARIES
     ModuleBase
     Config
     GeomAPI
+    GeomDataAPI
     ${QT_LIBRARIES}
     ${CAS_KERNEL}
     ${CAS_SHAPE}

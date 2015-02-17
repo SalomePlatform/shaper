@@ -194,6 +194,7 @@ void Config_ModuleReader::loadLibrary(const std::string& theLibName)
     #ifndef WIN32
     anErrorMsg += ": " + std::string(dlerror());
     #endif
+    std::cerr << anErrorMsg << std::endl;
     Events_Error::send(anErrorMsg);
   }
 }

@@ -5,15 +5,15 @@
     static const std::string MY_CENTER_ID = "ArcCenter";
     static const std::string MY_START_ID = "ArcStartPoint";
     static const std::string MY_END_ID = "ArcEndPoint";
-    data()->addAttribute(SketchPlugin_Arc::CENTER_ID(), GeomDataAPI_Point2D::type());
-    data()->addAttribute(SketchPlugin_Arc::START_ID(),  GeomDataAPI_Point2D::type());
-    data()->addAttribute(SketchPlugin_Arc::END_ID(),    GeomDataAPI_Point2D::type());
+    data()->addAttribute(SketchPlugin_Arc::CENTER_ID(), GeomDataAPI_Point2D::typeId());
+    data()->addAttribute(SketchPlugin_Arc::START_ID(),  GeomDataAPI_Point2D::typeId());
+    data()->addAttribute(SketchPlugin_Arc::END_ID(),    GeomDataAPI_Point2D::typeId());
     
     static const std::string MY_CIRCLE_ID("SketchCircle");
     static const std::string MY_CIRCLE_CENTER_ID("CircleCenter");
     static const std::string MY_CIRCLE_RADIUS_ID("CircleRadius");
-    data()->addAttribute(SketchPlugin_Circle::CENTER_ID(), GeomDataAPI_Point2D::type());
-    data()->addAttribute(SketchPlugin_Circle::RADIUS_ID(), ModelAPI_AttributeDouble::type());
+    data()->addAttribute(SketchPlugin_Circle::CENTER_ID(), GeomDataAPI_Point2D::typeId());
+    data()->addAttribute(SketchPlugin_Circle::RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
 """
 
 #=========================================================================
@@ -139,8 +139,8 @@ assert (anCircleCentr.y() == 0)
 assert (not anCircleCentr.isInitialized())
 aCircleRadius = aSketchCircle.real("CircleRadius")
 assert (type(aCircleRadius) == ModelAPI_AttributeDouble)
-# ModelAPI_AttributeDouble.type() is checked in ModelAPI_TestConstants
-assert (aCircleRadius.attributeType() == ModelAPI_AttributeDouble.type())
+# ModelAPI_AttributeDouble.typeId() is checked in ModelAPI_TestConstants
+assert (aCircleRadius.attributeType() == ModelAPI_AttributeDouble.typeId())
 assert (aCircleRadius.value() == 0)
 anCircleCentr.setValue(-25., -25)
 aCircleRadius.setValue(25.)

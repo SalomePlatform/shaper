@@ -27,9 +27,9 @@ SketchPlugin_Line::SketchPlugin_Line()
 
 void SketchPlugin_Line::initAttributes()
 {
-  data()->addAttribute(START_ID(), GeomDataAPI_Point2D::type());
-  data()->addAttribute(END_ID(), GeomDataAPI_Point2D::type());
-  data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
+  data()->addAttribute(START_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(END_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 }
 

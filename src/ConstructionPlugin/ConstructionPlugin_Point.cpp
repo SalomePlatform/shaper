@@ -21,9 +21,9 @@ ConstructionPlugin_Point::ConstructionPlugin_Point()
 
 void ConstructionPlugin_Point::initAttributes()
 {
-  data()->addAttribute(POINT_ATTR_X, ModelAPI_AttributeDouble::type());
-  data()->addAttribute(POINT_ATTR_Y, ModelAPI_AttributeDouble::type());
-  data()->addAttribute(POINT_ATTR_Z, ModelAPI_AttributeDouble::type());
+  data()->addAttribute(POINT_ATTR_X, ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(POINT_ATTR_Y, ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(POINT_ATTR_Z, ModelAPI_AttributeDouble::typeId());
 }
 
 void ConstructionPlugin_Point::execute()

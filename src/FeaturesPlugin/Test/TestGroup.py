@@ -6,7 +6,7 @@
         static const std::string MY_GROUP_ID("Group");
         static const std::string MY_GROUP_LIST_ID("group_list");
         
-        data()->addAttribute(FeaturesPlugin_Group::LIST_ID(), ModelAPI_AttributeSelectionList::type());
+        data()->addAttribute(FeaturesPlugin_Group::LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 """
 #=========================================================================
 # Initialization of the test

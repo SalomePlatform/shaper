@@ -250,7 +250,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
               //std::cout<<"Execute feature "<<theFeature->getKind()<<std::endl;
               // before execution update the selection attributes if any
               list<AttributePtr> aRefs = 
-                theFeature->data()->attributes(ModelAPI_AttributeSelection::type());
+                theFeature->data()->attributes(ModelAPI_AttributeSelection::typeId());
               list<AttributePtr>::iterator aRefsIter = aRefs.begin();
               for (; aRefsIter != aRefs.end(); aRefsIter++) {
                 std::shared_ptr<ModelAPI_AttributeSelection> aSel =
@@ -260,7 +260,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
                     aState = ModelAPI_StateInvalidArgument;
                 }
               }
-              aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelectionList::type());
+              aRefs = theFeature->data()->attributes(ModelAPI_AttributeSelectionList::typeId());
               for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
                 std::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
                   std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);

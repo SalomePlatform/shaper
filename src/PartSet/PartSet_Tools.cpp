@@ -220,7 +220,7 @@ std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::getFeaturePoint(FeaturePtr t
   std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = std::shared_ptr<GeomAPI_Pnt2d>(
                                                                  new GeomAPI_Pnt2d(theX, theY));
   std::list<std::shared_ptr<ModelAPI_Attribute> > anAttiributes =
-                                    theFeature->data()->attributes(GeomDataAPI_Point2D::type());
+                                    theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
   std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
                                                                     aLast = anAttiributes.end();
   std::shared_ptr<GeomDataAPI_Point2D> aFPoint;
@@ -319,7 +319,7 @@ std::shared_ptr<GeomDataAPI_Point2D> PartSet_Tools::
   for (int i = 0; i < theSketch->numberOfSubs(); i++) {
     FeaturePtr aFeature = theSketch->subFeature(i);
     if (!theIgnore.contains(aFeature)) {
-      anAttiributes = aFeature->data()->attributes(GeomDataAPI_Point2D::type());
+      anAttiributes = aFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
 
       std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt;
       for (anIt = anAttiributes.cbegin(); anIt != anAttiributes.cend(); ++anIt) {
@@ -362,7 +362,7 @@ void PartSet_Tools::setConstraints(CompositeFeaturePtr theSketch, FeaturePtr the
   for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
     // find the given point in the feature attributes
-    anAttiributes = aFeature->data()->attributes(GeomDataAPI_Point2D::type());
+    anAttiributes = aFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
     std::list<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anIt = anAttiributes.begin(),
         aLast = anAttiributes.end();
     std::shared_ptr<GeomDataAPI_Point2D> aFPoint;
@@ -626,7 +626,7 @@ AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj,
 
         // find the given point in the feature attributes
         std::list<AttributePtr> anAttiributes = 
-          aFeature->data()->attributes(GeomDataAPI_Point2D::type());
+          aFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
         std::list<AttributePtr>::const_iterator anIt = anAttiributes.begin(), 
                                                 aLast = anAttiributes.end();
         for (; anIt != aLast && !anAttribute; anIt++) {

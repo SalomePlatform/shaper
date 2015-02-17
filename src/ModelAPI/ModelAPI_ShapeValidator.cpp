@@ -16,7 +16,7 @@ bool ModelAPI_ShapeValidator::isValid(const FeaturePtr& theFeature,
   std::string aCurrentAttributeId = theAttribute->id();
   // get all feature attributes
   std::list<AttributePtr> anAttrs = 
-                   theFeature->data()->attributes(ModelAPI_AttributeSelection::type());
+                   theFeature->data()->attributes(ModelAPI_AttributeSelection::typeId());
   if (anAttrs.size() > 0 && theShape.get() != NULL) {
     std::list<AttributePtr>::iterator anAttr = anAttrs.begin();
     for(; anAttr != anAttrs.end(); anAttr++) {

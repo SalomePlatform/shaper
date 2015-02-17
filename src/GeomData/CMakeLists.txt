@@ -16,6 +16,7 @@ SET(PROJECT_SOURCES
 )
 
 SET(PROJECT_LIBRARIES
+    GeomDataAPI
     ModelAPI 
     GeomAPI 
     Events

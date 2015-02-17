@@ -62,7 +62,7 @@ bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeatur
                                                  const ObjectPtr& theObject) const
 {
   std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::type());
+    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
   std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
   for(; anAttr != anAttrs.end(); anAttr++) {
     if (*anAttr) {
@@ -86,7 +86,7 @@ bool SketchPlugin_DifferentObjectsValidator::isValid(
     const FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObj);
 
     std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-      aFeature->data()->attributes(ModelAPI_AttributeRefAttr::type());
+      aFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
     std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
     for(; anAttr != anAttrs.end(); anAttr++) {
       if (*anAttr && *anAttr != theAttribute) {
@@ -105,7 +105,7 @@ bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeatur
   const std::list<std::string>& theArguments, const AttributePtr& theAttribute) const
 {
   std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::type());
+    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
   std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
   for(; anAttr != anAttrs.end(); anAttr++) {
     if (*anAttr) {

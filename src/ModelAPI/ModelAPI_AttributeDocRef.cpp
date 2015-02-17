@@ -8,7 +8,7 @@
 
 std::string ModelAPI_AttributeDocRef::attributeType()
 {
-  return type();
+  return typeId();
 }
 
 ModelAPI_AttributeDocRef::~ModelAPI_AttributeDocRef()

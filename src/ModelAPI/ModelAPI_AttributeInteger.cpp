@@ -9,7 +9,7 @@
 
 std::string ModelAPI_AttributeInteger::attributeType()
 {
-  return type();
+  return typeId();
 }
 
 /// To virtually destroy the fields of successors

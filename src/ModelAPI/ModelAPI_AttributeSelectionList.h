@@ -45,7 +45,7 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   virtual void clear() = 0;
 
   /// Returns the type of this class of attributes
-  static std::string type()
+  static std::string typeId()
   {
     return "SelectionList";
   }

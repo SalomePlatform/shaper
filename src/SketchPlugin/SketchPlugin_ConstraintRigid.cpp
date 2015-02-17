@@ -18,7 +18,7 @@ SketchPlugin_ConstraintRigid::SketchPlugin_ConstraintRigid()
 
 void SketchPlugin_ConstraintRigid::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
+  data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
 }
 
 void SketchPlugin_ConstraintRigid::execute()

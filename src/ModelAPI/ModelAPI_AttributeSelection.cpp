@@ -10,7 +10,7 @@
 
 std::string ModelAPI_AttributeSelection::attributeType()
 {
-  return type();
+  return typeId();
 }
 
 ModelAPI_AttributeSelection::~ModelAPI_AttributeSelection()

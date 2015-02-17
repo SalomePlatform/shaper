@@ -8,7 +8,7 @@
 
 std::string ModelAPI_AttributeDouble::attributeType()
 {
-  return type();
+  return typeId();
 }
 
 ModelAPI_AttributeDouble::~ModelAPI_AttributeDouble()

@@ -24,8 +24,8 @@ FeaturesPlugin_Placement::FeaturesPlugin_Placement()
 
 void FeaturesPlugin_Placement::initAttributes()
 {
-  data()->addAttribute(FeaturesPlugin_Placement::BASE_FACE_ID(), ModelAPI_AttributeSelection::type());
-  data()->addAttribute(FeaturesPlugin_Placement::ATTRACT_FACE_ID(), ModelAPI_AttributeSelection::type());
+  data()->addAttribute(FeaturesPlugin_Placement::BASE_FACE_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(FeaturesPlugin_Placement::ATTRACT_FACE_ID(), ModelAPI_AttributeSelection::typeId());
 }
 
 void FeaturesPlugin_Placement::execute()

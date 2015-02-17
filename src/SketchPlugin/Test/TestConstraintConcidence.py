@@ -12,8 +12,8 @@
         
     SketchPlugin_ConstraintCoincidence
         static const std::string MY_CONSTRAINT_COINCIDENCE_ID("SketchConstraintCoincidence");
-        data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::type());
-        data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::type());
+        data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
+        data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
 
 """
 from GeomDataAPI import *

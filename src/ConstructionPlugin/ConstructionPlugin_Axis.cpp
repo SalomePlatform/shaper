@@ -23,8 +23,8 @@ ConstructionPlugin_Axis::ConstructionPlugin_Axis()
 
 void ConstructionPlugin_Axis::initAttributes()
 {
-  data()->addAttribute(POINT_ATTR_FIRST,  ModelAPI_AttributeSelection::type());
-  data()->addAttribute(POINT_ATTR_SECOND, ModelAPI_AttributeSelection::type());
+  data()->addAttribute(POINT_ATTR_FIRST,  ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(POINT_ATTR_SECOND, ModelAPI_AttributeSelection::typeId());
 }
 
 void ConstructionPlugin_Axis::execute()

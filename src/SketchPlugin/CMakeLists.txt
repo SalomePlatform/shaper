@@ -50,6 +50,7 @@ SET(PROJECT_LIBRARIES
     GeomAPI
     GeomAlgoAPI
     ModelAPI
+    GeomDataAPI
     ${CAS_KERNEL}
     ${CAS_SHAPE}
 )

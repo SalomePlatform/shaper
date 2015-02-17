@@ -43,13 +43,13 @@ SketchPlugin_Sketch::SketchPlugin_Sketch()
 
 void SketchPlugin_Sketch::initAttributes()
 {
-  data()->addAttribute(SketchPlugin_Sketch::ORIGIN_ID(), GeomDataAPI_Point::type());
-  data()->addAttribute(SketchPlugin_Sketch::DIRX_ID(), GeomDataAPI_Dir::type());
-  data()->addAttribute(SketchPlugin_Sketch::DIRY_ID(), GeomDataAPI_Dir::type());
-  data()->addAttribute(SketchPlugin_Sketch::NORM_ID(), GeomDataAPI_Dir::type());
-  data()->addAttribute(SketchPlugin_Sketch::FEATURES_ID(), ModelAPI_AttributeRefList::type());
+  data()->addAttribute(SketchPlugin_Sketch::ORIGIN_ID(), GeomDataAPI_Point::typeId());
+  data()->addAttribute(SketchPlugin_Sketch::DIRX_ID(), GeomDataAPI_Dir::typeId());
+  data()->addAttribute(SketchPlugin_Sketch::DIRY_ID(), GeomDataAPI_Dir::typeId());
+  data()->addAttribute(SketchPlugin_Sketch::NORM_ID(), GeomDataAPI_Dir::typeId());
+  data()->addAttribute(SketchPlugin_Sketch::FEATURES_ID(), ModelAPI_AttributeRefList::typeId());
   // the selected face, base for the sketcher plane, not obligatory
-  data()->addAttribute(SketchPlugin_Feature::EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
+  data()->addAttribute(SketchPlugin_Feature::EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(
     getKind(), SketchPlugin_Feature::EXTERNAL_ID());
 }

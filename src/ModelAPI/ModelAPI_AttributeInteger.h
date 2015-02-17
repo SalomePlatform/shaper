@@ -28,7 +28,7 @@ class ModelAPI_AttributeInteger : public ModelAPI_Attribute
   MODELAPI_EXPORT virtual int value() = 0;
 
   /// Returns the type of this class of attributes
-  MODELAPI_EXPORT static std::string type()
+  MODELAPI_EXPORT static std::string typeId()
   {
     return "Integer";
   }

@@ -22,8 +22,8 @@ ConstructionPlugin_Plane::ConstructionPlugin_Plane()
 
 void ConstructionPlugin_Plane::initAttributes()
 {
-  data()->addAttribute(FACE_ATTR,  ModelAPI_AttributeSelection::type());
-  data()->addAttribute(DISTANCE_ATTR, ModelAPI_AttributeDouble::type());
+  data()->addAttribute(FACE_ATTR,  ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(DISTANCE_ATTR, ModelAPI_AttributeDouble::typeId());
 }
 
 void ConstructionPlugin_Plane::execute()

@@ -116,7 +116,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
 {
   // Check RefAttr attributes
   std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::type());
+    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
   if (anAttrs.size() > 0) {
     std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
     for(; anAttr != anAttrs.end(); anAttr++) {
@@ -130,7 +130,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
     }
   }
   // Check selection attributes
-  anAttrs = theFeature->data()->attributes(ModelAPI_AttributeSelection::type());
+  anAttrs = theFeature->data()->attributes(ModelAPI_AttributeSelection::typeId());
   if (anAttrs.size() > 0) {
     std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
     for(; anAttr != anAttrs.end(); anAttr++) {
@@ -144,7 +144,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
     }
   }
   // Check selection attributes
-  anAttrs = theFeature->data()->attributes(ModelAPI_AttributeReference::type());
+  anAttrs = theFeature->data()->attributes(ModelAPI_AttributeReference::typeId());
   if (anAttrs.size() > 0) {
     std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
     for(; anAttr != anAttrs.end(); anAttr++) {

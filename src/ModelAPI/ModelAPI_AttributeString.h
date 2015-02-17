@@ -26,7 +26,7 @@ class ModelAPI_AttributeString : public ModelAPI_Attribute
   MODELAPI_EXPORT virtual std::string value() = 0;
 
   /// Returns the type of this class of attributes
-  MODELAPI_EXPORT static std::string type()
+  MODELAPI_EXPORT static std::string typeId()
   {
     return "String";
   }

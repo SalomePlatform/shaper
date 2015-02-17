@@ -70,33 +70,33 @@ void Model_Data::addAttribute(const std::string& theID, const std::string theAtt
 {
   TDF_Label anAttrLab = myLab.FindChild(myAttrs.size() + 1);
   ModelAPI_Attribute* anAttr = 0;
-  if (theAttrType == ModelAPI_AttributeDocRef::type()) {
+  if (theAttrType == ModelAPI_AttributeDocRef::typeId()) {
     anAttr = new Model_AttributeDocRef(anAttrLab);
-  } else if (theAttrType == Model_AttributeInteger::type()) {
+  } else if (theAttrType == Model_AttributeInteger::typeId()) {
     anAttr = new Model_AttributeInteger(anAttrLab);
-  } else if (theAttrType == ModelAPI_AttributeDouble::type()) {
+  } else if (theAttrType == ModelAPI_AttributeDouble::typeId()) {
     anAttr = new Model_AttributeDouble(anAttrLab);
-  } else if (theAttrType == Model_AttributeBoolean::type()) {
+  } else if (theAttrType == Model_AttributeBoolean::typeId()) {
     anAttr = new Model_AttributeBoolean(anAttrLab);
-  } else if (theAttrType == Model_AttributeString::type()) {
+  } else if (theAttrType == Model_AttributeString::typeId()) {
     anAttr = new Model_AttributeString(anAttrLab);
-  } else if (theAttrType == ModelAPI_AttributeReference::type()) {
+  } else if (theAttrType == ModelAPI_AttributeReference::typeId()) {
     anAttr = new Model_AttributeReference(anAttrLab);
-  } else if (theAttrType == ModelAPI_AttributeSelection::type()) {
+  } else if (theAttrType == ModelAPI_AttributeSelection::typeId()) {
     anAttr = new Model_AttributeSelection(anAttrLab);
-  } else if (theAttrType == ModelAPI_AttributeSelectionList::type()) {
+  } else if (theAttrType == ModelAPI_AttributeSelectionList::typeId()) {
     anAttr = new Model_AttributeSelectionList(anAttrLab);
-  } else if (theAttrType == ModelAPI_AttributeRefAttr::type()) {
+  } else if (theAttrType == ModelAPI_AttributeRefAttr::typeId()) {
     anAttr = new Model_AttributeRefAttr(anAttrLab);
-  } else if (theAttrType == ModelAPI_AttributeRefList::type()) {
+  } else if (theAttrType == ModelAPI_AttributeRefList::typeId()) {
     anAttr = new Model_AttributeRefList(anAttrLab);
   } 
   // create also GeomData attributes here because only here the OCAF strucure is known
-  else if (theAttrType == GeomData_Point::type()) {
+  else if (theAttrType == GeomData_Point::typeId()) {
     anAttr = new GeomData_Point(anAttrLab);
-  } else if (theAttrType == GeomData_Dir::type()) {
+  } else if (theAttrType == GeomData_Dir::typeId()) {
     anAttr = new GeomData_Dir(anAttrLab);
-  } else if (theAttrType == GeomData_Point2D::type()) {
+  } else if (theAttrType == GeomData_Point2D::typeId()) {
     anAttr = new GeomData_Point2D(anAttrLab);
   }
   if (anAttr) {
@@ -268,21 +268,21 @@ void Model_Data::referencesToObjects(
   std::list<ObjectPtr> aReferenced; // not inside of cycle to avoid excess memory menagement
   for(; anAttr != myAttrs.end(); anAttr++) {
     std::string aType = anAttr->second->attributeType();
-    if (aType == ModelAPI_AttributeReference::type()) { // reference to object
+    if (aType == ModelAPI_AttributeReference::typeId()) { // reference to object
       std::shared_ptr<ModelAPI_AttributeReference> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeReference>(anAttr->second);
       aReferenced.push_back(aRef->value());
-    } else if (aType == ModelAPI_AttributeRefAttr::type()) { // reference to attribute or object
+    } else if (aType == ModelAPI_AttributeRefAttr::typeId()) { // reference to attribute or object
       std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeRefAttr>(anAttr->second);
       aReferenced.push_back(aRef->isObject() ? aRef->object() : aRef->attr()->owner());
-    } else if (aType == ModelAPI_AttributeRefList::type()) { // list of references
+    } else if (aType == ModelAPI_AttributeRefList::typeId()) { // list of references
       aReferenced = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttr->second)->list();
-    } else if (aType == ModelAPI_AttributeSelection::type()) { // selection attribute
+    } else if (aType == ModelAPI_AttributeSelection::typeId()) { // selection attribute
       std::shared_ptr<ModelAPI_AttributeSelection> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeSelection>(anAttr->second);
       aReferenced.push_back(aRef->context());
-    } else if (aType == ModelAPI_AttributeSelectionList::type()) { // list of selection attributes
+    } else if (aType == ModelAPI_AttributeSelectionList::typeId()) { // list of selection attributes
       std::shared_ptr<ModelAPI_AttributeSelectionList> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeSelectionList>(anAttr->second);
       for(int a = aRef->size() - 1; a >= 0; a--) {

@@ -8,7 +8,7 @@
 
 std::string ModelAPI_AttributeReference::attributeType()
 {
-  return type();
+  return typeId();
 }
 
 ModelAPI_AttributeReference::~ModelAPI_AttributeReference()
