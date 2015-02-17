@@ -651,17 +651,32 @@ void Model_Document::removeFeature(FeaturePtr theFeature/*, const bool theCheck*
       myObjs.UnBind(aFeatureLabel);
     else
       return;  // not found feature => do not remove
+
+    // checking that the sub-element of composite feature is removed: if yes, inform the owner
+    std::set<std::shared_ptr<ModelAPI_Feature> > aRefs;
+    refsToFeature(theFeature, aRefs, false);
+    std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aRefIter = aRefs.begin();
+    for(; aRefIter != aRefs.end(); aRefIter++) {
+      std::shared_ptr<ModelAPI_CompositeFeature> aComposite = 
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aRefIter);
+      if (aComposite.get()) {
+        aComposite->removeFeature(theFeature);
+      }
+    }
+
     // erase fields
     theFeature->erase();
+    static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
     // erase all attributes under the label of feature
     aFeatureLabel.ForgetAllAttributes();
     // remove it from the references array
     if (theFeature->isInHistory()) {
       RemoveFromRefArray(featuresLabel(), aFeatureLabel);
     }
+    // event: feature is deleted
+    ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
   }
-  // event: feature is deleted
-  ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
 }
 
 FeaturePtr Model_Document::feature(TDF_Label& theLabel) const

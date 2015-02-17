@@ -110,8 +110,8 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
   /// appends a feature to the sketch sub-elements container
   SKETCHPLUGIN_EXPORT virtual std::shared_ptr<ModelAPI_Feature> addFeature(std::string theID);
 
-  /// appends a feature from the sketch sub-elements container
-  SKETCHPLUGIN_EXPORT virtual void removeFeature(ModelAPI_Feature* theFeature);
+  /// Just to synchronise the container of sub-features
+  virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
 
   /// Returns the number of sub-elements
   SKETCHPLUGIN_EXPORT virtual int numberOfSubs() const;
