@@ -6,15 +6,19 @@
 #include <ExchangePlugin.h>
 #include <ModelAPI_Feature.h>
 
+#include <GeomAPI_ICustomPrs.h>
+
 #include <map>
 
-/**\class ExchangePlugin_ImportFeature
+#define IMPORTED_FEATURE_COLOR "#E0A01B"
+
+  /**\class ExchangePlugin_ImportFeature
  * \ingroup Plugins
  * \brief Feature for import shapes from the external files in CAD formats.
  *
  * The set of supported formats is defined in the configuration file.
  */
-class ExchangePlugin_ImportFeature : public ModelAPI_Feature
+class ExchangePlugin_ImportFeature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
 {
  public:
   /// Extrusion kind
@@ -47,6 +51,9 @@ class ExchangePlugin_ImportFeature : public ModelAPI_Feature
   {
     return true;
   }
+
+  /// Modifies the given presentation in the custom way.
+  virtual void customisePresentation(AISObjectPtr thePrs);
 
  protected:
   /// POerforms the import of the file
