@@ -133,7 +133,7 @@ std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::addFeature(std::string th
   return aNew;
 }
 
-void SketchPlugin_Sketch::removeFeature(ModelAPI_Feature* theFeature)
+void SketchPlugin_Sketch::removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature)
 {
   if (!data().get()) // sketch is already removed (case on undo of sketch), sync is not needed
     return;
@@ -143,7 +143,7 @@ void SketchPlugin_Sketch::removeFeature(ModelAPI_Feature* theFeature)
   bool aHasEmtpyFeature = false;
   for(; aSubIt != aLastIt && !isRemoved; aSubIt++) {
     std::shared_ptr<ModelAPI_Feature> aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*aSubIt);
-    if (aFeature.get() != NULL && aFeature.get() == theFeature) {
+    if (aFeature.get() != NULL && aFeature == theFeature) {
       data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->remove(aFeature);
       isRemoved = true;
     }

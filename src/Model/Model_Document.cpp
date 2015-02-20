@@ -419,8 +419,11 @@ bool Model_Document::isModified()
 
 bool Model_Document::canUndo()
 {
-  if (myDoc->GetAvailableUndos() > 0 && (myNestedNum.empty() || *myNestedNum.rbegin() != 0) &&
-      !myTransactions.empty() /* for omitting the first useless transaction */)
+  // issue 406 : if transaction is opened, but nothing to undo behind, can not undo
+  int aCurrentNum = isOperation() ? 1 : 0;
+  if (myDoc->GetAvailableUndos() > 0 && 
+      (myNestedNum.empty() || *myNestedNum.rbegin() - aCurrentNum > 0) && // there is something to undo in nested
+      myTransactions.size() - aCurrentNum > 0 /* for omitting the first useless transaction */)
     return true;
   // check other subs contains operation that can be undoed
   const std::set<std::string> aSubs = subDocuments(true);
@@ -651,17 +654,32 @@ void Model_Document::removeFeature(FeaturePtr theFeature/*, const bool theCheck*
       myObjs.UnBind(aFeatureLabel);
     else
       return;  // not found feature => do not remove
+
+    // checking that the sub-element of composite feature is removed: if yes, inform the owner
+    std::set<std::shared_ptr<ModelAPI_Feature> > aRefs;
+    refsToFeature(theFeature, aRefs, false);
+    std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aRefIter = aRefs.begin();
+    for(; aRefIter != aRefs.end(); aRefIter++) {
+      std::shared_ptr<ModelAPI_CompositeFeature> aComposite = 
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aRefIter);
+      if (aComposite.get()) {
+        aComposite->removeFeature(theFeature);
+      }
+    }
+
     // erase fields
     theFeature->erase();
+    static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
     // erase all attributes under the label of feature
     aFeatureLabel.ForgetAllAttributes();
     // remove it from the references array
     if (theFeature->isInHistory()) {
       RemoveFromRefArray(featuresLabel(), aFeatureLabel);
     }
+    // event: feature is deleted
+    ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
   }
-  // event: feature is deleted
-  ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
 }
 
 FeaturePtr Model_Document::feature(TDF_Label& theLabel) const

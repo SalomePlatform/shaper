@@ -100,16 +100,6 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
       thePrs->setColor(aRGB[0], aRGB[1], aRGB[2]);
   }
 
-  /// removes also all sub-sketch elements
-  SKETCHPLUGIN_EXPORT virtual void erase()
-  {
-    /*SketchPlugin_Sketch* aSketch = sketch();
-    if (aSketch)
-      aSketch->removeFeature(this);
-      */
-    ModelAPI_Feature::erase();
-  }
-
   /// Returns the sketch of this feature
   SketchPlugin_Sketch* sketch();
 protected:

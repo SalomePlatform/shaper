@@ -35,6 +35,10 @@ public:
 
   /// Returns true if feature or reuslt belong to this composite feature as subs
   virtual bool isSub(ObjectPtr theObject) const = 0;
+
+  /// This method to inform that sub-feature is removed and must be removed from the internal data
+  /// structures of the owner (the remove from the document will be done outside just after)
+  virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature) = 0;
 };
 
 //! Pointer on the composite feature object
