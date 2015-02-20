@@ -6,6 +6,8 @@
 
 #include "ConstructionPlugin_Plane.h"
 
+#include <Config_PropManager.h>
+
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_ResultConstruction.h>
@@ -73,6 +75,8 @@ void ConstructionPlugin_Plane::execute()
 
 void ConstructionPlugin_Plane::customisePresentation(AISObjectPtr thePrs)
 {
-  thePrs->setColor(50, 255, 50);
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "construction_plane_color",
+                                                    CONSTRUCTION_PLANE_COLOR);
+  thePrs->setColor(aRGB[0], aRGB[1], aRGB[2]);
   thePrs->setTransparensy(0.6);
 }

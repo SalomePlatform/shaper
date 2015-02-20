@@ -21,6 +21,8 @@ const std::string POINT_ATTR_FIRST = "firstPoint";
 /// attribute name for second point
 const std::string POINT_ATTR_SECOND = "secondPoint";
 
+#define CONSTRUCTION_AXIS_COLOR "#000000"
+
 /**\class ConstructionPlugin_Axis
  * \ingroup Plugins
  * \brief Feature for creation of the new axis in PartSet.

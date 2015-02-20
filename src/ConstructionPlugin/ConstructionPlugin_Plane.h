@@ -24,6 +24,9 @@ const std::string DISTANCE_ATTR = "distance";
  * \ingroup Plugins
  * \brief Feature for creation of the new planar surface in PartSet.
  */
+#define CONSTRUCTION_PLANE_COLOR "#32FF32"
+
+
 class ConstructionPlugin_Plane : public ModelAPI_Feature, public GeomAPI_ICustomPrs
 {
  public:

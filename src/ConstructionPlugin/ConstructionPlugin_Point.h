@@ -9,6 +9,8 @@
 
 #include "ConstructionPlugin.h"
 #include <ModelAPI_Feature.h>
+#include <GeomAPI_ICustomPrs.h>
+
 
 /// Point kind
 const std::string CONSTRUCTION_POINT_KIND("Point");
@@ -20,11 +22,13 @@ const std::string POINT_ATTR_Y = "y";
 /// attribute name for Z coordinate
 const std::string POINT_ATTR_Z = "z";
 
+#define CONSTRUCTION_POINT_COLOR "#ffff00"
+
 /**\class ConstructionPlugin_Point
  * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.
  */
-class ConstructionPlugin_Point : public ModelAPI_Feature
+class ConstructionPlugin_Point : public ModelAPI_Feature, public GeomAPI_ICustomPrs
 {
  public:
   /// Returns the kind of a feature
@@ -45,6 +49,10 @@ class ConstructionPlugin_Point : public ModelAPI_Feature
 
   /// Use plugin manager for features creation
   ConstructionPlugin_Point();
+
+  /// Modifies the given presentation in the custom way.
+  virtual void customisePresentation(AISObjectPtr thePrs);
+
 };
 
 #endif
