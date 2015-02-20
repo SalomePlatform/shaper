@@ -21,12 +21,14 @@ SET(PROJECT_SOURCES
 SET(PROJECT_LIBRARIES
     ${SLVS_LIBRARIES}
     ${CAS_SHAPE}
+    Config
     Events
     ModelAPI
     GeomAPI
 )
 
 INCLUDE_DIRECTORIES(
+    ${PROJECT_SOURCE_DIR}/src/Config
     ${PROJECT_SOURCE_DIR}/src/SketchPlugin
     ${PROJECT_SOURCE_DIR}/src/ModelAPI
     ${PROJECT_SOURCE_DIR}/src/GeomAPI

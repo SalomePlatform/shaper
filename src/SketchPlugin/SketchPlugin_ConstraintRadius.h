@@ -11,8 +11,6 @@
 #include <SketchPlugin_Sketch.h>
 #include "SketchPlugin_ConstraintBase.h"
 
-#define RADIUS_COLOR "#ff00ff"
-
 /** \class SketchPlugin_ConstraintRadius
  *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint which defines 

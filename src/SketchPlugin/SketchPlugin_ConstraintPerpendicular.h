@@ -11,8 +11,6 @@
 #include <SketchPlugin_Sketch.h>
 #include "SketchPlugin_ConstraintBase.h"
 
-#define PERPENDICULAR_COLOR "#ffff00"
-
 /** \class SketchPlugin_ConstraintPerpendicular
  *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint for perpendicularity of two lines

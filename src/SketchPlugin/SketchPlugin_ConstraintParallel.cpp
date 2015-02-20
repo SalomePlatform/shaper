@@ -5,6 +5,7 @@
 // Author:  Artem ZHIDKOV
 
 #include "SketchPlugin_ConstraintParallel.h"
+#include "SketchPlugin_ConstraintPerpendicular.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
@@ -86,8 +87,8 @@ AISObjectPtr SketchPlugin_ConstraintParallel::getAISObject(AISObjectPtr thePrevi
   anAIS->createParallel(aLine1, aLine2, aFlyoutPnt, aPlane);
 
   // Set color from preferences
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "parallel_color",
-                                                    PARALLEL_COLOR);
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_parallel_color",
+                                                    SKETCH_CONSTRAINT_COLOR);
   anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }

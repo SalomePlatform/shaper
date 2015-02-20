@@ -21,13 +21,12 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
   ModelAPI_Session::get()->registerPlugin(this);
 
   // register construction properties
-  Config_PropManager::registerProp("Visualization", "construction_plane_color", "Construction plane color",
-                                   Config_Prop::Color, CONSTRUCTION_PLANE_COLOR);
-
   Config_PropManager::registerProp("Visualization", "construction_point_color", "Construction point color",
                                    Config_Prop::Color, CONSTRUCTION_POINT_COLOR);
   Config_PropManager::registerProp("Visualization", "construction_axis_color", "Construction axis color",
                                    Config_Prop::Color, CONSTRUCTION_AXIS_COLOR);
+  Config_PropManager::registerProp("Visualization", "construction_plane_color", "Construction plane color",
+                                   Config_Prop::Color, CONSTRUCTION_PLANE_COLOR);
 }
 
 FeaturePtr ConstructionPlugin_Plugin::createFeature(string theFeatureID)

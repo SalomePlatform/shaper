@@ -173,7 +173,8 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
   anAIS->createRadius(aCircle, aFlyoutPnt, aRadius);
 
   // Set color from preferences
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "radius_color", RADIUS_COLOR);
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_dimension_color",
+                                                    SKETCH_DIMENSION_COLOR);
   anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }

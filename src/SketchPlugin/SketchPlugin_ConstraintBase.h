@@ -30,6 +30,9 @@
  *    Also the list of possible attributes is provided to simplify assignment.
  */
 
+#define SKETCH_CONSTRAINT_COLOR "#ffff00"
+#define SKETCH_DIMENSION_COLOR "#ff00ff"
+
 /** \class SketchPlugin_ConstraintBase
  *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint between other features.

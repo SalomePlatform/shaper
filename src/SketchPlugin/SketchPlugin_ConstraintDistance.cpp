@@ -169,8 +169,8 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
   anAIS->createDistance(aPoint1, aPoint2, aFlyoutPnt, aPlane, aValue);
 
   // Set color from preferences
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "distance_color",
-                                                    DISTANCE_COLOR);
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_dimension_color",
+                                                    SKETCH_DIMENSION_COLOR);
   anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }

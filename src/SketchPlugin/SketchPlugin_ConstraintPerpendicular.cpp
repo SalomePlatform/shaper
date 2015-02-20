@@ -5,6 +5,7 @@
 // Author:  Artem ZHIDKOV
 
 #include "SketchPlugin_ConstraintPerpendicular.h"
+#include "SketchPlugin_ConstraintParallel.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
@@ -78,8 +79,8 @@ AISObjectPtr SketchPlugin_ConstraintPerpendicular::getAISObject(AISObjectPtr the
   anAIS->createPerpendicular(aLine1, aLine2, aPlane);
 
   // Set color from preferences
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "perpendicular_color",
-                                                    PERPENDICULAR_COLOR);
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_parallel_color",
+                                                    SKETCH_CONSTRAINT_COLOR);
   anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;
 }

@@ -14,8 +14,6 @@
 
 class GeomDataAPI_Point2D;
 
-#define LENGTH_COLOR "#ff00ff"
-
 /** \class SketchPlugin_ConstraintLength
  *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint which defines a length of a line segment
