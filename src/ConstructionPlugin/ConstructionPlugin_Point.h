@@ -10,16 +10,6 @@
 #include "ConstructionPlugin.h"
 #include <ModelAPI_Feature.h>
 
-/// Point kind
-const std::string CONSTRUCTION_POINT_KIND("Point");
-
-/// attribute name for X coordinate
-const std::string POINT_ATTR_X = "x";
-/// attribute name for Y coordinate
-const std::string POINT_ATTR_Y = "y";
-/// attribute name for Z coordinate
-const std::string POINT_ATTR_Z = "z";
-
 /**\class ConstructionPlugin_Point
  * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.
@@ -28,10 +18,31 @@ class ConstructionPlugin_Point : public ModelAPI_Feature
 {
  public:
   /// Returns the kind of a feature
-  CONSTRUCTIONPLUGIN_EXPORT virtual const std::string& getKind()
+  CONSTRUCTIONPLUGIN_EXPORT virtual const std::string& getKind();
+
+  inline static const std::string& ID()
   {
-    static std::string MY_KIND = CONSTRUCTION_POINT_KIND;
-    return MY_KIND;
+    static const std::string CONSTRUCTION_POINT_KIND("Point");
+    return CONSTRUCTION_POINT_KIND;
+  }
+
+  /// attribute name for X coordinate
+  inline static const std::string& X()
+  {
+    static const std::string POINT_ATTR_X("x");
+    return POINT_ATTR_X;
+  }
+  /// attribute name for Y coordinate
+  inline static const std::string& Y()
+  {
+    static const std::string POINT_ATTR_Y("y");
+    return POINT_ATTR_Y;
+  }
+  /// attribute name for Z coordinate
+  inline static const std::string& Z()
+  {
+    static const std::string POINT_ATTR_Z("z");
+    return POINT_ATTR_Z;
   }
 
   /// Creates a new part document if needed

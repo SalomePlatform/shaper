@@ -11,6 +11,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Feature.h>
 #include <Events_MessageGroup.h>
+#include <Events_Loop.h>
 
 #include <memory>
 #include <string>
@@ -137,6 +138,28 @@ public:
   std::shared_ptr<ModelAPI_Feature> myCurrentFeature;
   /// For response
   std::map<std::string, bool> myFeatureState;
+};
+
+/// Message that document (Part, PartSet) was created
+class MODELAPI_EXPORT ModelAPI_DocumentCreatedMessage : public Events_Message
+{
+  DocumentPtr myDocument;
+
+ public:
+  /// Creates an empty message
+  ModelAPI_DocumentCreatedMessage(const Events_ID theID, const void* theSender = 0);
+  /// The virtual destructor
+  virtual ~ModelAPI_DocumentCreatedMessage();
+
+  static Events_ID eventId()
+  {
+    static const char * MY_DOCUMENT_CREATED_EVENT_ID("DocumentCreated");
+    return Events_Loop::eventByName(MY_DOCUMENT_CREATED_EVENT_ID);
+  }
+
+
+  DocumentPtr document() const;
+  void setDocument(DocumentPtr theDocument);
 };
 
 #endif

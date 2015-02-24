@@ -21,13 +21,13 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
 
 FeaturePtr ConstructionPlugin_Plugin::createFeature(string theFeatureID)
 {
-  if (theFeatureID == CONSTRUCTION_POINT_KIND) {
+  if (theFeatureID == ConstructionPlugin_Point::ID()) {
     return FeaturePtr(new ConstructionPlugin_Point);
   }
-  else if (theFeatureID == CONSTRUCTION_AXIS_KIND) {
+  else if (theFeatureID == ConstructionPlugin_Axis::ID()) {
     return FeaturePtr(new ConstructionPlugin_Axis);
   }
-  else if (theFeatureID == CONSTRUCTION_PLANE_KIND) {
+  else if (theFeatureID == ConstructionPlugin_Plane::ID()) {
     return FeaturePtr(new ConstructionPlugin_Plane);
   }
   // feature of such kind is not found

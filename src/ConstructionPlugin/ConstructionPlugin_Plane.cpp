@@ -22,14 +22,14 @@ ConstructionPlugin_Plane::ConstructionPlugin_Plane()
 
 void ConstructionPlugin_Plane::initAttributes()
 {
-  data()->addAttribute(FACE_ATTR,  ModelAPI_AttributeSelection::type());
-  data()->addAttribute(DISTANCE_ATTR, ModelAPI_AttributeDouble::type());
+  data()->addAttribute(ConstructionPlugin_Plane::FACE(),  ModelAPI_AttributeSelection::type());
+  data()->addAttribute(ConstructionPlugin_Plane::DISTANCE(), ModelAPI_AttributeDouble::type());
 }
 
 void ConstructionPlugin_Plane::execute()
 {
-  AttributeSelectionPtr aFaceAttr = data()->selection(FACE_ATTR);
-  AttributeDoublePtr aDistAttr = data()->real(DISTANCE_ATTR);
+  AttributeSelectionPtr aFaceAttr = data()->selection(ConstructionPlugin_Plane::FACE());
+  AttributeDoublePtr aDistAttr = data()->real(ConstructionPlugin_Plane::DISTANCE());
   if ((aFaceAttr.get() != NULL) && (aDistAttr.get() != NULL) && 
     aFaceAttr->isInitialized() && aDistAttr->isInitialized()) {
 

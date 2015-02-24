@@ -15,29 +15,29 @@
 
 using namespace std;
 
-static const double MINIMAL_LENGTH = 1.e-5;
-
 ConstructionPlugin_Axis::ConstructionPlugin_Axis()
 {
 }
 
 void ConstructionPlugin_Axis::initAttributes()
 {
-  data()->addAttribute(POINT_ATTR_FIRST,  ModelAPI_AttributeSelection::type());
-  data()->addAttribute(POINT_ATTR_SECOND, ModelAPI_AttributeSelection::type());
+  data()->addAttribute(ConstructionPlugin_Axis::POINT_FIRST(),
+                       ModelAPI_AttributeSelection::type());
+  data()->addAttribute(ConstructionPlugin_Axis::POINT_SECOND(),
+                       ModelAPI_AttributeSelection::type());
 }
 
 void ConstructionPlugin_Axis::execute()
 {
-  AttributeSelectionPtr aRef1 = data()->selection(POINT_ATTR_FIRST);
-  AttributeSelectionPtr aRef2 = data()->selection(POINT_ATTR_SECOND);
+  AttributeSelectionPtr aRef1 = data()->selection(ConstructionPlugin_Axis::POINT_FIRST());
+  AttributeSelectionPtr aRef2 = data()->selection(ConstructionPlugin_Axis::POINT_SECOND());
   if ((aRef1.get() != NULL) && (aRef2.get() != NULL)) {
     GeomShapePtr aShape1 = aRef1->value();
     GeomShapePtr aShape2 = aRef2->value();
     if (aShape1->isVertex() && aShape2->isVertex() && (!aShape1->isEqual(aShape2))) {
       std::shared_ptr<GeomAPI_Pnt> aStart = GeomAlgoAPI_PointBuilder::point(aShape1);
       std::shared_ptr<GeomAPI_Pnt> anEnd = GeomAlgoAPI_PointBuilder::point(aShape2);
-      if (aStart->distance(anEnd) > MINIMAL_LENGTH) {
+      if (aStart->distance(anEnd) > ConstructionPlugin_Axis::MINIMAL_LENGTH()) {
         std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
 
         ResultConstructionPtr aConstr = document()->createConstruction(data());

@@ -19,18 +19,25 @@ ConstructionPlugin_Point::ConstructionPlugin_Point()
 {
 }
 
+const std::string& ConstructionPlugin_Point::getKind()
+{
+  static std::string MY_KIND = ConstructionPlugin_Point::ID();
+  return MY_KIND;
+}
+
 void ConstructionPlugin_Point::initAttributes()
 {
-  data()->addAttribute(POINT_ATTR_X, ModelAPI_AttributeDouble::type());
-  data()->addAttribute(POINT_ATTR_Y, ModelAPI_AttributeDouble::type());
-  data()->addAttribute(POINT_ATTR_Z, ModelAPI_AttributeDouble::type());
+  data()->addAttribute(ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble::type());
+  data()->addAttribute(ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble::type());
+  data()->addAttribute(ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble::type());
 }
 
 void ConstructionPlugin_Point::execute()
 {
   std::shared_ptr<GeomAPI_Pnt> aPnt(
-      new GeomAPI_Pnt(data()->real(POINT_ATTR_X)->value(), data()->real(POINT_ATTR_Y)->value(),
-                      data()->real(POINT_ATTR_Z)->value()));
+      new GeomAPI_Pnt(data()->real(ConstructionPlugin_Point::X())->value(),
+                      data()->real(ConstructionPlugin_Point::Y())->value(),
+                      data()->real(ConstructionPlugin_Point::Z())->value()));
 
   std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(data());
   aConstr->setShape(GeomAlgoAPI_PointBuilder::point(aPnt));
