@@ -283,6 +283,18 @@ bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
 //  if (!acceptObjectShape(aObject))
 //      return false;
 
+  // Check whether the value is valid for the viewer selection filters
+  Handle(SelectMgr_EntityOwner) anOwner = theValue.owner();
+  if (!anOwner.IsNull()) {
+    SelectMgr_ListOfFilter aFilters;
+    selectionFilters(aFilters);
+    SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
+    for (; aIt.More(); aIt.Next()) {
+      const Handle(SelectMgr_Filter)& aFilter = aIt.Value();
+      if (!aFilter->IsOk(anOwner))
+        return false;
+    }
+  }
   if (isValid(aObject, aShape)) {
     setObject(aObject, aShape);
     return true;
@@ -404,36 +416,29 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
       aList.append(shapeType(aType));
     }
     myWorkshop->activateSubShapesSelection(aList);
-    if (!myObjectTypes.isEmpty()) {
-      myObjTypeFilter = new ModuleBase_ObjectTypesFilter(myWorkshop, myObjectTypes);
-      aViewer->clearSelectionFilters();
-      aViewer->addSelectionFilter(myObjTypeFilter);
-    }
   } else {
     disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-    if (!myObjTypeFilter.IsNull()) {
-      aViewer->removeSelectionFilter(myObjTypeFilter);
-      myObjTypeFilter.Nullify();
-    }
     myWorkshop->deactivateSubShapesSelection();
   }
-  // apply filters loaded from the XML definition of the widget
-  ModuleBase_FilterFactory* aFactory = myWorkshop->selectionFilters();
+
+  // the initial code is moved here in order to clear filters, it is possible, that it is excessive and 
+  // is performed outside
+  if (myIsActive && !myObjectTypes.isEmpty()) {
+    aViewer->clearSelectionFilters();
+  }
   SelectMgr_ListOfFilter aFilters;
-  aFactory->filters(parentID(), attributeID(), aFilters);
+  selectionFilters(aFilters);
   SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
   for (; aIt.More(); aIt.Next()) {
-    Handle(SelectMgr_Filter) aSelFilter = aIt.Value();
-    if (aSelFilter.IsNull())
-      continue;
-
-    //Handle(ModuleBase_Filter) aFilter = Handle(ModuleBase_Filter)::DownCast(aIt.Value());
-    //if (aFilter.IsNull())
-    //  continue;
+    const Handle(SelectMgr_Filter)& aSelFilter = aIt.Value();
     if (myIsActive)
       aViewer->addSelectionFilter(aSelFilter);
     else
       aViewer->removeSelectionFilter(aSelFilter);
+  }
+  // the internal filter should be removed by the widget deactivation, it is done historically
+  if (!myIsActive && !myObjTypeFilter.IsNull()) {
+    myObjTypeFilter.Nullify();
   }
 }
 

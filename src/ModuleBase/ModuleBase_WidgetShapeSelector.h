@@ -15,6 +15,7 @@
 #include <GeomAPI_Shape.h>
 
 #include <TopAbs_ShapeEnum.hxx>
+#include <SelectMgr_ListOfFilter.hxx>
 
 #include <QStringList>
 
@@ -148,6 +149,12 @@ Q_OBJECT
 
   /// Clear attribute
   void clearAttribute();
+
+  /// Fills the given list with all widget filters. It can be used by activation widget for the viewer
+  /// or by checking the selection parameter in addition to check validity of the selection argument
+  /// It creates an object type filter if it has not been created yet and save it in the class field
+  /// \param theFilters a list of filter
+  void selectionFilters(SelectMgr_ListOfFilter& theFilters);
 
   //----------- Class members -------------
  protected:
