@@ -191,9 +191,16 @@ void PartSet_WidgetSketchLabel::showPreviewPlanes()
     std::shared_ptr<GeomAPI_Dir> aXZDir(new GeomAPI_Dir(0, 1, 0));
     std::shared_ptr<GeomAPI_Dir> aXYDir(new GeomAPI_Dir(0, 0, 1));
 
-    int aR[] = {255, 0, 0};
-    int aG[] = {0, 255, 0};
-    int aB[] = {0, 0, 255};
+    std::vector<int> aYZRGB, aXZRGB, aXYRGB;
+    aYZRGB = Config_PropManager::color("Visualization", "yz_plane_color",
+                                                        YZ_PLANE_COLOR);
+    aXZRGB = Config_PropManager::color("Visualization", "xz_plane_color",
+                                                        XZ_PLANE_COLOR);
+    aXYRGB = Config_PropManager::color("Visualization", "xy_plane_color",
+                                                        XY_PLANE_COLOR);
+    int aR[] = {aYZRGB[0], aYZRGB[1], aYZRGB[2]};
+    int aG[] = {aXZRGB[0], aXZRGB[1], aXZRGB[2]};
+    int aB[] = {aXYRGB[0], aXYRGB[1], aXYRGB[2]};
 
     myYZPlane = createPreviewPlane(anOrigin, aYZDir, aR);
     myXZPlane = createPreviewPlane(anOrigin, aXZDir, aG);

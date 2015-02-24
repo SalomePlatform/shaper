@@ -27,6 +27,13 @@ class ConstructionPlugin_Plane : public ModelAPI_Feature, public GeomAPI_ICustom
     return MY_KIND;
   }
 
+  /// default color for a plane
+  inline static const std::string& DEFAULT_COLOR()
+  {
+    static const std::string CONSTRUCTION_PLANE_COLOR("#32FF32");
+    return CONSTRUCTION_PLANE_COLOR;
+  }
+
   /// Plane kind
   inline static const std::string& ID()
   {

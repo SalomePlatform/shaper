@@ -14,6 +14,10 @@
 #include <GeomAPI_IPresentable.h>
 #include <list>
 
+#define YZ_PLANE_COLOR "#ff0000"
+#define XZ_PLANE_COLOR "#00ff00"
+#define XY_PLANE_COLOR "#0000ff"
+
 /**\class SketchPlugin_Sketch
  * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.

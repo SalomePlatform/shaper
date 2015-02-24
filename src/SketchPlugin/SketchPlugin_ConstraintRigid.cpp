@@ -5,6 +5,7 @@
 // Author:  Artem ZHIDKOV
 
 #include "SketchPlugin_ConstraintRigid.h"
+#include "SketchPlugin_ConstraintParallel.h"
 
 #include <ModelAPI_ResultConstruction.h>
 #include <Config_PropManager.h>
@@ -70,8 +71,9 @@ AISObjectPtr SketchPlugin_ConstraintRigid::getAISObject(AISObjectPtr thePrevious
   anAIS->createFixed(aShape, aPlane);
 
   // Set color from preferences
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "fixing_color",
-                                                    FIXING_COLOR);
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_parallel_color",
+                                                    SKETCH_CONSTRAINT_COLOR);
+
   anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
 
   return anAIS;

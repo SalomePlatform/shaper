@@ -15,6 +15,12 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <GeomAPI_ICustomPrs.h>
 
+#include <Config_PropManager.h>
+
+#define SKETCH_EDGE_COLOR "#ff0000"
+#define SKETCH_POINT_COLOR "#ff0000"
+#define SKETCH_EXTERNAL_EDGE_COLOR "#00ff00"
+
 class SketchPlugin_Sketch;
 class GeomAPI_Pnt2d;
 class Handle_AIS_InteractiveObject;
@@ -67,15 +73,31 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
   /// Customize presentation of the feature
   virtual void customisePresentation(AISObjectPtr thePrs)
   {
+    std::vector<int> aRGB;
     // if this is an edge
     if (thePrs->getShapeType() == 6) {
       thePrs->setWidth(3);
-      if (isExternal())
-        thePrs->setColor(0,255,0);
+      if (isExternal()) {
+        // Set color from preferences
+        aRGB = Config_PropManager::color("Visualization", "sketch_external_color",
+                                         SKETCH_EXTERNAL_EDGE_COLOR);
+      }
+      else {
+        // Set color from preferences
+        aRGB = Config_PropManager::color("Visualization", "sketch_edge_color",
+                                         SKETCH_EDGE_COLOR);
+      }
+    }
+    else if (thePrs->getShapeType() == 7) { // otherwise this is a vertex
+      // Set color from preferences
+      aRGB = Config_PropManager::color("Visualization", "sketch_point_color",
+                                       SKETCH_POINT_COLOR);
     }
     // if this is a vertex
     //else if (thePrs->getShapeType() == 7)
     //  thePrs->setPointMarker(6, 2.);
+    if (!aRGB.empty())
+      thePrs->setColor(aRGB[0], aRGB[1], aRGB[2]);
   }
 
   /// Returns the sketch of this feature

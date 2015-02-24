@@ -32,6 +32,8 @@
 #include <iostream>
 #endif
 
+//#define SET_PLANES_COLOR_IN_PREFERENCES
+
 using namespace std;
 
 // the only created instance of this plugin
@@ -52,21 +54,29 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
 
-  // register sketcher properties
+  Config_PropManager::registerProp("Visualization", "sketch_edge_color", "Sketch edge color",
+                                   Config_Prop::Color, SKETCH_EDGE_COLOR);
 
-  Config_PropManager::registerProp("Visualization", "parallel_color", "Parallel constraint color",
-                                   Config_Prop::Color, PARALLEL_COLOR);
-  Config_PropManager::registerProp("Visualization", "perpendicular_color",
-                                   "Perpendicular constraint color", Config_Prop::Color,
-                                   PERPENDICULAR_COLOR);
-  Config_PropManager::registerProp("Visualization", "distance_color", "Distance color",
-                                   Config_Prop::Color, DISTANCE_COLOR);
-  Config_PropManager::registerProp("Visualization", "length_color", "Length color",
-                                   Config_Prop::Color, LENGTH_COLOR);
-  Config_PropManager::registerProp("Visualization", "radius_color", "Radius color",
-                                   Config_Prop::Color, RADIUS_COLOR);
-  Config_PropManager::registerProp("Visualization", "fixing_color", "Fixing color",
-                                   Config_Prop::Color, FIXING_COLOR);
+  Config_PropManager::registerProp("Visualization", "sketch_point_color", "Sketch point color",
+                                   Config_Prop::Color, SKETCH_POINT_COLOR);
+
+  Config_PropManager::registerProp("Visualization", "sketch_external_color", "Sketch external edge color",
+                                   Config_Prop::Color, SKETCH_EXTERNAL_EDGE_COLOR);
+
+  Config_PropManager::registerProp("Visualization", "sketch_parallel_color", "Sketch constraint color",
+                                   Config_Prop::Color, SKETCH_CONSTRAINT_COLOR);
+  Config_PropManager::registerProp("Visualization", "sketch_dimension_color", "Sketch dimension color",
+                                   Config_Prop::Color, SKETCH_DIMENSION_COLOR);
+
+  // register sketcher properties
+#ifdef SET_PLANES_COLOR_IN_PREFERENCES
+  Config_PropManager::registerProp("Visualization", "yz_plane_color", "YZ plane color",
+                                   Config_Prop::Color, YZ_PLANE_COLOR);
+  Config_PropManager::registerProp("Visualization", "xz_plane_color", "XZ plane color",
+                                   Config_Prop::Color, XZ_PLANE_COLOR);
+  Config_PropManager::registerProp("Visualization", "xy_plane_color", "XY plane color",
+                                   Config_Prop::Color, XY_PLANE_COLOR);
+#endif
 }
 
 FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)

@@ -6,6 +6,8 @@
 
 #include "ConstructionPlugin_Axis.h"
 
+#include <Config_PropManager.h>
+
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_ResultConstruction.h>
 
@@ -50,7 +52,9 @@ void ConstructionPlugin_Axis::execute()
 
 void ConstructionPlugin_Axis::customisePresentation(AISObjectPtr thePrs)
 {
-  thePrs->setColor(0, 0, 0);
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "construction_axis_color",
+                                                    ConstructionPlugin_Axis::DEFAULT_COLOR());
+  thePrs->setColor(aRGB[0], aRGB[1], aRGB[2]);
   thePrs->setLineStyle(3);
   thePrs->redisplay();
 }

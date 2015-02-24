@@ -11,7 +11,6 @@
 #include <ModelAPI_Feature.h>
 #include <GeomAPI_ICustomPrs.h>
 
-
 /**\class ConstructionPlugin_Axis
  * \ingroup Plugins
  * \brief Feature for creation of the new axis in PartSet.
@@ -43,6 +42,12 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
   {
     static const std::string POINT_ATTR_SECOND("secondPoint");
     return POINT_ATTR_SECOND;
+  }
+  /// default color for an axis
+  inline static const std::string& DEFAULT_COLOR()
+  {
+    static const std::string CONSTRUCTION_AXIS_COLOR("#000000");
+    return CONSTRUCTION_AXIS_COLOR;
   }
 
   inline static const double MINIMAL_LENGTH() { return 1.e-5; }

@@ -26,6 +26,7 @@ SET(XML_RESOURCES
 )
 
 SET(PROJECT_LIBRARIES
+    Config
     ModelAPI 
     GeomAPI 
     GeomAlgoAPI
@@ -41,6 +42,7 @@ INSTALL(TARGETS ConstructionPlugin DESTINATION plugins)
 INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
 
 INCLUDE_DIRECTORIES(
+  ../Config
   ../ModelAPI
   ../GeomAPI
   ../GeomAlgoAPI
