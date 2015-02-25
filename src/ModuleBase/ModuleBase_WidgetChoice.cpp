@@ -46,7 +46,7 @@ ModuleBase_WidgetChoice::~ModuleBase_WidgetChoice()
 {
 }
   
-bool ModuleBase_WidgetChoice::storeValue() const
+bool ModuleBase_WidgetChoice::storeValueCustom() const
 {
   DataPtr aData = myFeature->data();
   std::shared_ptr<ModelAPI_AttributeInteger> aIntAttr = aData->integer(attributeID());

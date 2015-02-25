@@ -114,7 +114,7 @@ void fillFeature2Attribute(const QList<ModuleBase_ViewerPrs>& theList,
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
     myIsPropertyPanelValueChanged(false), myIsMouseOverWindow(false),
-    myIsMouseOverViewProcessed(true)
+    myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -184,6 +184,20 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   // the feature is to be erased here, but it is correct to call canDisplayObject because
   // there can be additional check (e.g. editor widget in distance constraint)
   visualizeFeature(aOperation, canDisplayObject());
+}
+
+void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
+{
+  if (isNestedCreateOperation(getCurrentOperation()))
+    return;
+  storeSelection();
+}
+
+void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
+{
+  if (isNestedCreateOperation(getCurrentOperation()))
+    return;
+  restoreSelection();
 }
 
 void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
@@ -842,10 +856,20 @@ void PartSet_SketcherMgr::connectToPropertyPanel(const bool isToConnect)
   if (aPropertyPanel) {
     const QList<ModuleBase_ModelWidget*>& aWidgets = aPropertyPanel->modelWidgets();
     foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
-      if (isToConnect)
+      if (isToConnect) {
+        connect(aWidget, SIGNAL(beforeValuesChanged()),
+                this, SLOT(onBeforeValuesChangedInPropertyPanel()));
         connect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
-      else
+        connect(aWidget, SIGNAL(afterValuesChanged()),
+                this, SLOT(onAfterValuesChangedInPropertyPanel()));
+      }
+      else {
+        disconnect(aWidget, SIGNAL(beforeValuesChanged()),
+                   this, SLOT(onBeforeValuesChangedInPropertyPanel()));
         disconnect(aWidget, SIGNAL(valuesChanged()), this, SLOT(onValuesChangedInPropertyPanel()));
+        disconnect(aWidget, SIGNAL(afterValuesChanged()),
+                   this, SLOT(onAfterValuesChangedInPropertyPanel()));
+      }
     }
   }
 }
@@ -890,4 +914,45 @@ void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
     }
   }
   aDisplayer->updateViewer();
+}
+
+void PartSet_SketcherMgr::storeSelection()
+{
+  //qDebug("  storeSelection");
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  // 1. it is necessary to save current selection in order to restore it after the features moving
+  //FeatureToSelectionMap aCurrentSelection;
+  myCurrentSelection.clear();
+  getCurrentSelection(myFeature2AttributeMap, myCurrentSketch, aWorkshop, myCurrentSelection);
+
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+  // 3. the flag to disable the update viewer should be set in order to avoid blinking in the 
+  // viewer happens by deselect/select the modified objects. The flag should be restored after
+  // the selection processing. The update viewer should be also called.
+  myPreviousUpdateViewerEnabled = aDisplayer->enableUpdateViewer(false);
+}
+
+void PartSet_SketcherMgr::restoreSelection()
+{
+  //qDebug("restoreSelection");
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  // 5. it is necessary to save current selection in order to restore it after the features moving
+  FeatureToSelectionMap::const_iterator aSIt = myCurrentSelection.begin(),
+                                        aSLast = myCurrentSelection.end();
+  SelectMgr_IndexedMapOfOwner anOwnersToSelect;
+  for (; aSIt != aSLast; aSIt++) {
+    anOwnersToSelect.Clear();
+    getSelectionOwners(aSIt->first, myCurrentSketch, aWorkshop, myCurrentSelection,
+                        anOwnersToSelect);
+    aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
+  }
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+  // 3. the flag to disable the update viewer should be set in order to avoid blinking in the 
+  // viewer happens by deselect/select the modified objects. The flag should be restored after
+  // the selection processing. The update viewer should be also called.
+  aDisplayer->enableUpdateViewer(myPreviousUpdateViewerEnabled);
+  //if (myPreviousUpdateViewerEnabled)
+    aDisplayer->updateViewer();
 }

@@ -141,8 +141,12 @@ private slots:
   /// Process the leave mouse of the view port. If the current operation is a create of
   /// a nested sketch feature, it hides the feature in the viewer
   void onLeaveViewPort();
-  /// Listens the value changed signal and display the current operation feature
+  /// Listens to the value changed signal and display the current operation feature
+  void onBeforeValuesChangedInPropertyPanel();
+  /// Listens to the signal about values are to be changed in the property panel
   void onValuesChangedInPropertyPanel();
+  /// Listens to the signal about the modification of the values have been done in the property panel
+  void onAfterValuesChangedInPropertyPanel();
 
   void onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseReleased(ModuleBase_IViewWindow*, QMouseEvent*);
@@ -230,6 +234,9 @@ private:
   /// \param isToDisplay a flag about the display or erase the feature
   void visualizeFeature(ModuleBase_Operation* theOperation, const bool isToDisplay);
 
+  void storeSelection();
+  void restoreSelection();
+
 private:
   PartSet_Module* myModule;
 
@@ -247,6 +254,8 @@ private:
   FeatureToAttributesMap myFeature2AttributeMap; /// a map of a feature to attributes
 
   Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;
+  FeatureToSelectionMap myCurrentSelection;
+  bool myPreviousUpdateViewerEnabled;
 };
 
 

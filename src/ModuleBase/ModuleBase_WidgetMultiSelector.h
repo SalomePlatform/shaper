@@ -94,7 +94,7 @@ protected slots:
  protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
-  virtual bool storeValue() const;
+  virtual bool storeValueCustom() const;
 
   /// Provide filtering of selected shapes
    /// \param theShapesToFilter source list of shapes

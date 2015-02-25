@@ -44,7 +44,7 @@ QWidget* ModuleBase_WidgetBoolValue::getControl() const
   return myCheckBox;
 }
 
-bool ModuleBase_WidgetBoolValue::storeValue() const
+bool ModuleBase_WidgetBoolValue::storeValueCustom() const
 {
   DataPtr aData = myFeature->data();
   std::shared_ptr<ModelAPI_AttributeBoolean> aBool = aData->boolean(attributeID());

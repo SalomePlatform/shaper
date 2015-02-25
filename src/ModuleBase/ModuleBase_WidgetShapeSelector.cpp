@@ -129,7 +129,7 @@ ModuleBase_WidgetShapeSelector::~ModuleBase_WidgetShapeSelector()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::storeValue() const
+bool ModuleBase_WidgetShapeSelector::storeValueCustom() const
 {
   FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(mySelectedObject);
   if (aSelectedFeature == myFeature)  // In order to avoid selection of the same object
@@ -439,6 +439,27 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
   // the internal filter should be removed by the widget deactivation, it is done historically
   if (!myIsActive && !myObjTypeFilter.IsNull()) {
     myObjTypeFilter.Nullify();
+  }
+}
+
+//********************************************************************
+void ModuleBase_WidgetShapeSelector::selectionFilters(SelectMgr_ListOfFilter& theFilters)
+{
+  if (!myObjectTypes.isEmpty()) {
+    myObjTypeFilter = new ModuleBase_ObjectTypesFilter(myWorkshop, myObjectTypes);
+    theFilters.Append(myObjTypeFilter);
+  }
+  // apply filters loaded from the XML definition of the widget
+  ModuleBase_FilterFactory* aFactory = myWorkshop->selectionFilters();
+  SelectMgr_ListOfFilter aFilters;
+  aFactory->filters(parentID(), attributeID(), aFilters);
+  SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
+  for (; aIt.More(); aIt.Next()) {
+    Handle(SelectMgr_Filter) aSelFilter = aIt.Value();
+    if (aSelFilter.IsNull())
+      continue;
+
+    theFilters.Append(aSelFilter);
   }
 }
 

@@ -45,7 +45,7 @@ Q_OBJECT
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
-  virtual bool storeValue() const;
+  virtual bool storeValueCustom() const;
 
   /// Check the selected with validators if installed
   virtual bool isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape);
@@ -85,7 +85,7 @@ Q_OBJECT
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
-  virtual bool storeValue() const;
+  virtual bool storeValueCustom() const;
 
 private:
   /// Pointer to a sketch 

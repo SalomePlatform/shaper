@@ -83,7 +83,7 @@ ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetMultiSelector::storeValue() const
+bool ModuleBase_WidgetMultiSelector::storeValueCustom() const
 {
   // A rare case when plugin was not loaded. 
   if(!myFeature)

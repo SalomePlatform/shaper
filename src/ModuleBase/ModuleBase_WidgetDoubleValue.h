@@ -63,7 +63,7 @@ Q_OBJECT
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
-  virtual bool storeValue() const;
+  virtual bool storeValueCustom() const;
 
 protected:
    /// Container for thw widget controls

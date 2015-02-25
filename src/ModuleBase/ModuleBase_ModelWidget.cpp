@@ -115,6 +115,15 @@ void ModuleBase_ModelWidget::activate()
   activateCustom();
 }
 
+bool ModuleBase_ModelWidget::storeValue()
+{
+  emit beforeValuesChanged();
+  bool isDone = storeValueCustom();
+  emit afterValuesChanged();
+
+  return isDone;
+}
+
 void ModuleBase_ModelWidget::updateObject(ObjectPtr theObj) const
 {
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));

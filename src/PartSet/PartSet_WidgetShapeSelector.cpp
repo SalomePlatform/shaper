@@ -16,7 +16,7 @@
 #include <SketchPlugin_Feature.h>
 
 
-bool PartSet_WidgetShapeSelector::storeValue() const
+bool PartSet_WidgetShapeSelector::storeValueCustom() const
 {
   if (!mySelectedObject)
     return false;
@@ -59,7 +59,7 @@ bool PartSet_WidgetShapeSelector::storeValue() const
       }
     }
   }
-  return ModuleBase_WidgetShapeSelector::storeValue();
+  return ModuleBase_WidgetShapeSelector::storeValueCustom();
 }
 
 //********************************************************************
@@ -126,7 +126,7 @@ bool PartSet_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<Geom
 }
 
 //*********************************************
-bool PartSet_WidgetConstraintShapeSelector::storeValue() const
+bool PartSet_WidgetConstraintShapeSelector::storeValueCustom() const
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(mySelectedObject);
   if (aFeature) {
@@ -142,5 +142,5 @@ bool PartSet_WidgetConstraintShapeSelector::storeValue() const
         return false;
     }
   }
-  return ModuleBase_WidgetShapeSelector::storeValue();
+  return ModuleBase_WidgetShapeSelector::storeValueCustom();
 }
