@@ -11,30 +11,71 @@
 #include <ModelAPI_Feature.h>
 #include <GeomAPI_ICustomPrs.h>
 
-/// Point kind
-const std::string CONSTRUCTION_PLANE_KIND("Plane");
 
-/// attribute name for base face
-const std::string FACE_ATTR = "planeFace";
-
-/// attribute name for distance
-const std::string DISTANCE_ATTR = "distance";
 
 /**\class ConstructionPlugin_Plane
  * \ingroup Plugins
  * \brief Feature for creation of the new planar surface in PartSet.
  */
-#define CONSTRUCTION_PLANE_COLOR "#32FF32"
-
-
 class ConstructionPlugin_Plane : public ModelAPI_Feature, public GeomAPI_ICustomPrs
 {
  public:
   /// Returns the kind of a feature
   CONSTRUCTIONPLUGIN_EXPORT virtual const std::string& getKind()
   {
-    static std::string MY_KIND = CONSTRUCTION_PLANE_KIND;
+    static std::string MY_KIND = ConstructionPlugin_Plane::ID();
     return MY_KIND;
+  }
+
+  /// default color for a plane
+  inline static const std::string& DEFAULT_COLOR()
+  {
+    static const std::string CONSTRUCTION_PLANE_COLOR("#32FF32");
+    return CONSTRUCTION_PLANE_COLOR;
+  }
+
+  /// Plane kind
+  inline static const std::string& ID()
+  {
+    static const std::string CONSTRUCTION_PLANE_KIND("Plane");
+    return CONSTRUCTION_PLANE_KIND;
+  }
+  /// attribute name for base face
+  inline static const std::string& FACE()
+  {
+    static const std::string FACE_ATTR("planeFace");
+    return FACE_ATTR;
+  }
+  /// attribute name for distance
+  inline static const std::string& DISTANCE()
+  {
+    static const std::string DISTANCE_ATTR("distance");
+    return DISTANCE_ATTR;
+  }
+
+  /// the a parameter for the general equation of a plane (ax+by+cz+d=0)
+  inline static const std::string& A()
+  {
+    static const std::string PARAM_A_ATTR("A");
+    return PARAM_A_ATTR;
+  }
+  /// the b parameter for the general equation of a plane (ax+by+cz+d=0)
+  inline static const std::string& B()
+  {
+    static const std::string PARAM_B_ATTR("B");
+    return PARAM_B_ATTR;
+  }
+  /// the c parameter for the general equation of a plane (ax+by+cz+d=0)
+  inline static const std::string& C()
+  {
+    static const std::string PARAM_C_ATTR("C");
+    return PARAM_C_ATTR;
+  }
+  /// the d parameter for the general equation of a plane (ax+by+cz+d=0)
+  inline static const std::string& D()
+  {
+    static const std::string PARAM_D_ATTR("D");
+    return PARAM_D_ATTR;
   }
 
   /// Creates a new part document if needed
@@ -43,7 +84,7 @@ class ConstructionPlugin_Plane : public ModelAPI_Feature, public GeomAPI_ICustom
   /// Request for initialization of data model of the feature: adding all attributes
   CONSTRUCTIONPLUGIN_EXPORT virtual void initAttributes();
 
-  /// Construction result is allways recomuted on the fly
+  /// Construction result is always recomputed on the fly
   CONSTRUCTIONPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
 
   /// Use plugin manager for features creation

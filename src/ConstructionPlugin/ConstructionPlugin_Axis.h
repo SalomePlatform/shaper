@@ -11,18 +11,6 @@
 #include <ModelAPI_Feature.h>
 #include <GeomAPI_ICustomPrs.h>
 
-
-/// Point kind
-const std::string CONSTRUCTION_AXIS_KIND("Axis");
-
-/// attribute name for first point
-const std::string POINT_ATTR_FIRST = "firstPoint";
-
-/// attribute name for second point
-const std::string POINT_ATTR_SECOND = "secondPoint";
-
-#define CONSTRUCTION_AXIS_COLOR "#000000"
-
 /**\class ConstructionPlugin_Axis
  * \ingroup Plugins
  * \brief Feature for creation of the new axis in PartSet.
@@ -33,9 +21,36 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
   /// Returns the kind of a feature
   CONSTRUCTIONPLUGIN_EXPORT virtual const std::string& getKind()
   {
-    static std::string MY_KIND = CONSTRUCTION_AXIS_KIND;
+    static std::string MY_KIND = ConstructionPlugin_Axis::ID();
     return MY_KIND;
   }
+
+  /// Axis kind
+  inline static const std::string& ID()
+  {
+    static const std::string CONSTRUCTION_AXIS_KIND("Axis");
+    return CONSTRUCTION_AXIS_KIND;
+  }
+  /// attribute name for first point
+  inline static const std::string& POINT_FIRST()
+  {
+    static const std::string POINT_ATTR_FIRST("firstPoint");
+    return POINT_ATTR_FIRST;
+  }
+  /// attribute name for second point
+  inline static const std::string& POINT_SECOND()
+  {
+    static const std::string POINT_ATTR_SECOND("secondPoint");
+    return POINT_ATTR_SECOND;
+  }
+  /// default color for an axis
+  inline static const std::string& DEFAULT_COLOR()
+  {
+    static const std::string CONSTRUCTION_AXIS_COLOR("#000000");
+    return CONSTRUCTION_AXIS_COLOR;
+  }
+
+  inline static const double MINIMAL_LENGTH() { return 1.e-5; }
 
   /// Creates a new part document if needed
   CONSTRUCTIONPLUGIN_EXPORT virtual void execute();

@@ -22,22 +22,22 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
 
   // register construction properties
   Config_PropManager::registerProp("Visualization", "construction_point_color", "Construction point color",
-                                   Config_Prop::Color, CONSTRUCTION_POINT_COLOR);
+                                   Config_Prop::Color, ConstructionPlugin_Point::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "construction_axis_color", "Construction axis color",
-                                   Config_Prop::Color, CONSTRUCTION_AXIS_COLOR);
+                                   Config_Prop::Color, ConstructionPlugin_Axis::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "construction_plane_color", "Construction plane color",
-                                   Config_Prop::Color, CONSTRUCTION_PLANE_COLOR);
+                                   Config_Prop::Color, ConstructionPlugin_Plane::DEFAULT_COLOR());
 }
 
 FeaturePtr ConstructionPlugin_Plugin::createFeature(string theFeatureID)
 {
-  if (theFeatureID == CONSTRUCTION_POINT_KIND) {
+  if (theFeatureID == ConstructionPlugin_Point::ID()) {
     return FeaturePtr(new ConstructionPlugin_Point);
   }
-  else if (theFeatureID == CONSTRUCTION_AXIS_KIND) {
+  else if (theFeatureID == ConstructionPlugin_Axis::ID()) {
     return FeaturePtr(new ConstructionPlugin_Axis);
   }
-  else if (theFeatureID == CONSTRUCTION_PLANE_KIND) {
+  else if (theFeatureID == ConstructionPlugin_Plane::ID()) {
     return FeaturePtr(new ConstructionPlugin_Plane);
   }
   // feature of such kind is not found

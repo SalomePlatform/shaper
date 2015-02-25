@@ -84,3 +84,24 @@ std::list<std::string> ModelAPI_FeatureStateMessage::features() const
   return result;
 }
 
+
+ModelAPI_DocumentCreatedMessage::ModelAPI_DocumentCreatedMessage(const Events_ID theID, const void* theSender)
+: Events_Message(theID, theSender)
+{
+
+}
+
+ModelAPI_DocumentCreatedMessage::~ModelAPI_DocumentCreatedMessage()
+{
+
+}
+
+DocumentPtr ModelAPI_DocumentCreatedMessage::document() const
+{
+  return myDocument;
+}
+
+void ModelAPI_DocumentCreatedMessage::setDocument(DocumentPtr theDocument)
+{
+  myDocument = theDocument;
+}
