@@ -11,6 +11,7 @@
 #include <XGUI_ActionsMgr.h>
 //#include <AppElements_Constants.h>
 #include <ModuleBase_WidgetMultiSelector.h>
+#include <ModuleBase_Tools.h>
 
 #include <QEvent>
 #include <QFrame>
@@ -19,7 +20,7 @@
 #include <QLayoutItem>
 #include <QToolButton>
 #include <QVBoxLayout>
-#include <QVBoxLayout>
+#include <QGridLayout>
 #include <QWidget>
 #include <QToolButton>
 #include <QAction>
@@ -38,16 +39,18 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
   QWidget* aContent = new QWidget(this);
-  myMainLayout = new QVBoxLayout(aContent);
+  myMainLayout = new QGridLayout(aContent);
+  const int kPanelColumn = 0;
+  int aPanelRow = 0;
   myMainLayout->setContentsMargins(3, 3, 3, 3);
   this->setWidget(aContent);
 
   QFrame* aFrm = new QFrame(aContent);
-  aFrm->setFrameStyle(QFrame::Sunken);
+  aFrm->setFrameStyle(QFrame::Raised);
   aFrm->setFrameShape(QFrame::Panel);
   QHBoxLayout* aBtnLay = new QHBoxLayout(aFrm);
-  aBtnLay->setContentsMargins(0, 0, 0, 0);
-  myMainLayout->addWidget(aFrm);
+  ModuleBase_Tools::zeroMargins(aBtnLay);
+  myMainLayout->addWidget(aFrm, aPanelRow++, kPanelColumn);
 
   QStringList aBtnNames;
   aBtnNames << QString(PROP_PANEL_HELP)
@@ -60,10 +63,10 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
     aBtnLay->addWidget(aBtn);
   }
   aBtnLay->insertStretch(1, 1);
-  // aBtn->setShortcut(QKeySequence(Qt::Key_Escape));
 
   myCustomWidget = new QWidget(aContent);
-  myMainLayout->addWidget(myCustomWidget);
+  myCustomWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+  myMainLayout->addWidget(myCustomWidget, aPanelRow, kPanelColumn);
   setStretchEnabled(true);
 }
 
@@ -85,32 +88,14 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
 {
   myWidgets = theWidgets;
   if (theWidgets.empty()) return;
-  bool isEnableStretch = true;
-  QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin(), aLast =
-      theWidgets.end();
-  for (; anIt != aLast; anIt++) {
+  QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin();
+  for (; anIt != theWidgets.end(); anIt++) {
     connect(*anIt, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
     connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
             this,  SLOT(activateNextWidget(ModuleBase_ModelWidget*)));
     connect(*anIt, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)),
             this,  SLOT(activateWidget(ModuleBase_ModelWidget*)));
-
-    //ModuleBase_WidgetPoint2D* aPointWidget = dynamic_cast<ModuleBase_WidgetPoint2D*>(*anIt);
-    //if (aPointWidget)
-    //  connect(aPointWidget, SIGNAL(storedPoint2D(ObjectPtr, const std::string&)), this,
-    //          SIGNAL(storedPoint2D(ObjectPtr, const std::string&)))
-    //}
-
-    if (!isEnableStretch) continue;
-    foreach(QWidget* eachWidget, (*anIt)->getControls()) {
-      QSizePolicy::Policy aVPolicy = eachWidget->sizePolicy().verticalPolicy();
-      if(aVPolicy == QSizePolicy::Expanding ||
-         aVPolicy == QSizePolicy::MinimumExpanding) {
-        isEnableStretch = false;
-      }
-    }
   }
-  setStretchEnabled(isEnableStretch);
   ModuleBase_ModelWidget* aLastWidget = theWidgets.last();
   if (aLastWidget) {
     QList<QWidget*> aControls = aLastWidget->getControls();
@@ -179,17 +164,10 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
 
 void XGUI_PropertyPanel::setStretchEnabled(bool isEnabled)
 {
-  if (myMainLayout->count() == 0)
+  int aStretchIdx = myMainLayout->rowCount() - 1;
+  if (aStretchIdx < 0)
     return;
-  int aStretchIdx = myMainLayout->count() - 1;
-  bool hasStretch = myMainLayout->itemAt(aStretchIdx)->spacerItem() != NULL;
-  QLayoutItem* aChild;
-  if (isEnabled) {
-    if (!hasStretch) myMainLayout->addStretch(1);
-  } else if (hasStretch) {
-    aChild = myMainLayout->takeAt(aStretchIdx);
-    delete aChild;
-  }
+  myMainLayout->setRowStretch(aStretchIdx, isEnabled ? 1 : 0);
 }
 
 void XGUI_PropertyPanel::activateNextWidget()

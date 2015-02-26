@@ -430,50 +430,38 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   XGUI_Workshop* aWorkshop = aConnector->workshop();
+  ModuleBase_ModelWidget* aWgt = NULL;
   if (theType == "sketch-start-label") {
-    PartSet_WidgetSketchLabel* aWgt = new PartSet_WidgetSketchLabel(theParent, theWidgetApi, theParentId);
-    aWgt->setWorkshop(aWorkshop);
-    connect(aWgt, SIGNAL(planeSelected(const std::shared_ptr<GeomAPI_Pln>&)), 
+    PartSet_WidgetSketchLabel* aLabelWgt = new PartSet_WidgetSketchLabel(theParent, theWidgetApi, theParentId);
+    aLabelWgt->setWorkshop(aWorkshop);
+    connect(aLabelWgt, SIGNAL(planeSelected(const std::shared_ptr<GeomAPI_Pln>&)),
       mySketchMgr, SLOT(onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>&)));
-    theModelWidgets.append(aWgt);
-    return aWgt->getControl();
-
+    aWgt = aLabelWgt;
   } else if (theType == "sketch-2dpoint_selector") {
-    PartSet_WidgetPoint2D* aWgt = new PartSet_WidgetPoint2D(theParent, theWidgetApi, theParentId);
-    aWgt->setWorkshop(aWorkshop);
-    aWgt->setSketch(mySketchMgr->activeSketch());
-
-    connect(aWgt, SIGNAL(vertexSelected()), this, SLOT(onVertexSelected()));
-
-    theModelWidgets.append(aWgt);
-    return aWgt->getControl();
-
+    PartSet_WidgetPoint2D* aPointWgt = new PartSet_WidgetPoint2D(theParent, theWidgetApi, theParentId);
+    aPointWgt->setWorkshop(aWorkshop);
+    aPointWgt->setSketch(mySketchMgr->activeSketch());
+    connect(aPointWgt, SIGNAL(vertexSelected()), this, SLOT(onVertexSelected()));
+    aWgt = aPointWgt;
   } if (theType == "point2ddistance") {
-    PartSet_WidgetPoint2dDistance* aWgt = new PartSet_WidgetPoint2dDistance(theParent, theWidgetApi, theParentId);
-    aWgt->setWorkshop(aWorkshop);
-    aWgt->setSketch(mySketchMgr->activeSketch());
-
-    theModelWidgets.append(aWgt);
-    return aWgt->getControl();
-
+    PartSet_WidgetPoint2dDistance* aDistanceWgt = new PartSet_WidgetPoint2dDistance(theParent, theWidgetApi, theParentId);
+    aDistanceWgt->setWorkshop(aWorkshop);
+    aDistanceWgt->setSketch(mySketchMgr->activeSketch());
+    aWgt = aDistanceWgt;
   } if (theType == "sketch_shape_selector") {
-    PartSet_WidgetShapeSelector* aWgt = 
+    PartSet_WidgetShapeSelector* aShapeSelectorWgt =
       new PartSet_WidgetShapeSelector(theParent, workshop(), theWidgetApi, theParentId);
-    aWgt->setSketcher(mySketchMgr->activeSketch());
-
-    theModelWidgets.append(aWgt);
-    return aWgt->getControl();
-
+    aShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
+    aWgt = aShapeSelectorWgt;
   } if (theType == "sketch_constraint_shape_selector") {
-    PartSet_WidgetConstraintShapeSelector* aWgt = 
+    PartSet_WidgetConstraintShapeSelector* aConstraintShapeSelectorWgt =
       new PartSet_WidgetConstraintShapeSelector(theParent, workshop(), theWidgetApi, theParentId);
-    aWgt->setSketcher(mySketchMgr->activeSketch());
-
+    aConstraintShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
+    aWgt = aConstraintShapeSelectorWgt;
+  }
+  if(aWgt)
     theModelWidgets.append(aWgt);
-    return aWgt->getControl();
-
-  } else
-    return 0;
+  return aWgt;
 }
 
 bool PartSet_Module::isSketchFeatureOperationActive() const

@@ -28,7 +28,7 @@ void adjustMargins(QLayout* theLayout)
 {
   if(!theLayout)
     return;
-  theLayout->setContentsMargins(2, 5, 5, 2);
+  theLayout->setContentsMargins(2, 5, 2, 5);
   theLayout->setSpacing(4);
 }
 

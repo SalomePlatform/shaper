@@ -69,6 +69,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
       aMessage->setAttributeId(anAttributeID);
       aMessage->setObligatory(getBooleanAttribute(theNode, ATTR_OBLIGATORY, true));
       aMessage->setConcealment(getBooleanAttribute(theNode, ATTR_CONCEALMENT, false));
+      //aMessage->setCaseId
       Events_Loop::loop()->send(aMessage);
     }
   }

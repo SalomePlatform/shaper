@@ -17,7 +17,7 @@
 
 #include <Config_WidgetAPI.h>
 
-#include <QHBoxLayout>
+#include <QFormLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QObject>
@@ -31,16 +31,13 @@ ModuleBase_WidgetLineEdit::ModuleBase_WidgetLineEdit(QWidget* theParent,
                                                      const std::string& theParentId)
     : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
-  myMainWidget = new QWidget(theParent);
-  QHBoxLayout* aMainLay = new QHBoxLayout(myMainWidget);
+  QFormLayout* aMainLay = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
   QString aTitle = QString::fromStdString(theData->widgetLabel());
-  QLabel* aTitleLabel = new QLabel(aTitle, myMainWidget);
-  aMainLay->addWidget(aTitleLabel);
-  myLineEdit = new QLineEdit(myMainWidget);
-  aMainLay->addWidget(myLineEdit);
+  myLineEdit = new QLineEdit(this);
   myLineEdit->setMinimumHeight(20);
-  myMainWidget->setLayout(aMainLay);
+  aMainLay->addRow(aTitle, myLineEdit);
+  this->setLayout(aMainLay);
 
   connect(myLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged()));
 }
@@ -75,11 +72,6 @@ bool ModuleBase_WidgetLineEdit::restoreValue()
   myLineEdit->blockSignals(isBlocked);
 
   return true;
-}
-
-QWidget* ModuleBase_WidgetLineEdit::getControl() const
-{
-  return myMainWidget;
 }
 
 QList<QWidget*> ModuleBase_WidgetLineEdit::getControls() const

@@ -21,18 +21,17 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
                                                  const std::string& theParentId)
     : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
-  myContainer = new QWidget(theParent);
-  QHBoxLayout* aLayout = new QHBoxLayout(myContainer);
+  QHBoxLayout* aLayout = new QHBoxLayout(this);
   ModuleBase_Tools::adjustMargins(aLayout);
 
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
-  myLabel = new QLabel(aLabelText, myContainer);
+  myLabel = new QLabel(aLabelText, this);
   if (!aLabelIcon.isEmpty())
     myLabel->setPixmap(QPixmap(aLabelIcon));
   aLayout->addWidget(myLabel);
 
-  myCombo = new QComboBox(myContainer);
+  myCombo = new QComboBox(this);
   aLayout->addWidget(myCombo, 1);
  
   std::string aTypes = theData->getProperty("string_list");

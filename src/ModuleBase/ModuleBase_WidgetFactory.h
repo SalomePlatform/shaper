@@ -40,6 +40,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
   /// \param theParent a parent widget
   void createWidget(QWidget* theParent);
 
+
   /// Returns list of model widgets
   QList<ModuleBase_ModelWidget*> getModelWidgets() const
   {
@@ -47,6 +48,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
   }
 
  protected:
+  /// check if ModuleBase_Widget has expandable widgets in getControls
+  bool hasExpandingControls(QWidget* theParent);
    /// Create widget by its type
    /// \param theType a type
    /// \param theParent a parent widget

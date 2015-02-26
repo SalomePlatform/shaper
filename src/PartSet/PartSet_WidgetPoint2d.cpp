@@ -90,6 +90,10 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
 
     connect(myYSpin, SIGNAL(valueChanged(double)), this, SLOT(onValuesChanged()));
   }
+  QVBoxLayout* aLayout = new QVBoxLayout(this);
+  ModuleBase_Tools::zeroMargins(aLayout);
+  aLayout->addWidget(myGroupBox);
+  setLayout(aLayout);
 }
 
 void PartSet_WidgetPoint2D::reset()
@@ -179,11 +183,6 @@ bool PartSet_WidgetPoint2D::restoreValue()
   ModuleBase_Tools::setSpinValue(myXSpin, aPoint->x());
   ModuleBase_Tools::setSpinValue(myYSpin, aPoint->y());
   return true;
-}
-
-QWidget* PartSet_WidgetPoint2D::getControl() const
-{
-  return myGroupBox;
 }
 
 QList<QWidget*> PartSet_WidgetPoint2D::getControls() const

@@ -142,9 +142,6 @@ void XGUI_ActionsMgr::updateOnViewSelection()
   foreach(QString aId, nestedCommands(aFeatureId)) {
     std::list<ModelAPI_Validator*> aValidators;
     std::list<std::list<std::string> > anArguments;
-    if (!anArguments.empty()) {
-      std::list<std::string> firstArg = anArguments.front();
-    }
     aFactory->validators(aId.toStdString(), aValidators, anArguments);
     std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
     std::list<std::list<std::string> >::iterator aValidatorArgs = anArguments.begin();

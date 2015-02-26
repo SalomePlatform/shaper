@@ -57,10 +57,6 @@ Q_OBJECT
 
   virtual bool restoreValue();
 
-  /// Returns the internal parent wiget control, that can be shown anywhere
-  /// \returns the widget
-  QWidget* getControl() const;
-
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;

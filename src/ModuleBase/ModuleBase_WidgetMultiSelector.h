@@ -64,10 +64,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
 
   virtual bool restoreValue();
 
-  /// Returns the internal parent wiget control, that can be shown anywhere
-  /// \returns the widget
-  QWidget* getControl() const;
-
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
@@ -117,9 +113,6 @@ protected slots:
 
   /// Combobox of types
   QComboBox* myTypeCombo;
-
-  /// Container
-  QWidget* myMainWidget;
 
   //TODO: Move into the base of selectors
   ModuleBase_IWorkshop* myWorkshop;

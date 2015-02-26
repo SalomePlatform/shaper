@@ -17,15 +17,16 @@
 #include <Events_Loop.h>
 
 #include <QEvent>
-#include <QWidget>
 #include <QGraphicsDropShadowEffect>
 #include <QColor>
 #include <QLabel>
 
-ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent, const Config_WidgetAPI* theData,
+ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
+                                               const Config_WidgetAPI* theData,
                                                const std::string& theParentId)
-    : QObject(theParent),
-      myParentId(theParentId)
+    : QWidget(theParent),
+      myParentId(theParentId),
+      myIsEditing(false)
 {
   myDefaultValue = theData->getProperty(ATTR_DEFAULT);
   myIsComputedDefault = theData->getProperty(ATTR_DEFAULT) == DOUBLE_WDG_DEFAULT_COMPUTED;
