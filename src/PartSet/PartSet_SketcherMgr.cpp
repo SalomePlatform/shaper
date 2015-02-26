@@ -190,14 +190,31 @@ void PartSet_SketcherMgr::onBeforeValuesChangedInPropertyPanel()
 {
   if (isNestedCreateOperation(getCurrentOperation()))
     return;
+  // it is necessary to save current selection in order to restore it after the values are modifed
   storeSelection();
+
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+  myPreviousUpdateViewerEnabled = aDisplayer->enableUpdateViewer(false);
 }
 
 void PartSet_SketcherMgr::onAfterValuesChangedInPropertyPanel()
 {
   if (isNestedCreateOperation(getCurrentOperation()))
     return;
+  // it is necessary to restore current selection in order to restore it after the values are modified
   restoreSelection();
+  myCurrentSelection.clear();
+
+  // 3. the flag to disable the update viewer should be set in order to avoid blinking in the 
+  // viewer happens by deselect/select the modified objects. The flag should be restored after
+  // the selection processing. The update viewer should be also called.
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+  aDisplayer->enableUpdateViewer(myPreviousUpdateViewerEnabled);
+  aDisplayer->updateViewer();
 }
 
 void PartSet_SketcherMgr::onValuesChangedInPropertyPanel()
@@ -261,20 +278,11 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
     // Remember highlighted objects for editing
     ModuleBase_ISelection* aSelect = aWorkshop->selection();
-    QList<ModuleBase_ViewerPrs> aHighlighted = aSelect->getHighlighted();
-    QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
-    myFeature2AttributeMap.clear();
 
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
-    if (aHasShift) {
-      fillFeature2Attribute(aHighlighted, myFeature2AttributeMap, myCurrentSketch);
-      fillFeature2Attribute(aSelected, myFeature2AttributeMap, myCurrentSketch);
-    }
-    else {
-      fillFeature2Attribute(aHighlighted, myFeature2AttributeMap, myCurrentSketch);
-    }
+    storeSelection(!aHasShift);
 
-    if (myFeature2AttributeMap.empty()) {
+    if (myCurrentSelection.empty()) {
       if (isSketchOpe && (!isSketcher))
         // commit previous operation
         if (!aOperation->commit())
@@ -318,8 +326,7 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
       if (myIsDragging) {
         if (myDragDone) {
           //aOp->commit();
-          myFeature2AttributeMap.clear();
-
+          myCurrentSelection.clear();
           // Reselect edited object
           /*aViewer->AISContext()->MoveTo(theEvent->x(), theEvent->y(), theWnd->v3dView());
           if (theEvent->modifiers() & Qt::ShiftModifier)
@@ -362,11 +369,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
   myClickedPoint.clear();
 
   if (myIsDragging) {
-    ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-    // 1. it is necessary to save current selection in order to restore it after the features moving
-    FeatureToSelectionMap aCurrentSelection;
-    getCurrentSelection(myFeature2AttributeMap, myCurrentSketch, aWorkshop, aCurrentSelection);
-
+    // 1. the current selection is saved in the mouse press method in order to restore it after moving
     // 2. the enable selection in the viewer should be temporary switched off in order to ignore
     // mouse press signal in the viewer(it call Select for AIS context and the dragged objects are
     // deselected). This flag should be restored in the slot, processed the mouse release signal.
@@ -386,6 +389,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     double dX =  aX - myCurrentPoint.myCurX;
     double dY =  aY - myCurrentPoint.myCurY;
 
+    ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
     XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
     XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
     // 3. the flag to disable the update viewer should be set in order to avoid blinking in the 
@@ -395,17 +399,17 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
 
     static Events_ID aMoveEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
     //static Events_ID aUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-
-    FeatureToAttributesMap::const_iterator anIt = myFeature2AttributeMap.begin(),
-                                           aLast = myFeature2AttributeMap.end();
+    FeatureToSelectionMap::const_iterator anIt = myCurrentSelection.begin(),
+                                          aLast = myCurrentSelection.end();
     // 4. the features and attributes modification(move)
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = anIt.key();
 
-      AttributeList anAttributes = anIt.value();
+      std::set<AttributePtr> anAttributes = anIt.value().first;
       // Process selection by attribute: the priority to the attribute
       if (!anAttributes.empty()) {
-        AttributeList::const_iterator anAttIt = anAttributes.begin(), anAttLast = anAttributes.end();
+        std::set<AttributePtr>::const_iterator anAttIt = anAttributes.begin(),
+                                               anAttLast = anAttributes.end();
         for (; anAttIt != anAttLast; anAttIt++) {
           AttributePtr anAttr = *anAttIt;
           if (anAttr.get() == NULL)
@@ -437,19 +441,11 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     //Events_Loop::loop()->flush(aUpdateEvent); // up update events - to redisplay presentations
 
     // 5. it is necessary to save current selection in order to restore it after the features moving
-    FeatureToSelectionMap::const_iterator aSIt = aCurrentSelection.begin(),
-                                          aSLast = aCurrentSelection.end();
-    SelectMgr_IndexedMapOfOwner anOwnersToSelect;
-    for (; aSIt != aSLast; aSIt++) {
-      anOwnersToSelect.Clear();
-      getSelectionOwners(aSIt->first, myCurrentSketch, aWorkshop, aCurrentSelection,
-                         anOwnersToSelect);
-      aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
-    }
-
+    restoreSelection();
     // 6. restore the update viewer flag and call this update
     aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
     aDisplayer->updateViewer();
+
     myDragDone = true;
     myCurrentPoint.setValue(aX, aY);
   }
@@ -535,8 +531,8 @@ void PartSet_SketcherMgr::launchEditing()
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
   aConnector->activateSubShapesSelection(aModes);
 
-  if (!myFeature2AttributeMap.empty()) {
-    FeaturePtr aFeature = myFeature2AttributeMap.begin().key();
+  if (!myCurrentSelection.empty()) {
+    FeaturePtr aFeature = myCurrentSelection.begin().key();
     std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
               std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
     if (aSPFeature) {
@@ -726,19 +722,6 @@ void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& th
   myPlaneFilter->setPlane(thePln->impl<gp_Pln>());
 }
 
-void PartSet_SketcherMgr::getCurrentSelection(const FeatureToAttributesMap& theFeatureToAttributes,
-                                              const FeaturePtr& theSketch,
-                                              ModuleBase_IWorkshop* theWorkshop,
-                                              FeatureToSelectionMap& theSelection)
-{
-  FeatureToAttributesMap::const_iterator anIt = theFeatureToAttributes.begin(),
-                                         aLast = theFeatureToAttributes.end();
-  for (; anIt != aLast; anIt++) {
-    FeaturePtr aFeature = anIt.key();
-    getCurrentSelection(aFeature, theSketch, theWorkshop, theSelection);
-  }
-}
-
 void PartSet_SketcherMgr::getCurrentSelection(const FeaturePtr& theFeature,
                                               const FeaturePtr& theSketch,
                                               ModuleBase_IWorkshop* theWorkshop,
@@ -804,8 +787,8 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
     return;
 
   FeatureToSelectionMap::const_iterator anIt = theSelection.find(theFeature);
-  std::set<AttributePtr> aSelectedAttributes = anIt->second.first;
-  std::set<ResultPtr> aSelectedResults = anIt->second.second;
+  std::set<AttributePtr> aSelectedAttributes = anIt.value().first;
+  std::set<ResultPtr> aSelectedResults = anIt.value().second;
 
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
   Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
@@ -916,43 +899,47 @@ void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
   aDisplayer->updateViewer();
 }
 
-void PartSet_SketcherMgr::storeSelection()
+void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
 {
-  //qDebug("  storeSelection");
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-  // 1. it is necessary to save current selection in order to restore it after the features moving
-  //FeatureToSelectionMap aCurrentSelection;
-  myCurrentSelection.clear();
-  getCurrentSelection(myFeature2AttributeMap, myCurrentSketch, aWorkshop, myCurrentSelection);
 
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
-  // 3. the flag to disable the update viewer should be set in order to avoid blinking in the 
-  // viewer happens by deselect/select the modified objects. The flag should be restored after
-  // the selection processing. The update viewer should be also called.
-  myPreviousUpdateViewerEnabled = aDisplayer->enableUpdateViewer(false);
+  ModuleBase_ISelection* aSelect = aWorkshop->selection();
+  QList<ModuleBase_ViewerPrs> aHighlighted = aSelect->getHighlighted();
+    
+  QMap<FeaturePtr, QList<AttributePtr> > aFeature2AttributeMap;
+  if (theHighlightedOnly) {
+    fillFeature2Attribute(aHighlighted, aFeature2AttributeMap, myCurrentSketch);
+  }
+  else {
+    fillFeature2Attribute(aHighlighted, aFeature2AttributeMap, myCurrentSketch);
+
+    QList<ModuleBase_ViewerPrs> aSelected = aSelect->getSelected();
+    fillFeature2Attribute(aSelected, aFeature2AttributeMap, myCurrentSketch);
+  }
+
+  // 1. it is necessary to save current selection in order to restore it after the features moving
+  myCurrentSelection.clear();
+  QMap<FeaturePtr, QList<AttributePtr> >::const_iterator anIt = aFeature2AttributeMap.begin(),
+                                                         aLast = aFeature2AttributeMap.end();
+  for (; anIt != aLast; anIt++) {
+    FeaturePtr aFeature = anIt.key();
+    getCurrentSelection(aFeature, myCurrentSketch, aWorkshop, myCurrentSelection);
+  }
+  qDebug(QString("  storeSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
 }
 
 void PartSet_SketcherMgr::restoreSelection()
 {
-  //qDebug("restoreSelection");
+  qDebug(QString("restoreSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-  // 5. it is necessary to save current selection in order to restore it after the features moving
   FeatureToSelectionMap::const_iterator aSIt = myCurrentSelection.begin(),
                                         aSLast = myCurrentSelection.end();
   SelectMgr_IndexedMapOfOwner anOwnersToSelect;
   for (; aSIt != aSLast; aSIt++) {
     anOwnersToSelect.Clear();
-    getSelectionOwners(aSIt->first, myCurrentSketch, aWorkshop, myCurrentSelection,
+    getSelectionOwners(aSIt.key(), myCurrentSketch, aWorkshop, myCurrentSelection,
                         anOwnersToSelect);
     aConnector->workshop()->selector()->setSelectedOwners(anOwnersToSelect, false);
   }
-  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
-  // 3. the flag to disable the update viewer should be set in order to avoid blinking in the 
-  // viewer happens by deselect/select the modified objects. The flag should be restored after
-  // the selection processing. The update viewer should be also called.
-  aDisplayer->enableUpdateViewer(myPreviousUpdateViewerEnabled);
-  //if (myPreviousUpdateViewerEnabled)
-    aDisplayer->updateViewer();
 }
