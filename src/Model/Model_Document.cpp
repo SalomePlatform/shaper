@@ -463,7 +463,7 @@ void Model_Document::undo()
 
 bool Model_Document::canRedo()
 {
-  if (myDoc->GetAvailableRedos() > 0)
+  if (!myRedos.empty())
     return true;
   // check other subs contains operation that can be redoed
   const std::set<std::string> aSubs = subDocuments(true);

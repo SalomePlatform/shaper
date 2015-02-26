@@ -46,7 +46,7 @@ ModuleBase_WidgetLineEdit::~ModuleBase_WidgetLineEdit()
 {
 }
 
-bool ModuleBase_WidgetLineEdit::storeValue() const
+bool ModuleBase_WidgetLineEdit::storeValueCustom() const
 {
   // A rare case when plugin was not loaded. 
   if(!myFeature)

@@ -133,8 +133,12 @@ Q_OBJECT
   bool isEditingMode() const { return myIsEditing; }
 
 signals:
+  /// The signal about widget values are to be changed
+  void beforeValuesChanged();
   /// The signal about widget values changed
   void valuesChanged();
+  /// The signal about widget values are to be changed
+  void afterValuesChanged();
 
   /// The signal about key release on the control, that corresponds to the attribute
   /// \param theEvent key release event
@@ -149,16 +153,20 @@ signals:
   void focusOutWidget(ModuleBase_ModelWidget* theWidget);
 
  protected:
-  /// Saves the internal parameters to the given feature
-  /// \return True in success
-  virtual bool storeValue() const = 0;
-
   /// \brief Set the attribute name
   /// \param theAttribute the string value with attribute name
   void setAttributeID(const std::string& theAttribute)
   {
     myAttributeID = theAttribute;
   }
+
+  /// Saves the internal parameters to the given feature. Emits signals before and after store
+  /// \return True in success
+  bool storeValue();
+
+  /// Saves the internal parameters to the given feature
+  /// \return True in success
+  virtual bool storeValueCustom() const = 0;
 
   /// The methiod called when widget is activated
   virtual void activateCustom() {};

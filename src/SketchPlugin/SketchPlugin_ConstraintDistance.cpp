@@ -18,6 +18,8 @@
 
 #include <Config_PropManager.h>
 
+const double tolerance = 1e-7;
+
 SketchPlugin_ConstraintDistance::SketchPlugin_ConstraintDistance()
 {
 }
@@ -98,6 +100,10 @@ bool SketchPlugin_ConstraintDistance::compute(const std::string& theAttributeId)
 
   std::shared_ptr<GeomAPI_Pnt> aPoint1 = sketch()->to3D(aPnt_A->x(), aPnt_A->y());
   std::shared_ptr<GeomAPI_Pnt> aPoint2 = sketch()->to3D(aPnt_B->x(), aPnt_B->y());
+  // it is not possible to create lin2d on the points with equal position
+  if (aPoint1->distance(aPoint1) < tolerance)
+    return false;
+
   std::shared_ptr<GeomAPI_Lin2d> aLine = std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aPnt_A, aPnt_B));
   double aDist = aPoint1->distance(aPoint2)/5.;
   std::shared_ptr<GeomAPI_Pnt2d> aFPnt = aLine->shiftedLocation(aDist);

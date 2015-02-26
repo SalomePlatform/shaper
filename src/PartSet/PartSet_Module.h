@@ -142,14 +142,6 @@ protected slots:
   /// Breaks sequense of automatically resterted operations
   void breakOperationSequence();
 
-  /// Check whether the sketch operation is active
-  /// \return boolean result
-  bool isSketchOperationActive() const;
-
-  /// Check whether the sketch feature operation is active
-  /// \return boolean result
-  bool isSketchFeatureOperationActive() const;
-
   /// Create all actions for context menus. It is called on creation of module
   /// Put the created actions into an internal map
   void createActions();

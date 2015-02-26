@@ -64,7 +64,7 @@ ModuleBase_WidgetFileSelector::~ModuleBase_WidgetFileSelector()
 {
 }
 
-bool ModuleBase_WidgetFileSelector::storeValue() const
+bool ModuleBase_WidgetFileSelector::storeValueCustom() const
 {
   // A rare case when plugin was not loaded. 
   if(!myFeature)

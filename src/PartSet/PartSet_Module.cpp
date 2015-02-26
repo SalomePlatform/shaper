@@ -275,9 +275,11 @@ bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 
 void PartSet_Module::addViewerItems(QMenu* theMenu) const
 {
-  if (!PartSet_SketcherMgr::isSketchOperation(myWorkshop->currentOperation()) &&
-      !isSketchFeatureOperationActive())
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  if (!PartSet_SketcherMgr::isSketchOperation(anOperation) &&
+      !PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
     return;
+
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
   QObjectPtrList aObjects = aSelection->selectedPresentations();
   if (aObjects.size() > 0) {
@@ -389,24 +391,24 @@ void PartSet_Module::onEnterReleased()
 
 void PartSet_Module::onOperationActivatedByPreselection()
 {
-  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if(aOperation && isSketchFeatureOperationActive()) {
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  if(anOperation && PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
     // Set final definitions if they are necessary
     //propertyPanelDefined(aOperation);
 
     /// Commit sketcher operations automatically
-    aOperation->commit();
+    anOperation->commit();
   }
 }
 
 void PartSet_Module::onNoMoreWidgets()
 {
-  if (isSketchFeatureOperationActive()) {
-    ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-    if (aOperation) {
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
+    if (anOperation) {
       if (myRestartingMode != RM_Forbided)
         myRestartingMode = RM_LastFeatureUsed;
-      aOperation->commit();
+      anOperation->commit();
     }
   }
 }
@@ -464,19 +466,6 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
   return aWgt;
 }
 
-bool PartSet_Module::isSketchFeatureOperationActive() const
-{
-  bool isCurrentSketchOp = false;
-  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if (aOperation) {
-    FeaturePtr aFeature = aOperation->feature();
-    std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
-              std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    isCurrentSketchOp = aSPFeature.get() != NULL;
-  }
-  return isCurrentSketchOp;
-}
-
 void PartSet_Module::createActions()
 {
   QAction* aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
@@ -511,8 +500,9 @@ void PartSet_Module::onAction(bool isChecked)
 
 void PartSet_Module::deleteObjects()
 {
-  bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(myWorkshop->currentOperation());
-  if (!isSketchOp && !isSketchFeatureOperationActive())
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
+  if (!isSketchOp && !PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
     return;
 
   // sketch feature should be skipped, only sub-features can be removed
@@ -547,8 +537,11 @@ void PartSet_Module::deleteObjects()
     }
     //}
   }
-
   QString aDescription = tr("Delete");
+  /**
+  // according to #355 feature, it is not necessary to inform about dependencies during
+  // sketch delete operation
+  // 
   if (!aRefFeatures.empty()) {
     QStringList aRefNames;
     std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
@@ -572,7 +565,7 @@ void PartSet_Module::deleteObjects()
       if (aRes != QMessageBox::Yes)
         return;
     }
-  }
+  }*/
 
   SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->startOperation(aDescription.toStdString());

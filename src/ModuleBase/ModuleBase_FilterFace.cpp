@@ -22,6 +22,7 @@ StdSelect_TypeOfFace ModuleBase_FilterFace::faceType(const std::string& theType)
 {
   if (MyFaceTypes.count() == 0) {
     MyFaceTypes["plane"] = StdSelect_Plane;
+    MyFaceTypes["cylinder"] = StdSelect_Cylinder;
   }
   QString aType = QString(theType.c_str()).toLower();
   if (MyFaceTypes.contains(aType))

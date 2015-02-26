@@ -92,9 +92,6 @@ public:
   /// \return a boolean value
   static bool isDistanceOperation(ModuleBase_Operation* theOperation);
 
-  /// Launches the operation from current highlighting
-  void launchEditing();
-
   /// Returns current Sketch feature/ Returns NULL if there is no launched sketch operation
   CompositeFeaturePtr activeSketch() const { return myCurrentSketch; }
 
@@ -141,8 +138,12 @@ private slots:
   /// Process the leave mouse of the view port. If the current operation is a create of
   /// a nested sketch feature, it hides the feature in the viewer
   void onLeaveViewPort();
-  /// Listens the value changed signal and display the current operation feature
+  /// Listens to the value changed signal and display the current operation feature
+  void onBeforeValuesChangedInPropertyPanel();
+  /// Listens to the signal about values are to be changed in the property panel
   void onValuesChangedInPropertyPanel();
+  /// Listens to the signal about the modification of the values have been done in the property panel
+  void onAfterValuesChangedInPropertyPanel();
 
   void onMousePressed(ModuleBase_IViewWindow*, QMouseEvent*);
   void onMouseReleased(ModuleBase_IViewWindow*, QMouseEvent*);
@@ -152,6 +153,9 @@ private slots:
   void onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
 private:
+  /// Launches the operation from current highlighting
+  void launchEditing();
+
   /// Returns list of strings which contains id's of sketch operations
   static QStringList sketchOperationIdList();
 
@@ -160,20 +164,8 @@ private:
   void get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent, 
                   Point& thePoint);
 
-  typedef QList<AttributePtr> AttributeList;
-  typedef QMap<FeaturePtr, AttributeList> FeatureToAttributesMap;
-  typedef std::map<FeaturePtr, std::pair<std::set<AttributePtr>, std::set<ResultPtr> > >
+  typedef QMap<FeaturePtr, std::pair<std::set<AttributePtr>, std::set<ResultPtr> > >
                                                                        FeatureToSelectionMap;
-  /// Obtains the current selection of the object in the workshop viewer by a map of feature to attributes
-  /// It calls the next method for each feature
-  /// \param theFeatureToAttributes a map of feature to attributes
-  /// \param theSketch a current sketch feature
-  /// \param theWorkshop a workshop to have an access to AIS context and displayer
-  /// \param theSelection a container for the selection, to save results and attributres for a feature
-  static void getCurrentSelection(const FeatureToAttributesMap& theFeatureToAttributes,
-                                  const FeaturePtr& theSketch,
-                                  ModuleBase_IWorkshop* theWorkshop,
-                                  FeatureToSelectionMap& theSelection);
 
   /// Obtains the current selection of the object in the workshop viewer 
   /// It includes the selection in all modes of activation, even local context - vertices, edges
@@ -230,6 +222,12 @@ private:
   /// \param isToDisplay a flag about the display or erase the feature
   void visualizeFeature(ModuleBase_Operation* theOperation, const bool isToDisplay);
 
+  /// Saves the current selection in the viewer into an internal container
+  /// It obtains the selected attributes. The highlighted objects can be processes as the selected ones
+  /// \param theHighlightedUse a boolean flag
+  void storeSelection(const bool theHighlightedOnly = false);
+  void restoreSelection();
+
 private:
   PartSet_Module* myModule;
 
@@ -244,9 +242,9 @@ private:
 
   CompositeFeaturePtr myCurrentSketch;
 
-  FeatureToAttributesMap myFeature2AttributeMap; /// a map of a feature to attributes
-
   Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;
+  FeatureToSelectionMap myCurrentSelection;
+  bool myPreviousUpdateViewerEnabled;
 };
 
 
