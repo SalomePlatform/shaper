@@ -795,6 +795,21 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
   XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
+  // 1. found the feature's owners. Check the AIS objects of the constructions
+  AISObjectPtr aAISObj = aDisplayer->getAISObject(theFeature);
+  if (aAISObj.get() != NULL && aSelectedAttributes.empty() && aSelectedResults.empty()) {
+    Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+
+    SelectMgr_IndexedMapOfOwner aSelectedOwners;  
+    aConnector->workshop()->selector()->selection()->entityOwners(anAISIO, aSelectedOwners);
+    for  (Standard_Integer i = 1, n = aSelectedOwners.Extent(); i <= n; i++) {
+      Handle(SelectMgr_EntityOwner) anOwner = aSelectedOwners(i);
+      if (!anOwner.IsNull())
+        anOwnersToSelect.Add(anOwner);
+    }
+  }
+
+  // 2. found the feature results's owners
   std::list<ResultPtr> aResults = theFeature->results();
   std::list<ResultPtr>::const_iterator aIt;
   for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt)
