@@ -94,6 +94,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
   connect(anOpMgr, SIGNAL(keyEnterReleased()), this, SLOT(onEnterReleased()));
+  connect(anOpMgr, SIGNAL(keyDeleteReleased()), this, SLOT(onDeleteObjects()));
   connect(anOpMgr, SIGNAL(operationActivatedByPreselection()),
           this, SLOT(onOperationActivatedByPreselection()));
 
@@ -388,6 +389,14 @@ void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* the
 void PartSet_Module::onEnterReleased()
 {
   myRestartingMode = RM_EmptyFeatureUsed;
+}
+
+void PartSet_Module::onDeleteObjects()
+{
+  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+  if (PartSet_SketcherMgr::isSketchOperation(anOperation) ||
+      PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
+    deleteObjects();
 }
 
 void PartSet_Module::onOperationActivatedByPreselection()

@@ -135,6 +135,8 @@ signals:
   /// Signal is emitted after the key released click.
   void keyEnterReleased();
 
+  /// Signal is emitted after the key delete released click.
+  void keyDeleteReleased();
 
  protected:
   /// Commits the current operatin if it is valid

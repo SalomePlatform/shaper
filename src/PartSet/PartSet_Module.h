@@ -123,6 +123,8 @@ protected slots:
   /// It commits the operation of it is can be committed
   void onOperationActivatedByPreselection();
 
+  //! Delete features
+  void onDeleteObjects();
 
  protected:
   /// Register validators for this module

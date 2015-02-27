@@ -48,7 +48,10 @@ void XGUI_ContextMenuMgr::createActions()
   addAction("DEACTIVATE_PART_CMD", aAction);
 
   aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
+  myWorkshop->mainWindow()->addAction(aAction);
   addAction("DELETE_CMD", aAction);
+  aAction->setShortcut(Qt::Key_Delete);
+  aAction->setShortcutContext(Qt::ApplicationShortcut);
 
   aAction = new QAction(QIcon(":pictures/eye_pencil.png"), tr("Show"), this);
   addAction("SHOW_CMD", aAction);

@@ -1289,8 +1289,10 @@ void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
 //**************************************************************
 void XGUI_Workshop::deleteObjects(const QObjectPtrList& theList)
 {
-  QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
+  if (!isActiveOperationAborted())
+    return;
 
+  QMainWindow* aDesktop = isSalomeMode() ? salomeConnector()->desktop() : myMainWindow;
   std::set<FeaturePtr> aRefFeatures;
   foreach (ObjectPtr aObj, theList)
   {
