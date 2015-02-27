@@ -141,25 +141,25 @@ public:
 };
 
 /// Message that document (Part, PartSet) was created
-class MODELAPI_EXPORT ModelAPI_DocumentCreatedMessage : public Events_Message
+class ModelAPI_DocumentCreatedMessage : public Events_Message
 {
   DocumentPtr myDocument;
 
  public:
   /// Creates an empty message
-  ModelAPI_DocumentCreatedMessage(const Events_ID theID, const void* theSender = 0);
+  MODELAPI_EXPORT ModelAPI_DocumentCreatedMessage(const Events_ID theID, const void* theSender = 0);
   /// The virtual destructor
-  virtual ~ModelAPI_DocumentCreatedMessage();
+  MODELAPI_EXPORT virtual ~ModelAPI_DocumentCreatedMessage();
 
-  static Events_ID eventId()
+  MODELAPI_EXPORT static Events_ID eventId()
   {
     static const char * MY_DOCUMENT_CREATED_EVENT_ID("DocumentCreated");
     return Events_Loop::eventByName(MY_DOCUMENT_CREATED_EVENT_ID);
   }
 
 
-  DocumentPtr document() const;
-  void setDocument(DocumentPtr theDocument);
+  MODELAPI_EXPORT DocumentPtr document() const;
+  MODELAPI_EXPORT void setDocument(DocumentPtr theDocument);
 };
 
 #endif

@@ -61,7 +61,7 @@ class Model_Document : public ModelAPI_Document
   //! Aborts the operation 
   MODEL_EXPORT virtual void abortOperation();
   //! Returns true if operation has been started, but not yet finished or aborted
-  MODEL_EXPORT virtual bool isOperation();
+  MODEL_EXPORT virtual bool isOperation() const;
   //! Returns true if document was modified (since creation/opening)
   MODEL_EXPORT virtual bool isModified();
 
