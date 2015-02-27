@@ -95,6 +95,10 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
   /// Returns true that it was registered that attribute conceals the referenced result
   virtual bool isConcealed(std::string theFeature, std::string theAttribute) = 0;
 
+  /// Register the case-attribute: this attribute is checked only if its case is selected
+  virtual void registerCase(std::string theFeature, std::string theAttribute,
+    std::string theSwitchId, std::string theCaseId) = 0;
+
  protected:
   /// Get instance from Session
   ModelAPI_ValidatorsFactory()

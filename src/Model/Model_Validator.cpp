@@ -10,6 +10,7 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_AttributeValidator.h>
+#include <ModelAPI_AttributeString.h>
 #include <Events_Error.h>
 
 void Model_ValidatorsFactory::registerValidator(const std::string& theID,
@@ -259,4 +260,35 @@ bool Model_ValidatorsFactory::isConcealed(std::string theFeature, std::string th
 {
   std::map<std::string, std::set<std::string> >::iterator aFind = myConcealed.find(theFeature);
   return aFind != myConcealed.end() && aFind->second.find(theAttribute) != aFind->second.end();
+}
+
+void Model_ValidatorsFactory::registerCase(std::string theFeature, std::string theAttribute,
+    std::string theSwitchId, std::string theCaseId)
+{
+  std::map<std::string, std::map<std::string, std::pair<std::string, std::string> > >::iterator 
+    aFindFeature = myCases.find(theFeature);
+  if (aFindFeature == myCases.end()) {
+    myCases[theFeature] = std::map<std::string, std::pair<std::string, std::string> >();
+    aFindFeature = myCases.find(theFeature);
+  }
+  (aFindFeature->second)[theAttribute] = std::pair<std::string, std::string>(theSwitchId, theCaseId);
+}
+
+bool Model_ValidatorsFactory::isCase(
+  FeaturePtr theFeature, std::string theAttribute)
+{
+  std::map<std::string, std::map<std::string, std::pair<std::string, std::string> > >::iterator 
+    aFindFeature = myCases.find(theFeature->getKind());
+  if (aFindFeature != myCases.end()) {
+    std::map<std::string, std::pair<std::string, std::string> >::iterator
+      aFindAttr = aFindFeature->second.find(theAttribute);
+    if (aFindAttr != aFindFeature->second.end()) {
+      // the the switch-attribute that contains the case value
+      AttributeStringPtr aSwitch = theFeature->string(aFindAttr->second.first);
+      if (aSwitch.get()) {
+        return aSwitch->value() == aFindAttr->second.second; // the second is the case identifier
+      }
+    }
+  }
+  return true; // if no additional conditions, this attribute is the case to be validated
 }
