@@ -85,7 +85,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
         Events_Loop::loop()->send(aMessage);
       }
     // container pages, like "case" or "box"
-    } else if (isNode(theNode, WDG_SWITCH, WDG_SWITCH_CASE, WDG_SWITCH, WDG_TOOLBOX, NULL)) {
+    } else if (isNode(theNode, WDG_SWITCH, WDG_SWITCH_CASE, WDG_TOOLBOX, WDG_TOOLBOX_BOX, NULL)) {
       storeAttribute(theNode, _ID); // save case:caseId (or box:boxId)
     }
   }
@@ -95,7 +95,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
 
 void Config_FeatureReader::cleanup(xmlNodePtr theNode)
 {
-  if (isNode(theNode, WDG_SWITCH, WDG_SWITCH_CASE, WDG_SWITCH, WDG_TOOLBOX, NULL)) {
+  if (isNode(theNode, WDG_SWITCH, WDG_SWITCH_CASE, WDG_TOOLBOX, WDG_TOOLBOX_BOX, NULL)) {
     // cleanup id of cases when leave case node
     cleanupAttribute(theNode, _ID);
   }

@@ -9,7 +9,6 @@
 
 #include <Model.h>
 #include <ModelAPI_Validator.h>
-#include <ModelAPI_Feature.h>
 #include <map>
 #include <set>
 

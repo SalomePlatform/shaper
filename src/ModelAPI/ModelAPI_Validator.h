@@ -8,6 +8,7 @@
 #define ModelAPI_Validator_H_
 
 #include <ModelAPI.h>
+#include <ModelAPI_Feature.h>
 #include <memory>
 #include <list>
 
@@ -98,6 +99,9 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
   /// Register the case-attribute: this attribute is checked only if its case is selected
   virtual void registerCase(std::string theFeature, std::string theAttribute,
     std::string theSwitchId, std::string theCaseId) = 0;
+
+ /// Returns true if the attribute must be checked (the case is selected)
+  virtual bool isCase(FeaturePtr theFeature, std::string theAttribute) = 0;
 
  protected:
   /// Get instance from Session
