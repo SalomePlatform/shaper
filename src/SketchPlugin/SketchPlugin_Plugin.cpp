@@ -15,6 +15,7 @@
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_Validators.h>
 #include <SketchPlugin_ResultValidators.h>
+#include <SketchPlugin_ShapeValidator.h>
 
 #include <Events_Loop.h>
 #include <GeomDataAPI_Dir.h>
@@ -50,6 +51,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   aFactory->registerValidator("SketchPlugin_ResultPoint", new SketchPlugin_ResultPointValidator);
   aFactory->registerValidator("SketchPlugin_ResultLine", new SketchPlugin_ResultLineValidator);
   aFactory->registerValidator("SketchPlugin_ResultArc", new SketchPlugin_ResultArcValidator);
+  aFactory->registerValidator("SketchPlugin_ShapeValidator",
+                              new SketchPlugin_ShapeValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

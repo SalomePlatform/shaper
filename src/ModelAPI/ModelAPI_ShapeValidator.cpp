@@ -10,6 +10,8 @@
 #include "ModelAPI_Object.h"
 
 bool ModelAPI_ShapeValidator::isValid(const FeaturePtr& theFeature,
+                                      const std::list<std::string>& theArguments,
+                                      const ObjectPtr& theObject,
                                       const AttributePtr& theAttribute,
                                       const GeomShapePtr& theShape) const
 {
