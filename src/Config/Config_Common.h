@@ -44,9 +44,20 @@ CONFIG_EXPORT bool isElementNode(xmlNodePtr theNode);
 CONFIG_EXPORT bool isNode(xmlNodePtr theNode, const char* theNodeName, ...);
 
 /*!
- * Checks is the given node is attribute (widget) node.
+ * Checks if the given node is attribute node.
+ * Attribute node represents a widget, that is able to store/restore
+ * values from the model. Actually it's every widget, displayed
+ * in the XGUI_PropertyPanel, except paged containers (toolbox, switch/case).
+ */
+CONFIG_EXPORT bool isAttributeNode(xmlNodePtr theNode);
+
+/*!
+ * Checks if the given node is widget node.
+ * Widget nodes are attribute node + paged containers nodes.
  */
 CONFIG_EXPORT bool isWidgetNode(xmlNodePtr theNode);
+
+CONFIG_EXPORT bool isCaseNode(xmlNodePtr theNode);
 
 /*!
  * Every xml node has child. Even if there is no explicit
@@ -56,6 +67,17 @@ CONFIG_EXPORT bool isWidgetNode(xmlNodePtr theNode);
  * given node.
  */
 CONFIG_EXPORT bool hasChild(xmlNodePtr theNode);
+
+
+/*!
+ * Checks if the given node has a valid parent.
+ */
+CONFIG_EXPORT bool hasParent(xmlNodePtr theNode);
+
+/*!
+ * Checks if the given node has a valid parent with any of the given node names.
+ */
+CONFIG_EXPORT bool hasParent(xmlNodePtr theNode, const char* theNodeName, ...);
 
 /*!
  * Returns named property for an id node as std::string and the parameters of the node.

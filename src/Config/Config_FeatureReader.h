@@ -39,6 +39,10 @@ class Config_FeatureReader : public Config_XMLReader
  protected:
   /// Overloaded method. Defines how to process each node
   virtual void processNode(xmlNodePtr aNode);
+
+  /// Overloaded method. Clears attribute cache on extit from attribute's node
+  virtual void cleanup(xmlNodePtr aNode);
+
   /// Overloaded method. Defines if the given node should be parsed recursively
   virtual bool processChildren(xmlNodePtr aNode);
 
@@ -53,6 +57,9 @@ class Config_FeatureReader : public Config_XMLReader
   std::string restoreAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
   /// Restores an attribute from internal map.
   std::string restoreAttribute(const char* theNodeName, const char* theNodeAttribute);
+
+  bool cleanupAttribute(xmlNodePtr theNode, const char* theNodeAttribute);
+  bool cleanupAttribute(const char* theNodeName, const char* theNodeAttribute);
 
  private:
   /// A map to store all parent's attributes.

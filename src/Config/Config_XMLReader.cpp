@@ -86,6 +86,11 @@ void Config_XMLReader::processNode(xmlNodePtr theNode)
   }
 }
 
+void Config_XMLReader::cleanup(xmlNodePtr)
+{
+  // do nothing;
+}
+
 bool Config_XMLReader::processChildren(xmlNodePtr aNode)
 {
   return true;
@@ -126,6 +131,7 @@ void Config_XMLReader::readRecursively(xmlNodePtr theParent)
     if (processChildren(aNode)) {
       readRecursively(aNode);
     }
+    cleanup(aNode);
   }
 }
 

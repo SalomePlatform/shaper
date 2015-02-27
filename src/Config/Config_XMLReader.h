@@ -61,6 +61,12 @@ class Config_XMLReader
    * "selection_filter" nodes.
    */
   virtual void processNode(xmlNodePtr aNode);
+
+  /*!
+   * This method gives an ability to finalize processing of a node,
+   * when reader is about to leave the node (node and all it's children are processed)
+   */
+  virtual void cleanup(xmlNodePtr aNode);
   /*!
    * \brief Defines which nodes should be processed recursively. Virtual.
    * The default impl is to read all nodes.
