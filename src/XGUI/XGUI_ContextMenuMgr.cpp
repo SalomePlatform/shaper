@@ -7,6 +7,7 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_Selection.h"
+#include "XGUI_SalomeConnector.h"
 
 #include <AppElements_MainWindow.h>
 
@@ -48,7 +49,10 @@ void XGUI_ContextMenuMgr::createActions()
   addAction("DEACTIVATE_PART_CMD", aAction);
 
   aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
-  myWorkshop->mainWindow()->addAction(aAction);
+  QMainWindow* aDesktop = myWorkshop->mainWindow();
+  if (!aDesktop)
+    aDesktop = myWorkshop->salomeConnector()->desktop();
+  aDesktop->addAction(aAction);
   addAction("DELETE_CMD", aAction);
   aAction->setShortcut(Qt::Key_Delete);
   aAction->setShortcutContext(Qt::ApplicationShortcut);
