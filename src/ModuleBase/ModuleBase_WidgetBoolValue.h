@@ -35,8 +35,6 @@ Q_OBJECT
 
   virtual QList<QWidget*> getControls() const;
 
-  QWidget* getControl() const;
-
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success

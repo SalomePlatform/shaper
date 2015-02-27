@@ -5,10 +5,11 @@
 Config_AttributeMessage::Config_AttributeMessage(const Events_ID theId, const void* theParent)
     : Events_Message(theId, theParent)
 {
-  myAttributeId = ""; // Attribute unique id
-  myFeatureId = ""; // Feature unique id
+  myAttributeId = std::string(); // Attribute unique id
+  myFeatureId = std::string(); // Feature unique id
   myIsObligatory = true;
   myIsConcealment = false;
+  myCaseId = std::string();
 }
 
 Config_AttributeMessage::~Config_AttributeMessage()
@@ -54,4 +55,14 @@ bool Config_AttributeMessage::isObligatory() const
 void Config_AttributeMessage::setObligatory(bool theObligatory)
 {
   this->myIsObligatory = theObligatory;
+}
+
+const std::string& Config_AttributeMessage::caseId() const
+{
+  return myCaseId;
+}
+
+void Config_AttributeMessage::setCaseId(const std::string& theId)
+{
+  this->myCaseId = theId;
 }

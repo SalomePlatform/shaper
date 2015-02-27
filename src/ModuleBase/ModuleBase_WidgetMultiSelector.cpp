@@ -41,29 +41,28 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
     : ModuleBase_ModelWidget(theParent, theData, theParentId),
       myWorkshop(theWorkshop), myIsActive(false)
 {
-  myMainWidget = new QWidget(theParent);
-  QGridLayout* aMainLay = new QGridLayout(myMainWidget);
+  QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
 
-  QLabel* aTypeLabel = new QLabel(tr("Type"), myMainWidget);
+  QLabel* aTypeLabel = new QLabel(tr("Type"), this);
   aMainLay->addWidget(aTypeLabel, 0, 0);
 
-  myTypeCombo = new QComboBox(myMainWidget);
+  myTypeCombo = new QComboBox(this);
   // There is no sence to paramerize list of types while we can not parametrize selection mode
   QString aTypesStr("Vertices Edges Faces Solids");
   QStringList aShapeTypes = aTypesStr.split(' ');
   myTypeCombo->addItems(aShapeTypes);
   aMainLay->addWidget(myTypeCombo, 0, 1);
 
-  QLabel* aListLabel = new QLabel(tr("Selected objects:"), myMainWidget);
+  QLabel* aListLabel = new QLabel(tr("Selected objects:"), this);
   aMainLay->addWidget(aListLabel, 1, 0, 1, -1);
 
-  myListControl = new QListWidget(myMainWidget);
+  myListControl = new QListWidget(this);
   aMainLay->addWidget(myListControl, 2, 0, 2, -1);
   aMainLay->setRowStretch(2, 1);
-  aMainLay->addWidget(new QLabel(myMainWidget));
+  aMainLay->addWidget(new QLabel(this)); //FIXME(sbh)???
   aMainLay->setRowMinimumHeight(3, 20);
-  myMainWidget->setLayout(aMainLay);
+  this->setLayout(aMainLay);
   connect(myTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectionTypeChanged()));
 
   myCopyAction = new QAction(QIcon(":pictures/copy.png"), tr("Copy"), this);
@@ -133,12 +132,6 @@ bool ModuleBase_WidgetMultiSelector::restoreValue()
     return true;
   }
   return false;
-}
-
-//********************************************************************
-QWidget* ModuleBase_WidgetMultiSelector::getControl() const
-{
-  return myMainWidget;
 }
 
 //********************************************************************

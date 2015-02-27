@@ -77,13 +77,6 @@ Q_OBJECT
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return true; }
 
-  /// Returns the internal parent wiget control, that can be shown anywhere
-  /// \returns the widget
-  QWidget* getControl() const
-  {
-    return myContainer;
-  }
-
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
@@ -158,10 +151,6 @@ Q_OBJECT
 
   //----------- Class members -------------
  protected:
-
-   /// Container of the widget's control
-  QWidget* myContainer;
-
   /// Label of the widget
   QLabel* myLabel;
 

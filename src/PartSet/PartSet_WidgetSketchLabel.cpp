@@ -16,6 +16,7 @@
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_Tools.h>
 
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomDataAPI_Point.h>
@@ -37,12 +38,15 @@
 #include <QLabel>
 #include <QTimer>
 #include <QApplication>
+#include <QVBoxLayout>
 
 
 PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
                                                      const Config_WidgetAPI* theData,
                                                      const std::string& theParentId)
-    : ModuleBase_ModelWidget(theParent, theData, theParentId), myPreviewDisplayed(false)
+    : ModuleBase_ModelWidget(theParent, theData, theParentId),
+      myPreviewDisplayed(false),
+      myWorkshop(NULL)
 {
   myText = QString::fromStdString(theData->getProperty("title"));
   myLabel = new QLabel("", theParent);
@@ -54,6 +58,11 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   mySelectionTimer = new QTimer(this);
   connect(mySelectionTimer, SIGNAL(timeout()), SLOT(setSketchingMode()));
   mySelectionTimer->setSingleShot(true);
+
+  QVBoxLayout* aLayout = new QVBoxLayout(this);
+  ModuleBase_Tools::zeroMargins(aLayout);
+  aLayout->addWidget(myLabel);
+  setLayout(aLayout);
 }
 
 PartSet_WidgetSketchLabel::~PartSet_WidgetSketchLabel()
@@ -64,11 +73,6 @@ PartSet_WidgetSketchLabel::~PartSet_WidgetSketchLabel()
 QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
 {
   return QList<QWidget*>();
-}
-
-QWidget* PartSet_WidgetSketchLabel::getControl() const
-{
-  return myLabel;
 }
 
 void PartSet_WidgetSketchLabel::onPlaneSelected()

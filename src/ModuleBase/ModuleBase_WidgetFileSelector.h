@@ -48,8 +48,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFileSelector : public ModuleBase_ModelW
 
   virtual bool restoreValue();
 
-  QWidget* getControl() const;
-
   virtual QList<QWidget*> getControls() const;
 
   /// Returns true if a file on the current path in the line edit
@@ -78,9 +76,6 @@ protected:
  private:
    /// A control for path input
   QLineEdit* myPathField;
-
-  /// Container
-  QWidget* myMainWidget;
 
   /// A title of open file dialog box
   QString myTitle;

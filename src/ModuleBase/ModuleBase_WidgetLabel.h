@@ -40,8 +40,6 @@ Q_OBJECT
 
   virtual QList<QWidget*> getControls() const;
 
-  QWidget* getControl() const;
-
   /// This control doesn't accept focus
   virtual bool focusTo() { return false; }
 

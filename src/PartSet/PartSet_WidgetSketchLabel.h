@@ -57,8 +57,6 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-  QWidget* getControl() const;
-
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 

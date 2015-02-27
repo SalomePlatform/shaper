@@ -40,8 +40,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetLineEdit : public ModuleBase_ModelWidge
 
   virtual bool restoreValue();
 
-  QWidget* getControl() const;
-
   virtual QList<QWidget*> getControls() const;
 
  public slots:
@@ -56,9 +54,6 @@ protected:
 private:
    /// A line edit control
   QLineEdit* myLineEdit;
-
-  /// A container widget
-  QWidget* myMainWidget;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

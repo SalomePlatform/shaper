@@ -43,13 +43,6 @@ Q_OBJECT
 
   virtual bool focusTo();
 
-  /// Returns the internal parent wiget control, that can be shown anywhere
-  /// \returns the widget
-  QWidget* getControl() const
-  {
-    return myContainer;
-  }
-
   /// Returns list of widget controls
   /// \return a controls list
   virtual QList<QWidget*> getControls() const;
@@ -64,9 +57,6 @@ private slots:
   void onCurrentIndexChanged(int theIndex);
 
 private:
-  /// Container widget
-  QWidget* myContainer;
-
   /// The label
   QLabel* myLabel;
 

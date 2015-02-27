@@ -55,6 +55,7 @@
 #include <QEvent>
 #include <QDockWidget>
 #include <QApplication>
+#include <QFormLayout>
 
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Shape.hxx>
@@ -95,25 +96,23 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
     : ModuleBase_ModelWidget(theParent, theData, theParentId),
       myWorkshop(theWorkshop), myIsActive(false)
 {
-  myContainer = new QWidget(theParent);
-  QHBoxLayout* aLayout = new QHBoxLayout(myContainer);
+  QFormLayout* aLayout = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aLayout);
 
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
-  myLabel = new QLabel(aLabelText, myContainer);
+  myLabel = new QLabel(aLabelText, this);
   if (!aLabelIcon.isEmpty())
     myLabel->setPixmap(QPixmap(aLabelIcon));
 
-  aLayout->addWidget(myLabel);
 
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());
-  myTextLine = new QLineEdit(myContainer);
+  myTextLine = new QLineEdit(this);
   myTextLine->setReadOnly(true);
   myTextLine->setToolTip(aToolTip);
   myTextLine->installEventFilter(this);
 
-  aLayout->addWidget(myTextLine, 1);
+  aLayout->addRow(myLabel, myTextLine);
 
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
@@ -466,7 +465,7 @@ void ModuleBase_WidgetShapeSelector::selectionFilters(SelectMgr_ListOfFilter& th
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::raisePanel() const
 {
-  QWidget* aParent = myContainer->parentWidget();
+  QWidget* aParent = this->parentWidget();
   QWidget* aLastPanel = 0;
   while (!aParent->inherits("QDockWidget")) {
     aLastPanel = aParent;

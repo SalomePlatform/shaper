@@ -9,6 +9,8 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
 
+#include <ModuleBase_Tools.h>
+
 #include <QLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -101,7 +103,7 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
     : QWidget(theParent)
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);
-  aLayout->setContentsMargins(0, 0, 0, 0);
+  ModuleBase_Tools::zeroMargins(aLayout);
   aLayout->setSpacing(0);
 
   QFrame* aLabelWgt = new QFrame(this);
@@ -112,7 +114,7 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent)
 
   aLayout->addWidget(aLabelWgt);
   QHBoxLayout* aLabelLay = new QHBoxLayout(aLabelWgt);
-  aLabelLay->setContentsMargins(0, 0, 0, 0);
+  ModuleBase_Tools::zeroMargins(aLabelLay);
   aLabelLay->setSpacing(0);
 
   QLabel* aLbl = new QLabel(aLabelWgt);

@@ -19,7 +19,7 @@
 
 class XGUI_ActionsMgr;
 class QKeyEvent;
-class QVBoxLayout;
+class QGridLayout;
 
 /// Internal name of property panel widget
 const static char* PROP_PANEL = "property_panel_dock";
@@ -106,7 +106,7 @@ Q_OBJECT
  private:
   QWidget* myCustomWidget;
   QList<ModuleBase_ModelWidget*> myWidgets;
-  QVBoxLayout* myMainLayout;
+  QGridLayout* myMainLayout;
 
   /// Currently active widget
   ModuleBase_ModelWidget* myActiveWidget;

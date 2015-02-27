@@ -22,6 +22,7 @@ class Config_AttributeMessage : public Events_Message
   std::string myFeatureId; ///< Attribute's feature's unique id
   bool myIsObligatory; ///< Required to be set by user, else it's feature is invalid.
   bool myIsConcealment; ///< If true, conceals features used as input
+  std::string myCaseId; ///< Attribute's case's id, if it placed inside a paged containers
 
  public:
   /// Same event as Config_FeatureMessage::MODEL_EVENT()
@@ -45,15 +46,20 @@ class Config_AttributeMessage : public Events_Message
   CONFIG_EXPORT bool isObligatory() const;
   /// Returns true if attribute should conceal input features
   CONFIG_EXPORT bool isConcealment() const;
+  /// Returns id of a case which contain the attribute
+  CONFIG_EXPORT const std::string& caseId() const;
 
   /// Set attribute's unique id
   CONFIG_EXPORT void setAttributeId(const std::string& theId);
   /// Set attribute's feature's unique id
   CONFIG_EXPORT void setFeatureId(const std::string& id);
-  /// Returns attribute's concealment state
+  /// Set attribute's concealment state
   CONFIG_EXPORT void setConcealment(bool isConcealment);
-  /// Returns attribute's obligatory state
+  /// Set attribute's obligatory state
   CONFIG_EXPORT void setObligatory(bool isObligatory);
+  /// Set attribute's case
+  CONFIG_EXPORT void setCaseId(const std::string& id);
+
 };
 
 #endif // ATTRIBUTE_MESSAGE_H

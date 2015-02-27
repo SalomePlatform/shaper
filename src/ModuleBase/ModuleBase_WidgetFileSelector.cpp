@@ -37,15 +37,14 @@ ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
   myTitle = QString::fromStdString(theData->getProperty("title"));
   myDefaultPath = QString::fromStdString(theData->getProperty("path"));
 
-  myMainWidget = new QWidget(theParent);
-  QGridLayout* aMainLay = new QGridLayout(myMainWidget);
+  QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
-  QLabel* aTitleLabel = new QLabel(myTitle, myMainWidget);
+  QLabel* aTitleLabel = new QLabel(myTitle, this);
   aTitleLabel->setIndent(1);
   aMainLay->addWidget(aTitleLabel, 0, 0);
-  myPathField = new QLineEdit(myMainWidget);
+  myPathField = new QLineEdit(this);
   aMainLay->addWidget(myPathField, 1, 0);
-  QPushButton* aSelectPathBtn = new QPushButton("...", myMainWidget);
+  QPushButton* aSelectPathBtn = new QPushButton("...", this);
   aSelectPathBtn->setToolTip(tr("Select file..."));
   aSelectPathBtn->setMaximumWidth(20);
   aSelectPathBtn->setMaximumHeight(20);
@@ -53,7 +52,7 @@ ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
   aMainLay->setColumnStretch(0, 1);
   myPathField->setMinimumHeight(20);
   aMainLay->setHorizontalSpacing(1);
-  myMainWidget->setLayout(aMainLay);
+  this->setLayout(aMainLay);
 
   connect(myPathField, SIGNAL(textChanged(const QString&)),
           this,        SLOT(onPathChanged()));
@@ -93,15 +92,10 @@ bool ModuleBase_WidgetFileSelector::restoreValue()
   return true;
 }
 
-QWidget* ModuleBase_WidgetFileSelector::getControl() const
-{
-  return myMainWidget;
-}
-
 QList<QWidget*> ModuleBase_WidgetFileSelector::getControls() const
 {
   QList<QWidget*> result;
-  //QPushButton * aButton = myMainWidget->findChild<QPushButton *>();
+  //QPushButton * aButton = this->findChild<QPushButton *>();
   //result << aButton;
   result << myPathField;
   return result;
@@ -117,7 +111,7 @@ bool ModuleBase_WidgetFileSelector::isCurrentPathValid()
 void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
 {
   QString aFilter = formatsString();
-  QString aFileName = QFileDialog::getOpenFileName(myMainWidget, myTitle, myDefaultPath, aFilter);
+  QString aFileName = QFileDialog::getOpenFileName(this, myTitle, myDefaultPath, aFilter);
   if (!aFileName.isEmpty()) {
     myPathField->setText(aFileName);
   }

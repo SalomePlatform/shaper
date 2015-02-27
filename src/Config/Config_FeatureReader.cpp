@@ -61,26 +61,49 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
   } else if (isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL)) {
     storeAttribute(theNode, _ID);
     storeAttribute(theNode, WORKBENCH_DOC);
-  } else if (myIsProcessWidgets && isWidgetNode(theNode)) {
-    std::shared_ptr<Config_AttributeMessage> aMessage(new Config_AttributeMessage(aMenuItemEvent, this));
-    aMessage->setFeatureId(restoreAttribute(NODE_FEATURE, _ID));
-    std::string anAttributeID = getProperty(theNode, _ID);
-    if (!anAttributeID.empty()) {
-      aMessage->setAttributeId(anAttributeID);
-      aMessage->setObligatory(getBooleanAttribute(theNode, ATTR_OBLIGATORY, true));
-      aMessage->setConcealment(getBooleanAttribute(theNode, ATTR_CONCEALMENT, false));
-      Events_Loop::loop()->send(aMessage);
+  } else if (myIsProcessWidgets) {
+    // widgets, like shape_selector or containers, like toolbox
+    if (isAttributeNode(theNode)) {
+      std::shared_ptr<Config_AttributeMessage> aMessage(new Config_AttributeMessage(aMenuItemEvent, this));
+      aMessage->setFeatureId(restoreAttribute(NODE_FEATURE, _ID));
+      std::string anAttributeID = getProperty(theNode, _ID);
+      if (!anAttributeID.empty()) {
+        aMessage->setAttributeId(anAttributeID);
+        aMessage->setObligatory(getBooleanAttribute(theNode, ATTR_OBLIGATORY, true));
+        aMessage->setConcealment(getBooleanAttribute(theNode, ATTR_CONCEALMENT, false));
+        // nested "paged" widgets are not allowed, this issue may be resolved here:
+        if (hasParent(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, NULL)) {
+          const char* kWdgCase = hasParent(theNode, WDG_SWITCH_CASE, NULL)
+                                 ? WDG_SWITCH_CASE
+                                 : WDG_TOOLBOX_BOX;
+          aMessage->setCaseId(restoreAttribute(kWdgCase, _ID));
+        }
+        Events_Loop::loop()->send(aMessage);
+      }
+    // container pages, like "case" or "box"
+    } else if (isCaseNode(theNode)) {
+      storeAttribute(theNode, _ID); // save case:caseId (or box:boxId)
     }
   }
   //Process SOURCE, VALIDATOR nodes.
   Config_XMLReader::processNode(theNode);
 }
 
+void Config_FeatureReader::cleanup(xmlNodePtr theNode)
+{
+  if (isCaseNode(theNode)) {
+    // cleanup id of cases when leave case node
+    cleanupAttribute(theNode, _ID);
+  }
+}
+
 bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
 {
   bool result = isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL);
   if(!result && myIsProcessWidgets) {
-    result = isNode(theNode, NODE_FEATURE, NULL);
+    result = isNode(theNode, NODE_FEATURE, 
+                             WDG_TOOLBOX, WDG_TOOLBOX_BOX,
+                             WDG_SWITCH, WDG_SWITCH_CASE, NULL);
   }
   return result;
 }
@@ -138,3 +161,23 @@ std::string Config_FeatureReader::restoreAttribute(const char* theNodeName,
   }
   return result;
 }
+
+bool Config_FeatureReader::cleanupAttribute(xmlNodePtr theNode,
+                                            const char* theNodeAttribute)
+{
+  return cleanupAttribute(getNodeName(theNode).c_str(), theNodeAttribute);
+}
+
+bool Config_FeatureReader::cleanupAttribute(const char* theNodeName,
+                                            const char* theNodeAttribute)
+{
+  std::string aKey = std::string(theNodeName) + ":" + std::string(theNodeAttribute);
+  bool result = false;
+  std::map<std::string, std::string>::iterator anEntry = myParentAttributes.find(aKey);
+  if( anEntry != myParentAttributes.end()) {
+    myParentAttributes.erase(anEntry);
+    result = true;
+  }
+  return result;
+}
+

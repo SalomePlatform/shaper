@@ -18,7 +18,7 @@
 #include <ModelAPI_Events.h>
 
 #include <QWidget>
-#include <QLayout>
+#include <QFormLayout>
 #include <QLabel>
 #include <QEvent>
 #include <QTimer>
@@ -37,18 +37,16 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
                                                            const std::string& theParentId)
     : ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
-  myContainer = new QWidget(theParent);
-  QHBoxLayout* aControlLay = new QHBoxLayout(myContainer);
+  QFormLayout* aControlLay = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aControlLay);
 
   QString aLabelText = QString::fromStdString(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
-  myLabel = new QLabel(aLabelText, myContainer);
+  myLabel = new QLabel(aLabelText, this);
   if (!aLabelIcon.isEmpty())
     myLabel->setPixmap(QPixmap(aLabelIcon));
-  aControlLay->addWidget(myLabel);
 
-  mySpinBox = new ModuleBase_DoubleSpinBox(myContainer);
+  mySpinBox = new ModuleBase_DoubleSpinBox(this);
   QString anObjName = QString::fromStdString(attributeID());
   mySpinBox->setObjectName(anObjName);
 
@@ -87,9 +85,7 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
   QString aTTip = QString::fromStdString(theData->widgetTooltip());
   mySpinBox->setToolTip(aTTip);
 
-  aControlLay->addWidget(mySpinBox);
-  aControlLay->setStretch(1, 1);
-
+  aControlLay->addRow(myLabel, mySpinBox);
   connect(mySpinBox, SIGNAL(valueChanged(double)), this, SIGNAL(valuesChanged()));
 }
 

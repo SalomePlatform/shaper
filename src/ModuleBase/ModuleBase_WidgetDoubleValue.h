@@ -48,13 +48,6 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
-  /// Returns the internal parent wiget control, that can be shown anywhere
-  /// \returns the widget
-  QWidget* getControl() const
-  {
-    return myContainer;
-  }
-
  public slots:
  // Delayed value chnged: when user starts typing something,
  // it gives him a 0,5 second to finish typing, when sends valueChnaged() signal
@@ -66,9 +59,6 @@ protected:
   virtual bool storeValueCustom() const;
 
 protected:
-   /// Container for thw widget controls
-  QWidget* myContainer;
-
   /// Label of the widget
   QLabel* myLabel;
 

@@ -70,6 +70,7 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
     return;
 
   QVBoxLayout* aWidgetLay = new QVBoxLayout(theParent);
+  bool isStretchLayout = false;
   do {  //Iterate over each node
     std::string aWdgType = myWidgetApi->widgetType();
     //Create a widget (doublevalue, groupbox, toolbox, etc.
@@ -96,8 +97,8 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
       do {
         QString aPageName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
         QWidget* aPage = new QWidget(aWidget);
-        ModuleBase_Tools::adjustMargins(aPage);
         createWidget(aPage);
+        ModuleBase_Tools::adjustMargins(aPage);
         if (aWdgType == WDG_SWITCH) {
           ModuleBase_WidgetSwitch* aSwitch = qobject_cast<ModuleBase_WidgetSwitch*>(aWidget);
           aSwitch->addPage(aPage, aPageName);
@@ -105,21 +106,36 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
           QToolBox* aToolbox = qobject_cast<QToolBox*>(aWidget);
           aToolbox->addItem(aPage, aPageName);
         }
+
       } while (myWidgetApi->toNextWidget());
     }
+    if (aWidget && !isStretchLayout) {
+      isStretchLayout = !hasExpandingControls(aWidget);
+    }
   } while (myWidgetApi->toNextWidget());
+  if (isStretchLayout) {
+    aWidgetLay->addStretch(1);
+  }
   theParent->setLayout(aWidgetLay);
 }
 
-
-QWidget* ModuleBase_WidgetFactory::labelControl(QWidget* theParent)
+bool ModuleBase_WidgetFactory::hasExpandingControls(QWidget* theParent)
 {
-  ModuleBase_WidgetLabel* aWgt =
-      new ModuleBase_WidgetLabel(theParent, myWidgetApi, myParentId);
-  myModelWidgets.append(aWgt);
-  return aWgt->getControl();
+  bool result = false;
+  QList<QWidget *> aListToCheck;
+  aListToCheck << theParent;
+  ModuleBase_ModelWidget* aModelWidget = qobject_cast<ModuleBase_ModelWidget*>(theParent);
+  if(aModelWidget) {
+    aListToCheck << aModelWidget->getControls();
+  }
+  foreach(QWidget* eachWidget, aListToCheck) {
+    QSizePolicy::Policy aVPolicy = eachWidget->sizePolicy().verticalPolicy();
+    if(aVPolicy & QSizePolicy::ExpandFlag) {
+      result = true;
+    }
+  }
+  return result;
 }
-
 
 QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType,
                                                       QWidget* theParent)
@@ -136,12 +152,6 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
 
   } else if (theType == WDG_BOOLVALUE) {
     result = booleanControl(theParent);
-
-  //} else if (theType == WDG_FEATURE_SELECTOR) {
-  //  result = featureSelectorControl(theParent);
-
-  //} else if (theType == WDG_FEATURE_OR_ATTRIBUTE_SELECTOR) {
-  //  result = featureOrAttributeSelectorControl(theParent);
 
   } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
     result = doubleValueEditor(theParent);
@@ -179,9 +189,21 @@ QWidget* ModuleBase_WidgetFactory::createContainer(const std::string& theType, Q
     result = aGroupBox;
   } else if (theType == WDG_TOOLBOX) {
     result = new QToolBox(theParent);
+    // Dark-grey rounded tabs with button-like border #and bold font
+    QString css = "QToolBox::tab{background-color:#c8c8c8;"
+                                "border-radius:5px;"
+                                "border:1px inset;"
+                                //"font-weight:700;"
+                                "border-color:#fff #505050 #505050 #fff;}";
+    result->setStyleSheet(css);
+    // default vertical size policy is preferred
+    QSizePolicy aSizePolicy = result->sizePolicy();
+    aSizePolicy.setVerticalPolicy(QSizePolicy::MinimumExpanding);
+    result->setSizePolicy(aSizePolicy);
   } else if (theType == WDG_SWITCH) {
     result = new ModuleBase_WidgetSwitch(theParent);
   } else if (theType == WDG_TOOLBOX_BOX || theType == WDG_SWITCH_CASE) {
+    // Do nothing for "box" and "case"
     result = NULL;
   }
 #ifdef _DEBUG
@@ -190,12 +212,20 @@ QWidget* ModuleBase_WidgetFactory::createContainer(const std::string& theType, Q
   return result;
 }
 
+QWidget* ModuleBase_WidgetFactory::labelControl(QWidget* theParent)
+{
+  ModuleBase_WidgetLabel* aWgt =
+      new ModuleBase_WidgetLabel(theParent, myWidgetApi, myParentId);
+  myModelWidgets.append(aWgt);
+  return aWgt;
+}
+
 QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
 {
   ModuleBase_WidgetDoubleValue* aDblWgt =
       new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aDblWgt);
-  return aDblWgt->getControl();
+  return aDblWgt;
 }
 
 QWidget* ModuleBase_WidgetFactory::doubleValueEditor(QWidget* theParent)
@@ -203,7 +233,7 @@ QWidget* ModuleBase_WidgetFactory::doubleValueEditor(QWidget* theParent)
   ModuleBase_WidgetEditor* aWidget =
       new ModuleBase_WidgetEditor(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aWidget);
-  return aWidget->getControl();
+  return aWidget;
 }
 
 QWidget* ModuleBase_WidgetFactory::shapeSelectorControl(QWidget* theParent)
@@ -211,7 +241,7 @@ QWidget* ModuleBase_WidgetFactory::shapeSelectorControl(QWidget* theParent)
   ModuleBase_WidgetShapeSelector* aSelector =
       new ModuleBase_WidgetShapeSelector(theParent, myWorkshop, myWidgetApi, myParentId);
   myModelWidgets.append(aSelector);
-  return aSelector->getControl();
+  return aSelector;
 }
 
 QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
@@ -219,7 +249,7 @@ QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
   ModuleBase_WidgetBoolValue* aBoolWgt =
       new ModuleBase_WidgetBoolValue(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aBoolWgt);
-  return aBoolWgt->getControl();
+  return aBoolWgt;
 }
 
 QWidget* ModuleBase_WidgetFactory::fileSelectorControl(QWidget* theParent)
@@ -227,7 +257,7 @@ QWidget* ModuleBase_WidgetFactory::fileSelectorControl(QWidget* theParent)
   ModuleBase_WidgetFileSelector* aFileSelectorWgt =
       new ModuleBase_WidgetFileSelector(theParent, myWidgetApi, myParentId);
   myModelWidgets.append(aFileSelectorWgt);
-  return aFileSelectorWgt->getControl();
+  return aFileSelectorWgt;
 }
 
 QWidget* ModuleBase_WidgetFactory::choiceControl(QWidget* theParent)
@@ -235,7 +265,7 @@ QWidget* ModuleBase_WidgetFactory::choiceControl(QWidget* theParent)
   ModuleBase_WidgetChoice* aChoiceWgt =
       new ModuleBase_WidgetChoice(theParent, myWidgetApi,myParentId);
   myModelWidgets.append(aChoiceWgt);
-  return aChoiceWgt->getControl();
+  return aChoiceWgt;
 }
 
 QWidget* ModuleBase_WidgetFactory::lineEditControl(QWidget* theParent)
@@ -243,7 +273,7 @@ QWidget* ModuleBase_WidgetFactory::lineEditControl(QWidget* theParent)
   ModuleBase_WidgetLineEdit* aLineEditWgt =
       new ModuleBase_WidgetLineEdit(theParent, myWidgetApi,myParentId);
   myModelWidgets.append(aLineEditWgt);
-  return aLineEditWgt->getControl();
+  return aLineEditWgt;
 }
 
 QWidget* ModuleBase_WidgetFactory::multiSelectorControl(QWidget* theParent)
@@ -251,7 +281,7 @@ QWidget* ModuleBase_WidgetFactory::multiSelectorControl(QWidget* theParent)
   ModuleBase_WidgetMultiSelector* aMultiselectorWgt =
       new ModuleBase_WidgetMultiSelector(theParent, myWorkshop, myWidgetApi,myParentId);
   myModelWidgets.append(aMultiselectorWgt);
-  return aMultiselectorWgt->getControl();
+  return aMultiselectorWgt;
 }
 
 QString ModuleBase_WidgetFactory::qs(const std::string& theStdString)

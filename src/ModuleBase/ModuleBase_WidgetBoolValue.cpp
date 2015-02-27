@@ -39,11 +39,6 @@ ModuleBase_WidgetBoolValue::~ModuleBase_WidgetBoolValue()
 {
 }
 
-QWidget* ModuleBase_WidgetBoolValue::getControl() const
-{
-  return myCheckBox;
-}
-
 bool ModuleBase_WidgetBoolValue::storeValueCustom() const
 {
   DataPtr aData = myFeature->data();

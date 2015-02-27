@@ -12,7 +12,7 @@
 
 #include <ModelAPI_Feature.h>
 
-#include <QObject>
+#include <QWidget>
 
 #include <memory>
 
@@ -28,7 +28,7 @@ class QKeyEvent;
  * Every widget are able to save/restore data from the model and/or to contain other widgets.
  *
  */
-class MODULEBASE_EXPORT ModuleBase_ModelWidget : public QObject
+class MODULEBASE_EXPORT ModuleBase_ModelWidget : public QWidget
 {
 Q_OBJECT
  public:
@@ -88,10 +88,6 @@ Q_OBJECT
 
   /// The methiod called when widget is deactivated
   virtual void deactivate() {}
-
-  /// Returns the internal parent wiget control, that can be shown anywhere
-  /// \returns the widget
-  virtual QWidget* getControl() const = 0;
 
   /// Returns list of widget controls
   /// \return a control list
