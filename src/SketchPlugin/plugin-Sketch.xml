@@ -103,12 +103,14 @@
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
             label="First line" tooltip="Select a line" shape_types="edge">
             <selection_filter id="EdgeFilter" parameters="line"/>
+          <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityB"/>
         </sketch_constraint_shape_selector>
         
         <sketch_constraint_shape_selector id="ConstraintEntityB" label="Last line" tooltip="Select a line" 
             shape_types="edge">
             <selection_filter id="EdgeFilter" parameters="line"/>
             <validator id="SketchPlugin_DifferentObjects"/>
+            <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityA"/>
         </sketch_constraint_shape_selector>
         
         <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
@@ -119,14 +121,16 @@
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
             label="First line" tooltip="Select an line" 
             shape_types="edge">
-      <selection_filter id="EdgeFilter" parameters="line"/>
+          <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityB"/>
+          <selection_filter id="EdgeFilter" parameters="line"/>
     </sketch_constraint_shape_selector>
         
         <sketch_constraint_shape_selector id="ConstraintEntityB" 
             label="Last line" tooltip="Select an line" 
             shape_types="edge">
             <validator id="SketchPlugin_DifferentObjects"/>
-      <selection_filter id="EdgeFilter" parameters="line"/>
+          <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityA"/>
+          <selection_filter id="EdgeFilter" parameters="line"/>
     </sketch_constraint_shape_selector>
         <validator id="PartSet_PerpendicularValidator"/>
       </feature>

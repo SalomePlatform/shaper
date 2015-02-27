@@ -535,7 +535,7 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
       if (aShapeValidator) {
         DataPtr aData = myFeature->data();
         AttributeSelectionPtr aSelectAttr = aData->selection(attributeID());
-        if (!aShapeValidator->isValid(myFeature, aSelectAttr, theShape)) {
+        if (!aShapeValidator->isValid(myFeature, *aArgs, theObj, aSelectAttr, theShape)) {
           return false;
         }
       }
