@@ -405,7 +405,7 @@ void Model_Document::abortOperation()
     subDoc(*aSubIter)->abortOperation();
 }
 
-bool Model_Document::isOperation()
+bool Model_Document::isOperation() const
 {
   // operation is opened for all documents: no need to check subs
   return myDoc->HasOpenCommand() == Standard_True ;
@@ -495,12 +495,15 @@ void Model_Document::redo()
 std::list<std::string> Model_Document::undoList() const
 {
   std::list<std::string> aResult;
+  // the number of skipped current operations (on undo they will be aborted)
+  int aSkipCurrent = isOperation() ? 1 : 0;
   std::list<Transaction>::const_reverse_iterator aTrIter = myTransactions.crbegin();
   int aNumUndo = myTransactions.size();
   if (!myNestedNum.empty())
     aNumUndo = *myNestedNum.rbegin();
   for( ; aNumUndo > 0; aTrIter++, aNumUndo--) {
-    aResult.push_back(aTrIter->myId);
+    if (aSkipCurrent == 0) aResult.push_back(aTrIter->myId);
+    else aSkipCurrent--;
   }
   return aResult;
 }
