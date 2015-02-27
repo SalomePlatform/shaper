@@ -7,6 +7,7 @@
 #include <PartSet_WidgetPoint2d.h>
 #include <PartSet_WidgetPoint2dDistance.h>
 #include <PartSet_WidgetShapeSelector.h>
+#include <PartSet_WidgetConstraintShapeSelector.h>
 #include <PartSet_SketcherMgr.h>
 
 #include <ModuleBase_Operation.h>

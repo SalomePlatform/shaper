@@ -125,22 +125,3 @@ bool PartSet_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<Geom
   return true;
 }
 
-//*********************************************
-bool PartSet_WidgetConstraintShapeSelector::storeValueCustom() const
-{
-  FeaturePtr aFeature = ModelAPI_Feature::feature(mySelectedObject);
-  if (aFeature) {
-    std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
-            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-    if ((!aSPFeature) && (!myShape->isNull())) {
-      ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(myShape->impl<TopoDS_Shape>(),
-                                                                  mySelectedObject, mySketch);
-      if (aObj) {
-        PartSet_WidgetConstraintShapeSelector* that = (PartSet_WidgetConstraintShapeSelector*) this;
-        that->mySelectedObject = aObj;
-      } else 
-        return false;
-    }
-  }
-  return ModuleBase_WidgetShapeSelector::storeValueCustom();
-}

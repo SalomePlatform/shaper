@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
 	PartSet_WidgetSketchLabel.h
 	PartSet_Validators.h
 	PartSet_WidgetPoint2d.h
+	PartSet_WidgetConstraintShapeSelector.h
 	PartSet_WidgetPoint2dDistance.h
 	PartSet_WidgetShapeSelector.h
 	PartSet_Filters.h
@@ -23,6 +24,7 @@ SET(PROJECT_SOURCES
 	PartSet_Tools.cpp
 	PartSet_WidgetSketchLabel.cpp
 	PartSet_Validators.cpp
+	PartSet_WidgetConstraintShapeSelector.cpp
 	PartSet_WidgetPoint2d.cpp
 	PartSet_WidgetPoint2dDistance.cpp
 	PartSet_WidgetShapeSelector.cpp
