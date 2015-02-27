@@ -10,6 +10,7 @@
 
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_AttributeString.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
@@ -23,9 +24,13 @@ ConstructionPlugin_Axis::ConstructionPlugin_Axis()
 
 void ConstructionPlugin_Axis::initAttributes()
 {
+  data()->addAttribute(ConstructionPlugin_Axis::METHOD(),
+                       ModelAPI_AttributeString::type());
   data()->addAttribute(ConstructionPlugin_Axis::POINT_FIRST(),
                        ModelAPI_AttributeSelection::type());
   data()->addAttribute(ConstructionPlugin_Axis::POINT_SECOND(),
+                       ModelAPI_AttributeSelection::type());
+  data()->addAttribute(ConstructionPlugin_Axis::CYLINDRICAL_FACE(),
                        ModelAPI_AttributeSelection::type());
 }
 
