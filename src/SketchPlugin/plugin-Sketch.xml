@@ -52,7 +52,6 @@
               tooltip="Select point, line end point, line, center of circle or arc."
               shape_types="edge vertex">
           <selection_filter id="MultiFilter" parameters="line,vertex"/>
-          <validator id="SketchPlugin_ResultLine"/>
         </sketch_shape_selector>/>
         <sketch_shape_selector 
           id="ConstraintEntityB" 
