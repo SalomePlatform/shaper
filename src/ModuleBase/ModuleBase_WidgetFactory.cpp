@@ -27,6 +27,7 @@
 #include <ModuleBase_WidgetLineEdit.h>
 #include <ModuleBase_WidgetMultiSelector.h>
 #include <ModuleBase_WidgetLabel.h>
+#include <ModuleBase_WidgetToolbox.h>
 
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
@@ -96,6 +97,7 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
       myWidgetApi->toChildWidget();
       do {
         QString aPageName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
+        QString aCaseId = qs(myWidgetApi->getProperty(_ID));
         QWidget* aPage = new QWidget(aWidget);
         createWidget(aPage);
         ModuleBase_Tools::adjustMargins(aPage);
@@ -103,10 +105,9 @@ void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
           ModuleBase_WidgetSwitch* aSwitch = qobject_cast<ModuleBase_WidgetSwitch*>(aWidget);
           aSwitch->addPage(aPage, aPageName);
         } else if (aWdgType == WDG_TOOLBOX) {
-          QToolBox* aToolbox = qobject_cast<QToolBox*>(aWidget);
-          aToolbox->addItem(aPage, aPageName);
+          ModuleBase_WidgetToolbox* aToolbox = qobject_cast<ModuleBase_WidgetToolbox*>(aWidget);
+          aToolbox->addPage(aPage, aPageName, aCaseId);
         }
-
       } while (myWidgetApi->toNextWidget());
     }
     if (aWidget && !isStretchLayout) {
@@ -182,34 +183,25 @@ QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType
 
 QWidget* ModuleBase_WidgetFactory::createContainer(const std::string& theType, QWidget* theParent)
 {
-  QWidget* result = NULL;
+  QWidget* aResult = NULL;
   if (theType == WDG_GROUP || theType == WDG_CHECK_GROUP) {
     QGroupBox* aGroupBox = new QGroupBox(theParent);
     aGroupBox->setCheckable(theType == WDG_CHECK_GROUP);
-    result = aGroupBox;
+    aResult = aGroupBox;
   } else if (theType == WDG_TOOLBOX) {
-    result = new QToolBox(theParent);
-    // Dark-grey rounded tabs with button-like border #and bold font
-    QString css = "QToolBox::tab{background-color:#c8c8c8;"
-                                "border-radius:5px;"
-                                "border:1px inset;"
-                                //"font-weight:700;"
-                                "border-color:#fff #505050 #505050 #fff;}";
-    result->setStyleSheet(css);
-    // default vertical size policy is preferred
-    QSizePolicy aSizePolicy = result->sizePolicy();
-    aSizePolicy.setVerticalPolicy(QSizePolicy::MinimumExpanding);
-    result->setSizePolicy(aSizePolicy);
+    ModuleBase_WidgetToolbox* aWdg = new ModuleBase_WidgetToolbox(theParent, myWidgetApi, myParentId);
+    myModelWidgets.append(aWdg);
+    aResult = aWdg;
   } else if (theType == WDG_SWITCH) {
-    result = new ModuleBase_WidgetSwitch(theParent);
+    aResult = new ModuleBase_WidgetSwitch(theParent);
   } else if (theType == WDG_TOOLBOX_BOX || theType == WDG_SWITCH_CASE) {
     // Do nothing for "box" and "case"
-    result = NULL;
+    aResult = NULL;
   }
 #ifdef _DEBUG
   else {qDebug() << "ModuleBase_WidgetFactory::fillWidget: find bad container type";}
 #endif
-  return result;
+  return aResult;
 }
 
 QWidget* ModuleBase_WidgetFactory::labelControl(QWidget* theParent)

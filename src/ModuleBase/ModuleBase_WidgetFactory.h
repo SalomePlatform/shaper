@@ -58,7 +58,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
    /// Create a widget of container type
    /// \param theType a type
    /// \param theParent a parent widget
-  QWidget* createContainer(const std::string& theType, QWidget* theParent = NULL);
+  QWidget* createContainer(const std::string& theType, QWidget* theParent);
 
   /// Create label widget
   /// \param theParent a parent widget

@@ -1,7 +1,7 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <toolbox>
+  <toolbox id="creationMethod">
     <box id="AxisByPointsCase" title="By two points">
       <shape_selector id="firstPoint"
         label="First point"
@@ -20,7 +20,7 @@
       </shape_selector>
     </box>
     <box id="AxisByCylindricalFaceCase" title="As axis of cylindrical face">
-      <shape_selector id="main_object" 
+      <shape_selector id="cylindricalFace" 
         label="Main object" 
         icon=":icons/circle.png" 
         tooltip="Select a cylindrical object"

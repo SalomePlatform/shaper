@@ -76,12 +76,16 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
           const char* kWdgCase = hasParent(theNode, WDG_SWITCH_CASE, NULL)
                                  ? WDG_SWITCH_CASE
                                  : WDG_TOOLBOX_BOX;
+          const char* kWdgSwitch = hasParent(theNode, WDG_SWITCH_CASE, NULL)
+                                   ? WDG_SWITCH
+                                   : WDG_TOOLBOX;
           aMessage->setCaseId(restoreAttribute(kWdgCase, _ID));
+          aMessage->setSwitchId(restoreAttribute(kWdgSwitch, _ID));
         }
         Events_Loop::loop()->send(aMessage);
       }
     // container pages, like "case" or "box"
-    } else if (isCaseNode(theNode)) {
+    } else if (isNode(theNode, WDG_SWITCH, WDG_SWITCH_CASE, WDG_TOOLBOX, WDG_TOOLBOX_BOX, NULL)) {
       storeAttribute(theNode, _ID); // save case:caseId (or box:boxId)
     }
   }
@@ -91,7 +95,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
 
 void Config_FeatureReader::cleanup(xmlNodePtr theNode)
 {
-  if (isCaseNode(theNode)) {
+  if (isNode(theNode, WDG_SWITCH, WDG_SWITCH_CASE, WDG_TOOLBOX, WDG_TOOLBOX_BOX, NULL)) {
     // cleanup id of cases when leave case node
     cleanupAttribute(theNode, _ID);
   }

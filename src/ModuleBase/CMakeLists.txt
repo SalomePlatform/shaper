@@ -44,6 +44,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_IPrefMgr.h
 	ModuleBase_Preferences.h
 	ModuleBase_ActionInfo.h
+	ModuleBase_WidgetToolbox.h
 )
 
 SET(PROJECT_SOURCES
@@ -78,6 +79,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetLabel.cpp
 	ModuleBase_Preferences.cpp
 	ModuleBase_ActionInfo.cpp
+	ModuleBase_WidgetToolbox.cpp
 )
 
 SET(PROJECT_LIBRARIES

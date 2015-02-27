@@ -31,6 +31,13 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
     static const std::string CONSTRUCTION_AXIS_KIND("Axis");
     return CONSTRUCTION_AXIS_KIND;
   }
+
+  /// attribute name for first point
+  inline static const std::string& METHOD()
+  {
+    static const std::string METHOD_ATTR("creationMethod");
+    return METHOD_ATTR;
+  }
   /// attribute name for first point
   inline static const std::string& POINT_FIRST()
   {
@@ -42,6 +49,12 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
   {
     static const std::string POINT_ATTR_SECOND("secondPoint");
     return POINT_ATTR_SECOND;
+  }
+  /// attribute name for second point
+  inline static const std::string& CYLINDRICAL_FACE()
+  {
+    static const std::string CYLINDRICAL_FACE_ATTR("cylindricalFace");
+    return CYLINDRICAL_FACE_ATTR;
   }
   /// default color for an axis
   inline static const std::string& DEFAULT_COLOR()

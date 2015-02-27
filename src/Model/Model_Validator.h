@@ -37,6 +37,10 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   /// Stores the registered attributes that leads to the concealment of referenced objects in 
   /// data tree. Map from feature kind to set of attribute IDs.
   std::map<std::string, std::set<std::string> > myConcealed;
+  /// Stores the registered attributes must be checked only if the particular case is activated
+  /// Map from feature kind to map of attribute IDs to pair 
+  // (switchId (ID of the attribute) and case Id (possible values of the switch attribute))
+  std::map<std::string, std::map<std::string, std::pair<std::string, std::string> > > myCases;
 
  public:
   /// Registers the instance of the validator by the ID
@@ -87,6 +91,14 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
 
   /// Returns true that it was registered that attribute conceals the referenced result
   virtual bool isConcealed(std::string theFeature, std::string theAttribute);
+
+  /// register the case-attribute (\a myCases set definition)
+  virtual void registerCase(std::string theFeature, std::string theAttribute,
+    std::string theSwitchId, std::string theCaseId);
+
+  /// Returns true if the attribute must be checked (the case is selected)
+  virtual bool isCase(FeaturePtr theFeature, std::string theAttribute);
+
 
 protected:
   /// Adds the defualt validators that are usefull for all features.

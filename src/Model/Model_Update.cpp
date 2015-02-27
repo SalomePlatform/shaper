@@ -256,7 +256,8 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
                 std::shared_ptr<ModelAPI_AttributeSelection> aSel =
                   std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRefsIter);
                 if (!aSel->update()) { // this must be done on execution since it may be long operation
-                  if (!aFactory->isNotObligatory(theFeature->getKind(), theFeature->data()->id(aSel)))
+                  if (!aFactory->isNotObligatory(theFeature->getKind(), theFeature->data()->id(aSel)) &&
+                      aFactory->isCase(theFeature, theFeature->data()->id(aSel)))
                     aState = ModelAPI_StateInvalidArgument;
                 }
               }
@@ -270,7 +271,8 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
                   if (aSelAttr) {
                     if (!aSelAttr->update()) {
                       if (!aFactory->isNotObligatory(
-                          theFeature->getKind(), theFeature->data()->id(aSel)))
+                            theFeature->getKind(), theFeature->data()->id(aSel)) &&
+                          aFactory->isCase(theFeature, theFeature->data()->id(aSel)))
                         aState = ModelAPI_StateInvalidArgument;
                     }
                   }
