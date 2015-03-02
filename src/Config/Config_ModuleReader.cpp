@@ -184,16 +184,28 @@ void Config_ModuleReader::loadLibrary(const std::string& theLibName)
   if (aFileName.empty())
     return;
 
-#ifdef WIN32
+  #ifdef WIN32
   HINSTANCE aModLib = ::LoadLibrary(aFileName.c_str());
-#else
+  #else
   void* aModLib = dlopen( aFileName.c_str(), RTLD_LAZY | RTLD_GLOBAL );
-#endif
+  #endif
   if(!aModLib && theLibName != "DFBrowser") { // don't show error for internal debugging tool
     std::string anErrorMsg = "Failed to load " + aFileName;
-    #ifndef WIN32
+    #ifdef WIN32
+    DWORD   dwLastError = ::GetLastError();
+    LPSTR messageBuffer = NULL;
+    size_t size = ::FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                                 FORMAT_MESSAGE_FROM_SYSTEM | 
+                                 FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL, 
+                                 dwLastError, 
+                                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+                                 (LPSTR)&messageBuffer, 0, NULL);
+    anErrorMsg += ": " +  std::string(messageBuffer, size);
+    #else
     anErrorMsg += ": " + std::string(dlerror());
     #endif
+    std::cerr << anErrorMsg << std::endl;
     Events_Error::send(anErrorMsg);
   }
 }
