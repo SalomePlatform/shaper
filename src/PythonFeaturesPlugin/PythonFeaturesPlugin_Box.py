@@ -5,7 +5,7 @@ import extrusion
 import sketch
 
 
-class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
+class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_CompositeFeature):
 
     "Feature to create a box by drawing a sketch and extruding it"
 
@@ -46,17 +46,19 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
     def initAttributes(self):
         # C++ static methods (in example "type()" of the ModelAPI_AttributeDouble
         # should be called like this: moduleName.ClassName_staticMethod()
-        self.data().addAttribute(self.WIDTH_ID(), ModelAPI.ModelAPI_AttributeDouble_type())
-        self.data().addAttribute(self.LENGTH_ID(), ModelAPI.ModelAPI_AttributeDouble_type())
-        self.data().addAttribute(self.HEIGHT_ID(), ModelAPI.ModelAPI_AttributeDouble_type())
-        self.data().addAttribute(self.WIDTH_REF_ID(), ModelAPI.ModelAPI_AttributeReference_type())
-        self.data().addAttribute(self.LENGTH_REF_ID(), ModelAPI.ModelAPI_AttributeReference_type())
-        self.data().addAttribute(self.HEIGHT_REF_ID(), ModelAPI.ModelAPI_AttributeReference_type())
+        self.data().addAttribute(self.WIDTH_ID(), ModelAPI.ModelAPI_AttributeDouble_typeId())
+        self.data().addAttribute(self.LENGTH_ID(), ModelAPI.ModelAPI_AttributeDouble_typeId())
+        self.data().addAttribute(self.HEIGHT_ID(), ModelAPI.ModelAPI_AttributeDouble_typeId())
+        self.data().addAttribute(self.WIDTH_REF_ID(), ModelAPI.ModelAPI_AttributeReference_typeId())
+        self.data().addAttribute(self.LENGTH_REF_ID(), ModelAPI.ModelAPI_AttributeReference_typeId())
+        self.data().addAttribute(self.HEIGHT_REF_ID(), ModelAPI.ModelAPI_AttributeReference_typeId())
         aSession = ModelAPI.ModelAPI_Session.get()
         aSession.validators().registerNotObligatory(self.getKind(), self.WIDTH_REF_ID())
         aSession.validators().registerNotObligatory(self.getKind(), self.LENGTH_REF_ID())
         aSession.validators().registerNotObligatory(self.getKind(), self.HEIGHT_REF_ID())
         aSession.validators().registerConcealment(self.getKind(), self.HEIGHT_REF_ID())
+        self.mySketch = None # not yet initialized
+        self.myExtrusion = None # not yet initialized
 
     def execute(self):
         aWidth = self.real(self.WIDTH_ID()).value()
@@ -79,19 +81,25 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
                 aHeightFeature = aHeightResult.document().feature(aHeightResult)
                 aHeightFeature.real("extrusion_size").setValue(aHeight)
                 aResult = extrusion.getBody(aHeightFeature)
-        self.setResult(aResult)
+        # create a new result with copied shape from extrusion
+        aResultBody = self.document().createBody(self.data())
+        if not aResult is None:
+          aResultBody.store(aResult.shape())
+          self.setResult(aResultBody)
+        pass
 
     def makeBox(self, aWidth, aLength, aHeight):
         aSession = ModelAPI.ModelAPI_Session.get()
         aPart = aSession.activeDocument()
         # Starting the Sketch
         aSketch = sketch.addTo(aPart)
+        self.mySketch = sketch
         sketch.setXOYPlane(aSketch)
         # Creating the lines
-        l1 = sketch.addLine(10, 10, 10, 50, aSketch)
-        l2 = sketch.addLine(10, 50, 60, 60, aSketch)
-        l3 = sketch.addLine(60, 60, 50, 10, aSketch)
-        l4 = sketch.addLine(50, 10, 10, 10, aSketch)
+        l1 = sketch.addLine(10, 10, 10, 60, aSketch)
+        l2 = sketch.addLine(10, 60, 60, 60, aSketch)
+        l3 = sketch.addLine(60, 60, 60, 10, aSketch)
+        l4 = sketch.addLine(60, 10, 10, 10, aSketch)
         aSketch.execute()
         # Creating the constraints
         sketch.makeCoincident(sketch.getEndPoint(l1), sketch.getStartPoint(l2), aSketch)
@@ -108,12 +116,32 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
         builder = SketchResult(aSketch)
         # Creating a feature Extrusion
         aHeightFeature = extrusion.addNew(builder, aHeight, aPart)
+        self.myExtrusion = aHeightFeature
         # Store features...
         self.reference(self.WIDTH_REF_ID()).setValue(aWidthFeature)
         self.reference(self.LENGTH_REF_ID()).setValue(aLengthFeature)
         self.reference(self.HEIGHT_REF_ID()).setValue(aHeightFeature.firstResult())
         return aHeightFeature
 
+    def addFeature(self, theID):
+        pass
+
+    def numberOfSubs(self):
+        # extrusion and sketch
+        return 2
+
+    def subFeature(self, theIndex):
+        if theIndex = 1: # sketch
+          return self.mySketch
+        return self.myExtrusion
+
+    def subFeatureId(self, theIndex):
+        return 0
+
+    def isSub(self, theFeature):
+        if theFeature = self.mySketch or theFeature = self.myExtrusion:
+          return True
+        return False
 
 # TEST
 """

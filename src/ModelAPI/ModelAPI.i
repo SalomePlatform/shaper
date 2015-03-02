@@ -63,6 +63,7 @@
 %feature("director") ModelAPI_Plugin;
 %feature("director") ModelAPI_Object;
 %feature("director") ModelAPI_Feature;
+%feature("director") ModelAPI_Data;
 
 // shared pointers
 // For ModelAPI_ResultConstruction.shape()
