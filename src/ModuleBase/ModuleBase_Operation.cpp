@@ -148,8 +148,14 @@ void ModuleBase_Operation::start()
 {
   ModelAPI_Session::get()->startOperation();
 
-  if (!myIsEditing)
-    createFeature();
+  if (!myIsEditing) {
+    FeaturePtr aFeature = createFeature();
+    // if the feature is not created, there is no sense to start the operation
+    if (aFeature.get() == NULL) {
+      ModelAPI_Session::get()->abortOperation();
+      return;
+    }
+  }
 
   startOperation();
   emit started();
