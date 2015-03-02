@@ -152,7 +152,10 @@ void ModuleBase_Operation::start()
     FeaturePtr aFeature = createFeature();
     // if the feature is not created, there is no sense to start the operation
     if (aFeature.get() == NULL) {
-      ModelAPI_Session::get()->abortOperation();
+      // it is necessary to abor the operation in the session and emit the aborted signal
+      // in order to update commands status in the workshop, to be exact the feature action
+      // to be unchecked
+      abort();
       return;
     }
   }
