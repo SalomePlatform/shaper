@@ -446,15 +446,13 @@ void XGUI_Workshop::processEvent(const std::shared_ptr<Events_Message>& theMessa
                                aMsg->parameters());
       }
     }
-  }
-
-  
-  else {
+  } else {
     //Show error dialog if error message received.
     std::shared_ptr<Events_Error> anAppError = std::dynamic_pointer_cast<Events_Error>(theMessage);
     if (anAppError) {
       emit errorOccurred(QString::fromLatin1(anAppError->description()));
     }
+    return;
   }
   if (!isSalomeMode()) {
     SessionPtr aMgr = ModelAPI_Session::get();
