@@ -5,7 +5,7 @@ import extrusion
 import sketch
 
 
-class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_CompositeFeature):
+class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_Feature):
 
     "Feature to create a box by drawing a sketch and extruding it"
 
@@ -123,25 +123,6 @@ class PythonFeaturesPlugin_Box(ModelAPI.ModelAPI_CompositeFeature):
         self.reference(self.HEIGHT_REF_ID()).setValue(aHeightFeature.firstResult())
         return aHeightFeature
 
-    def addFeature(self, theID):
-        pass
-
-    def numberOfSubs(self):
-        # extrusion and sketch
-        return 2
-
-    def subFeature(self, theIndex):
-        if theIndex = 1: # sketch
-          return self.mySketch
-        return self.myExtrusion
-
-    def subFeatureId(self, theIndex):
-        return 0
-
-    def isSub(self, theFeature):
-        if theFeature = self.mySketch or theFeature = self.myExtrusion:
-          return True
-        return False
 
 # TEST
 """
