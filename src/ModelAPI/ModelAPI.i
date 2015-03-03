@@ -9,8 +9,6 @@
 }
 
 %{
-  #include "GeomAPI_Interface.h"
-  #include "GeomAPI_Shape.h"
   #include "ModelAPI.h"
   #include "ModelAPI_Document.h"
   #include "ModelAPI_Session.h"
@@ -40,6 +38,9 @@
   #include "ModelAPI_ResultParameters.h"
   #include "ModelAPI_ResultGroup.h"
   #include "ModelAPI_Tools.h"
+
+  #include <memory>
+  #include <string>
   
   template<class T1, class T2> 
   std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject)
@@ -51,10 +52,10 @@
 
 // to avoid error on this
 #define MODELAPI_EXPORT
-#define GEOMAPI_EXPORT
 
 // standard definitions
 %include "typemaps.i"
+%include "GeomAPI.i"
 %include "std_string.i"
 %include "std_list.i"
 %include "std_shared_ptr.i"
@@ -68,8 +69,6 @@
 
 // shared pointers
 // For ModelAPI_ResultConstruction.shape()
-%shared_ptr(GeomAPI_Interface)
-%shared_ptr(GeomAPI_Shape)
 %shared_ptr(ModelAPI_Document)
 %shared_ptr(ModelAPI_Session)
 %shared_ptr(ModelAPI_Plugin)
@@ -99,8 +98,6 @@
 %shared_ptr(ModelAPI_ResultParameters)
 
 // all supported interfaces
-%include "GeomAPI_Interface.h"
-%include "GeomAPI_Shape.h"
 %include "ModelAPI_Document.h"
 %include "ModelAPI_Session.h"
 %include "ModelAPI_Plugin.h"
