@@ -5,6 +5,7 @@
 // Author:      Vitaly Smetannikov
 
 #include <ModuleBase_WidgetBoolValue.h>
+#include <ModuleBase_Tools.h>
 
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_Data.h>
@@ -28,9 +29,14 @@ ModuleBase_WidgetBoolValue::ModuleBase_WidgetBoolValue(QWidget* theParent,
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());
   bool isChecked = theData->getBooleanAttribute(ATTR_DEFAULT, false);
 
-  myCheckBox = new QCheckBox(aText, theParent);
+  myCheckBox = new QCheckBox(aText, this);
   myCheckBox->setToolTip(aToolTip);
   myCheckBox->setChecked(isChecked);
+
+  QVBoxLayout* aMainLayout = new QVBoxLayout(this);
+  ModuleBase_Tools::adjustMargins(aMainLayout);
+  aMainLayout->addWidget(myCheckBox);
+  setLayout(aMainLayout);
 
   connect(myCheckBox, SIGNAL(toggled(bool)), this, SIGNAL(valuesChanged()));
 }
