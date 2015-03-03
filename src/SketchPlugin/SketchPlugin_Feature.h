@@ -13,6 +13,7 @@
 #include <GeomAPI_AISObject.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <GeomAPI_ICustomPrs.h>
 
 #include <Config_PropManager.h>
@@ -20,6 +21,7 @@
 #define SKETCH_EDGE_COLOR "#ff0000"
 #define SKETCH_POINT_COLOR "#ff0000"
 #define SKETCH_EXTERNAL_EDGE_COLOR "#00ff00"
+#define SKETCH_CONSTRUCTION_COLOR "#000000"
 
 class SketchPlugin_Sketch;
 class GeomAPI_Pnt2d;
@@ -33,6 +35,13 @@ class Handle_AIS_InteractiveObject;
 class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
 {
  public:
+  /// Reference to the construction type of the feature
+  inline static const std::string& CONSTRUCTION_ID()
+  {
+    static const std::string MY_CONSTRUCTION_ID("Construction");
+    return MY_CONSTRUCTION_ID;
+  }
+
   /// Reference to the external edge or vertex as a AttributeSelection
   inline static const std::string& EXTERNAL_ID()
   {
@@ -74,28 +83,39 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
   virtual void customisePresentation(AISObjectPtr thePrs)
   {
     std::vector<int> aRGB;
-    // if this is an edge
-    if (thePrs->getShapeType() == 6) {
-      thePrs->setWidth(3);
-      if (isExternal()) {
-        // Set color from preferences
-        aRGB = Config_PropManager::color("Visualization", "sketch_external_color",
-                                         SKETCH_EXTERNAL_EDGE_COLOR);
+  
+    int aShapeType = thePrs->getShapeType();
+    if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/)
+      return;
+
+    bool isConstruction = data()->boolean(SketchPlugin_Feature::CONSTRUCTION_ID())->value();
+    if (aShapeType == 6) { // if this is an edge
+      if (isConstruction) {
+        thePrs->setWidth(1);
+        aRGB = Config_PropManager::color("Visualization", "sketch_construction_color",
+                                         SKETCH_CONSTRUCTION_COLOR);
       }
       else {
-        // Set color from preferences
-        aRGB = Config_PropManager::color("Visualization", "sketch_edge_color",
-                                         SKETCH_EDGE_COLOR);
+        thePrs->setWidth(3);
+        if (isExternal()) {
+          // Set color from preferences
+          aRGB = Config_PropManager::color("Visualization", "sketch_external_color",
+                                           SKETCH_EXTERNAL_EDGE_COLOR);
+        }
+        else {
+          // Set color from preferences
+          aRGB = Config_PropManager::color("Visualization", "sketch_edge_color",
+                                           SKETCH_EDGE_COLOR);
+        }
       }
     }
-    else if (thePrs->getShapeType() == 7) { // otherwise this is a vertex
+    else if (aShapeType == 7) { // otherwise this is a vertex
+      //  thePrs->setPointMarker(6, 2.);
       // Set color from preferences
       aRGB = Config_PropManager::color("Visualization", "sketch_point_color",
                                        SKETCH_POINT_COLOR);
     }
-    // if this is a vertex
-    //else if (thePrs->getShapeType() == 7)
-    //  thePrs->setPointMarker(6, 2.);
+
     if (!aRGB.empty())
       thePrs->setColor(aRGB[0], aRGB[1], aRGB[2]);
   }

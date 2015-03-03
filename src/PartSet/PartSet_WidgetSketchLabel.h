@@ -70,6 +70,9 @@ Q_OBJECT
   /// Returns sketcher plane
   std::shared_ptr<GeomAPI_Pln> plane() const;
 
+  /// This control accepts focus
+  virtual bool focusTo() { return true; }
+
 signals:
   /// Signal on plane selection
   void planeSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);

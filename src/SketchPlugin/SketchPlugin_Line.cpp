@@ -9,6 +9,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
 
@@ -29,6 +30,7 @@ void SketchPlugin_Line::initAttributes()
 {
   data()->addAttribute(START_ID(), GeomDataAPI_Point2D::type());
   data()->addAttribute(END_ID(), GeomDataAPI_Point2D::type());
+  data()->addAttribute(CONSTRUCTION_ID(), ModelAPI_AttributeBoolean::type());
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 }

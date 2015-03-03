@@ -19,6 +19,7 @@
       <feature id="SketchLine" title="Line" tooltip="Create a new line" icon=":icons/line.png">
         <sketch-2dpoint_selector id="StartPoint" title="Start point" tooltip="Start point coordinates" previous_feature_param="EndPoint"/>
         <sketch-2dpoint_selector id="EndPoint" title="End point" tooltip="End point coordinates"/>
+        <boolvalue id="Construction" label="Construction" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
       <feature id="SketchCircle" title="Circle" tooltip="Create a new circle" icon=":icons/circle.png">
         <sketch-2dpoint_selector id="CircleCenter" title="Center" tooltip="Center coordinates"/>

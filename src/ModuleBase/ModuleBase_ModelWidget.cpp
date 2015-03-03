@@ -31,6 +31,7 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
   myDefaultValue = theData->getProperty(ATTR_DEFAULT);
   myIsComputedDefault = theData->getProperty(ATTR_DEFAULT) == DOUBLE_WDG_DEFAULT_COMPUTED;
   myAttributeID = theData ? theData->widgetId() : "";
+  myIsObligatory = theData->getBooleanAttribute(ATTR_OBLIGATORY, true);
 
   connect(this, SIGNAL(valuesChanged()), this, SLOT(onWidgetValuesChanged()));
 }
@@ -44,8 +45,13 @@ void ModuleBase_ModelWidget::enableFocusProcessing()
 {
   QList<QWidget*> aMyControls = getControls();
   foreach(QWidget*  eachControl, aMyControls) {
-    eachControl->setFocusPolicy(Qt::StrongFocus);
-    eachControl->installEventFilter(this);
+    if (myIsObligatory) {
+      eachControl->setFocusPolicy(Qt::StrongFocus);
+      eachControl->installEventFilter(this);
+    }
+    else {
+      eachControl->setFocusPolicy(Qt::NoFocus);
+    }
   }
 }
 
@@ -85,14 +91,15 @@ bool ModuleBase_ModelWidget::focusTo()
 {
   QList<QWidget*> aControls = getControls();
   QList<QWidget*>::const_iterator anIt = aControls.begin(), aLast = aControls.end();
-  for (; anIt != aLast; anIt++) {
+  bool isFocusAccepted = false;
+  for (; anIt != aLast && !isFocusAccepted; anIt++) {
     QWidget* aWidget = *anIt;
     if (aWidget && aWidget->focusPolicy() != Qt::NoFocus) {
       aWidget->setFocus();
-      break;
+      isFocusAccepted = true;
     }
   }
-  return true;
+  return isFocusAccepted;
 }
 
 void ModuleBase_ModelWidget::activate()

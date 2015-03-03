@@ -96,8 +96,9 @@ Q_OBJECT
   /// FocusIn events processing
   virtual bool eventFilter(QObject* theObject, QEvent *theEvent);
 
-  //! \brief Enables processing of focus event on all controls by the widget
-  void enableFocusProcessing();
+  /// \brief Enables processing of focus event on all controls by the widget
+  /// if this widget is not obligatory and set no-focus policy otherwise
+  virtual void enableFocusProcessing();
 
   //! Switch On/Off highlighting of the widget
   void setHighlighted(bool isHighlighted);
@@ -196,6 +197,10 @@ protected slots:
 
   /// Flag which shows that current operation is in editing mode
   bool myIsEditing; 
+
+  /// Flag which shows whether current widget is obligatory
+  /// The non-obligatory widgets should not accept the focus in the property panel
+  bool myIsObligatory;
 
 private:
   /// Value should be computed on execute, like radius for circle's constraint (can not be zero)
