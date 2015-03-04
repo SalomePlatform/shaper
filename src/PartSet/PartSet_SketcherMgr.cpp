@@ -572,6 +572,21 @@ bool PartSet_SketcherMgr::isNestedSketchOperation(ModuleBase_Operation* theOpera
          PartSet_SketcherMgr::sketchOperationIdList().contains(theOperation->id());
 }
 
+bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOperation)
+{
+  return theOperation && !theOperation->isEditOperation() && isNestedSketchOperation(theOperation);
+}
+
+bool PartSet_SketcherMgr::isEntityOperation(ModuleBase_Operation* theOperation)
+{
+  std::string aId = theOperation ? theOperation->id().toStdString() : "";
+
+  return (aId == SketchPlugin_Line::ID()) ||
+         (aId == SketchPlugin_Point::ID()) ||
+         (aId == SketchPlugin_Arc::ID()) ||
+         (aId == SketchPlugin_Circle::ID());
+}
+
 bool PartSet_SketcherMgr::isDistanceOperation(ModuleBase_Operation* theOperation)
 {
   std::string aId = theOperation ? theOperation->id().toStdString() : "";
@@ -715,6 +730,48 @@ bool PartSet_SketcherMgr::canDisplayObject() const
   // of there was a value modified in the property panel after the mouse left the view
   aCanDisplay = myIsPropertyPanelValueChanged || myIsMouseOverWindow;
   return aCanDisplay;
+}
+
+bool PartSet_SketcherMgr::canChangeConstruction(bool& isConstruction) const
+{
+  ModuleBase_Operation* anOperation = getCurrentOperation();
+
+  bool anEnabled = PartSet_SketcherMgr::isNestedCreateOperation(anOperation) &&
+                   PartSet_SketcherMgr::isEntityOperation(anOperation);
+  if (anEnabled) {
+    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+            std::dynamic_pointer_cast<SketchPlugin_Feature>(anOperation->feature());
+    if (aSketchFeature.get() != NULL) {
+      std::string anAttribute = SketchPlugin_Feature::CONSTRUCTION_ID();
+
+      std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr = 
+        std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
+
+      isConstruction = aConstructionAttr->value();
+    }
+  }
+  return anEnabled;
+}
+  
+void PartSet_SketcherMgr::setConstruction(const bool isChecked)
+{
+  ModuleBase_Operation* anOperation = getCurrentOperation();
+  std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(anOperation->feature());
+  if (aSketchFeature.get() != NULL) {
+    std::string anAttribute = SketchPlugin_Feature::CONSTRUCTION_ID();
+
+    std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr = 
+      std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
+    aConstructionAttr->setValue(isChecked);
+
+    // ModuleBase_ModelWidget::updateObject
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+    
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anEvent);
+    Events_Loop::loop()->flush(anEvent);
+  }
 }
 
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
@@ -875,11 +932,6 @@ void PartSet_SketcherMgr::connectToPropertyPanel(const bool isToConnect)
 ModuleBase_Operation* PartSet_SketcherMgr::getCurrentOperation() const
 {
   return myModule->workshop()->currentOperation();
-}
-
-bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOperation) const
-{
-  return theOperation && !theOperation->isEditOperation() && isNestedSketchOperation(theOperation);
 }
 
 void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,

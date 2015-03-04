@@ -241,6 +241,10 @@ bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView,
 
 void PartSet_WidgetPoint2D::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  // the contex menu release by the right button should not be processed by this widget
+  if (theEvent->button() != Qt::LeftButton)
+    return;
+
   XGUI_Selection* aSelection = myWorkshop->selector()->selection();
   Handle(V3d_View) aView = theWnd->v3dView();
   // TODO: This fragment doesn't work because bug in OCC Viewer. It can be used after fixing.

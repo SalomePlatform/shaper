@@ -92,11 +92,13 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
     if (aShapeType == 6) { // if this is an edge
       if (isConstruction) {
         thePrs->setWidth(1);
+        thePrs->setLineStyle(3);
         aRGB = Config_PropManager::color("Visualization", "sketch_construction_color",
                                          SKETCH_CONSTRUCTION_COLOR);
       }
       else {
         thePrs->setWidth(3);
+        thePrs->setLineStyle(0);
         if (isExternal()) {
           // Set color from preferences
           aRGB = Config_PropManager::color("Visualization", "sketch_external_color",

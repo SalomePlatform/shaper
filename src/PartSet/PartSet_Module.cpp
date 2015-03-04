@@ -38,6 +38,7 @@
 #include <XGUI_OperationMgr.h>
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ModuleConnector.h>
+#include <XGUI_ContextMenuMgr.h>
 #include <XGUI_Tools.h>
 
 #include <SketchPlugin_Feature.h>
@@ -293,8 +294,19 @@ void PartSet_Module::addViewerItems(QMenu* theMenu) const
         hasFeature = true;
       }
     }
-    if (hasFeature)
+    if (hasFeature) {
+      XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+      XGUI_Workshop* aWorkshop = aConnector->workshop();
+      QAction* anAction = aWorkshop->contextMenuMgr()->action("DELETE_CMD");
+      theMenu->addAction(anAction);
       theMenu->addAction(action("DELETE_PARTSET_CMD"));
+    }
+  }
+  bool isConstruction;
+  if (mySketchMgr->canChangeConstruction(isConstruction)) {
+    QAction* anAction = action("CONSTRUCTION_CMD");
+    theMenu->addAction(anAction);
+    anAction->setChecked(isConstruction);
   }
 }
 
@@ -478,8 +490,14 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
 
 void PartSet_Module::createActions()
 {
-  QAction* aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
-  addAction("DELETE_PARTSET_CMD", aAction);
+  QAction* anAction;
+
+  anAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
+  addAction("DELETE_PARTSET_CMD", anAction);
+
+  anAction = new QAction(tr("Construction"), this);
+  anAction->setCheckable(true);
+  addAction("CONSTRUCTION_CMD", anAction);
 }
 
 QAction* PartSet_Module::action(const QString& theId) const
@@ -505,6 +523,9 @@ void PartSet_Module::onAction(bool isChecked)
 
   if (anId == "DELETE_PARTSET_CMD") {
     deleteObjects();
+  }
+  if (anId == "CONSTRUCTION_CMD") {
+    mySketchMgr->setConstruction(isChecked);
   }
 }
 
