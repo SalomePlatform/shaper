@@ -299,7 +299,7 @@ void PartSet_Module::addViewerItems(QMenu* theMenu) const
       XGUI_Workshop* aWorkshop = aConnector->workshop();
       QAction* anAction = aWorkshop->contextMenuMgr()->action("DELETE_CMD");
       theMenu->addAction(anAction);
-      theMenu->addAction(action("DELETE_PARTSET_CMD"));
+      //theMenu->addAction(action("DELETE_PARTSET_CMD"));
     }
   }
   bool isConstruction;
@@ -492,8 +492,8 @@ void PartSet_Module::createActions()
 {
   QAction* anAction;
 
-  anAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
-  addAction("DELETE_PARTSET_CMD", anAction);
+  //anAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
+  //addAction("DELETE_PARTSET_CMD", anAction);
 
   anAction = new QAction(tr("Construction"), this);
   anAction->setCheckable(true);
@@ -521,9 +521,9 @@ void PartSet_Module::onAction(bool isChecked)
   QAction* aAction = static_cast<QAction*>(sender());
   QString anId = aAction->data().toString();
 
-  if (anId == "DELETE_PARTSET_CMD") {
-    deleteObjects();
-  }
+  //if (anId == "DELETE_PARTSET_CMD") {
+  //  deleteObjects();
+  //}
   if (anId == "CONSTRUCTION_CMD") {
     mySketchMgr->setConstruction(isChecked);
   }
