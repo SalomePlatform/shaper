@@ -1288,9 +1288,8 @@ void XGUI_Workshop::activatePart(ResultPartPtr theFeature)
 //**************************************************************
 void XGUI_Workshop::deleteObjects(const QObjectPtrList& theList)
 {
-  // the active operation should not be aborted if there is an empty list of objects
-  // it is possible that delete shortcut should be processed in the active operation.
-  if (theList.empty())
+  ModuleBase_IModule* aModule = module();
+  if (aModule->deleteObjects())
     return;
 
   if (!isActiveOperationAborted())

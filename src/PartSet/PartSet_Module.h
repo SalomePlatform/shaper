@@ -123,9 +123,6 @@ protected slots:
   /// It commits the operation of it is can be committed
   void onOperationActivatedByPreselection();
 
-  //! Delete features
-  void onDeleteObjects();
-
  protected:
   /// Register validators for this module
   virtual void registerValidators();
@@ -158,7 +155,7 @@ protected slots:
   void addAction(const QString& theId, QAction* theAction);
 
   //! Delete features
-  void deleteObjects();
+  virtual bool deleteObjects();
 
  private:
    QString myLastOperationId;

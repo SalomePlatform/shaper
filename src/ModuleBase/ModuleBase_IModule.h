@@ -111,6 +111,10 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theObject a model object
   virtual bool canDisplayObject(const ObjectPtr& theObject) const;
 
+  /// Reacts to the delete action in module
+  /// \returns true if the action is processed
+  virtual bool deleteObjects() { return false; };
+
 public slots:
   /// Called on call of command corresponded to a feature
   void onFeatureTriggered();

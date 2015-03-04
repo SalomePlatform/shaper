@@ -95,7 +95,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
   connect(anOpMgr, SIGNAL(keyEnterReleased()), this, SLOT(onEnterReleased()));
-  connect(anOpMgr, SIGNAL(keyDeleteReleased()), this, SLOT(onDeleteObjects()));
   connect(anOpMgr, SIGNAL(operationActivatedByPreselection()),
           this, SLOT(onOperationActivatedByPreselection()));
 
@@ -299,7 +298,6 @@ void PartSet_Module::addViewerItems(QMenu* theMenu) const
       XGUI_Workshop* aWorkshop = aConnector->workshop();
       QAction* anAction = aWorkshop->contextMenuMgr()->action("DELETE_CMD");
       theMenu->addAction(anAction);
-      //theMenu->addAction(action("DELETE_PARTSET_CMD"));
     }
   }
   bool isConstruction;
@@ -403,14 +401,6 @@ void PartSet_Module::onEnterReleased()
   myRestartingMode = RM_EmptyFeatureUsed;
 }
 
-void PartSet_Module::onDeleteObjects()
-{
-  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  if (PartSet_SketcherMgr::isSketchOperation(anOperation) ||
-      PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
-    deleteObjects();
-}
-
 void PartSet_Module::onOperationActivatedByPreselection()
 {
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
@@ -492,9 +482,6 @@ void PartSet_Module::createActions()
 {
   QAction* anAction;
 
-  //anAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
-  //addAction("DELETE_PARTSET_CMD", anAction);
-
   anAction = new QAction(tr("Construction"), this);
   anAction->setCheckable(true);
   addAction("CONSTRUCTION_CMD", anAction);
@@ -521,20 +508,17 @@ void PartSet_Module::onAction(bool isChecked)
   QAction* aAction = static_cast<QAction*>(sender());
   QString anId = aAction->data().toString();
 
-  //if (anId == "DELETE_PARTSET_CMD") {
-  //  deleteObjects();
-  //}
   if (anId == "CONSTRUCTION_CMD") {
     mySketchMgr->setConstruction(isChecked);
   }
 }
 
-void PartSet_Module::deleteObjects()
+bool PartSet_Module::deleteObjects()
 {
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
   bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
   if (!isSketchOp && !PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
-    return;
+    return false;
 
   // sketch feature should be skipped, only sub-features can be removed
   // when sketch operation is active
@@ -545,6 +529,12 @@ void PartSet_Module::deleteObjects()
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   ModuleBase_ISelection* aSel = aConnector->selection();
   QObjectPtrList aSelectedObj = aSel->selectedPresentations();
+
+  // if there are no selected objects in the viewer, that means that the selection in another
+  // place cased this method. It is necessary to return the false value to understande in above
+  // method that delete is not processed
+  if (aSelectedObj.count() == 0)
+    return false;
 
   XGUI_Workshop* aWorkshop = aConnector->workshop();
   XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
@@ -628,4 +618,6 @@ void PartSet_Module::deleteObjects()
   aWorkshop->displayer()->updateViewer();
   //myDisplayer->updateViewer();
   aMgr->finishOperation();
+
+  return true;
 }
