@@ -447,7 +447,8 @@ void ModuleBase_WidgetShapeSelector::selectionFilters(SelectMgr_ListOfFilter& th
   if (!myObjectTypes.isEmpty() && myObjTypeFilter.IsNull()) {
     myObjTypeFilter = new ModuleBase_ObjectTypesFilter(myWorkshop, myObjectTypes);
   }
-  theFilters.Append(myObjTypeFilter);
+  if (!myObjTypeFilter.IsNull())
+    theFilters.Append(myObjTypeFilter);
 
   // apply filters loaded from the XML definition of the widget
   ModuleBase_FilterFactory* aFactory = myWorkshop->selectionFilters();

@@ -88,7 +88,9 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
     if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/)
       return;
 
-    bool isConstruction = data()->boolean(SketchPlugin_Feature::CONSTRUCTION_ID())->value();
+    std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr =
+                                   data()->boolean(SketchPlugin_Feature::CONSTRUCTION_ID());
+    bool isConstruction = aConstructionAttr.get() != NULL && aConstructionAttr->value();
     if (aShapeType == 6) { // if this is an edge
       if (isConstruction) {
         thePrs->setWidth(1);

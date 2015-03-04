@@ -47,6 +47,7 @@ double editedValue(double theValue, bool& isDone)
   ModuleBase_Tools::zeroMargins(aLay);
 
   QLineEdit* aEditor = new QLineEdit(QString::number(theValue), &aDlg);
+  aEditor->selectAll();
   aEditor->setValidator(new QDoubleValidator(aEditor));
   QObject::connect(aEditor, SIGNAL(returnPressed()), &aDlg, SLOT(accept()));
   aLay->addWidget(aEditor);
