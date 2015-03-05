@@ -87,6 +87,11 @@ void SketchPlugin_Sketch::execute()
         if (aFeature->data()->selection(SketchPlugin_Feature::EXTERNAL_ID())->value())
           continue;
       }
+      // do not include the construction entities in the result
+      if (aFeature->data()->attribute(SketchPlugin_Feature::CONSTRUCTION_ID())) {
+        if (aFeature->data()->boolean(SketchPlugin_Feature::CONSTRUCTION_ID())->value())
+          continue;
+      }
 
       const std::list<std::shared_ptr<ModelAPI_Result> >& aRes = aFeature->results();
       std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = aRes.cbegin();
