@@ -301,10 +301,6 @@ bool XGUI_OperationMgr::onKeyReleased(QKeyEvent* theEvent)
       commitOperation();
     }
     break;
-    case Qt::Key_Delete: { // the delete button is occupied by the workshop Delete action,
-      // so this button process is realized here
-      emit keyDeleteReleased();
-    }
     default:
       isAccepted = false;
       break;

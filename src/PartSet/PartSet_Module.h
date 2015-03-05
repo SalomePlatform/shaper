@@ -80,6 +80,10 @@ public:
   /// \param theOperation a stopped operation
   virtual void operationStopped(ModuleBase_Operation* theOperation);
 
+  /// Returns action according to the given ID
+  /// \param theId an action identifier, it should be uniqued in the bounds of the module
+  QAction* action(const QString& theId) const;
+
   /// Returns True if there are available Undos and the sketch manager allows undo
   /// \return the boolean result
   virtual bool canUndo() const;
@@ -144,10 +148,6 @@ protected slots:
   /// Create all actions for context menus. It is called on creation of module
   /// Put the created actions into an internal map
   void createActions();
-
-  /// Returns action according to the given ID
-  /// \param theId an action identifier, it should be uniqued in the bounds of the module
-  QAction* action(const QString& theId) const;
 
   /// Add action to the internal map
   /// \param theId - string ID of the item

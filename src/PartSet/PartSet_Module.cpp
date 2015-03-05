@@ -516,8 +516,9 @@ void PartSet_Module::onAction(bool isChecked)
 bool PartSet_Module::deleteObjects()
 {
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
-  if (!isSketchOp && !PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
+  bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation),
+       isNestedOp = PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
+  if (!isSketchOp && !isNestedOp)
     return false;
 
   // sketch feature should be skipped, only sub-features can be removed
@@ -527,6 +528,7 @@ bool PartSet_Module::deleteObjects()
   // selected objects should be collected before the current operation abort because
   // the abort leads to selection lost on constraint objects. It can be corrected after #386 issue
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
   ModuleBase_ISelection* aSel = aConnector->selection();
   QObjectPtrList aSelectedObj = aSel->selectedPresentations();
 
@@ -536,14 +538,13 @@ bool PartSet_Module::deleteObjects()
   if (aSelectedObj.count() == 0)
     return false;
 
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
-  XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
-  if (!isSketchOp && anOpMgr->canStopOperation()) {
-    ModuleBase_Operation* aCurrentOp = anOpMgr->currentOperation();
-    if (aCurrentOp) {
-      aCurrentOp->abort();
-    }
-  }
+  if (isNestedOp)
+    anOperation->abort();
+
+  // the active nested sketch operation should be aborted unconditionally
+  if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
+    anOperation->abort();
+
   std::set<FeaturePtr> aRefFeatures;
   foreach (ObjectPtr aObj, aSelectedObj)
   {
@@ -558,7 +559,8 @@ bool PartSet_Module::deleteObjects()
     }
     //}
   }
-  QString aDescription = tr("Delete");
+
+  QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
   /**
   // according to #355 feature, it is not necessary to inform about dependencies during
   // sketch delete operation
