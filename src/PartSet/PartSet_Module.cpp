@@ -435,14 +435,14 @@ void PartSet_Module::onVertexSelected()
     const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
     QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
     bool aFoundWidget = false;
-    bool aFoundNonObligatory = false;
-    for (; anIt != aLast && !aFoundNonObligatory; anIt++) {
-      aFoundWidget = aFoundWidget || *anIt == anActiveWidget;
+    bool aFoundObligatory = false;
+    for (; anIt != aLast && !aFoundObligatory; anIt++) {
       if (!aFoundWidget)
-        continue;
-      aFoundNonObligatory = !(*anIt)->isObligatory();
+        aFoundWidget = *anIt == anActiveWidget;
+      else
+        aFoundObligatory = (*anIt)->isObligatory();
     }
-    if (!aFoundNonObligatory)
+    if (!aFoundObligatory)
       myRestartingMode = RM_Forbided;
   }
 }

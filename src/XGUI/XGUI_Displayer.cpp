@@ -227,7 +227,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
     // before and after the values modification.
     // Moreother, this check avoids customize and redisplay presentation if the presentable
     // parameter is changed.
-    /*ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if (aResult.get() != NULL) {
       Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(aAISIO);
       if (!aShapePrs.IsNull()) {
@@ -241,7 +241,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
             return;
         }
       }
-    }*/
+    }
     // Customization of presentation
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     if (aFeature.get() != NULL) {
