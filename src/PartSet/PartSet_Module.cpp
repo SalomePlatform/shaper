@@ -431,10 +431,19 @@ void PartSet_Module::onVertexSelected()
   if (aOperation->id().toStdString() == SketchPlugin_Line::ID()) {
     /// If last line finished on vertex the lines creation sequence has to be break
     ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+    ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
     const QList<ModuleBase_ModelWidget*>& aWidgets = aPanel->modelWidgets();
-    if (aWidgets.last() == aPanel->activeWidget()) {
-      myRestartingMode = RM_Forbided;
+    QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
+    bool aFoundWidget = false;
+    bool aFoundNonObligatory = false;
+    for (; anIt != aLast && !aFoundNonObligatory; anIt++) {
+      aFoundWidget = aFoundWidget || *anIt == anActiveWidget;
+      if (!aFoundWidget)
+        continue;
+      aFoundNonObligatory = !(*anIt)->isObligatory();
     }
+    if (!aFoundNonObligatory)
+      myRestartingMode = RM_Forbided;
   }
 }
 

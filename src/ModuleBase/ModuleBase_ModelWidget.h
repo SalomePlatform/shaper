@@ -60,6 +60,10 @@ Q_OBJECT
   /// \return the boolean result
   std::string getDefaultValue() const { return myDefaultValue; }
 
+  /// Returns true, if the obligatory value of the widget is not defined in the XML or has true value
+  /// \return the boolean result
+  bool isObligatory() const { return myIsObligatory; }
+
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return false; }
 
