@@ -39,20 +39,21 @@ class SketchPlugin_DistanceAttrValidator : public ModelAPI_RefAttrValidator
  * Check that there is no same object was already selected in the feature.
  * For an example: to avoid perpendicularity on line and the same line.
  */
-class SketchPlugin_DifferentObjectsValidator : public ModelAPI_RefAttrValidator
-{
- public:
-  //! returns true if attribute is valid
-  //! \param theAttribute the checked attribute
-  //! \param theArguments arguments of the attribute
-  virtual bool isValid(
-    const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const;
-  //! Returns true if object is good for the feature attribute
-  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
-                       const ObjectPtr& theObject) const;
-  //! Returns true if the attribute is good for the feature attribute
-  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
-                       const AttributePtr& theAttribute) const;
-};
+// Use PartSet_DifferentObjectsValidator
+//class SketchPlugin_DifferentObjectsValidator : public ModelAPI_RefAttrValidator
+//{
+// public:
+//  //! returns true if attribute is valid
+//  //! \param theAttribute the checked attribute
+//  //! \param theArguments arguments of the attribute
+//  virtual bool isValid(
+//    const AttributePtr& theAttribute, const std::list<std::string>& theArguments) const;
+//  //! Returns true if object is good for the feature attribute
+//  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
+//                       const ObjectPtr& theObject) const;
+//  //! Returns true if the attribute is good for the feature attribute
+//  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
+//                       const AttributePtr& theAttribute) const;
+//};
 
 #endif
