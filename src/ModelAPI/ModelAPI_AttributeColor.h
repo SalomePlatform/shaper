@@ -15,7 +15,7 @@
 
 /**\class ModelAPI_AttributeColor
  * \ingroup DataModel
- * \brief API for the attribute that contains color (int, int, int).
+ * \brief API for the attribute that contains color (int, int, int). The color is in the range [0, 255]
  * There is an opportunity to fill the attribute by a random color
  */
 
@@ -23,6 +23,9 @@ class ModelAPI_AttributeColor : public ModelAPI_Attribute
 {
  public:
   /// Defines the color value
+  /// \param theRed the red part of the color
+  /// \param theRed the green part of the color
+  /// \param theRed the blue part of the color
   MODELAPI_EXPORT virtual void setValues(const int theRed,
                                          const int theGreen,
                                          const int theBlue) = 0;

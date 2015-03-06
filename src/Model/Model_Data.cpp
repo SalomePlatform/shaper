@@ -15,6 +15,7 @@
 #include <Model_AttributeString.h>
 #include <Model_AttributeSelection.h>
 #include <Model_AttributeSelectionList.h>
+#include <Model_AttributeColor.h>
 #include <Model_Events.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
@@ -90,6 +91,8 @@ void Model_Data::addAttribute(const std::string& theID, const std::string theAtt
     anAttr = new Model_AttributeRefAttr(anAttrLab);
   } else if (theAttrType == ModelAPI_AttributeRefList::type()) {
     anAttr = new Model_AttributeRefList(anAttrLab);
+  } else if (theAttrType == ModelAPI_AttributeColor::type()) {
+    anAttr = new Model_AttributeColor(anAttrLab);
   } 
   // create also GeomData attributes here because only here the OCAF strucure is known
   else if (theAttrType == GeomData_Point::type()) {

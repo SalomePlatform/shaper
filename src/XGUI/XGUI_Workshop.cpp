@@ -1406,26 +1406,33 @@ bool XGUI_Workshop::canChangeColor() const
 //**************************************************************
 #include <QDialog>
 #include <QHBoxLayout>
-#include <QLineEdit>
+#include <QtxColorButton.h>
+#include <ModelAPI_AttributeColor.h>
 void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 {
-  // 1. find the initial value of the material
-  std::string aFirstValue = "";
-  foreach(ObjectPtr anObj, theObjects)
-  {
+  // 1. find the initial value of the color
+  AttributeColorPtr aColorAttr;
+  foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
-    if (aResult.get() == NULL)
-      continue;
+    if (aResult.get() != NULL) {
+      AttributePtr anAttr = aResult->data()->attribute(ModelAPI_Result::COLOR_ID());
+      if (anAttr.get() != NULL)
+        aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>(anAttr);
+    }
   }
+  // there is no object with the color attribute
+  if (aColorAttr.get() == NULL)
+    return;
+  int aRed, aGreen, aBlue;
+  aColorAttr->values(aRed, aGreen, aBlue);
 
   // 2. show the dialog to change the value
   QDialog aDlg;
   QHBoxLayout* aLay = new QHBoxLayout(&aDlg);
 
-  QLineEdit* anEditor = new QLineEdit("QString::number(theValue)", &aDlg);
-  anEditor->setText(aFirstValue.c_str());
-  anEditor->selectAll();
-  aLay->addWidget(anEditor);
+  QtxColorButton* aColorBtn = new QtxColorButton(&aDlg);
+  aLay->addWidget(aColorBtn);
+  aColorBtn->setColor(QColor(aRed, aGreen, aBlue));
 
   QPoint aPoint = QCursor::pos();
   aDlg.move(aPoint);
@@ -1434,11 +1441,30 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   if (!isDone)
     return;
 
-  std::string aValue = anEditor->text().toStdString();
+  QColor aColorResult = aColorBtn->color();
+  int aRedResult = aColorResult.red(),
+      aGreenResult = aColorResult.green(),
+      aBlueResult = aColorResult.blue();
+
+  if (aRedResult == aRed && aGreenResult == aGreen && aBlueResult == aBlue)
+    return;
 
   // 3. abort the previous operation and start a new one
+  if(!isActiveOperationAborted())
+    return;
 
   // 4. set the value to all results
+  foreach(ObjectPtr anObj, theObjects) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+    if (aResult.get() != NULL) {
+      AttributePtr anAttr = aResult->data()->attribute(ModelAPI_Result::COLOR_ID());
+      if (anAttr.get() != NULL) {
+        aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>(anAttr);
+        if (aColorAttr.get() != NULL)
+          aColorAttr->setValues(aRedResult, aGreenResult, aBlueResult);
+      }
+    }
+  }
 }
 
 //**************************************************************
