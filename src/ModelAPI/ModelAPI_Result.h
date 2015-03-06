@@ -22,7 +22,15 @@ class ModelAPI_Result : public ModelAPI_Object
 {
   bool myIsConcealed; ///< the result is concealed from the data tree (referenced by other objects)
  public:
-   /// Returns true if the result is concealed from the data tree (referenced by other objects)
+
+  /// Reference to the color of the result
+  inline static const std::string& COLOR_ID()
+  {
+    static const std::string MY_COLOR_ID("Color");
+    return MY_COLOR_ID;
+  }
+
+  /// Returns true if the result is concealed from the data tree (referenced by other objects)
   inline bool isConcealed()
   {
     return myIsConcealed;
@@ -33,6 +41,9 @@ class ModelAPI_Result : public ModelAPI_Object
   {
     myIsConcealed = theValue;
   }
+
+  /// Request for initialization of data model of the result: adding all attributes
+  virtual void initAttributes() {};
 
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Result();

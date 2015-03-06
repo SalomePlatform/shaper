@@ -29,6 +29,7 @@
 
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Feature.h>
+#include <SketchPlugin_SketchEntity.h>
 
 #include <memory>
 
@@ -49,9 +50,9 @@ void SketchPlugin_Sketch::initAttributes()
   data()->addAttribute(SketchPlugin_Sketch::NORM_ID(), GeomDataAPI_Dir::type());
   data()->addAttribute(SketchPlugin_Sketch::FEATURES_ID(), ModelAPI_AttributeRefList::type());
   // the selected face, base for the sketcher plane, not obligatory
-  data()->addAttribute(SketchPlugin_Feature::EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
+  data()->addAttribute(SketchPlugin_SketchEntity::EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
   ModelAPI_Session::get()->validators()->registerNotObligatory(
-    getKind(), SketchPlugin_Feature::EXTERNAL_ID());
+    getKind(), SketchPlugin_SketchEntity::EXTERNAL_ID());
 }
 
 void SketchPlugin_Sketch::execute()
@@ -83,13 +84,13 @@ void SketchPlugin_Sketch::execute()
       if (!aFeature->sketch()) // on load document the back references are missed
         aFeature->setSketch(this);
       // do not include the external edges into the result
-      if (aFeature->data()->attribute(SketchPlugin_Feature::EXTERNAL_ID())) {
-        if (aFeature->data()->selection(SketchPlugin_Feature::EXTERNAL_ID())->value())
+      if (aFeature->data()->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID())) {
+        if (aFeature->data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->value())
           continue;
       }
       // do not include the construction entities in the result
-      if (aFeature->data()->attribute(SketchPlugin_Feature::CONSTRUCTION_ID())) {
-        if (aFeature->data()->boolean(SketchPlugin_Feature::CONSTRUCTION_ID())->value())
+      if (aFeature->data()->attribute(SketchPlugin_SketchEntity::CONSTRUCTION_ID())) {
+        if (aFeature->data()->boolean(SketchPlugin_SketchEntity::CONSTRUCTION_ID())->value())
           continue;
       }
 
@@ -262,9 +263,9 @@ void SketchPlugin_Sketch::erase()
 }
 
 void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
-  if (theID == SketchPlugin_Feature::EXTERNAL_ID()) {
+  if (theID == SketchPlugin_SketchEntity::EXTERNAL_ID()) {
     std::shared_ptr<GeomAPI_Shape> aSelection = 
-      data()->selection(SketchPlugin_Feature::EXTERNAL_ID())->value();
+      data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->value();
     if (aSelection) { // update arguments due to the selection value
       // update the sketch plane
       std::shared_ptr<GeomAPI_Pln> aPlane = GeomAlgoAPI_FaceBuilder::plane(aSelection);

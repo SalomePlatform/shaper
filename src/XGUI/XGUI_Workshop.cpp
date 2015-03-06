@@ -36,6 +36,7 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
 
@@ -1239,6 +1240,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     activatePart(ResultPartPtr());
   else if (theId == "DELETE_CMD")
     deleteObjects(aObjects);
+  else if (theId == "COLOR_CMD")
+    changeColor(aObjects);
   else if (theId == "SHOW_CMD")
     showObjects(aObjects, true);
   else if (theId == "HIDE_CMD")
@@ -1370,6 +1373,98 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
   myDisplayer->updateViewer();
   aMgr->finishOperation();
   updateCommandStatus();
+}
+
+bool hasResults(QObjectPtrList theObjects, const std::set<std::string>& theTypes)
+{
+  bool isFoundResultType = false;
+  foreach(ObjectPtr anObj, theObjects)
+  {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+    if (aResult.get() == NULL)
+      continue;
+
+    isFoundResultType = theTypes.find(aResult->groupName()) != theTypes.end();
+    if (isFoundResultType)
+      break;
+  }
+  return isFoundResultType;
+}
+
+//**************************************************************
+bool XGUI_Workshop::canChangeColor() const
+{
+  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+
+  std::set<std::string> aTypes;
+  aTypes.insert(ModelAPI_ResultGroup::group());
+  aTypes.insert(ModelAPI_ResultConstruction::group());
+  aTypes.insert(ModelAPI_ResultBody::group());
+  return hasResults(aObjects, aTypes);
+}
+
+//**************************************************************
+#include <QDialog>
+#include <QHBoxLayout>
+#include <QtxColorButton.h>
+#include <ModelAPI_AttributeColor.h>
+void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
+{
+  // 1. find the initial value of the color
+  AttributeColorPtr aColorAttr;
+  foreach(ObjectPtr anObj, theObjects) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+    if (aResult.get() != NULL) {
+      AttributePtr anAttr = aResult->data()->attribute(ModelAPI_Result::COLOR_ID());
+      if (anAttr.get() != NULL)
+        aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>(anAttr);
+    }
+  }
+  // there is no object with the color attribute
+  if (aColorAttr.get() == NULL)
+    return;
+  int aRed, aGreen, aBlue;
+  aColorAttr->values(aRed, aGreen, aBlue);
+
+  // 2. show the dialog to change the value
+  QDialog aDlg;
+  QHBoxLayout* aLay = new QHBoxLayout(&aDlg);
+
+  QtxColorButton* aColorBtn = new QtxColorButton(&aDlg);
+  aLay->addWidget(aColorBtn);
+  aColorBtn->setColor(QColor(aRed, aGreen, aBlue));
+
+  QPoint aPoint = QCursor::pos();
+  aDlg.move(aPoint);
+
+  bool isDone = aDlg.exec() == QDialog::Accepted;
+  if (!isDone)
+    return;
+
+  QColor aColorResult = aColorBtn->color();
+  int aRedResult = aColorResult.red(),
+      aGreenResult = aColorResult.green(),
+      aBlueResult = aColorResult.blue();
+
+  if (aRedResult == aRed && aGreenResult == aGreen && aBlueResult == aBlue)
+    return;
+
+  // 3. abort the previous operation and start a new one
+  if(!isActiveOperationAborted())
+    return;
+
+  // 4. set the value to all results
+  foreach(ObjectPtr anObj, theObjects) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+    if (aResult.get() != NULL) {
+      AttributePtr anAttr = aResult->data()->attribute(ModelAPI_Result::COLOR_ID());
+      if (anAttr.get() != NULL) {
+        aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>(anAttr);
+        if (aColorAttr.get() != NULL)
+          aColorAttr->setValues(aRedResult, aGreenResult, aBlueResult);
+      }
+    }
+  }
 }
 
 //**************************************************************

@@ -60,6 +60,10 @@ class Config_PropManager
   CONFIG_EXPORT static double real(const std::string& theSection,
                                    const std::string& theName,
                                    const std::string& theDefault);
+  //! Returns boolean by given section and name
+  CONFIG_EXPORT static bool boolean(const std::string& theSection,
+                                   const std::string& theName,
+                                   const std::string& theDefault);
 
  private:
   CONFIG_EXPORT static Config_Properties myProps; ///< List of all stored properties

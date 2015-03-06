@@ -8,6 +8,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_Feature.h
     SketchPlugin_Plugin.h
     SketchPlugin_Sketch.h
+    SketchPlugin_SketchEntity.h
     SketchPlugin_Line.h
     SketchPlugin_Point.h
     SketchPlugin_Circle.h
@@ -30,6 +31,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_Feature.cpp
     SketchPlugin_Plugin.cpp
     SketchPlugin_Sketch.cpp
+    SketchPlugin_SketchEntity.cpp
     SketchPlugin_Line.cpp
     SketchPlugin_Point.cpp
     SketchPlugin_Circle.cpp

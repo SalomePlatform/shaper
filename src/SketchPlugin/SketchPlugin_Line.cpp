@@ -23,14 +23,15 @@
 using namespace std;
 
 SketchPlugin_Line::SketchPlugin_Line()
-    : SketchPlugin_Feature()
+    : SketchPlugin_SketchEntity()
 {}
 
 void SketchPlugin_Line::initAttributes()
 {
+  SketchPlugin_SketchEntity::initAttributes();
+
   data()->addAttribute(START_ID(), GeomDataAPI_Point2D::type());
   data()->addAttribute(END_ID(), GeomDataAPI_Point2D::type());
-  data()->addAttribute(CONSTRUCTION_ID(), ModelAPI_AttributeBoolean::type());
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 }

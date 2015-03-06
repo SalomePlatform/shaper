@@ -251,6 +251,7 @@ private:
   bool myIsPropertyPanelValueChanged; /// the state that value in the property panel is changed
   bool myIsMouseOverWindow; /// the state that the mouse over the view
   bool myIsMouseOverViewProcessed; /// the state whether the over view state is processed by mouseMove method
+  bool myIsPopupMenuActive; /// the state of the popup menu is shown
   Point myCurrentPoint;
   Point myClickedPoint;
 

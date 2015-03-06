@@ -164,7 +164,22 @@ bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
                                                 const std::list<std::string>& theArguments,
                                                 const AttributePtr& theAttribute) const
 {
-  return PartSet_DifferentObjectsValidator::isValid(theAttribute, theArguments);
+  if (PartSet_DifferentObjectsValidator::isValid(theAttribute, theArguments)) {
+    std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
+      theFeature->data()->attributes(ModelAPI_AttributeRefAttr::type());
+    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+    for(; anAttr != anAttrs.end(); anAttr++) {
+      if (*anAttr) {
+        std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
+          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
+        // check the object is already presented
+        if (!aRef->isObject() && aRef->attr() == theAttribute)
+          return false;
+      }
+    }
+    return true;
+  }
+  return false;
 }
 
 bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute, 

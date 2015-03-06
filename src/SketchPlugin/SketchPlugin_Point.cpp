@@ -21,11 +21,14 @@
 using namespace std;
 
 SketchPlugin_Point::SketchPlugin_Point()
+    : SketchPlugin_SketchEntity()
 {
 }
 
 void SketchPlugin_Point::initAttributes()
 {
+  SketchPlugin_SketchEntity::initAttributes();
+
   data()->addAttribute(SketchPlugin_Point::COORD_ID(), GeomDataAPI_Point2D::type());
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::type());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());

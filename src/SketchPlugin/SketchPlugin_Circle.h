@@ -8,7 +8,7 @@
 #define SketchPlugin_Circle_H_
 
 #include "SketchPlugin.h"
-#include <SketchPlugin_Feature.h>
+#include <SketchPlugin_SketchEntity.h>
 #include <SketchPlugin_Sketch.h>
 #include <GeomAPI_IPresentable.h>
 
@@ -16,7 +16,7 @@
  * \ingroup Plugins
  * \brief Feature for creation of the new circle in PartSet.
  */
-class SketchPlugin_Circle : public SketchPlugin_Feature 
+class SketchPlugin_Circle : public SketchPlugin_SketchEntity 
 {
  public:
   /// Circle feature kind
