@@ -53,6 +53,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IViewer.h>
 #include<ModuleBase_FilterFactory.h>
+#include <ModuleBase_PageBase.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>

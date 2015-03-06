@@ -22,6 +22,11 @@ ModuleBase_PageBase::~ModuleBase_PageBase()
 
 }
 
+QWidget* ModuleBase_PageBase::pageWidget()
+{
+  return dynamic_cast<QWidget*>(this);
+}
+
 void ModuleBase_PageBase::addModelWidget(ModuleBase_ModelWidget* theWidget)
 {
   placeModelWidget(theWidget);
@@ -35,7 +40,14 @@ void ModuleBase_PageBase::addPageWidget(ModuleBase_PageBase* thePage)
 
 void ModuleBase_PageBase::clearPage()
 {
-  qDeleteAll(pageLayout()->children());
+  QLayoutItem *aChild;
+  while ((aChild = pageLayout()->takeAt(0)) != 0) {
+    if(aChild->widget()) {
+      aChild->widget()->deleteLater();
+    } else {
+      delete aChild;
+    }
+  }
   myWidgetList.clear();
 }
 
@@ -51,4 +63,24 @@ void ModuleBase_PageBase::takeFocus()
 QList<ModuleBase_ModelWidget*> ModuleBase_PageBase::modelWidgets()
 {
   return myWidgetList;
+}
+
+void ModuleBase_PageBase::alignToTop()
+{
+  bool hasExpanding = false;
+  QList<QWidget *> aListToCheck;
+  ModuleBase_ModelWidget* aModelWidget;
+  foreach(aModelWidget, myWidgetList) {
+    aListToCheck << aModelWidget->getControls();
+  }
+  foreach(QWidget* eachWidget, aListToCheck) {
+    QSizePolicy::Policy aVPolicy = eachWidget->sizePolicy().verticalPolicy();
+    if(aVPolicy & QSizePolicy::ExpandFlag) {
+      hasExpanding = true;
+      break;
+    }
+  }
+  if(!hasExpanding) {
+    addPageStretch();
+  }
 }

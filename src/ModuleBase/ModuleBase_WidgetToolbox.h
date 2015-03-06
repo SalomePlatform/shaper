@@ -26,9 +26,11 @@ class ModuleBase_WidgetToolbox : public ModuleBase_ModelWidget
   virtual QList<QWidget*> getControls() const;
   virtual bool focusTo();
 
-  int addPage(QWidget* theWidget, const QString& theName, const QString& theCaseId);
+  int addPage(ModuleBase_PageBase* theWidget,
+              const QString& theName, const QString& theCaseId);
 
  protected:
+  virtual void activateCustom();
   virtual bool storeValueCustom() const;
 
  protected slots:
@@ -37,6 +39,7 @@ class ModuleBase_WidgetToolbox : public ModuleBase_ModelWidget
  private:
   QToolBox* myToolBox;
   QStringList myCaseIds;
+  QList<ModuleBase_PageBase*> myPages;
 };
 
 #endif /* MODULEBASE_WIDGETTOOLBOX_H_ */

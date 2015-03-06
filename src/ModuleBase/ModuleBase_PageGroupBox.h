@@ -31,6 +31,7 @@ class MODULEBASE_EXPORT ModuleBase_PageGroupBox : public QGroupBox, public Modul
   virtual void placeModelWidget(ModuleBase_ModelWidget* theWidget);
   virtual void placePageWidget(ModuleBase_PageBase* theWidget);
   virtual QLayout* pageLayout();
+  virtual void addPageStretch();
 
  private:
   QGridLayout* myMainLayout;

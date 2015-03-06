@@ -73,26 +73,19 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
   if (!myWidgetApi->toChildWidget())
     return;
 
-  //bool isStretchLayout = false;
-  QWidget* aPageWidget = dynamic_cast<QWidget*>(thePage);
-  if(!aPageWidget) {
-    #ifdef _DEBUG
-    std::cout << "ModuleBase_WidgetFactory::createWidget: can not reinterpret_cast thePage" << std::endl;
-    #endif
-  }
   do {  //Iterate over each node
     std::string aWdgType = myWidgetApi->widgetType();
     // Create PageGroup TODO: extract
     if (myWidgetApi->isGroupBoxWidget()) {
       //if current widget is groupbox (container) process it's children recursively
       QString aGroupName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
-      ModuleBase_PageGroupBox* aPage = new ModuleBase_PageGroupBox(aPageWidget);
+      ModuleBase_PageGroupBox* aPage = new ModuleBase_PageGroupBox(thePage->pageWidget());
       aPage->setTitle(aGroupName);
       createWidget(aPage);
       thePage->addPageWidget(aPage);
     } else {
       // Create a ModelWidget
-      ModuleBase_ModelWidget* aWidget = createWidgetByType(aWdgType, aPageWidget);
+      ModuleBase_ModelWidget* aWidget = createWidgetByType(aWdgType, thePage->pageWidget());
       if (aWidget) {
         if (!myWidgetApi->getBooleanAttribute(ATTR_INTERNAL, false)) {
           thePage->addModelWidget(aWidget);
@@ -116,36 +109,14 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
             aSwitch->addPage(aCasePageWidget, aPageName);
           } else if (aWdgType == WDG_TOOLBOX) {
             ModuleBase_WidgetToolbox* aToolbox = qobject_cast<ModuleBase_WidgetToolbox*>(aWidget);
-            aToolbox->addPage(aCasePageWidget, aPageName, aCaseId);
+            aToolbox->addPage(aPage, aPageName, aCaseId);
           }
         } while (myWidgetApi->toNextWidget());
       }
     }
-//    if (aWidget && !isStretchLayout) {
-//      isStretchLayout = !hasExpandingControls(aWidget);
-//    }
   } while (myWidgetApi->toNextWidget());
-//  if (isStretchLayout) {
-//    aWidgetLay->addStretch(1);
-//  }
-}
 
-bool ModuleBase_WidgetFactory::hasExpandingControls(QWidget* theParent)
-{
-  bool result = false;
-  QList<QWidget *> aListToCheck;
-  aListToCheck << theParent;
-  ModuleBase_ModelWidget* aModelWidget = qobject_cast<ModuleBase_ModelWidget*>(theParent);
-  if(aModelWidget) {
-    aListToCheck << aModelWidget->getControls();
-  }
-  foreach(QWidget* eachWidget, aListToCheck) {
-    QSizePolicy::Policy aVPolicy = eachWidget->sizePolicy().verticalPolicy();
-    if(aVPolicy & QSizePolicy::ExpandFlag) {
-      result = true;
-    }
-  }
-  return result;
+  thePage->alignToTop();
 }
 
 ModuleBase_ModelWidget* ModuleBase_WidgetFactory

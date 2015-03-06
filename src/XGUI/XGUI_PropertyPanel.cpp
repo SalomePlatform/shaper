@@ -131,8 +131,7 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
     return;
   if (theFeature->isAction() || !theFeature->data())
     return;
-  foreach(ModuleBase_ModelWidget* eachWidget, myWidgets)
-  {
+  foreach(ModuleBase_ModelWidget* eachWidget, myWidgets) {
     eachWidget->setFeature(theFeature);
     eachWidget->restoreValue();
   }

@@ -23,6 +23,7 @@ class MODULEBASE_EXPORT ModuleBase_PageBase
  public:
   ModuleBase_PageBase();
   virtual ~ModuleBase_PageBase();
+  QWidget* pageWidget();
 
   void addModelWidget(ModuleBase_ModelWidget* theWidget);
   void addPageWidget(ModuleBase_PageBase* theWidget);
@@ -30,11 +31,13 @@ class MODULEBASE_EXPORT ModuleBase_PageBase
   void clearPage();
   void takeFocus();
   QList<ModuleBase_ModelWidget*> modelWidgets();
+  void alignToTop();
 
  protected:
   virtual void placeModelWidget(ModuleBase_ModelWidget* theWidget) = 0;
   virtual void placePageWidget(ModuleBase_PageBase* theWidget) = 0;
   virtual QLayout* pageLayout() = 0;
+  virtual void addPageStretch() = 0;
 
  private:
   QList<ModuleBase_ModelWidget*> myWidgetList;

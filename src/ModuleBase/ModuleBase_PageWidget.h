@@ -30,6 +30,7 @@ class MODULEBASE_EXPORT ModuleBase_PageWidget : public QFrame, public ModuleBase
   virtual void placeModelWidget(ModuleBase_ModelWidget* theWidget);
   virtual void placePageWidget(ModuleBase_PageBase* theWidget);
   virtual QLayout* pageLayout();
+  virtual void addPageStretch();
 
  private:
   QGridLayout* myMainLayout;

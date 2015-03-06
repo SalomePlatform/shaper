@@ -23,6 +23,10 @@ ModuleBase_PageGroupBox::~ModuleBase_PageGroupBox()
 {
 }
 
+void ModuleBase_PageGroupBox::addPageStretch()
+{
+}
+
 void ModuleBase_PageGroupBox::placeModelWidget(ModuleBase_ModelWidget* theWidget)
 {
   const int kCol = 0;
