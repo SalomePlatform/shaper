@@ -16,6 +16,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_AttributeColor.h>
 
 #include <ModuleBase_ResultPrs.h>
 
@@ -157,13 +158,8 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     aContext->Display(anAISIO, false);
 
     aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, false);
-    // Customization of presentation
-    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    if (aFeature.get() != NULL) {
-      GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
-      if (aCustPrs.get() != NULL)
-        aCustPrs->customisePresentation(theAIS);
-    }
+
+    customizeObject(theObject);
     if (aCanBeShaded) {
       openLocalContext();
       activateObjects(myActiveSelectionModes);
@@ -243,12 +239,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
       }
     }
     // Customization of presentation
-    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    if (aFeature.get() != NULL) {
-      GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
-      if (aCustPrs.get() != NULL)
-        aCustPrs->customisePresentation(aAISObj);
-    }
+    customizeObject(theObject);
 
     aContext->Redisplay(aAISIO, false);
     if (isUpdateViewer)
@@ -763,6 +754,30 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
         //aContext->Load(anAISIO, aMode, true);
         aContext->Activate(theIO, aMode);
       }
+    }
+  }
+}
+
+void XGUI_Displayer::customizeObject(ObjectPtr theObject)
+{
+  AISObjectPtr anAISObj = getAISObject(theObject);
+  // correct the result's color it it has the attribute
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+  if (aResult.get() != NULL && aResult->data()->attribute(ModelAPI_Result::COLOR_ID()).get() != NULL) {
+    int aRed, aGreen, aBlue;
+
+    AttributeColorPtr aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>(
+                                              aResult->data()->attribute(ModelAPI_Result::COLOR_ID()));
+    aColorAttr->values(aRed, aGreen, aBlue);
+    anAISObj->setColor(aRed, aGreen, aBlue);
+  }
+  else {
+    // Customization of presentation
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    if (aFeature.get() != NULL) {
+      GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
+      if (aCustPrs.get() != NULL)
+        aCustPrs->customisePresentation(anAISObj);
     }
   }
 }
