@@ -53,9 +53,13 @@ void XGUI_ContextMenuMgr::createActions()
   if (!aDesktop)
     aDesktop = myWorkshop->salomeConnector()->desktop();
   aDesktop->addAction(aAction);
+
   addAction("DELETE_CMD", aAction);
   aAction->setShortcut(Qt::Key_Delete);
   aAction->setShortcutContext(Qt::ApplicationShortcut);
+
+  aAction = new QAction(QIcon(":pictures/color.png"), tr("Color"), this);
+  addAction("COLOR_CMD", aAction);
 
   aAction = new QAction(QIcon(":pictures/eye_pencil.png"), tr("Show"), this);
   addAction("SHOW_CMD", aAction);
@@ -188,6 +192,9 @@ QMenu* XGUI_ContextMenuMgr::objectBrowserMenu() const
     if (hasFeature)
       aMenu->addAction(action("DELETE_CMD"));
   }
+  if (myWorkshop->canChangeColor())
+    aMenu->addAction(action("COLOR_CMD"));
+
   aMenu->addSeparator();
   aMenu->addActions(myWorkshop->objectBrowser()->actions());
 
@@ -257,6 +264,8 @@ void XGUI_ContextMenuMgr::addViewerItems(QMenu* theMenu) const
       aSubMenu->addActions(aMDI->actions());
     }
   }
+  if (myWorkshop->canChangeColor())
+    theMenu->addAction(action("COLOR_CMD"));
 
   ModuleBase_IModule* aModule = myWorkshop->module();
   if (aModule)

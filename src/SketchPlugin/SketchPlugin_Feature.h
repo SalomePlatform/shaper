@@ -14,14 +14,8 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeBoolean.h>
-#include <GeomAPI_ICustomPrs.h>
 
 #include <Config_PropManager.h>
-
-#define SKETCH_EDGE_COLOR "#ff0000"
-#define SKETCH_POINT_COLOR "#ff0000"
-#define SKETCH_EXTERNAL_EDGE_COLOR "#00ff00"
-#define SKETCH_CONSTRUCTION_COLOR "#000000"
 
 class SketchPlugin_Sketch;
 class GeomAPI_Pnt2d;
@@ -32,25 +26,17 @@ class Handle_AIS_InteractiveObject;
  * \brief Feature for creation of the new feature in PartSet. This is an abstract class to give
  * an interface to create the sketch feature preview.
  */
-class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
+class SketchPlugin_Feature : public ModelAPI_Feature
 {
  public:
-  /// Reference to the construction type of the feature
-  inline static const std::string& CONSTRUCTION_ID()
-  {
-    static const std::string MY_CONSTRUCTION_ID("Construction");
-    return MY_CONSTRUCTION_ID;
-  }
-
-  /// Reference to the external edge or vertex as a AttributeSelection
-  inline static const std::string& EXTERNAL_ID()
-  {
-    static const std::string MY_EXTERNAL_ID("External");
-    return MY_EXTERNAL_ID;
-  }
-
   /// Returns true if this feature must be displayed in the history (top level of Part tree)
   SKETCHPLUGIN_EXPORT virtual bool isInHistory()
+  {
+    return false;
+  }
+
+  /// Returns true of the feature is created basing on the external shape of not-this-sketch object
+  SKETCHPLUGIN_EXPORT virtual bool isExternal() const
   {
     return false;
   }
@@ -69,60 +55,6 @@ class SketchPlugin_Feature : public ModelAPI_Feature, public GeomAPI_ICustomPrs
 
   /// Returns true is sketch element is under the rigid constraint
   SKETCHPLUGIN_EXPORT virtual bool isFixed() {return false;}
-
-  /// Returns true of the feature is created basing on the external shape of not-this-sketch object
-  inline bool isExternal() const
-  {
-    AttributeSelectionPtr aAttr = data()->selection(EXTERNAL_ID());
-    if (aAttr)
-      return aAttr->context().get() != NULL;
-    return false;
-  }
-
-  /// Customize presentation of the feature
-  virtual void customisePresentation(AISObjectPtr thePrs)
-  {
-    std::vector<int> aRGB;
-  
-    int aShapeType = thePrs->getShapeType();
-    if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/)
-      return;
-
-    std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr =
-                                   data()->boolean(SketchPlugin_Feature::CONSTRUCTION_ID());
-    bool isConstruction = aConstructionAttr.get() != NULL && aConstructionAttr->value();
-    if (aShapeType == 6) { // if this is an edge
-      if (isConstruction) {
-        thePrs->setWidth(1);
-        thePrs->setLineStyle(3);
-        aRGB = Config_PropManager::color("Visualization", "sketch_construction_color",
-                                         SKETCH_CONSTRUCTION_COLOR);
-      }
-      else {
-        thePrs->setWidth(3);
-        thePrs->setLineStyle(0);
-        if (isExternal()) {
-          // Set color from preferences
-          aRGB = Config_PropManager::color("Visualization", "sketch_external_color",
-                                           SKETCH_EXTERNAL_EDGE_COLOR);
-        }
-        else {
-          // Set color from preferences
-          aRGB = Config_PropManager::color("Visualization", "sketch_edge_color",
-                                           SKETCH_EDGE_COLOR);
-        }
-      }
-    }
-    else if (aShapeType == 7) { // otherwise this is a vertex
-      //  thePrs->setPointMarker(6, 2.);
-      // Set color from preferences
-      aRGB = Config_PropManager::color("Visualization", "sketch_point_color",
-                                       SKETCH_POINT_COLOR);
-    }
-
-    if (!aRGB.empty())
-      thePrs->setColor(aRGB[0], aRGB[1], aRGB[2]);
-  }
 
   /// Returns the sketch of this feature
   SketchPlugin_Sketch* sketch();

@@ -22,12 +22,14 @@
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
 SketchPlugin_Circle::SketchPlugin_Circle()
-    : SketchPlugin_Feature()
+    : SketchPlugin_SketchEntity()
 {
 }
 
 void SketchPlugin_Circle::initAttributes()
 {
+  SketchPlugin_SketchEntity::initAttributes();
+
   data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::type());
   data()->addAttribute(RADIUS_ID(), ModelAPI_AttributeDouble::type());
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::type());

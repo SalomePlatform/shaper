@@ -29,6 +29,9 @@ class Model_ResultBody : public ModelAPI_ResultBody
   /// label; index in vector corresponds to the label tag
   std::vector<TNaming_Builder*> myBuilders;
 public:
+  /// Request for initialization of data model of the result: adding all attributes
+  virtual void initAttributes();
+
   /// Stores the shape (called by the execution method).
   MODEL_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape);
 

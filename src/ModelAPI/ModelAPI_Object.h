@@ -44,6 +44,9 @@ class ModelAPI_Object
   /// Returns the group identifier of this object
   virtual std::string groupName() = 0;
 
+  /// Request for initialization of data model of the object: adding all attributes
+  virtual void initAttributes() = 0;
+
   /// Called on change of any argument-attribute of this object
   /// \param theID identifier of changed attribute
   // MODELAPI_EXPORT

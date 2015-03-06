@@ -116,7 +116,8 @@ void fillFeature2Attribute(const QList<ModuleBase_ViewerPrs>& theList,
 PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsDragging(false), myDragDone(false),
     myIsPropertyPanelValueChanged(false), myIsMouseOverWindow(false),
-    myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true)
+    myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
+    myIsPopupMenuActive(false)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -236,6 +237,8 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 {
   get2dPoint(theWnd, theEvent, myClickedPoint);
 
+  myIsPopupMenuActive = theEvent->buttons() & Qt::RightButton;
+
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
 
@@ -315,6 +318,9 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
 void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  if (myIsPopupMenuActive)
+    myIsPopupMenuActive = false;
+
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   if (!aViewer->canDragByMouse())
@@ -727,6 +733,8 @@ bool PartSet_SketcherMgr::canDisplayObject() const
       return aCanDisplay;
     }
   }
+  if (myIsPopupMenuActive)
+    return aCanDisplay;
 
   // during a nested create operation, the feature is redisplayed only if the mouse over view
   // of there was a value modified in the property panel after the mouse left the view
@@ -768,7 +776,7 @@ bool PartSet_SketcherMgr::canChangeConstruction(bool& isConstruction) const
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
                             std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature.get() != NULL) {
-          std::string anAttribute = SketchPlugin_Feature::CONSTRUCTION_ID();
+          std::string anAttribute = SketchPlugin_SketchEntity::CONSTRUCTION_ID();
 
           std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr = 
             std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
@@ -821,7 +829,7 @@ void PartSet_SketcherMgr::setConstruction(const bool isChecked)
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
                             std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature.get() != NULL) {
-          std::string anAttribute = SketchPlugin_Feature::CONSTRUCTION_ID();
+          std::string anAttribute = SketchPlugin_SketchEntity::CONSTRUCTION_ID();
 
           std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr = 
             std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));

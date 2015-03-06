@@ -23,7 +23,7 @@
 const double tolerance = 1e-7;
 
 SketchPlugin_Arc::SketchPlugin_Arc()
-    : SketchPlugin_Feature()
+    : SketchPlugin_SketchEntity()
 {
   myStartUpdate = false;
   myEndUpdate = false;
@@ -31,6 +31,8 @@ SketchPlugin_Arc::SketchPlugin_Arc()
 
 void SketchPlugin_Arc::initAttributes()
 {
+  SketchPlugin_SketchEntity::initAttributes();
+
   data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::type());
   data()->addAttribute(START_ID(), GeomDataAPI_Point2D::type());
   data()->addAttribute(END_ID(), GeomDataAPI_Point2D::type());

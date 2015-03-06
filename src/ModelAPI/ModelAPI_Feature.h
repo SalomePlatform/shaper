@@ -49,9 +49,6 @@ class ModelAPI_Feature : public ModelAPI_Object
     return group();
   }
 
-  /// Request for initialization of data model of the feature: adding all attributes
-  virtual void initAttributes() = 0;
-
   /// Computes or recomputes the results
   virtual void execute() = 0;
 

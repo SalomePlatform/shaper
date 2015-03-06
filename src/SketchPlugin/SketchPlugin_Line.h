@@ -8,7 +8,7 @@
 #define SketchPlugin_Line_H_
 
 #include "SketchPlugin.h"
-#include <SketchPlugin_Feature.h>
+#include <SketchPlugin_SketchEntity.h>
 #include <SketchPlugin_Sketch.h>
 #include <list>
 
@@ -16,7 +16,7 @@
  * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.
  */
-class SketchPlugin_Line : public SketchPlugin_Feature
+class SketchPlugin_Line : public SketchPlugin_SketchEntity
 {
  public:
   /// Arc feature kind

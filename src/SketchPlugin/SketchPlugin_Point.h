@@ -9,14 +9,14 @@
 
 #include "SketchPlugin.h"
 #include <SketchPlugin_Sketch.h>
-#include "SketchPlugin_Feature.h"
+#include "SketchPlugin_SketchEntity.h"
 #include <list>
 
 /**\class SketchPlugin_Point
  * \ingroup Plugins
  * \brief Feature for creation of a new point.
  */
-class SketchPlugin_Point : public SketchPlugin_Feature
+class SketchPlugin_Point : public SketchPlugin_SketchEntity
 {
  public:
   /// Point feature kind

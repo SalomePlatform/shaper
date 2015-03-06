@@ -7,6 +7,8 @@
 #include "PartSet_WidgetSketchLabel.h"
 #include "PartSet_Tools.h"
 
+#include "SketchPlugin_SketchEntity.h"
+
 #include <XGUI_Workshop.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_SelectionMgr.h>
@@ -91,7 +93,7 @@ void PartSet_WidgetSketchLabel::onPlaneSelected()
           DataPtr aData = feature()->data();
           AttributeSelectionPtr aSelAttr = 
             std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-            (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
+            (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
           if (aSelAttr) {
             ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs.object());
             if (aRes) {
