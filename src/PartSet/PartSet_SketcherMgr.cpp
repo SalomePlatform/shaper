@@ -15,6 +15,7 @@
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_Workshop.h>
+#include <XGUI_ContextMenuMgr.h>
 #include <XGUI_Selection.h>
 #include <XGUI_SelectionMgr.h>
 #include <ModuleBase_ModelWidget.h>
@@ -55,6 +56,7 @@
 //#include <AIS_Shape.hxx>
 
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Session.h>
 
 #include <QMouseEvent>
 #include <QApplication>
@@ -572,6 +574,21 @@ bool PartSet_SketcherMgr::isNestedSketchOperation(ModuleBase_Operation* theOpera
          PartSet_SketcherMgr::sketchOperationIdList().contains(theOperation->id());
 }
 
+bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOperation)
+{
+  return theOperation && !theOperation->isEditOperation() && isNestedSketchOperation(theOperation);
+}
+
+bool PartSet_SketcherMgr::isEntityOperation(ModuleBase_Operation* theOperation)
+{
+  std::string aId = theOperation ? theOperation->id().toStdString() : "";
+
+  return (aId == SketchPlugin_Line::ID()) ||
+         (aId == SketchPlugin_Point::ID()) ||
+         (aId == SketchPlugin_Arc::ID()) ||
+         (aId == SketchPlugin_Circle::ID());
+}
+
 bool PartSet_SketcherMgr::isDistanceOperation(ModuleBase_Operation* theOperation)
 {
   std::string aId = theOperation ? theOperation->id().toStdString() : "";
@@ -715,6 +732,109 @@ bool PartSet_SketcherMgr::canDisplayObject() const
   // of there was a value modified in the property panel after the mouse left the view
   aCanDisplay = myIsPropertyPanelValueChanged || myIsMouseOverWindow;
   return aCanDisplay;
+}
+
+bool PartSet_SketcherMgr::canChangeConstruction(bool& isConstruction) const
+{
+  bool anEnabled = false;
+  ModuleBase_Operation* anOperation = getCurrentOperation();
+
+  bool isActiveSketch = PartSet_SketcherMgr::isSketchOperation(anOperation) ||
+                        PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
+  if (!isActiveSketch)
+    return anEnabled;
+
+  QObjectPtrList anObjects;
+  // 1. change construction type of a created feature
+  if (PartSet_SketcherMgr::isNestedCreateOperation(anOperation) &&
+      PartSet_SketcherMgr::isEntityOperation(anOperation) ) {
+    anObjects.append(anOperation->feature());
+  }
+  else {
+    if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
+      anOperation->abort();
+    // 2. change construction type of selected sketch entities
+    ModuleBase_ISelection* aSelection = myModule->workshop()->selection();
+    anObjects = aSelection->selectedPresentations();
+  }
+  anEnabled = anObjects.size() > 0;
+
+  bool isNotConstructedFound = false;
+  if (anObjects.size() > 0) {
+    QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
+    for (; anIt != aLast && !isNotConstructedFound; anIt++) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+      if (aFeature.get() != NULL) {
+        std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+                            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+        if (aSketchFeature.get() != NULL) {
+          std::string anAttribute = SketchPlugin_Feature::CONSTRUCTION_ID();
+
+          std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr = 
+            std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
+          isNotConstructedFound = !aConstructionAttr->value();
+        }
+      }
+    }
+  }
+  isConstruction = anObjects.size() && !isNotConstructedFound;
+  return anEnabled;
+}
+  
+void PartSet_SketcherMgr::setConstruction(const bool isChecked)
+{
+  ModuleBase_Operation* anOperation = getCurrentOperation();
+
+  bool isActiveSketch = PartSet_SketcherMgr::isSketchOperation(anOperation) ||
+                        PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
+  if (!isActiveSketch)
+    return;
+
+  QObjectPtrList anObjects;
+  bool isUseTransaction = false;
+  // 1. change construction type of a created feature
+  if (PartSet_SketcherMgr::isNestedCreateOperation(anOperation) &&
+      PartSet_SketcherMgr::isEntityOperation(anOperation) ) {
+    anObjects.append(anOperation->feature());
+  }
+  else {
+    isUseTransaction = true;
+    // 2. change construction type of selected sketch entities
+    ModuleBase_ISelection* aSelection = myModule->workshop()->selection();
+    anObjects = aSelection->selectedPresentations();
+  }
+
+  QAction* anAction = myModule->action("CONSTRUCTION_CMD");
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (isUseTransaction) {
+    if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
+      anOperation->abort();
+    aMgr->startOperation(anAction->text().toStdString());
+  }
+  storeSelection();
+
+  if (anObjects.size() > 0) {
+    QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
+    for (; anIt != aLast; anIt++) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+      if (aFeature.get() != NULL) {
+        std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+                            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+        if (aSketchFeature.get() != NULL) {
+          std::string anAttribute = SketchPlugin_Feature::CONSTRUCTION_ID();
+
+          std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr = 
+            std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
+          aConstructionAttr->setValue(isChecked);
+        }
+      }
+    }
+  }
+  if (isUseTransaction) {
+    aMgr->finishOperation();
+  }
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  restoreSelection();
 }
 
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
@@ -877,11 +997,6 @@ ModuleBase_Operation* PartSet_SketcherMgr::getCurrentOperation() const
   return myModule->workshop()->currentOperation();
 }
 
-bool PartSet_SketcherMgr::isNestedCreateOperation(ModuleBase_Operation* theOperation) const
-{
-  return theOperation && !theOperation->isEditOperation() && isNestedSketchOperation(theOperation);
-}
-
 void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
                                            const bool isToDisplay)
 {
@@ -917,7 +1032,6 @@ void PartSet_SketcherMgr::visualizeFeature(ModuleBase_Operation* theOperation,
 void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
 {
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-
   ModuleBase_ISelection* aSelect = aWorkshop->selection();
   QList<ModuleBase_ViewerPrs> aHighlighted = aSelect->getHighlighted();
     
@@ -940,12 +1054,12 @@ void PartSet_SketcherMgr::storeSelection(const bool theHighlightedOnly)
     FeaturePtr aFeature = anIt.key();
     getCurrentSelection(aFeature, myCurrentSketch, aWorkshop, myCurrentSelection);
   }
-  qDebug(QString("  storeSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
+  //qDebug(QString("  storeSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
 }
 
 void PartSet_SketcherMgr::restoreSelection()
 {
-  qDebug(QString("restoreSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
+  //qDebug(QString("restoreSelection: %1").arg(myCurrentSelection.size()).toStdString().c_str());
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
   FeatureToSelectionMap::const_iterator aSIt = myCurrentSelection.begin(),

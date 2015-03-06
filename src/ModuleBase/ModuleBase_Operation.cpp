@@ -80,16 +80,6 @@ bool ModuleBase_Operation::canBeCommitted() const
   return isValid();
 }
 
-void ModuleBase_Operation::flushUpdated()
-{
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-}
-
-void ModuleBase_Operation::flushCreated()
-{
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-}
-
 FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
 {
   if (myParentFeature.get()) {
@@ -111,7 +101,7 @@ FeaturePtr ModuleBase_Operation::createFeature(const bool theFlushMessage)
   }
 
   if (theFlushMessage)
-    flushCreated();
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   return myFeature;
 }
 

@@ -210,12 +210,6 @@ signals:
   /// Virtual method called after operation resume (see resume() method for more description)
   virtual void resumeOperation() {}
 
-  /// Send update message by loop
-  void flushUpdated();
-
-  /// Send created message by loop
-  void flushCreated();
-
   /// Creates an operation new feature
   /// \param theFlushMessage the flag whether the create message should be flushed
   /// \returns the created feature

@@ -222,8 +222,12 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
     // Check that the visualized shape is the same and the redisplay is not necessary
     // Redisplay of AIS object leads to this object selection compute and the selection 
     // in the browser is lost
-    // become
-    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+
+    // this check is not necessary anymore because the selection store/restore is realized
+    // before and after the values modification.
+    // Moreother, this check avoids customize and redisplay presentation if the presentable
+    // parameter is changed.
+    /*ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if (aResult.get() != NULL) {
       Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(aAISIO);
       if (!aShapePrs.IsNull()) {
@@ -237,7 +241,15 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
             return;
         }
       }
+    }*/
+    // Customization of presentation
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    if (aFeature.get() != NULL) {
+      GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
+      if (aCustPrs.get() != NULL)
+        aCustPrs->customisePresentation(aAISObj);
     }
+
     aContext->Redisplay(aAISIO, false);
     if (isUpdateViewer)
       updateViewer();

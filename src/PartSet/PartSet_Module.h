@@ -79,6 +79,10 @@ public:
   /// \param theOperation a stopped operation
   virtual void operationStopped(ModuleBase_Operation* theOperation);
 
+  /// Returns action according to the given ID
+  /// \param theId an action identifier, it should be uniqued in the bounds of the module
+  QAction* action(const QString& theId) const;
+
   /// Returns True if there are available Undos and the sketch manager allows undo
   /// \return the boolean result
   virtual bool canUndo() const;
@@ -122,9 +126,6 @@ protected slots:
   /// It commits the operation of it is can be committed
   void onOperationActivatedByPreselection();
 
-  //! Delete features
-  void onDeleteObjects();
-
  protected:
   /// Register validators for this module
   virtual void registerValidators();
@@ -147,17 +148,13 @@ protected slots:
   /// Put the created actions into an internal map
   void createActions();
 
-  /// Returns action according to the given ID
-  /// \param theId an action identifier, it should be uniqued in the bounds of the module
-  QAction* action(const QString& theId) const;
-
   /// Add action to the internal map
   /// \param theId - string ID of the item
   /// \param theAction - action to add
   void addAction(const QString& theId, QAction* theAction);
 
   //! Delete features
-  void deleteObjects();
+  virtual bool deleteObjects();
 
  private:
    QString myLastOperationId;

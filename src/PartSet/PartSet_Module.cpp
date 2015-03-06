@@ -38,6 +38,7 @@
 #include <XGUI_OperationMgr.h>
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_ModuleConnector.h>
+#include <XGUI_ContextMenuMgr.h>
 #include <XGUI_Tools.h>
 
 #include <SketchPlugin_Feature.h>
@@ -94,7 +95,6 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
   connect(anOpMgr, SIGNAL(keyEnterReleased()), this, SLOT(onEnterReleased()));
-  connect(anOpMgr, SIGNAL(keyDeleteReleased()), this, SLOT(onDeleteObjects()));
   connect(anOpMgr, SIGNAL(operationActivatedByPreselection()),
           this, SLOT(onOperationActivatedByPreselection()));
 
@@ -293,8 +293,18 @@ void PartSet_Module::addViewerItems(QMenu* theMenu) const
         hasFeature = true;
       }
     }
-    if (hasFeature)
-      theMenu->addAction(action("DELETE_PARTSET_CMD"));
+    if (hasFeature) {
+      XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+      XGUI_Workshop* aWorkshop = aConnector->workshop();
+      QAction* anAction = aWorkshop->contextMenuMgr()->action("DELETE_CMD");
+      theMenu->addAction(anAction);
+    }
+  }
+  bool isConstruction;
+  if (mySketchMgr->canChangeConstruction(isConstruction)) {
+    QAction* anAction = action("CONSTRUCTION_CMD");
+    theMenu->addAction(anAction);
+    anAction->setChecked(isConstruction);
   }
 }
 
@@ -391,14 +401,6 @@ void PartSet_Module::onEnterReleased()
   myRestartingMode = RM_EmptyFeatureUsed;
 }
 
-void PartSet_Module::onDeleteObjects()
-{
-  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  if (PartSet_SketcherMgr::isSketchOperation(anOperation) ||
-      PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
-    deleteObjects();
-}
-
 void PartSet_Module::onOperationActivatedByPreselection()
 {
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
@@ -475,8 +477,11 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
 
 void PartSet_Module::createActions()
 {
-  QAction* aAction = new QAction(QIcon(":pictures/delete.png"), tr("Delete"), this);
-  addAction("DELETE_PARTSET_CMD", aAction);
+  QAction* anAction;
+
+  anAction = new QAction(tr("Construction"), this);
+  anAction->setCheckable(true);
+  addAction("CONSTRUCTION_CMD", anAction);
 }
 
 QAction* PartSet_Module::action(const QString& theId) const
@@ -500,17 +505,18 @@ void PartSet_Module::onAction(bool isChecked)
   QAction* aAction = static_cast<QAction*>(sender());
   QString anId = aAction->data().toString();
 
-  if (anId == "DELETE_PARTSET_CMD") {
-    deleteObjects();
+  if (anId == "CONSTRUCTION_CMD") {
+    mySketchMgr->setConstruction(isChecked);
   }
 }
 
-void PartSet_Module::deleteObjects()
+bool PartSet_Module::deleteObjects()
 {
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
-  if (!isSketchOp && !PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
-    return;
+  bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation),
+       isNestedOp = PartSet_SketcherMgr::isNestedSketchOperation(anOperation);
+  if (!isSketchOp && !isNestedOp)
+    return false;
 
   // sketch feature should be skipped, only sub-features can be removed
   // when sketch operation is active
@@ -519,17 +525,23 @@ void PartSet_Module::deleteObjects()
   // selected objects should be collected before the current operation abort because
   // the abort leads to selection lost on constraint objects. It can be corrected after #386 issue
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
   ModuleBase_ISelection* aSel = aConnector->selection();
   QObjectPtrList aSelectedObj = aSel->selectedPresentations();
 
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
-  XGUI_OperationMgr* anOpMgr = aWorkshop->operationMgr();
-  if (!isSketchOp && anOpMgr->canStopOperation()) {
-    ModuleBase_Operation* aCurrentOp = anOpMgr->currentOperation();
-    if (aCurrentOp) {
-      aCurrentOp->abort();
-    }
-  }
+  // if there are no selected objects in the viewer, that means that the selection in another
+  // place cased this method. It is necessary to return the false value to understande in above
+  // method that delete is not processed
+  if (aSelectedObj.count() == 0)
+    return false;
+
+  if (isNestedOp)
+    anOperation->abort();
+
+  // the active nested sketch operation should be aborted unconditionally
+  if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
+    anOperation->abort();
+
   std::set<FeaturePtr> aRefFeatures;
   foreach (ObjectPtr aObj, aSelectedObj)
   {
@@ -544,7 +556,8 @@ void PartSet_Module::deleteObjects()
     }
     //}
   }
-  QString aDescription = tr("Delete");
+
+  QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
   /**
   // according to #355 feature, it is not necessary to inform about dependencies during
   // sketch delete operation
@@ -604,4 +617,6 @@ void PartSet_Module::deleteObjects()
   aWorkshop->displayer()->updateViewer();
   //myDisplayer->updateViewer();
   aMgr->finishOperation();
+
+  return true;
 }

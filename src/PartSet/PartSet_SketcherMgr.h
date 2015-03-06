@@ -87,7 +87,17 @@ public:
   /// \return the boolean result
   static bool isNestedSketchOperation(ModuleBase_Operation* theOperation);
 
-  /// Returns whethe the current operation is a sketch distance - lenght, distance or radius
+  /// Returns true if the operation is a create nested feature one
+  /// \param theOperation a checked operation
+  //// \return boolean value
+  static bool isNestedCreateOperation(ModuleBase_Operation* theOperation);
+
+  /// Returns whether the current operation is a sketch entity - line, point, arc or circle
+  /// \param the operation
+  /// \return a boolean value
+  static bool isEntityOperation(ModuleBase_Operation* theOperation);
+
+  /// Returns whether the current operation is a sketch distance - lenght, distance or radius
   /// \param the operation
   /// \return a boolean value
   static bool isDistanceOperation(ModuleBase_Operation* theOperation);
@@ -126,6 +136,15 @@ public:
   /// if it is a sketch operation
   /// \param theObject a model object
   bool canDisplayObject() const;
+
+  /// Returns true if the current operation is sketch entity create operation
+  /// \param isConstruction the current construction state
+  /// \return the boolean result
+  bool canChangeConstruction(bool& isConstruction) const;
+  
+  /// Changes the sketcher entity construction argument value
+  /// \param isChecked if true, the feature is a construction
+  void setConstruction(const bool isChecked);
 
 public slots:
   /// Process sketch plane selected event
@@ -210,11 +229,6 @@ private:
   /// Returns a current operation
   /// \return an operation
   ModuleBase_Operation* getCurrentOperation() const;
-
-  /// Returns true if the operation is a create nested feature one
-  /// \param theOperation a checked operation
-  //// \return boolean value
-  bool isNestedCreateOperation(ModuleBase_Operation* theOperation) const;
 
   /// Erase or display the feature of the current operation. If the mouse over the active view or
   /// a current value is changed by property panel, the feature is displayed otherwise it is hidden
