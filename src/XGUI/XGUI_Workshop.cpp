@@ -646,7 +646,6 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
 
   myPropertyPanel->cleanContent();
   aFactory.createWidget(myPropertyPanel->contentWidget());
-  ModuleBase_Tools::zeroMargins(myPropertyPanel->contentWidget());
 
   QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {

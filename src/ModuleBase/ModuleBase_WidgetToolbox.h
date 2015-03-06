@@ -12,6 +12,8 @@
 
 #include <QToolBox>
 
+class ModuleBase_PageBase;
+
 class ModuleBase_WidgetToolbox : public ModuleBase_ModelWidget
 {
   Q_OBJECT
@@ -22,6 +24,7 @@ class ModuleBase_WidgetToolbox : public ModuleBase_ModelWidget
 
   virtual bool restoreValue();
   virtual QList<QWidget*> getControls() const;
+  virtual bool focusTo();
 
   int addPage(QWidget* theWidget, const QString& theName, const QString& theCaseId);
 

@@ -6,6 +6,7 @@
  */
 
 #include <ModuleBase_WidgetToolbox.h>
+#include <ModuleBase_PageBase.h>
 #include <ModuleBase_Tools.h>
 
 #include <ModelAPI_AttributeString.h>
@@ -69,6 +70,11 @@ QList<QWidget*> ModuleBase_WidgetToolbox::getControls() const
   QList<QWidget*> aList;
   aList << myToolBox;
   return aList;
+}
+
+bool ModuleBase_WidgetToolbox::focusTo()
+{
+  return false;
 }
 
 bool ModuleBase_WidgetToolbox::storeValueCustom() const

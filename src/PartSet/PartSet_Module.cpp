@@ -436,9 +436,8 @@ void PartSet_Module::onVertexSelected()
   }
 }
 
-QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget* theParent,
-                                            Config_WidgetAPI* theWidgetApi, std::string theParentId,
-                                            QList<ModuleBase_ModelWidget*>& theModelWidgets)
+ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget* theParent,
+                                            Config_WidgetAPI* theWidgetApi, std::string theParentId)
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
   XGUI_Workshop* aWorkshop = aConnector->workshop();
@@ -471,8 +470,6 @@ QWidget* PartSet_Module::createWidgetByType(const std::string& theType, QWidget*
     aConstraintShapeSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aConstraintShapeSelectorWgt;
   }
-  if(aWgt)
-    theModelWidgets.append(aWgt);
   return aWgt;
 }
 

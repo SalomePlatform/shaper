@@ -45,6 +45,9 @@ SET(PROJECT_HEADERS
 	ModuleBase_Preferences.h
 	ModuleBase_ActionInfo.h
 	ModuleBase_WidgetToolbox.h
+	ModuleBase_PageBase.h
+	ModuleBase_PageWidget.h	
+	ModuleBase_PageGroupBox.h
 )
 
 SET(PROJECT_SOURCES
@@ -80,6 +83,9 @@ SET(PROJECT_SOURCES
 	ModuleBase_Preferences.cpp
 	ModuleBase_ActionInfo.cpp
 	ModuleBase_WidgetToolbox.cpp
+	ModuleBase_PageBase.cpp
+	ModuleBase_PageWidget.cpp
+	ModuleBase_PageGroupBox.cpp
 )
 
 SET(PROJECT_LIBRARIES

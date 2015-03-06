@@ -7,11 +7,11 @@
  *      Author: sbh
  */
 
-#ifndef ModuleBase_WidgetFactory_H_
-#define ModuleBase_WidgetFactory_H_
+#ifndef MODULEBASE_WIDGETFACTORY_H_
+#define MODULEBASE_WIDGETFACTORY_H_
 
-#include "ModuleBase.h"
-#include "ModuleBase_ModelWidget.h"
+#include <ModuleBase.h>
+#include <ModuleBase_ModelWidget.h>
 
 #include <QString>
 #include <QList>
@@ -20,6 +20,7 @@ class QObject;
 class QWidget;
 class Config_WidgetAPI;
 class ModuleBase_IWorkshop;
+class ModuleBase_PageBase;
 
 /**
 * \ingroup GUI
@@ -38,7 +39,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
 
   /// Creates content widget for property panel
   /// \param theParent a parent widget
-  void createWidget(QWidget* theParent);
+  void createWidget(ModuleBase_PageBase* theParent);
 
 
   /// Returns list of model widgets
@@ -53,48 +54,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFactory
    /// Create widget by its type
    /// \param theType a type
    /// \param theParent a parent widget
-  QWidget* createWidgetByType(const std::string& theType, QWidget* theParent = NULL);
-
-   /// Create a widget of container type
-   /// \param theType a type
-   /// \param theParent a parent widget
-  QWidget* createContainer(const std::string& theType, QWidget* theParent);
-
-  /// Create label widget
-  /// \param theParent a parent widget
-  QWidget* labelControl(QWidget* theParent);
-
-  /// Create double spin box widget
-  /// \param theParent a parent widget
-  QWidget* doubleSpinBoxControl(QWidget* theParent);
-
-  /// Create double value editor widget
-  /// \param theParent a parent widget
-  QWidget* doubleValueEditor(QWidget* theParent);
-
-  /// Create shape selector widget
-  /// \param theParent a parent widget
-  QWidget* shapeSelectorControl(QWidget* theParent);
-
-  /// Create boolean input widget
-  /// \param theParent a parent widget
-  QWidget* booleanControl(QWidget* theParent);
-
-  /// Create file selector widget
-  /// \param theParent a parent widget
-  QWidget* fileSelectorControl(QWidget* theParent);
-
-  /// Create choice widget (combo box)
-  /// \param theParent a parent widget
-  QWidget* choiceControl(QWidget* theParent);
-
-  /// Create line edit widget
-  /// \param theParent a parent widget
-  QWidget* lineEditControl(QWidget* theParent);
-
-  /// Create multi selector widget
-  /// \param theParent a parent widget
-  QWidget* multiSelectorControl(QWidget* theParent);
+  ModuleBase_ModelWidget* createWidgetByType(const std::string& theType,
+                                             QWidget* theParent = NULL);
 
   /// Convert STD string to QT string
   /// \param theStdString is STD string

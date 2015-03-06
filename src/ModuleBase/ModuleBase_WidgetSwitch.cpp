@@ -8,20 +8,24 @@
  */
 
 #include <ModuleBase_WidgetSwitch.h>
+#include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_PageBase.h>
 
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QSpacerItem>
 
-ModuleBase_WidgetSwitch::ModuleBase_WidgetSwitch(QWidget* parent)
-    : QFrame(parent)
+
+ModuleBase_WidgetSwitch::ModuleBase_WidgetSwitch(QWidget* theParent, const Config_WidgetAPI* theData,
+                                                 const std::string& theParentId)
+: ModuleBase_ModelWidget(theParent, theData, theParentId)
 {
   myMainLay = new QVBoxLayout(this);
   myMainLay->setContentsMargins(2, 4, 2, 2);
   myCombo = new QComboBox(this);
   myCombo->hide();
   myMainLay->addWidget(myCombo);
-  this->setFrameShape(QFrame::StyledPanel);
+  //this->setFrameShape(QFrame::StyledPanel);
   connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCurrentIndex(int)));
   connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SIGNAL(currentPageChanged(int)));
 
@@ -29,6 +33,13 @@ ModuleBase_WidgetSwitch::ModuleBase_WidgetSwitch(QWidget* parent)
 
 ModuleBase_WidgetSwitch::~ModuleBase_WidgetSwitch()
 {
+}
+
+QList<QWidget*> ModuleBase_WidgetSwitch::getControls() const
+{
+  QList<QWidget*> aList;
+  aList << myCombo;
+  return aList;
 }
 
 int ModuleBase_WidgetSwitch::addPage(QWidget* theWidget, const QString& theName)
