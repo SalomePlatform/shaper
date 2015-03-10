@@ -15,6 +15,7 @@
       </feature>
       <feature id="SketchPoint" title="Point" tooltip="Create a new point" icon=":icons/point.png">
         <sketch-2dpoint_selector id="PointCoordindates" title="Point" tooltip="Point coordinates"/>
+        <boolvalue id="Construction" label="Construction" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
       <feature id="SketchLine" title="Line" tooltip="Create a new line" icon=":icons/line.png">
         <sketch-2dpoint_selector id="StartPoint" title="Start point" tooltip="Start point coordinates" previous_feature_param="EndPoint"/>
@@ -26,11 +27,13 @@
         <point2ddistance id="CircleRadius" first_point="CircleCenter" label="Radius:" min="0" step="1.0" default="0" icon=":icons/radius.png" tooltip="Set radius">
           <validator id="GeomValidators_Positive"/>
         </point2ddistance>
+        <boolvalue id="Construction" label="Construction" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
       <feature id="SketchArc" title="Arc" tooltip="Create a new arc" icon=":icons/arc.png">
         <sketch-2dpoint_selector id="ArcCenter" title="Center" tooltip="Center of a circle"/>
         <sketch-2dpoint_selector id="ArcStartPoint" title="Start point" tooltip="Start point"/>
         <sketch-2dpoint_selector id="ArcEndPoint" title="End point" tooltip="End point"/>
+        <boolvalue id="Construction" label="Construction" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
     </group>
       
