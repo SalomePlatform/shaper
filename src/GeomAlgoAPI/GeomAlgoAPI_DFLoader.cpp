@@ -23,6 +23,9 @@ const TopoDS_Shape GeomAlgoAPI_DFLoader::refineResult(const  TopoDS_Shape& theRe
     if (nbSubResults == 1) {
       itr.Initialize(theResult);
       if (itr.More()) aResult = itr.Value();
+    } else {
+      /// MPV: store compound anyway: it may be Boolean operation that produces two solids from one
+      aResult = theResult;
     }
   }
   return aResult;

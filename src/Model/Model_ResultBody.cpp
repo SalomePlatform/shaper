@@ -7,7 +7,7 @@
 #include <Model_ResultBody.h>
 #include <Model_Data.h>
 #include <Model_Document.h>
-#include <ModelAPI_AttributeColor.h>
+#include <ModelAPI_AttributeIntArray.h>
 #include <TNaming_Builder.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TDataStd_Name.hxx>
@@ -48,19 +48,14 @@ void Model_ResultBody::initAttributes()
 {
   // append the color attribute
   DataPtr aData = data();
-  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeColor::type());
-  // set the default value
-  bool anIsRandomColor = Config_PropManager::boolean("Visualization", "random_result_color",
-                                                     "true");
-  AttributeColorPtr aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>
-                                                             (aData->attribute(COLOR_ID()));
-  if (anIsRandomColor)
-    aColorAttr->setValuesRandom();
-  else {
-    std::vector<int> aRGB;
-    aRGB = Config_PropManager::color("Visualization", "result_body_color", RESULT_BODY_COLOR);
-    aColorAttr->setValues(aRGB[0], aRGB[1], aRGB[2]);
-  }
+  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::type());
+  AttributeIntArrayPtr aColorAttr = aData->intArray(COLOR_ID());
+  std::vector<int> aRGB;
+  aRGB = Config_PropManager::color("Visualization", "result_body_color", RESULT_BODY_COLOR);
+  aColorAttr->setSize(3);
+  aColorAttr->setValue(0, aRGB[0]);
+  aColorAttr->setValue(1, aRGB[1]);
+  aColorAttr->setValue(2, aRGB[2]);
 }
 
 void Model_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape)

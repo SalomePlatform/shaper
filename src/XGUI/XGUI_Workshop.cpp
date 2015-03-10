@@ -1408,24 +1408,23 @@ bool XGUI_Workshop::canChangeColor() const
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QtxColorButton.h>
-#include <ModelAPI_AttributeColor.h>
+#include <ModelAPI_AttributeIntArray.h>
 void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 {
   // 1. find the initial value of the color
-  AttributeColorPtr aColorAttr;
+  AttributeIntArrayPtr aColorAttr;
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      AttributePtr anAttr = aResult->data()->attribute(ModelAPI_Result::COLOR_ID());
-      if (anAttr.get() != NULL)
-        aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>(anAttr);
+      aColorAttr = aResult->data()->intArray(ModelAPI_Result::COLOR_ID());
     }
   }
   // there is no object with the color attribute
-  if (aColorAttr.get() == NULL)
+  if (aColorAttr.get() == NULL || aColorAttr->size() == 0)
     return;
-  int aRed, aGreen, aBlue;
-  aColorAttr->values(aRed, aGreen, aBlue);
+  int aRed = aColorAttr->value(0);
+  int aGreen = aColorAttr->value(1);
+  int aBlue = aColorAttr->value(2);
 
   // 2. show the dialog to change the value
   QDialog* aDlg = new QDialog();
@@ -1468,13 +1467,15 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      AttributePtr anAttr = aResult->data()->attribute(ModelAPI_Result::COLOR_ID());
-      if (anAttr.get() != NULL) {
-        aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>(anAttr);
-        if (aColorAttr.get() != NULL) {
-          aColorAttr->setValues(aRedResult, aGreenResult, aBlueResult);
-          ModelAPI_EventCreator::get()->sendUpdated(anObj, EVENT_DISP);
+      aColorAttr = aResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+      if (aColorAttr.get() != NULL) {
+        if (!aColorAttr->size()) {
+          aColorAttr->setSize(3);
         }
+        aColorAttr->setValue(0, aRedResult);
+        aColorAttr->setValue(1, aGreenResult);
+        aColorAttr->setValue(2, aBlueResult);
+        ModelAPI_EventCreator::get()->sendUpdated(anObj, EVENT_DISP);
       }
     }
   }

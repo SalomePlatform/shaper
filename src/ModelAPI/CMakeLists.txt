@@ -9,7 +9,7 @@ SET(PROJECT_HEADERS
     ModelAPI.h
     ModelAPI_Attribute.h
     ModelAPI_AttributeBoolean.h
-    ModelAPI_AttributeColor.h
+    ModelAPI_AttributeIntArray.h
     ModelAPI_AttributeDocRef.h
     ModelAPI_AttributeDouble.h
     ModelAPI_AttributeInteger.h
@@ -45,7 +45,7 @@ SET(PROJECT_HEADERS
 SET(PROJECT_SOURCES
     ModelAPI_Attribute.cpp
     ModelAPI_AttributeBoolean.cpp
-    ModelAPI_AttributeColor.cpp
+    ModelAPI_AttributeIntArray.cpp
     ModelAPI_AttributeDocRef.cpp
     ModelAPI_AttributeDouble.cpp
     ModelAPI_AttributeInteger.cpp
