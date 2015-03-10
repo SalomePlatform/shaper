@@ -16,7 +16,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Tools.h>
-#include <ModelAPI_AttributeColor.h>
+#include <ModelAPI_AttributeIntArray.h>
 
 #include <ModuleBase_ResultPrs.h>
 
@@ -764,12 +764,13 @@ void XGUI_Displayer::customizeObject(ObjectPtr theObject)
   // correct the result's color it it has the attribute
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
   if (aResult.get() != NULL && aResult->data()->attribute(ModelAPI_Result::COLOR_ID()).get() != NULL) {
-    int aRed, aGreen, aBlue;
-
-    AttributeColorPtr aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>(
-                                              aResult->data()->attribute(ModelAPI_Result::COLOR_ID()));
-    aColorAttr->values(aRed, aGreen, aBlue);
-    anAISObj->setColor(aRed, aGreen, aBlue);
+    AttributeIntArrayPtr aColorAttr = aResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+    if (aColorAttr.get() && aColorAttr->size()) {
+      int aRed = aColorAttr->value(0);
+      int aGreen = aColorAttr->value(1);
+      int aBlue = aColorAttr->value(2);
+      anAISObj->setColor(aRed, aGreen, aBlue);
+    }
   }
   else {
     // Customization of presentation
