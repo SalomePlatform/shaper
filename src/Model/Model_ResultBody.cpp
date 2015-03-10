@@ -37,8 +37,6 @@
 //#include <TDF_Tool.hxx>
 //#define DEB_IMPORT 1
 
-#define RESULT_BODY_COLOR "#E0A01B"
-
 Model_ResultBody::Model_ResultBody()
 {
   setIsConcealed(false);
@@ -51,7 +49,7 @@ void Model_ResultBody::initAttributes()
   aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::type());
   AttributeIntArrayPtr aColorAttr = aData->intArray(COLOR_ID());
   std::vector<int> aRGB;
-  aRGB = Config_PropManager::color("Visualization", "result_body_color", RESULT_BODY_COLOR);
+  aRGB = Config_PropManager::color("Visualization", "result_body_color", DEFAULT_COLOR());
   aColorAttr->setSize(3);
   aColorAttr->setValue(0, aRGB[0]);
   aColorAttr->setValue(1, aRGB[1]);

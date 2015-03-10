@@ -39,6 +39,7 @@
 #include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeIntArray.h>
 
 //#include <PartSetPlugin_Part.h>
 
@@ -75,6 +76,10 @@
 #include <QMenu>
 #include <QToolButton>
 #include <QAction>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QHBoxLayout>
+#include <QtxColorButton.h>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -1404,11 +1409,6 @@ bool XGUI_Workshop::canChangeColor() const
 }
 
 //**************************************************************
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QHBoxLayout>
-#include <QtxColorButton.h>
-#include <ModelAPI_AttributeIntArray.h>
 void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 {
   // 1. find the initial value of the color
@@ -1456,11 +1456,12 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
     return;
 
   // 3. abort the previous operation and start a new one
-  if(!isActiveOperationAborted())
-    return;
   SessionPtr aMgr = ModelAPI_Session::get();
-  QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
-  aMgr->startOperation(aDescription.toStdString());
+  bool aWasOperation = aMgr->isOperation(); // keep this value
+  if (!aWasOperation) {
+    QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
+    aMgr->startOperation(aDescription.toStdString());
+  }
 
   // 4. set the value to all results
   static Events_ID EVENT_DISP = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
@@ -1479,7 +1480,8 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
       }
     }
   }
-  aMgr->finishOperation();
+  if (!aWasOperation)
+    aMgr->finishOperation();
   updateCommandStatus();
 }
 

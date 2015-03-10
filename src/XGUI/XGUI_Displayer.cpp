@@ -772,13 +772,11 @@ void XGUI_Displayer::customizeObject(ObjectPtr theObject)
       anAISObj->setColor(aRed, aGreen, aBlue);
     }
   }
-  else {
-    // Customization of presentation
-    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    if (aFeature.get() != NULL) {
-      GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
-      if (aCustPrs.get() != NULL)
-        aCustPrs->customisePresentation(anAISObj);
-    }
+  // Customization of presentation
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (aFeature.get() != NULL) {
+    GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
+    if (aCustPrs.get() != NULL)
+      aCustPrs->customisePresentation(anAISObj);
   }
 }
