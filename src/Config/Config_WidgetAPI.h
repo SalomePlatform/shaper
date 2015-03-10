@@ -40,7 +40,7 @@ class CONFIG_EXPORT Config_WidgetAPI
   //! Returns name of widget's node (attribute)
   std::string widgetType() const;
   //! Returns true if widget has container type, which means it able to contain other widgets
-  bool isContainerWidget() const;
+  bool isGroupBoxWidget() const;
   //! Returns true if widget has page type;
   //! Page is container widget with combo box control to switch between pages
   bool isPagedWidget() const;

@@ -86,9 +86,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theWidgetApi the widget configuation. The attribute of the model widget is obtained from
   /// \param theParentId is Id of a parent of the current attribute
   /// \param theModelWidgets list of widget objects
-  virtual QWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
-                                      Config_WidgetAPI* theWidgetApi, std::string theParentId,
-                                      QList<ModuleBase_ModelWidget*>& theModelWidgets)
+  virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
+                                      Config_WidgetAPI* theWidgetApi, std::string theParentId)
   {
     return 0;
   }

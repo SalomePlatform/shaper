@@ -20,6 +20,8 @@
 class XGUI_ActionsMgr;
 class QKeyEvent;
 class QGridLayout;
+class ModuleBase_PageBase;
+class ModuleBase_PageWidget;
 
 /// Internal name of property panel widget
 const static char* PROP_PANEL = "property_panel_dock";
@@ -50,7 +52,7 @@ Q_OBJECT
 
   /// Returns main widget of the property panel, which children will be created
   /// by WidgetFactory using the XML definition
-  QWidget* contentWidget();
+  ModuleBase_PageBase* contentWidget();
 
   /// Brings back all widget created by widget factory for signal/slot
   /// connections and further processing
@@ -71,9 +73,6 @@ Q_OBJECT
 
   /// Activate the next from current widget in the property panel
   virtual void activateNextWidget();
-
-  /// \brief Enable/Disable stretch area in the panel
-  void setStretchEnabled(bool isEnabled);
 
   /// Set Enable/Disable state of Cancel button
   /// \param theEnabled Enable/Disable state of Cancel button
@@ -104,9 +103,8 @@ Q_OBJECT
   virtual void activateWidget(ModuleBase_ModelWidget* theWidget);
 
  private:
-  QWidget* myCustomWidget;
+  ModuleBase_PageWidget* myPanelPage;
   QList<ModuleBase_ModelWidget*> myWidgets;
-  QGridLayout* myMainLayout;
 
   /// Currently active widget
   ModuleBase_ModelWidget* myActiveWidget;

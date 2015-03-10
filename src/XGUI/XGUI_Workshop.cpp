@@ -54,6 +54,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IViewer.h>
 #include<ModuleBase_FilterFactory.h>
+#include <ModuleBase_PageBase.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -647,7 +648,6 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
 
   myPropertyPanel->cleanContent();
   aFactory.createWidget(myPropertyPanel->contentWidget());
-  ModuleBase_Tools::zeroMargins(myPropertyPanel->contentWidget());
 
   QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {

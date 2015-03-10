@@ -72,16 +72,16 @@ std::string Config_WidgetAPI::widgetType() const
   return result;
 }
 
-bool Config_WidgetAPI::isContainerWidget() const
+bool Config_WidgetAPI::isGroupBoxWidget() const
 {
   return isNode(myCurrentNode, WDG_GROUP, WDG_CHECK_GROUP,
-  NULL);
+                NULL);
 }
 
 bool Config_WidgetAPI::isPagedWidget() const
 {
   return isNode(myCurrentNode, WDG_TOOLBOX, WDG_SWITCH,
-  NULL);
+                NULL);
 }
 
 std::string Config_WidgetAPI::getProperty(const char* thePropName) const
