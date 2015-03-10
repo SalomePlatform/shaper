@@ -35,7 +35,7 @@ ExchangePlugin_Plugin::ExchangePlugin_Plugin()
 
   // register random result color properties
   Config_PropManager::registerProp("Visualization", "random_result_color", "Use random color for results",
-                                   Config_Prop::Bool, "false");
+                                   Config_Prop::Bool, "true");
 }
 
 FeaturePtr ExchangePlugin_Plugin::createFeature(string theFeatureID)

@@ -37,7 +37,7 @@
 //#include <TDF_Tool.hxx>
 //#define DEB_IMPORT 1
 
-#define RESULT_BODY_COLOR "#ff0000"
+#define RESULT_BODY_COLOR "#E0A01B"
 
 Model_ResultBody::Model_ResultBody()
 {
@@ -51,7 +51,7 @@ void Model_ResultBody::initAttributes()
   aData->addAttribute(COLOR_ID(), ModelAPI_AttributeColor::type());
   // set the default value
   bool anIsRandomColor = Config_PropManager::boolean("Visualization", "random_result_color",
-                                                     "false");
+                                                     "true");
   AttributeColorPtr aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>
                                                              (aData->attribute(COLOR_ID()));
   if (anIsRandomColor)
