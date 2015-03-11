@@ -54,6 +54,7 @@ SET(PROJECT_LIBRARIES
     GeomAPI
     GeomAlgoAPI
     ModelAPI
+    SketcherPrs
     ${CAS_KERNEL}
     ${CAS_SHAPE}
 )
@@ -73,6 +74,7 @@ INCLUDE_DIRECTORIES(
   ../GeomAPI
   ../GeomAlgoAPI
   ../GeomDataAPI
+  ../SketcherPrs
 )
 
 INSTALL(TARGETS SketchPlugin DESTINATION plugins)

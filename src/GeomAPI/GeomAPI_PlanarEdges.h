@@ -11,6 +11,7 @@
 #include "GeomAPI_Edge.h"
 #include "GeomAPI_Pnt.h"
 #include "GeomAPI_Dir.h"
+#include "GeomAPI_Ax3.h"
 
 #include <memory>
 
@@ -41,36 +42,31 @@ class GeomAPI_PlanarEdges : public GeomAPI_Shape
   /// Returns True if the wire is defined in a plane
   GEOMAPI_EXPORT bool hasPlane() const;
 
-  /// Sets origin point
-  GEOMAPI_EXPORT void setOrigin(const std::shared_ptr<GeomAPI_Pnt>& theOrigin);
-
   /// Returns the plane origin point
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Pnt> origin() const;
 
-  /// Sets X direction vector
-  GEOMAPI_EXPORT void setDirX(const std::shared_ptr<GeomAPI_Dir>& theDirX);
   /// Returns X direction vector
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Dir> dirX() const;
 
-  /// Sets Y direction vector
-  GEOMAPI_EXPORT void setDirY(const std::shared_ptr<GeomAPI_Dir>& theDirY);
   /// Returns Y direction vector
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Dir> dirY() const;
 
-  /// Sets Z direction vector
-  GEOMAPI_EXPORT void setNorm(const std::shared_ptr<GeomAPI_Dir>& theNorm);
   /// Returns Z direction vector
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Dir> norm() const;
 
+  /// Set working plane
+  /// \param theOrigin origin of the plane axis
+  /// \param theDirX X direction of the plane axis
+  /// \param theDirY Y direction of the plane axis
+  /// \param theNorm normal direction of the plane axis
+  GEOMAPI_EXPORT void setPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                               const std::shared_ptr<GeomAPI_Dir>& theDirX,
+                               const std::shared_ptr<GeomAPI_Dir>& theDirY,
+                               const std::shared_ptr<GeomAPI_Dir>& theNorm);
+
 private:
-  /// Origin point of the plane
-  std::shared_ptr<GeomAPI_Pnt> myOrigin;
-  /// The X direction inside of the plane
-  std::shared_ptr<GeomAPI_Dir> myDirX;
-  /// The Y direction inside of the plane
-  std::shared_ptr<GeomAPI_Dir> myDirY;
-  /// The normal direction to the plane
-  std::shared_ptr<GeomAPI_Dir> myNorm;
+
+  std::shared_ptr<GeomAPI_Ax3> myPlane;
 };
 
 #endif

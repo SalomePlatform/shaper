@@ -98,9 +98,9 @@ void GeomAPI_AISObject::createDistance(std::shared_ptr<GeomAPI_Pnt> theStartPoin
 
     Handle(Prs3d_DimensionAspect) anAspect = new Prs3d_DimensionAspect();
     anAspect->MakeArrows3d(Standard_False);
-    anAspect->MakeText3d(false);
+    anAspect->MakeText3d(Standard_False);
     anAspect->TextAspect()->SetHeight(CONSTRAINT_TEXT_HEIGHT);
-    anAspect->MakeTextShaded(false);
+    anAspect->MakeTextShaded(Standard_True);
     anAspect->ArrowAspect()->SetLength(theDistance / 10.);
     aDimAIS->DimensionAspect()->MakeUnitsDisplayed(false);
     aDimAIS->SetDimensionAspect(anAspect);

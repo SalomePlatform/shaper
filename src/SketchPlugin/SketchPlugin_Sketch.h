@@ -12,6 +12,7 @@
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_IPresentable.h>
+#include <GeomAPI_Ax3.h>
 #include <list>
 
 #define YZ_PLANE_COLOR "#ff0000"
@@ -81,7 +82,6 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
   SKETCHPLUGIN_EXPORT virtual void move(const double theDeltaX, const double theDeltaY)
   {
   }
-  ;
 
   /// Return the distance between the feature and the point
   /// \param thePoint the point
@@ -89,7 +89,6 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
   {
     return 0;
   }
-  ;
 
   /// Converts a 2D sketch space point into point in 3D space
   SKETCHPLUGIN_EXPORT std::shared_ptr<GeomAPI_Pnt> to3D(const double theX, const double theY);
@@ -105,6 +104,8 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_I
 
   /// Returns the basis plane for the sketch
   std::shared_ptr<GeomAPI_Pln> plane();
+
+  SKETCHPLUGIN_EXPORT std::shared_ptr<GeomAPI_Ax3> coordinatePlane() const;
 
   //virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
