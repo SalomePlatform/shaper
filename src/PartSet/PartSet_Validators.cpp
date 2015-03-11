@@ -112,7 +112,8 @@ bool PartSet_RigidValidator::isValid(const ModuleBase_ISelection* theSelection) 
 
 bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature, 
                                                 const std::list<std::string>& theArguments,
-                                                const ObjectPtr& theObject) const
+                                                const ObjectPtr& theObject,
+                                                const GeomShapePtr& theShape) const
 {
   // Check RefAttr attributes
   std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
@@ -138,8 +139,13 @@ bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
         std::shared_ptr<ModelAPI_AttributeSelection> aRef = 
           std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*anAttr);
         // check the object is already presented
-        if (aRef->isInitialized() && aRef->context() == theObject)
-          return false;
+        if (aRef->isInitialized() && aRef->context() == theObject) {
+          if (theShape.get() != NULL) {
+            if (aRef->value()->isEqual(theShape))
+              return false;
+          } else
+            return false;
+        }
       }
     }
   }
@@ -164,7 +170,22 @@ bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,
                                                 const std::list<std::string>& theArguments,
                                                 const AttributePtr& theAttribute) const
 {
-  return PartSet_DifferentObjectsValidator::isValid(theAttribute, theArguments);
+  if (PartSet_DifferentObjectsValidator::isValid(theAttribute, theArguments)) {
+    std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
+      theFeature->data()->attributes(ModelAPI_AttributeRefAttr::typeId());
+    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+    for(; anAttr != anAttrs.end(); anAttr++) {
+      if (*anAttr) {
+        std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
+          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
+        // check the object is already presented
+        if (!aRef->isObject() && aRef->attr() == theAttribute)
+          return false;
+      }
+    }
+    return true;
+  }
+  return false;
 }
 
 bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute, 

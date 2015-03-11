@@ -116,7 +116,7 @@ bool PartSet_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<Geom
       }
       else
       {
-        if (!aAttrValidator->isValid(myFeature, *aArgs, theObj)) {
+        if (!aAttrValidator->isValid(myFeature, *aArgs, theObj, theShape)) {
           return false;
         }
       }

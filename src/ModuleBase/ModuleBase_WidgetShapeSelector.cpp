@@ -499,7 +499,7 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
     const ModelAPI_RefAttrValidator* aAttrValidator =
         dynamic_cast<const ModelAPI_RefAttrValidator*>(*aValidator);
     if (aAttrValidator) {
-      if (!aAttrValidator->isValid(myFeature, *aArgs, theObj)) {
+      if (!aAttrValidator->isValid(myFeature, *aArgs, theObj, theShape)) {
         return false;
       }
     }

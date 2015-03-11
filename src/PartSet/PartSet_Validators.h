@@ -78,7 +78,7 @@ class PartSet_DifferentObjectsValidator : public ModelAPI_RefAttrValidator
    /// \param theArguments a list of arguments (names of attributes to check)
    /// \param theObject a selected object
   virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
-                       const ObjectPtr& theObject) const;
+                       const ObjectPtr& theObject, const GeomShapePtr& theShape) const;
 
   //! Returns true if the attribute is good for the feature attribute
   //! \param theFeature a feature to check

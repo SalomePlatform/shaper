@@ -11,6 +11,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeValidator.h>
+#include <GeomAPI_Shape.h>
 
 /**\class ModelAPI_RefAttrValidator
  * \ingroup DataModel
@@ -21,7 +22,7 @@ class ModelAPI_RefAttrValidator : public ModelAPI_AttributeValidator
 public:
   //! Returns true if object is good for the feature attribute
   virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
-                       const ObjectPtr& theObject) const = 0;
+                       const ObjectPtr& theObject, const GeomShapePtr& theShape) const = 0;
 
   //! Returns true if the attribute is good for the feature attribute
   virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
