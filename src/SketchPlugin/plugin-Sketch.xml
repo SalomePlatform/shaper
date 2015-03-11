@@ -116,7 +116,6 @@
             <validator id="SketchPlugin_ShapeValidator" parameters="ConstraintEntityA"/>
         </sketch_constraint_shape_selector>
         
-        <sketch-2dpoint_selector id="ConstraintFlyoutValuePnt" internal="1" obligatory="0"/>
         <validator id="PartSet_ParallelValidator"/>
       </feature>
     <!--  SketchConstraintPerpendicular  -->

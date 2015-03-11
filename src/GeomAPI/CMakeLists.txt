@@ -29,6 +29,7 @@ SET(PROJECT_HEADERS
     GeomAPI_DataMapOfShapeShape.h
     GeomAPI_ICustomPrs.h
     GeomAPI_Vertex.h
+	GeomAPI_Ax3.h
 )
 
 SET(PROJECT_SOURCES
@@ -53,6 +54,7 @@ SET(PROJECT_SOURCES
     GeomAPI_DataMapOfShapeShape.cpp
     GeomAPI_Vertex.cpp
     GeomAPI_ICustomPrs.cpp
+	GeomAPI_Ax3.cpp
 )
 
 SET(PROJECT_LIBRARIES

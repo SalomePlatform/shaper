@@ -116,10 +116,7 @@ void SketchPlugin_Sketch::execute()
   for (; aShapeIt != aFeaturesPreview.end(); ++aShapeIt) {
     aBigWire->addEdge(*aShapeIt);
   }
-  aBigWire->setOrigin(anOrigin->pnt());
-  aBigWire->setDirX(aDirX->dir());
-  aBigWire->setDirY(aDirY->dir());
-  aBigWire->setNorm(aNorm->dir());
+  aBigWire->setPlane(anOrigin->pnt(), aDirX->dir(), aDirY->dir(), aNorm->dir());
 
 //  GeomAlgoAPI_SketchBuilder::createFaces(anOrigin->pnt(), aDirX->dir(), aDirY->dir(), aNorm->dir(),
 //                                         aFeaturesPreview, aLoops, aWires);
@@ -243,6 +240,21 @@ std::shared_ptr<GeomAPI_Pln> SketchPlugin_Sketch::plane()
     return std::shared_ptr<GeomAPI_Pln>();
 
   return std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(anOrigin->pnt(), aNorm->dir()));
+}
+
+std::shared_ptr<GeomAPI_Ax3> SketchPlugin_Sketch::coordinatePlane() const
+{
+  DataPtr aData = data();
+  std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+    aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+    aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aY = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+    aData->attribute(SketchPlugin_Sketch::DIRY_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+    aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+
+  return std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(aC->pnt(), aX->dir(), aY->dir(), aNorm->dir()));
 }
 
 void SketchPlugin_Sketch::erase()
