@@ -766,22 +766,24 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
 
 bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
 {
-  // we need not customize presentable objects
-  GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
-  if (aPrs.get() != NULL)
-    return false;
-
   AISObjectPtr anAISObj = getAISObject(theObject);
   // correct the result's color it it has the attribute
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
 
   // Customization of presentation
-  GeomCustomPrsPtr aCustomPrs = myCustomPrs;
+  GeomCustomPrsPtr aCustomPrs;
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
   if (aFeature.get() != NULL) {
     GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
     if (aCustPrs.get() != NULL)
       aCustomPrs = aCustPrs;
+  }
+  if (aCustomPrs.get() == NULL) {
+    // we ignore presentable not customized objects
+    GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
+    if (aPrs.get() != NULL)
+      return false;
+    aCustomPrs = myCustomPrs;
   }
   return aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
 }

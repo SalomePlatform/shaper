@@ -65,14 +65,15 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
   {
     bool isCustomized = false;
     int aShapeType = thePrs->getShapeType();
-    if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/)
+    // a compound is processed like the edge because the arc feature uses the compound for presentable AIS
+    if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/ && aShapeType != 0/*compound*/)
       return false;
 
     std::vector<int> aColor;
     std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr =
                                     data()->boolean(SketchPlugin_SketchEntity::CONSTRUCTION_ID());
     bool isConstruction = aConstructionAttr.get() != NULL && aConstructionAttr->value();
-    if (aShapeType == 6) { // if this is an edge
+    if (aShapeType == 6 || aShapeType == 0) { // if this is an edge or a compound
       if (isConstruction) {
         isCustomized = thePrs->setWidth(1) || isCustomized;
         isCustomized = thePrs->setLineStyle(3) || isCustomized;
