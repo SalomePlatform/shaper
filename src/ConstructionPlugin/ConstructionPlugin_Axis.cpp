@@ -16,6 +16,10 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 
+#ifdef _DEBUG
+#include <iostream>
+#endif
+
 using namespace std;
 
 ConstructionPlugin_Axis::ConstructionPlugin_Axis()
@@ -34,7 +38,7 @@ void ConstructionPlugin_Axis::initAttributes()
                        ModelAPI_AttributeSelection::type());
 }
 
-void ConstructionPlugin_Axis::execute()
+void ConstructionPlugin_Axis::createAxisByTwoPoints()
 {
   AttributeSelectionPtr aRef1 = data()->selection(ConstructionPlugin_Axis::POINT_FIRST());
   AttributeSelectionPtr aRef2 = data()->selection(ConstructionPlugin_Axis::POINT_SECOND());
@@ -52,6 +56,21 @@ void ConstructionPlugin_Axis::execute()
         setResult(aConstr);
       }
     }
+  }
+}
+
+void ConstructionPlugin_Axis::execute()
+{
+  AttributePtr anAttr = data()->attribute(ConstructionPlugin_Axis::METHOD());
+  AttributeStringPtr aMethodTypeAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeString>(anAttr);
+  std::string aMethodType = aMethodTypeAttr->value();
+  if (aMethodType == "AxisByPointsCase") {
+    createAxisByTwoPoints();
+  } else if (aMethodType == "AxisByCylindricalFaceCase") {
+    #ifdef _DEBUG
+    std::cout << "ConstructionPlugin_Axis::execute: " << "AxisByCylindricalFaceCase is not supported yet." << std::endl;
+    #endif
   }
 }
 
