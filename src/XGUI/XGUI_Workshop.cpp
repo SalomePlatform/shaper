@@ -1411,20 +1411,17 @@ bool XGUI_Workshop::canChangeColor() const
 //**************************************************************
 void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 {
-  // 1. find the initial value of the color
-  AttributeIntArrayPtr aColorAttr;
-  foreach(ObjectPtr anObj, theObjects) {
-    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
-    if (aResult.get() != NULL) {
-      aColorAttr = aResult->data()->intArray(ModelAPI_Result::COLOR_ID());
-    }
+  std::vector<int> aColor;
+  foreach(ObjectPtr anObject, theObjects) {
+
+    AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
+    aColor.resize(3);
+    anAISObj->getColor(aColor[0], aColor[1], aColor[2]);
+    if (!aColor.empty())
+      break;
   }
-  // there is no object with the color attribute
-  if (aColorAttr.get() == NULL || aColorAttr->size() == 0)
+  if (aColor.size() != 3)
     return;
-  int aRed = aColorAttr->value(0);
-  int aGreen = aColorAttr->value(1);
-  int aBlue = aColorAttr->value(2);
 
   // 2. show the dialog to change the value
   QDialog* aDlg = new QDialog();
@@ -1434,7 +1431,7 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   aColorBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   aLay->addWidget(aColorBtn);
-  aColorBtn->setColor(QColor(aRed, aGreen, aBlue));
+  aColorBtn->setColor(QColor(aColor[0], aColor[1], aColor[2]));
 
   QDialogButtonBox* aButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                                                     Qt::Horizontal, aDlg);
@@ -1452,7 +1449,7 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
       aGreenResult = aColorResult.green(),
       aBlueResult = aColorResult.blue();
 
-  if (aRedResult == aRed && aGreenResult == aGreen && aBlueResult == aBlue)
+  if (aRedResult == aColor[0] && aGreenResult == aColor[1] && aBlueResult == aColor[2])
     return;
 
   // 3. abort the previous operation and start a new one
@@ -1465,6 +1462,7 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 
   // 4. set the value to all results
   static Events_ID EVENT_DISP = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  AttributeIntArrayPtr aColorAttr;
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {

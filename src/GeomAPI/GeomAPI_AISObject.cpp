@@ -29,6 +29,8 @@
 #include <AIS_FixRelation.hxx>
 #include <Prs3d_PointAspect.hxx>
 
+#include <Graphic3d_AspectLine3d.hxx>
+
 const double tolerance = 1e-7;
 
 const int CONSTRAINT_TEXT_HEIGHT = 28;  /// the text height of the constraint
@@ -253,16 +255,6 @@ void GeomAPI_AISObject::createFixed(std::shared_ptr<GeomAPI_Shape> theShape,
   }
 }
 
-void GeomAPI_AISObject::redisplay()
-{
-  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
-  if (!anAIS.IsNull()) {
-    Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
-    aContext->Redisplay(anAIS, false);
-  }
-}
-
-
 void GeomAPI_AISObject::setColor(const int& theColor)
 {
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
@@ -278,21 +270,30 @@ void GeomAPI_AISObject::setColor(const int& theColor)
   aContext->SetColor(anAIS, aColor, false);
 }
 
-void GeomAPI_AISObject::setWidth(const double& theWidth)
+bool GeomAPI_AISObject::setWidth(const double& theWidth)
 {
+  bool isChanged = false;
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
-  if (anAIS.IsNull())
-    return;
-  anAIS->SetWidth(theWidth);
-  anAIS->Redisplay();
+  if (!anAIS.IsNull()) {
+    isChanged = anAIS->Width() != theWidth;
+    if (isChanged)
+      anAIS->SetWidth(theWidth);
+  }
+  return isChanged;
 }
 
-void GeomAPI_AISObject::setColor(int theR, int theG, int theB)
+bool GeomAPI_AISObject::setColor(int theR, int theG, int theB)
 {
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (anAIS.IsNull())
-    return;
+    return false;
   Quantity_Color aColor(theR / 255., theG / 255., theB / 255., Quantity_TOC_RGB);
+  Quantity_Color aCurrentColor;
+  anAIS->Color(aCurrentColor);
+  // do not set the same color to the presentation
+  if (aColor.IsEqual(aCurrentColor))
+    return false;
+
   anAIS->SetColor(aColor);
   Handle(AIS_Dimension) aDimAIS = Handle(AIS_Dimension)::DownCast(anAIS);
   if (!aDimAIS.IsNull()) {
@@ -300,6 +301,19 @@ void GeomAPI_AISObject::setColor(int theR, int theG, int theB)
   }
   Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
   aContext->SetColor(anAIS, aColor, false);
+  return true;
+}
+
+void GeomAPI_AISObject::getColor(int& theR, int& theG, int& theB)
+{
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (anAIS.IsNull())
+    return;
+
+  Quantity_Color aColor = anAIS->Color();
+  theR = aColor.Red()*255.;
+  theG = aColor.Green()*255.;
+  theB = aColor.Blue()*255.;
 }
 
 bool GeomAPI_AISObject::empty() const
@@ -340,26 +354,46 @@ void GeomAPI_AISObject::setPointMarker(int theType, double theScale)
   }
 }
 
-
-void GeomAPI_AISObject::setLineStyle(int theStyle)
+bool GeomAPI_AISObject::setLineStyle(int theStyle)
 {
+  bool isChanged = false;
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (!anAIS.IsNull()) {
     Handle(AIS_Drawer) aDrawer = anAIS->Attributes();
-    if (aDrawer->HasLineAspect())
-      aDrawer->LineAspect()->SetTypeOfLine((Aspect_TypeOfLine)theStyle);
-    if (aDrawer->HasWireAspect())
-      aDrawer->WireAspect()->SetTypeOfLine((Aspect_TypeOfLine)theStyle);
+    Handle(Prs3d_LineAspect) aLineAspect;
+
+    Aspect_TypeOfLine aType = (Aspect_TypeOfLine)theStyle;
+    if (aDrawer->HasLineAspect()) {
+      aLineAspect = aDrawer->LineAspect();
+    }
+    if (aDrawer->HasWireAspect()) {
+      aLineAspect = aDrawer->WireAspect();
+    }
+    Quantity_Color aCurrentColor;
+    Aspect_TypeOfLine aCurrentType;
+    Standard_Real aCurrentWidth;
+    aLineAspect->Aspect()->Values(aCurrentColor, aCurrentType, aCurrentWidth);
+    isChanged = aType != aCurrentType;
+    if (isChanged) {
+      aLineAspect->SetTypeOfLine(aType);
+    }
   }
+  return isChanged;
 }
 
 
-void GeomAPI_AISObject::setTransparensy(double theVal)
+bool GeomAPI_AISObject::setTransparensy(double theVal)
 {
+  bool isChanged = false;
   Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
   if (!anAIS.IsNull()) {
     Handle(AIS_InteractiveContext) aContext = anAIS->GetContext();
-    if (!aContext.IsNull())
-      aContext->SetTransparency(anAIS, theVal, false);
+    if (!aContext.IsNull()) {
+      double aCurrentValue = anAIS->Transparency();
+      isChanged = aCurrentValue != theVal;
+      if (isChanged)
+        aContext->SetTransparency(anAIS, theVal, false);
+    }
   }
+ return isChanged;
 }

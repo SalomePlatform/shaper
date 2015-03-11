@@ -7,6 +7,7 @@ SET(PROJECT_HEADERS
 	XGUI.h
 	XGUI_ActionsMgr.h
 	XGUI_ContextMenuMgr.h
+	XGUI_CustomPrs.h
 	XGUI_DataTreeModel.h
 	XGUI_Displayer.h
 	XGUI_DocumentDataModel.h
@@ -33,6 +34,7 @@ SET(PROJECT_AUTOMOC
 SET(PROJECT_SOURCES
 	XGUI_ActionsMgr.cpp
 	XGUI_ContextMenuMgr.cpp
+	XGUI_CustomPrs.cpp
 	XGUI_Displayer.cpp
 	XGUI_DocumentDataModel.cpp
 	XGUI_ErrorDialog.cpp

@@ -11,16 +11,17 @@
 
 void Model_ResultConstruction::initAttributes()
 {
-  // append the color attribute
+  // append the color attribute. It is empty, the attribute will be filled by a request
   DataPtr aData = data();
   aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::type());
-  AttributeIntArrayPtr aColorAttr = aData->intArray(COLOR_ID());
-  std::vector<int> aRGB;
-  aRGB = Config_PropManager::color("Visualization", "result_construction_color", DEFAULT_COLOR());
-  aColorAttr->setSize(3);
-  aColorAttr->setValue(0, aRGB[0]);
-  aColorAttr->setValue(1, aRGB[1]);
-  aColorAttr->setValue(2, aRGB[2]);
+}
+
+void Model_ResultConstruction::colorConfigInfo(std::string& theSection, std::string& theName,
+                                       std::string& theDefault)
+{
+  theSection = "Visualization";
+  theName = "result_construction_color";
+  theDefault = DEFAULT_COLOR();
 }
 
 void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)

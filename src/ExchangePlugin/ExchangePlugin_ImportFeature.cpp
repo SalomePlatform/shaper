@@ -70,14 +70,6 @@ void ExchangePlugin_ImportFeature::execute()
   importFile(aFilePath);
 }
 
-void ExchangePlugin_ImportFeature::customisePresentation(AISObjectPtr thePrs)
-{
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "import_feature_color",
-                                                    IMPORTED_FEATURE_COLOR);
-  thePrs->setColor(aRGB[0], aRGB[1], aRGB[2]);
-  thePrs->redisplay();
-}
-
 bool ExchangePlugin_ImportFeature::importFile(const std::string& theFileName)
 {
   // retrieve the file and plugin library names

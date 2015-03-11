@@ -20,16 +20,17 @@ Model_ResultGroup::Model_ResultGroup(std::shared_ptr<ModelAPI_Data> theOwnerData
 
 void Model_ResultGroup::initAttributes()
 {
-  // append the color attribute
+  // append the color attribute. It is empty, the attribute will be filled by a request
   DataPtr aData = data();
   aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::type());
-  AttributeIntArrayPtr aColorAttr = aData->intArray(COLOR_ID());
-  std::vector<int> aRGB;
-  aRGB = Config_PropManager::color("Visualization", "result_group_color", DEFAULT_COLOR());
-  aColorAttr->setSize(3);
-  aColorAttr->setValue(0, aRGB[0]);
-  aColorAttr->setValue(1, aRGB[1]);
-  aColorAttr->setValue(2, aRGB[2]);
+}
+
+void Model_ResultGroup::colorConfigInfo(std::string& theSection, std::string& theName,
+                                       std::string& theDefault)
+{
+  theSection = "Visualization";
+  theName = "result_group_color";
+  theDefault = DEFAULT_COLOR();
 }
 
 std::shared_ptr<GeomAPI_Shape> Model_ResultGroup::shape()

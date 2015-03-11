@@ -261,6 +261,9 @@ void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
   myPreferences->setItemProperty("custom_enabled", false, bgId);
   myPreferences->setItemProperty("image_formats", aImgFiles, bgId);
 
+  //Config_PropManager::registerProp("Visualization", "object_default_color", "Object color",
+  //                                 Config_Prop::Color, "#ffffff");
+
   Config_PropManager::registerProp("Visualization", "result_body_color", "Body color",
                                    Config_Prop::Color, Model_ResultBody::DEFAULT_COLOR());
   Config_PropManager::registerProp("Visualization", "result_group_color", "Group color",

@@ -11,6 +11,7 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_AttributeIntArray.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
 
 #include <GeomAPI_Pnt2d.h>
@@ -73,10 +74,28 @@ void ConstructionPlugin_Plane::execute()
   }
 }
 
-void ConstructionPlugin_Plane::customisePresentation(AISObjectPtr thePrs)
+bool ConstructionPlugin_Plane::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+                                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
 {
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "construction_plane_color",
-                                                    ConstructionPlugin_Plane::DEFAULT_COLOR());
-  thePrs->setColor(aRGB[0], aRGB[1], aRGB[2]);
-  thePrs->setTransparensy(0.6);
+  std::vector<int> aColor;
+  // get color from the attribute of the result
+  if (theResult.get() != NULL && theResult->data()->attribute(ModelAPI_Result::COLOR_ID()).get() != NULL) {
+    AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+    if (aColorAttr.get() && aColorAttr->size()) {
+      aColor.push_back(aColorAttr->value(0));
+      aColor.push_back(aColorAttr->value(1));
+      aColor.push_back(aColorAttr->value(2));
+    }
+  }
+  if (aColor.empty())
+    aColor = Config_PropManager::color("Visualization", "construction_plane_color",
+                                       ConstructionPlugin_Plane::DEFAULT_COLOR());
+
+  bool isCustomized = false;
+  if (aColor.size() == 3)
+    isCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+
+  isCustomized = thePrs->setTransparensy(0.6) || isCustomized;
+
+  return isCustomized;
 }
