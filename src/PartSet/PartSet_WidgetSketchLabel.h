@@ -71,7 +71,9 @@ Q_OBJECT
   std::shared_ptr<GeomAPI_Pln> plane() const;
 
   /// This control accepts focus
-  virtual bool focusTo() { return true; }
+  virtual bool focusTo();
+  virtual void setHighlighted(bool) { /*do nothing*/ };
+  virtual void enableFocusProcessing();
 
 signals:
   /// Signal on plane selection

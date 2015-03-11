@@ -156,7 +156,6 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory
 
   } else if (theType == WDG_SWITCH) {
     result = new ModuleBase_WidgetSwitch(theParent, myWidgetApi, myParentId);
-    return result;
 
   } else if (theType == WDG_TOOLBOX_BOX || theType == WDG_SWITCH_CASE) {
     // Do nothing for "box" and "case"

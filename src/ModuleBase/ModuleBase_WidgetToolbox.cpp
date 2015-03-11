@@ -7,16 +7,19 @@
 
 #include <ModuleBase_WidgetToolbox.h>
 #include <ModuleBase_PageBase.h>
+#include <ModuleBase_ModelWidget.h>
 #include <ModuleBase_Tools.h>
 
 #include <ModelAPI_AttributeString.h>
 
 #include <QWidget>
+#include <Qlist>
 #include <QVBoxLayout>
 
 ModuleBase_WidgetToolbox::ModuleBase_WidgetToolbox(QWidget* theParent, const Config_WidgetAPI* theData,
                                                    const std::string& theParentId)
-: ModuleBase_ModelWidget(theParent, theData, theParentId)
+: ModuleBase_ModelWidget(theParent, theData, theParentId),
+  myIsPassFocusToCurrentPage(false)
 {
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aMainLayout);
@@ -63,15 +66,18 @@ bool ModuleBase_WidgetToolbox::restoreValue()
   bool isSignalsBlocked = myToolBox->blockSignals(true);
   myToolBox->setCurrentIndex(idx);
   myToolBox->blockSignals(isSignalsBlocked);
-  focusTo();
   return true;
 }
 
 QList<QWidget*> ModuleBase_WidgetToolbox::getControls() const
 {
-  QList<QWidget*> aList;
-  aList << myToolBox;
-  return aList;
+  QList<QWidget*> aResult;
+  int idx = myToolBox->currentIndex();
+  QList<ModuleBase_ModelWidget*> aModelWidgets = myPages[idx]->modelWidgets();
+  foreach(ModuleBase_ModelWidget* eachModelWidget, aModelWidgets) {
+    aResult << eachModelWidget->getControls();
+  }
+  return aResult;
 }
 
 bool ModuleBase_WidgetToolbox::focusTo()
@@ -79,13 +85,24 @@ bool ModuleBase_WidgetToolbox::focusTo()
   int idx = myToolBox->currentIndex();
   if (idx > myPages.count())
     return false;
-  myPages[idx]->takeFocus();
-  repaint();
-  return true;
+  return myPages[idx]->takeFocus();
 }
+
+void ModuleBase_WidgetToolbox::setHighlighted(bool)
+{
+  //page containers sould not be highlighted, do nothing
+}
+
+void ModuleBase_WidgetToolbox::enableFocusProcessing()
+{
+  myIsPassFocusToCurrentPage = true;
+}
+
 
 void ModuleBase_WidgetToolbox::activateCustom()
 {
+  // activate current page
+  focusTo();
 }
 
 bool ModuleBase_WidgetToolbox::storeValueCustom() const
@@ -103,5 +120,5 @@ bool ModuleBase_WidgetToolbox::storeValueCustom() const
 void ModuleBase_WidgetToolbox::onPageChanged()
 {
   storeValue();
-  focusTo();
+  if (myIsPassFocusToCurrentPage) focusTo();
 }

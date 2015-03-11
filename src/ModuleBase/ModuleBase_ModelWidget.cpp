@@ -20,6 +20,7 @@
 #include <QGraphicsDropShadowEffect>
 #include <QColor>
 #include <QLabel>
+#include <QFocusEvent>
 
 ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
                                                const Config_WidgetAPI* theData,
@@ -150,6 +151,11 @@ bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
 {
   QWidget* aWidget = qobject_cast<QWidget*>(theObject);
   if (theEvent->type() == QEvent::FocusIn) {
+    #ifdef _DEBUG
+    // The following two lines are for debugging purpose only
+    QFocusEvent* aFocusEvent = dynamic_cast<QFocusEvent*>(theEvent);
+    bool isWinFocus = aFocusEvent->reason() == Qt::ActiveWindowFocusReason;
+    #endif
     if (getControls().contains(aWidget)) {
       emit focusInWidget(this);
     }

@@ -25,6 +25,8 @@ class ModuleBase_WidgetToolbox : public ModuleBase_ModelWidget
   virtual bool restoreValue();
   virtual QList<QWidget*> getControls() const;
   virtual bool focusTo();
+  virtual void setHighlighted(bool isHighlighted);
+  virtual void enableFocusProcessing();
 
   int addPage(ModuleBase_PageBase* theWidget,
               const QString& theName, const QString& theCaseId);
@@ -37,6 +39,7 @@ class ModuleBase_WidgetToolbox : public ModuleBase_ModelWidget
   void onPageChanged();
 
  private:
+  bool myIsPassFocusToCurrentPage;
   QToolBox* myToolBox;
   QStringList myCaseIds;
   QList<ModuleBase_PageBase*> myPages;

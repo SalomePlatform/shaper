@@ -105,7 +105,7 @@ Q_OBJECT
   virtual void enableFocusProcessing();
 
   //! Switch On/Off highlighting of the widget
-  void setHighlighted(bool isHighlighted);
+  virtual void setHighlighted(bool isHighlighted);
 
   /// Returns the attribute name
   /// \returns the string value

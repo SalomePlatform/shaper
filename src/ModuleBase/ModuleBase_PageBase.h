@@ -29,7 +29,7 @@ class MODULEBASE_EXPORT ModuleBase_PageBase
   void addPageWidget(ModuleBase_PageBase* theWidget);
 
   void clearPage();
-  void takeFocus();
+  bool takeFocus();
   QList<ModuleBase_ModelWidget*> modelWidgets();
   void alignToTop();
 

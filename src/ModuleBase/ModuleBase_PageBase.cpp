@@ -52,12 +52,12 @@ void ModuleBase_PageBase::clearPage()
 }
 
 
-void ModuleBase_PageBase::takeFocus()
+bool ModuleBase_PageBase::takeFocus()
 {
   if(myWidgetList.isEmpty())
-    return;
+    return false;
 
-  myWidgetList.first()->focusTo();
+  return myWidgetList.first()->focusTo();
 }
 
 QList<ModuleBase_ModelWidget*> ModuleBase_PageBase::modelWidgets()

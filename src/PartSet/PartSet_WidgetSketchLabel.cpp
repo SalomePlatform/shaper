@@ -74,7 +74,9 @@ PartSet_WidgetSketchLabel::~PartSet_WidgetSketchLabel()
 
 QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
 {
-  return QList<QWidget*>();
+  QList<QWidget*> aResult;
+  aResult << myLabel;
+  return aResult;
 }
 
 void PartSet_WidgetSketchLabel::onPlaneSelected()
@@ -132,6 +134,17 @@ std::shared_ptr<GeomAPI_Pln> PartSet_WidgetSketchLabel::plane() const
   CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
   return PartSet_Tools::sketchPlane(aSketch);
 
+}
+
+bool PartSet_WidgetSketchLabel::focusTo()
+{
+  myLabel->setFocus();
+  return true;
+}
+
+void PartSet_WidgetSketchLabel::enableFocusProcessing()
+{
+  myLabel->installEventFilter(this);
 }
 
 void PartSet_WidgetSketchLabel::activateCustom()

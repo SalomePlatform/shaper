@@ -33,6 +33,7 @@ void ModuleBase_PageWidget::placeModelWidget(ModuleBase_ModelWidget* theWidget)
   const int kCol = 0;
   const int kRow = myMainLayout->count();
   myMainLayout->addWidget(theWidget, kRow, kCol);
+  myMainLayout->setRowStretch(kRow, 0);
 }
 
 void ModuleBase_PageWidget::placePageWidget(ModuleBase_PageBase* theWidget)
@@ -46,7 +47,8 @@ void ModuleBase_PageWidget::placePageWidget(ModuleBase_PageBase* theWidget)
   }
   const int kCol = 0;
   const int kRow = myMainLayout->count();
-  myMainLayout->addWidget(aWidget, kRow, kCol);//, Qt::AlignTop | Qt::AlignLeft);
+  myMainLayout->addWidget(aWidget, kRow, kCol);
+  myMainLayout->setRowStretch(kRow, 0);
 }
 
 QLayout* ModuleBase_PageWidget::pageLayout()

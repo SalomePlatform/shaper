@@ -90,13 +90,13 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
 {
   myWidgets = theWidgets;
   if (theWidgets.empty()) return;
-  QList<ModuleBase_ModelWidget*>::const_iterator anIt = theWidgets.begin();
-  for (; anIt != theWidgets.end(); anIt++) {
-    connect(*anIt, SIGNAL(keyReleased(QKeyEvent*)), this, SIGNAL(keyReleased(QKeyEvent*)));
-    connect(*anIt, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
-            this,  SLOT(activateNextWidget(ModuleBase_ModelWidget*)));
-    connect(*anIt, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)),
-            this,  SLOT(activateWidget(ModuleBase_ModelWidget*)));
+  foreach (ModuleBase_ModelWidget* aWidget, theWidgets) {
+    connect(aWidget, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)),
+            this,    SLOT(activateWidget(ModuleBase_ModelWidget*)));
+    connect(aWidget, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
+            this,    SLOT(activateNextWidget(ModuleBase_ModelWidget*)));
+    connect(aWidget, SIGNAL(keyReleased(QKeyEvent*)),
+            this,    SIGNAL(keyReleased(QKeyEvent*)));
   }
   ModuleBase_ModelWidget* aLastWidget = theWidgets.last();
   if (aLastWidget) {
@@ -159,9 +159,9 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
   }
   // Normaly focusTo is enough to activate widget
   // here is a special case on mouse click in the viewer
-  //if(aNextWidget == NULL) {
+  if(aNextWidget == NULL) {
     activateWidget(aNextWidget);
-  //}
+  }
 }
 
 void XGUI_PropertyPanel::activateNextWidget()
@@ -172,23 +172,24 @@ void XGUI_PropertyPanel::activateNextWidget()
 void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget)
 {
   // Avoid activation of already actve widget. It could happen on focusIn event many times
-  if (theWidget == myActiveWidget)
+  if (theWidget == myActiveWidget) {
     return;
+  }
   if(myActiveWidget) {
     myActiveWidget->deactivate();
     myActiveWidget->setHighlighted(false);
   }
   if(theWidget) {
-    if (theWidget)
-      emit beforeWidgetActivated(theWidget);
-    theWidget->activate();
+    emit beforeWidgetActivated(theWidget);
     theWidget->setHighlighted(true);
+    theWidget->activate();
   }
   myActiveWidget = theWidget;
-  if (myActiveWidget)
+  if (myActiveWidget) {
     emit widgetActivated(theWidget);
-  else if (!isEditingMode())
+  } else if (!isEditingMode()) {
     emit noMoreWidgets();
+  }
 }
 
 void XGUI_PropertyPanel::setCancelEnabled(bool theEnabled)
