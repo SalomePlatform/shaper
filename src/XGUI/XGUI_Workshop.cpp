@@ -36,8 +36,10 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeIntArray.h>
 
 //#include <PartSetPlugin_Part.h>
 
@@ -53,6 +55,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IViewer.h>
 #include<ModuleBase_FilterFactory.h>
+#include <ModuleBase_PageBase.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -73,6 +76,10 @@
 #include <QMenu>
 #include <QToolButton>
 #include <QAction>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QHBoxLayout>
+#include <QtxColorButton.h>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -646,7 +653,6 @@ void XGUI_Workshop::setPropertyPanel(ModuleBase_Operation* theOperation)
 
   myPropertyPanel->cleanContent();
   aFactory.createWidget(myPropertyPanel->contentWidget());
-  ModuleBase_Tools::zeroMargins(myPropertyPanel->contentWidget());
 
   QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
@@ -1239,6 +1245,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     activatePart(ResultPartPtr());
   else if (theId == "DELETE_CMD")
     deleteObjects(aObjects);
+  else if (theId == "COLOR_CMD")
+    changeColor(aObjects);
   else if (theId == "SHOW_CMD")
     showObjects(aObjects, true);
   else if (theId == "HIDE_CMD")
@@ -1332,7 +1340,6 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
       return;
   }
 
-  SessionPtr aMgr = ModelAPI_Session::get();
   QString aDescription = tr("Delete %1");
   QStringList aObjectNames;
   foreach (ObjectPtr aObj, theList) {
@@ -1341,6 +1348,7 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
     aObjectNames << QString::fromStdString(aObj->data()->name());
   }
   aDescription = aDescription.arg(aObjectNames.join(", "));
+  SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->startOperation(aDescription.toStdString());
   std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
                                        aLast = aRefFeatures.end();
@@ -1369,6 +1377,111 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
 
   myDisplayer->updateViewer();
   aMgr->finishOperation();
+  updateCommandStatus();
+}
+
+bool hasResults(QObjectPtrList theObjects, const std::set<std::string>& theTypes)
+{
+  bool isFoundResultType = false;
+  foreach(ObjectPtr anObj, theObjects)
+  {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+    if (aResult.get() == NULL)
+      continue;
+
+    isFoundResultType = theTypes.find(aResult->groupName()) != theTypes.end();
+    if (isFoundResultType)
+      break;
+  }
+  return isFoundResultType;
+}
+
+//**************************************************************
+bool XGUI_Workshop::canChangeColor() const
+{
+  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+
+  std::set<std::string> aTypes;
+  aTypes.insert(ModelAPI_ResultGroup::group());
+  aTypes.insert(ModelAPI_ResultConstruction::group());
+  aTypes.insert(ModelAPI_ResultBody::group());
+  return hasResults(aObjects, aTypes);
+}
+
+//**************************************************************
+void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
+{
+  // 1. find the initial value of the color
+  AttributeIntArrayPtr aColorAttr;
+  foreach(ObjectPtr anObj, theObjects) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+    if (aResult.get() != NULL) {
+      aColorAttr = aResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+    }
+  }
+  // there is no object with the color attribute
+  if (aColorAttr.get() == NULL || aColorAttr->size() == 0)
+    return;
+  int aRed = aColorAttr->value(0);
+  int aGreen = aColorAttr->value(1);
+  int aBlue = aColorAttr->value(2);
+
+  // 2. show the dialog to change the value
+  QDialog* aDlg = new QDialog();
+  QVBoxLayout* aLay = new QVBoxLayout(aDlg);
+
+  QtxColorButton* aColorBtn = new QtxColorButton(aDlg);
+  aColorBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+  aLay->addWidget(aColorBtn);
+  aColorBtn->setColor(QColor(aRed, aGreen, aBlue));
+
+  QDialogButtonBox* aButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                                                    Qt::Horizontal, aDlg);
+  connect(aButtons, SIGNAL(accepted()), aDlg, SLOT(accept()));
+  connect(aButtons, SIGNAL(rejected()), aDlg, SLOT(reject()));
+  aLay->addWidget(aButtons);
+
+  aDlg->move(QCursor::pos());
+  bool isDone = aDlg->exec() == QDialog::Accepted;
+  if (!isDone)
+    return;
+
+  QColor aColorResult = aColorBtn->color();
+  int aRedResult = aColorResult.red(),
+      aGreenResult = aColorResult.green(),
+      aBlueResult = aColorResult.blue();
+
+  if (aRedResult == aRed && aGreenResult == aGreen && aBlueResult == aBlue)
+    return;
+
+  // 3. abort the previous operation and start a new one
+  SessionPtr aMgr = ModelAPI_Session::get();
+  bool aWasOperation = aMgr->isOperation(); // keep this value
+  if (!aWasOperation) {
+    QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
+    aMgr->startOperation(aDescription.toStdString());
+  }
+
+  // 4. set the value to all results
+  static Events_ID EVENT_DISP = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  foreach(ObjectPtr anObj, theObjects) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+    if (aResult.get() != NULL) {
+      aColorAttr = aResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+      if (aColorAttr.get() != NULL) {
+        if (!aColorAttr->size()) {
+          aColorAttr->setSize(3);
+        }
+        aColorAttr->setValue(0, aRedResult);
+        aColorAttr->setValue(1, aGreenResult);
+        aColorAttr->setValue(2, aBlueResult);
+        ModelAPI_EventCreator::get()->sendUpdated(anObj, EVENT_DISP);
+      }
+    }
+  }
+  if (!aWasOperation)
+    aMgr->finishOperation();
   updateCommandStatus();
 }
 

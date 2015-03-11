@@ -28,6 +28,9 @@
 #include <ModuleBase_WidgetMultiSelector.h>
 #include <ModuleBase_WidgetLabel.h>
 #include <ModuleBase_WidgetToolbox.h>
+#include <ModuleBase_PageBase.h>
+#include <ModuleBase_PageGroupBox.h>
+#include <ModuleBase_PageWidget.h>
 
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
@@ -64,216 +67,111 @@ ModuleBase_WidgetFactory::~ModuleBase_WidgetFactory()
   delete myWidgetApi;
 }
 
-void ModuleBase_WidgetFactory::createWidget(QWidget* theParent)
+void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
 {
   myParentId = myWidgetApi->widgetId();
   if (!myWidgetApi->toChildWidget())
     return;
 
-  QVBoxLayout* aWidgetLay = new QVBoxLayout(theParent);
-  bool isStretchLayout = false;
   do {  //Iterate over each node
     std::string aWdgType = myWidgetApi->widgetType();
-    //Create a widget (doublevalue, groupbox, toolbox, etc.
-    QWidget* aWidget = createWidgetByType(aWdgType, theParent);
-    if (aWidget) {
-      if (!myWidgetApi->getBooleanAttribute(ATTR_INTERNAL, false)) {
-        aWidgetLay->addWidget(aWidget);
-      } else {
-        aWidget->setVisible(false);
-      }
-    }
-    if (myWidgetApi->isContainerWidget()) {
+    // Create PageGroup TODO: extract
+    if (myWidgetApi->isGroupBoxWidget()) {
       //if current widget is groupbox (container) process it's children recursively
       QString aGroupName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
-      createWidget(aWidget);
-      ModuleBase_Tools::adjustMargins(aWidget);
-      QGroupBox* aGrBox = qobject_cast<QGroupBox*>(aWidget);
-      aGrBox->setTitle(aGroupName);
-    }
-    if (myWidgetApi->isPagedWidget()) {
-      //If current widget is toolbox or switch-casebox then fetch all
-      //it's pages recursively and setup into the widget.
-      myWidgetApi->toChildWidget();
-      do {
-        QString aPageName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
-        QString aCaseId = qs(myWidgetApi->getProperty(_ID));
-        QWidget* aPage = new QWidget(aWidget);
-        createWidget(aPage);
-        ModuleBase_Tools::adjustMargins(aPage);
-        if (aWdgType == WDG_SWITCH) {
-          ModuleBase_WidgetSwitch* aSwitch = qobject_cast<ModuleBase_WidgetSwitch*>(aWidget);
-          aSwitch->addPage(aPage, aPageName);
-        } else if (aWdgType == WDG_TOOLBOX) {
-          ModuleBase_WidgetToolbox* aToolbox = qobject_cast<ModuleBase_WidgetToolbox*>(aWidget);
-          aToolbox->addPage(aPage, aPageName, aCaseId);
+      ModuleBase_PageGroupBox* aPage = new ModuleBase_PageGroupBox(thePage->pageWidget());
+      aPage->setTitle(aGroupName);
+      createWidget(aPage);
+      thePage->addPageWidget(aPage);
+    } else {
+      // Create a ModelWidget
+      ModuleBase_ModelWidget* aWidget = createWidgetByType(aWdgType, thePage->pageWidget());
+      if (aWidget) {
+        if (!myWidgetApi->getBooleanAttribute(ATTR_INTERNAL, false)) {
+          thePage->addModelWidget(aWidget);
+        } else {
+          aWidget->setVisible(false);
         }
-      } while (myWidgetApi->toNextWidget());
-    }
-    if (aWidget && !isStretchLayout) {
-      isStretchLayout = !hasExpandingControls(aWidget);
+      }
+      // Create PagedContainer TODO: extract
+      if (myWidgetApi->isPagedWidget()) {
+        //If current widget is toolbox or switch-casebox then fetch all
+        //it's pages recursively and setup into the widget.
+        myWidgetApi->toChildWidget();
+        do {
+          QString aPageName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
+          QString aCaseId = qs(myWidgetApi->getProperty(_ID));
+          ModuleBase_PageBase* aPage = new ModuleBase_PageWidget(aWidget);
+          createWidget(aPage);
+          QWidget* aCasePageWidget = dynamic_cast<QWidget*>(aPage);
+          if (aWdgType == WDG_SWITCH) {
+            ModuleBase_WidgetSwitch* aSwitch = qobject_cast<ModuleBase_WidgetSwitch*>(aWidget);
+            aSwitch->addPage(aCasePageWidget, aPageName);
+          } else if (aWdgType == WDG_TOOLBOX) {
+            ModuleBase_WidgetToolbox* aToolbox = qobject_cast<ModuleBase_WidgetToolbox*>(aWidget);
+            aToolbox->addPage(aPage, aPageName, aCaseId);
+          }
+        } while (myWidgetApi->toNextWidget());
+      }
     }
   } while (myWidgetApi->toNextWidget());
-  if (isStretchLayout) {
-    aWidgetLay->addStretch(1);
-  }
-  theParent->setLayout(aWidgetLay);
+
+  thePage->alignToTop();
 }
 
-bool ModuleBase_WidgetFactory::hasExpandingControls(QWidget* theParent)
+ModuleBase_ModelWidget* ModuleBase_WidgetFactory
+::createWidgetByType(const std::string& theType, QWidget* theParent)
 {
-  bool result = false;
-  QList<QWidget *> aListToCheck;
-  aListToCheck << theParent;
-  ModuleBase_ModelWidget* aModelWidget = qobject_cast<ModuleBase_ModelWidget*>(theParent);
-  if(aModelWidget) {
-    aListToCheck << aModelWidget->getControls();
-  }
-  foreach(QWidget* eachWidget, aListToCheck) {
-    QSizePolicy::Policy aVPolicy = eachWidget->sizePolicy().verticalPolicy();
-    if(aVPolicy & QSizePolicy::ExpandFlag) {
-      result = true;
-    }
-  }
-  return result;
-}
+  ModuleBase_ModelWidget* result = NULL;
 
-QWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::string& theType,
-                                                      QWidget* theParent)
-{
-  QWidget* result = NULL;
-  if (theType == WDG_DOUBLEVALUE) {
-    result = doubleSpinBoxControl(theParent);
+  if (theType == WDG_INFO) {
+    result = new ModuleBase_WidgetLabel(theParent, myWidgetApi, myParentId);
 
-  } else if (theType == WDG_INFO) {
-    result = labelControl(theParent);
+  } else if (theType == WDG_DOUBLEVALUE) {
+    result = new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi, myParentId);
 
   } else if (theType == WDG_SHAPE_SELECTOR) {
-    result = shapeSelectorControl(theParent);
+    result =  new ModuleBase_WidgetShapeSelector(theParent, myWorkshop, myWidgetApi, myParentId);
 
   } else if (theType == WDG_BOOLVALUE) {
-    result = booleanControl(theParent);
+    result = new ModuleBase_WidgetBoolValue(theParent, myWidgetApi, myParentId);
 
   } else if (theType == WDG_DOUBLEVALUE_EDITOR) {
-    result = doubleValueEditor(theParent);
+    result = new ModuleBase_WidgetEditor(theParent, myWidgetApi, myParentId);
 
   } else if (theType == WDG_FILE_SELECTOR) {
-    result = fileSelectorControl(theParent);
+    result = new ModuleBase_WidgetFileSelector(theParent, myWidgetApi, myParentId);
 
   } else if (theType == WDG_CHOICE) {
-    result = choiceControl(theParent);
+    result = new ModuleBase_WidgetChoice(theParent, myWidgetApi,myParentId);
 
   } else if (theType == WDG_STRINGVALUE) {
-    result = lineEditControl(theParent);
+    result = new ModuleBase_WidgetLineEdit(theParent, myWidgetApi,myParentId);
 
   } else if (theType == WDG_MULTISELECTOR) {
-    result = multiSelectorControl(theParent);
+    result = new ModuleBase_WidgetMultiSelector(theParent, myWorkshop, myWidgetApi,myParentId);
 
-  } else if (myWidgetApi->isContainerWidget() || myWidgetApi->isPagedWidget()) {
-    result = createContainer(theType, theParent);
+  } else if (theType == WDG_TOOLBOX) {
+    result = new ModuleBase_WidgetToolbox(theParent, myWidgetApi, myParentId);
+
+  } else if (theType == WDG_SWITCH) {
+    result = new ModuleBase_WidgetSwitch(theParent, myWidgetApi, myParentId);
+    return result;
+
+  } else if (theType == WDG_TOOLBOX_BOX || theType == WDG_SWITCH_CASE) {
+    // Do nothing for "box" and "case"
+    result = NULL;
   } else {
     result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi,
-                                                      myParentId, myModelWidgets);
+                                                      myParentId);
 #ifdef _DEBUG
     if (!result) {qDebug("ModuleBase_WidgetFactory::fillWidget: find bad widget type");}
 #endif
   }
-  return result;
-}
-
-QWidget* ModuleBase_WidgetFactory::createContainer(const std::string& theType, QWidget* theParent)
-{
-  QWidget* aResult = NULL;
-  if (theType == WDG_GROUP || theType == WDG_CHECK_GROUP) {
-    QGroupBox* aGroupBox = new QGroupBox(theParent);
-    aGroupBox->setCheckable(theType == WDG_CHECK_GROUP);
-    aResult = aGroupBox;
-  } else if (theType == WDG_TOOLBOX) {
-    ModuleBase_WidgetToolbox* aWdg = new ModuleBase_WidgetToolbox(theParent, myWidgetApi, myParentId);
-    myModelWidgets.append(aWdg);
-    aResult = aWdg;
-  } else if (theType == WDG_SWITCH) {
-    aResult = new ModuleBase_WidgetSwitch(theParent);
-  } else if (theType == WDG_TOOLBOX_BOX || theType == WDG_SWITCH_CASE) {
-    // Do nothing for "box" and "case"
-    aResult = NULL;
+  if (result) {
+    myModelWidgets.append(result);
   }
-#ifdef _DEBUG
-  else {qDebug() << "ModuleBase_WidgetFactory::fillWidget: find bad container type";}
-#endif
-  return aResult;
-}
-
-QWidget* ModuleBase_WidgetFactory::labelControl(QWidget* theParent)
-{
-  ModuleBase_WidgetLabel* aWgt =
-      new ModuleBase_WidgetLabel(theParent, myWidgetApi, myParentId);
-  myModelWidgets.append(aWgt);
-  return aWgt;
-}
-
-QWidget* ModuleBase_WidgetFactory::doubleSpinBoxControl(QWidget* theParent)
-{
-  ModuleBase_WidgetDoubleValue* aDblWgt =
-      new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi, myParentId);
-  myModelWidgets.append(aDblWgt);
-  return aDblWgt;
-}
-
-QWidget* ModuleBase_WidgetFactory::doubleValueEditor(QWidget* theParent)
-{
-  ModuleBase_WidgetEditor* aWidget =
-      new ModuleBase_WidgetEditor(theParent, myWidgetApi, myParentId);
-  myModelWidgets.append(aWidget);
-  return aWidget;
-}
-
-QWidget* ModuleBase_WidgetFactory::shapeSelectorControl(QWidget* theParent)
-{
-  ModuleBase_WidgetShapeSelector* aSelector =
-      new ModuleBase_WidgetShapeSelector(theParent, myWorkshop, myWidgetApi, myParentId);
-  myModelWidgets.append(aSelector);
-  return aSelector;
-}
-
-QWidget* ModuleBase_WidgetFactory::booleanControl(QWidget* theParent)
-{
-  ModuleBase_WidgetBoolValue* aBoolWgt =
-      new ModuleBase_WidgetBoolValue(theParent, myWidgetApi, myParentId);
-  myModelWidgets.append(aBoolWgt);
-  return aBoolWgt;
-}
-
-QWidget* ModuleBase_WidgetFactory::fileSelectorControl(QWidget* theParent)
-{
-  ModuleBase_WidgetFileSelector* aFileSelectorWgt =
-      new ModuleBase_WidgetFileSelector(theParent, myWidgetApi, myParentId);
-  myModelWidgets.append(aFileSelectorWgt);
-  return aFileSelectorWgt;
-}
-
-QWidget* ModuleBase_WidgetFactory::choiceControl(QWidget* theParent)
-{
-  ModuleBase_WidgetChoice* aChoiceWgt =
-      new ModuleBase_WidgetChoice(theParent, myWidgetApi,myParentId);
-  myModelWidgets.append(aChoiceWgt);
-  return aChoiceWgt;
-}
-
-QWidget* ModuleBase_WidgetFactory::lineEditControl(QWidget* theParent)
-{
-  ModuleBase_WidgetLineEdit* aLineEditWgt =
-      new ModuleBase_WidgetLineEdit(theParent, myWidgetApi,myParentId);
-  myModelWidgets.append(aLineEditWgt);
-  return aLineEditWgt;
-}
-
-QWidget* ModuleBase_WidgetFactory::multiSelectorControl(QWidget* theParent)
-{
-  ModuleBase_WidgetMultiSelector* aMultiselectorWgt =
-      new ModuleBase_WidgetMultiSelector(theParent, myWorkshop, myWidgetApi,myParentId);
-  myModelWidgets.append(aMultiselectorWgt);
-  return aMultiselectorWgt;
+  return result;
 }
 
 QString ModuleBase_WidgetFactory::qs(const std::string& theStdString)

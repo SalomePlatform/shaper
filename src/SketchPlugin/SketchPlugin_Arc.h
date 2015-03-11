@@ -8,7 +8,7 @@
 #define SketchPlugin_Arc_H_
 
 #include "SketchPlugin.h"
-#include <SketchPlugin_Feature.h>
+#include <SketchPlugin_SketchEntity.h>
 #include <SketchPlugin_Sketch.h>
 #include <GeomAPI_IPresentable.h>
 
@@ -19,7 +19,7 @@
  * calculated when there is non-initialized attributes of the arc. The second is a result and
  * it is calculated if all attributes are initialized.
  */
-class SketchPlugin_Arc : public SketchPlugin_Feature, public GeomAPI_IPresentable
+class SketchPlugin_Arc : public SketchPlugin_SketchEntity, public GeomAPI_IPresentable
 {
   /// to avoid cyclic dependencies in automatic updates: they mean that 
   /// update is performed right now and automatic updates are not needed

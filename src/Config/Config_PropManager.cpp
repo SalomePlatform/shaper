@@ -9,6 +9,7 @@
 std::vector<int> stringToRGB(const std::string& theColor);
 int stringToInteger(const std::string& theInt);
 double stringToDouble(const std::string& theDouble);
+bool stringToBoolean(const std::string& theInt);
 
 Config_Properties Config_PropManager::myProps;
 
@@ -121,6 +122,14 @@ double Config_PropManager::real(const std::string& theSection, const std::string
   return stringToDouble(aStr);
 }
 
+bool Config_PropManager::boolean(const std::string& theSection,
+                                 const std::string& theName,
+                                 const std::string& theDefault)
+{
+  std::string aStr = string(theSection, theName, theDefault);
+  return stringToBoolean(aStr);
+}
+
 std::vector<int> stringToRGB(const std::string& theColor)
 {
   std::vector<int> aRes(3);
@@ -172,4 +181,9 @@ double stringToDouble(const std::string& theDouble)
 {
   char* p;
   return strtod(theDouble.c_str(), &p);
+}
+
+bool stringToBoolean(const std::string& theBoolean)
+{
+  return theBoolean == "true";
 }

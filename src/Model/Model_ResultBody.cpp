@@ -7,6 +7,7 @@
 #include <Model_ResultBody.h>
 #include <Model_Data.h>
 #include <Model_Document.h>
+#include <ModelAPI_AttributeIntArray.h>
 #include <TNaming_Builder.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TDataStd_Name.hxx>
@@ -30,6 +31,7 @@
 #include <BRep_Tool.hxx>
 #include <GeomAPI_Shape.h>
 #include <GeomAlgoAPI_MakeShape.h>
+#include <Config_PropManager.h>
 // DEB
 //#include <TCollection_AsciiString.hxx>
 //#include <TDF_Tool.hxx>
@@ -38,6 +40,20 @@
 Model_ResultBody::Model_ResultBody()
 {
   setIsConcealed(false);
+}
+
+void Model_ResultBody::initAttributes()
+{
+  // append the color attribute
+  DataPtr aData = data();
+  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::type());
+  AttributeIntArrayPtr aColorAttr = aData->intArray(COLOR_ID());
+  std::vector<int> aRGB;
+  aRGB = Config_PropManager::color("Visualization", "result_body_color", DEFAULT_COLOR());
+  aColorAttr->setSize(3);
+  aColorAttr->setValue(0, aRGB[0]);
+  aColorAttr->setValue(1, aRGB[1]);
+  aColorAttr->setValue(2, aRGB[2]);
 }
 
 void Model_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape)

@@ -462,7 +462,7 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
       DataPtr aData = aMyFeature->data();
       AttributeSelectionPtr anAttr = 
         std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-        (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
+        (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
 
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
       if (anAttr && aRes) {
@@ -495,7 +495,7 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(const TopoDS_Shape& theShap
       DataPtr aData = aMyFeature->data();
       AttributeSelectionPtr anAttr = 
         std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-        (aData->attribute(SketchPlugin_Feature::EXTERNAL_ID()));
+        (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
 
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
       if (anAttr && aRes) {

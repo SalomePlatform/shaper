@@ -893,8 +893,8 @@ void Model_Document::initData(ObjectPtr theObj, TDF_Label theLab, const int theT
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
   if (aFeature) {
     setUniqueName(aFeature);  // must be before "initAttributes" because duplicate part uses name
-    aFeature->initAttributes();
   }
+  theObj->initAttributes();
 }
 
 void Model_Document::synchronizeFeatures(const bool theMarkUpdated, const bool theUpdateReferences)

@@ -6,6 +6,7 @@
  */
 
 #include <ModuleBase_WidgetToolbox.h>
+#include <ModuleBase_PageBase.h>
 #include <ModuleBase_Tools.h>
 
 #include <ModelAPI_AttributeString.h>
@@ -28,9 +29,6 @@ ModuleBase_WidgetToolbox::ModuleBase_WidgetToolbox(QWidget* theParent, const Con
                               "border-color:#fff #505050 #505050 #fff;}";
   myToolBox->setStyleSheet(css);
   // default vertical size policy is preferred
-  QSizePolicy aSizePolicy = myToolBox->sizePolicy();
-  aSizePolicy.setVerticalPolicy(QSizePolicy::MinimumExpanding);
-  myToolBox->setSizePolicy(aSizePolicy);
   aMainLayout->addWidget(myToolBox);
 
   connect(myToolBox, SIGNAL(currentChanged(int)), this, SLOT(onPageChanged()));
@@ -40,11 +38,15 @@ ModuleBase_WidgetToolbox::~ModuleBase_WidgetToolbox()
 {
 }
 
-int ModuleBase_WidgetToolbox::addPage(QWidget* theWidget,
+int ModuleBase_WidgetToolbox::addPage(ModuleBase_PageBase* thePage,
                                       const QString& theName, const QString& theCaseId)
 {
   myCaseIds << theCaseId;
-  return myToolBox->addItem(theWidget, theName);
+  myPages << thePage;
+  QFrame* aFrame = dynamic_cast<QFrame*>(thePage);
+  aFrame->setFrameShape(QFrame::Box);
+  aFrame->setFrameStyle(QFrame::Sunken);
+  return myToolBox->addItem(aFrame, theName);
 }
 
 bool ModuleBase_WidgetToolbox::restoreValue()
@@ -61,6 +63,7 @@ bool ModuleBase_WidgetToolbox::restoreValue()
   bool isSignalsBlocked = myToolBox->blockSignals(true);
   myToolBox->setCurrentIndex(idx);
   myToolBox->blockSignals(isSignalsBlocked);
+  focusTo();
   return true;
 }
 
@@ -69,6 +72,20 @@ QList<QWidget*> ModuleBase_WidgetToolbox::getControls() const
   QList<QWidget*> aList;
   aList << myToolBox;
   return aList;
+}
+
+bool ModuleBase_WidgetToolbox::focusTo()
+{
+  int idx = myToolBox->currentIndex();
+  if (idx > myPages.count())
+    return false;
+  myPages[idx]->takeFocus();
+  repaint();
+  return true;
+}
+
+void ModuleBase_WidgetToolbox::activateCustom()
+{
 }
 
 bool ModuleBase_WidgetToolbox::storeValueCustom() const
@@ -86,4 +103,5 @@ bool ModuleBase_WidgetToolbox::storeValueCustom() const
 void ModuleBase_WidgetToolbox::onPageChanged()
 {
   storeValue();
+  focusTo();
 }

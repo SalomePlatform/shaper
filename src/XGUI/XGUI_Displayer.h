@@ -214,6 +214,13 @@ class XGUI_EXPORT XGUI_Displayer
   /// Opens local context. Does nothing if it is already opened.
   void openLocalContext();
 
+  /** Update the object presentable properties such as color, lines width and other
+   * If the object is result with the color attribute value set, it is used,
+   * otherwise the customize is applyed to the object's feature if it is a custom prs
+   * \param theObject an object instance
+   */
+  void customizeObject(ObjectPtr theObject);
+
  protected:
    /// Reference to workshop
   XGUI_Workshop* myWorkshop;

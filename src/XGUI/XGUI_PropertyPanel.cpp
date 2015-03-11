@@ -12,6 +12,8 @@
 //#include <AppElements_Constants.h>
 #include <ModuleBase_WidgetMultiSelector.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_PageBase.h>
+#include <ModuleBase_PageWidget.h>
 
 #include <QEvent>
 #include <QFrame>
@@ -31,7 +33,8 @@
 
 XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
     : ModuleBase_IPropertyPanel(theParent), 
-    myActiveWidget(NULL)
+    myActiveWidget(NULL),
+    myPanelPage(NULL)
 {
   this->setWindowTitle(tr("Property Panel"));
   QAction* aViewAct = this->toggleViewAction();
@@ -39,10 +42,10 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
   QWidget* aContent = new QWidget(this);
-  myMainLayout = new QGridLayout(aContent);
+  QGridLayout* aMainLayout = new QGridLayout(aContent);
   const int kPanelColumn = 0;
   int aPanelRow = 0;
-  myMainLayout->setContentsMargins(3, 3, 3, 3);
+  aMainLayout->setContentsMargins(3, 3, 3, 3);
   this->setWidget(aContent);
 
   QFrame* aFrm = new QFrame(aContent);
@@ -50,7 +53,7 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   aFrm->setFrameShape(QFrame::Panel);
   QHBoxLayout* aBtnLay = new QHBoxLayout(aFrm);
   ModuleBase_Tools::zeroMargins(aBtnLay);
-  myMainLayout->addWidget(aFrm, aPanelRow++, kPanelColumn);
+  aMainLayout->addWidget(aFrm, aPanelRow++, kPanelColumn);
 
   QStringList aBtnNames;
   aBtnNames << QString(PROP_PANEL_HELP)
@@ -64,10 +67,9 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent)
   }
   aBtnLay->insertStretch(1, 1);
 
-  myCustomWidget = new QWidget(aContent);
-  myCustomWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
-  myMainLayout->addWidget(myCustomWidget, aPanelRow, kPanelColumn);
-  setStretchEnabled(true);
+  myPanelPage = new ModuleBase_PageWidget(aContent);
+  myPanelPage->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+  aMainLayout->addWidget(myPanelPage, aPanelRow, kPanelColumn);
 }
 
 XGUI_PropertyPanel::~XGUI_PropertyPanel()
@@ -79,7 +81,7 @@ void XGUI_PropertyPanel::cleanContent()
   if (myActiveWidget)
     myActiveWidget->deactivate();
   myWidgets.clear();
-  qDeleteAll(myCustomWidget->children());
+  myPanelPage->clearPage();
   myActiveWidget = NULL;
   setWindowTitle(tr("Property Panel"));
 }
@@ -116,9 +118,10 @@ const QList<ModuleBase_ModelWidget*>& XGUI_PropertyPanel::modelWidgets() const
   return myWidgets;
 }
 
-QWidget* XGUI_PropertyPanel::contentWidget()
+ModuleBase_PageBase* XGUI_PropertyPanel::contentWidget()
 {
-  return myCustomWidget;
+
+  return static_cast<ModuleBase_PageBase*>(myPanelPage);
 }
 
 void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
@@ -128,8 +131,7 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
     return;
   if (theFeature->isAction() || !theFeature->data())
     return;
-  foreach(ModuleBase_ModelWidget* eachWidget, myWidgets)
-  {
+  foreach(ModuleBase_ModelWidget* eachWidget, myWidgets) {
     eachWidget->setFeature(theFeature);
     eachWidget->restoreValue();
   }
@@ -160,14 +162,6 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
   //if(aNextWidget == NULL) {
     activateWidget(aNextWidget);
   //}
-}
-
-void XGUI_PropertyPanel::setStretchEnabled(bool isEnabled)
-{
-  int aStretchIdx = myMainLayout->rowCount() - 1;
-  if (aStretchIdx < 0)
-    return;
-  myMainLayout->setRowStretch(aStretchIdx, isEnabled ? 1 : 0);
 }
 
 void XGUI_PropertyPanel::activateNextWidget()

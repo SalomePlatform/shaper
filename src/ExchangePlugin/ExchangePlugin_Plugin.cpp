@@ -32,6 +32,10 @@ ExchangePlugin_Plugin::ExchangePlugin_Plugin()
   // register construction properties
   Config_PropManager::registerProp("Visualization", "import_feature_color", "Imported feature color",
                                    Config_Prop::Color, IMPORTED_FEATURE_COLOR);
+
+  // register random result color properties
+  Config_PropManager::registerProp("Visualization", "random_result_color", "Use random color for results",
+                                   Config_Prop::Bool, "true");
 }
 
 FeaturePtr ExchangePlugin_Plugin::createFeature(string theFeatureID)

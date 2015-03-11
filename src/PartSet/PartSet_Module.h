@@ -52,9 +52,8 @@ public:
   virtual ~PartSet_Module();
 
   /// Creates custom widgets for property panel
-  virtual QWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
-                                      Config_WidgetAPI* theWidgetApi, std::string theParentId,
-                                      QList<ModuleBase_ModelWidget*>& theModelWidgets);
+  virtual ModuleBase_ModelWidget* createWidgetByType(const std::string& theType, QWidget* theParent,
+                                                     Config_WidgetAPI* theWidgetApi, std::string theParentId);
 
   /// Call back forlast tuning of property panel before operation performance
   virtual void propertyPanelDefined(ModuleBase_Operation* theOperation);

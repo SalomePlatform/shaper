@@ -11,7 +11,7 @@
 #define ModuleBase_WidgetSwitch_H_
 
 #include <ModuleBase.h>
-#include <QFrame>
+#include <ModuleBase_ModelWidget.h>
 
 class QComboBox;
 class QVBoxLayout;
@@ -20,19 +20,31 @@ class QVBoxLayout;
 * \ingroup GUI
 * Implements a model widget for swithch as a container widget. It can be defined in XML with "switch" keyword
 */
-class MODULEBASE_EXPORT ModuleBase_WidgetSwitch : public QFrame
+class MODULEBASE_EXPORT ModuleBase_WidgetSwitch : public ModuleBase_ModelWidget
 {
-Q_OBJECT
+  Q_OBJECT
  public:
    /// Constructor
    /// \param parent a parent widget
-  ModuleBase_WidgetSwitch(QWidget* parent = NULL);
+  ModuleBase_WidgetSwitch(QWidget* theParent,
+                          const Config_WidgetAPI* theData,
+                          const std::string& theParentId);
   virtual ~ModuleBase_WidgetSwitch();
+
+  virtual bool restoreValue() {
+    return false;
+  }
+
+  virtual QList<QWidget*> getControls() const;
+
+  virtual bool focusTo() {
+    return false;
+  }
 
   /// Add a page to the widget
   /// \param theWidget a page widget
   /// \param theName a name of page
-  int addPage(QWidget * theWidget, const QString & theName);
+  int addPage(QWidget* theWidget, const QString & theName);
 
   /// Returns count of pages
   int count() const;
@@ -94,6 +106,9 @@ signals:
   void currentPageChanged(int);
 
  protected:
+  virtual bool storeValueCustom() const {
+    return false;
+  }
   /// Update widget
   void refresh();
 
