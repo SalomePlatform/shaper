@@ -60,48 +60,53 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
   }
 
   /// Customize presentation of the feature
-  virtual void customisePresentation(AISObjectPtr thePrs)
+  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
   {
-    std::vector<int> aRGB;
-  
+    bool isCustomized = false;
     int aShapeType = thePrs->getShapeType();
-    if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/)
-      return;
+    // a compound is processed like the edge because the arc feature uses the compound for presentable AIS
+    if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/ && aShapeType != 0/*compound*/)
+      return false;
 
+    std::vector<int> aColor;
     std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr =
-                                   data()->boolean(SketchPlugin_SketchEntity::CONSTRUCTION_ID());
+                                    data()->boolean(SketchPlugin_SketchEntity::CONSTRUCTION_ID());
     bool isConstruction = aConstructionAttr.get() != NULL && aConstructionAttr->value();
-    if (aShapeType == 6) { // if this is an edge
+    if (aShapeType == 6 || aShapeType == 0) { // if this is an edge or a compound
       if (isConstruction) {
-        thePrs->setWidth(1);
-        thePrs->setLineStyle(3);
-        aRGB = Config_PropManager::color("Visualization", "sketch_construction_color",
-                                         SKETCH_CONSTRUCTION_COLOR);
+        isCustomized = thePrs->setWidth(1) || isCustomized;
+        isCustomized = thePrs->setLineStyle(3) || isCustomized;
+
+        aColor = Config_PropManager::color("Visualization", "sketch_construction_color",
+                                          SKETCH_CONSTRUCTION_COLOR);
       }
       else {
-        thePrs->setWidth(3);
-        thePrs->setLineStyle(0);
+        isCustomized = thePrs->setWidth(3) || isCustomized;
+        isCustomized = thePrs->setLineStyle(0) || isCustomized;
+
         if (isExternal()) {
           // Set color from preferences
-          aRGB = Config_PropManager::color("Visualization", "sketch_external_color",
-                                           SKETCH_EXTERNAL_EDGE_COLOR);
+          aColor = Config_PropManager::color("Visualization", "sketch_external_color",
+                                            SKETCH_EXTERNAL_EDGE_COLOR);
         }
         else {
           // Set color from preferences
-          aRGB = Config_PropManager::color("Visualization", "sketch_edge_color",
-                                           SKETCH_EDGE_COLOR);
+          aColor = Config_PropManager::color("Visualization", "sketch_edge_color",
+                                             SKETCH_EDGE_COLOR);
         }
       }
     }
     else if (aShapeType == 7) { // otherwise this is a vertex
       //  thePrs->setPointMarker(6, 2.);
-      // Set color from preferences
-      aRGB = Config_PropManager::color("Visualization", "sketch_point_color",
-                                       SKETCH_POINT_COLOR);
+      aColor = Config_PropManager::color("Visualization", "sketch_point_color",
+                                        SKETCH_POINT_COLOR);
     }
 
-    if (!aRGB.empty())
-      thePrs->setColor(aRGB[0], aRGB[1], aRGB[2]);
+    if (!aColor.empty()) {
+      isCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]) || isCustomized;
+    }
+    return isCustomized;
   }
 
 protected:

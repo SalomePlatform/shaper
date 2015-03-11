@@ -17,6 +17,7 @@
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Object.h>
@@ -100,6 +101,10 @@ class Model_Data : public ModelAPI_Data
   /// Returns the attribute that contains real value with double precision
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeString>
     string(const std::string& theID);
+  /// Returns the attribute that contains integer values array
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_AttributeIntArray>
+    intArray(const std::string& theID);
+
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Attribute> attribute(const std::string& theID);

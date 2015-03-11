@@ -35,6 +35,9 @@ class SketchPlugin_ConstraintCoincidence : public SketchPlugin_ConstraintBase
     return MY_KIND;
   }
 
+  /// Returns the AIS preview
+  SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
+
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 

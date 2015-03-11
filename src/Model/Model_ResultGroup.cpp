@@ -6,12 +6,31 @@
 
 #include <Model_ResultGroup.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeIntArray.h>
+
 #include <GeomAlgoAPI_CompoundBuilder.h>
+
+#include <Config_PropManager.h>
 
 Model_ResultGroup::Model_ResultGroup(std::shared_ptr<ModelAPI_Data> theOwnerData)
 {
   setIsConcealed(false);
   myOwnerData = theOwnerData;
+}
+
+void Model_ResultGroup::initAttributes()
+{
+  // append the color attribute. It is empty, the attribute will be filled by a request
+  DataPtr aData = data();
+  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::type());
+}
+
+void Model_ResultGroup::colorConfigInfo(std::string& theSection, std::string& theName,
+                                       std::string& theDefault)
+{
+  theSection = "Visualization";
+  theName = "result_group_color";
+  theDefault = DEFAULT_COLOR();
 }
 
 std::shared_ptr<GeomAPI_Shape> Model_ResultGroup::shape()

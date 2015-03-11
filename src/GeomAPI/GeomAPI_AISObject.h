@@ -78,10 +78,6 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
   void createFixed(std::shared_ptr<GeomAPI_Shape> theShape,
                    std::shared_ptr<GeomAPI_Pln> thePlane);
 
-  /** \brief Redisplays the current AIS object in the context
-   */
-  void redisplay();
-
   /** \brief Assigns the color for the shape
    *  \param[in] theColor index of the color
    */
@@ -91,11 +87,19 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
    *  \param[in] theR value of the red component
    *  \param[in] theG value of the green component
    *  \param[in] theB value of the blue component
+   *  \returns true if the presentation color is changed
    */
-  void setColor(int theR, int theG, int theB);
+  bool setColor(int theR, int theG, int theB);
+
+  /** \brief Returns the color for the shape
+   *  \param[in] theR value of the red component
+   *  \param[in] theG value of the green component
+   *  \param[in] theB value of the blue component
+   */
+  void getColor(int& theR, int& theG, int& theB);
 
   /// \brief Assigns the width of the lines of shape
-  void setWidth(const double& theWidth);
+  bool setWidth(const double& theWidth);
 
   /// \brief Checks if the object is empty
   bool empty() const;
@@ -110,10 +114,12 @@ class GEOMAPI_EXPORT GeomAPI_AISObject : public GeomAPI_Interface
 
   /// Set line type of edges
   /// Has to be defined according to Aspect_TypeOfLine
-  void setLineStyle(int theStyle);
+  /// \returns true if the object value differs from the current
+  bool setLineStyle(int theStyle);
 
   /// Set transparency of the presentation (theVal = 0 ... 1)
-  void setTransparensy(double theVal);
+  /// \returns true if the object value differs from the current
+  bool setTransparensy(double theVal);
 };
 
 //! Pointer on attribute object

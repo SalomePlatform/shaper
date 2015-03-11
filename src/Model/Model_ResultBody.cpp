@@ -7,7 +7,7 @@
 #include <Model_ResultBody.h>
 #include <Model_Data.h>
 #include <Model_Document.h>
-#include <ModelAPI_AttributeColor.h>
+#include <ModelAPI_AttributeIntArray.h>
 #include <TNaming_Builder.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TDataStd_Name.hxx>
@@ -37,8 +37,6 @@
 //#include <TDF_Tool.hxx>
 //#define DEB_IMPORT 1
 
-#define RESULT_BODY_COLOR "#ff0000"
-
 Model_ResultBody::Model_ResultBody()
 {
   setIsConcealed(false);
@@ -46,21 +44,17 @@ Model_ResultBody::Model_ResultBody()
 
 void Model_ResultBody::initAttributes()
 {
-  // append the color attribute
+  // append the color attribute. It is empty, the attribute will be filled by a request
   DataPtr aData = data();
-  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeColor::type());
-  // set the default value
-  bool anIsRandomColor = Config_PropManager::boolean("Visualization", "random_result_color",
-                                                     "false");
-  AttributeColorPtr aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>
-                                                             (aData->attribute(COLOR_ID()));
-  if (anIsRandomColor)
-    aColorAttr->setValuesRandom();
-  else {
-    std::vector<int> aRGB;
-    aRGB = Config_PropManager::color("Visualization", "result_body_color", RESULT_BODY_COLOR);
-    aColorAttr->setValues(aRGB[0], aRGB[1], aRGB[2]);
-  }
+  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::type());
+}
+
+void Model_ResultBody::colorConfigInfo(std::string& theSection, std::string& theName,
+                                       std::string& theDefault)
+{
+  theSection = "Visualization";
+  theName = "result_body_color";
+  theDefault = DEFAULT_COLOR();
 }
 
 void Model_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape)

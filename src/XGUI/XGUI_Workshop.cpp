@@ -39,6 +39,7 @@
 #include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeIntArray.h>
 
 //#include <PartSetPlugin_Part.h>
 
@@ -75,6 +76,10 @@
 #include <QMenu>
 #include <QToolButton>
 #include <QAction>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QHBoxLayout>
+#include <QtxColorButton.h>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -1335,7 +1340,6 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
       return;
   }
 
-  SessionPtr aMgr = ModelAPI_Session::get();
   QString aDescription = tr("Delete %1");
   QStringList aObjectNames;
   foreach (ObjectPtr aObj, theList) {
@@ -1344,6 +1348,7 @@ These features will be deleted also. Would you like to continue?")).arg(aNames),
     aObjectNames << QString::fromStdString(aObj->data()->name());
   }
   aDescription = aDescription.arg(aObjectNames.join(", "));
+  SessionPtr aMgr = ModelAPI_Session::get();
   aMgr->startOperation(aDescription.toStdString());
   std::set<FeaturePtr>::const_iterator anIt = aRefFeatures.begin(),
                                        aLast = aRefFeatures.end();
@@ -1404,40 +1409,38 @@ bool XGUI_Workshop::canChangeColor() const
 }
 
 //**************************************************************
-#include <QDialog>
-#include <QHBoxLayout>
-#include <QtxColorButton.h>
-#include <ModelAPI_AttributeColor.h>
 void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 {
-  // 1. find the initial value of the color
-  AttributeColorPtr aColorAttr;
-  foreach(ObjectPtr anObj, theObjects) {
-    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
-    if (aResult.get() != NULL) {
-      AttributePtr anAttr = aResult->data()->attribute(ModelAPI_Result::COLOR_ID());
-      if (anAttr.get() != NULL)
-        aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>(anAttr);
-    }
+  std::vector<int> aColor;
+  foreach(ObjectPtr anObject, theObjects) {
+
+    AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
+    aColor.resize(3);
+    anAISObj->getColor(aColor[0], aColor[1], aColor[2]);
+    if (!aColor.empty())
+      break;
   }
-  // there is no object with the color attribute
-  if (aColorAttr.get() == NULL)
+  if (aColor.size() != 3)
     return;
-  int aRed, aGreen, aBlue;
-  aColorAttr->values(aRed, aGreen, aBlue);
 
   // 2. show the dialog to change the value
-  QDialog aDlg;
-  QHBoxLayout* aLay = new QHBoxLayout(&aDlg);
+  QDialog* aDlg = new QDialog();
+  QVBoxLayout* aLay = new QVBoxLayout(aDlg);
 
-  QtxColorButton* aColorBtn = new QtxColorButton(&aDlg);
+  QtxColorButton* aColorBtn = new QtxColorButton(aDlg);
+  aColorBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
   aLay->addWidget(aColorBtn);
-  aColorBtn->setColor(QColor(aRed, aGreen, aBlue));
+  aColorBtn->setColor(QColor(aColor[0], aColor[1], aColor[2]));
 
-  QPoint aPoint = QCursor::pos();
-  aDlg.move(aPoint);
+  QDialogButtonBox* aButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+                                                    Qt::Horizontal, aDlg);
+  connect(aButtons, SIGNAL(accepted()), aDlg, SLOT(accept()));
+  connect(aButtons, SIGNAL(rejected()), aDlg, SLOT(reject()));
+  aLay->addWidget(aButtons);
 
-  bool isDone = aDlg.exec() == QDialog::Accepted;
+  aDlg->move(QCursor::pos());
+  bool isDone = aDlg->exec() == QDialog::Accepted;
   if (!isDone)
     return;
 
@@ -1446,25 +1449,38 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
       aGreenResult = aColorResult.green(),
       aBlueResult = aColorResult.blue();
 
-  if (aRedResult == aRed && aGreenResult == aGreen && aBlueResult == aBlue)
+  if (aRedResult == aColor[0] && aGreenResult == aColor[1] && aBlueResult == aColor[2])
     return;
 
   // 3. abort the previous operation and start a new one
-  if(!isActiveOperationAborted())
-    return;
+  SessionPtr aMgr = ModelAPI_Session::get();
+  bool aWasOperation = aMgr->isOperation(); // keep this value
+  if (!aWasOperation) {
+    QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text();
+    aMgr->startOperation(aDescription.toStdString());
+  }
 
   // 4. set the value to all results
+  static Events_ID EVENT_DISP = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  AttributeIntArrayPtr aColorAttr;
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      AttributePtr anAttr = aResult->data()->attribute(ModelAPI_Result::COLOR_ID());
-      if (anAttr.get() != NULL) {
-        aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>(anAttr);
-        if (aColorAttr.get() != NULL)
-          aColorAttr->setValues(aRedResult, aGreenResult, aBlueResult);
+      aColorAttr = aResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+      if (aColorAttr.get() != NULL) {
+        if (!aColorAttr->size()) {
+          aColorAttr->setSize(3);
+        }
+        aColorAttr->setValue(0, aRedResult);
+        aColorAttr->setValue(1, aGreenResult);
+        aColorAttr->setValue(2, aBlueResult);
+        ModelAPI_EventCreator::get()->sendUpdated(anObj, EVENT_DISP);
       }
     }
   }
+  if (!aWasOperation)
+    aMgr->finishOperation();
+  updateCommandStatus();
 }
 
 //**************************************************************

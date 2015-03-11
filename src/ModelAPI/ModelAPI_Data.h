@@ -26,6 +26,7 @@ class ModelAPI_Attribute;
 class ModelAPI_Feature;
 class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeSelectionList;
+class ModelAPI_AttributeIntArray;
 class ModelAPI_Object;
 class GeomAPI_Shape;
 
@@ -75,6 +76,8 @@ class MODELAPI_EXPORT ModelAPI_Data
   virtual std::shared_ptr<ModelAPI_AttributeBoolean> boolean(const std::string& theID) = 0;
   /// Returns the attribute that contains boolean value
   virtual std::shared_ptr<ModelAPI_AttributeString> string(const std::string& theID) = 0;
+  /// Returns the attribute that contains integer values array
+  virtual std::shared_ptr<ModelAPI_AttributeIntArray> intArray(const std::string& theID) = 0;
 
   /// Returns the generic attribute by identifier
   /// \param theID identifier of the attribute

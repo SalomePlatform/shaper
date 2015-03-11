@@ -9,18 +9,23 @@
 
 #include "GeomAPI.h"
 #include "GeomAPI_AISObject.h"
+#include "GeomAPI_AISObject.h"
 
+#include <vector>
 /**
 * Interface of a class which can provide specific customization of
 * object presentation
 */ 
+class ModelAPI_Result;
+
 class GeomAPI_ICustomPrs
 {
 public:
   GEOMAPI_EXPORT virtual ~GeomAPI_ICustomPrs();
 
   /// Modifies the given presentation in the custom way.
-  virtual void customisePresentation(AISObjectPtr thePrs) = 0;
+  virtual bool customisePresentation(std::shared_ptr<ModelAPI_Result> theResult, AISObjectPtr thePrs,
+                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs) = 0;
 };
 
 typedef std::shared_ptr<GeomAPI_ICustomPrs> GeomCustomPrsPtr;

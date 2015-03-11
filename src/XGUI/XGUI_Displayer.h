@@ -20,6 +20,8 @@
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ViewerPrs.h>
 
+#include <GeomAPI_ICustomPrs.h>
+
 #include <SelectMgr_AndFilter.hxx>
 
 #include <QString>
@@ -218,8 +220,9 @@ class XGUI_EXPORT XGUI_Displayer
    * If the object is result with the color attribute value set, it is used,
    * otherwise the customize is applyed to the object's feature if it is a custom prs
    * \param theObject an object instance
+   * \return the true state if there is changes and the presentation is customized
    */
-  void customizeObject(ObjectPtr theObject);
+  bool customizeObject(ObjectPtr theObject);
 
  protected:
    /// Reference to workshop
@@ -227,6 +230,9 @@ class XGUI_EXPORT XGUI_Displayer
 
   /// A container for selection filters
   Handle(SelectMgr_AndFilter) myAndFilter;
+
+  /// A default custom presentation, which is used if the displayed feature is not a custom presentation
+  GeomCustomPrsPtr myCustomPrs;
 
   /// Definition of a type of map which defines correspondance between objects and presentations
   typedef QMap<ObjectPtr, AISObjectPtr> ResultToAISMap;

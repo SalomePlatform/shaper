@@ -9,6 +9,7 @@
 
 #include "ConstructionPlugin.h"
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
 #include <GeomAPI_ICustomPrs.h>
 
 /**\class ConstructionPlugin_Axis
@@ -56,12 +57,6 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
     static const std::string CYLINDRICAL_FACE_ATTR("cylindricalFace");
     return CYLINDRICAL_FACE_ATTR;
   }
-  /// default color for an axis
-  inline static const std::string& DEFAULT_COLOR()
-  {
-    static const std::string CONSTRUCTION_AXIS_COLOR("#000000");
-    return CONSTRUCTION_AXIS_COLOR;
-  }
 
   inline static const double MINIMAL_LENGTH() { return 1.e-5; }
 
@@ -78,7 +73,8 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
   ConstructionPlugin_Axis();
 
   /// Customize presentation of the feature
-  virtual void customisePresentation(AISObjectPtr thePrs);
+  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
 };
 
 

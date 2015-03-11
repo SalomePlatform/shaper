@@ -7,6 +7,10 @@
 #include "ModuleBase_Preferences.h"
 //#include "ModuleBase_Constants.h"
 
+#include <Model_ResultBody.h>
+#include <Model_ResultGroup.h>
+#include <Model_ResultConstruction.h>
+
 #include <Config_PropManager.h>
 
 #include <SUIT_ResourceMgr.h>
@@ -256,6 +260,16 @@ void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
   myPreferences->setItemProperty("texture_stretch_enabled", true, bgId);
   myPreferences->setItemProperty("custom_enabled", false, bgId);
   myPreferences->setItemProperty("image_formats", aImgFiles, bgId);
+
+  //Config_PropManager::registerProp("Visualization", "object_default_color", "Object color",
+  //                                 Config_Prop::Color, "#ffffff");
+
+  Config_PropManager::registerProp("Visualization", "result_body_color", "Body color",
+                                   Config_Prop::Color, Model_ResultBody::DEFAULT_COLOR());
+  Config_PropManager::registerProp("Visualization", "result_group_color", "Group color",
+                                   Config_Prop::Color, Model_ResultGroup::DEFAULT_COLOR());
+  Config_PropManager::registerProp("Visualization", "result_construction_color", "Construction color",
+                                   Config_Prop::Color, Model_ResultConstruction::DEFAULT_COLOR());
 }
 
 void ModuleBase_PreferencesDlg::createMenuPage(int thePageId)

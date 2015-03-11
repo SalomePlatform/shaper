@@ -29,8 +29,19 @@ class Model_ResultBody : public ModelAPI_ResultBody
   /// label; index in vector corresponds to the label tag
   std::vector<TNaming_Builder*> myBuilders;
 public:
+  /// default color for a result body
+  inline static const std::string& DEFAULT_COLOR()
+  {
+    static const std::string RESULT_BODY_COLOR("#E0A01B");
+    return RESULT_BODY_COLOR;
+  }
+
   /// Request for initialization of data model of the result: adding all attributes
   virtual void initAttributes();
+
+  // Retuns the parameters of color definition in the resources config manager
+  MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
+                                            std::string& theDefault);
 
   /// Stores the shape (called by the execution method).
   MODEL_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape);

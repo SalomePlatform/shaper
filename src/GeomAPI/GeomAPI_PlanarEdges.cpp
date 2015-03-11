@@ -52,7 +52,7 @@ std::list<std::shared_ptr<GeomAPI_Shape> > GeomAPI_PlanarEdges::getEdges()
 }
 
 bool GeomAPI_PlanarEdges::hasPlane() const {
-  return myOrigin && myNorm && myDirX && myDirY;
+  return myPlane.get() != NULL;
 }
 
 bool GeomAPI_PlanarEdges::isVertex() const {
@@ -63,28 +63,38 @@ bool GeomAPI_PlanarEdges::isEdge() const {
   return false;
 }
 
-void GeomAPI_PlanarEdges::setOrigin(const std::shared_ptr<GeomAPI_Pnt>& theOrigin)
+std::shared_ptr<GeomAPI_Pnt> GeomAPI_PlanarEdges::origin() const 
 {
-  myOrigin = theOrigin;
+  if (hasPlane())
+    return myPlane->origin();
+  return std::shared_ptr<GeomAPI_Pnt>();
 }
-std::shared_ptr<GeomAPI_Pnt> GeomAPI_PlanarEdges::origin() const {
-  return myOrigin;
+
+std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirX() const 
+{
+  if (hasPlane())
+    return myPlane->dirX();
+  return std::shared_ptr<GeomAPI_Dir>();
 }
-void GeomAPI_PlanarEdges::setDirX(const std::shared_ptr<GeomAPI_Dir>& theDirX) {
-  myDirX = theDirX;
+
+std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirY() const 
+{
+  if (hasPlane())
+    return myPlane->dirY();
+  return std::shared_ptr<GeomAPI_Dir>();
 }
-std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirX() const {
-  return myDirX;
+
+std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::norm() const 
+{
+  if (hasPlane())
+    return myPlane->norm();
+  return std::shared_ptr<GeomAPI_Dir>();
 }
-void GeomAPI_PlanarEdges::setDirY(const std::shared_ptr<GeomAPI_Dir>& theDirY) {
-  myDirY = theDirY;
-}
-std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::dirY() const {
-  return myDirY;
-}
-void GeomAPI_PlanarEdges::setNorm(const std::shared_ptr<GeomAPI_Dir>& theNorm) {
-  myNorm = theNorm;
-}
-std::shared_ptr<GeomAPI_Dir> GeomAPI_PlanarEdges::norm() const {
-  return myNorm;
+
+void GeomAPI_PlanarEdges::setPlane(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                                   const std::shared_ptr<GeomAPI_Dir>& theDirX,
+                                   const std::shared_ptr<GeomAPI_Dir>& theDirY,
+                                   const std::shared_ptr<GeomAPI_Dir>& theNorm)
+{
+  myPlane = std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(theOrigin, theDirX, theDirY, theNorm));
 }

@@ -20,6 +20,19 @@ class Model_ResultGroup : public ModelAPI_ResultGroup
 {
   std::shared_ptr<ModelAPI_Data> myOwnerData;  ///< data of owner of this result
 public:
+  /// default color for a result body
+  inline static const std::string& DEFAULT_COLOR()
+  {
+    static const std::string RESULT_GROUP_COLOR("#E0A01B");
+    return RESULT_GROUP_COLOR;
+  }
+  /// Request for initialization of data model of the result: adding all attributes
+  virtual void initAttributes();
+
+  // Retuns the parameters of color definition in the resources config manager
+  MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
+                                            std::string& theDefault);
+
   /// Returns the compound of selected entities
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
 

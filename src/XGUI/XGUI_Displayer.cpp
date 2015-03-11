@@ -9,6 +9,7 @@
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_Selection.h"
+#include "XGUI_CustomPrs.h"
 
 #include <AppElements_Viewer.h>
 
@@ -16,7 +17,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Tools.h>
-#include <ModelAPI_AttributeColor.h>
+#include <ModelAPI_AttributeIntArray.h>
 
 #include <ModuleBase_ResultPrs.h>
 
@@ -72,6 +73,7 @@ XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
   : myWorkshop(theWorkshop)
 {
   enableUpdateViewer(true);
+  myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new XGUI_CustomPrs());
 }
 
 XGUI_Displayer::~XGUI_Displayer()
@@ -159,7 +161,10 @@ void XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
 
     aContext->SetDisplayMode(anAISIO, isShading? Shading : Wireframe, false);
 
-    customizeObject(theObject);
+    bool isCustomized = customizeObject(theObject);
+    if (isCustomized)
+      aContext->Redisplay(anAISIO, false);
+
     if (aCanBeShaded) {
       openLocalContext();
       activateObjects(myActiveSelectionModes);
@@ -223,6 +228,7 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
     // before and after the values modification.
     // Moreother, this check avoids customize and redisplay presentation if the presentable
     // parameter is changed.
+    bool isEqualShapes = false;
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if (aResult.get() != NULL) {
       Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(aAISIO);
@@ -233,17 +239,17 @@ void XGUI_Displayer::redisplay(ObjectPtr theObject, bool isUpdateViewer)
           std::shared_ptr<GeomAPI_Shape> anAISShapePtr(new GeomAPI_Shape());
           anAISShapePtr->setImpl(new TopoDS_Shape(aShape));
 
-          if (aShapePtr->isEqual(anAISShapePtr))
-            return;
+          isEqualShapes = aShapePtr->isEqual(anAISShapePtr);
         }
       }
     }
     // Customization of presentation
-    customizeObject(theObject);
-
-    aContext->Redisplay(aAISIO, false);
-    if (isUpdateViewer)
-      updateViewer();
+    bool isCustomized = customizeObject(theObject);
+    if (!isEqualShapes || isCustomized) {
+      aContext->Redisplay(aAISIO, false);
+      if (isUpdateViewer)
+        updateViewer();
+    }
   }
 }
 
@@ -758,26 +764,26 @@ void XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   }
 }
 
-void XGUI_Displayer::customizeObject(ObjectPtr theObject)
+bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
 {
   AISObjectPtr anAISObj = getAISObject(theObject);
   // correct the result's color it it has the attribute
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-  if (aResult.get() != NULL && aResult->data()->attribute(ModelAPI_Result::COLOR_ID()).get() != NULL) {
-    int aRed, aGreen, aBlue;
 
-    AttributeColorPtr aColorAttr = std::dynamic_pointer_cast<ModelAPI_AttributeColor>(
-                                              aResult->data()->attribute(ModelAPI_Result::COLOR_ID()));
-    aColorAttr->values(aRed, aGreen, aBlue);
-    anAISObj->setColor(aRed, aGreen, aBlue);
+  // Customization of presentation
+  GeomCustomPrsPtr aCustomPrs;
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (aFeature.get() != NULL) {
+    GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
+    if (aCustPrs.get() != NULL)
+      aCustomPrs = aCustPrs;
   }
-  else {
-    // Customization of presentation
-    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    if (aFeature.get() != NULL) {
-      GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
-      if (aCustPrs.get() != NULL)
-        aCustPrs->customisePresentation(anAISObj);
-    }
+  if (aCustomPrs.get() == NULL) {
+    // we ignore presentable not customized objects
+    GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
+    if (aPrs.get() != NULL)
+      return false;
+    aCustomPrs = myCustomPrs;
   }
+  return aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
 }

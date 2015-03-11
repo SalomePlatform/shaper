@@ -23,6 +23,20 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   std::shared_ptr<GeomAPI_Shape> myShape;  ///< shape of this result created "on the fly"
   bool myIsInHistory;
  public:
+  /// default color for a result construction
+  inline static const std::string& DEFAULT_COLOR()
+  {
+    static const std::string RESULT_CONSTRUCTION_COLOR("#000000");
+    return RESULT_CONSTRUCTION_COLOR;
+  }
+
+  /// Request for initialization of data model of the result: adding all attributes
+  virtual void initAttributes();
+
+  // Retuns the parameters of color definition in the resources config manager
+  MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
+                                            std::string& theDefault);
+
   /// By default object is displayed in the object browser.
   MODEL_EXPORT virtual bool isInHistory()
   {

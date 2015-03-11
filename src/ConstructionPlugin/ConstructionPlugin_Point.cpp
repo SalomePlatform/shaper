@@ -45,11 +45,3 @@ void ConstructionPlugin_Point::execute()
   aConstr->setShape(GeomAlgoAPI_PointBuilder::point(aPnt));
   setResult(aConstr);
 }
-
-void ConstructionPlugin_Point::customisePresentation(AISObjectPtr thePrs)
-{
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "construction_point_color",
-                                                    ConstructionPlugin_Point::DEFAULT_COLOR());
-  thePrs->setColor(aRGB[0], aRGB[1], aRGB[2]);
-  thePrs->redisplay();
-}

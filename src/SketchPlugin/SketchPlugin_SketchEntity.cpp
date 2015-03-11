@@ -4,6 +4,7 @@
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_AttributeIntArray.h>
 
 SketchPlugin_SketchEntity::SketchPlugin_SketchEntity()
 : SketchPlugin_Feature()

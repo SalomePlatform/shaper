@@ -9,6 +9,7 @@
 
 #include "ConstructionPlugin.h"
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
 #include <GeomAPI_ICustomPrs.h>
 
 
@@ -91,7 +92,8 @@ class ConstructionPlugin_Plane : public ModelAPI_Feature, public GeomAPI_ICustom
   ConstructionPlugin_Plane();
 
   /// Customize presentation of the feature
-  virtual void customisePresentation(AISObjectPtr thePrs);
+  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
 };
 
 #endif

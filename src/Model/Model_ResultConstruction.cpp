@@ -6,6 +6,24 @@
 
 #include <Model_ResultConstruction.h>
 
+#include <ModelAPI_AttributeIntArray.h>
+#include <Config_PropManager.h>
+
+void Model_ResultConstruction::initAttributes()
+{
+  // append the color attribute. It is empty, the attribute will be filled by a request
+  DataPtr aData = data();
+  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::type());
+}
+
+void Model_ResultConstruction::colorConfigInfo(std::string& theSection, std::string& theName,
+                                       std::string& theDefault)
+{
+  theSection = "Visualization";
+  theName = "result_construction_color";
+  theDefault = DEFAULT_COLOR();
+}
+
 void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)
 {
   myShape = theShape;
