@@ -55,6 +55,9 @@ signals:
   /// \param isChecked is checked flag
   void actionTriggered(const QString& theId, bool isChecked);
 
+  void beforeContextMenu();
+  void afterContextMenu();
+
  private slots:
    /// Process action event
    /// \param isChecked a checked action flag

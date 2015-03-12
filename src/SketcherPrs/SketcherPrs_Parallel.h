@@ -34,6 +34,18 @@ public:
   Standard_EXPORT SketcherPrs_Parallel(SketchPlugin_Constraint* theConstraint, 
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
+  //! Method which draws selected owners ( for fast presentation draw )
+  Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
+                                               const SelectMgr_SequenceOfOwner& theOwners);
+  
+  //! Method which hilight an owner belonging to
+  //! this selectable object  ( for fast presentation draw )
+  Standard_EXPORT virtual void HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM, 
+                                                     const Quantity_NameOfColor theColor, const Handle(SelectMgr_EntityOwner)& theOwner);
+
+  //! Method which clear all selected owners belonging
+  //! to this selectable object ( for fast presentation draw )
+  Standard_EXPORT virtual void ClearSelected();
 
   DEFINE_STANDARD_RTTI(SketcherPrs_Parallel)
 protected:
@@ -46,6 +58,8 @@ protected:
     const Standard_Integer aMode) ;
 
 private:
+
+  void drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const;
 
   SketchPlugin_Constraint* myConstraint;
   std::shared_ptr<GeomAPI_Ax3> myPlane;

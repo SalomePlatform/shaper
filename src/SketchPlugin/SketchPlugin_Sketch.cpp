@@ -89,8 +89,8 @@ void SketchPlugin_Sketch::execute()
           continue;
       }
       // do not include the construction entities in the result
-      if (aFeature->data()->attribute(SketchPlugin_SketchEntity::CONSTRUCTION_ID())) {
-        if (aFeature->data()->boolean(SketchPlugin_SketchEntity::CONSTRUCTION_ID())->value())
+      if (aFeature->data()->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID())) {
+        if (aFeature->data()->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value())
           continue;
       }
 

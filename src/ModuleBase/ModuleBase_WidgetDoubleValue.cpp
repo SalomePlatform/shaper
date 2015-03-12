@@ -104,6 +104,7 @@ void ModuleBase_WidgetDoubleValue::reset()
     bool isOk;
     double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
     ModuleBase_Tools::setSpinValue(mySpinBox, isOk ? aDefValue : 0.0);
+    storeValueCustom();
   }
 }
 

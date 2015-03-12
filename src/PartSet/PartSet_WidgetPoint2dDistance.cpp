@@ -47,6 +47,7 @@ void PartSet_WidgetPoint2dDistance::reset()
   double aDefValue = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
 
   ModuleBase_Tools::setSpinValue(mySpinBox, isOk ? aDefValue : 0.0);
+  storeValueCustom();
 }
 
 void PartSet_WidgetPoint2dDistance::setPoint(FeaturePtr theFeature,
@@ -89,6 +90,10 @@ void PartSet_WidgetPoint2dDistance::deactivate()
 
 void PartSet_WidgetPoint2dDistance::onMouseRelease(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  // the contex menu release by the right button should not be processed by this widget
+  if (theEvent->button() != Qt::LeftButton)
+    return;
+
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWnd->v3dView());
 
   double aX, aY;

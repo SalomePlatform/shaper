@@ -138,13 +138,13 @@ public:
   bool canDisplayObject() const;
 
   /// Returns true if the current operation is sketch entity create operation
-  /// \param isConstruction the current construction state
+  /// \param theValue the current auxiliary value
   /// \return the boolean result
-  bool canChangeConstruction(bool& isConstruction) const;
+  bool canSetAuxiliary(bool& theValue) const;
   
   /// Changes the sketcher entity construction argument value
   /// \param isChecked if true, the feature is a construction
-  void setConstruction(const bool isChecked);
+  void setAuxiliary(const bool isChecked);
 
 public slots:
   /// Process sketch plane selected event
@@ -170,6 +170,9 @@ private slots:
   void onMouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*);
   void onApplicationStarted();
   void onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget);
+
+  void onBeforeContextMenu();
+  void onAfterContextMenu();
 
 private:
   /// Launches the operation from current highlighting

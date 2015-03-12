@@ -121,7 +121,12 @@ void XGUI_ContextMenuMgr::onContextMenuRequest(QContextMenuEvent* theEvent)
   }
 
   if (aMenu && (aMenu->actions().size() > 0)) {
+    // it is possible that some objects should do something before and after the popup menu exec
+    // e.g. a sketch manager changes an internal flag on this signals in order to do not hide
+    // a created entity
+    emit beforeContextMenu();
     aMenu->exec(theEvent->globalPos());
+    emit afterContextMenu();
     delete aMenu;
   }
 }
