@@ -31,6 +31,12 @@ public:
   /// \param thePlane the current sketch plane
   static AISObjectPtr parallelConstraint(SketchPlugin_Constraint* theConstraint, 
                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+
+  /// Creates coincedent perpendicular presentation
+  /// \param theConstraint the constraint
+  /// \param thePlane the current sketch plane
+  static AISObjectPtr perpendicularConstraint(SketchPlugin_Constraint* theConstraint, 
+                                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 };
 
 #endif

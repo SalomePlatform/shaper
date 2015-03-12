@@ -4,15 +4,17 @@ SET(PROJECT_HEADERS
     SketcherPrs.h
     SketcherPrs_Coincident.h
     SketcherPrs_Factory.h
-	SketcherPrs_Parallel.h
-	SketcherPrs_Tools.h
+    SketcherPrs_Parallel.h
+    SketcherPrs_Tools.h
+    SketcherPrs_Perpendicular.h
 )
 
 SET(PROJECT_SOURCES
     SketcherPrs_Coincident.cpp
     SketcherPrs_Factory.cpp
-	SketcherPrs_Parallel.cpp
-	SketcherPrs_Tools.cpp
+    SketcherPrs_Parallel.cpp
+    SketcherPrs_Tools.cpp
+    SketcherPrs_Perpendicular.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -28,6 +30,7 @@ SET(PROJECT_LIBRARIES
 
 SET(PROJECT_PICTURES
     icons/parallel.png
+    icons/perpendicular.png
 )
 
 ADD_DEFINITIONS(-DCONSTRAINTS_EXPORTS ${CAS_DEFINITIONS})
