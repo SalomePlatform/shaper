@@ -36,25 +36,25 @@ class ConstructionPlugin_Axis : public ModelAPI_Feature, public GeomAPI_ICustomP
   /// attribute name for first point
   inline static const std::string& METHOD()
   {
-    static const std::string METHOD_ATTR("creationMethod");
+    static const std::string METHOD_ATTR("CreationMethod");
     return METHOD_ATTR;
   }
   /// attribute name for first point
   inline static const std::string& POINT_FIRST()
   {
-    static const std::string POINT_ATTR_FIRST("firstPoint");
+    static const std::string POINT_ATTR_FIRST("FirstPoint");
     return POINT_ATTR_FIRST;
   }
   /// attribute name for second point
   inline static const std::string& POINT_SECOND()
   {
-    static const std::string POINT_ATTR_SECOND("secondPoint");
+    static const std::string POINT_ATTR_SECOND("SecondPoint");
     return POINT_ATTR_SECOND;
   }
   /// attribute name for second point
   inline static const std::string& CYLINDRICAL_FACE()
   {
-    static const std::string CYLINDRICAL_FACE_ATTR("cylindricalFace");
+    static const std::string CYLINDRICAL_FACE_ATTR("CylindricalFace");
     return CYLINDRICAL_FACE_ATTR;
   }
 

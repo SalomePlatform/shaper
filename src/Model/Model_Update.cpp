@@ -67,8 +67,11 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
   bool isAutomaticChanged = false;
   if (theMessage->eventID() == kChangedEvent) { // automatic and manual rebuild flag is changed
-    isAutomatic = 
-      Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
+    bool aPropVal = 
+    Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
+    if (aPropVal == isAutomatic)
+      return;// nothing to
+    isAutomatic = aPropVal;
   } else if (theMessage->eventID() == kRebuildEvent) { // the rebuild command
     if (isAutomatic == false) {
       isAutomaticChanged = true;

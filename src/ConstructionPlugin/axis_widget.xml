@@ -1,16 +1,16 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <toolbox id="creationMethod">
+  <toolbox id="CreationMethod">
     <box id="AxisByPointsCase" title="By two points">
-      <shape_selector id="firstPoint"
+      <shape_selector id="FirstPoint"
         label="First point"
         icon=":icons/point.png"
         tooltip="Select a first point"
         shape_types="vertex">
         <selection_filter id="NoConstructionSubShapesFilter"/>
       </shape_selector>
-      <shape_selector id="secondPoint"
+      <shape_selector id="SecondPoint"
         label="Second point"
         icon=":icons/point.png"
         tooltip="Select a second point"
@@ -20,7 +20,7 @@
       </shape_selector>
     </box>
     <box id="AxisByCylindricalFaceCase" title="As axis of cylindrical face">
-      <shape_selector id="cylindricalFace" 
+      <shape_selector id="CylindricalFace"
         label="Main object" 
         icon=":icons/circle.png" 
         tooltip="Select a cylindrical object"
