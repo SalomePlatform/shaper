@@ -71,7 +71,7 @@ AISObjectPtr SketchPlugin_ConstraintRigid::getAISObject(AISObjectPtr thePrevious
   anAIS->createFixed(aShape, aPlane);
 
   // Set color from preferences
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_parallel_color",
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_constraint_color",
                                                     SKETCH_CONSTRAINT_COLOR);
 
   anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);

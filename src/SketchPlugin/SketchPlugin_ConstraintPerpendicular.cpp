@@ -79,7 +79,7 @@ AISObjectPtr SketchPlugin_ConstraintPerpendicular::getAISObject(AISObjectPtr the
   anAIS->createPerpendicular(aLine1, aLine2, aPlane);
 
   // Set color from preferences
-  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_parallel_color",
+  std::vector<int> aRGB = Config_PropManager::color("Visualization", "sketch_constraint_color",
                                                     SKETCH_CONSTRAINT_COLOR);
   anAIS->setColor(aRGB[0], aRGB[1], aRGB[2]);
   return anAIS;

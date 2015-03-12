@@ -57,20 +57,18 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
 
-  Config_PropManager::registerProp("Visualization", "sketch_edge_color", "Sketch edge color",
-                                   Config_Prop::Color, SKETCH_EDGE_COLOR);
+  Config_PropManager::registerProp("Visualization", "sketch_entity_color", "Sketch enity color",
+                                   Config_Prop::Color, SKETCH_ENTITY_COLOR);
 
-  Config_PropManager::registerProp("Visualization", "sketch_point_color", "Sketch point color",
-                                   Config_Prop::Color, SKETCH_POINT_COLOR);
-
-  Config_PropManager::registerProp("Visualization", "sketch_external_color", "Sketch external edge color",
-                                   Config_Prop::Color, SKETCH_EXTERNAL_EDGE_COLOR);
+  Config_PropManager::registerProp("Visualization", "sketch_external_color", "Sketch external entity color",
+                                   Config_Prop::Color, SKETCH_EXTERNAL_COLOR);
 
   Config_PropManager::registerProp("Visualization", "sketch_construction_color", "Sketch construction color",
                                    Config_Prop::Color, SKETCH_CONSTRUCTION_COLOR);
 
-  Config_PropManager::registerProp("Visualization", "sketch_parallel_color", "Sketch constraint color",
+  Config_PropManager::registerProp("Visualization", "sketch_constraint_color", "Sketch constraint color",
                                    Config_Prop::Color, SKETCH_CONSTRAINT_COLOR);
+
   Config_PropManager::registerProp("Visualization", "sketch_dimension_color", "Sketch dimension color",
                                    Config_Prop::Color, SKETCH_DIMENSION_COLOR);
 
