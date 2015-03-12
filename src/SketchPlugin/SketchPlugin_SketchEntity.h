@@ -20,9 +20,8 @@
 
 #include <Config_PropManager.h>
 
-#define SKETCH_EDGE_COLOR "#ff0000"
-#define SKETCH_POINT_COLOR "#ff0000"
-#define SKETCH_EXTERNAL_EDGE_COLOR "#00ff00"
+#define SKETCH_ENTITY_COLOR "#ff0000"
+#define SKETCH_EXTERNAL_COLOR "#00ff00"
 #define SKETCH_CONSTRUCTION_COLOR "#000000"
 
 /**\class SketchPlugin_SketchEntity
@@ -69,42 +68,38 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
     if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/ && aShapeType != 0/*compound*/)
       return false;
 
+    // set color from preferences
     std::vector<int> aColor;
     std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr =
                                     data()->boolean(SketchPlugin_SketchEntity::CONSTRUCTION_ID());
     bool isConstruction = aConstructionAttr.get() != NULL && aConstructionAttr->value();
+    if (isConstruction) {
+      aColor = Config_PropManager::color("Visualization", "sketch_construction_color",
+                                         SKETCH_CONSTRUCTION_COLOR);
+    }
+    else if (isExternal()) {
+      aColor = Config_PropManager::color("Visualization", "sketch_external_color",
+                                        SKETCH_EXTERNAL_COLOR);
+    }
+    else {
+      aColor = Config_PropManager::color("Visualization", "sketch_entity_color",
+                                          SKETCH_ENTITY_COLOR);
+    }
+    if (!aColor.empty())
+      isCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]) || isCustomized;
+
     if (aShapeType == 6 || aShapeType == 0) { // if this is an edge or a compound
       if (isConstruction) {
         isCustomized = thePrs->setWidth(1) || isCustomized;
         isCustomized = thePrs->setLineStyle(3) || isCustomized;
-
-        aColor = Config_PropManager::color("Visualization", "sketch_construction_color",
-                                          SKETCH_CONSTRUCTION_COLOR);
       }
       else {
         isCustomized = thePrs->setWidth(3) || isCustomized;
         isCustomized = thePrs->setLineStyle(0) || isCustomized;
-
-        if (isExternal()) {
-          // Set color from preferences
-          aColor = Config_PropManager::color("Visualization", "sketch_external_color",
-                                            SKETCH_EXTERNAL_EDGE_COLOR);
-        }
-        else {
-          // Set color from preferences
-          aColor = Config_PropManager::color("Visualization", "sketch_edge_color",
-                                             SKETCH_EDGE_COLOR);
-        }
       }
     }
     else if (aShapeType == 7) { // otherwise this is a vertex
       //  thePrs->setPointMarker(6, 2.);
-      aColor = Config_PropManager::color("Visualization", "sketch_point_color",
-                                        SKETCH_POINT_COLOR);
-    }
-
-    if (!aColor.empty()) {
-      isCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]) || isCustomized;
     }
     return isCustomized;
   }

@@ -237,8 +237,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 {
   get2dPoint(theWnd, theEvent, myClickedPoint);
 
-  myIsPopupMenuActive = theEvent->buttons() & Qt::RightButton;
-
   if (!(theEvent->buttons() & Qt::LeftButton))
     return;
 
@@ -318,9 +316,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
 void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  if (myIsPopupMenuActive)
-    myIsPopupMenuActive = false;
-
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   if (!aViewer->canDragByMouse())
@@ -494,6 +489,10 @@ void PartSet_SketcherMgr::onApplicationStarted()
   XGUI_ViewerProxy* aViewerProxy = aWorkshop->viewer();
   connect(aViewerProxy, SIGNAL(enterViewPort()), this, SLOT(onEnterViewPort()));
   connect(aViewerProxy, SIGNAL(leaveViewPort()), this, SLOT(onLeaveViewPort()));
+
+  XGUI_ContextMenuMgr* aContextMenuMgr = aWorkshop->contextMenuMgr();
+  connect(aContextMenuMgr, SIGNAL(beforeContextMenu()), this, SLOT(onBeforeContextMenu()));
+  connect(aContextMenuMgr, SIGNAL(afterContextMenu()), this, SLOT(onAfterContextMenu()));
 }
 
 void PartSet_SketcherMgr::onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget)
@@ -512,6 +511,16 @@ void PartSet_SketcherMgr::onBeforeWidgetActivated(ModuleBase_ModelWidget* theWid
   if (aPnt2dWgt) {
     aPnt2dWgt->setPoint(myClickedPoint.myCurX, myClickedPoint.myCurY);
   }
+}
+
+void PartSet_SketcherMgr::onBeforeContextMenu()
+{
+  myIsPopupMenuActive = true;
+}
+
+void PartSet_SketcherMgr::onAfterContextMenu()
+{
+  myIsPopupMenuActive = false;
 }
 
 void PartSet_SketcherMgr::get2dPoint(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent, 

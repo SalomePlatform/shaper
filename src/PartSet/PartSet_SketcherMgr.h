@@ -171,6 +171,9 @@ private slots:
   void onApplicationStarted();
   void onBeforeWidgetActivated(ModuleBase_ModelWidget* theWidget);
 
+  void onBeforeContextMenu();
+  void onAfterContextMenu();
+
 private:
   /// Launches the operation from current highlighting
   void launchEditing();
