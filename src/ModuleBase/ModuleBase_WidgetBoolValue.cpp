@@ -72,3 +72,8 @@ QList<QWidget*> ModuleBase_WidgetBoolValue::getControls() const
   aList.append(myCheckBox);
   return aList;
 }
+
+void ModuleBase_WidgetBoolValue::setHighlighted(bool)
+{
+  return;
+}
