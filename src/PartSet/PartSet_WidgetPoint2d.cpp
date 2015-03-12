@@ -112,6 +112,7 @@ void PartSet_WidgetPoint2D::reset()
     // locking of the validating state.
     ModuleBase_Tools::setSpinValue(myXSpin, isOk ? aDefValue : 0.0);
     ModuleBase_Tools::setSpinValue(myYSpin, isOk ? aDefValue : 0.0);
+    storeValueCustom();
   }
 }
 

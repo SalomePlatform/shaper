@@ -163,6 +163,10 @@ void PartSet_SketcherMgr::onLeaveViewPort()
 {
   if (!isNestedCreateOperation(getCurrentOperation()))
     return;
+  // the method should be performed if the popup menu is called,
+  // the reset of the current widget should not happen
+  if (myIsPopupMenuActive)
+    return;
 
   myIsMouseOverViewProcessed = false;
   myIsMouseOverWindow = false;
