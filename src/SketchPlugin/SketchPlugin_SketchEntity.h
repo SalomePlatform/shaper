@@ -22,7 +22,7 @@
 
 #define SKETCH_ENTITY_COLOR "#ff0000"
 #define SKETCH_EXTERNAL_COLOR "#00ff00"
-#define SKETCH_CONSTRUCTION_COLOR "#000000"
+#define SKETCH_AUXILIARY_COLOR "#000000"
 
 /**\class SketchPlugin_SketchEntity
  * \ingroup Plugins
@@ -33,10 +33,10 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
 {
  public:
   /// Reference to the construction type of the feature
-  inline static const std::string& CONSTRUCTION_ID()
+  inline static const std::string& AUXILIARY_ID()
   {
-    static const std::string MY_CONSTRUCTION_ID("Construction");
-    return MY_CONSTRUCTION_ID;
+    static const std::string MY_AUXILIARY_ID("Auxiliary");
+    return MY_AUXILIARY_ID;
   }
 
   /// Reference to the external edge or vertex as a AttributeSelection
@@ -70,12 +70,12 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
 
     // set color from preferences
     std::vector<int> aColor;
-    std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr =
-                                    data()->boolean(SketchPlugin_SketchEntity::CONSTRUCTION_ID());
-    bool isConstruction = aConstructionAttr.get() != NULL && aConstructionAttr->value();
+    std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr =
+                                    data()->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID());
+    bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
     if (isConstruction) {
-      aColor = Config_PropManager::color("Visualization", "sketch_construction_color",
-                                         SKETCH_CONSTRUCTION_COLOR);
+      aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color",
+                                         SKETCH_AUXILIARY_COLOR);
     }
     else if (isExternal()) {
       aColor = Config_PropManager::color("Visualization", "sketch_external_color",

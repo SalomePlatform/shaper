@@ -751,7 +751,7 @@ bool PartSet_SketcherMgr::canDisplayObject() const
   return aCanDisplay;
 }
 
-bool PartSet_SketcherMgr::canChangeConstruction(bool& isConstruction) const
+bool PartSet_SketcherMgr::canSetAuxiliary(bool& theValue) const
 {
   bool anEnabled = false;
   ModuleBase_Operation* anOperation = getCurrentOperation();
@@ -762,7 +762,7 @@ bool PartSet_SketcherMgr::canChangeConstruction(bool& isConstruction) const
     return anEnabled;
 
   QObjectPtrList anObjects;
-  // 1. change construction type of a created feature
+  // 1. change auxiliary type of a created feature
   if (PartSet_SketcherMgr::isNestedCreateOperation(anOperation) &&
       PartSet_SketcherMgr::isEntityOperation(anOperation) ) {
     anObjects.append(anOperation->feature());
@@ -770,35 +770,35 @@ bool PartSet_SketcherMgr::canChangeConstruction(bool& isConstruction) const
   else {
     if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
       anOperation->abort();
-    // 2. change construction type of selected sketch entities
+    // 2. change auxiliary type of selected sketch entities
     ModuleBase_ISelection* aSelection = myModule->workshop()->selection();
     anObjects = aSelection->selectedPresentations();
   }
   anEnabled = anObjects.size() > 0;
 
-  bool isNotConstructedFound = false;
+  bool isNotAuxiliaryFound = false;
   if (anObjects.size() > 0) {
     QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
-    for (; anIt != aLast && !isNotConstructedFound; anIt++) {
+    for (; anIt != aLast && !isNotAuxiliaryFound; anIt++) {
       FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
       if (aFeature.get() != NULL) {
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
                             std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature.get() != NULL) {
-          std::string anAttribute = SketchPlugin_SketchEntity::CONSTRUCTION_ID();
+          std::string anAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
 
-          std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr = 
+          std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr = 
             std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
-          isNotConstructedFound = !aConstructionAttr->value();
+          isNotAuxiliaryFound = !anAuxiliaryAttr->value();
         }
       }
     }
   }
-  isConstruction = anObjects.size() && !isNotConstructedFound;
+  theValue = anObjects.size() && !isNotAuxiliaryFound;
   return anEnabled;
 }
   
-void PartSet_SketcherMgr::setConstruction(const bool isChecked)
+void PartSet_SketcherMgr::setAuxiliary(const bool isChecked)
 {
   ModuleBase_Operation* anOperation = getCurrentOperation();
 
@@ -809,19 +809,19 @@ void PartSet_SketcherMgr::setConstruction(const bool isChecked)
 
   QObjectPtrList anObjects;
   bool isUseTransaction = false;
-  // 1. change construction type of a created feature
+  // 1. change auxiliary type of a created feature
   if (PartSet_SketcherMgr::isNestedCreateOperation(anOperation) &&
       PartSet_SketcherMgr::isEntityOperation(anOperation) ) {
     anObjects.append(anOperation->feature());
   }
   else {
     isUseTransaction = true;
-    // 2. change construction type of selected sketch entities
+    // 2. change auxiliary type of selected sketch entities
     ModuleBase_ISelection* aSelection = myModule->workshop()->selection();
     anObjects = aSelection->selectedPresentations();
   }
 
-  QAction* anAction = myModule->action("CONSTRUCTION_CMD");
+  QAction* anAction = myModule->action("AUXILIARY_CMD");
   SessionPtr aMgr = ModelAPI_Session::get();
   if (isUseTransaction) {
     if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation))
@@ -838,11 +838,11 @@ void PartSet_SketcherMgr::setConstruction(const bool isChecked)
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
                             std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature.get() != NULL) {
-          std::string anAttribute = SketchPlugin_SketchEntity::CONSTRUCTION_ID();
+          std::string anAttribute = SketchPlugin_SketchEntity::AUXILIARY_ID();
 
-          std::shared_ptr<ModelAPI_AttributeBoolean> aConstructionAttr = 
+          std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr = 
             std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(aSketchFeature->data()->attribute(anAttribute));
-          aConstructionAttr->setValue(isChecked);
+          anAuxiliaryAttr->setValue(isChecked);
         }
       }
     }

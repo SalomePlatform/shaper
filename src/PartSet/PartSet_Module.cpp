@@ -300,11 +300,11 @@ void PartSet_Module::addViewerItems(QMenu* theMenu) const
       theMenu->addAction(anAction);
     }
   }
-  bool isConstruction;
-  if (mySketchMgr->canChangeConstruction(isConstruction)) {
-    QAction* anAction = action("CONSTRUCTION_CMD");
+  bool isAuxiliary;
+  if (mySketchMgr->canSetAuxiliary(isAuxiliary)) {
+    QAction* anAction = action("AUXILIARY_CMD");
     theMenu->addAction(anAction);
-    anAction->setChecked(isConstruction);
+    anAction->setChecked(isAuxiliary);
   }
 }
 
@@ -488,9 +488,9 @@ void PartSet_Module::createActions()
 {
   QAction* anAction;
 
-  anAction = new QAction(tr("Construction"), this);
+  anAction = new QAction(tr("Auxiliary"), this);
   anAction->setCheckable(true);
-  addAction("CONSTRUCTION_CMD", anAction);
+  addAction("AUXILIARY_CMD", anAction);
 }
 
 QAction* PartSet_Module::action(const QString& theId) const
@@ -514,8 +514,8 @@ void PartSet_Module::onAction(bool isChecked)
   QAction* aAction = static_cast<QAction*>(sender());
   QString anId = aAction->data().toString();
 
-  if (anId == "CONSTRUCTION_CMD") {
-    mySketchMgr->setConstruction(isChecked);
+  if (anId == "AUXILIARY_CMD") {
+    mySketchMgr->setAuxiliary(isChecked);
   }
 }
 

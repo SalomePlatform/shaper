@@ -13,6 +13,6 @@ SketchPlugin_SketchEntity::SketchPlugin_SketchEntity()
 
 void SketchPlugin_SketchEntity::initAttributes()
 {
-  data()->addAttribute(CONSTRUCTION_ID(), ModelAPI_AttributeBoolean::type());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CONSTRUCTION_ID());
+  data()->addAttribute(AUXILIARY_ID(), ModelAPI_AttributeBoolean::type());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), AUXILIARY_ID());
 }
