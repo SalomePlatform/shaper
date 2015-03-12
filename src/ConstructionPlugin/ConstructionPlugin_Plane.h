@@ -41,6 +41,14 @@ class ConstructionPlugin_Plane : public ModelAPI_Feature, public GeomAPI_ICustom
     static const std::string CONSTRUCTION_PLANE_KIND("Plane");
     return CONSTRUCTION_PLANE_KIND;
   }
+
+  /// attribute name for first point
+  inline static const std::string& METHOD()
+  {
+    static const std::string METHOD_ATTR("CreationMethod");
+    return METHOD_ATTR;
+  }
+
   /// attribute name for base face
   inline static const std::string& FACE()
   {
@@ -94,6 +102,10 @@ class ConstructionPlugin_Plane : public ModelAPI_Feature, public GeomAPI_ICustom
   /// Customize presentation of the feature
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs);
+
+ protected:
+  std::shared_ptr<GeomAPI_Shape> createPlaneByFaceAndDistance();
+  std::shared_ptr<GeomAPI_Shape> createPlaneByGeneralEquation();
 };
 
 #endif

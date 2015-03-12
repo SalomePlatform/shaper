@@ -7,6 +7,8 @@
 #include <Model_Application.h>
 #include <Model_Document.h>
 
+#include <ModelAPI_Events.h>
+
 IMPLEMENT_STANDARD_HANDLE(Model_Application, TDocStd_Application)
 IMPLEMENT_STANDARD_RTTIEXT(Model_Application, TDocStd_Application)
 
@@ -31,6 +33,12 @@ const std::shared_ptr<Model_Document>& Model_Application::getDocument(string the
   std::shared_ptr<Model_Document> aNew(
     new Model_Document(theDocID, theDocID == "root" ? thePartSetKind : thePartKind));
   myDocs[theDocID] = aNew;
+
+  Events_ID anId = ModelAPI_DocumentCreatedMessage::eventId();
+  std::shared_ptr<ModelAPI_DocumentCreatedMessage> aMessage =
+        std::shared_ptr<ModelAPI_DocumentCreatedMessage>(new ModelAPI_DocumentCreatedMessage(anId, this));
+  aMessage->setDocument(aNew);
+  Events_Loop::loop()->send(aMessage);
   // load it if it must be loaded by demand
   if (myLoadedByDemand.find(theDocID) != myLoadedByDemand.end() && !myPath.empty()) {
     aNew->load(myPath.c_str());

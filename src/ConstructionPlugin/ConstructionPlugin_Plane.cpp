@@ -12,12 +12,10 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_AttributeString.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
 
 #include <GeomAPI_Pnt2d.h>
-
-
-#define PLANE_SIZE 300
 
 ConstructionPlugin_Plane::ConstructionPlugin_Plane()
 {
@@ -25,53 +23,32 @@ ConstructionPlugin_Plane::ConstructionPlugin_Plane()
 
 void ConstructionPlugin_Plane::initAttributes()
 {
+  data()->addAttribute(ConstructionPlugin_Plane::METHOD(), ModelAPI_AttributeString::type());
+  // Face & Distance
   data()->addAttribute(ConstructionPlugin_Plane::FACE(),  ModelAPI_AttributeSelection::type());
   data()->addAttribute(ConstructionPlugin_Plane::DISTANCE(), ModelAPI_AttributeDouble::type());
+  // General equation
+  data()->addAttribute(ConstructionPlugin_Plane::A(),  ModelAPI_AttributeDouble::type());
+  data()->addAttribute(ConstructionPlugin_Plane::B(),  ModelAPI_AttributeDouble::type());
+  data()->addAttribute(ConstructionPlugin_Plane::C(),  ModelAPI_AttributeDouble::type());
+  data()->addAttribute(ConstructionPlugin_Plane::D(),  ModelAPI_AttributeDouble::type());
 }
 
 void ConstructionPlugin_Plane::execute()
 {
-  AttributeSelectionPtr aFaceAttr = data()->selection(ConstructionPlugin_Plane::FACE());
-  AttributeDoublePtr aDistAttr = data()->real(ConstructionPlugin_Plane::DISTANCE());
-  if ((aFaceAttr.get() != NULL) && (aDistAttr.get() != NULL) && 
-    aFaceAttr->isInitialized() && aDistAttr->isInitialized()) {
-
-    double aDist = aDistAttr->value();
-    GeomShapePtr aShape = aFaceAttr->value();
-    if (aShape.get() != NULL) {
-      std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_FaceBuilder::plane(aShape);
-      std::shared_ptr<GeomAPI_Pnt> aOrig = aPln->location();
-      std::shared_ptr<GeomAPI_Dir> aDir = aPln->direction();
-
-      aOrig->translate(aDir, aDist);
-      std::shared_ptr<GeomAPI_Pln> aNewPln = 
-        std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aOrig, aDir));
-
-      // Create rectangular face close to the selected
-      double aXmin, aYmin, Zmin, aXmax, aYmax, Zmax;
-      aShape->computeSize(aXmin, aYmin, Zmin, aXmax, aYmax, Zmax);
-
-      std::shared_ptr<GeomAPI_Pnt> aPnt1 = 
-        std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aXmin, aYmin, Zmin));
-      std::shared_ptr<GeomAPI_Pnt> aPnt2 = 
-        std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aXmax, aYmax, Zmax));
-
-      std::shared_ptr<GeomAPI_Pnt2d> aPnt2d1 = aPnt1->to2D(aNewPln);
-      std::shared_ptr<GeomAPI_Pnt2d> aPnt2d2 = aPnt2->to2D(aNewPln);
-
-      double aWidth = aPnt2d2->x() - aPnt2d1->x();
-      double aHeight = aPnt2d2->y() - aPnt2d1->y();
-      double aWgap = aWidth * 0.1;
-      double aHgap = aHeight * 0.1;
-
-      std::shared_ptr<GeomAPI_Shape> aPlane = 
-        GeomAlgoAPI_FaceBuilder::planarFace(aNewPln, aPnt2d1->x() - aWgap, aPnt2d1->y() - aHgap, 
-                                            aWidth + 2 * aWgap, aHeight + 2 * aHgap);
-      ResultConstructionPtr aConstr = document()->createConstruction(data());
-      aConstr->setShape(aPlane);
-      setResult(aConstr);
-    }
+  AttributeStringPtr aMethodTypeAttr = string(ConstructionPlugin_Plane::METHOD());
+  std::string aMethodType = aMethodTypeAttr->value();
+  std::shared_ptr<GeomAPI_Shape> aPlaneFace;
+  if (aMethodType == "PlaneByFaceAndDistance") {
+    aPlaneFace = createPlaneByFaceAndDistance();
+  } else if (aMethodType == "PlaneByGeneralEquation") {
+    aPlaneFace = createPlaneByGeneralEquation();
   }
+  if (!aPlaneFace.get())
+    return;
+  ResultConstructionPtr aConstr = document()->createConstruction(data());
+  aConstr->setShape(aPlaneFace);
+  setResult(aConstr);
 }
 
 bool ConstructionPlugin_Plane::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
@@ -99,3 +76,73 @@ bool ConstructionPlugin_Plane::customisePresentation(ResultPtr theResult, AISObj
 
   return isCustomized;
 }
+
+std::shared_ptr<GeomAPI_Shape>  ConstructionPlugin_Plane::createPlaneByFaceAndDistance()
+{
+  AttributeSelectionPtr aFaceAttr = data()->selection(ConstructionPlugin_Plane::FACE());
+  AttributeDoublePtr aDistAttr = data()->real(ConstructionPlugin_Plane::DISTANCE());
+  std::shared_ptr<GeomAPI_Shape> aPlane;
+  if ((aFaceAttr.get() != NULL) &&
+      (aDistAttr.get() != NULL) &&
+      aFaceAttr->isInitialized() && aDistAttr->isInitialized()) {
+
+    double aDist = aDistAttr->value();
+    GeomShapePtr aShape = aFaceAttr->value();
+    if (aShape.get() != NULL) {
+      std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_FaceBuilder::plane(aShape);
+      std::shared_ptr<GeomAPI_Pnt> aOrig = aPln->location();
+      std::shared_ptr<GeomAPI_Dir> aDir = aPln->direction();
+
+      aOrig->translate(aDir, aDist);
+      std::shared_ptr<GeomAPI_Pln> aNewPln = std::shared_ptr<GeomAPI_Pln>(
+          new GeomAPI_Pln(aOrig, aDir));
+
+      // Create rectangular face close to the selected
+      double aXmin, aYmin, Zmin, aXmax, aYmax, Zmax;
+      aShape->computeSize(aXmin, aYmin, Zmin, aXmax, aYmax, Zmax);
+
+      std::shared_ptr<GeomAPI_Pnt> aPnt1 = std::shared_ptr<GeomAPI_Pnt>(
+          new GeomAPI_Pnt(aXmin, aYmin, Zmin));
+      std::shared_ptr<GeomAPI_Pnt> aPnt2 = std::shared_ptr<GeomAPI_Pnt>(
+          new GeomAPI_Pnt(aXmax, aYmax, Zmax));
+
+      std::shared_ptr<GeomAPI_Pnt2d> aPnt2d1 = aPnt1->to2D(aNewPln);
+      std::shared_ptr<GeomAPI_Pnt2d> aPnt2d2 = aPnt2->to2D(aNewPln);
+
+      double aWidth = aPnt2d2->x() - aPnt2d1->x();
+      double aHeight = aPnt2d2->y() - aPnt2d1->y();
+      double aWgap = aWidth * 0.1;
+      double aHgap = aHeight * 0.1;
+
+      aPlane = GeomAlgoAPI_FaceBuilder::planarFace(aNewPln,
+                                                   aPnt2d1->x() - aWgap,
+                                                   aPnt2d1->y() - aHgap,
+                                                   aWidth + 2 * aWgap,
+                                                   aHeight + 2 * aHgap);
+    }
+  }
+  return aPlane;
+}
+
+std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createPlaneByGeneralEquation()
+{
+  AttributeDoublePtr anAttrA = real(ConstructionPlugin_Plane::A());
+  AttributeDoublePtr anAttrB = real(ConstructionPlugin_Plane::B());
+  AttributeDoublePtr anAttrC = real(ConstructionPlugin_Plane::C());
+  AttributeDoublePtr anAttrD = real(ConstructionPlugin_Plane::D());
+  std::shared_ptr<GeomAPI_Shape> aPlaneFace;
+  if ((anAttrA.get() != NULL) && (anAttrB.get() != NULL) &&
+      (anAttrC.get() != NULL) && (anAttrD.get() != NULL) &&
+      anAttrA->isInitialized() && anAttrB->isInitialized() &&
+      anAttrC->isInitialized() && anAttrD->isInitialized() ) {
+    double aA = anAttrA->value(), aB = anAttrB->value(),
+           aC = anAttrC->value(), aD = anAttrD->value();
+    std::shared_ptr<GeomAPI_Pln> aPlane = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
+    std::string kDefaultPlaneSize = "200";
+    double aSize = Config_PropManager::integer("Sketch planes", "planes_size", kDefaultPlaneSize);
+    aSize *= 4.;
+    aPlaneFace = GeomAlgoAPI_FaceBuilder::square(aPlane, aSize);
+  }
+  return aPlaneFace;
+}
+

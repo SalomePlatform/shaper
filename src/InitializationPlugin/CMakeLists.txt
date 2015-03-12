@@ -9,17 +9,16 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
 SET(PROJECT_HEADERS
     InitializationPlugin.h
     InitializationPlugin_Plugin.h
-    InitializationPlugin_OriginPlanesFeature.h
+    #InitializationPlugin_OriginPlanesFeature.h
 )
  
 SET(PROJECT_SOURCES
     InitializationPlugin_Plugin.cpp
-    InitializationPlugin_OriginPlanesFeature.cpp
+    #InitializationPlugin_OriginPlanesFeature.cpp
 )
 
-SET(XML_RESOURCES
-    plugin-Initialization.xml
-)
+#SET(XML_RESOURCES
+#)
 
 SET(PROJECT_LIBRARIES
     Events
@@ -33,4 +32,4 @@ ADD_LIBRARY(InitializationPlugin MODULE ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${
 TARGET_LINK_LIBRARIES(InitializationPlugin ${PROJECT_LIBRARIES})
 
 INSTALL(TARGETS InitializationPlugin DESTINATION plugins)
-INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)
+#INSTALL(FILES ${XML_RESOURCES} DESTINATION plugins)

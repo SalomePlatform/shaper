@@ -61,9 +61,7 @@ void ConstructionPlugin_Axis::createAxisByTwoPoints()
 
 void ConstructionPlugin_Axis::execute()
 {
-  AttributePtr anAttr = data()->attribute(ConstructionPlugin_Axis::METHOD());
-  AttributeStringPtr aMethodTypeAttr =
-      std::dynamic_pointer_cast<ModelAPI_AttributeString>(anAttr);
+  AttributeStringPtr aMethodTypeAttr = string(ConstructionPlugin_Axis::METHOD());
   std::string aMethodType = aMethodTypeAttr->value();
   if (aMethodType == "AxisByPointsCase") {
     createAxisByTwoPoints();
