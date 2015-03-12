@@ -373,9 +373,9 @@ void Model_AttributeSelection::selectBody(
   TopoDS_Shape aContext;
 
   ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myRef.value());
-  if (aBody)
+  if (aBody) {
     aContext = aBody->shape()->impl<TopoDS_Shape>();
-  else {
+  } else {
     ResultConstructionPtr aConstr = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(myRef.value());
     if (aConstr) {
       aContext = aConstr->shape()->impl<TopoDS_Shape>();
@@ -384,6 +384,11 @@ void Model_AttributeSelection::selectBody(
       return;
     }
   }
+  /// fix for issue 411: result modified shapes must not participate in this selection mechanism
+  FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+  if (aFeatureOwner.get())
+    aFeatureOwner->eraseResults();
+
   aSel.Select(aNewShape, aContext); 
 }
 
