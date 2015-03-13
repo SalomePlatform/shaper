@@ -6,6 +6,7 @@
 
 #include "SketcherPrs_Perpendicular.h"
 #include "SketcherPrs_Tools.h"
+#include "SketcherPrs_PositionMgr.h"
 
 #include <GeomAPI_Pnt.h>
 
@@ -57,37 +58,40 @@ void SketcherPrs_Perpendicular::Compute(const Handle(PrsMgr_PresentationManager3
 {
   prepareAspect();
 
-  std::shared_ptr<GeomAPI_Edge> aLine1 = SketcherPrs_Tools::getLine(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getLine(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   if (aLine1.get() == NULL)
     return;
 
-  std::shared_ptr<GeomAPI_Edge> aLine2 = SketcherPrs_Tools::getLine(myConstraint, SketchPlugin_Constraint::ENTITY_B());
+  std::shared_ptr<GeomAPI_Shape> aLine2 = SketcherPrs_Tools::getLine(myConstraint, SketchPlugin_Constraint::ENTITY_B());
   if (aLine2.get() == NULL)
     return;
 
-  std::shared_ptr<GeomAPI_Pnt> aPnt1 = aLine1->firstPoint();
-  std::shared_ptr<GeomAPI_Pnt> aPnt2 = aLine1->lastPoint();
-  gp_Pnt aP1((aPnt1->x() + aPnt2->x())/2.,
-             (aPnt1->y() + aPnt2->y())/2.,
-             (aPnt1->z() + aPnt2->z())/2.);
+  SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
+  gp_Pnt aP1 = aMgr->getPosition(aLine1, this);
+  gp_Pnt aP2 = aMgr->getPosition(aLine2, this);
+  //std::shared_ptr<GeomAPI_Pnt> aPnt1 = aLine1->firstPoint();
+  //std::shared_ptr<GeomAPI_Pnt> aPnt2 = aLine1->lastPoint();
+  //gp_Pnt aP1((aPnt1->x() + aPnt2->x())/2.,
+  //           (aPnt1->y() + aPnt2->y())/2.,
+  //           (aPnt1->z() + aPnt2->z())/2.);
 
-  gp_Vec aVec1(aPnt1->impl<gp_Pnt>(), aPnt2->impl<gp_Pnt>());
-  gp_Vec aShift = aVec1.Crossed(myPlane->norm()->impl<gp_Dir>());
-  aShift.Normalize();
-  aShift.Multiply(20);
-  aP1.Translate(aShift);
+  //gp_Vec aVec1(aPnt1->impl<gp_Pnt>(), aPnt2->impl<gp_Pnt>());
+  //gp_Vec aShift = aVec1.Crossed(myPlane->norm()->impl<gp_Dir>());
+  //aShift.Normalize();
+  //aShift.Multiply(20);
+  //aP1.Translate(aShift);
 
-  aPnt1 = aLine2->firstPoint();
-  aPnt2 = aLine2->lastPoint();
-  gp_Pnt aP2((aPnt1->x() + aPnt2->x())/2.,
-             (aPnt1->y() + aPnt2->y())/2.,
-             (aPnt1->z() + aPnt2->z())/2.);
+  //aPnt1 = aLine2->firstPoint();
+  //aPnt2 = aLine2->lastPoint();
+  //gp_Pnt aP2((aPnt1->x() + aPnt2->x())/2.,
+  //           (aPnt1->y() + aPnt2->y())/2.,
+  //           (aPnt1->z() + aPnt2->z())/2.);
 
-  gp_Vec aVec2(aPnt1->impl<gp_Pnt>(), aPnt2->impl<gp_Pnt>());
-  aShift = aVec2.Crossed(myPlane->norm()->impl<gp_Dir>());
-  aShift.Normalize();
-  aShift.Multiply(20);
-  aP2.Translate(aShift);
+  //gp_Vec aVec2(aPnt1->impl<gp_Pnt>(), aPnt2->impl<gp_Pnt>());
+  //aShift = aVec2.Crossed(myPlane->norm()->impl<gp_Dir>());
+  //aShift.Normalize();
+  //aShift.Multiply(20);
+  //aP2.Translate(aShift);
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
   aGroup->SetPrimitivesAspect(myAspect);

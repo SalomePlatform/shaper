@@ -18,7 +18,7 @@
 namespace SketcherPrs_Tools {
 
 
-std::shared_ptr<GeomAPI_Edge> getLine(SketchPlugin_Constraint* theFeature,
+std::shared_ptr<GeomAPI_Shape> getLine(SketchPlugin_Constraint* theFeature,
                                       const std::string& theAttrName)
 {
   std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
@@ -28,12 +28,9 @@ std::shared_ptr<GeomAPI_Edge> getLine(SketchPlugin_Constraint* theFeature,
   ObjectPtr aObject = anAttr->object();
   ResultConstructionPtr aRes = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObject);
   if (aRes.get() != NULL) {
-    std::shared_ptr<GeomAPI_Shape> aShape = aRes->shape();
-    if (aShape.get() != NULL) {   
-      return std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aShape));
-    }
+    return aRes->shape();
   }
-  return std::shared_ptr<GeomAPI_Edge>();
+  return std::shared_ptr<GeomAPI_Shape>();
 }
 
 
