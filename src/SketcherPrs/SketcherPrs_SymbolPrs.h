@@ -31,12 +31,16 @@ public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
-  SketcherPrs_SymbolPrs(SketchPlugin_Constraint* theConstraint, 
+  Standard_EXPORT SketcherPrs_SymbolPrs(SketchPlugin_Constraint* theConstraint, 
                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
-
+  
   //! Method which clear all selected owners belonging
   //! to this selectable object ( for fast presentation draw )
   Standard_EXPORT virtual void ClearSelected();
+
+  Standard_EXPORT std::shared_ptr<GeomAPI_Ax3> plane() const { return myPlane; }
+
+  Standard_EXPORT SketchPlugin_Constraint* feature() const { return myConstraint; }
 
   DEFINE_STANDARD_RTTI(SketcherPrs_SymbolPrs)
 

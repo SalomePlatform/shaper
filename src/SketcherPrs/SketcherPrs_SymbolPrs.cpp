@@ -32,6 +32,7 @@ SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(SketchPlugin_Constraint* theConstra
   SetAutoHilight(Standard_False);
 }
 
+
 Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
 {
   if (myIconsMap.count(iconName()) == 1) {
@@ -65,12 +66,13 @@ void SketcherPrs_SymbolPrs::prepareAspect()
 
 void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup, std::string theAttrName) const
 {
-  std::shared_ptr<GeomAPI_Edge> aLine = SketcherPrs_Tools::getLine(myConstraint, theAttrName);
+  std::shared_ptr<GeomAPI_Shape> aLine = SketcherPrs_Tools::getLine(myConstraint, theAttrName);
   if (aLine.get() == NULL)
     return;
+  std::shared_ptr<GeomAPI_Edge> aEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLine));
 
-  std::shared_ptr<GeomAPI_Pnt> aPnt1 = aLine->firstPoint();
-  std::shared_ptr<GeomAPI_Pnt> aPnt2 = aLine->lastPoint();
+  std::shared_ptr<GeomAPI_Pnt> aPnt1 = aEdge->firstPoint();
+  std::shared_ptr<GeomAPI_Pnt> aPnt2 = aEdge->lastPoint();
 
   Handle(Graphic3d_ArrayOfSegments) aLines = new Graphic3d_ArrayOfSegments(2, 1);
   aLines->AddVertex(aPnt1->impl<gp_Pnt>());
