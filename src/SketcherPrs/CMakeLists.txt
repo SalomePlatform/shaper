@@ -7,6 +7,7 @@ SET(PROJECT_HEADERS
     SketcherPrs_Parallel.h
     SketcherPrs_Tools.h
     SketcherPrs_Perpendicular.h
+    SketcherPrs_SymbolPrs.h
 )
 
 SET(PROJECT_SOURCES
@@ -15,6 +16,7 @@ SET(PROJECT_SOURCES
     SketcherPrs_Parallel.cpp
     SketcherPrs_Tools.cpp
     SketcherPrs_Perpendicular.cpp
+    SketcherPrs_SymbolPrs.cpp
 )
 
 SET(PROJECT_LIBRARIES
