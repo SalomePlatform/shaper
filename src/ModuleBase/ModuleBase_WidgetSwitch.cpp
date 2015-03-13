@@ -10,128 +10,65 @@
 #include <ModuleBase_WidgetSwitch.h>
 #include <ModuleBase_ModelWidget.h>
 #include <ModuleBase_PageBase.h>
+#include <ModuleBase_Tools.h>
 
 #include <QComboBox>
-#include <QVBoxLayout>
+#include <QFrame>
 #include <QSpacerItem>
-
+#include <QStackedLayout>
+#include <QVBoxLayout>
 
 ModuleBase_WidgetSwitch::ModuleBase_WidgetSwitch(QWidget* theParent, const Config_WidgetAPI* theData,
                                                  const std::string& theParentId)
-: ModuleBase_ModelWidget(theParent, theData, theParentId)
+: ModuleBase_PagedContainer(theParent, theData, theParentId)
 {
-  myMainLay = new QVBoxLayout(this);
-  myMainLay->setContentsMargins(2, 4, 2, 2);
+  QVBoxLayout*  aMainLay = new QVBoxLayout(this);
+  //aMainLay->setContentsMargins(2, 4, 2, 2);
+  ModuleBase_Tools::adjustMargins(aMainLay);
   myCombo = new QComboBox(this);
   myCombo->hide();
-  myMainLay->addWidget(myCombo);
-  //this->setFrameShape(QFrame::StyledPanel);
-  connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setCurrentIndex(int)));
-  connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SIGNAL(currentPageChanged(int)));
+  myPagesLayout = new QStackedLayout(this);
+  aMainLay->addWidget(myCombo);
+  aMainLay->addLayout(myPagesLayout, 1);
+  setLayout(aMainLay);
 
+  connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onPageChanged()));
+  connect(myCombo, SIGNAL(activated(int)), myPagesLayout, SLOT(setCurrentIndex(int)));
 }
 
 ModuleBase_WidgetSwitch::~ModuleBase_WidgetSwitch()
 {
 }
 
-QList<QWidget*> ModuleBase_WidgetSwitch::getControls() const
-{
-  QList<QWidget*> aList;
-  aList << myCombo;
-  return aList;
-}
 
-int ModuleBase_WidgetSwitch::addPage(QWidget* theWidget, const QString& theName)
+int ModuleBase_WidgetSwitch::addPage(ModuleBase_PageBase* thePage, const QString& theName,
+                                                                   const QString& theCaseId)
 {
-  return insertPage(count(), theWidget, theName);
-}
-
-int ModuleBase_WidgetSwitch::count() const
-{
-  return myCombo->count();
-}
-
-int ModuleBase_WidgetSwitch::currentIndex() const
-{
-  return myCombo->currentIndex();
-}
-
-QWidget* ModuleBase_WidgetSwitch::currentWidget() const
-{
-  int idx = currentIndex();
-  return myCases[idx];
-}
-
-int ModuleBase_WidgetSwitch::indexOf(QWidget* theWidget) const
-{
-  return myCases.indexOf(theWidget);
-}
-
-int ModuleBase_WidgetSwitch::insertPage(int theIndex, QWidget* theWidget, const QString& theName)
-{
-  int index = theIndex < count() ? theIndex : count();
-  if (count() == 0)
+  int aSuperCount = ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId);
+  myCombo->addItem(theName);
+  int aResultCount = myCombo->count();
+  if (aResultCount == 1)
     myCombo->show();
-  myCombo->insertItem(index, theName);
-  myCases.insert(index, theWidget);
-  myMainLay->addWidget(theWidget);
-  setCurrentIndex(theIndex);
-  return index;
+  QFrame* aFrame = dynamic_cast<QFrame*>(thePage);
+  aFrame->setFrameShape(QFrame::Box);
+  aFrame->setFrameStyle(QFrame::Sunken);
+  myPagesLayout->addWidget(aFrame);
+  return aResultCount;
 }
 
-bool ModuleBase_WidgetSwitch::isPageEnabled(int index) const
+int ModuleBase_WidgetSwitch::currentPageIndex() const
 {
-  return myCases[index]->isEnabled();
+  int aComboIndex = myCombo->currentIndex();
+  return aComboIndex;
 }
 
-QString ModuleBase_WidgetSwitch::pageText(int index) const
-{
-  return myCombo->itemText(index);
-}
 
-QString ModuleBase_WidgetSwitch::pageToolTip(int index) const
+void ModuleBase_WidgetSwitch::setCurrentPageIndex(int theIndex)
 {
-  return myCases[index]->toolTip();
-}
-
-void ModuleBase_WidgetSwitch::removePage(int index)
-{
-  myCombo->removeItem(index);
-  myCases.removeAt(index);
-  if (count() == 0) {
-    myCombo->hide();
-  }
-}
-
-void ModuleBase_WidgetSwitch::setPageEnabled(int index, bool enabled)
-{
-  myCases[index]->setEnabled(enabled);
-}
-
-void ModuleBase_WidgetSwitch::setPageName(int index, const QString& theName)
-{
-  myCombo->setItemText(index, theName);
-}
-
-void ModuleBase_WidgetSwitch::setPageToolTip(int index, const QString& toolTip)
-{
-  myCases[index]->setToolTip(toolTip);
-}
-
-void ModuleBase_WidgetSwitch::setCurrentIndex(int index)
-{
-  myCombo->setCurrentIndex(index);
-  refresh();
-}
-
-void ModuleBase_WidgetSwitch::refresh()
-{
-  foreach(QWidget* eachWidget, myCases)
-  {
-    eachWidget->setVisible(false);
-  }
-  if (currentIndex() >= myCases.count())
-    return;
-  myCases[currentIndex()]->setVisible(true);
+  bool isComboSignalsBlocked = myCombo->blockSignals(true);
+  bool isPagesLayoutSignalsBlocked = myPagesLayout->blockSignals(true);
+  myCombo->setCurrentIndex(theIndex);
+  myPagesLayout->setCurrentIndex(theIndex);
+  myCombo->blockSignals(isComboSignalsBlocked);
+  myPagesLayout->blockSignals(isPagesLayoutSignalsBlocked);
 }

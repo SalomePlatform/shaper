@@ -1,23 +1,20 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <!-- 
   <switch id="CreationMethod">
-    <case id="PlaneByFaceAndDistance">
-   -->
-  <shape_selector id="planeFace"
-                  label="Plane face"
-                  tooltip="Select a planar face"
-                  shape_types="face">
-    <selection_filter id="FaceFilter" parameters="plane"/>
-  </shape_selector>
-  <doublevalue id="distance" 
-               label="Distance" 
-               tooltip="Distance from selected face to plane" 
+    <case id="PlaneByFaceAndDistance" title="On some distance from a face">
+      <shape_selector id="planeFace"
+                      label="Plane face"
+                      tooltip="Select a planar face"
+                      shape_types="face">
+        <selection_filter id="FaceFilter" parameters="plane"/>
+      </shape_selector>
+      <doublevalue id="distance" 
+                   label="Distance" 
+                   tooltip="Distance from selected face to plane" 
                default="0" />
-<!-- 
     </case>
-    <case id="PlaneByGeneralEquation">
+    <case id="PlaneByGeneralEquation" title="By palne equation parameters">
       <doublevalue id="A" 
                    label="A:" 
                    tooltip="The A parameter from general plane equation (Ax+By+Cz+D=0)" 
@@ -36,5 +33,4 @@
                    default="0" />
     </case>
   </switch>
- -->
 </source>

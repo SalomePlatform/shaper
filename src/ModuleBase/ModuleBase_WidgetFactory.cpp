@@ -103,13 +103,9 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage)
           QString aCaseId = qs(myWidgetApi->getProperty(_ID));
           ModuleBase_PageBase* aPage = new ModuleBase_PageWidget(aWidget);
           createWidget(aPage);
-          QWidget* aCasePageWidget = dynamic_cast<QWidget*>(aPage);
-          if (aWdgType == WDG_SWITCH) {
-            ModuleBase_WidgetSwitch* aSwitch = qobject_cast<ModuleBase_WidgetSwitch*>(aWidget);
-            aSwitch->addPage(aCasePageWidget, aPageName);
-          } else if (aWdgType == WDG_TOOLBOX) {
-            ModuleBase_WidgetToolbox* aToolbox = qobject_cast<ModuleBase_WidgetToolbox*>(aWidget);
-            aToolbox->addPage(aPage, aPageName, aCaseId);
+          if (aWdgType == WDG_SWITCH || aWdgType == WDG_TOOLBOX) {
+            ModuleBase_PagedContainer* aContainer = qobject_cast<ModuleBase_PagedContainer*>(aWidget);
+            aContainer->addPage(aPage, aPageName, aCaseId);
           }
         } while (myWidgetApi->toNextWidget());
       }

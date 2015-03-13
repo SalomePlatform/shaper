@@ -8,41 +8,32 @@
 #ifndef MODULEBASE_WIDGETTOOLBOX_H_
 #define MODULEBASE_WIDGETTOOLBOX_H_
 
-#include <ModuleBase_ModelWidget.h>
+#include <ModuleBase.h>
+#include <ModuleBase_PagedContainer.h>
 
 #include <QToolBox>
 
 class ModuleBase_PageBase;
 
-class ModuleBase_WidgetToolbox : public ModuleBase_ModelWidget
+class MODULEBASE_EXPORT ModuleBase_WidgetToolbox : public ModuleBase_PagedContainer
 {
   Q_OBJECT
  public:
   ModuleBase_WidgetToolbox(QWidget* theParent, const Config_WidgetAPI* theData,
                            const std::string& theParentId);
   virtual ~ModuleBase_WidgetToolbox();
-
-  virtual bool restoreValue();
-  virtual QList<QWidget*> getControls() const;
-  virtual bool focusTo();
-  virtual void setHighlighted(bool isHighlighted);
-  virtual void enableFocusProcessing();
-
+  /// Overrides ModuleBase_PagedContainer
   int addPage(ModuleBase_PageBase* theWidget,
               const QString& theName, const QString& theCaseId);
 
  protected:
-  virtual void activateCustom();
-  virtual bool storeValueCustom() const;
-
- protected slots:
-  void onPageChanged();
+  /// Implements ModuleBase_PagedContainer
+  virtual int currentPageIndex() const;
+  /// Implements ModuleBase_PagedContainer
+  virtual void setCurrentPageIndex(int);
 
  private:
-  bool myIsPassFocusToCurrentPage;
   QToolBox* myToolBox;
-  QStringList myCaseIds;
-  QList<ModuleBase_PageBase*> myPages;
 };
 
 #endif /* MODULEBASE_WIDGETTOOLBOX_H_ */

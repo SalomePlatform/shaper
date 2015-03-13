@@ -23,7 +23,6 @@ SET(PROJECT_HEADERS
 	ModuleBase_WidgetDoubleValue.h
 	ModuleBase_WidgetEditor.h
 	ModuleBase_WidgetFactory.h
-	ModuleBase_WidgetSwitch.h
 	ModuleBase_WidgetShapeSelector.h
 	ModuleBase_IWorkshop.h
 	ModuleBase_Definitions.h
@@ -44,10 +43,12 @@ SET(PROJECT_HEADERS
 	ModuleBase_IPrefMgr.h
 	ModuleBase_Preferences.h
 	ModuleBase_ActionInfo.h
-	ModuleBase_WidgetToolbox.h
 	ModuleBase_PageBase.h
 	ModuleBase_PageWidget.h	
 	ModuleBase_PageGroupBox.h
+	ModuleBase_PagedContainer.h
+	ModuleBase_WidgetSwitch.h
+	ModuleBase_WidgetToolbox.h
 	ModuleBase_WidgetValidated.h
 )
 
@@ -71,7 +72,6 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetDoubleValue.cpp
 	ModuleBase_WidgetEditor.cpp
 	ModuleBase_WidgetFactory.cpp
-	ModuleBase_WidgetSwitch.cpp
 	ModuleBase_WidgetShapeSelector.cpp
 	ModuleBase_WidgetChoice.cpp
 	ModuleBase_WidgetFileSelector.cpp
@@ -83,10 +83,12 @@ SET(PROJECT_SOURCES
 	ModuleBase_WidgetLabel.cpp
 	ModuleBase_Preferences.cpp
 	ModuleBase_ActionInfo.cpp
-	ModuleBase_WidgetToolbox.cpp
 	ModuleBase_PageBase.cpp
 	ModuleBase_PageWidget.cpp
 	ModuleBase_PageGroupBox.cpp
+	ModuleBase_PagedContainer.cpp
+	ModuleBase_WidgetSwitch.cpp
+	ModuleBase_WidgetToolbox.cpp
 	ModuleBase_WidgetValidated.cpp
 )
 

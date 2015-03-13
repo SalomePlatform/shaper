@@ -13,13 +13,12 @@
 #include <ModelAPI_AttributeString.h>
 
 #include <QWidget>
-#include <Qlist>
+#include <QList>
 #include <QVBoxLayout>
 
 ModuleBase_WidgetToolbox::ModuleBase_WidgetToolbox(QWidget* theParent, const Config_WidgetAPI* theData,
                                                    const std::string& theParentId)
-: ModuleBase_ModelWidget(theParent, theData, theParentId),
-  myIsPassFocusToCurrentPage(false)
+: ModuleBase_PagedContainer(theParent, theData, theParentId)
 {
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aMainLayout);
@@ -44,81 +43,24 @@ ModuleBase_WidgetToolbox::~ModuleBase_WidgetToolbox()
 int ModuleBase_WidgetToolbox::addPage(ModuleBase_PageBase* thePage,
                                       const QString& theName, const QString& theCaseId)
 {
-  myCaseIds << theCaseId;
-  myPages << thePage;
+  ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId);
   QFrame* aFrame = dynamic_cast<QFrame*>(thePage);
   aFrame->setFrameShape(QFrame::Box);
   aFrame->setFrameStyle(QFrame::Sunken);
-  return myToolBox->addItem(aFrame, theName);
+  myToolBox->addItem(aFrame, theName);
+  return myToolBox->count();
 }
 
-bool ModuleBase_WidgetToolbox::restoreValue()
+int ModuleBase_WidgetToolbox::currentPageIndex() const
 {
-  // A rare case when plugin was not loaded.
-  if(!myFeature)
-    return false;
-  DataPtr aData = myFeature->data();
-  AttributeStringPtr aStringAttr = aData->string(attributeID());
-  QString aCaseId = QString::fromStdString(aStringAttr->value());
-  int idx = myCaseIds.indexOf(aCaseId);
-  if (idx == -1)
-    return false;
+  return myToolBox->currentIndex();
+}
+
+void ModuleBase_WidgetToolbox::setCurrentPageIndex(int theIndex)
+{
   bool isSignalsBlocked = myToolBox->blockSignals(true);
-  myToolBox->setCurrentIndex(idx);
+  myToolBox->setCurrentIndex(theIndex);
   myToolBox->blockSignals(isSignalsBlocked);
-  return true;
-}
-
-QList<QWidget*> ModuleBase_WidgetToolbox::getControls() const
-{
-  QList<QWidget*> aResult;
-  int idx = myToolBox->currentIndex();
-  QList<ModuleBase_ModelWidget*> aModelWidgets = myPages[idx]->modelWidgets();
-  foreach(ModuleBase_ModelWidget* eachModelWidget, aModelWidgets) {
-    aResult << eachModelWidget->getControls();
-  }
-  return aResult;
-}
-
-bool ModuleBase_WidgetToolbox::focusTo()
-{
-  int idx = myToolBox->currentIndex();
-  if (idx > myPages.count())
-    return false;
-  return myPages[idx]->takeFocus();
-}
-
-void ModuleBase_WidgetToolbox::setHighlighted(bool)
-{
-  //page containers sould not be highlighted, do nothing
-}
-
-void ModuleBase_WidgetToolbox::enableFocusProcessing()
-{
-  myIsPassFocusToCurrentPage = true;
 }
 
 
-void ModuleBase_WidgetToolbox::activateCustom()
-{
-  // activate current page
-  focusTo();
-}
-
-bool ModuleBase_WidgetToolbox::storeValueCustom() const
-{
-  // A rare case when plugin was not loaded.
-  if(!myFeature)
-    return false;
-  DataPtr aData = myFeature->data();
-  AttributeStringPtr aStringAttr = aData->string(attributeID());
-  QString aWidgetValue = myCaseIds.at(myToolBox->currentIndex());
-  aStringAttr->setValue(aWidgetValue.toStdString());
-  return true;
-}
-
-void ModuleBase_WidgetToolbox::onPageChanged()
-{
-  storeValue();
-  if (myIsPassFocusToCurrentPage) focusTo();
-}
