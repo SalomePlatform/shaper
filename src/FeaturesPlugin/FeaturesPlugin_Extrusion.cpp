@@ -12,6 +12,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeBoolean.h>
 #include <GeomAlgoAPI_Extrusion.h>
 
@@ -27,15 +28,20 @@ FeaturesPlugin_Extrusion::FeaturesPlugin_Extrusion()
 
 void FeaturesPlugin_Extrusion::initAttributes()
 {
-  data()->addAttribute(FeaturesPlugin_Extrusion::FACE_ID(), ModelAPI_AttributeSelection::type());
+  data()->addAttribute(FeaturesPlugin_Extrusion::LIST_ID(), ModelAPI_AttributeSelectionList::type());
   data()->addAttribute(FeaturesPlugin_Extrusion::SIZE_ID(), ModelAPI_AttributeDouble::type());
   data()->addAttribute(FeaturesPlugin_Extrusion::REVERSE_ID(), ModelAPI_AttributeBoolean::type());
 }
 
 void FeaturesPlugin_Extrusion::execute()
 {
-  std::shared_ptr<ModelAPI_AttributeSelection> aFaceRef = std::dynamic_pointer_cast<
-    ModelAPI_AttributeSelection>(data()->attribute(FeaturesPlugin_Extrusion::FACE_ID()));
+  std::shared_ptr<ModelAPI_AttributeSelectionList> aFaceRefs = std::dynamic_pointer_cast<
+    ModelAPI_AttributeSelectionList>(data()->attribute(FeaturesPlugin_Extrusion::LIST_ID()));
+  if (aFaceRefs.get() == NULL || aFaceRefs->size() == 0) {
+    clearResult();
+    return;
+  }
+  std::shared_ptr<ModelAPI_AttributeSelection> aFaceRef = aFaceRefs->value(0);
   if (!aFaceRef)
     return;
 
@@ -46,11 +52,8 @@ void FeaturesPlugin_Extrusion::execute()
 
   std::shared_ptr<GeomAPI_Shape> aContext;
   ResultPtr aContextRes = aFaceRef->context();
-  if (aContextRes) {
-    if (aContextRes->groupName() == ModelAPI_ResultBody::group())
-      aContext = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContextRes)->shape();
-    else if (aContextRes->groupName() == ModelAPI_ResultConstruction::group())
-      aContext = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes)->shape();
+  if (aContextRes && aContextRes->groupName() == ModelAPI_ResultConstruction::group()) {
+    aContext = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes)->shape();
   }
   if (!aContext) {
     static const std::string aContextError = "The selection context is bad";
@@ -130,4 +133,13 @@ void FeaturesPlugin_Extrusion::LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature,
     theResultBody->generated(aTopFace, aTopName, _LAST_TAG);
   }
   
+}
+
+//============================================================================
+void FeaturesPlugin_Extrusion::clearResult()
+{
+  std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
+  std::shared_ptr<GeomAPI_Shape> anEmptyShape(new GeomAPI_Shape);
+  aResultBody->store(anEmptyShape);
+  setResult(aResultBody);
 }

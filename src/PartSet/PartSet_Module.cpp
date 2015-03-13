@@ -21,6 +21,7 @@
 #include <ModuleBase_FilterMulti.h>
 #include <ModuleBase_FilterCustom.h>
 #include <ModuleBase_FilterNoConsructionSubShapes.h>
+#include <PartSet_FilterSketchEntity.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
@@ -139,6 +140,8 @@ void PartSet_Module::registerFilters()
   Handle(SelectMgr_Filter) aSelectFilter = new ModuleBase_FilterNoConsructionSubShapes(workshop());
   aFactory->registerFilter("NoConstructionSubShapesFilter",
             new ModuleBase_FilterCustom(aSelectFilter));
+  aSelectFilter = new PartSet_FilterSketchEntity(workshop());
+  aFactory->registerFilter("SketchEntityFilter", new ModuleBase_FilterCustom(aSelectFilter));
 }
 
 void PartSet_Module::registerProperties()

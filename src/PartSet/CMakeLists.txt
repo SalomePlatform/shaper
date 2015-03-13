@@ -16,6 +16,7 @@ SET(PROJECT_HEADERS
 	PartSet_WidgetPoint2dDistance.h
 	PartSet_WidgetShapeSelector.h
 	PartSet_Filters.h
+	PartSet_FilterSketchEntity.h
 	PartSet_SketcherMgr.h
 )
 
@@ -29,6 +30,7 @@ SET(PROJECT_SOURCES
 	PartSet_WidgetPoint2dDistance.cpp
 	PartSet_WidgetShapeSelector.cpp
 	PartSet_Filters.cpp
+	PartSet_FilterSketchEntity.cpp
 	PartSet_SketcherMgr.cpp
 )
 

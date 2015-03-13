@@ -65,29 +65,16 @@ bool PartSet_WidgetShapeSelector::storeValueCustom() const
 //********************************************************************
 bool PartSet_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape)
 {
+  bool isValid = ModuleBase_WidgetValidated::isValid(theObj, theShape);
+  if (!isValid)
+    return false;
+
   // the method is redefined to analize the selected shape in validators
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   std::list<ModelAPI_Validator*> aValidators;
   std::list<std::list<std::string> > anArguments;
   aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
-
-  // Check the type of selected object
-  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
-  bool isValid = true;
-  for (; aValidator != aValidators.end(); aValidator++) {
-    const ModelAPI_ResultValidator* aResValidator =
-        dynamic_cast<const ModelAPI_ResultValidator*>(*aValidator);
-    if (aResValidator) {
-      isValid = false;
-      if (aResValidator->isValid(theObj)) {
-        isValid = true;
-        break;
-      }
-    }
-  }
-  if (!isValid)
-    return false;
 
   // Check the acceptability of the object and shape as validator attribute
   AttributePtr aPntAttr;
@@ -102,7 +89,7 @@ bool PartSet_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<Geom
     }
   }
   // Check the acceptability of the object as attribute
-  aValidator = aValidators.begin();
+  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
   std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
   for (; aValidator != aValidators.end(); aValidator++, aArgs++) {
     const ModelAPI_RefAttrValidator* aAttrValidator =

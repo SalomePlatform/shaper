@@ -36,6 +36,14 @@ class FeaturesPlugin_Extrusion : public ModelAPI_Feature
     static const std::string MY_FACE_ID("extrusion_face");
     return MY_FACE_ID;
   }
+  /// attribute name of references sketch entities list, it should contain a sketch result or
+  /// a pair a sketch result to sketch face
+  inline static const std::string& LIST_ID()
+  {
+    static const std::string MY_GROUP_LIST_ID("group_list");
+    return MY_GROUP_LIST_ID;
+  }
+
   /// attribute name of extrusion size
   inline static const std::string& SIZE_ID()
   {
@@ -69,6 +77,9 @@ private:
   void LoadNamingDS(GeomAlgoAPI_Extrusion& theFeature, std::shared_ptr<ModelAPI_ResultBody> theResultBody,
 	                std::shared_ptr<GeomAPI_Shape> theBasis,
 	                std::shared_ptr<GeomAPI_Shape> theContext);
+
+  /// Set an empty shape to the result of extrusion
+  void clearResult();
 };
 
 #endif

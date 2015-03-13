@@ -11,7 +11,7 @@
 #define MODULEBASE_WIDGETMULTISELECTOR_H_
 
 #include <ModuleBase.h>
-#include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_FilterNoDegeneratedEdge.h>
 
 #include <GeomAPI_Shape.h>
@@ -47,7 +47,7 @@ class QAction;
 * - tooltip - a tooltip for the widget
 * - type_choice - list of expected shape types.
 */
-class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_ModelWidget
+class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_WidgetValidated
 {
   Q_OBJECT
  public:
@@ -70,10 +70,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Model
 
   virtual bool eventFilter(QObject* , QEvent* );
 
- public slots:
-  /// Activate or deactivate selection
-  void activateSelection(bool toActivate);
+  /// The methiod called when widget is deactivated
+  virtual void deactivate();
 
+ public slots:
   /// Slot is called on selection type changed
   void onSelectionTypeChanged();
 
@@ -88,15 +88,12 @@ protected slots:
   void onListSelection();
 
  protected:
+  /// The methiod called when widget is activated
+  virtual void activateCustom();
+
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom() const;
-
-  /// Provide filtering of selected shapes
-   /// \param theShapesToFilter source list of shapes
-   /// \param theResult result list of shapes
-  void filterShapes(const NCollection_List<TopoDS_Shape>& theShapesToFilter,
-                    NCollection_List<TopoDS_Shape>& theResult);
 
   /// Set current shape type for selection
   void setCurrentShapeType(const TopAbs_ShapeEnum theShapeType);

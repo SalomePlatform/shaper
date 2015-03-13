@@ -38,7 +38,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
                                                                ModuleBase_IWorkshop* theWorkshop,
                                                                const Config_WidgetAPI* theData,
                                                                const std::string& theParentId)
-    : ModuleBase_ModelWidget(theParent, theData, theParentId),
+    : ModuleBase_WidgetValidated(theParent, theData, theParentId),
       myWorkshop(theWorkshop), myIsActive(false)
 {
   QGridLayout* aMainLay = new QGridLayout(this);
@@ -49,13 +49,31 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 
   myTypeCombo = new QComboBox(this);
   // There is no sence to paramerize list of types while we can not parametrize selection mode
-  QString aTypesStr("Vertices Edges Faces Solids");
+
+  std::string aPropertyTypes = theData->getProperty("type_choice");
+  QString aTypesStr = aPropertyTypes.c_str();
   QStringList aShapeTypes = aTypesStr.split(' ');
+
   myTypeCombo->addItems(aShapeTypes);
   aMainLay->addWidget(myTypeCombo, 0, 1);
+  // if the xml definition contains one type, the controls to select a type should not be shown
+  if (aShapeTypes.size() == 1) {
+    aTypeLabel->setVisible(false);
+    myTypeCombo->setVisible(false);
+  }
 
   QLabel* aListLabel = new QLabel(tr("Selected objects:"), this);
-  aMainLay->addWidget(aListLabel, 1, 0, 1, -1);
+  aMainLay->addWidget(aListLabel, 1, 0);
+  // if the xml definition contains one type, an information label should be shown near to the latest
+  if (aShapeTypes.size() == 1) {
+    QString aLabelText = QString::fromStdString(theData->widgetLabel());
+    QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
+    QLabel* aSelectedLabel = new QLabel(aLabelText, this);
+    if (!aLabelIcon.isEmpty())
+      aSelectedLabel->setPixmap(QPixmap(aLabelIcon));
+    aMainLay->addWidget(aSelectedLabel, 1, 1);
+    aMainLay->setColumnStretch(2, 1);
+  }
 
   myListControl = new QListWidget(this);
   aMainLay->addWidget(myListControl, 2, 0, 2, -1);
@@ -72,13 +90,32 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myListControl->addAction(myCopyAction);
   myListControl->setContextMenuPolicy(Qt::ActionsContextMenu);
   connect(myListControl, SIGNAL(itemSelectionChanged()), SLOT(onListSelection()));
-
-  activateSelection(true);
 }
 
 ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
 {
-  activateSelection(false);
+  myIsActive = false;
+  activateShapeSelection();
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::activateCustom()
+{
+  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
+  connect(myWorkshop, SIGNAL(selectionChanged()), 
+          this,       SLOT(onSelectionChanged()), 
+          Qt::UniqueConnection);
+
+  myIsActive = true;
+  activateShapeSelection();
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::deactivate()
+{
+  disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+  myIsActive = false;
+  activateShapeSelection();
 }
 
 //********************************************************************
@@ -151,23 +188,6 @@ bool ModuleBase_WidgetMultiSelector::eventFilter(QObject* theObj, QEvent* theEve
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::activateSelection(bool toActivate)
-{
-  myIsActive = toActivate;
-  if (myIsActive) {
-    connect(myWorkshop, SIGNAL(selectionChanged()), 
-            this,       SLOT(onSelectionChanged()), 
-            Qt::UniqueConnection);
-    activateShapeSelection();
-  } else {
-    disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-    myWorkshop->deactivateSubShapesSelection();
-
-    myWorkshop->viewer()->removeSelectionFilter(myEdgesTypeFilter);
-  }
-}
-
-//********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   activateShapeSelection();
@@ -214,23 +234,6 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::filterShapes(const NCollection_List<TopoDS_Shape>& theShapesToFilter,
-                                                  NCollection_List<TopoDS_Shape>& theResult)
-{
-  if(myTypeCombo->count() == 0 || theShapesToFilter.IsEmpty())
-    return;
-  TopAbs_ShapeEnum aReferenceType =
-      ModuleBase_WidgetShapeSelector::shapeType(myTypeCombo->currentText());
-  NCollection_List<TopoDS_Shape>::Iterator anIter(theShapesToFilter);
-  for (; anIter.More(); anIter.Next()) {
-    TopoDS_Shape aShape = anIter.Value();
-    if (aShape.IsNull() || aShape.ShapeType() != aReferenceType)
-      continue;
-    theResult.Append(aShape);
-  }
-}
-
-//********************************************************************
 void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum theShapeType)
 {
   QString aShapeTypeName;
@@ -239,11 +242,13 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
     aShapeTypeName = myTypeCombo->itemText(idx);
     TopAbs_ShapeEnum aRefType = ModuleBase_WidgetShapeSelector::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
-      activateSelection(false);
+      myIsActive = false;
+      activateShapeSelection();
       bool isBlocked = myTypeCombo->blockSignals(true);
       myTypeCombo->setCurrentIndex(idx);
+      myIsActive = true;
       myTypeCombo->blockSignals(isBlocked);
-      activateSelection(true);
+      activateShapeSelection();
       break;
     }
   }
@@ -251,21 +256,30 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const TopAbs_ShapeEnum 
 
 void ModuleBase_WidgetMultiSelector::activateShapeSelection()
 {
-  QString aNewType = myTypeCombo->currentText();
-  QIntList aList;
-  aList.append(ModuleBase_WidgetShapeSelector::shapeType(aNewType));
-  myWorkshop->activateSubShapesSelection(aList);
+  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
 
-  // it is necessary to filter the selected edges to be non-degenerated
-  // it is not possible to build naming name for such edges
-  if (aNewType == "Edges") {
-    myEdgesTypeFilter = new ModuleBase_FilterNoDegeneratedEdge();
-    ModuleBase_IViewer* aViewer = myWorkshop->viewer();
-    aViewer->addSelectionFilter(myEdgesTypeFilter);
+  if (myIsActive) {
+    QString aNewType = myTypeCombo->currentText();
+    QIntList aList;
+    aList.append(ModuleBase_WidgetShapeSelector::shapeType(aNewType));
+    myWorkshop->activateSubShapesSelection(aList);
+
+    // it is necessary to filter the selected edges to be non-degenerated
+    // it is not possible to build naming name for such edges
+    if (aNewType == "Edges") {
+      myEdgesTypeFilter = new ModuleBase_FilterNoDegeneratedEdge();
+      aViewer->addSelectionFilter(myEdgesTypeFilter);
+    }
+    else {
+      aViewer->removeSelectionFilter(myEdgesTypeFilter);
+    }
+
+  } else {
+    myWorkshop->deactivateSubShapesSelection();
+    aViewer->removeSelectionFilter(myEdgesTypeFilter);
   }
-  else {
-    myWorkshop->viewer()->removeSelectionFilter(myEdgesTypeFilter);
-  }
+
+  activateFilters(myWorkshop, myIsActive);
 }
 
 //********************************************************************

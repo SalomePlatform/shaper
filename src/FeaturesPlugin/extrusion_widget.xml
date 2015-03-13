@@ -1,15 +1,14 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <source>
-  <shape_selector id="extrusion_face"
-    label="Select a face"
+  <multi_selector id="group_list"
+    label="Select a sketch face"
     icon=":icons/sketch.png"
-    tooltip="Select a face"
-    activate="true"
-    shape_types="face"
-	  object_types="construction">
+    tooltip="Select a sketch face"
+    type_choice="Faces">
     <validator id="PartSet_SketchValidator"/>
-  </shape_selector>
+    <selection_filter id="SketchEntityFilter"/>
+  </multi_selector>
   <doublevalue
     id="extrusion_size"
     label="Size"

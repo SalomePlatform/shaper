@@ -48,6 +48,7 @@ SET(PROJECT_HEADERS
 	ModuleBase_PageBase.h
 	ModuleBase_PageWidget.h	
 	ModuleBase_PageGroupBox.h
+	ModuleBase_WidgetValidated.h
 )
 
 SET(PROJECT_SOURCES
@@ -86,6 +87,7 @@ SET(PROJECT_SOURCES
 	ModuleBase_PageBase.cpp
 	ModuleBase_PageWidget.cpp
 	ModuleBase_PageGroupBox.cpp
+	ModuleBase_WidgetValidated.cpp
 )
 
 SET(PROJECT_LIBRARIES

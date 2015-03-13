@@ -8,14 +8,13 @@
 #define ModuleBase_WidgetShapeSelector_H
 
 #include "ModuleBase.h"
-#include "ModuleBase_ModelWidget.h"
+#include "ModuleBase_WidgetValidated.h"
 #include "ModuleBase_ViewerFilters.h"
 
 #include <ModelAPI_Object.h>
 #include <GeomAPI_Shape.h>
 
 #include <TopAbs_ShapeEnum.hxx>
-#include <SelectMgr_ListOfFilter.hxx>
 
 #include <QStringList>
 
@@ -52,7 +51,7 @@ class ModuleBase_IWorkshop;
 *        which corresponds to ModelAPI_ResultConstruction object type
 * - concealment - hide or not hide selected object after operation
 */
-class MODULEBASE_EXPORT ModuleBase_WidgetShapeSelector : public ModuleBase_ModelWidget
+class MODULEBASE_EXPORT ModuleBase_WidgetShapeSelector : public ModuleBase_WidgetValidated
 {
 Q_OBJECT
  public:
@@ -124,12 +123,6 @@ Q_OBJECT
   /// \param theShape a shape
   virtual bool acceptSubShape(std::shared_ptr<GeomAPI_Shape> theShape) const;
 
-  /// Returns true if selected object corresponds to requested Object type
-  /// Thid method is used in any selection mode
-  /// \param theObject an object 
-  virtual bool acceptObjectType(const ObjectPtr theObject) const;
-
-
   // Set the given object as a value of the widget
   /// \param theObj an object 
   /// \param theShape a shape
@@ -142,12 +135,6 @@ Q_OBJECT
 
   /// Clear attribute
   void clearAttribute();
-
-  /// Fills the given list with all widget filters. It can be used by activation widget for the viewer
-  /// or by checking the selection parameter in addition to check validity of the selection argument
-  /// It creates an object type filter if it has not been created yet and save it in the class field
-  /// \param theFilters a list of filter
-  void selectionFilters(SelectMgr_ListOfFilter& theFilters);
 
   //----------- Class members -------------
  protected:
@@ -169,14 +156,8 @@ Q_OBJECT
   /// List of accepting shapes types
   QStringList myShapeTypes;
 
-  /// List of accepting object types
-  QStringList myObjectTypes;
-
   /// Active/inactive flag
   bool myIsActive;
-
-  /// Filter by objects types
-  Handle(ModuleBase_ObjectTypesFilter) myObjTypeFilter;
 };
 
 #endif

@@ -93,7 +93,7 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
                                                      ModuleBase_IWorkshop* theWorkshop,
                                                      const Config_WidgetAPI* theData,
                                                      const std::string& theParentId)
-    : ModuleBase_ModelWidget(theParent, theData, theParentId),
+    : ModuleBase_WidgetValidated(theParent, theData, theParentId),
       myWorkshop(theWorkshop), myIsActive(false)
 {
   QFormLayout* aLayout = new QFormLayout(this);
@@ -116,9 +116,6 @@ ModuleBase_WidgetShapeSelector::ModuleBase_WidgetShapeSelector(QWidget* theParen
 
   std::string aTypes = theData->getProperty("shape_types");
   myShapeTypes = QString(aTypes.c_str()).split(' ', QString::SkipEmptyParts);
-
-  std::string aObjTypes = theData->getProperty("object_types");
-  myObjectTypes = QString(aObjTypes.c_str()).split(' ', QString::SkipEmptyParts);
 }
 
 //********************************************************************
@@ -266,10 +263,6 @@ bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
   if (!aShape)
     return false;
 
-  /// Check that object has acceptable type
-  if (!acceptObjectType(aObject)) 
-    return false;
-
   // Get sub-shapes from local selection
   if (!theValue.shape().IsNull()) {
     aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape());
@@ -286,7 +279,7 @@ bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
   Handle(SelectMgr_EntityOwner) anOwner = theValue.owner();
   if (!anOwner.IsNull()) {
     SelectMgr_ListOfFilter aFilters;
-    selectionFilters(aFilters);
+    selectionFilters(myWorkshop, aFilters);
     SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
     for (; aIt.More(); aIt.Next()) {
       const Handle(SelectMgr_Filter)& aFilter = aIt.Value();
@@ -355,26 +348,6 @@ bool ModuleBase_WidgetShapeSelector::acceptSubShape(std::shared_ptr<GeomAPI_Shap
 }
 
 //********************************************************************
-bool ModuleBase_WidgetShapeSelector::acceptObjectType(const ObjectPtr theObject) const
-{
-  // Definition of types is not obligatory. If types are not defined then
-  // it means that accepted any type
-  if (myObjectTypes.isEmpty())
-    return true;
-
-  foreach (QString aType, myObjectTypes) {
-    if (aType.toLower() == "construction") {
-      ResultConstructionPtr aConstr = 
-        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
-      return (aConstr != NULL);
-    } // ToDo: Process other types of objects
-  }
-  // Object type is defined but not found
-  return false;
-}
-
-
-//********************************************************************
 void ModuleBase_WidgetShapeSelector::updateSelectionName()
 {
   DataPtr aData = myFeature->data();
@@ -406,62 +379,18 @@ void ModuleBase_WidgetShapeSelector::activateSelection(bool toActivate)
     return;
   myIsActive = toActivate;
   updateSelectionName();
-  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
 
   if (myIsActive) {
-    connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
     QIntList aList;
     foreach (QString aType, myShapeTypes) {
       aList.append(shapeType(aType));
     }
     myWorkshop->activateSubShapesSelection(aList);
   } else {
-    disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
     myWorkshop->deactivateSubShapesSelection();
   }
 
-  // the initial code is moved here in order to clear filters, it is possible, that it is excessive and 
-  // is performed outside
-  if (myIsActive && !myObjectTypes.isEmpty()) {
-    aViewer->clearSelectionFilters();
-  }
-  SelectMgr_ListOfFilter aFilters;
-  selectionFilters(aFilters);
-  SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
-  for (; aIt.More(); aIt.Next()) {
-    const Handle(SelectMgr_Filter)& aSelFilter = aIt.Value();
-    if (myIsActive)
-      aViewer->addSelectionFilter(aSelFilter);
-    else
-      aViewer->removeSelectionFilter(aSelFilter);
-  }
-  // the internal filter should be removed by the widget deactivation, it is done historically
-  if (!myIsActive && !myObjTypeFilter.IsNull()) {
-    myObjTypeFilter.Nullify();
-  }
-}
-
-//********************************************************************
-void ModuleBase_WidgetShapeSelector::selectionFilters(SelectMgr_ListOfFilter& theFilters)
-{
-  if (!myObjectTypes.isEmpty() && myObjTypeFilter.IsNull()) {
-    myObjTypeFilter = new ModuleBase_ObjectTypesFilter(myWorkshop, myObjectTypes);
-  }
-  if (!myObjTypeFilter.IsNull())
-    theFilters.Append(myObjTypeFilter);
-
-  // apply filters loaded from the XML definition of the widget
-  ModuleBase_FilterFactory* aFactory = myWorkshop->selectionFilters();
-  SelectMgr_ListOfFilter aFilters;
-  aFactory->filters(parentID(), attributeID(), aFilters);
-  SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
-  for (; aIt.More(); aIt.Next()) {
-    Handle(SelectMgr_Filter) aSelFilter = aIt.Value();
-    if (aSelFilter.IsNull())
-      continue;
-
-    theFilters.Append(aSelFilter);
-  }
+  activateFilters(myWorkshop, myIsActive);
 }
 
 //********************************************************************
@@ -484,6 +413,7 @@ void ModuleBase_WidgetShapeSelector::raisePanel() const
 //********************************************************************
 void ModuleBase_WidgetShapeSelector::activateCustom()
 {
+  connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   activateSelection(true);
 }
 
@@ -491,36 +421,24 @@ void ModuleBase_WidgetShapeSelector::activateCustom()
 void ModuleBase_WidgetShapeSelector::deactivate()
 {
   activateSelection(false);
+  disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
 }
 
 //********************************************************************
 bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape)
 {
+  bool isValid = ModuleBase_WidgetValidated::isValid(theObj, theShape);
+  if (!isValid)
+    return false;
+
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   std::list<ModelAPI_Validator*> aValidators;
   std::list<std::list<std::string> > anArguments;
   aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
 
-  // Check the type of selected object
-  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
-  bool isValid = true;
-  for (; aValidator != aValidators.end(); aValidator++) {
-    const ModelAPI_ResultValidator* aResValidator =
-        dynamic_cast<const ModelAPI_ResultValidator*>(*aValidator);
-    if (aResValidator) {
-      isValid = false;
-      if (aResValidator->isValid(theObj)) {
-        isValid = true;
-        break;
-      }
-    }
-  }
-  if (!isValid)
-    return false;
-
   // Check the acceptability of the object as attribute
-  aValidator = aValidators.begin();
+  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
   std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
   for (; aValidator != aValidators.end(); aValidator++, aArgs++) {
     const ModelAPI_RefAttrValidator* aAttrValidator =
