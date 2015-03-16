@@ -11,40 +11,17 @@
 #include <SketcherPrs_Perpendicular.h>
 #include <SketcherPrs_Rigid.h>
 
-
-AISObjectPtr SketcherPrs_Factory::coincidentConstraint(SketchPlugin_Constraint* theConstraint, 
-                                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane)
-{
-  std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
-  Handle(SketcherPrs_Coincident) aPrs = new SketcherPrs_Coincident(theConstraint, thePlane);
-  aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
-  return aAISObj;
+#define CONSTRAINT_PRS_IMPL(NAME, CLASS) \
+AISObjectPtr SketcherPrs_Factory::NAME(SketchPlugin_Constraint* theConstraint, \
+                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane) \
+{ \
+  std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject()); \
+  Handle(CLASS) aPrs = new CLASS(theConstraint, thePlane); \
+  aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs)); \
+  return aAISObj; \
 }
 
-
-AISObjectPtr SketcherPrs_Factory::parallelConstraint(SketchPlugin_Constraint* theConstraint, 
-                                                     const std::shared_ptr<GeomAPI_Ax3>& thePlane)
-{
-  std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
-  Handle(SketcherPrs_Parallel) aPrs = new SketcherPrs_Parallel(theConstraint, thePlane);
-  aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
-  return aAISObj;
-}
-
-AISObjectPtr SketcherPrs_Factory::perpendicularConstraint(SketchPlugin_Constraint* theConstraint, 
-                                                     const std::shared_ptr<GeomAPI_Ax3>& thePlane)
-{
-  std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
-  Handle(SketcherPrs_Perpendicular) aPrs = new SketcherPrs_Perpendicular(theConstraint, thePlane);
-  aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
-  return aAISObj;
-}
-
-AISObjectPtr SketcherPrs_Factory::rigidConstraint(SketchPlugin_Constraint* theConstraint, 
-                                                     const std::shared_ptr<GeomAPI_Ax3>& thePlane)
-{
-  std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
-  Handle(SketcherPrs_Rigid) aPrs = new SketcherPrs_Rigid(theConstraint, thePlane);
-  aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
-  return aAISObj;
-}
+CONSTRAINT_PRS_IMPL(coincidentConstraint, SketcherPrs_Coincident);
+CONSTRAINT_PRS_IMPL(parallelConstraint, SketcherPrs_Parallel);
+CONSTRAINT_PRS_IMPL(perpendicularConstraint, SketcherPrs_Perpendicular);
+CONSTRAINT_PRS_IMPL(rigidConstraint, SketcherPrs_Rigid)

@@ -14,6 +14,11 @@
 
 class SketchPlugin_Constraint;
 
+#define GET_CONSTRAINT_PRS(NAME) \
+  static AISObjectPtr NAME(SketchPlugin_Constraint* theConstraint, \
+                           const std::shared_ptr<GeomAPI_Ax3>& thePlane); \
+
+
 /**
 * Class which creates constraints presentations
 */
@@ -23,26 +28,22 @@ public:
   /// Creates coincedent constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
-  static AISObjectPtr coincidentConstraint(SketchPlugin_Constraint* theConstraint, 
-                                           const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+  GET_CONSTRAINT_PRS(coincidentConstraint)
 
   /// Creates coincedent parallel presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
-  static AISObjectPtr parallelConstraint(SketchPlugin_Constraint* theConstraint, 
-                                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+  GET_CONSTRAINT_PRS(parallelConstraint)
 
   /// Creates coincedent perpendicular presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
-  static AISObjectPtr perpendicularConstraint(SketchPlugin_Constraint* theConstraint, 
-                                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+  GET_CONSTRAINT_PRS(perpendicularConstraint)
 
   /// Creates coincedent perpendicular presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
-  static AISObjectPtr rigidConstraint(SketchPlugin_Constraint* theConstraint, 
-                                      const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+  GET_CONSTRAINT_PRS(rigidConstraint)
 };
 
 #endif
