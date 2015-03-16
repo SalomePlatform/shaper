@@ -143,7 +143,7 @@
       <feature id="SketchConstraintRigid" title="Fixed" tooltip="Fix an object" icon=":icons/fixed.png">
         <shape_selector id="ConstraintEntityA" label="Object" tooltip="Select an object" 
             shape_types="edge vertex">
-               <validator id="SketchPlugin_ResultPoint"/>
+            <validator id="SketchPlugin_ResultPoint"/>
             <validator id="SketchPlugin_ResultLine"/>
             <validator id="SketchPlugin_ResultArc"/>
         </shape_selector>

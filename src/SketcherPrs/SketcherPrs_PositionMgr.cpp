@@ -5,6 +5,7 @@
 // Author:      Vitaly SMETANNIKOV
 
 #include "SketcherPrs_PositionMgr.h"
+#include "SketcherPrs_Tools.h"
 
 #include <GeomAPI_Edge.h>
 
@@ -25,7 +26,7 @@ SketcherPrs_PositionMgr::SketcherPrs_PositionMgr()
 }
 
 
-int SketcherPrs_PositionMgr::getPositionIndex(std::shared_ptr<GeomAPI_Shape> theLine, 
+int SketcherPrs_PositionMgr::getPositionIndex(ObjectPtr theLine, 
                                               Handle(SketcherPrs_SymbolPrs) thePrs)
 {
   if (myShapes.count(theLine) == 1) {
@@ -45,11 +46,12 @@ int SketcherPrs_PositionMgr::getPositionIndex(std::shared_ptr<GeomAPI_Shape> the
   }
 }
 
-gp_Pnt SketcherPrs_PositionMgr::getPosition(std::shared_ptr<GeomAPI_Shape> theLine, 
+gp_Pnt SketcherPrs_PositionMgr::getPosition(ObjectPtr theLine, 
                                             Handle(SketcherPrs_SymbolPrs) thePrs)
 {
+  std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getLine(theLine);
   std::shared_ptr<GeomAPI_Edge> aEdge = 
-    std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(theLine));
+    std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aShape));
 
   std::shared_ptr<GeomAPI_Pnt> aPnt1 = aEdge->firstPoint();
   std::shared_ptr<GeomAPI_Pnt> aPnt2 = aEdge->lastPoint();
@@ -96,7 +98,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPosition(std::shared_ptr<GeomAPI_Shape> theLi
 
 void SketcherPrs_PositionMgr::deleteConstraint(Handle(SketcherPrs_SymbolPrs) thePrs)
 {
-  std::map<std::shared_ptr<GeomAPI_Shape>, PositionsMap>::iterator aIt;
+  std::map<ObjectPtr, PositionsMap>::iterator aIt;
   for (aIt = myShapes.begin(); aIt != myShapes.end(); ++aIt) {
     PositionsMap& aPosMap = aIt->second;
     if (aPosMap.count(thePrs.Access()) > 0) 

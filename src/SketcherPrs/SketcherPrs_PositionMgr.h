@@ -11,6 +11,7 @@
 
 #include <GeomAPI_Shape.h>
 #include <gp_Pnt.hxx>
+#include <ModelAPI_Object.h>
 
 #include <map>
 
@@ -28,7 +29,7 @@ public:
   /// Returns position of symbol for the given presentation
   /// \param theLine constrained object 
   /// \param thePrs a presentation of constraint
-  gp_Pnt getPosition(std::shared_ptr<GeomAPI_Shape> theLine, Handle(SketcherPrs_SymbolPrs) thePrs);
+  gp_Pnt getPosition(ObjectPtr theLine, Handle(SketcherPrs_SymbolPrs) thePrs);
 
   /// Deletes constraint object from internal structures. Has to be called on constraint delete.
   /// \param thePrs a constraint presentation
@@ -41,7 +42,7 @@ private:
   /// Returns position index of the given constraint
   /// \param theLine constrained object 
   /// \param thePrs a presentation of constraint
-  int getPositionIndex(std::shared_ptr<GeomAPI_Shape> theLine, Handle(SketcherPrs_SymbolPrs) thePrs);
+  int getPositionIndex(ObjectPtr theLine, Handle(SketcherPrs_SymbolPrs) thePrs);
 
 private:
   typedef std::map<void*, int> PositionsMap;
@@ -50,7 +51,7 @@ private:
   PositionsMap myIndexes;
 
   /// The map contains position index 
-  std::map<std::shared_ptr<GeomAPI_Shape>, PositionsMap> myShapes;
+  std::map<ObjectPtr, PositionsMap> myShapes;
 };
 
 #endif

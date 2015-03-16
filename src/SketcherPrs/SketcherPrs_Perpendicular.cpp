@@ -42,7 +42,7 @@ SketcherPrs_Perpendicular::SketcherPrs_Perpendicular(SketchPlugin_Constraint* th
 {
   myPntArray = new Graphic3d_ArrayOfPoints(2);
   myPntArray->AddVertex(0., 0., 0.);
-  myPntArray->AddVertex(0. ,0., 0.);
+  myPntArray->AddVertex(0., 0., 0.);
 }  
 
 void SketcherPrs_Perpendicular::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
@@ -51,17 +51,20 @@ void SketcherPrs_Perpendicular::Compute(const Handle(PrsMgr_PresentationManager3
 {
   prepareAspect();
 
-  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getLine(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aObj2 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
+
+  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getLine(aObj1);
   if (aLine1.get() == NULL)
     return;
 
-  std::shared_ptr<GeomAPI_Shape> aLine2 = SketcherPrs_Tools::getLine(myConstraint, SketchPlugin_Constraint::ENTITY_B());
+  std::shared_ptr<GeomAPI_Shape> aLine2 = SketcherPrs_Tools::getLine(aObj2);
   if (aLine2.get() == NULL)
     return;
 
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
-  gp_Pnt aP1 = aMgr->getPosition(aLine1, this);
-  gp_Pnt aP2 = aMgr->getPosition(aLine2, this);
+  gp_Pnt aP1 = aMgr->getPosition(aObj1, this);
+  gp_Pnt aP2 = aMgr->getPosition(aObj2, this);
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
   aGroup->SetPrimitivesAspect(myAspect);

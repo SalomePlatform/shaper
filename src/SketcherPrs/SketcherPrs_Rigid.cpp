@@ -55,12 +55,13 @@ void SketcherPrs_Rigid::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 {
   prepareAspect();
 
-  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getLine(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getLine(aObj1);
   if (aLine1.get() == NULL)
     return;
 
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
-  gp_Pnt aP1 = aMgr->getPosition(aLine1, this);
+  gp_Pnt aP1 = aMgr->getPosition(aObj1, this);
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
   aGroup->SetPrimitivesAspect(myAspect);

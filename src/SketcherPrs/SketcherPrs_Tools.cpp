@@ -17,16 +17,19 @@
 
 namespace SketcherPrs_Tools {
 
-
-std::shared_ptr<GeomAPI_Shape> getLine(SketchPlugin_Constraint* theFeature,
-                                      const std::string& theAttrName)
+ObjectPtr getResult(SketchPlugin_Constraint* theFeature, const std::string& theAttrName)
 {
   std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
   std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr = 
     std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aData->attribute(theAttrName));
 
-  ObjectPtr aObject = anAttr->object();
-  ResultConstructionPtr aRes = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObject);
+  return anAttr->object();
+}
+
+
+std::shared_ptr<GeomAPI_Shape> getLine(ObjectPtr theObject)
+{
+  ResultConstructionPtr aRes = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
   if (aRes.get() != NULL) {
     return aRes->shape();
   }
