@@ -11,6 +11,10 @@
 
 #include <Graphic3d_ArrayOfSegments.hxx>
 
+#include <SelectMgr_Selection.hxx>
+#include <SelectMgr_EntityOwner.hxx>
+#include <Select3D_SensitivePoint.hxx>
+
 
 #ifdef WIN32
 # define FSEP "\\"
@@ -78,4 +82,46 @@ void SketcherPrs_SymbolPrs::addLine(const Handle(Graphic3d_Group)& theGroup, std
   aLines->AddVertex(aPnt1->impl<gp_Pnt>());
   aLines->AddVertex(aPnt2->impl<gp_Pnt>());
   theGroup->AddPrimitiveArray(aLines);
+}
+
+void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
+                                           const SelectMgr_SequenceOfOwner& theOwners)
+{
+
+  Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( thePM );
+  aSelectionPrs->Clear();
+  drawLines(aSelectionPrs, Quantity_NOC_WHITE);
+
+  aSelectionPrs->SetDisplayPriority(9);
+  aSelectionPrs->Display();
+  thePM->Highlight(this);
+}
+
+void SketcherPrs_SymbolPrs::HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM, 
+                                                 const Quantity_NameOfColor theColor, const Handle(SelectMgr_EntityOwner)& theOwner)
+{
+  thePM->Color(this, theColor);
+
+  Handle( Prs3d_Presentation ) aHilightPrs = GetHilightPresentation( thePM );
+  aHilightPrs->Clear();
+  drawLines(aHilightPrs, theColor);
+
+  if (thePM->IsImmediateModeOn())
+    thePM->AddToImmediateList(aHilightPrs);
+}
+
+
+
+void SketcherPrs_SymbolPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
+                                            const Standard_Integer aMode)
+{
+  ClearSelected();
+
+  if (!myPntArray.IsNull()) {
+    Handle(SelectMgr_EntityOwner) aOwn = new SelectMgr_EntityOwner(this);
+    for (int i = 1; i <= myPntArray->VertexNumber(); i++) {
+      Handle(Select3D_SensitivePoint) aSP = new Select3D_SensitivePoint(aOwn, myPntArray->Vertice(i));
+      aSelection->Add(aSP);
+    }
+  }
 }

@@ -9,6 +9,7 @@ SET(PROJECT_HEADERS
     SketcherPrs_Perpendicular.h
     SketcherPrs_SymbolPrs.h
 	SketcherPrs_PositionMgr.h
+	SketcherPrs_Rigid.h
 )
 
 SET(PROJECT_SOURCES
@@ -19,6 +20,7 @@ SET(PROJECT_SOURCES
     SketcherPrs_Perpendicular.cpp
     SketcherPrs_SymbolPrs.cpp
 	SketcherPrs_PositionMgr.cpp
+	SketcherPrs_Rigid.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -35,6 +37,7 @@ SET(PROJECT_LIBRARIES
 SET(PROJECT_PICTURES
     icons/parallel.png
     icons/perpendicular.png
+	icons/anchor.png
 )
 
 ADD_DEFINITIONS(-DCONSTRAINTS_EXPORTS ${CAS_DEFINITIONS})

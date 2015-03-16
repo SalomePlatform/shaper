@@ -1,10 +1,10 @@
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
-// File:        SketcherPrs_Perpendicular.cpp
-// Created:     12 March 2015
+// File:        SketcherPrs_Rigid.cpp
+// Created:     16 February 2015
 // Author:      Vitaly SMETANNIKOV
 
-#include "SketcherPrs_Perpendicular.h"
+#include "SketcherPrs_Rigid.h"
 #include "SketcherPrs_Tools.h"
 #include "SketcherPrs_PositionMgr.h"
 
@@ -24,28 +24,32 @@
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Graphic3d_ArrayOfSegments.hxx>
 
+#include <Select3D_SensitivePoint.hxx>
+#include <Select3D_SensitiveSegment.hxx>
 
-// Function which is defined in SketchPlugin_ConstraintDistance.cpp
+#include <SelectMgr_SequenceOfOwner.hxx>
+#include <SelectMgr_Selection.hxx>
+#include <SelectMgr_EntityOwner.hxx>
+
+
 extern std::shared_ptr<GeomAPI_Pnt2d> getFeaturePoint(DataPtr theData,
                                                       const std::string& theAttribute);
 
 
-
-IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Perpendicular, SketcherPrs_SymbolPrs);
-IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Perpendicular, SketcherPrs_SymbolPrs);
+IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Rigid, SketcherPrs_SymbolPrs);
+IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Rigid, SketcherPrs_SymbolPrs);
 
 static Handle(Image_AlienPixMap) MyPixMap;
 
-SketcherPrs_Perpendicular::SketcherPrs_Perpendicular(SketchPlugin_Constraint* theConstraint, 
-                                                     const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
+SketcherPrs_Rigid::SketcherPrs_Rigid(SketchPlugin_Constraint* theConstraint, 
+                                           const std::shared_ptr<GeomAPI_Ax3>& thePlane) 
  : SketcherPrs_SymbolPrs(theConstraint, thePlane)
 {
-  myPntArray = new Graphic3d_ArrayOfPoints(2);
+  myPntArray = new Graphic3d_ArrayOfPoints(1);
   myPntArray->AddVertex(0., 0., 0.);
-  myPntArray->AddVertex(0. ,0., 0.);
 }  
 
-void SketcherPrs_Perpendicular::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
+void SketcherPrs_Rigid::Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
                                    const Handle(Prs3d_Presentation)& thePresentation, 
                                    const Standard_Integer theMode)
 {
@@ -55,22 +59,16 @@ void SketcherPrs_Perpendicular::Compute(const Handle(PrsMgr_PresentationManager3
   if (aLine1.get() == NULL)
     return;
 
-  std::shared_ptr<GeomAPI_Shape> aLine2 = SketcherPrs_Tools::getLine(myConstraint, SketchPlugin_Constraint::ENTITY_B());
-  if (aLine2.get() == NULL)
-    return;
-
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
   gp_Pnt aP1 = aMgr->getPosition(aLine1, this);
-  gp_Pnt aP2 = aMgr->getPosition(aLine2, this);
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
   aGroup->SetPrimitivesAspect(myAspect);
   myPntArray->SetVertice(1, aP1);
-  myPntArray->SetVertice(2, aP2);
   aGroup->AddPrimitiveArray(myPntArray);
 }
 
-void SketcherPrs_Perpendicular::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const
+void SketcherPrs_Rigid::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const
 {
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
 
@@ -78,6 +76,5 @@ void SketcherPrs_Perpendicular::drawLines(const Handle(Prs3d_Presentation)& theP
   aGroup->SetPrimitivesAspect(aLineAspect);
 
   addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
-  addLine(aGroup, SketchPlugin_Constraint::ENTITY_B());
 }
 

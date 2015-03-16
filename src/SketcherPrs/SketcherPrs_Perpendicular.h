@@ -28,33 +28,18 @@ public:
   Standard_EXPORT SketcherPrs_Perpendicular(SketchPlugin_Constraint* theConstraint, 
                                        const std::shared_ptr<GeomAPI_Ax3>& thePlane);
 
-  //! Method which draws selected owners ( for fast presentation draw )
-  Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
-                                               const SelectMgr_SequenceOfOwner& theOwners);
-  
-  //! Method which hilight an owner belonging to
-  //! this selectable object  ( for fast presentation draw )
-  Standard_EXPORT virtual void HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM, 
-                                                     const Quantity_NameOfColor theColor, const Handle(SelectMgr_EntityOwner)& theOwner);
-
-
   DEFINE_STANDARD_RTTI(SketcherPrs_Perpendicular)
 protected:
   /// Redefinition of virtual function
   Standard_EXPORT virtual void Compute(const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
     const Handle(Prs3d_Presentation)& thePresentation, const Standard_Integer theMode = 0);
 
-  /// Redefinition of virtual function
-  Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
-    const Standard_Integer aMode) ;
-
   virtual const char* iconName() const { return "perpendicular.png"; }
 
-private:
-
-  void drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const;
-
-  Handle(Graphic3d_ArrayOfPoints) myPntArray;
+  /// Redefine this function in order to add additiona lines of constraint base
+  /// \param thePrs a presentation
+  /// \param theColor a color of additiona lines
+  virtual void drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const;
 };
 
 #endif

@@ -9,6 +9,7 @@
 #include <SketcherPrs_Coincident.h>
 #include <SketcherPrs_Parallel.h>
 #include <SketcherPrs_Perpendicular.h>
+#include <SketcherPrs_Rigid.h>
 
 
 AISObjectPtr SketcherPrs_Factory::coincidentConstraint(SketchPlugin_Constraint* theConstraint, 
@@ -35,6 +36,15 @@ AISObjectPtr SketcherPrs_Factory::perpendicularConstraint(SketchPlugin_Constrain
 {
   std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
   Handle(SketcherPrs_Perpendicular) aPrs = new SketcherPrs_Perpendicular(theConstraint, thePlane);
+  aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
+  return aAISObj;
+}
+
+AISObjectPtr SketcherPrs_Factory::rigidConstraint(SketchPlugin_Constraint* theConstraint, 
+                                                     const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+{
+  std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
+  Handle(SketcherPrs_Rigid) aPrs = new SketcherPrs_Rigid(theConstraint, thePlane);
   aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
   return aAISObj;
 }

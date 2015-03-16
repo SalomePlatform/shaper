@@ -75,45 +75,6 @@ void SketcherPrs_Parallel::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   aGroup->AddPrimitiveArray(myPntArray);
 }
 
-void SketcherPrs_Parallel::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
-                                            const Standard_Integer aMode)
-{
-  ClearSelected();
-
-  Handle(SelectMgr_EntityOwner) aOwn = new SelectMgr_EntityOwner(this);
-  Handle(Select3D_SensitivePoint) aSP1 = new Select3D_SensitivePoint(aOwn, myPntArray->Vertice(1));
-  Handle(Select3D_SensitivePoint) aSP2 = new Select3D_SensitivePoint(aOwn, myPntArray->Vertice(2));
-  aSelection->Add(aSP1);
-  aSelection->Add(aSP2);
-}
-
-void SketcherPrs_Parallel::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
-                                           const SelectMgr_SequenceOfOwner& theOwners)
-{
-
-  Handle( Prs3d_Presentation ) aSelectionPrs = GetSelectPresentation( thePM );
-  aSelectionPrs->Clear();
-  drawLines(aSelectionPrs, Quantity_NOC_WHITE);
-
-  aSelectionPrs->SetDisplayPriority(9);
-  aSelectionPrs->Display();
-  thePM->Highlight(this);
-}
-
-void SketcherPrs_Parallel::HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM, 
-                                                 const Quantity_NameOfColor theColor, const Handle(SelectMgr_EntityOwner)& theOwner)
-{
-  thePM->Color(this, theColor);
-
-  Handle( Prs3d_Presentation ) aHilightPrs = GetHilightPresentation( thePM );
-  aHilightPrs->Clear();
-  drawLines(aHilightPrs, theColor);
-
-  if (thePM->IsImmediateModeOn())
-    thePM->AddToImmediateList(aHilightPrs);
-}
-
-
 void SketcherPrs_Parallel::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const
 {
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);

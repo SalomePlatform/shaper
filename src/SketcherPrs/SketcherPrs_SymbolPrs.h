@@ -38,6 +38,16 @@ public:
   //! to this selectable object ( for fast presentation draw )
   Standard_EXPORT virtual void ClearSelected();
 
+
+  //! Method which draws selected owners ( for fast presentation draw )
+  Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM, 
+                                               const SelectMgr_SequenceOfOwner& theOwners);
+  
+  //! Method which hilight an owner belonging to
+  //! this selectable object  ( for fast presentation draw )
+  Standard_EXPORT virtual void HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM, 
+                                                     const Quantity_NameOfColor theColor, const Handle(SelectMgr_EntityOwner)& theOwner);
+
   Standard_EXPORT std::shared_ptr<GeomAPI_Ax3> plane() const { return myPlane; }
 
   Standard_EXPORT SketchPlugin_Constraint* feature() const { return myConstraint; }
@@ -45,6 +55,11 @@ public:
   DEFINE_STANDARD_RTTI(SketcherPrs_SymbolPrs)
 
 protected:
+
+  /// Redefinition of virtual function
+  Standard_EXPORT virtual void ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
+    const Standard_Integer aMode);
+
   /// Returns an icon file name. Has to be redefined in successors
   virtual const char* iconName() const = 0;
 
@@ -60,6 +75,11 @@ protected:
   /// \param theAttrName an attribute name which corresponds to referenced line
   void addLine(const Handle(Graphic3d_Group)& theGroup, std::string theAttrName) const;
 
+  /// Redefine this function in order to add additiona lines of constraint base
+  /// \param thePrs a presentation
+  /// \param theColor a color of additiona lines
+  virtual void drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const {}
+
 protected:
   /// Constraint feature
   SketchPlugin_Constraint* myConstraint;
@@ -70,9 +90,13 @@ protected:
   /// Aspect for entities drawing
   Handle(Graphic3d_AspectMarker3d) myAspect;
 
+  /// Array of symbols positions
+  Handle(Graphic3d_ArrayOfPoints) myPntArray;
+
 private: 
   /// Static map to collect constraints icons {IconName : IconPixMap}
   static std::map<const char*, Handle(Image_AlienPixMap)> myIconsMap;
+
 };
 
 #endif
