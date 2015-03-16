@@ -30,5 +30,7 @@
      <file>icons/fixed.png</file>
      <file>icons/placement.png</file>
      <file>icons/geom_export.png</file>
+     <file>icons/horisontal.png</file>
+     <file>icons/vertical.png</file>
  </qresource>
  </RCC>

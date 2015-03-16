@@ -419,8 +419,8 @@ void PartSet_Module::onOperationActivatedByPreselection()
 void PartSet_Module::onNoMoreWidgets()
 {
   ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
-    if (anOperation) {
+  if (anOperation) {
+    if (PartSet_SketcherMgr::isNestedSketchOperation(anOperation)) {
       if (myRestartingMode != RM_Forbided)
         myRestartingMode = RM_LastFeatureUsed;
       anOperation->commit();
