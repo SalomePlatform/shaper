@@ -13,11 +13,13 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_ConstraintVertical.h>
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Data.h>
@@ -194,6 +196,22 @@ const int& SketchSolver_Constraint::getType(
     }
     if (aNbAttrs == 1)
       myType = SLVS_C_WHERE_DRAGGED;
+    return getType();
+  }
+
+  // Constraint for horizontal/vertical line
+  bool isHorizontal = (aConstraintKind.compare(SketchPlugin_ConstraintHorizontal::ID()) == 0);
+  bool isVertical = (aConstraintKind.compare(SketchPlugin_ConstraintVertical::ID()) == 0);
+  if (isHorizontal || isVertical) {
+    int aNbEntities = 2;  // lines in SolveSpace constraints should start from SketchPlugin_Constraint::ENTITY_C() attribute
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
+      std::shared_ptr<ModelAPI_Attribute> anAttr = 
+          aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+      if (typeOfAttribute(anAttr) == LINE)
+        myAttributesList[aNbEntities++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
+    }
+    if (aNbEntities == 3)
+      myType = isHorizontal ? SLVS_C_HORIZONTAL : SLVS_C_VERTICAL;
     return getType();
   }
 
