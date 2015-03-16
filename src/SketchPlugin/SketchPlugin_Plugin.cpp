@@ -8,11 +8,14 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintEqual.h>
+#include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_ConstraintVertical.h>
 #include <SketchPlugin_Validators.h>
 #include <SketchPlugin_ResultValidators.h>
 #include <SketchPlugin_ShapeValidator.h>
@@ -109,6 +112,12 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintRadius);
   } else if (theFeatureID == SketchPlugin_ConstraintRigid::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintRigid);
+  } else if (theFeatureID == SketchPlugin_ConstraintHorizontal::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintHorizontal);
+  } else if (theFeatureID == SketchPlugin_ConstraintVertical::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintVertical);
+  } else if (theFeatureID == SketchPlugin_ConstraintEqual::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintEqual);
   }
   // feature of such kind is not found
   return FeaturePtr();
@@ -153,6 +162,9 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_ConstraintPerpendicular::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintRadius::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintRigid::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintHorizontal::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintVertical::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintEqual::ID(), aHasSketchPlane);
     }
   }
   return aMsg;
