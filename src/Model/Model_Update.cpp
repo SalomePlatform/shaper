@@ -51,7 +51,8 @@ Model_Update::Model_Update()
 
   Config_PropManager::registerProp("Model update", "automatic_rebuild", "Rebuild immediately",
                                    Config_Prop::Bool, "false");
-  isAutomatic = Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
+  myIsAutomatic =
+    Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
 }
 
 void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessage)
@@ -67,21 +68,30 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static const Events_ID kOpStartEvent = aLoop->eventByName("StartOperation");
   bool isAutomaticChanged = false;
   if (theMessage->eventID() == kChangedEvent) { // automatic and manual rebuild flag is changed
-    isAutomatic = 
+    bool aPropVal =
       Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
+    if (aPropVal == myIsAutomatic)
+      return; // nothing is changed, so nithing to do
+    myIsAutomatic = aPropVal;
+    if (!myIsAutomatic)
+      return; // less automatization => nothing to do
   } else if (theMessage->eventID() == kRebuildEvent) { // the rebuild command
-    if (isAutomatic == false) {
+    if (myIsAutomatic == false) {
       isAutomaticChanged = true;
-      isAutomatic = true;
+      myIsAutomatic = true;
     }
   } else if (theMessage->eventID() == kCreatedEvent || theMessage->eventID() == kUpdatedEvent ||
-    theMessage->eventID() == kMovedEvent) {
+             theMessage->eventID() == kMovedEvent) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     const std::set<ObjectPtr>& anObjs = aMsg->objects();
     std::set<ObjectPtr>::const_iterator anObjIter = anObjs.cbegin();
     for(; anObjIter != anObjs.cend(); anObjIter++) {
       myJustCreatedOrUpdated.insert(*anObjIter);
+      // created objects are always must be up to date (python box feature)
+      // and updated not in internal uptation chain
+      if (!myIsExecuted || theMessage->eventID() == kCreatedEvent)
+        myInitial.insert(*anObjIter);
       // TODO(mpv): check the next line. Came into dev 0.6.1 from BR_PYTHON_PLUGIN
       // (*anObjIter)->data()->mustBeUpdated(true); // object must be updated because it was changed
     }
@@ -89,11 +99,12 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       return; // this event is for solver update, not here
   } else if (theMessage->eventID() == kOpStartEvent) {
     myJustCreatedOrUpdated.clear();
+    myInitial.clear();
     return; // we don't need the update only on operation start (caused problems in PartSet_Listener::processEvent)
   } else if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent) {
-    if (isAutomatic == false) { // Apply button now works as "Rebuild"
+    if (myIsAutomatic == false) { // Apply button now works as "Rebuild"
       isAutomaticChanged = true;
-      isAutomatic = true;
+      myIsAutomatic = true;
     }
     // the hardcode (DBC asked): hide the sketch referenced by extrusion on apply
     if (theMessage->eventID() == kOpFinishEvent) {
@@ -114,17 +125,11 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     }
   }
 
-  if (isExecuted)
+  if (myIsExecuted)
     return;  // nothing to do: it is executed now
 
   //Events_LongOp::start(this);
-  isExecuted = true;
-  std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aMsg =
-      std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
-  if (aMsg) myInitial = aMsg->objects();
-  else {
-    myInitial.clear();
-  }
+  myIsExecuted = true;
   // iterate all documents: features in Root first, then - subs
   updateInDoc(ModelAPI_Session::get()->moduleDocument());
 
@@ -133,13 +138,14 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   aLoop->flush(EVENT_DISP);
   //Events_LongOp::end(this);
-  if (isAutomaticChanged) isAutomatic = false;
+  if (isAutomaticChanged) myIsAutomatic = false;
 
   if (theMessage->eventID() == kOpFinishEvent || theMessage->eventID() == kOpAbortEvent) {
     myJustCreatedOrUpdated.clear();
+    myInitial.clear();
   }
 
-  isExecuted = false;
+  myIsExecuted = false;
 }
 
 void Model_Update::updateInDoc(std::shared_ptr<ModelAPI_Document> theDoc)
@@ -242,7 +248,7 @@ bool Model_Update::updateFeature(FeaturePtr theFeature)
       if (std::dynamic_pointer_cast<Model_Document>(theFeature->document())->executeFeatures() ||
           !theFeature->isPersistentResult()) {
         if (aFactory->validate(theFeature)) {
-          if (isAutomatic || 
+          if (myIsAutomatic || 
               (myJustCreatedOrUpdated.find(theFeature) != myJustCreatedOrUpdated.end()) ||
               !theFeature->isPersistentResult() /* execute quick, not persistent results */) 
           {
