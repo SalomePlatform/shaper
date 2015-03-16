@@ -8,6 +8,7 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintParallel.h>
@@ -115,6 +116,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(string theFeatureID)
     return FeaturePtr(new SketchPlugin_ConstraintHorizontal);
   } else if (theFeatureID == SketchPlugin_ConstraintVertical::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintVertical);
+  } else if (theFeatureID == SketchPlugin_ConstraintEqual::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintEqual);
   }
   // feature of such kind is not found
   return FeaturePtr();
@@ -161,6 +164,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_ConstraintRigid::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintHorizontal::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintVertical::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintEqual::ID(), aHasSketchPlane);
     }
   }
   return aMsg;

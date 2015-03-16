@@ -24,6 +24,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintRigid.h
     SketchPlugin_ConstraintHorizontal.h
     SketchPlugin_ConstraintVertical.h
+    SketchPlugin_ConstraintEqual.h
     SketchPlugin_ShapeValidator.h
     SketchPlugin_Validators.h
     SketchPlugin_ResultValidators.h 
@@ -48,6 +49,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintRigid.cpp
     SketchPlugin_ConstraintHorizontal.cpp
     SketchPlugin_ConstraintVertical.cpp
+    SketchPlugin_ConstraintEqual.cpp
     SketchPlugin_ShapeValidator.cpp
     SketchPlugin_Validators.cpp
     SketchPlugin_ResultValidators.cpp

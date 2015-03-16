@@ -5,7 +5,7 @@
     <group id="Basic">
       <feature
         id="Sketch"
-        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical"
+        nested="SketchPoint SketchLine SketchCircle SketchArc SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintParallel SketchConstraintPerpendicular SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical SketchConstraintEqual"
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create a new sketch"
@@ -161,6 +161,16 @@
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
             label="Line" tooltip="Select a line" shape_types="edge">
             <selection_filter id="EdgeFilter" parameters="line"/>
+        </sketch_constraint_shape_selector>
+      </feature>
+    <!--  SketchConstraintEqual  -->
+      <feature id="SketchConstraintEqual" title="Equal" tooltip="Create constraint defining equality of two objects">
+        <sketch_constraint_shape_selector id="ConstraintEntityA" 
+            label="First object" tooltip="Select line, circle or arc" shape_types="edge">
+        </sketch_constraint_shape_selector>
+        
+        <sketch_constraint_shape_selector id="ConstraintEntityB"
+            label="Last object" tooltip="Select line, circle or arc" shape_types="edge">
         </sketch_constraint_shape_selector>
       </feature>
     </group>

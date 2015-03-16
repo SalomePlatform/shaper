@@ -13,6 +13,7 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintDistance.h>
+#include <SketchPlugin_ConstraintEqual.h>
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintParallel.h>
@@ -212,6 +213,32 @@ const int& SketchSolver_Constraint::getType(
     }
     if (aNbEntities == 3)
       myType = isHorizontal ? SLVS_C_HORIZONTAL : SLVS_C_VERTICAL;
+    return getType();
+  }
+
+  if (aConstraintKind.compare(SketchPlugin_ConstraintEqual::ID()) == 0)
+  {
+    static const int aConstrType[3] = {
+        SLVS_C_EQUAL_RADIUS,
+        SLVS_C_EQUAL_LINE_ARC_LEN,
+        SLVS_C_EQUAL_LENGTH_LINES
+    };
+    int aNbLines = 0;
+    int aNbEntities = 2;  // lines and circles in SolveSpace constraints should start from SketchPlugin_Constraint::ENTITY_C() attribute
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
+      std::shared_ptr<ModelAPI_Attribute> anAttr = 
+          aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+      AttrType aType = typeOfAttribute(anAttr);
+      if (aType == LINE)
+      {
+        myAttributesList[aNbEntities++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
+        aNbLines++;
+      }
+      else if (aType == CIRCLE || aType == ARC)
+        myAttributesList[aNbEntities++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
+    }
+    if (aNbEntities == 4)
+      myType = aConstrType[aNbLines];
     return getType();
   }
 
