@@ -548,8 +548,12 @@ FeaturePtr Model_Document::addFeature(std::string theID)
   FeaturePtr aFeature = ModelAPI_Session::get()->createFeature(theID);
   if (!aFeature)
     return aFeature;
-  std::shared_ptr<Model_Document> aDocToAdd = std::dynamic_pointer_cast<Model_Document>(
-      aFeature->documentToAdd());
+  Model_Document* aDocToAdd;
+  if (aFeature->documentToAdd().get()) { // use the customized document to add
+    aDocToAdd = std::dynamic_pointer_cast<Model_Document>(aFeature->documentToAdd()).get();
+  } else { // if customized is not presented, add to "this" document
+    aDocToAdd = this;
+  }
   if (aFeature) {
     TDF_Label aFeatureLab;
     if (!aFeature->isAction()) {  // do not add action to the data model
@@ -577,7 +581,7 @@ FeaturePtr Model_Document::addFeature(std::string theID)
 }
 
 /// Appenad to the array of references a new referenced label.
-/// If theIndex is not -1, removes element at thisindex, not theReferenced.
+/// If theIndex is not -1, removes element at this index, not theReferenced.
 /// \returns the index of removed element
 static int RemoveFromRefArray(TDF_Label theArrayLab, TDF_Label theReferenced, const int theIndex =
                                   -1)
@@ -682,6 +686,22 @@ void Model_Document::removeFeature(FeaturePtr theFeature/*, const bool theCheck*
     }
     // event: feature is deleted
     ModelAPI_EventCreator::get()->sendDeleted(theFeature->document(), ModelAPI_Feature::group());
+  }
+}
+
+void Model_Document::addToHistory(const std::shared_ptr<ModelAPI_Object> theObject)
+{
+  TDF_Label aFeaturesLab = featuresLabel();
+  std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theObject->data());
+  if (!aData) {
+      return;  // not found feature => do not remove
+  }
+  TDF_Label aFeatureLabel = aData->label().Father();
+  // store feature in the history of features array
+  if (theObject->isInHistory()) {
+    AddToRefArray(aFeaturesLab, aFeatureLabel);
+  } else {
+    RemoveFromRefArray(aFeaturesLab, aFeatureLabel);
   }
 }
 

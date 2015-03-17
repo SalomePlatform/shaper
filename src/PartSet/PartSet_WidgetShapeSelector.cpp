@@ -15,36 +15,38 @@
 #include <PartSet_Tools.h>
 #include <SketchPlugin_Feature.h>
 
-
-bool PartSet_WidgetShapeSelector::storeValueCustom() const
+bool PartSet_WidgetShapeSelector::storeAttributeValues(ObjectPtr theSelectedObject, GeomShapePtr theShape) const
 {
-  if (!mySelectedObject)
+  ObjectPtr aSelectedObject = theSelectedObject;
+  GeomShapePtr aShape = theShape;
+
+  if (!aSelectedObject)
     return false;
 
-  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(mySelectedObject);
+  FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(aSelectedObject);
   if (aSelectedFeature == myFeature)  // In order to avoid selection of the same object
     return false;
   std::shared_ptr<SketchPlugin_Feature> aSPFeature = 
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aSelectedFeature);
-  if ((!aSPFeature) && (!myShape->isNull())) {
+  if ((!aSPFeature) && (!aShape->isNull())) {
     // Processing of external (non-sketch) object
-    ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(myShape->impl<TopoDS_Shape>(),
-                                                                mySelectedObject, mySketch);
+    ObjectPtr aObj = PartSet_Tools::createFixedObjectByExternal(aShape->impl<TopoDS_Shape>(),
+                                                                aSelectedObject, mySketch);
     if (aObj) {
       PartSet_WidgetShapeSelector* that = (PartSet_WidgetShapeSelector*) this;
-      that->mySelectedObject = aObj;
+      aSelectedObject = aObj;
     } else 
       return false;
   } else {
     // Processing of sketch object
     DataPtr aData = myFeature->data();
-    if (myShape) {
+    if (aShape) {
       AttributePtr aAttr = aData->attribute(attributeID());
       AttributeRefAttrPtr aRefAttr = 
         std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aAttr);
       if (aRefAttr) {
-        TopoDS_Shape aShape = myShape->impl<TopoDS_Shape>();
-        AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(mySelectedObject, aShape, mySketch);
+        TopoDS_Shape aTDSShape = aShape->impl<TopoDS_Shape>();
+        AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(aSelectedObject, aTDSShape, mySketch);
 
         // this is an alternative, whether the attribute should be set or object in the attribute
         // the first check is the attribute because the object already exist
@@ -52,63 +54,14 @@ bool PartSet_WidgetShapeSelector::storeValueCustom() const
         // test case is - preselection for distance operation, which contains two points selected on lines
         if (aPntAttr)
           aRefAttr->setAttr(aPntAttr);
-        else if (mySelectedObject)
-          aRefAttr->setObject(mySelectedObject);
-        updateObject(myFeature);
+        else if (aSelectedObject)
+          aRefAttr->setObject(aSelectedObject);
+        //updateObject(myFeature);
         return true;
       }
     }
   }
-  return ModuleBase_WidgetShapeSelector::storeValueCustom();
+  return ModuleBase_WidgetShapeSelector::storeAttributeValues(aSelectedObject, aShape);
 }
 
-//********************************************************************
-bool PartSet_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape)
-{
-  bool isValid = ModuleBase_WidgetValidated::isValid(theObj, theShape);
-  if (!isValid)
-    return false;
-
-  // the method is redefined to analize the selected shape in validators
-  SessionPtr aMgr = ModelAPI_Session::get();
-  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
-  std::list<ModelAPI_Validator*> aValidators;
-  std::list<std::list<std::string> > anArguments;
-  aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
-
-  // Check the acceptability of the object and shape as validator attribute
-  AttributePtr aPntAttr;
-  DataPtr aData = myFeature->data();
-  if (theShape.get() != NULL) {
-    AttributePtr aAttr = aData->attribute(attributeID());
-    AttributeRefAttrPtr aRefAttr = 
-      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(aAttr);
-    if (aRefAttr) {
-      TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
-      aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theObj, aShape, mySketch);
-    }
-  }
-  // Check the acceptability of the object as attribute
-  std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
-  std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
-  for (; aValidator != aValidators.end(); aValidator++, aArgs++) {
-    const ModelAPI_RefAttrValidator* aAttrValidator =
-        dynamic_cast<const ModelAPI_RefAttrValidator*>(*aValidator);
-    if (aAttrValidator) {
-      if (aPntAttr.get() != NULL)
-      {
-        if (!aAttrValidator->isValid(myFeature, *aArgs, aPntAttr)) {
-          return false;
-        }
-      }
-      else
-      {
-        if (!aAttrValidator->isValid(myFeature, *aArgs, theObj)) {
-          return false;
-        }
-      }
-    }
-  }
-  return true;
-}
 

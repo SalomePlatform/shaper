@@ -111,7 +111,8 @@ void ModelAPI_Feature::eraseResults()
 
 std::shared_ptr<ModelAPI_Document> ModelAPI_Feature::documentToAdd()
 {
-  return ModelAPI_Session::get()->activeDocument();
+  // null pointer t ouse the current document
+  return std::shared_ptr<ModelAPI_Document>();
 }
 
 void ModelAPI_Feature::erase()

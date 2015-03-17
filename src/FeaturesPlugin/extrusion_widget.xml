@@ -6,7 +6,6 @@
     icon=":icons/sketch.png"
     tooltip="Select a sketch face"
     type_choice="Faces">
-    <validator id="PartSet_SketchValidator"/>
     <selection_filter id="SketchEntityFilter"/>
   </multi_selector>
   <doublevalue

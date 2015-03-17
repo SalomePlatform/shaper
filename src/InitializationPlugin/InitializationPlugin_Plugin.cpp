@@ -1,4 +1,3 @@
-
 // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #include <InitializationPlugin_Plugin.h>
@@ -7,36 +6,21 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeString.h>
-
+#include <ModelAPI_Events.h>
 
 #include <Events_Message.h>
-
-#include <ModelAPI_Events.h>
-#include <ModelAPI_Session.h>
+#include <Events_Error.h>
 
 #include <memory>
-
-#ifdef _DEBUG
-#include <iostream>
-#endif
 
 // the only created instance of this plugin
 static InitializationPlugin_Plugin* MY_INITIALIZATIONPLUGIN_INSTANCE = new InitializationPlugin_Plugin();
 
 InitializationPlugin_Plugin::InitializationPlugin_Plugin()
 {
-  // register this plugin
-  SessionPtr aSession = ModelAPI_Session::get();
-  aSession->registerPlugin(this);
-
   Events_Loop* aLoop = Events_Loop::loop();
   const Events_ID kDocCreatedEvent = ModelAPI_DocumentCreatedMessage::eventId();
   aLoop->registerListener(this, kDocCreatedEvent, NULL, true);
-}
-
-FeaturePtr InitializationPlugin_Plugin::createFeature(std::string theFeatureID)
-{
-  return FeaturePtr();
 }
 
 void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Message>& theMessage)
@@ -50,11 +34,12 @@ void InitializationPlugin_Plugin::processEvent(const std::shared_ptr<Events_Mess
     createPlane(aDoc, 1., 0., 0.);
     createPlane(aDoc, 0., 1., 0.);
     createPlane(aDoc, 0., 0., 1.);
+    // for PartSet it is done outside of the transaction, so explicitly flush this creation
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   } else if (theMessage.get()) {
-    #ifdef _DEBUG
-    std::cout << "InitializationPlugin_Plugin::processEvent: unhandled message caught: " << std::endl
-              << theMessage->eventID().eventText() << std::endl;
-    #endif
+    Events_Error::send(
+      std::string("InitializationPlugin_Plugin::processEvent: unhandled message caught: ") + 
+      theMessage->eventID().eventText());
   }
 }
 
@@ -74,6 +59,7 @@ void InitializationPlugin_Plugin::createPlane(DocumentPtr theDoc, double theA, d
   } else if (theC) {
     aPlane->data()->setName("X0Y");
   }
+  aPlane->setInHistory(aPlane, false); // don't show automatically created feature in the features history
 }
 
 void InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc)
@@ -83,5 +69,5 @@ void InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc)
   aPoint->real("y")->setValue(0.);
   aPoint->real("z")->setValue(0.);
   aPoint->data()->setName("Origin");
+  aPoint->setInHistory(aPoint, false); // don't show automatically created feature in the features history
 }
-

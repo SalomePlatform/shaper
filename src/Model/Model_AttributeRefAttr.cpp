@@ -47,6 +47,10 @@ void Model_AttributeRefAttr::setObject(ObjectPtr theObject)
     myRef->Set(aData->label().Father());
     myID->Set("");  // feature is identified by the empty ID
     owner()->data()->sendAttributeUpdated(this);
+  } else if (theObject.get() == NULL) {
+    myRef->Set(myRef->Label()); // reference to itself means that object is null
+    myID->Set("");  // feature is identified by the empty ID
+    owner()->data()->sendAttributeUpdated(this);
   }
 }
 
