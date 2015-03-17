@@ -155,6 +155,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
       return true;
     }
   }
+  return true;
 }
 
 bool PartSet_DifferentObjectsValidator::featureHasReferences(const AttributePtr& theAttribute) const
