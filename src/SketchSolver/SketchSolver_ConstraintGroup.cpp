@@ -52,6 +52,12 @@ class SketchSolver_Error
     static const std::string MY_ERROR_VALUE("Conflicting constraints");
     return MY_ERROR_VALUE;
   }
+  /// The entities need to have shared point, but they have not
+  inline static const std::string& NO_COINCIDENT_POINTS()
+  {
+    static const std::string MY_ERROR_VALUE("Objects should have coincident point");
+    return MY_ERROR_VALUE;
+  }
 };
 
 /// This value is used to give unique index to the groups
@@ -351,14 +357,50 @@ bool SketchSolver_ConstraintGroup::changeConstraint(
           removeTemporaryConstraints(aTmpConstrToDelete);
       }
     }
+    // For the tangency constraints it is necessary to identify which points of entities are coincident
+    int aSlvsOtherFlag = 0;
+    int aSlvsOther2Flag = 0;
+    if (aConstrType == SLVS_C_ARC_LINE_TANGENT || aConstrType == SLVS_C_CURVE_CURVE_TANGENT) {
+      // Search entities used by constraint
+      int anEnt1Pos = Search(aConstrEnt[2], myEntities);
+      int anEnt2Pos = Search(aConstrEnt[3], myEntities);
+      // Obtain start and end points of entities
+      Slvs_hEntity aPointsToFind[4];
+      aPointsToFind[0] = myEntities[anEnt1Pos].point[1];
+      aPointsToFind[1]= myEntities[anEnt1Pos].point[2];
+      bool hasLine = (myEntities[anEnt2Pos].type == SLVS_E_LINE_SEGMENT);
+      aPointsToFind[2]= myEntities[anEnt2Pos].point[hasLine ? 0 : 1];
+      aPointsToFind[3]= myEntities[anEnt2Pos].point[hasLine ? 1 : 2];
+      // Search coincident points
+      bool isPointFound[4];
+      std::vector<std::set<Slvs_hEntity> >::const_iterator aCPIter = myCoincidentPoints.begin();
+      for ( ; aCPIter != myCoincidentPoints.end(); aCPIter++) {
+        for (int i = 0; i < 4; i++)
+          isPointFound[i] = (aCPIter->find(aPointsToFind[i]) != aCPIter->end());
+        if ((isPointFound[0] || isPointFound[1]) && (isPointFound[2] || isPointFound[3])) {
+          // the arc is tangent by end point
+          if (isPointFound[1]) aSlvsOtherFlag = 1;
+          // the second item is an arc and it is tangent by end point too
+          if (!hasLine && isPointFound[3]) aSlvsOther2Flag = 1;
+          break;
+        }
+      }
+      if (aCPIter == myCoincidentPoints.end()) {
+        // There is no coincident points between tangential objects. Generate error message
+        Events_Error::send(SketchSolver_Error::NO_COINCIDENT_POINTS(), this);
+        return false;
+      }
+    }
 
     // Create SolveSpace constraint structure
-    Slvs_Constraint aConstraint = Slvs_MakeConstraint(++myConstrMaxID, myID, aConstrType,
+    Slvs_Constraint aSlvsConstr = Slvs_MakeConstraint(++myConstrMaxID, myID, aConstrType,
                                                       myWorkplane.h, aDistance, aConstrEnt[0],
                                                       aConstrEnt[1], aConstrEnt[2], aConstrEnt[3]);
-    myConstraints.push_back(aConstraint);
-    myConstraintMap[theConstraint] = std::vector<Slvs_hEntity>(1, aConstraint.h);
-    int aConstrPos = Search(aConstraint.h, myConstraints);
+    if (aSlvsOtherFlag != 0) aSlvsConstr.other = aSlvsOtherFlag;
+    if (aSlvsOther2Flag != 0) aSlvsConstr.other2 = aSlvsOther2Flag;
+    myConstraints.push_back(aSlvsConstr);
+    myConstraintMap[theConstraint] = std::vector<Slvs_hEntity>(1, aSlvsConstr.h);
+    int aConstrPos = Search(aSlvsConstr.h, myConstraints);
     aConstrIter = myConstraints.begin() + aConstrPos;
     myNeedToSolve = true;
   } else { // Attributes of constraint may be changed => update constraint

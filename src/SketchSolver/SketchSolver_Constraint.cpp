@@ -20,6 +20,7 @@
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
 
 #include <ModelAPI_AttributeRefAttr.h>
@@ -229,8 +230,7 @@ const int& SketchSolver_Constraint::getType(
       std::shared_ptr<ModelAPI_Attribute> anAttr = 
           aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
       AttrType aType = typeOfAttribute(anAttr);
-      if (aType == LINE)
-      {
+      if (aType == LINE) {
         myAttributesList[aNbEntities++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
         aNbLines++;
       }
@@ -239,6 +239,26 @@ const int& SketchSolver_Constraint::getType(
     }
     if (aNbEntities == 4)
       myType = aConstrType[aNbLines];
+    return getType();
+  }
+
+  if (aConstraintKind.compare(SketchPlugin_ConstraintTangent::ID()) == 0)
+  {
+    static const int anArcPosDefault = 2;
+    static const int aLinePosDefault = 3;
+    int anArcPos = anArcPosDefault; // arc in tangency constraint should be placed before line
+    int aLinePos = aLinePosDefault;
+    for (unsigned int indAttr = 0; indAttr < CONSTRAINT_ATTR_SIZE; indAttr++) {
+      std::shared_ptr<ModelAPI_Attribute> anAttr = 
+          aConstrData->attribute(SketchPlugin_Constraint::ATTRIBUTE(indAttr));
+      AttrType aType = typeOfAttribute(anAttr);
+      if (aType == LINE && aLinePos < CONSTRAINT_ATTR_SIZE)
+        myAttributesList[aLinePos++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
+      else if (aType == ARC)
+        myAttributesList[anArcPos++] = SketchPlugin_Constraint::ATTRIBUTE(indAttr);
+    }
+    if (anArcPos - anArcPosDefault + aLinePos - aLinePosDefault == 2)
+      myType = aLinePos > 3 ? SLVS_C_ARC_LINE_TANGENT : SLVS_C_CURVE_CURVE_TANGENT;
     return getType();
   }
 
