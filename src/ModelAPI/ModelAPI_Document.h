@@ -98,6 +98,11 @@ public:
 protected:
   /// Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document();
+
+  /// Internally makes document know that feature was removed or added in history after creation
+  MODELAPI_EXPORT virtual void addToHistory(const std::shared_ptr<ModelAPI_Object> theObject) = 0;
+
+  friend class ModelAPI_Object; // to add or remove from the history
 };
 
 //! Pointer on document object

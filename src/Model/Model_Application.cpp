@@ -30,19 +30,21 @@ const std::shared_ptr<Model_Document>& Model_Application::getDocument(string the
 
   static const std::string thePartSetKind("PartSet");
   static const std::string thePartKind("Part");
+  bool isRoot = theDocID == "root"; // the document is root
   std::shared_ptr<Model_Document> aNew(
-    new Model_Document(theDocID, theDocID == "root" ? thePartSetKind : thePartKind));
+    new Model_Document(theDocID, isRoot ? thePartSetKind : thePartKind));
   myDocs[theDocID] = aNew;
 
-  Events_ID anId = ModelAPI_DocumentCreatedMessage::eventId();
-  std::shared_ptr<ModelAPI_DocumentCreatedMessage> aMessage =
-        std::shared_ptr<ModelAPI_DocumentCreatedMessage>(new ModelAPI_DocumentCreatedMessage(anId, this));
-  aMessage->setDocument(aNew);
-  Events_Loop::loop()->send(aMessage);
   // load it if it must be loaded by demand
   if (myLoadedByDemand.find(theDocID) != myLoadedByDemand.end() && !myPath.empty()) {
     aNew->load(myPath.c_str());
     myLoadedByDemand.erase(theDocID);  // done, don't do it anymore
+  } else {
+    static Events_ID anId = ModelAPI_DocumentCreatedMessage::eventId();
+    std::shared_ptr<ModelAPI_DocumentCreatedMessage> aMessage = std::shared_ptr
+      <ModelAPI_DocumentCreatedMessage>(new ModelAPI_DocumentCreatedMessage(anId, this));
+    aMessage->setDocument(aNew);
+    Events_Loop::loop()->send(aMessage);
   }
 
   return myDocs[theDocID];

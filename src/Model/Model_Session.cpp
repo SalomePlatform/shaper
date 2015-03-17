@@ -172,8 +172,18 @@ FeaturePtr Model_Session::createFeature(string theFeatureID)
 
 std::shared_ptr<ModelAPI_Document> Model_Session::moduleDocument()
 {
-  return std::shared_ptr<ModelAPI_Document>(
+  bool aFirstCall = !Model_Application::getApplication()->hasDocument("root");
+  if (aFirstCall) {
+    // creation of the root document is always outside of the transaction, so, avoid checking it
+    setCheckTransactions(false);
+  }
+  std::shared_ptr<ModelAPI_Document> aDoc = std::shared_ptr<ModelAPI_Document>(
       Model_Application::getApplication()->getDocument("root"));
+  if (aFirstCall) {
+    // creation of the root document is always outside of the transaction, so, avoid checking it
+    setCheckTransactions(true);
+  }
+  return aDoc;
 }
 
 std::shared_ptr<ModelAPI_Document> Model_Session::document(std::string theDocID)

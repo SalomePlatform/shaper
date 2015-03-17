@@ -28,9 +28,16 @@ class ModelAPI_Object
 {
   std::shared_ptr<ModelAPI_Data> myData;  ///< manager of the data model of a feature
   std::shared_ptr<ModelAPI_Document> myDoc;  ///< document this object belongs to
+  bool myInHistory; ///< keep the information about the presense of the object in the history tree
  public:
   /// By default object is displayed in the object browser.
   MODELAPI_EXPORT virtual bool isInHistory();
+
+  /// Makes object presented or not in the history of the created objects
+  /// \param theObject is shared pointer to "this"
+  /// \param theFlag is boolean value: to add or remove from the history
+  MODELAPI_EXPORT virtual void setInHistory(
+    const std::shared_ptr<ModelAPI_Object> theObject, const bool theFlag);
 
   /// Returns the data manager of this object: attributes
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Data> data() const;
@@ -51,6 +58,9 @@ class ModelAPI_Object
   /// \param theID identifier of changed attribute
   // MODELAPI_EXPORT
   MODELAPI_EXPORT virtual void attributeChanged(const std::string& theID);
+
+  /// Initializes the default states of the object
+  MODELAPI_EXPORT ModelAPI_Object();
 
   /// To use virtuality for destructors
   MODELAPI_EXPORT virtual ~ModelAPI_Object();

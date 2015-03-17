@@ -5,11 +5,20 @@
 // Author:      Mikhail PONIKAROV
 
 #include "ModelAPI_Object.h"
-
+#include "ModelAPI_Document.h"
 
 bool ModelAPI_Object::isInHistory()
 {
-  return true;
+  return myInHistory;
+}
+
+void ModelAPI_Object::setInHistory(
+  const std::shared_ptr<ModelAPI_Object> theObject, const bool theFlag)
+{
+  if (myInHistory != theFlag) {
+    myInHistory = theFlag;
+    myDoc->addToHistory(theObject);
+  }
 }
 
 std::shared_ptr<ModelAPI_Data> ModelAPI_Object::data() const
@@ -28,6 +37,10 @@ std::shared_ptr<ModelAPI_Document> ModelAPI_Object::document() const
 }
 
 void ModelAPI_Object::attributeChanged(const std::string& theID)
+{
+}
+
+ModelAPI_Object::ModelAPI_Object() : myInHistory(true)
 {
 }
 
