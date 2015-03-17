@@ -47,9 +47,6 @@ protected:
   /// \return True in success
   virtual bool storeValueCustom() const;
 
-  /// Check the selected with validators if installed
-  virtual bool isValid(ObjectPtr theObj, std::shared_ptr<GeomAPI_Shape> theShape);
-
 private:
   /// Pointer to a sketch 
   CompositeFeaturePtr mySketch;

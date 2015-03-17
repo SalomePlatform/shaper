@@ -110,80 +110,53 @@ bool PartSet_RigidValidator::isValid(const ModuleBase_ISelection* theSelection) 
   return (aCount > 0) && (aCount < 2);
 }
 
-bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature, 
-                                                const std::list<std::string>& theArguments,
-                                                const ObjectPtr& theObject) const
-{
-  // Check RefAttr attributes
-  std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-    theFeature->data()->attributes(ModelAPI_AttributeRefAttr::type());
-  if (anAttrs.size() > 0) {
-    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-    for(; anAttr != anAttrs.end(); anAttr++) {
-      if (*anAttr) {
-        std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
-        // check the object is already presented
-        if (aRef->isObject() && aRef->object() == theObject)
-          return false;
-      }
-    }
-  }
-  // Check selection attributes
-  anAttrs = theFeature->data()->attributes(ModelAPI_AttributeSelection::type());
-  if (anAttrs.size() > 0) {
-    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-    for(; anAttr != anAttrs.end(); anAttr++) {
-      if (*anAttr) {
-        std::shared_ptr<ModelAPI_AttributeSelection> aRef = 
-          std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*anAttr);
-        // check the object is already presented
-        if (aRef->isInitialized() && aRef->context() == theObject)
-          return false;
-      }
-    }
-  }
-  // Check selection attributes
-  anAttrs = theFeature->data()->attributes(ModelAPI_AttributeReference::type());
-  if (anAttrs.size() > 0) {
-    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-    for(; anAttr != anAttrs.end(); anAttr++) {
-      if (*anAttr) {
-        std::shared_ptr<ModelAPI_AttributeReference> aRef = 
-          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(*anAttr);
-        // check the object is already presented
-        if (aRef->isInitialized() && aRef->value() == theObject)
-          return false;
-      }
-    }
-  }
-  return true;
-}
-
-bool PartSet_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature, 
-                                                const std::list<std::string>& theArguments,
-                                                const AttributePtr& theAttribute) const
-{
-  if (PartSet_DifferentObjectsValidator::isValid(theAttribute, theArguments)) {
-    std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
-      theFeature->data()->attributes(ModelAPI_AttributeRefAttr::type());
-    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-    for(; anAttr != anAttrs.end(); anAttr++) {
-      if (*anAttr) {
-        std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
-          std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
-        // check the object is already presented
-        if (!aRef->isObject() && aRef->attr() == theAttribute)
-          return false;
-      }
-    }
-    return true;
-  }
-  return false;
-}
-
 bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute, 
                                                 const std::list<std::string>& theArguments) const
+{
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+
+  // 1. check whether the object of the attribute is not among the feature attributes
+  // find the attribute's object
+  ObjectPtr anObject = getObject(theAttribute);
+
+  // check whether the object is not among other feature attributes
+  if (anObject.get() != NULL) {
+    // Check RefAttr attributes
+    std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = aFeature->data()->attributes("");
+    //if (anAttrs.size() > 0) {
+    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anIt = anAttrs.begin();
+    for(; anIt != anAttrs.end(); anIt++) {
+      AttributePtr anAttr = *anIt;
+      // the function parameter attribute should be skipped
+      if (anAttr.get() == NULL || anAttr->id() == theAttribute->id())
+        continue;
+      ObjectPtr aCurObject = getObject(anAttr);
+      if (aCurObject  && aCurObject == anObject)
+        return false;
+    }
+  }
+  else {
+    // 2. collect object referenced by theAttribute and ...
+    if (featureHasReferences(theAttribute)) {
+      // 3. check whether the attribute value is not among other feature attributes
+      std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs = 
+        aFeature->data()->attributes(ModelAPI_AttributeRefAttr::type());
+      std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+      for(; anAttr != anAttrs.end(); anAttr++) {
+        if (*anAttr) {
+          std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = 
+            std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*anAttr);
+          // check the object is already presented
+          if (!aRef->isObject() && aRef->attr() == theAttribute)
+            return false;
+        }
+      }
+      return true;
+    }
+  }
+}
+
+bool PartSet_DifferentObjectsValidator::featureHasReferences(const AttributePtr& theAttribute) const
 {
   std::list<std::pair<std::string, std::list<ObjectPtr> > > allRefs;
   if (theAttribute->owner().get() && theAttribute->owner()->data().get())
@@ -211,6 +184,28 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
     }
   }
   return true;
+}
+
+ObjectPtr PartSet_DifferentObjectsValidator::getObject(const AttributePtr& theAttribute) const
+{
+  ObjectPtr anObject;
+  std::string anAttrType = theAttribute->attributeType();
+  if (anAttrType == ModelAPI_AttributeRefAttr::type()) {
+    AttributeRefAttrPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+    if (anAttr != NULL && anAttr->isObject())
+      anObject = anAttr->object();
+  }
+  if (anAttrType == ModelAPI_AttributeSelection::type()) {
+    AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+    if (anAttr != NULL && anAttr->isInitialized())
+      anObject = anAttr->context();
+  }
+  if (anAttrType == ModelAPI_AttributeReference::type()) {
+    AttributeReferencePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
+    if (anAttr.get() != NULL && anAttr->isInitialized())
+      anObject = anAttr->value();
+  }
+  return anObject;
 }
 
 bool PartSet_SketchValidator::isValid(const ObjectPtr theObject) const

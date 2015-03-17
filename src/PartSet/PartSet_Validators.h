@@ -73,25 +73,22 @@ class PartSet_RigidValidator : public ModuleBase_SelectionValidator
 class PartSet_DifferentObjectsValidator : public ModelAPI_RefAttrValidator
 {
  public:
-   /// Returns True if the feature is valid
-   /// \param theFeature a feature to check
-   /// \param theArguments a list of arguments (names of attributes to check)
-   /// \param theObject a selected object
-  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
-                       const ObjectPtr& theObject) const;
-
-  //! Returns true if the attribute is good for the feature attribute
-  //! \param theFeature a feature to check
-  //! \param theArguments a list of arguments (names of attributes to check)
-  //! \param theAttribute an attribute
-  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
-                       const AttributePtr& theAttribute) const;
-
   //! Returns true if the attribute is good for the feature attribute
   //! \param theAttribute an attribute
   //! \param theArguments a list of arguments (names of attributes to check)
   virtual bool isValid(const AttributePtr& theAttribute,
                        const std::list<std::string>& theArguments) const;
+
+protected:
+  //! Casts the attribute to an attribute kind and obtains an object value if it is possible
+  //! \param theAttribute a source attribute to find object
+  //! \return an attribute object or NULL
+  ObjectPtr getObject(const AttributePtr& theAttribute) const;
+
+  //! Checks whethe other feature attributes has a reference to the given attribute
+  //! \param theAttribute a source attribute to find object
+  //! \return a boolean value
+  bool featureHasReferences(const AttributePtr& theAttribute) const;
 };
 
 /**
@@ -105,6 +102,5 @@ class PartSet_SketchValidator : public ModelAPI_ResultValidator
    /// \param theObject an object
   virtual bool isValid(const ObjectPtr theObject) const;
 };
-
 
 #endif

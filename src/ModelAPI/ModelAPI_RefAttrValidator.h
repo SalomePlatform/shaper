@@ -19,14 +19,6 @@
 class ModelAPI_RefAttrValidator : public ModelAPI_AttributeValidator
 {
 public:
-  //! Returns true if object is good for the feature attribute
-  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
-                       const ObjectPtr& theObject) const = 0;
-
-  //! Returns true if the attribute is good for the feature attribute
-  virtual bool isValid(const FeaturePtr& theFeature, const std::list<std::string>& theArguments,
-                       const AttributePtr& theAttribute) const = 0;
-
 };
 
 #endif

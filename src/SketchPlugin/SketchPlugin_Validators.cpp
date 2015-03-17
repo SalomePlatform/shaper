@@ -14,47 +14,45 @@
 #include <ModelAPI_Session.h>
 #include <GeomDataAPI_Point2D.h>
 
-bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
-                                                 const std::list<std::string>& theArguments,
-                                                 const ObjectPtr& theObject) const
+bool SketchPlugin_DistanceAttrValidator::isValid(
+  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
 {
+  // there is a check whether the feature contains a point and a linear edge or two point values
   std::string aParamA = theArguments.front();
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
-  const ModelAPI_ResultValidator* anArcValidator =
-      dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultArc"));
-  bool anArcValid = anArcValidator->isValid(theObject);
-  if (anArcValid)
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  if (!aRefAttr)
     return false;
 
-
-  // If the object is not a line then it is accepted
-  const ModelAPI_ResultValidator* aLineValidator =
-      dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultLine"));
-  bool aLineValid = aLineValidator->isValid(theObject);
-  if (!aLineValid)
+  bool isObject = aRefAttr->isObject();
+  if (!isObject) {
+    // an attribute is a point. A point value is valid always for the distance
     return true;
+  } else {
+    // 1. check whether the references object is a linear
+    ObjectPtr anObject = aRefAttr->object();
+    const ModelAPI_ResultValidator* anArcValidator =
+        dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultArc"));
+    bool anArcValid = anArcValidator->isValid(anObject);
+    if (anArcValid)
+      return false;
 
-  // If it is a line then we have to check that first attribute id not a line
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint = getFeaturePoint(theFeature->data(), aParamA);
-  if (aPoint)
-    return true;
+    // If the object is not a line then it is accepted. It can be a point feature selected
+    const ModelAPI_ResultValidator* aLineValidator =
+        dynamic_cast<const ModelAPI_ResultValidator*>(aFactory->validator("SketchPlugin_ResultLine"));
+    bool aLineValid = aLineValidator->isValid(anObject);
+    if (!aLineValid)
+      return true;
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+
+    // If it is a line then we have to check that first attribute id not a line
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint = getFeaturePoint(aFeature->data(), aParamA);
+    if (aPoint)
+      return true;
+  }
   return false;
-}
-
-bool SketchPlugin_DistanceAttrValidator::isValid(
-  const AttributePtr& theAttribute, const std::list<std::string>& theArguments ) const
-{
-  // any point attribute is acceptable for the distance operation
-  return true;
-}
-
-bool SketchPlugin_DistanceAttrValidator::isValid(const FeaturePtr& theFeature,
-                                                 const std::list<std::string>& theArguments,
-                                                 const AttributePtr& theAttribute) const
-{
-  return isValid(theAttribute, theArguments);
 }
 
 //bool SketchPlugin_DifferentObjectsValidator::isValid(const FeaturePtr& theFeature,

@@ -437,6 +437,52 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
   std::list<std::list<std::string> > anArguments;
   aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
 
+  DataPtr aData = myFeature->data();
+  //AttributePtr aAttr = aData->attribute(attributeID());
+  AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
+  if (aRefAttr) {
+    // 1. saves the previous attribute values
+    bool isObject = aRefAttr->isObject();
+    ObjectPtr aPrevObject = aRefAttr->object();
+    AttributePtr aPrevAttr = aRefAttr->attr();
+
+    // 2. store the current values, disable the model's update
+    aData->blockSendAttributeUpdated(true);
+    ObjectPtr aPrevSelectedObject = mySelectedObject;
+    GeomShapePtr aPrevShape = myShape;
+
+    mySelectedObject = theObj;
+    myShape = theShape;
+    storeValueCustom();
+
+    // 3. check the acceptability of the current values
+    std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
+    std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
+    bool aValid = true;
+    for (; aValidator != aValidators.end() && aValid; aValidator++, aArgs++) {
+      const ModelAPI_RefAttrValidator* aAttrValidator =
+          dynamic_cast<const ModelAPI_RefAttrValidator*>(*aValidator);
+      if (aAttrValidator) {
+        aValid = aAttrValidator->isValid(aRefAttr, *aArgs);
+      }
+    }
+
+    // 4. if the values are not valid, restore the previous values to the attribute
+    //if (!aValid) {
+    mySelectedObject = aPrevSelectedObject;
+    myShape = aPrevShape;
+    if (isObject)
+      aRefAttr->setObject(aPrevObject);
+    else
+      aRefAttr->setAttr(aPrevAttr);
+    //}
+    // 5. enable the model's update
+    aData->blockSendAttributeUpdated(false);
+    //updateObject(myFeature);
+
+    return aValid;
+  }
+
   // Check the acceptability of the object as attribute
   std::list<ModelAPI_Validator*>::iterator aValidator = aValidators.begin();
   std::list<std::list<std::string> >::iterator aArgs = anArguments.begin();
@@ -444,9 +490,9 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
     const ModelAPI_RefAttrValidator* aAttrValidator =
         dynamic_cast<const ModelAPI_RefAttrValidator*>(*aValidator);
     if (aAttrValidator) {
-      if (!aAttrValidator->isValid(myFeature, *aArgs, theObj)) {
-        return false;
-      }
+      //if (!aAttrValidator->isValid(myFeature, *aArgs, theObj)) {
+      //  return false;
+      //}
     }
     else {
       const ModelAPI_ShapeValidator* aShapeValidator = 
