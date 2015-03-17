@@ -164,7 +164,7 @@
         </sketch_constraint_shape_selector>
       </feature>
     <!--  SketchConstraintEqual  -->
-      <feature id="SketchConstraintEqual" title="Equal" tooltip="Create constraint defining equality of two objects">
+      <feature id="SketchConstraintEqual" title="Equal" tooltip="Create constraint defining equality of two objects" icon=":icons/equal.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line, circle or arc" shape_types="edge">
         </sketch_constraint_shape_selector>

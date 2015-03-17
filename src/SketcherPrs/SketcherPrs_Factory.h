@@ -54,6 +54,11 @@ public:
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   GET_CONSTRAINT_PRS(verticalConstraint)
+
+  /// Creates coincedent perpendicular presentation
+  /// \param theConstraint the constraint
+  /// \param thePlane the current sketch plane
+  GET_CONSTRAINT_PRS(equalConstraint)
 };
 
 #endif
