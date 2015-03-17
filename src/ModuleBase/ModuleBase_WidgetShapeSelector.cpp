@@ -224,7 +224,7 @@ void ModuleBase_WidgetShapeSelector::onSelectionChanged()
 bool ModuleBase_WidgetShapeSelector::setSelection(ModuleBase_ViewerPrs theValue)
 {
   ObjectPtr aObject = theValue.object();
-  ObjectPtr aCurrentObject = getObject();
+  ObjectPtr aCurrentObject = getObject(myFeature->attribute(attributeID()));
   if ((!aCurrentObject) && (!aObject))
     return false;
 
@@ -338,31 +338,28 @@ bool ModuleBase_WidgetShapeSelector::acceptSubShape(std::shared_ptr<GeomAPI_Shap
   return false;
 }
 
-//********************************************************************
-ObjectPtr ModuleBase_WidgetShapeSelector::getObject() const
+ObjectPtr ModuleBase_WidgetShapeSelector::getObject(const AttributePtr& theAttribute)
 {
   ObjectPtr anObject;
-
-  DataPtr aData = myFeature->data();
-  if (aData.get() == NULL)
-    return anObject;
-
-  AttributeSelectionPtr aSelect = aData->selection(attributeID());
-  if (aSelect) {
-    anObject = aSelect->context();
-  } else {
-    AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
-    if (aRefAttr) {
-      anObject = aRefAttr->object();
-    } else {
-      AttributeReferencePtr aRef = aData->reference(attributeID());
-      if (aRef) {
-        anObject = aRef->value();
-      }
-    }
+  std::string anAttrType = theAttribute->attributeType();
+  if (anAttrType == ModelAPI_AttributeRefAttr::type()) {
+    AttributeRefAttrPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+    if (anAttr != NULL && anAttr->isObject())
+      anObject = anAttr->object();
+  }
+  if (anAttrType == ModelAPI_AttributeSelection::type()) {
+    AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+    if (anAttr != NULL && anAttr->isInitialized())
+      anObject = anAttr->context();
+  }
+  if (anAttrType == ModelAPI_AttributeReference::type()) {
+    AttributeReferencePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
+    if (anAttr.get() != NULL && anAttr->isInitialized())
+      anObject = anAttr->value();
   }
   return anObject;
 }
+
 
 //********************************************************************
 GeomShapePtr ModuleBase_WidgetShapeSelector::getShape() const
@@ -392,7 +389,7 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
     }
   }
   if (!isNameUpdated) {
-    ObjectPtr anObject = getObject();
+    ObjectPtr anObject = getObject(myFeature->attribute(attributeID()));
     if (anObject.get() != NULL) {
       std::string aName = anObject->data()->name();
       myTextLine->setText(QString::fromStdString(aName));
@@ -471,7 +468,6 @@ bool ModuleBase_WidgetShapeSelector::isValid(ObjectPtr theObj, std::shared_ptr<G
   aFactory->validators(parentID(), attributeID(), aValidators, anArguments);
 
   DataPtr aData = myFeature->data();
-  //AttributePtr aAttr = aData->attribute(attributeID());
   AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
   if (aRefAttr) {
     // 1. saves the previous attribute values

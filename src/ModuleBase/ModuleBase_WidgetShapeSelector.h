@@ -12,6 +12,7 @@
 #include "ModuleBase_ViewerFilters.h"
 
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Attribute.h>
 #include <GeomAPI_Shape.h>
 
 #include <TopAbs_ShapeEnum.hxx>
@@ -90,7 +91,7 @@ Q_OBJECT
 
   // Get the object from the attribute
   /// \param theObj an object 
-  static ObjectPtr getObject(const AttributePtr& theAttribute) const;
+  static ObjectPtr getObject(const AttributePtr& theAttribute);
 
  public slots:
 

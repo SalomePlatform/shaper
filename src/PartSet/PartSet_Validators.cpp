@@ -12,6 +12,7 @@
 #include <GeomAdaptor_Curve.hxx>
 #include <GeomAbs_CurveType.hxx>
 #include <ModuleBase_ISelection.h>
+#include <ModuleBase_WidgetShapeSelector.h>
 
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeSelection.h>
@@ -117,7 +118,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
 
   // 1. check whether the object of the attribute is not among the feature attributes
   // find the attribute's object
-  ObjectPtr anObject = getObject(theAttribute);
+  ObjectPtr anObject =  ModuleBase_WidgetShapeSelector::getObject(theAttribute);
 
   // check whether the object is not among other feature attributes
   if (anObject.get() != NULL) {
@@ -130,7 +131,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
       // the function parameter attribute should be skipped
       if (anAttr.get() == NULL || anAttr->id() == theAttribute->id())
         continue;
-      ObjectPtr aCurObject = getObject(anAttr);
+      ObjectPtr aCurObject =  ModuleBase_WidgetShapeSelector::getObject(anAttr);
       if (aCurObject  && aCurObject == anObject)
         return false;
     }
@@ -184,28 +185,6 @@ bool PartSet_DifferentObjectsValidator::featureHasReferences(const AttributePtr&
     }
   }
   return true;
-}
-
-ObjectPtr PartSet_DifferentObjectsValidator::getObject(const AttributePtr& theAttribute) const
-{
-  ObjectPtr anObject;
-  std::string anAttrType = theAttribute->attributeType();
-  if (anAttrType == ModelAPI_AttributeRefAttr::type()) {
-    AttributeRefAttrPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-    if (anAttr != NULL && anAttr->isObject())
-      anObject = anAttr->object();
-  }
-  if (anAttrType == ModelAPI_AttributeSelection::type()) {
-    AttributeSelectionPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
-    if (anAttr != NULL && anAttr->isInitialized())
-      anObject = anAttr->context();
-  }
-  if (anAttrType == ModelAPI_AttributeReference::type()) {
-    AttributeReferencePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
-    if (anAttr.get() != NULL && anAttr->isInitialized())
-      anObject = anAttr->value();
-  }
-  return anObject;
 }
 
 bool PartSet_SketchValidator::isValid(const ObjectPtr theObject) const
