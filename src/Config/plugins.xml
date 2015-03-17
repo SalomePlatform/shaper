@@ -1,13 +1,14 @@
 <!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
 
 <plugins module="PartSet">
+  <!-- Initialization plugin must be first here to initialize the PartSet document -->
+  <plugin library="InitializationPlugin"/>
   <plugin library="PartSetPlugin" configuration="plugin-PartSet.xml"/>
   <plugin library="SketchPlugin" configuration="plugin-Sketch.xml"/>
   <plugin library="ConstructionPlugin" configuration="plugin-Construction.xml"/>
   <plugin library="FeaturesPlugin" configuration="plugin-Features.xml"/>
   <plugin library="ExchangePlugin" configuration="plugin-Exchange.xml"/>
   <plugin script="ConnectorPlugin" configuration="plugin-Connector.xml" dependency="Geometry"/>
-  <plugin library="InitializationPlugin"/>
   <plugin library="SketchSolver"/>
   <plugin library="GeomValidators"/>
   <plugin library="DFBrowser" internal="true"/>
