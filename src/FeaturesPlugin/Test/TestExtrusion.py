@@ -72,14 +72,16 @@ assert (aSketchFaces[0] is not None)
 aSession.startOperation()
 anExtrusionFt = aPart.addFeature("Extrusion")
 assert (anExtrusionFt.getKind() == "Extrusion")
-anExtrusionFt.selection("extrusion_face").setValue(
+# selection type FACE=4
+anExtrusionFt.selectionList("base").setSelectionType(4)
+anExtrusionFt.selectionList("base").append(
     aSketchResult, aSketchFaces[0])
-anExtrusionFt.real("extrusion_size").setValue(50)
-anExtrusionFt.boolean("extrusion_reverse").setValue(False)
+anExtrusionFt.real("size").setValue(50)
+anExtrusionFt.boolean("reverse").setValue(False)
 anExtrusionFt.execute()
 aSession.finishOperation()
-assert (anExtrusionFt.real("extrusion_size").value() == 50.0)
-assert (anExtrusionFt.boolean("extrusion_reverse").value() == False)
+assert (anExtrusionFt.real("size").value() == 50.0)
+assert (anExtrusionFt.boolean("reverse").value() == False)
 
 # Check extrusion results
 assert (len(anExtrusionFt.results()) > 0)

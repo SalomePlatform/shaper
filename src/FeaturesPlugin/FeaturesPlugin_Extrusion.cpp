@@ -35,59 +35,55 @@ void FeaturesPlugin_Extrusion::initAttributes()
 
 void FeaturesPlugin_Extrusion::execute()
 {
-  std::shared_ptr<ModelAPI_AttributeSelectionList> aFaceRefs = std::dynamic_pointer_cast<
-    ModelAPI_AttributeSelectionList>(data()->attribute(FeaturesPlugin_Extrusion::LIST_ID()));
-  if (aFaceRefs.get() == NULL || aFaceRefs->size() == 0) {
-    clearResult();
-    return;
+  AttributeSelectionListPtr aFaceRefs = selectionList(FeaturesPlugin_Extrusion::LIST_ID());
+
+  // for each selected face generate a result
+  int anIndex = 0;
+  for(; anIndex < aFaceRefs->size(); anIndex++) {
+    std::shared_ptr<ModelAPI_AttributeSelection> aFaceRef = aFaceRefs->value(anIndex);
+    if (!aFaceRef.get())
+      continue;
+    std::shared_ptr<GeomAPI_Shape> aFace = aFaceRef->value();
+    if (!aFace.get())
+      continue;
+    ResultPtr aContextRes = aFaceRef->context();
+    std::shared_ptr<GeomAPI_Shape> aContext = aContextRes->shape();
+    if (!aContext.get()) {
+      static const std::string aContextError = "The selection context is bad";
+      setError(aContextError);
+      break;
+    }
+
+    double aSize = real(FeaturesPlugin_Extrusion::SIZE_ID())->value();
+    if (boolean(FeaturesPlugin_Extrusion::REVERSE_ID())->value())
+      aSize = -aSize;
+
+    ResultBodyPtr aResultBody = document()->createBody(data(), anIndex);
+    GeomAlgoAPI_Extrusion aFeature(aFace, aSize);
+    if(!aFeature.isDone()) {
+      static const std::string aFeatureError = "Extrusion algorithm failed";  
+      setError(aFeatureError);
+      break;
+    }
+
+    // Check if shape is valid
+    if (aFeature.shape()->isNull()) {
+      static const std::string aShapeError = "Resulting shape is Null";     
+      setError(aShapeError);
+      break;
+    }
+    if(!aFeature.isValid()) {
+      std::string aFeatureError = "Warning: resulting shape is not valid";  
+      setError(aFeatureError);
+      break;
+    }  
+    //LoadNamingDS
+    LoadNamingDS(aFeature, aResultBody, aFace, aContext);
+
+    setResult(aResultBody, anIndex);
   }
-  std::shared_ptr<ModelAPI_AttributeSelection> aFaceRef = aFaceRefs->value(0);
-  if (!aFaceRef)
-    return;
-
-  std::shared_ptr<GeomAPI_Shape> aFace = 
-    std::dynamic_pointer_cast<GeomAPI_Shape>(aFaceRef->value());
-  if (!aFace)
-    return;
-
-  std::shared_ptr<GeomAPI_Shape> aContext;
-  ResultPtr aContextRes = aFaceRef->context();
-  if (aContextRes && aContextRes->groupName() == ModelAPI_ResultConstruction::group()) {
-    aContext = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContextRes)->shape();
-  }
-  if (!aContext) {
-    static const std::string aContextError = "The selection context is bad";
-    setError(aContextError);
-    return;
-  }
-
-  double aSize = data()->real(FeaturesPlugin_Extrusion::SIZE_ID())->value();
-  if (data()->boolean(FeaturesPlugin_Extrusion::REVERSE_ID())->value())
-    aSize = -aSize;
-
-  std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
-  GeomAlgoAPI_Extrusion aFeature(aFace, aSize);
-  if(!aFeature.isDone()) {
-    static const std::string aFeatureError = "Extrusion algorithm failed";  
-    setError(aFeatureError);
-    return;
-  }
-
-  // Check if shape is valid
-  if (aFeature.shape()->isNull()) {
-    static const std::string aShapeError = "Resulting shape is Null";     
-    setError(aShapeError);
-    return;
-  }
-  if(!aFeature.isValid()) {
-    std::string aFeatureError = "Warning: resulting shape is not valid";  
-    setError(aFeatureError);
-    return;
-  }  
-  //LoadNamingDS
-  LoadNamingDS(aFeature, aResultBody, aFace, aContext);
-
-  setResult(aResultBody);
+  // remove the rest results if there were produced in the previous pass
+  removeResults(anIndex);
 }
 
 //============================================================================

@@ -4,9 +4,9 @@
       
       class FeaturesPlugin_Extrusion : public ModelAPI_Feature
         static const std::string MY_EXTRUSION_ID("Extrusion");
-        static const std::string MY_FACE_ID("extrusion_face");
-        static const std::string MY_SIZE_ID("extrusion_size");
-        static const std::string MY_REVERSE_ID("extrusion_reverse");
+        static const std::string MY_FACE_ID("base");
+        static const std::string MY_SIZE_ID("size");
+        static const std::string MY_REVERSE_ID("reverse");
           
         data()->addAttribute(FeaturesPlugin_Extrusion::FACE_ID(), ModelAPI_AttributeSelection::type());
         data()->addAttribute(FeaturesPlugin_Extrusion::SIZE_ID(), ModelAPI_AttributeDouble::type());
@@ -89,10 +89,13 @@ for i in xrange(0, N * N):
 
   anExtrusionFt = aPart.addFeature("Extrusion")
   assert (anExtrusionFt.getKind() == "Extrusion")
-  anExtrusionFt.selection("extrusion_face").setValue(
+
+  # selection type FACE=4
+  anExtrusionFt.selectionList("base").setSelectionType(4)
+  anExtrusionFt.selectionList("base").append(
       aSketchResult, aSketchFaces[0])
-  anExtrusionFt.real("extrusion_size").setValue(10)
-  anExtrusionFt.boolean("extrusion_reverse").setValue(False)
+  anExtrusionFt.real("size").setValue(10)
+  anExtrusionFt.boolean("reverse").setValue(False)
   anExtrusions.append(anExtrusionFt)
 
 aSession.finishOperation()
@@ -148,11 +151,12 @@ GeomAlgoAPI_SketchBuilder.createFaces(
     origin, dirX, dirY, norm, aSketchEdges, aSketchFaces)
 # Create extrusion on them
 aBox = aPart.addFeature("Extrusion")
-aBox.selection("extrusion_face").setValue(
+# selection type FACE=4
+aBox.selectionList("base").setSelectionType(4)
+aBox.selectionList("base").append(
     aSketchResult, aSketchFaces[0])
-aBox.real("extrusion_size").setValue(10)
-aBox.boolean("extrusion_reverse").setValue(False)
-
+aBox.real("size").setValue(10)
+aBox.boolean("reverse").setValue(False)
 aSession.finishOperation()
 
 
