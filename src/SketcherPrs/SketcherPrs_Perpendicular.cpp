@@ -54,11 +54,11 @@ void SketcherPrs_Perpendicular::Compute(const Handle(PrsMgr_PresentationManager3
   ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
   ObjectPtr aObj2 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_B());
 
-  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getLine(aObj1);
+  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getShape(aObj1);
   if (aLine1.get() == NULL)
     return;
 
-  std::shared_ptr<GeomAPI_Shape> aLine2 = SketcherPrs_Tools::getLine(aObj2);
+  std::shared_ptr<GeomAPI_Shape> aLine2 = SketcherPrs_Tools::getShape(aObj2);
   if (aLine2.get() == NULL)
     return;
 

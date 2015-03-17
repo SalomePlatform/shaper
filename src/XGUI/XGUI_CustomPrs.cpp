@@ -9,6 +9,8 @@
 #include <ModelAPI_AttributeIntArray.h>
 #include <Config_PropManager.h>
 
+#include <Events_Error.h>
+
 #include <vector>
 
 
@@ -37,9 +39,12 @@ void getDefaultColor(ResultPtr theResult, AISObjectPtr thePrs, std::vector<int>&
       theColor = Config_PropManager::color(aSection, aName, aDefault);
     }
   }
-  if (theColor.empty()) // all AIS objects, where the color is not set, a white.
+  if (theColor.empty()) {
+    // all AIS objects, where the color is not set, are in black.
     // The color should be defined in XML or set in the attribute
-    theColor = Config_PropManager::color("Visualization", "object_default_color", "#ffffff");
+    theColor = Config_PropManager::color("Visualization", "object_default_color", "#000000");
+    Events_Error::send("A default color is not defined in the preferences for this kind of result");
+  }
 }
 
 bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,

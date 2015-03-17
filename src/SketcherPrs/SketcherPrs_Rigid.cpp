@@ -9,6 +9,9 @@
 #include "SketcherPrs_PositionMgr.h"
 
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Curve.h>
+#include <GeomAPI_Vertex.h>
 
 #include <SketchPlugin_Constraint.h>
 
@@ -30,6 +33,12 @@
 #include <SelectMgr_SequenceOfOwner.hxx>
 #include <SelectMgr_Selection.hxx>
 #include <SelectMgr_EntityOwner.hxx>
+
+#include <GeomAdaptor_Curve.hxx>
+#include <BRep_Tool.hxx>
+#include <StdPrs_DeflectionCurve.hxx>
+#include <StdPrs_Point.hxx>
+#include <Geom_CartesianPoint.hxx>
 
 
 extern std::shared_ptr<GeomAPI_Pnt2d> getFeaturePoint(DataPtr theData,
@@ -56,7 +65,7 @@ void SketcherPrs_Rigid::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   prepareAspect();
 
   ObjectPtr aObj1 = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
-  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getLine(aObj1);
+  std::shared_ptr<GeomAPI_Shape> aLine1 = SketcherPrs_Tools::getShape(aObj1);
   if (aLine1.get() == NULL)
     return;
 
@@ -71,11 +80,31 @@ void SketcherPrs_Rigid::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 
 void SketcherPrs_Rigid::drawLines(const Handle(Prs3d_Presentation)& thePrs, Quantity_Color theColor) const
 {
+  ObjectPtr aObj = SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
+  std::shared_ptr<GeomAPI_Shape> aShape = SketcherPrs_Tools::getShape(aObj);
+  if (aShape.get() == NULL)
+    return;
+
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
+  if (aShape->isEdge()) {
+    Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
+    aGroup->SetPrimitivesAspect(aLineAspect);
+    std::shared_ptr<GeomAPI_Curve> aCurve = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape));
+    if (aCurve->isLine()) {
+      addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
+    } else {
+      GeomAdaptor_Curve aAdaptor(aCurve->impl<Handle(Geom_Curve)>(), aCurve->startParam(), aCurve->endParam());
+      StdPrs_DeflectionCurve::Add(thePrs,aAdaptor,myDrawer);
+    }
+  } else {
+    // This is a point
+    Handle(Prs3d_PointAspect) aPntAspect = new Prs3d_PointAspect(Aspect_TOM_PLUS, theColor, 1);
+    myDrawer->SetPointAspect(aPntAspect);
 
-  Handle(Graphic3d_AspectLine3d) aLineAspect = new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
-  aGroup->SetPrimitivesAspect(aLineAspect);
-
-  addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
+    std::shared_ptr<GeomAPI_Vertex> aVertex = std::shared_ptr<GeomAPI_Vertex>(new GeomAPI_Vertex(aShape));
+    std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
+    Handle(Geom_CartesianPoint) aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
+    StdPrs_Point::Add(thePrs, aPoint, myDrawer);
+  }
 }
 
