@@ -37,7 +37,9 @@ AISObjectPtr SketchPlugin_ConstraintTangent::getAISObject(AISObjectPtr thePrevio
     return thePrevious;
 
   AISObjectPtr anAIS = thePrevious;
-  /// TODO: Tangency constraint presentation should be put here
+  if (!anAIS) {
+    anAIS = SketcherPrs_Factory::tangentConstraint(this, sketch()->coordinatePlane());
+  }
   return anAIS;
 }
 

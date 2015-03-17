@@ -33,5 +33,6 @@
      <file>icons/horisontal.png</file>
      <file>icons/vertical.png</file>
      <file>icons/equal.png</file>
+     <file>icons/tangent.png</file>
  </qresource>
  </RCC>

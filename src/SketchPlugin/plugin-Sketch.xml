@@ -174,7 +174,7 @@
         </sketch_constraint_shape_selector>
       </feature>
     <!--  SketchConstraintTangent  -->
-      <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two objects">
+      <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two objects" icon=":icons/tangent.png">
         <sketch_constraint_shape_selector id="ConstraintEntityA" 
             label="First object" tooltip="Select line or arc" shape_types="edge">
         </sketch_constraint_shape_selector>

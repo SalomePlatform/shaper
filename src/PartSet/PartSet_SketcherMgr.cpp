@@ -51,6 +51,7 @@
 #include <SketchPlugin_ConstraintHorizontal.h>
 #include <SketchPlugin_ConstraintVertical.h>
 #include <SketchPlugin_ConstraintEqual.h>
+#include <SketchPlugin_ConstraintTangent.h>
 
 #include <SelectMgr_IndexedMapOfOwner.hxx>
 #include <StdSelect_BRepOwner.hxx>
@@ -584,6 +585,7 @@ QStringList PartSet_SketcherMgr::sketchOperationIdList()
     aIds << SketchPlugin_ConstraintHorizontal::ID().c_str();
     aIds << SketchPlugin_ConstraintVertical::ID().c_str();
     aIds << SketchPlugin_ConstraintEqual::ID().c_str();
+    aIds << SketchPlugin_ConstraintTangent::ID().c_str();
   }
   return aIds;
 }

@@ -12,6 +12,7 @@ SET(PROJECT_HEADERS
 	SketcherPrs_Rigid.h
 	SketcherPrs_HVDirection.h
 	SketcherPrs_Equal.h
+	SketcherPrs_Tangent.h
 )
 
 SET(PROJECT_SOURCES
@@ -25,6 +26,7 @@ SET(PROJECT_SOURCES
 	SketcherPrs_Rigid.cpp
 	SketcherPrs_HVDirection.cpp
 	SketcherPrs_Equal.cpp
+	SketcherPrs_Tangent.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -45,6 +47,7 @@ SET(PROJECT_PICTURES
 	icons/horisontal.png
 	icons/vertical.png
 	icons/equal.png
+	icons/tangent.png
 )
 
 ADD_DEFINITIONS(-DCONSTRAINTS_EXPORTS ${CAS_DEFINITIONS})

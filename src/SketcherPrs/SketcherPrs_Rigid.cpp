@@ -41,9 +41,6 @@
 #include <Geom_CartesianPoint.hxx>
 
 
-extern std::shared_ptr<GeomAPI_Pnt2d> getFeaturePoint(DataPtr theData,
-                                                      const std::string& theAttribute);
-
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Rigid, SketcherPrs_SymbolPrs);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Rigid, SketcherPrs_SymbolPrs);

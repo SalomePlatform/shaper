@@ -25,11 +25,6 @@
 #include <Graphic3d_ArrayOfSegments.hxx>
 
 
-// Function which is defined in SketchPlugin_ConstraintDistance.cpp
-extern std::shared_ptr<GeomAPI_Pnt2d> getFeaturePoint(DataPtr theData,
-                                                      const std::string& theAttribute);
-
-
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_Perpendicular, SketcherPrs_SymbolPrs);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Perpendicular, SketcherPrs_SymbolPrs);

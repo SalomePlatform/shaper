@@ -32,9 +32,6 @@
 #include <SelectMgr_EntityOwner.hxx>
 
 
-extern std::shared_ptr<GeomAPI_Pnt2d> getFeaturePoint(DataPtr theData,
-                                                      const std::string& theAttribute);
-
 
 IMPLEMENT_STANDARD_HANDLE(SketcherPrs_HVDirection, SketcherPrs_SymbolPrs);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_HVDirection, SketcherPrs_SymbolPrs);
